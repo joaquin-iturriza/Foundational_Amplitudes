@@ -1,0 +1,13 @@
+_target_: wrappers.AmplitudeMLPWrapper
+
+net:
+  _target_: models.mlp.MLP
+
+  in_shape: 20
+  out_shape: 1
+
+  hidden_channels: 128
+  hidden_layers: 5
+  
+  activation: 'gelu'
+  num_groups: 1
