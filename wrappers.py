@@ -50,9 +50,7 @@ class AmplitudeMLPWrapper(nn.Module):
 
     def forward(self, inputs, type_token, global_token, attn_mask=None):
         # ignore type_token, global_token and attn_mask (architecture is not permutation invariant)
-        # nprocesses, batchsize, num_particles, num_components = inputs.shape
-        # inputs = inputs.reshape(nprocesses, batchsize, num_particles * num_components)
-        out = self.net(inputs, type_token)
+        out = self.net(inputs)
         return out
 
 

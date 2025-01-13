@@ -7,9 +7,9 @@ from base_plots import plot_loss
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = "Charter"
 plt.rcParams["text.usetex"] = True
-plt.rcParams[
-    "text.latex.preamble"
-] = r"\usepackage[bitstream-charter]{mathdesign} \usepackage{amsmath} \usepackage{siunitx}"
+plt.rcParams["text.latex.preamble"] = (
+    r"\usepackage[bitstream-charter]{mathdesign} \usepackage{amsmath} \usepackage{siunitx}"
+)
 
 FONTSIZE = 14
 FONTSIZE_LEGEND = 13
@@ -102,6 +102,54 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                         bins=bins,
                         logy=True,
                     )
+        out = f"{plot_path}/delta_abs.pdf"
+        with PdfPages(out) as file:
+            delta_test = np.abs(
+                (
+                    plot_dict["results_test"][dataset]["raw"]["prediction"]
+                    - plot_dict["results_test"][dataset]["raw"]["truth"]
+                )
+                / plot_dict["results_test"][dataset]["raw"]["truth"]
+            )
+            delta_train = np.abs(
+                (
+                    plot_dict["results_train"][dataset]["raw"]["prediction"]
+                    - plot_dict["results_train"][dataset]["raw"]["truth"]
+                )
+                / plot_dict["results_train"][dataset]["raw"]["truth"]
+            )
+
+            # determine 1% largest amplitudes
+            scale = plot_dict["results_test"][dataset]["raw"]["truth"]
+            largest_idx = round(0.01 * len(scale))
+            sort_idx = np.argsort(scale)
+            largest_min = scale[sort_idx][-largest_idx - 1]
+            largest_mask = scale > largest_min
+
+            xrange = (1e-8, 1)
+            bins = 60
+            plot_delta_histogram(
+                file,
+                [delta_test, delta_train],
+                labels=["Test", "Train"],
+                title=title[idataset],
+                xrange=xrange,
+                xlabel=r"$|\Delta| = |\frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}|$ [\%]",
+                bins=bins,
+                logx=True,
+                logy=False,
+            )
+            plot_delta_histogram(
+                file,
+                [delta_test, delta_test[largest_mask]],
+                labels=["Test", "Largest 1\%"],
+                title=title[idataset],
+                xrange=xrange,
+                xlabel=r"$|\Delta| = |\frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}|$ [\%]",
+                bins=bins,
+                logx=True,
+                logy=False,
+            )
 
     if cfg.plotting.delta_prepd and cfg.evaluate:
         out = f"{plot_path}/delta_prepd.pdf"
@@ -245,11 +293,22 @@ def plot_histograms(
 
 
 def plot_delta_histogram(
-    file, datas, labels, title, xrange, bins=60, xlabel=None, logy=False
+    file,
+    datas,
+    labels,
+    title,
+    xrange,
+    bins=60,
+    xlabel=None,
+    logy=False,
+    logx=False,
 ):
     assert len(datas) == 2
     dup_last = lambda a: np.append(a, a[-1])
-    _, bins = np.histogram(datas[0], bins=bins - 1, range=xrange)
+    if logx:
+        bins = np.logspace(np.log(xrange[0]), np.log(xrange[1]), bins)
+    else:
+        _, bins = np.histogram(datas[0], bins=bins - 1, range=xrange)
     hists, scales, mses = [], [], []
     for data in datas:
         mse = np.mean(data**2)
@@ -283,6 +342,8 @@ def plot_delta_histogram(
 
     if logy:
         axs.set_yscale("log")
+    if logx:
+        axs.set_xscale("log")
     ymin, ymax = axs.get_ylim()
     if not logy:
         ymin = 0.0

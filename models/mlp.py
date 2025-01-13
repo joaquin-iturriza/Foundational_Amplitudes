@@ -5,7 +5,6 @@ import torch
 from torch import nn
 
 from .activation import switchable_activation
-from transformations import *
 
 
 class MLP(nn.Module):
@@ -16,6 +15,7 @@ class MLP(nn.Module):
 
     def __init__(
         self,
+        n_features,
         type_token_list,
         hidden_channels,
         hidden_layers,
@@ -30,21 +30,10 @@ class MLP(nn.Module):
         if not hidden_layers > 0:
             raise NotImplementedError("Only supports > 0 hidden layers")
 
-        n_particles = len(type_token_list)
-        if fv_input:
-            self.in_shape = 4*n_particles
-        else:
-            self.in_shape = 0
-        if transforms:
-            self.trafo_fns = [t['fn'] for t in transforms]
-            for t in transforms:
-                self.in_shape += t['out_dim']
-            self.transforms = transforms
-        else:
-            self.in_shape = 4*len(type_token_list)
+        self.in_shape = n_features
         self.out_shape = 1
 
-        layers: List[nn.Module] = [nn.Linear(np.prod(in_shape), hidden_channels)]
+        layers: List[nn.Module] = [nn.Linear(np.prod(self.in_shape), hidden_channels)]
         if dropout_prob is not None:
             layers.append(nn.Dropout(dropout_prob))
         for _ in range(hidden_layers - 1):

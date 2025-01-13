@@ -71,9 +71,9 @@ class BaseExperiment:
 
         self.init_physics()
         # self.init_geometric_algebra()
-        self.init_model()
         self.init_data()
         self._init_dataloader()
+        self.init_model()
         self._init_loss()
 
         if self.cfg.train:
@@ -101,6 +101,7 @@ class BaseExperiment:
 
     def init_model(self):
         # initialize model
+        print(self.cfg.model)
         self.model = instantiate(self.cfg.model)
         num_parameters = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad

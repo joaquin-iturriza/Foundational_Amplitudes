@@ -24,7 +24,7 @@ training:
  iterations : 20
  train_test_val: [.4, .5, .1]
  subsample: null
- es_patience: 1000000
+ es_patience: 100000000000
  es_load_best_model: true
  validate_every_n_steps: 100
 

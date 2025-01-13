@@ -63,8 +63,7 @@ class AmplitudeExperiment(BaseExperiment):
             if self.cfg.data.include_permsym:
                 self.type_token.append(TYPE_TOKEN_DICT[dataset])
             else:
-                self.type_token.append(
-                    list(range(len(TYPE_TOKEN_DICT[dataset]))))
+                self.type_token.append(list(range(len(TYPE_TOKEN_DICT[dataset]))))
 
         token_size = max(
             [max([max(token) for token in self.type_token]) + 1, self.n_datasets]
@@ -85,18 +84,6 @@ class AmplitudeExperiment(BaseExperiment):
                 self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
                     self.cfg.data.dataset[0]
                 ]
-            # elif modelname == "MLP" or modelname == "KANnet":
-            #     if "aag_inv" in self.cfg.data.dataset[0] or "zgg_inv" in self.cfg.data.dataset[0] or "zgg_pinv" in self.cfg.data.dataset[0]:
-            #         self.cfg.model.net.in_shape = 10
-            #         if 'all' in self.cfg.data.dataset[0]:
-            #             self.cfg.model.net.in_shape = 20
-            #     else:
-            #         self.cfg.model.net.in_shape = 4 * len(
-            #             TYPE_TOKEN_DICT[self.cfg.data.dataset[0]]
-            #         )
-            # elif modelname == "DSI":
-            # else:
-            #     raise ValueError(f"model {modelname} not implemented")
 
     def init_data(self):
         LOGGER.info(
@@ -117,11 +104,9 @@ class AmplitudeExperiment(BaseExperiment):
         for dataset in self.cfg.data.dataset:
             # load data
             data_path = os.path.join(self.cfg.data.data_path, f"{dataset}.npy")
-            assert os.path.exists(
-                data_path), f"data_path {data_path} does not exist"
+            assert os.path.exists(data_path), f"data_path {data_path} does not exist"
             data_raw = np.load(data_path)
-            LOGGER.info(
-                f"Loaded data with shape {data_raw.shape} from {data_path}")
+            LOGGER.info(f"Loaded data with shape {data_raw.shape} from {data_path}")
 
             # bring data into correct shape
             if self.cfg.data.subsample is not None:
@@ -130,20 +115,28 @@ class AmplitudeExperiment(BaseExperiment):
                     f"Reducing the size of the dataset from {data_raw.shape[0]} to {self.cfg.data.subsample}"
                 )
                 data_raw = data_raw[: self.cfg.data.subsample, :]
-            
+
             particles = data_raw[:, :-1]
-            particles = particles.reshape(
-                particles.shape[0], particles.shape[1] // 4, 4
-            )
+            # particles = particles.reshape(
+            #     particles.shape[0], particles.shape[1] // 4, 4
+            # )
             amplitudes = data_raw[:, [-1]]
 
+            # ensure that fvs are included if model is DSI
+            if "DSI" in self.cfg.model.net._target_:
+                assert self.cfg.data.incl_fvs, "DSI model requires fvs"
+
             # preprocess data
-            amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
-                amplitudes)
-            if type(self.model.net).__name__ in BASELINE_MODELS:
-                particles_prepd, _, _ = preprocess_particles(particles)
-            else:
-                particles_prepd = particles / particles.std()
+            amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(amplitudes)
+            particles_prepd = preprocess_particles(
+                particles,
+                self.type_token,
+                trafos=self.cfg.data.trafos,
+                incl_fvs=self.cfg.data.incl_fvs,
+            )
+
+            # save number of features for later
+            self.cfg.model.net.n_features = particles_prepd.shape[-1]
 
             # collect everything
             self.particles.append(particles)
@@ -165,35 +158,36 @@ class AmplitudeExperiment(BaseExperiment):
         for idataset in range(self.n_datasets):
             n_data = self.particles[idataset].shape[0]
             self.split_train = int(n_data * self.cfg.data.train_test_val[0])
-            self.split_test = int(
-                n_data * sum(self.cfg.data.train_test_val[:2]))
+            self.split_test = int(n_data * sum(self.cfg.data.train_test_val[:2]))
             self.split_val = int(n_data * sum(self.cfg.data.train_test_val))
 
             train_sets["particles"].append(
-                self.particles_prepd[idataset][0: self.split_train]
+                self.particles_prepd[idataset][0 : self.split_train]
             )
             train_sets["amplitudes"].append(
-                self.amplitudes_prepd[idataset][0: self.split_train]
+                self.amplitudes_prepd[idataset][0 : self.split_train]
             )
             if self.cfg.data.no_props:
-                self.props_train = self.props[idataset][0: self.split_train]
+                self.props_train = self.props[idataset][0 : self.split_train]
             test_sets["particles"].append(
-                self.particles_prepd[idataset][self.split_train: self.split_test]
+                self.particles_prepd[idataset][self.split_train : self.split_test]
             )
             test_sets["amplitudes"].append(
-                self.amplitudes_prepd[idataset][self.split_train: self.split_test]
+                self.amplitudes_prepd[idataset][self.split_train : self.split_test]
             )
             if self.cfg.data.no_props:
-                self.props_test = self.props[idataset][self.split_train: self.split_test]
+                self.props_test = self.props[idataset][
+                    self.split_train : self.split_test
+                ]
 
             val_sets["particles"].append(
-                self.particles_prepd[idataset][self.split_test: self.split_val]
+                self.particles_prepd[idataset][self.split_test : self.split_val]
             )
             val_sets["amplitudes"].append(
-                self.amplitudes_prepd[idataset][self.split_test: self.split_val]
+                self.amplitudes_prepd[idataset][self.split_test : self.split_val]
             )
             if self.cfg.data.no_props:
-                self.props_val = self.props[idataset][self.split_test: self.split_val]
+                self.props_val = self.props[idataset][self.split_test : self.split_val]
 
         # create dataloaders
         self.train_loader = torch.utils.data.DataLoader(
@@ -233,10 +227,8 @@ class AmplitudeExperiment(BaseExperiment):
                     self.results_train = self._evaluate_single(
                         self.train_loader, "train"
                     )
-                    self.results_val = self._evaluate_single(
-                        self.val_loader, "val")
-                    self.results_test = self._evaluate_single(
-                        self.test_loader, "test")
+                    self.results_val = self._evaluate_single(self.val_loader, "val")
+                    self.results_test = self._evaluate_single(self.test_loader, "test")
 
                 # also evaluate without ema to see the effect
                 self._evaluate_single(self.train_loader, "train_noema")
@@ -244,12 +236,9 @@ class AmplitudeExperiment(BaseExperiment):
                 self._evaluate_single(self.test_loader, "test_noema")
 
             else:
-                self.results_train = self._evaluate_single(
-                    self.train_loader, "train")
-                self.results_val = self._evaluate_single(
-                    self.val_loader, "val")
-                self.results_test = self._evaluate_single(
-                    self.test_loader, "test")
+                self.results_train = self._evaluate_single(self.train_loader, "train")
+                self.results_val = self._evaluate_single(self.val_loader, "val")
+                self.results_test = self._evaluate_single(self.test_loader, "test")
 
     def _evaluate_single(self, loader, title):
         # compute predictions
@@ -280,8 +269,7 @@ class AmplitudeExperiment(BaseExperiment):
 
                 y_pred = pred[0, ..., 0]
 
-                amplitudes_pred_prepd[idataset].append(
-                    y_pred.cpu().float().numpy())
+                amplitudes_pred_prepd[idataset].append(y_pred.cpu().float().numpy())
                 amplitudes_truth_prepd[idataset].append(
                     y.flatten().cpu().float().numpy()
                 )
@@ -333,7 +321,12 @@ class AmplitudeExperiment(BaseExperiment):
             mse = np.mean((amp_truth - amp_pred) ** 2)
 
             delta = (amp_truth - amp_pred) / amp_truth
-            delta_maxs = [0.001, 0.01, 0.1]
+            delta_abs = np.abs(delta)
+            delta_abs_mean = np.mean(delta_abs)
+            LOGGER.info(
+                f"Mean absolute relative error on {dataset} {title} dataset: {delta_abs_mean:.4f}"
+            )
+            delta_maxs = [1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2]
             delta_rates = []
             for delta_max in delta_maxs:
                 rate = np.mean(
@@ -344,12 +337,22 @@ class AmplitudeExperiment(BaseExperiment):
                 f"rate of events in delta interval on {dataset} {title} dataset:\t"
                 f"{[f'{delta_rates[i]:.4f} ({delta_maxs[i]})' for i in range(len(delta_maxs))]}"
             )
+            # determine 1% largest amplitudes
+            scale = np.abs(amp_truth)
+            idx = np.argsort(scale)
+            idx = idx[-int(0.01 * len(idx)) :]
+            delta_abs_mean_1percent = np.mean(delta_abs[idx])
+            LOGGER.info(
+                f"Mean absolute relative error on 1% largest amplitudes on {dataset} {title} dataset: {delta_abs_mean_1percent:.4f}"
+            )
 
             # log to mlflow
             if self.cfg.use_mlflow:
                 log_dict = {
                     f"eval.{title}.{dataset}.mse": mse_prepd,
                     f"eval.{title}.{dataset}.mse_raw": mse,
+                    f"eval.{title}.{dataset}.delta_abs_mean": delta_abs_mean,
+                    f"eval.{title}.{dataset}.delta_abs_mean_1percent": delta_abs_mean_1percent,
                 }
                 for key, value in log_dict.items():
                     log_mlflow(key, value)
@@ -376,8 +379,7 @@ class AmplitudeExperiment(BaseExperiment):
             DATASET_TITLE_DICT[dataset] for dataset in self.cfg.data.dataset
         ]
         model_title = MODEL_TITLE_DICT[type(self.model.net).__name__]
-        title = [
-            f"{model_title}: {dataset_title}" for dataset_title in dataset_titles]
+        title = [f"{model_title}: {dataset_title}" for dataset_title in dataset_titles]
         LOGGER.info(f"Creating plots in {plot_path}")
 
         plot_dict = {}
@@ -404,8 +406,7 @@ class AmplitudeExperiment(BaseExperiment):
             type_token = torch.tensor(
                 self.type_token, dtype=torch.long, device=self.device
             )
-            global_token = torch.tensor(
-                [0], dtype=torch.long, device=self.device)
+            global_token = torch.tensor([0], dtype=torch.long, device=self.device)
         else:
             particles_max = data[-1][0].shape[-2]
             assert particles_max == max([d[0].shape[-2] for d in data])
@@ -431,8 +432,7 @@ class AmplitudeExperiment(BaseExperiment):
             for i, d in enumerate(data):
                 particles_i = d[0].shape[-2]
                 x[i, :, :particles_i, :] = d[0]
-                attn_mask[i, :, :, : (1 + particles_i),
-                          : (1 + particles_i)] = 0.0
+                attn_mask[i, :, :, : (1 + particles_i), : (1 + particles_i)] = 0.0
                 type_token[i, :particles_i] = torch.tensor(
                     self.type_token[i], dtype=torch.long, device=self.device
                 )

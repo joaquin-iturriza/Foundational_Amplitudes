@@ -8,6 +8,12 @@ data:
  include_permsym: true
  train_test_val: [.4, .5, .1]
  no_props: false
+ trafos:
+  invs:
+  - invs
+  - log
+  - standardization
+ incl_fvs: true
 
 train: true
 training:

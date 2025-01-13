@@ -1,24 +1,6 @@
 import numpy as np
 
 
-def preprocess_particles(particles_raw, trafos=None, mean=None, std=None, eps_std=1e-2):
-    assert np.isfinite(particles_raw).all()
-    
-    if trafos:
-    
-    else:
-        features = particles_raw
-    
-    if mean is None or std is None:
-        mean = features.mean((0, 1))
-        std = features.std((0, 1))
-        std = np.clip(std, a_min=eps_std, a_max=None)  # avoid std=0.
-
-    features = (features - mean) / std
-    assert np.isfinite(features).all()
-    return features, mean, std
-
-
 def preprocess_amplitude(amplitude, std=None):
     log_amplitude = np.log(amplitude)
     if std is None:
@@ -34,3 +16,106 @@ def undo_preprocess_amplitude(prepd_amplitude, mean, std):
     log_amplitude = prepd_amplitude * std + mean
     amplitude = np.exp(log_amplitude)
     return amplitude
+
+
+def preprocess_particles(
+    particles_raw,
+    type_tokens,
+    trafos=None,
+    incl_fvs=True,
+    mean=None,
+    std=None,
+    eps_std=1e-2,
+    return_dict=False
+):
+    assert np.isfinite(particles_raw).all()
+
+    feature_sets = {}
+    if trafos:
+        for t_name, t_fns in trafos.items():
+            transformed_features = particles_raw
+            for fn_str in t_fns:
+                fn = get_fn(fn_str)
+                transformed_features = fn(transformed_features, type_tokens)
+            feature_sets[t_name] = transformed_features
+
+    if incl_fvs:
+        feature_sets["fvs_standardized"] = standardization(particles_raw)
+
+    if return_dict:
+        return feature_sets
+    else:
+        return np.concatenate(list(feature_sets.values()), axis=1)
+
+
+def standardization(features):
+    """standardize features"""
+    mean = features.mean(axis=0)
+    std = features.std(axis=0)
+    std = np.clip(std, a_min=1e-2, a_max=None)  # avoid std=0.
+    features = (features - mean) / std
+    assert np.isfinite(features).all()
+    return features
+
+
+def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False):
+    """compute Lorentz invariants out of four-vectors"""
+    print(particles.shape)
+    ps = particles.reshape(particles.shape[0], particles.shape[1] // 4, 4)
+
+    # compute matrix of all inner products
+    def inner_product(p1, p2):
+        return p1[..., 0] * p2[..., 0] - (p1[..., 1:] * p2[..., 1:]).sum(axis=-1)
+
+    if incl_diag_invariants:
+        offset = 0
+    else:
+        offset = 1
+
+    idxs = np.triu_indices(ps.shape[-2], k=offset)
+    invariants = inner_product(ps[..., idxs[0], :], ps[..., idxs[1], :])
+    invariants = np.clip(invariants, a_min=eps, a_max=None)
+    return invariants
+
+
+def sort_particles(particles, type_tokens, sort_key):
+    """sort particles according to some property"""
+    ps = particles.reshape(particles.shape[0], particles.shape[1] // 4, 4)
+    particle_types = np.unique(type_tokens)
+    sorted_ps = []
+    for particle_type in particle_types:
+        mask = type_tokens == particle_type
+        # sort according to energy, which is the first entry of the four-vector
+        match sort_key:
+            case "E":
+                sorted_indices = np.argsort(ps[:, mask][:, :, 0])
+            case "pt":
+                pts = np.linalg.norm(ps[:, mask][:, :, 1:3], axis=-1)
+                sorted_indices = np.argsort(pts)
+            case _:
+                raise ValueError(f"Unknown sort key {sort_key}")
+        sorted_ps.append(
+            np.take_along_axis(ps[:, mask], sorted_indices[:, :, np.newaxis], axis=1)
+        )
+    return np.concatenate(sorted_ps, axis=1).reshape(particles.shape)
+
+
+def get_fn(fn_str):
+    # get function from string
+    match fn_str:
+        case "log":
+            return lambda p, t: np.log(p)
+        case "exp":
+            return lambda p, t: np.exp(p)
+        case "sqrt":
+            return lambda p, t: np.sqrt(p)
+        case "invs":
+            return lambda p, t: compute_invariants(p)
+        case "standardization":
+            return lambda p, t: standardization(p)
+        case "sort_E":
+            return lambda p, t: sort_particles(p, t, "E")
+        case "sort_pt":
+            return lambda p, t: sort_particles(p, t, "pt")
+        case _:
+            raise ValueError(f"Unknown transformation function {fn_str}")
