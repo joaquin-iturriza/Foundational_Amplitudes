@@ -1,4 +1,7 @@
 import numpy as np
+import torch
+from scipy.stats import boxcox
+from sklearn.preprocessing import QuantileTransformer
 
 
 def preprocess_amplitude(amplitude, std=None):
@@ -40,7 +43,9 @@ def preprocess_particles(
             feature_sets[t_name] = transformed_features
 
     if incl_fvs:
-        feature_sets["fvs_standardized"] = standardization(particles_raw)
+        feature_sets["fvs_raw"] = sort_particles(particles_raw, type_tokens, "E")
+        feature_sets["fvs_raw"] /= np.max(np.abs(feature_sets["fvs_raw"][:, ::4])) # normalize by max energy of particles
+        # feature_sets["fvs_raw"] = particles_raw
 
     if return_dict:
         return feature_sets
@@ -58,10 +63,12 @@ def standardization(features):
     return features
 
 
-def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False):
+def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False, reshape=True):
     """compute Lorentz invariants out of four-vectors"""
-    print(particles.shape)
-    ps = particles.reshape(particles.shape[0], particles.shape[1] // 4, 4)
+    if reshape:
+        ps = particles.reshape(particles.shape[0], particles.shape[1] // 4, 4)
+    else:
+        ps = particles
 
     # compute matrix of all inner products
     def inner_product(p1, p2):
@@ -74,7 +81,10 @@ def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False):
 
     idxs = np.triu_indices(ps.shape[-2], k=offset)
     invariants = inner_product(ps[..., idxs[0], :], ps[..., idxs[1], :])
-    invariants = np.clip(invariants, a_min=eps, a_max=None)
+    if type(invariants) == np.ndarray:
+        invariants = np.clip(invariants, a_min=eps, a_max=None)
+    else:
+        invariants = torch.clip(invariants, eps, None)
     return invariants
 
 
@@ -100,6 +110,21 @@ def sort_particles(particles, type_tokens, sort_key):
     return np.concatenate(sorted_ps, axis=1).reshape(particles.shape)
 
 
+def apply_boxcox(particles):
+    ps = particles.transpose()
+    res = np.zeros(ps.shape)
+    for i in range(ps.shape[0]):
+        try:
+            res[i] = boxcox(ps[i])[0]
+        except:
+            res[i] = ps[i]
+    return res.transpose()
+
+
+def apply_quantile_transform(particles):
+    return QuantileTransformer(output_distribution='normal').fit_transform(particles)
+
+
 def get_fn(fn_str):
     # get function from string
     match fn_str:
@@ -109,6 +134,12 @@ def get_fn(fn_str):
             return lambda p, t: np.exp(p)
         case "sqrt":
             return lambda p, t: np.sqrt(p)
+        case "inverse":
+            return lambda p, t: 1 / p
+        case "boxcox":
+            return lambda p, t: apply_boxcox(p)
+        case "quantile_transform":
+            return lambda p, t: apply_quantile_transform(p)
         case "invs":
             return lambda p, t: compute_invariants(p)
         case "standardization":
