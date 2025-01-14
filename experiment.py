@@ -45,9 +45,9 @@ DATASET_TITLE_DICT = {
 MODEL_TITLE_DICT = {
     "Transformer": "Tr",
     "MLP": "MLP",
+    "FV_MLP": "FV MLP",
     "DSI": "DSI",
 }
-BASELINE_MODELS = ["MLP", "Transformer"]
 
 
 class AmplitudeExperiment(BaseExperiment):
@@ -117,20 +117,17 @@ class AmplitudeExperiment(BaseExperiment):
                 data_raw = data_raw[: self.cfg.data.subsample, :]
 
             particles = data_raw[:, :-1]
-            # particles = particles.reshape(
-            #     particles.shape[0], particles.shape[1] // 4, 4
-            # )
             amplitudes = data_raw[:, [-1]]
 
-            # ensure that fvs are included if model is DSI
-            if "DSI" in self.cfg.model.net._target_:
-                assert self.cfg.data.incl_fvs, "DSI model requires fvs"
+            # ensure that fvs are included if model is DSI or FV_MLP
+            if "DSI" in self.cfg.model.net._target_ or "FV_MLP" in self.cfg.model.net._target_:
+                assert self.cfg.data.incl_fvs, "DSI/FV_MLP model requires fvs"
 
             # preprocess data
             amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(amplitudes)
             particles_prepd = preprocess_particles(
                 particles,
-                self.type_token,
+                self.type_token[0],
                 trafos=self.cfg.data.trafos,
                 incl_fvs=self.cfg.data.incl_fvs,
             )

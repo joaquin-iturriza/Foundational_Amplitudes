@@ -40,7 +40,7 @@ training:
  eps: 1.e-8
  weight_decay: 0
  
- scheduler: null
+ scheduler: CosineAnnealingLR
  scheduler_scale: 1
  cosanneal_eta_min: 0
  reduceplateau_factor: 0.1

@@ -19,9 +19,9 @@ train: true
 training:
  iterations: 10000 # MLP, DSI: 2500000; Tr: 1000000; GAP, GATr, CGENN: 250000
  optimizer: Adam
- lr: 1e-4
+ lr: 1e-3
  batchsize: 256
- scheduler: null
+ scheduler: CosineAnnealingLR
 
 plot: true
 plotting:
@@ -30,5 +30,5 @@ plotting:
  delta_prepd: true
 
 defaults:
- - model: mlp_amplitudes
+ - model: mlp
  - default
