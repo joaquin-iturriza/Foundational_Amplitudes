@@ -19,6 +19,7 @@ class MLP(nn.Module):
         type_token_list,
         hidden_channels,
         hidden_layers,
+        out_shape=1,
         activation="gelu",
         transforms=None,
         fv_input=True,
@@ -31,7 +32,7 @@ class MLP(nn.Module):
             raise NotImplementedError("Only supports > 0 hidden layers")
 
         self.in_shape = n_features
-        self.out_shape = 1
+        self.out_shape = out_shape
 
         layers: List[nn.Module] = [nn.Linear(np.prod(self.in_shape), hidden_channels)]
         if dropout_prob is not None:

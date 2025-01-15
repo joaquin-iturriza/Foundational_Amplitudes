@@ -3,12 +3,9 @@ _target_: wrappers.AmplitudeDSIWrapper
 net:
   _target_: models.dsi.DSI
 
-  use_deepset: true
   sum_deepset: true
-  use_invariants: true
-  use_only_invariants: false
-  incl_diag_invariants: false
   
+  n_features: 0 # will be overwritten once the data is loaded and transformed
   hidden_channels_prenet: 128
   hidden_layers_prenet: 4
   out_dim_prenet_sep: 64

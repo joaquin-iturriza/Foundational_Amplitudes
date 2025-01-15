@@ -84,6 +84,9 @@ class AmplitudeExperiment(BaseExperiment):
                 self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
                     self.cfg.data.dataset[0]
                 ]
+                assert (
+                    len(np.unique(self.cfg.model.net.type_token_list)) == max(self.cfg.model.net.type_token_list) + 1
+                ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
 
     def init_data(self):
         LOGGER.info(
