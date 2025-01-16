@@ -57,6 +57,7 @@ training:
  force_xformers: false
 
  loss: MSE
+ dtype: float32
 
 evaluate: true
 evaluation:

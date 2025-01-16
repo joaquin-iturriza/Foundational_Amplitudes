@@ -1,4 +1,5 @@
 import hydra
+import torch
 from experiment import AmplitudeExperiment
 
 
@@ -9,6 +10,16 @@ def main(cfg):
     else:
         raise ValueError(f"exp_type {cfg.exp_type} not implemented")
 
+    match cfg.training.dtype:
+        case 'float16':
+            torch.set_default_dtype(torch.float16)
+        case 'float64':
+            torch.set_default_dtype(torch.float64)
+        case 'float32':
+            torch.set_default_dtype(torch.float32)
+        case _:
+            raise ValueError(f"dtype {cfg.dtype} not implemented")
+        
     exp()
 
 
