@@ -13,6 +13,9 @@ data:
   - invs
   - log
   - standardization
+ amp_trafos:
+  - log
+  - standardization
  incl_fvs: true
 
 train: true

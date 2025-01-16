@@ -4,20 +4,33 @@ from scipy.stats import boxcox
 from sklearn.preprocessing import QuantileTransformer
 
 
-def preprocess_amplitude(amplitude, std=None):
-    log_amplitude = np.log(amplitude)
-    if std is None:
-        mean = log_amplitude.mean()
-        std = log_amplitude.std()
-    prepd_amplitude = (log_amplitude - mean) / std
-    assert np.isfinite(prepd_amplitude).all()
-    return prepd_amplitude, mean, std
+def preprocess_amplitude(amplitude, trafos=None):
+    mean, std = 0, 0
+    if trafos:
+        for fn_str in trafos:
+            if (
+                fn_str == "standardization"
+            ):  # treat "standardize" separately because we need to save stds and means
+                amplitude, mean, std = standardization(
+                    amplitude, return_mean_std=True, clip=False
+                )
+            else:
+                fn = get_fn(fn_str)
+                amplitude = fn(amplitude, None)
+    assert np.isfinite(amplitude).all()
+    return amplitude, mean, std
 
 
-def undo_preprocess_amplitude(prepd_amplitude, mean, std):
-    assert mean is not None and std is not None
-    log_amplitude = prepd_amplitude * std + mean
-    amplitude = np.exp(log_amplitude)
+def undo_preprocess_amplitude(amplitude, mean, std, trafos=None):
+    if trafos:
+        trafos = trafos[::-1] # reverse order of trafos
+        for fn_str in trafos:
+            if fn_str == "standardization":
+                amplitude = amplitude * std + mean
+            else:
+                inv_fn = get_inv_fn(fn_str)
+                amplitude = inv_fn(amplitude, None)
+    assert np.isfinite(amplitude).all()
     return amplitude
 
 
@@ -29,7 +42,7 @@ def preprocess_particles(
     mean=None,
     std=None,
     eps_std=1e-2,
-    return_dict=False
+    return_dict=False,
 ):
     assert np.isfinite(particles_raw).all()
 
@@ -44,7 +57,9 @@ def preprocess_particles(
 
     if incl_fvs:
         feature_sets["fvs_raw"] = sort_particles(particles_raw, type_tokens, "E")
-        feature_sets["fvs_raw"] /= np.max(np.abs(feature_sets["fvs_raw"][:, ::4])) # normalize by max energy of particles
+        feature_sets["fvs_raw"] /= np.max(
+            np.abs(feature_sets["fvs_raw"][:, ::4])
+        )  # normalize by max energy of particles
         # feature_sets["fvs_raw"] = particles_raw
 
     if return_dict:
@@ -53,14 +68,18 @@ def preprocess_particles(
         return np.concatenate(list(feature_sets.values()), axis=1)
 
 
-def standardization(features):
+def standardization(features, return_mean_std=False, clip=True):
     """standardize features"""
     mean = features.mean(axis=0)
     std = features.std(axis=0)
-    std = np.clip(std, a_min=1e-2, a_max=None)  # avoid std=0.
+    if clip:
+        std = np.clip(std, a_min=1e-6, a_max=None)  # avoid std=0.
     features = (features - mean) / std
     assert np.isfinite(features).all()
-    return features
+    if return_mean_std:
+        return features, mean, std
+    else:
+        return features
 
 
 def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False, reshape=True):
@@ -122,11 +141,11 @@ def apply_boxcox(particles):
 
 
 def apply_quantile_transform(particles):
-    return QuantileTransformer(output_distribution='normal').fit_transform(particles)
+    return QuantileTransformer(output_distribution="normal").fit_transform(particles)
 
 
 def get_fn(fn_str):
-    # get function from string
+    # get functions from string
     match fn_str:
         case "log":
             return lambda p, t: np.log(p)
@@ -150,3 +169,18 @@ def get_fn(fn_str):
             return lambda p, t: sort_particles(p, t, "pt")
         case _:
             raise ValueError(f"Unknown transformation function {fn_str}")
+
+
+def get_inv_fn(fn_str):
+    # get inverse functions from string
+    match fn_str:
+        case "log":
+            return lambda p, t: np.exp(p)
+        case "exp":
+            return lambda p, t: np.log(p)
+        case "sqrt":
+            return lambda p, t: p**2
+        case "inverse":
+            return lambda p, t: 1 / p
+        case _:
+            raise ValueError(f"Unknown inverse transformation function {fn_str}")

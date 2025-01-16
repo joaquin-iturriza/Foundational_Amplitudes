@@ -86,7 +86,8 @@ class AmplitudeExperiment(BaseExperiment):
                     self.cfg.data.dataset[0]
                 ]
                 assert (
-                    len(np.unique(self.cfg.model.net.type_token_list)) == max(self.cfg.model.net.type_token_list) + 1
+                    len(np.unique(self.cfg.model.net.type_token_list))
+                    == max(self.cfg.model.net.type_token_list) + 1
                 ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
 
     def init_data(self):
@@ -124,11 +125,16 @@ class AmplitudeExperiment(BaseExperiment):
             amplitudes = data_raw[:, [-1]]
 
             # ensure that fvs are included if model is DSI or FV_MLP
-            if "DSI" in self.cfg.model.net._target_ or "FV_MLP" in self.cfg.model.net._target_:
+            if (
+                "DSI" in self.cfg.model.net._target_
+                or "FV_MLP" in self.cfg.model.net._target_
+            ):
                 assert self.cfg.data.incl_fvs, "DSI/FV_MLP model requires fvs"
 
             # preprocess data
-            amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(amplitudes)
+            amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
+                amplitudes, trafos=self.cfg.data.amp_trafos
+            )
             particles_prepd = preprocess_particles(
                 particles,
                 self.type_token[0],
@@ -303,10 +309,16 @@ class AmplitudeExperiment(BaseExperiment):
 
             # undo preprocessing
             amp_truth = undo_preprocess_amplitude(
-                amp_truth_prepd, self.prepd_mean[idataset], self.prepd_std[idataset]
+                amp_truth_prepd,
+                self.prepd_mean[idataset],
+                self.prepd_std[idataset],
+                trafos=self.cfg.data.amp_trafos,
             )
             amp_pred = undo_preprocess_amplitude(
-                amp_pred_prepd, self.prepd_mean[idataset], self.prepd_std[idataset]
+                amp_pred_prepd,
+                self.prepd_mean[idataset],
+                self.prepd_std[idataset],
+                trafos=self.cfg.data.amp_trafos,
             )
             if self.cfg.data.no_props:
                 match title:
@@ -400,11 +412,11 @@ class AmplitudeExperiment(BaseExperiment):
 
     def _init_loss(self):
         match self.cfg.training.loss:
-            case 'MSE':
+            case "MSE":
                 self.loss = torch.nn.MSELoss()
-            case 'L1':
+            case "L1":
                 self.loss = torch.nn.L1Loss()
-            case 'LogCosh':
+            case "LogCosh":
                 self.loss = LogCoshLoss()
             case _:
                 raise ValueError(f"Unknown loss function {self.cfg.training.loss}")
