@@ -15,6 +15,7 @@ from preprocessing import (
 from plots import plot_mixer
 from logger import LOGGER
 from mlflow_util import log_mlflow
+from losses import LogCoshLoss
 
 TYPE_TOKEN_DICT = {
     "aag": [0, 0, 1, 1, 0],
@@ -297,6 +298,8 @@ class AmplitudeExperiment(BaseExperiment):
             # compute metrics over preprocessed amplitudes
             mse_prepd = np.mean((amp_pred_prepd - amp_truth_prepd) ** 2)
             LOGGER.info(f"MSE on {title} {dataset} dataset: {mse_prepd:.4e}")
+            l1_prepd = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd))
+            LOGGER.info(f"L1 on {title} {dataset} dataset: {l1_prepd:.4e}")
 
             # undo preprocessing
             amp_truth = undo_preprocess_amplitude(
@@ -319,6 +322,7 @@ class AmplitudeExperiment(BaseExperiment):
 
             # compute metrics over actual amplitudes
             mse = np.mean((amp_truth - amp_pred) ** 2)
+            l1 = np.mean(np.abs(amp_truth - amp_pred))
 
             delta = (amp_truth - amp_pred) / amp_truth
             delta_abs = np.abs(delta)
@@ -349,10 +353,12 @@ class AmplitudeExperiment(BaseExperiment):
             # log to mlflow
             if self.cfg.use_mlflow:
                 log_dict = {
-                    f"eval.{title}.{dataset}.mse": mse_prepd,
-                    f"eval.{title}.{dataset}.mse_raw": mse,
-                    f"eval.{title}.{dataset}.delta_abs_mean": delta_abs_mean,
-                    f"eval.{title}.{dataset}.delta_abs_mean_1percent": delta_abs_mean_1percent,
+                    f"eval.{title}.mse": mse_prepd,
+                    f"eval.{title}.l1": l1_prepd,
+                    f"eval.{title}.mse_raw": mse,
+                    f"eval.{title}.l1_raw": l1,
+                    f"eval.{title}.delta_abs_mean": delta_abs_mean,
+                    f"eval.{title}.delta_abs_mean_1percent": delta_abs_mean_1percent,
                 }
                 for key, value in log_dict.items():
                     log_mlflow(key, value)
@@ -393,7 +399,15 @@ class AmplitudeExperiment(BaseExperiment):
         plot_mixer(self.cfg, plot_path, title, plot_dict)
 
     def _init_loss(self):
-        self.loss = torch.nn.MSELoss()
+        match self.cfg.training.loss:
+            case 'MSE':
+                self.loss = torch.nn.MSELoss()
+            case 'L1':
+                self.loss = torch.nn.L1Loss()
+            case 'LogCosh':
+                self.loss = LogCoshLoss()
+            case _:
+                raise ValueError(f"Unknown loss function {self.cfg.training.loss}")
 
     def _batch_loss(self, data):
         # average over contributions from different datasets
