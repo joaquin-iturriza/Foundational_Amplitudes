@@ -75,6 +75,7 @@ class BaseExperiment:
         self._init_dataloader()
         self.init_model()
         self._init_loss()
+        self._init_regularization()
 
         if self.cfg.train:
             self._init_optimizer()
@@ -546,7 +547,7 @@ class BaseExperiment:
 
     def _step(self, data, step):
         # actual update step
-        loss, metrics = self._batch_loss(data)
+        loss = self._batch_loss(data)
         self.optimizer.zero_grad()
         loss.backward()
         if self.cfg.training.clip_grad_value is not None:
@@ -583,8 +584,6 @@ class BaseExperiment:
         self.train_loss.append(loss.item())
         self.train_lr.append(self.optimizer.param_groups[0]["lr"])
         self.train_grad_norm.append(grad_norm)
-        for key, value in metrics.items():
-            self.train_metrics[key].append(value)
 
         # log to mlflow
         if (
@@ -601,9 +600,6 @@ class BaseExperiment:
             for key, values in log_dict.items():
                 log_mlflow(f"train.{key}", values, step=step)
 
-            for key, values in metrics.items():
-                log_mlflow(f"train.{key}", values, step=step)
-
     def _validate(self, step):
         losses = []
         metrics = self._init_metrics()
@@ -616,21 +612,15 @@ class BaseExperiment:
                 # use EMA for validation if available
                 if self.ema is not None:
                     with self.ema.average_parameters():
-                        loss, metric = self._batch_loss(data)
+                        loss = self._batch_loss(data)
                 else:
-                    loss, metric = self._batch_loss(data)
+                    loss = self._batch_loss(data)
 
                 losses.append(loss.cpu().item())
-                for key, value in metric.items():
-                    metrics[key].append(value)
         val_loss = np.mean(losses)
         self.val_loss.append(val_loss)
-        for key, values in metrics.items():
-            self.val_metrics[key].append(np.mean(values))
         if self.cfg.use_mlflow:
             log_mlflow("val.loss", val_loss, step=step)
-            for key, values in self.val_metrics.items():
-                log_mlflow(f"val.{key}", values[-1], step=step)
         return val_loss
 
     def _save_config(self, filename, to_mlflow=False):
@@ -683,6 +673,9 @@ class BaseExperiment:
         raise NotImplementedError()
 
     def _init_loss(self):
+        raise NotImplementedError()
+    
+    def _init_regularization(self):
         raise NotImplementedError()
 
     def _batch_loss(self, data):

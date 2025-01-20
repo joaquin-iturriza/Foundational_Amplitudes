@@ -59,6 +59,9 @@ training:
  loss: MSE
  dtype: float32
 
+ regularization: null
+ regularization_lambda: 1e-5
+
 evaluate: true
 evaluation:
  batchsize: 1024
