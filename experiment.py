@@ -420,6 +420,20 @@ class AmplitudeExperiment(BaseExperiment):
                 self.loss = LogCoshLoss()
             case _:
                 raise ValueError(f"Unknown loss function {self.cfg.training.loss}")
+            
+    def _init_regularization(self):
+        self.regularization_lambda = self.cfg.training.regularization_lambda
+        match self.cfg.training.regularization:
+            case "L2":
+                self.regularization = lambda model: sum(param.pow(2.0).sum() for param in model.parameters())
+            case "L1":
+                self.regularization = lambda model: sum(param.abs().sum() for param in model.parameters())
+            case None:
+                self.regularization = lambda model: 0.0
+            case _:
+                raise ValueError(
+                    f"Unknown regularization function {self.cfg.training.regularization}"
+                )
 
     def _batch_loss(self, data):
         # average over contributions from different datasets
@@ -469,18 +483,10 @@ class AmplitudeExperiment(BaseExperiment):
         y_pred = self.model(
             x, type_token=type_token, global_token=global_token, attn_mask=attn_mask
         )
-        loss = self.loss(y, y_pred)
-        mse = [
-            torch.mean((y_pred[i, :, 0] - y[i, :, 0]) ** 2).cpu().item()
-            for i in range(len(data))
-        ]
+        loss = self.loss(y, y_pred) + self.regularization_lambda*self.regularization(self.model)
         assert torch.isfinite(loss).all()
 
-        metrics = {
-            f"{dataset}.mse": mse[i]
-            for (i, dataset) in enumerate(self.cfg.data.dataset)
-        }
-        return loss, metrics
+        return loss
 
     def _init_metrics(self):
         metrics = {f"{dataset}.mse": [] for dataset in self.cfg.data.dataset}
