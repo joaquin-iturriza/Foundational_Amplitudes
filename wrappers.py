@@ -65,30 +65,13 @@ class AmplitudeDSIWrapper(nn.Module):
 
 
 class AmplitudeTransformerWrapper(nn.Module):
-    def __init__(self, net, token_size):
+    def __init__(self, net):
         super().__init__()
         self.net = net
-        self.token_size = token_size
 
     def forward(self, inputs, type_token, global_token, attn_mask=None):
-        nprocesses, batchsize, _, _ = inputs.shape
-
-        type_token, global_token = encode_tokens(
-            type_token,
-            global_token,
-            self.token_size,
-            isgatr=False,
-            batchsize=batchsize,
-            device=inputs.device,
-        )
-
-        # type_token
-        inputs = torch.cat((inputs, type_token), dim=-1)
-
-        # global_token
-        inputs = torch.cat((global_token, inputs), dim=-2)
+        nprocesses, batchsize, _ = inputs.shape
 
         outputs = self.net(inputs, attention_mask=attn_mask)
-        amplitudes = outputs[..., 0, :]
 
-        return amplitudes
+        return outputs

@@ -1,17 +1,56 @@
-from functools import partial
-from typing import Optional, Tuple, Union
+import functools
+from typing import Optional, Tuple, Union, List, Sequence
 
 import torch
+
 from torch import Tensor
 from einops import rearrange
 from torch import nn
 from torch.utils.checkpoint import checkpoint
 from torch.nn.functional import scaled_dot_product_attention as torch_sdpa
+
+import opt_einsum
+
 # from xformers.ops import AttentionBias
 
 from misc import to_nd
 
 from .activation import switchable_activation
+
+
+def custom_einsum(
+    equation: str, *operands: torch.Tensor, path: List[int]
+) -> torch.Tensor:
+    """Computes einsum with a custom contraction order."""
+
+    # Justification: For the sake of performance, we need direct access to torch's private methods.
+
+    # pylint:disable-next=protected-access
+    return torch._VF.einsum(equation, operands, path=path)  # type: ignore[attr-defined]
+
+@functools.lru_cache(maxsize=None)
+def _get_cached_path_for_equation_and_shapes(
+    equation: str, op_shape: Sequence[torch.Tensor]
+) -> List[int]:
+    """Provides caching of optimal path."""
+    tupled_path = opt_einsum.contract_path(
+        equation, *op_shape, optimize="optimal", shapes=True
+    )[0]
+
+    return [item for pair in tupled_path for item in pair]
+
+def cached_einsum(equation: str, *operands: torch.Tensor) -> torch.Tensor:
+    """Computes einsum with a cached optimal contraction.
+
+    Inspired by upstream
+    https://github.com/pytorch/pytorch/blob/v1.13.0/torch/functional.py#L381.
+    """
+    op_shape = tuple(op.shape for op in operands)
+    path = _get_cached_path_for_equation_and_shapes(
+        equation=equation, op_shape=op_shape
+    )
+
+    return custom_einsum(equation, *operands, path=path)
 
 
 def scaled_dot_product_attention(
@@ -544,12 +583,12 @@ class Transformer(nn.Module):
 
     def __init__(
         self,
-        in_channels: int,
-        out_channels: int,
+        n_features: int,
         hidden_channels: int,
+        out_channels: int = 1,
         num_blocks: int = 10,
         num_heads: int = 8,
-        pos_encoding: bool = False,
+        pos_encoding: bool = True,
         pos_encoding_base: int = 4096,
         checkpoint_blocks: bool = False,
         increase_hidden_channels=1,
@@ -557,10 +596,11 @@ class Transformer(nn.Module):
         activation="gelu",
         num_groups=1,
         dropout_prob=None,
+        type_token_list=None,
     ) -> None:
         super().__init__()
         self.checkpoint_blocks = checkpoint_blocks
-        self.linear_in = nn.Linear(in_channels, hidden_channels)
+        self.linear_in = nn.Linear(n_features, hidden_channels)
         self.blocks = nn.ModuleList(
             [
                 BaselineTransformerBlock(
