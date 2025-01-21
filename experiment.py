@@ -78,17 +78,13 @@ class AmplitudeExperiment(BaseExperiment):
             )
 
         with open_dict(self.cfg):
-            if modelname == "Transformer":
-                self.cfg.model.net.in_channels = 4 + token_size
-                self.cfg.model.token_size = token_size
-            else:
-                self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
-                    self.cfg.data.dataset[0]
-                ]
-                assert (
-                    len(np.unique(self.cfg.model.net.type_token_list))
-                    == max(self.cfg.model.net.type_token_list) + 1
-                ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
+            self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
+                self.cfg.data.dataset[0]
+            ]
+            assert (
+                len(np.unique(self.cfg.model.net.type_token_list))
+                == max(self.cfg.model.net.type_token_list) + 1
+            ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
 
     def init_data(self):
         LOGGER.info(
@@ -132,9 +128,11 @@ class AmplitudeExperiment(BaseExperiment):
                 assert self.cfg.data.incl_fvs, "DSI/FV_MLP model requires fvs"
 
             # preprocess data
+            LOGGER.info(f"Preprocessing amplitudes using trafos={self.cfg.data.amp_trafos}")
             amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
                 amplitudes, trafos=self.cfg.data.amp_trafos
             )
+            LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
             particles_prepd = preprocess_particles(
                 particles,
                 self.type_token[0],
