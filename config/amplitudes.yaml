@@ -22,9 +22,9 @@ data:
 
 train: true
 training:
- iterations: 10000 # MLP, DSI: 2500000; Tr: 1000000; GAP, GATr, CGENN: 250000
+ iterations: 2500000 # MLP, DSI: 2500000; Tr: 1000000; GAP, GATr, CGENN: 250000
  optimizer: Adam
- lr: 1e-3
+ lr: 2e-4
  batchsize: 256
  scheduler: CosineAnnealingLR
 
