@@ -1,5 +1,5 @@
 import torch.nn as nn
-from katrational import KAT_Group
+#from katrational import KAT_Group
 
 
 def switchable_activation(activation: str = 'gelu', num_groups: int = 1):
@@ -18,8 +18,8 @@ def switchable_activation(activation: str = 'gelu', num_groups: int = 1):
             return nn.Tanh()
         case 'elu':
             return nn.ELU()
-        case 'KAN':
-            return KAT_Group(mode="gelu", num_groups=num_groups)
+#        case 'KAN':
+#            return KAT_Group(mode="gelu", num_groups=num_groups)
         case _:
             raise ValueError(
                 f"Activation function {activation} not supported")

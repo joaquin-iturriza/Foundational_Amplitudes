@@ -2,7 +2,7 @@ _target_: wrappers.AmplitudeMLPWrapper
 
 
 net:
-  _target_: models.subamp_MLP
+  _target_: models.mlp.subamp_MLP
 
   n_features: 0 # will be overwritten once the data is loaded and transformed
   hidden_channels: 128

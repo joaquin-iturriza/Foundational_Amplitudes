@@ -4,6 +4,8 @@ net:
   _target_: models.dsi.DSI
 
   sum_deepset: true
+  #use_deepset: true
+  #use_invariants: true
   
   n_features: 0 # will be overwritten once the data is loaded and transformed
   hidden_channels_prenet: 128

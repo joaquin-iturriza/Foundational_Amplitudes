@@ -1,0 +1,12 @@
+_target_: wrappers.AmplitudeMLPWrapper
+
+
+net:
+  _target_: models.mlp.MLP
+
+  n_features: 0 # will be overwritten once the data is loaded and transformed
+  hidden_channels: 512
+  hidden_layers: 5
+
+  activation: "gelu"
+  num_groups: 1

@@ -14,8 +14,8 @@ from preprocessing import (
 )
 from plots import plot_mixer
 from logger import LOGGER
-from mlflow_util import log_mlflow
-from losses import LogCoshLoss
+#from mlflow_util import log_mlflow
+from losses import LogCoshLoss, RelL1Loss
 
 TYPE_TOKEN_DICT = {
     "aag": [0, 0, 1, 1, 0],
@@ -26,6 +26,16 @@ TYPE_TOKEN_DICT = {
     "zgggg": [0, 0, 1, 2, 2, 2, 2],
     "zggggg": [0, 0, 1, 2, 2, 2, 2, 2],
     "wz": [0, 0, 1, 2],
+    "qq_tth": [0, 0, 1, 1, 2],
+    "qq_tth_loop": [0, 1, 2, 3, 4],
+    "gg_tth": [0, 0, 1, 1, 2],
+    "gg_tth_loop": [0, 0, 1, 1, 2],
+    "gggh": [0, 0, 1, 2],
+    "qq_tth_uw": [0, 0, 1, 1, 2],
+    "qq_tth_loop_uw": [0, 1, 2, 3, 4],
+    "gg_tth_uw": [0, 0, 1, 1, 2],
+    "gg_tth_loop_uw": [0, 0, 1, 1, 2],
+    "gggh_uw": [0, 0, 1, 2],
 }
 DATASET_TITLE_DICT = {
     "aag": r"$gg\to\gamma\gamma g$",
@@ -42,12 +52,23 @@ DATASET_TITLE_DICT = {
     "zgggg_sorted": r"$q\bar q\to Zgggg$",
     "zggggg": r"$q\bar q \to Zggggg$",
     "wz": r"$q\bar q \to WZ$",
+    "qq_tth": r"$q\bar q \to ttH$",
+    "qq_tth_loop": r"$q\bar q \to ttH$ (Loop)",
+    "gg_tth": r"$gg \to ttH$",
+    "gg_tth_loop": r"$gg \to ttH$ (Loop)",
+    "gggh": r"$gg \to Hg$",
+    "qq_tth_uw": r"$q\bar q \to ttH$",
+    "qq_tth_loop_uw": r"$q\bar q \to ttH$ (Loop)",
+    "gg_tth_uw": r"$gg \to ttH$",
+    "gg_tth_loop_uw": r"$gg \to ttH$ (Loop)",
+    "gggh_uw": r"$gg \to Hg$",
 }
 MODEL_TITLE_DICT = {
     "Transformer": "Tr",
     "MLP": "MLP",
     "FV_MLP": "FV MLP",
     "DSI": "DSI",
+    "LGATr": "LGATr",
 }
 
 
@@ -78,6 +99,10 @@ class AmplitudeExperiment(BaseExperiment):
             )
 
         with open_dict(self.cfg):
+            if modelname == "LGATr":
+                self.cfg.model.net.in_s_channels = token_size
+                self.cfg.model.token_size = token_size
+                
             self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
                 self.cfg.data.dataset[0]
             ]
@@ -105,8 +130,17 @@ class AmplitudeExperiment(BaseExperiment):
         for dataset in self.cfg.data.dataset:
             # load data
             data_path = os.path.join(self.cfg.data.data_path, f"{dataset}.npy")
+            data_path_test = os.path.join(self.cfg.data.data_path, f"{dataset}_test.npy")
+            data_path_val = os.path.join(self.cfg.data.data_path, f"{dataset}_val.npy")
+            
             assert os.path.exists(data_path), f"data_path {data_path} does not exist"
-            data_raw = np.load(data_path)
+            if os.path.exists(data_path_val):
+                data_train_raw = np.load(data_path)
+                data_val_raw = np.load(data_path_val)
+                data_test_raw = np.load(data_path_test)
+                data_raw = np.concatenate([data_train_raw, data_val_raw, data_test_raw], axis=0)
+            else:
+                data_raw = np.load(data_path)
             LOGGER.info(f"Loaded data with shape {data_raw.shape} from {data_path}")
 
             # bring data into correct shape
@@ -115,10 +149,16 @@ class AmplitudeExperiment(BaseExperiment):
                 LOGGER.info(
                     f"Reducing the size of the dataset from {data_raw.shape[0]} to {self.cfg.data.subsample}"
                 )
-                data_raw = data_raw[: self.cfg.data.subsample, :]
+                data_raw = data_raw[: int(self.cfg.data.subsample), :]
+            else:
+                self.cfg.data.subsample = data_raw.shape[0]
 
-            particles = data_raw[:, :-1]
-            amplitudes = data_raw[:, [-1]]
+            if os.path.exists(data_path_val):
+                particles = data_raw[:, :-2]
+                amplitudes = data_raw[:, [-1]]
+            else:                
+                particles = data_raw[:, :-1]
+                amplitudes = data_raw[:, [-1]]
 
             # ensure that fvs are included if model is DSI or FV_MLP
             if (
@@ -139,6 +179,8 @@ class AmplitudeExperiment(BaseExperiment):
                 trafos=self.cfg.data.trafos,
                 incl_fvs=self.cfg.data.incl_fvs,
             )
+            #if 'LGATr' in self.cfg.model.net._target_:
+            #    particles_prepd = particles_prepd.reshape(particles_prepd.shape[0], particles_prepd.shape[1] // 4, 4)
 
             # save number of features for later
             self.cfg.model.net.n_features = particles_prepd.shape[-1]
@@ -245,6 +287,16 @@ class AmplitudeExperiment(BaseExperiment):
                 self.results_val = self._evaluate_single(self.val_loader, "val")
                 self.results_test = self._evaluate_single(self.test_loader, "test")
 
+            self.results = {}
+            for dataset in self.results_test.keys():
+                self.results[dataset] = {
+                    "train": self.results_train[dataset],
+                    "val": self.results_val[dataset],
+                    "test": self.results_test[dataset],
+                }
+            
+        return self.results
+
     def _evaluate_single(self, loader, title):
         # compute predictions
         # note: shuffle=True or False does not matter, because we take the predictions directly from the dataloader and not from the dataset
@@ -304,6 +356,8 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"MSE on {title} {dataset} dataset: {mse_prepd:.4e}")
             l1_prepd = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd))
             LOGGER.info(f"L1 on {title} {dataset} dataset: {l1_prepd:.4e}")
+            l1_rel_prepd = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd)/np.maximum(np.abs(amp_truth_prepd),1e-8))
+            LOGGER.info(f"Relative L1 on {title} {dataset} dataset: {l1_rel_prepd:.4e}")
 
             # undo preprocessing
             amp_truth = undo_preprocess_amplitude(
@@ -333,6 +387,7 @@ class AmplitudeExperiment(BaseExperiment):
             # compute metrics over actual amplitudes
             mse = np.mean((amp_truth - amp_pred) ** 2)
             l1 = np.mean(np.abs(amp_truth - amp_pred))
+            l1_rel = np.mean(np.abs(amp_truth - amp_pred) / np.abs(amp_truth))
 
             delta = (amp_truth - amp_pred) / amp_truth
             delta_abs = np.abs(delta)
@@ -365,8 +420,10 @@ class AmplitudeExperiment(BaseExperiment):
                 log_dict = {
                     f"eval.{title}.mse": mse_prepd,
                     f"eval.{title}.l1": l1_prepd,
+                    f"eval.{title}.l1_rel": l1_rel_prepd,
                     f"eval.{title}.mse_raw": mse,
                     f"eval.{title}.l1_raw": l1,
+                    f"eval.{title}.l1_rel_raw": l1_rel,
                     f"eval.{title}.delta_abs_mean": delta_abs_mean,
                     f"eval.{title}.delta_abs_mean_1percent": delta_abs_mean_1percent,
                 }
@@ -378,11 +435,15 @@ class AmplitudeExperiment(BaseExperiment):
                     "truth": amp_truth,
                     "prediction": amp_pred,
                     "mse": mse,
+                    "l1": l1,
+                    "l1_rel": l1_rel,
                 },
                 "preprocessed": {
                     "truth": amp_truth_prepd,
                     "prediction": amp_pred_prepd,
                     "mse": mse_prepd,
+                    "l1": l1_prepd,
+                    "l1_rel": l1_rel_prepd,
                 },
             }
             results[dataset] = amp
@@ -412,10 +473,16 @@ class AmplitudeExperiment(BaseExperiment):
         match self.cfg.training.loss:
             case "MSE":
                 self.loss = torch.nn.MSELoss()
+                LOGGER.info("Using MSE loss")
             case "L1":
                 self.loss = torch.nn.L1Loss()
+                LOGGER.info("Using L1 loss")
             case "LogCosh":
                 self.loss = LogCoshLoss()
+                LOGGER.info("Using LogCosh loss")
+            case "RelL1":
+                self.loss = RelL1Loss()
+                LOGGER.info("Using RelL1 loss")
             case _:
                 raise ValueError(f"Unknown loss function {self.cfg.training.loss}")
             
@@ -482,6 +549,15 @@ class AmplitudeExperiment(BaseExperiment):
             x, type_token=type_token, global_token=global_token, attn_mask=attn_mask
         )
         loss = self.loss(y, y_pred) + self.regularization_lambda*self.regularization(self.model)
+        #LOGGER.info(f"Loss: {loss}")
+        #REL_L1= torch.mean(
+        #   torch.abs((y - y_pred) / torch.max(torch.abs(y), 1e-8 * torch.ones_like(y)))
+        #)
+        #LOGGER.info(f"Relative L1: {REL_L1}")
+        #amp_pred_prepd = amplitudes_pred_prepd[idataset]
+        #amp_truth_prepd = amplitudes_truth_prepd[idataset]
+
+        #np.mean(np.abs(amp_pred_prepd - amp_truth_prepd)/np.maximum(np.abs(amp_truth_prepd),1e-8))
         assert torch.isfinite(loss).all()
 
         return loss

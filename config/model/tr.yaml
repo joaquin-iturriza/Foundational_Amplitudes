@@ -6,11 +6,11 @@ net:
   n_features: 0 # will be overwritten once the data is loaded and transformed
   hidden_channels: 128
 
-  num_blocks: 4
-  num_heads: 4
+  num_blocks: 8
+  num_heads: 8
   dropout_prob: null
 
-  pos_encoding: true
+  pos_encoding: false
   
   activation: 'gelu'
   num_groups: 1

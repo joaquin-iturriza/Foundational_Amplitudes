@@ -1,7 +1,8 @@
 import numpy as np
 import torch
+import math
 import datetime
-
+import pickle
 import os, time
 import zipfile
 import logging
@@ -9,16 +10,31 @@ from pathlib import Path
 from omegaconf import OmegaConf, open_dict, errors
 from hydra.core.config_store import ConfigStore
 from hydra.utils import instantiate
-import mlflow
+#import mlflow
 from torch_ema import ExponentialMovingAverage
 
 from misc import get_device, flatten_dict
 import logger
 from logger import LOGGER, MEMORY_HANDLER, FORMATTER
-from mlflow_util import log_mlflow
+#from mlflow_util import log_mlflow
 
 from lion_pytorch import Lion
 import schedulefree
+
+import lgatr.primitives.attention
+import lgatr.layers.linear
+import lgatr.layers.mlp.geometric_bilinears
+import lgatr.layers.mlp.mlp
+import lgatr.primitives.linear
+from lgatr.layers.mlp.config import MLPConfig
+from lgatr.layers.attention.config import SelfAttentionConfig
+
+
+cs = ConfigStore.instance()
+cs.store(name="base_attention", node=SelfAttentionConfig)
+cs.store(name="base_mlp", node=MLPConfig)
+
+#print("Registered configs:", cs.repo)
 
 # set to 'True' to debug autograd issues (slows down code)
 torch.autograd.set_detect_anomaly(False)
@@ -70,7 +86,7 @@ class BaseExperiment:
         self._save_config(f"config_{self.cfg.run_idx}.yaml")
 
         self.init_physics()
-        # self.init_geometric_algebra()
+        self.init_geometric_algebra()
         self.init_data()
         self._init_dataloader()
         self.init_model()
@@ -99,7 +115,29 @@ class BaseExperiment:
         LOGGER.info(
             f"Finished experiment {self.cfg.exp_name}/{self.cfg.run_name} after {dt/60:.2f}min = {dt/60**2:.2f}h"
         )
-
+    
+    def init_geometric_algebra(self):
+        lgatr.primitives.linear.USE_FULLY_CONNECTED_SUBGROUP = (
+            self.cfg.ga_settings.use_fully_connected_subgroup
+        )
+        if self.cfg.ga_settings.use_fully_connected_subgroup:
+            lgatr.layers.linear.MIX_MVPSEUDOSCALAR_INTO_SCALAR = (
+                self.cfg.ga_settings.mix_mvpseudoscalar_into_scalar
+            )
+        else:
+            lgatr.layers.linear.NUM_PIN_LINEAR_BASIS_ELEMENTS = 5
+            if self.cfg.ga_settings.mix_mvpseudoscalar_into_scalar:
+                LOGGER.warning(
+                    f"Mixing mvpseudoscalar into scalar is only possible if ga_settings.use_fully_connected_subgroup=True"
+                )
+                lgatr.layers.linear.MIX_MVPSEUDOSCALAR_INTO_SCALAR = False
+        lgatr.layers.mlp.mlp.USE_GEOMETRIC_PRODUCT = (
+            self.cfg.ga_settings.use_geometric_product
+        )
+        lgatr.layers.mlp.geometric_bilinears.ZERO_BIVECTOR = (
+            self.cfg.ga_settings.zero_bivector
+        )
+    
     def init_model(self):
         # initialize model
         print(self.cfg.model)
@@ -128,7 +166,7 @@ class BaseExperiment:
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location="cpu")["model"]
+                state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
                 LOGGER.info(f"Loading model from {model_path}")
                 self.model.load_state_dict(state_dict)
                 if self.ema is not None:
@@ -168,6 +206,7 @@ class BaseExperiment:
                 now = datetime.datetime.now()
                 rnd_number = np.random.randint(low=0, high=9999)
                 run_name = f"{now.strftime('%Y%m%d_%H%M%S')}_{modelname}_{rnd_number:04}"
+                self.cfg.run_name = run_name
             else:
                 run_name = self.cfg.run_name
 
@@ -390,7 +429,7 @@ class BaseExperiment:
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location="cpu")["optimizer"]
+                state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["optimizer"]
                 LOGGER.info(f"Loading optimizer from {model_path}")
                 self.optimizer.load_state_dict(state_dict)
             except FileNotFoundError:
@@ -476,19 +515,70 @@ class BaseExperiment:
                 for x in iterable:
                     yield x
 
+        results = {}
+        results['samplesize']=int(self.cfg.data.subsample)
+        mses_prepd = []
+        iters = []
+        iters_evaluated = []
         iterator = iter(cycle(self.train_loader))
         for step in range(self.cfg.training.iterations):
             # training
+            #iter_time_start = time.time()
             self.model.train()
             if self.cfg.training.optimizer == "ScheduleFree":
                 self.optimizer.train()
             data = next(iterator)
             self._step(data, step)
+            
+            if self.cfg.training.save_intermediate: ########## FIX LATER
+                oom=math.floor(np.log10(self.cfg.training.iterations))
+                mantissa=self.cfg.training.iterations/(10**oom)
+                iters_to_eval=[math.floor(mantissa*10**i) for i in range(0,oom+1)]
+                if step+1 in iters_to_eval:
+                    LOGGER.info(
+                            f"### Evaluating in iteration {smallest_val_loss_step+1} ###"
+                        )
+                    self._save_model(
+                        f"model_run{self.cfg.run_idx}_current.pt"
+                    )
+                    try:
+                        self._load_previous_best_model()
+                    except FileNotFoundError:
+                        self._load_previous_current_model()
+                    res = self.evaluate()
+                    self._load_previous_current_model()
+                    #### There might be a better way to do this ####
+                    for dataset in res.keys():
+                        if dataset not in results.keys():
+                            results[dataset] = {}
+                        for title in res[dataset].keys():
+                            if title not in results[dataset].keys():
+                                results[dataset][title] = {}
+                            for key in res[dataset][title].keys():
+                                if key not in results[dataset][title].keys():
+                                    results[dataset][title][key] = {}
+                                if "mses" not in results[dataset][title][key]:
+                                    results[dataset][title][key]["mses"] = []
+                                    results[dataset][title][key]["l1s"] = []
+                                    results[dataset][title][key]["l1s_rel"] = []
+                                    results[dataset][title][key]["iters"] = []
+                                    results[dataset][title][key]["iters_evaluated"] = []
+                                    results[dataset][title][key]["time"] = []
+                            
+                                results[dataset][title][key]["mses"].append(res[dataset][title][key]["mse"])
+                                results[dataset][title][key]["l1s"].append(res[dataset][title][key]["l1"])
+                                results[dataset][title][key]["l1s_rel"].append(res[dataset][title][key]["l1_rel"])
+                                results[dataset][title][key]["iters"].append(step+1)
+                                results[dataset][title][key]["iters_evaluated"].append(smallest_val_loss_step)
+                                results[dataset][title][key]["time"].append(time.time() - self.training_start_time)                  
 
             # validation (and early stopping)
-            if (step + 1) % self.cfg.training.validate_every_n_steps == 0:
+            if ((step + 1) % self.cfg.training.validate_every_n_steps == 0) or (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
                 val_loss = self._validate(step)
                 if val_loss < smallest_val_loss:
+                    #LOGGER.info(
+                    #    f"Validation loss improved from {smallest_val_loss:.4f} to {val_loss:.4f} in iteration {step+1}"
+                    #)
                     smallest_val_loss = val_loss
                     smallest_val_loss_step = step
                     patience = 0
@@ -496,7 +586,7 @@ class BaseExperiment:
                     # save best model
                     if self.cfg.training.es_load_best_model:
                         self._save_model(
-                            f"model_run{self.cfg.run_idx}_it{smallest_val_loss_step}.pt"
+                            f"model_run{self.cfg.run_idx}_best.pt"#it{smallest_val_loss_step}.pt"
                         )
                 else:
                     patience += 1
@@ -531,20 +621,59 @@ class BaseExperiment:
 
         # wrap up early stopping
         if self.cfg.training.es_load_best_model:
-            model_path = os.path.join(
+            self._load_previous_best_model()
+
+        # save results intermediate
+        if self.cfg.training.save_intermediate:
+            LOGGER.info(
+                f"Saving results to {self.cfg.run_dir}/results_intermediate.pkl"
+            )
+            with open(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"), "wb") as f:
+                pickle.dump(results, f)
+
+    def _load_previous_model(self,step):
+        model_path = os.path.join(
                 self.cfg.run_dir,
                 "models",
-                f"model_run{self.cfg.run_idx}_it{smallest_val_loss_step}.pt",
+                f"model_run{self.cfg.run_idx}_it{step}.pt",
             )
-            try:
-                state_dict = torch.load(model_path, map_location=self.device)["model"]
-                LOGGER.info(f"Loading model from {model_path}")
-                self.model.load_state_dict(state_dict)
-            except FileNotFoundError:
-                LOGGER.warning(
-                    f"Cannot load best model (epoch {smallest_val_loss_step}) from {model_path}"
-                )
-
+        try:
+            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
+            LOGGER.info(f"Loading model from {model_path}")
+            self.model.load_state_dict(state_dict)
+        except FileNotFoundError:
+            LOGGER.warning(
+                f"Cannot load model (epoch {step}) from {model_path}"
+            )
+    def _load_previous_best_model(self):
+        model_path = os.path.join(
+                self.cfg.run_dir,
+                "models",
+                f"model_run{self.cfg.run_idx}_best.pt",
+            )
+        try:
+            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
+            LOGGER.info(f"Loading model from {model_path}")
+            self.model.load_state_dict(state_dict)
+        except FileNotFoundError:
+            LOGGER.warning(
+                f"Cannot load best model from {model_path}"
+            )
+    def _load_previous_current_model(self):
+        model_path = os.path.join(
+                self.cfg.run_dir,
+                "models",
+                f"model_run{self.cfg.run_idx}_current.pt",
+            )
+        try:
+            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
+            LOGGER.info(f"Loading model from {model_path}")
+            self.model.load_state_dict(state_dict)
+        except FileNotFoundError:
+            LOGGER.warning(
+                f"Cannot load current model from {model_path}"
+            )
+            
     def _step(self, data, step):
         # actual update step
         loss = self._batch_loss(data)
@@ -601,6 +730,7 @@ class BaseExperiment:
                 log_mlflow(f"train.{key}", values, step=step)
 
     def _validate(self, step):
+        start_time_validate = time.time()
         losses = []
         metrics = self._init_metrics()
 
@@ -618,9 +748,18 @@ class BaseExperiment:
 
                 losses.append(loss.cpu().item())
         val_loss = np.mean(losses)
+        #LOGGER.info(
+        #    f"Validation loss after {step} iterations = {val_loss:.4f} "
+        #    f"(mean over {len(losses)} batches)"
+        #)
         self.val_loss.append(val_loss)
         if self.cfg.use_mlflow:
             log_mlflow("val.loss", val_loss, step=step)
+
+        end_time_validate = time.time()
+        #LOGGER.info(
+        #    f"Validation took {end_time_validate - start_time_validate:.2f}s " ######################################################
+        # )
         return val_loss
 
     def _save_config(self, filename, to_mlflow=False):

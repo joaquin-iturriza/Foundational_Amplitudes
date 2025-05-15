@@ -29,8 +29,10 @@ def undo_preprocess_amplitude(amplitude, mean, std, trafos=None):
                 amplitude = amplitude * std + mean
             else:
                 inv_fn = get_inv_fn(fn_str)
-                amplitude = inv_fn(amplitude, None)
-    assert np.isfinite(amplitude).all()
+                amplitude = np.minimum(30, inv_fn(amplitude, None))
+
+            assert np.isfinite(amplitude).all(), f'{fn_str} failed'
+
     return amplitude
 
 
@@ -49,8 +51,11 @@ def preprocess_particles(
     feature_sets = {}
     if trafos:
         for t_name, t_fns in trafos.items():
+            if not t_fns:  # skip empty transformation lists
+                continue
             transformed_features = particles_raw
             for fn_str in t_fns:
+                print(fn_str)
                 fn = get_fn(fn_str)
                 transformed_features = fn(transformed_features, type_tokens)
             feature_sets[t_name] = transformed_features
@@ -61,6 +66,7 @@ def preprocess_particles(
             np.abs(feature_sets["fvs_raw"][:, ::4])
         )  # normalize by max energy of particles
         # feature_sets["fvs_raw"] = particles_raw
+        print(feature_sets["fvs_raw"].shape)
 
     if return_dict:
         return feature_sets
@@ -84,6 +90,9 @@ def standardization(features, return_mean_std=False, clip=True):
 
 def compute_invariants(particles, eps=1e-4, incl_diag_invariants=False, reshape=True):
     """compute Lorentz invariants out of four-vectors"""
+    print('#####################')
+    print(particles.shape)
+    print('#####################')
     if reshape:
         ps = particles.reshape(particles.shape[0], particles.shape[1] // 4, 4)
     else:
@@ -126,6 +135,7 @@ def sort_particles(particles, type_tokens, sort_key):
         sorted_ps.append(
             np.take_along_axis(ps[:, mask], sorted_indices[:, :, np.newaxis], axis=1)
         )
+        #print(sorted_ps)
     return np.concatenate(sorted_ps, axis=1).reshape(particles.shape)
 
 
@@ -147,6 +157,8 @@ def apply_quantile_transform(particles):
 def get_fn(fn_str):
     # get functions from string
     match fn_str:
+        case "None":
+            return lambda p, t: p
         case "log":
             return lambda p, t: np.log(p)
         case "exp":

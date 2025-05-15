@@ -48,6 +48,7 @@ class subamp_MLP(nn.Module):
 
     def forward(self, inputs: torch.Tensor):
         """Forward pass of subamp MLP."""
+        return [subamp(inputs) for subamp in self.subamps]
         subamps = [subamp(inputs) for subamp in self.subamps]
         # sum subamps and square
         return torch.stack(subamps).sum(dim=0) ** 2

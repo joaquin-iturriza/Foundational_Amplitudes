@@ -8,7 +8,7 @@ import wget
 # dataset sizes: amplitudes 0.6G, toptagging 1.5G, event-generation 4.7G
 DOWNLOAD = {"amplitudes": True, "toptagging": False, "event-generation": False}
 # and which you want to unzip
-UNZIP = {"amplitudes": True, "toptagging": True, "event-generation": True}
+UNZIP = {"amplitudes": True, "toptagging": False, "event-generation": False}
 
 BASE_URL = "https://www.thphys.uni-heidelberg.de/~plehn/data"
 FILENAMES = {
@@ -16,7 +16,7 @@ FILENAMES = {
     "toptagging": "toptagging_full.npz",
     "event-generation": "event_generation_ttbar.hdf5",
 }
-DATA_DIR = "data"
+DATA_DIR = "/pbs/throng/lpnhe/jitu/amplitude_DSI/data"
 
 """
 To use the JetClass dataset, download all .tar files from 
