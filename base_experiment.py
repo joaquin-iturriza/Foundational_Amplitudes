@@ -440,6 +440,7 @@ class BaseExperiment:
     def _init_scheduler(self):
         if self.cfg.training.scheduler is None:
             self.scheduler = None  # constant lr
+            LOGGER.info("Using no scheduler")
         elif self.cfg.training.scheduler == "OneCycleLR":
             self.scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 self.optimizer,
@@ -449,6 +450,7 @@ class BaseExperiment:
                     self.cfg.training.iterations * self.cfg.training.scheduler_scale
                 ),
             )
+            LOGGER.info('Using OneCycleLR scheduler')
         elif self.cfg.training.scheduler == "CosineAnnealingLR":
             self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 self.optimizer,
@@ -457,12 +459,14 @@ class BaseExperiment:
                 ),
                 eta_min=self.cfg.training.cosanneal_eta_min,
             )
+            LOGGER.info('Using CosineAnnealingLR scheduler')
         elif self.cfg.training.scheduler == "ReduceLROnPlateau":
             self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
                 factor=self.cfg.training.reduceplateau_factor,
                 patience=self.cfg.training.reduceplateau_patience,
             )
+            LOGGER.info('Using ReduceLROnPlateau scheduler')
         else:
             raise ValueError(
                 f"Learning rate scheduler {self.cfg.training.scheduler} not implemented"
@@ -752,7 +756,8 @@ class BaseExperiment:
         #    f"Validation loss after {step} iterations = {val_loss:.4f} "
         #    f"(mean over {len(losses)} batches)"
         #)
-        self.val_loss.append(val_loss)
+        if ((step + 1) % self.cfg.training.validate_every_n_steps == 0):
+            self.val_loss.append(val_loss)
         if self.cfg.use_mlflow:
             log_mlflow("val.loss", val_loss, step=step)
 
