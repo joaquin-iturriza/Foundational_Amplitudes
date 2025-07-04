@@ -25,6 +25,7 @@ class MLP(nn.Module):
         fv_input=True,
         num_groups=1,
         dropout_prob=None,
+        gain=1.0
     ):
         super().__init__()
 
@@ -46,6 +47,18 @@ class MLP(nn.Module):
         layers.append(switchable_activation(activation=activation, num_groups=1))
         layers.append(nn.Linear(hidden_channels, np.prod(self.out_shape)))
         self.mlp = nn.Sequential(*layers)
+        self.mlp.apply(lambda m: self.init_weights(m, gain=gain))
+
+    @staticmethod
+    def init_weights(m,gain=1.0):
+        """Initialize weights of the MLP."""
+        if isinstance(m, nn.Linear):
+            torch.nn.init.xavier_uniform_(m.weight, gain=gain)
+            if m.bias is not None:
+                fan_in = m.weight.size(1)
+                bound = 1 / math.sqrt(fan_in)
+                nn.init.uniform_(m.bias, -bound, bound)
+                m.bias.data.mul_(gain)
 
     def forward(self, inputs: torch.Tensor):
         """Forward pass of baseline MLP."""

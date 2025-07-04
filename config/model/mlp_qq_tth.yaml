@@ -7,6 +7,7 @@ net:
   n_features: 0 # will be overwritten once the data is loaded and transformed
   hidden_channels: 512
   hidden_layers: 5
+  gain: 1.0 # scaling factor for the initialization of the weights
 
   activation: "gelu"
   num_groups: 1

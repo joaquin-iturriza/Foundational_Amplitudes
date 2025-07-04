@@ -37,7 +37,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             for idataset, dataset in enumerate(cfg.data.dataset):
                 data = [
                     np.log(plot_dict["results_test"][dataset]["raw"]["truth"]),
-                    np.log(plot_dict["results_test"][dataset]["raw"]["truth"]),
+                    np.log(plot_dict["results_train"][dataset]["raw"]["truth"]),
                     np.log(plot_dict["results_test"][dataset]["raw"]["prediction"]),
                 ]
                 plot_histograms(
@@ -366,3 +366,67 @@ def plot_delta_histogram(
 
     fig.savefig(file, format="pdf", bbox_inches="tight")
     plt.close()
+
+def plot_gradients(file, model, iteration):
+    layer_names = []
+    grad_values = []
+
+    for name, param in model.named_parameters():
+        if param.grad is not None:
+            layer_names.append(name)
+            grad_values.append(param.grad.detach().cpu().view(-1).numpy())
+
+    # Plotting
+    n_layers = len(layer_names)
+    if n_layers == 0:
+        print("No gradients to plot.")
+        return
+        
+    fig, axs = plt.subplots(n_layers, 1, figsize=(6, 2 * n_layers))
+
+    if n_layers == 1:
+        axs = [axs]
+
+    for ax, name, grads in zip(axs, layer_names, grad_values):
+        ax.hist(grads, range=(grads.min(),grads.max()), bins=50, alpha=0.7)
+        ax.set_title(f'Gradient Histogram: {name}')
+        ax.set_xlabel("Gradient value")
+        ax.set_ylabel("Frequency")
+        ax.set_xlim(grads.min(), grads.max())
+        print(name, grads.min(), grads.max(), grads.mean(), grads.std())
+    plt.suptitle(f"Gradients at iteration {iteration}", fontsize=FONTSIZE)
+    plt.tight_layout()
+    plt.savefig(f'{file}/gradients_{iteration}.pdf', format="pdf", bbox_inches="tight")
+    plt.show()
+
+def plot_weights(file, model, iteration):
+    layer_names = []
+    weight_values = []
+
+    for name, param in model.named_parameters():
+        if param.requires_grad and param.data is not None:
+            layer_names.append(name)
+            weight_values.append(param.data.detach().cpu().view(-1).numpy())
+
+    n_layers = len(layer_names)
+    if n_layers == 0:
+        print("No weights to plot.")
+        return
+
+    fig, axs = plt.subplots(n_layers, 1, figsize=(6, 2 * n_layers))
+
+    if n_layers == 1:
+        axs = [axs]
+
+    for ax, name, weights in zip(axs, layer_names, weight_values):
+        ax.hist(weights, range=(weights.min(), weights.max()), bins=50, alpha=0.7)
+        ax.set_title(f'Weight Histogram: {name}')
+        ax.set_xlabel("Weight value")
+        ax.set_ylabel("Frequency")
+        ax.set_xlim(weights.min(), weights.max())
+        print(name, weights.min(), weights.max(), weights.mean(), weights.std())
+
+    plt.suptitle(f"Weights at iteration {iteration}", fontsize=FONTSIZE)
+    plt.tight_layout()
+    plt.savefig(f'{file}/weights_{iteration}.pdf', format="pdf", bbox_inches="tight")
+    plt.show()

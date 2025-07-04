@@ -301,6 +301,21 @@ class AmplitudeExperiment(BaseExperiment):
             
         return self.results
 
+    def call_model_fn(self, x, idataset):
+        return self.model(
+            x.to(self.device),
+            type_token=torch.tensor(
+                [self.type_token[idataset]],
+                dtype=torch.long,
+                device=self.device,
+            ),
+            global_token=torch.tensor(
+                [idataset],
+                dtype=torch.long,
+                device=self.device,
+            ),
+        )
+
     def _evaluate_single(self, loader, title):
         # compute predictions
         # note: shuffle=True or False does not matter, because we take the predictions directly from the dataloader and not from the dataset
@@ -455,7 +470,7 @@ class AmplitudeExperiment(BaseExperiment):
 
     def plot(self):
         plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
-        os.makedirs(plot_path)
+        os.makedirs(plot_path, exist_ok=True)
         dataset_titles = [
             DATASET_TITLE_DICT[dataset] for dataset in self.cfg.data.dataset
         ]

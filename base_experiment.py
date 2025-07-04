@@ -6,6 +6,7 @@ import pickle
 import os, time
 import zipfile
 import logging
+import pandas as pd
 from pathlib import Path
 from omegaconf import OmegaConf, open_dict, errors
 from hydra.core.config_store import ConfigStore
@@ -16,10 +17,13 @@ from torch_ema import ExponentialMovingAverage
 from misc import get_device, flatten_dict
 import logger
 from logger import LOGGER, MEMORY_HANDLER, FORMATTER
+from plots import plot_gradients, plot_weights
 #from mlflow_util import log_mlflow
 
 from lion_pytorch import Lion
 import schedulefree
+
+from IntrinsicDimDeep.get_dim import get_intrinsic_dim
 
 import lgatr.primitives.attention
 import lgatr.layers.linear
@@ -519,8 +523,8 @@ class BaseExperiment:
                 for x in iterable:
                     yield x
 
-        results = {}
-        results['samplesize']=int(self.cfg.data.subsample)
+        results = []#{}
+        #results['samplesize']=int(self.cfg.data.subsample)
         mses_prepd = []
         iters = []
         iters_evaluated = []
@@ -528,17 +532,18 @@ class BaseExperiment:
         for step in range(self.cfg.training.iterations):
             # training
             #iter_time_start = time.time()
-            self.model.train()
-            if self.cfg.training.optimizer == "ScheduleFree":
-                self.optimizer.train()
-            data = next(iterator)
-            self._step(data, step)
+            if step > 0:   # skip first step to get evaluation at initialization #### NOT GOOD, FIX LATER
+                self.model.train()
+                if self.cfg.training.optimizer == "ScheduleFree":
+                    self.optimizer.train()
+                data = next(iterator)
+                self._step(data, step)
             
-            if self.cfg.training.save_intermediate: ########## FIX LATER
+            if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
                 oom=math.floor(np.log10(self.cfg.training.iterations))
                 mantissa=self.cfg.training.iterations/(10**oom)
                 iters_to_eval=[math.floor(mantissa*10**i) for i in range(0,oom+1)]
-                if step+1 in iters_to_eval:
+                if ((step+1) in iters_to_eval) or (step == 0):
                     LOGGER.info(
                             f"### Evaluating in iteration {smallest_val_loss_step+1} ###"
                         )
@@ -551,32 +556,94 @@ class BaseExperiment:
                         self._load_previous_current_model()
                     res = self.evaluate()
                     self._load_previous_current_model()
+
+                    if self.cfg.training.get_ID:  ### ONLY WORKS WITH ONE DATASET, FIX LATER
+                        id_time = time.time()
+                        ID_mean, ID_std = get_intrinsic_dim(
+                            model = self.model,
+                            input_dataloader = self.test_loader,
+                            nsamples = min(1e4,self.cfg.data.subsample*self.cfg.training.train_test_val[1]),
+                            bs=self.cfg.training.batchsize,
+                            divs = 5,
+                            res = 10,
+                            call_model_fn=self.call_model_fn
+                        )
+                        id_time = time.time() - id_time
+                        LOGGER.info(
+                            f"Intrinsic Dimension estimation took {id_time:.2f}s"
+                        )
                     #### There might be a better way to do this ####
-                    for dataset in res.keys():
-                        if dataset not in results.keys():
-                            results[dataset] = {}
-                        for title in res[dataset].keys():
-                            if title not in results[dataset].keys():
-                                results[dataset][title] = {}
-                            for key in res[dataset][title].keys():
-                                if key not in results[dataset][title].keys():
-                                    results[dataset][title][key] = {}
-                                if "mses" not in results[dataset][title][key]:
-                                    results[dataset][title][key]["mses"] = []
-                                    results[dataset][title][key]["l1s"] = []
-                                    results[dataset][title][key]["l1s_rel"] = []
-                                    results[dataset][title][key]["iters"] = []
-                                    results[dataset][title][key]["iters_evaluated"] = []
-                                    results[dataset][title][key]["time"] = []
+                    # for dataset in res.keys():
+                    #     if dataset not in results.keys():
+                    #         results[dataset] = {}
+                    #     for title in res[dataset].keys():
+                    #         if title not in results[dataset].keys():
+                    #             results[dataset][title] = {}
+                    #         for key in res[dataset][title].keys():
+                    #             if key not in results[dataset][title].keys():
+                    #                 results[dataset][title][key] = {}
+                    #             if "mses" not in results[dataset][title][key]:
+                    #                 results[dataset][title][key]["mses"] = []
+                    #                 results[dataset][title][key]["l1s"] = []
+                    #                 results[dataset][title][key]["l1s_rel"] = []
+                    #                 results[dataset][title][key]["iters"] = []
+                    #                 results[dataset][title][key]["iters_evaluated"] = []
+                    #                 results[dataset][title][key]["time"] = []
                             
-                                results[dataset][title][key]["mses"].append(res[dataset][title][key]["mse"])
-                                results[dataset][title][key]["l1s"].append(res[dataset][title][key]["l1"])
-                                results[dataset][title][key]["l1s_rel"].append(res[dataset][title][key]["l1_rel"])
-                                results[dataset][title][key]["iters"].append(step+1)
-                                results[dataset][title][key]["iters_evaluated"].append(smallest_val_loss_step)
-                                results[dataset][title][key]["time"].append(time.time() - self.training_start_time)                  
+                    #             results[dataset][title][key]["mses"].append(res[dataset][title][key]["mse"])
+                    #             results[dataset][title][key]["l1s"].append(res[dataset][title][key]["l1"])
+                    #             results[dataset][title][key]["l1s_rel"].append(res[dataset][title][key]["l1_rel"])
+                    #             results[dataset][title][key]["iters"].append(step+1)
+                    #             results[dataset][title][key]["iters_evaluated"].append(smallest_val_loss_step)
+                    #             results[dataset][title][key]["time"].append(time.time() - self.training_start_time)                  
+                    for dataset, dataset_results in self.results.items():  # Loop through datasets
+                        for split, split_results in dataset_results.items():  # Loop through splits (train/val/test)
+                            for processing_type, metrics in split_results.items():  # Loop through raw/preprocessed
+                                # Create directory for predictions if it doesn't exist
+                                if self.cfg.training.save_preds_intermediate or (step+1) == self.cfg.training.iterations:
+                                    os.makedirs(os.path.join(self.cfg.run_dir, "preds"), exist_ok=True)
+                                    
+                                    # Save predictions to file
+                                    pred_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pred.npy")
+                                    np.save(pred_path, metrics["prediction"])
+                                    
+                                    # For heteroscedastic case, also save sigmas if they exist
+                                    if self.cfg.training.loss == "HETEROSC" and processing_type == "preprocessed":
+                                        sigma_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_sigmas.npy")
+                                        np.save(sigma_path, metrics["sigmas"])
+                                        pull_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pull.npy")
+                                        np.save(pull_path, metrics["pull"])
+                                # Append results to list
+                                
+                                results.append({
+                                    'run_id': self.cfg.run_idx,
+                                    'samplesize': int(self.cfg.data.subsample),
+                                    'dataset': dataset,
+                                    'split': split,  # train/val/test
+                                    'processing_type': processing_type,  # raw/preprocessed
+                                    'mse': metrics.get('mse'),
+                                    'l1': metrics.get('l1'),
+                                    'l1_rel': metrics.get('l1_rel'),
+                                    'iter': step + 1,
+                                    'iter_evaluated': smallest_val_loss_step,
+                                    'ID': [ID_mean, ID_std] if self.cfg.training.get_ID else None,
+                                    'time': time.time() - self.training_start_time
+                                })
 
             # validation (and early stopping)
+            if self.cfg.training.save_gradients:
+                if ((step+1) in iters_to_eval): #plot gradients
+                    plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
+                    os.makedirs(plot_path, exist_ok=True)
+                    LOGGER.info(f"Plotting gradients to {plot_path}/gradients_{step+1}.pdf")
+                    plot_gradients(file=plot_path,model=self.model, iteration=step+1)
+            if self.cfg.training.save_weights:
+                if ((step+1) in iters_to_eval): #plot weights
+                    plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
+                    os.makedirs(plot_path, exist_ok=True)
+                    LOGGER.info(f"Plotting weights to {plot_path}/weights_{step+1}.pdf")
+                    plot_weights(file=plot_path,model=self.model, iteration=step+1)
+
             if ((step + 1) % self.cfg.training.validate_every_n_steps == 0) or (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
                 val_loss = self._validate(step)
                 if val_loss < smallest_val_loss:
@@ -634,6 +701,8 @@ class BaseExperiment:
             )
             with open(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"), "wb") as f:
                 pickle.dump(results, f)
+            # df = pd.DataFrame(results)
+            # df.to_pickle(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"))
 
     def _load_previous_model(self,step):
         model_path = os.path.join(
