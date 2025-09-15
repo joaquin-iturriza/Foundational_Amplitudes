@@ -41,4 +41,5 @@ trove_classifiers==2025.3.13.13
 urllib3_secure_extra==0.1.0
 wget==3.2
 xformers
+mup
 # xmlrpclib==1.0.1

@@ -7,6 +7,10 @@ import os, time
 import zipfile
 import logging
 import pandas as pd
+import glob
+import gzip
+import copy
+import shutil
 from pathlib import Path
 from omegaconf import OmegaConf, open_dict, errors
 from hydra.core.config_store import ConfigStore
@@ -33,6 +37,12 @@ import lgatr.primitives.linear
 from lgatr.layers.mlp.config import MLPConfig
 from lgatr.layers.attention.config import SelfAttentionConfig
 
+
+from mup import set_base_shapes, make_base_shapes
+from mup import MuAdam, MuAdamW  # μP optimizers
+
+import copy
+import os
 
 cs = ConfigStore.instance()
 cs.store(name="base_attention", node=SelfAttentionConfig)
@@ -115,6 +125,8 @@ class BaseExperiment:
             LOGGER.info(
                 f"GPU RAM information: max_used = {max_used/1e9:.3} GB, max_total = {max_total/1e9:.3} GB"
             )
+        
+        self.compress_models()
         dt = time.time() - t0
         LOGGER.info(
             f"Finished experiment {self.cfg.exp_name}/{self.cfg.run_name} after {dt/60:.2f}min = {dt/60**2:.2f}h"
@@ -141,47 +153,77 @@ class BaseExperiment:
         lgatr.layers.mlp.geometric_bilinears.ZERO_BIVECTOR = (
             self.cfg.ga_settings.zero_bivector
         )
-    
+
     def init_model(self):
-        # initialize model
-        print(self.cfg.model)
+        # === instantiate model ===
+        self.cfg.model.net.loss = self.cfg.training.loss
         self.model = instantiate(self.cfg.model)
+
         num_parameters = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
-        if self.cfg.use_mlflow:
-            log_mlflow("num_parameters", float(num_parameters), step=0)
         LOGGER.info(
-            f"Instantiated model {type(self.model.net).__name__} with {num_parameters} learnable parameters"
+            f"Instantiated model {type(self.model.net).__name__} "
+            f"with {num_parameters} learnable parameters"
         )
 
+        # === EMA setup ===
         if self.cfg.ema:
-            LOGGER.info(f"Using EMA for validation and eval")
+            LOGGER.info("Using EMA for validation and eval")
             self.ema = ExponentialMovingAverage(
                 self.model.parameters(), decay=self.cfg.training.ema_decay
             )
         else:
-            LOGGER.info(f"Not using EMA")
             self.ema = None
+            LOGGER.info("Not using EMA")
 
-        # load existing model if specified
+        # === Warm start ===
         if self.warm_start:
             model_path = os.path.join(
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
+                state_dict = torch.load(model_path, map_location=self.device, weights_only=False)
                 LOGGER.info(f"Loading model from {model_path}")
-                self.model.load_state_dict(state_dict)
-                if self.ema is not None:
-                    LOGGER.info(f"Loading EMA from {model_path}")
-                    state_dict = torch.load(model_path, map_location="cpu")["ema"]
-                    self.ema.load_state_dict(state_dict)
+                self.model.load_state_dict(state_dict["model"])
+
+                if self.ema is not None and "ema" in state_dict:
+                    self.ema.load_state_dict(state_dict["ema"])
+                    LOGGER.info(f"Loaded EMA from {model_path}")
             except FileNotFoundError:
                 LOGGER.warning(
                     f"Cannot load model from {model_path}, training model from scratch"
                 )
 
+        # === μP setup ===
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+            self.bsh_path = os.path.join(self.cfg.run_dir, "base_shapes.bsh")
+
+            if os.path.exists(self.bsh_path):
+                LOGGER.info(f"Loading μP base shapes from {self.bsh_path}")
+                # Critical: always reset infshapes after load
+                # - warm start → rescale_params=False
+                # - fresh init → rescale_params=True
+                set_base_shapes(self.model, self.bsh_path, rescale_params=not self.warm_start)
+
+            else:
+                LOGGER.info("Defining base and delta models for μP setup")
+                base_cfg = copy.deepcopy(self.cfg.model)
+                base_cfg.net.hidden_channels = 49  # example base width
+                base_model = instantiate(base_cfg)
+
+                delta_cfg = copy.deepcopy(self.cfg.model)
+                delta_cfg.net.hidden_channels = 128  # example delta width
+                delta_model = instantiate(delta_cfg)
+
+                make_base_shapes(base_model, delta_model, savefile=self.bsh_path)
+                LOGGER.info(f"Saved μP base shapes to {self.bsh_path}")
+
+                set_base_shapes(self.model, self.bsh_path, rescale_params=True)
+
+            LOGGER.info("Using μP-aware MLP")
+
+        # === Move to device ===
         self.model.to(self.device, dtype=self.dtype)
         if self.ema is not None:
             self.ema.to(self.device)
@@ -382,49 +424,78 @@ class BaseExperiment:
             LOGGER.debug("Forcing use of xformers' attention implementation")
             gatr.primitives.attention.FORCE_XFORMERS = True
 
+
     def _init_optimizer(self, param_groups=None):
         if param_groups is None:
             param_groups = [
                 {"params": self.model.parameters(), "lr": self.cfg.training.lr}
             ]
 
+        # Check if we should use μP optimizers
+        use_mup = self.cfg.model.net._target_ == "models.mup_mlp.MuMLP"
+
         if self.cfg.training.optimizer == "Adam":
-            self.optimizer = torch.optim.Adam(
-                param_groups,
-                betas=self.cfg.training.betas,
-                eps=self.cfg.training.eps,
-                weight_decay=self.cfg.training.weight_decay,
-            )
+            if use_mup:
+                self.optimizer = MuAdam(
+                    param_groups,
+                    betas=self.cfg.training.betas,
+                    eps=self.cfg.training.eps,
+                    weight_decay=self.cfg.training.weight_decay,
+                )
+            else:
+                self.optimizer = torch.optim.Adam(
+                    param_groups,
+                    betas=self.cfg.training.betas,
+                    eps=self.cfg.training.eps,
+                    weight_decay=self.cfg.training.weight_decay,
+                )
+
         elif self.cfg.training.optimizer == "AdamW":
-            self.optimizer = torch.optim.AdamW(
-                param_groups,
-                betas=self.cfg.training.betas,
-                eps=self.cfg.training.eps,
-                weight_decay=self.cfg.training.weight_decay,
-            )
+            if use_mup:
+                self.optimizer = MuAdamW(
+                    param_groups,
+                    betas=self.cfg.training.betas,
+                    eps=self.cfg.training.eps,
+                    weight_decay=self.cfg.training.weight_decay,
+                )
+            else:
+                self.optimizer = torch.optim.AdamW(
+                    param_groups,
+                    betas=self.cfg.training.betas,
+                    eps=self.cfg.training.eps,
+                    weight_decay=self.cfg.training.weight_decay,
+                )
+
         elif self.cfg.training.optimizer == "RAdam":
+            # no MuRAdam implemented yet
             self.optimizer = torch.optim.RAdam(
                 param_groups,
                 betas=self.cfg.training.betas,
                 eps=self.cfg.training.eps,
                 weight_decay=self.cfg.training.weight_decay,
             )
+
         elif self.cfg.training.optimizer == "Lion":
+            # Lion is not μP-aware (you'd need to implement a MuLion if required)
             self.optimizer = Lion(
                 param_groups,
                 betas=self.cfg.training.betas,
                 weight_decay=self.cfg.training.weight_decay,
             )
+
         elif self.cfg.training.optimizer == "ScheduleFree":
+            # also not μP-aware
             self.optimizer = schedulefree.AdamWScheduleFree(
                 param_groups,
                 betas=self.cfg.training.betas,
                 weight_decay=self.cfg.training.weight_decay,
             )
+
         else:
             raise ValueError(f"Optimizer {self.cfg.training.optimizer} not implemented")
+
         LOGGER.debug(
-            f"Using optimizer {self.cfg.training.optimizer} with lr={self.cfg.training.lr}"
+            f"Using optimizer {self.cfg.training.optimizer}{' (μP)' if use_mup else ''} with lr={self.cfg.training.lr}"
         )
 
         # load existing optimizer if specified
@@ -433,13 +504,14 @@ class BaseExperiment:
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["optimizer"]
+                state_dict = torch.load(model_path, map_location=self.device, weights_only=False)["optimizer"]
                 LOGGER.info(f"Loading optimizer from {model_path}")
                 self.optimizer.load_state_dict(state_dict)
             except FileNotFoundError:
                 LOGGER.warning(
                     f"Cannot load optimizer from {model_path}, starting from scratch"
                 )
+
 
     def _init_scheduler(self):
         if self.cfg.training.scheduler is None:
@@ -542,108 +614,18 @@ class BaseExperiment:
             if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
                 oom=math.floor(np.log10(self.cfg.training.iterations))
                 mantissa=self.cfg.training.iterations/(10**oom)
-                iters_to_eval=[math.floor(mantissa*10**i) for i in range(0,oom+1)]
+                iters_to_eval=[math.floor(mantissa*10**(i/2)) for i in range(0,2*oom+1)]
                 if ((step+1) in iters_to_eval) or (step == 0):
-                    LOGGER.info(
-                            f"### Evaluating in iteration {smallest_val_loss_step+1} ###"
-                        )
-                    self._save_model(
-                        f"model_run{self.cfg.run_idx}_current.pt"
-                    )
-                    try:
-                        self._load_previous_best_model()
-                    except FileNotFoundError:
-                        self._load_previous_current_model()
-                    res = self.evaluate()
-                    self._load_previous_current_model()
-
-                    if self.cfg.training.get_ID:  ### ONLY WORKS WITH ONE DATASET, FIX LATER
-                        id_time = time.time()
-                        ID_mean, ID_std = get_intrinsic_dim(
-                            model = self.model,
-                            input_dataloader = self.test_loader,
-                            nsamples = min(1e4,self.cfg.data.subsample*self.cfg.training.train_test_val[1]),
-                            bs=self.cfg.training.batchsize,
-                            divs = 5,
-                            res = 10,
-                            call_model_fn=self.call_model_fn
-                        )
-                        id_time = time.time() - id_time
-                        LOGGER.info(
-                            f"Intrinsic Dimension estimation took {id_time:.2f}s"
-                        )
-                    #### There might be a better way to do this ####
-                    # for dataset in res.keys():
-                    #     if dataset not in results.keys():
-                    #         results[dataset] = {}
-                    #     for title in res[dataset].keys():
-                    #         if title not in results[dataset].keys():
-                    #             results[dataset][title] = {}
-                    #         for key in res[dataset][title].keys():
-                    #             if key not in results[dataset][title].keys():
-                    #                 results[dataset][title][key] = {}
-                    #             if "mses" not in results[dataset][title][key]:
-                    #                 results[dataset][title][key]["mses"] = []
-                    #                 results[dataset][title][key]["l1s"] = []
-                    #                 results[dataset][title][key]["l1s_rel"] = []
-                    #                 results[dataset][title][key]["iters"] = []
-                    #                 results[dataset][title][key]["iters_evaluated"] = []
-                    #                 results[dataset][title][key]["time"] = []
-                            
-                    #             results[dataset][title][key]["mses"].append(res[dataset][title][key]["mse"])
-                    #             results[dataset][title][key]["l1s"].append(res[dataset][title][key]["l1"])
-                    #             results[dataset][title][key]["l1s_rel"].append(res[dataset][title][key]["l1_rel"])
-                    #             results[dataset][title][key]["iters"].append(step+1)
-                    #             results[dataset][title][key]["iters_evaluated"].append(smallest_val_loss_step)
-                    #             results[dataset][title][key]["time"].append(time.time() - self.training_start_time)                  
-                    for dataset, dataset_results in self.results.items():  # Loop through datasets
-                        for split, split_results in dataset_results.items():  # Loop through splits (train/val/test)
-                            for processing_type, metrics in split_results.items():  # Loop through raw/preprocessed
-                                # Create directory for predictions if it doesn't exist
-                                if self.cfg.training.save_preds_intermediate or (step+1) == self.cfg.training.iterations:
-                                    os.makedirs(os.path.join(self.cfg.run_dir, "preds"), exist_ok=True)
-                                    
-                                    # Save predictions to file
-                                    pred_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pred.npy")
-                                    np.save(pred_path, metrics["prediction"])
-                                    
-                                    # For heteroscedastic case, also save sigmas if they exist
-                                    if self.cfg.training.loss == "HETEROSC" and processing_type == "preprocessed":
-                                        sigma_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_sigmas.npy")
-                                        np.save(sigma_path, metrics["sigmas"])
-                                        pull_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pull.npy")
-                                        np.save(pull_path, metrics["pull"])
-                                # Append results to list
-                                
-                                results.append({
-                                    'run_id': self.cfg.run_idx,
-                                    'samplesize': int(self.cfg.data.subsample),
-                                    'dataset': dataset,
-                                    'split': split,  # train/val/test
-                                    'processing_type': processing_type,  # raw/preprocessed
-                                    'mse': metrics.get('mse'),
-                                    'l1': metrics.get('l1'),
-                                    'l1_rel': metrics.get('l1_rel'),
-                                    'iter': step + 1,
-                                    'iter_evaluated': smallest_val_loss_step,
-                                    'ID': [ID_mean, ID_std] if self.cfg.training.get_ID else None,
-                                    'time': time.time() - self.training_start_time
-                                })
-
-            # validation (and early stopping)
-            if self.cfg.training.save_gradients:
-                if ((step+1) in iters_to_eval): #plot gradients
-                    plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
-                    os.makedirs(plot_path, exist_ok=True)
-                    LOGGER.info(f"Plotting gradients to {plot_path}/gradients_{step+1}.pdf")
-                    plot_gradients(file=plot_path,model=self.model, iteration=step+1)
-            if self.cfg.training.save_weights:
-                if ((step+1) in iters_to_eval): #plot weights
-                    plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
-                    os.makedirs(plot_path, exist_ok=True)
-                    LOGGER.info(f"Plotting weights to {plot_path}/weights_{step+1}.pdf")
-                    plot_weights(file=plot_path,model=self.model, iteration=step+1)
-
+                    self._evals(results,smallest_val_loss_step,step)
+            
+                if self.cfg.training.save_gradients:
+                    if ((step+1) in iters_to_eval) or (step == 0): #plot gradients
+                        self._save_gradients(step)                    
+                if self.cfg.training.save_weights or (step == 0):
+                    if ((step+1) in iters_to_eval): #plot weights
+                        self._save_weights(step)
+                
+            # validation (and early stopping)        
             if ((step + 1) % self.cfg.training.validate_every_n_steps == 0) or (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
                 val_loss = self._validate(step)
                 if val_loss < smallest_val_loss:
@@ -660,7 +642,10 @@ class BaseExperiment:
                             f"model_run{self.cfg.run_idx}_best.pt"#it{smallest_val_loss_step}.pt"
                         )
                 else:
-                    patience += 1
+                    if (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
+                        patience += 1
+                    else:
+                        patience += self.cfg.training.validate_every_n_steps
                     if patience > self.cfg.training.es_patience:
                         LOGGER.info(
                             f"Early stopping in iteration {step} = epoch {step / len(self.train_loader):.1f}"
@@ -691,18 +676,99 @@ class BaseExperiment:
             log_mlflow("traintime", dt / 3600)
 
         # wrap up early stopping
-        if self.cfg.training.es_load_best_model:
+        if (self.cfg.training.es_load_best_model) and (patience > self.cfg.training.es_patience):
+            self._evals(results,smallest_val_loss_step,step)
             self._load_previous_best_model()
-
-        # save results intermediate
-        if self.cfg.training.save_intermediate:
-            LOGGER.info(
-                f"Saving results to {self.cfg.run_dir}/results_intermediate.pkl"
+        elif (self.cfg.training.es_load_best_model):
+            self._load_previous_best_model()
+        
+    def _evals(self,results,smallest_val_loss_step,step):
+        LOGGER.info(
+                f"### Evaluating model from iteration {smallest_val_loss_step+1} in iteration {step+1}###"
             )
-            with open(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"), "wb") as f:
-                pickle.dump(results, f)
-            # df = pd.DataFrame(results)
-            # df.to_pickle(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"))
+        self._save_model(
+            f"model_run{self.cfg.run_idx}_current.pt"
+        )
+        if self.cfg.training.load_best_previous:
+            try:
+                self._load_previous_best_model()
+            except FileNotFoundError:
+                self._load_previous_current_model()
+        res = self.evaluate()
+        
+
+        if self.cfg.training.get_ID:  ### ONLY WORKS WITH ONE DATASET, FIX LATER
+            id_time = time.time()
+            ID_mean, ID_std = get_intrinsic_dim(
+                model = self.model,
+                input_dataloader = self.test_loader,
+                nsamples = min(1e3,self.cfg.data.subsample*self.cfg.training.train_test_val[1]),
+                bs=self.cfg.training.batchsize,
+                divs = 2,
+                res = 3,
+                call_model_fn=self.call_model_fn
+            )
+            id_time = time.time() - id_time
+            LOGGER.info(
+                f"Intrinsic Dimension estimation took {id_time:.2f}s"
+            )
+        for dataset, dataset_results in self.results.items():  # Loop through datasets
+            for split, split_results in dataset_results.items():  # Loop through splits (train/val/test)
+                for processing_type, metrics in split_results.items():  # Loop through raw/preprocessed
+                    # Create directory for predictions if it doesn't exist
+                    if self.cfg.training.save_preds_intermediate or (step+1) == self.cfg.training.iterations:
+                        self._save_preds_intermediate(
+                            step + 1, dataset, split, processing_type, metrics
+                        )
+                    # Append results to list
+                    
+                    results.append({
+                        'run_id': self.cfg.run_idx,
+                        'samplesize': int(self.cfg.data.subsample),
+                        'dataset': dataset,
+                        'split': split,  # train/val/test
+                        'processing_type': processing_type,  # raw/preprocessed
+                        'mse': metrics.get('mse'),
+                        'l1': metrics.get('l1'),
+                        'l1_rel': metrics.get('l1_rel'),
+                        'iter': step + 1,
+                        'iter_evaluated': smallest_val_loss_step,
+                        'ID': [ID_mean, ID_std] if self.cfg.training.get_ID else None,
+                        'time': time.time() - self.training_start_time
+                    })
+        self._load_previous_current_model()
+        LOGGER.info(
+            f"Saving results to {self.cfg.run_dir}/results_intermediate.pkl"
+        )
+        with open(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"), "wb") as f:
+            pickle.dump(results, f)
+
+
+    def _save_gradients(self, step):
+        plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
+        os.makedirs(plot_path, exist_ok=True)
+        LOGGER.info(f"Plotting gradients to {plot_path}/gradients_{step+1}.pdf")
+        plot_gradients(file=plot_path,model=self.model, iteration=step+1)
+
+    def _save_weights(self, step):
+        plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
+        os.makedirs(plot_path, exist_ok=True)
+        LOGGER.info(f"Plotting weights to {plot_path}/weights_{step+1}.pdf")
+        plot_weights(file=plot_path,model=self.model, iteration=step+1)
+
+    def _save_preds_intermediate(self, step, dataset, split, processing_type, metrics):
+        os.makedirs(os.path.join(self.cfg.run_dir, "preds"), exist_ok=True)
+                                    
+        # Save predictions to file
+        pred_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pred.npy")
+        np.save(pred_path, metrics["prediction"])
+        
+        # For heteroscedastic case, also save sigmas if they exist
+        if self.cfg.training.loss == "HETEROSC" and processing_type == "preprocessed":
+            sigma_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_sigmas.npy")
+            np.save(sigma_path, metrics["sigmas"])
+            pull_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pull.npy")
+            np.save(pull_path, metrics["pull"])
 
     def _load_previous_model(self,step):
         model_path = os.path.join(
@@ -717,7 +783,10 @@ class BaseExperiment:
         except FileNotFoundError:
             LOGGER.warning(
                 f"Cannot load model (epoch {step}) from {model_path}"
-            )
+            )  
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
+
     def _load_previous_best_model(self):
         model_path = os.path.join(
                 self.cfg.run_dir,
@@ -732,6 +801,9 @@ class BaseExperiment:
             LOGGER.warning(
                 f"Cannot load best model from {model_path}"
             )
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
+        
     def _load_previous_current_model(self):
         model_path = os.path.join(
                 self.cfg.run_dir,
@@ -746,6 +818,8 @@ class BaseExperiment:
             LOGGER.warning(
                 f"Cannot load current model from {model_path}"
             )
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
             
     def _step(self, data, step):
         # actual update step
@@ -870,6 +944,27 @@ class BaseExperiment:
             model_path,
         )
 
+    def compress_models(self):
+        pt_files = glob.glob(os.path.join(self.cfg.run_dir , "models", "*.pt"))
+
+        if not pt_files:
+            print("No .pt files found.")
+        else:
+            for path in pt_files:
+                gz_path = path + ".gz"
+
+                if os.path.exists(gz_path):
+                    print(f"Skipping {path} (already compressed)")
+                    continue
+
+                print(f"Compressing {path} -> {gz_path}")
+                with open(path, 'rb') as f_in:
+                    with gzip.open(gz_path, 'wb', compresslevel=9) as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+
+                os.remove(path)  # Remove original
+                print(f"  Done, original removed.")
+                
     def init_physics(self):
         raise NotImplementedError()
 

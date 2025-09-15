@@ -66,9 +66,13 @@ class LGATr(nn.Module):
         checkpoint_blocks: bool = False,
         dropout_prob: Optional[float] = None,
         double_layernorm: bool = False,
+        loss = 'MSE',
         **kwargs,
     ) -> None:
         super().__init__()
+        self.loss = loss
+        self.out_mv_channels = out_mv_channels
+        self.out_s_channels = out_s_channels
         self.linear_in = EquiLinear(
             in_mv_channels,
             hidden_mv_channels,
@@ -98,6 +102,7 @@ class LGATr(nn.Module):
                 for _ in range(num_blocks)
             ]
         )
+    
         self.linear_out = EquiLinear(
             hidden_mv_channels,
             out_mv_channels,
@@ -161,6 +166,16 @@ class LGATr(nn.Module):
                     **attn_kwargs,
                 )
 
+        # if self.loss == 'HETEROSC':
+        #     x_mv, x_s = self.linear_out(h_mv, scalars=h_s)
+        #     x_mv_sigmas = torch.nn.functional.gelu(x_mv[:, -self.out_mv_channels:]) + 0.17
+        #     x_s_sigmas = torch.nn.functional.gelu(x_s[:, -self.out_s_channels:]) + 0.17
+
+        #     x_mv = torch.cat((x_mv[:, :-self.out_mv_channels], x_mv_sigmas), dim=1)
+        #     x_s = torch.cat((x_s[:, :-self.out_s_channels], x_s_sigmas), dim=1)
+            
+        #     outputs_mv, outputs_s = x_mv, x_s
+        # else:
         outputs_mv, outputs_s = self.linear_out(h_mv, scalars=h_s)
 
         return outputs_mv, outputs_s

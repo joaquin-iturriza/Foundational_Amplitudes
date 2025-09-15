@@ -28,3 +28,15 @@ class RelL1Loss(torch.nn.Module):
         self, y_true: torch.Tensor, y_pred: torch.Tensor
     ) -> torch.Tensor:
         return rel_l1_loss(y_true, y_pred, self.epsilon)
+    
+def heteroscedastic_loss(y_pred: torch.Tensor, y_true: torch.Tensor, sigma: torch.Tensor) -> torch.Tensor:
+    sigma_clamped = torch.clamp(sigma, min=1e-15, max=1e5)
+    loss = ((y_true - y_pred) ** 2) / (2 * sigma_clamped ** 2) + torch.log(sigma_clamped)
+    return torch.mean(loss)
+
+class HeteroscedasticLoss(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor, sigma: torch.Tensor) -> torch.Tensor:
+        return heteroscedastic_loss(y_pred, y_true, sigma)

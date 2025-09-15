@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
+from scipy.stats import norm
 
 from base_plots import plot_loss
 
-plt.rcParams["font.family"] = "serif"
-plt.rcParams["font.serif"] = "Charter"
+#plt.rcParams["font.family"] = "serif"
+#plt.rcParams["font.serif"] = "Charter"
 plt.rcParams["text.usetex"] = False
 #plt.rcParams["text.latex.preamble"] = (
 #    r"\usepackage[bitstream-charter]{mathdesign} \usepackage{amsmath} \usepackage{siunitx}"
@@ -21,12 +22,16 @@ colors = ["black", "#0343DE", "#A52A2A", "darkorange"]
 def plot_mixer(cfg, plot_path, title, plot_dict):
     if cfg.plotting.loss and cfg.train:
         file = f"{plot_path}/loss.pdf"
+        if cfg.training.loss == "HETEROSC":
+            logy = True
+        else:
+            logy = True
         plot_loss(
             file,
             [plot_dict["train_loss"], plot_dict["val_loss"]],
             plot_dict["train_lr"],
             labels=["train loss", "val loss"],
-            logy=True,
+            logy=logy,
         )
 
     if cfg.plotting.histograms and cfg.evaluate:
@@ -47,6 +52,99 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     title=title[idataset],
                     xlabel=r"$\log A$",
                     logx=False,
+                )
+        
+            if cfg.training.loss == "HETEROSC":
+                labels = ["Test", "Train"]
+                sigmas_test = plot_dict["results_test"][dataset]["preprocessed"]["sigmas"]
+                pull_test = plot_dict["results_test"][dataset]["preprocessed"]["pull"]
+                sigmas_train = plot_dict["results_train"][dataset]["preprocessed"]["sigmas"]
+                pull_train = plot_dict["results_train"][dataset]["preprocessed"]["pull"]
+                sigmas = [sigmas_test, sigmas_train]
+                pulls = [pull_test, pull_train]
+                plot_histogram_single_output(
+                    file,
+                    sigmas,
+                    labels,
+                    title=f'{title[idataset]} - $\sigma$',
+                    xlabel=r"$\sigma$",
+                    logy=False,
+                    plot_ratios=False
+                )
+                plot_histogram_single_output(
+                    file,
+                    [sigmas_test],
+                    labels=["Test"],
+                    title=f'{title[idataset]} - $\sigma$',
+                    xlabel=r"$\sigma$",
+                    logy=False,
+                    plot_ratios=False
+                )
+                plot_histogram_single_output(
+                    file,
+                    [sigmas_test],
+                    labels=["Test"],
+                    title=f'{title[idataset]} - $\sigma$',
+                    xlabel=r"$\sigma$",
+                    logy=True,
+                    plot_ratios=False
+                )
+                plot_histogram_single_output(
+                    file,
+                    pulls,
+                    labels,
+                    xrange=(-5,5),
+                    title=f'{title[idataset]} - Pull',
+                    xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
+                    logy=False,
+                    plot_ratios=False,
+                    pull=True
+                )
+                plot_histogram_single_output(
+                    file,
+                    [pull_test],
+                    xrange=(-5,5),
+                    labels=["Test"],
+                    title=f'{title[idataset]} - Pull',
+                    xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
+                    logy=False,
+                    plot_ratios=False,
+                    pull=True
+                )
+                plot_histogram_single_output(
+                    file,
+                    [pull_test],
+                    xrange=(-5,5),
+                    labels=["Test"],
+                    title=f'{title[idataset]} - Pull',
+                    xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
+                    logy=True,
+                    plot_ratios=False,
+                    pull=True
+                )
+                # Test vs 1% largest 
+                truth_test = plot_dict["results_test"][dataset]["raw"]["truth"]
+                plot_histogram_single_output(
+                    file,
+                    [pull_test, pull_test], # Will be masked internally
+                    xrange=(-5,5),  
+                    labels=["Test", "Largest 1\%"],
+                    title=f'{title[idataset]} - Pull',
+                    xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
+                    logy=True,
+                    reference_truth=truth_test,  # Pass truth values for selection
+                    pull=True,
+                    plot_ratios=False
+                )
+                plot_histogram_single_output(
+                    file,
+                    [sigmas_test, sigmas_test],  # Will be masked internally
+                    labels=["Test", "Largest 1\%"],
+                    title=f'{title[idataset]} - $\sigma$',
+                    xlabel=r"$\sigma$",
+                    logy=True,
+                    plot_ratios=False,
+                    reference_truth=truth_test  # Pass truth values for selection
                 )
 
     if cfg.plotting.delta and cfg.evaluate:
@@ -150,6 +248,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 logx=True,
                 logy=False,
             )
+            
 
     if cfg.plotting.delta_prepd and cfg.evaluate:
         out = f"{plot_path}/delta_prepd.pdf"
@@ -430,3 +529,119 @@ def plot_weights(file, model, iteration):
     plt.tight_layout()
     plt.savefig(f'{file}/weights_{iteration}.pdf', format="pdf", bbox_inches="tight")
     plt.show()
+
+def plot_histogram_single_output(
+    file,
+    data,  # List of arrays with shape (N,) or list of batches with shape (M,)
+    labels,
+    n_bins=60,
+    xlabel=None,
+    title=None,
+    logx=False,
+    logy=False,
+    xrange=None,
+    ratio_range=[0.85, 1.15],
+    ratio_ticks=[0.9, 1.0, 1.1],
+    plot_ratios=True,
+    pull=False,
+    reference_truth=None,
+):
+    # Flatten data if needed
+    #print('###################DATA####################')
+    #print(data)
+    #print(data.shape)
+    
+    restructured_data = [np.concatenate([np.array(batch) for batch in dataset]) for dataset in data]
+    flat_reference = np.concatenate([np.array(batch) for batch in reference_truth]) if reference_truth is not None else None
+    
+    if reference_truth is not None and len(restructured_data) == 2:
+        truth_values = flat_reference
+        largest_idx = max(1,round(0.01 * len(truth_values)))
+        sort_idx = np.argsort(truth_values)
+        largest_min = truth_values[sort_idx][-largest_idx - 1]
+        largest_mask = truth_values > largest_min
+        restructured_data[1] = restructured_data[1][largest_mask]
+    #print('###################RESTRUCTURED####################')
+    #print(restructured_data)
+    if xrange is None:
+        min_val = min(np.min(dat) for dat in restructured_data)
+        max_val = max(np.max(dat) for dat in restructured_data)
+        bins = np.linspace(min_val, max_val, n_bins + 1)
+    else:
+        bins = np.linspace(xrange[0], xrange[1], n_bins + 1)
+
+    hists = []
+    for dat in restructured_data:
+        hist, _ = np.histogram(dat, bins=bins)
+        hists.append(hist)
+
+    integrals = [np.sum((bins[1:] - bins[:-1]) * hist) for hist in hists]
+    scales = [1 / integral if integral != 0.0 else 1.0 for integral in integrals]
+    dup_last = lambda a: np.append(a, a[-1])
+
+    # Plotting
+    fig = plt.figure(figsize=(6, 6 if not plot_ratios else 8))
+    if plot_ratios:
+        gs = fig.add_gridspec(2, 1, height_ratios=[3, 1], hspace=0)
+        ax_main = fig.add_subplot(gs[0])
+        ax_ratio = fig.add_subplot(gs[1], sharex=ax_main)
+        ax_ratio.set_ylabel("Ratio", fontsize=FONTSIZE)
+    else:
+        ax_main = fig.add_subplot(111)
+        ax_ratio = None
+
+    for i, hist, scale, label, color in zip(
+        range(len(hists)), hists, scales, labels, colors
+    ):
+        ax_main.step(
+            bins,
+            dup_last(hist) * scale,
+            label=label,
+            color=color,
+            linewidth=1.0,
+            where="post",
+        )
+        if i == 0:
+            ax_main.fill_between(
+                bins,
+                dup_last(hist) * scale,
+                0.0,
+                facecolor=color,
+                alpha=0.1,
+                step="post",
+            )
+        elif plot_ratios:
+            ratio = np.divide(
+                hist * scale, hists[0] * scales[0], where=hists[0] * scales[0] != 0
+            )
+            ax_ratio.step(
+                bins, dup_last(ratio), linewidth=1.0, where="post", color=color
+            )
+
+    if logx:
+        ax_main.set_xscale("log")
+    if logy:
+        ax_main.set_yscale("log")
+    if pull:
+        x = np.linspace(xrange[0], xrange[1], 1000) if xrange else np.linspace(min_val, max_val, 1000)
+        gaussian = norm.pdf(x, 0, 1)
+        ax_main.plot(x, gaussian, 'r--', linewidth=2, label='Gaussian (0, 1)')
+
+    ax_main.set_ylabel("Normalized", fontsize=FONTSIZE)
+    ax_main.set_title(title, fontsize=FONTSIZE + 2)
+    ax_main.tick_params(axis="both", labelsize=FONTSIZE_TICK)
+    ax_main.legend(loc="best", frameon=False, fontsize=FONTSIZE_LEGEND)
+
+    if xlabel:
+        (ax_ratio if plot_ratios else ax_main).set_xlabel(xlabel, fontsize=FONTSIZE)
+
+    if plot_ratios:
+        ax_ratio.set_yticks(ratio_ticks)
+        ax_ratio.set_ylim(ratio_range)
+        for tick in ratio_ticks:
+            ax_ratio.axhline(y=tick, c="black", ls="--" if tick == 1.0 else "dotted", lw=0.7)
+        ax_ratio.tick_params(axis="both", labelsize=FONTSIZE_TICK)
+
+    fig.tight_layout()
+    fig.savefig(file, format="pdf", bbox_inches="tight")
+    plt.close()

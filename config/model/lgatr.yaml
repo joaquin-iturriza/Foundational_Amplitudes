@@ -14,6 +14,8 @@ net:
  out_s_channels: null
  hidden_s_channels: 32
 
+ loss: "MSE"
+
  num_blocks: 8
  reinsert_mv_channels: null
  reinsert_s_channels: null
