@@ -1,0 +1,15 @@
+_target_: wrappers.AmplitudeMLPWrapper
+
+net:
+  _target_: models.mup_mlp.MuMLP
+
+  n_features: 0   # overwritten once the data is loaded
+  hidden_channels: 512
+  hidden_layers: 5
+  out_shape: 1
+  loss: "MSE"
+  gain: 1
+  init_bias: true
+
+  activation: "gelu"
+  num_groups: 1
