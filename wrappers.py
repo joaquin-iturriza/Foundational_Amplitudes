@@ -4,46 +4,6 @@ from torch_geometric.utils import dense_to_sparse
 from lgatr.interface import embed_vector, extract_scalar
 
 
-def encode_tokens(type_token, global_token, token_size, isgatr, batchsize, device):
-    """Compute embedded type_token and global_token to be used within Transformers
-
-    Parameters
-    type_token: iterable of int
-        list with type_tokens for each particle in the event
-    global_token: int
-    isgatr: bool
-        whether the encoded tokens will be used within L-GATr or within the baseline Transformer
-        This affects how many zeroes have to be padded to the global_token (4 more for the baseline Transformer)
-    batchsize: int
-    device: torch.device
-
-
-    Returns:
-    type_token: torch.Tensor with shape (batchsize, num_particles, type_token_max)
-        one-hot-encoded type tokens, to be appended to each encoded 4-momenta in case of the
-        baseline transformer / make up the full scalar channel for L-GATr
-    global_token: torch.Tensor with shape (batchsize, 1, type_token_max+4)
-        ont-hot-encoded dataset token, this will be the global_token and appended to the individual particles
-    """
-    type_token = nn.functional.one_hot(type_token, num_classes=token_size)
-    type_token = (
-        type_token.unsqueeze(1)
-        .expand(type_token.shape[0], batchsize, *type_token.shape[1:])
-        .float()
-    )
-
-    global_token = nn.functional.one_hot(
-        global_token, num_classes=token_size + (0 if isgatr else 4)
-    )
-    global_token = (
-        global_token.unsqueeze(1)
-        .expand(global_token.shape[0], batchsize, *global_token.shape[1:])
-        .unsqueeze(-2)
-        .float()
-    )
-    return type_token, global_token
-
-
 class AmplitudeMLPWrapper(nn.Module):
     def __init__(self, net):
         super().__init__()
@@ -135,3 +95,19 @@ class AmplitudeGATrWrapper(nn.Module):
 
         amplitude = lorentz_scalars[..., 0, :]
         return amplitude
+        
+
+class AmplitudeLLoCaWrapper(nn.Module):
+    def __init__(self, net):
+        super().__init__()
+        self.net = net
+        self.network_dtype = torch.float32
+
+    def forward(self, inputs, type_token, mean, std):
+        particle_type = torch.nn.functional.one_hot(
+            type_token, num_classes=type_token.max() + 1
+        )
+        particle_type = particle_type.repeat(inputs.shape[0], 1, 1)
+        particle_type = particle_type.to(dtype=self.network_dtype, device=inputs.device)
+        outputs = self.net(inputs, particle_type, mean, std)
+        return outputs.mean(dim=-2)

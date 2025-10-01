@@ -17,6 +17,9 @@ from logger import LOGGER
 #from mlflow_util import log_mlflow
 from losses import LogCoshLoss, RelL1Loss, HeteroscedasticLoss
 
+from lloca.utils.rand_transforms import rand_lorentz
+from lloca.utils.polar_decomposition import restframe_boost
+
 import psutil, os
 
 def log_memory_usage(tag=""):
@@ -116,7 +119,18 @@ MODEL_TITLE_DICT = {
     "FV_MLP": "FV MLP",
     "DSI": "DSI",
     "LGATr": "LGATr",
+    "LLOCATransformer": "LLoCa Transformer"
 }
+
+mass_Z = 91.188
+
+def get_mass(dataset):
+    # initialize massless particles
+    mass = [1e-5] * (len(dataset))
+
+    # Set the Z mass (change later for more general datasets)
+    mass[2] = mass_Z
+    return mass
 
 
 class AmplitudeExperiment(BaseExperiment):
@@ -138,25 +152,29 @@ class AmplitudeExperiment(BaseExperiment):
             [max([max(token) for token in self.type_token]) + 1, self.n_datasets]
         )
         OmegaConf.set_struct(self.cfg, True)
-        modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
-        if modelname in ["GAP", "MLP", "DSI"]:
+        self.modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
+        if self.modelname in ["GAP", "MLP", "DSI"]:
             assert len(self.cfg.data.dataset) == 1, (
-                f"Architecture {modelname} can not handle several datasets "
+                f"Architecture {self.modelname} can not handle several datasets "
                 f"as specified in {self.cfg.data.dataset}"
             )
 
-        with open_dict(self.cfg):
-            if modelname == "LGATr":
-                self.cfg.model.net.in_s_channels = token_size
-                self.cfg.model.token_size = token_size
-                
-            self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
-                self.cfg.data.dataset[0]
-            ]
-            assert (
-                len(np.unique(self.cfg.model.net.type_token_list))
-                == max(self.cfg.model.net.type_token_list) + 1
-            ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
+        if self.modelname == "LLOCATransformer":
+            self.cfg.model.net.in_channels = token_size + 4
+            self.cfg.model.net.num_scalars = token_size
+        else:
+            with open_dict(self.cfg):
+                if self.modelname == "LGATr":
+                    self.cfg.model.net.in_s_channels = token_size
+                    self.cfg.model.token_size = token_size
+                    
+                self.cfg.model.net.type_token_list = TYPE_TOKEN_DICT[
+                    self.cfg.data.dataset[0]
+                ]
+                assert (
+                    len(np.unique(self.cfg.model.net.type_token_list))
+                    == max(self.cfg.model.net.type_token_list) + 1
+                ), f"Invalid type_token_list={self.cfg.model.net.type_token_list}"
 
     def init_data(self):
         LOGGER.info(
@@ -222,18 +240,40 @@ class AmplitudeExperiment(BaseExperiment):
             amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
                 amplitudes, trafos=self.cfg.data.amp_trafos
             )
-            LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
-            particles_prepd = preprocess_particles(
-                particles,
-                self.type_token[0],
-                trafos=self.cfg.data.trafos,
-                incl_fvs=self.cfg.data.incl_fvs,
-            )
-            #if 'LGATr' in self.cfg.model.net._target_:
-            #    particles_prepd = particles_prepd.reshape(particles_prepd.shape[0], particles_prepd.shape[1] // 4, 4)
+            if self.modelname == "LLOCATransformer": 
+                particles = torch.tensor(particles, dtype=torch.float64)
+                particles = particles.reshape(-1, len(self.type_token[0]), 4)
+                mass = get_mass(self.type_token[0])
+                mass = torch.tensor(mass, dtype=particles.dtype).unsqueeze(0)
+                particles[..., 0] = torch.sqrt((particles[..., 1:] ** 2).sum(dim=-1) + mass**2)
 
-            # save number of features for later
-            self.cfg.model.net.n_features = particles_prepd.shape[-1]
+                # boost to the center-of-mass ref. frame of incoming particles
+                # then apply general Lorentz trafo L=R*B
+                lab_particles = particles[..., :2, :].sum(dim=-2)
+                to_com = restframe_boost(lab_particles)
+                trafo = rand_lorentz(
+                    particles.shape[:-2], generator=None, dtype=particles.dtype
+                )
+                trafo = torch.einsum("...ij,...jk->...ik", trafo, to_com)
+                particles = torch.einsum("...ij,...kj->...ki", trafo, particles)
+                particles_prepd = particles / particles.std()
+
+                self.mom_mean = particles_prepd.mean()
+                self.mom_std = np.clip(particles_prepd.std(), 1e-2, None)
+                particles_prepd = particles_prepd.numpy()
+            else:
+                LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
+                particles_prepd = preprocess_particles(
+                    particles,
+                    self.type_token[0],
+                    trafos=self.cfg.data.trafos,
+                    incl_fvs=self.cfg.data.incl_fvs,
+                )
+                #if 'LGATr' in self.cfg.model.net._target_:
+                #    particles_prepd = particles_prepd.reshape(particles_prepd.shape[0], particles_prepd.shape[1] // 4, 4)
+
+                # save number of features for later
+                self.cfg.model.net.n_features = particles_prepd.shape[-1]
 
             # collect everything
             self.particles.append(particles)
@@ -378,29 +418,41 @@ class AmplitudeExperiment(BaseExperiment):
         for data in loader:
             for idataset, data_onedataset in enumerate(data):
                 x, y = data_onedataset
-                modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
-                if modelname=="LGATr":    
-                    x = x.unsqueeze(0) 
-                pred = self.model(
-                    x.to(self.device),
-                    type_token=torch.tensor(
-                        [self.type_token[idataset]],
-                        dtype=torch.long,
-                        device=self.device,
-                    ),
-                    global_token=torch.tensor(
-                        [idataset], dtype=torch.long, device=self.device
-                    ),
-                )
-                #print(pred)
-                y_pred = pred.squeeze(0)  
-                #y_pred = pred[0, ..., 0]
-                #print(y_pred)
-                #print(f"y_pred shape: {y_pred.shape}")
-                #print(f"y shape: {y.shape}")
-                amplitudes_pred_prepd[idataset].append(y_pred[:, :1].cpu().float().numpy())
-                if self.cfg.training.loss == "HETEROSC":
-                    amplitudes_sigmas[idataset].append(y_pred[:, -1:].cpu().float().numpy())
+                if self.modelname == "LLOCATransformer":
+                    y_pred = self.model(
+                        x.to(self.device),
+                        type_token=torch.tensor(
+                            [self.type_token[idataset]],
+                            dtype=torch.long,
+                            device=self.device,
+                        ),
+                        mean=self.mom_mean,
+                        std=self.mom_std,
+                    )
+                    amplitudes_pred_prepd[idataset].append(y_pred.cpu().float().numpy())
+                else:
+                    if self.modelname=="LGATr":    
+                        x = x.unsqueeze(0) 
+                    pred = self.model(
+                        x.to(self.device),
+                        type_token=torch.tensor(
+                            [self.type_token[idataset]],
+                            dtype=torch.long,
+                            device=self.device,
+                        ),
+                        global_token=torch.tensor(
+                            [idataset], dtype=torch.long, device=self.device
+                        ),
+                    )
+                    #print(pred)
+                    y_pred = pred.squeeze(0)  
+                    #y_pred = pred[0, ..., 0]
+                    #print(y_pred)
+                    #print(f"y_pred shape: {y_pred.shape}")
+                    #print(f"y shape: {y.shape}")
+                    amplitudes_pred_prepd[idataset].append(y_pred[:, :1].cpu().float().numpy())
+                    if self.cfg.training.loss == "HETEROSC":
+                        amplitudes_sigmas[idataset].append(y_pred[:, -1:].cpu().float().numpy())
                 
                 amplitudes_truth_prepd[idataset].append(
                     y.cpu().float().numpy()
@@ -616,8 +668,7 @@ class AmplitudeExperiment(BaseExperiment):
         mse = []
         if len(data) == 1:
             x, y = data[0]
-            modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
-            if modelname=="LGATr":
+            if self.modelname=="LGATr":
                 x, y = x.unsqueeze(0), y.unsqueeze(0)
             attn_mask = None
             type_token = torch.tensor(
@@ -658,9 +709,14 @@ class AmplitudeExperiment(BaseExperiment):
             )
         x, y = x.to(self.device), y.to(self.device)
         #print('_batch_loss: x shape:', x.shape, 'y shape:', y.shape)
-        y_pred = self.model(
-            x, type_token=type_token, global_token=global_token, attn_mask=attn_mask
-        )
+        if self.modelname == "LLOCATransformer":
+            y_pred = self.model(
+                x, type_token=type_token, mean=self.mom_mean, std=self.mom_std
+            )
+        else:
+            y_pred = self.model(
+                x, type_token=type_token, global_token=global_token, attn_mask=attn_mask
+            )
         if self.cfg.training.loss == "HETEROSC":
             #LOGGER.info('total output shape:', y_pred.shape)
             # Heteroscedastic loss expects the last channel to be the sigma
