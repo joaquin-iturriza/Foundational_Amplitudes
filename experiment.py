@@ -329,6 +329,7 @@ class AmplitudeExperiment(BaseExperiment):
             ),
             batch_size=self.cfg.training.batchsize,
             shuffle=True,
+            drop_last=True,
         )
 
         self.test_loader = torch.utils.data.DataLoader(
@@ -337,6 +338,7 @@ class AmplitudeExperiment(BaseExperiment):
             ),
             batch_size=self.cfg.evaluation.batchsize,
             shuffle=False,
+            drop_last=True,
         )
 
         self.val_loader = torch.utils.data.DataLoader(
@@ -345,6 +347,7 @@ class AmplitudeExperiment(BaseExperiment):
             ),
             batch_size=self.cfg.evaluation.batchsize,
             shuffle=False,
+            drop_last=True,
         )
         n_train = sum(len(x) for x in train_sets["particles"])
         n_val   = sum(len(x) for x in val_sets["particles"])

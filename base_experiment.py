@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn as nn
 import math
 import datetime
 import pickle
@@ -224,6 +225,9 @@ class BaseExperiment:
             LOGGER.info("Using μP-aware MLP")
 
         # === Move to device ===
+        if torch.cuda.device_count() > 1:
+            print("Using", torch.cuda.device_count(), "GPUs")
+            model = nn.DataParallel(model)
         self.model.to(self.device, dtype=self.dtype)
         if self.ema is not None:
             self.ema.to(self.device)
