@@ -29,7 +29,8 @@ class MuMLP(nn.Module):
         dropout_prob=None,
         gain=1.0,
         loss='MSE',
-        init_bias=True
+        init_bias=True,
+        use_mup_init=True,
     ):
         super().__init__()
 
@@ -64,7 +65,8 @@ class MuMLP(nn.Module):
             layers.append(MuReadout(hidden_channels, np.prod(self.out_shape)))
 
         self.mlp = nn.Sequential(*layers)
-        self.mlp.apply(lambda m: self.init_weights(m, activation=activation, init_bias=init_bias))
+        if use_mup_init:
+            self.mlp.apply(lambda m: self.init_weights(m, activation=activation, init_bias=init_bias))
 
     @staticmethod
     def init_weights(m, activation='gelu', init_bias=True):

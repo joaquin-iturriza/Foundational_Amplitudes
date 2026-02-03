@@ -1,7 +1,7 @@
 _target_: wrappers.AmplitudeLLoCaWrapper
 
 net:
-  _target_: models.lloca.LLOCATransformer
+  _target_: models.lloca.LLOCAMuPTransformer
 
   num_scalars: null
   hidden_channels_mlp: 128
@@ -12,5 +12,6 @@ net:
   out_channels: 1
   num_blocks: 8
   num_heads: 8
+  freeze_framesnet: false
 
   loss: "MSE"

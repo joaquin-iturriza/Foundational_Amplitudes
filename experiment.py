@@ -71,6 +71,47 @@ TYPE_TOKEN_DICT = {
     "gg_tth_loop_uw": [0, 0, 1, 1, 2],
     "gggh_uw": [0, 0, 1, 2],
 }
+mass_Z = 91.188
+mass_W = 80.369
+mass_H = 125.11
+mass_top = 172.76
+#mass_up = 2.2e-3
+
+MASSES_DICT = {
+    "aag": [1e-5]*5,
+    "aag_cleaned": [1e-5]*5,
+    "aagg": [1e-5]*6,
+    "aagg_cleaned": [1e-5]*6,
+    "zg": [1e-5, 1e-5, mass_Z, 1e-5],
+    "zg_cleaned": [1e-5, 1e-5, mass_Z, 1e-5],
+    "zgg": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5],
+    "zgg_cleaned": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5],
+    "zggg": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5],
+    "zggg_cleaned": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5],
+    "zgggg": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5, 1e-5],
+    "zgggg_cleaned": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5, 1e-5],
+    "zgggg_10M": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5, 1e-5],
+    "zggggg": [1e-5, 1e-5, mass_Z, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5],
+    "wz": [1e-5, 1e-5, mass_W, mass_Z],
+    "wz_cleaned": [1e-5, 1e-5, mass_W, mass_Z],
+    "wzg": [1e-5, 1e-5, mass_W, mass_Z, 1e-5],
+    "wzg_cleaned": [1e-5, 1e-5, mass_W, mass_Z, 1e-5],
+    "wzgg": [1e-5, 1e-5, mass_W, mass_Z, 1e-5, 1e-5],
+    "wzgg_cleaned": [1e-5, 1e-5, mass_W, mass_Z, 1e-5, 1e-5],
+    "wwz": [1e-5, 1e-5, mass_W, mass_W, mass_Z],
+    "wwz_cleaned": [1e-5, 1e-5, mass_W, mass_W, mass_Z],
+    "qq_tth": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "qq_tth_16M": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "qq_tth_loop": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gg_tth": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gg_tth_loop": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gggh": [1e-5, 1e-5, mass_H, 1e-5],
+    "qq_tth_uw": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "qq_tth_loop_uw": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gg_tth_uw": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gg_tth_loop_uw": [1e-5, 1e-5, mass_top, mass_top, mass_H],
+    "gggh_uw": [1e-5, 1e-5, mass_H, 1e-5],
+}
 DATASET_TITLE_DICT = {
     "aag": r"$gg\to\gamma\gamma g$",
     "aag_cleaned": r"$gg\to\gamma\gamma g$",
@@ -119,10 +160,11 @@ MODEL_TITLE_DICT = {
     "FV_MLP": "FV MLP",
     "DSI": "DSI",
     "LGATr": "LGATr",
-    "LLOCATransformer": "LLoCa Transformer"
+    "LLOCATransformer": "LLoCa Transformer",
+    "LLOCAMuPTransformer": "LLoCa muP Transformer"
 }
 
-mass_Z = 91.188
+
 
 def get_mass(dataset):
     # initialize massless particles
@@ -159,7 +201,7 @@ class AmplitudeExperiment(BaseExperiment):
                 f"as specified in {self.cfg.data.dataset}"
             )
 
-        if self.modelname == "LLOCATransformer":
+        if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
             self.cfg.model.net.in_channels = token_size + 4
             self.cfg.model.net.num_scalars = token_size
         else:
@@ -240,10 +282,10 @@ class AmplitudeExperiment(BaseExperiment):
             amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
                 amplitudes, trafos=self.cfg.data.amp_trafos
             )
-            if self.modelname == "LLOCATransformer": 
+            if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer": 
                 particles = torch.tensor(particles, dtype=torch.float64)
                 particles = particles.reshape(-1, len(self.type_token[0]), 4)
-                mass = get_mass(self.type_token[0])
+                mass = MASSES_DICT[self.cfg.data.dataset[0]]  #get_mass(self.type_token[0])
                 mass = torch.tensor(mass, dtype=particles.dtype).unsqueeze(0)
                 particles[..., 0] = torch.sqrt((particles[..., 1:] ** 2).sum(dim=-1) + mass**2)
 
@@ -282,6 +324,9 @@ class AmplitudeExperiment(BaseExperiment):
             self.amplitudes_prepd.append(amplitudes_prepd)
             self.prepd_mean.append(prepd_mean)
             self.prepd_std.append(prepd_std)
+            
+            print('###################################')
+            print(self.particles_prepd[-1].shape)
 
     def _init_dataloader(self):
         assert sum(self.cfg.data.train_test_val) <= 1
@@ -299,11 +344,17 @@ class AmplitudeExperiment(BaseExperiment):
                 self.cfg.data.subsample = int(n_data*self.cfg.data.train_test_val[0])
             n_train = int(self.cfg.data.subsample) if self.cfg.data.subsample is not None else int(n_data*self.cfg.data.train_test_val[0])
             n_train = min(n_train, int(n_data*self.cfg.data.train_test_val[0]))  # cap at dataset size
-
+            if n_train%2!=0 and n_train>1:  # ensure even number of training samples 
+                n_train-=1
+            elif n_train==1:
+                n_train=2
             # ratio val/train relative to config
             val_ratio = self.cfg.data.train_test_val[2] / self.cfg.data.train_test_val[0]
             n_val = max(int(n_train * val_ratio),1)
-
+            if n_val%2!=0 and n_val>1:  # ensure even number of validation samples
+                n_val-=1
+            elif n_val==1:
+                n_val=2
             # pick indices
             train_idx = np.arange(0, n_train)
             val_idx   = np.arange(n_train, n_train + n_val)
@@ -332,20 +383,25 @@ class AmplitudeExperiment(BaseExperiment):
             drop_last=True,
         )
 
+        n_val = sum(len(x) for x in val_sets["particles"])
+        n_test = sum(len(x) for x in test_sets["particles"])
+        test_batchsize = min(self.cfg.evaluation.batchsize, max(n_test // 2, 1))
+
         self.test_loader = torch.utils.data.DataLoader(
             dataset=AmplitudeDataset(
                 test_sets["particles"], test_sets["amplitudes"], dtype=self.dtype
             ),
-            batch_size=self.cfg.evaluation.batchsize,
+            batch_size=test_batchsize,
             shuffle=False,
             drop_last=True,
         )
 
+        val_batchsize = min(self.cfg.evaluation.batchsize, max(n_val // 2, 1))
         self.val_loader = torch.utils.data.DataLoader(
             dataset=AmplitudeDataset(
                 val_sets["particles"], val_sets["amplitudes"], dtype=self.dtype
             ),
-            batch_size=self.cfg.evaluation.batchsize,
+            batch_size=val_batchsize,
             shuffle=False,
             drop_last=True,
         )
@@ -391,19 +447,31 @@ class AmplitudeExperiment(BaseExperiment):
         return self.results
 
     def call_model_fn(self, x, idataset):
-        return self.model(
-            x.to(self.device),
-            type_token=torch.tensor(
-                [self.type_token[idataset]],
-                dtype=torch.long,
-                device=self.device,
-            ),
-            global_token=torch.tensor(
-                [idataset],
-                dtype=torch.long,
-                device=self.device,
-            ),
-        )
+        if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
+            return self.model(
+                x.to(self.device),
+                type_token=torch.tensor(
+                    [self.type_token[idataset]],
+                    dtype=torch.long,
+                    device=self.device,
+                ),
+                mean=self.mom_mean,
+                std=self.mom_std,
+            )
+        else:
+            return self.model(
+                x.to(self.device),
+                type_token=torch.tensor(
+                    [self.type_token[idataset]],
+                    dtype=torch.long,
+                    device=self.device,
+                ),
+                global_token=torch.tensor(
+                    [idataset],
+                    dtype=torch.long,
+                    device=self.device,
+                ),
+            )
 
     def _evaluate_single(self, loader, title):
         # compute predictions
@@ -418,10 +486,13 @@ class AmplitudeExperiment(BaseExperiment):
         if self.cfg.training.optimizer == "ScheduleFree":
             self.optimizer.eval()
         t0 = time.time()
+        
         for data in loader:
+            #print(data)
             for idataset, data_onedataset in enumerate(data):
                 x, y = data_onedataset
-                if self.modelname == "LLOCATransformer":
+                #print(f"x shape: {x.shape}, y shape: {y.shape}")
+                if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
                     y_pred = self.model(
                         x.to(self.device),
                         type_token=torch.tensor(
@@ -448,7 +519,12 @@ class AmplitudeExperiment(BaseExperiment):
                         ),
                     )
                     #print(pred)
-                    y_pred = pred.squeeze(0)  
+                    #print(f'pred shape: {pred.shape}' )
+                    if pred.shape[0]!=1:
+                        y_pred = pred.squeeze(0)  
+                    else:
+                        y_pred = pred
+
                     #y_pred = pred[0, ..., 0]
                     #print(y_pred)
                     #print(f"y_pred shape: {y_pred.shape}")
@@ -478,13 +554,9 @@ class AmplitudeExperiment(BaseExperiment):
         
         #print('amp_truth_prep shape: ', amplitudes_truth_prepd.shape)
         
-        dt = (
-            (time.time() - t0)
-            * 1e6
-            / sum(arr.shape[0] for arr in amplitudes_truth_prepd)
-        )
+        dt = time.time() - t0 
         LOGGER.info(
-            f"Evaluation time: {dt:.2f}s for 1M events "
+            f"Evaluation time: {dt:.2f}s for {sum(arr.shape[0] for arr in amplitudes_truth_prepd)} samples "
             f"using batchsize {self.cfg.evaluation.batchsize}"
         )
 
@@ -617,7 +689,9 @@ class AmplitudeExperiment(BaseExperiment):
         dataset_titles = [
             DATASET_TITLE_DICT[dataset] for dataset in self.cfg.data.dataset
         ]
-        model_title = MODEL_TITLE_DICT[type(self.model.net).__name__]
+        model_core = self.model.module if isinstance(self.model, torch.nn.parallel.DistributedDataParallel) else self.model
+        model_title = MODEL_TITLE_DICT[type(model_core.net).__name__]   
+        #model_title = MODEL_TITLE_DICT[type(self.model.net).__name__]
         title = [f"{model_title}: {dataset_title}" for dataset_title in dataset_titles]
         LOGGER.info(f"Creating plots in {plot_path}")
 
@@ -670,6 +744,7 @@ class AmplitudeExperiment(BaseExperiment):
         loss = 0.0
         mse = []
         if len(data) == 1:
+            #print('single dataset batch')
             x, y = data[0]
             if self.modelname=="LGATr":
                 x, y = x.unsqueeze(0), y.unsqueeze(0)
@@ -712,7 +787,7 @@ class AmplitudeExperiment(BaseExperiment):
             )
         x, y = x.to(self.device), y.to(self.device)
         #print('_batch_loss: x shape:', x.shape, 'y shape:', y.shape)
-        if self.modelname == "LLOCATransformer":
+        if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
             y_pred = self.model(
                 x, type_token=type_token, mean=self.mom_mean, std=self.mom_std
             )
@@ -733,6 +808,7 @@ class AmplitudeExperiment(BaseExperiment):
             loss = self.loss(y_pred, y, sigma)
         else:
             loss = self.loss(y_pred, y)
+        print('batch loss:', loss.item())
         loss = loss + self.regularization_lambda*self.regularization(self.model)
         assert torch.isfinite(loss).all()
 

@@ -5,11 +5,13 @@ net:
 
   n_features: 0   # overwritten once the data is loaded
   hidden_channels: 512
-  hidden_layers: 5
+  hidden_layers: 4
   out_shape: 1
   loss: "MSE"
   gain: 1
   init_bias: true
+  dropout_prob: 0
+  use_mup_init: true
 
   activation: "gelu"
   num_groups: 1

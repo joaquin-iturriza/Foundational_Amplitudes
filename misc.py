@@ -1,5 +1,7 @@
 from collections.abc import Mapping
 import torch
+from torch.optim.lr_scheduler import LambdaLR
+import math
 
 
 class NaNError(BaseException):
@@ -55,3 +57,24 @@ def frequency_check(step, every_n_steps, skip_initial=False):
         return False
 
     return step % every_n_steps == 0
+
+def cosine_warmup_scheduler(optimizer, warmup_steps, T_max, eta_min=0):
+    """
+    Cosine annealing LR with linear warmup.
+
+    Args:
+        optimizer: your optimizer
+        warmup_steps: number of steps to linearly increase LR from 0 -> max_lr
+        total_steps: total number of training steps
+        eta_min: minimum LR at the end of cosine decay
+    """
+    def lr_lambda(step):
+        if step < warmup_steps:
+            # linear warmup 0 -> 1
+            return float(step) / float(max(1, warmup_steps))
+        else:
+            # cosine annealing from 1 -> eta_min/max_lr
+            progress = float(step - warmup_steps) / float(max(1, T_max - warmup_steps))
+            return eta_min / optimizer.defaults['lr'] + (1 - eta_min / optimizer.defaults['lr']) * 0.5 * (1 + math.cos(math.pi * progress))
+
+    return LambdaLR(optimizer, lr_lambda)

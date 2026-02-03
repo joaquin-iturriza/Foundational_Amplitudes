@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import torch
 import torch.nn as nn
 import math
@@ -12,6 +13,12 @@ import glob
 import gzip
 import copy
 import shutil
+import matplotlib.pyplot as plt
+from torch.utils.flop_counter import FlopCounterMode
+
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+
 from pathlib import Path
 from omegaconf import OmegaConf, open_dict, errors
 from hydra.core.config_store import ConfigStore
@@ -24,6 +31,7 @@ import logger
 from logger import LOGGER, MEMORY_HANDLER, FORMATTER
 from plots import plot_gradients, plot_weights
 #from mlflow_util import log_mlflow
+from misc import cosine_warmup_scheduler
 
 from lion_pytorch import Lion
 import schedulefree
@@ -78,6 +86,9 @@ class BaseExperiment:
             MEMORY_HANDLER.setTarget(stream_handler)
             MEMORY_HANDLER.close()
 
+    def is_main_process(self):
+        return (not dist.is_initialized()) or dist.get_rank() == 0
+    
     def run_mlflow(self):
         experiment_id, run_name = self._init()
         git_hash = os.popen("git rev-parse HEAD").read().strip()
@@ -107,18 +118,28 @@ class BaseExperiment:
         self.init_model()
         self._init_loss()
         self._init_regularization()
+        free_mem, total_mem = torch.cuda.mem_get_info()
+        LOGGER.info(f"Available VRAM: {free_mem / 1024**2:.2f} MB")
+        LOGGER.info(f"Total VRAM: {total_mem / 1024**2:.2f} MB")
+        torch.cuda.reset_peak_memory_stats()
+
+        if self.cfg.count_flops:
+            self.count_flops(dataloader=self.train_loader)
 
         if self.cfg.train:
             self._init_optimizer()
             self._init_scheduler()
             self.train()
             self._save_model()
+        peak = torch.cuda.max_memory_allocated()
+        LOGGER.info(f"Peak VRAM used: {peak / 1024**2:.2f} MB")
 
-        if self.cfg.evaluate:
-            self.evaluate()
+        if self.is_main_process():
+            if self.cfg.evaluate:
+                self.evaluate()
 
-        if self.cfg.plot and self.cfg.save:
-            self.plot()
+            if self.cfg.plot and self.cfg.save:
+                self.plot()
 
         if self.device == torch.device("cuda"):
             max_used = torch.cuda.max_memory_allocated()
@@ -126,8 +147,8 @@ class BaseExperiment:
             LOGGER.info(
                 f"GPU RAM information: max_used = {max_used/1e9:.3} GB, max_total = {max_total/1e9:.3} GB"
             )
-        
-        self.compress_models()
+        if self.is_main_process():
+            self.compress_models()
         dt = time.time() - t0
         LOGGER.info(
             f"Finished experiment {self.cfg.exp_name}/{self.cfg.run_name} after {dt/60:.2f}min = {dt/60**2:.2f}h"
@@ -167,6 +188,16 @@ class BaseExperiment:
             f"Instantiated model {type(self.model.net).__name__} "
             f"with {num_parameters} learnable parameters"
         )
+        def list_all_layer_names(model: nn.Module):
+            """
+            List all named modules in the model.
+            Useful for finding the right layer to hook.
+            """
+            print("All named modules:")
+            for name, module in model.named_modules():
+                if name:  # Skip empty names
+                    print(f"  {name}: {module.__class__.__name__}")
+        list_all_layer_names(self.model)
 
         # === EMA setup ===
         if self.cfg.ema:
@@ -197,7 +228,7 @@ class BaseExperiment:
                 )
 
         # === μP setup ===
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
             self.bsh_path = os.path.join(self.cfg.run_dir, "base_shapes.bsh")
 
             if os.path.exists(self.bsh_path):
@@ -210,11 +241,22 @@ class BaseExperiment:
             else:
                 LOGGER.info("Defining base and delta models for μP setup")
                 base_cfg = copy.deepcopy(self.cfg.model)
-                base_cfg.net.hidden_channels = 49  # example base width
+                if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+                    base_cfg.net.hidden_channels = 49  # example base width
+                elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
+                    base_cfg.net.attn_reps = "8x0n+2x1n"
+                    base_cfg.net.hidden_channels_mlp = 32
+                    base_cfg.net.num_heads = 2
                 base_model = instantiate(base_cfg)
 
                 delta_cfg = copy.deepcopy(self.cfg.model)
-                delta_cfg.net.hidden_channels = 128  # example delta width
+                if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+                    delta_cfg.net.hidden_channels = 128  # example delta width
+                elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
+                    delta_cfg.net.attn_reps = "16x0n+4x1n"
+                    delta_cfg.net.hidden_channels_mlp = 256
+                    delta_cfg.net.num_heads = 8
+
                 delta_model = instantiate(delta_cfg)
 
                 make_base_shapes(base_model, delta_model, savefile=self.bsh_path)
@@ -226,15 +268,18 @@ class BaseExperiment:
 
         # === Move to device ===
         if torch.cuda.device_count() > 1:
-            print("Using", torch.cuda.device_count(), "GPUs")
-            model = nn.DataParallel(model)
+            LOGGER.info("Using", torch.cuda.device_count(), "GPUs")
+            dist.init_process_group("nccl")
+            torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+            self.model = DDP(self.model.to(torch.device("cuda")), device_ids=[int(os.environ["LOCAL_RANK"])])
         self.model.to(self.device, dtype=self.dtype)
         if self.ema is not None:
             self.ema.to(self.device)
 
     def _init(self):
         run_name = self._init_experiment()
-        self._init_directory()
+        if self.is_main_process():
+            self._init_directory()
 
         if self.cfg.use_mlflow:
             experiment_id = self._init_mlflow()
@@ -439,7 +484,7 @@ class BaseExperiment:
         use_mup = self.cfg.model.net._target_ == "models.mup_mlp.MuMLP"
 
         if self.cfg.training.optimizer == "Adam":
-            if use_mup:
+            if use_mup and self.cfg.training.mup_use_optim:
                 self.optimizer = MuAdam(
                     param_groups,
                     betas=self.cfg.training.betas,
@@ -455,7 +500,7 @@ class BaseExperiment:
                 )
 
         elif self.cfg.training.optimizer == "AdamW":
-            if use_mup:
+            if use_mup and self.cfg.training.mup_use_optim:
                 self.optimizer = MuAdamW(
                     param_groups,
                     betas=self.cfg.training.betas,
@@ -532,8 +577,9 @@ class BaseExperiment:
             )
             LOGGER.info('Using OneCycleLR scheduler')
         elif self.cfg.training.scheduler == "CosineAnnealingLR":
-            self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            self.scheduler = cosine_warmup_scheduler(
                 self.optimizer,
+                self.cfg.training.cosanneal_warmup_steps,
                 T_max=int(
                     self.cfg.training.iterations * self.cfg.training.scheduler_scale
                 ),
@@ -605,30 +651,64 @@ class BaseExperiment:
         iters = []
         iters_evaluated = []
         iterator = iter(cycle(self.train_loader))
+        avg_iter_time = 0
+        if self.cfg.find_BS:
+            gradients = []
+            S_estimates = []
+            G2_estimates = []
+            B_simples = []
         for step in range(self.cfg.training.iterations):
             # training
-            #iter_time_start = time.time()
+            iter_time_start = time.time()
             if step > 0:   # skip first step to get evaluation at initialization #### NOT GOOD, FIX LATER
                 self.model.train()
                 if self.cfg.training.optimizer == "ScheduleFree":
                     self.optimizer.train()
                 data = next(iterator)
                 self._step(data, step)
-            
-            if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
-                oom=math.floor(np.log10(self.cfg.training.iterations))
-                mantissa=self.cfg.training.iterations/(10**oom)
-                iters_to_eval=[math.floor(mantissa*10**(i/2)) for i in range(0,2*oom+1)]
-                if ((step+1) in iters_to_eval) or (step == 0):
-                    self._evals(results,smallest_val_loss_step,step)
-            
-                if self.cfg.training.save_gradients:
-                    if ((step+1) in iters_to_eval) or (step == 0): #plot gradients
-                        self._save_gradients(step)                    
-                if self.cfg.training.save_weights or (step == 0):
-                    if ((step+1) in iters_to_eval): #plot weights
-                        self._save_weights(step)
+                if self.cfg.find_BS:   
+                    grads = torch.cat([p.grad.view(-1) for p in self.model.parameters() if p.grad is not None])
+                    gradients.append(grads.detach().clone())
+                    if len(gradients) > self.cfg.BS_finding.n_batches_big:
+                        gradients = gradients[-self.cfg.BS_finding.n_batches_big:]  
+                        grad_big = torch.stack(gradients).mean(dim=0)
+                        grad_small = torch.stack(random.sample(gradients,self.cfg.BS_finding.n_batches_small)).mean(dim=0)
+                        #grad_small = torch.stack(gradients[-self.cfg.BS_finding.n_batches_small:]).mean(dim=0)
+                        B_big = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_big
+                        B_small = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_small
+                        S_estimate = abs(1/(1/B_small - 1/B_big) * ( grad_small.norm()**2 - grad_big.norm()**2 ))
+                        G2_estimate = abs(1/(B_big - B_small) * ( B_big * grad_big.norm()**2 - B_small * grad_small.norm()**2))
+                        S_estimates.append(S_estimate.item())
+                        G2_estimates.append(G2_estimate.item())
+                        ema_S = pd.Series(S_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
+                        ema_G2 = pd.Series(G2_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
+                        B_simple = ema_S.iloc[-1]/ema_G2.iloc[-1]
+                        #B_simple = S_estimate/G2_estimate 
+                        if step % 100 == 0: 
+                            print("grad_small ",grad_small.norm(), "grad_big ",grad_big.norm())
+                            print("S_estimate ",S_estimate.item()," G2_estimate ",G2_estimate.item()," B_simple ",B_simple.item())
+                            print("EMA S ",ema_S.iloc[-1]," EMA G2 ",ema_G2.iloc[-1])
+                        B_simples.append(B_simple.item())
+
+            iter_time = time.time() - iter_time_start
+            #print(f"Iteration {step+1} took {iter_time:.2f}s")
+            avg_iter_time = (avg_iter_time * step + iter_time) / (step + 1)
+            if self.is_main_process():
+                if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
+                    oom=math.floor(np.log10(self.cfg.training.iterations))
+                    mantissa=self.cfg.training.iterations/(10**oom)
+                    iters_to_eval=[math.floor(mantissa*10**(i/2)) for i in range(0,2*oom+1)]
+                    if ((step+1) in iters_to_eval) or (step == 0):
+                        self._evals(results,smallest_val_loss_step,step)
                 
+                    if self.cfg.training.save_gradients:
+                        if ((step+1) in iters_to_eval) or (step == 0): #plot gradients
+                            self._save_gradients(step)                    
+                    if self.cfg.training.save_weights or (step == 0):
+                        if ((step+1) in iters_to_eval): #plot weights
+                            self._save_weights(step)
+            
+            
             # validation (and early stopping)        
             if ((step + 1) % self.cfg.training.validate_every_n_steps == 0) or (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
                 val_loss = self._validate(step)
@@ -643,6 +723,7 @@ class BaseExperiment:
                     # save best model
                     if self.cfg.training.es_load_best_model:
                         self._save_model(
+                            step,
                             f"model_run{self.cfg.run_idx}_best.pt"#it{smallest_val_loss_step}.pt"
                         )
                 else:
@@ -661,18 +742,20 @@ class BaseExperiment:
 
             # output
             dt = time.time() - self.training_start_time
-            if step in [0, 999]:
+            if step in [0, 999] or step in [round(x) for x in np.linspace(0, self.cfg.training.iterations-1, num=10)]: # print 10 logs during training
                 dt_estimate = dt * self.cfg.training.iterations / (step + 1)
                 LOGGER.info(
                     f"Finished iteration {step+1} after {dt:.2f}s, "
                     f"training time estimate: {dt_estimate/60:.2f}min "
                     f"= {dt_estimate/60**2:.2f}h"
                 )
-
+            
+            
         dt = time.time() - self.training_start_time
         LOGGER.info(
             f"Finished training for {step} iterations = {step / len(self.train_loader):.1f} epochs "
-            f"after {dt/60:.2f}min = {dt/60**2:.2f}h"
+            f"after {dt/60:.4f}min = {dt/60**2:.4f}h"
+            f" (avg iter time {avg_iter_time:.4f}s, est. total time {avg_iter_time*step/60:.4f}min = {avg_iter_time*self.cfg.training.iterations/60**2:.2f}h)"
         )
         if self.cfg.use_mlflow:
             log_mlflow("iterations", step)
@@ -685,12 +768,52 @@ class BaseExperiment:
             self._load_previous_best_model()
         elif (self.cfg.training.es_load_best_model):
             self._load_previous_best_model()
+
+        if self.cfg.find_BS:
+            plt.figure()
+            #plt.plot(range(len(B_simples)), B_simples)
+            plt.plot(range(len(S_estimates)), S_estimates, label='S estimates', color='blue')
+            plt.plot(range(len(ema_S)), ema_S, label='EMA of S estimates', color='cyan')
+            # Also plot EMA of B_simple
+            #plt.plot(range(len(B_simples)), ema_B_simple, label='EMA of B_simple', color='orange')
+            plt.xlabel('Iteration')
+            plt.ylabel('Estimated S')
+            plt.title('Estimation of S over Iterations')
+            plt.yscale('log')
+            plt.tight_layout()
+            plt.legend()
+            plt.savefig(os.path.join(self.cfg.run_dir, f"S_estimation_run{self.cfg.run_idx}.pdf"))
+            plt.close()
+            plt.figure()
+            plt.plot(range(len(G2_estimates)), G2_estimates, label='G2 estimates', color='green')
+            plt.plot(range(len(ema_G2)), ema_G2, label='EMA of G2 estimates', color='lime')
+            plt.xlabel('Iteration')
+            plt.ylabel('Estimated G2')
+            plt.title('Estimation of G2 over Iterations')
+            plt.yscale('log')
+            plt.tight_layout()
+            plt.legend()
+            plt.savefig(os.path.join(self.cfg.run_dir, f"G2_estimation_run{self.cfg.run_idx}.pdf"))
+            plt.close()
+            plt.figure()
+            plt.plot(range(len(B_simples)), B_simples, label='B_simple estimates', color='red')
+            plt.xlabel('Iteration')
+            plt.ylabel('Estimated B_simple')
+            plt.title('Estimation of B_simple over Iterations')
+            plt.yscale('log')
+            plt.tight_layout()
+            plt.legend()
+            plt.savefig(os.path.join(self.cfg.run_dir, f"B_simple_estimation_run{self.cfg.run_idx}.pdf"))
+            plt.close()
         
     def _evals(self,results,smallest_val_loss_step,step):
+        if not self.is_main_process():
+            return
         LOGGER.info(
                 f"### Evaluating model from iteration {smallest_val_loss_step+1} in iteration {step+1}###"
             )
         self._save_model(
+            step,
             f"model_run{self.cfg.run_idx}_current.pt"
         )
         if self.cfg.training.load_best_previous:
@@ -788,7 +911,7 @@ class BaseExperiment:
             LOGGER.warning(
                 f"Cannot load model (epoch {step}) from {model_path}"
             )  
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
             set_base_shapes(self.model, self.bsh_path, rescale_params=False)
 
     def _load_previous_best_model(self):
@@ -805,7 +928,7 @@ class BaseExperiment:
             LOGGER.warning(
                 f"Cannot load best model from {model_path}"
             )
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
             set_base_shapes(self.model, self.bsh_path, rescale_params=False)
         
     def _load_previous_current_model(self):
@@ -822,7 +945,7 @@ class BaseExperiment:
             LOGGER.warning(
                 f"Cannot load current model from {model_path}"
             )
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
+        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
             set_base_shapes(self.model, self.bsh_path, rescale_params=False)
             
     def _step(self, data, step):
@@ -928,7 +1051,7 @@ class BaseExperiment:
             for key, value in flatten_dict(self.cfg).items():
                 log_mlflow(key, value, kind="param")
 
-    def _save_model(self, filename=None):
+    def _save_model(self, step="end", filename=None):
         if not self.cfg.save:
             return
 
@@ -944,6 +1067,7 @@ class BaseExperiment:
                 if self.scheduler is not None
                 else None,
                 "ema": self.ema.state_dict() if self.ema is not None else None,
+                "step": step
             },
             model_path,
         )
@@ -969,6 +1093,38 @@ class BaseExperiment:
                 os.remove(path)  # Remove original
                 print(f"  Done, original removed.")
                 
+    def count_flops(self, dataloader):
+        with FlopCounterMode(self.model) as fcm:
+            for data in dataloader:
+                for idataset, data_onedataset in enumerate(data):
+                    x, y = data_onedataset
+                    if self.modelname == "LLOCAMuPTransformer":
+                        outputs = self.model(
+                            x.to(self.device),
+                            type_token=torch.tensor(
+                                [self.type_token[idataset]],
+                                dtype=torch.long,
+                                device=self.device,
+                            ),
+                            coord_scale=self.coord_scale,
+                            mean=self.mom_mean,
+                            std=self.mom_std,
+                        )
+                    else:
+                        self.model(
+                        x.to(self.device),
+                        type_token=torch.tensor(
+                            [self.type_token[idataset]],
+                            dtype=torch.long,
+                            device=self.device,
+                        ),
+                        global_token=torch.tensor(
+                            [idataset], dtype=torch.long, device=self.device
+                        ),
+                    )
+        flops = fcm.get_total_flops()
+        print(f"FLOPs per forward pass: {flops}")
+
     def init_physics(self):
         raise NotImplementedError()
 

@@ -48,11 +48,14 @@ training:
  
  scheduler: null
  scheduler_scale: 1
+ cosanneal_warmup_steps: 0
  cosanneal_eta_min: 0
  reduceplateau_factor: 0.1
  reduceplateau_patience: 50
  onecycle_max_lr: 10
  onecycle_pct_start: 0.3
+
+ mup_use_optim: true
 
  ema_decay: 0.99
 
@@ -70,7 +73,15 @@ training:
 
 evaluate: true
 evaluation:
- batchsize: 1024
+ batchsize: 65536
+
+find_BS: false
+BS_finding:
+ ema_alpha: 0.9
+ n_batches_big: 20
+ n_batches_small: 10
+
+count_flops: false
 
 plot: true
 plotting:
