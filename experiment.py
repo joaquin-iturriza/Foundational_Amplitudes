@@ -325,9 +325,6 @@ class AmplitudeExperiment(BaseExperiment):
             self.prepd_mean.append(prepd_mean)
             self.prepd_std.append(prepd_std)
             
-            print('###################################')
-            print(self.particles_prepd[-1].shape)
-
     def _init_dataloader(self):
         assert sum(self.cfg.data.train_test_val) <= 1
 
@@ -488,10 +485,8 @@ class AmplitudeExperiment(BaseExperiment):
         t0 = time.time()
         
         for data in loader:
-            #print(data)
             for idataset, data_onedataset in enumerate(data):
                 x, y = data_onedataset
-                #print(f"x shape: {x.shape}, y shape: {y.shape}")
                 if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
                     y_pred = self.model(
                         x.to(self.device),
@@ -518,17 +513,11 @@ class AmplitudeExperiment(BaseExperiment):
                             [idataset], dtype=torch.long, device=self.device
                         ),
                     )
-                    #print(pred)
-                    #print(f'pred shape: {pred.shape}' )
                     if pred.shape[0]!=1:
                         y_pred = pred.squeeze(0)  
                     else:
                         y_pred = pred
 
-                    #y_pred = pred[0, ..., 0]
-                    #print(y_pred)
-                    #print(f"y_pred shape: {y_pred.shape}")
-                    #print(f"y shape: {y.shape}")
                     amplitudes_pred_prepd[idataset].append(y_pred[:, :1].cpu().float().numpy())
                     if self.cfg.training.loss == "HETEROSC":
                         amplitudes_sigmas[idataset].append(y_pred[:, -1:].cpu().float().numpy())
@@ -536,8 +525,6 @@ class AmplitudeExperiment(BaseExperiment):
                 amplitudes_truth_prepd[idataset].append(
                     y.cpu().float().numpy()
                 )
-        #print(amplitudes_pred_prepd)
-        #print('amp_pred_prep shape: ', amplitudes_pred_prepd.shape)
         #if modelname=="LGATr":
         amplitudes_pred_prepd = [
             np.concatenate(individual) for individual in amplitudes_pred_prepd
@@ -549,10 +536,6 @@ class AmplitudeExperiment(BaseExperiment):
             amplitudes_sigmas = [
                 np.concatenate(individual) for individual in amplitudes_sigmas
             ]
-        #print(amplitudes_pred_prepd)
-        #print('amp_pred_prep shape: ', amplitudes_pred_prepd.shape)
-        
-        #print('amp_truth_prep shape: ', amplitudes_truth_prepd.shape)
         
         dt = time.time() - t0 
         LOGGER.info(
@@ -566,11 +549,7 @@ class AmplitudeExperiment(BaseExperiment):
             amp_truth_prepd = amplitudes_truth_prepd[idataset]
             if self.cfg.training.loss == "HETEROSC":
                 amplitudes_sigmas = amplitudes_sigmas[idataset]
-            print(amp_pred_prepd.shape, amp_truth_prepd.shape)
-            print(amp_pred_prepd.dtype, amp_truth_prepd.dtype)
             # compute metrics over preprocessed amplitudes
-            #print(f"amp_pred_prepd shape: {amp_pred_prepd.shape}")
-            #print(f"amp_truth_prepd shape: {amp_truth_prepd.shape}")
             mse_prepd = np.mean((amp_pred_prepd - amp_truth_prepd) ** 2)
             LOGGER.info(f"MSE on {title} {dataset} dataset: {mse_prepd:.4e}")
             l1_prepd = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd))
@@ -627,18 +606,8 @@ class AmplitudeExperiment(BaseExperiment):
             )
             # determine 1% largest amplitudes
             scale = np.abs(amp_truth)
-            # log_memory_usage("before argsort")
-            # log_gpu_memory("before argsort")
-
-            #k = min(int(0.01 * len(scale)), len(scale))  # top 1% or all elements if fewer
-            #idx = np.argpartition(scale, -k)[-k:]
-            #LOGGER.info("Starting argpartition on %d elements", len(scale))
             idx = np.argsort(scale)
-            #LOGGER.info("Finished argpartition")
-
-            # log_memory_usage("after argpartition")
-            # log_gpu_memory("after argpartition")
-
+            
             delta_abs_mean_1percent = np.mean(delta_abs[idx])
             LOGGER.info(
                 f"Mean absolute relative error on 1%% largest amplitudes on {dataset} {title} dataset: "
@@ -700,9 +669,15 @@ class AmplitudeExperiment(BaseExperiment):
             plot_dict["results_test"] = self.results_test
             plot_dict["results_train"] = self.results_train
         if self.cfg.train:
-            plot_dict["train_loss"] = self.train_loss
-            plot_dict["val_loss"] = self.val_loss
-            plot_dict["train_lr"] = self.train_lr
+            plot_dict["train_loss"]        = self.train_loss
+            plot_dict["val_loss"]          = self.val_loss
+            plot_dict["train_lr"]          = self.train_lr
+            # new:
+            plot_dict["train_loss_no_reg"] = getattr(self, "train_loss_no_reg", [])
+            plot_dict["val_loss_no_reg"]   = getattr(self, "val_loss_no_reg",   [])
+            plot_dict["train_mse"]         = getattr(self, "train_mse",         [])
+            plot_dict["val_mse"]           = getattr(self, "val_mse",           [])
+
         plot_mixer(self.cfg, plot_path, title, plot_dict)
 
     def _init_loss(self):
@@ -744,7 +719,6 @@ class AmplitudeExperiment(BaseExperiment):
         loss = 0.0
         mse = []
         if len(data) == 1:
-            #print('single dataset batch')
             x, y = data[0]
             if self.modelname=="LGATr":
                 x, y = x.unsqueeze(0), y.unsqueeze(0)
@@ -786,7 +760,7 @@ class AmplitudeExperiment(BaseExperiment):
                 range(len(data)), dtype=torch.long, device=self.device
             )
         x, y = x.to(self.device), y.to(self.device)
-        #print('_batch_loss: x shape:', x.shape, 'y shape:', y.shape)
+        out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
         if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
             y_pred = self.model(
                 x, type_token=type_token, mean=self.mom_mean, std=self.mom_std
@@ -796,23 +770,19 @@ class AmplitudeExperiment(BaseExperiment):
                 x, type_token=type_token, global_token=global_token, attn_mask=attn_mask
             )
         if self.cfg.training.loss == "HETEROSC":
-            #LOGGER.info('total output shape:', y_pred.shape)
-            # Heteroscedastic loss expects the last channel to be the sigma
-            #print('total output shape:', y_pred.shape)
-            sigma = y_pred[..., -self.cfg.model.net.out_shape:]
-            #LOGGER.info('sigma shape:', sigma.shape)
-            #print('sigma shape:', sigma.shape)
-            y_pred = y_pred[..., :-self.cfg.model.net.out_shape]
-            #LOGGER.info('y_pred shape:', y_pred.shape)
-            #print('y_pred shape:', y_pred.shape)
-            loss = self.loss(y_pred, y, sigma)
+            sigma   = y_pred[..., -out_shape:]
+            y_pred  = y_pred[..., :-out_shape]
+            loss    = self.loss(y_pred, y, sigma)
+            mse_val = torch.nn.functional.mse_loss(y_pred, y).item()
         else:
-            loss = self.loss(y_pred, y)
-        print('batch loss:', loss.item())
-        loss = loss + self.regularization_lambda*self.regularization(self.model)
-        assert torch.isfinite(loss).all()
+            loss    = self.loss(y_pred, y)
+            mse_val = None
 
-        return loss
+        reg_term = self.regularization_lambda * self.regularization(self.model)
+        loss_no_reg = loss.item()          # scalar before adding reg
+        loss = loss + reg_term
+        assert torch.isfinite(loss).all()
+        return loss, loss_no_reg, mse_val
 
     def _init_metrics(self):
         metrics = {f"{dataset}.mse": [] for dataset in self.cfg.data.dataset}

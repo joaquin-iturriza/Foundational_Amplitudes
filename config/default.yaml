@@ -86,6 +86,9 @@ count_flops: false
 plot: true
 plotting:
  loss: true
+ loss_log_scale: true          # show log-scale panel
+ plot_without_regularization: true   # overlay no-reg curves
+ plot_mse_het: true           # separate MSE plot (HETEROSC only)
 
 mlflow:
  db: '${base_dir}/runs/${exp_name}/mlflow/mlflow.db'

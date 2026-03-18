@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy.stats import norm
 
-from base_plots import plot_loss
+from base_plots import plot_loss, plot_mse
 
 #plt.rcParams["font.family"] = "serif"
 #plt.rcParams["font.serif"] = "Charter"
@@ -20,19 +20,52 @@ colors = ["black", "#0343DE", "#A52A2A", "darkorange"]
 
 
 def plot_mixer(cfg, plot_path, title, plot_dict):
+    """Dispatch all requested plots based on cfg flags."""
+ 
     if cfg.plotting.loss and cfg.train:
-        file = f"{plot_path}/loss.pdf"
-        if cfg.training.loss == "HETEROSC":
-            logy = True
-        else:
-            logy = True
+        logy = cfg.plotting.get("loss_log_scale", True)
+ 
+        # ── primary loss curves ───────────────────────────────────────────────
+        losses = [plot_dict["train_loss"], plot_dict["val_loss"]]
+        labels = ["train loss", "val loss"]
+ 
+        # ── optional: loss without regularization ────────────────────────────
+        losses_no_reg = None
+        labels_no_reg = None
+        if cfg.plotting.get("plot_without_regularization", False):
+            losses_no_reg = [
+                plot_dict.get("train_loss_no_reg", []),
+                plot_dict.get("val_loss_no_reg", []),
+            ]
+            labels_no_reg = ["train loss (no reg)", "val loss (no reg)"]
+ 
+        loss_title = title[0] if isinstance(title, list) else title
         plot_loss(
-            file,
-            [plot_dict["train_loss"], plot_dict["val_loss"]],
-            plot_dict["train_lr"],
-            labels=["train loss", "val loss"],
+            file=f"{plot_path}/loss.pdf",
+            losses=losses,
+            lr=plot_dict["train_lr"],
+            labels=labels,
             logy=logy,
+            title=loss_title,
+            losses_no_reg=losses_no_reg,
+            labels_no_reg=labels_no_reg,
         )
+ 
+        # ── optional: MSE plot for HETEROSC ───────────────────────────────────
+        if (
+            cfg.training.loss == "HETEROSC"
+            and cfg.plotting.get("plot_mse_het", False)
+        ):
+            mse_losses = [
+                plot_dict.get("train_mse", []),
+                plot_dict.get("val_mse", []),
+            ]
+            plot_mse(
+                file=f"{plot_path}/mse.pdf",
+                mse_losses=mse_losses,
+                labels=["train MSE", "val MSE"],
+                title=loss_title,
+            )
 
     if cfg.plotting.histograms and cfg.evaluate:
         out = f"{plot_path}/histograms.pdf"
@@ -478,7 +511,7 @@ def plot_gradients(file, model, iteration):
     # Plotting
     n_layers = len(layer_names)
     if n_layers == 0:
-        print("No gradients to plot.")
+        # print("No gradients to plot.")
         return
         
     fig, axs = plt.subplots(n_layers, 1, figsize=(6, 2 * n_layers))
@@ -492,7 +525,7 @@ def plot_gradients(file, model, iteration):
         ax.set_xlabel("Gradient value")
         ax.set_ylabel("Frequency")
         ax.set_xlim(grads.min(), grads.max())
-        print(name, grads.min(), grads.max(), grads.mean(), grads.std())
+        # print(name, grads.min(), grads.max(), grads.mean(), grads.std())
     plt.suptitle(f"Gradients at iteration {iteration}", fontsize=FONTSIZE)
     plt.tight_layout()
     plt.savefig(f'{file}/gradients_{iteration}.pdf', format="pdf", bbox_inches="tight")
@@ -509,7 +542,7 @@ def plot_weights(file, model, iteration):
 
     n_layers = len(layer_names)
     if n_layers == 0:
-        print("No weights to plot.")
+        # print("No weights to plot.")
         return
 
     fig, axs = plt.subplots(n_layers, 1, figsize=(6, 2 * n_layers))
@@ -523,7 +556,7 @@ def plot_weights(file, model, iteration):
         ax.set_xlabel("Weight value")
         ax.set_ylabel("Frequency")
         ax.set_xlim(weights.min(), weights.max())
-        print(name, weights.min(), weights.max(), weights.mean(), weights.std())
+        # print(name, weights.min(), weights.max(), weights.mean(), weights.std())
 
     plt.suptitle(f"Weights at iteration {iteration}", fontsize=FONTSIZE)
     plt.tight_layout()
@@ -546,10 +579,6 @@ def plot_histogram_single_output(
     pull=False,
     reference_truth=None,
 ):
-    # Flatten data if needed
-    #print('###################DATA####################')
-    #print(data)
-    #print(data.shape)
     
     restructured_data = [np.concatenate([np.array(batch) for batch in dataset]) for dataset in data]
     flat_reference = np.concatenate([np.array(batch) for batch in reference_truth]) if reference_truth is not None else None
@@ -561,8 +590,7 @@ def plot_histogram_single_output(
         largest_min = truth_values[sort_idx][-largest_idx - 1]
         largest_mask = truth_values > largest_min
         restructured_data[1] = restructured_data[1][largest_mask]
-    #print('###################RESTRUCTURED####################')
-    #print(restructured_data)
+    
     if xrange is None:
         min_val = min(np.min(dat) for dat in restructured_data)
         max_val = max(np.max(dat) for dat in restructured_data)

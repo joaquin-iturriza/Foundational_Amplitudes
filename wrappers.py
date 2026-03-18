@@ -53,9 +53,6 @@ class AmplitudeGATrWrapper(nn.Module):
         return amplitude
 
     def embed_into_ga(self, inputs, type_token, global_token):
-        #print('###########################')
-        #print(inputs.shape)
-        #print('###########################')
         inputs=inputs.reshape(1,inputs.shape[1], inputs.shape[2] // 4, 4)
         
         nprocesses, batchsize, num_objects, _ = inputs.shape

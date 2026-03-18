@@ -27,7 +27,8 @@ class MLP(nn.Module):
         dropout_prob=None,
         gain=1.0,
         loss='MSE',
-        init_bias=True
+        init_bias=True,
+        batchnorm=False,
     ):
         super().__init__()
 
@@ -41,11 +42,15 @@ class MLP(nn.Module):
         layers: List[nn.Module] = [nn.Linear(np.prod(self.in_shape), hidden_channels)]
         if dropout_prob is not None:
             layers.append(nn.Dropout(dropout_prob))
+        if batchnorm:
+            layers.append(nn.BatchNorm1d(hidden_channels))
         for _ in range(hidden_layers - 1):
             layers.append(switchable_activation(activation=activation, num_groups=1))
             layers.append(nn.Linear(hidden_channels, hidden_channels))
             if dropout_prob is not None:
                 layers.append(nn.Dropout(dropout_prob))
+            if batchnorm:
+                layers.append(nn.BatchNorm1d(hidden_channels))
 
         layers.append(switchable_activation(activation=activation, num_groups=1))
         if self.loss == 'HETEROSC':
@@ -70,17 +75,10 @@ class MLP(nn.Module):
         """Forward pass of baseline MLP."""
         if self.loss == 'HETEROSC':
             x = self.mlp(inputs)    # Separate the last 4 outputs and process them
-            #x_sigmas = torch.nn.functional.gelu(x[:, -self.out_shape:]) + 0.17   # Ensure positivity and avoid zero
-            #x_sigmas = torch.nn.functional.softplus(x[:, -self.out_shape:]) + 1e-6
             x_sigmas = torch.max(torch.nn.functional.softplus(x[:, -self.out_shape:]), torch.tensor(1e-15, device=x.device))
 
-            #print('x shape: ', x.shape)
-            #print('self.out_shape: ', self.out_shape)
-            #print('x_sigmas shape: ', x_sigmas.shape)
-            #print('##########')
             # Combine the unmodified first outputs with the processed last 4 outputs
             x = torch.cat((x[:, :-self.out_shape], x_sigmas), dim=1)
-            #print(x[0])
             return x
         else:
             return self.mlp(inputs)

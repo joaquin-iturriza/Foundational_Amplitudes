@@ -57,8 +57,6 @@ cs = ConfigStore.instance()
 cs.store(name="base_attention", node=SelfAttentionConfig)
 cs.store(name="base_mlp", node=MLPConfig)
 
-#print("Registered configs:", cs.repo)
-
 # set to 'True' to debug autograd issues (slows down code)
 torch.autograd.set_detect_anomaly(False)
 MIN_STEP_SKIP = 1000
@@ -118,10 +116,11 @@ class BaseExperiment:
         self.init_model()
         self._init_loss()
         self._init_regularization()
-        free_mem, total_mem = torch.cuda.mem_get_info()
-        LOGGER.info(f"Available VRAM: {free_mem / 1024**2:.2f} MB")
-        LOGGER.info(f"Total VRAM: {total_mem / 1024**2:.2f} MB")
-        torch.cuda.reset_peak_memory_stats()
+        if self.device == torch.device("cuda"):
+            free_mem, total_mem = torch.cuda.mem_get_info()
+            LOGGER.info(f"Available VRAM: {free_mem / 1024**2:.2f} MB")
+            LOGGER.info(f"Total VRAM: {total_mem / 1024**2:.2f} MB")
+            torch.cuda.reset_peak_memory_stats()
 
         if self.cfg.count_flops:
             self.count_flops(dataloader=self.train_loader)
@@ -193,10 +192,10 @@ class BaseExperiment:
             List all named modules in the model.
             Useful for finding the right layer to hook.
             """
-            print("All named modules:")
+            LOGGER.info("All named modules:")
             for name, module in model.named_modules():
                 if name:  # Skip empty names
-                    print(f"  {name}: {module.__class__.__name__}")
+                    LOGGER.info(f"  {name}: {module.__class__.__name__}")
         list_all_layer_names(self.model)
 
         # === EMA setup ===
@@ -616,7 +615,11 @@ class BaseExperiment:
 
     def train(self):
         # performance metrics
-        self.train_lr, self.train_loss, self.val_loss, self.train_grad_norm = (
+        self.train_lr, self.train_loss, self.val_loss, self.train_grad_norm, self.train_loss_no_reg, self.train_mse, self.val_loss_no_reg, self.val_mse = (
+            [],
+            [],
+            [],
+            [],
             [],
             [],
             [],
@@ -685,13 +688,12 @@ class BaseExperiment:
                         B_simple = ema_S.iloc[-1]/ema_G2.iloc[-1]
                         #B_simple = S_estimate/G2_estimate 
                         if step % 100 == 0: 
-                            print("grad_small ",grad_small.norm(), "grad_big ",grad_big.norm())
-                            print("S_estimate ",S_estimate.item()," G2_estimate ",G2_estimate.item()," B_simple ",B_simple.item())
-                            print("EMA S ",ema_S.iloc[-1]," EMA G2 ",ema_G2.iloc[-1])
+                            LOGGER.info("grad_small ",grad_small.norm(), "grad_big ",grad_big.norm())
+                            LOGGER.info("S_estimate ",S_estimate.item()," G2_estimate ",G2_estimate.item()," B_simple ",B_simple.item())
+                            LOGGER.info("EMA S ",ema_S.iloc[-1]," EMA G2 ",ema_G2.iloc[-1])
                         B_simples.append(B_simple.item())
 
             iter_time = time.time() - iter_time_start
-            #print(f"Iteration {step+1} took {iter_time:.2f}s")
             avg_iter_time = (avg_iter_time * step + iter_time) / (step + 1)
             if self.is_main_process():
                 if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
@@ -950,7 +952,7 @@ class BaseExperiment:
             
     def _step(self, data, step):
         # actual update step
-        loss = self._batch_loss(data)
+        loss, loss_no_reg, mse_val = self._batch_loss(data)
         self.optimizer.zero_grad()
         loss.backward()
         if self.cfg.training.clip_grad_value is not None:
@@ -987,6 +989,10 @@ class BaseExperiment:
         self.train_loss.append(loss.item())
         self.train_lr.append(self.optimizer.param_groups[0]["lr"])
         self.train_grad_norm.append(grad_norm)
+        if self.cfg.plotting.get("plot_without_regularization", False):
+            self.train_loss_no_reg.append(loss_no_reg)
+        if mse_val is not None and self.cfg.plotting.get("plot_mse_het", False):
+            self.train_mse.append(mse_val)
 
         # log to mlflow
         if (
@@ -1006,35 +1012,37 @@ class BaseExperiment:
     def _validate(self, step):
         start_time_validate = time.time()
         losses = []
+        losses_no_reg = []
+        mse_vals = []
         metrics = self._init_metrics()
-
         self.model.eval()
         if self.cfg.training.optimizer == "ScheduleFree":
             self.optimizer.eval()
         with torch.no_grad():
             for data in self.val_loader:
-                # use EMA for validation if available
                 if self.ema is not None:
                     with self.ema.average_parameters():
-                        loss = self._batch_loss(data)
+                        loss, loss_no_reg, mse_val = self._batch_loss(data)
                 else:
-                    loss = self._batch_loss(data)
-
+                    loss, loss_no_reg, mse_val = self._batch_loss(data)
                 losses.append(loss.cpu().item())
+                if loss_no_reg is not None:
+                    losses_no_reg.append(loss_no_reg)
+                if mse_val is not None:
+                    mse_vals.append(mse_val)
+
         val_loss = np.mean(losses)
-        #LOGGER.info(
-        #    f"Validation loss after {step} iterations = {val_loss:.4f} "
-        #    f"(mean over {len(losses)} batches)"
-        #)
+
         if ((step + 1) % self.cfg.training.validate_every_n_steps == 0):
             self.val_loss.append(val_loss)
-        if self.cfg.use_mlflow:
-            log_mlflow("val.loss", val_loss, step=step)
+            if losses_no_reg:
+                self.val_loss_no_reg.append(np.mean(losses_no_reg))
+            if mse_vals:
+                self.val_mse.append(np.mean(mse_vals))
+            if self.cfg.use_mlflow:
+                log_mlflow("val.loss", val_loss, step=step)
 
         end_time_validate = time.time()
-        #LOGGER.info(
-        #    f"Validation took {end_time_validate - start_time_validate:.2f}s " ######################################################
-        # )
         return val_loss
 
     def _save_config(self, filename, to_mlflow=False):
@@ -1076,22 +1084,22 @@ class BaseExperiment:
         pt_files = glob.glob(os.path.join(self.cfg.run_dir , "models", "*.pt"))
 
         if not pt_files:
-            print("No .pt files found.")
+            LOGGER.info("No .pt files found.")
         else:
             for path in pt_files:
                 gz_path = path + ".gz"
 
                 if os.path.exists(gz_path):
-                    print(f"Skipping {path} (already compressed)")
+                    LOGGER.info(f"Skipping {path} (already compressed)")
                     continue
 
-                print(f"Compressing {path} -> {gz_path}")
+                LOGGER.info(f"Compressing {path} -> {gz_path}")
                 with open(path, 'rb') as f_in:
                     with gzip.open(gz_path, 'wb', compresslevel=9) as f_out:
                         shutil.copyfileobj(f_in, f_out)
 
                 os.remove(path)  # Remove original
-                print(f"  Done, original removed.")
+                LOGGER.info(f"  Done, original removed.")
                 
     def count_flops(self, dataloader):
         with FlopCounterMode(self.model) as fcm:
@@ -1123,7 +1131,7 @@ class BaseExperiment:
                         ),
                     )
         flops = fcm.get_total_flops()
-        print(f"FLOPs per forward pass: {flops}")
+        LOGGER.info(f"FLOPs per forward pass: {flops}")
 
     def init_physics(self):
         raise NotImplementedError()
