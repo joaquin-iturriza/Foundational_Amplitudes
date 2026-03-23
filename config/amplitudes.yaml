@@ -3,7 +3,7 @@ exp_name: amp
 
 data:
  dataset : [zgg]
- data_path : /eos/user/j/joiturri/jitu/lorentz-gatr/data/data
+ data_path : C:\Users\Joaquin\Foundational_Amplitudes\data
  subsample : null
  include_permsym: true
  train_test_val: [.4, .5, .1]

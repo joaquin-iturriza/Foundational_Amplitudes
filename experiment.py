@@ -201,6 +201,14 @@ class AmplitudeExperiment(BaseExperiment):
         # mom_mean and mom_std are per-dataset, populated in init_data
         self.mom_mean = []
         self.mom_std  = []
+
+        if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer"):
+            self.type_token = []
+            for dataset in self.cfg.data.dataset:
+                if self.cfg.data.include_permsym:
+                    self.type_token.append(TYPE_TOKEN_DICT[dataset])
+                else:
+                    self.type_token.append(list(range(len(TYPE_TOKEN_DICT[dataset]))))
         
     def init_data(self):
         (
@@ -466,9 +474,9 @@ class AmplitudeExperiment(BaseExperiment):
 
         self.test_loader = torch.utils.data.DataLoader(
             dataset=AmplitudeDataset(
-                train_sets["particles"],
-                train_sets["amplitudes"],
-                train_sets["tokens"],      
+                test_sets["particles"],
+                test_sets["amplitudes"],
+                test_sets["tokens"],      
                 dtype=self.dtype,
             ),
             batch_size=test_batchsize,
@@ -480,9 +488,9 @@ class AmplitudeExperiment(BaseExperiment):
         val_batchsize = min(self.cfg.evaluation.batchsize, max(n_val // 2, 1))
         self.val_loader = torch.utils.data.DataLoader(
             dataset=AmplitudeDataset(
-                train_sets["particles"],
-                train_sets["amplitudes"],
-                train_sets["tokens"],      
+                val_sets["particles"],
+                val_sets["amplitudes"],
+                val_sets["tokens"],      
                 dtype=self.dtype,
             ),
             batch_size=val_batchsize,
@@ -531,17 +539,15 @@ class AmplitudeExperiment(BaseExperiment):
             
         return self.results
 
-    def call_model_fn(self, x, idataset):
-        if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
+    def call_model_fn(self, x, idataset, tokens=None):
+        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
+            if tokens is None:
+                raise ValueError("call_model_fn requires tokens for LLoCA models")
             return self.model(
                 x.to(self.device),
-                type_token=torch.tensor(
-                    [self.type_token[idataset]],
-                    dtype=torch.long,
-                    device=self.device,
-                ),
-                mean=self.mom_mean[idataset],   # was self.mom_mean
-                std=self.mom_std[idataset],     # was self.mom_std
+                type_token=tokens.to(self.device),
+                mean=self.mom_mean[idataset],
+                std=self.mom_std[idataset],
             )
         else:
             return self.model(
@@ -574,22 +580,18 @@ class AmplitudeExperiment(BaseExperiment):
         
         for data in loader:
             for idataset, data_onedataset in enumerate(data):
-                x, y = data_onedataset
-                if self.modelname == "LLOCATransformer" or self.modelname == "LLOCAMuPTransformer":
+                x, y, tokens = data_onedataset   # unpack 3-tuple
+                if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
                     y_pred = self.model(
                         x.to(self.device),
-                        type_token=torch.tensor(
-                            [self.type_token[idataset]],
-                            dtype=torch.long,
-                            device=self.device,
-                        ),
-                        mean=self.mom_mean[idataset],   # was self.mom_mean
-                        std=self.mom_std[idataset],     # was self.mom_std
+                        type_token=tokens.to(self.device),   # per-event tokens from batch
+                        mean=self.mom_mean[idataset],
+                        std=self.mom_std[idataset],
                     )
                     amplitudes_pred_prepd[idataset].append(y_pred.cpu().float().numpy())
                 else:
-                    if self.modelname=="LGATr":    
-                        x = x.unsqueeze(0) 
+                    if self.modelname == "LGATr":
+                        x = x.unsqueeze(0)
                     pred = self.model(
                         x.to(self.device),
                         type_token=torch.tensor(
@@ -601,18 +603,15 @@ class AmplitudeExperiment(BaseExperiment):
                             [idataset], dtype=torch.long, device=self.device
                         ),
                     )
-                    if pred.shape[0]!=1:
-                        y_pred = pred.squeeze(0)  
+                    if pred.shape[0] != 1:
+                        y_pred = pred.squeeze(0)
                     else:
                         y_pred = pred
-
                     amplitudes_pred_prepd[idataset].append(y_pred[:, :1].cpu().float().numpy())
                     if self.cfg.training.loss == "HETEROSC":
                         amplitudes_sigmas[idataset].append(y_pred[:, -1:].cpu().float().numpy())
-                
-                amplitudes_truth_prepd[idataset].append(
-                    y.cpu().float().numpy()
-                )
+
+                amplitudes_truth_prepd[idataset].append(y.cpu().float().numpy())
         #if modelname=="LGATr":
         amplitudes_pred_prepd = [
             np.concatenate(individual) for individual in amplitudes_pred_prepd

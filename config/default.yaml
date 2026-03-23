@@ -1,7 +1,7 @@
 exp_name: amplitudes
 exp_type: amplitudes
 run_name: null
-base_dir: /eos/user/j/joiturri/jitu/amplitude_DSI
+base_dir: C:\Users\Joaquin\Foundational_Amplitudes
 
 jobid: null
 seed: null

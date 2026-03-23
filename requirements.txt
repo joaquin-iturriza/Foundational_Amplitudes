@@ -29,7 +29,7 @@ pyOpenSSL==25.0.0
 railroad==0.5.0
 redis==5.2.1
 schedulefree==1.4
-scikit_learn==1.6.1
+scikit_learn
 scipy
 Sphinx
 thread==2.0.5
