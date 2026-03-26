@@ -1,7 +1,7 @@
 exp_name: amplitudes
 exp_type: amplitudes
 run_name: null
-base_dir: C:\Users\Joaquin\Foundational_Amplitudes
+base_dir: .
 
 jobid: null
 seed: null
@@ -24,9 +24,9 @@ training:
  iterations : 10
  train_test_val: [.4, .5, .1]
  subsample: null
- es_patience: 100
+ es_patience: 100000000000000
  es_load_best_model: true
- validate_every_n_steps: 1000
+ validate_every_n_steps: 100
  save_intermediate: false
  load_best_previous: true
  save_gradients: false
@@ -39,7 +39,7 @@ training:
  max_grad_norm: null
  log_every_n_steps: 1000
 
- optimizer : Adam
+ optimizer : AdamW
  lr: 3.e-4
  batchsize: 256
  betas: [.9, .999]
@@ -73,7 +73,7 @@ training:
 
 evaluate: true
 evaluation:
- batchsize: 65536
+ batchsize: 2048
 
 find_BS: false
 BS_finding:

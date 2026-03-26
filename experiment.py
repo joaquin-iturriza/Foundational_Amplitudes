@@ -114,6 +114,8 @@ TYPE_TOKEN_DICT = {
 #     "gggh_uw": [1e-5, 1e-5, mass_H, 1e-5],
 # }
 DATASET_TITLE_DICT = {
+    "qqbar_Zg_13000GeV_amplitudes": r"$q\bar q\to Zg$",
+    "ee_uu__pp_Zj": r"$e^+e^-\to u\bar u$ and $pp\to Zj$",
     "aag": r"$gg\to\gamma\gamma g$",
     "aag_cleaned": r"$gg\to\gamma\gamma g$",
     "aag_inv": r"$gg\to\gamma\gamma g$",
@@ -225,6 +227,10 @@ class AmplitudeExperiment(BaseExperiment):
             data_path = os.path.join(self.cfg.data.data_path, f"{dataset}.npy")
             # ... existing file loading logic unchanged ...
             data_raw = np.load(data_path)
+            # shuffle data to avoid any ordering effects (e.g. if different datasets are concatenated in order)
+            # with fixed seed for reproducibility
+            rng = np.random.default_rng(seed=42)
+            rng.shuffle(data_raw, axis=0)
 
             # new layout: (n_events, n_particles*4 + n_particles + 1)
             # i.e. 4-momenta block, then PDG IDs block, then amplitude
@@ -290,6 +296,7 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"Saved tokenizer with vocab_size={self.tokenizer.vocab_size}")
 
         self.token_size = self.tokenizer.vocab_size
+        self.cfg.model.token_size = self.token_size
         if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
             self.cfg.model.net.in_channels  = self.token_size + 4
             self.cfg.model.net.num_scalars  = self.token_size
