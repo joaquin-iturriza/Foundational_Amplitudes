@@ -39,6 +39,8 @@ def log_gpu_memory(tag=""):
 
 
 DATASET_TITLE_DICT = {
+    "qqbar_Zg_13000GeV_amplitudes": r"$q\bar q\to Zg$",
+    "ee_uu__pp_Zj": r"$e^+e^-\to u\bar u$ and $pp\to Zj$",
     "aag": r"$gg\to\gamma\gamma g$",
     "aag_cleaned": r"$gg\to\gamma\gamma g$",
     "aag_inv": r"$gg\to\gamma\gamma g$",

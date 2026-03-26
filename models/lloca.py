@@ -97,6 +97,7 @@ class LLOCAMuPTransformer(nn.Module):
         loss='MSE',
         dropout_prob: float = 0.0,
         freeze_framesnet: bool = False,
+        # token_size: int = 0,
     ):
         super().__init__()
 

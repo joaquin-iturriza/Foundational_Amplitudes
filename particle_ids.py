@@ -49,8 +49,8 @@ class ParticleTokenizer:
 
     def save(self, path: str):
         with open(path, "w") as f:
-            json.dump(self._pdg_to_idx, f)
-
+            json.dump({int(k): v for k, v in self._pdg_to_idx.items()}, f)
+            
     @classmethod
     def load(cls, path: str) -> "ParticleTokenizer":
         obj = cls()

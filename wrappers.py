@@ -102,9 +102,14 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.token_size = token_size
 
     def forward(self, inputs, type_token, mean, std):
-        particle_type = torch.nn.functional.one_hot(
-            type_token, num_classes=type_token.max() + 1
-        )
+        # print("### type_token:", type_token)
+        # print("### type_token.max() + 1:", int(type_token.max() + 1))
+        # print("### type_token.min():", int(type_token.min()))
+        # print("### type_token.dtype:", type_token.dtype)
+        # print("### token_size:", self.token_size)
+        # particle_type = torch.nn.functional.one_hot(
+        #     type_token, num_classes=int(type_token.max() + 1)
+        # )
         particle_type = torch.nn.functional.one_hot(
             type_token, num_classes=self.token_size   # <-- use fixed size
         )

@@ -1,5 +1,6 @@
 _target_: wrappers.AmplitudeLLoCaWrapper
 
+token_size: 0
 net:
   _target_: models.lloca.LLOCAMuPTransformer
 
@@ -13,5 +14,6 @@ net:
   num_blocks: 8
   num_heads: 8
   freeze_framesnet: false
+  
 
   loss: "MSE"
