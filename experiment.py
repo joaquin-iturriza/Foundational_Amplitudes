@@ -162,7 +162,7 @@ class AmplitudeExperiment(BaseExperiment):
             pdg_ids    = data_raw[:, momenta_cols:-1].astype(int)
             amplitudes = data_raw[:, [-1]]
     
-            type_tokens = self.tokenizer.register_and_encode(pdg_ids)  # (N, n_particles)
+            type_tokens = self.tokenizer.register_and_encode(pdg_ids)
     
             if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
                 particles_t = torch.tensor(particles, dtype=torch.float64)
@@ -184,8 +184,7 @@ class AmplitudeExperiment(BaseExperiment):
                 particles_prepd = particles_t / particles_t.std()
                 self.mom_mean.append(float(particles_prepd.mean()))
                 self.mom_std.append(float(np.clip(particles_prepd.std(), 1e-2, None)))
-                # shape: (N, n_particles, 4) — keep as list-of-events for sparse collation
-                particles_prepd = particles_prepd.numpy()
+                particles_prepd = particles_prepd.numpy()  # (N, n_particles, 4)
             else:
                 LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
                 particles_prepd = preprocess_particles(
@@ -201,64 +200,73 @@ class AmplitudeExperiment(BaseExperiment):
             self.pdg_ids.append(type_tokens)
     
         # ------------------------------------------------------------------
-        # Preprocess amplitudes per-dataset, then concatenate
+        # Build flat per-event lists and concatenate amplitudes
         # ------------------------------------------------------------------
-        LOGGER.info(
-            f"Preprocessing amplitudes per-dataset using trafos={self.cfg.data.amp_trafos}"
-        )
-        self.prepd_mean = []
-        self.prepd_std  = []
-        prepd_amplitudes = []
-        for amplitudes in self.amplitudes:
-            amp_prepd, mean, std = preprocess_amplitude(
-                amplitudes, trafos=self.cfg.data.amp_trafos
-            )
-            prepd_amplitudes.append(amp_prepd)
-            self.prepd_mean.append(mean)
-            self.prepd_std.append(std)
-            LOGGER.info(
-                f"  amplitude stats: mean={amp_prepd.mean():.3f}, "
-                f"std={amp_prepd.std():.3f}, "
-                f"min={amp_prepd.min():.3f}, max={amp_prepd.max():.3f}"
-            )
-    
-        # Concatenate everything — amplitudes are scalar so shape is fine.
-        # Particles stay as a list of per-event arrays (variable length).
         is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer")
     
-        # Build flat per-event lists across all datasets
-        # For LLOCA: each element is (n_particles_i, 4)
-        # For other models: each element is (n_features,)  [already flat per event]
-        all_particles_prepd = []
-        all_tokens          = []
-        all_amplitudes      = []
+        all_particles_list = []
+        all_tokens_list    = []
+        all_amplitudes_raw = []
     
-        for i, (parts, toks, amps) in enumerate(
-            zip(self.particles_prepd, self.pdg_ids, prepd_amplitudes)
-        ):
+        for parts, toks, amps in zip(self.particles_prepd, self.pdg_ids, self.amplitudes):
             N = parts.shape[0]
             if is_lloca:
-                # parts: (N, n_particles, 4) → split into N arrays of (n_particles, 4)
-                all_particles_prepd.extend([parts[j] for j in range(N)])
+                # parts: (N, n_particles, 4) → list of (n_particles, 4)
+                all_particles_list.extend([parts[j] for j in range(N)])
             else:
-                all_particles_prepd.extend([parts[j] for j in range(N)])
-            # toks: (N, n_particles) → split into N arrays of (n_particles,)
-            all_tokens.extend([toks[j] for j in range(N)])
-            all_amplitudes.append(amps)
+                all_particles_list.extend([parts[j] for j in range(N)])
+            all_tokens_list.extend([toks[j] for j in range(N)])
+            all_amplitudes_raw.append(amps)
     
-        self.all_particles_list = all_particles_prepd   # list of (n_particles_i, 4) or (n_features,)
-        self.all_tokens_list    = all_tokens             # list of (n_particles_i,)
-        self.all_amplitudes     = np.concatenate(all_amplitudes, axis=0)  # (N_total, 1)
+        all_amplitudes_raw = np.concatenate(all_amplitudes_raw, axis=0)  # (N_total, 1)
     
+        # ------------------------------------------------------------------
+        # Global amplitude preprocessing across all datasets combined
+        # ------------------------------------------------------------------
+        LOGGER.info(
+            f"Preprocessing amplitudes globally using trafos={self.cfg.data.amp_trafos}"
+        )
+        all_amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
+            all_amplitudes_raw, trafos=self.cfg.data.amp_trafos
+        )
+        self.prepd_mean = [prepd_mean]
+        self.prepd_std  = [prepd_std]
+        LOGGER.info(
+            f"Combined amplitude stats after preprocessing: "
+            f"mean={all_amplitudes_prepd.mean():.3f}, "
+            f"std={all_amplitudes_prepd.std():.3f}, "
+            f"min={all_amplitudes_prepd.min():.3f}, "
+            f"max={all_amplitudes_prepd.max():.3f}"
+        )
+    
+        # ------------------------------------------------------------------
         # Shuffle with fixed seed
-        N_total = len(self.all_particles_list)
-        rng = np.random.default_rng(seed=42)
+        # ------------------------------------------------------------------
+        N_total = len(all_particles_list)
+        rng  = np.random.default_rng(seed=42)
         perm = rng.permutation(N_total)
-        self.all_particles_list = [self.all_particles_list[i] for i in perm]
-        self.all_tokens_list    = [self.all_tokens_list[i]    for i in perm]
-        self.all_amplitudes     = self.all_amplitudes[perm]
     
-        LOGGER.info(f"Combined dataset: {N_total} events")
+        all_particles_list   = [all_particles_list[i]   for i in perm]
+        all_tokens_list      = [all_tokens_list[i]      for i in perm]
+        all_amplitudes_prepd = all_amplitudes_prepd[perm]
+    
+        # ------------------------------------------------------------------
+        # Build contiguous flat arrays for fast O(1) indexing in DataLoader
+        # ------------------------------------------------------------------
+        from dataset import build_flat_arrays
+        particles_flat, tokens_flat, offsets = build_flat_arrays(
+            all_particles_list, all_tokens_list
+        )
+        self.particles_flat    = particles_flat     # (N_total_particles, 4)
+        self.tokens_flat       = tokens_flat        # (N_total_particles,)
+        self.offsets           = offsets            # (N_events, 2)
+        self.all_amplitudes    = all_amplitudes_prepd  # (N_events, 1)
+        self.N_events          = N_total
+    
+        LOGGER.info(
+            f"Combined dataset: {N_total} events, "
+            f"{particles_flat.shape[0]} total particles"
+        )
     
         # ------------------------------------------------------------------
         # Set model size
@@ -282,9 +290,10 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"Saved tokenizer with vocab_size={token_size}")
             
     def _init_dataloader(self):
+        from dataset import AmplitudeDataset, collate_variable_length
         assert sum(self.cfg.data.train_test_val) <= 1
     
-        N_total = len(self.all_particles_list)
+        N_total = self.N_events
     
         if self.cfg.data.subsample is None:
             self.cfg.data.subsample = int(N_total * self.cfg.data.train_test_val[0])
@@ -301,23 +310,25 @@ class AmplitudeExperiment(BaseExperiment):
         if n_val % 2 != 0:
             n_val -= 1
     
-        train_idx = list(range(0, n_train))
-        val_idx   = list(range(n_train, n_train + n_val))
-        test_idx  = list(range(n_train + n_val, N_total))
+        train_idx = np.arange(0,       n_train)
+        val_idx   = np.arange(n_train, n_train + n_val)
+        test_idx  = np.arange(n_train + n_val, N_total)
     
         def make_loader(indices, shuffle, batchsize):
+            # All indexing is into numpy arrays — fast O(1) per element
             ds = AmplitudeDataset(
-                particles_list = [self.all_particles_list[i] for i in indices],
-                amplitudes     = self.all_amplitudes[indices],
-                tokens_list    = [self.all_tokens_list[i]    for i in indices],
+                particles_flat = self.particles_flat,           # shared, not copied
+                offsets        = self.offsets[indices],         # (n_split, 2)
+                amplitudes     = self.all_amplitudes[indices],  # (n_split, 1)
+                tokens_flat    = self.tokens_flat,              # shared, not copied
                 dtype          = self.dtype,
             )
             return torch.utils.data.DataLoader(
                 ds,
-                batch_size  = batchsize,
-                shuffle     = shuffle,
-                drop_last   = True,
-                collate_fn  = collate_variable_length,
+                batch_size = batchsize,
+                shuffle    = shuffle,
+                drop_last  = True,
+                collate_fn = collate_variable_length,
             )
     
         self.cfg.training.batchsize = int(min(self.cfg.training.batchsize, n_train / 2))
@@ -339,7 +350,7 @@ class AmplitudeExperiment(BaseExperiment):
             f"batchsize={self.cfg.training.batchsize} (train), "
             f"{self.cfg.evaluation.batchsize} (eval)"
         )
-        
+                
     def evaluate(self):
         with torch.no_grad():
             if self.ema is not None:
@@ -664,19 +675,13 @@ class AmplitudeExperiment(BaseExperiment):
 
     def _batch_loss_lloca(self, data):
         particles, y, tokens, ptr = data
-        # particles: (N_total, 4)
-        # y:         (B, 1)
-        # tokens:    (N_total,)
-        # ptr:       (B+1,)
-    
         particles = particles.to(self.device)
         y         = y.to(self.device)
         tokens    = tokens.to(self.device)
         ptr       = ptr.to(self.device)
     
         y_pred = self.model(
-            particles,
-            tokens,
+            particles, tokens,
             mean = self.mom_mean[0],
             std  = self.mom_std[0],
             ptr  = ptr,
@@ -688,7 +693,7 @@ class AmplitudeExperiment(BaseExperiment):
         loss        = loss + reg
         assert torch.isfinite(loss).all()
         return loss, loss_no_reg, None
-    
+        
 
     def _init_metrics(self):
         result_key = (

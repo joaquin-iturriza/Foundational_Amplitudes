@@ -126,25 +126,22 @@ class AmplitudeLLoCaWrapper(nn.Module):
  
     def forward(self, fourmomenta, particle_type_indices, mean, std, ptr):
         """
-        Parameters
-        ----------
-        fourmomenta         : (N_total, 4)   flat sparse particles
-        particle_type_indices : (N_total,)   long tensor of token indices
-        mean, std           : float          normalization constants
-        ptr                 : (B+1,)         event boundaries in the flat sequence
+        fourmomenta           : (N_total, 4)
+        particle_type_indices : (N_total,)   long
+        mean, std             : float
+        ptr                   : (B+1,)       event boundaries
         """
         particle_type = torch.nn.functional.one_hot(
             particle_type_indices, num_classes=self.token_size
         ).to(dtype=self.network_dtype, device=fourmomenta.device)
-        # (N_total, token_size)
  
         outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr)
-        # outputs shape: (N_total, out_channels)
+        # outputs: (N_total, out_channels)
  
-        # Pool per event: mean over each event's particles using ptr
+        # Mean-pool per event using ptr
         B = ptr.shape[0] - 1
         pooled = torch.stack([
-            outputs[ptr[i]:ptr[i+1]].mean(dim=0)
+            outputs[ptr[i]:ptr[i + 1]].mean(dim=0)
             for i in range(B)
         ])  # (B, out_channels)
  
