@@ -72,20 +72,21 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
         with PdfPages(out) as file:
             labels = ["Test", "Train", "Prediction"]
 
-            for idataset, dataset in enumerate(cfg.data.dataset):
-                data = [
-                    np.log(plot_dict["results_test"][dataset]["raw"]["truth"]),
-                    np.log(plot_dict["results_train"][dataset]["raw"]["truth"]),
-                    np.log(plot_dict["results_test"][dataset]["raw"]["prediction"]),
-                ]
-                plot_histograms(
-                    file,
-                    data,
-                    labels,
-                    title=title[idataset],
-                    xlabel=r"$\log A$",
-                    logx=False,
-                )
+            dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
+            data = [
+                np.log(plot_dict["results_test"][dataset]["raw"]["truth"]),
+                np.log(plot_dict["results_train"][dataset]["raw"]["truth"]),
+                np.log(plot_dict["results_test"][dataset]["raw"]["prediction"]),
+            ]
+            plot_histograms(
+                file,
+                data,
+                labels,
+                title=title[0],
+                xlabel=r"$\log A$",
+                logx=False,
+                logy=True,
+            )
         
             if cfg.training.loss == "HETEROSC":
                 labels = ["Test", "Train"]
@@ -99,7 +100,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     file,
                     sigmas,
                     labels,
-                    title=f'{title[idataset]} - $\sigma$',
+                    title=f'{title[0]} - $\sigma$',
                     xlabel=r"$\sigma$",
                     logy=False,
                     plot_ratios=False
@@ -108,7 +109,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     file,
                     [sigmas_test],
                     labels=["Test"],
-                    title=f'{title[idataset]} - $\sigma$',
+                    title=f'{title[0]} - $\sigma$',
                     xlabel=r"$\sigma$",
                     logy=False,
                     plot_ratios=False
@@ -117,7 +118,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     file,
                     [sigmas_test],
                     labels=["Test"],
-                    title=f'{title[idataset]} - $\sigma$',
+                    title=f'{title[0]} - $\sigma$',
                     xlabel=r"$\sigma$",
                     logy=True,
                     plot_ratios=False
@@ -127,7 +128,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     pulls,
                     labels,
                     xrange=(-5,5),
-                    title=f'{title[idataset]} - Pull',
+                    title=f'{title[0]} - Pull',
                     xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
                     logy=False,
                     plot_ratios=False,
@@ -138,7 +139,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     [pull_test],
                     xrange=(-5,5),
                     labels=["Test"],
-                    title=f'{title[idataset]} - Pull',
+                    title=f'{title[0]} - Pull',
                     xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
                     logy=False,
                     plot_ratios=False,
@@ -149,7 +150,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     [pull_test],
                     xrange=(-5,5),
                     labels=["Test"],
-                    title=f'{title[idataset]} - Pull',
+                    title=f'{title[0]} - Pull',
                     xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
                     logy=True,
                     plot_ratios=False,
@@ -162,7 +163,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     [pull_test, pull_test], # Will be masked internally
                     xrange=(-5,5),  
                     labels=["Test", "Largest 1\%"],
-                    title=f'{title[idataset]} - Pull',
+                    title=f'{title[0]} - Pull',
                     xlabel=r"$\mathrm{pull} = \frac{A_\mathrm{pred} - A_\mathrm{true}}{\sigma}$",
                     logy=True,
                     reference_truth=truth_test,  # Pass truth values for selection
@@ -173,7 +174,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     file,
                     [sigmas_test, sigmas_test],  # Will be masked internally
                     labels=["Test", "Largest 1\%"],
-                    title=f'{title[idataset]} - $\sigma$',
+                    title=f'{title[0]} - $\sigma$',
                     xlabel=r"$\sigma$",
                     logy=True,
                     plot_ratios=False,
@@ -183,56 +184,56 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
     if cfg.plotting.delta and cfg.evaluate:
         out = f"{plot_path}/delta.pdf"
         with PdfPages(out) as file:
-            for idataset, dataset in enumerate(cfg.data.dataset):
-                delta_test = (
-                    plot_dict["results_test"][dataset]["raw"]["prediction"]
-                    - plot_dict["results_test"][dataset]["raw"]["truth"]
-                ) / plot_dict["results_test"][dataset]["raw"]["truth"]
-                delta_train = (
-                    plot_dict["results_train"][dataset]["raw"]["prediction"]
-                    - plot_dict["results_train"][dataset]["raw"]["truth"]
-                ) / plot_dict["results_train"][dataset]["raw"]["truth"]
+            dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
+            delta_test = (
+                plot_dict["results_test"][dataset]["raw"]["prediction"]
+                - plot_dict["results_test"][dataset]["raw"]["truth"]
+            ) / plot_dict["results_test"][dataset]["raw"]["truth"]
+            delta_train = (
+                plot_dict["results_train"][dataset]["raw"]["prediction"]
+                - plot_dict["results_train"][dataset]["raw"]["truth"]
+            ) / plot_dict["results_train"][dataset]["raw"]["truth"]
 
-                # determine 1% largest amplitudes
-                scale = plot_dict["results_test"][dataset]["raw"]["truth"]
-                largest_idx = round(0.01 * len(scale))
-                sort_idx = np.argsort(scale)
-                largest_min = scale[sort_idx][-largest_idx - 1]
-                largest_mask = scale > largest_min
+            # determine 1% largest amplitudes
+            scale = plot_dict["results_test"][dataset]["raw"]["truth"]
+            largest_idx = round(0.01 * len(scale))
+            sort_idx = np.argsort(scale)
+            largest_min = scale[sort_idx][-largest_idx - 1]
+            largest_mask = scale > largest_min
 
-                xranges = [(-10.0, 10.0), (-30.0, 30.0), (-100.0, 100.0)]  # in %
-                binss = [100, 50, 50]
-                for xrange, bins in zip(xranges, binss):
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_train * 100],
-                        labels=["Test", "Train"],
-                        title=title[idataset],
-                        xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=False,
-                    )
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_test[largest_mask] * 100],
-                        labels=["Test", "Largest 1\%"],
-                        title=title[idataset],
-                        xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=False,
-                    )
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_test[largest_mask] * 100],
-                        labels=["Test", "Largest 1\%"],
-                        title=title[idataset],
-                        xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=True,
-                    )
+            xranges = [(-10.0, 10.0), (-30.0, 30.0), (-100.0, 100.0)]  # in %
+            binss = [100, 50, 50]
+            for xrange, bins in zip(xranges, binss):
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_train * 100],
+                    labels=["Test", "Train"],
+                    title=title[0],
+                    xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=False,
+                )
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_test[largest_mask] * 100],
+                    labels=["Test", "Largest 1\%"],
+                    title=title[0],
+                    xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=False,
+                )
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_test[largest_mask] * 100],
+                    labels=["Test", "Largest 1\%"],
+                    title=title[0],
+                    xlabel=r"$\Delta = \frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=True,
+                )
         out = f"{plot_path}/delta_abs.pdf"
         with PdfPages(out) as file:
             delta_test = np.abs(
@@ -263,7 +264,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 file,
                 [delta_test, delta_train],
                 labels=["Test", "Train"],
-                title=title[idataset],
+                title=title[0],
                 xrange=xrange,
                 xlabel=r"$|\Delta| = |\frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}|$ [\%]",
                 bins=bins,
@@ -274,7 +275,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 file,
                 [delta_test, delta_test[largest_mask]],
                 labels=["Test", "Largest 1\%"],
-                title=title[idataset],
+                title=title[0],
                 xrange=xrange,
                 xlabel=r"$|\Delta| = |\frac{A_\mathrm{pred} - A_\mathrm{true}}{A_\mathrm{true}}|$ [\%]",
                 bins=bins,
@@ -286,56 +287,56 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
     if cfg.plotting.delta_prepd and cfg.evaluate:
         out = f"{plot_path}/delta_prepd.pdf"
         with PdfPages(out) as file:
-            for idataset, dataset in enumerate(cfg.data.dataset):
-                delta_test = (
-                    plot_dict["results_test"][dataset]["preprocessed"]["prediction"]
-                    - plot_dict["results_test"][dataset]["preprocessed"]["truth"]
-                ) / plot_dict["results_test"][dataset]["preprocessed"]["truth"]
-                delta_train = (
-                    plot_dict["results_train"][dataset]["preprocessed"]["prediction"]
-                    - plot_dict["results_train"][dataset]["preprocessed"]["truth"]
-                ) / plot_dict["results_train"][dataset]["preprocessed"]["truth"]
+            dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
+            delta_test = (
+                plot_dict["results_test"][dataset]["preprocessed"]["prediction"]
+                - plot_dict["results_test"][dataset]["preprocessed"]["truth"]
+            ) / plot_dict["results_test"][dataset]["preprocessed"]["truth"]
+            delta_train = (
+                plot_dict["results_train"][dataset]["preprocessed"]["prediction"]
+                - plot_dict["results_train"][dataset]["preprocessed"]["truth"]
+            ) / plot_dict["results_train"][dataset]["preprocessed"]["truth"]
 
-                # determine 1% largest amplitudes
-                scale = plot_dict["results_test"][dataset]["preprocessed"]["truth"]
-                largest_idx = round(0.01 * len(scale))
-                sort_idx = np.argsort(scale)
-                largest_min = scale[sort_idx][-largest_idx - 1]
-                largest_mask = scale > largest_min
+            # determine 1% largest amplitudes
+            scale = plot_dict["results_test"][dataset]["preprocessed"]["truth"]
+            largest_idx = round(0.01 * len(scale))
+            sort_idx = np.argsort(scale)
+            largest_min = scale[sort_idx][-largest_idx - 1]
+            largest_mask = scale > largest_min
 
-                xranges = [(-10.0, 10.0), (-30.0, 30.0), (-100.0, 100.0)]  # in %
-                binss = [100, 50, 50]
-                for xrange, bins in zip(xranges, binss):
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_train * 100],
-                        labels=["Test", "Train"],
-                        title=title[idataset],
-                        xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=False,
-                    )
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_test[largest_mask] * 100],
-                        labels=["Test", "Largest 1\%"],
-                        title=title[idataset],
-                        xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=False,
-                    )
-                    plot_delta_histogram(
-                        file,
-                        [delta_test * 100, delta_test[largest_mask] * 100],
-                        labels=["Test", "Largest 1\%"],
-                        title=title[idataset],
-                        xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
-                        xrange=xrange,
-                        bins=bins,
-                        logy=True,
-                    )
+            xranges = [(-10.0, 10.0), (-30.0, 30.0), (-100.0, 100.0)]  # in %
+            binss = [100, 50, 50]
+            for xrange, bins in zip(xranges, binss):
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_train * 100],
+                    labels=["Test", "Train"],
+                    title=title[0],
+                    xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=False,
+                )
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_test[largest_mask] * 100],
+                    labels=["Test", "Largest 1\%"],
+                    title=title[0],
+                    xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=False,
+                )
+                plot_delta_histogram(
+                    file,
+                    [delta_test * 100, delta_test[largest_mask] * 100],
+                    labels=["Test", "Largest 1\%"],
+                    title=title[0],
+                    xlabel=r"$\tilde\Delta = \frac{\tilde A_\mathrm{pred} - \tilde A_\mathrm{true}}{\tilde A_\mathrm{true}}$ [\%]",
+                    xrange=xrange,
+                    bins=bins,
+                    logy=True,
+                )
 
 
 def plot_histograms(
@@ -395,6 +396,8 @@ def plot_histograms(
 
     if logx:
         axs[0].set_xscale("log")
+    if logy:
+        axs[0].set_yscale("log")
 
     axs[0].legend(loc="upper right", frameon=False, fontsize=FONTSIZE_LEGEND)
     axs[0].set_ylabel("Normalized", fontsize=FONTSIZE)

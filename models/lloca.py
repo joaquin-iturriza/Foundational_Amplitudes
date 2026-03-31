@@ -135,6 +135,7 @@ class LLOCAMuPTransformer(nn.Module):
         particle_type: torch.Tensor, 
         mean: float,
         std: float,
+        ptr: torch.Tensor,
     ):          
         """Forward pass of the LLoCa network."""
         frames = self.framesnet(

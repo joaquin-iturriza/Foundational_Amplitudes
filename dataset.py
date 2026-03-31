@@ -5,32 +5,29 @@ from torch.utils.data import Dataset
  
 class AmplitudeDataset(Dataset):
     """
-    Single flat dataset produced after padding and concatenating all source
-    files in init_data.  Each item is a 3-tuple:
-        particles  : float tensor  (nparticles_max, 4)        [LLOCA]
-                     or            (nparticles_max * 4,)      [other models]
+    Single flat dataset. Each item is a 3-tuple:
+        particles  : float tensor  (n_particles, 4)   — natural multiplicity, no padding
         amplitude  : float tensor  (1,)
-        tokens     : long tensor   (nparticles_max,)
-                     real particles carry their encoded PDG token,
-                     padded slots carry 0 (the reserved padding index)
+        tokens     : long tensor   (n_particles,)
+ 
+    Events within a batch have different n_particles. collate_variable_length
+    handles this by concatenating them into a flat sparse representation with
+    a ptr tensor, matching the interface expected by LLoCa's framesnet and
+    backbone when ptr is not None.
     """
  
-    def __init__(self, particles, amplitudes, tokens, dtype, reshape=False):
+    def __init__(self, particles_list, amplitudes, tokens_list, dtype):
         """
         Parameters
         ----------
-        particles  : np.ndarray  (N, nparticles_max * 4)
-        amplitudes : np.ndarray  (N, 1)
-        tokens     : np.ndarray  (N, nparticles_max)  int
-        dtype      : torch dtype
-        reshape    : if True particles are returned as (nparticles_max, 4)
+        particles_list : list of np.ndarray, each shape (n_particles_i, 4)
+        amplitudes     : np.ndarray  (N, 1)
+        tokens_list    : list of np.ndarray, each shape (n_particles_i,)
+        dtype          : torch dtype
         """
-        nparticles_max = tokens.shape[1]
-        self.particles  = torch.tensor(particles,  dtype=dtype)
+        self.particles  = [torch.tensor(p, dtype=dtype)      for p in particles_list]
         self.amplitudes = torch.tensor(amplitudes, dtype=dtype)
-        self.tokens     = torch.tensor(tokens,     dtype=torch.long)
-        if reshape:
-            self.particles = self.particles.view(-1, nparticles_max, 4)
+        self.tokens     = [torch.tensor(t, dtype=torch.long) for t in tokens_list]
  
     def __len__(self):
         return len(self.amplitudes)
@@ -41,11 +38,27 @@ class AmplitudeDataset(Dataset):
  
 def collate_variable_length(batch):
     """
-    batch: list of (particles, amplitude, tokens) tuples.
-    Returns a single (particles, amplitudes, tokens) tuple of stacked tensors.
-    The name is kept for drop-in compatibility with the existing DataLoader calls.
+    Collate a list of (particles, amplitude, tokens) tuples into a sparse batch.
+ 
+    Returns
+    -------
+    particles  : (N_total, 4)    flat concatenation of all particles in the batch
+    amplitudes : (B, 1)          one amplitude per event
+    tokens     : (N_total,)      flat concatenation of all token sequences
+    ptr        : (B+1,)          ptr[i] = start index of event i in the flat sequence
+                                 e.g. for batch of 3 events with 4,4,3 particles:
+                                 ptr = [0, 4, 8, 11]
     """
-    particles  = torch.stack([item[0] for item in batch], dim=0)
-    amplitudes = torch.stack([item[1] for item in batch], dim=0)
-    tokens     = torch.stack([item[2] for item in batch], dim=0)
-    return particles, amplitudes, tokens
+    particles_list  = [item[0] for item in batch]
+    amplitudes_list = [item[1] for item in batch]
+    tokens_list     = [item[2] for item in batch]
+ 
+    particles  = torch.cat(particles_list,   dim=0)   # (N_total, 4)
+    amplitudes = torch.stack(amplitudes_list, dim=0)  # (B, 1)
+    tokens     = torch.cat(tokens_list,      dim=0)   # (N_total,)
+ 
+    counts = torch.tensor([p.shape[0] for p in particles_list], dtype=torch.long)
+    ptr    = torch.zeros(len(batch) + 1, dtype=torch.long)
+    torch.cumsum(counts, dim=0, out=ptr[1:])
+ 
+    return particles, amplitudes, tokens, ptr

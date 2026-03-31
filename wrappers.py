@@ -94,25 +94,58 @@ class AmplitudeGATrWrapper(nn.Module):
         return amplitude
         
 
+# class AmplitudeLLoCaWrapper(nn.Module):
+#     def __init__(self, net, token_size):
+#         super().__init__()
+#         self.net = net
+#         self.network_dtype = torch.float32
+#         self.token_size = token_size
+
+#     def forward(self, inputs, type_token, mean, std):
+#         # print("### type_token:", type_token)
+#         # print("### type_token.max() + 1:", int(type_token.max() + 1))
+#         # print("### type_token.min():", int(type_token.min()))
+#         # print("### type_token.dtype:", type_token.dtype)
+#         # print("### token_size:", self.token_size)
+#         # particle_type = torch.nn.functional.one_hot(
+#         #     type_token, num_classes=int(type_token.max() + 1)
+#         # )
+#         particle_type = torch.nn.functional.one_hot(
+#             type_token, num_classes=self.token_size   # <-- use fixed size
+#         )
+#         particle_type = particle_type.to(dtype=self.network_dtype, device=inputs.device)
+#         outputs = self.net(inputs, particle_type, mean, std)
+#         return outputs.mean(dim=-2)
+
 class AmplitudeLLoCaWrapper(nn.Module):
     def __init__(self, net, token_size):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
         self.token_size = token_size
-
-    def forward(self, inputs, type_token, mean, std):
-        # print("### type_token:", type_token)
-        # print("### type_token.max() + 1:", int(type_token.max() + 1))
-        # print("### type_token.min():", int(type_token.min()))
-        # print("### type_token.dtype:", type_token.dtype)
-        # print("### token_size:", self.token_size)
-        # particle_type = torch.nn.functional.one_hot(
-        #     type_token, num_classes=int(type_token.max() + 1)
-        # )
+ 
+    def forward(self, fourmomenta, particle_type_indices, mean, std, ptr):
+        """
+        Parameters
+        ----------
+        fourmomenta         : (N_total, 4)   flat sparse particles
+        particle_type_indices : (N_total,)   long tensor of token indices
+        mean, std           : float          normalization constants
+        ptr                 : (B+1,)         event boundaries in the flat sequence
+        """
         particle_type = torch.nn.functional.one_hot(
-            type_token, num_classes=self.token_size   # <-- use fixed size
-        )
-        particle_type = particle_type.to(dtype=self.network_dtype, device=inputs.device)
-        outputs = self.net(inputs, particle_type, mean, std)
-        return outputs.mean(dim=-2)
+            particle_type_indices, num_classes=self.token_size
+        ).to(dtype=self.network_dtype, device=fourmomenta.device)
+        # (N_total, token_size)
+ 
+        outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr)
+        # outputs shape: (N_total, out_channels)
+ 
+        # Pool per event: mean over each event's particles using ptr
+        B = ptr.shape[0] - 1
+        pooled = torch.stack([
+            outputs[ptr[i]:ptr[i+1]].mean(dim=0)
+            for i in range(B)
+        ])  # (B, out_channels)
+ 
+        return pooled

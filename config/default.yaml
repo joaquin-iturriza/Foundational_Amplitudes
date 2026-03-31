@@ -41,7 +41,7 @@ training:
 
  optimizer : AdamW
  lr: 3.e-4
- batchsize: 256
+ batchsize: 128
  betas: [.9, .999]
  eps: 1.e-8
  weight_decay: 0
@@ -73,7 +73,7 @@ training:
 
 evaluate: true
 evaluation:
- batchsize: 2048
+ batchsize: 128
 
 find_BS: false
 BS_finding:
