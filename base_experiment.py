@@ -46,12 +46,8 @@ import lgatr.primitives.linear
 from lgatr.layers.mlp.config import MLPConfig
 from lgatr.layers.attention.config import SelfAttentionConfig
 
-
 from mup import set_base_shapes, make_base_shapes
 from mup import MuAdam, MuAdamW  # μP optimizers
-
-import copy
-import os
 
 cs = ConfigStore.instance()
 cs.store(name="base_attention", node=SelfAttentionConfig)
@@ -130,11 +126,16 @@ class BaseExperiment:
             self._init_scheduler()
             self.train()
             self._save_model()
-        peak = torch.cuda.max_memory_allocated()
-        LOGGER.info(f"Peak VRAM used: {peak / 1024**2:.2f} MB")
+
+        if self.device == torch.device("cuda"):
+            peak = torch.cuda.max_memory_allocated()
+            LOGGER.info(f"Peak VRAM used: {peak / 1024**2:.2f} MB")
 
         if self.is_main_process():
-            if self.cfg.evaluate:
+            # Only run a standalone evaluate() when we didn't train (eval-only mode),
+            # or when save_intermediate=False meaning _evals was never called inside
+            # train() and we need a final evaluation here.
+            if self.cfg.evaluate and (not self.cfg.train or not self.cfg.training.save_intermediate):
                 self.evaluate()
 
             if self.cfg.plot and self.cfg.save:
@@ -165,9 +166,10 @@ class BaseExperiment:
             lgatr.layers.linear.NUM_PIN_LINEAR_BASIS_ELEMENTS = 5
             if self.cfg.ga_settings.mix_mvpseudoscalar_into_scalar:
                 LOGGER.warning(
-                    f"Mixing mvpseudoscalar into scalar is only possible if ga_settings.use_fully_connected_subgroup=True"
+                    "Mixing mvpseudoscalar into scalar is only possible if "
+                    "ga_settings.use_fully_connected_subgroup=True"
                 )
-                lgatr.layers.linear.MIX_MVPSEUDOSCALAR_INTO_SCALAR = False
+            lgatr.layers.linear.MIX_MVPSEUDOSCALAR_INTO_SCALAR = False
         lgatr.layers.mlp.mlp.USE_GEOMETRIC_PRODUCT = (
             self.cfg.ga_settings.use_geometric_product
         )
@@ -227,7 +229,7 @@ class BaseExperiment:
                 )
 
         # === μP setup ===
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
+        if self._is_mup_model():
             self.bsh_path = os.path.join(self.cfg.run_dir, "base_shapes.bsh")
 
             if os.path.exists(self.bsh_path):
@@ -614,262 +616,218 @@ class BaseExperiment:
                 )
 
     def train(self):
-        # performance metrics
-        self.train_lr, self.train_loss, self.val_loss, self.train_grad_norm, self.train_loss_no_reg, self.train_mse, self.val_loss_no_reg, self.val_mse = (
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-        )
+        self.train_lr, self.train_loss, self.val_loss = [], [], []
+        self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
+        self.val_loss_no_reg, self.val_mse = [], []
         self.train_metrics = self._init_metrics()
-        self.val_metrics = self._init_metrics()
+        self.val_metrics   = self._init_metrics()
 
-        # early stopping
         smallest_val_loss, smallest_val_loss_step = 1e10, 0
-        patience = 0
+        patience  = 0
+        results   = []
+        iterator  = iter(self._cycle(self.train_loader))
+        avg_iter_time = 0
 
-        # main train loop
+        if self.cfg.find_BS:
+            gradients, S_estimates, G2_estimates, B_simples = [], [], [], []
+
+        # Log-spaced checkpoints at which to run _evals (save preds / intrinsic dim)
+        oom          = math.floor(np.log10(self.cfg.training.iterations))
+        mantissa     = self.cfg.training.iterations / (10 ** oom)
+        iters_to_eval = set(math.floor(mantissa * 10 ** (i / 2)) for i in range(0, 2 * oom + 1))
+
         LOGGER.info(
             f"Starting to train for {self.cfg.training.iterations} iterations "
             f"= {self.cfg.training.iterations / len(self.train_loader):.1f} epochs "
-            f"on a dataset with {len(self.train_loader)} batches "
-            f"using early stopping with patience {self.cfg.training.es_patience} "
-            f"while validating every {self.cfg.training.validate_every_n_steps} iterations"
+            f"on a dataset with {len(self.train_loader)} batches | "
+            f"early stopping patience {self.cfg.training.es_patience} | "
+            f"validating every {self.cfg.training.validate_every_n_steps} steps"
         )
         self.training_start_time = time.time()
 
-        # recycle trainloader
-        def cycle(iterable):
-            while True:
-                for x in iterable:
-                    yield x
+        # --- evaluate at initialisation (step 0, before any gradient update) ---
+        if self.is_main_process() and self.cfg.training.save_intermediate:
+            self._evals(results, smallest_val_loss_step, step=0)
+            if self.cfg.training.save_gradients:
+                self._save_gradients(step=0)
 
-        results = []#{}
-        #results['samplesize']=int(self.cfg.data.subsample)
-        mses_prepd = []
-        iters = []
-        iters_evaluated = []
-        iterator = iter(cycle(self.train_loader))
-        avg_iter_time = 0
-        if self.cfg.find_BS:
-            gradients = []
-            S_estimates = []
-            G2_estimates = []
-            B_simples = []
         for step in range(self.cfg.training.iterations):
-            # training
             iter_time_start = time.time()
-            if step > 0:   # skip first step to get evaluation at initialization #### NOT GOOD, FIX LATER
-                self.model.train()
-                if self.cfg.training.optimizer == "ScheduleFree":
-                    self.optimizer.train()
-                data = next(iterator)
-                self._step(data, step)
-                if self.cfg.find_BS:   
-                    grads = torch.cat([p.grad.view(-1) for p in self.model.parameters() if p.grad is not None])
-                    gradients.append(grads.detach().clone())
-                    if len(gradients) > self.cfg.BS_finding.n_batches_big:
-                        gradients = gradients[-self.cfg.BS_finding.n_batches_big:]  
-                        grad_big = torch.stack(gradients).mean(dim=0)
-                        grad_small = torch.stack(random.sample(gradients,self.cfg.BS_finding.n_batches_small)).mean(dim=0)
-                        #grad_small = torch.stack(gradients[-self.cfg.BS_finding.n_batches_small:]).mean(dim=0)
-                        B_big = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_big
-                        B_small = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_small
-                        S_estimate = abs(1/(1/B_small - 1/B_big) * ( grad_small.norm()**2 - grad_big.norm()**2 ))
-                        G2_estimate = abs(1/(B_big - B_small) * ( B_big * grad_big.norm()**2 - B_small * grad_small.norm()**2))
-                        S_estimates.append(S_estimate.item())
-                        G2_estimates.append(G2_estimate.item())
-                        ema_S = pd.Series(S_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
-                        ema_G2 = pd.Series(G2_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
-                        B_simple = ema_S.iloc[-1]/ema_G2.iloc[-1]
-                        #B_simple = S_estimate/G2_estimate 
-                        if step % 100 == 0: 
-                            LOGGER.info("grad_small ",grad_small.norm(), "grad_big ",grad_big.norm())
-                            LOGGER.info("S_estimate ",S_estimate.item()," G2_estimate ",G2_estimate.item()," B_simple ",B_simple.item())
-                            LOGGER.info("EMA S ",ema_S.iloc[-1]," EMA G2 ",ema_G2.iloc[-1])
-                        B_simples.append(B_simple.item())
 
-            iter_time = time.time() - iter_time_start
-            avg_iter_time = (avg_iter_time * step + iter_time) / (step + 1)
-            if self.is_main_process():
-                if self.cfg.training.save_intermediate or (step+1) == self.cfg.training.iterations: ########## FIX LATER
-                    oom=math.floor(np.log10(self.cfg.training.iterations))
-                    mantissa=self.cfg.training.iterations/(10**oom)
-                    iters_to_eval=[math.floor(mantissa*10**(i/2)) for i in range(0,2*oom+1)]
-                    if ((step+1) in iters_to_eval) or (step == 0):
-                        self._evals(results,smallest_val_loss_step,step)
-                
-                    if self.cfg.training.save_gradients:
-                        if ((step+1) in iters_to_eval) or (step == 0): #plot gradients
-                            self._save_gradients(step)                    
-                    if self.cfg.training.save_weights or (step == 0):
-                        if ((step+1) in iters_to_eval): #plot weights
-                            self._save_weights(step)
-            
-            
-            # validation (and early stopping)        
-            if ((step + 1) % self.cfg.training.validate_every_n_steps == 0) or (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
+            # --- training step ---
+            self.model.train()
+            if self.cfg.training.optimizer == "ScheduleFree":
+                self.optimizer.train()
+            data = next(iterator)
+            self._step(data, step)
+
+            # --- batch-size finder ---
+            if self.cfg.find_BS:
+                grads = torch.cat([p.grad.view(-1) for p in self.model.parameters() if p.grad is not None])
+                gradients.append(grads.detach().clone())
+                if len(gradients) > self.cfg.BS_finding.n_batches_big:
+                    gradients = gradients[-self.cfg.BS_finding.n_batches_big:]
+                    grad_big   = torch.stack(gradients).mean(dim=0)
+                    grad_small = torch.stack(random.sample(gradients, self.cfg.BS_finding.n_batches_small)).mean(dim=0)
+                    B_big   = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_big
+                    B_small = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_small
+                    S_estimate  = abs(1 / (1/B_small - 1/B_big) * (grad_small.norm()**2 - grad_big.norm()**2))
+                    G2_estimate = abs(1 / (B_big - B_small) * (B_big * grad_big.norm()**2 - B_small * grad_small.norm()**2))
+                    S_estimates.append(S_estimate.item())
+                    G2_estimates.append(G2_estimate.item())
+                    ema_S  = pd.Series(S_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha,  adjust=False).mean()
+                    ema_G2 = pd.Series(G2_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
+                    B_simple = ema_S.iloc[-1] / ema_G2.iloc[-1]
+                    B_simples.append(B_simple.item())
+                    if step % 100 == 0:
+                        LOGGER.info(f"S={S_estimate.item():.3e}  G2={G2_estimate.item():.3e}  B_simple={B_simple.item():.3e}")
+
+            avg_iter_time = (avg_iter_time * step + (time.time() - iter_time_start)) / (step + 1)
+
+            # --- validation ---
+            is_val_step = (step + 1) % self.cfg.training.validate_every_n_steps == 0
+            is_last_step = (step + 1) == self.cfg.training.iterations
+
+            if is_val_step or is_last_step:
                 val_loss = self._validate(step)
-                if val_loss < smallest_val_loss:
-                    #LOGGER.info(
-                    #    f"Validation loss improved from {smallest_val_loss:.4f} to {val_loss:.4f} in iteration {step+1}"
-                    #)
-                    smallest_val_loss = val_loss
+                improved = val_loss < smallest_val_loss
+
+                if improved:
+                    smallest_val_loss      = val_loss
                     smallest_val_loss_step = step
                     patience = 0
-
-                    # save best model
                     if self.cfg.training.es_load_best_model:
-                        self._save_model(
-                            step,
-                            f"model_run{self.cfg.run_idx}_best.pt"#it{smallest_val_loss_step}.pt"
-                        )
+                        self._save_model(step, f"model_run{self.cfg.run_idx}_best.pt")
                 else:
-                    if (step < self.cfg.training.validate_every_n_steps and self.cfg.training.save_intermediate):
-                        patience += 1
-                    else:
-                        patience += self.cfg.training.validate_every_n_steps
+                    patience += self.cfg.training.validate_every_n_steps
                     if patience > self.cfg.training.es_patience:
-                        LOGGER.info(
-                            f"Early stopping in iteration {step} = epoch {step / len(self.train_loader):.1f}"
-                        )
-                        break  # early stopping
+                        LOGGER.info(f"Early stopping at iteration {step + 1} = epoch {(step + 1) / len(self.train_loader):.1f}")
+                        break
 
-                if self.cfg.training.scheduler in ["ReduceLROnPlateau"]:
+                if self.cfg.training.scheduler == "ReduceLROnPlateau":
                     self.scheduler.step(val_loss)
 
-            # output
+                # --- _evals immediately after validation, always on val steps ---
+                # This ensures _evals always reflects the current best model
+                # (smallest_val_loss_step is up-to-date), not a stale snapshot.
+                if self.is_main_process() and self.cfg.training.save_intermediate:
+                    self._evals(results, smallest_val_loss_step, step)
+                    if self.cfg.training.save_gradients and (step + 1) in iters_to_eval:
+                        self._save_gradients(step)
+                    if self.cfg.training.save_weights and (step + 1) in iters_to_eval:
+                        self._save_weights(step)
+
+            # --- progress logging ---
             dt = time.time() - self.training_start_time
-            if step in [0, 999] or step in [round(x) for x in np.linspace(0, self.cfg.training.iterations-1, num=10)]: # print 10 logs during training
-                dt_estimate = dt * self.cfg.training.iterations / (step + 1)
+            log_steps = {0, 999} | set(round(x) for x in np.linspace(0, self.cfg.training.iterations - 1, num=10))
+            if step in log_steps:
+                dt_est = dt * self.cfg.training.iterations / (step + 1)
                 LOGGER.info(
-                    f"Finished iteration {step+1} after {dt:.2f}s, "
-                    f"training time estimate: {dt_estimate/60:.2f}min "
-                    f"= {dt_estimate/60**2:.2f}h"
+                    f"Finished iteration {step + 1} after {dt:.2f}s | "
+                    f"estimate: {dt_est/60:.2f}min = {dt_est/3600:.2f}h"
                 )
-            
-            
+
+        # --- end of training ---
         dt = time.time() - self.training_start_time
         LOGGER.info(
-            f"Finished training for {step} iterations = {step / len(self.train_loader):.1f} epochs "
-            f"after {dt/60:.4f}min = {dt/60**2:.4f}h"
-            f" (avg iter time {avg_iter_time:.4f}s, est. total time {avg_iter_time*step/60:.4f}min = {avg_iter_time*self.cfg.training.iterations/60**2:.2f}h)"
+            f"Finished training: {step + 1} iterations = {(step + 1) / len(self.train_loader):.1f} epochs "
+            f"in {dt/60:.2f}min (avg {avg_iter_time:.4f}s/iter)"
         )
         if self.cfg.use_mlflow:
-            log_mlflow("iterations", step)
-            log_mlflow("epochs", step / len(self.train_loader))
-            log_mlflow("traintime", dt / 3600)
+            log_mlflow("iterations", step + 1)
+            log_mlflow("epochs",     (step + 1) / len(self.train_loader))
+            log_mlflow("traintime",  dt / 3600)
 
-        # wrap up early stopping
-        if (self.cfg.training.es_load_best_model) and (patience > self.cfg.training.es_patience):
-            self._evals(results,smallest_val_loss_step,step)
-            self._load_previous_best_model()
-        elif (self.cfg.training.es_load_best_model):
+        # Load best model at end of training
+        if self.cfg.training.es_load_best_model:
             self._load_previous_best_model()
 
         if self.cfg.find_BS:
-            plt.figure()
-            #plt.plot(range(len(B_simples)), B_simples)
-            plt.plot(range(len(S_estimates)), S_estimates, label='S estimates', color='blue')
-            plt.plot(range(len(ema_S)), ema_S, label='EMA of S estimates', color='cyan')
-            # Also plot EMA of B_simple
-            #plt.plot(range(len(B_simples)), ema_B_simple, label='EMA of B_simple', color='orange')
-            plt.xlabel('Iteration')
-            plt.ylabel('Estimated S')
-            plt.title('Estimation of S over Iterations')
-            plt.yscale('log')
-            plt.tight_layout()
-            plt.legend()
-            plt.savefig(os.path.join(self.cfg.run_dir, f"S_estimation_run{self.cfg.run_idx}.pdf"))
-            plt.close()
-            plt.figure()
-            plt.plot(range(len(G2_estimates)), G2_estimates, label='G2 estimates', color='green')
-            plt.plot(range(len(ema_G2)), ema_G2, label='EMA of G2 estimates', color='lime')
-            plt.xlabel('Iteration')
-            plt.ylabel('Estimated G2')
-            plt.title('Estimation of G2 over Iterations')
-            plt.yscale('log')
-            plt.tight_layout()
-            plt.legend()
-            plt.savefig(os.path.join(self.cfg.run_dir, f"G2_estimation_run{self.cfg.run_idx}.pdf"))
-            plt.close()
-            plt.figure()
-            plt.plot(range(len(B_simples)), B_simples, label='B_simple estimates', color='red')
-            plt.xlabel('Iteration')
-            plt.ylabel('Estimated B_simple')
-            plt.title('Estimation of B_simple over Iterations')
-            plt.yscale('log')
-            plt.tight_layout()
-            plt.legend()
-            plt.savefig(os.path.join(self.cfg.run_dir, f"B_simple_estimation_run{self.cfg.run_idx}.pdf"))
-            plt.close()
+            self._plot_bs_finding(S_estimates, G2_estimates, B_simples, ema_S, ema_G2)
+
+    @staticmethod
+    def _cycle(iterable):
+        while True:
+            for x in iterable:
+                yield x
         
-    def _evals(self,results,smallest_val_loss_step,step):
+    def _plot_bs_finding(self, S_estimates, G2_estimates, B_simples, ema_S, ema_G2):
+        for values, ema, label, color, ema_color, fname in [
+            (S_estimates,  ema_S,  "S",        "blue",  "cyan",  "S_estimation"),
+            (G2_estimates, ema_G2, "G2",       "green", "lime",  "G2_estimation"),
+            (B_simples,    None,   "B_simple", "red",   None,    "B_simple_estimation"),
+        ]:
+            plt.figure()
+            plt.plot(range(len(values)), values, label=f"{label} estimates", color=color)
+            if ema is not None:
+                plt.plot(range(len(ema)), ema, label=f"EMA of {label}", color=ema_color)
+            plt.xlabel("Iteration")
+            plt.ylabel(f"Estimated {label}")
+            plt.title(f"Estimation of {label} over Iterations")
+            plt.yscale("log")
+            plt.tight_layout()
+            plt.legend()
+            plt.savefig(os.path.join(self.cfg.run_dir, f"{fname}_run{self.cfg.run_idx}.pdf"))
+            plt.close()
+
+    def _evals(self, results, smallest_val_loss_step, step):
         if not self.is_main_process():
             return
         LOGGER.info(
-                f"### Evaluating model from iteration {smallest_val_loss_step+1} in iteration {step+1}###"
-            )
-        self._save_model(
-            step,
-            f"model_run{self.cfg.run_idx}_current.pt"
+            f"### Evaluating model (best from iteration {smallest_val_loss_step + 1}) "
+            f"at iteration {step + 1} ###"
         )
+        self._save_model(step, f"model_run{self.cfg.run_idx}_current.pt")
+
         if self.cfg.training.load_best_previous:
             try:
                 self._load_previous_best_model()
             except FileNotFoundError:
                 self._load_previous_current_model()
-        res = self.evaluate()
-        
 
-        if self.cfg.training.get_ID:  ### ONLY WORKS WITH ONE DATASET, FIX LATER
+        self.evaluate()
+
+        if self.cfg.training.get_ID:
             id_time = time.time()
             ID_mean, ID_std = get_intrinsic_dim(
-                model = self.model,
-                input_dataloader = self.test_loader,
-                nsamples = min(1e3,self.cfg.data.subsample*self.cfg.training.train_test_val[1]),
+                model=self.model,
+                input_dataloader=self.test_loader,
+                nsamples=min(1e3, self.cfg.data.subsample * self.cfg.training.train_test_val[1]),
                 bs=self.cfg.training.batchsize,
-                divs = 2,
-                res = 3,
-                call_model_fn=self.call_model_fn
+                divs=2,
+                res=3,
+                call_model_fn=self.call_model_fn,
             )
-            id_time = time.time() - id_time
-            LOGGER.info(
-                f"Intrinsic Dimension estimation took {id_time:.2f}s"
-            )
-        for dataset, dataset_results in self.results.items():  # Loop through datasets
-            for split, split_results in dataset_results.items():  # Loop through splits (train/val/test)
-                for processing_type, metrics in split_results.items():  # Loop through raw/preprocessed
-                    # Create directory for predictions if it doesn't exist
-                    if self.cfg.training.save_preds_intermediate or (step+1) == self.cfg.training.iterations:
-                        self._save_preds_intermediate(
-                            step + 1, dataset, split, processing_type, metrics
-                        )
-                    # Append results to list
-                    
+            LOGGER.info(f"Intrinsic Dimension estimation took {time.time() - id_time:.2f}s")
+        else:
+            ID_mean = ID_std = None
+
+        for dataset, dataset_results in self.results.items():
+            for split, split_results in dataset_results.items():
+                for processing_type, metrics in split_results.items():
+                    if self.cfg.training.save_preds_intermediate or (step + 1) == self.cfg.training.iterations:
+                        self._save_preds_intermediate(step + 1, dataset, split, processing_type, metrics)
                     results.append({
-                        'run_id': self.cfg.run_idx,
-                        'samplesize': int(self.cfg.data.subsample),
-                        'dataset': dataset,
-                        'split': split,  # train/val/test
-                        'processing_type': processing_type,  # raw/preprocessed
-                        'mse': metrics.get('mse'),
-                        'l1': metrics.get('l1'),
-                        'l1_rel': metrics.get('l1_rel'),
-                        'iter': step + 1,
-                        'iter_evaluated': smallest_val_loss_step,
-                        'ID': [ID_mean, ID_std] if self.cfg.training.get_ID else None,
-                        'time': time.time() - self.training_start_time
+                        "run_id":          self.cfg.run_idx,
+                        "samplesize":      int(self.cfg.data.subsample),
+                        "dataset":         dataset,
+                        "split":           split,
+                        "processing_type": processing_type,
+                        "mse":             metrics.get("mse"),
+                        "l1":              metrics.get("l1"),
+                        "l1_rel":          metrics.get("l1_rel"),
+                        "iter":            step + 1,
+                        "iter_evaluated":  smallest_val_loss_step + 1,
+                        "ID":              [ID_mean, ID_std] if self.cfg.training.get_ID else None,
+                        "time":            time.time() - self.training_start_time,
                     })
+
+        # Restore the current (non-best) weights so training can continue
         self._load_previous_current_model()
-        LOGGER.info(
-            f"Saving results to {self.cfg.run_dir}/results_intermediate.pkl"
-        )
-        with open(os.path.join(self.cfg.run_dir, "results_intermediate.pkl"), "wb") as f:
+
+        pkl_path = os.path.join(self.cfg.run_dir, "results_intermediate.pkl")
+        LOGGER.info(f"Saving results to {pkl_path}")
+        with open(pkl_path, "wb") as f:
             pickle.dump(results, f)
 
 
@@ -887,68 +845,44 @@ class BaseExperiment:
 
     def _save_preds_intermediate(self, step, dataset, split, processing_type, metrics):
         os.makedirs(os.path.join(self.cfg.run_dir, "preds"), exist_ok=True)
-                                    
-        # Save predictions to file
-        pred_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pred.npy")
+        pred_path = os.path.join(self.cfg.run_dir, f"preds/{step}_{dataset}_{split}_{processing_type}_pred.npy")
         np.save(pred_path, metrics["prediction"])
-        
-        # For heteroscedastic case, also save sigmas if they exist
         if self.cfg.training.loss == "HETEROSC" and processing_type == "preprocessed":
-            sigma_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_sigmas.npy")
+            sigma_path = os.path.join(self.cfg.run_dir, f"preds/{step}_{dataset}_{split}_{processing_type}_sigmas.npy")
             np.save(sigma_path, metrics["sigmas"])
-            pull_path = os.path.join(self.cfg.run_dir, f"preds/{step+1}_{dataset}_{split}_{processing_type}_pull.npy")
+            pull_path = os.path.join(self.cfg.run_dir, f"preds/{step}_{dataset}_{split}_{processing_type}_pull.npy")
             np.save(pull_path, metrics["pull"])
 
-    def _load_previous_model(self,step):
-        model_path = os.path.join(
-                self.cfg.run_dir,
-                "models",
-                f"model_run{self.cfg.run_idx}_it{step}.pt",
-            )
+    def _is_mup_model(self):
+        return self.cfg.model.net._target_ in (
+            "models.mup_mlp.MuMLP",
+            "models.lloca.LLOCAMuPTransformer",
+        )
+
+    def _load_model_weights(self, model_path):
         try:
-            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
+            state_dict = torch.load(model_path, map_location=self.device, weights_only=False)["model"]
             LOGGER.info(f"Loading model from {model_path}")
             self.model.load_state_dict(state_dict)
         except FileNotFoundError:
-            LOGGER.warning(
-                f"Cannot load model (epoch {step}) from {model_path}"
-            )  
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
+            LOGGER.warning(f"Cannot load model from {model_path}")
+        if self._is_mup_model():
             set_base_shapes(self.model, self.bsh_path, rescale_params=False)
 
+    def _load_previous_model(self, step):
+        self._load_model_weights(os.path.join(
+            self.cfg.run_dir, "models", f"model_run{self.cfg.run_idx}_it{step}.pt"
+        ))
+
     def _load_previous_best_model(self):
-        model_path = os.path.join(
-                self.cfg.run_dir,
-                "models",
-                f"model_run{self.cfg.run_idx}_best.pt",
-            )
-        try:
-            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
-            LOGGER.info(f"Loading model from {model_path}")
-            self.model.load_state_dict(state_dict)
-        except FileNotFoundError:
-            LOGGER.warning(
-                f"Cannot load best model from {model_path}"
-            )
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
-        
+        self._load_model_weights(os.path.join(
+            self.cfg.run_dir, "models", f"model_run{self.cfg.run_idx}_best.pt"
+        ))
+
     def _load_previous_current_model(self):
-        model_path = os.path.join(
-                self.cfg.run_dir,
-                "models",
-                f"model_run{self.cfg.run_idx}_current.pt",
-            )
-        try:
-            state_dict = torch.load(model_path, map_location=self.device,weights_only=False)["model"]
-            LOGGER.info(f"Loading model from {model_path}")
-            self.model.load_state_dict(state_dict)
-        except FileNotFoundError:
-            LOGGER.warning(
-                f"Cannot load current model from {model_path}"
-            )
-        if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP" or self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
+        self._load_model_weights(os.path.join(
+            self.cfg.run_dir, "models", f"model_run{self.cfg.run_idx}_current.pt"
+        ))
             
     def _step(self, data, step):
         # actual update step
