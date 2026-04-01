@@ -57,7 +57,10 @@ class MultiHeadQKVLinear(nn.Module):
         self.hidden_channels = hidden_channels
         self.linear = nn.Linear(in_channels, 3 * hidden_channels * num_heads)
 
-        self.init_method = init_method_normal((encoder_var / hidden_channels)**0.5)
+        # fan-in of the K/V projections is in_channels (the full hidden dim, scales with width),
+        # not hidden_channels (the per-head dim, constant). Using in_channels keeps K/V output
+        # variance O(1) across widths.
+        self.init_method = init_method_normal((encoder_var / in_channels)**0.5)
 
         self._reset_parameters()
 
@@ -111,7 +114,8 @@ class MultiQueryQKVLinear(nn.Module):
         self.k_linear = nn.Linear(in_channels, hidden_channels)
         self.v_linear = nn.Linear(in_channels, hidden_channels)
 
-        self.init_method = init_method_normal((encoder_var / hidden_channels)**0.5)
+        # Same reasoning as MultiHeadQKVLinear: fan-in is in_channels, not hidden_channels.
+        self.init_method = init_method_normal((encoder_var / in_channels)**0.5)
 
         self._reset_parameters()
 
@@ -207,7 +211,9 @@ class BaselineSelfAttention(nn.Module):
         else:
             self.dropout = None
 
-        self.init_method = init_method_normal((encoder_var / hidden_channels)**0.5)
+        # out_linear fan-in is hidden_channels * num_heads (total concatenated heads),
+        # not hidden_channels (per-head). Use the total to keep output variance O(1).
+        self.init_method = init_method_normal((encoder_var / (hidden_channels * num_heads))**0.5)
 
         self._reset_parameters()
 

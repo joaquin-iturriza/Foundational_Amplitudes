@@ -245,8 +245,9 @@ class BaseExperiment:
                 if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
                     base_cfg.net.hidden_channels = 49  # example base width
                 elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-                    base_cfg.net.attn_reps = "8x0n+2x1n"
-                    base_cfg.net.hidden_channels_mlp = 32
+                    # attn_reps defines the per-head Lorentz representation (structure, not width)
+                    # and must stay fixed between base and delta so mup correctly identifies
+                    # num_heads as the width axis.
                     base_cfg.net.num_heads = 2
                 base_model = instantiate(base_cfg)
 
@@ -254,8 +255,6 @@ class BaseExperiment:
                 if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
                     delta_cfg.net.hidden_channels = 128  # example delta width
                 elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-                    delta_cfg.net.attn_reps = "16x0n+4x1n"
-                    delta_cfg.net.hidden_channels_mlp = 256
                     delta_cfg.net.num_heads = 8
 
                 delta_model = instantiate(delta_cfg)
@@ -966,6 +965,11 @@ class BaseExperiment:
                     mse_vals.append(mse_val)
 
         val_loss = np.mean(losses)
+
+        # Release validation tensors from the GPU memory pool to avoid fragmentation
+        # that would slow down subsequent training steps.
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
         if ((step + 1) % self.cfg.training.validate_every_n_steps == 0):
             self.val_loss.append(val_loss)

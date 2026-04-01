@@ -39,14 +39,16 @@ training:
  max_grad_norm: null
  log_every_n_steps: 1000
 
+ num_workers: 0       # DataLoader worker processes. 0=main thread (safe on Windows). Use 4+ on Linux.
+
  optimizer : AdamW
  lr: 3.e-4
- batchsize: 128
+ batchsize: 256
  betas: [.9, .999]
  eps: 1.e-8
  weight_decay: 0
  
- scheduler: null
+ scheduler: CosineAnnealingLR
  scheduler_scale: 1
  cosanneal_warmup_steps: 0
  cosanneal_eta_min: 0
@@ -73,7 +75,7 @@ training:
 
 evaluate: true
 evaluation:
- batchsize: 128
+ batchsize: 256
 
 find_BS: false
 BS_finding:

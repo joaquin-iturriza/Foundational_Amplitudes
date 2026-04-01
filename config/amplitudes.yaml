@@ -2,7 +2,7 @@ exp_type: amplitudes
 exp_name: amp
 
 data:
- dataset : [qqbar_Zg_13000GeV_amplitudes]
+ dataset : ["ee_uu_91GeV_amplitudes","ee_aa_13000GeV_amplitudes","ee_aaa_13000GeV_amplitudes"]
  data_path : data/
  subsample : null
  include_permsym: true
@@ -19,10 +19,10 @@ training:
  iterations: 2500000 # MLP, DSI: 2500000; Tr: 1000000; GAP, GATr, CGENN: 250000
  optimizer: AdamW
  lr: 1e-4
- batchsize: 128
+ batchsize: 256
  validate_every_n_steps: 100
  clip_grad_norm: 1000
- scheduler: null #CosineAnnealingLR
+ scheduler: CosineAnnealingLR
 
 plot: true
 plotting:
@@ -34,3 +34,4 @@ defaults:
  - _self_
  - model: lloca
  - default
+ - local: none   # override with `local=desktop` on your Windows machine

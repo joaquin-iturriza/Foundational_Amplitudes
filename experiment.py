@@ -183,7 +183,7 @@ class AmplitudeExperiment(BaseExperiment):
     
                 particles_prepd = particles_t / particles_t.std()
                 self.mom_mean.append(float(particles_prepd.mean()))
-                self.mom_std.append(float(np.clip(particles_prepd.std(), 1e-2, None)))
+                self.mom_std.append(float(particles_prepd.std().clamp(min=1e-2)))
                 particles_prepd = particles_prepd.numpy()  # (N, n_particles, 4)
             else:
                 LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
@@ -323,12 +323,15 @@ class AmplitudeExperiment(BaseExperiment):
                 tokens_flat    = self.tokens_flat,              # shared, not copied
                 dtype          = self.dtype,
             )
+            nw = self.cfg.training.num_workers
             return torch.utils.data.DataLoader(
                 ds,
-                batch_size = batchsize,
-                shuffle    = shuffle,
-                drop_last  = True,
-                collate_fn = collate_variable_length,
+                batch_size  = batchsize,
+                shuffle     = shuffle,
+                drop_last   = True,
+                collate_fn  = collate_variable_length,
+                pin_memory  = torch.cuda.is_available() and nw > 0,
+                num_workers = nw,
             )
     
         self.cfg.training.batchsize = int(min(self.cfg.training.batchsize, n_train / 2))

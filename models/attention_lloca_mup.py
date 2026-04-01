@@ -1,5 +1,6 @@
 import math
 from math import prod
+from typing import Optional
 import torch
 from torch import Tensor
 from torch.nn import functional as F
@@ -7,6 +8,19 @@ from torch.nn import functional as F
 from lloca.framesnet.frames import Frames, InverseFrames, LowerIndicesFrames
 from lloca.reps.tensorreps import TensorReps
 from lloca.reps.tensorreps_transform import TensorRepsTransform
+
+try:
+    from xformers.ops import memory_efficient_attention
+    from xformers.ops.fmha.attn_bias import BlockDiagonalMask
+    _XFORMERS_AVAILABLE = True
+except ImportError:
+    _XFORMERS_AVAILABLE = False
+
+# Cache BlockDiagonalMask objects by seq_lens pattern.
+# BlockDiagonalMask is a lightweight descriptor that does not hold CUDA tensors
+# itself — the actual CUDA work happens inside memory_efficient_attention — so
+# caching it is safe and avoids repeated Python-level allocation on every step.
+_mask_cache: dict = {}
 
 
 class LLoCaAttention(torch.nn.Module):
@@ -144,28 +158,54 @@ def scaled_dot_product_attention(
     key: Tensor,
     value: Tensor,
     mup_scaling: bool = True,
+    ptr: Optional[Tensor] = None,
 ) -> Tensor:
     """Execute μP-scaled dot-product attention (1/d instead of 1/sqrt(d)).
+
+    When `ptr` is provided, uses xformers block-diagonal attention so that
+    particles in each event only attend to other particles in the same event.
+    This is both physically correct and O(B * N_particles^2) instead of
+    O(N_total^2), giving a large speedup for batched variable-length sequences.
 
     Parameters
     ----------
     query : torch.Tensor
-        (..., items_out, channels)
+        (..., H, N_total, C)
     key : torch.Tensor
-        (..., items_in, channels)
+        (..., H, N_total, C)
     value : torch.Tensor
-        (..., items_in, channels)
+        (..., H, N_total, C)
     mup_scaling : bool
         If True, use μP scaling (divide by d instead of sqrt(d)).
+    ptr : torch.Tensor, optional
+        Event boundary pointer of shape (B+1,). If provided, block-diagonal
+        attention is used via xformers.
 
     Returns
     -------
     torch.Tensor
-        (..., items_out, channels)
+        (..., H, N_total, C)
     """
     d = query.shape[-1]
     scale = 1.0 / d if mup_scaling else 1.0 / math.sqrt(d)
 
+    if ptr is not None and _XFORMERS_AVAILABLE:
+        seq_lens = tuple((ptr[1:] - ptr[:-1]).tolist())
+        if seq_lens not in _mask_cache:
+            _mask_cache[seq_lens] = BlockDiagonalMask.from_seqlens(list(seq_lens))
+        attn_bias = _mask_cache[seq_lens]
+
+        # xformers expects (1, N_total, H, C) — reshape from (..., H, N_total, C)
+        *leading, H, N, C = query.shape
+        q = query.reshape(1, H, N, C).permute(0, 2, 1, 3)  # (1, N, H, C)
+        k = key.reshape(1, H, N, C).permute(0, 2, 1, 3)
+        v = value.reshape(1, H, N, C).permute(0, 2, 1, 3)
+
+        out = memory_efficient_attention(q, k, v, attn_bias=attn_bias, scale=scale)
+        # (1, N, H, C) → (..., H, N, C)
+        return out.permute(0, 2, 1, 3).reshape(*leading, H, N, C)
+
+    # Fallback: dense attention (cross-event attention will occur if ptr not given)
     attn_scores = torch.matmul(query, key.transpose(-2, -1)) * scale
     attn_weights = F.softmax(attn_scores, dim=-1)
     return torch.matmul(attn_weights, value)

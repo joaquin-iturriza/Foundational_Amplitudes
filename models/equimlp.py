@@ -66,7 +66,7 @@ class EquiEdgeConv(MessagePassing):
         aggr : str
             Aggregation method for message passing. Options are "add", "mean", or "max". Default is "sum".
         """
-        super().__init__(aggr=aggr, flow="target_to_source")
+        super().__init__(aggr=aggr, flow="target_to_source", node_dim=0)
         assert (
             num_scalars > 0 or include_edges
         ), "Either num_scalars > 0 or include_edges==True, otherwise there are no inputs."
@@ -138,14 +138,18 @@ class EquiEdgeConv(MessagePassing):
             edge_attr = None
 
         # message-passing
+        # node_ptr and node_batch are graph-level tensors (not node features), so they
+        # must NOT be passed to propagate() — torch_geometric 2.x tries to index-select
+        # every tensor argument at node_dim, which fails for 1-D ptr/batch tensors.
+        # Store them as temporary instance attributes and access them inside message().
         fourmomenta = fourmomenta.reshape(-1, 4)
+        self._node_ptr = ptr
+        self._node_batch = batch
         vecs = self.propagate(
             edge_index,
             s=scalars,
             fm=fourmomenta,
             edge_attr=edge_attr,
-            node_ptr=ptr,
-            node_batch=batch,
         )
         # equivariant layer normalization
         if self.layer_norm:
@@ -155,7 +159,7 @@ class EquiEdgeConv(MessagePassing):
         return vecs
 
     def message(
-        self, edge_index, s_i, s_j, fm_i, fm_j, node_ptr, node_batch, edge_attr=None
+        self, edge_index, s_i, s_j, fm_i, fm_j, edge_attr=None
     ):
         """
         Parameters
@@ -193,7 +197,7 @@ class EquiEdgeConv(MessagePassing):
             prefactor = torch.cat([prefactor, edge_attr], dim=-1)
         prefactor = self.mlp(prefactor)
         prefactor = self.nonlinearity(
-            prefactor, index=edge_index[0], node_ptr=node_ptr, node_batch=node_batch
+            prefactor, index=edge_index[0], node_ptr=self._node_ptr, node_batch=self._node_batch
         )
         fm_rel = (fm_rel / fm_rel_norm)[:, None, :4]
         prefactor = prefactor.unsqueeze(-1)

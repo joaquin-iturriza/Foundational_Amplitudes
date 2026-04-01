@@ -6,7 +6,7 @@ from torch import nn
 
 from lloca.reps.tensorreps import TensorReps
 from lloca.reps.tensorreps_transform import TensorRepsTransform
-from lloca.utils.utils import build_edge_index_fully_connected, get_edge_attr
+from lloca.utils.utils import get_edge_attr
 from lloca.framesnet.nonequi_frames import IdentityFrames
 from lloca.framesnet.equi_frames import LearnedPDFrames
 from .equimlp import EquiMLP
@@ -136,12 +136,12 @@ class LLOCAMuPTransformer(nn.Module):
         mean: float,
         std: float,
         ptr: torch.Tensor,
-    ):          
+    ):
         """Forward pass of the LLoCa network."""
         frames = self.framesnet(
             fourmomenta, scalars=particle_type, ptr=None, return_tracker=False
         )
-        fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)  
+        fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
         features_local = (fourmomenta_local - mean) / std
 
 
@@ -149,5 +149,7 @@ class LLOCAMuPTransformer(nn.Module):
         features_local = features_local.to(torch.float32)
         frames.to(torch.float32)
         features = torch.cat([features_local, particle_type], dim=-1)
-        
-        return self.net(features, frames)
+
+        # Pass ptr so the transformer can build a block-diagonal attention mask,
+        # restricting each event's particles to attend only within that event.
+        return self.net(features, frames, ptr=ptr)

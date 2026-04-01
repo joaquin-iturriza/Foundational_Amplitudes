@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", message=".*NumPy 1.x.*")
+warnings.filterwarnings("ignore", message=".*_ARRAY_API.*")
+
 import hydra
 import torch
 from experiment import AmplitudeExperiment
