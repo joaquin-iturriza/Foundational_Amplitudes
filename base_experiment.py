@@ -618,6 +618,7 @@ class BaseExperiment:
         self.train_lr, self.train_loss, self.val_loss = [], [], []
         self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
         self.val_loss_no_reg, self.val_mse = [], []
+        self.proc_val_losses = {}   # populated by AmplitudeExperiment._validate
         self.train_metrics = self._init_metrics()
         self.val_metrics   = self._init_metrics()
 

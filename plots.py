@@ -51,6 +51,22 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             labels_no_reg=labels_no_reg,
         )
  
+        # ── optional: per-process val loss curves ────────────────────────────
+        proc_val_losses = plot_dict.get("proc_val_losses", {})
+        if proc_val_losses:
+            proc_losses_list  = list(proc_val_losses.values())
+            proc_labels_list  = [f"val {name}" for name in proc_val_losses]
+            # combined val loss for reference
+            combined_val = plot_dict["val_loss"]
+            plot_loss(
+                file=f"{plot_path}/loss_per_process.pdf",
+                losses=[combined_val] + proc_losses_list,
+                lr=None,
+                labels=["val loss (combined)"] + proc_labels_list,
+                logy=logy,
+                title=loss_title,
+            )
+
         # ── optional: MSE plot for HETEROSC ───────────────────────────────────
         if (
             cfg.training.loss == "HETEROSC"
@@ -87,6 +103,23 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 logx=False,
                 logy=True,
             )
+
+            # Per-dataset pages
+            for ds_name, ds_results in plot_dict.get("results_per_proc", {}).items():
+                ds_data = [
+                    np.log(ds_results["test"]["raw"]["truth"]),
+                    np.log(ds_results["train"]["raw"]["truth"]),
+                    np.log(ds_results["test"]["raw"]["prediction"]),
+                ]
+                plot_histograms(
+                    file,
+                    ds_data,
+                    labels,
+                    title=f"{title[0].split(':')[0]}: {ds_name}",
+                    xlabel=r"$\log A$",
+                    logx=False,
+                    logy=True,
+                )
         
             if cfg.training.loss == "HETEROSC":
                 labels = ["Test", "Train"]

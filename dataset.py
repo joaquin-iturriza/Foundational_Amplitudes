@@ -1,6 +1,7 @@
 import numpy as np
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Sampler
+from collections import defaultdict
  
  
 class AmplitudeDataset(Dataset):
@@ -95,4 +96,111 @@ def collate_variable_length(batch):
     torch.cumsum(counts, dim=0, out=ptr[1:])
  
     return particles, amplitudes, tokens, ptr
- 
+
+
+class ProcessBalancedSampler(Sampler):
+    """
+    Yields batches where each process contributes equally (or according to
+    dynamically updated weights).
+
+    At each step, draws `batch_size // n_processes` indices from each process,
+    then shuffles them together to form one batch.  When a process runs out of
+    indices it reshuffles its own pool — so no process is ever exhausted.
+
+    Weights are updated via `set_weights(weights)` where weights is a list of
+    non-negative floats (one per process).  A weight of 0 disables that process.
+    Internally weights are normalised to allocate slots per batch.
+
+    Parameters
+    ----------
+    process_ids : np.ndarray  (N_events,)
+        Integer process index for every event in the dataset (after shuffling).
+    batch_size : int
+    weights : list[float] | None
+        Initial sampling weights per process.  Defaults to uniform.
+    seed : int
+    """
+
+    def __init__(self, process_ids, batch_size, weights=None, seed=0):
+        self.process_ids = np.asarray(process_ids)
+        self.batch_size  = batch_size
+        self.seed        = seed
+        self.rng         = np.random.default_rng(seed)
+
+        # indices per process
+        unique = sorted(set(self.process_ids.tolist()))
+        self.n_processes = len(unique)
+        self.proc_indices = {
+            p: np.where(self.process_ids == p)[0] for p in unique
+        }
+        # shuffled pools (refilled on exhaustion)
+        self._pools = {p: self._shuffle(p) for p in unique}
+        self._pool_pos = defaultdict(int)
+
+        if weights is None:
+            weights = [1.0] * self.n_processes
+        self._weights = np.array(weights, dtype=float)
+
+        # total number of batches per "epoch" based on smallest process
+        min_proc_size = min(len(v) for v in self.proc_indices.values())
+        self._n_batches = max(1, min_proc_size * self.n_processes // batch_size)
+
+    def _shuffle(self, p):
+        idx = self.proc_indices[p].copy()
+        self.rng.shuffle(idx)
+        return idx
+
+    def set_weights(self, weights):
+        """Update sampling weights (called after each validation)."""
+        w = np.array(weights, dtype=float)
+        w = np.clip(w, 0, None)
+        self._weights = w
+
+    def _slots_per_process(self):
+        """Allocate batch slots proportionally to weights, at least 1 per active process."""
+        w = self._weights.copy()
+        total = w.sum()
+        if total == 0:
+            w = np.ones(self.n_processes, dtype=float)
+            total = float(self.n_processes)
+        slots = np.floor(w / total * self.batch_size).astype(int)
+        # ensure at least 1 slot per active process
+        slots = np.maximum(slots, (w > 0).astype(int))
+        # distribute remaining slots to highest-weight processes
+        remainder = self.batch_size - slots.sum()
+        if remainder > 0:
+            order = np.argsort(-w)
+            for i in order[:remainder]:
+                slots[i] += 1
+        return slots
+
+    def _next(self, p, n):
+        """Draw n indices from process p, refilling pool as needed."""
+        out = []
+        while len(out) < n:
+            pos   = self._pool_pos[p]
+            pool  = self._pools[p]
+            avail = len(pool) - pos
+            need  = n - len(out)
+            if avail >= need:
+                out.extend(pool[pos:pos + need].tolist())
+                self._pool_pos[p] = pos + need
+            else:
+                out.extend(pool[pos:].tolist())
+                self._pools[p]    = self._shuffle(p)
+                self._pool_pos[p] = 0
+        return out
+
+    def __iter__(self):
+        for _ in range(self._n_batches):
+            slots   = self._slots_per_process()
+            procs   = sorted(self.proc_indices.keys())
+            batch   = []
+            for p, n in zip(procs, slots):
+                if n > 0:
+                    batch.extend(self._next(p, n))
+            self.rng.shuffle(batch)
+            yield from batch
+
+    def __len__(self):
+        return self._n_batches * self.batch_size
