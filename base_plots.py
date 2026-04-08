@@ -22,6 +22,7 @@ def plot_loss(
     title=None,
     losses_no_reg=None,
     labels_no_reg=None,
+    x_scale=1,
 ):
     """Plot one or more loss curves.
  
@@ -65,14 +66,14 @@ def plot_loss(
             else labels_no_reg
         )
  
-    iterations = np.arange(1, len(losses[0]) + 1)
- 
+    iterations = np.arange(1, len(losses[0]) + 1) * x_scale
+
     # ── helper: compute x-axis for a curve that may be sub-sampled ───────────
     def _its(loss):
-        if len(loss) == len(iterations):
+        if len(loss) == len(losses[0]):
             return iterations
         frac = len(losses[0]) / len(loss)
-        return np.arange(1, len(loss) + 1) * frac
+        return np.arange(1, len(loss) + 1) * frac * x_scale
  
     # ── shift negative losses for the log-scale panel ────────────────────────
     all_vals = [v for curve in losses for v in curve]

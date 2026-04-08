@@ -58,6 +58,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             proc_labels_list  = [f"val {name}" for name in proc_val_losses]
             # combined val loss for reference
             combined_val = plot_dict["val_loss"]
+            val_step = plot_dict.get("validate_every_n_steps", 1)
             plot_loss(
                 file=f"{plot_path}/loss_per_process.pdf",
                 losses=[combined_val] + proc_losses_list,
@@ -65,6 +66,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 labels=["val loss (combined)"] + proc_labels_list,
                 logy=logy,
                 title=loss_title,
+                x_scale=val_step,
             )
 
         # ── optional: MSE plot for HETEROSC ───────────────────────────────────

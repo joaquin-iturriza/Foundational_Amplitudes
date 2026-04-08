@@ -38,12 +38,13 @@ training:
  clip_grad_value: null
  max_grad_norm: null
  log_every_n_steps: 1000
+ sampler_log_every_n_vals: 10   # log sampler weights every N validation steps (0 = never)
 
- num_workers: 0       # DataLoader worker processes. 0=main thread (safe on Windows). Use 4+ on Linux.
+ num_workers: 4       # DataLoader worker processes. 0=main thread (safe on Windows). Use 4+ on Linux.
 
  optimizer : AdamW
  lr: 3.e-4
- batchsize: 256
+ batchsize: 512
  betas: [.9, .999]
  eps: 1.e-8
  weight_decay: 0
@@ -73,9 +74,11 @@ training:
  regularization: null
  regularization_lambda: 1e-5
 
+ result_path: null
+
 evaluate: true
 evaluation:
- batchsize: 256
+ batchsize: 512
 
 find_BS: false
 BS_finding:

@@ -719,7 +719,8 @@ class AmplitudeExperiment(BaseExperiment):
             plot_dict["val_loss_no_reg"]   = getattr(self, "val_loss_no_reg",   [])
             plot_dict["train_mse"]         = getattr(self, "train_mse",         [])
             plot_dict["val_mse"]           = getattr(self, "val_mse",           [])
-            plot_dict["proc_val_losses"]   = getattr(self, "proc_val_losses",   {})
+            plot_dict["proc_val_losses"]      = getattr(self, "proc_val_losses",   {})
+            plot_dict["validate_every_n_steps"] = self.cfg.training.validate_every_n_steps
 
         plot_mixer(self.cfg, plot_path, title, plot_dict)
 
@@ -911,10 +912,13 @@ class AmplitudeExperiment(BaseExperiment):
         if self.train_sampler is not None:
             weights = [proc_losses.get(name, 1.0) for name in self.cfg.data.dataset]
             self.train_sampler.set_weights(weights)
-            LOGGER.info(
-                "Sampler weights: " +
-                ", ".join(f"{n}={w:.4f}" for n, w in zip(self.cfg.data.dataset, weights))
-            )
+            log_every = self.cfg.training.get("sampler_log_every_n_vals", 10)
+            n_vals = len(self.val_loss)
+            if log_every > 0 and n_vals % log_every == 0:
+                LOGGER.info(
+                    "Sampler weights: " +
+                    ", ".join(f"{n}={w:.4f}" for n, w in zip(self.cfg.data.dataset, weights))
+                )
 
         return val_loss
     

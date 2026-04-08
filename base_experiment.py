@@ -623,6 +623,7 @@ class BaseExperiment:
         self.val_metrics   = self._init_metrics()
 
         smallest_val_loss, smallest_val_loss_step = 1e10, 0
+        smallest_val_loss_no_reg = 1e10   # tracked alongside for HPO result reporting
         patience  = 0
         results   = []
         iterator  = iter(self._cycle(self.train_loader))
@@ -695,6 +696,8 @@ class BaseExperiment:
                 if improved:
                     smallest_val_loss      = val_loss
                     smallest_val_loss_step = step
+                    if self.val_loss_no_reg:
+                        smallest_val_loss_no_reg = self.val_loss_no_reg[-1]
                     patience = 0
                     if self.cfg.training.es_load_best_model:
                         self._save_model(step, f"model_run{self.cfg.run_idx}_best.pt")
@@ -741,6 +744,18 @@ class BaseExperiment:
         # Load best model at end of training
         if self.cfg.training.es_load_best_model:
             self._load_previous_best_model()
+
+        # Write best val loss for external HPO tools (e.g. Optuna sweep).
+        # Reports the no-regularization loss so the surrogate isn't biased by the
+        # regularization strength (which is itself a tuned hyperparameter).
+        # Falls back to the regularized loss if no-reg tracking wasn't enabled.
+        result_path = self.cfg.training.get("result_path", None)
+        if result_path:
+            import json
+            os.makedirs(os.path.dirname(result_path), exist_ok=True)
+            best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
+            with open(result_path, "w") as _f:
+                json.dump({"val_loss": float(best_loss)}, _f)
 
         if self.cfg.find_BS:
             self._plot_bs_finding(S_estimates, G2_estimates, B_simples, ema_S, ema_G2)
