@@ -97,9 +97,12 @@ class LLOCAMuPTransformer(nn.Module):
         loss='MSE',
         dropout_prob: float = 0.0,
         freeze_framesnet: bool = False,
+        checkpoint_blocks: bool = False,
+        parametrization: str = "mup",
         # token_size: int = 0,
     ):
         super().__init__()
+        self.parametrization = parametrization
 
         def equivectors_constructor(n_vectors):
             return EquiMLP(
@@ -108,8 +111,8 @@ class LLOCAMuPTransformer(nn.Module):
                 num_scalars=num_scalars,
                 hidden_channels=128, # FIXED TO 128 FOR MUP
                 num_layers_mlp=num_layers_mlp,
-                fm_norm=True, 
-                layer_norm=True, 
+                fm_norm=True,
+                layer_norm=True,
                 nonlinearity="softmax",
                 dropout_prob=dropout_prob,
             )
@@ -127,19 +130,22 @@ class LLOCAMuPTransformer(nn.Module):
             num_blocks,
             num_heads,
             dropout_prob=dropout_prob,
+            checkpoint_blocks=checkpoint_blocks,
+            parametrization=parametrization,
         )
 
     def forward(
-        self, 
-        fourmomenta: torch.Tensor, 
-        particle_type: torch.Tensor, 
+        self,
+        fourmomenta: torch.Tensor,
+        particle_type: torch.Tensor,
         mean: float,
         std: float,
         ptr: torch.Tensor,
+        seq_lens=None,
     ):
         """Forward pass of the LLoCa network."""
         frames = self.framesnet(
-            fourmomenta, scalars=particle_type, ptr=None, return_tracker=False
+            fourmomenta, scalars=particle_type, ptr=ptr, return_tracker=False
         )
         fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
         features_local = (fourmomenta_local - mean) / std
@@ -152,4 +158,6 @@ class LLOCAMuPTransformer(nn.Module):
 
         # Pass ptr so the transformer can build a block-diagonal attention mask,
         # restricting each event's particles to attend only within that event.
-        return self.net(features, frames, ptr=ptr)
+        # seq_lens (CPU per-event lengths, optional) lets the mask builder skip a
+        # GPU→CPU sync; see build_block_diagonal_bias.
+        return self.net(features, frames, ptr=ptr, seq_lens=seq_lens)

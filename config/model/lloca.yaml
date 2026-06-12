@@ -1,6 +1,10 @@
 _target_: wrappers.AmplitudeLLoCaWrapper
 
 token_size: 0
+d_particle_hidden: 16  # fixed projection dim: Linear(n_features → d_particle_hidden).
+                        # in_channels = d_particle_hidden + 4 is constant regardless of
+                        # how many quantum numbers are in PARTICLE_PROPERTIES, so adding
+                        # a 9th feature never requires retraining the transformer.
 net:
   _target_: models.lloca.LLOCAMuPTransformer
 
@@ -14,6 +18,9 @@ net:
   num_blocks: 8
   num_heads: 8
   freeze_framesnet: false
-  
+  checkpoint_blocks: false   # gradient-checkpoint transformer blocks: recompute block
+                             # activations in backward instead of storing them — large
+                             # activation-memory saving for ~one extra forward of compute.
+
 
   loss: "MSE"

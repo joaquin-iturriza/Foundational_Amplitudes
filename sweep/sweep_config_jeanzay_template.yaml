@@ -1,0 +1,56 @@
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2          # V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "20:00:00"
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+sweep_name: my_sweep_name
+n_trials: 40
+
+dyhpo:
+  n_candidates: 300
+  seed: 42
+  n_startup: 10
+  total_budget: 10000
+
+fidelity_schedule:
+  t_steps: [1000, 10000, 40000]
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.dataset: '[ee_uu_91GeV_amplitudes]'
+  model: lloca
+  plot: 'true'
+  training.batchsize: 512
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.0e-06
+  high: 0.01
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.0
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06

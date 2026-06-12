@@ -9,12 +9,55 @@ from .backboneMLP import MLP, MuMLP_LLoCa
 from lloca.utils.lorentz import lorentz_squarednorm
 from lloca.utils.utils import (
     get_edge_index_from_shape,
-    get_edge_index_from_ptr,
     get_edge_attr,
     get_ptr_from_batch,
     get_node_to_edge_ptr_fully_connected,
     get_batch_from_ptr,
 )
+
+
+def get_edge_index_from_ptr(ptr, shape=None, remove_self_loops=True):
+    """Sparse fully-connected within-event edge index built directly from ptr.
+
+    The lloca library version builds a dense (N_total x N_total) boolean matrix
+    then masks it — O(N_total^2) memory.  This version is O(sum n_i^2): it only
+    allocates the edges that actually exist, which is at most ~25x the number of
+    particles for typical 5-particle events.
+    """
+    device = ptr.device
+    counts = (ptr[1:] - ptr[:-1]).long()          # (B,) — particles per event
+    n_sq   = counts * counts                       # (B,) — pairs per event
+    n_total_pairs = int(n_sq.sum().item())
+
+    if n_total_pairs == 0:
+        edge_index = torch.zeros(2, 0, dtype=torch.long, device=device)
+        return edge_index
+
+    # For each pair, which event does it belong to?
+    event_idx = torch.repeat_interleave(
+        torch.arange(len(counts), device=device), n_sq
+    )                                               # (n_total_pairs,)
+
+    # Cumulative pair starts per event — lets us compute the local pair index
+    pair_starts = torch.zeros(len(counts) + 1, dtype=torch.long, device=device)
+    torch.cumsum(n_sq, dim=0, out=pair_starts[1:])
+
+    local_pair = (
+        torch.arange(n_total_pairs, device=device) - pair_starts[event_idx]
+    )                                               # index within event's n_i^2 block
+
+    n_i    = counts[event_idx]                     # n_i for each pair
+    offset = ptr[:-1][event_idx]                   # global start of each pair's event
+
+    row = offset + local_pair // n_i
+    col = offset + local_pair  % n_i
+
+    edge_index = torch.stack([row, col], dim=0)
+
+    if remove_self_loops:
+        edge_index = edge_index[:, row != col]
+
+    return edge_index
 
 
 class EquiEdgeConv(MessagePassing):

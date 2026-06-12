@@ -1,0 +1,22 @@
+_target_: wrappers.AmplitudeLGATrMuPWrapper
+
+token_size: 0
+d_particle_hidden: 16   # fixed projection dim (n_features -> d_particle_hidden), as for lloca
+
+net:
+  _target_: models.lgatr_mup.MuPLGATr
+
+  in_mv_channels: 1       # the 4-momentum embeds into a single multivector
+  out_mv_channels: 1      # scalar amplitude read out via extract_scalar(out_mv)
+  hidden_mv_channels: 16  # μP width axis (multivector)
+  in_s_channels: null     # set by experiment.init_data = n_scalars (particle encoding + order)
+  out_s_channels: null
+  hidden_s_channels: 16   # μP width axis (scalar)
+
+  num_blocks: 8
+  num_heads: 8
+  multi_query: false
+  mlp_activation: gelu
+  checkpoint_blocks: false
+
+  parametrization: mup    # base/delta = (4,4)/(8,8) by default; see models/lgatr_mup.py

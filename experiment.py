@@ -1,7 +1,10 @@
+import math
+
 import numpy as np
 import torch
 
 import os
+import json
 import time
 from omegaconf import OmegaConf, open_dict
 
@@ -11,8 +14,9 @@ from preprocessing import (
     preprocess_particles,
     preprocess_amplitude,
     undo_preprocess_amplitude,
+    resolve_amp_trafos,
 )
-from plots import plot_mixer
+from plots import plot_mixer, short_ds_name
 from logger import LOGGER
 #from mlflow_util import log_mlflow
 from losses import LogCoshLoss, RelL1Loss, HeteroscedasticLoss
@@ -93,16 +97,6 @@ MODEL_TITLE_DICT = {
 }
 
 
-
-# def get_mass(dataset):
-#     # initialize massless particles
-#     mass = [1e-5] * (len(dataset))
-
-#     # Set the Z mass (change later for more general datasets)
-#     mass[2] = mass_Z
-#     return mass
-
-
 class AmplitudeExperiment(BaseExperiment):
     def init_physics(self):
         assert not self.cfg.training.force_xformers
@@ -119,9 +113,26 @@ class AmplitudeExperiment(BaseExperiment):
         # initialise tokenizer — will be populated in init_data
         from particle_ids import ParticleTokenizer
         tokenizer_path = os.path.join(self.cfg.run_dir, "particle_tokenizer.json")
+        ft = self.cfg.get("fine_tune", None)
+        ft_path = ft.get("pretrained_path", None) if ft is not None else None
         if self.warm_start and os.path.exists(tokenizer_path):
             self.tokenizer = ParticleTokenizer.load(tokenizer_path)
             LOGGER.info(f"Loaded tokenizer with vocab_size={self.tokenizer.vocab_size}")
+        elif ft_path is not None:
+            # Load tokenizer from pretrained model's run directory (two levels up from .pt)
+            pretrained_run_dir = os.path.dirname(os.path.dirname(ft_path))
+            pretrained_tok_path = os.path.join(pretrained_run_dir, "particle_tokenizer.json")
+            if os.path.exists(pretrained_tok_path):
+                self.tokenizer = ParticleTokenizer.load(pretrained_tok_path)
+                LOGGER.info(
+                    f"Fine-tuning: loaded tokenizer from pretrained run at {pretrained_tok_path} "
+                    f"(vocab_size={self.tokenizer.vocab_size})"
+                )
+            else:
+                LOGGER.warning(
+                    f"Fine-tuning: no tokenizer found at {pretrained_tok_path}, using fresh tokenizer"
+                )
+                self.tokenizer = ParticleTokenizer()
         else:
             self.tokenizer = ParticleTokenizer()
 
@@ -129,7 +140,7 @@ class AmplitudeExperiment(BaseExperiment):
         self.mom_mean = []
         self.mom_std  = []
 
-        if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer"):
+        if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             self.type_token = []
             for dataset in self.cfg.data.dataset:
                 if self.cfg.data.include_permsym:
@@ -151,7 +162,7 @@ class AmplitudeExperiment(BaseExperiment):
 
         # Normalise per-dataset subsample spec to a list[int|None]
         subsample_cfg = self.cfg.data.subsample
-        if subsample_cfg is None:
+        if subsample_cfg is None or (isinstance(subsample_cfg, str) and subsample_cfg.lower() in ("none", "null")):
             subsample_per_ds = [None] * len(self.cfg.data.dataset)
         elif OmegaConf.is_list(subsample_cfg) or isinstance(subsample_cfg, (list, tuple)):
             subsample_per_ds = [int(s) if s is not None else None for s in subsample_cfg]
@@ -173,9 +184,19 @@ class AmplitudeExperiment(BaseExperiment):
             pdg_ids    = data_raw[:, momenta_cols:-1].astype(int)
             amplitudes = data_raw[:, [-1]]
     
-            type_tokens = self.tokenizer.register_and_encode(pdg_ids)
-    
-            if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
+            use_pids = self.cfg.data.get("use_PIDs", False)
+            if use_pids:
+                type_tokens = self.tokenizer.register_and_encode(pdg_ids)
+            else:
+                # Global fixed encoding: PDG ID → property-table index.
+                # Independent of the training dataset, so a new BSM particle added
+                # to PARTICLE_PROPERTIES in particle_ids.py is immediately usable
+                # at inference without any model changes.
+                from particle_ids import global_encode
+                type_tokens = global_encode(pdg_ids)
+                self.tokenizer.register_and_encode(pdg_ids)  # keep tokenizer in sync for use_PIDs=True warm starts
+
+            if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
                 particles_t = torch.tensor(particles, dtype=torch.float64)
                 particles_t = particles_t.reshape(-1, n_particles, 4)
     
@@ -213,12 +234,23 @@ class AmplitudeExperiment(BaseExperiment):
         # ------------------------------------------------------------------
         # Build flat per-event lists and concatenate amplitudes
         # ------------------------------------------------------------------
-        is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer")
+        is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
     
         all_particles_list = []
         all_tokens_list    = []
         all_amplitudes_raw = []
         all_process_ids    = []   # integer process index per event
+
+        # amp_orders: list of [n_loops, alpha_s_power, ...] per dataset.
+        # Defaults to [0, 0] (LO) for each dataset if not specified.
+        amp_orders_cfg = self.cfg.data.get("amp_orders", None)
+        if amp_orders_cfg is None:
+            amp_orders = [[0, 0]] * len(self.cfg.data.dataset)
+        else:
+            amp_orders = [list(o) for o in amp_orders_cfg]
+        n_order_features = len(amp_orders[0])
+
+        all_order_labels = []   # will be (N_events, n_order_features)
 
         for proc_idx, (parts, toks, amps) in enumerate(zip(self.particles_prepd, self.pdg_ids, self.amplitudes)):
             N = parts.shape[0]
@@ -230,6 +262,10 @@ class AmplitudeExperiment(BaseExperiment):
             all_tokens_list.extend([toks[j] for j in range(N)])
             all_amplitudes_raw.append(amps)
             all_process_ids.extend([proc_idx] * N)
+            order_row = np.array(amp_orders[proc_idx], dtype=np.float32)
+            all_order_labels.append(np.tile(order_row, (N, 1)))  # (N, n_order_features)
+
+        all_order_labels = np.concatenate(all_order_labels, axis=0)  # (N_total, n_order_features)
 
         all_amplitudes_raw = np.concatenate(all_amplitudes_raw, axis=0)  # (N_total, 1)
         all_process_ids    = np.array(all_process_ids, dtype=np.int32)   # (N_total,)
@@ -237,11 +273,16 @@ class AmplitudeExperiment(BaseExperiment):
         # ------------------------------------------------------------------
         # Global amplitude preprocessing across all datasets combined
         # ------------------------------------------------------------------
+        # Swap 'log' -> 'signedlog' when amplitudes contain non-positive values
+        # (e.g. virtual corrections / virt-born ratios). Store the resolved list back
+        # on the config so the inverse (undo_preprocess_amplitude) uses the same one.
+        amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, all_amplitudes_raw)
+        self.cfg.data.amp_trafos = amp_trafos
         LOGGER.info(
-            f"Preprocessing amplitudes globally using trafos={self.cfg.data.amp_trafos}"
+            f"Preprocessing amplitudes globally using trafos={amp_trafos}"
         )
         all_amplitudes_prepd, prepd_mean, prepd_std = preprocess_amplitude(
-            all_amplitudes_raw, trafos=self.cfg.data.amp_trafos
+            all_amplitudes_raw, trafos=amp_trafos
         )
         self.prepd_mean = [prepd_mean]
         self.prepd_std  = [prepd_std]
@@ -264,6 +305,7 @@ class AmplitudeExperiment(BaseExperiment):
         all_tokens_list      = [all_tokens_list[i]      for i in perm]
         all_amplitudes_prepd = all_amplitudes_prepd[perm]
         all_process_ids      = all_process_ids[perm]
+        all_order_labels     = all_order_labels[perm]
     
         # ------------------------------------------------------------------
         # Build contiguous flat arrays for fast O(1) indexing in DataLoader
@@ -277,6 +319,8 @@ class AmplitudeExperiment(BaseExperiment):
         self.offsets           = offsets              # (N_events, 2)
         self.all_amplitudes    = all_amplitudes_prepd # (N_events, 1)
         self.all_process_ids   = all_process_ids      # (N_events,)
+        self.all_order_labels  = all_order_labels     # (N_events, n_order_features)
+        self.n_order_features  = n_order_features
         self.N_events          = N_total
     
         LOGGER.info(
@@ -285,26 +329,115 @@ class AmplitudeExperiment(BaseExperiment):
         )
     
         # ------------------------------------------------------------------
-        # Set model size
+        # Set model size — particle feature dimension depends on encoding mode
         # ------------------------------------------------------------------
         token_size = self.tokenizer.vocab_size
         self.token_size = token_size
         with open_dict(self.cfg):
             self.cfg.model.token_size = token_size
+
         if is_lloca:
+            use_pids = self.cfg.data.get("use_PIDs", False)
+            if use_pids:
+                particle_feature_dim = token_size
+                self.property_matrix = None
+                LOGGER.info(f"Particle encoding: one-hot PIDs (vocab_size={token_size})")
+            else:
+                from particle_ids import (
+                    ParticleFeaturizer, GLOBAL_PROPERTY_MATRIX, GLOBAL_N_ENTRIES
+                )
+                self.property_matrix = GLOBAL_PROPERTY_MATRIX
+                # d_particle_hidden is the fixed projection output dim.
+                # in_channels and num_scalars use this fixed dim — they never
+                # change when quantum numbers are added, only the tiny projection
+                # matrix (n_features → d_particle_hidden) needs extending.
+                d_hidden = self.cfg.model.get("d_particle_hidden", 16)
+                particle_feature_dim = d_hidden
+                LOGGER.info(
+                    f"Particle encoding: physical properties "
+                    f"({ParticleFeaturizer.N_FEATURES}D → projected to {d_hidden}D) | "
+                    f"global table covers {GLOBAL_N_ENTRIES - 1} particle species"
+                )
+            # n_order_features extra scalars per particle (same value broadcast across event)
+            n_scalars   = particle_feature_dim + self.n_order_features
             with open_dict(self.cfg):
-                self.cfg.model.net.in_channels = token_size + 4
-                self.cfg.model.net.num_scalars = token_size
+                if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):
+                    # GATr nets: the 4-momentum is the (multi)vector input (in_*v_channels=1
+                    # in the config), the particle/order encoding are the scalar inputs.
+                    self.cfg.model.net.in_s_channels = n_scalars
+                else:
+                    self.cfg.model.net.in_channels = n_scalars + 4
+                    self.cfg.model.net.num_scalars = n_scalars
+            LOGGER.info(
+                f"Order encoding: {self.n_order_features} features "
+                f"(e.g. [n_loops, alpha_s_power]) → n_scalars={n_scalars}"
+            )
         else:
             with open_dict(self.cfg):
                 if self.modelname == "LGATr":
                     self.cfg.model.net.in_s_channels = token_size
-    
+
         if self.cfg.save:
             tokenizer_path = os.path.join(self.cfg.run_dir, "particle_tokenizer.json")
             self.tokenizer.save(tokenizer_path)
             LOGGER.info(f"Saved tokenizer with vocab_size={token_size}")
             
+    def _post_instantiate_model(self, model):
+        """Called on the instantiated model after construction.
+        Adds particle_encoder. Since the μP backbone computes its own base shapes in
+        __init__, particle_encoder is added outside that scope and is later marked as a
+        standard-parametrization (SP) parameter by lloca.mup.finalize (in init_model)."""
+        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
+            use_pids = self.cfg.data.get("use_PIDs", False)
+            model.setup_particle_features(
+                use_pids=use_pids,
+                property_matrix=getattr(self, "property_matrix", None),
+            )
+
+    def init_model(self):
+        super().init_model()  # _post_instantiate_model is called inside for all three models
+
+        ft = self.cfg.get("fine_tune", None)
+        if ft is None or ft.get("pretrained_path", None) is None:
+            return
+
+        self._load_pretrained_weights(
+            ft.pretrained_path,
+            reset_output_head=ft.get("reset_output_head", False),
+        )
+
+        if ft.lora.get("enabled", False):
+            from fine_tune import inject_lora
+            inject_lora(
+                self.model,
+                rank=ft.lora.rank,
+                alpha=ft.lora.alpha,
+                target=list(ft.lora.target),
+            )
+
+        freeze_blocks = list(ft.get("freeze_blocks", []))
+        if freeze_blocks:
+            for idx in freeze_blocks:
+                for p in self.model.net.net.blocks[idx].parameters():
+                    p.requires_grad_(False)
+            LOGGER.info(f"Fine-tuning: froze transformer blocks {freeze_blocks}")
+
+    def _init_ewc(self):
+        ft = self.cfg.get("fine_tune", None)
+        if ft is None or not ft.ewc.get("enabled", False):
+            self.ewc = None
+            return
+        from fine_tune import EWC
+        loss_fn = lambda batch: self._batch_loss(batch)[0]
+        self.ewc = EWC(
+            self.model,
+            self.train_loader,
+            n_fisher_batches=ft.ewc.get("n_fisher_batches", 64),
+            device=self.device,
+            loss_fn=loss_fn,
+        )
+        LOGGER.info(f"Fine-tuning: EWC initialized (lambda={ft.ewc.get('lambda', 1000.0)})")
+
     def _init_dataloader(self):
         from dataset import AmplitudeDataset, collate_variable_length, ProcessBalancedSampler
         assert sum(self.cfg.data.train_test_val) <= 1
@@ -338,11 +471,27 @@ class AmplitudeExperiment(BaseExperiment):
                 offsets        = self.offsets[indices],
                 amplitudes     = self.all_amplitudes[indices],
                 tokens_flat    = self.tokens_flat,
+                order_labels   = self.all_order_labels[indices],
+                process_ids    = self.all_process_ids[indices],
                 dtype          = self.dtype,
             )
 
-        def make_loader(indices, shuffle, batchsize, sampler=None):
+        def make_loader(indices, shuffle, batchsize, sampler=None, workers=None):
+            # workers defaults to nw (cfg.training.num_workers); eval / per-process loaders
+            # pass workers=0 so the large in-memory dataset isn't forked into many worker
+            # sets (one per loader), whose copy-on-write pages creep the RSS up.
+            #
+            # pin_memory=False (NOT w>0): batches are variable-length (the collated particle
+            # tensor size differs every step), so a pinned-memory caching allocator hoards a
+            # distinct page-locked buffer per distinct size -> host RAM grows unbounded ->
+            # OOM over a long run. This is independent of workers/persistence (it bit every
+            # config). Dropping pin_memory removes the pinned cache; the H2D copy is then
+            # sync, but it's tiny (~1 MB/batch) next to compute, and the worker collate
+            # overlap (the real speedup) is unaffected. persistent_workers stays True so
+            # workers are never respawned mid-run (respawning leaks semaphores/procs and
+            # progressively slows the run).
             ds = make_dataset(indices)
+            w = nw if workers is None else workers
             return torch.utils.data.DataLoader(
                 ds,
                 batch_size  = batchsize,
@@ -350,8 +499,9 @@ class AmplitudeExperiment(BaseExperiment):
                 sampler     = sampler,
                 drop_last   = True,
                 collate_fn  = collate_variable_length,
-                pin_memory  = torch.cuda.is_available() and nw > 0,
-                num_workers = nw,
+                pin_memory         = False,
+                num_workers        = w,
+                persistent_workers = w > 0,
             )
 
         self.cfg.training.batchsize = int(min(self.cfg.training.batchsize, n_train / 2))
@@ -379,13 +529,15 @@ class AmplitudeExperiment(BaseExperiment):
         # Plain train loader for evaluation — always reflects the true data distribution,
         # regardless of whether a balanced sampler is used for training.
         train_eval_bs = min(self.cfg.evaluation.batchsize, max(len(train_idx) // 2, 1))
-        self.train_eval_loader = make_loader(train_idx, shuffle=False, batchsize=train_eval_bs)
+        self.train_eval_loader = make_loader(train_idx, shuffle=False, batchsize=train_eval_bs,
+                                             workers=0)
 
         eval_bs = min(self.cfg.evaluation.batchsize, max(len(val_idx) // 2, 1))
-        self.val_loader  = make_loader(val_idx,  shuffle=False, batchsize=eval_bs)
+        self.val_loader  = make_loader(val_idx,  shuffle=False, batchsize=eval_bs, workers=0)
         self.test_loader = make_loader(test_idx, shuffle=False,
                                        batchsize=min(self.cfg.evaluation.batchsize,
-                                                     max(len(test_idx) // 2, 1)))
+                                                     max(len(test_idx) // 2, 1)),
+                                       workers=0)
 
         # --- per-process loaders (val for loss tracking; test+train for per-dataset plots) ---
         self.proc_val_loaders        = {}
@@ -403,7 +555,8 @@ class AmplitudeExperiment(BaseExperiment):
                 if len(p_idx) >= 2:
                     self.proc_val_loaders[name] = make_loader(
                         p_idx, shuffle=False,
-                        batchsize=min(eval_bs, max(len(p_idx) // 2, 1))
+                        batchsize=min(eval_bs, max(len(p_idx) // 2, 1)),
+                        workers=0,
                     )
                     LOGGER.info(f"  Per-process val loader '{name}': {len(p_idx)} events")
                 # test
@@ -412,7 +565,8 @@ class AmplitudeExperiment(BaseExperiment):
                 if len(p_idx) >= 2:
                     self.proc_test_loaders[name] = make_loader(
                         p_idx, shuffle=False,
-                        batchsize=min(test_bs, max(len(p_idx) // 2, 1))
+                        batchsize=min(test_bs, max(len(p_idx) // 2, 1)),
+                        workers=0,
                     )
                 # train (plain, for evaluation only)
                 mask  = train_proc_ids == p
@@ -420,7 +574,8 @@ class AmplitudeExperiment(BaseExperiment):
                 if len(p_idx) >= 2:
                     self.proc_train_eval_loaders[name] = make_loader(
                         p_idx, shuffle=False,
-                        batchsize=min(train_eval_bs, max(len(p_idx) // 2, 1))
+                        batchsize=min(train_eval_bs, max(len(p_idx) // 2, 1)),
+                        workers=0,
                     )
     
         LOGGER.info(
@@ -514,7 +669,7 @@ class AmplitudeExperiment(BaseExperiment):
         return self.results
 
     def call_model_fn(self, x, tokens=None):
-        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
+        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             if tokens is None:
                 raise ValueError("call_model_fn requires tokens for LLoCA models")
             return self.model(
@@ -549,22 +704,23 @@ class AmplitudeExperiment(BaseExperiment):
         amp_truth_prepd : np.ndarray  (N, 1)
         sigmas          : np.ndarray | None   (only for HETEROSC loss)
         """
-        is_lloca  = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer")
+        is_lloca  = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
         all_pred  = []
         all_truth = []
         all_sigma = [] if self.cfg.training.loss == "HETEROSC" else None
 
         t0 = time.time()
         for data in loader:
-            particles, y, tokens, ptr = data
+            particles, y, tokens, order_labels, ptr, _ = data
             if is_lloca:
-                particles = particles.to(self.device)
-                tokens    = tokens.to(self.device)
-                ptr       = ptr.to(self.device)
+                particles    = particles.to(self.device)
+                tokens       = tokens.to(self.device)
+                order_labels = order_labels.to(self.device)
+                ptr          = ptr.to(self.device)
                 y_pred = self.model(
                     particles, tokens,
                     mean=self.mom_mean[0], std=self.mom_std[0],
-                    ptr=ptr,
+                    ptr=ptr, order_labels=order_labels,
                 )
             else:
                 x      = particles.to(self.device)
@@ -698,7 +854,7 @@ class AmplitudeExperiment(BaseExperiment):
         plot_path = os.path.join(self.cfg.run_dir, f"plots_{self.cfg.run_idx}")
         os.makedirs(plot_path, exist_ok=True)
         dataset_titles = [
-            "combined" if len(self.cfg.data.dataset) > 1 else self.cfg.data.dataset[0]
+            "combined" if len(self.cfg.data.dataset) > 1 else short_ds_name(self.cfg.data.dataset[0])
         ]
         model_core = self.model.module if isinstance(self.model, torch.nn.parallel.DistributedDataParallel) else self.model
         model_title = MODEL_TITLE_DICT[type(model_core.net).__name__]   
@@ -719,10 +875,62 @@ class AmplitudeExperiment(BaseExperiment):
             plot_dict["val_loss_no_reg"]   = getattr(self, "val_loss_no_reg",   [])
             plot_dict["train_mse"]         = getattr(self, "train_mse",         [])
             plot_dict["val_mse"]           = getattr(self, "val_mse",           [])
-            plot_dict["proc_val_losses"]      = getattr(self, "proc_val_losses",   {})
+            plot_dict["proc_val_losses"]        = getattr(self, "proc_val_losses",        {})
+            plot_dict["proc_val_losses_no_reg"] = getattr(self, "proc_val_losses_no_reg", {})
+            plot_dict["proc_ema_losses"]        = getattr(self, "_proc_ema_losses",        {})
+            plot_dict["proc_ema_losses_no_reg"] = getattr(self, "_proc_ema_losses_no_reg", {})
             plot_dict["validate_every_n_steps"] = self.cfg.training.validate_every_n_steps
+            # per-process cumulative compute (samples seen) at each validation step;
+            # list[dict{proc_id: n_samples}], aligned with proc_val_losses.
+            plot_dict["proc_compute_snapshots"] = (
+                self.train_sampler.compute_snapshots if self.train_sampler is not None else []
+            )
+            plot_dict["dataset_order"] = list(self.cfg.data.dataset)
 
+        self._save_per_process_metrics(plot_path)
         plot_mixer(self.cfg, plot_path, title, plot_dict)
+
+    def _save_per_process_metrics(self, plot_path):
+        """Dump per-process validation metrics to JSON for later reconstruction.
+
+        Saves the raw per-dataset val losses (with/without reg), the EMA-smoothed
+        series the sampler fits α on, the per-dataset cumulative compute, and the
+        combined val losses — enough to rebuild the global loss, the EMA curves,
+        and the loss-vs-compute scaling offline.
+        """
+        if not self.cfg.train or not getattr(self, "proc_val_losses", {}):
+            return
+        dataset_order = list(self.cfg.data.dataset)
+        snapshots = (
+            self.train_sampler.compute_snapshots if self.train_sampler is not None else []
+        )
+        proc_compute = {
+            name: [int(s.get(i, 0)) for s in snapshots]
+            for i, name in enumerate(dataset_order)
+        }
+
+        def _f(seq):
+            return [float(v) for v in seq]
+
+        def _fd(d):
+            return {k: _f(v) for k, v in d.items()}
+
+        dump = {
+            "validate_every_n_steps": self.cfg.training.validate_every_n_steps,
+            "dataset_order": dataset_order,
+            "val_loss": _f(self.val_loss),
+            "val_loss_no_reg": _f(getattr(self, "val_loss_no_reg", [])),
+            "proc_val_losses": _fd(self.proc_val_losses),
+            "proc_val_losses_no_reg": _fd(getattr(self, "proc_val_losses_no_reg", {})),
+            "proc_ema_losses": _fd(getattr(self, "_proc_ema_losses", {})),
+            "proc_ema_losses_no_reg": _fd(getattr(self, "_proc_ema_losses_no_reg", {})),
+            "proc_compute": proc_compute,
+            "proc_status": getattr(self, "_ds_status_hist", {}),
+        }
+        out_path = os.path.join(plot_path, "per_process_metrics.json")
+        with open(out_path, "w") as f:
+            json.dump(dump, f)
+        LOGGER.info(f"Saved per-process metrics to {out_path}")
 
     def _init_loss(self):
         match self.cfg.training.loss:
@@ -746,11 +954,32 @@ class AmplitudeExperiment(BaseExperiment):
             
     def _init_regularization(self):
         self.regularization_lambda = self.cfg.training.regularization_lambda
+        # The naive `sum(p.pow(2).sum() for p in model.parameters())` launches one
+        # pow + one reduction kernel (plus a full-size temporary) per parameter
+        # tensor and chains the adds in Python — ~100+ tiny serialized kernels every
+        # step for an 8-block transformer, independent of width. torch._foreach_norm
+        # fuses all tensors into a handful of multi-tensor kernels (the same
+        # machinery clip_grad_norm_ uses). Set LLOCA_REG=loop for the old path.
+        use_loop = os.environ.get("LLOCA_REG", "foreach") == "loop"
         match self.cfg.training.regularization:
             case "L2":
-                self.regularization = lambda model: sum(param.pow(2.0).sum() for param in model.parameters())
+                if use_loop:
+                    self.regularization = lambda model: sum(param.pow(2.0).sum() for param in model.parameters())
+                else:
+                    # sum of squared L2 norms == sum of squares of all params.
+                    # norm-then-square introduces a tiny float rounding difference
+                    # vs. pow(2).sum() — negligible for a regularization term.
+                    self.regularization = lambda model: torch.stack(
+                        torch._foreach_norm(list(model.parameters()))
+                    ).square().sum()
             case "L1":
-                self.regularization = lambda model: sum(param.abs().sum() for param in model.parameters())
+                if use_loop:
+                    self.regularization = lambda model: sum(param.abs().sum() for param in model.parameters())
+                else:
+                    # L1 norm per tensor (ord=1), summed → sum of |p| over all params (exact).
+                    self.regularization = lambda model: torch.stack(
+                        torch._foreach_norm(list(model.parameters()), ord=1)
+                    ).sum()
             case None:
                 self.regularization = lambda model: 0.0
             case _:
@@ -761,7 +990,7 @@ class AmplitudeExperiment(BaseExperiment):
     def _batch_loss(self, data):
         
     
-        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer"):
+        if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             return self._batch_loss_lloca(data)
         x, y, tokens = data   # (B, nparticles_max[,4]), (B,1), (B, nparticles_max)
         x      = x.to(self.device)
@@ -809,32 +1038,131 @@ class AmplitudeExperiment(BaseExperiment):
             mse_val = None
     
         reg_term    = self.regularization_lambda * self.regularization(self.model)
-        loss_no_reg = loss.item()
+        # Detached tensor (not .item()) — deferred sync; see _batch_loss_lloca / _step.
+        loss_no_reg = loss.detach()
         loss        = loss + reg_term
-        assert torch.isfinite(loss).all()
+        if os.environ.get("LLOCA_SYNC", "deferred") == "blocking":
+            assert torch.isfinite(loss).all()
         return loss, loss_no_reg, mse_val
 
     def _batch_loss_lloca(self, data):
-        particles, y, tokens, ptr = data
-        particles = particles.to(self.device)
-        y         = y.to(self.device)
-        tokens    = tokens.to(self.device)
-        ptr       = ptr.to(self.device)
-    
+        particles, y, tokens, order_labels, ptr, process_ids = data
+
+        # Compute the per-event particle counts on the CPU (ptr is born on the CPU
+        # in collate_variable_length) so the attention-mask builder doesn't have to
+        # `.tolist()` the GPU ptr — that sync drains the CUDA queue every forward.
+        # Disabled under LLOCA_SYNC=blocking (original device-ptr path) for A/B.
+        sync_blocking = os.environ.get("LLOCA_SYNC", "deferred") == "blocking"
+        seq_lens = None
+        if not sync_blocking and not ptr.is_cuda:
+            seq_lens = tuple((ptr[1:] - ptr[:-1]).tolist())   # pure-CPU, no GPU sync
+
+        # non_blocking=True overlaps the H2D copy with compute when the source is
+        # pinned (pin_memory engages automatically for num_workers>0); it's a safe
+        # no-op for unpinned/num_workers=0. CUDA stream ordering guarantees the
+        # consuming kernels wait for the copy, so this stays correct.
+        particles    = particles.to(self.device, non_blocking=True)
+        y            = y.to(self.device, non_blocking=True)
+        tokens       = tokens.to(self.device, non_blocking=True)
+        order_labels = order_labels.to(self.device, non_blocking=True)
+        ptr          = ptr.to(self.device, non_blocking=True)
+        process_ids  = process_ids.to(self.device, non_blocking=True)
+
         y_pred = self.model(
             particles, tokens,
-            mean = self.mom_mean[0],
-            std  = self.mom_std[0],
-            ptr  = ptr,
+            mean         = self.mom_mean[0],
+            std          = self.mom_std[0],
+            ptr          = ptr,
+            order_labels = order_labels,
+            seq_lens     = seq_lens,
         )  # (B, out_channels)
-    
-        loss        = self.loss(y_pred, y)
+
+        loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg)
+
         reg         = self.regularization_lambda * self.regularization(self.model)
-        loss_no_reg = loss.item()
+        # Keep the no-reg loss as a detached tensor instead of syncing here with
+        # .item() *before backward* — that sync forces the whole forward to finish
+        # and the CPU to wait before backward is even queued. Callers materialise it
+        # later (post-step, fused into one sync). See base_experiment._step.
+        loss_no_reg = loss.detach()
         loss        = loss + reg
-        assert torch.isfinite(loss).all()
+        if sync_blocking:
+            assert torch.isfinite(loss).all()   # original per-step guard (D2H sync)
         return loss, loss_no_reg, None
-        
+
+    def _per_event_loss(self, y_pred, y, sigma=None):
+        """Per-event loss vector (B,) with NO cross-event reduction.
+
+        Mirrors the elementwise term of each loss in `_init_loss`, then means over
+        the feature dim only — so the result can be segment-averaged per process.
+        Because every supported loss is a mean over an elementwise term, this works
+        for any of them (MSE / L1 / LogCosh / RelL1 / HETEROSC); wiring het loss into
+        the LLoCa path later needs no change here (just split `sigma` out of `y_pred`
+        upstream and pass it in).
+
+        Arg order matches the existing `self.loss(y_pred, y)` call in the loop, so
+        results stay numerically identical to the previous per-process loop —
+        including RelL1's quirk of using the *prediction* in the denominator.
+        """
+        name = self.cfg.training.loss
+        if name == "MSE":
+            elem = (y_pred - y) ** 2
+        elif name == "L1":
+            elem = (y_pred - y).abs()
+        elif name == "LogCosh":
+            d = y_pred - y
+            elem = d + torch.nn.functional.softplus(-2.0 * d) - math.log(2.0)
+        elif name == "RelL1":
+            eps = torch.tensor(1e-8, device=y.device, dtype=y.dtype)
+            # denominator uses y_pred to match self.loss(y_pred, y) call order
+            elem = ((y_pred - y) / torch.maximum(y_pred.abs(), eps)).abs()
+        elif name == "HETEROSC":
+            assert sigma is not None, "HETEROSC per-event loss requires sigma"
+            sigma_c = torch.clamp(sigma, min=1e-15, max=1e5)
+            elem = ((y - y_pred) ** 2) / (2 * sigma_c ** 2) + torch.log(sigma_c)
+        else:
+            raise ValueError(f"Unknown loss function {name}")
+        # mean over feature dims → (B,)
+        return elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
+
+    def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None):
+        """Mean (or geometric mean) over per-process mean losses.
+
+        Vectorised replacement for the old
+            for p in torch.unique(process_ids): self.loss(y_pred[mask], y[mask])
+        loop, which launched ~3 kernels per process every step and forced a
+        torch.unique sync. Here we compute a per-event loss once, then segment-mean
+        it by process with a single index_add_ into a fixed-size buffer
+        (size = self.n_datasets, since process_ids are contiguous 0..n_datasets-1),
+        so there is no Python loop and no GPU→CPU sync.
+
+        Set LLOCA_PROC_LOSS=loop to fall back to the original loop (A/B checks).
+        """
+        if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop":
+            unique_procs = torch.unique(process_ids)
+            per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
+                        for p in unique_procs]
+            if loss_agg == "geometric_mean" and len(per_proc) > 1:
+                return torch.stack(per_proc).log().mean().exp()
+            return torch.stack(per_proc).mean()
+
+        per_event = self._per_event_loss(y_pred, y, sigma=sigma)        # (B,)
+        n_proc = self.n_datasets
+        sums   = per_event.new_zeros(n_proc)
+        counts = per_event.new_zeros(n_proc)
+        sums.index_add_(0, process_ids, per_event)
+        counts.index_add_(0, process_ids, torch.ones_like(per_event))
+        present   = counts > 0
+        n_present = present.sum().clamp(min=1)
+        proc_mean = sums / counts.clamp(min=1)                         # 0 where a process is absent
+        if loss_agg == "geometric_mean":
+            # mean over present processes of log(proc_mean), then exp; absent → 0 (dropped)
+            log_pm = torch.where(present, proc_mean.clamp(min=1e-30).log(),
+                                 torch.zeros_like(proc_mean))
+            return (log_pm.sum() / n_present).exp()
+        return proc_mean.sum() / n_present
+
 
     def _init_metrics(self):
         result_key = (
@@ -842,16 +1170,254 @@ class AmplitudeExperiment(BaseExperiment):
         )
         return {f"{result_key}.mse": []}
 
+    @staticmethod
+    def _robust_slope(log_c, log_l):
+        """Theil–Sen slope: median of pairwise slopes.  Far less sensitive than
+        least-squares to the noise in short (compute, loss) windows — a single
+        outlier validation can't swing the estimated exponent.  Returns None when
+        no pair has a usable compute separation.
+        """
+        m = len(log_c)
+        slopes = []
+        for i in range(m):
+            for j in range(i + 1, m):
+                dc = log_c[j] - log_c[i]
+                if abs(dc) > 1e-9:
+                    slopes.append((log_l[j] - log_l[i]) / dc)
+        if not slopes:
+            return None
+        return float(np.median(slopes))
+
+    def _alpha_and_se(self, ds_name: str, proc_idx: int, start_idx=None,
+                      target_span: float = 0.4, max_lookback: int = 30,
+                      min_obs: int = 4, min_span: float = 0.1):
+        """Local exponent α and its standard error over a (compute, EMA-loss) window.
+
+        α = −slope of log(L) vs log(compute) via Theil–Sen (robust).  SE(α) is the
+        OLS-style slope standard error using a robust residual scale (MAD).  A narrow
+        or noisy window → large SE, so the significance tests in the controller
+        default to "keep feeding" whenever the data can't support a confident call.
+
+        Window selection is **span-targeted, not count-based**: compute accrues
+        roughly linearly, so a fixed number of recent validations shrinks in
+        log-compute over training and eventually falls below `min_span`, blinding the
+        controller (everything looks undecidable → uniform).  Instead the recent
+        window walks back until it spans `target_span` in log-compute (≥ min_obs
+        points, ≤ max_lookback validations).  When start_idx is given (a probe), the
+        window is exactly [start_idx:], growing as the probe continues.
+
+        Returns (alpha, se, n_points); se = inf when the window can't be judged
+        (< min_obs points, or log-compute span below `min_span`).  The span guard is
+        essential — on a 2–3 point window the MAD residual scale collapses to ≈0 and
+        SE looks deceptively tiny, which would let status flip on pure noise.
+        """
+        snapshots   = self.train_sampler.compute_snapshots
+        losses_hist = getattr(self, "_proc_ema_losses", {}).get(ds_name, [])
+        end = min(len(losses_hist), len(snapshots))
+
+        def _pt(k):
+            c = snapshots[k].get(proc_idx, 0)
+            l = losses_hist[k]
+            return (np.log(c), np.log(l)) if (c > 0 and l > 0) else None
+
+        pts = []
+        if start_idx is not None:                    # probe window: exactly [start:end)
+            for k in range(max(0, start_idx), end):
+                p = _pt(k)
+                if p:
+                    pts.append(p)
+        else:                                        # recent: span-targeted lookback
+            for k in range(end - 1, max(-1, end - max_lookback) - 1, -1):
+                p = _pt(k)
+                if p:
+                    pts.append(p)
+                    if len(pts) >= min_obs and (pts[0][0] - pts[-1][0]) >= target_span:
+                        break
+        if len(pts) < min_obs:
+            return 0.0, np.inf, len(pts)
+        log_c = np.array([p[0] for p in pts])
+        log_l = np.array([p[1] for p in pts])
+        sd_c = float(log_c.std())
+        if sd_c < 1e-6 or float(log_c.max() - log_c.min()) < min_span:
+            return 0.0, np.inf, len(pts)            # too little compute spread to judge
+        slope = self._robust_slope(log_c, log_l)
+        if slope is None:
+            return 0.0, np.inf, len(pts)
+        intercept = float(np.median(log_l - slope * log_c))
+        resid = log_l - (intercept + slope * log_c)
+        sigma = 1.4826 * float(np.median(np.abs(resid - np.median(resid))))
+        if sigma <= 0:
+            sigma = float(resid.std())            # MAD degenerate → plain std
+        se = sigma / (sd_c * np.sqrt(len(pts)))
+        return float(-slope), float(se), len(pts)
+
+    def _compute_sampler_weights(self, dataset_names):
+        """Significance-based plateau detection + status-aware weighting.
+
+        For each dataset the controller fits the local exponent α and its standard
+        error SE(α) over recent (compute, EMA-loss) history.  A dataset is only
+        *confirmed plateaued* — and thus allowed to fall below uniform — when, even
+        optimistically (α + k·SE), its improvement rate is below a meaningful floor
+        α_min; it is sent to a *probe* (boosted sampling, which shrinks SE) before
+        that call is trusted, and re-probed periodically in case it is a late
+        bloomer.  When the data is too noisy/narrow to decide (large SE), the test
+        fails safe to "keep feeding", which is what breaks the self-reinforcing
+        starvation of a transient low slope.
+
+        The single significance knob k (sampler_sig_k) and the meaning-of-flat knob
+        α_min (sampler_alpha_min) replace the old hand-thresholds (plateau_rel,
+        plateau_alpha, dwell, alpha_smooth, probe_len, probe_min_growth,
+        recover_min_drop): the noise handling is now adaptive per dataset.
+
+        Returns (weights, statuses, alphas) where alphas are the clipped α used for
+        weighting (handy for logging).
+        """
+        cfg        = self.cfg.training
+        warmup     = cfg.get("sampler_warmup_vals", 10)
+        reprobe    = cfg.get("sampler_reprobe_every", 20)
+        probe_boost = cfg.get("sampler_probe_boost", 1.0)
+        min_frac   = cfg.get("sampler_min_alpha_frac", 0.25)
+        alpha_min  = cfg.get("sampler_alpha_min", 0.05)
+        sig_k      = cfg.get("sampler_sig_k", 2.0)
+        probe_max  = cfg.get("sampler_probe_max", 15)
+        max_lookback = cfg.get("sampler_alpha_window", 30)
+        gamma      = cfg.get("sampler_deficit_gamma", 1.5)
+        dcap       = cfg.get("sampler_deficit_cap", 2.0)
+        plat_floor = cfg.get("sampler_plateau_floor", 0.3)
+
+        # debounce: consecutive low-α readings required before opening a probe, so a
+        # single borderline/knee reading can't start (or re-start) one.  Structural,
+        # not a sensitivity knob.
+        TRIGGER_DEBOUNCE = 2
+
+        if not hasattr(self, "_ds_status"):
+            self._ds_status      = {n: "scaling" for n in dataset_names}
+            self._probe_start    = {n: None for n in dataset_names}
+            self._last_probe_val = {n: 0 for n in dataset_names}
+            self._low_streak     = {n: 0 for n in dataset_names}
+            self._ds_status_hist = {n: [] for n in dataset_names}
+            # per-dataset *expected solo* exponent α_solo (real, from solo runs).
+            # A dataset whose live local α sits below α_solo is under-scaling →
+            # boosted.  Falls back to {} (no boost) if the reference is absent.
+            self._solo_alpha = {}
+            p = cfg.get("sampler_solo_alpha_path", None)
+            if not p:
+                dcfg = self.cfg.get("data", None)
+                dp = (dcfg.get("data_path", "") if dcfg else "") or ""
+                p = os.path.join(dp, "solo_alpha.json") if dp else None
+            try:
+                if p and os.path.exists(p):
+                    self._solo_alpha = json.load(open(p))
+                    LOGGER.info(f"Sampler loaded solo-α reference ({len(self._solo_alpha)} ds): {p}")
+                else:
+                    LOGGER.warning(f"Sampler solo-α reference not found at {p}; deficit boosting disabled")
+            except Exception as e:
+                LOGGER.warning(f"Sampler solo-α load failed ({p}): {e}")
+
+        # current 0-based validation index (histories appended once per validation)
+        hist_lens = [len(self._proc_ema_losses[m])
+                     for m in dataset_names if m in self._proc_ema_losses]
+        n = (max(hist_lens) - 1) if hist_lens else 0
+
+        # recent-window (α, SE) per dataset — drives both trigger and weighting
+        ase = {name: self._alpha_and_se(name, i, max_lookback=max_lookback)
+               for i, name in enumerate(dataset_names)}
+        # clipped α (positive, bounded) used only for the proportional weighting
+        alpha_w = {name: float(np.clip(ase[name][0], 0.05, 2.0)) for name in dataset_names}
+
+        # warmup: uniform sampling so every dataset can enter its scaling regime
+        # before any down-weighting decision is made.
+        if n < warmup:
+            for name in dataset_names:
+                self._ds_status_hist[name].append(self._ds_status[name])
+            return [1.0] * len(dataset_names), dict(self._ds_status), alpha_w
+
+        # ── status state machine (significance-gated) ─────────────────────────
+        for i, name in enumerate(dataset_names):
+            a, se, _ = ase[name]
+            s = self._ds_status[name]
+            if s == "scaling":
+                # trigger a probe only after the point estimate has sat below the
+                # meaningful floor for TRIGGER_DEBOUNCE consecutive validations
+                if np.isfinite(se) and a < alpha_min:
+                    self._low_streak[name] += 1
+                else:
+                    self._low_streak[name] = 0
+                if self._low_streak[name] >= TRIGGER_DEBOUNCE:
+                    s = "probing"
+                    self._probe_start[name] = n
+                    self._low_streak[name] = 0
+            elif s == "probing":
+                # judge on the probe window (boosted sampling has shrunk its SE)
+                pa, pse, _ = self._alpha_and_se(name, i, start_idx=self._probe_start[name])
+                elapsed = n - self._probe_start[name]
+                # plateau requires the loss to be confidently FLAT — below the floor
+                # AND not rising (pa > -alpha_min).  A rising loss (pa << 0) is a
+                # disruption/spike, not a plateau, and must keep being fed.
+                if np.isfinite(pse) and pa - sig_k * pse > alpha_min:
+                    s = "scaling"                 # significantly still improving
+                elif np.isfinite(pse) and pa + sig_k * pse < alpha_min and pa > -alpha_min:
+                    s = "plateaued"               # significantly flat, not rising
+                    self._last_probe_val[name] = n
+                elif elapsed >= probe_max:        # undecided too long → fail safe
+                    if np.isfinite(pse) and pa < alpha_min and pa > -alpha_min:
+                        s = "plateaued"
+                        self._last_probe_val[name] = n
+                    else:
+                        s = "scaling"
+            elif s == "plateaued":
+                if n - self._last_probe_val[name] >= reprobe:
+                    s = "probing"                 # periodic re-probe for late bloomers
+                    self._probe_start[name] = n
+            self._ds_status[name] = s
+
+        # ── deficit-based weights: boost datasets scaling BELOW their solo α ──
+        # deficit_d = max(0, α_solo_d − α_local_d): how far a dataset is under its
+        # expected solo scaling (i.e. starved by the mixture).  At-or-above-solo
+        # datasets stay at baseline (they don't need extra compute); confirmed-
+        # plateaued ones drop to plat_floor.  This replaces the old weight∝α rule,
+        # which boosted the *fast* (easy, already-above-solo) datasets — exactly the
+        # ones that need help least.
+        deficits = {}
+        weights = []
+        for name in dataset_names:
+            a_local, se, _ = ase[name]
+            s = self._ds_status[name]
+            sa = self._solo_alpha.get(name)
+            if sa is not None and np.isfinite(se):
+                deficits[name] = float(np.clip(sa - a_local, 0.0, dcap))
+            else:
+                deficits[name] = 0.0
+            if s == "plateaued":
+                w = plat_floor                       # truly done → save compute
+            else:
+                w = 1.0 + gamma * deficits[name]     # baseline 1.0, boosted if under solo
+            weights.append(w)
+
+        for name in dataset_names:
+            self._ds_status_hist[name].append(self._ds_status[name])
+
+        # expose deficits for logging
+        self._last_deficits = deficits
+        return weights, dict(self._ds_status), alpha_w
+
     def _validate(self, step):
         """Override base _validate.
 
         Single dataset: delegates to base (no change).
-        Multiple datasets: runs per-process val loaders only, derives combined
-        loss as a simple mean across processes — consistent with the balanced
-        sampler which gives each process equal batch slots during training.
+        Multiple datasets: runs per-process val loaders only.
+        Combined loss is the geometric mean of per-process losses (scale-invariant,
+        treats relative improvements equally across processes of different difficulty).
+        Sampler weights are updated by estimated local power-law exponent α_eff per
+        process — giving more batch slots to processes that are still improving and
+        fewer to those that have plateaued.
         """
         if not self.proc_val_loaders:
             return super()._validate(step)
+
+        # Snapshot compute counts at the start of this validation (before any updates)
+        if self.train_sampler is not None:
+            self.train_sampler.record_snapshot()
 
         self.model.eval()
         if self.cfg.training.optimizer == "ScheduleFree":
@@ -872,7 +1438,7 @@ class AmplitudeExperiment(BaseExperiment):
                         loss, loss_no_reg, mse_val = self._batch_loss(data)
                     losses.append(loss.cpu().item())
                     if loss_no_reg is not None:
-                        losses_no_reg.append(loss_no_reg)
+                        losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                     if mse_val is not None:
                         mse_vals.append(mse_val)
                 proc_losses[name]        = float(np.mean(losses))
@@ -882,15 +1448,32 @@ class AmplitudeExperiment(BaseExperiment):
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        # Equal-weight combined loss across processes — matches the balanced sampler
-        # which gives each process equal batch slots during training.
-        val_loss = float(np.mean(list(proc_losses.values())))
+        loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+
+        def _combine(vals):
+            if loss_agg == "geometric_mean":
+                return float(np.exp(np.mean(np.log(np.clip(vals, 1e-10, None)))))
+            return float(np.mean(vals))
+
+        # Combine the per-process *no-reg* MSEs first, then add the whole-model reg
+        # term ONCE — mirroring the training loss  GM_p(MSE_p) + reg.  Previously the
+        # combined val loss folded reg into each process before the geometric mean,
+        # GM_p(MSE_p + reg), a larger (reg-inflated) quantity not comparable to
+        # train_loss.  (val_loss_no_reg = GM_p(MSE_p) is unchanged, so checkpoint
+        # selection / HPO, which use the no-reg loss, are unaffected.)
+        lnr = [v for v in proc_losses_no_reg.values() if v is not None]
+        if lnr:
+            val_loss_no_reg = _combine(lnr)
+            reg_val  = float(self.regularization_lambda * self.regularization(self.model))
+            val_loss = val_loss_no_reg + reg_val
+        else:
+            val_loss_no_reg = None
+            val_loss = _combine(list(proc_losses.values()))
 
         if (step + 1) % self.cfg.training.validate_every_n_steps == 0:
             self.val_loss.append(val_loss)
-            lnr = [v for v in proc_losses_no_reg.values() if v is not None]
-            if lnr:
-                self.val_loss_no_reg.append(float(np.mean(lnr)))
+            if val_loss_no_reg is not None:
+                self.val_loss_no_reg.append(val_loss_no_reg)
             mse = [v for v in proc_mse_vals.values() if v is not None]
             if mse:
                 self.val_mse.append(float(np.mean(mse)))
@@ -902,23 +1485,108 @@ class AmplitudeExperiment(BaseExperiment):
             if name not in self.proc_val_losses:
                 self.proc_val_losses[name] = []
             self.proc_val_losses[name].append(loss)
+        for name, loss in proc_losses_no_reg.items():
+            if loss is not None:
+                if name not in self.proc_val_losses_no_reg:
+                    self.proc_val_losses_no_reg[name] = []
+                self.proc_val_losses_no_reg[name].append(loss)
 
         LOGGER.info(
             f"Val loss (combined): {val_loss:.4f} | " +
             ", ".join(f"{n}={v:.4f}" for n, v in proc_losses.items())
         )
 
-        # Update sampler weights proportional to per-process loss
+        # Update sampler weights (_compute_sampler_weights): each dataset's live
+        # local exponent α is fit from recent (compute, EMA-loss) history and
+        # compared to its expected SOLO exponent α_solo.  Datasets scaling BELOW
+        # solo (deficit = α_solo − α_local > 0) are under-scaling/starved and get
+        # boosted ∝ deficit; at-or-above-solo datasets stay at baseline; datasets
+        # confirmed flat (plateaued, via the significance probe) drop to a floor.
+        # Uniform during warmup.
         if self.train_sampler is not None:
-            weights = [proc_losses.get(name, 1.0) for name in self.cfg.data.dataset]
+            dataset_names = list(self.cfg.data.dataset)
+
+            # EMA-smooth the per-process validation losses before fitting α.
+            # sampler_alpha_ema is the decay: high = slow to forget, low = reactive.
+            ema_decay = self.cfg.training.get("sampler_alpha_ema", 0.7)
+            if not hasattr(self, '_proc_loss_ema'):
+                self._proc_loss_ema   = {}   # running EMA scalar per process (with reg)
+                self._proc_ema_losses = {}   # history of EMA loss values for α fit
+                # parallel EMA of the no-reg loss (same decay) — for plotting only;
+                # the sampler fits α on the with-reg EMA above.
+                self._proc_loss_ema_no_reg   = {}
+                self._proc_ema_losses_no_reg = {}
+
+            for name, loss in proc_losses.items():
+                if name not in self._proc_loss_ema:
+                    self._proc_loss_ema[name] = loss
+                else:
+                    self._proc_loss_ema[name] = (
+                        ema_decay * self._proc_loss_ema[name] + (1.0 - ema_decay) * loss
+                    )
+                self._proc_ema_losses.setdefault(name, []).append(self._proc_loss_ema[name])
+
+            for name, loss in proc_losses_no_reg.items():
+                if loss is None:
+                    continue
+                if name not in self._proc_loss_ema_no_reg:
+                    self._proc_loss_ema_no_reg[name] = loss
+                else:
+                    self._proc_loss_ema_no_reg[name] = (
+                        ema_decay * self._proc_loss_ema_no_reg[name] + (1.0 - ema_decay) * loss
+                    )
+                self._proc_ema_losses_no_reg.setdefault(name, []).append(self._proc_loss_ema_no_reg[name])
+
+            weights, statuses, alphas = self._compute_sampler_weights(dataset_names)
             self.train_sampler.set_weights(weights)
+
             log_every = self.cfg.training.get("sampler_log_every_n_vals", 10)
             n_vals = len(self.val_loss)
             if log_every > 0 and n_vals % log_every == 0:
+                defs = getattr(self, "_last_deficits", {})
                 LOGGER.info(
-                    "Sampler weights: " +
-                    ", ".join(f"{n}={w:.4f}" for n, w in zip(self.cfg.data.dataset, weights))
+                    "Sampler [α|deficit|status]: " +
+                    ", ".join(f"{short_ds_name(n)}={alphas[n]:.2f}|{defs.get(n,0):.2f}|{statuses[n][:4]}"
+                              for n in dataset_names)
                 )
 
         return val_loss
-    
+
+    def _result_extra(self) -> dict:
+        """Return per-dataset val_losses and compute counts at the best checkpoint.
+
+        proc_val_losses        : {ds_name: val_loss}        at the best combined checkpoint step
+        proc_val_losses_no_reg : {ds_name: val_loss_no_reg} at the best combined checkpoint step
+        compute_ds             : {ds_name: n_samples}       total samples seen from each dataset
+        """
+        if not self.proc_val_losses or not self.val_loss:
+            return {}
+        # Use no-reg val_loss for index selection when available (matches checkpoint selection)
+        ref_series = self.val_loss_no_reg if self.val_loss_no_reg else self.val_loss
+        best_idx = int(np.argmin(ref_series))
+
+        proc = {}
+        for name, losses in self.proc_val_losses.items():
+            if best_idx < len(losses):
+                proc[name] = float(losses[best_idx])
+        if not proc:
+            return {}
+
+        result = {"proc_val_losses": proc}
+
+        proc_nr = {}
+        for name, losses in self.proc_val_losses_no_reg.items():
+            if best_idx < len(losses):
+                proc_nr[name] = float(losses[best_idx])
+        if proc_nr:
+            result["proc_val_losses_no_reg"] = proc_nr
+
+        if self.train_sampler is not None:
+            dataset_names = list(self.cfg.data.dataset)
+            result["compute_ds"] = {
+                name: int(self.train_sampler.samples_per_process.get(i, 0))
+                for i, name in enumerate(dataset_names)
+            }
+
+        return result
+

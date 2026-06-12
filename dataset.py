@@ -7,19 +7,20 @@ from collections import defaultdict
 class AmplitudeDataset(Dataset):
     """
     Sparse variable-length dataset backed by contiguous numpy arrays for fast indexing.
- 
+
     Particles are stored as one big (N_total_particles, 4) array plus an offsets
     array of shape (N_events, 2) where offsets[i] = [start, end] for event i.
     This makes __getitem__ O(1) with a simple slice, avoiding the Python list
     overhead of storing N_events separate arrays.
- 
-    Each item is a 3-tuple:
-        particles : float tensor  (n_particles_i, 4)
-        amplitude : float tensor  (1,)
-        tokens    : long tensor   (n_particles_i,)
+
+    Each item is a 4-tuple:
+        particles    : float tensor  (n_particles_i, 4)
+        amplitude    : float tensor  (1,)
+        tokens       : long tensor   (n_particles_i,)
+        order_labels : float tensor  (n_order_features,)  — coupling order vector
     """
- 
-    def __init__(self, particles_flat, offsets, amplitudes, tokens_flat, dtype):
+
+    def __init__(self, particles_flat, offsets, amplitudes, tokens_flat, order_labels, dtype, process_ids=None):
         """
         Parameters
         ----------
@@ -27,22 +28,28 @@ class AmplitudeDataset(Dataset):
         offsets        : np.ndarray  (N_events, 2)  — [start, end] per event
         amplitudes     : np.ndarray  (N_events, 1)
         tokens_flat    : np.ndarray  (N_total_particles,)
+        order_labels   : np.ndarray  (N_events, n_order_features)  — e.g. [n_loops, alpha_s_power]
         dtype          : torch dtype
+        process_ids    : np.ndarray  (N_events,) int  — process index per event, or None
         """
         self.particles_flat = torch.tensor(particles_flat, dtype=dtype)
         self.offsets        = offsets                                      # keep as numpy for slicing
         self.amplitudes     = torch.tensor(amplitudes,     dtype=dtype)
         self.tokens_flat    = torch.tensor(tokens_flat,    dtype=torch.long)
- 
+        self.order_labels   = torch.tensor(order_labels,   dtype=dtype)
+        self.process_ids    = torch.tensor(process_ids, dtype=torch.long) if process_ids is not None else None
+
     def __len__(self):
         return len(self.amplitudes)
- 
+
     def __getitem__(self, idx):
         start, end = int(self.offsets[idx, 0]), int(self.offsets[idx, 1])
         return (
             self.particles_flat[start:end],   # (n_particles_i, 4)
             self.amplitudes[idx],              # (1,)
             self.tokens_flat[start:end],       # (n_particles_i,)
+            self.order_labels[idx],            # (n_order_features,)
+            self.process_ids[idx] if self.process_ids is not None else torch.tensor(-1, dtype=torch.long),
         )
  
  
@@ -74,28 +81,33 @@ def build_flat_arrays(particles_list, tokens_list):
  
 def collate_variable_length(batch):
     """
-    Collate (particles, amplitude, tokens) tuples into a sparse batch.
- 
+    Collate (particles, amplitude, tokens, order_labels) tuples into a sparse batch.
+
     Returns
     -------
-    particles  : (N_total, 4)   flat concatenation across all events in the batch
-    amplitudes : (B, 1)
-    tokens     : (N_total,)
-    ptr        : (B+1,)         ptr[i] = start of event i in the flat tensors
+    particles    : (N_total, 4)              flat concatenation across all events
+    amplitudes   : (B, 1)
+    tokens       : (N_total,)
+    order_labels : (B, n_order_features)     one coupling-order vector per event
+    ptr          : (B+1,)                    ptr[i] = start of event i in flat tensors
     """
-    particles_list  = [item[0] for item in batch]
-    amplitudes_list = [item[1] for item in batch]
-    tokens_list     = [item[2] for item in batch]
- 
-    particles  = torch.cat(particles_list,    dim=0)
-    amplitudes = torch.stack(amplitudes_list, dim=0)
-    tokens     = torch.cat(tokens_list,       dim=0)
- 
+    particles_list    = [item[0] for item in batch]
+    amplitudes_list   = [item[1] for item in batch]
+    tokens_list       = [item[2] for item in batch]
+    order_labels_list = [item[3] for item in batch]
+    process_ids_list  = [item[4] for item in batch]
+
+    particles    = torch.cat(particles_list,       dim=0)
+    amplitudes   = torch.stack(amplitudes_list,    dim=0)
+    tokens       = torch.cat(tokens_list,          dim=0)
+    order_labels = torch.stack(order_labels_list,  dim=0)  # (B, n_order_features)
+    process_ids  = torch.stack(process_ids_list,   dim=0)  # (B,)
+
     counts = torch.tensor([p.shape[0] for p in particles_list], dtype=torch.long)
     ptr    = torch.zeros(len(batch) + 1, dtype=torch.long)
     torch.cumsum(counts, dim=0, out=ptr[1:])
- 
-    return particles, amplitudes, tokens, ptr
+
+    return particles, amplitudes, tokens, order_labels, ptr, process_ids
 
 
 class ProcessBalancedSampler(Sampler):
@@ -121,10 +133,12 @@ class ProcessBalancedSampler(Sampler):
     seed : int
     """
 
-    def __init__(self, process_ids, batch_size, weights=None, seed=0):
-        self.process_ids = np.asarray(process_ids)
-        self.batch_size  = batch_size
-        self.seed        = seed
+    def __init__(self, process_ids, batch_size, weights=None, seed=0,
+                 min_proc_frac=0.2):
+        self.process_ids  = np.asarray(process_ids)
+        self.batch_size   = batch_size
+        self.seed         = seed
+        self.min_proc_frac = min_proc_frac   # minimum fraction of uniform share per process
         self.rng         = np.random.default_rng(seed)
 
         # indices per process
@@ -141,14 +155,39 @@ class ProcessBalancedSampler(Sampler):
             weights = [1.0] * self.n_processes
         self._weights = np.array(weights, dtype=float)
 
-        # total number of batches per "epoch" based on smallest process
-        min_proc_size = min(len(v) for v in self.proc_indices.values())
-        self._n_batches = max(1, min_proc_size * self.n_processes // batch_size)
+        # total number of batches per "epoch".
+        # Using min_proc_size caused _n_batches=1 for imbalanced datasets (e.g. n_aa=300
+        # gives only ~120 training events → min*3//512=0 → max(1,0)=1).  With
+        # persistent_workers=True, iter(DataLoader) is called every step, leaving workers
+        # idle between steps; on a busy cluster the OS scheduling wake-up latency is
+        # 150-400 ms and is counted directly in avg_iter_time via next(iterator).
+        # Fix: size on total data with a floor of 100 so workers stay continuously busy.
+        total_proc_size = sum(len(v) for v in self.proc_indices.values())
+        self._n_batches = max(100, total_proc_size // batch_size)
+
+        # Compute tracking: total samples yielded per process
+        self._samples_per_process: dict = {p: 0 for p in unique}
+        # Snapshot of sample counts at each validation step (recorded via record_snapshot)
+        self._compute_snapshots: list = []
 
     def _shuffle(self, p):
         idx = self.proc_indices[p].copy()
         self.rng.shuffle(idx)
         return idx
+
+    def record_snapshot(self):
+        """Snapshot current per-process sample counts (call at the start of each validation)."""
+        self._compute_snapshots.append(dict(self._samples_per_process))
+
+    @property
+    def samples_per_process(self) -> dict:
+        """Total samples yielded per process integer ID since training started."""
+        return dict(self._samples_per_process)
+
+    @property
+    def compute_snapshots(self) -> list:
+        """List of sample-count dicts, one per validation step (from record_snapshot calls)."""
+        return self._compute_snapshots
 
     def set_weights(self, weights):
         """Update sampling weights (called after each validation)."""
@@ -164,8 +203,10 @@ class ProcessBalancedSampler(Sampler):
             w = np.ones(self.n_processes, dtype=float)
             total = float(self.n_processes)
         slots = np.floor(w / total * self.batch_size).astype(int)
-        # ensure at least 1 slot per active process
-        slots = np.maximum(slots, (w > 0).astype(int))
+        # ensure each active process gets at least min_proc_frac of its uniform share,
+        # so that no dataset is starved and its alpha_eff estimate stays well-conditioned
+        min_slots = max(1, int(self.batch_size * self.min_proc_frac / self.n_processes))
+        slots = np.maximum(slots, (w > 0).astype(int) * min_slots)
         # distribute remaining slots to highest-weight processes
         remainder = self.batch_size - slots.sum()
         if remainder > 0:
@@ -198,6 +239,7 @@ class ProcessBalancedSampler(Sampler):
             batch   = []
             for p, n in zip(procs, slots):
                 if n > 0:
+                    self._samples_per_process[p] += n
                     batch.extend(self._next(p, n))
             self.rng.shuffle(batch)
             yield from batch

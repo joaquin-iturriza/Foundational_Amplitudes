@@ -1,3 +1,4 @@
+import os
 from functools import partial
 
 import torch
@@ -6,8 +7,9 @@ from torch.utils.checkpoint import checkpoint
 import mup  # Microsoft μP library
 from mup import MuReadout, set_base_shapes, make_base_shapes
 
-from .attention_lloca_mup import LLoCaAttention
+from .attention_lloca_mup import LLoCaAttention, build_block_diagonal_bias
 from lloca.reps.tensorreps import TensorReps
+from lloca.mup import mup_parametrized  # self-contained μP base-shape machinery
 
 def init_method_normal(sigma):
     """Init method based on N(0, sigma)."""
@@ -361,11 +363,18 @@ class BaselineTransformerBlock(nn.Module):
         return outputs
 
 
+@mup_parametrized
 class MuPTransformer(nn.Module):
     """Baseline transformer.
 
     Combines num_blocks transformer blocks, each consisting of multi-head self-attention layers, an
     MLP, residual connections, and normalization layers.
+
+    μP is self-contained: with ``parametrization="mup"`` (the default) the backbone
+    computes its own base shapes during ``__init__`` (width axis = ``num_heads``), so
+    no external ``make_base_shapes`` / ``set_base_shapes`` is needed. Any parameters
+    living outside this backbone (framesnet, particle encoder, ...) are marked as
+    standard parametrization by ``lloca.mup.finalize(model)`` in the training loop.
 
     Parameters
     ----------
@@ -390,7 +399,16 @@ class MuPTransformer(nn.Module):
         Use multi-query attention instead of multi-head attention.
     dropout_prob : float
         Dropout probability for output.
+    parametrization : str
+        ``"mup"`` (default) or ``"sp"``. Note this backbone uses ``MuReadout`` and
+        only works under μP; ``"sp"`` exists only so base/delta clones can be built.
+    mup_base_shapes, mup_delta_shapes : dict, optional
+        Base/delta width overrides; default ``{"num_heads": 2}`` / ``{"num_heads": 8}``
+        (matching the previous base_experiment base/delta configuration).
     """
+
+    # Base/delta widths previously defined in base_experiment.init_model.
+    DEFAULT_MUP_SHAPES = ({"num_heads": 2}, {"num_heads": 8})
 
     def __init__(
         self,
@@ -405,8 +423,13 @@ class MuPTransformer(nn.Module):
         multi_query: bool = False,
         dropout_prob=None,
         encoder_var=1.0,
+        *,
+        parametrization: str = "mup",
+        mup_base_shapes: dict | None = None,
+        mup_delta_shapes: dict | None = None,
     ) -> None:
         super().__init__()
+        self.parametrization = parametrization
         attn_reps = TensorReps(attn_reps)
         self.hidden_channels = attn_reps.dim * num_heads // attention_factor
         self.checkpoint_blocks = checkpoint_blocks
@@ -454,11 +477,34 @@ class MuPTransformer(nn.Module):
         """
         self.attention.prepare_frames(frames)
 
+        # Build the block-diagonal attention mask ONCE per forward instead of once
+        # per block. Deriving it from `ptr` requires a GPU→CPU sync (.tolist()); the
+        # mask is identical for every block, so doing it here turns num_blocks syncs
+        # per step into one. Set LLOCA_ATTN_MASK=per_block to fall back to the old
+        # per-block derivation (kept for A/B timing / equivalence checks).
+        ptr = attn_kwargs.pop("ptr", None)
+        # CPU-side per-event lengths (optional): lets build_block_diagonal_bias skip
+        # the GPU→CPU sync. Computed from the CPU ptr in _batch_loss_lloca; None on
+        # the eval path or under LLOCA_SYNC=blocking, where we fall back to ptr.
+        seq_lens = attn_kwargs.pop("seq_lens", None)
+        if ptr is not None:
+            if os.environ.get("LLOCA_ATTN_MASK", "per_forward") == "per_block":
+                attn_kwargs["ptr"] = ptr
+            else:
+                attn_kwargs["attn_bias"] = build_block_diagonal_bias(ptr, seq_lens=seq_lens)
+
         h = self.linear_in(inputs)
         for block in self.blocks:
             if self.checkpoint_blocks:
                 fn = partial(block, **attn_kwargs)
-                h = checkpoint(fn, h)
+                # use_reentrant=False is required here: the block's attention reads
+                # the per-event frames stored on the shared LLoCaAttention module
+                # (computed once outside the checkpoint, and grad-connected to the
+                # framesnet). The reentrant checkpoint assumes all grad tensors are
+                # explicit inputs and double-backwards through those frames; the
+                # non-reentrant implementation tracks closure/module-captured tensors
+                # correctly. (It's also the recommended default in modern torch.)
+                h = checkpoint(fn, h, use_reentrant=False)
             else:
                 h = block(h, **attn_kwargs)
         outputs = self.linear_out(h)

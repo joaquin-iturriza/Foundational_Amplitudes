@@ -4,6 +4,22 @@ from scipy.stats import boxcox
 from sklearn.preprocessing import QuantileTransformer
 
 
+def resolve_amp_trafos(trafos, amplitude):
+    """Swap 'log' -> 'signedlog' when the amplitude contains non-positive values.
+
+    Plain log is undefined for x <= 0 (e.g. virtual corrections or virt/born ratios
+    that go negative).  signedlog, f(x) = sgn(x) * log(1 + |x|), is total and
+    invertible (inverse sgn(y) * (exp(|y|) - 1)).  The caller must store the returned
+    list and use it for BOTH the forward preprocessing and the inverse so the two
+    stay consistent.  Positive-only data is left untouched (keeps plain 'log').
+    """
+    if not trafos or "log" not in trafos:
+        return list(trafos) if trafos else trafos
+    if float(np.min(amplitude)) > 0.0:
+        return list(trafos)
+    return ["signedlog" if t == "log" else t for t in trafos]
+
+
 def preprocess_amplitude(amplitude, trafos=None):
     mean, std = 0, 0
     if trafos:
@@ -155,6 +171,8 @@ def get_fn(fn_str):
             return lambda p, t: p
         case "log":
             return lambda p, t: np.log(p)
+        case "signedlog":
+            return lambda p, t: np.sign(p) * np.log1p(np.abs(p))
         case "exp":
             return lambda p, t: np.exp(p)
         case "sqrt":
@@ -182,6 +200,8 @@ def get_inv_fn(fn_str):
     match fn_str:
         case "log":
             return lambda p, t: np.exp(p)
+        case "signedlog":
+            return lambda p, t: np.sign(p) * np.expm1(np.abs(p))
         case "exp":
             return lambda p, t: np.log(p)
         case "sqrt":

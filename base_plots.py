@@ -23,6 +23,7 @@ def plot_loss(
     losses_no_reg=None,
     labels_no_reg=None,
     x_scale=1,
+    legend_outside=False,
 ):
     """Plot one or more loss curves.
  
@@ -45,6 +46,10 @@ def plot_loss(
         same axes so the reader can see the regularization contribution.
     labels_no_reg : list[str] | None
         Legend labels for *losses_no_reg*.  Defaults to "<label> (no reg)".
+    legend_outside : bool
+        If True, draw a single shared legend *below* the panels (instead of one
+        legend per panel inside the axes).  Use for the per-process plots, whose
+        many long labels otherwise obstruct the curves.
     """
     # ── drop empty val curve ──────────────────────────────────────────────────
     if len(losses) > 1 and len(losses[1]) == 0:
@@ -118,7 +123,8 @@ def plot_loss(
             ax.set_ylabel("Loss", fontsize=FONTSIZE)
  
         ax.set_xlabel("Iteration", fontsize=FONTSIZE)
-        ax.legend(fontsize=FONTSIZE_LEGEND, frameon=False, loc="upper right")
+        if not legend_outside:
+            ax.legend(fontsize=FONTSIZE_LEGEND, frameon=False, loc="upper right")
         ax.grid(True, which="both", linewidth=0.4, alpha=0.4)
  
         if lr is not None:
@@ -145,7 +151,18 @@ def plot_loss(
  
     if title:
         fig.suptitle(title, fontsize=FONTSIZE + 1, y=1.02)
- 
+
+    # ── one shared legend below all panels (per-process plots) ────────────────
+    if legend_outside:
+        handles, leg_labels = axes[0, 0].get_legend_handles_labels()
+        if handles:
+            ncol = min(len(leg_labels), 4)
+            fig.legend(
+                handles, leg_labels,
+                loc="upper center", bbox_to_anchor=(0.5, -0.02), ncol=ncol,
+                frameon=False, fontsize=FONTSIZE_LEGEND,
+            )
+
     fig.savefig(file, format="pdf", bbox_inches="tight")
     plt.close(fig)
 

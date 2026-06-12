@@ -7,13 +7,22 @@ import mup  # Microsoft μP library
 from mup import MuReadout, set_base_shapes, make_base_shapes
 
 from .activation import switchable_activation
+from lloca.mup import mup_parametrized  # self-contained μP base-shape machinery
 
 
+@mup_parametrized
 class MuMLP(nn.Module):
     """A μP-aware MLP.
 
     Flattens all dimensions except batch and uses GELU nonlinearities.
+
+    μP is self-contained: with ``parametrization="mup"`` (the default) the base shapes
+    (width axis = ``hidden_channels``) are computed during ``__init__``; no external
+    ``set_base_shapes`` is required.
     """
+
+    # Base/delta widths previously defined in base_experiment.init_model.
+    DEFAULT_MUP_SHAPES = ({"hidden_channels": 49}, {"hidden_channels": 128})
 
     def __init__(
         self,
@@ -31,8 +40,13 @@ class MuMLP(nn.Module):
         loss='MSE',
         init_bias=True,
         use_mup_init=True,
+        *,
+        parametrization: str = "mup",
+        mup_base_shapes: dict | None = None,
+        mup_delta_shapes: dict | None = None,
     ):
         super().__init__()
+        self.parametrization = parametrization
 
         if not hidden_layers > 0:
             raise NotImplementedError("Only supports > 0 hidden layers")

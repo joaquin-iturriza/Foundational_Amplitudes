@@ -8,6 +8,7 @@ seed: null
 debug: false
 
 warm_start_idx: null
+run_dir: null               # output directory override used by run_trial.py
 save: true
 use_mlflow: false
 save_source: true
@@ -27,6 +28,7 @@ training:
  es_patience: 100000000000000
  es_load_best_model: true
  validate_every_n_steps: 100
+ validate_frac: 0.0          # if > 0, overrides validate_every_n_steps: val_step = frac * iterations
  save_intermediate: false
  load_best_previous: true
  save_gradients: false
@@ -39,6 +41,30 @@ training:
  max_grad_norm: null
  log_every_n_steps: 1000
  sampler_log_every_n_vals: 10   # log sampler weights every N validation steps (0 = never)
+ sampler_alpha_ema: 0.7         # EMA decay applied to per-process val losses before fitting α (0 = no smoothing, 1 = never update)
+ sampler_min_alpha_frac: 0.25   # minimum weight as fraction of max weight; extreme-starvation floor for confirmed-plateaued datasets (0.25 = 4:1 cap)
+ # ── significance-based plateau detection (ProcessBalancedSampler) ───────────
+ # A dataset is starved below uniform only when, even optimistically (α + k·SE),
+ # its improvement rate is below α_min; it is probed (boosted, which shrinks the
+ # SE) before that call is trusted, and the test fails safe to "keep feeding"
+ # whenever the data is too noisy/narrow to decide.  Only two real knobs: α_min
+ # (what counts as flat) and k (how sure before acting) — the noise handling is
+ # adaptive per dataset, so the rest are fixed structural defaults.
+ sampler_alpha_min: 0.05        # improvement-rate (exponent) floor below which a dataset isn't worth more compute
+ sampler_sig_k: 2.0             # confidence: σ-multiple of SE(α) required before confirming plateau / recovery
+ sampler_warmup_vals: 10        # uniform sampling for the first N validations (let every dataset enter its scaling regime first)
+ sampler_probe_max: 15          # max validations to keep probing before deciding on the point estimate (fail-safe)
+ sampler_reprobe_every: 20      # re-probe a "plateaued" dataset every N validations (catch late bloomers)
+ sampler_alpha_window: 30       # max validations to look back when fitting α/SE(α); the window is span-targeted (≈0.4 in log-compute) within this cap, so it stays well-conditioned as compute accrues
+ # ── deficit-to-solo weighting ───────────────────────────────────────────────
+ # Boost datasets whose live local α sits below their expected solo exponent
+ # (deficit = α_solo − α_local): these are under-scaling/starved by the mixture.
+ # weight = 1 + gamma·deficit for non-plateaued; plateaued → plateau_floor.
+ sampler_solo_alpha_path: null  # path to solo-α JSON {dataset: α_solo}; null → <data_path>/solo_alpha.json
+ sampler_deficit_gamma: 1.5     # boost strength per unit of under-scaling deficit
+ sampler_deficit_cap: 2.0       # cap on deficit (bounds the max boost / spike effect)
+ sampler_plateau_floor: 0.3     # weight for confirmed-plateaued datasets (relative to baseline 1.0)
+ # (sampler_probe_boost / sampler_min_alpha_frac are no longer used by the weighting)
 
  num_workers: 4       # DataLoader worker processes. 0=main thread (safe on Windows). Use 4+ on Linux.
 
@@ -52,6 +78,7 @@ training:
  scheduler: CosineAnnealingLR
  scheduler_scale: 1
  cosanneal_warmup_steps: 0
+ cosanneal_warmup_frac: 0.0   # if > 0, overrides warmup_steps: warmup = frac * increment_steps
  cosanneal_eta_min: 0
  reduceplateau_factor: 0.1
  reduceplateau_patience: 50
@@ -68,13 +95,23 @@ training:
  enable_mem_efficient_sdp: false
  force_xformers: false
 
+ # --- compute knobs (see CLAUDE.md "Compute knobs") ---
+ allow_tf32: true        # TF32 matmul/cudnn. No-op on V100; ~2x matmul on A100 at ~1e-3
+                         # precision -> A/B the loss on A100 before trusting it.
+ fused_optimizer: true   # fused=True for Adam/AdamW (CUDA only); flows through MuAdam/MuAdamW.
+
  loss: MSE
+ loss_aggregation: mean   # mean | geometric_mean (geo mean treats all processes equally regardless of scale)
  dtype: float32
 
  regularization: null
  regularization_lambda: 1e-5
 
  result_path: null
+
+ # DyHPO multi-fidelity fields
+ is_dyhpo_run: false         # set to true by run_trial.py / test_sweep.py
+ increment_steps: null       # training steps for this fidelity increment (null = full run)
 
 evaluate: true
 evaluation:
@@ -98,6 +135,22 @@ plotting:
 mlflow:
  db: '${base_dir}/runs/${exp_name}/mlflow/mlflow.db'
  artifacts: '${base_dir}/runs/${exp_name}/mlflow_artifacts'
+
+fine_tune:
+ pretrained_path: null        # absolute path to pretrained .pt checkpoint
+ lr_scale: 0.1                # global LR multiplier on top of base LR (sweep: 0.01–1.0)
+ layer_decay: 1.0             # LLRD: lr = base_lr * lr_scale * layer_decay^depth (1.0 = no decay)
+ freeze_blocks: []            # list of block indices to freeze, e.g. [0,1,2,3]
+ reset_output_head: false     # re-init linear_out weights after loading
+ lora:
+  enabled: false
+  rank: 8                     # bottleneck rank r
+  alpha: 16.0                 # scaling: effective ΔW LR = alpha/rank * group_lr
+  target: [qkv, out]          # which attention projections to apply LoRA to
+ ewc:
+  enabled: false
+  lambda: 1000.0              # EWC regularization strength (sweep: 1e2–1e5)
+  n_fisher_batches: 64        # number of train batches to estimate Fisher diagonal
 
 defaults:
  - hydra

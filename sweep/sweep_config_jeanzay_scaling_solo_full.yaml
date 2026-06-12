@@ -1,0 +1,105 @@
+# Short solo scaling sweep — one independent DyHPO cell per (dataset x t_steps).
+#
+# Base: the 8 joint-pretraining datasets, each trained SOLO (scaling-law baseline
+# vs the joint run), plus the eeuu/eett virtual corrections and their virt/born
+# ratio form. 12 datasets x 5 compute levels = 60 independent cells x 15 trials.
+#
+# t_steps = epochs x iters_per_epoch, with 100k subsample (train=70k) and BS=16384
+# -> iters/epoch = floor(70000/16384) = 4. Epochs [1, 1e1.5, 1e2, 1e2.5, 1e3].
+#   1      epoch  -> 4
+#   1e1.5  epochs -> 126
+#   1e2    epochs -> 400
+#   1e2.5  epochs -> 1265
+#   1e3    epochs -> 4000
+#
+# Generate:  python sweep/generate_scaling_sweep.py --config sweep/sweep_config_jeanzay_scaling_solo_full.yaml
+# then submit all cells interleaved (the generator prints the exact command):
+#            python sweep/sweep_manager.py submit <all 60 cell dirs>
+
+cluster:
+  scheduler: slurm
+  auto_submit: false          # submit via sweep_manager (interleaved across cells)
+  partition: gpu_p2           # V100 32GB; nh=4 BS=16384 ~6.8GB
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "01:00:00"            # covers the largest cell (t=4000 ~19min train + eval)
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+sweep_name: scaling_solo_full
+seed: 42
+
+datasets:
+  # 8 joint-pretraining datasets, solo
+  - ee_wwz_255-1000GeV_amplitudes
+  - ee_WW_162-1000GeV_amplitudes
+  - ee_ttbar_346-1000GeV_amplitudes
+  - ee_uug_91-1000GeV_amplitudes
+  - ee_uugg_91-1000GeV_amplitudes
+  - ee_aa_10-1000GeV_amplitudes
+  - ee_aaa_10-1000GeV_amplitudes
+  - ee_uu_91-1000GeV_amplitudes
+  # virtual corrections (eeuu, eett)
+  - ee_uu_nlo_virt_e4
+  - ee_ttbar_nlo_virt_e4
+  # virtual corrections in ratio form (virt_fin / born) — created by make_ratio_datasets.py
+  - ee_uu_nlo_virt_ratio
+  - ee_ttbar_nlo_virt_ratio
+
+t_steps_values: [4, 126, 400, 1265, 4000]
+
+n_trials_per_level: 15
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 4                # Sobol startup trials before the surrogate activates
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.subsample: 100000
+  data.train_test_val: "[0.7, 0.2, 0.1]"
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 4
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+
+# Search space = the pretraining-scaling space MINUS the two balanced-sampler HPs
+# (sampler_alpha_ema / sampler_min_alpha_frac), which are inert for single-dataset
+# solo runs (no ProcessBalancedSampler). Left: optimizer/regularization/schedule HPs.
+search_space:
+  - name: training.lr
+    type: float_log
+    low: 3.1622776601683795e-05   # 10^-4.5
+    high: 0.1
+  - name: training.regularization_lambda
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.cosanneal_warmup_frac
+    type: float_uniform
+    low: 0.0
+    high: 0.2
+  - name: training.cosanneal_eta_min
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.ema_decay
+    type: float_uniform
+    low: 0.9
+    high: 0.9999

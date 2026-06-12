@@ -1,229 +1,355 @@
 #!/usr/bin/env python3
 """
-run_trial.py  —  Per-job entrypoint for asynchronous Bayesian HPO.
+run_trial.py  —  Per-job entrypoint for DyHPO-based multi-fidelity HPO.
 
-Each HTCondor job runs this script. It:
-  1. Connects to the shared Optuna study (via JournalFileStorage on EOS).
-  2. Calls study.ask() to get the best hyperparameter suggestion given whatever
-     trials have completed by the time this job actually starts.
-  3. Runs `python run.py` with those parameters.
-  4. Reports the validation loss back to the study via study.tell().
+Each HTCondor job runs this script once. It:
+  1. Locks the shared DyHPO state on AFS, calls sampler.suggest(), unlocks.
+  2. Checks the checkpoint index to decide whether to warm-start from a previous
+     fidelity level for this HP configuration.
+  3. Runs `python run.py` with the suggested HP params and fidelity overrides.
+  4. Locks the state again, calls sampler.observe() with the result, unlocks.
+  5. Registers the new training checkpoint in the checkpoint index.
 
-Failed trials (crash, OOM, missing result) are marked FAIL in the study so they
-don't pollute the surrogate, but the study keeps running.
+Fidelity dimension:
+  - t_steps : training steps (training.iterations = increment from previous level)
 """
 
 import argparse
 import json
 import os
-import subprocess
+import signal
 import sys
 import time
 
-import optuna
+import numpy as np
 import yaml
-from optuna.storages import JournalStorage
-from optuna.storages.journal import JournalFileBackend
 
-optuna.logging.set_verbosity(optuna.logging.WARNING)
+# Make sweep/ importable from the project root
+_project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_dir not in sys.path:
+    sys.path.insert(0, _project_dir)
+
+import subprocess
+
+# ---------------------------------------------------------------
+# SIGTERM handler — called when SLURM cancels the job.
+# Reports the in-flight trial as failed so DyHPO can reuse the
+# slot. Uses os._exit to avoid hanging on Python cleanup.
+# ---------------------------------------------------------------
+_sigterm_hp_idx   = None
+_sigterm_state    = None
+_sigterm_eos      = None
+
+def _sigterm_handler(signum, frame):
+    if _sigterm_hp_idx is not None and _sigterm_state is not None:
+        try:
+            from sweep.dyhpo_sampler import DyHPOSampler
+            with DyHPOSampler.locked(_sigterm_state, _sigterm_eos) as sampler:
+                sampler.report_failure(_sigterm_hp_idx)
+            print(f"[run_trial] SIGTERM: reported failure for hp_idx={_sigterm_hp_idx}",
+                  file=sys.stderr)
+        except Exception as e:
+            print(f"[run_trial] SIGTERM: report_failure failed: {e}", file=sys.stderr)
+    os._exit(1)
+
+signal.signal(signal.SIGTERM, _sigterm_handler)
+from sweep.dyhpo_sampler import DyHPOSampler
+from sweep.checkpoint_index import CheckpointIndex
+
+
+def _sweep_dirs(cfg, sweep_name):
+    if "sweep_dir" in cfg.get("paths", {}):
+        d = os.path.join(cfg["paths"]["sweep_dir"], sweep_name)
+        return d, d
+    afs = os.path.join(cfg["paths"]["afs_sweep_dir"], sweep_name)
+    eos = os.path.join(cfg["paths"]["eos_sweep_dir"], sweep_name)
+    return afs, eos
+
 
 RETRY_ATTEMPTS = 3
 RETRY_DELAY_S  = 30
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def load_config(path):
     with open(path) as f:
         return yaml.safe_load(f)
 
 
-def open_study_with_retry(cfg):
-    sweep_name = cfg["sweep_name"]
-    # Journal is on AFS (not EOS) — AFS has reliable POSIX locking.
-    afs_dir      = os.path.join(cfg["paths"]["afs_sweep_dir"], sweep_name)
-    journal_path = os.path.join(afs_dir, "optuna_journal.log")
+def compute_hpo_objective(result: dict, scaling_law_cfg: dict) -> float | None:
+    """
+    Compute the geometric mean of per-dataset transfer ratios as the HPO objective.
 
-    for attempt in range(1, RETRY_ATTEMPTS + 1):
-        try:
-            storage = JournalStorage(JournalFileBackend(journal_path))
-            study = optuna.load_study(
-                study_name=sweep_name,
-                storage=storage,
-            )
-            return study
-        except Exception as e:
-            if attempt == RETRY_ATTEMPTS:
-                raise RuntimeError(
-                    f"Could not open Optuna study after {RETRY_ATTEMPTS} attempts: {e}"
-                ) from e
-            print(
-                f"[run_trial] Warning: failed to open study (attempt {attempt}/{RETRY_ATTEMPTS}): {e}",
-                file=sys.stderr,
-            )
-            time.sleep(RETRY_DELAY_S)
+    transfer_ratio_ds = val_loss_joint_ds / (C_ds · compute_ds^{-α_ds})
 
+    Values < 1 mean joint training beats the solo scaling law prediction (positive
+    transfer).  Returns None if scaling law params are unavailable.
+    """
+    proc_val_losses = result.get("proc_val_losses", {})
+    compute_ds      = result.get("compute_ds", {})
 
-def suggest_param(trial, entry):
-    name = entry["name"]
-    t    = entry["type"]
-    if t == "float_log":
-        return trial.suggest_float(name, entry["low"], entry["high"], log=True)
-    elif t == "float_uniform":
-        return trial.suggest_float(name, entry["low"], entry["high"], log=False)
-    elif t == "int_log":
-        return trial.suggest_int(name, entry["low"], entry["high"], log=True)
-    elif t == "int_uniform":
-        return trial.suggest_int(name, entry["low"], entry["high"], log=False)
-    elif t == "categorical":
-        return trial.suggest_categorical(name, entry["choices"])
-    else:
-        raise ValueError(f"Unknown search space type: {t!r}")
+    if not proc_val_losses or not compute_ds:
+        return None
+
+    # Load fitted params if available
+    sl_params  = {}
+    params_file = scaling_law_cfg.get("params_file")
+    if params_file and os.path.exists(params_file):
+        with open(params_file) as f:
+            sl_params = json.load(f)
+
+    alpha_priors = scaling_law_cfg.get("alpha_prior", {})
+
+    ratios = []
+    for ds_name, val_loss in proc_val_losses.items():
+        compute = compute_ds.get(ds_name, 0)
+        if compute <= 0 or val_loss <= 0:
+            continue
+
+        p     = sl_params.get(ds_name, {})
+        alpha = p.get("alpha", alpha_priors.get(ds_name, 0.5))
+        C     = p.get("C")   # None if scaling_law.py hasn't been run yet
+
+        if C is None:
+            # Without C we can't compute the transfer ratio — skip this dataset
+            continue
+
+        expected = C * (compute ** (-alpha))
+        if expected > 0:
+            ratios.append(val_loss / expected)
+
+    if not ratios:
+        return None
+
+    return float(np.exp(np.mean(np.log(np.clip(ratios, 1e-10, None)))))
 
 
 def format_value(v):
-    """Format a suggested value for Hydra command-line override."""
     if isinstance(v, float):
-        # Scientific notation avoids floating-point display issues
         return f"{v:.6e}"
     return str(v)
 
 
-def build_command(cfg, trial, result_path):
+def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
+                  warm_start_idx=None, increment_steps=None):
     project_dir = cfg["paths"]["project_dir"]
     run_script  = os.path.join(project_dir, "run.py")
     sweep_name  = cfg["sweep_name"]
 
     cmd = [sys.executable, run_script]
-
-    # config/amplitudes.yaml has `local: none` in its defaults, which looks for
-    # config/local/none.yaml — that file doesn't exist on lxplus. Override it here.
     cmd.append("local=none")
 
-    # Fixed params
+    # Fixed params (excluding training.iterations — set below)
+    skip_keys = {"training.iterations"}
     for key, val in cfg.get("fixed_params", {}).items():
-        cmd.append(f"{key}={val}")
+        if key not in skip_keys:
+            cmd.append(f"{key}={val}")
 
-    # Suggested params from Optuna
-    for key, val in trial.params.items():
+    # Suggested HP params
+    for key, val in hp_params.items():
         cmd.append(f"{key}={format_value(val)}")
 
-    # base_experiment builds: base_dir/runs/exp_name/run_name
-    # With base_dir=project_dir and exp_name=sweep_name/trial_N:
-    # → project_dir/runs/sweep_name/trial_N/run_name  ✓
-    cmd.append(f"base_dir={project_dir}")
-    exp_name = f"{sweep_name}/trial_{trial.number:04d}"
-    cmd.append(f"exp_name={exp_name}")
+    cmd.append(f"training.iterations={increment_steps}")
+    cmd.append(f"training.is_dyhpo_run=true")
 
-    # Result path for handoff back to this script
+    # Run dir and index for output organisation
+    cmd.append(f"base_dir={project_dir}")
+    cmd.append(f"run_dir={run_dir}")
+    cmd.append(f"exp_name={sweep_name}")
+
+    # Always pass increment_steps so scheduler logic has it explicitly at every fidelity level
+    cmd.append(f"training.increment_steps={increment_steps}")
+
+    if warm_start_idx is not None:
+        # Resume from previous fidelity level checkpoint
+        cmd.append(f"warm_start_idx={warm_start_idx}")
+    else:
+        # Cold start
+        cmd.append("warm_start_idx=null")
+
     cmd.append(f"training.result_path={result_path}")
 
     return cmd
 
 
-# ---------------------------------------------------------------------------
-# Summary helper
-# ---------------------------------------------------------------------------
-
-def _write_summary(study, eos_dir):
-    """Write a human-readable summary of the sweep so far to {eos_dir}/summary.txt.
-
-    Updated after every completed trial. Check it with:
-        cat /eos/user/j/joiturri/sweeps/{sweep_name}/summary.txt
-    """
-    completed = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
-    failed    = [t for t in study.trials if t.state == optuna.trial.TrialState.FAIL]
-    total     = len(study.trials)
+def _write_summary(cfg, sampler, eos_dir):
+    results = sampler.all_results()
+    best    = sampler.best_result()
 
     lines = [
-        f"Sweep: {study.study_name}",
-        f"Trials: {len(completed)} completed, {len(failed)} failed, {total} total",
+        f"Sweep: {cfg['sweep_name']}",
+        f"Evaluations completed: {len(results)}",
     ]
-
-    if completed:
-        best = study.best_trial
-        lines += [
-            f"Best trial: #{best.number}  val_loss = {best.value:.6f}",
-            "Best params:",
-        ]
-        for k, v in best.params.items():
+    if best:
+        params, loss = best
+        lines += [f"Best val_loss: {loss:.6f}", "Best params:"]
+        for k, v in params.items():
             lines.append(f"  {k} = {v}")
+    lines.append("")
+    lines.append("Top-10 results (across all fidelity levels):")
+    for r in results[:10]:
+        ps = "  ".join(
+            f"{k.split('.')[-1]}={v:.3g}" if isinstance(v, float) else f"{k.split('.')[-1]}={v}"
+            for k, v in r['params'].items()
+        )
+        lines.append(
+            f"  hp_{r['hp_idx']:04d}  val_loss={r['val_loss']:.6f}"
+            f"  t_steps={r['t_steps']}  {ps}"
+        )
 
-        lines.append("")
-        lines.append(f"Top-10 (of {len(completed)} completed):")
-        sorted_trials = sorted(completed, key=lambda t: t.value)
-        for t in sorted_trials[:10]:
-            param_str = "  ".join(f"{k}={v:.3g}" if isinstance(v, float) else f"{k}={v}"
-                                  for k, v in t.params.items())
-            lines.append(f"  #{t.number:04d}  val_loss={t.value:.6f}  {param_str}")
-
-    summary_path = os.path.join(eos_dir, "summary.txt")
-    with open(summary_path, "w") as f:
+    os.makedirs(eos_dir, exist_ok=True)
+    with open(os.path.join(eos_dir, "summary.txt"), "w") as f:
         f.write("\n".join(lines) + "\n")
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 def main():
-    parser = argparse.ArgumentParser(description="Run one HPO trial on a compute node")
-    parser.add_argument("--sweep-config", required=True, help="Path to sweep_config.yaml")
-    parser.add_argument("--trial-idx", type=int, required=True,
-                        help="Submission-time index (used for logging only; actual params come from Optuna)")
+    parser = argparse.ArgumentParser(description="Run one DyHPO trial on a compute node")
+    parser.add_argument("--sweep-config",  required=True)
+    parser.add_argument("--trial-idx",     type=int, required=True,
+                        help="Submission-time index (for logging only)")
+    parser.add_argument("--t-steps-cap",   type=int, default=None,
+                        help="Cap the suggested t_steps to this value (for low-fidelity jobs)")
+    parser.add_argument("--fixed-hp-idx",  type=int, default=None,
+                        help="Skip DyHPO suggest and run this specific HP config")
+    parser.add_argument("--fixed-t-steps", type=int, default=None,
+                        help="Fixed t_steps for finalization jobs (requires --fixed-hp-idx)")
     args = parser.parse_args()
 
     cfg        = load_config(args.sweep_config)
     sweep_name = cfg["sweep_name"]
-    eos_dir    = os.path.join(cfg["paths"]["eos_sweep_dir"], sweep_name)
-    results_dir = os.path.join(eos_dir, "results")
+    project_dir= cfg["paths"]["project_dir"]
+
+    afs_dir, eos_dir = _sweep_dirs(cfg, sweep_name)
+    results_dir= os.path.join(eos_dir, "results")
     os.makedirs(results_dir, exist_ok=True)
 
-    print(f"[run_trial] Sweep: {sweep_name}  |  submission index: {args.trial_idx}")
+    state_path  = os.path.join(afs_dir, "dyhpo_state.pkl")
+    ckpt_index_path = os.path.join(afs_dir, "checkpoint_index.json")
 
-    # --- Connect to study and get next trial ---
-    study = open_study_with_retry(cfg)
-    trial = study.ask()
+    print(f"[run_trial] Sweep: {sweep_name}  |  trial_idx: {args.trial_idx}")
 
-    print(f"[run_trial] Optuna trial number: {trial.number}")
+    # ---------------------------------------------------------------
+    # 1. Ask DyHPO for the next (hp_config, fidelity) to evaluate
+    #    — or use fixed values for finalization jobs
+    # ---------------------------------------------------------------
+    eos_output_path = os.path.join(eos_dir, "dyhpo_surrogate")
+    os.makedirs(eos_output_path, exist_ok=True)
 
-    # --- Suggest parameters ---
-    for entry in cfg.get("search_space", []):
-        suggest_param(trial, entry)
+    if args.fixed_hp_idx is not None:
+        t_steps = args.fixed_t_steps
+        with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
+            hp_idx    = args.fixed_hp_idx
+            hp_params = sampler.candidates_raw[hp_idx]
+        print(f"[run_trial] FIXED hp_idx={hp_idx}  t_steps={t_steps}")
+    else:
+        for attempt in range(1, RETRY_ATTEMPTS + 1):
+            try:
+                with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
+                    hp_idx, hp_params, t_steps = sampler.suggest(max_t_steps=args.t_steps_cap)
+                break
+            except Exception as e:
+                if attempt == RETRY_ATTEMPTS:
+                    raise RuntimeError(f"Failed to get DyHPO suggestion after {RETRY_ATTEMPTS} attempts: {e}") from e
+                print(f"[run_trial] suggest() failed (attempt {attempt}): {e}", file=sys.stderr)
+                time.sleep(RETRY_DELAY_S)
 
-    print(f"[run_trial] Parameters: {trial.params}")
+    print(f"[run_trial] hp_idx={hp_idx}  t_steps={t_steps}")
+    print(f"[run_trial] HP params: {hp_params}")
 
-    # --- Result file path (unique per trial + timestamp to avoid any collision) ---
-    result_path = os.path.join(results_dir, f"trial_{trial.number:04d}_{int(time.time())}.json")
+    # Arm SIGTERM handler now that we know which trial to report as failed
+    global _sigterm_hp_idx, _sigterm_state, _sigterm_eos
+    _sigterm_hp_idx = hp_idx
+    _sigterm_state  = state_path
+    _sigterm_eos    = eos_output_path
 
-    # --- Run training ---
-    cmd = build_command(cfg, trial, result_path)
-    project_dir = cfg["paths"]["project_dir"]
+    # ---------------------------------------------------------------
+    # 2. Check checkpoint index — resume or cold start?
+    # ---------------------------------------------------------------
+    with CheckpointIndex(ckpt_index_path) as idx:
+        prev = idx.lookup(hp_idx)
 
+    run_dir = os.path.join(project_dir, "runs", sweep_name, f"trial_{hp_idx:04d}")
+
+    can_warm_start = prev is not None and prev['t_steps'] < t_steps
+
+    if can_warm_start:
+        warm_start_idx  = prev['run_idx']
+        prev_t_steps    = prev['t_steps']
+        increment_steps = t_steps - prev_t_steps
+        run_idx         = warm_start_idx + 1
+        print(f"[run_trial] Resuming hp_{hp_idx:04d} from run_idx={warm_start_idx} "
+              f"(t={prev_t_steps} → {t_steps}, +{increment_steps} steps)")
+    else:
+        warm_start_idx  = None
+        increment_steps = t_steps
+        run_idx         = 0
+        print(f"[run_trial] Cold start hp_{hp_idx:04d}")
+
+    # Use t_steps for unique result filename (encodes fidelity level without listing all dataset sizes)
+    result_path = os.path.join(results_dir, f"hp{hp_idx:04d}_t{t_steps}_{int(time.time())}.json")
+
+    # ---------------------------------------------------------------
+    # 3. Run training
+    # ---------------------------------------------------------------
+    cmd = build_command(
+        cfg, hp_params, run_dir, run_idx, result_path,
+        t_steps,
+        warm_start_idx=warm_start_idx,
+        increment_steps=increment_steps,
+    )
     print(f"[run_trial] Running: {' '.join(cmd)}")
 
     try:
         proc = subprocess.run(cmd, cwd=project_dir)
-
         if proc.returncode != 0:
             raise RuntimeError(f"run.py exited with code {proc.returncode}")
 
-        # --- Read result ---
         with open(result_path) as f:
             result = json.load(f)
-        val_loss = float(result["val_loss"])
+        val_loss        = float(result["val_loss"])
+        proc_val_losses = result.get("proc_val_losses")
 
-        print(f"[run_trial] Trial {trial.number}: val_loss = {val_loss:.6f}")
-        study.tell(trial, val_loss)
+        # Use transfer-ratio geometric mean as HPO objective when scaling law
+        # params are available; fall back to raw combined val_loss otherwise.
+        hpo_obj = compute_hpo_objective(result, cfg.get("scaling_law", {}))
+        observe_loss = hpo_obj if hpo_obj is not None else val_loss
+        print(f"[run_trial] hp_{hp_idx:04d}  t_steps={t_steps}"
+              f"  val_loss={val_loss:.6f}"
+              + (f"  hpo_obj={hpo_obj:.4f}" if hpo_obj is not None else ""))
 
-        # Write a running summary so you can check progress without running analyze_sweep.py
-        _write_summary(study, eos_dir)
+        # -----------------------------------------------------------
+        # 4. Report result to DyHPO surrogate
+        # -----------------------------------------------------------
+        with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
+            sampler.observe(hp_idx, t_steps, observe_loss, proc_val_losses)
+
+            range_ext_cfg = cfg.get("range_extension", {})
+            if range_ext_cfg.get("enabled", False):
+                ext_kwargs = {k: v for k, v in range_ext_cfg.items() if k != "enabled"}
+                extended = sampler.check_and_extend_ranges(**ext_kwargs)
+                for name, info in extended.items():
+                    print(
+                        f"[run_trial] Range extended: {name} {info['direction']}"
+                        f"  {info['old_bound']:.3g} -> {info['new_bound']:.3g}"
+                        f"  (extension #{info['extension_count']})"
+                    )
+
+            _write_summary(cfg, sampler, eos_dir)
+
+        # -----------------------------------------------------------
+        # 5. Register new checkpoint in index
+        # -----------------------------------------------------------
+        with CheckpointIndex(ckpt_index_path) as idx:
+            idx.register(hp_idx, run_dir, run_idx, t_steps, t_steps,
+                         trial_idx=args.trial_idx)
 
     except Exception as e:
-        print(f"[run_trial] Trial {trial.number} FAILED: {e}", file=sys.stderr)
-        study.tell(trial, state=optuna.trial.TrialState.FAIL)
+        print(f"[run_trial] Trial FAILED: {e}", file=sys.stderr)
+        if args.fixed_hp_idx is None:
+            try:
+                with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
+                    sampler.report_failure(hp_idx)
+            except Exception as cleanup_err:
+                print(f"[run_trial] report_failure: {cleanup_err}", file=sys.stderr)
         sys.exit(1)
 
 

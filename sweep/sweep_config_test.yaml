@@ -1,0 +1,75 @@
+# sweep_config_test.yaml
+# Small-scale config for local pipeline testing (no HTCondor, no GPU).
+# Use with: python sweep/test_sweep.py --config /path/to/sweep_config_test.yaml
+#
+# Fidelity: 3 datasets × 2 n_data levels × 2 t_steps levels = 16 combos total.
+# Each trial finishes in ~10–30 seconds on CPU.
+
+cluster:
+  auto_submit: false
+  gpus_minimum_memory: 20000
+  job_flavour: tomorrow
+  request_gpus: 1
+  requirements: '!regexp("MIG", TARGET.GPUs_DeviceName)'
+
+paths:
+  afs_sweep_dir: /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps
+  eos_sweep_dir: /eos/user/j/joiturri/Foundational_Amplitudes/sweeps
+  project_dir: /eos/user/j/joiturri/Foundational_Amplitudes
+  python_env: /eos/user/j/joiturri/jitu/amplitude_DSI/amplitudes_env/bin/activate
+
+sweep_name: lloca_test_sweep_001
+n_trials: 10
+
+scaling_law:
+  params_file: null    # set to output of scaling_law.py once run; null = use alpha_prior only
+  alpha_prior:         # 4/DoF approximations; same for all 2→2 processes
+    ee_uu_91GeV_amplitudes:     0.5
+    ee_aa_13000GeV_amplitudes:  0.5
+    ee_aaa_13000GeV_amplitudes: 0.25
+
+dyhpo:
+  n_candidates: 20    # small pool → fast surrogate fitting
+  seed: 42
+  n_startup: 3        # 3 random trials before surrogate activates
+  total_budget: 10000
+
+# Two fidelity levels per axis; 2×2×2×2 = 16 combos.
+# ee_uu has 10M events so 5000 is still a tiny fraction — adjust upward if you want
+# more signal, but 500/5000 is enough to verify the pipeline in seconds.
+fidelity_schedule:
+  n_data:
+    ee_uu_91GeV_amplitudes:     [500,  5000]
+    ee_aa_13000GeV_amplitudes:  [500,  5000]
+    ee_aaa_13000GeV_amplitudes: [500,  5000]
+  t_steps: [100, 500]
+
+fixed_params:
+  data.data_path: /eos/user/j/joiturri/Foundational_Amplitudes/data/
+  data.dataset: '[ee_uu_91GeV_amplitudes,ee_aa_13000GeV_amplitudes,ee_aaa_13000GeV_amplitudes]'
+  model: lloca
+  plot: 'false'
+  training.batchsize: 16
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.validate_every_n_steps: 50
+
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.0e-06
+  high: 0.01
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.0
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06

@@ -6,6 +6,7 @@ import math
 import datetime
 import pickle
 import os, time
+import io
 import zipfile
 import logging
 import pandas as pd
@@ -46,12 +47,30 @@ import lgatr.primitives.linear
 from lgatr.layers.mlp.config import MLPConfig
 from lgatr.layers.attention.config import SelfAttentionConfig
 
-from mup import set_base_shapes, make_base_shapes
 from mup import MuAdam, MuAdamW  # μP optimizers
+from lloca.mup import finalize as mup_finalize  # μP base shapes are now self-contained
+                                                # in the backbones; we only finalize the
+                                                # parameters living outside them.
 
 cs = ConfigStore.instance()
 cs.store(name="base_attention", node=SelfAttentionConfig)
 cs.store(name="base_mlp", node=MLPConfig)
+
+def _torch_load(path, **kwargs):
+    """Load a PyTorch checkpoint, transparently decompressing .pt.gz if needed."""
+    if path.endswith('.gz') and os.path.exists(path):
+        with gzip.open(path, 'rb') as f:
+            buf = io.BytesIO(f.read())
+        return torch.load(buf, **kwargs)
+    if os.path.exists(path):
+        return torch.load(path, **kwargs)
+    gz_path = path + ".gz"
+    if os.path.exists(gz_path):
+        with gzip.open(gz_path, 'rb') as f:
+            buf = io.BytesIO(f.read())
+        return torch.load(buf, **kwargs)
+    raise FileNotFoundError(path)
+
 
 # set to 'True' to debug autograd issues (slows down code)
 torch.autograd.set_detect_anomaly(False)
@@ -116,12 +135,21 @@ class BaseExperiment:
             free_mem, total_mem = torch.cuda.mem_get_info()
             LOGGER.info(f"Available VRAM: {free_mem / 1024**2:.2f} MB")
             LOGGER.info(f"Total VRAM: {total_mem / 1024**2:.2f} MB")
+            n_params = sum(p.numel() for p in self.model.parameters())
+            param_mb = sum(p.numel() * p.element_size() for p in self.model.parameters()) / 1024**2
+            model_alloc_mb = torch.cuda.memory_allocated() / 1024**2
+            LOGGER.info(
+                f"Model (uncompressed): {n_params:,} parameters | "
+                f"param tensor memory: {param_mb:.2f} MB | "
+                f"CUDA allocated: {model_alloc_mb:.2f} MB"
+            )
             torch.cuda.reset_peak_memory_stats()
 
         if self.cfg.count_flops:
             self.count_flops(dataloader=self.train_loader)
 
         if self.cfg.train:
+            self._init_ewc()
             self._init_optimizer()
             self._init_scheduler()
             self.train()
@@ -137,6 +165,20 @@ class BaseExperiment:
             # train() and we need a final evaluation here.
             if self.cfg.evaluate and (not self.cfg.train or not self.cfg.training.save_intermediate):
                 self.evaluate()
+                result_path = self.cfg.training.get("result_path", None)
+                if result_path and os.path.exists(result_path) and hasattr(self, "results_test"):
+                    try:
+                        import json as _json
+                        with open(result_path) as _f:
+                            _result = _json.load(_f)
+                        _combined_key = next(iter(self.results_test))
+                        _result["test_loss"] = float(
+                            self.results_test[_combined_key]["preprocessed"]["mse"]
+                        )
+                        with open(result_path, "w") as _f:
+                            _json.dump(_result, _f)
+                    except Exception:
+                        pass
 
             if self.cfg.plot and self.cfg.save:
                 self.plot()
@@ -177,10 +219,31 @@ class BaseExperiment:
             self.cfg.ga_settings.zero_bivector
         )
 
+    def _post_instantiate_model(self, model):
+        """Hook called immediately after every model instantiation (main, base, delta).
+        Override in subclasses to add custom modules (e.g. particle_encoder) so they
+        exist before MuP base shapes are computed and before warm-start loading."""
+        pass
+
     def init_model(self):
         # === instantiate model ===
         self.cfg.model.net.loss = self.cfg.training.loss
         self.model = instantiate(self.cfg.model)
+        self._post_instantiate_model(self.model)
+
+        # === μP setup ===
+        # μP base shapes are computed inside the backbone's __init__ (self-contained,
+        # see lloca.mup): the width-bearing backbone already has its infshapes set by
+        # the time `instantiate` returns. We only need to mark the parameters that live
+        # *outside* that backbone (e.g. particle_encoder added in _post_instantiate_model,
+        # or the framesnet) as standard parametrization, which finalize() does. This
+        # replaces the old base/delta-model + make_base_shapes/set_base_shapes + .bsh-file
+        # dance that used to live here. Reloading a checkpoint needs no special handling:
+        # reconstructing with the same config reproduces identical base shapes, and
+        # load_state_dict preserves infshapes.
+        if self._is_mup_model():
+            mup_finalize(self.model)
+            LOGGER.info("Using μP (base shapes set in-backbone; external params finalized)")
 
         num_parameters = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad
@@ -216,7 +279,7 @@ class BaseExperiment:
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location=self.device, weights_only=False)
+                state_dict = _torch_load(model_path, map_location=self.device, weights_only=False)
                 LOGGER.info(f"Loading model from {model_path}")
                 self.model.load_state_dict(state_dict["model"])
 
@@ -227,44 +290,6 @@ class BaseExperiment:
                 LOGGER.warning(
                     f"Cannot load model from {model_path}, training model from scratch"
                 )
-
-        # === μP setup ===
-        if self._is_mup_model():
-            self.bsh_path = os.path.join(self.cfg.run_dir, "base_shapes.bsh")
-
-            if os.path.exists(self.bsh_path):
-                LOGGER.info(f"Loading μP base shapes from {self.bsh_path}")
-                # Critical: always reset infshapes after load
-                # - warm start → rescale_params=False
-                # - fresh init → rescale_params=True
-                set_base_shapes(self.model, self.bsh_path, rescale_params=not self.warm_start)
-
-            else:
-                LOGGER.info("Defining base and delta models for μP setup")
-                base_cfg = copy.deepcopy(self.cfg.model)
-                if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
-                    base_cfg.net.hidden_channels = 49  # example base width
-                elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-                    # attn_reps defines the per-head Lorentz representation (structure, not width)
-                    # and must stay fixed between base and delta so mup correctly identifies
-                    # num_heads as the width axis.
-                    base_cfg.net.num_heads = 2
-                base_model = instantiate(base_cfg)
-
-                delta_cfg = copy.deepcopy(self.cfg.model)
-                if self.cfg.model.net._target_ == "models.mup_mlp.MuMLP":
-                    delta_cfg.net.hidden_channels = 128  # example delta width
-                elif self.cfg.model.net._target_ == "models.lloca.LLOCAMuPTransformer":
-                    delta_cfg.net.num_heads = 8
-
-                delta_model = instantiate(delta_cfg)
-
-                make_base_shapes(base_model, delta_model, savefile=self.bsh_path)
-                LOGGER.info(f"Saved μP base shapes to {self.bsh_path}")
-
-                set_base_shapes(self.model, self.bsh_path, rescale_params=True)
-
-            LOGGER.info("Using μP-aware MLP")
 
         # === Move to device ===
         if torch.cuda.device_count() > 1:
@@ -296,18 +321,28 @@ class BaseExperiment:
         self.warm_start = False if self.cfg.warm_start_idx is None else True
 
         if not self.warm_start:
-            if self.cfg.run_name is None:
-                modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
-                now = datetime.datetime.now()
-                rnd_number = np.random.randint(low=0, high=9999)
-                run_name = f"{now.strftime('%Y%m%d_%H%M%S')}_{modelname}_{rnd_number:04}"
-                self.cfg.run_name = run_name
+            if self.cfg.run_dir is not None:
+                # Explicit run_dir override (e.g. from run_trial.py for DyHPO sweeps).
+                # Use it directly; derive run_name from the last path component for logging.
+                run_dir  = self.cfg.run_dir
+                run_name = os.path.basename(run_dir)
+                if self.cfg.run_name is None:
+                    pass  # run_name already set above
+                else:
+                    run_name = self.cfg.run_name
             else:
-                run_name = self.cfg.run_name
+                if self.cfg.run_name is None:
+                    modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
+                    now = datetime.datetime.now()
+                    rnd_number = np.random.randint(low=0, high=9999)
+                    run_name = f"{now.strftime('%Y%m%d_%H%M%S')}_{modelname}_{rnd_number:04}"
+                    self.cfg.run_name = run_name
+                else:
+                    run_name = self.cfg.run_name
 
-            run_dir = os.path.join(
-                self.cfg.base_dir, "runs", self.cfg.exp_name, run_name
-            )
+                run_dir = os.path.join(
+                    self.cfg.base_dir, "runs", self.cfg.exp_name, run_name
+                )
             run_idx = 0
             LOGGER.info(f"Creating new experiment {self.cfg.exp_name}/{run_name}")
 
@@ -381,7 +416,7 @@ class BaseExperiment:
             return
 
         # create experiment directory
-        run_dir = Path(self.cfg.run_dir).resolve()
+        run_dir = Path(os.path.abspath(self.cfg.run_dir))
         if run_dir.exists() and not self.warm_start:
             raise ValueError(
                 f"Experiment in directory {self.cfg.run_dir} alredy exists. Aborting."
@@ -464,6 +499,14 @@ class BaseExperiment:
             self.dtype = torch.float32
             LOGGER.debug("Using dtype float32")
 
+        # TF32: ~2x matmul on A100 (Ampere+) at ~1e-3 relative precision; a no-op on
+        # V100 (Volta has no TF32). Only the bulk fp32 matmuls are affected; the
+        # frame math stays fp32 (pinned by minimum_autocast_precision). A/B the loss
+        # on A100 before trusting it for precision-sensitive amplitude fits.
+        if self.cfg.training.get("allow_tf32", True):
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+
         torch.backends.cuda.enable_flash_sdp(self.cfg.training.enable_flash_sdp)
         torch.backends.cuda.enable_math_sdp(self.cfg.training.enable_math_sdp)
         torch.backends.cuda.enable_mem_efficient_sdp(
@@ -476,12 +519,42 @@ class BaseExperiment:
 
     def _init_optimizer(self, param_groups=None):
         if param_groups is None:
-            param_groups = [
-                {"params": self.model.parameters(), "lr": self.cfg.training.lr}
-            ]
+            ft = self.cfg.get("fine_tune", None)
+            if (
+                ft is not None
+                and ft.get("pretrained_path", None) is not None
+                and (ft.get("layer_decay", 1.0) != 1.0 or ft.get("freeze_blocks", []))
+            ):
+                from fine_tune import build_ft_param_groups
+                param_groups = build_ft_param_groups(
+                    self.model,
+                    base_lr=self.cfg.training.lr,
+                    lr_scale=ft.get("lr_scale", 1.0),
+                    layer_decay=ft.get("layer_decay", 1.0),
+                )
+            elif ft is not None and ft.get("pretrained_path", None) is not None:
+                # Fine-tuning without LLRD: global lr_scale only
+                lr = self.cfg.training.lr * ft.get("lr_scale", 1.0)
+                param_groups = [{"params": list(self.model.parameters()), "lr": lr}]
+            else:
+                param_groups = [
+                    {"params": self.model.parameters(), "lr": self.cfg.training.lr}
+                ]
 
         # Check if we should use μP optimizers
-        use_mup = self.cfg.model.net._target_ == "models.mup_mlp.MuMLP"
+        use_mup = self._is_mup_model()
+
+        # fused=True fuses the Adam/AdamW step into a single multi-tensor CUDA kernel
+        # (params already on CUDA here — init_model moved them). MuAdam/MuAdamW pass
+        # **kwargs straight through to the underlying torch optimizer, so this reaches
+        # the μP path too. CUDA-only; ignored for other optimizers.
+        adam_extra = {}
+        if (
+            self.cfg.training.get("fused_optimizer", True)
+            and torch.cuda.is_available()
+            and self.cfg.training.optimizer in ("Adam", "AdamW")
+        ):
+            adam_extra["fused"] = True
 
         if self.cfg.training.optimizer == "Adam":
             if use_mup and self.cfg.training.mup_use_optim:
@@ -490,6 +563,7 @@ class BaseExperiment:
                     betas=self.cfg.training.betas,
                     eps=self.cfg.training.eps,
                     weight_decay=self.cfg.training.weight_decay,
+                    **adam_extra,
                 )
             else:
                 self.optimizer = torch.optim.Adam(
@@ -497,6 +571,7 @@ class BaseExperiment:
                     betas=self.cfg.training.betas,
                     eps=self.cfg.training.eps,
                     weight_decay=self.cfg.training.weight_decay,
+                    **adam_extra,
                 )
 
         elif self.cfg.training.optimizer == "AdamW":
@@ -506,6 +581,7 @@ class BaseExperiment:
                     betas=self.cfg.training.betas,
                     eps=self.cfg.training.eps,
                     weight_decay=self.cfg.training.weight_decay,
+                    **adam_extra,
                 )
             else:
                 self.optimizer = torch.optim.AdamW(
@@ -513,6 +589,7 @@ class BaseExperiment:
                     betas=self.cfg.training.betas,
                     eps=self.cfg.training.eps,
                     weight_decay=self.cfg.training.weight_decay,
+                    **adam_extra,
                 )
 
         elif self.cfg.training.optimizer == "RAdam":
@@ -553,7 +630,7 @@ class BaseExperiment:
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location=self.device, weights_only=False)["optimizer"]
+                state_dict = _torch_load(model_path, map_location=self.device, weights_only=False)["optimizer"]
                 LOGGER.info(f"Loading optimizer from {model_path}")
                 self.optimizer.load_state_dict(state_dict)
             except FileNotFoundError:
@@ -577,15 +654,40 @@ class BaseExperiment:
             )
             LOGGER.info('Using OneCycleLR scheduler')
         elif self.cfg.training.scheduler == "CosineAnnealingLR":
+            is_dyhpo_run = self.cfg.training.get("is_dyhpo_run", False)
+            # increment_steps is the number of steps for this fidelity increment.
+            # For DyHPO cold starts it equals training.iterations; for warm starts
+            # it is passed explicitly via training.increment_steps.
+            increment_steps = self.cfg.training.get("increment_steps", None) or self.cfg.training.iterations
+
+            warmup_frac = self.cfg.training.get("cosanneal_warmup_frac", 0.0)
+            if warmup_frac > 0:
+                # Fraction-based: scale warmup to the current increment so it is
+                # meaningful at every fidelity level (short or long run).
+                warmup = int(warmup_frac * increment_steps)
+            elif is_dyhpo_run:
+                # Fallback for DyHPO runs that still use absolute warmup_steps:
+                # cap at 5 % of the increment to prevent warmup > run length on
+                # short fidelity levels or LR shock on warm-start resumes.
+                cfg_warmup = self.cfg.training.cosanneal_warmup_steps
+                warmup = min(cfg_warmup, int(0.05 * increment_steps))
+            else:
+                warmup = self.cfg.training.cosanneal_warmup_steps
+
             self.scheduler = cosine_warmup_scheduler(
                 self.optimizer,
-                self.cfg.training.cosanneal_warmup_steps,
-                T_max=int(
-                    self.cfg.training.iterations * self.cfg.training.scheduler_scale
-                ),
+                warmup,
+                T_max=int(increment_steps * self.cfg.training.scheduler_scale),
                 eta_min=self.cfg.training.cosanneal_eta_min,
             )
-            LOGGER.info('Using CosineAnnealingLR scheduler')
+            if is_dyhpo_run:
+                run_kind = "resume" if self.warm_start else "cold start"
+                LOGGER.info(
+                    f'Using CosineAnnealingLR scheduler'
+                    f' (DyHPO {run_kind}, increment={increment_steps} steps, warmup={warmup})'
+                )
+            else:
+                LOGGER.info('Using CosineAnnealingLR scheduler')
         elif self.cfg.training.scheduler == "ReduceLROnPlateau":
             self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
@@ -600,13 +702,14 @@ class BaseExperiment:
 
         LOGGER.debug(f"Using learning rate scheduler {self.cfg.training.scheduler}")
 
-        # load existing scheduler if specified
-        if self.warm_start and self.scheduler is not None:
+        # load existing scheduler if specified — skip for DyHPO resume (fresh cycle per increment)
+        is_dyhpo_resume = self.cfg.training.get("is_dyhpo_run", False) and self.warm_start
+        if self.warm_start and self.scheduler is not None and not is_dyhpo_resume:
             model_path = os.path.join(
                 self.cfg.run_dir, "models", f"model_run{self.cfg.warm_start_idx}.pt"
             )
             try:
-                state_dict = torch.load(model_path, map_location="cpu")["scheduler"]
+                state_dict = _torch_load(model_path, map_location="cpu")["scheduler"]
                 LOGGER.info(f"Loading scheduler from {model_path}")
                 self.scheduler.load_state_dict(state_dict)
             except FileNotFoundError:
@@ -618,12 +721,13 @@ class BaseExperiment:
         self.train_lr, self.train_loss, self.val_loss = [], [], []
         self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
         self.val_loss_no_reg, self.val_mse = [], []
-        self.proc_val_losses = {}   # populated by AmplitudeExperiment._validate
+        self.proc_val_losses        = {}   # populated by AmplitudeExperiment._validate
+        self.proc_val_losses_no_reg = {}
         self.train_metrics = self._init_metrics()
         self.val_metrics   = self._init_metrics()
 
         smallest_val_loss, smallest_val_loss_step = 1e10, 0
-        smallest_val_loss_no_reg = 1e10   # tracked alongside for HPO result reporting
+        smallest_val_loss_no_reg = 1e10   # checkpoint selection uses this when available
         patience  = 0
         results   = []
         iterator  = iter(self._cycle(self.train_loader))
@@ -637,14 +741,36 @@ class BaseExperiment:
         mantissa     = self.cfg.training.iterations / (10 ** oom)
         iters_to_eval = set(math.floor(mantissa * 10 ** (i / 2)) for i in range(0, 2 * oom + 1))
 
+        # validate_frac: if > 0, sets validate_every_n_steps = frac * effective_steps,
+        # giving a fixed number of validation points regardless of total iterations.
+        # Uses increment_steps in DyHPO mode so each fidelity level also gets ~1/frac validations.
+        validate_frac = self.cfg.training.get("validate_frac", 0.0)
+        if validate_frac > 0:
+            inc = self.cfg.training.get("increment_steps", None)
+            effective_steps = inc if inc is not None else self.cfg.training.iterations
+            with open_dict(self.cfg):
+                self.cfg.training.validate_every_n_steps = max(1, int(validate_frac * effective_steps))
+
         LOGGER.info(
             f"Starting to train for {self.cfg.training.iterations} iterations "
             f"= {self.cfg.training.iterations / len(self.train_loader):.1f} epochs "
             f"on a dataset with {len(self.train_loader)} batches | "
             f"early stopping patience {self.cfg.training.es_patience} | "
             f"validating every {self.cfg.training.validate_every_n_steps} steps"
+            + (f" (validate_frac={validate_frac})" if validate_frac > 0 else "")
         )
         self.training_start_time = time.time()
+
+        # --- optional per-iter profiling: split dataloading vs compute ---
+        # LLOCA_PROFILE_STEP=1 attributes each iteration to next(iterator)
+        # (collate + H2D — serial with the GPU when num_workers=0) vs _step
+        # (forward/backward/opt). CUDA syncs bracket each segment so the split is
+        # accurate; this perturbs absolute throughput, so use it only as a
+        # diagnostic run, not for the headline avg-iter number.
+        profile_step = os.environ.get("LLOCA_PROFILE_STEP", "0") == "1"
+        prof_data_sum = prof_step_sum = 0.0
+        prof_n = 0
+        _on_cuda = self.device == torch.device("cuda")
 
         # --- evaluate at initialisation (step 0, before any gradient update) ---
         if self.is_main_process() and self.cfg.training.save_intermediate:
@@ -659,8 +785,26 @@ class BaseExperiment:
             self.model.train()
             if self.cfg.training.optimizer == "ScheduleFree":
                 self.optimizer.train()
-            data = next(iterator)
-            self._step(data, step)
+            if profile_step:
+                if _on_cuda:
+                    torch.cuda.synchronize()
+                _t0 = time.time()
+                data = next(iterator)
+                if _on_cuda:
+                    torch.cuda.synchronize()
+                _t1 = time.time()
+                self._step(data, step)
+                if _on_cuda:
+                    torch.cuda.synchronize()
+                _t2 = time.time()
+                # skip the first few steps (lazy init, cudnn autotune, worker warmup)
+                if step >= 5:
+                    prof_data_sum += _t1 - _t0
+                    prof_step_sum += _t2 - _t1
+                    prof_n += 1
+            else:
+                data = next(iterator)
+                self._step(data, step)
 
             # --- batch-size finder ---
             if self.cfg.find_BS:
@@ -691,13 +835,16 @@ class BaseExperiment:
 
             if is_val_step or is_last_step:
                 val_loss = self._validate(step)
-                improved = val_loss < smallest_val_loss
+                # Select checkpoint on no-reg loss when available; fall back to
+                # regularized loss only if no-reg was never computed.
+                val_loss_no_reg_now = self.val_loss_no_reg[-1] if self.val_loss_no_reg else None
+                selection_loss = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
+                improved = selection_loss < smallest_val_loss
 
                 if improved:
-                    smallest_val_loss      = val_loss
-                    smallest_val_loss_step = step
-                    if self.val_loss_no_reg:
-                        smallest_val_loss_no_reg = self.val_loss_no_reg[-1]
+                    smallest_val_loss        = selection_loss
+                    smallest_val_loss_step   = step
+                    smallest_val_loss_no_reg = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
                     patience = 0
                     if self.cfg.training.es_load_best_model:
                         self._save_model(step, f"model_run{self.cfg.run_idx}_best.pt")
@@ -708,7 +855,7 @@ class BaseExperiment:
                         break
 
                 if self.cfg.training.scheduler == "ReduceLROnPlateau":
-                    self.scheduler.step(val_loss)
+                    self.scheduler.step(selection_loss)
 
                 # --- _evals immediately after validation, always on val steps ---
                 # This ensures _evals always reflects the current best model
@@ -725,13 +872,38 @@ class BaseExperiment:
             log_steps = {0, 999} | set(round(x) for x in np.linspace(0, self.cfg.training.iterations - 1, num=10))
             if step in log_steps:
                 dt_est = dt * self.cfg.training.iterations / (step + 1)
+                vram_str = ""
+                if self.device == torch.device("cuda"):
+                    alloc_mb = torch.cuda.memory_allocated() / 1024**2
+                    peak_mb  = torch.cuda.max_memory_allocated() / 1024**2
+                    vram_str = f" | VRAM alloc: {alloc_mb:.0f} MB, peak: {peak_mb:.0f} MB"
+                prof_str = ""
+                if profile_step and prof_n > 0:
+                    d_ms = prof_data_sum / prof_n * 1000
+                    s_ms = prof_step_sum / prof_n * 1000
+                    tot  = d_ms + s_ms
+                    prof_str = (
+                        f" | PROFILE n={prof_n}: data {d_ms:.1f}ms ({100*d_ms/tot:.0f}%), "
+                        f"step {s_ms:.1f}ms ({100*s_ms/tot:.0f}%)"
+                    )
                 LOGGER.info(
                     f"Finished iteration {step + 1} after {dt:.2f}s | "
                     f"estimate: {dt_est/60:.2f}min = {dt_est/3600:.2f}h"
+                    + vram_str + prof_str
                 )
 
         # --- end of training ---
         dt = time.time() - self.training_start_time
+        if profile_step and prof_n > 0:
+            d_ms = prof_data_sum / prof_n * 1000
+            s_ms = prof_step_sum / prof_n * 1000
+            tot  = d_ms + s_ms
+            LOGGER.info(
+                f"PROFILE summary over {prof_n} iters: "
+                f"dataloading {d_ms:.1f}ms/iter ({100*d_ms/tot:.0f}%), "
+                f"compute(_step) {s_ms:.1f}ms/iter ({100*s_ms/tot:.0f}%), "
+                f"total {tot:.1f}ms/iter"
+            )
         LOGGER.info(
             f"Finished training: {step + 1} iterations = {(step + 1) / len(self.train_loader):.1f} epochs "
             f"in {dt/60:.2f}min (avg {avg_iter_time:.4f}s/iter)"
@@ -754,8 +926,14 @@ class BaseExperiment:
             import json
             os.makedirs(os.path.dirname(result_path), exist_ok=True)
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
+            result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0}
+            result.update(self._result_extra())
             with open(result_path, "w") as _f:
-                json.dump({"val_loss": float(best_loss)}, _f)
+                json.dump(result, _f)
+
+    def _result_extra(self) -> dict:
+        """Subclasses can override to add extra fields to the result JSON."""
+        return {}
 
         if self.cfg.find_BS:
             self._plot_bs_finding(S_estimates, G2_estimates, B_simples, ema_S, ema_G2)
@@ -872,17 +1050,45 @@ class BaseExperiment:
         return self.cfg.model.net._target_ in (
             "models.mup_mlp.MuMLP",
             "models.lloca.LLOCAMuPTransformer",
+            "models.lgatr_slim_mup.MuPLGATrSlim",
+            "models.lgatr_mup.MuPLGATr",
         )
+
+    def _load_pretrained_weights(self, pretrained_path: str, reset_output_head: bool = False):
+        """Load model weights from an external pretrained checkpoint.
+
+        Unlike warm-start (which resumes the same run), this loads only model
+        weights — optimizer and scheduler state are always started fresh.
+        """
+        try:
+            state_dict = _torch_load(pretrained_path, map_location=self.device, weights_only=False)["model"]
+            LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
+            self.model.load_state_dict(state_dict)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
+
+        if reset_output_head:
+            head = self.model.net.net.linear_out
+            nn.init.zeros_(head.weight)
+            if head.bias is not None:
+                nn.init.zeros_(head.bias)
+            LOGGER.info("Fine-tuning: reset output head (linear_out) to zeros.")
+
+        # No μP bookkeeping needed: base shapes were set when the backbone was
+        # constructed and load_state_dict preserves the per-parameter infshapes.
+
+    def _init_ewc(self):
+        self.ewc = None
 
     def _load_model_weights(self, model_path):
         try:
-            state_dict = torch.load(model_path, map_location=self.device, weights_only=False)["model"]
+            state_dict = _torch_load(model_path, map_location=self.device, weights_only=False)["model"]
             LOGGER.info(f"Loading model from {model_path}")
             self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             LOGGER.warning(f"Cannot load model from {model_path}")
-        if self._is_mup_model():
-            set_base_shapes(self.model, self.bsh_path, rescale_params=False)
+        # base shapes are intrinsic to the constructed backbone; load_state_dict
+        # preserves infshapes, so no set_base_shapes call is needed here.
 
     def _load_previous_model(self, step):
         self._load_model_weights(os.path.join(
@@ -902,6 +1108,9 @@ class BaseExperiment:
     def _step(self, data, step):
         # actual update step
         loss, loss_no_reg, mse_val = self._batch_loss(data)
+        if self.ewc is not None:
+            ewc_lambda = self.cfg.fine_tune.ewc.get("lambda", 1000.0)
+            loss = loss + (ewc_lambda / 2.0) * self.ewc.penalty(self.model)
         self.optimizer.zero_grad()
         loss.backward()
         if self.cfg.training.clip_grad_value is not None:
@@ -911,15 +1120,43 @@ class BaseExperiment:
                 self.cfg.training.clip_grad_value,
             )
         # rescale gradients such that their norm matches a given number
-        grad_norm = (
-            torch.nn.utils.clip_grad_norm_(
-                self.model.parameters(),
-                self.cfg.training.clip_grad_norm,
-                error_if_nonfinite=False,
-            )
-            .cpu()
-            .item()
+        grad_norm_t = torch.nn.utils.clip_grad_norm_(
+            self.model.parameters(),
+            self.cfg.training.clip_grad_norm,
+            error_if_nonfinite=False,
         )
+
+        # --- materialise the per-step scalars (the one unavoidable D2H sync) ---
+        # train_grad_norm is always logged, so grad_norm must be read every step;
+        # we fold loss (and the no-reg loss, if plotted) into the SAME .tolist() so
+        # the whole step costs one sync instead of 3-4. The old per-step syncs we
+        # removed: loss.item() before backward (in _batch_loss), the isfinite
+        # assert, clip_grad_norm_().cpu().item(), and a duplicate loss.item().
+        # LLOCA_SYNC=blocking reproduces the original separate syncs for A/B timing.
+        sync_blocking = os.environ.get("LLOCA_SYNC", "deferred") == "blocking"
+        want_lnr = self.cfg.plotting.get("plot_without_regularization", False)
+
+        if sync_blocking:
+            grad_norm = grad_norm_t.cpu().item()
+            loss_val  = None   # original read loss.item() after optimizer.step()
+            lnr_val   = loss_no_reg.item() if want_lnr else None
+        else:
+            # .float() so the stack is dtype-uniform (loss may be fp16/bf16 while the
+            # grad norm is fp32); all are 0-dim so the cast is free.
+            scalars = [loss.detach().float(), grad_norm_t.float()]
+            if want_lnr:
+                scalars.append(loss_no_reg.float())
+            vals     = torch.stack(scalars).tolist()      # single fused GPU→CPU sync
+            loss_val = vals[0]
+            grad_norm = vals[1]
+            lnr_val  = vals[2] if want_lnr else None
+            # NaN/inf guard: replaces the per-step isfinite assert (which synced).
+            # A non-finite loss yields a non-finite grad_norm; skip the update so a
+            # transient blow-up doesn't corrupt the weights (better than crashing).
+            if not math.isfinite(grad_norm):
+                LOGGER.warning(f"Skipping update, non-finite gradient norm {grad_norm}")
+                return
+
         if step > MIN_STEP_SKIP and self.cfg.training.max_grad_norm is not None:
             if grad_norm > self.cfg.training.max_grad_norm:
                 LOGGER.warning(
@@ -935,11 +1172,13 @@ class BaseExperiment:
             self.scheduler.step()
 
         # collect metrics
-        self.train_loss.append(loss.item())
+        if loss_val is None:
+            loss_val = loss.item()   # blocking path: read post-step (matches original)
+        self.train_loss.append(loss_val)
         self.train_lr.append(self.optimizer.param_groups[0]["lr"])
         self.train_grad_norm.append(grad_norm)
-        if self.cfg.plotting.get("plot_without_regularization", False):
-            self.train_loss_no_reg.append(loss_no_reg)
+        if want_lnr:
+            self.train_loss_no_reg.append(lnr_val)
         if mse_val is not None and self.cfg.plotting.get("plot_mse_het", False):
             self.train_mse.append(mse_val)
 
@@ -950,7 +1189,7 @@ class BaseExperiment:
             and step % self.cfg.training.log_every_n_steps == 0
         ):
             log_dict = {
-                "loss": loss.item(),
+                "loss": loss_val,
                 "lr": self.train_lr[-1],
                 "time_per_step": (time.time() - self.training_start_time) / (step + 1),
                 "grad_norm": grad_norm,
@@ -976,7 +1215,7 @@ class BaseExperiment:
                     loss, loss_no_reg, mse_val = self._batch_loss(data)
                 losses.append(loss.cpu().item())
                 if loss_no_reg is not None:
-                    losses_no_reg.append(loss_no_reg)
+                    losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                 if mse_val is not None:
                     mse_vals.append(mse_val)
 
@@ -1021,9 +1260,14 @@ class BaseExperiment:
             filename = f"model_run{self.cfg.run_idx}.pt"
         model_path = os.path.join(self.cfg.run_dir, "models", filename)
         LOGGER.debug(f"Saving model at {model_path}")
+        if self.ema is not None:
+            with self.ema.average_parameters():
+                model_state = self.model.state_dict()
+        else:
+            model_state = self.model.state_dict()
         torch.save(
             {
-                "model": self.model.state_dict(),
+                "model": model_state,
                 "optimizer": self.optimizer.state_dict(),
                 "scheduler": self.scheduler.state_dict()
                 if self.scheduler is not None

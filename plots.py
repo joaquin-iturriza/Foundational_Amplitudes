@@ -1,9 +1,25 @@
+import re
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 from scipy.stats import norm
 
 from base_plots import plot_loss, plot_mse
+
+
+def short_ds_name(name: str) -> str:
+    """Compact a dataset name for titles/legends.
+
+    'ee_wwz_255-1000GeV_amplitudes' -> 'ee_wwz_255'.  Strips the trailing
+    '_amplitudes' and drops the common upper energy bound '-<N>GeV'; keeps the
+    'ee_' process prefix.
+    """
+    s = str(name)
+    if s.endswith("_amplitudes"):
+        s = s[: -len("_amplitudes")]
+    s = re.sub(r"-\d+GeV", "", s)
+    return s
 
 #plt.rcParams["font.family"] = "serif"
 #plt.rcParams["font.serif"] = "Charter"
@@ -17,6 +33,71 @@ FONTSIZE_LEGEND = 13
 FONTSIZE_TICK = 12
 
 colors = ["black", "#0343DE", "#A52A2A", "darkorange"]
+
+
+def plot_loss_vs_compute(
+    file,
+    losses,
+    computes,
+    labels,
+    title=None,
+    losses_no_reg=None,
+    computes_no_reg=None,
+    labels_no_reg=None,
+    val_step=1,
+):
+    """Per-dataset loss on log-log axes, stacked: top vs global iteration,
+    bottom vs that dataset's own cumulative compute (samples seen from it).
+
+    losses[i] and computes[i] are aligned arrays for dataset i (same length,
+    one entry per validation step).  The two panels make explicit the gap
+    between loss-vs-global-step (what the EMA plot shows) and
+    loss-vs-per-process-compute (what the balanced sampler fits α on).
+    """
+    fig, (ax_it, ax_c) = plt.subplots(2, 1, figsize=(7, 9))
+
+    def _draw(ax, xs, ys, label, ci, dashed=False):
+        x = np.asarray(xs, dtype=float)
+        y = np.asarray(ys, dtype=float)
+        m = (x > 0) & (y > 0)
+        ax.plot(
+            x[m], y[m], label=label, color=f"C{ci}",
+            linestyle="--" if dashed else "-", alpha=0.7 if dashed else 1.0,
+        )
+
+    for i, (loss, label) in enumerate(zip(losses, labels)):
+        it = np.arange(1, len(loss) + 1) * val_step
+        _draw(ax_it, it, loss, label, i)
+        _draw(ax_c, computes[i], loss, label, i)
+
+    if losses_no_reg is not None:
+        for i, (loss, label) in enumerate(zip(losses_no_reg, labels_no_reg)):
+            it = np.arange(1, len(loss) + 1) * val_step
+            _draw(ax_it, it, loss, label, i, dashed=True)
+            _draw(ax_c, computes_no_reg[i], loss, label, i, dashed=True)
+
+    for ax in (ax_it, ax_c):
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_ylabel("Loss", fontsize=FONTSIZE)
+        ax.grid(True, which="both", linewidth=0.4, alpha=0.4)
+    ax_it.set_xlabel("Iteration (global)", fontsize=FONTSIZE)
+    ax_it.set_title("vs global iteration", fontsize=FONTSIZE)
+    ax_c.set_xlabel("Samples seen from this dataset (compute)", fontsize=FONTSIZE)
+    ax_c.set_title("vs per-dataset compute", fontsize=FONTSIZE)
+
+    handles, leg_labels = ax_it.get_legend_handles_labels()
+    if handles:
+        fig.legend(
+            handles, leg_labels,
+            loc="upper center", bbox_to_anchor=(0.5, -0.01),
+            ncol=min(len(leg_labels), 4), frameon=False, fontsize=FONTSIZE_LEGEND,
+        )
+    if title:
+        fig.suptitle(title, fontsize=FONTSIZE + 1, y=1.02)
+    fig.tight_layout()
+    fig.savefig(file, format="pdf", bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_mixer(cfg, plot_path, title, plot_dict):
@@ -51,23 +132,118 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             labels_no_reg=labels_no_reg,
         )
  
+        val_step = plot_dict.get("validate_every_n_steps", 1)
+
         # ── optional: per-process val loss curves ────────────────────────────
         proc_val_losses = plot_dict.get("proc_val_losses", {})
         if proc_val_losses:
             proc_losses_list  = list(proc_val_losses.values())
-            proc_labels_list  = [f"val {name}" for name in proc_val_losses]
+            proc_labels_list  = [short_ds_name(name) for name in proc_val_losses]
             # combined val loss for reference
             combined_val = plot_dict["val_loss"]
-            val_step = plot_dict.get("validate_every_n_steps", 1)
             plot_loss(
                 file=f"{plot_path}/loss_per_process.pdf",
                 losses=[combined_val] + proc_losses_list,
                 lr=None,
-                labels=["val loss (combined)"] + proc_labels_list,
+                labels=["combined"] + proc_labels_list,
                 logy=logy,
                 title=loss_title,
                 x_scale=val_step,
+                legend_outside=True,
             )
+
+        # ── optional: per-process val loss WITHOUT regularization ─────────────
+        proc_val_losses_no_reg = plot_dict.get("proc_val_losses_no_reg", {})
+        if proc_val_losses_no_reg:
+            proc_losses_nr_list = list(proc_val_losses_no_reg.values())
+            proc_labels_nr_list = [f"{short_ds_name(name)} (no reg)" for name in proc_val_losses_no_reg]
+            combined_val_no_reg = plot_dict.get("val_loss_no_reg", [])
+            base_losses = ([combined_val_no_reg] if combined_val_no_reg else []) + proc_losses_nr_list
+            base_labels = (["combined (no reg)"] if combined_val_no_reg else []) + proc_labels_nr_list
+            plot_loss(
+                file=f"{plot_path}/loss_per_process_no_reg.pdf",
+                losses=base_losses,
+                lr=None,
+                labels=base_labels,
+                logy=logy,
+                title=loss_title,
+                x_scale=val_step,
+                legend_outside=True,
+            )
+
+        # ── optional: per-process EMA loss the balanced sampler actually sees ──
+        # (with- and without-regularization EMAs, forced log scale).
+        proc_ema_losses = plot_dict.get("proc_ema_losses", {})
+        if proc_ema_losses:
+            ema_list   = list(proc_ema_losses.values())
+            ema_labels = [short_ds_name(name) for name in proc_ema_losses]
+
+            proc_ema_no_reg = plot_dict.get("proc_ema_losses_no_reg", {})
+            ema_nr_list   = list(proc_ema_no_reg.values()) if proc_ema_no_reg else None
+            ema_nr_labels = (
+                [f"{short_ds_name(name)} (no reg)" for name in proc_ema_no_reg]
+                if proc_ema_no_reg else None
+            )
+            plot_loss(
+                file=f"{plot_path}/loss_per_process_ema.pdf",
+                losses=ema_list,
+                lr=None,
+                labels=ema_labels,
+                logy=True,
+                title=loss_title,
+                x_scale=val_step,
+                losses_no_reg=ema_nr_list,
+                labels_no_reg=ema_nr_labels,
+                legend_outside=True,
+            )
+
+        # ── optional: per-process loss vs that dataset's own compute ──────────
+        # Stacked log-log (vs global iteration on top, vs per-dataset compute
+        # below) — the per-dataset compute is what the balanced sampler fits α on.
+        snapshots     = plot_dict.get("proc_compute_snapshots", [])
+        dataset_order = plot_dict.get("dataset_order", [])
+        if proc_val_losses and snapshots and dataset_order:
+            idx_of = {name: i for i, name in enumerate(dataset_order)}
+
+            def _compute_for(name):
+                return [s.get(idx_of[name], 0) for s in snapshots]
+
+            names       = [n for n in proc_val_losses if n in idx_of]
+            losses_list = [proc_val_losses[n] for n in names]
+            computes    = [_compute_for(n) for n in names]
+            vc_labels   = [short_ds_name(n) for n in names]
+
+            nr     = plot_dict.get("proc_val_losses_no_reg", {})
+            nr_names = [n for n in names if n in nr]
+            losses_nr   = [nr[n] for n in nr_names] if nr_names else None
+            computes_nr = [_compute_for(n) for n in nr_names] if nr_names else None
+            labels_nr   = (
+                [f"{short_ds_name(n)} (no reg)" for n in nr_names] if nr_names else None
+            )
+
+            plot_loss_vs_compute(
+                file=f"{plot_path}/loss_per_process_vs_compute.pdf",
+                losses=losses_list,
+                computes=computes,
+                labels=vc_labels,
+                title=loss_title,
+                losses_no_reg=losses_nr,
+                computes_no_reg=computes_nr,
+                labels_no_reg=labels_nr,
+                val_step=val_step,
+            )
+
+            # EMA variant — the exact series the sampler fits α on.
+            if proc_ema_losses:
+                ema_names    = [n for n in proc_ema_losses if n in idx_of]
+                plot_loss_vs_compute(
+                    file=f"{plot_path}/loss_per_process_ema_vs_compute.pdf",
+                    losses=[proc_ema_losses[n] for n in ema_names],
+                    computes=[_compute_for(n) for n in ema_names],
+                    labels=[short_ds_name(n) for n in ema_names],
+                    title=loss_title,
+                    val_step=val_step,
+                )
 
         # ── optional: MSE plot for HETEROSC ───────────────────────────────────
         if (

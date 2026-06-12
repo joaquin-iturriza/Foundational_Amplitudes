@@ -1,0 +1,23 @@
+_target_: wrappers.AmplitudeLGATrSlimMuPWrapper
+
+token_size: 0
+d_particle_hidden: 16   # fixed projection dim (n_features -> d_particle_hidden), as for lloca
+
+net:
+  _target_: models.lgatr_slim_mup.MuPLGATrSlim
+
+  in_v_channels: 1        # the 4-momentum is a single Lorentz vector
+  out_v_channels: 0
+  hidden_v_channels: 8    # μP width axis (vector)
+  in_s_channels: null     # set by experiment.init_data = n_scalars (particle encoding + order)
+  out_s_channels: 1       # scalar amplitude
+  hidden_s_channels: 16   # μP width axis (scalar)
+
+  num_blocks: 8
+  num_heads: 8
+  mlp_ratio: 2
+  attn_ratio: 2
+  num_layers_mlp: 2
+  checkpoint_blocks: false
+
+  parametrization: mup    # base/delta = (4,8)/(8,16) by default; see models/lgatr_slim_mup.py

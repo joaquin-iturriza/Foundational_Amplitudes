@@ -1,0 +1,9 @@
+# @package _global_
+# Default for lxplus (and any Linux machine)
+
+training:
+  # num_workers=2 overlaps the collate (8192 per-sample __getitem__ + cat) and the
+  # pinned H2D copy with GPU compute. Benchmarked at BS=8192/nh=4/8 blocks on V100:
+  # nw=0 0.356 s/iter -> nw=2 0.128 s/iter (2.78x); nw=4 no better, nw=6 oversubscribes.
+  # This drops to the ~0.119 s/iter compute floor (profiling: data was 69% of the step).
+  num_workers: 2

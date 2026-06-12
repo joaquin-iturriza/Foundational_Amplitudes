@@ -2,7 +2,7 @@ exp_type: amplitudes
 exp_name: amp
 
 data:
- dataset : ["ee_uu_91GeV_amplitudes","ee_aa_13000GeV_amplitudes","ee_aaa_13000GeV_amplitudes"]
+ dataset : ["ee_wwz_255-1000GeV_amplitudes","ee_WW_162-1000GeV_amplitudes","ee_ttbar_346-1000GeV_amplitudes","ee_uug_91-1000GeV_amplitudes","ee_uugg_91-1000GeV_amplitudes","ee_aa_10-1000GeV_amplitudes","ee_aaa_10-1000GeV_amplitudes","ee_uu_91-1000GeV_amplitudes"]
  data_path : data/
  subsample : null
  include_permsym: true
@@ -13,6 +13,19 @@ data:
   - log
   - standardization
  incl_fvs: false
+ use_PIDs: false  # false: 8D physical property vector; true: one-hot PDG token index (legacy)
+ # Coupling-order vector per dataset: [n_loops, alpha_s_power]
+ # Examples: LO=[0,0]  NLO_full=[1,1]  virt_only=[1,0]  NNLO=[2,2]
+ # Add entries here when mixing perturbative orders; no model changes needed.
+ amp_orders:
+  - [0, 0]   # ee_wwz_255-1000GeV_amplitudes  — LO
+  - [0, 0]   # ee_WW_162-1000GeV_amplitudes   — LO
+  - [0, 0]   # ee_ttbar_346-1000GeV_amplitudes — LO
+  - [0, 0]   # ee_uug_91-1000GeV_amplitudes   — LO
+  - [0, 0]   # ee_uugg_91-1000GeV_amplitudes  — LO
+  - [0, 0]   # ee_aa_10-1000GeV_amplitudes    — LO
+  - [0, 0]   # ee_aaa_10-1000GeV_amplitudes   — LO
+  - [0, 0]   # ee_uu_91-1000GeV_amplitudes    — LO (fine-tune on NLO later)
 
 train: true
 training:
