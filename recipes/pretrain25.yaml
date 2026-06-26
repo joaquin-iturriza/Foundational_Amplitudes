@@ -1,0 +1,38 @@
+# 25-process tree-level LO foundation pretraining set, 500k train points each
+# (+50k val / +50k test, frozen) — sized so a ~1h trial trains on the whole pool
+# (12.5M total ≈ 1.2 epochs at t_steps=15000), not 50x more than it can consume.
+# Spans QED photon multiplicity, leptons
+# (massless/massive), down-type & heavy-b quarks, QCD radiation ladders, and
+# EW di/tri-boson + Higgs (incl. unequal-mass 2->2). Excludes ee_uu / ee_ttbar
+# (NLO fine-tune targets) and ee_ccbar (massless c == up-type, == excluded uu).
+# sqrts_min is set above each process's production threshold.
+processes:
+  # QED photons
+  - {name: ee_aa,        sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_aaa,       sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_aaaa,      sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  # leptons
+  - {name: ee_mumu,      sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_tautau,    sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_mumua,     sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_tautaua,   sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_mumumumu,  sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_bhabha,    sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_nnbar,     sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  # quarks + QCD radiation
+  - {name: ee_ddbar,     sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_bbbar,     sqrts: [20,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_uug,       sqrts: [91,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_uugg,      sqrts: [91,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_uuggg,     sqrts: [91,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ddbarg,    sqrts: [10,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_bbbarg,    sqrts: [20,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  # electroweak di/tri-boson + Higgs
+  - {name: ee_WW,        sqrts: [162, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZ,        sqrts: [185, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_Za,        sqrts: [95,  1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZH,        sqrts: [220, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_WWa,       sqrts: [165, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_wwz,       sqrts: [255, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZa,       sqrts: [185, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZZ,       sqrts: [280, 1000], n_train: 500_000, n_val: 50_000, n_test: 50_000}
