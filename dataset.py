@@ -32,12 +32,18 @@ class AmplitudeDataset(Dataset):
         dtype          : torch dtype
         process_ids    : np.ndarray  (N_events,) int  — process index per event, or None
         """
-        self.particles_flat = torch.tensor(particles_flat, dtype=dtype)
+        # as_tensor (not tensor) so a numpy array already in the target dtype is
+        # shared zero-copy rather than duplicated. The big flat arrays
+        # (particles_flat / tokens_flat) are passed identically to every loader
+        # (train + evals + one per process), so copying them here multiplies host
+        # RAM by the loader count — fatal at multi-million-event scale. Keeping
+        # the source arrays float32 / int64 lets all loaders view one buffer.
+        self.particles_flat = torch.as_tensor(particles_flat, dtype=dtype)
         self.offsets        = offsets                                      # keep as numpy for slicing
-        self.amplitudes     = torch.tensor(amplitudes,     dtype=dtype)
-        self.tokens_flat    = torch.tensor(tokens_flat,    dtype=torch.long)
-        self.order_labels   = torch.tensor(order_labels,   dtype=dtype)
-        self.process_ids    = torch.tensor(process_ids, dtype=torch.long) if process_ids is not None else None
+        self.amplitudes     = torch.as_tensor(amplitudes,     dtype=dtype)
+        self.tokens_flat    = torch.as_tensor(tokens_flat,    dtype=torch.long)
+        self.order_labels   = torch.as_tensor(order_labels,   dtype=dtype)
+        self.process_ids    = torch.as_tensor(process_ids, dtype=torch.long) if process_ids is not None else None
 
     def __len__(self):
         return len(self.amplitudes)

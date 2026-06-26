@@ -227,7 +227,12 @@ class BaseExperiment:
 
     def init_model(self):
         # === instantiate model ===
-        self.cfg.model.net.loss = self.cfg.training.loss
+        # `loss` is a (largely vestigial) net field that only some backbones declare;
+        # propagate the training loss into it only when the net config has the key.
+        # The lloca transformer declares it (and its ctor accepts it); the lgatr
+        # backbones don't, and their constructors don't take a `loss` kwarg.
+        if "loss" in self.cfg.model.net:
+            self.cfg.model.net.loss = self.cfg.training.loss
         self.model = instantiate(self.cfg.model)
         self._post_instantiate_model(self.model)
 

@@ -104,6 +104,132 @@ def _run(cmd, dry_run=False, capture=True):
     return (res.stdout or "").strip()
 
 
+def write_prebuild_script(sweep_dir, cfg):
+    """Write `<sweep_dir>/prebuild.sh` for a recipe-based sweep config dict.
+    Returns (script, spec, seed) or None if the sweep isn't recipe-based. This is
+    the single source of truth for the prebuild job, shared by generate_sweep
+    (emit at generation) and ensure_prebuild_script (emit at submission)."""
+    fp = cfg.get("fixed_params", {})
+    if str(fp.get("data.source", "files")) != "recipes":
+        return None
+    spec = fp.get("data.processes_file")
+    if not spec:
+        return None
+    seed    = int(fp.get("data.seed", 42))
+    proj    = cfg["paths"]["project_dir"]
+    account = cfg["cluster"].get("account", "itg@v100")
+    setup   = "\n".join(cfg["paths"].get("setup_commands", []))
+    name    = cfg.get("sweep_name", os.path.basename(sweep_dir.rstrip("/")))
+    script  = os.path.join(sweep_dir, "prebuild.sh")
+    with open(script, "w") as f:
+        f.write(f"""#!/bin/bash
+# SPEC: {spec}
+# SEED: {seed}
+# Auto-emitted CPU prebuild for this recipe sweep — materializes datasets on the
+# prepost partition (CPU billed at weight 0; no GPU hours). Self-skips cached.
+#SBATCH --job-name=prebuild_{name}
+#SBATCH --partition=prepost
+#SBATCH --account={account}
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --time=04:00:00
+#SBATCH --hint=nomultithread
+#SBATCH --output={sweep_dir}/prebuild_%j.out
+#SBATCH --error={sweep_dir}/prebuild_%j.err
+set -euo pipefail
+{setup}
+cd {proj}
+python prebuild_recipes.py {spec} --seed {seed} --workers "${{SLURM_CPUS_PER_TASK:-16}}"
+""")
+    os.chmod(script, 0o755)
+    return script, spec, seed
+
+
+def ensure_prebuild_script(sweep_dir):
+    """Return the sweep's prebuild.sh, emitting it from sweep_config.yaml if a
+    recipe-based sweep doesn't have one yet (covers every generator at submit
+    time, regardless of how the cell was created). Returns path or None."""
+    script = os.path.join(sweep_dir, "prebuild.sh")
+    if os.path.exists(script):
+        return script
+    cfg_path = os.path.join(sweep_dir, "sweep_config.yaml")
+    if not os.path.exists(cfg_path):
+        return None
+    import yaml
+    with open(cfg_path) as f:
+        cfg = yaml.safe_load(f)
+    res = write_prebuild_script(sweep_dir, cfg)
+    return res[0] if res else None
+
+
+def _prebuild_info(sweep_dir):
+    """Return (script, spec, seed) for a sweep's auto-emitted prebuild, or None."""
+    script = ensure_prebuild_script(sweep_dir)
+    if not script or not os.path.exists(script):
+        return None
+    spec, seed = None, 42
+    with open(script) as f:
+        for line in f:
+            if line.startswith("# SPEC:"):
+                spec = line.split(":", 1)[1].strip()
+            elif line.startswith("# SEED:"):
+                seed = int(line.split(":", 1)[1].strip())
+            elif not line.startswith("#") and line.strip() and "SBATCH" not in line:
+                break
+    return (script, spec, seed) if spec else None
+
+
+def _spec_fully_cached(spec, seed):
+    """True if every (process, role) dataset for `spec` is already cached."""
+    proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if proj not in sys.path:
+        sys.path.insert(0, proj)
+    import yaml
+    import datagen
+    import mg5_pipeline_final as mg
+    with open(spec) as f:
+        doc = yaml.safe_load(f)
+    procs = doc["processes"] if isinstance(doc, dict) else doc
+    ck = {"train": "n_train", "val": "n_val", "test": "n_test"}
+    for role in ("train", "val", "test"):
+        dest = datagen.dest_for_role(role)
+        for p in procs:
+            rec = mg.variable_energy_recipe(
+                p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
+                int(p[ck[role]]), role=role, seed=seed)
+            if not datagen._is_cached(mg.recipe_output_path(rec, dest), mg.recipe_id(rec)):
+                return False
+    return True
+
+
+def submit_prebuilds(sweep_dirs, dry_run=False):
+    """Submit the auto-emitted prebuild for each sweep whose recipe data isn't
+    fully cached, deduped by spec. Returns {sweep_name: prebuild_jobid} so the
+    trials can depend on their data being ready."""
+    spec_job = {}          # spec -> jobid (dedup across sweeps sharing a spec)
+    sweep_dep = {}         # sweep_name -> jobid or None
+    for d in sweep_dirs:
+        d = os.path.abspath(d)
+        name = sweep_name_from_dir(d)
+        info = _prebuild_info(d)
+        if not info:
+            sweep_dep[name] = None
+            continue
+        script, spec, seed = info
+        if _spec_fully_cached(spec, seed):
+            print(f"  {name}: datasets already cached — no prebuild needed")
+            sweep_dep[name] = None
+            continue
+        if spec not in spec_job:
+            out = _run(["sbatch", "--parsable", script], dry_run=dry_run)
+            jid = out.split(";")[0].strip() if out else f"DRYPB{len(spec_job)}"
+            spec_job[spec] = jid
+            print(f"  prebuild submitted for {os.path.basename(spec)}  job={jid}")
+        sweep_dep[name] = spec_job[spec]
+    return sweep_dep
+
+
 def squeue_states():
     """Return {job_id(str): state(str)} for the current user's jobs.
 
@@ -198,6 +324,11 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         print("Nothing to submit.")
         return
 
+    # 1b. Auto-emitted prebuilds: materialize any missing recipe datasets on
+    #     prepost first, and make each sweep's trials depend on it (afterok), so
+    #     GPUs are never allocated to wait for data generation.
+    sweep_dep = submit_prebuilds(list(sweep_dirs), dry_run=dry_run)
+
     weights = {s: reg["sweeps"][s]["weight"] for s in new_items}
     ordered = assign_rounds(new_items, weights)
     print(f"Submitting {len(ordered)} trials across {len(new_items)} sweep(s), "
@@ -206,8 +337,12 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     # 2. sbatch in round order, with provisional nice = round * gap.
     for rnd, sweep, (idx, script) in ordered:
         nice = rnd * gap
-        out = _run(["sbatch", "--parsable", f"--nice={nice}", script],
-                   dry_run=dry_run)
+        cmd = ["sbatch", "--parsable", f"--nice={nice}"]
+        dep = sweep_dep.get(sweep)
+        if dep:
+            cmd.append(f"--dependency=afterok:{dep}")
+        cmd.append(script)
+        out = _run(cmd, dry_run=dry_run)
         jid = out.split(";")[0].strip() if out else f"DRY{idx}"
         reg["sweeps"][sweep]["jobs"][jid] = {
             "trial_idx": idx, "script": script, "round": rnd, "nice": nice,

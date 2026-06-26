@@ -20,21 +20,32 @@ def resolve_amp_trafos(trafos, amplitude):
     return ["signedlog" if t == "log" else t for t in trafos]
 
 
-def preprocess_amplitude(amplitude, trafos=None):
-    mean, std = 0, 0
+def preprocess_amplitude(amplitude, trafos=None, mean=None, std=None):
+    """Forward amplitude preprocessing.
+
+    If `mean`/`std` are given, the standardization step uses them instead of
+    computing fresh statistics. This lets val/test be transformed with the
+    *frozen, train-only* statistics (recipe data path) rather than leaking their
+    own distribution into the normalization.
+    """
+    out_mean, out_std = 0, 0
     if trafos:
         for fn_str in trafos:
             if (
                 fn_str == "standardization"
             ):  # treat "standardize" separately because we need to save stds and means
-                amplitude, mean, std = standardization(
-                    amplitude, return_mean_std=True, clip=False
-                )
+                if mean is not None and std is not None:
+                    amplitude = (amplitude - mean) / std
+                    out_mean, out_std = mean, std
+                else:
+                    amplitude, out_mean, out_std = standardization(
+                        amplitude, return_mean_std=True, clip=False
+                    )
             else:
                 fn = get_fn(fn_str)
                 amplitude = fn(amplitude, None)
     assert np.isfinite(amplitude).all()
-    return amplitude, mean, std
+    return amplitude, out_mean, out_std
 
 
 def undo_preprocess_amplitude(amplitude, mean, std, trafos=None):

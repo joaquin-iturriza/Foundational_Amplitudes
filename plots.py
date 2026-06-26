@@ -45,6 +45,7 @@ def plot_loss_vs_compute(
     computes_no_reg=None,
     labels_no_reg=None,
     val_step=1,
+    solo_ref=None,
 ):
     """Per-dataset loss on log-log axes, stacked: top vs global iteration,
     bottom vs that dataset's own cumulative compute (samples seen from it).
@@ -53,6 +54,11 @@ def plot_loss_vs_compute(
     one entry per validation step).  The two panels make explicit the gap
     between loss-vs-global-step (what the EMA plot shows) and
     loss-vs-per-process-compute (what the balanced sampler fits α on).
+
+    solo_ref[i] = (a, b) of the dataset's solo scaling fit, L_solo(c)=exp(a+b·log c);
+    when given, the solo curve is overlaid (dotted) on the vs-compute panel over the
+    dataset's compute range, so you can read directly how far each process sits above
+    its solo scaling (and whether its slope matches the solo exponent −b).
     """
     fig, (ax_it, ax_c) = plt.subplots(2, 1, figsize=(7, 9))
 
@@ -69,6 +75,15 @@ def plot_loss_vs_compute(
         it = np.arange(1, len(loss) + 1) * val_step
         _draw(ax_it, it, loss, label, i)
         _draw(ax_c, computes[i], loss, label, i)
+        # overlay the solo scaling line on the compute panel
+        if solo_ref is not None and i < len(solo_ref) and solo_ref[i] is not None:
+            a, b = solo_ref[i]
+            c = np.asarray(computes[i], dtype=float)
+            c = c[c > 0]
+            if len(c):
+                cg = np.geomspace(c.min(), c.max(), 50)
+                ax_c.plot(cg, np.exp(a + b * np.log(cg)), color=f"C{i}",
+                          linestyle=":", linewidth=1.4, alpha=0.9)
 
     if losses_no_reg is not None:
         for i, (loss, label) in enumerate(zip(losses_no_reg, labels_no_reg)):
@@ -208,10 +223,14 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             def _compute_for(name):
                 return [s.get(idx_of[name], 0) for s in snapshots]
 
+            # solo scaling reference (dotted overlay): {dataset: [a, b]}
+            solo = plot_dict.get("solo_scaling", {}) or {}
+
             names       = [n for n in proc_val_losses if n in idx_of]
             losses_list = [proc_val_losses[n] for n in names]
             computes    = [_compute_for(n) for n in names]
             vc_labels   = [short_ds_name(n) for n in names]
+            solo_ref    = [solo.get(n) for n in names]
 
             nr     = plot_dict.get("proc_val_losses_no_reg", {})
             nr_names = [n for n in names if n in nr]
@@ -231,6 +250,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 computes_no_reg=computes_nr,
                 labels_no_reg=labels_nr,
                 val_step=val_step,
+                solo_ref=solo_ref,
             )
 
             # EMA variant — the exact series the sampler fits α on.
@@ -243,6 +263,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     labels=[short_ds_name(n) for n in ema_names],
                     title=loss_title,
                     val_step=val_step,
+                    solo_ref=[solo.get(n) for n in ema_names],
                 )
 
         # ── optional: MSE plot for HETEROSC ───────────────────────────────────

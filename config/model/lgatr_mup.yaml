@@ -14,7 +14,8 @@ net:
   hidden_s_channels: 16   # μP width axis (scalar)
 
   num_blocks: 8
-  num_heads: 8
+  num_heads: 2       # fixed structure (μP width axis is hidden_mv/s_channels); matches
+                     # the validated lloca-experiments amp_lgatr_mup config (num_heads=2)
   multi_query: false
   mlp_activation: gelu
   checkpoint_blocks: false

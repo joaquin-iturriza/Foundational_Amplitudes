@@ -2,8 +2,48 @@ exp_type: amplitudes
 exp_name: amp
 
 data:
+ # Data source: "files" (default) loads pre-generated .npy from data_path and
+ # splits each positionally by train_test_val. "recipes" instead materializes
+ # explicit per-role pools on demand from the MG5 generator (frozen, persistent
+ # val/test; purgeable train cache) — see the `processes` block below.
+ source: files
  dataset : ["ee_wwz_255-1000GeV_amplitudes","ee_WW_162-1000GeV_amplitudes","ee_ttbar_346-1000GeV_amplitudes","ee_uug_91-1000GeV_amplitudes","ee_uugg_91-1000GeV_amplitudes","ee_aa_10-1000GeV_amplitudes","ee_aaa_10-1000GeV_amplitudes","ee_uu_91-1000GeV_amplitudes"]
  data_path : data/
+ # Recipe data path (used only when source: recipes). Each process carries its
+ # own √s range and per-role event counts; normalization is fit on train only,
+ # frozen, and saved to the run dir. amp_orders is taken from the process
+ # definition unless overridden per entry.
+ seed: 42
+ # Amplitude preprocessing scope (recipe path): true (default) normalizes each
+ # process to its own unit scale independently; false fits ONE train-only
+ # signedlog+standardization scale across all processes, preserving the relative
+ # magnitude differences between them. Momentum normalization stays global in
+ # both cases. Per-dataset is the validated default — ~6x lower raw relative
+ # error at the median and far less HP-sensitive than global (global starves the
+ # small/complex processes by letting large-amplitude ones dominate the loss);
+ # the advantage grows with data. See sweeps/preproc_comparison.
+ preprocess_per_dataset: true
+ # Per-process recipe spec. Either inline as `processes` (a list of dicts) or via
+ # `processes_file` (path to a YAML/JSON list — easier to thread through a sweep).
+ # Each entry: {name, sqrts: [min, max], n_train, n_val, n_test[, amp_orders]}.
+ processes: null
+ processes_file: null
+ # Cache-only guard: when true (default), a recipe run never generates data
+ # inline — it expects the datasets to have been prebuilt by the CPU prebuild job
+ # (`sbatch prebuild_recipes.sh <spec>`) and fails fast otherwise, so GPU time is
+ # never spent materializing data. Set false to allow inline generation (e.g. a
+ # quick local/dev run without a separate prebuild step).
+ require_cache: true
+ # Per-dataset load caps (recipe path): the frozen pools may hold far more than a
+ # single run trains on (e.g. 10M/process). Only this many train / val+test events
+ # per process are pulled into memory (mmap slice — the full file is never read).
+ # null = load the whole pool.
+ train_subsample: null
+ eval_subsample: null
+ # Example inline form:
+ #   - {name: ee_uu,    sqrts: [91, 1000],  n_train: 1_000_000, n_val: 100_000, n_test: 100_000}
+ #   - {name: ee_uug,   sqrts: [91, 1000],  n_train: 2_000_000, n_val: 100_000, n_test: 100_000}
+ #   - {name: ee_ttbar, sqrts: [346, 1000], n_train: 1_000_000, n_val: 100_000, n_test: 100_000}
  subsample : null
  include_permsym: true
  train_test_val: [.4, .5, .1]
@@ -14,18 +54,11 @@ data:
   - standardization
  incl_fvs: false
  use_PIDs: false  # false: 8D physical property vector; true: one-hot PDG token index (legacy)
- # Coupling-order vector per dataset: [n_loops, alpha_s_power]
- # Examples: LO=[0,0]  NLO_full=[1,1]  virt_only=[1,0]  NNLO=[2,2]
- # Add entries here when mixing perturbative orders; no model changes needed.
- amp_orders:
-  - [0, 0]   # ee_wwz_255-1000GeV_amplitudes  — LO
-  - [0, 0]   # ee_WW_162-1000GeV_amplitudes   — LO
-  - [0, 0]   # ee_ttbar_346-1000GeV_amplitudes — LO
-  - [0, 0]   # ee_uug_91-1000GeV_amplitudes   — LO
-  - [0, 0]   # ee_uugg_91-1000GeV_amplitudes  — LO
-  - [0, 0]   # ee_aa_10-1000GeV_amplitudes    — LO
-  - [0, 0]   # ee_aaa_10-1000GeV_amplitudes   — LO
-  - [0, 0]   # ee_uu_91-1000GeV_amplitudes    — LO (fine-tune on NLO later)
+ # Coupling-order vector per dataset: [n_loops, alpha_s_power].
+ # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
+ #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]
+ # Set an explicit length-matched list only to override the name-keyed default.
+ amp_orders: null
 
 train: true
 training:

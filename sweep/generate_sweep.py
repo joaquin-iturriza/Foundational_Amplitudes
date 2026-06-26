@@ -60,6 +60,16 @@ def _scheduler(cfg):
     return cfg["cluster"].get("scheduler", "htcondor")
 
 
+def emit_prebuild_script(cfg, afs_dir):
+    """For a recipe-based sweep, emit the CPU prebuild job (`prebuild.sh`) into the
+    sweep dir. Delegates to the shared writer in sweep_manager (also used at
+    submit time), so there is one source of truth. Returns (script, spec) or None.
+    """
+    from sweep.sweep_manager import write_prebuild_script
+    res = write_prebuild_script(afs_dir, cfg)
+    return (res[0], res[1]) if res else None
+
+
 def init_sampler(cfg, afs_dir, eos_dir):
     """Create and save the initial DyHPOSampler state to AFS."""
     from sweep.dyhpo_sampler import DyHPOSampler
@@ -308,6 +318,12 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
     lf_summary = f"  ({n_lf} low-fidelity with t_steps_cap={lf_t_steps_cap})" if n_lf else ""
     print(f"\nGenerated {n_trials} jobs (trial_{existing_jobs:04d} … trial_{existing_jobs+n_trials-1:04d}){lf_summary}")
     print(f"  jobs : {os.path.join(afs_dir, 'jobs')}")
+
+    # Recipe sweeps get an auto-emitted CPU prebuild job; sweep_manager submits it
+    # first (when data is missing) and makes the trials depend on it.
+    pb = emit_prebuild_script(cfg, afs_dir)
+    if pb:
+        print(f"  prebuild : {pb[0]}  (spec={pb[1]})")
 
     if dry_run:
         print("\n[dry-run] Done.")

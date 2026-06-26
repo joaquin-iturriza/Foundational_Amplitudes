@@ -27,6 +27,25 @@ from lloca.utils.polar_decomposition import restframe_boost
 
 import psutil, os
 
+# Coupling-order convention (see config/amplitudes.yaml): [n_loops, alpha_s_power].
+#   LO=[0,0]  virt_only=[1,0]  NLO_full=[1,1]  NNLO=[2,2]
+# Name-keyed so a new NLO/NNLO dataset file is labelled correctly without
+# hand-editing positional amp_orders lists in every config. Checked most-specific
+# token first; tree-level datasets (no nlo/nnlo token) fall back to LO.
+_AMP_ORDER_BY_NAME = [
+    ("nnlo",     [2, 2]),
+    ("nlo_full", [1, 1]),
+    ("nlo_virt", [1, 0]),   # absolute-virt (e4) and the virt/born ratio
+]
+
+def amp_order_for_dataset(name):
+    """Map a dataset name to its coupling-order vector [n_loops, alpha_s_power]."""
+    low = str(name).lower()
+    for token, order in _AMP_ORDER_BY_NAME:
+        if token in low:
+            return list(order)
+    return [0, 0]
+
 def log_memory_usage(tag=""):
     process = psutil.Process(os.getpid())
     mem_info = process.memory_info()
@@ -93,13 +112,20 @@ MODEL_TITLE_DICT = {
     "DSI": "DSI",
     "LGATr": "LGATr",
     "LLOCATransformer": "LLoCa Transformer",
-    "LLOCAMuPTransformer": "LLoCa muP Transformer"
+    "LLOCAMuPTransformer": "LLoCa muP Transformer",
+    "MuPLGATr": "L-GATr muP",
+    "MuPLGATrSlim": "L-GATr-slim muP"
 }
 
 
 class AmplitudeExperiment(BaseExperiment):
     def init_physics(self):
         assert not self.cfg.training.force_xformers
+
+        # Recipe-based data path: derive the dataset name list / amp_orders from
+        # the `data.processes` spec before anything reads cfg.data.dataset.
+        if self.cfg.data.get("source", "files") == "recipes":
+            self._resolve_recipe_config()
 
         self.n_datasets = len(self.cfg.data.dataset)
 
@@ -148,7 +174,110 @@ class AmplitudeExperiment(BaseExperiment):
                 else:
                     self.type_token.append(list(range(len(TYPE_TOKEN_DICT[dataset]))))
         
+    def _resolve_recipe_config(self):
+        """Parse the `data.processes` recipe spec into the per-process spec list
+        and populate the config keys the rest of the pipeline expects
+        (`data.dataset`, `data.amp_orders`). Runs once, at the top of
+        init_physics, before n_datasets is read."""
+        import mg5_pipeline_final as mg
+
+        procs = self.cfg.data.get("processes", None)
+        # Fall back to an external spec file (data.processes_file) — easier to
+        # thread through a sweep than a nested list-of-dicts CLI override. The
+        # file is a YAML/JSON list of the same per-process dicts.
+        if not procs:
+            pf = self.cfg.data.get("processes_file", None)
+            if pf:
+                import yaml
+                with open(pf) as f:
+                    procs = yaml.safe_load(f)
+                # Allow either a bare list or {processes: [...]}.
+                if isinstance(procs, dict):
+                    procs = procs.get("processes", procs)
+                LOGGER.info(f"Loaded {len(procs)} recipe processes from {pf}")
+        assert procs, ("data.source=recipes requires data.processes or "
+                       "data.processes_file to be set")
+
+        specs, names, amp_orders = [], [], []
+        for p in procs:
+            p = OmegaConf.to_container(p, resolve=True) if OmegaConf.is_config(p) else dict(p)
+            name = p["name"]
+            sqrts = p["sqrts"]
+            specs.append({
+                "name":      name,
+                "sqrts_min": float(sqrts[0]),
+                "sqrts_max": float(sqrts[1]),
+                "n_train":   int(p["n_train"]),
+                "n_val":     int(p["n_val"]),
+                "n_test":    int(p["n_test"]),
+            })
+            names.append(name)
+            # Coupling order from the process definition (LO=[0,0]); explicit
+            # override on the spec wins if given.
+            if "amp_orders" in p and p["amp_orders"] is not None:
+                amp_orders.append(list(p["amp_orders"]))
+            else:
+                k = mg.PROCESSES[name].get("alphas_power", 0)
+                amp_orders.append([0, int(k)])
+
+        self._recipe_specs = specs
+        with open_dict(self.cfg):
+            self.cfg.data.dataset    = names
+            self.cfg.data.amp_orders = amp_orders
+        LOGGER.info(
+            f"Recipe data source: {len(names)} processes {names} "
+            f"(seed={self.cfg.data.get('seed', 42)})"
+        )
+
+    def _boost_augment_momenta(self, particles, n_particles):
+        """COM-boost + random-Lorentz augment a raw momentum block (the
+        equivariant `prepare: lorentz` step). Returns the boosted/augmented
+        momenta as a numpy array (N, n_particles, 4); the global `/std`
+        standardization is applied separately so it can use one train-only scale
+        across all processes (see _init_data_recipes)."""
+        particles_t = torch.tensor(particles, dtype=torch.float64)
+        particles_t = particles_t.reshape(-1, n_particles, 4)
+
+        m2 = particles_t[..., 0] ** 2 - (particles_t[..., 1:] ** 2).sum(dim=-1)
+        particles_t[..., 0] = torch.sqrt(
+            (particles_t[..., 1:] ** 2).sum(dim=-1) + m2.clamp(min=0)
+        )
+
+        lab_particles = particles_t[..., :2, :].sum(dim=-2)
+        to_com = restframe_boost(lab_particles)
+        trafo = rand_lorentz(
+            particles_t.shape[:-2], generator=None, dtype=particles_t.dtype
+        )
+        trafo = torch.einsum("...ij,...jk->...ik", trafo, to_com)
+        particles_t = torch.einsum("...ij,...kj->...ki", trafo, particles_t)
+        # Boost math is done in float64; store float32 — the model trains in
+        # float32 and this halves the in-memory momentum footprint (matters at
+        # the multi-million-event scale of the recipe pools).
+        return particles_t.numpy().astype(np.float32)
+
+    def _resolve_amp_orders(self, names):
+        """Per-dataset [n_loops, alpha_s_power]. An explicit, length-matched
+        data.amp_orders wins (e.g. the recipe path sets it per process); otherwise
+        derive from dataset names so NLO/NNLO targets are labelled correctly instead
+        of silently inheriting the positional LO default."""
+        cfg_orders = self.cfg.data.get("amp_orders", None)
+        if cfg_orders is not None and len(cfg_orders) == len(names):
+            return [list(o) for o in cfg_orders]
+        derived = [amp_order_for_dataset(n) for n in names]
+        if cfg_orders is not None:
+            LOGGER.warning(
+                f"data.amp_orders has {len(cfg_orders)} entries but {len(names)} "
+                f"dataset(s); deriving from names instead: {list(zip(names, derived))}")
+        else:
+            LOGGER.info(f"Derived amp_orders from dataset names: {list(zip(names, derived))}")
+        with open_dict(self.cfg):
+            self.cfg.data.amp_orders = derived
+        return derived
+
     def init_data(self):
+        if self.cfg.data.get("source", "files") == "recipes":
+            return self._init_data_recipes()
+
         LOGGER.info(f"Loading datasets: {self.cfg.data.dataset}")
 
         (
@@ -241,13 +370,9 @@ class AmplitudeExperiment(BaseExperiment):
         all_amplitudes_raw = []
         all_process_ids    = []   # integer process index per event
 
-        # amp_orders: list of [n_loops, alpha_s_power, ...] per dataset.
-        # Defaults to [0, 0] (LO) for each dataset if not specified.
-        amp_orders_cfg = self.cfg.data.get("amp_orders", None)
-        if amp_orders_cfg is None:
-            amp_orders = [[0, 0]] * len(self.cfg.data.dataset)
-        else:
-            amp_orders = [list(o) for o in amp_orders_cfg]
+        # amp_orders: list of [n_loops, alpha_s_power] per dataset, name-keyed
+        # (NLO/NNLO targets labelled from their dataset name; LO otherwise).
+        amp_orders = self._resolve_amp_orders(self.cfg.data.dataset)
         n_order_features = len(amp_orders[0])
 
         all_order_labels = []   # will be (N_events, n_order_features)
@@ -322,12 +447,21 @@ class AmplitudeExperiment(BaseExperiment):
         self.all_order_labels  = all_order_labels     # (N_events, n_order_features)
         self.n_order_features  = n_order_features
         self.N_events          = N_total
-    
-        LOGGER.info(
-            f"Combined dataset: {N_total} events, "
-            f"{particles_flat.shape[0]} total particles"
+
+        self._finalize_data_sizing()
+
+    def _finalize_data_sizing(self):
+        """Shared tail of data init (legacy + recipe paths): derive the particle
+        feature / order dimensions from the populated tokenizer + flat arrays and
+        write the model in_channels, then save the tokenizer."""
+        is_lloca = self.modelname in (
+            "LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"
         )
-    
+        LOGGER.info(
+            f"Combined dataset: {self.N_events} events, "
+            f"{self.particles_flat.shape[0]} total particles"
+        )
+
         # ------------------------------------------------------------------
         # Set model size — particle feature dimension depends on encoding mode
         # ------------------------------------------------------------------
@@ -438,30 +572,300 @@ class AmplitudeExperiment(BaseExperiment):
         )
         LOGGER.info(f"Fine-tuning: EWC initialized (lambda={ft.ewc.get('lambda', 1000.0)})")
 
+    def _init_data_recipes(self):
+        """Recipe-based data path: materialize explicit per-role pools
+        (train / frozen val / frozen test) from the `data.processes` spec, build
+        the combined flat arrays, and normalize using train-only statistics that
+        are frozen and saved to the run dir (reloaded on warm start rather than
+        recomputed)."""
+        import datagen
+        from particle_ids import global_encode
+        from dataset import build_flat_arrays
+
+        assert self.modelname in (
+            "LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"
+        ), "data.source=recipes is only supported for the LLoCa μP model"
+
+        specs     = self._recipe_specs
+        names     = [s["name"] for s in specs]
+        seed      = int(self.cfg.data.get("seed", 42))
+        use_pids  = self.cfg.data.get("use_PIDs", False)
+        roles     = ("train", "val", "test")
+        count_key = {"train": "n_train", "val": "n_val", "test": "n_test"}
+
+        # --- materialize the three role pools (frozen val/test, cached train) ---
+        # require_cache (default true on the recipe path) means a GPU training job
+        # never generates data inline — it expects the prebuild job
+        # (prebuild_recipes.sh) to have populated the cache, and fails fast
+        # otherwise rather than burning GPU time. Set data.require_cache=false to
+        # allow inline generation (e.g. a quick local run).
+        require_cache = bool(self.cfg.data.get("require_cache", True))
+        paths = {}
+        for role in roles:
+            role_specs = [{
+                "process":   s["name"],
+                "sqrts_min": s["sqrts_min"],
+                "sqrts_max": s["sqrts_max"],
+                "n_events":  s[count_key[role]],
+            } for s in specs]
+            paths[role] = datagen.ensure_split_set(
+                role_specs, role=role, seed=seed, require_cache=require_cache)
+
+        # --- frozen normalization stats (all GLOBAL scalars, train-only) ---
+        # Source of truth, in priority order:
+        #   1. warm-start resume  -> this run's own data_stats.json
+        #   2. fine-tune          -> the pretrained run's data_stats.json, so the
+        #                            backbone keeps seeing inputs in its training
+        #                            normalization (mirrors the tokenizer reuse)
+        #   3. otherwise          -> compute fresh from train below
+        stats_path = os.path.join(self.cfg.run_dir, "data_stats.json")
+        ft         = self.cfg.get("fine_tune", None)
+        ft_path    = ft.get("pretrained_path", None) if ft is not None else None
+        stats_src  = None
+        if self.warm_start and os.path.exists(stats_path):
+            stats_src = stats_path
+        elif ft_path is not None:
+            cand = os.path.join(os.path.dirname(os.path.dirname(ft_path)),
+                                "data_stats.json")
+            if os.path.exists(cand):
+                stats_src = cand
+
+        # Amplitude preprocessing scope: global (single train-only scale, keeps
+        # the relative magnitude differences between processes) vs per-dataset
+        # (each process normalized to unit scale independently). Controlled by
+        # data.preprocess_per_dataset (default False = global).
+        per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
+
+        if stats_src is not None:
+            with open(stats_src) as f:
+                stats = json.load(f)
+            mom_div    = float(stats["mom_div"])
+            mom_mean   = float(stats["mom_mean"])
+            mom_std    = float(stats["mom_std"])
+            amp_trafos = stats["amp_trafos"]
+            # prepd_mean/std stored as a list: length 1 (global) or n_proc
+            # (per-dataset, aligned with data.dataset order).
+            prepd_means = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_mean"], dtype=np.float64))]
+            prepd_stds  = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_std"],  dtype=np.float64))]
+            per_dataset = bool(stats.get("preprocess_per_dataset", len(prepd_means) > 1))
+            LOGGER.info(f"Loaded frozen data stats from {stats_src}")
+        else:
+            mom_div = mom_mean = mom_std = None
+            amp_trafos = None
+            prepd_means = prepd_stds = None
+
+        amp_orders       = self._resolve_amp_orders(self.cfg.data.dataset)
+        n_order_features = len(amp_orders[0])
+
+        # Per-dataset load caps: the frozen pools can hold far more than a single
+        # run trains on (e.g. 10M/process), so only `train_subsample` train events
+        # and `eval_subsample` val/test events per process are pulled into memory
+        # (mmap slice — the full file is never read). None = load all.
+        train_cap = self.cfg.data.get("train_subsample", None)
+        eval_cap  = self.cfg.data.get("eval_subsample", None)
+        cap_for   = {"train": train_cap, "val": eval_cap, "test": eval_cap}
+
+        # --- load every (role, process); boost+augment momenta (no scale yet) ---
+        store = {}
+        for role in roles:
+            cap = cap_for[role]
+            cap = int(cap) if cap not in (None, "null", "none") else None
+            for s in specs:
+                name = s["name"]
+                if cap is not None:
+                    data_raw = np.asarray(np.load(paths[role][name], mmap_mode="r")[:cap])
+                else:
+                    data_raw = np.load(paths[role][name])
+                LOGGER.info(
+                    f"  [{role}] {name}: {data_raw.shape[0]} events"
+                    f"{f' (cap {cap})' if cap else ''} from {paths[role][name]}"
+                )
+                n_particles  = (data_raw.shape[1] - 1) // 5
+                momenta_cols = n_particles * 4
+                particles  = data_raw[:, :momenta_cols]
+                pdg_ids    = data_raw[:, momenta_cols:-1].astype(int)
+                amplitudes = data_raw[:, [-1]]
+
+                if use_pids:
+                    toks = self.tokenizer.register_and_encode(pdg_ids)
+                else:
+                    toks = global_encode(pdg_ids)
+                    self.tokenizer.register_and_encode(pdg_ids)  # keep in sync
+
+                store[(role, name)] = {
+                    "momenta": self._boost_augment_momenta(particles, n_particles),
+                    "tokens":  toks,
+                    "raw_amp": amplitudes,
+                }
+
+        # --- single GLOBAL momentum scale, fit on TRAIN only (matches upstream
+        #     load_file: momentum /= momentum.std()), then applied to every block.
+        #     mom_mean/mom_std for the in-net (local-mean)/std are the global
+        #     stats of the scaled train momenta. ---
+        if mom_div is None:
+            train_mom = np.concatenate(
+                [store[("train", n)]["momenta"].reshape(-1, 4) for n in names], axis=0
+            )
+            mom_div  = float(train_mom.std())
+            scaled   = train_mom / mom_div
+            mom_mean = float(scaled.mean())
+            mom_std  = float(max(scaled.std(), 1e-2))
+        self.mom_mean = [mom_mean]
+        self.mom_std  = [mom_std]
+        for k in store:
+            store[k]["momenta"] = store[k]["momenta"] / mom_div
+
+        # --- amplitude preprocessing: stats fitted on TRAIN, applied to all ---
+        # The amp_trafos list (e.g. signedlog) is always resolved globally so the
+        # same transform is used for every process; only the standardization
+        # mean/std differ between the global and per-dataset scopes.
+        train_raw = np.concatenate(
+            [store[("train", n)]["raw_amp"] for n in names], axis=0
+        )
+        if amp_trafos is None:
+            amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, train_raw)
+        self.cfg.data.amp_trafos = amp_trafos
+        if prepd_means is None:
+            if per_dataset:
+                prepd_means, prepd_stds = [], []
+                for name in names:
+                    _, m, s = preprocess_amplitude(
+                        store[("train", name)]["raw_amp"], trafos=amp_trafos)
+                    prepd_means.append(float(m)); prepd_stds.append(float(s))
+            else:
+                _, m, s = preprocess_amplitude(train_raw, trafos=amp_trafos)
+                prepd_means, prepd_stds = [float(m)], [float(s)]
+        self.prepd_mean = prepd_means
+        self.prepd_std  = prepd_stds
+        LOGGER.info(
+            f"Preprocessing amplitudes "
+            f"{'per-dataset (independent unit scale)' if per_dataset else 'globally (shared scale)'} "
+            f"using trafos={amp_trafos} (train-only stats); "
+            f"means={[f'{m:.3f}' for m in prepd_means]}"
+        )
+
+        # --- assemble combined flat arrays, role-contiguous (train|val|test) ---
+        # Vectorized per dataset (no per-event Python list), so this scales to
+        # millions of events. Within a (role, process) block every event has the
+        # same particle count P, so the boosted momenta (N,P,4) reshape directly
+        # to a flat (N*P,4) and offsets are built arithmetically. The flat
+        # particle arrays stay in dataset order; only the small per-event arrays
+        # (offsets / amp / pid / order) are shuffled (seed 42) to interleave
+        # processes for the balanced sampler — the offsets still index the right
+        # (unshuffled) particle ranges, so O(events) work touches only metadata.
+        role_particles, role_tokens, role_offsets = [], [], []
+        role_amp, role_pid, role_order = [], [], []
+        role_counts = {}
+        rng = np.random.default_rng(seed=42)
+        part_base = 0   # cumulative particle offset into the final flat array
+
+        for role in roles:
+            ds_parts, ds_toks = [], []
+            ev_starts, ev_pid, ev_order, amp_blocks = [], [], [], []
+            P_of = []
+            for proc_idx, name in enumerate(names):
+                rec   = store[(role, name)]
+                parts = rec["momenta"]          # (N, P, 4)
+                toks  = rec["tokens"]           # (N, P)
+                N, P  = parts.shape[0], parts.shape[1]
+                m = prepd_means[proc_idx] if per_dataset else prepd_means[0]
+                s = prepd_stds[proc_idx]  if per_dataset else prepd_stds[0]
+                amp_prepd, _, _ = preprocess_amplitude(
+                    rec["raw_amp"], trafos=amp_trafos, mean=m, std=s,
+                )
+                ds_parts.append(parts.reshape(N * P, 4))
+                ds_toks.append(np.asarray(toks).reshape(N * P))
+                ev_starts.append(part_base + np.arange(N, dtype=np.int64) * P)
+                P_of.append(np.full(N, P, dtype=np.int64))
+                ev_pid.append(np.full(N, proc_idx, dtype=np.int32))
+                ev_order.append(np.tile(
+                    np.array(amp_orders[proc_idx], dtype=np.float32), (N, 1)))
+                amp_blocks.append(amp_prepd)
+                part_base += N * P
+
+            starts = np.concatenate(ev_starts)
+            ends   = starts + np.concatenate(P_of)
+            offs   = np.stack([starts, ends], axis=1)        # (N_role, 2)
+            amp    = np.concatenate(amp_blocks, axis=0)
+            pid    = np.concatenate(ev_pid)
+            order  = np.concatenate(ev_order, axis=0)
+
+            perm = rng.permutation(offs.shape[0])
+            role_particles.append(np.concatenate(ds_parts, axis=0))
+            role_tokens.append(np.concatenate(ds_toks, axis=0))
+            role_offsets.append(offs[perm])
+            role_amp.append(amp[perm])
+            role_pid.append(pid[perm])
+            role_order.append(order[perm])
+            role_counts[role] = offs.shape[0]
+
+        # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
+        # zero-copy across all loaders instead of copying per loader.
+        self.particles_flat   = np.concatenate(role_particles, axis=0).astype(np.float32, copy=False)
+        self.tokens_flat      = np.concatenate(role_tokens, axis=0).astype(np.int64, copy=False)
+        self.offsets          = np.concatenate(role_offsets, axis=0)
+        self.all_amplitudes   = np.concatenate(role_amp, axis=0).astype(np.float32, copy=False)
+        self.all_process_ids  = np.concatenate(role_pid, axis=0).astype(np.int64, copy=False)
+        self.all_order_labels = np.concatenate(role_order, axis=0).astype(np.float32, copy=False)
+        self.n_order_features = n_order_features
+        self.N_events         = self.offsets.shape[0]
+        self._role_counts     = (role_counts["train"], role_counts["val"],
+                                  role_counts["test"])
+
+        # --- freeze stats to this run's dir (skip if already present, i.e. a
+        #     warm-start resume; a fine-tune persists the inherited stats here so
+        #     the fine-tune run can itself be resumed reproducibly). ---
+        if self.cfg.save and not os.path.exists(stats_path):
+            with open(stats_path, "w") as f:
+                json.dump({
+                    "mom_div":    float(mom_div),
+                    "mom_mean":   float(self.mom_mean[0]),
+                    "mom_std":    float(self.mom_std[0]),
+                    "amp_trafos": list(amp_trafos) if amp_trafos else amp_trafos,
+                    "preprocess_per_dataset": per_dataset,
+                    "prepd_mean": [float(x) for x in self.prepd_mean],
+                    "prepd_std":  [float(x) for x in self.prepd_std],
+                }, f, indent=2)
+            LOGGER.info(f"Saved frozen data stats to {stats_path}")
+
+        self._finalize_data_sizing()
+
     def _init_dataloader(self):
         from dataset import AmplitudeDataset, collate_variable_length, ProcessBalancedSampler
-        assert sum(self.cfg.data.train_test_val) <= 1
 
         N_total = self.N_events
 
-        n_train = int(N_total * self.cfg.data.train_test_val[0])
-        if n_train % 2 != 0 and n_train > 1:
-            n_train -= 1
-        elif n_train == 1:
-            n_train = 2
+        role_counts = getattr(self, "_role_counts", None)
+        if role_counts is not None:
+            # Recipe data path: explicit, role-contiguous train|val|test pools
+            # (no positional ratio split).
+            n_train, n_val, n_test = role_counts
+            train_idx = np.arange(0,                 n_train)
+            val_idx   = np.arange(n_train,           n_train + n_val)
+            test_idx  = np.arange(n_train + n_val,   n_train + n_val + n_test)
+            with open_dict(self.cfg):
+                self.cfg.data.subsample = n_train
+        else:
+            assert sum(self.cfg.data.train_test_val) <= 1
 
-        # Store as scalar for base_experiment._evals compatibility
-        with open_dict(self.cfg):
-            self.cfg.data.subsample = n_train
+            n_train = int(N_total * self.cfg.data.train_test_val[0])
+            if n_train % 2 != 0 and n_train > 1:
+                n_train -= 1
+            elif n_train == 1:
+                n_train = 2
 
-        val_ratio = self.cfg.data.train_test_val[2] / self.cfg.data.train_test_val[0]
-        n_val = max(int(n_train * val_ratio), 2)
-        if n_val % 2 != 0:
-            n_val -= 1
+            # Store as scalar for base_experiment._evals compatibility
+            with open_dict(self.cfg):
+                self.cfg.data.subsample = n_train
 
-        train_idx = np.arange(0,       n_train)
-        val_idx   = np.arange(n_train, n_train + n_val)
-        test_idx  = np.arange(n_train + n_val, N_total)
+            val_ratio = self.cfg.data.train_test_val[2] / self.cfg.data.train_test_val[0]
+            n_val = max(int(n_train * val_ratio), 2)
+            if n_val % 2 != 0:
+                n_val -= 1
+
+            train_idx = np.arange(0,       n_train)
+            val_idx   = np.arange(n_train, n_train + n_val)
+            test_idx  = np.arange(n_train + n_val, N_total)
 
         nw = self.cfg.training.num_workers
 
@@ -594,6 +998,16 @@ class AmplitudeExperiment(BaseExperiment):
 
         combined_key = "combined" if len(self.cfg.data.dataset) > 1 else self.cfg.data.dataset[0]
 
+        # Per-process amplitude un-standardization stats. With per-dataset
+        # preprocessing self.prepd_mean is aligned with data.dataset order; with
+        # global preprocessing it is length-1 and every process shares stats[0].
+        per_dataset_amp = len(self.prepd_mean) > 1
+        def _amp_stats(name):
+            if per_dataset_amp:
+                p = list(self.cfg.data.dataset).index(name)
+                return self.prepd_mean[p], self.prepd_std[p]
+            return self.prepd_mean[0], self.prepd_std[0]
+
         def collect(loader):
             with torch.no_grad():
                 if self.ema is not None:
@@ -628,22 +1042,33 @@ class AmplitudeExperiment(BaseExperiment):
                 loader = {"train": self.train_eval_loader,
                           "val":   self.val_loader,
                           "test":  self.test_loader}[split]
-                return collect(loader)
+                pred, truth, sigmas = collect(loader)
+                return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0]
             pred   = np.concatenate([proc_preds[n][split][0] for n in available], axis=0)
             truth  = np.concatenate([proc_preds[n][split][1] for n in available], axis=0)
             first_sig = proc_preds[available[0]][split][2]
             sigmas = (np.concatenate([proc_preds[n][split][2] for n in available], axis=0)
                       if first_sig is not None else None)
-            return pred, truth, sigmas
+            # Per-event un-standardization stats, in the same concat order, so the
+            # combined raw-amplitude metrics undo each process correctly under
+            # per-dataset preprocessing (no-op broadcast under global).
+            pm = np.concatenate([
+                np.full((proc_preds[n][split][1].shape[0], 1), _amp_stats(n)[0])
+                for n in available], axis=0)
+            ps = np.concatenate([
+                np.full((proc_preds[n][split][1].shape[0], 1), _amp_stats(n)[1])
+                for n in available], axis=0)
+            return pred, truth, sigmas, pm, ps
 
         # ------------------------------------------------------------------
         # Compute metrics (pure numpy, fast)
         # ------------------------------------------------------------------
         LOGGER.info("### Computing combined metrics ###")
         for split, attr in [("train", "results_train"), ("val", "results_val"), ("test", "results_test")]:
-            pred, truth, sigmas = concat_split(split)
+            pred, truth, sigmas, pm, ps = concat_split(split)
             setattr(self, attr,
-                    self._metrics_from_arrays(pred, truth, split, combined_key, sigmas))
+                    self._metrics_from_arrays(pred, truth, split, combined_key, sigmas,
+                                              prepd_mean=pm, prepd_std=ps))
 
         self.results = {
             combined_key: {
@@ -657,9 +1082,11 @@ class AmplitudeExperiment(BaseExperiment):
         self.results_per_proc = {}
         for name, splits in proc_preds.items():
             self.results_per_proc[name] = {}
+            pm, ps = _amp_stats(name)
             for split, (pred, truth, sigmas) in splits.items():
                 self.results_per_proc[name][split] = self._metrics_from_arrays(
-                    pred, truth, f"{split}_{name}", name, sigmas
+                    pred, truth, f"{split}_{name}", name, sigmas,
+                    prepd_mean=pm, prepd_std=ps,
                 )[name]
 
         # Optionally log noema metrics (no extra forward pass — just re-use arrays)
@@ -773,8 +1200,18 @@ class AmplitudeExperiment(BaseExperiment):
         return amp_pred_prepd, amp_truth_prepd, sigmas
 
     def _metrics_from_arrays(self, amp_pred_prepd, amp_truth_prepd, title, result_key,
-                             sigmas=None):
-        """Compute metrics from preprocessed arrays (no model call). Pure numpy."""
+                             sigmas=None, prepd_mean=None, prepd_std=None):
+        """Compute metrics from preprocessed arrays (no model call). Pure numpy.
+
+        `prepd_mean`/`prepd_std` override the standardization stats used to undo
+        the amplitude preprocessing. They may be scalars or per-event arrays
+        (broadcastable to amp shape) — needed when amplitudes were preprocessed
+        per-dataset, so each event is un-standardized with its own process's
+        stats. Default to the global stats (self.prepd_mean[0])."""
+        if prepd_mean is None:
+            prepd_mean = self.prepd_mean[0]
+        if prepd_std is None:
+            prepd_std = self.prepd_std[0]
         mse_prepd    = np.mean((amp_pred_prepd - amp_truth_prepd) ** 2)
         l1_prepd     = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd))
         l1_rel_prepd = np.mean(
@@ -786,11 +1223,11 @@ class AmplitudeExperiment(BaseExperiment):
         LOGGER.info(f"L1r (prepd) {title} {result_key}: {l1_rel_prepd:.4e}")
 
         amp_truth = undo_preprocess_amplitude(
-            amp_truth_prepd, self.prepd_mean[0], self.prepd_std[0],
+            amp_truth_prepd, prepd_mean, prepd_std,
             trafos=self.cfg.data.amp_trafos,
         )
         amp_pred = undo_preprocess_amplitude(
-            amp_pred_prepd, self.prepd_mean[0], self.prepd_std[0],
+            amp_pred_prepd, prepd_mean, prepd_std,
             trafos=self.cfg.data.amp_trafos,
         )
 
@@ -886,6 +1323,14 @@ class AmplitudeExperiment(BaseExperiment):
                 self.train_sampler.compute_snapshots if self.train_sampler is not None else []
             )
             plot_dict["dataset_order"] = list(self.cfg.data.dataset)
+            # solo scaling reference {dataset: [a, b]} for the vs-compute overlay
+            dp = (self.cfg.data.get("data_path", "") or "")
+            solo_path = os.path.join(dp, "solo_scaling.json") if dp else None
+            try:
+                if solo_path and os.path.exists(solo_path):
+                    plot_dict["solo_scaling"] = json.load(open(solo_path))
+            except Exception as e:
+                LOGGER.warning(f"Could not load solo_scaling reference ({solo_path}): {e}")
 
         self._save_per_process_metrics(plot_path)
         plot_mixer(self.cfg, plot_path, title, plot_dict)

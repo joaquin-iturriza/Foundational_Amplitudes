@@ -37,3 +37,27 @@ data/*.npy
 # none.yaml is the no-op default and is safe to commit
 config/local/*.yaml
 !config/local/none.yaml
+
+# SLURM / job logs and core dumps
+*.err
+*.out
+*.log
+core-claude-*
+core.*
+
+# Hydra and sweep run outputs
+outputs/
+sweeps/
+
+# Plot outputs (root collection dir + generated comparison plots under data/)
+/plots/
+data/*.pdf
+
+# Large generated MadGraph data
+data/*.lhe
+data/*.dat
+
+# Editor / OS / filesystem artifacts
+._*
+.fuse_hidden*
+*:Zone.Identifier

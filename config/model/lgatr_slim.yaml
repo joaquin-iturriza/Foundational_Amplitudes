@@ -14,7 +14,11 @@ net:
   hidden_s_channels: 16   # μP width axis (scalar)
 
   num_blocks: 8
-  num_heads: 8
+  num_heads: 2       # L-GATr-slim: num_heads is fixed structure, NOT the μP width axis
+                     # (that's hidden_v/s_channels). With attn_ratio=2 and the (8/16)
+                     # base/delta widths, nh>2 collapses the per-head scalar dim to the
+                     # RMSNorm floor (4) at both reference widths → μP base-shape assert.
+                     # nh=2 matches the validated lloca-experiments amp_slim_mup config.
   mlp_ratio: 2
   attn_ratio: 2
   num_layers_mlp: 2

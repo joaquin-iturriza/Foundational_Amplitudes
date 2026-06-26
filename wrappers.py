@@ -4,6 +4,8 @@ import torch
 from torch import nn
 from lgatr.interface import embed_vector, extract_scalar
 
+from models.attention_lloca_mup import build_block_diagonal_bias
+
 
 def _block_diagonal_attn_mask(ptr, device):
     """Boolean (N_total, N_total) mask: True where two particles share an event.
@@ -219,26 +221,39 @@ class _AmplitudeGATrMuPBase(nn.Module):
         # Scale by std only (a Lorentz-invariant rescaling); do NOT subtract the mean,
         # which would break equivariance. (The 4-momenta are already preprocessed.)
         fm = fourmomenta / std
-        attn_mask = _block_diagonal_attn_mask(ptr, fourmomenta.device)
-        amp_per_particle = self._run_net(fm, scalars, attn_mask)  # (N_total,)
+        # Prefer the xformers block-diagonal kernel (memory-efficient, O(sum n_i^2)) —
+        # passed as `attn_bias`, which lgatr's backend dispatcher routes to xformers
+        # `memory_efficient_attention` (same kernel LLoCa uses). The dense O(N_total^2)
+        # `attn_mask` path materialises the full cross-event score matrix and OOMs at
+        # batchsize 1024. μP's 1/d query pre-scaling is unaffected: it wraps the
+        # `scaled_dot_product_attention` dispatcher *above* backend selection, and
+        # xformers defaults to the same 1/sqrt(d) scale as native SDPA.
+        # `build_block_diagonal_bias` returns None when xformers is unavailable
+        # (e.g. login-node CPU) -> fall back to the dense mask + native attention.
+        attn_bias = build_block_diagonal_bias(ptr, seq_lens)
+        if attn_bias is not None:
+            amp_per_particle = self._run_net(fm, scalars, attn_bias=attn_bias)
+        else:
+            attn_mask = _block_diagonal_attn_mask(ptr, fourmomenta.device)
+            amp_per_particle = self._run_net(fm, scalars, attn_mask=attn_mask)
         return _pool_events(amp_per_particle.unsqueeze(-1), ptr)  # (B, 1)
 
 
 class AmplitudeLGATrMuPWrapper(_AmplitudeGATrMuPBase):
     """μP full L-GATr: 4-momentum -> one multivector, scalar amplitude via extract_scalar."""
 
-    def _run_net(self, fm, scalars, attn_mask):
+    def _run_net(self, fm, scalars, **attn_kwargs):
         mv = embed_vector(fm.unsqueeze(0).unsqueeze(-2))  # (1, N, 1, 16)
         s = scalars.unsqueeze(0)                          # (1, N, n_scalars)
-        out_mv, _ = self.net(mv, scalars=s, attn_mask=attn_mask)
+        out_mv, _ = self.net(mv, scalars=s, **attn_kwargs)
         return extract_scalar(out_mv)[0, :, 0, 0]         # (N,)
 
 
 class AmplitudeLGATrSlimMuPWrapper(_AmplitudeGATrMuPBase):
     """μP L-GATr-slim: 4-momentum -> one vector, scalar amplitude from the scalar output."""
 
-    def _run_net(self, fm, scalars, attn_mask):
+    def _run_net(self, fm, scalars, **attn_kwargs):
         vectors = fm.unsqueeze(0).unsqueeze(-2)           # (1, N, 1, 4)  (v_channels=1)
         s = scalars.unsqueeze(0)                          # (1, N, n_scalars)
-        _, out_s = self.net(vectors, s, attn_mask=attn_mask)
+        _, out_s = self.net(vectors, s, **attn_kwargs)
         return out_s[0, :, 0]                             # (N,)
