@@ -9,7 +9,9 @@ Run on Jean-Zay with a GPU allocated:
     python test_amp.py
 """
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# This test lives in tests/ but imports project-root modules; put the repo root
+# (parent of tests/) on sys.path so `python tests/test_amp.py` works.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 import torch.optim as optim

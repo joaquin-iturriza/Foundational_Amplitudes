@@ -18,6 +18,9 @@ import argparse
 import numpy as np
 import torch
 
+import os, sys
+# tests/ -> repo root on sys.path so project-root modules import when run directly.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.lgatr_slim_mup import MuPLGATrSlim
 from models.lgatr_mup import MuPLGATr
 from lloca.mup import MuAdam, finalize

@@ -40,6 +40,9 @@ import mup
 from mup import set_base_shapes, MuAdam
 from lloca.mup import finalize as mup_finalize
 
+import os, sys
+# tests/ -> repo root on sys.path so project-root modules import when run directly.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.lloca import LLOCAMuPTransformer
 from wrappers import AmplitudeLLoCaWrapper
 from particle_ids import GLOBAL_PROPERTY_MATRIX

@@ -23,6 +23,9 @@ import types
 import numpy as np
 from omegaconf import OmegaConf
 
+import os, sys
+# tests/ -> repo root on sys.path so project-root modules import when run directly.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from experiment import AmplitudeExperiment
 
 # ── bare instance (skip __init__) + just the attributes the methods read ──────
