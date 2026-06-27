@@ -1,0 +1,77 @@
+# Solo nh8 HPO at 1/10 data (subsample=10000) with reg_lambda extended to [1e-9,1e-2].
+# The data-starved reruns reused full-data best HPs (reg ~1e-11..1e-7 => under-regularized
+# for 7000 train events => overfitting). This properly sweeps the 10k regime.
+# 10 trials/cell, submitted FULLY SERIALIZED (dependency chain) for true Bayesian.
+
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "01:00:00"
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
+
+sweep_name: solo_nh8_10k_virt
+seed: 42
+
+datasets:
+  - ee_uu_nlo_virt_e4
+  - ee_ttbar_nlo_virt_e4
+
+t_steps_values: [4, 13, 40, 126, 400, 1265, 4000, 8000]
+
+n_trials_per_level: 10
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 4
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.subsample: 10000
+  data.train_test_val: "[0.7, 0.2, 0.1]"
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+
+search_space:
+  - name: training.lr
+    type: float_log
+    low: 3.1622776601683795e-05
+    high: 0.1
+  - name: training.regularization_lambda
+    type: float_log
+    low: 1.0e-09
+    high: 1.0e-02
+  - name: training.cosanneal_warmup_frac
+    type: float_uniform
+    low: 0.0
+    high: 0.2
+  - name: training.cosanneal_eta_min
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.ema_decay
+    type: float_uniform
+    low: 0.9
+    high: 0.9999

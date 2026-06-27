@@ -1,0 +1,69 @@
+cluster:
+  account: itg@v100
+  auto_submit: false
+  cpus_per_task: 8
+  partition: gpu_p2
+  request_gpus: 1
+  scheduler: slurm
+  time: "02:00:00"
+dyhpo:
+  n_candidates: 300
+  n_startup: 8
+  seed: 42
+  total_budget: 10000
+fidelity_schedule:
+  # Equal WALL-TIME to LLoCa's 15000-step pretrain25 run: L-GATr (full) measured
+  # 600.9 ms/step vs LLoCa 39.6 ms/step (15.2x), so 15000 * 39.6/600.9 = 988 steps.
+  t_steps:
+  - 988
+fixed_params:
+  # --- identical 25-process recipe data to pretrain25 (the LLoCa baseline) ---
+  data.source: recipes
+  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25.yaml
+  data.preprocess_per_dataset: 'true'
+  data.require_cache: 'true'
+  # 200k/process (5M pool) not pretrain25's 500k: at equal wall-time L-GATr trains
+  # on only ~1M samples (988 steps x 1024), so a 5M pool is already >> what it sees,
+  # and the final per-process train-eval (which iterates the WHOLE pool) is ~15x
+  # slower than LLoCa — capping the pool keeps it inside walltime. The val-loss metric
+  # is unaffected (val/test come from the separate frozen pools below).
+  data.train_subsample: 200000
+  data.eval_subsample: 20000
+  data.seed: 42
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  # --- model: full L-GATr muP, ~1.64M params (matched to LLoCa's 1.61M) ---
+  model: lgatr_mup
+  model.net.num_blocks: 8
+  model.net.num_heads: 2            # fixed structure (muP width axis = hidden channels)
+  model.net.hidden_mv_channels: 22
+  model.net.hidden_s_channels: 22
+  evaluation.batchsize: 8192
+  plot: 'true'
+  seed: 42
+  training.batchsize: 1024
+  training.get_ID: 'false'
+  training.loss_aggregation: geometric_mean
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  # 0.1 (not pretrain25's 0.02): geometric forward is ~15x slower, so 50 validations
+  # would dominate walltime; ~10 validations still tracks the best checkpoint.
+  training.validate_frac: 0.1
+n_trials: 20
+paths:
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+  - module load anaconda-py3/2023.09
+  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/pretrain25_lgatr
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr,                     type: float_log,     low: 5.0e-4, high: 1.0e-2}
+- {name: training.regularization_lambda,  type: float_log,     low: 1.0e-11, high: 1.0e-6}
+- {name: training.cosanneal_warmup_frac,  type: float_uniform, low: 0.0,    high: 0.2}
+- {name: training.cosanneal_eta_min,      type: float_log,     low: 1.0e-11, high: 1.0e-6}
+- {name: training.ema_decay,              type: float_uniform, low: 0.9,    high: 0.9999}
+- {name: training.sampler_alpha_ema,      type: float_uniform, low: 0.3,    high: 0.95}
+- {name: training.sampler_min_alpha_frac, type: float_uniform, low: 0.05,   high: 0.5}
+sweep_name: pretrain25_lgatr

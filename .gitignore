@@ -61,3 +61,11 @@ data/*.dat
 ._*
 .fuse_hidden*
 *:Zone.Identifier
+
+# Generated figures (all formats; already-tracked figures stay tracked)
+*.pdf
+
+# Profiling / smoke scratch outputs
+compare_models/_probe_*
+compare_models/_smoke_*
+compare_models/flops.txt

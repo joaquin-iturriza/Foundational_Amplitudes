@@ -1,0 +1,34 @@
+{
+  "ee_wwz_255-1000GeV_amplitudes": [
+    12.44283,
+    -1.14764
+  ],
+  "ee_WW_162-1000GeV_amplitudes": [
+    19.50684,
+    -1.80786
+  ],
+  "ee_ttbar_346-1000GeV_amplitudes": [
+    21.29176,
+    -1.94743
+  ],
+  "ee_uug_91-1000GeV_amplitudes": [
+    15.20937,
+    -1.33631
+  ],
+  "ee_uugg_91-1000GeV_amplitudes": [
+    10.2758,
+    -0.95527
+  ],
+  "ee_aa_10-1000GeV_amplitudes": [
+    23.74359,
+    -2.20981
+  ],
+  "ee_aaa_10-1000GeV_amplitudes": [
+    13.17094,
+    -1.21361
+  ],
+  "ee_uu_91-1000GeV_amplitudes": [
+    19.94803,
+    -1.7424
+  ]
+}

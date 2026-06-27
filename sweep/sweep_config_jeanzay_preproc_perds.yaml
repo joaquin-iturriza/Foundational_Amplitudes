@@ -1,0 +1,86 @@
+cluster:
+  account: itg@v100
+  auto_submit: false
+  cpus_per_task: 8
+  partition: gpu_p2
+  request_gpus: 1
+  scheduler: slurm
+  time: 00:30:00
+dyhpo:
+  n_candidates: 300
+  n_startup: 8
+  seed: 42
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 100
+fixed_params:
+  # --- on-demand recipe data source (8-process pretrain-scaling D1e3p5 short cell) ---
+  data.source: recipes
+  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain8_short.yaml
+  data.preprocess_per_dataset: 'true'    # PER-DATASET amplitude scale (each process unit-normalized)
+  data.seed: 42
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  # --- model / training (identical to scaling_p1_nh16_D1e3p5_t100_fast) ---
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 16
+  evaluation.batchsize: 8192
+  plot: 'true'
+  seed: 42
+  training.batchsize: 1024
+  training.get_ID: 'false'
+  training.loss_aggregation: geometric_mean
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.validate_frac: 0.01
+n_trials: 20
+paths:
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+  - module load anaconda-py3/2023.09
+  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/preproc_comparison
+range_extension:
+  boundary_frac: 0.2
+  enabled: false
+  extend_factor: 3.0
+  max_extensions: 3
+  min_observations: 20
+  n_new_candidates: 50
+  params:
+  - training.lr
+  - training.regularization_lambda
+  top_k: 5
+  trigger_count: 3
+search_space:
+- high: 0.01
+  low: 0.0005
+  name: training.lr
+  type: float_log
+- high: 1.0e-06
+  low: 1.0e-11
+  name: training.regularization_lambda
+  type: float_log
+- high: 0.2
+  low: 0.0
+  name: training.cosanneal_warmup_frac
+  type: float_uniform
+- high: 1.0e-06
+  low: 1.0e-11
+  name: training.cosanneal_eta_min
+  type: float_log
+- high: 0.9999
+  low: 0.9
+  name: training.ema_decay
+  type: float_uniform
+- high: 0.95
+  low: 0.3
+  name: training.sampler_alpha_ema
+  type: float_uniform
+- high: 0.5
+  low: 0.05
+  name: training.sampler_min_alpha_frac
+  type: float_uniform
+sweep_name: preproc_perds

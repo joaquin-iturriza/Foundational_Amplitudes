@@ -1,0 +1,87 @@
+# nh=8 solo (from-scratch) SECOND ANCHOR — a single t=8000 cell per virtual dataset.
+#
+# Why: scaling_solo_nh8_anchor_virt_002 gives ONE nh=8 solo point (t=126, ~0.03 h)
+# and borrows the slope from the nh=4 scaling_solo_full. This sweep adds a SECOND
+# nh=8 solo point at a much longer fidelity (~2 h wall time) so the solo line in the
+# finetune comparison can be anchored on two measured points instead of one point +
+# a borrowed slope.
+#
+# Identical to scaling_solo_nh8_anchor_virt EXCEPT: t_steps=[8000] (≈2 h wall time at
+# BS16384, vs ~0.03 h at t=126), only the two absolute-virtual (e4) datasets the
+# comparison plots use, and a 3 h SLURM limit to cover the longer training + eval.
+#
+# Generate:  python sweep/generate_scaling_sweep.py --config sweep/sweep_config_jeanzay_solo_nh8_anchor2_virt.yaml
+# Submit:    python sweep/sweep_manager.py submit <the 2 cell dirs it prints>
+
+cluster:
+  scheduler: slurm
+  auto_submit: false         # generate only; review then submit via sweep_manager
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "03:00:00"
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+sweep_name: scaling_solo_nh8_anchor2_virt
+seed: 42
+
+datasets:
+  - ee_uu_nlo_virt_e4
+  - ee_ttbar_nlo_virt_e4
+
+t_steps_values: [8000]
+
+n_trials_per_level: 15
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 4
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.subsample: 100000
+  data.train_test_val: "[0.7, 0.2, 0.1]"
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8                  # matched to the nh=8 finetune
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+
+# Solo (from-scratch) search space — same as scaling_solo_nh8_anchor_virt.
+search_space:
+  - name: training.lr
+    type: float_log
+    low: 3.1622776601683795e-05   # 10^-4.5
+    high: 0.1
+  - name: training.regularization_lambda
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.cosanneal_warmup_frac
+    type: float_uniform
+    low: 0.0
+    high: 0.2
+  - name: training.cosanneal_eta_min
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.ema_decay
+    type: float_uniform
+    low: 0.9
+    high: 0.9999

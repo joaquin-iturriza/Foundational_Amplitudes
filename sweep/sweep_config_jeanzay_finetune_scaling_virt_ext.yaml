@@ -1,0 +1,87 @@
+# Standard finetune scaling — RE-RUN with a wider fine_tune.lr_scale range and chunked
+# (5-at-a-time) Bayesian submission, because the original sweep railed lr_scale at the
+# top of [0.005, 1.0] (best values 0.83-0.98, decade-pos 0.97-1.00) AND ran concurrently
+# so the DyHPO surrogate never engaged.
+#
+# Changes vs sweep_config_jeanzay_finetune_scaling_virt.yaml:
+#   - fine_tune.lr_scale upper bound 1.0 -> 5.0 (it wanted higher than allowed).
+#   - only the 2 absolute-virt (e4) datasets the plots use.
+#   - fidelities matched to the solo ladder [4..8000] (so finetune & solo have the same
+#     8 points; avoids the 6h t=20000/40000 cells).
+# Submitted in CHUNKS of 5 per cell (run 5 -> observe -> next 5) for partial Bayesian.
+
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "02:00:00"           # covers the largest cell (t=8000, ~1.2h)
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
+
+sweep_name: finetune_scaling_virt_ext
+seed: 42
+
+datasets:
+  - ee_uu_nlo_virt_e4
+  - ee_ttbar_nlo_virt_e4
+
+t_steps_values: [4, 13, 40, 126, 400, 1265, 4000, 8000]
+
+n_trials_per_level: 15
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 4
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.subsample: 100000
+  data.train_test_val: "[0.7, 0.2, 0.1]"
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
+  training.lr: 0.001081750557879577
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.es_load_best_model: 'false'
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+
+search_space:
+  - name: fine_tune.lr_scale
+    type: float_log
+    low: 0.005
+    high: 5.0                 # widened from 1.0
+  - name: fine_tune.layer_decay
+    type: float_uniform
+    low: 0.65
+    high: 1.0
+  - name: training.regularization_lambda
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.cosanneal_warmup_frac
+    type: float_uniform
+    low: 0.0
+    high: 0.2
+  - name: training.cosanneal_eta_min
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06

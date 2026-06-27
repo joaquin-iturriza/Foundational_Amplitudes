@@ -1,0 +1,83 @@
+# nh=8 solo (from-scratch) LOW-t coverage — fills the empty left of the scaling plot.
+#
+# The solo curve currently covers t=126..8000; the finetune method ladder reaches down
+# to t=4. This adds the cheap low-fidelity cells (t=4,13,40, each <0.02 h train) so the
+# solo line is measured across the same compute range as the methods.
+#
+# Submitted SERIALIZED (SLURM dependency chain per cell) so DyHPO's Bayesian surrogate
+# actually engages — the earlier concurrent runs degenerated to random search.
+#
+# Generate:  python sweep/generate_scaling_sweep.py --config sweep/sweep_config_jeanzay_solo_nh8_lowt_virt.yaml
+# Submit:    serialized per cell (see chain-submit helper), NOT via sweep_manager.
+
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "00:30:00"
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+sweep_name: scaling_solo_nh8_lowt_virt
+seed: 42
+
+datasets:
+  - ee_uu_nlo_virt_e4
+  - ee_ttbar_nlo_virt_e4
+
+t_steps_values: [4, 13, 40]
+
+n_trials_per_level: 15
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 4
+
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.subsample: 100000
+  data.train_test_val: "[0.7, 0.2, 0.1]"
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+
+search_space:
+  - name: training.lr
+    type: float_log
+    low: 3.1622776601683795e-05
+    high: 0.1
+  - name: training.regularization_lambda
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.cosanneal_warmup_frac
+    type: float_uniform
+    low: 0.0
+    high: 0.2
+  - name: training.cosanneal_eta_min
+    type: float_log
+    low: 1.0e-11
+    high: 1.0e-06
+  - name: training.ema_decay
+    type: float_uniform
+    low: 0.9
+    high: 0.9999

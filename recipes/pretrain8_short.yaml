@@ -1,0 +1,14 @@
+# On-demand recipe spec replicating the 8-process pretraining-scaling D1e3p5
+# short cell (~395 events/process, split 0.7/0.2/0.1 -> 280 train / 80 val /
+# 40 test per process). Consumed via data.processes_file when source: recipes.
+# amp_orders are derived from each process's alphas_power automatically
+# (ee_uug -> [0,1], ee_uugg -> [0,2], rest -> [0,0]).
+processes:
+  - {name: ee_wwz,   sqrts: [255, 1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_WW,    sqrts: [162, 1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_ttbar, sqrts: [346, 1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_uug,   sqrts: [91,  1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_uugg,  sqrts: [91,  1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_aa,    sqrts: [10,  1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_aaa,   sqrts: [10,  1000], n_train: 280, n_val: 80, n_test: 40}
+  - {name: ee_uu,    sqrts: [91,  1000], n_train: 280, n_val: 80, n_test: 40}

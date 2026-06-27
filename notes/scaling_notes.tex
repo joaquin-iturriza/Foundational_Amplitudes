@@ -1,0 +1,217 @@
+% ============================================================
+% VRAM and Iteration-time Scaling — LLOCAMuPTransformer
+% Hardware: Tesla V100-SXM2-16GB (Jean-Zay gpu\_p2 partition)
+%           for 32 GB projections: V100-SXM2-32GB (gpu\_p2l)
+% ============================================================
+
+\section{GPU Scaling Benchmarks}
+
+Jean-Zay allocates GPU hours as a fixed budget per project, so
+maximising the amount of useful computation per step is critical.
+This section quantifies two bottlenecks: peak VRAM (which limits
+batch size and model width) and step time (which limits how many
+gradient updates fit in an allocation).  The goal is to understand
+the trade-off between batch size $\mathrm{bs}$, number of particles
+per event $n$, and network width $n_h$ (number of attention heads,
+$d = 16 n_h$), so that each job runs close to the hardware ceiling.
+
+Measurements were collected with \texttt{test\_vram\_scaling.py} and
+\texttt{test\_iteration\_time.py}, which perform realistic steps
+including a full forward pass, backward pass, and \textsc{AdamW}
+update.
+
+\subsection{Peak VRAM}
+
+\subsubsection{Fitting formula}
+
+Peak VRAM during a training step is well described by
+\begin{equation}
+  V_\text{peak}(\mathrm{bs},\, n,\, n_h)
+    \;\approx\; a(n_h)\cdot\mathrm{bs}\cdot n
+              + b(n_h)\cdot\mathrm{bs}
+              + C(n_h)
+  \quad [\text{MB}],
+  \label{eq:vram}
+\end{equation}
+where the $b\cdot\mathrm{bs}$ term is small relative to the leading
+term for $n\geq 2$.  The coefficient $a$ accounts for activation
+memory (scales as $n_h$) and $C$ for fixed memory: model parameters
+plus the two AdamW momentum buffers ($\approx 3\times$ params in
+float32).
+
+\subsubsection{Width scaling}
+
+The network width is $d = 16\,n_h$; the framesnet MLP is fixed at
+128 hidden channels regardless of width.  Parameters scale roughly
+as $n_h^2$ (transformer attention and MLP blocks dominate), so fixed
+memory grows as $n_h^2$ while the activation coefficient $a$ grows
+linearly with $n_h$.
+
+\begin{table}[h]
+\centering
+\caption{%
+  Model size and VRAM fit coefficients vs.\ width.
+  $d = 16\,n_h$ is the transformer hidden dimension.
+  Fixed memory = params + AdamW states ($\approx 3\times$ params).
+  EMA (\texttt{torch\_ema}) adds one float32 shadow copy on GPU,
+  increasing $C$ by exactly $\Delta C_\text{EMA} = \text{params (MB)}$;
+  $a$ and $b$ are unchanged.
+  All measurements on V100-SXM2-16\,GB.}
+\label{tab:width}
+\begin{tabular}{rrrrrrl}
+\hline
+$n_h$ & $d$ & Params\,(MB) & Optim\,(MB) & $C$\,(MB) & $C_\text{EMA}$\,(MB) & $a$\,(MB/bs$\cdot n$) \\
+\hline
+  2 &   32 &   0.5 &   0.9 &   21 &   22 & 0.0501 \\
+  4 &   64 &   1.6 &   3.2 &   26 &   28 & 0.0710 \\
+  8 &  128 &   6.1 &  12.3 &   40 &   46 & 0.1129 \\
+ 16 &  256 &  24.2 &  48.4 &  103 &  127 & 0.1939 \\
+ 32 &  512 &  96.3 & 192.5 &  329 &  426 & 0.3583 \\
+ 64 & 1024 & 384.5 & 768.9 & 1222 & 1607 & 0.6921 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  % \includegraphics[width=\textwidth]{vram_plots.pdf}
+  \caption{%
+    \textbf{VRAM scaling} (six panels).
+    \textit{Top row:} peak VRAM vs.\ batch size (log--log) and vs.\
+    $n$ particles (linear) at $n_h=16$; lines separate cleanly,
+    confirming the bilinear model in Eq.~\eqref{eq:vram}.
+    \textit{Middle row:} maximum $n$ before OOM at 16\,GB and 32\,GB
+    as a function of batch size, for all six widths.
+    \textit{Bottom row:} fixed memory components vs.\ $n_h$ (log--log,
+    slope $\approx 2$ confirming $n_h^2$ scaling) and fitted
+    activation coefficient $a$ vs.\ $n_h$ (log--log, slope $\approx 1$
+    confirming linear scaling).}
+  \label{fig:vram}
+\end{figure}
+
+\subsubsection{Maximum model width given batch size and particle count}
+
+Table~\ref{tab:maxnh} gives the largest $n_h$ that fits in memory
+for each $(\mathrm{bs}, n)$ pair, derived from Eq.~\eqref{eq:vram}
+and cross-checked against measured peaks.  Entries in parentheses are
+for 32\,GB GPUs; unparenthesised entries fit on 16\,GB.
+
+\begin{table}[h]
+\centering
+\caption{%
+  Maximum $n_h$ (attention heads) that fits within 16\,GB (bold) and
+  32\,GB (parenthesised) for each $(\mathrm{bs}, n)$.
+  OOM entries are blank.
+  Current standard configuration: $n_h=16$, $\mathrm{bs}=512$, $n\leq 6$.}
+\label{tab:maxnh}
+\begin{tabular}{r|rrrrrr}
+\hline
+      & \multicolumn{6}{c}{$n$ particles per event} \\
+bs    & 2    & 4    & 6    & 8    & 10   & 12   \\
+\hline
+  256 & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) \\
+  512 & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) \\
+ 1024 & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) \\
+ 2048 & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{64}\,(64) & \textbf{32}\,(64) & \textbf{32}\,(64) & \textbf{32}\,(64) \\
+ 4096 & \textbf{64}\,(64) & \textbf{32}\,(64) & \textbf{32}\,(64) & \textbf{32}\,(64) & \textbf{16}\,(32) & \textbf{16}\,(32) \\
+ 8192 & \textbf{32}\,(64) & \textbf{16}\,(32) & \textbf{16}\,(32) & \textbf{8}\,(32)  & \textbf{8}\,(16)  & \textbf{8}\,(16)  \\
+\hline
+\end{tabular}
+\end{table}
+
+Key takeaways:
+\begin{itemize}
+  \item Below $\mathrm{bs}=2048$, activation memory is small enough
+    that the widest model ($n_h=64$) fits for all tested $n\leq 12$
+    on 16\,GB.
+  \item At $\mathrm{bs}=4096$ (a practical training batch size) one
+    can run $n_h=32$ for $n\leq 8$, or $n_h=64$ for $n\leq 2$, on
+    16\,GB.
+  \item Moving to 32\,GB GPUs (gpu\_p2l) unlocks one width tier at
+    every $(bs, n)$: e.g.\ $\mathrm{bs}=8192$, $n=8$ goes from
+    $n_h=8$ to $n_h=32$.
+\end{itemize}
+
+\subsection{Iteration Time}
+
+\subsubsection{Timing methodology}
+
+Five warmup steps are discarded; 20 steps are timed with
+\texttt{torch.cuda.synchronize()} bracketing each step.
+Mean and standard deviation are reported; standard deviations are
+below $2\,\mathrm{ms}$ in all non-OOM cases.
+
+\subsubsection{Step time}
+
+\begin{table}[h]
+\centering
+\caption{%
+  Step time (ms) at $\mathrm{bs}=2048$ for all measured $(n_h, n)$
+  combinations.  OOM cells are blank.
+  Throughput $=\mathrm{bs}/t\,[\mathrm{k\,samples/s}]$ in
+  parentheses.}
+\label{tab:time}
+\begin{tabular}{r|rrrrrr}
+\hline
+     & \multicolumn{5}{c}{$n$ particles per event} \\
+$n_h$ & 2 & 4 & 6 & 8 & 10 \\
+\hline
+ 4  & 38\,(53.5) & 51\,(40.4) & 62\,(33.1) & 79\,(26.0) & 93\,(22.1) \\
+ 8  & 58\,(35.4) & 86\,(23.7) &115\,(17.8) &144\,(14.2) &175\,(11.7) \\
+16  &107\,(19.1) &170\,(12.0) &233\,(8.8)  &295\,(6.9)  &360\,(5.7)  \\
+32  &226\,(9.0)  &373\,(5.5)  &517\,(4.0)  &664\,(3.1)  &825\,(2.5)  \\
+64  &526\,(3.9)  &925\,(2.2)  &1302\,(1.6) &     ---    &     ---    \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  % \includegraphics[width=\textwidth]{iteration_time_plots.pdf}
+  \caption{%
+    \textbf{Iteration time and throughput} (six panels).
+    \textit{Top row:} step time (log--log) and throughput vs.\ batch
+    size at $n_h=16$, with $n$ as parameter: throughput saturates
+    above $\mathrm{bs}\approx 2048$, reaching $\sim 9\,\mathrm{k/s}$
+    at $n=6$.
+    \textit{Middle row:} same with $n_h$ as parameter at $n=6$:
+    wider models are slower but reach lower saturated throughput.
+    \textit{Bottom left:} step time vs.\ $n$ at $n_h=16$ is linear
+    above $\mathrm{bs}\approx 1024$, confirming MLP dominance
+    (FLOPs $\propto n\cdot d^2$).
+    \textit{Bottom right:} step time vs.\ $n_h$ at $n=6$ in log--log;
+    slope $\approx 1.1$, slightly super-linear at the largest widths.}
+  \label{fig:time}
+\end{figure}
+
+\subsubsection{Scaling relationships}
+
+\paragraph{Scaling with $n$ (fixed $n_h$, large bs):}
+Step time grows linearly with $n$ once $\mathrm{bs}$ is large
+enough to saturate the GPU.
+This follows from the MLP dominating compute:
+$\mathrm{FLOPs}_\text{MLP} \propto n\cdot d^2$, whereas
+$\mathrm{FLOPs}_\text{attn} \propto n^2 \cdot d$,
+so $\mathrm{FLOPs}_\text{MLP}/\mathrm{FLOPs}_\text{attn}
+= d/n = 16\,n_h/n \gg 1$ for $n \leq 12$.
+At $n_h=16$, $\mathrm{bs}=2048$:
+\[
+  \Delta t / \Delta n \approx 31\,\text{ms per extra particle}.
+\]
+
+\paragraph{Scaling with $n_h$ (fixed $n$, large bs):}
+At $n=6$, $\mathrm{bs}=2048$, doubling $n_h$ increases the step
+time by a factor of roughly $2.0$--$2.5$ (slightly super-linear):
+\[
+  t \propto n_h^{1.1},
+\]
+consistent with MLP FLOPs $\propto d^2 \propto n_h^2$ partially
+offset by increased parallelism at wider widths saturating memory
+bandwidth.
+
+\paragraph{Throughput plateau:}
+The GPU saturates above $\mathrm{bs}\approx 2048$ for all widths
+tested.  Saturated throughput (k\,samples/s) at $n=6$:
+$n_h=4$: 35, $n_h=8$: 19, $n_h=16$: 9, $n_h=32$: 4,
+$n_h=64$: 1.6.
+Throughput scales roughly as $1/n_h$.
