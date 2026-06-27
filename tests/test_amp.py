@@ -187,6 +187,42 @@ def check_frame_broadcast_equivalence():
     print(f"  frame broadcast == repeat  OK  (max rel diff {rel:.1e})")
 
 
+def check_fast_equilinear_equivalence():
+    """L-GATr hot-path: LGATR_FAST_LINEAR (fancy-index-free EquiLinear.forward in
+    models/lgatr_mup.py) must reproduce the stock forward bit-for-bit, including
+    gradients, for every scalar/MV in/out combination. Checked in float64."""
+    import importlib
+    import models.lgatr_mup as lg
+    from lgatr.layers.linear import EquiLinear
+
+    torch.manual_seed(0)
+    worst = 0.0
+    for in_s, out_s in [(8, 5), (8, None), (None, 5), (None, None)]:
+        lin = EquiLinear(in_mv_channels=4, out_mv_channels=7,
+                         in_s_channels=in_s, out_s_channels=out_s).double()
+        mv0 = torch.randn(3, 4, 16, dtype=torch.float64, requires_grad=True)
+        mv1 = mv0.detach().clone().requires_grad_(True)
+        s = torch.randn(3, 8, dtype=torch.float64) if in_s else None
+
+        EquiLinear.forward = lg._ORIG_EQUILINEAR_FORWARD
+        o0_mv, o0_s = lin(mv0, scalars=s)
+        (o0_mv.sum() + (o0_s.sum() if o0_s is not None else 0)).backward()
+
+        EquiLinear.forward = lg._fast_equilinear_forward
+        f1_mv, f1_s = lin(mv1, scalars=s)
+        (f1_mv.sum() + (f1_s.sum() if f1_s is not None else 0)).backward()
+
+        d = (o0_mv - f1_mv).abs().max().item()
+        if o0_s is not None:
+            d = max(d, (o0_s - f1_s).abs().max().item())
+        d = max(d, (mv0.grad - mv1.grad).abs().max().item())
+        worst = max(worst, d)
+    # restore default (env-driven) behavior
+    lg.enable_fast_equilinear()
+    assert worst < 1e-10, f"fast EquiLinear != stock: max diff {worst:.2e}"
+    print(f"  fast EquiLinear == stock   OK  (max fwd+grad diff {worst:.1e})")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -194,6 +230,7 @@ check_proc_loss_equivalence()
 check_reg_equivalence()
 check_attention_routing()
 check_frame_broadcast_equivalence()
+check_fast_equilinear_equivalence()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────
