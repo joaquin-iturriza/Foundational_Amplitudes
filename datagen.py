@@ -148,6 +148,11 @@ def plan_chunks(n_events, chunk_size=None):
     if chunk_size is None:
         chunk_size = MAX_CHUNK
     nch = max(1, math.ceil(n_events / chunk_size))
+    return split_counts(n_events, nch)
+
+
+def split_counts(n_events, nch):
+    """Split n_events into `nch` near-equal contiguous counts (deterministic)."""
     base, rem = divmod(n_events, nch)
     return [base + (1 if i < rem else 0) for i in range(nch)]
 
@@ -163,9 +168,11 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
     """Independent chunk work-units for one (process, role) dataset. Each is a
     self-contained dict that gen_chunk() can run in any worker / any order."""
     tasks = []
-    weight     = process_gen_weight(process)
-    chunk_size = process_chunk_size(process)
-    for idx, count in enumerate(plan_chunks(n_events, chunk_size)):
+    weight = process_gen_weight(process)
+    # NLO-virtual is generated as one unit (see mg.process_n_chunks); LO uses the
+    # cost-aware split. Both go through the same per-chunk seed / identity machinery.
+    nch    = mg.process_n_chunks(process, n_events)
+    for idx, count in enumerate(split_counts(n_events, nch)):
         tasks.append({
             "process":   process,
             "sqrts_min": float(sqrts_min),
@@ -185,18 +192,31 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
 def gen_virt_chunk(task):
     """Worker: generate one NLO-virtual chunk in an isolated subprocess (MadLoop's
     matrix2py.so chdir's and is a process-singleton, so it can't be loaded in a
-    shared pool worker). Deterministic via the per-chunk seed. Returns (idx, path)."""
+    shared pool worker). Deterministic via the per-chunk seed. Returns (idx, path).
+
+    NLO datasets are one unit each (mg.process_n_chunks), so only a few of these
+    run at once; the retry is belt-and-suspenders against the transient numpy
+    C-extension import race that fresh interpreters can hit under FS contention
+    (PyCapsule_Import 'datetime'). The seed is fixed, so a retry is identical."""
     process = task["process"]
     base    = mg.PROCESSES[process]["virt_base"]
     os.makedirs(task["out_dir"], exist_ok=True)
     out_path = os.path.join(task["out_dir"], "chunk.npy")
-    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib",
+               PYTHONDONTWRITEBYTECODE="1")
     cmd = [sys.executable, _NLO_PIPELINE, base, "--generate",
            "--n", str(task["count"]), "--seed", str(task["seed"]),
            "--sqrts-min", repr(task["sqrts_min"]), "--sqrts-max", repr(task["sqrts_max"]),
            "--out", out_path]
-    subprocess.run(cmd, check=True, env=env)
-    return task["idx"], out_path
+    import time
+    last = None
+    for attempt in range(4):
+        r = subprocess.run(cmd, env=env, capture_output=True, text=True)
+        if r.returncode == 0:
+            return task["idx"], out_path
+        last = r.stderr[-2000:]
+        time.sleep(1.5 * (attempt + 1))   # brief stagger; race is transient
+    raise RuntimeError(f"gen_virt_chunk failed for {process} after 4 tries:\n{last}")
 
 
 def gen_chunk(task):

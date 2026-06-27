@@ -1575,6 +1575,20 @@ def process_chunk_size(process):
     return int(min(MAX_CHUNK, max(MIN_CHUNK, round(size))))
 
 
+def process_n_chunks(process, n_events):
+    """Number of generation chunks for a dataset — the byte-determining split.
+
+    NLO-virtual processes are generated as ONE unit (datagen runs them in an
+    isolated subprocess: MadLoop's matrix2py.so is a process-singleton, and many
+    concurrent fresh-interpreter per-chunk subprocesses race on numpy's C-extension
+    import on Lustre). NLO is cheap per point (~0.2 ms), so a whole dataset in one
+    process is fast enough and needs no intra-process parallelism. LO uses the
+    cost-aware size."""
+    if PROCESSES.get(process, {}).get("kind") == "virt":
+        return 1
+    return -(-int(n_events) // process_chunk_size(process))
+
+
 def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
                            role=None, seed=None):
     """Canonical content-determining recipe dict for a variable-energy dataset.
@@ -1608,7 +1622,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         "per_event_alphas":   True,
     }
     ceil_div    = lambda a, b: -(-a // b)
-    n_chunks    = ceil_div(n, process_chunk_size(process))
+    n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)
     if n_chunks != legacy_nch:
         recipe["n_chunks"] = n_chunks          # identity-bearing; legacy plan is implicit
