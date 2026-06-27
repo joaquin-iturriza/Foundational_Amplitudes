@@ -186,6 +186,67 @@ for _pdg, _idx in GLOBAL_PDG_IDX.items():
 GLOBAL_PROPERTY_MATRIX = _mat   # (GLOBAL_N_ENTRIES, N_FEATURES), row 0 = padding zeros
 
 
+# ---------------------------------------------------------------------------
+# Optional hybrid encoding: one-hot the *categorical* spin column
+# ---------------------------------------------------------------------------
+# Spin is a label, not a magnitude — spin-1 is not "twice" spin-½, and spin-½
+# is not "halfway between" 0 and 1.  Fed as a raw scalar through Linear(n→d),
+# every spin is forced onto one line through the origin (contributions
+# 0·w, 0.5·w, 1·w), so the projection can't give bosons and fermions
+# independent embedding directions.  One-hot gives each spin value its own
+# learnable row instead.  We keep the additive/continuous quantum numbers
+# (charge, T₃, B, L, mass, casimir) as scalars — for those the ordering and
+# distance ARE physical, so one-hot would throw information away.
+#
+# Pre-allocated spin values get a clean one-hot; anything outside the list
+# falls back to a scalar "overflow" channel, so you do NOT have to pick a hard
+# maximum spin up front — arbitrarily high/unusual spins still encode (you just
+# lose the one-hot benefit for those rare cases until you add them to the list).
+SPIN_ONEHOT_VALUES = (0.0, 0.5, 1.0, 1.5, 2.0)   # extend freely; regen base shapes
+_SPIN_TOL = 1e-6
+_SPIN_COL = PARTICLE_FEATURE_NAMES.index("spin")   # == 1
+
+
+def expand_spin_onehot(matrix):
+    """Replace the scalar spin column of a property matrix with a one-hot over
+    SPIN_ONEHOT_VALUES plus a scalar overflow channel.
+
+    Returns (expanded_matrix, expanded_feature_names).  Layout is the original
+    column order with the single spin column expanded in place:
+        [charge, spin_is_0, spin_is_0.5, …, spin_overflow, <rest scalars…>]
+    All-zero rows (the padding row 0) are preserved as all-zero so padded
+    particles still contribute nothing.
+    """
+    matrix = np.asarray(matrix, dtype=np.float32)
+    n      = matrix.shape[0]
+    spin   = matrix[:, _SPIN_COL]
+
+    onehot   = np.zeros((n, len(SPIN_ONEHOT_VALUES)), dtype=np.float32)
+    overflow = np.zeros((n, 1), dtype=np.float32)
+    matched  = np.zeros(n, dtype=bool)
+    for i, v in enumerate(SPIN_ONEHOT_VALUES):
+        hit         = np.abs(spin - v) < _SPIN_TOL
+        onehot[:, i] = hit
+        matched     |= hit
+    overflow[:, 0] = np.where(matched, 0.0, spin)   # 0 for known spins, raw value otherwise
+
+    expanded = np.concatenate(
+        [matrix[:, :_SPIN_COL], onehot, overflow, matrix[:, _SPIN_COL + 1:]],
+        axis=1,
+    )
+    # keep padding rows all-zero (spin 0.0 would otherwise one-hot to a real slot)
+    padding = ~np.any(matrix != 0.0, axis=1)
+    expanded[padding] = 0.0
+
+    names = (
+        PARTICLE_FEATURE_NAMES[:_SPIN_COL]
+        + [f"spin_is_{v:g}" for v in SPIN_ONEHOT_VALUES]
+        + ["spin_overflow"]
+        + PARTICLE_FEATURE_NAMES[_SPIN_COL + 1:]
+    )
+    return expanded, names
+
+
 def global_encode(pdg_ids: np.ndarray) -> np.ndarray:
     """Map PDG IDs → global property-table indices (use_PIDs=False mode)."""
     pdg_ids = np.asarray(pdg_ids, dtype=int)

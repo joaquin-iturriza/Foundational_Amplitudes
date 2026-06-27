@@ -54,6 +54,10 @@ data:
   - standardization
  incl_fvs: false
  use_PIDs: false  # false: 8D physical property vector; true: one-hot PDG token index (legacy)
+ # Hybrid encoding: one-hot the categorical spin column of the property vector
+ # (8D -> 13D). Off by default (keeps existing checkpoints/warm-start valid).
+ # Only meaningful when use_PIDs: false. See particle_ids.expand_spin_onehot.
+ spin_onehot: false
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
  #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]

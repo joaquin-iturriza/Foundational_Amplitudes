@@ -163,10 +163,11 @@ def _coalition_values(fn, fm_t, pr_t, or_t, bits_t, ref, P, M, device, budget):
     for b0 in range(0, B, ev_chunk):
         b1 = min(b0 + ev_chunk, B); bs = b1 - b0
         xfm, xpr, xor = fm_t[b0:b1], pr_t[b0:b1], or_t[b0:b1]
-        coal = bsel * xpr[:, None] + (1 - bsel) * ref.view(1, 1, 1, 8)  # (bs,M,P,8)
+        F = xpr.shape[-1]
+        coal = bsel * xpr[:, None] + (1 - bsel) * ref.view(1, 1, 1, F)  # (bs,M,P,F)
         E = bs * M
         fm_flat = xfm[:, None].expand(bs, M, P, 4).reshape(E * P, 4)
-        pr_flat = coal.reshape(E * P, 8)
+        pr_flat = coal.reshape(E * P, F)
         or_flat = xor[:, None].expand(bs, M, xor.shape[-1]).reshape(E, -1)
         ptr = torch.arange(0, (E + 1) * P, P, device=device, dtype=torch.long)
         with torch.no_grad():
@@ -236,13 +237,14 @@ def local_sensitivity(fn, fm, props, order, scale_fm, scale_pr, device, mb_event
     preds = torch.zeros((B, 1), device=device)
     for b0 in range(0, B, mb_events):
         b1 = min(b0 + mb_events, B); bs = b1 - b0
+        F = pr_t.shape[-1]
         fm_flat = fm_t[b0:b1].reshape(bs * P, 4).clone().requires_grad_(True)
-        pr_flat = pr_t[b0:b1].reshape(bs * P, 8).clone().requires_grad_(True)
+        pr_flat = pr_t[b0:b1].reshape(bs * P, F).clone().requires_grad_(True)
         ptr = torch.arange(0, (bs + 1) * P, P, device=device, dtype=torch.long)
         out = fn(fm_flat, pr_flat, or_t[b0:b1], ptr, tuple([P] * bs))
         gfm, gpr = torch.autograd.grad(out.sum(), [fm_flat, pr_flat])
         g_fm[b0:b1] = gfm.reshape(bs, P, 4)
-        g_pr[b0:b1] = gpr.reshape(bs, P, 8)
+        g_pr[b0:b1] = gpr.reshape(bs, P, F)
         preds[b0:b1] = out.detach()
     sfm = np.abs(g_fm.cpu().numpy()) * scale_fm
     spr = np.abs(g_pr.cpu().numpy()) * scale_pr
@@ -274,12 +276,13 @@ def property_contrasts(fn, fm, props, order, contrasts, device, mb_events):
             tA = torch.as_tensor(pa, dtype=torch.float32, device=device)
             tB = torch.as_tensor(pb, dtype=torch.float32, device=device)
             dsum = 0.0
+            F = pr_t.shape[-1]
             for s in range(P):                 # swap each slot in turn
                 prA = pr_t[b0:b1].clone(); prA[:, s, :] = tA
                 prB = pr_t[b0:b1].clone(); prB[:, s, :] = tB
                 with torch.no_grad():
-                    fA = fn(xfm, prA.reshape(bs * P, 8), xor, ptr, seq)
-                    fB = fn(xfm, prB.reshape(bs * P, 8), xor, ptr, seq)
+                    fA = fn(xfm, prA.reshape(bs * P, F), xor, ptr, seq)
+                    fB = fn(xfm, prB.reshape(bs * P, F), xor, ptr, seq)
                 dsum += (fA - fB).abs().sum().item()
             sums[name] += dsum
         cnt += bs * P
@@ -422,19 +425,39 @@ def main():
     out_prefix = args.out_prefix or os.path.join(args.run_dir, "attribution", "shap")
     os.makedirs(os.path.dirname(out_prefix), exist_ok=True)
 
-    from particle_ids import GLOBAL_PDG_IDX, PARTICLE_FEATURE_NAMES
+    from particle_ids import (
+        GLOBAL_PDG_IDX, PARTICLE_FEATURE_NAMES, GLOBAL_PROPERTY_MATRIX,
+        expand_spin_onehot,
+    )
     idx2pdg = {v: k for k, v in GLOBAL_PDG_IDX.items()}
-    prop_names = PARTICLE_FEATURE_NAMES
 
     exp = load_experiment(args.run_dir, args.ckpt, args.frame)
+
+    # Feature names must match the run's property-vector width: the spin-one-hot
+    # encoding (data.spin_onehot) replaces the scalar "spin" column with a one-hot
+    # block + overflow (8D -> 13D). Derive names from the run config so indexing
+    # and labels line up regardless of which encoding the run used.
+    if exp.cfg.data.get("spin_onehot", False):
+        _, prop_names = expand_spin_onehot(GLOBAL_PROPERTY_MATRIX)
+    else:
+        prop_names = list(PARTICLE_FEATURE_NAMES)
+    assert len(prop_names) == exp.property_matrix.shape[1], (
+        f"prop_names ({len(prop_names)}) != property dim "
+        f"({exp.property_matrix.shape[1]})")
     fn = ForwardFn(exp)
     rng = np.random.default_rng(args.seed)
     dataset_names = list(exp.cfg.data.dataset)
 
     scale_fm = exp.particles_flat.std(axis=0).astype(np.float32)   # (4,)
     all_props = exp.property_matrix[exp.tokens_flat].astype(np.float32)
-    scale_pr = all_props.std(axis=0).astype(np.float32)            # (8,)
-    scale_pr[scale_pr == 0] = 1.0
+    scale_pr = all_props.std(axis=0).astype(np.float32)            # (F,)
+    # A feature that never varies in the data (sigma == 0) has no on-manifold
+    # importance: changing it never happens on the data manifold. Leave its scale
+    # at 0 so |dF/dx|*sigma = 0 rather than fabricating sensitivity by flooring to
+    # 1. (Matters for the spin one-hot encoding: slots for spins absent from the
+    # training processes — e.g. spin 0/3-2/2 here — and the spin_overflow channel
+    # are identically 0, and must not be credited with importance.)
+    scale_pr[scale_pr == 0] = 0.0
     if args.ref_mode == "background":
         present = np.unique(exp.tokens_flat)
         present = present[present > 0]
@@ -498,7 +521,7 @@ def main():
         )
         for pdg, val in zip(slot_pdg, shap_abs):
             pdg_imp.setdefault(pdg, []).append(float(val))
-        prop_accum.append(spr.reshape(-1, 8))
+        prop_accum.append(spr.reshape(-1, spr.shape[-1]))
 
         labels = ", ".join(f"{PDG_NAMES.get(q, str(q))}={shap_abs[i]:.2e}"
                            for i, q in enumerate(slot_pdg))
@@ -519,6 +542,21 @@ def main():
     print("\n=== GLOBAL physical-property importance (|dF/dprop|*sigma, local proxy) ===")
     for i in np.argsort(global_prop_imp)[::-1]:
         print(f"  {prop_names[i]:>16s} : {global_prop_imp[i]:.4e}")
+
+    # Aggregate the spin encoding back to a single comparable number. With the
+    # scalar encoding this is just the "spin" column; with one-hot it sums the
+    # whole spin block (spin_is_* + spin_overflow) so the two runs are comparable.
+    spin_dims = [i for i, n in enumerate(prop_names) if n == "spin" or n.startswith("spin_")]
+    spin_agg = float(global_prop_imp[spin_dims].sum())
+    spin_block = ", ".join(f"{prop_names[i]}={global_prop_imp[i]:.3e}" for i in spin_dims)
+    print(f"\n  spin (aggregated over {len(spin_dims)} dim(s)) : {spin_agg:.4e}")
+    print(f"    [{spin_block}]")
+    # rank of spin among the non-spin properties + spin-agg, for a quick read
+    nonspin = [(prop_names[i], float(global_prop_imp[i]))
+               for i in range(len(prop_names)) if i not in spin_dims]
+    ranked = sorted(nonspin + [("spin(agg)", spin_agg)], key=lambda kv: kv[1], reverse=True)
+    spin_rank = [k for k, _ in ranked].index("spin(agg)") + 1
+    print(f"    spin(agg) ranks #{spin_rank}/{len(ranked)} among properties")
 
     # property contrasts: weighted mean over processes (by event count)
     cnames = [nm for nm, _, _ in contrasts]
@@ -547,6 +585,8 @@ def main():
         global_imp=np.array(list(global_pdg_imp.values())),
         prop_names=np.array(prop_names),
         global_prop_imp=global_prop_imp,
+        spin_agg=spin_agg,
+        spin_dims=np.array(spin_dims),
         **{f"{n}__shap_abs": d["shap_abs"] for n, d in per_proc.items()},
         **{f"{n}__shap_signed": d["shap_signed"] for n, d in per_proc.items()},
         **{f"{n}__mom_slot": d["mom_per_slot"] for n, d in per_proc.items()},

@@ -478,9 +478,16 @@ class AmplitudeExperiment(BaseExperiment):
                 LOGGER.info(f"Particle encoding: one-hot PIDs (vocab_size={token_size})")
             else:
                 from particle_ids import (
-                    ParticleFeaturizer, GLOBAL_PROPERTY_MATRIX, GLOBAL_N_ENTRIES
+                    ParticleFeaturizer, GLOBAL_PROPERTY_MATRIX, GLOBAL_N_ENTRIES,
+                    expand_spin_onehot,
                 )
                 self.property_matrix = GLOBAL_PROPERTY_MATRIX
+                # Optional hybrid encoding: one-hot the categorical spin column
+                # (scalars otherwise). Off by default so warm-start/fine-tune
+                # from existing checkpoints stay valid (this changes input width).
+                spin_onehot = self.cfg.data.get("spin_onehot", False)
+                if spin_onehot:
+                    self.property_matrix, _ = expand_spin_onehot(self.property_matrix)
                 # d_particle_hidden is the fixed projection output dim.
                 # in_channels and num_scalars use this fixed dim — they never
                 # change when quantum numbers are added, only the tiny projection
@@ -489,7 +496,9 @@ class AmplitudeExperiment(BaseExperiment):
                 particle_feature_dim = d_hidden
                 LOGGER.info(
                     f"Particle encoding: physical properties "
-                    f"({ParticleFeaturizer.N_FEATURES}D → projected to {d_hidden}D) | "
+                    f"({self.property_matrix.shape[1]}D"
+                    f"{' [spin one-hot]' if spin_onehot else ''} "
+                    f"→ projected to {d_hidden}D) | "
                     f"global table covers {GLOBAL_N_ENTRIES - 1} particle species"
                 )
             # n_order_features extra scalars per particle (same value broadcast across event)
