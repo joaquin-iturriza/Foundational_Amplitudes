@@ -344,16 +344,20 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         cmd.append(script)
         out = _run(cmd, dry_run=dry_run)
         jid = out.split(";")[0].strip() if out else f"DRY{idx}"
-        reg["sweeps"][sweep]["jobs"][jid] = {
-            "trial_idx": idx, "script": script, "round": rnd, "nice": nice,
-        }
-        reg["sweeps"][sweep]["submitted_scripts"].append(script)
+        # Only record the submission when it actually happened: a dry-run must not
+        # mutate the registry, or it marks these scripts as submitted and a later
+        # real submit skips them ("no new trial scripts to submit").
+        if not dry_run:
+            reg["sweeps"][sweep]["jobs"][jid] = {
+                "trial_idx": idx, "script": script, "round": rnd, "nice": nice,
+            }
+            reg["sweeps"][sweep]["submitted_scripts"].append(script)
         print(f"  round {rnd:>3}  {sweep}  trial_{idx:04d}  nice={nice}  job={jid}")
 
-    save_registry(registry, reg)
-
-    # 3. Globally re-interleave everything still pending (fixes nice across sweeps).
+    # 3. Persist and globally re-interleave everything still pending (fixes nice
+    #    across sweeps). Both are no-ops under dry-run.
     if not dry_run:
+        save_registry(registry, reg)
         _rebalance(reg, registry, gap, dry_run=dry_run)
 
 
@@ -402,13 +406,17 @@ def _rebalance(reg, registry_path, gap, dry_run=False):
         if info.get("nice") == nice:
             continue
         _run(["scontrol", "update", f"jobid={jid}", f"nice={nice}"], dry_run=dry_run)
-        info["nice"] = nice
-        info["round"] = rnd
+        # Record the new nice only if scontrol actually ran; a dry-run must leave
+        # the registry matching the real queue state.
+        if not dry_run:
+            info["nice"] = nice
+            info["round"] = rnd
         changes += 1
         print(f"  round {rnd:>3}  {sweep}  trial_{idx:04d}  -> nice={nice}  job={jid}")
     if changes == 0:
         print("  (already balanced)")
-    save_registry(registry_path, reg)
+    if not dry_run:
+        save_registry(registry_path, reg)
 
 
 def cmd_boost(args):
@@ -416,7 +424,8 @@ def cmd_boost(args):
     if args.sweep not in reg["sweeps"]:
         sys.exit(f"unknown sweep '{args.sweep}'. Known: {list(reg['sweeps'])}")
     reg["sweeps"][args.sweep]["weight"] = args.weight
-    save_registry(args.registry, reg)
+    if not args.dry_run:
+        save_registry(args.registry, reg)
     print(f"Set weight of '{args.sweep}' to {args.weight} (trials per round).")
     _rebalance(reg, args.registry, reg["round_gap"], dry_run=args.dry_run)
 
