@@ -12,11 +12,13 @@ dyhpo:
   seed: 42
   total_budget: 10000
 fidelity_schedule:
-  # Equal WALL-TIME to LLoCa's 15000-step pretrain25 run: L-GATr-slim measured
-  # 66.9 ms/step vs LLoCa 36.5 ms/step (1.83x) in one shared profiling run (sparse
-  # block-diagonal xformers attention, batchsize 1024), so 15000 * 36.5/66.9 = 8184.
+  # Equal training COMPUTE to LLoCa's 15000-step pretrain25 run: L-GATr-slim
+  # measured 7.429e10 FLOP/step vs LLoCa 4.878e10 (1.52x) in one shared profiling
+  # run (batchsize 1024). Matching total FLOPs: 15000 * 4.878e10 / 7.429e10 = 9850.
+  # (More steps than the equal-wall-time 8184: slim is FLOP-light but wall-heavy --
+  # 1.52x FLOPs yet 1.83x wall time, i.e. lower V100 utilisation than LLoCa.)
   t_steps:
-  - 8184
+  - 9850
 fixed_params:
   # --- identical 25-process recipe data to pretrain25 (the LLoCa baseline) ---
   data.source: recipes
@@ -25,7 +27,7 @@ fixed_params:
   data.require_cache: 'true'
   # 500k/process (12.5M pool): identical to the LLoCa pretrain25 baseline, so every
   # architecture sees the same data pool and the comparison's only controlled axis is
-  # t_steps. At equal wall-time slim sees ~8.4M samples (8184 x 1024) < 12.5M, i.e. no
+  # t_steps. At equal compute slim sees ~10.1M samples (9850 x 1024) < 12.5M, i.e. no
   # repetition. val/test come from the separate frozen eval pool (eval_subsample 20k
   # below), so this knob does not affect the comparison metric.
   data.train_subsample: 500000
@@ -56,7 +58,7 @@ paths:
   setup_commands:
   - module load anaconda-py3/2023.09
   - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/pretrain25_slim
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/pretrain25_slim_eqc
 range_extension:
   enabled: false
 search_space:
@@ -67,4 +69,4 @@ search_space:
 - {name: training.ema_decay,              type: float_uniform, low: 0.9,    high: 0.9999}
 - {name: training.sampler_alpha_ema,      type: float_uniform, low: 0.3,    high: 0.95}
 - {name: training.sampler_min_alpha_frac, type: float_uniform, low: 0.05,   high: 0.5}
-sweep_name: pretrain25_slim
+sweep_name: pretrain25_slim_eqc

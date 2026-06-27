@@ -23,12 +23,12 @@ fixed_params:
   data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
-  # 200k/process (5M pool) not pretrain25's 500k: at equal wall-time L-GATr trains
-  # on only ~1M samples (988 steps x 1024), so a 5M pool is already >> what it sees,
-  # and the final per-process train-eval (which iterates the WHOLE pool) is ~15x
-  # slower than LLoCa — capping the pool keeps it inside walltime. The val-loss metric
-  # is unaffected (val/test come from the separate frozen pools below).
-  data.train_subsample: 200000
+  # 500k/process (12.5M pool): identical to the LLoCa pretrain25 baseline, so every
+  # architecture sees the same data pool and the comparison's only controlled axis is
+  # t_steps. At equal wall-time L-GATr sees ~1.2M samples (1151 x 1024) << 12.5M, i.e.
+  # no repetition. val/test come from the separate frozen eval pool (eval_subsample
+  # 20k below), so this knob does not affect the comparison metric.
+  data.train_subsample: 500000
   data.eval_subsample: 20000
   data.seed: 42
   data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
