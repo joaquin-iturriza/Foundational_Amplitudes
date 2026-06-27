@@ -13,21 +13,22 @@ dyhpo:
   total_budget: 10000
 fidelity_schedule:
   # Equal WALL-TIME to LLoCa's 15000-step pretrain25 run: L-GATr-slim measured
-  # 222.9 ms/step vs LLoCa 39.6 ms/step (5.6x), so 15000 * 39.6/222.9 = 2665 steps.
+  # 66.9 ms/step vs LLoCa 36.5 ms/step (1.83x) in one shared profiling run (sparse
+  # block-diagonal xformers attention, batchsize 1024), so 15000 * 36.5/66.9 = 8184.
   t_steps:
-  - 2665
+  - 8184
 fixed_params:
   # --- identical 25-process recipe data to pretrain25 (the LLoCa baseline) ---
   data.source: recipes
   data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
-  # 200k/process (5M pool) not pretrain25's 500k: at equal wall-time slim trains on
-  # ~2.7M samples (2665 steps x 1024), so a 5M pool is still > what it sees, and the
-  # final per-process train-eval (which iterates the WHOLE pool) is the walltime
-  # bottleneck for the slow geometric forward. The val-loss metric is unaffected
-  # (val/test come from the separate frozen pools below).
-  data.train_subsample: 200000
+  # 400k/process (10M pool) not pretrain25's 500k: at equal wall-time slim trains on
+  # ~8.4M samples (8184 steps x 1024), so keep the pool (10M) > what it sees to avoid
+  # data repetition. The final per-process train-eval iterates the WHOLE pool, so the
+  # pool stays below pretrain25's 12.5M to bound that cost. The val-loss metric is
+  # unaffected (val/test come from the separate frozen pools below).
+  data.train_subsample: 400000
   data.eval_subsample: 20000
   data.seed: 42
   data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/

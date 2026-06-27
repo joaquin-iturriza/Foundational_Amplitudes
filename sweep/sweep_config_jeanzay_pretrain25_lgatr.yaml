@@ -13,9 +13,10 @@ dyhpo:
   total_budget: 10000
 fidelity_schedule:
   # Equal WALL-TIME to LLoCa's 15000-step pretrain25 run: L-GATr (full) measured
-  # 600.9 ms/step vs LLoCa 39.6 ms/step (15.2x), so 15000 * 39.6/600.9 = 988 steps.
+  # 475.6 ms/step vs LLoCa 36.5 ms/step (13.0x) in one shared profiling run (sparse
+  # block-diagonal xformers attention, batchsize 1024), so 15000 * 36.5/475.6 = 1151.
   t_steps:
-  - 988
+  - 1151
 fixed_params:
   # --- identical 25-process recipe data to pretrain25 (the LLoCa baseline) ---
   data.source: recipes
