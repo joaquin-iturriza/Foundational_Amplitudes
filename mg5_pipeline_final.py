@@ -527,6 +527,28 @@ PROCESSES = {
     #     "param_card_patches": {},
     #     "run_card_patches": {"lpp1": "0", "lpp2": "0"},
     # },
+    # ------------------------------------------------------------------
+    # NLO QCD *virtual* processes (kind="virt"): generated through MadLoop
+    # (tools/nlo_virtual_pipeline.py), NOT the LO standalone path. datagen routes
+    # them by `kind`: the backend is the [virt=QCD] standalone (`virt_base` keys
+    # tools.VIRT_PROCESSES), and each chunk is generated in an isolated subprocess
+    # because matrix2py.so chdir's and is a process-singleton. `n_loops=1` flows to
+    # amp_orders=[1, alphas_power] (so the recipe/ id is distinct from LO same-name
+    # processes); `virt=True` triggers the ×8 generation-cost weight. The stored
+    # amplitude is virt_e4 (absolute one-loop finite part, no alpha_s prefactor).
+    # Distinct names (…_nlo) keep recipes/outputs/cache separate from the LO entries.
+    "ee_ss_nlo": {                       # easy: massless, fast loop
+        "kind": "virt", "virt": True, "virt_base": "ee_ss",
+        "nfinal": 2, "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [11, -11, 3, -3], "m_finals": [0.0, 0.0],
+        "param_card_patches": {},
+    },
+    "ee_ttbar_nlo": {                    # hard: massive top loop + stability checks
+        "kind": "virt", "virt": True, "virt_base": "ee_ttbar",
+        "nfinal": 2, "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [11, -11, 6, -6], "m_finals": [172.5, 172.5],
+        "param_card_patches": {},
+    },
 }
 
 # =============================================================================
@@ -1582,7 +1604,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         "pdg_ids":            list(cfg["pdg_ids"]),
         "param_card_patches": cfg.get("param_card_patches", {}),
         "alphas_power":       k,
-        "amp_orders":         [0, k],
+        "amp_orders":         [int(cfg.get("n_loops", 0)), k],
         "per_event_alphas":   True,
     }
     ceil_div    = lambda a, b: -(-a // b)

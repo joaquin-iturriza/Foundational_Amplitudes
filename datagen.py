@@ -18,10 +18,23 @@ import json
 import math
 import os
 import shutil
+import subprocess
+import sys
 
 import numpy as np
 
 import mg5_pipeline_final as mg
+
+# NLO-virtual generation lives in tools/nlo_virtual_pipeline.py and goes through
+# MadLoop (matrix2py.so), which chdir's and is a process-singleton — so a virt
+# chunk is generated in its own subprocess rather than in a shared pool worker.
+_NLO_PIPELINE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             "tools", "nlo_virtual_pipeline.py")
+
+
+def is_virt(process):
+    """True if `process` is an NLO-virtual process routed through MadLoop."""
+    return mg.PROCESSES.get(process, {}).get("kind") == "virt"
 
 # Cost-aware events-per-chunk policy for parallel generation.
 #
@@ -82,11 +95,33 @@ def dest_for_role(role):
     return frozen_dir() if role in ("val", "test") else train_cache_dir()
 
 
+def _virt_standalone_dir(process):
+    base = mg.PROCESSES[process]["virt_base"]
+    return f"{mg.WORK_DIR}/{base}_virt_standalone"
+
+
+def ensure_virt_backend(process):
+    """Build the [virt=QCD] MadLoop standalone (matrix2py.so) for an NLO-virtual
+    process if absent, then pole-certify it. Idempotent; run serially before the
+    pool, like the LO backends."""
+    base = mg.PROCESSES[process]["virt_base"]
+    sa   = _virt_standalone_dir(process)
+    import glob
+    if glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so"):
+        return sa
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
+    subprocess.run([sys.executable, _NLO_PIPELINE, base, "--build", "--certify"],
+                   check=True, env=env)
+    return sa
+
+
 def ensure_backend(process):
     """Compile the matrix-element backend for `process` if it isn't built yet.
 
     Run this serially (once per unique process) before parallel generation so
     that concurrent workers never race to compile the same backend."""
+    if is_virt(process):
+        return ensure_virt_backend(process)
     cfg = dict(mg.PROCESSES[process])
     standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
     backend, subproc_dirs, driver_bin, _ = mg.detect_compiled_backend(standalone_dir)
@@ -147,6 +182,23 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
     return tasks
 
 
+def gen_virt_chunk(task):
+    """Worker: generate one NLO-virtual chunk in an isolated subprocess (MadLoop's
+    matrix2py.so chdir's and is a process-singleton, so it can't be loaded in a
+    shared pool worker). Deterministic via the per-chunk seed. Returns (idx, path)."""
+    process = task["process"]
+    base    = mg.PROCESSES[process]["virt_base"]
+    os.makedirs(task["out_dir"], exist_ok=True)
+    out_path = os.path.join(task["out_dir"], "chunk.npy")
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
+    cmd = [sys.executable, _NLO_PIPELINE, base, "--generate",
+           "--n", str(task["count"]), "--seed", str(task["seed"]),
+           "--sqrts-min", repr(task["sqrts_min"]), "--sqrts-max", repr(task["sqrts_max"]),
+           "--out", out_path]
+    subprocess.run(cmd, check=True, env=env)
+    return task["idx"], out_path
+
+
 def gen_chunk(task):
     """Worker: generate one chunk into its own temp dir. The backend must already
     be compiled (call ensure_backend first). Returns (idx, chunk_npy_path).
@@ -156,6 +208,8 @@ def gen_chunk(task):
     update, which would race across the pool. The single recipe/manifest write
     happens once, serially, in finalize_dataset."""
     process        = task["process"]
+    if is_virt(process):
+        return gen_virt_chunk(task)
     cfg            = dict(mg.PROCESSES[process])
     standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
     backend, subproc_dirs, driver_bin, eff_dir = mg.detect_compiled_backend(standalone_dir)

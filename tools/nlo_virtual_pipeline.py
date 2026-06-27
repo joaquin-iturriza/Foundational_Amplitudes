@@ -254,6 +254,8 @@ def main():
     ap.add_argument("--sqrts-min", type=float, default=None)
     ap.add_argument("--sqrts-max", type=float, default=1000.0)
     ap.add_argument("--n", type=int, default=100_000)
+    ap.add_argument("--seed", type=int, default=42,
+                    help="RNG seed (per-chunk seed when driven by the prebuild)")
     ap.add_argument("--out", default=None)
     ap.add_argument("--no-mass-shift", action="store_true")
     args = ap.parse_args()
@@ -270,7 +272,7 @@ def main():
             smin = 1.05 * sum(cfg["m_finals"]) if sum(cfg["m_finals"]) > 0 else 50.0
         out = args.out or f"{mg.OUTPUT_DIR}/{args.process}_nlo_virt_e4_{smin:.0f}-{args.sqrts_max:.0f}GeV.npy"
         generate_virt_dataset(args.process, smin, args.sqrts_max, args.n, out,
-                              mass_shift=not args.no_mass_shift)
+                              seed=args.seed, mass_shift=not args.no_mass_shift)
 
 
 if __name__ == "__main__":
