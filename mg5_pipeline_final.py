@@ -131,8 +131,9 @@ def recipe_id(recipe):
                 "backend", "effective_seed", "recipe_id",
                 # generation-strategy metadata: recorded for traceability but not
                 # part of "what the data is" — a dataset has the same id whether
-                # it was made in one shot or chunked, so the cache stays valid.
-                "chunked", "chunk_size"}
+                # it was made in one shot or chunked, and whatever the per-process
+                # cost-aware chunk granularity, so the cache stays valid.
+                "chunked", "chunk_size", "gen_weight"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
