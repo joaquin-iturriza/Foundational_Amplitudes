@@ -27,11 +27,21 @@ Two output files are produced per process:
     *_nlo_virt_e4.npy      — virtual-only    = virt_fin × e⁴  (no αs factor)
                              Add (αs/2π) × virt_e4 to born×e⁴ to reconstruct NLO.
 
-Particle ordering in .dat files (deduced from kinematics):
+Particle ordering in .dat files:
     p1 = e-  (PDG  11)  — massless, +z beam
     p2 = e+  (PDG -11)  — massless, -z beam
-    p3 = t or u   (PDG  6 or  2)  — outgoing
-    p4 = tbar or ubar (PDG -6 or -2)  — outgoing
+    p3, p4   — outgoing quark pair
+
+IMPORTANT (ttbar t<->tbar labeling, established 2026-06 by point-by-point
+comparison vs MadGraph):
+    For eett the outgoing pair is ordered  p3 = tbar (-6),  p4 = t (6)  —
+    the OPPOSITE of the naive p3=t, p4=tbar guess. Evidence: MadGraph's Born for
+    "e+ e- > t t~" reproduces the .dat born only when p3 is assigned the antitop;
+    with p3=t the Born ratio scatters by ~110% (anti-correlated with cos(theta_t)),
+    with p3=tbar it is flat to 0.25%. For massless eeuu the Born is ~forward-
+    backward symmetric so the analogous choice is immaterial (and we keep p3=u).
+    The amplitude is C-invariant, so this is purely a labeling convention; we pick
+    e- along +z (standard) which forces p3=tbar, p4=t for ttbar.
 """
 
 import numpy as np
@@ -48,7 +58,8 @@ PROCESSES = {
         "input":       DATA_DIR / "eett.dat",
         "output_nlo":  DATA_DIR / "ee_ttbar_nlo_amplitudes.npy",
         "output_virt": DATA_DIR / "ee_ttbar_nlo_virt_e4.npy",
-        "pdg_ids":     [11, -11, 6, -6],
+        # p3 = tbar (-6), p4 = t (6): see header note (confirmed vs MadGraph Born).
+        "pdg_ids":     [11, -11, -6, 6],
     },
     "eeuu": {
         "input":       DATA_DIR / "eeuu.dat",
