@@ -27,11 +27,10 @@ import mg5_pipeline_final as mg
 #
 # Chunk boundaries and per-chunk seeds derive ONLY from (recipe, process cost) —
 # never from the worker count — so a dataset is bit-identical whether generated
-# serially or across N cores, and whatever its recipe_id the cache stays valid.
-# `recipe_id` deliberately excludes the chunk policy (it is generation strategy,
-# not data identity), so making the policy cost-aware stays inside that contract:
-# the only invariant that matters for correctness — bytes independent of the
-# worker count — is preserved because the policy is a pure function of the process.
+# serially or across N cores. The resolved per-process chunk_size is folded into
+# the recipe and into recipe_id (see mg5_pipeline_final.variable_energy_recipe /
+# recipe_id): a different chunk policy yields a different id, so cost-aware data
+# never silently shares an id with the old fixed-100k bytes.
 #
 # Why cost-aware: per-event generation cost grows steeply with final-state
 # multiplicity (a 2→4 point is ~tens of times a 2→2). With a *fixed* events-per-
@@ -45,40 +44,15 @@ import mg5_pipeline_final as mg
 # MAX_CHUNK is the old fixed size (cheap 2→2 keeps ~100k-event chunks → unchanged
 # bytes). TARGET_CHUNK_COST is one chunk's worth of work in 2→2-equivalent events;
 # an expensive process gets chunk_size = TARGET / gen_weight (clamped to
-# [MIN_CHUNK, MAX_CHUNK]). ~100k keeps per-chunk overhead (driver startup + concat)
-# under a few percent for cheap processes; the expensive ones spend far more
-# compute per event so their smaller chunks keep overhead low too.
-MAX_CHUNK = 100_000
-MIN_CHUNK = 2_500
-TARGET_CHUNK_COST = 100_000          # 2→2-equivalent events per chunk
-CHUNK_SIZE = MAX_CHUNK               # back-compat alias (cheap-process chunk size)
-
-
-def process_gen_weight(process):
-    """Relative per-event generation cost of `process`, normalized to a 2→2 LO
-    process (= 1.0). Used ONLY to balance load across the worker pool (chunk
-    granularity + scheduling order) — it never enters the physics or the data.
-
-    An explicit ``gen_weight`` in the PROCESSES entry wins; otherwise a heuristic
-    from the final-state multiplicity (the dominant cost driver: more diagrams,
-    higher phase-space dimension, harder unweighting) plus loop order. Being
-    approximate is fine — it only affects how work is sliced, not what is made."""
-    cfg = mg.PROCESSES.get(process, {})
-    explicit = cfg.get("gen_weight")
-    if explicit is not None:
-        return float(explicit)
-    nfinal = int(cfg.get("nfinal", 2))
-    w = 6.0 ** max(0, nfinal - 2)        # 2→2:1, 2→3:6, 2→4:36, 2→5:216
-    if cfg.get("loop") or cfg.get("nlo") or cfg.get("virt"):
-        w *= 8.0                          # one-loop ME ~ an order of magnitude
-    return w
-
-
-def process_chunk_size(process):
-    """Deterministic per-process events-per-chunk, sized for ≈ equal wall-time.
-    Cheap processes → MAX_CHUNK (unchanged); expensive → fewer events per chunk."""
-    size = TARGET_CHUNK_COST / process_gen_weight(process)
-    return int(min(MAX_CHUNK, max(MIN_CHUNK, round(size))))
+# [MIN_CHUNK, MAX_CHUNK]). The cost model lives in mg5_pipeline_final (next to
+# PROCESSES + the recipe builders, since chunk_size is identity-bearing); these
+# names re-export it for the generation call sites here.
+MAX_CHUNK          = mg.MAX_CHUNK
+MIN_CHUNK          = mg.MIN_CHUNK
+TARGET_CHUNK_COST  = mg.TARGET_CHUNK_COST
+CHUNK_SIZE         = mg.MAX_CHUNK     # back-compat alias (cheap-process chunk size)
+process_gen_weight = mg.process_gen_weight
+process_chunk_size = mg.process_chunk_size
 
 
 def frozen_dir():
@@ -213,7 +187,9 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     full = dict(rec)
     full["effective_seed"] = seed + mg.ROLE_SEED_OFFSET.get(role, 0)
     full["chunked"]        = True
-    full["chunk_size"]     = process_chunk_size(process)   # per-process, cost-aware
+    # n_chunks (in `rec` when non-legacy) carries the identity; record the nominal
+    # chunk_size + gen_weight as excluded traceability metadata.
+    full["chunk_size"]     = process_chunk_size(process)
     full["gen_weight"]     = process_gen_weight(process)
     mg.write_recipe(final, full)
     shutil.rmtree(work_dir, ignore_errors=True)
