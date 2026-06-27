@@ -1,0 +1,13 @@
+# On-demand recipe spec replicating the 8-process pretraining-scaling D1e5 cell
+# (the largest size: 100k total events, ~12500/process, split 0.7/0.2/0.1 ->
+# 8750 train / 2500 val / 1250 test per process). Larger frozen val/test than the
+# short cell for stable benchmark metrics. amp_orders derived from alphas_power.
+processes:
+  - {name: ee_wwz,   sqrts: [255, 1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_WW,    sqrts: [162, 1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_ttbar, sqrts: [346, 1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_uug,   sqrts: [91,  1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_uugg,  sqrts: [91,  1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_aa,    sqrts: [10,  1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_aaa,   sqrts: [10,  1000], n_train: 8750, n_val: 2500, n_test: 1250}
+  - {name: ee_uu,    sqrts: [91,  1000], n_train: 8750, n_val: 2500, n_test: 1250}
