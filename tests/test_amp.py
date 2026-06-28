@@ -373,6 +373,60 @@ def check_diagram_virtuality():
     print(f"  diagram virtuality: s-channel == E_cm^2 over 64 events  OK  (rel {rel:.1e})")
 
 
+def check_diagram_virtuality_batch():
+    """Tier B optimization: the batched per-event path (one encode_grouped call over
+    all processes' event×diagram graphs) must equal the per-process forward_per_event
+    loop. Small encoder for speed."""
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ddir = os.path.join(repo, "data", "diagrams")
+    if not os.path.exists(os.path.join(ddir, "ee_ttbar.diagrams.json")):
+        print("  diagram virtuality batch: SKIP (no sidecars)")
+        return
+    from diagram_graphs import load_diagram_registry, feature_dims, build_process_virtuality
+    from models.diagram_encoder import DiagramEncoder
+    from wrappers import AmplitudeLLoCaWrapper
+    torch.manual_seed(0)
+    F = dict(spin_onehot=True, is_massless=True, standardize=True)
+    reg, _ = load_diagram_registry(ddir, ["ee_ttbar", "ee_uug"], **F, k_pe=8)
+    n_prop = reg["ee_ttbar"].node_feat.shape[-1] - 4 - 2 - 2   # back out from f_node
+    f_node, f_edge = feature_dims(reg["ee_ttbar"].edge_feat.shape[-1] - 1)
+    enc = DiagramEncoder(f_node, f_edge, k_pe=8, d_model=16, n_heads=2, n_layers=1, d_out=4, f_edge_extra=1)
+    wrap = AmplitudeLLoCaWrapper.__new__(AmplitudeLLoCaWrapper)
+    torch.nn.Module.__init__(wrap)
+    wrap.diagram_encoder = enc; wrap.d_diag = 4; wrap.use_diagrams = True
+    wrap._pd_by_pid = [reg["ee_ttbar"], reg["ee_uug"]]
+    virt = [build_process_virtuality(reg["ee_ttbar"], [11, -11, 6, -6], 2),
+            build_process_virtuality(reg["ee_uug"], [11, -11, 2, -2, 21], 2)]
+    wrap.setup_diagram_virtuality(virt, log_scale=0.1)
+    np_ = {0: 4, 1: 5}; pids = torch.tensor([0, 1, 0, 1, 0])
+    def fm(n):
+        p = torch.randn(n, 3); m = torch.rand(n, 1) + 0.1
+        return torch.cat([(p.pow(2).sum(-1, keepdim=True) + m.pow(2)).sqrt(), p], -1)
+    moms = torch.cat([fm(np_[int(p)]) for p in pids], 0)
+    counts = torch.tensor([np_[int(p)] for p in pids])
+    ptr = torch.cat([torch.zeros(1, dtype=torch.long), counts.cumsum(0)])
+    std = torch.tensor(0.7)
+    with torch.no_grad():
+        new = wrap._diagram_features_virtuality(moms, std, pids, ptr, moms.device, torch.float32)
+        ref = torch.zeros(pids.shape[0], 4)
+        for pid in (0, 1):
+            pd, vt = wrap._pd_by_pid[pid], virt[pid]
+            ev = (pids == pid).nonzero(as_tuple=True)[0]
+            N, D = pd.node_feat.shape[1], pd.n_diagrams
+            g = ptr[ev][:, None] + torch.arange(vt["n_part"])[None, :]
+            pp = torch.einsum("kn,enc->ekc", vt["mask"], moms[g])
+            s = (pp[..., 0] ** 2 - (pp[..., 1:] ** 2).sum(-1)) * std * std
+            vf = torch.sign(s) * torch.log1p(s.abs()) * 0.1
+            ee = torch.zeros(ev.shape[0], D, N, N, 1)
+            ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = vf
+            ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = vf
+            ref[ev] = enc.forward_per_event(pd, ee)
+        ref = ref.repeat_interleave(counts, dim=0)
+    d = (new - ref).abs().max().item()
+    assert d < 1e-5, f"batched Tier-B != per-process loop: {d:.2e}"
+    print(f"  diagram virtuality batch == per-process loop  OK  (max {d:.1e})")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -384,6 +438,7 @@ check_fast_equilinear_equivalence()
 check_diagram_conditioning()
 check_diagram_batch_equivalence()
 check_diagram_virtuality()
+check_diagram_virtuality_batch()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────

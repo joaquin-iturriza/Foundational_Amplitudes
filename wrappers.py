@@ -211,59 +211,93 @@ class AmplitudeLLoCaWrapper(nn.Module):
         """Enable Tier B: per-event propagator virtualities (call after
         setup_diagram_conditioning). ``virt_by_pid`` is a list indexed by process_id
         of the precompute dicts from diagram_graphs.build_process_virtuality (or None
-        for processes without a usable per-event leg↔slot map — they fall back to the
-        static topology embedding)."""
+        for processes without a usable per-event leg↔slot map — those events get a
+        zero virtuality, i.e. the topology embedding through the same encoder).
+
+        Precomputes each process's static graph tensors padded to the GLOBAL max node
+        count so the per-step path can concatenate every (event,diagram) graph into
+        ONE batched encoder call (see _diagram_features_virtuality)."""
         self._virt_by_pid = list(virt_by_pid)
         self._virt_log_scale = float(log_scale)
         self.use_diagram_virtuality = True
 
-    def _diagram_features_virtuality(self, fourmomenta, std, process_ids, ptr, device, dtype):
-        """Tier B per-particle diagram embedding (N_total, d_diag).
+        Mstar = max(pd.node_feat.shape[1] for pd in self._pd_by_pid if pd is not None)
+        self._virt_Mstar = Mstar
+        static = []
+        for pd in self._pd_by_pid:
+            if pd is None:
+                static.append(None); continue
+            D, N = pd.node_feat.shape[0], pd.node_feat.shape[1]
+            nf = pd.node_feat.new_zeros(D, Mstar, pd.node_feat.shape[-1]); nf[:, :N] = pd.node_feat
+            lp = pd.lap_pe.new_zeros(D, Mstar, pd.lap_pe.shape[-1]);       lp[:, :N] = pd.lap_pe
+            nm = pd.node_mask.new_zeros(D, Mstar);                         nm[:, :N] = pd.node_mask
+            ef = pd.edge_feat.new_zeros(D, Mstar, Mstar, pd.edge_feat.shape[-1]); ef[:, :N, :N] = pd.edge_feat
+            em = pd.edge_mask.new_zeros(D, Mstar, Mstar);                  em[:, :N, :N] = pd.edge_mask
+            static.append({"node_feat": nf, "lap_pe": lp, "node_mask": nm,
+                           "edge_feat": ef, "edge_mask": em, "D": D})
+        self._virt_static = static
+        self._pd_device = None   # force re-move of the new tensors
 
-        For each process in the batch, gather its events' momenta, compute each
-        diagram-propagator's Lorentz-invariant virtuality s=(Σ sign·p)² (all-outgoing
-        convention; signed-log compressed), feed it as the encoder's per-event edge
-        feature, and run forward_per_event → one embedding per event. Processes
-        without a virtuality map (flavour-summed, unmappable) fall back to the static
-        topology embedding for their events.
+    def _diagram_features_virtuality(self, fourmomenta, std, process_ids, ptr, device, dtype):
+        """Tier B per-particle diagram embedding (N_total, d_diag), batched.
+
+        Builds every (event, diagram) graph in the batch — static topology tensors
+        tiled per event, plus the event's per-propagator virtuality s=(Σ sign·p)²
+        (all-outgoing; signed-log compressed) as the encoder's edge feature — into ONE
+        flat batch, then a SINGLE encode_grouped call segment-pools per event. The
+        per-process loop only does cheap tensor ops (gather/einsum/scatter/tile); the
+        expensive graph-transformer forward runs once on the whole batch (vs one
+        launch-bound forward_per_event per process). A process with no per-event map
+        gets zero virtuality (topology embedding through the same encoder); a process
+        with no diagrams leaves its events at zero.
         """
-        # move per-process virtuality precompute to device once
         if self._pd_device != device:
-            self._diag_batch = {k: (v.to(device) if torch.is_tensor(v) else v)
-                                for k, v in self._diag_batch.items()} if self._diag_batch else None
             self._virt_by_pid = [
                 ({k: (v.to(device) if torch.is_tensor(v) else v) for k, v in vt.items()}
-                 if vt is not None else None)
-                for vt in self._virt_by_pid]
-            self._pd_by_pid = [pd.to(device) if pd is not None else None for pd in self._pd_by_pid]
+                 if vt is not None else None) for vt in self._virt_by_pid]
+            self._virt_static = [
+                ({k: (v.to(device) if torch.is_tensor(v) else v) for k, v in st.items()}
+                 if st is not None else None) for st in self._virt_static]
             self._pd_device = device
 
         B = process_ids.shape[0]
-        E_event = torch.zeros(B, self.d_diag, device=device, dtype=dtype)
-        std2 = (std * std)
+        M = self._virt_Mstar
+        std2 = std * std
+        nf_l, lp_l, nm_l, ef_l, em_l, ee_l, seg_l = [], [], [], [], [], [], []
         for pid in torch.unique(process_ids).tolist():
+            st = self._virt_static[pid] if 0 <= pid < len(self._virt_static) else None
+            if st is None:
+                continue
             ev_idx = (process_ids == pid).nonzero(as_tuple=True)[0]      # (E_p,)
-            vt = self._virt_by_pid[pid] if 0 <= pid < len(self._virt_by_pid) else None
-            pd = self._pd_by_pid[pid] if 0 <= pid < len(self._pd_by_pid) else None
-            if pd is None:
-                continue
-            if vt is None:
-                # no per-event map -> static topology embedding for these events
-                E_event[ev_idx] = self.diagram_encoder(pd).to(dtype)
-                continue
-            n_part = vt["n_part"]
-            starts = ptr[ev_idx]                                         # (E_p,) event starts
-            gather = starts[:, None] + torch.arange(n_part, device=device)[None, :]
-            mom = fourmomenta[gather]                                    # (E_p, n_part, 4)
-            # propagator momenta: Σ sign·p over each edge's leg set
-            p_prop = torch.einsum("kn,enc->ekc", vt["mask"], mom)        # (E_p, K, 4)
-            s = (p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)) * std2  # (E_p, K) physical-ish
-            virt = torch.sign(s) * torch.log1p(s.abs()) * self._virt_log_scale
-            E_p, K = virt.shape
-            ee = torch.zeros(E_p, vt["D"], vt["N"], vt["N"], 1, device=device, dtype=virt.dtype)
-            ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = virt
-            ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = virt    # symmetric
-            E_event[ev_idx] = self.diagram_encoder.forward_per_event(pd, ee).to(dtype)
+            E_p, D_p = ev_idx.shape[0], st["D"]
+            vt = self._virt_by_pid[pid]
+            if vt is not None:
+                n_part = vt["n_part"]
+                gather = ptr[ev_idx][:, None] + torch.arange(n_part, device=device)[None, :]
+                mom = fourmomenta[gather]                               # (E_p, n_part, 4)
+                p_prop = torch.einsum("kn,enc->ekc", vt["mask"], mom)   # (E_p, K, 4)
+                s = (p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)) * std2
+                virt = torch.sign(s) * torch.log1p(s.abs()) * self._virt_log_scale
+                ee = torch.zeros(E_p, D_p, M, M, 1, device=device, dtype=virt.dtype)
+                ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = virt
+                ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = virt   # symmetric
+            else:
+                ee = torch.zeros(E_p, D_p, M, M, 1, device=device, dtype=dtype)
+
+            def tile(t):   # (D_p, ...) -> (E_p*D_p, ...) event-major, sharing static graph
+                return t.unsqueeze(0).expand(E_p, *t.shape).reshape(E_p * D_p, *t.shape[1:])
+            nf_l.append(tile(st["node_feat"])); lp_l.append(tile(st["lap_pe"]))
+            nm_l.append(tile(st["node_mask"])); ef_l.append(tile(st["edge_feat"]))
+            em_l.append(tile(st["edge_mask"])); ee_l.append(ee.reshape(E_p * D_p, M, M, 1))
+            seg_l.append(ev_idx.repeat_interleave(D_p))                 # graph -> event id
+
+        if not seg_l:
+            E_event = torch.zeros(B, self.d_diag, device=device, dtype=dtype)
+        else:
+            E_event = self.diagram_encoder.encode_grouped(
+                torch.cat(nf_l), torch.cat(lp_l), torch.cat(nm_l),
+                torch.cat(ef_l), torch.cat(em_l), torch.cat(seg_l), B,
+                edge_extra=torch.cat(ee_l)).to(dtype)                   # (B, d_diag)
 
         counts = ptr[1:] - ptr[:-1]
         return E_event.repeat_interleave(counts, dim=0)

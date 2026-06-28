@@ -189,40 +189,50 @@ class DiagramEncoder(nn.Module):
         ).reshape(E, D, self.d_model)                                    # (E, D, d)
         return self.out(self._attn_pool(cls, dim=1))                     # (E, d_out)
 
+    def _segment_pool(self, cls, seg, n_groups):
+        """Attention-pool per-graph CLS embeddings into ``n_groups`` groups via a
+        segmented softmax over ``seg`` (graph→group id). Equals a per-group
+        ``_attn_pool`` softmax; groups with no graphs get a zero row. Used by both
+        the Tier-A per-process pool (group=process) and the Tier-B per-event pool
+        (group=event)."""
+        dev, dt = cls.device, cls.dtype
+        scores = (cls @ self.pool_query) / (self.d_model ** 0.5)      # (G,)
+        seg_max = torch.full((n_groups,), torch.finfo(dt).min, device=dev, dtype=dt)
+        seg_max = seg_max.scatter_reduce(0, seg, scores, reduce="amax", include_self=True)
+        ex = torch.exp(scores - seg_max[seg])                         # (G,)
+        denom = torch.zeros(n_groups, device=dev, dtype=dt).scatter_add(0, seg, ex)
+        w = ex / denom[seg].clamp_min(torch.finfo(dt).tiny)          # (G,)
+        pooled = torch.zeros(n_groups, self.d_model, device=dev, dtype=dt).index_add(
+            0, seg, w.unsqueeze(-1) * cls)                            # (n_groups, d_model)
+        E = self.out(pooled)                                         # (n_groups, d_out)
+        present = torch.zeros(n_groups, dtype=torch.bool, device=dev)
+        present[seg] = True
+        return E * present.unsqueeze(-1)
+
     def encode_all(self, batch):
         """Tier A, batched: encode EVERY process's diagram set in one forward and
         attention-pool per process → ``E_all`` of shape (n_proc, d_out).
 
-        Numerically identical to calling ``forward(pd)`` per process (the per-graph
-        attention is independent across the batch axis, and the segmented softmax
-        below equals a per-process softmax) — just one big GPU call instead of one
-        small launch-bound forward per process. Processes with no diagrams get a
-        zero row.
-
-        batch : dict from diagram_graphs.build_diagram_batch (tensors + ``seg`` +
-                ``n_proc``).
+        Numerically identical to calling ``forward(pd)`` per process (per-graph
+        attention is independent across the batch axis; the segmented softmax equals
+        a per-process softmax) — one big GPU call instead of one launch-bound forward
+        per process. Processes with no diagrams get a zero row.
         """
         cls = self._encode_graphs(batch["node_feat"], batch["lap_pe"],
                                   batch["node_mask"], batch["edge_feat"],
                                   batch["edge_mask"])                 # (TotalD, d_model)
-        seg = batch["seg"]
-        P = batch["n_proc"]
-        dev, dt = cls.device, cls.dtype
+        return self._segment_pool(cls, batch["seg"], batch["n_proc"])
 
-        scores = (cls @ self.pool_query) / (self.d_model ** 0.5)      # (TotalD,)
-        # segmented softmax over diagrams within each process
-        seg_max = torch.full((P,), torch.finfo(dt).min, device=dev, dtype=dt)
-        seg_max = seg_max.scatter_reduce(0, seg, scores, reduce="amax", include_self=True)
-        ex = torch.exp(scores - seg_max[seg])                         # (TotalD,)
-        denom = torch.zeros(P, device=dev, dtype=dt).scatter_add(0, seg, ex)
-        w = ex / denom[seg].clamp_min(torch.finfo(dt).tiny)          # (TotalD,)
-        pooled = torch.zeros(P, self.d_model, device=dev, dtype=dt).index_add(
-            0, seg, w.unsqueeze(-1) * cls)                            # (P, d_model)
-
-        E = self.out(pooled)                                         # (P, d_out)
-        present = torch.zeros(P, dtype=torch.bool, device=dev)
-        present[seg] = True                                          # zero processes w/o diagrams
-        return E * present.unsqueeze(-1)
+    def encode_grouped(self, node_feat, lap_pe, node_mask, edge_feat, edge_mask,
+                       seg, n_groups, edge_extra=None):
+        """Tier B, batched: encode a flat batch of (event,diagram) graphs in one
+        forward and segment-pool per event. ``seg`` (G,) maps each graph to its event
+        id in [0,n_groups); ``edge_extra`` (G,N,N,f_edge_extra) carries the per-event
+        virtualities. Returns (n_groups, d_out). Numerically identical to looping
+        forward_per_event over processes, but a single batched GPU call."""
+        cls = self._encode_graphs(node_feat, lap_pe, node_mask, edge_feat, edge_mask,
+                                  edge_extra)                         # (G, d_model)
+        return self._segment_pool(cls, seg, n_groups)
 
     def encode_registry(self, registry, names=None, edge_extra_fn=None):
         """Encode several processes → ``{name: E}``.
