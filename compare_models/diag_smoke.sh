@@ -25,10 +25,10 @@ PROJ=$PWD
 COMMON=(
   model=lloca
   local=none
-  data.source=recipes
-  "data.processes_file=${PROJ}/recipes/pretrain8_short.yaml"
-  "data.data_path=${PROJ}/data/"
+  data.source=files
+  "data.data_path=${PROJ}/data_small_encab/"
   data.preprocess_per_dataset=true
+  data.subsample=null
   data.seed=42
   seed=42
   # smart particle encoding (use_PIDs stays false -> diagrams allowed)

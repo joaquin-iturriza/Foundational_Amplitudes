@@ -67,6 +67,73 @@ def _pdg_index(pdg, pdg_to_idx):
     return 0
 
 
+def propagator_leg_sets(graph):
+    """External-leg set carried by each INTERNAL propagator edge of a tree diagram.
+
+    Removing an internal edge splits the tree in two; the external legs in one
+    component fix the propagator momentum p_prop = Σ_{legs in set} p_leg (all-
+    outgoing convention), and its virtuality is s = p_prop² — the pole structure
+    1/(s−m²) that *is* the amplitude (Tier B). By momentum conservation
+    (Σ_A p)² = (Σ_B p)², so either side gives the same s; we return the side
+    containing edge endpoint ``u``.
+
+    Returns ``[(u, v, frozenset(leg_numbers))]`` over internal edges.
+    """
+    nodes, edges = graph["nodes"], graph["edges"]
+    adj = {i: [] for i in range(len(nodes))}
+    for e in edges:
+        adj[e["u"]].append(e["v"])
+        adj[e["v"]].append(e["u"])
+    leg_of = {i: (n.get("leg_number") if n["kind"] == "external" else None)
+              for i, n in enumerate(nodes)}
+
+    def component_legs(start, blocked):
+        seen, stack, legs = {start}, [start], set()
+        while stack:
+            x = stack.pop()
+            if leg_of[x] is not None:
+                legs.add(leg_of[x])
+            for y in adj[x]:
+                if {x, y} == blocked or y in seen:
+                    continue
+                seen.add(y); stack.append(y)
+        return legs
+
+    out = []
+    for e in edges:
+        if e["external"]:
+            continue
+        legs = component_legs(e["u"], {e["u"], e["v"]})
+        out.append((e["u"], e["v"], frozenset(legs)))
+    return out
+
+
+def leg_to_slot(external, slot_pdgs, n_initial):
+    """Map MadGraph leg number → event particle-slot index by (pdg, state).
+
+    The dataset's per-particle slot order does NOT equal MadGraph's leg order
+    (e.g. ee→ttbar stores [e-, e+, t, t̄] while MG5 numbers them [e+, e-, t, t̄]),
+    so we match each leg to a slot by PDG id and initial/final state (the first
+    ``n_initial`` slots are initial-state). Ties among identical particles are
+    broken by slot order — a canonical but arbitrary choice; for processes with
+    identical final-state particles (γγγ, ggg, …) the per-diagram virtuality is
+    only defined up to that permutation, which the diagram pooling averages over.
+
+    Returns ``{leg_number: slot_index}``.
+    """
+    used, mapping = set(), {}
+    for leg in sorted(external, key=lambda d: d["number"]):
+        want_in = (leg["state"] == "in")
+        for s in range(len(slot_pdgs)):
+            if s in used:
+                continue
+            if slot_pdgs[s] == leg["pdg"] and (s < n_initial) == want_in:
+                mapping[leg["number"]] = s
+                used.add(s)
+                break
+    return mapping
+
+
 def _undirected_adjacency(edges, n_nodes):
     """Dense symmetric 0/1 adjacency (no self-loops) from an edge list."""
     a = np.zeros((n_nodes, n_nodes), dtype=np.float64)
