@@ -117,27 +117,24 @@ class DiagramEncoder(nn.Module):
         nn.init.normal_(self.pool_query, std=0.02)
         self.out = nn.Linear(d_model, d_out)
 
-    def forward(self, pd, edge_extra=None):
-        """Encode one :class:`diagram_graphs.ProcessDiagrams` → ``E`` of shape (d_out,).
+    def _encode_graphs(self, node_feat, lap_pe, node_mask, edge_feat, edge_mask,
+                       edge_extra=None):
+        """Per-graph CLS embeddings for a batch of graphs.
 
-        ``edge_extra`` (optional): (D, N, N, f_edge_extra) per-event edge features
-        already aligned to the static ``pd.edge_feat`` node order. Must be supplied
-        iff ``f_edge_extra > 0``.
+        All inputs share a leading graph axis G: node_feat (G,N,F_node),
+        lap_pe (G,N,K), node_mask (G,N), edge_feat (G,N,N,F_edge),
+        edge_mask (G,N,N), edge_extra (G,N,N,f_edge_extra) | None.
+        Returns the readout-token embedding per graph, (G, d_model).
         """
-        node_feat, lap_pe = pd.node_feat, pd.lap_pe
-        edge_feat, edge_mask, node_mask = pd.edge_feat, pd.edge_mask, pd.node_mask
-        D, N = node_feat.shape[0], node_feat.shape[1]
+        G, N = node_feat.shape[0], node_feat.shape[1]
         dev = node_feat.device
 
-        # ---- node embeddings + CLS ----
-        x_nodes = self.node_in(torch.cat([node_feat, lap_pe], dim=-1))   # (D, N, d)
-        cls = self.cls.expand(D, 1, self.d_model).to(x_nodes.dtype)
-        x = torch.cat([cls, x_nodes], dim=1)                              # (D, M, d), M=N+1
+        x_nodes = self.node_in(torch.cat([node_feat, lap_pe], dim=-1))   # (G, N, d)
+        cls = self.cls.expand(G, 1, self.d_model).to(x_nodes.dtype)
+        x = torch.cat([cls, x_nodes], dim=1)                             # (G, M, d), M=N+1
         key_mask = torch.cat(
-            [torch.ones(D, 1, dtype=torch.bool, device=dev), node_mask], dim=1
-        )
+            [torch.ones(G, 1, dtype=torch.bool, device=dev), node_mask], dim=1)
 
-        # ---- edge bias (D, H, M, M) ----
         ef = edge_feat
         if self.f_edge_extra > 0:
             if edge_extra is None:
@@ -145,23 +142,52 @@ class DiagramEncoder(nn.Module):
             ef = torch.cat([ef, edge_extra.to(ef.dtype)], dim=-1)
         elif edge_extra is not None:
             raise ValueError("edge_extra given but f_edge_extra==0")
-        eb = self.edge_bias(ef) * edge_mask[..., None].to(ef.dtype)       # (D, N, N, H)
-        eb = eb.permute(0, 3, 1, 2)                                       # (D, H, N, N)
-        # pad a zero CLS row/col at index 0 -> (D, H, M, M)
+        eb = self.edge_bias(ef) * edge_mask[..., None].to(ef.dtype)       # (G, N, N, H)
+        eb = eb.permute(0, 3, 1, 2)                                       # (G, H, N, N)
         M = N + 1
-        eb_full = eb.new_zeros(D, self.n_heads, M, M)
-        eb_full[:, :, 1:, 1:] = eb
+        eb_full = eb.new_zeros(G, self.n_heads, M, M)
+        eb_full[:, :, 1:, 1:] = eb                                       # zero CLS row/col
 
         for layer in self.layers:
             x = layer(x, eb_full, key_mask)
         x = self.ln_f(x)
+        return x[:, 0]                                                   # (G, d_model) CLS
 
-        diag_emb = x[:, 0]                                               # (D, d) CLS per diagram
-        # ---- attention pool over diagrams ----
-        scores = (diag_emb @ self.pool_query) / (self.d_model ** 0.5)    # (D,)
-        weights = torch.softmax(scores, dim=0)                          # (D,)
-        pooled = (weights[:, None] * diag_emb).sum(dim=0)               # (d,)
-        return self.out(pooled)                                         # (d_out,)
+    def _attn_pool(self, cls, dim):
+        """Attention-pool readout embeddings along ``dim`` with the learned query."""
+        scores = (cls @ self.pool_query) / (self.d_model ** 0.5)         # (...,) over dim
+        weights = torch.softmax(scores, dim=dim)
+        return (weights.unsqueeze(-1) * cls).sum(dim=dim)
+
+    def forward(self, pd, edge_extra=None):
+        """Tier A: encode one process's static diagram set → ``E`` of shape (d_out,).
+
+        ``edge_extra`` (optional): (D, N, N, f_edge_extra), required iff
+        ``f_edge_extra > 0``.
+        """
+        cls = self._encode_graphs(pd.node_feat, pd.lap_pe, pd.node_mask,
+                                  pd.edge_feat, pd.edge_mask, edge_extra)  # (D, d)
+        return self.out(self._attn_pool(cls, dim=0))                      # (d_out,)
+
+    def forward_per_event(self, pd, edge_extra):
+        """Tier B: per-event embeddings, one per event, pooling over the process's
+        diagrams with **event-specific** edge features (e.g. propagator virtualities).
+
+        edge_extra : (E, D, N, N, f_edge_extra)   per-event edge features for the E
+                     events of this process over its D diagrams.
+        Returns (E, d_out).
+        """
+        E, D, N = edge_extra.shape[0], edge_extra.shape[1], edge_extra.shape[2]
+
+        def tile(t):   # (D, ...) -> (E*D, ...) sharing the static graph across events
+            return t.unsqueeze(0).expand(E, *t.shape).reshape(E * D, *t.shape[1:])
+
+        cls = self._encode_graphs(
+            tile(pd.node_feat), tile(pd.lap_pe), tile(pd.node_mask),
+            tile(pd.edge_feat), tile(pd.edge_mask),
+            edge_extra.reshape(E * D, N, N, edge_extra.shape[-1]),
+        ).reshape(E, D, self.d_model)                                    # (E, D, d)
+        return self.out(self._attn_pool(cls, dim=1))                     # (E, d_out)
 
     def encode_registry(self, registry, names=None, edge_extra_fn=None):
         """Encode several processes → ``{name: E}``.
