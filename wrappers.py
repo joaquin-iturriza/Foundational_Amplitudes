@@ -7,6 +7,32 @@ from lgatr.interface import embed_vector, extract_scalar
 from models.attention_lloca_mup import build_block_diagonal_bias
 
 
+def _build_particle_encoder(n_features: int, d_hidden: int, encoder_hidden: int = 0):
+    """Project the physical property vector (n_features) → d_hidden.
+
+    encoder_hidden == 0 → a single Linear (legacy: the embedding is a *linear*
+    function of the quantum numbers, so only one-hot columns get independent
+    directions). encoder_hidden > 0 → a 2-layer MLP (Linear→GELU→Linear), which
+    lets the encoder form nonlinear *products* of quantum numbers (charged-AND-
+    colored, fermion-AND-massive, …) a single Linear cannot. Negligible params
+    vs the transformer. Marked standard-parametrization by mup_finalize either way.
+    """
+    if encoder_hidden and encoder_hidden > 0:
+        enc = nn.Sequential(
+            nn.Linear(n_features, encoder_hidden, bias=True),
+            nn.GELU(),
+            nn.Linear(encoder_hidden, d_hidden, bias=True),
+        )
+        for lin in (enc[0], enc[2]):
+            nn.init.xavier_uniform_(lin.weight)
+            nn.init.zeros_(lin.bias)
+        return enc
+    enc = nn.Linear(n_features, d_hidden, bias=True)
+    nn.init.xavier_uniform_(enc.weight)
+    nn.init.zeros_(enc.bias)
+    return enc
+
+
 def _block_diagonal_attn_mask(ptr, device):
     """Boolean (N_total, N_total) mask: True where two particles share an event.
 
@@ -102,25 +128,32 @@ class AmplitudeGATrWrapper(nn.Module):
 
 
 class AmplitudeLLoCaWrapper(nn.Module):
-    def __init__(self, net, token_size, d_particle_hidden: int = 16):
+    def __init__(self, net, token_size, d_particle_hidden: int = 16,
+                 particle_encoder_hidden: int = 0):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
         self.token_size = token_size
         self.d_particle_hidden = d_particle_hidden
+        # 0 → single Linear encoder; >0 → 2-layer MLP (see _build_particle_encoder).
+        # Hydra passes this from config/model/lloca.yaml; setup_particle_features
+        # receives the same value explicitly from experiment._post_instantiate_model.
+        self.particle_encoder_hidden = particle_encoder_hidden
         self.use_pids = True   # overridden by setup_particle_features()
         # particle_encoder and property_matrix are set by setup_particle_features()
 
-    def setup_particle_features(self, use_pids: bool, property_matrix=None):
+    def setup_particle_features(self, use_pids: bool, property_matrix=None,
+                                encoder_hidden: int = 0):
         """
         Configure particle encoding after construction (called from experiment.init_model).
 
         use_pids=False (default):
-            Looks up a fixed property matrix (global_pdg_idx → 8D quantum numbers)
-            then projects through a small learned Linear(n_features → d_particle_hidden).
+            Looks up a fixed property matrix (global_pdg_idx → quantum numbers) then
+            projects through a small learned encoder (n_features → d_particle_hidden).
             d_particle_hidden is fixed regardless of n_features, so adding a new quantum
-            number only requires extending the projection matrix — all transformer weights
-            stay identical and can be reloaded without retraining.
+            number only requires extending the projection — all transformer weights
+            stay identical and can be reloaded without retraining. ``encoder_hidden>0``
+            makes that encoder a 2-layer MLP instead of a single Linear.
 
         use_pids=True (legacy):
             One-hot encodes particle type indices; no projection layer.
@@ -131,10 +164,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
             t = torch.tensor(property_matrix, dtype=torch.float32)
             self.register_buffer("property_matrix", t)
             n_features = property_matrix.shape[1]
-            # Learned projection: n_features → d_particle_hidden (fixed dim)
-            self.particle_encoder = nn.Linear(n_features, self.d_particle_hidden, bias=True)
-            nn.init.xavier_uniform_(self.particle_encoder.weight)
-            nn.init.zeros_(self.particle_encoder.bias)
+            self.particle_encoder = _build_particle_encoder(
+                n_features, self.d_particle_hidden, encoder_hidden
+            )
 
     def forward(self, fourmomenta, particle_type_indices, mean, std, ptr, order_labels=None,
                 seq_lens=None):
@@ -191,16 +223,17 @@ class _AmplitudeGATrMuPBase(nn.Module):
         self.use_pids = True
 
     # identical to AmplitudeLLoCaWrapper.setup_particle_features
-    def setup_particle_features(self, use_pids: bool, property_matrix=None):
+    def setup_particle_features(self, use_pids: bool, property_matrix=None,
+                                encoder_hidden: int = 0):
         self.use_pids = use_pids
         if not use_pids:
             assert property_matrix is not None
             t = torch.tensor(property_matrix, dtype=torch.float32)
             self.register_buffer("property_matrix", t)
             n_features = property_matrix.shape[1]
-            self.particle_encoder = nn.Linear(n_features, self.d_particle_hidden, bias=True)
-            nn.init.xavier_uniform_(self.particle_encoder.weight)
-            nn.init.zeros_(self.particle_encoder.bias)
+            self.particle_encoder = _build_particle_encoder(
+                n_features, self.d_particle_hidden, encoder_hidden
+            )
 
     def _scalars(self, particle_type_indices, fourmomenta, ptr, order_labels):
         if self.use_pids:

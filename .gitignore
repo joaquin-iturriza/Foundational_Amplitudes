@@ -69,3 +69,7 @@ data/*.dat
 compare_models/_probe_*
 compare_models/_smoke_*
 compare_models/flops.txt
+
+# Fortran/MadLoop crash core dumps (can be multi-GB)
+core-python-*
+core.[0-9]*

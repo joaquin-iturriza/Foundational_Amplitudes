@@ -54,6 +54,16 @@ data:
   - standardization
  incl_fvs: false
  use_PIDs: false  # false: 8D physical property vector; true: one-hot PDG token index (legacy)
+ # Smart-encoding transforms of the physical property vector (use_PIDs: false only).
+ # These widen the encoder's INPUT, not n_scalars (see particle_ids.build_property_matrix),
+ # so changing them invalidates warm-start from checkpoints trained under a different set.
+ # The "combo" (spin_onehot + prop_is_massless + standardize_props) is on by default — it
+ # won the encoding A/B; color_onehot stayed neutral/worse on short runs so it's off but
+ # kept available to revisit.
+ spin_onehot: true         # one-hot the categorical spin column
+ color_onehot: false       # one-hot the SU(3) color representation (rep identity)
+ prop_is_massless: true    # explicit "exactly massless" flag + neutralise mass sentinel
+ standardize_props: true   # z-score the continuous property columns
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
  #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]

@@ -478,18 +478,40 @@ class AmplitudeExperiment(BaseExperiment):
                 LOGGER.info(f"Particle encoding: one-hot PIDs (vocab_size={token_size})")
             else:
                 from particle_ids import (
-                    ParticleFeaturizer, GLOBAL_PROPERTY_MATRIX, GLOBAL_N_ENTRIES
+                    ParticleFeaturizer, GLOBAL_N_ENTRIES, build_property_matrix,
                 )
-                self.property_matrix = GLOBAL_PROPERTY_MATRIX
+                # Smart-encoding transforms of the physical property vector, each
+                # off by default so warm-start/fine-tune from existing checkpoints
+                # stay valid (they change the encoder's *input* width — but not
+                # n_scalars, which is fixed at d_particle_hidden + n_order_features):
+                #   spin_onehot       — one-hot the categorical spin column
+                #   color_onehot      — one-hot the SU(3) color representation
+                #   prop_is_massless  — explicit "exactly massless" flag + neutralise sentinel
+                #   standardize_props — z-score the continuous columns
+                spin_onehot   = self.cfg.data.get("spin_onehot", False)
+                color_onehot  = self.cfg.data.get("color_onehot", False)
+                is_massless   = self.cfg.data.get("prop_is_massless", False)
+                standardize   = self.cfg.data.get("standardize_props", False)
+                self.property_matrix, _ = build_property_matrix(
+                    spin_onehot=spin_onehot, color_onehot=color_onehot,
+                    is_massless=is_massless, standardize=standardize,
+                )
                 # d_particle_hidden is the fixed projection output dim.
                 # in_channels and num_scalars use this fixed dim — they never
                 # change when quantum numbers are added, only the tiny projection
                 # matrix (n_features → d_particle_hidden) needs extending.
                 d_hidden = self.cfg.model.get("d_particle_hidden", 16)
                 particle_feature_dim = d_hidden
+                _enc = "+".join(
+                    [n for n, on in (("spin1hot", spin_onehot),
+                                     ("color1hot", color_onehot),
+                                     ("masslessflag", is_massless),
+                                     ("std", standardize)) if on]
+                ) or "raw"
                 LOGGER.info(
                     f"Particle encoding: physical properties "
-                    f"({ParticleFeaturizer.N_FEATURES}D → projected to {d_hidden}D) | "
+                    f"({self.property_matrix.shape[1]}D [{_enc}] "
+                    f"→ projected to {d_hidden}D) | "
                     f"global table covers {GLOBAL_N_ENTRIES - 1} particle species"
                 )
             # n_order_features extra scalars per particle (same value broadcast across event)
@@ -526,6 +548,7 @@ class AmplitudeExperiment(BaseExperiment):
             model.setup_particle_features(
                 use_pids=use_pids,
                 property_matrix=getattr(self, "property_matrix", None),
+                encoder_hidden=self.cfg.model.get("particle_encoder_hidden", 0),
             )
 
     def init_model(self):

@@ -186,6 +186,245 @@ for _pdg, _idx in GLOBAL_PDG_IDX.items():
 GLOBAL_PROPERTY_MATRIX = _mat   # (GLOBAL_N_ENTRIES, N_FEATURES), row 0 = padding zeros
 
 
+# ---------------------------------------------------------------------------
+# Optional hybrid encoding: one-hot the *categorical* spin column
+# ---------------------------------------------------------------------------
+# Spin is a label, not a magnitude — spin-1 is not "twice" spin-½, and spin-½
+# is not "halfway between" 0 and 1.  Fed as a raw scalar through Linear(n→d),
+# every spin is forced onto one line through the origin (contributions
+# 0·w, 0.5·w, 1·w), so the projection can't give bosons and fermions
+# independent embedding directions.  One-hot gives each spin value its own
+# learnable row instead.  We keep the additive/continuous quantum numbers
+# (charge, T₃, B, L, mass, casimir) as scalars — for those the ordering and
+# distance ARE physical, so one-hot would throw information away.
+#
+# Pre-allocated spin values get a clean one-hot; anything outside the list
+# falls back to a scalar "overflow" channel, so you do NOT have to pick a hard
+# maximum spin up front — arbitrarily high/unusual spins still encode (you just
+# lose the one-hot benefit for those rare cases until you add them to the list).
+SPIN_ONEHOT_VALUES = (0.0, 0.5, 1.0, 1.5, 2.0)   # extend freely; regen base shapes
+_SPIN_TOL = 1e-6
+_SPIN_COL = PARTICLE_FEATURE_NAMES.index("spin")   # == 1
+
+
+def expand_spin_onehot(matrix):
+    """Replace the scalar spin column of a property matrix with a one-hot over
+    SPIN_ONEHOT_VALUES plus a scalar overflow channel.
+
+    Returns (expanded_matrix, expanded_feature_names).  Layout is the original
+    column order with the single spin column expanded in place:
+        [charge, spin_is_0, spin_is_0.5, …, spin_overflow, <rest scalars…>]
+    All-zero rows (the padding row 0) are preserved as all-zero so padded
+    particles still contribute nothing.
+    """
+    matrix = np.asarray(matrix, dtype=np.float32)
+    n      = matrix.shape[0]
+    spin   = matrix[:, _SPIN_COL]
+
+    onehot   = np.zeros((n, len(SPIN_ONEHOT_VALUES)), dtype=np.float32)
+    overflow = np.zeros((n, 1), dtype=np.float32)
+    matched  = np.zeros(n, dtype=bool)
+    for i, v in enumerate(SPIN_ONEHOT_VALUES):
+        hit         = np.abs(spin - v) < _SPIN_TOL
+        onehot[:, i] = hit
+        matched     |= hit
+    overflow[:, 0] = np.where(matched, 0.0, spin)   # 0 for known spins, raw value otherwise
+
+    expanded = np.concatenate(
+        [matrix[:, :_SPIN_COL], onehot, overflow, matrix[:, _SPIN_COL + 1:]],
+        axis=1,
+    )
+    # keep padding rows all-zero (spin 0.0 would otherwise one-hot to a real slot)
+    padding = ~np.any(matrix != 0.0, axis=1)
+    expanded[padding] = 0.0
+
+    names = (
+        PARTICLE_FEATURE_NAMES[:_SPIN_COL]
+        + [f"spin_is_{v:g}" for v in SPIN_ONEHOT_VALUES]
+        + ["spin_overflow"]
+        + PARTICLE_FEATURE_NAMES[_SPIN_COL + 1:]
+    )
+    return expanded, names
+
+
+# ---------------------------------------------------------------------------
+# Optional encoding: one-hot the categorical SU(3) color representation
+# ---------------------------------------------------------------------------
+# Same lesson as spin: the color rep is a *categorical label*, not a magnitude.
+# `color_casimir` ∈ {0, 4/3, 3, 10/3, …} tags the rep (singlet / fundamental /
+# adjoint / sextet); fed as a raw scalar through Linear(n→d) every rep is forced
+# onto one line through the origin, so the octet and the triplet can't get
+# independent embedding directions ("adjoint = 2.25×fundamental" is not a
+# meaningful distance). We one-hot the rep identity — distinguishing 3 from 3̄ by
+# the sign of `color_charge` — and REPLACE the scalar `color_charge`/`color_casimir`
+# columns (exactly as `expand_spin_onehot` replaces the scalar spin), with a single
+# `color_overflow` scalar that carries the Casimir of any rep outside the listed
+# set so unlisted reps stay distinguishable.
+#
+# Each entry is (color_charge, color_casimir); extend freely (regen base shapes).
+COLOR_REP_VALUES = (
+    ( 0.0, 0.0  ),   # singlet  (leptons, γ, Z, W, H)
+    ( 1.0, 4/3  ),   # triplet  3   (quark)
+    (-1.0, 4/3  ),   # antitriplet 3̄ (antiquark)
+    ( 0.0, 3.0  ),   # adjoint  8   (gluon)
+)
+_COLOR_TOL = 1e-6
+
+
+def expand_color_onehot(matrix, names=None):
+    """Replace the scalar ``color_charge``/``color_casimir`` columns with a one-hot
+    over COLOR_REP_VALUES (rep identity, including 3 vs 3̄) plus a scalar overflow
+    channel carrying the Casimir of any *unlisted* rep.
+
+    This mirrors :func:`expand_spin_onehot` exactly — the categorical scalars are
+    REMOVED, not kept alongside, so there is no one-hot/scalar redundancy. The
+    one-hot slots already encode the 3-vs-3̄ sign (separate triplet/antitriplet
+    rows), so dropping ``color_charge`` loses nothing; the overflow preserves
+    magnitude for reps outside the list. Returns ``(matrix, feature_names)``;
+    padding rows (all-zero) stay all-zero.
+    """
+    matrix = np.asarray(matrix, dtype=np.float32)
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
+    cc = names.index("color_charge")
+    assert names[cc + 1] == "color_casimir", \
+        "expand_color_onehot expects color_charge immediately followed by color_casimir"
+    c2 = cc + 1
+
+    n        = matrix.shape[0]
+    onehot   = np.zeros((n, len(COLOR_REP_VALUES)), dtype=np.float32)
+    overflow = np.zeros((n, 1), dtype=np.float32)
+    matched  = np.zeros(n, dtype=bool)
+    for i, (q_col, casimir) in enumerate(COLOR_REP_VALUES):
+        hit = (np.abs(matrix[:, cc] - q_col) < _COLOR_TOL) & \
+              (np.abs(matrix[:, c2] - casimir) < _COLOR_TOL)
+        onehot[:, i] = hit
+        matched     |= hit
+    overflow[:, 0] = np.where(matched, 0.0, matrix[:, c2])  # Casimir for unlisted reps
+
+    expanded = np.concatenate(
+        [matrix[:, :cc], onehot, overflow, matrix[:, c2 + 1:]], axis=1)
+    # keep padding rows all-zero (singlet (0,0) would otherwise one-hot to a slot)
+    padding = ~np.any(matrix != 0.0, axis=1)
+    expanded[padding] = 0.0
+
+    names_out = (names[:cc]
+                 + [f"color_is_{i}" for i in range(len(COLOR_REP_VALUES))]
+                 + ["color_overflow"]
+                 + names[c2 + 1:])
+    return expanded, names_out
+
+
+# ---------------------------------------------------------------------------
+# Optional encoding: explicit "exactly massless" flag
+# ---------------------------------------------------------------------------
+# `log10_mass_gev` uses a _MASSLESS = -5.0 sentinel, which (a) conflates the
+# *categorical* fact "symmetry-protected exactly massless" (γ, g, ν) with "very
+# light", and (b) sits as a large outlier far below the electron (-3.3), so it
+# dominates the single Linear's init/gradients. We split the two: a binary
+# ``is_massless`` flag carries the categorical fact, and the massless rows'
+# scalar mass is neutralised to the mean over massive species so the scalar
+# axis carries magnitude only (≈0 after standardization).
+def add_is_massless_flag(matrix, names=None):
+    """Append a binary ``is_massless`` column and neutralise the massless
+    sentinel in ``log10_mass_gev``. Returns ``(matrix, names)``; padding stays 0."""
+    matrix = np.asarray(matrix, dtype=np.float32).copy()
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
+    m      = names.index("log10_mass_gev")
+
+    padding  = ~np.any(matrix != 0.0, axis=1)
+    massless = (np.abs(matrix[:, m] - _MASSLESS) < 1e-6) & ~padding
+    massive  = ~massless & ~padding
+
+    flag = massless.astype(np.float32).reshape(-1, 1)
+    # neutralise sentinel → mean log10 mass of the massive species
+    if massive.any():
+        matrix[massless, m] = matrix[massive, m].mean()
+
+    expanded = np.concatenate([matrix, flag], axis=1)
+    return expanded, names + ["is_massless"]
+
+
+# ---------------------------------------------------------------------------
+# Optional: per-column standardization of the *continuous* features
+# ---------------------------------------------------------------------------
+# The raw columns live on wildly different scales (log10_mass −5…+2 vs charge
+# ±1), so through one Xavier Linear the mass column dominates the initial
+# embedding and gradients. Z-score the continuous columns across the real
+# (non-padding) species. Categorical / one-hot / binary columns are left as-is
+# (standardizing them would break their 0/1 sparsity and the all-zero padding).
+_STD_SKIP_PREFIXES = ("spin_is_", "spin_overflow", "color_is_", "color_overflow", "is_massless")
+
+
+# FROZEN standardization constants (per physical feature), computed ONCE over the
+# current SM particle table. They are hardcoded — NOT recomputed from the table —
+# so that extending PARTICLE_PROPERTIES with a new species does NOT shift the
+# encoding of existing particles, preserving the project's zero-shot-new-particle
+# property (a pretrained encoder stays valid; a new particle is just placed on the
+# frozen scale). `log10_mass_gev` stats are over the is_massless-neutralised values
+# (the massless sentinel replaced by the massive mean), matching the
+# prop_is_massless pipeline that runs before standardize.
+#
+# Regenerate intentionally (only if the canonical feature set changes), via:
+#   mat, names = add_is_massless_flag(GLOBAL_PROPERTY_MATRIX)
+#   real = np.any(GLOBAL_PROPERTY_MATRIX != 0, axis=1)
+#   {f: (mat[real, names.index(f)].mean(), mat[real, names.index(f)].std()) for f in CONT}
+_FROZEN_STD_STATS = {
+    "charge":          (0.00000000, 0.61463630),
+    "spin":            (0.56666666, 0.21343747),
+    "log10_mass_gev":  (-0.28611699, 1.58533919),
+    "weak_isospin_t3": (0.00000000, 0.51639777),
+    "baryon_number":   (0.00000000, 0.21081853),
+    "lepton_number":   (0.00000000, 0.63245553),
+    "color_charge":    (0.00000000, 0.63245553),
+    "color_casimir":   (0.63333333, 0.78102499),
+}
+
+
+def standardize_property_columns(matrix, names=None):
+    """Z-score continuous columns using FROZEN per-feature constants
+    (``_FROZEN_STD_STATS``), so the encoding is invariant to which particles are
+    in the table. Categorical/one-hot/binary columns are skipped; padding rows
+    stay zero. A continuous feature not present in the frozen table falls back to
+    table statistics (with a warning) so unusual configs still run.
+    Returns ``(matrix, names)`` (names unchanged)."""
+    matrix = np.asarray(matrix, dtype=np.float32).copy()
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
+    padding = ~np.any(matrix != 0.0, axis=1)
+    real    = ~padding
+    for j, name in enumerate(names):
+        if name.startswith(_STD_SKIP_PREFIXES):
+            continue
+        if name in _FROZEN_STD_STATS:
+            mu, sd = _FROZEN_STD_STATS[name]
+        else:
+            col = matrix[real, j]
+            mu, sd = float(col.mean()), float(col.std())
+            import warnings
+            warnings.warn(f"standardize_property_columns: no frozen stats for "
+                          f"'{name}', falling back to table statistics.")
+        matrix[real, j] = (matrix[real, j] - mu) / sd if sd > 1e-12 else (matrix[real, j] - mu)
+    matrix[padding] = 0.0
+    return matrix, names
+
+
+def build_property_matrix(spin_onehot=False, color_onehot=False,
+                          is_massless=False, standardize=False):
+    """Assemble the particle property matrix with the requested smart-encoding
+    transforms, applied in a fixed order (spin → color → mass-flag →
+    standardize). Returns ``(matrix, feature_names)``. With all flags False this
+    is exactly ``(GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES)``."""
+    mat, names = GLOBAL_PROPERTY_MATRIX, list(PARTICLE_FEATURE_NAMES)
+    if spin_onehot:
+        mat, names = expand_spin_onehot(mat)
+    if color_onehot:
+        mat, names = expand_color_onehot(mat, names)
+    if is_massless:
+        mat, names = add_is_massless_flag(mat, names)
+    if standardize:
+        mat, names = standardize_property_columns(mat, names)
+    return mat, names
+
+
 def global_encode(pdg_ids: np.ndarray) -> np.ndarray:
     """Map PDG IDs → global property-table indices (use_PIDs=False mode)."""
     pdg_ids = np.asarray(pdg_ids, dtype=int)

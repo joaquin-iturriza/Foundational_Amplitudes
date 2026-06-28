@@ -129,10 +129,17 @@ def recipe_id(recipe):
     """
     volatile = {"created", "output_file", "provenance", "schema_version",
                 "backend", "effective_seed", "recipe_id",
-                # generation-strategy metadata: recorded for traceability but not
-                # part of "what the data is" — a dataset has the same id whether
-                # it was made in one shot or chunked, so the cache stays valid.
-                "chunked", "chunk_size"}
+                # Traceability metadata, not part of "what the data is":
+                #   - `chunked`    : whether the chunked path was used (a bool).
+                #   - `chunk_size` : the nominal cost-aware events-per-chunk; the
+                #                    BYTE-determining quantity is the realized
+                #                    `n_chunks` (= ceil(n_events/chunk_size)), which
+                #                    variable_energy_recipe folds INTO the id when it
+                #                    differs from the legacy plan — so chunk_size
+                #                    itself stays metadata here.
+                #   - `gen_weight` : the cost estimate that derives chunk_size.
+                # NOTE: `n_chunks` is intentionally NOT listed — it IS identity.
+                "chunked", "chunk_size", "gen_weight"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -520,6 +527,28 @@ PROCESSES = {
     #     "param_card_patches": {},
     #     "run_card_patches": {"lpp1": "0", "lpp2": "0"},
     # },
+    # ------------------------------------------------------------------
+    # NLO QCD *virtual* processes (kind="virt"): generated through MadLoop
+    # (tools/nlo_virtual_pipeline.py), NOT the LO standalone path. datagen routes
+    # them by `kind`: the backend is the [virt=QCD] standalone (`virt_base` keys
+    # tools.VIRT_PROCESSES), and each chunk is generated in an isolated subprocess
+    # because matrix2py.so chdir's and is a process-singleton. `n_loops=1` flows to
+    # amp_orders=[1, alphas_power] (so the recipe/ id is distinct from LO same-name
+    # processes); `virt=True` triggers the ×8 generation-cost weight. The stored
+    # amplitude is virt_e4 (absolute one-loop finite part, no alpha_s prefactor).
+    # Distinct names (…_nlo) keep recipes/outputs/cache separate from the LO entries.
+    "ee_ss_nlo": {                       # easy: massless, fast loop
+        "kind": "virt", "virt": True, "virt_base": "ee_ss",
+        "nfinal": 2, "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [11, -11, 3, -3], "m_finals": [0.0, 0.0],
+        "param_card_patches": {},
+    },
+    "ee_ttbar_nlo": {                    # hard: massive top loop + stability checks
+        "kind": "virt", "virt": True, "virt_base": "ee_ttbar",
+        "nfinal": 2, "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [11, -11, 6, -6], "m_finals": [172.5, 172.5],
+        "param_card_patches": {},
+    },
 }
 
 # =============================================================================
@@ -1514,26 +1543,90 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
 # LIBRARY API: recipe -> dataset (importable by the training job)
 # =============================================================================
 
+# ── Cost-aware chunk policy ───────────────────────────────────────────────────
+# Per-process generation cost drives how a dataset is sliced into work units for
+# parallel generation. Lives here (next to PROCESSES + the recipe builders) because
+# the resolved chunk_size is part of the recipe IDENTITY: the per-chunk RNG stream
+# depends on the chunking, so two policies produce different bytes and must get
+# different recipe_ids. See datagen.py for the full rationale.
+MAX_CHUNK = 100_000          # cheap 2→2 chunk size (unchanged from the old policy)
+MIN_CHUNK = 2_500            # floor so expensive processes don't over-fragment
+TARGET_CHUNK_COST = 100_000  # one chunk's work in 2→2-equivalent events
+
+def process_gen_weight(process):
+    """Relative per-event generation cost of `process`, normalized to 2→2 LO = 1.
+    Used only to size chunks/schedule load — never enters the physics. An explicit
+    ``gen_weight`` in the PROCESSES entry wins; else a heuristic from final-state
+    multiplicity (dominant cost driver) and loop order."""
+    cfg = PROCESSES.get(process, {})
+    explicit = cfg.get("gen_weight")
+    if explicit is not None:
+        return float(explicit)
+    nfinal = int(cfg.get("nfinal", 2))
+    w = 6.0 ** max(0, nfinal - 2)        # 2→2:1, 2→3:6, 2→4:36, 2→5:216
+    if cfg.get("loop") or cfg.get("nlo") or cfg.get("virt"):
+        w *= 8.0
+    return w
+
+def process_chunk_size(process):
+    """Deterministic per-process events-per-chunk, sized for ≈ equal wall-time.
+    Cheap → MAX_CHUNK (unchanged bytes); expensive → fewer events per chunk."""
+    size = TARGET_CHUNK_COST / process_gen_weight(process)
+    return int(min(MAX_CHUNK, max(MIN_CHUNK, round(size))))
+
+
+def process_n_chunks(process, n_events):
+    """Number of generation chunks for a dataset — the byte-determining split.
+
+    NLO-virtual processes are generated as ONE unit (datagen runs them in an
+    isolated subprocess: MadLoop's matrix2py.so is a process-singleton, and many
+    concurrent fresh-interpreter per-chunk subprocesses race on numpy's C-extension
+    import on Lustre). NLO is cheap per point (~0.2 ms), so a whole dataset in one
+    process is fast enough and needs no intra-process parallelism. LO uses the
+    cost-aware size."""
+    if PROCESSES.get(process, {}).get("kind") == "virt":
+        return 1
+    return -(-int(n_events) // process_chunk_size(process))
+
+
 def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
                            role=None, seed=None):
     """Canonical content-determining recipe dict for a variable-energy dataset.
-    recipe_id() of this uniquely identifies the dataset's contents."""
+    recipe_id() of this uniquely identifies the dataset's contents — including the
+    cost-aware chunking, since the per-chunk RNG streams (and therefore the bytes)
+    depend on how the dataset is split.
+
+    The byte-determining quantity is the REALIZED number of chunks, n_chunks =
+    ceil(n_events / chunk_size) — not the nominal chunk_size. A dataset small
+    enough to be one chunk under both the cost-aware and the legacy 100k policy is
+    byte-identical regardless of the policy. So `n_chunks` is recorded in the
+    identity ONLY when it differs from the legacy ceil(n_events / MAX_CHUNK): then
+    cost-aware data that actually re-chunks gets a fresh id, while everything whose
+    chunking is unchanged keeps its original id and existing cache. (The nominal
+    chunk_size is kept as excluded traceability metadata, written in finalize.)"""
     cfg = PROCESSES[process]
     k   = cfg.get("alphas_power", 0)
-    return {
+    n   = int(n_events)
+    recipe = {
         "process":            process,
         "mode":               "variable_energy",
         "sqrts_min":          float(sqrts_min),
         "sqrts_max":          float(sqrts_max),
-        "n_events":           int(n_events),
+        "n_events":           n,
         "role":               role,
         "seed":               seed,
         "pdg_ids":            list(cfg["pdg_ids"]),
         "param_card_patches": cfg.get("param_card_patches", {}),
         "alphas_power":       k,
-        "amp_orders":         [0, k],
+        "amp_orders":         [int(cfg.get("n_loops", 0)), k],
         "per_event_alphas":   True,
     }
+    ceil_div    = lambda a, b: -(-a // b)
+    n_chunks    = process_n_chunks(process, n)
+    legacy_nch  = ceil_div(n, MAX_CHUNK)
+    if n_chunks != legacy_nch:
+        recipe["n_chunks"] = n_chunks          # identity-bearing; legacy plan is implicit
+    return recipe
 
 def recipe_output_path(recipe, out_dir):
     role_tag = f"_{recipe['role']}" if recipe.get("role") else ""

@@ -18,18 +18,54 @@ import json
 import math
 import os
 import shutil
+import subprocess
+import sys
 
 import numpy as np
 
 import mg5_pipeline_final as mg
 
-# Fixed events-per-chunk policy for parallel generation. Boundaries and per-chunk
-# seeds derive ONLY from this constant + the recipe (never from the worker count),
-# so a dataset is bit-identical whether generated serially or across N cores, and
-# whatever its recipe_id, the cache stays valid. ~100k keeps per-chunk overhead
-# (driver startup + concat) under a few percent while allowing wide parallelism
-# (a 1M-event set → 10 chunks; the whole prebuild's chunks share one pool).
-CHUNK_SIZE = 100_000
+# NLO-virtual generation lives in tools/nlo_virtual_pipeline.py and goes through
+# MadLoop (matrix2py.so), which chdir's and is a process-singleton — so a virt
+# chunk is generated in its own subprocess rather than in a shared pool worker.
+_NLO_PIPELINE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             "tools", "nlo_virtual_pipeline.py")
+
+
+def is_virt(process):
+    """True if `process` is an NLO-virtual process routed through MadLoop."""
+    return mg.PROCESSES.get(process, {}).get("kind") == "virt"
+
+# Cost-aware events-per-chunk policy for parallel generation.
+#
+# Chunk boundaries and per-chunk seeds derive ONLY from (recipe, process cost) —
+# never from the worker count — so a dataset is bit-identical whether generated
+# serially or across N cores. The resolved per-process chunk_size is folded into
+# the recipe and into recipe_id (see mg5_pipeline_final.variable_energy_recipe /
+# recipe_id): a different chunk policy yields a different id, so cost-aware data
+# never silently shares an id with the old fixed-100k bytes.
+#
+# Why cost-aware: per-event generation cost grows steeply with final-state
+# multiplicity (a 2→4 point is ~tens of times a 2→2). With a *fixed* events-per-
+# chunk size, an expensive process becomes one fat, indivisible work unit: the
+# whole prebuild then waits on that single slow chunk while every other core sits
+# idle. Sizing each process's chunks for roughly EQUAL WALL-TIME instead spreads
+# the expensive process across many small chunks (fine-grained parallelism, short
+# tail) while leaving cheap processes coarse (low per-chunk overhead). What you
+# ask of each process is "how long it takes", not "how many events".
+#
+# MAX_CHUNK is the old fixed size (cheap 2→2 keeps ~100k-event chunks → unchanged
+# bytes). TARGET_CHUNK_COST is one chunk's worth of work in 2→2-equivalent events;
+# an expensive process gets chunk_size = TARGET / gen_weight (clamped to
+# [MIN_CHUNK, MAX_CHUNK]). The cost model lives in mg5_pipeline_final (next to
+# PROCESSES + the recipe builders, since chunk_size is identity-bearing); these
+# names re-export it for the generation call sites here.
+MAX_CHUNK          = mg.MAX_CHUNK
+MIN_CHUNK          = mg.MIN_CHUNK
+TARGET_CHUNK_COST  = mg.TARGET_CHUNK_COST
+CHUNK_SIZE         = mg.MAX_CHUNK     # back-compat alias (cheap-process chunk size)
+process_gen_weight = mg.process_gen_weight
+process_chunk_size = mg.process_chunk_size
 
 
 def frozen_dir():
@@ -59,11 +95,33 @@ def dest_for_role(role):
     return frozen_dir() if role in ("val", "test") else train_cache_dir()
 
 
+def _virt_standalone_dir(process):
+    base = mg.PROCESSES[process]["virt_base"]
+    return f"{mg.WORK_DIR}/{base}_virt_standalone"
+
+
+def ensure_virt_backend(process):
+    """Build the [virt=QCD] MadLoop standalone (matrix2py.so) for an NLO-virtual
+    process if absent, then pole-certify it. Idempotent; run serially before the
+    pool, like the LO backends."""
+    base = mg.PROCESSES[process]["virt_base"]
+    sa   = _virt_standalone_dir(process)
+    import glob
+    if glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so"):
+        return sa
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
+    subprocess.run([sys.executable, _NLO_PIPELINE, base, "--build", "--certify"],
+                   check=True, env=env)
+    return sa
+
+
 def ensure_backend(process):
     """Compile the matrix-element backend for `process` if it isn't built yet.
 
     Run this serially (once per unique process) before parallel generation so
     that concurrent workers never race to compile the same backend."""
+    if is_virt(process):
+        return ensure_virt_backend(process)
     cfg = dict(mg.PROCESSES[process])
     standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
     backend, subproc_dirs, driver_bin, _ = mg.detect_compiled_backend(standalone_dir)
@@ -83,11 +141,18 @@ def _is_cached(out_path, wanted_id):
 
 
 def plan_chunks(n_events, chunk_size=None):
-    """Split n_events into as few, as-equal chunks as the fixed policy allows.
-    Boundaries depend only on n_events (+ CHUNK_SIZE), never the worker count."""
+    """Split n_events into as few, as-equal chunks as the policy allows.
+    Boundaries depend only on (n_events, chunk_size), never the worker count.
+    Pass a per-process `chunk_size` (from process_chunk_size) for cost-aware
+    granularity; defaults to the cheap-process MAX_CHUNK."""
     if chunk_size is None:
-        chunk_size = CHUNK_SIZE
+        chunk_size = MAX_CHUNK
     nch = max(1, math.ceil(n_events / chunk_size))
+    return split_counts(n_events, nch)
+
+
+def split_counts(n_events, nch):
+    """Split n_events into `nch` near-equal contiguous counts (deterministic)."""
     base, rem = divmod(n_events, nch)
     return [base + (1 if i < rem else 0) for i in range(nch)]
 
@@ -103,7 +168,11 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
     """Independent chunk work-units for one (process, role) dataset. Each is a
     self-contained dict that gen_chunk() can run in any worker / any order."""
     tasks = []
-    for idx, count in enumerate(plan_chunks(n_events)):
+    weight = process_gen_weight(process)
+    # NLO-virtual is generated as one unit (see mg.process_n_chunks); LO uses the
+    # cost-aware split. Both go through the same per-chunk seed / identity machinery.
+    nch    = mg.process_n_chunks(process, n_events)
+    for idx, count in enumerate(split_counts(n_events, nch)):
         tasks.append({
             "process":   process,
             "sqrts_min": float(sqrts_min),
@@ -112,8 +181,42 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
             "seed":      _child_seed(seed, role, idx),
             "out_dir":   os.path.join(work_dir, f"c{idx:04d}"),
             "idx":       idx,
+            # est_cost: relative wall-time of this chunk (events × per-event
+            # weight), in 2→2-equivalent events. For LPT scheduling + reporting
+            # only — never touches the data.
+            "est_cost":  float(count) * weight,
         })
     return tasks
+
+
+def gen_virt_chunk(task):
+    """Worker: generate one NLO-virtual chunk in an isolated subprocess (MadLoop's
+    matrix2py.so chdir's and is a process-singleton, so it can't be loaded in a
+    shared pool worker). Deterministic via the per-chunk seed. Returns (idx, path).
+
+    NLO datasets are one unit each (mg.process_n_chunks), so only a few of these
+    run at once; the retry is belt-and-suspenders against the transient numpy
+    C-extension import race that fresh interpreters can hit under FS contention
+    (PyCapsule_Import 'datetime'). The seed is fixed, so a retry is identical."""
+    process = task["process"]
+    base    = mg.PROCESSES[process]["virt_base"]
+    os.makedirs(task["out_dir"], exist_ok=True)
+    out_path = os.path.join(task["out_dir"], "chunk.npy")
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib",
+               PYTHONDONTWRITEBYTECODE="1")
+    cmd = [sys.executable, _NLO_PIPELINE, base, "--generate",
+           "--n", str(task["count"]), "--seed", str(task["seed"]),
+           "--sqrts-min", repr(task["sqrts_min"]), "--sqrts-max", repr(task["sqrts_max"]),
+           "--out", out_path]
+    import time
+    last = None
+    for attempt in range(4):
+        r = subprocess.run(cmd, env=env, capture_output=True, text=True)
+        if r.returncode == 0:
+            return task["idx"], out_path
+        last = r.stderr[-2000:]
+        time.sleep(1.5 * (attempt + 1))   # brief stagger; race is transient
+    raise RuntimeError(f"gen_virt_chunk failed for {process} after 4 tries:\n{last}")
 
 
 def gen_chunk(task):
@@ -125,6 +228,8 @@ def gen_chunk(task):
     update, which would race across the pool. The single recipe/manifest write
     happens once, serially, in finalize_dataset."""
     process        = task["process"]
+    if is_virt(process):
+        return gen_virt_chunk(task)
     cfg            = dict(mg.PROCESSES[process])
     standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
     backend, subproc_dirs, driver_bin, eff_dir = mg.detect_compiled_backend(standalone_dir)
@@ -156,7 +261,10 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     full = dict(rec)
     full["effective_seed"] = seed + mg.ROLE_SEED_OFFSET.get(role, 0)
     full["chunked"]        = True
-    full["chunk_size"]     = CHUNK_SIZE
+    # n_chunks (in `rec` when non-legacy) carries the identity; record the nominal
+    # chunk_size + gen_weight as excluded traceability metadata.
+    full["chunk_size"]     = process_chunk_size(process)
+    full["gen_weight"]     = process_gen_weight(process)
     mg.write_recipe(final, full)
     shutil.rmtree(work_dir, ignore_errors=True)
     return final
