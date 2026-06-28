@@ -36,6 +36,7 @@ read LR REG WARM ETA EMA < <(python -c "import json;h=json.load(open('compare_mo
 mkdir -p compare_models/multiseed25
 RES="$PROJ/compare_models/multiseed25/diag_virt_seed${SEED}.json"
 echo "=== diag seed=$SEED  lr=$LR reg=$REG ema=$EMA  $(date +%H:%M:%S) ==="
+rm -rf "$PROJ/runs/dvirtms/s${SEED}"
 python run.py model=lloca local=none \
   data.source=recipes "data.processes_file=${PROJ}/recipes/pretrain25_short.yaml" "data.data_path=${PROJ}/data/" data.require_cache=true \
   data.preprocess_per_dataset=true data.subsample=null "${ENC[@]}" \
