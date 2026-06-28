@@ -33,6 +33,8 @@ mlruns
 draft
 cluster_scripts
 data/*.npy
+# Feynman-diagram graph sidecars: regenerable from MG5 via tools/dump_diagrams.py
+data/diagrams/
 # Machine-specific local config overrides
 # none.yaml is the no-op default and is safe to commit
 config/local/*.yaml
