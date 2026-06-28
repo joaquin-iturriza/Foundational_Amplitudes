@@ -184,6 +184,12 @@ class ProcessDiagrams:
       leg_pdg   : (D, N)           long    external leg PDG per external node; 0 else
     The leg_slot/leg_pdg arrays carry the diagram↔event correspondence needed for
     the Tier-B per-event propagator-virtuality features.
+
+    prop_leg_sets : list (len D) of list of (i, j, tuple(leg_numbers)) — for each
+      diagram, the internal propagator edges and the external-leg set whose
+      momentum sum gives that propagator's virtuality s=(Σp)² (Tier B). Plain
+      Python (ragged, device-independent); the experiment turns the leg numbers
+      into a per-event momentum-gather mask once the event slot order is known.
     """
     node_feat: torch.Tensor
     lap_pe: torch.Tensor
@@ -192,6 +198,7 @@ class ProcessDiagrams:
     edge_mask: torch.Tensor
     leg_slot: torch.Tensor
     leg_pdg: torch.Tensor
+    prop_leg_sets: list = None
 
     @property
     def n_diagrams(self):
@@ -214,6 +221,7 @@ class ProcessDiagrams:
             edge_mask=self.edge_mask.to(device),
             leg_slot=self.leg_slot.to(device),
             leg_pdg=self.leg_pdg.to(device),
+            prop_leg_sets=self.prop_leg_sets,   # ragged Python data; device-independent
         )
 
 
@@ -279,6 +287,7 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
     edge_mask = np.zeros((D, max_nodes, max_nodes), dtype=bool)
     leg_slot = np.full((D, max_nodes), -1, dtype=np.int64)
     leg_pdg = np.zeros((D, max_nodes), dtype=np.int64)
+    prop_leg_sets = []   # per diagram: [(i, j, tuple(leg_numbers)), ...] internal edges
 
     # node feature column offsets
     c_type = n_prop            # is_external, is_vertex
@@ -321,6 +330,9 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
         adj = _undirected_adjacency(edges, nn)
         lap_pe[di, :nn] = _laplacian_pe(adj, k_pe)
 
+        prop_leg_sets.append(
+            [(u, v, tuple(sorted(s))) for (u, v, s) in propagator_leg_sets(g)])
+
     return ProcessDiagrams(
         node_feat=torch.from_numpy(node_feat),
         lap_pe=torch.from_numpy(lap_pe),
@@ -329,6 +341,7 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
         edge_mask=torch.from_numpy(edge_mask),
         leg_slot=torch.from_numpy(leg_slot),
         leg_pdg=torch.from_numpy(leg_pdg),
+        prop_leg_sets=prop_leg_sets,
     )
 
 
