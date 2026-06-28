@@ -300,6 +300,50 @@ def check_diagram_conditioning():
           f"pid-swap effect {ddiag:.1e}  OK")
 
 
+def check_diagram_batch_equivalence():
+    """DiagramEncoder.encode_all (one batched forward over all processes) must match
+    the per-process forward() loop — same E and gradients up to float32 reduction-
+    order noise. This is the per-step optimization that removes the 25x launch-bound
+    loop + the unique() GPU->CPU sync; guarding it keeps a future refactor honest."""
+    ddir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "data", "diagrams")
+    names = [n for n in ("ee_aa", "ee_ttbar", "ee_uug", "ee_uugg", "ee_ZH")
+             if os.path.exists(os.path.join(ddir, f"{n}.diagrams.json"))]
+    if len(names) < 2:
+        print("  diagram batch equivalence: SKIP (no data/diagrams sidecars)")
+        return
+    from diagram_graphs import load_diagram_registry, feature_dims, build_diagram_batch
+    from models.diagram_encoder import DiagramEncoder
+    reg, n_prop = load_diagram_registry(ddir, names, spin_onehot=True, is_massless=True,
+                                        standardize=True, k_pe=8)
+    f_node, f_edge = feature_dims(n_prop)
+    torch.manual_seed(0)
+    enc = DiagramEncoder(f_node, f_edge, k_pe=8, d_model=64, n_heads=4, n_layers=3, d_out=32)
+    pd_by_pid = [reg[n] for n in names] + [None]   # include a missing process
+
+    enc.zero_grad()
+    E_loop = torch.zeros(len(pd_by_pid), 32)
+    for pid, pd in enumerate(pd_by_pid):
+        if pd is not None:
+            E_loop = E_loop.index_copy(0, torch.tensor([pid]), enc(pd).unsqueeze(0))
+    E_loop.pow(2).sum().backward()
+    g_loop = {k: p.grad.clone() for k, p in enc.named_parameters()}
+
+    enc.zero_grad()
+    E_b = enc.encode_all(build_diagram_batch(pd_by_pid))
+    E_b.pow(2).sum().backward()
+    g_b = {k: p.grad.clone() for k, p in enc.named_parameters()}
+
+    dfwd = (E_loop - E_b).abs().max().item()
+    grel = max((g_loop[k] - g_b[k]).norm().item() / (g_loop[k].norm().item() + 1e-30)
+               for k in g_loop)
+    assert E_b[-1].abs().max().item() < 1e-9, "missing process should get zero embedding"
+    assert dfwd < 1e-5, f"batched encode_all forward differs: {dfwd:.2e}"
+    assert grel < 2e-3, f"batched encode_all grad differs beyond float noise: {grel:.2e}"
+    print(f"  diagram batch encode == per-process loop  OK  "
+          f"(fwd {dfwd:.1e}, grad rel {grel:.1e})")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -309,6 +353,7 @@ check_attention_routing()
 check_frame_broadcast_equivalence()
 check_fast_equilinear_equivalence()
 check_diagram_conditioning()
+check_diagram_batch_equivalence()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────

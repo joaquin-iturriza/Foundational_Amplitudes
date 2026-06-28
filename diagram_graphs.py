@@ -345,6 +345,47 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
     )
 
 
+def build_diagram_batch(pd_by_pid):
+    """Concatenate every process's diagrams into ONE padded batch for a single
+    encoder forward (instead of one small forward per process — kernel-launch
+    bound). Pads all diagrams to the global max node count and tags each diagram
+    with its process id for a segmented pool.
+
+    pd_by_pid : list indexed by process_id of ProcessDiagrams | None.
+    Returns a dict of stacked tensors + ``seg`` (process id per diagram) + ``n_proc``,
+    or None if no process has diagrams. ``edge_feat``/etc. keep their static (Tier-A)
+    width; the per-event Tier-B path uses forward_per_event instead.
+    """
+    pds = [(pid, pd) for pid, pd in enumerate(pd_by_pid) if pd is not None]
+    if not pds:
+        return None
+    n_proc = len(pd_by_pid)
+    M = max(pd.node_feat.shape[1] for _, pd in pds)             # global max nodes
+    F_node = pds[0][1].node_feat.shape[-1]
+    K = pds[0][1].lap_pe.shape[-1]
+    F_edge = pds[0][1].edge_feat.shape[-1]
+    total_D = sum(pd.n_diagrams for _, pd in pds)
+
+    nf = torch.zeros(total_D, M, F_node)
+    lp = torch.zeros(total_D, M, K)
+    nm = torch.zeros(total_D, M, dtype=torch.bool)
+    ef = torch.zeros(total_D, M, M, F_edge)
+    em = torch.zeros(total_D, M, M, dtype=torch.bool)
+    seg = torch.zeros(total_D, dtype=torch.long)
+    off = 0
+    for pid, pd in pds:
+        D, N = pd.node_feat.shape[0], pd.node_feat.shape[1]
+        nf[off:off + D, :N] = pd.node_feat
+        lp[off:off + D, :N] = pd.lap_pe
+        nm[off:off + D, :N] = pd.node_mask
+        ef[off:off + D, :N, :N] = pd.edge_feat
+        em[off:off + D, :N, :N] = pd.edge_mask
+        seg[off:off + D] = pid
+        off += D
+    return {"node_feat": nf, "lap_pe": lp, "node_mask": nm,
+            "edge_feat": ef, "edge_mask": em, "seg": seg, "n_proc": n_proc}
+
+
 def load_diagram_registry(diagrams_dir, process_names, spin_onehot=False,
                           color_onehot=False, is_massless=False, standardize=False,
                           k_pe=8, order_keys=DEFAULT_ORDER_KEYS, max_diagrams=None,

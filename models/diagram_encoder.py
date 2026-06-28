@@ -189,6 +189,41 @@ class DiagramEncoder(nn.Module):
         ).reshape(E, D, self.d_model)                                    # (E, D, d)
         return self.out(self._attn_pool(cls, dim=1))                     # (E, d_out)
 
+    def encode_all(self, batch):
+        """Tier A, batched: encode EVERY process's diagram set in one forward and
+        attention-pool per process → ``E_all`` of shape (n_proc, d_out).
+
+        Numerically identical to calling ``forward(pd)`` per process (the per-graph
+        attention is independent across the batch axis, and the segmented softmax
+        below equals a per-process softmax) — just one big GPU call instead of one
+        small launch-bound forward per process. Processes with no diagrams get a
+        zero row.
+
+        batch : dict from diagram_graphs.build_diagram_batch (tensors + ``seg`` +
+                ``n_proc``).
+        """
+        cls = self._encode_graphs(batch["node_feat"], batch["lap_pe"],
+                                  batch["node_mask"], batch["edge_feat"],
+                                  batch["edge_mask"])                 # (TotalD, d_model)
+        seg = batch["seg"]
+        P = batch["n_proc"]
+        dev, dt = cls.device, cls.dtype
+
+        scores = (cls @ self.pool_query) / (self.d_model ** 0.5)      # (TotalD,)
+        # segmented softmax over diagrams within each process
+        seg_max = torch.full((P,), torch.finfo(dt).min, device=dev, dtype=dt)
+        seg_max = seg_max.scatter_reduce(0, seg, scores, reduce="amax", include_self=True)
+        ex = torch.exp(scores - seg_max[seg])                         # (TotalD,)
+        denom = torch.zeros(P, device=dev, dtype=dt).scatter_add(0, seg, ex)
+        w = ex / denom[seg].clamp_min(torch.finfo(dt).tiny)          # (TotalD,)
+        pooled = torch.zeros(P, self.d_model, device=dev, dtype=dt).index_add(
+            0, seg, w.unsqueeze(-1) * cls)                            # (P, d_model)
+
+        E = self.out(pooled)                                         # (P, d_out)
+        present = torch.zeros(P, dtype=torch.bool, device=dev)
+        present[seg] = True                                          # zero processes w/o diagrams
+        return E * present.unsqueeze(-1)
+
     def encode_registry(self, registry, names=None, edge_extra_fn=None):
         """Encode several processes → ``{name: E}``.
 

@@ -193,8 +193,12 @@ class AmplitudeLLoCaWrapper(nn.Module):
                     sidecar; it gets a zero diagram embedding so the run still works).
         d_diag    : width of the appended embedding (must match in_channels sizing).
         """
+        from diagram_graphs import build_diagram_batch
         self.diagram_encoder = encoder
         self._pd_by_pid = list(pd_by_pid)
+        # Pre-batch every process's diagrams into one padded tensor bundle so each
+        # step is ONE encoder forward (vs one launch-bound forward per process).
+        self._diag_batch = build_diagram_batch(pd_by_pid)
         self._pd_device = None
         self.d_diag = int(d_diag)
         self.use_diagrams = True
@@ -202,26 +206,23 @@ class AmplitudeLLoCaWrapper(nn.Module):
     def _diagram_features(self, process_ids, ptr, device, dtype):
         """Per-particle diagram embedding (N_total, d_diag).
 
-        Encodes each process present in the batch once (the encoder is small and a
-        process's diagram set is static), gathers per event via process_ids, then
-        broadcasts to particles — exactly the order_labels broadcast pattern.
+        Encodes ALL processes' (static) diagram sets in a single batched encoder
+        forward → E_all (n_proc, d_diag), gathers per event via process_ids, then
+        broadcasts to particles — the order_labels broadcast pattern. The static
+        topology embedding only depends on the encoder weights (not the batch), so
+        encoding all processes once and gathering is both correct and far cheaper
+        than a per-process Python loop (no GPU→CPU unique() sync, one big GPU call).
         """
-        # Move the static graph tensors onto the compute device once (they are not
-        # nn buffers — regenerable data — so they don't auto-migrate with .to()).
+        if self._diag_batch is None:                                       # no sidecars
+            return torch.zeros(int(ptr[-1]), self.d_diag, device=device, dtype=dtype)
+        # Move the static batch onto the compute device once (regenerable data, not
+        # nn buffers, so it doesn't auto-migrate with .to()).
         if self._pd_device != device:
-            self._pd_by_pid = [pd.to(device) if pd is not None else None
-                               for pd in self._pd_by_pid]
+            self._diag_batch = {k: (v.to(device) if torch.is_tensor(v) else v)
+                                for k, v in self._diag_batch.items()}
             self._pd_device = device
 
-        n_proc = len(self._pd_by_pid)
-        E_all = torch.zeros(n_proc, self.d_diag, device=device, dtype=dtype)
-        for pid in torch.unique(process_ids).tolist():
-            pd = self._pd_by_pid[pid] if 0 <= pid < n_proc else None
-            if pd is not None:
-                E = self.diagram_encoder(pd).to(dtype).unsqueeze(0)        # (1, d_diag)
-                # out-of-place scatter keeps autograd happy (grad flows to encoder)
-                E_all = E_all.index_copy(0, torch.tensor([pid], device=device), E)
-
+        E_all = self.diagram_encoder.encode_all(self._diag_batch).to(dtype)  # (n_proc, d_diag)
         E_event = E_all[process_ids]                                       # (B, d_diag)
         counts = ptr[1:] - ptr[:-1]                                        # (B,)
         return E_event.repeat_interleave(counts, dim=0)                    # (N_total, d_diag)
