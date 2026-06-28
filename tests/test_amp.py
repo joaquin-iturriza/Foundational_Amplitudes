@@ -344,6 +344,35 @@ def check_diagram_batch_equivalence():
           f"(fwd {dfwd:.1e}, grad rel {grel:.1e})")
 
 
+def check_diagram_virtuality():
+    """Tier B: the propagator-virtuality precompute must reproduce the physical
+    Mandelstam invariant. For ee->ttbar the single s-channel propagator carries the
+    e+e- pair, so its s=(Σ sign·p)² must equal (p_e- + p_e+)² = E_cm² on real events.
+    Pure-tensor check (no model), so it's fast."""
+    import numpy as np
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ddir = os.path.join(repo, "data", "diagrams")
+    npy = os.path.join(repo, "data", "ee_ttbar_346-1000GeV_amplitudes.npy")
+    if not (os.path.exists(os.path.join(ddir, "ee_ttbar.diagrams.json")) and os.path.exists(npy)):
+        print("  diagram virtuality: SKIP (no ee_ttbar sidecar/data)")
+        return
+    from diagram_graphs import load_diagram_registry, build_process_virtuality
+    reg, _ = load_diagram_registry(ddir, ["ee_ttbar"], spin_onehot=True,
+                                   is_massless=True, standardize=True, k_pe=8)
+    a = np.load(npy, mmap_mode="r")
+    slot_pdgs = a[0, 16:20].astype(int).tolist()           # [11,-11,6,-6]
+    vt = build_process_virtuality(reg["ee_ttbar"], slot_pdgs, n_initial=2)
+    assert vt is not None and vt["mask"].shape[0] == 2, "expected 2 s-channel propagators (gamma,Z)"
+    mom = torch.tensor(np.asarray(a[:64, :16]).reshape(64, 4, 4), dtype=torch.float64)
+    p_prop = torch.einsum("kn,enc->ekc", vt["mask"].double(), mom)        # (64, 2, 4)
+    s = p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)             # (64, 2)
+    ecm = mom[:, 0] + mom[:, 1]
+    ecm2 = ecm[:, 0] ** 2 - (ecm[:, 1:] ** 2).sum(-1)                    # (64,)
+    rel = ((s.abs() - ecm2.abs().unsqueeze(-1)).abs() / ecm2.abs().unsqueeze(-1)).max().item()
+    assert rel < 1e-5, f"propagator virtuality != E_cm^2: max rel {rel:.2e}"
+    print(f"  diagram virtuality: s-channel == E_cm^2 over 64 events  OK  (rel {rel:.1e})")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -354,6 +383,7 @@ check_frame_broadcast_equivalence()
 check_fast_equilinear_equivalence()
 check_diagram_conditioning()
 check_diagram_batch_equivalence()
+check_diagram_virtuality()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────

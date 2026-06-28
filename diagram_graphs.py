@@ -190,6 +190,10 @@ class ProcessDiagrams:
       momentum sum gives that propagator's virtuality s=(Σp)² (Tier B). Plain
       Python (ragged, device-independent); the experiment turns the leg numbers
       into a per-event momentum-gather mask once the event slot order is known.
+    external : list of {number, pdg, state} — the process's external legs (from the
+      first subprocess); used with the event slot order to build the leg→slot map.
+    n_subprocesses : int — >1 means flavour-summed (ee_qqbar): the per-event leg↔slot
+      map is ambiguous, so Tier-B virtuality is skipped for it.
     """
     node_feat: torch.Tensor
     lap_pe: torch.Tensor
@@ -199,6 +203,8 @@ class ProcessDiagrams:
     leg_slot: torch.Tensor
     leg_pdg: torch.Tensor
     prop_leg_sets: list = None
+    external: list = None
+    n_subprocesses: int = 1
 
     @property
     def n_diagrams(self):
@@ -222,6 +228,8 @@ class ProcessDiagrams:
             leg_slot=self.leg_slot.to(device),
             leg_pdg=self.leg_pdg.to(device),
             prop_leg_sets=self.prop_leg_sets,   # ragged Python data; device-independent
+            external=self.external,
+            n_subprocesses=self.n_subprocesses,
         )
 
 
@@ -342,7 +350,54 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
         leg_slot=torch.from_numpy(leg_slot),
         leg_pdg=torch.from_numpy(leg_pdg),
         prop_leg_sets=prop_leg_sets,
+        external=payload["subprocesses"][0]["external"],
+        n_subprocesses=len(payload["subprocesses"]),
     )
+
+
+def build_process_virtuality(pd, slot_pdgs, n_initial):
+    """Precompute the per-event propagator-virtuality gather for one process (Tier B).
+
+    Given the event's per-slot PDG order (``slot_pdgs``) and the number of
+    initial-state particles, map each internal propagator's external-leg set to a
+    signed (all-outgoing) momentum-gather row over the event's particle slots, so at
+    runtime ``s = (Σ sign·p_slot)²`` per propagator is one einsum + Minkowski norm.
+
+    Returns a dict of tensors (mask (K,n_part) signed, diag_idx/i_idx/j_idx (K,),
+    plus n_part/D/N) for the K internal edges across the process's D diagrams, or
+    None when it can't be built (flavour-summed process, or legs unmappable).
+    """
+    if pd.n_subprocesses != 1 or pd.external is None or pd.prop_leg_sets is None:
+        return None
+    n_part = len(slot_pdgs)
+    legmap = leg_to_slot(pd.external, list(slot_pdgs), n_initial)   # {leg_number: slot}
+    if len(legmap) != len(pd.external):
+        return None
+    # all-outgoing sign per slot: initial-state momenta flip sign
+    sign = [-1.0 if s < n_initial else 1.0 for s in range(n_part)]
+
+    masks, diag_idx, i_idx, j_idx = [], [], [], []
+    for d, edges in enumerate(pd.prop_leg_sets):
+        for (i, j, legs) in edges:
+            if any(L not in legmap for L in legs):
+                continue
+            row = [0.0] * n_part
+            for L in legs:
+                s = legmap[L]
+                row[s] = sign[s]
+            masks.append(row)
+            diag_idx.append(d); i_idx.append(i); j_idx.append(j)
+    if not masks:
+        return None
+    return {
+        "mask": torch.tensor(masks, dtype=torch.float32),   # (K, n_part) signed
+        "diag_idx": torch.tensor(diag_idx, dtype=torch.long),
+        "i_idx": torch.tensor(i_idx, dtype=torch.long),
+        "j_idx": torch.tensor(j_idx, dtype=torch.long),
+        "n_part": n_part,
+        "D": pd.n_diagrams,
+        "N": pd.node_feat.shape[1],
+    }
 
 
 def build_diagram_batch(pd_by_pid):

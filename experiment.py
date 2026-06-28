@@ -525,10 +525,12 @@ class AmplitudeExperiment(BaseExperiment):
             )
             if self._use_diagrams:
                 self._d_diag = int(self.cfg.model.get("d_diag", 32))
+                self._use_diag_virt = bool(self.cfg.model.get("use_diagram_virtuality", False))
                 self._setup_diagram_registry(
                     list(self.cfg.data.dataset),
                     spin_onehot=spin_onehot, color_onehot=color_onehot,
                     is_massless=is_massless, standardize=standardize,
+                    build_virtuality=self._use_diag_virt,
                 )
                 n_scalars += self._d_diag
                 LOGGER.info(
@@ -578,7 +580,7 @@ class AmplitudeExperiment(BaseExperiment):
         return None
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
-                                is_massless, standardize):
+                                is_massless, standardize, build_virtuality=False):
         """Load each process's diagram graphs into ``self._diag_pd_by_pid`` (indexed
         by process_id == position in ``data.dataset``). The property matrix uses the
         SAME smart-encoding flags as the particle encoder, so diagram particles ride
@@ -612,6 +614,28 @@ class AmplitudeExperiment(BaseExperiment):
         self._diag_pd_by_pid = pd_by_pid
         self._diag_feature_dims = feature_dims(prop_matrix.shape[1])   # (f_node, f_edge)
         self._diag_k_pe = k_pe
+
+        # Tier B: per-process propagator-virtuality precompute. Needs the event's
+        # per-slot PDG order (recover raw PDG from the stored property-table indices
+        # via the inverse global map) and the number of initial-state legs.
+        self._diag_virt_by_pid = None
+        if build_virtuality:
+            from diagram_graphs import build_process_virtuality
+            from particle_ids import GLOBAL_PDG_IDX
+            inv_global = {idx: pdg for pdg, idx in GLOBAL_PDG_IDX.items()}
+            virt, n_virt = [], 0
+            for i, pd in enumerate(pd_by_pid):
+                if pd is None:
+                    virt.append(None); continue
+                slot_tokens = np.asarray(self.pdg_ids[i])[0]               # (n_part,) property idx
+                slot_pdgs = [int(inv_global.get(int(t), 0)) for t in slot_tokens]
+                n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
+                vt = build_process_virtuality(pd, slot_pdgs, n_initial)
+                virt.append(vt)
+                n_virt += int(vt is not None)
+            self._diag_virt_by_pid = virt
+            LOGGER.info(f"Diagram virtuality (Tier B): built per-event maps for "
+                        f"{n_virt}/{len(pd_by_pid)} processes")
         if missing:
             LOGGER.warning(
                 f"Diagram conditioning: no sidecar for {missing} (zero embedding "
@@ -641,14 +665,20 @@ class AmplitudeExperiment(BaseExperiment):
                 from models.diagram_encoder import DiagramEncoder
                 f_node, f_edge = self._diag_feature_dims
                 enc_cfg = self.cfg.model.get("diagram_encoder", {}) or {}
+                # Tier B adds one per-event edge feature (the propagator virtuality).
+                f_edge_extra = 1 if getattr(self, "_use_diag_virt", False) else 0
                 encoder = DiagramEncoder(
                     f_node=f_node, f_edge=f_edge, k_pe=self._diag_k_pe,
                     d_model=int(enc_cfg.get("d_model", 64)),
                     n_heads=int(enc_cfg.get("n_heads", 4)),
                     n_layers=int(enc_cfg.get("n_layers", 3)),
-                    d_out=self._d_diag,
+                    d_out=self._d_diag, f_edge_extra=f_edge_extra,
                 )
                 model.setup_diagram_conditioning(encoder, self._diag_pd_by_pid, self._d_diag)
+                if getattr(self, "_use_diag_virt", False):
+                    model.setup_diagram_virtuality(
+                        self._diag_virt_by_pid,
+                        log_scale=float(self.cfg.model.get("virt_log_scale", 0.1)))
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models

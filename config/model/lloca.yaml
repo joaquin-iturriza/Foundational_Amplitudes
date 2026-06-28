@@ -16,6 +16,10 @@ particle_encoder_hidden: 32  # >0 → 2-layer MLP encoder (Linear→GELU→Linea
 # into the scalar features exactly like the coupling-order labels (equivariant: E is
 # a Lorentz scalar). Needs data/diagrams/<process>.diagrams.json (tools/dump_diagrams.py).
 use_diagrams: false
+use_diagram_virtuality: false  # Tier B: feed per-event propagator virtuality s=(Σp)² on
+                               # internal edges (requires use_diagrams). The pole structure
+                               # 1/(s-m²); per-event, so slower than the static topology embed.
+virt_log_scale: 0.1            # signed-log(s) is scaled by this before the encoder edge bias
 d_diag: 32                   # width of E appended to n_scalars (and num_scalars)
 diagrams_dir: data/diagrams  # where the <process>.diagrams.json sidecars live
 diagram_encoder:             # graph-transformer hyperparameters (standard-param, off muP axis)

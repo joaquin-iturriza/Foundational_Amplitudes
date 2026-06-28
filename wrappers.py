@@ -131,7 +131,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
     def __init__(self, net, token_size, d_particle_hidden: int = 16,
                  particle_encoder_hidden: int = 0,
                  use_diagrams: bool = False, d_diag: int = 32,
-                 diagrams_dir: str = "data/diagrams", diagram_encoder=None):
+                 diagrams_dir: str = "data/diagrams", diagram_encoder=None,
+                 use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -150,12 +151,15 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # diagram registry, which Hydra cannot build). use_diagrams stays False
         # until then, so an un-set-up wrapper behaves exactly like before.
         self.use_diagrams = False
+        self.use_diagram_virtuality = False
         self._cfg_use_diagrams = bool(use_diagrams)
         self.d_diag = int(d_diag)
         self.diagrams_dir = diagrams_dir
         self._diag_enc_cfg = diagram_encoder
         self._pd_by_pid = None
         self._pd_device = None
+        self._virt_by_pid = None
+        self._virt_log_scale = 0.1   # signed-log virtuality scale; see _diagram_features_virtuality
 
     def setup_particle_features(self, use_pids: bool, property_matrix=None,
                                 encoder_hidden: int = 0):
@@ -202,6 +206,67 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._pd_device = None
         self.d_diag = int(d_diag)
         self.use_diagrams = True
+
+    def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1):
+        """Enable Tier B: per-event propagator virtualities (call after
+        setup_diagram_conditioning). ``virt_by_pid`` is a list indexed by process_id
+        of the precompute dicts from diagram_graphs.build_process_virtuality (or None
+        for processes without a usable per-event leg↔slot map — they fall back to the
+        static topology embedding)."""
+        self._virt_by_pid = list(virt_by_pid)
+        self._virt_log_scale = float(log_scale)
+        self.use_diagram_virtuality = True
+
+    def _diagram_features_virtuality(self, fourmomenta, std, process_ids, ptr, device, dtype):
+        """Tier B per-particle diagram embedding (N_total, d_diag).
+
+        For each process in the batch, gather its events' momenta, compute each
+        diagram-propagator's Lorentz-invariant virtuality s=(Σ sign·p)² (all-outgoing
+        convention; signed-log compressed), feed it as the encoder's per-event edge
+        feature, and run forward_per_event → one embedding per event. Processes
+        without a virtuality map (flavour-summed, unmappable) fall back to the static
+        topology embedding for their events.
+        """
+        # move per-process virtuality precompute to device once
+        if self._pd_device != device:
+            self._diag_batch = {k: (v.to(device) if torch.is_tensor(v) else v)
+                                for k, v in self._diag_batch.items()} if self._diag_batch else None
+            self._virt_by_pid = [
+                ({k: (v.to(device) if torch.is_tensor(v) else v) for k, v in vt.items()}
+                 if vt is not None else None)
+                for vt in self._virt_by_pid]
+            self._pd_by_pid = [pd.to(device) if pd is not None else None for pd in self._pd_by_pid]
+            self._pd_device = device
+
+        B = process_ids.shape[0]
+        E_event = torch.zeros(B, self.d_diag, device=device, dtype=dtype)
+        std2 = (std * std)
+        for pid in torch.unique(process_ids).tolist():
+            ev_idx = (process_ids == pid).nonzero(as_tuple=True)[0]      # (E_p,)
+            vt = self._virt_by_pid[pid] if 0 <= pid < len(self._virt_by_pid) else None
+            pd = self._pd_by_pid[pid] if 0 <= pid < len(self._pd_by_pid) else None
+            if pd is None:
+                continue
+            if vt is None:
+                # no per-event map -> static topology embedding for these events
+                E_event[ev_idx] = self.diagram_encoder(pd).to(dtype)
+                continue
+            n_part = vt["n_part"]
+            starts = ptr[ev_idx]                                         # (E_p,) event starts
+            gather = starts[:, None] + torch.arange(n_part, device=device)[None, :]
+            mom = fourmomenta[gather]                                    # (E_p, n_part, 4)
+            # propagator momenta: Σ sign·p over each edge's leg set
+            p_prop = torch.einsum("kn,enc->ekc", vt["mask"], mom)        # (E_p, K, 4)
+            s = (p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)) * std2  # (E_p, K) physical-ish
+            virt = torch.sign(s) * torch.log1p(s.abs()) * self._virt_log_scale
+            E_p, K = virt.shape
+            ee = torch.zeros(E_p, vt["D"], vt["N"], vt["N"], 1, device=device, dtype=virt.dtype)
+            ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = virt
+            ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = virt    # symmetric
+            E_event[ev_idx] = self.diagram_encoder.forward_per_event(pd, ee).to(dtype)
+
+        counts = ptr[1:] - ptr[:-1]
+        return E_event.repeat_interleave(counts, dim=0)
 
     def _diagram_features(self, process_ids, ptr, device, dtype):
         """Per-particle diagram embedding (N_total, d_diag).
@@ -263,9 +328,13 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # order labels so the feature layout is [property | order | diagram], matching
         # the in_channels/num_scalars sizing in experiment._finalize_data_sizing.
         if self.use_diagrams and process_ids is not None:
-            diag_feat = self._diagram_features(
-                process_ids, ptr, particle_type.device, particle_type.dtype
-            )
+            if self.use_diagram_virtuality:
+                diag_feat = self._diagram_features_virtuality(
+                    fourmomenta, std, process_ids, ptr,
+                    particle_type.device, particle_type.dtype)
+            else:
+                diag_feat = self._diagram_features(
+                    process_ids, ptr, particle_type.device, particle_type.dtype)
             particle_type = torch.cat([particle_type, diag_feat], dim=-1)
 
         outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr, seq_lens=seq_lens)
