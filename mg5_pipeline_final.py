@@ -138,7 +138,10 @@ def recipe_id(recipe):
                 #                    differs from the legacy plan — so chunk_size
                 #                    itself stays metadata here.
                 #   - `gen_weight` : the cost estimate that derives chunk_size.
-                # NOTE: `n_chunks` is intentionally NOT listed — it IS identity.
+                # NOTE: `n_chunks` is intentionally NOT listed here — when present
+                #       it IS identity. variable_energy_recipe only adds it for
+                #       TRAIN (byte-strict $SCRATCH cache); val/test omit it so the
+                #       frozen benchmark is chunk-policy-independent.
                 "chunked", "chunk_size", "gen_weight"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
@@ -1603,7 +1606,15 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     identity ONLY when it differs from the legacy ceil(n_events / MAX_CHUNK): then
     cost-aware data that actually re-chunks gets a fresh id, while everything whose
     chunking is unchanged keeps its original id and existing cache. (The nominal
-    chunk_size is kept as excluded traceability metadata, written in finalize.)"""
+    chunk_size is kept as excluded traceability metadata, written in finalize.)
+
+    SCOPE: this byte-strict chunk identity applies to TRAIN only, where recipe_id
+    is the $SCRATCH cache key and we want exact-bytes reuse within a sweep. For the
+    FROZEN val/test benchmark, chunking is a pure generation-parallelism detail:
+    any valid sample of the physical spec is an equally good benchmark, so we do
+    NOT want a different chunk policy to mint a second, physically-identical frozen
+    dataset. Hence `n_chunks` is left out of the val/test identity entirely — one
+    test set serves regardless of how it was sliced for generation."""
     cfg = PROCESSES[process]
     k   = cfg.get("alphas_power", 0)
     n   = int(n_events)
@@ -1624,7 +1635,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     ceil_div    = lambda a, b: -(-a // b)
     n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)
-    if n_chunks != legacy_nch:
+    # Chunk identity is byte-strict for TRAIN only; frozen val/test stay
+    # chunk-policy-independent (one physical sample per spec — see docstring).
+    if role not in ("val", "test") and n_chunks != legacy_nch:
         recipe["n_chunks"] = n_chunks          # identity-bearing; legacy plan is implicit
     return recipe
 
