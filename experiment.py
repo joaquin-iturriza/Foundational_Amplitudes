@@ -325,6 +325,11 @@ class AmplitudeExperiment(BaseExperiment):
                 type_tokens = global_encode(pdg_ids)
                 self.tokenizer.register_and_encode(pdg_ids)  # keep tokenizer in sync for use_PIDs=True warm starts
 
+            # Raw per-slot PDG order (fixed per process) for the Tier-B leg→slot map.
+            if not hasattr(self, "_slot_pdgs_by_name"):
+                self._slot_pdgs_by_name = {}
+            self._slot_pdgs_by_name.setdefault(dataset, [int(x) for x in pdg_ids[0]])
+
             if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
                 particles_t = torch.tensor(particles, dtype=torch.float64)
                 particles_t = particles_t.reshape(-1, n_particles, 4)
@@ -621,16 +626,14 @@ class AmplitudeExperiment(BaseExperiment):
         self._diag_virt_by_pid = None
         if build_virtuality:
             from diagram_graphs import build_process_virtuality
-            from particle_ids import GLOBAL_PDG_IDX
-            inv_global = {idx: pdg for pdg, idx in GLOBAL_PDG_IDX.items()}
+            slot_map = getattr(self, "_slot_pdgs_by_name", {})            # set in both data paths
             virt, n_virt = [], 0
             for i, pd in enumerate(pd_by_pid):
-                if pd is None:
+                slot_pdgs = slot_map.get(names[i])
+                if pd is None or slot_pdgs is None:
                     virt.append(None); continue
-                slot_tokens = np.asarray(self.pdg_ids[i])[0]               # (n_part,) property idx
-                slot_pdgs = [int(inv_global.get(int(t), 0)) for t in slot_tokens]
                 n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
-                vt = build_process_virtuality(pd, slot_pdgs, n_initial)
+                vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial)
                 virt.append(vt)
                 n_virt += int(vt is not None)
             self._diag_virt_by_pid = virt
@@ -843,6 +846,11 @@ class AmplitudeExperiment(BaseExperiment):
                 else:
                     toks = global_encode(pdg_ids)
                     self.tokenizer.register_and_encode(pdg_ids)  # keep in sync
+
+                # Raw per-slot PDG order (fixed per process) for the Tier-B leg→slot map.
+                if not hasattr(self, "_slot_pdgs_by_name"):
+                    self._slot_pdgs_by_name = {}
+                self._slot_pdgs_by_name.setdefault(name, [int(x) for x in pdg_ids[0]])
 
                 store[(role, name)] = {
                     "momenta": self._boost_augment_momenta(particles, n_particles),
