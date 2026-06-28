@@ -129,7 +129,9 @@ class AmplitudeGATrWrapper(nn.Module):
 
 class AmplitudeLLoCaWrapper(nn.Module):
     def __init__(self, net, token_size, d_particle_hidden: int = 16,
-                 particle_encoder_hidden: int = 0):
+                 particle_encoder_hidden: int = 0,
+                 use_diagrams: bool = False, d_diag: int = 32,
+                 diagrams_dir: str = "data/diagrams", diagram_encoder=None):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -141,6 +143,19 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.particle_encoder_hidden = particle_encoder_hidden
         self.use_pids = True   # overridden by setup_particle_features()
         # particle_encoder and property_matrix are set by setup_particle_features()
+
+        # Feynman-diagram conditioning config (Hydra passes these from lloca.yaml).
+        # The encoder module + per-process graphs are attached later by the
+        # experiment via setup_diagram_conditioning() (they need the loaded
+        # diagram registry, which Hydra cannot build). use_diagrams stays False
+        # until then, so an un-set-up wrapper behaves exactly like before.
+        self.use_diagrams = False
+        self._cfg_use_diagrams = bool(use_diagrams)
+        self.d_diag = int(d_diag)
+        self.diagrams_dir = diagrams_dir
+        self._diag_enc_cfg = diagram_encoder
+        self._pd_by_pid = None
+        self._pd_device = None
 
     def setup_particle_features(self, use_pids: bool, property_matrix=None,
                                 encoder_hidden: int = 0):
@@ -168,8 +183,51 @@ class AmplitudeLLoCaWrapper(nn.Module):
                 n_features, self.d_particle_hidden, encoder_hidden
             )
 
+    def setup_diagram_conditioning(self, encoder, pd_by_pid, d_diag):
+        """Attach the diagram graph encoder + per-process graphs (from experiment).
+
+        encoder   : models.diagram_encoder.DiagramEncoder (a real submodule → trained,
+                    checkpointed, and marked standard-parametrisation by mup_finalize).
+        pd_by_pid : list indexed by process_id (0..n_processes-1) of
+                    diagram_graphs.ProcessDiagrams | None (None → that process has no
+                    sidecar; it gets a zero diagram embedding so the run still works).
+        d_diag    : width of the appended embedding (must match in_channels sizing).
+        """
+        self.diagram_encoder = encoder
+        self._pd_by_pid = list(pd_by_pid)
+        self._pd_device = None
+        self.d_diag = int(d_diag)
+        self.use_diagrams = True
+
+    def _diagram_features(self, process_ids, ptr, device, dtype):
+        """Per-particle diagram embedding (N_total, d_diag).
+
+        Encodes each process present in the batch once (the encoder is small and a
+        process's diagram set is static), gathers per event via process_ids, then
+        broadcasts to particles — exactly the order_labels broadcast pattern.
+        """
+        # Move the static graph tensors onto the compute device once (they are not
+        # nn buffers — regenerable data — so they don't auto-migrate with .to()).
+        if self._pd_device != device:
+            self._pd_by_pid = [pd.to(device) if pd is not None else None
+                               for pd in self._pd_by_pid]
+            self._pd_device = device
+
+        n_proc = len(self._pd_by_pid)
+        E_all = torch.zeros(n_proc, self.d_diag, device=device, dtype=dtype)
+        for pid in torch.unique(process_ids).tolist():
+            pd = self._pd_by_pid[pid] if 0 <= pid < n_proc else None
+            if pd is not None:
+                E = self.diagram_encoder(pd).to(dtype).unsqueeze(0)        # (1, d_diag)
+                # out-of-place scatter keeps autograd happy (grad flows to encoder)
+                E_all = E_all.index_copy(0, torch.tensor([pid], device=device), E)
+
+        E_event = E_all[process_ids]                                       # (B, d_diag)
+        counts = ptr[1:] - ptr[:-1]                                        # (B,)
+        return E_event.repeat_interleave(counts, dim=0)                    # (N_total, d_diag)
+
     def forward(self, fourmomenta, particle_type_indices, mean, std, ptr, order_labels=None,
-                seq_lens=None):
+                seq_lens=None, process_ids=None):
         """
         fourmomenta           : (N_total, 4)
         particle_type_indices : (N_total,)              long
@@ -197,6 +255,17 @@ class AmplitudeLLoCaWrapper(nn.Module):
             particle_type = torch.cat(
                 [particle_type, order_per_particle.to(particle_type.dtype)], dim=-1
             )
+
+        # Feynman-diagram conditioning: append the per-process diagram embedding to
+        # every particle's scalar features (broadcast like order_labels). E(process)
+        # is a Lorentz scalar, so this preserves equivariance. Appended AFTER the
+        # order labels so the feature layout is [property | order | diagram], matching
+        # the in_channels/num_scalars sizing in experiment._finalize_data_sizing.
+        if self.use_diagrams and process_ids is not None:
+            diag_feat = self._diagram_features(
+                process_ids, ptr, particle_type.device, particle_type.dtype
+            )
+            particle_type = torch.cat([particle_type, diag_feat], dim=-1)
 
         outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr, seq_lens=seq_lens)
 

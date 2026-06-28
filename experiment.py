@@ -516,6 +516,26 @@ class AmplitudeExperiment(BaseExperiment):
                 )
             # n_order_features extra scalars per particle (same value broadcast across event)
             n_scalars   = particle_feature_dim + self.n_order_features
+
+            # Feynman-diagram conditioning: load each process's diagram graphs and
+            # widen the scalar channel by d_diag (the appended diagram embedding).
+            # Requires the property encoding (use_PIDs=false). Off → no change.
+            self._use_diagrams = (
+                not use_pids and bool(self.cfg.model.get("use_diagrams", False))
+            )
+            if self._use_diagrams:
+                self._d_diag = int(self.cfg.model.get("d_diag", 32))
+                self._setup_diagram_registry(
+                    list(self.cfg.data.dataset),
+                    spin_onehot=spin_onehot, color_onehot=color_onehot,
+                    is_massless=is_massless, standardize=standardize,
+                )
+                n_scalars += self._d_diag
+                LOGGER.info(
+                    f"Diagram conditioning: ON (d_diag={self._d_diag}); "
+                    f"n_scalars {n_scalars - self._d_diag}→{n_scalars}"
+                )
+
             with open_dict(self.cfg):
                 if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):
                     # GATr nets: the 4-momentum is the (multi)vector input (in_*v_channels=1
@@ -538,6 +558,70 @@ class AmplitudeExperiment(BaseExperiment):
             self.tokenizer.save(tokenizer_path)
             LOGGER.info(f"Saved tokenizer with vocab_size={token_size}")
             
+    def _resolve_diagram_path(self, diagrams_dir, name):
+        """Locate a process's diagram sidecar, tolerating dataset-name decoration.
+
+        Recipe-mode names are registry keys (``ee_ttbar``) that match sidecar files
+        directly; file-stem names (``ee_ttbar_346-1000GeV_amplitudes``) are retried
+        after stripping a trailing ``_amplitudes`` and an energy tag. Returns the
+        path or None."""
+        import re
+        cands = [name]
+        base = re.sub(r"_amplitudes$", "", name)
+        base = re.sub(r"_\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?GeV$", "", base)
+        if base not in cands:
+            cands.append(base)
+        for c in cands:
+            p = os.path.join(diagrams_dir, f"{c}.diagrams.json")
+            if os.path.exists(p):
+                return p
+        return None
+
+    def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
+                                is_massless, standardize):
+        """Load each process's diagram graphs into ``self._diag_pd_by_pid`` (indexed
+        by process_id == position in ``data.dataset``). The property matrix uses the
+        SAME smart-encoding flags as the particle encoder, so diagram particles ride
+        the identical physical-quantity encoding. Missing sidecars → None (that
+        process gets a zero diagram embedding; the run still works)."""
+        from diagram_graphs import build_process_diagrams, feature_dims
+        from particle_ids import build_property_matrix
+
+        diagrams_dir = self.cfg.model.get("diagrams_dir", "data/diagrams")
+        if not os.path.isabs(diagrams_dir):
+            diagrams_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), diagrams_dir)
+        enc_cfg = self.cfg.model.get("diagram_encoder", {}) or {}
+        k_pe = int(enc_cfg.get("k_pe", 8))
+        max_diagrams = enc_cfg.get("max_diagrams", None)
+        max_diagrams = int(max_diagrams) if max_diagrams is not None else None
+
+        prop_matrix, _ = build_property_matrix(
+            spin_onehot=spin_onehot, color_onehot=color_onehot,
+            is_massless=is_massless, standardize=standardize,
+        )
+        pd_by_pid, missing = [], []
+        for name in names:
+            path = self._resolve_diagram_path(diagrams_dir, name)
+            if path is None:
+                pd_by_pid.append(None)
+                missing.append(name)
+                continue
+            pd_by_pid.append(build_process_diagrams(
+                path, prop_matrix, k_pe=k_pe, max_diagrams=max_diagrams))
+
+        self._diag_pd_by_pid = pd_by_pid
+        self._diag_feature_dims = feature_dims(prop_matrix.shape[1])   # (f_node, f_edge)
+        self._diag_k_pe = k_pe
+        if missing:
+            LOGGER.warning(
+                f"Diagram conditioning: no sidecar for {missing} (zero embedding "
+                f"used). Generate via `python tools/dump_diagrams.py --all`.")
+        n_ok = sum(p is not None for p in pd_by_pid)
+        LOGGER.info(
+            f"Diagram conditioning: loaded graphs for {n_ok}/{len(names)} processes "
+            f"from {diagrams_dir} (f_node={self._diag_feature_dims[0]}, "
+            f"f_edge={self._diag_feature_dims[1]}, k_pe={k_pe})")
+
     def _post_instantiate_model(self, model):
         """Called on the instantiated model after construction.
         Adds particle_encoder. Since the μP backbone computes its own base shapes in
@@ -550,6 +634,21 @@ class AmplitudeExperiment(BaseExperiment):
                 property_matrix=getattr(self, "property_matrix", None),
                 encoder_hidden=self.cfg.model.get("particle_encoder_hidden", 0),
             )
+            # Build + attach the diagram graph encoder (a real submodule → trained,
+            # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
+            # so it exists before μP finalisation and warm-start loading.
+            if getattr(self, "_use_diagrams", False):
+                from models.diagram_encoder import DiagramEncoder
+                f_node, f_edge = self._diag_feature_dims
+                enc_cfg = self.cfg.model.get("diagram_encoder", {}) or {}
+                encoder = DiagramEncoder(
+                    f_node=f_node, f_edge=f_edge, k_pe=self._diag_k_pe,
+                    d_model=int(enc_cfg.get("d_model", 64)),
+                    n_heads=int(enc_cfg.get("n_heads", 4)),
+                    n_layers=int(enc_cfg.get("n_layers", 3)),
+                    d_out=self._d_diag,
+                )
+                model.setup_diagram_conditioning(encoder, self._diag_pd_by_pid, self._d_diag)
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models
@@ -1161,16 +1260,18 @@ class AmplitudeExperiment(BaseExperiment):
 
         t0 = time.time()
         for data in loader:
-            particles, y, tokens, order_labels, ptr, _ = data
+            particles, y, tokens, order_labels, ptr, process_ids = data
             if is_lloca:
                 particles    = particles.to(self.device)
                 tokens       = tokens.to(self.device)
                 order_labels = order_labels.to(self.device)
                 ptr          = ptr.to(self.device)
+                process_ids  = process_ids.to(self.device)
                 y_pred = self.model(
                     particles, tokens,
                     mean=self.mom_mean[0], std=self.mom_std[0],
                     ptr=ptr, order_labels=order_labels,
+                    process_ids=process_ids,
                 )
             else:
                 x      = particles.to(self.device)
@@ -1543,6 +1644,7 @@ class AmplitudeExperiment(BaseExperiment):
             ptr          = ptr,
             order_labels = order_labels,
             seq_lens     = seq_lens,
+            process_ids  = process_ids,
         )  # (B, out_channels)
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")

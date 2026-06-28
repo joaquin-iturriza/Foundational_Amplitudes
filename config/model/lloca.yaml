@@ -8,6 +8,22 @@ d_particle_hidden: 16  # fixed projection dim: encoder(n_features → d_particle
 particle_encoder_hidden: 32  # >0 → 2-layer MLP encoder (Linear→GELU→Linear) instead of a
                              # single Linear, so it can form nonlinear products of quantum
                              # numbers. 0 = legacy single Linear.
+
+# --- Feynman-diagram conditioning (arXiv:2606.23791 graph route) ---------------
+# Off by default → in_channels unchanged, model byte-identical to a non-diagram run.
+# When on (use_PIDs must be false), a graph encoder embeds each process's diagram
+# set into a d_diag vector E(process), broadcast to every particle and concatenated
+# into the scalar features exactly like the coupling-order labels (equivariant: E is
+# a Lorentz scalar). Needs data/diagrams/<process>.diagrams.json (tools/dump_diagrams.py).
+use_diagrams: false
+d_diag: 32                   # width of E appended to n_scalars (and num_scalars)
+diagrams_dir: data/diagrams  # where the <process>.diagrams.json sidecars live
+diagram_encoder:             # graph-transformer hyperparameters (standard-param, off muP axis)
+  d_model: 64
+  n_heads: 4
+  n_layers: 3
+  k_pe: 8                     # Laplacian positional-encoding dimension
+  max_diagrams: 512          # cap per process (high-multiplicity guard, e.g. qqbar_Zgggg)
 net:
   _target_: models.lloca.LLOCAMuPTransformer
 
