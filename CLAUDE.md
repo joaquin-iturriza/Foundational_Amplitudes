@@ -10,12 +10,21 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 
 ## Ground rules (read first)
 
-1. **LLoCa + μP only.** The only maintained architecture is the μP LLoCa
-   Lorentz-local transformer: `models.lloca.LLOCAMuPTransformer`, wrapped by
-   `wrappers.AmplitudeLLoCaWrapper` (config `model: lloca`). Everything else —
-   the non-μP `LLOCATransformer`, GATr/L-GATr, plain Transformer, MLP/DSI/EquiMLP,
-   etc. — is legacy, **not updated, and should be ignored** unless I explicitly
-   ask. Don't refactor, "fix", or reference them in solutions by default.
+1. **μP only — three maintained architectures.** All maintained models use μP.
+   The default and usual best is the μP LLoCa Lorentz-local transformer:
+   `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`
+   (config `model: lloca`). Two μP L-GATr variants are also maintained and work
+   in this codebase — they're **not better than LLoCa**, but they're real options,
+   not legacy:
+   - **L-GATr** (`model: lgatr_mup`): `wrappers.AmplitudeLGATrMuPWrapper` →
+     `models.lgatr_mup.MuPLGATr`.
+   - **L-GATr slim** (`model: lgatr_slim`): `wrappers.AmplitudeLGATrSlimMuPWrapper`
+     → `models.lgatr_slim_mup.MuPLGATrSlim`.
+
+   Everything else — the non-μP `LLOCATransformer`, the non-μP GATr/L-GATr,
+   plain Transformer, MLP/DSI/EquiMLP, etc. — is legacy, **not updated, and should
+   be ignored** unless I explicitly ask. Don't refactor, "fix", or reference the
+   legacy models in solutions by default.
 
 2. **You are running directly on Jean Zay.** You are on the cluster itself (no
    mount in between), so you **can** execute things: `sbatch`, `squeue`,
@@ -25,9 +34,18 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    - **But you're typically on a login node — no GPU.** Don't run training or any
      GPU/CUDA code directly (xformers attention is CUDA-only and crashes on login
      nodes); GPU work goes through `sbatch`. Quick CPU-only python/imports are fine.
-   - **Confirm with me before submitting jobs** (`sbatch`/sweep submission) or
-     other expensive/outward **compute** actions — show me the command first, unless it's clear from what I'm asking that I want jobs to be submitted. Inspecting state
-     (`squeue`, `scontrol`, reading logs) you can just do.
+   - **Submitting jobs is gated by GPU budget, not a blanket confirm.** You may
+     submit quick tests on your own — **always be mindful of the GPU budget**.
+     The rule: estimate the **total GPU-hours** of everything you're about to
+     submit; if it's **> 10 GPU-hours, stop and confirm with me first** (show the
+     command + your estimate). Under that, just run it (still show me what you ran).
+     Inspecting state (`squeue`, `scontrol`, reading logs) you can always just do.
+     - **Estimate total wall-time × GPUs across *all* jobs, and understand "small."**
+       "A quick A/B test" does **not** mean "a 20-job HPO sweep at 30 min each"
+       (= 10 GPU-h). Many of our runs train in **seconds to a few minutes**, so a
+       short per-run sweep over those can total **well under half a GPU-hour** —
+       *that* is small. Size the request to what I actually asked for; don't inflate
+       a quick check into a full sweep.
    - **Git is NOT in the confirm-first set.** `git add`/`commit`/`push` (and
      `git worktree`) happen freely and automatically — see the git workflow
      section. Never ask permission to commit or push, and never conflate a `git
@@ -215,6 +233,31 @@ Same round ⇒ same nice ⇒ runs together (fills GPUs); higher round ⇒ runs l
 rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pending,
 e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
 Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
+
+---
+
+## A/B testing a new feature (how I want comparisons run)
+
+When I ask whether a new feature/change helps, follow this protocol — it's about
+being *fair* and *not wasteful*:
+
+1. **Don't rerun the baseline if it already exists.** Reuse the existing baseline
+   run/sweep results. Re-training a baseline you already have is pure waste.
+2. **The baseline is the best run of a short per-run HPO sweep**, not a single
+   arbitrary run.
+3. **First try the cheap shortcut:** run the new feature with **the same HPs as the
+   baseline's best**. If it's **already better**, the feature wins — **stop, you're
+   done.** No need to sweep.
+4. **Only if the same-HP run is *not* better, sweep the feature fairly:** run the
+   **same HPO sweep** for the new feature, find *its* best HP config, and compare
+   best-vs-best. A feature can lose at the baseline's HPs but win at its own.
+5. **The comparison metric is the best NON-REGULARIZED val loss on the log-amplitude
+   values** — this matters a lot. Compare `val_loss_no_reg` (no L2/L1 reg term),
+   on log-amplitudes, **not** the regularized tracked loss.
+6. **Account for any preprocessing differences** between the two sides before
+   comparing — if the feature changes standardization/amp_trafos/etc., the val
+   losses aren't on the same scale and a raw comparison is meaningless. Make sure
+   you're comparing like with like.
 
 ---
 
