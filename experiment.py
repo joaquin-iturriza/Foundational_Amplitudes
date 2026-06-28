@@ -681,7 +681,9 @@ class AmplitudeExperiment(BaseExperiment):
                 if getattr(self, "_use_diag_virt", False):
                     model.setup_diagram_virtuality(
                         self._diag_virt_by_pid,
-                        log_scale=float(self.cfg.model.get("virt_log_scale", 0.1)))
+                        log_scale=float(self.cfg.model.get("virt_log_scale", 0.1)),
+                        standardize=bool(self.cfg.model.get("virt_standardize", True)),
+                        clamp=float(self.cfg.model.get("virt_clamp", 4.0)))
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models

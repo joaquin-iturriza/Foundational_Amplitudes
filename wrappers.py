@@ -132,7 +132,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  particle_encoder_hidden: int = 0,
                  use_diagrams: bool = False, d_diag: int = 32,
                  diagrams_dir: str = "data/diagrams", diagram_encoder=None,
-                 use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1):
+                 use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1,
+                 virt_standardize: bool = True, virt_clamp: float = 4.0):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -207,19 +208,35 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.d_diag = int(d_diag)
         self.use_diagrams = True
 
-    def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1):
+    def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1,
+                                 standardize=True, clamp=4.0):
         """Enable Tier B: per-event propagator virtualities (call after
         setup_diagram_conditioning). ``virt_by_pid`` is a list indexed by process_id
         of the precompute dicts from diagram_graphs.build_process_virtuality (or None
         for processes without a usable per-event leg↔slot map — those events get a
         zero virtuality, i.e. the topology embedding through the same encoder).
 
+        The propagator virtuality is fed as signed-log(s). Its raw distribution is
+        very wide and bimodal by channel (s-channel s>0 ~ +9..+19, t-channel s<0 ~
+        −8..−19), which destabilises training. With ``standardize=True`` we z-score it
+        (mean 0 / std 1, calibrated once on the first training batch and stored as
+        buffers so eval/reload are consistent) and clamp the tails to ``±clamp``;
+        otherwise the legacy ``signed-log·log_scale`` is used.
+
         Precomputes each process's static graph tensors padded to the GLOBAL max node
         count so the per-step path can concatenate every (event,diagram) graph into
         ONE batched encoder call (see _diagram_features_virtuality)."""
         self._virt_by_pid = list(virt_by_pid)
         self._virt_log_scale = float(log_scale)
+        self._virt_standardize = bool(standardize)
+        self._virt_clamp = float(clamp)
         self.use_diagram_virtuality = True
+        # calibration buffers (persisted in the checkpoint); _virt_cal_done mirrors
+        # _virt_calibrated as a Python flag to avoid a GPU→CPU sync after calibration.
+        self.register_buffer("_virt_mu", torch.zeros(()))
+        self.register_buffer("_virt_sigma", torch.ones(()))
+        self.register_buffer("_virt_calibrated", torch.zeros((), dtype=torch.bool))
+        self._virt_cal_done = False
 
         Mstar = max(pd.node_feat.shape[1] for pd in self._pd_by_pid if pd is not None)
         self._virt_Mstar = Mstar
@@ -262,27 +279,49 @@ class AmplitudeLLoCaWrapper(nn.Module):
 
         B = process_ids.shape[0]
         M = self._virt_Mstar
-        std2 = std * std
-        nf_l, lp_l, nm_l, ef_l, em_l, ee_l, seg_l = [], [], [], [], [], [], []
+
+        # --- pass 1: per-process raw signed-log virtuality (cheap einsum, no encoder) ---
+        jobs, calib = [], []
         for pid in torch.unique(process_ids).tolist():
             st = self._virt_static[pid] if 0 <= pid < len(self._virt_static) else None
             if st is None:
                 continue
             ev_idx = (process_ids == pid).nonzero(as_tuple=True)[0]      # (E_p,)
-            E_p, D_p = ev_idx.shape[0], st["D"]
             vt = self._virt_by_pid[pid]
+            raw = None
             if vt is not None:
                 n_part = vt["n_part"]
                 gather = ptr[ev_idx][:, None] + torch.arange(n_part, device=device)[None, :]
                 mom = fourmomenta[gather]                               # (E_p, n_part, 4)
                 p_prop = torch.einsum("kn,enc->ekc", vt["mask"], mom)   # (E_p, K, 4)
-                s = (p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)) * std2
-                virt = torch.sign(s) * torch.log1p(s.abs()) * self._virt_log_scale
-                ee = torch.zeros(E_p, D_p, M, M, 1, device=device, dtype=virt.dtype)
-                ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = virt
-                ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = virt   # symmetric
-            else:
-                ee = torch.zeros(E_p, D_p, M, M, 1, device=device, dtype=dtype)
+                s = p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)
+                raw = torch.sign(s) * torch.log1p(s.abs())             # (E_p, K) signed-log
+                calib.append(raw.detach().reshape(-1))
+            jobs.append((ev_idx, st, vt, raw))
+
+        # --- calibrate standardization stats once (first batch); persisted as buffers ---
+        if self._virt_standardize and not self._virt_cal_done:
+            if not bool(self._virt_calibrated) and calib:    # sync only until calibrated
+                allraw = torch.cat(calib)
+                self._virt_mu.copy_(allraw.mean())
+                self._virt_sigma.copy_(allraw.std().clamp_min(1e-3))
+                self._virt_calibrated.fill_(True)
+            self._virt_cal_done = True
+
+        # --- pass 2: standardize+clamp the virtuality, scatter, tile static graphs ---
+        nf_l, lp_l, nm_l, ef_l, em_l, ee_l, seg_l = [], [], [], [], [], [], []
+        for (ev_idx, st, vt, raw) in jobs:
+            E_p, D_p = ev_idx.shape[0], st["D"]
+            ee = torch.zeros(E_p, D_p, M, M, 1, device=device, dtype=dtype)
+            if vt is not None:
+                if self._virt_standardize:
+                    feat = ((raw - self._virt_mu) / self._virt_sigma).clamp(
+                        -self._virt_clamp, self._virt_clamp)
+                else:
+                    feat = raw * self._virt_log_scale
+                feat = feat.to(dtype)
+                ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = feat
+                ee[:, vt["diag_idx"], vt["j_idx"], vt["i_idx"], 0] = feat   # symmetric
 
             def tile(t):   # (D_p, ...) -> (E_p*D_p, ...) event-major, sharing static graph
                 return t.unsqueeze(0).expand(E_p, *t.shape).reshape(E_p * D_p, *t.shape[1:])

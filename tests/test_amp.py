@@ -397,7 +397,7 @@ def check_diagram_virtuality_batch():
     wrap._pd_by_pid = [reg["ee_ttbar"], reg["ee_uug"]]
     virt = [build_process_virtuality(reg["ee_ttbar"], [11, -11, 6, -6], 2),
             build_process_virtuality(reg["ee_uug"], [11, -11, 2, -2, 21], 2)]
-    wrap.setup_diagram_virtuality(virt, log_scale=0.1)
+    wrap.setup_diagram_virtuality(virt, log_scale=0.1, standardize=False)
     np_ = {0: 4, 1: 5}; pids = torch.tensor([0, 1, 0, 1, 0])
     def fm(n):
         p = torch.randn(n, 3); m = torch.rand(n, 1) + 0.1
@@ -415,7 +415,7 @@ def check_diagram_virtuality_batch():
             N, D = pd.node_feat.shape[1], pd.n_diagrams
             g = ptr[ev][:, None] + torch.arange(vt["n_part"])[None, :]
             pp = torch.einsum("kn,enc->ekc", vt["mask"], moms[g])
-            s = (pp[..., 0] ** 2 - (pp[..., 1:] ** 2).sum(-1)) * std * std
+            s = pp[..., 0] ** 2 - (pp[..., 1:] ** 2).sum(-1)
             vf = torch.sign(s) * torch.log1p(s.abs()) * 0.1
             ee = torch.zeros(ev.shape[0], D, N, N, 1)
             ee[:, vt["diag_idx"], vt["i_idx"], vt["j_idx"], 0] = vf

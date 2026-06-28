@@ -19,7 +19,11 @@ use_diagrams: false
 use_diagram_virtuality: false  # Tier B: feed per-event propagator virtuality s=(Σp)² on
                                # internal edges (requires use_diagrams). The pole structure
                                # 1/(s-m²); per-event, so slower than the static topology embed.
-virt_log_scale: 0.1            # signed-log(s) is scaled by this before the encoder edge bias
+virt_standardize: true         # z-score signed-log(s) (calibrated on the first batch, stored as
+                               # buffers) + clamp tails — the raw feature is wide/bimodal
+                               # (s-channel +9..+19, t-channel -8..-19) and destabilises training
+virt_clamp: 4.0               # clamp the standardised virtuality to +/- this (sigma units)
+virt_log_scale: 0.1            # legacy fixed scale used only when virt_standardize=false
 d_diag: 32                   # width of E appended to n_scalars (and num_scalars)
 diagrams_dir: data/diagrams  # where the <process>.diagrams.json sidecars live
 diagram_encoder:             # graph-transformer hyperparameters (standard-param, off muP axis)
