@@ -70,7 +70,9 @@ def _tiny_model(n_scalars=6, num_blocks=2, num_heads=2):
         "num_blocks": num_blocks, "num_heads": num_heads,
     })
     model = instantiate(cfg).to(_CPU)
-    set_base_shapes(model, model)
+    # The μP backbone sets its own base shapes in __init__ (self-contained μP), so
+    # re-rescaling here would double-apply; keep the in-backbone shapes.
+    set_base_shapes(model, model, rescale_params=False)
     return model, n_scalars
 
 
@@ -223,6 +225,81 @@ def check_fast_equilinear_equivalence():
     print(f"  fast EquiLinear == stock   OK  (max fwd+grad diff {worst:.1e})")
 
 
+def check_diagram_conditioning():
+    """Feynman-diagram conditioning (concat-to-scalars): the diagram-conditioned
+    LLoCa forward must (a) run and be finite, (b) stay Lorentz-invariant (the
+    appended diagram embedding E(process) is a Lorentz scalar), and (c) actually
+    depend on the diagrams (swapping process ids changes the prediction). CPU dense
+    attention path (xformers is CUDA-only); needs data/diagrams/*.diagrams.json."""
+    from lloca.mup import finalize as mup_finalize
+    from particle_ids import build_property_matrix, GLOBAL_PDG_IDX
+    from diagram_graphs import load_diagram_registry, feature_dims
+    from models.diagram_encoder import DiagramEncoder
+    from wrappers import AmplitudeLLoCaWrapper
+    from lloca.utils.rand_transforms import rand_lorentz
+    import models.attention_lloca_mup as _attn
+
+    ddir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "data", "diagrams")
+    if not os.path.exists(os.path.join(ddir, "ee_ttbar.diagrams.json")):
+        print("  diagram conditioning: SKIP (no data/diagrams sidecars; "
+              "run tools/dump_diagrams.py)")
+        return
+
+    torch.manual_seed(0)
+    FLAGS = dict(spin_onehot=True, color_onehot=True, is_massless=True, standardize=True)
+    D_PH, ENC_H, N_ORDER, D_DIAG = 16, 32, 2, 8
+    prop_matrix, _ = build_property_matrix(**FLAGS)
+    n_prop = prop_matrix.shape[1]
+    n_scalars = D_PH + N_ORDER + D_DIAG
+    cfg = OmegaConf.create({
+        "_target_": "models.lloca.LLOCAMuPTransformer",
+        "num_scalars": n_scalars, "hidden_channels_mlp": 128, "num_layers_mlp": 2,
+        "in_channels": n_scalars + 4, "attn_reps": "8x0n+2x1n", "out_channels": 1,
+        "num_blocks": 2, "num_heads": 2})
+    net = instantiate(cfg)
+    wrap = AmplitudeLLoCaWrapper(net, token_size=prop_matrix.shape[0], d_particle_hidden=D_PH,
+                                 particle_encoder_hidden=ENC_H, use_diagrams=True, d_diag=D_DIAG)
+    wrap.setup_particle_features(use_pids=False, property_matrix=prop_matrix, encoder_hidden=ENC_H)
+    reg, _ = load_diagram_registry(ddir, ["ee_ttbar", "ee_uug"], **FLAGS, k_pe=8)
+    f_node, f_edge = feature_dims(n_prop)
+    enc = DiagramEncoder(f_node, f_edge, k_pe=8, d_model=64, n_heads=4, n_layers=3, d_out=D_DIAG)
+    wrap.setup_diagram_conditioning(enc, [reg["ee_ttbar"], reg["ee_uug"]], D_DIAG)
+    mup_finalize(wrap); wrap.eval()
+
+    def four_mom(n):
+        p = torch.randn(n, 3); m = torch.rand(n, 1) + 0.1
+        return torch.cat([(p.pow(2).sum(-1, keepdim=True) + m.pow(2)).sqrt(), p], dim=-1)
+    n0, n1 = 4, 5
+    fm = torch.cat([four_mom(n0), four_mom(n1)], 0)
+    idx = torch.tensor([GLOBAL_PDG_IDX[i] for i in (11, -11, 6, -6, 11, -11, 2, -2, 21)])
+    ptr = torch.tensor([0, n0, n0 + n1], dtype=torch.long)
+    order = torch.zeros(2, 2)
+    mean, std = torch.zeros(4), torch.tensor(100.0)
+
+    saved = _attn._XFORMERS_AVAILABLE
+    _attn._XFORMERS_AVAILABLE = False           # force dense CPU attention
+    try:
+        with torch.no_grad():
+            y = wrap(fm, idx, mean, std, ptr, order_labels=order,
+                     process_ids=torch.tensor([0, 1]))
+            Lam = rand_lorentz((1,), dtype=torch.float64).squeeze(0).to(fm.dtype)
+            fm2 = torch.einsum("ij,nj->ni", Lam, fm)
+            y2 = wrap(fm2, idx, mean, std, ptr, order_labels=order,
+                      process_ids=torch.tensor([0, 1]))
+            y_swap = wrap(fm, idx, mean, std, ptr, order_labels=order,
+                          process_ids=torch.tensor([1, 0]))
+    finally:
+        _attn._XFORMERS_AVAILABLE = saved
+    assert torch.isfinite(y).all(), "diagram-conditioned forward produced non-finite output"
+    dinv = (y - y2).abs().max().item()
+    ddiag = (y - y_swap).abs().max().item()
+    assert dinv < 1e-3, f"diagram conditioning broke Lorentz invariance: max|Δ|={dinv:.2e}"
+    assert ddiag > 1e-6, f"diagram conditioning had no effect on output: max|Δ|={ddiag:.2e}"
+    print(f"  diagram conditioning: forward OK, Lorentz-inv {dinv:.1e}, "
+          f"pid-swap effect {ddiag:.1e}  OK")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -231,6 +308,7 @@ check_reg_equivalence()
 check_attention_routing()
 check_frame_broadcast_equivalence()
 check_fast_equilinear_equivalence()
+check_diagram_conditioning()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────
