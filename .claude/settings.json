@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git worktree:*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/auto_push.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/worktree_guard.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -26,8 +26,13 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      GPU/CUDA code directly (xformers attention is CUDA-only and crashes on login
      nodes); GPU work goes through `sbatch`. Quick CPU-only python/imports are fine.
    - **Confirm with me before submitting jobs** (`sbatch`/sweep submission) or
-     other expensive/outward actions — show me the command first, unless it's clear from what I'm asking that I want jobs to be submitted. Inspecting state
+     other expensive/outward **compute** actions — show me the command first, unless it's clear from what I'm asking that I want jobs to be submitted. Inspecting state
      (`squeue`, `scontrol`, reading logs) you can just do.
+   - **Git is NOT in the confirm-first set.** `git add`/`commit`/`push` (and
+     `git worktree`) happen freely and automatically — see the git workflow
+     section. Never ask permission to commit or push, and never conflate a `git
+     push` with submitting a job. The confirm-first rule is about cluster compute
+     (`sbatch`/sweeps), not git.
    - File edits: do them directly.
 
 3. **One centralized CLAUDE.md.** Keep all project guidance in this file.
@@ -213,6 +218,31 @@ Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 
 ---
 
+## Waiting on jobs (always background, never hand-poll)
+
+When I submit a job/test and need its result before continuing, **do not** poll
+`squeue` in a manual loop of tool calls, and **do not** promise "I'll check back"
+without a mechanism. The single standard way:
+
+1. Submit and capture the id: `jid=$(sbatch --parsable <script>)`.
+2. Launch the waiter **in the background** (Claude Code `run_in_background: true`):
+   `scripts/wait_for_slurm.sh "$jid"`.
+
+`scripts/wait_for_slurm.sh` blocks (cheaply, `squeue` every `POLL=30`s) until the
+job(s) leave the queue, then prints final `sacct` state/exit/elapsed + a `TAIL=25`
+tail of each job's `*_<jobid>.out` log. Because it's backgrounded, the harness
+**re-invokes me exactly once when it exits** — so I pick the results up
+automatically instead of polling or forgetting.
+
+- No id ⇒ waits on *all* my current jobs: `scripts/wait_for_slurm.sh`.
+- Knobs: `POLL=<s>` interval, `TAIL=<n>` log lines. Works on the login node
+  (`squeue`/`sacct` only — no GPU).
+- Don't `sleep`-loop or re-run `squeue` by hand across turns; if I need an
+  interim peek I can read the background task's output, but the completion ping is
+  the source of truth.
+
+---
+
 ## Conventions & gotchas
 
 - **dtype:** set via `training.dtype` (`float16/32/64`); `run.py` sets the torch
@@ -282,6 +312,15 @@ Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 This repo uses a **development trunk + generated public branch** model. Claude
 handles git: commit and push as work progresses, keep a readable timeline.
 
+**This is automatic, not a thing to ask about.** Commit with clear messages as
+work lands and push without asking — pushing is *not* an outward action that needs
+confirmation (see ground rule #2). Two hooks back this up so it can't be silently
+forgotten (`.claude/settings.json` → `.claude/hooks/`): a **`Stop` hook
+(`auto_push.sh`)** pushes any unpushed `jeanzay`/feature-branch commits to origin
+at the end of every turn (already-committed work only; never `main`); a
+**`PreToolUse` hook (`worktree_guard.sh`)** reminds me to open a worktree when I
+start editing trunk code on `jeanzay`.
+
 **Branches**
 - **`jeanzay`** — the development trunk and default working branch. *Everything*
   lives here: the core code plus all tooling (`tools/`, `tests/`, `sweep/`,
@@ -300,12 +339,19 @@ handles git: commit and push as work progresses, keep a readable timeline.
 
 **Working rules**
 1. **Do work on `jeanzay`** (or a feature branch off it).
-2. **Use a worktree per new feature:**
+2. **Open a worktree for new work, by default:**
    `git worktree add ../wt-<feat> -b <feat> jeanzay`, implement + verify there,
-   then merge back into `jeanzay` and remove the worktree. Lets parallel
-   experiments coexist without clobbering the trunk checkout.
-3. **Push after every significant change** — commit with a clear message and
-   `git push origin jeanzay`. Small, frequent, readable commits over big dumps.
+   then merge back into `jeanzay` and `git worktree remove` it. Lets parallel
+   experiments coexist without clobbering the trunk checkout. **If a worktree
+   ends up unused** (no commits beyond `jeanzay`, no diff), just delete it —
+   it cost nothing. The `worktree_guard.sh` hook nudges me when I edit trunk code
+   without one; for genuinely quick/standalone edits it's fine to proceed on the
+   trunk.
+3. **Commit small and often; pushing is automatic.** Commit with a clear message
+   after every significant change (small, frequent, readable commits over big
+   dumps). The `Stop` hook pushes for me — I do **not** ask permission to push and
+   do **not** need to remember `git push`; if I want it pushed mid-turn I just run
+   `git push` (allowlisted, no prompt).
 4. **Publish the public core** with `scripts/publish_main.sh` (regenerates `main`
    from the allowlist and pushes). Run it after core-facing changes land on
    `jeanzay`. Use `--no-push` to review first.
