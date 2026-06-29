@@ -203,17 +203,28 @@ class AmplitudeExperiment(BaseExperiment):
                        "data.processes_file to be set")
 
         specs, names, amp_orders = [], [], []
+        couplings_by_pid = []   # per-dataset {order_key: alpha} or None (vertex + scalar features)
+        base_by_name = {}       # decorated dataset name → underlying mg5/sidecar process
         for p in procs:
             p = OmegaConf.to_container(p, resolve=True) if OmegaConf.is_config(p) else dict(p)
             name = p["name"]
+            # ``base`` is the underlying mg5 PROCESSES key / diagram-sidecar name.
+            # It defaults to ``name`` but lets a coupling/mass SCAN give each variant
+            # a distinct dataset name (e.g. ee_uug__as0.13) that still resolves to the
+            # one ee_uug process for generation and the diagram graph.
+            base = p.get("base", name)
+            base_by_name[name] = base
             sqrts = p["sqrts"]
             specs.append({
                 "name":      name,
+                "base":      base,
                 "sqrts_min": float(sqrts[0]),
                 "sqrts_max": float(sqrts[1]),
                 "n_train":   int(p["n_train"]),
                 "n_val":     int(p["n_val"]),
                 "n_test":    int(p["n_test"]),
+                # physics overrides for generation (masses, aS, EW inputs, …)
+                "param_card_patches": dict(p.get("param_card_patches", {}) or {}),
             })
             names.append(name)
             # Coupling order from the process definition (LO=[0,0]); explicit
@@ -221,16 +232,23 @@ class AmplitudeExperiment(BaseExperiment):
             if "amp_orders" in p and p["amp_orders"] is not None:
                 amp_orders.append(list(p["amp_orders"]))
             else:
-                k = mg.PROCESSES[name].get("alphas_power", 0)
+                k = mg.PROCESSES[base].get("alphas_power", 0)
                 amp_orders.append([0, int(k)])
+            # Per-dataset coupling VALUES {order_key: alpha} for the vertex features
+            # and the global scalar fallback. Explicit on the spec; else None.
+            cpl = p.get("couplings", None)
+            couplings_by_pid.append({str(k): float(v) for k, v in cpl.items()} if cpl else None)
 
-        self._recipe_specs = specs
+        self._recipe_specs       = specs
+        self._coupling_by_pid    = couplings_by_pid
+        self._recipe_base_by_name = base_by_name
         with open_dict(self.cfg):
             self.cfg.data.dataset    = names
             self.cfg.data.amp_orders = amp_orders
+        n_cpl = sum(c is not None for c in couplings_by_pid)
         LOGGER.info(
             f"Recipe data source: {len(names)} processes {names} "
-            f"(seed={self.cfg.data.get('seed', 42)})"
+            f"(seed={self.cfg.data.get('seed', 42)}; couplings on {n_cpl}/{len(names)} datasets)"
         )
 
     def _boost_augment_momenta(self, particles, n_particles):
@@ -278,7 +296,34 @@ class AmplitudeExperiment(BaseExperiment):
             self.cfg.data.amp_orders = derived
         return derived
 
+    # Fixed key order for the global per-event coupling scalar (data.coupling_scalars).
+    # Matches diagram_graphs.DEFAULT_ORDER_KEYS so the vertex feature and the global
+    # fallback speak the same coupling vocabulary (QED ↔ EW, QCD ↔ strong).
+    COUPLING_SCALAR_KEYS = ("QED", "QCD")
+
+    def _coupling_scalar_row(self, proc_idx):
+        """Per-event log-coupling vector log(alpha_key) for COUPLING_SCALAR_KEYS,
+        broadcast like amp_orders (constant within a dataset). Keys absent from the
+        dataset's coupling dict (coupling doesn't enter the process) → 0 = log(1).
+        Returns a length-0 array when data.coupling_scalars is off."""
+        if not getattr(self, "_use_coupling_scalars", False):
+            return np.zeros((0,), dtype=np.float32)
+        cpl = (getattr(self, "_coupling_by_pid", None) or [None] * (proc_idx + 1))[proc_idx]
+        cpl = cpl or {}
+        return np.array(
+            [np.log(cpl[k]) if (k in cpl and cpl[k] > 0) else 0.0
+             for k in self.COUPLING_SCALAR_KEYS], dtype=np.float32)
+
+    def _order_row(self, proc_idx, amp_orders):
+        """Per-event scalar vector fed as order_labels: the amp_orders powers
+        [n_loops, alpha_s_power] optionally extended with the global coupling
+        scalars (data.coupling_scalars). Shared by both data paths so
+        n_order_features is identical."""
+        base = np.array(amp_orders[proc_idx], dtype=np.float32)
+        return np.concatenate([base, self._coupling_scalar_row(proc_idx)])
+
     def init_data(self):
+        self._use_coupling_scalars = bool(self.cfg.data.get("coupling_scalars", False))
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
 
@@ -387,7 +432,7 @@ class AmplitudeExperiment(BaseExperiment):
         # amp_orders: list of [n_loops, alpha_s_power] per dataset, name-keyed
         # (NLO/NNLO targets labelled from their dataset name; LO otherwise).
         amp_orders = self._resolve_amp_orders(self.cfg.data.dataset)
-        n_order_features = len(amp_orders[0])
+        n_order_features = len(self._order_row(0, amp_orders))
 
         all_order_labels = []   # will be (N_events, n_order_features)
 
@@ -401,7 +446,7 @@ class AmplitudeExperiment(BaseExperiment):
             all_tokens_list.extend([toks[j] for j in range(N)])
             all_amplitudes_raw.append(amps)
             all_process_ids.extend([proc_idx] * N)
-            order_row = np.array(amp_orders[proc_idx], dtype=np.float32)
+            order_row = self._order_row(proc_idx, amp_orders)
             all_order_labels.append(np.tile(order_row, (N, 1)))  # (N, n_order_features)
 
         all_order_labels = np.concatenate(all_order_labels, axis=0)  # (N_total, n_order_features)
@@ -584,6 +629,10 @@ class AmplitudeExperiment(BaseExperiment):
         path or None."""
         import re
         cands = [name]
+        # explicit recipe ``base`` (coupling/mass scan: decorated name → real process)
+        recipe_base = getattr(self, "_recipe_base_by_name", {}).get(name)
+        if recipe_base and recipe_base not in cands:
+            cands.append(recipe_base)
         base = re.sub(r"_amplitudes$", "", name)
         base = re.sub(r"_\d+(?:\.\d+)?(?:-\d+(?:\.\d+)?)?GeV$", "", base)
         if base not in cands:
@@ -866,7 +915,7 @@ class AmplitudeExperiment(BaseExperiment):
             prepd_means = prepd_stds = None
 
         amp_orders       = self._resolve_amp_orders(self.cfg.data.dataset)
-        n_order_features = len(amp_orders[0])
+        n_order_features = len(self._order_row(0, amp_orders))
 
         # Per-dataset load caps: the frozen pools can hold far more than a single
         # run trains on (e.g. 10M/process), so only `train_subsample` train events
@@ -996,7 +1045,7 @@ class AmplitudeExperiment(BaseExperiment):
                 P_of.append(np.full(N, P, dtype=np.int64))
                 ev_pid.append(np.full(N, proc_idx, dtype=np.int32))
                 ev_order.append(np.tile(
-                    np.array(amp_orders[proc_idx], dtype=np.float32), (N, 1)))
+                    self._order_row(proc_idx, amp_orders), (N, 1)))
                 amp_blocks.append(amp_prepd)
                 part_base += N * P
 
