@@ -835,6 +835,36 @@ def patch_card(card_path, patches):
     with open(card_path, 'w') as f:
         f.writelines(new_lines)
 
+
+def patch_param_card_slha(card_path, patches):
+    """Patch an SLHA param_card (Blocks MASS/SMINPUTS/…), whose lines are
+    ``<id> <value> # NAME`` — a format ``patch_card`` (which expects ``value = key``)
+    cannot touch. The value is the last token before the ``# NAME`` comment; NAME is
+    matched case-insensitively against the patch keys (e.g. ``{"MZ": 90.0}``). Only
+    real INPUT parameters are matched — a dependent line like ``24 ... # w+ : cmath…``
+    has comment-name ``w+`` so ``MW`` won't (and can't) be set this way. Returns the
+    set of keys that were NOT found."""
+    want = {str(k).lower(): float(v) for k, v in patches.items()}
+    out, done = [], set()
+    for line in open(card_path):
+        if "#" in line and line.split("#", 1)[0].strip():
+            code, comment = line.split("#", 1)
+            name = comment.strip().split()[0].lower() if comment.strip() else ""
+            if name in want and name not in done:
+                toks = code.rstrip("\n").rstrip().split()
+                toks[-1] = f"{want[name]:.6e}"
+                out.append(" " + " ".join(toks) + " #" + comment)
+                done.add(name)
+                continue
+        out.append(line)
+    with open(card_path, "w") as f:
+        f.writelines(out)
+    missing = set(want) - done
+    if missing:
+        print(f"  [WARN] patch_param_card_slha: keys not found in {card_path}: {sorted(missing)}")
+    return missing
+
+
 def get_existing_batch_count(events_dir):
     events_path = Path(events_dir) / "Events"
     if not events_path.exists():
@@ -869,8 +899,10 @@ def configure_cards(events_dir, config, com_energy, nevents, batch_idx):
 
     param_patches = config.get("param_card_patches", {})
     if param_patches:
-        print(f"  [CARD] Patching param_card...")
-        patch_card(param_card_path, param_patches)
+        print(f"  [CARD] Patching param_card (SLHA)...")
+        # param_card is SLHA (`id value # NAME`), NOT the run_card `value = key`
+        # format — must use the SLHA patcher or mass/coupling patches silently no-op.
+        patch_param_card_slha(param_card_path, param_patches)
 
 # =============================================================================
 # STEP 3: Run MadGraph event generation

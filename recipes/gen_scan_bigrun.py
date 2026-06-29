@@ -26,7 +26,12 @@ import mg5_pipeline_final as mg
 from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS
 
 _MCOL = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
-HEAVY = {5, 23, 24, 25}            # b, Z, W, H — masses that move 2->2/2->3 kinematics
+# Scannable masses = direct SLHA param_card MASS-block INPUTS that also appear as
+# EXTERNAL finals (so the data-derived mass reads the scanned value from momenta):
+# b(5), t(6), tau(15), Z(23), H(25). The W mass (24) is a DEPENDENT parameter
+# (derived from MZ/Gf/aEW), not a settable input, so it is excluded — W-final
+# processes (WW, WWa) get no mass scan and become anchors.
+HEAVY = {5, 6, 15, 23, 25}
 ALPHA_S_RANGE  = (0.09, 0.15)
 # α_ew is NOT scanned: it is a per-dataset CONSTANT multiplier on |M|^2 (it does not
 # run per event), so in log-amplitude it is a constant offset that per-dataset
