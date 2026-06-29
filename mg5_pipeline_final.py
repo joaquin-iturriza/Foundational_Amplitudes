@@ -91,6 +91,132 @@ def read_alphas_from_param_card(param_card_path, default=0.118):
         pass
     return default
 
+
+# =============================================================================
+# Per-dataset PHYSICS SCAN — vary reference couplings + masses across datasets
+# =============================================================================
+# A recipe entry may carry a single ``physics`` block specifying the reference
+# couplings and masses to use for that dataset:
+#
+#     physics: { alpha_s: 0.13, alpha_ew: 0.0078125, masses: {6: 173.0, 5: 4.2} }
+#
+# That ONE block is the single source of truth. ``physics_to_generation`` derives
+# the MadGraph generation inputs (param_card_patches + final-state masses +
+# reference alpha_s for the per-event running), and ``physics_to_couplings``
+# derives the coupling VALUES the model conditions on (vertex factors + global
+# scalar). Masses do NOT need to be passed to the model separately: the
+# data-derived on-shell mass (data.mass_from_momenta) reads them straight from the
+# generated 4-momenta. ``register_scan_process`` merges all of this onto a base
+# PROCESSES entry under the (decorated) dataset name so the whole existing
+# generation pipeline — backend compile, chunking, recipe identity, caching —
+# works unchanged, with each (process, physics) variant getting its own dataset.
+
+# PDG id → MadGraph SM param_card mass symbol (Block MASS).
+PDG_TO_MASS_SYM = {
+    6: "MT", 5: "MB", 4: "MC", 3: "MS", 2: "MU", 1: "MD",
+    15: "MTA", 13: "MM", 11: "ME",
+    23: "MZ", 24: "MW", 25: "MH",
+}
+
+
+def physics_to_generation(physics):
+    """Recipe ``physics`` block → (param_card_patches, mass_by_pdg, alphas_mz).
+
+    ``param_card_patches`` are MG symbol→value (aS, aEWM1=1/alpha_ew, MT, …).
+    ``mass_by_pdg`` is {pdg: mass_GeV} for the masses the user overrode (used to
+    rebuild m_finals). ``alphas_mz`` is the reference α_s(M_Z) threaded into the
+    per-event running (``compute_alphas``); None ⇒ keep the 0.118 default."""
+    physics = dict(physics or {})
+    patches, mass_by_pdg = {}, {}
+    alphas_mz = None
+    if physics.get("alpha_s") is not None:
+        alphas_mz = float(physics["alpha_s"])
+        patches["aS"] = alphas_mz
+    if physics.get("alpha_ew") is not None:
+        patches["aEWM1"] = 1.0 / float(physics["alpha_ew"])   # MG input is 1/alpha_ew
+    for pdg, m in (physics.get("masses") or {}).items():
+        pdg, m = abs(int(pdg)), float(m)   # mass is identical for particle/antiparticle
+        mass_by_pdg[pdg] = m
+        sym = PDG_TO_MASS_SYM.get(pdg)
+        if sym:
+            patches[sym] = m
+        else:
+            print(f"  [WARN] physics.masses: no param_card symbol for PDG {pdg}; "
+                  f"ME mass unchanged (phase-space mass still updated).")
+    return patches, mass_by_pdg, alphas_mz
+
+
+def physics_to_couplings(physics):
+    """Recipe ``physics`` block → model coupling values {order_key: alpha}, keyed to
+    diagram_graphs.DEFAULT_ORDER_KEYS (QED↔EW, QCD↔strong). None if neither set."""
+    physics = dict(physics or {})
+    c = {}
+    if physics.get("alpha_ew") is not None:
+        c["QED"] = float(physics["alpha_ew"])
+    if physics.get("alpha_s") is not None:
+        c["QCD"] = float(physics["alpha_s"])
+    return c or None
+
+
+def _table_mass(pdg):
+    """Default on-shell mass (GeV) for a PDG id, from the shared property table
+    (massless → 0). Used to rebuild m_finals so phase space matches the ME."""
+    from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS
+    col = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+    props = PARTICLE_PROPERTIES.get(int(pdg)) or PARTICLE_PROPERTIES.get(-int(pdg))
+    if props is None:
+        return 0.0
+    lm = props[col]
+    return 0.0 if abs(lm - _MASSLESS) < 1e-6 else float(10.0 ** lm)
+
+
+def register_scan_process(name, base, physics):
+    """Register ``PROCESSES[name]`` as ``base`` with the ``physics`` scan applied:
+    merged param_card_patches, final-state m_finals rebuilt from the (possibly
+    overridden) masses, and the reference alphas_mz recorded. Returns the new cfg.
+    Idempotent. ``name`` may equal ``base`` (in-place physics override)."""
+    if base not in PROCESSES:
+        raise KeyError(f"register_scan_process: base process '{base}' not in PROCESSES")
+    patches, mass_by_pdg, alphas_mz = physics_to_generation(physics)
+    cfg = dict(PROCESSES[base])
+    cfg["param_card_patches"] = {**cfg.get("param_card_patches", {}), **patches}
+    if alphas_mz is not None:
+        cfg["alphas_mz"] = alphas_mz
+    # Final-state masses START from the base process (which already encodes its
+    # intended choices, e.g. massless light quarks in ee_uug) and are overridden
+    # ONLY where physics.masses changes a particle — so a pure coupling scan leaves
+    # the phase space bit-identical to the base. Fall back to the table mass only
+    # when the base specifies neither m_finals nor m_final.
+    final_pdgs = list(cfg["pdg_ids"])[2:]
+    if "m_finals" in cfg:
+        base_mf = list(cfg["m_finals"])
+    elif "m_final" in cfg:
+        mf = cfg["m_final"]
+        base_mf = list(mf) if isinstance(mf, (list, tuple)) else [float(mf)] * len(final_pdgs)
+    else:
+        base_mf = [_table_mass(p) for p in final_pdgs]
+    m_finals = [mass_by_pdg.get(abs(int(p)), base_mf[i]) for i, p in enumerate(final_pdgs)]
+    cfg["m_finals"] = m_finals
+    if len(m_finals) == 2:
+        cfg["m_final"] = m_finals          # (m3, m4) pair; 2→2 sampler accepts a list
+    cfg["scan_base"] = base
+    PROCESSES[name] = cfg
+    return cfg
+
+
+def register_recipe_processes(specs):
+    """Register every recipe spec carrying a ``physics`` scan (or a decorated
+    ``base``) into PROCESSES, so generation can address them by dataset name.
+    ``specs`` is the experiment's ``_recipe_specs`` list. No-op for plain entries
+    (name already a PROCESSES key and no physics)."""
+    for s in specs:
+        name = s["name"]
+        base = s.get("base", name)
+        physics = s.get("physics")
+        if physics or base != name:
+            register_scan_process(name, base, physics or {})
+
+
 # =============================================================================
 # REPRODUCIBILITY — recipe sidecar + provenance
 # A dataset is fully described by its *recipe* (the inputs that determine its
@@ -1449,6 +1575,9 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     ncols      = nparticles * 5 + 1
     pdg_ids    = config["pdg_ids"]
     param_card = f"{standalone_dir}/Cards/param_card.dat"
+    # Reference α_s(M_Z) for the per-event running μ=√s. Per-dataset scans set this
+    # (register_scan_process); default 0.118 keeps existing datasets bit-identical.
+    amz        = float(config.get("alphas_mz", 0.118))
 
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
@@ -1495,7 +1624,7 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
             swap_idx = [1, 0] + list(range(2, nparticles))
             me2 = np.empty(n_events)
             for i, (momenta, _) in enumerate(events):
-                alphas = compute_alphas(sqrts_arr[i])
+                alphas = compute_alphas(sqrts_arr[i], alphas_mz=amz)
                 p_mg = momenta[swap_idx]
                 me2[i] = matrix2py.py_get_value(_invert_momenta(p_mg), alphas, -1)
                 if (i + 1) % 100_000 == 0:
@@ -1517,9 +1646,10 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
             total_me2 = pipe.compute(events)
         if k:
             alphas_ref = read_alphas_from_param_card(param_card)
-            scale = (compute_alphas(sqrts_arr) / alphas_ref) ** k
+            scale = (compute_alphas(sqrts_arr, alphas_mz=amz) / alphas_ref) ** k
             print(f"  [AMP] per-event α_s rescale: k={k}, α_s_ref={alphas_ref:.4f}, "
-                  f"α_s(√s)∈[{compute_alphas(sqrts_max):.4f},{compute_alphas(sqrts_min):.4f}]")
+                  f"α_s(√s)∈[{compute_alphas(sqrts_max, alphas_mz=amz):.4f},"
+                  f"{compute_alphas(sqrts_min, alphas_mz=amz):.4f}]")
             total_me2 = np.asarray(total_me2, dtype=np.float64) * scale
 
     # ----------------------------------------------------------------
@@ -1632,6 +1762,15 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         "amp_orders":         [int(cfg.get("n_loops", 0)), k],
         "per_event_alphas":   True,
     }
+    # Per-dataset physics scan (register_scan_process): the reference α_s(M_Z)
+    # drives the per-event running but is NOT in param_card_patches, so it must
+    # enter the identity explicitly. Only recorded when non-default so existing
+    # datasets keep their recipe_id (and cache). m_finals records the phase-space
+    # masses (also identity-bearing when a mass is scanned).
+    if abs(float(cfg.get("alphas_mz", 0.118)) - 0.118) > 1e-12:
+        recipe["alphas_mz"] = float(cfg["alphas_mz"])
+    if "scan_base" in cfg:
+        recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", [])]
     ceil_div    = lambda a, b: -(-a // b)
     n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)

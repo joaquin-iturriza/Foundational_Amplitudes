@@ -54,6 +54,11 @@ def main():
         spec = yaml.safe_load(f)
     procs = spec["processes"] if isinstance(spec, dict) else spec
 
+    # Register any per-dataset physics scans / decorated-base entries into
+    # mg.PROCESSES so generation can address them by their (decorated) dataset name
+    # — same registration the training recipe path does in init_physics.
+    mg.register_recipe_processes(procs)
+
     print(f"Spec        : {args.spec}")
     print(f"Frozen dir  : {datagen.frozen_dir()}")
     print(f"Train cache : {datagen.train_cache_dir()}")

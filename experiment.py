@@ -215,6 +215,13 @@ class AmplitudeExperiment(BaseExperiment):
             base = p.get("base", name)
             base_by_name[name] = base
             sqrts = p["sqrts"]
+            # Single physics block (alpha_s / alpha_ew / masses) is the source of
+            # truth: the generator derives param_card_patches + m_finals from it
+            # (register_recipe_processes below), and the model's coupling feature is
+            # derived from the SAME block — so the two cannot drift. Masses reach the
+            # model via the generated momenta (data.mass_from_momenta), not here.
+            physics = p.get("physics", None)
+            physics = OmegaConf.to_container(physics, resolve=True) if OmegaConf.is_config(physics) else (dict(physics) if physics else None)
             specs.append({
                 "name":      name,
                 "base":      base,
@@ -223,8 +230,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "n_train":   int(p["n_train"]),
                 "n_val":     int(p["n_val"]),
                 "n_test":    int(p["n_test"]),
-                # physics overrides for generation (masses, aS, EW inputs, …)
-                "param_card_patches": dict(p.get("param_card_patches", {}) or {}),
+                "physics":   physics,
             })
             names.append(name)
             # Coupling order from the process definition (LO=[0,0]); explicit
@@ -235,9 +241,16 @@ class AmplitudeExperiment(BaseExperiment):
                 k = mg.PROCESSES[base].get("alphas_power", 0)
                 amp_orders.append([0, int(k)])
             # Per-dataset coupling VALUES {order_key: alpha} for the vertex features
-            # and the global scalar fallback. Explicit on the spec; else None.
+            # and the global scalar fallback. Derived from the physics block; an
+            # explicit `couplings` on the spec still wins (manual override).
             cpl = p.get("couplings", None)
+            if cpl is None and physics is not None:
+                cpl = mg.physics_to_couplings(physics)
             couplings_by_pid.append({str(k): float(v) for k, v in cpl.items()} if cpl else None)
+
+        # Register any physics-scan / decorated-base datasets into mg.PROCESSES so
+        # generation (inline or prebuild) can address them by dataset name.
+        mg.register_recipe_processes(specs)
 
         self._recipe_specs       = specs
         self._coupling_by_pid    = couplings_by_pid
