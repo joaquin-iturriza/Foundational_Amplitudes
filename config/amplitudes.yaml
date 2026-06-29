@@ -64,6 +64,14 @@ data:
  color_onehot: false       # one-hot the SU(3) color representation (rep identity)
  prop_is_massless: true    # explicit "exactly massless" flag + neutralise mass sentinel
  standardize_props: true   # z-score the continuous property columns
+ # Replace the frozen log10_mass_gev table column with each particle's on-shell mass
+ # m=sqrt(E^2-|p|^2) from its 4-momentum — faithful to the dataset's actual masses
+ # (recipe path or single-dataset legacy path; use_PIDs must be false).
+ mass_from_momenta: false
+ # Feed a global per-event coupling scalar [log(alpha_QED), log(alpha_QCD)] (broadcast
+ # like amp_orders) so coupling reaches the model even with model.use_diagrams=false.
+ # Coupling VALUES come from each dataset's recipe `physics`/`couplings` block.
+ coupling_scalars: false
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
  #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]

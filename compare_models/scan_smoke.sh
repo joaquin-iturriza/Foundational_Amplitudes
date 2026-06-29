@@ -21,6 +21,9 @@
 # Runs all features ON, plus an all-OFF twin (old path must be unaffected).
 
 module load anaconda-py3/2023.09
+# Source conda.sh so `conda activate` works in a non-interactive sbatch shell
+# (a bare `conda activate` fails: the conda shell function isn't loaded).
+source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 PROJ=$PWD
