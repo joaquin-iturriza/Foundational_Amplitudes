@@ -287,11 +287,18 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
         with PdfPages(out) as file:
             labels = ["Test", "Train", "Prediction"]
 
+            # Signed-log so the histogram survives NON-POSITIVE amplitudes (NLO
+            # virtual corrections are not positive-definite); for positive LO |M|^2
+            # this is exactly log. Matches the signedlog amp_trafo training uses.
+            def _slog(a):
+                a = np.asarray(a, dtype=float)
+                return np.sign(a) * np.log(np.abs(a) + 1e-30)
+
             dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
             data = [
-                np.log(plot_dict["results_test"][dataset]["raw"]["truth"]),
-                np.log(plot_dict["results_train"][dataset]["raw"]["truth"]),
-                np.log(plot_dict["results_test"][dataset]["raw"]["prediction"]),
+                _slog(plot_dict["results_test"][dataset]["raw"]["truth"]),
+                _slog(plot_dict["results_train"][dataset]["raw"]["truth"]),
+                _slog(plot_dict["results_test"][dataset]["raw"]["prediction"]),
             ]
             plot_histograms(
                 file,
@@ -306,9 +313,9 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             # Per-dataset pages
             for ds_name, ds_results in plot_dict.get("results_per_proc", {}).items():
                 ds_data = [
-                    np.log(ds_results["test"]["raw"]["truth"]),
-                    np.log(ds_results["train"]["raw"]["truth"]),
-                    np.log(ds_results["test"]["raw"]["prediction"]),
+                    _slog(ds_results["test"]["raw"]["truth"]),
+                    _slog(ds_results["train"]["raw"]["truth"]),
+                    _slog(ds_results["test"]["raw"]["prediction"]),
                 ]
                 plot_histograms(
                     file,
