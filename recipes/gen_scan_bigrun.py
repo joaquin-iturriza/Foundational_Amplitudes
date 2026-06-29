@@ -31,7 +31,17 @@ _MCOL = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
 # b(5), t(6), tau(15), Z(23), H(25). The W mass (24) is a DEPENDENT parameter
 # (derived from MZ/Gf/aEW), not a settable input, so it is excluded — W-final
 # processes (WW, WWa) get no mass scan and become anchors.
-HEAVY = {5, 6, 15, 23, 25}
+# Scannable masses: only those that (a) genuinely enter the matrix element and
+# (b) are tree-level "clean" — i.e. patching them in the param_card does NOT leave
+# stale EW-dependent parameters in the ME. That is MT(6), MTA(15), MH(25): each is
+# an external final whose mass enters the spinor/propagator while the params it
+# would otherwise feed (Yukawas, Higgs self-coupling) don't appear at tree level.
+# EXCLUDED: MZ(23) is the EW master input (changing it must recompute MW/couplings —
+# a copied/patched standalone is inconsistent); MW is dependent; light quarks
+# (u/d/s/c/b) are massless in the 5-flavour ME so their mass does nothing.
+HEAVY = {6, 15, 25}
+# Extra base processes (not in the LO recipe) added purely for a clean mass scan.
+EXTRA_LO = [{"name": "ee_ttbar", "sqrts": [400, 1000]}]   # MT scan (top threshold)
 ALPHA_S_RANGE  = (0.09, 0.15)
 # α_ew is NOT scanned: it is a per-dataset CONSTANT multiplier on |M|^2 (it does not
 # run per event), so in log-amplitude it is a constant offset that per-dataset
@@ -79,6 +89,17 @@ def lo_points(name, rng):
     return pts
 
 
+def scan_sqrts(base, base_sqrts, physics):
+    """Raise sqrts_min so the (possibly mass-shifted) final state is above threshold:
+    sum of final-state masses (scanned override or table value) × 1.05. A heavier
+    scanned mass needs a higher minimum √s."""
+    smin, smax = float(base_sqrts[0]), float(base_sqrts[1])
+    masses = (physics or {}).get("masses", {})
+    finals = mg.PROCESSES[base]["pdg_ids"][2:]
+    thr = sum(masses.get(abs(int(p)), phys_mass(p)) for p in finals)
+    return [max(smin, round(1.05 * thr)), smax]
+
+
 def entry(name, base, sqrts, physics, n):
     e = {"name": name, "sqrts": list(sqrts),
          "n_train": n[0], "n_val": n[1], "n_test": n[2]}
@@ -94,8 +115,8 @@ def main():
     ap.add_argument("--out", default="recipes/scan_bigrun.yaml")
     ap.add_argument("--lo-recipe", default="recipes/pretrain25.yaml",
                     help="source of the LO process list + sqrts ranges")
-    ap.add_argument("--nlo-bases", default="ee_uu_nlo,ee_dd_nlo,ee_ss_nlo,ee_cc_nlo,ee_bb_nlo,ee_ttbar_nlo",
-                    help="comma list of certified NLO bases to scan")
+    ap.add_argument("--nlo-bases", default="ee_ss_nlo,ee_ttbar_nlo,ee_dd_nlo,ee_cc_nlo,ee_uug_nlo,ee_ddg_nlo",
+                    help="comma list of CERTIFIED NLO bases to scan (uu/bb failed cert)")
     ap.add_argument("--nlo-points", type=int, default=16, help="alpha_s points per NLO base")
     ap.add_argument("--seed", type=int, default=20260629)
     ap.add_argument("--lo-counts", default="10000,2000,2000")
@@ -110,7 +131,7 @@ def main():
 
     procs = []
     # --- LO scan -----------------------------------------------------------
-    lo = yaml.safe_load(open(args.lo_recipe))["processes"]
+    lo = yaml.safe_load(open(args.lo_recipe))["processes"] + EXTRA_LO
     n_lo = n_anchor = 0
     for p in lo:
         base, sqrts = p["name"], p["sqrts"]
@@ -120,7 +141,9 @@ def main():
             n_lo += 1; n_anchor += 1
             continue
         for i, phys in enumerate(pts):
-            procs.append(entry(f"{base}__s{i:02d}", base, sqrts, phys, lo_n))
+            # mass-scan points may need a higher √s_min to clear the shifted threshold
+            sq = scan_sqrts(base, sqrts, phys) if phys.get("masses") else sqrts
+            procs.append(entry(f"{base}__s{i:02d}", base, sq, phys, lo_n))
             n_lo += 1
 
     # --- NLO scan ----------------------------------------------------------
