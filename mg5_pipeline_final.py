@@ -779,6 +779,19 @@ output standalone_cpp {standalone_dir}
     else:
         print(f"[MG5] Process directory already exists, skipping generation.")
 
+    # Apply per-dataset param_card overrides (masses, EW inputs) to the STANDALONE's
+    # card — the one the C++ driver / matrix2py actually read at runtime (derived
+    # params like MW and the couplings are recomputed from these inputs by the
+    # model's Parameters class). Without this a mass/EW scan silently used defaults.
+    # SLHA format ('<id> value # NAME'), so the SLHA patcher (not patch_card).
+    param_patches = config.get("param_card_patches", {})
+    if param_patches:
+        for pc in (f"{standalone_dir}/Cards/param_card.dat",
+                   f"{fortran_dir}/Cards/param_card.dat"):
+            if os.path.exists(pc):
+                print(f"  [CARD] Patching standalone param_card (SLHA) {param_patches} -> {pc}")
+                patch_param_card_slha(pc, param_patches)
+
     return events_dir, standalone_dir
 
 # =============================================================================
