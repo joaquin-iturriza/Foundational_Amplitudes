@@ -285,6 +285,47 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     return final
 
 
+def is_reweightable_virt_scan(process):
+    """True for an NLO α_s-scan dataset that can be DERIVED from its stripped base
+    by reweighting instead of re-running MadLoop: a virt process with the physical
+    α_s prefactor on, a scan_base, and unchanged masses (mass scans change the
+    kinematics/coefficient, so they are not reweightable)."""
+    cfg = mg.PROCESSES.get(process, {})
+    base = cfg.get("scan_base")
+    if not (cfg.get("kind") == "virt" and cfg.get("alphas_prefactor") and base):
+        return False
+    return list(cfg.get("m_finals", [])) == list(mg.PROCESSES.get(base, {}).get("m_finals", []))
+
+
+def reweight_virt_alphas(parent_npy, process, out_npy):
+    """Write the α_s-scanned NLO dataset for ``process`` by reweighting its stripped
+    parent (``parent_npy``), event by event:
+
+        target = virt_e4 · (α_s(√s; amz)/0.118)^b · α_s(√s; amz)/(2π),  b = alphas_power−1
+
+    This is EXACT: the MadLoop loop coefficient c0 is α_s-independent, the parent's
+    born was evaluated at the 0.118 reference, and (α_s/0.118)^b restores the born's
+    own α_s running (b=0 for 2→2 qqbar, 1 for 2→3 qqg). √s is recovered from the two
+    incoming momenta (rows 0,1)."""
+    cfg = mg.PROCESSES[process]
+    amz = float(cfg["alphas_mz"])
+    b   = int(cfg.get("alphas_power", 1)) - 1
+    REF = 0.118
+    npart = int(cfg["nfinal"]) + 2
+    d = np.load(parent_npy)
+    mom = d[:, :npart * 4].reshape(-1, npart, 4)
+    pin = mom[:, 0, :] + mom[:, 1, :]
+    s = pin[:, 0] ** 2 - (pin[:, 1:] ** 2).sum(axis=1)
+    asr = mg.compute_alphas(np.sqrt(np.abs(s)), alphas_mz=amz)
+    factor = (asr / REF) ** b * (asr / (2.0 * np.pi))
+    out = d.copy()
+    out[:, -1] = d[:, -1] * factor
+    tmp = out_npy + ".tmp.npy"
+    np.save(tmp, out)
+    os.replace(tmp, out_npy)
+    return out_npy
+
+
 def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
                    dest_dir=None, require_cache=False):
     """Path to the (process, role) dataset, generated reproducibly if absent
@@ -308,6 +349,18 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
             f"require_cache: dataset for ({process}, {role}, {n_events} ev) "
             f"not prebuilt at {out} (recipe_id={wanted}). Run the prebuild "
             f"job first: sbatch prebuild_recipes.sh <spec.yaml>.")
+
+    # NLO α_s scan: derive from the stripped base by reweighting (ONE MadLoop run
+    # per base feeds all its α_s points) instead of re-running MadLoop per point.
+    if is_reweightable_virt_scan(process):
+        parent = mg.PROCESSES[process]["scan_base"]
+        parent_path = ensure_dataset(parent, sqrts_min, sqrts_max, n_events,
+                                     role, seed, dest_dir, require_cache=False)
+        reweight_virt_alphas(parent_path, process, out)
+        full = dict(recipe)
+        full["derived_from"] = os.path.basename(parent_path)
+        mg.write_recipe(out, full)
+        return out
 
     ensure_backend(process)
     work    = os.path.join(dest_dir, f".chunks_{wanted}")

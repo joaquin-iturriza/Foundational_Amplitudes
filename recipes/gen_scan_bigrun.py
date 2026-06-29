@@ -128,14 +128,11 @@ def main():
         smin = 1.05 * sum(cfg["m_finals"]) if sum(cfg["m_finals"]) > 0 else 50.0
         sqrts = [round(smin), 1000]
         counts = nlo3_n if cfg.get("nfinal", 2) >= 3 else nlo_n
-        scan_top = (nb == "ee_ttbar_nlo")
-        npts = args.nlo_points
-        for i in range(npts):
+        # alpha_s-ONLY scan (fixed masses): every variant reweights from one stripped
+        # MadLoop parent (datagen._ensure_virt_reweighted) — no per-point MadLoop re-run.
+        # (NLO mass-scanning would need a MadLoop rebuild per mass; out of scope here.)
+        for i in range(args.nlo_points):
             phys = {"alpha_s": round(float(rng.uniform(*ALPHA_S_RANGE)), 4)}
-            # top-mass scan on ee_ttbar_nlo (own MadLoop build per mass -> few values)
-            if scan_top:
-                f = float(np.linspace(MASS_LO, MASS_HI, 4)[i % 4])
-                phys["masses"] = {6: round(172.5 * f, 2)}
             procs.append(entry(f"{nb}__s{i:02d}", nb, sqrts, phys, counts))
             n_nlo += 1
 
