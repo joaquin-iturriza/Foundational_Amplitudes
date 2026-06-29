@@ -275,6 +275,11 @@ def recipe_id(recipe):
     """
     volatile = {"created", "output_file", "provenance", "schema_version",
                 "backend", "effective_seed", "recipe_id",
+                # `derived_from`: provenance for an NLO α_s dataset reweighted from
+                # its stripped parent — traceability, not "what the data is" (the
+                # content identity already lives in process/alphas_mz/prefactor), so
+                # it must NOT change the id, or the trainer's lookup would miss it.
+                "derived_from",
                 # Traceability metadata, not part of "what the data is":
                 #   - `chunked`    : whether the chunked path was used (a bool).
                 #   - `chunk_size` : the nominal cost-aware events-per-chunk; the
