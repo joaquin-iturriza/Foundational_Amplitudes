@@ -1,0 +1,15 @@
+# Tiny end-to-end smoke for the coupling+mass features (data.mass_from_momenta,
+# data.coupling_scalars, vertex couplings via use_diagrams). Recipe path with
+# require_cache=false so it generates inline in seconds. Exercises:
+#   - mass variety: ee_aa (massless) + ee_WW (massive W) read via data-derived mass
+#   - vertex + scalar couplings: QED everywhere, QCD on ee_uug
+#   - a coupling SCAN: ee_uug at alpha_s 0.118 and 0.13 (distinct decorated name,
+#     shares the ee_uug backend → no recompile)
+# All four backends (ee_aa, ee_WW, ee_uug) already compiled; the scan reuses ee_uug.
+# The single `physics` block per entry is the source of truth for both generation
+# and the model coupling feature.
+processes:
+  - {name: ee_aa,         sqrts: [10,  1000], n_train: 400, n_val: 200, n_test: 200, physics: {alpha_ew: 0.0078125}}
+  - {name: ee_WW,         sqrts: [162, 1000], n_train: 400, n_val: 200, n_test: 200, physics: {alpha_ew: 0.0078125}}
+  - {name: ee_uug,        sqrts: [91,  1000], n_train: 400, n_val: 200, n_test: 200, physics: {alpha_s: 0.118, alpha_ew: 0.0078125}}
+  - {name: ee_uug__as013, base: ee_uug, sqrts: [91, 1000], n_train: 400, n_val: 200, n_test: 200, physics: {alpha_s: 0.13, alpha_ew: 0.0078125}}
