@@ -1,0 +1,82 @@
+cluster:
+  account: itg@v100
+  partition: gpu_p2
+  request_gpus: 1
+  cpus_per_task: 8
+  scheduler: slurm
+  time: 00:25:00
+  auto_submit: false
+dyhpo:
+  n_candidates: 300
+  n_startup: 8
+  seed: 42
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 4500
+n_trials: 20
+fixed_params:
+  data.source: recipes
+  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25_short.yaml
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.preprocess_per_dataset: 'true'
+  data.require_cache: 'true'
+  data.seed: 42
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  evaluation.batchsize: 8192
+  plot: 'false'
+  seed: 42
+  training.batchsize: 1024
+  training.get_ID: 'false'
+  training.loss_aggregation: geometric_mean
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.validate_frac: 0.05
+  training.validate_every_n_steps: 225
+  training.dtype: float32
+  use_mlflow: 'false'
+  data.spin_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  model.use_diagrams: 'true'
+  model.use_diagram_virtuality: 'true'
+  model.virt_standardize: 'false'
+  model.d_diag: 32
+paths:
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/dvirt_sweep
+  setup_commands:
+  - module load anaconda-py3/2023.09
+  - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.0001
+  high: 0.01
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.0
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-11
+  high: 1.0e-06
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.9999
+- name: model.virt_log_scale
+  type: float_log
+  low: 0.02
+  high: 0.3
+sweep_name: dvirt_sweep
