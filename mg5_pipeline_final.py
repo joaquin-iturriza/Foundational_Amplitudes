@@ -204,6 +204,21 @@ def register_scan_process(name, base, physics):
     return cfg
 
 
+def standalone_name(process):
+    """Backend-directory key for ``process``. A coupling-ONLY scan (same matrix-
+    element inputs as its base — identical masses and EW params, differing only in
+    the per-event α_s reference) reuses the BASE standalone: matrix2py is handed α_s
+    explicitly per event, and the C++ driver's fixed α_s is divided back out in the
+    analytic rescale — so the compiled amplitude is bit-identical. Mass/EW scans get
+    their own backend. Saves recompiling one MG5 standalone per α_s point."""
+    cfg = PROCESSES.get(process, {})
+    base = cfg.get("scan_base")
+    if not base or base not in PROCESSES:
+        return process
+    me = lambda c: {k: v for k, v in c.get("param_card_patches", {}).items() if k != "aS"}
+    return base if me(cfg) == me(PROCESSES[base]) else process
+
+
 def register_recipe_processes(specs):
     """Register every recipe spec carrying a ``physics`` scan (or a decorated
     ``base``) into PROCESSES, so generation can address them by dataset name.

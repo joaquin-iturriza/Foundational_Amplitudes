@@ -122,11 +122,14 @@ def ensure_backend(process):
     that concurrent workers never race to compile the same backend."""
     if is_virt(process):
         return ensure_virt_backend(process)
-    cfg = dict(mg.PROCESSES[process])
-    standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
+    # A coupling-only scan shares its base's compiled standalone (see
+    # mg.standalone_name): compile under that key with the base's cfg.
+    sa  = mg.standalone_name(process)
+    cfg = dict(mg.PROCESSES[sa])
+    standalone_dir = f"{mg.WORK_DIR}/{sa}_standalone"
     backend, subproc_dirs, driver_bin, _ = mg.detect_compiled_backend(standalone_dir)
     if not subproc_dirs or (backend == "cpp" and driver_bin is None):
-        mg.generate_mg5_process(process, cfg)
+        mg.generate_mg5_process(sa, cfg)
         mg.compile_backends(standalone_dir, cfg["nfinal"] + 2)
     return standalone_dir
 
@@ -230,8 +233,12 @@ def gen_chunk(task):
     process        = task["process"]
     if is_virt(process):
         return gen_virt_chunk(task)
+    # cfg is the SCAN's (its alphas_mz / m_finals drive the per-event computation),
+    # but the compiled backend dir may be the shared base (mg.standalone_name): a
+    # coupling-only scan has base-identical masses/EW, so the base param_card is
+    # correct and α_s is applied per event.
     cfg            = dict(mg.PROCESSES[process])
-    standalone_dir = f"{mg.WORK_DIR}/{process}_standalone"
+    standalone_dir = f"{mg.WORK_DIR}/{mg.standalone_name(process)}_standalone"
     backend, subproc_dirs, driver_bin, eff_dir = mg.detect_compiled_backend(standalone_dir)
     if not subproc_dirs or (backend == "cpp" and driver_bin is None):
         raise RuntimeError(
