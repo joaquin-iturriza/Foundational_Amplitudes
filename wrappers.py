@@ -147,6 +147,14 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.use_pids = True   # overridden by setup_particle_features()
         # particle_encoder and property_matrix are set by setup_particle_features()
 
+        # Data-derived per-particle mass (data.mass_from_momenta); off until the
+        # experiment calls setup_mass_from_momenta(). When on, the forward replaces
+        # the gathered property matrix's log10_mass_gev column with the on-shell mass
+        # m=sqrt(E^2-|p|^2) of each particle (see setup_mass_from_momenta).
+        self.mass_from_momenta = False
+        self._mom_div = 1.0
+        self._mass_spec = None
+
         # Feynman-diagram conditioning config (Hydra passes these from lloca.yaml).
         # The encoder module + per-process graphs are attached later by the
         # experiment via setup_diagram_conditioning() (they need the loaded
@@ -188,6 +196,45 @@ class AmplitudeLLoCaWrapper(nn.Module):
             self.particle_encoder = _build_particle_encoder(
                 n_features, self.d_particle_hidden, encoder_hidden
             )
+
+    def setup_mass_from_momenta(self, mom_div: float, mass_spec: dict):
+        """Enable data-derived per-particle mass (``data.mass_from_momenta``).
+
+        ``mom_div`` is the run's global momentum scale (the model sees momenta
+        already divided by it), so physical GeV are recovered as ``p*mom_div``.
+        ``mass_spec`` is :func:`particle_ids.mass_feature_spec` — the column index
+        and transform constants that put the on-shell mass on the same scale the
+        frozen ``log10_mass_gev`` column would have under the active encoding flags.
+        Off (default) ⇒ the forward is unchanged."""
+        self.mass_from_momenta = True
+        self._mom_div = float(mom_div)
+        self._mass_spec = dict(mass_spec)
+
+    def _apply_mass_from_momenta(self, raw_props, fourmomenta):
+        """Replace the log10_mass_gev column of ``raw_props`` (N, n_features) with
+        each particle's on-shell mass derived from ``fourmomenta`` (N, 4), matching
+        the table column's massless-neutralise → standardize pipeline. Returns the
+        (cloned) feature tensor. Shared by the LLoCa + GATr wrappers."""
+        spec = self._mass_spec
+        raw_props = raw_props.clone()
+        p = fourmomenta * self._mom_div                       # scaled → physical GeV
+        m2 = p[:, 0] ** 2 - (p[:, 1:] ** 2).sum(dim=-1)
+        m = torch.sqrt(m2.clamp(min=0.0))
+        floor = spec["floor_log10"]
+        log10m = torch.log10(m.clamp(min=10.0 ** floor))      # massless → _MASSLESS floor
+        massless = log10m < spec["threshold_log10"]
+        if spec["neutralize_log10"] is not None:              # is_massless flag active
+            log10m = torch.where(
+                massless,
+                torch.full_like(log10m, spec["neutralize_log10"]),
+                log10m,
+            )
+        if spec["std_mu"] is not None:
+            log10m = (log10m - spec["std_mu"]) / spec["std_sd"]
+        raw_props[:, spec["mass_col"]] = log10m.to(raw_props.dtype)
+        if spec["is_massless_col"] is not None:
+            raw_props[:, spec["is_massless_col"]] = massless.to(raw_props.dtype)
+        return raw_props
 
     def setup_diagram_conditioning(self, encoder, pd_by_pid, d_diag):
         """Attach the diagram graph encoder + per-process graphs (from experiment).
@@ -468,6 +515,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
             ).to(dtype=self.network_dtype, device=fourmomenta.device)
         else:
             raw_props = self.property_matrix[particle_type_indices]   # (N_total, n_features)
+            if self.mass_from_momenta:
+                raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
             particle_type = self.particle_encoder(raw_props)           # (N_total, d_particle_hidden)
 
         if order_labels is not None:
@@ -519,6 +568,13 @@ class _AmplitudeGATrMuPBase(nn.Module):
         self.token_size = token_size
         self.d_particle_hidden = d_particle_hidden
         self.use_pids = True
+        self.mass_from_momenta = False
+        self._mom_div = 1.0
+        self._mass_spec = None
+
+    # identical to AmplitudeLLoCaWrapper.setup_mass_from_momenta / _apply_mass_from_momenta
+    setup_mass_from_momenta = AmplitudeLLoCaWrapper.setup_mass_from_momenta
+    _apply_mass_from_momenta = AmplitudeLLoCaWrapper._apply_mass_from_momenta
 
     # identical to AmplitudeLLoCaWrapper.setup_particle_features
     def setup_particle_features(self, use_pids: bool, property_matrix=None,
@@ -539,7 +595,10 @@ class _AmplitudeGATrMuPBase(nn.Module):
                 particle_type_indices, num_classes=self.token_size
             ).to(dtype=self.network_dtype, device=fourmomenta.device)
         else:
-            scalars = self.particle_encoder(self.property_matrix[particle_type_indices])
+            raw_props = self.property_matrix[particle_type_indices]
+            if self.mass_from_momenta:
+                raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
+            scalars = self.particle_encoder(raw_props)
         if order_labels is not None:
             counts = ptr[1:] - ptr[:-1]
             order_per_particle = order_labels.repeat_interleave(counts, dim=0)

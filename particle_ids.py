@@ -425,6 +425,75 @@ def build_property_matrix(spin_onehot=False, color_onehot=False,
     return mat, names
 
 
+# ---------------------------------------------------------------------------
+# Per-particle (data-derived) on-shell mass
+# ---------------------------------------------------------------------------
+# The table's ``log10_mass_gev`` is a frozen per-species constant. When
+# ``data.mass_from_momenta`` is set we instead REPLACE that column, per particle,
+# with the on-shell mass derived from the event 4-momentum (m=sqrt(E^2-|p|^2)) —
+# exact for external legs, Lorentz-invariant, and faithful to whatever mass the
+# dataset was actually generated with. The model (wrappers) does the per-particle
+# computation in the forward pass; this helper returns the small metadata needed
+# to reproduce the *same* downstream transform the table column would have had
+# under the active smart-encoding flags (massless neutralisation → standardize),
+# so the data-derived value lands on the identical scale.
+#
+# Threshold: log10(m/GeV) below MASS_MASSLESS_LOG10_THR is treated as "exactly
+# massless" (symmetry-protected: gamma/g/nu, or light quarks generated massless).
+# It sits below the electron (-3.29) and above the _MASSLESS sentinel (-5).
+MASS_MASSLESS_LOG10_THR = -4.0
+
+
+def mass_feature_spec(spin_onehot=False, color_onehot=False,
+                      is_massless=False, standardize=False):
+    """Metadata for the data-derived mass column (see ``data.mass_from_momenta``).
+
+    Returns a dict the wrapper uses to map a per-particle physical mass onto the
+    same scale the frozen ``log10_mass_gev`` column would occupy under the active
+    flags::
+
+        mass_col       : int   column index of log10_mass_gev in the built matrix
+        is_massless_col: int|None  column index of the is_massless flag, if present
+        floor_log10    : float massless sentinel value (_MASSLESS); the floor of log10(m)
+        threshold_log10: float log10(m) below this ⇒ treated as exactly massless
+        neutralize_log10: float|None  value massless rows take when the is_massless
+                          flag is active (mean log10 over massive species); None ⇒
+                          massless rows keep the sentinel
+        std_mu, std_sd : float|None  z-score constants if standardize is active, else None
+    """
+    _, names = build_property_matrix(
+        spin_onehot=spin_onehot, color_onehot=color_onehot,
+        is_massless=is_massless, standardize=standardize,
+    )
+    mass_col = names.index("log10_mass_gev")
+    is_massless_col = names.index("is_massless") if "is_massless" in names else None
+
+    neutralize_log10 = None
+    if is_massless:
+        # Reproduce add_is_massless_flag's neutralisation: massless rows take the
+        # mean log10 over the massive species (computed on the raw table).
+        m = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+        col = GLOBAL_PROPERTY_MATRIX[:, m]
+        padding  = ~np.any(GLOBAL_PROPERTY_MATRIX != 0.0, axis=1)
+        massless = (np.abs(col - _MASSLESS) < 1e-6) & ~padding
+        massive  = ~massless & ~padding
+        neutralize_log10 = float(col[massive].mean()) if massive.any() else _MASSLESS
+
+    std_mu = std_sd = None
+    if standardize:
+        std_mu, std_sd = _FROZEN_STD_STATS["log10_mass_gev"]
+
+    return {
+        "mass_col":        int(mass_col),
+        "is_massless_col": is_massless_col,
+        "floor_log10":     float(_MASSLESS),
+        "threshold_log10": float(MASS_MASSLESS_LOG10_THR),
+        "neutralize_log10": neutralize_log10,
+        "std_mu":          None if std_mu is None else float(std_mu),
+        "std_sd":          None if std_sd is None else float(std_sd),
+    }
+
+
 def global_encode(pdg_ids: np.ndarray) -> np.ndarray:
     """Map PDG IDs → global property-table indices (use_PIDs=False mode)."""
     pdg_ids = np.asarray(pdg_ids, dtype=int)

@@ -165,6 +165,10 @@ class AmplitudeExperiment(BaseExperiment):
         # mom_mean and mom_std are per-dataset, populated in init_data
         self.mom_mean = []
         self.mom_std  = []
+        # Global physical momentum scale (recipe path: one train-fit std applied to
+        # every process). The model sees momenta divided by it; needed to recover
+        # physical GeV for data.mass_from_momenta. None until set in init_data.
+        self.mom_div  = None
 
         if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             self.type_token = []
@@ -347,9 +351,14 @@ class AmplitudeExperiment(BaseExperiment):
                 trafo = torch.einsum("...ij,...jk->...ik", trafo, to_com)
                 particles_t = torch.einsum("...ij,...kj->...ki", trafo, particles_t)
     
-                particles_prepd = particles_t / particles_t.std()
+                _mom_div_ds = float(particles_t.std())
+                particles_prepd = particles_t / _mom_div_ds
                 self.mom_mean.append(float(particles_prepd.mean()))
                 self.mom_std.append(float(particles_prepd.std().clamp(min=1e-2)))
+                # Single-dataset legacy path has a well-defined global scale; with
+                # several datasets each is scaled independently so there is no single
+                # mom_div (mass_from_momenta is then unsupported — asserted at setup).
+                self.mom_div = _mom_div_ds if self.n_datasets == 1 else None
                 particles_prepd = particles_prepd.numpy()  # (N, n_particles, 4)
             else:
                 LOGGER.info(f"Preprocessing particles using trafos={self.cfg.data.trafos}")
@@ -661,6 +670,29 @@ class AmplitudeExperiment(BaseExperiment):
                 property_matrix=getattr(self, "property_matrix", None),
                 encoder_hidden=self.cfg.model.get("particle_encoder_hidden", 0),
             )
+            # Data-derived per-particle on-shell mass (replaces the frozen
+            # log10_mass_gev table column with m=sqrt(E^2-|p|^2) per particle).
+            if self.cfg.data.get("mass_from_momenta", False):
+                assert not use_pids, (
+                    "data.mass_from_momenta requires the property encoding "
+                    "(use_PIDs=false)"
+                )
+                assert self.mom_div is not None, (
+                    "data.mass_from_momenta needs a single global momentum scale; "
+                    "use the recipe data path or a single-dataset run."
+                )
+                from particle_ids import mass_feature_spec
+                spec = mass_feature_spec(
+                    spin_onehot=self.cfg.data.get("spin_onehot", False),
+                    color_onehot=self.cfg.data.get("color_onehot", False),
+                    is_massless=self.cfg.data.get("prop_is_massless", False),
+                    standardize=self.cfg.data.get("standardize_props", False),
+                )
+                model.setup_mass_from_momenta(self.mom_div, spec)
+                LOGGER.info(
+                    f"Mass encoding: data-derived on-shell mass (mom_div={self.mom_div:.4g}, "
+                    f"mass_col={spec['mass_col']}, replaces frozen table mass)"
+                )
             # Build + attach the diagram graph encoder (a real submodule → trained,
             # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
             # so it exists before μP finalisation and warm-start loading.
@@ -879,6 +911,7 @@ class AmplitudeExperiment(BaseExperiment):
             mom_std  = float(max(scaled.std(), 1e-2))
         self.mom_mean = [mom_mean]
         self.mom_std  = [mom_std]
+        self.mom_div  = float(mom_div)   # physical scale (for data.mass_from_momenta)
         for k in store:
             store[k]["momenta"] = store[k]["momenta"] / mom_div
 
