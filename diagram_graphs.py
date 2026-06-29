@@ -389,11 +389,19 @@ def build_process_virtuality(pd, slot_pdgs, n_initial):
             diag_idx.append(d); i_idx.append(i); j_idx.append(j)
     if not masks:
         return None
+    diag_idx = torch.tensor(diag_idx, dtype=torch.long)
+    i_idx = torch.tensor(i_idx, dtype=torch.long)
+    j_idx = torch.tensor(j_idx, dtype=torch.long)
+    # propagator property vector per internal edge (incl. its mass) — lets the
+    # "pool" mode learn resonance s≈m² (virtuality alone can't tell a γ- from a
+    # Z-propagator when both carry the same s).
+    edge_prop = pd.edge_feat[diag_idx, i_idx, j_idx]                     # (K, f_edge)
     return {
         "mask": torch.tensor(masks, dtype=torch.float32),   # (K, n_part) signed
-        "diag_idx": torch.tensor(diag_idx, dtype=torch.long),
-        "i_idx": torch.tensor(i_idx, dtype=torch.long),
-        "j_idx": torch.tensor(j_idx, dtype=torch.long),
+        "diag_idx": diag_idx,
+        "i_idx": i_idx,
+        "j_idx": j_idx,
+        "edge_prop": edge_prop,
         "n_part": n_part,
         "D": pd.n_diagrams,
         "N": pd.node_feat.shape[1],

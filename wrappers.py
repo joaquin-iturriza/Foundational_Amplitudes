@@ -133,7 +133,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  use_diagrams: bool = False, d_diag: int = 32,
                  diagrams_dir: str = "data/diagrams", diagram_encoder=None,
                  use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1,
-                 virt_standardize: bool = True, virt_clamp: float = 4.0):
+                 virt_standardize: bool = True, virt_clamp: float = 4.0,
+                 virt_mode: str = "edge"):
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -209,7 +210,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.use_diagrams = True
 
     def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1,
-                                 standardize=True, clamp=4.0):
+                                 standardize=True, clamp=4.0, mode="edge"):
         """Enable Tier B: per-event propagator virtualities (call after
         setup_diagram_conditioning). ``virt_by_pid`` is a list indexed by process_id
         of the precompute dicts from diagram_graphs.build_process_virtuality (or None
@@ -230,7 +231,16 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._virt_log_scale = float(log_scale)
         self._virt_standardize = bool(standardize)
         self._virt_clamp = float(clamp)
+        self._virt_mode = str(mode)        # "edge" (per-event encode) | "pool" (cached topology + weighted)
         self.use_diagram_virtuality = True
+        # Per-process diagram slice in the concatenated static batch (build_diagram_batch
+        # iterates pids in order over non-None pds) — used by the "pool" mode to map
+        # events to their process's diagram CLS embeddings.
+        offs, cur = {}, 0
+        for pid, pd in enumerate(self._pd_by_pid):
+            if pd is not None:
+                offs[pid] = (cur, pd.n_diagrams); cur += pd.n_diagrams
+        self._diag_offsets = offs
         # calibration buffers (persisted in the checkpoint); _virt_cal_done mirrors
         # _virt_calibrated as a Python flag to avoid a GPU→CPU sync after calibration.
         self.register_buffer("_virt_mu", torch.zeros(()))
@@ -341,6 +351,80 @@ class AmplitudeLLoCaWrapper(nn.Module):
         counts = ptr[1:] - ptr[:-1]
         return E_event.repeat_interleave(counts, dim=0)
 
+    def _diagram_features_virtuality_pool(self, fourmomenta, std, process_ids, ptr, device, dtype):
+        """Tier B, "pool" mode (the structural speedup): encode every diagram's
+        TOPOLOGY once (static, ~#diagrams graphs/step, like Tier A), then let the
+        per-event virtuality enter ONLY the pooling weights — a learned ``virt_score``
+        of each propagator's virtuality up/down-weights its diagram (near-resonant
+        s≈m² → larger weight). The expensive graph transformer no longer runs per
+        event, so the cost is ~Tier A's. A different model from "edge" mode (the
+        virtuality doesn't change a diagram's internal representation), so it is A/B'd
+        separately."""
+        if self._pd_device != device:
+            self._diag_batch = {k: (v.to(device) if torch.is_tensor(v) else v)
+                                for k, v in self._diag_batch.items()} if self._diag_batch else None
+            self._virt_by_pid = [
+                ({k: (v.to(device) if torch.is_tensor(v) else v) for k, v in vt.items()}
+                 if vt is not None else None) for vt in self._virt_by_pid]
+            self._pd_device = device
+
+        enc = self.diagram_encoder
+        cls_all = enc.encode_static(self._diag_batch)                   # (TotalD, d) — ONE forward
+        base_all = (cls_all @ enc.pool_query) / (enc.d_model ** 0.5)    # (TotalD,)
+        B = process_ids.shape[0]
+
+        # pass 1: raw signed-log virtuality per process (for calibration)
+        jobs, calib = [], []
+        for pid in torch.unique(process_ids).tolist():
+            if pid not in self._diag_offsets:
+                continue
+            ev_idx = (process_ids == pid).nonzero(as_tuple=True)[0]
+            vt = self._virt_by_pid[pid]
+            raw = None
+            if vt is not None:
+                n_part = vt["n_part"]
+                gather = ptr[ev_idx][:, None] + torch.arange(n_part, device=device)[None, :]
+                p_prop = torch.einsum("kn,enc->ekc", vt["mask"], fourmomenta[gather])
+                s = p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)
+                raw = torch.sign(s) * torch.log1p(s.abs())             # (E_p, K)
+                calib.append(raw.detach().reshape(-1))
+            jobs.append((pid, ev_idx, vt, raw))
+
+        if self._virt_standardize and not self._virt_cal_done:
+            if not bool(self._virt_calibrated) and calib:
+                allraw = torch.cat(calib)
+                self._virt_mu.copy_(allraw.mean())
+                self._virt_sigma.copy_(allraw.std().clamp_min(1e-3))
+                self._virt_calibrated.fill_(True)
+            self._virt_cal_done = True
+
+        # pass 2: per-event virtuality-weighted pool over the process's diagrams
+        E_event = torch.zeros(B, self.d_diag, device=device, dtype=dtype)
+        for (pid, ev_idx, vt, raw) in jobs:
+            start, D_p = self._diag_offsets[pid]
+            cls_p = cls_all[start:start + D_p]                          # (D_p, d)
+            base_p = base_all[start:start + D_p]                        # (D_p,)
+            E_p = ev_idx.shape[0]
+            if vt is not None:
+                if self._virt_standardize:
+                    feat = ((raw - self._virt_mu) / self._virt_sigma).clamp(
+                        -self._virt_clamp, self._virt_clamp)
+                else:
+                    feat = raw * self._virt_log_scale
+                # [signed-log(s)] ++ propagator property (incl. mass) -> resonance-aware
+                ep = vt["edge_prop"].to(feat.dtype).unsqueeze(0).expand(E_p, -1, -1)  # (E_p,K,f_edge)
+                vin = torch.cat([feat.unsqueeze(-1), ep], dim=-1)       # (E_p, K, 1+f_edge)
+                score = enc.virt_score(vin).squeeze(-1)                # (E_p, K)
+                contrib = torch.zeros(E_p, D_p, device=device, dtype=score.dtype)
+                contrib.index_add_(1, vt["diag_idx"], score)           # (E_p, D_p)
+            else:
+                contrib = torch.zeros(E_p, D_p, device=device, dtype=base_p.dtype)
+            w = torch.softmax(base_p.unsqueeze(0) + contrib, dim=1)     # (E_p, D_p)
+            E_event[ev_idx] = enc.out(w @ cls_p).to(dtype)             # (E_p, d_diag)
+
+        counts = ptr[1:] - ptr[:-1]
+        return E_event.repeat_interleave(counts, dim=0)
+
     def _diagram_features(self, process_ids, ptr, device, dtype):
         """Per-particle diagram embedding (N_total, d_diag).
 
@@ -402,9 +486,11 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # the in_channels/num_scalars sizing in experiment._finalize_data_sizing.
         if self.use_diagrams and process_ids is not None:
             if self.use_diagram_virtuality:
-                diag_feat = self._diagram_features_virtuality(
-                    fourmomenta, std, process_ids, ptr,
-                    particle_type.device, particle_type.dtype)
+                feat_fn = (self._diagram_features_virtuality_pool
+                           if getattr(self, "_virt_mode", "edge") == "pool"
+                           else self._diagram_features_virtuality)
+                diag_feat = feat_fn(fourmomenta, std, process_ids, ptr,
+                                    particle_type.device, particle_type.dtype)
             else:
                 diag_feat = self._diagram_features(
                     process_ids, ptr, particle_type.device, particle_type.dtype)

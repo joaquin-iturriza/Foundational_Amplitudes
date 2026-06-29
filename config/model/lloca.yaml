@@ -24,6 +24,9 @@ virt_standardize: true         # z-score signed-log(s) (calibrated on the first 
                                # (s-channel +9..+19, t-channel -8..-19) and destabilises training
 virt_clamp: 4.0               # clamp the standardised virtuality to +/- this (sigma units)
 virt_log_scale: 0.1            # legacy fixed scale used only when virt_standardize=false
+virt_mode: edge               # "edge": virtuality is a per-event graph edge feature (re-encodes
+                              # per event). "pool": encode topology once + virtuality only weights
+                              # the diagram pooling (~Tier A cost, a different/faster model).
 d_diag: 32                   # width of E appended to n_scalars (and num_scalars)
 diagrams_dir: data/diagrams  # where the <process>.diagrams.json sidecars live
 diagram_encoder:             # graph-transformer hyperparameters (standard-param, off muP axis)

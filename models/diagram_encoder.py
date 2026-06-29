@@ -94,12 +94,21 @@ class DiagramEncoder(nn.Module):
     """
 
     def __init__(self, f_node, f_edge, k_pe, d_model=64, n_heads=4, n_layers=3,
-                 d_out=32, f_edge_extra=0, dropout=0.0, mlp_ratio=4):
+                 d_out=32, f_edge_extra=0, dropout=0.0, mlp_ratio=4, virt_pool_hidden=16):
         super().__init__()
         self.d_model = d_model
         self.n_heads = n_heads
         self.f_edge = f_edge
         self.f_edge_extra = f_edge_extra
+        # virt_mode="pool" head: maps a propagator's (per-event virtuality, static
+        # property) to an additive contribution to its diagram's pooling weight —
+        # the property carries the propagator MASS so the head can learn resonance
+        # s≈m² (a near-resonant propagator up-weights its diagram). Unused in the
+        # default "edge" mode. Input = [signed-log(s)] ++ edge property vector.
+        self.virt_score = nn.Sequential(
+            nn.Linear(1 + f_edge, virt_pool_hidden), nn.GELU(),
+            nn.Linear(virt_pool_hidden, 1))
+        nn.init.zeros_(self.virt_score[-1].weight); nn.init.zeros_(self.virt_score[-1].bias)
 
         self.node_in = nn.Linear(f_node + k_pe, d_model)
         self.cls = nn.Parameter(torch.zeros(1, 1, d_model))
@@ -222,6 +231,16 @@ class DiagramEncoder(nn.Module):
                                   batch["node_mask"], batch["edge_feat"],
                                   batch["edge_mask"])                 # (TotalD, d_model)
         return self._segment_pool(cls, batch["seg"], batch["n_proc"])
+
+    def encode_static(self, batch):
+        """virt_mode="pool": encode every diagram's TOPOLOGY once → per-diagram CLS
+        (TotalD, d_model), no pooling and NO edge_extra (the virtuality enters later,
+        only in the per-event pooling weights). The expensive graph transformer runs
+        once per step regardless of batch size — the per-event cost is then just the
+        weighted pool. Requires f_edge_extra == 0."""
+        return self._encode_graphs(batch["node_feat"], batch["lap_pe"],
+                                   batch["node_mask"], batch["edge_feat"],
+                                   batch["edge_mask"])                 # (TotalD, d_model)
 
     def encode_grouped(self, node_feat, lap_pe, node_mask, edge_feat, edge_mask,
                        seg, n_groups, edge_extra=None):

@@ -327,12 +327,13 @@ def check_diagram_batch_equivalence():
         if pd is not None:
             E_loop = E_loop.index_copy(0, torch.tensor([pid]), enc(pd).unsqueeze(0))
     E_loop.pow(2).sum().backward()
-    g_loop = {k: p.grad.clone() for k, p in enc.named_parameters()}
+    # skip params with no grad (e.g. the pool-mode virt_score head, unused here)
+    g_loop = {k: p.grad.clone() for k, p in enc.named_parameters() if p.grad is not None}
 
     enc.zero_grad()
     E_b = enc.encode_all(build_diagram_batch(pd_by_pid))
     E_b.pow(2).sum().backward()
-    g_b = {k: p.grad.clone() for k, p in enc.named_parameters()}
+    g_b = {k: p.grad.clone() for k, p in enc.named_parameters() if p.grad is not None}
 
     dfwd = (E_loop - E_b).abs().max().item()
     grel = max((g_loop[k] - g_b[k]).norm().item() / (g_loop[k].norm().item() + 1e-30)

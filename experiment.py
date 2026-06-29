@@ -668,8 +668,12 @@ class AmplitudeExperiment(BaseExperiment):
                 from models.diagram_encoder import DiagramEncoder
                 f_node, f_edge = self._diag_feature_dims
                 enc_cfg = self.cfg.model.get("diagram_encoder", {}) or {}
-                # Tier B adds one per-event edge feature (the propagator virtuality).
-                f_edge_extra = 1 if getattr(self, "_use_diag_virt", False) else 0
+                # Tier B "edge" mode adds one per-event graph edge feature (the
+                # virtuality); "pool" mode feeds virtuality only into the pooling, so
+                # the graph encoder needs no extra edge channel.
+                _virt_mode = str(self.cfg.model.get("virt_mode", "edge"))
+                f_edge_extra = 1 if (getattr(self, "_use_diag_virt", False)
+                                     and _virt_mode == "edge") else 0
                 encoder = DiagramEncoder(
                     f_node=f_node, f_edge=f_edge, k_pe=self._diag_k_pe,
                     d_model=int(enc_cfg.get("d_model", 64)),
@@ -683,7 +687,8 @@ class AmplitudeExperiment(BaseExperiment):
                         self._diag_virt_by_pid,
                         log_scale=float(self.cfg.model.get("virt_log_scale", 0.1)),
                         standardize=bool(self.cfg.model.get("virt_standardize", True)),
-                        clamp=float(self.cfg.model.get("virt_clamp", 4.0)))
+                        clamp=float(self.cfg.model.get("virt_clamp", 4.0)),
+                        mode=_virt_mode)
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models
