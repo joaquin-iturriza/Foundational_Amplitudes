@@ -200,9 +200,19 @@ def pole_certify(process, n=100, seed=7):
 
 
 def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
-                          seed=42, mass_shift=True, alphas_mz=0.118):
+                          seed=42, mass_shift=True, alphas_mz=0.118,
+                          alphas_prefactor=False):
     """Sample phase space, evaluate the virtual, apply the heavy-quark mass
-    shift, and write a 21-col virt_e4 dataset (momenta in [e-,e+,finals] order)."""
+    shift, and write a 21-col virt dataset (momenta in [e-,e+,finals] order).
+
+    By default the stored target is virt_e4 = (c0+shift)*born — the α_s-STRIPPED
+    finite coefficient (α_s/2π divided out), so it is α_s-independent. With
+    ``alphas_prefactor=True`` the physical α_s weighting is restored per event,
+    target = virt_e4 * α_s(√s; alphas_mz)/(2π), using the running coupling at the
+    reference ``alphas_mz`` — exactly like the LO path. This makes the NLO target
+    DEPEND on the strong coupling, so a per-dataset α_s(M_Z) scan is meaningful.
+    (c0 is α_s-independent by construction, so the α_s handed to MadLoop cancels;
+    only this explicit prefactor carries the dependence.)"""
     import nlo_madloop as ML
     cfg = VIRT_PROCESSES[process]
     pdg = cfg["pdg_ids"]
@@ -229,7 +239,13 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         if c0 is None:
             bad += 1; born, c0 = 0.0, 0.0
         shift = C.heavy_quark_scheme_shift(s, heavy_m) if mass_shift else 0.0
-        amp[i] = (c0 + shift) * born            # virt_e4 (absolute, no alpha_s)
+        virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
+        if alphas_prefactor:
+            # restore physical α_s weighting with the per-event running coupling
+            asrun = mg.compute_alphas(np.sqrt(s), alphas_mz=alphas_mz)
+            amp[i] = virt_e4 * (asrun / (2.0 * np.pi))
+        else:
+            amp[i] = virt_e4                    # absolute, no α_s (legacy default)
         mom_store[i] = mom.flatten()            # store [e-,e+,finals] order
         if (i + 1) % 50_000 == 0:
             print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
@@ -258,6 +274,11 @@ def main():
                     help="RNG seed (per-chunk seed when driven by the prebuild)")
     ap.add_argument("--out", default=None)
     ap.add_argument("--no-mass-shift", action="store_true")
+    ap.add_argument("--alphas-mz", type=float, default=0.118,
+                    help="reference α_s(M_Z) for the per-event running (scan knob)")
+    ap.add_argument("--alphas-prefactor", action="store_true",
+                    help="store the physical α_s-weighted virtual (target depends "
+                         "on α_s); default off keeps the legacy α_s-stripped virt_e4")
     args = ap.parse_args()
 
     if args.build or args.force_build:
@@ -272,7 +293,9 @@ def main():
             smin = 1.05 * sum(cfg["m_finals"]) if sum(cfg["m_finals"]) > 0 else 50.0
         out = args.out or f"{mg.OUTPUT_DIR}/{args.process}_nlo_virt_e4_{smin:.0f}-{args.sqrts_max:.0f}GeV.npy"
         generate_virt_dataset(args.process, smin, args.sqrts_max, args.n, out,
-                              seed=args.seed, mass_shift=not args.no_mass_shift)
+                              seed=args.seed, mass_shift=not args.no_mass_shift,
+                              alphas_mz=args.alphas_mz,
+                              alphas_prefactor=args.alphas_prefactor)
 
 
 if __name__ == "__main__":

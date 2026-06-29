@@ -182,6 +182,11 @@ def register_scan_process(name, base, physics):
     cfg["param_card_patches"] = {**cfg.get("param_card_patches", {}), **patches}
     if alphas_mz is not None:
         cfg["alphas_mz"] = alphas_mz
+        # NLO-virtual: an α_s scan only bites if the physical α_s weighting is
+        # restored (the stored virt is α_s-stripped by default). Turn it on for any
+        # virt α_s scan; the base (non-scan) NLO datasets keep the legacy target.
+        if cfg.get("kind") == "virt":
+            cfg["alphas_prefactor"] = True
     # Final-state masses START from the base process (which already encodes its
     # intended choices, e.g. massless light quarks in ee_uug) and are overridden
     # ONLY where physics.masses changes a particle — so a pure coupling scan leaves
@@ -1784,6 +1789,8 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     # masses (also identity-bearing when a mass is scanned).
     if abs(float(cfg.get("alphas_mz", 0.118)) - 0.118) > 1e-12:
         recipe["alphas_mz"] = float(cfg["alphas_mz"])
+    if cfg.get("alphas_prefactor"):
+        recipe["alphas_prefactor"] = True   # NLO target carries the physical α_s weight
     if "scan_base" in cfg:
         recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", [])]
     ceil_div    = lambda a, b: -(-a // b)

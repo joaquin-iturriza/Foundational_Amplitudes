@@ -202,7 +202,8 @@ def gen_virt_chunk(task):
     C-extension import race that fresh interpreters can hit under FS contention
     (PyCapsule_Import 'datetime'). The seed is fixed, so a retry is identical."""
     process = task["process"]
-    base    = mg.PROCESSES[process]["virt_base"]
+    cfg     = mg.PROCESSES[process]
+    base    = cfg["virt_base"]
     os.makedirs(task["out_dir"], exist_ok=True)
     out_path = os.path.join(task["out_dir"], "chunk.npy")
     env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib",
@@ -211,6 +212,13 @@ def gen_virt_chunk(task):
            "--n", str(task["count"]), "--seed", str(task["seed"]),
            "--sqrts-min", repr(task["sqrts_min"]), "--sqrts-max", repr(task["sqrts_max"]),
            "--out", out_path]
+    # Per-dataset α_s scan (register_scan_process sets alphas_mz/alphas_prefactor on
+    # a virt scan): restore the physical α_s weighting at the scanned reference so
+    # the NLO target depends on the coupling. The α_s scan shares the base virt
+    # standalone (no rebuild — c0 is α_s-independent).
+    if cfg.get("alphas_prefactor"):
+        cmd += ["--alphas-mz", repr(float(cfg.get("alphas_mz", 0.118))),
+                "--alphas-prefactor"]
     import time
     last = None
     for attempt in range(4):
