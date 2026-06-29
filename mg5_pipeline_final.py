@@ -698,6 +698,26 @@ PROCESSES = {
         "pdg_ids": [11, -11, 6, -6], "m_finals": [172.5, 172.5],
         "param_card_patches": {},
     },
+    # 2->2 qqbar QCD-virtual flavours (QED born; target ∝ α_s¹ → amp_orders [1,1]).
+    "ee_uu_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_uu", "nfinal": 2,
+                  "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 2, -2],
+                  "m_finals": [0.0, 0.0], "param_card_patches": {}},
+    "ee_dd_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_dd", "nfinal": 2,
+                  "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 1, -1],
+                  "m_finals": [0.0, 0.0], "param_card_patches": {}},
+    "ee_cc_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_cc", "nfinal": 2,
+                  "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 4, -4],
+                  "m_finals": [0.0, 0.0], "param_card_patches": {}},
+    "ee_bb_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_bb", "nfinal": 2,
+                  "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 5, -5],
+                  "m_finals": [4.18, 4.18], "param_card_patches": {}},
+    # 2->3 qqg QCD-virtual (born ∝ α_s; target ∝ α_s² → amp_orders [1,2]).
+    "ee_uug_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_uug", "nfinal": 3,
+                   "n_loops": 1, "alphas_power": 2, "pdg_ids": [11, -11, 2, -2, 21],
+                   "m_finals": [0.0, 0.0, 0.0], "param_card_patches": {}},
+    "ee_ddg_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_ddg", "nfinal": 3,
+                   "n_loops": 1, "alphas_power": 2, "pdg_ids": [11, -11, 1, -1, 21],
+                   "m_finals": [0.0, 0.0, 0.0], "param_card_patches": {}},
 }
 
 # =============================================================================

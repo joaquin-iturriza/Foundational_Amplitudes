@@ -42,11 +42,18 @@ import nlo_pole_check as PC
 # Process table (extend freely; mass>0 final quarks get the mass-scheme shift)
 # ---------------------------------------------------------------------------
 VIRT_PROCESSES = {
+    # 2->2 qqbar (QED born, α_s-independent): the loop is the only α_s — fast, robust.
     "ee_uu":    {"mg5": "generate e+ e- > u u~ [virt=QCD]", "pdg_ids": [11, -11,  2, -2], "m_finals": [0.0, 0.0]},
     "ee_dd":    {"mg5": "generate e+ e- > d d~ [virt=QCD]", "pdg_ids": [11, -11,  1, -1], "m_finals": [0.0, 0.0]},
     "ee_ss":    {"mg5": "generate e+ e- > s s~ [virt=QCD]", "pdg_ids": [11, -11,  3, -3], "m_finals": [0.0, 0.0]},
     "ee_cc":    {"mg5": "generate e+ e- > c c~ [virt=QCD]", "pdg_ids": [11, -11,  4, -4], "m_finals": [0.0, 0.0]},
+    "ee_bb":    {"mg5": "generate e+ e- > b b~ [virt=QCD]", "pdg_ids": [11, -11,  5, -5], "m_finals": [4.18, 4.18]},
     "ee_ttbar": {"mg5": "generate e+ e- > t t~ [virt=QCD]", "pdg_ids": [11, -11,  6, -6], "m_finals": [172.5, 172.5]},
+    # 2->3 qqg: born already carries α_s — distinct topology (real radiation kinematics
+    # + 2->3 one-loop). Heavier to build/generate; the running-α_s evaluation makes the
+    # born scale correctly (target ∝ α_s²).
+    "ee_uug":   {"mg5": "generate e+ e- > u u~ g [virt=QCD]", "pdg_ids": [11, -11,  2, -2, 21], "m_finals": [0.0, 0.0, 0.0]},
+    "ee_ddg":   {"mg5": "generate e+ e- > d d~ g [virt=QCD]", "pdg_ids": [11, -11,  1, -1, 21], "m_finals": [0.0, 0.0, 0.0]},
 }
 
 # Fortran subroutine appended to each standalone's f2py_wrapper.f so the f2py
