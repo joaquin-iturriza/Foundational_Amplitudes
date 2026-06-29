@@ -233,16 +233,23 @@ class ProcessDiagrams:
         )
 
 
-def feature_dims(n_prop, order_keys=DEFAULT_ORDER_KEYS):
-    """(F_node, F_edge) for a given property width and order-key set."""
+def feature_dims(n_prop, order_keys=DEFAULT_ORDER_KEYS, with_couplings=False):
+    """(F_node, F_edge) for a given property width and order-key set.
+
+    ``with_couplings`` adds one vertex column per order key carrying the per-vertex
+    log coupling-*factor* (``order_power · log(alpha_key)``) — the numeric coupling
+    VALUE, not just its power. See :func:`build_process_diagrams`.
+    """
     n_orders = len(order_keys)
     f_node = n_prop + 2 + 2 + n_orders   # prop | type(2) | state(2) | orders
+    if with_couplings:
+        f_node += n_orders               # + per-vertex log coupling-factor
     f_edge = n_prop + 1                  # prop | is_external
     return f_node, f_edge
 
 
 def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER_KEYS,
-                           max_diagrams=None):
+                           max_diagrams=None, couplings=None):
     """Build a :class:`ProcessDiagrams` from a sidecar path/dict.
 
     Parameters
@@ -262,6 +269,15 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
         processes such as ``qqbar_Zgggg`` with >2000 diagrams). Diagrams are kept
         in MadGraph order; the drop count is reported by the caller via
         :func:`load_diagram_registry`. ``None`` keeps all.
+    couplings : dict[str, float] | None
+        Per-dataset numeric coupling VALUES keyed by order name, e.g.
+        ``{"QED": alpha_ew, "QCD": alpha_s}``. When given, each vertex gets an
+        extra column per order key holding ``order_power · log(alpha_key)`` — the
+        log of that vertex's coupling factor — so the diagram channel carries the
+        actual coupling magnitude, not just its perturbative power. Fully general:
+        any order key MadGraph tracks (QED/QCD/BSM) is handled the same way; a key
+        absent from ``couplings`` (or a non-positive value) contributes 0. ``None``
+        ⇒ no coupling columns (back-compatible).
     """
     if isinstance(source, str):
         with open(source) as f:
@@ -272,7 +288,12 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
     prop_matrix = np.asarray(prop_matrix, dtype=np.float32)
     n_prop = prop_matrix.shape[1]
     n_orders = len(order_keys)
-    f_node, f_edge = feature_dims(n_prop, order_keys)
+    with_couplings = couplings is not None
+    f_node, f_edge = feature_dims(n_prop, order_keys, with_couplings=with_couplings)
+    # log(alpha_key) per order key (0 where absent / non-positive → factor 1)
+    log_coupling = np.array(
+        [np.log(couplings[k]) if (with_couplings and couplings.get(k, 0) > 0) else 0.0
+         for k in order_keys], dtype=np.float32)
 
     # Flatten every subprocess's diagrams into one list (a process embeds over its
     # whole diagram set; multi-flavour processes like ee_qqbar pool over flavours).
@@ -301,6 +322,7 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
     c_type = n_prop            # is_external, is_vertex
     c_state = c_type + 2       # is_in, is_out
     c_order = c_state + 2      # order powers
+    c_coupl = c_order + n_orders   # per-vertex log coupling-factor (if with_couplings)
 
     for di, g in enumerate(diagrams):
         nodes, edges = g["nodes"], g["edges"]
@@ -323,7 +345,11 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
                 node_feat[di, ni, c_type + 1] = 1.0       # is_vertex
                 orders = node.get("orders", {})
                 for oi, key in enumerate(order_keys):
-                    node_feat[di, ni, c_order + oi] = float(orders.get(key, 0))
+                    power = float(orders.get(key, 0))
+                    node_feat[di, ni, c_order + oi] = power
+                    if with_couplings:
+                        # log of this vertex's coupling factor: log(alpha_key^power)
+                        node_feat[di, ni, c_coupl + oi] = power * log_coupling[oi]
 
         for e in edges:
             u, v = e["u"], e["v"]
@@ -452,13 +478,19 @@ def build_diagram_batch(pd_by_pid):
 def load_diagram_registry(diagrams_dir, process_names, spin_onehot=False,
                           color_onehot=False, is_massless=False, standardize=False,
                           k_pe=8, order_keys=DEFAULT_ORDER_KEYS, max_diagrams=None,
-                          logger=None):
+                          logger=None, couplings_by_process=None):
     """Load a ``{process_name: ProcessDiagrams}`` registry for the given processes.
 
     The property matrix is built ONCE with the supplied smart-encoding flags (pass
     the same ones the experiment uses for particles) and shared across processes.
     Missing sidecars are reported and skipped (the caller decides whether to error
     or run without a diagram for that process).
+
+    ``couplings_by_process`` : dict[name → {order_key: alpha}] | None. When given,
+    each process's vertices get the per-vertex log coupling-factor columns from its
+    own coupling values (see :func:`build_process_diagrams`). A name absent from the
+    dict gets no coupling columns — so either pass values for ALL processes or none,
+    to keep F_node uniform across the batch.
     """
     prop_matrix, _ = build_property_matrix(
         spin_onehot=spin_onehot, color_onehot=color_onehot,
@@ -475,9 +507,10 @@ def load_diagram_registry(diagrams_dir, process_names, spin_onehot=False,
                 import warnings
                 warnings.warn(msg)
             continue
+        couplings = (couplings_by_process or {}).get(name)
         pd = build_process_diagrams(
             path, prop_matrix, k_pe=k_pe, order_keys=order_keys,
-            max_diagrams=max_diagrams,
+            max_diagrams=max_diagrams, couplings=couplings,
         )
         registry[name] = pd
         if logger is not None:

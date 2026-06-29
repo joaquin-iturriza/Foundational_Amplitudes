@@ -545,6 +545,7 @@ class AmplitudeExperiment(BaseExperiment):
                     spin_onehot=spin_onehot, color_onehot=color_onehot,
                     is_massless=is_massless, standardize=standardize,
                     build_virtuality=self._use_diag_virt,
+                    couplings_by_pid=getattr(self, "_coupling_by_pid", None),
                 )
                 n_scalars += self._d_diag
                 LOGGER.info(
@@ -594,12 +595,19 @@ class AmplitudeExperiment(BaseExperiment):
         return None
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
-                                is_massless, standardize, build_virtuality=False):
+                                is_massless, standardize, build_virtuality=False,
+                                couplings_by_pid=None):
         """Load each process's diagram graphs into ``self._diag_pd_by_pid`` (indexed
         by process_id == position in ``data.dataset``). The property matrix uses the
         SAME smart-encoding flags as the particle encoder, so diagram particles ride
         the identical physical-quantity encoding. Missing sidecars → None (that
-        process gets a zero diagram embedding; the run still works)."""
+        process gets a zero diagram embedding; the run still works).
+
+        ``couplings_by_pid`` : list[{order_key: alpha} | None] aligned with ``names``.
+        When any entry is set, every vertex gets per-vertex log coupling-factor
+        columns from that dataset's coupling values (see build_process_diagrams).
+        Datasets without couplings are still given the columns (filled 0) so F_node
+        stays uniform across the batched encoder forward."""
         from diagram_graphs import build_process_diagrams, feature_dims
         from particle_ids import build_property_matrix
 
@@ -615,18 +623,27 @@ class AmplitudeExperiment(BaseExperiment):
             spin_onehot=spin_onehot, color_onehot=color_onehot,
             is_massless=is_massless, standardize=standardize,
         )
+        # Couplings on vertices: if ANY dataset carries coupling values, every
+        # process gets the coupling columns (0-filled where absent) so the batched
+        # encoder sees one uniform F_node.
+        use_couplings = bool(couplings_by_pid) and any(c for c in couplings_by_pid)
+        empty_coupl = {} if use_couplings else None   # {} → columns present, all 0
+
         pd_by_pid, missing = [], []
-        for name in names:
+        for i, name in enumerate(names):
             path = self._resolve_diagram_path(diagrams_dir, name)
             if path is None:
                 pd_by_pid.append(None)
                 missing.append(name)
                 continue
+            cpl = (couplings_by_pid[i] if couplings_by_pid else None) or empty_coupl
             pd_by_pid.append(build_process_diagrams(
-                path, prop_matrix, k_pe=k_pe, max_diagrams=max_diagrams))
+                path, prop_matrix, k_pe=k_pe, max_diagrams=max_diagrams,
+                couplings=cpl))
 
         self._diag_pd_by_pid = pd_by_pid
-        self._diag_feature_dims = feature_dims(prop_matrix.shape[1])   # (f_node, f_edge)
+        self._diag_feature_dims = feature_dims(
+            prop_matrix.shape[1], with_couplings=use_couplings)   # (f_node, f_edge)
         self._diag_k_pe = k_pe
 
         # Tier B: per-process propagator-virtuality precompute. Needs the event's
