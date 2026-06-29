@@ -1,0 +1,55 @@
+# =============================================================================
+# Physics-scan recipe TEMPLATE — vary couplings + masses across datasets
+# =============================================================================
+# Schema for the planned large mixed-physics run (e.g. 500 LO + 100 NLO). Each
+# entry is a dataset; a single `physics` block per entry is the SOURCE OF TRUTH
+# for both the generated data and the coupling values the model conditions on.
+#
+# physics:
+#   alpha_s:  reference alpha_s(M_Z). Drives the per-event running alpha_s(sqrt s)
+#             AND the model's QCD coupling feature. Omit for purely-EW processes.
+#   alpha_ew: electroweak coupling (= e^2/4pi). Patches the param card (aEWM1 =
+#             1/alpha_ew) and is the model's QED coupling feature.
+#   masses:   {pdg: mass_GeV} overrides. Patches the param card mass AND the
+#             phase-space final-state mass (particle+antiparticle together). The
+#             model picks the mass up from the generated momenta automatically via
+#             data.mass_from_momenta — no separate model input needed.
+#
+# SCANNING the same process at several physics points: give each variant a
+# distinct `name` and point `base` at the underlying process (the mg5/sidecar
+# key). A coupling-only scan reuses the base's compiled backend (no recompile);
+# a mass/EW scan compiles its own. amp_orders are auto-derived from `base`.
+#
+# To USE this in a run (after prebuilding the data):
+#   python prebuild_recipes.py recipes/<your_scan>.yaml --workers 24
+#   python run.py model=lloca data.source=recipes \
+#     data.processes_file=recipes/<your_scan>.yaml \
+#     data.use_PIDs=false data.spin_onehot=true data.color_onehot=true \
+#     data.prop_is_massless=true data.standardize_props=true \
+#     data.mass_from_momenta=true data.coupling_scalars=true \
+#     model.use_diagrams=true model.d_diag=32 ...
+# =============================================================================
+processes:
+  # --- plain entries: one physics point, physical SM values ----------------
+  - {name: ee_mumu, sqrts: [10, 1000], n_train: 100000, n_val: 5000, n_test: 5000,
+     physics: {alpha_ew: 0.0078125}}
+  - {name: ee_uug,  sqrts: [91, 1000], n_train: 100000, n_val: 5000, n_test: 5000,
+     physics: {alpha_s: 0.118, alpha_ew: 0.0078125}}
+
+  # --- alpha_s SCAN: same process, several reference couplings -------------
+  #     (coupling-only → all four share the ee_uug backend; no recompile)
+  - {name: ee_uug__as100, base: ee_uug, sqrts: [91, 1000],
+     n_train: 50000, n_val: 5000, n_test: 5000, physics: {alpha_s: 0.100, alpha_ew: 0.0078125}}
+  - {name: ee_uug__as130, base: ee_uug, sqrts: [91, 1000],
+     n_train: 50000, n_val: 5000, n_test: 5000, physics: {alpha_s: 0.130, alpha_ew: 0.0078125}}
+
+  # --- mass SCAN: vary the top mass (own backend per mass point) -----------
+  - {name: ee_ttbar__mt165, base: ee_ttbar, sqrts: [346, 1000],
+     n_train: 50000, n_val: 5000, n_test: 5000, physics: {alpha_ew: 0.0078125, masses: {6: 165.0}}}
+  - {name: ee_ttbar__mt180, base: ee_ttbar, sqrts: [346, 1000],
+     n_train: 50000, n_val: 5000, n_test: 5000, physics: {alpha_ew: 0.0078125, masses: {6: 180.0}}}
+
+  # --- combined coupling+mass scan ----------------------------------------
+  - {name: ee_bbbarg__as110, base: ee_bbbarg, sqrts: [20, 1000],
+     n_train: 50000, n_val: 5000, n_test: 5000,
+     physics: {alpha_s: 0.110, alpha_ew: 0.0078125, masses: {5: 4.5}}}
