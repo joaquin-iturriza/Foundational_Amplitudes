@@ -234,15 +234,20 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     amp = np.empty(n_events)
     bad = 0
     for i, (mom, _) in enumerate(events):
-        r = ML.evaluate(get_me_full, mom[swap], alphas=alphas_mz)
+        # Evaluate MadLoop at the per-event RUNNING α_s(√s) (scale μ=√s) when the
+        # physical weighting is wanted, so a born that itself carries α_s (e.g. the
+        # 2→3 ee→qqg LO) runs correctly with the energy; the normalized loop
+        # coefficient c0 is α_s-independent so it is unaffected. Legacy default
+        # (no prefactor) keeps the fixed reference α_s, so existing data is identical.
+        asrun = mg.compute_alphas(sqrts[i], alphas_mz=alphas_mz) if alphas_prefactor else alphas_mz
+        r = ML.evaluate(get_me_full, mom[swap], alphas=asrun)
         born, c0, s = r["born"], r.get("c0"), r["s"]
         if c0 is None:
             bad += 1; born, c0 = 0.0, 0.0
         shift = C.heavy_quark_scheme_shift(s, heavy_m) if mass_shift else 0.0
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:
-            # restore physical α_s weighting with the per-event running coupling
-            asrun = mg.compute_alphas(np.sqrt(s), alphas_mz=alphas_mz)
+            # restore the loop's physical α_s weighting (born already ran above)
             amp[i] = virt_e4 * (asrun / (2.0 * np.pi))
         else:
             amp[i] = virt_e4                    # absolute, no α_s (legacy default)
