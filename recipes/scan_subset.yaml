@@ -1,0 +1,8 @@
+# Tiny subset of scan_bigrun.yaml to validate the prebuild path for each scan kind
+# before the full 419-dataset run: an anchor (no scan), an alpha_s scan (shares the
+# base backend), and a MASS scan (recompiles a fresh LO standalone at the shifted
+# W mass — the one path not yet exercised end-to-end). Small counts → quick.
+processes:
+  - {name: ee_aa,          sqrts: [10, 1000],  n_train: 2000, n_val: 500, n_test: 500}
+  - {name: ee_uug__sA,     base: ee_uug, sqrts: [91, 1000], n_train: 2000, n_val: 500, n_test: 500, physics: {alpha_s: 0.13}}
+  - {name: ee_WW__mw75,    base: ee_WW,  sqrts: [152, 1000], n_train: 2000, n_val: 500, n_test: 500, physics: {masses: {24: 75.0}}}
