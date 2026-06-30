@@ -16,6 +16,7 @@ Fidelity dimension:
 
 import argparse
 import json
+import math
 import os
 import signal
 import sys
@@ -121,6 +122,24 @@ def compute_hpo_objective(result: dict, scaling_law_cfg: dict) -> float | None:
         return None
 
     return float(np.exp(np.mean(np.log(np.clip(ratios, 1e-10, None)))))
+
+
+def _failure_penalty(sampler, cfg):
+    """Worst-case val_loss to impute for a crashed/diverged trial.
+
+    Returns ``max(observed) * margin`` so the penalty stays on the same scale as
+    real losses (a fixed huge value would distort the GP's noise/lengthscale fit).
+    Falls back to a configured constant when nothing has been observed yet.
+    Set ``dyhpo.failure_penalty: null`` to disable imputation entirely.
+    """
+    dy = cfg.get("dyhpo", {}) or {}
+    if "failure_penalty" in dy and dy["failure_penalty"] is None:
+        return None
+    margin   = float(dy.get("failure_penalty_margin", 1.5))
+    fallback = float(dy.get("failure_penalty", 10.0))
+    observed = [v for d in sampler._val_loss_history.values() for v in d.values()
+                if v is not None and math.isfinite(v)]
+    return max(observed) * margin if observed else fallback
 
 
 def format_value(v):
@@ -347,6 +366,19 @@ def main():
         if args.fixed_hp_idx is None:
             try:
                 with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
+                    # Impute a finite worst-case loss so the surrogate LEARNS this
+                    # region is bad. report_failure() alone only drops this exact
+                    # hp_idx from the candidate pool; it feeds the GP nothing, so
+                    # the GP keeps proposing nearby points that diverge the same
+                    # way (this is exactly how a feature arm that diverges in one
+                    # HP corner can lose ~all its trials — see the scalar A/B arm,
+                    # which crashed 14/15 on a CUDA index-OOB after diverging).
+                    penalty = _failure_penalty(sampler, cfg)
+                    if penalty is not None:
+                        sampler.observe(hp_idx, t_steps, penalty, None)
+                        print(f"[run_trial] imputed failure penalty "
+                              f"val_loss={penalty:.4f} for hp_{hp_idx:04d}",
+                              file=sys.stderr)
                     sampler.report_failure(hp_idx)
             except Exception as cleanup_err:
                 print(f"[run_trial] report_failure: {cleanup_err}", file=sys.stderr)
