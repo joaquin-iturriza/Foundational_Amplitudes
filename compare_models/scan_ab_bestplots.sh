@@ -20,6 +20,12 @@ conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 PROJ=$PWD
 
+# Read from scan_bigrun's PRIVATE cache (decoupled from the shared cache that the
+# concurrent pretrain25_zs_phys sweep clobbers — see datagen.train_cache_dir /
+# frozen_dir overrides). Must match the dirs the private prebuild wrote into.
+export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_data_cache_scanbig
+export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig
+
 case "$SLURM_ARRAY_TASK_ID" in
   0) N=off;     FEAT="data.mass_from_momenta=false data.coupling_scalars=false model.use_diagrams=false"
      HP="training.lr=0.0037850206125016168 training.regularization_lambda=1.4383791066176087e-10 training.cosanneal_warmup_frac=0.037281612306833266 training.cosanneal_eta_min=5.00942594074264e-10 training.ema_decay=0.9687763301244937" ;;
