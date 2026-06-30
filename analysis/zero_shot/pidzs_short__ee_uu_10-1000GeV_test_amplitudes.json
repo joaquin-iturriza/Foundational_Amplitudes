@@ -1,0 +1,53 @@
+{
+  "ckpt_run_dir": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110",
+  "weights": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110/models/model_run0_best.pt.gz",
+  "dataset": "ee_uu_10-1000GeV_test_amplitudes",
+  "use_PIDs": true,
+  "held_out_pdgs": [
+    -11,
+    -2,
+    2,
+    11
+  ],
+  "subsample": 30000,
+  "train_vocab_pdgs": [
+    -24,
+    -15,
+    -13,
+    -12,
+    -11,
+    -5,
+    -2,
+    -1,
+    1,
+    2,
+    5,
+    11,
+    12,
+    13,
+    15,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "encodable": true,
+  "val": {
+    "mse_prepd": 0.26660460233688354,
+    "l1_prepd": 0.25401782989501953,
+    "rel_err_mean": 0.5141731608584321,
+    "rel_err_median": 0.06934478311794506,
+    "raw_mse": 0.12206705480434683,
+    "n_events": 2000
+  },
+  "test": {
+    "mse_prepd": 0.32206031680107117,
+    "l1_prepd": 0.2845264673233032,
+    "rel_err_mean": 0.6847385917135612,
+    "rel_err_median": 0.07684863944414272,
+    "raw_mse": 0.12076152173787948,
+    "n_events": 10000
+  },
+  "trivial_mse_prepd": 1.0
+}
