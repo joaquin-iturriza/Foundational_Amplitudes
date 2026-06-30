@@ -158,6 +158,19 @@ def main():
             "raw_mse": float(raw["mse"]),
             "n_events": int(t.shape[0]) if t is not None else None,
         }
+        # Dump prediction/truth arrays for the test split so histograms can be drawn.
+        # log|A| = log of the physical amplitude (what the network actually models,
+        # before per-process standardization). raw truth/pred are the physical |A|.
+        if split == "test" and t is not None:
+            npz = os.path.splitext(os.path.abspath(args.out))[0] + "_arrays.npz"
+            np.savez_compressed(
+                npz,
+                truth_prepd=np.asarray(pre["truth"]).ravel(),
+                pred_prepd=np.asarray(pre["prediction"]).ravel(),
+                truth_logamp=np.log(np.abs(np.asarray(raw["truth"]).ravel())),
+                pred_logamp=np.log(np.abs(np.asarray(raw["prediction"]).ravel())),
+            )
+            result["arrays_npz"] = npz
     # trivial predict-the-mean baseline in standardized space ~ Var(target) ~ 1.0
     result["trivial_mse_prepd"] = 1.0
 
