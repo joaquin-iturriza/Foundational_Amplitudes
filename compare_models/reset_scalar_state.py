@@ -12,7 +12,8 @@ s = pickle.load(open(P, "rb"))
 DYNAMIC = {
     "observations": {}, "diverged_configs": set(), "in_flight": set(),
     "val_loss_history": {}, "proc_val_loss_history": {}, "eval_order": [],
-    "budget_spent": 0, "no_improvement_patience": 0, "best_value_observed": None,
+    "budget_spent": 0, "no_improvement_patience": 0,
+    "best_value_observed": float("-inf"),   # algorithm fresh-init is np.NINF, NOT None
     "extension_count": {},
 }
 before = {k: (len(v) if hasattr(v, "__len__") else v)
