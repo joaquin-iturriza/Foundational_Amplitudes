@@ -34,20 +34,21 @@
   ],
   "encodable": true,
   "val": {
-    "mse_prepd": 0.26660460233688354,
-    "l1_prepd": 0.25401782989501953,
-    "rel_err_mean": 0.5141731608584321,
+    "mse_prepd": 0.26661303639411926,
+    "l1_prepd": 0.2540200650691986,
+    "rel_err_mean": 0.5141882102394528,
     "rel_err_median": 0.06934478311794506,
-    "raw_mse": 0.12206705480434683,
+    "raw_mse": 0.12206707024600953,
     "n_events": 2000
   },
   "test": {
-    "mse_prepd": 0.32206031680107117,
-    "l1_prepd": 0.2845264673233032,
-    "rel_err_mean": 0.6847385917135612,
+    "mse_prepd": 0.3220601975917816,
+    "l1_prepd": 0.28452637791633606,
+    "rel_err_mean": 0.6847385017253942,
     "rel_err_median": 0.07684863944414272,
-    "raw_mse": 0.12076152173787948,
+    "raw_mse": 0.12076153599401745,
     "n_events": 10000
   },
+  "arrays_npz": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/zero_shot/pidzs_short__ee_uu_10-1000GeV_test_amplitudes_arrays.npz",
   "trivial_mse_prepd": 1.0
 }

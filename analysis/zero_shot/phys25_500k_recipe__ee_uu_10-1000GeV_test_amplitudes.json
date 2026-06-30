@@ -12,20 +12,21 @@
   "subsample": 30000,
   "encodable": true,
   "val": {
-    "mse_prepd": 0.33702170848846436,
+    "mse_prepd": 0.3370217978954315,
     "l1_prepd": 0.3125935196876526,
-    "rel_err_mean": 0.5957864735916957,
-    "rel_err_median": 0.17216612365230574,
-    "raw_mse": 0.27671706190728496,
+    "rel_err_mean": 0.595786369992836,
+    "rel_err_median": 0.17216598241824382,
+    "raw_mse": 0.2767170621475907,
     "n_events": 2000
   },
   "test": {
     "mse_prepd": 0.39753419160842896,
     "l1_prepd": 0.343791127204895,
-    "rel_err_mean": 0.718906772832863,
-    "rel_err_median": 0.17215068907268596,
-    "raw_mse": 0.36228557568209,
+    "rel_err_mean": 0.7189067212112397,
+    "rel_err_median": 0.17215065376698208,
+    "raw_mse": 0.362285100510457,
     "n_events": 10000
   },
+  "arrays_npz": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/zero_shot/phys25_500k_recipe__ee_uu_10-1000GeV_test_amplitudes_arrays.npz",
   "trivial_mse_prepd": 1.0
 }
