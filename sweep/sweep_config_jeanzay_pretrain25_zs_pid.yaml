@@ -22,8 +22,8 @@ fixed_params:
   data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25_zs.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
-  data.train_subsample: null
-  data.eval_subsample: null
+  data.train_subsample: 20000
+  data.eval_subsample: 2000
   data.seed: 42
   data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
   data.use_PIDs: 'true'
