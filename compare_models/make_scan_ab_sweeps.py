@@ -45,7 +45,7 @@ BASE_FIXED = {
     "training.save_intermediate": "false",
     "training.validate_every_n_steps": 500,
     "training.dtype": "float32",
-    "plot": "false",
+    "plot": "true",
     "use_mlflow": "false",
 }
 
