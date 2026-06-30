@@ -13,9 +13,9 @@
 #SBATCH --output=zshot_%j.out
 #SBATCH --error=zshot_%j.err
 
-set -euo pipefail
-module load anaconda-py3/2023.09
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+set -uo pipefail
+module load anaconda-py3/2023.09 2>/dev/null || true
+PY=/lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational/bin/python
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
 RUN_DIR="${1:?usage: sbatch run_zero_shot.sh <ckpt_run_dir> <out_label>}"
@@ -24,7 +24,7 @@ OUT=analysis/zero_shot
 
 for DS in ee_uu_91-1000GeV_amplitudes ee_ttbar_346-1000GeV_amplitudes; do
   echo "=== zero-shot: $LABEL on $DS ==="
-  python tools/zero_shot_eval.py \
+  $PY tools/zero_shot_eval.py \
     --ckpt-run-dir "$RUN_DIR" \
     --dataset "$DS" \
     --out "$OUT/${LABEL}__${DS}.json" \
