@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=00:25:00
+#SBATCH --time=00:50:00
 #SBATCH --array=0-2
 #SBATCH --output=compare_models/ab_bestplot_%A_%a.out
 #SBATCH --error=compare_models/ab_bestplot_%A_%a.err
@@ -47,7 +47,6 @@ python run.py model=lloca local=none \
   training.loss_aggregation=geometric_mean training.regularization=L2 \
   training.scheduler=CosineAnnealingLR $HP \
   training.iterations=5000 training.validate_frac=0.02 \
-  training.save_intermediate=true \
   training.get_ID=false training.dtype=float32 use_mlflow=false plot=true \
   exp_name="ab_bestplot_$N" run_dir="$RUNDIR" \
   && echo ">>> $N done; plots in $RUNDIR/plots" || echo ">>> $N FAILED"
