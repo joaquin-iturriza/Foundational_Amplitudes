@@ -46,7 +46,8 @@ python run.py model=lloca local=none \
   training.batchsize=1024 evaluation.batchsize=4096 \
   training.loss_aggregation=geometric_mean training.regularization=L2 \
   training.scheduler=CosineAnnealingLR $HP \
-  training.iterations=5000 training.validate_frac=0.34 \
+  training.iterations=5000 training.validate_frac=0.02 \
+  training.save_intermediate=true \
   training.get_ID=false training.dtype=float32 use_mlflow=false plot=true \
   exp_name="ab_bestplot_$N" run_dir="$RUNDIR" \
   && echo ">>> $N done; plots in $RUNDIR/plots" || echo ">>> $N FAILED"
