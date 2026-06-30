@@ -39,6 +39,7 @@ training:
  clip_grad_norm: 5
  clip_grad_value: null
  max_grad_norm: null
+ diverge_patience: 50         # abort training after this many consecutive non-finite-grad skips
  log_every_n_steps: 1000
  sampler_log_every_n_vals: 10   # log sampler weights every N validation steps (0 = never)
  sampler_alpha_ema: 0.7         # EMA decay applied to per-process val losses before fitting α (0 = no smoothing, 1 = never update)

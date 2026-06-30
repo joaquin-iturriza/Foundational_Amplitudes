@@ -734,6 +734,13 @@ class BaseExperiment:
         smallest_val_loss, smallest_val_loss_step = 1e10, 0
         smallest_val_loss_no_reg = 1e10   # checkpoint selection uses this when available
         patience  = 0
+        # Divergence abort: a sustained run of non-finite-grad skips means the run
+        # has blown up for good. Abort cleanly (and let the result be written with
+        # the bad val_loss) instead of limping to the end and then crashing on a
+        # downstream CUDA index-OOB once a NaN feature feeds a gather/scatter.
+        self._consec_skips     = 0
+        self._diverged         = False
+        self._diverge_patience = self.cfg.training.get("diverge_patience", 50)
         results   = []
         iterator  = iter(self._cycle(self.train_loader))
         avg_iter_time = 0
@@ -810,6 +817,19 @@ class BaseExperiment:
             else:
                 data = next(iterator)
                 self._step(data, step)
+
+            # --- divergence abort ---
+            # A clean exception (not a result file) so a sweep trial takes the same
+            # path as a crash: run_trial imputes an on-scale worst-case penalty into
+            # the surrogate. Writing val_loss directly here could be 1e10 (diverged
+            # before the first validation), which would wreck the GP's scale.
+            if self._diverged:
+                raise RuntimeError(
+                    f"Training diverged: {self._consec_skips} consecutive non-finite-"
+                    f"gradient steps (patience {self._diverge_patience}) at step "
+                    f"{step + 1}. Aborting before a NaN feature can feed a downstream "
+                    f"gather/scatter and crash on a CUDA index-OOB."
+                )
 
             # --- batch-size finder ---
             if self.cfg.find_BS:
@@ -1155,12 +1175,21 @@ class BaseExperiment:
             loss_val = vals[0]
             grad_norm = vals[1]
             lnr_val  = vals[2] if want_lnr else None
-            # NaN/inf guard: replaces the per-step isfinite assert (which synced).
-            # A non-finite loss yields a non-finite grad_norm; skip the update so a
-            # transient blow-up doesn't corrupt the weights (better than crashing).
-            if not math.isfinite(grad_norm):
-                LOGGER.warning(f"Skipping update, non-finite gradient norm {grad_norm}")
-                return
+
+        # NaN/inf guard (BOTH sync paths): replaces the per-step isfinite assert
+        # (which synced). A non-finite loss yields a non-finite grad_norm; skip the
+        # update so a transient blow-up doesn't corrupt the weights (better than
+        # crashing). The blocking path used to fall through this guard — a latent
+        # hole, now closed. Count consecutive skips so a *sustained* divergence
+        # trips self._diverged and train() aborts the run cleanly, before a NaN
+        # feature can feed a downstream gather/scatter and crash on an index-OOB.
+        if not math.isfinite(grad_norm):
+            LOGGER.warning(f"Skipping update, non-finite gradient norm {grad_norm}")
+            self._consec_skips += 1
+            if self._consec_skips >= self._diverge_patience:
+                self._diverged = True
+            return
+        self._consec_skips = 0
 
         if step > MIN_STEP_SKIP and self.cfg.training.max_grad_norm is not None:
             if grad_norm > self.cfg.training.max_grad_norm:
