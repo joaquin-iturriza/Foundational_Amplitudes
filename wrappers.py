@@ -134,7 +134,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  diagrams_dir: str = "data/diagrams", diagram_encoder=None,
                  use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1,
                  virt_standardize: bool = True, virt_clamp: float = 4.0,
-                 virt_mode: str = "edge"):
+                 virt_mode: str = "edge",
+                 diagram_scanned_mass: bool = False):   # read in experiment.init_model; accepted here so Hydra can pass it
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
