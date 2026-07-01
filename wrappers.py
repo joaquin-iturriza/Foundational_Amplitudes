@@ -278,6 +278,12 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._virt_by_pid = list(virt_by_pid)
         self._virt_log_scale = float(log_scale)
         self._virt_mom_div = float(mom_div)   # physical scale: model momenta are /mom_div
+        _pm2 = [vt.get("prop_mass2") for vt in self._virt_by_pid if vt is not None and vt.get("prop_mass2") is not None]
+        if _pm2:
+            import logging as _lg
+            _lg.getLogger("lorentz-gatr").info(
+                f"[diag off-shell] mom_div={self._virt_mom_div:.3f}  "
+                f"prop masses(GeV)={[round(float(m)**0.5,1) for m in _pm2[0].tolist()]}")
         self._virt_standardize = bool(standardize)
         self._virt_clamp = float(clamp)
         self._virt_mode = str(mode)        # "edge" (per-event encode) | "pool" (cached topology + weighted)
