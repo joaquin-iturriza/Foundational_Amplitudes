@@ -1,0 +1,14 @@
+{processes: [{name: ee_mumu_mz00, base: ee_mumu, sqrts: [70.0, 115.0], n_train: 6000,
+      n_val: 1500, n_test: 1500, physics: {masses: {23: 85.0}}}, {name: ee_mumu_mz01,
+      base: ee_mumu, sqrts: [70.0, 115.0], n_train: 6000, n_val: 1500, n_test: 1500,
+      physics: {masses: {23: 86.71}}}, {name: ee_mumu_mz02, base: ee_mumu, sqrts: [
+        70.0, 115.0], n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {
+          23: 88.43}}}, {name: ee_mumu_mz03, base: ee_mumu, sqrts: [70.0, 115.0],
+      n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {23: 90.14}}}, {
+      name: ee_mumu_mz04, base: ee_mumu, sqrts: [70.0, 115.0], n_train: 6000, n_val: 1500,
+      n_test: 1500, physics: {masses: {23: 91.86}}}, {name: ee_mumu_mz05, base: ee_mumu,
+      sqrts: [70.0, 115.0], n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {
+          23: 93.57}}}, {name: ee_mumu_mz06, base: ee_mumu, sqrts: [70.0, 115.0],
+      n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {23: 95.29}}}, {
+      name: ee_mumu_mz07, base: ee_mumu, sqrts: [70.0, 115.0], n_train: 6000, n_val: 1500,
+      n_test: 1500, physics: {masses: {23: 97.0}}}]}
