@@ -204,6 +204,7 @@ class AmplitudeExperiment(BaseExperiment):
 
         specs, names, amp_orders = [], [], []
         couplings_by_pid = []   # per-dataset {order_key: alpha} or None (vertex + scalar features)
+        internal_mass_by_pid = []   # per-dataset [mass for pdg in internal_mass_pdgs] (log-fed scalar)
         base_by_name = {}       # decorated dataset name → underlying mg5/sidecar process
         for p in procs:
             p = OmegaConf.to_container(p, resolve=True) if OmegaConf.is_config(p) else dict(p)
@@ -247,6 +248,15 @@ class AmplitudeExperiment(BaseExperiment):
             if cpl is None and physics is not None:
                 cpl = mg.physics_to_couplings(physics)
             couplings_by_pid.append({str(k): float(v) for k, v in cpl.items()} if cpl else None)
+            # Per-dataset INTERNAL (propagator/resonance) mass values for the
+            # internal_mass_scalars feature: the scanned mass of a mediator that is
+            # NOT an external leg. Falls back to the table mass when unscanned.
+            masses_blk = (physics or {}).get("masses", {}) if physics else {}
+            imrow = []
+            for pdg in getattr(self, "_internal_mass_pdgs", []):
+                v = masses_blk.get(pdg, masses_blk.get(str(pdg)))
+                imrow.append(float(v) if v is not None else float(mg._table_mass(pdg)))
+            internal_mass_by_pid.append(imrow)
 
         # Register any physics-scan / decorated-base datasets into mg.PROCESSES so
         # generation (inline or prebuild) can address them by dataset name.
@@ -254,6 +264,7 @@ class AmplitudeExperiment(BaseExperiment):
 
         self._recipe_specs       = specs
         self._coupling_by_pid    = couplings_by_pid
+        self._internal_mass_by_proc = internal_mass_by_pid
         self._recipe_base_by_name = base_by_name
         with open_dict(self.cfg):
             self.cfg.data.dataset    = names
@@ -327,16 +338,40 @@ class AmplitudeExperiment(BaseExperiment):
             [np.log(cpl[k]) if (k in cpl and cpl[k] > 0) else 0.0
              for k in self.COUPLING_SCALAR_KEYS], dtype=np.float32)
 
+    def _internal_mass_row(self, proc_idx):
+        """Per-event log-mass vector for the configured INTERNAL (propagator/
+        resonance) PDGs — a mass that is NOT an external leg, so it is absent from
+        the momenta and mass_from_momenta cannot recover it (the internal-mass analog
+        of _coupling_scalar_row). Constant within a dataset; length = len(pdgs) when
+        on (0-padded for datasets that don't scan it), length 0 when off."""
+        pdgs = getattr(self, "_internal_mass_pdgs", []) or []
+        if not getattr(self, "_use_internal_mass_scalars", False) or not pdgs:
+            return np.zeros((0,), dtype=np.float32)
+        im = getattr(self, "_internal_mass_by_proc", None) or []
+        row = im[proc_idx] if (proc_idx < len(im) and im[proc_idx]) else None
+        # Center by the table mass: feed log(m / m_table) so the signal is a clean
+        # O(0.1) deviation instead of a ~4.5 constant (well-conditioned; 0 = table).
+        out = []
+        for j, pdg in enumerate(pdgs):
+            m  = float(row[j]) if row else 0.0
+            m0 = float(mg._table_mass(pdg))
+            out.append(float(np.log(m / m0)) if (m > 0 and m0 > 0) else 0.0)
+        return np.array(out, dtype=np.float32)
+
     def _order_row(self, proc_idx, amp_orders):
         """Per-event scalar vector fed as order_labels: the amp_orders powers
         [n_loops, alpha_s_power] optionally extended with the global coupling
-        scalars (data.coupling_scalars). Shared by both data paths so
+        scalars (data.coupling_scalars) and internal-mass scalars
+        (data.internal_mass_scalars). Shared by both data paths so
         n_order_features is identical."""
         base = np.array(amp_orders[proc_idx], dtype=np.float32)
-        return np.concatenate([base, self._coupling_scalar_row(proc_idx)])
+        return np.concatenate([base, self._coupling_scalar_row(proc_idx),
+                               self._internal_mass_row(proc_idx)])
 
     def init_data(self):
         self._use_coupling_scalars = bool(self.cfg.data.get("coupling_scalars", False))
+        self._use_internal_mass_scalars = bool(self.cfg.data.get("internal_mass_scalars", False))
+        self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
 
