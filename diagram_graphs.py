@@ -454,6 +454,7 @@ def build_process_virtuality(pd, slot_pdgs, n_initial, mass_override=None, offsh
         "j_idx": j_idx,
         "edge_prop": edge_prop,
         "prop_mass2": prop_mass2,                           # (K,) physical GeV²
+        "prop_pdgs": list(prop_pdgs),                       # (K,) propagator PDG per edge
         "n_part": n_part,
         "D": pd.n_diagrams,
         "N": pd.node_feat.shape[1],

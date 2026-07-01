@@ -84,6 +84,14 @@ data:
  # kinematic×mass interaction for the model, to test whether that interaction (not
  # the info) is what a plain internal-mass scalar can't learn. Needs internal_mass_scalars.
  resonance_per_event: false
+ # Production internal-mass conditioning: fill the internal_mass slot PER-EVENT with the
+ # propagator OFF-SHELLNESS s_prop − M² fed DIRECTLY to the main transformer (not through
+ # the diagram encoder, which dilutes it). Generalizes resonance_per_event's proven
+ # s-channel √s−M result to arbitrary propagator topology via the diagram masks +
+ # scanned propagator masses: one column per internal_mass_pdgs entry, the nearest-pole
+ # propagator of that PDG; signed-log + unit-std. Needs internal_mass_scalars + a diagram
+ # sidecar per process. Takes precedence over resonance_per_event when both are on.
+ offshell_per_event: false
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
  #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]

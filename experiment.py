@@ -387,6 +387,7 @@ class AmplitudeExperiment(BaseExperiment):
         self._use_internal_mass_scalars = bool(self.cfg.data.get("internal_mass_scalars", False))
         self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         self._resonance_per_event = bool(self.cfg.data.get("resonance_per_event", False))
+        self._offshell_per_event = bool(self.cfg.data.get("offshell_per_event", False))
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
 
@@ -708,6 +709,72 @@ class AmplitudeExperiment(BaseExperiment):
             if os.path.exists(p):
                 return p
         return None
+
+    def _setup_offshell_masks(self, names):
+        """Per-process propagator masks for the DIRECT off-shellness feature.
+
+        Returns a list aligned with ``names``; each entry is
+        ``{pdg: [(mask (n_part,) float64 signed, M² float)]}`` for every internal
+        propagator carrying one of ``self._internal_mass_pdgs``, or None where the
+        process has no diagram sidecar / unmappable legs. The mask contracts with the
+        event's per-slot momenta to give s_prop=(Σ sign·p)²; off-shellness = s_prop−M².
+        Built once (topology is per-process, not per-event) and applied in the
+        assembly loop. Independent of the diagram encoder (use_diagrams): this feeds
+        the main transformer directly, which is where the signal survives."""
+        from diagram_graphs import build_process_diagrams, build_process_virtuality
+        from particle_ids import build_property_matrix
+        pdgs = [int(p) for p in (self._internal_mass_pdgs or [])]
+        if not pdgs:
+            return None
+        diagrams_dir = self.cfg.model.get("diagrams_dir", "data/diagrams")
+        if not os.path.isabs(diagrams_dir):
+            diagrams_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), diagrams_dir)
+        prop_matrix, _ = build_property_matrix(
+            spin_onehot=bool(self.cfg.data.get("spin_onehot", False)),
+            color_onehot=bool(self.cfg.data.get("color_onehot", False)),
+            is_massless=bool(self.cfg.data.get("prop_is_massless", True)),
+            standardize=bool(self.cfg.data.get("standardize_props", True)),
+        )
+        k_pe = int((self.cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8))
+        slot_map = getattr(self, "_slot_pdgs_by_name", {})
+        imp = getattr(self, "_internal_mass_by_proc", None)
+        by_proc, n_ok = [], 0
+        for i, name in enumerate(names):
+            slot_pdgs = slot_map.get(name)
+            path = self._resolve_diagram_path(diagrams_dir, name)
+            if path is None or slot_pdgs is None:
+                by_proc.append(None); continue
+            pd = build_process_diagrams(path, prop_matrix, k_pe=k_pe)
+            n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
+            # scanned propagator masses for this dataset → the pole is at the SCANNED M²
+            mo = {pdg: float(imp[i][j]) for j, pdg in enumerate(pdgs)} \
+                if (imp and i < len(imp) and imp[i]) else None
+            vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial,
+                                          mass_override=mo, offshell=True)
+            if vt is None:
+                by_proc.append(None); continue
+            mask = vt["mask"].numpy().astype(np.float64)   # (K, n_part)
+            m2   = vt["prop_mass2"].numpy()                # (K,)
+            ppdg = list(vt["prop_pdgs"])                   # (K,)
+            sel = {}
+            for pdg in pdgs:
+                uniq = []
+                for k in range(len(ppdg)):
+                    # MadGraph orients self-conjugate propagators arbitrarily (−23 Z,
+                    # −22 γ), so match on |pdg| (same canonicalisation as _phys_mass).
+                    if abs(ppdg[k]) != abs(pdg):
+                        continue
+                    mrow, mm = mask[k], float(m2[k])
+                    # collapse identical propagators shared across diagrams (same
+                    # s-channel edge appears once per diagram → one physical value)
+                    if not any(np.array_equal(mrow, u[0]) and mm == u[1] for u in uniq):
+                        uniq.append((mrow, mm))
+                sel[pdg] = uniq
+            by_proc.append(sel)
+            n_ok += 1
+        LOGGER.info(f"offshell_per_event: built propagator masks for {n_ok}/{len(names)} "
+                    f"processes, pdgs {pdgs}")
+        return by_proc
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
                                 is_massless, standardize, build_virtuality=False,
@@ -1136,8 +1203,14 @@ class AmplitudeExperiment(BaseExperiment):
         role_amp, role_pid, role_order = [], [], []
         role_resarg = []   # per-event resonance arg (√s − m), when resonance_per_event
         role_counts = {}
+        # Production off-shellness feed (s_prop − M², direct) takes precedence over the
+        # s-channel √s−m diagnostic when both are on.
+        _want_offshell = (self._offshell_per_event and self._use_internal_mass_scalars
+                          and bool(self._internal_mass_pdgs))
         _want_resarg = (self._resonance_per_event and self._use_internal_mass_scalars
-                        and bool(self._internal_mass_pdgs))
+                        and bool(self._internal_mass_pdgs) and not _want_offshell)
+        offshell_masks = self._setup_offshell_masks(names) if _want_offshell else None
+        role_offshell = []   # per-event propagator off-shellness (s_prop − M²)
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
@@ -1145,6 +1218,7 @@ class AmplitudeExperiment(BaseExperiment):
             ds_parts, ds_toks = [], []
             ev_starts, ev_pid, ev_order, amp_blocks = [], [], [], []
             ev_resarg = []
+            ev_offshell = []
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
@@ -1172,6 +1246,31 @@ class AmplitudeExperiment(BaseExperiment):
                     mz = self._internal_mass_by_proc[proc_idx]              # [m_pdg...]
                     ev_resarg.append(np.stack([roots - float(m) for m in mz], axis=1
                                               ).astype(np.float32))          # (N, n_pdg)
+                if _want_offshell:
+                    # Per-event propagator off-shellness s_prop − M², one column per
+                    # internal_mass_pdgs entry. mask contracts the event momenta into
+                    # the propagator 4-momentum (physical = /mom_div × mom_div); the
+                    # nearest-pole propagator (min |s−M²|) dominates when a PDG appears
+                    # in several channels. Columns for PDGs absent from the process stay
+                    # 0 (the on-arm state), so mixed process sets share one width.
+                    n_pdg = len(self._internal_mass_pdgs)
+                    cols  = np.zeros((N, n_pdg), dtype=np.float64)
+                    sel   = offshell_masks[proc_idx] if offshell_masks is not None else None
+                    if sel is not None:
+                        pp = parts.astype(np.float64)                        # (N,P,4), /mom_div
+                        for c, pdg in enumerate(self._internal_mass_pdgs):
+                            props = sel.get(pdg, [])
+                            if not props:
+                                continue
+                            offs = []
+                            for mrow, mm in props:
+                                q = np.einsum("s,nsc->nc", mrow, pp) * mom_div   # (N,4) physical
+                                s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                                offs.append(s_prop - mm)                        # (N,)
+                            offs = np.stack(offs, axis=1)                       # (N, n_props)
+                            idx  = np.argmin(np.abs(offs), axis=1)
+                            cols[:, c] = offs[np.arange(N), idx]
+                    ev_offshell.append(cols.astype(np.float32))
                 part_base += N * P
 
             starts = np.concatenate(ev_starts)
@@ -1190,6 +1289,8 @@ class AmplitudeExperiment(BaseExperiment):
             role_order.append(order[perm])
             if _want_resarg:
                 role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
+            if _want_offshell:
+                role_offshell.append(np.concatenate(ev_offshell, axis=0)[perm])
             role_counts[role] = offs.shape[0]
 
         # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
@@ -1213,6 +1314,22 @@ class AmplitudeExperiment(BaseExperiment):
             self.all_order_labels[:, -n_pdg:] = resarg
             LOGGER.info(f"resonance_per_event ON: internal-mass slot ({n_pdg} col) filled "
                         f"per-event with standardized (√s − m) for pdgs {self._internal_mass_pdgs}")
+        if _want_offshell:
+            # Replace the internal-mass slot with the PER-EVENT propagator off-shellness
+            # s_prop − M², fed DIRECTLY here (not via the diagram encoder, which dilutes
+            # it). s−M² is wide/bimodal (±thousands of GeV²), so signed-log compress then
+            # unit-std per column — matching the diagram-virtuality treatment. This is the
+            # general form of the proven s-channel reson result.
+            osh = np.concatenate(role_offshell, axis=0).astype(np.float64)
+            osh = np.sign(osh) * np.log1p(np.abs(osh))
+            mu, sd = osh.mean(0), osh.std(0)
+            sd[sd < 1e-8] = 1.0
+            osh = ((osh - mu) / sd).astype(np.float32)
+            n_pdg = len(self._internal_mass_pdgs)
+            self.all_order_labels[:, -n_pdg:] = osh
+            LOGGER.info(f"offshell_per_event ON: internal-mass slot ({n_pdg} col) filled "
+                        f"per-event with signed-log-standardized (s−M²) for pdgs "
+                        f"{self._internal_mass_pdgs}")
         self.n_order_features = n_order_features
         self.N_events         = self.offsets.shape[0]
         self._role_counts     = (role_counts["train"], role_counts["val"],
