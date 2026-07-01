@@ -205,6 +205,9 @@ class AmplitudeExperiment(BaseExperiment):
         specs, names, amp_orders = [], [], []
         couplings_by_pid = []   # per-dataset {order_key: alpha} or None (vertex + scalar features)
         internal_mass_by_pid = []   # per-dataset [mass for pdg in internal_mass_pdgs] (log-fed scalar)
+        # Read straight from cfg (this runs in init_physics, before init_data sets the
+        # attribute) so the extraction below is always populated, like couplings.
+        self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         base_by_name = {}       # decorated dataset name → underlying mg5/sidecar process
         for p in procs:
             p = OmegaConf.to_container(p, resolve=True) if OmegaConf.is_config(p) else dict(p)
