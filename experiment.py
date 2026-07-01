@@ -654,6 +654,9 @@ class AmplitudeExperiment(BaseExperiment):
                     is_massless=is_massless, standardize=standardize,
                     build_virtuality=self._use_diag_virt,
                     couplings_by_pid=getattr(self, "_coupling_by_pid", None),
+                    internal_mass_by_pid=getattr(self, "_internal_mass_by_proc", None),
+                    internal_mass_pdgs=getattr(self, "_internal_mass_pdgs", None),
+                    scanned_mass=bool(self.cfg.model.get("diagram_scanned_mass", False)),
                 )
                 n_scalars += self._d_diag
                 LOGGER.info(
@@ -708,7 +711,9 @@ class AmplitudeExperiment(BaseExperiment):
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
                                 is_massless, standardize, build_virtuality=False,
-                                couplings_by_pid=None):
+                                couplings_by_pid=None,
+                                internal_mass_by_pid=None, internal_mass_pdgs=None,
+                                scanned_mass=False):
         """Load each process's diagram graphs into ``self._diag_pd_by_pid`` (indexed
         by process_id == position in ``data.dataset``). The property matrix uses the
         SAME smart-encoding flags as the particle encoder, so diagram particles ride
@@ -741,6 +746,41 @@ class AmplitudeExperiment(BaseExperiment):
         use_couplings = bool(couplings_by_pid) and any(c for c in couplings_by_pid)
         empty_coupl = {} if use_couplings else None   # {} → columns present, all 0
 
+        # Scanned internal (propagator) mass: build a per-dataset property-matrix copy
+        # with the SCANNED mass in the propagator's mass column, so its diagram
+        # propagator edge carries the scanned value (not the stale table mass). With
+        # Tier-B virtuality on the same edge, the encoder can form the propagator
+        # off-shellness locally. Off (default) → the frozen table mass, as before.
+        im_by_pid = internal_mass_by_pid or []
+        im_pdgs   = [int(p) for p in (internal_mass_pdgs or [])]
+        mass_spec = None
+        if scanned_mass and im_pdgs and any(im_by_pid):
+            from particle_ids import mass_feature_spec, GLOBAL_PDG_IDX
+            mass_spec = mass_feature_spec(spin_onehot=spin_onehot, color_onehot=color_onehot,
+                                          is_massless=is_massless, standardize=standardize)
+
+        def _encode_mass(m):
+            s = mass_spec
+            lm = np.log10(max(float(m), 10.0 ** s["floor_log10"]))
+            if s["neutralize_log10"] is not None and lm < s["threshold_log10"]:
+                lm = s["neutralize_log10"]
+            if s["std_mu"] is not None:
+                lm = (lm - s["std_mu"]) / s["std_sd"]
+            return float(lm)
+
+        def _prop_matrix_for(i):
+            if mass_spec is None:
+                return prop_matrix
+            row = im_by_pid[i] if i < len(im_by_pid) else None
+            if not row:
+                return prop_matrix
+            pm = prop_matrix.copy()
+            for j, pdg in enumerate(im_pdgs):
+                idx = GLOBAL_PDG_IDX.get(pdg)
+                if idx is not None:
+                    pm[idx, mass_spec["mass_col"]] = _encode_mass(row[j])
+            return pm
+
         pd_by_pid, missing = [], []
         for i, name in enumerate(names):
             path = self._resolve_diagram_path(diagrams_dir, name)
@@ -750,8 +790,11 @@ class AmplitudeExperiment(BaseExperiment):
                 continue
             cpl = (couplings_by_pid[i] if couplings_by_pid else None) or empty_coupl
             pd_by_pid.append(build_process_diagrams(
-                path, prop_matrix, k_pe=k_pe, max_diagrams=max_diagrams,
+                path, _prop_matrix_for(i), k_pe=k_pe, max_diagrams=max_diagrams,
                 couplings=cpl))
+        if mass_spec is not None:
+            LOGGER.info(f"Diagram scanned-mass ON: propagator mass column overridden "
+                        f"per-dataset for pdgs {im_pdgs}")
 
         self._diag_pd_by_pid = pd_by_pid
         self._diag_feature_dims = feature_dims(

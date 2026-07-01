@@ -16,6 +16,11 @@ particle_encoder_hidden: 32  # >0 → 2-layer MLP encoder (Linear→GELU→Linea
 # into the scalar features exactly like the coupling-order labels (equivariant: E is
 # a Lorentz scalar). Needs data/diagrams/<process>.diagrams.json (tools/dump_diagrams.py).
 use_diagrams: false
+diagram_scanned_mass: false    # override the propagator's mass column per-dataset with the
+                               # SCANNED internal mass (data.internal_mass_pdgs), so a mass
+                               # scan reaches the diagram (else the table mass is stale). With
+                               # use_diagram_virtuality, the encoder gets scanned-mass + per-event
+                               # virtuality on the SAME propagator edge (local off-shellness).
 use_diagram_virtuality: false  # Tier B: feed per-event propagator virtuality s=(Σp)² on
                                # internal edges (requires use_diagrams). The pole structure
                                # 1/(s-m²); per-event, so slower than the static topology embed.
