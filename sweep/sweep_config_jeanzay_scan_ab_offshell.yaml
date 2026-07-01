@@ -46,7 +46,7 @@ fixed_params:
   model.use_diagrams: 'false'
   data.internal_mass_scalars: 'true'
   data.offshell_per_event: 'true'
-  data.internal_mass_pdgs: '[23]'
+  data.internal_mass_pdgs: '[23,6,25]'
 paths:
   project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/scan_ab

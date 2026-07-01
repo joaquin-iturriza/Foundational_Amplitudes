@@ -25,7 +25,7 @@ ARMS = {
     "offshell": {"data.mass_from_momenta": "true", "data.coupling_scalars": "true",
                  "model.use_diagrams": "false",
                  "data.internal_mass_scalars": "true", "data.offshell_per_event": "true",
-                 "data.internal_mass_pdgs": "[23]"},
+                 "data.internal_mass_pdgs": "[23,6,25]"},   # s-channel Z + exotic top, Higgs
 }
 
 BASE_FIXED = {
