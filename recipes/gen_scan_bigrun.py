@@ -42,7 +42,16 @@ _MCOL = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
 HEAVY = {6, 15, 25}
 # Extra base processes (not in the LO recipe) added purely for a clean mass scan.
 EXTRA_LO = [{"name": "ee_ttbar", "sqrts": [400, 1000]}]   # MT scan (top threshold)
-ALPHA_S_RANGE  = (0.09, 0.15)
+# Widened from (0.09, 0.15): the coupling capability tests showed the α feature
+# earns its keep ∝ (α range) × (running steepness). A wide α range makes the
+# per-dataset baseline change the per-event *shape* (via running) enough to survive
+# per-dataset standardization instead of being a removed offset.
+ALPHA_S_RANGE  = (0.05, 0.25)
+# Extend QCD (alphas_power>0) processes' √s_min down into the steep-running region
+# (α_s runs hard at low μ) so the running-shape — the part the coupling feature can
+# actually resolve under per-dataset standardization — is non-negligible. Massless
+# QCD drops to here; massive finals keep their (higher) kinematic threshold.
+RUNNING_SQRTS_MIN = 25.0
 # α_ew is NOT scanned: it is a per-dataset CONSTANT multiplier on |M|^2 (it does not
 # run per event), so in log-amplitude it is a constant offset that per-dataset
 # preprocessing removes — no learnable per-event signal. Only the per-event knobs
@@ -100,6 +109,19 @@ def scan_sqrts(base, base_sqrts, physics):
     return [max(smin, round(1.05 * thr)), smax]
 
 
+def running_floor(base, sqrts):
+    """For QCD processes, extend √s_min down to RUNNING_SQRTS_MIN (never below a
+    massive final's threshold) so events cover the steep-running region. No-op for
+    pure-EW processes (alphas_power==0) and for anything already below the floor."""
+    cfg = mg.PROCESSES.get(base, {})
+    if cfg.get("alphas_power", 0) <= 0:
+        return sqrts
+    finals = list(cfg.get("pdg_ids", []))[2:]
+    thr = sum(phys_mass(p) for p in finals)
+    new_min = max(1.05 * thr, min(float(sqrts[0]), RUNNING_SQRTS_MIN))
+    return [round(new_min), float(sqrts[1])]
+
+
 def entry(name, base, sqrts, physics, n):
     e = {"name": name, "sqrts": list(sqrts),
          "n_train": n[0], "n_val": n[1], "n_test": n[2]}
@@ -141,8 +163,13 @@ def main():
             n_lo += 1; n_anchor += 1
             continue
         for i, phys in enumerate(pts):
-            # mass-scan points may need a higher √s_min to clear the shifted threshold
-            sq = scan_sqrts(base, sqrts, phys) if phys.get("masses") else sqrts
+            if phys.get("masses"):
+                # mass-scan points need a higher √s_min to clear the shifted threshold
+                sq = scan_sqrts(base, sqrts, phys)
+            else:
+                # pure-coupling QCD points: extend √s_min DOWN into the steep-running
+                # region so the α feature carries real per-event shape (no-op for EW)
+                sq = running_floor(base, sqrts)
             procs.append(entry(f"{base}__s{i:02d}", base, sq, phys, lo_n))
             n_lo += 1
 
