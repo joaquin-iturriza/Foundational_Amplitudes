@@ -26,39 +26,28 @@ import mg5_pipeline_final as mg
 from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS
 
 _MCOL = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
-# Scannable masses = direct SLHA param_card MASS-block INPUTS that also appear as
-# EXTERNAL finals (so the data-derived mass reads the scanned value from momenta):
-# b(5), t(6), tau(15), Z(23), H(25). The W mass (24) is a DEPENDENT parameter
-# (derived from MZ/Gf/aEW), not a settable input, so it is excluded — W-final
-# processes (WW, WWa) get no mass scan and become anchors.
-# Scannable masses: only those that (a) genuinely enter the matrix element and
-# (b) are tree-level "clean" — i.e. patching them in the param_card does NOT leave
-# stale EW-dependent parameters in the ME. That is MT(6), MTA(15), MH(25): each is
-# an external final whose mass enters the spinor/propagator while the params it
-# would otherwise feed (Yukawas, Higgs self-coupling) don't appear at tree level.
-# EXCLUDED: MZ(23) is the EW master input (changing it must recompute MW/couplings —
-# a copied/patched standalone is inconsistent); MW is dependent; light quarks
-# (u/d/s/c/b) are massless in the 5-flavour ME so their mass does nothing.
-HEAVY = {6, 15, 25}
-# Extra base processes (not in the LO recipe) added purely for a clean mass scan.
-EXTRA_LO = [{"name": "ee_ttbar", "sqrts": [400, 1000]}]   # MT scan (top threshold)
+# EXTERNAL-mass scanning was DROPPED: a final-state mass shifts the whole |M|² by a
+# per-dataset amount that per-dataset standardization removes — no learnable per-event
+# signal (same conclusion as α_ew below). The internal-propagator mass IS scanned
+# (Z block below): being s-channel/internal, it is hidden from the momenta, so its
+# off-shellness is genuine per-event info.
 # Widened from (0.09, 0.15): the coupling capability tests showed the α feature
 # earns its keep ∝ (α range) × (running steepness). A wide α range makes the
 # per-dataset baseline change the per-event *shape* (via running) enough to survive
 # per-dataset standardization instead of being a removed offset.
 ALPHA_S_RANGE  = (0.05, 0.25)
-# Extend QCD (alphas_power>0) processes' √s_min down into the steep-running region
-# (α_s runs hard at low μ) so the running-shape — the part the coupling feature can
-# actually resolve under per-dataset standardization — is non-negligible. Massless
-# QCD drops to here; massive finals keep their (higher) kinematic threshold.
-RUNNING_SQRTS_MIN = 25.0
+# Single COMMON √s floor for every LO dataset (anchors AND coupling scans): span from
+# a shared minimum (clamped up only by the final-state kinematic threshold) to 1000, so
+# the LO set is kinematically uniform. Low enough to cover the steep α_s-running region
+# for QCD and to keep the light-EW anchors wide. Threshold-limited finals (dibosons,
+# etc.) start just above 2·m as before.
+LO_SQRTS_MIN = 25.0
+LO_SQRTS_MAX = 1000.0
 # α_ew is NOT scanned: it is a per-dataset CONSTANT multiplier on |M|^2 (it does not
 # run per event), so in log-amplitude it is a constant offset that per-dataset
-# preprocessing removes — no learnable per-event signal. Only the per-event knobs
-# are scanned: α_s(√s) (runs with energy) and masses (move thresholds/resonances).
+# preprocessing removes — no learnable per-event signal. Only the per-event knobs are
+# scanned: α_s(√s) (runs with energy) and the INTERNAL Z mass (moves the s-channel pole).
 N_ALPHAS = 48                      # α_s points per QCD process (free: shares backend)
-N_MASS   = 8                       # distinct mass values per massive process (each = 1 LO compile)
-MASS_LO, MASS_HI = 0.85, 1.15      # multiplicative mass-scan range
 
 # --- Internal-propagator (Z) mass scan + resonance-dense sampling ------------------
 # The s-channel Z is INTERNAL in ee→ffbar neutral-current: its mass is HIDDEN from the
@@ -73,8 +62,8 @@ MASS_LO, MASS_HI = 0.85, 1.15      # multiplicative mass-scan range
 # MadGraph re-derives the EW sector from the patched card — the scan is consistent.
 ZSCAN_PROCS = ["ee_mumu", "ee_tautau", "ee_ddbar", "ee_bbbar", "ee_nnbar"]
 Z_PDG       = 23
-N_MZ        = 8
-MZ_FACTORS  = np.linspace(0.88, 1.12, N_MZ)   # ~[80,102] GeV around M_Z=91.19 (incl. ≈physical)
+N_MZ        = 12
+MZ_FACTORS  = np.linspace(0.75, 1.25, N_MZ)   # ~[68,114] GeV around M_Z=91.19 (incl. ≈physical)
 ZWIN_LO, ZWIN_HI = 0.78, 1.28                 # √s window = [lo,hi]×M_Z_scanned (dense pole bracket)
 
 
@@ -96,55 +85,24 @@ def phys_mass(pdg):
 
 def lo_points(name, rng):
     """Scan points (list of physics dicts) for one LO process. Empty list ⇒ the
-    process has no per-event scan axis (pure-EW massless) → emit a single anchor.
+    process has no per-event scan axis (pure-EW) → emit a single anchor.
 
-    α_s axis (QCD processes): N_ALPHAS samples, backend shared (no recompile).
-    mass axis (heavy externals): N_MASS distinct mass factors, each its own LO
-    compile; for a QCD+massive process α_s is resampled at each mass value."""
+    α_s axis (QCD processes only): N_ALPHAS samples, backend shared (no recompile).
+    External-mass scanning was dropped (per-dataset offset removed by standardization)."""
     cfg = mg.PROCESSES[name]
-    has_qcd = cfg.get("alphas_power", 0) > 0
-    finals = [abs(p) for p in cfg["pdg_ids"][2:]]
-    massive = sorted({p for p in finals if p in HEAVY and phys_mass(p) > 0})
-
-    pts = []
-    if massive:
-        factors = np.linspace(MASS_LO, MASS_HI, N_MASS)
-        as_per = max(1, N_ALPHAS // N_MASS) if has_qcd else 1
-        for f in factors:
-            masses = {int(p): round(phys_mass(p) * float(f), 4) for p in massive}
-            for _ in range(as_per):
-                phys = {"masses": masses}
-                if has_qcd:
-                    phys["alpha_s"] = round(float(rng.uniform(*ALPHA_S_RANGE)), 4)
-                pts.append(phys)
-    elif has_qcd:
-        for _ in range(N_ALPHAS):
-            pts.append({"alpha_s": round(float(rng.uniform(*ALPHA_S_RANGE)), 4)})
-    return pts
-
-
-def scan_sqrts(base, base_sqrts, physics):
-    """Raise sqrts_min so the (possibly mass-shifted) final state is above threshold:
-    sum of final-state masses (scanned override or table value) × 1.05. A heavier
-    scanned mass needs a higher minimum √s."""
-    smin, smax = float(base_sqrts[0]), float(base_sqrts[1])
-    masses = (physics or {}).get("masses", {})
-    finals = mg.PROCESSES[base]["pdg_ids"][2:]
-    thr = sum(masses.get(abs(int(p)), phys_mass(p)) for p in finals)
-    return [max(smin, round(1.05 * thr)), smax]
-
-
-def running_floor(base, sqrts):
-    """For QCD processes, extend √s_min down to RUNNING_SQRTS_MIN (never below a
-    massive final's threshold) so events cover the steep-running region. No-op for
-    pure-EW processes (alphas_power==0) and for anything already below the floor."""
-    cfg = mg.PROCESSES.get(base, {})
     if cfg.get("alphas_power", 0) <= 0:
-        return sqrts
+        return []
+    return [{"alpha_s": round(float(rng.uniform(*ALPHA_S_RANGE)), 4)} for _ in range(N_ALPHAS)]
+
+
+def lo_sqrts(base):
+    """Common LO √s range for EVERY LO process (anchors AND coupling scans): span from
+    the shared floor LO_SQRTS_MIN (raised only to clear the final-state kinematic
+    threshold, 1.05·Σm) up to LO_SQRTS_MAX, so the LO set is kinematically uniform."""
+    cfg = mg.PROCESSES.get(base, {})
     finals = list(cfg.get("pdg_ids", []))[2:]
     thr = sum(phys_mass(p) for p in finals)
-    new_min = max(1.05 * thr, min(float(sqrts[0]), RUNNING_SQRTS_MIN))
-    return [round(new_min), float(sqrts[1])]
+    return [round(max(1.05 * thr, LO_SQRTS_MIN)), round(LO_SQRTS_MAX)]
 
 
 def entry(name, base, sqrts, physics, n):
@@ -178,23 +136,19 @@ def main():
 
     procs = []
     # --- LO scan -----------------------------------------------------------
-    lo = yaml.safe_load(open(args.lo_recipe))["processes"] + EXTRA_LO
+    # Every LO process spans the SAME √s range (lo_sqrts, clamped up by threshold):
+    # anchors and coupling scans alike. QCD procs additionally get an α_s scan.
+    lo = yaml.safe_load(open(args.lo_recipe))["processes"]
     n_lo = n_anchor = 0
     for p in lo:
-        base, sqrts = p["name"], p["sqrts"]
+        base = p["name"]
+        sq = lo_sqrts(base)
         pts = lo_points(base, rng)
-        if not pts:                       # pure-EW massless → single anchor (no scan)
-            procs.append(entry(base, base, sqrts, None, lo_n))
+        if not pts:                       # pure-EW → single anchor (no per-event scan)
+            procs.append(entry(base, base, sq, None, lo_n))
             n_lo += 1; n_anchor += 1
             continue
-        for i, phys in enumerate(pts):
-            if phys.get("masses"):
-                # mass-scan points need a higher √s_min to clear the shifted threshold
-                sq = scan_sqrts(base, sqrts, phys)
-            else:
-                # pure-coupling QCD points: extend √s_min DOWN into the steep-running
-                # region so the α feature carries real per-event shape (no-op for EW)
-                sq = running_floor(base, sqrts)
+        for i, phys in enumerate(pts):    # QCD: α_s scan, all points share lo_sqrts
             procs.append(entry(f"{base}__s{i:02d}", base, sq, phys, lo_n))
             n_lo += 1
 
@@ -229,11 +183,14 @@ def main():
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     header = (f"# Auto-generated by recipes/gen_scan_bigrun.py (seed={args.seed}).\n"
-              f"# {n_lo} LO ({n_anchor} anchors + {n_lo - n_anchor} scanned) + {n_zscan} Z-mass"
+              f"# {n_lo} LO ({n_anchor} anchors + {n_lo - n_anchor} α_s-scanned) + {n_zscan} Z-mass"
               f" + {n_nlo} NLO.\n"
-              f"# Scan axes: alpha_s(running) on QCD procs, masses on heavy externals,\n"
-              f"#            INTERNAL M_Z (s-channel, hidden) on {len(ZSCAN_PROCS)} neutral-current\n"
-              f"#            procs with resonance-dense √s windows (pdg 23).\n"
+              f"# Scan axes: alpha_s(running) on QCD procs; INTERNAL M_Z (s-channel, hidden)\n"
+              f"#            on {len(ZSCAN_PROCS)} neutral-current procs × {N_MZ} masses "
+              f"(~[68,114] GeV) with\n"
+              f"#            resonance-dense √s windows (pdg 23). External-mass scan DROPPED\n"
+              f"#            (per-dataset offset, removed by standardization). All LO share one\n"
+              f"#            √s range [{int(LO_SQRTS_MIN)},{int(LO_SQRTS_MAX)}] (clamped up by threshold).\n"
               f"# Run with: data.mass_from_momenta=true data.coupling_scalars=true\n"
               f"#           data.offshell_per_event=true data.internal_mass_scalars=true\n"
               f"#           data.internal_mass_pdgs=[23]  (offshell arm)\n"
