@@ -42,9 +42,11 @@ fixed_params:
   plot: 'true'
   use_mlflow: 'false'
   data.mass_from_momenta: 'true'
-  data.coupling_scalars: 'false'
-  model.use_diagrams: 'true'
-  model.d_diag: 32
+  data.coupling_scalars: 'true'
+  model.use_diagrams: 'false'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.internal_mass_pdgs: '[23]'
 paths:
   project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/scan_ab
@@ -52,7 +54,7 @@ paths:
   - module load anaconda-py3/2023.09
   - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
   - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-sweep_name: scan_ab_diagram
+sweep_name: scan_ab_offshell
 range_extension:
   enabled: false
 search_space:

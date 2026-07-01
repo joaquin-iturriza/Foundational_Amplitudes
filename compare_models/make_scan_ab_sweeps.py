@@ -18,6 +18,14 @@ ARMS = {
                 "model.use_diagrams": "false"},
     "diagram": {"data.mass_from_momenta": "true",  "data.coupling_scalars": "false",
                 "model.use_diagrams": "true", "model.d_diag": 32},
+    # scalar arm + the INTERNAL-mass propagator off-shellness (s−M_Z², direct feed).
+    # Isolates the marginal value of the internal-mass lever on top of scalar:
+    # best(offshell) vs best(scalar) on val_loss_no_reg. Uses the Z-mass-scan datasets
+    # in scan_bigrun.yaml where s−M_Z² is genuinely new info (M_Z hidden, s-channel).
+    "offshell": {"data.mass_from_momenta": "true", "data.coupling_scalars": "true",
+                 "model.use_diagrams": "false",
+                 "data.internal_mass_scalars": "true", "data.offshell_per_event": "true",
+                 "data.internal_mass_pdgs": "[23]"},
 }
 
 BASE_FIXED = {
