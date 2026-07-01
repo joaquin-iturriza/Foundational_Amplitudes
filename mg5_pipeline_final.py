@@ -440,6 +440,17 @@ PROCESSES = {
         "pdg_ids": [11, -11, 24, -24, 23],
         "m_finals": [80.419, 80.419, 91.1880],  # mW, mW, mZ (GeV)
     },
+    # Resonant-INTERNAL-propagator processes for the offshell mass lever: the scanned
+    # particle is an intermediate that decays to the final state (hidden pole), so its
+    # mass (a FREE param_card input) is genuinely new per-event info via s_prop − M².
+    "ee_wwbb": {   # top: ee→tt̄→W⁺W⁻bb̄, internal t/t̄ propagators resonate at M(Wb)≈MT
+        "mg5_generate": ["generate e+ e- > w+ w- b b~"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 24, -24, 5, -5],
+        "m_finals": [80.419, 80.419, 0.0, 0.0],  # mW, mW, mb=0 (5F); top is internal
+    },
     # ------------------------------------------------------------------
     # Foundation pretraining set (25 e+e- processes, tree-level LO).
     # Deliberately excludes ee_uu / ee_ttbar (their NLO versions are the
