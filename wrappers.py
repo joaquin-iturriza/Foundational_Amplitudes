@@ -258,7 +258,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.use_diagrams = True
 
     def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1,
-                                 standardize=True, clamp=4.0, mode="edge"):
+                                 standardize=True, clamp=4.0, mode="edge", mom_div=1.0):
         """Enable Tier B: per-event propagator virtualities (call after
         setup_diagram_conditioning). ``virt_by_pid`` is a list indexed by process_id
         of the precompute dicts from diagram_graphs.build_process_virtuality (or None
@@ -277,6 +277,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         ONE batched encoder call (see _diagram_features_virtuality)."""
         self._virt_by_pid = list(virt_by_pid)
         self._virt_log_scale = float(log_scale)
+        self._virt_mom_div = float(mom_div)   # physical scale: model momenta are /mom_div
         self._virt_standardize = bool(standardize)
         self._virt_clamp = float(clamp)
         self._virt_mode = str(mode)        # "edge" (per-event encode) | "pool" (cached topology + weighted)
@@ -353,6 +354,13 @@ class AmplitudeLLoCaWrapper(nn.Module):
                 mom = fourmomenta[gather]                               # (E_p, n_part, 4)
                 p_prop = torch.einsum("kn,enc->ekc", vt["mask"], mom)   # (E_p, K, 4)
                 s = p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)
+                # Off-shellness s − m² (the propagator pole variable 1/(s−m²)),
+                # rather than raw s: converts s to physical GeV² (momenta are /mom_div)
+                # and subtracts each propagator's (scanned) mass². Massless props (m=0)
+                # → unchanged. This is the resonance-aware Tier-B feature.
+                pm2 = vt.get("prop_mass2")
+                if pm2 is not None:
+                    s = s * (self._virt_mom_div ** 2) - pm2[None, :]
                 raw = torch.sign(s) * torch.log1p(s.abs())             # (E_p, K) signed-log
                 calib.append(raw.detach().reshape(-1))
             jobs.append((ev_idx, st, vt, raw))

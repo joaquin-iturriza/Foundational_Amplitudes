@@ -814,7 +814,13 @@ class AmplitudeExperiment(BaseExperiment):
                 if pd is None or slot_pdgs is None:
                     virt.append(None); continue
                 n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
-                vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial)
+                # Off-shellness (s − m²) with the SCANNED propagator masses when
+                # diagram_scanned_mass is on — the resonance-aware Tier-B feature.
+                mo = None
+                if scanned_mass and im_pdgs and i < len(im_by_pid) and im_by_pid[i]:
+                    mo = {pdg: float(im_by_pid[i][j]) for j, pdg in enumerate(im_pdgs)}
+                vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial,
+                                              mass_override=mo, offshell=bool(scanned_mass))
                 virt.append(vt)
                 n_virt += int(vt is not None)
             self._diag_virt_by_pid = virt
@@ -892,7 +898,8 @@ class AmplitudeExperiment(BaseExperiment):
                         log_scale=float(self.cfg.model.get("virt_log_scale", 0.1)),
                         standardize=bool(self.cfg.model.get("virt_standardize", True)),
                         clamp=float(self.cfg.model.get("virt_clamp", 4.0)),
-                        mode=_virt_mode)
+                        mode=_virt_mode,
+                        mom_div=float(self.mom_div or 1.0))
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models

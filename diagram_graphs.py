@@ -43,7 +43,24 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from particle_ids import build_property_matrix, GLOBAL_PDG_IDX
+from particle_ids import (build_property_matrix, GLOBAL_PDG_IDX,
+                          GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, _MASSLESS)
+
+_MASS_COL = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+
+
+def _phys_mass(pdg, override=None):
+    """Physical mass (GeV) of a PDG from the raw property table; ``override`` (a
+    dict pdg→mass, e.g. a scanned propagator mass) wins. Massless sentinel → 0.
+    Canonicalises signed self-conjugate ids (−23 → 23)."""
+    if override:
+        if pdg in override:  return float(override[pdg])
+        if -pdg in override: return float(override[-pdg])
+    idx = GLOBAL_PDG_IDX.get(pdg) or GLOBAL_PDG_IDX.get(-pdg)
+    if idx is None:
+        return 0.0
+    lm = float(GLOBAL_PROPERTY_MATRIX[idx][_MASS_COL])
+    return 0.0 if abs(lm - _MASSLESS) < 1e-6 else float(10.0 ** lm)
 
 
 # Default coupling-order channels exposed as vertex features, in fixed order.
@@ -104,7 +121,7 @@ def propagator_leg_sets(graph):
         if e["external"]:
             continue
         legs = component_legs(e["u"], {e["u"], e["v"]})
-        out.append((e["u"], e["v"], frozenset(legs)))
+        out.append((e["u"], e["v"], frozenset(legs), int(e.get("pdg", 0))))
     return out
 
 
@@ -365,7 +382,7 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
         lap_pe[di, :nn] = _laplacian_pe(adj, k_pe)
 
         prop_leg_sets.append(
-            [(u, v, tuple(sorted(s))) for (u, v, s) in propagator_leg_sets(g)])
+            [(u, v, tuple(sorted(s)), pdg) for (u, v, s, pdg) in propagator_leg_sets(g)])
 
     return ProcessDiagrams(
         node_feat=torch.from_numpy(node_feat),
@@ -381,7 +398,7 @@ def build_process_diagrams(source, prop_matrix, k_pe=8, order_keys=DEFAULT_ORDER
     )
 
 
-def build_process_virtuality(pd, slot_pdgs, n_initial):
+def build_process_virtuality(pd, slot_pdgs, n_initial, mass_override=None, offshell=False):
     """Precompute the per-event propagator-virtuality gather for one process (Tier B).
 
     Given the event's per-slot PDG order (``slot_pdgs``) and the number of
@@ -402,9 +419,9 @@ def build_process_virtuality(pd, slot_pdgs, n_initial):
     # all-outgoing sign per slot: initial-state momenta flip sign
     sign = [-1.0 if s < n_initial else 1.0 for s in range(n_part)]
 
-    masks, diag_idx, i_idx, j_idx = [], [], [], []
+    masks, diag_idx, i_idx, j_idx, prop_pdgs = [], [], [], [], []
     for d, edges in enumerate(pd.prop_leg_sets):
-        for (i, j, legs) in edges:
+        for (i, j, legs, pdg) in edges:
             if any(L not in legmap for L in legs):
                 continue
             row = [0.0] * n_part
@@ -412,9 +429,17 @@ def build_process_virtuality(pd, slot_pdgs, n_initial):
                 s = legmap[L]
                 row[s] = sign[s]
             masks.append(row)
-            diag_idx.append(d); i_idx.append(i); j_idx.append(j)
+            diag_idx.append(d); i_idx.append(i); j_idx.append(j); prop_pdgs.append(pdg)
     if not masks:
         return None
+    # Per-propagator mass² (physical GeV²) so the Tier-B feature can be the propagator
+    # OFF-SHELLNESS s − m² (the pole variable 1/(s−m²)), not raw s. ``mass_override``
+    # supplies scanned propagator masses (e.g. a M_Z scan); others use the table.
+    # None when off (raw-s behaviour unchanged for existing runs).
+    prop_mass2 = None
+    if offshell:
+        prop_mass2 = torch.tensor(
+            [_phys_mass(p, mass_override) ** 2 for p in prop_pdgs], dtype=torch.float32)
     diag_idx = torch.tensor(diag_idx, dtype=torch.long)
     i_idx = torch.tensor(i_idx, dtype=torch.long)
     j_idx = torch.tensor(j_idx, dtype=torch.long)
@@ -428,6 +453,7 @@ def build_process_virtuality(pd, slot_pdgs, n_initial):
         "i_idx": i_idx,
         "j_idx": j_idx,
         "edge_prop": edge_prop,
+        "prop_mass2": prop_mass2,                           # (K,) physical GeV²
         "n_part": n_part,
         "D": pd.n_diagrams,
         "N": pd.node_feat.shape[1],
