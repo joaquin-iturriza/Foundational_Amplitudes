@@ -42,7 +42,7 @@ python run.py model=lloca local=none \
   training.lr=0.0037850206125016168 training.regularization_lambda=1.4383791066176087e-10 \
   training.cosanneal_warmup_frac=0.037281612306833266 \
   training.cosanneal_eta_min=5.00942594074264e-10 training.ema_decay=0.9687763301244937 \
-  training.iterations=4000 training.validate_frac=0.02 \
+  training.iterations=8000 training.validate_frac=0.02 \
   training.get_ID=false training.dtype=float32 use_mlflow=false plot=true \
   exp_name="imz_test_$N" run_dir="$RUNDIR" \
   && echo ">>> $N done; val + plots in $RUNDIR/plots_0" || echo ">>> $N FAILED"
