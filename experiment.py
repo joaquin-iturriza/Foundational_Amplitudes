@@ -265,10 +265,19 @@ class AmplitudeExperiment(BaseExperiment):
         self._recipe_specs       = specs
         self._coupling_by_pid    = couplings_by_pid
         self._internal_mass_by_proc = internal_mass_by_pid
-        # Table masses for centering the internal-mass scalar (mg is in scope here;
-        # _internal_mass_row runs later, outside this method's local import).
-        self._internal_mass_table = {pdg: float(mg._table_mass(pdg))
-                                     for pdg in getattr(self, "_internal_mass_pdgs", [])}
+        # Standardize log-mass per PDG across the run's datasets so the fed scalar is
+        # O(1). Mass varies little in relative terms (log M_Z spans ~0.13 over an
+        # 85->97 scan), so a raw/centered log is a near-constant the net ignores;
+        # unit-std matches the coupling's naturally-O(1) log(alpha). (Test-time
+        # choice: for production one would freeze these stats like amp standardization.)
+        self._internal_mass_feat = None
+        pdgs = getattr(self, "_internal_mass_pdgs", [])
+        if pdgs and internal_mass_by_pid:
+            arr  = np.array(internal_mass_by_pid, dtype=np.float64)      # (n_ds, n_pdg)
+            logm = np.log(np.clip(arr, 1e-9, None))
+            mu, sd = logm.mean(0), logm.std(0)
+            sd[sd < 1e-8] = 1.0
+            self._internal_mass_feat = ((logm - mu) / sd).astype(np.float32)
         self._recipe_base_by_name = base_by_name
         with open_dict(self.cfg):
             self.cfg.data.dataset    = names
@@ -351,17 +360,14 @@ class AmplitudeExperiment(BaseExperiment):
         pdgs = getattr(self, "_internal_mass_pdgs", []) or []
         if not getattr(self, "_use_internal_mass_scalars", False) or not pdgs:
             return np.zeros((0,), dtype=np.float32)
-        im = getattr(self, "_internal_mass_by_proc", None) or []
-        row = im[proc_idx] if (proc_idx < len(im) and im[proc_idx]) else None
-        # Center by the table mass: feed log(m / m_table) so the signal is a clean
-        # O(0.1) deviation instead of a ~4.5 constant (well-conditioned; 0 = table).
-        tbl = getattr(self, "_internal_mass_table", {})
-        out = []
-        for j, pdg in enumerate(pdgs):
-            m  = float(row[j]) if row else 0.0
-            m0 = float(tbl.get(pdg, 0.0))
-            out.append(float(np.log(m / m0)) if (m > 0 and m0 > 0) else 0.0)
-        return np.array(out, dtype=np.float32)
+        # Standardized (unit-std across the run's datasets) log-mass — see
+        # _internal_mass_feat: mass varies little in relative terms, so a raw log
+        # would be a near-constant the net ignores; standardizing makes it O(1)
+        # like the coupling's naturally-O(1) log(alpha).
+        feat = getattr(self, "_internal_mass_feat", None)
+        if feat is None or proc_idx >= len(feat):
+            return np.zeros((len(pdgs),), dtype=np.float32)
+        return np.asarray(feat[proc_idx], dtype=np.float32).copy()
 
     def _order_row(self, proc_idx, amp_orders):
         """Per-event scalar vector fed as order_labels: the amp_orders powers
