@@ -1,0 +1,13 @@
+{processes: [{name: ee_uuggg_st00, base: ee_uuggg, sqrts: [20, 300], n_train: 6000,
+      n_val: 1500, n_test: 1500, physics: {alpha_s: 0.04}}, {name: ee_uuggg_st01,
+      base: ee_uuggg, sqrts: [20, 300], n_train: 6000, n_val: 1500, n_test: 1500,
+      physics: {alpha_s: 0.0503}}, {name: ee_uuggg_st02, base: ee_uuggg, sqrts: [
+        20, 300], n_train: 6000, n_val: 1500, n_test: 1500, physics: {alpha_s: 0.0634}},
+    {name: ee_uuggg_st03, base: ee_uuggg, sqrts: [20, 300], n_train: 6000, n_val: 1500,
+      n_test: 1500, physics: {alpha_s: 0.0797}}, {name: ee_uuggg_st04, base: ee_uuggg,
+      sqrts: [20, 300], n_train: 6000, n_val: 1500, n_test: 1500, physics: {alpha_s: 0.1003}},
+    {name: ee_uuggg_st05, base: ee_uuggg, sqrts: [20, 300], n_train: 6000, n_val: 1500,
+      n_test: 1500, physics: {alpha_s: 0.1263}}, {name: ee_uuggg_st06, base: ee_uuggg,
+      sqrts: [20, 300], n_train: 6000, n_val: 1500, n_test: 1500, physics: {alpha_s: 0.1589}},
+    {name: ee_uuggg_st07, base: ee_uuggg, sqrts: [20, 300], n_train: 6000, n_val: 1500,
+      n_test: 1500, physics: {alpha_s: 0.2}}]}
