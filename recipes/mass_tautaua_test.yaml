@@ -1,0 +1,14 @@
+{processes: [{name: ee_tautaua_mt00, base: ee_tautaua, sqrts: [2.64, 30.0], n_train: 6000,
+      n_val: 1500, n_test: 1500, physics: {masses: {15: 1.2}}}, {name: ee_tautaua_mt01,
+      base: ee_tautaua, sqrts: [3.08, 30.0], n_train: 6000, n_val: 1500, n_test: 1500,
+      physics: {masses: {15: 1.4}}}, {name: ee_tautaua_mt02, base: ee_tautaua, sqrts: [
+        3.52, 30.0], n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {
+          15: 1.6}}}, {name: ee_tautaua_mt03, base: ee_tautaua, sqrts: [3.96, 30.0],
+      n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {15: 1.8}}}, {name: ee_tautaua_mt04,
+      base: ee_tautaua, sqrts: [4.4, 30.0], n_train: 6000, n_val: 1500, n_test: 1500,
+      physics: {masses: {15: 2.0}}}, {name: ee_tautaua_mt05, base: ee_tautaua, sqrts: [
+        4.84, 30.0], n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {
+          15: 2.2}}}, {name: ee_tautaua_mt06, base: ee_tautaua, sqrts: [5.28, 30.0],
+      n_train: 6000, n_val: 1500, n_test: 1500, physics: {masses: {15: 2.4}}}, {name: ee_tautaua_mt07,
+      base: ee_tautaua, sqrts: [5.72, 30.0], n_train: 6000, n_val: 1500, n_test: 1500,
+      physics: {masses: {15: 2.6}}}]}
