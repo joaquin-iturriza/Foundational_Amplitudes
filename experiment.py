@@ -265,6 +265,10 @@ class AmplitudeExperiment(BaseExperiment):
         self._recipe_specs       = specs
         self._coupling_by_pid    = couplings_by_pid
         self._internal_mass_by_proc = internal_mass_by_pid
+        # Table masses for centering the internal-mass scalar (mg is in scope here;
+        # _internal_mass_row runs later, outside this method's local import).
+        self._internal_mass_table = {pdg: float(mg._table_mass(pdg))
+                                     for pdg in getattr(self, "_internal_mass_pdgs", [])}
         self._recipe_base_by_name = base_by_name
         with open_dict(self.cfg):
             self.cfg.data.dataset    = names
@@ -351,10 +355,11 @@ class AmplitudeExperiment(BaseExperiment):
         row = im[proc_idx] if (proc_idx < len(im) and im[proc_idx]) else None
         # Center by the table mass: feed log(m / m_table) so the signal is a clean
         # O(0.1) deviation instead of a ~4.5 constant (well-conditioned; 0 = table).
+        tbl = getattr(self, "_internal_mass_table", {})
         out = []
         for j, pdg in enumerate(pdgs):
             m  = float(row[j]) if row else 0.0
-            m0 = float(mg._table_mass(pdg))
+            m0 = float(tbl.get(pdg, 0.0))
             out.append(float(np.log(m / m0)) if (m > 0 and m0 > 0) else 0.0)
         return np.array(out, dtype=np.float32)
 
