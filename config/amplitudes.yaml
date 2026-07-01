@@ -79,6 +79,11 @@ data:
  # physics.masses block (table mass as fallback).
  internal_mass_scalars: false
  internal_mass_pdgs: []          # e.g. [23] to feed the scanned Z-propagator mass
+ # Diagnostic: when true, the internal_mass slot is filled PER-EVENT with the
+ # resonance argument (√s − m) instead of the per-dataset log-mass — i.e. do the
+ # kinematic×mass interaction for the model, to test whether that interaction (not
+ # the info) is what a plain internal-mass scalar can't learn. Needs internal_mass_scalars.
+ resonance_per_event: false
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
  #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]

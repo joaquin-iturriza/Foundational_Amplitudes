@@ -383,6 +383,7 @@ class AmplitudeExperiment(BaseExperiment):
         self._use_coupling_scalars = bool(self.cfg.data.get("coupling_scalars", False))
         self._use_internal_mass_scalars = bool(self.cfg.data.get("internal_mass_scalars", False))
         self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
+        self._resonance_per_event = bool(self.cfg.data.get("resonance_per_event", False))
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
 
@@ -1080,13 +1081,17 @@ class AmplitudeExperiment(BaseExperiment):
         # (unshuffled) particle ranges, so O(events) work touches only metadata.
         role_particles, role_tokens, role_offsets = [], [], []
         role_amp, role_pid, role_order = [], [], []
+        role_resarg = []   # per-event resonance arg (√s − m), when resonance_per_event
         role_counts = {}
+        _want_resarg = (self._resonance_per_event and self._use_internal_mass_scalars
+                        and bool(self._internal_mass_pdgs))
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
         for role in roles:
             ds_parts, ds_toks = [], []
             ev_starts, ev_pid, ev_order, amp_blocks = [], [], [], []
+            ev_resarg = []
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
@@ -1106,6 +1111,14 @@ class AmplitudeExperiment(BaseExperiment):
                 ev_order.append(np.tile(
                     self._order_row(proc_idx, amp_orders), (N, 1)))
                 amp_blocks.append(amp_prepd)
+                if _want_resarg:
+                    # per-event √s (physical) from the initial pair (parts are /mom_div)
+                    q  = parts[:, 0, :] + parts[:, 1, :]                    # (N,4)
+                    s2 = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                    roots = np.sqrt(np.clip(s2, 0.0, None)) * mom_div       # (N,)
+                    mz = self._internal_mass_by_proc[proc_idx]              # [m_pdg...]
+                    ev_resarg.append(np.stack([roots - float(m) for m in mz], axis=1
+                                              ).astype(np.float32))          # (N, n_pdg)
                 part_base += N * P
 
             starts = np.concatenate(ev_starts)
@@ -1122,6 +1135,8 @@ class AmplitudeExperiment(BaseExperiment):
             role_amp.append(amp[perm])
             role_pid.append(pid[perm])
             role_order.append(order[perm])
+            if _want_resarg:
+                role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
             role_counts[role] = offs.shape[0]
 
         # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
@@ -1132,6 +1147,19 @@ class AmplitudeExperiment(BaseExperiment):
         self.all_amplitudes   = np.concatenate(role_amp, axis=0).astype(np.float32, copy=False)
         self.all_process_ids  = np.concatenate(role_pid, axis=0).astype(np.int64, copy=False)
         self.all_order_labels = np.concatenate(role_order, axis=0).astype(np.float32, copy=False)
+        if _want_resarg:
+            # Replace the internal-mass slot (last n_pdg cols) with the PER-EVENT
+            # resonance argument (√s − m), standardized to O(1). This hands the model
+            # the kinematic×mass interaction directly — a diagnostic for whether that
+            # interaction (not the info) is what the plain internal-mass scalar can't learn.
+            resarg = np.concatenate(role_resarg, axis=0).astype(np.float32)
+            mu, sd = resarg.mean(0), resarg.std(0)
+            sd[sd < 1e-8] = 1.0
+            resarg = (resarg - mu) / sd
+            n_pdg = len(self._internal_mass_pdgs)
+            self.all_order_labels[:, -n_pdg:] = resarg
+            LOGGER.info(f"resonance_per_event ON: internal-mass slot ({n_pdg} col) filled "
+                        f"per-event with standardized (√s − m) for pdgs {self._internal_mass_pdgs}")
         self.n_order_features = n_order_features
         self.N_events         = self.offsets.shape[0]
         self._role_counts     = (role_counts["train"], role_counts["val"],
