@@ -63,7 +63,9 @@ N_ALPHAS = 48                      # α_s points per QCD process (free: shares b
 ZSCAN_PROCS = ["ee_mumu", "ee_tautau", "ee_ddbar", "ee_bbbar", "ee_nnbar"]
 Z_PDG       = 23
 N_MZ        = 12
-MZ_FACTORS  = np.linspace(0.75, 1.25, N_MZ)   # ~[68,114] GeV around M_Z=91.19 (incl. ≈physical)
+# Floor ≥0.88 (~80 GeV): below M_Z≈77 the on-shell relation M_W²=M_Z²/2(1+√(1−4πα/√2 G_F M_Z²))
+# has no real root → NaN EW couplings (M_Z must stay above M_W). Upper end widened to 1.25.
+MZ_FACTORS  = np.linspace(0.88, 1.25, N_MZ)   # ~[80,114] GeV around M_Z=91.19 (incl. ≈physical)
 ZWIN_LO, ZWIN_HI = 0.78, 1.28                 # √s window = [lo,hi]×M_Z_scanned (dense pole bracket)
 
 
@@ -85,7 +87,7 @@ def zscan_points():
 RESON_SCANS = [
     ("ee_wwbb",     6,  10, 0.80, 1.20),   # top   : t→Wb resonance (MT)
     ("ee_wwbb",     25, 10, 0.80, 1.20),   # Higgs : H→WW* resonance (MH, gauge coupling)
-    ("ee_mumumumu", 23, 12, 0.75, 1.25),   # Z     : μμ-pair resonance in 4-lepton (MZ)
+    ("ee_mumumumu", 23, 12, 0.88, 1.25),   # Z     : μμ-pair resonance in 4-lepton (MZ; floor >M_W)
 ]
 RESON_TAG = {6: "mt", 25: "mh", 23: "mz4l"}
 
