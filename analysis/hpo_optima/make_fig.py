@@ -87,5 +87,6 @@ a.set_title('grey=declared range, red=optima p5–p95'); a.grid(alpha=.3,axis='x
 
 fig.suptitle('HPO optima across 422 converged Bayesian sweeps — empirical search-range rules',fontsize=14)
 fig.tight_layout(rect=[0,0,1,0.97])
-fig.savefig(out,dpi=110)
-print("saved",out)
+base=out[:-4] if out.lower().endswith(('.png','.pdf')) else out
+fig.savefig(base+'.png',dpi=110); fig.savefig(base+'.pdf')
+print("saved",base+'.png',base+'.pdf')

@@ -61,5 +61,7 @@ a.set_xscale('log'); a.set_yscale('log'); a.set_xlabel('t_steps (iterations)'); 
 a.set_title('C) LEARNING CURVES (★ = t of peak lr)\nfloor shifts later with D, but ★ stays ~3k → peak≠convergence'); a.legend(fontsize=8); a.grid(alpha=.3,which='both')
 
 fig.suptitle('scaling_p grid: dataset-size vs iterations disentangled — optimal lr is governed by proximity to convergence',fontsize=13)
-fig.tight_layout(rect=[0,0,1,0.94]); fig.savefig(out,dpi=115)
-print("saved",out)
+fig.tight_layout(rect=[0,0,1,0.94])
+base=out[:-4] if out.lower().endswith(('.png','.pdf')) else out
+fig.savefig(base+'.png',dpi=115); fig.savefig(base+'.pdf')
+print("saved",base+'.png',base+'.pdf')
