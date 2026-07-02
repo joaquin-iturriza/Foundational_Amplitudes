@@ -228,8 +228,11 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     npart = nfinal + 2
 
     rng = np.random.default_rng(seed)
+    # Same fiducial cuts as the LO path so phase-space coverage is consistent across
+    # the perturbative-order axis (and matches the fiducial_cuts recorded in recipe_id).
+    cuts = mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None
     events, sqrts = mg.sample_nbody_phase_space(
-        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng)
+        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts)
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
 
