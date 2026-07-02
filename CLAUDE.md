@@ -243,6 +243,39 @@ rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pendin
 e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
 Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 
+### HPO search-space rules (empirical — harvested from 422 converged sweeps)
+
+Full derivation, figures, and numbers are in `docs/results.tex` (§ optimization
+laws); the settled rules that govern how sweeps are set up:
+
+1. **`training.lr` transfers across width (μP) — never re-sweep it per width.**
+   Tune HPs once at the smallest width and reuse for all larger widths (up to a
+   5× cut on a width-scaling grid). Re-sweeping lr per width is pure waste.
+2. **lr follows an inverted-U in *training length*, peaking at an absolute
+   optimizer scale `t* ≈ 3000` steps** (independent of dataset size):
+   `lr*(t) ≈ 1e-2 · min[(t/3000)^+0.5, (t/3000)^-0.55]`. Center the lr window on
+   this and sweep **only ±½ decade**, not a flat 4-decade prior. This is NOT
+   "more iters ⇒ lower lr": the peak is an optimizer timescale (Adam β₂ EMA +
+   warmup + weight EMA), not the convergence point.
+   - **Real scaled run (data grows with steps ⇒ under-converged):** the negative
+     t-slope and positive weak D-slope cancel — just sweep the **peak band
+     `[3e-3, 3e-2]`** at every horizon. The template default is `[1e-3, 3e-2]`.
+   - **Fixed dataset over-trained past its loss floor:** apply the `t^-0.55`
+     decay. Rule of thumb: is `val_loss_no_reg` still dropping at your budget? →
+     under-converged → peak band. Floored? → over-converged → decay.
+3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
+   `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
+   `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`
+   fix ~1e-8 (or `[1e-10, 1e-7]`, weakest knob), `ema_decay ∈ [0.9, 0.999]`.
+   Keep `sampler_alpha_ema ∈ [0.3, 0.95]` (2nd most important). **Drop the exotic
+   sampler variants** (`sampler_sig_k`, `sampler_deficit_*`, … |ρ|≈0.1 = noise).
+4. **Finetune:** `fine_tune.lr_scale ∈ [0.1, 10]` centered at **1** (best finetune
+   lr ≈ pretrain lr), `fine_tune.layer_decay ∈ [0.75, 1.0]`; same reg/warmup rules.
+5. **Net effect:** ~10–100× smaller search volume ⇒ halve the trial budget
+   (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
+   denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
+   The `sweep_config*template.yaml` defaults already encode these ranges.
+
 ---
 
 ## A/B testing a new feature (how I want comparisons run)

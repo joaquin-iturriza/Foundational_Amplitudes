@@ -1,0 +1,690 @@
+\documentclass[11pt]{article}
+
+% ---------------------------------------------------------------------------
+%  Foundational_Amplitudes -- definitions, methods & results
+%  A running, mathematically precise record of the amplitude foundation-model
+%  program: the regression target and its preprocessing, the equivariant model
+%  and its physical encodings, the multi-fidelity HPO machinery, and the
+%  empirical results -- optimization laws, feature ablations, scaling, and the
+%  training-throughput campaign -- each stated so a reader fluent in physics and
+%  ML can reproduce and audit it.
+% ---------------------------------------------------------------------------
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{booktabs}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{float}          % the [H] specifier
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
+
+% --- notation -------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\Mamp}{\mathcal{M}}
+\newcommand{\amp}{\abs{\Mamp}^2}
+\newcommand{\Lloss}{\mathcal{L}}
+\newcommand{\vlnr}{\mathcal{L}^{\mathrm{val}}_{0}}   % val loss, no reg
+\newcommand{\lrpeak}{\eta_{\mathrm{peak}}}
+\newcommand{\tstar}{t_\ast}
+\newcommand{\nh}{n_h}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+\newtheorem{principle}{Principle}
+
+\title{\textbf{A Foundation Model for Scattering Amplitudes}\\[2pt]
+\large Definitions, Methods, and Results}
+\author{Joaqu\'in Iturriza}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We train a single Lorentz-equivariant transformer to regress tree- and loop-level
+scattering amplitudes across many processes ($ee\!\to\!WW$, $ee\!\to\!t\bar t$,
+$ee\!\to\!u\bar u(g)$, $ee\!\to\!\gamma\gamma(\gamma)$, \dots) jointly, as a step
+toward a reusable ``foundation'' model that transfers to new processes and
+perturbative orders. This note fixes precise definitions for the regression target
+and its preprocessing, the equivariant architecture and the physical particle
+encoding, the joint loss, and the multi-fidelity (\textsc{DyHPO}) hyperparameter
+search, and then reports the empirical results with their governing quantities. The
+settled results are: (i) amplitude preprocessing must be resolved \emph{per process},
+which lowers the median relative error by $\sim\!6\times$ and de-sensitizes the whole
+sweep; (ii) under maximal-update parameterization ($\mu$P) the optimal learning rate
+\emph{transfers across model width} but obeys a strong \emph{inverted-$U$ law in
+training length}, peaking at an absolute optimizer time scale $\tstar\!\approx\!3\times10^3$
+steps independent of dataset size --- which rewrites how we set and search learning
+rates; (iii) a family of physics-motivated input features (coupling order, internal
+propagator mass, off-shellness, \dots) helps exactly when the added quantity is
+\emph{not recoverable from the external momenta}, and is neutral otherwise; (iv) among
+the three maintained $\mu$P architectures LLoCa is the standing default and by far the
+cheapest ($\sim\!20\times$ fewer FLOPs/step than L-GATr, $\sim\!1.5\times$ fewer than the
+slim variant), and the physical-property encoding is best at spin$+$mass-flag$+$standardization
+--- adding color or an MLP embedder regresses; and (v) a per-step optimization campaign took the training step from
+$0.356$ to $0.128$\,s (data-bound fix) down onto a compute floor that vectorization and
+a fused optimizer lowered by a further $\sim\!3\times$, every numerical fast path proven
+equivalent to the original. We close with the methodological principles these results
+impose on how sweeps and HPO are run.
+\end{abstract}
+
+\tableofcontents
+
+% ==========================================================================
+\section{The system, target, and notation}\label{sec:system}
+% ==========================================================================
+
+\paragraph{Scattering amplitudes.} For a fixed partonic process the squared matrix
+element $\amp$ is a function of the external four-momenta $\{p_i\}_{i=1}^{n}$ (with
+$p_i\in\R^{4}$, metric $(+,-,-,-)$) that determines the differential cross section. It
+is the object a Monte-Carlo event generator evaluates once per phase-space point; our
+aim is to \emph{learn} it, so that a trained network replaces the per-point matrix-element
+call. We treat the problem as regression of a single scalar, $\amp$, from the event's
+particle set.
+
+\paragraph{Data.} Each dataset is one process, stored as rows of flat four-momenta
+($4n$ numbers), the $n$ PDG identifiers, and the scalar $\amp$ in the last column.
+Events are generated over a range of centre-of-mass energy $\sqrt s$. The maintained
+joint set spans eight base processes ($ee\!\to\!WWZ,\,WW,\,t\bar t,\,u\bar u,\,u\bar ug,\,
+u\bar ugg,\,\gamma\gamma,\,\gamma\gamma\gamma,\,u\bar u$) and, in the ``big-run'' recipes,
+of order $10^{2}$ datasets once the coupling-, mass-, and order-scans are included. A
+\emph{process} (or \emph{dataset}) index $p\in\{1,\dots,P\}$ labels which physical
+process an event belongs to; the model is trained on all of them at once.
+
+\paragraph{Notation.} We write $n$ for the number of particles in an event, $\nh$ for the
+number of attention heads (the $\mu$P \emph{width} axis, with transformer hidden dimension
+$d=16\,\nh$), $D\equiv n_{\mathrm{train}}$ for the number of training events, and
+$t\equiv t_{\mathrm{steps}}$ for the number of optimizer steps (the training horizon /
+\emph{fidelity}). $\eta$ denotes the learning rate \code{training.lr}. A hat marks a
+model prediction. All logarithms in scaling exponents are base-10 unless noted.
+
+% ==========================================================================
+\section{The regression target and its preprocessing}\label{sec:target}
+% ==========================================================================
+
+Raw $\amp$ spans many orders of magnitude (down to $\sim\!10^{-13}$) and can be
+negative at one loop (interference); it must be compressed and standardized before it
+is a sane regression target.
+
+\begin{definition}[Amplitude transform]\label{def:trafo}
+The target is the preprocessed amplitude $y = (s\circ f)(\amp)$, a \emph{log} (or
+\emph{signed-log}) compression followed by an affine \emph{standardization}:
+\begin{equation}
+  f(a) =
+  \begin{cases}
+    \ln a, & \text{$a>0$ throughout (positive-definite $\amp$),}\\[2pt]
+    \operatorname{sgn}(a)\,\ln\!\bigl(1+\abs a\bigr), & \text{$a$ genuinely signed (loop interference),}
+  \end{cases}
+  \qquad
+  s(x) = \frac{x-\mu}{\sigma},
+  \label{eq:trafo}
+\end{equation}
+with $(\mu,\sigma)$ estimated on the training split only. The choice log vs.\ signed-log
+is made by \code{resolve\_amp\_trafos} from the sign content of the data.
+\end{definition}
+
+\begin{principle}[Per-process preprocessing]\label{prin:perproc}
+The transform and its $(\mu,\sigma)$ are resolved \textbf{per process}, not once
+globally. This is the validated default (\code{preprocess\_per\_dataset: true}).
+\end{principle}
+
+\noindent The reason is quantitative and was a genuine bug fix:
+signed-log only compresses $\abs a\!\gg\!1$, but every $\amp\!\ll\!1$, so a single
+\emph{global} signed-log --- forced on all processes by one loop-level dataset with
+negative entries --- leaves the targets in \emph{linear} scale (target $\sigma$ ranging
+$8$--$30$, up to $1.2\times10^{4}$ for one process), whereupon a shared standardization
+cannot reach unit variance and most processes simply fail to train. Resolving the
+transform per process ($416$ log / $32$ signed-log across the $448$-dataset big run)
+collapses the global preprocessed $\sigma$ from $282$ to $1.06$.
+
+% ==========================================================================
+\section{The model and the physical encoding}\label{sec:model}
+% ==========================================================================
+
+\paragraph{Architecture.} The maintained models are $\mu$P (maximal-update
+parameterized) Lorentz-equivariant transformers. The default and usual best is the
+\textbf{LLoCa} Lorentz-local transformer (\code{LLOCAMuPTransformer}): a
+\code{LearnedPDFrames} network builds an equivariant local frame per particle, and a
+\code{MuPTransformer} backbone attends over the particle set with a block-diagonal mask
+built from the event boundaries \code{ptr}, so particles attend only within their own
+event. Two $\mu$P L-GATr variants (\code{lgatr\_mup}, \code{lgatr\_slim}) are maintained
+alternatives. Defaults: $8$ blocks, $\nh=8$ heads, \code{attn\_reps}$=$``\code{8x0n+2x1n}''.
+
+\begin{definition}[Maximal-update parameterization ($\mu$P)]\label{def:mup}
+$\mu$P is a width-dependent rescaling of initialization and per-layer learning rates
+under which the optimal hyperparameters --- above all $\eta$ --- become
+\emph{width-invariant}, so a configuration tuned at a small width can be reused at any
+larger width without re-tuning. The width axis here is $\nh$ (base $\nh=2$, delta $\nh=8$
+for the base-shape file); \code{attn\_reps} is held fixed between base and delta.
+\end{definition}
+
+\begin{definition}[Physical particle encoding]\label{def:enc}
+With \code{use\_PIDs: false} (the default) each PDG id maps through a fixed global table
+to an $8$-dimensional \emph{physical property vector}
+\[
+  \bigl[\,Q,\ \text{spin},\ \log_{10}(m/\mathrm{GeV}),\ T_3,\ B,\ L,\ \text{color charge},\ C_2(R)\,\bigr]
+\]
+(electric charge, spin, log-mass, weak isospin, baryon and lepton number, and the SU(3)
+color charge and quadratic Casimir), which a learned $\operatorname{Linear}(n_{\mathrm{feat}}\!\to\!16)$
+projects to the particle embedding. Because the input dimension depends only on the number
+of \emph{properties}, never on the vocabulary, adding a new particle or a $9$th quantum
+number never forces retraining the transformer. The legacy \code{use\_PIDs: true} uses a
+one-hot token index instead.
+\end{definition}
+
+\begin{definition}[Coupling / auxiliary scalars]\label{def:coup}
+Per-dataset physics that is \emph{not} a function of the external momenta is broadcast to
+every particle as extra scalar features: the coupling order
+\code{amp\_orders}$=[n_{\mathrm{loops}},\,\alpha_s\text{-power}]$
+(LO $=[0,0]$, NLO-full $=[1,1]$, virtual-only $=[1,0]$), the per-event log-coupling
+$\log\alpha$, and, for a scanned propagator/resonance, the internal log-mass
+$\log(m/m_{\mathrm{table}})$. Mixing orders or couplings therefore needs no architecture
+change. These are the ``feature levers'' ablated in \S\ref{sec:levers}.
+\end{definition}
+
+% ==========================================================================
+\section{The joint loss and the comparison metric}\label{sec:loss}
+% ==========================================================================
+
+\begin{definition}[Per-process joint loss]\label{def:loss}
+For a batch mixing $P$ processes, the loss is the mean over processes of each process's
+mean squared error on the preprocessed target,
+\begin{equation}
+  \Lloss \;=\; \frac1P \sum_{p=1}^{P}
+     \frac{1}{\abs{B_p}}\sum_{e\in B_p}\bigl(\hat y_e - y_e\bigr)^2
+   \;+\; \lambda\,R(\theta),
+  \label{eq:loss}
+\end{equation}
+where $B_p$ is the batch's share of process $p$, $R(\theta)$ is an $L_2$/$L_1$ weight
+penalty, and $\lambda=$\code{regularization\_lambda}. Averaging \emph{per process} (rather
+than per event) prevents large-amplitude processes from dominating and starving the small,
+complex ones; an optional geometric mean over the per-process losses is available. A
+\code{ProcessBalancedSampler} draws each process's share with dynamically updatable weights.
+\end{definition}
+
+\begin{definition}[Comparison metric $\vlnr$]\label{def:metric}
+Every model comparison in this note uses the \textbf{best non-regularized validation loss}
+on the log-amplitude target,
+\begin{equation}
+  \vlnr \;=\; \min_{t\le T}\ \Lloss_{\text{val}}(t)\big|_{\lambda=0},
+  \label{eq:vlnr}
+\end{equation}
+i.e.\ Eq.~\eqref{eq:loss} \emph{without} the $\lambda R$ term, evaluated on the validation
+split and minimized over the run. It is the object DyHPO optimizes and the checkpoint
+selector tracks. Using $\vlnr$ (not the regularized tracked loss) is essential: $\lambda$
+is itself a tuned hyperparameter, so comparing regularized losses would confound the metric
+with the search. Two sides are only comparable when they share the preprocessing of
+\S\ref{sec:target}; a feature that changes standardization changes the scale of $\vlnr$
+and must be re-based before comparison.
+\end{definition}
+
+% ==========================================================================
+\section{Multi-fidelity hyperparameter search (DyHPO)}\label{sec:dyhpo}
+% ==========================================================================
+
+\begin{definition}[Fidelity and DyHPO]\label{def:dyhpo}
+A \emph{fidelity} is a training-step budget $t$. DyHPO is a multi-fidelity Bayesian
+optimizer: a shared surrogate over $(\text{HP config},\,t)$ proposes cheap low-$t$ probes,
+warm-starts promising configurations to higher $t$ from a checkpoint index, and observes
+$\vlnr$ at each fidelity. All jobs of a sweep share one surrogate through a lock file on the
+shared filesystem, so a trial only informs its siblings if it \code{observe}s before they
+\code{suggest} --- which is why sweeps must be submitted \emph{interleaved} (round-robin)
+rather than all-at-once (\S\ref{sec:principles}).
+\end{definition}
+
+A \emph{sweep} draws HP candidates from a declared \emph{search space} (log-uniform or
+uniform ranges per hyperparameter) and runs a fixed budget of trials across the fidelity
+schedule. The results of \S\ref{sec:lrlaw} are what those search spaces should be; the
+methodological cost of getting them wrong is the subject of \S\ref{sec:principles}.
+
+% ==========================================================================
+\section{Optimization laws: how the learning rate should be set}\label{sec:lrlaw}
+% ==========================================================================
+
+This section is the one that changes how we run sweeps. It is harvested from
+\textbf{771} DyHPO sweeps on disk, of which \textbf{422} are \emph{converged} in the
+operational sense that their effective learning-rate knob ($\eta$ for pretrain/solo/scaling
+sweeps, \code{fine\_tune.lr\_scale} for finetune) does not sit at the edge of its explored
+range and the sweep has $\ge 6$ observations ($338$ $\eta$-sweeps, $84$
+\code{lr\_scale}-sweeps). Each sweep contributes its own best $\vlnr$ and the HP
+configuration attaining it.
+
+% --------------------------------------------------------------------------
+\subsection{$\mu$P holds across width; it does not excuse a fixed $\eta$ across horizon}
+% --------------------------------------------------------------------------
+
+The $\mu$P promise (Def.~\ref{def:mup}) is that $\eta$ transfers across width. It does:
+binning the best $\eta$ by width and taking the geometric mean gives, across a $16\times$
+range $\nh\in\{2,\dots,32\}$,
+\[
+  \eta^\ast(\nh):\quad 6.0,\ 3.6,\ 3.4,\ 3.0,\ 2.9\ \ (\times10^{-3}),
+\]
+i.e.\ \textbf{flat} --- re-sweeping $\eta$ per width is pure waste (Fig.~\ref{fig:hpo}, top-left).
+But $\eta^\ast$ is \emph{not} flat in the training horizon $t$; a single log-log line
+through $\eta^\ast$ vs $t$ has slope $\approx 0$ only because it averages a rise and a fall.
+
+\begin{principle}[Inverted-$U$ learning-rate law]\label{prin:invU}
+At fixed data, the optimal learning rate rises then falls with the training horizon,
+peaking at an \textbf{absolute optimizer time scale} $\tstar\approx 3\times10^{3}$ steps:
+\begin{equation}
+  \eta^\ast(t) \;\approx\; \lrpeak\,\min\!\Bigl[(t/\tstar)^{+0.5},\ (t/\tstar)^{-0.55}\Bigr],
+  \qquad \lrpeak \approx 1\times10^{-2},\ \ \tstar\approx 3\times10^{3}.
+  \label{eq:invU}
+\end{equation}
+\end{principle}
+
+\noindent The two branches are clean power laws, consistent across the joint ($8$-process,
+$\mathrm{bs}=256$) and solo ($\mathrm{bs}=16384$) regimes: ascending slope
+$\mathrm{d}\log\eta/\mathrm{d}\log t \approx +0.43$ to $+0.51$ ($t\lesssim\tstar$), descending
+slope $-0.55$ to $-0.58$ ($t\gtrsim\tstar$). The geometric-mean $\eta^\ast$ by horizon is
+$7.8\times10^{-4}$ at $t=4$, $1.1\times10^{-3}$ at $t=100$, $6$--$8\times10^{-3}$ at the
+$1$--$3$k peak, then $2.5\times10^{-3}$ ($t=10$k), $1.6\times10^{-3}$ ($t=31$k),
+$7\times10^{-4}$ ($t=100$k) (Fig.~\ref{fig:iters}).
+
+\begin{remark}[Why an absolute step scale, not the convergence point]
+The peak sits at $\operatorname{argmax}_t = 3162$ steps for \emph{every} dataset size from
+$700$ to $70{,}000$ (a $100\times$ range), whereas the loss-floor knee shifts \emph{later}
+with data. So $\tstar$ is not ``where the model converges'' --- it is an optimizer/schedule
+time scale: Adam's second-moment EMA has horizon $1/(1-\beta_2)\approx10^{3}$ steps, warmup
+is a fraction of $t$, and the weight EMA adds another $10^{2}$--$10^{3}$-step scale. Below
+$\tstar$ the run never leaves warmup/steady-state transient, so a large $\eta$ cannot be
+exploited and the optimum is \emph{lower} and rising (the counter-intuitive branch we rarely
+sweep); above $\tstar$ extra steps polish an already-fit model and $\eta^\ast$ falls as
+$t^{-0.55}$ (the intuitive branch).
+\end{remark}
+
+\begin{remark}[Data-size dependence is weak, and partly cancels the horizon effect]
+Disentangled on the clean 2D grid (Fig.~\ref{fig:2d}), the optimum rises \emph{weakly} with
+data, $\eta^\ast\propto D^{+0.15\ldots0.3}$ (saturating: $\sim2\times$ over $100\times$ data).
+A realistic scaled run grows \emph{both} $D$ and $t$, so the negative $t$-slope past the peak
+and the positive $D$-slope partly cancel and $\eta^\ast$ stays near the peak band
+$[3\times10^{-3},3\times10^{-2}]$. The decay branch of Eq.~\eqref{eq:invU} applies only when a
+\emph{fixed} dataset is over-trained past its loss floor. Operationally: if $\vlnr$ is still
+dropping at your budget you are under-converged $\Rightarrow$ use the peak band; if it has
+floored, apply the $t^{-0.55}$ decay.
+\end{remark}
+
+% --------------------------------------------------------------------------
+\subsection{Which knobs matter, and where the optima land}
+% --------------------------------------------------------------------------
+
+Ranking hyperparameters by the mean $\abs{\text{Spearman}(\text{HP},\vlnr)}$ within a sweep,
+$\eta$ is the dominant knob ($0.29$), followed by \code{sampler\_alpha\_ema} ($0.27$),
+\code{regularization\_lambda} ($0.23$), \code{warmup\_frac} ($0.22$), and \code{ema\_decay}
+($0.20$); the exotic sampler variants carry $\abs\rho\approx0.08$--$0.11$ (one sweep each) and
+are noise. For finetune sweeps \code{lr\_scale} dominates far more strongly ($0.48$), then
+\code{layer\_decay} and \code{warmup} ($0.29$). The best finetune learning rate is
+$\approx$ the pretrain rate: \code{lr\_scale} optimum $\approx 1.0$ (median $1.26$, p5--p95
+$0.13$--$7.7$), and \code{layer\_decay} $\approx 0.88$ (p5--p95 $0.74$--$1.0$).
+
+Table~\ref{tab:searchspace} contrasts where the optima actually land against the previously
+declared (much wider) ranges; the right column is the redesigned default search space that
+these results impose (\S\ref{sec:principles}).
+
+\begin{table}[H]
+\centering
+\caption{Where HP optima land vs.\ the declared range, and the redesigned default. The
+$\eta$ window is centred on Eq.~\eqref{eq:invU} and swept $\pm\tfrac12$ decade
+($\eta_{\mathrm{lo/hi}}=\eta_c/3,\ 3\eta_c$ with
+$\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$).}
+\label{tab:searchspace}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
+\midrule
+\code{training.lr} & $3.2\text{e-}5$--$3\text{e-}1$ (4 dec) & $3.5\text{e-}4$--$2.1\text{e-}2$ & centre on $\eta_c(t)$, $\pm\tfrac12$ dec \\
+\code{regularization\_lambda} & $1\text{e-}11$--$1\text{e-}2$ (9 dec) & $2.5\text{e-}11$--$9.8\text{e-}7$ & $[1\text{e-}10,\,1\text{e-}6]$ \\
+\code{cosanneal\_eta\_min} & $1\text{e-}11$--$1\text{e-}6$ & spans full, weakest & fix $\approx 1\text{e-}8$ \\
+\code{cosanneal\_warmup\_frac} & $0$--$0.2$ & $0.007$--$0.2$ (med.\ $0.15$) & $[0.05,\,0.2]$ \\
+\code{ema\_decay} & $0.9$--$1.0$ & $0.90$--$1.0$ (med.\ $0.96$) & $[0.9,\,0.999]$ \\
+\code{sampler\_alpha\_ema} & $0.3$--$0.95$ & spans full & keep (2nd most important) \\
+\code{fine\_tune.lr\_scale} & $5\text{e-}3$--$50$ (4 dec) & $0.13$--$7.7$ & $[0.1,\,10]$ (2 dec), centre $1$ \\
+\code{fine\_tune.layer\_decay} & $0.65$--$1.0$ & $0.74$--$1.0$ & $[0.75,\,1.0]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{hpo_optima_summary.pdf}
+  \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
+  $\mu$P transfers), vs batch (entangled with horizon --- do not read as causal), and vs
+  horizon (the inverted-$U$); the $\eta^\ast$ histogram with the recommended band; and the
+  finetune \code{lr\_scale} landing near $1$.}
+  \label{fig:hpo}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.86\textwidth]{lr_vs_iterations_by_regime.pdf}
+  \caption{\textbf{The inverted-$U$ law.} Geometric-mean best $\eta$ per exact horizon
+  $t$, pooled (left) and split by regime (right); a single fitted slope averages the
+  $+0.5$ rise and $-0.55$ fall to nearly zero, which is why the effect was long missed.}
+  \label{fig:iters}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{lr_2d_disentangled.pdf}
+  \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. (A) $\eta^\ast$
+  vs horizon at fixed $D$: an inverted-$U$ at every $D$, peak pinned to $\sim3$k steps
+  independent of $D$. (B) $\eta^\ast$ vs $D$ at fixed horizon: weak, $\propto D^{+0.15\ldots0.3}$,
+  saturating. (C) learning curves flooring later as $D$ grows --- the peak is not the floor.}
+  \label{fig:2d}
+\end{figure}
+
+% ==========================================================================
+\section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
+% ==========================================================================
+
+A recurring question is whether handing the model a physics-motivated input feature
+(Def.~\ref{def:coup}) helps. The organizing result is a single principle, verified across
+coupling, external-mass, and internal-mass/resonance experiments (all single-seed at matched
+HPs; arms are comparable \emph{within} a test, which shares one standardization scheme, but not
+\emph{across} tests).
+
+\begin{principle}[Feed only what the external momenta cannot recover]\label{prin:levers}
+A feature helps precisely when the quantity it supplies is \emph{not} a function of the
+external four-momenta --- an internal or theory input (coupling $\alpha$, a propagator mass) ---
+\emph{and} is supplied in a form the network can actually use (a kinematic$\,\times\,$mass
+\emph{interaction}, not a near-constant scalar). It is neutral when the information is already
+present in the momenta, or already carried by the per-process amplitude offset.
+\end{principle}
+
+The evidence (Table~\ref{tab:levers}):
+\begin{itemize}
+  \item \textbf{Coupling order.} When per-dataset standardization removes the constant
+  amplitude offset and kinematics are identical across couplings, the net cannot infer
+  $\alpha$ at all; supplying \code{coupling\_scalars} then cuts $\vlnr$ by $\sim18\times$
+  ($0.0573\!\to\!0.0031$). With the offset left intact it is neutral ($-6.5\%$); where a
+  per-event shape survives (steep running, wide $\alpha$) it wins modestly ($-19\%$).
+  \item \textbf{External mass} (\code{mass\_from\_momenta}) is redundant --- the invariant mass
+  \emph{is} in the legs; both arms are already at $\vlnr\!\sim\!2\times10^{-5}$.
+  \item \textbf{Internal (propagator) mass.} The physically important case. A raw internal
+  log-mass scalar \emph{fails} ($+5\%$; a near-constant the net ignores). The correct
+  construction is the per-event off-shellness $s_{\mathrm{prop}}-M^2$ (equivalently $\sqrt s-M$
+  for an $s$-channel resonance) fed \emph{directly to the transformer}: it collapses the
+  mass-scan $U$-shape by three to four orders of magnitude ($0.082\!\to\!1.8\times10^{-5}$ for
+  the resonance form; $0.076\!\to\!9.4\times10^{-5}$ for the general off-shellness). Routing the
+  same corrected mass through the diagram encoder instead is far weaker ($-8\%$, $U$-shape not
+  flattened).
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Feature-lever A/B on $\vlnr$ (best non-regularized val loss, single seed, matched HPs).
+Baseline is feature-off. Scales are comparable within a row, not across rows with different
+standardization (row 1 is a deliberate pooled-standardization capability probe).}
+\label{tab:levers}
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+Lever & Setting & off & on & Verdict \\
+\midrule
+Coupling scalars (capability probe) & pooled std, $ee\,u\bar ug\!g\!g$ & $0.0573$ & $0.0031$ & \textbf{win} $18\times$ \\
+Coupling scalars (control) & per-dataset std & $0.0049$ & $0.0046$ & neutral \\
+Coupling scalars (steep-running) & wide $\alpha$, low $\sqrt s$ & $0.0064$ & $0.0052$ & win $-19\%$ \\
+Mass from momenta & near-threshold $t\bar t$ & $2.1\text{e-}5$ & $1.7\text{e-}5$ & redundant \\
+Internal-mass scalar & $M_Z$ scan, $ee\,\mu\mu$ & $0.0756$ & $0.0795$ & \textbf{lose} \\
+Resonance $\sqrt s-M$ & $M_Z$ scan & $0.0819$ & $1.8\text{e-}5$ & \textbf{win} $4500\times$ \\
+Off-shellness $s-M^2$ & $M_Z$ scan & $0.0763$ & $9.4\text{e-}5$ & \textbf{win} $810\times$ \\
+Diagram scanned-mass & $M_Z$ scan, diagram enc. & $0.0777$ & $0.0718$ & weak $-8\%$ \\
+\textbf{Combined levers (flagship)} & 44 dsets, full data, 30k it & $0.2676$ & $0.0053$ & \textbf{win} $50\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The flagship confirmation bundles all internal-mass levers over $44$ datasets spanning $Z$,
+top, and Higgs resonances ($ee\,\mu\mu$, $ee\,4\mu$, $ee\,WWb\bar b$, $ee\,\mu\mu\tau\tau$), on
+full data with fiducial cuts at $30$k iterations --- a well-trained (not undertraining-noise)
+regime --- and off-shellness lowers $\vlnr$ by $\sim50\times$ ($0.268\!\to\!0.0053$).
+
+% ==========================================================================
+\section{Neural scaling and transfer}\label{sec:scaling}
+% ==========================================================================
+
+We fit held-out log-amplitude loss against training compute
+$C = 2\,F_{\mathrm{step}}\,t$ (MACs, forward$+$backward; $F_{\mathrm{step}}$ known in closed
+form from $\mathrm{bs}$, $n$, $d=16\nh$), so cells of different width sit on a fair axis. Two
+forms are used: a plain power law $L=A\,C^{-\alpha}$ (\code{fit\_scaling\_law.py}) and a
+floor-aware $L=A\,C^{-\alpha}+C_0$.
+
+\begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
+The compute-scaling exponent $\alpha_C$ decreases with the number of final-state particles:
+$\alpha_C\approx1.7$--$2.2$ for $2\!\to\!2$, $\approx1.2$--$1.3$ for $2\!\to\!3$, and
+$\approx0.96$ for $2\!\to\!4$, tracking the theoretical lower bound $\alpha=4/\mathrm{DOF}$
+with $\mathrm{DOF}=3n_{\mathrm{fs}}-4$: harder, higher-dimensional targets learn more slowly
+per FLOP.
+\end{principle}
+
+Two structural facts sharpen this. First, $\alpha_C$ is \textbf{width-independent} (the
+$\nh\in\{4,8,16,32\}$ points overlap within error at each $D$), validating the $\mu$P claim
+that the exponent does not depend on width --- there is no separate loss-vs-parameters power
+law here; width enters only through $C$. Second, the virtual/Born \emph{ratio} targets barely
+scale ($\alpha_C\approx0.03$--$0.07$): they are essentially learned at zero compute, an
+irreducibly flat target. The compute-optimal (plateau) budget $C^\ast(D)$ rises only $\sim5\times$
+over a $100\times$ range in per-process data, saturating near $1.1\times10^{17}$ FLOP by
+$D\gtrsim3\times10^{4}$.
+
+\begin{table}[H]
+\centering
+\caption{Representative from-scratch compute-scaling exponents $\alpha_C$ ($L=A\,C^{-\alpha}$,
+solo, $\nh=4$). Grouped by final-state multiplicity; ratio target shown as the flat outlier.}
+\label{tab:scaling}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Process & Type & $\alpha_C$ & $r^2$ \\
+\midrule
+$ee\to\gamma\gamma$      & QED $2\!\to\!2$ & $2.21$ & $0.99$ \\
+$ee\to t\bar t$          & EW  $2\!\to\!2$ & $1.95$ & $0.99$ \\
+$ee\to WW$               & EW  $2\!\to\!2$ & $1.81$ & $0.99$ \\
+$ee\to u\bar u$          & QCD $2\!\to\!2$ & $1.74$ & $0.94$ \\
+$ee\to \gamma\gamma\gamma$ & QED $2\!\to\!3$ & $1.21$ & $0.98$ \\
+$ee\to u\bar ug$         & QCD $2\!\to\!3$ & $1.34$ & $0.97$ \\
+$ee\to u\bar ugg$        & QCD $2\!\to\!4$ & $0.96$ & $0.96$ \\
+$ee\to u\bar u$ NLO virt/Born ratio & ratio & $0.03$ & $0.78$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% --------------------------------------------------------------------------
+\subsection{Foundation pretraining transfers, and the physics encoding is what makes it possible}
+% --------------------------------------------------------------------------
+
+Finetuning a $25$-process foundation model onto held-out NLO-virtual targets transfers with a
+\emph{steeper} exponent than training from scratch. On $ee\,u\bar u$ NLO-virtual, the foundation
+gives $\alpha_C=2.18\pm0.26$ and reaches $\sim10^{-4}$ held-out loss at $10^{13}$--$10^{14}$ FLOP,
+orders of magnitude below from-scratch ($\alpha_C\approx0.9$, stuck near $10^{-2}$); on $ee\,t\bar t$
+the curves largely coincide (an early-compute head-start, smaller asymptotic gain). Across
+finetuning methods (plain, LoRA, freeze, EWC, reset-head) the exponent is stable at
+$\alpha_C\approx1.7$--$2.2$ on the e4 targets.
+
+\begin{principle}[Physics encoding generalizes zero-shot; one-hot PIDs cannot]\label{prin:zeroshot}
+The $8$-D physical-property encoding (Def.~\ref{def:enc}) lets a frozen foundation model predict
+entirely held-out processes at MSE on standardized log-amplitudes of $0.22$--$0.51$ --- well below
+the trivial constant-predictor baseline of $1.0$ --- whereas a one-hot PID model
+\emph{cannot even represent} a process containing an unseen particle (e.g.\ $ee\to t\bar t$: PDG
+$\pm6$ absent from the training vocabulary). Encoding particles by their quantum numbers, not their
+identity, is what makes transfer to new processes possible.
+\end{principle}
+
+% ==========================================================================
+\section{Architecture and encoding ablations}\label{sec:arch}
+% ==========================================================================
+
+\paragraph{Architecture cost.} At matched parameter count ($\approx1.6$M) and on the real
+25-process pipeline, the three maintained $\mu$P models differ enormously in compute
+(Table~\ref{tab:arch}): L-GATr costs $\sim20\times$ the FLOPs/step of LLoCa, while the slim
+variant costs only $\sim1.5\times$. LLoCa is the standing default; a matched-iteration
+three-way \emph{accuracy} comparison is not on record (the available cross-model train is a
+40-iteration smoke, too short to rank accuracy), so the architecture verdict here is a
+\emph{cost} statement: full L-GATr is not competitive on throughput, the slim variant is the
+affordable geometric alternative, and LLoCa remains the operating point.
+
+\begin{table}[H]
+\centering
+\caption{Compute of the three maintained $\mu$P architectures at $\approx1.6$M params,
+25-process pipeline, $\mathrm{bs}=1024$, forward$+$backward.}
+\label{tab:arch}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Model & Params & GFLOP/step & rel.\ to LLoCa \\
+\midrule
+LLoCa (\code{LLOCAMuPTransformer}) & $1{,}607{,}060$ & $48.8$ & $1.0\times$ \\
+L-GATr slim (\code{MuPLGATrSlim})  & $1{,}569{,}765$ & $74.3$ & $1.5\times$ \\
+L-GATr (\code{MuPLGATr})           & $1{,}635{,}736$ & $999.2$ & $20.5\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Encoding.} The physical-property encoding (Def.~\ref{def:enc}) admits optional
+extra channels: a one-hot \emph{spin} embedding (spin is a label, not a magnitude), a binary
+\emph{massless} flag, per-column \emph{standardization}, an optional \emph{color} one-hot, and
+an MLP (vs.\ Linear) embedder. Sweeping these under BO (20 DyHPO trials/arm) and confirming the
+winners over 5 seeds gives a clear verdict on the real 25-process target: the
+$\code{combo}=\text{spin}+\text{mass-flag}+\text{standardization}$ encoding is best
+($\vlnr = 1.66\pm0.26\times10^{-3}$), and going further \emph{regresses} --- adding a color
+one-hot costs $+12\%$ and an MLP embedder $+24\%$, both outside the 5-seed bands
+(Table~\ref{tab:enc}). The mass flag and standardization carry the physics-consistent gain
+(largest on colored final states); color and nonlinearity do not pay.
+
+\begin{table}[H]
+\centering
+\caption{Encoding ablation on the 25-process target ($\vlnr$, 5-seed mean$\pm$std; BO-tuned
+per arm). \code{combo}$=$spin$+$mass$+$std.}
+\label{tab:enc}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Encoding arm & $\vlnr$ (5-seed) & rel.\ to combo \\
+\midrule
+\code{combo}        & $1.66\times10^{-3}\pm2.6\times10^{-4}$ & $1.00$ \\
+\code{combo\_color} & $1.85\times10^{-3}\pm3.2\times10^{-4}$ & $1.12$ (worse) \\
+\code{combo\_mlp}   & $2.06\times10^{-3}\pm5.0\times10^{-4}$ & $1.24$ (worse) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ==========================================================================
+\section{Training throughput}\label{sec:throughput}
+% ==========================================================================
+
+All runs are on V100~32GB (Jean-Zay \code{gpu\_p2}, account \code{itg@v100}); A100 is
+unavailable to the account, which matters below. A per-step optimization campaign attacked two
+distinct regimes, each fast path proven numerically equal to the original by CPU equivalence
+guards (\code{tests/test\_amp.py}, Section~0).
+
+\begin{principle}[The step was data-bound before it was compute-bound]\label{prin:dataloader}
+At \code{num\_workers=0}, profiling showed dataloading was $69\%$ ($260$\,ms) of a $380$\,ms
+step --- $8192$ serial \code{\_\_getitem\_\_} calls plus a collate concatenation on the main
+thread with the GPU idle. Moving to \code{num\_workers=2} with pinned memory and a
+\code{non\_blocking} host$\to$device copy overlaps the load under compute and takes the step
+from $0.356$ to $0.128$\,s/iter ($2.78\times$), landing on the $\sim0.119$\,s compute floor.
+This is now the default (\code{num\_workers: 2}); $nw{=}4$ is no better, $nw{=}6$ oversubscribes
+the 8 CPUs and hangs.
+\end{principle}
+
+The compute floor was then lowered on two fronts. \emph{Vectorizing the on-GPU hot path} ---
+per-event mean pooling, the block-diagonal attention mask (built once per forward, not per
+block), the per-process loss (a single segment-mean, not a Python loop over processes), the
+$L_2/L_1$ regularizer (one fused \code{\_foreach}), and broadcasting per-particle local frames
+across heads instead of materializing a per-head copy --- gives a combined $\sim3.1\times$ at
+$nw{=}0$ (dominated by the pooling rewrite, $3.08\times$ alone). A \emph{fused Adam}
+(\code{fused\_optimizer}, default on) adds $1.34\times$; \emph{deferring host$\leftrightarrow$device
+syncs} (collapsing $\sim4$ syncs/step into one fused \code{stack(\dots).tolist()}, with the NaN
+guard moved onto the already-synced grad-norm) adds a further $\sim2\%$ --- small precisely
+because, after Principle~\ref{prin:dataloader}, the step is no longer GPU-bound. Each vectorized
+path is toggleable (\code{LLOCA\_*} env vars) with the original retained for A/B, and each is
+\code{allclose}-verified against it.
+
+\begin{remark}[Carried but inert, and deliberately declined]
+\code{allow\_tf32} is carried (default on) but is a \textbf{no-op on V100}; it would give
+$\sim2\times$ matmul on A100 at $\sim10^{-3}$ precision, so it must be loss-A/B'd on A100 before
+it is trusted --- and A100 is unavailable. Two optimizations were declined on purpose:
+converting the $L_2$ penalty to decoupled \code{weight\_decay} (it is folded into $\vlnr$,
+checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP --- converting it
+would silently break continuity with all existing sweep results), and \code{torch.compile} (the
+compute is dominated by the torch-geometric framesnet and xformers attention, neither of which
+compiles --- heavy graph breaks for no gain --- and it would prefix \code{state\_dict} keys,
+breaking warm-start/fine-tune reloads). A gradient-checkpointing knob
+(\code{checkpoint\_blocks}) trades $\sim$one extra forward for a large activation-memory saving
+when memory-bound.
+\end{remark}
+
+% ==========================================================================
+\section{The compute envelope: VRAM and step time}\label{sec:envelope}
+% ==========================================================================
+
+Because Jean-Zay bills a fixed GPU-hour budget, each job should run near the hardware ceiling.
+Two quantities bound the operating point on the V100: peak VRAM (limiting batch size and width)
+and step time (limiting how many updates fit in an allocation). With batch size $\mathrm{bs}$,
+particles per event $n$, and width $\nh$ ($d=16\nh$), peak VRAM is bilinear,
+\begin{equation}
+  V_{\text{peak}}(\mathrm{bs},n,\nh) \approx a(\nh)\,\mathrm{bs}\,n + b(\nh)\,\mathrm{bs} + C(\nh)
+  \quad[\mathrm{MB}],
+  \label{eq:vram}
+\end{equation}
+with the activation coefficient $a\propto\nh$ and the fixed term $C\propto\nh^2$ (parameters
+plus the two AdamW moment buffers, $\approx3\times$ params in float32; the EMA shadow adds one
+more params-sized copy). Below $\mathrm{bs}=2048$ the widest tested model ($\nh=64$) fits for
+all $n\le12$ on 16\,GB; at a practical $\mathrm{bs}=4096$ one fits $\nh=32$ for $n\le8$. Step
+time is set by the MLP ($\mathrm{FLOPs}_{\text{MLP}}\propto n\,d^2$ dominates attention's
+$n^2 d$ for $n\lesssim12$): it is linear in $n$ once the GPU is saturated
+($\mathrm{bs}\gtrsim2048$) and grows as $t\propto\nh^{1.1}$, so throughput scales roughly as
+$1/\nh$. The full six-panel benchmark tables are in \code{notes/scaling\_notes.tex}.
+
+% ==========================================================================
+\section{Methodological principles}\label{sec:principles}
+% ==========================================================================
+
+The results above impose a concrete protocol on how sweeps, HPO, and comparisons are run.
+
+\begin{principle} Compare on $\vlnr$ --- the best \emph{non-regularized} validation loss on
+log-amplitudes (Eq.~\ref{eq:vlnr}) --- never the regularized tracked loss, since $\lambda$ is a
+tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{prin:perproc}).
+\end{principle}
+\begin{principle} Never re-sweep $\eta$ across width: $\mu$P transfers it. Tune once at the
+smallest width and reuse for all larger widths --- up to a $5\times$ cut on a width-scaling grid.
+\end{principle}
+\begin{principle} Centre the $\eta$ search on the inverted-$U$ law
+$\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$ (Eq.~\ref{eq:invU}) and sweep only
+$\pm\tfrac12$ decade, not a flat 4-decade prior. Use the peak band $[3\text{e-}3,3\text{e-}2]$
+when under-converged (loss still falling); apply the $t^{-0.55}$ decay only when over-training a
+fixed dataset past its floor.
+\end{principle}
+\begin{principle} Narrow the secondary knobs to where optima actually land
+(Table~\ref{tab:searchspace}): cap \code{regularization\_lambda} at $10^{-6}$, fix
+\code{cosanneal\_eta\_min}$\approx10^{-8}$, keep \code{warmup\_frac}$\in[0.05,0.2]$, and drop the
+exotic sampler variants ($\abs\rho\approx0.1$, noise). Together with the $\eta$ window this
+shrinks the search volume $10$--$100\times$, so halve the trial budget at equal resolution or
+explore far more densely at equal budget.
+\end{principle}
+\begin{principle} Finetune from a pretrain-tuned config: \code{lr\_scale}$\in[0.1,10]$ centred at
+$1$ (best finetune $\eta\approx$ pretrain $\eta$), \code{layer\_decay}$\in[0.75,1.0]$; same
+reg/warmup/$\eta_{\min}$ rules.
+\end{principle}
+\begin{principle} Seed new sweep cells from the law, not a flat prior: $\eta_c(t)$ is smooth in
+$t$ and width-invariant, so a good rate at one horizon predicts its neighbours. Do \emph{not}
+assume batch/data-size invariance --- those axes were never cleanly isolated here.
+\end{principle}
+\begin{principle} Submit multiple sweeps \emph{interleaved} (round-robin), not all-at-once: DyHPO
+trials only inform siblings that \code{observe} before they \code{suggest}, so a simultaneous
+launch suggests against a stale surrogate (Def.~\ref{def:dyhpo}).
+\end{principle}
+\begin{principle} Add a feature only when it supplies what the external momenta cannot encode,
+and in a usable form (Principle~\ref{prin:levers}): an internal/theory quantity as a
+kinematic$\,\times\,$mass interaction, not a near-constant scalar. Encode particles by quantum
+numbers, not identity, so the model transfers to unseen particles (Principle~\ref{prin:zeroshot}).
+\end{principle}
+\begin{principle} A/B fairly and cheaply: reuse the existing baseline (the best of its own short
+HPO sweep --- never a single arbitrary run); first try the feature at the baseline's best HPs and
+stop if it already wins; only if it does not, sweep the feature with the same HPO and compare
+best-vs-best. Every figure ships as both \code{.png} and \code{.pdf}.
+\end{principle}
+
+\end{document}

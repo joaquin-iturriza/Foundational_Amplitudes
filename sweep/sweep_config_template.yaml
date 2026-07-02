@@ -40,20 +40,27 @@ fixed_params:
 
 # HP search space — same format as before.
 # DyHPOSampler pre-samples n_candidates configs from this space at init.
+# Search space centred on the empirical HPO optima (422 converged sweeps; see
+# docs/results.tex sec:lrlaw). lr obeys the inverted-U law across horizon and
+# transfers across width (muP) -- NEVER re-sweep lr per width. The band below is
+# the peak/under-converged default (~1.2 decade). For a fixed-horizon sweep,
+# centre on lr_center(t) = 1e-2 * min((t/3000)**0.5, (t/3000)**-0.55) and set
+# low = lr_center/3, high = lr_center*3; apply the t^-0.55 decay only when
+# over-training a fixed dataset past its loss floor.
 search_space:
 - name: training.lr
   type: float_log
-  low: 1.0e-06
-  high: 0.01
+  low: 1.0e-03      # peak band [1e-3, 3e-2]; was 1e-6..1e-2 (6 decades, mostly empty)
+  high: 3.0e-02
 - name: training.regularization_lambda
   type: float_log
-  low: 1.0e-11
+  low: 1.0e-10      # optima p5-p95 within [2.5e-11, 9.8e-7]; cap high at 1e-6
   high: 1.0e-06
 - name: training.cosanneal_warmup_frac
   type: float_uniform
-  low: 0.0
+  low: 0.05         # optima median 0.15; floor at 0.05 (was 0.0)
   high: 0.2
 - name: training.cosanneal_eta_min
   type: float_log
-  low: 1.0e-11
-  high: 1.0e-06
+  low: 1.0e-10      # weakest knob, spans full range; narrow (or fix ~1e-8)
+  high: 1.0e-07
