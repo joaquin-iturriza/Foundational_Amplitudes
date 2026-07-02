@@ -91,6 +91,12 @@ data:
  # scanned propagator masses: one column per internal_mass_pdgs entry, the nearest-pole
  # propagator of that PDG; signed-log + unit-std. Needs internal_mass_scalars + a diagram
  # sidecar per process. Takes precedence over resonance_per_event when both are on.
+ # VALIDATED (focused levers A/B, full data, 30k it, val_loss_no_reg): resolves the
+ # internal-mass regress-to-mean U-shape that the no-feature baseline cannot — s-channel
+ # Z ~1.6 → ~1e-6..1e-4, top 0.42 → 5.4e-2, Z-in-4ℓ 0.17 → 5.9e-2, Higgs(H→ττ) 0.10 →
+ # 7.7e-2 (weak: Z→ττ swamps the τ-Yukawa). Production setting for the big-run pretrain:
+ # internal_mass_scalars=true, offshell_per_event=true, internal_mass_pdgs=[23,6,25].
+ # Off by default (opt-in) since it needs the recipe path + diagram sidecars.
  offshell_per_event: false
  # Coupling-order vector per dataset: [n_loops, alpha_s_power].
  # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):

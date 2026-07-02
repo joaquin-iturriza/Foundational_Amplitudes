@@ -33,8 +33,11 @@ BASE_FIXED = {
     "data.source": "recipes",
     "data.processes_file": f"{PROJ}/recipes/scan_bigrun.yaml",
     "data.require_cache": "true",
-    "data.train_subsample": 2000,
-    "data.eval_subsample": 500,
+    # FULL train data per dataset: the 2000 cap starved the mass-scan datasets — the
+    # focused levers A/B showed they plateau at ~0.2 under the cap but reach ~5e-2
+    # (top/Higgs) to ~1e-6 (s-channel Z) with all 5k–10k events. null = load all.
+    "data.train_subsample": "null",
+    "data.eval_subsample": 2000,
     "data.preprocess_per_dataset": "true",
     "data.seed": 42,
     "data.use_PIDs": "false",

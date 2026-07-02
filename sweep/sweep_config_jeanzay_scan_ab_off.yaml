@@ -19,8 +19,8 @@ fixed_params:
   data.source: recipes
   data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/scan_bigrun.yaml
   data.require_cache: 'true'
-  data.train_subsample: 2000
-  data.eval_subsample: 500
+  data.train_subsample: 'null'
+  data.eval_subsample: 2000
   data.preprocess_per_dataset: 'true'
   data.seed: 42
   data.use_PIDs: 'false'
