@@ -86,6 +86,11 @@ def make(arm, feat):
                 "module load anaconda-py3/2023.09",
                 "source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh",
                 "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
+                # Cut-tagged big-run cache (fiducial cuts on): the recipe datasets are
+                # prebuilt here, so require_cache hits without any GPU-side generation.
+                "export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut",
+                "export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut",
+                "export AMP_FIDUCIAL_CUTS=on",
             ],
         },
         "sweep_name": f"scan_ab_{arm}",

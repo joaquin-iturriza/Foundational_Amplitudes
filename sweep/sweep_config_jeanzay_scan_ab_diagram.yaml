@@ -52,6 +52,9 @@ paths:
   - module load anaconda-py3/2023.09
   - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
   - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
+  - export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut
+  - export AMP_FIDUCIAL_CUTS=on
 sweep_name: scan_ab_diagram
 range_extension:
   enabled: false
