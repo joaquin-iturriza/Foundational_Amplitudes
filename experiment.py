@@ -1168,15 +1168,31 @@ class AmplitudeExperiment(BaseExperiment):
         train_raw = np.concatenate(
             [store[("train", n)]["raw_amp"] for n in names], axis=0
         )
-        if amp_trafos is None:
-            amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, train_raw)
+        # Resolve the amplitude transform. Per-dataset (preprocess_per_dataset) resolves
+        # it INDEPENDENTLY per process: a positive-definite |M|² dataset uses `log`
+        # (compresses its multiplicative range to ~unit std), a genuinely-signed one
+        # (e.g. an NLO virtual with negative events) uses `signedlog`. A GLOBAL
+        # resolution forces signedlog on EVERY process as soon as ONE dataset has a
+        # negative event — and signedlog leaves sub-1 amplitudes in linear scale
+        # (log1p(x)≈x for |x|≪1, and every |M|² is ≪1), so those targets never
+        # standardize to unit variance and the datasets don't train. self.cfg.data.
+        # amp_trafos keeps a representative resolution; per-process trafos in _amp_trafos_pp.
+        base_trafos = list(self.cfg.data.amp_trafos)
+        self._amp_trafos_pp = None
+        if amp_trafos is None:                       # fresh run: resolve from raw amps
+            amp_trafos = resolve_amp_trafos(base_trafos, train_raw)
+            if per_dataset:
+                self._amp_trafos_pp = [
+                    resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"])
+                    for n in names]
         self.cfg.data.amp_trafos = amp_trafos
         if prepd_means is None:
             if per_dataset:
                 prepd_means, prepd_stds = [], []
-                for name in names:
+                for i, name in enumerate(names):
+                    tr = self._amp_trafos_pp[i] if self._amp_trafos_pp else amp_trafos
                     _, m, s = preprocess_amplitude(
-                        store[("train", name)]["raw_amp"], trafos=amp_trafos)
+                        store[("train", name)]["raw_amp"], trafos=tr)
                     prepd_means.append(float(m)); prepd_stds.append(float(s))
             else:
                 _, m, s = preprocess_amplitude(train_raw, trafos=amp_trafos)
@@ -1227,8 +1243,9 @@ class AmplitudeExperiment(BaseExperiment):
                 N, P  = parts.shape[0], parts.shape[1]
                 m = prepd_means[proc_idx] if per_dataset else prepd_means[0]
                 s = prepd_stds[proc_idx]  if per_dataset else prepd_stds[0]
+                tr = self._amp_trafos_pp[proc_idx] if self._amp_trafos_pp else amp_trafos
                 amp_prepd, _, _ = preprocess_amplitude(
-                    rec["raw_amp"], trafos=amp_trafos, mean=m, std=s,
+                    rec["raw_amp"], trafos=tr, mean=m, std=s,
                 )
                 ds_parts.append(parts.reshape(N * P, 4))
                 ds_toks.append(np.asarray(toks).reshape(N * P))
@@ -1530,6 +1547,11 @@ class AmplitudeExperiment(BaseExperiment):
                 p = list(self.cfg.data.dataset).index(name)
                 return self.prepd_mean[p], self.prepd_std[p]
             return self.prepd_mean[0], self.prepd_std[0]
+        def _amp_trafo(name):
+            pp = getattr(self, "_amp_trafos_pp", None)
+            if pp:
+                return pp[list(self.cfg.data.dataset).index(name)]
+            return self.cfg.data.amp_trafos
 
         def collect(loader):
             with torch.no_grad():
@@ -1606,10 +1628,11 @@ class AmplitudeExperiment(BaseExperiment):
         for name, splits in proc_preds.items():
             self.results_per_proc[name] = {}
             pm, ps = _amp_stats(name)
+            tr = _amp_trafo(name)
             for split, (pred, truth, sigmas) in splits.items():
                 self.results_per_proc[name][split] = self._metrics_from_arrays(
                     pred, truth, f"{split}_{name}", name, sigmas,
-                    prepd_mean=pm, prepd_std=ps,
+                    prepd_mean=pm, prepd_std=ps, prepd_trafos=tr,
                 )[name]
 
         # Optionally log noema metrics (no extra forward pass — just re-use arrays)
@@ -1725,7 +1748,7 @@ class AmplitudeExperiment(BaseExperiment):
         return amp_pred_prepd, amp_truth_prepd, sigmas
 
     def _metrics_from_arrays(self, amp_pred_prepd, amp_truth_prepd, title, result_key,
-                             sigmas=None, prepd_mean=None, prepd_std=None):
+                             sigmas=None, prepd_mean=None, prepd_std=None, prepd_trafos=None):
         """Compute metrics from preprocessed arrays (no model call). Pure numpy.
 
         `prepd_mean`/`prepd_std` override the standardization stats used to undo
@@ -1737,6 +1760,8 @@ class AmplitudeExperiment(BaseExperiment):
             prepd_mean = self.prepd_mean[0]
         if prepd_std is None:
             prepd_std = self.prepd_std[0]
+        if prepd_trafos is None:
+            prepd_trafos = self.cfg.data.amp_trafos
         mse_prepd    = np.mean((amp_pred_prepd - amp_truth_prepd) ** 2)
         l1_prepd     = np.mean(np.abs(amp_pred_prepd - amp_truth_prepd))
         l1_rel_prepd = np.mean(
@@ -1748,12 +1773,10 @@ class AmplitudeExperiment(BaseExperiment):
         LOGGER.info(f"L1r (prepd) {title} {result_key}: {l1_rel_prepd:.4e}")
 
         amp_truth = undo_preprocess_amplitude(
-            amp_truth_prepd, prepd_mean, prepd_std,
-            trafos=self.cfg.data.amp_trafos,
+            amp_truth_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
         )
         amp_pred = undo_preprocess_amplitude(
-            amp_pred_prepd, prepd_mean, prepd_std,
-            trafos=self.cfg.data.amp_trafos,
+            amp_pred_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
         )
 
         mse    = np.mean((amp_truth - amp_pred) ** 2)
