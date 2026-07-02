@@ -451,6 +451,16 @@ PROCESSES = {
         "pdg_ids": [11, -11, 24, -24, 5, -5],
         "m_finals": [80.419, 80.419, 0.0, 0.0],  # mW, mW, mb=0 (5F); top is internal
     },
+    "ee_mumutautau": {   # Higgs: ee→ZH, Z→μμ, H→ττ — internal H resonates at M(ττ)≈MH.
+        # τ is massive (nonzero Yukawa), so H→ττ exists at the physical M_H≈125 (unlike
+        # H→WW in ee_wwbb, bounded by 2·M_W). The μμ pair also carries the s-channel Z.
+        "mg5_generate": ["generate e+ e- > mu+ mu- ta+ ta-"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, -13, 13, -15, 15],
+        "m_finals": [0.0, 0.0, 1.777, 1.777],   # μμ massless, ττ massive; H/Z are internal
+    },
     # ------------------------------------------------------------------
     # Foundation pretraining set (25 e+e- processes, tree-level LO).
     # Deliberately excludes ee_uu / ee_ttbar (their NLO versions are the

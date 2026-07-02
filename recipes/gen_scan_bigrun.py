@@ -85,9 +85,9 @@ def zscan_points():
 # each scan is a genuinely new, hidden per-event lever for data.offshell_per_event.
 #   (process, pdg, n_pts, factor_lo, factor_hi)
 RESON_SCANS = [
-    ("ee_wwbb",     6,  10, 0.80, 1.20),   # top   : t→Wb resonance (MT)
-    ("ee_wwbb",     25, 10, 0.80, 1.20),   # Higgs : H→WW* resonance (MH, gauge coupling)
-    ("ee_mumumumu", 23, 12, 0.88, 1.25),   # Z     : μμ-pair resonance in 4-lepton (MZ; floor >M_W)
+    ("ee_wwbb",       6,  10, 0.80, 1.20),  # top   : t→Wb resonance (MT)
+    ("ee_mumutautau", 25, 10, 0.80, 1.20),  # Higgs : H→ττ resonance in M(ττ) at physical MH
+    ("ee_mumumumu",   23, 12, 0.88, 1.25),  # Z     : μμ-pair resonance in 4-lepton (MZ; floor >M_W)
 ]
 RESON_TAG = {6: "mt", 25: "mh", 23: "mz4l"}
 
