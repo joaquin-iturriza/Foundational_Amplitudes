@@ -16,23 +16,49 @@ val_loss (DyHPO objective); optima are the HP config at that minimum.
 
 ---
 
-## Headline result: the optimum barely moves — μP + Adam deliver
+## Headline result #1: lr transfers across width (μP), but NOT across iterations
 
-**`training.lr` optimum ≈ 3×10⁻³, and it is essentially invariant to everything
-we scanned.** Best-lr geomean by axis:
+**`training.lr` optimum is flat in width — that part of μP holds** — but it is
+**strongly non-monotonic in training length** (an inverted-U). Best-lr geomean by
+axis:
 
 | axis | range scanned | best-lr behaviour |
 |------|---------------|-------------------|
-| **width** `num_heads` | 2 → 32 (16×) | 6.0e-3, 3.6e-3, 3.4e-3, 3.0e-3, 2.9e-3 — **flat** (slope ≈ −0.004/head, r=−0.07) |
-| **batch size** | 256 → 16384 (64×) | all ~2.5–4.8e-3 — **flat** (slope +0.08/decade) |
-| **data size** `n_train` | 7 distinct | slope +0.06/decade, r=+0.09 — **flat** |
-| **iterations** `t_steps` | 4 → 6×10⁵ | slope +0.09/decade, r=+0.19 — weak, near-flat |
-| **# processes** | solo=5.1e-3, 8-proc=2.7e-3 | within 2× |
+| **width** `num_heads` | 2 → 32 (16×) | 6.0e-3, 3.6e-3, 3.4e-3, 3.0e-3, 2.9e-3 — **flat** (μP transfer ✓) |
+| **iterations** `t_steps` | 4 → 6×10⁵ | **INVERTED-U** — see below (a single slope is ≈0 and is *misleading*) |
+| **data size** `n_train` | 7 distinct | weak; largely a proxy for the iterations effect |
+| **batch / #proc** | 256↔16384, solo↔8-proc | **cannot isolate** — entangled with t_steps and regime |
 
-μP is doing exactly its job: **lr transfers across width**, so re-sweeping lr per
-width is pure waste. Adam + μP also make lr near-insensitive to batch size and
-data size in this regime. **90% of all lr optima fall inside a single decade**
-(`p5–p95 = 3.5e-4 … 2.1e-2`), vs the declared 4-decade range `[3.2e-5, 3e-1]`.
+> ⚠️ Correction to an earlier version of this note: I first reported lr as
+> "invariant to iterations." That was wrong — it came from fitting one straight
+> line in log-log, whose slope (+0.09/dec, r=0.19) averages the rise and fall of a
+> hump to nearly zero. Binning best-lr by `t_steps` and plotting the geomean (as
+> was already done for width/batch) makes the trend obvious.
+
+### The iterations law (inverted-U, peak t\* ≈ 3000 steps)
+
+Splitting at the peak gives two clean power laws, consistent across regimes
+(numbers = slope `dlog10 lr / dlog10 t`, Pearson r):
+
+| branch | joint 8-proc (bs 256) | solo (bs 16384) | pooled |
+|--------|-----------------------|-----------------|--------|
+| ascending  (t ≲ 3000) | **+0.49** (r 0.68) | +0.51 (r 0.71) | +0.43 (r 0.63) |
+| descending (t ≳ 3000) | **−0.58** (r 0.68) | −0.21 (r 0.22) | −0.57 (r 0.62) |
+
+i.e. `lr*(t) ≈ lr_peak · min[(t/t*)^{+0.5}, (t/t*)^{−0.55}]`, with **t\* ≈ 3×10³**,
+**lr_peak ≈ 8×10⁻³** (joint) to ~1.5×10⁻² (solo). Geomean lr by t_steps (well-
+populated bins): t=4→7.8e-4, t=100→1.1e-3, t≈1–3k→**6–8e-3 (peak)**, t=10k→2.5e-3,
+t=31k→1.6e-3, t=100k→7e-4.
+
+**Practically:** short probe runs and long production runs both want *lower* lr;
+the ~1e-2 sweet spot only holds near a few-thousand-step horizon. A 10⁵-step
+pretraining run wants lr ≈ 1e-3, **not** 3e-3 and certainly not the 8e-3 that is
+optimal at 3k steps. The old "universal ≈3e-3" was just the geomean over a mix of
+horizons (90% of *marginal* lr optima do fall in `[3.5e-4, 2.1e-2]`, but that
+decade is t-dependent — condition on t_steps and it tightens to ~½ decade).
+
+μP still earns its keep: **lr transfers across width at matched t_steps**, so
+re-sweeping lr per width remains pure waste.
 
 `fine_tune.lr_scale` optimum ≈ **1.0** (median 1.26, p5–p95 = 0.13…7.7): the best
 finetune lr is ≈ the pretrain lr. Declared `[5e-3, 50]` (4 decades) is ~2 decades
@@ -54,7 +80,7 @@ each) → noise, drop them.
 
 | HP | declared | optima p5–p95 | recommendation |
 |----|----------|---------------|----------------|
-| `training.lr` | 3.2e-5…3e-1 (4 dec) | 3.5e-4…2.1e-2 (1.8 dec) | **[1e-3, 1e-2]** (1 dec), center 3e-3 |
+| `training.lr` | 3.2e-5…3e-1 (4 dec) | 3.5e-4…2.1e-2 (1.8 dec) | **center on lr\*(t_steps)** (below), sweep ±½ dec |
 | `regularization_lambda` | 1e-11…1e-2 (9 dec) | 2.5e-11…9.8e-7 | **cap high at 1e-6**; use [1e-10, 1e-6] |
 | `cosanneal_eta_min` | 1e-11…1e-6 | spans full range, weakest | **fix at ~1e-8** (or [1e-10,1e-7]) |
 | `cosanneal_warmup_frac` | 0…0.2 | 0.007…0.2 (median 0.15) | **[0.05, 0.2]** |
@@ -66,9 +92,19 @@ each) → noise, drop them.
 
 ## Recommended default search space (pretrain / solo `training.lr` sweeps)
 
+Center the lr window on the horizon and sweep only ±½ decade around it:
+
+```
+lr_center(t) = 1.0e-2 * min( (t/3000)**0.5, (t/3000)**-0.55 )   # peak 1e-2 @ 3k steps
+low  = lr_center / 3
+high = lr_center * 3
+```
+Worked values: t=300 → ~[1e-3,9e-3]; t=3k → ~[3e-3,3e-2]; t=1e4 → ~[1.7e-3,1.5e-2];
+t=1e5 → ~[4e-4,4e-3]. (~1 decade total vs the current 4.)
+
 ```yaml
 search_space:
-- {name: training.lr,                     type: float_log,     low: 1.0e-3,  high: 1.0e-2}   # was 3e-5..3e-1
+- {name: training.lr,                     type: float_log,     low: LR_LOW,  high: LR_HIGH}  # from lr_center(t_steps) ±3×; was 3e-5..3e-1
 - {name: training.cosanneal_warmup_frac,  type: float_uniform, low: 0.05,    high: 0.2}
 - {name: training.ema_decay,              type: float_uniform, low: 0.9,     high: 0.999}
 - {name: training.regularization_lambda,  type: float_log,     low: 1.0e-10, high: 1.0e-6}   # was ..1e-2
@@ -87,15 +123,20 @@ range + 5–7 loosely-bounded knobs.
 1. **Never re-sweep lr across width** — μP transfers it. Tune HPs once at the
    smallest width, reuse for all larger widths. On a width-scaling grid
    (nh ∈ {2,4,8,16,32}) that's up to a **5× cut in sweeps**.
-2. **lr range 4→1 decade + fix eta_min + cap reg_lambda + drop exotic sampler
-   knobs** shrinks the search volume by ~10–100×, so the *same trial budget*
-   explores it far more densely — or **drop trials/candidates roughly in half**
-   (e.g. 300→150 candidates, ~15→~8 obs) for equal resolution.
-3. lr is also **batch- and data-size-robust**, so a good lr found at one
-   (D, t_steps) cell transfers to neighbours — you can seed new cells at 3e-3
-   instead of re-searching from a flat prior.
+2. **Center lr on lr\*(t_steps)** (the inverted-U law) and sweep ±½ decade
+   instead of a flat 4-decade prior; fix eta_min, cap reg_lambda, drop the exotic
+   sampler knobs. Together this shrinks the search volume ~10–100×, so the *same*
+   trial budget explores it far more densely — or **drop trials/candidates roughly
+   in half** (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution.
+3. **Seed new cells from the law, not a flat prior.** lr\*(t) is smooth in
+   t_steps and transfers across width, so a good lr at one horizon predicts its
+   neighbours — start DyHPO's candidates around lr_center(t) rather than sampling
+   the whole range. (Do NOT assume batch/data-size invariance — those axes are
+   entangled with t_steps here and were never cleanly isolated.)
 
 Caveat: derived `n_train` / `eff_bs` are exact for `subsample`+`train_test_val`
 sweeps (majority); source/`train_subsample` sweeps (pretrain25, encab, preproc)
-are estimated (`size_reliable=false` in the json). The invariance conclusions
-hold regardless since lr is flat along *every* axis.
+are estimated (`size_reliable=false` in the json). This mostly affects the
+data-size / batch axes — which are already entangled with t_steps and not used
+for a strong claim. The width-transfer and iterations-hump results stand on the
+clean joint grid (fixed batch & #processes, width and t_steps varied on a grid).

@@ -34,16 +34,24 @@ for x,y in zip(xs,ys): g[x].append(math.log10(y))
 gx=sorted(g); gy=[10**np.mean(g[k]) for k in gx]
 a.plot(gx,gy,'o-',color='red',lw=2,label='geomean')
 a.set_xscale('log',base=2); a.set_yscale('log'); a.set_xlabel('configured batchsize')
-a.set_ylabel('best training.lr'); a.set_title('lr vs batch — flat ⇒ batch-robust'); a.legend(); a.grid(alpha=.3,which='both')
+a.set_ylabel('best training.lr'); a.set_title('lr vs batch (NOTE: batch entangled with t_steps & regime)'); a.legend(); a.grid(alpha=.3,which='both')
 
-# 3. lr vs t_steps colored by n_datasets
+# 3. lr vs t_steps: GEOMEAN per t_steps by regime -> clear inverted-U (hump)
 a=ax[0,2]
-for nd,col in [(1,'#A52A2A'),(8,'#0343DE')]:
-    xs=[r['t_steps'] for r in raw if bv(r,'training.lr') and r['t_steps'] and r['n_datasets']==nd]
-    ys=[bv(r,'training.lr') for r in raw if bv(r,'training.lr') and r['t_steps'] and r['n_datasets']==nd]
-    a.scatter(xs,ys,s=18,alpha=0.5,color=col,label=f'{nd} process'+('es' if nd>1 else ''))
+xs=[r['t_steps'] for r in raw if bv(r,'training.lr') and r['t_steps']]
+ys=[bv(r,'training.lr') for r in raw if bv(r,'training.lr') and r['t_steps']]
+a.scatter(xs,ys,s=12,alpha=0.18,color='gray')
+for nd,col,lab in [(8,'#0343DE','joint 8-proc geomean'),(1,'#A52A2A','solo geomean')]:
+    g=collections.defaultdict(list)
+    for r in raw:
+        lr=bv(r,'training.lr'); t=r['t_steps']
+        if lr and lr>0 and t and r['n_datasets']==nd: g[t].append(math.log10(lr))
+    gx=sorted(g); gy=[10**np.mean(g[k]) for k in gx]
+    a.plot(gx,gy,'o-',color=col,lw=2,ms=5,label=lab)
+a.axvline(3000,color='green',ls=':',label='peak t*~3e3')
 a.set_xscale('log'); a.set_yscale('log'); a.set_xlabel('t_steps (iterations)')
-a.set_ylabel('best training.lr'); a.set_title('lr vs iterations — no trend'); a.legend(); a.grid(alpha=.3,which='both')
+a.set_ylabel('best training.lr')
+a.set_title('lr vs iterations — INVERTED-U: lr∝t^+0.5 then t^-0.55'); a.legend(fontsize=7); a.grid(alpha=.3,which='both')
 
 # 4. lr histogram + recommended band
 a=ax[1,0]
@@ -52,7 +60,7 @@ a.hist(ys,bins=30,color='#0343DE',alpha=0.7)
 a.axvspan(math.log10(1e-3),math.log10(1e-2),color='green',alpha=0.2,label='recommend [1e-3,1e-2]')
 a.axvline(math.log10(3e-3),color='red',ls='--',label='median ~3e-3')
 a.set_xlabel('log10 best training.lr'); a.set_ylabel('# sweeps')
-a.set_title('lr optima: 90% inside 1 decade'); a.legend(fontsize=8); a.grid(alpha=.3)
+a.set_title('lr optima MARGINAL spread (condition on t_steps → panel 3)'); a.legend(fontsize=8); a.grid(alpha=.3)
 
 # 5. HP importance bars (recomputed lightweight: use declared spread proxy is wrong; load precomputed)
 a=ax[1,1]
