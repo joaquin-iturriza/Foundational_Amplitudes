@@ -761,6 +761,26 @@ def fortran_dir_for(standalone_dir):
     """Sibling dir holding the Fortran standalone (matrix2py backend)."""
     return standalone_dir + "_py"
 
+
+def repatch_standalone_param_cards(standalone_dir, config):
+    """Re-apply config's param_card_patches to an ALREADY-compiled standalone's cards.
+
+    Standalone dirs are keyed by process name, compiled once, and the runtime driver
+    reads the param_card at generation time. When a name-keyed standalone is reused
+    across recipe versions with DIFFERENT physics — e.g. a mass scan whose M_Z/M_T
+    values changed — the compiled backend is fine but its param_card still holds the
+    FIRST-build masses. ensure_backend() calls this on every reuse so the card always
+    reflects THIS dataset's physics (a mass patch that isn't re-applied silently
+    generates at the stale mass — NaN couplings if it pushed M_Z below the on-shell
+    root). No-op when there are no patches (base processes)."""
+    patches = config.get("param_card_patches", {})
+    if not patches:
+        return
+    for pc in (f"{standalone_dir}/Cards/param_card.dat",
+               f"{fortran_dir_for(standalone_dir)}/Cards/param_card.dat"):
+        if os.path.exists(pc):
+            patch_param_card_slha(pc, patches)
+
 def generate_mg5_process(process_name, config):
     """Run MadGraph to generate the events dir plus two standalone outputs:
        - <proc>_standalone     : standalone_cpp (C++ driver, fixed α_s) — fallback

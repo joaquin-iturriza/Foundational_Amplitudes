@@ -131,6 +131,13 @@ def ensure_backend(process):
     if not subproc_dirs or (backend == "cpp" and driver_bin is None):
         mg.generate_mg5_process(sa, cfg)
         mg.compile_backends(standalone_dir, cfg["nfinal"] + 2)
+    # A name-keyed OWN backend (mass/EW scan: sa == process) may be reused across
+    # recipe versions with different masses; re-patch its param_card to THIS dataset's
+    # physics every time (the compile step only patches on first build). Shared
+    # coupling-only scans (sa == base) keep the base card — α_s is applied by analytic
+    # rescale, not the card — so they are left untouched.
+    if sa == process:
+        mg.repatch_standalone_param_cards(standalone_dir, cfg)
     return standalone_dir
 
 
