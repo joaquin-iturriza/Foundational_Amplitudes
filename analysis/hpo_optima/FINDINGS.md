@@ -25,9 +25,17 @@ axis:
 | axis | range scanned | best-lr behaviour |
 |------|---------------|-------------------|
 | **width** `num_heads` | 2 → 32 (16×) | 6.0e-3, 3.6e-3, 3.4e-3, 3.0e-3, 2.9e-3 — **flat** (μP transfer ✓) |
-| **iterations** `t_steps` | 4 → 6×10⁵ | **INVERTED-U** — see below (a single slope is ≈0 and is *misleading*) |
-| **data size** `n_train` | 7 distinct | weak; largely a proxy for the iterations effect |
+| **iterations** `t_steps` | 4 → 6×10⁵ | **INVERTED-U** at fixed D — see below (a single slope is ≈0 and *misleading*) |
+| **data size** `n_train` | 700 → 70000 | **weak positive**: `lr* ∝ n_train^{+0.15..0.3}` at fixed t (~2× over 100× data, saturating) |
 | **batch / #proc** | 256↔16384, solo↔8-proc | **cannot isolate** — entangled with t_steps and regime |
+
+Disentangled on the clean `scaling_p` 2D grid (`nh × n_train × t_steps`, width
+marginalized since lr is width-flat) — see `lr_2d_disentangled.png`:
+* **down each column (fix t, vary data): weak.** Optimal lr rises mildly with
+  dataset size, slope +0.15–0.3 in log-log, saturating. *This is the dataset-size
+  dependence — it's real but small, which is why it never jumped out of the
+  marginal plots.*
+* **along each row (fix data, vary t): the inverted-U, at every single D.**
 
 > ⚠️ Correction to an earlier version of this note: I first reported lr as
 > "invariant to iterations." That was wrong — it came from fitting one straight
@@ -50,12 +58,40 @@ i.e. `lr*(t) ≈ lr_peak · min[(t/t*)^{+0.5}, (t/t*)^{−0.55}]`, with **t\* �
 populated bins): t=4→7.8e-4, t=100→1.1e-3, t≈1–3k→**6–8e-3 (peak)**, t=10k→2.5e-3,
 t=31k→1.6e-3, t=100k→7e-4.
 
-**Practically:** short probe runs and long production runs both want *lower* lr;
-the ~1e-2 sweet spot only holds near a few-thousand-step horizon. A 10⁵-step
-pretraining run wants lr ≈ 1e-3, **not** 3e-3 and certainly not the 8e-3 that is
-optimal at 3k steps. The old "universal ≈3e-3" was just the geomean over a mix of
-horizons (90% of *marginal* lr optima do fall in `[3.5e-4, 2.1e-2]`, but that
-decade is t-dependent — condition on t_steps and it tightens to ~½ decade).
+**The peak is at an absolute ~3×10³ steps, independent of dataset size**
+(argmax-t = 3162 for *every* n_train from 700 to 70000, a 100× range). The
+convergence knee (where `best_val_loss` floors, panel C) instead shifts *later*
+with D — so the peak is **not** "the convergence point"; it's pinned to an
+absolute step scale. That points to an **optimizer/schedule timescale**, not a
+data effect: Adam's 2nd-moment EMA has timescale `1/(1−β₂) ≈ 10³` steps, warmup is
+`warmup_frac·t` (and optimal warmup collapses toward 0 at the shortest horizons,
+0.064 @ t=10), and the weight EMA adds another ~10²–10³-step scale.
+
+### Why this matches (not contradicts) intuition
+
+* **Descending branch (t ≳ 3k), the intuitive one:** past the optimizer's
+  steady-state/convergence scale, extra steps are spent polishing an
+  already-fit model, and optimal peak-lr falls as ≈ `t^{−0.5..−0.6}` — exactly
+  "more iterations ⇒ lower lr." This is where standard intuition lives.
+* **Rising branch (t ≲ 3k), the counterintuitive one:** with fewer steps than
+  Adam's variance-EMA and warmup timescales you're **not in steady state** — a
+  large peak lr can't be exploited (you'd end mid-warmup or overshoot with no
+  time to anneal), so the best lr is *lower* and grows as you add steps. We just
+  rarely sweep lr this deep in the undertrained regime, so we never built
+  intuition for it. These are also mostly the cheap low-fidelity DyHPO probes,
+  not real runs.
+
+### What this means for a real (scaled-up) run — corrects an earlier claim
+
+A production run grows **both** data and steps. The two structured effects then
+**partly cancel**: the negative t-slope past the peak vs the positive D-slope. So
+along a realistic compute-scaling ray optimal lr stays **near the peak, ~5e-3 to
+1e-2** (at the base μP width) and is fairly *stable* — which is why the marginal
+looked flat. My earlier "10⁵ steps ⇒ lr 1e-3" was wrong: that came from
+*over-training small subsampled datasets* (fixed tiny D, many steps → deep into
+the descending branch). On full data at 10⁵ steps you're still under-converged →
+stay near the peak lr (~1e-2), **don't** lower it just because t is large. Only
+lower lr when you knowingly train a fixed dataset well past its loss floor.
 
 μP still earns its keep: **lr transfers across width at matched t_steps**, so
 re-sweeping lr per width remains pure waste.
@@ -92,15 +128,20 @@ each) → noise, drop them.
 
 ## Recommended default search space (pretrain / solo `training.lr` sweeps)
 
-Center the lr window on the horizon and sweep only ±½ decade around it:
+Center the lr window on the horizon **relative to the ~3k-step optimizer scale**,
+and sweep only ±½ decade around it:
 
 ```
-lr_center(t) = 1.0e-2 * min( (t/3000)**0.5, (t/3000)**-0.55 )   # peak 1e-2 @ 3k steps
-low  = lr_center / 3
-high = lr_center * 3
+lr_center(t) = 1.0e-2 * min( (t/3000)**0.5, (t/3000)**-0.55 )   # peak 1e-2 @ ~3k steps
+low  = lr_center / 3 ;  high = lr_center * 3
 ```
-Worked values: t=300 → ~[1e-3,9e-3]; t=3k → ~[3e-3,3e-2]; t=1e4 → ~[1.7e-3,1.5e-2];
-t=1e5 → ~[4e-4,4e-3]. (~1 decade total vs the current 4.)
+BUT the decay side (`t>3k`) only applies when the dataset is **fixed and being
+over-trained**. For a **real scaled run** (data grows with steps ⇒ under-converged)
+just **sweep the peak band, `[3e-3, 3e-2]`**, at every horizon — the t and D
+effects cancel and the optimum stays near the peak. Rule of thumb: is
+`best_val_loss` still dropping at your budget? → under-converged → use the peak
+band. Has it floored? → over-converged → apply the `t^{-0.55}` decay.
+Either way the range is ~1 decade vs the current 4.
 
 ```yaml
 search_space:
