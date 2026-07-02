@@ -1484,7 +1484,74 @@ def build_dataset(events_dir, standalone_dir, backend, subproc_dirs,
 # VARIABLE-ENERGY MODE: direct phase-space sampling (bypasses MadGraph LHE gen)
 # =============================================================================
 
-def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None):
+# Fiducial cuts — RAMBO samples the FULL phase space (MadGraph's run-card cuts are
+# bypassed), so soft/collinear/forward/low-mass-pair regions give an IR tail spanning
+# ~10+ log units. These cuts define the fiducial region kept in the dataset. They
+# apply ONLY to massless, VISIBLE final-state particles (m_final==0 and not a
+# neutrino) — the IR-singular ones; massive finals (W/Z/t/H) and neutrinos are exempt.
+# Toggle off with AMP_FIDUCIAL_CUTS=off (reproduces pre-cut data; cut params enter
+# recipe_id so cut/no-cut datasets never share a cache entry).
+FIDUCIAL_CUTS = {"pt_min": 10.0, "cos_max": 0.9, "dr_min": 0.4, "m_min": 10.0}
+FIDUCIAL_CUTS_ENABLED = os.environ.get("AMP_FIDUCIAL_CUTS", "on").lower() != "off"
+_NEUTRINOS = frozenset((12, 14, 16))
+
+
+def _cut_key(cuts):
+    """Identity-bearing view of the active cuts (for recipe_id)."""
+    return {k: float(cuts[k]) for k in ("pt_min", "cos_max", "dr_min", "m_min")}
+
+
+def fiducial_pass_mask(P, m_finals, pdg_ids, cuts, n_initial=2):
+    """Boolean mask (N,) of events passing the fiducial cuts. P is (N, npart, 4).
+    Cuts hit only massless visible finals (m_final==0, |pdg|∉{12,14,16}): single-
+    particle pt>pt_min & |cosθ|<cos_max; pairwise (among those) ΔR>dr_min & m>m_min.
+    A process with no such particle (all-massive / all-neutrino finals) passes all."""
+    import itertools
+    N = P.shape[0]
+    m_finals = np.asarray(m_finals, float)
+    fin = list(range(n_initial, n_initial + len(m_finals)))
+    slots = [fin[i] for i in range(len(m_finals))
+             if m_finals[i] == 0.0 and abs(int(pdg_ids[fin[i]])) not in _NEUTRINOS]
+    keep = np.ones(N, dtype=bool)
+    if not slots:
+        return keep
+    pt   = lambda p: np.sqrt(p[..., 1] ** 2 + p[..., 2] ** 2)
+    cost = lambda p: np.abs(p[..., 3]) / np.clip(np.linalg.norm(p[..., 1:], axis=-1), 1e-12, None)
+    eta  = lambda p: np.arcsinh(p[..., 3] / np.clip(pt(p), 1e-9, None))
+    phi  = lambda p: np.arctan2(p[..., 2], p[..., 1])
+    for s in slots:
+        keep &= (pt(P[:, s]) > cuts["pt_min"]) & (cost(P[:, s]) < cuts["cos_max"])
+    for i, j in itertools.combinations(slots, 2):
+        pi, pj = P[:, i], P[:, j]
+        dphi = np.abs(phi(pi) - phi(pj)); dphi = np.minimum(dphi, 2 * np.pi - dphi)
+        dr   = np.sqrt((eta(pi) - eta(pj)) ** 2 + dphi ** 2)
+        q    = pi + pj
+        m    = np.sqrt(np.clip(q[..., 0] ** 2 - (q[..., 1:] ** 2).sum(-1), 0.0, None))
+        keep &= (dr > cuts["dr_min"]) & (m > cuts["m_min"])
+    return keep
+
+
+def _collect_with_cuts(draw, n_events, m_finals, pdg_ids, cuts):
+    """Oversample-and-reject: call draw(n)->(P (n,npart,4), sqrts (n,)) repeatedly,
+    keep events passing fiducial_pass_mask, until n_events accumulate. Returns
+    (P (n_events,npart,4), sqrts (n_events,)). cuts=None → single unfiltered draw.
+    Deterministic given the draw's rng (adaptive batch size depends only on the
+    running acceptance estimate, itself a function of the drawn — seeded — events)."""
+    if cuts is None:
+        return draw(n_events)
+    accP, accS, got, acc = [], [], 0, 0.5
+    while got < n_events:
+        need  = n_events - got
+        batch = int(min(max(need / max(acc, 0.03) * 1.3, need), need * 50)) + 32
+        P, sq = draw(batch)
+        m = fiducial_pass_mask(P, m_finals, pdg_ids, cuts)
+        if m.any():
+            accP.append(P[m]); accS.append(sq[m]); got += int(m.sum())
+        acc = 0.85 * acc + 0.15 * (float(m.mean()) if m.size else acc)
+    return np.concatenate(accP)[:n_events], np.concatenate(accS)[:n_events]
+
+
+def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None, cuts=None):
     """
     Sample uniform phase space for a 2→2 partonic process with a massless,
     back-to-back initial state (e+e-, gg, qq~, …).
@@ -1514,32 +1581,33 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None)
     else:
         m3, m4 = float(m_final[0]), float(m_final[1])
 
-    sqrts  = rng.uniform(sqrts_min, sqrts_max, n)
-    cos_t  = rng.uniform(-1.0, 1.0, n)
-    phi    = rng.uniform(0.0, 2.0 * np.pi, n)
-
-    s       = sqrts**2
-    E_beam  = sqrts / 2.0
-    E3      = (s + m3**2 - m4**2) / (2.0 * sqrts)
-    E4      = sqrts - E3
-    p_mag   = np.sqrt(np.maximum(E3**2 - m3**2, 0.0))
-    sin_t   = np.sqrt(1.0 - cos_t**2)
-
-    px = p_mag * sin_t * np.cos(phi)
-    py = p_mag * sin_t * np.sin(phi)
-    pz = p_mag * cos_t
-
     pdg_arr = np.array(pdg_ids, dtype=int)
-    events = []
-    for i in range(n):
-        momenta = np.array([
-            [E_beam[i],  0.0,   0.0,    E_beam[i]],   # beam-
-            [E_beam[i],  0.0,   0.0,   -E_beam[i]],   # beam+
-            [E3[i],      px[i], py[i],  pz[i]],        # X
-            [E4[i],     -px[i],-py[i], -pz[i]],        # Xbar
-        ])
-        events.append((momenta, pdg_arr))
+    m_finals = [m3, m4]
 
+    def draw(nb):
+        sqrts  = rng.uniform(sqrts_min, sqrts_max, nb)
+        cos_t  = rng.uniform(-1.0, 1.0, nb)
+        phi    = rng.uniform(0.0, 2.0 * np.pi, nb)
+        s      = sqrts ** 2
+        E_beam = sqrts / 2.0
+        E3     = (s + m3 ** 2 - m4 ** 2) / (2.0 * sqrts)
+        E4     = sqrts - E3
+        p_mag  = np.sqrt(np.maximum(E3 ** 2 - m3 ** 2, 0.0))
+        sin_t  = np.sqrt(1.0 - cos_t ** 2)
+        px = p_mag * sin_t * np.cos(phi)
+        py = p_mag * sin_t * np.sin(phi)
+        pz = p_mag * cos_t
+        zero = np.zeros(nb)
+        P = np.stack([
+            np.stack([E_beam, zero,  zero,  E_beam], axis=1),   # beam-
+            np.stack([E_beam, zero,  zero, -E_beam], axis=1),   # beam+
+            np.stack([E3,     px,    py,    pz],     axis=1),    # X
+            np.stack([E4,    -px,   -py,   -pz],     axis=1),    # Xbar
+        ], axis=1)                                              # (nb, 4, 4)
+        return P, sqrts
+
+    P, sqrts = _collect_with_cuts(draw, n, m_finals, pdg_arr, cuts)
+    events = [(P[i], pdg_arr) for i in range(n)]
     return events, sqrts
 
 
@@ -1618,12 +1686,13 @@ def _rambo_massive_batch(sqrts_arr, masses, p_massless):
     return p
 
 
-def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=None):
+def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=None, cuts=None):
     """
     Sample n-body phase space using RAMBO for a range of CM energies.
 
     Uses fully vectorized batch RAMBO; no Python loop over events.
     The initial-state convention (e- row 0, e+ row 1) matches CPPProcess.
+    With ``cuts`` set, oversamples and keeps only events in the fiducial region.
 
     Returns (events, sqrts_arr) where events is a list of
     (momenta_array (nparticles x 4), pdg_ids_array).
@@ -1634,22 +1703,22 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
     masses   = np.asarray(m_finals, dtype=float)
     nfinal   = len(masses)
     all_zero = np.all(masses == 0.0)
-    sqrts    = rng.uniform(sqrts_min, sqrts_max, n_events)
-    E_beam   = sqrts / 2.0
     pdg_arr  = np.array(pdg_ids, dtype=int)
 
-    p_ml    = _rambo_massless_batch(sqrts, nfinal, rng)              # (N, nfinal, 4)
-    p_final = p_ml if all_zero else _rambo_massive_batch(sqrts, masses, p_ml)
+    def draw(nb):
+        sqrts   = rng.uniform(sqrts_min, sqrts_max, nb)
+        E_beam  = sqrts / 2.0
+        p_ml    = _rambo_massless_batch(sqrts, nfinal, rng)          # (nb, nfinal, 4)
+        p_final = p_ml if all_zero else _rambo_massive_batch(sqrts, masses, p_ml)
+        zero    = np.zeros(nb)
+        p_init  = np.stack([
+            np.stack([E_beam, zero, zero,  E_beam], axis=1),
+            np.stack([E_beam, zero, zero, -E_beam], axis=1),
+        ], axis=1)                                                  # (nb, 2, 4)
+        return np.concatenate([p_init, p_final], axis=1), sqrts     # (nb, nparticles, 4)
 
-    # Build event list (format expected by CppDriverPipe and compute_amplitudes_matrix2py)
-    events = []
-    for i in range(n_events):
-        p_init = np.array([
-            [E_beam[i], 0.0, 0.0,  E_beam[i]],   # e-
-            [E_beam[i], 0.0, 0.0, -E_beam[i]],   # e+
-        ])
-        events.append((np.vstack([p_init, p_final[i]]), pdg_arr))
-
+    P, sqrts = _collect_with_cuts(draw, n_events, m_finals, pdg_arr, cuts)
+    events = [(P[i], pdg_arr) for i in range(n_events)]
     return events, sqrts
 
 
@@ -1679,22 +1748,24 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     # Reference α_s(M_Z) for the per-event running μ=√s. Per-dataset scans set this
     # (register_scan_process); default 0.118 keeps existing datasets bit-identical.
     amz        = float(config.get("alphas_mz", 0.118))
+    cuts       = FIDUCIAL_CUTS if FIDUCIAL_CUTS_ENABLED else None
+    cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
 
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
         # fall back to the scalar m_final for an equal-mass pair (X X~).
         m_final = config["m_finals"] if "m_finals" in config else config["m_final"]
-        print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV")
+        print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}")
         print(f"[DATA] m_final = {m_final} GeV   backend = {backend}")
         events, sqrts_arr = sample_2to2_phase_space(
-            n_events, sqrts_min, sqrts_max, m_final, pdg_ids, rng=rng
+            n_events, sqrts_min, sqrts_max, m_final, pdg_ids, rng=rng, cuts=cuts
         )
     else:
         m_finals = config["m_finals"]
-        print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV")
+        print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}")
         print(f"[DATA] nfinal = {nfinal}  m_finals = {m_finals}  backend = {backend}")
         events, sqrts_arr = sample_nbody_phase_space(
-            n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=rng
+            n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=rng, cuts=cuts
         )
 
     os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
@@ -1874,6 +1945,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         recipe["alphas_prefactor"] = True   # NLO target carries the physical α_s weight
     if "scan_base" in cfg:
         recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", [])]
+    # Fiducial cuts (when active) change the sampled events → part of the identity, so
+    # cut and pre-cut (no-cut) datasets never collide in the cache. Omitted when off,
+    # so existing pre-cut datasets keep their recipe_id.
+    if FIDUCIAL_CUTS_ENABLED:
+        recipe["fiducial_cuts"] = _cut_key(FIDUCIAL_CUTS)
     ceil_div    = lambda a, b: -(-a // b)
     n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)
