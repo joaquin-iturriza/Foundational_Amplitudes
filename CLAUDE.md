@@ -59,6 +59,15 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    (`~/.claude/.../memory/`, `MEMORY.md`) — it's disabled in settings
    (`autoMemoryEnabled: false`) and a hook blocks writes to it. Everything goes
    in this file, which I maintain; only add here when I explicitly ask.
+   **This bans *any* new standalone `.md` / notes / findings / report / summary
+   file anywhere in the tree** — not just files literally named `CLAUDE.md`.
+   Writing conclusions into a fresh `FOO.md` next to some code/plots is exactly
+   the thing to avoid; **"it's a report/analysis write-up, not project guidance"
+   is NOT an exception.** If you think a doc is genuinely warranted, **ask first**;
+   if I approve, its path gets recorded in `.claude/md_allowlist.txt`. Editing an
+   *existing* `.md`, and files under `notes/` / `.claude/` / `README*`, are fine.
+   Enforced by the `md_guard.sh` `PreToolUse(Write)` hook (blocks new `.md`
+   outside the allowlist).
 
 4. **Go easy on `find` over large trees.** This is Lustre, not a slow network
    mount anymore, so `find` is allowed — but it can still be slow on huge
@@ -294,6 +303,14 @@ automatically instead of polling or forgetting.
   resumption from a previous fidelity checkpoint; don't hand-edit these — they're
   set by `run_trial.py`.
 - **Always keep `plot: true`** in sweep/experiment configs — I always want plots.
+- **Every figure ships as BOTH `.png` and `.pdf`** (same basename, same dir) —
+  no exceptions. When you write a plot, save both formats in the same call
+  (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`); make plotting scripts
+  emit both by default. Both are gitignored here (`*.png`, `*.pdf`) — "both
+  formats" means **on disk as deliverables**, not committed. Enforced by the
+  `figure_pair_guard.sh` `Stop` hook (blocks end-of-turn if a figure you just
+  made is missing its counterpart; genuine single-format exceptions go in
+  `.claude/figure_pair_ignore.txt`).
 - **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
   freezing are all in the `fine_tune` config block.
 - `.fuse_hidden*` and `._*` files are leftover filesystem artifacts — ignore them.
@@ -357,12 +374,16 @@ handles git: commit and push as work progresses, keep a readable timeline.
 
 **This is automatic, not a thing to ask about.** Commit with clear messages as
 work lands and push without asking — pushing is *not* an outward action that needs
-confirmation (see ground rule #2). Two hooks back this up so it can't be silently
-forgotten (`.claude/settings.json` → `.claude/hooks/`): a **`Stop` hook
-(`auto_push.sh`)** pushes any unpushed `jeanzay`/feature-branch commits to origin
-at the end of every turn (already-committed work only; never `main`); a
-**`PreToolUse` hook (`worktree_guard.sh`)** reminds me to open a worktree when I
-start editing trunk code on `jeanzay`.
+confirmation (see ground rule #2). Hooks back the workflow (and other rules) up
+so they can't be silently forgotten (`.claude/settings.json` → `.claude/hooks/`):
+a **`Stop` hook (`auto_push.sh`)** pushes any unpushed `jeanzay`/feature-branch
+commits to origin at the end of every turn (already-committed work only; never
+`main`); a **`PreToolUse` hook (`worktree_guard.sh`)** reminds me to open a
+worktree when I start editing trunk code on `jeanzay`. Two more enforce rules
+above: **`md_guard.sh`** (`PreToolUse(Write)`) blocks new scattered `.md` files
+(ground rule #3; allowlist `.claude/md_allowlist.txt`), and
+**`figure_pair_guard.sh`** (`Stop`) blocks finishing a turn if a figure was saved
+in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 
 **Branches**
 - **`jeanzay`** — the development trunk and default working branch. *Everything*

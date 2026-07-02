@@ -75,3 +75,6 @@ compare_models/flops.txt
 # Fortran/MadLoop crash core dumps (can be multi-GB)
 core-python-*
 core.[0-9]*
+
+# runtime marker for figure_pair_guard hook
+.claude/.figpair_last
