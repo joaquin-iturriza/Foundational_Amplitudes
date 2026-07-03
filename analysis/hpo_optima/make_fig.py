@@ -62,10 +62,10 @@ a.axvline(math.log10(3e-3),color='red',ls='--',label='median ~3e-3')
 a.set_xlabel('log10 best training.lr'); a.set_ylabel('# sweeps')
 a.set_title('lr optima MARGINAL spread (condition on t_steps → panel 3)'); a.legend(fontsize=8); a.grid(alpha=.3)
 
-# 5. HP importance bars (recomputed lightweight: use declared spread proxy is wrong; load precomputed)
+# 5. HP importance bars (sampler knobs excluded: the balanced sampler is no longer used)
 a=ax[1,1]
-imp_raw={'lr':0.285,'sampler_alpha_ema':0.274,'reg_lambda':0.233,'warmup_frac':0.219,
-         'ema_decay':0.199,'eta_min':0.198,'min_alpha_frac':0.198}
+imp_raw={'lr':0.285,'reg_lambda':0.233,'warmup_frac':0.219,
+         'ema_decay':0.199,'eta_min':0.198}
 imp_ft ={'lr_scale':0.479,'layer_decay':0.287,'warmup_frac':0.286,'reg_lambda':0.268,'eta_min':0.257}
 names=list(imp_raw); vals=[imp_raw[n] for n in names]
 a.barh(range(len(names)),vals,color='#0343DE',alpha=0.8)

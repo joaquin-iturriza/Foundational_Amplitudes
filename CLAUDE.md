@@ -169,7 +169,16 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
   - `collate_variable_length` — concatenates events into a flat batch + `ptr`
     (event boundaries) consumed by the model's attention mask.
   - `ProcessBalancedSampler` — draws each process's share per batch with
-    dynamically updatable weights (used for loss-balancing across processes).
+    dynamically updatable weights (deficit-to-solo plateau-aware). **Discarded as
+    the default** (`training.use_balanced_sampler: false`): an A/B at 8 datasets had
+    the naive **equal/uniform** sampler win best-vs-best (val_loss_no_reg 8.1e-8 vs
+    2.6e-7), since the benefit dilutes with many datasets and perturbing the sampling
+    dynamics hurts. Kept opt-in for mixtures of few, very unbalanced datasets.
+  - **Loss aggregation is `geometric_mean` by default** (`config/default.yaml`;
+    used in essentially every run): a log-space mean over per-process MSEs, so a 10%
+    relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
+    processes of different final-state dimensionality (hence very different MSE
+    scale) all keep scaling instead of the high-MSE ones dominating the gradient.
 
 ---
 
@@ -233,6 +242,13 @@ they only inform each other if earlier trials `observe()` before later trials
 when many GPUs free up), they all `suggest()` against an empty/stale surrogate.
 When running several sweeps at once, interleave submissions across sweeps
 (round-robin) and/or use SLURM priorities so each sweep stays partly serialized.
+**Fallback when interleaving can't help (a lone sweep, or abundant GPUs):**
+`sweep_manager submit` now defaults to **3 sequential waves** (`--seq-batches 3`)
+for a single-sweep submission — the trials are split into 3 groups chained by
+SLURM `afterany` dependencies, so wave *k+1* only starts after wave *k* has
+`observe()`d and the (single-fidelity) Bayesian optimiser actually has data to fit.
+Multi-sweep submissions default to `--seq-batches 1` (rely on interleaving); pass
+`--seq-batches N` to force, `1` to disable.
 
 **Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
 trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
@@ -436,12 +452,15 @@ in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 
 **Working rules**
 1. **Do work on `jeanzay`** (or a feature branch off it).
-2. **Open a worktree for new work, by default:**
-   `git worktree add ../wt-<feat> -b <feat> jeanzay`, implement + verify there,
-   then merge back into `jeanzay` and `git worktree remove` it. Lets parallel
-   experiments coexist without clobbering the trunk checkout. **If a worktree
-   ends up unused** (no commits beyond `jeanzay`, no diff), just delete it —
-   it cost nothing. The `worktree_guard.sh` hook nudges me when I edit trunk code
+2. **Open a worktree for new work, by default — always UNDER this repo, never
+   outside it.** Create it at `worktrees/wt-<feat>` inside the project root:
+   `git worktree add worktrees/wt-<feat> -b <feat> jeanzay`, implement + verify
+   there, then merge back into `jeanzay` and `git worktree remove` it. **Do NOT
+   use `../wt-<feat>` or any path outside the project root** — sibling-dir
+   worktrees are confusing and unnecessary; keep them contained in `worktrees/`
+   (gitignored). Lets parallel experiments coexist without clobbering the trunk
+   checkout. **If a worktree ends up unused** (no commits beyond `jeanzay`, no
+   diff), just delete it — it cost nothing. The `worktree_guard.sh` hook nudges me when I edit trunk code
    without one; for genuinely quick/standalone edits it's fine to proceed on the
    trunk.
 3. **Commit small and often; pushing is automatic.** Commit with a clear message

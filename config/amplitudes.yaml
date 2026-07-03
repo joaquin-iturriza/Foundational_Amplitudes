@@ -57,11 +57,16 @@ data:
  # Smart-encoding transforms of the physical property vector (use_PIDs: false only).
  # These widen the encoder's INPUT, not n_scalars (see particle_ids.build_property_matrix),
  # so changing them invalidates warm-start from checkpoints trained under a different set.
- # The "combo" (spin_onehot + prop_is_massless + standardize_props) is on by default — it
- # won the encoding A/B; color_onehot stayed neutral/worse on short runs so it's off but
- # kept available to revisit.
+ # spin_onehot + prop_is_massless + standardize_props + color_onehot are all on by default;
+ # they encode particles by quantum numbers (labels one-hot, magnitudes standardized). color
+ # and the MLP encoder (particle_encoder_hidden>0) showed no big gain on short/small A/B runs
+ # but are expected to help on richer data / longer training, so they are kept ON by default.
  spin_onehot: true         # one-hot the categorical spin column
- color_onehot: false       # one-hot the SU(3) color representation (rep identity)
+ color_onehot: true        # one-hot the SU(3) color representation (rep identity). Same
+                           # reasoning as spin_onehot (color is a label, not a magnitude);
+                           # on by default. It was neutral on short/small A/B runs, but is
+                           # expected to help on richer data / longer training (open — drop
+                           # only if a rigorous test shows it hurts).
  prop_is_massless: true    # explicit "exactly massless" flag + neutralise mass sentinel
  standardize_props: true   # z-score the continuous property columns
  # Replace the frozen log10_mass_gev table column with each particle's on-shell mass

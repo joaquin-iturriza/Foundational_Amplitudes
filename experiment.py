@@ -1451,8 +1451,12 @@ class AmplitudeExperiment(BaseExperiment):
         self.cfg.training.batchsize = int(min(self.cfg.training.batchsize, n_train / 2))
         batchsize = self.cfg.training.batchsize
 
-        # --- training loader: balanced sampler when multiple processes ---
-        if self.n_datasets > 1:
+        # --- training loader: equal (uniform) sampler by default; opt-in balanced ---
+        # The ProcessBalancedSampler was tried and discarded as a default (benefit
+        # dilutes with many datasets, perturbing the sampling dynamics hurts); it stays
+        # available via training.use_balanced_sampler for few, very unbalanced datasets.
+        use_balanced = bool(self.cfg.training.get("use_balanced_sampler", False))
+        if self.n_datasets > 1 and use_balanced:
             train_proc_ids = self.all_process_ids[train_idx]
             self.train_sampler = ProcessBalancedSampler(
                 process_ids = train_proc_ids,
@@ -1469,6 +1473,11 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             self.train_sampler = None
             self.train_loader  = make_loader(train_idx, shuffle=True, batchsize=batchsize)
+            if self.n_datasets > 1:
+                LOGGER.info(
+                    f"Using equal/uniform sampler across {self.n_datasets} processes "
+                    f"(batch_size={batchsize})"
+                )
 
         # Plain train loader for evaluation — always reflects the true data distribution,
         # regardless of whether a balanced sampler is used for training.

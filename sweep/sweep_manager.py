@@ -290,7 +290,8 @@ def assign_rounds(items_by_sweep, weights):
 # --------------------------------------------------------------------------- #
 # Commands
 # --------------------------------------------------------------------------- #
-def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=False):
+def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=False,
+                  seq_batches=None):
     """Submit one or more sweeps, interleaved across them by round.
 
     Importable entry point used by the generate_*.py scripts. `sweep_dirs` are
@@ -298,6 +299,16 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     scripts (tracked in the registry) are skipped, so it is safe to call repeatedly
     (e.g. after `generate_sweep.py --extend`). Ends with a global rebalance so the
     new jobs interleave with everything already pending in the queue.
+
+    Sequential-batch fallback (`seq_batches`): interleaving only serialises trials
+    when several sweeps are co-submitted and GPUs are scarce — a lone sweep (or an
+    abundant-GPU moment) starts every trial at once, so single-fidelity DyHPO (which
+    is how nearly every sweep runs) suggests against a stale/empty surrogate. To
+    guarantee the Bayesian optimiser has observations to learn from, the trials are
+    split into `seq_batches` waves chained by SLURM `afterany` dependencies, so wave
+    k+1 only starts once wave k has finished (and therefore observed). Default: 3
+    waves when a single sweep is submitted (no cross-sweep interleaving to rely on),
+    1 (off) when several sweeps are co-submitted. Pass an int to force, or 1 to disable.
     """
     reg = load_registry(registry)
     gap = reg["round_gap"]
@@ -331,28 +342,53 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
 
     weights = {s: reg["sweeps"][s]["weight"] for s in new_items}
     ordered = assign_rounds(new_items, weights)
-    print(f"Submitting {len(ordered)} trials across {len(new_items)} sweep(s), "
-          f"interleaved by round (gap={gap}):")
 
-    # 2. sbatch in round order, with provisional nice = round * gap.
-    for rnd, sweep, (idx, script) in ordered:
+    # Sequential-batch fallback: default 3 waves for a lone sweep, off for multi-sweep.
+    if seq_batches is None:
+        seq_batches = 3 if len(new_items) == 1 else 1
+    seq_batches = max(1, min(int(seq_batches), len(ordered)))
+    # Contiguous, roughly-equal waves over the round-ordered trials. batch_of[i] is
+    # the wave index of the i-th ordered trial.
+    def _batch_of(i):
+        return (i * seq_batches) // len(ordered)
+
+    print(f"Submitting {len(ordered)} trials across {len(new_items)} sweep(s), "
+          f"interleaved by round (gap={gap})"
+          + (f", in {seq_batches} sequential waves (afterany-chained)" if seq_batches > 1 else "")
+          + ":")
+
+    # 2. sbatch in round order, with provisional nice = round * gap. When seq_batches>1,
+    #    each wave depends (afterany) on all jobs of the previous wave, so DyHPO observes
+    #    before the next wave suggests.
+    prev_batch_jids, cur_batch_jids, cur_batch = [], [], 0
+    for i, (rnd, sweep, (idx, script)) in enumerate(ordered):
+        b = _batch_of(i)
+        if b != cur_batch:
+            prev_batch_jids, cur_batch_jids, cur_batch = cur_batch_jids, [], b
         nice = rnd * gap
         cmd = ["sbatch", "--parsable", f"--nice={nice}"]
-        dep = sweep_dep.get(sweep)
-        if dep:
-            cmd.append(f"--dependency=afterok:{dep}")
+        deps = []
+        pdep = sweep_dep.get(sweep)
+        if pdep:
+            deps.append(f"afterok:{pdep}")
+        if b > 0 and prev_batch_jids:
+            deps.append("afterany:" + ":".join(prev_batch_jids))
+        if deps:
+            cmd.append("--dependency=" + ",".join(deps))
         cmd.append(script)
         out = _run(cmd, dry_run=dry_run)
         jid = out.split(";")[0].strip() if out else f"DRY{idx}"
+        cur_batch_jids.append(jid)
         # Only record the submission when it actually happened: a dry-run must not
         # mutate the registry, or it marks these scripts as submitted and a later
         # real submit skips them ("no new trial scripts to submit").
         if not dry_run:
             reg["sweeps"][sweep]["jobs"][jid] = {
-                "trial_idx": idx, "script": script, "round": rnd, "nice": nice,
+                "trial_idx": idx, "script": script, "round": rnd, "nice": nice, "wave": b,
             }
             reg["sweeps"][sweep]["submitted_scripts"].append(script)
-        print(f"  round {rnd:>3}  {sweep}  trial_{idx:04d}  nice={nice}  job={jid}")
+        wtag = f"wave {b} " if seq_batches > 1 else ""
+        print(f"  {wtag}round {rnd:>3}  {sweep}  trial_{idx:04d}  nice={nice}  job={jid}")
 
     # 3. Persist and globally re-interleave everything still pending (fixes nice
     #    across sweeps). Both are no-ops under dry-run.
@@ -369,7 +405,8 @@ def rebalance(registry=DEFAULT_REGISTRY, dry_run=False):
 
 def cmd_submit(args):
     submit_sweeps(args.sweep_dirs, weight=args.weight,
-                  registry=args.registry, dry_run=args.dry_run)
+                  registry=args.registry, dry_run=args.dry_run,
+                  seq_batches=args.seq_batches)
 
 
 def cmd_rebalance(args):
@@ -486,6 +523,10 @@ def build_parser():
 
     s = sub.add_parser("submit", help="submit one or more sweeps, interleaved")
     s.add_argument("sweep_dirs", nargs="+", help="paths to sweep dirs (contain jobs/)")
+    s.add_argument("--seq-batches", dest="seq_batches", type=int, default=None,
+                   help="split trials into N afterany-chained sequential waves so DyHPO "
+                        "observes between waves (default: 3 for a lone sweep, 1 for "
+                        "multi-sweep; pass 1 to disable)")
     s.add_argument("--weight", type=int, default=None,
                    help="trials per round for these sweeps (default keeps existing/1)")
     s.set_defaults(func=cmd_submit)

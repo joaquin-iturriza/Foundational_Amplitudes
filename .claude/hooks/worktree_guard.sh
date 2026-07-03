@@ -17,10 +17,16 @@ except Exception:
     print("")' 2>/dev/null)
 [ -z "$fp" ] && exit 0
 
-# Only the MAIN checkout matters; feature worktrees live outside REPO (../wt-*).
+# Only files in this repo matter.
 case "$fp" in
   "$REPO"/*) ;;
   *) exit 0 ;;
+esac
+
+# Feature worktrees live UNDER the repo at worktrees/wt-<feat> — editing inside one
+# is already "in a worktree", so never nudge there.
+case "$fp" in
+  "$REPO"/worktrees/*) exit 0 ;;
 esac
 
 # Exempt meta / lightweight files that don't warrant a feature worktree.
@@ -33,7 +39,7 @@ br=$(git -C "$REPO" symbolic-ref --quiet --short HEAD 2>/dev/null)
 [ "$br" = "jeanzay" ] || exit 0
 
 rel=${fp#"$REPO"/}
-msg="Worktree reminder: editing trunk file '$rel' directly on jeanzay. Per the git workflow, new feature work should go in a worktree (git worktree add ../wt-<feat> -b <feat> jeanzay). If this is a quick standalone edit, proceed; otherwise create a worktree first."
+msg="Worktree reminder: editing trunk file '$rel' directly on jeanzay. Per the git workflow, new feature work should go in a worktree created UNDER this repo (git worktree add worktrees/wt-<feat> -b <feat> jeanzay), never outside it (no ../wt-<feat>). If this is a quick standalone edit, proceed; otherwise create a worktree first."
 # Inject as additional context to the model without blocking the edit.
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":%s}}\n' \
   "$(printf '%s' "$msg" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')"

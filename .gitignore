@@ -78,3 +78,6 @@ core.[0-9]*
 
 # runtime marker for figure_pair_guard hook
 .claude/.figpair_last
+
+# feature worktrees live under the repo (worktrees/wt-<feat>), never outside it
+/worktrees/
