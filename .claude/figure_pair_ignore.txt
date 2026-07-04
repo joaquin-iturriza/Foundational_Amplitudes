@@ -2,3 +2,4 @@
 # files that legitimately have NO png/pdf counterpart (e.g. a one-off preview or
 # an asset). One per line. '#' starts a comment.
 # Only add here when a figure genuinely should exist in a single format.
+docs/results.pdf
