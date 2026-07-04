@@ -28,6 +28,8 @@ NFS = {
 FT_NFS = {"ee_uu_nlo_virt_e4": 2, "ee_ttbar_nlo_virt_e4": 2,
           "ee_uu_nlo_virt": 2, "ee_ttbar_nlo_virt": 2}
 def is_ratio(k): return "ratio" in k
+def norm(k):  # JSON keys carry an "_amplitudes" suffix; NFS maps use the bare name
+    return k[:-len("_amplitudes")] if k.endswith("_amplitudes") else k
 
 def load(path, allow):
     try:
@@ -36,11 +38,12 @@ def load(path, allow):
         print("WARN could not read", path, e); return {}
     out = {}
     for k, v in d.items():
-        if is_ratio(k) or k not in allow:
+        nk = norm(k)
+        if is_ratio(nk) or nk not in allow:
             continue
         a = v.get("alpha") if isinstance(v, dict) else None
         if a is not None:
-            out[k] = (allow[k], float(a))
+            out[nk] = (allow[nk], float(a))
     return out
 
 solo = load(SOLO, NFS)
