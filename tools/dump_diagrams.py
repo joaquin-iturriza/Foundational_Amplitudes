@@ -43,6 +43,9 @@ if _MG5_ROOT and _MG5_ROOT not in sys.path:
 _HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
+_TOOLS = os.path.dirname(os.path.abspath(__file__))
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)  # so nlo_virtual_pipeline (the [virt=QCD] command source) imports
 
 # Default sidecar location: data/diagrams/ in the project tree (versionable, small).
 DEFAULT_OUT_DIR = os.path.join(_HERE, "data", "diagrams")
@@ -101,10 +104,51 @@ def _diagram_to_graph(diagram, model):
     ``number`` (meaningful for external legs; kept for propagators too).
     """
     import madgraph.core.drawing as drawing
-
     fd = drawing.FeynmanDiagram(diagram, model)
     fd.main()  # populates vertexList / lineList and their begin/end links
+    return _graph_from_fd(fd, model, diagram_type="tree")
 
+
+def _loop_diagram_to_graph(diagram, structures, model):
+    """One MadGraph LOOP diagram -> ``{nodes, edges}`` via the loop-aware drawer.
+
+    The tree ``FeynmanDiagram`` cannot resolve a closed loop (its begin/end links
+    are left ``None``); ``LoopFeynmanDiagram`` walks the loop using the amplitude's
+    ``structure_repository``. Node/edge extraction is otherwise identical.
+    """
+    import madgraph.core.drawing as drawing
+    fd = drawing.LoopFeynmanDiagram(diagram, structures, model)
+    fd.main()
+    return _graph_from_fd(fd, model, diagram_type="loop")
+
+
+def _flag_loop_edges(graph):
+    """Flag internal edges lying on the closed loop (``in_loop``): an internal
+    edge whose removal leaves its endpoints still connected. Their momentum is
+    NOT fixed by an external-leg partition, so Tier-B virtuality must skip them.
+    """
+    adj = {i: [] for i in range(len(graph["nodes"]))}
+    for k, e in enumerate(graph["edges"]):
+        adj[e["u"]].append((e["v"], k)); adj[e["v"]].append((e["u"], k))
+
+    def _connected(a, b, skip):
+        seen, stack = {a}, [a]
+        while stack:
+            x = stack.pop()
+            if x == b:
+                return True
+            for y, ek in adj[x]:
+                if ek != skip and y not in seen:
+                    seen.add(y); stack.append(y)
+        return False
+
+    for k, e in enumerate(graph["edges"]):
+        e["in_loop"] = (not e["external"]) and _connected(e["u"], e["v"], k)
+
+
+def _graph_from_fd(fd, model, diagram_type="tree"):
+    """Extract ``{nodes, edges, diagram_type}`` from a resolved (post-``main()``)
+    tree or loop Feynman diagram; loop graphs get their loop edges flagged."""
     vidx = {id(v): i for i, v in enumerate(fd.vertexList)}
 
     # Map each external endpoint vertex -> the external line touching it, so the
@@ -150,7 +194,10 @@ def _diagram_to_graph(diagram, model):
             "leg_number": int(line.number),
         })
 
-    return {"nodes": nodes, "edges": edges}
+    graph = {"nodes": nodes, "edges": edges, "diagram_type": diagram_type}
+    if diagram_type == "loop":
+        _flag_loop_edges(graph)
+    return graph
 
 
 def _external_legs(amplitude):
@@ -172,12 +219,86 @@ def _external_legs(amplitude):
     return out
 
 
+def _virt_generate_cmd(spec):
+    """The MG5 ``[virt=QCD]`` generate line for an NLO-virtual process, keyed by
+    its ``virt_base``. Single source of truth is
+    ``tools/nlo_virtual_pipeline.VIRT_PROCESSES``; falls back to the base LO
+    ``mg5_generate`` (when present) with ``[virt=QCD]`` appended.
+    """
+    vb = spec.get("virt_base")
+    try:
+        from nlo_virtual_pipeline import VIRT_PROCESSES
+        entry = VIRT_PROCESSES.get(vb)
+        if entry and entry.get("mg5"):
+            return entry["mg5"]
+    except Exception:
+        pass
+    from mg5_pipeline_final import PROCESSES
+    gen = (PROCESSES.get(vb, {}).get("mg5_generate") or [None])[0]
+    return f"{gen} [virt=QCD]" if gen else None
+
+
+def _dump_virt_process(name, spec, out_dir):
+    """NLO-virtual process: drive the MadLoop ``[virt=QCD]`` amplitude and dump
+    both its born (tree) and loop diagram graphs. Loop diagrams use the loop-aware
+    drawer and carry ``diagram_type: 'loop'`` with their loop edges flagged.
+    """
+    gen = _virt_generate_cmd(spec)
+    if not gen:
+        return None, f"no [virt=QCD] generate command (virt_base={spec.get('virt_base')})"
+
+    cmd = _master_cmd()
+    with _quiet():
+        cmd.exec_cmd("import model loop_sm", printcmd=False, precmd=True)
+        cmd.exec_cmd(gen, printcmd=False, precmd=True)
+
+    model = cmd._curr_model
+    amps = list(cmd._curr_amps)
+    if not amps:
+        return None, "MG5 produced no loop amplitudes"
+
+    subprocesses = []
+    for amp in amps:
+        structures = amp.get("structure_repository")
+        born = [_diagram_to_graph(d, model) for d in amp.get("born_diagrams")]
+        loop = [_loop_diagram_to_graph(d, structures, model) for d in amp.get("loop_diagrams")]
+        graphs = born + loop
+        subprocesses.append({
+            "process_str": amp.get("process").nice_string().replace("Process: ", ""),
+            "external": _external_legs(amp),
+            "n_diagrams": len(graphs),
+            "n_born": len(born),
+            "n_loop": len(loop),
+            "diagrams": graphs,
+        })
+
+    payload = {
+        "process": name,
+        "model": "loop_sm",
+        "mg5_generate": [gen],
+        "perturbation": "QCD",
+        "n_subprocesses": len(subprocesses),
+        "subprocesses": subprocesses,
+    }
+    os.makedirs(out_dir, exist_ok=True)
+    path = os.path.join(out_dir, f"{name}.diagrams.json")
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=2)
+    n_diag = sum(s["n_diagrams"] for s in subprocesses)
+    n_loop = sum(s["n_loop"] for s in subprocesses)
+    return path, f"{len(subprocesses)} subprocess(es), {n_diag} diagram(s) ({n_loop} loop)"
+
+
 def dump_process(name, spec, out_dir, model_name="sm"):
     """Generate one process in MG5 and write ``<out_dir>/<name>.diagrams.json``.
 
     A process may expand into several subprocesses (e.g. ``ee_qqbar`` adds five
-    flavours); each contributes its own external-leg list and diagram set.
+    flavours); each contributes its own external-leg list and diagram set. NLO
+    virtual processes (``kind == 'virt'``) go through the loop-aware path.
     """
+    if spec.get("kind") == "virt":
+        return _dump_virt_process(name, spec, out_dir)
+
     mg5_generate = spec.get("mg5_generate")
     if not mg5_generate:
         return None, "no mg5_generate commands"
