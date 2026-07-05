@@ -373,8 +373,9 @@ $7\times10^{-4}$ ($t=100$k) (Fig.~\ref{fig:iters}).
 The peak sits at $\operatorname{argmax}_t = 3162$ steps for \emph{every} dataset size from
 $700$ to $70{,}000$ (a $100\times$ range), whereas the loss-floor knee shifts \emph{later}
 with data. So $\tstar$ is not ``where the model converges'' --- it is an optimizer/schedule
-time scale: Adam's second-moment EMA has horizon $1/(1-\beta_2)\approx10^{3}$ steps, warmup
-is a fraction of $t$, and the weight EMA adds another $10^{2}$--$10^{3}$-step scale. Below
+time scale: Adam's second-moment EMA has horizon $1/(1-\beta_2)\approx10^{3}$ steps and warmup
+is a fraction of $t$ (the optional weight-EMA is \emph{not} implicated --- it was inactive by
+default in every sweep these optima are harvested from). Below
 $\tstar$ the run never leaves warmup/steady-state transient, so a large $\eta$ cannot be
 exploited and the optimum is \emph{lower} and rising (the counter-intuitive branch we rarely
 sweep); above $\tstar$ extra steps polish an already-fit model and $\eta^\ast$ falls as
@@ -848,7 +849,12 @@ when memory-bound.
 
 Because Jean-Zay bills a fixed GPU-hour budget, each job should run near the hardware ceiling.
 Two quantities bound the operating point on the V100: peak VRAM (limiting batch size and width)
-and step time (limiting how many updates fit in an allocation). With batch size $\mathrm{bs}$,
+and step time (limiting how many updates fit in an allocation). The standard training batch is
+therefore the largest that fits, $\mathrm{bs}=16384$ (at $\nh\!\le\!8$ on the 32\,GB V100);
+for the many-process joint runs this is also a statistical requirement, not just throughput ---
+at $448$ datasets and a per-dataset geometric-mean loss, $\mathrm{bs}=16384$ gives
+$\sim\!36$ events/dataset per batch, where $\mathrm{bs}=1024$ would give only $\sim\!2$ and the
+per-dataset MSEs (hence their log-mean) would be noise. With batch size $\mathrm{bs}$,
 particles per event $n$, and width $\nh$ ($d=16\nh$), peak VRAM is bilinear,
 \begin{equation}
   V_{\text{peak}}(\mathrm{bs},n,\nh) \approx a(\nh)\,\mathrm{bs}\,n + b(\nh)\,\mathrm{bs} + C(\nh)

@@ -31,7 +31,9 @@ fixed_params:
   data.dataset: '[ee_uu_91GeV_amplitudes]'
   model: lloca
   plot: 'true'
-  training.batchsize: 512
+  training.batchsize: 16384          # decided operating point: biggest BS that fits (nh<=8, V100 32GB)
+  evaluation.batchsize: 16384        # eval forward-only -> match train BS, never eval slower
+  training.loss_aggregation: geometric_mean
   training.get_ID: 'false'
   training.regularization: L2
   training.save_intermediate: 'false'
@@ -39,15 +41,22 @@ fixed_params:
 
 # Search space centred on the empirical HPO optima (422 converged sweeps; see
 # docs/results.tex sec:lrlaw). lr obeys the inverted-U law across horizon and
-# transfers across width (muP) -- NEVER re-sweep lr per width. The band below is
-# the peak/under-converged default (~1.2 decade). For a fixed-horizon sweep,
-# centre on lr_center(t) = 1e-2 * min((t/3000)**0.5, (t/3000)**-0.55) and set
-# low = lr_center/3, high = lr_center*3; apply the t^-0.55 decay only when
-# over-training a fixed dataset past its loss floor.
+# transfers across width (muP) -- NEVER re-sweep lr per width.
+#
+# lr CENTRE: evaluate the measured 2D surface eta*(t,D) at YOUR (t,D) and sweep
+# +/-1/2 decade [c/3, 3c]. Do NOT use a static band, and do NOT collapse to the
+# t-only lr_center(t) -- that discards the measured D-axis. Every real run sits
+# past the peak (t*=3000 steps), so the centre DECREASES with horizon; a large-D
+# run sits at the high-D asymptote so its centre is ABOVE the D-pooled value (read
+# the high-D row of analysis/hpo_optima/hpo_optima.json). For a big foundation run
+# (per-proc D~30-100k) the (high-D,high-t) corner is off the measured grid, so the
+# centre is an extrapolation of the high-D decay: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
+# @100k steps. The band below is a wide default for when (t,D) are not yet fixed.
+# (There is NO "is the loss floored?" test -- never a measured axis; only t and D.)
 search_space:
 - name: training.lr
   type: float_log
-  low: 1.0e-03      # peak band [1e-3, 3e-2]; was 1e-6..1e-2 (6 decades, mostly empty)
+  low: 1.0e-03      # default band [1e-3, 3e-2]; replace with [c/3, 3c] once (t,D) are set
   high: 3.0e-02
 - name: training.regularization_lambda
   type: float_log
@@ -61,3 +70,14 @@ search_space:
   type: float_log
   low: 1.0e-10      # weakest knob, spans full range; narrow (or fix ~1e-8)
   high: 1.0e-07
+# EMA (weight averaging) is UNTESTED -- gated by top-level `ema` (default false), so
+# it has never been active. Test it properly here: ema=false is "no EMA at all",
+# ema=true uses ema_decay. Choices are strings so the Hydra override is lowercase
+# (ema=true/false); once settled, fix `ema` and drop from the search.
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9          # inert on ema=false trials; ~100-10000 step averaging horizon when on
+  high: 0.9999

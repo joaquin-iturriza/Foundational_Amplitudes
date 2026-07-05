@@ -73,11 +73,15 @@ training:
  sampler_plateau_floor: 0.3     # weight for confirmed-plateaued datasets (relative to baseline 1.0)
  # (sampler_probe_boost / sampler_min_alpha_frac are no longer used by the weighting)
 
- num_workers: 4       # DataLoader worker processes. 0=main thread (safe on Windows). Use 4+ on Linux.
+ num_workers: 2       # DataLoader worker processes. Benchmarked optimum on V100 (nw=2 hits the
+                      # compute floor; nw=4 no better, nw=6 oversubscribes 8 CPUs and hangs).
+                      # local/none also sets 2; 0=main thread (safe on Windows).
 
  optimizer : AdamW
  lr: 3.e-4
- batchsize: 512
+ batchsize: 16384        # decided operating point: biggest BS that fits (nh<=8 on V100 32GB).
+                         # For the 448-dataset joint run this also keeps ~36 events/dataset per
+                         # batch so the per-dataset geometric-mean loss is well estimated.
  betas: [.9, .999]
  eps: 1.e-8
  weight_decay: 0
@@ -116,7 +120,8 @@ training:
                         # equally with a 10% improvement on a 1e-2 one, so every process keeps scaling.
  dtype: float32
 
- regularization: null
+ regularization: L2       # decided default (was null): L2 penalty folded into loss_no_reg /
+                          # checkpoint selection / HPO objective; lambda is a swept HP.
  regularization_lambda: 1e-5
 
  result_path: null
@@ -127,7 +132,8 @@ training:
 
 evaluate: true
 evaluation:
- batchsize: 512
+ batchsize: 16384        # eval is forward-only (less memory than a train step) -> match train BS,
+                         # never eval slower for no reason.
 
 find_BS: false
 BS_finding:

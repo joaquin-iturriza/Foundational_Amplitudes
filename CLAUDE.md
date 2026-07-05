@@ -191,9 +191,44 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
   block (`fine_tune.lr_scale`, `layer_decay`, `freeze_blocks`, `reset_output_head`,
   `lora.*`, `ewc.*`).
 - `config/model/lloca.yaml` — the only model config that matters here.
-- `config/local/none.yaml` — Linux/cluster local overrides (`num_workers: 0`,
+- `config/local/none.yaml` — Linux/cluster local overrides (`num_workers: 2`,
   in-memory dataset).
 - `config/hydra.yaml` — disables Hydra's dir-changing/logging hijack.
+
+### Canonical run setup — the ONE source of truth (don't drift, don't copy random runs)
+
+These are the decided-best defaults. **When starting a new run/sweep, copy ONLY
+`sweep/sweep_config_jeanzay_template.yaml`** (the one canonical template) — never
+lift values from an arbitrary old run config (`scan_ab_*`, `pretrain25*`, etc.):
+those are historical artifacts and several carry stale values (e.g. `batchsize:
+1024`). If a value here disagrees with a run config, this table wins.
+
+| Knob | Value | Kind |
+|---|---|---|
+| `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
+| `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
+| `particle_encoder_hidden` (MLP embed) | `32` (on) | fixed, open |
+| `use_diagrams` / `d_diag` | `true` / `32` | fixed |
+| `use_PIDs` | `false` | fixed |
+| `spin_onehot`/`color_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
+| physics levers `mass_from_momenta`/`coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run; `internal_mass_pdgs=[23,6,25]` | per-run (need recipe+sidecars) |
+| `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
+| `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
+| `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` / `L2` | fixed |
+| **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
+| **`evaluation.batchsize`** | **`16384`** (eval forward-only → match train BS) | fixed |
+| `num_workers` | `2` | fixed |
+| `dtype` / `allow_tf32` / `fused_optimizer` | `float32` / `true` (no-op V100) / `true` | fixed |
+| optimizer / betas / eps / weight_decay | `AdamW` / `[0.9,0.999]` / `1e-8` / `0` | fixed |
+| `scheduler` / `clip_grad_norm` | `CosineAnnealingLR` / `5` | fixed |
+| `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (see rule #2) | per-run |
+| **EMA** (`ema` top-level flag) | **UNTESTED — has always been `false`.** Now swept `{false,true}` × `ema_decay∈[0.9,0.9999]`; settle before fixing | open |
+| fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
+
+Sweep search ranges (redesigned): `regularization_lambda [1e-10,1e-6]`,
+`cosanneal_warmup_frac [0.05,0.2]`, `cosanneal_eta_min` fix ~`1e-8`, `ema_decay
+[0.9,0.9999]` (+ `ema` categorical), `sampler_alpha_ema [0.3,0.95]` only if the
+balanced sampler is on. Drop the exotic sampler variants.
 
 ---
 
