@@ -269,16 +269,25 @@ laws); the settled rules that govern how sweeps are set up:
    5× cut on a width-scaling grid). Re-sweeping lr per width is pure waste.
 2. **lr follows an inverted-U in *training length*, peaking at an absolute
    optimizer scale `t* ≈ 3000` steps** (independent of dataset size):
-   `lr*(t) ≈ 1e-2 · min[(t/3000)^+0.5, (t/3000)^-0.55]`. Center the lr window on
-   this and sweep **only ±½ decade**, not a flat 4-decade prior. This is NOT
-   "more iters ⇒ lower lr": the peak is an optimizer timescale (Adam β₂ EMA +
-   warmup + weight EMA), not the convergence point.
-   - **Real scaled run (data grows with steps ⇒ under-converged):** the negative
-     t-slope and positive weak D-slope cancel — just sweep the **peak band
-     `[3e-3, 3e-2]`** at every horizon. The template default is `[1e-3, 3e-2]`.
-   - **Fixed dataset over-trained past its loss floor:** apply the `t^-0.55`
-     decay. Rule of thumb: is `val_loss_no_reg` still dropping at your budget? →
-     under-converged → peak band. Floored? → over-converged → decay.
+   `lr_c(t) ≈ 1e-2 · min[(t/3000)^+0.5, (t/3000)^-0.55]`. The peak is an optimizer
+   timescale (Adam β₂ EMA + warmup + weight EMA), **not** a convergence point — so
+   it is not a monotone "more iters ⇒ lower lr": below `t*` the optimum *rises*,
+   past `t*` it falls as `t^-0.55`. **The procedure is fixed, not a judgment call:**
+   - **Evaluate `lr_c` at YOUR horizon `t`** (the run's actual step budget) and
+     sweep **only ±½ decade** around it (`[lr_c/3, 3·lr_c]`), never a flat
+     4-decade prior. Every real run sits well past the peak (`t ≫ 3000`), so
+     `lr_c` is on the `t^-0.55` branch and a **longer run takes a lower center,
+     computed from `t`** — not the `1e-2` peak value (fixed-data `lr_c`: ~2.8e-3
+     at 30k, ~2.1e-3 at 50k, ~1.5e-3 at 100k steps).
+   - **The `D`-dependence is a weak, saturating nudge — not a separate regime.**
+     Measured `lr* ∝ D^{+0.15..0.3}`, saturating (~2× over 100× data). So the
+     optimum is a 2D surface `lr*(t,D)`: the inverted-U in `t` times this weak
+     factor in `D`. A scaled run (`D` grows with `t`) has net exponent
+     `t^{-0.55+0.15..0.3}` — **still decreasing**; the `D` term only lifts the
+     fixed-data center by `<2×`, already inside the ±½-decade window. Plug your
+     own `(t, D)` into the surface and sweep — there is nothing to "diagnose"
+     (no "is the loss floored?" test; that heuristic was never measured and is
+     dropped). The template default window is `[1e-3, 3e-2]`.
 3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
    `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
    `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`

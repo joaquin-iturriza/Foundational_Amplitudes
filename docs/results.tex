@@ -381,15 +381,22 @@ sweep); above $\tstar$ extra steps polish an already-fit model and $\eta^\ast$ f
 $t^{-0.55}$ (the intuitive branch).
 \end{remark}
 
-\begin{remark}[Data-size dependence is weak, and partly cancels the horizon effect]
+\begin{remark}[The optimum is a 2D surface $\eta^\ast(t,D)$: evaluate it at your own $(t,D)$]
 Disentangled on the clean 2D grid (Fig.~\ref{fig:2d}), the optimum rises \emph{weakly} with
-data, $\eta^\ast\propto D^{+0.15\ldots0.3}$ (saturating: $\sim2\times$ over $100\times$ data).
-A realistic scaled run grows \emph{both} $D$ and $t$, so the negative $t$-slope past the peak
-and the positive $D$-slope partly cancel and $\eta^\ast$ stays near the peak band
-$[3\times10^{-3},3\times10^{-2}]$. The decay branch of Eq.~\eqref{eq:invU} applies only when a
-\emph{fixed} dataset is over-trained past its loss floor. Operationally: if $\vlnr$ is still
-dropping at your budget you are under-converged $\Rightarrow$ use the peak band; if it has
-floored, apply the $t^{-0.55}$ decay.
+data, $\eta^\ast\propto D^{+0.15\ldots0.3}$, and \emph{saturates} ($\sim2\times$ over $100\times$
+data). The optimum is thus a 2D surface $\eta^\ast(t,D)$ --- approximately the inverted-$U$ in
+$t$ (Eq.~\eqref{eq:invU}) times this weak, saturating factor in $D$ --- and both axes are set by
+the experimenter when the run is designed. \textbf{Set the learning rate by evaluating the
+surface at your own $t$ and $D$}; there is no ``regime'' to diagnose. Every real run sits well
+past the peak ($t\gg\tstar$), so it is on the decay side and a \emph{longer} run takes a
+\emph{lower} centre, computed from its $t$. A fixed-epoch scaled run has $D\propto t$, so the net
+exponent past the peak is $t^{-0.55+0.15\ldots0.3}=t^{-0.40\ldots-0.25}$: the $D$-slope
+\emph{softens} the drop but does not cancel it. Because that $D$-factor is weak and saturating,
+it only lifts the fixed-data centre $\eta_c(t)$ by $<2\times$ --- already inside the
+$\pm\tfrac12$-decade sweep window --- so in practice one centres on $\eta_c(t)$ and lets the
+window absorb the $D$-nudge. (An earlier ``is $\vlnr$ still dropping vs.\ floored?'' rule of thumb
+is dropped: that distinction was never a measured axis --- only $t$ and $D$ were --- and it is
+unnecessary once both are read off the run design.)
 \end{remark}
 
 % --------------------------------------------------------------------------
@@ -868,10 +875,13 @@ tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{p
 smallest width and reuse for all larger widths --- up to a $5\times$ cut on a width-scaling grid.
 \end{principle}
 \begin{principle} Centre the $\eta$ search on the inverted-$U$ law
-$\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$ (Eq.~\ref{eq:invU}) and sweep only
-$\pm\tfrac12$ decade, not a flat 4-decade prior. Use the peak band $[3\text{e-}3,3\text{e-}2]$
-when under-converged (loss still falling); apply the $t^{-0.55}$ decay only when over-training a
-fixed dataset past its floor.
+$\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$ (Eq.~\ref{eq:invU}) \emph{evaluated at
+your actual horizon $t$}, and sweep only $\pm\tfrac12$ decade, not a flat 4-decade prior. Every
+real run sits past the peak ($t\gg\tstar=3$k), so $\eta_c$ is on the $t^{-0.55}$ branch and
+\emph{decreases} with horizon --- a longer run takes a lower centre (e.g.\ $\approx$2.8, 2.1,
+1.5$\times10^{-3}$ at $t=$30, 50, 100k), never the $\tstar$ peak value. A scaled run's weak,
+saturating $D$-slope lifts that centre by $<2\times$, already inside the window; it is not a
+separate regime to diagnose.
 \end{principle}
 \begin{principle} Narrow the secondary knobs to where optima actually land
 (Table~\ref{tab:searchspace}): cap \code{regularization\_lambda} at $10^{-6}$, fix
