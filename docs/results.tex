@@ -383,20 +383,23 @@ $t^{-0.55}$ (the intuitive branch).
 
 \begin{remark}[The optimum is a 2D surface $\eta^\ast(t,D)$: evaluate it at your own $(t,D)$]
 Disentangled on the clean 2D grid (Fig.~\ref{fig:2d}), the optimum rises \emph{weakly} with
-data, $\eta^\ast\propto D^{+0.15\ldots0.3}$, and \emph{saturates} ($\sim2\times$ over $100\times$
-data). The optimum is thus a 2D surface $\eta^\ast(t,D)$ --- approximately the inverted-$U$ in
-$t$ (Eq.~\eqref{eq:invU}) times this weak, saturating factor in $D$ --- and both axes are set by
-the experimenter when the run is designed. \textbf{Set the learning rate by evaluating the
-surface at your own $t$ and $D$}; there is no ``regime'' to diagnose. Every real run sits well
-past the peak ($t\gg\tstar$), so it is on the decay side and a \emph{longer} run takes a
-\emph{lower} centre, computed from its $t$. A fixed-epoch scaled run has $D\propto t$, so the net
-exponent past the peak is $t^{-0.55+0.15\ldots0.3}=t^{-0.40\ldots-0.25}$: the $D$-slope
-\emph{softens} the drop but does not cancel it. Because that $D$-factor is weak and saturating,
-it only lifts the fixed-data centre $\eta_c(t)$ by $<2\times$ --- already inside the
-$\pm\tfrac12$-decade sweep window --- so in practice one centres on $\eta_c(t)$ and lets the
-window absorb the $D$-nudge. (An earlier ``is $\vlnr$ still dropping vs.\ floored?'' rule of thumb
-is dropped: that distinction was never a measured axis --- only $t$ and $D$ were --- and it is
-unnecessary once both are read off the run design.)
+data, $\eta^\ast\propto D^{+0.15\ldots0.3}$, and \emph{saturates} (measured $\sim\!2.2\times$ from
+$D=700$ to $70$k at $t=3162$, most of it by $D\!\sim\!2$k). The optimum is thus a 2D surface
+$\eta^\ast(t,D)$ --- the inverted-$U$ in $t$ (Eq.~\eqref{eq:invU}) times this weak, saturating
+factor in $D$ --- and both axes are set by the experimenter when the run is designed.
+\textbf{Set the learning rate by evaluating the surface at your own $t$ and $D$}, sweeping
+$\pm\tfrac12$ decade around that value --- not the $t$-only $\eta_c(t)$, which discards the
+measured $D$-axis. A large-$D$ run sits at the high-$D$ asymptote, so its centre lies
+\emph{above} the $D$-pooled $\eta_c(t)$; read it off the high-$D$ row of the grid at your $t$.
+Two cautions the pooled curve hides: (i) the high-$D$ rows only reach $t\approx1.8\times10^{4}$,
+so every large-$t$ pooled point comes from \emph{small} $D\ (\le7$k$)$, which floors early and
+over-trains --- its steep large-$t$ decay is not representative of a large-$D$ run; (ii) a big
+foundation run therefore lives in the (high-$D$, high-$t$) corner that the grid does not cover,
+so its centre is an \emph{extrapolation} of the high-$D$ row's decay ($\approx$2, 1.4,
+$0.9\times10^{-3}$ at $t=$30, 50, 100k for per-process $D\!\approx\!70$k), and the sweep both
+centres the search and \emph{measures} that corner. (The earlier ``is $\vlnr$ still dropping
+vs.\ floored?'' rule of thumb is dropped: it was never a measured axis --- only $t$ and $D$
+were.)
 \end{remark}
 
 % --------------------------------------------------------------------------
@@ -874,14 +877,15 @@ tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{p
 \begin{principle} Never re-sweep $\eta$ across width: $\mu$P transfers it. Tune once at the
 smallest width and reuse for all larger widths --- up to a $5\times$ cut on a width-scaling grid.
 \end{principle}
-\begin{principle} Centre the $\eta$ search on the inverted-$U$ law
-$\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$ (Eq.~\ref{eq:invU}) \emph{evaluated at
-your actual horizon $t$}, and sweep only $\pm\tfrac12$ decade, not a flat 4-decade prior. Every
-real run sits past the peak ($t\gg\tstar=3$k), so $\eta_c$ is on the $t^{-0.55}$ branch and
-\emph{decreases} with horizon --- a longer run takes a lower centre (e.g.\ $\approx$2.8, 2.1,
-1.5$\times10^{-3}$ at $t=$30, 50, 100k), never the $\tstar$ peak value. A scaled run's weak,
-saturating $D$-slope lifts that centre by $<2\times$, already inside the window; it is not a
-separate regime to diagnose.
+\begin{principle} Centre the $\eta$ search by evaluating the measured 2D surface
+$\eta^\ast(t,D)$ at your \emph{own} $(t,D)$ --- the inverted-$U$ $\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$
+(Eq.~\ref{eq:invU}) lifted onto the high-$D$ row of the grid --- and sweep only $\pm\tfrac12$
+decade, not a flat 4-decade prior and not the $t$-only $\eta_c(t)$. Every real run sits past the
+peak ($t\gg\tstar=3$k), so the centre \emph{decreases} with horizon; a large-$D$ foundation run
+lives in the (high-$D$, high-$t$) corner the grid does not cover, so its centre is an
+extrapolation of the high-$D$ decay ($\approx$2, 1.4, $0.9\times10^{-3}$ at $t=$30, 50, 100k for
+per-process $D\!\approx\!70$k) and the sweep both centres and measures it. Do not hold $\eta$ at
+the $\tstar$ peak, and do not discard $D$.
 \end{principle}
 \begin{principle} Narrow the secondary knobs to where optima actually land
 (Table~\ref{tab:searchspace}): cap \code{regularization\_lambda} at $10^{-6}$, fix

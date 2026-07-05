@@ -272,22 +272,26 @@ laws); the settled rules that govern how sweeps are set up:
    `lr_c(t) ≈ 1e-2 · min[(t/3000)^+0.5, (t/3000)^-0.55]`. The peak is an optimizer
    timescale (Adam β₂ EMA + warmup + weight EMA), **not** a convergence point — so
    it is not a monotone "more iters ⇒ lower lr": below `t*` the optimum *rises*,
-   past `t*` it falls as `t^-0.55`. **The procedure is fixed, not a judgment call:**
-   - **Evaluate `lr_c` at YOUR horizon `t`** (the run's actual step budget) and
-     sweep **only ±½ decade** around it (`[lr_c/3, 3·lr_c]`), never a flat
-     4-decade prior. Every real run sits well past the peak (`t ≫ 3000`), so
-     `lr_c` is on the `t^-0.55` branch and a **longer run takes a lower center,
-     computed from `t`** — not the `1e-2` peak value (fixed-data `lr_c`: ~2.8e-3
-     at 30k, ~2.1e-3 at 50k, ~1.5e-3 at 100k steps).
-   - **The `D`-dependence is a weak, saturating nudge — not a separate regime.**
-     Measured `lr* ∝ D^{+0.15..0.3}`, saturating (~2× over 100× data). So the
-     optimum is a 2D surface `lr*(t,D)`: the inverted-U in `t` times this weak
-     factor in `D`. A scaled run (`D` grows with `t`) has net exponent
-     `t^{-0.55+0.15..0.3}` — **still decreasing**; the `D` term only lifts the
-     fixed-data center by `<2×`, already inside the ±½-decade window. Plug your
-     own `(t, D)` into the surface and sweep — there is nothing to "diagnose"
-     (no "is the loss floored?" test; that heuristic was never measured and is
-     dropped). The template default window is `[1e-3, 3e-2]`.
+   past `t*` it falls as `t^-0.55`. **The procedure is fixed, not a judgment call:
+   evaluate the measured 2D surface `lr*(t,D)` at YOUR `(t,D)` and sweep ±½ decade**
+   around it (`[c/3, 3c]`), never a flat 4-decade prior nor the t-only `lr_c(t)`.
+   Both axes are set by the run design, so both are known inputs, not uncertainty:
+   - **`t`-axis (horizon):** every real run sits past the peak (`t ≫ t*=3000`), so
+     `lr*` is on the `t^-0.55`-ish decay — a **longer run takes a lower center**.
+   - **`D`-axis (per-process events):** measured `lr* ∝ D^{~0.17}`, **saturating**
+     (~2.2× from D=700→70k at t=3162, most of it by D~2k). A large-`D` run sits at
+     the **high-D asymptote → center ABOVE the D-pooled value**; read it off the
+     grid's high-D row at your `t`. Do NOT collapse `D` into "a nudge the window
+     absorbs" — that discards a measured axis. (The "is the loss floored?" rule of
+     thumb is also dropped — never a measured axis; only `t` and `D` were.)
+   - **The (high-`D`, high-`t`) corner is OFF the measured grid** (high-D rows stop
+     at `t≈1.8e4`; every large-`t` pooled point comes from small `D≤7k`, which
+     over-trains and decays steeply — not representative of a large-`D` run). So
+     for a big foundation run (per-proc `D`≈30–100k) the center is an
+     **extrapolation of the high-D row's decay**: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
+     @100k steps. The ±½-decade sweep then both centers the search AND *measures*
+     that off-grid corner. Surface + numbers: `analysis/hpo_optima/`
+     (`make_fig_2d.py`, `hpo_optima.json`). Template default window `[1e-3, 3e-2]`.
 3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
    `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
    `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`
