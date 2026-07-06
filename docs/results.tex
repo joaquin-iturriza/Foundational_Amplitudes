@@ -778,6 +778,9 @@ exactly like spin, and an MLP is strictly more expressive than a Linear embed, s
 reason to hurt asymptotically. We therefore keep both \textbf{on by default} (as in the big-run
 recipes) and treat them as \emph{open}, to be re-tested on richer data and longer schedules; we
 would drop them only if a rigorous test in that regime showed a real regression.
+That re-test has since been run at full scale ($448$ datasets, Sec.~\ref{sec:bigrun}): the color
+one-hot \emph{confirms its keep} (removing it costs $\sim\!17\%$ on the converged bulk), while the
+MLP embedder does not pull its weight and is dropped together with the diagram encoder.
 
 \begin{table}[H]
 \centering
@@ -796,6 +799,129 @@ Encoding arm & $\vlnr$ (5-seed) & rel.\ to combo \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+% ==========================================================================
+\section{The 448-process big run: what fails to learn, and which levers survive at scale}\label{sec:bigrun}
+% ==========================================================================
+
+The first full-scale joint pretraining campaign (\code{bigrun\_baseline}: $448$ datasets from the
+\code{scan\_bigrun\_100k} recipe, $10^5$ events/process with fiducial cuts, $8601$ steps at
+$\mathrm{bs}=16384$, DyHPO over lr/reg/warmup/EMA, $8$ evaluated trials, best geometric-mean
+$\vlnr=5.8\times10^{-4}$ at $\eta=4.1\times10^{-3}$ with EMA) doubles as a diagnostic: which
+processes a joint model of this size actually learns, and which of the physics levers of
+Secs.~\ref{sec:levers}--\ref{sec:arch} still earn their keep at scale.
+
+\paragraph{Failure taxonomy.} The median per-process $\vlnr$ is $2\times10^{-4}$, but $50/448$
+datasets sit above $0.05$ --- \emph{the same ones in every top trial}, so the failures are
+systematic, not seed noise:
+
+\begin{table}[H]
+\centering
+\caption{Big-run failure census (best trial; ``failing'' $=$ per-process $\vlnr>0.05$; a loss of
+$\sim\!1$ on the standardized log-amplitude means nothing was learned).}
+\label{tab:bigrun_census}
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Dataset category & failing & total & note \\
+\midrule
+$\alpha_s$-scan variants (\code{\_\_sXX}) & $0$ & $336$ & all learn, down to $10^{-4}$ \\
+$M_Z$-scan variants of $2\!\to\!2$ (\code{\_\_mzXX}) & $3$ & $60$ & only the widest-window \code{\_\_mz00}s \\
+$m_t/m_H/M_Z^{4\ell}$-scan families & $32$ & $32$ & whole families plateau at $0.1$--$0.3$ \\
+plain processes & $15$ & $20$ & worst: $ee\,d\bar d$, $ee\,b\bar b$ at $\vlnr\!\sim\!1.6$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two mechanisms explain the census; both were isolated against the boring alternatives (no
+train/val distribution mismatch --- stats agree to $2\%$; per-dataset preprocessing stats verified
+correct; zero NaN/skip-step events in the logs).
+
+\begin{principle}[Resonance needles: a dataset fails when a resonance is a sliver of its window]\label{prin:needle}
+A dataset learns its resonance structure only if the resonance occupies a non-negligible fraction
+of the sampled kinematic range. The plain $2\!\to\!2$ sets span $\sqrt s\in[25,1000]$\,GeV, so the
+$Z$ pole is $\sim\!0.3\%$ of the range ($\sim\!2.6\%$ of events within $10$\,GeV of it) while the
+standardized log-amplitude target jumps to $+3.3$--$3.8\sigma$ there (max $7\sigma$): missing the
+needle alone contributes $0.3$--$0.4$ to the per-process MSE, which fully accounts for
+$ee\,\mu\mu$/$ee\,\tau\tau$. The proof by contrast: the \emph{same} processes' narrow-window
+$M_Z$-scan variants (window centered on the shifted pole) learn to $10^{-3}$--$10^{-4}$, and the
+only plain processes that learn ($ee\,WW$, $ee\,ZZ$, $ee\,ZZZ$, $ee\,4\gamma$, \dots) are exactly
+those whose threshold or physics excludes the $Z$ pole from the window. The all-failing
+$m_t/m_H/M_Z^{4\ell}$ families are the same needle in a different variable: their peaks live in
+\emph{internal} pair invariant masses ($m_{\mu\mu}$, $m_{Wb}$, $m_{\tau\tau}$), phase-space
+corners that flat sampling barely populates, so the whole family plateaus at the
+family-average level regardless of the scanned mass value.
+\end{principle}
+
+\begin{principle}[Gradient competition under the geometric mean]\label{prin:gradcomp}
+The log-space aggregation (Principle~\ref{prin:geomean}) weights each process's gradient by
+$1/\mathrm{MSE}_p$: once the bulk of $448$ processes reaches $10^{-4}$, a converged process
+outweighs a laggard at $\mathrm{MSE}\sim1$ by $\sim\!10^4$. Consequences observed in every trial,
+EMA on or off: laggards never gain traction ($ee\,d\bar d$ flat at $1.6$ from the first
+validation), and fragile \emph{learned} processes get overwritten late in training ---
+$ee\,\gamma\gamma$ (no resonance at all) trains down to $7\times10^{-4}$ by step $\sim\!7$k and
+then regresses to $0.1$--$0.7$. Re-balancing the \emph{sampler} cannot fix this: it changes
+process frequency by $O(1)$ factors against a $10^4$ gradient-scale imbalance (consistent with the
+balanced-sampler A/B of Sec.~\ref{sec:loss} finding no gain).
+\end{principle}
+
+\paragraph{Feature ablation at scale (one-factor-out arms).} Five single-GPU arms re-ran the best
+trial's exact HPs with one feature removed (plus one combined arm), the protocol's cheap-shortcut
+direction: an ablation that wins at HPs tuned \emph{for the baseline} wins conservatively. Since
+the number of stuck processes itself differs between arms and biases the pooled geometric mean,
+the decisive column is the geometric mean over the $390$ processes that converged
+($\vlnr\le0.05$) in \emph{all six} configurations.
+
+\begin{table}[H]
+\centering
+\caption{Big-run feature arms at the baseline's best HPs (single seed, $8601$ steps). ``GM
+conv.''\ $=$ geometric-mean $\vlnr$ over the $390$-process everywhere-converged subset (the
+stuck-dataset--robust comparison); median is over all $448$. Per-process tail values are
+run-to-run flaky (e.g.\ $ee\,d\bar d$: $1.63/0.62/1.34$ across baseline/no-diagram/combined) ---
+only the aggregates are trusted.}
+\label{tab:bigrun_arms}
+\begin{tabular}{@{}lrrrrl@{}}
+\toprule
+Arm & GM all & GM conv. & median & $n_{>0.05}$ & verdict \\
+\midrule
+baseline (all on)            & $5.79\text{e-}4$ & $2.56\text{e-}4$ & $1.98\text{e-}4$ & $50$ & reference \\
+no \code{use\_diagrams}      & $3.88\text{e-}4$ & $1.65\text{e-}4$ & $1.90\text{e-}4$ & $49$ & \textbf{drop diagrams} ($-35\%$, all views) \\
+no MLP embedder              & $4.86\text{e-}4$ & $2.21\text{e-}4$ & $3.13\text{e-}4$ & $45$ & tail-driven win; median worse \\
+no \code{color\_onehot}      & $6.81\text{e-}4$ & $3.00\text{e-}4$ & $2.47\text{e-}4$ & $57$ & \textbf{keep color} ($+17\%$ if removed) \\
+no \code{offshell\_per\_event} & $8.63\text{e-}4$ & $3.74\text{e-}4$ & $4.55\text{e-}4$ & $48$ & \textbf{keep off-shellness} ($+46\%$) \\
+no diagrams $+$ no MLP       & $\mathbf{3.85\text{e-}4}$ & $\mathbf{1.59\text{e-}4}$ & $\mathbf{1.88\text{e-}4}$ & $51$ & \textbf{adopted candidate} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Readings. (i)~\textbf{Off-shellness reconfirms its flagship status} (Sec.~\ref{sec:levers}) in the
+$448$-process regime, and the damage from removing it localizes exactly where the physics says:
+the internal-resonance families ($m_t/m_H/M_Z^{4\ell}$ group GM $0.156\!\to\!0.454$;
+$ee\,ZH$ $0.08\!\to\!1.32$). (ii)~\textbf{Color one-hot flips from ``open'' to ``keep''}: the
+short-run $+12\%$ of Table~\ref{tab:enc} was undertraining noise; at scale removing it hurts
+everywhere. (iii)~\textbf{The diagram encoder actively hurts} at scale ($-35\%$ from removing it,
+robust in every view and at both failure thresholds), consistent with the earlier finding that
+diagram-routed signals are weak (Table~\ref{tab:levers}); (iv)~the \textbf{MLP embedder} is not
+load-bearing --- its solo win is tail-driven (median worse) --- and dropping it \emph{with} the
+diagrams costs nothing and cures that median regression, so the combined
+no-diagrams$+$linear-embed configuration is the adopted candidate: best or tied-best in
+every aggregate view while being the simplest and cheapest of the six.
+
+\paragraph{Open threads.} Two structural problems cap what any feature set can do about the
+$\sim\!50$ stuck processes; both are actionable and unresolved:
+\begin{itemize}
+  \item \textbf{Resonance-aware generation} (data-side fix for Principle~\ref{prin:needle}).
+  Uniform-$\sqrt s$/flat-phase-space sampling starves the pole regions. Options, in increasing
+  invasiveness: drop or window the redundant plain wide-range $2\!\to\!2$ sets (their physics is
+  covered by the scan variants); importance-sample $\sqrt s$ around poles at generation time; for
+  the internal-invariant-mass needles ($4\ell$, $WWb\bar b$, $\mu\mu\tau\tau$), resonance-aware
+  phase-space sampling (\`a la MadGraph channel mapping) is the only real cure.
+  \item \textbf{Taming the $1/\mathrm{MSE}$ gradient weight} (optimizer-side fix for
+  Principle~\ref{prin:gradcomp}). Candidate one-liner: aggregate
+  $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau\sim10^{-4}$, which caps a converged
+  process's weight at $1/\tau$ while leaving processes above $\tau$ on the exact geometric-mean
+  behavior (comparison metrics unchanged). Untested; the decisive check is whether
+  $ee\,\gamma\gamma$'s late-training collapse disappears at otherwise-identical HPs.
+\end{itemize}
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
