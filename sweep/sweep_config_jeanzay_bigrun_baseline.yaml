@@ -1,0 +1,91 @@
+cluster:
+  account: itg@v100
+  partition: gpu_p2
+  request_gpus: 1
+  cpus_per_task: 8
+  scheduler: slurm
+  time: 03:30:00
+  auto_submit: false
+dyhpo:
+  n_candidates: 300
+  n_startup: 8
+  seed: 42
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 8601
+n_trials: 8
+fixed_params:
+  data.source: recipes
+  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/scan_bigrun_100k.yaml
+  data.require_cache: 'true'
+  data.train_subsample: 'null'
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'true'
+  model.d_diag: 32
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  training.loss_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.01'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+paths:
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/bigrun
+  setup_commands:
+  - module load anaconda-py3/2023.09
+  - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
+  - export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut
+  - export AMP_FIDUCIAL_CUTS=on
+sweep_name: bigrun_baseline
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.0006
+  high: 0.006
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.9999

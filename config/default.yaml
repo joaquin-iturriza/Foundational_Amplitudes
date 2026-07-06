@@ -28,7 +28,7 @@ training:
  es_patience: 100000000000000
  es_load_best_model: true
  validate_every_n_steps: 100
- validate_frac: 0.0          # if > 0, overrides validate_every_n_steps: val_step = frac * iterations
+ validate_frac: 0.01         # if > 0, overrides validate_every_n_steps: val_step = frac * iterations (0.01 -> 100 val points)
  save_intermediate: false
  load_best_previous: true
  save_gradients: false

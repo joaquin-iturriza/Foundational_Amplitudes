@@ -34,6 +34,7 @@ fixed_params:
   training.batchsize: 16384          # decided operating point: biggest BS that fits (nh<=8, V100 32GB)
   evaluation.batchsize: 16384        # eval forward-only -> match train BS, never eval slower
   training.loss_aggregation: geometric_mean
+  training.validate_frac: '0.01'     # 100 val points regardless of horizon; never hand-set validate_every_n_steps
   training.get_ID: 'false'
   training.regularization: L2
   training.save_intermediate: 'false'
