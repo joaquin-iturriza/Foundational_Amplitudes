@@ -57,6 +57,71 @@ def build_block_diagonal_bias(ptr, seq_lens=None):
     return _cached_block_diagonal_mask(seq_lens)
 
 
+def build_pair_ctx(ptr, n_total, seq_lens=None):
+    """Build the padded-layout context used when a per-pair attention bias is active.
+
+    The xformers BlockDiagonalMask fast path cannot carry a tensor bias, so with
+    pair_bias on, attention runs in a padded (B, H, n_max, n_max) layout instead:
+    events are tiny (n ≲ 12), so the dense per-event attention is cheap. This builds,
+    once per forward (like the block-diagonal mask):
+
+    - flat2pad (N_total,)   : each flat particle's slot in the padded layout
+    - pad2flat (B*n_max,)   : padded slot -> flat index, with N_total pointing at a
+                              zero dummy row appended by the consumer
+    - mask_add (B,1,n,n)    : additive 0/-inf key-padding mask. Only VALID query rows
+                              mask padded keys; padded query rows stay all-zero so no
+                              softmax row is fully -inf (their output is dropped on
+                              unpad, and a fully-masked row would poison backward
+                              with NaNs).
+
+    `seq_lens` (CPU per-event counts) avoids the GPU→CPU sync exactly like
+    build_block_diagonal_bias; `n_total` is passed in so we never read ptr[-1].
+    """
+    device = ptr.device
+    counts = ptr[1:] - ptr[:-1]                               # (B,) on device
+    if seq_lens is not None:
+        n_max, B = max(seq_lens), len(seq_lens)
+    else:
+        cl = counts.tolist()                                  # GPU→CPU sync (eval path)
+        n_max, B = max(cl), len(cl)
+    b_idx = torch.repeat_interleave(torch.arange(B, device=device), counts)   # (N,)
+    pos = torch.arange(n_total, device=device) - ptr[b_idx]                   # (N,)
+    flat2pad = b_idx * n_max + pos                                            # (N,)
+    pad2flat = torch.full((B * n_max,), n_total, device=device, dtype=torch.long)
+    pad2flat[flat2pad] = torch.arange(n_total, device=device)
+    valid = torch.arange(n_max, device=device)[None, :] < counts[:, None]     # (B,n)
+    mask_add = torch.zeros(B, 1, n_max, n_max, device=device)
+    mask_add.masked_fill_(
+        valid[:, None, :, None] & ~valid[:, None, None, :], float("-inf"))
+    return {"B": B, "n_max": n_max, "flat2pad": flat2pad, "pad2flat": pad2flat,
+            "mask_add": mask_add, "bias": None}
+
+
+def _pair_ctx_attention(query, key, value, ctx, scale):
+    """Dense per-event attention in padded layout with an additive per-pair bias.
+
+    query/key/value: (*lead, H, N_total, C) with prod(lead) == 1 (the LLoCa flat
+    layout). Pads to (B, H, n_max, C), runs SDPA with mask_add (+ bias), unpads.
+    """
+    *lead, H, N, C = query.shape
+    assert prod(lead) in (0, 1), "pair-bias attention expects the flat (1,H,N,C) layout"
+    B, n_max = ctx["B"], ctx["n_max"]
+    pad2flat, flat2pad = ctx["pad2flat"], ctx["flat2pad"]
+
+    def pad(t):
+        t = t.reshape(H, N, C)
+        t = torch.cat([t, t.new_zeros(H, 1, C)], dim=1)       # dummy row at index N
+        return t[:, pad2flat].reshape(H, B, n_max, C).transpose(0, 1)  # (B,H,n,C)
+
+    qp, kp, vp = pad(query), pad(key), pad(value)
+    m = ctx["mask_add"].to(qp.dtype)
+    if ctx["bias"] is not None:
+        m = m + ctx["bias"].to(qp.dtype)
+    out = F.scaled_dot_product_attention(qp, kp, vp, attn_mask=m, scale=scale)
+    out = out.transpose(0, 1).reshape(H, B * n_max, C)[:, flat2pad]           # (H,N,C)
+    return out.reshape(*lead, H, N, C)
+
+
 class LLoCaAttention(torch.nn.Module):
     """"""
 
@@ -278,6 +343,7 @@ def scaled_dot_product_attention(
     mup_scaling: bool = True,
     ptr: Optional[Tensor] = None,
     attn_bias=None,
+    pair_ctx=None,
 ) -> Tensor:
     """Execute μP-scaled dot-product attention (1/d instead of 1/sqrt(d)).
 
@@ -312,6 +378,12 @@ def scaled_dot_product_attention(
     """
     d = query.shape[-1]
     scale = 1.0 / d if mup_scaling else 1.0 / math.sqrt(d)
+
+    # Pair-bias path: padded dense per-event attention with an additive per-pair
+    # bias (see build_pair_ctx). The event isolation is enforced by the padded
+    # layout itself, so the block-diagonal mask is not needed here.
+    if pair_ctx is not None:
+        return _pair_ctx_attention(query, key, value, pair_ctx, scale)
 
     # Legacy path: derive the mask from ptr here (one sync per call, i.e. per block).
     if attn_bias is None and ptr is not None:

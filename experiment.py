@@ -665,6 +665,17 @@ class AmplitudeExperiment(BaseExperiment):
                     f"n_scalars {n_scalars - self._d_diag}→{n_scalars}"
                 )
 
+            # Pairwise attention bias (model.use_pair_bias): reads the same diagram
+            # sidecars but is independent of the diagram ENCODER above — no input
+            # widening (n_scalars unchanged); the signal enters the attention logits.
+            # Specs built here so _post_instantiate_model can attach them.
+            self._use_pair_bias = (
+                not use_pids and bool(self.cfg.model.get("use_pair_bias", False))
+            )
+            if self._use_pair_bias:
+                self._pair_bias_specs = self._setup_pair_bias_specs(
+                    list(self.cfg.data.dataset))
+
             with open_dict(self.cfg):
                 if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):
                     # GATr nets: the 4-momentum is the (multi)vector input (in_*v_channels=1
@@ -774,6 +785,112 @@ class AmplitudeExperiment(BaseExperiment):
             n_ok += 1
         LOGGER.info(f"offshell_per_event: built propagator masks for {n_ok}/{len(names)} "
                     f"processes, pdgs {pdgs}")
+        return by_proc
+
+    def _setup_pair_bias_specs(self, names):
+        """Per-process propagator specs for the PAIRWISE attention bias
+        (``model.use_pair_bias``); see wrappers.setup_pair_bias.
+
+        For every internal propagator (ALL of them — unlike _setup_offshell_masks,
+        which keeps only the internal_mass_pdgs channels) this yields the signed
+        momentum-gather row + physical m², deduplicated across diagrams up to a
+        global sign flip (s = (Σ sign·p)² is invariant under row → −row, and by
+        momentum conservation a leg set and its complement give the same s). The
+        propagator's bias lands on the ordered particle pairs inside its resonating
+        cluster: the SMALLER of the two leg clusters it cuts the process into (both
+        clusters when they tie — e.g. 2→2, where the s-channel needle lives in the
+        final pair). Propagator count is capped (smallest clusters first, then
+        massive before massless) by ``model.pair_bias_max_props``.
+
+        Returns a list aligned with ``names``: None (no sidecar / unmappable) or
+        {"mask": (K,n_part) f32, "m2": (K,) f32, "trips": (T,3) i64 rows (k,i,j)}.
+        """
+        from diagram_graphs import build_process_diagrams, build_process_virtuality
+        from particle_ids import build_property_matrix
+        diagrams_dir = self.cfg.model.get("diagrams_dir", "data/diagrams")
+        if not os.path.isabs(diagrams_dir):
+            diagrams_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), diagrams_dir)
+        prop_matrix, _ = build_property_matrix(
+            spin_onehot=bool(self.cfg.data.get("spin_onehot", False)),
+            color_onehot=bool(self.cfg.data.get("color_onehot", False)),
+            is_massless=bool(self.cfg.data.get("prop_is_massless", True)),
+            standardize=bool(self.cfg.data.get("standardize_props", True)),
+        )
+        k_pe = int((self.cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8))
+        max_props = int(self.cfg.model.get("pair_bias_max_props", 48))
+        slot_map = getattr(self, "_slot_pdgs_by_name", {})
+        imp = getattr(self, "_internal_mass_by_proc", None)
+        im_pdgs = [int(p) for p in (getattr(self, "_internal_mass_pdgs", None) or [])]
+        by_proc, n_ok, n_props_tot = [], 0, 0
+        for i, name in enumerate(names):
+            slot_pdgs = slot_map.get(name)
+            path = self._resolve_diagram_path(diagrams_dir, name)
+            if path is None or slot_pdgs is None:
+                by_proc.append(None); continue
+            pd = build_process_diagrams(path, prop_matrix, k_pe=k_pe)
+            n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
+            # scanned propagator masses for this dataset → the pole is at the SCANNED m²
+            mo = {pdg: float(imp[i][j]) for j, pdg in enumerate(im_pdgs)} \
+                if (imp and i < len(imp) and imp[i]) else None
+            vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial,
+                                          mass_override=mo, offshell=True)
+            if vt is None:
+                by_proc.append(None); continue
+            mask = vt["mask"].numpy().astype(np.float32)   # (K_all, n_part)
+            m2   = vt["prop_mass2"].numpy().astype(np.float32)
+            n_part = mask.shape[1]
+            # dedup up to a global sign flip (identical propagator across diagrams,
+            # or the complementary leg set — same physical invariant)
+            uniq = []
+            seen = set()
+            for k in range(mask.shape[0]):
+                row = mask[k]
+                nz = np.nonzero(row)[0]
+                if nz.size == 0:
+                    continue
+                crow = row if row[nz[0]] > 0 else -row     # canonical sign
+                key = (crow.tobytes(), round(float(m2[k]), 6))
+                ckey = ((-crow).tobytes(), round(float(m2[k]), 6))
+                if key in seen or ckey in seen:
+                    continue
+                seen.add(key)
+                uniq.append((row, float(m2[k])))
+            if not uniq:
+                by_proc.append(None); continue
+            # resonating cluster = smaller side of the cut (both when they tie)
+            def sides(row):
+                sup = set(np.nonzero(row)[0].tolist())
+                comp = set(range(n_part)) - sup
+                if len(sup) < len(comp):
+                    return [sorted(sup)]
+                if len(comp) < len(sup):
+                    return [sorted(comp)]
+                return [sorted(sup), sorted(comp)]
+            # cap: smallest clusters first (2-body needles), massive before massless
+            uniq.sort(key=lambda u: (min(int(np.count_nonzero(u[0])),
+                                         n_part - int(np.count_nonzero(u[0]))),
+                                     -u[1]))
+            uniq = uniq[:max_props]
+            rows, masses, trips = [], [], []
+            for k, (row, mm) in enumerate(uniq):
+                pairs = [(a, b) for side in sides(row) if len(side) > 1
+                         for a in side for b in side if a != b]
+                if not pairs:
+                    continue
+                rows.append(row); masses.append(mm)
+                kk = len(rows) - 1
+                trips.extend((kk, a, b) for a, b in pairs)
+            if not trips:
+                by_proc.append(None); continue
+            by_proc.append({
+                "mask": np.stack(rows).astype(np.float32),
+                "m2": np.asarray(masses, dtype=np.float32),
+                "trips": np.asarray(trips, dtype=np.int64),
+            })
+            n_ok += 1
+            n_props_tot += len(rows)
+        LOGGER.info(f"pair_bias: built propagator pair specs for {n_ok}/{len(names)} "
+                    f"processes ({n_props_tot} propagators total, cap {max_props}/proc)")
         return by_proc
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
@@ -959,6 +1076,20 @@ class AmplitudeExperiment(BaseExperiment):
                     d_out=self._d_diag, f_edge_extra=f_edge_extra,
                 )
                 model.setup_diagram_conditioning(encoder, self._diag_pd_by_pid, self._d_diag)
+            # Pairwise attention bias: attach the propagator specs + zero-init head
+            # (a real submodule → trained, checkpointed, marked SP by mup_finalize).
+            if getattr(self, "_use_pair_bias", False) and \
+                    any(s is not None for s in getattr(self, "_pair_bias_specs", [])):
+                model.setup_pair_bias(
+                    self._pair_bias_specs,
+                    num_heads=int(self.cfg.model.net.num_heads),
+                    hidden=int(self.cfg.model.get("pair_bias_hidden", 16)),
+                    clamp=float(self.cfg.model.get("pair_bias_clamp", 4.0)),
+                    mom_div=float(self.mom_div or 1.0),
+                )
+                LOGGER.info("pair_bias: ON — per-pair off-shellness attention bias "
+                            f"(H={int(self.cfg.model.net.num_heads)}, zero-init head)")
+            if getattr(self, "_use_diagrams", False):
                 if getattr(self, "_use_diag_virt", False):
                     model.setup_diagram_virtuality(
                         self._diag_virt_by_pid,

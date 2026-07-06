@@ -163,6 +163,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # until then, so an un-set-up wrapper behaves exactly like before.
         self.use_diagrams = False
         self.use_diagram_virtuality = False
+        # Pairwise attention bias (model.use_pair_bias); attached later by the
+        # experiment via setup_pair_bias() (needs the diagram sidecars).
+        self.use_pair_bias = False
         self._cfg_use_diagrams = bool(use_diagrams)
         self.d_diag = int(d_diag)
         self.diagrams_dir = diagrams_dir
@@ -256,6 +259,121 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._pd_device = None
         self.d_diag = int(d_diag)
         self.use_diagrams = True
+
+    def setup_pair_bias(self, specs_by_pid, num_heads, hidden=16, clamp=4.0,
+                        mom_div=1.0):
+        """Attach the diagram-derived PAIRWISE attention bias (``model.use_pair_bias``).
+
+        Independent of the diagram encoder (use_diagrams): the diagram sidecars are
+        used only to enumerate each process's internal propagators. Every propagator
+        cuts the process into two leg clusters; per event its off-shellness
+        s−m² = (Σ sign·p)² − m² (a Lorentz scalar) is signed-log compressed,
+        standardized (first-batch calibration, persisted buffers), passed through a
+        small zero-init MLP → one score per head, and added to the attention logits
+        of every particle pair inside the resonating cluster(s). Zero-init makes the
+        model EXACTLY the baseline at step 0 — the bias is opt-in by gradient.
+
+        specs_by_pid : list indexed by process_id of None | dict with numpy arrays
+                       mask (K,n_part) signed momentum-gather rows, m2 (K,) physical
+                       GeV², trips (T,3) int64 rows (k, i, j) — the (propagator,
+                       ordered pair) index triples the score is scattered into.
+        num_heads    : per-head bias width (the backbone's H).
+        """
+        P = len(specs_by_pid)
+        K = max((s["mask"].shape[0] for s in specs_by_pid if s is not None), default=0)
+        T = max((s["trips"].shape[0] for s in specs_by_pid if s is not None), default=0)
+        n = max((s["mask"].shape[1] for s in specs_by_pid if s is not None), default=0)
+        if K == 0 or T == 0:
+            return   # nothing usable; feature stays off
+        mask = torch.zeros(P, K, n)
+        m2 = torch.zeros(P, K)
+        kvalid = torch.zeros(P, K)
+        tk = torch.zeros(P, T, dtype=torch.long)
+        ti = torch.zeros(P, T, dtype=torch.long)
+        tj = torch.zeros(P, T, dtype=torch.long)
+        tvalid = torch.zeros(P, T)
+        for pid, s in enumerate(specs_by_pid):
+            if s is None:
+                continue
+            k, t, m = s["mask"].shape[0], s["trips"].shape[0], s["mask"].shape[1]
+            mask[pid, :k, :m] = torch.as_tensor(s["mask"], dtype=torch.float32)
+            m2[pid, :k] = torch.as_tensor(s["m2"], dtype=torch.float32)
+            kvalid[pid, :k] = 1.0
+            trips = torch.as_tensor(s["trips"], dtype=torch.long)
+            tk[pid, :t], ti[pid, :t], tj[pid, :t] = trips[:, 0], trips[:, 1], trips[:, 2]
+            tvalid[pid, :t] = 1.0
+        # regenerable statics (not nn buffers) + device-migration flag, like _diag_batch
+        self._pb_static = {"mask": mask, "m2": m2, "kvalid": kvalid,
+                           "tk": tk, "ti": ti, "tj": tj, "tvalid": tvalid}
+        self._pb_device = None
+        self._pb_num_heads = int(num_heads)
+        self._pb_clamp = float(clamp)
+        self._pb_mom_div = float(mom_div)
+        self.pair_bias_head = nn.Sequential(
+            nn.Linear(1, hidden, bias=True),
+            nn.GELU(),
+            nn.Linear(hidden, num_heads, bias=True),
+        )
+        nn.init.xavier_uniform_(self.pair_bias_head[0].weight)
+        nn.init.zeros_(self.pair_bias_head[0].bias)
+        nn.init.zeros_(self.pair_bias_head[2].weight)   # zero-init: exact baseline at t=0
+        nn.init.zeros_(self.pair_bias_head[2].bias)
+        # calibration buffers (persisted in the checkpoint, same pattern as _virt_*)
+        self.register_buffer("_pb_mu", torch.zeros(()))
+        self.register_buffer("_pb_sigma", torch.ones(()))
+        self.register_buffer("_pb_calibrated", torch.zeros((), dtype=torch.bool))
+        self._pb_cal_done = False
+        self.use_pair_bias = True
+
+    def _pair_bias(self, fourmomenta, process_ids, ctx):
+        """Per-head padded attention bias (B, H, n_max, n_max) for this batch.
+
+        Fully batched over processes: static per-process tensors are gathered by
+        process_ids (no per-pid Python loop), the per-propagator off-shellness is one
+        einsum + Minkowski norm, and the per-head scores are scatter-added into the
+        padded pair grid via precomputed (k, i, j) triples. Processes without a
+        sidecar have all-zero/invalid static rows and contribute exactly zero bias.
+        """
+        st = self._pb_static
+        device, dtype = fourmomenta.device, fourmomenta.dtype
+        if self._pb_device != device:
+            self._pb_static = st = {k: v.to(device) for k, v in st.items()}
+            self._pb_device = device
+        B, n_max, H = ctx["B"], ctx["n_max"], self._pb_num_heads
+
+        # padded per-event momenta via the ctx index maps (dummy zero row at index N)
+        momp = torch.cat([fourmomenta, fourmomenta.new_zeros(1, 4)], dim=0)
+        momp = momp[ctx["pad2flat"]].reshape(B, n_max, 4)
+
+        mask = st["mask"][process_ids]                        # (B, K, n_slot)
+        m = min(mask.shape[-1], n_max)   # procs in batch have n_part <= n_max; extra cols are 0
+        p_prop = torch.einsum("bkn,bnc->bkc", mask[..., :m], momp[:, :m])   # (B,K,4)
+        s = p_prop[..., 0] ** 2 - (p_prop[..., 1:] ** 2).sum(-1)
+        s = s * (self._pb_mom_div ** 2) - st["m2"][process_ids]             # physical s − m²
+        raw = torch.sign(s) * torch.log1p(s.abs())                          # signed-log
+        kvalid = st["kvalid"][process_ids]                                  # (B,K)
+
+        if not self._pb_cal_done:                # first-batch standardization stats
+            if not bool(self._pb_calibrated):
+                sel = raw.detach()[kvalid > 0]
+                if sel.numel() > 1:
+                    self._pb_mu.copy_(sel.mean())
+                    self._pb_sigma.copy_(sel.std().clamp_min(1e-3))
+                    self._pb_calibrated.fill_(True)
+            self._pb_cal_done = True
+
+        feat = ((raw - self._pb_mu) / self._pb_sigma).clamp(
+            -self._pb_clamp, self._pb_clamp).to(dtype)
+        scores = self.pair_bias_head(feat.unsqueeze(-1))                    # (B,K,H)
+        scores = scores * kvalid.unsqueeze(-1)
+
+        tk, tv = st["tk"][process_ids], st["tvalid"][process_ids]           # (B,T)
+        vals = scores.gather(1, tk.unsqueeze(-1).expand(-1, -1, H))         # (B,T,H)
+        vals = vals * tv.unsqueeze(-1)
+        idx = st["ti"][process_ids] * n_max + st["tj"][process_ids]         # (B,T)
+        bias = scores.new_zeros(B, n_max * n_max, H)
+        bias.scatter_add_(1, idx.unsqueeze(-1).expand(-1, -1, H), vals)
+        return bias.reshape(B, n_max, n_max, H).permute(0, 3, 1, 2)         # (B,H,n,n)
 
     def setup_diagram_virtuality(self, virt_by_pid, log_scale=0.1,
                                  standardize=True, clamp=4.0, mode="edge", mom_div=1.0):
@@ -560,7 +678,18 @@ class AmplitudeLLoCaWrapper(nn.Module):
                     process_ids, ptr, particle_type.device, particle_type.dtype)
             particle_type = torch.cat([particle_type, diag_feat], dim=-1)
 
-        outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr, seq_lens=seq_lens)
+        # Pairwise diagram-derived attention bias: build the padded-layout context
+        # (index maps + key-padding mask) once per forward, then the per-pair bias.
+        # The bias is a function of Lorentz scalars (s − m² per propagator), so
+        # equivariance is preserved.
+        pair_ctx = None
+        if self.use_pair_bias and process_ids is not None:
+            from models.attention_lloca_mup import build_pair_ctx
+            pair_ctx = build_pair_ctx(ptr, fourmomenta.shape[0], seq_lens=seq_lens)
+            pair_ctx["bias"] = self._pair_bias(fourmomenta, process_ids, pair_ctx)
+
+        outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr,
+                           seq_lens=seq_lens, pair_ctx=pair_ctx)
 
         # Per-event mean pool (vectorised; see _pool_events / LLOCA_POOL env toggle)
         return _pool_events(outputs, ptr)

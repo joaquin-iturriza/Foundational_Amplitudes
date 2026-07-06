@@ -142,6 +142,7 @@ class LLOCAMuPTransformer(nn.Module):
         std: float,
         ptr: torch.Tensor,
         seq_lens=None,
+        pair_ctx=None,
     ):
         """Forward pass of the LLoCa network."""
         frames = self.framesnet(
@@ -160,4 +161,4 @@ class LLOCAMuPTransformer(nn.Module):
         # restricting each event's particles to attend only within that event.
         # seq_lens (CPU per-event lengths, optional) lets the mask builder skip a
         # GPU→CPU sync; see build_block_diagonal_bias.
-        return self.net(features, frames, ptr=ptr, seq_lens=seq_lens)
+        return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)

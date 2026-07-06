@@ -18,6 +18,18 @@ particle_encoder_hidden: 32  # >0 → 2-layer MLP encoder (Linear→GELU→Linea
 # zero embedding. Set false for a diagram-free ablation (also changes in_channels, so
 # a checkpoint trained with one setting cannot warm-start the other).
 use_diagrams: true
+# --- Pairwise attention bias (diagram-derived, independent of use_diagrams) -----
+# Reads the same data/diagrams/*.diagrams.json sidecars, but instead of an input
+# embedding, each internal propagator's per-event off-shellness s−m² (signed-log,
+# standardized) drives a small zero-init MLP whose per-head output is ADDED to the
+# attention logits of every particle pair inside the propagator's resonating
+# cluster (the smaller side of the cut; both sides on a tie). Puts the pole
+# variable where the pair correlation lives, directly in the main transformer.
+# Zero-init head ⇒ exactly the baseline at step 0. Requires use_PIDs=false.
+use_pair_bias: false
+pair_bias_hidden: 16      # hidden width of the per-propagator score MLP (1 → H heads)
+pair_bias_clamp: 4.0      # clamp the standardized off-shellness to ± this (sigma units)
+pair_bias_max_props: 48   # cap propagators/process (smallest clusters + massive first)
 diagram_scanned_mass: false    # override the propagator's mass column per-dataset with the
                                # SCANNED internal mass (data.internal_mass_pdgs), so a mass
                                # scan reaches the diagram (else the table mass is stale). With

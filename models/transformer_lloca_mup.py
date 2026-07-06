@@ -487,7 +487,13 @@ class MuPTransformer(nn.Module):
         # the GPU→CPU sync. Computed from the CPU ptr in _batch_loss_lloca; None on
         # the eval path or under LLOCA_SYNC=blocking, where we fall back to ptr.
         seq_lens = attn_kwargs.pop("seq_lens", None)
-        if ptr is not None:
+        # Per-pair attention bias (diagram-derived off-shellness; built by the
+        # wrapper). When present it carries its own padded event-isolation mask, so
+        # the xformers block-diagonal mask is skipped entirely.
+        pair_ctx = attn_kwargs.pop("pair_ctx", None)
+        if pair_ctx is not None:
+            attn_kwargs["pair_ctx"] = pair_ctx
+        elif ptr is not None:
             if os.environ.get("LLOCA_ATTN_MASK", "per_forward") == "per_block":
                 attn_kwargs["ptr"] = ptr
             else:

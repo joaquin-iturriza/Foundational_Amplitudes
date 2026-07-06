@@ -428,6 +428,125 @@ def check_diagram_virtuality_batch():
     print(f"  diagram virtuality batch == per-process loop  OK  (max {d:.1e})")
 
 
+def check_pair_bias():
+    """Pairwise attention bias (model.use_pair_bias): the padded-SDPA path must
+    (a) equal per-event dense attention on the SAME q/k/v inside the real forward
+        (guards pad/unpad indexing + event isolation across VARIABLE lengths; the
+        comparison is made at the attention op, not on the pooled output, because
+        the framesnet's frame choice is batch-composition sensitive at float32 —
+        the same reason the end-to-end invariance assertion was dropped, see
+        check_frame_broadcast_equivalence), with the zero-init head giving an
+        exactly-zero bias tensor (exact-baseline-at-t0),
+    (b) produce a Lorentz-invariant bias tensor (s − m² is a scalar), and
+    (c) flow gradients into the bias head once its last layer is nonzero.
+    """
+    import models.attention_lloca_mup as attn_mod
+    from wrappers import AmplitudeLLoCaWrapper
+    torch.manual_seed(0)
+    token_size = 6
+    net, ns = _tiny_model(n_scalars=token_size)
+    wrap = AmplitudeLLoCaWrapper(net, token_size=token_size).to(_CPU)
+    wrap.eval()
+
+    # variable-length batch: 4 events of 3/4/3/5 particles, 3 "processes"
+    lens = [3, 4, 3, 5]
+    ptr = torch.tensor(np.cumsum([0] + lens), dtype=torch.long)
+    N = int(ptr[-1])
+    p = torch.randn(N, 3); m = torch.rand(N, 1) + 0.1
+    E = (p.pow(2).sum(-1, keepdim=True) + m.pow(2)).sqrt()
+    fm = torch.cat([E, p], dim=-1)
+    toks = torch.randint(0, token_size, (N,))
+    process_ids = torch.tensor([0, 2, 0, 1])   # event -> process (n_part 3/4/3/5)
+
+    specs = [
+        {"mask": np.array([[-1., -1., 0.], [0., 1., 1.]], dtype=np.float32),
+         "m2": np.array([91.2**2, 0.0], dtype=np.float32),
+         "trips": np.array([(0, 0, 1), (0, 1, 0), (1, 1, 2), (1, 2, 1)], dtype=np.int64)},
+        {"mask": np.array([[0., 0., 1., 1., 0.]], dtype=np.float32),
+         "m2": np.array([172.5**2], dtype=np.float32),
+         "trips": np.array([(0, 2, 3), (0, 3, 2)], dtype=np.int64)},
+        {"mask": np.array([[-1., 0., 1., 0.]], dtype=np.float32),
+         "m2": np.array([0.0], dtype=np.float32),
+         "trips": np.array([(0, 0, 2), (0, 2, 0)], dtype=np.int64)},
+    ]
+    wrap.setup_pair_bias(specs, num_heads=2, hidden=8, clamp=4.0, mom_div=1.0)
+
+    saved = attn_mod._XFORMERS_AVAILABLE
+    attn_mod._XFORMERS_AVAILABLE = False
+    try:
+        # (a) zero-init head ⇒ bias tensor exactly zero, and the padded attention
+        # equals per-event dense attention on the same q/k/v in every block
+        ctx0 = attn_mod.build_pair_ctx(ptr, N)
+        with torch.no_grad():
+            b0 = wrap._pair_bias(fm, process_ids, ctx0)
+        assert b0.abs().max().item() == 0.0, "zero-init head gave a nonzero bias"
+
+        diffs = []
+        orig_attn = attn_mod.scaled_dot_product_attention
+
+        def spy(q, k, v, mup_scaling=True, ptr=None, attn_bias=None, pair_ctx=None):
+            out = orig_attn(q, k, v, mup_scaling=mup_scaling, ptr=ptr,
+                            attn_bias=attn_bias, pair_ctx=pair_ctx)
+            if pair_ctx is not None:
+                scale = 1.0 / q.shape[-1]
+                ref = torch.zeros_like(out)
+                for i in range(len(lens)):
+                    s, e = int(ptr_full[i]), int(ptr_full[i + 1])
+                    qs, ks, vs = q[..., s:e, :], k[..., s:e, :], v[..., s:e, :]
+                    w = torch.softmax(qs @ ks.transpose(-2, -1) * scale, dim=-1)
+                    ref[..., s:e, :] = w @ vs
+                diffs.append((out - ref).abs().max().item())
+            return out
+
+        ptr_full = ptr
+        attn_mod.scaled_dot_product_attention = spy
+        try:
+            with torch.no_grad():
+                wrap(fm, toks, 0.0, 1.0, ptr, process_ids=process_ids)
+        finally:
+            attn_mod.scaled_dot_product_attention = orig_attn
+        assert diffs, "pair-bias padded attention path was never taken"
+        d = max(diffs)
+        assert d < 1e-5, f"padded attention != per-event dense: {d:.2e}"
+
+        # (b) nonzero head: bias tensor is Lorentz-invariant
+        torch.manual_seed(1)
+        nn_last = wrap.pair_bias_head[2]
+        torch.nn.init.normal_(nn_last.weight, std=0.5)
+        torch.nn.init.normal_(nn_last.bias, std=0.5)
+    finally:
+        attn_mod._XFORMERS_AVAILABLE = saved
+    # manual z-boost + xy-rotation (exact Lorentz transform, moderate rapidity)
+    eta, th = 0.4, 0.7
+    B_ = torch.tensor([[np.cosh(eta), 0, 0, np.sinh(eta)],
+                       [0, 1, 0, 0], [0, 0, 1, 0],
+                       [np.sinh(eta), 0, 0, np.cosh(eta)]], dtype=fm.dtype)
+    R_ = torch.tensor([[1, 0, 0, 0],
+                       [0, np.cos(th), -np.sin(th), 0],
+                       [0, np.sin(th), np.cos(th), 0], [0, 0, 0, 1]], dtype=fm.dtype)
+    L = R_ @ B_
+    ctx = attn_mod.build_pair_ctx(ptr, N)
+    with torch.no_grad():
+        b0 = wrap._pair_bias(fm, process_ids, ctx)
+        b1 = wrap._pair_bias(fm @ L.T, process_ids, ctx)
+    rel = ((b0 - b1).abs().max() / b0.abs().max().clamp(min=1e-8)).item()
+    assert rel < 1e-3, f"pair bias not Lorentz-invariant: rel {rel:.2e}"
+    assert b0.abs().max().item() > 0, "nonzero head produced an all-zero bias"
+
+    # (c) gradients reach the bias head through the padded attention
+    attn_mod._XFORMERS_AVAILABLE = False
+    try:
+        wrap.zero_grad()
+        out = wrap(fm, toks, 0.0, 1.0, ptr, process_ids=process_ids)
+        out.sum().backward()
+    finally:
+        attn_mod._XFORMERS_AVAILABLE = saved
+    g = wrap.pair_bias_head[0].weight.grad
+    assert g is not None and g.abs().max().item() > 0, "no gradient in pair_bias head"
+    print(f"  pair bias: zero-init bias == 0; padded attn == per-event dense "
+          f"(max {d:.1e}); Lorentz-invariant (rel {rel:.1e}); grads flow  OK")
+
+
 print("=" * 60)
 print("0. Vectorization equivalence regression guard (CPU)")
 print("=" * 60)
@@ -440,6 +559,7 @@ check_diagram_conditioning()
 check_diagram_batch_equivalence()
 check_diagram_virtuality()
 check_diagram_virtuality_batch()
+check_pair_bias()
 
 
 # ── 1. Load real data and check preprocessed amplitude distribution ──────────
