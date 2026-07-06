@@ -135,7 +135,10 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  use_diagram_virtuality: bool = False, virt_log_scale: float = 0.1,
                  virt_standardize: bool = True, virt_clamp: float = 4.0,
                  virt_mode: str = "edge",
-                 diagram_scanned_mass: bool = False):   # read in experiment.init_model; accepted here so Hydra can pass it
+                 diagram_scanned_mass: bool = False,   # read in experiment.init_model; accepted here so Hydra can pass it
+                 use_pair_bias: bool = False, pair_bias_hidden: int = 16,
+                 pair_bias_clamp: float = 4.0,
+                 pair_bias_max_props: int = 48):       # ditto: consumed by the experiment (spec build + setup_pair_bias)
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
