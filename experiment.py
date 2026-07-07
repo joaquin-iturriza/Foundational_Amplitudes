@@ -871,13 +871,18 @@ class AmplitudeExperiment(BaseExperiment):
                                          n_part - int(np.count_nonzero(u[0]))),
                                      -u[1]))
             uniq = uniq[:max_props]
-            rows, masses, trips = [], [], []
+            rows, masses, pfeat, trips = [], [], [], []
             for k, (row, mm) in enumerate(uniq):
                 pairs = [(a, b) for side in sides(row) if len(side) > 1
                          for a in side for b in side if a != b]
                 if not pairs:
                     continue
                 rows.append(row); masses.append(mm)
+                # propagator identity for the bias head: [log10(m)/2, massless flag]
+                # — the same off-shellness means different physics per propagator type
+                mprop = float(np.sqrt(max(mm, 0.0)))
+                pfeat.append([np.log10(max(mprop, 1e-3)) / 2.0,
+                              1.0 if mprop < 1e-3 else 0.0])
                 kk = len(rows) - 1
                 trips.extend((kk, a, b) for a, b in pairs)
             if not trips:
@@ -885,6 +890,7 @@ class AmplitudeExperiment(BaseExperiment):
             by_proc.append({
                 "mask": np.stack(rows).astype(np.float32),
                 "m2": np.asarray(masses, dtype=np.float32),
+                "pfeat": np.asarray(pfeat, dtype=np.float32),
                 "trips": np.asarray(trips, dtype=np.int64),
             })
             n_ok += 1
@@ -1086,6 +1092,7 @@ class AmplitudeExperiment(BaseExperiment):
                     hidden=int(self.cfg.model.get("pair_bias_hidden", 16)),
                     clamp=float(self.cfg.model.get("pair_bias_clamp", 4.0)),
                     mom_div=float(self.mom_div or 1.0),
+                    logit_cap=float(self.cfg.model.get("pair_bias_logit_cap", 8.0)),
                 )
                 LOGGER.info("pair_bias: ON — per-pair off-shellness attention bias "
                             f"(H={int(self.cfg.model.net.num_heads)}, zero-init head)")

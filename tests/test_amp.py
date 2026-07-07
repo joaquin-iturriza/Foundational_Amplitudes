@@ -461,12 +461,15 @@ def check_pair_bias():
     specs = [
         {"mask": np.array([[-1., -1., 0.], [0., 1., 1.]], dtype=np.float32),
          "m2": np.array([91.2**2, 0.0], dtype=np.float32),
+         "pfeat": np.array([[0.98, 0.0], [-1.5, 1.0]], dtype=np.float32),
          "trips": np.array([(0, 0, 1), (0, 1, 0), (1, 1, 2), (1, 2, 1)], dtype=np.int64)},
         {"mask": np.array([[0., 0., 1., 1., 0.]], dtype=np.float32),
          "m2": np.array([172.5**2], dtype=np.float32),
+         "pfeat": np.array([[1.12, 0.0]], dtype=np.float32),
          "trips": np.array([(0, 2, 3), (0, 3, 2)], dtype=np.int64)},
         {"mask": np.array([[-1., 0., 1., 0.]], dtype=np.float32),
          "m2": np.array([0.0], dtype=np.float32),
+         "pfeat": np.array([[-1.5, 1.0]], dtype=np.float32),
          "trips": np.array([(0, 0, 2), (0, 2, 0)], dtype=np.int64)},
     ]
     wrap.setup_pair_bias(specs, num_heads=2, hidden=8, clamp=4.0, mom_div=1.0)

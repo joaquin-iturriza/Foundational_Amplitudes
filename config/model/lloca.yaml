@@ -30,6 +30,9 @@ use_pair_bias: false
 pair_bias_hidden: 16      # hidden width of the per-propagator score MLP (1 → H heads)
 pair_bias_clamp: 4.0      # clamp the standardized off-shellness to ± this (sigma units)
 pair_bias_max_props: 48   # cap propagators/process (smallest clusters + massive first)
+pair_bias_logit_cap: 8.0  # soft cap (cap·tanh(x/cap)) on the per-head bias logits; the
+                          # uncapped v1 arm drifted to −17-logit hard masks that hurt
+                          # the converged bulk. 0 disables the cap.
 diagram_scanned_mass: false    # override the propagator's mass column per-dataset with the
                                # SCANNED internal mass (data.internal_mass_pdgs), so a mass
                                # scan reaches the diagram (else the table mass is stale). With

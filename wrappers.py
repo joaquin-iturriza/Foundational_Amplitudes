@@ -138,7 +138,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  diagram_scanned_mass: bool = False,   # read in experiment.init_model; accepted here so Hydra can pass it
                  use_pair_bias: bool = False, pair_bias_hidden: int = 16,
                  pair_bias_clamp: float = 4.0,
-                 pair_bias_max_props: int = 48):       # ditto: consumed by the experiment (spec build + setup_pair_bias)
+                 pair_bias_max_props: int = 48,
+                 pair_bias_logit_cap: float = 8.0):    # ditto: consumed by the experiment (spec build + setup_pair_bias)
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -264,33 +265,41 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.use_diagrams = True
 
     def setup_pair_bias(self, specs_by_pid, num_heads, hidden=16, clamp=4.0,
-                        mom_div=1.0):
+                        mom_div=1.0, logit_cap=8.0):
         """Attach the diagram-derived PAIRWISE attention bias (``model.use_pair_bias``).
 
         Independent of the diagram encoder (use_diagrams): the diagram sidecars are
         used only to enumerate each process's internal propagators. Every propagator
         cuts the process into two leg clusters; per event its off-shellness
         s−m² = (Σ sign·p)² − m² (a Lorentz scalar) is signed-log compressed,
-        standardized (first-batch calibration, persisted buffers), passed through a
-        small zero-init MLP → one score per head, and added to the attention logits
-        of every particle pair inside the resonating cluster(s). Zero-init makes the
-        model EXACTLY the baseline at step 0 — the bias is opt-in by gradient.
+        standardized (first-batch calibration, persisted buffers), passed WITH the
+        propagator's identity features (pfeat: log-mass + massless flag) through a
+        small zero-init MLP → one score per head, soft-capped to ±logit_cap
+        (cap·tanh(x/cap): linear for small scores, saturating instead of the
+        unbounded −17-logit hard-mask regime the v1 arm learned), and added to the
+        attention logits of every particle pair inside the resonating cluster(s).
+        Zero-init makes the model EXACTLY the baseline at step 0 — the bias is
+        opt-in by gradient.
 
         specs_by_pid : list indexed by process_id of None | dict with numpy arrays
                        mask (K,n_part) signed momentum-gather rows, m2 (K,) physical
-                       GeV², trips (T,3) int64 rows (k, i, j) — the (propagator,
-                       ordered pair) index triples the score is scattered into.
+                       GeV², pfeat (K,F) per-propagator identity features, trips
+                       (T,3) int64 rows (k, i, j) — the (propagator, ordered pair)
+                       index triples the score is scattered into.
         num_heads    : per-head bias width (the backbone's H).
         """
         P = len(specs_by_pid)
         K = max((s["mask"].shape[0] for s in specs_by_pid if s is not None), default=0)
         T = max((s["trips"].shape[0] for s in specs_by_pid if s is not None), default=0)
         n = max((s["mask"].shape[1] for s in specs_by_pid if s is not None), default=0)
+        F = max((s["pfeat"].shape[1] for s in specs_by_pid
+                 if s is not None and "pfeat" in s), default=0)
         if K == 0 or T == 0:
             return   # nothing usable; feature stays off
         mask = torch.zeros(P, K, n)
         m2 = torch.zeros(P, K)
         kvalid = torch.zeros(P, K)
+        pfeat = torch.zeros(P, K, F) if F else None
         tk = torch.zeros(P, T, dtype=torch.long)
         ti = torch.zeros(P, T, dtype=torch.long)
         tj = torch.zeros(P, T, dtype=torch.long)
@@ -302,18 +311,24 @@ class AmplitudeLLoCaWrapper(nn.Module):
             mask[pid, :k, :m] = torch.as_tensor(s["mask"], dtype=torch.float32)
             m2[pid, :k] = torch.as_tensor(s["m2"], dtype=torch.float32)
             kvalid[pid, :k] = 1.0
+            if F and "pfeat" in s:
+                pfeat[pid, :k] = torch.as_tensor(s["pfeat"], dtype=torch.float32)
             trips = torch.as_tensor(s["trips"], dtype=torch.long)
             tk[pid, :t], ti[pid, :t], tj[pid, :t] = trips[:, 0], trips[:, 1], trips[:, 2]
             tvalid[pid, :t] = 1.0
         # regenerable statics (not nn buffers) + device-migration flag, like _diag_batch
         self._pb_static = {"mask": mask, "m2": m2, "kvalid": kvalid,
                            "tk": tk, "ti": ti, "tj": tj, "tvalid": tvalid}
+        if pfeat is not None:
+            self._pb_static["pfeat"] = pfeat
         self._pb_device = None
         self._pb_num_heads = int(num_heads)
         self._pb_clamp = float(clamp)
         self._pb_mom_div = float(mom_div)
+        self._pb_logit_cap = float(logit_cap)
+        self._pb_in_dim = 1 + F
         self.pair_bias_head = nn.Sequential(
-            nn.Linear(1, hidden, bias=True),
+            nn.Linear(1 + F, hidden, bias=True),
             nn.GELU(),
             nn.Linear(hidden, num_heads, bias=True),
         )
@@ -366,8 +381,15 @@ class AmplitudeLLoCaWrapper(nn.Module):
             self._pb_cal_done = True
 
         feat = ((raw - self._pb_mu) / self._pb_sigma).clamp(
-            -self._pb_clamp, self._pb_clamp).to(dtype)
-        scores = self.pair_bias_head(feat.unsqueeze(-1))                    # (B,K,H)
+            -self._pb_clamp, self._pb_clamp).to(dtype).unsqueeze(-1)        # (B,K,1)
+        if "pfeat" in st:   # propagator identity (log-mass, massless flag): the same
+            # off-shellness means different physics for a γ vs Z vs top propagator
+            feat = torch.cat([feat, st["pfeat"][process_ids].to(dtype)], dim=-1)
+        scores = self.pair_bias_head(feat)                                  # (B,K,H)
+        cap = self._pb_logit_cap
+        if cap > 0:   # soft cap: linear for small scores, saturates at ±cap instead
+            # of the unbounded hard-mask logits (−17) the uncapped v1 arm learned
+            scores = cap * torch.tanh(scores / cap)
         scores = scores * kvalid.unsqueeze(-1)
 
         tk, tv = st["tk"][process_ids], st["tvalid"][process_ids]           # (B,T)
