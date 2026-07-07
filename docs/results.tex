@@ -923,6 +923,55 @@ $\sim\!50$ stuck processes; both are actionable and unresolved:
   $ee\,\gamma\gamma$'s late-training collapse disappears at otherwise-identical HPs.
 \end{itemize}
 
+\paragraph{Pairwise attention bias: the diagram signal at the pair level (tested, not adopted).}
+Motivated by the delivery-mechanism reading of the diagram results (the off-shellness signal wins
+when it reaches the main transformer, Sec.~\ref{sec:levers}) and by the external evidence that
+\emph{static} diagram conditioning buys nothing in-distribution even in its home setting
+(arXiv:2606.23791: prefix-token diagram embeddings move held-out-process generalization and
+$500\times$ fine-tune data efficiency, but only $\sim\!0.01$ AUC on training processes), the
+pair-level generalization of \code{offshell\_per\_event} was built and tested
+(\code{model.use\_pair\_bias}): every internal propagator's per-event $s-m^2$ (signed-log,
+first-batch standardized; propagator identity features log-mass$+$massless flag in v2) drives a
+zero-init per-head MLP whose output is \emph{added to the attention logits} of the particle pairs
+inside the propagator's resonating cluster --- the pole variable placed where the pair
+correlation lives. Implementation: padded-SDPA attention branch (the xformers block-diagonal mask
+cannot carry a tensor bias; $\sim\!25$--$30\%$ step-time cost when on), exact-baseline at $t_0$ by
+zero-init, CPU equivalence guards in \code{tests/test\_amp.py}.
+
+Three single-seed arms at the adopted candidate config (baseline best HPs unless noted):
+
+\begin{center}\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Arm & GM all & $\alpha_s$-bulk GM & plain GM & $n_{>0.05}$ \\
+\midrule
+adopted baseline (no bias)          & $\mathbf{3.85\text{e-}4}$ & $\mathbf{1.24\text{e-}4}$ & $0.209$ & $51$ \\
+pair-bias v1 (unbounded, 1-D head)  & $5.26\text{e-}4$ & $1.60\text{e-}4$ & $0.193$ & $52$ \\
+pair-bias v2 ($+$identity, cap 8)   & $5.74\text{e-}4$ & $1.89\text{e-}4$ & $\mathbf{0.097}$ & $\mathbf{48}$ \\
+pair-bias v2 at $\eta/2$ (lr probe) & $7.37\text{e-}4$ & $2.57\text{e-}4$ & $0.215$ & $53$ \\
+\bottomrule
+\end{tabular}\end{center}
+
+The signature is consistent and two-sided. (i)~\emph{The mechanism works on its targets}: every
+pair-bias arm improves the stuck-tail population (v2: plain GM halved, fewest stuck processes of
+any big-run arm), with per-run categorical rescues of exactly the predicted physics ---
+$ee\,\text{bhabha}$ $0.81\!\to\!0.012$ and $ee\,\bar\nu\nu$ $0.39\!\to\!0.10$ in v1 (t-channel
+poles), $ee\,ZH$ $0.31\!\to\!0.0009$ and $ee\,\gamma\gamma$ $0.41\!\to\!0.009$ in v2 --- but
+\emph{which} process gets rescued is run-dependent (the known tail flakiness). (ii)~\emph{The
+converged bulk pays a robust $30$--$50\%$ tax} that neither the logit cap, nor propagator-identity
+features, nor the dominant HP (the v1 arm's learned bias drifted to $-17$-logit hard masks; the
+$\eta/2$ probe made bulk and tail worse simultaneously) removes --- so under the $448$-process
+geometric mean the aggregate verdict is a loss, and the feature is \textbf{not adopted}; the
+planned fair sweep was cancelled by the lr-probe criterion (bulk did not recover
+$\Rightarrow$ the tax is design-intrinsic, not HP-tunable). The lesson joins
+Principle~\ref{prin:gradcomp}: a single globally-shared bias function cannot serve $448$
+processes whose gradient scales differ by $10^4$ --- the converged bulk's weights dominate the
+head's training signal yet any bias motion perturbs their converged attention. The natural
+successor couples this to the aggregation thread above: a \emph{per-process gate} on the bias
+(active only for processes the loss flags as stuck, or trained under a $\tau$-floored
+aggregation that stops the bulk from vetoing it) would let the demonstrated tail rescues stand
+without taxing the bulk. Code and arms retained: \code{model.use\_pair\_bias} (default off),
+\code{compare\_models/\_bigrun\_arm\_pairbias*}.
+
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
