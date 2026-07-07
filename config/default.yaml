@@ -118,6 +118,10 @@ training:
                         # and a plain mean lets the high-MSE processes dominate the gradient. The
                         # geometric mean makes a 10% relative improvement on a 1e-6 process count
                         # equally with a 10% improvement on a 1e-2 one, so every process keeps scaling.
+ loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate
+                        # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
+                        # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact
+                        # geometric mean; validation/checkpoint metrics are never floored.
  dtype: float32
 
  regularization: L2       # decided default (was null): L2 penalty folded into loss_no_reg /

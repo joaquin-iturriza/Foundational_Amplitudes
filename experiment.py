@@ -2280,12 +2280,21 @@ class AmplitudeExperiment(BaseExperiment):
 
         Set LLOCA_PROC_LOSS=loop to fall back to the original loop (A/B checks).
         """
+        # τ-floored geometric mean (training.loss_aggregation_tau, default 0 = off):
+        # aggregate log(MSE_p + τ) instead of log(MSE_p), capping a converged
+        # process's gradient weight at 1/τ while leaving processes above τ on the
+        # exact geometric-mean behaviour. TRAINING loss only — validation and
+        # checkpoint selection stay on the unfloored metric, so comparisons with
+        # existing runs are unchanged (see sec:bigrun open threads).
+        tau = float(self.cfg.training.get("loss_aggregation_tau", 0.0) or 0.0)
+        if not getattr(getattr(self, "model", None), "training", False):
+            tau = 0.0
         if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop":
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
                         for p in unique_procs]
             if loss_agg == "geometric_mean" and len(per_proc) > 1:
-                return torch.stack(per_proc).log().mean().exp()
+                return (torch.stack(per_proc) + tau).log().mean().exp()
             return torch.stack(per_proc).mean()
 
         per_event = self._per_event_loss(y_pred, y, sigma=sigma)        # (B,)
@@ -2298,8 +2307,8 @@ class AmplitudeExperiment(BaseExperiment):
         n_present = present.sum().clamp(min=1)
         proc_mean = sums / counts.clamp(min=1)                         # 0 where a process is absent
         if loss_agg == "geometric_mean":
-            # mean over present processes of log(proc_mean), then exp; absent → 0 (dropped)
-            log_pm = torch.where(present, proc_mean.clamp(min=1e-30).log(),
+            # mean over present processes of log(proc_mean + τ), then exp; absent → 0 (dropped)
+            log_pm = torch.where(present, (proc_mean + tau).clamp(min=1e-30).log(),
                                  torch.zeros_like(proc_mean))
             return (log_pm.sum() / n_present).exp()
         return proc_mean.sum() / n_present
