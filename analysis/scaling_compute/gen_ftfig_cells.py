@@ -116,16 +116,19 @@ for fam, (arm, flags) in FAMS.items():
                 os.chmod(p, os.stat(p).st_mode | stat.S_IEXEC)
                 scripts.append(p)
 
-# ladder: one job, D=100k, t=6193, both targets
-body = HEADER.format(name="ftladder", hours=3, jobdir=JOBDIR, root=ROOT)
-for fam, (arm, flags) in LADDER.items():
-    for key in TARGETS:
-        hp = HPS[f"{key}|100k|6193"]
-        body += run_cmd(fam, arm, flags, key, "100k", 6193, hp)
-p = f"{JOBDIR}/ftladder.sh"
-open(p, "w").write(body + 'echo "===== ftladder DONE ====="\n')
-os.chmod(p, os.stat(p).st_mode | stat.S_IEXEC)
-scripts.append(p)
+# ladder: D=100k, t=6193, both targets — split into two jobs (8 x ~0.9h runs
+# exceed a single 3h walltime), one per target pair of rungs.
+lad = list(LADDER.items())
+for half, fams in (("a", lad[:2]), ("b", lad[2:])):
+    body = HEADER.format(name=f"ftladder_{half}", hours=5, jobdir=JOBDIR, root=ROOT)
+    for fam, (arm, flags) in fams:
+        for key in TARGETS:
+            hp = HPS[f"{key}|100k|6193"]
+            body += run_cmd(fam, arm, flags, key, "100k", 6193, hp)
+    p = f"{JOBDIR}/ftladder_{half}.sh"
+    open(p, "w").write(body + f'echo "===== ftladder_{half} DONE ====="\n')
+    os.chmod(p, os.stat(p).st_mode | stat.S_IEXEC)
+    scripts.append(p)
 
 print(f"generated {len(scripts)} job scripts in {JOBDIR}")
 for s in scripts: print(" ", os.path.basename(s))
