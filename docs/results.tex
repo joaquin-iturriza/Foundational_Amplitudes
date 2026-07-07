@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -701,13 +701,27 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.49\textwidth]{transfer_nh8.pdf}\hfill
-  \includegraphics[width=0.49\textwidth]{finetune_methods_walltime.pdf}
-  \caption{\textbf{Transfer.} Left: held-out loss vs.\ compute and wall-time for fine-tune (from
-  the 8- and 25-process foundations) vs.\ from-scratch on $ee\,u\bar u$ and $ee\,t\bar t$
-  NLO-virtual --- fine-tuning stays below solo and does not plateau. Right: the five fine-tune
-  methods in wall-time; full layer-decay reaches a given loss soonest.}
+  \includegraphics[width=0.49\textwidth]{compute_scan_eeuu_wt.pdf}\hfill
+  \includegraphics[width=0.49\textwidth]{compute_scan_eettbar_wt.pdf}
+  \caption{\textbf{Transfer: the compute scan.} Fair log-space test MSE vs.\ fine-tune wall-time
+  on $ee\,u\bar u$ (left) and $ee\,t\bar t$ (right) NLO-virtual, one panel per target dataset
+  size $D\in\{10^3,10^4,10^5,10^6\}$: from-scratch vs.\ fine-tuning from the 8- and 25-process
+  foundations, and from the leak-free $416$-process big-run pretrains (raw pt25-era encoding vs.\
+  the adopted feature set) plus the LO-only $352$-process variant --- the $416$-set curves
+  isolate raw multi-process scale from the encoding improvements, and the LO-only curve asks
+  whether NLO pretraining data matters for NLO-virtual transfer. The $1$h-pretrain feature-ladder
+  markers ($D{=}10^5$ panel) walk raw $\to$ +one-hots $\to$ +mass/coupling scalars $\to$ full
+  adopted config at fixed pretrain compute. (Full compute-axis version:
+  \code{plots/compute\_scan\_*\_big.pdf}.)}
   \label{fig:transfer}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.62\textwidth]{finetune_methods_walltime.pdf}
+  \caption{\textbf{Fine-tune methods in wall-time.} The five fine-tune methods; full layer-decay
+  reaches a given loss soonest.}
+  \label{fig:ftmethods_wt}
 \end{figure}
 
 \begin{figure}[H]
