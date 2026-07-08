@@ -5,6 +5,8 @@ fonts/markers. Saves to plots/compute_scan_{eeuu,eettbar}_wt.pdf.
 
 With --clean: omit the 1h feature-ladder markers and the raw-encoding 416-proc
 curve (talk variant), saving to plots/compute_scan_{eeuu,eettbar}_wt_clean.pdf.
+With --minimal: additionally omit the big-run (416/352-proc) curves, keeping only
+solo / FT8 / FT25, saving to plots/compute_scan_{eeuu,eettbar}_wt_min.pdf.
 """
 import glob, json, os, re, sys
 import numpy as np
@@ -89,8 +91,10 @@ FAM_LABEL = {"solo": "solo (scratch)", "ft8": "FT ← 8-proc", "ft25": "FT ← 2
              "ft416raw":  "FT ← 416-proc (raw enc.)",
              "ft416best": "FT ← 416-proc (best)",
              "ft352lo":   "FT ← 352-proc (LO only)"}
-CLEAN = "--clean" in sys.argv[1:]
-FAMS = ("solo", "ft8", "ft25", "ft416best", "ft352lo") if CLEAN else \
+MINIMAL = "--minimal" in sys.argv[1:]
+CLEAN = MINIMAL or "--clean" in sys.argv[1:]
+FAMS = ("solo", "ft8", "ft25") if MINIMAL else \
+       ("solo", "ft8", "ft25", "ft416best", "ft352lo") if CLEAN else \
        ("solo", "ft8", "ft25", "ft416raw", "ft416best", "ft352lo")
 DORDER = ["1k", "10k", "100k", "1M"]
 WT_IDX = 1   # (logMSE, walltime_h, compute)  ->  walltime
@@ -129,7 +133,8 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
     # suptitle removed for talk slides (slide caption explains the figure)
     fig.tight_layout()
     tag = key.replace("nlovirte4", "")
-    out = f"{ROOT}/plots/compute_scan_{tag}_wt{'_clean' if CLEAN else ''}.pdf"
+    suffix = "_min" if MINIMAL else "_clean" if CLEAN else ""
+    out = f"{ROOT}/plots/compute_scan_{tag}_wt{suffix}.pdf"
     fig.savefig(out)
     fig.savefig(out.replace(".pdf", ".png"), dpi=180)
     print(f"saved {out} (+.png)")

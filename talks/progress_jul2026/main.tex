@@ -264,11 +264,30 @@
     \end{column}
     \begin{column}{0.60\textwidth}
       \centering
-      \includegraphics[width=\linewidth]{compute_scan_eettbar_wt_clean.pdf}\\[0.1em]
+      \includegraphics[width=\linewidth]{compute_scan_eettbar_wt_min.pdf}\\[0.1em]
       {\scriptsize\color{gray} $ee\!\to\!t\bar t$ one-loop: test error vs.\ wall-time, panels $=$ dataset size $10^3$--$10^6$.}
     \end{column}
   \end{columns}
   \takeaway{Pretraining pays off exactly where it should: little data, new process, higher order.}
+\end{frame}
+
+%---------------------------------------------------------------- TRANSFER BIG
+\begin{frame}{Same scan, adding the big-run foundations}
+  \begin{columns}[T]
+    \begin{column}{0.40\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item Two more starting points from the \textbf{448-dataset campaign} (both exclude the targets): the \textcolor{red!75!black}{\textbf{416-process}} pretrain with the adopted feature set, and its \textcolor{magenta!70!black}{\textbf{352-process LO-only}} variant.
+        \item Both land \textbf{in the same band as the 8/25-process fine-tunes} --- the transfer benefit is robust to scaling up the pretraining mixture.
+        \item The \textbf{LO-only} foundation trails at long fine-tunes: having loop-level data in the pretraining mix helps when the target is one-loop.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.60\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{compute_scan_eettbar_wt_clean.pdf}\\[0.1em]
+      {\scriptsize\color{gray} as previous slide, with the 416-process and LO-only 352-process foundations added.}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 %---------------------------------------------------------------- BIG RUN
