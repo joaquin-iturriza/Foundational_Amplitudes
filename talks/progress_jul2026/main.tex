@@ -254,15 +254,25 @@
 %---------------------------------------------------------------- DATASETS
 \begin{frame}{Three pretraining mixtures}
   \begin{columns}[T]
-    \begin{column}{0.42\textwidth}
-      \footnotesize
-      \begin{itemize}
-        \item \textbf{8 processes} --- the base $e^+e^-$ set shown right; \emph{includes} the LO versions of the transfer targets; trained long ($\sim\!1.5\times10^9$ events).
-        \item \textbf{25 processes} --- broader physics (leptons, $Z/H$, multi-boson), \emph{excludes} the targets entirely; a short $\sim$20-min run.
-        \item \textbf{448 datasets} --- the big-run recipe: the plain processes plus coupling-, mass- and order-scans; the 416/352-set foundations of the next slides.
-      \end{itemize}
+    \begin{column}{0.47\textwidth}
+      \scriptsize
+      \textbf{8 processes} {\color{gray}(\emph{includes} the targets' LO; trained long, $\sim\!1.5\times10^9$ events)}\\
+      $\gamma\gamma$, $\gamma\gamma\gamma$, $u\bar u$, $u\bar ug$, $u\bar ugg$, $t\bar t$, $WW$, $WWZ$
+      \vskip0.5em
+      \textbf{25 processes} {\color{gray}(\emph{excludes} the targets; short $\sim$20-min run)}\\
+      $\gamma\gamma$, $\gamma\gamma\gamma$, $\gamma\gamma\gamma\gamma$;\quad
+      $e^+e^-$ (Bhabha), $\mu\mu$, $\tau\tau$, $\mu\mu\gamma$, $\tau\tau\gamma$, $4\mu$, $\nu\bar\nu$;\quad
+      $d\bar d$, $b\bar b$, $u\bar ug$, $d\bar dg$, $b\bar bg$, $u\bar ugg$, $u\bar uggg$;\quad
+      $WW$, $WW\gamma$, $WWZ$, $ZZ$, $Z\gamma$, $ZZ\gamma$, $ZZZ$, $ZH$
+      \vskip0.5em
+      \textbf{448 datasets} {\color{gray}(big run: the same physics, scanned)}\\
+      20 plain processes (the 25 minus the quark$+$gluon ones);\quad
+      $336$ $\alpha_s$-scan variants of $u\bar ug$, $u\bar ugg$, $u\bar uggg$, $d\bar dg$, $b\bar bg$;\quad
+      $60$ $M_Z$-scan windows of the $2\!\to\!2$ leptonic sets;\quad
+      $32$ internal-mass scans ($4\mu$ [$Z$], $WWb\bar b$ [top], $\mu\mu\tau\tau$ [$H$]);\quad
+      NLO-virtual sets ($c\bar c$, $d\bar d$, $s\bar s$, $t\bar t$, $u\bar ug$, $d\bar dg$)
     \end{column}
-    \begin{column}{0.58\textwidth}
+    \begin{column}{0.53\textwidth}
       \centering
       \includegraphics[width=\linewidth]{amp_dists_8ds.pdf}\\[0.1em]
       {\scriptsize\color{gray} the 8 base datasets: $\log_{10}\Amp$ distributions, one color per process.}
