@@ -17,7 +17,7 @@
 \usepackage{xcolor}
 
 % local figs first, then the project figure trees
-\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}}
+\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}{../../analysis/zero_shot/}}
 
 %---------- colours / theme (same as the CSI talk) ------------------------
 \definecolor{navy}{RGB}{38,38,110}
@@ -113,8 +113,7 @@
   \footnotesize
   \begin{itemize}
     \item Each particle $=$ momentum $+$ its \textbf{quantum numbers}
-      $[\,Q,\ \mathrm{spin},\ \log m,\ T_3,\ B,\ L,\ \mathrm{color},\ C_2\,]$ --- not a particle ``dictionary''.\\
-      {\color{gray} $\Rightarrow$ a frozen model already predicts \emph{unseen} processes zero-shot; a dictionary model can't even represent them.}
+      $[\,Q,\ \mathrm{spin},\ \log m,\ T_3,\ B,\ L,\ \mathrm{color},\ C_2\,]$ --- not a particle ``dictionary'' (next slide).
     \item Plus per-dataset physics the momenta \textbf{cannot} encode, broadcast as extra scalars:
       \begin{itemize}
         \item \textbf{coupling order} $[n_{\rm loops},\,\alpha_s\text{-power}]$ and coupling value $\log\alpha$ $\Rightarrow$ LO and NLO mix in one model;
@@ -123,6 +122,26 @@
     \item And a detail that mattered a lot: \Amp{} spans $\sim$13 orders of magnitude $\Rightarrow$ log-compress and standardize \textbf{per process} (a global transform left most processes untrainable; median error $6\times$ worse).
   \end{itemize}
   \takeaway{Guiding principle (verified by A/Bs): a feature helps exactly when it supplies what the external momenta cannot recover.}
+\end{frame}
+
+%---------------------------------------------------------------- PID VS QN
+\begin{frame}{Why quantum numbers beat particle IDs}
+  \begin{columns}[T]
+    \begin{column}{0.36\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item Test: freeze a pretrained model, evaluate \textbf{zero-shot} on processes it \emph{never trained on} ($1.0 =$ knows nothing, predicts the mean).
+        \item \textbf{Quantum numbers}: both held-out processes predicted well below trivial, even the top quark --- a particle the model \emph{never saw}.
+        \item \textbf{Particle-ID dictionary}: $ee\!\to\!t\bar t$ \textbf{cannot even be encoded} (no ``top'' entry exists); and where it can encode, it still loses.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.64\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{zero_shot_comparison.pdf}\\[0.1em]
+      {\scriptsize\color{gray} zero-shot on held-out processes: standardized MSE (left) and median relative error on \Amp{} (right).}
+    \end{column}
+  \end{columns}
+  \takeaway{Encoding particles by their physics, not their name, is what makes transfer to new processes possible at all.}
 \end{frame}
 
 %---------------------------------------------------------------- AB HIGHLIGHTS
