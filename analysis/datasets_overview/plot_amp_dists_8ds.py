@@ -25,6 +25,7 @@ for i, (name, label) in enumerate(DATASETS):
 ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$")
 ax.set_ylabel("density")
 ax.set_xlim(-11.5, 2.5)
+ax.set_yscale('log')
 ax.legend(ncol=2, framealpha=0.9)
 fig.tight_layout()
 base = os.path.join(os.path.dirname(__file__), "amp_dists_8ds")
