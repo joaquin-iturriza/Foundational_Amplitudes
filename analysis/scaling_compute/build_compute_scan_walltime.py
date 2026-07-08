@@ -49,9 +49,9 @@ CURVES = {
     },
     "ft8":  {D: [f"cscan_ft8_D{D}"]  for D in SUB},
     "ft25": {D: [f"cscan_ft25_D{D}"] for D in SUB},
-    "ft416raw":  {D: [f"cscan_ft416raw_D{D}"]  for D in SUB},
-    "ft416best": {D: [f"cscan_ft416best_D{D}"] for D in SUB},
-    "ft352lo":   {D: [f"cscan_ft352lo_D{D}"]   for D in SUB},
+    "ft416raw":  {D: [f"cscan_ft416raw_D{D}", f"cscan_ft416raw_D{D}_hpo"]  for D in SUB},
+    "ft416best": {D: [f"cscan_ft416best_D{D}", f"cscan_ft416best_D{D}_hpo"] for D in SUB},
+    "ft352lo":   {D: [f"cscan_ft352lo_D{D}", f"cscan_ft352lo_D{D}_hpo"]   for D in SUB},
 }
 
 def cells(prefix, key):
@@ -108,7 +108,7 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
         if D == "100k":
             for j, (fam, lbl) in enumerate([("ftraw1h", "raw"), ("ftrung2", "+onehots"),
                                             ("ftrung3", "+scalars"), ("ftbest1h", "full")]):
-                for t, pt in curve([f"cscan_{fam}_D100k"], key, D).items():
+                for t, pt in curve([f"cscan_{fam}_D100k", f"cscan_{fam}_hpo"], key, D).items():
                     ax.scatter([pt[WT_IDX]], [pt[0]], s=150, marker="*",
                                color=f"C{j+4}", zorder=5,
                                label=f"1h ladder: {lbl}")

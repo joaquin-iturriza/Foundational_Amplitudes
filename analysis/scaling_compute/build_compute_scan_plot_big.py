@@ -49,9 +49,9 @@ CURVES = {
     },
     "ft8":  {D: [f"cscan_ft8_D{D}"]  for D in SUB},
     "ft25": {D: [f"cscan_ft25_D{D}"] for D in SUB},
-    "ft416raw":  {D: [f"cscan_ft416raw_D{D}"]  for D in SUB},
-    "ft416best": {D: [f"cscan_ft416best_D{D}"] for D in SUB},
-    "ft352lo":   {D: [f"cscan_ft352lo_D{D}"]   for D in SUB},
+    "ft416raw":  {D: [f"cscan_ft416raw_D{D}", f"cscan_ft416raw_D{D}_hpo"]  for D in SUB},
+    "ft416best": {D: [f"cscan_ft416best_D{D}", f"cscan_ft416best_D{D}_hpo"] for D in SUB},
+    "ft352lo":   {D: [f"cscan_ft352lo_D{D}", f"cscan_ft352lo_D{D}_hpo"]   for D in SUB},
 }
 
 def cells(prefix, key):
