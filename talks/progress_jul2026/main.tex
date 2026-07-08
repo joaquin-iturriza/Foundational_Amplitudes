@@ -324,6 +324,21 @@
   \takeaway{Model and feature set are settled; the frontier is data generation and loss balancing for the hard tail.}
 \end{frame}
 
+%---------------------------------------------------------------- ZERO SHOT
+\begin{frame}{A glimpse of where this goes: zero-shot amplitudes}
+  \footnotesize
+  Freeze a pretrained model and ask for processes it \textbf{never trained on} --- no fine-tuning at all:
+  \vskip0.1em
+  \centering
+  \includegraphics[height=0.56\textheight]{zero_shot_histograms.pdf}
+  \vskip0.1em
+  \raggedright
+  \begin{itemize}
+    \item The quantum-number encoding produces \textbf{sensible amplitude distributions for unseen processes} --- even $ee\!\to\!t\bar t$, whose \textbf{top quark the model never saw}; a particle-ID dictionary cannot encode it at all.
+  \end{itemize}
+  \takeaway{Not yet precision physics --- but the model demonstrably carries physics it can apply to processes it has never seen.}
+\end{frame}
+
 %---------------------------------------------------------------- SUMMARY
 \begin{frame}{Summary}
   \footnotesize
@@ -341,13 +356,6 @@
 
 %================================================================ BACKUP
 \begin{frame}[plain]\centering\vfill {\color{gray}\large Backup}\vfill\end{frame}
-
-\begin{frame}{Backup: zero-shot on unseen processes}
-  \centering
-  \includegraphics[height=0.72\textheight]{zero_shot_histograms.pdf}\\[0.1em]
-  {\scriptsize\color{gray} frozen pretrained model on held-out processes, true vs.\ predicted log-amplitude distributions:
-  quantum numbers handle even the never-seen top quark; the PID dictionary cannot encode it.}
-\end{frame}
 
 \begin{frame}{Backup: architecture shoot-out}
   \footnotesize
