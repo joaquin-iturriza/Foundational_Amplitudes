@@ -17,7 +17,7 @@
 \usepackage{xcolor}
 
 % local figs first, then the project figure trees
-\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}{../../analysis/zero_shot/}{../../analysis/pid_vs_phys/}}
+\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}{../../analysis/zero_shot/}{../../analysis/pid_vs_phys/}{../../analysis/datasets_overview/}}
 
 %---------- colours / theme (same as the CSI talk) ------------------------
 \definecolor{navy}{RGB}{38,38,110}
@@ -249,6 +249,26 @@
     \item In \textbf{wall-time}: the curves essentially \textbf{collapse} --- any of these widths buys the same loss per GPU-hour.
   \end{itemize}
   \takeaway{The scaling exponent is width-independent ($\mu$P at work); width is a throughput choice, not an accuracy one.}
+\end{frame}
+
+%---------------------------------------------------------------- DATASETS
+\begin{frame}{Three pretraining mixtures}
+  \begin{columns}[T]
+    \begin{column}{0.42\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{8 processes} --- the base $e^+e^-$ set shown right; \emph{includes} the LO versions of the transfer targets; trained long ($\sim\!1.5\times10^9$ events).
+        \item \textbf{25 processes} --- broader physics (leptons, $Z/H$, multi-boson), \emph{excludes} the targets entirely; a short $\sim$20-min run.
+        \item \textbf{448 datasets} --- the big-run recipe: the plain processes plus coupling-, mass- and order-scans; the 416/352-set foundations of the next slides.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.58\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{amp_dists_8ds.pdf}\\[0.1em]
+      {\scriptsize\color{gray} the 8 base datasets: $\log_{10}\Amp$ distributions, one color per process.}
+    \end{column}
+  \end{columns}
+  \takeaway{Amplitudes span $\sim$10 orders of magnitude across processes --- why preprocessing and the loss are per-process.}
 \end{frame}
 
 %---------------------------------------------------------------- TRANSFER
