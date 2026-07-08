@@ -67,25 +67,24 @@
 \end{frame}
 
 %---------------------------------------------------------------- IDEA
-\begin{frame}{The idea: one model for all amplitudes}
+\begin{frame}{Where this starts: scaling laws for amplitude surrogates}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \footnotesize
       \begin{itemize}
-        \item A surrogate replaces the matrix-element call:
-          \begin{center}\fbox{particle momenta $\longrightarrow$ \Amp}\end{center}
-        \item Until now: \textbf{one network per process} --- each starts from zero, no physics shared.
-        \item Here: a \emph{single} network trained \textbf{jointly} on many processes ($ee\!\to\!WW$, $t\bar t$, $u\bar u(g)$, $\gamma\gamma$, \dots up to \textbf{448 datasets}), tree \emph{and} loop level.
-        \item Then \textbf{fine-tuned} to any new process or order with a fraction of the data.
+        \item Previous work {\color{gray}(arXiv:2601.13308)}: surrogate accuracy follows clean \textbf{power laws} in data, compute and model size, across 11 processes.
+        \item The exponent is \textbf{set by the physics}: bounded by $\alpha \gtrsim 4/d$ with $d = 3n_f-4$ the final-state degrees of freedom.
+        \item $\Rightarrow$ a \emph{recipe}: one cheap run anchors the curve, then the budget for any precision target is predicted \textbf{before training}.
+        \item This talk: the follow-up --- stop training one surrogate per process, train \textbf{one foundation model jointly on all of them} (up to 448 datasets, tree and loop), and fine-tune it to anything new.
       \end{itemize}
     \end{column}
-    \begin{column}{0.44\textwidth}
+    \begin{column}{0.48\textwidth}
       \centering
-      \includegraphics[width=0.82\linewidth]{amp_surface_pts.png}\\[0.2em]
-      {\scriptsize\color{gray} \Amp{} over a phase-space slice; \textcolor{warn}{dots} $=$ training samples.}
+      \includegraphics[width=0.72\linewidth]{tth_C.pdf}\\[0.1em]
+      {\scriptsize\color{gray} $q\bar q\to t\bar tH$: error vs.\ compute --- power laws with data-set plateaus.}
     \end{column}
   \end{columns}
-  \takeaway{Learn the physics once, reuse it everywhere: new process $=$ cheap fine-tune, not a new model.}
+  \takeaway{Scaling is predictable; the next question is how much a single shared model can reuse across processes.}
 \end{frame}
 
 %---------------------------------------------------------------- MODEL
@@ -113,7 +112,7 @@
   \footnotesize
   \begin{itemize}
     \item Each particle $=$ momentum $+$ its \textbf{quantum numbers}
-      $[\,Q,\ \mathrm{spin},\ \log m,\ T_3,\ B,\ L,\ \mathrm{color},\ C_2\,]$ --- not a particle ``dictionary'' (next slide).
+      $[\,Q,\ \mathrm{spin},\ \log m,\ T_3,\ B,\ L,\ \mathrm{color},\ C_2\,]$ --- not a particle-ID ``dictionary'': same accuracy in-distribution, but only quantum numbers can encode a \emph{never-seen} particle and predict unseen processes zero-shot (backup).
     \item Plus per-dataset physics the momenta \textbf{cannot} encode, broadcast as extra scalars:
       \begin{itemize}
         \item \textbf{coupling order} $[n_{\rm loops},\,\alpha_s\text{-power}]$ and coupling value $\log\alpha$ $\Rightarrow$ LO and NLO mix in one model;
@@ -122,22 +121,6 @@
     \item And a detail that mattered a lot: \Amp{} spans $\sim$13 orders of magnitude $\Rightarrow$ log-compress and standardize \textbf{per process} (a global transform left most processes untrainable; median error $6\times$ worse).
   \end{itemize}
   \takeaway{Guiding principle (verified by A/Bs): a feature helps exactly when it supplies what the external momenta cannot recover.}
-\end{frame}
-
-%---------------------------------------------------------------- PID VS QN
-\begin{frame}{Particle IDs $\to$ quantum numbers: free at home, decisive away}
-  \footnotesize
-  Same sweep run twice on the 25-process pretrain, \textcolor{warn}{\textbf{particle-ID one-hot}} vs.\ \textcolor{blue!60!black}{\textbf{quantum numbers}}, 15 trials paired at identical hyperparameters:
-  \vskip0.1em
-  \centering
-  \includegraphics[height=0.46\textheight]{pid_vs_phys.pdf}
-  \vskip0.1em
-  \raggedright
-  \begin{itemize}
-    \item \textbf{On the training processes the two are indistinguishable} (paired trials sit on the diagonal): switching to quantum numbers costs nothing in-distribution.
-    \item What it buys: an ID dictionary \textbf{cannot encode a particle it never saw} (no token for the top); the quantum-number model predicts unseen processes \emph{zero-shot} (backup).
-  \end{itemize}
-  \takeaway{Quantum numbers: same accuracy where both can play, and the only encoding that can leave the training set.}
 \end{frame}
 
 %---------------------------------------------------------------- AB HIGHLIGHTS
