@@ -582,8 +582,8 @@ law is the \textbf{floor-aware} power law
 \end{equation}
 with an irreducible loss $L_\infty$; the bare power law $L\approx A\,C^{-\alpha_C}$ is only ever a
 diagnostic in the regime far above the floor. We report $\alpha_C$ as the local exponent over the
-sampled compute range (Fig.~\ref{fig:perdataset} shows the per-process learning curves for all
-pretraining processes). A virtual/Born \emph{ratio} target was also tried as a learning
+sampled compute range (Fig.~\ref{fig:phase1scaling} shows the phase-1 joint-pretraining learning
+curves at each per-process dataset size $D$). A virtual/Born \emph{ratio} target was also tried as a learning
 objective; it does not scale meaningfully and is excluded from what follows.
 
 \begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
@@ -626,12 +626,12 @@ $ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{per_dataset_scaling.pdf}
-  \caption{\textbf{Per-process scaling of the joint foundation model.} Held-out loss vs.\ training
-  compute for each pretraining process, with the fitted floor-aware law Eq.~\eqref{eq:scaling}
-  overlaid; the local slope is the exponent $\alpha_C$ of Table~\ref{tab:scaling}, steeper for
-  lower final-state multiplicity.}
-  \label{fig:perdataset}
+  \includegraphics[width=\textwidth]{phase1_scaling.pdf}
+  \caption{\textbf{Phase-1 compute scaling of the joint pretraining} ($n_\mathrm{heads}=16$).
+  Best held-out loss vs.\ training compute, one panel per per-process dataset size $D$, with the
+  bare power law (dashed) and the floor-aware law Eq.~\eqref{eq:scaling} (solid) overlaid; the
+  dotted vertical line marks the largest sampled compute $C^\ast$.}
+  \label{fig:phase1scaling}
 \end{figure}
 
 \begin{figure}[H]
