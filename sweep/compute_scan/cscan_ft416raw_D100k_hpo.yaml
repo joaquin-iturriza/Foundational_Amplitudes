@@ -1,0 +1,84 @@
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: 02:00:00
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  setup_commands:
+  - module load anaconda-py3/2023.09
+  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+sweep_name: cscan_ft416raw_D100k_hpo
+seed: 42
+datasets:
+- ee_uu_nlo_virt_e4
+- ee_ttbar_nlo_virt_e4
+t_steps_values:
+- 8
+- 23
+- 77
+- 232
+- 774
+- 2323
+- 6193
+n_trials_per_level: 8
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 10
+fixed_params:
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.train_test_val: '[0.7, 0.2, 0.1]'
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  training.batchsize: 16384
+  evaluation.batchsize: 8192
+  training.es_load_best_model: 'false'
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: 0.01
+  plot: 'true'
+  seed: 42
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/compare_models/_ftfig_pre_raw416/models/model_run0_best.pt.gz
+  training.lr: 0.008322839
+  data.subsample: 100000
+  training.cosanneal_eta_min: 1.0e-08
+  data.use_PIDs: 'false'
+  data.preprocess_per_dataset: 'true'
+  data.seed: 42
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  data.spin_onehot: 'false'
+  data.color_onehot: 'false'
+  data.prop_is_massless: 'false'
+  data.standardize_props: 'false'
+  data.mass_from_momenta: 'false'
+  data.coupling_scalars: 'false'
+  data.internal_mass_scalars: 'false'
+  data.offshell_per_event: 'false'
+search_space:
+- name: fine_tune.lr_scale
+  type: float_log
+  low: 0.1
+  high: 10.0
+- name: fine_tune.layer_decay
+  type: float_uniform
+  low: 0.75
+  high: 1.0
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
