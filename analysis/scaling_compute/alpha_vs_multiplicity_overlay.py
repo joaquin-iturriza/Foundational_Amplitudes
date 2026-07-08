@@ -64,7 +64,8 @@ ax.set_xscale("log"); ax.set_yscale("log")
 # alpha = 4/DOF is an exactly straight slope -1 line, with a grey shaded wedge
 # below and the label rotated along it.
 dofx = lambda n: 3.0 * n - 4.0
-XLIM, YLIM = (1.55, 10.5), (0.28, 2.9)
+XLIM = (1.55, 10.5)
+YLIM = (4.0 / XLIM[1], 4.0 / XLIM[0])  # bound runs corner to corner
 dd = np.array(XLIM)
 ax.plot(dd, 4.0 / dd, color="0.65", ls="--", lw=2.0, zorder=1)
 ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
