@@ -125,22 +125,18 @@
 \end{frame}
 
 %---------------------------------------------------------------- PID VS QN
-\begin{frame}{Why quantum numbers beat particle IDs}
-  \begin{columns}[T]
-    \begin{column}{0.36\textwidth}
-      \footnotesize
-      \begin{itemize}
-        \item Test: freeze a pretrained model, evaluate \textbf{zero-shot} on processes it \emph{never trained on} ($1.0 =$ knows nothing, predicts the mean).
-        \item \textbf{Quantum numbers}: both held-out processes predicted well below trivial, even the top quark --- a particle the model \emph{never saw}.
-        \item \textbf{Particle-ID dictionary}: $ee\!\to\!t\bar t$ \textbf{cannot even be encoded} (no ``top'' entry exists); and where it can encode, it still loses.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.64\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{zero_shot_comparison.pdf}\\[0.1em]
-      {\scriptsize\color{gray} zero-shot on held-out processes: standardized MSE (left) and median relative error on \Amp{} (right).}
-    \end{column}
-  \end{columns}
+\begin{frame}{Why quantum numbers, not particle IDs}
+  \footnotesize
+  Freeze a pretrained model, predict processes it \textbf{never trained on} --- true vs.\ predicted amplitude distributions:
+  \vskip0.2em
+  \centering
+  \includegraphics[height=0.52\textheight]{zero_shot_histograms.pdf}
+  \vskip0.2em
+  \raggedright
+  \begin{itemize}
+    \item With \textbf{quantum numbers} the model produces sensible amplitudes for both held-out processes --- including $ee\!\to\!t\bar t$, whose \textbf{top quark it never saw} in training.
+    \item With a \textbf{particle-ID dictionary}, $ee\!\to\!t\bar t$ \emph{cannot even be encoded} --- there is no token for the top.
+  \end{itemize}
   \takeaway{Encoding particles by their physics, not their name, is what makes transfer to new processes possible at all.}
 \end{frame}
 
