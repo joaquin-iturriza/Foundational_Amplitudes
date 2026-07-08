@@ -636,6 +636,26 @@ $ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
 
 \begin{figure}[H]
   \centering
+  \includegraphics[width=\textwidth,page=2]{phase1_scaling.pdf}\\
+  \includegraphics[width=\textwidth,page=3]{phase1_scaling.pdf}\\
+  \includegraphics[width=\textwidth,page=4]{phase1_scaling.pdf}
+  \caption{\textbf{Phase-1 per-$D$ detail: $D=10^3$, $10^{3.5}$, $10^4$} (top to bottom). All
+  trials (light dots) and per-width envelope fits, vs.\ FLOPs (left) and actual GPU-hours (right),
+  for $n_\mathrm{heads}\in\{4,8,16,32\}$.}
+  \label{fig:phase1detailA}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,page=5]{phase1_scaling.pdf}\\
+  \includegraphics[width=\textwidth,page=6]{phase1_scaling.pdf}
+  \caption{\textbf{Phase-1 per-$D$ detail (cont.): $D=10^{4.5}$, $10^5$} (top to bottom). Same
+  layout as Fig.~\ref{fig:phase1detailA}.}
+  \label{fig:phase1detailB}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
   \includegraphics[width=0.66\textwidth]{alpha_vs_multiplicity_overlay.pdf}
   \caption{\textbf{Compute-scaling exponent vs.\ final-state multiplicity.} From-scratch (blue)
   and full-finetune (red) fitted $\alpha_C$ against the theoretical lower bound
