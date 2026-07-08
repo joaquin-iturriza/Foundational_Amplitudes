@@ -212,6 +212,45 @@
   \end{columns}
 \end{frame}
 
+%---------------------------------------------------------------- JOINT VS SOLO
+\begin{frame}{The scaling laws survive joint training, process by process}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item Black: each process's \textbf{dedicated single-process (``solo'') scaling law}.
+        \item Stars: the \textbf{one jointly-pretrained model}, its per-process losses placed at the same compute.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item The joint model lands \textbf{on or below each solo curve} at equal compute --- for every process at once.
+        \item Sharing one network across processes costs nothing per process.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vskip0.1em
+  \centering
+  \includegraphics[width=0.78\linewidth]{loss_vs_solo_wide.pdf}
+  \takeaway{One shared model matches the specialists on every individual process, at the same compute.}
+\end{frame}
+
+%---------------------------------------------------------------- WIDTH / WALLTIME
+\begin{frame}{Model width changes the cost, not the law}
+  \footnotesize
+  Joint pretraining at four widths ($n_h\in\{4,8,16,32\}$), loss vs.\ \textbf{FLOPs} (left) and \textbf{actual GPU-hours} (right):
+  \vskip0.1em
+  \centering
+  \includegraphics[width=0.74\linewidth,page=6]{phase1_scaling.pdf}
+  \vskip0.1em
+  \raggedright
+  \begin{itemize}
+    \item In \textbf{compute}: parallel power laws --- same exponent, shifted by the per-step cost of the width.
+    \item In \textbf{wall-time}: the curves essentially \textbf{collapse} --- any of these widths buys the same loss per GPU-hour.
+  \end{itemize}
+  \takeaway{The scaling exponent is width-independent ($\mu$P at work); width is a throughput choice, not an accuracy one.}
+\end{frame}
+
 %---------------------------------------------------------------- TRANSFER
 \begin{frame}{Result: fine-tuning beats from-scratch, and never plateaus}
   \begin{columns}[T]
