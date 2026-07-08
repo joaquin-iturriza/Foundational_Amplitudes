@@ -2,8 +2,11 @@
 but a single 2x2 grid per process (the four dataset sizes 1k/10k/100k/1M), each
 panel = fair log-space test MSE vs WALLTIME [h], curves solo / FT8 / FT25. Large
 fonts/markers. Saves to plots/compute_scan_{eeuu,eettbar}_wt.pdf.
+
+With --clean: omit the 1h feature-ladder markers and the raw-encoding 416-proc
+curve (talk variant), saving to plots/compute_scan_{eeuu,eettbar}_wt_clean.pdf.
 """
-import glob, json, os, re
+import glob, json, os, re, sys
 import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -86,7 +89,9 @@ FAM_LABEL = {"solo": "solo (scratch)", "ft8": "FT ← 8-proc", "ft25": "FT ← 2
              "ft416raw":  "FT ← 416-proc (raw enc.)",
              "ft416best": "FT ← 416-proc (best)",
              "ft352lo":   "FT ← 352-proc (LO only)"}
-FAMS = ("solo", "ft8", "ft25", "ft416raw", "ft416best", "ft352lo")
+CLEAN = "--clean" in sys.argv[1:]
+FAMS = ("solo", "ft8", "ft25", "ft416best", "ft352lo") if CLEAN else \
+       ("solo", "ft8", "ft25", "ft416raw", "ft416best", "ft352lo")
 DORDER = ["1k", "10k", "100k", "1M"]
 WT_IDX = 1   # (logMSE, walltime_h, compute)  ->  walltime
 
@@ -105,7 +110,7 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
         # -> +onehots -> +mass/coupling scalars -> full adopted config, each
         # pretrained ~1h on the 416 sets, fine-tuned at the deepest cell. Same
         # x-axis convention as the curves (fine-tune walltime only).
-        if D == "100k":
+        if D == "100k" and not CLEAN:
             for j, (fam, lbl) in enumerate([("ftraw1h", "raw"), ("ftrung2", "+onehots"),
                                             ("ftrung3", "+scalars"), ("ftbest1h", "full")]):
                 for t, pt in curve([f"cscan_{fam}_D100k", f"cscan_{fam}_hpo"], key, D).items():
@@ -124,7 +129,7 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
     # suptitle removed for talk slides (slide caption explains the figure)
     fig.tight_layout()
     tag = key.replace("nlovirte4", "")
-    out = f"{ROOT}/plots/compute_scan_{tag}_wt.pdf"
+    out = f"{ROOT}/plots/compute_scan_{tag}_wt{'_clean' if CLEAN else ''}.pdf"
     fig.savefig(out)
     fig.savefig(out.replace(".pdf", ".png"), dpi=180)
     print(f"saved {out} (+.png)")
