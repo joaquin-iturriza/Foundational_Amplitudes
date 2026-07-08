@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Compute-scaling exponent alpha_C vs final-state multiplicity, overlaying the
-from-scratch (solo) fits and the full-finetune fits on one axis, with the
-theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4) drawn in grey.
+"""Compute-scaling exponent alpha_C vs final-state multiplicity, styled after the
+alphas_panels figure of the Quantifying-ML-uncertainties talk: log-y axis, grey
+shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4)
+with the label rotated along the dashed line, one tab10 colour per process
+family joined by dotted lines, fine-tuned (full, layer-decay) targets as stars.
 
 Exponents are read from the two scaling_law_params.json files so the figure
 tracks the actual fits; the ratio (virt/Born) targets are excluded as nonsense.
@@ -11,6 +13,7 @@ import json, os, sys
 import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
 
 ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 SOLO = os.path.join(ROOT, "sweeps/scaling_solo_full/scaling_law_params.json")
@@ -18,62 +21,90 @@ FT   = os.path.join(ROOT, "sweeps/finetune_scaling_virt_002/scaling_law_params.j
 out  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
     ROOT, "analysis/scaling_compute/alpha_vs_multiplicity_overlay")
 
-# final-state multiplicity per process key (2->n_fs). Ratio targets excluded.
-NFS = {
-    "ee_aa_10-1000GeV": 2, "ee_ttbar_346-1000GeV": 2, "ee_WW_162-1000GeV": 2,
-    "ee_uu_91-1000GeV": 2, "ee_ttbar_nlo_virt_e4": 2, "ee_uu_nlo_virt_e4": 2,
-    "ee_uug_91-1000GeV": 3, "ee_aaa_10-1000GeV": 3, "ee_wwz_255-1000GeV": 3,
-    "ee_uugg_91-1000GeV": 4,
-}
-FT_NFS = {"ee_uu_nlo_virt_e4": 2, "ee_ttbar_nlo_virt_e4": 2,
-          "ee_uu_nlo_virt": 2, "ee_ttbar_nlo_virt": 2}
-def is_ratio(k): return "ratio" in k
-def norm(k):  # JSON keys carry an "_amplitudes" suffix; NFS maps use the bare name
-    return k[:-len("_amplitudes")] if k.endswith("_amplitudes") else k
+# process families: colour + members as (json key stem, n_fs). tab10 colours as
+# in the talk (cZ/cWZ/cAA/cWWZ/cttH).
+FAMILIES = [
+    (r"$ee\to q\bar q(+ng)$", "#2ca02c",
+     [("ee_uu_91-1000GeV", 2), ("ee_uug_91-1000GeV", 3), ("ee_uugg_91-1000GeV", 4)]),
+    (r"$ee\to \gamma\gamma(+\gamma)$", "#9467bd",
+     [("ee_aa_10-1000GeV", 2), ("ee_aaa_10-1000GeV", 3)]),
+    (r"$ee\to WW(+Z)$", "#1f77b4",
+     [("ee_WW_162-1000GeV", 2), ("ee_wwz_255-1000GeV", 3)]),
+    (r"$ee\to t\bar t$", "#e377c2", [("ee_ttbar_346-1000GeV", 2)]),
+    (r"$ee\to t\bar t$ virt", "#d62728", [("ee_ttbar_nlo_virt_e4", 2)]),
+    (r"$ee\to q\bar q$ virt", "#ff7f0e", [("ee_uu_nlo_virt_e4", 2)]),
+]
+# fine-tuned (starred) points: same colour as the matching from-scratch family
+FT_STARS = [("ee_ttbar_nlo_virt_e4", 2, "#d62728"),
+            ("ee_uu_nlo_virt_e4", 2, "#ff7f0e")]
 
-def load(path, allow):
+def load(path):
     try:
         d = json.load(open(path))
     except Exception as e:
         print("WARN could not read", path, e); return {}
-    out = {}
-    for k, v in d.items():
-        nk = norm(k)
-        if is_ratio(nk) or nk not in allow:
-            continue
-        a = v.get("alpha") if isinstance(v, dict) else None
-        if a is not None:
-            out[nk] = (allow[nk], float(a))
-    return out
+    def norm(k):
+        return k[:-len("_amplitudes")] if k.endswith("_amplitudes") else k
+    return {norm(k): float(v["alpha"]) for k, v in d.items()
+            if isinstance(v, dict) and v.get("alpha") is not None
+            and "ratio" not in norm(k)}
 
-solo = load(SOLO, NFS)
-ft   = load(FT, FT_NFS)
+solo, ft = load(SOLO), load(FT)
 
-fig, ax = plt.subplots(figsize=(7.2, 5.0))
-# theoretical lower bound alpha = 4/DOF, DOF = 3 n_fs - 4
-ns = np.array([2, 3, 4]); dof = 3 * ns - 4; bound = 4.0 / dof
-ax.plot(ns, bound, color="0.5", ls="--", lw=2, zorder=1,
-        label=r"theoretical bound $\alpha=4/\mathrm{DOF}$")
-ax.fill_between(ns, 0, bound, color="0.5", alpha=0.12, zorder=0)
+plt.rcParams.update({
+    "font.family": "serif", "mathtext.fontset": "cm",
+    "axes.linewidth": 1.1, "xtick.direction": "out", "ytick.direction": "out",
+})
 
-def scatter(d, color, marker, lab):
-    if not d: return
-    xs = [n for (n, a) in d.values()]; ys = [a for (n, a) in d.values()]
-    # small horizontal jitter so overlapping n_fs=2 points separate
-    xj = np.array(xs, float) + np.linspace(-0.06, 0.06, len(xs))
-    ax.scatter(xj, ys, s=70, color=color, marker=marker, zorder=3,
-               edgecolor="k", linewidth=0.4, label=lab)
+fig, ax = plt.subplots(figsize=(5.4, 4.4))
+ax.set_yscale("log")
 
-scatter(solo, "#0343DE", "o", "from scratch (solo)")
-scatter(ft,   "#C1121F", "s", "finetuned (full, layer-decay)")
+# theoretical lower bound alpha = 4/DOF, DOF = 3 n_fs - 4, drawn as a dense
+# dashed curve with a grey shaded wedge below and the label rotated along it
+XLIM, YLIM = (1.55, 4.45), (0.28, 2.9)
+nn = np.linspace(*XLIM, 200)
+bound = 4.0 / (3.0 * nn - 4.0)
+ax.plot(nn, bound, color="0.65", ls="--", lw=2.0, zorder=1)
+ax.fill_between(nn, YLIM[0], bound, color="0.5", alpha=0.14, zorder=0, lw=0)
+# rotate the label along the on-screen slope of the bound at the wedge centre
+x0 = 3.05; y0 = 4.0 / (3.0 * x0 - 4.0)
+p = lambda x: ax.transData.transform((x, 4.0 / (3.0 * x - 4.0)))
+(dx, dy) = p(x0 + 0.4) - p(x0 - 0.4)
+ax.text(x0, y0 * 0.72, "Theoretical lower bound", color="0.55", fontsize=13,
+        rotation=np.degrees(np.arctan2(dy, dx)), rotation_mode="anchor",
+        ha="center", va="center", zorder=1)
 
+# small horizontal jitter so overlapping n_fs=2 points separate
+jit = {2: np.linspace(-0.10, 0.10, sum(n == 2 for _, _, m in FAMILIES for _, n in m))}
+taken = {2: 0}
+def jx(n):
+    if n not in jit: return float(n)
+    x = float(n) + jit[n][taken[n]]; taken[n] += 1; return x
+
+for lab, color, members in FAMILIES:
+    pts = [(jx(n), solo[k]) for k, n in members if k in solo]
+    if not pts: continue
+    xs, ys = zip(*pts)
+    ax.plot(xs, ys, ls=":", lw=1.6, color=color, zorder=2)
+    ax.scatter(xs, ys, s=75, color=color, zorder=3, label=lab)
+
+for k, n, color in FT_STARS:
+    if k in ft:
+        ax.scatter([n + 0.16], [ft[k]], s=130, marker="*", color=color,
+                   zorder=4, label=None)
+ax.scatter([], [], s=130, marker="*", color="0.3", label="fine-tuned")
+
+ax.set_xlim(*XLIM); ax.set_ylim(*YLIM)
 ax.set_xticks([2, 3, 4])
-ax.set_xticklabels([r"$2{\to}2$", r"$2{\to}3$", r"$2{\to}4$"])
-ax.set_xlabel("final-state multiplicity")
-ax.set_ylabel(r"compute-scaling exponent $\alpha_C$")
-ax.set_title(r"$\alpha_C$ vs multiplicity: from-scratch and finetuned vs the $4/\mathrm{DOF}$ bound")
-ax.set_ylim(0, 2.6); ax.grid(alpha=0.3)
-ax.legend(fontsize=9, loc="upper right")
+ax.yaxis.set_major_locator(FixedLocator([0.5, 1, 2]))
+ax.yaxis.set_major_formatter(ScalarFormatter())
+ax.yaxis.set_minor_formatter(NullFormatter())
+ax.set_xlabel("Final state particles", fontsize=15)
+ax.set_ylabel(r"$\alpha_C$", fontsize=17)
+ax.tick_params(labelsize=13)
+ax.legend(fontsize=9.5, loc="upper right", frameon=False, borderaxespad=0.4)
 fig.tight_layout()
-fig.savefig(out + ".png", dpi=140); fig.savefig(out + ".pdf")
-print("saved", out + ".png", out + ".pdf", "| solo:", len(solo), "ft:", len(ft))
+fig.savefig(out + ".png", dpi=200); fig.savefig(out + ".pdf")
+print("saved", out + ".png", out + ".pdf",
+      "| solo pts:", sum(k in solo for _, _, m in FAMILIES for k, _ in m),
+      "ft stars:", sum(k in ft for k, _, _ in FT_STARS))
