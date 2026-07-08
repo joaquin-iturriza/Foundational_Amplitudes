@@ -57,29 +57,30 @@ plt.rcParams.update({
 })
 
 fig, ax = plt.subplots(figsize=(5.4, 4.4))
-ax.set_yscale("log")
+ax.set_xscale("log"); ax.set_yscale("log")
 
-# theoretical lower bound alpha = 4/DOF, DOF = 3 n_fs - 4, drawn as a dense
-# dashed curve with a grey shaded wedge below and the label rotated along it
-XLIM, YLIM = (1.55, 4.45), (0.28, 2.9)
-nn = np.linspace(*XLIM, 200)
-bound = 4.0 / (3.0 * nn - 4.0)
-ax.plot(nn, bound, color="0.65", ls="--", lw=2.0, zorder=1)
-ax.fill_between(nn, YLIM[0], bound, color="0.5", alpha=0.14, zorder=0, lw=0)
-# rotate the label along the on-screen slope of the bound at the wedge centre
-x0 = 3.05; y0 = 4.0 / (3.0 * x0 - 4.0)
-p = lambda x: ax.transData.transform((x, 4.0 / (3.0 * x - 4.0)))
-(dx, dy) = p(x0 + 0.4) - p(x0 - 0.4)
-ax.text(x0, y0 * 0.72, "Theoretical lower bound", color="0.55", fontsize=13,
-        rotation=np.degrees(np.arctan2(dy, dx)), rotation_mode="anchor",
-        ha="center", va="center", zorder=1)
+# As in the talk figure: x is the phase-space DOF = 3 n_fs - 4 on a log axis
+# (ticks labelled by the particle count n_fs), so the theoretical lower bound
+# alpha = 4/DOF is an exactly straight slope -1 line, with a grey shaded wedge
+# below and the label rotated along it.
+dofx = lambda n: 3.0 * n - 4.0
+XLIM, YLIM = (1.55, 10.5), (0.28, 2.9)
+dd = np.array(XLIM)
+ax.plot(dd, 4.0 / dd, color="0.65", ls="--", lw=2.0, zorder=1)
+ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
+x0 = np.sqrt(XLIM[0] * XLIM[1])
+p = lambda x: ax.transData.transform((x, 4.0 / x))
+(dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
+ax.text(x0, (4.0 / x0) * 0.66, "Theoretical lower bound", color="0.55",
+        fontsize=13, rotation=np.degrees(np.arctan2(dy, dx)),
+        rotation_mode="anchor", ha="center", va="center", zorder=1)
 
-# small horizontal jitter so overlapping n_fs=2 points separate
-jit = {2: np.linspace(-0.10, 0.10, sum(n == 2 for _, _, m in FAMILIES for _, n in m))}
+# small multiplicative jitter so overlapping n_fs=2 points separate
+jit = {2: np.geomspace(1 / 1.06, 1.06, sum(n == 2 for _, _, m in FAMILIES for _, n in m))}
 taken = {2: 0}
 def jx(n):
-    if n not in jit: return float(n)
-    x = float(n) + jit[n][taken[n]]; taken[n] += 1; return x
+    if n not in jit: return dofx(n)
+    x = dofx(n) * jit[n][taken[n]]; taken[n] += 1; return x
 
 for lab, color, members in FAMILIES:
     pts = [(jx(n), solo[k]) for k, n in members if k in solo]
@@ -90,12 +91,15 @@ for lab, color, members in FAMILIES:
 
 for k, n, color in FT_STARS:
     if k in ft:
-        ax.scatter([n + 0.16], [ft[k]], s=130, marker="*", color=color,
+        ax.scatter([dofx(n) * 1.10], [ft[k]], s=130, marker="*", color=color,
                    zorder=4, label=None)
 ax.scatter([], [], s=130, marker="*", color="0.3", label="fine-tuned")
 
 ax.set_xlim(*XLIM); ax.set_ylim(*YLIM)
-ax.set_xticks([2, 3, 4])
+ax.xaxis.set_major_locator(FixedLocator([dofx(n) for n in (2, 3, 4)]))
+ax.xaxis.set_minor_locator(FixedLocator([]))
+ax.set_xticklabels(["2", "3", "4"])
+ax.xaxis.set_minor_formatter(NullFormatter())
 ax.yaxis.set_major_locator(FixedLocator([0.5, 1, 2]))
 ax.yaxis.set_major_formatter(ScalarFormatter())
 ax.yaxis.set_minor_formatter(NullFormatter())
