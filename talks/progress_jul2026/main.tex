@@ -17,7 +17,7 @@
 \usepackage{xcolor}
 
 % local figs first, then the project figure trees
-\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}{../../analysis/zero_shot/}}
+\graphicspath{{figs/}{../../docs/figs/}{../../plots/}{../../analysis/hpo_optima/}{../../analysis/zero_shot/}{../../analysis/pid_vs_phys/}}
 
 %---------- colours / theme (same as the CSI talk) ------------------------
 \definecolor{navy}{RGB}{38,38,110}
@@ -125,19 +125,19 @@
 \end{frame}
 
 %---------------------------------------------------------------- PID VS QN
-\begin{frame}{Why quantum numbers, not particle IDs}
+\begin{frame}{Particle IDs $\to$ quantum numbers: free at home, decisive away}
   \footnotesize
-  Freeze a pretrained model, predict processes it \textbf{never trained on} --- true vs.\ predicted amplitude distributions:
-  \vskip0.2em
+  Same sweep run twice on the 25-process pretrain, \textcolor{warn}{\textbf{particle-ID one-hot}} vs.\ \textcolor{blue!60!black}{\textbf{quantum numbers}}, 15 trials paired at identical hyperparameters:
+  \vskip0.1em
   \centering
-  \includegraphics[height=0.52\textheight]{zero_shot_histograms.pdf}
-  \vskip0.2em
+  \includegraphics[height=0.46\textheight]{pid_vs_phys.pdf}
+  \vskip0.1em
   \raggedright
   \begin{itemize}
-    \item With \textbf{quantum numbers} the model produces sensible amplitudes for both held-out processes --- including $ee\!\to\!t\bar t$, whose \textbf{top quark it never saw} in training.
-    \item With a \textbf{particle-ID dictionary}, $ee\!\to\!t\bar t$ \emph{cannot even be encoded} --- there is no token for the top.
+    \item \textbf{On the training processes the two are indistinguishable} (paired trials sit on the diagonal): switching to quantum numbers costs nothing in-distribution.
+    \item What it buys: an ID dictionary \textbf{cannot encode a particle it never saw} (no token for the top); the quantum-number model predicts unseen processes \emph{zero-shot} (backup).
   \end{itemize}
-  \takeaway{Encoding particles by their physics, not their name, is what makes transfer to new processes possible at all.}
+  \takeaway{Quantum numbers: same accuracy where both can play, and the only encoding that can leave the training set.}
 \end{frame}
 
 %---------------------------------------------------------------- AB HIGHLIGHTS
@@ -280,6 +280,13 @@
 
 %================================================================ BACKUP
 \begin{frame}[plain]\centering\vfill {\color{gray}\large Backup}\vfill\end{frame}
+
+\begin{frame}{Backup: zero-shot on unseen processes}
+  \centering
+  \includegraphics[height=0.72\textheight]{zero_shot_histograms.pdf}\\[0.1em]
+  {\scriptsize\color{gray} frozen pretrained model on held-out processes, true vs.\ predicted log-amplitude distributions:
+  quantum numbers handle even the never-seen top quark; the PID dictionary cannot encode it.}
+\end{frame}
 
 \begin{frame}{Backup: architecture shoot-out}
   \footnotesize
