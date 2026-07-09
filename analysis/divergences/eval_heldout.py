@@ -76,28 +76,27 @@ def main():
     for tag in [t.strip() for t in args.tags.split(",")]:
         run_dir = os.path.join(args.runs_root, f"ft_f{tag}")
         cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
-        stats = json.load(open(os.path.join(run_dir, "data_stats.json")))
-        mom_div = float(stats["mom_div"])
-        mom_mean = float(stats["mom_mean"])
-        mom_std = float(stats["mom_std"])
-        pm = np.atleast_1d(np.asarray(stats["prepd_mean"], dtype=np.float64))
-        ps = np.atleast_1d(np.asarray(stats["prepd_std"], dtype=np.float64))
-        amp_mean, amp_std = float(pm[0]), float(ps[0])
-
-        # Wire the model on a tiny subsample (fast), then override stats with stored.
+        # source=files fine-tunes don't persist data_stats.json (only the recipe path
+        # does); they recompute frozen stats fresh in init_data. Reproduce them the
+        # extract_ir.py way: re-run init_data on the run's OWN full training set. The
+        # amplitude stats are deterministic; the momentum divisor/mean/std are mutually
+        # consistent (rand-aug scale cancels), so the model's effective input is exact.
         with open_dict(cfg):
             cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
             cfg.use_mlflow = False; cfg.save_source = False; cfg.warm_start_idx = None
             cfg.ema = False; cfg.count_flops = False
             cfg.run_dir = os.path.join(REPO, "runs", "_ho_eval_tmp")
-            cfg.data.subsample = 2000
+            cfg.data.subsample = None              # full data -> exact recomputed stats
             cfg.fine_tune.pretrained_path = None   # don't reload base; we load ft ckpt below
         exp = AmplitudeExperiment(cfg)
         exp._init(); exp.init_physics(); exp.init_geometric_algebra()
         exp.init_data(); exp._init_dataloader(); exp.init_model()
         exp.model.load_state_dict(load_finetuned_state(os.path.join(run_dir, "models", args.ckpt))["model"])
         exp.model.to(exp.device, dtype=exp.dtype).eval()
-        exp.mom_mean = [mom_mean]; exp.mom_std = [mom_std]
+        mom_div = float(exp.mom_div)
+        mom_mean = float(exp.mom_mean[0]); mom_std = float(exp.mom_std[0])
+        amp_mean = float(np.atleast_1d(exp.prepd_mean)[0])
+        amp_std = float(np.atleast_1d(exp.prepd_std)[0])
 
         parts = com_normalize(raw_mom, mom_div)                       # (N,P,4)
         from particle_ids import global_encode
