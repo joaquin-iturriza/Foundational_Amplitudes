@@ -39,8 +39,8 @@ def make_ir(npz, label, out_base):
     emap, _, _ = _map(ly, lx, np.abs(resid), xb, yb)
     vmin, vmax = np.nanpercentile(tmap, 1), np.nanpercentile(tmap, 99)
 
-    fig = plt.figure(figsize=(15.5, 9.4))
-    gs = GridSpec(2, 3, figure=fig, hspace=0.34, wspace=0.32, height_ratios=[1.0, 0.95])
+    fig = plt.figure(figsize=(17.8, 9.4))
+    gs = GridSpec(2, 3, figure=fig, hspace=0.34, wspace=0.58, height_ratios=[1.0, 0.95])
     rms = float(np.sqrt(np.mean(resid ** 2)))
     fig.suptitle(f"{label}: model vs truth at the IR singularities  "
                  f"(N={n:,}, RMS Δlog|M|²={rms:.3g})", fontsize=13, y=0.98)

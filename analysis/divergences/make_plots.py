@@ -70,8 +70,8 @@ def make_figure(npz, process_label, out_base, split="all"):
     vmin = np.nanpercentile(true_map, 1)
     vmax = np.nanpercentile(true_map, 99)
 
-    fig = plt.figure(figsize=(15.5, 13.4))
-    gs = GridSpec(3, 3, figure=fig, hspace=0.38, wspace=0.30,
+    fig = plt.figure(figsize=(17.8, 13.4))
+    gs = GridSpec(3, 3, figure=fig, hspace=0.38, wspace=0.55,
                   height_ratios=[1.0, 0.95, 0.95])
     fig.suptitle(
         f"{process_label}: model vs truth across phase space  "
