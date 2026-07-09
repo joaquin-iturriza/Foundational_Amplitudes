@@ -1122,72 +1122,113 @@ Degradation \emph{into} a divergence appears only for the highest-multiplicity p
 ($u\bar u gg$) in its deepest soft/collinear limit --- the natural next fine-tuning target.
 \end{principle}
 
-\subsection{Work in progress: hold-out / add-back extrapolation on $e^+e^-\to u\bar u g$}
-\label{sec:divergences-wip}
+\subsection{Extrapolation into a held-out divergence: a hold-out / add-back study on
+$e^+e^-\to u\bar u g$}
+\label{sec:divergences-holdout}
 
-Goal: measure how a foundation model that \emph{never saw} $u\bar u g$ extrapolates
-\emph{into} its soft/collinear divergence when fine-tuned with that region held out,
-and how the error recovers as divergent-region data is added back. The generator
-samples phase space flat (RAMBO), so the divergent region is data-starved by
-construction --- this is a data-density experiment. All tooling is under
-\code{analysis/divergences/}.
+The degradation \emph{into} the singularity seen for the hardest process
+(Sec.~\ref{sec:divergences}) raises a sharper question: can a foundation model that
+\emph{never saw} $u\bar u g$ predict its soft/collinear divergence when fine-tuned on
+data from which that region is \emph{held out} --- and how much in-region data is needed
+to recover it? Because the generator samples phase space flat (RAMBO), the divergent
+region is data-starved by construction, so this is a controlled data-density experiment.
+All tooling is under \code{analysis/divergences/}.
 
-\paragraph{Currently running --- the leave-$u\bar u g$-out base.} A 22-process
-foundation (the 25ds set of \code{recipes/pretrain25.yaml} minus the five final-state
-gluon processes that share $u\bar u g$'s IR: $u\bar u g,\,u\bar u gg,\,u\bar u ggg,\,
-d\bar d g,\,b\bar b g$), recipe \code{recipes/pretrain22\_heldout\_uug.yaml}, pools
-$200$k train / $50$k val / $50$k test per process ($50$k/$10$k/$10$k for the two NLO
-virtuals), \emph{already prebuilt} on the weight-$0$ \code{prepost} partition (no GPU
-allocation). HPs copied from the well-trained 25ds reference
-\code{runs/pretrain25/trial\_0009} for the knobs not fixed by best practice
-(\code{regularization\_lambda}, \code{cosanneal\_warmup\_frac}, \code{cosanneal\_eta\_min},
-\code{ema\_decay}); best practice fixes the rest: \code{batchsize=16384} (NOT
-pretrain25's stale $1024$), \code{lr=4e-3} (the lr-law centre $\eta_c(t)$ of
-Eq.~\eqref{eq:invU} evaluated at \emph{this} run's $t=10^4$ steps and high $D$, not the
-$t\!=\!3\!\times\!10^4$ value), \code{iterations=10000}, and the adopted architecture
-\code{use\_diagrams=false} + \code{particle\_encoder\_hidden=0} (Sec.~\ref{sec:arch}:
-the diagram encoder actively hurts $-35\%$). Launcher
-\code{analysis/divergences/train\_base22.sh}; the best checkpoint lands at
-\code{runs/pretrain22\_heldout\_uug/base/models/model\_run0\_best.pt.gz}.
+\paragraph{Setup.} The leave-out base is a 22-process foundation --- the 25-dataset
+joint set minus the five final-state-gluon processes that share $u\bar u g$'s IR
+($u\bar u g,\,u\bar u gg,\,u\bar u ggg,\,d\bar d g,\,b\bar b g$; recipe
+\code{pretrain22\_heldout\_uug.yaml}, $200$k train/process, the adopted architecture of
+Sec.~\ref{sec:arch}) --- and reproduces every retained process to test MSE
+$\lesssim10^{-3}$. The divergence region is $y_{\min}<c$, with $y_{\min}$ the IR
+resolution variable of Eq.~\eqref{eq:ir} and $c=3.9\times10^{-2}$ (the $15$th percentile
+of $y_{\min}$ over the $10^6$-event $u\bar u g$ sample). Those events split into $850$k
+\emph{FAR} ($y_{\min}>c$, always trained), a fixed $75$k held-out \emph{TEST} set inside
+the divergence region (never trained), and a $75$k add-back pool. Five fine-tunes take
+the base onto FAR${}\cup{}$(fraction $f$ of the add-back pool) for
+$f\in\{0,0.05,0.15,0.5,1\}$ (full retrain with layer decay; the finetune HPs of
+\code{finetune\_scaling\_virt\_002} transferred at fixed finetune/pretrain lr ratio,
+$4000$ steps each). Each model is then forwarded over the \emph{same} held-out TEST
+region and we measure RMS $\Delta\log|\mathcal{M}|^2$ inside it (the evaluation
+reconstructs each run's frozen input normalization; a $y_{\min}$ alignment guard
+confirms the momenta agree to $<10^{-7}$). $f\!=\!0$ is thus pure extrapolation into an
+unseen divergence, $f\!=\!1$ the in-support baseline.
 
-\paragraph{Data already prepared} (\code{analysis/divergences/holdout\_prep.py}). The
-divergence region is $y_{\min}<c$ with $y_{\min}$ the IR resolution variable
-(min gluon-pair invariant$/s$; Eq.~\eqref{eq:ir}) and $c=3.9\text{e-}2$ (its $15$th
-percentile). From the $10^6$-event \code{data/ee\_uug\_91-1000GeV\_amplitudes.npy}:
-$850$k FAR events ($y_{\min}>c$, always trained), a fixed $75$k held-out TEST set
-(\code{analysis/divergences/uug\_heldtest.npz}, never trained), and a $75$k add-back
-pool. Five training sets are written as \code{data\_ho\_f\{000,005,015,050,100\}/}
-(FAR $\cup$ fraction $f$ of the add-back pool; the dataset \emph{name} is unchanged so
-the diagram sidecar still resolves --- irrelevant now that diagrams are off, but kept).
+\paragraph{Result --- a small in-region data density recovers most of the divergence.}
+The held-out-region error falls steeply and \emph{saturates} with $f$
+(Fig.~\ref{fig:div_addback}, Table~\ref{tab:div_addback}): pure extrapolation is poor
+(RMS $0.84$, and $3.3$ in the deepest $y_{\min}<10^{-3}$ bin, where the amplitude is
+mispredicted by $\sim\!e^{3}$), but adding back just \emph{five percent} of the
+divergent-region pool cuts the error $4.9\times$ (to $0.17$), after which the curve
+flattens toward the in-support baseline ($0.053$ at $f\!=\!1$). Every $f$ degrades
+monotonically into deeper IR (the per-$y_{\min}$-bin curves, Fig.~\ref{fig:div_addback}
+right). The $f\!=\!0$ failure is diagnostic (Fig.~\ref{fig:div_holdout_f0}): the model's
+mean $\log|\mathcal{M}|^2$ \emph{plateaus} instead of following the IR ramp, its
+predictions saturate against a ceiling in the predicted-vs-true plane, and the error
+piles up in the soft\,+\,collinear corner --- the surrogate cannot invent the
+divergence's growth from out-of-region data alone. With the region back in support
+($f\!=\!1$, Fig.~\ref{fig:div_holdout_f1}) the ramp is tracked, the ceiling is gone, and
+the residual is flat and small across the plane.
 
-\paragraph{Next steps (in order).}
-\begin{enumerate}
-  \item Verify the base: read \code{runs/pretrain22\_heldout\_uug/base/out\_0.log} for
-    the per-process test MSE; confirm it is a reasonable foundation and that the
-    dataset list contains no $u\bar u g$-family process.
-  \item Fine-tune the base onto each add-back set: \code{source=files},
-    \code{data.data\_path=data\_ho\_f<ff>/},
-    \code{data.dataset=[ee\_uug\_91-1000GeV\_amplitudes]},
-    \code{fine\_tune.pretrained\_path}=the base checkpoint, \emph{same} arch overrides
-    (\code{use\_diagrams=false}, \code{particle\_encoder\_hidden=0}) so the checkpoint
-    loads; reuse the finetune HPs of \code{finetune\_scaling\_virt\_002} (\code{lr\_scale}
-    $\approx1$, \code{layer\_decay}, a few$\times10^3$ steps). One run per
-    $f\in\{0,0.05,0.15,0.5,1\}$ ($\sim$4--5 GPU-h total). \textbf{Cross-check} each
-    extracted per-split MSE against its own training log before trusting it (the
-    \code{amp\_orders} / preprocessing pitfalls of Sec.~\ref{sec:divergences} apply).
-  \item Evaluate: forward each fine-tuned model over the fixed held-out TEST region
-    (reuse \code{analysis/divergences/extract\_ir.py}'s forward path + \code{ir\_observables};
-    guard with the \code{preprocess(raw)==stored-truth} alignment check), and compute
-    RMS $\Delta\log|\mathcal{M}|^2$ \emph{inside} the region.
-  \item Plot the \textbf{add-back curve} --- held-out-region error vs $f$: $f\!=\!0$ is
-    pure extrapolation, $f\!=\!1$ the in-support baseline. Reuse \code{make\_ir.py} to
-    show \emph{where} the residual concentrates at $f\!=\!0$ vs $f\!=\!1$.
-\end{enumerate}
+\begin{table}[H]
+\centering
+\caption{Held-out divergence-region ($y_{\min}<c$) error vs add-back fraction $f$, for
+$e^+e^-\to u\bar u g$ ($N=75$k held-out events).}
+\label{tab:div_addback}
+\begin{tabular}{@{}lccccc@{}}
+\hline
+$f$ (add-back fraction) & $0$ & $0.05$ & $0.15$ & $0.5$ & $1$ \\
+\hline
+RMS $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.842$ & $0.173$ & $0.106$ & $0.080$ & $0.053$ \\
+\quad deepest bin $y_{\min}<10^{-3}$ & $3.34$ & $0.74$ & $0.44$ & $0.32$ & $0.19$ \\
+\hline
+\end{tabular}
+\end{table}
 
-\paragraph{Follow-ups.} Repeat for the soft ($x_g$) vs collinear ($y_{\min}$) axes
-separately; extend to $u\bar u gg$ (needs its own leave-out base); and the deeper-
-sampling variant (regenerate $u\bar u g$ with tighter \code{ptj}/\code{drjj} fiducial
-cuts to reach below the current IR cutoff, \code{mg5\_pipeline\_final}).
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{addback_curve.pdf}
+  \caption{\textbf{Add-back curve, $e^+e^-\to u\bar u g$.} Held-out
+  divergence-region ($y_{\min}<c$) error vs the add-back fraction $f$ (leftmost tick
+  $f\!=\!0$ is pure extrapolation). Left: RMS and MAE $\Delta\log|\mathcal{M}|^2$ over
+  the whole held-out region; right: split by $y_{\min}$ sub-bin (deeper IR toward the
+  top). The steep drop already by $f\!=\!0.05$ and the subsequent flattening show a small
+  in-region data density recovers most of the divergence.}
+  \label{fig:div_addback}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{heldout_resid_f000.pdf}
+  \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region}, in the IR plane of
+  Eq.~\eqref{eq:ir}. The model mean plateaus off the IR ramp (bottom-left, red vs black),
+  predictions saturate against a ceiling (predicted-vs-true, bottom-right), and the error
+  concentrates in the soft/collinear corner (top-right) --- the model, never having seen
+  the region, cannot reproduce the divergence's growth.}
+  \label{fig:div_holdout_f0}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{heldout_resid_f100.pdf}
+  \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region.} With the
+  divergent region back in the training support the IR ramp is tracked into the deep IR,
+  the predicted-vs-true ceiling is gone, and the error is flat and small across the
+  plane --- contrast Fig.~\ref{fig:div_holdout_f0}.}
+  \label{fig:div_holdout_f1}
+\end{figure}
+
+\begin{principle} A flat-sampled surrogate does not extrapolate \emph{into} an unseen
+divergence: held out, $e^+e^-\to u\bar u g$'s soft/collinear region is mispredicted by
+$\sim\!e^{3}$ in the deepest bin and the model saturates against a ceiling. But the
+divergence is \emph{data-recoverable} --- adding back only $5\%$ of the divergent-region
+events recovers $\sim\!5\times$ of the error, and the add-back curve then saturates
+toward the in-support baseline.
+\end{principle}
+
+\paragraph{Follow-ups.} Separate the soft ($x_g$) and collinear ($y_{\min}$) axes;
+extend to $u\bar u gg$ (its own leave-out base); and a deeper-sampling variant
+(regenerate $u\bar u g$ with tighter \code{ptj}/\code{drjj} fiducial cuts to probe below
+the current IR cutoff, \code{mg5\_pipeline\_final}).
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
