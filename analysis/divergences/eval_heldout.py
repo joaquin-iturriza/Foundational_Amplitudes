@@ -136,9 +136,10 @@ def main():
             print(f"      y_min[{lo:.0e},{hi:.0e}) n={n:6d} RMS={r:.4f}", flush=True)
 
         out = os.path.join(args.out_dir, f"heldout_eval_ft_f{tag}.npz")
+        extra = {k: obs[k] for k in ("x_q", "x_qbar") if k in obs}   # Dalitz vars (uug)
         np.savez_compressed(out, true_logamp=true_logamp, pred_logamp=pred_logamp,
                             y_min=obs["y_min"], x_gmin=obs["x_gmin"], sqrt_s=obs["sqrt_s"],
-                            amp_mean=amp_mean, amp_std=amp_std, cut=np.array(cut))
+                            amp_mean=amp_mean, amp_std=amp_std, cut=np.array(cut), **extra)
         summary.append(dict(tag=tag, f=int(tag) / 100.0, rms=rms, mae=mae,
                             binrms=[[lo, hi, n, r] for lo, hi, n, r in binrms]))
         print(f"    saved -> {out}", flush=True)
