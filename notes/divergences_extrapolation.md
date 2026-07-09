@@ -105,6 +105,40 @@ Caveat: these are 2→2 *virtual* NLO amplitudes, whose "divergences" are mild
 IR singularity. The genuinely divergent case is **real-emission** NLO (uug, uugg),
 which is the natural next target (see §4).
 
+### Jointly-pretrained processes (NOT fine-tuned) — 2026-07-09
+
+Extended the same phase-space view to processes the model learned *jointly* in a
+pretraining mixture (no per-process fine-tune), from `pretrain_full_nh8/trial_0271`
+(8-process joint pretrain: ee→WWZ, WW, ttbar, uug, uugg, γγ, γγγ, uu). Chose three
+well-learned **2→2** processes with *distinct* divergence structures:
+
+| process | pretrain test MSE | divergence structure |
+|---|---|---|
+| ee→γγ (`ee_aa`) | 9.0e-10 | t/u-channel **collinear** peaks at cosθ*→±1 (~1/sin²θ), √s-independent |
+| ee→W⁺W⁻ (`ee_WW`) | 2.5e-8 | t-channel ν exchange → **forward** peak, grows with √s |
+| ee→uu (`ee_uu`) | 6.1e-9 | s-channel, ~(1+cos²θ), no angular divergence (control) |
+
+Findings: the joint model reproduces all three across the whole (√s,cosθ*) plane at
+RMS Δlog|M|² ≈ 3.5e-4 (γγ) / 4.9e-4 (WW) / 4.5e-4 (uu). The **collinear divergence**
+of ee→γγ (log|M|² rising to ≈10 at cosθ*→±1) and the **forward peak** of ee→WW are
+tracked faithfully *through* the singular region; error rises only mildly toward the
+cosθ*→±1 edges and sparse corners — same story as the fine-tuned NLO cases, now for
+jointly-learned tree amplitudes. So the "no degradation at the divergence, small
+error only at the phase-space boundary" behaviour is a property of the pretrained
+foundation model, not just of fine-tuning.
+
+Tooling: `analysis/divergences/extract_pretrain.py` (+ `extract_pretrain.sh`).
+It loads ALL pretrain datasets together (needed to reproduce the global amp stats
+and dataset-0 momentum norm faithfully), forwards the chosen 2→2 processes, and gets
+exact physical kinematics by inverting the deterministic `default_rng(42)` event
+shuffle back to the raw rows. It is scope-aware: detects GLOBAL vs PER-DATASET amp
+preprocessing (`len(prepd_mean)>1`) and un-preprocesses each process with its own
+stats — important for recipe-path pretrains (per-dataset), though `pretrain_full_nh8`
+is files-path (global). A per-event `preprocess(raw_amp, stats)==stored true_prepd`
+check (max|Δ|=0 here) guards the alignment/stats; the per-process MSE matches the
+pretrain log (e.g. ee→uu 5.9e-9 vs logged 6.1e-9).
+Figures: `analysis/divergences/figs/phase_space[_3d]_pretrain_{aa,ww,uu}.{png,pdf}`.
+
 ## 4. Next steps
 
 - Add an **error-vs-|M|²-percentile** curve (question 2) to quantify tail behaviour.
