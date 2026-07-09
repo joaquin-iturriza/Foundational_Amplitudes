@@ -65,12 +65,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    the thing to avoid; **"it's a report/analysis write-up, not project guidance"
    is NOT an exception.** If you think a doc is genuinely warranted, **ask first**;
    if I approve, its path gets recorded in `.claude/md_allowlist.txt`. Editing an
-   *existing* file is fine (that is not scattering a new one); **creating a *new*
-   one is not — including under `notes/`, which is NOT an exception** (that was
-   exactly the loophole that got abused — a `notes/*.md` is still a scattered file).
-   The only path exemptions are `CLAUDE.md`, `README*`, and `.claude/`. Enforced by
-   the `md_guard.sh` `PreToolUse(Write)` hook, which blocks creation of any new
-   `.md` / `.tex` / `.rst` anywhere outside the allowlist.
+   *existing* file is fine; creating a *new* `.md` / `.tex` / `.rst` is not. The
+   only exemptions are `CLAUDE.md` and `README*`. Enforced by the `md_guard.sh`
+   `PreToolUse(Write)` hook.
 
 4. **Go easy on `find` over large trees.** This is Lustre, not a slow network
    mount anymore, so `find` is allowed — but it can still be slow on huge
@@ -480,8 +477,8 @@ a **`Stop` hook (`auto_push.sh`)** pushes any unpushed `jeanzay`/feature-branch
 commits to origin at the end of every turn (already-committed work only; never
 `main`); a **`PreToolUse` hook (`worktree_guard.sh`)** reminds me to open a
 worktree when I start editing trunk code on `jeanzay`. Two more enforce rules
-above: **`md_guard.sh`** (`PreToolUse(Write)`) blocks new scattered
-`.md`/`.tex`/`.rst` files anywhere, `notes/` included (ground rule #3; allowlist
+above: **`md_guard.sh`** (`PreToolUse(Write)`) blocks creation of new
+`.md`/`.tex`/`.rst` files (ground rule #3; allowlist
 `.claude/md_allowlist.txt`), and
 **`figure_pair_guard.sh`** (`Stop`) blocks finishing a turn if a figure was saved
 in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
