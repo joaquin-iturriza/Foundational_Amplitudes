@@ -1,0 +1,39 @@
+# 22-process leave-out foundation set for the uug divergence-extrapolation study.
+# = pretrain25_nlo.yaml MINUS the 5 final-state-gluon processes that share uug's
+#   soft/collinear QCD IR structure (ee_uug [the fine-tune target], ee_uugg,
+#   ee_uuggg, ee_ddbarg, ee_bbbarg). The base therefore has NEVER seen a real
+#   soft/collinear GLUON divergence; it has seen collinear PHOTON poles (aaa/…)
+#   and forward peaks, so fine-tuning onto uug tests whether the foundation
+#   transfers the coupling-blind IR structure from QED to a never-seen QCD gluon
+#   divergence.
+# Pool sizes: 200k train / 50k val / 50k test per LO process (10x the small dev
+#   cache), 50k/10k/10k for the slow NLO-virtual (MadLoop) processes. Prebuilt on
+#   the weight-0 prepost partition (does not touch the GPU allocation).
+processes:
+  # QED photons
+  - {name: ee_aa,        sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_aaa,       sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_aaaa,      sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  # leptons
+  - {name: ee_mumu,      sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_tautau,    sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_mumua,     sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_tautaua,   sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_mumumumu,  sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_bhabha,    sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_nnbar,     sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  # quarks (no final-state gluon)
+  - {name: ee_ddbar,     sqrts: [10,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_bbbar,     sqrts: [20,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  # electroweak di/tri-boson + Higgs
+  - {name: ee_WW,        sqrts: [162, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZ,        sqrts: [185, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_Za,        sqrts: [95,  1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZH,        sqrts: [220, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_WWa,       sqrts: [165, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_wwz,       sqrts: [255, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZa,       sqrts: [185, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  - {name: ee_ZZZ,       sqrts: [280, 1000], n_train: 200_000, n_val: 50_000, n_test: 50_000}
+  # NLO QCD virtual (MadLoop) — slower, smaller pools
+  - {name: ee_ss_nlo,    sqrts: [50,  1000], n_train: 50_000, n_val: 10_000, n_test: 10_000}
+  - {name: ee_ttbar_nlo, sqrts: [350, 1000], n_train: 50_000, n_val: 10_000, n_test: 10_000}
