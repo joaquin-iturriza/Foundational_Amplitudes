@@ -16,18 +16,24 @@ cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
 REC=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain22_heldout_uug.yaml
 
-# 22-process leave-uug-out foundation base. Config = canonical recipe-pretrain
-# defaults + the ADOPTED architecture candidate (docs/results.tex sec:arch):
-# no diagram encoder + linear (no-MLP) particle embed -- the diagram encoder
-# actively hurts (-35%) at scale and doubles step time. Only best-defaults changed:
-#   iterations 10000, lr 2e-3, warmup 0.15, eta_min 1e-8, reg 1e-8.
+# 22-process leave-uug-out foundation base. HPs copied verbatim from the well-trained
+# 25ds reference runs/pretrain25/trial_0009 (recipe path; the trial the ft25 finetunes
+# were built on), with ONLY the decided best-practice architecture overrides applied:
+# no diagram encoder + linear (no-MLP) embed (docs/results.tex sec:arch: diagram encoder
+# actively hurts -35%). Physics levers stay default-off, as in pretrain25 (the offshell/
+# coupling levers are a big-run addition, not 25ds).
+# best-practice-fixed: batchsize 16384 (canonical operating point; NOT pretrain25's
+#   stale 1024), lr = lr-law foundation centre (~2e-3), no diagrams + linear embed.
+# copied from the 25ds ref (pretrain25/trial_0009), being within best-practice ranges:
+#   reg_lambda, warmup_frac, eta_min, ema_decay.
 python run.py \
   exp_name=pretrain22_heldout_uug run_name=base \
   data.source=recipes data.processes_file="$REC" \
   model.use_diagrams=false model.particle_encoder_hidden=0 \
-  training.iterations=10000 training.lr=0.002 \
-  training.cosanneal_warmup_frac=0.15 training.cosanneal_eta_min=1e-8 \
-  training.regularization_lambda=1e-8 \
+  training.batchsize=16384 training.iterations=10000 training.lr=0.002 \
+  training.regularization_lambda=6.264093e-10 \
+  training.cosanneal_warmup_frac=0.1079041 training.cosanneal_eta_min=6.17785e-9 \
+  training.ema_decay=0.9330307 \
   plot=true save=true
 
 echo "DONE base22"
