@@ -81,3 +81,4 @@ core.[0-9]*
 
 # feature worktrees live under the repo (worktrees/wt-<feat>), never outside it
 /worktrees/
+data_ho_f*/
