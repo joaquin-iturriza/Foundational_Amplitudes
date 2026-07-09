@@ -10,8 +10,9 @@
 #
 # Scope: Write (file creation) of a NEW doc file (.md/.markdown/.tex/.rst) that
 # does NOT already exist. Editing/overwriting an existing file is always fine
-# (that's not "scattering a new file"). Exemptions: CLAUDE.md and README* only.
-# Nothing else — not notes/, not .claude/, not the scratchpad.
+# (that's not "scattering a new file"). Exemptions: CLAUDE.md, README*, and the
+# harness plan-mode dir (*/.claude/plans/*). Nothing else — not notes/, not the
+# rest of .claude/, not the scratchpad.
 #
 # Escape hatch (deliberate + recorded): to create an approved new doc, add its
 # repo-relative or absolute path to  .claude/md_allowlist.txt  (one per line).
@@ -35,9 +36,10 @@ case "$fp" in
   *) exit 0 ;;
 esac
 
-# Exemptions: CLAUDE.md and README* only.
+# Exemptions: CLAUDE.md and README* only, plus the harness plan-mode dir
+# (~/.claude/plans/*.md are plan-mode files outside the repo, not scattered repo docs).
 case "$fp" in
-  */CLAUDE.md|*/README.md|*/README*.md) exit 0 ;;
+  */CLAUDE.md|*/README.md|*/README*.md|*/.claude/plans/*) exit 0 ;;
 esac
 
 # Editing an existing file is fine — only NEW files are "scattering".
