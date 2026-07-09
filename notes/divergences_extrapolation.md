@@ -153,9 +153,40 @@ V ramping to ≈+8 at both edges; ee→WW an asymmetric forward-only ramp; ee→
 up the ramps; the error panel shows accuracy degrades only in the most collinear,
 sparsest bins (ee→WW: into the forward peak; ~1e-3 elsewhere).
 
+### Real IR channels: ee→uug (2→3) and ee→uugg (2→4) — 2026-07-09
+
+The genuine test: gluon-emission channels with real SOFT (E_g→0) and COLLINEAR
+(g∥quark) singularities, from the same 8-process joint pretrain (zero-shot).
+IR observables, all Lorentz invariants from the raw momenta (`extract_ir.py`):
+x_g = 2(p_g·Q)/s (gluon energy fraction; x_gmin = softest), y_ij = (p_i+p_j)²/s over
+gluon-involving colored pairs, **y_min** = master IR-resolution variable (→0 in both
+the soft and collinear limits). Plots (`make_ir.py`): 2D maps over
+(log₁₀ y_min, log₁₀ x_gmin), the IR ramp log|M|² vs log₁₀ y_min (mean & max), the
+soft-gluon ramp vs log₁₀ x_gmin, a pred-vs-true hexbin, and — for ee→uug — the Dalitz
+plane (x_q, x_q̄). Faithful (align max|Δ|=0; MSE matches pretrain log: uug 1.5e-6 vs
+4.4e-6 all-splits-vs-test, uugg 2.1e-4 vs 2.3e-4).
+
+- **ee→uug** (pretrain MSE 4.4e-6): the model reproduces the soft (~1/x_g²) and
+  soft+collinear (~1/y_min) ramps and the **full bremsstrahlung Dalitz** (collinear
+  walls at x_q→1 / x_q̄→1 meeting at the soft (1,1) corner) — truth≈model across
+  ~30 orders of magnitude in |M|², RMS Δlog|M|²=0.007. No IR degradation.
+- **ee→uugg** (pretrain MSE 2.3e-4 — the HARDEST process in the set): the model still
+  tracks the MEAN IR ramps faithfully into the deep IR, but this is the **first clear
+  case of divergence-region degradation** — per-event error grows monotonically into
+  the IR: ⟨|Δlog|M|²|⟩ ≈ 0.03 at y_min~0.1 → **0.27 at y_min~1e-4**, and the pred-vs-
+  true band visibly widens (RMS 0.085). The error maps localize it to the deep
+  soft/collinear corner.
+
+**Bottom line for collaborators:** across 2→2 (incl. the ee→γγ collinear divergence)
+and ee→uug, accuracy does NOT degrade at the divergences — only at phase-space
+boundaries / sparse bins. Degradation *into* the singular region appears only for the
+hardest, highest-multiplicity process (ee→uugg) in its deepest soft/collinear limits.
+Figures: `analysis/divergences/figs/ir_pretrain_{uug,uugg}.{png,pdf}` (+ `_uug_dalitz`).
+
 ## 4. Next steps
 
 - Add an **error-vs-|M|²-percentile** curve (question 2) to quantify tail behaviour.
 - Run the **restricted-window fine-tune** experiment (question 3) for a clean
-  extrapolation number, on the same two processes.
-- Extend to real-emission NLO (uug/uugg) to probe genuine IR divergences.
+  extrapolation number.
+- ee→uugg deep-IR degradation: does a short **fine-tune** (or more pretrain weight on
+  uugg) recover the deep soft/collinear limit? Natural follow-up to the finding above.
