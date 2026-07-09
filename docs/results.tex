@@ -1122,6 +1122,73 @@ Degradation \emph{into} a divergence appears only for the highest-multiplicity p
 ($u\bar u gg$) in its deepest soft/collinear limit --- the natural next fine-tuning target.
 \end{principle}
 
+\subsection{Work in progress: hold-out / add-back extrapolation on $e^+e^-\to u\bar u g$}
+\label{sec:divergences-wip}
+
+Goal: measure how a foundation model that \emph{never saw} $u\bar u g$ extrapolates
+\emph{into} its soft/collinear divergence when fine-tuned with that region held out,
+and how the error recovers as divergent-region data is added back. The generator
+samples phase space flat (RAMBO), so the divergent region is data-starved by
+construction --- this is a data-density experiment. All tooling is under
+\code{analysis/divergences/}.
+
+\paragraph{Currently running --- the leave-$u\bar u g$-out base.} A 22-process
+foundation (the 25ds set of \code{recipes/pretrain25.yaml} minus the five final-state
+gluon processes that share $u\bar u g$'s IR: $u\bar u g,\,u\bar u gg,\,u\bar u ggg,\,
+d\bar d g,\,b\bar b g$), recipe \code{recipes/pretrain22\_heldout\_uug.yaml}, pools
+$200$k train / $50$k val / $50$k test per process ($50$k/$10$k/$10$k for the two NLO
+virtuals), \emph{already prebuilt} on the weight-$0$ \code{prepost} partition (no GPU
+allocation). HPs copied from the well-trained 25ds reference
+\code{runs/pretrain25/trial\_0009} for the knobs not fixed by best practice
+(\code{regularization\_lambda}, \code{cosanneal\_warmup\_frac}, \code{cosanneal\_eta\_min},
+\code{ema\_decay}); best practice fixes the rest: \code{batchsize=16384} (NOT
+pretrain25's stale $1024$), \code{lr=4e-3} (the lr-law centre $\eta_c(t)$ of
+Eq.~\eqref{eq:invU} evaluated at \emph{this} run's $t=10^4$ steps and high $D$, not the
+$t\!=\!3\!\times\!10^4$ value), \code{iterations=10000}, and the adopted architecture
+\code{use\_diagrams=false} + \code{particle\_encoder\_hidden=0} (Sec.~\ref{sec:arch}:
+the diagram encoder actively hurts $-35\%$). Launcher
+\code{analysis/divergences/train\_base22.sh}; the best checkpoint lands at
+\code{runs/pretrain22\_heldout\_uug/base/models/model\_run0\_best.pt.gz}.
+
+\paragraph{Data already prepared} (\code{analysis/divergences/holdout\_prep.py}). The
+divergence region is $y_{\min}<c$ with $y_{\min}$ the IR resolution variable
+(min gluon-pair invariant$/s$; Eq.~\eqref{eq:ir}) and $c=3.9\text{e-}2$ (its $15$th
+percentile). From the $10^6$-event \code{data/ee\_uug\_91-1000GeV\_amplitudes.npy}:
+$850$k FAR events ($y_{\min}>c$, always trained), a fixed $75$k held-out TEST set
+(\code{analysis/divergences/uug\_heldtest.npz}, never trained), and a $75$k add-back
+pool. Five training sets are written as \code{data\_ho\_f\{000,005,015,050,100\}/}
+(FAR $\cup$ fraction $f$ of the add-back pool; the dataset \emph{name} is unchanged so
+the diagram sidecar still resolves --- irrelevant now that diagrams are off, but kept).
+
+\paragraph{Next steps (in order).}
+\begin{enumerate}
+  \item Verify the base: read \code{runs/pretrain22\_heldout\_uug/base/out\_0.log} for
+    the per-process test MSE; confirm it is a reasonable foundation and that the
+    dataset list contains no $u\bar u g$-family process.
+  \item Fine-tune the base onto each add-back set: \code{source=files},
+    \code{data.data\_path=data\_ho\_f<ff>/},
+    \code{data.dataset=[ee\_uug\_91-1000GeV\_amplitudes]},
+    \code{fine\_tune.pretrained\_path}=the base checkpoint, \emph{same} arch overrides
+    (\code{use\_diagrams=false}, \code{particle\_encoder\_hidden=0}) so the checkpoint
+    loads; reuse the finetune HPs of \code{finetune\_scaling\_virt\_002} (\code{lr\_scale}
+    $\approx1$, \code{layer\_decay}, a few$\times10^3$ steps). One run per
+    $f\in\{0,0.05,0.15,0.5,1\}$ ($\sim$4--5 GPU-h total). \textbf{Cross-check} each
+    extracted per-split MSE against its own training log before trusting it (the
+    \code{amp\_orders} / preprocessing pitfalls of Sec.~\ref{sec:divergences} apply).
+  \item Evaluate: forward each fine-tuned model over the fixed held-out TEST region
+    (reuse \code{analysis/divergences/extract\_ir.py}'s forward path + \code{ir\_observables};
+    guard with the \code{preprocess(raw)==stored-truth} alignment check), and compute
+    RMS $\Delta\log|\mathcal{M}|^2$ \emph{inside} the region.
+  \item Plot the \textbf{add-back curve} --- held-out-region error vs $f$: $f\!=\!0$ is
+    pure extrapolation, $f\!=\!1$ the in-support baseline. Reuse \code{make\_ir.py} to
+    show \emph{where} the residual concentrates at $f\!=\!0$ vs $f\!=\!1$.
+\end{enumerate}
+
+\paragraph{Follow-ups.} Repeat for the soft ($x_g$) vs collinear ($y_{\min}$) axes
+separately; extend to $u\bar u gg$ (needs its own leave-out base); and the deeper-
+sampling variant (regenerate $u\bar u g$ with tighter \code{ptj}/\code{drjj} fiducial
+cuts to reach below the current IR cutoff, \code{mg5\_pipeline\_final}).
+
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
