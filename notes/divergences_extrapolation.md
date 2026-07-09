@@ -139,6 +139,19 @@ check (max|Δ|=0 here) guards the alignment/stats; the per-process MSE matches t
 pretrain log (e.g. ee→uu 5.9e-9 vs logged 6.1e-9).
 Figures: `analysis/divergences/figs/phase_space[_3d]_pretrain_{aa,ww,uu}.{png,pdf}`.
 
+**Collinear-resolved view** (`make_collinear.py` → `figs/collinear_pretrain.{png,pdf}`).
+The mean-per-bin maps/projections *hide* the divergence: it lives in a razor-thin
+cos→±1 sliver (for ee→γγ only 0.003% of events exceed log|M|²=6, all at |cosθ*|>0.9999,
+peak 9.86), so a linear-cosθ* bin averages log|M|² down to ~+0.35 in its outer bin.
+Re-plotting vs the signed collinear coordinate
+  η = sign(cosθ*)·log₁₀[1/(1−|cosθ*|)]   (η=0 central, η→±6 collinear)
+stretches the beam directions and turns the divergence into a visible linear ramp
+(log|M|² ~ −ln(1−|cosθ*|)). Shows MEAN and MAX per η-bin. Result: ee→γγ is a symmetric
+V ramping to ≈+8 at both edges; ee→WW an asymmetric forward-only ramp; ee→uu flat
+(no collinear divergence — control, mild forward tilt = γ/Z A_FB). Model tracks truth
+up the ramps; the error panel shows accuracy degrades only in the most collinear,
+sparsest bins (ee→WW: into the forward peak; ~1e-3 elsewhere).
+
 ## 4. Next steps
 
 - Add an **error-vs-|M|²-percentile** curve (question 2) to quantify tail behaviour.
