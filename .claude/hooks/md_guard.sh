@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-# PreToolUse(Write) hook — block creation of NEW scattered .md/report files.
+# PreToolUse(Write) hook — block creation of NEW scattered notes/report docs.
 #
-# Why: CLAUDE.md ground rule #3 says all guidance lives in the one central
-# CLAUDE.md — no scattered .md / memory / findings / report dumps. The model
-# (me) violated this by rationalizing "it's a report, not guidance". This makes
-# the rule non-negotiable at the moment of creation instead of relying on the
-# model to not invent exceptions.
+# Why: CLAUDE.md ground rule #3 says all guidance/results live in ONE document —
+# no scattered .md / .tex / findings / report / summary dumps anywhere in the
+# tree. The model (me) violated this by rationalizing "it's a report, not
+# guidance", and by abusing a blanket notes/ exemption to drop a new .md there.
+# This makes the rule non-negotiable at the moment of creation instead of
+# relying on the model to not invent exceptions.
 #
-# Scope: only Write (file creation/overwrite) of a .md that does NOT already
-# exist. Editing an existing .md is always fine (that's not "scattering a new
-# file"). Baked exemptions: CLAUDE.md, README*.md, anything under notes/ or
-# .claude/, and the scratchpad.
+# Scope: Write (file creation) of a NEW doc file (.md/.markdown/.tex/.rst) that
+# does NOT already exist. Editing/overwriting an existing file is always fine
+# (that's not "scattering a new file"). Baked exemptions (meta only): CLAUDE.md,
+# README*, anything under .claude/, and the scratchpad. NOTE: notes/ is NOT
+# exempt — a new doc under notes/ is exactly the violation that occurred.
 #
-# Escape hatch (deliberate + recorded): to create an approved new .md, add its
+# Escape hatch (deliberate + recorded): to create an approved new doc, add its
 # repo-relative or absolute path to  .claude/md_allowlist.txt  (one per line).
 # That makes "the user approved this doc" an explicit, auditable act rather than
 # an in-the-moment rationalization.
@@ -28,15 +30,15 @@ except Exception:
     print("")' 2>/dev/null)
 [ -z "$fp" ] && exit 0
 
-# Only guard markdown.
+# Only guard note/report/document formats.
 case "$fp" in
-  *.md|*.markdown) ;;
+  *.md|*.markdown|*.tex|*.rst) ;;
   *) exit 0 ;;
 esac
 
-# Baked exemptions (meta / notes / scratch).
+# Baked exemptions (meta / scratch ONLY — deliberately NOT notes/).
 case "$fp" in
-  */CLAUDE.md|*/README.md|*/README*.md|*/.claude/*|*/notes/*|*/scratchpad/*) exit 0 ;;
+  */CLAUDE.md|*/README.md|*/README*.md|*/.claude/*|*/scratchpad/*) exit 0 ;;
 esac
 
 # Editing an existing file is fine — only NEW files are "scattering".
@@ -54,8 +56,8 @@ fi
 
 # Block. exit 2 => tool call denied, stderr shown to the model.
 {
-  echo "BLOCKED by md_guard: refusing to create new markdown file '$rel'."
-  echo "CLAUDE.md ground rule #3: no scattered .md / findings / report files — all guidance goes in the central CLAUDE.md. 'It's a report, not guidance' is NOT an exception."
-  echo "If the user has explicitly approved THIS file, record it: add its path to .claude/md_allowlist.txt, then retry. Otherwise, ask the user first."
+  echo "BLOCKED by md_guard: refusing to create new doc file '$rel'."
+  echo "CLAUDE.md ground rule #3: no scattered .md/.tex/notes/findings/report files anywhere (notes/ included) — results/guidance go in the ONE existing document (docs/results.tex), not a new file. 'It's a report/analysis, not guidance' is NOT an exception, and there is no notes/ loophole."
+  echo "Write a section into the existing doc instead. Only if the user has EXPLICITLY approved a brand-new file: record its path in .claude/md_allowlist.txt, then retry. Otherwise ask first."
 } >&2
 exit 2
