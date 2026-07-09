@@ -30,7 +30,7 @@ python run.py \
   exp_name=pretrain22_heldout_uug run_name=base \
   data.source=recipes data.processes_file="$REC" \
   model.use_diagrams=false model.particle_encoder_hidden=0 \
-  training.batchsize=16384 training.iterations=10000 training.lr=0.002 \
+  training.batchsize=16384 training.iterations=10000 training.lr=0.004 \
   training.regularization_lambda=6.264093e-10 \
   training.cosanneal_warmup_frac=0.1079041 training.cosanneal_eta_min=6.17785e-9 \
   training.ema_decay=0.9330307 \
