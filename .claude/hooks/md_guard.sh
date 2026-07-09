@@ -11,8 +11,8 @@
 # Scope: Write (file creation) of a NEW doc file (.md/.markdown/.tex/.rst) that
 # does NOT already exist. Editing/overwriting an existing file is always fine
 # (that's not "scattering a new file"). Baked exemptions (meta only): CLAUDE.md,
-# README*, anything under .claude/, and the scratchpad. NOTE: notes/ is NOT
-# exempt — a new doc under notes/ is exactly the violation that occurred.
+# README*, and anything under .claude/. NOTE: neither notes/ nor the scratchpad
+# is exempt — a new doc under notes/ is exactly the violation that occurred.
 #
 # Escape hatch (deliberate + recorded): to create an approved new doc, add its
 # repo-relative or absolute path to  .claude/md_allowlist.txt  (one per line).
@@ -36,9 +36,9 @@ case "$fp" in
   *) exit 0 ;;
 esac
 
-# Baked exemptions (meta / scratch ONLY — deliberately NOT notes/).
+# Baked exemptions (meta ONLY — deliberately NOT notes/ or scratchpad).
 case "$fp" in
-  */CLAUDE.md|*/README.md|*/README*.md|*/.claude/*|*/scratchpad/*) exit 0 ;;
+  */CLAUDE.md|*/README.md|*/README*.md|*/.claude/*) exit 0 ;;
 esac
 
 # Editing an existing file is fine — only NEW files are "scattering".
