@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -1008,150 +1008,118 @@ without taxing the bulk. Code and arms retained: \code{model.use\_pair\_bias} (d
 \code{compare\_models/\_bigrun\_arm\_pairbias*}.
 
 % ==========================================================================
-\section{Behaviour near amplitude divergences and extrapolation}\label{sec:divergences}
+\section{Behaviour near amplitude divergences}\label{sec:divergences}
 % ==========================================================================
 
-So far the model has been judged mostly on \emph{aggregate} accuracy: whether one
-Lorentz-equivariant foundation model can \emph{learn} many processes jointly and
-\emph{transfer} (fine-tune) to new processes/orders at good pooled validation loss.
-A sharper, physics-driven question is how the model behaves on the \textbf{divergence
-structure} of the amplitudes --- the regions where $|\mathcal{M}|^2$ grows large or
-varies fastest (soft/collinear limits, $s$-channel resonances, production thresholds,
-Sudakov/IR logarithms). Does accuracy \textbf{degrade} there, and can the model
-\textbf{extrapolate} into those regions (sparsely-sampled tails and kinematics outside
-the training support)?
+An aggregate $\vlnr$ can be excellent while a thin, high-$|\mathcal{M}|^2$ tail is
+mispredicted --- and it is precisely the near-divergent regions (soft/collinear limits,
+$s$-channel resonances, thresholds) that dominate cross sections and are hardest for a
+surrogate. A useful amplitude model must be accurate \emph{where the physics lives}. We
+therefore measure the error in $\log|\mathcal{M}|^2$ \emph{phase-space-locally}, as a
+function of the kinematics and of the amplitude magnitude, rather than as a single pooled
+number.
 
-This matters because the peaked / near-divergent regions dominate cross sections and
-are the hardest for a surrogate: a foundation model is only useful if it is reliable
-\emph{where the physics lives}, not merely on average. An aggregate $\vlnr$ can look
-excellent while a thin, high-$|\mathcal{M}|^2$ tail is mispredicted. The evaluation is
-therefore reframed from a single pooled number to a \emph{phase-space-local} picture:
-error as a function of where one sits in phase space and of how large / how rare the
-amplitude is. All tooling lives under \code{analysis/divergences/}.
+\subsection{Two-body phase space and the collinear limit}
 
-\subsection{Questions}
-\begin{enumerate}
-  \item \textbf{Degradation map.} Bin the model error in $\log|\mathcal{M}|^2$ over the
-    physical phase space; is the worst error co-located with the divergences (low
-    $\sqrt{s}$ / resonance / forward--backward peaks / threshold)?
-  \item \textbf{Error vs.\ magnitude.} Does $|\Delta\log|\mathcal{M}|^2|$ rise with the
-    $|\mathcal{M}|^2$ percentile (systematically worse on the largest, most physical
-    events)?
-  \item \textbf{Interpolation vs.\ extrapolation.} Separate ``sparse but in-support''
-    from ``outside training support'': fine-tune on a restricted kinematic window
-    (e.g.\ $|\cos\theta^*|<0.8$) and measure error in the held-out window beyond the cut.
-  \item \textbf{Specifics.} Near-threshold $e^+e^-\to t\bar t$ ($\sqrt{s}\to2m_t$), the
-    $Z$ pole for $e^+e^-\to u\bar u$, and the genuine soft/collinear IR of the
-    real-emission channels ($u\bar u g$, $u\bar u gg$).
-\end{enumerate}
+For a $2\to2$ process the physical coordinates are the invariant $\sqrt{s}$ and the
+c.o.m.\ scattering angle $\cos\theta^*$. Across the jointly-pretrained tree processes of
+Table~\ref{tab:div_pretrain} and the fine-tuned NLO-virtual $u\bar u,\,t\bar t$, the model
+reproduces $\log|\mathcal{M}|^2$ over the whole plane to RMS
+$\Delta\log|\mathcal{M}|^2\sim10^{-4}$, with the residual concentrated at the phase-space
+\emph{boundaries} ($\cos\theta^*\to\pm1$, $\sqrt{s}$ extremes) rather than at the physical
+peaks.
 
-\subsection{Method and a faithfulness gotcha}
-
-For each measured process, \code{analysis/divergences/extract*.py} reloads a run's exact
-config / preprocessing / $\mu$P model, loads the checkpoint, forwards on GPU
-(\code{sbatch}; the xformers block-diagonal attention is CUDA-only, so a CPU forward at
-$\sim\!1.5$\,s/event is infeasible), and recovers exact physical kinematics by inverting
-the deterministic \code{default\_rng(42)} event shuffle back to the raw rows (so
-$\sqrt{s}$ and $\cos\theta^*$ are Lorentz invariants read straight off the raw momenta).
-The extractors are preprocessing-scope-aware (GLOBAL vs.\ PER-DATASET amplitude stats,
-detected via \code{len(prepd\_mean)>1}) and guard alignment/stats with a per-event
-$\mathrm{preprocess}(\mathrm{raw\_amp}) = $ stored-truth check (max\,$|\Delta|=0$).
-
-A reproduction must match each run's own logged per-split MSE before an error map can be
-trusted. The NLO fine-tune runs (2026-06-17) \emph{predate} the name-based
-\code{amp\_orders} resolver (2026-06-26): the stale 8-entry \code{amp\_orders} fed
-\code{order\_labels}$=[0,0]$ at training time, whereas today's resolver derives $[1,0]$
-from ``nlo\_virt'' in the dataset name. Feeding that wrong constant degraded \emph{every}
-prediction by $20$--$20000\times$ (even memorised train events); pinning the training-time
-value restores a match to $4$--$5$ significant figures. Lesson: always cross-check the
-extracted MSE against the training log.
-
-\subsection{Fine-tuned NLO virtual, $e^+e^-\to u\bar u$ and $t\bar t$}
-
-Best fine-tunes (lowest $\vlnr$ over all \code{sweeps/*/results/*.json}, from
-\code{pretrain\_full\_nh8/trial\_0271}, $D=100$k, $40$k steps). Over $100$k events each,
-the model reproduces $\log|\mathcal{M}|^2$ across the \emph{whole} $2\to2$ phase space:
-RMS $\Delta\log|\mathcal{M}|^2 \approx 1.7\mathrm{e}{-}4$ ($u\bar u$),
-$9.4\mathrm{e}{-}5$ ($t\bar t$). The near-divergent structure (the $1/s$ growth toward
-low $\sqrt{s}$, the $t\bar t$ threshold, the forward/backward angular peaks) is tracked
-\emph{through} the sharp rises; the largest (still $\sim\!10^{-4}$) errors sit at the
-phase-space boundaries ($\cos\theta^*\to\pm1$, $\sqrt{s}$ extremes) and sparse corners,
-not at the physical peaks. Caveat: these virtual $2\to2$ amplitudes have only mild
-``divergences'' (finite $1/s$ growth, threshold, angular peaks), no explicit
-soft/collinear singularity.
-
-\subsection{Jointly-pretrained $2\to2$ (zero-shot, not fine-tuned)}
-
-The same view for processes learned \emph{jointly} in the 8-process pretrain
-\code{pretrain\_full\_nh8/trial\_0271}. Three well-learned $2\to2$ processes with
-distinct structures (Table~\ref{tab:div_pretrain}) are all reproduced at RMS
-$\Delta\log|\mathcal{M}|^2\approx 3.5\text{--}4.9\mathrm{e}{-}4$. The collinear divergence
-of $\gamma\gamma$ ($\log|\mathcal{M}|^2$ rising to $\approx10$ at $\cos\theta^*\to\pm1$)
-and the forward peak of $WW$ are tracked \emph{through} the singular region. So the ``no
-degradation at the divergence, small error only at the phase-space boundary'' behaviour
-is a property of the pretrained foundation model, not just of fine-tuning.
+A genuine divergence occupies a razor-thin sliver: the $t/u$-channel collinear pole of
+$e^+e^-\to\gamma\gamma$ ($|\mathcal{M}|^2\sim1/\sin^2\theta$) puts only $0.003\%$ of events
+above $\log|\mathcal{M}|^2=6$, all at $|\cos\theta^*|>0.9999$ (peak $9.86$), so uniform
+$\cos\theta^*$ binning averages it away. Resolving it needs a coordinate that stretches the
+beam directions,
+\begin{equation}
+  \eta \;=\; \mathrm{sign}(\cos\theta^*)\,\log_{10}\frac{1}{1-|\cos\theta^*|},
+  \label{eq:collinear}
+\end{equation}
+under which the pole becomes a linear ramp, $\log|\mathcal{M}|^2\sim-\ln(1-|\cos\theta^*|)$.
+The model follows this ramp up to $\log|\mathcal{M}|^2\approx10$ for $\gamma\gamma$
+(Fig.~\ref{fig:div_gg}); $W^+W^-$ gives an asymmetric forward-only ramp ($t$-channel $\nu$
+exchange) and $u\bar u$ a flat control, each reproduced with error rising only in the
+sparsest, most collinear bins.
 
 \begin{table}[H]
 \centering
-\caption{Well-learned jointly-pretrained $2\to2$ processes (zero-shot).}
+\caption{Jointly-pretrained (zero-shot) $2\to2$ processes and their angular structure.}
 \label{tab:div_pretrain}
 \begin{tabular}{@{}lll@{}}
 \hline
-process & pretrain test MSE & divergence structure \\
+process & test MSE & angular structure \\
 \hline
-$e^+e^-\to\gamma\gamma$ & $9.0\mathrm{e}{-}10$ & $t/u$-channel collinear peaks at
+$e^+e^-\to\gamma\gamma$ & $9.0\mathrm{e}{-}10$ & $t/u$-channel collinear pole at
   $\cos\theta^*\to\pm1$ ($\sim1/\sin^2\theta$), $\sqrt{s}$-independent \\
-$e^+e^-\to W^+W^-$ & $2.5\mathrm{e}{-}8$ & $t$-channel $\nu$ exchange, forward peak
-  growing with $\sqrt{s}$ \\
-$e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, no
-  angular divergence (control) \\
+$e^+e^-\to W^+W^-$ & $2.5\mathrm{e}{-}8$ & $t$-channel $\nu$ exchange, forward peak growing
+  with $\sqrt{s}$ \\
+$e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, no angular
+  divergence (control) \\
 \hline
 \end{tabular}
 \end{table}
 
-\paragraph{Collinear-resolved view.} Mean-per-bin maps hide the divergence: for
-$\gamma\gamma$ only $0.003\%$ of events exceed $\log|\mathcal{M}|^2=6$, all at
-$|\cos\theta^*|>0.9999$ (peak $9.86$), so a linear-$\cos\theta^*$ bin averages
-$\log|\mathcal{M}|^2$ down to $\sim+0.35$ in its outer bin. Re-plotting against the signed
-collinear coordinate
-\[
-  \eta \;=\; \mathrm{sign}(\cos\theta^*)\,\log_{10}\!\frac{1}{1-|\cos\theta^*|}
-  \qquad(\eta=0\text{ central},\ \eta\to\pm6\text{ collinear})
-\]
-turns the divergence into a visible linear ramp ($\log|\mathcal{M}|^2\sim-\ln(1-|\cos\theta^*|)$).
-Plotting mean \emph{and} max per $\eta$-bin: $\gamma\gamma$ is a symmetric V ramping to
-$\approx+8$ at both edges; $WW$ an asymmetric forward-only ramp; $u\bar u$ flat (control;
-the mild forward tilt is the real $\gamma/Z$ forward--backward asymmetry). The model tracks
-truth up the ramps; error grows only in the most collinear, sparsest bins.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{phase_space_pretrain_aa.pdf}
+  \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained (zero-shot).}
+  $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$ --- truth, model,
+  error (top); $\sqrt{s}$/$\cos\theta^*$ projections and predicted-vs-true (middle); and
+  the collinear-resolved ramp in $\eta$ of Eq.~\eqref{eq:collinear} (bottom), where the
+  model tracks the collinear pole to $\log|\mathcal{M}|^2\approx10$. Error concentrates at
+  the boundaries, not the pole.}
+  \label{fig:div_gg}
+\end{figure}
 
-\subsection{Real IR channels: $e^+e^-\to u\bar u g$ and $u\bar u gg$}
+\subsection{Real infrared singularities}
 
-The genuine test: gluon-emission channels with real soft ($E_g\to0$) and collinear
-($g\parallel$ quark) singularities, from the same joint pretrain (zero-shot). IR
-observables are built as Lorentz invariants from the raw momenta: the gluon energy
-fraction $x_g = 2(p_g\!\cdot\!Q)/s$ (softest $x_{g,\min}$) and the master resolution
-variable $y_{\min}=\min_{ij}(p_i+p_j)^2/s$ over gluon-involving coloured pairs, which
-$\to0$ in both the soft and collinear limits.
-\begin{itemize}
-  \item \textbf{$e^+e^-\to u\bar u g$} (pretrain MSE $4.4\mathrm{e}{-}6$): the model
-    reproduces the soft ($\sim1/x_g^2$) and soft$+$collinear ($\sim1/y_{\min}$) ramps and
-    the full bremsstrahlung Dalitz (collinear walls at $x_q\to1$, $x_{\bar q}\to1$ meeting
-    at the soft $(1,1)$ corner) --- truth $\approx$ model across $\sim\!30$ orders of
-    magnitude in $|\mathcal{M}|^2$, RMS $\Delta\log|\mathcal{M}|^2 = 0.007$. No IR
-    degradation.
-  \item \textbf{$e^+e^-\to u\bar u gg$} (pretrain MSE $2.3\mathrm{e}{-}4$, the hardest
-    process in the set): the model still tracks the \emph{mean} IR ramps into the deep IR,
-    but this is the first clear case of divergence-region degradation --- per-event error
-    grows monotonically into the IR, $\langle|\Delta\log|\mathcal{M}|^2|\rangle\approx0.03$
-    at $y_{\min}\!\sim\!0.1 \to 0.27$ at $y_{\min}\!\sim\!10^{-4}$, and the pred-vs-true
-    band widens (RMS $0.085$); the error maps localise it to the deep soft/collinear corner.
-\end{itemize}
+The decisive test is real gluon emission. For $e^+e^-\to u\bar u g\,(gg)$ the soft
+($E_g\to0$) and collinear ($g\parallel$ quark) singularities are exposed by two invariant
+resolution variables, the gluon energy fraction and the minimum coloured-pair invariant,
+\begin{equation}
+  x_g \;=\; \frac{2\,p_g\!\cdot\!Q}{s}, \qquad
+  y_{\min} \;=\; \min_{i<j}\frac{(p_i+p_j)^2}{s}
+  \qquad (Q=p_{e^-}+p_{e^+}),
+  \label{eq:ir}
+\end{equation}
+the minimum taken over gluon-involving coloured pairs; both $\to0$ in the soft/collinear
+limit. For $u\bar u g$ the model reproduces the soft ($\sim1/x_g^2$) and soft$+$collinear
+($\sim1/y_{\min}$) ramps and the full bremsstrahlung Dalitz plane
+(Fig.~\ref{fig:div_dalitz}), matching truth across $\sim\!30$ orders of magnitude in
+$|\mathcal{M}|^2$ (RMS $0.007$). The six-particle $u\bar u gg$, the hardest process in the
+mixture, still tracks the mean ramps but is the one case where accuracy \emph{degrades
+into} the singular region: the per-event error grows from
+$\langle|\Delta\log|\mathcal{M}|^2|\rangle\approx0.03$ at $y_{\min}\sim0.1$ to $0.27$ at
+$y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 
-\begin{principle} Across all $2\to2$ (including the $\gamma\gamma$ collinear divergence)
-and $e^+e^-\to u\bar u g$, accuracy does \emph{not} degrade at the divergences --- only at
-phase-space boundaries / sparse bins. Degradation \emph{into} the singular region appears
-only for the hardest, highest-multiplicity process ($u\bar u gg$) in its deepest
-soft/collinear limits, which is the natural next fine-tuning target.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ir_pretrain_uug_dalitz.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. The collinear
+  poles lie on the $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$
+  corner; the model (centre) reproduces the truth (left) with a residual (right) that is
+  small even along the singular edges.}
+  \label{fig:div_dalitz}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ir_pretrain_uugg.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process.} $\log|\mathcal{M}|^2$ vs
+  the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom) are tracked
+  into the deep IR, but the model error (blue, and the error map top-right) grows toward
+  small $y_{\min}$ --- the sole case of degradation \emph{into} a singularity.}
+  \label{fig:div_uugg}
+\end{figure}
+
+\begin{principle} The model holds at the amplitude divergences: across all $2\to2$
+(including the $\gamma\gamma$ collinear pole) and $e^+e^-\to u\bar u g$, error rises only at
+phase-space boundaries and undersampled bins, not at the physical singularities.
+Degradation \emph{into} a divergence appears only for the highest-multiplicity process
+($u\bar u gg$) in its deepest soft/collinear limit --- the natural next fine-tuning target.
 \end{principle}
 
 % ==========================================================================
