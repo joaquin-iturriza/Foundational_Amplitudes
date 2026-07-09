@@ -7,6 +7,7 @@ threshold) and whether accuracy degrades there.
 Produces, per process, ONE figure (png + pdf):
   row 1 : <log|M|^2> true | predicted | mean |Δlog|M|^2| (error) 2D maps
   row 2 : projection vs sqrt_s | projection vs cos_theta | pred-vs-true hexbin
+  row 3 : collinear-resolved log|M|^2 vs eta (mean & max, truth vs model) | error vs eta
 CPU only.
 """
 import argparse
@@ -23,6 +24,15 @@ from scipy.stats import binned_statistic, binned_statistic_2d
 def load(npz):
     d = np.load(npz, allow_pickle=True)
     return d
+
+
+def collinear_coord(cos):
+    """Signed collinear coordinate that stretches both beam directions so the
+    collinear divergence (crammed against cos->+-1, washed out by mean-per-bin in
+    linear cos) becomes a visible linear ramp:
+        eta = sign(cos) * log10( 1/(1-|cos|) );  eta=0 central, eta->+-6 collinear."""
+    a = np.clip(1.0 - np.abs(cos), 1e-7, None)
+    return -np.sign(cos) * np.log10(a)
 
 
 def _map(x, y, z, xbins, ybins, stat="mean"):
@@ -60,12 +70,12 @@ def make_figure(npz, process_label, out_base, split="all"):
     vmin = np.nanpercentile(true_map, 1)
     vmax = np.nanpercentile(true_map, 99)
 
-    fig = plt.figure(figsize=(15.5, 9.2))
-    gs = GridSpec(2, 3, figure=fig, hspace=0.32, wspace=0.30,
-                  height_ratios=[1.0, 0.95])
+    fig = plt.figure(figsize=(15.5, 13.4))
+    gs = GridSpec(3, 3, figure=fig, hspace=0.38, wspace=0.30,
+                  height_ratios=[1.0, 0.95, 0.95])
     fig.suptitle(
         f"{process_label}: model vs truth across phase space  "
-        f"(N={n:,}, split={split})", fontsize=14, y=0.98)
+        f"(N={n:,}, split={split})", fontsize=14, y=0.99)
 
     # ---- row 1: 2D maps ----
     def draw_map(ax, M, title, cmap, vmn, vmx, cbar_label):
@@ -139,6 +149,45 @@ def make_figure(npz, process_label, out_base, split="all"):
     axsc.text(0.04, 0.96, f"RMS Δ={rms:.3g}\nMAE Δ={mae:.3g}",
               transform=axsc.transAxes, va="top", ha="left", fontsize=8,
               bbox=dict(boxstyle="round", fc="white", alpha=0.7))
+
+    # ---- row 3: collinear-resolved (stretch cos->+-1 so the divergence shows) ----
+    eta = collinear_coord(cos_t)
+    ebins = np.linspace(-6, 6, 49)
+    ec = 0.5 * (ebins[:-1] + ebins[1:])
+
+    def ebin(v, how):
+        r, _, _ = binned_statistic(eta, v, statistic=how, bins=ebins)
+        return r
+    t_mean, p_mean = ebin(true_l, "mean"), ebin(pred_l, "mean")
+    t_max, p_max = ebin(true_l, "max"), ebin(pred_l, "max")
+    e_err = ebin(np.abs(resid), "mean")
+
+    axcol = fig.add_subplot(gs[2, 0:2])
+    axcol.plot(ec, t_mean, color="k", lw=1.9, label="truth (mean)")
+    axcol.plot(ec, p_mean, color="crimson", lw=1.3, ls="--", label="model (mean)")
+    axcol.plot(ec, t_max, color="k", lw=1.0, ls=":", alpha=0.7, label="truth (max)")
+    axcol.plot(ec, p_max, color="crimson", lw=1.0, ls=":", alpha=0.7,
+               label="model (max)")
+    axcol.axvline(0, color="0.7", lw=0.8, zorder=0)
+    axcol.set_xlabel(r"$\eta=\mathrm{sign}(\cos\theta^*)\,\log_{10}\frac{1}{1-|\cos\theta^*|}$"
+                     r"   ($\leftarrow$ backward $\cdot$ central $\cdot$ forward $\rightarrow$)")
+    axcol.set_ylabel(r"$\log|\mathcal{M}|^2$")
+    axcol.set_title("collinear-resolved (both beam directions stretched)", fontsize=11)
+    axcol.legend(fontsize=8, ncol=2, loc="upper center")
+    axt = axcol.secondary_xaxis("top")
+    et = [-6, -4, -2, 0, 2, 4, 6]
+    axt.set_xticks(et)
+    axt.set_xticklabels(["0" if e == 0 else f"{1.0 - 10.0**(-abs(e)):.6g}" for e in et],
+                        fontsize=7)
+    axt.set_xlabel(r"$|\cos\theta^*|$", fontsize=8)
+
+    axce = fig.add_subplot(gs[2, 2])
+    axce.plot(ec, e_err, color="steelblue", lw=1.4)
+    axce.axvline(0, color="0.7", lw=0.8, zorder=0)
+    axce.set_xlabel(r"$\eta$")
+    axce.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$", fontsize=9)
+    axce.set_ylim(bottom=0)
+    axce.set_title("error into the collinear region", fontsize=11)
 
     for ext in ("png", "pdf"):
         fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
