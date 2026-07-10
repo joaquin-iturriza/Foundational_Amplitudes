@@ -49,11 +49,14 @@ def main():
     ap.add_argument("--tags", default="000,005,015,050,100")
     ap.add_argument("--out_base", default=os.path.join(here, "figs", "addback_curve"))
     ap.add_argument("--summary_out", default=os.path.join(here, "heldout_eval_summary.json"))
+    ap.add_argument("--npz_prefix", default="heldout_eval_ft_f", help="eval npz basename prefix")
+    ap.add_argument("--title", default=r"$e^+e^-\to u\bar u g$ hold-out / add-back: held-out deep-IR "
+                                        r"($y_{\min}<c$) error vs add-back fraction $f$")
     args = ap.parse_args()
 
     S = []
     for tag in [t.strip() for t in args.tags.split(",")]:
-        npz = os.path.join(args.eval_dir, f"heldout_eval_ft_f{tag}.npz")
+        npz = os.path.join(args.eval_dir, f"{args.npz_prefix}{tag}.npz")
         r = summarize(npz)
         r.update(tag=tag, f=int(tag) / 100.0)
         S.append(r)
@@ -70,8 +73,7 @@ def main():
 
     os.makedirs(os.path.dirname(args.out_base), exist_ok=True)
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(12.5, 5.0))
-    fig.suptitle(r"$e^+e^-\to u\bar u g$ hold-out / add-back: held-out deep-IR "
-                 r"($y_{\min}<c$) error vs add-back fraction $f$", fontsize=12.5)
+    fig.suptitle(args.title, fontsize=12.5)
 
     axL.plot(fpos, mse, "o-", color="crimson", lw=1.8, label=r"MSE $\Delta\log|\mathcal{M}|^2$")
     axL.plot(fpos, mae, "s--", color="steelblue", lw=1.3, label=r"MAE")
