@@ -30,8 +30,9 @@ from extract_ir import ir_observables  # noqa
 
 EDGES = np.array([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0])
 CEN = np.sqrt(EDGES[:-1] * EDGES[1:])          # geometric bin centers
-COL = {"uniform": "#4C72B0", "antenna": "#C44E52"}
-LAB = {"uniform": "uniform (flat RAMBO)", "antenna": r"antenna $\propto 1/y_{\min}$"}
+COL = {"uniform": "#4C72B0", "antenna": "#C44E52", "mixture": "#55A868"}
+LAB = {"uniform": "uniform (flat RAMBO)", "antenna": r"antenna $\propto 1/y_{\min}$",
+       "mixture": "mixture (50% flat + 50% antenna)"}
 
 
 def binned_mse(y, resid):
@@ -62,9 +63,10 @@ def main():
     ap.add_argument("--data_root", default=REPO)
     ap.add_argument("--out_base", default=os.path.join(here, "figs", "deep_sampling_uniform_vs_antenna"))
     ap.add_argument("--summary_out", default=os.path.join(here, "deep_sampling_summary.json"))
+    ap.add_argument("--modes", default="uniform,antenna", help="comma list of sampler tags")
     args = ap.parse_args()
 
-    modes = ["uniform", "antenna"]
+    modes = [m.strip() for m in args.modes.split(",")]
     res = {}
     for mode in modes:
         d = np.load(os.path.join(args.eval_dir, f"{args.npz_prefix}{mode}.npz"))
@@ -82,20 +84,21 @@ def main():
     fig.suptitle(r"$e^+e^-\to u\bar u g$ deep-IR sampling A/B  (same base22, same 400k events, "
                  r"same held-out test — only sampling density differs)", fontsize=12)
 
-    # Left: per-decade MSE
+    # Left: per-decade MSE (natural log axis: deeper IR = smaller y_min = left)
     for mode in modes:
         axL.plot(CEN, res[mode]["mse"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
     axL.set_xscale("log"); axL.set_yscale("log")
-    axL.set_xlabel(r"$y_{\min}$  (deeper IR $\to$ left)")
+    axL.set_xlabel(r"$y_{\min}$  ($\leftarrow$ deeper IR / soft-collinear pole)")
     axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$ on held-out test (per decade)")
     axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=10)
-    axL.invert_xaxis()
 
-    # Right: training coverage per decade
-    w = 0.38
+    # Right: training coverage per decade (grouped bars, centered per decade)
+    nb = len(modes)
+    w = 0.8 / nb
     xpos = np.arange(len(CEN))
     for i, mode in enumerate(modes):
-        axR.bar(xpos + (i - 0.5) * w, np.maximum(res[mode]["cov"], 0.5), width=w,
+        off = (i - (nb - 1) / 2.0) * w
+        axR.bar(xpos + off, np.maximum(res[mode]["cov"], 0.5), width=w,
                 color=COL[mode], alpha=0.85, label=LAB[mode])
     axR.set_yscale("log")
     axR.set_xticks(xpos)

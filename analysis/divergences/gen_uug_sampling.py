@@ -102,6 +102,20 @@ def sample_uniform(n_events, sqrts_min, sqrts_max, cuts, rng):
         n_events, sqrts_min, sqrts_max, [0.0, 0.0, 0.0], PDG, rng=rng, cuts=cuts)
 
 
+def sample_mixture(n_events, sqrts_min, sqrts_max, y_lo, cuts, rng, frac_antenna=0.5):
+    """frac_antenna of the events from the antenna sampler (fills the singular decades),
+    the rest flat RAMBO (keeps the O(1) bulk). One dataset, shuffled together — so the
+    model sees both the pole AND the bulk at fixed event count."""
+    n_ant = int(round(frac_antenna * n_events))
+    n_uni = n_events - n_ant
+    ev_a, sq_a = sample_antenna(n_ant, sqrts_min, sqrts_max, y_lo, cuts, rng)
+    ev_u, sq_u = sample_uniform(n_uni, sqrts_min, sqrts_max, cuts, rng)
+    events = ev_a + ev_u
+    sqrts = np.concatenate([sq_a, sq_u])
+    idx = rng.permutation(n_events)
+    return [events[i] for i in idx], sqrts[idx]
+
+
 def build(events, sqrts):
     """Exact tree |M|^2 via the compiled C++ standalone (fixed α_s=0.118)."""
     with mp.CppDriverPipe(f"{STANDALONE}/driver", STANDALONE) as pipe:
@@ -114,11 +128,12 @@ def build(events, sqrts):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", required=True, choices=["uniform", "antenna"])
+    ap.add_argument("--mode", required=True, choices=["uniform", "antenna", "mixture"])
     ap.add_argument("--n", type=int, default=400000)
     ap.add_argument("--sqrts_min", type=float, default=91.0)
     ap.add_argument("--sqrts_max", type=float, default=1000.0)
     ap.add_argument("--y_lo", type=float, default=1e-7, help="antenna log-uniform floor")
+    ap.add_argument("--mix_frac", type=float, default=0.5, help="mixture: antenna fraction")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True, help="output .npy (dataset) or .npz (test)")
     ap.add_argument("--as_test", action="store_true",
@@ -131,6 +146,10 @@ def main():
     if args.mode == "antenna":
         events, sqrts = sample_antenna(args.n, args.sqrts_min, args.sqrts_max,
                                        args.y_lo, LOW_CUTS, rng)
+    elif args.mode == "mixture":
+        print(f"  mixture: antenna_frac={args.mix_frac}", flush=True)
+        events, sqrts = sample_mixture(args.n, args.sqrts_min, args.sqrts_max,
+                                       args.y_lo, LOW_CUTS, rng, args.mix_frac)
     else:
         events, sqrts = sample_uniform(args.n, args.sqrts_min, args.sqrts_max,
                                        LOW_CUTS, rng)
