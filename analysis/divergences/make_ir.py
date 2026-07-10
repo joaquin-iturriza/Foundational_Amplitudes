@@ -45,6 +45,63 @@ def _anchor_offset(coord, val, slope, deep_frac=40.0):
     return float(np.nanmedian(val[sel] - slope * coord[sel]))
 
 
+def make_collinear_ramp(d, label, out_base,
+                        xg_bands=((0.25, 0.45), (0.45, 0.65), (0.65, 0.85))):
+    """PURE COLLINEAR ramp for ee->q qbar g, complementary to the soft (x_g) ramp.
+    Uses 1-x_q = (Q-p_q)^2/s = (p_qbar+p_g)^2/s, the normalized qbar-g invariant,
+    which ->0 iff qbar || g (collinear) with the gluon staying HARD; symmetrized to
+    the nearest collinear edge via min(1-x_q, 1-x_qbar). Restricting to bands of
+    fixed, O(1) x_g switches the SOFT pole off, so only the collinear pole survives:
+    |M|^2 ~ 1/(1-x_q) => slope -ln10 vs log10, and the ramp is x_g-INDEPENDENT
+    (collinear factorization -> parallel lines offset only by the splitting kernel)."""
+    tl, pl = d["true_logamp"], d["pred_logamp"]
+    resid = pl - tl
+    xq, xqb, xg = d["x_q"], d["x_qbar"], d["x_gmin"]
+    tcol = np.clip(np.minimum(1.0 - xq, 1.0 - xqb), 1e-6, None)   # nearest collinear invariant
+    lt = np.log10(tcol)
+    ln10 = np.log(10.0)
+
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13.6, 5.0))
+    fig.suptitle(rf"{label}: pure COLLINEAR ramp at fixed hard $x_g$   "
+                 rf"($1-x_q=(p_{{\bar q}}+p_g)^2/s\to0$, soft pole switched off)",
+                 fontsize=12)
+    colors = plt.cm.plasma(np.linspace(0.12, 0.78, len(xg_bands)))
+    anchor_off, span = None, []
+    for (lo, hi), col in zip(xg_bands, colors):
+        m = (xg >= lo) & (xg < hi)
+        if int(m.sum()) < 500:
+            continue
+        bins = np.linspace(np.percentile(lt[m], 1.0), np.percentile(lt[m], 99.0), 40)
+        c = 0.5 * (bins[:-1] + bins[1:]); span.append(c)
+        tm, _, _ = binned_statistic(lt[m], tl[m], "mean", bins=bins)
+        pm, _, _ = binned_statistic(lt[m], pl[m], "mean", bins=bins)
+        am, _, _ = binned_statistic(lt[m], np.abs(resid[m]), "mean", bins=bins)
+        lbl = rf"$x_g\in[{lo:.2f},{hi:.2f}]$"
+        axL.plot(c, tm, color=col, lw=2.0, label=lbl + " truth")
+        axL.plot(c, pm, color=col, lw=1.2, ls="--", label=lbl + " model")
+        axR.plot(c, am, color=col, lw=1.6, label=lbl)
+        if anchor_off is None:              # anchor the analytic slope to the first valid band
+            anchor_off = _anchor_offset(c, tm, -ln10)
+    if anchor_off is not None:
+        allc = np.concatenate(span)
+        xline = np.linspace(np.nanmin(allc), np.nanmax(allc), 50)
+        axL.plot(xline, -ln10 * xline + anchor_off, color="darkgreen", lw=1.8, ls="-.",
+                 zorder=5, label=r"analytic $\propto 1/(1-x_q)$ (slope $-\ln 10$)")
+    axL.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear, $\bar q\parallel g$)")
+    axL.set_ylabel(r"$\log|\mathcal{M}|^2$")
+    axL.set_title("collinear ramp: truth solid, model dashed", fontsize=11)
+    axL.legend(fontsize=7, ncol=2, loc="lower right")
+    axR.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear)")
+    axR.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
+    axR.set_title("model error into the collinear limit", fontsize=11)
+    axR.legend(fontsize=8, loc="upper left"); axR.set_ylim(bottom=0)
+    fig.tight_layout()
+    for ext in ("png", "pdf"):
+        fig.savefig(f"{out_base}_collinear.{ext}", dpi=140, bbox_inches="tight")
+    plt.close(fig)
+    print(f"wrote {out_base}_collinear.png/.pdf")
+
+
 def make_ir(npz, label, out_base):
     d = np.load(npz)
     tl, pl = d["true_logamp"], d["pred_logamp"]
@@ -170,6 +227,7 @@ def make_ir(npz, label, out_base):
             figd.savefig(f"{out_base}_dalitz.{ext}", dpi=140, bbox_inches="tight")
         plt.close(figd)
         print(f"wrote {out_base}_dalitz.png/.pdf  (analytic-vs-truth corr={corr:.3f})")
+        make_collinear_ramp(d, label, out_base)
 
 
 def main():
