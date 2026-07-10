@@ -77,8 +77,10 @@ def make_collinear_ramp(d, label, out_base,
         pm, _, _ = binned_statistic(lt[m], pl[m], "mean", bins=bins)
         am, _, _ = binned_statistic(lt[m], np.abs(resid[m]), "mean", bins=bins)
         lbl = rf"$x_g\in[{lo:.2f},{hi:.2f}]$"
-        axL.plot(c, tm, color=col, lw=2.0, label=lbl + " truth")
-        axL.plot(c, pm, color=col, lw=1.2, ls="--", label=lbl + " model")
+        axL.plot(c, tm, color=col, lw=4.2, alpha=0.30, solid_capstyle="round",
+                 label=lbl + " truth", zorder=2)
+        axL.plot(c, pm, color=col, lw=1.3, ls=(0, (4, 2)), marker="o", ms=2.6,
+                 markevery=3, label=lbl + " model", zorder=6)
         axR.plot(c, am, color=col, lw=1.6, label=lbl)
         if anchor_off is None:              # anchor the analytic slope to the first valid band
             anchor_off = _anchor_offset(c, tm, -ln10)
@@ -89,7 +91,7 @@ def make_collinear_ramp(d, label, out_base,
                  zorder=5, label=r"analytic $\propto 1/(1-x_q)$ (slope $-\ln 10$)")
     axL.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear, $\bar q\parallel g$)")
     axL.set_ylabel(r"$\log|\mathcal{M}|^2$")
-    axL.set_title("collinear ramp: truth solid, model dashed", fontsize=11)
+    axL.set_title("collinear ramp: truth faint band, model dashed+markers", fontsize=11)
     axL.legend(fontsize=7, ncol=2, loc="lower right")
     axR.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear)")
     axR.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
