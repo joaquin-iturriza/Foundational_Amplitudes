@@ -66,6 +66,8 @@ def boost_to_com_and_angle(P):
 
 
 def load_finetuned_state(ckpt):
+    if not ckpt.endswith(".gz") and not os.path.exists(ckpt) and os.path.exists(ckpt + ".gz"):
+        ckpt = ckpt + ".gz"          # tolerate a checkpoint gzipped by cleanup after training
     if ckpt.endswith(".gz"):
         with gzip.open(ckpt, "rb") as f:
             buf = io.BytesIO(f.read())
