@@ -1157,10 +1157,15 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 together, we isolate the pure \emph{collinear} pole by binning $\log|\mathcal{M}|^2$ against
 the $\bar q g$ invariant $1-x_q=(p_{\bar q}+p_g)^2/s$ at \emph{fixed, hard} $x_g$, which
 switches the soft pole off (Fig.~\ref{fig:div_uug_coll}). In three disjoint $x_g$ bands the
-ramp is a straight line of the universal slope $-\ln10$ ($|\mathcal{M}|^2\sim1/(1-x_q)$) and
-is \emph{$x_g$-independent} --- the bands are parallel, offset only by the collinear
-splitting kernel, the hallmark of collinear factorization --- and the model tracks each band
-to $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear limit.
+ramp is a straight line of the universal slope $-\ln10$ ($|\mathcal{M}|^2\sim1/(1-x_q)$):
+the fitted deep-collinear slopes are $-2.15,-2.24,-2.26$ against the analytic $-2.303$, and
+are \emph{$x_g$-independent} (the pole exponent). The bands are parallel, offset only by the
+collinear \emph{residue} --- and that residue is quantitatively the DGLAP $q\to qg$ kernel
+$P_{qq}(z)\propto(1+z^2)/(1-z)$ with $z=x_{\bar q}/(x_{\bar q}+x_g)$: the measured offsets
+relative to the hardest-gluon band, $\Delta=-0.62,-1.08$ at $1-x_q=10^{-2}$, track the
+band-averaged $\Delta\langle\ln P(z)\rangle=-0.54,-0.91$ to $\lesssim0.2$. This is collinear
+factorization made quantitative, and the model tracks each band to
+$\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear limit.
 
 \begin{figure}[H]
   \centering
@@ -1271,10 +1276,11 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
   \centering
   \includegraphics[width=\textwidth]{heldout_resid_f000.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region}, in the IR plane of
-  Eq.~\eqref{eq:ir}. The model mean plateaus off the IR ramp (bottom-left, red vs black),
-  predictions saturate against a ceiling (predicted-vs-true, bottom-right), and the error
-  concentrates in the soft/collinear corner (top-right) --- the model, never having seen
-  the region, cannot reproduce the divergence's growth.}
+  Eq.~\eqref{eq:ir}. The model mean (red) plateaus \emph{off} the IR ramp (bottom-left),
+  while truth (black) lies on the analytic $1/y_{\min}$ slope (green); predictions
+  saturate against a ceiling (predicted-vs-true, bottom-right), and the error concentrates
+  in the soft/collinear corner (top-right) --- the model, never having seen the region,
+  cannot reproduce the divergence's growth.}
   \label{fig:div_holdout_f0}
 \end{figure}
 
@@ -1282,9 +1288,10 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
   \centering
   \includegraphics[width=\textwidth]{heldout_resid_f100.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region.} With the
-  divergent region back in the training support the IR ramp is tracked into the deep IR,
-  the predicted-vs-true ceiling is gone, and the error is flat and small across the
-  plane --- contrast Fig.~\ref{fig:div_holdout_f0}.}
+  divergent region back in the training support the IR ramp (analytic $1/y_{\min}$ slope,
+  green) is tracked into the deep IR by both truth and model, the predicted-vs-true ceiling
+  is gone, and the error is flat and small across the plane (note the $\sim\!25\times$
+  smaller error axis) --- contrast Fig.~\ref{fig:div_holdout_f0}.}
   \label{fig:div_holdout_f1}
 \end{figure}
 

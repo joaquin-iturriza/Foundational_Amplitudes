@@ -60,13 +60,20 @@ def make_collinear_ramp(d, label, out_base,
     tcol = np.clip(np.minimum(1.0 - xq, 1.0 - xqb), 1e-6, None)   # nearest collinear invariant
     lt = np.log10(tcol)
     ln10 = np.log(10.0)
+    # DGLAP momentum fraction z of the nearest collinear split (qbar||g -> parent qbar,
+    # else q||g), from energy fractions; P_qq(z) ~ (1+z^2)/(1-z) sets the pole RESIDUE,
+    # i.e. the x_g-dependent vertical offset between otherwise-parallel ramps.
+    zfrac = np.where((1.0 - xq) <= (1.0 - xqb), xqb / (xqb + xg), xq / (xq + xg))
+    zfrac = np.clip(zfrac, 1e-4, 1.0 - 1e-4)
+    logP = np.log((1.0 + zfrac ** 2) / (1.0 - zfrac))
+    C0 = -2.0                                       # reference log10(1-x_q) for offset compare
 
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(13.6, 5.0))
     fig.suptitle(rf"{label}: pure COLLINEAR ramp at fixed hard $x_g$   "
                  rf"($1-x_q=(p_{{\bar q}}+p_g)^2/s\to0$, soft pole switched off)",
                  fontsize=12)
     colors = plt.cm.plasma(np.linspace(0.12, 0.78, len(xg_bands)))
-    anchor_off, span = None, []
+    anchor_off, span, fits = None, [], []
     for (lo, hi), col in zip(xg_bands, colors):
         m = (xg >= lo) & (xg < hi)
         if int(m.sum()) < 500:
@@ -76,14 +83,30 @@ def make_collinear_ramp(d, label, out_base,
         tm, _, _ = binned_statistic(lt[m], tl[m], "mean", bins=bins)
         pm, _, _ = binned_statistic(lt[m], pl[m], "mean", bins=bins)
         am, _, _ = binned_statistic(lt[m], np.abs(resid[m]), "mean", bins=bins)
-        lbl = rf"$x_g\in[{lo:.2f},{hi:.2f}]$"
+        # slope fit over the deep-collinear (linear) portion where the pole dominates
+        fitsel = np.isfinite(tm) & (c < -1.0)
+        slope_fit = ybar = logPbar = np.nan
+        if int(fitsel.sum()) >= 4:
+            slope_fit, b_fit = np.polyfit(c[fitsel], tm[fitsel], 1)
+            ybar = slope_fit * C0 + b_fit          # fit value at the reference point
+            logPbar = float(np.nanmean(logP[m]))   # <log P(z)> over the band
+            fits.append((0.5 * (lo + hi), slope_fit, ybar, logPbar))
+        lbl = rf"$x_g\in[{lo:.2f},{hi:.2f}]$ (fit {slope_fit:.2f})"
         axL.plot(c, tm, color=col, lw=4.2, alpha=0.30, solid_capstyle="round",
                  label=lbl + " truth", zorder=2)
         axL.plot(c, pm, color=col, lw=1.3, ls=(0, (4, 2)), marker="o", ms=2.6,
-                 markevery=3, label=lbl + " model", zorder=6)
-        axR.plot(c, am, color=col, lw=1.6, label=lbl)
+                 markevery=3, label=rf"$x_g\in[{lo:.2f},{hi:.2f}]$ model", zorder=6)
+        axR.plot(c, am, color=col, lw=1.6, label=rf"$x_g\in[{lo:.2f},{hi:.2f}]$")
         if anchor_off is None:              # anchor the analytic slope to the first valid band
             anchor_off = _anchor_offset(c, tm, -ln10)
+    # report: measured slopes vs -ln10, and offset spacing vs DGLAP <log P(z)>
+    if fits:
+        print(f"  [collinear fit] {label}:  analytic slope -ln10 = {-ln10:.3f}")
+        x0, s0, y0, lp0 = fits[0]
+        for xgc, s, y, lp in fits:
+            print(f"    x_g~{xgc:.2f}: slope={s:+.3f}  "
+                  f"offset@(1-x_q=1e{C0:.0f}) meas Δ={y - y0:+.2f}  "
+                  f"DGLAP Δ<logP>={lp - lp0:+.2f}")
     if anchor_off is not None:
         allc = np.concatenate(span)
         xline = np.linspace(np.nanmin(allc), np.nanmax(allc), 50)
