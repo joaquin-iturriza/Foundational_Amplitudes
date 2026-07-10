@@ -19,7 +19,7 @@ cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 # same absolute (de-standardized) scale, so the two samplings compare like-for-like.
 python analysis/divergences/eval_heldout.py \
   --runs_root runs/pretrain22_heldout_uug \
-  --run_prefix ft_deep_ --tags uniform,antenna \
+  --run_prefix ft_deep_ --tags ${TAGS:-uniform,antenna,mixture} \
   --heldout analysis/divergences/uug_deep_test.npz \
   --out_prefix deep_eval_ \
   --summary deep_eval_summary.json
