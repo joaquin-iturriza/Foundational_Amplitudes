@@ -144,9 +144,9 @@ def make_figure(npz, process_label, out_base, split="all"):
     cb.set_label("count", fontsize=9)
 
     # global error annotation
-    rms = float(np.sqrt(np.mean(resid ** 2)))
+    mse = float(np.mean(resid ** 2))
     mae = float(np.mean(np.abs(resid)))
-    axsc.text(0.04, 0.96, f"RMS Δ={rms:.3g}\nMAE Δ={mae:.3g}",
+    axsc.text(0.04, 0.96, f"MSE Δ={mse:.3g}\nMAE Δ={mae:.3g}",
               transform=axsc.transAxes, va="top", ha="left", fontsize=8,
               bbox=dict(boxstyle="round", fc="white", alpha=0.7))
 
@@ -192,7 +192,7 @@ def make_figure(npz, process_label, out_base, split="all"):
     for ext in ("png", "pdf"):
         fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
     plt.close(fig)
-    print(f"wrote {out_base}.png / .pdf  (N={n}, RMSΔ={rms:.3g}, MAEΔ={mae:.3g})")
+    print(f"wrote {out_base}.png / .pdf  (N={n}, MSEΔ={mse:.3g}, MAEΔ={mae:.3g})")
 
 
 def main():

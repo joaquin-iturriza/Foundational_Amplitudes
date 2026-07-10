@@ -1024,8 +1024,8 @@ number.
 For a $2\to2$ process the physical coordinates are the invariant $\sqrt{s}$ and the
 c.o.m.\ scattering angle $\cos\theta^*$. Across the jointly-pretrained tree processes of
 Table~\ref{tab:div_pretrain} and the fine-tuned NLO-virtual $u\bar u,\,t\bar t$, the model
-reproduces $\log|\mathcal{M}|^2$ over the whole plane to RMS
-$\Delta\log|\mathcal{M}|^2\sim10^{-4}$, with the residual concentrated at the phase-space
+reproduces $\log|\mathcal{M}|^2$ over the whole plane to MSE
+$\Delta\log|\mathcal{M}|^2\sim10^{-7}$, with the residual concentrated at the phase-space
 \emph{boundaries} ($\cos\theta^*\to\pm1$, $\sqrt{s}$ extremes) rather than at the physical
 peaks.
 
@@ -1089,7 +1089,7 @@ the minimum taken over gluon-involving coloured pairs; both $\to0$ in the soft/c
 limit. For $u\bar u g$ the model reproduces the soft ($\sim1/x_g^2$) and soft$+$collinear
 ($\sim1/y_{\min}$) ramps and the full bremsstrahlung Dalitz plane
 (Fig.~\ref{fig:div_dalitz}), matching truth across $\sim\!30$ orders of magnitude in
-$|\mathcal{M}|^2$ (RMS $0.007$). The six-particle $u\bar u gg$, the hardest process in the
+$|\mathcal{M}|^2$ (MSE $5.3\times10^{-5}$). The six-particle $u\bar u gg$, the hardest process in the
 mixture, still tracks the mean ramps but is the one case where accuracy \emph{degrades
 into} the singular region: the per-event error grows from
 $\langle|\Delta\log|\mathcal{M}|^2|\rangle\approx0.03$ at $y_{\min}\sim0.1$ to $0.27$ at
@@ -1148,7 +1148,7 @@ the base onto FAR${}\cup{}$(fraction $f$ of the add-back pool) for
 $f\in\{0,0.05,0.15,0.5,1\}$ (full retrain with layer decay; the finetune HPs of
 \code{finetune\_scaling\_virt\_002} transferred at fixed finetune/pretrain lr ratio,
 $4000$ steps each). Each model is then forwarded over the \emph{same} held-out TEST
-region and we measure RMS $\Delta\log|\mathcal{M}|^2$ inside it (the evaluation
+region and we measure MSE $\Delta\log|\mathcal{M}|^2$ inside it (the evaluation
 reconstructs each run's frozen input normalization; a $y_{\min}$ alignment guard
 confirms the momenta agree to $<10^{-7}$). $f\!=\!0$ is thus pure extrapolation into an
 unseen divergence, $f\!=\!1$ the in-support baseline.
@@ -1156,10 +1156,11 @@ unseen divergence, $f\!=\!1$ the in-support baseline.
 \paragraph{Result --- a small in-region data density recovers most of the divergence.}
 The held-out-region error falls steeply and \emph{saturates} with $f$
 (Fig.~\ref{fig:div_addback}, Table~\ref{tab:div_addback}): pure extrapolation is poor
-(RMS $0.84$, and $3.3$ in the deepest $y_{\min}<10^{-3}$ bin, where the amplitude is
-mispredicted by $\sim\!e^{3}$), but adding back just \emph{five percent} of the
-divergent-region pool cuts the error $4.9\times$ (to $0.17$), after which the curve
-flattens toward the in-support baseline ($0.053$ at $f\!=\!1$). Every $f$ degrades
+(MSE $0.71$, and $11$ in the deepest $y_{\min}<10^{-3}$ bin --- there
+$\sqrt{\mathrm{MSE}}\!\approx\!3.3$, i.e.\ the amplitude is mispredicted by
+$\sim\!e^{3}$), but adding back just \emph{five percent} of the divergent-region pool
+cuts the error $\sim\!24\times$ (to MSE $0.030$), after which the curve flattens toward
+the in-support baseline (MSE $2.8\times10^{-3}$ at $f\!=\!1$). Every $f$ degrades
 monotonically into deeper IR (the per-$y_{\min}$-bin curves, Fig.~\ref{fig:div_addback}
 right). The $f\!=\!0$ failure is diagnostic (Fig.~\ref{fig:div_holdout_f0}): the model's
 mean $\log|\mathcal{M}|^2$ \emph{plateaus} instead of following the IR ramp, its
@@ -1178,8 +1179,8 @@ $e^+e^-\to u\bar u g$ ($N=75$k held-out events).}
 \hline
 $f$ (add-back fraction) & $0$ & $0.05$ & $0.15$ & $0.5$ & $1$ \\
 \hline
-RMS $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.842$ & $0.173$ & $0.106$ & $0.080$ & $0.053$ \\
-\quad deepest bin $y_{\min}<10^{-3}$ & $3.34$ & $0.74$ & $0.44$ & $0.32$ & $0.19$ \\
+MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $0.0063$ & $0.0028$ \\
+\quad deepest bin $y_{\min}<10^{-3}$ & $11.1$ & $0.55$ & $0.20$ & $0.10$ & $0.035$ \\
 \hline
 \end{tabular}
 \end{table}
@@ -1189,8 +1190,8 @@ RMS $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.842$ & $0.173$ & $0.106$ & $
   \includegraphics[width=\textwidth]{addback_curve.pdf}
   \caption{\textbf{Add-back curve, $e^+e^-\to u\bar u g$.} Held-out
   divergence-region ($y_{\min}<c$) error vs the add-back fraction $f$ (leftmost tick
-  $f\!=\!0$ is pure extrapolation). Left: RMS and MAE $\Delta\log|\mathcal{M}|^2$ over
-  the whole held-out region; right: split by $y_{\min}$ sub-bin (deeper IR toward the
+  $f\!=\!0$ is pure extrapolation). Left: MSE and MAE $\Delta\log|\mathcal{M}|^2$ over
+  the whole held-out region; right: MSE split by $y_{\min}$ sub-bin (deeper IR toward the
   top). The steep drop already by $f\!=\!0.05$ and the subsequent flattening show a small
   in-region data density recovers most of the divergence.}
   \label{fig:div_addback}
@@ -1221,8 +1222,8 @@ RMS $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.842$ & $0.173$ & $0.106$ & $
 divergence: held out, $e^+e^-\to u\bar u g$'s soft/collinear region is mispredicted by
 $\sim\!e^{3}$ in the deepest bin and the model saturates against a ceiling. But the
 divergence is \emph{data-recoverable} --- adding back only $5\%$ of the divergent-region
-events recovers $\sim\!5\times$ of the error, and the add-back curve then saturates
-toward the in-support baseline.
+events cuts the MSE $\sim\!24\times$, and the add-back curve then saturates toward the
+in-support baseline.
 \end{principle}
 
 \paragraph{Follow-ups.} Separate the soft ($x_g$) and collinear ($y_{\min}$) axes;

@@ -41,9 +41,9 @@ def make_ir(npz, label, out_base):
 
     fig = plt.figure(figsize=(17.8, 9.4))
     gs = GridSpec(2, 3, figure=fig, hspace=0.34, wspace=0.58, height_ratios=[1.0, 0.95])
-    rms = float(np.sqrt(np.mean(resid ** 2)))
+    mse = float(np.mean(resid ** 2))
     fig.suptitle(f"{label}: model vs truth at the IR singularities  "
-                 f"(N={n:,}, RMS Δlog|M|²={rms:.3g})", fontsize=13, y=0.98)
+                 f"(N={n:,}, MSE Δlog|M|²={mse:.3g})", fontsize=13, y=0.98)
 
     def draw(ax, M, title, cmap, vmn, vmx, cl):
         pm = ax.pcolormesh(xe, ye, M, cmap=cmap, vmin=vmn, vmax=vmx, shading="flat")
@@ -95,7 +95,7 @@ def make_ir(npz, label, out_base):
     for ext in ("png", "pdf"):
         fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
     plt.close(fig)
-    print(f"wrote {out_base}.png/.pdf (N={n}, RMSΔ={rms:.3g})")
+    print(f"wrote {out_base}.png/.pdf (N={n}, MSEΔ={mse:.3g})")
 
     # Dalitz (ee -> q qbar g only)
     if "x_q" in d.files:

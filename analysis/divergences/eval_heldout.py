@@ -121,26 +121,26 @@ def main():
         pred_logamp = pred_prepd * amp_std + amp_mean
 
         d = pred_logamp - true_logamp
-        rms = float(np.sqrt(np.mean(d ** 2)))
+        mse = float(np.mean(d ** 2))                    # paper's primary metric (log-amp MSE)
         mae = float(np.mean(np.abs(d)))
         # deep-IR bins by y_min
         ybins = [(0, 1e-3), (1e-3, 3e-3), (3e-3, 1e-2), (1e-2, cut)]
-        binrms = []
+        binmse = []
         for lo, hi in ybins:
             msk = (obs["y_min"] >= lo) & (obs["y_min"] < hi)
-            binrms.append((lo, hi, int(msk.sum()),
-                           float(np.sqrt(np.mean(d[msk] ** 2))) if msk.any() else float("nan")))
-        print(f"  ft_f{tag}: RMS Δlog|M|^2={rms:.4f}  MAE={mae:.4f}  (N={len(d)})", flush=True)
-        for lo, hi, n, r in binrms:
-            print(f"      y_min[{lo:.0e},{hi:.0e}) n={n:6d} RMS={r:.4f}", flush=True)
+            binmse.append((lo, hi, int(msk.sum()),
+                           float(np.mean(d[msk] ** 2)) if msk.any() else float("nan")))
+        print(f"  ft_f{tag}: MSE Δlog|M|^2={mse:.4g}  MAE={mae:.4g}  (N={len(d)})", flush=True)
+        for lo, hi, n, r in binmse:
+            print(f"      y_min[{lo:.0e},{hi:.0e}) n={n:6d} MSE={r:.4g}", flush=True)
 
         out = os.path.join(args.out_dir, f"heldout_eval_ft_f{tag}.npz")
         extra = {k: obs[k] for k in ("x_q", "x_qbar") if k in obs}   # Dalitz vars (uug)
         np.savez_compressed(out, true_logamp=true_logamp, pred_logamp=pred_logamp,
                             y_min=obs["y_min"], x_gmin=obs["x_gmin"], sqrt_s=obs["sqrt_s"],
                             amp_mean=amp_mean, amp_std=amp_std, cut=np.array(cut), **extra)
-        summary.append(dict(tag=tag, f=int(tag) / 100.0, rms=rms, mae=mae,
-                            binrms=[[lo, hi, n, r] for lo, hi, n, r in binrms]))
+        summary.append(dict(tag=tag, f=int(tag) / 100.0, mse=mse, mae=mae,
+                            binmse=[[lo, hi, n, r] for lo, hi, n, r in binmse]))
         print(f"    saved -> {out}", flush=True)
 
     with open(os.path.join(args.out_dir, "heldout_eval_summary.json"), "w") as f:
