@@ -1086,10 +1086,56 @@ resolution variables, the gluon energy fraction and the minimum coloured-pair in
   \label{eq:ir}
 \end{equation}
 the minimum taken over gluon-involving coloured pairs; both $\to0$ in the soft/collinear
-limit. For $u\bar u g$ the model reproduces the soft ($\sim1/x_g^2$) and soft$+$collinear
-($\sim1/y_{\min}$) ramps and the full bremsstrahlung Dalitz plane
-(Fig.~\ref{fig:div_dalitz}), matching truth across $\sim\!30$ orders of magnitude in
-$|\mathcal{M}|^2$ (MSE $5.3\times10^{-5}$). The six-particle $u\bar u gg$, the hardest process in the
+limit.
+
+\paragraph{What these variables are, and why they are the right ones.}
+Soft and collinear are \emph{distinct} infrared limits. A gluon is \emph{soft} when its
+energy vanishes ($E_g\to0$) at any angle --- the eikonal factor gives
+$|\mathcal{M}|^2\sim1/E_g^2$; two massless partons are \emph{collinear} when they become
+parallel ($\theta_{ij}\to0$) at any energy --- an internal propagator $1/(p_i+p_j)^2$ goes
+on shell. Neither limit implies the other, so there are three singular regions: soft-only,
+collinear-only, and the soft\,$+$\,collinear overlap where both happen at once and the
+divergence is strongest. The gluon energy fraction $x_g=2E_g/\sqrt s$ isolates the
+\emph{soft} axis (angle-independent). The pair invariant
+$y_{ij}=(p_i+p_j)^2/s=2E_iE_j(1-\cos\theta_{ij})/s$ --- the JADE jet-resolution measure
+(JADE, Z.\ Phys.\ C\textbf{33} (1986) 23; Durham/$k_T$ variant, Catani et al., Phys.\
+Lett.\ B\textbf{269} (1991) 432) --- vanishes for \emph{either} a soft energy \emph{or} a
+collinear angle, so $y_{\min}$ is a single ``distance to the nearest singularity'': one
+scalar measuring IR depth, at the cost of conflating the two limits (disentangled by
+pairing it with $x_g$, the top rows of Figs.~\ref{fig:div_dalitz}\,ff.).
+
+For a three-body final state these are not arbitrary coordinates. The five-dimensional
+phase space splits into \emph{two} shape degrees of freedom --- the energy fractions
+$x_i=2E_i/\sqrt s$, constrained by $x_q+x_{\bar q}+x_g=2$, so $(x_q,x_{\bar q})$ is a
+complete 2D chart --- and \emph{three} orientation (Euler) angles fixing the event plane
+relative to the beam. Every soft and collinear singularity lives entirely in the two shape
+variables; the three orientation angles carry only a smooth, pole-free production-angle
+modulation that the Dalitz projection integrates over. So the Dalitz plane is the complete
+map of the \emph{singular} dynamics --- not literally lossless for orientation-differential
+observables, but exhaustive for the divergence structure. On it the leading-order QCD
+``antenna'' $|\mathcal{M}|^2\propto(x_q^2+x_{\bar q}^2)/[(1-x_q)(1-x_{\bar q})]$ (Ellis,
+Stirling \& Webber, \emph{QCD and Collider Physics}, CUP 1996; Peskin \& Schroeder,
+\emph{An Introduction to QFT}, ch.~17) puts the collinear poles on the $x_q\to1$ and
+$x_{\bar q}\to1$ edges --- where $1-x_q=(p_{\bar q}+p_g)^2/s$ is the $\bar q g$ invariant
+--- meeting at the soft-gluon $(1,1)$ corner. The colour factor is \emph{universal}:
+$\gamma$ vs $Z$ production only rescales the normalization and adds smooth orientation
+dependence, not the pole structure. This universality is precisely QCD factorization ---
+near any soft/collinear limit a real-emission amplitude factorizes into a hard part times a
+universal singular factor depending only on the soft energy and the collinear invariant,
+i.e.\ exactly $x_g$ and the $y_{ij}$ (Catani \& Seymour, Nucl.\ Phys.\ B\textbf{485} (1997)
+291; first NLO 3-jet calculation, Ellis, Ross \& Terrano, Nucl.\ Phys.\ B\textbf{178}
+(1981) 421; IR-safe resolution, Sterman \& Weinberg, Phys.\ Rev.\ Lett.\ \textbf{39} (1977)
+1436). Because the RAMBO generator samples phase space flat (Kleiss, Stirling \& Ellis,
+Comput.\ Phys.\ Commun.\ \textbf{40} (1986) 359), these thin singular slivers are
+data-starved by construction --- the premise of the hold-out study of
+Sec.~\ref{sec:divergences-holdout}.
+
+\paragraph{Result.} For $u\bar u g$ the model reproduces the soft ($\sim1/x_g^2$) and
+soft$+$collinear ($\sim1/y_{\min}$) ramps --- the analytic leading-power slopes ($-2\ln10$
+and $-\ln10$ per decade of $\log_{10}$) lie on the measured mean ramps into the deep IR ---
+and the full bremsstrahlung Dalitz plane, on which the analytic $C_F$-antenna map is
+reproduced to Pearson correlation $0.995$ (Fig.~\ref{fig:div_dalitz}), matching truth
+across $\sim\!30$ orders of magnitude in $|\mathcal{M}|^2$ (MSE $5.3\times10^{-5}$). The six-particle $u\bar u gg$, the hardest process in the
 mixture, still tracks the mean ramps but is the one case where accuracy \emph{degrades
 into} the singular region: the per-event error grows from
 $\langle|\Delta\log|\mathcal{M}|^2|\rangle\approx0.03$ at $y_{\min}\sim0.1$ to $0.27$ at
@@ -1098,20 +1144,44 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{ir_pretrain_uug_dalitz.pdf}
-  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. The collinear
-  poles lie on the $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$
-  corner; the model (centre) reproduces the truth (left) with a residual (right) that is
-  small even along the singular edges.}
+  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. Panels:
+  analytic LO $C_F$-antenna, truth, model, absolute error. The collinear poles lie on the
+  $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$ corner; white
+  lines on the truth/model panels are the analytic iso-$|\mathcal{M}|^2$ contours. The
+  model reproduces truth (analytic-vs-truth Pearson $0.995$) with a residual small even
+  along the singular edges.}
   \label{fig:div_dalitz}
+\end{figure}
+
+\paragraph{Separating the soft and collinear axes.} Because $y_{\min}$ folds the two limits
+together, we isolate the pure \emph{collinear} pole by binning $\log|\mathcal{M}|^2$ against
+the $\bar q g$ invariant $1-x_q=(p_{\bar q}+p_g)^2/s$ at \emph{fixed, hard} $x_g$, which
+switches the soft pole off (Fig.~\ref{fig:div_uug_coll}). In three disjoint $x_g$ bands the
+ramp is a straight line of the universal slope $-\ln10$ ($|\mathcal{M}|^2\sim1/(1-x_q)$) and
+is \emph{$x_g$-independent} --- the bands are parallel, offset only by the collinear
+splitting kernel, the hallmark of collinear factorization --- and the model tracks each band
+to $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear limit.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ir_pretrain_uug_collinear.pdf}
+  \caption{\textbf{Pure collinear ramp, $e^+e^-\to u\bar u g$.} $\log|\mathcal{M}|^2$ vs the
+  $\bar q g$ collinear invariant $1-x_q=(p_{\bar q}+p_g)^2/s$, in three bands of fixed hard
+  gluon energy $x_g$ (soft pole switched off). Left: truth (faint bands) and model
+  (dashed$+$markers) fall on the analytic slope $-\ln10$ (green) and stay parallel across
+  $x_g$ --- collinear factorization. Right: the model error into the collinear limit, small
+  and $x_g$-independent. Complements the soft ($x_g$) ramp, which isolates the other axis.}
+  \label{fig:div_uug_coll}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{ir_pretrain_uugg.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process.} $\log|\mathcal{M}|^2$ vs
-  the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom) are tracked
-  into the deep IR, but the model error (blue, and the error map top-right) grows toward
-  small $y_{\min}$ --- the sole case of degradation \emph{into} a singularity.}
+  the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom, with the
+  analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$ overlaid) are tracked into the
+  deep IR, but the model error (blue, and the error map top-right) grows toward small
+  $y_{\min}$ --- the sole case of degradation \emph{into} a singularity.}
   \label{fig:div_uugg}
 \end{figure}
 
@@ -1226,7 +1296,9 @@ events cuts the MSE $\sim\!24\times$, and the add-back curve then saturates towa
 in-support baseline.
 \end{principle}
 
-\paragraph{Follow-ups.} Separate the soft ($x_g$) and collinear ($y_{\min}$) axes;
+\paragraph{Follow-ups.} Separate the soft ($x_g$) and collinear ($1-x_q$) axes in the
+\emph{hold-out cut} too (the zero-shot diagnostic of Fig.~\ref{fig:div_uug_coll} already
+does this for the pretrained model, isolating the collinear pole at fixed hard $x_g$);
 extend to $u\bar u gg$ (its own leave-out base); and a deeper-sampling variant
 (regenerate $u\bar u g$ with tighter \code{ptj}/\code{drjj} fiducial cuts to probe below
 the current IR cutoff, \code{mg5\_pipeline\_final}).
