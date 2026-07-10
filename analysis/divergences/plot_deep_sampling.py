@@ -35,14 +35,21 @@ LAB = {"uniform": "uniform (flat RAMBO)", "antenna": r"antenna $\propto 1/y_{\mi
        "mixture": "mixture (50% flat + 50% antenna)"}
 
 
-def binned_mse(y, resid):
-    """MSE of resid per y_min decade + counts."""
-    mse, cnt = [], []
+def binned_metrics(y, resid):
+    """Per y_min decade: MSE and MAE of Δln|M|^2 (log-space L2/L1 = fractional error),
+    and median relative error |M2_pred/M2_true - 1| = |exp(Δln)-1| (robust, in %)."""
+    mse, mae, medrel, cnt = [], [], [], []
     for lo, hi in zip(EDGES[:-1], EDGES[1:]):
         m = (y >= lo) & (y < hi)
         cnt.append(int(m.sum()))
-        mse.append(float(np.mean(resid[m] ** 2)) if m.sum() > 20 else np.nan)
-    return np.array(mse), np.array(cnt)
+        if m.sum() > 20:
+            r = resid[m]
+            mse.append(float(np.mean(r ** 2)))
+            mae.append(float(np.mean(np.abs(r))))
+            medrel.append(float(np.median(np.abs(np.exp(r) - 1.0))))
+        else:
+            mse.append(np.nan); mae.append(np.nan); medrel.append(np.nan)
+    return np.array(mse), np.array(mae), np.array(medrel), np.array(cnt)
 
 
 def train_coverage(npy_path):
@@ -72,40 +79,51 @@ def main():
         d = np.load(os.path.join(args.eval_dir, f"{args.npz_prefix}{mode}.npz"))
         resid = d["pred_logamp"] - d["true_logamp"]
         y = d["y_min"]
-        mse, cnt = binned_mse(y, resid)
+        mse, mae, medrel, cnt = binned_metrics(y, resid)
         cov = train_coverage(os.path.join(args.data_root, f"data_deep_{mode}",
                                           "ee_uug_91-1000GeV_amplitudes.npy"))
-        res[mode] = dict(mse=mse, cnt=cnt, cov=cov,
+        res[mode] = dict(mse=mse, mae=mae, medrel=medrel, cnt=cnt, cov=cov,
                          mse_all=float(np.mean(resid ** 2)),
-                         mae_all=float(np.mean(np.abs(resid))), n=int(resid.size))
+                         mae_all=float(np.mean(np.abs(resid))),
+                         medrel_all=float(np.median(np.abs(np.exp(resid) - 1.0))),
+                         n=int(resid.size))
 
     os.makedirs(os.path.dirname(args.out_base), exist_ok=True)
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13.0, 5.2))
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18.5, 5.2))
     fig.suptitle(r"$e^+e^-\to u\bar u g$ deep-IR sampling A/B  (same base22, same 400k events, "
                  r"same held-out test — only sampling density differs)", fontsize=12)
 
-    # Left: per-decade MSE (natural log axis: deeper IR = smaller y_min = left)
+    xlab = r"$y_{\min}$  ($\leftarrow$ deeper IR / soft-collinear pole)"
+    # Panel 1: per-decade MSE of Δln|M|^2 (log-space L2 = squared fractional error)
     for mode in modes:
-        axL.plot(CEN, res[mode]["mse"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
-    axL.set_xscale("log"); axL.set_yscale("log")
-    axL.set_xlabel(r"$y_{\min}$  ($\leftarrow$ deeper IR / soft-collinear pole)")
-    axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$ on held-out test (per decade)")
-    axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=10)
+        ax1.plot(CEN, res[mode]["mse"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
+    ax1.set_xscale("log"); ax1.set_yscale("log")
+    ax1.set_xlabel(xlab)
+    ax1.set_ylabel(r"MSE $\Delta\ln|\mathcal{M}|^2$ per decade  (log-space L2)")
+    ax1.grid(True, which="both", alpha=0.25); ax1.legend(fontsize=9)
 
-    # Right: training coverage per decade (grouped bars, centered per decade)
+    # Panel 2: per-decade median relative error |M2_pred/M2_true - 1| (robust, in %)
+    for mode in modes:
+        ax2.plot(CEN, 100 * res[mode]["medrel"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
+    ax2.set_xscale("log"); ax2.set_yscale("log")
+    ax2.set_xlabel(xlab)
+    ax2.set_ylabel(r"median relative error $|\mathcal{M}^2_{\rm pred}/\mathcal{M}^2_{\rm true}-1|$  [%]")
+    ax2.grid(True, which="both", alpha=0.25); ax2.legend(fontsize=9)
+
+    # Panel 3: training coverage per decade (grouped bars, centered per decade)
     nb = len(modes)
     w = 0.8 / nb
     xpos = np.arange(len(CEN))
     for i, mode in enumerate(modes):
         off = (i - (nb - 1) / 2.0) * w
-        axR.bar(xpos + off, np.maximum(res[mode]["cov"], 0.5), width=w,
+        ax3.bar(xpos + off, np.maximum(res[mode]["cov"], 0.5), width=w,
                 color=COL[mode], alpha=0.85, label=LAB[mode])
-    axR.set_yscale("log")
-    axR.set_xticks(xpos)
-    axR.set_xticklabels([fr"$10^{{{int(np.log10(lo))}}}$" for lo in EDGES[:-1]])
-    axR.set_xlabel(r"$y_{\min}$ decade (lower edge)")
-    axR.set_ylabel("training events in decade (of 400k)")
-    axR.grid(True, which="both", axis="y", alpha=0.25); axR.legend(fontsize=10)
+    ax3.set_yscale("log")
+    ax3.set_xticks(xpos)
+    ax3.set_xticklabels([fr"$10^{{{int(np.log10(lo))}}}$" for lo in EDGES[:-1]])
+    ax3.set_xlabel(r"$y_{\min}$ decade (lower edge)")
+    ax3.set_ylabel("training events in decade (of 400k)")
+    ax3.grid(True, which="both", axis="y", alpha=0.25); ax3.legend(fontsize=9)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     for ext in ("png", "pdf"):
@@ -113,23 +131,32 @@ def main():
     plt.close(fig)
     print(f"wrote {args.out_base}.png/.pdf")
 
+    def cell(v):
+        return None if np.isnan(v) else float(v)
     summ = {}
     for mode in modes:
         r = res[mode]
-        summ[mode] = dict(mse_all=r["mse_all"], mae_all=r["mae_all"], n=r["n"],
-                          per_decade=[[float(EDGES[i]), float(EDGES[i + 1]),
-                                       int(r["cnt"][i]), int(r["cov"][i]),
-                                       (None if np.isnan(r["mse"][i]) else float(r["mse"][i]))]
+        summ[mode] = dict(mse_all=r["mse_all"], mae_all=r["mae_all"],
+                          medrel_all=r["medrel_all"], n=r["n"],
+                          per_decade=[dict(lo=float(EDGES[i]), hi=float(EDGES[i + 1]),
+                                           n_test=int(r["cnt"][i]), n_train=int(r["cov"][i]),
+                                           mse_log=cell(r["mse"][i]), mae_log=cell(r["mae"][i]),
+                                           median_rel_err=cell(r["medrel"][i]))
                                       for i in range(len(CEN))])
     with open(args.summary_out, "w") as f:
         json.dump(summ, f, indent=1)
     print(f"wrote {args.summary_out}")
-    print(f"\n{'decade':>18} {'uniform MSE':>14} {'antenna MSE':>14}   (test-set MSE per y_min decade)")
+
+    # per-decade table: median relative error (%) for each mode — the readable metric
+    print("\nmedian relative error |M2_pred/M2_true - 1|  [%]  per y_min decade")
+    print("  " + "decade".ljust(16) + "".join(f"{m[:9]:>11}" for m in modes))
     for i in range(len(CEN)):
-        u, a = res["uniform"]["mse"][i], res["antenna"]["mse"][i]
-        print(f"  [{EDGES[i]:.0e},{EDGES[i+1]:.0e})  {u:>14.4g} {a:>14.4g}")
-    print(f"\n  overall  uniform MSE={res['uniform']['mse_all']:.4g}  "
-          f"antenna MSE={res['antenna']['mse_all']:.4g}")
+        cells = "".join(f"{100*res[m]['medrel'][i]:>10.2f}%" for m in modes)
+        print(f"  [{EDGES[i]:.0e},{EDGES[i+1]:.0e}) {cells}")
+    print("\noverall (MSE-log / MAE-log / median-rel-err%):")
+    for m in modes:
+        print(f"  {m:>9}: {res[m]['mse_all']:.4g} / {res[m]['mae_all']:.4g} / "
+              f"{100*res[m]['medrel_all']:.2f}%")
 
 
 if __name__ == "__main__":
