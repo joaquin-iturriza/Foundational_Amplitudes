@@ -55,6 +55,9 @@ def main():
     ap.add_argument("--ckpt", default="model_run0_best.pt")
     ap.add_argument("--heldout", default=os.path.join(REPO, "analysis/divergences/uug_heldtest.npz"))
     ap.add_argument("--out_dir", default=os.path.join(REPO, "analysis/divergences"))
+    ap.add_argument("--run_prefix", default="ft_f", help="run-name prefix; run dir = <prefix><tag>")
+    ap.add_argument("--out_prefix", default="heldout_eval_ft_f", help="output npz basename prefix")
+    ap.add_argument("--summary", default="heldout_eval_summary.json")
     ap.add_argument("--batch_events", type=int, default=8192)
     args = ap.parse_args()
 
@@ -74,7 +77,7 @@ def main():
 
     summary = []
     for tag in [t.strip() for t in args.tags.split(",")]:
-        run_dir = os.path.join(args.runs_root, f"ft_f{tag}")
+        run_dir = os.path.join(args.runs_root, f"{args.run_prefix}{tag}")
         cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
         # source=files fine-tunes don't persist data_stats.json (only the recipe path
         # does); they recompute frozen stats fresh in init_data. Reproduce them the
@@ -134,7 +137,7 @@ def main():
         for lo, hi, n, r in binmse:
             print(f"      y_min[{lo:.0e},{hi:.0e}) n={n:6d} MSE={r:.4g}", flush=True)
 
-        out = os.path.join(args.out_dir, f"heldout_eval_ft_f{tag}.npz")
+        out = os.path.join(args.out_dir, f"{args.out_prefix}{tag}.npz")
         extra = {k: obs[k] for k in ("x_q", "x_qbar") if k in obs}   # Dalitz vars (uug)
         np.savez_compressed(out, true_logamp=true_logamp, pred_logamp=pred_logamp,
                             y_min=obs["y_min"], x_gmin=obs["x_gmin"], sqrt_s=obs["sqrt_s"],
@@ -143,9 +146,9 @@ def main():
                             binmse=[[lo, hi, n, r] for lo, hi, n, r in binmse]))
         print(f"    saved -> {out}", flush=True)
 
-    with open(os.path.join(args.out_dir, "heldout_eval_summary.json"), "w") as f:
+    with open(os.path.join(args.out_dir, args.summary), "w") as f:
         json.dump(summary, f, indent=1)
-    print("wrote heldout_eval_summary.json", flush=True)
+    print(f"wrote {args.summary}", flush=True)
 
 
 if __name__ == "__main__":
