@@ -24,6 +24,27 @@ def _map(x, y, z, xb, yb, stat="mean"):
     return s.T, xe, ye
 
 
+def analytic_dalitz_logM(xq, xqb):
+    """LO QCD antenna for ee -> q qbar g (up to an additive constant):
+    |M|^2 ~ (x_q^2 + x_qbar^2)/((1-x_q)(1-x_qbar)), so log|M|^2 = ln[...] + c.
+    The C_F antenna factor is universal (photon/Z production only shifts c and a
+    smooth non-singular orientation modulation), so this captures the collinear
+    edges (x->1) and the soft-gluon (1,1) corner exactly."""
+    eps = 1e-9
+    num = xq ** 2 + xqb ** 2
+    den = np.clip((1.0 - xq) * (1.0 - xqb), eps, None)
+    return np.log(np.clip(num / den, eps, None))
+
+
+def _anchor_offset(coord, val, slope, deep_frac=40.0):
+    """Additive constant c for the line val ~= slope*coord + c, fit (robust median)
+    over the deep-IR portion (leftmost `deep_frac`% of coord) where the asymptotics
+    dominate. Returns c."""
+    thr = np.nanpercentile(coord, deep_frac)
+    sel = (coord <= thr) & np.isfinite(val)
+    return float(np.nanmedian(val[sel] - slope * coord[sel]))
+
+
 def make_ir(npz, label, out_base):
     d = np.load(npz)
     tl, pl = d["true_logamp"], d["pred_logamp"]
@@ -59,7 +80,7 @@ def make_ir(npz, label, out_base):
     draw(fig.add_subplot(gs[0, 2]), emap, "model error", "inferno",
          0.0, np.nanpercentile(emap, 99), r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
 
-    def ramp(ax, coord, xlabel, title):
+    def ramp(ax, coord, xlabel, title, slope=None, slope_label=None):
         bins = np.linspace(np.percentile(coord, 0.2), np.percentile(coord, 99.8), 55)
         c = 0.5 * (bins[:-1] + bins[1:])
         tm, _, _ = binned_statistic(coord, tl, "mean", bins=bins)
@@ -67,6 +88,10 @@ def make_ir(npz, label, out_base):
         tx, _, _ = binned_statistic(coord, tl, "max", bins=bins)
         px, _, _ = binned_statistic(coord, pl, "max", bins=bins)
         am, _, _ = binned_statistic(coord, np.abs(resid), "mean", bins=bins)
+        if slope is not None:  # analytic leading-power IR slope, offset anchored in deep IR
+            off = _anchor_offset(c, tm, slope)  # anchor to the mean ramp (the clean asymptote)
+            ax.plot(c, slope * c + off, color="darkgreen", lw=1.6, ls="-.",
+                    label=slope_label, zorder=5)
         ax.plot(c, tm, "k", lw=1.9, label="truth (mean)")
         ax.plot(c, pm, color="crimson", lw=1.3, ls="--", label="model (mean)")
         ax.plot(c, tx, "k", lw=1.0, ls=":", alpha=0.7, label="truth (max)")
@@ -79,10 +104,13 @@ def make_ir(npz, label, out_base):
                        fontsize=9)
         axr.tick_params(axis="y", labelcolor="steelblue"); axr.set_ylim(bottom=0)
 
+    ln10 = np.log(10.0)
     ramp(fig.add_subplot(gs[1, 0]), ly,
-         r"$\log_{10} y_{\min}$  ($\leftarrow$ deeper IR)", "IR ramp: soft + collinear")
+         r"$\log_{10} y_{\min}$  ($\leftarrow$ deeper IR)", "IR ramp: soft + collinear",
+         slope=-ln10, slope_label=r"analytic $\propto 1/y_{\min}$")
     ramp(fig.add_subplot(gs[1, 1]), lx,
-         r"$\log_{10} x_{g,\min}$  ($\leftarrow$ softer gluon)", "soft-gluon limit")
+         r"$\log_{10} x_{g,\min}$  ($\leftarrow$ softer gluon)", "soft-gluon limit",
+         slope=-2.0 * ln10, slope_label=r"analytic $\propto 1/x_g^2$")
 
     axsc = fig.add_subplot(gs[1, 2])
     hb = axsc.hexbin(tl, pl, gridsize=55, bins="log", cmap="magma", mincnt=1)
@@ -101,19 +129,39 @@ def make_ir(npz, label, out_base):
     if "x_q" in d.files:
         xq, xqb = d["x_q"], d["x_qbar"]
         b = np.linspace(0, 1, 60)
+        cb = 0.5 * (b[:-1] + b[1:])
         tm, xe2, ye2 = _map(xq, xqb, tl, b, b)
         pm, _, _ = _map(xq, xqb, pl, b, b)
         em, _, _ = _map(xq, xqb, np.abs(resid), b, b)
+        # analytic LO QCD-antenna map on the same grid; kinematic region is x_q+x_qbar>1
+        XX, YY = np.meshgrid(cb, cb)                       # XX=x_q, YY=x_qbar (row=x_qbar)
+        amap = analytic_dalitz_logM(XX, YY)
+        phys = (XX + YY) > 1.0                             # 3-body Dalitz boundary
+        amap = np.where(phys, amap, np.nan)
+        # anchor the analytic additive constant to truth over populated, physical bins
+        good = np.isfinite(tm) & np.isfinite(amap)
+        off = float(np.nanmedian(tm[good] - amap[good]))
+        amap_a = amap + off
+        corr = float(np.corrcoef(tm[good], amap[good])[0, 1])
         vmn, vmx = np.nanpercentile(tm, 1), np.nanpercentile(tm, 99)
-        figd, axs = plt.subplots(1, 3, figsize=(16, 4.8))
-        figd.suptitle(f"{label}: Dalitz plane  (collinear at $x\\to1$ edges, "
-                      f"soft gluon at the $(1,1)$ corner)", fontsize=12)
-        for ax, M, ti, cm, a, bb, cl in [
-                (axs[0], tm, "truth", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
-                (axs[1], pm, "model", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
-                (axs[2], em, "error", "inferno", 0.0, np.nanpercentile(em, 99),
-                 r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")]:
+        clev = np.linspace(vmn, vmx, 7)                    # shared analytic contour levels
+        figd, axs = plt.subplots(1, 4, figsize=(21, 4.8))
+        figd.suptitle(f"{label}: Dalitz plane  (collinear at $x\\to1$ edges, soft gluon at "
+                      f"the $(1,1)$ corner)   —   analytic vs truth corr={corr:.3f}", fontsize=12)
+        panels = [
+            (axs[0], amap_a, "analytic LO ($C_F$ antenna)", "viridis", vmn, vmx,
+             r"$\langle\log|\mathcal{M}|^2\rangle$"),
+            (axs[1], tm, "truth", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
+            (axs[2], pm, "model", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
+            (axs[3], em, "error", "inferno", 0.0, np.nanpercentile(em, 99),
+             r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")]
+        for ax, M, ti, cm, a, bb, cl in panels:
             pmesh = ax.pcolormesh(xe2, ye2, M, cmap=cm, vmin=a, vmax=bb, shading="flat")
+            # overlay analytic iso-|M|^2 contours on truth & model to show they track
+            if ti in ("truth", "model"):
+                cs = ax.contour(cb, cb, amap_a, levels=clev, colors="white",
+                                linewidths=0.7, alpha=0.75)
+                ax.clabel(cs, fmt="%.0f", fontsize=6)
             ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$"); ax.set_ylabel(r"$x_{\bar q}=2E_{\bar q}/\sqrt{s}$")
             ax.set_title(ti, fontsize=11)
             figd.colorbar(pmesh, ax=ax, fraction=0.046, pad=0.02).set_label(cl, fontsize=9)
@@ -121,7 +169,7 @@ def make_ir(npz, label, out_base):
         for ext in ("png", "pdf"):
             figd.savefig(f"{out_base}_dalitz.{ext}", dpi=140, bbox_inches="tight")
         plt.close(figd)
-        print(f"wrote {out_base}_dalitz.png/.pdf")
+        print(f"wrote {out_base}_dalitz.png/.pdf  (analytic-vs-truth corr={corr:.3f})")
 
 
 def main():
