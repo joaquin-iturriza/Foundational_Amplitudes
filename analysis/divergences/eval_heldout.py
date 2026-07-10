@@ -142,7 +142,8 @@ def main():
         np.savez_compressed(out, true_logamp=true_logamp, pred_logamp=pred_logamp,
                             y_min=obs["y_min"], x_gmin=obs["x_gmin"], sqrt_s=obs["sqrt_s"],
                             amp_mean=amp_mean, amp_std=amp_std, cut=np.array(cut), **extra)
-        summary.append(dict(tag=tag, f=int(tag) / 100.0, mse=mse, mae=mae,
+        summary.append(dict(tag=tag, f=(int(tag) / 100.0 if tag.isdigit() else None),
+                            mse=mse, mae=mae,
                             binmse=[[lo, hi, n, r] for lo, hi, n, r in binmse]))
         print(f"    saved -> {out}", flush=True)
 
