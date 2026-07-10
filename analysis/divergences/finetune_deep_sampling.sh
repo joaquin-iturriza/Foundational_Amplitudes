@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
-#SBATCH --array=0-2
+#SBATCH --array=0-4
 #SBATCH --output=analysis/divergences/ft_deep_%A_%a.out
 #SBATCH --error=analysis/divergences/ft_deep_%A_%a.out
 
@@ -26,7 +26,7 @@ CKPT=$REPO/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt
 # the exact tree |M|^2 (fixed a_s=0.118), so both sides are on the same amplitude scale;
 # per-dataset preprocessing then standardizes each independently (accounted for at eval
 # by comparing MSE on de-standardized log|M|^2 over a common held-out deep-IR test set).
-TAGS=(uniform antenna mixture)
+TAGS=(uniform antenna mixture mix025 mix075)
 TAG=${TAGS[$SLURM_ARRAY_TASK_ID]}
 DATA_PATH=$REPO/data_deep_${TAG}/
 
