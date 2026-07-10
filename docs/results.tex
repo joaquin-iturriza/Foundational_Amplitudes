@@ -1303,12 +1303,71 @@ events cuts the MSE $\sim\!24\times$, and the add-back curve then saturates towa
 in-support baseline.
 \end{principle}
 
-\paragraph{Follow-ups.} Separate the soft ($x_g$) and collinear ($1-x_q$) axes in the
-\emph{hold-out cut} too (the zero-shot diagnostic of Fig.~\ref{fig:div_uug_coll} already
-does this for the pretrained model, isolating the collinear pole at fixed hard $x_g$);
-extend to $u\bar u gg$ (its own leave-out base); and a deeper-sampling variant
-(regenerate $u\bar u g$ with tighter \code{ptj}/\code{drjj} fiducial cuts to probe below
-the current IR cutoff, \code{mg5\_pipeline\_final}).
+\subsection{Two extensions: the hardest process, and separating the two limits}
+\label{sec:div-extensions}
+
+Because the leave-out base held out \emph{all five} gluon processes, both extensions below
+reuse the same base22 foundation with \emph{no new pretraining} --- only the add-back
+fine-tunes differ.
+
+\paragraph{The hardest process ($u\bar u gg$) is also data-recoverable.} On the same
+$y_{\min}<c$ ($15$th-percentile) held-out region (Fig.~\ref{fig:div_addback_uugg}), pure
+extrapolation on the six-particle $u\bar u gg$ gives MSE $0.22$ (deepest $y_{\min}<10^{-3}$
+bin $0.98$), and adding the divergent region back drives it monotonically to $0.024$ at
+$f\!=\!1$ ($\sim\!9\times$). Two differences from $u\bar u g$ mark it as the harder process:
+recovery is \emph{gradual} rather than the sharp $24\times$-by-$f{=}0.05$ drop (only
+$2.4\times$ at $f{=}0.05$), and the in-support floor is $\sim\!10\times$ higher ($0.024$ vs
+$0.0028$). But unlike $u\bar u g$ the $f{=}0$ model does \emph{not} flatly plateau: having
+learned the process from the FAR region it tracks the analytic $1/y_{\min}$ ramp through most
+of the plane, degrading only in the very deepest soft$+$collinear corner --- a partial, not
+total, extrapolation failure.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{addback_curve_uugg.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u gg$ add-back curve} (hardest process, same base22).
+  Left: held-out deep-IR ($y_{\min}<c$) MSE/MAE vs add-back fraction $f$; right: MSE split
+  by $y_{\min}$ sub-bin. The divergence is data-recoverable ($0.22\to0.024$) but recovery is
+  more gradual and the floor $\sim\!10\times$ higher than $u\bar u g$ --- the harder process
+  needs more in-region data.}
+  \label{fig:div_addback_uugg}
+\end{figure}
+
+\paragraph{Which limit is harder to extrapolate into: soft vs collinear.} Splitting the
+$u\bar u g$ hold-out into a \emph{pure-soft} region ($x_g<c$, any angle) and a
+\emph{pure-collinear} region ($y_{\min}<c$ at hard $x_g$, soft pole off) separates the two IR
+limits (Fig.~\ref{fig:div_soft_coll}), giving two findings. (i) Both single-limit cuts are
+far easier to extrapolate into than the $y_{\min}$ cut that \emph{conflates} them: $f{=}0$
+MSE is $0.076$ (soft) and $0.047$ (collinear) versus $0.71$ for the combined cut --- the
+difficulty lives in the soft$\cap$collinear \emph{overlap}, not either limit alone. (ii) A
+crossover: the collinear pole is easier to \emph{extrapolate into} (lower $f{=}0$ error, its
+DGLAP structure being partly inferable from the FAR region), but the soft pole \emph{recovers
+faster} once any in-region data is added --- by $f{=}0.05$ soft ($0.008$) has overtaken
+collinear ($0.014$) and stays below it to $f{=}1$. The eikonal $1/x_g^2$ enhancement is hard
+to guess but simple to learn from a few examples; the collinear residue is guessable but
+richer (the full $P_{qq}(z)$), hence slower to pin down.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.62\textwidth]{soft_vs_coll_addback.pdf}
+  \caption{\textbf{Soft vs collinear extrapolation, $e^+e^-\to u\bar u g$.} Held-out-region
+  MSE vs add-back fraction for the pure-soft ($x_g<c$) and pure-collinear ($y_{\min}<c$ at
+  hard $x_g$) cuts. Collinear is easier to extrapolate into ($f{=}0$), but soft recovers
+  faster and crosses below it once any in-region data is added back.}
+  \label{fig:div_soft_coll}
+\end{figure}
+
+\begin{principle} The difficulty of extrapolating into a divergence is concentrated in the
+soft$\cap$collinear \emph{overlap}: single-limit hold-outs ($x_g$ or $1-x_q$ alone) are an
+order of magnitude easier ($f{=}0$ MSE $\sim\!0.05$--$0.08$) than the combined $y_{\min}$ cut
+($0.71$). Across limits, collinear is easier to extrapolate but soft is easier to recover
+with a little data; and the hardest process ($u\bar u gg$) is data-recoverable but needs more
+in-region data than $u\bar u g$.
+\end{principle}
+
+\paragraph{Follow-ups.} A deeper-sampling variant: regenerate $u\bar u g$ with tighter
+\code{ptj}/\code{drjj} fiducial cuts to probe below the current IR cutoff
+(\code{mg5\_pipeline\_final}), and extend the soft/collinear split to $u\bar u gg$.
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
