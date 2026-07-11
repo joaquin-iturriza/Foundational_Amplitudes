@@ -36,10 +36,12 @@ dyhpo:
   n_startup: 6
   total_budget: 40
 
-# Warm-started finetune converges by ~4000 steps (the MSE antenna finetune hits its
-# 8.5e-5 floor there); low fidelity is cheap (warm-start increments).
+# SINGLE fidelity at the matched horizon (= the MSE antenna finetune's 4000 steps, where
+# it hits 8.5e-5). We use DyHPO as a one-fidelity Bayesian optimiser (project convention;
+# see CLAUDE.md "single-fidelity Bayesian optimiser") — every trial trains the full 4000
+# steps, no low-fidelity ladder.
 fidelity_schedule:
-  t_steps: [400, 1265, 4000]
+  t_steps: [4000]
 
 fixed_params:
   # --- data: dense-IR antenna uug pool, per-dataset preprocessing (matches ft_deep_antenna) ---
