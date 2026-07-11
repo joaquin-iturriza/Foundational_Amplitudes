@@ -2218,8 +2218,16 @@ class AmplitudeExperiment(BaseExperiment):
             process_ids  = process_ids,
         )  # (B, out_channels)
 
+        # HETEROSC: the net emits [mean, sigma]; split sigma out and pass it to the
+        # per-event NLL (the aggregator threads it through to _per_event_loss).
+        sigma = None
+        if self.cfg.training.loss == "HETEROSC":
+            out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
+            sigma  = y_pred[..., -out_shape:]
+            y_pred = y_pred[..., :-out_shape]
+
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
-        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg)
+        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma)
 
         reg         = self.regularization_lambda * self.regularization(self.model)
         # Keep the no-reg loss as a detached tensor instead of syncing here with
