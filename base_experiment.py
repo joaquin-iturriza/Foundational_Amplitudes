@@ -1227,7 +1227,7 @@ class BaseExperiment:
         if want_lnr:
             self.train_loss_no_reg.append(lnr_val)
         if mse_val is not None and self.cfg.plotting.get("plot_mse_het", False):
-            self.train_mse.append(mse_val)
+            self.train_mse.append(float(mse_val))   # float(): detached tensor on the LLoCa HETEROSC path
 
         # log to mlflow
         if (
@@ -1264,7 +1264,7 @@ class BaseExperiment:
                 if loss_no_reg is not None:
                     losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                 if mse_val is not None:
-                    mse_vals.append(mse_val)
+                    mse_vals.append(float(mse_val))   # float() materialises a detached tensor (LLoCa HETEROSC path)
 
         val_loss = np.mean(losses)
 
