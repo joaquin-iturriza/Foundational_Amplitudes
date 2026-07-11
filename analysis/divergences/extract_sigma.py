@@ -65,6 +65,9 @@ def main():
         cfg.run_dir = os.path.join(REPO, "runs", "_het_eval_tmp")
         cfg.data.subsample = None
         cfg.fine_tune.pretrained_path = None
+        # Force the net's HETEROSC head explicitly (2-ch readout) — the ${training.loss}
+        # interpolation isn't reliably resolved on a bare OmegaConf.load rebuild.
+        cfg.model.net.loss = cfg.training.loss
     exp = AmplitudeExperiment(cfg)
     exp._init(); exp.init_physics(); exp.init_geometric_algebra()
     exp.init_data(); exp._init_dataloader(); exp.init_model()
