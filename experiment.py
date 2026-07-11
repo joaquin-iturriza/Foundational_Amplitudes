@@ -2305,6 +2305,12 @@ class AmplitudeExperiment(BaseExperiment):
         tau = float(self.cfg.training.get("loss_aggregation_tau", 0.0) or 0.0)
         if not getattr(getattr(self, "model", None), "training", False):
             tau = 0.0
+        # geometric_mean takes log(per-process loss), valid only for NON-NEGATIVE losses
+        # (MSE/L1/…). The HETEROSC NLL is SIGNED (the log σ term), so log()+clamp destroys
+        # the gradient of every well-fit (negative-NLL) process → μ collapses to the mean.
+        # Force arithmetic mean for HETEROSC.
+        if self.cfg.training.loss == "HETEROSC":
+            loss_agg = "mean"
         if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop":
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
