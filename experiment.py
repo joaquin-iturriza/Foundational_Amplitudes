@@ -2621,6 +2621,12 @@ class AmplitudeExperiment(BaseExperiment):
             torch.cuda.empty_cache()
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+        # HETEROSC NLL is SIGNED: geometric_mean's log(clip(·,1e-10)) collapses every
+        # well-fit (negative) process to a constant → val_loss ≡ ~0, so best-checkpoint
+        # selection NEVER updates and a barely-trained model is saved. Match the training
+        # path: arithmetic mean for HETEROSC (see _aggregate_per_process_loss).
+        if self.cfg.training.loss == "HETEROSC":
+            loss_agg = "mean"
 
         def _combine(vals):
             if loss_agg == "geometric_mean":
