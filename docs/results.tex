@@ -1365,9 +1365,109 @@ with a little data; and the hardest process ($u\bar u gg$) is data-recoverable b
 in-region data than $u\bar u g$.
 \end{principle}
 
-\paragraph{Follow-ups.} A deeper-sampling variant: regenerate $u\bar u g$ with tighter
-\code{ptj}/\code{drjj} fiducial cuts to probe below the current IR cutoff
-(\code{mg5\_pipeline\_final}), and extend the soft/collinear split to $u\bar u gg$.
+\subsection{Hand-off: deeper/cleverer sampling, optimal allocation, and heteroscedastic
+uncertainty (work in progress)}\label{sec:div-handoff}
+
+\emph{State of an in-progress line of work, three threads. Thread~A is complete; Thread~B is
+analysis plus a validated but un-integrated tool; Thread~C is mid-debug and is the main open
+item. New tooling is under \code{analysis/divergences/}; the heteroscedastic code lives on git
+worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}), \emph{not yet merged} to
+\code{jeanzay}. The adaptive-sampler prototype is on branch \code{adaptive-ir}.}
+
+\paragraph{Thread A --- deeper + antenna phase-space sampling (done).} The production
+$u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
+IR is starved (median $y_{\min}\!\approx\!0.15$; only $\sim$5 of $10^6$ events below
+$y_{\min}=10^{-5}$). \code{gen\_uug\_sampling.py} adds two samplers over a lowered-cut fiducial
+region ($p_T\!>\!1$, $m\!>\!0.3$, $\Delta R\!>\!0.05$): \emph{antenna}
+($\mathrm{d}N\!\propto\!\mathrm{d}a/a\,\mathrm{d}b/b$ in the gluon invariants $a=1-x_u$,
+$b=1-x_{\bar u}$, so $y_{\min}=\min(a,b)$ reaches $<10^{-6}$) and \emph{mixture} (fraction $f$
+antenna $+\,(1-f)$ uniform). Labels use the compiled mg5 C++ standalone at fixed
+$\alpha_s=0.118$, verified bit-identical to the production data; since we fit
+$\ln|\mathcal{M}|^2$ pointwise, importance sampling needs \emph{no} target reweighting --- only
+the density of training points changes. Data: \code{data\_deep\_\{uniform,antenna,mixture,
+mix025,mix075\}/}; common deep-IR test \code{uug\_deep\_test.npz}.
+A/B (same base22, 400k events, 4000 steps; \code{finetune\_deep\_sampling.sh},
+\code{eval\_deep.sh}, \code{plot\_deep\_sampling.py}): antenna crushes the pole --- median
+relative error in $y_{\min}\!\in\![10^{-6},10^{-5})$ drops $47.9\%\!\to\!1.4\%$; overall
+MSE$(\Delta\ln|\mathcal{M}|^2)$ $0.108\!\to\!0.0017$ ($\sim$62$\times$). The fraction sweep
+$f\in\{0,.25,.5,.75,1\}$ (\code{plot\_fraction\_sweep.py}, fig
+\code{deep\_sampling\_fraction\_sweep}) shows a \emph{broad interior optimum} $f\in[0.25,0.75]$:
+$f{=}0$ catastrophic ($\sim$200$\times$), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
+location inside the basin is single-seed noise ($f{=}0.5$ sits above both neighbours). Metrics
+reported: MSE and MAE of $\Delta\ln|\mathcal{M}|^2$ (both scale-invariant, since the residual is
+$\ln$ of the amplitude ratio) plus median relative error.
+
+\paragraph{Float32 label floor.} $s_{ij}=s\,y_{\min}$ is a near-cancellation of $O(s)$ momenta,
+so float32 storage imposes a relative floor $\sim\varepsilon/y_{\min}$: measured (recomputing
+$|\mathcal{M}|^2$ from float32- vs float64-rounded momenta) at median $0.39\%$ in
+$[10^{-6},10^{-5})$, $\times{\sim}8$ per decade, negligible by $10^{-3}$. All current models sit
+well \emph{above} this (short trainings) --- optimisation-limited, not precision-limited. If ever
+precision-limited, reparametrise (feed $\ln y_{\min}$ / pair masses as features) rather than store
+float64.
+
+\paragraph{Thread B --- optimal allocation (analysis + un-integrated tool).} For a fixed data
+budget the optimum is the equimarginal (water-filling) allocation: sample until the marginal
+(test-weighted) error reduction is equal everywhere, $p^\star\!\propto\!\sqrt{q\cdot\text{diff}}$
+for test weighting $q$ --- neither uniform nor pure antenna, consistent with the interior optimum
+above. An online adaptive per-$y_{\min}$-bin importance sampler was prototyped
+(\code{adaptive\_ir.py}, branch \code{adaptive-ir}); the controller math is CPU-validated
+(unbiased IS correction with mean weight $=1$; variance-optimal proposal
+$\pi_b\!\propto\!Q_b\sqrt{E_b}$). It is \emph{not} wired into the training loop. Caveat: the
+variance-reduction proposal ($\pi\!\propto\!Q\sqrt{E}$, fixed objective, faster convergence) is
+\emph{not} the finite-data allocation optimum ($\pi\!\propto\!\sqrt{QC}$). Deprioritised in favour
+of Thread~C.
+
+\paragraph{Thread C --- heteroscedastic $(\mu,\sigma)$ head (in progress; main open item).}
+Goal: a learned per-event uncertainty $\sigma(x)$ as an attention/sampling signal
+(process/divergence-agnostic, no hand-binning). All on branch \code{heterosc}.
+\emph{Wiring (done):} HETEROSC existed for the MLP configs but was never wired for the $\mu$P
+LLoCa net --- now the net emits $2\times$\code{out\_shape} channels (mean, softplus $\sigma$) when
+\code{loss=HETEROSC} (\code{models/lloca.py}); \code{net.loss} interpolates \code{training.loss};
+$\sigma$ is split out in \code{\_batch\_loss\_lloca}; \code{reset\_output\_head} shape-filters the
+1ch$\to$2ch load; \code{extract\_sigma.py} re-asserts the worktree on \code{sys.path} (hydra
+imports \code{models.lloca} lazily and the analysis helpers prepend the main repo).
+\emph{$\beta$-NLL (done):} \code{training.heterosc\_beta} weights the NLL by detached
+$\sigma^{2\beta}$ (Seitzer 2022); $\beta{=}1$ restores $\mu$'s MSE-like gradient.
+\emph{Bugs found+fixed:} (i) \textbf{geometric\_mean aggregation is invalid for the signed NLL} ---
+$\log(\text{clip})$ of negative per-process losses zeros the gradient of every well-fit process, so
+$\mu$ collapses to the mean; forced arithmetic mean for HETEROSC in both the training aggregate
+(\code{\_aggregate\_per\_process\_loss}) and the 22-proc validation combine (checkpoint selection).
+This was the dominant failure ($\mu$-MSE $\sim$1 across \emph{all} configs, including $\beta{=}1$).
+(ii) \code{float(mse\_val)} in the base \code{\_validate}/\code{\_step} consumers (single-dataset
+finetunes delegate there; a detached CUDA tensor crashed \code{np.mean}). \emph{Foundation sweep
+(done):} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe as base22,
+\code{loss=HETEROSC}, lr$\in\{4\mathrm{e}{-}3,1.6\mathrm{e}{-}2\}\times\beta\in\{0,.5,1\}$, 6000
+iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives in-distribution val
+$\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
+gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
+
+\paragraph{Open --- the uug finetune underfits.} \code{finetune\_heterosc\_v2.sh} (best foundation
+$\to$ uug antenna pool, $\beta{=}1$, \emph{no} head reset, both sides 2ch) still yields a
+$\sigma$-map (\code{extract\_sigma.py}, fig \code{heterosc\_sigma\_map}) with $\mu$ error $\sim$1
+and $\sigma$ flat $\sim$1 --- $\mu$ near the mean. This is \emph{not} a data mismatch (base22 is
+genuinely leave-uug-out: its log shows ``Loaded 22 recipe processes'', and \code{data.dataset} in a
+\code{source=recipes} config is vestigial, so the ``8 datasets'' there is a red herring) and
+\emph{not} the val-aggregation bug (single-dataset finetunes use the base arithmetic
+\code{\_validate}). The MSE finetune on the \emph{same} transfer task fits to $\sim$0.01, so
+HETEROSC should too.
+
+\paragraph{What's left (priority order).}
+(1) \textbf{Fix the HETEROSC uug finetune.} Diagnose first ($\sim$0.3 GPU-h): its best-vs-last
+checkpoint $\mu$-MSE (rules in/out checkpoint selection) against the MSE antenna finetune's uug
+$\mu$-MSE as a matched baseline. Prime suspects: finetune HPs (\code{lr\_scale}/\code{layer\_decay}
+were borrowed from the MSE recipe, never tuned for the NLL gradient scale), the $\sigma$-head
+sharing the backbone, or checkpoint selection. Then a finetune HP sweep if needed.
+(2) \textbf{Redo the $\sigma$-map on a well-fit $\mu$.} The earlier (contaminated) map already
+suggested $\sigma$ is \emph{epistemic} --- it peaked in the antenna-\emph{undersampled} bulk, not
+the float32-heavy deep IR, and sat 2--3 decades above the float32 floor. Confirm once $\mu$ fits.
+(3) \textbf{Then:} drive adaptive sampling from $\sigma$ (or an epistemic variant ---
+MC-dropout/evidential, since a single $(\mu,\sigma)$ head is aleatoric), optionally wiring in the
+Thread~B controller; and merge \code{heterosc} into \code{jeanzay} once sound (cosmetic left-over:
+the HETEROSC val ``combined'' display still prints $0$ via geometric mean --- harmless, since
+training and checkpointing now use arithmetic mean).
+
+\paragraph{Earlier follow-ups (still open).} Extend the soft/collinear split to $u\bar u gg$
+(\code{holdout\_prep.py} \code{region}=soft/collinear already supports the split).
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
