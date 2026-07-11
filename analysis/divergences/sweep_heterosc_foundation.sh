@@ -4,7 +4,7 @@
 #SBATCH --partition=gpu_p2
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=02:00:00
+#SBATCH --time=02:45:00
 #SBATCH --array=0-5
 #SBATCH --output=analysis/divergences/het_found_%A_%a.out
 #SBATCH --error=analysis/divergences/het_found_%A_%a.out
