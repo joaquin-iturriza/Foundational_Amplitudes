@@ -1,0 +1,94 @@
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2          # V100 32GB
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "01:30:00"
+
+paths:
+  # project_dir MUST be the heterosc worktree: the HETEROSC 2-ch head, beta-NLL,
+  # arithmetic-mean aggregation fix and detach knob all live on branch `heterosc`,
+  # not on jeanzay/main. run_trial.py -> run.py resolves experiment.py/models from here.
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-heterosc/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-heterosc
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+# Fair Bayesian (DyHPO) HPO for the COUPLED beta=1 heteroscedastic uug finetune.
+# Diagnosis (analysis/divergences/diag_ckpt_mu.py) ruled out checkpoint selection
+# (best==last) and sigma-inflation (sigma calibrated); the coupled foundation fits mu
+# (0.025 ~= MSE 0.020) but the single-process uug finetune underfits (0.086) and even
+# fully decoupled (detach_sigma_backbone) only reaches 0.0315 vs the MSE finetune's
+# 8.5e-5. That residual points at the finetune OPTIMISER/HPs (lr_scale, layer_decay,
+# warmup), which were borrowed from the MSE recipe and never tuned for the NLL. This
+# sweep keeps sigma COUPLED (detach off) and asks: can the coupled loss fit mu like MSE
+# with proper HPs? DyHPO objective = best val_loss_no_reg (beta-NLL); winners re-ranked
+# on mu-MSE post-hoc (rank_mu_mse.py) for the like-with-like comparison to MSE (8.5e-5).
+sweep_name: heterosc_ft_uug
+n_trials: 16
+
+dyhpo:
+  n_candidates: 100
+  seed: 42
+  n_startup: 6
+  total_budget: 40
+
+# Warm-started finetune converges by ~4000 steps (the MSE antenna finetune hits its
+# 8.5e-5 floor there); low fidelity is cheap (warm-start increments).
+fidelity_schedule:
+  t_steps: [400, 1265, 4000]
+
+fixed_params:
+  # --- data: dense-IR antenna uug pool, per-dataset preprocessing (matches ft_deep_antenna) ---
+  data.source: files
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data_deep_antenna/
+  data.dataset: '[ee_uug_91-1000GeV_amplitudes]'
+  data.preprocess_per_dataset: 'true'
+  data.train_test_val: '[0.9, 0.05, 0.05]'
+  data.subsample: null
+  # --- model: LLoCa, matches the HETEROSC foundation architecture (diagram-free) ---
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.detach_sigma_backbone: 'false'   # COUPLED (faithful) — the whole point
+  # --- warm start from the best HETEROSC foundation (lr4e-3, beta1; both sides 2-ch, no head reset) ---
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-heterosc/runs/heterosc_foundation/het_lr0.004_b1.0/models/model_run0_best.pt
+  # --- HETEROSC loss ---
+  training.loss: HETEROSC
+  training.heterosc_beta: 1.0
+  training.lr: 0.004                 # fixed at the foundation lr; fine_tune.lr_scale is the swept step lever
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  training.scheduler: CosineAnnealingLR
+  training.cosanneal_eta_min: 1.0e-8   # weakest knob — fixed
+  training.regularization: L2
+  training.validate_frac: '0.01'
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  plot: 'true'
+  plotting.plot_mse_het: 'false'
+
+# Search space per the finetune HPO rules (CLAUDE.md / docs/results.tex sec:optimization).
+# lr_scale is the primary lever (effective finetune step); centred at 1, wide log band.
+search_space:
+- name: fine_tune.lr_scale
+  type: float_log
+  low: 0.1
+  high: 10.0
+- name: fine_tune.layer_decay
+  type: float_uniform
+  low: 0.75
+  high: 1.0
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
