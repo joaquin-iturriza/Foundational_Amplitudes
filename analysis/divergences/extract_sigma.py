@@ -68,6 +68,11 @@ def main():
         # Force the net's HETEROSC head explicitly (2-ch readout) — the ${training.loss}
         # interpolation isn't reliably resolved on a bare OmegaConf.load rebuild.
         cfg.model.net.loss = cfg.training.loss
+    # The helper imports above (eval_heldout/extract_ir/extract_preds) each prepend the
+    # MAIN repo to sys.path; hydra.instantiate imports models.lloca LAZILY at init_model
+    # time, so without this the MAIN (non-HETEROSC) lloca shadows the worktree's and the
+    # readout builds 1-ch. Re-assert the worktree first so the wired net is imported.
+    sys.path.insert(0, WT)
     exp = AmplitudeExperiment(cfg)
     exp._init(); exp.init_physics(); exp.init_geometric_algebra()
     exp.init_data(); exp._init_dataloader(); exp.init_model()
