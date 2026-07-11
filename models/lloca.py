@@ -100,10 +100,17 @@ class LLOCAMuPTransformer(nn.Module):
         freeze_framesnet: bool = False,
         checkpoint_blocks: bool = False,
         parametrization: str = "mup",
+        detach_sigma_backbone: bool = False,
         # token_size: int = 0,
     ):
         super().__init__()
         self.parametrization = parametrization
+        # HETEROSC only: feed the sigma readout DETACHED backbone features, so the
+        # backbone receives only the mean's (pure-MSE, beta=1) gradient and sigma is a
+        # read-only calibration head. Decouples the (mu, sigma) multi-task interference
+        # that otherwise floors mu where the mean is easy to fit (single-process
+        # finetune). Same weights/shape -> warm-starts from a non-detached checkpoint.
+        self.detach_sigma_backbone = detach_sigma_backbone
         # Heteroscedastic head: the net emits 2*out_shape channels (mean, sigma);
         # sigma is softplus-ed for positivity in forward. out_shape stays the real
         # target dim so experiment.py's split (last out_shape = sigma) is unchanged.
@@ -168,6 +175,16 @@ class LLOCAMuPTransformer(nn.Module):
         # restricting each event's particles to attend only within that event.
         # seq_lens (CPU per-event lengths, optional) lets the mask builder skip a
         # GPU→CPU sync; see build_block_diagonal_bias.
+        if self.loss == "HETEROSC" and self.detach_sigma_backbone:
+            # Apply linear_out twice: mu from live features (grad -> backbone), sigma
+            # from detached features (linear_out sigma-rows still train, backbone does
+            # not see sigma's gradient). See __init__ note.
+            h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
+                         pair_ctx=pair_ctx, return_features=True)
+            mu = self.net.linear_out(h)[..., : self.out_shape]
+            sigma_raw = self.net.linear_out(h.detach())[..., -self.out_shape:]
+            sigma = torch.clamp(F.softplus(sigma_raw), min=1e-6)
+            return torch.cat([mu, sigma], dim=-1)
         out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
         if self.loss == "HETEROSC":
             # softplus the sigma channels for positivity (floored), matching MuMLP.
