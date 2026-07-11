@@ -40,7 +40,7 @@ FLOAT32_FLOOR = np.array([0.00386, 0.00048, 0.00006, 1e-5, 1e-5, 1e-5])
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run_dir", default=os.path.join(WT, "runs/pretrain22_heldout_uug/ft_deep_antenna_het"))
+    ap.add_argument("--run_dir", default=os.path.join(WT, "runs/heterosc_foundation/ft_uug_het"))
     ap.add_argument("--ckpt", default="model_run0_best.pt")
     ap.add_argument("--heldout", default=os.path.join(REPO, "analysis/divergences/uug_deep_test.npz"))
     ap.add_argument("--out_base", default=os.path.join(WT, "analysis/divergences/figs/heterosc_sigma_map"))
