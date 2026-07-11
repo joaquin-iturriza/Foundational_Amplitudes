@@ -2221,10 +2221,13 @@ class AmplitudeExperiment(BaseExperiment):
         # HETEROSC: the net emits [mean, sigma]; split sigma out and pass it to the
         # per-event NLL (the aggregator threads it through to _per_event_loss).
         sigma = None
+        mse_val = None
         if self.cfg.training.loss == "HETEROSC":
             out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
             sigma  = y_pred[..., -out_shape:]
             y_pred = y_pred[..., :-out_shape]
+            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
+            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
         loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma)
@@ -2238,7 +2241,7 @@ class AmplitudeExperiment(BaseExperiment):
         loss        = loss + reg
         if sync_blocking:
             assert torch.isfinite(loss).all()   # original per-step guard (D2H sync)
-        return loss, loss_no_reg, None
+        return loss, loss_no_reg, mse_val
 
     def _per_event_loss(self, y_pred, y, sigma=None):
         """Per-event loss vector (B,) with NO cross-event reduction.
@@ -2270,6 +2273,11 @@ class AmplitudeExperiment(BaseExperiment):
             assert sigma is not None, "HETEROSC per-event loss requires sigma"
             sigma_c = torch.clamp(sigma, min=1e-15, max=1e5)
             elem = ((y - y_pred) ** 2) / (2 * sigma_c ** 2) + torch.log(sigma_c)
+            # β-NLL (Seitzer 2022): scale each event's NLL by a DETACHED σ^{2β}. β=0 is
+            # plain NLL; β>0 cancels the 1/σ² that starves μ's gradient where σ is large.
+            beta = float(self.cfg.training.get("heterosc_beta", 0.0) or 0.0)
+            if beta > 0.0:
+                elem = (sigma_c.detach() ** (2.0 * beta)) * elem
         else:
             raise ValueError(f"Unknown loss function {name}")
         # mean over feature dims → (B,)
@@ -2598,7 +2606,7 @@ class AmplitudeExperiment(BaseExperiment):
                     if loss_no_reg is not None:
                         losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                     if mse_val is not None:
-                        mse_vals.append(mse_val)
+                        mse_vals.append(float(mse_val))   # float() also materialises a detached tensor (LLoCa path)
                 proc_losses[name]        = float(np.mean(losses))
                 proc_losses_no_reg[name] = float(np.mean(losses_no_reg)) if losses_no_reg else None
                 proc_mse_vals[name]      = float(np.mean(mse_vals))      if mse_vals      else None

@@ -112,6 +112,9 @@ training:
  fused_optimizer: true   # fused=True for Adam/AdamW (CUDA only); flows through MuAdam/MuAdamW.
 
  loss: MSE
+ heterosc_beta: 0.0   # β-NLL (Seitzer et al. 2022): weight the HETEROSC NLL by detach(σ^{2β}).
+                      # 0 = plain Gaussian NLL; 0.5–1 restores μ's gradient (fixes σ-inflation
+                      # underfitting μ). Only used when loss=HETEROSC.
  loss_aggregation: geometric_mean   # mean | geometric_mean. geo mean is the default and used
                         # in essentially every run: processes of different final-state
                         # dimensionality plateau at very different MSE magnitudes (1e-6 vs 1e-2),
