@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 from lloca.reps.tensorreps import TensorReps
 from lloca.reps.tensorreps_transform import TensorRepsTransform
@@ -103,6 +104,12 @@ class LLOCAMuPTransformer(nn.Module):
     ):
         super().__init__()
         self.parametrization = parametrization
+        # Heteroscedastic head: the net emits 2*out_shape channels (mean, sigma);
+        # sigma is softplus-ed for positivity in forward. out_shape stays the real
+        # target dim so experiment.py's split (last out_shape = sigma) is unchanged.
+        self.loss = loss
+        self.out_shape = out_channels
+        net_out_channels = 2 * out_channels if loss == "HETEROSC" else out_channels
 
         def equivectors_constructor(n_vectors):
             return EquiMLP(
@@ -126,7 +133,7 @@ class LLOCAMuPTransformer(nn.Module):
         self.net = MuPTransformer(
             in_channels,
             attn_reps,
-            out_channels,
+            net_out_channels,
             num_blocks,
             num_heads,
             dropout_prob=dropout_prob,
@@ -161,4 +168,10 @@ class LLOCAMuPTransformer(nn.Module):
         # restricting each event's particles to attend only within that event.
         # seq_lens (CPU per-event lengths, optional) lets the mask builder skip a
         # GPU→CPU sync; see build_block_diagonal_bias.
-        return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
+        out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
+        if self.loss == "HETEROSC":
+            # softplus the sigma channels for positivity (floored), matching MuMLP.
+            mu = out[..., : self.out_shape]
+            sigma = torch.clamp(F.softplus(out[..., -self.out_shape:]), min=1e-6)
+            out = torch.cat([mu, sigma], dim=-1)
+        return out

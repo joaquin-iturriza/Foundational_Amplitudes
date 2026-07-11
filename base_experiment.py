@@ -1088,7 +1088,20 @@ class BaseExperiment:
         try:
             state_dict = _torch_load(pretrained_path, map_location=self.device, weights_only=False)["model"]
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
-            self.model.load_state_dict(state_dict)
+            if reset_output_head:
+                # Drop any parameter whose shape differs from the current model (e.g. the
+                # readout when switching MSE 1-ch -> HETEROSC 2-ch): load the body strictly
+                # via non-strict + an explicit shape filter, then (re)init the head below.
+                own = self.model.state_dict()
+                filtered = {k: v for k, v in state_dict.items()
+                            if k in own and own[k].shape == v.shape}
+                dropped = [k for k in state_dict if k not in filtered]
+                self.model.load_state_dict(filtered, strict=False)
+                if dropped:
+                    LOGGER.info(f"Fine-tuning: skipped {len(dropped)} shape-mismatched "
+                                f"pretrained tensors (e.g. {dropped[:2]}).")
+            else:
+                self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
 

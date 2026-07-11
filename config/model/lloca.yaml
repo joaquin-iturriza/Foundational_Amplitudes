@@ -67,6 +67,7 @@ net:
   in_channels: null
   attn_reps: "8x0n+2x1n"
   out_channels: 1
+  loss: ${training.loss}   # HETEROSC -> net emits 2 channels (mean, sigma); else 1
   num_blocks: 8
   num_heads: 8
   freeze_framesnet: false
