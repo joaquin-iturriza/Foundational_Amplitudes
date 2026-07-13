@@ -2271,6 +2271,13 @@ class AmplitudeExperiment(BaseExperiment):
             elem = ((y_pred - y) / torch.maximum(y_pred.abs(), eps)).abs()
         elif name == "HETEROSC":
             assert sigma is not None, "HETEROSC per-event loss requires sigma"
+            # DIAGNOSTIC (heterosc_mu_only): keep the 2-ch HETEROSC net exactly as-is but
+            # optimise plain MSE on mu, so sigma receives no gradient at all. Bisects a
+            # "the objective is wrong" cause from a "the 2-ch model/wiring is wrong" cause:
+            # the beta=1 mu-gradient is provably 0.5x the MSE one (uniform, Adam-invariant),
+            # so this arm MUST reproduce the 1-ch MSE result unless the model is at fault.
+            if bool(self.cfg.training.get("heterosc_mu_only", False)):
+                return ((y_pred - y) ** 2).flatten(1).mean(dim=1)
             sigma_c = torch.clamp(sigma, min=1e-15, max=1e5)
             elem = ((y - y_pred) ** 2) / (2 * sigma_c ** 2) + torch.log(sigma_c)
             # β-NLL (Seitzer 2022): scale each event's NLL by a DETACHED σ^{2β}. β=0 is
