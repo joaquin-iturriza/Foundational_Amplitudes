@@ -66,8 +66,27 @@ def gnorm(loss, params):
 
 
 def main():
+    # We need a state with GOOD mu AND a LIVE sigma head -- which no single run produces:
+    #   het_mu_only  : mu-MSE 1.0e-4, but sigma gets no loss gradient, so the L2 penalty
+    #                  (full-size step under Adam even at tiny lambda) decays its readout row
+    #                  to EXACTLY zero -> sigma = softplus(0) = const, ||g_sigma|| == 0.
+    #   het_full_b1  : sigma alive, but mu is already wrecked (8.6e-2).
+    # So: take het_mu_only's trunk + mu head, and GRAFT the foundation's live sigma row back
+    # in. That is the state the NLL would face if mu were well fit -- exactly the point where
+    # we want to know whether the sigma term's trunk gradient swamps mu's.
     run_dir = os.path.join(WT, "runs/heterosc_bisect/het_mu_only")   # mu-MSE ~1.0e-4
     exp = build(run_dir, "model_run0_best.pt")
+
+    found = load_finetuned_state(os.path.join(
+        WT, "runs/heterosc_foundation/het_lr0.004_b1.0/models/model_run0_best.pt"))["model"]
+    sd = exp.model.state_dict()
+    with torch.no_grad():
+        sd["net.net.linear_out.weight"][1] = found["net.net.linear_out.weight"][1].to(exp.device)
+        sd["net.net.linear_out.bias"][1]   = found["net.net.linear_out.bias"][1].to(exp.device)
+    exp.model.load_state_dict(sd)
+    print(f"[grafted foundation sigma row: ||W_sig||="
+          f"{sd['net.net.linear_out.weight'][1].norm().item():.4f}]\n")
+
     tp = trunk_params(exp.model)
 
     data = next(iter(exp.train_loader))
