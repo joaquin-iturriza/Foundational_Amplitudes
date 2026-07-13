@@ -1,0 +1,2 @@
+# Explicitly user-approved one-off HP grids (bypass hpo_guard.sh). One path per line.
+# Adding a line here is an auditable record that the USER approved a grid instead of DyHPO.

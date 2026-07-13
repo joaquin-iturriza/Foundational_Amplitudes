@@ -40,6 +40,15 @@
             "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/md_guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/hpo_guard.sh"
+          }
+        ]
       }
     ]
   }

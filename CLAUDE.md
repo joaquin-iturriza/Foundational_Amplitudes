@@ -339,6 +339,17 @@ laws); the settled rules that govern how sweeps are set up:
    (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
    denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
    The `sweep_config*template.yaml` defaults already encode these ranges.
+6. **HP questions go through DyHPO — NEVER a hand-rolled grid, and DyHPO is used
+   SINGLE-FIDELITY** (`fidelity_schedule.t_steps: [T]`, one value; the multi-fidelity
+   ladder is not used here). This holds *whatever the question is phrased as*:
+   "is `clip_grad_norm` the culprit?" or "does it work at any `lr`?" are **HP searches**,
+   not diagnostics — reframing one as "just a mechanism test" is exactly the
+   rationalization that must not happen. It is not a style rule: HPs **interact**, so a
+   1-D grid at fixed everything-else answers "best `lr` *given those* values", cannot reach
+   a joint optimum (e.g. one needing `lr` *and* `beta` together), and will come back flat
+   — manufacturing a **false** "it doesn't work at any `lr`" conclusion. Sweep the coupled
+   space. Job arrays remain right for **non-HP** ablations (loss type, data tag, warm-start
+   checkpoint, ablation flags, seeds). Enforced by `hpo_guard.sh`.
 
 ---
 
@@ -482,6 +493,12 @@ above: **`md_guard.sh`** (`PreToolUse(Write)`) blocks creation of new
 `.claude/md_allowlist.txt`), and
 **`figure_pair_guard.sh`** (`Stop`) blocks finishing a turn if a figure was saved
 in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
+**`hpo_guard.sh`** (`PreToolUse(Bash)`) blocks `sbatch` of a hand-rolled **HP grid**
+— a job array that feeds an HP (`training.lr`, `clip_grad_norm`, `heterosc_beta`,
+`regularization_lambda`, `cosanneal_*`, `fine_tune.lr_scale`/`layer_decay`) a
+per-task shell variable — because HP search goes through DyHPO (allowlist
+`.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
+tag, warm-start ckpt, ablation flags, seeds) stay allowed.
 
 **Branches**
 - **`jeanzay`** — the development trunk and default working branch. *Everything*
