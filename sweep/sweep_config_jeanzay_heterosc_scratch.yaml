@@ -1,0 +1,97 @@
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2          # V100 32GB
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "01:30:00"
+
+paths:
+  # project_dir MUST be the heterosc worktree (HETEROSC 2-ch head + beta-NLL live on branch
+  # `heterosc`, not on jeanzay/main).
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-heterosc/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-heterosc
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+# Give HETEROSC its OWN HPs, FROM SCRATCH, and ask whether it then matches MSE.
+# Reference: scratch_mse (same data/budget, lr=4e-3, untuned) = 9.19e-5 val mu-MSE.
+# At MSE's HPs, het was 9.12e-2 (~1000x worse). Per the A/B protocol (CLAUDE.md step 4) the
+# feature now gets its own HPO before ANY conclusion is drawn. This is deliberately a fair
+# fight that FAVOURS het: het gets a full 16-trial Bayesian sweep, MSE gets a single untuned
+# run. So if het's best STILL loses badly, the conclusion is safe a fortiori; only if het
+# wins/ties do we need to sweep MSE too for a true best-vs-best.
+#
+# Crucially this sweeps the COUPLED space. A 1-D lr grid at fixed beta/lambda/warmup could not
+# find an optimum that needs (lr AND beta) together, and would have produced a false
+# "het is broken at every lr" verdict. heterosc_beta is the het-specific knob and has been
+# pinned at 1.0 in every run so far (the old foundation grid only tried {0,0.5,1} x 2 lrs).
+sweep_name: heterosc_scratch_hpo
+n_trials: 16
+
+dyhpo:
+  n_candidates: 100
+  seed: 42
+  n_startup: 6
+  total_budget: 40
+
+# SINGLE fidelity (project convention: DyHPO as a one-fidelity Bayesian optimiser), at the
+# same 4000-step budget as the scratch_mse reference.
+fidelity_schedule:
+  t_steps: [4000]
+
+fixed_params:
+  # --- data: dense-IR antenna uug pool, per-dataset preprocessing (== scratch_mse) ---
+  data.source: files
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data_deep_antenna/
+  data.dataset: '[ee_uug_91-1000GeV_amplitudes]'
+  data.preprocess_per_dataset: 'true'
+  data.train_test_val: '[0.9, 0.05, 0.05]'
+  data.subsample: null
+  # --- model: LLoCa, diagram-free (== scratch_mse). NO warm start: fresh init. ---
+  model: lloca
+  model.net.num_blocks: 8
+  model.net.num_heads: 8
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.detach_sigma_backbone: 'false'   # stock coupled path
+  # --- HETEROSC loss ---
+  training.loss: HETEROSC
+  training.heterosc_mu_only: 'false'
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  training.scheduler: CosineAnnealingLR
+  training.cosanneal_eta_min: 1.0e-8     # weakest knob — fixed
+  training.clip_grad_norm: 5             # measured: binds ~1% of steps for both losses
+  training.regularization: L2
+  training.validate_frac: '0.01'
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  plot: 'true'
+  plotting.plot_mse_het: 'false'
+
+search_space:
+# lr: the measured lr*(t,D) law was fitted on MSE runs; het's gradient scale differs (at beta=1
+# mu's gradient is exactly half MSE's, plus the sigma term), so its optimum need not sit at the
+# MSE centre. The whole question is whether het's optimum lives elsewhere -> deliberately wider
+# than the usual +/-1/2 decade (MSE centre for t=4000, high D is ~8.5e-3).
+- name: training.lr
+  type: float_log
+  low: 3.0e-04
+  high: 3.0e-02
+# THE het-specific knob, pinned at 1.0 in every run so far. beta-NLL (Seitzer): weights the NLL
+# by detach(sigma^{2beta}); 0 = plain NLL, 1 = mu's gradient becomes MSE-like.
+- name: training.heterosc_beta
+  type: float_uniform
+  low: 0.0
+  high: 1.0
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
