@@ -1,0 +1,1 @@
+# Explicitly user-approved plot-disabling (bypasses plot_guard.sh). One substring/path per line.
