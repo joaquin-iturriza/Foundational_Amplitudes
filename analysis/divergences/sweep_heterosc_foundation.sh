@@ -38,7 +38,7 @@ python run.py \
   training.regularization_lambda=6.264093e-10 \
   training.cosanneal_warmup_frac=0.1079041 training.cosanneal_eta_min=6.17785e-9 \
   training.ema_decay=0.9330307 \
-  plotting.plot_mse_het=false \
+  \
   plot=true save=true
 
 echo "DONE het_${TAG}"

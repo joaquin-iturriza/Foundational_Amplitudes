@@ -33,7 +33,7 @@ NAME=${NAMES[$i]}; LOSS=${LOSSES[$i]}
 if [ "$LOSS" = "MSE" ]; then
   EXTRA="training.loss_aggregation=geometric_mean"
 else
-  EXTRA="training.heterosc_beta=1.0 model.net.detach_sigma_backbone=false plotting.plot_mse_het=false"
+  EXTRA="training.heterosc_beta=1.0 model.net.detach_sigma_backbone=false"
 fi
 DATA_PATH=$MAIN/data_deep_antenna/
 

@@ -73,7 +73,6 @@ fixed_params:
   training.get_ID: 'false'
   training.save_intermediate: 'false'
   plot: 'true'
-  plotting.plot_mse_het: 'false'
 
 # Search space per the finetune HPO rules (CLAUDE.md / docs/results.tex sec:optimization).
 # lr_scale is the primary lever (effective finetune step); centred at 1, wide log band.

@@ -45,7 +45,7 @@ if [ "$LOSS" = "MSE" ]; then
   EXTRA="training.loss_aggregation=geometric_mean"
 else
   CKPT=$WT/runs/heterosc_foundation/het_lr0.004_b1.0/models/model_run0_best.pt
-  EXTRA="training.heterosc_beta=1.0 model.net.detach_sigma_backbone=false plotting.plot_mse_het=false"
+  EXTRA="training.heterosc_beta=1.0 model.net.detach_sigma_backbone=false"
 fi
 DATA_PATH=$MAIN/data_deep_antenna/
 

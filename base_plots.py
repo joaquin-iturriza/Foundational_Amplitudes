@@ -208,7 +208,9 @@ def plot_mse(file, mse_losses, labels=None, title=None):
     if title:
         fig.suptitle(title, fontsize=FONTSIZE + 1, y=1.02)
  
-    fig.savefig(file, format="pdf", bbox_inches="tight")
+    base = file[:-4] if file.endswith(".pdf") else file
+    fig.savefig(base + ".pdf", format="pdf", bbox_inches="tight")
+    fig.savefig(base + ".png", format="png", dpi=150, bbox_inches="tight")
     plt.close(fig)
 
 

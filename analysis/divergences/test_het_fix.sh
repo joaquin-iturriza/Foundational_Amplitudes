@@ -19,5 +19,5 @@ python run.py exp_name=heterosc_foundation run_name=het_fixtest \
   training.batchsize=16384 training.iterations=2000 training.lr=0.004 \
   training.regularization_lambda=6.264093e-10 \
   training.cosanneal_warmup_frac=0.1079041 training.cosanneal_eta_min=6.17785e-9 \
-  training.ema_decay=0.9330307 plotting.plot_mse_het=false plot=true save=true
+  training.ema_decay=0.9330307 plot=true save=true
 echo "DONE het_fixtest"

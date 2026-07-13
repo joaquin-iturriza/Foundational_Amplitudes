@@ -16,7 +16,12 @@ paths:
     - "module load anaconda-py3/2023.09"
     - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
 
-# Give HETEROSC its OWN HPs, FROM SCRATCH, and ask whether it then matches MSE.
+# REFINED het sweep. Sweep 1 (heterosc_scratch_hpo) put the optimum at the EDGE of the beta
+# range (best beta~0.025, i.e. essentially the PLAIN NLL) with lr~3-6e-3, and beta dominated
+# (100x spread: beta~0.02 -> 7.6e-4, beta~0.9 -> 7.9e-2). NOTE beta=0 IS the standard
+# heteroscedastic loss; beta=1 (the sigma^2-weighted Seitzer variant, added for this project)
+# is the catastrophic end and was wrongly pinned in every earlier run. Concentrate the search
+# on the region the optimum actually wants rather than re-exploring known-bad high beta.
 # Reference: scratch_mse (same data/budget, lr=4e-3, untuned) = 9.19e-5 val mu-MSE.
 # At MSE's HPs, het was 9.12e-2 (~1000x worse). Per the A/B protocol (CLAUDE.md step 4) the
 # feature now gets its own HPO before ANY conclusion is drawn. This is deliberately a fair
@@ -28,7 +33,7 @@ paths:
 # find an optimum that needs (lr AND beta) together, and would have produced a false
 # "het is broken at every lr" verdict. heterosc_beta is the het-specific knob and has been
 # pinned at 1.0 in every run so far (the old foundation grid only tried {0,0.5,1} x 2 lrs).
-sweep_name: heterosc_scratch_hpo
+sweep_name: heterosc_scratch_hpo2
 n_trials: 16
 
 dyhpo:
@@ -78,14 +83,14 @@ search_space:
 # than the usual +/-1/2 decade (MSE centre for t=4000, high D is ~8.5e-3).
 - name: training.lr
   type: float_log
-  low: 3.0e-04
-  high: 3.0e-02
+  low: 1.0e-03
+  high: 1.2e-02
 # THE het-specific knob, pinned at 1.0 in every run so far. beta-NLL (Seitzer): weights the NLL
 # by detach(sigma^{2beta}); 0 = plain NLL, 1 = mu's gradient becomes MSE-like.
 - name: training.heterosc_beta
   type: float_uniform
   low: 0.0
-  high: 1.0
+  high: 0.15
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10

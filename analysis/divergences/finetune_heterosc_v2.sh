@@ -37,6 +37,6 @@ python run.py \
   training.regularization=L2 training.regularization_lambda=2.47e-7 \
   training.scheduler=CosineAnnealingLR \
   training.cosanneal_warmup_frac=0.191 training.cosanneal_eta_min=1.6e-7 \
-  plotting.plot_mse_het=false plot=true save=true
+  plot=true save=true
 
 echo "DONE ft_uug_het"

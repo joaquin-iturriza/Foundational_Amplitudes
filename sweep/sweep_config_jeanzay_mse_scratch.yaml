@@ -16,7 +16,10 @@ paths:
     - "module load anaconda-py3/2023.09"
     - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
 
-# Give HETEROSC its OWN HPs, FROM SCRATCH, and ask whether it then matches MSE.
+# MSE BASELINE sweep -- the real best-vs-best reference for the het sweep.
+# Same search space (minus the het-only beta), same data/budget/model, from scratch.
+# The previous MSE number (9.19e-5) was a SINGLE UNTUNED run; comparing a swept het against an
+# untuned MSE is not a fair best-vs-best (CLAUDE.md A/B protocol step 4).
 # Reference: scratch_mse (same data/budget, lr=4e-3, untuned) = 9.19e-5 val mu-MSE.
 # At MSE's HPs, het was 9.12e-2 (~1000x worse). Per the A/B protocol (CLAUDE.md step 4) the
 # feature now gets its own HPO before ANY conclusion is drawn. This is deliberately a fair
@@ -28,7 +31,7 @@ paths:
 # find an optimum that needs (lr AND beta) together, and would have produced a false
 # "het is broken at every lr" verdict. heterosc_beta is the het-specific knob and has been
 # pinned at 1.0 in every run so far (the old foundation grid only tried {0,0.5,1} x 2 lrs).
-sweep_name: heterosc_scratch_hpo
+sweep_name: mse_scratch_hpo
 n_trials: 16
 
 dyhpo:
@@ -56,10 +59,9 @@ fixed_params:
   model.net.num_heads: 8
   model.use_diagrams: 'false'
   model.particle_encoder_hidden: 0
-  model.net.detach_sigma_backbone: 'false'   # stock coupled path
-  # --- HETEROSC loss ---
-  training.loss: HETEROSC
-  training.heterosc_mu_only: 'false'
+    # --- HETEROSC loss ---
+  training.loss: MSE
+  training.loss_aggregation: geometric_mean
   training.batchsize: 16384
   evaluation.batchsize: 16384
   training.scheduler: CosineAnnealingLR
@@ -80,12 +82,6 @@ search_space:
   type: float_log
   low: 3.0e-04
   high: 3.0e-02
-# THE het-specific knob, pinned at 1.0 in every run so far. beta-NLL (Seitzer): weights the NLL
-# by detach(sigma^{2beta}); 0 = plain NLL, 1 = mu's gradient becomes MSE-like.
-- name: training.heterosc_beta
-  type: float_uniform
-  low: 0.0
-  high: 1.0
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10
