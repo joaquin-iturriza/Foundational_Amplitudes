@@ -933,6 +933,18 @@ class BaseExperiment:
             f"Finished training: {step + 1} iterations = {(step + 1) / len(self.train_loader):.1f} epochs "
             f"in {dt/60:.2f}min (avg {avg_iter_time:.4f}s/iter)"
         )
+        # Pre-clip grad-norm distribution + how often clip_grad_norm actually BINDS.
+        # clip_grad_norm_ is a GLOBAL norm over all params, so a loss with extra heads
+        # (HETEROSC's sigma) can inflate it and shrink the *whole* update, mu included.
+        if self.train_grad_norm:
+            g = np.asarray(self.train_grad_norm, dtype=np.float64)
+            g = g[np.isfinite(g)]
+            if g.size:
+                clip = self.cfg.training.clip_grad_norm
+                LOGGER.info(
+                    f"Grad-norm (pre-clip): median={np.median(g):.3g} p90={np.percentile(g, 90):.3g} "
+                    f"max={g.max():.3g} | clip={clip} bound {100.0 * (g > clip).mean():.1f}% of steps"
+                )
         if self.cfg.use_mlflow:
             log_mlflow("iterations", step + 1)
             log_mlflow("epochs",     (step + 1) / len(self.train_loader))
