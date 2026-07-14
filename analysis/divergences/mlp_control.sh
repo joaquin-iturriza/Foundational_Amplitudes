@@ -30,6 +30,11 @@ cd "$WT"
 # Read-out: het slope ~1.0 AND accuracy ~ the MLP's MSE arm => the loss is fine and the problem
 #   is LLoCa-specific (pooled per-particle sigma). het slope ~1.4 here TOO => the pathology
 #   follows the loss/data, not the architecture.
+# INPUT FEATURES: the reference's MLP config feeds trafos = {fvs_standardized: [standardization],
+#   invs: [invs, log, standardization]} -- i.e. LOG of the Lorentz INVARIANTS s_ij. Those are the
+#   pole variables: near an IR pole |M|^2 ~ 1/s_ij, so log|M|^2 ~ -log(s_ij) and the target is close
+#   to LINEAR in the features. Our LLoCa gets raw boosted four-momenta with no explicit invariants
+#   (trafos: [] in our config). This is a completely different input basis and is reproduced here.
 # NOTE: slope ~1 is only meaningful if mu is ACTUALLY FIT -- an undertrained model trivially gets
 # slope ~1 (we measured that trade-off). Hence the MSE arm, to bound what the MLP can reach.
 NAMES=(mlp_mse mlp_het)
@@ -47,6 +52,7 @@ python run.py \
   data.source=files data.data_path="$MAIN/data_deep_antenna/" \
   'data.dataset=[ee_uug_91-1000GeV_amplitudes]' \
   data.preprocess_per_dataset=true data.include_permsym=false \
+  'data.trafos={fvs_standardized: [standardization], invs: [invs, log, standardization]}' \
   'data.train_test_val=[0.9, 0.05, 0.05]' \
   data.subsample=null \
   training.loss=${LOSS} \
