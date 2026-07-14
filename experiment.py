@@ -1127,8 +1127,51 @@ class AmplitudeExperiment(BaseExperiment):
                         mode=_virt_mode,
                         mom_div=float(self.mom_div or 1.0))
 
+    def _freeze_all_but_sigma_head(self):
+        """Stage 2 of the two-stage HETEROSC recipe: train ONLY the σ rows of the readout.
+
+        The trunk and the μ row come from a converged plain-MSE run (grown to a 2-channel
+        readout by analysis/divergences/grow_sigma_head.py) and stay frozen bit-for-bit, so μ
+        is exactly the MSE model's μ and val μ-MSE is constant by construction. That removes
+        BOTH failure modes at once: there is no (μ,σ) multi-task competition for the shared
+        trunk, and — at β=0 — the Gaussian NLL is a proper scoring rule for σ (its only
+        stationary point is σ=|r|; the β>0 spurious optimum at r*=exp(-½-1/(2β)) is a statement
+        about μ, which is no longer free).
+
+        linear_out.weight/bias are single tensors holding BOTH heads, so the μ rows cannot be
+        frozen via requires_grad; a grad hook zeroes them instead (this also stops the L2
+        regularization term from decaying the μ row, since reg reaches params through the same
+        .grad).
+        """
+        k = int(self.cfg.model.net.out_channels)
+        lin = self.model.net.net.linear_out
+
+        for p in self.model.parameters():
+            p.requires_grad_(False)
+
+        def _zero_mu_rows(grad):
+            grad = grad.clone()
+            grad[:k] = 0.0
+            return grad
+
+        for p in (lin.weight, lin.bias):
+            if p is None:
+                continue
+            p.requires_grad_(True)
+            p.register_hook(_zero_mu_rows)
+
+        n_train = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        LOGGER.info(
+            f"HETEROSC σ-only: trunk + μ head frozen; {n_train} readout params trainable, "
+            f"μ rows [:{k}] grad-zeroed → only σ trains."
+        )
+
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models
+
+        if (self.cfg.training.loss == "HETEROSC"
+                and bool(self.cfg.training.get("heterosc_sigma_only", False))):
+            self._freeze_all_but_sigma_head()
 
         ft = self.cfg.get("fine_tune", None)
         if ft is None or ft.get("pretrained_path", None) is None:
@@ -2299,6 +2342,16 @@ class AmplitudeExperiment(BaseExperiment):
             # so this arm MUST reproduce the 1-ch MSE result unless the model is at fault.
             if bool(self.cfg.training.get("heterosc_mu_only", False)):
                 return ((y_pred - y) ** 2).flatten(1).mean(dim=1)
+            # STAGE 2 of the two-stage recipe (heterosc_sigma_only): mu comes from a frozen,
+            # MSE-trained trunk+head, and only the sigma readout row trains. Detaching mu here
+            # makes the residual a CONSTANT w.r.t. autograd, so the NLL's mu-gradient
+            # ((mu-y)/sigma^2) cannot touch the frozen weights even numerically, and sigma is
+            # fitted against a fixed error field. With mu fixed there is no (mu,sigma)
+            # multi-task coupling and, at beta=0, the Gaussian NLL is a PROPER scoring rule for
+            # sigma (its only stationary point is sigma=|r|; the beta>0 spurious optimum at
+            # r*=exp(-1/2-1/(2*beta)) is a statement about mu, which is no longer free).
+            if bool(self.cfg.training.get("heterosc_sigma_only", False)):
+                y_pred = y_pred.detach()
             sigma_c = torch.clamp(sigma, min=1e-15, max=1e5)
             elem = ((y - y_pred) ** 2) / (2 * sigma_c ** 2) + torch.log(sigma_c)
             # β-NLL (Seitzer 2022): scale each event's NLL by a DETACHED σ^{2β}. β=0 is

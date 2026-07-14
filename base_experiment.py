@@ -864,12 +864,31 @@ class BaseExperiment:
                 # regularized loss only if no-reg was never computed.
                 val_loss_no_reg_now = self.val_loss_no_reg[-1] if self.val_loss_no_reg else None
                 selection_loss = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
+
+                # HETEROSC: the β-NLL VALUE is not a valid selection metric whenever μ is
+                # trainable. Profiling σ out at its own stationary point (σ=|r|) leaves
+                #     L(r) = r^{2β} · (½ + ln r),
+                # which for β>0 is minimised at r* = exp(-½ - 1/(2β)) — NOT at r=0. At β=1
+                # that is r*=1/e≈0.37, i.e. a model with 37% RMS residual scores BETTER
+                # (L=-0.068) than a perfect one (L→0). Selecting on it therefore saves the
+                # WORSE checkpoint. The value also carries the β-dependent σ^{2β} prefactor,
+                # so it is not comparable across the trials of a β sweep either (this is what
+                # run_trial.py's DyHPO observes — see result["val_loss"] below).
+                # Select on the β-invariant μ-MSE instead.
+                # Exception: heterosc_sigma_only freezes μ, and at β=0 the plain Gaussian NLL
+                # IS a proper scoring rule for σ — there the NLL is exactly the right metric
+                # (and μ-MSE is constant, so it could not select anything).
+                if (self.cfg.training.loss == "HETEROSC"
+                        and not self.cfg.training.get("heterosc_sigma_only", False)
+                        and self.val_mse):
+                    selection_loss = self.val_mse[-1]
+
                 improved = selection_loss < smallest_val_loss
 
                 if improved:
                     smallest_val_loss        = selection_loss
                     smallest_val_loss_step   = step
-                    smallest_val_loss_no_reg = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
+                    smallest_val_loss_no_reg = selection_loss
                     patience = 0
                     if self.cfg.training.es_load_best_model:
                         self._save_model(step, f"model_run{self.cfg.run_idx}_best.pt")
@@ -962,6 +981,10 @@ class BaseExperiment:
         if result_path:
             import json
             os.makedirs(os.path.dirname(result_path), exist_ok=True)
+            # This is what DyHPO observes (sweep/run_trial.py: observe_loss = val_loss).
+            # It is now the same quantity used for checkpoint selection above — i.e. the
+            # β-invariant μ-MSE for HETEROSC, never the β-scaled NLL (which is monotone in
+            # β and would make any sweep over heterosc_beta a pure argmin-β).
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
             result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0}
             result.update(self._result_extra())
