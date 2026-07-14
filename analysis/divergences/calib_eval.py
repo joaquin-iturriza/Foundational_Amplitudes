@@ -87,6 +87,13 @@ def report(run_dir, label):
         act = np.sqrt(np.mean(r[m] ** 2))
         print(f"    [{qs[i]:.4g}, {qs[i+1]:.4g}){'':4s} {m.sum():7d} {pred_s:16.4g} {act:18.4g} "
               f"{act/pred_s:7.2f}")
+    px, py = [], []
+    for i in range(10):
+        m = (s >= qs[i]) & (s <= qs[i + 1]) if i == 9 else (s >= qs[i]) & (s < qs[i + 1])
+        if m.sum() >= 10:
+            px.append(s[m].mean()); py.append(np.sqrt(np.mean(r[m] ** 2)))
+    slope = np.polyfit(np.log10(px), np.log10(py), 1)[0]
+    print(f"\n  >>> RELIABILITY SLOPE = {slope:.2f}   (1.00 = calibrated; >1 = sigma under-dispersed)")
     return r, s, label, beta, float(np.mean(r ** 2))
 
 
@@ -150,8 +157,8 @@ def make_plot(runs, out_base):
 
 def main():
     runs = [
-        (os.path.join(WT, "runs/heterosc_scratch_hpo/trial_0097"), "best het (plain NLL)"),
-        (os.path.join(WT, "runs/heterosc_scratch_hpo/trial_0073"), "2nd het"),
+        (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0016"), "best het (refined sweep)"),
+        (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0021"), "2nd het (refined sweep)"),
     ]
     collected = []
     for rd, label in runs:

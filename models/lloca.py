@@ -101,10 +101,14 @@ class LLOCAMuPTransformer(nn.Module):
         checkpoint_blocks: bool = False,
         parametrization: str = "mup",
         detach_sigma_backbone: bool = False,
+        sigma_after_pool: bool = True,
         # token_size: int = 0,
     ):
         super().__init__()
         self.parametrization = parametrization
+        # See forward(): softplus must be applied ONCE to the POOLED per-event sigma logit, not
+        # per-particle before pooling. False restores the old (range-compressing) behaviour for A/B.
+        self.sigma_after_pool = sigma_after_pool
         # HETEROSC only: feed the sigma readout DETACHED backbone features, so the
         # backbone receives only the mean's (pure-MSE, beta=1) gradient and sigma is a
         # read-only calibration head. Decouples the (mu, sigma) multi-task interference
@@ -175,6 +179,30 @@ class LLOCAMuPTransformer(nn.Module):
         # restricting each event's particles to attend only within that event.
         # seq_lens (CPU per-event lengths, optional) lets the mask builder skip a
         # GPU→CPU sync; see build_block_diagonal_bias.
+        # sigma_after_pool (default, CORRECT): emit sigma as a RAW per-particle logit and let the
+        # wrapper apply softplus ONCE to the pooled, per-event value -> sigma = softplus(mean_i z_i).
+        #
+        # This matches the reference implementation (heidelberg-hepml/amplitude_DSI), where HETEROSC
+        # is only ever wired into the MLP: there the readout is ALREADY per-event and softplus is
+        # applied to that per-event scalar. There is no pooling in its sigma path.
+        #
+        # The old path (sigma_after_pool=False) applied softplus PER PARTICLE and then mean-pooled,
+        # giving sigma = mean_i softplus(z_i). That compresses sigma's dynamic range: making sigma
+        # small needs EVERY particle's logit very negative, while one large logit makes it big. Net
+        # effect measured: sigma spans 23x while the true error spans 91x -> reliability slope ~1.5
+        # (under-dispersed), sigma over-predicting small errors and under-predicting the hard tail by
+        # ~2.75x, and a hard accuracy-vs-calibration trade-off. mu was never affected, because
+        # pooling is linear and commutes with its readout.
+        if self.loss == "HETEROSC" and self.sigma_after_pool:
+            if self.detach_sigma_backbone:
+                h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
+                             pair_ctx=pair_ctx, return_features=True)
+                mu = self.net.linear_out(h)[..., : self.out_shape]
+                sig_logit = self.net.linear_out(h.detach())[..., -self.out_shape:]
+                return torch.cat([mu, sig_logit], dim=-1)
+            # raw logits; the wrapper pools then softpluses
+            return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
+
         if self.loss == "HETEROSC" and self.detach_sigma_backbone:
             # Apply linear_out twice: mu from live features (grad -> backbone), sigma
             # from detached features (linear_out sigma-rows still train, backbone does

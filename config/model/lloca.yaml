@@ -76,6 +76,11 @@ net:
 
 
   loss: ${training.loss}   # HETEROSC -> net emits 2 channels (mean, softplus sigma); else 1
+  sigma_after_pool: true     # HETEROSC: apply softplus ONCE to the POOLED per-event sigma logit
+                             # (sigma = softplus(mean_i z_i)), matching the reference impl where the
+                             # readout is already per-event. false = old per-particle softplus then
+                             # mean-pool (sigma = mean_i softplus(z_i)), which COMPRESSES sigma's
+                             # dynamic range -> reliability slope ~1.5, tail under-predicted ~2.75x.
   detach_sigma_backbone: false   # HETEROSC only: sigma reads DETACHED backbone features so
                                  # the backbone gets only mu's (pure-MSE, beta=1) gradient and
                                  # sigma is a read-only calibration head. Fixes the mu underfit

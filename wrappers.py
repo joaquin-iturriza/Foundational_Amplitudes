@@ -717,7 +717,20 @@ class AmplitudeLLoCaWrapper(nn.Module):
                            seq_lens=seq_lens, pair_ctx=pair_ctx)
 
         # Per-event mean pool (vectorised; see _pool_events / LLOCA_POOL env toggle)
-        return _pool_events(outputs, ptr)
+        pooled = _pool_events(outputs, ptr)
+
+        # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the
+        # positivity nonlinearity is applied here — ONCE, to the pooled per-event value:
+        #     sigma = softplus(mean_i z_i)      (matches the reference: softplus on a per-event readout)
+        # rather than the old  sigma = mean_i softplus(z_i), which compresses sigma's dynamic range
+        # (see models/lloca.py forward). mu is untouched: pooling is linear, so it commutes with
+        # its own readout either way.
+        if getattr(self.net, "loss", None) == "HETEROSC" and getattr(self.net, "sigma_after_pool", False):
+            k = self.net.out_shape
+            mu = pooled[..., :k]
+            sigma = torch.clamp(torch.nn.functional.softplus(pooled[..., -k:]), min=1e-6)
+            pooled = torch.cat([mu, sigma], dim=-1)
+        return pooled
 
 
 class _AmplitudeGATrMuPBase(nn.Module):
