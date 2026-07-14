@@ -27,6 +27,27 @@ from lloca.utils.polar_decomposition import restframe_boost
 
 import psutil, os
 
+
+# TYPE_TOKEN_DICT — LEGACY, non-LLoCa path only (MLP / plain transformer). It is referenced in
+# init_physics but its definition was dropped in the LLoCa refactor, so `model=mup_mlp` has been
+# dead code (NameError). Restored purely to run the DIAGNOSTIC CONTROL: the reference
+# implementation (heidelberg-hepml/amplitude_DSI) wires HETEROSC ONLY into the MLP, never into
+# LLoCa, so the MLP is the one architecture on which the het loss is actually validated.
+#
+# Values are the per-particle type tokens used to expose permutation symmetry (identical
+# particles share a token). We only ever run this control with data.include_permsym=false, where
+# the caller takes list(range(len(...))) — i.e. only the LENGTH (= n_particles) is used, and each
+# particle stays distinct. That avoids asserting a symmetry that does not hold (u and ubar are
+# NOT identical particles, so they must not share a token).
+TYPE_TOKEN_DICT = {
+    # e+ e- -> u ubar g   : 5 particles
+    "ee_uug_91-1000GeV_amplitudes":  [0, 1, 2, 3, 4],
+    # e+ e- -> u ubar g g : 6 particles
+    "ee_uugg_91-1000GeV_amplitudes": [0, 1, 2, 3, 4, 5],
+    # e+ e- -> u ubar     : 4 particles
+    "ee_uu_91-1000GeV_amplitudes":   [0, 1, 2, 3],
+}
+
 # Coupling-order convention (see config/amplitudes.yaml): [n_loops, alpha_s_power].
 #   LO=[0,0]  virt_only=[1,0]  NLO_full=[1,1]  NNLO=[2,2]
 # Name-keyed so a new NLO/NNLO dataset file is labelled correctly without

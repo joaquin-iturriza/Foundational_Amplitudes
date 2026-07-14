@@ -78,11 +78,11 @@ def metrics(run_dir):
 
 def main():
     out = []
-    for sweep in ("heterosc_fixpool_hpo",):
+    for sweep, trials in (("heterosc_datactrl", ["flat_het"]),):
         root = os.path.join(WT, "runs", sweep)
         if not os.path.isdir(root):
             continue
-        for t in sorted(os.listdir(root)):
+        for t in trials:
             rd = os.path.join(root, t)
             if not os.path.exists(os.path.join(rd, "config.yaml")):
                 continue
@@ -102,7 +102,7 @@ def main():
         print(f"  {d['trial']:22s} {d['slope']:6.2f} {d['mse']:10.3g} {d['pull_std']:9.3f} "
               f"{d['tail_ratio']:6.2f} {d['lr']:9.1e} {d['beta']:7.3f}")
     print(f"\n  (MSE baseline accuracy, swept: 4.72e-5 -- het has no config beating that)")
-    with open(os.path.join(WT, "analysis/divergences/calib_rank_fixpool.json"), "w") as f:
+    with open(os.path.join(WT, "analysis/divergences/calib_rank_datactrl.json"), "w") as f:
         json.dump(out, f, indent=1)
 
 
