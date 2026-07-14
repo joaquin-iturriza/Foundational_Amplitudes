@@ -78,7 +78,7 @@ def metrics(run_dir):
 
 def main():
     out = []
-    for sweep in ("heterosc_scratch_hpo", "heterosc_scratch_hpo2"):
+    for sweep in ("heterosc_fixpool_hpo",):
         root = os.path.join(WT, "runs", sweep)
         if not os.path.isdir(root):
             continue
@@ -102,7 +102,7 @@ def main():
         print(f"  {d['trial']:22s} {d['slope']:6.2f} {d['mse']:10.3g} {d['pull_std']:9.3f} "
               f"{d['tail_ratio']:6.2f} {d['lr']:9.1e} {d['beta']:7.3f}")
     print(f"\n  (MSE baseline accuracy, swept: 4.72e-5 -- het has no config beating that)")
-    with open(os.path.join(WT, "analysis/divergences/calib_rank.json"), "w") as f:
+    with open(os.path.join(WT, "analysis/divergences/calib_rank_fixpool.json"), "w") as f:
         json.dump(out, f, indent=1)
 
 
