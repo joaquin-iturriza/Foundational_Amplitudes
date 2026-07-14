@@ -90,6 +90,30 @@ def _build_block_diagonal_mask(ptr, device):
     return mask
 
 
+class AmplitudeMLPWrapper(nn.Module):
+    """LEGACY (non-LLoCa). Restored verbatim from the reference implementation
+    (heidelberg-hepml/amplitude_DSI, wrappers.py) — it was removed in the LLoCa refactor, which
+    left `model=mup_mlp` un-instantiable.
+
+    Restored ONLY to run the diagnostic control: the reference wires the HETEROSC head exclusively
+    into the MLP (models/mup_mlp.py: softplus applied to an ALREADY PER-EVENT readout, no pooling),
+    and never into LLoCa. So the MLP is the one architecture on which the het loss is actually
+    validated, and it is the last untested axis behind het's failure on LLoCa (14-20x worse
+    accuracy than MSE, reliability slope 1.3-1.5, on BOTH datasets, unfixed by the sigma-pool
+    change and by three Bayesian sweeps).
+
+    The net is not permutation invariant, so type_token / global_token / attn_mask are ignored —
+    the flattened per-event feature vector is fed straight in.
+    """
+
+    def __init__(self, net):
+        super().__init__()
+        self.net = net
+
+    def forward(self, inputs, type_token=None, global_token=None, attn_mask=None, **kwargs):
+        return self.net(inputs)
+
+
 class AmplitudeGATrWrapper(nn.Module):
     def __init__(self, net, token_size):
         super().__init__()

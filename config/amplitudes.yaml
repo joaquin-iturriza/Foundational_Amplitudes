@@ -48,7 +48,9 @@ data:
  include_permsym: true
  train_test_val: [.4, .5, .1]
  no_props: false
- trafos: []
+ trafos: {}   # dict (was []): preprocess_particles does `if trafos: trafos.items()`, so an
+              # empty dict is functionally identical (both falsy) but permits a dict override.
+              # Only used by the LEGACY non-LLoCa path; LLoCa never reads it.
  amp_trafos:
   - log
   - standardization

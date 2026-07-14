@@ -52,7 +52,7 @@ python run.py \
   data.source=files data.data_path="$MAIN/data_deep_antenna/" \
   'data.dataset=[ee_uug_91-1000GeV_amplitudes]' \
   data.preprocess_per_dataset=true data.include_permsym=false \
-  'data.trafos={fvs_standardized: [standardization], invs: [invs, log, standardization]}' \
+  '+data.trafos={fvs_standardized: [standardization], invs: [invs, log, standardization]}' \
   'data.train_test_val=[0.9, 0.05, 0.05]' \
   data.subsample=null \
   training.loss=${LOSS} \
