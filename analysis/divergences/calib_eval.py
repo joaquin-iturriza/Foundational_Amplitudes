@@ -64,7 +64,7 @@ def report(run_dir, label):
 
     print(f"\n================ {label} ================")
     print(f"  (lr={lr:.2e}, beta={beta:.3f}, N={len(r)})")
-    print(f"  mu-MSE            = {np.mean(r**2):.4g}      [MSE reference: 9.19e-5]")
+    print(f"  mu-MSE            = {np.mean(r**2):.4g}      [MSE reference (swept best): 4.72e-5]")
     print(f"  residual RMS      = {np.sqrt(np.mean(r**2)):.4g}")
     print(f"  sigma  median     = {np.median(s):.4g}   mean = {np.mean(s):.4g}")
     print()
@@ -156,10 +156,21 @@ def make_plot(runs, out_base):
 
 
 def main():
-    runs = [
-        (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0016"), "best het (refined sweep)"),
-        (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0021"), "2nd het (refined sweep)"),
-    ]
+    # Args: RUNS="<rundir>|<label>;<rundir>|<label>" and FIG=<figure basename>, so the same
+    # evaluator serves the sweep trials and the two-stage runs. Defaults = the old sweep pair.
+    spec = os.environ.get("RUNS", "")
+    if spec:
+        runs = []
+        for item in spec.split(";"):
+            if not item.strip():
+                continue
+            rd, _, label = item.partition("|")
+            runs.append((os.path.join(WT, rd.strip()), label.strip() or rd.strip()))
+    else:
+        runs = [
+            (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0016"), "best het (refined sweep)"),
+            (os.path.join(WT, "runs/heterosc_scratch_hpo2/trial_0021"), "2nd het (refined sweep)"),
+        ]
     collected = []
     for rd, label in runs:
         if not os.path.exists(os.path.join(rd, "config.yaml")):
@@ -173,7 +184,7 @@ def main():
     if collected:
         figdir = os.path.join(WT, "analysis/divergences/figs")
         os.makedirs(figdir, exist_ok=True)
-        make_plot(collected, os.path.join(figdir, "heterosc_calibration"))
+        make_plot(collected, os.path.join(figdir, os.environ.get("FIG", "heterosc_calibration")))
 
 
 if __name__ == "__main__":
