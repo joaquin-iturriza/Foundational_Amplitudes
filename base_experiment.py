@@ -1317,6 +1317,40 @@ class BaseExperiment:
             if self.cfg.use_mlflow:
                 log_mlflow("val.loss", val_loss, step=step)
 
+        # --- σ-ranking SPEED probe (two-stage σ-head study) ---------------------
+        # Guarded, worktree-local: on σ-only fits, record how the σ RANKING (not its
+        # calibration) converges along the trajectory, so we can read off how few
+        # iters make σ usable as a reweighting signal. One extra forward over a
+        # capped val subset (μ frozen → cheap). Dumped to sigma_rank_curve.json each
+        # val step so it survives preemption.
+        if (self.cfg.training.get("heterosc_rank_curve", False)
+                and self.cfg.training.get("heterosc_sigma_only", False)
+                and self.is_main_process()):
+            import json
+            import sys
+            probe_dir = os.path.join(os.path.dirname(__file__),
+                                     "analysis", "divergences")
+            if probe_dir not in sys.path:
+                sys.path.insert(0, probe_dir)
+            from sigma_speed_probe import rank_metrics
+            m = rank_metrics(
+                self, self.val_loader,
+                max_events=int(self.cfg.training.get("rank_curve_max_events", 50000)))
+            m["step"] = int(step + 1)
+            m["wall_s"] = round(time.time() - self.training_start_time, 1)
+            m["lr"] = float(self.train_lr[-1]) if self.train_lr else None
+            if not hasattr(self, "_rank_curve"):
+                self._rank_curve = []
+            self._rank_curve.append(m)
+            LOGGER.info(
+                f"[σ-rank] step {m['step']:>5} | ρ_glob {m['spearman_global']:.3f} "
+                f"| ρ_proc {m['spearman_proc']:.3f} (n_proc={m['n_proc']}) "
+                f"| slope {m['slope']:.3f} | μ-MSE {m['mu_mse']:.4e}")
+            if self.cfg.save:
+                with open(os.path.join(self.cfg.run_dir, "sigma_rank_curve.json"),
+                          "w", encoding="utf-8") as fh:
+                    json.dump(self._rank_curve, fh, indent=2)
+
         end_time_validate = time.time()
         return val_loss
 
