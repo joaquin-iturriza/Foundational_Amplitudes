@@ -1368,9 +1368,12 @@ in-region data than $u\bar u g$.
 \subsection{Hand-off: deeper/cleverer sampling, optimal allocation, and heteroscedastic
 uncertainty (work in progress)}\label{sec:div-handoff}
 
-\emph{State of an in-progress line of work, three threads. Thread~A is complete; Thread~B is
-analysis plus a validated but un-integrated tool; Thread~C is mid-debug and is the main open
-item. New tooling is under \code{analysis/divergences/}; the heteroscedastic code lives on git
+\emph{State of an in-progress line of work, now four threads. Thread~A is complete; Thread~B is
+analysis plus a validated but un-integrated tool; Thread~C (heteroscedastic $\sigma$) is
+\textbf{de-risked} --- the coupled-fit failure is resolved by a two-stage recipe, and $\sigma$ is
+validated as a reweighting signal (a speed and a tolerance study, below); Thread~D is the
+synthesis that reframes the whole line of work around a general, process-agnostic default
+sampling. New tooling is under \code{analysis/divergences/}; the heteroscedastic code lives on git
 worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}), \emph{not yet merged} to
 \code{jeanzay}. The adaptive-sampler prototype is on branch \code{adaptive-ir}.}
 
@@ -1441,30 +1444,94 @@ iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives i
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
 gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
 
-\paragraph{Open --- the uug finetune underfits.} \code{finetune\_heterosc\_v2.sh} (best foundation
-$\to$ uug antenna pool, $\beta{=}1$, \emph{no} head reset, both sides 2ch) still yields a
-$\sigma$-map (\code{extract\_sigma.py}, fig \code{heterosc\_sigma\_map}) with $\mu$ error $\sim$1
-and $\sigma$ flat $\sim$1 --- $\mu$ near the mean. This is \emph{not} a data mismatch (base22 is
-genuinely leave-uug-out: its log shows ``Loaded 22 recipe processes'', and \code{data.dataset} in a
-\code{source=recipes} config is vestigial, so the ``8 datasets'' there is a red herring) and
-\emph{not} the val-aggregation bug (single-dataset finetunes use the base arithmetic
-\code{\_validate}). The MSE finetune on the \emph{same} transfer task fits to $\sim$0.01, so
-HETEROSC should too.
+\paragraph{Resolved --- the coupled fit fails for a structural reason; two-stage $\sigma$ works.}
+The coupled $(\mu,\sigma)$ NLL underfit $\mu$ ($\mu$-MSE $\sim$1 or $\gg$ the MSE baseline) across
+$\sim$40 GPU-h of runs and three sweeps. Mechanism (\code{grad\_decomp.py}, \code{clip\_test.sh}):
+amplitudes are \emph{deterministic} (no aleatoric noise), so the Gaussian likelihood is degenerate
+(true $\sigma\!\to\!0$) and at $\beta{=}0$ the $\sigma$-readout gradient
+$\sigma^{-1}(1-r^2/\sigma^2)$ \emph{blows up} as $\sigma$ shrinks; \code{clip\_grad\_norm} is a
+\textbf{global} norm, so it throttles the \emph{whole} step ($\mu$ included) to $\sim$10\% on
+nearly every step (median grad-norm 51 vs clip 5, binds 97.5\% of steps). The earlier
+\code{clip\_test} missed this because it ran at $\beta{=}1$, where $\sigma$'s gradient is damped.
+\emph{Fix --- two-stage} (\code{twostage\_sigma.sh}, \code{twostage\_sigma2.sh}, \code{calib\_eval.py}):
+train $\mu$ with plain MSE, freeze trunk$+\mu$ (\code{training.heterosc\_sigma\_only}), then train
+\emph{only} the 258-param $\sigma$ readout row at $\beta{=}0$ (a proper scoring rule with $\mu$
+fixed). Result: \textbf{calibrated $\sigma$ at zero accuracy cost} --- pull std $1.0$, reliability
+slope $\sim$1.1, $\mu$-MSE bit-identical to the MSE model, on both the deep-IR uug finetune and the
+22-proc base22 foundation (which tracks error across $4.5$ decades of per-process scale). Cost:
+$\sim$3 min (single process), $\sim$31 min (base22). So the NLL loss and $\sigma$ head were never
+broken --- they must not be trained \emph{jointly} with $\mu$. NAMING TRAP recorded: Seitzer's
+$\beta$-NLL is $\mathrm{detach}(\sigma^{2\beta})\!\cdot\!\text{NLL}$, so $\beta{=}0$ is the standard
+Gaussian NLL (works); the catastrophic runs were all $\beta{=}1$.
 
-\paragraph{What's left (priority order).}
-(1) \textbf{Fix the HETEROSC uug finetune.} Diagnose first ($\sim$0.3 GPU-h): its best-vs-last
-checkpoint $\mu$-MSE (rules in/out checkpoint selection) against the MSE antenna finetune's uug
-$\mu$-MSE as a matched baseline. Prime suspects: finetune HPs (\code{lr\_scale}/\code{layer\_decay}
-were borrowed from the MSE recipe, never tuned for the NLL gradient scale), the $\sigma$-head
-sharing the backbone, or checkpoint selection. Then a finetune HP sweep if needed.
-(2) \textbf{Redo the $\sigma$-map on a well-fit $\mu$.} The earlier (contaminated) map already
-suggested $\sigma$ is \emph{epistemic} --- it peaked in the antenna-\emph{undersampled} bulk, not
-the float32-heavy deep IR, and sat 2--3 decades above the float32 floor. Confirm once $\mu$ fits.
-(3) \textbf{Then:} drive adaptive sampling from $\sigma$ (or an epistemic variant ---
-MC-dropout/evidential, since a single $(\mu,\sigma)$ head is aleatoric), optionally wiring in the
-Thread~B controller; and merge \code{heterosc} into \code{jeanzay} once sound (cosmetic left-over:
-the HETEROSC val ``combined'' display still prints $0$ via geometric mean --- harmless, since
-training and checkpointing now use arithmetic mean).
+\paragraph{Q1 --- the $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
+a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
+$\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
+Spearman$(\sigma,|r|)$ global + per-process median; \code{sigma\_speed.sh}, constant-lr to avoid
+the cosine-horizon confound) shows the ranking \emph{saturates by iter $\sim$20--30} ($\sim$1 min),
+long before calibration converges --- 600 iters is overkill \emph{for ranking}. The apparent 23-min
+base22 run was \emph{validation} overhead, not the fit: \code{LLOCA\_PROFILE\_STEP} split it
+$55$\,s pure training ($182$\,ms/iter) vs $\sim$45\,s $\times$30 full 22-proc validations. Key
+subtlety: cross-process ranking is strong ($\rho\!\approx\!0.85$), within-process weak
+($\rho\!\approx\!0.29$ for base22, $0.46$ for single-proc uug) and \emph{does not} improve with more
+training --- global Spearman \emph{under-rates} a learned head because it weights bulk ordering
+(irrelevant to reweighting) equally with the high-error tail.
+
+\paragraph{Q2 --- imperfect $\sigma$ is tolerable, but the metric must be equal-footing.} Since a
+reweighting proposal $\pi\!\propto\!Q\sigma^\alpha$ renormalizes, only $\sigma$'s order/magnitude
+\emph{relative} to the true error matters, not calibration per se. Test: resample the antenna pool
+by $\pi\!\propto\!Q\,\mathrm{score}^\alpha$ at several signal qualities (\code{build\_reweight\_pools.py}
+without replacement to a fixed $N$; \code{finetune\_sigma\_reweight.sh}; deep-IR eval), plus a
+magnitude-controlled rank-vs-magnitude split (\code{build\_rank\_pools.py}: same weight multiset
+$\Phi=\mathrm{sort}|r|$ reassigned by different orderings). \textbf{Metric correction (important):}
+the eval must weight each $y_{\min}$ decade \emph{equally} (log-flat-per-decade, the Thread-A
+metric), \emph{not} \code{np.mean}$(d^2)$ over all events --- the antenna test set is $\sim$50\%
+below $y_{\min}\,10^{-3}$, so event-weighting is deep-IR-dominated
+(\code{recompute\_q2\_logflat.py}). Under equal footing: the real $\sigma$ head captures
+\textbf{$\sim$80\% of the perfect-oracle reweighting gain} (event-weighted $87$\%) and improves
+\emph{every} decade including the bulk. But the rank/magnitude split \emph{flips} versus the
+event-weighted view: \textbf{magnitude dominates} --- ordering-alone gives only $11$\%, because
+after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ (MSE $10^{-2}\!\gg\!$
+deep-IR $8\!\times\!10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
+heuristics (rank, weak $\sigma$) starve the bulk and can \emph{net-hurt} (a $\rho{=}0.29$ synthetic
+$\sigma$ scores $-9$\% under equal footing). So calibration matters more than a pure-rank framing
+suggests. Figures: \code{q2\_confirm}, \code{q2\_dense}, \code{q2\_rankmag}, \code{q2\_logflat}.
+
+\paragraph{Thread D --- coverage vs.\ emphasis, and the general default sampling.} The decisive
+structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage --- it cannot beat
+the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
+so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$) as well as the sampling-study
+mixture ($2.2\!\times\!10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
+$[10^{-1},10^0)$ at $63$\%, antenna at $4$\%; the two are complementary, $0$\% uniform coverage in
+the two deepest decades). The mixture ``wins overall'' by \emph{coverage}, which no reweighting of a
+starved pool can replicate. And the optimum is \emph{dynamic}: the worst region migrates IR$\to$bulk
+\emph{during} training, so no static hand-designed density (antenna, flat-in-log-$y_{\min}$,
+mixture) stays optimal --- adaptive $\sigma$ tracks the moving target, static densities cannot.
+\emph{The general default} (subsuming the process-specific proxies): sample \textbf{flat in
+$\log|\mathcal{M}|^2$} --- equal training density per amplitude decade. This is the universal,
+structure-agnostic coverage criterion, because \emph{every} divergence type (soft/collinear IR,
+$s$-channel resonance, threshold) is an \emph{amplitude extreme}, and $|\mathcal{M}|^2$ is the one
+coordinate always available (computed to label every event); it matches the $\log$-MSE
+equal-footing loss. \emph{How:} you cannot draw a target $|\mathcal{M}|^2$, so shape the density by
+adaptive importance sampling (VEGAS/foam) \emph{guided by} $|\mathcal{M}|^2$ --- crucially toward
+flat-in-$\log|\mathcal{M}|^2$, \emph{not} the physical measure $|\mathcal{M}|^2\mathrm{d}\Phi$ a
+cross-section generator targets (that is the \textsc{rambo} starvation trap). The three layers: (L0)
+coverage via flat-$\log|\mathcal{M}|^2$ importance sampling; (L1) emphasis via $\sigma$-reweighting
+$\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); (L2, aspirational)
+$\sigma$-informed \emph{on-the-fly generation} --- the only layer that lets $\sigma$ overcome the
+coverage ceiling, by generating where $\sigma$ is high \emph{and} data is sparse.
+
+\paragraph{Next step (start of next session).} Build the \textbf{flat-in-$\log|\mathcal{M}|^2$
+resampler} (L0) --- the reusable, process-agnostic piece --- and validate on a \emph{different}
+singularity type with no structure-aware code: $e^+e^-\!\to u\bar u$ ($91$--$1000$ GeV) has an
+$s$-channel $Z$ resonance ($|\mathcal{M}|^2$ peaks $\sim$200$\times$ at $\sqrt{s}\!\approx\!91$; the
+\textsc{rambo} set gives only $0.3$\% of events there --- the same starvation as the uug bulk). Show
+flat-$\log|\mathcal{M}|^2$ resampling of the $10^6$-event pool fixes the resonance vs raw
+\textsc{rambo} (validate against $\sqrt{s}$, which the \emph{method} never uses), then that
+$\sigma$-reweighting adds emphasis on top. Then wire the online L0+L1 loop
+(train $\to$ fit $\sigma$ $\to$ reweight $\to$ repeat) and merge \code{heterosc} into \code{jeanzay}
+(cosmetic left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric mean ---
+harmless, since training and checkpointing use arithmetic mean).
 
 \paragraph{Earlier follow-ups (still open).} Extend the soft/collinear split to $u\bar u gg$
 (\code{holdout\_prep.py} \code{region}=soft/collinear already supports the split).
