@@ -43,9 +43,6 @@ def main():
     ap.add_argument("--out_dir", default=os.path.join(REPO, "analysis/divergences"))
     ap.add_argument("--out_prefix", default="eeuu_reson_")
     ap.add_argument("--summary", default="eeuu_reson_summary.json")
-    ap.add_argument("--frozen_stats", default=None,
-                    help="shared data_stats.json; de-standardize BOTH arms with it (fair A/B). "
-                         "If unset, each arm recomputes its own per-pool stats (confounded).")
     ap.add_argument("--batch_events", type=int, default=8192)
     args = ap.parse_args()
 
@@ -71,8 +68,6 @@ def main():
             cfg.run_dir = os.path.join(REPO, "runs", "_eeuu_eval_tmp")
             cfg.data.subsample = None
             cfg.fine_tune.pretrained_path = None
-            if args.frozen_stats is not None:      # de-standardize both arms with the SHARED scale
-                cfg.data.frozen_stats_path = args.frozen_stats
         exp = AmplitudeExperiment(cfg)
         exp._init(); exp.init_physics(); exp.init_geometric_algebra()
         exp.init_data(); exp._init_dataloader(); exp.init_model()

@@ -1255,12 +1255,6 @@ class AmplitudeExperiment(BaseExperiment):
 
         # --- frozen normalization stats (all GLOBAL scalars, train-only) ---
         # Source of truth, in priority order:
-        #   0. data.frozen_stats_path -> an EXPLICIT stats json (any path). Forces two
-        #                            runs onto IDENTICAL preprocessing regardless of their
-        #                            own (possibly resampled) training pools -- required for
-        #                            a fair sampling A/B, where per-dataset standardization
-        #                            would otherwise give each pool a different amp mean/std
-        #                            and silently rescale the log-amp loss (CLAUDE.md A/B #6).
         #   1. warm-start resume  -> this run's own data_stats.json
         #   2. fine-tune          -> the pretrained run's data_stats.json, so the
         #                            backbone keeps seeing inputs in its training
@@ -1269,12 +1263,8 @@ class AmplitudeExperiment(BaseExperiment):
         stats_path = os.path.join(self.cfg.run_dir, "data_stats.json")
         ft         = self.cfg.get("fine_tune", None)
         ft_path    = ft.get("pretrained_path", None) if ft is not None else None
-        frozen_stats_path = self.cfg.data.get("frozen_stats_path", None)
         stats_src  = None
-        if frozen_stats_path is not None:
-            assert os.path.exists(frozen_stats_path), f"frozen_stats_path not found: {frozen_stats_path}"
-            stats_src = frozen_stats_path
-        elif self.warm_start and os.path.exists(stats_path):
+        if self.warm_start and os.path.exists(stats_path):
             stats_src = stats_path
         elif ft_path is not None:
             cand = os.path.join(os.path.dirname(os.path.dirname(ft_path)),
