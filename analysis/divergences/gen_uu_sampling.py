@@ -114,14 +114,36 @@ def _decade_report(me2, sqrts, tag):
           f"<100={100*np.mean(sqrts<100):.2f}%", flush=True)
 
 
+def gen_uniform(n, smin, smax, rng):
+    """Flat RAMBO: sqrt(s) ~ U[smin,smax] -> build -> label."""
+    sqrts = rng.uniform(smin, smax, n)
+    P = build_momenta(sqrts, rng)
+    return P, label(P), sqrts
+
+
+def gen_flatlogm(n, n_cand, smin, smax, frac_pole, floor, bins, rng):
+    """Generate n_cand candidates from the pole-covering proposal, label, thin to n
+    flat-in-log|M|^2 (unique)."""
+    print(f"  generating {n_cand} candidates (frac_pole={frac_pole}, floor={floor})", flush=True)
+    s_cand = candidate_sqrts(n_cand, smin, smax, frac_pole, floor, rng)
+    P_cand = build_momenta(s_cand, rng)
+    me2_cand = label(P_cand)
+    print(f"  labeled {len(me2_cand)} candidates; |M|^2 log10 span "
+          f"{np.log10(me2_cand.min()):.2f}..{np.log10(me2_cand.max()):.2f}", flush=True)
+    idx = flat_logm_thin(me2_cand, n, bins, rng)
+    return P_cand[idx], me2_cand[idx], s_cand[idx]
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", required=True, choices=["uniform", "flatlogm"])
+    ap.add_argument("--mode", required=True, choices=["uniform", "flatlogm", "mixture"])
     ap.add_argument("--n", type=int, default=400000, help="events in the output training set")
-    ap.add_argument("--n_cand", type=int, default=3000000, help="flatlogm: candidate pool size")
+    ap.add_argument("--n_cand", type=int, default=3000000, help="flatlogm candidate pool size (per unit n)")
+    ap.add_argument("--mix_frac", type=float, default=0.5,
+                    help="mixture: fraction f of events from flat-log|M|^2 (rest uniform-sqrt(s))")
     ap.add_argument("--sqrts_min", type=float, default=91.0)
     ap.add_argument("--sqrts_max", type=float, default=1000.0)
-    ap.add_argument("--frac_pole", type=float, default=0.5, help="candidate frac from the pole proposal")
+    ap.add_argument("--frac_pole", type=float, default=0.6, help="candidate frac from the pole proposal")
     ap.add_argument("--floor", type=float, default=0.02, help="min sqrt(s) offset above threshold (GeV)")
     ap.add_argument("--bins", type=int, default=40, help="log|M|^2 bins for flat thinning")
     ap.add_argument("--seed", type=int, default=42)
@@ -131,18 +153,22 @@ def main():
     print(f"mode={args.mode} n={args.n} sqrts=[{args.sqrts_min},{args.sqrts_max}] seed={args.seed}", flush=True)
 
     if args.mode == "uniform":
-        sqrts = rng.uniform(args.sqrts_min, args.sqrts_max, args.n)
-        P = build_momenta(sqrts, rng)
-        me2 = label(P)
-    else:
-        print(f"  generating {args.n_cand} candidates (frac_pole={args.frac_pole}, floor={args.floor})", flush=True)
-        s_cand = candidate_sqrts(args.n_cand, args.sqrts_min, args.sqrts_max, args.frac_pole, args.floor, rng)
-        P_cand = build_momenta(s_cand, rng)
-        me2_cand = label(P_cand)
-        print(f"  labeled {len(me2_cand)} candidates; |M|^2 log10 span "
-              f"{np.log10(me2_cand.min()):.2f}..{np.log10(me2_cand.max()):.2f}", flush=True)
-        idx = flat_logm_thin(me2_cand, args.n, args.bins, rng)
-        P, me2, sqrts = P_cand[idx], me2_cand[idx], s_cand[idx]
+        P, me2, sqrts = gen_uniform(args.n, args.sqrts_min, args.sqrts_max, rng)
+    elif args.mode == "flatlogm":
+        P, me2, sqrts = gen_flatlogm(args.n, args.n_cand, args.sqrts_min, args.sqrts_max,
+                                     args.frac_pole, args.floor, args.bins, rng)
+    else:  # mixture: f flat-log|M|^2 + (1-f) uniform, generated fresh and shuffled together
+        f = args.mix_frac
+        n_flat = int(round(f * args.n)); n_uni = args.n - n_flat
+        print(f"  mixture mix_frac={f}: n_flat={n_flat} n_uni={n_uni}", flush=True)
+        # scale candidate pool with the flat count (same ~7.5x ratio proven for n=400k/3M)
+        n_cand = max(500_000, int(round(args.n_cand * n_flat / args.n)))
+        Pf, mf, sf = gen_flatlogm(n_flat, n_cand, args.sqrts_min, args.sqrts_max,
+                                  args.frac_pole, args.floor, args.bins, rng)
+        Pu, mu, su = gen_uniform(n_uni, args.sqrts_min, args.sqrts_max, rng)
+        P = np.concatenate([Pf, Pu]); me2 = np.concatenate([mf, mu]); sqrts = np.concatenate([sf, su])
+        perm = rng.permutation(len(P))
+        P, me2, sqrts = P[perm], me2[perm], sqrts[perm]
 
     _decade_report(me2, sqrts, args.mode)
     mom = P.reshape(len(P), -1)                                   # (N,16)
