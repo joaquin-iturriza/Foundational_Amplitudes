@@ -19,26 +19,33 @@ AN = os.path.join(REPO, "analysis/divergences")
 def main():
     summ = json.load(open(os.path.join(AN, "eeuu_reson_summary.json")))
     by = {d["tag"]: d for d in summ}
-    colors = {"raw": "#c44e52", "flatlogm": "#4c72b0"}
-    labels = {"raw": "raw RAMBO (native density)", "flatlogm": r"flat-$\log|\mathcal{M}|^2$ (L0)"}
+    colors = {"raw": "#7f7f7f", "flatlogm": "#c44e52", "genflat": "#4c72b0"}
+    labels = {"raw": "raw RAMBO (native density)",
+              "flatlogm": r"flat-$\log|\mathcal{M}|^2$ RESAMPLED (coverage ceiling)",
+              "genflat": r"flat-$\log|\mathcal{M}|^2$ GENERATED (L0)"}
 
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    for tag in ("raw", "flatlogm"):
+    fig, ax = plt.subplots(figsize=(7.2, 4.6))
+    for tag in ("raw", "flatlogm", "genflat"):
+        if tag not in by:
+            continue
         b = np.array(by[tag]["binmse"], float)     # lo, hi, n, mse
         ctr = np.sqrt(b[:, 0] * b[:, 1])            # geometric bin center (log axis)
         ax.plot(ctr, b[:, 3], "o-", color=colors[tag], label=labels[tag], lw=2, ms=6)
     ax.axvline(91.19, color="0.5", ls=":", lw=1)
     ax.text(91.19, ax.get_ylim()[1], r" $Z$ pole", va="top", ha="left", color="0.4", fontsize=9)
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"$\sqrt{s}$ [GeV]  (validation axis --- unused by the resampler)")
+    ax.set_xlabel(r"$\sqrt{s}$ [GeV]  (validation axis --- unused by the generator's shaper)")
     ax.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-    r, f = by["raw"], by["flatlogm"]
-    ax.set_title(f"ee$\\to u\\bar u$ Z resonance: L0 coverage fix\n"
-                 f"logflat MSE {r['logflat']:.2g}$\\to${f['logflat']:.2g} "
-                 f"({r['logflat']/f['logflat']:.1f}$\\times$); "
-                 f"Zpeak {r['zpeak']:.2g}$\\to${f['zpeak']:.2g} "
-                 f"({r['zpeak']/f['zpeak']:.1f}$\\times$)", fontsize=10)
-    ax.legend(frameon=False, fontsize=9)
+    r = by["raw"]
+    title = "ee$\\to u\\bar u$ $Z$ resonance: generate, don't resample\n"
+    if "genflat" in by:
+        g = by["genflat"]
+        title += (f"raw$\\to$gen: logflat {r['logflat']:.2g}$\\to${g['logflat']:.2g} "
+                  f"({r['logflat']/g['logflat']:.1f}$\\times$), "
+                  f"Zpeak {r['zpeak']:.2g}$\\to${g['zpeak']:.2g} "
+                  f"({r['zpeak']/g['zpeak']:.1f}$\\times$)")
+    ax.set_title(title, fontsize=10)
+    ax.legend(frameon=False, fontsize=8.5)
     ax.grid(True, which="both", alpha=0.2)
     fig.tight_layout()
     base = os.path.join(AN, "eeuu_flatlogm_resonance")

@@ -15,7 +15,10 @@ conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
 # eval script lives on the heterosc branch (worktree only); run configs + ckpts are in MAIN.
+# Three-way: raw RAMBO baseline vs flatlogm (RESAMPLED fixed pool -> coverage ceiling, fails)
+# vs genflat (GENERATED fresh flat-log|M|^2 events -> breaks the ceiling). Each de-standardized
+# with its OWN per-pool stats back to true log|M|^2 (comparable), binned by sqrt(s).
 python worktrees/wt-heterosc/analysis/divergences/eval_eeuu_resonance.py \
-  --runs_root runs/eeuu_flatlogm --run_prefix ft_ --tags raw,flatlogm
+  --runs_root runs/eeuu_flatlogm --run_prefix ft_ --tags raw,flatlogm,genflat
 
 echo "DONE eval_flatlogm"
