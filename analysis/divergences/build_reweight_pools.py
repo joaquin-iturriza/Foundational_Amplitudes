@@ -27,8 +27,11 @@ sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
 from q2_sigma_tolerance import qflat_weights, make_sigma_rho, _spearman  # noqa
 
 
-def resample(rows, pi, n, rng):
-    idx = rng.choice(len(rows), size=n, replace=True, p=pi)
+def resample(rows, pi, n, rng, replace=False):
+    # WITHOUT replacement to a fixed N: every arm trains on the SAME-size unique set,
+    # differing only in WHICH events the signal selects (removes a unique-count confound
+    # that with-replacement resampling introduces when pi is more/less peaked per arm).
+    idx = rng.choice(len(rows), size=n, replace=replace, p=pi)
     return rows[idx], idx
 
 
@@ -37,7 +40,7 @@ def main():
     ap.add_argument("--pool", default=os.path.join(REPO, "data_deep_antenna/ee_uug_91-1000GeV_amplitudes.npy"))
     ap.add_argument("--sigma_npz", default=os.path.join(WT, "analysis/divergences/train_pool_sigma_antenna.npz"))
     ap.add_argument("--alpha", type=float, default=1.0)
-    ap.add_argument("--n", type=int, default=400000)
+    ap.add_argument("--n", type=int, default=200000)   # < pool -> sample without replacement
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
 
