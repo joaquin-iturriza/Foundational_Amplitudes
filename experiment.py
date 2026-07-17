@@ -2755,6 +2755,11 @@ class AmplitudeExperiment(BaseExperiment):
             ", ".join(f"{n}={v:.4f}" for n, v in proc_losses.items())
         )
 
+        # σ-ranking SPEED probe on the MULTI-PROCESS path (this override does not
+        # call super()._validate, so the base hook can't reach here). Uses the
+        # combined self.val_loader — process_ids per event give the per-process ρ.
+        self._sigma_rank_probe(step)
+
         # Update sampler weights (_compute_sampler_weights): each dataset's live
         # local exponent α is fit from recent (compute, EMA-loss) history and
         # compared to its expected SOLO exponent α_solo.  Datasets scaling BELOW

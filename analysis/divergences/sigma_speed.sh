@@ -50,6 +50,11 @@ CKPTS=(
 i=$SLURM_ARRAY_TASK_ID
 NAME=${NAMES[$i]}; CKPT=${CKPTS[$i]}
 
+# Schedule (constant lr → a shorter horizon is a pure truncation, so curves at
+# different ITERS overlay). Defaults reproduce the first uug run; override per-arm.
+ITERS=${ITERS:-800}
+VALEVERY=${VALEVERY:-15}
+
 if [ "$i" -eq 0 ]; then
   DATA_ARGS=(data.source=recipes data.processes_file="$REC")
 else
@@ -76,9 +81,9 @@ python run.py \
   training.heterosc_rank_curve=true \
   training.rank_curve_max_events=50000 \
   training.lr=0.04 \
-  training.iterations=800 training.batchsize=16384 \
+  training.iterations=${ITERS} training.batchsize=16384 \
   evaluation.batchsize=16384 \
-  training.validate_frac=0.0 training.validate_every_n_steps=15 \
+  training.validate_frac=0.0 training.validate_every_n_steps=${VALEVERY} \
   training.es_patience=100000 \
   training.clip_grad_norm=5 \
   training.regularization=L2 training.regularization_lambda=9.892346e-07 \
