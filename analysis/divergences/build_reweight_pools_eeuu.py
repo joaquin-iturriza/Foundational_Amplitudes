@@ -22,6 +22,7 @@ def main():
     ap.add_argument("--n", type=int, default=400000)
     ap.add_argument("--alpha", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--outsuffix", default="", help="appended to arm dir name, e.g. _s1 (seed study)")
     args = ap.parse_args()
 
     rows = np.load(args.pool)
@@ -43,7 +44,7 @@ def main():
         pi = score ** args.alpha
         pi = pi / pi.sum()
         idx = rng.choice(len(rows), size=args.n, replace=False, p=pi)
-        outdir = os.path.join(REPO, f"data_{name}_eeuu")
+        outdir = os.path.join(REPO, f"data_{name}{args.outsuffix}_eeuu")
         os.makedirs(outdir, exist_ok=True)
         np.save(os.path.join(outdir, "ee_uu_91-1000GeV_amplitudes.npy"), rows[idx])
         frac = "  ".join(f"[{lo},{hi}):{100*np.mean((sqrt_s[idx]>=lo)&(sqrt_s[idx]<hi)):.1f}%" for lo, hi in reg)
