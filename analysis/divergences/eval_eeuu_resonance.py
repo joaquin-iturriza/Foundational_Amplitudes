@@ -46,6 +46,32 @@ def main():
     ap.add_argument("--batch_events", type=int, default=8192)
     args = ap.parse_args()
 
+    tags = [t.strip() for t in args.tags.split(",") if t.strip()]
+    # IN-PROCESS STATE LEAK: evaluating >1 tag in one process corrupts every tag after the
+    # first (a module/MuP global survives across AmplitudeExperiment instances; a per-tag
+    # run_dir does NOT fix it -> confirmed the leak is in-process, not file-based). Isolate by
+    # running exactly ONE tag per subprocess, then merge the per-tag summaries. Each child hits
+    # the `else` single-tag branch below with a fresh interpreter -> reproducible, uncorrupted.
+    if len(tags) > 1:
+        import json as _json
+        import subprocess as _sp
+        merged = []
+        for t in tags:
+            sub_summary = f".sub_{args.summary}_{t}.json"
+            cmd = [sys.executable, os.path.abspath(__file__),
+                   "--runs_root", args.runs_root, "--tags", t, "--run_prefix", args.run_prefix,
+                   "--ckpt", args.ckpt, "--test", args.test, "--out_dir", args.out_dir,
+                   "--out_prefix", args.out_prefix, "--summary", sub_summary,
+                   "--batch_events", str(args.batch_events)]
+            _sp.run(cmd, check=True)
+            with open(os.path.join(args.out_dir, sub_summary)) as f:
+                merged.extend(_json.load(f))
+            os.remove(os.path.join(args.out_dir, sub_summary))
+        with open(os.path.join(args.out_dir, args.summary), "w") as f:
+            _json.dump(merged, f, indent=1)
+        print(f"wrote {args.summary} (merged {len(merged)} tags, subprocess-isolated)", flush=True)
+        return
+
     rows = np.load(args.test).astype(np.float64)
     P = (rows.shape[1] - 1) // 5
     raw_mom = rows[:, : P * 4].reshape(-1, P, 4)
@@ -65,7 +91,9 @@ def main():
             cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
             cfg.use_mlflow = False; cfg.save_source = False; cfg.warm_start_idx = None
             cfg.ema = False; cfg.count_flops = False
-            cfg.run_dir = os.path.join(REPO, "runs", "_eeuu_eval_tmp")
+            # per-tag run_dir: a SHARED tmp dir leaks MuP base_shapes.bsh / data_stats.json
+            # from tag N into tag N+1 -> only the first tag evaluates correctly.
+            cfg.run_dir = os.path.join(REPO, "runs", f"_eeuu_eval_tmp_{tag}")
             cfg.data.subsample = None
             cfg.fine_tune.pretrained_path = None
         exp = AmplitudeExperiment(cfg)
