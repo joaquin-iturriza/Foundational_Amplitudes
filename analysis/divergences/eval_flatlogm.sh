@@ -14,7 +14,8 @@ module load anaconda-py3/2023.09
 conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
-python analysis/divergences/eval_eeuu_resonance.py \
+# eval script lives on the heterosc branch (worktree only); run configs + ckpts are in MAIN.
+python worktrees/wt-heterosc/analysis/divergences/eval_eeuu_resonance.py \
   --runs_root runs/eeuu_flatlogm --run_prefix ft_ --tags raw,flatlogm
 
 echo "DONE eval_flatlogm"
