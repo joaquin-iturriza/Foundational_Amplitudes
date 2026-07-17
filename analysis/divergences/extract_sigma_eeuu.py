@@ -53,6 +53,9 @@ def main():
         cfg.data.subsample = None
         cfg.fine_tune.pretrained_path = None
         cfg.model.net.loss = cfg.training.loss                 # HETEROSC -> 2ch net
+    # the analysis helpers above prepend the MAIN repo to sys.path; re-assert the worktree so
+    # hydra instantiates the HETEROSC models.lloca (with sigma_after_pool), not MAIN's 1ch net.
+    sys.path.insert(0, WT)
     exp = AmplitudeExperiment(cfg)
     exp._init(); exp.init_physics(); exp.init_geometric_algebra()
     exp.init_data(); exp._init_dataloader(); exp.init_model()

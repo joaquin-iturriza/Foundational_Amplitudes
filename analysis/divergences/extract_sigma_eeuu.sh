@@ -12,5 +12,5 @@ set -e
 module purge; module load anaconda-py3/2023.09
 conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
-python worktrees/wt-heterosc/analysis/divergences/extract_sigma_eeuu.py
+python worktrees/wt-heterosc/analysis/divergences/extract_sigma_eeuu.py --run_dir worktrees/wt-heterosc/runs/eeuu_sigfit/mix025_sigma
 echo "DONE extract_sigma_eeuu"

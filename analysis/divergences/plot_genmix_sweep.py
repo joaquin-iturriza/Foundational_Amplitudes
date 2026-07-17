@@ -17,7 +17,7 @@ TAG2F = {"raw": 0.0, "mix025": 0.25, "mix050": 0.5, "mix075": 0.75, "genflat": 1
 
 
 def main():
-    summ = json.load(open(os.path.join(AN, "eeuu_reson_sweep_summary.json")))
+    summ = json.load(open(os.path.join(AN, "eeuu_reson_clean_summary.json")))
     by = {d["tag"]: d for d in summ if d["tag"] in TAG2F}
     tags = sorted(by, key=lambda t: TAG2F[t])
     f = np.array([TAG2F[t] for t in tags])
