@@ -60,8 +60,18 @@ def build_momenta(sqrts, rng):
 
 
 def label(P):
-    """Exact tree |M|^2 via the compiled ee_uu standalone."""
-    events = [(P[i], PDG) for i in range(len(P))]
+    """Exact tree |M|^2 via the compiled ee_uu standalone.
+
+    CONVENTION: production stores momenta as [e-, e+, u, ubar] (u at index 2), but the
+    standalone's matrix element expects the final-state quarks in the OPPOSITE slot order
+    -- verified decisively: relabeling production events AS-IS anti-correlates the forward-
+    backward asymmetry (corr 0.94, mirrored), while swapping the final two recovers the stored
+    |M|^2 EXACTLY (corr 1.0000, ratio 1.0000). The production pipeline applies this swap when
+    labeling; a direct driver call must too, else every |M|^2 is the mirror image and a model
+    trained on it anti-correlates on production test data. So: SWAP the last two rows for the
+    driver, STORE unswapped (production [e-,e+,u,ubar] convention)."""
+    P_drv = P[:, [0, 1, 3, 2], :]                       # [e-, e+, ubar, u] for the driver
+    events = [(P_drv[i], PDG) for i in range(len(P_drv))]
     with mp.CppDriverPipe(f"{STANDALONE}/driver", STANDALONE) as pipe:
         me2 = np.asarray(pipe.compute(events), dtype=np.float64)
     return me2
