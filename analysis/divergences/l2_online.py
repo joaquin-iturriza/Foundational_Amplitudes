@@ -125,11 +125,13 @@ def coverage_weight(rows, f, bins):
     return f * w_flat + (1.0 - f) * w_uni
 
 
-def build_pool(rows, p_cov, score, alpha, n, seed, out_npy, bins=40):
+def build_pool(rows, p_cov, score, alpha, n, seed, out_npy, bins=40, q_cov=None):
     """Draw n WITHOUT replacement, pi ∝ p_cov * clip(score)^alpha. score=None -> coverage only.
     Also writes is_weights.json: per-log|M|^2-bin unbiased-IS factor c_b = Q_b/pi_b, where Q_b is the
-    coverage-mixture objective marginal (p_cov aggregated into |M|^2 bins) and pi_b the realized pool
-    density -- so a sigma-emphasized draw can be trained UNBIASEDLY against the flat-coverage objective."""
+    OBJECTIVE marginal (q_cov aggregated into |M|^2 bins, defaulting to the sampling base p_cov) and
+    pi_b the realized pool density -- so a sigma-emphasized draw is trained UNBIASEDLY against the
+    objective. Decoupling q_cov from p_cov lets a STARVED sampling base (e.g. uniform-sqrt(s)) be
+    trained toward a GOOD coverage objective (e.g. the f=0.25 mixture) that sigma must fill."""
     pi = p_cov.astype(np.float64).copy()
     if score is not None and alpha != 0:
         pi = pi * np.clip(score, 1e-12, None) ** alpha
@@ -140,10 +142,11 @@ def build_pool(rows, p_cov, score, alpha, n, seed, out_npy, bins=40):
     np.save(out_npy, rows[idx])
 
     # IS correction table over fixed log|M|^2 bins (aligned to the loss-side bucketize).
+    q_src = p_cov if q_cov is None else q_cov
     u_all = np.log(rows[:, -1])
     edges = np.linspace(u_all.min(), u_all.max(), bins + 1)
     which_all = np.clip(np.digitize(u_all, edges[1:-1]), 0, bins - 1)
-    Qb = np.array([p_cov[which_all == b].sum() for b in range(bins)], float)      # objective marginal
+    Qb = np.array([q_src[which_all == b].sum() for b in range(bins)], float)      # objective marginal
     Qb = Qb / Qb.sum()
     cnt_pool = np.bincount(which_all[idx], minlength=bins).astype(float)          # realized pool
     pib = cnt_pool / cnt_pool.sum()
@@ -161,13 +164,13 @@ def build_pool(rows, p_cov, score, alpha, n, seed, out_npy, bins=40):
 
 
 # ----------------------------------------------------------------------------- GPU stages (subprocess)
-def run_finetune(prev_ckpt, pool_dir, iters, run_name, is_weight_path=None):
+def run_finetune(prev_ckpt, pool_dir, iters, run_name, is_weight_path=None, train_seed=42):
     if ckpt_exists(run_name):
         print(f"[mu] reuse {run_name}", flush=True)
         return ckpt_path(run_name)
     ov = " ".join(DATA_HPS + MU_HPS)
     isw = f"training.is_weight_path={is_weight_path} " if is_weight_path else ""
-    sh(f"python run.py exp_name=eeuu_l2 run_name={run_name} "
+    sh(f"python run.py exp_name=eeuu_l2 run_name={run_name} seed={train_seed} "
        f"data.data_path={pool_dir}/ {ov} {isw}"
        f"fine_tune.pretrained_path={prev_ckpt} "
        f"training.iterations={iters} plot=false save=true")
@@ -216,7 +219,8 @@ def main():
     ap.add_argument("--floor", type=float, default=0.02)
     ap.add_argument("--smin", type=float, default=91.0)
     ap.add_argument("--smax", type=float, default=1000.0)
-    ap.add_argument("--f", type=float, default=0.25, help="coverage-base flat-log|M|^2 fraction (L0 optimum)")
+    ap.add_argument("--f", type=float, default=0.25, help="SAMPLING-base flat-log|M|^2 fraction (0=starved uniform-sqrt(s))")
+    ap.add_argument("--q_f", type=float, default=None, help="OBJECTIVE (IS-correction Q) flat-log|M|^2 fraction; default=f. Set >f for a starved base trained toward good coverage.")
     ap.add_argument("--alpha", type=float, default=1.0, help="sigma/err emphasis exponent")
     ap.add_argument("--correct", action="store_true",
                     help="apply the unbiased IS loss correction (c_b=Q_b/pi_b) on emphasized arms")
@@ -230,7 +234,9 @@ def main():
     gen_candidate_pool(args.n_cand, args.frac_pole, args.floor, args.smin, args.smax, args.cand_seed, cand_npy)
     rows = np.load(cand_npy)
     p_cov = coverage_weight(rows, args.f, args.bins)
-    print(f"[cov] f={args.f} p_cov built over {len(rows)} candidates", flush=True)
+    q_f = args.f if args.q_f is None else args.q_f
+    q_cov = coverage_weight(rows, q_f, args.bins) if q_f != args.f else None
+    print(f"[cov] sampling f={args.f}  objective q_f={q_f} over {len(rows)} candidates", flush=True)
 
     prev_mu = args.base_ckpt
     prev_sig = None
@@ -250,11 +256,12 @@ def main():
             sig, err = extract_score(prev_sig, cand_npy,
                                      os.path.join(REPO, "analysis/divergences", f"l2_{args.tag}_{args.arm}_score_r{r-1}.npz"))
             score = sig if args.arm == "l2" else err
-            build_pool(rows, p_cov, score, args.alpha, args.n, args.seed + r, pool_npy, args.bins)
+            build_pool(rows, p_cov, score, args.alpha, args.n, args.seed + r, pool_npy, args.bins, q_cov=q_cov)
 
         # --- warm-chain mu finetune (IS-correct only the emphasized arms/rounds when --correct) ---
         isw = os.path.join(pool_dir, "is_weights.json") if (args.correct and emphasized) else None
-        prev_mu = run_finetune(prev_mu, pool_dir, args.iters, f"{args.tag}_{args.arm}_mu_r{r}", is_weight_path=isw)
+        prev_mu = run_finetune(prev_mu, pool_dir, args.iters, f"{args.tag}_{args.arm}_mu_r{r}",
+                               is_weight_path=isw, train_seed=42 + args.seed)
 
         # --- sigma-fit for the NEXT round (l2/oracle only) ---
         if args.arm in ("l2", "oracle") and r < args.rounds - 1:
