@@ -302,10 +302,12 @@ def main():
                 adapt_pool(rows, score, args.n, args.seed + r, pool_npy, gamma=args.gamma,   # p ∝ σ^γ, NO correction
                            state_path=os.path.join(RUNS, f"{args.tag}_{args.arm}_semastate.npz"), damp=0.5)
         elif r == 0:
-            build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins)   # coverage-only start
+            build_pool(rows, p_cov, None, 0, args.n, args.seed + r, pool_npy, args.bins)   # coverage-only start
         elif args.arm in ("static", "reweight"):
             qc = q_cov if args.arm == "reweight" else None
-            build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins, q_cov=qc)  # uniform draw
+            # FRESH draw every round (args.seed + r) so a static arm sees the SAME total unique data as
+            # an adaptive one -- matching the training budget on the data axis, not just the iter axis.
+            build_pool(rows, p_cov, None, 0, args.n, args.seed + r, pool_npy, args.bins, q_cov=qc)
         else:
             sig, err = extract_score(prev_sig, cand_npy,
                                      os.path.join(REPO, "analysis/divergences", f"l2_{args.tag}_{args.arm}_score_r{r-1}.npz"))
