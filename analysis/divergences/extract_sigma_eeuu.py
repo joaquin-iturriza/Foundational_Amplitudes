@@ -14,7 +14,9 @@ import torch
 from omegaconf import OmegaConf, open_dict
 
 REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
-WT = os.path.join(REPO, "worktrees/wt-heterosc")
+# Self-locate the worktree from this file (…/<WT>/analysis/divergences/extract_sigma_eeuu.py)
+# so the HETEROSC experiment.py that gets imported is THIS worktree's, not a hardcoded one.
+WT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, WT)
 from experiment import AmplitudeExperiment  # noqa
 sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
