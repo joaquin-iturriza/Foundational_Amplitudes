@@ -1579,14 +1579,29 @@ run-to-run variance.} Even the oracle buys little on the mean and does not beat 
 (sharpening Thread~D): \textbf{coverage (L0) is the dominant lever; emphasis (L1) is second-order once
 coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
 $\sigma$-emphasis should earn its keep only where coverage is \emph{capped} --- a starved,
-un-regenerable pool --- \emph{being tested now} (\code{sigma\_fit\_raw.sh} $\to$ 3-seed
-$\sigma$-reweight of a $1.5\mathrm{M}$ \textsc{rambo} base).
+un-regenerable pool.
 
-\paragraph{Next step.} Read out the starved-base L1 test; if $\sigma$ helps there but not on the covered
-base, that scopes L1 precisely (emphasis matters iff coverage is capped). Then merge \code{heterosc} into
-\code{jeanzay} (cosmetic left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric
-mean --- harmless, training/checkpointing use arithmetic mean). Earlier follow-up still open: extend the
-soft/collinear split to $u\bar u gg$ (\code{holdout\_prep.py} \code{region} already supports it).
+\paragraph{L1 CONFIRMED where coverage is capped: $\sigma\!\approx\!$oracle on a starved base (3-seed).}
+Repeating the L1 pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{rambo} base (pole $0.44\%$;
+\code{sigma\_fit\_raw.sh}, $\rho(\sigma,|r|){=}0.52$; $\sigma$ lifts pole selection $0.4\%\!\to\!1.6\%$,
+the $4\times$ ceiling, $\approx$oracle's $1.5\%$) \emph{flips the verdict}. Over 3 seeds
+$\times$\{base,$\sigma$,oracle\}, logflat: base $1.4\mathrm{e}{-}4\!\pm\!1.3\mathrm{e}{-}4$, $\sigma$
+$4.1\mathrm{e}{-}5\!\pm\!2.8\mathrm{e}{-}5$, oracle $4.4\mathrm{e}{-}5\!\pm\!2.4\mathrm{e}{-}5$; $\sigma$/base
+per-seed $=1.10\times,1.89\times,12.65\times$ (\emph{helps every seed}, mean $5.2\times$ logflat / $5.7\times$
+resonance), and \textbf{$\sigma$ recovers $103$--$143\%$ of the oracle} --- the real head is as good as the
+perfect error signal here. Contrast the covered $f{=}0.25$ base, where $\sigma$/base was
+$1.46\times,0.04\times,1.12\times$ (null). \textbf{This scopes L1 precisely: $\sigma$-reweighting is the
+tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate well
+(L0), emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
+the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
+is already balanced, leaving $\sigma$ nothing to reallocate.
+
+\paragraph{Next step.} The L0+L1 picture is complete and consistent: \emph{generate a modest
+flat-$\log|\mathcal{M}|^2$ admixture ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only
+when the pool is starved and un-regenerable.} Merge \code{heterosc} into \code{jeanzay} (cosmetic
+left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric mean --- harmless,
+training/checkpointing use arithmetic mean). Earlier follow-up still open: extend the soft/collinear split
+to $u\bar u gg$ (\code{holdout\_prep.py} \code{region} already supports it).
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
