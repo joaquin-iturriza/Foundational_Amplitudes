@@ -163,6 +163,42 @@ def build_pool(rows, p_cov, score, alpha, n, seed, out_npy, bins=40, q_cov=None)
           f"sqrt(s) {frac} | IS c in [{cb[cb>0].min():.2f},{cb.max():.2f}] mean_w={mean_w:.3f}", flush=True)
 
 
+# ----------------------------------------------------------------------------- coordinate-free adaptive generation
+def adapt_pool(rows, score, n, seed, out_npy, gamma=1.0, state_path=None, damp=0.5):
+    """COORDINATE-FREE, self-driven adaptive sampling: the per-event training density is p(x) ∝
+    sigma(x)^gamma -- shaped ONLY by the model's own uncertainty score(x) (learned sigma, or |residual|
+    for the oracle), with NO reference density, NO physics coordinate (sqrt(s)/y_min/|M|^2), NO bins,
+    and NO loss correction. This is the whole point of sigma: it flags where the model is wrong in ANY
+    process without naming the divergence variable. Iterated (each round re-scores the SAME candidate
+    pool with the current model and re-draws), the density flows toward wherever sigma is large and,
+    as those regions get trained down, sigma there falls and the density rebalances -> a fixed point of
+    EQUALIZED sigma (uniform error) over phase space. DAMPED via a per-candidate sigma EMA (state_path,
+    aligned to the fixed candidate pool) so a huge sigma ratio doesn't collapse the whole budget onto a
+    handful of events and oscillate. Draws n WITHOUT replacement by pi ∝ sigma_ema^gamma."""
+    sc = np.clip(np.asarray(score, float), 1e-12, None)
+    if state_path and os.path.exists(state_path):
+        prev = np.load(state_path)["s"]
+        s_ema = (1.0 - damp) * prev + damp * sc               # per-candidate EMA (pool is fixed across rounds)
+    else:
+        s_ema = sc
+    if state_path:
+        os.makedirs(os.path.dirname(state_path), exist_ok=True)
+        np.savez(state_path, s=s_ema)
+    pi = s_ema ** gamma
+    pi = pi / pi.sum()
+    rng = np.random.RandomState(seed)
+    idx = rng.choice(len(rows), size=n, replace=False, p=pi)
+    os.makedirs(os.path.dirname(out_npy), exist_ok=True)
+    np.save(out_npy, rows[idx])
+    # diagnostics only (NOT used by the algorithm): sigma spread of the draw + a coarse sqrt(s) view.
+    ss = 2.0 * rows[idx, 0]
+    q = np.percentile(s_ema[idx], [50, 90, 99])
+    reg = [(88, 95), (95, 150), (150, 400), (400, 1000)]
+    frac = " ".join(f"[{lo},{hi}):{100*np.mean((ss>=lo)&(ss<hi)):.0f}%" for lo, hi in reg)
+    print(f"[adapt] {os.path.basename(os.path.dirname(out_npy))}: N={n} gamma={gamma} "
+          f"| sigma(sel) p50/90/99={q[0]:.3g}/{q[1]:.3g}/{q[2]:.3g} | diag sqrt(s) {frac}", flush=True)
+
+
 # ----------------------------------------------------------------------------- GPU stages (subprocess)
 def run_finetune(prev_ckpt, pool_dir, iters, run_name, is_weight_path=None, train_seed=42):
     if ckpt_exists(run_name):
@@ -208,7 +244,8 @@ def extract_score(sig_run_dir, cand_npy, out_npz):
 # ----------------------------------------------------------------------------- driver
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", required=True, choices=["static", "l2", "oracle", "reweight"])
+    ap.add_argument("--arm", required=True,
+                    choices=["static", "l2", "oracle", "reweight", "adapt", "adapt_oracle"])
     ap.add_argument("--tag", default="run", help="namespace for cand pool / training pools / run dirs")
     ap.add_argument("--rounds", type=int, default=3)
     ap.add_argument("--iters", type=int, default=1500, help="mu iters per round")
@@ -221,7 +258,10 @@ def main():
     ap.add_argument("--smax", type=float, default=1000.0)
     ap.add_argument("--f", type=float, default=0.25, help="SAMPLING-base flat-log|M|^2 fraction (0=starved uniform-sqrt(s))")
     ap.add_argument("--q_f", type=float, default=None, help="OBJECTIVE (IS-correction Q) flat-log|M|^2 fraction; default=f. Set >f for a starved base trained toward good coverage.")
-    ap.add_argument("--alpha", type=float, default=1.0, help="sigma/err emphasis exponent")
+    ap.add_argument("--alpha", type=float, default=1.0, help="sigma/err emphasis exponent (l2/oracle arms)")
+    ap.add_argument("--gamma", type=float, default=1.0,
+                    help="coordinate-free adaptive exponent p(x) ∝ sigma(x)^gamma (adapt arms). gamma=1 = "
+                         "sample ∝ uncertainty; larger = more aggressive concentration on high-sigma events.")
     ap.add_argument("--correct", action="store_true",
                     help="apply the unbiased IS loss correction (c_b=Q_b/pi_b) on emphasized arms")
     ap.add_argument("--bins", type=int, default=40)
@@ -248,10 +288,19 @@ def main():
         # reweight = mechanism CONTROL: same uniform sampling as static, but the loss is IS-corrected
         # to the q_f objective (upweight rare pole events) WITHOUT sigma-resampling -> isolates
         # "objective reweighting" from "sigma adds pole samples (generation)".
-        uses_sigma = args.arm in ("l2", "oracle")
+        uses_sigma = args.arm in ("l2", "oracle", "adapt", "adapt_oracle")
         corrected = (r >= 1 and args.arm in ("l2", "oracle", "reweight"))
         if os.path.exists(pool_npy):
             print(f"[pool] reuse {pool_npy}", flush=True)
+        elif args.arm in ("adapt", "adapt_oracle"):
+            if r == 0:                                    # coord-free uniform start (generator's natural density)
+                adapt_pool(rows, np.ones(len(rows)), args.n, args.seed, pool_npy, gamma=1.0, state_path=None)
+            else:
+                sig, err = extract_score(prev_sig, cand_npy,
+                                         os.path.join(REPO, "analysis/divergences", f"l2_{args.tag}_{args.arm}_score_r{r-1}.npz"))
+                score = sig if args.arm == "adapt" else err
+                adapt_pool(rows, score, args.n, args.seed + r, pool_npy, gamma=args.gamma,   # p ∝ σ^γ, NO correction
+                           state_path=os.path.join(RUNS, f"{args.tag}_{args.arm}_semastate.npz"), damp=0.5)
         elif r == 0:
             build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins)   # coverage-only start
         elif args.arm in ("static", "reweight"):
