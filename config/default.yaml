@@ -140,6 +140,11 @@ training:
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
                         # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact
                         # geometric mean; validation/checkpoint metrics are never floored.
+ is_weight_path: null    # L2 unbiased importance-sampling correction. Path to is_weights.json
+                        # {logm_edges, c} written at pool-build: per-log|M|^2-bin factor c_b=Q_b/π_b
+                        # multiplying each event's TRAINING loss, so a σ-emphasized (oversampled)
+                        # pool estimates the flat-coverage objective UNBIASEDLY (σ changes only
+                        # gradient variance). null = off. Applies to μ training, not the σ-fit.
  dtype: float32
 
  regularization: L2       # decided default (was null): L2 penalty folded into loss_no_reg /

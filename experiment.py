@@ -2362,7 +2362,44 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             raise ValueError(f"Unknown loss function {name}")
         # mean over feature dims → (B,)
-        return elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
+        per_event = elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
+
+        # --- L2 unbiased importance-sampling correction (training.is_weight_path) ---
+        # When the training pool was drawn from a sigma-emphasized density pi (oversampling
+        # high-uncertainty log|M|^2 regions), multiply each event's loss by c_b = Q_b/pi_b over
+        # its log|M|^2 bin (Q = the flat-coverage-mixture objective). With mean_b c_b*pi_b = 1 the
+        # batch loss is an UNBIASED estimator of the Q-weighted objective for ANY pi, so sigma only
+        # changes gradient VARIANCE, not the optimum -> oversampling the pole can no longer starve
+        # the bulk (the failure mode of uncorrected reweighting). Off by default (no path -> no-op).
+        isw = self._get_is_weights()
+        if isw is not None:
+            edges, cvals, amp_mean, amp_std = isw
+            yf = (y.flatten(1).mean(dim=1) if y.dim() > 1 else y).detach()
+            logm = yf * amp_std + amp_mean                     # standardized log-amp -> raw log|M|^2
+            b = torch.bucketize(logm, edges).clamp(0, cvals.numel() - 1)
+            per_event = per_event * cvals[b]
+        return per_event
+
+    def _get_is_weights(self):
+        """Lazily load+cache the per-log|M|^2-bin IS correction table (training.is_weight_path)."""
+        if getattr(self, "_is_weight_cache", "unset") != "unset":
+            return self._is_weight_cache
+        path = self.cfg.training.get("is_weight_path", None)
+        if not path:
+            self._is_weight_cache = None
+            return None
+        import json as _json
+        with open(path) as f:
+            d = _json.load(f)
+        dev, dt = self.device, self.dtype
+        edges = torch.tensor(d["logm_edges"][1:-1], device=dev, dtype=dt)   # inner edges for bucketize
+        cvals = torch.tensor(d["c"], device=dev, dtype=dt)
+        amp_mean = float(np.atleast_1d(self.prepd_mean)[0])
+        amp_std = float(np.atleast_1d(self.prepd_std)[0])
+        LOGGER.info(f"IS-correction loaded from {path}: {cvals.numel()} bins, "
+                    f"c in [{cvals.min():.3f},{cvals.max():.3f}]")
+        self._is_weight_cache = (edges, cvals, amp_mean, amp_std)
+        return self._is_weight_cache
 
     def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None):
         """Mean (or geometric mean) over per-process mean losses.
