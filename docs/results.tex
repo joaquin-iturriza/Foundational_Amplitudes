@@ -1521,20 +1521,72 @@ $\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); (L2, aspi
 $\sigma$-informed \emph{on-the-fly generation} --- the only layer that lets $\sigma$ overcome the
 coverage ceiling, by generating where $\sigma$ is high \emph{and} data is sparse.
 
-\paragraph{Next step (start of next session).} Build the \textbf{flat-in-$\log|\mathcal{M}|^2$
-resampler} (L0) --- the reusable, process-agnostic piece --- and validate on a \emph{different}
-singularity type with no structure-aware code: $e^+e^-\!\to u\bar u$ ($91$--$1000$ GeV) has an
-$s$-channel $Z$ resonance ($|\mathcal{M}|^2$ peaks $\sim$200$\times$ at $\sqrt{s}\!\approx\!91$; the
-\textsc{rambo} set gives only $0.3$\% of events there --- the same starvation as the uug bulk). Show
-flat-$\log|\mathcal{M}|^2$ resampling of the $10^6$-event pool fixes the resonance vs raw
-\textsc{rambo} (validate against $\sqrt{s}$, which the \emph{method} never uses), then that
-$\sigma$-reweighting adds emphasis on top. Then wire the online L0+L1 loop
-(train $\to$ fit $\sigma$ $\to$ reweight $\to$ repeat) and merge \code{heterosc} into \code{jeanzay}
-(cosmetic left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric mean ---
-harmless, since training and checkpointing use arithmetic mean).
+\paragraph{L0 validated on the $ee\to u\bar u$ $Z$ resonance --- by GENERATION, not resampling.}
+The $s$-channel $Z$ pole ($|\mathcal{M}|^2$ peaks $\sim$$200\times$ at $\sqrt{s}\!\approx\!91$; flat
+\textsc{rambo} in $\sqrt{s}$ puts only $0.4$\% of events in $[88,95]$, and the production foundation
+duly fits the peak $\sim$$400\times$ worse than the bulk, MSE $1.9\mathrm{e}{-}5$ vs $4.8\mathrm{e}{-}8$)
+is the second, structurally-distinct singularity. \emph{Key negative result first:}
+\textbf{resampling the fixed $10^6$ \textsc{rambo} pool to flat-$\log|\mathcal{M}|^2$ does NOT fix the
+resonance} --- the pool holds only $\sim$$3300$ real pole events, so flat resampling merely duplicates
+them ($155$k unique of $400$k), no new pole physics. This is the coverage ceiling of
+Thread~D made concrete: \emph{you cannot resample your way past what the pool contains.} The fix is to
+\textbf{generate} fresh pole events, exactly as the uug antenna sampler generates deep-IR points.
+\code{gen\_uu\_sampling.py} draws $\sqrt{s}$ from a pole-covering importance proposal, builds $2\to2$
+momenta, labels the exact tree $|\mathcal{M}|^2$ with the compiled \code{ee\_uu} standalone
+($14.5$k\,ev/s, scale verified vs production), and thins $3\mathrm{M}$ candidates to $400$k
+flat-in-$\log|\mathcal{M}|^2$ \emph{without replacement} (all unique). The shaper reads \emph{only}
+$|\mathcal{M}|^2$; $\sqrt{s}$ is eval-only. Generation lifts pole coverage $0.4\%\!\to\!32\%$ with
+GENUINE new events. \emph{Bug found + fixed (would have inverted the result):} the standalone expects
+the final-state quarks in the \emph{opposite} slot order from how production stores $[e^-,e^+,u,\bar u]$;
+a direct driver call mirror-flips the $Z$ forward-backward asymmetry, so the model trains perfectly on
+its own set (internal val $10^{-5}$) yet \emph{anti-correlates} on production test ($\rho_{\rm bulk}\!=\!-0.99$).
+Relabeling production AS-IS gives $\rho{=}0.94$ (mirrored); swapping the final two recovers the stored
+$|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0.994$ post-fix).
 
-\paragraph{Earlier follow-ups (still open).} Extend the soft/collinear split to $u\bar u gg$
-(\code{holdout\_prep.py} \code{region}=soft/collinear already supports the split).
+\paragraph{The generated fraction sweep --- a clean interior optimum; pure flat over-corrects.}
+$f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated fresh, same base8
+ckpt/HPs/$N{=}400$k, common \textsc{rambo} test binned by $\sqrt{s}$, each arm de-standardized to true
+$\log|\mathcal{M}|^2$ (per-dataset standardization already handles the scale --- the earlier
+``$\sigma$-scale confound'' worry was spurious). Under the equal-per-$\sqrt{s}$-decade (log-flat) metric:
+$f{=}0$ (raw) $1.0\mathrm{e}{-}3$; $f{=}0.25$ $3.5\mathrm{e}{-}5$; $\mathbf{f{=}0.5}$ $\mathbf{1.5\mathrm{e}{-}5}$
+(optimum); $f{=}0.75$ $7.9\mathrm{e}{-}5$; $f{=}1$ (pure flat) $1.1\mathrm{e}{-}4$. Event-weighted
+(bulk-heavy) overall bottoms at $f{=}0.25$. So the interior optimum is $f\!\approx\!0.25$--$0.5$, beating
+raw \textsc{rambo} $\sim$$30$--$70\times$ and \textbf{pure} flat-$\log|\mathcal{M}|^2$ $\sim$$4$--$7\times$:
+\emph{flat-$\log|\mathcal{M}|^2$ is the coverage criterion you MIX IN at a modest fraction, not a good
+pure base} --- pure flat starves the bulk (mirror of \textsc{rambo} starving the pole), same shape as the
+uug antenna interior optimum. Generation still beats resampling $\sim$$8\times$ ($3.5\mathrm{e}{-}5$ vs
+$2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
+\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (fig \code{eeuu\_genmix\_fraction\_sweep}).
+
+\paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
+resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after the first}: the same
+\code{ft\_mix025} scored logflat $3.5\mathrm{e}{-}5$ as tag~1 but $2.1\mathrm{e}{-}4$ as tag~2, reproducibly
+(a module/\muP\ global survives across \code{AmplitudeExperiment} instances; a per-tag \code{run\_dir} does
+\emph{not} fix it $\Rightarrow$ in-process, not file-based). Fix: self-dispatch one tag per subprocess,
+merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
+bump'' was this corruption, not seed noise.
+
+\paragraph{L1 --- $\sigma$-reweighting the coverage base does NOT robustly help (3-seed).} On the $f{=}0.25$
+base: grow a $\sigma$ row on the $\mu$ model, two-stage fit (frozen $\mu$, $\beta{=}0$; $\mu$ recovers
+bit-identically), extract $\sigma$ over a fresh $1.5\mathrm{M}$ mix025 pool (global $\rho(\sigma,|r|){=}0.66$),
+subsample $400$k \emph{without replacement} by $\pi\!\propto\!\sigma^\alpha$ (no ceiling --- fresh pool).
+$\sigma$'s budget reallocation matches the oracle almost exactly (pole $20\%$ vs $18\%$). But over
+\textbf{3 seeds} $\times$\{base,$\sigma$,oracle\} (\code{finetune\_l1\_seeds.sh}): logflat base
+$4.6\mathrm{e}{-}5\!\pm\!3.4\mathrm{e}{-}5$, $\sigma$ $1.8\mathrm{e}{-}4\!\pm\!2.3\mathrm{e}{-}4$, oracle
+$3.1\mathrm{e}{-}5\!\pm\!3.3\mathrm{e}{-}6$; $\sigma$/base per-seed $=1.46\times,0.04\times,1.12\times$ (one
+seed $25\times$ \emph{worse}). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
+run-to-run variance.} Even the oracle buys little on the mean and does not beat base's best draws. Conclusion
+(sharpening Thread~D): \textbf{coverage (L0) is the dominant lever; emphasis (L1) is second-order once
+coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
+$\sigma$-emphasis should earn its keep only where coverage is \emph{capped} --- a starved,
+un-regenerable pool --- \emph{being tested now} (\code{sigma\_fit\_raw.sh} $\to$ 3-seed
+$\sigma$-reweight of a $1.5\mathrm{M}$ \textsc{rambo} base).
+
+\paragraph{Next step.} Read out the starved-base L1 test; if $\sigma$ helps there but not on the covered
+base, that scopes L1 precisely (emphasis matters iff coverage is capped). Then merge \code{heterosc} into
+\code{jeanzay} (cosmetic left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric
+mean --- harmless, training/checkpointing use arithmetic mean). Earlier follow-up still open: extend the
+soft/collinear split to $u\bar u gg$ (\code{holdout\_prep.py} \code{region} already supports it).
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
