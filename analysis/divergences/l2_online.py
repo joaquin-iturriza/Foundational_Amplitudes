@@ -82,7 +82,10 @@ def ckpt_exists(run_name):
 
 
 def ckpt_path(run_name):
-    return os.path.join(RUNS, run_name, "models", "model_run0_best.pt")
+    # run.py gzips the checkpoint to .pt.gz after training; return whichever exists so downstream
+    # consumers (grow_sigma_head, which only decompresses when the path ends in .gz) get a real file.
+    base = os.path.join(RUNS, run_name, "models", "model_run0_best.pt")
+    return base if os.path.exists(base) else base + ".gz"
 
 
 # ----------------------------------------------------------------------------- generation
