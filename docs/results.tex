@@ -1366,7 +1366,7 @@ in-region data than $u\bar u g$.
 \end{principle}
 
 \subsection{Deeper/cleverer sampling, optimal allocation, and heteroscedastic
-uncertainty}\label{sec:div-handoff}
+uncertainty}\label{sec:div-sampling}
 
 \emph{Settled picture of this line of work. The training-density question resolves into two layers.
 \textbf{(L0) Coverage is the dominant lever, and it must be GENERATED, not resampled}: a fixed pool
@@ -1381,11 +1381,9 @@ and is replaced by a two-stage recipe (train $\mu$, then fit a frozen-$\mu$ $\si
 resulting $\sigma$ helps \emph{only where coverage is capped} --- on a starved, un-regenerable pool it
 is robustly ${\approx}$oracle ($3$-seed), on a base you can already generate well it is a null.
 Equimarginal (water-filling) allocation (Thread~B) frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
-\mathrm{diff}}$), consistent with the interior mixture. \textbf{Open:} merge \code{heterosc} into
-\code{jeanzay}; integrate the CPU-validated online importance-sampler prototype
-(\code{adaptive\_ir.py}, branch \code{adaptive-ir}) into the training loop; extend the soft/collinear
-split to $u\bar u gg$. Tooling under \code{analysis/divergences/}; heteroscedastic code on worktree
-\code{worktrees/wt-heterosc} (branch \code{heterosc}).}
+\mathrm{diff}}$), consistent with the interior mixture. Tooling under \code{analysis/divergences/};
+heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
+work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 
 \paragraph{Thread A --- deeper + antenna phase-space sampling (done).} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
@@ -1608,9 +1606,20 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 
 \paragraph{Takeaway.} \emph{Generate a modest flat-$\log|\mathcal{M}|^2$ admixture
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
-un-regenerable.} (Cleanup note for the \code{heterosc}$\to$\code{jeanzay} merge: the HETEROSC val
-``combined'' display still prints $0$ via geometric mean --- harmless, since training/checkpointing use
-the arithmetic mean.)
+un-regenerable.}
+
+\subsection{Hand-off: open items}\label{sec:div-open}
+Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
+\begin{itemize}
+  \item \textbf{Merge \code{heterosc} into \code{jeanzay}.} Cosmetic left-over to clean up in the
+    merge: the HETEROSC validation ``combined'' display still prints $0$ via the geometric mean ---
+    harmless, since training and checkpoint selection use the arithmetic mean.
+  \item \textbf{Integrate the online importance-sampler.} The per-$y_{\min}$-bin adaptive proposal
+    (\code{adaptive\_ir.py}, branch \code{adaptive-ir}) is CPU-validated but not wired into the
+    training loop; wire the online L0$+$L1 loop (train $\to$ fit $\sigma$ $\to$ reweight $\to$ repeat).
+  \item \textbf{Extend the soft/collinear split to $u\bar u gg$} (\code{holdout\_prep.py}
+    \code{region} already supports it).
+\end{itemize}
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
