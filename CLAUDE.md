@@ -69,12 +69,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    only exemptions are `CLAUDE.md` and `README*`. Enforced by the `md_guard.sh`
    `PreToolUse(Write)` hook.
 
-   **In `docs/results.tex`: results and the hand-off are separate, and never mix.**
-   Completed findings go in the **results section they belong to** (write them there,
-   as results). A **hand-off** section holds **only** unfinished / future / open work.
-   Do **not** dump results into a hand-off. When work a hand-off item pointed to gets
-   done, **delete that item from the hand-off** and write the finding into its results
-   section; only genuinely-undone or future work stays in the hand-off.
+   **In `docs/results.tex`, results and the hand-off don't mix:** a finished finding
+   goes in its results section and its hand-off item is deleted; the hand-off holds
+   only open/future work.
 
 4. **Go easy on `find` over large trees.** This is Lustre, not a slow network
    mount anymore, so `find` is allowed — but it can still be slow on huge
