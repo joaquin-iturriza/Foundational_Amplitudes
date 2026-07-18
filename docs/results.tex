@@ -1365,17 +1365,27 @@ with a little data; and the hardest process ($u\bar u gg$) is data-recoverable b
 in-region data than $u\bar u g$.
 \end{principle}
 
-\subsection{Hand-off: deeper/cleverer sampling, optimal allocation, and heteroscedastic
-uncertainty (work in progress)}\label{sec:div-handoff}
+\subsection{Deeper/cleverer sampling, optimal allocation, and heteroscedastic
+uncertainty}\label{sec:div-handoff}
 
-\emph{State of an in-progress line of work, now four threads. Thread~A is complete; Thread~B is
-analysis plus a validated but un-integrated tool; Thread~C (heteroscedastic $\sigma$) is
-\textbf{de-risked} --- the coupled-fit failure is resolved by a two-stage recipe, and $\sigma$ is
-validated as a reweighting signal (a speed and a tolerance study, below); Thread~D is the
-synthesis that reframes the whole line of work around a general, process-agnostic default
-sampling. New tooling is under \code{analysis/divergences/}; the heteroscedastic code lives on git
-worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}), \emph{not yet merged} to
-\code{jeanzay}. The adaptive-sampler prototype is on branch \code{adaptive-ir}.}
+\emph{Settled picture of this line of work. The training-density question resolves into two layers.
+\textbf{(L0) Coverage is the dominant lever, and it must be GENERATED, not resampled}: a fixed pool
+has a coverage ceiling (resampling only duplicates the few extreme events), so a divergence is fixed
+by importance-\emph{generating} fresh events, shaped flat-in-$\log|\mathcal{M}|^2$ (the general,
+process-agnostic criterion); the deployable density is a uniform$+$flat \emph{mixture} at a modest
+fraction ($f\!\approx\!0.25$--$0.5$), not pure flat. Validated on two structurally-distinct
+singularities: the $u\bar u g$ soft/collinear IR (antenna sampler, Thread~A) and the $ee\to u\bar u$
+$s$-channel $Z$ resonance (fraction sweep). \textbf{(L1) Heteroscedastic $\sigma$-reweighting is a
+scoped, second-order emphasis layer}: the coupled $(\mu,\sigma)$ fit fails for a structural reason
+and is replaced by a two-stage recipe (train $\mu$, then fit a frozen-$\mu$ $\sigma$ head); the
+resulting $\sigma$ helps \emph{only where coverage is capped} --- on a starved, un-regenerable pool it
+is robustly ${\approx}$oracle ($3$-seed), on a base you can already generate well it is a null.
+Equimarginal (water-filling) allocation (Thread~B) frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
+\mathrm{diff}}$), consistent with the interior mixture. \textbf{Open:} merge \code{heterosc} into
+\code{jeanzay}; integrate the CPU-validated online importance-sampler prototype
+(\code{adaptive\_ir.py}, branch \code{adaptive-ir}) into the training loop; extend the soft/collinear
+split to $u\bar u gg$. Tooling under \code{analysis/divergences/}; heteroscedastic code on worktree
+\code{worktrees/wt-heterosc} (branch \code{heterosc}).}
 
 \paragraph{Thread A --- deeper + antenna phase-space sampling (done).} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
@@ -1596,12 +1606,11 @@ tool for when you cannot regenerate coverage (a starved, fixed pool); on a base 
 the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
 is already balanced, leaving $\sigma$ nothing to reallocate.
 
-\paragraph{Next step.} The L0+L1 picture is complete and consistent: \emph{generate a modest
-flat-$\log|\mathcal{M}|^2$ admixture ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only
-when the pool is starved and un-regenerable.} Merge \code{heterosc} into \code{jeanzay} (cosmetic
-left-over: the HETEROSC val ``combined'' display still prints $0$ via geometric mean --- harmless,
-training/checkpointing use arithmetic mean). Earlier follow-up still open: extend the soft/collinear split
-to $u\bar u gg$ (\code{holdout\_prep.py} \code{region} already supports it).
+\paragraph{Takeaway.} \emph{Generate a modest flat-$\log|\mathcal{M}|^2$ admixture
+($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
+un-regenerable.} (Cleanup note for the \code{heterosc}$\to$\code{jeanzay} merge: the HETEROSC val
+``combined'' display still prints $0$ via geometric mean --- harmless, since training/checkpointing use
+the arithmetic mean.)
 
 % ==========================================================================
 \section{Training throughput}\label{sec:throughput}
