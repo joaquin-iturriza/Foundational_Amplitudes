@@ -22,9 +22,13 @@ import torch
 from omegaconf import OmegaConf, open_dict
 
 REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
-sys.path.insert(0, REPO)
+# Import THIS worktree's experiment/models.lloca (HETEROSC-aware, accepts sigma_after_pool) BEFORE
+# the analysis helpers prepend MAIN -- runs finetuned from the worktree save configs carrying the
+# HETEROSC net params, which MAIN's models.lloca cannot instantiate. Same trick as extract_sigma_eeuu.
+WT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, WT)
 from experiment import AmplitudeExperiment  # noqa
-sys.path.insert(0, os.path.join(REPO, "analysis/divergences"))
+sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
 from eval_heldout import com_normalize  # noqa
 from extract_preds import load_finetuned_state  # noqa
 
@@ -96,6 +100,7 @@ def main():
             cfg.run_dir = os.path.join(REPO, "runs", f"_eeuu_eval_tmp_{tag}")
             cfg.data.subsample = None
             cfg.fine_tune.pretrained_path = None
+        sys.path.insert(0, WT)   # re-assert: hydra imports models.lloca lazily at instantiate()
         exp = AmplitudeExperiment(cfg)
         exp._init(); exp.init_physics(); exp.init_geometric_algebra()
         exp.init_data(); exp._init_dataloader(); exp.init_model()
