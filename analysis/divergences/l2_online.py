@@ -208,7 +208,7 @@ def extract_score(sig_run_dir, cand_npy, out_npz):
 # ----------------------------------------------------------------------------- driver
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", required=True, choices=["static", "l2", "oracle"])
+    ap.add_argument("--arm", required=True, choices=["static", "l2", "oracle", "reweight"])
     ap.add_argument("--tag", default="run", help="namespace for cand pool / training pools / run dirs")
     ap.add_argument("--rounds", type=int, default=3)
     ap.add_argument("--iters", type=int, default=1500, help="mu iters per round")
@@ -245,26 +245,31 @@ def main():
         pool_npy = os.path.join(pool_dir, DATASET + ".npy")
 
         # --- build this round's training pool ---
-        emphasized = (r >= 1 and args.arm in ("l2", "oracle"))
+        # reweight = mechanism CONTROL: same uniform sampling as static, but the loss is IS-corrected
+        # to the q_f objective (upweight rare pole events) WITHOUT sigma-resampling -> isolates
+        # "objective reweighting" from "sigma adds pole samples (generation)".
+        uses_sigma = args.arm in ("l2", "oracle")
+        corrected = (r >= 1 and args.arm in ("l2", "oracle", "reweight"))
         if os.path.exists(pool_npy):
             print(f"[pool] reuse {pool_npy}", flush=True)
         elif r == 0:
             build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins)   # coverage-only start
-        elif args.arm == "static":
-            build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins)   # fixed coverage
+        elif args.arm in ("static", "reweight"):
+            qc = q_cov if args.arm == "reweight" else None
+            build_pool(rows, p_cov, None, 0, args.n, args.seed, pool_npy, args.bins, q_cov=qc)  # uniform draw
         else:
             sig, err = extract_score(prev_sig, cand_npy,
                                      os.path.join(REPO, "analysis/divergences", f"l2_{args.tag}_{args.arm}_score_r{r-1}.npz"))
             score = sig if args.arm == "l2" else err
             build_pool(rows, p_cov, score, args.alpha, args.n, args.seed + r, pool_npy, args.bins, q_cov=q_cov)
 
-        # --- warm-chain mu finetune (IS-correct only the emphasized arms/rounds when --correct) ---
-        isw = os.path.join(pool_dir, "is_weights.json") if (args.correct and emphasized) else None
+        # --- warm-chain mu finetune (IS-correct the emphasized/reweight arms when --correct) ---
+        isw = os.path.join(pool_dir, "is_weights.json") if (args.correct and corrected) else None
         prev_mu = run_finetune(prev_mu, pool_dir, args.iters, f"{args.tag}_{args.arm}_mu_r{r}",
                                is_weight_path=isw, train_seed=42 + args.seed)
 
         # --- sigma-fit for the NEXT round (l2/oracle only) ---
-        if args.arm in ("l2", "oracle") and r < args.rounds - 1:
+        if uses_sigma and r < args.rounds - 1:
             prev_sig = run_sigma_fit(prev_mu, pool_dir, args.sig_iters, f"{args.tag}_{args.arm}_sig_r{r}")
 
     print(f"\n[done] arm={args.arm} rounds={args.rounds}  final mu = {prev_mu}", flush=True)
