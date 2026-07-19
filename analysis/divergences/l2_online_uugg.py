@@ -206,10 +206,12 @@ def _make_train_loader(exp, pool):
 
 
 # ---------------------------------------------------------------- cfg build
-def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm):
+def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained=None):
     from hydra import compose, initialize_config_dir
     arm_ov = SIG_ARM_OVERRIDES if arm == "sigma" else []
-    overrides = DATA_OVERRIDES + MU_OVERRIDES + arm_ov + [
+    # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
+    pre_ov = [f"fine_tune.pretrained_path={pretrained}"] if pretrained else []
+    overrides = DATA_OVERRIDES + MU_OVERRIDES + arm_ov + pre_ov + [
         f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
         f"data.data_path={round0_dir}/",
         f"training.iterations={total_steps}",
@@ -232,6 +234,7 @@ def main():
     ap.add_argument("--n_total", type=int, default=300000)
     ap.add_argument("--rounds", type=int, default=10)
     ap.add_argument("--gamma", type=float, default=1.0, help="sigma arm: p(x) ∝ sigma^gamma")
+    ap.add_argument("--sigma0", type=float, default=0.1, help="sigma arm: initial sigma for grow_sigma_head")
     ap.add_argument("--oversample", type=float, default=4.0, help="propose oversample*inc_n, keep inc_n")
     ap.add_argument("--y_lo", type=float, default=1e-6)
     ap.add_argument("--mix_ir", type=float, default=0.5, help="base = mix_ir IR-democratic + rest RAMBO")
@@ -260,10 +263,21 @@ def main():
         np.save(r0_npy, rows0.astype(np.float64))
         print(f"[r0] saved {r0_npy} N={len(rows0)}  |M|^2 [{me0.min():.2e},{me0.max():.2e}]", flush=True)
 
-    # --- build experiment (warm-start base22, freeze stats, ONE cosine over total_steps) ---
+    # --- sigma arm: GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row) so warm-start
+    #     into the HETEROSC net matches shapes AND keeps base22's converged mu head. ---
+    pretrained = None
+    if args.arm == "sigma":
+        grown = os.path.join(REPO, f"data_l2uugg/{run_name}_base_grown.pt")
+        if not os.path.exists(grown):
+            import subprocess
+            subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
+                            BASE22, grown, str(args.sigma0)], check=True)
+        pretrained = grown
+
+    # --- build experiment (warm-start base22[grown], freeze stats, ONE cosine over total_steps) ---
     from experiment import AmplitudeExperiment
     torch.set_default_dtype(torch.float32)
-    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm)
+    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained)
     exp = AmplitudeExperiment(cfg)
     exp._init()                     # run_dir, logger, backend (device/dtype/tf32) -- normally via __call__
 
