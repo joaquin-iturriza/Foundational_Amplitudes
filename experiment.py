@@ -27,6 +27,27 @@ from lloca.utils.polar_decomposition import restframe_boost
 
 import psutil, os
 
+
+# TYPE_TOKEN_DICT — LEGACY, non-LLoCa path only (MLP / plain transformer). It is referenced in
+# init_physics but its definition was dropped in the LLoCa refactor, so `model=mup_mlp` has been
+# dead code (NameError). Restored purely to run the DIAGNOSTIC CONTROL: the reference
+# implementation (heidelberg-hepml/amplitude_DSI) wires HETEROSC ONLY into the MLP, never into
+# LLoCa, so the MLP is the one architecture on which the het loss is actually validated.
+#
+# Values are the per-particle type tokens used to expose permutation symmetry (identical
+# particles share a token). We only ever run this control with data.include_permsym=false, where
+# the caller takes list(range(len(...))) — i.e. only the LENGTH (= n_particles) is used, and each
+# particle stays distinct. That avoids asserting a symmetry that does not hold (u and ubar are
+# NOT identical particles, so they must not share a token).
+TYPE_TOKEN_DICT = {
+    # e+ e- -> u ubar g   : 5 particles
+    "ee_uug_91-1000GeV_amplitudes":  [0, 1, 2, 3, 4],
+    # e+ e- -> u ubar g g : 6 particles
+    "ee_uugg_91-1000GeV_amplitudes": [0, 1, 2, 3, 4, 5],
+    # e+ e- -> u ubar     : 4 particles
+    "ee_uu_91-1000GeV_amplitudes":   [0, 1, 2, 3],
+}
+
 # Coupling-order convention (see config/amplitudes.yaml): [n_loops, alpha_s_power].
 #   LO=[0,0]  virt_only=[1,0]  NLO_full=[1,1]  NNLO=[2,2]
 # Name-keyed so a new NLO/NNLO dataset file is labelled correctly without
@@ -1106,8 +1127,51 @@ class AmplitudeExperiment(BaseExperiment):
                         mode=_virt_mode,
                         mom_div=float(self.mom_div or 1.0))
 
+    def _freeze_all_but_sigma_head(self):
+        """Stage 2 of the two-stage HETEROSC recipe: train ONLY the σ rows of the readout.
+
+        The trunk and the μ row come from a converged plain-MSE run (grown to a 2-channel
+        readout by analysis/divergences/grow_sigma_head.py) and stay frozen bit-for-bit, so μ
+        is exactly the MSE model's μ and val μ-MSE is constant by construction. That removes
+        BOTH failure modes at once: there is no (μ,σ) multi-task competition for the shared
+        trunk, and — at β=0 — the Gaussian NLL is a proper scoring rule for σ (its only
+        stationary point is σ=|r|; the β>0 spurious optimum at r*=exp(-½-1/(2β)) is a statement
+        about μ, which is no longer free).
+
+        linear_out.weight/bias are single tensors holding BOTH heads, so the μ rows cannot be
+        frozen via requires_grad; a grad hook zeroes them instead (this also stops the L2
+        regularization term from decaying the μ row, since reg reaches params through the same
+        .grad).
+        """
+        k = int(self.cfg.model.net.out_channels)
+        lin = self.model.net.net.linear_out
+
+        for p in self.model.parameters():
+            p.requires_grad_(False)
+
+        def _zero_mu_rows(grad):
+            grad = grad.clone()
+            grad[:k] = 0.0
+            return grad
+
+        for p in (lin.weight, lin.bias):
+            if p is None:
+                continue
+            p.requires_grad_(True)
+            p.register_hook(_zero_mu_rows)
+
+        n_train = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        LOGGER.info(
+            f"HETEROSC σ-only: trunk + μ head frozen; {n_train} readout params trainable, "
+            f"μ rows [:{k}] grad-zeroed → only σ trains."
+        )
+
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models
+
+        if (self.cfg.training.loss == "HETEROSC"
+                and bool(self.cfg.training.get("heterosc_sigma_only", False))):
+            self._freeze_all_but_sigma_head()
 
         ft = self.cfg.get("fine_tune", None)
         if ft is None or ft.get("pretrained_path", None) is None:
@@ -2218,8 +2282,19 @@ class AmplitudeExperiment(BaseExperiment):
             process_ids  = process_ids,
         )  # (B, out_channels)
 
+        # HETEROSC: the net emits [mean, sigma]; split sigma out and pass it to the
+        # per-event NLL (the aggregator threads it through to _per_event_loss).
+        sigma = None
+        mse_val = None
+        if self.cfg.training.loss == "HETEROSC":
+            out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
+            sigma  = y_pred[..., -out_shape:]
+            y_pred = y_pred[..., :-out_shape]
+            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
+            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
+
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
-        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg)
+        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma)
 
         reg         = self.regularization_lambda * self.regularization(self.model)
         # Keep the no-reg loss as a detached tensor instead of syncing here with
@@ -2230,7 +2305,7 @@ class AmplitudeExperiment(BaseExperiment):
         loss        = loss + reg
         if sync_blocking:
             assert torch.isfinite(loss).all()   # original per-step guard (D2H sync)
-        return loss, loss_no_reg, None
+        return loss, loss_no_reg, mse_val
 
     def _per_event_loss(self, y_pred, y, sigma=None):
         """Per-event loss vector (B,) with NO cross-event reduction.
@@ -2260,8 +2335,30 @@ class AmplitudeExperiment(BaseExperiment):
             elem = ((y_pred - y) / torch.maximum(y_pred.abs(), eps)).abs()
         elif name == "HETEROSC":
             assert sigma is not None, "HETEROSC per-event loss requires sigma"
+            # DIAGNOSTIC (heterosc_mu_only): keep the 2-ch HETEROSC net exactly as-is but
+            # optimise plain MSE on mu, so sigma receives no gradient at all. Bisects a
+            # "the objective is wrong" cause from a "the 2-ch model/wiring is wrong" cause:
+            # the beta=1 mu-gradient is provably 0.5x the MSE one (uniform, Adam-invariant),
+            # so this arm MUST reproduce the 1-ch MSE result unless the model is at fault.
+            if bool(self.cfg.training.get("heterosc_mu_only", False)):
+                return ((y_pred - y) ** 2).flatten(1).mean(dim=1)
+            # STAGE 2 of the two-stage recipe (heterosc_sigma_only): mu comes from a frozen,
+            # MSE-trained trunk+head, and only the sigma readout row trains. Detaching mu here
+            # makes the residual a CONSTANT w.r.t. autograd, so the NLL's mu-gradient
+            # ((mu-y)/sigma^2) cannot touch the frozen weights even numerically, and sigma is
+            # fitted against a fixed error field. With mu fixed there is no (mu,sigma)
+            # multi-task coupling and, at beta=0, the Gaussian NLL is a PROPER scoring rule for
+            # sigma (its only stationary point is sigma=|r|; the beta>0 spurious optimum at
+            # r*=exp(-1/2-1/(2*beta)) is a statement about mu, which is no longer free).
+            if bool(self.cfg.training.get("heterosc_sigma_only", False)):
+                y_pred = y_pred.detach()
             sigma_c = torch.clamp(sigma, min=1e-15, max=1e5)
             elem = ((y - y_pred) ** 2) / (2 * sigma_c ** 2) + torch.log(sigma_c)
+            # β-NLL (Seitzer 2022): scale each event's NLL by a DETACHED σ^{2β}. β=0 is
+            # plain NLL; β>0 cancels the 1/σ² that starves μ's gradient where σ is large.
+            beta = float(self.cfg.training.get("heterosc_beta", 0.0) or 0.0)
+            if beta > 0.0:
+                elem = (sigma_c.detach() ** (2.0 * beta)) * elem
         else:
             raise ValueError(f"Unknown loss function {name}")
         # mean over feature dims → (B,)
@@ -2289,6 +2386,12 @@ class AmplitudeExperiment(BaseExperiment):
         tau = float(self.cfg.training.get("loss_aggregation_tau", 0.0) or 0.0)
         if not getattr(getattr(self, "model", None), "training", False):
             tau = 0.0
+        # geometric_mean takes log(per-process loss), valid only for NON-NEGATIVE losses
+        # (MSE/L1/…). The HETEROSC NLL is SIGNED (the log σ term), so log()+clamp destroys
+        # the gradient of every well-fit (negative-NLL) process → μ collapses to the mean.
+        # Force arithmetic mean for HETEROSC.
+        if self.cfg.training.loss == "HETEROSC":
+            loss_agg = "mean"
         if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop":
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
@@ -2590,7 +2693,7 @@ class AmplitudeExperiment(BaseExperiment):
                     if loss_no_reg is not None:
                         losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                     if mse_val is not None:
-                        mse_vals.append(mse_val)
+                        mse_vals.append(float(mse_val))   # float() also materialises a detached tensor (LLoCa path)
                 proc_losses[name]        = float(np.mean(losses))
                 proc_losses_no_reg[name] = float(np.mean(losses_no_reg)) if losses_no_reg else None
                 proc_mse_vals[name]      = float(np.mean(mse_vals))      if mse_vals      else None
@@ -2599,6 +2702,12 @@ class AmplitudeExperiment(BaseExperiment):
             torch.cuda.empty_cache()
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+        # HETEROSC NLL is SIGNED: geometric_mean's log(clip(·,1e-10)) collapses every
+        # well-fit (negative) process to a constant → val_loss ≡ ~0, so best-checkpoint
+        # selection NEVER updates and a barely-trained model is saved. Match the training
+        # path: arithmetic mean for HETEROSC (see _aggregate_per_process_loss).
+        if self.cfg.training.loss == "HETEROSC":
+            loss_agg = "mean"
 
         def _combine(vals):
             if loss_agg == "geometric_mean":
@@ -2645,6 +2754,11 @@ class AmplitudeExperiment(BaseExperiment):
             f"Val loss (combined): {val_loss:.4f} | " +
             ", ".join(f"{n}={v:.4f}" for n, v in proc_losses.items())
         )
+
+        # σ-ranking SPEED probe on the MULTI-PROCESS path (this override does not
+        # call super()._validate, so the base hook can't reach here). Uses the
+        # combined self.val_loader — process_ids per event give the per-process ρ.
+        self._sigma_rank_probe(step)
 
         # Update sampler weights (_compute_sampler_weights): each dataset's live
         # local exponent α is fit from recent (compute, EMA-loss) history and

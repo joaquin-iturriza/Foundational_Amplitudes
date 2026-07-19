@@ -880,12 +880,31 @@ class BaseExperiment:
                 # regularized loss only if no-reg was never computed.
                 val_loss_no_reg_now = self.val_loss_no_reg[-1] if self.val_loss_no_reg else None
                 selection_loss = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
+
+                # HETEROSC: the β-NLL VALUE is not a valid selection metric whenever μ is
+                # trainable. Profiling σ out at its own stationary point (σ=|r|) leaves
+                #     L(r) = r^{2β} · (½ + ln r),
+                # which for β>0 is minimised at r* = exp(-½ - 1/(2β)) — NOT at r=0. At β=1
+                # that is r*=1/e≈0.37, i.e. a model with 37% RMS residual scores BETTER
+                # (L=-0.068) than a perfect one (L→0). Selecting on it therefore saves the
+                # WORSE checkpoint. The value also carries the β-dependent σ^{2β} prefactor,
+                # so it is not comparable across the trials of a β sweep either (this is what
+                # run_trial.py's DyHPO observes — see result["val_loss"] below).
+                # Select on the β-invariant μ-MSE instead.
+                # Exception: heterosc_sigma_only freezes μ, and at β=0 the plain Gaussian NLL
+                # IS a proper scoring rule for σ — there the NLL is exactly the right metric
+                # (and μ-MSE is constant, so it could not select anything).
+                if (self.cfg.training.loss == "HETEROSC"
+                        and not self.cfg.training.get("heterosc_sigma_only", False)
+                        and self.val_mse):
+                    selection_loss = self.val_mse[-1]
+
                 improved = selection_loss < smallest_val_loss
 
                 if improved:
                     smallest_val_loss        = selection_loss
                     smallest_val_loss_step   = step
-                    smallest_val_loss_no_reg = val_loss_no_reg_now if val_loss_no_reg_now is not None else val_loss
+                    smallest_val_loss_no_reg = selection_loss
                     patience = 0
                     if self.cfg.training.es_load_best_model:
                         self._save_model(step, f"model_run{self.cfg.run_idx}_best.pt")
@@ -949,6 +968,18 @@ class BaseExperiment:
             f"Finished training: {step + 1} iterations = {(step + 1) / len(self.train_loader):.1f} epochs "
             f"in {dt/60:.2f}min (avg {avg_iter_time:.4f}s/iter)"
         )
+        # Pre-clip grad-norm distribution + how often clip_grad_norm actually BINDS.
+        # clip_grad_norm_ is a GLOBAL norm over all params, so a loss with extra heads
+        # (HETEROSC's sigma) can inflate it and shrink the *whole* update, mu included.
+        if self.train_grad_norm:
+            g = np.asarray(self.train_grad_norm, dtype=np.float64)
+            g = g[np.isfinite(g)]
+            if g.size:
+                clip = self.cfg.training.clip_grad_norm
+                LOGGER.info(
+                    f"Grad-norm (pre-clip): median={np.median(g):.3g} p90={np.percentile(g, 90):.3g} "
+                    f"max={g.max():.3g} | clip={clip} bound {100.0 * (g > clip).mean():.1f}% of steps"
+                )
         if self.cfg.use_mlflow:
             log_mlflow("iterations", step + 1)
             log_mlflow("epochs",     (step + 1) / len(self.train_loader))
@@ -966,6 +997,10 @@ class BaseExperiment:
         if result_path:
             import json
             os.makedirs(os.path.dirname(result_path), exist_ok=True)
+            # This is what DyHPO observes (sweep/run_trial.py: observe_loss = val_loss).
+            # It is now the same quantity used for checkpoint selection above — i.e. the
+            # β-invariant μ-MSE for HETEROSC, never the β-scaled NLL (which is monotone in
+            # β and would make any sweep over heterosc_beta a pure argmin-β).
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
             result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0}
             result.update(self._result_extra())
@@ -1104,7 +1139,20 @@ class BaseExperiment:
         try:
             state_dict = _torch_load(pretrained_path, map_location=self.device, weights_only=False)["model"]
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
-            self.model.load_state_dict(state_dict)
+            if reset_output_head:
+                # Drop any parameter whose shape differs from the current model (e.g. the
+                # readout when switching MSE 1-ch -> HETEROSC 2-ch): load the body strictly
+                # via non-strict + an explicit shape filter, then (re)init the head below.
+                own = self.model.state_dict()
+                filtered = {k: v for k, v in state_dict.items()
+                            if k in own and own[k].shape == v.shape}
+                dropped = [k for k in state_dict if k not in filtered]
+                self.model.load_state_dict(filtered, strict=False)
+                if dropped:
+                    LOGGER.info(f"Fine-tuning: skipped {len(dropped)} shape-mismatched "
+                                f"pretrained tensors (e.g. {dropped[:2]}).")
+            else:
+                self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
 
@@ -1230,7 +1278,7 @@ class BaseExperiment:
         if want_lnr:
             self.train_loss_no_reg.append(lnr_val)
         if mse_val is not None and self.cfg.plotting.get("plot_mse_het", False):
-            self.train_mse.append(mse_val)
+            self.train_mse.append(float(mse_val))   # float(): detached tensor on the LLoCa HETEROSC path
 
         # log to mlflow
         if (
@@ -1267,7 +1315,7 @@ class BaseExperiment:
                 if loss_no_reg is not None:
                     losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
                 if mse_val is not None:
-                    mse_vals.append(mse_val)
+                    mse_vals.append(float(mse_val))   # float() materialises a detached tensor (LLoCa HETEROSC path)
 
         val_loss = np.mean(losses)
 
@@ -1285,8 +1333,51 @@ class BaseExperiment:
             if self.cfg.use_mlflow:
                 log_mlflow("val.loss", val_loss, step=step)
 
+        # σ-ranking SPEED probe. Called here for the single-dataset path; the
+        # multi-process AmplitudeExperiment._validate override calls it too (it does
+        # NOT delegate to super), so both paths record the curve.
+        self._sigma_rank_probe(step)
+
         end_time_validate = time.time()
         return val_loss
+
+    def _sigma_rank_probe(self, step):
+        """Record the σ-RANKING convergence (SPEED study), guarded + worktree-local.
+
+        On σ-only fits, log how the σ RANKING (not its calibration) converges along
+        the trajectory, so we can read off how few iters make σ usable as a
+        reweighting signal. One extra forward over a capped val subset (μ frozen →
+        cheap). Appended to sigma_rank_curve.json each val step (preemption-safe).
+        No-op unless heterosc_rank_curve + heterosc_sigma_only are set.
+        """
+        if not (self.cfg.training.get("heterosc_rank_curve", False)
+                and self.cfg.training.get("heterosc_sigma_only", False)
+                and self.is_main_process()):
+            return
+        import json
+        import sys
+        probe_dir = os.path.join(os.path.dirname(__file__),
+                                 "analysis", "divergences")
+        if probe_dir not in sys.path:
+            sys.path.insert(0, probe_dir)
+        from sigma_speed_probe import rank_metrics
+        m = rank_metrics(
+            self, self.val_loader,
+            max_events=int(self.cfg.training.get("rank_curve_max_events", 50000)))
+        m["step"] = int(step + 1)
+        m["wall_s"] = round(time.time() - self.training_start_time, 1)
+        m["lr"] = float(self.train_lr[-1]) if self.train_lr else None
+        if not hasattr(self, "_rank_curve"):
+            self._rank_curve = []
+        self._rank_curve.append(m)
+        LOGGER.info(
+            f"[σ-rank] step {m['step']:>5} | ρ_glob {m['spearman_global']:.3f} "
+            f"| ρ_proc {m['spearman_proc']:.3f} (n_proc={m['n_proc']}) "
+            f"| slope {m['slope']:.3f} | μ-MSE {m['mu_mse']:.4e}")
+        if self.cfg.save:
+            with open(os.path.join(self.cfg.run_dir, "sigma_rank_curve.json"),
+                      "w", encoding="utf-8") as fh:
+                json.dump(self._rank_curve, fh, indent=2)
 
     def _save_config(self, filename, to_mlflow=False):
         # Save config
