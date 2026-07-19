@@ -69,6 +69,15 @@ DATA_OVERRIDES = [
     "data.source=files", f"data.dataset=[{DATASET}]", "data.preprocess_per_dataset=true",
     "data.train_test_val=[0.9,0.05,0.05]", "data.subsample=null",
 ]
+# sigma arm: train the whole loop as HETEROSC with a DETACHED sigma head at beta=1. Then the mu
+# channel gets a pure-MSE gradient (beta=1 cancels the sigma^2 weighting) and mu trains EXACTLY as
+# MSE, while sigma is fit continuously as a read-only calibration head off detached features -- no
+# per-round sigma-fit, no grow_sigma_head, no wasted iters. sigma is always live to score proposals.
+SIG_ARM_OVERRIDES = [
+    "training.loss=HETEROSC", "training.heterosc_beta=1.0",
+    "training.heterosc_sigma_only=false",
+    "model.net.detach_sigma_backbone=true", "model.net.sigma_after_pool=true",
+]
 
 
 # ---------------------------------------------------------------- base proposal (process-agnostic)
@@ -105,10 +114,10 @@ def label_events(P):
 
 
 # ---------------------------------------------------------------- frozen-stats preprocessing
-def preprocess_increment(exp, P, me2):
-    """Preprocess a labeled increment with the FROZEN stats set at round 0 (exp.mom_div,
-    exp.prepd_mean/std, exp.cfg.data.amp_trafos). Mirrors experiment.init_data's LLoCa branch exactly
-    so appended events are on the SAME scale as round 0. Returns per-event lists ready to append."""
+def preprocess_momenta(exp, P):
+    """Momentum path only (no amplitude): mirror experiment.init_data's LLoCa branch with the FROZEN
+    round-0 mom scale. Returns per-event particle/token/order/pid lists. Used for BOTH the training
+    increment (label added separately) and sigma scoring (no label needed)."""
     n = len(P)
     particles_t = torch.tensor(P, dtype=torch.float64).reshape(-1, NP, 4)
     # enforce the mass shell from the 3-momenta (identical to init_data)
@@ -121,18 +130,45 @@ def preprocess_increment(exp, P, me2):
     particles_t = torch.einsum("...ij,...kj->...ki", trafo, particles_t)
     particles_prepd = (particles_t / exp.mom_div).numpy()          # (n,6,4), FROZEN mom scale
 
-    pdg_block = np.tile(PDG, (n, 1))
-    toks = global_encode(pdg_block)                                # (n,6) per-particle tokens
-    amp_prepd, _, _ = preprocess_amplitude(
-        me2.reshape(-1, 1), trafos=exp.cfg.data.amp_trafos,
-        mean=exp.prepd_mean[0], std=exp.prepd_std[0])              # FROZEN amp stats
-
+    toks = global_encode(np.tile(PDG, (n, 1)))                     # (n,6) per-particle tokens
     order0 = exp.train_loader.dataset.order_labels[0].cpu().numpy()  # uugg LO row (same every event)
     parts = [particles_prepd[j] for j in range(n)]
     toks_l = [toks[j] for j in range(n)]
     orders = np.tile(order0, (n, 1))
     pids = np.zeros(n, dtype=np.int32)                             # single process
+    return parts, toks_l, orders, pids
+
+
+def preprocess_increment(exp, P, me2):
+    """A labeled training increment: momentum path (frozen mom scale) + amplitude (frozen amp stats)."""
+    parts, toks_l, orders, pids = preprocess_momenta(exp, P)
+    amp_prepd, _, _ = preprocess_amplitude(
+        me2.reshape(-1, 1), trafos=exp.cfg.data.amp_trafos,
+        mean=exp.prepd_mean[0], std=exp.prepd_std[0])              # FROZEN amp stats
     return parts, toks_l, amp_prepd, orders, pids
+
+
+def score_sigma(exp, P):
+    """Forward the LIVE (mu,sigma) model over proposed momenta -> per-proposal sigma (the model's own
+    uncertainty). No labels needed. Reuses exp._collect_predictions (handles the HETEROSC split)."""
+    from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length
+    parts, toks_l, orders, pids = preprocess_momenta(exp, P)
+    pf, tf, off = build_flat_arrays(parts, toks_l)
+    ds = AmplitudeDataset(
+        particles_flat=pf, offsets=off,
+        amplitudes=np.zeros((len(parts), 1), dtype=np.float64),     # dummy (unused for sigma)
+        tokens_flat=tf, order_labels=np.asarray(orders),
+        process_ids=pids.astype(np.int64), dtype=exp.dtype)
+    loader = torch.utils.data.DataLoader(
+        ds, batch_size=int(exp.cfg.evaluation.batchsize), shuffle=False, drop_last=False,
+        collate_fn=collate_variable_length, num_workers=0)
+    was_training = exp.model.training
+    exp.model.eval()
+    with torch.no_grad():
+        _, _, sig = exp._collect_predictions(loader)
+    if was_training:
+        exp.model.train()
+    return np.asarray(sig, dtype=np.float64).reshape(-1)            # (N,)
 
 
 def _dataset_to_lists(ds):
@@ -170,15 +206,19 @@ def _make_train_loader(exp, pool):
 
 
 # ---------------------------------------------------------------- cfg build
-def build_cfg(total_steps, round0_dir, exp_name, run_name, seed):
+def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm):
     from hydra import compose, initialize_config_dir
-    overrides = DATA_OVERRIDES + MU_OVERRIDES + [
+    arm_ov = SIG_ARM_OVERRIDES if arm == "sigma" else []
+    overrides = DATA_OVERRIDES + MU_OVERRIDES + arm_ov + [
         f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
         f"data.data_path={round0_dir}/",
         f"training.iterations={total_steps}",
         "plot=false", "save=true", "training.save_intermediate=true",
     ]
-    with initialize_config_dir(config_dir=os.path.join(WT, "config"), version_base=None):
+    # Compose from the MAIN-repo config, NOT the worktree's: the runtime imports the core modules
+    # (experiment/base_experiment/models) from the main repo, so the config tree must match them --
+    # e.g. the sigma-head fields (heterosc_beta, detach_sigma_backbone) live in the main-repo config.
+    with initialize_config_dir(config_dir=os.path.join(REPO, "config"), version_base=None):
         cfg = compose(config_name="amplitudes", overrides=overrides)
     return cfg
 
@@ -223,13 +263,9 @@ def main():
     # --- build experiment (warm-start base22, freeze stats, ONE cosine over total_steps) ---
     from experiment import AmplitudeExperiment
     torch.set_default_dtype(torch.float32)
-    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed)
+    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm)
     exp = AmplitudeExperiment(cfg)
     exp._init()                     # run_dir, logger, backend (device/dtype/tf32) -- normally via __call__
-
-    if args.arm == "sigma":
-        raise NotImplementedError("sigma arm needs the heteroscedastic sigma head (ported separately); "
-                                  "run --arm base for the baseline first.")
 
     # We need init_data to have run (stats frozen) before defining the hook, but train() is called
     # inside full_run(). So we run the init prefix here, install the hook, then the loop.
@@ -252,7 +288,17 @@ def main():
         rng = np.random.default_rng(2000 + args.seed * 97 + r)
         M = int(round(args.oversample * inc_n))
         P_prop = propose_momenta(M, args.y_lo, args.mix_ir, LOW_CUTS, rng)
-        keep = rng.choice(len(P_prop), size=min(inc_n, len(P_prop)), replace=False)   # base arm
+        keep_n = min(inc_n, len(P_prop))
+        if args.arm == "sigma":
+            # score fresh proposals by the LIVE model's uncertainty; keep WITHOUT replacement ∝ σ^γ.
+            sig = score_sigma(exp, P_prop)
+            w = np.clip(sig, 1e-12, None) ** args.gamma
+            p = w / w.sum()
+            keep = rng.choice(len(P_prop), size=keep_n, replace=False, p=p)
+            print(f"[round {r}] σ p50/90/99={np.percentile(sig,[50,90,99])} "
+                  f"kept σ mean={sig[keep].mean():.3g} vs all {sig.mean():.3g}", flush=True)
+        else:
+            keep = rng.choice(len(P_prop), size=keep_n, replace=False)          # base arm: uniform
         P_keep = P_prop[keep]
         me = label_events(P_keep)
         parts, toks, amp_p, orders, pids = preprocess_increment(exp, P_keep, me)
