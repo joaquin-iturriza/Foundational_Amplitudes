@@ -112,6 +112,24 @@ training:
  fused_optimizer: true   # fused=True for Adam/AdamW (CUDA only); flows through MuAdam/MuAdamW.
 
  loss: MSE
+ heterosc_beta: 0.0   # β-NLL (Seitzer et al. 2022): weight the HETEROSC NLL by detach(σ^{2β}).
+                      # 0 = plain Gaussian NLL; 0.5–1 restores μ's gradient (fixes σ-inflation
+                      # underfitting μ). Only used when loss=HETEROSC.
+ heterosc_sigma_only: false   # TWO-STAGE recipe, stage 2. Freeze the trunk + μ head (warm-started
+                      # from a converged MSE run via grow_sigma_head.py) and train ONLY the σ
+                      # readout row on the frozen residuals. Use with heterosc_beta=0: with μ
+                      # fixed the plain Gaussian NLL is a proper scoring rule for σ, and there is
+                      # no (μ,σ) competition for the shared trunk. Checkpoint selection stays on
+                      # the NLL here (μ-MSE is constant by construction).
+ heterosc_mu_only: false   # DIAGNOSTIC only. Keep the 2-ch HETEROSC net but optimise plain MSE
+                      # on μ (σ gets no gradient). Bisects "the NLL objective is at fault" from
+                      # "the 2-ch model/wiring is at fault": since β=1's μ-gradient is a uniform
+                      # 0.5× the MSE one, this MUST match a 1-ch MSE run unless the model is.
+ heterosc_rank_curve: false   # SPEED study only. On a σ-only fit, record the σ-RANKING
+                      # convergence per validation step (Spearman(σ,|r|) global + per-process
+                      # median, reliability slope) → sigma_rank_curve.json. Measures how few
+                      # iters make σ usable as a reweighting signal (ranking, not calibration).
+ rank_curve_max_events: 50000   # cap events collected by the σ-rank probe per val step.
  loss_aggregation: geometric_mean   # mean | geometric_mean. geo mean is the default and used
                         # in essentially every run: processes of different final-state
                         # dimensionality plateau at very different MSE magnitudes (1e-6 vs 1e-2),

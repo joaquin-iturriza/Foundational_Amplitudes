@@ -487,6 +487,11 @@ class MuPTransformer(nn.Module):
         # the GPU→CPU sync. Computed from the CPU ptr in _batch_loss_lloca; None on
         # the eval path or under LLOCA_SYNC=blocking, where we fall back to ptr.
         seq_lens = attn_kwargs.pop("seq_lens", None)
+        # Return the pre-readout backbone features h instead of linear_out(h). Used by
+        # the HETEROSC detach_sigma_backbone path (models/lloca.py) so the caller can
+        # apply linear_out twice — once on h (mean, grad to backbone) and once on
+        # h.detach() (sigma, no grad to backbone).
+        return_features = attn_kwargs.pop("return_features", False)
         # Per-pair attention bias (diagram-derived off-shellness; built by the
         # wrapper). When present it carries its own padded event-isolation mask, so
         # the xformers block-diagonal mask is skipped entirely.
@@ -513,5 +518,7 @@ class MuPTransformer(nn.Module):
                 h = checkpoint(fn, h, use_reentrant=False)
             else:
                 h = block(h, **attn_kwargs)
+        if return_features:
+            return h
         outputs = self.linear_out(h)
         return outputs
