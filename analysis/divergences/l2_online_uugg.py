@@ -264,10 +264,33 @@ def main():
         print(f"[round {r}] +{len(P_keep)} events -> pool={len(pool['parts'])} "
               f"(step {step}/{args.total_steps})", flush=True)
 
-    exp._online_hook = online_hook
-    exp._online_round_steps = steps_per_round
+    # --- drive the round loop by MONKEYPATCHING exp._cycle (no core-module edit) ---
+    # train() builds its training iterator once via `iter(self._cycle(self.train_loader))` and pulls
+    # one batch/step from it. We replace _cycle with a generator that, every steps_per_round yields,
+    # calls online_hook (regenerate+extend the pool, rebuild exp.train_loader) and re-iterates the new
+    # loader. The optimizer/scheduler/EMA are train()'s own and are never touched -> ONE continuous
+    # cosine across rounds. (Editing base_experiment.train() itself is futile here: the runtime imports
+    # the core modules from the MAIN repo, not this worktree -- gen_ir_democratic inserts REPO on
+    # sys.path -- so a worktree edit to train() is dead code. The monkeypatch works regardless.)
+    def online_cycle(_iterable_ignored=None):
+        step = 0
+        it = iter(exp.train_loader)
+        while True:
+            if step > 0 and step % steps_per_round == 0:
+                online_hook(step)
+                it = iter(exp.train_loader)          # loader rebuilt by the hook
+            try:
+                batch = next(it)
+            except StopIteration:
+                it = iter(exp.train_loader)
+                batch = next(it)
+            yield batch
+            step += 1
 
-    # run training (hook fires at each round boundary) + the rest of full_run's tail
+    exp._cycle = online_cycle
+    print(f'[driver] online _cycle installed: round_steps={steps_per_round} inc_n={inc_n} R={R}', flush=True)
+
+    # run training (regeneration fires inside _cycle at each round boundary) + full_run's tail
     exp.train(); exp._save_model()
     if exp.is_main_process():
         exp.evaluate()
