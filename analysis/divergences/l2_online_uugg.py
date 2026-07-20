@@ -242,6 +242,12 @@ def main():
     ap.add_argument("--y_lo", type=float, default=1e-6)
     ap.add_argument("--mix_ir", type=float, default=0.5, help="base = mix_ir IR-democratic + rest RAMBO")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--heldout_eval", action="store_true",
+                    help="fold the fixed held-out deep-IR eval into the run tail (reloads the best ckpt, "
+                         "scores it in-process, saves heldout_eval_<label>.npz) -- no separate eval job")
+    ap.add_argument("--heldout_label", default=None,
+                    help="label for the held-out npz (default: <base|sigma|g{γ}>_s{seed}, the plot tags)")
+    ap.add_argument("--heldout_path", default=None, help="held-out npz (default: heldout_uugg_deepIR.npz)")
     ap.add_argument("--validate_prep", action="store_true",
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
@@ -357,6 +363,17 @@ def main():
     exp.train(); exp._save_model()
     if exp.is_main_process():
         exp.evaluate()
+        # Fold the held-out deep-IR eval into the run tail: reload the BEST checkpoint (the same
+        # model_run0_best.pt the standalone eval scores, so the number matches) and score it in-process
+        # BEFORE compress_models() gzips the checkpoints. Eliminates the separate eval job + queue wait.
+        if args.heldout_eval:
+            import eval_heldout_uugg as EV
+            tag = "base" if args.arm == "base" else ("sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}")
+            label = args.heldout_label or f"{tag}_s{args.seed}"
+            state = EV._load_ckpt_state(exp.run_dir, "model_run0_best.pt")
+            exp.model.load_state_dict(state)
+            exp.model.to(exp.device, dtype=exp.dtype).eval()
+            EV.score_and_save(exp, label, args.heldout_path or EV.DEFAULT_HELDOUT)
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)
 

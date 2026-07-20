@@ -15,5 +15,6 @@ export PYTHONDONTWRITEBYTECODE=1
 ARM=${ARM:-sigma}; SEED=${SEED:-0}; TAG=${TAG:-run}
 python analysis/divergences/l2_online_uugg.py \
   --arm $ARM --tag $TAG --total_steps 4000 --n_total 300000 --rounds 10 \
-  --oversample ${OVERSAMPLE:-4} --gamma ${GAMMA:-1.0} --y_lo 1e-6 --mix_ir 0.5 --sigma0 0.1 --seed $SEED
+  --oversample ${OVERSAMPLE:-4} --gamma ${GAMMA:-1.0} --y_lo 1e-6 --mix_ir 0.5 --sigma0 0.1 --seed $SEED \
+  --heldout_eval
 echo "DONE l2uugg arm=$ARM seed=$SEED"
