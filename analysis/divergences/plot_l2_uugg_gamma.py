@@ -22,11 +22,11 @@ def load(tag):
 
 
 b = load("base")
-gammas = [1, 2, 3, 5]
-tags = {1: "sigma", 2: "g2", 3: "g3", 5: "g5"}
+gammas = [1, 2, 3, 5, 10]
+tags = {1: "sigma", 2: "g2", 3: "g3", 5: "g5", 10: "g10"}
 arms = {g: load(tags[g]) for g in gammas}
 x = np.arange(len(DEC))
-colors = ["#f6a300", "#e85d04", "#c1121f", "#6a040f"]
+colors = ["#f6a300", "#e85d04", "#c1121f", "#6a040f", "#370617"]
 
 fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.5, 4.3))
 

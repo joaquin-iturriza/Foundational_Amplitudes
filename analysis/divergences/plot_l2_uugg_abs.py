@@ -25,7 +25,8 @@ series = [("base (uniform)", load("base"), "#444", "o", ":"),
           (r"$\sigma$, $\gamma=1$", load("sigma"), "#f6a300", "s", "-"),
           (r"$\sigma$, $\gamma=2$", load("g2"), "#e85d04", "s", "-"),
           (r"$\sigma$, $\gamma=3$", load("g3"), "#c1121f", "s", "-"),
-          (r"$\sigma$, $\gamma=5$", load("g5"), "#6a040f", "s", "-")]
+          (r"$\sigma$, $\gamma=5$", load("g5"), "#6a040f", "s", "-"),
+          (r"$\sigma$, $\gamma=10$", load("g10"), "#370617", "s", "-")]
 
 fig, ax = plt.subplots(figsize=(7.2, 4.6))
 for name, arr, c, mk, ls in series:
