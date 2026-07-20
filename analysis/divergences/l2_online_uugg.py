@@ -208,7 +208,10 @@ def _make_train_loader(exp, pool):
 # ---------------------------------------------------------------- cfg build
 def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained=None):
     from hydra import compose, initialize_config_dir
-    arm_ov = SIG_ARM_OVERRIDES if arm == "sigma" else []
+    # BOTH arms train the identical HETEROSC(detach, beta=1) model (same mu training, same sigma head);
+    # they differ ONLY in the per-round keep rule (uniform vs prop sigma^gamma), so the base arm is a
+    # clean control that isolates the sigma-sampling effect with no loss-function confound.
+    arm_ov = SIG_ARM_OVERRIDES
     # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
     pre_ov = [f"fine_tune.pretrained_path={pretrained}"] if pretrained else []
     overrides = DATA_OVERRIDES + MU_OVERRIDES + arm_ov + pre_ov + [
@@ -263,16 +266,14 @@ def main():
         np.save(r0_npy, rows0.astype(np.float64))
         print(f"[r0] saved {r0_npy} N={len(rows0)}  |M|^2 [{me0.min():.2e},{me0.max():.2e}]", flush=True)
 
-    # --- sigma arm: GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row) so warm-start
-    #     into the HETEROSC net matches shapes AND keeps base22's converged mu head. ---
-    pretrained = None
-    if args.arm == "sigma":
-        grown = os.path.join(REPO, f"data_l2uugg/{run_name}_base_grown.pt")
-        if not os.path.exists(grown):
-            import subprocess
-            subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
-                            BASE22, grown, str(args.sigma0)], check=True)
-        pretrained = grown
+    # --- GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row) so warm-start into the
+    #     HETEROSC net matches shapes AND keeps base22's converged mu head. BOTH arms are HETEROSC. ---
+    grown = os.path.join(REPO, f"data_l2uugg/{run_name}_base_grown.pt")
+    if not os.path.exists(grown):
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
+                        BASE22, grown, str(args.sigma0)], check=True)
+    pretrained = grown
 
     # --- build experiment (warm-start base22[grown], freeze stats, ONE cosine over total_steps) ---
     from experiment import AmplitudeExperiment
