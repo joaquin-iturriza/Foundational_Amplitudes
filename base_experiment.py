@@ -790,24 +790,8 @@ class BaseExperiment:
             if self.cfg.training.save_gradients:
                 self._save_gradients(step=0)
 
-        # --- online-generation hook (opt-in; no-op unless a driver sets it) ---
-        # At each round boundary the driver regenerates/extends the training pool
-        # (propose -> score by sigma -> keep -> label -> append) and swaps in a fresh
-        # self.train_loader. The optimizer/scheduler/EMA are left untouched, so the
-        # cosine schedule stays CONTINUOUS across rounds (one warmup, one anneal over
-        # the full horizon) instead of being restarted per round. See
-        # analysis/divergences/l2_online_uugg.py.
-        _online_hook  = getattr(self, "_online_hook", None)
-        _online_every = int(getattr(self, "_online_round_steps", 0) or 0)
-
         for step in range(self.cfg.training.iterations):
             iter_time_start = time.time()
-
-            # --- online round boundary: extend the pool, rebuild the iterator ---
-            if _online_hook is not None and _online_every > 0 and step > 0 \
-                    and step % _online_every == 0:
-                _online_hook(step)
-                iterator = iter(self._cycle(self.train_loader))
 
             # --- training step ---
             self.model.train()
