@@ -370,7 +370,7 @@ def main():
             import eval_heldout_uugg as EV
             tag = "base" if args.arm == "base" else ("sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}")
             label = args.heldout_label or f"{tag}_s{args.seed}"
-            state = EV._load_ckpt_state(exp.run_dir, "model_run0_best.pt")
+            state = EV._load_ckpt_state(exp.cfg.run_dir, "model_run0_best.pt")
             exp.model.load_state_dict(state)
             exp.model.to(exp.device, dtype=exp.dtype).eval()
             EV.score_and_save(exp, label, args.heldout_path or EV.DEFAULT_HELDOUT)
