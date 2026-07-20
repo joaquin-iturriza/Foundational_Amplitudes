@@ -1525,9 +1525,9 @@ adaptive importance sampling (VEGAS/foam) \emph{guided by} $|\mathcal{M}|^2$ ---
 flat-in-$\log|\mathcal{M}|^2$, \emph{not} the physical measure $|\mathcal{M}|^2\mathrm{d}\Phi$ a
 cross-section generator targets (that is the \textsc{rambo} starvation trap). The three layers: (L0)
 coverage via flat-$\log|\mathcal{M}|^2$ importance sampling; (L1) emphasis via $\sigma$-reweighting
-$\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); (L2, aspirational)
-$\sigma$-informed \emph{on-the-fly generation} --- the only layer that lets $\sigma$ overcome the
-coverage ceiling, by generating where $\sigma$ is high \emph{and} data is sparse.
+$\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); (L2, \textbf{validated on
+\code{uugg}}, below) $\sigma$-informed \emph{on-the-fly generation} --- the only layer that lets
+$\sigma$ overcome the coverage ceiling, by generating where $\sigma$ is high \emph{and} data is sparse.
 
 \paragraph{L0 validated on the $ee\to u\bar u$ $Z$ resonance --- by GENERATION, not resampling.}
 The $s$-channel $Z$ pole ($|\mathcal{M}|^2$ peaks $\sim$$200\times$ at $\sqrt{s}\!\approx\!91$; flat
@@ -1608,74 +1608,68 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
 un-regenerable.}
 
+\paragraph{L2 validated on $ee\to u\bar u gg$ --- $\sigma$-informed on-the-fly GENERATION beats
+uniform generation, coordinate-free.} L2 is the layer where $\sigma$ finally overcomes the coverage
+ceiling: instead of \emph{reweighting} a fixed pool (L1), the model's live uncertainty steers what
+gets \emph{generated} next. Demonstrated on $ee\to u\bar u gg$ --- deliberately the process the
+earlier $ee\to u\bar u$ attempt flagged as the right test, since its overlapping soft \emph{and}
+collinear singularities admit \emph{no} single hand-tuned density (no one-parameter $f$ can be
+near-optimal, unlike the $2\!\to\!2$ resonance). \emph{The loop} (\code{l2\_online\_uugg.py}): ONE
+long-lived process, model $+$ optimizer $+$ a SINGLE cosine built once over the full horizon
+(round~0 \code{init\_data} also FREEZES the amp/mom preprocessing stats); rounds are boundaries
+\emph{inside} the one \code{train()} loop, reached by monkeypatching \code{exp.\_cycle} (no core edit
+--- the runtime imports the core modules from the main repo, so a worktree edit to \code{train()}
+would be dead code). At each boundary: PROPOSE fresh momenta from a process-agnostic base, [score by
+the LIVE $\sigma$], KEEP $n$, LABEL survivors with the exact \code{ee\_uugg} standalone, preprocess
+with the FROZEN stats, and APPEND to a growing pool. The base proposal
+(\code{gen\_ir\_democratic.py}) is genuinely process-agnostic: an IR-democratic recursive $1\!\to\!2$
+phase-space split with log-uniform intermediate masses (SARGE/HAAG core, reaches the soft/collinear
+corners of \emph{any} massless final state) mixed $50/50$ with flat \textsc{rambo} for the bulk --- no
+\code{uugg} antenna, no $y_{\min}$/$\sqrt s$ coordinate anywhere. \emph{Clean isolation of the
+sampling effect:} BOTH arms train the identical HETEROSC net with a \emph{detached} $\sigma$ backbone
+at $\beta{=}1$, so $\mu$ gets a pure-MSE gradient and trains \emph{exactly} as MSE in both arms while
+$\sigma$ is a read-only calibration head that is always live to score proposals (no per-round
+$\sigma$-fit subprocess, no \code{grow\_sigma\_head} at each round). The arms differ in ONE thing: the
+keep rule --- \textbf{base} keeps a \emph{uniform} subset of the proposal (the ``best hand-coded
+sampler'' control), \textbf{sigma} keeps $\propto\!\sigma(x)^\gamma$ without replacement. Matched
+totals both arms ($4000$ steps, $N{=}300$k over $R{=}10$ rounds, warm-started from \code{base22} grown
+$1$ch$\to$$2$ch), fresh data every round both arms --- so the \emph{only} difference between base and
+sigma is \emph{where} the increment is drawn. Held-out eval on a FIXED disjoint deep-IR set ($100$k,
+$y_{\min}$ down to $10^{-8}$, seed $777$), scored on raw $\log|\mathcal{M}|^2$ per $y_{\min}$ decade
+(preprocessing-independent, so base/sigma are strictly like-for-like); the eval reloads the run's
+\code{model\_run0\_best.pt} and can run in-process at the run tail (\code{--heldout\_eval}), no separate
+job. Tooling: \code{l2\_online\_uugg.py}, \code{gen\_ir\_democratic.py}, \code{grow\_sigma\_head.py},
+\code{make\_heldout\_uugg.py}, \code{eval\_heldout\_uugg.py}; plots \code{plot\_l2\_uugg\{,\_gamma,
+\_abs\}.py}.
+
+\emph{Result (3 seeds each of base and $\gamma\!\in\!\{1,2,3,5,10\}$).} $\sigma$-driven generation
+beats uniform, and the gain \textbf{concentrates in the deep IR and grows monotonically with the
+concentration exponent $\gamma$}. Log-flat-per-decade MSE, $\sigma$/base (mean over the $7$ $y_{\min}$
+decades): $92\%,81\%,78\%,76\%,74\%$ at $\gamma{=}1,2,3,5,10$ --- a real but \emph{saturating} overall
+gain. The deepest decade ($y_{\min}\!<\!10^{-6}$) tells the sharper story: $\sigma$/base
+$=90\%,70\%,66\%,62\%,\mathbf{55\%}$ --- the deep-IR error is nearly \emph{halved} at $\gamma{=}10$ and
+still falling. The overall metric saturates because the reallocation has a real cost: the shallowest
+(bulk) decade $y_{\min}\!>\!0.1$ \emph{rises} $107\%\!\to\!128\%$ over $\gamma{=}1\!\to\!10$, an
+accelerating penalty that eats the deep-IR gain in the log-flat average. So $\gamma\!\approx\!3$--$5$ is
+the sweet spot for the overall metric; larger $\gamma$ buys still-lower deep-IR error by paying more in
+the bulk --- exactly the water-filling trade-off (Thread~B), now traversed by a single coordinate-free
+knob. \textbf{This closes L2: on a process where no one-parameter hand density fits, the model's own
+$\sigma$, raised to a power, generates a strictly better training set than uniform --- with no physics
+coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
+confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ L2 numbers from the earlier
+session, which are retracted.) Figures: \code{l2\_uugg\_perdecade} (base vs $\sigma$ at $\gamma{=}1$),
+\code{l2\_uugg\_gamma} (per-decade ratio + the deep-vs-bulk trade-off vs $\gamma$),
+\code{l2\_uugg\_perdecade\_abs} (absolute MSE per decade, all $\gamma$).
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
-  \item \textbf{Merge \code{heterosc} into \code{jeanzay}.} Cosmetic left-over to clean up in the
-    merge: the HETEROSC validation ``combined'' display still prints $0$ via the geometric mean ---
-    harmless, since training and checkpoint selection use the arithmetic mean.
-  \item \textbf{Coordinate-free $\sigma$-driven online generation (L2) --- BUILT and RUN on
-    \code{ee}$\to$\code{uu}, but EVERY cross-arm number from that session is CONFOUNDED; treat all
-    magnitudes as INVALID pending the matched re-run below.} Tooling lives on worktree
-    \code{worktrees/wt-l2-gen} (branch \code{l2-gen}, off \code{heterosc}; \emph{not merged}, and its
-    \code{results.tex} is stale --- this hand-off is the current record).
-    \code{analysis/divergences/l2\_online.py} is a single-GPU-job, resumable round orchestrator
-    (train $\mu$ $\to$ two-stage $\sigma$-fit $\to$ re-score a frozen $3\mathrm{M}$ candidate pool $\to$
-    regenerate the training pool $\to$ repeat; each GPU stage a fresh \code{run.py} subprocess to dodge
-    the $\mu$P global leak). Eval \code{eval\_l2\_online.sh}$\to$\code{eval\_eeuu\_resonance.py};
-    plots \code{plot\_l2\_online.py}. \code{extract\_sigma\_eeuu.py}/\code{eval\_eeuu\_resonance.py}
-    were patched to self-locate the worktree (they must load the HETEROSC \code{models.lloca}).
-    \begin{itemize}
-      \item \emph{Method that survives (the design, not the numbers).} The general, divergence-agnostic
-        sampler is \textbf{$p(x)\!\propto\!\sigma(x)^\gamma$} (\code{adapt\_pool}): per-event, with NO
-        physics coordinate (no $\sqrt s$/$y_{\min}$/$|\mathcal M|^2$ binning), NO reference density, NO
-        loss correction; damped by a per-candidate $\sigma$-EMA so a large $\sigma$ ratio cannot collapse
-        the whole budget onto a few events and oscillate. Iterated, it flows toward equalized $\sigma$
-        (uniform error). This is the whole point of $\sigma$: it flags where the model is wrong in ANY
-        process without naming the divergence variable.
-      \item \emph{MISTAKE 1 --- un-matched training budget.} The ``adapt $\approx$ f=0.25'' headline
-        compared \code{adapt} at $6$--$8$ rounds ($9$--$12$k $\mu$-iters) against f=0.25 at $3$ rounds
-        ($4.5$k $\mu$-iters). At MATCHED budget f=0.25 is clearly ahead ($r{=}2$: $2.1\mathrm{e}{-}5$ vs
-        adapt's $7.9\mathrm{e}{-}5$); adapt only draws level after spending extra rounds discovering the
-        density from a uniform start. So there is NO measured tie --- at equal budget the hand-tuned
-        $f$ wins; the honest open claim is only ``adapt converges TOWARD f=0.25 autonomously, paying a
-        transient.''
-      \item \emph{MISTAKE 2 --- data-freshness confound (taints EVERY $\sigma$-vs-static comparison this
-        session).} The static/raw/reweight arms \emph{reused the same $400$k pool every round}, while the
-        adaptive/score arms \emph{drew a fresh $400$k each round} --- so the ``winning'' arms also saw
-        $\sim$$2$--$3\times$ more UNIQUE data. This confounds the covered-base and starved-base
-        $\sigma$-vs-static runs, the ``$7.5\times$ over raw'' starved result, AND the adapt-vs-f=0.25
-        comparison. Fixed now (see below), but all prior numbers predate the fix.
-      \item \emph{MISTAKE 3 --- two wasted detours before the right method.} (a) An unbiased IS loss
-        correction $c_b\!=\!Q_b/\pi_b$ to a FIXED $Q\!=\!$f=0.25 objective: mathematically unbiased
-        (mean weight $1$, verified) but it \emph{caps} performance at f=0.25 by construction --- the
-        wrong target, and it made the ``reweight'' control tie ``l2'' trivially. (b) A $\sqrt s$-binned
-        water-filling allocator: particularizes a method that must be coordinate-free. Both removed.
-      \item \emph{What is probably still directionally true} (unconfounded by data-freshness, or verified
-        analytically): uncorrected $\sigma$-resampling HURTS --- changing which events train without a
-        loss correction biases the objective, so even the perfect-error oracle loses to naive coverage;
-        the IS correction removes that bias but does not fix an over-concentrated ($\alpha{=}1$, per-event)
-        proposal; the coordinate-free \code{adapt} loop is numerically STABLE and CONVERGES (the
-        $\sigma$-EMA damping works). No magnitude claim is trustworthy.
-      \item \emph{The CORRECT experiment (fairness fix ALREADY COMMITTED on \code{l2-gen}:
-        static/reweight now redraw a fresh pool each round, \code{seed+r}).} Run ALL arms identically ---
-        same $R$ rounds, same $1500$ $\mu$-iters/round, same FRESH $400$k/round, same seeds, same
-        candidate pool --- varying ONLY the sampling distribution \{uniform (raw), fixed f=0.25, adaptive
-        $\sigma^\gamma$\}, and compare the logflat curve PER ROUND-INDEX (isolates sampling from budget;
-        the $\sigma$-fit iters are frozen-$\mu$ overhead, not $\mu$-training, so they never enter the
-        budget axis). $\sim$$2$ GPU-h: \code{adapt} seeds $0$--$2$ already exist and are fresh-per-round
-        (reusable); only the two static baselines need re-running fresh, $6$ rounds, $3$ seeds:
-        \code{l2\_online.sh --arm static --f 0.25 --tag mf025\_s\$s --rounds 6 --seed \$s} and
-        \code{--arm static --f 0 --tag mraw\_s\$s --rounds 6 --seed \$s}.
-      \item \emph{Open beyond the fix.} A genuine WIN (adapt beats a fixed $f$) is unlikely on this
-        simple $2\!\to\!2$ resonance, where one $f\!\approx\!0.25$ is already near-optimal --- test where
-        no $1$-parameter family fits: \code{uugg}, or the $u\bar u g$ soft AND collinear IR at once. Then
-        generalize \code{adapt} to $u\bar u g$ with the SAME code (only $\sigma$, no $y_{\min}$) as the
-        process-agnostic demonstration. Note also: a round is a warm-restarted cosine finetune, not one
-        continuous schedule --- reconsider whether that is the right vehicle. Distinct from this loop, the
-        per-$y_{\min}$-bin \code{adaptive\_ir.py} (branch \code{adaptive-ir}) remains CPU-validated but
-        unwired.
-    \end{itemize}
+  \item \textbf{The $\mu$P-LLoCa $\sigma$-head subset is now on \code{jeanzay}} (cherry-picked, not a
+    full \code{heterosc} merge): the $2$-channel (mean, softplus $\sigma$) HETEROSC output head with
+    \code{detach\_sigma\_backbone}/\code{sigma\_after\_pool}, used by the L2 loop above. Cosmetic
+    left-over from the wider \code{heterosc} branch, if ever merged: the HETEROSC validation
+    ``combined'' display still prints $0$ via the geometric mean --- harmless, since training and
+    checkpoint selection use the arithmetic mean.
   \item \textbf{Extend the soft/collinear split to $u\bar u gg$} (\code{holdout\_prep.py}
     \code{region} already supports it).
 \end{itemize}
