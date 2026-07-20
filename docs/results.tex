@@ -1672,6 +1672,28 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     checkpoint selection use the arithmetic mean.
   \item \textbf{Extend the soft/collinear split to $u\bar u gg$} (\code{holdout\_prep.py}
     \code{region} already supports it).
+  \item \textbf{Harder / structurally-different divergences.} The L2 loop is coordinate-free, so it
+    should transfer with \emph{no} per-process tuning --- stress it on divergence structures it has
+    not seen: more legs / higher multiplicity ($u\bar u ggg$, $u\bar u q\bar q g$), a genuine
+    \emph{multi-scale} overlap (simultaneous $s$-channel resonance \emph{and} IR, e.g.\ $Z$/$W$
+    radiation), massive-particle thresholds ($t\bar t$ near threshold, $2m_t$ cusp), and mixed
+    soft$+$collinear$+$resonant coverage in one process. The open question: does the single $\gamma$
+    knob still suffice when there is more than one competing extreme, or does the density want to be
+    multi-modal (does $\sigma^\gamma$ automatically split its budget, or must it)? The generator
+    (\code{gen\_ir\_democratic.py}) already handles arbitrary massless $N$-body; massive/threshold
+    cases need the mass handling and a standalone label per process.
+  \item \textbf{Bayesian networks, not only the heteroscedastic loss.} The current $\sigma$ is a
+    single \emph{point} heteroscedastic head (aleatoric-style readout off detached features). Test a
+    genuinely \emph{Bayesian} network --- a posterior over weights (variational/Bayes-by-backprop,
+    MC-dropout, a deep ensemble, or a Laplace/last-layer approximation) --- so the uncertainty that
+    steers generation is \emph{epistemic} (``the model has not seen data like this'') rather than a
+    learned spread. Epistemic $\sigma$ is arguably the \emph{right} signal for on-the-fly generation:
+    it is high exactly where the training set is sparse, which is what L2 wants to fill, and it should
+    shrink as coverage improves (a natural stopping/annealing signal the point head lacks). Compare,
+    on the same \code{uugg} L2 harness and held-out deep-IR metric, epistemic-$\sigma$ generation vs.\
+    the het-loss $\sigma^\gamma$ baseline; watch cost (ensemble = $k\times$ training; MC-dropout /
+    last-layer $\approx$ free) and whether epistemic $\sigma$ ranks the deep IR better than the
+    het-head's within-region signal (which was the weak link at L1).
 \end{itemize}
 
 % ==========================================================================
