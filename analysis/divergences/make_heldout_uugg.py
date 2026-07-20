@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+"""Generate a FIXED held-out deep-IR ee->uugg evaluation set for the L2 comparison.
+
+Both arms (sigma-driven online generation, and any existing baseline) are scored on THIS set, on raw
+log|M|^2 (each model's own preprocessing inverted) so training-side preprocessing differences never
+bias the comparison. Drawn from the SAME process-agnostic base proposal used in training (IR-democratic
++ RAMBO bulk) so it spans both the O(1) bulk AND the soft/collinear corners; y_min / x_gmin are stored
+so error can be reported per IR-resolution decade (where the divergences live). Never trained on
+(separate seed). CPU only.
+"""
+import argparse
+import os
+import sys
+
+import numpy as np
+
+WT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
+import l2_online_uugg as L   # propose_momenta / label_events / PDG   # noqa: E402
+
+
+def ir_observables(P):
+    """y_min (min gluon-involving pair invariant / s) and x_gmin (softest gluon energy frac)."""
+    def dot(a, b): return a[..., 0] * b[..., 0] - (a[..., 1:] * b[..., 1:]).sum(-1)
+    Q = P[:, 0] + P[:, 1]; s = dot(Q, Q)
+    glu = [4, 5]; colored = [2, 3, 4, 5]; gset = set(glu)
+    pairs = [(i, j) for a in range(4) for b in range(a + 1, 4)
+             for i, j in [(colored[a], colored[b])] if (i in gset or j in gset)]
+    yv = np.stack([dot(P[:, i] + P[:, j], P[:, i] + P[:, j]) / s for i, j in pairs], 1)
+    y_min = np.clip(yv, 1e-14, None).min(1)
+    xg = np.stack([2.0 * dot(P[:, g], Q) / s for g in glu], 1)
+    return y_min, xg.min(1), 2.0 * P[:, 0, 0]   # y_min, x_gmin, sqrt_s (CM: 2*E_beam)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--n", type=int, default=100000)
+    ap.add_argument("--y_lo", type=float, default=1e-8, help="deeper than training to stress the tail")
+    ap.add_argument("--mix_ir", type=float, default=0.5)
+    ap.add_argument("--seed", type=int, default=777, help="disjoint from training seeds")
+    ap.add_argument("--out", default=os.path.join(L.REPO, "analysis/divergences/heldout_uugg_deepIR.npz"))
+    args = ap.parse_args()
+
+    rng = np.random.default_rng(args.seed)
+    print(f"[heldout] proposing {args.n} events (y_lo={args.y_lo}, mix_ir={args.mix_ir})", flush=True)
+    P = L.propose_momenta(args.n, args.y_lo, args.mix_ir, L.LOW_CUTS, rng)
+    me2 = L.label_events(P)
+    y_min, x_gmin, sqrt_s = ir_observables(P)
+    rows = np.concatenate([P.reshape(len(P), -1), np.tile(L.PDG.astype(np.float64), (len(P), 1)),
+                           me2.reshape(-1, 1)], axis=1)
+    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    np.savez_compressed(args.out, rows=rows.astype(np.float64), y_min=y_min, x_gmin=x_gmin,
+                        sqrt_s=sqrt_s, pdg=L.PDG)
+    print(f"[heldout] saved {args.out}  N={len(rows)}  |M|^2 [{me2.min():.2e},{me2.max():.2e}]", flush=True)
+    for lo, hi in [(0, 1e-6), (1e-6, 1e-5), (1e-5, 1e-4), (1e-4, 1e-3), (1e-3, 1e-2), (1e-2, 1e-1), (1e-1, 1.01)]:
+        n = int(((y_min >= lo) & (y_min < hi)).sum())
+        print(f"    y_min[{lo:.0e},{hi:.0e}): {n:6d}  ({100*n/len(rows):.1f}%)", flush=True)
+
+
+if __name__ == "__main__":
+    main()
