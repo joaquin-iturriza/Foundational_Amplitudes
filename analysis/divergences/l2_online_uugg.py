@@ -281,6 +281,8 @@ def main():
     cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained)
     exp = AmplitudeExperiment(cfg)
     exp._init()                     # run_dir, logger, backend (device/dtype/tf32) -- normally via __call__
+    exp._save_config("config.yaml")  # full_run normally does this; we bypass full_run, so save it here
+                                     # (the held-out eval reloads config.yaml to rebuild the model).
 
     # We need init_data to have run (stats frozen) before defining the hook, but train() is called
     # inside full_run(). So we run the init prefix here, install the hook, then the loop.
