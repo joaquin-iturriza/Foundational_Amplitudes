@@ -1642,6 +1642,41 @@ job. Tooling: \code{l2\_online\_uugg.py}, \code{gen\_ir\_democratic.py}, \code{g
 \code{make\_heldout\_uugg.py}, \code{eval\_heldout\_uugg.py}; plots \code{plot\_l2\_uugg\{,\_gamma,
 \_abs\}.py}.
 
+\paragraph{The process-agnostic base generator: ``democratic'' phase space.} The one component that
+makes the whole method coordinate-free is the base proposal (\code{gen\_ir\_democratic.py}); it must
+reach the singular regions of \emph{any} massless process with \emph{no} process-specific antenna or
+channel list --- otherwise the physics has been smuggled back in. It uses a single generic fact: the
+IR singularities of a massless amplitude all live at \emph{small invariants} --- soft ($E_i\!\to\!0$)
+and collinear ($s_{ij}=(p_i+p_j)^2\!\to\!0$) --- and both are reached ``democratically'' (equal weight
+per decade of invariant) by a recursive $1\!\to\!2$ split of the total invariant mass with the
+intermediate masses drawn \textbf{flat in log}. This is the process-agnostic \emph{core} of the
+SARGE/HAAG antenna generators (Draggiotis--van~Hameren--Kleiss), stripped of their process-specific
+antenna/channel weights. \emph{Construction} (CM frame, $N$ final legs of mass $m_i$, total energy
+$\sqrt s$): start a ``blob'' $Q=(\sqrt s,\mathbf 0)$ of invariant mass $M_N=\sqrt s$; for $k=N,\dots,2$
+split the current blob (mass $M_k$) into an emitted particle $p_k$ (mass $m_k$) plus a remaining blob
+(mass $M_{k-1}$), drawing $M_{k-1}^2$ \emph{log-uniform} in $[(m_{\rm rest}+M_{\rm floor})^2,\,
+(M_k-m_k)^2]$, where $m_{\rm rest}=\sum_{j>k} m_j$ is the least mass the leftover cluster can carry.
+A \emph{small} $M_{k-1}$ is exactly a soft/collinear leftover cluster, so log-uniform sampling visits
+those corners across all scales at once. Two-body kinematics fix the back-to-back momenta in the
+blob's rest frame at an isotropic direction; a boost by the blob's lab momentum puts them in the lab;
+the final blob \emph{is} $p_1$. Momentum conservation and on-shellness are \textbf{exact by
+construction} (no reject-for-validity). $M_{\rm floor}=\sqrt s\,\sqrt{y_{\rm lo}}$ sets the deepest
+invariant reached --- the coordinate-free analogue of the antenna's $y_{\rm lo}$ cut. \emph{One
+implementation subtlety:} the \emph{last} split ($k{=}2$) does \emph{not} draw a free mass --- the
+remaining blob already \emph{is} the final particle, so its mass is pinned to $m_1$ (drawing it freely
+would leave the last leg off-shell); for $N{=}2$ this is the only split and gives a back-to-back
+massless pair. \emph{Why no Jacobian appears anywhere:} we deliberately never compute this proposal's
+density or weight --- because training regresses $\log|\mathcal M|^2$ \emph{pointwise}, only \emph{where}
+the events sit matters, not how often the generator would have put them there (the same argument that
+lets $\sigma$-reweighting skip an importance correction). So \emph{any} construction that yields valid
+on-shell, momentum-conserving events covering the soft/collinear corners is admissible; this one,
+unlike a bespoke per-process antenna, is process-agnostic --- the \emph{same} \code{democratic\_draw}
+generates $u\bar u$, $u\bar u g$, and $u\bar u gg$ with no per-process code, verified (\code{--validate},
+\code{ir\_report}) to reach $y_{\min}\!<\!10^{-6}$ and small soft fraction $x_{\min}$ while staying
+momentum-conserving and massless. It is mixed $50/50$ with flat \textsc{rambo}, which the democratic
+draw under-covers: \textsc{rambo} fills the non-singular $O(1)$ bulk, the democratic half fills the
+IR corners.
+
 \emph{Result (3 seeds each of base and $\gamma\!\in\!\{1,2,3,5,10\}$).} $\sigma$-driven generation
 beats uniform, and the gain \textbf{concentrates in the deep IR and grows monotonically with the
 concentration exponent $\gamma$}. Log-flat-per-decade MSE, $\sigma$/base (mean over the $7$ $y_{\min}$
