@@ -24,8 +24,12 @@ b, g = load("base"), load("sigma")
 x = np.arange(len(DEC))
 fig, (axL, axR) = plt.subplots(1, 2, figsize=(11, 4.2))
 
-axL.errorbar(x - 0.06, b.mean(0), yerr=b.std(0), fmt="o-", color="#444", capsize=3, label="base (uniform)")
-axL.errorbar(x + 0.06, g.mean(0), yerr=g.std(0), fmt="s-", color="#c1121f", capsize=3, label=r"$\sigma$-driven ($\gamma$=1)")
+# both arms are evaluated on the SAME y_min decades -> markers sit on the true decade center (no
+# horizontal dodge, which on a physical x-axis would falsely suggest different y_min).
+axL.errorbar(x, b.mean(0), yerr=b.std(0), fmt="o-", color="#444", capsize=3, mfc="white",
+             label="base (uniform)")
+axL.errorbar(x, g.mean(0), yerr=g.std(0), fmt="s-", color="#c1121f", capsize=3,
+             label=r"$\sigma$-driven ($\gamma$=1)")
 axL.set_yscale("log"); axL.set_xticks(x); axL.set_xticklabels(LBL)
 axL.set_xlabel(r"$y_{\min}$ decade (deep IR $\to$ bulk)"); axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
 axL.set_title("Held-out deep-IR error per IR decade"); axL.legend(); axL.grid(alpha=0.3)
