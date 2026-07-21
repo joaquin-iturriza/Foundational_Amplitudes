@@ -47,6 +47,15 @@ def _softplus_inv(y):
     return torch.log(torch.expm1(y))
 
 
+def _copy_infshape(new_param, ref_param):
+    """Copy muP's `infshape` from ref_param onto new_param (same shape). MuAdam asserts every
+    parameter carries an infshape; the new rho params otherwise crash the optimizer build. Copying
+    the sibling weight's infshape makes MuAdam scale rho with muP identically to that weight."""
+    ish = getattr(ref_param, "infshape", None)
+    if ish is not None:
+        new_param.infshape = ish
+
+
 class VariationalLinear(nn.Module):
     """Wraps a built nn.Linear/MuReadout: mean = the original weight/bias, plus a log-std rho each.
 
@@ -70,11 +79,13 @@ class VariationalLinear(nn.Module):
         self.register_buffer("prior_sigma_w", torch.tensor(prior_rel * s_w), persistent=True)
         self.weight_rho = nn.Parameter(
             _softplus_inv(torch.full_like(lin.weight, sigma_rel * s_w)))
+        _copy_infshape(self.weight_rho, lin.weight)     # muP: rho scales like its weight (MuAdam needs it)
         if self.has_bias:
             with torch.no_grad():
                 s_b = max(sigma_rel * s_w, rho_floor)   # bias has no fan-in; reuse the layer scale
             self.register_buffer("prior_sigma_b", torch.tensor(prior_rel * s_w), persistent=True)
             self.bias_rho = nn.Parameter(_softplus_inv(torch.full_like(lin.bias, s_b)))
+            _copy_infshape(self.bias_rho, lin.bias)
 
         # MuReadout applies an output multiplier (output_mult / width_mult) after the linear. Detect
         # and reproduce it so the sampled-weight forward matches the deterministic path exactly.
@@ -85,10 +96,16 @@ class VariationalLinear(nn.Module):
                 self._out_mult = float(om) / float(wm() if callable(wm) else wm)
             except Exception:
                 self._out_mult = None
+        # Sampling policy: draw a posterior weight sample iff we are TRAINING (standard BBB) OR
+        # `sample_in_eval` is forced on (for epistemic-std scoring in eval mode). Validation / held-out
+        # eval run in eval mode with sample_in_eval=False -> the deterministic posterior MEAN, so
+        # checkpoint selection and the reported metric are stable. `deterministic` hard-forces the mean
+        # regardless of mode (bitwise-equivalence check against the pre-variationalized net).
         self.deterministic = False
+        self.sample_in_eval = False
 
     def _sample(self, mu, rho):
-        if self.deterministic:
+        if self.deterministic or not (self.training or self.sample_in_eval):
             return mu
         sigma = F.softplus(rho)
         return mu + sigma * torch.randn_like(sigma)
@@ -151,7 +168,14 @@ def total_kl(model: nn.Module):
 
 
 def set_deterministic(model: nn.Module, flag: bool = True):
-    """Toggle mu-only (no weight noise) forward on every VariationalLinear -- for the mean prediction
-    or a bitwise-equivalence check against the pre-variationalized net."""
+    """Hard-toggle mu-only (no weight noise) forward on every VariationalLinear, regardless of
+    train/eval mode -- for the mean prediction or a bitwise-equivalence check against the base net."""
     for vl in collect_variational(model):
         vl.deterministic = flag
+
+
+def set_sample_in_eval(model: nn.Module, flag: bool = True):
+    """Force posterior sampling even in eval() mode (for epistemic-std scoring). Training-mode
+    sampling is unaffected; remember to turn this back off after scoring."""
+    for vl in collect_variational(model):
+        vl.sample_in_eval = flag
