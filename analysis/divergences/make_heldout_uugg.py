@@ -42,6 +42,10 @@ def main():
     ap.add_argument("--y_lo", type=float, default=1e-8, help="deeper than training to stress the tail")
     ap.add_argument("--mix_ir", type=float, default=0.5)
     ap.add_argument("--seed", type=int, default=777, help="disjoint from training seeds")
+    ap.add_argument("--peak_frac", type=float, default=0.0,
+                    help="uug multi-scale: add this fraction of extra events with sqrt_s near M_Z "
+                         "(enriches the Z-peak for a well-measured resonance-region MSE)")
+    ap.add_argument("--peak_hi", type=float, default=96.0, help="upper sqrt_s for the peak-enrichment batch")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
@@ -52,6 +56,16 @@ def main():
     rng = np.random.default_rng(args.seed)
     print(f"[heldout] proposing {args.n} events (y_lo={args.y_lo}, mix_ir={args.mix_ir})", flush=True)
     P = L.propose_momenta(args.n, args.y_lo, args.mix_ir, L.LOW_CUTS, rng)
+    # Multi-scale (uug): M_Z=91.19 sits at the very bottom of the sqrt(s)=[91,1000] window, so uniform
+    # sampling starves the Z-peak (~0.3%). Enrich it with a dedicated peak-window batch so the
+    # resonance-region MSE (and the deep-IR x on-peak split) is well-estimated. Evaluation only --
+    # per-region MSEs are unaffected by cross-region proportions; training keeps the uniform base.
+    if args.peak_frac > 0:
+        n_peak = int(round(args.peak_frac * args.n))
+        print(f"[heldout] enriching {n_peak} events near M_Z (sqrt_s in [91,{args.peak_hi}])", flush=True)
+        P_pk = L.propose_momenta(n_peak, args.y_lo, args.mix_ir, L.LOW_CUTS, rng,
+                                 sqrt_s_lo=91.0, sqrt_s_hi=args.peak_hi)
+        P = np.concatenate([P, P_pk], axis=0)
     me2 = L.label_events(P)
     y_min, x_gmin, sqrt_s = ir_observables(P)
     rows = np.concatenate([P.reshape(len(P), -1), np.tile(L.PDG.astype(np.float64), (len(P), 1)),

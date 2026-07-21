@@ -115,7 +115,7 @@ SIG_ARM_OVERRIDES = [
 
 
 # ---------------------------------------------------------------- base proposal (process-agnostic)
-def propose_momenta(n, y_lo, mix_ir, cuts, rng):
+def propose_momenta(n, y_lo, mix_ir, cuts, rng, sqrt_s_lo=91.0, sqrt_s_hi=1000.0):
     """Propose n full events (n,6,4) from the base: mix_ir fraction from the IR-democratic generator
     (reaches soft/collinear corners of ANY massless process), the rest flat RAMBO (fills the O(1)
     bulk). Fiducial cuts applied by oversample-and-reject. No labels, no weights -- only WHERE."""
@@ -123,7 +123,7 @@ def propose_momenta(n, y_lo, mix_ir, cuts, rng):
     n_ram = n - n_ir
 
     def draw_ir(nb):
-        sq = rng.uniform(91.0, 1000.0, nb)
+        sq = rng.uniform(sqrt_s_lo, sqrt_s_hi, nb)
         Pf = G.democratic_draw(nb, sq, MASSES, y_lo, rng)
         return G.build_full_event(Pf, sq), sq
 
@@ -132,7 +132,7 @@ def propose_momenta(n, y_lo, mix_ir, cuts, rng):
         P_ir, _ = mp._collect_with_cuts(draw_ir, n_ir, list(MASSES), PDG, cuts)
         parts.append(P_ir)
     if n_ram > 0:
-        ev, _ = mp.sample_nbody_phase_space(n_ram, 91.0, 1000.0, list(MASSES), PDG, rng=rng, cuts=cuts)
+        ev, _ = mp.sample_nbody_phase_space(n_ram, sqrt_s_lo, sqrt_s_hi, list(MASSES), PDG, rng=rng, cuts=cuts)
         P_ram = np.stack([e[0] for e in ev], axis=0)
         parts.append(P_ram)
     P = np.concatenate(parts, axis=0)
