@@ -179,3 +179,36 @@ def set_sample_in_eval(model: nn.Module, flag: bool = True):
     sampling is unaffected; remember to turn this back off after scoring."""
     for vl in collect_variational(model):
         vl.sample_in_eval = flag
+
+
+import contextlib
+
+
+@contextlib.contextmanager
+def predictive_forward(model: nn.Module, k: int):
+    """Within this context, model(...) returns the PREDICTIVE MEAN over k posterior weight samples --
+    the average of the network OUTPUT E_q[f(x,w)] ~ (1/k) sum_k f(x,w_k), the correct marginalisation
+    (NOT f(x,mu)). Used so checkpoint-ranking validation scores the SAME predictive quantity the
+    Bayesian eval reports, rather than a single deterministic mean-weights forward. No-op for a
+    non-variational net or k<=1. Patches the instance `forward` (picked up by nn.Module.__call__)."""
+    vls = collect_variational(model)
+    if not vls or k <= 1:
+        yield
+        return
+    orig_forward = model.forward
+    prev = [vl.sample_in_eval for vl in vls]
+    for vl in vls:
+        vl.sample_in_eval = True                       # sample even though validation runs in eval()
+    def _averaged(*a, **kw):
+        out = None
+        for _ in range(k):
+            o = orig_forward(*a, **kw)
+            out = o if out is None else out + o
+        return out / k
+    model.forward = _averaged
+    try:
+        yield
+    finally:
+        model.forward = orig_forward
+        for vl, p in zip(vls, prev):
+            vl.sample_in_eval = p

@@ -341,7 +341,10 @@ def main():
     print(f"[driver] process={args.process} PDG={PDG.tolist()} NP={NP} standalone={STANDALONE}", flush=True)
 
     # --- round 0 increment -> disk, so init_data builds it + FREEZES the stats ---
-    round0_dir = os.path.join(REPO, f"data_l2{args.process}/{run_name}_r0")
+    # NB: encode inc_n in the dir name -- else a small smoke run (small n_total) and a full run that
+    # share a run_name would share this dir, and the full run would silently REUSE the smoke's tiny
+    # round-0 pool (10x less data -> wrong, and misleadingly faster). inc_n makes them disjoint.
+    round0_dir = os.path.join(REPO, f"data_l2{args.process}/{run_name}_r0n{inc_n}")
     os.makedirs(round0_dir, exist_ok=True)
     r0_npy = os.path.join(round0_dir, DATASET + ".npy")
     if not os.path.exists(r0_npy):
@@ -416,6 +419,16 @@ def main():
             loss = loss + (args.bbb_beta / n) * BBB.total_kl(exp.model)
             return loss, lnr, mse
         exp._batch_loss = _bbb_batch_loss
+
+        # Checkpoint RANKING is Bayesian too: score validation with the PREDICTIVE MEAN over K_val
+        # posterior samples (matches how the model is evaluated + reported), not a single mean-weights
+        # forward. Cheaper K for the frequent validation than the eval/scoring K.
+        _orig_validate = exp._validate
+        K_val = min(args.bbb_ksamples, 8)
+        def _bbb_validate(step):
+            with BBB.predictive_forward(exp.model, K_val):
+                return _orig_validate(step)
+        exp._validate = _bbb_validate
 
     # seed the growing pool from the round-0 TRAIN split
     pool_lists = _dataset_to_lists(exp.train_loader.dataset)
