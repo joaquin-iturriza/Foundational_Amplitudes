@@ -327,6 +327,10 @@ def main():
     from experiment import AmplitudeExperiment
     torch.set_default_dtype(torch.float32)
     cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained)
+    # idempotent rerun: base_experiment aborts on an existing run dir, so clear THIS run's dir first
+    # (disposable L2 run; the round-0 data dir + grown ckpt above are reused, not cleared).
+    import shutil
+    shutil.rmtree(os.path.join("runs", exp_name, run_name), ignore_errors=True)
     exp = AmplitudeExperiment(cfg)
     exp._init()                     # run_dir, logger, backend (device/dtype/tf32) -- normally via __call__
     exp._save_config("config.yaml")  # full_run normally does this; we bypass full_run, so save it here
