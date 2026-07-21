@@ -22,7 +22,10 @@ Arms:
   base   : keep a uniform subset of the base proposal   -> trains on the fixed "best hand-coded
            sampler" (IR-democratic + RAMBO) every round. The baseline the sigma arm must beat.
   sigma  : keep proposals with prob ∝ sigma(x)^gamma     -> reallocates the increment toward where the
-           model is CURRENTLY wrong. [needs the heteroscedratic sigma head -- ported separately.]
+           model is CURRENTLY wrong (het-head ALEATORIC sigma). The point-uncertainty baseline.
+  bbb    : keep proposals with prob ∝ sigma_epi(x)^gamma  -> sigma_epi is the EPISTEMIC predictive std
+           of a full-network Bayes-by-backprop posterior (K weight samples). High where training data
+           is sparse -- the arguably-right signal for what to generate. See bbb.py.
 
 CPU generation/labeling; GPU training. Run under sbatch (xformers attention is CUDA-only).
 """
@@ -185,9 +188,8 @@ def preprocess_increment(exp, P, me2):
     return parts, toks_l, amp_prepd, orders, pids
 
 
-def score_sigma(exp, P):
-    """Forward the LIVE (mu,sigma) model over proposed momenta -> per-proposal sigma (the model's own
-    uncertainty). No labels needed. Reuses exp._collect_predictions (handles the HETEROSC split)."""
+def _score_loader(exp, P):
+    """Build a shuffle-free eval loader over proposed momenta (dummy amps) for scoring."""
     from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length
     parts, toks_l, orders, pids = preprocess_momenta(exp, P)
     pf, tf, off = build_flat_arrays(parts, toks_l)
@@ -196,9 +198,15 @@ def score_sigma(exp, P):
         amplitudes=np.zeros((len(parts), 1), dtype=np.float64),     # dummy (unused for sigma)
         tokens_flat=tf, order_labels=np.asarray(orders),
         process_ids=pids.astype(np.int64), dtype=exp.dtype)
-    loader = torch.utils.data.DataLoader(
+    return torch.utils.data.DataLoader(
         ds, batch_size=int(exp.cfg.evaluation.batchsize), shuffle=False, drop_last=False,
         collate_fn=collate_variable_length, num_workers=0)
+
+
+def score_sigma(exp, P):
+    """Forward the LIVE (mu,sigma) model over proposed momenta -> per-proposal sigma (the model's own
+    HETEROSC uncertainty). No labels needed. Reuses exp._collect_predictions (handles the split)."""
+    loader = _score_loader(exp, P)
     was_training = exp.model.training
     exp.model.eval()
     with torch.no_grad():
@@ -206,6 +214,26 @@ def score_sigma(exp, P):
     if was_training:
         exp.model.train()
     return np.asarray(sig, dtype=np.float64).reshape(-1)            # (N,)
+
+
+def score_epistemic(exp, P, k_samples):
+    """EPISTEMIC sigma for the bbb arm: draw k_samples posterior weight samples, forward each over the
+    proposals, and return the per-proposal STD of the predicted mu (log|M|^2). High where the posterior
+    disagrees = where training data is sparse -- exactly what L2 wants to fill. No labels needed."""
+    import bbb as BBB
+    loader = _score_loader(exp, P)
+    was_training = exp.model.training
+    exp.model.eval()                                    # disables dropout...
+    BBB.set_sample_in_eval(exp.model, True)             # ...but force posterior weight sampling
+    preds = []
+    with torch.no_grad():
+        for _ in range(k_samples):
+            mu, _, _ = exp._collect_predictions(loader)   # fresh weight sample each pass
+            preds.append(np.asarray(mu, dtype=np.float64).reshape(-1))
+    BBB.set_sample_in_eval(exp.model, False)
+    if was_training:
+        exp.model.train()
+    return np.std(np.stack(preds, axis=0), axis=0)      # (N,) epistemic predictive std
 
 
 def _dataset_to_lists(ds):
@@ -248,7 +276,8 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
     # BOTH arms train the identical HETEROSC(detach, beta=1) model (same mu training, same sigma head);
     # they differ ONLY in the per-round keep rule (uniform vs prop sigma^gamma), so the base arm is a
     # clean control that isolates the sigma-sampling effect with no loss-function confound.
-    arm_ov = SIG_ARM_OVERRIDES
+    # bbb arm is a pure-MSE net (variationalized post-init); base/sigma are HETEROSC(detach,beta=1).
+    arm_ov = [] if arm == "bbb" else SIG_ARM_OVERRIDES
     # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
     pre_ov = [f"fine_tune.pretrained_path={pretrained}"] if pretrained else []
     overrides = data_overrides() + MU_OVERRIDES + arm_ov + pre_ov + [
@@ -268,7 +297,14 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
 # ---------------------------------------------------------------- driver
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", required=True, choices=["base", "sigma"])
+    ap.add_argument("--arm", required=True, choices=["base", "sigma", "bbb"],
+                    help="base=uniform keep; sigma=keep prop het-head sigma^gamma; "
+                         "bbb=keep prop EPISTEMIC sigma^gamma from a full-network Bayes-by-backprop net")
+    ap.add_argument("--bbb_beta", type=float, default=1e-2, help="bbb: ELBO KL weight (loss += beta*KL/N)")
+    ap.add_argument("--bbb_sigma_rel", type=float, default=0.05,
+                    help="bbb: initial posterior std as a fraction of each layer's muP weight scale")
+    ap.add_argument("--bbb_ksamples", type=int, default=16,
+                    help="bbb: posterior forward samples for the epistemic predictive std")
     ap.add_argument("--process", default="uugg", choices=list(PROCESSES),
                     help="ee -> u ubar + n_g gluons: uug (multi-scale Z-res+IR), uugg, uuggg (more legs)")
     ap.add_argument("--tag", default=None, help="default: the process name")
@@ -297,7 +333,10 @@ def main():
     inc_n = args.n_total // R
     steps_per_round = args.total_steps // R
     exp_name = f"eeuu_l2{args.process}"
-    run_name = f"{tag}_{args.arm}_s{args.seed}"
+    # encode gamma for the sigma/bbb arms (else two gamma runs of the same arm share a run dir and
+    # collide); gamma=1 stays the canonical unsuffixed name for backward compatibility.
+    gsuf = f"_g{int(args.gamma)}" if (args.arm in ("sigma", "bbb") and args.gamma != 1.0) else ""
+    run_name = f"{tag}_{args.arm}{gsuf}_s{args.seed}"
     rng_gen = np.random.default_rng(1000 + args.seed)
     print(f"[driver] process={args.process} PDG={PDG.tolist()} NP={NP} standalone={STANDALONE}", flush=True)
 
@@ -314,14 +353,20 @@ def main():
         np.save(r0_npy, rows0.astype(np.float64))
         print(f"[r0] saved {r0_npy} N={len(rows0)}  |M|^2 [{me0.min():.2e},{me0.max():.2e}]", flush=True)
 
-    # --- GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row) so warm-start into the
-    #     HETEROSC net matches shapes AND keeps base22's converged mu head. BOTH arms are HETEROSC. ---
-    grown = os.path.join(REPO, f"data_l2{args.process}/{run_name}_base_grown.pt")
-    if not os.path.exists(grown):
-        import subprocess
-        subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
-                        BASE22, grown, str(args.sigma0)], check=True)
-    pretrained = grown
+    # --- warm-start checkpoint ---
+    # base/sigma arms are HETEROSC: GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row)
+    # so the warm start matches the 2-ch net AND keeps base22's converged mu head.
+    # bbb arm is a pure-MSE (1-ch) net that gets variationalized post-init, so it warm-starts from the
+    # ORIGINAL 1-ch base22 directly (its weights become the posterior means) -- no grow needed.
+    if args.arm == "bbb":
+        pretrained = BASE22
+    else:
+        grown = os.path.join(REPO, f"data_l2{args.process}/{run_name}_base_grown.pt")
+        if not os.path.exists(grown):
+            import subprocess
+            subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
+                            BASE22, grown, str(args.sigma0)], check=True)
+        pretrained = grown
 
     # --- build experiment (warm-start base22[grown], freeze stats, ONE cosine over total_steps) ---
     from experiment import AmplitudeExperiment
@@ -343,8 +388,34 @@ def main():
     if args.validate_prep:
         _validate_prep(exp, args, rng_gen); return
 
-    exp.init_model(); exp._init_loss(); exp._init_regularization()
+    exp.init_model()
+    bbb_layers = None
+    if args.arm == "bbb":
+        # Turn the warm-started (base22 means) MSE net into a full-network Bayes-by-backprop posterior:
+        # every Linear (except the equivariant framesnet) gets a Gaussian weight posterior. Done AFTER
+        # init_model (means = base22, muP finalised) and BEFORE _init_optimizer so the fresh rho params
+        # are picked up by build_ft_param_groups (matched to their layer's depth by name prefix).
+        import bbb as BBB
+        bbb_layers = BBB.variationalize(exp.model, sigma_rel=args.bbb_sigma_rel, prior_rel=1.0)
+        n_rho = sum(p.numel() for m in bbb_layers for p in (m.weight_rho,
+                    *( (m.bias_rho,) if m.has_bias else ())))
+        print(f"[bbb] variationalized {len(bbb_layers)} Linear layers ({n_rho} posterior-std params); "
+              f"beta={args.bbb_beta} sigma_rel={args.bbb_sigma_rel} K={args.bbb_ksamples}", flush=True)
+    exp._init_loss(); exp._init_regularization()
     exp._init_ewc(); exp._init_optimizer(); exp._init_scheduler()
+
+    if args.arm == "bbb":
+        # ELBO: add the KL(q||prior) term to the MINIMISED loss (loss += beta*KL/N), leaving
+        # loss_no_reg the PURE data MSE so best-checkpoint selection and the comparison metric stay
+        # like-for-like with the het-head arms. N = current pool size (KL is a per-example prior).
+        import bbb as BBB
+        _orig_batch_loss = exp._batch_loss
+        def _bbb_batch_loss(data):
+            loss, lnr, mse = _orig_batch_loss(data)
+            n = max(1, len(exp.train_loader.dataset))
+            loss = loss + (args.bbb_beta / n) * BBB.total_kl(exp.model)
+            return loss, lnr, mse
+        exp._batch_loss = _bbb_batch_loss
 
     # seed the growing pool from the round-0 TRAIN split
     pool_lists = _dataset_to_lists(exp.train_loader.dataset)
@@ -358,13 +429,17 @@ def main():
         M = int(round(args.oversample * inc_n))
         P_prop = propose_momenta(M, args.y_lo, args.mix_ir, LOW_CUTS, rng)
         keep_n = min(inc_n, len(P_prop))
-        if args.arm == "sigma":
+        if args.arm in ("sigma", "bbb"):
             # score fresh proposals by the LIVE model's uncertainty; keep WITHOUT replacement ∝ σ^γ.
-            sig = score_sigma(exp, P_prop)
+            # sigma arm = het-head aleatoric σ; bbb arm = epistemic predictive std (K posterior samples).
+            if args.arm == "bbb":
+                sig = score_epistemic(exp, P_prop, args.bbb_ksamples)
+            else:
+                sig = score_sigma(exp, P_prop)
             w = np.clip(sig, 1e-12, None) ** args.gamma
             p = w / w.sum()
             keep = rng.choice(len(P_prop), size=keep_n, replace=False, p=p)
-            print(f"[round {r}] σ p50/90/99={np.percentile(sig,[50,90,99])} "
+            print(f"[round {r}] {args.arm} σ p50/90/99={np.percentile(sig,[50,90,99])} "
                   f"kept σ mean={sig[keep].mean():.3g} vs all {sig.mean():.3g}", flush=True)
         else:
             keep = rng.choice(len(P_prop), size=keep_n, replace=False)          # base arm: uniform
@@ -414,7 +489,12 @@ def main():
         # BEFORE compress_models() gzips the checkpoints. Eliminates the separate eval job + queue wait.
         if args.heldout_eval:
             import eval_heldout_uugg as EV
-            htag = "base" if args.arm == "base" else ("sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}")
+            if args.arm == "base":
+                htag = "base"
+            elif args.arm == "bbb":
+                htag = "bbb" if args.gamma == 1.0 else f"bbb_g{int(args.gamma)}"
+            else:
+                htag = "sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}"
             label = args.heldout_label or f"{args.process}_{htag}_s{args.seed}"
             heldout_path = args.heldout_path or os.path.join(
                 REPO, f"analysis/divergences/heldout_{args.process}_deepIR.npz")
