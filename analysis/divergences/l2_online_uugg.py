@@ -505,7 +505,9 @@ def main():
             state = EV._load_ckpt_state(exp.cfg.run_dir, "model_run0_best.pt")
             exp.model.load_state_dict(state)
             exp.model.to(exp.device, dtype=exp.dtype).eval()
-            EV.score_and_save(exp, label, heldout_path)
+            # bbb: evaluate THROUGH the posterior (predictive mean over K samples + calibration).
+            EV.score_and_save(exp, label, heldout_path,
+                              mc_samples=(args.bbb_ksamples if args.arm == "bbb" else 1))
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)
 

@@ -25,7 +25,7 @@ DECADES = [(0, 1e-6), (1e-6, 1e-5), (1e-5, 1e-4), (1e-4, 1e-3), (1e-3, 1e-2), (1
 DEFAULT_HELDOUT = os.path.join(REPO, "analysis/divergences/heldout_uugg_deepIR.npz")
 
 
-def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
+def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT, mc_samples=1):
     """Score a LIVE exp (frozen stats, model already loaded + in eval mode) on the FIXED held-out deep-IR
     uugg set, on raw log|M|^2, binned by y_min decade. Reports overall + per-decade MSE and saves
     heldout_eval_{label}.npz (row-aligned pred/true/y_min/sigma for downstream plots). This is the SHARED
@@ -48,8 +48,28 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
                                          drop_last=False, collate_fn=collate_variable_length, num_workers=0)
     was_training = exp.model.training
     exp.model.eval()
+    # A Bayesian (BBB) model must be evaluated THROUGH its posterior, not collapsed to a single
+    # mean-weights forward: the point estimate is the PREDICTIVE MEAN E_q[f] ~ (1/K) sum_k f(x,w_k)
+    # (marginalised over the weight posterior; != f(x,mu) for a nonlinear net), and the predictive
+    # SPREAD is a first-class output we report (calibration), not something to hide. mc_samples>1 with
+    # a variational net does exactly this; for a deterministic net it is a no-op (one forward).
+    import bbb as BBB
+    is_bayes = mc_samples > 1 and len(BBB.collect_variational(exp.model)) > 0
+    pred_std_prepd = None
     with torch.no_grad():
-        pred_prepd, _truth_prepd, sigma = exp._collect_predictions(loader)
+        if is_bayes:
+            BBB.set_sample_in_eval(exp.model, True)          # sample the weight posterior each pass
+            samples = []
+            for _ in range(mc_samples):
+                p, _t, _s = exp._collect_predictions(loader)
+                samples.append(np.asarray(p, dtype=np.float64).reshape(-1))
+            BBB.set_sample_in_eval(exp.model, False)
+            samples = np.stack(samples, axis=0)              # (K, N) preprocessed
+            pred_prepd = samples.mean(0)                     # predictive mean (the point estimate)
+            pred_std_prepd = samples.std(0)                  # epistemic predictive std
+            sigma = None
+        else:
+            pred_prepd, _truth_prepd, sigma = exp._collect_predictions(loader)
     if was_training:
         exp.model.train()
 
@@ -57,6 +77,7 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
     amp_mean = float(np.atleast_1d(exp.prepd_mean)[0]); amp_std = float(np.atleast_1d(exp.prepd_std)[0])
     assert list(exp.cfg.data.amp_trafos) == ["log", "standardization"], exp.cfg.data.amp_trafos
     pred_logamp = pred_prepd.reshape(-1) * amp_std + amp_mean
+    pred_std_logamp = (pred_std_prepd * amp_std) if pred_std_prepd is not None else None
 
     err2 = (pred_logamp - true_logamp) ** 2
     print(f"\n=== {label} : MSE(Δlog|M|^2) on held-out deep-IR {L.PROCESS} (N={len(err2)}) ===", flush=True)
@@ -90,10 +111,33 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
                 continue
             print(f"  {name:16s} {int(m.sum()):>7d} {err2[m].mean():>12.4e} {np.sqrt(err2[m].mean()):>8.4f}",
                   flush=True)
+    # --- Bayesian predictive uncertainty: report calibration of the epistemic predictive std against
+    #     the actual error (the whole point of a posterior). z2 = err^2 / sigma_pred^2 should average ~1
+    #     if calibrated; a Gaussian NLL scores the full predictive distribution. Epistemic-only sigma
+    #     (no aleatoric term) will tend to under-cover (z2>1) where the target has irreducible spread --
+    #     itself informative. Also report how well sigma_pred RANKS the error (Spearman), since ranking
+    #     is what the L2 keep-rule actually uses. ---
+    if pred_std_logamp is not None:
+        eps = 1e-12
+        s2 = pred_std_logamp.reshape(-1) ** 2 + eps
+        z2 = err2 / s2
+        nll = 0.5 * (np.log(2 * np.pi * s2) + z2)
+        # Spearman rank corr (sigma_pred vs |error|) without scipy: corr of the ranks.
+        def _rank(a): return np.argsort(np.argsort(a))
+        rp, re = _rank(pred_std_logamp.reshape(-1)), _rank(np.abs(pred_logamp - true_logamp))
+        rho = float(np.corrcoef(rp, re)[0, 1])
+        print(f"  --- Bayesian predictive uncertainty (K={mc_samples} posterior samples) ---", flush=True)
+        print(f"  sigma_pred  mean={pred_std_logamp.mean():.4e}  median={np.median(pred_std_logamp):.4e}"
+              f"  (log|M|^2 units)", flush=True)
+        print(f"  calibration <z^2>={z2.mean():.3f} (want ~1; >1 = under-confident/under-covers)"
+              f"   Gaussian NLL={nll.mean():.4f}", flush=True)
+        print(f"  sigma_pred vs |err| Spearman rho={rho:.3f} (ranking power the L2 keep-rule uses)",
+              flush=True)
     out = os.path.join(REPO, "analysis/divergences", f"heldout_eval_{label}.npz")
     np.savez(out, pred_logamp=pred_logamp, true_logamp=true_logamp, y_min=y_min,
              sqrt_s=(sqrt_s if sqrt_s is not None else np.array([])),
-             sigma=(sigma.reshape(-1) if sigma is not None else np.array([])))
+             sigma=(sigma.reshape(-1) if sigma is not None else np.array([])),
+             pred_std=(pred_std_logamp.reshape(-1) if pred_std_logamp is not None else np.array([])))
     print(f"  saved {out}", flush=True)
     return out
 
@@ -119,6 +163,9 @@ def main():
     ap.add_argument("--ckpt", default="model_run0_best.pt")
     ap.add_argument("--heldout", default=DEFAULT_HELDOUT)
     ap.add_argument("--label", default=None, help="label for the printout (default: run basename)")
+    ap.add_argument("--mc_samples", type=int, default=1,
+                    help="bbb: posterior samples for the predictive mean + calibration (auto-set to 16 "
+                         "if a variational checkpoint is detected and this is left at 1)")
     args = ap.parse_args()
     L.set_process(args.process)
     if args.heldout == DEFAULT_HELDOUT:
@@ -139,10 +186,22 @@ def main():
     exp = AmplitudeExperiment(cfg)
     exp._init(); exp.init_physics(); exp.init_geometric_algebra()
     exp.init_data(); exp._init_dataloader(); exp.init_model()
-    exp.model.load_state_dict(_load_ckpt_state(args.run_dir, args.ckpt))
+    state = _load_ckpt_state(args.run_dir, args.ckpt)
+    # bbb checkpoints carry '*_rho' posterior-std params: variationalize the freshly-built MSE net so
+    # the shapes match, then load. Auto-enable the predictive-mean eval (K>1) so a Bayesian run is not
+    # silently scored as a single deterministic forward.
+    mc = args.mc_samples
+    if any(k.endswith("_rho") for k in state.keys()):
+        import bbb as BBB
+        BBB.variationalize(exp.model)
+        if mc == 1:
+            mc = 16
+        print(f"[eval] variational checkpoint detected -> predictive-mean eval with K={mc} samples",
+              flush=True)
+    exp.model.load_state_dict(state)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
 
-    score_and_save(exp, label, args.heldout)
+    score_and_save(exp, label, args.heldout, mc_samples=mc)
 
 
 if __name__ == "__main__":
