@@ -99,10 +99,13 @@ MU_OVERRIDES = [
     "training.cosanneal_warmup_frac=0.191", "training.cosanneal_eta_min=1.6e-7",
     f"fine_tune.pretrained_path={BASE22}",
 ]
-DATA_OVERRIDES = [
-    "data.source=files", f"data.dataset=[{DATASET}]", "data.preprocess_per_dataset=true",
-    "data.train_test_val=[0.9,0.05,0.05]", "data.subsample=null",
-]
+def data_overrides():
+    """Built from the CURRENT DATASET (set by set_process) -- NOT frozen at import, else a
+    --process switch would leave the config pointing at the default (uugg) dataset name."""
+    return [
+        "data.source=files", f"data.dataset=[{DATASET}]", "data.preprocess_per_dataset=true",
+        "data.train_test_val=[0.9,0.05,0.05]", "data.subsample=null",
+    ]
 # sigma arm: train the whole loop as HETEROSC with a DETACHED sigma head at beta=1. Then the mu
 # channel gets a pure-MSE gradient (beta=1 cancels the sigma^2 weighting) and mu trains EXACTLY as
 # MSE, while sigma is fit continuously as a read-only calibration head off detached features -- no
@@ -248,7 +251,7 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
     arm_ov = SIG_ARM_OVERRIDES
     # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
     pre_ov = [f"fine_tune.pretrained_path={pretrained}"] if pretrained else []
-    overrides = DATA_OVERRIDES + MU_OVERRIDES + arm_ov + pre_ov + [
+    overrides = data_overrides() + MU_OVERRIDES + arm_ov + pre_ov + [
         f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
         f"data.data_path={round0_dir}/",
         f"training.iterations={total_steps}",
