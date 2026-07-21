@@ -27,11 +27,16 @@ DECADES = [(0, 1e-6), (1e-6, 1e-5), (1e-5, 1e-4), (1e-4, 1e-3), (1e-3, 1e-2), (1
 MZ = 91.1876
 
 
+# heldout_eval_*.npz are written to the MAIN repo (score_and_save uses REPO), not the worktree copy.
+NPZ_DIR = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/divergences"
+
+
 def load(path):
     if not path.endswith(".npz"):
         path += ".npz"
     if not os.path.isabs(path):
-        path = os.path.join(os.path.dirname(__file__), path)
+        cand = os.path.join(NPZ_DIR, path)
+        path = cand if os.path.exists(cand) else os.path.join(os.path.dirname(__file__), path)
     d = np.load(path)
     err2 = (d["pred_logamp"] - d["true_logamp"]) ** 2
     s = d["sqrt_s"] if ("sqrt_s" in d.files and d["sqrt_s"].size) else None
