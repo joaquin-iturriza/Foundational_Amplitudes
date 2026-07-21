@@ -101,7 +101,7 @@ def init_sampler(cfg, afs_dir, eos_dir):
 def write_sh(i, cfg, afs_dir, config_abs_path, t_steps_cap=None):
     project_dir  = cfg["paths"]["project_dir"]
     python_env   = cfg["paths"]["python_env"]
-    trial_script = os.path.join(project_dir, "sweep", "run_trial.py")
+    trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
 
     eos_check = ""
@@ -142,10 +142,21 @@ def _env_setup_lines(cfg):
     return f"source {cfg['paths']['python_env']}"
 
 
+def _resolve_trial_script(cfg):
+    """The per-trial runner. Default is the standard run.py-based run_trial.py; a sweep can override
+    with `trial_script:` (absolute, or relative to project_dir) to drive a different entrypoint
+    (e.g. the L2 online-generation loop for a BBB HP sweep)."""
+    project_dir = cfg["paths"]["project_dir"]
+    ts = cfg.get("trial_script")
+    if not ts:
+        return os.path.join(project_dir, "sweep", "run_trial.py")
+    return ts if os.path.isabs(ts) else os.path.join(project_dir, ts)
+
+
 def write_slurm_script(i, cfg, sweep_dir, config_abs_path, t_steps_cap=None):
     cluster      = cfg["cluster"]
     project_dir  = cfg["paths"]["project_dir"]
-    trial_script = os.path.join(project_dir, "sweep", "run_trial.py")
+    trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
 
     mem_line = f"#SBATCH --mem={cluster['mem']}\n" if "mem" in cluster else ""
