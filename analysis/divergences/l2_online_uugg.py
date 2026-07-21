@@ -44,15 +44,49 @@ from particle_ids import global_encode  # noqa: E402
 from lloca.utils.rand_transforms import rand_lorentz          # noqa: E402
 from lloca.utils.polar_decomposition import restframe_boost   # noqa: E402
 
-DATASET = "ee_uugg_91-1000GeV_amplitudes"
-PDG = np.array([11, -11, 2, -2, 21, 21], dtype=int)
-MASSES = np.zeros(4)                    # final-state masses (u ubar g g, all massless)
-NP = 6                                  # particles per event
 WORK = os.environ["WORK"]
-STANDALONE = f"{WORK}/mg5amcnlo/ee_uugg_standalone"
 BASE22 = f"{REPO}/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt"
 # Lowered fiducial cuts (open the deep IR), matching gen_uug_sampling.LOW_CUTS.
 LOW_CUTS = {"pt_min": 1.0, "cos_max": 0.9, "dr_min": 0.05, "m_min": 0.3}
+
+# ---------------------------------------------------------------- process registry
+# The L2 loop is coordinate-free: the ONLY process-specific facts are the particle content
+# (PDG/masses/multiplicity), the compiled tree standalone that labels proposals, and the round-0
+# frozen-stats dataset. gen_ir_democratic reaches the soft/collinear corners of ANY massless
+# process, so extending to a new gluon multiplicity or a resonance+IR process is just a new row
+# here -- no new sampler, no per-process tuning (exactly the transfer claim being stress-tested).
+# All are ee -> u ubar + n_g gluons: PDG = [e-, e+, u, ubar, g...]; particles 2..NP-1 all coloured.
+_UUX = [11, -11, 2, -2]
+PROCESSES = {
+    #  key       n_g   standalone dir                 round-0 dataset (in data/)
+    "uug":   dict(n_g=1, standalone="ee_uug_standalone",   dataset="ee_uug_91-1000GeV_amplitudes"),
+    "uugg":  dict(n_g=2, standalone="ee_uugg_standalone",  dataset="ee_uugg_91-1000GeV_amplitudes"),
+    "uuggg": dict(n_g=3, standalone="ee_uuggg_standalone", dataset="ee_uuggg_91-1000GeV_amplitudes"),
+}
+
+# module globals set by set_process() (default uugg -> unchanged behaviour for existing importers).
+PROCESS = None; DATASET = None; PDG = None; MASSES = None; NP = None; STANDALONE = None
+GLUONS = None; COLORED = None
+
+
+def set_process(name):
+    """Point the module globals at process `name` (uug|uugg|uuggg). Importers (make_heldout_uugg,
+    eval_heldout_uugg) read L.PDG/NP/... so this must set module globals, not just locals."""
+    spec = PROCESSES[name]
+    n_g = spec["n_g"]
+    g = globals()
+    g["PROCESS"] = name
+    g["PDG"] = np.array(_UUX + [21] * n_g, dtype=int)
+    g["NP"] = 4 + n_g                                        # 2 leptons + u + ubar + n_g gluons
+    g["MASSES"] = np.zeros(2 + n_g)                          # final-state masses (u ubar g..., massless)
+    g["STANDALONE"] = f"{WORK}/mg5amcnlo/{spec['standalone']}"
+    g["DATASET"] = spec["dataset"]
+    g["GLUONS"] = list(range(4, 4 + n_g))                    # gluon indices in the event
+    g["COLORED"] = list(range(2, 4 + n_g))                   # u, ubar, gluons: all coloured final state
+    return spec
+
+
+set_process("uugg")     # default: identical to the original hard-coded constants
 
 # mu finetune HPs -- the validated ee->uugg finetune (finetune_addback_uugg.sh).
 MU_OVERRIDES = [
@@ -232,7 +266,9 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", required=True, choices=["base", "sigma"])
-    ap.add_argument("--tag", default="uugg")
+    ap.add_argument("--process", default="uugg", choices=list(PROCESSES),
+                    help="ee -> u ubar + n_g gluons: uug (multi-scale Z-res+IR), uugg, uuggg (more legs)")
+    ap.add_argument("--tag", default=None, help="default: the process name")
     ap.add_argument("--total_steps", type=int, default=4000)
     ap.add_argument("--n_total", type=int, default=300000)
     ap.add_argument("--rounds", type=int, default=10)
@@ -252,15 +288,18 @@ def main():
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
 
+    set_process(args.process)                 # point PDG/NP/MASSES/STANDALONE/DATASET at this process
+    tag = args.tag or args.process
     R = args.rounds
     inc_n = args.n_total // R
     steps_per_round = args.total_steps // R
-    exp_name = f"eeuu_l2uugg"
-    run_name = f"{args.tag}_{args.arm}_s{args.seed}"
+    exp_name = f"eeuu_l2{args.process}"
+    run_name = f"{tag}_{args.arm}_s{args.seed}"
     rng_gen = np.random.default_rng(1000 + args.seed)
+    print(f"[driver] process={args.process} PDG={PDG.tolist()} NP={NP} standalone={STANDALONE}", flush=True)
 
     # --- round 0 increment -> disk, so init_data builds it + FREEZES the stats ---
-    round0_dir = os.path.join(REPO, f"data_l2uugg/{run_name}_r0")
+    round0_dir = os.path.join(REPO, f"data_l2{args.process}/{run_name}_r0")
     os.makedirs(round0_dir, exist_ok=True)
     r0_npy = os.path.join(round0_dir, DATASET + ".npy")
     if not os.path.exists(r0_npy):
@@ -274,7 +313,7 @@ def main():
 
     # --- GROW base22 (1-ch MSE) -> 2-ch (mu row verbatim, fresh sigma row) so warm-start into the
     #     HETEROSC net matches shapes AND keeps base22's converged mu head. BOTH arms are HETEROSC. ---
-    grown = os.path.join(REPO, f"data_l2uugg/{run_name}_base_grown.pt")
+    grown = os.path.join(REPO, f"data_l2{args.process}/{run_name}_base_grown.pt")
     if not os.path.exists(grown):
         import subprocess
         subprocess.run([sys.executable, os.path.join(WT, "analysis/divergences/grow_sigma_head.py"),
@@ -368,12 +407,14 @@ def main():
         # BEFORE compress_models() gzips the checkpoints. Eliminates the separate eval job + queue wait.
         if args.heldout_eval:
             import eval_heldout_uugg as EV
-            tag = "base" if args.arm == "base" else ("sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}")
-            label = args.heldout_label or f"{tag}_s{args.seed}"
+            htag = "base" if args.arm == "base" else ("sigma" if args.gamma == 1.0 else f"g{int(args.gamma)}")
+            label = args.heldout_label or f"{args.process}_{htag}_s{args.seed}"
+            heldout_path = args.heldout_path or os.path.join(
+                REPO, f"analysis/divergences/heldout_{args.process}_deepIR.npz")
             state = EV._load_ckpt_state(exp.cfg.run_dir, "model_run0_best.pt")
             exp.model.load_state_dict(state)
             exp.model.to(exp.device, dtype=exp.dtype).eval()
-            EV.score_and_save(exp, label, args.heldout_path or EV.DEFAULT_HELDOUT)
+            EV.score_and_save(exp, label, heldout_path)
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)
 

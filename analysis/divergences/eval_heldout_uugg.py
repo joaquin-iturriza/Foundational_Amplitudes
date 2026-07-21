@@ -35,6 +35,7 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
     from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length
     d = np.load(heldout_path)
     rows = d["rows"]; y_min = d["y_min"]
+    sqrt_s = d["sqrt_s"] if "sqrt_s" in d.files else None
     P_held = rows[:, :L.NP * 4].reshape(-1, L.NP, 4)
     true_logamp = np.log(rows[:, -1]); me2 = rows[:, -1]
 
@@ -58,7 +59,7 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
     pred_logamp = pred_prepd.reshape(-1) * amp_std + amp_mean
 
     err2 = (pred_logamp - true_logamp) ** 2
-    print(f"\n=== {label} : MSE(Δlog|M|^2) on held-out deep-IR uugg (N={len(err2)}) ===", flush=True)
+    print(f"\n=== {label} : MSE(Δlog|M|^2) on held-out deep-IR {L.PROCESS} (N={len(err2)}) ===", flush=True)
     print(f"  OVERALL          MSE = {err2.mean():.4e}   RMSE = {np.sqrt(err2.mean()):.4f}", flush=True)
     print(f"  {'y_min decade':16s} {'N':>7s} {'MSE':>12s} {'RMSE':>8s}", flush=True)
     for lo, hi in DECADES:
@@ -67,8 +68,31 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT):
             continue
         print(f"  [{lo:.0e},{hi:.0e})   {int(m.sum()):>7d} {err2[m].mean():>12.4e} {np.sqrt(err2[m].mean()):>8.4f}",
               flush=True)
+    # --- multi-scale (uug): the s-channel gamma*/Z resonance is a SECOND competing extreme at
+    #     sqrt(s) ~ M_Z. Report the sqrt(s) regions (Z-peak / shoulders / continuum) and the deep-IR x
+    #     on/off-peak split, so we can see whether one sigma^gamma knob budgets across BOTH extremes or
+    #     robs the resonance to pay the IR (the open question this experiment answers). ---
+    if sqrt_s is not None:
+        MZ = 91.1876
+        SREG = [("Z-peak |s-Mz|<3", np.abs(sqrt_s - MZ) < 3.0),
+                ("shoulder 3-15",  (np.abs(sqrt_s - MZ) >= 3.0) & (np.abs(sqrt_s - MZ) < 15.0)),
+                ("continuum >15",   np.abs(sqrt_s - MZ) >= 15.0)]
+        print(f"  {'sqrt(s) region':16s} {'N':>7s} {'MSE':>12s} {'RMSE':>8s}", flush=True)
+        for name, m in SREG:
+            if m.sum() == 0:
+                continue
+            print(f"  {name:16s} {int(m.sum()):>7d} {err2[m].mean():>12.4e} {np.sqrt(err2[m].mean()):>8.4f}",
+                  flush=True)
+        deep = y_min < 1e-3
+        for name, m in [("deep-IR & Z-peak", deep & (np.abs(sqrt_s - MZ) < 3.0)),
+                        ("deep-IR & contin", deep & (np.abs(sqrt_s - MZ) >= 15.0))]:
+            if m.sum() == 0:
+                continue
+            print(f"  {name:16s} {int(m.sum()):>7d} {err2[m].mean():>12.4e} {np.sqrt(err2[m].mean()):>8.4f}",
+                  flush=True)
     out = os.path.join(REPO, "analysis/divergences", f"heldout_eval_{label}.npz")
     np.savez(out, pred_logamp=pred_logamp, true_logamp=true_logamp, y_min=y_min,
+             sqrt_s=(sqrt_s if sqrt_s is not None else np.array([])),
              sigma=(sigma.reshape(-1) if sigma is not None else np.array([])))
     print(f"  saved {out}", flush=True)
     return out
@@ -87,6 +111,8 @@ def _load_ckpt_state(run_dir, ckpt):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--process", default="uugg", choices=list(L.PROCESSES),
+                    help="must match the run's process (sets NP/PDG for the held-out momenta)")
     ap.add_argument("--run_dir", required=True, help="runs/<exp>/<run_name>")
     ap.add_argument("--round0_dir", default=None,
                     help="data dir whose npy re-derives the frozen stats (default: from config data_path)")
@@ -94,6 +120,9 @@ def main():
     ap.add_argument("--heldout", default=DEFAULT_HELDOUT)
     ap.add_argument("--label", default=None, help="label for the printout (default: run basename)")
     args = ap.parse_args()
+    L.set_process(args.process)
+    if args.heldout == DEFAULT_HELDOUT:
+        args.heldout = os.path.join(REPO, f"analysis/divergences/heldout_{args.process}_deepIR.npz")
     label = args.label or os.path.basename(args.run_dir.rstrip("/"))
 
     cfg = OmegaConf.load(os.path.join(args.run_dir, "config.yaml"))

@@ -20,12 +20,14 @@ import l2_online_uugg as L   # propose_momenta / label_events / PDG   # noqa: E4
 
 
 def ir_observables(P):
-    """y_min (min gluon-involving pair invariant / s) and x_gmin (softest gluon energy frac)."""
+    """y_min (min gluon-involving pair invariant / s) and x_gmin (softest gluon energy frac).
+    Process-agnostic: gluon/coloured indices come from the l2_online_uugg registry (L.GLUONS/COLORED),
+    so this works for uug (1 gluon), uugg (2), uuggg (3)."""
     def dot(a, b): return a[..., 0] * b[..., 0] - (a[..., 1:] * b[..., 1:]).sum(-1)
     Q = P[:, 0] + P[:, 1]; s = dot(Q, Q)
-    glu = [4, 5]; colored = [2, 3, 4, 5]; gset = set(glu)
-    pairs = [(i, j) for a in range(4) for b in range(a + 1, 4)
-             for i, j in [(colored[a], colored[b])] if (i in gset or j in gset)]
+    glu = L.GLUONS; colored = L.COLORED; gset = set(glu)
+    pairs = [(colored[a], colored[b]) for a in range(len(colored)) for b in range(a + 1, len(colored))
+             if (colored[a] in gset or colored[b] in gset)]
     yv = np.stack([dot(P[:, i] + P[:, j], P[:, i] + P[:, j]) / s for i, j in pairs], 1)
     y_min = np.clip(yv, 1e-14, None).min(1)
     xg = np.stack([2.0 * dot(P[:, g], Q) / s for g in glu], 1)
@@ -34,12 +36,18 @@ def ir_observables(P):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--process", default="uugg", choices=list(L.PROCESSES),
+                    help="uug (Z-res+IR multi-scale) | uugg | uuggg")
     ap.add_argument("--n", type=int, default=100000)
     ap.add_argument("--y_lo", type=float, default=1e-8, help="deeper than training to stress the tail")
     ap.add_argument("--mix_ir", type=float, default=0.5)
     ap.add_argument("--seed", type=int, default=777, help="disjoint from training seeds")
-    ap.add_argument("--out", default=os.path.join(L.REPO, "analysis/divergences/heldout_uugg_deepIR.npz"))
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+
+    L.set_process(args.process)
+    if args.out is None:
+        args.out = os.path.join(L.REPO, f"analysis/divergences/heldout_{args.process}_deepIR.npz")
 
     rng = np.random.default_rng(args.seed)
     print(f"[heldout] proposing {args.n} events (y_lo={args.y_lo}, mix_ir={args.mix_ir})", flush=True)
