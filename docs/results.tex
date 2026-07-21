@@ -1696,6 +1696,40 @@ session, which are retracted.) Figures: \code{l2\_uugg\_perdecade} (base vs $\si
 \code{l2\_uugg\_gamma} (per-decade ratio + the deep-vs-bulk trade-off vs $\gamma$),
 \code{l2\_uugg\_perdecade\_abs} (absolute MSE per decade, all $\gamma$).
 
+\paragraph{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale,
+$u\bar u ggg$ more legs).} Because the L2 loop carries \emph{no} process coordinate, it should transfer
+with \emph{no} per-process tuning; we stress it on two structurally-different divergences by changing
+only the process registry (\code{--process}: PDG/multiplicity, the compiled standalone labeller, and
+the round-0 frozen-stats set) --- same base22, same democratic generator, same finetune HPs. Held-out
+sets are drawn from the same democratic base (uug enriched near $M_Z$ so the resonance region is
+well-measured), scored per $y_{\min}$ decade AND, for uug, per $\sqrt s$ region.
+\emph{(i) $u\bar u g$ --- a genuine multi-scale process:} the $s$-channel $\gamma^\ast/Z$ propagator
+gives a resonance at $\sqrt s\!\approx\!M_Z$ (the window bottom) \emph{and} the gluon gives soft/collinear
+IR --- two competing extremes at once. The open question was whether a \emph{single} $\sigma^\gamma$ knob
+can budget across both, or must go multi-modal. It budgets, and it does so by finding the genuinely-hard
+extreme: the entire difficulty lives in the \textbf{resonance}, not the IR continuum, which \code{base22}
+already fits to $\mathrm{MSE}\!\approx\!9\times10^{-4}$. $\sigma$-driven generation cuts the Z-peak error
+$8.3\times10^{-2}\!\to\!3.3\times10^{-2}$ ($2.5\times$) and the deep-IR$\,\cap\,$Z-peak corner
+$9.0\times10^{-2}\!\to\!2.2\times10^{-2}$ ($4\times$) at $\gamma{=}3$, while leaving the already-easy
+continuum \emph{untouched} ($8.6\times10^{-4}$, unchanged) --- overall MSE $2.2\times10^{-2}\to
+1.4\times10^{-2}\to9.3\times10^{-3}$ at $\gamma{=}0,1,3$. So one scalar $\sigma$ automatically identifies
+the resonance as the sparse region and reallocates there; it need \emph{not} be multi-modal.
+\emph{(ii) $u\bar u ggg$ --- higher multiplicity:} here $\sigma$-driven generation gives essentially
+\emph{nothing} (overall $5.68\!\to\!5.67\!\to\!5.65\times10^{-2}$ at $\gamma{=}0,1,3$), because with three
+gluons the divergence is \emph{diffuse} --- every $y_{\min}$ decade is comparably hard
+($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
+uniformly-hard set cannot help. Figures \code{l2\_uug\_multiscale} (per-decade $+$ $\sqrt s$-region panel),
+\code{l2\_uuggg\_perdecade}.
+
+\begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
+The single-knob $\sigma^\gamma$ keep-rule wins exactly when the error is concentrated in an identifiable,
+data-sparse sub-region the model can point to --- the deep soft$\cap$collinear corner of $u\bar u gg$, the
+$Z$ resonance of $u\bar u g$ (which it finds automatically, without a multi-modal density, leaving the
+already-learned IR continuum alone) --- and gives $\sim\!$nothing when the difficulty is diffuse across the
+whole divergence, as at higher multiplicity ($u\bar u ggg$). Concentration, not divergence depth per se, is
+what $\sigma$-steering can exploit.
+\end{principle}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
@@ -1705,16 +1739,15 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     left-over from the wider \code{heterosc} branch, if ever merged: the HETEROSC validation
     ``combined'' display still prints $0$ via the geometric mean --- harmless, since training and
     checkpoint selection use the arithmetic mean.
-  \item \textbf{Harder / structurally-different divergences.} The L2 loop is coordinate-free, so it
-    should transfer with \emph{no} per-process tuning --- stress it on divergence structures it has
-    not seen: more legs / higher multiplicity ($u\bar u ggg$, $u\bar u q\bar q g$), a genuine
-    \emph{multi-scale} overlap (simultaneous $s$-channel resonance \emph{and} IR, e.g.\ $Z$/$W$
-    radiation), massive-particle thresholds ($t\bar t$ near threshold, $2m_t$ cusp), and mixed
-    soft$+$collinear$+$resonant coverage in one process. The open question: does the single $\gamma$
-    knob still suffice when there is more than one competing extreme, or does the density want to be
-    multi-modal (does $\sigma^\gamma$ automatically split its budget, or must it)? The generator
-    (\code{gen\_ir\_democratic.py}) already handles arbitrary massless $N$-body; massive/threshold
-    cases need the mass handling and a standalone label per process.
+  \item \textbf{Massive-particle thresholds and mixed coverage} (the remaining harder-divergence cases;
+    the multi-scale $u\bar u g$ and more-legs $u\bar u ggg$ tests are \emph{done} --- see the
+    ``concentration'' principle above). The coordinate-free loop has only been stressed on \emph{massless}
+    final states so far. Still open: massive-particle thresholds ($t\bar t$ near threshold, the $2m_t$
+    cusp) and a single process carrying soft$+$collinear$+$resonant coverage at once. The generator
+    (\code{gen\_ir\_democratic.py}) already handles arbitrary massless $N$-body, but the threshold cusp is
+    a \emph{massive} scale the democratic split does not target --- it needs mass-aware proposal support
+    and a per-process standalone label. The open sub-question there mirrors the concentration principle:
+    is a threshold cusp ``concentrated'' enough for $\sigma$-steering to help, or diffuse like $u\bar u ggg$?
   \item \textbf{Bayesian networks, not only the heteroscedastic loss.} The current $\sigma$ is a
     single \emph{point} heteroscedastic head (aleatoric-style readout off detached features). Test a
     genuinely \emph{Bayesian} network --- a posterior over weights (variational/Bayes-by-backprop,
