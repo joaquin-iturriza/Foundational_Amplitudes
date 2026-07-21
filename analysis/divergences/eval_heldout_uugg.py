@@ -139,7 +139,10 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT, mc_samples=1):
              sigma=(sigma.reshape(-1) if sigma is not None else np.array([])),
              pred_std=(pred_std_logamp.reshape(-1) if pred_std_logamp is not None else np.array([])))
     print(f"  saved {out}", flush=True)
-    return out
+    # return the objective(s) so a sweep can read them without re-parsing stdout: overall MSE (the
+    # comparison metric) + the deep-IR (y_min<1e-3) MSE.
+    deep_mse = float(err2[y_min < 1e-3].mean()) if (y_min < 1e-3).any() else float(err2.mean())
+    return {"npz": out, "overall_mse": float(err2.mean()), "deep_mse": deep_mse}
 
 
 def _load_ckpt_state(run_dir, ckpt):

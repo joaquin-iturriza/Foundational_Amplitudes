@@ -323,6 +323,9 @@ def main():
     ap.add_argument("--heldout_label", default=None,
                     help="label for the held-out npz (default: <base|sigma|g{γ}>_s{seed}, the plot tags)")
     ap.add_argument("--heldout_path", default=None, help="held-out npz (default: heldout_uugg_deepIR.npz)")
+    ap.add_argument("--result_path", default=None,
+                    help="if set, write {'val_loss': deep-IR MSE, ...} here after the held-out eval "
+                         "(the objective a DyHPO sweep reads).")
     ap.add_argument("--validate_prep", action="store_true",
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
@@ -519,8 +522,17 @@ def main():
             exp.model.load_state_dict(state)
             exp.model.to(exp.device, dtype=exp.dtype).eval()
             # bbb: evaluate THROUGH the posterior (predictive mean over K samples + calibration).
-            EV.score_and_save(exp, label, heldout_path,
-                              mc_samples=(args.bbb_ksamples if args.arm == "bbb" else 1))
+            metrics = EV.score_and_save(exp, label, heldout_path,
+                                        mc_samples=(args.bbb_ksamples if args.arm == "bbb" else 1))
+            # a sweep reads the objective from here (val_loss = the deep-IR MSE we minimise).
+            if args.result_path and isinstance(metrics, dict):
+                import json
+                with open(args.result_path, "w") as f:
+                    json.dump({"val_loss": metrics["deep_mse"], "overall_mse": metrics["overall_mse"],
+                               "deep_mse": metrics["deep_mse"], "arm": args.arm, "gamma": args.gamma,
+                               "bbb_beta": args.bbb_beta, "bbb_sigma_rel": args.bbb_sigma_rel}, f)
+                print(f"[result] wrote {args.result_path} val_loss(deep_mse)={metrics['deep_mse']:.6e}",
+                      flush=True)
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)
 
