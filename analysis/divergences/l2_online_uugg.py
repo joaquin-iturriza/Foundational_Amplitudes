@@ -489,6 +489,10 @@ def main():
         # BEFORE compress_models() gzips the checkpoints. Eliminates the separate eval job + queue wait.
         if args.heldout_eval:
             import eval_heldout_uugg as EV
+            # This driver runs as __main__, but EV does `import l2_online_uugg as L`, which is a SECOND
+            # module object still on the default set_process("uugg"). EV.score_and_save reads L.NP/PDG,
+            # so point THAT copy at our process too, else uug/uuggg momenta get reshaped with NP=6.
+            EV.L.set_process(args.process)
             if args.arm == "base":
                 htag = "base"
             elif args.arm == "bbb":
