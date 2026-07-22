@@ -1605,13 +1605,20 @@ $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{eeuu_flatlogm_resonance.pdf}
-  \caption{\textbf{L0 on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Error across
-  $\sqrt s$ for the raw \textsc{rambo} base vs a flat-$\log|\mathcal M|^2$ arm. Flat \textsc{rambo} puts
-  only $0.4\%$ of events in $\sqrt s\!\in\![88,95]$, and the foundation fits the peak $\sim\!400\times$
-  worse than the bulk. \emph{Resampling} the fixed $10^6$ pool cannot fix this --- the pool holds only
-  $\sim\!3300$ true pole events, so flat resampling just duplicates them ($155$k unique of $400$k). Only
-  \emph{generating} fresh pole events lifts coverage $0.4\%\!\to\!32\%$ with genuinely new physics. This
-  is the coverage ceiling of Thread~D made concrete: you cannot resample past what the pool contains.}
+  \caption{\textbf{L0 on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Held-out MSE
+  binned in $\sqrt s$ for three training densities scored on the same test set: raw \textsc{rambo}, a
+  flat-$\log|\mathcal M|^2$ set obtained by \emph{resampling} the fixed $10^6$ \textsc{rambo} pool, and
+  one obtained by \emph{generating} fresh events. Raw \textsc{rambo} is the best arm in the bulk and the
+  worst at the pole --- it puts only $0.4\%$ of events in $\sqrt s\!\in\![88,95]$, and the foundation
+  fits the peak $\sim\!400\times$ worse than the bulk --- so both flat arms trade bulk accuracy for pole
+  accuracy. Resampling cannot go far: the pool holds only $\sim\!3300$ genuine pole events, so flat
+  resampling merely duplicates them ($155$k unique of $400$k). Generating lifts pole coverage
+  $0.4\%\!\to\!32\%$ with genuinely new events, and is $2.6\times$ better than resampling on the log-flat
+  metric; against raw it is $9.4\times$ better log-flat and $2.1\times$ at the $Z$ peak. This is the
+  coverage ceiling of Thread~D made concrete: you cannot resample past what the pool contains.
+  \emph{(Rebuilt from the corrected re-eval \code{eeuu\_reson\_clean\_summary.json}; the earlier version
+  of this figure was drawn from the pre-fix evaluation, whose cross-tag state leak corrupted every tag
+  after the first and gave $5.8\times/1.5\times$ here.)}}
   \label{fig:eeuu_flatlogm_resonance}
 \end{figure}
 
