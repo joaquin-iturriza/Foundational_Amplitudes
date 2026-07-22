@@ -1,0 +1,64 @@
+\contentsline {section}{\numberline {1}The system, target, and notation}{2}{section.1}%
+\contentsline {paragraph}{Scattering amplitudes.}{2}{section*.2}%
+\contentsline {paragraph}{Data.}{2}{section*.3}%
+\contentsline {paragraph}{Notation.}{2}{section*.4}%
+\contentsline {section}{\numberline {2}The regression target and its preprocessing}{3}{section.2}%
+\contentsline {section}{\numberline {3}The model and the physical encoding}{3}{section.3}%
+\contentsline {paragraph}{Architecture.}{3}{section*.5}%
+\contentsline {section}{\numberline {4}The joint loss and the comparison metric}{4}{section.4}%
+\contentsline {paragraph}{The training sampler: balanced vs.\ equal.}{5}{section*.6}%
+\contentsline {section}{\numberline {5}Multi-fidelity hyperparameter search (DyHPO)}{5}{section.5}%
+\contentsline {section}{\numberline {6}Optimization laws: how the learning rate should be set}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}$\mu $P holds across width; it does not excuse a fixed $\eta $ across horizon}{6}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Which knobs matter, and where the optima land}{7}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Physical feature levers: what the momenta cannot encode}{10}{section.7}%
+\contentsline {paragraph}{Resonance vs.\ off-shellness (which we adopt, and why).}{11}{section*.7}%
+\contentsline {paragraph}{The flagship (the production configuration).}{12}{section*.8}%
+\contentsline {section}{\numberline {8}Neural scaling and transfer}{13}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Foundation pretraining transfers, and how}{18}{subsection.8.1}%
+\contentsline {paragraph}{The transfer advantage is in the prefactor and the floor, not the slope.}{18}{section*.9}%
+\contentsline {paragraph}{Full layer-decay fine-tuning wins; the methods are not equal.}{19}{section*.10}%
+\contentsline {section}{\numberline {9}Architecture and encoding ablations}{22}{section.9}%
+\contentsline {paragraph}{Architecture: LLoCa wins on cost \emph {and} accuracy.}{22}{section*.11}%
+\contentsline {paragraph}{Encoding.}{23}{section*.12}%
+\contentsline {section}{\numberline {10}The 448-process big run: what fails to learn, and which levers survive at scale}{23}{section.10}%
+\contentsline {paragraph}{Failure taxonomy.}{24}{section*.13}%
+\contentsline {paragraph}{Feature ablation at scale (one-factor-out arms).}{24}{section*.14}%
+\contentsline {paragraph}{Open threads.}{25}{section*.15}%
+\contentsline {paragraph}{Pairwise attention bias: the diagram signal at the pair level (tested, not adopted).}{25}{section*.16}%
+\contentsline {section}{\numberline {11}Behaviour near amplitude divergences}{26}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Two-body phase space and the collinear limit}{26}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Real infrared singularities}{28}{subsection.11.2}%
+\contentsline {paragraph}{What these variables are, and why they are the right ones.}{29}{section*.17}%
+\contentsline {paragraph}{Result.}{29}{section*.18}%
+\contentsline {paragraph}{Separating the soft and collinear axes.}{30}{section*.19}%
+\contentsline {subsection}{\numberline {11.3}Extrapolation into a held-out divergence: a hold-out / add-back study on $e^+e^-\to u\bar u g$}{33}{subsection.11.3}%
+\contentsline {paragraph}{Setup.}{33}{section*.20}%
+\contentsline {paragraph}{Result --- a small in-region data density recovers most of the divergence.}{33}{section*.21}%
+\contentsline {subsection}{\numberline {11.4}Two extensions: the hardest process, and separating the two limits}{37}{subsection.11.4}%
+\contentsline {paragraph}{The hardest process ($u\bar u gg$) is also data-recoverable.}{37}{section*.22}%
+\contentsline {paragraph}{Which limit is harder to extrapolate into: soft vs collinear.}{38}{section*.23}%
+\contentsline {subsection}{\numberline {11.5}Deeper/cleverer sampling, optimal allocation, and heteroscedastic uncertainty}{39}{subsection.11.5}%
+\contentsline {paragraph}{Thread A --- deeper + antenna phase-space sampling (done).}{40}{section*.24}%
+\contentsline {paragraph}{Float32 label floor.}{42}{section*.25}%
+\contentsline {paragraph}{Thread B --- optimal allocation (analysis + un-integrated tool).}{43}{section*.26}%
+\contentsline {paragraph}{Thread C --- heteroscedastic $(\mu ,\sigma )$ head (in progress; main open item).}{43}{section*.27}%
+\contentsline {paragraph}{Resolved --- the coupled fit fails for a structural reason; two-stage $\sigma $ works.}{43}{section*.28}%
+\contentsline {paragraph}{Q1 --- the $\sigma $ step costs $\sim $1 min, not the recipe's 600 iters.}{44}{section*.29}%
+\contentsline {paragraph}{Q2 --- imperfect $\sigma $ is tolerable, but the metric must be equal-footing.}{44}{section*.30}%
+\contentsline {paragraph}{Thread D --- coverage vs.\ emphasis, and the general default sampling.}{46}{section*.31}%
+\contentsline {paragraph}{L0 validated on the $ee\to u\bar u$ $Z$ resonance --- by GENERATION, not resampling.}{47}{section*.32}%
+\contentsline {paragraph}{The generated fraction sweep --- a clean interior optimum; pure flat over-corrects.}{49}{section*.33}%
+\contentsline {paragraph}{Eval bug (invalidated an earlier read): in-process state leak across tags.}{51}{section*.34}%
+\contentsline {paragraph}{L1 --- $\sigma $-reweighting the coverage base does NOT robustly help (3-seed).}{51}{section*.35}%
+\contentsline {paragraph}{L1 CONFIRMED where coverage is capped: $\sigma \!\approx \!$oracle on a starved base (3-seed).}{51}{section*.36}%
+\contentsline {paragraph}{Takeaway.}{51}{section*.37}%
+\contentsline {paragraph}{L2 validated on $ee\to u\bar u gg$ --- $\sigma $-informed on-the-fly GENERATION beats uniform generation, coordinate-free.}{51}{section*.38}%
+\contentsline {paragraph}{The process-agnostic base generator: ``democratic'' phase space.}{52}{section*.39}%
+\contentsline {paragraph}{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale, $u\bar u ggg$ more legs).}{56}{section*.40}%
+\contentsline {paragraph}{$\sigma $ resolved against the divergence coordinate --- and a \emph {pre-flight} test for the concentration principle.}{61}{section*.41}%
+\contentsline {paragraph}{A genuinely Bayesian $\sigma $ (full-network Bayes-by-backprop) does \emph {not} pay for itself.}{62}{section*.42}%
+\contentsline {subsection}{\numberline {11.6}Hand-off: open items}{66}{subsection.11.6}%
+\contentsline {section}{\numberline {12}Training throughput}{67}{section.12}%
+\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{67}{section.13}%
+\contentsline {section}{\numberline {14}Methodological principles}{68}{section.14}%

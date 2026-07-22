@@ -2047,15 +2047,29 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     left-over from the wider \code{heterosc} branch, if ever merged: the HETEROSC validation
     ``combined'' display still prints $0$ via the geometric mean --- harmless, since training and
     checkpoint selection use the arithmetic mean.
-  \item \textbf{Massive-particle thresholds and mixed coverage} (the remaining harder-divergence cases;
-    the multi-scale $u\bar u g$ and more-legs $u\bar u ggg$ tests are \emph{done} --- see the
-    ``concentration'' principle above). The coordinate-free loop has only been stressed on \emph{massless}
-    final states so far. Still open: massive-particle thresholds ($t\bar t$ near threshold, the $2m_t$
-    cusp) and a single process carrying soft$+$collinear$+$resonant coverage at once. The generator
-    (\code{gen\_ir\_democratic.py}) already handles arbitrary massless $N$-body, but the threshold cusp is
-    a \emph{massive} scale the democratic split does not target --- it needs mass-aware proposal support
-    and a per-process standalone label. The open sub-question there mirrors the concentration principle:
-    is a threshold cusp ``concentrated'' enough for $\sigma$-steering to help, or diffuse like $u\bar u ggg$?
+  \item \textbf{Massive final states} (the remaining harder-divergence case; the multi-scale $u\bar u g$
+    and more-legs $u\bar u ggg$ tests are \emph{done} --- see the ``concentration'' principle above).
+    \emph{The $t\bar t$ threshold is ruled out as the test, and this is a real finding rather than a
+    deferral:} at tree level $ee\to t\bar t$ has \textbf{no threshold divergence at all} --- $|\mathcal
+    M|^2$ spans only $8.7\times$ in total and is \emph{flattest} at threshold ($\mathrm{std}\log|\mathcal
+    M|^2 = 0.022$ for $\beta<0.05$ vs $0.665$ in the bulk). The $2m_t$ cusp is a phase-space/cross-section
+    feature, not an amplitude one, so running it would have produced a guaranteed null that says nothing
+    about the method. The replacement is $ee\to b\bar b g$ (registry row added): the direct massive
+    analogue of $u\bar u g$ --- same $Z$ resonance, same soft-gluon singularity --- but with the
+    \emph{collinear} limit regulated by $m_b$, and the dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}
+    $--$3\times10^{-3}$ sits \emph{inside} the $y_{\min}$ window we bin over, so the mass reshapes the
+    divergence instead of merely relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$). Generator
+    support turned out to be already present --- \code{democratic\_draw} produces exact on-shell massive
+    momenta (verified to $10^{-13}$) and \code{fiducial\_pass\_mask} already skips massive legs; what was
+    missing was only the registry row, a mass-correct collinear variable ($2p_i\!\cdot\!p_j/s$ rather than
+    $s_{ij}/s$, identical for massless legs), and the standalone slot-order check. \emph{Still genuinely
+    open:} the run itself, and a single process carrying soft$+$collinear$+$resonant coverage at once.
+    \textbf{Slot-order trap, now characterised:} the convention is \emph{per-build}, not global ---
+    \code{ee\_ttbar} takes production order bit-identically while \code{ee\_uu} needs its final pair
+    swapped --- so every new standalone must be checked. Where production data exists, relabel and
+    compare; where it does not (\code{ee\_bbbarg}), the sign of $A_{\rm FB}$ at the $Z$ pole against an
+    already-validated standalone is a data-free substitute (both negative under the same construction,
+    with $|A_{\rm FB}(b)|>|A_{\rm FB}(u)|$ as the SM requires; the swapped order anti-correlates).
   \item \textbf{The \emph{cheap} epistemic approximations, and a seed-replicated confirmation}
     (full-network Bayes-by-backprop is \emph{done} and lost --- see the ``ranking'' principle above).
     Two loose ends. (i) BBB was the most expensive way to get an epistemic $\sigma$; the cheap
