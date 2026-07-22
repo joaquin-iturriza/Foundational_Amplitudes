@@ -1761,8 +1761,15 @@ beats uniform, and the gain \textbf{concentrates in the deep IR and grows monoto
 concentration exponent $\gamma$}. Log-flat-per-decade MSE, $\sigma$/base (mean over the $7$ $y_{\min}$
 decades): $92\%,81\%,78\%,76\%,74\%$ at $\gamma{=}1,2,3,5,10$ --- a real but \emph{saturating} overall
 gain. The deepest decade ($y_{\min}\!<\!10^{-6}$) tells the sharper story: $\sigma$/base
-$=90\%,70\%,66\%,62\%,\mathbf{55\%}$ --- the deep-IR error is nearly \emph{halved} at $\gamma{=}10$ and
-still falling. The overall metric saturates because the reallocation has a real cost: the shallowest
+$=90\%,70\%,66\%,62\%,\mathbf{55\%}$ --- the deep-IR error is nearly \emph{halved} at $\gamma{=}10$.
+\emph{Correction from the extended sweep:} an earlier reading of this series as ``still falling'' at
+$\gamma{=}10$ was too optimistic. Pushing to $\gamma=20,30$ (single seed, so compared within the seed-0
+series) shows the deepest decade \textbf{saturating} --- ratio $0.529\to0.525\to0.509$ over
+$\gamma=10\to20\to30$, i.e.\ $\sim\!4\%$ of further gain for a trebling of $\gamma$ --- while the bulk
+penalty keeps climbing, $1.30\to1.55\to1.63$, and the overall metric degrades monotonically past its
+$\gamma\!\approx\!3$ optimum until it is $\sim\!12\%$ \emph{worse} than uniform at $\gamma{=}30$.
+So the useful range really does end near $\gamma\!\approx\!3$--$10$: beyond it the trade-off buys almost
+nothing deep and pays steadily in the bulk (Fig.~\ref{fig:l2_gamma_response_extended}). The overall metric saturates because the reallocation has a real cost: the shallowest
 (bulk) decade $y_{\min}\!>\!0.1$ \emph{rises} $107\%\!\to\!128\%$ over $\gamma{=}1\!\to\!10$, an
 accelerating penalty that eats the deep-IR gain in the log-flat average. So $\gamma\!\approx\!3$--$5$ is
 the sweet spot for the overall metric; larger $\gamma$ buys still-lower deep-IR error by paying more in
@@ -1791,10 +1798,12 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   \includegraphics[width=\textwidth]{l2_uugg_gamma.pdf}
   \caption{\textbf{The concentration exponent $\gamma$ traverses a water-filling trade-off.} Per-decade
   $\sigma$/base ratio and the deep-vs-bulk split against $\gamma\in\{1,2,3,5,10\}$. The deepest decade
-  ($y_{\min}\!<\!10^{-6}$) falls monotonically --- $90,70,66,62,\mathbf{55}\%$ of base --- while the
-  shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average saturates around
+  ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,70,66,62,55\%$) while the
+  shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average is best around
   $\gamma\!\approx\!3$--$5$ and larger $\gamma$ buys deep-IR accuracy by paying in the bulk: one
-  coordinate-free scalar knob sliding along the allocation trade-off of Thread~B.}
+  coordinate-free scalar knob sliding along the allocation trade-off of Thread~B. Extending the sweep to
+  $\gamma=20,30$ shows the deep gain \emph{saturating} rather than continuing
+  (Fig.~\ref{fig:l2_gamma_response_extended}).}
   \label{fig:l2_uugg_gamma}
 \end{figure}
 
@@ -1832,6 +1841,28 @@ the resonance as the sparse region and reallocates there; it need \emph{not} be 
 gluons the divergence is \emph{diffuse} --- every $y_{\min}$ decade is comparably hard
 ($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
 uniformly-hard set cannot help (Figs.~\ref{fig:l2_uug_multiscale}, \ref{fig:l2_uuggg_perdecade}).
+The obvious objection --- that $u\bar u ggg$ was simply not concentrated \emph{hard enough}, since
+$u\bar u gg$ needed $\gamma\!\approx\!3$--$10$ --- was tested directly and \textbf{fails}: pushing to
+$\gamma=10,20$ does not unlock a gain, it \emph{reverses} the small one. The deep-IR ratio turns over,
+$0.989,0.976,1.035,1.079$ at $\gamma=1,3,10,20$, so by $\gamma{=}20$ the $\sigma$ arm is $8\%$
+\emph{worse than uniform} (overall $5.65\!\to\!6.07\!\to\!6.48\times10^{-2}$). Harder concentration on a
+diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast --- saturation
+for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for the principle below
+(Fig.~\ref{fig:l2_gamma_response_extended}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_gamma_response_extended.pdf}
+  \caption{\textbf{Pushing the concentration exponent: saturation vs reversal.} $\sigma$-arm/base MSE
+  ratio against $\gamma$ (seed 0), by $y_{\min}$ band. \emph{Left, $u\bar u gg$ (concentrated):} the
+  deepest decade improves steeply to $\gamma\!\approx\!10$ then \textbf{saturates} ($0.53\to0.51$ over
+  $\gamma=10\to30$) while the bulk penalty keeps growing ($1.30\to1.63$) --- the water-filling trade-off
+  running out of anything left to buy. \emph{Right, $u\bar u ggg$ (diffuse):} the curve is nearly flat
+  and \textbf{turns over} above $\gamma\!\approx\!3$, crossing the uniform baseline so that harder
+  concentration is actively worse. Concentration of the error, not depth of the divergence, is what
+  decides whether $\sigma$-steering can pay.}
+  \label{fig:l2_gamma_response_extended}
+\end{figure}
 
 \begin{figure}[H]
   \centering
@@ -1863,7 +1894,11 @@ data-sparse sub-region the model can point to --- the deep soft$\cap$collinear c
 $Z$ resonance of $u\bar u g$ (which it finds automatically, without a multi-modal density, leaving the
 already-learned IR continuum alone) --- and gives $\sim\!$nothing when the difficulty is diffuse across the
 whole divergence, as at higher multiplicity ($u\bar u ggg$). Concentration, not divergence depth per se, is
-what $\sigma$-steering can exploit.
+what $\sigma$-steering can exploit. The $\gamma$ sweep separates the two regimes cleanly: on a concentrated
+divergence the gain \emph{saturates} with harder concentration (there is a finite amount of misplaced
+budget to recover), whereas on a diffuse one it \emph{reverses} and drops below uniform --- so a flat or
+turning $\gamma$-response is the diagnostic that no targetable sparse region exists, and the right move is
+more capacity or more data everywhere, not smarter allocation.
 \end{principle}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
