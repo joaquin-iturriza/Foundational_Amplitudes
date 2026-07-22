@@ -1718,8 +1718,31 @@ the resonance as the sparse region and reallocates there; it need \emph{not} be 
 \emph{nothing} (overall $5.68\!\to\!5.67\!\to\!5.65\times10^{-2}$ at $\gamma{=}0,1,3$), because with three
 gluons the divergence is \emph{diffuse} --- every $y_{\min}$ decade is comparably hard
 ($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
-uniformly-hard set cannot help. Figures \code{l2\_uug\_multiscale} (per-decade $+$ $\sqrt s$-region panel),
-\code{l2\_uuggg\_perdecade}.
+uniformly-hard set cannot help (Figs.~\ref{fig:l2_uug_multiscale}, \ref{fig:l2_uuggg_perdecade}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uug_multiscale.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u g$: the multi-scale test (Z-resonance \emph{and} IR).} Left:
+  held-out MSE per $y_{\min}$ decade for base (uniform) vs $\sigma$-driven generation at
+  $\gamma{=}1,3$. Right: the same error split by $\sqrt s$ region. The difficulty lives almost
+  entirely in the \emph{Z-peak}, not the IR continuum (which \code{base22} already fits to
+  $\sim\!9\times10^{-4}$); one scalar $\sigma^\gamma$ finds the resonance on its own --- $2.5\times$
+  at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner --- while leaving the easy continuum
+  untouched. The steering density need \emph{not} be multi-modal to serve two competing extremes.}
+  \label{fig:l2_uug_multiscale}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uuggg_perdecade.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u ggg$: more legs, a \emph{diffuse} divergence.} Held-out MSE per
+  $y_{\min}$ decade, base vs $\sigma$-driven at $\gamma{=}1,3$: the three curves lie on top of each
+  other. With three gluons every decade is comparably hard, so there is no thin sparse region for
+  $\sigma$ to reallocate \emph{into} --- the contrast with Fig.~\ref{fig:l2_uug_multiscale} is the
+  content of the concentration principle below.}
+  \label{fig:l2_uuggg_perdecade}
+\end{figure}
 
 \begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
 The single-knob $\sigma^\gamma$ keep-rule wins exactly when the error is concentrated in an identifiable,
@@ -1769,10 +1792,35 @@ under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi
 only $\rho\!\approx\!0.17$--$0.20$ --- barely above the het-head's $0.11$--$0.16$ --- so it never earns back
 the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
 \emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter --- so the safe
-claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal. Figure
-\code{l2\_bbb\_sweep}; tooling \code{bbb.py}, \code{sweep/l2\_bbb\_trial.py},
-\code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the L2 loop via \code{generate\_sweep}'s new
-\code{trial\_script} hook).
+claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal
+(Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
+\code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the L2 loop via
+\code{generate\_sweep}'s new \code{trial\_script} hook).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uugg_bbb_vs_het.pdf}
+  \caption{\textbf{Epistemic (BBB) vs the het-head $\sigma$ on $e^+e^-\to u\bar u gg$.} Held-out MSE per
+  $y_{\min}$ decade. The full-network Bayes-by-backprop arm sits \emph{above} both the het-head
+  $\sigma^\gamma$ and the uniform baseline across essentially every decade: training under sampled
+  weights costs point accuracy, and the epistemic $\sigma$ does not rank the error well enough
+  ($\rho\!\approx\!0.2$ vs $0.15$) to earn it back.}
+  \label{fig:l2_uugg_bbb_vs_het}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_bbb_sweep.pdf}
+  \caption{\textbf{The fair BBB HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
+  the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
+  coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
+  $\sigma_{\rm rel}$ alone sets the outcome (Spearman $+0.965$) and its optimum lands \emph{on the search
+  lower bound} --- the optimiser drives the weight posterior toward the deterministic limit to buy back
+  accuracy --- while $\beta_{\rm KL}$ ($-0.05$) and $\gamma$ ($-0.07$) are noise. The best tuned BBB
+  (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
+  structural, not a tuning artefact.}
+  \label{fig:l2_bbb_sweep}
+\end{figure}
 
 \begin{principle}[For steering generation, what matters is how well $\sigma$ \emph{ranks} error]
 A genuinely Bayesian weight posterior is not automatically the better generation signal. What the keep-rule
