@@ -1569,7 +1569,7 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
 \paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
 resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after the first}: the same
 \code{ft\_mix025} scored logflat $3.5\mathrm{e}{-}5$ as tag~1 but $2.1\mathrm{e}{-}4$ as tag~2, reproducibly
-(a module/\muP\ global survives across \code{AmplitudeExperiment} instances; a per-tag \code{run\_dir} does
+(a module/$\mu$P\ global survives across \code{AmplitudeExperiment} instances; a per-tag \code{run\_dir} does
 \emph{not} fix it $\Rightarrow$ in-process, not file-based). Fix: self-dispatch one tag per subprocess,
 merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
 bump'' was this corruption, not seed noise.
