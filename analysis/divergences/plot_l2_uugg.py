@@ -31,8 +31,8 @@ axL.errorbar(x, b.mean(0), yerr=b.std(0), fmt="o-", color="#444", capsize=3, mfc
 axL.errorbar(x, g.mean(0), yerr=g.std(0), fmt="s-", color="#c1121f", capsize=3,
              label=r"$\sigma$-driven ($\gamma$=1)")
 axL.set_yscale("log"); axL.set_xticks(x); axL.set_xticklabels(LBL)
-axL.set_xlabel(r"$y_{\min}$ decade (deep IR $\to$ bulk)"); axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-axL.set_title("Held-out deep-IR error per IR decade"); axL.legend(); axL.grid(alpha=0.3)
+axL.set_xlabel(r"$y_{\min}$ decade"); axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
+axL.legend(); axL.grid(alpha=0.3)
 
 ratio = g.mean(0) / b.mean(0)
 # per-seed ratio spread (pair seeds)
@@ -41,14 +41,13 @@ axR.axhline(1.0, color="k", lw=0.8)
 axR.errorbar(x, ratio, yerr=rr.std(0), fmt="D-", color="#c1121f", capsize=3)
 axR.fill_between(x, 1.0, ratio, where=ratio < 1, color="#c1121f", alpha=0.15)
 axR.set_xticks(x); axR.set_xticklabels(LBL)
-axR.set_xlabel(r"$y_{\min}$ decade (deep IR $\to$ bulk)"); axR.set_ylabel(r"$\sigma$-driven / base MSE")
-axR.set_title(r"$\sigma$ gain concentrates in the deep IR ($<1$ = better)"); axR.grid(alpha=0.3)
+axR.set_xlabel(r"$y_{\min}$ decade"); axR.set_ylabel(r"$\sigma$-driven / base MSE")
+axR.grid(alpha=0.3)
 for xi, ri in zip(x, ratio):
     axR.annotate(f"{ri:.0%}", (xi, ri), textcoords="offset points", xytext=(0, 6 if ri < 1 else -12),
                  ha="center", fontsize=8)
 
-fig.suptitle(r"L2: coordinate-free $p(x)\propto\sigma(x)^\gamma$ online generation, $ee\to u\bar u gg$ "
-             "(3 seeds, matched $\\mu$/budget)", fontsize=11)
+fig.suptitle(r"$ee\to u\bar u gg$", fontsize=11)
 fig.tight_layout(rect=[0, 0, 1, 0.96])
 base = os.path.join(REPO, "analysis/divergences/figs/l2_uugg_perdecade")
 os.makedirs(os.path.dirname(base), exist_ok=True)

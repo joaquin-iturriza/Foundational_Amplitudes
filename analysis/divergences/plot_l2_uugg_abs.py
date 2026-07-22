@@ -33,9 +33,9 @@ for name, arr, c, mk, ls in series:
     ax.errorbar(x, arr.mean(0), yerr=arr.std(0), fmt=mk, ls=ls, color=c, capsize=2,
                 mfc=("white" if name.startswith("base") else c), label=name)
 ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(LBL)
-ax.set_xlabel(r"$y_{\min}$ decade (deep IR $\to$ bulk)")
+ax.set_xlabel(r"$y_{\min}$ decade")
 ax.set_ylabel(r"held-out MSE $\Delta\log|\mathcal{M}|^2$")
-ax.set_title(r"$ee\to u\bar u gg$ deep-IR error per decade (3 seeds, matched $\mu$/budget)")
+ax.set_title(r"$ee\to u\bar u gg$")
 ax.legend(); ax.grid(alpha=0.3, which="both")
 fig.tight_layout()
 base = os.path.join(REPO, "analysis/divergences/figs/l2_uugg_perdecade_abs")

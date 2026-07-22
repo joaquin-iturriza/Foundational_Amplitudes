@@ -35,9 +35,9 @@ for g, c in zip(gammas, colors):
     r = arms[g] / b
     axL.errorbar(x, r.mean(0), yerr=r.std(0), fmt="o-", color=c, capsize=2, label=rf"$\gamma={g}$")
 axL.set_xticks(x); axL.set_xticklabels(LBL)
-axL.set_xlabel(r"$y_{\min}$ decade (deep IR $\to$ bulk)")
-axL.set_ylabel(r"$\sigma$-driven / base MSE  ($<1$ = better)")
-axL.set_title("Per-decade gain vs concentration $\\gamma$"); axL.legend(ncol=2); axL.grid(alpha=0.3)
+axL.set_xlabel(r"$y_{\min}$ decade")
+axL.set_ylabel(r"$\sigma$-driven / base MSE")
+axL.legend(ncol=2); axL.grid(alpha=0.3)
 
 # right: three tracks vs gamma
 gg = np.array(gammas)
@@ -49,12 +49,11 @@ axR.plot(gg, deep, "o-", color="#6a040f", label="deepest decade ($y_{\\min}<10^{
 axR.plot(gg, logf, "s-", color="#c1121f", label="log-flat overall")
 axR.plot(gg, shal, "^-", color="#8d99ae", label="shallowest decade ($y_{\\min}>0.1$)")
 axR.set_xlabel(r"concentration exponent $\gamma$"); axR.set_ylabel(r"$\sigma$/base MSE ratio")
-axR.set_title(r"Deep-IR gain grows; bulk pays"); axR.set_xticks(gg); axR.legend(); axR.grid(alpha=0.3)
+axR.set_xticks(gg); axR.legend(); axR.grid(alpha=0.3)
 for xi, yi in zip(gg, deep):
     axR.annotate(f"{yi:.0%}", (xi, yi), textcoords="offset points", xytext=(0, -12), ha="center", fontsize=8)
 
-fig.suptitle(r"L2 $ee\to u\bar u gg$: coordinate-free $p(x)\propto\sigma(x)^\gamma$ online generation "
-             r"vs uniform (3 seeds, matched $\mu$/budget)", fontsize=11)
+fig.suptitle(r"$ee\to u\bar u gg$", fontsize=11)
 fig.tight_layout(rect=[0, 0, 1, 0.95])
 base = os.path.join(REPO, "analysis/divergences/figs/l2_uugg_gamma")
 os.makedirs(os.path.dirname(base), exist_ok=True)

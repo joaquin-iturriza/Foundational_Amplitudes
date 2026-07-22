@@ -75,9 +75,9 @@ def main():
         x, y, n = decade_mse(err2, y_min)
         ax.plot(x, y, "o-", color=c, lw=2.0, label=f"{label}  (overall {err2.mean():.3e})")
     ax.set_xscale("log"); ax.set_yscale("log"); ax.invert_xaxis()
-    ax.set_xlabel(r"$y_{\min}$ (IR resolution; deeper IR $\to$ left)")
+    ax.set_xlabel(r"$y_{\min}$")
     ax.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-    ax.set_title(args.title or "Held-out deep-IR error per decade")
+    ax.set_title(args.title)
     ax.grid(True, which="both", alpha=0.25); ax.legend(fontsize=8)
 
     if args.regions:
@@ -104,7 +104,6 @@ def main():
         ax2.set_xticks(np.arange(len(SREG)) + width * (len(runs) - 1) / 2)
         ax2.set_xticklabels(xlab, fontsize=8)
         ax2.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-        ax2.set_title(r"Multi-scale: does $\sigma^\gamma$ serve the resonance AND the IR?")
         ax2.grid(True, axis="y", which="both", alpha=0.25); ax2.legend(fontsize=8)
 
     fig.tight_layout()
