@@ -1730,6 +1730,58 @@ whole divergence, as at higher multiplicity ($u\bar u ggg$). Concentration, not 
 what $\sigma$-steering can exploit.
 \end{principle}
 
+\paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
+itself.} The steering $\sigma$ above is a \emph{point} heteroscedastic head --- a learned (aleatoric)
+spread. The arguably-right signal for deciding what to \emph{generate} is \emph{epistemic}: high where
+the training set is sparse, which is exactly what L2 wants to fill. We therefore built a genuinely
+Bayesian alternative --- \textbf{full-network Bayes-by-backprop} (\code{bbb.py}), a mean-field Gaussian
+posterior $q(w)=\mathcal N(\mu_w,\sigma_w^2)$ over \emph{every} weight and bias (not MC-dropout, not a
+Laplace/last-layer approximation, not an ensemble). \emph{Implementation:} rather than rebuild the
+architecture, \code{variationalize()} wraps an already-built, $\mu$P-finalised, \code{base22}-warm-started
+net: each existing \code{weight}/\code{bias} is kept \emph{verbatim} as the posterior MEAN (so $\mu$P
+init, the MuAdam per-layer scaling, and the warm start are untouched --- the net \emph{starts} as the
+deterministic pretrained model and only learns the spread) and a sibling \code{\_rho} parameterises
+$\sigma=\mathrm{softplus}(\rho)$, initialised to $\sigma_{\rm rel}$ times that layer's $\mu$P weight RMS
+so the injected noise keeps the $\mu$P activation scaling across width; the per-layer Gaussian prior uses
+the same scale, and $\rho$ inherits its weight's \code{infshape} (MuAdam asserts one on every parameter).
+Training maximises the ELBO ($\mathrm{loss}\mathrel{+}=\beta_{\rm KL}\mathrm{KL}/N$, with $\vlnr$ left as
+\emph{pure} MSE so checkpoint selection and the comparison metric stay like-for-like). Crucially the model
+is \emph{evaluated through its posterior}, never collapsed to a mean-weights forward: the point estimate is
+the predictive mean $\mathbb E_q[f]\!\approx\!\tfrac1K\sum_k f(x,w_k)$ (which is \emph{not} $f(x,\mu)$ for a
+nonlinear net), and we report the predictive $\sigma$, calibration $\langle z^2\rangle$, Gaussian NLL, and the
+$\sigma$-vs-$|\mathrm{err}|$ rank correlation; checkpoint \emph{ranking} scores the same predictive quantity.
+Proposals are kept $\propto\sigma_{\rm epi}^\gamma$ with $\sigma_{\rm epi}$ the $K$-sample predictive spread.
+
+\emph{Fair best-vs-best (12-trial single-fidelity DyHPO sweep over $\beta_{\rm KL}\!\in\![10^{-5},10^{-1}]$,
+$\sigma_{\rm rel}\!\in\![5\!\times\!10^{-3},0.15]$, $\gamma\!\in\![1,5]$; objective = held-out deep-IR MSE).}
+The tuned BBB arm reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
+($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
+($1.08\times$ --- \textbf{it loses}). The sweep's \emph{structure} is the informative part:
+$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone --- wider
+posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $\sim\!3$), while
+$\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
+comparison --- and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
+optimiser is driving the weight posterior toward the \emph{deterministic limit} to buy back point accuracy.
+That is the mechanism: Bayes-by-backprop trains under sampled weights, which degrades the mean fit, and the
+only way to recover accuracy is to shrink the posterior --- which simultaneously removes the epistemic
+signal that was the whole point. Calibration is respectable ($\langle z^2\rangle\!\approx\!1.26$, mildly
+under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi}$ \emph{ranks} the error at
+only $\rho\!\approx\!0.17$--$0.20$ --- barely above the het-head's $0.11$--$0.16$ --- so it never earns back
+the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
+\emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter --- so the safe
+claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal. Figure
+\code{l2\_bbb\_sweep}; tooling \code{bbb.py}, \code{sweep/l2\_bbb\_trial.py},
+\code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the L2 loop via \code{generate\_sweep}'s new
+\code{trial\_script} hook).
+
+\begin{principle}[For steering generation, what matters is how well $\sigma$ \emph{ranks} error]
+A genuinely Bayesian weight posterior is not automatically the better generation signal. What the keep-rule
+consumes is a \emph{ranking} of where the model is wrong, and full-network Bayes-by-backprop buys only a
+marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a systematically worse point fit
+--- its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
+detached heteroscedastic head remains the better trade on this harness.
+\end{principle}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
@@ -1748,18 +1800,18 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     a \emph{massive} scale the democratic split does not target --- it needs mass-aware proposal support
     and a per-process standalone label. The open sub-question there mirrors the concentration principle:
     is a threshold cusp ``concentrated'' enough for $\sigma$-steering to help, or diffuse like $u\bar u ggg$?
-  \item \textbf{Bayesian networks, not only the heteroscedastic loss.} The current $\sigma$ is a
-    single \emph{point} heteroscedastic head (aleatoric-style readout off detached features). Test a
-    genuinely \emph{Bayesian} network --- a posterior over weights (variational/Bayes-by-backprop,
-    MC-dropout, a deep ensemble, or a Laplace/last-layer approximation) --- so the uncertainty that
-    steers generation is \emph{epistemic} (``the model has not seen data like this'') rather than a
-    learned spread. Epistemic $\sigma$ is arguably the \emph{right} signal for on-the-fly generation:
-    it is high exactly where the training set is sparse, which is what L2 wants to fill, and it should
-    shrink as coverage improves (a natural stopping/annealing signal the point head lacks). Compare,
-    on the same \code{uugg} L2 harness and held-out deep-IR metric, epistemic-$\sigma$ generation vs.\
-    the het-loss $\sigma^\gamma$ baseline; watch cost (ensemble = $k\times$ training; MC-dropout /
-    last-layer $\approx$ free) and whether epistemic $\sigma$ ranks the deep IR better than the
-    het-head's within-region signal (which was the weak link at L1).
+  \item \textbf{The \emph{cheap} epistemic approximations, and a seed-replicated confirmation}
+    (full-network Bayes-by-backprop is \emph{done} and lost --- see the ``ranking'' principle above).
+    Two loose ends. (i) BBB was the most expensive way to get an epistemic $\sigma$; the cheap
+    approximations were never tried --- \textbf{MC-dropout} and a \textbf{Laplace/last-layer} posterior are
+    $\approx$free (no $2\times$ parameters, no training under weight noise, so they should \emph{not} pay
+    BBB's point-accuracy penalty), and a \textbf{deep ensemble} ($k\times$ training) is the quality ceiling.
+    Since the diagnosis was ``BBB's accuracy loss, not its ranking, is what sinks it'', an epistemic
+    $\sigma$ that costs \emph{no} accuracy is the obvious next probe: does it keep the
+    $\rho\!\approx\!0.2$ ranking without the penalty? (ii) The BBB verdict rests on single-seed trials with
+    $5$--$8\%$ gaps, comparable to seed scatter; $3$ seeds at the swept optimum would firm ``loses to the
+    het head'' from suggestive to settled. Also untested: the claimed \emph{annealing} property --- epistemic
+    $\sigma$ should \emph{shrink} as coverage improves, giving a natural stopping signal the point head lacks.
 \end{itemize}
 
 % ==========================================================================
