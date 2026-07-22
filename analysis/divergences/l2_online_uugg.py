@@ -398,6 +398,10 @@ def main():
     ap.add_argument("--heldout_label", default=None,
                     help="label for the held-out npz (default: <base|sigma|g{γ}>_s{seed}, the plot tags)")
     ap.add_argument("--heldout_path", default=None, help="held-out npz (default: heldout_uugg_deepIR.npz)")
+    ap.add_argument("--objective", default="deep", choices=["deep", "overall", "logflat"],
+                    help="which held-out metric becomes val_loss in --result_path (sweep objective). "
+                         "'deep' is the historical default; 'logflat' is correct for concentration "
+                         "trade-off questions -- 'deep' rewards starving the bulk.")
     ap.add_argument("--result_path", default=None,
                     help="if set, write {'val_loss': deep-IR MSE, ...} here after the held-out eval "
                          "(the objective a DyHPO sweep reads).")
@@ -671,11 +675,20 @@ def main():
             # a sweep reads the objective from here (val_loss = the deep-IR MSE we minimise).
             if args.result_path and isinstance(metrics, dict):
                 import json
+                # Which metric the sweep minimises. 'deep' is the historical default (the BBB sweep
+                # used it); 'logflat' is the right choice for any question about the concentration
+                # trade-off, since 'deep' rewards starving the bulk and 'overall' is bulk-dominated.
+                key = {"deep": "deep_mse", "overall": "overall_mse",
+                       "logflat": "logflat_mse"}[args.objective]
                 with open(args.result_path, "w") as f:
-                    json.dump({"val_loss": metrics["deep_mse"], "overall_mse": metrics["overall_mse"],
-                               "deep_mse": metrics["deep_mse"], "arm": args.arm, "gamma": args.gamma,
+                    json.dump({"val_loss": metrics[key], "objective": args.objective,
+                               "overall_mse": metrics["overall_mse"], "deep_mse": metrics["deep_mse"],
+                               "logflat_mse": metrics.get("logflat_mse"),
+                               "arm": args.arm, "gamma": args.gamma,
+                               "keep_c1": args.keep_c1, "keep_c2": args.keep_c2,
+                               "keep_c3": args.keep_c3,
                                "bbb_beta": args.bbb_beta, "bbb_sigma_rel": args.bbb_sigma_rel}, f)
-                print(f"[result] wrote {args.result_path} val_loss(deep_mse)={metrics['deep_mse']:.6e}",
+                print(f"[result] wrote {args.result_path} val_loss({key})={metrics[key]:.6e}",
                       flush=True)
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)

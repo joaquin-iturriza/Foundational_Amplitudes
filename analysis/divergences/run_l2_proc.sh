@@ -16,10 +16,14 @@ export PYTHONDONTWRITEBYTECODE=1
 # base arm = uniform keep; sigma arm = keep prop sigma^gamma. Held-out deep-IR eval folded into tail.
 PROCESS=${PROCESS:-uug}; ARM=${ARM:-sigma}; SEED=${SEED:-0}; GAMMA=${GAMMA:-1.0}
 STEPS=${STEPS:-4000}; NTOTAL=${NTOTAL:-300000}; ROUNDS=${ROUNDS:-10}
+# SAT_LOG: per-round saturation diagnostics (sigma percentiles vs pool size) -> json.
+# TAG lets an N-sweep keep its run dirs disjoint (run_name embeds the tag).
+SAT_LOG=${SAT_LOG:-}; TAG=${TAG:-$PROCESS}
+EXTRA=""; [ -n "$SAT_LOG" ] && EXTRA="--sat_log $SAT_LOG"
 python analysis/divergences/l2_online_uugg.py \
-  --process $PROCESS --arm $ARM --tag ${TAG:-$PROCESS} --seed $SEED \
+  --process $PROCESS --arm $ARM --tag $TAG --seed $SEED $EXTRA \
   --total_steps $STEPS --n_total $NTOTAL --rounds $ROUNDS \
   --oversample ${OVERSAMPLE:-4} --gamma $GAMMA --y_lo 1e-6 --mix_ir 0.5 --sigma0 0.1 \
   --bbb_beta ${BBB_BETA:-1e-2} --bbb_sigma_rel ${BBB_SIGMA_REL:-0.05} --bbb_ksamples ${BBB_KSAMPLES:-16} \
   --heldout_eval
-echo "DONE l2 process=$PROCESS arm=$ARM seed=$SEED gamma=$GAMMA"
+echo "DONE l2 process=$PROCESS arm=$ARM seed=$SEED gamma=$GAMMA n_total=$NTOTAL tag=$TAG"

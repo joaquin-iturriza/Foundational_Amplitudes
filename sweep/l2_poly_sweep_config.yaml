@@ -1,0 +1,87 @@
+# DyHPO single-fidelity sweep over a POLYNOMIAL keep rule for L2 sigma-driven generation on ee->uugg.
+#
+# Question: is the deployed p ~ sigma^gamma ("gamma as a temperature") the right family, or does the
+# optimum need curvature? The keep rule is generalised to
+#     log w = c1*u + c2*u^2 + c3*u^3,   u = log sigma - median(log sigma)
+# so c1=gamma, c2=c3=0 reproduces the power law EXACTLY (verified to 2e-16). The comparison is
+# therefore properly NESTED: a polynomial that cannot beat c2=c3=0 has genuinely found nothing.
+#
+# Why expect curvature: E[err^2|sigma] measured on held-out sets is not a power law in sigma. Fitting
+# log E[err^2|sigma] vs log sigma, R^2 goes 0.89 -> 0.99 (uugg) and 0.68 -> 0.93 (uuggg) from degree 1
+# to 2, with POSITIVE curvature. Positive c2 concentrates extra budget only in the high-sigma tail
+# while staying mild at moderate sigma -- exactly what a single large gamma cannot express, since it
+# over-concentrates everywhere at once (the measured bulk penalty).
+#
+# BASELINE TO BEAT (existing seed-0 runs, no rerun needed -- A/B protocol rule 1). Log-flat metric:
+#   base (uniform) 4.658e-2 | g1 4.140e-2 | g2 3.615e-2 | g3 3.416e-2 | g5 3.536e-2
+#   g10 3.351e-2 (BEST power law) | g20 3.447e-2 | g30 3.429e-2
+# The power law sits in a FLAT basin from gamma 3..30, i.e. it has saturated -- which is precisely why
+# a shape change rather than a harder exponent is the thing worth testing.
+#
+# OBJECTIVE = logflat (mean of per-decade MSEs), NOT deep_mse and NOT the event mean. This matters:
+# deep_mse rewards starving the bulk, so optimising it would just rediscover "larger exponent" and
+# answer a different question; the event mean is bulk-dominated. Log-flat is the honest scoring rule
+# for a concentration trade-off (see the Q2 metric correction in results.tex).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_p2
+  account: itg@v100
+  request_gpus: 1
+  cpus_per_task: 8
+  time: "01:10:00"
+
+paths:
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup
+  setup_commands:
+    - "module load anaconda-py3/2023.09"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+
+sweep_name: l2_poly_uugg
+n_trials: 12
+# drive the L2 online-generation loop, not run.py:
+trial_script: sweep/l2_bbb_trial.py
+l2_driver: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup/analysis/divergences/l2_online_uugg.py
+
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 6           # narrow 3-HP space -> few startup points (HPO rule 5)
+  total_budget: 10000
+  failure_fallback: 1.0
+
+# SINGLE fidelity (HPO rule 6): one t_steps = the full run length.
+fidelity_schedule:
+  t_steps: [4000]
+
+fixed_params:
+  process: uugg
+  arm: sigma             # het-head aleatoric sigma -- the arm the power law was tuned on
+  n_total: 300000
+  rounds: 10
+  oversample: 4
+  seed: 0
+  y_lo: 1.0e-6
+  mix_ir: 0.5
+  objective: logflat
+
+search_space:
+# Linear term == gamma. Range covers the measured power-law basin (3..30) and below it, so the sweep
+# can sit at the power-law optimum if curvature turns out to be worthless.
+- name: keep_c1
+  type: float_uniform
+  low: 1.0
+  high: 12.0
+# Quadratic term: the shape knob. Centred on the measured E[err^2|sigma] curvature (~+1.6) but allowed
+# negative, so "concentrate LESS aggressively in the tail" is reachable rather than assumed away.
+- name: keep_c2
+  type: float_uniform
+  low: -1.0
+  high: 3.0
+# Cubic term: kept deliberately narrow. It exists to detect whether degree 2 is still under-flexible,
+# not to fit noise -- with 12 trials a wide cubic would just add variance.
+- name: keep_c3
+  type: float_uniform
+  low: -0.5
+  high: 0.5
