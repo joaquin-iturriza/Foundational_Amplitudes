@@ -58,7 +58,8 @@
 \contentsline {paragraph}{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale, $u\bar u ggg$ more legs).}{56}{section*.40}%
 \contentsline {paragraph}{$\sigma $ resolved against the divergence coordinate --- and a \emph {pre-flight} test for the concentration principle.}{61}{section*.41}%
 \contentsline {paragraph}{A genuinely Bayesian $\sigma $ (full-network Bayes-by-backprop) does \emph {not} pay for itself.}{62}{section*.42}%
-\contentsline {subsection}{\numberline {11.6}Hand-off: open items}{66}{subsection.11.6}%
-\contentsline {section}{\numberline {12}Training throughput}{67}{section.12}%
-\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{67}{section.13}%
-\contentsline {section}{\numberline {14}Methodological principles}{68}{section.14}%
+\contentsline {paragraph}{Uncapped data: the uncertainty tail saturates, and it does so data-\emph {independently}.}{66}{section*.43}%
+\contentsline {subsection}{\numberline {11.6}Hand-off: open items}{67}{subsection.11.6}%
+\contentsline {section}{\numberline {12}Training throughput}{68}{section.12}%
+\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{68}{section.13}%
+\contentsline {section}{\numberline {14}Methodological principles}{69}{section.14}%

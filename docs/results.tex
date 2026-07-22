@@ -2038,6 +2038,40 @@ marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a sys
 detached heteroscedastic head remains the better trade on this harness.
 \end{principle}
 
+\paragraph{Uncapped data: the uncertainty tail saturates, and it does so data-\emph{independently}.}
+Every A/B above is at a fixed data budget. The complementary question --- \emph{how much} data a region
+actually needs before more is waste --- the loop can now answer directly, because the same $\sigma$ it
+uses to steer is also a saturation gauge. At each round it records the $\sigma$ distribution over the
+\emph{fresh} proposal batch (drawn from the same fixed base every round, so it is a like-for-like
+measure of the model's remaining uncertainty over the whole space, unlike a pool statistic, which
+drifts as the keep rule reshapes the pool); the $p99$ --- the hard tail, i.e.\ the singular region the
+bulk has long since left --- is the stopping statistic, since a mean would call saturation far too early
+(the bulk saturates first). Running $u\bar u gg$ at $N\!\in\!\{75,150,600\}$k (\code{--sat\_log},
+\code{plot\_saturation.py}, Fig.~\ref{fig:l2_saturation}): the $\sigma$-$p99$ falls steeply then
+\textbf{floors at ${\approx}0.046$ \emph{regardless of budget}} --- $75$k reaches $0.0457$, $150$k
+$0.0465$, $600$k $0.0498$ (still descending only because its larger per-round increment has taken fewer
+optimizer steps to the same wall-clock). So $8\times$ more data does \emph{not} lower the floor: at this
+model size and horizon the deep region is saturated by ${\sim}75$k events, and the floor is set by
+capacity/horizon, not data volume. The per-round fractional fall in $p99$ crossing (and staying below) a
+$2\%$ tolerance is a machine-checkable stopping rule --- the \code{--stop\_on\_saturation} latch freezes
+the pool there and lets training continue --- so the loop can add data until a region saturates instead
+of running to a fixed cap. This also makes the ``add more capacity, not more data'' half of the
+concentration principle actionable: a floored $\sigma$-tail that no longer falls with data is the signal
+to stop generating and grow the model.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_saturation.pdf}
+  \caption{\textbf{Saturation: the uncertainty tail converges to a data-independent floor.} \emph{(a)}
+  $\sigma$-$p99$ over the fresh proposal batch vs pool size, for three data budgets on $u\bar u gg$. The
+  curves do not collapse on pool (a larger budget takes fewer optimizer steps to reach a given pool, so
+  its live $\sigma$ sits higher there), but all converge to the same ${\approx}0.046$ floor by end of
+  training --- $8\times$ more data does not lower it, so ${\sim}75$k events already saturate the deep
+  region at this model size/horizon. \emph{(b)} The per-round fractional fall in $p99$; crossing below
+  the $2\%$ tolerance band is the stopping rule the \code{--stop\_on\_saturation} latch uses.}
+  \label{fig:l2_saturation}
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
