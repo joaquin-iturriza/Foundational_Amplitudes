@@ -66,14 +66,25 @@ def main():
     fig.suptitle(r"$e^+e^-\to u\bar u g$: offline mixture-fraction sweep — overall held-out error vs "
                  r"sampling density $f$ (antenna fraction)", fontsize=12)
 
-    axL.plot(fs, logflat, "o-", color="#C44E52", lw=2, ms=7, label="log-flat per decade (objective)")
-    axL.plot(fs, per_event, "s--", color="#4C72B0", lw=1.6, ms=6, label="equal-per-event (antenna-dense test)")
-    axL.axvline(f_opt_lf, color="#C44E52", ls=":", lw=1, alpha=0.7)
+    # SAME runs, SAME test set -- the two curves differ ONLY in how per-event errors are AGGREGATED.
+    # Spell that out: the old labels ("objective" / "antenna-dense test") read like two datasets.
+    axL.plot(fs, logflat, "o-", color="#C44E52", lw=2, ms=7,
+             label=r"equal weight per $y_{\min}$ decade  $\rightarrow$ OUR OBJECTIVE")
+    axL.plot(fs, per_event, "s--", color="#4C72B0", lw=1.6, ms=6,
+             label="equal weight per event  (deep-IR-dominated:\n"
+                   r"the test set is antenna-generated, $\sim$50% below $y_{\min}\!=\!10^{-3}$)")
+    # The interior BASIN is the result; the fine location inside it is single-seed noise
+    # (f=0.5 sits above both neighbours), so shade the basin rather than advertise one f*.
+    axL.axvspan(0.25, 0.75, color="#55A868", alpha=0.12, zorder=0)
+    axL.text(0.5, max(logflat) * 0.45, "broad interior basin\n(fine location = single-seed noise)",
+             ha="center", va="center", fontsize=7.5, color="#2F6B4F")
     axL.set_yscale("log")
     axL.set_xlabel(r"$f$  =  antenna fraction  (0 = uniform/flat RAMBO,  1 = pure antenna)")
     axL.set_ylabel(r"overall MSE $\Delta\ln|\mathcal{M}|^2$")
-    axL.set_title(f"optimum: log-flat f*={f_opt_lf:g},  per-event f*={f_opt_pe:g}", fontsize=10)
-    axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=9)
+    axL.set_title("same runs, same test set — two WEIGHTINGS of the same errors\n"
+                  "(they agree on the basin; they disagree most at $f{=}0$, where the error is "
+                  "most uneven across decades)", fontsize=8.5)
+    axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=7.5, loc="best")
 
     cmap = plt.cm.viridis(np.linspace(0.1, 0.9, len(fs)))
     cen = np.sqrt(EDGES[:-1] * EDGES[1:])

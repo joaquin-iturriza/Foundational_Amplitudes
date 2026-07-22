@@ -1424,12 +1424,21 @@ $\ln$ of the amplitude ratio) plus median relative error.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{deep_sampling_fraction_sweep.pdf}
-  \caption{\textbf{Thread A: the antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
-  the antenna fraction $f$. Both endpoints are bad --- $f{=}0$ (pure \textsc{rambo}) is catastrophic
-  ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
-  starves the $O(1)$ bulk --- while any $f\in[0.25,0.75]$ sits in a flat basin. The fine location inside
-  the basin is single-seed noise. This ``mix the coverage criterion in at a modest fraction, do not adopt
-  it as the base'' shape recurs for the $Z$ resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
+  \caption{\textbf{Thread A: the antenna/uniform mixture has a broad interior optimum.}
+  \emph{Left:} overall held-out error vs the antenna fraction $f$. The two curves are the \textbf{same
+  runs on the same test set} and differ only in how the per-event errors are \emph{aggregated}: red
+  weights every $y_{\min}$ decade equally (our objective), blue weights every \emph{event} equally.
+  Blue sits lower because the test set is antenna-generated and hence deep-IR-dense ($\sim\!50\%$ of
+  events below $y_{\min}\!=\!10^{-3}$), so event-weighting lets the deep IR set the number; the two
+  disagree most at $f{=}0$ ($0.34$ vs $0.11$), precisely where the error is most uneven across decades,
+  and converge once it is flat. They agree on the basin. Both endpoints are bad --- $f{=}0$ (pure
+  \textsc{rambo}) is catastrophic ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse
+  than the basin because it starves the $O(1)$ bulk --- while any $f\in[0.25,0.75]$ (shaded) sits in a
+  flat basin whose fine location is single-seed noise. \emph{Right:} the same runs resolved per
+  $y_{\min}$ decade, which shows the mechanism: $f{=}0$ is steeply bad in the deep IR and best in the
+  bulk, $f{=}1$ is the mirror image, and the interior mixtures are flat across all decades. This ``mix
+  the coverage criterion in at a modest fraction, do not adopt it as the base'' shape recurs for the $Z$
+  resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
   \label{fig:deep_sampling_fraction_sweep}
 \end{figure}
 
