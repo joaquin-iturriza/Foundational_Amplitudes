@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -1408,6 +1408,31 @@ location inside the basin is single-seed noise ($f{=}0.5$ sits above both neighb
 reported: MSE and MAE of $\Delta\ln|\mathcal{M}|^2$ (both scale-invariant, since the residual is
 $\ln$ of the amplitude ratio) plus median relative error.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{deep_sampling_uniform_vs_antenna.pdf}
+  \caption{\textbf{Thread A: antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
+  for the production flat-\textsc{rambo} set vs the antenna sampler, same base22 / $400$k events /
+  $4000$ steps. Flat \textsc{rambo} starves the deep IR by construction (median
+  $y_{\min}\!\approx\!0.15$); the antenna proposal, which is flat per decade in the gluon invariants,
+  takes the median relative error in $y_{\min}\!\in\![10^{-6},10^{-5})$ from $47.9\%$ to $1.4\%$ and the
+  overall MSE from $0.108$ to $0.0017$ ($\sim\!62\times$). Because we fit $\ln|\mathcal M|^2$
+  pointwise, this needs \emph{no} importance reweighting --- only where the training points sit changes.}
+  \label{fig:deep_sampling_antenna}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{deep_sampling_fraction_sweep.pdf}
+  \caption{\textbf{Thread A: the antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
+  the antenna fraction $f$. Both endpoints are bad --- $f{=}0$ (pure \textsc{rambo}) is catastrophic
+  ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
+  starves the $O(1)$ bulk --- while any $f\in[0.25,0.75]$ sits in a flat basin. The fine location inside
+  the basin is single-seed noise. This ``mix the coverage criterion in at a modest fraction, do not adopt
+  it as the base'' shape recurs for the $Z$ resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
+  \label{fig:deep_sampling_fraction_sweep}
+\end{figure}
+
 \paragraph{Float32 label floor.} $s_{ij}=s\,y_{\min}$ is a near-cancellation of $O(s)$ momenta,
 so float32 storage imposes a relative floor $\sim\varepsilon/y_{\min}$: measured (recomputing
 $|\mathcal{M}|^2$ from float32- vs float64-rounded momenta) at median $0.39\%$ in
@@ -1503,7 +1528,33 @@ after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ 
 deep-IR $8\!\times\!10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
 heuristics (rank, weak $\sigma$) starve the bulk and can \emph{net-hurt} (a $\rho{=}0.29$ synthetic
 $\sigma$ scores $-9$\% under equal footing). So calibration matters more than a pure-rank framing
-suggests. Figures: \code{q2\_confirm}, \code{q2\_dense}, \code{q2\_rankmag}, \code{q2\_logflat}.
+suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{q2\_confirm},
+\code{q2\_dense}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{q2_logflat.pdf}
+  \caption{\textbf{Q2: the metric must weight each $y_{\min}$ decade equally.} $\sigma$-reweighting gain
+  under the log-flat-per-decade metric. The antenna test set is $\sim\!50\%$ below
+  $y_{\min}\!=\!10^{-3}$, so a plain event-weighted \code{mean}$(d^2)$ is deep-IR-dominated and
+  flatters any deep-IR-following heuristic. Under equal footing the real $\sigma$ head captures
+  $\sim\!80\%$ of the perfect-oracle reweighting gain ($87\%$ event-weighted) and improves \emph{every}
+  decade, bulk included.}
+  \label{fig:q2_logflat}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{q2_rankmag.pdf}
+  \caption{\textbf{Q2: magnitude dominates ranking (a controlled rank-vs-magnitude split).} The same
+  weight multiset $\Phi=\mathrm{sort}|r|$ reassigned by different orderings, so ordering and magnitude
+  are varied independently. Ordering \emph{alone} recovers only $11\%$ of the oracle gain: after antenna
+  training the worst-fit decade is the \emph{bulk} ($\mathrm{MSE}\sim10^{-2}$, vs deep-IR
+  $8\times10^{-4}$), and only $\sigma$'s calibrated \emph{magnitude} points there. Deep-IR-following
+  heuristics starve the bulk and can net-hurt --- a $\rho{=}0.29$ synthetic $\sigma$ scores $-9\%$. This
+  is why a pure-rank framing of $\sigma$ quality is misleading.}
+  \label{fig:q2_rankmag}
+\end{figure}
 
 \paragraph{Thread D --- coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage --- it cannot beat
@@ -1551,6 +1602,19 @@ its own set (internal val $10^{-5}$) yet \emph{anti-correlates} on production te
 Relabeling production AS-IS gives $\rho{=}0.94$ (mirrored); swapping the final two recovers the stored
 $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0.994$ post-fix).
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{eeuu_flatlogm_resonance.pdf}
+  \caption{\textbf{L0 on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Error across
+  $\sqrt s$ for the raw \textsc{rambo} base vs a flat-$\log|\mathcal M|^2$ arm. Flat \textsc{rambo} puts
+  only $0.4\%$ of events in $\sqrt s\!\in\![88,95]$, and the foundation fits the peak $\sim\!400\times$
+  worse than the bulk. \emph{Resampling} the fixed $10^6$ pool cannot fix this --- the pool holds only
+  $\sim\!3300$ true pole events, so flat resampling just duplicates them ($155$k unique of $400$k). Only
+  \emph{generating} fresh pole events lifts coverage $0.4\%\!\to\!32\%$ with genuinely new physics. This
+  is the coverage ceiling of Thread~D made concrete: you cannot resample past what the pool contains.}
+  \label{fig:eeuu_flatlogm_resonance}
+\end{figure}
+
 \paragraph{The generated fraction sweep --- a clean interior optimum; pure flat over-corrects.}
 $f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated fresh, same base8
 ckpt/HPs/$N{=}400$k, common \textsc{rambo} test binned by $\sqrt{s}$, each arm de-standardized to true
@@ -1564,7 +1628,22 @@ raw \textsc{rambo} $\sim$$30$--$70\times$ and \textbf{pure} flat-$\log|\mathcal{
 pure base} --- pure flat starves the bulk (mirror of \textsc{rambo} starving the pole), same shape as the
 uug antenna interior optimum. Generation still beats resampling $\sim$$8\times$ ($3.5\mathrm{e}{-}5$ vs
 $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
-\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (fig \code{eeuu\_genmix\_fraction\_sweep}).
+\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{eeuu_genmix_fraction_sweep.pdf}
+  \caption{\textbf{The generated fraction sweep on the $Z$ resonance --- a clean interior optimum.}
+  Error vs $f$, the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
+  uniform-$\sqrt s$), same base8/HPs/$N{=}400$k. Under the equal-per-$\sqrt s$-decade metric:
+  $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$, $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$,
+  $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$. The interior optimum beats raw \textsc{rambo}
+  $\sim\!30$--$70\times$ and \emph{pure} flat $\sim\!4$--$7\times$: flat-$\log|\mathcal M|^2$ is a
+  criterion to \emph{mix in}, not a good base --- pure flat starves the bulk exactly as \textsc{rambo}
+  starves the pole. Same shape as the $u\bar u g$ antenna sweep
+  (Fig.~\ref{fig:deep_sampling_fraction_sweep}).}
+  \label{fig:eeuu_genmix_fraction_sweep}
+\end{figure}
 
 \paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
 resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after the first}: the same
@@ -1692,9 +1771,43 @@ knob. \textbf{This closes L2: on a process where no one-parameter hand density f
 $\sigma$, raised to a power, generates a strictly better training set than uniform --- with no physics
 coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
 confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ L2 numbers from the earlier
-session, which are retracted.) Figures: \code{l2\_uugg\_perdecade} (base vs $\sigma$ at $\gamma{=}1$),
-\code{l2\_uugg\_gamma} (per-decade ratio + the deep-vs-bulk trade-off vs $\gamma$),
-\code{l2\_uugg\_perdecade\_abs} (absolute MSE per decade, all $\gamma$).
+session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l2_uugg_perdecade_abs}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uugg_perdecade.pdf}
+  \caption{\textbf{L2 on $e^+e^-\to u\bar u gg$: $\sigma$-driven generation vs uniform ($\gamma{=}1$,
+  $3$ seeds).} Held-out deep-IR MSE per $y_{\min}$ decade. Both arms train the \emph{identical}
+  HETEROSC net with a detached $\sigma$ backbone at $\beta{=}1$ (so $\mu$ trains exactly as MSE in
+  both) on matched totals with fresh data every round --- the \emph{only} difference is the keep rule,
+  uniform vs $\propto\sigma^\gamma$. The $\sigma$ arm wins, and the gain is concentrated at small
+  $y_{\min}$: the model's own uncertainty, with no physics coordinate and no reference density, builds
+  a better training set than the best hand-coded sampler.}
+  \label{fig:l2_uugg_perdecade}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uugg_gamma.pdf}
+  \caption{\textbf{The concentration exponent $\gamma$ traverses a water-filling trade-off.} Per-decade
+  $\sigma$/base ratio and the deep-vs-bulk split against $\gamma\in\{1,2,3,5,10\}$. The deepest decade
+  ($y_{\min}\!<\!10^{-6}$) falls monotonically --- $90,70,66,62,\mathbf{55}\%$ of base --- while the
+  shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average saturates around
+  $\gamma\!\approx\!3$--$5$ and larger $\gamma$ buys deep-IR accuracy by paying in the bulk: one
+  coordinate-free scalar knob sliding along the allocation trade-off of Thread~B.}
+  \label{fig:l2_uugg_gamma}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_uugg_perdecade_abs.pdf}
+  \caption{\textbf{Absolute per-decade MSE for all $\gamma$.} The same runs as
+  Fig.~\ref{fig:l2_uugg_gamma} on an absolute scale rather than as a ratio to base, so the size of each
+  decade's error is visible alongside the relative gain --- the deep decades carry MSE orders of
+  magnitude above the bulk, which is why a log-flat-per-decade metric (Q2,
+  Fig.~\ref{fig:q2_logflat}) is the honest way to score the trade-off.}
+  \label{fig:l2_uugg_perdecade_abs}
+\end{figure}
 
 \paragraph{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale,
 $u\bar u ggg$ more legs).} Because the L2 loop carries \emph{no} process coordinate, it should transfer
