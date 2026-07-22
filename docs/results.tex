@@ -1641,13 +1641,22 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   \centering
   \includegraphics[width=\textwidth]{eeuu_genmix_fraction_sweep.pdf}
   \caption{\textbf{The generated fraction sweep on the $Z$ resonance --- a clean interior optimum.}
-  Error vs $f$, the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
-  uniform-$\sqrt s$), same base8/HPs/$N{=}400$k. Under the equal-per-$\sqrt s$-decade metric:
-  $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$, $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$,
-  $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$. The interior optimum beats raw \textsc{rambo}
-  $\sim\!30$--$70\times$ and \emph{pure} flat $\sim\!4$--$7\times$: flat-$\log|\mathcal M|^2$ is a
-  criterion to \emph{mix in}, not a good base --- pure flat starves the bulk exactly as \textsc{rambo}
-  starves the pole. Same shape as the $u\bar u g$ antenna sweep
+  $f$ is the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
+  uniform-$\sqrt s$); same base8/HPs/$N{=}400$k throughout.
+  \emph{Left --- the interior optimum.} Three metrics vs $f$. The objective is the \emph{log-flat}
+  one, defined under the panel: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
+  however many events it holds; the plain event mean instead follows the bulk, which holds almost all
+  the events, and so barely sees the pole. Log-flat gives $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$,
+  $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$, $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$ ---
+  a minimum at $f{=}0.5$, beating raw \textsc{rambo} $\sim\!30$--$70\times$ and \emph{pure} flat
+  $\sim\!4$--$7\times$. The resonance-region curve ($\sqrt s<100$) tracks it; the event-weighted
+  ``overall'' curve, being bulk-heavy, bottoms earlier at $f{=}0.25$ --- which is exactly why the
+  objective has to be the equal-per-bin one.
+  \emph{Right --- the mechanism, the bulk$\leftrightarrow$pole trade-off.} The same runs resolved per
+  $\sqrt s$ bin: $f{=}0$ is far the best in the bulk and far the worst at the pole, $f{=}1$ is the
+  mirror image, and the interior mixtures are the flattest across both. So
+  flat-$\log|\mathcal M|^2$ is a criterion to \emph{mix in}, not a good base --- pure flat starves the
+  bulk exactly as \textsc{rambo} starves the pole. Same shape as the $u\bar u g$ antenna sweep
   (Fig.~\ref{fig:deep_sampling_fraction_sweep}).}
   \label{fig:eeuu_genmix_fraction_sweep}
 \end{figure}
