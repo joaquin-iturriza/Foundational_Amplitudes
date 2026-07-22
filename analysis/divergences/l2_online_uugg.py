@@ -452,7 +452,13 @@ def main():
                 sig = score_epistemic(exp, P_prop, args.bbb_ksamples)
             else:
                 sig = score_sigma(exp, P_prop)
-            w = np.clip(sig, 1e-12, None) ** args.gamma
+            # p ∝ sigma^gamma, computed in LOG space and max-shifted. Mathematically identical to
+            # sigma**gamma / sum, but safe at large gamma: a direct power underflows to exact 0 for the
+            # small-sigma tail once gamma is big (sigma~1e-2, gamma~30 -> 1e-60, and worse for wider
+            # spreads), and if fewer than keep_n entries stay non-zero np.random.choice(replace=False)
+            # raises "Fewer non-zero entries in p than size". Large gamma is the greedy-top-k limit.
+            logw = args.gamma * np.log(np.clip(sig, 1e-12, None))
+            w = np.exp(logw - logw.max())
             p = w / w.sum()
             keep = rng.choice(len(P_prop), size=keep_n, replace=False, p=p)
             print(f"[round {r}] {args.arm} σ p50/90/99={np.percentile(sig,[50,90,99])} "

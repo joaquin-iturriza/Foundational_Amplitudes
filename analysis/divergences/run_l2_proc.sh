@@ -10,7 +10,7 @@
 set -e
 module purge; module load anaconda-py3/2023.09
 conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-harder-div
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 export PYTHONDONTWRITEBYTECODE=1
 # Process-general L2 online-generation run (uug multi-scale Z-res+IR, uugg, uuggg more-legs).
 # base arm = uniform keep; sigma arm = keep prop sigma^gamma. Held-out deep-IR eval folded into tail.
