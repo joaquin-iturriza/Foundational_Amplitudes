@@ -10,7 +10,11 @@
 set -e
 module purge; module load anaconda-py3/2023.09
 conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+# Run from the checkout this script was SUBMITTED from, not a hardcoded path: this file also lives
+# in worktrees, and a hardcoded trunk path silently runs the TRUNK driver instead of the worktree's
+# (which fails on any flag the trunk does not have yet, or worse, quietly runs the wrong code).
+cd "${L2_ROOT:-${SLURM_SUBMIT_DIR:-/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes}}"
+echo "[run_l2_proc] cwd=$(pwd)"
 export PYTHONDONTWRITEBYTECODE=1
 # Process-general L2 online-generation run (uug multi-scale Z-res+IR, uugg, uuggg more-legs).
 # base arm = uniform keep; sigma arm = keep prop sigma^gamma. Held-out deep-IR eval folded into tail.
