@@ -1914,8 +1914,52 @@ what $\sigma$-steering can exploit. The $\gamma$ sweep separates the two regimes
 divergence the gain \emph{saturates} with harder concentration (there is a finite amount of misplaced
 budget to recover), whereas on a diffuse one it \emph{reverses} and drops below uniform --- so a flat or
 turning $\gamma$-response is the diagnostic that no targetable sparse region exists, and the right move is
-more capacity or more data everywhere, not smarter allocation.
+more capacity or more data everywhere, not smarter allocation. Concentration also has a directly
+measurable order parameter that does \emph{not} require running the A/B: the \textbf{$\sigma$-contrast}
+of the baseline model, $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$, which
+orders these three processes exactly as their measured gains do (next paragraph,
+Fig.~\ref{fig:l2_sigma_vs_divergence}).
 \end{principle}
+
+\paragraph{$\sigma$ resolved against the divergence coordinate --- and a \emph{pre-flight} test for
+the concentration principle.} Everything above scores $\sigma$ only through its downstream effect (the
+A/B on held-out MSE). Resolving $\sigma$ directly against the variable that \emph{defines} each
+divergence both confirms the mechanism and, unexpectedly, makes the concentration principle
+\emph{predictive}. The stored held-out evaluations already carry what is needed --- \code{score\_and\_save}
+saves $\sigma$ row-aligned with $y_{\min}$ and $\sqrt s$ --- so this costs no GPU
+(\code{plot\_sigma\_vs\_divergence.py}, Fig.~\ref{fig:l2_sigma_vs_divergence}). Multiplying the stored
+(preprocessed-unit) $\sigma$ by the run's amplitude standardization scale puts $\sigma$ and the actual
+RMSE in the same $\log|\mathcal M|^2$ units, so the two curves are directly comparable and their gap
+\emph{is} the calibration. \emph{(i) $\sigma$ does rise inside the divergence, and it is well calibrated
+there.} On $u\bar u g$, $\sigma$ climbs $4.5\times$ from the continuum into the $Z$ pole and plateaus
+across it, tracking a $10\times$ rise in the true error; per region $\sigma/\mathrm{RMSE}=0.77$ (peak),
+$1.01$ (shoulder), $1.69$ (continuum) --- accurate where it matters and merely \emph{conservative} in the
+easy bulk. Across the $u\bar ugg$ $y_{\min}$ decades the same ratio stays in $0.85$--$1.24$ except the
+very deepest bin ($0.53$, under-covering where the error is largest). \emph{(ii) The sharpness of that
+rise predicts the gain.} Define the \textbf{$\sigma$-contrast} $\langle\sigma\rangle_{\rm
+singular}/\langle\sigma\rangle_{\rm bulk}$, measured on the \emph{base} (uniform-keep) arm alone. It
+orders the three processes exactly as the measured steering gain does: $u\bar u g$ (Z peak) contrast
+$4.48\Rightarrow$ $\sigma$/base MSE $0.40$; $u\bar u gg$ (deep IR) $1.83\Rightarrow0.53$; $u\bar u ggg$
+(deep IR) $1.29\Rightarrow0.97$ (nothing). Because the contrast needs only one forward pass of the
+baseline model --- no second arm, no A/B --- it converts ``is this divergence concentrated?'' from a
+post-hoc reading of the outcome into a \textbf{cheap test you can run before committing the compute},
+and gives the concentration principle a directly measurable order parameter.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_sigma_vs_divergence.pdf}
+  \caption{\textbf{The learned $\sigma$ rises inside the divergence, and how sharply it does so predicts
+  whether $\sigma$-steering pays.} \emph{(a)--(c)} Mean $\sigma$ and actual RMSE against the coordinate
+  defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical gap is the calibration),
+  all on the base/uniform arm. $u\bar u g$: $\sigma$ climbs $4.5\times$ into the $Z$ pole and plateaus
+  across it, following a $10\times$ rise in the error. $u\bar u gg$: a $1.8\times$ rise into the deep IR.
+  $u\bar u ggg$: nearly flat ($1.3\times$) --- there is no thin region for $\sigma$ to point at.
+  \emph{(d)} The $\sigma$-contrast $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$,
+  measured on the base arm alone, against the $\sigma$-arm/base MSE ratio actually measured in that
+  region. The three processes order monotonically, so the contrast is a \emph{pre-flight} diagnostic for
+  the concentration principle --- one forward pass, no A/B.}
+  \label{fig:l2_sigma_vs_divergence}
+\end{figure}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
 itself.} The steering $\sigma$ above is a \emph{point} heteroscedastic head --- a learned (aleatoric)
