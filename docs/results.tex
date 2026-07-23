@@ -1381,7 +1381,17 @@ and is replaced by a two-stage recipe (train $\mu$, then fit a frozen-$\mu$ $\si
 resulting $\sigma$ helps \emph{only where coverage is capped} --- on a starved, un-regenerable pool it
 is robustly ${\approx}$oracle ($3$-seed), on a base you can already generate well it is a null.
 Equimarginal (water-filling) allocation (Thread~B) frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
-\mathrm{diff}}$), consistent with the interior mixture. Tooling under \code{analysis/divergences/};
+\mathrm{diff}}$), consistent with the interior mixture. \textbf{(L2) $\sigma$-driven on-the-fly
+generation} beats uniform generation on a coordinate-free loop, and helps \emph{iff} the hardness is
+\emph{concentrated} (the concentration principle) --- with three sharpening results: (i) the learned
+$\sigma$ rises inside every divergence, and its base-arm \emph{contrast}
+$\langle\sigma\rangle_{\rm sing}/\langle\sigma\rangle_{\rm bulk}$ is a one-forward-pass \emph{pre-flight}
+predictor of the steering gain (no A/B needed); (ii) it transfers to a \emph{massive} final state
+($b\bar b g$), where the contrast correctly predicted a $Z$-localised gain and the $m_b$-dead-cone
+softening of the IR, in advance; (iii) the keep rule's shape is settled --- a nested polynomial confirms
+\emph{positive curvature} is the right direction but does not robustly beat the simple $\sigma^\gamma$
+temperature over seeds, and the $\sigma$-tail \emph{saturates} at a data-independent floor, giving a
+stopping rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 
@@ -2077,6 +2087,44 @@ marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a sys
 --- its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
 detached heteroscedastic head remains the better trade on this harness.
 \end{principle}
+
+\paragraph{Is $\sigma^\gamma$ the right keep-rule family, or does the optimum need curvature? A
+\emph{nested} polynomial test.} The deployed keep rule is $p\!\propto\!\sigma^\gamma$ --- ``$\gamma$ as a
+temperature'', one scalar. We generalise it to a polynomial in $u=\log\sigma-\mathrm{median}$,
+$\log w = c_1 u + c_2 u^2 + c_3 u^3$, so the power law is the \emph{nested} member $c_1{=}\gamma,\,
+c_2{=}c_3{=}0$ (verified identical to $10^{-16}$): a polynomial that cannot beat $c_2{=}c_3{=}0$ has
+genuinely found nothing. The motivation is measured, not aesthetic: $\mathbb E[\mathrm{err}^2\,|\,\sigma]$
+on held-out sets is \emph{not} a power law in $\sigma$ --- fitting $\log\mathbb E$ against $\log\sigma$,
+$R^2$ rises $0.89\!\to\!0.99$ ($u\bar u gg$) and $0.68\!\to\!0.93$ ($u\bar u ggg$) from degree $1$ to $2$,
+with \emph{positive} curvature, so positive $c_2$ should concentrate extra budget in the high-$\sigma$
+tail while staying mild at moderate $\sigma$ --- exactly what a single large $\gamma$ cannot do (it
+over-concentrates everywhere, the measured bulk penalty). A $12$-trial single-fidelity DyHPO sweep over
+$(c_1,c_2,c_3)$ on $u\bar u gg$ (objective the log-flat MSE, \emph{not} deep-only, which would just reward
+starving the bulk) confirms the \emph{direction}: the best two configs both sit at $c_2\!\approx\!+1.3$--$1.4$
+and every negative-$c_2$ config is mid-pack or worse (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
+does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.25\times10^{-2}$) looked $3\%$
+under the best power law --- until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
+$3.25\times10^{-2}$: the ``win'' was against one unlucky power-law seed. Running the polynomial optimum at
+$3$ seeds gives $3.22\times10^{-2}\!\pm\!1.2\times10^{-3}$ vs $\sigma^{10}$'s $3.25\times10^{-2}\!\pm\!
+7\times10^{-4}$ --- a $1.0\%$ edge well inside the pooled seed scatter, i.e.\ a \textbf{wash}
+(Fig.~\ref{fig:l2_poly_keep}b). So the curvature the error profile shows is real and points the right way,
+but on the flat $\gamma$-basin it buys nothing a well-tuned exponent does not already have. \emph{The
+temperature picture holds: $\sigma^\gamma$ stays the right practical family --- one knob, no measurable
+loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code{l2\_online\_uugg.py},
+\code{sweep/l2\_poly\_sweep\_config.yaml}, \code{plot\_poly\_keep.py}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_poly_keep.pdf}
+  \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
+  sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
+  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
+  $c_2\!\approx\!+1.3$--$1.4$, negative-$c_2$ mid-pack), confirming the $\mathbb E[\mathrm{err}^2|\sigma]$
+  curvature. \emph{(b)} The honest $3$-seed comparison: the polynomial optimum ($3.22\times10^{-2}$) and the
+  best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed --- the $1\%$ edge is
+  inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
+  \label{fig:l2_poly_keep}
+\end{figure}
 
 \paragraph{Uncapped data: the uncertainty tail saturates, and it does so data-\emph{independently}.}
 Every A/B above is at a fixed data budget. The complementary question --- \emph{how much} data a region

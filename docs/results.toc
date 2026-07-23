@@ -59,8 +59,9 @@
 \contentsline {paragraph}{A MASSIVE final state ($e^+e^-\to b\bar b g$) --- and a genuine out-of-sample test of the $\sigma $-contrast diagnostic.}{60}{section*.41}%
 \contentsline {paragraph}{$\sigma $ resolved against the divergence coordinate --- and a \emph {pre-flight} test for the concentration principle.}{62}{section*.42}%
 \contentsline {paragraph}{A genuinely Bayesian $\sigma $ (full-network Bayes-by-backprop) does \emph {not} pay for itself.}{63}{section*.43}%
-\contentsline {paragraph}{Uncapped data: the uncertainty tail saturates, and it does so data-\emph {independently}.}{67}{section*.44}%
+\contentsline {paragraph}{Is $\sigma ^\gamma $ the right keep-rule family, or does the optimum need curvature? A \emph {nested} polynomial test.}{67}{section*.44}%
+\contentsline {paragraph}{Uncapped data: the uncertainty tail saturates, and it does so data-\emph {independently}.}{68}{section*.45}%
 \contentsline {subsection}{\numberline {11.6}Hand-off: open items}{68}{subsection.11.6}%
 \contentsline {section}{\numberline {12}Training throughput}{69}{section.12}%
-\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{69}{section.13}%
-\contentsline {section}{\numberline {14}Methodological principles}{70}{section.14}%
+\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{70}{section.13}%
+\contentsline {section}{\numberline {14}Methodological principles}{71}{section.14}%
