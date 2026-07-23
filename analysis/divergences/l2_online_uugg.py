@@ -55,16 +55,38 @@ LOW_CUTS = {"pt_min": 1.0, "cos_max": 0.9, "dr_min": 0.05, "m_min": 0.3}
 # ---------------------------------------------------------------- process registry
 # The L2 loop is coordinate-free: the ONLY process-specific facts are the particle content
 # (PDG/masses/multiplicity), the compiled tree standalone that labels proposals, and the round-0
-# frozen-stats dataset. gen_ir_democratic reaches the soft/collinear corners of ANY massless
-# process, so extending to a new gluon multiplicity or a resonance+IR process is just a new row
-# here -- no new sampler, no per-process tuning (exactly the transfer claim being stress-tested).
-# All are ee -> u ubar + n_g gluons: PDG = [e-, e+, u, ubar, g...]; particles 2..NP-1 all coloured.
-_UUX = [11, -11, 2, -2]
+# frozen-stats dataset. gen_ir_democratic reaches the soft/collinear corners of any process, so
+# extending to a new multiplicity, a resonance+IR process, or a MASSIVE final state is just a new
+# row here -- no new sampler, no per-process tuning (exactly the transfer claim being stress-tested).
+#
+# Rows carry the final-state PDG and MASSES explicitly rather than deriving them from a gluon count,
+# so massive final states are expressible. `dataset` is only a FILENAME for the round-0 pool the
+# driver generates itself (nothing needs to pre-exist in data/).
+#
+# SLOT-ORDER WARNING: each compiled standalone has its own final-state slot convention, and getting
+# it wrong mirrors the forward-backward asymmetry -- a model then trains perfectly on its own set yet
+# ANTI-correlates on production data (this silently inverted an earlier ee->uu result). The
+# convention is not shared across builds: ee_ttbar takes production order as-is while ee_uu needs its
+# final pair swapped. Every row below has been checked -- massless ones against production data,
+# ee_bbbarg via the sign of A_FB at the Z pole against the validated ee_uug (both negative under the
+# same construction, with |A_FB(b)|>|A_FB(u)| as the SM requires).
+MB = 4.7                                                     # m_b in the standalone's param_card
 PROCESSES = {
-    #  key       n_g   standalone dir                 round-0 dataset (in data/)
-    "uug":   dict(n_g=1, standalone="ee_uug_standalone",   dataset="ee_uug_91-1000GeV_amplitudes"),
-    "uugg":  dict(n_g=2, standalone="ee_uugg_standalone",  dataset="ee_uugg_91-1000GeV_amplitudes"),
-    "uuggg": dict(n_g=3, standalone="ee_uuggg_standalone", dataset="ee_uuggg_91-1000GeV_amplitudes"),
+    "uug":    dict(pdg=[11, -11, 2, -2, 21],      masses=[0.0, 0.0, 0.0],
+                   standalone="ee_uug_standalone",    dataset="ee_uug_91-1000GeV_amplitudes"),
+    "uugg":   dict(pdg=[11, -11, 2, -2, 21, 21],  masses=[0.0, 0.0, 0.0, 0.0],
+                   standalone="ee_uugg_standalone",   dataset="ee_uugg_91-1000GeV_amplitudes"),
+    "uuggg":  dict(pdg=[11, -11, 2, -2, 21, 21, 21], masses=[0.0] * 5,
+                   standalone="ee_uuggg_standalone",  dataset="ee_uuggg_91-1000GeV_amplitudes"),
+    # MASSIVE: ee -> b bbar g. The direct massive analogue of uug -- same Z resonance, same soft
+    # gluon singularity, but the COLLINEAR limit is regulated by the b mass (dead cone). With
+    # sqrt(s) in [91,1000] the dead-cone scale m_b^2/s ~ 2e-5..3e-3 sits inside the y_min window we
+    # bin over, so the mass genuinely reshapes the divergence rather than just relabelling it.
+    # (ee->ttbar was the original candidate for the "massive threshold" test and is NOT usable: at
+    # tree level |M|^2 varies only ~8.7x in total and is FLATTEST at threshold -- the 2m_t cusp is a
+    # phase-space/cross-section effect, not an amplitude feature. See results.tex.)
+    "bbbarg": dict(pdg=[11, -11, 5, -5, 21],      masses=[MB, MB, 0.0],
+                   standalone="ee_bbbarg_standalone", dataset="ee_bbbarg_91-1000GeV_amplitudes"),
 }
 
 # module globals set by set_process() (default uugg -> unchanged behaviour for existing importers).
@@ -73,19 +95,22 @@ GLUONS = None; COLORED = None
 
 
 def set_process(name):
-    """Point the module globals at process `name` (uug|uugg|uuggg). Importers (make_heldout_uugg,
-    eval_heldout_uugg) read L.PDG/NP/... so this must set module globals, not just locals."""
+    """Point the module globals at process `name`. Importers (make_heldout_uugg, eval_heldout_uugg)
+    read L.PDG/NP/... so this must set module globals, not just locals."""
     spec = PROCESSES[name]
-    n_g = spec["n_g"]
+    pdg = np.asarray(spec["pdg"], dtype=int)
+    masses = np.asarray(spec["masses"], dtype=float)
+    assert len(pdg) == 2 + len(masses), f"{name}: pdg/masses length mismatch"
     g = globals()
     g["PROCESS"] = name
-    g["PDG"] = np.array(_UUX + [21] * n_g, dtype=int)
-    g["NP"] = 4 + n_g                                        # 2 leptons + u + ubar + n_g gluons
-    g["MASSES"] = np.zeros(2 + n_g)                          # final-state masses (u ubar g..., massless)
+    g["PDG"] = pdg
+    g["NP"] = len(pdg)                                       # 2 beams + final state
+    g["MASSES"] = masses                                     # FINAL-state masses only
     g["STANDALONE"] = f"{WORK}/mg5amcnlo/{spec['standalone']}"
     g["DATASET"] = spec["dataset"]
-    g["GLUONS"] = list(range(4, 4 + n_g))                    # gluon indices in the event
-    g["COLORED"] = list(range(2, 4 + n_g))                   # u, ubar, gluons: all coloured final state
+    fin = np.arange(2, len(pdg))
+    g["GLUONS"] = [int(i) for i in fin if pdg[i] == 21]
+    g["COLORED"] = [int(i) for i in fin if (abs(pdg[i]) <= 6 or pdg[i] == 21)]
     return spec
 
 
@@ -236,6 +261,37 @@ def score_epistemic(exp, P, k_samples):
     return np.std(np.stack(preds, axis=0), axis=0)      # (N,) epistemic predictive std
 
 
+def keep_logweight(sig, args):
+    """Log of the un-normalised keep weight for a batch of proposal sigmas.
+
+    The deployed rule has been p ∝ sigma^gamma -- one scalar "temperature" gamma. This generalises it
+    to a POLYNOMIAL in u = log(sigma) - median(log sigma):
+
+        log w = c1*u + c2*u^2 + c3*u^3        (c1 = gamma, c2 = c3 = 0  =>  exactly sigma^gamma)
+
+    so the power law is the DEGREE-1 MEMBER and the comparison is properly nested -- a polynomial
+    that cannot beat c2=c3=0 has genuinely found nothing. Two design points:
+
+    * Centering on the median (not the max/mean) makes the constant term irrelevant -- it cancels in
+      the normalisation -- so c1 reproduces gamma EXACTLY rather than approximately, which is what
+      makes the nesting exact. Centering is also what keeps the basis conditioned as sigma drifts
+      downward over training: u stays O(1) while log(sigma) does not.
+    * We do NOT rescale u by its spread. That would make c1 = gamma*std(log sigma), and since the
+      spread changes round to round a fixed c1 would no longer correspond to a fixed gamma -- the
+      nesting would silently break.
+
+    Motivation for going beyond degree 1: E[err^2 | sigma] measured on held-out sets is NOT a power
+    law in sigma -- fitting log E[err^2|sigma] against log sigma gives R^2 0.89 -> 0.99 (uugg) and
+    0.68 -> 0.93 (uuggg) going from degree 1 to 2, with POSITIVE curvature. Positive c2 concentrates
+    extra budget only in the high-sigma tail while staying mild at moderate sigma, which is exactly
+    the trade-off a single large gamma cannot express (it over-concentrates everywhere at once, which
+    is the measured bulk penalty).
+    """
+    ls = np.log(np.clip(sig, 1e-12, None))
+    u = ls - np.median(ls)
+    return args.keep_c1 * u + args.keep_c2 * u ** 2 + args.keep_c3 * u ** 3
+
+
 def _dataset_to_lists(ds):
     """Explode an AmplitudeDataset (round-0 train pool) back into per-event lists to seed the pool."""
     pf = ds.particles_flat.cpu().numpy()
@@ -312,6 +368,25 @@ def main():
     ap.add_argument("--n_total", type=int, default=300000)
     ap.add_argument("--rounds", type=int, default=10)
     ap.add_argument("--gamma", type=float, default=1.0, help="sigma arm: p(x) ∝ sigma^gamma")
+    # Polynomial generalisation of the keep rule: log w = c1*u + c2*u^2 + c3*u^3, u = log sigma -
+    # median. c1 defaults to --gamma and c2=c3=0, so omitting these reproduces p ∝ sigma^gamma
+    # EXACTLY and every existing gamma result stands unchanged. See keep_logweight().
+    ap.add_argument("--keep_c1", type=float, default=None,
+                    help="keep rule linear coeff (default: --gamma, i.e. the plain power law)")
+    ap.add_argument("--keep_c2", type=float, default=0.0, help="keep rule quadratic coeff in log-sigma")
+    ap.add_argument("--keep_c3", type=float, default=0.0, help="keep rule cubic coeff in log-sigma")
+    # Saturation: how much data does a region actually need? Logs, every round, the sigma distribution
+    # over the FRESH proposal batch (drawn from the same base every round, so it is a like-for-like
+    # measure of the model's remaining uncertainty over the whole space) alongside the pool size.
+    # A high-sigma tail that stops falling as the pool grows is the region saturating.
+    ap.add_argument("--sat_log", default=None,
+                    help="write per-round saturation diagnostics (pool size, sigma percentiles) to this json")
+    ap.add_argument("--stop_on_saturation", action="store_true",
+                    help="stop GROWING the pool (training continues) once the sigma tail plateaus")
+    ap.add_argument("--sat_tol", type=float, default=0.02,
+                    help="relative fall in the sigma p99 below which a round counts as saturated")
+    ap.add_argument("--sat_patience", type=int, default=2,
+                    help="consecutive saturated rounds required before data addition stops")
     ap.add_argument("--sigma0", type=float, default=0.1, help="sigma arm: initial sigma for grow_sigma_head")
     ap.add_argument("--oversample", type=float, default=4.0, help="propose oversample*inc_n, keep inc_n")
     ap.add_argument("--y_lo", type=float, default=1e-6)
@@ -323,6 +398,10 @@ def main():
     ap.add_argument("--heldout_label", default=None,
                     help="label for the held-out npz (default: <base|sigma|g{γ}>_s{seed}, the plot tags)")
     ap.add_argument("--heldout_path", default=None, help="held-out npz (default: heldout_uugg_deepIR.npz)")
+    ap.add_argument("--objective", default="deep", choices=["deep", "overall", "logflat"],
+                    help="which held-out metric becomes val_loss in --result_path (sweep objective). "
+                         "'deep' is the historical default; 'logflat' is correct for concentration "
+                         "trade-off questions -- 'deep' rewards starving the bulk.")
     ap.add_argument("--result_path", default=None,
                     help="if set, write {'val_loss': deep-IR MSE, ...} here after the held-out eval "
                          "(the objective a DyHPO sweep reads).")
@@ -330,6 +409,8 @@ def main():
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
 
+    if args.keep_c1 is None:
+        args.keep_c1 = args.gamma             # degree-1 default == the plain sigma^gamma power law
     set_process(args.process)                 # point PDG/NP/MASSES/STANDALONE/DATASET at this process
     tag = args.tag or args.process
     R = args.rounds
@@ -439,30 +520,79 @@ def main():
             "amps": list(pool_lists[2]), "orders": list(pool_lists[3]), "pids": list(pool_lists[4])}
     print(f"[pool] round-0 train pool seeded: {len(pool['parts'])} events", flush=True)
 
+    # --- saturation state: per-round record + the "stop growing" latch ---
+    sat = {"rounds": [], "stopped_at": None, "n_saturated": 0, "prev_p99": None}
+
+    def saturation_probe(r, sig, pool_n):
+        """Record how much uncertainty is left, and decide whether the pool has saturated.
+
+        The probe is the sigma distribution over the FRESH proposal batch. That batch is drawn from
+        the same fixed base proposal every round, so its sigma percentiles are directly comparable
+        across rounds and measure the model's remaining uncertainty over the whole space -- unlike a
+        pool statistic, which drifts because the pool itself is being reshaped by the keep rule.
+        The p99 (the hard tail) is the stopping statistic: the bulk saturates long before the
+        singular region does, so a mean would call saturation far too early."""
+        p50, p90, p99 = (float(x) for x in np.percentile(sig, [50, 90, 99]))
+        rec = {"round": int(r), "pool": int(pool_n), "sigma_p50": p50,
+               "sigma_p90": p90, "sigma_p99": p99, "sigma_mean": float(sig.mean())}
+        prev = sat["prev_p99"]
+        rec["rel_drop_p99"] = (float((prev - p99) / prev) if prev else None)
+        if prev is not None and (prev - p99) / prev < args.sat_tol:
+            sat["n_saturated"] += 1
+        else:
+            sat["n_saturated"] = 0
+        sat["prev_p99"] = p99
+        rec["n_saturated"] = sat["n_saturated"]
+        sat["rounds"].append(rec)
+        if args.sat_log:
+            import json
+            with open(args.sat_log, "w") as f:
+                json.dump({"process": args.process, "arm": args.arm, "seed": args.seed,
+                           "gamma": args.gamma, "n_total": args.n_total, "rounds": sat["rounds"],
+                           "stopped_at": sat["stopped_at"]}, f, indent=2)
+        return sat["n_saturated"] >= args.sat_patience
+
     def online_hook(step):
         r = step // steps_per_round
         rng = np.random.default_rng(2000 + args.seed * 97 + r)
+        if sat["stopped_at"] is not None:
+            print(f"[round {r}] pool SATURATED at round {sat['stopped_at']} "
+                  f"(pool={len(pool['parts'])}); training on, not growing", flush=True)
+            return
         M = int(round(args.oversample * inc_n))
         P_prop = propose_momenta(M, args.y_lo, args.mix_ir, LOW_CUTS, rng)
         keep_n = min(inc_n, len(P_prop))
-        if args.arm in ("sigma", "bbb"):
+        # The base arm needs no sigma to CHOOSE, but the saturation probe needs one to MEASURE. Both
+        # arms carry the same detached sigma head, so scoring the base arm costs one extra forward and
+        # keeps the saturation curves comparable between arms.
+        want_sat = bool(args.sat_log or args.stop_on_saturation)
+        sig = None
+        if args.arm in ("sigma", "bbb") or want_sat:
             # score fresh proposals by the LIVE model's uncertainty; keep WITHOUT replacement ∝ σ^γ.
             # sigma arm = het-head aleatoric σ; bbb arm = epistemic predictive std (K posterior samples).
             if args.arm == "bbb":
                 sig = score_epistemic(exp, P_prop, args.bbb_ksamples)
             else:
                 sig = score_sigma(exp, P_prop)
-            # p ∝ sigma^gamma, computed in LOG space and max-shifted. Mathematically identical to
-            # sigma**gamma / sum, but safe at large gamma: a direct power underflows to exact 0 for the
-            # small-sigma tail once gamma is big (sigma~1e-2, gamma~30 -> 1e-60, and worse for wider
-            # spreads), and if fewer than keep_n entries stay non-zero np.random.choice(replace=False)
-            # raises "Fewer non-zero entries in p than size". Large gamma is the greedy-top-k limit.
-            logw = args.gamma * np.log(np.clip(sig, 1e-12, None))
+        if args.arm in ("sigma", "bbb"):
+            # Keep-rule weight, always built in LOG space and max-shifted. Mathematically identical
+            # to the direct power, but safe at large gamma: a direct sigma**gamma underflows to exact
+            # 0 for the small-sigma tail once gamma is big (sigma~1e-2, gamma~30 -> 1e-60, worse for
+            # wider spreads), and if fewer than keep_n entries stay non-zero
+            # np.random.choice(replace=False) raises "Fewer non-zero entries in p than size".
+            logw = keep_logweight(sig, args)
             w = np.exp(logw - logw.max())
             p = w / w.sum()
             keep = rng.choice(len(P_prop), size=keep_n, replace=False, p=p)
+            # Spearman(logw, sigma) instruments MONOTONICITY of the keep rule. For the pure power law
+            # it is identically +1; a polynomial with negative curvature can turn over and start
+            # up-weighting the LOW-sigma tail, which is a pathology worth seeing rather than assuming
+            # away, so it is logged rather than forbidden.
+            def _rank(a): return np.argsort(np.argsort(a))
+            mono = float(np.corrcoef(_rank(logw), _rank(sig))[0, 1])
             print(f"[round {r}] {args.arm} σ p50/90/99={np.percentile(sig,[50,90,99])} "
-                  f"kept σ mean={sig[keep].mean():.3g} vs all {sig.mean():.3g}", flush=True)
+                  f"kept σ mean={sig[keep].mean():.3g} vs all {sig.mean():.3g} "
+                  f"keep-rule monotonicity ρ={mono:+.3f}", flush=True)
         else:
             keep = rng.choice(len(P_prop), size=keep_n, replace=False)          # base arm: uniform
         P_keep = P_prop[keep]
@@ -475,6 +605,18 @@ def main():
         _make_train_loader(exp, pool)
         print(f"[round {r}] +{len(P_keep)} events -> pool={len(pool['parts'])} "
               f"(step {step}/{args.total_steps})", flush=True)
+        # Probe AFTER the pool has grown, so `pool` is the size that produced the next round's sigma.
+        if want_sat:
+            saturated = saturation_probe(r, sig, len(pool["parts"]))
+            rec = sat["rounds"][-1]
+            drop = rec["rel_drop_p99"]
+            drop_s = "n/a" if drop is None else f"{drop:.2%}"
+            print(f"[round {r}] saturation: σ p99={rec['sigma_p99']:.4g} (drop {drop_s}) "
+                  f"consec_saturated={rec['n_saturated']}", flush=True)
+            if saturated and args.stop_on_saturation and sat["stopped_at"] is None:
+                sat["stopped_at"] = int(r)
+                print(f"[round {r}] SATURATION REACHED -> pool frozen at {len(pool['parts'])} events "
+                      f"({args.sat_patience} rounds with <{args.sat_tol:.1%} σ-p99 fall)", flush=True)
 
     # --- drive the round loop by MONKEYPATCHING exp._cycle (no core-module edit) ---
     # train() builds its training iterator once via `iter(self._cycle(self.train_loader))` and pulls
@@ -533,11 +675,20 @@ def main():
             # a sweep reads the objective from here (val_loss = the deep-IR MSE we minimise).
             if args.result_path and isinstance(metrics, dict):
                 import json
+                # Which metric the sweep minimises. 'deep' is the historical default (the BBB sweep
+                # used it); 'logflat' is the right choice for any question about the concentration
+                # trade-off, since 'deep' rewards starving the bulk and 'overall' is bulk-dominated.
+                key = {"deep": "deep_mse", "overall": "overall_mse",
+                       "logflat": "logflat_mse"}[args.objective]
                 with open(args.result_path, "w") as f:
-                    json.dump({"val_loss": metrics["deep_mse"], "overall_mse": metrics["overall_mse"],
-                               "deep_mse": metrics["deep_mse"], "arm": args.arm, "gamma": args.gamma,
+                    json.dump({"val_loss": metrics[key], "objective": args.objective,
+                               "overall_mse": metrics["overall_mse"], "deep_mse": metrics["deep_mse"],
+                               "logflat_mse": metrics.get("logflat_mse"),
+                               "arm": args.arm, "gamma": args.gamma,
+                               "keep_c1": args.keep_c1, "keep_c2": args.keep_c2,
+                               "keep_c3": args.keep_c3,
                                "bbb_beta": args.bbb_beta, "bbb_sigma_rel": args.bbb_sigma_rel}, f)
-                print(f"[result] wrote {args.result_path} val_loss(deep_mse)={metrics['deep_mse']:.6e}",
+                print(f"[result] wrote {args.result_path} val_loss({key})={metrics[key]:.6e}",
                       flush=True)
         exp.compress_models()
     print(f"[done] arm={args.arm} run={run_name}", flush=True)

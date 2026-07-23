@@ -22,13 +22,18 @@ import l2_online_uugg as L   # propose_momenta / label_events / PDG   # noqa: E4
 def ir_observables(P):
     """y_min (min gluon-involving pair invariant / s) and x_gmin (softest gluon energy frac).
     Process-agnostic: gluon/coloured indices come from the l2_online_uugg registry (L.GLUONS/COLORED),
-    so this works for uug (1 gluon), uugg (2), uuggg (3)."""
+    so this works for uug (1 gluon), uugg (2), uuggg (3), and massive finals (bbbarg).
+
+    MASS-CORRECT collinear variable: y_ij = 2 p_i.p_j / s, NOT s_ij/s. For massless legs the two are
+    identical (s_ij = 2 p_i.p_j), so every existing massless result is unchanged; for a massive quark
+    s_ij/s would floor at m_q^2/s and never approach zero, hiding the soft limit and mislabelling the
+    dead cone. 2 p_i.p_j is the invariant that actually appears in the eikonal/collinear factors."""
     def dot(a, b): return a[..., 0] * b[..., 0] - (a[..., 1:] * b[..., 1:]).sum(-1)
     Q = P[:, 0] + P[:, 1]; s = dot(Q, Q)
     glu = L.GLUONS; colored = L.COLORED; gset = set(glu)
     pairs = [(colored[a], colored[b]) for a in range(len(colored)) for b in range(a + 1, len(colored))
              if (colored[a] in gset or colored[b] in gset)]
-    yv = np.stack([dot(P[:, i] + P[:, j], P[:, i] + P[:, j]) / s for i, j in pairs], 1)
+    yv = np.stack([2.0 * dot(P[:, i], P[:, j]) / s for i, j in pairs], 1)
     y_min = np.clip(yv, 1e-14, None).min(1)
     xg = np.stack([2.0 * dot(P[:, g], Q) / s for g in glu], 1)
     return y_min, xg.min(1), 2.0 * P[:, 0, 0]   # y_min, x_gmin, sqrt_s (CM: 2*E_beam)

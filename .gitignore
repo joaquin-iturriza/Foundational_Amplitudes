@@ -82,9 +82,12 @@ core.[0-9]*
 # feature worktrees live under the repo (worktrees/wt-<feat>), never outside it
 /worktrees/
 data_ho_f*/
-
 # latex build intermediates
 docs/results.aux
 docs/results.toc
 docs/results.fls
 docs/results.fdb_latexmk
+
+# regenerable eval data (produced by L2 runs)
+analysis/divergences/*.npz
+analysis/divergences/satlogs/

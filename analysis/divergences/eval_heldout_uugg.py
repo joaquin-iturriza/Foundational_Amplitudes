@@ -139,10 +139,23 @@ def score_and_save(exp, label, heldout_path=DEFAULT_HELDOUT, mc_samples=1):
              sigma=(sigma.reshape(-1) if sigma is not None else np.array([])),
              pred_std=(pred_std_logamp.reshape(-1) if pred_std_logamp is not None else np.array([])))
     print(f"  saved {out}", flush=True)
-    # return the objective(s) so a sweep can read them without re-parsing stdout: overall MSE (the
-    # comparison metric) + the deep-IR (y_min<1e-3) MSE.
+    # Return the objective(s) so a sweep can read them without re-parsing stdout.
+    #   overall_mse : plain event mean. BULK-DOMINATED -- the held-out set is deep-IR-heavy by
+    #                 construction in some processes and bulk-heavy in others, so this is not a
+    #                 like-for-like objective across arms.
+    #   deep_mse    : y_min<1e-3 only. Ignores what concentration COSTS in the bulk, so optimising it
+    #                 just drives the keep rule harder and harder -- the wrong objective for any
+    #                 question about the concentration trade-off.
+    #   logflat_mse : mean of the per-decade MSEs, every decade counting once however many events it
+    #                 holds. This is the honest scoring rule for the trade-off (see the Q2 metric
+    #                 correction in results.tex) and the right default sweep objective.
     deep_mse = float(err2[y_min < 1e-3].mean()) if (y_min < 1e-3).any() else float(err2.mean())
-    return {"npz": out, "overall_mse": float(err2.mean()), "deep_mse": deep_mse}
+    per_decade = [err2[(y_min >= lo) & (y_min < hi)].mean()
+                  for lo, hi in DECADES if ((y_min >= lo) & (y_min < hi)).sum() > 0]
+    logflat_mse = float(np.mean(per_decade)) if per_decade else float(err2.mean())
+    print(f"  LOG-FLAT (mean of {len(per_decade)} per-decade MSEs) = {logflat_mse:.4e}", flush=True)
+    return {"npz": out, "overall_mse": float(err2.mean()), "deep_mse": deep_mse,
+            "logflat_mse": logflat_mse}
 
 
 def _load_ckpt_state(run_dir, ckpt):

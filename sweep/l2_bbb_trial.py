@@ -50,6 +50,7 @@ def build_l2_cmd(cfg, hp_params, t_steps, tag, result_path):
            "--bbb_ksamples", str(fp.get("bbb_ksamples", 8)),
            "--y_lo", str(fp.get("y_lo", 1e-6)),
            "--mix_ir", str(fp.get("mix_ir", 0.5)),
+           "--objective", str(fp.get("objective", "deep")),
            "--heldout_eval", "--result_path", result_path]
     # HPs the sweep varies (bare names -> --<name> <val>)
     for key, val in hp_params.items():
