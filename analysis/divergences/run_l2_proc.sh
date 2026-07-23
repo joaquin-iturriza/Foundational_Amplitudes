@@ -24,6 +24,11 @@ STEPS=${STEPS:-4000}; NTOTAL=${NTOTAL:-300000}; ROUNDS=${ROUNDS:-10}
 # TAG lets an N-sweep keep its run dirs disjoint (run_name embeds the tag).
 SAT_LOG=${SAT_LOG:-}; TAG=${TAG:-$PROCESS}
 EXTRA=""; [ -n "$SAT_LOG" ] && EXTRA="--sat_log $SAT_LOG"
+[ -n "${KEEP_C1:-}" ] && EXTRA="$EXTRA --keep_c1 $KEEP_C1"
+[ -n "${KEEP_C2:-}" ] && EXTRA="$EXTRA --keep_c2 $KEEP_C2"
+[ -n "${KEEP_C3:-}" ] && EXTRA="$EXTRA --keep_c3 $KEEP_C3"
+[ -n "${OBJECTIVE:-}" ] && EXTRA="$EXTRA --objective $OBJECTIVE"
+[ -n "${HLABEL:-}" ] && EXTRA="$EXTRA --heldout_label $HLABEL"
 python analysis/divergences/l2_online_uugg.py \
   --process $PROCESS --arm $ARM --tag $TAG --seed $SEED $EXTRA \
   --total_steps $STEPS --n_total $NTOTAL --rounds $ROUNDS \
