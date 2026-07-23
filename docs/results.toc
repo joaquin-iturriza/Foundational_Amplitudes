@@ -56,10 +56,11 @@
 \contentsline {paragraph}{L2 validated on $ee\to u\bar u gg$ --- $\sigma $-informed on-the-fly GENERATION beats uniform generation, coordinate-free.}{51}{section*.38}%
 \contentsline {paragraph}{The process-agnostic base generator: ``democratic'' phase space.}{52}{section*.39}%
 \contentsline {paragraph}{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale, $u\bar u ggg$ more legs).}{56}{section*.40}%
-\contentsline {paragraph}{$\sigma $ resolved against the divergence coordinate --- and a \emph {pre-flight} test for the concentration principle.}{61}{section*.41}%
-\contentsline {paragraph}{A genuinely Bayesian $\sigma $ (full-network Bayes-by-backprop) does \emph {not} pay for itself.}{62}{section*.42}%
-\contentsline {paragraph}{Uncapped data: the uncertainty tail saturates, and it does so data-\emph {independently}.}{66}{section*.43}%
-\contentsline {subsection}{\numberline {11.6}Hand-off: open items}{67}{subsection.11.6}%
-\contentsline {section}{\numberline {12}Training throughput}{68}{section.12}%
-\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{68}{section.13}%
-\contentsline {section}{\numberline {14}Methodological principles}{69}{section.14}%
+\contentsline {paragraph}{A MASSIVE final state ($e^+e^-\to b\bar b g$) --- and a genuine out-of-sample test of the $\sigma $-contrast diagnostic.}{60}{section*.41}%
+\contentsline {paragraph}{$\sigma $ resolved against the divergence coordinate --- and a \emph {pre-flight} test for the concentration principle.}{62}{section*.42}%
+\contentsline {paragraph}{A genuinely Bayesian $\sigma $ (full-network Bayes-by-backprop) does \emph {not} pay for itself.}{63}{section*.43}%
+\contentsline {paragraph}{Uncapped data: the uncertainty tail saturates, and it does so data-\emph {independently}.}{67}{section*.44}%
+\contentsline {subsection}{\numberline {11.6}Hand-off: open items}{68}{subsection.11.6}%
+\contentsline {section}{\numberline {12}Training throughput}{69}{section.12}%
+\contentsline {section}{\numberline {13}The compute envelope: VRAM and step time}{69}{section.13}%
+\contentsline {section}{\numberline {14}Methodological principles}{70}{section.14}%

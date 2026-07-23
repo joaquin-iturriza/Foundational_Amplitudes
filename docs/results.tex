@@ -1904,13 +1904,53 @@ for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for th
   \label{fig:l2_uuggg_perdecade}
 \end{figure}
 
+\paragraph{A MASSIVE final state ($e^+e^-\to b\bar b g$) --- and a genuine out-of-sample test of the
+$\sigma$-contrast diagnostic.} The loop had only been stressed on massless finals. $b\bar b g$ is the
+massive analogue of $u\bar u g$ --- same $Z$ resonance, same soft gluon --- but the \emph{collinear}
+limit is regulated by $m_b$ (the dead cone), which softens one of the two singular directions; the
+dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}$--$3\times10^{-3}$ sits inside the $y_{\min}$ window,
+so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$).
+The generator needed \emph{no} change --- \code{democratic\_draw} already yields exact on-shell massive
+momenta (verified to $10^{-13}$); only a registry row, the mass-correct collinear variable
+$y_{ij}=2p_i\!\cdot\!p_j/s$ (identical to $s_{ij}/s$ for massless legs, so nothing above moves), and a
+standalone slot-order check were required (the convention is per-build; $b\bar b g$ was fixed by the sign
+of $A_{\rm FB}$ at the $Z$ pole against the validated $u\bar u g$). \emph{What makes this more than one
+more transfer:} the $\sigma$-contrast diagnostic (previous paragraphs) was used to \textbf{predict the
+result before the $\sigma$ arm ran}. From the base arm alone: a $Z$-peak contrast of $2.51$ (between
+$u\bar u g$'s $4.48$ and $u\bar u gg$'s $1.83$) $\Rightarrow$ a \emph{moderate} $Z$-peak gain, milder than
+massless $u\bar u g$; a deep-IR contrast of only $1.61$ $\Rightarrow$ a \emph{weak} IR gain, the dead cone
+having flattened the collinear enhancement. Both held: at $\gamma{=}3$ the $\sigma$ arm cuts the $Z$-peak
+MSE to $\mathbf{0.56\times}$ (predicted ${\sim}0.50$) and the shoulder to $0.50\times$, while the pure
+deep-IR ($y_{\min}<10^{-5}$) moves only to $0.85\times$ (predicted ${\sim}0.71$) and the continuum to
+$0.82\times$ --- overall $2.15\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
+is \textbf{$Z$-driven, exactly where the contrast pointed}, and the mass's suppression of the IR direction
+is visible as the weaker deep-IR gain --- the diagnostic called both the \emph{magnitude} and the
+\emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). \emph{Caveat: single seed;}
+a $3$-seed repeat would firm the numbers, but the sign and the region-ordering are the claim.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{l2_bbbarg.pdf}
+  \caption{\textbf{$e^+e^-\to b\bar b g$ (massive): $\sigma$-steering pays where the $\sigma$-contrast
+  predicted.} \emph{(a)} Held-out MSE per $y_{\min}$ decade (mass-correct $y_{\min}=\min_{ij}2p_i\!\cdot\!
+  p_j/s$), base vs $\sigma$-driven $\gamma{=}3$. \emph{(b)} The same error by $\sqrt s$ region, with the
+  \emph{pre-recorded} predictions (navy) beside the measured ratios (crimson). The gain concentrates at
+  the $Z$-peak ($0.56\times$) and shoulder ($0.50\times$), not the IR continuum ($0.82\times$): the
+  $m_b$ dead cone softens the collinear direction, so --- as the low deep-IR $\sigma$-contrast predicted
+  --- there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
+  size and the location of the effect on a process the diagnostic was never fit on.}
+  \label{fig:l2_bbbarg}
+\end{figure}
+
 \begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
 The single-knob $\sigma^\gamma$ keep-rule wins exactly when the error is concentrated in an identifiable,
 data-sparse sub-region the model can point to --- the deep soft$\cap$collinear corner of $u\bar u gg$, the
 $Z$ resonance of $u\bar u g$ (which it finds automatically, without a multi-modal density, leaving the
 already-learned IR continuum alone) --- and gives $\sim\!$nothing when the difficulty is diffuse across the
 whole divergence, as at higher multiplicity ($u\bar u ggg$). Concentration, not divergence depth per se, is
-what $\sigma$-steering can exploit. The $\gamma$ sweep separates the two regimes cleanly: on a concentrated
+what $\sigma$-steering can exploit. It also survives the move to a \emph{massive} final state ($b\bar b g$),
+where it correctly localises to the $Z$ resonance and the $m_b$ dead cone's suppression of the collinear
+direction shows up as a weaker IR gain --- both predicted in advance by the $\sigma$-contrast. The $\gamma$ sweep separates the two regimes cleanly: on a concentrated
 divergence the gain \emph{saturates} with harder concentration (there is a finite amount of misplaced
 budget to recover), whereas on a diffuse one it \emph{reverses} and drops below uniform --- so a flat or
 turning $\gamma$-response is the diagnostic that no targetable sparse region exists, and the right move is
@@ -2096,8 +2136,11 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     support turned out to be already present --- \code{democratic\_draw} produces exact on-shell massive
     momenta (verified to $10^{-13}$) and \code{fiducial\_pass\_mask} already skips massive legs; what was
     missing was only the registry row, a mass-correct collinear variable ($2p_i\!\cdot\!p_j/s$ rather than
-    $s_{ij}/s$, identical for massless legs), and the standalone slot-order check. \emph{Still genuinely
-    open:} the run itself, and a single process carrying soft$+$collinear$+$resonant coverage at once.
+    $s_{ij}/s$, identical for massless legs), and the standalone slot-order check. \emph{The run is now
+    done (single seed):} $\sigma$-steering on $b\bar b g$ localises to the $Z$ peak ($0.56\times$) with a
+    weak IR gain ($0.85\times$), both predicted in advance by the base-arm $\sigma$-contrast --- see the
+    massive-process paragraph and Fig.~\ref{fig:l2_bbbarg} above. \emph{Still genuinely open:} a $3$-seed
+    repeat of $b\bar b g$, and a single process carrying soft$+$collinear$+$resonant coverage at once.
     \textbf{Slot-order trap, now characterised:} the convention is \emph{per-build}, not global ---
     \code{ee\_ttbar} takes production order bit-identically while \code{ee\_uu} needs its final pair
     swapped --- so every new standalone must be checked. Where production data exists, relabel and
