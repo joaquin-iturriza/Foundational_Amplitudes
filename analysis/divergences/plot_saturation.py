@@ -34,8 +34,18 @@ COLORS = {75000: "steelblue", 150000: "darkorange", 300000: "seagreen", 600000: 
 
 
 def load(arm):
+    """Load every satlog for `arm`. Raises if none are found: a missing satlogs dir must NOT
+    silently yield an empty figure -- that once shipped a blank plot into the paper build after the
+    logs were deleted with a worktree. Fail loudly instead."""
+    files = sorted(glob.glob(os.path.join(HERE, f"satlogs/uugg_{arm}_n*.json")))
+    if not files:
+        raise SystemExit(
+            f"[plot_saturation] no satlogs matching satlogs/uugg_{arm}_n*.json under {HERE}.\n"
+            f"  These are written by l2_online_uugg.py --sat_log and are gitignored (regenerable).\n"
+            f"  Re-run: PROCESS=uugg ARM={arm} NTOTAL=<N> TAG=sat<N> "
+            f"SAT_LOG=analysis/divergences/satlogs/uugg_{arm}_n<N>.json sbatch analysis/divergences/run_l2_proc.sh")
     out = {}
-    for f in sorted(glob.glob(os.path.join(HERE, f"satlogs/uugg_{arm}_n*.json"))):
+    for f in files:
         d = json.load(open(f))
         rr = d["rounds"]
         out[d["n_total"]] = dict(
