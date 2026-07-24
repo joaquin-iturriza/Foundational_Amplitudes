@@ -7,11 +7,15 @@ comparable across rounds). The p99 -- the hard tail, i.e. the singular region th
 left behind -- is the stopping statistic: when it stops falling as the pool grows, that region has
 absorbed all the data it can at this model size / horizon, and adding more is waste.
 
-Panel (a): sigma p99 vs POOL SIZE for several n_total budgets. The curves do NOT collapse on pool
-(a larger budget takes fewer optimizer steps to reach a given pool, so its live sigma sits higher
-there); the point is that all budgets converge to the SAME tail floor (~0.046) by end of training,
-and 8x more data does not lower it -- the deep region is saturated by ~75k events at this model size
-and horizon, so more data there is waste.
+Panel (a): sigma p99 vs POOL SIZE for several n_total budgets. The end-of-training floor is
+essentially flat in the data budget -- base 0.0448/0.0468/0.0477 and sigma 0.0420/0.0418/0.0427 at
+N=75k/150k/600k -- i.e. 8x more generated data does NOT lower it (for the base arm it is marginally
+WORSE, +6.4%). IMPORTANT CONFOUND: every run uses the same 4000 steps, so a larger pool gets
+proportionally less optimization per event (~870 passes at 75k vs ~109 at 600k). The defensible claim
+is therefore "at FIXED optimizer budget, more unique data buys no reduction in residual uncertainty",
+i.e. the binding constraint here is capacity/optimization rather than coverage -- NOT that 75k events
+is all this region could ever absorb. Separating the two needs a fixed-EPOCH (steps scaled with data)
+or capacity sweep. Note also the sigma arm floors ~8% below base at every budget.
 Panel (b): the per-round fractional fall in p99. Crossing below the tolerance band (and staying there
 for `patience` rounds) is the machine-checkable stopping rule the --stop_on_saturation latch uses.
 
@@ -71,9 +75,9 @@ for arm, ls, mk in [("base", "-", "o"), ("sigma", "--", "s")]:
 ax.set_xscale("log"); ax.set_yscale("log")
 ax.set_xlabel("training pool size (events)")
 ax.set_ylabel(r"$\sigma$ tail (p99) over the fresh proposal batch")
-ax.axhspan(0.042, 0.050, color="k", alpha=0.06)
-ax.text(ax.get_xlim()[0]*1.1, 0.046, "common floor ~0.046", fontsize=8, va="center")
-ax.set_title("(a) every budget converges to the same $\\sigma$-tail floor", fontsize=10.5)
+ax.axhspan(0.041, 0.049, color="k", alpha=0.06)
+ax.text(ax.get_xlim()[0]*1.1, 0.045, "floor 0.042-0.048\n(8x data changes it by <7%)", fontsize=8, va="center")
+ax.set_title("(a) 8$\\times$ more data does not lower the $\\sigma$-tail floor", fontsize=10.5)
 ax.grid(True, which="both", alpha=0.25)
 ax.legend(fontsize=7.5, ncol=2, loc="upper right")
 
@@ -94,8 +98,7 @@ ax.set_title("(b) the stopping rule: fall drops below tolerance", fontsize=10.5)
 ax.grid(True, which="both", alpha=0.25)
 ax.legend(fontsize=8, loc="upper right")
 
-fig.suptitle(r"Saturation: the uncertainty tail converges to a data-independent floor -- more data past "
-             r"$\sim$75k does not lower it", fontsize=12)
+fig.suptitle(r"Saturation: at fixed optimizer budget the uncertainty tail floors regardless of data volume", fontsize=12)
 fig.tight_layout(rect=[0, 0, 1, 0.96])
 base_path = os.path.join(HERE, "figs", "l2_saturation")
 os.makedirs(os.path.dirname(base_path), exist_ok=True)

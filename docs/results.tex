@@ -1390,8 +1390,9 @@ predictor of the steering gain (no A/B needed); (ii) it transfers to a \emph{mas
 ($b\bar b g$), where the contrast correctly predicted a $Z$-localised gain and the $m_b$-dead-cone
 softening of the IR, in advance; (iii) the keep rule's shape is settled --- a nested polynomial confirms
 \emph{positive curvature} is the right direction but does not robustly beat the simple $\sigma^\gamma$
-temperature over seeds, and the $\sigma$-tail \emph{saturates} at a data-independent floor, giving a
-stopping rule for how much to generate. Tooling under \code{analysis/divergences/};
+temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$ more data does not move
+(at fixed optimizer budget --- so the binding constraint is capacity, not coverage), giving a stopping
+rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 
@@ -2126,7 +2127,7 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
   \label{fig:l2_poly_keep}
 \end{figure}
 
-\paragraph{Uncapped data: the uncertainty tail saturates, and it does so data-\emph{independently}.}
+\paragraph{Uncapped data: the uncertainty tail floors, and more data does not move it.}
 Every A/B above is at a fixed data budget. The complementary question --- \emph{how much} data a region
 actually needs before more is waste --- the loop can now answer directly, because the same $\sigma$ it
 uses to steer is also a saturation gauge. At each round it records the $\sigma$ distribution over the
@@ -2135,34 +2136,62 @@ measure of the model's remaining uncertainty over the whole space, unlike a pool
 drifts as the keep rule reshapes the pool); the $p99$ --- the hard tail, i.e.\ the singular region the
 bulk has long since left --- is the stopping statistic, since a mean would call saturation far too early
 (the bulk saturates first). Running $u\bar u gg$ at $N\!\in\!\{75,150,600\}$k (\code{--sat\_log},
-\code{plot\_saturation.py}, Fig.~\ref{fig:l2_saturation}): the $\sigma$-$p99$ falls steeply then
-\textbf{floors at ${\approx}0.046$ \emph{regardless of budget}} --- $75$k reaches $0.0457$, $150$k
-$0.0465$, $600$k $0.0498$ (still descending only because its larger per-round increment has taken fewer
-optimizer steps to the same wall-clock). So $8\times$ more data does \emph{not} lower the floor: at this
-model size and horizon the deep region is saturated by ${\sim}75$k events, and the floor is set by
-capacity/horizon, not data volume. The per-round fractional fall in $p99$ crossing (and staying below) a
-$2\%$ tolerance is a machine-checkable stopping rule --- the \code{--stop\_on\_saturation} latch freezes
-the pool there and lets training continue --- so the loop can add data until a region saturates instead
-of running to a fixed cap. This also makes the ``add more capacity, not more data'' half of the
-concentration principle actionable: a floored $\sigma$-tail that no longer falls with data is the signal
-to stop generating and grow the model.
+\code{plot\_saturation.py}, Fig.~\ref{fig:l2_saturation}): the $\sigma$-$p99$ falls steeply and then
+\textbf{floors at a level essentially independent of the data budget} --- base arm $0.0448$, $0.0468$,
+$0.0477$ and $\sigma$ arm $0.0420$, $0.0418$, $0.0427$ at $N=75$k, $150$k, $600$k. \emph{$8\times$ more
+generated data does not lower the floor}; for the base arm it is marginally \emph{worse} ($+6.4\%$),
+against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep. (The $\sigma$ arm also
+floors ${\sim}8\%$ \emph{below} base at every budget --- an independent sign that $\sigma$-steering
+removes more of the hard tail than uniform generation.)
+
+\emph{What this does and does not establish --- the compute confound.} Every run here uses the
+\textbf{same $4000$ steps} at batch $16384$, i.e.\ ${\sim}65$M example-presentations regardless of pool
+size: ${\sim}870$ passes over a $75$k pool but only ${\sim}109$ over a $600$k one. Data volume and
+per-example optimisation are therefore \emph{confounded}, and the slight \emph{rise} of the base floor
+with $N$ is exactly what that confound predicts. So the defensible claim is ``\textbf{at a fixed
+optimizer budget, $8\times$ more unique data buys no reduction in residual uncertainty}'' --- i.e.\ the
+binding constraint in this configuration is capacity/optimisation rather than coverage --- and \emph{not}
+that ${\sim}75$k events is all this region could ever absorb. Separating the two needs a fixed-\emph{epoch}
+design (steps scaled with data) or a capacity sweep; that is left open (Sec.~\ref{sec:div-open}). A second,
+related caveat: within a run $\sigma$ falls both because the pool grows \emph{and} because the model
+trains longer, and the probe cannot separate those --- it is the \emph{cross-budget} comparison at
+end-of-training that carries the weight, not the within-run decay.
+
+The per-round fractional fall in $p99$ crossing (and staying below) a $2\%$ tolerance is nonetheless a
+machine-checkable stopping rule --- the \code{--stop\_on\_saturation} latch freezes the pool there and
+lets training continue --- so the loop can add data until the tail stops responding instead of running to
+a fixed cap. And it makes the ``add more capacity, not more data'' half of the concentration principle
+actionable: a floored $\sigma$-tail that no longer falls as data is added is the signal to stop
+generating and grow the model or the horizon.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{l2_saturation.pdf}
-  \caption{\textbf{Saturation: the uncertainty tail converges to a data-independent floor.} \emph{(a)}
-  $\sigma$-$p99$ over the fresh proposal batch vs pool size, for three data budgets on $u\bar u gg$. The
-  curves do not collapse on pool (a larger budget takes fewer optimizer steps to reach a given pool, so
-  its live $\sigma$ sits higher there), but all converge to the same ${\approx}0.046$ floor by end of
-  training --- $8\times$ more data does not lower it, so ${\sim}75$k events already saturate the deep
-  region at this model size/horizon. \emph{(b)} The per-round fractional fall in $p99$; crossing below
-  the $2\%$ tolerance band is the stopping rule the \code{--stop\_on\_saturation} latch uses.}
+  \caption{\textbf{At a fixed optimizer budget the uncertainty tail floors regardless of data volume.}
+  \emph{(a)} $\sigma$-$p99$ over the fresh proposal batch vs pool size, for three data budgets on
+  $u\bar u gg$. The curves do not collapse on pool (a larger budget has taken fewer optimizer steps by
+  the time it reaches a given pool, so its live $\sigma$ sits higher there); what matters is the
+  end-of-training floor, which is flat in the budget --- base $0.0448/0.0468/0.0477$, $\sigma$
+  $0.0420/0.0418/0.0427$ at $N{=}75/150/600$k. $8\times$ more data does not lower it, and for the base
+  arm marginally raises it. \emph{Caveat:} all runs share the same $4000$ steps, so a larger pool gets
+  proportionally less optimisation per event --- the honest reading is ``more data buys nothing \emph{at
+  fixed compute}'', not that $75$k saturates the region absolutely. \emph{(b)} The per-round fractional
+  fall in $p99$; crossing below the $2\%$ tolerance band is the stopping rule the
+  \code{--stop\_on\_saturation} latch uses.}
   \label{fig:l2_saturation}
 \end{figure}
 
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
+  \item \textbf{Disentangle data from compute in the saturation result.} The $\sigma$-tail floor is flat
+    in the data budget, but every run held the step count fixed at $4000$, so more data meant less
+    optimisation per event and the two axes are confounded (see the saturation paragraph). Two clean
+    follow-ups: (i) a \emph{fixed-epoch} sweep (scale \code{total\_steps} with $N$ so every event gets the
+    same number of passes) --- if the floor then falls with $N$, the constraint was compute, not data;
+    (ii) a \emph{capacity} axis at fixed data (vary \code{num\_heads}) --- if the floor falls with width,
+    that confirms ``grow the model'' as the right response to a floored tail, which is currently an
+    inference rather than a measurement. Cheap: the runs are ${\sim}13$--$45$ min each.
   \item \textbf{The $\mu$P-LLoCa $\sigma$-head subset is now on \code{jeanzay}} (cherry-picked, not a
     full \code{heterosc} merge): the $2$-channel (mean, softplus $\sigma$) HETEROSC output head with
     \code{detach\_sigma\_backbone}/\code{sigma\_after\_pool}, used by the L2 loop above. Cosmetic
