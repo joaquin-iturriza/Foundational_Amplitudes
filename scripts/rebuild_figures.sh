@@ -81,6 +81,17 @@ run l2_uugg_bbb_vs_het       $PY $D/plot_l2_compare.py \
                                        'het $\sigma$, $\gamma=3$=heldout_eval_g3_s0' \
                                        'BBB $\sigma$, $\gamma=3$=heldout_eval_uugg_bbb_g3_s0'
 
+echo "== sigma reweighting (Q2) =="
+# Both read the q2rw_eval_*.npz on disk; the shared metric layer is $D/q2_metrics.py, which
+# replaces the lost recompute_q2_logflat.py that results.tex used to cite.
+run q2_logflat               $PY $D/plot_q2_logflat.py
+run q2_rankmag               $PY $D/plot_q2_rankmag.py
+
+echo "== feature levers =="
+# Reads each arm's plots_0/per_process_metrics.json from compare_models/_levers_ab/,
+# produced by compare_models/run_levers_ab.sh (GPU, 2-task array).
+run levers_offshell_ab       $PY compare_models/plot_levers_ab.py
+
 echo "== HPO optima =="
 H=analysis/hpo_optima
 run hpo_optima_summary       $PY $H/make_fig.py       $H/hpo_optima.json $H/hpo_optima_summary
@@ -133,6 +144,7 @@ for f in docs/figs/*.pdf; do
   b=$(basename "$f" .pdf)
   other=$(ls analysis/hpo_optima/$b.pdf analysis/divergences/figs/$b.pdf \
              analysis/divergences/$b.pdf analysis/scaling_compute/$b.pdf \
+             compare_models/_levers_ab/$b.pdf compare_models/figs/$b.pdf \
              plots/$b.pdf 2>/dev/null | head -1)
   if [ -n "$other" ]; then
     echo "  SHADOWED  docs/figs/$b.pdf hides $other -- delete the docs/figs copy"

@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../sweeps/pretraining_scaling/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../sweeps/pretraining_scaling/}{../compare_models/figs/}{../compare_models/_levers_ab/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -571,9 +571,14 @@ off-shellness conditioning is on by default in the big-run recipes.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{levers_offshell_ab.pdf}
-  \caption{\textbf{Flagship off-shellness A/B.} Validation $\vlnr$ vs.\ training step for the
-  off-vs-on arms over the $44$-dataset $Z$/top/Higgs mixture (full data, fiducial cuts, 30k
-  iterations). Off-shellness conditioning lowers the achievable loss by $\sim\!50\times$.}
+  \caption{\textbf{Flagship off-shellness A/B} over the $44$-dataset $Z$/top/Higgs mixture (full
+  data, fiducial cuts, 30k iterations); best $\vlnr$ per dataset. \emph{Left:} the
+  $ee\!\to\!\mu\mu$ $M_Z$ scan. Without a mass feature the model can fit only one effective
+  $M_Z$, so the loss traces a U about the middle of the scanned range; the off-shellness feature
+  removes the dependence entirely and sits $\sim\!5$ decades lower. \emph{Right:} median per
+  resonance family, so the lever is seen to generalise past the $s$-channel $Z$ it was designed
+  for, though far more weakly ($2.7\times$ for $Z$-in-$4\ell$, $7.2\times$ for top,
+  $1.2\times$ for Higgs). Pooled over all $44$ datasets it lowers $\vlnr$ by $\sim\!50\times$.}
   \label{fig:levers}
 \end{figure}
 
@@ -1552,7 +1557,7 @@ $\Phi=\mathrm{sort}|r|$ reassigned by different orderings). \textbf{Metric corre
 the eval must weight each $y_{\min}$ decade \emph{equally} (log-flat-per-decade, the antenna-study
 metric), \emph{not} \code{np.mean}$(d^2)$ over all events: the antenna test set is $\sim$50\%
 below $y_{\min}\,10^{-3}$, so event-weighting is deep-IR-dominated
-(\code{recompute\_q2\_logflat.py}). Under equal footing: the real $\sigma$ head captures
+(\code{q2\_metrics.py}). Under equal footing: the real $\sigma$ head captures
 \textbf{$\sim$80\% of the perfect-oracle reweighting gain} (event-weighted $87$\%) and improves
 \emph{every} decade including the bulk. But the rank/magnitude split \emph{flips} versus the
 event-weighted view: \textbf{magnitude dominates}: ordering-alone gives only $11$\%, because
