@@ -2289,7 +2289,7 @@ all $n\le12$ on 16\,GB; at a practical $\mathrm{bs}=4096$ one fits $\nh=32$ for 
 time is set by the MLP ($\mathrm{FLOPs}_{\text{MLP}}\propto n\,d^2$ dominates attention's
 $n^2 d$ for $n\lesssim12$): it is linear in $n$ once the GPU is saturated
 ($\mathrm{bs}\gtrsim2048$) and grows as $t\propto\nh^{1.1}$, so throughput scales roughly as
-$1/\nh$. The full six-panel benchmark tables are in \code{notes/scaling\_notes.tex}.
+$1/\nh$.
 
 % ==========================================================================
 \section{Methodological principles}\label{sec:principles}

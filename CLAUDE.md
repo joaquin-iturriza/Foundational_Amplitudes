@@ -40,34 +40,26 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      submit; if it's **> 10 GPU-hours, stop and confirm with me first** (show the
      command + your estimate). Under that, just run it (still show me what you ran).
      Inspecting state (`squeue`, `scontrol`, reading logs) you can always just do.
-     - **Estimate total wall-time × GPUs across *all* jobs, and understand "small."**
-       "A quick A/B test" does **not** mean "a 20-job HPO sweep at 30 min each"
-       (= 10 GPU-h). Many of our runs train in **seconds to a few minutes**, so a
-       short per-run sweep over those can total **well under half a GPU-hour** —
-       *that* is small. Size the request to what I actually asked for; don't inflate
-       a quick check into a full sweep.
-   - **Git is NOT in the confirm-first set.** `git add`/`commit`/`push` (and
-     `git worktree`) happen freely and automatically — see the git workflow
-     section. Never ask permission to commit or push, and never conflate a `git
-     push` with submitting a job. The confirm-first rule is about cluster compute
-     (`sbatch`/sweeps), not git.
-   - File edits: do them directly.
+     - Estimate wall-time × GPUs across *all* jobs, and size the request to what I
+       actually asked for. Many runs train in seconds to minutes, so a short sweep
+       over those is well under half a GPU-hour; don't inflate a quick check into a
+       20-job sweep, and don't pad an estimate to avoid deciding.
+   - **Git and file edits are never confirm-first.** `git add`/`commit`/`push`/
+     `worktree` and edits happen freely (see the git workflow). Never conflate a
+     `git push` with submitting a job: the budget rule covers cluster compute only.
 
-3. **One centralized CLAUDE.md.** Keep all project guidance in this file.
-   Do not create per-directory `CLAUDE.md`/memory files; if you find others,
-   flag them for deletion. This also covers the Claude persistent-memory system
-   (`~/.claude/.../memory/`, `MEMORY.md`) — it's disabled in settings
-   (`autoMemoryEnabled: false`) and a hook blocks writes to it. Everything goes
-   in this file, which I maintain; only add here when I explicitly ask.
-   **This bans *any* new standalone `.md` / notes / findings / report / summary
-   file anywhere in the tree** — not just files literally named `CLAUDE.md`.
-   Writing conclusions into a fresh `FOO.md` next to some code/plots is exactly
-   the thing to avoid; **"it's a report/analysis write-up, not project guidance"
-   is NOT an exception.** If you think a doc is genuinely warranted, **ask first**;
-   if I approve, its path gets recorded in `.claude/md_allowlist.txt`. Editing an
-   *existing* file is fine; creating a *new* `.md` / `.tex` / `.rst` is not. The
-   only exemptions are `CLAUDE.md` and `README*`. Enforced by the `md_guard.sh`
-   `PreToolUse(Write)` hook.
+3. **One centralized CLAUDE.md, and no new docs.** All project guidance lives in
+   this file, which I maintain; add to it only when I ask. No per-directory
+   `CLAUDE.md`/memory files (flag any you find for deletion), and no Claude
+   persistent memory (`~/.claude/.../memory/`, `MEMORY.md`) — disabled via
+   `autoMemoryEnabled: false` and blocked by a hook.
+   **Creating any new `.md`/`.tex`/`.rst` anywhere in the tree is banned.** Results,
+   findings and reports go in `docs/results.tex`, never a fresh `FOO.md` next to some
+   code or plots; "it's a report, not guidance" is not an exception. Editing an
+   *existing* file is always fine. Exemptions: `CLAUDE.md`, `README*`, and
+   `.claude/agents|commands/*.md` (harness config in Claude Code's required format).
+   If a new doc is genuinely warranted, ask; on approval its path goes in
+   `.claude/md_allowlist.txt`. Enforced by `md_guard.sh` (`PreToolUse(Write)`).
 
    **In `docs/results.tex`, results and the hand-off don't mix:** a finished finding
    goes in its results section and its hand-off item is deleted; the hand-off holds
@@ -343,16 +335,15 @@ laws); the settled rules that govern how sweeps are set up:
    (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
    denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
    The `sweep_config*template.yaml` defaults already encode these ranges.
-6. **HP questions go through DyHPO — NEVER a hand-rolled grid, and DyHPO is used
-   SINGLE-FIDELITY** (`fidelity_schedule.t_steps: [T]`, one value; the multi-fidelity
-   ladder is not used here). This holds *whatever the question is phrased as*:
-   "is `clip_grad_norm` the culprit?" or "does it work at any `lr`?" are **HP searches**,
-   not diagnostics — reframing one as "just a mechanism test" is exactly the
-   rationalization that must not happen. It is not a style rule: HPs **interact**, so a
-   1-D grid at fixed everything-else answers "best `lr` *given those* values", cannot reach
-   a joint optimum (e.g. one needing `lr` *and* `beta` together), and will come back flat
-   — manufacturing a **false** "it doesn't work at any `lr`" conclusion. Sweep the coupled
-   space. Job arrays remain right for **non-HP** ablations (loss type, data tag, warm-start
+6. **HP questions go through DyHPO, single-fidelity** (`fidelity_schedule.t_steps:
+   [T]`, one value; the multi-fidelity ladder is unused here) — never a hand-rolled
+   grid, whatever the question is called. "Is `clip_grad_norm` the culprit?" and
+   "does it work at any `lr`?" are HP searches, not diagnostics. The reason is
+   substantive, not stylistic: HPs **interact**, so a 1-D grid at fixed
+   everything-else answers only "best `lr` *given those* values", cannot reach a joint
+   optimum (one needing `lr` *and* `beta` together), and comes back flat —
+   manufacturing a **false** "it doesn't work at any `lr`". Sweep the coupled space.
+   Job arrays stay right for **non-HP** ablations (loss type, data tag, warm-start
    checkpoint, ablation flags, seeds). Enforced by `hpo_guard.sh`.
 
 ---
@@ -372,13 +363,12 @@ being *fair* and *not wasteful*:
 4. **Only if the same-HP run is *not* better, sweep the feature fairly:** run the
    **same HPO sweep** for the new feature, find *its* best HP config, and compare
    best-vs-best. A feature can lose at the baseline's HPs but win at its own.
-5. **The comparison metric is the best NON-REGULARIZED val loss on the log-amplitude
-   values** — this matters a lot. Compare `val_loss_no_reg` (no L2/L1 reg term),
-   on log-amplitudes, **not** the regularized tracked loss.
-6. **Account for any preprocessing differences** between the two sides before
-   comparing — if the feature changes standardization/amp_trafos/etc., the val
-   losses aren't on the same scale and a raw comparison is meaningless. Make sure
-   you're comparing like with like.
+5. **Compare on `val_loss_no_reg`** — the best non-regularized val loss on
+   log-amplitudes, never the regularized tracked loss: `λ` is itself a tuned HP, so
+   comparing regularized losses confounds the metric with the search.
+6. **Re-base for preprocessing differences** before comparing. If the feature
+   changes standardization or `amp_trafos`, the two val losses aren't on the same
+   scale and the comparison is meaningless.
 
 ---
 
@@ -438,25 +428,14 @@ automatically instead of polling or forgetting.
   order ≤ 1, else auto-falls-back to repeat). Equivalence guards: `test_amp.py`
   Section 0. Read the code for details.
 - **Per-step host↔device syncs** — `LLOCA_SYNC` env toggle (default `deferred`,
-  `blocking` = original for A/B). `deferred` collapses the ~4 syncs/step into one
-  fused `torch.stack([loss, grad_norm(, loss_no_reg)]).tolist()` in
-  `base_experiment._step`, drops the pre-backward `loss.item()` and the per-step
-  `isfinite` assert (NaN now caught via the synced grad-norm → skip-step instead of
-  crash), and computes the xformers block-diagonal `seq_lens` on the **CPU** ptr in
-  `experiment._batch_loss_lloca` (threaded as `seq_lens=` through wrappers→net→
-  `build_block_diagonal_bias`) so the mask never `.tolist()`s the GPU ptr. Worth
-  only ~2% (the step was data-bound, not GPU-bound — see next bullet). `loss_no_reg`
-  is now a detached tensor, materialized at the consumer.
-- **Dataloading is the real per-step bottleneck — use `num_workers≥2`.** Profiling
-  (`LLOCA_PROFILE_STEP=1`, prints a data-vs-compute split at the end of `train()`)
-  showed dataloading was **69% (260ms) of a 380ms step** at `num_workers=0`: 8192
-  serial `__getitem__` + collate `cat` on the main thread with the GPU idle.
-  `num_workers=2` + `pin_memory` (auto for nw>0) + `non_blocking=True` H2D
-  (`_batch_loss_lloca`) overlaps it under compute → **0.356→0.128 s/iter (2.78x)**,
-  at the ~0.119s compute floor. **`config/local/none.yaml` now defaults
-  `num_workers: 2`** (was 0). `nw=4` no better; `nw=6` oversubscribes (`cpus-per-
-  task=8`) and hangs — stick with 2. Bench: `bench_workers_ab.sh` (sbatch, needs a
-  GPU — xformers attention is CUDA-only, crashes on login nodes).
+  `blocking` = original for A/B). `deferred` fuses the per-step syncs into one and
+  catches NaN via the synced grad-norm (skip-step instead of crash); NaN no longer
+  raises. Mechanism and measured gain: `docs/results.tex` § throughput.
+- **Dataloading is the per-step bottleneck — keep `num_workers: 2`.** It is the
+  default in `config/local/none.yaml`; `nw=4` is no better and `nw=6` oversubscribes
+  (`cpus-per-task=8`) and hangs. Profile with `LLOCA_PROFILE_STEP=1` (data-vs-compute
+  split at the end of `train()`); bench with `bench_workers_ab.sh` (needs a GPU via
+  sbatch). Numbers: `docs/results.tex` § throughput.
 - **Compute knobs** (default-on, A/B via config; attack the compute floor):
   `training.allow_tf32` (default true) sets `matmul/cudnn.allow_tf32` in
   `_init_backend` — **no-op on V100**, ~2x matmul on A100 (`gpu_p13`) at ~1e-3
@@ -504,6 +483,27 @@ per-task shell variable — because HP search goes through DyHPO (allowlist
 `.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
 tag, warm-start ckpt, ablation flags, seeds) stay allowed.
 
+### Batched pillar review (`review_backlog.sh` + three reviewer subagents)
+
+Three pillars each have a reviewer subagent in `.claude/agents/`:
+`CLAUDE.md` → **claudemd-keeper**, `docs/*.tex` → **notes-editor**, source →
+**repo-reviewer**. Review is **batched, not per-change**: each pillar carries a
+watermark (the commit it was last reviewed at, plus the size of the change reviewed
+then), and the `Stop` hook `review_backlog.sh check` only asks for a reviewer once
+that pillar's accumulated backlog crosses its threshold (80 changed lines or 8
+commits for `CLAUDE.md`/`.tex`, 200/12 for code). The reviewer then reads the
+**whole backlog at once**, which is the point: cross-edit problems (a rule now
+stated twice, a config default whose callers were not updated, a section that no
+longer reads as one argument) are invisible to a per-hunk review.
+
+- Commits are **never** blocked. Only the end of a turn is, once; ending the turn
+  again passes through, and it re-nudges next turn, so a pause is possible but a
+  backlog cannot be silently dropped.
+- On a pass a reviewer clears its own watermark via
+  `review_backlog.sh advance <name>`. Never run `advance` on a reviewer's behalf.
+- `review_backlog.sh status` shows all backlogs; `/review-now` runs the reviewers
+  on demand. Watermarks live in `.claude/.review_state/` (gitignored, per-checkout).
+
 **Branches**
 - **`jeanzay`** — the development trunk and default working branch. *Everything*
   lives here: the core code plus all tooling (`tools/`, `tests/`, `sweep/`,
@@ -522,22 +522,16 @@ tag, warm-start ckpt, ablation flags, seeds) stay allowed.
 
 **Working rules**
 1. **Do work on `jeanzay`** (or a feature branch off it).
-2. **Open a worktree for new work, by default — always UNDER this repo, never
-   outside it.** Create it at `worktrees/wt-<feat>` inside the project root:
-   `git worktree add worktrees/wt-<feat> -b <feat> jeanzay`, implement + verify
-   there, then merge back into `jeanzay` and `git worktree remove` it. **Do NOT
-   use `../wt-<feat>` or any path outside the project root** — sibling-dir
-   worktrees are confusing and unnecessary; keep them contained in `worktrees/`
-   (gitignored). Lets parallel experiments coexist without clobbering the trunk
-   checkout. **If a worktree ends up unused** (no commits beyond `jeanzay`, no
-   diff), just delete it — it cost nothing. The `worktree_guard.sh` hook nudges me when I edit trunk code
-   without one; for genuinely quick/standalone edits it's fine to proceed on the
-   trunk.
-3. **Commit small and often; pushing is automatic.** Commit with a clear message
-   after every significant change (small, frequent, readable commits over big
-   dumps). The `Stop` hook pushes for me — I do **not** ask permission to push and
-   do **not** need to remember `git push`; if I want it pushed mid-turn I just run
-   `git push` (allowlisted, no prompt).
+2. **Open a worktree for new work, always under this repo:**
+   `git worktree add worktrees/wt-<feat> -b <feat> jeanzay`, implement and verify
+   there, then merge back into `jeanzay` and `git worktree remove` it. Never
+   `../wt-<feat>` or any path outside the project root — keep them in `worktrees/`
+   (gitignored) so parallel experiments don't clobber the trunk checkout. Delete an
+   unused worktree; it cost nothing. `worktree_guard.sh` nudges when I edit trunk
+   code without one; for quick standalone edits it's fine to proceed on the trunk.
+3. **Commit small and often; pushing is automatic.** Small, frequent, readable
+   commits over big dumps. The `Stop` hook pushes already-committed work, so never
+   ask permission to push; to push mid-turn just run `git push` (allowlisted).
 4. **Publish the public core** with `scripts/publish_main.sh` (regenerates `main`
    from the allowlist and pushes). Run it after core-facing changes land on
    `jeanzay`. Use `--no-push` to review first.
