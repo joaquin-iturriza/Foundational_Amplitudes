@@ -50,6 +50,35 @@ invent a new one.
   log-amplitudes (`val_loss_no_reg`), and a claim that silently uses another metric, or
   compares across differing preprocessing, is a blocking finding.
 
+## Terminology: one term, one meaning (a BLOCKING axis, not a style nit)
+
+A term that carries a technical claim must mean exactly one thing across the whole file. The
+failure mode to hunt: a term used strictly in one section and loosely in another, where the
+loose use silently inherits the strict use's strength and inflates a result.
+
+**This is cheap to check and you must actually do it.** For every load-bearing term the
+backlog touches, `grep -n` it across the whole document and confirm all uses agree. Do this
+even when the term is not in the diff: the backlog may have introduced the *second*,
+conflicting use.
+
+Terms in this document whose scope changes what a number means:
+
+- **zero-shot** = the process was **never in training**. It does *not* mean "no fine-tuning";
+  that is "without fine-tuning". A process in the joint training mixture (`sec:system`) is
+  **in-distribution** however little adaptation it received. Getting this backwards turns a
+  good in-distribution fit into a spurious generalization claim, which is exactly what
+  happened once: three processes that are all in the 8-process training set were captioned
+  "zero-shot", next to an MSE of $9\times10^{-10}$.
+- **held-out** — distinguish a held-out *process* (absent from pretraining) from a held-out
+  *region or split* of a process that was trained on. Both appear here and they are not the
+  same claim.
+- **frozen** vs **fine-tuned**; **transfer** vs **generalization**; **converged** vs
+  **floored**; **oracle** vs the real learned signal.
+
+When a term's scope changes what a number means, say so and **block** — it is a claim error
+wearing a word's clothing. Propose the rewording; do not silently apply it, because choosing
+the convention is the author's call.
+
 ## Kill on sight (LLM tells)
 
 - **"not just X, but Y" / "it's not just … it's …"** antithesis scaffolding. Rewrite as a

@@ -94,7 +94,7 @@ particle set.
 \paragraph{Data.} Each dataset is one process, stored as rows of flat four-momenta
 ($4n$ numbers), the $n$ PDG identifiers, and the scalar $\amp$ in the last column.
 Events are generated over a range of centre-of-mass energy $\sqrt s$. The maintained
-joint set spans eight base processes ($ee\!\to\!WWZ,\,WW,\,t\bar t,\,u\bar u,\,u\bar ug,\,
+joint set spans eight base processes ($ee\!\to\!WWZ,\,WW,\,t\bar t,\,u\bar ug,\,
 u\bar ugg,\,\gamma\gamma,\,\gamma\gamma\gamma,\,u\bar u$) and, in the ``big-run'' recipes,
 of order $10^{2}$ datasets once the coupling-, mass-, and order-scans are included. A
 \emph{process} (or \emph{dataset}) index $p\in\{1,\dots,P\}$ labels which physical
@@ -1046,7 +1046,9 @@ sparsest, most collinear bins.
 
 \begin{table}[H]
 \centering
-\caption{Jointly-pretrained (zero-shot) $2\to2$ processes and their angular structure.}
+\caption{Jointly-pretrained (no fine-tuning) $2\to2$ processes and their angular structure.
+These processes are in the joint training mixture; the evaluation is in-distribution, and
+``zero-shot'' is reserved for genuinely held-out processes (Principle~\ref{prin:zeroshot}).}
 \label{tab:div_pretrain}
 \begin{tabular}{@{}lll@{}}
 \hline
@@ -1065,7 +1067,7 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{phase_space_pretrain_aa.pdf}
-  \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained (zero-shot).}
+  \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning.}
   $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$: truth, model,
   error (top); $\sqrt{s}$/$\cos\theta^*$ projections and predicted-vs-true (middle); and
   the collinear-resolved ramp in $\eta$ of Eq.~\eqref{eq:collinear} (bottom), where the
@@ -1209,11 +1211,14 @@ to recover it? Because the generator samples phase space flat (RAMBO), the diver
 region is data-starved by construction, so this is a controlled data-density experiment.
 All tooling is under \code{analysis/divergences/}.
 
-\paragraph{Setup.} The leave-out base is a 22-process foundation, the 25-dataset
-joint set minus the five final-state-gluon processes that share $u\bar u g$'s IR
+\paragraph{Setup.} The leave-out base is a 22-process foundation: the NLO joint
+set minus the five final-state-gluon processes that share $u\bar u g$'s IR
 ($u\bar u g,\,u\bar u gg,\,u\bar u ggg,\,d\bar d g,\,b\bar b g$; recipe
-\code{pretrain22\_heldout\_uug.yaml}, $200$k train/process, the adopted architecture of
-Sec.~\ref{sec:arch}), and reproduces every retained process to test MSE
+\code{pretrain22\_heldout\_uug.yaml}, $200$k train/process). It retains two NLO-virtual
+sets ($ee\,s\bar s$, $ee\,t\bar t$) and contains no $ee\to u\bar u$ at all, and it uses the
+encoder configuration adopted in Sec.~\ref{sec:bigrun} (no diagram encoder, linear embed)
+with the physical feature levers of Sec.~\ref{sec:levers} left \emph{off}, as in
+\code{pretrain25}. It reproduces every retained process to test MSE
 $\lesssim10^{-3}$. The divergence region is $y_{\min}<c$, with $y_{\min}$ the IR
 resolution variable of Eq.~\eqref{eq:ir} and $c=3.9\times10^{-2}$ (the $15$th percentile
 of $y_{\min}$ over the $10^6$-event $u\bar u g$ sample). Those events split into $850$k
@@ -1634,7 +1639,7 @@ $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0
 \end{figure}
 
 \paragraph{The generated fraction sweep: a clean interior optimum, and pure flat over-corrects.}
-$f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated fresh, same base8
+$f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated fresh, same base22
 ckpt/HPs/$N{=}400$k, common \textsc{rambo} test binned by $\sqrt{s}$, each arm de-standardized to true
 $\log|\mathcal{M}|^2$ (per-dataset standardization already handles the scale, so the earlier
 ``$\sigma$-scale confound'' worry was spurious). Under the equal-per-$\sqrt{s}$-decade (log-flat) metric:
@@ -1653,7 +1658,7 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   \includegraphics[width=\textwidth]{eeuu_genmix_fraction_sweep.pdf}
   \caption{\textbf{The generated fraction sweep on the $Z$ resonance: a clean interior optimum.}
   $f$ is the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
-  uniform-$\sqrt s$); same base8/HPs/$N{=}400$k throughout.
+  uniform-$\sqrt s$); same base22/HPs/$N{=}400$k throughout.
   \emph{Left: the interior optimum.} Three metrics vs $f$. The objective is the \emph{log-flat}
   one, defined under the panel: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
   however many events it holds; the plain event mean instead follows the bulk, which holds almost all
