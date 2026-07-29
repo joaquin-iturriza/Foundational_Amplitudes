@@ -79,6 +79,9 @@ core.[0-9]*
 # runtime marker for figure_pair_guard hook
 .claude/.figpair_last
 
+# per-checkout review watermarks (review_backlog.sh); local state, not shared
+.claude/.review_state/
+
 # feature worktrees live under the repo (worktrees/wt-<feat>), never outside it
 /worktrees/
 data_ho_f*/

@@ -37,9 +37,14 @@ case "$fp" in
 esac
 
 # Exemptions: CLAUDE.md and README* only, plus the harness plan-mode dir
-# (~/.claude/plans/*.md are plan-mode files outside the repo, not scattered repo docs).
+# (~/.claude/plans/*.md are plan-mode files outside the repo, not scattered repo docs)
+# and .claude/agents|commands/*.md — those are HARNESS CONFIG in Claude Code's own
+# required format (subagent + slash-command definitions must be .md with frontmatter),
+# not notes or findings. Rule #3 bans scattered prose; it does not ban tool config that
+# only happens to use a .md extension. The rest of .claude/ stays guarded.
 case "$fp" in
   */CLAUDE.md|*/README.md|*/README*.md|*/.claude/plans/*) exit 0 ;;
+  */.claude/agents/*.md|*/.claude/commands/*.md) exit 0 ;;
 esac
 
 # Editing an existing file is fine — only NEW files are "scattering".
