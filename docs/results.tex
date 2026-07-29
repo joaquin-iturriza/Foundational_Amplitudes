@@ -287,8 +287,9 @@ is itself a tuned hyperparameter, so comparing regularized losses would confound
 with the search. Two sides are only comparable when they share the preprocessing of
 \S\ref{sec:target}; a feature that changes standardization changes the scale of $\vlnr$
 and must be re-based before comparison. Two families of number in this note are deliberately
-\emph{not} $\vlnr$ and are not commensurable with it: the scaling curves of
-\S\ref{sec:scaling} report a held-out \emph{test} loss at the best-validation checkpoint, and
+\emph{not} $\vlnr$ and are not commensurable with it: the transfer compute-scans of
+\S\ref{sec:transfer} (Fig.~\ref{fig:transfer}) report a held-out \emph{test} loss at the
+best-validation checkpoint, and
 the divergence studies of \S\ref{sec:divergences} score raw $\log\amp$ error over a held-out
 phase-space \emph{region}, deliberately preprocessing-independent so that arms trained at
 different sampling densities stay comparable. Each is named where it is used.
@@ -2330,7 +2331,8 @@ The results above impose a concrete protocol on how sweeps, HPO, and comparisons
 best \emph{non-regularized} validation loss on
 log-amplitudes (Eq.~\ref{eq:vlnr}), never the regularized tracked loss, since $\lambda$ is a
 tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{prin:perproc}).
-The scaling and divergence sections use their own, named metrics (Def.~\ref{def:metric}); do
+The transfer compute-scans and the divergence studies use their own, named metrics
+(Def.~\ref{def:metric}); do
 not compare their numbers against $\vlnr$.
 \end{principle}
 \begin{principle} Never re-sweep $\eta$ across width: $\mu$P transfers it. Tune once at the
