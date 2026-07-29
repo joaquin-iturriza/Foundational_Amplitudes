@@ -1922,7 +1922,7 @@ deferral: at tree level $ee\to t\bar t$ has \textbf{no threshold divergence at a
 spans only $8.7\times$ in total and is \emph{flattest} at threshold ($\mathrm{std}\log|\mathcal M|^2
 = 0.022$ for $\beta<0.05$ against $0.665$ in the bulk), because the $2m_t$ cusp is a phase-space and
 cross-section feature, not an amplitude one; running it would have produced a guaranteed null that
-says nothing about the method. $b\bar b g$ is the replacement, and is the
+says nothing about the method. $b\bar b g$ is the replacement, and the direct
 massive analogue of $u\bar u g$ (same $Z$ resonance, same soft gluon), but the \emph{collinear}
 limit is regulated by $m_b$ (the dead cone), which softens one of the two singular directions; the
 dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}$--$3\times10^{-3}$ sits inside the $y_{\min}$ window,
@@ -1930,7 +1930,9 @@ so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$
 The generator needed \emph{no} change: \code{democratic\_draw} already yields exact on-shell massive
 momenta (verified to $10^{-13}$); only a registry row, the mass-correct collinear variable
 $y_{ij}=2p_i\!\cdot\!p_j/s$ (identical to $s_{ij}/s$ for massless legs, so nothing above moves), and a
-standalone slot-order check were required. That convention is \emph{per-build}, not global (\code{ee\_ttbar} takes production order bit-identically, \code{ee\_uu} needs its final pair swapped), so every new standalone must be checked; here it was settled by the sign
+standalone slot-order check were required. That convention is \emph{per-build}, not global
+(\code{ee\_ttbar} takes production order bit-identically, \code{ee\_uu} needs its final pair
+swapped), so every new standalone must be checked; here it was settled by the sign
 of $A_{\rm FB}$ at the $Z$ pole against the already-validated $u\bar u g$, a data-free substitute where
 no production data exists (both negative under the same construction, with $|A_{\rm FB}(b)|>|A_{\rm
 FB}(u)|$ as the SM requires; the swapped order anti-correlates). \emph{What makes this more than one
