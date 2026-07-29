@@ -6,10 +6,15 @@ exactly on the surface. Two viewing azimuths per process for legibility.
 CPU only (reads the npz produced by extract_preds.py)."""
 import argparse
 import numpy as np
+import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 from scipy.stats import binned_statistic_2d
 
 
@@ -44,34 +49,31 @@ def make(npz, label, out_base, nb=40):
     resid = pl - tl
     rms = float(np.sqrt(np.mean(resid ** 2)))
 
-    fig = plt.figure(figsize=(15, 6.4))
-    fig.suptitle(f"{label}: truth surface + model wireframe over phase space "
-                 f"(RMS Δlog|M|²={rms:.2g})", fontsize=13, y=0.97)
+    fig = plt.figure(figsize=ps.figsize(ncols=2))
     norm = plt.Normalize(np.nanmin(T), np.nanmax(T))
     for k, (elev, azim) in enumerate([(28, -60), (28, 130)]):
         ax = fig.add_subplot(1, 2, k + 1, projection="3d")
         ax.plot_surface(X, Y, T, facecolors=cm.viridis(norm(T)),
                         rstride=1, cstride=1, linewidth=0, antialiased=True,
                         alpha=0.55, shade=False)
-        ax.plot_wireframe(X, Y, Pf, color="crimson", linewidth=0.6,
+        ax.plot_wireframe(X, Y, Pf, color=ps.C.vermillion, linewidth=0.6,
                           rstride=2, cstride=2, alpha=0.95)
         ax.set_xlabel(r"$\sqrt{s}$ [GeV]", labelpad=8)
         ax.set_ylabel(r"$\cos\theta^{*}$", labelpad=8)
         ax.set_zlabel(r"$\langle\log|\mathcal{M}|^2\rangle$", labelpad=6)
         ax.view_init(elev=elev, azim=azim)
-        ax.set_title(f"view {k+1}", fontsize=10)
 
     # shared legend / colorbar
     m = cm.ScalarMappable(norm=norm, cmap=cm.viridis)
     m.set_array([])
     cb = fig.colorbar(m, ax=fig.axes, fraction=0.02, pad=0.02)
-    cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$", fontsize=9)
+    cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$")
     from matplotlib.lines import Line2D
-    fig.legend([Line2D([0], [0], color="crimson", lw=1.5)], ["model prediction"],
-               loc="upper right", fontsize=9, frameon=False)
-
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
+    fig.legend([Line2D([0], [0], color=ps.C.vermillion, lw=1.5)], ["model prediction"],
+               loc="upper right", frameon=False)
+    fig.text(0.02, 0.96, label, ha="left", va="top")
+    fig._ps_layout_done = True      # 3-D axes + shared colourbar own the layout
+    ps.save(fig, out_base)
     plt.close(fig)
     print(f"wrote {out_base}.png / .pdf  (RMS Δ={rms:.3g})")
 

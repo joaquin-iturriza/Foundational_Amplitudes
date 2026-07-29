@@ -97,6 +97,16 @@ run heldout_resid_f100       $PY $D/make_ir.py --npz $D/heldout_eval_ft_f100.npz
                                  --label 'ee->uug hold-out f=1' \
                                  --out_base $D/figs/heldout_resid_f100
 run ir3d                     $PY $D/make_ir_3d.py
+run ir_pretrain_uug          $PY $D/make_ir.py \
+                                 --npz $D/preds_ir_pretrain8_ee_uug_91-1000GeV_amplitudes.npz \
+                                 --label 'ee->uug' --out_base $D/figs/ir_pretrain_uug
+run ir_pretrain_uugg         $PY $D/make_ir.py \
+                                 --npz $D/preds_ir_pretrain8_ee_uugg_91-1000GeV_amplitudes.npz \
+                                 --label 'ee->uugg' --out_base $D/figs/ir_pretrain_uugg
+run phase_space_pretrain_aa  $PY $D/make_3d.py \
+                                 --npz $D/preds_pretrain8_ee_aa_10-1000GeV_amplitudes.npz \
+                                 --label '$e^+e^-\to\gamma\gamma$' \
+                                 --out_base $D/figs/phase_space_pretrain_aa
 
 echo "== scaling =="
 run compute_scan_wt          $PY analysis/scaling_compute/build_compute_scan_walltime.py
