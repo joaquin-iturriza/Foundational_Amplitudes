@@ -75,12 +75,17 @@ real scrutiny.
 
 Model the brevity you enforce. Padding a review to look thorough is itself a failure.
 
-## Before you edit anything: take the lock
+## Take the lock first, always
 
-A `PreToolUse` gate denies edits to this pillar while its backlog is overdue, so your
-own fixes would be refused. Take the lock as your **first** action:
+Your **first action**, before reading the diff, is:
 
     bash .claude/hooks/review_backlog.sh begin claudemd-keeper
+
+The lock means "a review cycle is open on this pillar". A `PreToolUse` gate otherwise
+denies edits to these files while the backlog is overdue, which would block both your own
+fixes and the main agent applying the findings you return. Take it even if you only report
+and never edit. `advance` drops it; a blocking verdict deliberately leaves it held so the
+fixes you demanded can be made.
 
 ## Clear the backlog (only on a pass)
 
