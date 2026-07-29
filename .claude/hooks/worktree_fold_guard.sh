@@ -38,14 +38,21 @@ names=$(printf '%s' "$cmd" | grep -oE 'worktrees/[A-Za-z0-9._-]+' | sed 's#workt
 for n in $names; do
   wt="$REPO/worktrees/$n"
   [ -d "$wt" ] || continue
-  if [ -f "$FOLDED" ] && grep -qxF "$n" "$FOLDED" 2>/dev/null; then
-    continue          # already folded
-  fi
-  # Is there anything worth saving? Cheap check: any result file under the usual dirs.
-  pending=$(find "$wt"/sweeps "$wt"/runs "$wt"/analysis "$wt"/plots "$wt"/compare_models \
-                 "$wt"/data_* "$wt"/satlogs -type f \
-                 \( -name '*.json' -o -name '*.npz' -o -name '*.npy' -o -name '*.png' \
-                    -o -name '*.pdf' -o -name '*.csv' -o -name '*.pkl' \) 2>/dev/null | head -1)
+  # Self-validating check: is any result file in the worktree ABSENT from the trunk?
+  # A name-keyed "already folded" record goes stale the moment a worktree of the same name
+  # is recreated, and it cannot notice a fold that was incomplete -- which is exactly how
+  # 327 config.yaml files were nearly lost. Ask the filesystem instead of a memo.
+  pending=""
+  while IFS= read -r src; do
+    rel="${src#"$wt"/}"
+    # tracked files come back through the merge; only untracked results are at risk
+    if git -C "$wt" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then continue; fi
+    if [ ! -e "$REPO/$rel" ]; then pending="$rel"; break; fi
+  done < <(find "$wt"/sweeps "$wt"/runs "$wt"/analysis "$wt"/plots "$wt"/compare_models \
+                "$wt"/data_* "$wt"/satlogs -type f \
+                \( -name '*.json' -o -name '*.yaml' -o -name '*.yml' -o -name '*.npz' \
+                   -o -name '*.npy' -o -name '*.png' -o -name '*.pdf' -o -name '*.csv' \
+                   -o -name '*.pkl' \) 2>/dev/null)
   [ -z "$pending" ] && continue
 
   {
@@ -57,6 +64,7 @@ for n in $names; do
     echo "  bash scripts/fold_worktree.sh worktrees/$n              # see what would be copied"
     echo "  bash scripts/fold_worktree.sh worktrees/$n --apply      # copy them"
     echo
+    echo "First still-missing file: $pending"
     echo "Then retry the removal. (This already cost the l2_poly_uugg sweep once.)"
   } >&2
   exit 2
