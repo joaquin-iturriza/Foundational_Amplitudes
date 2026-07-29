@@ -583,7 +583,7 @@ law is the \textbf{floor-aware} power law
 with an irreducible loss $L_\infty$; the bare power law $L\approx A\,C^{-\alpha_C}$ is only ever a
 diagnostic in the regime far above the floor. We report $\alpha_C$ as the local exponent over the
 sampled compute range (Fig.~\ref{fig:phase1scaling} shows the phase-1 joint-pretraining learning
-curves at each per-process dataset size $D$). A virtual/Born \emph{ratio} target was also tried as a learning
+curves at each per-process dataset size $D$, and Figs.~\ref{fig:phase1detailA}--\ref{fig:phase1detailB} resolve every trial and per-width envelope fit within each $D$). A virtual/Born \emph{ratio} target was also tried as a learning
 objective; it does not scale meaningfully and is excluded from what follows.
 
 \begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
@@ -695,12 +695,12 @@ not memorization of the target's LO.
 
 \paragraph{Full layer-decay fine-tuning wins; the methods are not equal.} Comparing full
 retraining with per-layer learning-rate decay against LoRA, block freezing, EWC, and output-head
-reset (Table~\ref{tab:ftmethods}), the exponents end up similar but the methods are far apart in
+reset (Table~\ref{tab:ftmethods}, Fig.~\ref{fig:ftmethods}), the exponents end up similar but the methods are far apart in
 \emph{where} they reach a given loss. Full layer-decay is best at every intermediate fidelity,
 often $1$--$2$ orders below the next method (e.g.\ $ee\,t\bar t$ at $t=400$: $3.2\times10^{-5}$
 vs.\ $5.4\times10^{-4}$, $\sim\!17\times$). Read in wall-time this is a $\sim\!10\times$ speedup at
 matched loss (full reaches $3\times10^{-5}$ in $0.07$\,h where the others need $\sim\!0.6$\,h;
-Fig.~\ref{fig:ftmethods}). Only at the very top fidelity do all methods converge toward the shared
+Fig.~\ref{fig:ftmethods_wt}). Only at the very top fidelity do all methods converge toward the shared
 floor. Full retraining with per-layer decay is therefore the default fine-tune method.
 
 \begin{table}[H]
@@ -1228,10 +1228,10 @@ reconstructs each run's frozen input normalization; a $y_{\min}$ alignment guard
 confirms the momenta agree to $<10^{-7}$). $f\!=\!0$ is thus pure extrapolation into an
 unseen divergence, $f\!=\!1$ the in-support baseline.
 
-\paragraph{Result --- a small in-region data density recovers most of the divergence.}
+\paragraph{Result: a small in-region data density recovers most of the divergence.}
 The held-out-region error falls steeply and \emph{saturates} with $f$
 (Fig.~\ref{fig:div_addback}, Table~\ref{tab:div_addback}): pure extrapolation is poor
-(MSE $0.71$, and $11$ in the deepest $y_{\min}<10^{-3}$ bin --- there
+(MSE $0.71$, and $11$ in the deepest $y_{\min}<10^{-3}$ bin, where
 $\sqrt{\mathrm{MSE}}\!\approx\!3.3$, i.e.\ the amplitude is mispredicted by
 $\sim\!e^{3}$), but adding back just \emph{five percent} of the divergent-region pool
 cuts the error $\sim\!24\times$ (to MSE $0.030$), after which the curve flattens toward
@@ -1240,7 +1240,7 @@ monotonically into deeper IR (the per-$y_{\min}$-bin curves, Fig.~\ref{fig:div_a
 right). The $f\!=\!0$ failure is diagnostic (Fig.~\ref{fig:div_holdout_f0}): the model's
 mean $\log|\mathcal{M}|^2$ \emph{plateaus} instead of following the IR ramp, its
 predictions saturate against a ceiling in the predicted-vs-true plane, and the error
-piles up in the soft\,+\,collinear corner --- the surrogate cannot invent the
+piles up in the soft\,+\,collinear corner: the surrogate cannot invent the
 divergence's growth from out-of-region data alone. With the region back in support
 ($f\!=\!1$, Fig.~\ref{fig:div_holdout_f1}) the ramp is tracked, the ceiling is gone, and
 the residual is flat and small across the plane.
@@ -1279,7 +1279,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
   Eq.~\eqref{eq:ir}. The model mean (red) plateaus \emph{off} the IR ramp (bottom-left),
   while truth (black) lies on the analytic $1/y_{\min}$ slope (green); predictions
   saturate against a ceiling (predicted-vs-true, bottom-right), and the error concentrates
-  in the soft/collinear corner (top-right) --- the model, never having seen the region,
+  in the soft/collinear corner (top-right): the model, never having seen the region,
   cannot reproduce the divergence's growth.}
   \label{fig:div_holdout_f0}
 \end{figure}
@@ -1291,14 +1291,14 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
   divergent region back in the training support the IR ramp (analytic $1/y_{\min}$ slope,
   green) is tracked into the deep IR by both truth and model, the predicted-vs-true ceiling
   is gone, and the error is flat and small across the plane (note the $\sim\!25\times$
-  smaller error axis) --- contrast Fig.~\ref{fig:div_holdout_f0}.}
+  smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}.}
   \label{fig:div_holdout_f1}
 \end{figure}
 
 \begin{principle} A flat-sampled surrogate does not extrapolate \emph{into} an unseen
 divergence: held out, $e^+e^-\to u\bar u g$'s soft/collinear region is mispredicted by
 $\sim\!e^{3}$ in the deepest bin and the model saturates against a ceiling. But the
-divergence is \emph{data-recoverable} --- adding back only $5\%$ of the divergent-region
+divergence is \emph{data-recoverable}: adding back only $5\%$ of the divergent-region
 events cuts the MSE $\sim\!24\times$, and the add-back curve then saturates toward the
 in-support baseline.
 \end{principle}
@@ -1307,7 +1307,7 @@ in-support baseline.
 \label{sec:div-extensions}
 
 Because the leave-out base held out \emph{all five} gluon processes, both extensions below
-reuse the same base22 foundation with \emph{no new pretraining} --- only the add-back
+reuse the same base22 foundation with \emph{no new pretraining}; only the add-back
 fine-tunes differ.
 
 \paragraph{The hardest process ($u\bar u gg$) is also data-recoverable.} On the same
@@ -1319,7 +1319,7 @@ recovery is \emph{gradual} rather than the sharp $24\times$-by-$f{=}0.05$ drop (
 $2.4\times$ at $f{=}0.05$), and the in-support floor is $\sim\!10\times$ higher ($0.024$ vs
 $0.0028$). But unlike $u\bar u g$ the $f{=}0$ model does \emph{not} flatly plateau: having
 learned the process from the FAR region it tracks the analytic $1/y_{\min}$ ramp through most
-of the plane, degrading only in the very deepest soft$+$collinear corner --- a partial, not
+of the plane, degrading only in the very deepest soft$+$collinear corner, a partial, not
 total, extrapolation failure.
 
 \begin{figure}[H]
@@ -1328,7 +1328,7 @@ total, extrapolation failure.
   \caption{\textbf{$e^+e^-\to u\bar u gg$ add-back curve} (hardest process, same base22).
   Left: held-out deep-IR ($y_{\min}<c$) MSE/MAE vs add-back fraction $f$; right: MSE split
   by $y_{\min}$ sub-bin. The divergence is data-recoverable ($0.22\to0.024$) but recovery is
-  more gradual and the floor $\sim\!10\times$ higher than $u\bar u g$ --- the harder process
+  more gradual and the floor $\sim\!10\times$ higher than $u\bar u g$: the harder process
   needs more in-region data.}
   \label{fig:div_addback_uugg}
 \end{figure}
@@ -1338,11 +1338,11 @@ $u\bar u g$ hold-out into a \emph{pure-soft} region ($x_g<c$, any angle) and a
 \emph{pure-collinear} region ($y_{\min}<c$ at hard $x_g$, soft pole off) separates the two IR
 limits (Fig.~\ref{fig:div_soft_coll}), giving two findings. (i) Both single-limit cuts are
 far easier to extrapolate into than the $y_{\min}$ cut that \emph{conflates} them: $f{=}0$
-MSE is $0.076$ (soft) and $0.047$ (collinear) versus $0.71$ for the combined cut --- the
+MSE is $0.076$ (soft) and $0.047$ (collinear) versus $0.71$ for the combined cut: the
 difficulty lives in the soft$\cap$collinear \emph{overlap}, not either limit alone. (ii) A
 crossover: the collinear pole is easier to \emph{extrapolate into} (lower $f{=}0$ error, its
 DGLAP structure being partly inferable from the FAR region), but the soft pole \emph{recovers
-faster} once any in-region data is added --- by $f{=}0.05$ soft ($0.008$) has overtaken
+faster} once any in-region data is added: by $f{=}0.05$ soft ($0.008$) has overtaken
 collinear ($0.014$) and stays below it to $f{=}1$. The eikonal $1/x_g^2$ enhancement is hard
 to guess but simple to learn from a few examples; the collinear residue is guessable but
 richer (the full $P_{qq}(z)$), hence slower to pin down.
@@ -1378,20 +1378,20 @@ singularities: the $u\bar u g$ soft/collinear IR (antenna sampler, Thread~A) and
 $s$-channel $Z$ resonance (fraction sweep). \textbf{(L1) Heteroscedastic $\sigma$-reweighting is a
 scoped, second-order emphasis layer}: the coupled $(\mu,\sigma)$ fit fails for a structural reason
 and is replaced by a two-stage recipe (train $\mu$, then fit a frozen-$\mu$ $\sigma$ head); the
-resulting $\sigma$ helps \emph{only where coverage is capped} --- on a starved, un-regenerable pool it
+resulting $\sigma$ helps \emph{only where coverage is capped}: on a starved, un-regenerable pool it
 is robustly ${\approx}$oracle ($3$-seed), on a base you can already generate well it is a null.
 Equimarginal (water-filling) allocation (Thread~B) frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
 \mathrm{diff}}$), consistent with the interior mixture. \textbf{(L2) $\sigma$-driven on-the-fly
 generation} beats uniform generation on a coordinate-free loop, and helps \emph{iff} the hardness is
-\emph{concentrated} (the concentration principle) --- with three sharpening results: (i) the learned
+\emph{concentrated} (the concentration principle), with three sharpening results: (i) the learned
 $\sigma$ rises inside every divergence, and its base-arm \emph{contrast}
 $\langle\sigma\rangle_{\rm sing}/\langle\sigma\rangle_{\rm bulk}$ is a one-forward-pass \emph{pre-flight}
 predictor of the steering gain (no A/B needed); (ii) it transfers to a \emph{massive} final state
 ($b\bar b g$), where the contrast correctly predicted a $Z$-localised gain and the $m_b$-dead-cone
-softening of the IR, in advance; (iii) the keep rule's shape is settled --- a nested polynomial confirms
+softening of the IR, in advance; (iii) the keep rule's shape is settled, since a nested polynomial confirms
 \emph{positive curvature} is the right direction but does not robustly beat the simple $\sigma^\gamma$
 temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$ more data does not move
-(at fixed optimizer budget --- so the binding constraint is capacity, not coverage), giving a stopping
+(at fixed optimizer budget, so the binding constraint is capacity, not coverage), giving a stopping
 rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
@@ -1405,13 +1405,13 @@ region ($p_T\!>\!1$, $m\!>\!0.3$, $\Delta R\!>\!0.05$): \emph{antenna}
 $b=1-x_{\bar u}$, so $y_{\min}=\min(a,b)$ reaches $<10^{-6}$) and \emph{mixture} (fraction $f$
 antenna $+\,(1-f)$ uniform). Labels use the compiled mg5 C++ standalone at fixed
 $\alpha_s=0.118$, verified bit-identical to the production data; since we fit
-$\ln|\mathcal{M}|^2$ pointwise, importance sampling needs \emph{no} target reweighting --- only
+$\ln|\mathcal{M}|^2$ pointwise, importance sampling needs \emph{no} target reweighting: only
 the density of training points changes. Data: \code{data\_deep\_\{uniform,antenna,mixture,
 mix025,mix075\}/}; common deep-IR test \code{uug\_deep\_test.npz}.
 A/B (same base22, 400k events, 4000 steps; \code{finetune\_deep\_sampling.sh},
-\code{eval\_deep.sh}, \code{plot\_deep\_sampling.py}): antenna crushes the pole --- median
+\code{eval\_deep.sh}, \code{plot\_deep\_sampling.py}): antenna crushes the pole, with median
 relative error in $y_{\min}\!\in\![10^{-6},10^{-5})$ drops $47.9\%\!\to\!1.4\%$; overall
-MSE$(\Delta\ln|\mathcal{M}|^2)$ $0.108\!\to\!0.0017$ ($\sim$62$\times$). The fraction sweep
+MSE$(\Delta\ln|\mathcal{M}|^2)$ $0.108\!\to\!0.0017$ ($\sim$62$\times$; Fig.~\ref{fig:deep_sampling_antenna}). The fraction sweep
 $f\in\{0,.25,.5,.75,1\}$ (\code{plot\_fraction\_sweep.py}, fig
 \code{deep\_sampling\_fraction\_sweep}) shows a \emph{broad interior optimum} $f\in[0.25,0.75]$:
 $f{=}0$ catastrophic ($\sim$200$\times$), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
@@ -1504,7 +1504,7 @@ fixed). Result: \textbf{calibrated $\sigma$ at zero accuracy cost}: pull std $1.
 slope $\sim$1.1, $\mu$-MSE bit-identical to the MSE model, on both the deep-IR uug finetune and the
 22-proc base22 foundation (which tracks error across $4.5$ decades of per-process scale). Cost:
 $\sim$3 min (single process), $\sim$31 min (base22). So the NLL loss and $\sigma$ head were never
-broken --- they must not be trained \emph{jointly} with $\mu$. A naming trap worth recording: Seitzer's
+broken; they must not be trained \emph{jointly} with $\mu$. A naming trap worth recording: Seitzer's
 $\beta$-NLL is $\mathrm{detach}(\sigma^{2\beta})\!\cdot\!\text{NLL}$, so $\beta{=}0$ is the standard
 Gaussian NLL (works); the catastrophic runs were all $\beta{=}1$.
 
@@ -1567,7 +1567,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   \label{fig:q2_rankmag}
 \end{figure}
 
-\paragraph{Thread D --- coverage vs.\ emphasis, and the general default sampling.} The decisive
+\paragraph{Thread D: coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage: it cannot beat
 the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
 so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$) as well as the sampling-study
@@ -1605,8 +1605,8 @@ Thread~D made concrete: \emph{you cannot resample your way past what the pool co
 momenta, labels the exact tree $|\mathcal{M}|^2$ with the compiled \code{ee\_uu} standalone
 ($14.5$k\,ev/s, scale verified vs production), and thins $3\mathrm{M}$ candidates to $400$k
 flat-in-$\log|\mathcal{M}|^2$ \emph{without replacement} (all unique). The shaper reads \emph{only}
-$|\mathcal{M}|^2$; $\sqrt{s}$ is eval-only. Generation lifts pole coverage $0.4\%\!\to\!32\%$ with
-GENUINE new events. \emph{Bug found + fixed (would have inverted the result):} the standalone expects
+$|\mathcal{M}|^2$; $\sqrt{s}$ is eval-only. Generation lifts pole coverage $0.4\%\!\to\!32\%$ with genuinely
+new events, and beats resampling $2.6\times$ on the log-flat metric (Fig.~\ref{fig:eeuu_flatlogm_resonance}). \emph{Bug found + fixed (would have inverted the result):} the standalone expects
 the final-state quarks in the \emph{opposite} slot order from how production stores $[e^-,e^+,u,\bar u]$;
 a direct driver call mirror-flips the $Z$ forward-backward asymmetry, so the model trains perfectly on
 its own set (internal val $10^{-5}$) yet \emph{anti-correlates} on production test ($\rho_{\rm bulk}\!=\!-0.99$).
@@ -1772,7 +1772,7 @@ implementation subtlety:} the \emph{last} split ($k{=}2$) does \emph{not} draw a
 remaining blob already \emph{is} the final particle, so its mass is pinned to $m_1$ (drawing it freely
 would leave the last leg off-shell); for $N{=}2$ this is the only split and gives a back-to-back
 massless pair. \emph{Why no Jacobian appears anywhere:} we deliberately never compute this proposal's
-density or weight --- because training regresses $\log|\mathcal M|^2$ \emph{pointwise}, only \emph{where}
+density or weight, because training regresses $\log|\mathcal M|^2$ \emph{pointwise}, only \emph{where}
 the events sit matters, not how often the generator would have put them there (the same argument that
 lets $\sigma$-reweighting skip an importance correction). So \emph{any} construction that yields valid
 on-shell, momentum-conserving events covering the soft/collinear corners is admissible; this one,
@@ -1839,7 +1839,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   \includegraphics[width=\textwidth]{l2_uugg_perdecade_abs.pdf}
   \caption{\textbf{Absolute per-decade MSE for all $\gamma$.} The same runs as
   Fig.~\ref{fig:l2_uugg_gamma} on an absolute scale rather than as a ratio to base, so the size of each
-  decade's error is visible alongside the relative gain --- the deep decades carry MSE orders of
+  decade's error is visible alongside the relative gain: the deep decades carry MSE orders of
   magnitude above the bulk, which is why a log-flat-per-decade metric (Q2,
   Fig.~\ref{fig:q2_logflat}) is the honest way to score the trade-off.}
   \label{fig:l2_uugg_perdecade_abs}
@@ -1849,32 +1849,32 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
 $u\bar u ggg$ more legs).} Because the L2 loop carries \emph{no} process coordinate, it should transfer
 with \emph{no} per-process tuning; we stress it on two structurally-different divergences by changing
 only the process registry (\code{--process}: PDG/multiplicity, the compiled standalone labeller, and
-the round-0 frozen-stats set) --- same base22, same democratic generator, same finetune HPs. Held-out
+the round-0 frozen-stats set): same base22, same democratic generator, same finetune HPs. Held-out
 sets are drawn from the same democratic base (uug enriched near $M_Z$ so the resonance region is
 well-measured), scored per $y_{\min}$ decade AND, for uug, per $\sqrt s$ region.
-\emph{(i) $u\bar u g$ --- a genuine multi-scale process:} the $s$-channel $\gamma^\ast/Z$ propagator
+\emph{(i) $u\bar u g$, a genuine multi-scale process:} the $s$-channel $\gamma^\ast/Z$ propagator
 gives a resonance at $\sqrt s\!\approx\!M_Z$ (the window bottom) \emph{and} the gluon gives soft/collinear
-IR --- two competing extremes at once. The open question was whether a \emph{single} $\sigma^\gamma$ knob
+IR, two competing extremes at once. The open question was whether a \emph{single} $\sigma^\gamma$ knob
 can budget across both, or must go multi-modal. It budgets, and it does so by finding the genuinely-hard
 extreme: the entire difficulty lives in the \textbf{resonance}, not the IR continuum, which \code{base22}
 already fits to $\mathrm{MSE}\!\approx\!9\times10^{-4}$. $\sigma$-driven generation cuts the Z-peak error
 $8.3\times10^{-2}\!\to\!3.3\times10^{-2}$ ($2.5\times$) and the deep-IR$\,\cap\,$Z-peak corner
 $9.0\times10^{-2}\!\to\!2.2\times10^{-2}$ ($4\times$) at $\gamma{=}3$, while leaving the already-easy
-continuum \emph{untouched} ($8.6\times10^{-4}$, unchanged) --- overall MSE $2.2\times10^{-2}\to
+continuum \emph{untouched} ($8.6\times10^{-4}$, unchanged), with overall MSE $2.2\times10^{-2}\to
 1.4\times10^{-2}\to9.3\times10^{-3}$ at $\gamma{=}0,1,3$. So one scalar $\sigma$ automatically identifies
 the resonance as the sparse region and reallocates there; it need \emph{not} be multi-modal.
-\emph{(ii) $u\bar u ggg$ --- higher multiplicity:} here $\sigma$-driven generation gives essentially
+\emph{(ii) $u\bar u ggg$, higher multiplicity:} here $\sigma$-driven generation gives essentially
 \emph{nothing} (overall $5.68\!\to\!5.67\!\to\!5.65\times10^{-2}$ at $\gamma{=}0,1,3$), because with three
-gluons the divergence is \emph{diffuse} --- every $y_{\min}$ decade is comparably hard
+gluons the divergence is \emph{diffuse}: every $y_{\min}$ decade is comparably hard
 ($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
 uniformly-hard set cannot help (Figs.~\ref{fig:l2_uug_multiscale}, \ref{fig:l2_uuggg_perdecade}).
-The obvious objection --- that $u\bar u ggg$ was simply not concentrated \emph{hard enough}, since
-$u\bar u gg$ needed $\gamma\!\approx\!3$--$10$ --- was tested directly and \textbf{fails}: pushing to
+The obvious objection, that $u\bar u ggg$ was simply not concentrated \emph{hard enough}, since
+$u\bar u gg$ needed $\gamma\!\approx\!3$--$10$, was tested directly and \textbf{fails}: pushing to
 $\gamma=10,20$ does not unlock a gain, it \emph{reverses} the small one. The deep-IR ratio turns over,
 $0.989,0.976,1.035,1.079$ at $\gamma=1,3,10,20$, so by $\gamma{=}20$ the $\sigma$ arm is $8\%$
 \emph{worse than uniform} (overall $5.65\!\to\!6.07\!\to\!6.48\times10^{-2}$). Harder concentration on a
-diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast --- saturation
-for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for the principle below
+diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast, saturation
+for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for the principle below
 (Fig.~\ref{fig:l2_gamma_response_extended}).
 
 \begin{figure}[H]
@@ -1883,7 +1883,7 @@ for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for th
   \caption{\textbf{Pushing the concentration exponent: saturation vs reversal.} $\sigma$-arm/base MSE
   ratio against $\gamma$ (seed 0), by $y_{\min}$ band. \emph{Left, $u\bar u gg$ (concentrated):} the
   deepest decade improves steeply to $\gamma\!\approx\!10$ then \textbf{saturates} ($0.53\to0.51$ over
-  $\gamma=10\to30$) while the bulk penalty keeps growing ($1.30\to1.63$) --- the water-filling trade-off
+  $\gamma=10\to30$) while the bulk penalty keeps growing ($1.30\to1.63$): the water-filling trade-off
   running out of anything left to buy. \emph{Right, $u\bar u ggg$ (diffuse):} the curve is nearly flat
   and \textbf{turns over} above $\gamma\!\approx\!3$, crossing the uniform baseline so that harder
   concentration is actively worse. Concentration of the error, not depth of the divergence, is what
@@ -1898,8 +1898,8 @@ for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for th
   held-out MSE per $y_{\min}$ decade for base (uniform) vs $\sigma$-driven generation at
   $\gamma{=}1,3$. Right: the same error split by $\sqrt s$ region. The difficulty lives almost
   entirely in the \emph{Z-peak}, not the IR continuum (which \code{base22} already fits to
-  $\sim\!9\times10^{-4}$); one scalar $\sigma^\gamma$ finds the resonance on its own --- $2.5\times$
-  at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner --- while leaving the easy continuum
+  $\sim\!9\times10^{-4}$); one scalar $\sigma^\gamma$ finds the resonance on its own ($2.5\times$
+  at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner), while leaving the easy continuum
   untouched. The steering density need \emph{not} be multi-modal to serve two competing extremes.}
   \label{fig:l2_uug_multiscale}
 \end{figure}
@@ -1910,22 +1910,22 @@ for $u\bar u gg$, reversal for $u\bar u ggg$ --- is the sharpest evidence for th
   \caption{\textbf{$e^+e^-\to u\bar u ggg$: more legs, a \emph{diffuse} divergence.} Held-out MSE per
   $y_{\min}$ decade, base vs $\sigma$-driven at $\gamma{=}1,3$: the three curves lie on top of each
   other. With three gluons every decade is comparably hard, so there is no thin sparse region for
-  $\sigma$ to reallocate \emph{into} --- the contrast with Fig.~\ref{fig:l2_uug_multiscale} is the
+  $\sigma$ to reallocate \emph{into}: the contrast with Fig.~\ref{fig:l2_uug_multiscale} is the
   content of the concentration principle below.}
   \label{fig:l2_uuggg_perdecade}
 \end{figure}
 
-\paragraph{A MASSIVE final state ($e^+e^-\to b\bar b g$) --- and a genuine out-of-sample test of the
+\paragraph{A massive final state ($e^+e^-\to b\bar b g$), and a genuine out-of-sample test of the
 $\sigma$-contrast diagnostic.} The loop had only been stressed on massless finals. $b\bar b g$ is the
-massive analogue of $u\bar u g$ --- same $Z$ resonance, same soft gluon --- but the \emph{collinear}
+massive analogue of $u\bar u g$ (same $Z$ resonance, same soft gluon), but the \emph{collinear}
 limit is regulated by $m_b$ (the dead cone), which softens one of the two singular directions; the
 dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}$--$3\times10^{-3}$ sits inside the $y_{\min}$ window,
 so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$).
-The generator needed \emph{no} change --- \code{democratic\_draw} already yields exact on-shell massive
+The generator needed \emph{no} change: \code{democratic\_draw} already yields exact on-shell massive
 momenta (verified to $10^{-13}$); only a registry row, the mass-correct collinear variable
 $y_{ij}=2p_i\!\cdot\!p_j/s$ (identical to $s_{ij}/s$ for massless legs, so nothing above moves), and a
-standalone slot-order check were required (the convention is per-build; $b\bar b g$ was fixed by the sign
-of $A_{\rm FB}$ at the $Z$ pole against the validated $u\bar u g$). \emph{What makes this more than one
+standalone slot-order check were required. That convention is \emph{per-build}, not global (\code{ee\_ttbar} takes production order bit-identically, \code{ee\_uu} needs its final pair swapped), so every new standalone must be checked; here it was settled by the sign
+of $A_{\rm FB}$ at the $Z$ pole against the already-validated $u\bar u g$, a data-free substitute where no production data exists. \emph{What makes this more than one
 more transfer:} the $\sigma$-contrast diagnostic (previous paragraphs) was used to \textbf{predict the
 result before the $\sigma$ arm ran}. From the base arm alone: a $Z$-peak contrast of $2.51$ (between
 $u\bar u g$'s $4.48$ and $u\bar u gg$'s $1.83$) $\Rightarrow$ a \emph{moderate} $Z$-peak gain, milder than
@@ -1933,9 +1933,9 @@ massless $u\bar u g$; a deep-IR contrast of only $1.61$ $\Rightarrow$ a \emph{we
 having flattened the collinear enhancement. Both held: at $\gamma{=}3$ the $\sigma$ arm cuts the $Z$-peak
 MSE to $\mathbf{0.56\times}$ (predicted ${\sim}0.50$) and the shoulder to $0.50\times$, while the pure
 deep-IR ($y_{\min}<10^{-5}$) moves only to $0.85\times$ (predicted ${\sim}0.71$) and the continuum to
-$0.82\times$ --- overall $2.15\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
+$0.82\times$, with overall $2.15\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
 is \textbf{$Z$-driven, exactly where the contrast pointed}, and the mass's suppression of the IR direction
-is visible as the weaker deep-IR gain --- the diagnostic called both the \emph{magnitude} and the
+is visible as the weaker deep-IR gain: the diagnostic called both the \emph{magnitude} and the
 \emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). \emph{Caveat: single seed;}
 a $3$-seed repeat would firm the numbers, but the sign and the region-ordering are the claim.
 
@@ -1947,23 +1947,23 @@ a $3$-seed repeat would firm the numbers, but the sign and the region-ordering a
   p_j/s$), base vs $\sigma$-driven $\gamma{=}3$. \emph{(b)} The same error by $\sqrt s$ region, with the
   \emph{pre-recorded} predictions (navy) beside the measured ratios (crimson). The gain concentrates at
   the $Z$-peak ($0.56\times$) and shoulder ($0.50\times$), not the IR continuum ($0.82\times$): the
-  $m_b$ dead cone softens the collinear direction, so --- as the low deep-IR $\sigma$-contrast predicted
-  --- there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
+  $m_b$ dead cone softens the collinear direction, so, as the low deep-IR $\sigma$-contrast predicted,
+  there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
   size and the location of the effect on a process the diagnostic was never fit on.}
   \label{fig:l2_bbbarg}
 \end{figure}
 
 \begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
 The single-knob $\sigma^\gamma$ keep-rule wins exactly when the error is concentrated in an identifiable,
-data-sparse sub-region the model can point to --- the deep soft$\cap$collinear corner of $u\bar u gg$, the
+data-sparse sub-region the model can point to: the deep soft$\cap$collinear corner of $u\bar u gg$, the
 $Z$ resonance of $u\bar u g$ (which it finds automatically, without a multi-modal density, leaving the
-already-learned IR continuum alone) --- and gives $\sim\!$nothing when the difficulty is diffuse across the
+already-learned IR continuum alone). It gives $\sim\!$nothing when the difficulty is diffuse across the
 whole divergence, as at higher multiplicity ($u\bar u ggg$). Concentration, not divergence depth per se, is
 what $\sigma$-steering can exploit. It also survives the move to a \emph{massive} final state ($b\bar b g$),
 where it correctly localises to the $Z$ resonance and the $m_b$ dead cone's suppression of the collinear
-direction shows up as a weaker IR gain --- both predicted in advance by the $\sigma$-contrast. The $\gamma$ sweep separates the two regimes cleanly: on a concentrated
+direction shows up as a weaker IR gain, both predicted in advance by the $\sigma$-contrast. The $\gamma$ sweep separates the two regimes cleanly: on a concentrated
 divergence the gain \emph{saturates} with harder concentration (there is a finite amount of misplaced
-budget to recover), whereas on a diffuse one it \emph{reverses} and drops below uniform --- so a flat or
+budget to recover), whereas on a diffuse one it \emph{reverses} and drops below uniform, so a flat or
 turning $\gamma$-response is the diagnostic that no targetable sparse region exists, and the right move is
 more capacity or more data everywhere, not smarter allocation. Concentration also has a directly
 measurable order parameter that does \emph{not} require running the A/B: the \textbf{$\sigma$-contrast}
@@ -1972,19 +1972,19 @@ orders these three processes exactly as their measured gains do (next paragraph,
 Fig.~\ref{fig:l2_sigma_vs_divergence}).
 \end{principle}
 
-\paragraph{$\sigma$ resolved against the divergence coordinate --- and a \emph{pre-flight} test for
+\paragraph{$\sigma$ resolved against the divergence coordinate, and a \emph{pre-flight} test for
 the concentration principle.} Everything above scores $\sigma$ only through its downstream effect (the
 A/B on held-out MSE). Resolving $\sigma$ directly against the variable that \emph{defines} each
 divergence both confirms the mechanism and, unexpectedly, makes the concentration principle
-\emph{predictive}. The stored held-out evaluations already carry what is needed --- \code{score\_and\_save}
-saves $\sigma$ row-aligned with $y_{\min}$ and $\sqrt s$ --- so this costs no GPU
+\emph{predictive}. The stored held-out evaluations already carry what is needed: \code{score\_and\_save}
+saves $\sigma$ row-aligned with $y_{\min}$ and $\sqrt s$, so this costs no GPU
 (\code{plot\_sigma\_vs\_divergence.py}, Fig.~\ref{fig:l2_sigma_vs_divergence}). Multiplying the stored
 (preprocessed-unit) $\sigma$ by the run's amplitude standardization scale puts $\sigma$ and the actual
 RMSE in the same $\log|\mathcal M|^2$ units, so the two curves are directly comparable and their gap
 \emph{is} the calibration. \emph{(i) $\sigma$ does rise inside the divergence, and it is well calibrated
 there.} On $u\bar u g$, $\sigma$ climbs $4.5\times$ from the continuum into the $Z$ pole and plateaus
 across it, tracking a $10\times$ rise in the true error; per region $\sigma/\mathrm{RMSE}=0.77$ (peak),
-$1.01$ (shoulder), $1.69$ (continuum) --- accurate where it matters and merely \emph{conservative} in the
+$1.01$ (shoulder), $1.69$ (continuum), accurate where it matters and merely \emph{conservative} in the
 easy bulk. Across the $u\bar ugg$ $y_{\min}$ decades the same ratio stays in $0.85$--$1.24$ except the
 very deepest bin ($0.53$, under-covering where the error is largest). \emph{(ii) The sharpness of that
 rise predicts the gain.} Define the \textbf{$\sigma$-contrast} $\langle\sigma\rangle_{\rm
@@ -1992,7 +1992,7 @@ singular}/\langle\sigma\rangle_{\rm bulk}$, measured on the \emph{base} (uniform
 orders the three processes exactly as the measured steering gain does: $u\bar u g$ (Z peak) contrast
 $4.48\Rightarrow$ $\sigma$/base MSE $0.40$; $u\bar u gg$ (deep IR) $1.83\Rightarrow0.53$; $u\bar u ggg$
 (deep IR) $1.29\Rightarrow0.97$ (nothing). Because the contrast needs only one forward pass of the
-baseline model --- no second arm, no A/B --- it converts ``is this divergence concentrated?'' from a
+baseline model (no second arm, no A/B), it converts ``is this divergence concentrated?'' from a
 post-hoc reading of the outcome into a \textbf{cheap test you can run before committing the compute},
 and gives the concentration principle a directly measurable order parameter.
 
@@ -2004,30 +2004,30 @@ and gives the concentration principle a directly measurable order parameter.
   defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical gap is the calibration),
   all on the base/uniform arm. $u\bar u g$: $\sigma$ climbs $4.5\times$ into the $Z$ pole and plateaus
   across it, following a $10\times$ rise in the error. $u\bar u gg$: a $1.8\times$ rise into the deep IR.
-  $u\bar u ggg$: nearly flat ($1.3\times$) --- there is no thin region for $\sigma$ to point at.
+  $u\bar u ggg$: nearly flat ($1.3\times$): there is no thin region for $\sigma$ to point at.
   \emph{(d)} The $\sigma$-contrast $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$,
   measured on the base arm alone, against the $\sigma$-arm/base MSE ratio actually measured in that
   region. The three processes order monotonically, so the contrast is a \emph{pre-flight} diagnostic for
-  the concentration principle --- one forward pass, no A/B.}
+  the concentration principle: one forward pass, no A/B.}
   \label{fig:l2_sigma_vs_divergence}
 \end{figure}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
-itself.} The steering $\sigma$ above is a \emph{point} heteroscedastic head --- a learned (aleatoric)
+itself.} The steering $\sigma$ above is a \emph{point} heteroscedastic head, a learned (aleatoric)
 spread. The arguably-right signal for deciding what to \emph{generate} is \emph{epistemic}: high where
 the training set is sparse, which is exactly what L2 wants to fill. We therefore built a genuinely
-Bayesian alternative --- \textbf{full-network Bayes-by-backprop} (\code{bbb.py}), a mean-field Gaussian
+Bayesian alternative, \textbf{full-network Bayes-by-backprop} (\code{bbb.py}), a mean-field Gaussian
 posterior $q(w)=\mathcal N(\mu_w,\sigma_w^2)$ over \emph{every} weight and bias (not MC-dropout, not a
 Laplace/last-layer approximation, not an ensemble). \emph{Implementation:} rather than rebuild the
 architecture, \code{variationalize()} wraps an already-built, $\mu$P-finalised, \code{base22}-warm-started
-net: each existing \code{weight}/\code{bias} is kept \emph{verbatim} as the posterior MEAN (so $\mu$P
-init, the MuAdam per-layer scaling, and the warm start are untouched --- the net \emph{starts} as the
+net: each existing \code{weight}/\code{bias} is kept \emph{verbatim} as the posterior mean (so $\mu$P
+init, the MuAdam per-layer scaling, and the warm start are untouched: the net \emph{starts} as the
 deterministic pretrained model and only learns the spread) and a sibling \code{\_rho} parameterises
 $\sigma=\mathrm{softplus}(\rho)$, initialised to $\sigma_{\rm rel}$ times that layer's $\mu$P weight RMS
 so the injected noise keeps the $\mu$P activation scaling across width; the per-layer Gaussian prior uses
 the same scale, and $\rho$ inherits its weight's \code{infshape} (MuAdam asserts one on every parameter).
 Training maximises the ELBO ($\mathrm{loss}\mathrel{+}=\beta_{\rm KL}\mathrm{KL}/N$, with $\vlnr$ left as
-\emph{pure} MSE so checkpoint selection and the comparison metric stay like-for-like). Crucially the model
+\emph{pure} MSE so checkpoint selection and the comparison metric stay like-for-like). The model
 is \emph{evaluated through its posterior}, never collapsed to a mean-weights forward: the point estimate is
 the predictive mean $\mathbb E_q[f]\!\approx\!\tfrac1K\sum_k f(x,w_k)$ (which is \emph{not} $f(x,\mu)$ for a
 nonlinear net), and we report the predictive $\sigma$, calibration $\langle z^2\rangle$, Gaussian NLL, and the
@@ -2038,19 +2038,19 @@ Proposals are kept $\propto\sigma_{\rm epi}^\gamma$ with $\sigma_{\rm epi}$ the 
 $\sigma_{\rm rel}\!\in\![5\!\times\!10^{-3},0.15]$, $\gamma\!\in\![1,5]$; objective = held-out deep-IR MSE).}
 The tuned BBB arm reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
-($1.08\times$ --- \textbf{it loses}). The sweep's \emph{structure} is the informative part:
-$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone --- wider
+($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
+$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
 posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $\sim\!3$), while
 $\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
-comparison --- and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
+comparison, and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
 optimiser is driving the weight posterior toward the \emph{deterministic limit} to buy back point accuracy.
 That is the mechanism: Bayes-by-backprop trains under sampled weights, which degrades the mean fit, and the
-only way to recover accuracy is to shrink the posterior --- which simultaneously removes the epistemic
+only way to recover accuracy is to shrink the posterior, which simultaneously removes the epistemic
 signal that was the whole point. Calibration is respectable ($\langle z^2\rangle\!\approx\!1.26$, mildly
 under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi}$ \emph{ranks} the error at
-only $\rho\!\approx\!0.17$--$0.20$ --- barely above the het-head's $0.11$--$0.16$ --- so it never earns back
+only $\rho\!\approx\!0.17$--$0.20$, barely above the het-head's $0.11$--$0.16$, so it never earns back
 the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
-\emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter --- so the safe
+\emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter, so the safe
 claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
 \code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the L2 loop via
@@ -2074,8 +2074,8 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
   the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
   coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
   $\sigma_{\rm rel}$ alone sets the outcome (Spearman $+0.965$) and its optimum lands \emph{on the search
-  lower bound} --- the optimiser drives the weight posterior toward the deterministic limit to buy back
-  accuracy --- while $\beta_{\rm KL}$ ($-0.05$) and $\gamma$ ($-0.07$) are noise. The best tuned BBB
+  lower bound} (the optimiser drives the weight posterior toward the deterministic limit to buy back
+  accuracy), while $\beta_{\rm KL}$ ($-0.05$) and $\gamma$ ($-0.07$) are noise. The best tuned BBB
   (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
   structural, not a tuning artefact.}
   \label{fig:l2_bbb_sweep}
@@ -2085,32 +2085,32 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 A genuinely Bayesian weight posterior is not automatically the better generation signal. What the keep-rule
 consumes is a \emph{ranking} of where the model is wrong, and full-network Bayes-by-backprop buys only a
 marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a systematically worse point fit
---- its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
+, and its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
 detached heteroscedastic head remains the better trade on this harness.
 \end{principle}
 
 \paragraph{Is $\sigma^\gamma$ the right keep-rule family, or does the optimum need curvature? A
-\emph{nested} polynomial test.} The deployed keep rule is $p\!\propto\!\sigma^\gamma$ --- ``$\gamma$ as a
+\emph{nested} polynomial test.} The deployed keep rule is $p\!\propto\!\sigma^\gamma$, ``$\gamma$ as a
 temperature'', one scalar. We generalise it to a polynomial in $u=\log\sigma-\mathrm{median}$,
 $\log w = c_1 u + c_2 u^2 + c_3 u^3$, so the power law is the \emph{nested} member $c_1{=}\gamma,\,
 c_2{=}c_3{=}0$ (verified identical to $10^{-16}$): a polynomial that cannot beat $c_2{=}c_3{=}0$ has
 genuinely found nothing. The motivation is measured, not aesthetic: $\mathbb E[\mathrm{err}^2\,|\,\sigma]$
-on held-out sets is \emph{not} a power law in $\sigma$ --- fitting $\log\mathbb E$ against $\log\sigma$,
+on held-out sets is \emph{not} a power law in $\sigma$: fitting $\log\mathbb E$ against $\log\sigma$,
 $R^2$ rises $0.89\!\to\!0.99$ ($u\bar u gg$) and $0.68\!\to\!0.93$ ($u\bar u ggg$) from degree $1$ to $2$,
 with \emph{positive} curvature, so positive $c_2$ should concentrate extra budget in the high-$\sigma$
-tail while staying mild at moderate $\sigma$ --- exactly what a single large $\gamma$ cannot do (it
+tail while staying mild at moderate $\sigma$, exactly what a single large $\gamma$ cannot do (it
 over-concentrates everywhere, the measured bulk penalty). A $12$-trial single-fidelity DyHPO sweep over
 $(c_1,c_2,c_3)$ on $u\bar u gg$ (objective the log-flat MSE, \emph{not} deep-only, which would just reward
 starving the bulk) confirms the \emph{direction}: the best two configs both sit at $c_2\!\approx\!+1.3$--$1.4$
 and every negative-$c_2$ config is mid-pack or worse (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
 does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.25\times10^{-2}$) looked $3\%$
-under the best power law --- until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
+under the best power law, until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
 $3.25\times10^{-2}$: the ``win'' was against one unlucky power-law seed. Running the polynomial optimum at
 $3$ seeds gives $3.22\times10^{-2}\!\pm\!1.2\times10^{-3}$ vs $\sigma^{10}$'s $3.25\times10^{-2}\!\pm\!
-7\times10^{-4}$ --- a $1.0\%$ edge well inside the pooled seed scatter, i.e.\ a \textbf{wash}
+7\times10^{-4}$, a $1.0\%$ edge well inside the pooled seed scatter, i.e.\ a \textbf{wash}
 (Fig.~\ref{fig:l2_poly_keep}b). So the curvature the error profile shows is real and points the right way,
 but on the flat $\gamma$-basin it buys nothing a well-tuned exponent does not already have. \emph{The
-temperature picture holds: $\sigma^\gamma$ stays the right practical family --- one knob, no measurable
+temperature picture holds: $\sigma^\gamma$ stays the right practical family: one knob, no measurable
 loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code{l2\_online\_uugg.py},
 \code{sweep/l2\_poly\_sweep\_config.yaml}, \code{plot\_poly\_keep.py}.
 
@@ -2122,44 +2122,44 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
   nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
   $c_2\!\approx\!+1.3$--$1.4$, negative-$c_2$ mid-pack), confirming the $\mathbb E[\mathrm{err}^2|\sigma]$
   curvature. \emph{(b)} The honest $3$-seed comparison: the polynomial optimum ($3.22\times10^{-2}$) and the
-  best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed --- the $1\%$ edge is
+  best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed: the $1\%$ edge is
   inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
   \label{fig:l2_poly_keep}
 \end{figure}
 
 \paragraph{Uncapped data: the uncertainty tail floors, and more data does not move it.}
-Every A/B above is at a fixed data budget. The complementary question --- \emph{how much} data a region
-actually needs before more is waste --- the loop can now answer directly, because the same $\sigma$ it
+Every A/B above is at a fixed data budget. The complementary question, \emph{how much} data a region
+actually needs before more is waste, the loop can now answer directly, because the same $\sigma$ it
 uses to steer is also a saturation gauge. At each round it records the $\sigma$ distribution over the
 \emph{fresh} proposal batch (drawn from the same fixed base every round, so it is a like-for-like
 measure of the model's remaining uncertainty over the whole space, unlike a pool statistic, which
-drifts as the keep rule reshapes the pool); the $p99$ --- the hard tail, i.e.\ the singular region the
-bulk has long since left --- is the stopping statistic, since a mean would call saturation far too early
+drifts as the keep rule reshapes the pool); the $p99$ (the hard tail, i.e.\ the singular region the
+bulk has long since left) is the stopping statistic, since a mean would call saturation far too early
 (the bulk saturates first). Running $u\bar u gg$ at $N\!\in\!\{75,150,600\}$k (\code{--sat\_log},
 \code{plot\_saturation.py}, Fig.~\ref{fig:l2_saturation}): the $\sigma$-$p99$ falls steeply and then
-\textbf{floors at a level essentially independent of the data budget} --- base arm $0.0448$, $0.0468$,
+\textbf{floors at a level essentially independent of the data budget}: base arm $0.0448$, $0.0468$,
 $0.0477$ and $\sigma$ arm $0.0420$, $0.0418$, $0.0427$ at $N=75$k, $150$k, $600$k. \emph{$8\times$ more
 generated data does not lower the floor}; for the base arm it is marginally \emph{worse} ($+6.4\%$),
 against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep. (The $\sigma$ arm also
-floors ${\sim}8\%$ \emph{below} base at every budget --- an independent sign that $\sigma$-steering
+floors ${\sim}8\%$ \emph{below} base at every budget, an independent sign that $\sigma$-steering
 removes more of the hard tail than uniform generation.)
 
-\emph{What this does and does not establish --- the compute confound.} Every run here uses the
+\emph{What this does and does not establish: the compute confound.} Every run here uses the
 \textbf{same $4000$ steps} at batch $16384$, i.e.\ ${\sim}65$M example-presentations regardless of pool
 size: ${\sim}870$ passes over a $75$k pool but only ${\sim}109$ over a $600$k one. Data volume and
 per-example optimisation are therefore \emph{confounded}, and the slight \emph{rise} of the base floor
 with $N$ is exactly what that confound predicts. So the defensible claim is ``\textbf{at a fixed
-optimizer budget, $8\times$ more unique data buys no reduction in residual uncertainty}'' --- i.e.\ the
-binding constraint in this configuration is capacity/optimisation rather than coverage --- and \emph{not}
+optimizer budget, $8\times$ more unique data buys no reduction in residual uncertainty}'', i.e.\ the
+binding constraint in this configuration is capacity/optimisation rather than coverage, and \emph{not}
 that ${\sim}75$k events is all this region could ever absorb. Separating the two needs a fixed-\emph{epoch}
 design (steps scaled with data) or a capacity sweep; that is left open (Sec.~\ref{sec:div-open}). A second,
 related caveat: within a run $\sigma$ falls both because the pool grows \emph{and} because the model
-trains longer, and the probe cannot separate those --- it is the \emph{cross-budget} comparison at
+trains longer, and the probe cannot separate those: it is the \emph{cross-budget} comparison at
 end-of-training that carries the weight, not the within-run decay.
 
 The per-round fractional fall in $p99$ crossing (and staying below) a $2\%$ tolerance is nonetheless a
-machine-checkable stopping rule --- the \code{--stop\_on\_saturation} latch freezes the pool there and
-lets training continue --- so the loop can add data until the tail stops responding instead of running to
+machine-checkable stopping rule (the \code{--stop\_on\_saturation} latch freezes the pool there and
+lets training continue), so the loop can add data until the tail stops responding instead of running to
 a fixed cap. And it makes the ``add more capacity, not more data'' half of the concentration principle
 actionable: a floored $\sigma$-tail that no longer falls as data is added is the signal to stop
 generating and grow the model or the horizon.
@@ -2171,10 +2171,10 @@ generating and grow the model or the horizon.
   \emph{(a)} $\sigma$-$p99$ over the fresh proposal batch vs pool size, for three data budgets on
   $u\bar u gg$. The curves do not collapse on pool (a larger budget has taken fewer optimizer steps by
   the time it reaches a given pool, so its live $\sigma$ sits higher there); what matters is the
-  end-of-training floor, which is flat in the budget --- base $0.0448/0.0468/0.0477$, $\sigma$
+  end-of-training floor, which is flat in the budget: base $0.0448/0.0468/0.0477$, $\sigma$
   $0.0420/0.0418/0.0427$ at $N{=}75/150/600$k. $8\times$ more data does not lower it, and for the base
   arm marginally raises it. \emph{Caveat:} all runs share the same $4000$ steps, so a larger pool gets
-  proportionally less optimisation per event --- the honest reading is ``more data buys nothing \emph{at
+  proportionally less optimisation per event: the honest reading is ``more data buys nothing \emph{at
   fixed compute}'', not that $75$k saturates the region absolutely. \emph{(b)} The per-round fractional
   fall in $p99$; crossing below the $2\%$ tolerance band is the stopping rule the
   \code{--stop\_on\_saturation} latch uses.}
@@ -2188,53 +2188,33 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     in the data budget, but every run held the step count fixed at $4000$, so more data meant less
     optimisation per event and the two axes are confounded (see the saturation paragraph). Two clean
     follow-ups: (i) a \emph{fixed-epoch} sweep (scale \code{total\_steps} with $N$ so every event gets the
-    same number of passes) --- if the floor then falls with $N$, the constraint was compute, not data;
-    (ii) a \emph{capacity} axis at fixed data (vary \code{num\_heads}) --- if the floor falls with width,
+    same number of passes): if the floor then falls with $N$, the constraint was compute, not data;
+    (ii) a \emph{capacity} axis at fixed data (vary \code{num\_heads}): if the floor falls with width,
     that confirms ``grow the model'' as the right response to a floored tail, which is currently an
     inference rather than a measurement. Cheap: the runs are ${\sim}13$--$45$ min each.
   \item \textbf{The $\mu$P-LLoCa $\sigma$-head subset is now on \code{jeanzay}} (cherry-picked, not a
     full \code{heterosc} merge): the $2$-channel (mean, softplus $\sigma$) HETEROSC output head with
     \code{detach\_sigma\_backbone}/\code{sigma\_after\_pool}, used by the L2 loop above. Cosmetic
     left-over from the wider \code{heterosc} branch, if ever merged: the HETEROSC validation
-    ``combined'' display still prints $0$ via the geometric mean --- harmless, since training and
+    ``combined'' display still prints $0$ via the geometric mean, which is harmless since training and
     checkpoint selection use the arithmetic mean.
-  \item \textbf{Massive final states} (the remaining harder-divergence case; the multi-scale $u\bar u g$
-    and more-legs $u\bar u ggg$ tests are \emph{done} --- see the ``concentration'' principle above).
-    \emph{The $t\bar t$ threshold is ruled out as the test, and this is a real finding rather than a
-    deferral:} at tree level $ee\to t\bar t$ has \textbf{no threshold divergence at all} --- $|\mathcal
-    M|^2$ spans only $8.7\times$ in total and is \emph{flattest} at threshold ($\mathrm{std}\log|\mathcal
-    M|^2 = 0.022$ for $\beta<0.05$ vs $0.665$ in the bulk). The $2m_t$ cusp is a phase-space/cross-section
-    feature, not an amplitude one, so running it would have produced a guaranteed null that says nothing
-    about the method. The replacement is $ee\to b\bar b g$ (registry row added): the direct massive
-    analogue of $u\bar u g$ --- same $Z$ resonance, same soft-gluon singularity --- but with the
-    \emph{collinear} limit regulated by $m_b$, and the dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}
-    $--$3\times10^{-3}$ sits \emph{inside} the $y_{\min}$ window we bin over, so the mass reshapes the
-    divergence instead of merely relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$). Generator
-    support turned out to be already present --- \code{democratic\_draw} produces exact on-shell massive
-    momenta (verified to $10^{-13}$) and \code{fiducial\_pass\_mask} already skips massive legs; what was
-    missing was only the registry row, a mass-correct collinear variable ($2p_i\!\cdot\!p_j/s$ rather than
-    $s_{ij}/s$, identical for massless legs), and the standalone slot-order check. \emph{The run is now
-    done (single seed):} $\sigma$-steering on $b\bar b g$ localises to the $Z$ peak ($0.56\times$) with a
-    weak IR gain ($0.85\times$), both predicted in advance by the base-arm $\sigma$-contrast --- see the
-    massive-process paragraph and Fig.~\ref{fig:l2_bbbarg} above. \emph{Still genuinely open:} a $3$-seed
-    repeat of $b\bar b g$, and a single process carrying soft$+$collinear$+$resonant coverage at once.
-    \textbf{Slot-order trap, now characterised:} the convention is \emph{per-build}, not global ---
-    \code{ee\_ttbar} takes production order bit-identically while \code{ee\_uu} needs its final pair
-    swapped --- so every new standalone must be checked. Where production data exists, relabel and
-    compare; where it does not (\code{ee\_bbbarg}), the sign of $A_{\rm FB}$ at the $Z$ pole against an
-    already-validated standalone is a data-free substitute (both negative under the same construction,
-    with $|A_{\rm FB}(b)|>|A_{\rm FB}(u)|$ as the SM requires; the swapped order anti-correlates).
+  \item \textbf{Seed-replicate the massive final state, and find a process carrying all three
+    limits at once.} The $b\bar b g$ result above (Fig.~\ref{fig:l2_bbbarg}) is single-seed; a
+    $3$-seed repeat would firm the magnitudes, though the sign and the region-ordering are what the
+    claim rests on. Still missing is a single process carrying soft, collinear, and resonant
+    structure simultaneously, which is the sharpest available test of whether one $\sigma^\gamma$
+    knob can budget across three competing extremes rather than two.
   \item \textbf{The \emph{cheap} epistemic approximations, and a seed-replicated confirmation}
-    (full-network Bayes-by-backprop is \emph{done} and lost --- see the ``ranking'' principle above).
+    (full-network Bayes-by-backprop lost; see the ``ranking'' principle above).
     Two loose ends. (i) BBB was the most expensive way to get an epistemic $\sigma$; the cheap
-    approximations were never tried --- \textbf{MC-dropout} and a \textbf{Laplace/last-layer} posterior are
+    approximations were never tried: \textbf{MC-dropout} and a \textbf{Laplace/last-layer} posterior are
     $\approx$free (no $2\times$ parameters, no training under weight noise, so they should \emph{not} pay
     BBB's point-accuracy penalty), and a \textbf{deep ensemble} ($k\times$ training) is the quality ceiling.
     Since the diagnosis was ``BBB's accuracy loss, not its ranking, is what sinks it'', an epistemic
     $\sigma$ that costs \emph{no} accuracy is the obvious next probe: does it keep the
     $\rho\!\approx\!0.2$ ranking without the penalty? (ii) The BBB verdict rests on single-seed trials with
     $5$--$8\%$ gaps, comparable to seed scatter; $3$ seeds at the swept optimum would firm ``loses to the
-    het head'' from suggestive to settled. Also untested: the claimed \emph{annealing} property --- epistemic
+    het head'' from suggestive to settled. Also untested: the claimed \emph{annealing} property, that epistemic
     $\sigma$ should \emph{shrink} as coverage improves, giving a natural stopping signal the point head lacks.
 \end{itemize}
 
@@ -2249,7 +2229,7 @@ guards (\code{tests/test\_amp.py}, Section~0).
 
 \begin{principle}[The step was data-bound before it was compute-bound]\label{prin:dataloader}
 At \code{num\_workers=0}, profiling showed dataloading was $69\%$ ($260$\,ms) of a $380$\,ms
-step --- $8192$ serial \code{\_\_getitem\_\_} calls plus a collate concatenation on the main
+step: $8192$ serial \code{\_\_getitem\_\_} calls plus a collate concatenation on the main
 thread with the GPU idle. Moving to \code{num\_workers=2} with pinned memory and a
 \code{non\_blocking} host$\to$device copy overlaps the load under compute and takes the step
 from $0.356$ to $0.128$\,s/iter ($2.78\times$), landing on the $\sim0.119$\,s compute floor.
@@ -2257,15 +2237,15 @@ This is now the default (\code{num\_workers: 2}); $nw{=}4$ is no better, $nw{=}6
 the 8 CPUs and hangs.
 \end{principle}
 
-The compute floor was then lowered on two fronts. \emph{Vectorizing the on-GPU hot path} ---
+The compute floor was then lowered on two fronts. \emph{Vectorizing the on-GPU hot path} (
 per-event mean pooling, the block-diagonal attention mask (built once per forward, not per
 block), the per-process loss (a single segment-mean, not a Python loop over processes), the
 $L_2/L_1$ regularizer (one fused \code{\_foreach}), and broadcasting per-particle local frames
-across heads instead of materializing a per-head copy --- gives a combined $\sim3.1\times$ at
+across heads instead of materializing a per-head copy) gives a combined $\sim3.1\times$ at
 $nw{=}0$ (dominated by the pooling rewrite, $3.08\times$ alone). A \emph{fused Adam}
 (\code{fused\_optimizer}, default on) adds $1.34\times$; \emph{deferring host$\leftrightarrow$device
 syncs} (collapsing $\sim4$ syncs/step into one fused \code{stack(\dots).tolist()}, with the NaN
-guard moved onto the already-synced grad-norm) adds a further $\sim2\%$ --- small precisely
+guard moved onto the already-synced grad-norm) adds a further $\sim2\%$, small precisely
 because, after Principle~\ref{prin:dataloader}, the step is no longer GPU-bound. Each vectorized
 path is toggleable (\code{LLOCA\_*} env vars) with the original retained for A/B, and each is
 \code{allclose}-verified against it.
@@ -2273,12 +2253,12 @@ path is toggleable (\code{LLOCA\_*} env vars) with the original retained for A/B
 \begin{remark}[Carried but inert, and deliberately declined]
 \code{allow\_tf32} is carried (default on) but is a \textbf{no-op on V100}; it would give
 $\sim2\times$ matmul on A100 at $\sim10^{-3}$ precision, so it must be loss-A/B'd on A100 before
-it is trusted --- and A100 is unavailable. Two optimizations were declined on purpose:
+it is trusted, and A100 is unavailable. Two optimizations were declined on purpose:
 converting the $L_2$ penalty to decoupled \code{weight\_decay} (it is folded into $\vlnr$,
-checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP --- converting it
+checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP, so converting it
 would silently break continuity with all existing sweep results), and \code{torch.compile} (the
 compute is dominated by the torch-geometric framesnet and xformers attention, neither of which
-compiles --- heavy graph breaks for no gain --- and it would prefix \code{state\_dict} keys,
+compiles (heavy graph breaks for no gain), and it would prefix \code{state\_dict} keys,
 breaking warm-start/fine-tune reloads). A gradient-checkpointing knob
 (\code{checkpoint\_blocks}) trades $\sim$one extra forward for a large activation-memory saving
 when memory-bound.
@@ -2292,7 +2272,7 @@ Because Jean-Zay bills a fixed GPU-hour budget, each job should run near the har
 Two quantities bound the operating point on the V100: peak VRAM (limiting batch size and width)
 and step time (limiting how many updates fit in an allocation). The standard training batch is
 therefore the largest that fits, $\mathrm{bs}=16384$ (at $\nh\!\le\!8$ on the 32\,GB V100);
-for the many-process joint runs this is also a statistical requirement, not just throughput ---
+for the many-process joint runs this is a statistical requirement as well as a throughput one:
 at $448$ datasets and a per-dataset geometric-mean loss, $\mathrm{bs}=16384$ gives
 $\sim\!36$ events/dataset per batch, where $\mathrm{bs}=1024$ would give only $\sim\!2$ and the
 per-dataset MSEs (hence their log-mean) would be noise. With batch size $\mathrm{bs}$,
@@ -2317,16 +2297,16 @@ $1/\nh$. The full six-panel benchmark tables are in \code{notes/scaling\_notes.t
 
 The results above impose a concrete protocol on how sweeps, HPO, and comparisons are run.
 
-\begin{principle} Compare on $\vlnr$ --- the best \emph{non-regularized} validation loss on
-log-amplitudes (Eq.~\ref{eq:vlnr}) --- never the regularized tracked loss, since $\lambda$ is a
+\begin{principle} Compare on $\vlnr$, the best \emph{non-regularized} validation loss on
+log-amplitudes (Eq.~\ref{eq:vlnr}), never the regularized tracked loss, since $\lambda$ is a
 tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{prin:perproc}).
 \end{principle}
 \begin{principle} Never re-sweep $\eta$ across width: $\mu$P transfers it. Tune once at the
-smallest width and reuse for all larger widths --- up to a $5\times$ cut on a width-scaling grid.
+smallest width and reuse for all larger widths, up to a $5\times$ cut on a width-scaling grid.
 \end{principle}
 \begin{principle} Centre the $\eta$ search by evaluating the measured 2D surface
-$\eta^\ast(t,D)$ at your \emph{own} $(t,D)$ --- the inverted-$U$ $\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$
-(Eq.~\ref{eq:invU}) lifted onto the high-$D$ row of the grid --- and sweep only $\pm\tfrac12$
+$\eta^\ast(t,D)$ at your \emph{own} $(t,D)$: the inverted-$U$ $\eta_c(t)=10^{-2}\min[(t/3000)^{0.5},(t/3000)^{-0.55}]$
+(Eq.~\ref{eq:invU}) lifted onto the high-$D$ row of the grid, and sweep only $\pm\tfrac12$
 decade, not a flat 4-decade prior and not the $t$-only $\eta_c(t)$. Every real run sits past the
 peak ($t\gg\tstar=3$k), so the centre \emph{decreases} with horizon; a large-$D$ foundation run
 lives in the (high-$D$, high-$t$) corner the grid does not cover, so its centre is an
@@ -2347,18 +2327,18 @@ reg/warmup/$\eta_{\min}$ rules.
 \end{principle}
 \begin{principle} Seed new sweep cells from the law, not a flat prior: $\eta_c(t)$ is smooth in
 $t$ and width-invariant, so a good rate at one horizon predicts its neighbours. Do \emph{not}
-assume batch/data-size invariance --- those axes were never cleanly isolated here.
+assume batch/data-size invariance; those axes were never cleanly isolated here.
 \end{principle}
 \begin{principle} Submit multiple sweeps \emph{interleaved} (round-robin), not all-at-once: DyHPO
 trials only inform siblings that \code{observe} before they \code{suggest}, so a simultaneous
 launch suggests against a stale surrogate (Def.~\ref{def:dyhpo}). When there are not enough
-concurrent jobs for interleaving to serialize anything --- a lone sweep, or a moment of abundant
-free GPUs --- fall back to \textbf{sequential batches}: split the trials into (by default) three
+concurrent jobs for interleaving to serialize anything (a lone sweep, or a moment of abundant
+free GPUs), fall back to \textbf{sequential batches}: split the trials into (by default) three
 dependency-chained waves, so each wave \code{observe}s before the next \code{suggest}s and the
 single-fidelity optimizer always has data to fit (Rem.~\ref{rem:dyhpo}).
 \end{principle}
 \begin{principle} A/B fairly and cheaply: reuse the existing baseline (the best of its own short
-HPO sweep --- never a single arbitrary run); first try the feature at the baseline's best HPs and
+HPO sweep, never a single arbitrary run); first try the feature at the baseline's best HPs and
 stop if it already wins; only if it does not, sweep the feature with the same HPO and compare
 best-vs-best on $\vlnr$, re-basing for any preprocessing difference first.
 \end{principle}
