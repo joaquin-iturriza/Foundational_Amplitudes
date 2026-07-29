@@ -1388,21 +1388,22 @@ in-region data than $u\bar u g$.
 \subsection{Deeper/cleverer sampling, optimal allocation, and heteroscedastic
 uncertainty}\label{sec:div-sampling}
 
-\emph{Settled picture of this line of work. The training-density question resolves into two layers.
-\textbf{(L0) Coverage is the dominant lever, and it must be GENERATED, not resampled}: a fixed pool
+\emph{Settled picture of this line of work. The training-density question resolves into three
+layers, which we call \textbf{coverage}, \textbf{emphasis} and \textbf{steering}.
+\textbf{Coverage is the dominant lever, and it must be \emph{generated}, not resampled}: a fixed pool
 has a coverage ceiling (resampling only duplicates the few extreme events), so a divergence is fixed
 by importance-\emph{generating} fresh events, shaped flat-in-$\log|\mathcal{M}|^2$ (the general,
 process-agnostic criterion); the deployable density is a uniform$+$flat \emph{mixture} at a modest
 fraction ($f\!\approx\!0.25$--$0.5$), not pure flat. Validated on two structurally-distinct
-singularities: the $u\bar u g$ soft/collinear IR (antenna sampler, Thread~A) and the $ee\to u\bar u$
-$s$-channel $Z$ resonance (fraction sweep). \textbf{(L1) Heteroscedastic $\sigma$-reweighting is a
-scoped, second-order emphasis layer}: the coupled $(\mu,\sigma)$ fit fails for a structural reason
+singularities: the $u\bar u g$ soft/collinear IR (antenna sampler) and the $ee\to u\bar u$
+$s$-channel $Z$ resonance (fraction sweep). \textbf{Emphasis ($\sigma$-reweighting) is a scoped,
+second-order layer}: the coupled $(\mu,\sigma)$ fit fails for a structural reason
 and is replaced by a two-stage recipe (train $\mu$, then fit a frozen-$\mu$ $\sigma$ head); the
 resulting $\sigma$ helps \emph{only where coverage is capped}: on a starved, un-regenerable pool it
 is robustly ${\approx}$oracle ($3$-seed), on a base you can already generate well it is a null.
-Equimarginal (water-filling) allocation (Thread~B) frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
-\mathrm{diff}}$), consistent with the interior mixture. \textbf{(L2) $\sigma$-driven on-the-fly
-generation} beats uniform generation on a coordinate-free loop, and helps \emph{iff} the hardness is
+Equimarginal (water-filling) allocation frames the optimum ($p^\star\!\propto\!\sqrt{q\cdot
+\mathrm{diff}}$), consistent with the interior mixture. \textbf{Steering ($\sigma$-driven
+on-the-fly generation)} beats uniform generation on a coordinate-free loop, and helps \emph{iff} the hardness is
 \emph{concentrated} (the concentration principle), with three sharpening results: (i) the learned
 $\sigma$ rises inside every divergence, and its base-arm \emph{contrast}
 $\langle\sigma\rangle_{\rm sing}/\langle\sigma\rangle_{\rm bulk}$ is a one-forward-pass \emph{pre-flight}
@@ -1416,7 +1417,7 @@ rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 
-\paragraph{Thread A: deeper and antenna phase-space sampling.} The production
+\paragraph{Deeper and antenna phase-space sampling.} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
 IR is starved (median $y_{\min}\!\approx\!0.15$; only $\sim$5 of $10^6$ events below
 $y_{\min}=10^{-5}$). \code{gen\_uug\_sampling.py} adds two samplers over a lowered-cut fiducial
@@ -1442,7 +1443,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{deep_sampling_uniform_vs_antenna.pdf}
-  \caption{\textbf{Thread A: antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
+  \caption{\textbf{Antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
   for the production flat-\textsc{rambo} set vs the antenna sampler, same base22 / $400$k events /
   $4000$ steps. Flat \textsc{rambo} starves the deep IR by construction (median
   $y_{\min}\!\approx\!0.15$); the antenna proposal, which is flat per decade in the gluon invariants,
@@ -1455,7 +1456,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{deep_sampling_fraction_sweep.pdf}
-  \caption{\textbf{Thread A: the antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
+  \caption{\textbf{The antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
   the antenna fraction $f$. Both endpoints are bad: $f{=}0$ (pure \textsc{rambo}) is catastrophic
   ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
   starves the $O(1)$ bulk, while any $f\in[0.25,0.75]$ sits in a flat basin. The fine location inside
@@ -1472,7 +1473,7 @@ well \emph{above} this (short trainings), so they are optimisation-limited, not 
 precision-limited, reparametrise (feed $\ln y_{\min}$ / pair masses as features) rather than store
 float64.
 
-\paragraph{Thread B: optimal allocation.} For a fixed data
+\paragraph{Optimal allocation of a fixed data budget.} For a fixed data
 budget the optimum is the equimarginal (water-filling) allocation: sample until the marginal
 (test-weighted) error reduction is equal everywhere, $p^\star\!\propto\!\sqrt{q\cdot\text{diff}}$
 for test weighting $q$, neither uniform nor pure antenna, consistent with the interior optimum
@@ -1482,9 +1483,9 @@ above. An online adaptive per-$y_{\min}$-bin importance sampler was prototyped
 $\pi_b\!\propto\!Q_b\sqrt{E_b}$). It is \emph{not} wired into the training loop. Caveat: the
 variance-reduction proposal ($\pi\!\propto\!Q\sqrt{E}$, fixed objective, faster convergence) is
 \emph{not} the finite-data allocation optimum ($\pi\!\propto\!\sqrt{QC}$). Deprioritised in favour
-of Thread~C.
+of the heteroscedastic head below.
 
-\paragraph{Thread C: the heteroscedastic $(\mu,\sigma)$ head.}
+\paragraph{The heteroscedastic $(\mu,\sigma)$ head.}
 Goal: a learned per-event uncertainty $\sigma(x)$ as an attention/sampling signal
 (process/divergence-agnostic, no hand-binning). All on branch \code{heterosc}.
 \emph{Wiring:} HETEROSC existed for the MLP configs but was never wired for the $\mu$P
@@ -1528,7 +1529,7 @@ broken; they must not be trained \emph{jointly} with $\mu$. A naming trap worth 
 $\beta$-NLL is $\mathrm{detach}(\sigma^{2\beta})\!\cdot\!\text{NLL}$, so $\beta{=}0$ is the standard
 Gaussian NLL (works); the catastrophic runs were all $\beta{=}1$.
 
-\paragraph{Q1: the $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
+\paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
 Spearman$(\sigma,|r|)$ global + per-process median; \code{sigma\_speed.sh}, constant-lr to avoid
@@ -1541,14 +1542,14 @@ subtlety: cross-process ranking is strong ($\rho\!\approx\!0.85$), within-proces
 training: global Spearman \emph{under-rates} a learned head because it weights bulk ordering
 (irrelevant to reweighting) equally with the high-error tail.
 
-\paragraph{Q2: imperfect $\sigma$ is tolerable, but the metric must be equal-footing.} Since a
+\paragraph{Imperfect $\sigma$ is tolerable, but the metric must be equal-footing.} Since a
 reweighting proposal $\pi\!\propto\!Q\sigma^\alpha$ renormalizes, only $\sigma$'s order/magnitude
 \emph{relative} to the true error matters, not calibration per se. Test: resample the antenna pool
 by $\pi\!\propto\!Q\,\mathrm{score}^\alpha$ at several signal qualities (\code{build\_reweight\_pools.py}
 without replacement to a fixed $N$; \code{finetune\_sigma\_reweight.sh}; deep-IR eval), plus a
 magnitude-controlled rank-vs-magnitude split (\code{build\_rank\_pools.py}: same weight multiset
 $\Phi=\mathrm{sort}|r|$ reassigned by different orderings). \textbf{Metric correction (important):}
-the eval must weight each $y_{\min}$ decade \emph{equally} (log-flat-per-decade, the Thread-A
+the eval must weight each $y_{\min}$ decade \emph{equally} (log-flat-per-decade, the antenna-study
 metric), \emph{not} \code{np.mean}$(d^2)$ over all events: the antenna test set is $\sim$50\%
 below $y_{\min}\,10^{-3}$, so event-weighting is deep-IR-dominated
 (\code{recompute\_q2\_logflat.py}). Under equal footing: the real $\sigma$ head captures
@@ -1565,7 +1566,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{q2_logflat.pdf}
-  \caption{\textbf{Q2: the metric must weight each $y_{\min}$ decade equally.} $\sigma$-reweighting gain
+  \caption{\textbf{The metric must weight each $y_{\min}$ decade equally.} $\sigma$-reweighting gain
   under the log-flat-per-decade metric. The antenna test set is $\sim\!50\%$ below
   $y_{\min}\!=\!10^{-3}$, so a plain event-weighted \code{mean}$(d^2)$ is deep-IR-dominated and
   flatters any deep-IR-following heuristic. Under equal footing the real $\sigma$ head captures
@@ -1577,7 +1578,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{q2_rankmag.pdf}
-  \caption{\textbf{Q2: magnitude dominates ranking (a controlled rank-vs-magnitude split).} The same
+  \caption{\textbf{Magnitude dominates ranking (a controlled rank-vs-magnitude split).} The same
   weight multiset $\Phi=\mathrm{sort}|r|$ reassigned by different orderings, so ordering and magnitude
   are varied independently. Ordering \emph{alone} recovers only $11\%$ of the oracle gain: after antenna
   training the worst-fit decade is the \emph{bulk} ($\mathrm{MSE}\sim10^{-2}$, vs deep-IR
@@ -1587,7 +1588,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   \label{fig:q2_rankmag}
 \end{figure}
 
-\paragraph{Thread D: coverage vs.\ emphasis, and the general default sampling.} The decisive
+\paragraph{Coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage: it cannot beat
 the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
 so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$) as well as the sampling-study
@@ -1605,21 +1606,22 @@ coordinate always available (computed to label every event); it matches the $\lo
 equal-footing loss. \emph{How:} you cannot draw a target $|\mathcal{M}|^2$, so shape the density by
 adaptive importance sampling (VEGAS/foam) \emph{guided by} $|\mathcal{M}|^2$ toward
 flat-in-$\log|\mathcal{M}|^2$, \emph{not} the physical measure $|\mathcal{M}|^2\mathrm{d}\Phi$ a
-cross-section generator targets (that is the \textsc{rambo} starvation trap). The three layers: (L0)
-coverage via flat-$\log|\mathcal{M}|^2$ importance sampling; (L1) emphasis via $\sigma$-reweighting
-$\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); (L2, \textbf{validated on
-\code{uugg}}, below) $\sigma$-informed \emph{on-the-fly generation}, the only layer that lets
-$\sigma$ overcome the coverage ceiling, by generating where $\sigma$ is high \emph{and} data is sparse.
+cross-section generator targets (that is the \textsc{rambo} starvation trap). The three layers, then:
+\textbf{coverage} via flat-$\log|\mathcal{M}|^2$ importance sampling; \textbf{emphasis} via
+$\sigma$-reweighting $\pi\!\propto\!\sigma^\alpha$ (no physical binning, process-agnostic); and
+\textbf{steering} (validated on \code{uugg}, below), $\sigma$-informed \emph{on-the-fly
+generation}, the only layer that lets $\sigma$ overcome the coverage ceiling, by generating where
+$\sigma$ is high \emph{and} data is sparse. The code and figure names for the steering layer carry an
+older \code{l2\_} prefix.
 
-\paragraph{L0 validated on the $ee\to u\bar u$ $Z$ resonance, by generation rather than resampling.}
+\paragraph{Coverage validated on the $ee\to u\bar u$ $Z$ resonance, by generation rather than resampling.}
 The $s$-channel $Z$ pole ($|\mathcal{M}|^2$ peaks $\sim$$200\times$ at $\sqrt{s}\!\approx\!91$; flat
 \textsc{rambo} in $\sqrt{s}$ puts only $0.4$\% of events in $[88,95]$, and the production foundation
 duly fits the peak $\sim$$400\times$ worse than the bulk, MSE $1.9\mathrm{e}{-}5$ vs $4.8\mathrm{e}{-}8$)
 is the second, structurally-distinct singularity. \emph{Key negative result first:}
 \textbf{resampling the fixed $10^6$ \textsc{rambo} pool to flat-$\log|\mathcal{M}|^2$ does not fix the
 resonance}: the pool holds only $\sim$$3300$ real pole events, so flat resampling merely duplicates
-them ($155$k unique of $400$k), no new pole physics. This is the coverage ceiling of
-Thread~D made concrete: \emph{you cannot resample your way past what the pool contains.} The fix is to
+them ($155$k unique of $400$k), no new pole physics. This is the coverage ceiling made concrete: \emph{you cannot resample your way past what the pool contains.} The fix is to
 \textbf{generate} fresh pole events, exactly as the uug antenna sampler generates deep-IR points.
 \code{gen\_uu\_sampling.py} draws $\sqrt{s}$ from a pole-covering importance proposal, builds $2\to2$
 momenta, labels the exact tree $|\mathcal{M}|^2$ with the compiled \code{ee\_uu} standalone
@@ -1636,7 +1638,7 @@ $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{eeuu_flatlogm_resonance.pdf}
-  \caption{\textbf{L0 on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Held-out MSE
+  \caption{\textbf{Coverage on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Held-out MSE
   binned in $\sqrt s$ for three training densities scored on the same test set: raw \textsc{rambo}, a
   flat-$\log|\mathcal M|^2$ set obtained by \emph{resampling} the fixed $10^6$ \textsc{rambo} pool, and
   one obtained by \emph{generating} fresh events. Raw \textsc{rambo} is the best arm in the bulk and the
@@ -1646,7 +1648,7 @@ $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0
   resampling merely duplicates them ($155$k unique of $400$k). Generating lifts pole coverage
   $0.4\%\!\to\!32\%$ with genuinely new events, and is $2.6\times$ better than resampling on the log-flat
   metric; against raw it is $9.4\times$ better log-flat and $2.1\times$ at the $Z$ peak. This is the
-  coverage ceiling of Thread~D made concrete: you cannot resample past what the pool contains.
+  coverage ceiling made concrete: you cannot resample past what the pool contains.
   \emph{(Rebuilt from the corrected re-eval \code{eeuu\_reson\_clean\_summary.json}; the earlier version
   of this figure was drawn from the pre-fix evaluation, whose cross-tag state leak corrupted every tag
   after the first and gave $5.8\times/1.5\times$ here.)}}
@@ -1700,7 +1702,7 @@ resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after
 merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
 bump'' was this corruption, not seed noise.
 
-\paragraph{L1: $\sigma$-reweighting the coverage base does not robustly help (3 seeds).} On the $f{=}0.25$
+\paragraph{Emphasis: $\sigma$-reweighting the coverage base does not robustly help (3 seeds).} On the $f{=}0.25$
 base: grow a $\sigma$ row on the $\mu$ model, two-stage fit (frozen $\mu$, $\beta{=}0$; $\mu$ recovers
 bit-identically), extract $\sigma$ over a fresh $1.5\mathrm{M}$ mix025 pool (global $\rho(\sigma,|r|){=}0.66$),
 subsample $400$k \emph{without replacement} by $\pi\!\propto\!\sigma^\alpha$ (no ceiling, since the pool is fresh).
@@ -1709,14 +1711,13 @@ $\sigma$'s budget reallocation matches the oracle almost exactly (pole $20\%$ vs
 $4.6\mathrm{e}{-}5\!\pm\!3.4\mathrm{e}{-}5$, $\sigma$ $1.8\mathrm{e}{-}4\!\pm\!2.3\mathrm{e}{-}4$, oracle
 $3.1\mathrm{e}{-}5\!\pm\!3.3\mathrm{e}{-}6$; $\sigma$/base per-seed $=1.46\times,0.04\times,1.12\times$ (one
 seed $25\times$ \emph{worse}). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
-run-to-run variance.} Even the oracle buys little on the mean and does not beat base's best draws. Conclusion
-(sharpening Thread~D): \textbf{coverage (L0) is the dominant lever; emphasis (L1) is second-order once
-coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
+run-to-run variance.} Even the oracle buys little on the mean and does not beat base's best draws. Conclusion:
+\textbf{coverage is the dominant lever; emphasis is second-order once coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
 $\sigma$-emphasis should earn its keep only where coverage is \emph{capped}: a starved,
 un-regenerable pool.
 
-\paragraph{L1 confirmed where coverage is capped: $\sigma\!\approx\!$oracle on a starved base (3-seed).}
-Repeating the L1 pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{rambo} base (pole $0.44\%$;
+\paragraph{Emphasis confirmed where coverage is capped: $\sigma\!\approx\!$oracle on a starved base (3-seed).}
+Repeating the emphasis pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{rambo} base (pole $0.44\%$;
 \code{sigma\_fit\_raw.sh}, $\rho(\sigma,|r|){=}0.52$; $\sigma$ lifts pole selection $0.4\%\!\to\!1.6\%$,
 the $4\times$ ceiling, $\approx$oracle's $1.5\%$) \emph{flips the verdict}. Over 3 seeds
 $\times$\{base,$\sigma$,oracle\}, logflat: base $1.4\mathrm{e}{-}4\!\pm\!1.3\mathrm{e}{-}4$, $\sigma$
@@ -1724,9 +1725,9 @@ $4.1\mathrm{e}{-}5\!\pm\!2.8\mathrm{e}{-}5$, oracle $4.4\mathrm{e}{-}5\!\pm\!2.4
 per-seed $=1.10\times,1.89\times,12.65\times$ (\emph{helps every seed}, mean $5.2\times$ logflat / $5.7\times$
 resonance), and \textbf{$\sigma$ recovers $103$--$143\%$ of the oracle}: the real head is as good as the
 perfect error signal here. Contrast the covered $f{=}0.25$ base, where $\sigma$/base was
-$1.46\times,0.04\times,1.12\times$ (null). \textbf{This scopes L1 precisely: $\sigma$-reweighting is the
-tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate well
-(L0), emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
+$1.46\times,0.04\times,1.12\times$ (null). \textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
+tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate
+well, emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
 the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
 is already balanced, leaving $\sigma$ nothing to reallocate.
 
@@ -1734,9 +1735,9 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
 un-regenerable.}
 
-\paragraph{L2 validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
-uniform generation, coordinate-free.} L2 is the layer where $\sigma$ finally overcomes the coverage
-ceiling: instead of \emph{reweighting} a fixed pool (L1), the model's live uncertainty steers what
+\paragraph{Steering validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
+uniform generation, coordinate-free.} Steering is the layer where $\sigma$ finally overcomes the
+coverage ceiling: instead of \emph{reweighting} a fixed pool, the model's live uncertainty steers what
 gets \emph{generated} next. Demonstrated on $ee\to u\bar u gg$, deliberately the process the
 earlier $ee\to u\bar u$ attempt flagged as the right test, since its overlapping soft \emph{and}
 collinear singularities admit \emph{no} single hand-tuned density (no one-parameter $f$ can be
@@ -1820,17 +1821,17 @@ nothing deep and pays steadily in the bulk (Fig.~\ref{fig:l2_gamma_response_exte
 (bulk) decade $y_{\min}\!>\!0.1$ \emph{rises} $107\%\!\to\!128\%$ over $\gamma{=}1\!\to\!10$, an
 accelerating penalty that eats the deep-IR gain in the log-flat average. So $\gamma\!\approx\!3$--$5$ is
 the sweet spot for the overall metric; larger $\gamma$ buys still-lower deep-IR error by paying more in
-the bulk, exactly the water-filling trade-off (Thread~B), now traversed by a single coordinate-free
-knob. \textbf{This closes L2: on a process where no one-parameter hand density fits, the model's own
+the bulk, exactly the water-filling trade-off above, now traversed by a single coordinate-free
+knob. \textbf{This closes the steering layer: on a process where no one-parameter hand density fits, the model's own
 $\sigma$, raised to a power, generates a strictly better training set than uniform, with no physics
 coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
-confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ L2 numbers from the earlier
+confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ steering numbers from the earlier
 session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l2_uugg_perdecade_abs}.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{l2_uugg_perdecade.pdf}
-  \caption{\textbf{L2 on $e^+e^-\to u\bar u gg$: $\sigma$-driven generation vs uniform ($\gamma{=}1$,
+  \caption{\textbf{Steering on $e^+e^-\to u\bar u gg$: $\sigma$-driven generation vs uniform ($\gamma{=}1$,
   $3$ seeds).} Held-out deep-IR MSE per $y_{\min}$ decade. Both arms train the \emph{identical}
   HETEROSC net with a detached $\sigma$ backbone at $\beta{=}1$ (so $\mu$ trains exactly as MSE in
   both) on matched totals with fresh data every round: the \emph{only} difference is the keep rule,
@@ -1848,7 +1849,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,70,66,62,55\%$) while the
   shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average is best around
   $\gamma\!\approx\!3$--$5$ and larger $\gamma$ buys deep-IR accuracy by paying in the bulk: one
-  coordinate-free scalar knob sliding along the allocation trade-off of Thread~B. Extending the sweep to
+  coordinate-free scalar knob sliding along the equimarginal allocation trade-off. Extending the sweep to
   $\gamma=20,30$ shows the deep gain \emph{saturating} rather than continuing
   (Fig.~\ref{fig:l2_gamma_response_extended}).}
   \label{fig:l2_uugg_gamma}
@@ -1860,13 +1861,13 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   \caption{\textbf{Absolute per-decade MSE for all $\gamma$.} The same runs as
   Fig.~\ref{fig:l2_uugg_gamma} on an absolute scale rather than as a ratio to base, so the size of each
   decade's error is visible alongside the relative gain: the deep decades carry MSE orders of
-  magnitude above the bulk, which is why a log-flat-per-decade metric (Q2,
-  Fig.~\ref{fig:q2_logflat}) is the honest way to score the trade-off.}
+  magnitude above the bulk, which is why a log-flat-per-decade metric
+  (Fig.~\ref{fig:q2_logflat}) is the honest way to score the trade-off.}
   \label{fig:l2_uugg_perdecade_abs}
 \end{figure}
 
 \paragraph{Transfer of the coordinate-free loop to harder divergences ($u\bar u g$ multi-scale,
-$u\bar u ggg$ more legs).} Because the L2 loop carries \emph{no} process coordinate, it should transfer
+$u\bar u ggg$ more legs).} Because the steering loop carries \emph{no} process coordinate, it should transfer
 with \emph{no} per-process tuning; we stress it on two structurally-different divergences by changing
 only the process registry (\code{--process}: PDG/multiplicity, the compiled standalone labeller, and
 the round-0 frozen-stats set): same base22, same democratic generator, same finetune HPs. Held-out
@@ -2045,7 +2046,7 @@ and gives the concentration principle a directly measurable order parameter.
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
 itself.} The steering $\sigma$ above is a \emph{point} heteroscedastic head, a learned (aleatoric)
 spread. The arguably-right signal for deciding what to \emph{generate} is \emph{epistemic}: high where
-the training set is sparse, which is exactly what L2 wants to fill. We therefore built a genuinely
+the training set is sparse, which is exactly what steering wants to fill. We therefore built a genuinely
 Bayesian alternative, \textbf{full-network Bayes-by-backprop} (\code{bbb.py}), a mean-field Gaussian
 posterior $q(w)=\mathcal N(\mu_w,\sigma_w^2)$ over \emph{every} weight and bias (not MC-dropout, not a
 Laplace/last-layer approximation, not an ensemble). \emph{Implementation:} rather than rebuild the
@@ -2083,7 +2084,7 @@ the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$
 \emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter, so the safe
 claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
-\code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the L2 loop via
+\code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the steering loop via
 \code{generate\_sweep}'s new \code{trial\_script} hook).
 
 \begin{figure}[H]
@@ -2224,7 +2225,7 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     inference rather than a measurement. Cheap: the runs are ${\sim}13$--$45$ min each.
   \item \textbf{The $\mu$P-LLoCa $\sigma$-head subset is now on \code{jeanzay}} (cherry-picked, not a
     full \code{heterosc} merge): the $2$-channel (mean, softplus $\sigma$) HETEROSC output head with
-    \code{detach\_sigma\_backbone}/\code{sigma\_after\_pool}, used by the L2 loop above. Cosmetic
+    \code{detach\_sigma\_backbone}/\code{sigma\_after\_pool}, used by the steering loop above. Cosmetic
     left-over from the wider \code{heterosc} branch, if ever merged: the HETEROSC validation
     ``combined'' display still prints $0$ via the geometric mean, which is harmless since training and
     checkpoint selection use the arithmetic mean.
