@@ -54,7 +54,7 @@ ps.process_label(ax, r"$e^+e^-\to b\bar b g$", loc="upper right")
 # ---------------------------------------------------------------- per sqrt(s) region
 ax = axes[1]
 REG = [(r"$|\sqrt{s}-M_Z|<3$", np.abs(ss - MZ) < 3.0),
-       (r"$3$–$15$", (np.abs(ss - MZ) >= 3) & (np.abs(ss - MZ) < 15)),
+       (r"$3\!-\!15$", (np.abs(ss - MZ) >= 3) & (np.abs(ss - MZ) < 15)),
        (r"$>15$", np.abs(ss - MZ) >= 15)]
 xs = np.arange(len(REG)); w = 0.38
 bvals = [eb[m].mean() for _, m in REG]

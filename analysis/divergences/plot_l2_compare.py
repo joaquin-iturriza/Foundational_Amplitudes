@@ -17,11 +17,15 @@ Usage:
 """
 import argparse
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 DECADES = [(0, 1e-6), (1e-6, 1e-5), (1e-5, 1e-4), (1e-4, 1e-3), (1e-3, 1e-2), (1e-2, 1e-1), (1e-1, 1.01)]
 MZ = 91.1876
@@ -57,35 +61,37 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--npz", nargs="+", required=True, help="label=heldout_eval_<...> pairs")
     ap.add_argument("--out", required=True, help="output basename (writes .png + .pdf)")
-    ap.add_argument("--title", default="")
+    ap.add_argument("--process", default="", help="process label drawn inside the axes")
     ap.add_argument("--regions", action="store_true", help="add the sqrt(s) Z-peak/continuum panel (uug)")
     args = ap.parse_args()
 
     runs = []
     for spec in args.npz:
-        label, path = spec.split("=", 1)
+        # rsplit: paths never contain "=", but labels do (e.g. "$\\gamma=3$")
+        label, path = spec.rsplit("=", 1)
         err2, y_min, s = load(path)
         runs.append((label, err2, y_min, s))
 
     ncol = 2 if args.regions else 1
-    fig, axes = plt.subplots(1, ncol, figsize=(6.6 * ncol, 5.2), squeeze=False)
+    fig, axes = ps.figure(ncols=ncol, squeeze=False)
     ax = axes[0, 0]
-    colors = plt.cm.viridis(np.linspace(0.15, 0.85, len(runs)))
+    colors = ps.sequence(len(runs))
     for (label, err2, y_min, s), c in zip(runs, colors):
         x, y, n = decade_mse(err2, y_min)
-        ax.plot(x, y, "o-", color=c, lw=2.0, label=f"{label}  (overall {err2.mean():.3e})")
+        ax.plot(x, y, "o-", color=c, label=label)
     ax.set_xscale("log"); ax.set_yscale("log"); ax.invert_xaxis()
     ax.set_xlabel(r"$y_{\min}$")
-    ax.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-    ax.set_title(args.title)
-    ax.grid(True, which="both", alpha=0.25); ax.legend(fontsize=8)
+    ax.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+    ax.legend(loc="upper right")
+    if args.process:
+        ps.process_label(ax, args.process, loc="lower left")
 
     if args.regions:
         ax2 = axes[0, 1]
-        SREG = [("Z-peak\n|√s-Mz|<3", lambda s: np.abs(s - MZ) < 3.0),
-                ("shoulder\n3-15", lambda s: (np.abs(s - MZ) >= 3.0) & (np.abs(s - MZ) < 15.0)),
-                ("continuum\n>15", lambda s: np.abs(s - MZ) >= 15.0),
-                ("deep-IR\n&Z-peak", lambda s: None)]  # special-cased below
+        SREG = [(r"$<3$", lambda s: np.abs(s - MZ) < 3.0),
+                (r"$3\!-\!15$", lambda s: (np.abs(s - MZ) >= 3.0) & (np.abs(s - MZ) < 15.0)),
+                (r"$>15$", lambda s: np.abs(s - MZ) >= 15.0),
+                ("$<3$," "\n" r"$y_{\min}<10^{-3}$", lambda s: None)]  # special-cased below
         xlab = [r[0] for r in SREG]
         width = 0.8 / max(1, len(runs))
         for j, (label, err2, y_min, s) in enumerate(runs):
@@ -93,7 +99,7 @@ def main():
                 continue
             vals = []
             for name, fn in SREG:
-                if name.startswith("deep-IR"):
+                if name.startswith("$<3$,"):
                     m = (y_min < 1e-3) & (np.abs(s - MZ) < 3.0)
                 else:
                     m = fn(s)
@@ -102,16 +108,13 @@ def main():
             ax2.bar(xpos, vals, width=width, label=label, color=colors[j])
         ax2.set_yscale("log")
         ax2.set_xticks(np.arange(len(SREG)) + width * (len(runs) - 1) / 2)
-        ax2.set_xticklabels(xlab, fontsize=8)
-        ax2.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-        ax2.grid(True, axis="y", which="both", alpha=0.25); ax2.legend(fontsize=8)
+        ax2.set_xticklabels(xlab)
+        ax2.set_xlabel(r"$|\sqrt{s}-M_Z|$  [GeV]")
+        ax2.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+        ax2.grid(True, axis="y", which="both")
+        ax2.legend(loc="upper left")
 
-    fig.tight_layout()
-    os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{args.out}.{ext}", dpi=140, bbox_inches="tight")
-    plt.close(fig)
-    print(f"wrote {args.out}.png/.pdf")
+    ps.save(fig, args.out)
 
 
 if __name__ == "__main__":
