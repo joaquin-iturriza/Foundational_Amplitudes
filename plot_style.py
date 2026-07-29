@@ -298,6 +298,16 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
     movers = [a for a in (ax.get_legend(), getattr(ax, "_ps_label", None)) if a is not None]
     if not movers:
         return
+    # Never touch a colourbar, nor a panel whose content is a 2-D map: growing the y-range
+    # of a pcolormesh/imshow does not "make room", it stretches the image and leaves a band
+    # of blank axes. Those panels need a smaller legend, not a bigger axis.
+    if ax.get_label() == "<colorbar>" or getattr(ax, "_colorbar", None) is not None:
+        return
+    if ax.images:
+        return
+    from matplotlib.collections import QuadMesh
+    if any(isinstance(c, QuadMesh) for c in ax.collections):
+        return
     # Bound the growth. Without a cap a tall legend on a log axis spanning several decades
     # keeps demanding room and ends up squashing the data into a corner, which is worse
     # than a little overlap. Past the cap, leave it: the panel needs a smaller legend

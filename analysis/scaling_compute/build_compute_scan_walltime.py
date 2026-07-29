@@ -13,14 +13,9 @@ import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({
-    "figure.facecolor": "white", "axes.facecolor": "white", "savefig.facecolor": "white",
-    "font.size": 16, "axes.labelsize": 18, "axes.titlesize": 18,
-    "xtick.labelsize": 14, "ytick.labelsize": 14, "legend.fontsize": 15,
-    "axes.linewidth": 1.1,
-})
-
 ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, ROOT)
+import plot_style as ps  # noqa: E402
 DATASET = {"eeuunlovirte4": "ee_uu_nlo_virt_e4", "eettbarnlovirte4": "ee_ttbar_nlo_virt_e4"}
 SUB = {"1k": 1000, "10k": 10000, "100k": 100000, "1M": 1000000}
 
@@ -87,10 +82,10 @@ FAM_STYLE = {"solo": dict(color="C2", marker="o"),
              "ft416raw":  dict(color="C5", marker="v"),
              "ft416best": dict(color="C3", marker="^"),
              "ft352lo":   dict(color="C6", marker="P")}
-FAM_LABEL = {"solo": "solo (scratch)", "ft8": "FT ← 8-proc", "ft25": "FT ← 25-proc",
-             "ft416raw":  "FT ← 416-proc (raw enc.)",
-             "ft416best": "FT ← 416-proc (best)",
-             "ft352lo":   "FT ← 352-proc (LO only)"}
+FAM_LABEL = {"solo": "solo (scratch)", "ft8": r"FT $\leftarrow$ 8-proc", "ft25": r"FT $\leftarrow$ 25-proc",
+             "ft416raw":  r"FT $\leftarrow$ 416-proc (raw enc.)",
+             "ft416best": r"FT $\leftarrow$ 416-proc (best)",
+             "ft352lo":   r"FT $\leftarrow$ 352-proc (LO only)"}
 MINIMAL = "--minimal" in sys.argv[1:]
 CLEAN = MINIMAL or "--clean" in sys.argv[1:]
 FAMS = ("solo", "ft8", "ft25") if MINIMAL else \
@@ -100,7 +95,7 @@ DORDER = ["1k", "10k", "100k", "1M"]
 WT_IDX = 1   # (logMSE, walltime_h, compute)  ->  walltime
 
 for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt", "eettbarnlovirte4")]:
-    fig, axes = plt.subplots(2, 2, figsize=(14, 11), sharey=True)
+    fig, axes = ps.figure(ncols=2, nrows=2, sharey=True)
     for i, D in enumerate(DORDER):
         ax = axes[i // 2][i % 2]
         for fam in FAMS:
@@ -122,19 +117,18 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
                                color=f"C{j+4}", zorder=5,
                                label=f"1h ladder: {lbl}")
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.grid(True, which="both", alpha=0.3, lw=0.6)
-        ax.set_title(f"D = {D} points")
+        ps.process_label(ax, f"$D={D}$", loc="upper right")
         if i // 2 == 1:
             ax.set_xlabel("walltime [h]")
         if i % 2 == 0:
-            ax.set_ylabel("test MSE (log space)")
+            ax.set_ylabel(r"test MSE$(\log|\mathcal{M}|^2)$")
         if i == 0:
-            ax.legend(framealpha=0.9)
-    # suptitle removed for talk slides (slide caption explains the figure)
-    fig.tight_layout()
+            ax.legend()
+            _leg_ax = ax
+    # all four panels plot the same series: one legend on top beats one inside a panel
+    if "_leg_ax" in dir():
+        _leg_ax.get_legend().remove()
+        ps.shared_legend(fig, _leg_ax, ncol=3)
     tag = key.replace("nlovirte4", "")
     suffix = "_min" if MINIMAL else "_clean" if CLEAN else ""
-    out = f"{ROOT}/plots/compute_scan_{tag}_wt{suffix}.pdf"
-    fig.savefig(out)
-    fig.savefig(out.replace(".pdf", ".png"), dpi=180)
-    print(f"saved {out} (+.png)")
+    ps.save(fig, f"{ROOT}/plots/compute_scan_{tag}_wt{suffix}")

@@ -12,9 +12,14 @@ CPU only.
 """
 import argparse
 import numpy as np
+import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 from matplotlib.gridspec import GridSpec
 from scipy.stats import binned_statistic, binned_statistic_2d
 
@@ -68,10 +73,7 @@ def make_collinear_ramp(d, label, out_base,
     logP = np.log((1.0 + zfrac ** 2) / (1.0 - zfrac))
     C0 = -2.0                                       # reference log10(1-x_q) for offset compare
 
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13.6, 5.0))
-    fig.suptitle(rf"{label}: pure COLLINEAR ramp at fixed hard $x_g$   "
-                 rf"($1-x_q=(p_{{\bar q}}+p_g)^2/s\to0$, soft pole switched off)",
-                 fontsize=12)
+    fig, (axL, axR) = ps.figure(ncols=2)
     colors = plt.cm.plasma(np.linspace(0.12, 0.78, len(xg_bands)))
     anchor_off, span, fits = None, [], []
     for (lo, hi), col in zip(xg_bands, colors):
@@ -112,17 +114,14 @@ def make_collinear_ramp(d, label, out_base,
         xline = np.linspace(np.nanmin(allc), np.nanmax(allc), 50)
         axL.plot(xline, -ln10 * xline + anchor_off, color="darkgreen", lw=1.8, ls="-.",
                  zorder=5, label=r"analytic $\propto 1/(1-x_q)$ (slope $-\ln 10$)")
-    axL.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear, $\bar q\parallel g$)")
+    axL.set_xlabel(r"$\log_{10}(1-x_q)$")
     axL.set_ylabel(r"$\log|\mathcal{M}|^2$")
-    axL.set_title("collinear ramp: truth faint band, model dashed+markers", fontsize=11)
-    axL.legend(fontsize=7, ncol=2, loc="lower right")
-    axR.set_xlabel(r"$\log_{10}(1-x_q)$   ($\leftarrow$ more collinear)")
+    axL.legend(ncol=2, loc="lower right")
+    axR.set_xlabel(r"$\log_{10}(1-x_q)$")
     axR.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
-    axR.set_title("model error into the collinear limit", fontsize=11)
-    axR.legend(fontsize=8, loc="upper left"); axR.set_ylim(bottom=0)
+    axR.legend(loc="upper left"); axR.set_ylim(bottom=0)
     fig.tight_layout()
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{out_base}_collinear.{ext}", dpi=140, bbox_inches="tight")
+    ps.save(fig, f"{out_base}_collinear")
     plt.close(fig)
     print(f"wrote {out_base}_collinear.png/.pdf")
 
@@ -142,18 +141,16 @@ def make_ir(npz, label, out_base):
     emap, _, _ = _map(ly, lx, np.abs(resid), xb, yb)
     vmin, vmax = np.nanpercentile(tmap, 1), np.nanpercentile(tmap, 99)
 
-    fig = plt.figure(figsize=(17.8, 9.4))
-    gs = GridSpec(2, 3, figure=fig, hspace=0.34, wspace=0.58, height_ratios=[1.0, 0.95])
+    fig = plt.figure(figsize=(ps.TEXTWIDTH_IN, 7.2), layout="constrained")
+    gs = GridSpec(2, 3, figure=fig, height_ratios=[1.0, 0.95])
     mse = float(np.mean(resid ** 2))
-    fig.suptitle(f"{label}: model vs truth at the IR singularities  "
-                 f"(N={n:,}, MSE Δlog|M|²={mse:.3g})", fontsize=13, y=0.98)
 
     def draw(ax, M, title, cmap, vmn, vmx, cl):
         pm = ax.pcolormesh(xe, ye, M, cmap=cmap, vmin=vmn, vmax=vmx, shading="flat")
-        ax.set_xlabel(r"$\log_{10} y_{\min}$   (collinear/soft $\to -\infty$)")
-        ax.set_ylabel(r"$\log_{10} x_{g,\min}$   (soft $\to -\infty$)")
-        ax.set_title(title, fontsize=11)
-        cb = fig.colorbar(pm, ax=ax, fraction=0.046, pad=0.02); cb.set_label(cl, fontsize=9)
+        ax.set_xlabel(r"$\log_{10} y_{\min}$")
+        ax.set_ylabel(r"$\log_{10} x_{g,\min}$")
+        ax.set_title(title)
+        cb = fig.colorbar(pm, ax=ax); cb.set_label(cl)
 
     draw(fig.add_subplot(gs[0, 0]), tmap, "truth", "viridis", vmin, vmax,
          r"$\langle\log|\mathcal{M}|^2\rangle$")
@@ -175,23 +172,22 @@ def make_ir(npz, label, out_base):
             ax.plot(c, slope * c + off, color="darkgreen", lw=1.6, ls="-.",
                     label=slope_label, zorder=5)
         ax.plot(c, tm, "k", lw=1.9, label="truth (mean)")
-        ax.plot(c, pm, color="crimson", lw=1.3, ls="--", label="model (mean)")
+        ax.plot(c, pm, color=ps.C.vermillion, lw=1.3, ls="--", label="model (mean)")
         ax.plot(c, tx, "k", lw=1.0, ls=":", alpha=0.7, label="truth (max)")
-        ax.plot(c, px, color="crimson", lw=1.0, ls=":", alpha=0.7, label="model (max)")
+        ax.plot(c, px, color=ps.C.vermillion, lw=1.0, ls=":", alpha=0.7, label="model (max)")
         ax.set_xlabel(xlabel); ax.set_ylabel(r"$\log|\mathcal{M}|^2$")
-        ax.set_title(title, fontsize=11); ax.legend(fontsize=7, ncol=2, loc="upper right")
+        ax.set_title(title); ax.legend(ncol=1, loc="lower left")
         axr = ax.twinx()
-        axr.plot(c, am, color="steelblue", lw=1.0, alpha=0.7)
-        axr.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$", color="steelblue",
-                       fontsize=9)
-        axr.tick_params(axis="y", labelcolor="steelblue"); axr.set_ylim(bottom=0)
+        axr.plot(c, am, color=ps.C.blue, lw=1.0, alpha=0.7)
+        axr.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$", color=ps.C.blue)
+        axr.tick_params(axis="y", labelcolor=ps.C.blue); axr.set_ylim(bottom=0)
 
     ln10 = np.log(10.0)
     ramp(fig.add_subplot(gs[1, 0]), ly,
-         r"$\log_{10} y_{\min}$  ($\leftarrow$ deeper IR)", "IR ramp: soft + collinear",
+         r"$\log_{10} y_{\min}$", "soft $+$ collinear",
          slope=-ln10, slope_label=r"analytic $\propto 1/y_{\min}$")
     ramp(fig.add_subplot(gs[1, 1]), lx,
-         r"$\log_{10} x_{g,\min}$  ($\leftarrow$ softer gluon)", "soft-gluon limit",
+         r"$\log_{10} x_{g,\min}$", "soft gluon",
          slope=-2.0 * ln10, slope_label=r"analytic $\propto 1/x_g^2$")
 
     axsc = fig.add_subplot(gs[1, 2])
@@ -199,11 +195,11 @@ def make_ir(npz, label, out_base):
     lo, hi = min(tl.min(), pl.min()), max(tl.max(), pl.max())
     axsc.plot([lo, hi], [lo, hi], color="cyan", lw=1.0, ls=":")
     axsc.set_xlabel(r"truth $\log|\mathcal{M}|^2$"); axsc.set_ylabel(r"model $\log|\mathcal{M}|^2$")
-    axsc.set_title("predicted vs true", fontsize=11)
-    fig.colorbar(hb, ax=axsc, fraction=0.046, pad=0.02).set_label("count", fontsize=9)
+    axsc.set_title("predicted vs true")
+    fig.colorbar(hb, ax=axsc).set_label("count")
 
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
+    fig._ps_layout_done = True      # GridSpec + colourbars own the layout
+    ps.save(fig, out_base)
     plt.close(fig)
     print(f"wrote {out_base}.png/.pdf (N={n}, MSEΔ={mse:.3g})")
 
@@ -227,9 +223,7 @@ def make_ir(npz, label, out_base):
         corr = float(np.corrcoef(tm[good], amap[good])[0, 1])
         vmn, vmx = np.nanpercentile(tm, 1), np.nanpercentile(tm, 99)
         clev = np.linspace(vmn, vmx, 7)                    # shared analytic contour levels
-        figd, axs = plt.subplots(1, 4, figsize=(21, 4.8))
-        figd.suptitle(f"{label}: Dalitz plane  (collinear at $x\\to1$ edges, soft gluon at "
-                      f"the $(1,1)$ corner)   —   analytic vs truth corr={corr:.3f}", fontsize=12)
+        figd, axs = ps.figure(ncols=4)
         panels = [
             (axs[0], amap_a, "analytic LO ($C_F$ antenna)", "viridis", vmn, vmx,
              r"$\langle\log|\mathcal{M}|^2\rangle$"),
@@ -243,13 +237,12 @@ def make_ir(npz, label, out_base):
             if ti in ("truth", "model"):
                 cs = ax.contour(cb, cb, amap_a, levels=clev, colors="white",
                                 linewidths=0.7, alpha=0.75)
-                ax.clabel(cs, fmt="%.0f", fontsize=6)
+                ax.clabel(cs, fmt="%.0f")
             ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$"); ax.set_ylabel(r"$x_{\bar q}=2E_{\bar q}/\sqrt{s}$")
-            ax.set_title(ti, fontsize=11)
-            figd.colorbar(pmesh, ax=ax, fraction=0.046, pad=0.02).set_label(cl, fontsize=9)
+            ax.set_title(ti)
+            figd.colorbar(pmesh, ax=ax).set_label(cl)
         figd.tight_layout()
-        for ext in ("png", "pdf"):
-            figd.savefig(f"{out_base}_dalitz.{ext}", dpi=140, bbox_inches="tight")
+        ps.save(figd, f"{out_base}_dalitz")
         plt.close(figd)
         print(f"wrote {out_base}_dalitz.png/.pdf  (analytic-vs-truth corr={corr:.3f})")
         make_collinear_ramp(d, label, out_base)

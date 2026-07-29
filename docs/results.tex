@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -731,8 +731,8 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.49\textwidth]{compute_scan_eeuu_wt.pdf}\hfill
-  \includegraphics[width=0.49\textwidth]{compute_scan_eettbar_wt.pdf}
+  \includegraphics[width=\textwidth]{compute_scan_eeuu_wt.pdf}\\[2ex]
+  \includegraphics[width=\textwidth]{compute_scan_eettbar_wt.pdf}
   \caption{\textbf{Transfer: the compute scan.} Fair log-space test MSE vs.\ fine-tune wall-time
   on $ee\,u\bar u$ (left) and $ee\,t\bar t$ (right) NLO-virtual, one panel per target dataset
   size $D\in\{10^3,10^4,10^5,10^6\}$: from-scratch vs.\ fine-tuning from the 8- and 25-process

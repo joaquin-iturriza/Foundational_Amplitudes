@@ -87,7 +87,19 @@ run hpo_optima_summary       $PY $H/make_fig.py       $H/hpo_optima.json $H/hpo_
 run lr_2d_disentangled       $PY $H/make_fig_2d.py    $H/hpo_optima.json $H/lr_2d_disentangled
 run lr_vs_iterations         $PY $H/make_fig_iters.py $H/hpo_optima.json $H/lr_vs_iterations_by_regime
 
+echo "== IR residual maps =="
+# heldout_resid_f100 CANNOT be rebuilt: heldout_eval_ft_f100.npz was overwritten by an
+# unrelated eval and no longer carries `cut`/`x_gmin`. Kept here so the breakage is visible.
+run heldout_resid_f000       $PY $D/make_ir.py --npz $D/heldout_eval_ft_f000.npz \
+                                 --label 'ee->uug hold-out f=0' \
+                                 --out_base $D/figs/heldout_resid_f000
+run heldout_resid_f100       $PY $D/make_ir.py --npz $D/heldout_eval_ft_f100.npz \
+                                 --label 'ee->uug hold-out f=1' \
+                                 --out_base $D/figs/heldout_resid_f100
+run ir3d                     $PY $D/make_ir_3d.py
+
 echo "== scaling =="
+run compute_scan_wt          $PY analysis/scaling_compute/build_compute_scan_walltime.py
 run alpha_vs_multiplicity    $PY analysis/scaling_compute/alpha_vs_multiplicity_overlay.py \
                                  analysis/scaling_compute/alpha_vs_multiplicity_overlay
 
