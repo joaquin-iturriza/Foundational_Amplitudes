@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 """Extended gamma-response: sigma/base error ratio vs the keep exponent gamma, for uugg (2 gluons,
 concentrated divergence) and uuggg (3 gluons, diffuse). Shows the two behaviours the concentration
-principle predicts -- uugg's deepest decade improves then SATURATES while its bulk penalty keeps
-growing; uuggg barely responds and TURNS OVER above gamma~3, going worse than uniform. Emits png+pdf."""
+principle predicts: uugg's deepest decade improves then saturates while its bulk penalty keeps
+growing; uuggg barely responds and turns over above gamma~3, going worse than uniform. png+pdf."""
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 UUGG = [(1, "heldout_eval_sigma_s0"), (2, "heldout_eval_g2_s0"), (3, "heldout_eval_g3_s0"),
@@ -39,37 +43,28 @@ def series(base_tag, rows):
     return np.array(g), np.array(out)
 
 
-fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.0), sharey=True)
-for ax, (title, base_tag, rows) in zip(axes, [
-        (r"$e^+e^-\to u\bar u gg$  (2 gluons: CONCENTRATED)", "heldout_eval_base_s0", UUGG),
-        (r"$e^+e^-\to u\bar u ggg$  (3 gluons: DIFFUSE)", "heldout_eval_uuggg_base_s0", UUGGG)]):
+TRACKS = [(r"$\log_{10} y_{\min}<-3$", ps.C.blue, "o"),
+          (r"$\log_{10} y_{\min}<-6$", ps.C.vermillion, "s"),
+          (r"$\log_{10} y_{\min}>-1$", ps.C.green, "^")]
+
+fig, axes = ps.figure(ncols=2, sharey=True)
+for ax, (proc, base_tag, rows) in zip(axes, [
+        (r"$e^+e^-\to u\bar u gg$", "heldout_eval_base_s0", UUGG),
+        (r"$e^+e^-\to u\bar u ggg$", "heldout_eval_uuggg_base_s0", UUGGG)]):
     g, r = series(base_tag, rows)
-    for j, (lab, c, m) in enumerate([(r"deep IR $y_{\min}<10^{-3}$", "steelblue", "o"),
-                                     (r"deepest $y_{\min}<10^{-6}$", "crimson", "s"),
-                                     (r"bulk $y_{\min}>10^{-1}$", "darkorange", "^")]):
+    ax.axhline(1.0, color=ps.C.grey, lw=0.8, label="parity")
+    for j, (lab, c, m) in enumerate(TRACKS):
         if np.isfinite(r[:, j]).any():
-            ax.plot(g, r[:, j], m + "-", color=c, lw=2.0, ms=7, label=lab)
-    ax.axhline(1.0, color="k", ls="--", lw=1.2)
-    ax.text(g[0] * 1.05, 1.012, "uniform baseline (no gain)", fontsize=8, color="k")
-    ax.set_xscale("log"); ax.set_xlabel(r"keep exponent $\gamma$   ($p\propto\sigma^\gamma$)")
+            ax.plot(g, r[:, j], m + "-", color=c, label=lab)
+    ax.set_xscale("log")
+    ax.set_xlabel(r"$\gamma$")
     ax.set_xticks(g); ax.set_xticklabels([str(int(x)) for x in g])
-    ax.set_title(title, fontsize=11); ax.grid(True, which="both", alpha=0.25)
-    ax.legend(fontsize=8, loc="best")
-axes[0].set_ylabel(r"$\sigma$-arm / base   MSE ratio  (lower = better)")
-axes[0].annotate("deepest decade SATURATES\n(0.53→0.51 over γ=10→30)\nwhile the bulk penalty keeps growing",
-                 xy=(20, 0.52), xytext=(0.06, 0.30), textcoords="axes fraction", fontsize=8,
-                 color="crimson", arrowprops=dict(arrowstyle="->", color="crimson", lw=1.1))
-axes[1].annotate("TURNS OVER above γ≈3:\nharder concentration is WORSE\nthan uniform",
-                 xy=(20, 1.079), xytext=(0.10, 0.72), textcoords="axes fraction", fontsize=8,
-                 color="steelblue", arrowprops=dict(arrowstyle="->", color="steelblue", lw=1.1))
-fig.suptitle(r"Pushing the concentration exponent $\gamma$: saturation vs reversal", fontsize=12)
-fig.tight_layout()
-base = os.path.join(HERE, "figs", "l2_gamma_response_extended")
-os.makedirs(os.path.dirname(base), exist_ok=True)
-for ext in ("png", "pdf"):
-    fig.savefig(f"{base}.{ext}", dpi=140, bbox_inches="tight")
-plt.close(fig)
-print(f"wrote {base}.png/.pdf")
+    ax.minorticks_off()
+    ps.process_label(ax, proc, loc="upper left")
+axes[0].set_ylabel(r"MSE ratio")
+axes[0].legend(loc="center left")
+
+ps.save(fig, "analysis/divergences/figs/l2_gamma_response_extended")
 for nm, bt, rows in [("uugg", "heldout_eval_base_s0", UUGG), ("uuggg", "heldout_eval_uuggg_base_s0", UUGGG)]:
     g, r = series(bt, rows)
     print(f"{nm}: gamma={list(g)}")

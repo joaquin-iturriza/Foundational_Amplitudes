@@ -22,17 +22,18 @@ import sys
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, "analysis/divergences"))
+import plot_style as ps  # noqa: E402
 from extract_ir import ir_observables  # noqa
 
 EDGES = np.array([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0])
 CEN = np.sqrt(EDGES[:-1] * EDGES[1:])          # geometric bin centers
-COL = {"uniform": "#4C72B0", "antenna": "#C44E52", "mixture": "#55A868"}
-LAB = {"uniform": "uniform (flat RAMBO)", "antenna": r"antenna $\propto 1/y_{\min}$",
-       "mixture": "mixture (50% flat + 50% antenna)"}
+COL = {"uniform": ps.C.blue, "antenna": ps.C.vermillion, "mixture": ps.C.green}
+LAB = {"uniform": "uniform", "antenna": r"antenna, $\mathrm{d}N\propto 1/y_{\min}$",
+       "mixture": "50/50 mixture"}
 
 
 def binned_metrics(y, resid):
@@ -71,6 +72,7 @@ def main():
     ap.add_argument("--out_base", default=os.path.join(here, "figs", "deep_sampling_uniform_vs_antenna"))
     ap.add_argument("--summary_out", default=os.path.join(here, "deep_sampling_summary.json"))
     ap.add_argument("--modes", default="uniform,antenna", help="comma list of sampler tags")
+    ap.add_argument("--process", default=r"$e^+e^-\to u\bar u g$")
     args = ap.parse_args()
 
     modes = [m.strip() for m in args.modes.split(",")]
@@ -88,27 +90,22 @@ def main():
                          medrel_all=float(np.median(np.abs(np.exp(resid) - 1.0))),
                          n=int(resid.size))
 
-    os.makedirs(os.path.dirname(args.out_base), exist_ok=True)
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18.5, 5.2))
-    fig.suptitle(r"$e^+e^-\to u\bar u g$ deep-IR sampling A/B  (same base22, same 400k events, "
-                 r"same held-out test — only sampling density differs)", fontsize=12)
+    fig, (ax1, ax2, ax3) = ps.figure(ncols=3)
 
-    xlab = r"$y_{\min}$  ($\leftarrow$ deeper IR / soft-collinear pole)"
     # Panel 1: per-decade MSE of Δln|M|^2 (log-space L2 = squared fractional error)
     for mode in modes:
-        ax1.plot(CEN, res[mode]["mse"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
+        ax1.plot(CEN, res[mode]["mse"], "o-", color=COL[mode], label=LAB[mode])
     ax1.set_xscale("log"); ax1.set_yscale("log")
-    ax1.set_xlabel(xlab)
-    ax1.set_ylabel(r"MSE $\Delta\ln|\mathcal{M}|^2$ per decade  (log-space L2)")
-    ax1.grid(True, which="both", alpha=0.25); ax1.legend(fontsize=9)
+    ax1.set_xlabel(r"$y_{\min}$")
+    ax1.set_ylabel(r"MSE$(\Delta\ln|\mathcal{M}|^2)$")
+    ps.process_label(ax1, args.process, loc="upper right")
 
     # Panel 2: per-decade median relative error |M2_pred/M2_true - 1| (robust, in %)
     for mode in modes:
-        ax2.plot(CEN, 100 * res[mode]["medrel"], "o-", color=COL[mode], lw=1.9, ms=6, label=LAB[mode])
+        ax2.plot(CEN, 100 * res[mode]["medrel"], "o-", color=COL[mode], label=LAB[mode])
     ax2.set_xscale("log"); ax2.set_yscale("log")
-    ax2.set_xlabel(xlab)
-    ax2.set_ylabel(r"median relative error $|\mathcal{M}^2_{\rm pred}/\mathcal{M}^2_{\rm true}-1|$  [%]")
-    ax2.grid(True, which="both", alpha=0.25); ax2.legend(fontsize=9)
+    ax2.set_xlabel(r"$y_{\min}$")
+    ax2.set_ylabel("median rel. error [%]")
 
     # Panel 3: training coverage per decade (grouped bars, centered per decade)
     nb = len(modes)
@@ -117,18 +114,15 @@ def main():
     for i, mode in enumerate(modes):
         off = (i - (nb - 1) / 2.0) * w
         ax3.bar(xpos + off, np.maximum(res[mode]["cov"], 0.5), width=w,
-                color=COL[mode], alpha=0.85, label=LAB[mode])
+                color=COL[mode], label=LAB[mode])
     ax3.set_yscale("log")
     ax3.set_xticks(xpos)
-    ax3.set_xticklabels([fr"$10^{{{int(np.log10(lo))}}}$" for lo in EDGES[:-1]])
-    ax3.set_xlabel(r"$y_{\min}$ decade (lower edge)")
-    ax3.set_ylabel("training events in decade (of 400k)")
-    ax3.grid(True, which="both", axis="y", alpha=0.25); ax3.legend(fontsize=9)
+    ax3.set_xticklabels([fr"${int(np.log10(lo))}$" for lo in EDGES[:-1]])
+    ax3.set_xlabel(r"$\log_{10} y_{\min}$")
+    ax3.set_ylabel("training events")
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{args.out_base}.{ext}", dpi=140, bbox_inches="tight")
-    plt.close(fig)
+    ps.shared_legend(fig, ax1, ncol=len(modes))
+    ps.save(fig, args.out_base)
     print(f"wrote {args.out_base}.png/.pdf")
 
     def cell(v):

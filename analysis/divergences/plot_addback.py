@@ -17,11 +17,15 @@ hardest) are separated from the shallow tail.
 import argparse
 import json
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 YBINS = [(0.0, 1e-3), (1e-3, 3e-3), (3e-3, 1e-2)]   # + a final [1e-2, cut) added per-file
 
@@ -50,8 +54,9 @@ def main():
     ap.add_argument("--out_base", default=os.path.join(here, "figs", "addback_curve"))
     ap.add_argument("--summary_out", default=os.path.join(here, "heldout_eval_summary.json"))
     ap.add_argument("--npz_prefix", default="heldout_eval_ft_f", help="eval npz basename prefix")
-    ap.add_argument("--title", default=r"$e^+e^-\to u\bar u g$ hold-out / add-back: held-out deep-IR "
-                                        r"($y_{\min}<c$) error vs add-back fraction $f$")
+    # The process label is the only text allowed inside the axes; there is deliberately no
+    # --title, since what the figure shows belongs in the results.tex caption.
+    ap.add_argument("--process", default=r"$e^+e^-\to u\bar u g$")
     args = ap.parse_args()
 
     S = []
@@ -71,38 +76,32 @@ def main():
     f0 = 3e-3
     fpos[f == 0] = f0                      # f=0 mapped to a small positive tick on log-x
 
-    os.makedirs(os.path.dirname(args.out_base), exist_ok=True)
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(12.5, 5.0))
-    fig.suptitle(args.title, fontsize=12.5)
-
-    axL.plot(fpos, mse, "o-", color="crimson", lw=1.8, label=r"MSE $\Delta\log|\mathcal{M}|^2$")
-    axL.plot(fpos, mae, "s--", color="steelblue", lw=1.3, label=r"MAE")
-    axL.set_xscale("log"); axL.set_yscale("log")
-    axL.set_xlabel(r"add-back fraction $f$  (leftmost tick = $f{=}0$, pure extrapolation)")
-    axL.set_ylabel(r"held-out-region error")
-    axL.axvline(f0 * 2.2, color="grey", ls=":", lw=0.8)
+    fig, (axL, axR) = ps.figure(ncols=2)
     xt = [f0] + [x for x in f if x > 0]
-    axL.set_xticks(xt)
-    axL.set_xticklabels(["0"] + [f"{x:g}" for x in f if x > 0])
-    axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=9)
+    xtl = ["0"] + [f"{x:g}" for x in f if x > 0]
+
+    axL.plot(fpos, mse, "o-", color=ps.C.vermillion, label=r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+    axL.plot(fpos, mae, "s--", color=ps.C.blue, label=r"MAE$(\Delta\log|\mathcal{M}|^2)$")
+    axL.set_xscale("log"); axL.set_yscale("log")
+    axL.set_xlabel(r"add-back fraction $f$")
+    axL.set_ylabel("held-out-region error")
+    axL.set_xticks(xt); axL.set_xticklabels(xtl); axL.minorticks_off()
+    axL.legend(loc="lower left")
+    ps.process_label(axL, args.process, loc="upper right")
 
     bins = S[0]["binmse"]
-    cmap = plt.cm.viridis(np.linspace(0.1, 0.85, len(bins)))
+    ramp = ps.sequence(len(bins))
     for bi, (lo, hi, _, _) in enumerate(bins):
         y = np.array([r["binmse"][bi][3] for r in S])
-        axR.plot(fpos, y, "o-", color=cmap[bi], lw=1.5,
+        axR.plot(fpos, y, "o-", color=ramp[bi],
                  label=fr"$y_{{\min}}\in[{lo:.0e},{hi:.0e})$")
     axR.set_xscale("log"); axR.set_yscale("log")
     axR.set_xlabel(r"add-back fraction $f$")
-    axR.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$ (per $y_{\min}$ bin)")
-    axR.set_xticks(xt); axR.set_xticklabels(["0"] + [f"{x:g}" for x in f if x > 0])
-    axR.grid(True, which="both", alpha=0.25); axR.legend(fontsize=8, title="deeper IR $\\to$ top")
+    axR.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+    axR.set_xticks(xt); axR.set_xticklabels(xtl); axR.minorticks_off()
+    axR.legend(loc="lower left")
 
-    fig.tight_layout(rect=[0, 0, 1, 0.96])
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{args.out_base}.{ext}", dpi=140, bbox_inches="tight")
-    plt.close(fig)
-    print(f"wrote {args.out_base}.png/.pdf")
+    ps.save(fig, args.out_base)
     for r in S:
         deep = r["binmse"][0][3]
         print(f"  f={r['f']:.2f}: MSE={r['mse']:.4g} MAE={r['mae']:.4g} "

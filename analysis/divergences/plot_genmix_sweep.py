@@ -2,24 +2,28 @@
 """Generated mixture-fraction sweep for the ee->uu Z resonance.
 
 f = fraction of training events drawn flat-log|M|^2, the rest uniform-sqrt(s).
-  Left  : the three metrics vs f -> the interior optimum. The log-flat objective is DEFINED on the
-          panel, since it is the metric everything else is judged against.
+  Left  : the three metrics vs f -> the interior optimum.
   Right : per-sqrt(s)-bin MSE coloured by f -> the bulk<->pole trade-off.
 
-Reads the CORRECTED re-eval (eeuu_reson_clean_summary.json). Titles live in the figure caption, not
-on the axes; no marker lines, and explicit sqrt(s) ticks. CPU only; emits .png and .pdf.
+Reads the CORRECTED re-eval (eeuu_reson_clean_summary.json). What the metrics mean, and why
+log-flat rather than the plain event mean, belongs in the results.tex caption, not on the axes.
+CPU only; emits .png and .pdf.
 """
 import json
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 AN = os.path.dirname(os.path.abspath(__file__))
 TAG2F = {"raw": 0.0, "mix025": 0.25, "mix050": 0.5, "mix075": 0.75, "genflat": 1.0}
-XTICKS = [91, 100, 150, 300, 600, 1000]
+XTICKS = [91, 150, 300, 600, 1000]
 
 
 def main():
@@ -33,51 +37,29 @@ def main():
     reson = np.array([np.nanmean(np.array(by[t]["binmse"], float)[
         np.array(by[t]["binmse"], float)[:, 0] < 100][:, 3]) for t in tags])
 
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(11.6, 4.6))
+    fig, (axL, axR) = ps.figure(ncols=2)
 
-    # --- left: metrics vs f. Legend entries ARE the definitions (no bare parentheticals). ---
-    axL.plot(f, logflat, "o-", color="#4c72b0", lw=2, ms=6,
-             label=r"log-flat: mean of the per-$\sqrt{s}$-bin MSE")
-    axL.plot(f, reson, "s-", color="#c44e52", lw=2, ms=6,
-             label=r"resonance region: $\sqrt{s}<100$ GeV")
-    axL.plot(f, overall, "^--", color="#7f7f7f", lw=1.6, ms=6,
-             label="overall: plain mean over all events")
+    axL.plot(f, logflat, "o-", color=ps.C.blue, label=r"log-flat over $\sqrt{s}$ bins")
+    axL.plot(f, reson, "s-", color=ps.C.vermillion, label=r"$\sqrt{s}<100$ GeV")
+    axL.plot(f, overall, "^--", color=ps.C.grey, label="mean over events")
     axL.set_yscale("log")
-    axL.set_xlabel(r"$f$ = fraction flat-$\log|\mathcal{M}|^2$   (rest uniform-$\sqrt{s}$)")
-    axL.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-    axL.legend(frameon=False, fontsize=8.5, loc="upper center")
-    axL.grid(True, which="both", alpha=0.2)
+    axL.set_xlabel(r"$f$ = fraction flat-$\log|\mathcal{M}|^2$")
+    axL.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+    axL.legend(loc="upper center")
+    ps.process_label(axL, r"$e^+e^-\to u\bar u$", loc="lower right")
 
-    # --- right: per-bin trade-off ---
-    for t in tags:
+    ramp = ps.sequence(len(tags))
+    for t, c in zip(tags, ramp):
         b = np.array(by[t]["binmse"], float)
         ctr = np.sqrt(b[:, 0] * b[:, 1])
-        axR.plot(ctr, b[:, 3], "o-", color=plt.cm.viridis(TAG2F[t]), lw=1.8, ms=5,
-                 label=f"f = {TAG2F[t]:g}")
+        axR.plot(ctr, b[:, 3], "o-", color=c, label=f"$f={TAG2F[t]:g}$")
     axR.set_xscale("log"); axR.set_yscale("log")
     axR.set_xticks(XTICKS); axR.set_xticklabels([str(t) for t in XTICKS]); axR.minorticks_off()
     axR.set_xlabel(r"$\sqrt{s}$ [GeV]")
-    axR.set_ylabel(r"MSE $\Delta\log|\mathcal{M}|^2$")
-    axR.legend(frameon=False, fontsize=8, ncol=2)
-    axR.grid(True, which="major", alpha=0.2)
+    axR.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+    axR.legend(loc="lower left", ncol=2)
 
-    fig.tight_layout()
-    # Spell the objective out BELOW the axes -- inside the panel it would sit on top of the
-    # "overall" curve. log-flat is the metric everything else is judged against, so define it.
-    fig.subplots_adjust(bottom=0.30)
-    fig.text(0.055, 0.045,
-             r"objective:   $\mathrm{log\text{-}flat}\;=\;\frac{1}{N_{\mathrm{bins}}}"
-             r"\sum_{b}\mathrm{MSE}_{b}$   —   every $\sqrt{s}$ bin counts once, "
-             r"however many events it holds." "\n"
-             r"The plain event mean instead follows the bulk, which holds almost all the events, "
-             r"so it barely sees the pole.",
-             fontsize=8.2, va="bottom", ha="left", color="#333333")
-
-    base = os.path.join(AN, "eeuu_genmix_fraction_sweep")
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{base}.{ext}", dpi=150, bbox_inches="tight")
-    plt.close(fig)
-    print("wrote", base + ".png/.pdf")
+    ps.save(fig, os.path.join(AN, "eeuu_genmix_fraction_sweep"))
     print(f"{'f':>5} {'logflat':>12} {'resonance':>12} {'overall':>12}")
     for i, t in enumerate(tags):
         print(f"{f[i]:5.2f} {logflat[i]:12.4e} {reson[i]:12.4e} {overall[i]:12.4e}")

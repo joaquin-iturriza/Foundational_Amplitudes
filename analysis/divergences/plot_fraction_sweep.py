@@ -16,11 +16,15 @@ CPU only.
 import argparse
 import json
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 EDGES = np.array([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0])
 TAG_F = [("uniform", 0.0), ("mix025", 0.25), ("mixture", 0.5), ("mix075", 0.75), ("antenna", 1.0)]
@@ -41,6 +45,7 @@ def main():
     ap.add_argument("--npz_prefix", default="deep_eval_")
     ap.add_argument("--out_base", default=os.path.join(here, "figs", "deep_sampling_fraction_sweep"))
     ap.add_argument("--summary_out", default=os.path.join(here, "fraction_sweep_summary.json"))
+    ap.add_argument("--process", default=r"$e^+e^-\to u\bar u g$")
     args = ap.parse_args()
 
     fs, logflat, per_event, decades = [], [], [], []
@@ -61,34 +66,26 @@ def main():
     f_opt_lf = fs[int(np.argmin(logflat))]
     f_opt_pe = fs[int(np.argmin(per_event))]
 
-    os.makedirs(os.path.dirname(args.out_base), exist_ok=True)
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(13.0, 5.2))
-    fig.suptitle(r"$e^+e^-\to u\bar u g$: offline mixture-fraction sweep — overall held-out error vs "
-                 r"sampling density $f$ (antenna fraction)", fontsize=12)
+    fig, (axL, axR) = ps.figure(ncols=2)
 
-    axL.plot(fs, logflat, "o-", color="#C44E52", lw=2, ms=7, label="log-flat per decade (objective)")
-    axL.plot(fs, per_event, "s--", color="#4C72B0", lw=1.6, ms=6, label="equal-per-event (antenna-dense test)")
-    axL.axvline(f_opt_lf, color="#C44E52", ls=":", lw=1, alpha=0.7)
+    axL.plot(fs, logflat, "o-", color=ps.C.vermillion, label="log-flat over decades")
+    axL.plot(fs, per_event, "s--", color=ps.C.blue, label="equal per event")
     axL.set_yscale("log")
-    axL.set_xlabel(r"$f$  =  antenna fraction  (0 = uniform/flat RAMBO,  1 = pure antenna)")
-    axL.set_ylabel(r"overall MSE $\Delta\ln|\mathcal{M}|^2$")
-    axL.set_title(f"optimum: log-flat f*={f_opt_lf:g},  per-event f*={f_opt_pe:g}", fontsize=10)
-    axL.grid(True, which="both", alpha=0.25); axL.legend(fontsize=9)
+    axL.set_xlabel(r"antenna fraction $f$")
+    axL.set_ylabel(r"MSE$(\Delta\ln|\mathcal{M}|^2)$")
+    axL.legend(loc="upper center")
+    ps.process_label(axL, args.process, loc="lower left")
 
-    cmap = plt.cm.viridis(np.linspace(0.1, 0.9, len(fs)))
+    ramp = ps.sequence(len(fs))
     cen = np.sqrt(EDGES[:-1] * EDGES[1:])
     for i, f in enumerate(fs):
-        axR.plot(cen, decades[i], "o-", color=cmap[i], lw=1.6, ms=5, label=f"f={f:g}")
+        axR.plot(cen, decades[i], "o-", color=ramp[i], label=f"$f={f:g}$")
     axR.set_xscale("log"); axR.set_yscale("log")
-    axR.set_xlabel(r"$y_{\min}$  ($\leftarrow$ deeper IR)")
-    axR.set_ylabel(r"MSE $\Delta\ln|\mathcal{M}|^2$ per decade")
-    axR.grid(True, which="both", alpha=0.25); axR.legend(fontsize=8, title="antenna frac")
+    axR.set_xlabel(r"$y_{\min}$")
+    axR.set_ylabel(r"MSE$(\Delta\ln|\mathcal{M}|^2)$ per decade")
+    axR.legend(loc="lower left", ncol=2)
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{args.out_base}.{ext}", dpi=140, bbox_inches="tight")
-    plt.close(fig)
-    print(f"wrote {args.out_base}.png/.pdf")
+    ps.save(fig, args.out_base)
 
     summ = dict(f=fs.tolist(), logflat_mse=logflat.tolist(), per_event_mse=per_event.tolist(),
                 f_opt_logflat=float(f_opt_lf), f_opt_per_event=float(f_opt_pe),

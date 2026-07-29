@@ -62,7 +62,7 @@ PANEL_ASPECT = 1.75
 _SIZES = {
     (1, 1): (TEXTWIDTH_IN, 3.9),
     (2, 1): (TEXTWIDTH_IN, 2.9),
-    (3, 1): (TEXTWIDTH_IN, 2.4),
+    (3, 1): (TEXTWIDTH_IN, 2.9),
     (4, 1): (TEXTWIDTH_IN, 2.0),
     (1, 2): (TEXTWIDTH_IN, 6.2),
     (2, 2): (TEXTWIDTH_IN, 5.2),
@@ -104,6 +104,19 @@ CMAP = "viridis"
 
 #: Diverging colormap, for quantities with a meaningful zero (e.g. log ratios).
 CMAP_DIV = "RdBu_r"
+
+
+def sequence(n: int, cmap: str = "viridis", lo: float = 0.10, hi: float = 0.88) -> list:
+    """`n` colours along a perceptually-ordered ramp, for series with a natural ORDER.
+
+    Use for an ordered sweep (gamma = 1, 2, 3, 5, 10; dataset size; fraction f), where the
+    qualitative palette `C` would hide the ordering. Endpoints are trimmed to keep both ends
+    readable on white.
+    """
+    cm = plt.get_cmap(cmap)
+    if n == 1:
+        return [cm(0.5)]
+    return [cm(lo + (hi - lo) * i / (n - 1)) for i in range(n)]
 
 
 def use() -> None:
@@ -196,6 +209,25 @@ def process_label(ax, text: str, loc: str = "upper left", **kwargs):
                    ha=xy[2], va=xy[3], **kwargs)
 
 
+def shared_legend(fig, ax, ncol: int = 3, **kwargs):
+    """One legend above the panels, for a multi-panel figure whose panels share series.
+
+    Per-axes legends in a 2- or 3-panel figure almost always land on the data. When every
+    panel plots the same series, take the handles from one axes and put a single legend
+    across the top instead. Call BEFORE `save`.
+    """
+    handles, labels = ax.get_legend_handles_labels()
+    kwargs.setdefault("loc", "upper center")
+    kwargs.setdefault("bbox_to_anchor", (0.5, 1.0))
+    kwargs.setdefault("frameon", False)
+    leg = fig.legend(handles, labels, ncol=ncol, **kwargs)
+    # Reserve the strip for it, and tell save() not to re-run a plain tight_layout(),
+    # which would drop the rect and put the legend back on top of the panels.
+    fig.tight_layout(rect=[0, 0, 1, 0.90])
+    fig._ps_layout_done = True
+    return leg
+
+
 def save(fig, base: str, repo: str | None = None) -> str:
     """Save `fig` as BOTH `<base>.png` and `<base>.pdf` (repo convention, no exceptions).
 
@@ -207,10 +239,11 @@ def save(fig, base: str, repo: str | None = None) -> str:
         root = repo or os.path.dirname(os.path.abspath(__file__))
         base = os.path.join(root, base)
     os.makedirs(os.path.dirname(base), exist_ok=True)
-    try:
-        fig.tight_layout()
-    except Exception:
-        pass
+    if not getattr(fig, "_ps_layout_done", False):
+        try:
+            fig.tight_layout()
+        except Exception:
+            pass
     fig.savefig(base + ".png")
     fig.savefig(base + ".pdf")
     print(f"saved {base}.png / .pdf")
