@@ -125,6 +125,18 @@ class BaseExperiment:
         self._save_config(f"config_{self.cfg.run_idx}.yaml")
 
         self.init_physics()
+
+        # Re-save now that init_physics has run. On the recipe path
+        # (`data.source: recipes`), `_resolve_recipe_config` REPLACES
+        # `data.dataset`/`data.amp_orders` with the processes the recipe actually
+        # names — so the configs written above still carry the inherited 8-entry
+        # default from config/amplitudes.yaml and misreport what this run trained
+        # on. That stale key has repeatedly been read as ground truth and has
+        # inverted claims about what was held out. The early save is kept so a
+        # crash inside init_physics still leaves a record; this one makes the
+        # persisted config true. No-op for non-recipe runs.
+        self._save_config("config.yaml")
+        self._save_config(f"config_{self.cfg.run_idx}.yaml")
         self.init_geometric_algebra()
         self.init_data()
         self._init_dataloader()
