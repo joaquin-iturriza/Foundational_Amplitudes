@@ -75,23 +75,23 @@ for arm, ls, mk in [("base", "-", "o"), ("sigma", "--", "s")]:
     data = load(arm)
     for N, d in sorted(data.items()):
         c = COLORS.get(N, ps.C.grey)
-        ax.plot(d["pool"], d["p99"], ls + mk, color=c, label=f"{arm}, $N={N//1000}$k")
+        ax.plot(d["pool"], d["p99"], ls + mk, color=c, label=f"{arm} {N//1000}k")
 ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("training pool size (events)")
+ax.set_xlabel("training pool size")
 ax.set_ylabel(r"$\sigma$ p99 over the proposal batch")
-ax.legend(ncol=2, loc="lower left")
+ax.legend(ncol=2, loc="lower left", columnspacing=1.0)
 ps.process_label(ax, r"$e^+e^-\to u\bar u gg$", loc="upper right")
 
 # ---------------------------------------------------------------- (b) per-round fractional fall
 ax = axes[1]
 base = load("base")
-ax.axhline(SAT_TOL, color=ps.C.grey, ls=":", label=rf"saturation tolerance $={100*SAT_TOL:.0f}\%$")
+ax.axhline(SAT_TOL, color=ps.C.grey, ls=":", label=rf"tolerance ${100*SAT_TOL:.0f}\%$")
 for N, d in sorted(base.items()):
     c = COLORS.get(N, ps.C.grey)
-    ax.plot(d["pool"], d["drop"], "-o", color=c, label=f"$N={N//1000}$k")
+    ax.plot(d["pool"], d["drop"], "-o", color=c, label=f"{N//1000}k")
 ax.set_xscale("log")
-ax.set_xlabel("training pool size (events)")
-ax.set_ylabel(r"per-round fractional fall in $\sigma$ p99")
+ax.set_xlabel("training pool size")
+ax.set_ylabel(r"fractional fall in $\sigma$ p99")
 ax.legend(loc="upper right")
 
 base_path = os.path.join(HERE, "figs", "l2_saturation")

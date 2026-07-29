@@ -8,6 +8,7 @@ them, live in the results.tex caption and body text.
 import json, sys, math, collections
 import numpy as np
 import matplotlib; matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
@@ -34,6 +35,8 @@ for x, y in zip(xs, ys): g[x].append(math.log10(y))
 gx = sorted(g); gy = [10**np.mean(g[k]) for k in gx]
 a.plot(gx, gy, 'o-', color=ps.C.vermillion, label='geometric mean')
 a.set_xscale('log', base=2); a.set_yscale('log')
+a.set_xticks(sorted(set(xs))); a.get_xaxis().set_major_formatter(
+    plt.matplotlib.ticker.FuncFormatter(lambda v, _: f"{int(v)}"))
 a.set_xlabel(r'$n_{\rm heads}$'); a.set_ylabel('optimal learning rate')
 a.legend(loc='lower left')
 
@@ -47,6 +50,9 @@ for x, y in zip(xs, ys): g[x].append(math.log10(y))
 gx = sorted(g); gy = [10**np.mean(g[k]) for k in gx]
 a.plot(gx, gy, 'o-', color=ps.C.vermillion, label='geometric mean')
 a.set_xscale('log', base=2); a.set_yscale('log')
+a.set_xticks(sorted(set(xs))); a.get_xaxis().set_major_formatter(
+    plt.matplotlib.ticker.FuncFormatter(lambda v, _: f"{int(v)}"))
+a.tick_params(axis='x', labelrotation=45)
 a.set_xlabel('batch size'); a.set_ylabel('optimal learning rate')
 a.legend(loc='lower left')
 
@@ -65,7 +71,6 @@ for nd, col, lab in [(8, ps.C.blue, 'joint, 8 processes'), (1, ps.C.vermillion, 
 a.axvline(3000, color=ps.C.green, ls=':', label=r'$t^\ast=3\times10^3$')
 a.set_xscale('log'); a.set_yscale('log')
 a.set_xlabel(r'training steps $t$'); a.set_ylabel('optimal learning rate')
-a.set_ylim(top=a.get_ylim()[1] * 12)      # headroom so the 4-entry legend clears the data
 a.legend(loc='upper left')
 
 # 4. lr histogram + recommended band

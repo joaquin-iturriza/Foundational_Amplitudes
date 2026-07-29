@@ -37,7 +37,10 @@ def summarize(npz_path):
     cut = float(d["cut"])
     mse = float(np.mean(resid ** 2))
     mae = float(np.mean(np.abs(resid)))
-    bins = YBINS + [(1e-2, cut)]
+    # The trailing [1e-2, cut) bin is only meaningful when the analysis cut sits ABOVE
+    # 1e-2. For uugg cut=6e-3, which made an inverted, permanently-empty bin that still
+    # claimed a legend entry.
+    bins = YBINS + ([(1e-2, cut)] if cut > 1e-2 else [])
     binmse = []
     for lo, hi in bins:
         m = (y >= lo) & (y < hi)
@@ -91,10 +94,20 @@ def main():
 
     bins = S[0]["binmse"]
     ramp = ps.sequence(len(bins))
+    def _p10(v):
+        """1e-3 -> 10^{-3}; 3e-3 -> 3\times10^{-3}. Rounding the exponent alone turned
+        3e-3 into 10^{-3} and printed two identical bin edges."""
+        if v <= 0:
+            return "0"
+        e = int(np.floor(np.log10(v)))
+        m = v / 10.0 ** e
+        return fr"10^{{{e}}}" if abs(m - 1) < 1e-9 else fr"{m:g}\times 10^{{{e}}}"
     for bi, (lo, hi, _, _) in enumerate(bins):
         y = np.array([r["binmse"][bi][3] for r in S])
+        if not np.isfinite(y).any():
+            continue
         axR.plot(fpos, y, "o-", color=ramp[bi],
-                 label=fr"$y_{{\min}}\in[{lo:.0e},{hi:.0e})$")
+                 label=fr"$y_{{\min}}\in[{_p10(lo)},{_p10(hi)})$")
     axR.set_xscale("log"); axR.set_yscale("log")
     axR.set_xlabel(r"add-back fraction $f$")
     axR.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")

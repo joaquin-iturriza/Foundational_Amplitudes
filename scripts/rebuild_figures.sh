@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# Rebuild every figure that docs/results.tex includes, from data already on disk. CPU only,
+# login-node safe.
+#
+# WHY THIS FILE EXISTS. Several figures in results.tex were produced by ad-hoc one-off
+# invocations that were never written down, so when the eval data moved or a worktree was
+# deleted there was no way to reproduce them: q2_logflat, q2_rankmag, levers_offshell_ab,
+# heldout_resid_f000/f100 and compute_scan_*_wt currently have no surviving producer at all.
+# Every figure that CAN be rebuilt now has its exact command recorded here. Add a line here
+# whenever you add a figure -- a plotting script whose invocation is undocumented is one
+# worktree deletion away from being unreproducible.
+#
+# Usage:  bash scripts/rebuild_figures.sh [pattern]
+#         pattern filters by output basename, e.g. `bash scripts/rebuild_figures.sh l2_`
+set -uo pipefail
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+PY=/lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational/bin/python
+D=analysis/divergences
+FILTER="${1:-}"
+
+ok=0; fail=0; skip=0
+run() {  # run <output-basename> <command...>
+  local name="$1"; shift
+  if [ -n "$FILTER" ] && [[ "$name" != *"$FILTER"* ]]; then skip=$((skip+1)); return; fi
+  if out=$("$@" 2>&1); then
+    echo "  ok      $name"; ok=$((ok+1))
+  else
+    echo "  FAILED  $name"
+    echo "$out" | tail -3 | sed 's/^/            /'
+    fail=$((fail+1))
+  fi
+}
+
+echo "== divergence sampling =="
+run l2_uugg_perdecade        $PY $D/plot_l2_uugg.py
+run l2_uugg_perdecade_abs    $PY $D/plot_l2_uugg_abs.py
+run l2_uugg_gamma            $PY $D/plot_l2_uugg_gamma.py
+run l2_gamma_response_ext    $PY $D/plot_gamma_response.py
+run l2_saturation            $PY $D/plot_saturation.py
+run l2_sigma_vs_divergence   $PY $D/plot_sigma_vs_divergence.py
+run l2_poly_keep             $PY $D/plot_poly_keep.py
+run l2_bbbarg                $PY $D/plot_l2_bbbarg.py
+run l2_bbb_sweep             $PY $D/plot_bbb_sweep.py
+run soft_vs_coll_addback     $PY $D/plot_soft_vs_coll.py
+run deep_sampling_fraction   $PY $D/plot_fraction_sweep.py
+run deep_sampling_uniform    $PY $D/plot_deep_sampling.py
+run eeuu_flatlogm_resonance  $PY $D/plot_eeuu_resonance.py
+run eeuu_genmix_fraction     $PY $D/plot_genmix_sweep.py
+
+# add-back curves. The uug variant (addback_curve) currently FAILS because
+# heldout_eval_ft_f100.npz was overwritten by an unrelated eval and no longer carries the
+# `cut` key; it is kept here so the breakage stays visible rather than silently forgotten.
+run addback_curve            $PY $D/plot_addback.py --tags 000,005,015,050,100 \
+                                 --out_base $D/figs/addback_curve \
+                                 --summary_out $D/heldout_eval_summary.json
+run addback_curve_uugg       $PY $D/plot_addback.py --tags 000,005,015,050,100 \
+                                 --npz_prefix heldout_eval_uugg_f \
+                                 --out_base $D/figs/addback_curve_uugg \
+                                 --summary_out $D/heldout_eval_uugg_summary.json \
+                                 --process '$e^+e^-\to u\bar u gg$'
+
+echo "== multi-run comparisons =="
+run l2_uug_multiscale        $PY $D/plot_l2_compare.py --regions \
+                                 --out $D/figs/l2_uug_multiscale \
+                                 --process '$e^+e^-\to u\bar u g$' \
+                                 --npz 'uniform=heldout_eval_uug_base_s0' \
+                                       '$\sigma$, $\gamma=1$=heldout_eval_uug_sigma_s0' \
+                                       '$\sigma$, $\gamma=3$=heldout_eval_uug_g3_s0'
+run l2_uuggg_perdecade       $PY $D/plot_l2_compare.py \
+                                 --out $D/figs/l2_uuggg_perdecade \
+                                 --process '$e^+e^-\to u\bar u ggg$' \
+                                 --npz 'uniform=heldout_eval_uuggg_base_s0' \
+                                       '$\sigma$, $\gamma=1$=heldout_eval_uuggg_sigma_s0' \
+                                       '$\sigma$, $\gamma=3$=heldout_eval_uuggg_g3_s0' \
+                                       '$\sigma$, $\gamma=10$=heldout_eval_uuggg_g10_s0' \
+                                       '$\sigma$, $\gamma=20$=heldout_eval_uuggg_g20_s0'
+run l2_uugg_bbb_vs_het       $PY $D/plot_l2_compare.py \
+                                 --out $D/figs/l2_uugg_bbb_vs_het \
+                                 --process '$e^+e^-\to u\bar u gg$' \
+                                 --npz 'uniform=heldout_eval_base_s0' \
+                                       'het $\sigma$, $\gamma=3$=heldout_eval_g3_s0' \
+                                       'BBB $\sigma$, $\gamma=3$=heldout_eval_uugg_bbb_g3_s0'
+
+echo "== HPO optima =="
+H=analysis/hpo_optima
+run hpo_optima_summary       $PY $H/make_fig.py       $H/hpo_optima.json $H/hpo_optima_summary
+run lr_2d_disentangled       $PY $H/make_fig_2d.py    $H/hpo_optima.json $H/lr_2d_disentangled
+run lr_vs_iterations         $PY $H/make_fig_iters.py $H/hpo_optima.json $H/lr_vs_iterations_by_regime
+
+echo "== scaling =="
+run alpha_vs_multiplicity    $PY analysis/scaling_compute/alpha_vs_multiplicity_overlay.py \
+                                 analysis/scaling_compute/alpha_vs_multiplicity_overlay
+
+# --- shadowing check ---------------------------------------------------------
+# docs/figs is FIRST in results.tex \graphicspath, so a stale copy there silently wins
+# over a freshly generated one elsewhere. That happened to four figures. Fail loudly.
+shadow=0
+for f in docs/figs/*.pdf; do
+  [ -e "$f" ] || continue
+  b=$(basename "$f" .pdf)
+  other=$(ls analysis/hpo_optima/$b.pdf analysis/divergences/figs/$b.pdf \
+             analysis/divergences/$b.pdf analysis/scaling_compute/$b.pdf \
+             plots/$b.pdf 2>/dev/null | head -1)
+  if [ -n "$other" ]; then
+    echo "  SHADOWED  docs/figs/$b.pdf hides $other -- delete the docs/figs copy"
+    shadow=$((shadow+1))
+  fi
+done
+
+echo
+echo "rebuilt $ok, failed $fail, skipped $skip, shadowed $shadow"
+[ "$fail" -gt 0 ] || [ "$shadow" -gt 0 ] && exit 1
+exit 0

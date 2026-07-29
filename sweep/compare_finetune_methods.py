@@ -484,11 +484,14 @@ def main():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    import sys as _sys
+    _sys.path.insert(0, "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes")
+    import plot_style as ps
     cmap = plt.get_cmap("tab10")
 
     ncol = min(len(datasets), 2) or 1
     nrow = math.ceil(len(datasets) / ncol)
-    fig, axes = plt.subplots(nrow, ncol, figsize=(6 * ncol, 4.2 * nrow), squeeze=False)
+    fig, axes = ps.figure(ncols=ncol, nrows=nrow, squeeze=False)
     axflat = axes.flatten()
     for ax in axflat[len(datasets):]:
         ax.axis("off")
@@ -520,13 +523,9 @@ def main():
             _solo_scatter(ax, solo_excluded.get(ds, []), fitted=False)
 
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel("compute  (FLOPs, method-agnostic)"); ax.set_ylabel("val_loss")
-        ax.set_title(_pretty_ds(ds), fontsize=10)
-        ax.grid(True, which="both", linewidth=0.3, alpha=0.4)
-        ax.legend(fontsize=7)
-
-    fig.suptitle("Finetuning methods — scaling laws  (x = full-model FLOPs, "
-                 "same per-step cost charged to every method)", fontsize=11)
+        ax.set_xlabel("compute [FLOPs]"); ax.set_ylabel(r"$\mathcal{L}_{\rm val}$")
+        ps.process_label(ax, _pretty_ds(ds), loc="upper right")
+        ax.legend()
     fig.tight_layout()
     for ext in ("png", "pdf"):
         path = os.path.join(args.out_dir, f"finetune_methods_comparison.{ext}")
@@ -567,7 +566,7 @@ def main():
     print("\n=== method-aware FLOPs (per-step factor vs standard) ===")
     for metric in ("test", "val"):
         suffix = "" if metric == "test" else "_val"
-        fig, axes = plt.subplots(nrow, ncol, figsize=(6 * ncol, 4.2 * nrow), squeeze=False)
+        fig, axes = ps.figure(ncols=ncol, nrows=nrow, squeeze=False)
         axflat = axes.flatten()
         for ax in axflat[len(corr_datasets):]:
             ax.axis("off")
@@ -608,10 +607,8 @@ def main():
                            zorder=NEW_SOLO_STYLE["z"], label="solo nh8 (new anchor)")
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlabel("training compute  (FLOPs)"); ax.set_ylabel(_ylabel(metric))
-            ax.set_title(_pretty_ds(ds), fontsize=10)
-            ax.grid(True, which="both", linewidth=0.3, alpha=0.4)
-            ax.legend(fontsize=7)
-        fig.suptitle(f"Finetuning methods — {metric} loss vs compute", fontsize=11)
+            ps.process_label(ax, _pretty_ds(ds), loc="upper right")
+            ax.legend()
         fig.tight_layout()
         for ext in ("png", "pdf"):
             path = os.path.join(args.out_dir, f"finetune_methods_comparison_flops{suffix}.{ext}")
@@ -621,7 +618,7 @@ def main():
 
     # ---- Figure (b): best val_loss vs TRAINABLE PARAMS (LoRA's real win) --
     if breakdown is not None:
-        fig, axes = plt.subplots(nrow, ncol, figsize=(6 * ncol, 4.2 * nrow), squeeze=False)
+        fig, axes = ps.figure(ncols=ncol, nrows=nrow, squeeze=False)
         axflat = axes.flatten()
         for ax in axflat[len(corr_datasets):]:
             ax.axis("off")
@@ -639,11 +636,8 @@ def main():
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlabel("trainable parameters  (∝ Adam optimizer-state bytes)")
             ax.set_ylabel("best val_loss")
-            ax.set_title(_pretty_ds(ds), fontsize=10)
-            ax.grid(True, which="both", linewidth=0.3, alpha=0.4)
-            ax.legend(fontsize=7)
-        fig.suptitle("Finetuning methods — parameter efficiency  "
-                     "(best loss vs #trainable params; lower-left = better)", fontsize=11)
+            ps.process_label(ax, _pretty_ds(ds), loc="upper right")
+            ax.legend()
         fig.tight_layout()
         for ext in ("png", "pdf"):
             path = os.path.join(args.out_dir, f"finetune_methods_comparison_params.{ext}")
@@ -656,7 +650,7 @@ def main():
     # (solid ●), joined by a horizontal connector at the same val_loss, so the
     # left/right move is explicit. Solo reference line restored.
     from matplotlib.lines import Line2D
-    fig, axes = plt.subplots(nrow, ncol, figsize=(6 * ncol, 4.2 * nrow), squeeze=False)
+    fig, axes = ps.figure(ncols=ncol, nrows=nrow, squeeze=False)
     axflat = axes.flatten()
     for ax in axflat[len(corr_datasets):]:
         ax.axis("off")
@@ -694,16 +688,12 @@ def main():
                 _solo_scatter(ax, solo_excluded.get(ds, []), fitted=False)
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel("compute  (FLOPs)"); ax.set_ylabel("val_loss")
-        ax.set_title(_pretty_ds(ds), fontsize=10)
-        ax.grid(True, which="both", linewidth=0.3, alpha=0.4)
-        ax.legend(fontsize=7)
+        ps.process_label(ax, _pretty_ds(ds), loc="upper right")
+        ax.legend()
     # global style legend (× faint = old/method-agnostic, ● solid = new/method-aware)
     style = [Line2D([0], [0], color="0.4", marker="x", ls=":", lw=1.0, label="old (method-agnostic)"),
              Line2D([0], [0], color="0.4", marker="o", ls="-", lw=1.4, label="new (method-aware)")]
     fig.legend(handles=style, loc="lower center", ncol=2, fontsize=9, frameon=False)
-    fig.suptitle("Finetuning methods — old vs corrected compute  "
-                 "(× = previous plot, ● = method-aware; connector shows the shift)",
-                 fontsize=11)
     fig.tight_layout(rect=[0, 0.03, 1, 1])
     for ext in ("png", "pdf"):
         path = os.path.join(args.out_dir, f"finetune_methods_comparison_overlay.{ext}")
@@ -751,7 +741,7 @@ def main():
             continue
         wcol = min(len(wall_datasets), 2) or 1
         wrow = math.ceil(len(wall_datasets) / wcol)
-        fig, axes = plt.subplots(wrow, wcol, figsize=(6 * wcol, 4.2 * wrow), squeeze=False)
+        fig, axes = ps.figure(ncols=wcol, nrows=wrow, squeeze=False)
         axflat = axes.flatten()
         for ax in axflat[len(wall_datasets):]:
             ax.axis("off")
@@ -805,13 +795,10 @@ def main():
             elif solo_pts:
                 _draw(ax, solo_pts, SOLO_STYLE, "solo (nh8)")
             ax.set_xscale("log"); ax.set_yscale("log")
-            ax.set_xlabel("training wall time  (hours)"); ax.set_ylabel(_ylabel(metric))
-            ax.set_title(_pretty_ds(ds), fontsize=10)
-            ax.grid(True, which="both", linewidth=0.3, alpha=0.4)
-            ax.legend(fontsize=7)
+            ax.set_xlabel("training wall time [h]"); ax.set_ylabel(_ylabel(metric))
+            ps.process_label(ax, _pretty_ds(ds), loc="upper right")
+            ax.legend()
         title_metric = metric.capitalize()
-        fig.suptitle(f"Finetuning methods — {title_metric} loss vs measured training wall time",
-                     fontsize=12)
         fig.tight_layout()
         for ext in ("png", "pdf"):
             path = os.path.join(args.out_dir, f"finetune_methods_comparison_walltime{suffix}.{ext}")

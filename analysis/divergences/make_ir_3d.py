@@ -11,14 +11,19 @@ Cross sections:
 CPU only (reads the extract_ir npz)."""
 import argparse
 import numpy as np
+import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy.stats import binned_statistic_2d
 
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
-def surface(x, y, tl, pl, xlabel, ylabel, title, out_base,
+
+def surface(x, y, tl, pl, xlabel, ylabel, process, out_base,
             nb=42, mincount=10, views=((26, -58), (26, 128))):
     xb = np.linspace(np.percentile(x, 0.1), np.percentile(x, 99.9), nb + 1)
     yb = np.linspace(np.percentile(y, 0.1), np.percentile(y, 99.9), nb + 1)
@@ -36,30 +41,30 @@ def surface(x, y, tl, pl, xlabel, ylabel, title, out_base,
     fc = cm.viridis(norm(np.nan_to_num(T, nan=np.nanmin(T))))
     fc[..., 3] = np.where(np.isnan(T), 0.0, 0.55)   # transparent where unpopulated
 
-    fig = plt.figure(figsize=(15, 6.6))
+    fig = plt.figure(figsize=ps.figsize(ncols=2))
     rms = float(np.sqrt(np.nanmean((pl - tl) ** 2)))
-    fig.suptitle(f"{title}  (RMS Δlog|M|²={rms:.2g})", fontsize=13, y=0.98)
     for k, (elev, azim) in enumerate(views):
         ax = fig.add_subplot(1, 2, k + 1, projection="3d")
         ax.plot_surface(X, Y, T, facecolors=fc, rstride=1, cstride=1, linewidth=0,
                         antialiased=True, shade=False)
-        ax.plot_wireframe(X, Y, P, color="crimson", linewidth=0.55, rstride=2,
+        ax.plot_wireframe(X, Y, P, color=ps.C.vermillion, linewidth=0.55, rstride=2,
                           cstride=2, alpha=0.9)
         ax.set_xlabel(xlabel, labelpad=8)
         ax.set_ylabel(ylabel, labelpad=8)
         ax.set_zlabel(r"$\langle\log|\mathcal{M}|^2\rangle$", labelpad=6)
         ax.view_init(elev=elev, azim=azim)
-        ax.set_title(f"view {k+1}", fontsize=10)
     m = cm.ScalarMappable(norm=norm, cmap=cm.viridis); m.set_array([])
     cb = fig.colorbar(m, ax=fig.axes, fraction=0.02, pad=0.02)
-    cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$", fontsize=9)
+    cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$")
     from matplotlib.lines import Line2D
-    fig.legend([Line2D([0], [0], color="crimson", lw=1.5)], ["model prediction"],
-               loc="upper right", fontsize=9, frameon=False)
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{out_base}.{ext}", dpi=140, bbox_inches="tight")
+    # The process label goes at figure level here: a 3-D axes has no sane in-axes corner.
+    fig.legend([Line2D([0], [0], color=ps.C.vermillion, lw=1.5)],
+               ["model prediction"], loc="upper right", frameon=False)
+    fig.text(0.02, 0.96, process, ha="left", va="top")
+    fig._ps_layout_done = True          # 3-D axes + colourbar: tight_layout would wreck it
+    ps.save(fig, out_base)
     plt.close(fig)
-    print(f"wrote {out_base}.png/.pdf (RMSΔ={rms:.3g})")
+    print(f"  RMSD={rms:.3g}")
 
 
 def main():
@@ -70,7 +75,7 @@ def main():
     # ee->uug : Dalitz plane (collinear ridges at x->1, soft gluon at the (1,1) corner)
     surface(uug["x_q"], uug["x_qbar"], uug["true_logamp"], uug["pred_logamp"],
             r"$x_q$", r"$x_{\bar q}$",
-            r"$e^+e^-\to u\bar u g$: Dalitz surface (collinear ridges, soft corner)",
+            r"$e^+e^-\to u\bar u g$",
             f"{D}/figs/ir3d_uug_dalitz")
 
     # ee->uug and ee->uugg : IR-resolution plane
@@ -81,7 +86,7 @@ def main():
                 np.log10(np.clip(d["x_gmin"], 1e-12, None)),
                 d["true_logamp"], d["pred_logamp"],
                 r"$\log_{10} y_{\min}$", r"$\log_{10} x_{g,\min}$",
-                ttl + r": IR-resolution surface (divergence toward the deep-IR corner)",
+                ttl,
                 f"{D}/figs/ir3d_{tag}_irplane")
 
 

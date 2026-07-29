@@ -45,6 +45,16 @@ rows = [json.load(open(f)) for f in glob.glob(os.path.join(HERE, "..", "..", "sw
 if not rows:  # fall back to the worktree-local sweeps dir layout
     rows = [json.load(open(f)) for f in glob.glob(os.path.join(HERE, "..", "sweeps",
             "l2_poly_uugg", "results", "*.json"))]
+if not rows:
+    # An empty sweep dir must NOT yield a silently blank panel -- that is exactly how the
+    # missing left panel shipped into the document. sweeps/l2_poly_uugg was destroyed with
+    # a worktree (see scripts/fold_worktree.sh) and no copy survives anywhere on disk.
+    raise SystemExit(
+        "[plot_poly_keep] no trials found under sweeps/l2_poly_uugg/results/.\n"
+        "  That 12-trial DyHPO sweep was lost when its worktree was removed without\n"
+        "  folding results back. The left panel cannot be rebuilt without re-running it:\n"
+        "    python sweep/generate_sweep.py --config sweep/l2_poly_sweep_config.yaml\n"
+        "  The right panel (3-seed confirmation) does not depend on the sweep.")
 c1 = np.array([r["keep_c1"] for r in rows]); c2 = np.array([r["keep_c2"] for r in rows])
 lf = np.array([r["logflat_mse"] for r in rows])
 POWER_BEST_1SEED = 3.351e-2         # sigma^10 seed 0

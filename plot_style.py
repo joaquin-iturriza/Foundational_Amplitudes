@@ -67,7 +67,7 @@ _SIZES = {
     (1, 2): (TEXTWIDTH_IN, 6.2),
     (2, 2): (TEXTWIDTH_IN, 5.2),
     (3, 2): (TEXTWIDTH_IN, 4.4),
-    (2, 3): (TEXTWIDTH_IN, 7.4),
+    (2, 3): (TEXTWIDTH_IN, 8.8),
     (3, 3): (TEXTWIDTH_IN, 6.4),
 }
 
@@ -157,8 +157,13 @@ def use() -> None:
         "grid.linewidth": 0.6,
         "axes.axisbelow": True,
         "axes.linewidth": 0.8,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
+        # Full box frame, as in the reference paper: all four spines drawn.
+        "axes.spines.top": True,
+        "axes.spines.right": True,
+        "xtick.top": True,
+        "ytick.right": True,
+        "xtick.minor.visible": False,
+        "ytick.minor.visible": False,
 
         # --- lines and markers
         "lines.linewidth": 1.6,
@@ -214,8 +219,10 @@ def process_label(ax, text: str, loc: str = "upper left", **kwargs):
         "lower right": (0.97, 0.03, "right", "bottom"),
     }[loc]
     kwargs.setdefault("fontsize", BASE_PT)
-    return ax.text(xy[0], xy[1], text, transform=ax.transAxes,
-                   ha=xy[2], va=xy[3], **kwargs)
+    lbl = ax.text(xy[0], xy[1], text, transform=ax.transAxes,
+                  ha=xy[2], va=xy[3], **kwargs)
+    ax._ps_label = lbl          # make_room() keeps data out from under it
+    return lbl
 
 
 def shared_legend(fig, ax, ncol: int = 3, **kwargs):
@@ -237,6 +244,103 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     return leg
 
 
+def _data_points(ax):
+    """Every plotted point in DISPLAY coordinates, for overlap tests."""
+    import numpy as np
+    pts = []
+    for ln in ax.get_lines():
+        xy = ln.get_xydata()
+        if xy is not None and len(xy):
+            pts.append(ax.transData.transform(xy))
+    for coll in ax.collections:
+        try:
+            off = coll.get_offsets()
+        except Exception:
+            continue
+        if off is not None and len(off):
+            pts.append(ax.transData.transform(np.asarray(off)))
+    if not pts:
+        return None
+    P = np.vstack(pts)
+    return P[np.isfinite(P).all(axis=1)]
+
+
+def _collides(ax, artist, renderer) -> bool:
+    """Does `artist` (a legend or the process label) sit on top of any drawn data?"""
+    import numpy as np
+    try:
+        bb = artist.get_window_extent(renderer)
+    except Exception:
+        return False
+    P = _data_points(ax)
+    if P is not None and len(P):
+        hit = ((P[:, 0] >= bb.x0) & (P[:, 0] <= bb.x1) &
+               (P[:, 1] >= bb.y0) & (P[:, 1] <= bb.y1))
+        if bool(np.any(hit)):
+            return True
+    for p in ax.patches:                      # bars, spans
+        try:
+            if p.get_window_extent(renderer).overlaps(bb):
+                return True
+        except Exception:
+            pass
+    return False
+
+
+def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.8) -> None:
+    """Grow the y-range until the legend and process label no longer cover data.
+
+    The alternative -- hand-picking `loc=` per panel -- does not survive a data change and
+    was the source of most of the overlapping labels here. Expanding the axis instead
+    compresses the curves slightly and always leaves the annotation legible.
+    """
+    fig = ax.figure
+    movers = [a for a in (ax.get_legend(), getattr(ax, "_ps_label", None)) if a is not None]
+    if not movers:
+        return
+    # Bound the growth. Without a cap a tall legend on a log axis spanning several decades
+    # keeps demanding room and ends up squashing the data into a corner, which is worse
+    # than a little overlap. Past the cap, leave it: the panel needs a smaller legend
+    # (ncol=2) or to be split into two figures.
+    lo0, hi0 = ax.get_ylim()
+    log_y = ax.get_yscale() == "log" and lo0 > 0 and hi0 > 0
+    span0 = (hi0 / lo0) if log_y else (hi0 - lo0)
+    for _ in range(max_iter):
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        bad = [m for m in movers if _collides(ax, m, renderer)]
+        if not bad:
+            return
+        ax_bb = ax.get_window_extent(renderer)
+        mid = 0.5 * (ax_bb.y0 + ax_bb.y1)
+        grow_top = grow_bot = False
+        for m in bad:
+            bb = m.get_window_extent(renderer)
+            if 0.5 * (bb.y0 + bb.y1) >= mid:
+                grow_top = True
+            else:
+                grow_bot = True
+        lo, hi = ax.get_ylim()
+        span = (hi / lo) if log_y else (hi - lo)
+        if span0 > 0 and span / span0 >= max_growth:
+            return
+        if ax.get_yscale() == "log":
+            if lo <= 0 or hi <= 0:
+                return
+            r = hi / lo
+            if grow_top:
+                hi *= r ** step
+            if grow_bot:
+                lo /= r ** step
+        else:
+            span = hi - lo
+            if grow_top:
+                hi += span * step
+            if grow_bot:
+                lo -= span * step
+        ax.set_ylim(lo, hi)
+
+
 def save(fig, base: str, repo: str | None = None) -> str:
     """Save `fig` as BOTH `<base>.png` and `<base>.pdf` (repo convention, no exceptions).
 
@@ -253,6 +357,18 @@ def save(fig, base: str, repo: str | None = None) -> str:
     # discards that work and drops the colourbar/legend back onto the panels.
     engine = fig.get_layout_engine()
     managed = engine is not None and engine.__class__.__name__ != "PlaceHolderLayoutEngine"
+    if not managed and not getattr(fig, "_ps_layout_done", False):
+        try:
+            fig.tight_layout()
+        except Exception:
+            pass
+    # Nothing may sit on top of the data: grow each panel's y-range until its legend and
+    # process label are clear. Done here so every script gets it without asking.
+    for _ax in fig.axes:
+        try:
+            make_room(_ax)
+        except Exception:
+            pass
     if not managed and not getattr(fig, "_ps_layout_done", False):
         try:
             fig.tight_layout()

@@ -38,7 +38,7 @@ def main():
     srel = np.array([r[2] for r in rows]); gam = np.array([r[3] for r in rows])
     best = int(np.argmin(obj))
 
-    fig, axes = ps.figure(ncols=2)
+    fig, axes = ps.figure(ncols=2, sharey=True)
     for ax, x, lab, logx in ((axes[0], srel, r"$\sigma_{\rm rel}$", True),
                              (axes[1], beta, r"$\beta_{\rm KL}$", True)):
         sc = ax.scatter(x, obj, c=gam, cmap=ps.CMAP, s=40, zorder=3, label="BBB trial")
@@ -51,9 +51,10 @@ def main():
             ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlabel(lab)
-        ax.set_ylabel(r"held-out deep-IR MSE")
-    axes[0].axvline(5e-3, color=ps.C.blue, ls="-.", label=r"$\sigma_{\rm rel}$ search lower bound")
-    axes[0].legend(loc="upper left")
+        if ax is axes[0]:
+            ax.set_ylabel(r"deep-IR MSE")
+    axes[0].axvline(5e-3, color=ps.C.blue, ls="-.", label=r"$\sigma_{\rm rel}$ lower bound")
+    ps.shared_legend(fig, axes[0], ncol=3)
     cb = fig.colorbar(sc, ax=axes, fraction=0.03, pad=0.02)
     cb.set_label(r"$\gamma$")
     fig._ps_layout_done = True          # colorbar owns the layout; tight_layout would fight it
