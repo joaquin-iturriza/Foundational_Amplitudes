@@ -314,7 +314,12 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
     # (ncol=2) or to be split into two figures.
     lo0, hi0 = ax.get_ylim()
     log_y = ax.get_yscale() == "log" and lo0 > 0 and hi0 > 0
-    span0 = (hi0 / lo0) if log_y else (hi0 - lo0)
+    # Measure the span the same way on both scales: DECADES on a log axis, absolute range
+    # on a linear one. Comparing a raw ratio (e.g. 7 decades = 1e7) against max_growth=1.8
+    # made the cap fire after a single step on any axis wider than ~2.6 decades, so
+    # make_room silently became "one 10% expansion" instead of "grow until clear".
+    import math
+    span0 = math.log10(hi0 / lo0) if log_y else (hi0 - lo0)
     for _ in range(max_iter):
         fig.canvas.draw()
         renderer = fig.canvas.get_renderer()
@@ -331,7 +336,7 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
             else:
                 grow_bot = True
         lo, hi = ax.get_ylim()
-        span = (hi / lo) if log_y else (hi - lo)
+        span = math.log10(hi / lo) if log_y else (hi - lo)
         if span0 > 0 and span / span0 >= max_growth:
             return
         if ax.get_yscale() == "log":

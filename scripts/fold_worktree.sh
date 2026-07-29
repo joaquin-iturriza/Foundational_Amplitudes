@@ -15,8 +15,8 @@
 #   scripts/fold_worktree.sh worktrees/wt-foo            # dry run: list what would be copied
 #   scripts/fold_worktree.sh worktrees/wt-foo --apply    # copy it into the trunk
 #
-# It copies only files that are MISSING from the trunk, or newer in the worktree than a
-# same-sized trunk file. It never deletes and never overwrites a trunk file with an older
+# It copies only files that are MISSING from the trunk, or whose worktree mtime is newer
+# than the trunk copy's. It never deletes and never overwrites a trunk file with an older
 # or identical one, so running it twice is safe.
 set -uo pipefail
 
@@ -37,7 +37,11 @@ WT=$(cd "$WT" && pwd)
 # gitignored (so a merge does not move them) but expensive or impossible to regenerate.
 RESULT_DIRS="sweeps runs analysis plots data logs compare_models"
 # Extensions worth folding when they turn up inside those dirs.
-RESULT_EXTS="json npz npy png pdf csv pkl txt log out"
+# yaml is NOT optional: a run's config.yaml is the only record of what it trained on
+# (data.processes_file, lr, preprocessing). Folding the numbers without it produces results
+# that look citable but have no provenance -- the exact failure this script exists to stop.
+# sh covers generated sweep job scripts (jobs/trial_*.sh).
+RESULT_EXTS="json yaml yml npz npy png pdf csv pkl txt log out sh"
 
 echo "folding results:  $WT"
 echo "            into: $REPO"

@@ -1,0 +1,36 @@
+# Short 25-process LO set for the encoding A/B on the FULL process diversity
+# (d/s/b quarks, multi-gluon ee_uuggg/ee_bbbarg, di/tri-boson, etc.) — the color
+# diversity the 8-process set lacked. Same processes/sqrts as pretrain25.yaml but
+# reduced counts (5k/1k/1k) so it generates quickly on a login node and each trial
+# is a ~5-minute run; consumed via data.source=recipes + data.processes_file.
+# amp_orders auto-derived per process.
+processes:
+  # QED photons
+  - {name: ee_aa,        sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_aaa,       sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_aaaa,      sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  # leptons
+  - {name: ee_mumu,      sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_tautau,    sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_mumua,     sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_tautaua,   sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_mumumumu,  sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_bhabha,    sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_nnbar,     sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  # quarks + QCD radiation
+  - {name: ee_ddbar,     sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_bbbar,     sqrts: [20,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_uug,       sqrts: [91,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_uugg,      sqrts: [91,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_uuggg,     sqrts: [91,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_ddbarg,    sqrts: [10,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_bbbarg,    sqrts: [20,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  # electroweak di/tri-boson + Higgs
+  - {name: ee_WW,        sqrts: [162, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_ZZ,        sqrts: [185, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_Za,        sqrts: [95,  1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_ZH,        sqrts: [220, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_WWa,       sqrts: [165, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_wwz,       sqrts: [255, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_ZZa,       sqrts: [185, 1000], n_train: 5000, n_val: 1000, n_test: 1000}
+  - {name: ee_ZZZ,       sqrts: [280, 1000], n_train: 5000, n_val: 1000, n_test: 1000}

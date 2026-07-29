@@ -26,13 +26,25 @@ Ds = sorted(set(r['n_train'] for r in sp if r['n_train']))
 Ts = sorted(set(r['t_steps'] for r in sp if r['t_steps']))
 
 
-def ramp_bar(a, values, label):
-    """Colourbar keying an ordered set of lines, in place of a legend."""
-    norm = plt.matplotlib.colors.LogNorm(vmin=min(values), vmax=max(values))
+def make_norm(values):
+    """Shared LogNorm for a set of series values."""
+    return plt.matplotlib.colors.LogNorm(vmin=min(values), vmax=max(values))
+
+
+def norm_colors(values, norm):
+    """Colours read off the SAME norm the colourbar displays.
+
+    Using ps.sequence() here instead spaces colours by INDEX, so on a non-log-uniform grid
+    (good_t = 10,32,100,316,...) a curve is drawn at a colour that reads off the bar as a
+    different value entirely. That bar keys the lr*(t,D) surface, so a misread row gives the
+    wrong lr search window."""
+    return [plt.get_cmap(ps.CMAP)(norm(v)) for v in values]
+
+
+def ramp_bar(a, norm, label):
     sm = plt.cm.ScalarMappable(norm=norm, cmap=ps.CMAP)
-    cb = fig.colorbar(sm, ax=a, fraction=0.046, pad=0.03)
+    cb = fig.colorbar(sm, ax=a)
     cb.set_label(label)
-    return norm
 
 
 # 2x2 rather than 1x3: three panels each carrying a colourbar do not fit across
@@ -40,8 +52,8 @@ def ramp_bar(a, values, label):
 fig, axg = ps.figure(ncols=2, nrows=2, layout="constrained")
 ax = [axg[0, 0], axg[0, 1], axg[1, 0]]
 axg[1, 1].remove()
-cols_D = ps.sequence(len(Ds))
-cols_T = ps.sequence(len(Ts))
+norm_D = make_norm(Ds)
+cols_D = norm_colors(Ds, norm_D)
 
 # A: lr vs t_steps, one line per dataset size
 a = ax[0]
@@ -53,12 +65,13 @@ for i, D in enumerate(Ds):
     a.plot(ts, ys, 'o-', color=cols_D[i])
 a.set_xscale('log'); a.set_yscale('log')
 a.set_xlabel(r'training steps $t$'); a.set_ylabel(r'optimal learning rate')
-ramp_bar(a, Ds, r'$D$')
+ramp_bar(a, norm_D, r'$D$')
 
 # B: lr vs dataset size, one line per t_steps (only well-sampled t)
 a = ax[1]
 good_t = [t for t in Ts if sum(1 for r in sp if r['t_steps'] == t) >= 8]
-cols_g = ps.sequence(len(good_t))
+norm_T = make_norm(good_t)
+cols_g = norm_colors(good_t, norm_T)
 for i, t in enumerate(good_t):
     pts = collections.defaultdict(list)
     for r in sp:
@@ -69,7 +82,7 @@ for i, t in enumerate(good_t):
     a.plot(ds, ys, 's-', color=cols_g[i])
 a.set_xscale('log'); a.set_yscale('log')
 a.set_xlabel(r'training set size $D$'); a.set_ylabel(r'optimal learning rate')
-ramp_bar(a, good_t, r'$t$')
+ramp_bar(a, norm_T, r'$t$')
 
 # C: learning curves — best val loss vs t_steps per D, with the lr-peak t marked
 a = ax[2]
@@ -88,7 +101,7 @@ for i, D in enumerate(Ds):
 a.set_xscale('log'); a.set_yscale('log')
 a.set_xlabel(r'training steps $t$'); a.set_ylabel(r'best validation loss')
 a.legend(loc='upper right')
-ramp_bar(a, Ds, r'$D$')
+ramp_bar(a, norm_D, r'$D$')
 
 base = out[:-4] if out.lower().endswith(('.png', '.pdf')) else out
 ps.save(fig, base)
