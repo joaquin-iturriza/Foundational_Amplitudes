@@ -72,12 +72,20 @@ _SIZES = {
 }
 
 
-def figsize(ncols: int = 1, nrows: int = 1) -> tuple[float, float]:
-    """Figure size in inches for an `ncols` x `nrows` panel grid, always \\textwidth wide."""
-    if (ncols, nrows) in _SIZES:
+def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full") -> tuple[float, float]:
+    """Figure size in inches for an `ncols` x `nrows` panel grid.
+
+    `width` is "full" (\\textwidth, the default) or "half", for the case where TWO figures
+    sit side by side in one LaTeX figure environment at `0.49\\textwidth` each. A half-width
+    figure must be SAVED at 3.25in, otherwise LaTeX scales it down and its 11pt text lands
+    on the page at 5.5pt. A float is taken as a fraction of \\textwidth.
+    """
+    frac = {"full": 1.0, "half": 0.49}.get(width, width)
+    w = TEXTWIDTH_IN * float(frac)
+    if frac == 1.0 and (ncols, nrows) in _SIZES:
         return _SIZES[(ncols, nrows)]
-    panel_h = (TEXTWIDTH_IN / ncols) / PANEL_ASPECT
-    return (TEXTWIDTH_IN, round(panel_h * nrows + 0.9, 2))
+    panel_h = (w / ncols) / PANEL_ASPECT
+    return (w, round(panel_h * nrows + 0.9, 2))
 
 
 # --- colour -----------------------------------------------------------------
@@ -182,13 +190,14 @@ use()
 
 # --- construction and output -------------------------------------------------
 
-def figure(ncols: int = 1, nrows: int = 1, **kwargs):
+def figure(ncols: int = 1, nrows: int = 1, width: float | str = "full", **kwargs):
     """`plt.subplots` at the repo's standard width and aspect for this grid.
 
+    `width="half"` for a figure that LaTeX will include at 0.49\textwidth beside another.
     Returns whatever `plt.subplots` returns: `(fig, ax)` for a single panel,
     `(fig, axes)` otherwise.
     """
-    kwargs.setdefault("figsize", figsize(ncols, nrows))
+    kwargs.setdefault("figsize", figsize(ncols, nrows, width))
     return plt.subplots(nrows, ncols, **kwargs)
 
 
