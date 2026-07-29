@@ -1,0 +1,16 @@
+{
+ "mom_div": 206.94041901537835,
+ "mom_mean": 0.3343474761296001,
+ "mom_std": 0.9999999999999993,
+ "amp_trafos": [
+  "log",
+  "standardization"
+ ],
+ "preprocess_per_dataset": true,
+ "prepd_mean": [
+  -4.017852614334728
+ ],
+ "prepd_std": [
+  0.9669102300167003
+ ]
+}

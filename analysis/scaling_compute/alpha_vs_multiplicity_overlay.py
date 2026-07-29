@@ -15,6 +15,10 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
 
+ROOT_FOR_STYLE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, ROOT_FOR_STYLE)
+import plot_style as ps  # noqa: E402
+
 ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 SOLO = os.path.join(ROOT, "sweeps/scaling_solo_full/scaling_law_params.json")
 FT   = os.path.join(ROOT, "sweeps/finetune_scaling_virt_002/scaling_law_params.json")
@@ -51,12 +55,9 @@ def load(path):
 
 solo, ft = load(SOLO), load(FT)
 
-plt.rcParams.update({
-    "font.family": "serif", "mathtext.fontset": "cm",
-    "axes.linewidth": 1.1, "xtick.direction": "out", "ytick.direction": "out",
-})
-
-fig, ax = plt.subplots(figsize=(5.4, 4.4))
+# The per-family colours are deliberately the talk's tab10 assignment, not the shared
+# qualitative palette: they identify process families consistently with the reference figure.
+fig, ax = ps.figure()
 ax.set_xscale("log"); ax.set_yscale("log")
 
 # As in the talk figure: x is the phase-space DOF = 3 n_fs - 4 on a log axis
@@ -72,8 +73,9 @@ ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
 x0 = np.sqrt(XLIM[0] * XLIM[1])
 p = lambda x: ax.transData.transform((x, 4.0 / x))
 (dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
+# One of the two sanctioned in-axes labels: it names a line that cannot go in the legend.
 ax.text(x0, (4.0 / x0) * 0.66, "Theoretical lower bound", color="0.55",
-        fontsize=13, rotation=np.degrees(np.arctan2(dy, dx)),
+        rotation=np.degrees(np.arctan2(dy, dx)),
         rotation_mode="anchor", ha="center", va="center", zorder=1)
 
 # small multiplicative jitter so overlapping n_fs=2 points separate
@@ -88,13 +90,13 @@ for lab, color, members in FAMILIES:
     if not pts: continue
     xs, ys = zip(*pts)
     ax.plot(xs, ys, ls=":", lw=1.6, color=color, zorder=2)
-    ax.scatter(xs, ys, s=75, color=color, zorder=3, label=lab)
+    ax.scatter(xs, ys, s=45, color=color, zorder=3, label=lab)
 
 for k, n, color in FT_STARS:
     if k in ft:
-        ax.scatter([dofx(n) * 1.10], [ft[k]], s=130, marker="*", color=color,
+        ax.scatter([dofx(n) * 1.10], [ft[k]], s=90, marker="*", color=color,
                    zorder=4, label=None)
-ax.scatter([], [], s=130, marker="*", color="0.3", label="fine-tuned")
+ax.scatter([], [], s=90, marker="*", color="0.3", label="fine-tuned")
 
 ax.set_xlim(*XLIM); ax.set_ylim(*YLIM)
 ax.xaxis.set_major_locator(FixedLocator([dofx(n) for n in (2, 3, 4)]))
@@ -104,12 +106,11 @@ ax.xaxis.set_minor_formatter(NullFormatter())
 ax.yaxis.set_major_locator(FixedLocator([0.5, 1, 2]))
 ax.yaxis.set_major_formatter(ScalarFormatter())
 ax.yaxis.set_minor_formatter(NullFormatter())
-ax.set_xlabel("Final state particles", fontsize=15)
-ax.set_ylabel(r"$\alpha_C$", fontsize=17)
-ax.tick_params(labelsize=13)
-ax.legend(fontsize=9.5, loc="upper right", frameon=False, borderaxespad=0.4)
-fig.tight_layout()
-fig.savefig(out + ".png", dpi=200); fig.savefig(out + ".pdf")
+ax.set_xlabel("final-state particles")
+ax.set_ylabel(r"$\alpha_C$")
+ax.legend(loc="upper right")
+ax.grid(False)
+ps.save(fig, out)
 print("saved", out + ".png", out + ".pdf",
       "| solo pts:", sum(k in solo for _, _, m in FAMILIES for k, _ in m),
       "ft stars:", sum(k in ft for k, _, _ in FT_STARS))
