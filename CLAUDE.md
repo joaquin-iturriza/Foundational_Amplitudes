@@ -151,6 +151,22 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
 
 ## Data
 
+- **Which datasets a run actually trained on: the recipe wins, `data.dataset` lies.**
+  `config/amplitudes.yaml` hardcodes an 8-entry `data.dataset` default, and every run
+  config dumps it verbatim whether or not a recipe overrode it. So in a run's
+  `config.yaml`:
+  - `data.processes_file` set (equivalently `data.source: recipes`) ⇒ **the recipe at
+    that path is the only authority**. `data.dataset` is stale inherited default;
+    ignore it completely. E.g. `runs/dvirt_time` lists 8 datasets and actually
+    trained on the 25 in `recipes/pretrain25_short.yaml`.
+  - `data.processes_file: null` and no recipe source ⇒ **then** `data.dataset` is
+    authoritative.
+
+  Never state which processes a run saw from `data.dataset` without checking
+  `processes_file` first. This has been got wrong repeatedly, and it silently
+  inverts claims about what was held out, hence what "zero-shot", "held-out", or
+  "never seen" mean in `docs/results.tex`.
+
 - Datasets are `.npy` files in `data/`, named like
   `ee_ttbar_346-1000GeV_amplitudes.npy`. Each row: flat 4-momenta
   (`n_particles*4`) + PDG ids (`n_particles`) + amplitude (last col).

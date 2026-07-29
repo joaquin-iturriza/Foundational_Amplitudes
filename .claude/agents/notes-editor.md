@@ -79,6 +79,22 @@ When a term's scope changes what a number means, say so and **block** — it is 
 wearing a word's clothing. Propose the rewording; do not silently apply it, because choosing
 the convention is the author's call.
 
+## Data provenance: the recipe wins, `data.dataset` lies
+
+Before asserting which processes ANY run trained on, open its `config.yaml` and check
+`data.processes_file` FIRST:
+
+- `processes_file` set (or `data.source: recipes`) -> **the recipe at that path is the only
+  authority**. `data.dataset` in that config is a stale default inherited from
+  `config/amplitudes.yaml` (an 8-entry list every run dumps verbatim) and is meaningless.
+  `runs/dvirt_time` lists 8 datasets and actually trained on the 25 in
+  `recipes/pretrain25_short.yaml`.
+- `processes_file: null` and no recipe source -> **then** `data.dataset` is authoritative.
+
+Reading `data.dataset` on a recipe run silently inverts what was held out, and therefore
+what "zero-shot", "held-out", "never seen" and "in-distribution" mean. Treat a claim about
+training-set membership that was not checked this way as unverified, and say so.
+
 ## Kill on sight (LLM tells)
 
 - **"not just X, but Y" / "it's not just … it's …"** antithesis scaffolding. Rewrite as a

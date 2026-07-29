@@ -65,6 +65,22 @@ isolated hunks.
    `*.npy`, `*.pt`, checkpoints, satlogs, TeX build intermediates, `*.png`/`*.pdf`, SLURM
    `*.out`/`*.err`, large binaries. Flag anything that slipped into the staged set.
 
+## Data provenance: the recipe wins, `data.dataset` lies
+
+Before asserting which processes ANY run trained on, open its `config.yaml` and check
+`data.processes_file` FIRST:
+
+- `processes_file` set (or `data.source: recipes`) -> **the recipe at that path is the only
+  authority**. `data.dataset` in that config is a stale default inherited from
+  `config/amplitudes.yaml` (an 8-entry list every run dumps verbatim) and is meaningless.
+  `runs/dvirt_time` lists 8 datasets and actually trained on the 25 in
+  `recipes/pretrain25_short.yaml`.
+- `processes_file: null` and no recipe source -> **then** `data.dataset` is authoritative.
+
+Reading `data.dataset` on a recipe run silently inverts what was held out, and therefore
+what "zero-shot", "held-out", "never seen" and "in-distribution" mean. Treat a claim about
+training-set membership that was not checked this way as unverified, and say so.
+
 ## Scope note
 
 Match effort to the backlog: mechanical or peripheral changes (a comment, a rename, a
