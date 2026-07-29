@@ -10,11 +10,21 @@
 # panel renders empty and cannot be rebuilt without re-running the sweep on GPU.
 #
 # The hook blocks the deletion and points at scripts/fold_worktree.sh, which copies the
-# result files into the trunk. Once that script has run with --apply it records the
-# worktree name, and the deletion is allowed through.
+# result files into the trunk. It then re-checks the filesystem: a name-keyed "already
+# folded" memo cannot notice an INCOMPLETE fold, which is how a missing extension nearly
+# destroyed 327 config.yaml files while the guard reported everything fine.
 set -uo pipefail
 REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
-FOLDED="$REPO/.claude/.review_state/folded_worktrees"
+FOLDER="$REPO/scripts/fold_worktree.sh"
+
+# Single source of truth for WHICH files count as results: read RESULT_EXTS out of the fold
+# script rather than keeping a second list here. Two hand-maintained lists drifting apart is
+# precisely what caused the original data loss (the fold omitted yaml while the guard was
+# happy), so the guard must ask the folder what it folds.
+EXTS=$(sed -n 's/^RESULT_EXTS="\(.*\)"$/\1/p' "$FOLDER" 2>/dev/null)
+[ -z "$EXTS" ] && EXTS="json yaml yml npz npy png pdf csv pkl txt log out sh"
+# Filter by extension in the loop rather than building a find expression: unquoted
+# `-name *.json` tokens get pathname-expanded by the shell before find ever sees them.
 
 input=$(cat)
 cmd=$(printf '%s' "$input" | python3 -c 'import sys,json
@@ -44,15 +54,14 @@ for n in $names; do
   # 327 config.yaml files were nearly lost. Ask the filesystem instead of a memo.
   pending=""
   while IFS= read -r src; do
+    ext="${src##*.}"
+    case " $EXTS " in *" $ext "*) ;; *) continue ;; esac
     rel="${src#"$wt"/}"
     # tracked files come back through the merge; only untracked results are at risk
     if git -C "$wt" ls-files --error-unmatch "$rel" >/dev/null 2>&1; then continue; fi
     if [ ! -e "$REPO/$rel" ]; then pending="$rel"; break; fi
   done < <(find "$wt"/sweeps "$wt"/runs "$wt"/analysis "$wt"/plots "$wt"/compare_models \
-                "$wt"/data_* "$wt"/satlogs -type f \
-                \( -name '*.json' -o -name '*.yaml' -o -name '*.yml' -o -name '*.npz' \
-                   -o -name '*.npy' -o -name '*.png' -o -name '*.pdf' -o -name '*.csv' \
-                   -o -name '*.pkl' \) 2>/dev/null)
+                "$wt"/data_* "$wt"/satlogs -type f 2>/dev/null)
   [ -z "$pending" ] && continue
 
   {

@@ -97,9 +97,8 @@ if [ "$APPLY" = 1 ]; then
   echo
   echo "COPIED. Commit anything that belongs in git, then the worktree is safe to remove:"
   echo "  git worktree remove $WT"
-  # Record that this worktree was folded, so the removal guard can let it through.
-  mkdir -p "$REPO/.claude/.review_state"
-  echo "$(basename "$WT")" >> "$REPO/.claude/.review_state/folded_worktrees"
+  # No "folded" record is written on purpose: worktree_fold_guard.sh re-checks the
+  # filesystem instead, so an incomplete fold cannot be masked by a memo saying it is done.
 elif [ $((n_new + n_newer)) -gt 0 ]; then
   echo
   echo "Nothing copied yet. Re-run with --apply before removing this worktree."
