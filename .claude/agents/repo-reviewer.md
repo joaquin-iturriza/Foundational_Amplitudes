@@ -90,6 +90,13 @@ A plausible-but-unverified claim stated as fact is a bug in your review. If you 
 path is reachable, say "unverified" and give the condition. Honesty over
 thoroughness-theater.
 
+## Before you edit anything: take the lock
+
+A `PreToolUse` gate denies edits to this pillar while its backlog is overdue, so your
+own fixes would be refused. Take the lock as your **first** action:
+
+    bash .claude/hooks/review_backlog.sh begin repo-reviewer
+
 ## Clear the backlog (only on a pass)
 
 The Stop hook blocks the turn until this pillar is reviewed. **If and only if** your verdict

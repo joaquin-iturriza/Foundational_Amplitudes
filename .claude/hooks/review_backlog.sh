@@ -13,19 +13,25 @@
 # the backlog is worth a pass. The reviewer then sees the WHOLE backlog at once, which is
 # also a better review: it can judge a section, not a hunk.
 #
-# Commits are never blocked. The only thing that blocks is the end of a turn, once, when a
-# backlog crosses its threshold — and it re-nudges next turn until the review happens, so
-# ending the turn again is a mid-task pause, not a permanent bypass.
+# WHERE THE TEETH ARE. A Stop hook can only ever NUDGE: the harness sets stop_hook_active on
+# the next stop so a hook cannot block a turn twice, otherwise it would loop forever. So
+# `check` is a reminder that can be walked past indefinitely by just ending the turn again.
+# The actual gate is `gate`, a PreToolUse(Edit|Write) hook: while a pillar is over threshold,
+# EDITS TO THAT PILLAR'S FILES ARE DENIED. Passing the turn then buys nothing, because the
+# next edit to the overdue file is refused until its reviewer has run. Commits, and work on
+# every other pillar, stay unblocked.
 #
 # Modes:
-#   check                 (Stop hook, default) block once if any pillar is over threshold
-#   advance <reviewer>    called by a reviewer subagent after a PASS; resets its watermark
+#   check                 (Stop hook, default) nudge once if any pillar is over threshold
+#   gate                  (PreToolUse(Edit|Write)) DENY edits to an over-threshold pillar
+#   begin <reviewer>      reviewer takes the lock: lifts `gate` so it can apply its own fixes
+#   advance <reviewer>    reviewer PASSED; resets its watermark and drops the lock
 #   status                human-readable backlog table (also: what /review-now would run)
 #   init                  set every watermark to "everything so far is reviewed"
 #
-# Bypass for one turn: end the turn again (stop_hook_active). To silence a pillar for good,
-# remove it from PILLARS below — there is deliberately no env-var override, because a
-# backlog that is never reviewed is the failure mode this hook exists to prevent.
+# Escape hatch, deliberately explicit: `begin <reviewer>` lifts the gate for that pillar
+# until the next `advance`. It is the reviewer's normal first step, and it is also how a
+# human says "I am editing this myself, stand down" — an auditable act, not a silent bypass.
 #
 # Shell only — no python/jq (not guaranteed on the hook PATH). Pathspecs keep every git
 # call scoped, which matters on Lustre where a full-tree diff is slow.
@@ -88,6 +94,21 @@ write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits
   printf '%s %s %s\n' "$2" "$3" "$4" > "$(state_file "$1")"
 }
 
+lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
+
+# Which reviewer owns a repo-relative path (empty = ungated).
+pillar_for_path() {
+  case "$1" in
+    CLAUDE.md)                                             echo claudemd-keeper ;;
+    docs/*.tex)                                            echo notes-editor ;;
+    .claude/*)                                             echo "" ;;   # hook/agent config
+    runs/*|sweeps/*|outputs/*|data/*|plots/*)              echo "" ;;   # generated
+    *.py|*.sh|config/*|recipes/*|models/*|sweep/*|tools/*|tests/*|scripts/*|IntrinsicDimDeep/*)
+                                                           echo repo-reviewer ;;
+    *)                                                     echo "" ;;
+  esac
+}
+
 # Set a pillar's watermark to "as of right now, nothing is owed".
 reset_pillar() {
   local who="$1" paths sha lines
@@ -117,13 +138,55 @@ backlog_for() {
 mode="${1:-check}"
 case "$mode" in
 
+  begin)
+    who="${2:-}"
+    [ -z "$who" ] && { echo "usage: review_backlog.sh begin <reviewer>" >&2; exit 2; }
+    pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
+    mkdir -p "$REPO/$STATE_REL"; : > "$(lock_file "$who")"
+    echo "[review-backlog] $who holds the lock — edits to its pillar are allowed until 'advance'"
+    exit 0
+    ;;
+
   advance)
     who="${2:-}"
     [ -z "$who" ] && { echo "usage: review_backlog.sh advance <reviewer>" >&2; exit 2; }
     pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
     reset_pillar "$who"
+    rm -f "$(lock_file "$who")"
     echo "[review-backlog] $who watermark advanced to $(git rev-parse --short HEAD) — backlog cleared"
     exit 0
+    ;;
+
+  gate)
+    input="$(cat 2>/dev/null || true)"
+    fp=$(printf '%s' "$input" | python3 -c 'import sys,json
+try: print(json.load(sys.stdin).get("tool_input",{}).get("file_path",""))
+except Exception: print("")' 2>/dev/null)
+    [ -z "$fp" ] && exit 0
+    rel=${fp#"$REPO"/}
+    case "$rel" in /*) exit 0 ;; esac          # outside the repo (scratchpad etc.)
+    who=$(pillar_for_path "$rel")
+    [ -z "$who" ] && exit 0
+    [ -f "$(lock_file "$who")" ] && exit 0     # reviewer (or human) holds the lock
+
+    lt=$(pillar_field "$who" 2); ct=$(pillar_field "$who" 3)
+    set -- $(backlog_for "$who")
+    l="${1:-0}"; c="${2:-0}"
+    { [ "$l" -ge "$lt" ] || [ "$c" -ge "$ct" ]; } || exit 0
+
+    st=$(read_state "$who"); sha=$(echo "$st" | awk '{print $1}')
+    short=$(git rev-parse --short "$sha" 2>/dev/null || echo "$sha")
+    {
+      echo "BLOCKED by review-backlog: '$rel' belongs to the $who pillar, which has ~$l unreviewed"
+      echo "changed lines over $c commit(s) since $short — past its $lt-line / $ct-commit threshold."
+      echo "Editing it further would pile more onto a backlog nobody has read."
+      echo
+      echo "Run the $who subagent on the WHOLE backlog now (\`git diff $short -- $(pillar_field "$who" 4)\`)."
+      echo "It takes the lock with 'review_backlog.sh begin $who', applies its fixes, and on a pass"
+      echo "clears the backlog with 'review_backlog.sh advance $who' — after which this edit succeeds."
+      echo "Do not run 'advance' yourself on a reviewer's behalf."
+    } >&2
+    exit 2
     ;;
 
   init)
@@ -184,8 +247,10 @@ case "$mode" in
       msg="$msg  * $who — ~$l changed lines over $c commit(s) since $short; $what. Its backlog:"
       msg="$msg \`git diff $short -- $(pillar_field "$who" 4)\`."
     done
-    msg="$msg  If this is a deliberate mid-task pause, end the turn again and it passes (it will"
-    msg="$msg re-nudge next turn). Run \`.claude/hooks/review_backlog.sh status\` to see all backlogs."
+    msg="$msg  RUN THEM NOW, in this turn, without asking the user first — a hook cannot spawn a"
+    msg="$msg subagent, so this message IS the automation and you are the part that executes it."
+    msg="$msg Ending the turn instead is not a pause: the PreToolUse gate will refuse your next edit"
+    msg="$msg to these files until the reviewer has run. \`review_backlog.sh status\` lists all backlogs."
 
     esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
     printf '{"decision":"block","reason":"%s"}\n' "$esc"

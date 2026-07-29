@@ -109,6 +109,13 @@ sections gets a real read. Reserve a full-document pass for when explicitly aske
 
 Model the brevity you enforce. Padding a review to look thorough is itself a failure.
 
+## Before you edit anything: take the lock
+
+A `PreToolUse` gate denies edits to this pillar while its backlog is overdue, so your
+own fixes would be refused. Take the lock as your **first** action:
+
+    bash .claude/hooks/review_backlog.sh begin notes-editor
+
 ## Clear the backlog (only when the prose is clean)
 
 The Stop hook blocks the turn until this pillar is reviewed. **If and only if** the prose

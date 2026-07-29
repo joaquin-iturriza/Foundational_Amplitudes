@@ -75,6 +75,13 @@ real scrutiny.
 
 Model the brevity you enforce. Padding a review to look thorough is itself a failure.
 
+## Before you edit anything: take the lock
+
+A `PreToolUse` gate denies edits to this pillar while its backlog is overdue, so your
+own fixes would be refused. Take the lock as your **first** action:
+
+    bash .claude/hooks/review_backlog.sh begin claudemd-keeper
+
 ## Clear the backlog (only on a pass)
 
 The Stop hook blocks the turn until this pillar is reviewed. **If and only if** your verdict

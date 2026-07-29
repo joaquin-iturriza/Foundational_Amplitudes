@@ -496,13 +496,29 @@ commits for `CLAUDE.md`/`.tex`, 200/12 for code). The reviewer then reads the
 stated twice, a config default whose callers were not updated, a section that no
 longer reads as one argument) are invisible to a per-hunk review.
 
-- Commits are **never** blocked. Only the end of a turn is, once; ending the turn
-  again passes through, and it re-nudges next turn, so a pause is possible but a
-  backlog cannot be silently dropped.
-- On a pass a reviewer clears its own watermark via
-  `review_backlog.sh advance <name>`. Never run `advance` on a reviewer's behalf.
-- `review_backlog.sh status` shows all backlogs; `/review-now` runs the reviewers
-  on demand. Watermarks live in `.claude/.review_state/` (gitignored, per-checkout).
+**A hook cannot spawn a subagent, so I am the automation.** Hooks are shell
+commands; only the model invokes an agent. When the `Stop` hook says a pillar is
+due, **spawn that subagent in the same turn, without asking first.** Do not hand the
+decision back — the point is that it happens without the user's involvement. Report
+only what the reviewer flags for a human.
+
+**The gate is the backstop, not a second workflow.** A `Stop` hook can only nudge:
+the harness sets `stop_hook_active` on the next stop so it cannot block twice, or it
+would loop forever, which makes `check` alone walk-past-able. So
+`review_backlog.sh gate` (**`PreToolUse(Edit|Write)`**) denies edits to a pillar
+whose backlog is over threshold. Ending the turn is therefore not a pause: it just
+stalls, since the next edit to those files is refused. In normal operation the gate
+never fires, because the reviewer already ran at the nudge. Commits, generated paths
+(`runs/`, `sweeps/`, `outputs/`, `data/`, `plots/`), `.claude/` config, and any
+pillar under threshold stay unblocked.
+
+- A reviewer takes `review_backlog.sh begin <name>` first, which lifts the gate so
+  it can apply its own fixes, then `advance <name>` on a pass (clears the backlog
+  and drops the lock). **Never run `advance` on a reviewer's behalf.**
+- `begin <name>` is also the human escape hatch: it stands the gate down for that
+  pillar until the next `advance`, as an explicit, auditable act.
+- `review_backlog.sh status` shows all backlogs; `/review-now` runs the reviewers on
+  demand. Watermarks live in `.claude/.review_state/` (gitignored, per-checkout).
 
 **Branches**
 - **`jeanzay`** — the development trunk and default working branch. *Everything*
