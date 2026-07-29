@@ -44,7 +44,7 @@ esac
 # only happens to use a .md extension. The rest of .claude/ stays guarded.
 case "$fp" in
   */CLAUDE.md|*/README.md|*/README*.md|*/.claude/plans/*) exit 0 ;;
-  */.claude/agents/*.md|*/.claude/commands/*.md) exit 0 ;;
+  */.claude/agents/*.md|*/.claude/commands/*.md|*/.claude/skills/*.md) exit 0 ;;
 esac
 
 # Editing an existing file is fine — only NEW files are "scattering".
