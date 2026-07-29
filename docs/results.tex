@@ -386,8 +386,8 @@ $t^{-0.55}$ (the intuitive branch).
 Disentangled on the clean 2D grid (Fig.~\ref{fig:2d}), the optimum rises \emph{weakly} with
 data, $\eta^\ast\propto D^{+0.15\ldots0.3}$, and \emph{saturates} (measured $\sim\!2.2\times$ from
 $D=700$ to $70$k at $t=3162$, most of it by $D\!\sim\!2$k). The optimum is thus a 2D surface
-$\eta^\ast(t,D)$, the inverted-$U$ in $t$ (Eq.~\eqref{eq:invU}) times this weak, saturating
-factor in $D$, and both axes are set by the experimenter when the run is designed.
+$\eta^\ast(t,D)$ (the inverted-$U$ in $t$, Eq.~\eqref{eq:invU}, times this weak, saturating
+factor in $D$), and both axes are set by the experimenter when the run is designed.
 \textbf{Set the learning rate by evaluating the surface at your own $t$ and $D$}, sweeping
 $\pm\tfrac12$ decade around that value, not the $t$-only $\eta_c(t)$, which discards the
 measured $D$-axis. A large-$D$ run sits at the high-$D$ asymptote, so its centre lies
@@ -484,7 +484,7 @@ HPs; arms are comparable \emph{within} a test, which shares one standardization 
 
 \begin{principle}[Feed only what the external momenta cannot recover]\label{prin:levers}
 A feature helps precisely when the quantity it supplies is \emph{not} a function of the
-external four-momenta, an internal or theory input (coupling $\alpha$, a propagator mass),
+external four-momenta (an internal or theory input: a coupling $\alpha$, a propagator mass),
 \emph{and} is supplied in a form the network can actually use (a kinematic$\,\times\,$mass
 \emph{interaction}, not a near-constant scalar). It is neutral when the information is already
 present in the momenta, or already carried by the per-process amplitude offset.
@@ -549,9 +549,9 @@ Diagram scanned-mass & $M_Z$ scan, diagram enc. & $0.0777$ & $0.0718$ & weak $-8
 \end{tabular}
 \end{table}
 
-\paragraph{The flagship (the production configuration).} The adopted setup, off-shellness
+\paragraph{The flagship (the production configuration).} The adopted setup (off-shellness
 $s_{\mathrm{prop}}-M^2$ fed directly to the transformer, with coupling scalars, for the internal
-$Z$, top, and Higgs propagators (\code{internal\_mass\_pdgs}$=[23,6,25]$), is confirmed in the
+$Z$, top, and Higgs propagators, \code{internal\_mass\_pdgs}$=[23,6,25]$) is confirmed in the
 well-trained regime that matters: $44$ datasets spanning the four resonances
 ($ee\!\to\!\mu\mu$ $Z$-scan, $ee\!\to\!4\mu$ $Z$-in-$4\ell$, $ee\!\to\!WWb\bar b$ top, and
 $ee\!\to\!\mu\mu\tau\tau$ Higgs), on \emph{full} data with fiducial cuts, at $30$k iterations (not
@@ -1092,7 +1092,7 @@ limit.
 Soft and collinear are \emph{distinct} infrared limits. A gluon is \emph{soft} when its
 energy vanishes ($E_g\to0$) at any angle, and the eikonal factor gives
 $|\mathcal{M}|^2\sim1/E_g^2$; two massless partons are \emph{collinear} when they become
-parallel ($\theta_{ij}\to0$) at any energy, where an internal propagator $1/(p_i+p_j)^2$ goes
+parallel ($\theta_{ij}\to0$) at any energy, and an internal propagator $1/(p_i+p_j)^2$ goes
 on shell. Neither limit implies the other, so there are three singular regions: soft-only,
 collinear-only, and the soft\,$+$\,collinear overlap where both happen at once and the
 divergence is strongest. The gluon energy fraction $x_g=2E_g/\sqrt s$ isolates the
@@ -1481,8 +1481,8 @@ $\mu$ collapses to the mean; forced arithmetic mean for HETEROSC in both the tra
 (\code{\_aggregate\_per\_process\_loss}) and the 22-proc validation combine (checkpoint selection).
 This was the dominant failure ($\mu$-MSE $\sim$1 across \emph{all} configs, including $\beta{=}1$).
 (ii) \code{float(mse\_val)} in the base \code{\_validate}/\code{\_step} consumers (single-dataset
-finetunes delegate there; a detached CUDA tensor crashed \code{np.mean}). \emph{Foundation sweep
-:} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe as base22,
+finetunes delegate there; a detached CUDA tensor crashed \code{np.mean}). \emph{Foundation
+sweep:} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe as base22,
 \code{loss=HETEROSC}, lr$\in\{4\mathrm{e}{-}3,1.6\mathrm{e}{-}2\}\times\beta\in\{0,.5,1\}$, 6000
 iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives in-distribution val
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
@@ -1583,7 +1583,7 @@ structure-agnostic coverage criterion, because \emph{every} divergence type (sof
 $s$-channel resonance, threshold) is an \emph{amplitude extreme}, and $|\mathcal{M}|^2$ is the one
 coordinate always available (computed to label every event); it matches the $\log$-MSE
 equal-footing loss. \emph{How:} you cannot draw a target $|\mathcal{M}|^2$, so shape the density by
-adaptive importance sampling (VEGAS/foam) \emph{guided by} $|\mathcal{M}|^2$, and toward
+adaptive importance sampling (VEGAS/foam) \emph{guided by} $|\mathcal{M}|^2$ toward
 flat-in-$\log|\mathcal{M}|^2$, \emph{not} the physical measure $|\mathcal{M}|^2\mathrm{d}\Phi$ a
 cross-section generator targets (that is the \textsc{rambo} starvation trap). The three layers: (L0)
 coverage via flat-$\log|\mathcal{M}|^2$ importance sampling; (L1) emphasis via $\sigma$-reweighting
@@ -1723,8 +1723,8 @@ collinear singularities admit \emph{no} single hand-tuned density (no one-parame
 near-optimal, unlike the $2\!\to\!2$ resonance). \emph{The loop} (\code{l2\_online\_uugg.py}): one
 long-lived process, model $+$ optimizer $+$ a single cosine built once over the full horizon
 (round~0 \code{init\_data} also freezes the amp/mom preprocessing stats); rounds are boundaries
-\emph{inside} the one \code{train()} loop, reached by monkeypatching \code{exp.\_cycle} (no core edit
-, since the runtime imports the core modules from the main repo, so a worktree edit to \code{train()}
+\emph{inside} the one \code{train()} loop, reached by monkeypatching \code{exp.\_cycle} (no core
+edit: the runtime imports the core modules from the main repo, so a worktree edit to \code{train()}
 would be dead code). At each boundary: propose fresh momenta from a process-agnostic base, score by
 the live $\sigma$, keep $n$, label survivors with the exact \code{ee\_uugg} standalone, preprocess
 with the frozen stats, and append to a growing pool. The base proposal
@@ -1851,7 +1851,7 @@ with \emph{no} per-process tuning; we stress it on two structurally-different di
 only the process registry (\code{--process}: PDG/multiplicity, the compiled standalone labeller, and
 the round-0 frozen-stats set): same base22, same democratic generator, same finetune HPs. Held-out
 sets are drawn from the same democratic base (uug enriched near $M_Z$ so the resonance region is
-well-measured), scored per $y_{\min}$ decade AND, for uug, per $\sqrt s$ region.
+well-measured), scored per $y_{\min}$ decade and, for uug, per $\sqrt s$ region.
 \emph{(i) $u\bar u g$, a genuine multi-scale process:} the $s$-channel $\gamma^\ast/Z$ propagator
 gives a resonance at $\sqrt s\!\approx\!M_Z$ (the window bottom) \emph{and} the gluon gives soft/collinear
 IR, two competing extremes at once. The open question was whether a \emph{single} $\sigma^\gamma$ knob
@@ -2084,8 +2084,8 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 \begin{principle}[For steering generation, what matters is how well $\sigma$ \emph{ranks} error]
 A genuinely Bayesian weight posterior is not automatically the better generation signal. What the keep-rule
 consumes is a \emph{ranking} of where the model is wrong, and full-network Bayes-by-backprop buys only a
-marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a systematically worse point fit
-, and its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
+marginally better ranking ($\rho\!\approx\!0.2$ vs $0.15$) at the price of a systematically worse point
+fit, and its own HP search runs the posterior width to the deterministic bound to recover that accuracy. The cheap
 detached heteroscedastic head remains the better trade on this harness.
 \end{principle}
 
@@ -2128,8 +2128,8 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
 \end{figure}
 
 \paragraph{Uncapped data: the uncertainty tail floors, and more data does not move it.}
-Every A/B above is at a fixed data budget. The complementary question, \emph{how much} data a region
-actually needs before more is waste, the loop can now answer directly, because the same $\sigma$ it
+Every A/B above is at a fixed data budget. The complementary question (\emph{how much} data a region
+actually needs before more is waste) the loop can now answer directly, because the same $\sigma$ it
 uses to steer is also a saturation gauge. At each round it records the $\sigma$ distribution over the
 \emph{fresh} proposal batch (drawn from the same fixed base every round, so it is a like-for-like
 measure of the model's remaining uncertainty over the whole space, unlike a pool statistic, which
@@ -2258,7 +2258,7 @@ converting the $L_2$ penalty to decoupled \code{weight\_decay} (it is folded int
 checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP, so converting it
 would silently break continuity with all existing sweep results), and \code{torch.compile} (the
 compute is dominated by the torch-geometric framesnet and xformers attention, neither of which
-compiles (heavy graph breaks for no gain), and it would prefix \code{state\_dict} keys,
+compiles, so it buys heavy graph breaks for no gain; and it would prefix \code{state\_dict} keys,
 breaking warm-start/fine-tune reloads). A gradient-checkpointing knob
 (\code{checkpoint\_blocks}) trades $\sim$one extra forward for a large activation-memory saving
 when memory-bound.
