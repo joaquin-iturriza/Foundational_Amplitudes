@@ -94,3 +94,6 @@ docs/results.fdb_latexmk
 # regenerable eval data (produced by L2 runs)
 analysis/divergences/*.npz
 analysis/divergences/satlogs/
+
+# restore points for bulk run-config repairs (tools/fix_stale_run_datasets.py)
+/backups/

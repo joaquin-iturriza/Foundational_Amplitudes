@@ -91,7 +91,8 @@ def main() -> int:
     t0 = time.time()
     cache: dict[str, list[str] | None] = {}
     scanned = recipe_runs = already_ok = to_fix = 0
-    missing_recipe = unparsed = 0
+    missing_recipe = unparsed = cosmetic = substantive = 0
+    sub_examples: list[tuple[Path, list[str], list[str]]] = []
     planned: list[tuple[Path, list[str], list[str]]] = []
 
     for dirpath, _dirnames, filenames in os.walk(root):
@@ -137,6 +138,19 @@ def main() -> int:
                 already_ok += 1
                 continue
             to_fix += 1
+            # How BADLY wrong: the stale default names datasets by filename
+            # (`ee_wwz_255-1000GeV_amplitudes`), the recipe by process
+            # (`ee_wwz`). If the underlying process sets agree, the config was
+            # merely in the wrong FORM and never misled about membership. If they
+            # differ, the config actively misreported what the run trained on --
+            # that is the class that produced the `base8` error.
+            stale_base = {re.sub(r"_[-\d.]+-[-\d.]+GeV_amplitudes$", "", c) for c in cur}
+            if stale_base == set(names):
+                cosmetic += 1
+            else:
+                substantive += 1
+                if len(sub_examples) < 5:
+                    sub_examples.append((p, cur, names))
             planned.append((p, cur, names))
 
     print(f"scanned {scanned} config files in {time.time()-t0:.0f}s")
@@ -145,10 +159,12 @@ def main() -> int:
     print(f"  recipe file missing              : {missing_recipe}")
     print(f"  unparsed (odd yaml shape)        : {unparsed}")
     print(f"  STALE, would fix                 : {to_fix}")
+    print(f"    of which cosmetic (same processes, filename form) : {cosmetic}")
+    print(f"    of which SUBSTANTIVE (wrong process set)          : {substantive}")
 
-    if planned:
-        print("\n  examples:")
-        for p, cur, names in planned[:3]:
+    if sub_examples:
+        print("\n  SUBSTANTIVE examples (config misreported membership):")
+        for p, cur, names in sub_examples:
             print(f"    {p.resolve().relative_to(REPO)}")
             print(f"      stale ({len(cur)}): {cur[:3]}{' ...' if len(cur) > 3 else ''}")
             print(f"      real  ({len(names)}): {names[:3]}{' ...' if len(names) > 3 else ''}")
