@@ -98,6 +98,19 @@ already carries it. If the exact numbers matter, they belong in a table.
 to individual calls. If tick labels collide, use fewer ticks or shorter tick labels (e.g.
 $\log_{10}$ exponents instead of `1e-6`), never a smaller font.
 
+## cmr10 glyph traps
+
+The figure font is cmr10, which has a small glyph set. Three things bite:
+
+- **En/em dashes** (`–`, `—`) render as a hollow box. Write a range as `r"$3\!-\!15$"`
+  (math minus) or a plain ASCII hyphen.
+- **Unicode minus** is already handled (`axes.unicode_minus = False`); do not re-enable it.
+- **`%` inside mathtext is a comment character.** `rf"$={x:.0%}$"` raises a parse error.
+  Write `rf"$={100*x:.0f}\%$"`, or keep the percent outside math entirely. Note that in a
+  plain (non-math) label, `\%` renders literally as `\%` — there you want a bare `%`.
+
+After any label change, look at the PNG. A missing glyph is silent: no warning, just a box.
+
 ## Self-containedness check
 
 Before saving, ask: with the title gone, can a reader who has the caption tell what every

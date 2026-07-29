@@ -239,7 +239,12 @@ def save(fig, base: str, repo: str | None = None) -> str:
         root = repo or os.path.dirname(os.path.abspath(__file__))
         base = os.path.join(root, base)
     os.makedirs(os.path.dirname(base), exist_ok=True)
-    if not getattr(fig, "_ps_layout_done", False):
+    # Skip tight_layout when the figure already has a layout engine (constrained, used for
+    # colourbar figures) or when shared_legend already reserved its strip — running it anyway
+    # discards that work and drops the colourbar/legend back onto the panels.
+    engine = fig.get_layout_engine()
+    managed = engine is not None and engine.__class__.__name__ != "PlaceHolderLayoutEngine"
+    if not managed and not getattr(fig, "_ps_layout_done", False):
         try:
             fig.tight_layout()
         except Exception:
