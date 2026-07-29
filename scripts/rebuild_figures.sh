@@ -108,6 +108,17 @@ run phase_space_pretrain_aa  $PY $D/make_3d.py \
                                  --label '$e^+e^-\to\gamma\gamma$' \
                                  --out_base $D/figs/phase_space_pretrain_aa
 
+echo "== fine-tune methods =="
+# Reads each sweep's SAVED outer config (sweeps/<name>/sweep_config.yaml), not sweep/*.yaml.
+run finetune_methods         $PY sweep/compare_finetune_methods.py --out-dir docs/figs \
+                                 --configs sweeps/finetune_scaling_virt_002/sweep_config.yaml \
+                                           sweeps/finetune_lora_scaling_virt/sweep_config.yaml \
+                                           sweeps/finetune_ewc_scaling_virt/sweep_config.yaml \
+                                           sweeps/finetune_freeze_scaling_virt/sweep_config.yaml \
+                                           sweeps/finetune_resethead_scaling_virt/sweep_config.yaml
+# Multi-page PDF (results.tex includes pages 2-6); PdfPages emits no .png counterpart.
+run phase1_scaling           $PY sweep/analyze_pretraining_scaling.py --dry-run
+
 echo "== scaling =="
 run compute_scan_wt          $PY analysis/scaling_compute/build_compute_scan_walltime.py
 run alpha_vs_multiplicity    $PY analysis/scaling_compute/alpha_vs_multiplicity_overlay.py \

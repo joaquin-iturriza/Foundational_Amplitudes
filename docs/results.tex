@@ -17,7 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
-\graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
+\graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../sweeps/pretraining_scaling/}{../compare_models/figs/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
 
@@ -748,7 +748,7 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{finetune_methods_walltime.pdf}
+  \includegraphics[width=\textwidth]{finetune_methods_comparison_walltime.pdf}
   \caption{\textbf{Fine-tune methods in wall-time.} The five fine-tune methods; full layer-decay
   reaches a given loss soonest.}
   \label{fig:ftmethods_wt}

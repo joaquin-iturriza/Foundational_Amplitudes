@@ -638,20 +638,19 @@ def main():
                 ax.set_xlabel("GPU-hours (actual)")
             else:
                 ax.set_xlabel("GPU-hours (V100, benchmark)")
-            ax.set_ylabel("val_loss")
+            ax.set_ylabel(r"$\mathcal{L}_{\rm val}$")
 
         plot_path = os.path.join(SWEEP_BASE, "phase1_scaling.pdf")
         with PdfPages(plot_path) as pdf:
             # ── Page 1: overview — one panel per D, compute x-axis ──────────
             n_cols = len(data_by_d)
-            fig, axes = plt.subplots(1, n_cols, figsize=(5 * n_cols, 5), squeeze=False)
+            import plot_style as ps
+            fig, axes = ps.figure(ncols=n_cols, squeeze=False)
             for ax, (d_key, series) in zip(axes[0], data_by_d.items()):
                 _draw_scaling(ax, d_key, series["p1"], series["ext_by_nh"],
                               c_star.get(d_key), show_all_trials=False, x_axis="compute")
-                ax.set_title(f"D={d_key}", fontsize=10)
-                ax.legend(fontsize=6)
-            nh_legend = "  ".join(f"nh={nh}" for nh in sorted(NH_STYLE))
-            fig.suptitle(f"Phase 1 overview: val_loss vs compute  [{nh_legend}]", fontsize=11)
+                ps.process_label(ax, f"$D={d_key}$", loc="upper right")
+                ax.legend()
             fig.tight_layout()
             pdf.savefig(fig, dpi=150)
             plt.close(fig)
@@ -669,7 +668,7 @@ def main():
 
                 d_total = DATASET_SIZES[d_key]
                 bs      = _batch_size(d_total)
-                fig, (ax_c, ax_w) = plt.subplots(1, 2, figsize=(14, 6))
+                fig, (ax_c, ax_w) = ps.figure(ncols=2)
 
                 # Build unified (nh, c_macs) → hours dict from both p1 and ext runs
                 actual_hours: dict[tuple[int, float], float] = {
@@ -689,19 +688,13 @@ def main():
                 for nh, cells in [(16, _nh16_merged)] + [(nh, c) for nh, c in ext_by_nh.items() if nh != 16]:
                     color = _nh_style(nh)["color"]
                     for c in sorted(cells):
-                        ax_c.annotate(f"n={len(cells[c])}", (c, cells[c][0]),
-                                      textcoords="offset points", xytext=(4, 4),
-                                      fontsize=7, color=color)
+                        pass  # per-marker n= labels removed: clutter, and the axis carries it
 
-                nh_present = [16] + sorted(ext_by_nh)
-                nh_str = ", ".join(f"nh={h}" for h in nh_present)
-                fig.suptitle(
-                    f"D={d_key}  (subsample={d_total//N_DATASETS}/ds, BS={bs})  [{nh_str}]\n"
-                    f"light dots=all trials  |  left: vs FLOPs  |  right: vs GPU-hours",
-                    fontsize=10
-                )
-                ax_c.legend(fontsize=8)
-                ax_w.legend(fontsize=8)
+                # What the panels are, and that faint dots are individual trials, belongs in
+                # the results.tex caption; the panel keeps only its D label.
+                ps.process_label(ax_c, f"$D={d_key}$", loc="upper right")
+                ax_c.legend()
+                ax_w.legend()
                 fig.tight_layout()
                 pdf.savefig(fig, dpi=150)
                 plt.close(fig)
