@@ -13,11 +13,15 @@ Right : the same error split by sqrt(s) region, where the gain actually lives --
 Emits png+pdf.
 """
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MZ = 91.1876
@@ -29,7 +33,7 @@ y = base["y_min"]; ss = base["sqrt_s"]
 eb = (base["pred_logamp"] - base["true_logamp"]) ** 2
 es = (sig["pred_logamp"] - sig["true_logamp"]) ** 2
 
-fig, axes = plt.subplots(1, 2, figsize=(12.6, 5.0))
+fig, axes = ps.figure(ncols=2)
 
 # ---------------------------------------------------------------- per y_min decade
 ax = axes[0]
@@ -39,43 +43,33 @@ for lo, hi in DEC:
     if m.sum() < 20:
         continue
     xc.append(np.sqrt(max(lo, 1e-7) * hi)); mb.append(eb[m].mean()); ms.append(es[m].mean())
-ax.plot(xc, mb, "o-", color="0.4", lw=2, ms=6, label="base (uniform)")
-ax.plot(xc, ms, "s-", color="crimson", lw=2, ms=6, label=r"$\sigma$-driven ($\gamma{=}3$)")
+ax.plot(xc, mb, "o-", color=ps.C.grey, label="uniform")
+ax.plot(xc, ms, "s-", color=ps.C.vermillion, label=r"$\sigma$-driven ($\gamma{=}3$)")
 ax.set_xscale("log"); ax.set_yscale("log")
 ax.set_xlabel(r"$y_{\min}=\min_{ij}2p_i\!\cdot\!p_j/s$")
-ax.set_ylabel(r"held-out MSE$(\Delta\log|\mathcal{M}|^2)$")
-ax.set_title(r"(a) per $y_{\min}$ decade", fontsize=10.5)
-ax.grid(True, which="both", alpha=0.25); ax.legend(fontsize=9)
+ax.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+ax.legend(loc="lower left")
+ps.process_label(ax, r"$e^+e^-\to b\bar b g$", loc="upper right")
 
 # ---------------------------------------------------------------- per sqrt(s) region
 ax = axes[1]
-REG = [(r"Z-peak" "\n" r"$|\sqrt{s}-M_Z|<3$", np.abs(ss - MZ) < 3.0, 0.50),
-       ("shoulder\n3–15", (np.abs(ss - MZ) >= 3) & (np.abs(ss - MZ) < 15), None),
-       ("continuum\n>15", np.abs(ss - MZ) >= 15, None)]
+REG = [(r"$|\sqrt{s}-M_Z|<3$", np.abs(ss - MZ) < 3.0),
+       (r"$3$–$15$", (np.abs(ss - MZ) >= 3) & (np.abs(ss - MZ) < 15)),
+       (r"$>15$", np.abs(ss - MZ) >= 15)]
 xs = np.arange(len(REG)); w = 0.38
-bvals = [eb[m].mean() for _, m, _ in REG]
-svals = [es[m].mean() for _, m, _ in REG]
-ax.bar(xs - w / 2, bvals, w, color="0.4", label="base (uniform)")
-ax.bar(xs + w / 2, svals, w, color="crimson", label=r"$\sigma$-driven ($\gamma{=}3$)")
-for i, (_, m, pred) in enumerate(REG):
-    r = es[m].mean() / eb[m].mean()
-    ax.text(i + w/2, svals[i] * 1.08, f"×{r:.2f}", ha="center", fontsize=9, color="crimson")
-    if pred is not None:
-        ax.text(i - w/2, bvals[i] * 1.08, f"pred ×{pred:.2f}", ha="center",
-                fontsize=8, color="navy")
+bvals = [eb[m].mean() for _, m in REG]
+svals = [es[m].mean() for _, m in REG]
+ax.bar(xs - w / 2, bvals, w, color=ps.C.grey, label="uniform")
+ax.bar(xs + w / 2, svals, w, color=ps.C.vermillion, label=r"$\sigma$-driven ($\gamma{=}3$)")
 ax.set_yscale("log")
-ax.set_xticks(xs); ax.set_xticklabels([r[0] for r in REG], fontsize=9)
-ax.set_ylabel(r"held-out MSE$(\Delta\log|\mathcal{M}|^2)$")
-ax.set_title(r"(b) per $\sqrt{s}$ region — the gain is Z-driven, as predicted", fontsize=10.5)
-ax.grid(True, axis="y", which="both", alpha=0.25); ax.legend(fontsize=9, loc="upper right")
-ax.set_ylim(top=ax.get_ylim()[1]*1.6)
+ax.set_xticks(xs); ax.set_xticklabels([r[0] for r in REG])
+ax.set_xlabel(r"$|\sqrt{s}-M_Z|$  [GeV]")
+ax.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
+ax.grid(True, axis="y", which="both")
+ax.legend(loc="upper left")
+ax.set_ylim(top=ax.get_ylim()[1] * 2.2)
 
-fig.suptitle(r"$e^+e^-\to b\bar b g$ (massive): $\sigma$-steering pays where the $\sigma$-contrast "
-             r"predicted, and the $m_b$ dead cone softens the IR", fontsize=11.5)
-fig.tight_layout(rect=[0, 0, 1, 0.95])
 base_path = os.path.join(HERE, "figs", "l2_bbbarg")
-os.makedirs(os.path.dirname(base_path), exist_ok=True)
-for ext in ("png", "pdf"):
-    fig.savefig(f"{base_path}.{ext}", dpi=140, bbox_inches="tight")
-plt.close(fig)
-print(f"wrote {base_path}.png/.pdf")
+ps.save(fig, base_path)
+for (nm, m) in REG:
+    print(f"  {nm}: ratio {es[m].mean()/eb[m].mean():.3f}")

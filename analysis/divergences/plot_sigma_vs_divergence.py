@@ -20,11 +20,15 @@ principle from a post-hoc explanation into a test you can run BEFORE the A/B.
 Emits png+pdf.
 """
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MZ = 91.1876
@@ -33,8 +37,8 @@ MZ = 91.1876
 # (preprocessed-unit) sigma back to log|M|^2 units, so sigma and RMSE are on one axis.
 AMP_STD = {"uug": 3.3545, "uugg": 6.1200, "uuggg": 8.9193}
 
-SIG_C = "crimson"
-ERR_C = "steelblue"
+SIG_C = ps.C.vermillion
+ERR_C = ps.C.blue
 
 
 def load(tag):
@@ -59,22 +63,17 @@ def profile(x, sigma, err2, edges, min_n=40):
     return np.array(xc), np.array(sm), np.array(rm)
 
 
-def panel(ax, x, sigma_log, rmse, xlabel, title, note=None):
-    ax.plot(x, sigma_log, "o-", color=SIG_C, lw=2.0, ms=5.5,
-            label=r"learned $\sigma$  (model's own uncertainty)")
-    ax.plot(x, rmse, "s--", color=ERR_C, lw=2.0, ms=5.5,
-            label=r"actual RMSE$(\Delta\log|\mathcal{M}|^2)$")
+def panel(ax, x, sigma_log, rmse, xlabel, process):
+    ax.plot(x, sigma_log, "o-", color=SIG_C, label=r"learned $\sigma$")
+    ax.plot(x, rmse, "s--", color=ERR_C, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(r"$\log|\mathcal{M}|^2$ units")
-    ax.set_title(title, fontsize=10.5)
-    ax.grid(True, which="both", alpha=0.25)
-    ax.legend(fontsize=8, loc="best")
-    if note:
-        ax.text(0.03, 0.04, note, transform=ax.transAxes, fontsize=8, va="bottom")
+    ps.process_label(ax, process, loc="upper right")
+    return ax
 
 
-fig, axes = plt.subplots(2, 2, figsize=(12.8, 9.2))
+fig, axes = ps.figure(ncols=2, nrows=2)
 
 # ---------------------------------------------------------------- (a) uug: the Z resonance
 d = load("heldout_eval_uug_base_s0")
@@ -82,29 +81,20 @@ A = AMP_STD["uug"]
 dist = np.abs(d["sqrt_s"] - MZ)                      # distance from the pole = the divergence variable
 edges = np.logspace(np.log10(0.02), np.log10(900.0), 22)
 x, s, r = profile(dist, d["sigma"] * A, d["err2"], edges)
-panel(axes[0, 0], x, s, r,
-      r"$|\sqrt{s}-M_Z|$  [GeV]",
-      r"(a) $e^+e^-\to u\bar u g$: the $s$-channel $Z$ resonance",
-      note="$\\sigma$ rises $\\sim\\!4.5\\times$ into the pole,\ntracking a $10\\times$ rise in the true error")
+panel(axes[0, 0], x, s, r, r"$|\sqrt{s}-M_Z|$  [GeV]", r"$e^+e^-\to u\bar u g$")
 
 # ---------------------------------------------------------------- (b) uugg: concentrated IR
 d = load("heldout_eval_base_s0")
 A = AMP_STD["uugg"]
 edges = np.logspace(-7.2, 0.0, 18)
 x, s, r = profile(d["y"], d["sigma"] * A, d["err2"], edges)
-panel(axes[0, 1], x, s, r,
-      r"$y_{\min}=\min_{ij} s_{ij}/s$",
-      r"(b) $e^+e^-\to u\bar u gg$: a CONCENTRATED IR divergence",
-      note="$\\sigma$ rises $\\sim\\!1.8\\times$ into the deep IR")
+panel(axes[0, 1], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u gg$")
 
 # ---------------------------------------------------------------- (c) uuggg: diffuse IR
 d = load("heldout_eval_uuggg_base_s0")
 A = AMP_STD["uuggg"]
 x, s, r = profile(d["y"], d["sigma"] * A, d["err2"], edges)
-panel(axes[1, 0], x, s, r,
-      r"$y_{\min}=\min_{ij} s_{ij}/s$",
-      r"(c) $e^+e^-\to u\bar u ggg$: a DIFFUSE divergence",
-      note="$\\sigma$ is nearly FLAT ($\\sim\\!1.3\\times$):\nno thin region to point at")
+panel(axes[1, 0], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u ggg$")
 
 # ---------------------------------------------------------------- (d) the pre-flight diagnostic
 # sigma-contrast measured on the BASE arm (singular region vs bulk) against the sigma-arm/base MSE
@@ -125,31 +115,24 @@ POINTS = [
     (r"$u\bar u ggg$" + "\n(deep IR)", "heldout_eval_uuggg_base_s0", "heldout_eval_uuggg_g10_s0",
      lambda x: x < 1e-6, lambda x: x > 1e-2, "y", r"$\gamma{=}10$"),
 ]
-LABEL_OFF = [(8, 8), (8, 8), (10, -34)]     # nudge the uuggg label clear of the baseline
+axes[0, 0].legend(loc="lower left")
+
 ax = axes[1, 1]
 cs, gs = [], []
-for (name, bt, st, rf, bf, coord, glab), off in zip(POINTS, LABEL_OFF):
+MARKS = ["o", "s", "D"]
+COLS = [ps.C.blue, ps.C.vermillion, ps.C.green]
+for (name, bt, st, rf, bf, coord, glab), mk, col in zip(POINTS, MARKS, COLS):
     c, g = contrast_and_gain(bt, st, rf, bf, coord)
     cs.append(c); gs.append(g)
-    ax.plot(c, g, "o", ms=13, color="darkorange", mec="k", mew=1.2, zorder=3)
-    ax.annotate(f"{name}\n{glab}", xy=(c, g), xytext=off, textcoords="offset points", fontsize=8.5)
+    lab = name.replace("\n", " ") + f", {glab}"
+    ax.plot(c, g, mk, ms=8, color=col, zorder=3, label=lab)
     print(f"  {name.replace(chr(10),' '):22s} sigma-contrast={c:.2f}  sigma/base MSE in region={g:.3f}")
-ax.plot(cs, gs, "-", color="darkorange", lw=1.4, alpha=0.6, zorder=2)
-ax.axhline(1.0, color="k", ls="--", lw=1.2)
-ax.text(4.85, 1.012, "no gain over uniform generation", fontsize=8, ha="right")
-ax.set_xlabel(r"$\sigma$-CONTRAST: $\langle\sigma\rangle_{\rm singular}\,/\,\langle\sigma\rangle_{\rm bulk}$"
-              "\n(measured on the base arm alone — one forward pass, no A/B)")
-ax.set_ylabel(r"measured $\sigma$-arm / base  MSE ratio in that region")
-ax.set_title(r"(d) the $\sigma$ profile PREDICTS whether steering pays", fontsize=10.5)
-ax.grid(True, alpha=0.25)
-ax.set_xlim(1.1, 5.0); ax.set_ylim(0.30, 1.10)
+ax.plot(cs, gs, "-", color=ps.C.grey, lw=1.0, zorder=2)
+ax.axhline(1.0, color=ps.C.grey, ls="--", label="parity")
+ax.set_xlabel(r"$\langle\sigma\rangle_{\rm singular}\,/\,\langle\sigma\rangle_{\rm bulk}$")
+ax.set_ylabel(r"MSE ratio in that region")
+ax.set_xlim(1.1, 5.0); ax.set_ylim(0.30, 1.15)
+ax.legend(loc="center right")
 
-fig.suptitle(r"The learned $\sigma$ rises inside the divergence — and how sharply it does so "
-             r"predicts whether $\sigma$-driven generation helps", fontsize=12.5)
-fig.tight_layout(rect=[0, 0, 1, 0.97])
 base = os.path.join(HERE, "figs", "l2_sigma_vs_divergence")
-os.makedirs(os.path.dirname(base), exist_ok=True)
-for ext in ("png", "pdf"):
-    fig.savefig(f"{base}.{ext}", dpi=140, bbox_inches="tight")
-plt.close(fig)
-print(f"wrote {base}.png/.pdf")
+ps.save(fig, base)

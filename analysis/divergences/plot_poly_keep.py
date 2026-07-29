@@ -17,11 +17,16 @@ for the 3-seed confirmation (the latter written by the confirmation runs). Emits
 import glob
 import json
 import os
+import sys
 
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEC = [(0, 1e-6), (1e-6, 1e-5), (1e-5, 1e-4), (1e-4, 1e-3), (1e-3, 1e-2), (1e-2, 1e-1), (1e-1, 1.01)]
@@ -44,27 +49,18 @@ c1 = np.array([r["keep_c1"] for r in rows]); c2 = np.array([r["keep_c2"] for r i
 lf = np.array([r["logflat_mse"] for r in rows])
 POWER_BEST_1SEED = 3.351e-2         # sigma^10 seed 0
 
-fig, axes = plt.subplots(1, 2, figsize=(12.4, 5.0))
+fig, axes = ps.figure(ncols=2)
 
 # ---------------------------------------------------------------- (a) logflat vs c2
 ax = axes[0]
-sc = ax.scatter(c2, lf, c=c1, s=90, cmap="viridis", edgecolor="k", zorder=3)
-plt.colorbar(sc, ax=ax, label=r"$c_1$  (= $\gamma$, linear term)")
-ax.axvline(0.0, color="crimson", ls="--", lw=1.5)
-ax.text(0.05, ax.get_ylim()[1], "power-law family\n($c_2{=}c_3{=}0$)", color="crimson",
-        fontsize=8, va="top")
-ax.axhline(POWER_BEST_1SEED, color="0.4", ls=":", lw=1.4)
-ax.text(ax.get_xlim()[1], POWER_BEST_1SEED, r"best $\sigma^\gamma$ (seed 0)", fontsize=8,
-        ha="right", va="bottom", color="0.4")
-# mark the winner
-i0 = int(np.argmin(lf))
-ax.annotate("best polynomial\n" fr"$c_2={c2[i0]:+.2f}$", xy=(c2[i0], lf[i0]),
-            xytext=(10, 18), textcoords="offset points", fontsize=8.5,
-            arrowprops=dict(arrowstyle="->", lw=1))
-ax.set_xlabel(r"quadratic coefficient $c_2$  (curvature in $\log\sigma$)")
+sc = ax.scatter(c2, lf, c=c1, s=45, cmap=ps.CMAP, zorder=3)
+cb = plt.colorbar(sc, ax=ax)
+cb.set_label(r"$c_1$")
+ax.axvline(0.0, color=ps.C.vermillion, ls="--", label=r"power law, $c_2{=}c_3{=}0$")
+ax.axhline(POWER_BEST_1SEED, color=ps.C.grey, ls=":", label=r"best $\sigma^\gamma$, seed 0")
+ax.set_xlabel(r"$c_2$")
 ax.set_ylabel("held-out logflat MSE")
-ax.set_title(r"(a) positive curvature helps; the power law ($c_2{=}0$) is nested", fontsize=10)
-ax.grid(True, alpha=0.25)
+ax.legend(loc="upper left")
 
 # ---------------------------------------------------------------- (b) 3-seed confirmation
 ax = axes[1]
@@ -74,36 +70,26 @@ powr = [logflat(f"heldout_eval_g10_s{s}") for s in (0, 1, 2)
         if os.path.exists(os.path.join(HERE, f"heldout_eval_g10_s{s}.npz"))]
 labels, groups, colors = [], [], []
 if powr:
-    labels.append(r"power law $\sigma^{10}$" "\n(3 seeds)"); groups.append(powr); colors.append("0.5")
+    labels.append(r"$\sigma^{10}$"); groups.append(powr); colors.append(ps.C.grey)
 if poly:
-    labels.append(r"polynomial $c_2{=}1.3$" "\n(3 seeds)"); groups.append(poly); colors.append("crimson")
+    labels.append(r"$c_2{=}1.3$"); groups.append(poly); colors.append(ps.C.vermillion)
 if groups:
     xs = np.arange(len(groups))
     means = [np.mean(g) for g in groups]; stds = [np.std(g) for g in groups]
-    ax.bar(xs, means, 0.55, yerr=stds, color=colors, capsize=6, alpha=0.85)
+    ax.bar(xs, means, 0.55, yerr=stds, color=colors, capsize=4)
     for x, g in zip(xs, groups):
-        ax.plot([x] * len(g), g, "o", color="k", ms=6, zorder=3)
-    ax.set_xticks(xs); ax.set_xticklabels(labels, fontsize=9)
+        ax.plot([x] * len(g), g, "o", color="k", ms=4, zorder=3)
+    ax.set_xticks(xs); ax.set_xticklabels(labels)
     ax.set_ylabel("held-out logflat MSE")
     lo = min(min(g) for g in groups) * 0.97; hi = max(max(g) for g in groups) * 1.03
     ax.set_ylim(lo, hi)
-    if len(groups) == 2:
-        ax.set_title(f"(b) 3-seed: poly {means[-1]:.3e} vs power {means[0]:.3e}", fontsize=10)
 else:
-    ax.text(0.5, 0.5, "3-seed confirmation pending", ha="center", va="center",
-            transform=ax.transAxes, fontsize=11)
-    ax.set_title("(b) 3-seed confirmation", fontsize=10)
-ax.grid(True, axis="y", alpha=0.25)
+    ax.set_xticks([])
+ax.grid(True, axis="y")
+ps.process_label(ax, r"$e^+e^-\to u\bar u gg$", loc="upper right")
 
-fig.suptitle(r"Polynomial keep rule: positive curvature $c_2$ is the helpful direction, "
-             r"but the gain over well-tuned $\sigma^\gamma$ is within seed scatter", fontsize=11)
-fig.tight_layout(rect=[0, 0, 1, 0.95])
 base = os.path.join(HERE, "figs", "l2_poly_keep")
-os.makedirs(os.path.dirname(base), exist_ok=True)
-for ext in ("png", "pdf"):
-    fig.savefig(f"{base}.{ext}", dpi=140, bbox_inches="tight")
-plt.close(fig)
-print(f"wrote {base}.png/.pdf")
+ps.save(fig, base)
 if groups and len(groups) == 2:
     print(f"  power sigma^10: {np.mean(powr):.4e} ± {np.std(powr):.4e}")
     print(f"  polynomial    : {np.mean(poly):.4e} ± {np.std(poly):.4e}")
