@@ -67,6 +67,10 @@
           {
             "type": "command",
             "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/plot_guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/worktree_fold_guard.sh"
           }
         ]
       }

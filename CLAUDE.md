@@ -547,9 +547,22 @@ leaves its lock held on purpose, so the fixes it demanded can be applied. Waterm
    `git worktree add worktrees/wt-<feat> -b <feat> jeanzay`, implement and verify
    there, then merge back into `jeanzay` and `git worktree remove` it. Never
    `../wt-<feat>` or any path outside the project root — keep them in `worktrees/`
-   (gitignored) so parallel experiments don't clobber the trunk checkout. Delete an
-   unused worktree; it cost nothing. `worktree_guard.sh` nudges when I edit trunk
-   code without one; for quick standalone edits it's fine to proceed on the trunk.
+   (gitignored) so parallel experiments don't clobber the trunk checkout.
+   `worktree_guard.sh` nudges when I edit trunk code without one; for quick standalone
+   edits it's fine to proceed on the trunk.
+   **Merging brings back the CODE and nothing else.** Sweep results, run dirs, eval
+   `.npz`, satlogs, generated datasets and figures are gitignored, so they live only
+   inside the worktree and `git worktree remove` destroys them. Before removing any
+   worktree, fold its results into the trunk:
+   ```bash
+   bash scripts/fold_worktree.sh worktrees/wt-<feat>            # what would be copied
+   bash scripts/fold_worktree.sh worktrees/wt-<feat> --apply    # copy it
+   ```
+   It copies untracked result files only (tracked ones return via the merge), never
+   deletes, and is safe to re-run. `worktree_fold_guard.sh` (`PreToolUse(Bash)`) blocks
+   the removal until this has run. This is not hypothetical: the 12-trial
+   `sweeps/l2_poly_uugg` DyHPO sweep was lost this way, so the left panel of
+   `fig:l2_poly_keep` is empty and cannot be rebuilt without re-running it on GPU.
 3. **Commit small and often; pushing is automatic.** Small, frequent, readable
    commits over big dumps. The `Stop` hook pushes already-committed work, so never
    ask permission to push; to push mid-turn just run `git push` (allowlisted).
