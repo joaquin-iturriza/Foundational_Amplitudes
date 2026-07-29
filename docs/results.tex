@@ -68,8 +68,11 @@ propagator mass, off-shellness, \dots) helps exactly when the added quantity is
 \emph{not recoverable from the external momenta}, and is neutral otherwise; (iv) among
 the three maintained $\mu$P architectures LLoCa is both the cheapest ($\sim\!20\times$ fewer
 FLOPs/step than L-GATr) and the most accurate at matched compute \emph{and} matched wall-time,
-and fine-tuning a foundation model onto held-out one-loop targets transfers with the same
-scaling exponent but a strictly lower floor and no plateau, with full per-layer-decay retraining
+and fine-tuning a foundation model onto one-loop targets withheld from pretraining transfers
+with the same
+scaling exponent but a strictly lower floor and no plateau, holding for both a foundation that
+contains the targets' tree-level counterparts and one that excludes the targets entirely, with
+full per-layer-decay retraining
 the best method; and (v) a per-step optimization campaign took the training step from
 $0.356$ to $0.128$\,s (data-bound fix) down onto a compute floor that vectorization and
 a fused optimizer lowered by a further $\sim\!3\times$, every numerical fast path proven
@@ -271,7 +274,7 @@ default} (\code{use\_balanced\_sampler: false}) and kept opt-in for mixtures of 
 unbalanced} datasets, where the mechanism may still pay.
 
 \begin{definition}[Comparison metric $\vlnr$]\label{def:metric}
-Every model comparison in this note uses the \textbf{best non-regularized validation loss}
+Model comparisons through \S\ref{sec:bigrun} use the \textbf{best non-regularized validation loss}
 on the log-amplitude target,
 \begin{equation}
   \vlnr \;=\; \min_{t\le T}\ \Lloss_{\text{val}}(t)\big|_{\lambda=0},
@@ -283,7 +286,12 @@ selector tracks. Using $\vlnr$ (not the regularized tracked loss) is essential: 
 is itself a tuned hyperparameter, so comparing regularized losses would confound the metric
 with the search. Two sides are only comparable when they share the preprocessing of
 \S\ref{sec:target}; a feature that changes standardization changes the scale of $\vlnr$
-and must be re-based before comparison.
+and must be re-based before comparison. Two families of number in this note are deliberately
+\emph{not} $\vlnr$ and are not commensurable with it: the scaling curves of
+\S\ref{sec:scaling} report a held-out \emph{test} loss at the best-validation checkpoint, and
+the divergence studies of \S\ref{sec:divergences} score raw $\log\amp$ error over a held-out
+phase-space \emph{region}, deliberately preprocessing-independent so that arms trained at
+different sampling densities stay comparable. Each is named where it is used.
 \end{definition}
 
 % ==========================================================================
@@ -755,12 +763,18 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 \end{figure}
 
 \begin{principle}[Physics encoding generalizes zero-shot; one-hot PIDs cannot]\label{prin:zeroshot}
-The $8$-D physical-property encoding (Def.~\ref{def:enc}) lets a frozen foundation model predict
-entirely held-out processes at MSE on standardized log-amplitudes of $0.22$--$0.51$, well below
+The $8$-D physical-property encoding (Def.~\ref{def:enc}) lets a foundation model predict, with no
+gradient update, processes it has never seen, at MSE on standardized log-amplitudes of $0.22$
+($ee\to u\bar u$) and $0.51$ ($ee\to t\bar t$), well below
 the trivial constant-predictor baseline of $1.0$, whereas a one-hot PID model
 \emph{cannot even represent} a process containing an unseen particle (e.g.\ $ee\to t\bar t$: PDG
 $\pm6$ absent from the training vocabulary). Encoding particles by their quantum numbers, not their
-identity, is what makes transfer to new processes possible.
+identity, is what makes transfer to new processes possible. This is measured on a \emph{dedicated
+reduced} foundation (\code{pretrain25\_zs}: $25$ LO processes at $20$k events/process, with
+$ee\to u\bar u$ and $ee\to t\bar t$ removed so that neither target, nor the top quark, ever
+enters training), \emph{not} on the maintained joint set of \S\ref{sec:system}, which contains
+both. Which datasets a run saw is read from its recipe (\code{data.processes\_file}); the
+\code{data.dataset} key in a run config is an inherited default and does not report it.
 \end{principle}
 
 % ==========================================================================
@@ -2312,9 +2326,12 @@ $1/\nh$.
 
 The results above impose a concrete protocol on how sweeps, HPO, and comparisons are run.
 
-\begin{principle} Compare on $\vlnr$, the best \emph{non-regularized} validation loss on
+\begin{principle} For model comparisons through \S\ref{sec:bigrun}, compare on $\vlnr$, the
+best \emph{non-regularized} validation loss on
 log-amplitudes (Eq.~\ref{eq:vlnr}), never the regularized tracked loss, since $\lambda$ is a
 tuned HP. Re-base for preprocessing before comparing two sides (Principle~\ref{prin:perproc}).
+The scaling and divergence sections use their own, named metrics (Def.~\ref{def:metric}); do
+not compare their numbers against $\vlnr$.
 \end{principle}
 \begin{principle} Never re-sweep $\eta$ across width: $\mu$P transfers it. Tune once at the
 smallest width and reuse for all larger widths, up to a $5\times$ cut on a width-scaling grid.
