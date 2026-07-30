@@ -96,12 +96,14 @@ def main():
     ramp = ps.sequence(len(bins))
     def _p10(v):
         """1e-3 -> 10^{-3}; 3e-3 -> 3\times10^{-3}. Rounding the exponent alone turned
-        3e-3 into 10^{-3} and printed two identical bin edges."""
+        3e-3 into 10^{-3} and printed two identical bin edges. The mantissa is cut to two
+        significant digits because the top bin's edge is the analysis cut, whose exact value
+        (3.8986e-2) is not a round number and spilled 5 digits into the legend."""
         if v <= 0:
             return "0"
         e = int(np.floor(np.log10(v)))
-        m = v / 10.0 ** e
-        return fr"10^{{{e}}}" if abs(m - 1) < 1e-9 else fr"{m:g}\times 10^{{{e}}}"
+        m = float(f"{v / 10.0 ** e:.2g}")
+        return fr"10^{{{e}}}" if abs(m - 1) < 5e-3 else fr"{m:g}\times 10^{{{e}}}"
     for bi, (lo, hi, _, _) in enumerate(bins):
         y = np.array([r["binmse"][bi][3] for r in S])
         if not np.isfinite(y).any():

@@ -389,7 +389,46 @@ def save(fig, base: str, repo: str | None = None) -> str:
             fig.tight_layout()
         except Exception:
             pass
+    _warn_if_squeezed(fig, base)
     fig.savefig(base + ".png")
     fig.savefig(base + ".pdf")
     print(f"saved {base}.png / .pdf")
     return base
+
+
+#: A data panel narrower than this (inches) is not a figure, it is a sliver.
+MIN_PANEL_IN = 1.05
+
+
+def _warn_if_squeezed(fig, base: str) -> None:
+    """Shout if the layout has squeezed any data panel down to nothing.
+
+    Multi-column figures die silently: a colourbar plus a y-label per column, or one wide
+    in-axes legend (tight_layout and constrained_layout both count legends), can drive the
+    panels to a fraction of an inch. The figure still "builds" and still gets included in the
+    document -- four figures shipped in results.tex with 0.2-0.3in panels, unreadable, and no
+    script reported a problem. Cheap width check so that never passes unnoticed again.
+
+    Fixes, in order of effectiveness: share the y-axis across a row (`sharey`, then
+    `tick_params(labelleft=False)`); make colourbars horizontal (`orientation="horizontal",
+    location="bottom"`) so they cost height, not width; move a wide legend out of the axes
+    (`fig.legend(..., loc="outside lower center")`).
+    """
+    try:
+        fig.canvas.draw()
+        inv = fig.dpi_scale_trans.inverted()
+        bad = []
+        for ax in fig.axes:
+            if ax.get_label() == "<colorbar>" or not ax.get_visible():
+                continue
+            if not (ax.lines or ax.collections or ax.images or ax.patches):
+                continue                                  # legend-only / spacer axes
+            w = ax.get_window_extent().transformed(inv).width
+            if w < MIN_PANEL_IN:
+                bad.append(w)
+        if bad:
+            print(f"  !! {os.path.basename(base)}: {len(bad)} panel(s) squeezed to "
+                  f"{min(bad):.2f}in wide (want >= {MIN_PANEL_IN}in) -- see "
+                  f"plot_style._warn_if_squeezed for the fixes")
+    except Exception:
+        pass

@@ -6,7 +6,7 @@ Main figure (per process), reading the extract_ir npz:
   row 1 : <log|M|^2> truth | model | error, over (log10 y_min, log10 x_gmin)
           [y_min = IR resolution var ->0 soft&collinear; x_gmin = softest gluon frac]
   row 2 : log|M|^2 vs log10 y_min (IR ramp, mean&max) | vs log10 x_gmin (soft)
-          | pred-vs-true hexbin.  (blue = mean model error on twin axis)
+          | pred-vs-true hexbin
 Plus, for ee->q qbar g, a Dalitz figure: <log|M|^2> over (x_q, x_qbar) truth/model/error.
 CPU only.
 """
@@ -73,7 +73,8 @@ def make_collinear_ramp(d, label, out_base,
     logP = np.log((1.0 + zfrac ** 2) / (1.0 - zfrac))
     C0 = -2.0                                       # reference log10(1-x_q) for offset compare
 
-    fig, (axL, axR) = ps.figure(ncols=2)
+    fig, (axL, axR) = ps.figure(ncols=2, width="full")
+    fig.set_size_inches(ps.TEXTWIDTH_IN, 3.7)   # +0.8in for the legend strip below
     colors = plt.cm.plasma(np.linspace(0.12, 0.78, len(xg_bands)))
     anchor_off, span, fits = None, [], []
     for (lo, hi), col in zip(xg_bands, colors):
@@ -93,11 +94,14 @@ def make_collinear_ramp(d, label, out_base,
             ybar = slope_fit * C0 + b_fit          # fit value at the reference point
             logPbar = float(np.nanmean(logP[m]))   # <log P(z)> over the band
             fits.append((0.5 * (lo + hi), slope_fit, ybar, logPbar))
-        lbl = rf"$x_g\in[{lo:.2f},{hi:.2f}]$ (fit {slope_fit:.2f})"
+        # The fitted slope belongs in the text, not the legend: with it, each of the seven
+        # entries ran to ~0.8in and the legend reached 5.71in -- wider than the 6.5in figure.
+        # tight_layout counts in-axes legends, so it shrank both panels to 0.85in to fit it.
+        band = rf"$x_g\in[{lo:.2f},{hi:.2f}]$"
         axL.plot(c, tm, color=col, lw=4.2, alpha=0.30, solid_capstyle="round",
-                 label=lbl + " truth", zorder=2)
+                 label=band + " truth", zorder=2)
         axL.plot(c, pm, color=col, lw=1.3, ls=(0, (4, 2)), marker="o", ms=2.6,
-                 markevery=3, label=rf"$x_g\in[{lo:.2f},{hi:.2f}]$ model", zorder=6)
+                 markevery=3, label=band + " model", zorder=6)
         axR.plot(c, am, color=col, lw=1.6, label=rf"$x_g\in[{lo:.2f},{hi:.2f}]$")
         if anchor_off is None:              # anchor the analytic slope to the first valid band
             anchor_off = _anchor_offset(c, tm, -ln10)
@@ -116,11 +120,15 @@ def make_collinear_ramp(d, label, out_base,
                  zorder=5, label=r"analytic $\propto 1/(1-x_q)$ (slope $-\ln 10$)")
     axL.set_xlabel(r"$\log_{10}(1-x_q)$")
     axL.set_ylabel(r"$\log|\mathcal{M}|^2$")
-    axL.legend(ncol=2, loc="lower right")
     axR.set_xlabel(r"$\log_{10}(1-x_q)$")
     axR.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
-    axR.legend(loc="upper left"); axR.set_ylim(bottom=0)
-    fig.tight_layout()
+    axR.set_ylim(bottom=0)
+    # Both panels are the same three x_g bands, so one legend below the figure serves both and
+    # costs no panel width. axL's own 7-entry legend is what collapsed this figure.
+    h, l = axL.get_legend_handles_labels()
+    fig.legend(h, l, ncol=3, loc="lower center", frameon=False)
+    fig.tight_layout(rect=[0, 0.22, 1, 1])
+    fig._ps_layout_done = True
     ps.save(fig, f"{out_base}_collinear")
     plt.close(fig)
     print(f"wrote {out_base}_collinear.png/.pdf")
@@ -141,62 +149,94 @@ def make_ir(npz, label, out_base):
     emap, _, _ = _map(ly, lx, np.abs(resid), xb, yb)
     vmin, vmax = np.nanpercentile(tmap, 1), np.nanpercentile(tmap, 99)
 
-    fig = plt.figure(figsize=(ps.TEXTWIDTH_IN, 7.2), layout="constrained")
+    # Three columns of decorations do not fit across \textwidth at 11pt. With a VERTICAL
+    # colourbar and a y-label per panel, plus a twinx label on the bottom row, constrained
+    # layout gave up entirely -- "axes sizes collapsed to zero" -- and every panel rendered
+    # as a 0.3in vertical sliver. Measured panel width for this 2x3 grid:
+    #
+    #   vertical colourbars, per-panel y-labels, twinx   0.31 in   (collapsed)
+    #   vertical colourbars, shared y, no twinx          0.99 in
+    #   HORIZONTAL colourbars, shared y, no twinx        1.50 in   <- this layout
+    #
+    # Everything that costs COLUMN width is therefore shared or turned sideways: one y-axis
+    # per row, one colourbar for the truth/prediction pair (they already share vmin/vmax),
+    # colourbars laid horizontally so they cost height instead of width, no twinx, and the
+    # ramp legend hung below the figure. 1.5in is the ceiling for a 3-column \textwidth
+    # figure at 11pt; the panels are square rather than roomy.
+    fig = plt.figure(figsize=(ps.TEXTWIDTH_IN, 6.4), layout="constrained")
     gs = GridSpec(2, 3, figure=fig, height_ratios=[1.0, 0.95])
+    CBH = dict(orientation="horizontal", location="bottom")
     mse = float(np.mean(resid ** 2))
 
-    def draw(ax, M, title, cmap, vmn, vmx, cl):
+    def draw(ax, M, name, cmap, vmn, vmx, first):
         pm = ax.pcolormesh(xe, ye, M, cmap=cmap, vmin=vmn, vmax=vmx, shading="flat")
         ax.set_xlabel(r"$\log_{10} y_{\min}$")
-        ax.set_ylabel(r"$\log_{10} x_{g,\min}$")
-        ax.set_title(title)
-        cb = fig.colorbar(pm, ax=ax); cb.set_label(cl)
+        if first:
+            ax.set_ylabel(r"$\log_{10} x_{g,\min}$")
+        else:
+            ax.tick_params(labelleft=False)
+        # process_label, not set_title: the style forbids titles, and an in-axes tag also
+        # costs no vertical space. White bbox so it stays legible over a dense map.
+        ps.process_label(ax, name, loc="upper left",
+                         bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5))
+        return pm
 
-    draw(fig.add_subplot(gs[0, 0]), tmap, "truth", "viridis", vmin, vmax,
-         r"$\langle\log|\mathcal{M}|^2\rangle$")
-    draw(fig.add_subplot(gs[0, 1]), pmap, "model prediction", "viridis", vmin, vmax,
-         r"$\langle\log|\mathcal{M}|^2\rangle$")
-    draw(fig.add_subplot(gs[0, 2]), emap, "model error", "inferno",
-         0.0, np.nanpercentile(emap, 99), r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
+    ax0 = fig.add_subplot(gs[0, 0])
+    ax1 = fig.add_subplot(gs[0, 1], sharey=ax0)
+    ax2 = fig.add_subplot(gs[0, 2], sharey=ax0)
+    draw(ax0, tmap, "truth", "viridis", vmin, vmax, True)
+    pm1 = draw(ax1, pmap, "model", "viridis", vmin, vmax, False)
+    pm2 = draw(ax2, emap, r"$|$error$|$", "inferno",
+               0.0, np.nanpercentile(emap, 99), False)
+    # One bar for truth+model (same scale by construction), one for the error panel.
+    fig.colorbar(pm1, ax=[ax0, ax1], **CBH).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
+    fig.colorbar(pm2, ax=ax2, **CBH).set_label(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
 
-    def ramp(ax, coord, xlabel, title, slope=None, slope_label=None):
+    def ramp(ax, coord, xlabel, name, slope, first):
         bins = np.linspace(np.percentile(coord, 0.2), np.percentile(coord, 99.8), 55)
         c = 0.5 * (bins[:-1] + bins[1:])
         tm, _, _ = binned_statistic(coord, tl, "mean", bins=bins)
         pm, _, _ = binned_statistic(coord, pl, "mean", bins=bins)
         tx, _, _ = binned_statistic(coord, tl, "max", bins=bins)
         px, _, _ = binned_statistic(coord, pl, "max", bins=bins)
-        am, _, _ = binned_statistic(coord, np.abs(resid), "mean", bins=bins)
-        if slope is not None:  # analytic leading-power IR slope, offset anchored in deep IR
-            off = _anchor_offset(c, tm, slope)  # anchor to the mean ramp (the clean asymptote)
-            ax.plot(c, slope * c + off, color="darkgreen", lw=1.6, ls="-.",
-                    label=slope_label, zorder=5)
+        # Analytic leading-power IR slope, offset anchored to the mean ramp (the clean
+        # asymptote). Labelled generically: the two panels carry DIFFERENT slopes
+        # (1/y_min and 1/x_g^2), so one shared legend cannot name both -- the caption does.
+        off = _anchor_offset(c, tm, slope)
+        ax.plot(c, slope * c + off, color="darkgreen", lw=1.6, ls="-.",
+                label="analytic leading power", zorder=5)
         ax.plot(c, tm, "k", lw=1.9, label="truth (mean)")
         ax.plot(c, pm, color=ps.C.vermillion, lw=1.3, ls="--", label="model (mean)")
         ax.plot(c, tx, "k", lw=1.0, ls=":", alpha=0.7, label="truth (max)")
         ax.plot(c, px, color=ps.C.vermillion, lw=1.0, ls=":", alpha=0.7, label="model (max)")
-        ax.set_xlabel(xlabel); ax.set_ylabel(r"$\log|\mathcal{M}|^2$")
-        ax.set_title(title); ax.legend(ncol=1, loc="lower left")
-        axr = ax.twinx()
-        axr.plot(c, am, color=ps.C.blue, lw=1.0, alpha=0.7)
-        axr.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$", color=ps.C.blue)
-        axr.tick_params(axis="y", labelcolor=ps.C.blue); axr.set_ylim(bottom=0)
+        ax.set_xlabel(xlabel)
+        if first:
+            ax.set_ylabel(r"$\log|\mathcal{M}|^2$")
+        else:
+            ax.tick_params(labelleft=False)
+        ps.process_label(ax, name, loc="upper right")
+        return ax
 
     ln10 = np.log(10.0)
-    ramp(fig.add_subplot(gs[1, 0]), ly,
-         r"$\log_{10} y_{\min}$", "soft $+$ collinear",
-         slope=-ln10, slope_label=r"analytic $\propto 1/y_{\min}$")
-    ramp(fig.add_subplot(gs[1, 1]), lx,
-         r"$\log_{10} x_{g,\min}$", "soft gluon",
-         slope=-2.0 * ln10, slope_label=r"analytic $\propto 1/x_g^2$")
+    axr0 = fig.add_subplot(gs[1, 0])
+    ramp(axr0, ly, r"$\log_{10} y_{\min}$", "soft $+$ collinear", -ln10, True)
+    axr1 = fig.add_subplot(gs[1, 1], sharey=axr0)
+    ramp(axr1, lx, r"$\log_{10} x_{g,\min}$", "soft gluon", -2.0 * ln10, False)
 
     axsc = fig.add_subplot(gs[1, 2])
     hb = axsc.hexbin(tl, pl, gridsize=55, bins="log", cmap="magma", mincnt=1)
     lo, hi = min(tl.min(), pl.min()), max(tl.max(), pl.max())
-    axsc.plot([lo, hi], [lo, hi], color="cyan", lw=1.0, ls=":")
+    axsc.plot([lo, hi], [lo, hi], color="cyan", lw=1.0, ls=":", label="ideal")
     axsc.set_xlabel(r"truth $\log|\mathcal{M}|^2$"); axsc.set_ylabel(r"model $\log|\mathcal{M}|^2$")
-    axsc.set_title("predicted vs true")
-    fig.colorbar(hb, ax=axsc).set_label("count")
+    axsc.legend(loc="upper left")
+    ps.process_label(axsc, "predicted vs true", loc="lower right")
+    fig.colorbar(hb, ax=axsc, **CBH).set_label("count")
+
+    # The ramp panels' five series need a legend wider than a 1.5in panel. Hung outside the
+    # grid ("outside lower center") it costs figure height, whereas a legend axes spanning
+    # the columns constrains their width and squeezed the panels from 0.99in to 0.30in.
+    h, l = axr0.get_legend_handles_labels()
+    fig.legend(h, l, ncol=3, loc="outside lower center", frameon=False)
 
     fig._ps_layout_done = True      # GridSpec + colourbars own the layout
     ps.save(fig, out_base)
@@ -223,25 +263,42 @@ def make_ir(npz, label, out_base):
         corr = float(np.corrcoef(tm[good], amap[good])[0, 1])
         vmn, vmx = np.nanpercentile(tm, 1), np.nanpercentile(tm, 99)
         clev = np.linspace(vmn, vmx, 7)                    # shared analytic contour levels
-        figd, axs = ps.figure(ncols=4)
+        # Four columns, so the width budget is even tighter than the 3-column figure above:
+        # a y-label plus a vertical colourbar per panel collapsed these to 0.21in. Same
+        # remedy -- shared y-axis, horizontal colourbars, in-axes tags instead of titles.
+        figd = plt.figure(figsize=(ps.TEXTWIDTH_IN, 2.9), layout="constrained")
+        gsd = GridSpec(1, 4, figure=figd)
+        a0 = figd.add_subplot(gsd[0, 0])
+        axs = [a0] + [figd.add_subplot(gsd[0, i], sharey=a0) for i in (1, 2, 3)]
         panels = [
-            (axs[0], amap_a, "analytic LO ($C_F$ antenna)", "viridis", vmn, vmx,
-             r"$\langle\log|\mathcal{M}|^2\rangle$"),
-            (axs[1], tm, "truth", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
-            (axs[2], pm, "model", "viridis", vmn, vmx, r"$\langle\log|\mathcal{M}|^2\rangle$"),
-            (axs[3], em, "error", "inferno", 0.0, np.nanpercentile(em, 99),
-             r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")]
-        for ax, M, ti, cm, a, bb, cl in panels:
+            (axs[0], amap_a, r"analytic LO", "viridis", vmn, vmx),
+            (axs[1], tm, "truth", "viridis", vmn, vmx),
+            (axs[2], pm, "model", "viridis", vmn, vmx),
+            (axs[3], em, r"$|$error$|$", "inferno", 0.0, np.nanpercentile(em, 99))]
+        for ax, M, ti, cm, a, bb in panels:
             pmesh = ax.pcolormesh(xe2, ye2, M, cmap=cm, vmin=a, vmax=bb, shading="flat")
             # overlay analytic iso-|M|^2 contours on truth & model to show they track
             if ti in ("truth", "model"):
                 cs = ax.contour(cb, cb, amap_a, levels=clev, colors="white",
                                 linewidths=0.7, alpha=0.75)
                 ax.clabel(cs, fmt="%.0f")
-            ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$"); ax.set_ylabel(r"$x_{\bar q}=2E_{\bar q}/\sqrt{s}$")
-            ax.set_title(ti)
-            figd.colorbar(pmesh, ax=ax).set_label(cl)
-        figd.tight_layout()
+            ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$")
+            if ax is axs[0]:
+                ax.set_ylabel(r"$x_{\bar q}=2E_{\bar q}/\sqrt{s}$")
+            else:
+                ax.tick_params(labelleft=False)
+            ps.process_label(ax, ti, loc="upper right",
+                             bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5))
+            if ax is axs[3]:
+                figd.colorbar(pmesh, ax=ax, orientation="horizontal", location="bottom"
+                              ).set_label(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
+        # The first three panels share one scale by construction, so they share one bar.
+        # Take the mappable from panel 0, NOT the loop's last `pmesh` (the error panel, on a
+        # different scale) -- that would label the shared bar with the error normalisation.
+        figd.colorbar(axs[0].collections[0], ax=axs[:3],
+                      orientation="horizontal", location="bottom"
+                      ).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
+        figd._ps_layout_done = True
         ps.save(figd, f"{out_base}_dalitz")
         plt.close(figd)
         print(f"wrote {out_base}_dalitz.png/.pdf  (analytic-vs-truth corr={corr:.3f})")
