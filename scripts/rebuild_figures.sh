@@ -123,10 +123,19 @@ run ir_pretrain_uug          $PY $D/make_ir.py \
 run ir_pretrain_uugg         $PY $D/make_ir.py \
                                  --npz $D/preds_ir_pretrain8_ee_uugg_91-1000GeV_amplitudes.npz \
                                  --label 'ee->uugg' --out_base $D/figs/ir_pretrain_uugg
-run phase_space_pretrain_aa  $PY $D/make_3d.py \
+# fig:div_gg is make_plots.py's 3x3 (truth/model/error, projections + pred-vs-true, collinear
+# ramp), NOT make_3d.py's two 3-D surfaces. This line previously pointed at make_3d.py with the
+# make_plots basename, so it silently OVERWROTE the figure the caption describes with a
+# different plot entirely. The two generators own separate basenames: phase_space_<tag> for
+# make_plots.py, phase_space_3d_<tag> for make_3d.py.
+run phase_space_pretrain_aa  $PY $D/make_plots.py \
                                  --npz $D/preds_pretrain8_ee_aa_10-1000GeV_amplitudes.npz \
                                  --label '$e^+e^-\to\gamma\gamma$' \
                                  --out_base $D/figs/phase_space_pretrain_aa
+run phase_space_3d_pretrain_aa $PY $D/make_3d.py \
+                                 --npz $D/preds_pretrain8_ee_aa_10-1000GeV_amplitudes.npz \
+                                 --label '$e^+e^-\to\gamma\gamma$' \
+                                 --out_base $D/figs/phase_space_3d_pretrain_aa
 
 echo "== fine-tune methods =="
 # Reads each sweep's SAVED outer config (sweeps/<name>/sweep_config.yaml), not sweep/*.yaml.

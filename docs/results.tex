@@ -456,9 +456,11 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
   \centering
   \includegraphics[width=\textwidth]{hpo_optima_summary.pdf}
   \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
-  $\mu$P transfers), vs batch (entangled with horizon; do not read as causal), and vs
-  horizon (the inverted-$U$); the $\eta^\ast$ histogram with the recommended band; and the
-  finetune \code{lr\_scale} landing near $1$.}
+  $\mu$P transfers) and vs batch (entangled with horizon; do not read as causal) on the top
+  row; vs horizon (the inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with
+  the recommended band in the middle; and on the bottom row the mean $|\rho_{\mathrm{Spearman}}|$
+  of each HP against val loss, ranking $\eta$ first, beside each HP's declared search range
+  against where its optima actually landed.}
   \label{fig:hpo}
 \end{figure}
 
@@ -474,10 +476,11 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{lr_2d_disentangled.pdf}
-  \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. (A) $\eta^\ast$
-  vs horizon at fixed $D$: an inverted-$U$ at every $D$, peak pinned to $\sim3$k steps
-  independent of $D$. (B) $\eta^\ast$ vs $D$ at fixed horizon: weak, $\propto D^{+0.15\ldots0.3}$,
-  saturating. (C) learning curves flooring later as $D$ grows: the peak is not the floor.}
+  \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
+  $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
+  $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
+  (colour): weak, $\propto D^{+0.15\ldots0.3}$, saturating. \emph{Bottom left:} learning curves
+  flooring later as $D$ grows, stars marking the $t$ of peak $\eta$: the peak is not the floor.}
   \label{fig:2d}
 \end{figure}
 
@@ -1207,8 +1210,8 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process.} $\log|\mathcal{M}|^2$ vs
   the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom, with the
   analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$ overlaid) are tracked into the
-  deep IR, but the model error (blue, and the error map top-right) grows toward small
-  $y_{\min}$, the sole case of degradation \emph{into} a singularity.}
+  deep IR, but the error map (top right) grows toward small $y_{\min}$, the sole case of
+  degradation \emph{into} a singularity.}
   \label{fig:div_uugg}
 \end{figure}
 
@@ -1682,7 +1685,7 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   $f$ is the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
   uniform-$\sqrt s$); same base22/HPs/$N{=}400$k throughout.
   \emph{Left: the interior optimum.} Three metrics vs $f$. The objective is the \emph{log-flat}
-  one, defined under the panel: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
+  one: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
   however many events it holds; the plain event mean instead follows the bulk, which holds almost all
   the events, and so barely sees the pole. Log-flat gives $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$,
   $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$, $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$,

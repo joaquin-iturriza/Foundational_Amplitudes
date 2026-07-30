@@ -31,9 +31,14 @@ cluster:
   cpus_per_task: 8
   time: "01:10:00"
 
+# Paths deliberately point at the TRUNK, not a worktree. This sweep was originally run under
+# worktrees/wt-l2-followup and its 12 trial results were destroyed when that worktree was
+# removed without folding results back, leaving fig:l2_poly_keep's left panel unbuildable and
+# forcing this re-run. Sweep results are gitignored, so a worktree is exactly the wrong place
+# for them; see scripts/fold_worktree.sh and the guard that now blocks such a removal.
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   setup_commands:
     - "module load anaconda-py3/2023.09"
     - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
@@ -42,7 +47,7 @@ sweep_name: l2_poly_uugg
 n_trials: 12
 # drive the L2 online-generation loop, not run.py:
 trial_script: sweep/l2_bbb_trial.py
-l2_driver: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-followup/analysis/divergences/l2_online_uugg.py
+l2_driver: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/divergences/l2_online_uugg.py
 
 dyhpo:
   n_candidates: 200
