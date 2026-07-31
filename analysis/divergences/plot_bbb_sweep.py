@@ -56,7 +56,10 @@ def main():
     axes[0].axvline(5e-3, color=ps.C.blue, ls="-.", label=r"$\sigma_{\rm rel}$ lower bound")
     ps.shared_legend(fig, axes[0], ncol=3)
     cb = fig.colorbar(sc, ax=axes, fraction=0.03, pad=0.02)
-    cb.set_label(r"$\gamma$")
+    # Above the bar, not rotated beside it: as a side label the gamma overhung the 6.5in
+    # canvas by 0.15in and savefig (bbox=None) cut it off -- on a figure whose subject IS
+    # the gamma sweep.
+    cb.ax.set_title(r"$\gamma$", pad=6)
     fig._ps_layout_done = True          # colorbar owns the layout; tight_layout would fight it
     ps.save(fig, args.out)
     print(f"wrote {args.out}.png/.pdf")

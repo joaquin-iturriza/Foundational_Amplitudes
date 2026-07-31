@@ -526,11 +526,7 @@ def main():
         ax.set_xlabel("compute [FLOPs]"); ax.set_ylabel(r"$\mathcal{L}_{\rm val}$")
         ps.process_label(ax, _pretty_ds(ds), loc="upper right")
         ax.legend()
-    fig.tight_layout()
-    for ext in ("png", "pdf"):
-        path = os.path.join(args.out_dir, f"finetune_methods_comparison.{ext}")
-        fig.savefig(path, dpi=150, bbox_inches="tight")
-        print(f"Plot: {path}")
+    ps.save(fig, os.path.join(args.out_dir, f"finetune_methods_comparison"))
     plt.close(fig)
 
     # =====================================================================
@@ -609,11 +605,7 @@ def main():
             ax.set_xlabel("training compute  (FLOPs)"); ax.set_ylabel(_ylabel(metric))
             ps.process_label(ax, _pretty_ds(ds), loc="upper right")
             ax.legend()
-        fig.tight_layout()
-        for ext in ("png", "pdf"):
-            path = os.path.join(args.out_dir, f"finetune_methods_comparison_flops{suffix}.{ext}")
-            fig.savefig(path, dpi=150, bbox_inches="tight")
-            print(f"Plot: {path}")
+        ps.save(fig, os.path.join(args.out_dir, f"finetune_methods_comparison_flops{suffix}"))
         plt.close(fig)
 
     # ---- Figure (b): best val_loss vs TRAINABLE PARAMS (LoRA's real win) --
@@ -638,11 +630,7 @@ def main():
             ax.set_ylabel("best val_loss")
             ps.process_label(ax, _pretty_ds(ds), loc="upper right")
             ax.legend()
-        fig.tight_layout()
-        for ext in ("png", "pdf"):
-            path = os.path.join(args.out_dir, f"finetune_methods_comparison_params.{ext}")
-            fig.savefig(path, dpi=150, bbox_inches="tight")
-            print(f"Plot: {path}")
+        ps.save(fig, os.path.join(args.out_dir, f"finetune_methods_comparison_params"))
         plt.close(fig)
 
     # ---- Overlay: old (method-agnostic) vs new (method-aware), shift visible ----
@@ -693,12 +681,14 @@ def main():
     # global style legend (× faint = old/method-agnostic, ● solid = new/method-aware)
     style = [Line2D([0], [0], color="0.4", marker="x", ls=":", lw=1.0, label="old (method-agnostic)"),
              Line2D([0], [0], color="0.4", marker="o", ls="-", lw=1.4, label="new (method-aware)")]
-    fig.legend(handles=style, loc="lower center", ncol=2, fontsize=9, frameon=False)
-    fig.tight_layout(rect=[0, 0.03, 1, 1])
-    for ext in ("png", "pdf"):
-        path = os.path.join(args.out_dir, f"finetune_methods_comparison_overlay.{ext}")
-        fig.savefig(path, dpi=150, bbox_inches="tight")
-        print(f"Plot: {path}")
+    leg = fig.legend(handles=style, loc="lower center", ncol=2, fontsize=9, frameon=False)
+    # Reserve the strip in INCHES, the way ps.shared_legend does. A raw
+    # tight_layout(rect=[0, 0.03, 1, 1]) reserves a fraction that nothing downstream knows
+    # about, so enforce_panels' resize re-lays out and drops the legend onto the panels.
+    fig.canvas.draw()
+    fig._ps_legend_in = leg.get_window_extent(fig.canvas.get_renderer()).height / fig.dpi + 0.10
+    fig._ps_legend_side = "bottom"
+    ps.save(fig, os.path.join(args.out_dir, "finetune_methods_comparison_overlay"))
     plt.close(fig)
 
     # ---- Figure: loss vs WALL TIME (measured training hours) --------------
@@ -799,11 +789,7 @@ def main():
             ps.process_label(ax, _pretty_ds(ds), loc="upper right")
             ax.legend()
         title_metric = metric.capitalize()
-        fig.tight_layout()
-        for ext in ("png", "pdf"):
-            path = os.path.join(args.out_dir, f"finetune_methods_comparison_walltime{suffix}.{ext}")
-            fig.savefig(path, dpi=150, bbox_inches="tight")
-            print(f"Plot: {path}")
+        ps.save(fig, os.path.join(args.out_dir, f"finetune_methods_comparison_walltime{suffix}"))
         plt.close(fig)
 
 

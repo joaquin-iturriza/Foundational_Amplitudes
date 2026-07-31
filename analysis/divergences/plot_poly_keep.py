@@ -64,8 +64,16 @@ fig, axes = ps.figure(ncols=2)
 # ---------------------------------------------------------------- (a) logflat vs c2
 ax = axes[0]
 sc = ax.scatter(c2, lf, c=c1, s=45, cmap=ps.CMAP, zorder=3)
-cb = plt.colorbar(sc, ax=ax)
-cb.set_label(r"$c_1$")
+# Colourbar in an INSET above the panel, not `colorbar(ax=ax)`. Attaching it to the axes takes
+# its width out of that gridspec column only, so the left panel came out 1.75in against the
+# right one's 2.19in -- two different panel sizes inside one figure, which is the most visible
+# form of the inconsistency. An inset is laid out in axes coordinates, so both panels keep the
+# same box and the bar is paid for out of the margin (which _expand_to_content then covers).
+cax = ax.inset_axes([0.0, 1.04, 1.0, 0.05])
+cax.set_label("<colorbar>")
+cb = fig.colorbar(sc, cax=cax, orientation="horizontal")
+cax.xaxis.set_ticks_position("top")
+cb.set_label(r"$c_1$", labelpad=-38)
 ax.axvline(0.0, color=ps.C.vermillion, ls="--", label=r"power law, $c_2{=}c_3{=}0$")
 ax.axhline(POWER_BEST_1SEED, color=ps.C.grey, ls=":", label=r"best $\sigma^\gamma$, seed 0")
 ax.set_xlabel(r"$c_2$")

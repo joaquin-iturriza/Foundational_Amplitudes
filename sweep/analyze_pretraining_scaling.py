@@ -607,7 +607,7 @@ def main():
                         label  = (rf"$n_h$={nh}" if label_mode == "series"
                                   else rf"$n_h$={nh}, $\alpha$={alpha_f:.2f}")
                         fit_y  = A_f * fit_x ** (-alpha_f) + l_inf_f
-                        print(f"      [fit] D={d_key} nh={nh}: alpha={alpha_f:.3f} "
+                        print(f"      [fit/{x_axis}] D={d_key} nh={nh}: alpha={alpha_f:.3f} "
                               f"L_inf={l_inf_f:.3e} chi2r={chi2r_f:.2f}")
 
                 if fit_y is None and len(c_sorted) >= 2:
@@ -615,7 +615,7 @@ def main():
                     label  = (rf"$n_h$={nh}" if label_mode == "series"
                               else rf"$n_h$={nh}, $\alpha$={alpha_p:.2f}")
                     fit_y  = A_p * fit_x ** (-alpha_p)
-                    print(f"      [fit] D={d_key} nh={nh}: alpha={alpha_p:.3f} "
+                    print(f"      [fit/{x_axis}] D={d_key} nh={nh}: alpha={alpha_p:.3f} "
                           f"chi2r={chi2r_p:.2f} (no floor)")
 
                 if fit_y is not None:
@@ -654,25 +654,49 @@ def main():
             # ── Page 1: overview — one panel per D, compute x-axis ──────────
             # One panel per D. Laid out as a GRID, not a single row: five panels across
             # \textwidth leaves each ~0.6in wide whatever the font size, which is what this
-            # page used to render as. At 3 columns they are ~1.5in, the practical maximum.
+            # page used to render as.
+            #
+            # TWO columns, not three. Three columns cannot hold the standard panel at
+            # \textwidth -- 3 x 2.55in plus decorations needs 8.6in against 6.5in available --
+            # so the panels came out 1.02in, less than half the size of a panel anywhere else
+            # in the document, on a page facing figures drawn at full size. Two columns hold
+            # the standard panel exactly; the five cells then run down the page instead of
+            # across it, which costs a taller figure and nothing else.
             import plot_style as ps
             n_d = len(data_by_d)
-            n_cols = min(3, n_d)
+            n_cols = min(2, n_d)
             n_rows = -(-n_d // n_cols)      # ceil; a local `import math` here shadows the
                                             # module-level one used earlier in this function
             fig, axes = ps.figure(ncols=n_cols, nrows=n_rows, squeeze=False)
             flat = [a for row in axes for a in row]
+            def _dlabel(k):
+                """1e3p5 -> 10^{3.5}: the internal key leaked into the panels as $D=1e3p5$
+                while the caption wrote $D=10^{3.5}$ for the same cell."""
+                # strip the leading "1e", not every "e": "1e3".replace("e","") is "13",
+                # which rendered $D=10^{13}$ for the 1000-event cell.
+                return ("10^{" + k[2:].replace("p", ".") + "}") if k.startswith("1e") else k
+
             for ax, (d_key, series) in zip(flat, data_by_d.items()):
                 _draw_scaling(ax, d_key, series["p1"], series["ext_by_nh"],
                               c_star.get(d_key), show_all_trials=False, x_axis="compute",
                               label_mode="series")
-                ps.process_label(ax, f"$D={d_key}$", loc="upper right")
-            for ax in flat[n_d:]:
+                ps.process_label(ax, f"$D={_dlabel(d_key)}$", loc="upper right")
+            spare = flat[n_d:]
+            for ax in spare:
                 ax.axis("off")                       # unused cells of the last row
             # One legend for the whole page: every panel draws the same n_h series, and a
-            # per-panel legend does not fit in a 1.5in panel. Per-D fitted alphas are on the
+            # per-panel legend does not fit in a small panel. Per-D fitted alphas are on the
             # detail pages that follow.
-            ps.shared_legend(fig, flat[0], ncol=min(4, n_d))
+            #
+            # Put it in the EMPTY CELL when the grid leaves one. Five panels on two columns
+            # leave the sixth cell blank anyway, while a strip above the panels added ~0.4in of
+            # height -- enough to push the figure past what a page holds together with its
+            # caption ("Float too large for page"). The blank cell costs nothing.
+            if spare:
+                _h, _l = flat[0].get_legend_handles_labels()
+                spare[0].legend(_h, _l, loc="center", frameon=False)
+            else:
+                ps.shared_legend(fig, flat[0], ncol=min(4, n_d))
             ps.check_panels(fig, "phase1_scaling p1")
             pdf.savefig(fig, dpi=150)
             plt.close(fig)

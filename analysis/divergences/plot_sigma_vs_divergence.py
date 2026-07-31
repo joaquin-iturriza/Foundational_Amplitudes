@@ -70,7 +70,7 @@ def panel(ax, x, sigma_log, rmse, xlabel, process):
     ax.plot(x, rmse, "s--", color=ERR_C, ms=3, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r"$\log|\mathcal{M}|^2$")
+    ax.set_ylabel(r"$\log|\mathcal{M}|^2$ units")
     ps.process_label(ax, process, loc="upper right")
     return ax
 

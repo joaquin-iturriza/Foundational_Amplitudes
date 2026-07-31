@@ -125,10 +125,16 @@ def make_collinear_ramp(d, label, out_base,
     axR.set_ylim(bottom=0)
     # Both panels are the same three x_g bands, so one legend below the figure serves both and
     # costs no panel width. axL's own 7-entry legend is what collapsed this figure.
-    h, l = axL.get_legend_handles_labels()
-    fig.legend(h, l, ncol=3, loc="lower center", frameon=False)
-    fig.tight_layout(rect=[0, 0.22, 1, 1])
-    fig._ps_layout_done = True
+    # ncol=2, not 3: seven entries of "$x_g\in[0.25,0.45]$ truth" at three columns measured
+    # 7.24in on a 6.5in canvas. It never looked clipped, because savefig used to crop to
+    # content -- the PDF just saved at 7.28in and LaTeX scaled the whole figure to 0.892,
+    # printing its 11pt text at 9.8pt while the rest of the set printed at 11.6pt.
+    # Via ps.shared_legend, not a raw fig.legend + tight_layout(rect=[0, 0.30, 1, 1]). That
+    # reserved a FRACTION of the canvas, which nothing else in the pipeline knew about, so the
+    # first resize by enforce_panels re-ran tight_layout and expanded the axes over the strip --
+    # the legend printed through both panels and their x-labels. shared_legend reserves INCHES
+    # and is honoured by every later layout pass.
+    ps.shared_legend(fig, axL, ncol=2, loc="lower center")
     ps.save(fig, f"{out_base}_collinear")
     plt.close(fig)
     print(f"wrote {out_base}_collinear.png/.pdf")
@@ -263,13 +269,30 @@ def make_ir(npz, label, out_base):
         corr = float(np.corrcoef(tm[good], amap[good])[0, 1])
         vmn, vmx = np.nanpercentile(tm, 1), np.nanpercentile(tm, 99)
         clev = np.linspace(vmn, vmx, 7)                    # shared analytic contour levels
-        # Four columns, so the width budget is even tighter than the 3-column figure above:
-        # a y-label plus a vertical colourbar per panel collapsed these to 0.21in. Same
-        # remedy -- shared y-axis, horizontal colourbars, in-axes tags instead of titles.
-        figd = plt.figure(figsize=(ps.TEXTWIDTH_IN, 2.9), layout="constrained")
-        gsd = GridSpec(1, 4, figure=figd)
+        # TWO BY TWO, not one by four. At \textwidth four columns leave 1.02in per panel --
+        # below the legibility floor, and 2.5x smaller than the standard panel every other
+        # figure in the document uses, which is exactly the size inconsistency the layout is
+        # supposed to prevent. Two columns hold the standard panel exactly, and four Dalitz
+        # maps read just as well stacked 2x2 as in a row.
+        figd = plt.figure(figsize=ps.figsize(ncols=2, nrows=2, shared_y=True),
+                          layout="constrained")
+        # Without extra width padding constrained layout parks the first column's y-label at
+        # x0 = -0.033in and savefig (bbox=None) cuts it. Shortening the label does NOT help: a
+        # rotated label's horizontal footprint is its font height, independent of its text.
+        # w_pad=0.10 measured: y-label x0 goes -0.033in (none) -> -0.015in (0.06) -> +0.025in.
+        figd.get_layout_engine().set(w_pad=0.10)
+        # A dedicated bottom row for the two colourbars. Letting matplotlib place them from
+        # `ax=` instead put BOTH in the same strip -- the union of the three shared-scale
+        # panels spans the whole 2x2 grid, so the error bar was drawn on top of the log|M|^2
+        # bar with the two labels overprinted.
+        gsd = GridSpec(3, 2, figure=figd, height_ratios=[1, 1, 0.05])
         a0 = figd.add_subplot(gsd[0, 0])
-        axs = [a0] + [figd.add_subplot(gsd[0, i], sharey=a0) for i in (1, 2, 3)]
+        axs = [a0] + [figd.add_subplot(gsd[i // 2, i % 2], sharey=a0, sharex=a0)
+                      for i in (1, 2, 3)]
+        cax_shared = figd.add_subplot(gsd[2, 0])
+        cax_err = figd.add_subplot(gsd[2, 1])
+        for _c in (cax_shared, cax_err):
+            _c.set_label("<colorbar>")     # keep them out of the panel-geometry solve
         panels = [
             (axs[0], amap_a, r"analytic LO", "viridis", vmn, vmx),
             (axs[1], tm, "truth", "viridis", vmn, vmx),
@@ -282,21 +305,26 @@ def make_ir(npz, label, out_base):
                 cs = ax.contour(cb, cb, amap_a, levels=clev, colors="white",
                                 linewidths=0.7, alpha=0.75)
                 ax.clabel(cs, fmt="%.0f")
-            ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$")
-            if ax is axs[0]:
+            # 2x2: axis labels on the outside edges only -- left column carries y, bottom row
+            # carries x. Labelling all four repeats the same two strings four times and eats
+            # the width that makes the panels standard-sized.
+            if ax in (axs[2], axs[3]):
+                ax.set_xlabel(r"$x_q=2E_q/\sqrt{s}$")
+            else:
+                ax.tick_params(labelbottom=False)
+            if ax in (axs[0], axs[2]):
                 ax.set_ylabel(r"$x_{\bar q}=2E_{\bar q}/\sqrt{s}$")
             else:
                 ax.tick_params(labelleft=False)
             ps.process_label(ax, ti, loc="upper right",
                              bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5))
             if ax is axs[3]:
-                figd.colorbar(pmesh, ax=ax, orientation="horizontal", location="bottom"
+                figd.colorbar(pmesh, cax=cax_err, orientation="horizontal"
                               ).set_label(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
-        # The first three panels share one scale by construction, so they share one bar.
-        # Take the mappable from panel 0, NOT the loop's last `pmesh` (the error panel, on a
-        # different scale) -- that would label the shared bar with the error normalisation.
-        figd.colorbar(axs[0].collections[0], ax=axs[:3],
-                      orientation="horizontal", location="bottom"
+        # The analytic/truth/model panels share one scale by construction, so they share one
+        # bar. Take the mappable from panel 0, NOT the loop's last `pmesh` (the error panel, on
+        # a different scale) -- that would label the shared bar with the error normalisation.
+        figd.colorbar(axs[0].collections[0], cax=cax_shared, orientation="horizontal"
                       ).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
         figd._ps_layout_done = True
         ps.save(figd, f"{out_base}_dalitz")

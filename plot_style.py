@@ -685,12 +685,11 @@ def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
         if not over:
             return grew
         w, h = fig.get_size_inches()
-        # HEIGHT ONLY. Figure WIDTH is invariant at TEXTWIDTH_IN: it is what makes the LaTeX
-        # scale factor 1.000 and every figure's text print at 11pt. Widening to chase a
-        # horizontal overhang traded a 0.03in clipped label for an 8.75in canvas that LaTeX
-        # then scaled to 0.74, printing the whole figure at 8.1pt -- far worse than the
-        # problem. A horizontal overhang is reported by _warn_if_squeezed and fixed in the
-        # producer (shorter label, fewer legend columns, more layout pad), not here.
+        # HEIGHT ONLY. Width is the panel grid's to set (see PANEL_W_IN) and is bounded by
+        # TEXTWIDTH_IN, so widening here to chase a horizontal overhang would both break the
+        # panel geometry and risk a canvas too wide for the text block. A horizontal overhang
+        # is reported by _warn_if_squeezed, covered up to \textwidth by _expand_to_content, and
+        # otherwise fixed in the producer (shorter label, fewer legend columns, more pad).
         if wide:
             return grew
         fig.set_size_inches(w, h * grow, forward=True)

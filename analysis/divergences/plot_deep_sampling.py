@@ -90,7 +90,13 @@ def main():
                          medrel_all=float(np.median(np.abs(np.exp(resid) - 1.0))),
                          n=int(resid.size))
 
-    fig, (ax1, ax2, ax3) = ps.figure(ncols=3)
+    # 2x2, not 1x3. Three panels across \textwidth left each one 1.36x1.09in -- the smallest
+    # in the document, barely over the legibility floor, and roughly half the panel every
+    # 1- and 2-column figure gets. Two columns hold the standard panel; the fourth cell stays
+    # empty rather than any panel being dropped or shrunk.
+    fig, axes = ps.figure(ncols=2, nrows=2)
+    (ax1, ax2), (ax3, ax_blank) = axes
+    ax_blank.axis("off")
 
     # Panel 1: per-decade MSE of Δln|M|^2 (log-space L2 = squared fractional error)
     for mode in modes:
