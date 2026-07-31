@@ -479,13 +479,23 @@ def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
                     bb = lbl.get_window_extent(rend)
                 except Exception:
                     continue
-                # Grow ONLY when a label is genuinely off the canvas. A label merely taller
-                # than its panel is fine once clipping is off (above) -- triggering on that
-                # ratio grew figures that did not need it, and each growth re-ran layout and
-                # pushed shared legends down onto the panels. Verified: 'median rel. error [%]'
-                # sits at 84% of its panel and renders complete.
+                # Grow when the label runs off the canvas...
                 if bb.y0 < -1.0 or bb.y1 > h_px + 1.0 or bb.x0 < -1.0 or bb.x1 > w_px + 1.0:
                     over = True
+                # ...or when it collides with a figure-level legend. With clipping off, a
+                # label taller than its panel does not get truncated any more -- it runs on
+                # THROUGH the shared legend instead ("[%]" printed over the word "uniform").
+                # Test the collision itself rather than a "label > x% of panel" proxy: the
+                # proxy grew figures that were perfectly fine, and this catches the real case.
+                else:
+                    for _leg in fig.legends:
+                        try:
+                            lb = _leg.get_window_extent(rend)
+                        except Exception:
+                            continue
+                        if (min(bb.x1, lb.x1) - max(bb.x0, lb.x0) > 0 and
+                                min(bb.y1, lb.y1) - max(bb.y0, lb.y0) > 0):
+                            over = True
         if not over:
             return grew
         w, h = fig.get_size_inches()
