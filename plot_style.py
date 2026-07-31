@@ -69,9 +69,12 @@ MAX_COLS = 4
 #   width  decor = _W_FIRST + _W_PER_COL * (ncols - 1)
 #   height decor = _H_ROW per row
 _W_FIRST, _W_PER_COL, _H_ROW = 0.73, 0.68, 0.63
+#: Per-extra-column cost when the y-axis is SHARED: just the gap, no second tick-label block.
+_W_GAP_ONLY = 0.30
 
 
-def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full") -> tuple[float, float]:
+def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full",
+            shared_y: bool = False) -> tuple[float, float]:
     """Figure size in inches for an `ncols` x `nrows` panel grid.
 
     The height is DERIVED so every panel lands at PANEL_ASPECT, instead of being read off a
@@ -86,7 +89,12 @@ def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full") -> tupl
     """
     frac = {"full": 1.0, "half": 0.49}.get(width, width)
     w = TEXTWIDTH_IN * float(frac)
-    panel_w = (w - _W_FIRST - _W_PER_COL * (ncols - 1)) / ncols
+    # With a shared y-axis the extra columns carry no tick labels, so they cost only the
+    # inter-column gap. Charging them the full per-column price makes the panels come out
+    # WIDER than budgeted and the derived height too small: a 3-column sharey figure landed at
+    # aspect 1.94 against a 1.25 target until this was accounted for.
+    per_col = _W_GAP_ONLY if shared_y else _W_PER_COL
+    panel_w = (w - _W_FIRST - per_col * (ncols - 1)) / ncols
     panel_h = panel_w / PANEL_ASPECT
     return (round(w, 2), round(nrows * (panel_h + _H_ROW), 2))
 
@@ -223,7 +231,9 @@ def figure(ncols: int = 1, nrows: int = 1, width: float | str = "full", **kwargs
     Returns whatever `plt.subplots` returns: `(fig, ax)` for a single panel,
     `(fig, axes)` otherwise.
     """
-    kwargs.setdefault("figsize", figsize(ncols, nrows, width))
+    # sharey changes the width budget, so the derived height must know about it.
+    kwargs.setdefault("figsize", figsize(ncols, nrows, width,
+                                         shared_y=bool(kwargs.get("sharey"))))
     return plt.subplots(nrows, ncols, **kwargs)
 
 
@@ -258,14 +268,21 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     kwargs.setdefault("bbox_to_anchor", (0.5, 1.0))
     kwargs.setdefault("frameon", False)
     leg = fig.legend(handles, labels, ncol=ncol, **kwargs)
-    # Reserve the legend's MEASURED height, not a fixed 10%. Now that figsize derives height
-    # from PANEL_ASPECT, a 3x1 figure is only ~1.8in tall, where 10% is less than one 11pt
-    # legend row -- so a two-row legend sat across the panels' top spine.
+    # GROW the figure by the legend's measured height; do not carve the strip out of the
+    # panels. Reserving a rect on the existing canvas pays for the legend with data area: on a
+    # figsize(3,1) that turned a 1.77x0.91in panel into 1.77x0.52in, i.e. aspect 1.95 -> 3.41,
+    # and left l2_sigma_vs_divergence rendering as three letterbox strips at aspect 3.48
+    # against a target of 1.25. Adding the height instead keeps the panel at PANEL_ASPECT,
+    # which is the whole point of deriving figsize.
+    pad_in = 0.10
     try:
         fig.canvas.draw()
         rend = fig.canvas.get_renderer()
-        frac = leg.get_window_extent(rend).height / (fig.get_size_inches()[1] * fig.dpi)
-        top = min(0.95, max(0.55, 1.0 - frac - 0.03))
+        leg_in = leg.get_window_extent(rend).height / fig.dpi
+        w, h = fig.get_size_inches()
+        new_h = h + leg_in + pad_in
+        fig.set_size_inches(w, new_h, forward=True)
+        top = max(0.50, 1.0 - (leg_in + pad_in) / new_h)
     except Exception:
         top = 0.90
     rect = [0, 0, 1, top]
@@ -543,19 +560,28 @@ def _warn_if_squeezed(fig, base: str) -> None:
     try:
         fig.canvas.draw()
         inv = fig.dpi_scale_trans.inverted()
-        bad = []
+        bad, short = [], []
         for ax in fig.axes:
             if ax.get_label() == "<colorbar>" or not ax.get_visible():
                 continue
             if not (ax.lines or ax.collections or ax.images or ax.patches):
                 continue                                  # legend-only / spacer axes
-            w = ax.get_window_extent().transformed(inv).width
-            if w < MIN_PANEL_IN:
-                bad.append(w)
+            bb_ax = ax.get_window_extent().transformed(inv)
+            if bb_ax.width < MIN_PANEL_IN:
+                bad.append(bb_ax.width)
+            # Height too: a panel can be full-width and still be a 0.49in letterbox strip,
+            # which passed as "squeezed 0" while rendering with two y-ticks and no room for
+            # the data. Checking width alone is what let that ship.
+            if bb_ax.height < MIN_PANEL_IN:
+                short.append(bb_ax.height)
         if bad:
             print(f"  !! {os.path.basename(base)}: {len(bad)} panel(s) squeezed to "
                   f"{min(bad):.2f}in wide (want >= {MIN_PANEL_IN}in) -- see "
                   f"plot_style._warn_if_squeezed for the fixes")
+        if short:
+            print(f"  !! {os.path.basename(base)}: {len(short)} panel(s) only "
+                  f"{min(short):.2f}in tall (want >= {MIN_PANEL_IN}in) -- a legend or "
+                  f"colourbar is being paid for out of the panels")
         # Width was not enough: a panel can be wide and still ship a y-label truncated off the
         # top of the canvas, which passed as "ok" on four figures. Check the labels too.
         rend = fig.canvas.get_renderer()
