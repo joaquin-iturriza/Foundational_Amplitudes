@@ -97,3 +97,25 @@ analysis/divergences/satlogs/
 
 # restore points for bulk run-config repairs (tools/fix_stale_run_datasets.py)
 /backups/
+
+# Scratch run dirs and their checkpoints under compare_models/. These are experiment output
+# (model_run0*.pt.gz, source.zip snapshots, eval npz), not source: `git add -A` at the repo
+# root would otherwise stage ~893 files / ~4.0 GB in one go. Only _probe_/_smoke_ were covered
+# before, which left every _ab_/_bigrun_/_scan_/_ftfig_/_coup_ dir exposed.
+compare_models/_*/
+compare_models/multiseed*/
+compare_models/data_l2*/
+/data_l2*/
+
+# talk build intermediates and export bundles
+talks/**/*.aux
+talks/**/*.nav
+talks/**/*.snm
+talks/**/*.toc
+talks/**/*_overleaf.zip
+
+# stray scratch files that keep landing at the repo root
+/py.py
+/additional_command
+/scratchpad_jid.txt
+/*.zip
