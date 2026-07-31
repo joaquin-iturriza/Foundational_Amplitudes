@@ -14,12 +14,18 @@ Importing it applies the style; you do not need to call `use()` yourself.
 
 WHY THESE CHOICES
 
-Size. `docs/results.tex` is `article` at 11pt with 1in margins, so \\textwidth is exactly
-6.5in. Figures are saved 6.5in wide and included at `width=\\textwidth`, which makes the
-scale factor exactly 1.0: 11pt in the figure renders as 11pt on the page, matching body
-text. Including a 6.5in figure at `width=0.62\\textwidth` instead shrinks its text to 6.8pt,
-which is why every figure should be included at full \\textwidth and given the aspect ratio
-it actually needs rather than being scaled down in LaTeX.
+Size. THE PANEL IS THE FIXED QUANTITY, NOT THE FIGURE. Every data panel is drawn at
+PANEL_W_IN x PANEL_H_IN whatever grid it sits in, and the figure comes out as wide as that
+grid needs -- so a 1-column figure is ~3.3in wide and a 2-column one ~6.5in, and a panel
+looks the same in both. Pinning the figure at \\textwidth instead, as this module used to,
+gives a lone panel 5.4in and a cell of a 3-wide grid 1.7in: the same object at 3x different
+size on facing pages, which is what "the sizes are not consistent" means.
+
+Because the saved width now varies, figures are included in LaTeX at their NATURAL size
+(`\\includegraphics{f.pdf}`, no `width=`), not at `width=\\textwidth`. That keeps the scale
+factor exactly 1.000, so 11pt in the figure prints as 11pt on the page, matching body text.
+Forcing `width=\\textwidth` on a 3.3in figure would blow it up 2x and print its labels at
+21pt. `enforce_panels` guarantees no figure is ever wider than \\textwidth.
 
 Font. cmr10 is Computer Modern Roman, the document's own body font, so figure text is
 typographically identical to the surrounding prose. cmr10 has no glyph for U+2212 MINUS,
@@ -58,16 +64,27 @@ BASE_PT = 11
 #: that makes the figures look like a set: one cell of a 3x2 has the same shape as a lone 1x1.
 PANEL_ASPECT = 1.25
 
-#: Widest sensible grid at \textwidth and 11pt. Beyond this the per-column decorations leave
-#: nothing for the data -- see MIN_PANEL_IN and _warn_if_squeezed.
-MAX_COLS = 4
+#: THE standard data panel, in inches. Every panel of every figure is drawn at this size --
+#: this is the quantity that is held fixed, and the FIGURE size is whatever follows from it.
+#:
+#: It used to be the other way round: the figure was pinned at \textwidth and the panels got
+#: whatever was left over after the decorations. That is what made the set incoherent, and the
+#: arithmetic says so plainly -- at 6.5in a lone panel comes out 5.4in wide, a cell of a 3-wide
+#: grid 1.7in. Those are the SAME KIND OF OBJECT rendered at 3x different linear size, on
+#: facing pages. Fixing the panel and letting a 1-column figure be 3.3in wide instead of 6.5in
+#: is what makes a panel look the same wherever it appears.
+#:
+#: The value is the panel a 2-column figure gets at \textwidth, because ncols=2 is by far the
+#: commonest layout here -- so the modal figure is unchanged and everything else moves to meet
+#: it.
+PANEL_W_IN = 2.55
+PANEL_H_IN = PANEL_W_IN / PANEL_ASPECT
 
-# Inches the decorations take, FITTED to _measure_panels() output rather than guessed. The
-# first guess treated the y-label block as a one-off plus a small gap, which under-charged
-# multi-column grids and left the aspect drifting 1.38 -> 1.26 -> 1.12 across 1, 2 and 3
-# columns. Every column pays for its own tick labels, so the cost is affine in ncols:
-#   width  decor = _W_FIRST + _W_PER_COL * (ncols - 1)
-#   height decor = _H_ROW per row
+# Starting guess for the decorations, in inches. These are ONLY a starting guess now:
+# enforce_panels() measures what the layout engine actually did and corrects the figure size,
+# so an error here costs an iteration, not a misshapen figure. Before that existed these
+# constants were load-bearing and every figure that deviated from the grid they were fitted on
+# (a colourbar, a shared legend, a long label) silently shipped at the wrong panel size.
 _W_FIRST, _W_PER_COL, _H_ROW = 0.73, 0.68, 0.63
 #: Per-extra-column cost when the y-axis is SHARED: just the gap, no second tick-label block.
 _W_GAP_ONLY = 0.30
@@ -75,41 +92,170 @@ _W_GAP_ONLY = 0.30
 
 def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full",
             shared_y: bool = False) -> tuple[float, float]:
-    """Figure size in inches for an `ncols` x `nrows` panel grid.
+    """Figure size in inches holding PANEL_W_IN x PANEL_H_IN per panel.
 
-    The height is DERIVED so every panel lands at PANEL_ASPECT, instead of being read off a
-    hand-tuned per-grid table. That table was the reason figures did not match each other: it
-    gave a 1x1 panel an aspect near 1.9 and a cell of a 2x1 near 1.15, which is visible at a
-    glance when two such figures sit on the same page.
-
-    `width` is "full" (\\textwidth, the default) or "half", for the case where TWO figures
-    sit side by side in one LaTeX figure environment at `0.49\\textwidth` each. A half-width
-    figure must be SAVED at 3.25in, otherwise LaTeX scales it down and its 11pt text lands
-    on the page at 5.5pt. A float is taken as a fraction of \\textwidth.
+    Capped at `width` (\\textwidth by default): a grid too wide to hold the standard panel
+    gets uniformly smaller panels AT THE SAME ASPECT, rather than a wider-than-page figure.
+    So aspect is invariant everywhere, and size is invariant everywhere it can be.
     """
     frac = {"full": 1.0, "half": 0.49}.get(width, width)
-    w = TEXTWIDTH_IN * float(frac)
-    # With a shared y-axis the extra columns carry no tick labels, so they cost only the
-    # inter-column gap. Charging them the full per-column price makes the panels come out
-    # WIDER than budgeted and the derived height too small: a 3-column sharey figure landed at
-    # aspect 1.94 against a 1.25 target until this was accounted for.
+    w_max = TEXTWIDTH_IN * float(frac)
     per_col = _W_GAP_ONLY if shared_y else _W_PER_COL
-    panel_w = (w - _W_FIRST - per_col * (ncols - 1)) / ncols
+    deco_w = _W_FIRST + per_col * (ncols - 1)
+    panel_w = min(PANEL_W_IN, (w_max - deco_w) / ncols)
     panel_h = panel_w / PANEL_ASPECT
-    return (round(w, 2), round(nrows * (panel_h + _H_ROW), 2))
+    return (round(deco_w + ncols * panel_w, 2), round(nrows * (panel_h + _H_ROW), 2))
+
+
+def _is_3d(ax) -> bool:
+    """A 3-D axes. Its window extent is the projection's bounding square, not a data panel."""
+    return hasattr(ax, "get_proj")
+
+
+def _data_axes(fig):
+    """The axes that hold data: everything except colourbars, spacers and empty cells."""
+    out = []
+    for ax in fig.axes:
+        if ax.get_label() == "<colorbar>" or not ax.get_visible():
+            continue
+        if getattr(ax, "_colorbar", None) is not None:
+            continue
+        if not (ax.lines or ax.collections or ax.images or ax.patches):
+            continue
+        out.append(ax)
+    return out
+
+
+def _relayout(fig) -> None:
+    """Re-run whatever layout engine this figure uses, preserving any reserved strip.
+
+    MUST honour `_ps_layout_done`. Producers set that flag to mean "I have laid this figure
+    out myself, do not run tight_layout on it" -- a raw `tight_layout(rect=...)` reserving a
+    legend strip, or a GridSpec-plus-colourbar arrangement that tight_layout fights. Calling a
+    bare tight_layout here regardless is what re-broke the collinear figures: the axes expanded
+    straight over the reserved strip and the 7-entry legend printed on top of both panels and
+    their x-labels. Resizing alone is safe for those figures -- axes positions are stored as
+    figure FRACTIONS, so they scale with the canvas and the reservation survives.
+    """
+    engine = fig.get_layout_engine()
+    if engine is not None and engine.__class__.__name__ != "PlaceHolderLayoutEngine":
+        return                                   # constrained layout re-runs itself on draw
+    # Recompute the legend strip as a FRACTION of the current height. Caching the fraction
+    # instead would silently shrink the strip every time the figure grew.
+    leg_in = getattr(fig, "_ps_legend_in", 0.0)
+    if leg_in:
+        frac = min(0.50, leg_in / fig.get_size_inches()[1])
+        rect = ([0, frac, 1, 1] if getattr(fig, "_ps_legend_side", "top") == "bottom"
+                else [0, 0, 1, 1 - frac])
+        try:
+            fig.tight_layout(rect=rect)
+        except Exception:
+            pass
+        return
+    if getattr(fig, "_ps_layout_done", False):
+        return                                   # the producer owns this layout; leave it
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+
+def enforce_panels(fig, max_iter: int = 6, tol: float = 0.02) -> None:
+    """Resize the FIGURE until its panels actually measure PANEL_W_IN x PANEL_H_IN.
+
+    This is the piece that was missing. `figsize()` can only ever PREDICT the panel size from
+    a model of what the decorations cost; the layout engine then allocates whatever it likes,
+    and every figure carrying something the model did not know about -- a colourbar, a shared
+    legend, a two-line label -- came out at a different panel size and a different aspect. The
+    prediction was right only for the grids the constants were fitted on.
+
+    Measuring instead makes the model self-correcting: read back the panel boxes the engine
+    produced, treat `fig_size - grid_of_panels` as the true decoration cost, and solve for the
+    figure size that puts the panels on target. Two or three passes converge, because the
+    decorations have a fixed physical size and do not scale with the canvas.
+    """
+    import statistics as _st
+    # 3-D axes are not data panels: mplot3d reports the bounding square of the projection, not
+    # the plotted region, so solving for "panel = 2.55x2.04" against that measurement drove the
+    # ir3d and phase-space 3-D figures down to a 1.2in-tall canvas with their labels sliced off.
+    # A figure holding any 3-D axes keeps the size its producer chose.
+    if any(_is_3d(ax) for ax in fig.axes):
+        return
+    # A panel with a pinned data aspect (imshow, set_aspect("equal")) cannot be solved for both
+    # width and height: the two solves fight the constraint and the iteration walks the figure
+    # DOWN instead of converging -- measured, a 10x8 imshow figure ended at 6.50x1.91in with a
+    # 1.10in panel, just clear of MIN_PANEL_IN and so unreported. Leave those to their producer.
+    for ax in fig.axes:
+        try:
+            if ax.get_aspect() != "auto" and not _is_3d(ax):
+                return
+        except Exception:
+            pass
+    for _ in range(max_iter):
+        fig.canvas.draw()
+        inv = fig.dpi_scale_trans.inverted()
+        axes = _data_axes(fig)
+        if not axes:
+            return
+        boxes = [ax.get_window_extent().transformed(inv) for ax in axes]
+        # Grid shape by POSITION, not by gridspec: figures built with a raw GridSpec, nested
+        # subfigures or hand-placed axes have no single gridspec to ask, and those are exactly
+        # the composite figures that drifted worst.
+        ncols = len({round(b.x0, 1) for b in boxes}) or 1
+        nrows = len({round(b.y0, 1) for b in boxes}) or 1
+        w_r, h_r = _st.median([b.width for b in boxes]), _st.median([b.height for b in boxes])
+        fw, fh = fig.get_size_inches()
+        deco_w, deco_h = fw - ncols * w_r, fh - nrows * h_r
+        panel_w = min(PANEL_W_IN, (TEXTWIDTH_IN - deco_w) / ncols)
+        panel_h = panel_w / PANEL_ASPECT
+        if abs(w_r - panel_w) < tol and abs(h_r - panel_h) < tol:
+            return
+        new_w = min(deco_w + ncols * panel_w, TEXTWIDTH_IN)
+        new_h = deco_h + nrows * panel_h
+        if not (0.5 < new_w < 20 and 0.5 < new_h < 30):
+            return                                # degenerate measurement; leave it alone
+        fig.set_size_inches(new_w, new_h, forward=True)
+        _relayout(fig)
+
+
+def _expand_to_content(fig, max_iter: int = 3) -> None:
+    """Grow the canvas until nothing hangs off it. Safety net for `savefig.bbox=None`.
+
+    Sizing the figure from the panels leaves the margins to the layout engine, and it can miss
+    by a few hundredths of an inch -- compute_scan's y-label sat at x0=-0.05in on a 6.40in
+    canvas, i.e. shipped shaved. Since bbox="tight" is deliberately off (it silently rescales
+    the figure on the page), an overhang is a real loss of ink and has to be paid for in canvas.
+    Width stays capped at \\textwidth: a wider figure would overrun the text block, so if the
+    overhang cannot be covered within that, the panels give up the difference instead.
+    """
+    for _ in range(max_iter):
+        fig.canvas.draw()
+        tb = fig.get_tightbbox(fig.canvas.get_renderer())
+        fw, fh = fig.get_size_inches()
+        need_w = fw + max(0.0, -tb.x0) + max(0.0, tb.x1 - fw)
+        need_h = fh + max(0.0, -tb.y0) + max(0.0, tb.y1 - fh)
+        if need_w <= fw + 0.01 and need_h <= fh + 0.01:
+            return
+        # never SHRINK: this function only ever adds margin. Clamping to \textwidth
+        # unconditionally would narrow a producer-chosen wider canvas whose content needs the
+        # room, causing exactly the clipping this exists to prevent.
+        fig.set_size_inches(max(fw, min(need_w, TEXTWIDTH_IN)), max(fh, need_h), forward=True)
+        _relayout(fig)
 
 
 def _measure_panels(grids=((1, 1), (2, 1), (3, 1), (1, 2), (2, 2), (3, 2))) -> None:
-    """Print the achieved panel aspect per grid. Run after touching the constants above: the
-    whole point of the formula is that the last column comes out the same for every grid."""
+    """Print the achieved panel size per grid. Run after touching the constants above: the
+    whole point is that the last two columns come out the same for every grid."""
     import matplotlib.pyplot as _plt
-    print(f"target aspect {PANEL_ASPECT}")
+    print(f"target {PANEL_W_IN:.2f}x{PANEL_H_IN:.2f}in, aspect {PANEL_ASPECT}")
     for nc, nr in grids:
         fig, _ = figure(ncols=nc, nrows=nr)
-        fig.tight_layout()
+        _relayout(fig)
+        enforce_panels(fig)
         fig.canvas.draw()
         bb = fig.axes[0].get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-        print(f"  {nc}x{nr}: fig={figsize(nc, nr)} panel={bb.width:.2f}x{bb.height:.2f}"
+        fw, fh = fig.get_size_inches()
+        print(f"  {nc}x{nr}: fig={fw:.2f}x{fh:.2f} panel={bb.width:.2f}x{bb.height:.2f}"
               f" aspect={bb.width / bb.height:.2f}")
         _plt.close(fig)
 
@@ -212,7 +358,15 @@ def use() -> None:
         "legend.labelspacing": 0.3,
 
         # --- output
-        "savefig.bbox": "tight",
+        # NOT "tight". bbox="tight" crops the canvas to its content, so a figure built at
+        # 6.5in saves at ~6.19in; \includegraphics[width=\textwidth] then scales it back UP to
+        # 6.5in and its 11pt text prints at 11.6pt. A figure whose legend overhangs saves at
+        # 7.28in and is scaled DOWN to 9.8pt. Measured across the included set, that was a 19%
+        # spread in effective font size -- which is exactly what "figures should look like a
+        # set, text the same size as the body" rules out. Saving the full canvas makes the
+        # scale factor exactly 1.000, and makes overhang show up as visible clipping instead
+        # of a silent rescale on the page.
+        "savefig.bbox": None,
         "savefig.pad_inches": 0.02,
         "pdf.fonttype": 42,
         "ps.fonttype": 42,
@@ -264,10 +418,16 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     across the top instead. Call BEFORE `save`.
     """
     handles, labels = ax.get_legend_handles_labels()
+    # `loc="lower center"` puts the strip BELOW the panels. Producers that want that used to
+    # hand-roll `fig.legend(...)` + `tight_layout(rect=[0, 0.30, 1, 1])`, which reserves a
+    # fraction rather than inches and is invisible to the geometry solve. Supporting it here
+    # means there is one path, and one place that knows how much room the legend needs.
+    bottom = "lower" in str(kwargs.get("loc", "upper center"))
     kwargs.setdefault("loc", "upper center")
-    kwargs.setdefault("bbox_to_anchor", (0.5, 1.0))
+    kwargs.setdefault("bbox_to_anchor", (0.5, 0.0) if bottom else (0.5, 1.0))
     kwargs.setdefault("frameon", False)
     leg = fig.legend(handles, labels, ncol=ncol, **kwargs)
+    fig._ps_legend_side = "bottom" if bottom else "top"
     # GROW the figure by the legend's measured height; do not carve the strip out of the
     # panels. Reserving a rect on the existing canvas pays for the legend with data area: on a
     # figsize(3,1) that turned a 1.77x0.91in panel into 1.77x0.52in, i.e. aspect 1.95 -> 3.41,
@@ -278,18 +438,16 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     try:
         fig.canvas.draw()
         rend = fig.canvas.get_renderer()
-        leg_in = leg.get_window_extent(rend).height / fig.dpi
+        leg_in = leg.get_window_extent(rend).height / fig.dpi + pad_in
         w, h = fig.get_size_inches()
-        new_h = h + leg_in + pad_in
-        fig.set_size_inches(w, new_h, forward=True)
-        top = max(0.50, 1.0 - (leg_in + pad_in) / new_h)
+        fig.set_size_inches(w, h + leg_in, forward=True)
     except Exception:
-        top = 0.90
-    rect = [0, 0, 1, top]
-    fig.tight_layout(rect=rect)
-    # Remembered so fit_labels can re-apply it after growing the canvas; a bare tight_layout
-    # would otherwise undo the reservation.
-    fig._ps_legend_rect = rect
+        leg_in = 0.10 * fig.get_size_inches()[1]
+    # Stored in INCHES, not as a fraction of the height: enforce_panels resizes the figure
+    # afterwards, and a cached fraction would quietly shrink the strip on every growth step
+    # until the legend sat back on the panels.
+    fig._ps_legend_in = leg_in
+    _relayout(fig)
     fig._ps_layout_done = True
     return leg
 
@@ -446,6 +604,15 @@ def save(fig, base: str, repo: str | None = None) -> str:
         fit_labels(fig)
     except Exception:
         pass
+    # LAST, after every other step that can change the canvas (shared_legend's strip,
+    # make_room, fit_labels' growth). Each of those adds decoration height, and the panels are
+    # what has to stay fixed, so the correction has to see the final decoration cost.
+    try:
+        enforce_panels(fig)
+        _expand_to_content(fig)
+    except Exception as exc:
+        print(f"  !! {os.path.basename(base)}: enforce_panels failed: "
+              f"{type(exc).__name__}: {exc}")
     _warn_if_squeezed(fig, base)
     fig.savefig(base + ".png")
     fig.savefig(base + ".pdf")
@@ -484,7 +651,7 @@ def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
         rend = fig.canvas.get_renderer()
         h_px = fig.get_size_inches()[1] * fig.dpi
         w_px = fig.get_size_inches()[0] * fig.dpi
-        over = False
+        over = wide = False
         for ax in fig.axes:
             if ax.get_label() == "<colorbar>":
                 continue
@@ -499,6 +666,8 @@ def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
                 # Grow when the label runs off the canvas...
                 if bb.y0 < -1.0 or bb.y1 > h_px + 1.0 or bb.x0 < -1.0 or bb.x1 > w_px + 1.0:
                     over = True
+                    if bb.x0 < -1.0 or bb.x1 > w_px + 1.0:
+                        wide = True
                 # ...or when it collides with a figure-level legend. With clipping off, a
                 # label taller than its panel does not get truncated any more -- it runs on
                 # THROUGH the shared legend instead ("[%]" printed over the word "uniform").
@@ -516,19 +685,20 @@ def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
         if not over:
             return grew
         w, h = fig.get_size_inches()
+        # HEIGHT ONLY. Figure WIDTH is invariant at TEXTWIDTH_IN: it is what makes the LaTeX
+        # scale factor 1.000 and every figure's text print at 11pt. Widening to chase a
+        # horizontal overhang traded a 0.03in clipped label for an 8.75in canvas that LaTeX
+        # then scaled to 0.74, printing the whole figure at 8.1pt -- far worse than the
+        # problem. A horizontal overhang is reported by _warn_if_squeezed and fixed in the
+        # producer (shorter label, fewer legend columns, more layout pad), not here.
+        if wide:
+            return grew
         fig.set_size_inches(w, h * grow, forward=True)
         grew = True
-        # Re-lay out with whatever rect shared_legend reserved. A bare tight_layout() here
-        # drops that rect and redraws the legend on top of the panels -- which it did, on the
-        # flagship levers A/B among others.
-        rect = getattr(fig, "_ps_legend_rect", None)
-        engine = fig.get_layout_engine()
-        managed = engine is not None and engine.__class__.__name__ != "PlaceHolderLayoutEngine"
-        if not managed:
-            try:
-                fig.tight_layout(rect=rect) if rect else fig.tight_layout()
-            except Exception:
-                pass
+        # Re-lay out preserving whatever strip shared_legend reserved. A bare tight_layout()
+        # here drops that reservation and redraws the legend on top of the panels -- which it
+        # did, on the flagship levers A/B among others.
+        _relayout(fig)
     return grew
 
 
@@ -540,6 +710,11 @@ def check_panels(fig, name: str) -> None:
     slivers while `rebuild_figures.sh` reported `ok` and `squeezed 0`. Call this immediately
     before every `pdf.savefig(fig)`.
     """
+    try:
+        enforce_panels(fig)
+        _expand_to_content(fig)
+    except Exception as exc:
+        print(f"  !! {name}: enforce_panels failed: {type(exc).__name__}: {exc}")
     _warn_if_squeezed(fig, name)
 
 
@@ -582,17 +757,63 @@ def _warn_if_squeezed(fig, base: str) -> None:
             print(f"  !! {os.path.basename(base)}: {len(short)} panel(s) only "
                   f"{min(short):.2f}in tall (want >= {MIN_PANEL_IN}in) -- a legend or "
                   f"colourbar is being paid for out of the panels")
+        # OFF-TARGET PANELS. The check the old guard never made: it asked only whether a panel
+        # had collapsed below a floor, so a figure whose panels were a perfectly healthy but
+        # WRONG 5.4x4.6in passed silently, sitting opposite a figure with 1.7in panels. Report
+        # the realised geometry against the standard panel, and the spread WITHIN the figure,
+        # since panels of one figure disagreeing with each other is the more visible fault.
+        # 3-D axes excluded for the same reason enforce_panels skips them: their extent is the
+        # projection's bounding square, so they report aspect 1.00 by construction and would
+        # warn on every 3-D figure forever.
+        pan = [ax.get_window_extent().transformed(inv)
+               for ax in _data_axes(fig) if not _is_3d(ax)]
+        if pan:
+            ws = [b.width for b in pan]
+            hs2 = [b.height for b in pan]
+            asp = [w / h for w, h in zip(ws, hs2) if h > 0]
+            if max(ws) - min(ws) > 0.05 or max(hs2) - min(hs2) > 0.05:
+                print(f"  !! {os.path.basename(base)}: panels disagree within the figure "
+                      f"(width {min(ws):.2f}-{max(ws):.2f}in, height "
+                      f"{min(hs2):.2f}-{max(hs2):.2f}in) -- unequal grid cells")
+            if asp and (max(asp) > PANEL_ASPECT * 1.15 or min(asp) < PANEL_ASPECT / 1.15):
+                print(f"  !! {os.path.basename(base)}: panel aspect {min(asp):.2f}-"
+                      f"{max(asp):.2f} off the {PANEL_ASPECT} standard")
+            # OFF THE STANDARD SIZE. The check that was missing: everything above compares a
+            # figure against ITSELF (spread, aspect) or against a bare legibility floor, so a
+            # figure whose panels are uniformly 1.36in -- half the standard, and the actual
+            # complaint -- passed silently, clearing MIN_PANEL_IN by 0.04in. Report the gap to
+            # PANEL_W_IN so the rebuild names the real fault instead of counting "squeezed".
+            # Threshold at 2.0in, not "PANEL_W_IN minus a hair". A 2-column figure whose
+            # y-labels are wide is already at \textwidth and lands at 2.26-2.39in: capped by
+            # its own decorations, nothing to reflow, and warning on it buried the real cases
+            # in 20 lines of noise. Below 2.0in means a third column is being carried.
+            if max(ws) < 2.0:
+                print(f"  !! {os.path.basename(base)}: panels {max(ws):.2f}x{max(hs2):.2f}in "
+                      f"vs the {PANEL_W_IN:.2f}x{PANEL_H_IN:.2f}in standard -- too many "
+                      f"columns to hold it at \\textwidth; reflow to <= 2 columns")
+        rend = fig.canvas.get_renderer()
+        fw, fh = fig.get_size_inches()
+        # CANVAS OVERHANG. savefig writes the full canvas now, so anything outside it is CUT.
+        # Compare POSITIONS, not sizes: l2_bbb_sweep's tight bbox ran x0=0.165 .. x1=6.653 on a
+        # 6.500in canvas, so 0.153in was being destroyed on the right while its total WIDTH
+        # (6.488) still measured under the canvas -- a size comparison saw nothing wrong and
+        # the figure shipped with the gamma colourbar label sliced off.
+        tb = fig.get_tightbbox(rend)
+        eps = 0.02
+        if tb.x0 < -eps or tb.y0 < -eps or tb.x1 > fw + eps or tb.y1 > fh + eps:
+            print(f"  !! {os.path.basename(base)}: content overhangs the canvas "
+                  f"(tight bbox {tb.x0:.2f}..{tb.x1:.2f} x {tb.y0:.2f}..{tb.y1:.2f}in vs "
+                  f"canvas {fw:.2f}x{fh:.2f}in) -- it WILL BE CLIPPED on save; shrink the "
+                  f"legend (fewer ncol) or grow the figure")
         # Width was not enough: a panel can be wide and still ship a y-label truncated off the
         # top of the canvas, which passed as "ok" on four figures. Check the labels too.
-        rend = fig.canvas.get_renderer()
-        h_px = fig.get_size_inches()[1] * fig.dpi
-        w_px = fig.get_size_inches()[0] * fig.dpi
+        h_px = fh * fig.dpi
+        w_px = fw * fig.dpi
         clipped = []
         for ax in fig.axes:
-            # fit_labels never acts on a colourbar, so warning about one is unactionable --
-            # l2_bbb_sweep was reporting a fully-rendered colourbar label as cut off.
-            if ax.get_label() == "<colorbar>":
-                continue
+            # Colourbars ARE checked. The old exemption was justified by a false positive under
+            # bbox="tight", where nothing could be clipped; with bbox=None a colourbar label is
+            # exactly what gets cut, and l2_bbb_sweep's gamma was the one true positive.
             for lbl in (ax.yaxis.label, ax.xaxis.label):
                 if not lbl.get_text():
                     continue
@@ -609,5 +830,9 @@ def _warn_if_squeezed(fig, base: str) -> None:
         # fit_labels turns off label clipping, such a label renders in full ('median rel.
         # error [%]' sits at 84% of its panel and is complete), so the check only produced
         # false alarms -- and acting on it grew figures and pushed shared legends onto data.
-    except Exception:
-        pass
+    except Exception as exc:
+        # NEVER silent. A bare `pass` here hid a NameError (rend used before assignment) that
+        # made this entire function dead code -- both the overhang and the label checks were
+        # skipped on every figure while the rebuild still reported success.
+        print(f"  !! {os.path.basename(base)}: layout check failed to run: "
+              f"{type(exc).__name__}: {exc}")
