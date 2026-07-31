@@ -11,8 +11,9 @@ Left : the ee->mumu Z-mass scan. Without a mass feature the model can only learn
        off-shellness feature s_prop - M^2 it is flat and ~5 orders of magnitude lower.
 Right: median loss per resonance family, showing the lever generalises beyond the s-channel Z.
 
-Metric is `val_loss_no_reg`, best over the validation trajectory -- the repo's comparison rule
-(the regularized loss confounds the metric with the tuned lambda). CPU only.
+Metric is `val_loss_no_reg` read at each run's best checkpoint -- the repo's comparison rule
+(the regularized loss confounds the metric with the tuned lambda). See best_per_process for
+why that is not the same as a per-process minimum. CPU only.
 """
 import argparse
 import json
@@ -39,11 +40,25 @@ FAMILIES = [
 
 
 def best_per_process(run_dir):
-    """{dataset: best val_loss_no_reg over the validation trajectory}."""
+    """{dataset: val_loss_no_reg at the run's BEST checkpoint}.
+
+    The repo's comparison rule is the minimum of the COMBINED `val_loss_no_reg` series --
+    the checkpoint-selection metric, see compare_models/aggregate_scan_ab.py:best_val_no_reg.
+    Taking a per-process min instead reports a per-process epoch oracle that no single saved
+    model realises: in this A/B the off arm's global best is validation index 7 and the
+    offshell arm's is 14, while the per-process argmins scatter over indices 0-11. It also
+    biases the comparison, and towards the baseline: ee->mumu median for `off` reads 0.558
+    under per-process min against 0.704 at its own best checkpoint, a 21% flattering.
+    """
     with open(os.path.join(run_dir, "plots_0", "per_process_metrics.json")) as f:
         d = json.load(f)
+    series = d.get("val_loss_no_reg") or d.get("val_loss") or []
+    vals = [(i, v) for i, v in enumerate(series) if v is not None and np.isfinite(v)]
+    if not vals:
+        raise SystemExit(f"[plot_levers_ab] no val_loss_no_reg series in {run_dir}")
+    best_i = min(vals, key=lambda t: t[1])[0]
     P = d["proc_val_losses_no_reg"]
-    return {k: float(np.nanmin(v)) for k, v in P.items() if len(v)}
+    return {k: float(v[best_i]) for k, v in P.items() if len(v) > best_i}
 
 
 def scanned_masses(recipe, prefix, pdg):
@@ -86,10 +101,13 @@ def main():
     axL.set_yscale("log")
     axL.set_xlabel(r"scanned $M_Z$ [GeV]")
     axL.set_ylabel(r"$\mathrm{val\ loss}_{\mathrm{no\ reg}}$")
-    # Fixed limits on both panels. Left to itself, make_room grows the range to keep an
-    # in-panel legend clear, which flattens the off arm's U-shape -- the whole point of the
-    # panel -- into a straight line. The shared legend below removes the need.
-    axL.set_ylim(1e-6, 3e1)
+    # Bound the range from the DATA, with a decade of headroom, rather than hardcoding it:
+    # a fixed 1e-6 floor sat above a real 6.1e-7 point, which make_room happened to rescue
+    # here but would silently clip on any rerun where make_room does not fire. (make_room
+    # still runs: the process label counts as a mover even with the legend moved out.)
+    _all = [v for arm in arms.values() for v in arm.values() if v > 0]
+    axL.set_ylim(10 ** np.floor(np.log10(min(_all)) - 0.3),
+                 10 ** np.ceil(np.log10(max(_all)) + 0.3))
     ps.process_label(axL, r"$e^+e^-\to\mu^+\mu^-$", loc="lower right")
 
     # --- right: median per resonance family ------------------------------------
@@ -106,7 +124,7 @@ def main():
     # A bar on a log axis is drawn from the axis floor, so an unbounded floor makes the
     # s-channel bar a 10-decade slab whose length says nothing. Clip to just below the
     # smallest median so every bar's length is readable against the others.
-    axR.set_ylim(1e-6, 3e0)
+    axR.set_ylim(10 ** np.floor(np.log10(min(_all)) - 0.3), 3e0)
 
     # One legend across the top: both panels plot the same two arms, and any in-panel legend
     # here sits on either the scan curves or the bars.

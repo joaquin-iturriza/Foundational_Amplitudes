@@ -72,7 +72,9 @@ fixed_params:
   objective: logflat
 
 search_space:
-# Linear term == gamma. Range covers the measured power-law basin (3..30) and below it, so the sweep
+# Linear term == gamma. Range spans the LOW half of the measured power-law basin (3..30) and
+# below it: the basin is flat above ~10, so exponent alone is not what is being tested here -- the
+# question is whether curvature (c2) buys anything, so the sweep
 # can sit at the power-law optimum if curvature turns out to be worthless.
 - name: keep_c1
   type: float_uniform

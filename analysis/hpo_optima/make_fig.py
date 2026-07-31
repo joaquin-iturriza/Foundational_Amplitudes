@@ -16,7 +16,8 @@ import plot_style as ps  # noqa: E402
 
 recs = json.load(open(sys.argv[1])); out = sys.argv[2]
 raw = [r for r in recs if r['converged'] and r['lr_key'] == 'training.lr']
-ft = [r for r in recs if r['converged'] and r['lr_key'] == 'fine_tune.lr_scale']
+# NOTE: the finetune lr_scale panel this fed was dropped from the figure; the caption in
+# docs/results.tex no longer promises it. Left out rather than left dangling.
 
 
 def bv(r, k):

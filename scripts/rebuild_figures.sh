@@ -8,10 +8,11 @@
 # recorded here. Add a line here whenever you add a figure -- a plotting script whose
 # invocation is undocumented is one worktree deletion away from being unreproducible.
 #
-# Everything included by results.tex rebuilds from data on disk EXCEPT the left panel of
-# l2_poly_keep: its 12-trial DyHPO sweep `sweeps/l2_poly_uugg` was destroyed with a worktree
-# and exists nowhere, so plot_poly_keep.py exits non-zero by design rather than emitting the
-# blank panel that once shipped. That one needs the sweep re-run on GPU.
+# Everything included by results.tex now rebuilds from data on disk. l2_poly_keep was the
+# lone exception -- its 12-trial DyHPO sweep had been destroyed with a worktree -- and the
+# sweep was re-run on the trunk (sweeps/l2_poly_uugg, 12 trials, ~7.4 GPU-h), so that figure
+# builds again. plot_poly_keep.py still exits non-zero if the results directory is empty,
+# rather than emitting the blank panel that once shipped into the document.
 #
 # Usage:  bash scripts/rebuild_figures.sh [pattern]
 #         pattern filters by output basename, e.g. `bash scripts/rebuild_figures.sh l2_`
@@ -46,6 +47,7 @@ run l2_uugg_perdecade_abs    $PY $D/plot_l2_uugg_abs.py
 run l2_uugg_gamma            $PY $D/plot_l2_uugg_gamma.py
 run l2_gamma_response_ext    $PY $D/plot_gamma_response.py
 run l2_saturation            $PY $D/plot_saturation.py
+# emits TWO figures: the 3-process sigma/RMSE panels and the pre-flight diagnostic
 run l2_sigma_vs_divergence   $PY $D/plot_sigma_vs_divergence.py
 run l2_poly_keep             $PY $D/plot_poly_keep.py
 run l2_bbbarg                $PY $D/plot_l2_bbbarg.py

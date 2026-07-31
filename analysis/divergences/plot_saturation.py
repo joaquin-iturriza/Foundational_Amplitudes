@@ -78,7 +78,7 @@ for arm, ls, mk in [("base", "-", "o"), ("sigma", "--", "s")]:
         ax.plot(d["pool"], d["p99"], ls + mk, color=c, label=f"{arm} {N//1000}k")
 ax.set_xscale("log"); ax.set_yscale("log")
 ax.set_xlabel("training pool size")
-ax.set_ylabel(r"$\sigma$ p99 over the proposal batch")
+ax.set_ylabel(r"$\sigma$ p99")
 ax.legend(ncol=2, loc="lower left", columnspacing=1.0)
 ps.process_label(ax, r"$e^+e^-\to u\bar u gg$", loc="upper right")
 

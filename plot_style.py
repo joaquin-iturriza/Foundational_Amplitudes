@@ -54,26 +54,30 @@ TEXTWIDTH_IN = 6.5
 #: Body font size of docs/results.tex. Figures use this everywhere.
 BASE_PT = 11
 
-#: Default width:height of a single axes panel. Fixed so figures look like a set.
-PANEL_ASPECT = 1.75
+#: Width:height every DATA PANEL is drawn at, whatever grid it sits in. This is the number
+#: that makes the figures look like a set: one cell of a 3x2 has the same shape as a lone 1x1.
+PANEL_ASPECT = 1.25
 
-# Hand-tuned figure heights for the common grids, so that panels keep a consistent
-# shape once axis labels and legends have taken their share of the canvas.
-_SIZES = {
-    (1, 1): (TEXTWIDTH_IN, 3.9),
-    (2, 1): (TEXTWIDTH_IN, 2.9),
-    (3, 1): (TEXTWIDTH_IN, 2.9),
-    (4, 1): (TEXTWIDTH_IN, 2.0),
-    (1, 2): (TEXTWIDTH_IN, 6.2),
-    (2, 2): (TEXTWIDTH_IN, 5.2),
-    (3, 2): (TEXTWIDTH_IN, 4.4),
-    (2, 3): (TEXTWIDTH_IN, 8.8),
-    (3, 3): (TEXTWIDTH_IN, 6.4),
-}
+#: Widest sensible grid at \textwidth and 11pt. Beyond this the per-column decorations leave
+#: nothing for the data -- see MIN_PANEL_IN and _warn_if_squeezed.
+MAX_COLS = 4
+
+# Inches the decorations take, FITTED to _measure_panels() output rather than guessed. The
+# first guess treated the y-label block as a one-off plus a small gap, which under-charged
+# multi-column grids and left the aspect drifting 1.38 -> 1.26 -> 1.12 across 1, 2 and 3
+# columns. Every column pays for its own tick labels, so the cost is affine in ncols:
+#   width  decor = _W_FIRST + _W_PER_COL * (ncols - 1)
+#   height decor = _H_ROW per row
+_W_FIRST, _W_PER_COL, _H_ROW = 0.73, 0.68, 0.63
 
 
 def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full") -> tuple[float, float]:
     """Figure size in inches for an `ncols` x `nrows` panel grid.
+
+    The height is DERIVED so every panel lands at PANEL_ASPECT, instead of being read off a
+    hand-tuned per-grid table. That table was the reason figures did not match each other: it
+    gave a 1x1 panel an aspect near 1.9 and a cell of a 2x1 near 1.15, which is visible at a
+    glance when two such figures sit on the same page.
 
     `width` is "full" (\\textwidth, the default) or "half", for the case where TWO figures
     sit side by side in one LaTeX figure environment at `0.49\\textwidth` each. A half-width
@@ -82,10 +86,24 @@ def figsize(ncols: int = 1, nrows: int = 1, width: float | str = "full") -> tupl
     """
     frac = {"full": 1.0, "half": 0.49}.get(width, width)
     w = TEXTWIDTH_IN * float(frac)
-    if frac == 1.0 and (ncols, nrows) in _SIZES:
-        return _SIZES[(ncols, nrows)]
-    panel_h = (w / ncols) / PANEL_ASPECT
-    return (w, round(panel_h * nrows + 0.9, 2))
+    panel_w = (w - _W_FIRST - _W_PER_COL * (ncols - 1)) / ncols
+    panel_h = panel_w / PANEL_ASPECT
+    return (round(w, 2), round(nrows * (panel_h + _H_ROW), 2))
+
+
+def _measure_panels(grids=((1, 1), (2, 1), (3, 1), (1, 2), (2, 2), (3, 2))) -> None:
+    """Print the achieved panel aspect per grid. Run after touching the constants above: the
+    whole point of the formula is that the last column comes out the same for every grid."""
+    import matplotlib.pyplot as _plt
+    print(f"target aspect {PANEL_ASPECT}")
+    for nc, nr in grids:
+        fig, _ = figure(ncols=nc, nrows=nr)
+        fig.tight_layout()
+        fig.canvas.draw()
+        bb = fig.axes[0].get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        print(f"  {nc}x{nr}: fig={figsize(nc, nr)} panel={bb.width:.2f}x{bb.height:.2f}"
+              f" aspect={bb.width / bb.height:.2f}")
+        _plt.close(fig)
 
 
 # --- colour -----------------------------------------------------------------
@@ -145,7 +163,7 @@ def use() -> None:
         "figure.titlesize": BASE_PT,
 
         # --- geometry
-        "figure.figsize": _SIZES[(1, 1)],
+        "figure.figsize": figsize(1, 1),
         "figure.dpi": 140,
         "savefig.dpi": 200,
         "figure.constrained_layout.use": False,   # we call tight_layout in save()
@@ -157,11 +175,14 @@ def use() -> None:
         "grid.linewidth": 0.6,
         "axes.axisbelow": True,
         "axes.linewidth": 0.8,
-        # Full box frame, as in the reference paper: all four spines drawn.
+        # Full box frame, as in the reference paper: all four spines drawn. The reference
+        # draws the enclosing LINES only -- tick marks stay on the left and bottom, where the
+        # numbers are. Mirroring ticks onto the top and right edges is a different choice and
+        # was never asked for; it just adds clutter to every panel.
         "axes.spines.top": True,
         "axes.spines.right": True,
-        "xtick.top": True,
-        "ytick.right": True,
+        "xtick.top": False,
+        "ytick.right": False,
         "xtick.minor.visible": False,
         "ytick.minor.visible": False,
 
@@ -237,9 +258,21 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     kwargs.setdefault("bbox_to_anchor", (0.5, 1.0))
     kwargs.setdefault("frameon", False)
     leg = fig.legend(handles, labels, ncol=ncol, **kwargs)
-    # Reserve the strip for it, and tell save() not to re-run a plain tight_layout(),
-    # which would drop the rect and put the legend back on top of the panels.
-    fig.tight_layout(rect=[0, 0, 1, 0.90])
+    # Reserve the legend's MEASURED height, not a fixed 10%. Now that figsize derives height
+    # from PANEL_ASPECT, a 3x1 figure is only ~1.8in tall, where 10% is less than one 11pt
+    # legend row -- so a two-row legend sat across the panels' top spine.
+    try:
+        fig.canvas.draw()
+        rend = fig.canvas.get_renderer()
+        frac = leg.get_window_extent(rend).height / (fig.get_size_inches()[1] * fig.dpi)
+        top = min(0.95, max(0.55, 1.0 - frac - 0.03))
+    except Exception:
+        top = 0.90
+    rect = [0, 0, 1, top]
+    fig.tight_layout(rect=rect)
+    # Remembered so fit_labels can re-apply it after growing the canvas; a bare tight_layout
+    # would otherwise undo the reservation.
+    fig._ps_legend_rect = rect
     fig._ps_layout_done = True
     return leg
 
@@ -389,6 +422,13 @@ def save(fig, base: str, repo: str | None = None) -> str:
             fig.tight_layout()
         except Exception:
             pass
+    # Grow the canvas if an axis label would be clipped. Runs for every figure, after layout
+    # and make_room, so a long y-label on a narrow multi-column panel widens the figure a
+    # little rather than being silently chopped.
+    try:
+        fit_labels(fig)
+    except Exception:
+        pass
     _warn_if_squeezed(fig, base)
     fig.savefig(base + ".png")
     fig.savefig(base + ".pdf")
@@ -398,6 +438,82 @@ def save(fig, base: str, repo: str | None = None) -> str:
 
 #: A data panel narrower than this (inches) is not a figure, it is a sliver.
 MIN_PANEL_IN = 1.05
+
+
+def fit_labels(fig, max_iter: int = 2, grow: float = 1.16) -> bool:
+    """Grow the figure until no axis label is cut off by the canvas edge. Returns True if it grew.
+
+    A rotated 11pt y-label is ~1.8in of text. Once the derived `figsize` makes a multi-column
+    panel shorter than that, the label overflows the figure and `savefig(bbox="tight")` does
+    NOT rescue it -- it ships truncated ("MSE(dlog|M|^2) in dec"). No fixed aspect can prevent
+    this in general, because label length is a property of the data, not the grid: at 3 columns
+    a panel is 1.47in wide and holding the aspect would need a taller-than-wide panel to fit an
+    unabbreviated label. So the aspect is the target, and this is the escape hatch when a
+    particular label will not fit -- it costs a small aspect deviation on those figures only,
+    which is much cheaper than an unreadable axis.
+    """
+    # An axis label taller than its own axes is clipped to the AXES box, not the figure, so it
+    # ships with its ends sliced off ("...in decad") even though it sits well inside the canvas
+    # and `bbox_inches="tight"` would have room for it. Turning clipping off on the labels is
+    # what actually fixes the truncation; growing the figure below only handles the rarer case
+    # where the label really does run past the canvas edge.
+    for ax in fig.axes:
+        for lbl in (ax.yaxis.label, ax.xaxis.label):
+            lbl.set_clip_on(False)
+
+    grew = False
+    for _ in range(max_iter):
+        fig.canvas.draw()
+        rend = fig.canvas.get_renderer()
+        h_px = fig.get_size_inches()[1] * fig.dpi
+        w_px = fig.get_size_inches()[0] * fig.dpi
+        over = False
+        for ax in fig.axes:
+            if ax.get_label() == "<colorbar>":
+                continue
+            axbb = ax.get_window_extent()
+            for lbl in (ax.yaxis.label, ax.xaxis.label):
+                if not lbl.get_text():
+                    continue
+                try:
+                    bb = lbl.get_window_extent(rend)
+                except Exception:
+                    continue
+                # Grow ONLY when a label is genuinely off the canvas. A label merely taller
+                # than its panel is fine once clipping is off (above) -- triggering on that
+                # ratio grew figures that did not need it, and each growth re-ran layout and
+                # pushed shared legends down onto the panels. Verified: 'median rel. error [%]'
+                # sits at 84% of its panel and renders complete.
+                if bb.y0 < -1.0 or bb.y1 > h_px + 1.0 or bb.x0 < -1.0 or bb.x1 > w_px + 1.0:
+                    over = True
+        if not over:
+            return grew
+        w, h = fig.get_size_inches()
+        fig.set_size_inches(w, h * grow, forward=True)
+        grew = True
+        # Re-lay out with whatever rect shared_legend reserved. A bare tight_layout() here
+        # drops that rect and redraws the legend on top of the panels -- which it did, on the
+        # flagship levers A/B among others.
+        rect = getattr(fig, "_ps_legend_rect", None)
+        engine = fig.get_layout_engine()
+        managed = engine is not None and engine.__class__.__name__ != "PlaceHolderLayoutEngine"
+        if not managed:
+            try:
+                fig.tight_layout(rect=rect) if rect else fig.tight_layout()
+            except Exception:
+                pass
+    return grew
+
+
+def check_panels(fig, name: str) -> None:
+    """Public squeeze check, for figures that do NOT exit through `save()`.
+
+    `save()` calls this for you. Multi-page producers write via `PdfPages.savefig` and so
+    never touch `save()` -- which is exactly how `phase1_scaling.pdf` shipped as five 0.6in
+    slivers while `rebuild_figures.sh` reported `ok` and `squeezed 0`. Call this immediately
+    before every `pdf.savefig(fig)`.
+    """
+    _warn_if_squeezed(fig, name)
 
 
 def _warn_if_squeezed(fig, base: str) -> None:
@@ -430,5 +546,32 @@ def _warn_if_squeezed(fig, base: str) -> None:
             print(f"  !! {os.path.basename(base)}: {len(bad)} panel(s) squeezed to "
                   f"{min(bad):.2f}in wide (want >= {MIN_PANEL_IN}in) -- see "
                   f"plot_style._warn_if_squeezed for the fixes")
+        # Width was not enough: a panel can be wide and still ship a y-label truncated off the
+        # top of the canvas, which passed as "ok" on four figures. Check the labels too.
+        rend = fig.canvas.get_renderer()
+        h_px = fig.get_size_inches()[1] * fig.dpi
+        w_px = fig.get_size_inches()[0] * fig.dpi
+        clipped = []
+        for ax in fig.axes:
+            # fit_labels never acts on a colourbar, so warning about one is unactionable --
+            # l2_bbb_sweep was reporting a fully-rendered colourbar label as cut off.
+            if ax.get_label() == "<colorbar>":
+                continue
+            for lbl in (ax.yaxis.label, ax.xaxis.label):
+                if not lbl.get_text():
+                    continue
+                try:
+                    bb = lbl.get_window_extent(rend)
+                except Exception:
+                    continue
+                if bb.y0 < -1.0 or bb.y1 > h_px + 1.0 or bb.x0 < -1.0 or bb.x1 > w_px + 1.0:
+                    clipped.append(lbl.get_text()[:40])
+        if clipped:
+            print(f"  !! {os.path.basename(base)}: axis label(s) cut off by the canvas: "
+                  f"{clipped[:3]} -- plot_style.fit_labels should have grown the figure")
+        # NOTE: there is deliberately no "label taller than its panel" warning here. Once
+        # fit_labels turns off label clipping, such a label renders in full ('median rel.
+        # error [%]' sits at 84% of its panel and is complete), so the check only produced
+        # false alarms -- and acting on it grew figures and pushed shared legends onto data.
     except Exception:
         pass

@@ -9,8 +9,12 @@ Left : fraction of oracle gain per arm, coloured by what the arm supplies.
 Right: the same gain against ranking quality rho, with the real sigma head's two contributions
        marked at its own rho -- the ordering it achieves is worth much less than its magnitude.
 
-Scored event-weighted, the metric under which the rank-vs-magnitude question was originally
-posed; Fig. q2_logflat is the companion showing that the log-flat metric reverses the ranking.
+Scored LOG-FLAT (mean of the per-y_min-decade MSEs), the metric Fig. q2_logflat establishes as
+the honest one. This matters for what the figure says: event-weighted, ordering alone recovers
+73% of the oracle gain and "magnitude dominates" is simply false; log-flat, the same arm
+recovers 11%, because the worst-fit decade after antenna training is the BULK and only a
+calibrated magnitude points there. The figure previously used the event-weighted numbers while
+its caption quoted the log-flat ones, so the panel contradicted the claim above it.
 CPU only.
 """
 import argparse
@@ -30,6 +34,7 @@ import q2_metrics as q2          # noqa: E402
 #: (tag, short tick name, family). The family sets the colour and is what the legend explains.
 BARS = [
     ("sigma",        r"$\sigma$ head",        "both"),
+    ("deg029",       r"degraded $\sigma$",     "both"),
     ("oracle",       r"oracle $|r|$",         "oracle"),
     ("rank_real",    r"order, $\sigma$",      "order"),
     ("rank_synth30", r"order, $\rho{=}0.30$", "order"),
@@ -49,6 +54,9 @@ FAMILY = {
 #: ordering, so the curve spans the whole reachable range rather than only the synthetic arms.
 CURVE = ["baseQ", "rank_synth30", "rank_synth46", "rank_synth70", "oracle"]
 
+#: Scored under the log-flat metric; see the module docstring for why not event-weighted.
+METRIC = "logflat"
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -66,7 +74,7 @@ def main():
     # --- left: gain by arm, coloured by what the arm supplies ------------------
     x = np.arange(len(BARS))
     for i, (t, _, fam) in enumerate(BARS):
-        axL.bar(i, G[t]["event"], 0.66, color=FAMILY[fam][0])
+        axL.bar(i, G[t][METRIC], 0.66, color=FAMILY[fam][0])
     axL.set_xticks(x)
     axL.set_xticklabels([nm for _, nm, _ in BARS], rotation=35, ha="right")
     axL.set_ylabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
@@ -82,11 +90,11 @@ def main():
 
     # --- right: gain vs ranking quality, magnitude held fixed ------------------
     xs = [q2.RHO[t] for t in CURVE]
-    ys = [G[t]["event"] for t in CURVE]
+    ys = [G[t][METRIC] for t in CURVE]
     axR.plot(xs, ys, "o-", color=ps.C.vermillion, label="order only, magnitude fixed")
-    axR.plot([q2.RHO["rank_real"]], [G["rank_real"]["event"]], "*", ms=13,
+    axR.plot([q2.RHO["rank_real"]], [G["rank_real"][METRIC]], "*", ms=13,
              color=ps.C.green, label=r"$\sigma$ head, order only")
-    axR.plot([q2.RHO["sigma"]], [G["sigma"]["event"]], "P", ms=10,
+    axR.plot([q2.RHO["sigma"]], [G["sigma"][METRIC]], "P", ms=10,
              color=ps.C.blue, label=r"$\sigma$ head, order and magnitude")
     axR.set_xlabel(r"ranking quality $\rho(\mathrm{score},|r|)$")
     axR.set_ylabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
@@ -95,7 +103,7 @@ def main():
     ps.save(fig, args.out_base)
 
     for t, nm, fam in BARS:
-        print(f"{nm:26s} {fam:8s} gain={100 * G[t]['event']:6.1f}%")
+        print(f"{nm:26s} {fam:8s} gain={100 * G[t][METRIC]:6.1f}%")
 
 
 if __name__ == "__main__":

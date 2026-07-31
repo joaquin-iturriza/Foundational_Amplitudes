@@ -77,7 +77,10 @@ def main():
     axR.set_xscale("log")
     axR.set_yscale("log")
     axR.set_xlabel(r"$y_{\min}$")
-    axR.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$ in decade")
+    # "in decade" dropped: the x-axis is y_min and the caption says the binning is per decade,
+    # so it was redundant -- and it made the label 87% of the panel height, where savefig's
+    # tight bbox sliced the last glyph off ("...in decad").
+    axR.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
     axR.legend(loc="upper left")
 
     ps.save(fig, args.out_base)

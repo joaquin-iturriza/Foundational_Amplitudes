@@ -64,16 +64,22 @@ def profile(x, sigma, err2, edges, min_n=40):
 
 
 def panel(ax, x, sigma_log, rmse, xlabel, process):
-    ax.plot(x, sigma_log, "o-", color=SIG_C, label=r"learned $\sigma$")
-    ax.plot(x, rmse, "s--", color=ERR_C, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
+    # ms=3, not the 5pt default: at three panels across \textwidth each is ~1.5in wide, where
+    # default markers merge into a band and hide the curve they are meant to mark.
+    ax.plot(x, sigma_log, "o-", color=SIG_C, ms=3, label=r"learned $\sigma$")
+    ax.plot(x, rmse, "s--", color=ERR_C, ms=3, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(r"$\log|\mathcal{M}|^2$ units")
+    ax.set_ylabel(r"$\log|\mathcal{M}|^2$")
     ps.process_label(ax, process, loc="upper right")
     return ax
 
 
-fig, axes = ps.figure(ncols=2, nrows=2)
+# TWO figures, not one 2x2. Panel (d) is a different quantity on a different x-axis, so it was
+# only ever sharing a canvas with (a)-(c), not a story: as a 2x2 it left every panel small with
+# a band of white space, and (d)'s seven-entry legend covered half its own panel. results.tex
+# includes them as separate figures.
+fig, axes = ps.figure(ncols=3, sharey=True)
 
 # ---------------------------------------------------------------- (a) uug: the Z resonance
 d = load("heldout_eval_uug_base_s0")
@@ -81,20 +87,20 @@ A = AMP_STD["uug"]
 dist = np.abs(d["sqrt_s"] - MZ)                      # distance from the pole = the divergence variable
 edges = np.logspace(np.log10(0.02), np.log10(900.0), 22)
 x, s, r = profile(dist, d["sigma"] * A, d["err2"], edges)
-panel(axes[0, 0], x, s, r, r"$|\sqrt{s}-M_Z|$  [GeV]", r"$e^+e^-\to u\bar u g$")
+panel(axes[0], x, s, r, r"$|\sqrt{s}-M_Z|$  [GeV]", r"$e^+e^-\to u\bar u g$")
 
 # ---------------------------------------------------------------- (b) uugg: concentrated IR
 d = load("heldout_eval_base_s0")
 A = AMP_STD["uugg"]
 edges = np.logspace(-7.2, 0.0, 18)
 x, s, r = profile(d["y"], d["sigma"] * A, d["err2"], edges)
-panel(axes[0, 1], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u gg$")
+panel(axes[1], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u gg$")
 
 # ---------------------------------------------------------------- (c) uuggg: diffuse IR
 d = load("heldout_eval_uuggg_base_s0")
 A = AMP_STD["uuggg"]
 x, s, r = profile(d["y"], d["sigma"] * A, d["err2"], edges)
-panel(axes[1, 0], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u ggg$")
+panel(axes[2], x, s, r, r"$y_{\min}=\min_{ij} s_{ij}/s$", r"$e^+e^-\to u\bar u ggg$")
 
 # ---------------------------------------------------------------- (d) the pre-flight diagnostic
 # sigma-contrast measured on the BASE arm (singular region vs bulk) against the sigma-arm/base MSE
@@ -115,9 +121,17 @@ POINTS = [
     (r"$u\bar u ggg$" + "\n(deep IR)", "heldout_eval_uuggg_base_s0", "heldout_eval_uuggg_g10_s0",
      lambda x: x < 1e-6, lambda x: x > 1e-2, "y", r"$\gamma{=}10$"),
 ]
-axes[0, 0].legend(loc="lower left")
+# Both series appear in all three panels, and neither label fits inside a 1.5in panel.
+# sharey also buys back the width two extra sets of y tick labels were costing, and puts the
+# three processes on one scale so the sigma/RMSE gap is comparable across them.
+for _a in axes[1:]:
+    _a.set_ylabel("")
+ps.shared_legend(fig, axes[0], ncol=2)
+base = os.path.join(HERE, "figs", "l2_sigma_vs_divergence")
+ps.save(fig, base)
 
-ax = axes[1, 1]
+# ---- second figure: the pre-flight diagnostic -------------------------------------------
+fig2, ax = ps.figure()
 cs, gs = [], []
 MARKS = ["o", "s", "D"]
 COLS = [ps.C.blue, ps.C.vermillion, ps.C.green]
@@ -130,9 +144,10 @@ for (name, bt, st, rf, bf, coord, glab), mk, col in zip(POINTS, MARKS, COLS):
 ax.plot(cs, gs, "-", color=ps.C.grey, lw=1.0, zorder=2)
 ax.axhline(1.0, color=ps.C.grey, ls="--", label="parity")
 ax.set_xlabel(r"$\langle\sigma\rangle_{\rm singular}\,/\,\langle\sigma\rangle_{\rm bulk}$")
-ax.set_ylabel(r"MSE ratio in that region")
+ax.set_ylabel(r"$\mathrm{MSE}_{\sigma}\,/\,\mathrm{MSE}_{\rm base}$ in that region")
 ax.set_xlim(1.1, 5.0); ax.set_ylim(0.30, 1.15)
-ax.legend(loc="center right")
+# Lower left is the free corner: the points fall left-to-right and the parity line sits at
+# the top. In the old 2x2 this legend sat at center right, across its own data.
+ax.legend(loc="lower left")
 
-base = os.path.join(HERE, "figs", "l2_sigma_vs_divergence")
-ps.save(fig, base)
+ps.save(fig2, os.path.join(HERE, "figs", "l2_sigma_preflight"))

@@ -541,7 +541,7 @@ def main():
 
         def _draw_scaling(ax, d_key, p1_cells, ext_by_nh, c_star_d,
                           show_all_trials, x_axis="compute",
-                          actual_hours=None):
+                          actual_hours=None, label_mode="full"):
             """
             Plot val_loss vs compute (MACs) or vs wall time (GPU-hours).
             actual_hours: {(nh, c_macs): mean_hours} — uses measured times when
@@ -594,20 +594,29 @@ def main():
                 fit_x   = np.logspace(math.log10(min(x_vals)), math.log10(max(x_vals)), 200)
                 fit_y   = None
 
+                # Legend labels stay SHORT. The full fit line
+                # ("nh=16 alpha=0.936 L_inf=1.45e-04 chi2=192.16") is ~3in of text at 11pt,
+                # several times wider than a panel on a multi-column page, and both
+                # tight_layout and constrained_layout shrink the axes to accommodate an
+                # in-axes legend -- which is how this figure ended up as five slivers. The
+                # floor and chi2 are fit diagnostics: they go to stdout, not the legend.
                 if len(c_sorted) >= 4:   # need dof > 0 for 3-param fit
                     fr = fit_power_law_with_floor(x_vals, y_vals)
                     if fr is not None:
                         A_f, alpha_f, l_inf_f, chi2r_f = fr
-                        label  = (rf"nh={nh}  $\alpha$={alpha_f:.3f}  "
-                                  rf"$L_\infty$={l_inf_f:.2e}  $\tilde{{\chi}}^2$={chi2r_f:.2f}")
+                        label  = (rf"$n_h$={nh}" if label_mode == "series"
+                                  else rf"$n_h$={nh}, $\alpha$={alpha_f:.2f}")
                         fit_y  = A_f * fit_x ** (-alpha_f) + l_inf_f
-                        if l_inf_f > 0:
-                            ax.axhline(l_inf_f, color=style["color"], linestyle=":", alpha=0.35, zorder=1)
+                        print(f"      [fit] D={d_key} nh={nh}: alpha={alpha_f:.3f} "
+                              f"L_inf={l_inf_f:.3e} chi2r={chi2r_f:.2f}")
 
                 if fit_y is None and len(c_sorted) >= 2:
                     A_p, alpha_p, chi2r_p = fit_power_law_pure(x_vals, y_vals)
-                    label  = rf"nh={nh}  $\alpha$={alpha_p:.3f}  $\tilde{{\chi}}^2$={chi2r_p:.2f}"
+                    label  = (rf"$n_h$={nh}" if label_mode == "series"
+                              else rf"$n_h$={nh}, $\alpha$={alpha_p:.2f}")
                     fit_y  = A_p * fit_x ** (-alpha_p)
+                    print(f"      [fit] D={d_key} nh={nh}: alpha={alpha_p:.3f} "
+                          f"chi2r={chi2r_p:.2f} (no floor)")
 
                 if fit_y is not None:
                     ax.plot(fit_x, fit_y, color=style["color"], linestyle="-", alpha=0.7, zorder=3)
@@ -643,15 +652,28 @@ def main():
         plot_path = os.path.join(SWEEP_BASE, "phase1_scaling.pdf")
         with PdfPages(plot_path) as pdf:
             # ── Page 1: overview — one panel per D, compute x-axis ──────────
-            n_cols = len(data_by_d)
+            # One panel per D. Laid out as a GRID, not a single row: five panels across
+            # \textwidth leaves each ~0.6in wide whatever the font size, which is what this
+            # page used to render as. At 3 columns they are ~1.5in, the practical maximum.
             import plot_style as ps
-            fig, axes = ps.figure(ncols=n_cols, squeeze=False)
-            for ax, (d_key, series) in zip(axes[0], data_by_d.items()):
+            n_d = len(data_by_d)
+            n_cols = min(3, n_d)
+            n_rows = -(-n_d // n_cols)      # ceil; a local `import math` here shadows the
+                                            # module-level one used earlier in this function
+            fig, axes = ps.figure(ncols=n_cols, nrows=n_rows, squeeze=False)
+            flat = [a for row in axes for a in row]
+            for ax, (d_key, series) in zip(flat, data_by_d.items()):
                 _draw_scaling(ax, d_key, series["p1"], series["ext_by_nh"],
-                              c_star.get(d_key), show_all_trials=False, x_axis="compute")
+                              c_star.get(d_key), show_all_trials=False, x_axis="compute",
+                              label_mode="series")
                 ps.process_label(ax, f"$D={d_key}$", loc="upper right")
-                ax.legend()
-            fig.tight_layout()
+            for ax in flat[n_d:]:
+                ax.axis("off")                       # unused cells of the last row
+            # One legend for the whole page: every panel draws the same n_h series, and a
+            # per-panel legend does not fit in a 1.5in panel. Per-D fitted alphas are on the
+            # detail pages that follow.
+            ps.shared_legend(fig, flat[0], ncol=min(4, n_d))
+            ps.check_panels(fig, "phase1_scaling p1")
             pdf.savefig(fig, dpi=150)
             plt.close(fig)
 
@@ -676,26 +698,20 @@ def main():
                 }
                 actual_hours.update(series.get("ext_actual_hours", {}))
                 _draw_scaling(ax_c, d_key, p1_cells, ext_by_nh, c_star.get(d_key),
-                              show_all_trials=True, x_axis="compute")
+                              show_all_trials=True, x_axis="compute", label_mode="full")
                 _draw_scaling(ax_w, d_key, p1_cells, ext_by_nh, c_star.get(d_key),
                               show_all_trials=True, x_axis="wall_time",
-                              actual_hours=actual_hours)
-
-                # Annotate n_done on the compute panel
-                _nh16_merged = dict(p1_cells)
-                for _c, _v in ext_by_nh.get(16, {}).items():
-                    _nh16_merged[_c] = sorted(_nh16_merged.get(_c, []) + _v)
-                for nh, cells in [(16, _nh16_merged)] + [(nh, c) for nh, c in ext_by_nh.items() if nh != 16]:
-                    color = _nh_style(nh)["color"]
-                    for c in sorted(cells):
-                        pass  # per-marker n= labels removed: clutter, and the axis carries it
+                              actual_hours=actual_hours, label_mode="full")
 
                 # What the panels are, and that faint dots are individual trials, belongs in
                 # the results.tex caption; the panel keeps only its D label.
-                ps.process_label(ax_c, f"$D={d_key}$", loc="upper right")
-                ax_c.legend()
-                ax_w.legend()
+                # Lower left: these curves fall left-to-right, so the free corners are
+                # lower-left and upper-right, and the legend already owns upper-right.
+                ps.process_label(ax_c, f"$D={d_key}$", loc="lower left")
+                ax_c.legend(loc="upper right")
+                ax_w.legend(loc="upper right")
                 fig.tight_layout()
+                ps.check_panels(fig, f"phase1_scaling D={d_key}")
                 pdf.savefig(fig, dpi=150)
                 plt.close(fig)
 
