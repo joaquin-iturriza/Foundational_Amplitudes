@@ -454,7 +454,7 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{hpo_optima_summary.pdf}
+  \includegraphics{hpo_optima_summary.pdf}
   \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
   $\mu$P transfers) and vs batch (entangled with horizon; do not read as causal) on the top
   row; vs horizon (the inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with
@@ -466,7 +466,7 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{lr_vs_iterations_by_regime.pdf}
+  \includegraphics{lr_vs_iterations_by_regime.pdf}
   \caption{\textbf{The inverted-$U$ law.} Geometric-mean best $\eta$ per exact horizon
   $t$, pooled (left) and split by regime (right): $\eta^\ast$ rises as $\sim t^{+0.5}$ up to
   $\tstar\approx3$k steps, then falls as $\sim t^{-0.55}$.}
@@ -475,7 +475,7 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{lr_2d_disentangled.pdf}
+  \includegraphics{lr_2d_disentangled.pdf}
   \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
   $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
   $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
@@ -573,7 +573,7 @@ off-shellness conditioning is on by default in the big-run recipes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{levers_offshell_ab.pdf}
+  \includegraphics{levers_offshell_ab.pdf}
   \caption{\textbf{Flagship off-shellness A/B} over the $44$-dataset $Z$/top/Higgs mixture (full
   data, fiducial cuts, 30k iterations); $\vlnr$ per dataset at each arm's best checkpoint.
   \emph{Left:} the
@@ -601,7 +601,7 @@ law is the \textbf{floor-aware} power law
 with an irreducible loss $L_\infty$; the bare power law $L\approx A\,C^{-\alpha_C}$ is only ever a
 diagnostic in the regime far above the floor. We report $\alpha_C$ as the local exponent over the
 sampled compute range (Fig.~\ref{fig:phase1scaling} shows the phase-1 joint-pretraining learning
-curves at each per-process dataset size $D$, and Figs.~\ref{fig:phase1detailA}--\ref{fig:phase1detailB} resolve every trial and per-width envelope fit within each $D$). A virtual/Born \emph{ratio} target was also tried as a learning
+curves at each pretraining pool size $D$, and Figs.~\ref{fig:phase1detailA}--\ref{fig:phase1detailB} resolve every trial and per-width envelope fit within each $D$). A virtual/Born \emph{ratio} target was also tried as a learning
 objective; it does not scale meaningfully and is excluded from what follows.
 
 \begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
@@ -616,8 +616,9 @@ Moreover $\alpha_C$ is \textbf{width-independent}: overlaying the $\nh\in\{4,8,1
 each data size $D$, they share a slope, so width does not change the compute-scaling exponent,
 consistent with $\mu$P and meaning there is no separate loss-vs-parameters power law; width enters
 only through $C$. The compute-optimal (plateau) budget $C^\ast(D)$ where Eq.~\eqref{eq:scaling}
-flattens rises only $\sim5\times$ over a $100\times$ range in per-process data, saturating near
-$1.1\times10^{17}$ FLOP by $D\gtrsim3\times10^{4}$.
+flattens rises only $\sim5\times$ over a $100\times$ range in pool size, saturating near
+$1.1\times10^{17}$ FLOP by $D\gtrsim3\times10^{4}$ (i.e.\ $\sim4\times10^{3}$ events per
+process).
 
 \begin{table}[H]
 \centering
@@ -642,21 +643,22 @@ $ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[p]
   \centering
-  \includegraphics[width=\textwidth]{phase1_scaling.pdf}
-  \caption{\textbf{Phase-1 compute scaling of the joint pretraining} ($n_\mathrm{heads}=16$).
-  Best held-out loss vs.\ training compute, one panel per per-process dataset size $D$, with the
-  bare power law (dashed) and the floor-aware law Eq.~\eqref{eq:scaling} (solid) overlaid; the
-  dotted vertical line marks the largest sampled compute $C^\ast$.}
+  \includegraphics{phase1_scaling.pdf}
+  \caption{\textbf{Phase-1 compute scaling of the joint pretraining.} Best held-out loss vs.\
+  training compute, one panel per pretraining pool size $D$ (\emph{total} across the eight
+  processes, as above: $D=10^5$ is $1.25\times10^{4}$ events per process). All four widths
+  $\nh\in\{4,8,16,32\}$, with Eq.~\eqref{eq:scaling} fitted per width; \code{analyze\_pretraining\_scaling.py}
+  prints $\alpha_C$, $L_\infty$ and $\tilde\chi^2$ per cell.}
   \label{fig:phase1scaling}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,page=2]{phase1_scaling.pdf}\\
-  \includegraphics[width=\textwidth,page=3]{phase1_scaling.pdf}\\
-  \includegraphics[width=\textwidth,page=4]{phase1_scaling.pdf}
+  \includegraphics[page=2]{phase1_scaling.pdf}\\
+  \includegraphics[page=3]{phase1_scaling.pdf}\\
+  \includegraphics[page=4]{phase1_scaling.pdf}
   \caption{\textbf{Phase-1 per-$D$ detail: $D=10^3$, $10^{3.5}$, $10^4$} (top to bottom). All
   trials (light dots) and per-width envelope fits, vs.\ FLOPs (left) and actual GPU-hours (right),
   for $n_\mathrm{heads}\in\{4,8,16,32\}$.}
@@ -665,8 +667,8 @@ $ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,page=5]{phase1_scaling.pdf}\\
-  \includegraphics[width=\textwidth,page=6]{phase1_scaling.pdf}
+  \includegraphics[page=5]{phase1_scaling.pdf}\\
+  \includegraphics[page=6]{phase1_scaling.pdf}
   \caption{\textbf{Phase-1 per-$D$ detail (cont.): $D=10^{4.5}$, $10^5$} (top to bottom). Same
   layout as Fig.~\ref{fig:phase1detailA}.}
   \label{fig:phase1detailB}
@@ -674,7 +676,7 @@ $ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{alpha_vs_multiplicity_overlay.pdf}
+  \includegraphics{alpha_vs_multiplicity_overlay.pdf}
   \caption{\textbf{Compute-scaling exponent vs.\ final-state multiplicity.} Fitted $\alpha_C$
   per process family (dots, dotted lines; one colour per family) against the theoretical lower
   bound $\alpha=4/\mathrm{DOF}$ (grey wedge). $2\!\to\!2$ targets sit near the bound; higher
@@ -738,12 +740,11 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[p]
   \centering
-  \includegraphics[width=\textwidth]{compute_scan_eeuu_wt.pdf}\\[2ex]
-  \includegraphics[width=\textwidth]{compute_scan_eettbar_wt.pdf}
-  \caption{\textbf{Transfer: the compute scan.} Fair log-space test MSE vs.\ fine-tune wall-time
-  on $ee\,u\bar u$ (left) and $ee\,t\bar t$ (right) NLO-virtual, one panel per target dataset
+  \includegraphics{compute_scan_eeuu_wt.pdf}
+  \caption{\textbf{Transfer: the compute scan on $ee\,u\bar u$.} Fair log-space test MSE vs.\
+  fine-tune wall-time on $ee\,u\bar u$ NLO-virtual, one panel per target dataset
   size $D\in\{10^3,10^4,10^5,10^6\}$: from-scratch vs.\ fine-tuning from the 8- and 25-process
   foundations, and from the leak-free $416$-process big-run pretrains (raw pt25-era encoding vs.\
   the adopted feature set) plus the LO-only $352$-process variant. The $416$-set curves
@@ -755,9 +756,17 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
   \label{fig:transfer}
 \end{figure}
 
+\begin{figure}[p]
+  \centering
+  \includegraphics{compute_scan_eettbar_wt.pdf}
+  \caption{\textbf{Transfer: the compute scan on $ee\,t\bar t$.} As
+  Fig.~\ref{fig:transfer}, for the $ee\,t\bar t$ NLO-virtual target.}
+  \label{fig:transfer_ttbar}
+\end{figure}
+
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{finetune_methods_comparison_walltime.pdf}
+  \includegraphics{finetune_methods_comparison_walltime.pdf}
   \caption{\textbf{Fine-tune methods in wall-time.} The five fine-tune methods; full layer-decay
   reaches a given loss soonest.}
   \label{fig:ftmethods_wt}
@@ -765,7 +774,7 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{finetune_methods_comparison.pdf}
+  \includegraphics{finetune_methods_comparison.pdf}
   \caption{\textbf{Fine-tune methods vs.\ compute.} Held-out loss vs.\ training compute for full
   layer-decay, reset-head, freeze, EWC, and LoRA; full layer-decay is lowest at every intermediate
   budget, the methods converging only near the shared floor.}
@@ -1090,7 +1099,7 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{phase_space_pretrain_aa.pdf}
+  \includegraphics{phase_space_pretrain_aa.pdf}
   \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning.}
   $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$: truth, model,
   error (top); $\sqrt{s}$/$\cos\theta^*$ projections and predicted-vs-true (middle); and
@@ -1169,7 +1178,7 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{ir_pretrain_uug_dalitz.pdf}
+  \includegraphics{ir_pretrain_uug_dalitz.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. Panels:
   analytic LO $C_F$-antenna, truth, model, absolute error. The collinear poles lie on the
   $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$ corner; white
@@ -1195,7 +1204,7 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{ir_pretrain_uug_collinear.pdf}
+  \includegraphics{ir_pretrain_uug_collinear.pdf}
   \caption{\textbf{Pure collinear ramp, $e^+e^-\to u\bar u g$.} $\log|\mathcal{M}|^2$ vs the
   $\bar q g$ collinear invariant $1-x_q=(p_{\bar q}+p_g)^2/s$, in three bands of fixed hard
   gluon energy $x_g$ (soft pole switched off). Left: truth (faint bands) and model
@@ -1207,7 +1216,7 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{ir_pretrain_uugg.pdf}
+  \includegraphics{ir_pretrain_uugg.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process.} $\log|\mathcal{M}|^2$ vs
   the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom, with the
   analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$ overlaid) are tracked into the
@@ -1291,7 +1300,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{addback_curve.pdf}
+  \includegraphics{addback_curve.pdf}
   \caption{\textbf{Add-back curve, $e^+e^-\to u\bar u g$.} Held-out
   divergence-region ($y_{\min}<c$) error vs the add-back fraction $f$ (leftmost tick
   $f\!=\!0$ is pure extrapolation). Left: MSE and MAE $\Delta\log|\mathcal{M}|^2$ over
@@ -1303,7 +1312,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{heldout_resid_f000.pdf}
+  \includegraphics{heldout_resid_f000.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region}, in the IR plane of
   Eq.~\eqref{eq:ir}. The model mean (red) plateaus \emph{off} the IR ramp (bottom-left),
   while truth (black) lies on the analytic $1/y_{\min}$ slope (green); predictions
@@ -1315,7 +1324,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{heldout_resid_f100.pdf}
+  \includegraphics{heldout_resid_f100.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region.} With the
   divergent region back in the training support the IR ramp (analytic $1/y_{\min}$ slope,
   green) is tracked into the deep IR by both truth and model, the predicted-vs-true ceiling
@@ -1353,7 +1362,7 @@ total, extrapolation failure.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{addback_curve_uugg.pdf}
+  \includegraphics{addback_curve_uugg.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$ add-back curve} (hardest process, same base22).
   Left: held-out deep-IR ($y_{\min}<c$) MSE/MAE vs add-back fraction $f$; right: MSE split
   by $y_{\min}$ sub-bin. The divergence is data-recoverable ($0.22\to0.024$) but recovery is
@@ -1378,7 +1387,7 @@ richer (the full $P_{qq}(z)$), hence slower to pin down.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{soft_vs_coll_addback.pdf}
+  \includegraphics{soft_vs_coll_addback.pdf}
   \caption{\textbf{Soft vs collinear extrapolation, $e^+e^-\to u\bar u g$.} Held-out-region
   MSE vs add-back fraction for the pure-soft ($x_g<c$) and pure-collinear ($y_{\min}<c$ at
   hard $x_g$) cuts. Collinear is easier to extrapolate into ($f{=}0$), but soft recovers
@@ -1451,7 +1460,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{deep_sampling_uniform_vs_antenna.pdf}
+  \includegraphics{deep_sampling_uniform_vs_antenna.pdf}
   \caption{\textbf{Antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
   for the production flat-\textsc{rambo} set vs the antenna sampler, same base22 / $400$k events /
   $4000$ steps. Flat \textsc{rambo} starves the deep IR by construction (median
@@ -1464,7 +1473,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{deep_sampling_fraction_sweep.pdf}
+  \includegraphics{deep_sampling_fraction_sweep.pdf}
   \caption{\textbf{The antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
   the antenna fraction $f$. Both endpoints are bad: $f{=}0$ (pure \textsc{rambo}) is catastrophic
   ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
@@ -1574,7 +1583,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{q2_logflat.pdf}
+  \includegraphics{q2_logflat.pdf}
   \caption{\textbf{The metric must weight each $y_{\min}$ decade equally.} $\sigma$-reweighting gain
   under the log-flat-per-decade metric. The antenna test set is $\sim\!50\%$ below
   $y_{\min}\!=\!10^{-3}$, so a plain event-weighted \code{mean}$(d^2)$ is deep-IR-dominated and
@@ -1586,7 +1595,7 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{q2_rankmag.pdf}
+  \includegraphics{q2_rankmag.pdf}
   \caption{\textbf{Magnitude dominates ranking (a controlled rank-vs-magnitude split).} The same
   weight multiset $\Phi=\mathrm{sort}|r|$ reassigned by different orderings, so ordering and magnitude
   are varied independently. Ordering \emph{alone} recovers only $11\%$ of the oracle gain: after antenna
@@ -1646,7 +1655,7 @@ $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{eeuu_flatlogm_resonance.pdf}
+  \includegraphics{eeuu_flatlogm_resonance.pdf}
   \caption{\textbf{Coverage on the $ee\to u\bar u$ $Z$ resonance: generation, not resampling.} Held-out MSE
   binned in $\sqrt s$ for three training densities scored on the same test set: raw \textsc{rambo}, a
   flat-$\log|\mathcal M|^2$ set obtained by \emph{resampling} the fixed $10^6$ \textsc{rambo} pool, and
@@ -1681,7 +1690,7 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{eeuu_genmix_fraction_sweep.pdf}
+  \includegraphics{eeuu_genmix_fraction_sweep.pdf}
   \caption{\textbf{The generated fraction sweep on the $Z$ resonance: a clean interior optimum.}
   $f$ is the fraction of freshly \emph{generated} flat-$\log|\mathcal M|^2$ events (rest
   uniform-$\sqrt s$); same base22/HPs/$N{=}400$k throughout.
@@ -1839,7 +1848,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uugg_perdecade.pdf}
+  \includegraphics{l2_uugg_perdecade.pdf}
   \caption{\textbf{Steering on $e^+e^-\to u\bar u gg$: $\sigma$-driven generation vs uniform ($\gamma{=}1$,
   $3$ seeds).} Held-out deep-IR MSE per $y_{\min}$ decade. Both arms train the \emph{identical}
   HETEROSC net with a detached $\sigma$ backbone at $\beta{=}1$ (so $\mu$ trains exactly as MSE in
@@ -1852,7 +1861,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uugg_gamma.pdf}
+  \includegraphics{l2_uugg_gamma.pdf}
   \caption{\textbf{The concentration exponent $\gamma$ traverses a water-filling trade-off.} Per-decade
   $\sigma$/base ratio and the deep-vs-bulk split against $\gamma\in\{1,2,3,5,10\}$. The deepest decade
   ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,70,66,62,55\%$) while the
@@ -1866,7 +1875,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uugg_perdecade_abs.pdf}
+  \includegraphics{l2_uugg_perdecade_abs.pdf}
   \caption{\textbf{Absolute per-decade MSE for all $\gamma$.} The same runs as
   Fig.~\ref{fig:l2_uugg_gamma} on an absolute scale rather than as a ratio to base, so the size of each
   decade's error is visible alongside the relative gain: the deep decades carry MSE orders of
@@ -1909,7 +1918,7 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_gamma_response_extended.pdf}
+  \includegraphics{l2_gamma_response_extended.pdf}
   \caption{\textbf{Pushing the concentration exponent: saturation vs reversal.} $\sigma$-arm/base MSE
   ratio against $\gamma$ (seed 0), by $y_{\min}$ band. \emph{Left, $u\bar u gg$ (concentrated):} the
   deepest decade improves steeply to $\gamma\!\approx\!10$ then \textbf{saturates} ($0.53\to0.51$ over
@@ -1923,7 +1932,7 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uug_multiscale.pdf}
+  \includegraphics{l2_uug_multiscale.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u g$: the multi-scale test (Z-resonance \emph{and} IR).} Left:
   held-out MSE per $y_{\min}$ decade for base (uniform) vs $\sigma$-driven generation at
   $\gamma{=}1,3$. Right: the same error split by $\sqrt s$ region. The difficulty lives almost
@@ -1936,7 +1945,7 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uuggg_perdecade.pdf}
+  \includegraphics{l2_uuggg_perdecade.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u ggg$: more legs, a \emph{diffuse} divergence.} Held-out MSE per
   $y_{\min}$ decade, base vs $\sigma$-driven at $\gamma{=}1,3$: the three curves lie on top of each
   other. With three gluons every decade is comparably hard, so there is no thin sparse region for
@@ -1981,7 +1990,7 @@ a $3$-seed repeat would firm the numbers, but the sign and the region-ordering a
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_bbbarg.pdf}
+  \includegraphics{l2_bbbarg.pdf}
   \caption{\textbf{$e^+e^-\to b\bar b g$ (massive): $\sigma$-steering pays where the $\sigma$-contrast
   predicted.} \emph{(a)} Held-out MSE per $y_{\min}$ decade (mass-correct $y_{\min}=\min_{ij}2p_i\!\cdot\!
   p_j/s$), base vs $\sigma$-driven $\gamma{=}3$. \emph{(b)} The same error by $\sqrt s$ region, with the
@@ -2038,7 +2047,7 @@ and gives the concentration principle a directly measurable order parameter.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_sigma_vs_divergence.pdf}
+  \includegraphics{l2_sigma_vs_divergence.pdf}
   \caption{\textbf{The learned $\sigma$ rises inside the divergence.} Mean $\sigma$ and actual RMSE
   against the coordinate defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical
   gap is the calibration) and on a shared scale, all on the base/uniform arm. $u\bar u g$: $\sigma$
@@ -2050,7 +2059,7 @@ and gives the concentration principle a directly measurable order parameter.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_sigma_preflight.pdf}
+  \includegraphics{l2_sigma_preflight.pdf}
   \caption{\textbf{How sharply $\sigma$ rises predicts whether $\sigma$-steering pays.} The
   $\sigma$-contrast $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$, measured on
   the base arm alone, against the $\sigma$-arm/base MSE ratio actually measured in that region, for the
@@ -2105,7 +2114,7 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_uugg_bbb_vs_het.pdf}
+  \includegraphics{l2_uugg_bbb_vs_het.pdf}
   \caption{\textbf{Epistemic (BBB) vs the het-head $\sigma$ on $e^+e^-\to u\bar u gg$.} Held-out MSE per
   $y_{\min}$ decade. The full-network Bayes-by-backprop arm sits \emph{above} both the het-head
   $\sigma^\gamma$ and the uniform baseline across essentially every decade: training under sampled
@@ -2116,7 +2125,7 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_bbb_sweep.pdf}
+  \includegraphics{l2_bbb_sweep.pdf}
   \caption{\textbf{The fair BBB HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
   the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
   coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
@@ -2163,7 +2172,7 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_poly_keep.pdf}
+  \includegraphics{l2_poly_keep.pdf}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
   nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
@@ -2213,7 +2222,7 @@ generating and grow the model or the horizon.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{l2_saturation.pdf}
+  \includegraphics{l2_saturation.pdf}
   \caption{\textbf{At a fixed optimizer budget the uncertainty tail floors regardless of data volume.}
   \emph{(a)} $\sigma$-$p99$ over the fresh proposal batch vs pool size, for three data budgets on
   $u\bar u gg$. The curves do not collapse on pool (a larger budget has taken fewer optimizer steps by
