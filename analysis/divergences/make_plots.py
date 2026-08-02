@@ -196,7 +196,6 @@ def make_figure(npz, process_label, out_base, split="all"):
     axce.set_ylabel(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
     axce.set_ylim(bottom=0)
 
-    fig._ps_layout_done = True      # GridSpec + colourbars own the layout
     ps.save(fig, out_base)
     plt.close(fig)
     print(f"wrote {out_base}.png / .pdf  (N={n}, MSEΔ={mse:.3g}, MAEΔ={mae:.3g})")

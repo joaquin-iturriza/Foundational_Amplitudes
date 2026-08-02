@@ -470,6 +470,9 @@ def main():
     datasets = sorted({ds for _, best, _ in methods for ds in best if _keep_ds(ds)})
     if not datasets:
         sys.exit("No datasets with results across the given sweeps.")
+    # absolute: ps.save resolves a RELATIVE base against the repo root, so the default
+    # --out-dir "." would silently write to the top of the tree instead of the cwd.
+    args.out_dir = os.path.abspath(args.out_dir)
     os.makedirs(args.out_dir, exist_ok=True)
 
     # alpha summary table

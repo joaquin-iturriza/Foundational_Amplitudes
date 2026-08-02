@@ -61,7 +61,6 @@ def surface(x, y, tl, pl, xlabel, ylabel, process, out_base,
     fig.legend([Line2D([0], [0], color=ps.C.vermillion, lw=1.5)],
                ["model prediction"], loc="upper right", frameon=False)
     fig.text(0.02, 0.96, process, ha="left", va="top")
-    fig._ps_layout_done = True          # 3-D axes + colourbar: tight_layout would wreck it
     ps.save(fig, out_base)
     plt.close(fig)
     print(f"  RMSD={rms:.3g}")

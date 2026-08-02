@@ -64,10 +64,10 @@ def profile(x, sigma, err2, edges, min_n=40):
 
 
 def panel(ax, x, sigma_log, rmse, xlabel, process):
-    # ms=3, not the 5pt default: at three panels across \textwidth each is ~1.5in wide, where
+    # (marker size left at the shared default; the ms=3 here was a workaround for 1.5in
     # default markers merge into a band and hide the curve they are meant to mark.
-    ax.plot(x, sigma_log, "o-", color=SIG_C, ms=3, label=r"learned $\sigma$")
-    ax.plot(x, rmse, "s--", color=ERR_C, ms=3, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
+    ax.plot(x, sigma_log, "o-", color=SIG_C, label=r"learned $\sigma$")
+    ax.plot(x, rmse, "s--", color=ERR_C, label=r"RMSE$(\Delta\log|\mathcal{M}|^2)$")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(r"$\log|\mathcal{M}|^2$ units")
@@ -79,7 +79,11 @@ def panel(ax, x, sigma_log, rmse, xlabel, process):
 # only ever sharing a canvas with (a)-(c), not a story: as a 2x2 it left every panel small with
 # a band of white space, and (d)'s seven-entry legend covered half its own panel. results.tex
 # includes them as separate figures.
-fig, axes = ps.figure(ncols=3, sharey=True)
+# 2x2 with the fourth cell blank, not 1x3: three columns cannot hold the standard 2.40in
+# plot box at \textwidth (measured 8.19in), and the plot box is not negotiable.
+fig, axg = ps.figure(ncols=2, nrows=2, sharey=True, squeeze=False)
+axes = [axg[0][0], axg[0][1], axg[1][0]]
+axg[1][1].axis("off")
 
 # ---------------------------------------------------------------- (a) uug: the Z resonance
 d = load("heldout_eval_uug_base_s0")
@@ -124,8 +128,9 @@ POINTS = [
 # Both series appear in all three panels, and neither label fits inside a 1.5in panel.
 # sharey also buys back the width two extra sets of y tick labels were costing, and puts the
 # three processes on one scale so the sigma/RMSE gap is comparable across them.
-for _a in axes[1:]:
-    _a.set_ylabel("")
+# Column 1 shares the y-axis with column 0, so only the right-hand panel drops its label;
+# the bottom-left panel starts a new row and keeps it.
+axes[1].set_ylabel("")
 ps.shared_legend(fig, axes[0], ncol=2)
 base = os.path.join(HERE, "figs", "l2_sigma_vs_divergence")
 ps.save(fig, base)

@@ -72,7 +72,6 @@ def make(npz, label, out_base, nb=40):
     fig.legend([Line2D([0], [0], color=ps.C.vermillion, lw=1.5)], ["model prediction"],
                loc="upper right", frameon=False)
     fig.text(0.02, 0.96, label, ha="left", va="top")
-    fig._ps_layout_done = True      # 3-D axes + shared colourbar own the layout
     ps.save(fig, out_base)
     plt.close(fig)
     print(f"wrote {out_base}.png / .pdf  (RMS Δ={rms:.3g})")

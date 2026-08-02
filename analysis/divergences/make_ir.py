@@ -169,8 +169,18 @@ def make_ir(npz, label, out_base):
     # colourbars laid horizontally so they cost height instead of width, no twinx, and the
     # ramp legend hung below the figure. 1.5in is the ceiling for a 3-column \textwidth
     # figure at 11pt; the panels are square rather than roomy.
-    fig = plt.figure(figsize=(ps.TEXTWIDTH_IN, 6.4), layout="constrained")
-    gs = GridSpec(2, 3, figure=fig, height_ratios=[1.0, 0.95])
+    # THREE ROWS OF TWO, not two rows of three. Three columns cannot hold the standard
+    # 2.40in plot box at \textwidth, and the plot box is not negotiable. Column 0 carries the
+    # panels with no colour scale, column 1 those with one; the colourbars are HORIZONTAL,
+    # under their panel, because for a 2-D map that is the placement that costs height rather
+    # than width, and width is the binding constraint here. Applied to every map panel in the
+    # repo, so it is a class rule and not a per-figure workaround.
+    fig, axg = ps.figure(ncols=2, nrows=2, squeeze=False)
+    # Error map in column 0, under truth: both panels that carry a y-label then live in the
+    # same column, and column 1 needs none. With it on the right the canvas came to 6.57in
+    # against a 6.5in text width -- 0.07in, but the invariant does not do "close enough".
+    ((ax0, ax1), (ax2, ax_blank)) = axg
+    ax_blank.axis("off")
     CBH = dict(orientation="horizontal", location="bottom")
     mse = float(np.mean(resid ** 2))
 
@@ -187,15 +197,14 @@ def make_ir(npz, label, out_base):
                          bbox=dict(fc="white", ec="none", alpha=0.8, pad=1.5))
         return pm
 
-    ax0 = fig.add_subplot(gs[0, 0])
-    ax1 = fig.add_subplot(gs[0, 1], sharey=ax0)
-    ax2 = fig.add_subplot(gs[0, 2], sharey=ax0)
     draw(ax0, tmap, "truth", "viridis", vmin, vmax, True)
     pm1 = draw(ax1, pmap, "model", "viridis", vmin, vmax, False)
+    # first=True: the error map's left neighbour is a blank cell, not a shared-y panel, so it
+    # carries its own y label and ticks.
     pm2 = draw(ax2, emap, r"$|$error$|$", "inferno",
-               0.0, np.nanpercentile(emap, 99), False)
+               0.0, np.nanpercentile(emap, 99), True)
     # One bar for truth+model (same scale by construction), one for the error panel.
-    fig.colorbar(pm1, ax=[ax0, ax1], **CBH).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
+    fig.colorbar(pm1, ax=ax1, **CBH).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
     fig.colorbar(pm2, ax=ax2, **CBH).set_label(r"$\langle|\Delta\log|\mathcal{M}|^2|\rangle$")
 
     def ramp(ax, coord, xlabel, name, slope, first):
@@ -223,13 +232,22 @@ def make_ir(npz, label, out_base):
         ps.process_label(ax, name, loc="upper right")
         return ax
 
+    ps.save(fig, out_base)
+    plt.close(fig)
+    print(f"wrote {out_base}.png/.pdf (N={n}, MSE\u0394={mse:.3g})")
+
+    # --- second figure: the IR ramps and the prediction scatter --------------------------
+    # Split out of the map figure. As one 3x2 it stood 10.22in tall against a 9in text block,
+    # i.e. it could not be placed on any page; and six panels of three different kinds was
+    # never one figure to begin with.
+    fig, axg2 = ps.figure(ncols=2, nrows=2, squeeze=False)
+    ((axr0, axr1), (blank2, axsc)) = axg2
+    blank2.axis("off")
     ln10 = np.log(10.0)
-    axr0 = fig.add_subplot(gs[1, 0])
     ramp(axr0, ly, r"$\log_{10} y_{\min}$", "soft $+$ collinear", -ln10, True)
-    axr1 = fig.add_subplot(gs[1, 1], sharey=axr0)
+    axr1.sharey(axr0)
     ramp(axr1, lx, r"$\log_{10} x_{g,\min}$", "soft gluon", -2.0 * ln10, False)
 
-    axsc = fig.add_subplot(gs[1, 2])
     hb = axsc.hexbin(tl, pl, gridsize=55, bins="log", cmap="magma", mincnt=1)
     lo, hi = min(tl.min(), pl.min()), max(tl.max(), pl.max())
     axsc.plot([lo, hi], [lo, hi], color="cyan", lw=1.0, ls=":", label="ideal")
@@ -238,16 +256,13 @@ def make_ir(npz, label, out_base):
     ps.process_label(axsc, "predicted vs true", loc="lower right")
     fig.colorbar(hb, ax=axsc, **CBH).set_label("count")
 
-    # The ramp panels' five series need a legend wider than a 1.5in panel. Hung outside the
-    # grid ("outside lower center") it costs figure height, whereas a legend axes spanning
-    # the columns constrains their width and squeezed the panels from 0.99in to 0.30in.
-    h, l = axr0.get_legend_handles_labels()
-    fig.legend(h, l, ncol=3, loc="outside lower center", frameon=False)
+    # The ramp panels' five series need a legend wider than one panel, so it goes below the
+    # grid, where it costs canvas height and nothing else.
+    ps.shared_legend(fig, axr0, ncol=3, loc="lower center")
 
-    fig._ps_layout_done = True      # GridSpec + colourbars own the layout
-    ps.save(fig, out_base)
+    ps.save(fig, f"{out_base}_ramps")
     plt.close(fig)
-    print(f"wrote {out_base}.png/.pdf (N={n}, MSEΔ={mse:.3g})")
+    print(f"wrote {out_base}_ramps.png/.pdf")
 
     # Dalitz (ee -> q qbar g only)
     if "x_q" in d.files:
@@ -326,7 +341,6 @@ def make_ir(npz, label, out_base):
         # a different scale) -- that would label the shared bar with the error normalisation.
         figd.colorbar(axs[0].collections[0], cax=cax_shared, orientation="horizontal"
                       ).set_label(r"$\langle\log|\mathcal{M}|^2\rangle$")
-        figd._ps_layout_done = True
         ps.save(figd, f"{out_base}_dalitz")
         plt.close(figd)
         print(f"wrote {out_base}_dalitz.png/.pdf  (analytic-vs-truth corr={corr:.3f})")

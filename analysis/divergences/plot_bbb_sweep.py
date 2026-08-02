@@ -60,7 +60,6 @@ def main():
     # canvas by 0.15in and savefig (bbox=None) cut it off -- on a figure whose subject IS
     # the gamma sweep.
     cb.ax.set_title(r"$\gamma$", pad=6)
-    fig._ps_layout_done = True          # colorbar owns the layout; tight_layout would fight it
     ps.save(fig, args.out)
     print(f"wrote {args.out}.png/.pdf")
     print(f"best: deep_mse={obj[best]:.4e} at sigma_rel={srel[best]:.3e} beta={beta[best]:.3e} "

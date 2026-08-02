@@ -51,21 +51,30 @@ def main():
 
     G = q2.gains(BARS + PROFILE, args.eval_dir)
 
-    fig, (axL, axR) = ps.figure(ncols=2)
+    # ONE column, two rows. The left panel's category names are long, and with the plot box
+    # fixed those labels are charged to the canvas: side by side the figure needed 7.1in
+    # against a 6.5in text width. Stacking is the sanctioned fix -- fewer columns, never a
+    # smaller plot.
+    fig, (axL, axR) = ps.figure(nrows=2)
 
     # --- left: the same arms scored by both metrics ---------------------------
     x = np.arange(len(BARS))
     w = 0.38
     ev = [G[t]["event"] for t in BARS]
     lf = [G[t]["logflat"] for t in BARS]
-    axL.bar(x - w / 2, ev, w, color=ps.C.grey, label="event-weighted")
-    axL.bar(x + w / 2, lf, w, color=ps.C.blue, label="log-flat per decade")
-    axL.set_xticks(x)
-    axL.set_xticklabels([TICK[t] for t in BARS], rotation=35, ha="right")
+    # HORIZONTAL bars. The category names are long, and as vertical bars they needed
+    # rotation=35, which makes a tall label block: tall labels used to be paid for out of the
+    # plot, so the panel shrank. Sideways they read straight, need no rotation, and cost only
+    # left margin -- which the canvas absorbs.
+    axL.barh(x - w / 2, ev, w, color=ps.C.grey, label="event-weighted")
+    axL.barh(x + w / 2, lf, w, color=ps.C.blue, label="log-flat per decade")
+    axL.set_yticks(x)
+    axL.set_yticklabels([TICK[t] for t in BARS])
+    axL.invert_yaxis()
     # The formula IS the axis label: it says exactly how to read the scale (0 = no reweighting,
     # 1 = oracle) without a prose reading hint in the figure.
-    axL.set_ylabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
-    axL.axhline(0.0, color="black", lw=0.8, zorder=1)
+    axL.set_xlabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
+    axL.axvline(0.0, color="black", lw=0.8, zorder=1)
     axL.legend(loc="upper left")
     ps.process_label(axL, args.process, loc="lower right")
 

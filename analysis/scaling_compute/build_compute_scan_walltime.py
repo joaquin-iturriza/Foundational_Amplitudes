@@ -104,7 +104,7 @@ for proc_title, key in [("ee_uu NLO-virt", "eeuunlovirte4"), ("ee_ttbar NLO-virt
                 continue
             ts = sorted(data)
             ax.plot([data[t][WT_IDX] for t in ts], [data[t][0] for t in ts],
-                    label=FAM_LABEL[fam], lw=2.8, ms=9, **FAM_STYLE[fam])
+                    label=FAM_LABEL[fam], **FAM_STYLE[fam])
         # 1h-pretrain feature-ladder markers (D=100k panel only): raw-era encoding
         # -> +onehots -> +mass/coupling scalars -> full adopted config, each
         # pretrained ~1h on the 416 sets, fine-tuned at the deepest cell. Same

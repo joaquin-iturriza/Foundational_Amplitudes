@@ -69,15 +69,23 @@ def main():
     tags = [t for t, _, _ in BARS] + CURVE
     G = q2.gains(tags, args.eval_dir)
 
-    fig, (axL, axR) = ps.figure(ncols=2)
+    # ONE column, two rows. The left panel's category names are long, and with the plot box
+    # fixed those labels are charged to the canvas: side by side the figure needed 7.1in
+    # against a 6.5in text width. Stacking is the sanctioned fix -- fewer columns, never a
+    # smaller plot.
+    fig, (axL, axR) = ps.figure(nrows=2)
 
     # --- left: gain by arm, coloured by what the arm supplies ------------------
+    # HORIZONTAL bars: seven long category names ("order, $\rho{=}0.30$") needed
+    # rotation=35 as vertical ticks, and a tall rotated label block used to be paid for out of
+    # the plot. Sideways they read straight and cost only left margin.
     x = np.arange(len(BARS))
     for i, (t, _, fam) in enumerate(BARS):
-        axL.bar(i, G[t][METRIC], 0.66, color=FAMILY[fam][0])
-    axL.set_xticks(x)
-    axL.set_xticklabels([nm for _, nm, _ in BARS], rotation=35, ha="right")
-    axL.set_ylabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
+        axL.barh(i, G[t][METRIC], 0.66, color=FAMILY[fam][0])
+    axL.set_yticks(x)
+    axL.set_yticklabels([nm for _, nm, _ in BARS])
+    axL.invert_yaxis()
+    axL.set_xlabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
     # Proxy handles: bars carry meaning through colour, so the legend must decode the colour.
     from matplotlib.patches import Patch
     seen, handles = set(), []

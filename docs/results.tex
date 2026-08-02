@@ -1217,12 +1217,22 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 \begin{figure}[H]
   \centering
   \includegraphics{ir_pretrain_uugg.pdf}
-  \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process.} $\log|\mathcal{M}|^2$ vs
-  the IR resolution variables of Eq.~\eqref{eq:ir}. The mean ramps (bottom, with the
-  analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$ overlaid) are tracked into the
-  deep IR, but the error map (top right) grows toward small $y_{\min}$, the sole case of
-  degradation \emph{into} a singularity.}
+  \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process: the maps.}
+  $\langle\log|\mathcal{M}|^2\rangle$ over the IR resolution variables of Eq.~\eqref{eq:ir},
+  truth and model on a common scale, with the absolute error below. The error grows toward
+  small $y_{\min}$: the sole case of degradation \emph{into} a singularity. The ramps are
+  Fig.~\ref{fig:div_uugg_ramps}.}
   \label{fig:div_uugg}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{ir_pretrain_uugg_ramps.pdf}
+  \caption{\textbf{$e^+e^-\to u\bar u gg$: the IR ramps.} $\log|\mathcal{M}|^2$ against each
+  resolution variable, with the analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$
+  overlaid, and the prediction-vs-truth density. The mean ramps are tracked into the deep IR
+  even where the error map of Fig.~\ref{fig:div_uugg} grows.}
+  \label{fig:div_uugg_ramps}
 \end{figure}
 
 \begin{principle} The model holds at the amplitude divergences: across all $2\to2$
@@ -1313,24 +1323,39 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 \begin{figure}[H]
   \centering
   \includegraphics{heldout_resid_f000.pdf}
-  \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region}, in the IR plane of
-  Eq.~\eqref{eq:ir}. The model mean (red) plateaus \emph{off} the IR ramp (bottom-left),
-  while truth (black) lies on the analytic $1/y_{\min}$ slope (green); predictions
-  saturate against a ceiling (predicted-vs-true, bottom-right), and the error concentrates
-  in the soft/collinear corner (top-right): the model, never having seen the region,
-  cannot reproduce the divergence's growth.}
+  \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region: the maps}, in the IR plane
+  of Eq.~\eqref{eq:ir}. Truth and model on a common scale, with the absolute error below: the
+  error concentrates in the soft/collinear corner the model never saw. The ramps are
+  Fig.~\ref{fig:div_holdout_f0_ramps}.}
   \label{fig:div_holdout_f0}
 \end{figure}
 
 \begin{figure}[H]
   \centering
+  \includegraphics{heldout_resid_f000_ramps.pdf}
+  \caption{\textbf{Pure extrapolation ($f\!=\!0$): the ramps.} The model mean (red) plateaus
+  \emph{off} the IR ramp while truth (black) lies on the analytic $1/y_{\min}$ slope (green),
+  and predictions saturate against a ceiling (predicted-vs-true): never having seen the
+  region, the model cannot reproduce the divergence's growth.}
+  \label{fig:div_holdout_f0_ramps}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
   \includegraphics{heldout_resid_f100.pdf}
-  \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region.} With the
-  divergent region back in the training support the IR ramp (analytic $1/y_{\min}$ slope,
-  green) is tracked into the deep IR by both truth and model, the predicted-vs-true ceiling
-  is gone, and the error is flat and small across the plane (note the $\sim\!25\times$
-  smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}.}
+  \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region: the maps.} With the
+  divergent region back in the training support the error is flat and small across the plane
+  (note the $\sim\!25\times$ smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}.}
   \label{fig:div_holdout_f1}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{heldout_resid_f100_ramps.pdf}
+  \caption{\textbf{In-support baseline ($f\!=\!1$): the ramps.} The IR ramp (analytic
+  $1/y_{\min}$ slope, green) is tracked into the deep IR by both truth and model and the
+  predicted-vs-true ceiling is gone; contrast Fig.~\ref{fig:div_holdout_f0_ramps}.}
+  \label{fig:div_holdout_f1_ramps}
 \end{figure}
 
 \begin{principle} A flat-sampled surrogate does not extrapolate \emph{into} an unseen
