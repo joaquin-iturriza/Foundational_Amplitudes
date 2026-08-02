@@ -47,11 +47,13 @@ def ramp_bar(a, norm, label):
     cb.set_label(label)
 
 
-# 2x2 rather than 1x3: three panels each carrying a colourbar do not fit across
-# \textwidth at 11pt (the bar lands on the next panel's y-label). The 4th cell is removed.
-fig, axg = ps.figure(ncols=2, nrows=2, layout="constrained")
-ax = [axg[0, 0], axg[0, 1], axg[1, 0]]
-axg[1, 1].remove()
+# ONE column, three rows. Three panels each carrying their own colourbar cannot hold the
+# standard plot box across two columns -- measured 7.55in against a 6.5in text width, which at
+# natural size is wider than the paper and gets CLIPPED, not merely overfull. Fewer columns is
+# the sanctioned fix; the plot box is not negotiable. No layout="constrained": ps.layout owns
+# the geometry, and a layout engine distributing a fixed canvas is what shrinks plots.
+fig, axg = ps.figure(ncols=1, nrows=3, squeeze=False)
+ax = [axg[0, 0], axg[1, 0], axg[2, 0]]
 norm_D = make_norm(Ds)
 cols_D = norm_colors(Ds, norm_D)
 
