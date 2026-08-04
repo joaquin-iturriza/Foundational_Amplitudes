@@ -51,11 +51,11 @@ def main():
 
     G = q2.gains(BARS + PROFILE, args.eval_dir)
 
-    # ONE column, two rows. The left panel's category names are long, and with the plot box
-    # fixed those labels are charged to the canvas: side by side the figure needed 7.1in
-    # against a 6.5in text width. Stacking is the sanctioned fix -- fewer columns, never a
-    # smaller plot.
-    fig, (axL, axR) = ps.figure(nrows=2)
+    # TWO columns. The left panel's category names are long, and with the plot box
+    # fixed those labels are charged to the canvas: side by side the figure needs ~7.1in. That
+    # is over \textwidth but well inside MAX_FIG_IN, so the row simply overhangs the margins
+    # (\widerow) and the two panels stay side by side, which is how they are read.
+    fig, (axL, axR) = ps.figure(ncols=2)
 
     # --- left: the same arms scored by both metrics ---------------------------
     x = np.arange(len(BARS))

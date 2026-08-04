@@ -24,6 +24,11 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAX_ROW_IN = 8.2      # \textwidth 6.5 + the two 1in margins, less a little paper
 SAVEFIG_DPI = 200
 
+# Multi-page PDFs (included with [page=N]) have a .png sibling that is a DIFFERENT
+# artifact -- a wide contact sheet -- so measuring it says nothing about the page as
+# included, and it reported 18.75in for a figure that fits fine. Skip them.
+MULTIPAGE = {"phase1_scaling.pdf"}
+
 # Where \graphicspath points. Cheaper and more predictable than a recursive glob.
 ROOTS = ["analysis/divergences/figs", "analysis/hpo_optima", "analysis/scaling_compute",
          "compare_models/_levers_ab", "sweep/plots", "docs/figs"]
@@ -55,6 +60,8 @@ def main():
         gs = re.findall(r"\\(?:includegraphics(?:\[[^\]]*\])?|pnl)\{([^}]+)\}", line)
         if len(gs) < 2:
             continue                       # a lone figure per line always fits
+        if any(g in MULTIPAGE for g in gs):
+            continue
         widths = []
         for g in gs:
             p = find_png(g)
