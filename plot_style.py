@@ -204,6 +204,10 @@ def layout(fig, max_iter: int = 3) -> None:
 
     Skipped for 3-D and fixed-aspect axes, whose extent is not a data rectangle.
     """
+    # Clear first: layout() returns early for 3-D, fixed-aspect and empty figures, and a
+    # stale grid left over from an earlier call would be read by the empty-cell check as
+    # if it described this one.
+    fig._ps_grid = None
     if any(_is_3d(ax) for ax in fig.axes):
         return
     axes = _data_axes(fig)
@@ -270,7 +274,8 @@ def layout(fig, max_iter: int = 3) -> None:
 
         # A figure-level legend is paid for by the canvas, never by the plots.
         # Which SIDE a figure legend is on is measured, not declared. Trusting
-        # `_ps_legend_side` (set only by ps.shared_legend) reserved a top strip for
+        # A declared side (the old `_ps_legend_side`, set only by ps.shared_legend) reserved
+        # a top strip for
         # make_ir.py's raw `fig.legend(loc="outside lower center")`, leaving 0.36in of dead
         # white space at the top and printing the legend over the bottom colourbar.
         fh_now = fig.get_size_inches()[1]
@@ -327,7 +332,6 @@ def layout(fig, max_iter: int = 3) -> None:
                 else:
                     cb.set_position([cx / W, y0 / H, CBAR_W_IN / W, PLOT_H_IN / H])
                     cx += w + CBAR_GAP_IN
-        fig._ps_laid_out = True
         fig._ps_grid = (nrows, ncols, len(axes))
         # Anything still hanging off the canvas becomes outer margin on the next pass. The
         # plot boxes are never touched: an overhang costs canvas, like every other decoration.
@@ -443,7 +447,7 @@ def use() -> None:
         "figure.figsize": figsize(1, 1),
         "figure.dpi": 140,
         "savefig.dpi": 200,
-        "figure.constrained_layout.use": False,   # we call tight_layout in save()
+        "figure.constrained_layout.use": False,   # layout() owns the geometry, not an engine
 
         # --- axes: light, unobtrusive frame; grid is a reading aid, not a feature
         "axes.prop_cycle": mpl.cycler(color=CYCLE),
@@ -616,8 +620,10 @@ def legend(ax, loc: str = "upper left", **kwargs):
         raise ValueError(f"legend loc {loc!r} is not a corner; use one of {LEGEND_LOCS}")
     kwargs.setdefault("loc", loc)
     leg = ax.legend(**kwargs)
-    _shrink_wide_legend(ax, leg, kwargs)
-    return leg
+    # RETURN the rebuilt legend: _shrink_wide_legend draws a new one and the old is no
+    # longer a child of the axes, so handing back the pre-shrink object would give the
+    # caller an orphan that silently ignores set_title / get_window_extent.
+    return _shrink_wide_legend(ax, leg, kwargs)
 
 
 def _shrink_wide_legend(ax, leg, kwargs):
@@ -655,7 +661,6 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     kwargs.setdefault("bbox_to_anchor", (0.5, 0.0) if bottom else (0.5, 1.0))
     kwargs.setdefault("frameon", False)
     leg = fig.legend(handles, labels, ncol=ncol, **kwargs)
-    fig._ps_legend_side = "bottom" if bottom else "top"
     # GROW the figure by the legend's measured height; do not carve the strip out of the
     # panels. Reserving a rect on the existing canvas pays for the legend with data area: on a
     # figsize(3,1) that turned a 1.77x0.91in panel into 1.77x0.52in, i.e. aspect 1.95 -> 3.41,
@@ -671,10 +676,6 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
         fig.set_size_inches(w, h + leg_in, forward=True)
     except Exception:
         leg_in = 0.10 * fig.get_size_inches()[1]
-    # Stored in INCHES, not as a fraction of the height: enforce_panels resizes the figure
-    # afterwards, and a cached fraction would quietly shrink the strip on every growth step
-    # until the legend sat back on the panels.
-    fig._ps_legend_in = leg_in
     return leg
 
 
@@ -932,20 +933,25 @@ def colorbar(ax, mappable, label: str = "", **kwargs):
 def tidy_colorbars(fig) -> None:
     """Keep colourbar tick labels from colliding, without shrinking the font.
 
-    A horizontal bar under a 2.40in panel has room for about four labels. Left to matplotlib
+    A horizontal bar under a 2.40in panel has room for about five labels. Left to matplotlib
     the error map's bar asked for six at full decimal precision
     ("0.000000 0.00005 0.00010 0.00015 0.00020") and they ran into each other. Fewer ticks and
     mathtext scientific notation is the fix the style rules already name for crowded ticks.
     """
-    from matplotlib.ticker import MaxNLocator, ScalarFormatter, LogLocator
+    from matplotlib.ticker import (MaxNLocator, ScalarFormatter, LogLocator,
+                                   SymmetricalLogLocator, FixedLocator)
     for cb in fig.axes:
         if not _is_cbar(cb):
             continue
         bar = getattr(cb, "_colorbar", None)
         horiz = getattr(bar, "orientation", "vertical") == "horizontal"
         axis = cb.xaxis if horiz else cb.yaxis
-        if isinstance(axis.get_major_locator(), LogLocator):
-            continue                       # a log bar's decade ticks are already sparse
+        # Leave any locator that is already saying something about the SCALE: a log bar's
+        # decade ticks are sparse to begin with, and MaxNLocator on a SymLogNorm or a
+        # BoundaryNorm would move the ticks off the boundaries they are marking.
+        if isinstance(axis.get_major_locator(),
+                      (LogLocator, SymmetricalLogLocator, FixedLocator)):
+            continue
         axis.set_major_locator(MaxNLocator(nbins=4))
         fmt = ScalarFormatter(useMathText=True)
         fmt.set_powerlimits((-2, 3))       # 0.00020 -> 2 x 10^-4, in the document's mathtext
@@ -956,8 +962,8 @@ def save(fig, base: str, repo: str | None = None) -> str:
     """Save `fig` as BOTH `<base>.png` and `<base>.pdf` (repo convention, no exceptions).
 
     `base` is a path without extension; if relative and `repo` is given (or the module
-    can find the repo root), it is resolved against the repo root. Applies
-    `tight_layout()` first, so callers never need to.
+    can find the repo root), it is resolved against the repo root. Runs the geometry
+    solve first, so callers never need to.
     """
     if not os.path.isabs(base):
         root = repo or os.path.dirname(os.path.abspath(__file__))
@@ -996,10 +1002,6 @@ def save(fig, base: str, repo: str | None = None) -> str:
     fig.savefig(base + ".pdf")
     print(f"saved {base}.png / .pdf")
     return base
-
-
-#: A data panel narrower than this (inches) is not a figure, it is a sliver.
-MIN_PANEL_IN = 1.05
 
 
 def check_panels(fig, name: str) -> None:
@@ -1057,7 +1059,7 @@ def _warn_if_squeezed(fig, base: str) -> None:
         # A grid with an empty cell. Three panels in a 2x2 leave a visible hole where the
         # fourth would be; the fix is ps.panels(3) + ps.save_panels, so LaTeX packs them two
         # on the first line and the third centred underneath, as three figures would have.
-        nr, nc, n = getattr(fig, "_ps_grid", (1, 1, 1))
+        nr, nc, n = getattr(fig, "_ps_grid", None) or (1, 1, 1)
         # A spare cell holding the figure's legend is not a hole -- it is the legend's home,
         # and it is cheaper than a strip above the panels. Count it as occupied.
         n += sum(1 for ax in fig.axes

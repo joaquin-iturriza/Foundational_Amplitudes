@@ -688,11 +688,10 @@ def main():
              Line2D([0], [0], color="0.4", marker="o", ls="-", lw=1.4, label="new (method-aware)")]
     leg = fig.legend(handles=style, loc="lower center", ncol=2, fontsize=9, frameon=False)
     # Reserve the strip in INCHES, the way ps.shared_legend does. A raw
-    # tight_layout(rect=[0, 0.03, 1, 1]) reserves a fraction that nothing downstream knows
-    # about, so enforce_panels' resize re-lays out and drops the legend onto the panels.
+    # No hand-reserved strip: ps.layout() measures the legend and sizes the canvas around
+    # it. Reserving a FRACTION here (the old tight_layout(rect=...)) was invisible to the
+    # geometry solve, which then re-laid out and dropped the legend onto the panels.
     fig.canvas.draw()
-    fig._ps_legend_in = leg.get_window_extent(fig.canvas.get_renderer()).height / fig.dpi + 0.10
-    fig._ps_legend_side = "bottom"
     ps.save(fig, os.path.join(args.out_dir, "finetune_methods_comparison_overlay"))
     plt.close(fig)
 
