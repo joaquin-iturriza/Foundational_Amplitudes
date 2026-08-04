@@ -49,7 +49,7 @@ hold standard plot boxes at that column count. Fix it structurally:
 | symptom | fix |
 |---|---|
 | 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels` |
-| 2 columns + a colourbar per panel | separate panel files; maps take a horizontal bar |
+| 2 columns + a colourbar per panel | separate panel files (the bar is horizontal, so a panel stays ~3.1 in) |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
 | a 2x2 that still measures over 6.5 in | separate panel files, two per line |
 | legend outside the axes | put it inside; use `ps.make_room` to open space |
@@ -79,19 +79,20 @@ ps.save_panels(figs, "analysis/divergences/figs/my_set")   # prints the LaTeX to
 Three panels forced into a 2x2 leave a hole where the fourth would go, and that hole is the
 first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
 
-A single panel must stay under ~3.2 in for two to share a line; `ps.save` reports the canvas
-width. A map with a vertical colourbar is ~3.9 in and will sit one per line — that is fine, but
-it is why maps take a horizontal bar (below).
+Two panels share a line only if their canvases add to under 6.5 in — about 3.2 in each;
+`ps.save` prints each canvas width. A colourbar under the panel keeps it near 3.1 in, which is
+the whole reason colourbars go there (below). If a pair does not fit, shorten the longest tick
+or legend label; LaTeX will otherwise drop the second panel to its own line.
 
 Group panels into one figure only when they are the same quantity over one swept parameter.
 Unrelated plots that happen to be discussed together go in separate figures.
 
 **Do not share anything to buy width.** No `sharey` so one column can drop its tick labels, no
 "axis labels on the outside edges only", no one legend or colourbar serving some panels and not
-others. Sharing is how panels stop looking like each other: with `sharey` in a 2x2, columns 0
-gets tick labels, so panels (a) and (c) have numbers and (b) does not. Every panel labels its
-own axes. `sharey` is fine in a 1x2 when both panels really are the same quantity — there it is
-symmetric — but never as a width workaround.
+others. Sharing is how panels stop looking like each other: with `sharey` in a 2x2 only
+column 0 carries tick labels, so panels (a) and (c) have numbers and (b) does not. Every panel
+labels its own axes. `sharey` is fine in a 1x2 when both panels really are the same quantity —
+there it is symmetric — but never as a width workaround.
 
 ## Always use the shared module
 
@@ -219,11 +220,16 @@ A missing glyph is silent: no warning, just a box. Look at the PNG after any lab
    `ps.panels`; a `legend is wider than its plot box` line means factorise the labels.
 2. **Look at the PNG.** Colliding tick labels, a legend on the data, a missing glyph and a
    colourbar in the wrong place are only visible in the render.
-3. **Look at the figure next to its neighbours in the compiled PDF.** Every one of the size
+3. **Run `python scripts/check_tex_figure_rows.py`.** Panels included two per line have
+   to *add up* to under `\textwidth`; if they do not, LaTeX silently drops the last one
+   onto its own line and the caption's "(a) and (b)" stops describing the page. Nothing
+   else warns about this: not `ps.save`, not the LaTeX log. `rebuild_figures.sh` runs it
+   at the end.
+4. **Look at the figure next to its neighbours in the compiled PDF.** Every one of the size
    complaints in this document's history was invisible in the single figure and obvious on the
    page. Rasterise a couple of pages (`gs -sDEVICE=png16m -r100 -dFirstPage=N -dLastPage=N`)
    and compare against the figure before and after it.
-4. Ask: with the title gone, can a reader with the caption identify every line, band and marker
+5. Ask: with the title gone, can a reader with the caption identify every line, band and marker
    from the axes and legend alone? If not, add a legend entry or a better axis label — not a
    note inside the plot.
 

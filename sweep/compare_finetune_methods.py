@@ -627,12 +627,14 @@ def main():
                 st = mstyle[label]
                 ax.scatter([best["params"]], [best["val"]], color=st["color"],
                            marker=st["marker"], alpha=st["alpha"], s=90, zorder=st["z"],
-                           label=f"{label} ({best['params']:,} params)")
+                           # The parameter count IS the x-axis; repeating it per entry made
+                           # the legend wider than the plot box.
+                           label=label)
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlabel("trainable parameters  (∝ Adam optimizer-state bytes)")
             ax.set_ylabel("best val_loss")
             ps.process_label(ax, _pretty_ds(ds), loc="upper right")
-            ax.legend()
+            ps.legend(ax, "lower left")
         ps.save(fig, os.path.join(args.out_dir, f"finetune_methods_comparison_params"))
         plt.close(fig)
 

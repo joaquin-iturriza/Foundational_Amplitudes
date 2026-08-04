@@ -174,5 +174,11 @@ done
 
 echo
 echo "rebuilt $ok, failed $fail, skipped $skip, shadowed $shadow, squeezed $warn"
-[ "$fail" -gt 0 ] || [ "$shadow" -gt 0 ] && exit 1
+
+# Panels included two per line have to ADD UP to less than \\textwidth or LaTeX quietly drops
+# the last one onto its own line -- a real layout regression that nothing else warns about.
+echo
+$PY scripts/check_tex_figure_rows.py || rows_bad=1
+
+[ "$fail" -gt 0 ] || [ "$shadow" -gt 0 ] || [ -n "${rows_bad:-}" ] && exit 1
 exit 0

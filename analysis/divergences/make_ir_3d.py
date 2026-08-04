@@ -54,6 +54,10 @@ def surface(x, y, tl, pl, xlabel, ylabel, process, out_base,
         ax.set_zlabel(r"$\langle\log|\mathcal{M}|^2\rangle$", labelpad=6)
         ax.view_init(elev=elev, azim=azim)
     m = cm.ScalarMappable(norm=norm, cmap=cm.viridis); m.set_array([])
+    # ps.layout() deliberately skips any figure with a 3-D axes -- a projection's extent is its
+    # bounding square, not a plot box -- so this one has to reserve its own right margin. Without
+    # it the colourbar label reached 6.62in on a 6.50in canvas and savefig (bbox=None) cut it off.
+    fig.subplots_adjust(left=0.01, right=0.84)
     cb = fig.colorbar(m, ax=fig.axes, fraction=0.02, pad=0.02)
     cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$")
     from matplotlib.lines import Line2D

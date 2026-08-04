@@ -482,7 +482,7 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
   \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
   $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
   $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
-  (colour): weak, $\propto D^{+0.15\ldots0.3}$, saturating. \emph{Bottom left:} learning curves
+  (colour): weak, $\propto D^{+0.15\ldots0.3}$, saturating. \emph{Bottom:} learning curves
   flooring later as $D$ grows, stars marking the $t$ of peak $\eta$: the peak is not the floor.}
   \label{fig:2d}
 \end{figure}
@@ -712,7 +712,7 @@ $\approx\!1.7$--$2.2$ on these $2\!\to\!2$ targets; Fig.~\ref{fig:alphamult}). W
 buys is a strictly lower curve at every compute budget and, decisively, \textbf{no plateau}:
 solo training flattens (even mildly regresses) once it nears its floor within the reachable
 budget, whereas the fine-tuned run keeps descending on the same slope to one-to-two orders lower
-loss (Fig.~\ref{fig:transfer}). The effect is consistent, not marginal, and holds even for the
+loss (Fig.~\ref{fig:transfer}, and Fig.~\ref{fig:transfer_ttbar} for $ee\,t\bar t$). The effect is consistent, not marginal, and holds even for the
 short, target-excluding 25-process foundation, so it is genuine transfer of reusable structure,
 not memorization of the target's LO.
 
@@ -1376,7 +1376,8 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
   \includegraphics{heldout_resid_f100_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region: the maps.} With the
   divergent region back in the training support the error is flat and small across the plane
-  (note the $\sim\!25\times$ smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}.}
+  (note the $\sim\!25\times$ smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}. The
+  ramps are Fig.~\ref{fig:div_holdout_f1_ramps}.}
   \label{fig:div_holdout_f1}
 \end{figure}
 

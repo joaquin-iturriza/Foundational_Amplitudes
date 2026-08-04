@@ -1058,6 +1058,10 @@ def _warn_if_squeezed(fig, base: str) -> None:
         # fourth would be; the fix is ps.panels(3) + ps.save_panels, so LaTeX packs them two
         # on the first line and the third centred underneath, as three figures would have.
         nr, nc, n = getattr(fig, "_ps_grid", (1, 1, 1))
+        # A spare cell holding the figure's legend is not a hole -- it is the legend's home,
+        # and it is cheaper than a strip above the panels. Count it as occupied.
+        n += sum(1 for ax in fig.axes
+                 if ax not in [b[0] for b in boxes] and ax.get_legend() is not None)
         if nr * nc > n:
             print(f"  !! {name}: {n} panels in a {nr}x{nc} grid leaves {nr * nc - n} empty "
                   f"cell(s) -- use ps.panels({n}) + ps.save_panels() instead")

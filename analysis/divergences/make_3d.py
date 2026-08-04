@@ -66,6 +66,10 @@ def make(npz, label, out_base, nb=40):
     # shared legend / colorbar
     m = cm.ScalarMappable(norm=norm, cmap=cm.viridis)
     m.set_array([])
+    # ps.layout() skips any figure with a 3-D axes (a projection's extent is its bounding
+    # square, not a plot box), so the right margin has to be reserved here or the colourbar
+    # label runs off the canvas and savefig (bbox=None) cuts it.
+    fig.subplots_adjust(left=0.01, right=0.84)
     cb = fig.colorbar(m, ax=fig.axes, fraction=0.02, pad=0.02)
     cb.set_label(r"truth $\langle\log|\mathcal{M}|^2\rangle$")
     from matplotlib.lines import Line2D
