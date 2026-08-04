@@ -24,7 +24,15 @@ def bv(r, k):
     h = r['hp_best'].get(k); return h['val'] if h else None
 
 
-fig, ax = ps.figure(ncols=2, nrows=3)
+# SIX separate panel files. As one 2x3 canvas this measured 6.66in against a 6.5in text width
+# -- clipped, not merely overfull -- because both columns carry their own y-label and log tick
+# labels. Six files of ~3.2in go three lines of two, which is the same arrangement on the page
+# and fits. The panels answer six different questions; nothing about them was ever shared.
+figs = ps.panels(6)
+# Kept as a 3x2 object array so the panel code below still reads ax[row, col].
+ax = np.empty((3, 2), dtype=object)
+for _i, (_f, _a) in enumerate(figs):
+    ax[_i // 2, _i % 2] = _a
 
 # 1. lr vs num_heads (muP)
 a = ax[0, 0]
@@ -51,9 +59,11 @@ for x, y in zip(xs, ys): g[x].append(math.log10(y))
 gx = sorted(g); gy = [10**np.mean(g[k]) for k in gx]
 a.plot(gx, gy, 'o-', color=ps.C.vermillion, label='geometric mean')
 a.set_xscale('log', base=2); a.set_yscale('log')
+# Every batch size here is a power of two, so label the exponent: "$2^{10}$" is a third the
+# width of "1024" and the seven ticks stop colliding. Rotating them was the old fix, and a
+# rotated label block is tall -- which is exactly what the tick-label rule forbids.
 a.set_xticks(sorted(set(xs))); a.get_xaxis().set_major_formatter(
-    plt.matplotlib.ticker.FuncFormatter(lambda v, _: f"{int(v)}"))
-a.tick_params(axis='x', labelrotation=45)
+    plt.matplotlib.ticker.FuncFormatter(lambda v, _: rf"$2^{{{int(round(math.log2(v)))}}}$"))
 a.set_xlabel('batch size'); a.set_ylabel('optimal learning rate')
 a.legend(loc='lower left')
 
@@ -110,4 +120,4 @@ a.legend(loc='lower right')
 a.grid(True, axis='x', which='both')
 
 base = out[:-4] if out.lower().endswith(('.png', '.pdf')) else out
-ps.save(fig, base)
+ps.save_panels(figs, base)

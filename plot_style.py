@@ -328,6 +328,7 @@ def layout(fig, max_iter: int = 3) -> None:
                     cb.set_position([cx / W, y0 / H, CBAR_W_IN / W, PLOT_H_IN / H])
                     cx += w + CBAR_GAP_IN
         fig._ps_laid_out = True
+        fig._ps_grid = (nrows, ncols, len(axes))
         # Anything still hanging off the canvas becomes outer margin on the next pass. The
         # plot boxes are never touched: an overhang costs canvas, like every other decoration.
         # (A colourbar's tick labels can reach a little above the bar, which the per-axes
@@ -515,6 +516,49 @@ def figure(ncols: int = 1, nrows: int = 1, width: float | str = "full", **kwargs
     return fig, axes
 
 
+def panels(n: int, **kwargs):
+    """`n` INDEPENDENT one-plot figures, to be included side by side in one LaTeX figure.
+
+    Use this whenever the panel count does not fill a rectangle -- in practice, any 3. A 3-panel
+    set forced into a 2x2 leaves a hole where the fourth would go, and that hole is the single
+    most-remarked-on defect in this document's figures. Emitting three separate files and
+    letting LaTeX pack them (two on the first line, the third centred under them) is what the
+    same three plots would have looked like had they been written as three figures, which is
+    what they are.
+
+        figs = ps.panels(3)
+        for (fig, ax), d in zip(figs, datasets):
+            ax.plot(...)
+        ps.save_panels(figs, "analysis/divergences/figs/my_set")
+
+    Each panel carries its own axis labels, its own legend and its own colourbar; nothing is
+    shared, because sharing is what forced them into one canvas in the first place.
+    """
+    return [figure(**kwargs) for _ in range(n)]
+
+
+#: Suffixes for the files `save_panels` writes. `_a`, `_b`, ... so the LaTeX include order is
+#: obvious and a caption can say "(a)", "(b)", "(c)" without counting.
+PANEL_SUFFIXES = "abcdefghij"
+
+
+def save_panels(figs, base: str, repo: str | None = None) -> list:
+    """Save each of `figs` as `<base>_a`, `<base>_b`, ... and print the LaTeX to include them.
+
+    `figs` is what `panels()` returned (a list of `(fig, ax)`), or a plain list of figures.
+    """
+    out = []
+    for i, item in enumerate(figs):
+        fig = item[0] if isinstance(item, tuple) else item
+        out.append(save(fig, f"{base}_{PANEL_SUFFIXES[i]}", repo=repo))
+    stem = os.path.basename(base)
+    rows = [PANEL_SUFFIXES[i:i + 2] for i in range(0, len(figs), 2)]
+    body = " \\\\[1ex]\n  ".join(
+        "\\hfill".join(f"\\includegraphics{{{stem}_{s}.pdf}}" for s in row) for row in rows)
+    print(f"  LaTeX:\n  \\centering\n  {body}")
+    return out
+
+
 def tag_grid(fig, nrows: int, ncols: int) -> None:
     """Record each axes' (row, col) on the axes itself, for `layout()`.
 
@@ -547,6 +591,51 @@ def process_label(ax, text: str, loc: str = "upper right", **kwargs):
                   ha=xy[2], va=xy[3], **kwargs)
     ax._ps_label = lbl          # make_room() keeps data out from under it
     return lbl
+
+
+#: The only legend positions allowed. A legend at `center left` / `center right` / `center`
+#: floats in the middle of the plot with data on both sides of it, and it reads as a mistake
+#: even when it happens not to overlap anything -- two of them ("weirdly placed") were spotted
+#: on sight in the compiled document. A corner is always either clear or made clear by
+#: `make_room`, which grows the axis; the middle of a plot cannot be cleared at all.
+LEGEND_LOCS = ("upper left", "upper right", "lower left", "lower right")
+
+
+def legend(ax, loc: str = "upper left", **kwargs):
+    """The one way to put a legend on an axes: inside it, in a corner.
+
+    `loc` must be a corner (see LEGEND_LOCS). `make_room`, called by `save`, then grows the
+    y-range until the legend is clear of the data, so the corner does not have to be chosen to
+    suit this particular dataset -- which is what made every script pick a different one.
+
+    If the legend comes out wider than the plot box it is rebuilt at `ncol=1`: a legend that
+    overhangs the axes is the "pops out horizontally" failure, and dropping to one column is
+    the fix that does not shrink the font.
+    """
+    if loc not in LEGEND_LOCS:
+        raise ValueError(f"legend loc {loc!r} is not a corner; use one of {LEGEND_LOCS}")
+    kwargs.setdefault("loc", loc)
+    leg = ax.legend(**kwargs)
+    _shrink_wide_legend(ax, leg, kwargs)
+    return leg
+
+
+def _shrink_wide_legend(ax, leg, kwargs):
+    """Rebuild a legend at fewer columns while it is wider than the plot box."""
+    if leg is None or kwargs.get("ncol", 1) <= 1:
+        return leg
+    fig = ax.figure
+    for ncol in range(int(kwargs["ncol"]) - 1, 0, -1):
+        try:
+            fig.canvas.draw()
+            rend = fig.canvas.get_renderer()
+            if leg.get_window_extent(rend).width <= ax.get_window_extent().width:
+                return leg
+        except Exception:
+            return leg
+        kwargs["ncol"] = ncol
+        leg = ax.legend(**kwargs)
+    return leg
 
 
 def shared_legend(fig, ax, ncol: int = 3, **kwargs):
@@ -815,6 +904,54 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
         ax.set_ylim(lo, hi)
 
 
+#: Colourbar geometry: horizontal, under its own panel. `pad` is in fractions of the axes
+#: height and has to clear the panel's x tick labels and x-label.
+CBAR_KW = dict(orientation="horizontal", location="bottom", fraction=0.07, pad=0.32)
+
+
+def colorbar(ax, mappable, label: str = "", **kwargs):
+    """The one way to put a colourbar on a plot: HORIZONTAL, directly under its own panel.
+
+    One rule with no branches, because every branch this had before turned into an
+    inconsistency someone noticed on the page: bars on the right of some panels and under
+    others, one bar serving two panels while a third had its own, a bar above a panel because
+    that was the only place it fitted.
+
+    Horizontal-below is the placement that always fits. A vertical bar costs ~0.8in of COLUMN,
+    which puts a panel at ~3.9in so two can never share a line; a horizontal one costs height
+    and leaves the panel at ~3.1in. Every panel that needs a scale gets its own bar.
+    """
+    kw = dict(CBAR_KW)
+    kw.update(kwargs)
+    cb = ax.figure.colorbar(mappable, ax=ax, **kw)
+    if label:
+        cb.set_label(label)
+    return cb
+
+
+def tidy_colorbars(fig) -> None:
+    """Keep colourbar tick labels from colliding, without shrinking the font.
+
+    A horizontal bar under a 2.40in panel has room for about four labels. Left to matplotlib
+    the error map's bar asked for six at full decimal precision
+    ("0.000000 0.00005 0.00010 0.00015 0.00020") and they ran into each other. Fewer ticks and
+    mathtext scientific notation is the fix the style rules already name for crowded ticks.
+    """
+    from matplotlib.ticker import MaxNLocator, ScalarFormatter, LogLocator
+    for cb in fig.axes:
+        if not _is_cbar(cb):
+            continue
+        bar = getattr(cb, "_colorbar", None)
+        horiz = getattr(bar, "orientation", "vertical") == "horizontal"
+        axis = cb.xaxis if horiz else cb.yaxis
+        if isinstance(axis.get_major_locator(), LogLocator):
+            continue                       # a log bar's decade ticks are already sparse
+        axis.set_major_locator(MaxNLocator(nbins=4))
+        fmt = ScalarFormatter(useMathText=True)
+        fmt.set_powerlimits((-2, 3))       # 0.00020 -> 2 x 10^-4, in the document's mathtext
+        axis.set_major_formatter(fmt)
+
+
 def save(fig, base: str, repo: str | None = None) -> str:
     """Save `fig` as BOTH `<base>.png` and `<base>.pdf` (repo convention, no exceptions).
 
@@ -836,6 +973,10 @@ def save(fig, base: str, repo: str | None = None) -> str:
     # limits, never sizes, so it cannot disturb the invariant.
     try:
         apply_headroom(fig)
+    except Exception:
+        pass
+    try:
+        tidy_colorbars(fig)
     except Exception:
         pass
     for _ax in _data_axes(fig):
@@ -913,5 +1054,24 @@ def _warn_if_squeezed(fig, base: str) -> None:
         if tb.x0 < -0.02 or tb.y0 < -0.02 or tb.x1 > fw + 0.02 or tb.y1 > fh + 0.02:
             print(f"  !! {name}: content overhangs the canvas ({tb.x0:.2f}..{tb.x1:.2f} x "
                   f"{tb.y0:.2f}..{tb.y1:.2f}in vs {fw:.2f}x{fh:.2f}in) -- it WILL be clipped")
+        # A grid with an empty cell. Three panels in a 2x2 leave a visible hole where the
+        # fourth would be; the fix is ps.panels(3) + ps.save_panels, so LaTeX packs them two
+        # on the first line and the third centred underneath, as three figures would have.
+        nr, nc, n = getattr(fig, "_ps_grid", (1, 1, 1))
+        if nr * nc > n:
+            print(f"  !! {name}: {n} panels in a {nr}x{nc} grid leaves {nr * nc - n} empty "
+                  f"cell(s) -- use ps.panels({n}) + ps.save_panels() instead")
+        # A legend wider than its plot box hangs out over the neighbouring panel or off the
+        # canvas. ps.legend drops ncol for you; a raw ax.legend(ncol=...) does not.
+        for ax, box in boxes:
+            lg = ax.get_legend()
+            if lg is None:
+                continue
+            try:
+                if lg.get_window_extent(rend).width > ax.get_window_extent().width + 1:
+                    print(f"  !! {name}: legend is wider than its plot box -- use ps.legend(), "
+                          f"which drops to ncol=1, or shorten the labels")
+            except Exception:
+                pass
     except Exception as exc:
         print(f"  !! {name}: layout check failed to run: {type(exc).__name__}: {exc}")

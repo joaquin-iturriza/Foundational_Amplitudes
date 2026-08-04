@@ -75,15 +75,18 @@ def panel(ax, x, sigma_log, rmse, xlabel, process):
     return ax
 
 
-# TWO figures, not one 2x2. Panel (d) is a different quantity on a different x-axis, so it was
-# only ever sharing a canvas with (a)-(c), not a story: as a 2x2 it left every panel small with
-# a band of white space, and (d)'s seven-entry legend covered half its own panel. results.tex
-# includes them as separate figures.
-# 2x2 with the fourth cell blank, not 1x3: three columns cannot hold the standard 2.40in
-# plot box at \textwidth (measured 8.19in), and the plot box is not negotiable.
-fig, axg = ps.figure(ncols=2, nrows=2, sharey=True, squeeze=False)
-axes = [axg[0][0], axg[0][1], axg[1][0]]
-axg[1][1].axis("off")
+# FOUR independent panels: the three sigma-vs-divergence profiles and the pre-flight diagnostic
+# they feed. They belong in one figure -- the diagnostic is the conclusion of the other three,
+# not a separate result -- and results.tex includes the four files two per line, so on the page
+# it reads as a 2x2.
+#
+# Not ps.figure(2, 2): four panels each carrying a y-label and log tick labels measure 6.79in
+# as one canvas, which is wider than the paper. As four files it is two lots of 3.2in, which
+# fits with room for the \hfill. And nothing is shared: no sharey (with a shared y-axis only
+# column 0 carries tick labels, so in a 2x2 that is (a) and (c) but not (b), and the panels
+# stop looking like each other), no shared legend strip.
+figs = ps.panels(4)
+axes = [f[1] for f in figs]
 
 # ---------------------------------------------------------------- (a) uug: the Z resonance
 d = load("heldout_eval_uug_base_s0")
@@ -125,34 +128,32 @@ POINTS = [
     (r"$u\bar u ggg$" + "\n(deep IR)", "heldout_eval_uuggg_base_s0", "heldout_eval_uuggg_g10_s0",
      lambda x: x < 1e-6, lambda x: x > 1e-2, "y", r"$\gamma{=}10$"),
 ]
-# Both series appear in all three panels, and neither label fits inside a 1.5in panel.
-# sharey also buys back the width two extra sets of y tick labels were costing, and puts the
-# three processes on one scale so the sigma/RMSE gap is comparable across them.
-# Column 1 shares the y-axis with column 0, so only the right-hand panel drops its label;
-# the bottom-left panel starts a new row and keeps it.
-axes[1].set_ylabel("")
-ps.shared_legend(fig, axes[0], ncol=2)
-base = os.path.join(HERE, "figs", "l2_sigma_vs_divergence")
-ps.save(fig, base)
+# The two series are the same in all three profile panels, so ONE legend, inside panel (a),
+# in its free corner -- not a strip above the figure. Both curves start high on the left and
+# fall, so the lower left is clear.
+ps.legend(axes[0], "lower left")
 
-# ---- second figure: the pre-flight diagnostic -------------------------------------------
-fig2, ax = ps.figure()
+# ---------------------------------------------------------------- (d) the pre-flight panel
+ax = axes[3]
 cs, gs = [], []
 MARKS = ["o", "s", "D"]
 COLS = [ps.C.blue, ps.C.vermillion, ps.C.green]
 for (name, bt, st, rf, bf, coord, glab), mk, col in zip(POINTS, MARKS, COLS):
     c, g = contrast_and_gain(bt, st, rf, bf, coord)
     cs.append(c); gs.append(g)
-    lab = name.replace("\n", " ") + f", {glab}"
-    ax.plot(c, g, mk, ms=8, color=col, zorder=3, label=lab)
+    # Just the process and the exponent: the region each point refers to is already the
+    # x-axis of the panel it came from, and the long "(Z peak)" / "(deep IR)" labels made the
+    # legend nearly as wide as the plot box.
+    lab = name.split("\n")[0] + f", {glab}"
+    ax.plot(c, g, mk, color=col, zorder=3, label=lab)
     print(f"  {name.replace(chr(10),' '):22s} sigma-contrast={c:.2f}  sigma/base MSE in region={g:.3f}")
 ax.plot(cs, gs, "-", color=ps.C.grey, lw=1.0, zorder=2)
 ax.axhline(1.0, color=ps.C.grey, ls="--", label="parity")
 ax.set_xlabel(r"$\langle\sigma\rangle_{\rm singular}\,/\,\langle\sigma\rangle_{\rm bulk}$")
-ax.set_ylabel(r"$\mathrm{MSE}_{\sigma}\,/\,\mathrm{MSE}_{\rm base}$ in that region")
+ax.set_ylabel(r"$\mathrm{MSE}_{\sigma}\,/\,\mathrm{MSE}_{\rm base}$")
 ax.set_xlim(1.1, 5.0); ax.set_ylim(0.30, 1.15)
 # Lower left is the free corner: the points fall left-to-right and the parity line sits at
-# the top. In the old 2x2 this legend sat at center right, across its own data.
-ax.legend(loc="lower left")
+# the top.
+ps.legend(ax, "lower left")
 
-ps.save(fig2, os.path.join(HERE, "figs", "l2_sigma_preflight"))
+ps.save_panels(figs, os.path.join(HERE, "figs", "l2_sigma_vs_divergence"))

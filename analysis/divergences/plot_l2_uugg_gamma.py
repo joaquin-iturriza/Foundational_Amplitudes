@@ -40,7 +40,7 @@ for g, c in zip(gammas, ramp):
 axL.set_xticks(x); axL.set_xticklabels(LBL)
 axL.set_xlabel(r"$\log_{10} y_{\min}$")
 axL.set_ylabel(r"MSE ratio")
-axL.legend(ncol=2, loc="upper left")
+ps.legend(axL, "upper left", ncol=2)
 ps.process_label(axL, r"$e^+e^-\to u\bar u gg$", loc="lower right")
 
 # right: three tracks vs gamma
@@ -53,7 +53,10 @@ axR.plot(gg, deep, "o-", color=ps.C.blue, label=r"$\log_{10} y_{\min}<-6$")
 axR.plot(gg, logf, "s-", color=ps.C.vermillion, label="log-flat over decades")
 axR.plot(gg, shal, "^-", color=ps.C.green, label=r"$\log_{10} y_{\min}>-1$")
 axR.set_xlabel(r"$\gamma$"); axR.set_ylabel(r"MSE ratio")
-axR.set_xticks(gg); axR.legend(loc="center right")
+axR.set_xticks(gg)
+# A corner, not "center right": a legend floating in the middle of the plot with data on
+# both sides of it reads as a mistake. make_room opens the top if the curves reach into it.
+ps.legend(axR, "upper left")
 
 ps.save(fig, "analysis/divergences/figs/l2_uugg_gamma")
 for g in gammas:

@@ -62,7 +62,12 @@ for ax, (proc, base_tag, rows) in zip(axes, [
     ax.minorticks_off()
     ps.process_label(ax, proc, loc="upper left")
 axes[0].set_ylabel(r"MSE ratio")
-axes[0].legend(loc="center left")
+# The legend goes in the RIGHT panel, which is empty: the uuggg curves all sit on parity, and
+# that flatness is the point of the panel. In the left panel the three tracks fan across the
+# whole box, so any corner there costs a y-range expansion big enough to push the axis below
+# zero -- meaningless for a ratio. Handles come from the left panel, which has all three
+# tracks; the right one only ever draws two.
+ps.legend(axes[1], "lower left", handles=axes[0].get_legend_handles_labels()[0])
 
 ps.save(fig, "analysis/divergences/figs/l2_gamma_response_extended")
 for nm, bt, rows in [("uugg", "heldout_eval_base_s0", UUGG), ("uuggg", "heldout_eval_uuggg_base_s0", UUGGG)]:

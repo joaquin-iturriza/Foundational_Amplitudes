@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Compute-scaling exponent alpha_C vs final-state multiplicity, styled after the
 alphas_panels figure of the Quantifying-ML-uncertainties talk: log-y axis, grey
-shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4)
-with the label rotated along the dashed line, one tab10 colour per process
-family joined by dotted lines, fine-tuned (full, layer-decay) targets as stars.
+shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4),
+one tab10 colour per process family joined by dotted lines, fine-tuned (full,
+layer-decay) targets as stars.
 
 Exponents are read from the two scaling_law_params.json files so the figure
 tracks the actual fits; the ratio (virt/Born) targets are excluded as nonsense.
@@ -68,15 +68,11 @@ dofx = lambda n: 3.0 * n - 4.0
 XLIM = (1.55, 10.5)
 YLIM = (4.0 / XLIM[1], 4.0 / XLIM[0])  # bound runs corner to corner
 dd = np.array(XLIM)
-ax.plot(dd, 4.0 / dd, color="0.65", ls="--", lw=2.0, zorder=1)
+# The bound goes in the LEGEND, not in rotated text along the line. The rotated label ran
+# diagonally across the middle of the plot, under the data and under the legend both, and it
+# is the kind of in-axes prose the figure rules exist to keep out.
+ax.plot(dd, 4.0 / dd, color="0.65", ls="--", zorder=1, label=r"$\alpha=4/\mathrm{DOF}$")
 ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
-x0 = np.sqrt(XLIM[0] * XLIM[1])
-p = lambda x: ax.transData.transform((x, 4.0 / x))
-(dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
-# One of the two sanctioned in-axes labels: it names a line that cannot go in the legend.
-ax.text(x0, (4.0 / x0) * 0.66, "Theoretical lower bound", color="0.55",
-        rotation=np.degrees(np.arctan2(dy, dx)),
-        rotation_mode="anchor", ha="center", va="center", zorder=1)
 
 # small multiplicative jitter so overlapping n_fs=2 points separate
 jit = {2: np.geomspace(1 / 1.06, 1.06, sum(n == 2 for _, _, m in FAMILIES for _, n in m))}
@@ -108,7 +104,11 @@ ax.yaxis.set_major_formatter(ScalarFormatter())
 ax.yaxis.set_minor_formatter(NullFormatter())
 ax.set_xlabel("final-state particles")
 ax.set_ylabel(r"$\alpha_C$")
-ax.legend(loc="upper right")
+# Eight entries with long process labels cannot go inside a 2.40in plot box at 11pt: the
+# legend was covering most of the panel and printing over the fine-tuned stars. This is the
+# sanctioned last resort -- one strip above the plot, paid for by the CANVAS, so the plot box
+# is still the standard one.
+ps.shared_legend(fig, ax, ncol=2)
 ax.grid(False)
 ps.save(fig, out)
 print("saved", out + ".png", out + ".pdf",

@@ -454,7 +454,9 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics{hpo_optima_summary.pdf}
+  \includegraphics{hpo_optima_summary_a.pdf}\hfill\includegraphics{hpo_optima_summary_b.pdf} \\[1ex]
+  \includegraphics{hpo_optima_summary_c.pdf}\hfill\includegraphics{hpo_optima_summary_d.pdf} \\[1ex]
+  \includegraphics{hpo_optima_summary_e.pdf}\hfill\includegraphics{hpo_optima_summary_f.pdf}
   \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
   $\mu$P transfers) and vs batch (entangled with horizon; do not read as causal) on the top
   row; vs horizon (the inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with
@@ -475,7 +477,8 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics{lr_2d_disentangled.pdf}
+  \includegraphics{lr_2d_disentangled_a.pdf}\hfill\includegraphics{lr_2d_disentangled_b.pdf} \\[1ex]
+  \includegraphics{lr_2d_disentangled_c.pdf}
   \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
   $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
   $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
@@ -573,7 +576,7 @@ off-shellness conditioning is on by default in the big-run recipes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{levers_offshell_ab.pdf}
+  \includegraphics{levers_offshell_ab_a.pdf}\hfill\includegraphics{levers_offshell_ab_b.pdf}
   \caption{\textbf{Flagship off-shellness A/B} over the $44$-dataset $Z$/top/Higgs mixture (full
   data, fiducial cuts, 30k iterations); $\vlnr$ per dataset at each arm's best checkpoint.
   \emph{Left:} the
@@ -1099,14 +1102,36 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 
 \begin{figure}[H]
   \centering
-  \includegraphics{phase_space_pretrain_aa.pdf}
-  \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning.}
-  $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$: truth, model,
-  error (top); $\sqrt{s}$/$\cos\theta^*$ projections and predicted-vs-true (middle); and
-  the collinear-resolved ramp in $\eta$ of Eq.~\eqref{eq:collinear} (bottom), where the
-  model tracks the collinear pole to $\log|\mathcal{M}|^2\approx10$. Error concentrates at
-  the boundaries, not the pole.}
+  \includegraphics{phase_space_pretrain_aa_a.pdf}\hfill\includegraphics{phase_space_pretrain_aa_b.pdf} \\[1ex]
+  \includegraphics{phase_space_pretrain_aa_c.pdf}
+  \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning: the maps.}
+  $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$ for truth and model,
+  with the absolute error. Error concentrates at the phase-space boundaries, not at the pole;
+  the cyan contour on the error map rings the bins with too little data to trust. The
+  projections are Fig.~\ref{fig:div_gg_proj} and the collinear ramp Fig.~\ref{fig:div_gg_coll}.}
   \label{fig:div_gg}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{phase_space_pretrain_aa_proj_a.pdf}\hfill\includegraphics{phase_space_pretrain_aa_proj_b.pdf} \\[1ex]
+  \includegraphics{phase_space_pretrain_aa_proj_c.pdf}
+  \caption{\textbf{$e^+e^-\to\gamma\gamma$: projections and predicted-vs-true.} The same
+  events as Fig.~\ref{fig:div_gg}, projected onto $\sqrt{s}$ and onto $\cos\theta^*$ (truth
+  as the thick curve, model dashed over it), and the joint density of model against truth.}
+  \label{fig:div_gg_proj}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{phase_space_pretrain_aa_collinear.pdf}
+  \caption{\textbf{$e^+e^-\to\gamma\gamma$: the collinear-resolved ramp.} Left:
+  $\log|\mathcal{M}|^2$ against the stretched collinear coordinate $\eta$ of
+  Eq.~\eqref{eq:collinear} (mean and max, truth against model), where the model tracks the
+  collinear pole to $\log|\mathcal{M}|^2\approx10$; the upper axis gives the corresponding
+  $|\cos\theta^*|$. Right: the mean absolute error along the same coordinate, flat across the
+  ramp.}
+  \label{fig:div_gg_coll}
 \end{figure}
 
 \subsection{Real infrared singularities}
@@ -1178,7 +1203,8 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 
 \begin{figure}[H]
   \centering
-  \includegraphics{ir_pretrain_uug_dalitz.pdf}
+  \includegraphics{ir_pretrain_uug_dalitz_a.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_b.pdf} \\[1ex]
+  \includegraphics{ir_pretrain_uug_dalitz_c.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_d.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. Panels:
   analytic LO $C_F$-antenna, truth, model, absolute error. The collinear poles lie on the
   $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$ corner; white
@@ -1216,7 +1242,8 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[H]
   \centering
-  \includegraphics{ir_pretrain_uugg.pdf}
+  \includegraphics{ir_pretrain_uugg_a.pdf}\hfill\includegraphics{ir_pretrain_uugg_b.pdf} \\[1ex]
+  \includegraphics{ir_pretrain_uugg_c.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process: the maps.}
   $\langle\log|\mathcal{M}|^2\rangle$ over the IR resolution variables of Eq.~\eqref{eq:ir},
   truth and model on a common scale, with the absolute error below. The error grows toward
@@ -1227,7 +1254,8 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[H]
   \centering
-  \includegraphics{ir_pretrain_uugg_ramps.pdf}
+  \includegraphics{ir_pretrain_uugg_ramps_a.pdf}\hfill\includegraphics{ir_pretrain_uugg_ramps_b.pdf} \\[1ex]
+  \includegraphics{ir_pretrain_uugg_ramps_c.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$: the IR ramps.} $\log|\mathcal{M}|^2$ against each
   resolution variable, with the analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$
   overlaid, and the prediction-vs-truth density. The mean ramps are tracked into the deep IR
@@ -1322,7 +1350,8 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f000.pdf}
+  \includegraphics{heldout_resid_f000_a.pdf}\hfill\includegraphics{heldout_resid_f000_b.pdf} \\[1ex]
+  \includegraphics{heldout_resid_f000_c.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region: the maps}, in the IR plane
   of Eq.~\eqref{eq:ir}. Truth and model on a common scale, with the absolute error below: the
   error concentrates in the soft/collinear corner the model never saw. The ramps are
@@ -1332,7 +1361,8 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f000_ramps.pdf}
+  \includegraphics{heldout_resid_f000_ramps_a.pdf}\hfill\includegraphics{heldout_resid_f000_ramps_b.pdf} \\[1ex]
+  \includegraphics{heldout_resid_f000_ramps_c.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$): the ramps.} The model mean (red) plateaus
   \emph{off} the IR ramp while truth (black) lies on the analytic $1/y_{\min}$ slope (green),
   and predictions saturate against a ceiling (predicted-vs-true): never having seen the
@@ -1342,7 +1372,8 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f100.pdf}
+  \includegraphics{heldout_resid_f100_a.pdf}\hfill\includegraphics{heldout_resid_f100_b.pdf} \\[1ex]
+  \includegraphics{heldout_resid_f100_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region: the maps.} With the
   divergent region back in the training support the error is flat and small across the plane
   (note the $\sim\!25\times$ smaller error axis); contrast Fig.~\ref{fig:div_holdout_f0}.}
@@ -1351,7 +1382,8 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f100_ramps.pdf}
+  \includegraphics{heldout_resid_f100_ramps_a.pdf}\hfill\includegraphics{heldout_resid_f100_ramps_b.pdf} \\[1ex]
+  \includegraphics{heldout_resid_f100_ramps_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$): the ramps.} The IR ramp (analytic
   $1/y_{\min}$ slope, green) is tracked into the deep IR by both truth and model and the
   predicted-vs-true ceiling is gone; contrast Fig.~\ref{fig:div_holdout_f0_ramps}.}
@@ -1485,7 +1517,8 @@ $\ln$ of the amplitude ratio) plus median relative error.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{deep_sampling_uniform_vs_antenna.pdf}
+  \includegraphics{deep_sampling_uniform_vs_antenna_a.pdf}\hfill\includegraphics{deep_sampling_uniform_vs_antenna_b.pdf} \\[1ex]
+  \includegraphics{deep_sampling_uniform_vs_antenna_c.pdf}
   \caption{\textbf{Antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
   for the production flat-\textsc{rambo} set vs the antenna sampler, same base22 / $400$k events /
   $4000$ steps. Flat \textsc{rambo} starves the deep IR by construction (median
@@ -2072,25 +2105,19 @@ and gives the concentration principle a directly measurable order parameter.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{l2_sigma_vs_divergence.pdf}
-  \caption{\textbf{The learned $\sigma$ rises inside the divergence.} Mean $\sigma$ and actual RMSE
-  against the coordinate defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical
-  gap is the calibration) and on a shared scale, all on the base/uniform arm. $u\bar u g$: $\sigma$
-  climbs $4.5\times$ into the $Z$ pole and plateaus across it, following a $10\times$ rise in the error.
-  $u\bar u gg$: a $1.8\times$ rise into the deep IR. $u\bar u ggg$: nearly flat ($1.3\times$): there is
-  no thin region for $\sigma$ to point at.}
+  \includegraphics{l2_sigma_vs_divergence_a.pdf}\hfill\includegraphics{l2_sigma_vs_divergence_b.pdf} \\[1ex]
+  \includegraphics{l2_sigma_vs_divergence_c.pdf}\hfill\includegraphics{l2_sigma_vs_divergence_d.pdf}
+  \caption{\textbf{The learned $\sigma$ rises inside the divergence, and how sharply it rises
+  predicts whether $\sigma$-steering pays.} \emph{(a)--(c)} Mean $\sigma$ and actual RMSE against the
+  coordinate defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical gap is the
+  calibration), all on the base/uniform arm. $u\bar u g$: $\sigma$ climbs $4.5\times$ into the $Z$ pole
+  and plateaus across it, following a $10\times$ rise in the error. $u\bar u gg$: a $1.8\times$ rise into
+  the deep IR. $u\bar u ggg$: nearly flat ($1.3\times$): there is no thin region for $\sigma$ to point
+  at. \emph{(d)} The pre-flight diagnostic those three feed: the $\sigma$-contrast
+  $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$, measured on the base arm
+  alone, against the $\sigma$-arm/base MSE ratio actually measured in that region. They order
+  monotonically, so the contrast decides the question with one forward pass and no A/B.}
   \label{fig:l2_sigma_vs_divergence}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics{l2_sigma_preflight.pdf}
-  \caption{\textbf{How sharply $\sigma$ rises predicts whether $\sigma$-steering pays.} The
-  $\sigma$-contrast $\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$, measured on
-  the base arm alone, against the $\sigma$-arm/base MSE ratio actually measured in that region, for the
-  three processes of Fig.~\ref{fig:l2_sigma_vs_divergence}. They order monotonically, so the contrast is
-  a \emph{pre-flight} diagnostic for the concentration principle: one forward pass, no A/B.}
-  \label{fig:l2_sigma_preflight}
 \end{figure}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for

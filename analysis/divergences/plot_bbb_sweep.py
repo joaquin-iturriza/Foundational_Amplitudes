@@ -54,12 +54,15 @@ def main():
         if ax is axes[0]:
             ax.set_ylabel(r"deep-IR MSE")
     axes[0].axvline(5e-3, color=ps.C.blue, ls="-.", label=r"$\sigma_{\rm rel}$ lower bound")
-    ps.shared_legend(fig, axes[0], ncol=3)
-    cb = fig.colorbar(sc, ax=axes, fraction=0.03, pad=0.02)
-    # Above the bar, not rotated beside it: as a side label the gamma overhung the 6.5in
-    # canvas by 0.15in and savefig (bbox=None) cut it off -- on a figure whose subject IS
-    # the gamma sweep.
-    cb.ax.set_title(r"$\gamma$", pad=6)
+    # Inside the left panel, not a strip above the figure. The trials climb left-to-right in
+    # both panels, so the upper left is the free corner; a legend strip on top was buying
+    # nothing here except a second style of legend in the same document.
+    ps.legend(axes[0], "upper left")
+    # One bar per panel, horizontal and underneath, like every other colourbar in the
+    # document. A single vertical bar to the right of the pair meant two panels shared a scale
+    # a third figure's panels did not -- the sharing is what looked arbitrary, not the bar.
+    for _ax in axes:
+        ps.colorbar(_ax, sc, r"$\gamma$")
     ps.save(fig, args.out)
     print(f"wrote {args.out}.png/.pdf")
     print(f"best: deep_mse={obj[best]:.4e} at sigma_rel={srel[best]:.3e} beta={beta[best]:.3e} "

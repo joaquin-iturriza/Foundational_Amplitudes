@@ -82,16 +82,16 @@ def main():
     ax.set_xscale("log"); ax.set_yscale("log"); ax.invert_xaxis()
     ax.set_xlabel(r"$y_{\min}$")
     ax.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
-    ax.legend(loc="upper right")
+    ps.legend(ax, "upper left")
     if args.process:
-        ps.process_label(ax, args.process, loc="lower left")
+        ps.process_label(ax, args.process)
 
     if args.regions:
         ax2 = axes[0, 1]
         SREG = [(r"$<3$", lambda s: np.abs(s - MZ) < 3.0),
                 (r"$3\!-\!15$", lambda s: (np.abs(s - MZ) >= 3.0) & (np.abs(s - MZ) < 15.0)),
                 (r"$>15$", lambda s: np.abs(s - MZ) >= 15.0),
-                ("$<3$," "\n" r"$y_{\min}<10^{-3}$", lambda s: None)]  # special-cased below
+                (r"$<3$, IR", lambda s: None)]  # special-cased below
         xlab = [r[0] for r in SREG]
         width = 0.8 / max(1, len(runs))
         for j, (label, err2, y_min, s) in enumerate(runs):
@@ -99,7 +99,7 @@ def main():
                 continue
             vals = []
             for name, fn in SREG:
-                if name.startswith("$<3$,"):
+                if "IR" in name:
                     m = (y_min < 1e-3) & (np.abs(s - MZ) < 3.0)
                 else:
                     m = fn(s)
@@ -112,7 +112,8 @@ def main():
         ax2.set_xlabel(r"$|\sqrt{s}-M_Z|$  [GeV]")
         ax2.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
         ax2.grid(True, axis="y", which="both")
-        ax2.legend(loc="upper left")
+        # No second legend: both panels draw the SAME three arms, so repeating it here just
+        # takes up plot area. One legend per figure, inside an axes.
 
     ps.save(fig, args.out)
 

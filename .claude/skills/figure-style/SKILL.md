@@ -48,18 +48,50 @@ hold standard plot boxes at that column count. Fix it structurally:
 
 | symptom | fix |
 |---|---|
-| 2 columns + a colourbar per panel | 1 column, or one shared colourbar |
+| 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels` |
+| 2 columns + a colourbar per panel | separate panel files; maps take a horizontal bar |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
+| a 2x2 that still measures over 6.5 in | separate panel files, two per line |
 | legend outside the axes | put it inside; use `ps.make_room` to open space |
+| a panel spanning two cells | split the figure; every panel is one cell |
 
-## Grids
+## Grids: one canvas holds 1, 2 or 4 panels. Anything else is separate files.
 
-**Allowed: 1x1, 1x2, 2x2. Never 3 across, never 4 across, never a spanning panel.** A 1-column
-figure is a ~2.9 in-wide canvas centred on the page, *not* a stretched 6.5 in one — that is the
-price of a plot being the same size everywhere, and it is the price we pay.
+**`ps.figure` is only for 1x1, 1x2 and 2x2.** Never 3 across, never 4 across, never a panel
+spanning two cells, and never a grid with an empty cell.
+
+**For any other panel count — in practice any 3 — use `ps.panels(n)` and `ps.save_panels`.**
+Each panel is written as its own file (`<base>_a.pdf`, `_b`, `_c`) and `results.tex` includes
+them two per line, so LaTeX puts two on the first line and the third centred underneath:
+
+```python
+figs = ps.panels(3)
+for (fig, ax), d in zip(figs, datasets):
+    ax.plot(...)
+ps.save_panels(figs, "analysis/divergences/figs/my_set")   # prints the LaTeX to paste
+```
+
+```latex
+\includegraphics{my_set_a.pdf}\hfill\includegraphics{my_set_b.pdf} \\[1ex]
+\includegraphics{my_set_c.pdf}
+```
+
+Three panels forced into a 2x2 leave a hole where the fourth would go, and that hole is the
+first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
+
+A single panel must stay under ~3.2 in for two to share a line; `ps.save` reports the canvas
+width. A map with a vertical colourbar is ~3.9 in and will sit one per line — that is fine, but
+it is why maps take a horizontal bar (below).
 
 Group panels into one figure only when they are the same quantity over one swept parameter.
 Unrelated plots that happen to be discussed together go in separate figures.
+
+**Do not share anything to buy width.** No `sharey` so one column can drop its tick labels, no
+"axis labels on the outside edges only", no one legend or colourbar serving some panels and not
+others. Sharing is how panels stop looking like each other: with `sharey` in a 2x2, columns 0
+gets tick labels, so panels (a) and (c) have numbers and (b) does not. Every panel labels its
+own axes. `sharey` is fine in a 1x2 when both panels really are the same quantity — there it is
+symmetric — but never as a width workaround.
 
 ## Always use the shared module
 
@@ -101,11 +133,38 @@ precisely what the reader notices.
 
 | element | rule |
 |---|---|
-| legend | **inside the axes**, always. `ps.make_room` grows the y-range until it is clear of the data. A figure-level legend outside is a last resort and needs a reason. |
+| legend | **`ps.legend(ax, "upper left")` — inside the axes, in a CORNER.** `ps.legend` rejects anything else. `ps.make_room` then grows the y-range until it is clear of the data. |
+| legend, which panel | **one legend per figure**, in whichever panel has room — often not the one the series were drawn on. Pass `handles=other_ax.get_legend_handles_labels()[0]`. |
 | process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. |
-| colourbar | **vertical, immediately right of its plot**, in its allocated strip. Not below, not on top, not in an inset. |
+| colourbar | **`ps.colorbar(ax, mappable, label)` — horizontal, directly under its own panel.** Always, and one per panel that needs a scale. |
 | headroom | `ps.headroom` gives every plot the same clear band above and below the data. Do not hand-tune `ylim` for appearance. |
 | tick labels | horizontal. **Never rotate them** — rotated labels are tall, and tall labels used to shrink the plot. If they collide, use fewer ticks or shorter text ($\log_{10}$ exponents, not `1e-6`). |
+
+**Why colourbars have exactly one placement.** Every branch this rule ever had turned into
+something a reader spotted: bars on the right of some panels and under others, one bar serving
+two panels while a third had its own, a bar *above* a panel because that was the only place it
+fitted. Horizontal-below is the placement that always fits — a vertical bar costs ~0.8 in of
+*column*, which puts a panel at ~3.9 in so two can never share a line, while a horizontal one
+costs height and leaves it at ~3.1 in. So: one rule, no exceptions, one bar per panel. Sharing
+a bar across panels is what looked arbitrary, not the bar.
+
+`ps.save` also thins colourbar ticks to four and switches them to mathtext scientific notation;
+six labels at full decimal precision ran into each other under a 2.40 in panel.
+
+**`center left` / `center right` / `center` are not legend positions.** A legend floating in the
+middle of a plot with data on both sides of it reads as a mistake even when it happens not to
+overlap anything; two were spotted on sight in the compiled document. A corner is always either
+clear or made clear by growing the axis. The middle cannot be cleared at all.
+
+**A legend wider than its plot box hangs over the neighbouring panel.** `ps.legend` drops `ncol`
+until it fits, and `ps.save` warns if one still does not. If the labels are a cross product
+(arm x size, band x truth/model), **factorise it**: colour carries one factor, line style the
+other, so six entries of "base 75k", "sigma 150k", … become three short colour entries plus two
+style entries. That is narrower *and* says what the figure is comparing.
+
+An outside legend is a last resort for when the entries fit in no panel at all — eight process
+labels, say. Then it is **one strip above the plot** via `ps.shared_legend`, never below, never
+to the side, and it grows the canvas rather than the panel.
 
 ## Include at natural size in LaTeX
 
@@ -156,7 +215,8 @@ A missing glyph is silent: no warning, just a box. Look at the PNG after any lab
 ## Before you call it done
 
 1. **Run the script and read its output.** `!!` lines are the invariant being violated. A
-   `canvas exceeds \textwidth` line means restructure, not shrink.
+   `canvas exceeds \textwidth` line means restructure, not shrink; an `empty cell(s)` line means
+   `ps.panels`; a `legend is wider than its plot box` line means factorise the labels.
 2. **Look at the PNG.** Colliding tick labels, a legend on the data, a missing glyph and a
    colourbar in the wrong place are only visible in the render.
 3. **Look at the figure next to its neighbours in the compiled PDF.** Every one of the size
@@ -169,10 +229,16 @@ A missing glyph is silent: no warning, just a box. Look at the PNG after any lab
 
 ## When editing an existing script
 
-Convert it fully rather than patching around it: swap `plt.subplots` for `ps.figure`, delete
-local rcParams, colour constants, `figsize`, `lw`/`ms` overrides and any `tight_layout` call,
-replace both `savefig` calls with `ps.save`, and strip titles, annotations and reading hints.
-Then regenerate and look at the PNG.
+Convert it fully rather than patching around it: swap `plt.subplots` for `ps.figure` (or
+`ps.panels` for a 3-panel set), delete local rcParams, colour constants, `figsize`, `lw`/`ms`
+overrides and any `tight_layout` call, replace both `savefig` calls with `ps.save`, route
+legends through `ps.legend` and colourbars through `ps.colorbar`, drop any `sharey` or
+outer-edge-labels-only trick that exists to save width, and strip titles, annotations and
+reading hints. Then regenerate and look at the PNG.
+
+**A hand-rolled `GridSpec` is a sign the figure is the wrong shape.** Every one in this repo
+existed to fit something that did not fit: a dedicated colourbar row, a panel spanning two
+cells, a spacer column. Split the figure instead.
 
 Moving explanation out of a figure usually means the caption in `docs/results.tex` must absorb
 it, and a caption that says "left" and "right" must still be true after a reflow.

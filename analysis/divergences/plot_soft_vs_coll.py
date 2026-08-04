@@ -42,15 +42,18 @@ def main():
     xc = fcoll.copy(); xc[fcoll == 0] = f0
 
     fig, ax = ps.figure()
-    ax.plot(xs, msoft, "o-", color=ps.C.vermillion, label=r"soft cut, $x_g<c$")
-    ax.plot(xc, mcoll, "s-", color=ps.C.blue, label=r"collinear cut, $y_{\min}<c$ at hard $x_g$")
+    ax.plot(xs, msoft, "o-", color=ps.C.vermillion, label=r"soft, $x_g<c$")
+    ax.plot(xc, mcoll, "s-", color=ps.C.blue, label=r"collinear, $y_{\min}<c$")
     ax.set_xscale("log"); ax.set_yscale("log")
     xt = [f0] + [x for x in sorted(set(list(fsoft) + list(fcoll))) if x > 0]
     ax.set_xticks(xt); ax.set_xticklabels(["0"] + [f"{x:g}" for x in xt[1:]])
     ax.minorticks_off()
     ax.set_xlabel(r"add-back fraction $f$")
     ax.set_ylabel(r"MSE$(\Delta\log|\mathcal{M}|^2)$")
-    ax.legend(loc="lower left")
+    # "collinear cut, $y_{\\min}<c$ at hard $x_g$" made the legend wider than the plot box.
+    # That the collinear cut is taken at hard $x_g$ is the definition of the cut and belongs
+    # in the caption, not in a legend entry.
+    ps.legend(ax, "lower left")
     ps.process_label(ax, r"$e^+e^-\to u\bar u g$", loc="upper right")
 
     ps.save(fig, args.out_base)

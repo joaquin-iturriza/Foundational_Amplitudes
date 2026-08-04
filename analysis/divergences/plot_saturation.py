@@ -71,15 +71,27 @@ fig, axes = ps.figure(ncols=2)
 
 # ---------------------------------------------------------------- (a) sigma tail vs pool size
 ax = axes[0]
+sizes = []
 for arm, ls, mk in [("base", "-", "o"), ("sigma", "--", "s")]:
     data = load(arm)
     for N, d in sorted(data.items()):
         c = COLORS.get(N, ps.C.grey)
-        ax.plot(d["pool"], d["p99"], ls + mk, color=c, label=f"{arm} {N//1000}k")
+        ax.plot(d["pool"], d["p99"], ls + mk, color=c)
+        if N not in sizes:
+            sizes.append(N)
 ax.set_xscale("log"); ax.set_yscale("log")
 ax.set_xlabel("training pool size")
 ax.set_ylabel(r"$\sigma$ p99")
-ax.legend(ncol=2, loc="lower left", columnspacing=1.0)
+# The six curves are a 2x3 of arm x pool size, so the legend factorises: colour carries the
+# size, line style and marker carry the arm. Spelling out all six ("base 75k", "sigma 150k",
+# ...) needed two columns and came out wider than the plot box, hanging over the panel beside
+# it. Five short entries in one column fit inside the axes at the document font size.
+from matplotlib.lines import Line2D  # noqa: E402
+handles = [Line2D([], [], color=COLORS.get(N, ps.C.grey), marker="o", ls="-",
+                  label=f"{N//1000}k") for N in sorted(sizes)]
+handles += [Line2D([], [], color=ps.C.grey, marker=mk, ls=ls, label=lab)
+            for lab, ls, mk in [("base", "-", "o"), (r"$\sigma$", "--", "s")]]
+ps.legend(ax, "lower left", handles=handles)
 ps.process_label(ax, r"$e^+e^-\to u\bar u gg$", loc="upper right")
 
 # ---------------------------------------------------------------- (b) per-round fractional fall

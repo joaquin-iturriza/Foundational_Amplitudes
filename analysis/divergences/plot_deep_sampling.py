@@ -92,11 +92,11 @@ def main():
 
     # 2x2, not 1x3. Three panels across \textwidth left each one 1.36x1.09in -- the smallest
     # in the document, barely over the legibility floor, and roughly half the panel every
-    # 1- and 2-column figure gets. Two columns hold the standard panel; the fourth cell stays
-    # empty rather than any panel being dropped or shrunk.
-    fig, axes = ps.figure(ncols=2, nrows=2)
-    (ax1, ax2), (ax3, ax_blank) = axes
-    ax_blank.axis("off")
+    # THREE separate panel files, not a 2x2 with the fourth cell blanked out: the hole where
+    # the fourth panel would be is the first thing anyone sees. results.tex packs them two per
+    # line, the third centred underneath.
+    figs = ps.panels(3)
+    ax1, ax2, ax3 = (f[1] for f in figs)
 
     # Panel 1: per-decade MSE of Δln|M|^2 (log-space L2 = squared fractional error)
     for mode in modes:
@@ -127,8 +127,10 @@ def main():
     ax3.set_xlabel(r"$\log_{10} y_{\min}$")
     ax3.set_ylabel("training events")
 
-    ps.shared_legend(fig, ax1, ncol=len(modes))
-    ps.save(fig, args.out_base)
+    # Inside the first panel, not a strip over the figure: the arms separate downward to the
+    # right, so the lower left is clear.
+    ps.legend(ax1, "lower left")
+    ps.save_panels(figs, args.out_base)
     print(f"wrote {args.out_base}.png/.pdf")
 
     def cell(v):

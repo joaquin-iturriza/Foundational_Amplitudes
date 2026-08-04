@@ -47,7 +47,7 @@ BARS = [
 FAMILY = {
     "both":   (ps.C.green,      "order and magnitude"),
     "oracle": (ps.C.blue,       "oracle"),
-    "order":  (ps.C.vermillion, "order only, magnitude fixed"),
+    "order":  (ps.C.vermillion, "order only"),
 }
 
 #: The order-only tolerance curve. rho=0 is the no-reweighting baseline and rho=1 the oracle
@@ -93,20 +93,23 @@ def main():
         if fam not in seen:
             seen.add(fam)
             handles.append(Patch(facecolor=FAMILY[fam][0], label=FAMILY[fam][1]))
-    axL.legend(handles=handles, loc="upper left")
+    ps.legend(axL, "upper left", handles=handles)
     ps.process_label(axL, args.process, loc="lower right")
 
     # --- right: gain vs ranking quality, magnitude held fixed ------------------
     xs = [q2.RHO[t] for t in CURVE]
     ys = [G[t][METRIC] for t in CURVE]
-    axR.plot(xs, ys, "o-", color=ps.C.vermillion, label="order only, magnitude fixed")
+    axR.plot(xs, ys, "o-", color=ps.C.vermillion, label="order only")
     axR.plot([q2.RHO["rank_real"]], [G["rank_real"][METRIC]], "*", ms=13,
-             color=ps.C.green, label=r"$\sigma$ head, order only")
+             color=ps.C.green, label=r"$\sigma$, order only")
     axR.plot([q2.RHO["sigma"]], [G["sigma"][METRIC]], "P", ms=10,
-             color=ps.C.blue, label=r"$\sigma$ head, order and magnitude")
+             color=ps.C.blue, label=r"$\sigma$, order $+$ magnitude")
     axR.set_xlabel(r"ranking quality $\rho(\mathrm{score},|r|)$")
     axR.set_ylabel(r"$\dfrac{M_{\mathrm{base}}-M}{M_{\mathrm{base}}-M_{\mathrm{oracle}}}$")
-    axR.legend(loc="upper left")
+    # Short labels: "order only, magnitude fixed" and "$\sigma$ head, order and magnitude"
+    # made a legend wider than the plot box, which then hung over the panel beside it. What
+    # is held fixed is already the point of the x-axis, and the caption says it in full.
+    ps.legend(axR, "upper left")
 
     ps.save(fig, args.out_base)
 

@@ -32,7 +32,7 @@ import plot_style as ps  # noqa: E402
 #: (dataset-name prefix, legend/tick name). Order is the argument: the s-channel Z scan is the
 #: probe the lever was designed for, the other three are the generalisation test.
 FAMILIES = [
-    ("ee_mumu__mz",       r"$Z$ ($s$-channel)"),
+    ("ee_mumu__mz",       r"$Z$ ($s$-chan)"),
     ("ee_mumumumu__mz4l", r"$Z$ in $4\ell$"),
     ("ee_wwbb__mt",       r"top"),
     ("ee_mumutautau__mh", r"Higgs"),
@@ -90,7 +90,11 @@ def main():
     style = {"off": (ps.C.vermillion, "o-", "no mass feature"),
              "offshell": (ps.C.blue, "s-", r"off-shellness $s_{\mathrm{prop}}-M^2$")}
 
-    fig, (axL, axR) = ps.figure(ncols=2)
+    # Two separate panel files. The right panel's family names run along the y-axis now that
+    # the bars are horizontal, and as one canvas that pushed the figure to 6.58in -- past the
+    # text width, so it would be clipped. Two files fit whatever LaTeX can put on a line.
+    figs = ps.panels(2)
+    (_, axL), (_, axR) = figs
 
     # --- left: the Z-mass scan -------------------------------------------------
     mz = scanned_masses(args.recipe, "ee_mumu__mz", 23)
@@ -116,20 +120,23 @@ def main():
     for i, (arm, (col, _, lab)) in enumerate(style.items()):
         med = [np.median([v for k, v in arms[arm].items() if k.startswith(pref)])
                for pref, _ in FAMILIES]
-        axR.bar(x + (i - 0.5) * w, med, w, color=col, label=lab)
-    axR.set_yscale("log")
-    axR.set_xticks(x)
-    axR.set_xticklabels([nm for _, nm in FAMILIES], rotation=20, ha="right")
-    axR.set_ylabel(r"median $\mathrm{val\ loss}_{\mathrm{no\ reg}}$")
+        axR.barh(x + (i - 0.5) * w, med, w, color=col, label=lab)
+    # Horizontal bars, so the family names read left-to-right at their natural width. As
+    # vertical bars they needed rotation=20 to fit, and a rotated label block is tall.
+    axR.set_xscale("log")
+    axR.set_yticks(x)
+    axR.set_yticklabels([nm for _, nm in FAMILIES])
+    axR.invert_yaxis()
+    axR.set_xlabel(r"median $\mathrm{val\ loss}_{\mathrm{no\ reg}}$")
     # A bar on a log axis is drawn from the axis floor, so an unbounded floor makes the
     # s-channel bar a 10-decade slab whose length says nothing. Clip to just below the
     # smallest median so every bar's length is readable against the others.
-    axR.set_ylim(10 ** np.floor(np.log10(min(_all)) - 0.3), 3e0)
+    axR.set_xlim(10 ** np.floor(np.log10(min(_all)) - 0.3), 3e0)
 
-    # One legend across the top: both panels plot the same two arms, and any in-panel legend
-    # here sits on either the scan curves or the bars.
-    ps.shared_legend(fig, axL, ncol=2)
-    ps.save(fig, args.out_base)
+    # One legend, inside the bar panel: horizontal bars leave the top right of that panel
+    # empty, and the scan panel's curves run through every corner of theirs.
+    ps.legend(axR, "lower right")
+    ps.save_panels(figs, args.out_base)
 
     for pref, nm in FAMILIES:
         a = np.median([v for k, v in arms["off"].items() if k.startswith(pref)])

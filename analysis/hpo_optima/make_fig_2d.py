@@ -43,17 +43,15 @@ def norm_colors(values, norm):
 
 def ramp_bar(a, norm, label):
     sm = plt.cm.ScalarMappable(norm=norm, cmap=ps.CMAP)
-    cb = fig.colorbar(sm, ax=a)
-    cb.set_label(label)
+    ps.colorbar(a, sm, label)
 
 
-# ONE column, three rows. Three panels each carrying their own colourbar cannot hold the
-# standard plot box across two columns -- measured 7.55in against a 6.5in text width, which at
-# natural size is wider than the paper and gets CLIPPED, not merely overfull. Fewer columns is
-# the sanctioned fix; the plot box is not negotiable. No layout="constrained": ps.layout owns
-# the geometry, and a layout engine distributing a fixed canvas is what shrinks plots.
-fig, axg = ps.figure(ncols=1, nrows=3, squeeze=False)
-ax = [axg[0, 0], axg[1, 0], axg[2, 0]]
+# THREE separate panel files. As a 2x2 this left a hole where the fourth panel would go; as a
+# 1x3 column it was three plots stacked down a narrow canvas, wasting the width. Separate files
+# let results.tex put two on the first line and the third centred underneath. Each panel takes
+# its own colourbar, horizontal and under it, which is what keeps a panel at ~3.1in so two fit.
+figs = ps.panels(3)
+ax = [f[1] for f in figs]
 norm_D = make_norm(Ds)
 cols_D = norm_colors(Ds, norm_D)
 
@@ -106,4 +104,4 @@ a.legend(loc='upper right')
 ramp_bar(a, norm_D, r'$D$')
 
 base = out[:-4] if out.lower().endswith(('.png', '.pdf')) else out
-ps.save(fig, base)
+ps.save_panels(figs, base)
