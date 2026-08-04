@@ -49,7 +49,7 @@ hold standard plot boxes at that column count. Fix it structurally:
 | symptom | fix |
 |---|---|
 | 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels` |
-| 2 columns + a colourbar per panel | separate panel files (the bar is horizontal, so a panel stays ~3.1 in) |
+| a colourbar on any panel of a multi-panel row | separate panel files; the bar costs ~0.8 in of column |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
 | a 2x2 that still measures over 6.5 in | separate panel files, two per line |
 | legend outside the axes | put it inside; use `ps.make_room` to open space |
@@ -80,9 +80,10 @@ Three panels forced into a 2x2 leave a hole where the fourth would go, and that 
 first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
 
 Two panels share a line only if their canvases add to under 6.5 in — about 3.2 in each;
-`ps.save` prints each canvas width. A colourbar under the panel keeps it near 3.1 in, which is
-the whole reason colourbars go there (below). If a pair does not fit, shorten the longest tick
-or legend label; LaTeX will otherwise drop the second panel to its own line.
+`ps.save` prints each canvas width and `scripts/check_tex_figure_rows.py` checks the sums. A
+panel carrying a colourbar is ~3.9 in and will sit one per line; that is expected, not a
+failure. If a pair *nearly* fits, shorten the longest tick or legend label — otherwise LaTeX
+drops the second panel onto its own line.
 
 Group panels into one figure only when they are the same quantity over one swept parameter.
 Unrelated plots that happen to be discussed together go in separate figures.
@@ -135,19 +136,24 @@ precisely what the reader notices.
 | element | rule |
 |---|---|
 | legend | **`ps.legend(ax, "upper left")` — inside the axes, in a CORNER.** `ps.legend` rejects anything else. `ps.make_room` then grows the y-range until it is clear of the data. |
+| legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 8.5pt). Do **not** rewrite the labels to save width if that costs the reader a distinction. |
 | legend, which panel | **one legend per figure**, in whichever panel has room — often not the one the series were drawn on. Pass `handles=other_ax.get_legend_handles_labels()[0]`. |
 | process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. |
-| colourbar | **`ps.colorbar(ax, mappable, label)` — horizontal, directly under its own panel.** Always, and one per panel that needs a scale. |
+| colourbar | **`ps.colorbar(ax, mappable, label)` — vertical, immediately right of its own panel.** Always, and one per panel that needs a scale. Not below, not on top, not in an inset. |
 | headroom | `ps.headroom` gives every plot the same clear band above and below the data. Do not hand-tune `ylim` for appearance. |
 | tick labels | horizontal. **Never rotate them** — rotated labels are tall, and tall labels used to shrink the plot. If they collide, use fewer ticks or shorter text ($\log_{10}$ exponents, not `1e-6`). |
 
 **Why colourbars have exactly one placement.** Every branch this rule ever had turned into
 something a reader spotted: bars on the right of some panels and under others, one bar serving
 two panels while a third had its own, a bar *above* a panel because that was the only place it
-fitted. Horizontal-below is the placement that always fits — a vertical bar costs ~0.8 in of
-*column*, which puts a panel at ~3.9 in so two can never share a line, while a horizontal one
-costs height and leaves it at ~3.1 in. So: one rule, no exceptions, one bar per panel. Sharing
-a bar across panels is what looked arbitrary, not the bar.
+fitted. So: one rule, no exceptions, one bar per panel. Sharing a bar across panels is what
+looked arbitrary, not the bar.
+
+The cost is real and accepted: a vertical bar takes ~0.8 in of *column*, so a panel carrying
+one lands near 3.9 in and two of them cannot share a line — those figures stack one per line,
+and a 1x2 where only one panel has a bar has to become two panel files. That is the price of
+the bar always being in the same place, and it is the right trade. Do **not** turn a bar
+sideways to make a row fit.
 
 `ps.save` also thins colourbar ticks to four and switches them to mathtext scientific notation;
 six labels at full decimal precision ran into each other under a 2.40 in panel.
@@ -157,11 +163,18 @@ middle of a plot with data on both sides of it reads as a mistake even when it h
 overlap anything; two were spotted on sight in the compiled document. A corner is always either
 clear or made clear by growing the axis. The middle cannot be cleared at all.
 
-**A legend wider than its plot box hangs over the neighbouring panel.** `ps.legend` drops `ncol`
-until it fits, and `ps.save` warns if one still does not. If the labels are a cross product
-(arm x size, band x truth/model), **factorise it**: colour carries one factor, line style the
-other, so six entries of "base 75k", "sigma 150k", … become three short colour entries plus two
-style entries. That is narrower *and* says what the figure is comparing.
+**A legend wider than its plot box hangs over the neighbouring panel.** `ps.legend` fixes
+that by dropping the legend font in half-point steps, keeping the column count you asked for,
+and only reaches for fewer columns once it hits `LEGEND_MIN_PT`. Font first is deliberate:
+dropping a column looks free but trades width for **height**, and six entries at `ncol=1` is
+six rows tall, which lands straight on the curves in a 1.92 in box — the column drop passes
+every width test while making the overlap worse.
+
+Factorising a cross-product legend (colour carries the size, line style carries the arm) is
+available but is **not** the default fix. It saved almost no width on the six-curve saturation
+figure and made the reader assemble each curve's identity themselves. Prefer the smaller font;
+reach for factorising only when the two factors are genuinely independent and the reader
+already thinks in them.
 
 An outside legend is a last resort for when the entries fit in no panel at all — eight process
 labels, say. Then it is **one strip above the plot** via `ps.shared_legend`, never below, never

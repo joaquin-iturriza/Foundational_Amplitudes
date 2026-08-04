@@ -38,7 +38,10 @@ def main():
     srel = np.array([r[2] for r in rows]); gam = np.array([r[3] for r in rows])
     best = int(np.argmin(obj))
 
-    fig, axes = ps.figure(ncols=2, sharey=True)
+    # Two panel files: each panel carries its own vertical colourbar, and a vertical bar takes
+    # ~0.8in of column, so as one canvas the pair measured 6.73in against a 6.5in text width.
+    figs = ps.panels(2)
+    axes = [f[1] for f in figs]
     for ax, x, lab, logx in ((axes[0], srel, r"$\sigma_{\rm rel}$", True),
                              (axes[1], beta, r"$\beta_{\rm KL}$", True)):
         sc = ax.scatter(x, obj, c=gam, cmap=ps.CMAP, s=40, zorder=3, label="BBB trial")
@@ -63,7 +66,7 @@ def main():
     # a third figure's panels did not -- the sharing is what looked arbitrary, not the bar.
     for _ax in axes:
         ps.colorbar(_ax, sc, r"$\gamma$")
-    ps.save(fig, args.out)
+    ps.save_panels(figs, args.out)
     print(f"wrote {args.out}.png/.pdf")
     print(f"best: deep_mse={obj[best]:.4e} at sigma_rel={srel[best]:.3e} beta={beta[best]:.3e} "
           f"gamma={gam[best]:.2f}")

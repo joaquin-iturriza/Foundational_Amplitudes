@@ -612,9 +612,9 @@ def legend(ax, loc: str = "upper left", **kwargs):
     y-range until the legend is clear of the data, so the corner does not have to be chosen to
     suit this particular dataset -- which is what made every script pick a different one.
 
-    If the legend comes out wider than the plot box it is rebuilt at `ncol=1`: a legend that
-    overhangs the axes is the "pops out horizontally" failure, and dropping to one column is
-    the fix that does not shrink the font.
+    If the legend comes out wider than the plot box, its font comes down (never below
+    LEGEND_MIN_PT) and only then are columns dropped. A legend that overhangs the axes is
+    the "pops out horizontally" failure.
     """
     if loc not in LEGEND_LOCS:
         raise ValueError(f"legend loc {loc!r} is not a corner; use one of {LEGEND_LOCS}")
@@ -626,18 +626,43 @@ def legend(ax, loc: str = "upper left", **kwargs):
     return _shrink_wide_legend(ax, leg, kwargs)
 
 
+#: How far the legend font may drop below BASE_PT to fit a legend inside its plot box.
+#: Only the legend, only as a last resort, and never below this -- a legend at 7pt beside 11pt
+#: body text reads as a different document.
+LEGEND_MIN_PT = 8.5
+
+
+def _legend_fits(ax, leg):
+    try:
+        ax.figure.canvas.draw()
+        rend = ax.figure.canvas.get_renderer()
+        return leg.get_window_extent(rend).width <= ax.get_window_extent().width
+    except Exception:
+        return True
+
+
 def _shrink_wide_legend(ax, leg, kwargs):
-    """Rebuild a legend at fewer columns while it is wider than the plot box."""
-    if leg is None or kwargs.get("ncol", 1) <= 1:
+    """Make a legend fit inside its plot box: smaller font first, fewer columns only if that
+    is not enough.
+
+    Font FIRST, deliberately. Dropping columns looks free but it is not: it trades width for
+    HEIGHT, and a six-entry legend at ncol=1 is six rows tall, which lands on the curves in a
+    1.92in box. That is what happened here -- the column drop "fitted" the legend by every
+    width test while making the overlap worse. Half a point off the legend, keeping the
+    author's chosen column count, is the smaller change and the one that actually helps.
+
+    The font floor is LEGEND_MIN_PT; past it the columns come down after all, and if that is
+    still not enough `_warn_if_squeezed` says so.
+    """
+    if leg is None:
         return leg
-    fig = ax.figure
-    for ncol in range(int(kwargs["ncol"]) - 1, 0, -1):
-        try:
-            fig.canvas.draw()
-            rend = fig.canvas.get_renderer()
-            if leg.get_window_extent(rend).width <= ax.get_window_extent().width:
-                return leg
-        except Exception:
+    pt = float(kwargs.get("fontsize", BASE_PT))
+    while not _legend_fits(ax, leg) and pt > LEGEND_MIN_PT:
+        pt = max(LEGEND_MIN_PT, pt - 0.5)
+        kwargs["fontsize"] = pt
+        leg = ax.legend(**kwargs)
+    for ncol in range(int(kwargs.get("ncol", 1)) - 1, 0, -1):
+        if _legend_fits(ax, leg):
             return leg
         kwargs["ncol"] = ncol
         leg = ax.legend(**kwargs)
@@ -905,22 +930,21 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
         ax.set_ylim(lo, hi)
 
 
-#: Colourbar geometry: horizontal, under its own panel. `pad` is in fractions of the axes
-#: height and has to clear the panel's x tick labels and x-label.
-CBAR_KW = dict(orientation="horizontal", location="bottom", fraction=0.07, pad=0.32)
+#: Colourbar geometry: VERTICAL, immediately right of its own panel.
+CBAR_KW = dict(fraction=0.046, pad=0.04)
 
 
 def colorbar(ax, mappable, label: str = "", **kwargs):
-    """The one way to put a colourbar on a plot: HORIZONTAL, directly under its own panel.
+    """The one way to put a colourbar on a plot: VERTICAL, immediately right of its own panel.
 
-    One rule with no branches, because every branch this had before turned into an
-    inconsistency someone noticed on the page: bars on the right of some panels and under
-    others, one bar serving two panels while a third had its own, a bar above a panel because
-    that was the only place it fitted.
+    One rule with no branches. Every branch this had before turned into an inconsistency
+    visible on the page: bars on the right of some panels and under others, one bar serving two
+    panels while a third had its own, a bar ABOVE a panel because that was the only place it
+    fitted.
 
-    Horizontal-below is the placement that always fits. A vertical bar costs ~0.8in of COLUMN,
-    which puts a panel at ~3.9in so two can never share a line; a horizontal one costs height
-    and leaves the panel at ~3.1in. Every panel that needs a scale gets its own bar.
+    The cost is real and accepted: a vertical bar takes ~0.8in of COLUMN, so a map panel lands
+    near 3.9in and two of them cannot share a line -- those figures stack one per line instead.
+    `layout()` allocates the strip, so the bar still never comes out of the plot box.
     """
     kw = dict(CBAR_KW)
     kw.update(kwargs)
@@ -933,10 +957,11 @@ def colorbar(ax, mappable, label: str = "", **kwargs):
 def tidy_colorbars(fig) -> None:
     """Keep colourbar tick labels from colliding, without shrinking the font.
 
-    A horizontal bar under a 2.40in panel has room for about five labels. Left to matplotlib
-    the error map's bar asked for six at full decimal precision
-    ("0.000000 0.00005 0.00010 0.00015 0.00020") and they ran into each other. Fewer ticks and
-    mathtext scientific notation is the fix the style rules already name for crowded ticks.
+    A bar beside a 1.92in panel has room for about five labels. Left to matplotlib the error
+    map's bar asked for six at full decimal precision ("0.000000 0.00005 0.00010 0.00015
+    0.00020"), which collided when the bar was horizontal and is simply wide when it is
+    vertical. Fewer ticks and mathtext scientific notation is the fix the style rules
+    already name for crowded ticks.
     """
     from matplotlib.ticker import (MaxNLocator, ScalarFormatter, LogLocator,
                                    SymmetricalLogLocator, FixedLocator)

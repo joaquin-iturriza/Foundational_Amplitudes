@@ -83,14 +83,13 @@ def make_figure(npz, process_label, out_base, split="all"):
     # the panels are separate files that results.tex packs two per line, so a set of three has
     # no hole where a fourth would be.
     #
-    # COLOURBAR RULE, applied to every 2-D map in this document without exception: the bar is
-    # HORIZONTAL, directly under its own panel. Everything that is not a map gets the vertical
-    # bar immediately right of its plot. The split is not taste, it is width: a vertical bar
-    # costs ~0.8in of column, which puts a map panel at 3.9in and means two of them can never
-    # share a line, while a horizontal bar costs height and leaves the panel at 3.08in. What
-    # the document must not do is mix the two ACROSS maps, or share one bar between some panels
-    # and not others -- that is what made the colourbars look arbitrary.
-    CB = ps.CBAR_KW
+    # COLOURBAR RULE, applied everywhere without exception: VERTICAL, immediately right of its
+    # own panel, one per panel. The cost is accepted -- a vertical bar takes ~0.8in of column, so
+    # a map panel lands near 3.9in and two of them cannot share a line, which is why these fall
+    # one per line on the page. What the document must not do is turn some bars sideways to make
+    # a row fit, or share one bar between some panels and not others; that is what made the
+    # colourbars look arbitrary.
+    CB = ps.CBAR_KW      # vertical, right of its own panel
 
     # ---- figure 1: 2D maps ----
     def draw_map(ax, M, name, cmap, vmn, vmx, label):

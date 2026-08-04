@@ -59,21 +59,19 @@ c1 = np.array([r["keep_c1"] for r in rows]); c2 = np.array([r["keep_c2"] for r i
 lf = np.array([r["logflat_mse"] for r in rows])
 POWER_BEST_1SEED = 3.351e-2         # sigma^10 seed 0
 
-fig, axes = ps.figure(ncols=2)
+# Two separate panel files: the left panel carries a colourbar, and a vertical bar takes
+# ~0.8in of column, so as one canvas the pair measured 6.83in against a 6.5in text width.
+figs = ps.panels(2)
+axes = [f[1] for f in figs]
 
 # ---------------------------------------------------------------- (a) logflat vs c2
 ax = axes[0]
 sc = ax.scatter(c2, lf, c=c1, s=45, cmap=ps.CMAP, zorder=3)
-# Colourbar in an INSET above the panel, not `colorbar(ax=ax)`. Attaching it to the axes takes
-# its width out of that gridspec column only, so the left panel came out 1.75in against the
-# right one's 2.19in -- two different panel sizes inside one figure, which is the most visible
-# form of the inconsistency. An inset is laid out in axes coordinates, so both panels keep the
-# same box and the bar is paid for out of the margin (which _expand_to_content then covers).
-cax = ax.inset_axes([0.0, 1.04, 1.0, 0.05])
-cax.set_label("<colorbar>")
-cb = fig.colorbar(sc, cax=cax, orientation="horizontal")
-cax.xaxis.set_ticks_position("top")
-cb.set_label(r"$c_1$", labelpad=-38)
+# Standard placement, like every other colourbar: vertical, right of its own panel. The inset
+# strip ABOVE the panel that used to be here dated from when a colourbar came out of the
+# panel's own width; ps.layout() now gives the bar its own strip, so the panel keeps its box
+# either way and there is no reason for this one to sit somewhere different from the rest.
+ps.colorbar(ax, sc, r"$c_1$")
 ax.axvline(0.0, color=ps.C.vermillion, ls="--", label=r"power law, $c_2{=}c_3{=}0$")
 ax.axhline(POWER_BEST_1SEED, color=ps.C.grey, ls=":", label=r"best $\sigma^\gamma$, seed 0")
 ax.set_xlabel(r"$c_2$")
@@ -107,7 +105,7 @@ ax.grid(True, axis="y")
 ps.process_label(ax, r"$e^+e^-\to u\bar u gg$", loc="upper right")
 
 base = os.path.join(HERE, "figs", "l2_poly_keep")
-ps.save(fig, base)
+ps.save_panels(figs, base)
 if groups and len(groups) == 2:
     print(f"  power sigma^10: {np.mean(powr):.4e} ± {np.std(powr):.4e}")
     print(f"  polynomial    : {np.mean(poly):.4e} ± {np.std(poly):.4e}")

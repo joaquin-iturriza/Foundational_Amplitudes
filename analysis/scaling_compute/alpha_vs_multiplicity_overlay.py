@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Compute-scaling exponent alpha_C vs final-state multiplicity, styled after the
 alphas_panels figure of the Quantifying-ML-uncertainties talk: log-y axis, grey
-shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4),
-one tab10 colour per process family joined by dotted lines, fine-tuned (full,
-layer-decay) targets as stars.
+shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4)
+with the label rotated along the dashed line, one tab10 colour per process
+family joined by dotted lines, fine-tuned (full, layer-decay) targets as stars.
 
 Exponents are read from the two scaling_law_params.json files so the figure
 tracks the actual fits; the ratio (virt/Born) targets are excluded as nonsense.
@@ -68,11 +68,17 @@ dofx = lambda n: 3.0 * n - 4.0
 XLIM = (1.55, 10.5)
 YLIM = (4.0 / XLIM[1], 4.0 / XLIM[0])  # bound runs corner to corner
 dd = np.array(XLIM)
-# The bound goes in the LEGEND, not in rotated text along the line. The rotated label ran
-# diagonally across the middle of the plot, under the data and under the legend both, and it
-# is the kind of in-axes prose the figure rules exist to keep out.
-ax.plot(dd, 4.0 / dd, color="0.65", ls="--", zorder=1, label=r"$\alpha=4/\mathrm{DOF}$")
+ax.plot(dd, 4.0 / dd, color="0.65", ls="--", zorder=1)
 ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
+# The bound is labelled ALONG THE LINE, rotated to its slope, as in the reference figure. This
+# is the sanctioned second in-axes label: it names a line that a legend entry would only put at
+# one remove from the thing it names, and here the line IS the figure's reference.
+x0 = np.sqrt(XLIM[0] * XLIM[1])
+p = lambda x: ax.transData.transform((x, 4.0 / x))
+(dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
+ax.text(x0, (4.0 / x0) * 0.66, "Theoretical lower bound", color="0.55",
+        rotation=np.degrees(np.arctan2(dy, dx)),
+        rotation_mode="anchor", ha="center", va="center", zorder=1)
 
 # small multiplicative jitter so overlapping n_fs=2 points separate
 jit = {2: np.geomspace(1 / 1.06, 1.06, sum(n == 2 for _, _, m in FAMILIES for _, n in m))}

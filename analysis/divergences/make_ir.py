@@ -173,14 +173,13 @@ def make_ir(npz, label, out_base):
     # document with a bar underneath them.
     maps = ps.panels(3)
     ax0, ax1, ax2 = (f[1] for f in maps)
-    # COLOURBAR RULE, applied to every 2-D map in this document without exception: the bar is
-    # HORIZONTAL, directly under its own panel. Everything that is not a map gets the vertical
-    # bar immediately right of its plot. The split is not taste, it is width: a vertical bar
-    # costs ~0.8in of column, which puts a map panel at 3.9in and means two of them can never
-    # share a line, while a horizontal bar costs height and leaves the panel at 3.08in. What
-    # the document must not do is mix the two ACROSS maps, or share one bar between some panels
-    # and not others -- that is what made the colourbars look arbitrary.
-    CB = ps.CBAR_KW
+    # COLOURBAR RULE, applied everywhere without exception: VERTICAL, immediately right of its
+    # own panel, one per panel. The cost is accepted -- a vertical bar takes ~0.8in of column, so
+    # a map panel lands near 3.9in and two of them cannot share a line, which is why these fall
+    # one per line on the page. What the document must not do is turn some bars sideways to make
+    # a row fit, or share one bar between some panels and not others; that is what made the
+    # colourbars look arbitrary.
+    CB = ps.CBAR_KW      # vertical, right of its own panel
     mse = float(np.mean(resid ** 2))
 
     def draw(ax, M, name, cmap, vmn, vmx, label):
