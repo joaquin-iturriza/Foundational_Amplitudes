@@ -49,7 +49,10 @@ def main():
     tex = open(os.path.join(REPO, "docs/results.tex")).read()
     rows = over = missing = 0
     for line in tex.splitlines():
-        gs = re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", line)
+        # Both spellings: a bare \includegraphics and the \pnl{} top-align wrapper that
+        # rows use. Matching only the former made this silently report "0 rows checked"
+        # the moment the rows were wrapped -- a guard that passes by seeing nothing.
+        gs = re.findall(r"\\(?:includegraphics(?:\[[^\]]*\])?|pnl)\{([^}]+)\}", line)
         if len(gs) < 2:
             continue                       # a lone figure per line always fits
         widths = []

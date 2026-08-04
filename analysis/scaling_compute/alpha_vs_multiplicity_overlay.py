@@ -76,7 +76,7 @@ ax.fill_between(dd, YLIM[0], 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
 x0 = np.sqrt(XLIM[0] * XLIM[1])
 p = lambda x: ax.transData.transform((x, 4.0 / x))
 (dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
-ax.text(x0, (4.0 / x0) * 0.66, "Theoretical lower bound", color="0.55",
+ax.text(x0, (4.0 / x0) * 0.86, "Theoretical lower bound", color="0.55",
         rotation=np.degrees(np.arctan2(dy, dx)),
         rotation_mode="anchor", ha="center", va="center", zorder=1)
 

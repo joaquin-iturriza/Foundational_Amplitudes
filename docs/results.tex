@@ -49,6 +49,10 @@
 % overhangs both 1in margins equally. Holding a row to \textwidth would mean either
 % shrinking the plots or stacking them one per line, and blank margin is cheaper than
 % either. LaTeX reports these as Overfull \hbox; that is the intent, not a defect.
+% Panels in a row line up by their TOPS, not their baselines. Two canvases of the same
+% plot box can differ in height (one has an x-label, the other only tick labels), and
+% baseline alignment then drops the shorter one's plot area below its neighbour's.
+\newcommand{\pnl}[1]{\raisebox{-\height}{\includegraphics{#1}}}
 \newcommand{\widerow}[1]{\noindent\makebox[\textwidth][c]{#1}}
 
 \begin{document}
@@ -460,9 +464,9 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[H]
   \centering
-  \includegraphics{hpo_optima_summary_a.pdf}\hfill\includegraphics{hpo_optima_summary_b.pdf} \\[1ex]
-  \includegraphics{hpo_optima_summary_c.pdf}\hfill\includegraphics{hpo_optima_summary_d.pdf} \\[1ex]
-  \includegraphics{hpo_optima_summary_e.pdf}\hfill\includegraphics{hpo_optima_summary_f.pdf}
+  \pnl{hpo_optima_summary_a.pdf}\hfill\pnl{hpo_optima_summary_b.pdf} \\[1ex]
+  \pnl{hpo_optima_summary_c.pdf}\hfill\pnl{hpo_optima_summary_d.pdf} \\[1ex]
+  \pnl{hpo_optima_summary_e.pdf}\hfill\pnl{hpo_optima_summary_f.pdf}
   \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
   $\mu$P transfers) and vs batch (entangled with horizon; do not read as causal) on the top
   row; vs horizon (the inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with
@@ -483,7 +487,7 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{lr_2d_disentangled_a.pdf}\hfill\includegraphics{lr_2d_disentangled_b.pdf}} \\[1ex]
+  \widerow{\pnl{lr_2d_disentangled_a.pdf}\hfill\pnl{lr_2d_disentangled_b.pdf}} \\[1ex]
   \includegraphics{lr_2d_disentangled_c.pdf}
   \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
   $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
@@ -582,7 +586,7 @@ off-shellness conditioning is on by default in the big-run recipes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{levers_offshell_ab_a.pdf}\hfill\includegraphics{levers_offshell_ab_b.pdf}
+  \pnl{levers_offshell_ab_a.pdf}\hfill\pnl{levers_offshell_ab_b.pdf}
   \caption{\textbf{Flagship off-shellness A/B} over the $44$-dataset $Z$/top/Higgs mixture (full
   data, fiducial cuts, 30k iterations); $\vlnr$ per dataset at each arm's best checkpoint.
   \emph{Left:} the
@@ -1108,7 +1112,7 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{phase_space_pretrain_aa_a.pdf}\hfill\includegraphics{phase_space_pretrain_aa_b.pdf}} \\[1ex]
+  \widerow{\pnl{phase_space_pretrain_aa_a.pdf}\hfill\pnl{phase_space_pretrain_aa_b.pdf}} \\[1ex]
   \includegraphics{phase_space_pretrain_aa_c.pdf}
   \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning: the maps.}
   $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$ for truth and model,
@@ -1120,7 +1124,7 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 
 \begin{figure}[H]
   \centering
-  \includegraphics{phase_space_pretrain_aa_proj_a.pdf}\hfill\includegraphics{phase_space_pretrain_aa_proj_b.pdf} \\[1ex]
+  \pnl{phase_space_pretrain_aa_proj_a.pdf}\hfill\pnl{phase_space_pretrain_aa_proj_b.pdf} \\[1ex]
   \includegraphics{phase_space_pretrain_aa_proj_c.pdf}
   \caption{\textbf{$e^+e^-\to\gamma\gamma$: projections and predicted-vs-true.} The same
   events as Fig.~\ref{fig:div_gg}, projected onto $\sqrt{s}$ and onto $\cos\theta^*$ (truth
@@ -1209,8 +1213,8 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{ir_pretrain_uug_dalitz_a.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_b.pdf}} \\[1ex]
-  \widerow{\includegraphics{ir_pretrain_uug_dalitz_c.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_d.pdf}}
+  \widerow{\pnl{ir_pretrain_uug_dalitz_a.pdf}\hfill\pnl{ir_pretrain_uug_dalitz_b.pdf}} \\[1ex]
+  \widerow{\pnl{ir_pretrain_uug_dalitz_c.pdf}\hfill\pnl{ir_pretrain_uug_dalitz_d.pdf}}
   \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. Panels:
   analytic LO $C_F$-antenna, truth, model, absolute error. The collinear poles lie on the
   $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$ corner; white
@@ -1248,7 +1252,7 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{ir_pretrain_uugg_a.pdf}\hfill\includegraphics{ir_pretrain_uugg_b.pdf}} \\[1ex]
+  \widerow{\pnl{ir_pretrain_uugg_a.pdf}\hfill\pnl{ir_pretrain_uugg_b.pdf}} \\[1ex]
   \includegraphics{ir_pretrain_uugg_c.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process: the maps.}
   $\langle\log|\mathcal{M}|^2\rangle$ over the IR resolution variables of Eq.~\eqref{eq:ir},
@@ -1260,7 +1264,7 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[H]
   \centering
-  \includegraphics{ir_pretrain_uugg_ramps_a.pdf}\hfill\includegraphics{ir_pretrain_uugg_ramps_b.pdf} \\[1ex]
+  \pnl{ir_pretrain_uugg_ramps_a.pdf}\hfill\pnl{ir_pretrain_uugg_ramps_b.pdf} \\[1ex]
   \includegraphics{ir_pretrain_uugg_ramps_c.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$: the IR ramps.} $\log|\mathcal{M}|^2$ against each
   resolution variable, with the analytic leading-power slopes $1/y_{\min}$ and $1/x_g^2$
@@ -1356,7 +1360,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{heldout_resid_f000_a.pdf}\hfill\includegraphics{heldout_resid_f000_b.pdf}} \\[1ex]
+  \widerow{\pnl{heldout_resid_f000_a.pdf}\hfill\pnl{heldout_resid_f000_b.pdf}} \\[1ex]
   \includegraphics{heldout_resid_f000_c.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region: the maps}, in the IR plane
   of Eq.~\eqref{eq:ir}. Truth and model on a common scale, with the absolute error below: the
@@ -1367,7 +1371,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f000_ramps_a.pdf}\hfill\includegraphics{heldout_resid_f000_ramps_b.pdf} \\[1ex]
+  \pnl{heldout_resid_f000_ramps_a.pdf}\hfill\pnl{heldout_resid_f000_ramps_b.pdf} \\[1ex]
   \includegraphics{heldout_resid_f000_ramps_c.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$): the ramps.} The model mean (red) plateaus
   \emph{off} the IR ramp while truth (black) lies on the analytic $1/y_{\min}$ slope (green),
@@ -1378,7 +1382,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[p]
   \centering
-  \widerow{\includegraphics{heldout_resid_f100_a.pdf}\hfill\includegraphics{heldout_resid_f100_b.pdf}} \\[1ex]
+  \widerow{\pnl{heldout_resid_f100_a.pdf}\hfill\pnl{heldout_resid_f100_b.pdf}} \\[1ex]
   \includegraphics{heldout_resid_f100_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region: the maps.} With the
   divergent region back in the training support the error is flat and small across the plane
@@ -1389,7 +1393,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[H]
   \centering
-  \includegraphics{heldout_resid_f100_ramps_a.pdf}\hfill\includegraphics{heldout_resid_f100_ramps_b.pdf} \\[1ex]
+  \pnl{heldout_resid_f100_ramps_a.pdf}\hfill\pnl{heldout_resid_f100_ramps_b.pdf} \\[1ex]
   \includegraphics{heldout_resid_f100_ramps_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$): the ramps.} The IR ramp (analytic
   $1/y_{\min}$ slope, green) is tracked into the deep IR by both truth and model and the
@@ -1524,7 +1528,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{deep_sampling_uniform_vs_antenna_a.pdf}\hfill\includegraphics{deep_sampling_uniform_vs_antenna_b.pdf} \\[1ex]
+  \pnl{deep_sampling_uniform_vs_antenna_a.pdf}\hfill\pnl{deep_sampling_uniform_vs_antenna_b.pdf} \\[1ex]
   \includegraphics{deep_sampling_uniform_vs_antenna_c.pdf}
   \caption{\textbf{Antenna sampling crushes the pole ($e^+e^-\to u\bar u g$).} Deep-IR error
   for the production flat-\textsc{rambo} set vs the antenna sampler, same base22 / $400$k events /
@@ -2112,8 +2116,8 @@ and gives the concentration principle a directly measurable order parameter.
 
 \begin{figure}[H]
   \centering
-  \includegraphics{l2_sigma_vs_divergence_a.pdf}\hfill\includegraphics{l2_sigma_vs_divergence_b.pdf} \\[1ex]
-  \includegraphics{l2_sigma_vs_divergence_c.pdf}\hfill\includegraphics{l2_sigma_vs_divergence_d.pdf}
+  \pnl{l2_sigma_vs_divergence_a.pdf}\hfill\pnl{l2_sigma_vs_divergence_b.pdf} \\[1ex]
+  \pnl{l2_sigma_vs_divergence_c.pdf}\hfill\pnl{l2_sigma_vs_divergence_d.pdf}
   \caption{\textbf{The learned $\sigma$ rises inside the divergence, and how sharply it rises
   predicts whether $\sigma$-steering pays.} \emph{(a)--(c)} Mean $\sigma$ and actual RMSE against the
   coordinate defining each divergence, both in $\log|\mathcal M|^2$ units (so the vertical gap is the
@@ -2184,7 +2188,7 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 
 \begin{figure}[H]
   \centering
-  \widerow{\includegraphics{l2_bbb_sweep_a.pdf}\hfill\includegraphics{l2_bbb_sweep_b.pdf}}
+  \widerow{\pnl{l2_bbb_sweep_a.pdf}\hfill\pnl{l2_bbb_sweep_b.pdf}}
   \caption{\textbf{The fair BBB HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
   the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
   coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
@@ -2231,7 +2235,7 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
 
 \begin{figure}[H]
   \centering
-  \widerow{\includegraphics{l2_poly_keep_a.pdf}\hfill\includegraphics{l2_poly_keep_b.pdf}}
+  \widerow{\pnl{l2_poly_keep_a.pdf}\hfill\pnl{l2_poly_keep_b.pdf}}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
   nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at

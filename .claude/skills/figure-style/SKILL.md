@@ -83,9 +83,19 @@ ps.save_panels(figs, "analysis/divergences/figs/my_set")   # prints the LaTeX to
 ```
 
 ```latex
-\includegraphics{my_set_a.pdf}\hfill\includegraphics{my_set_b.pdf} \\[1ex]
-\includegraphics{my_set_c.pdf}
+\widerow{\pnl{my_set_a.pdf}\hfill\pnl{my_set_b.pdf}} \\[1ex]
+\pnl{my_set_c.pdf}
 ```
+
+Two macros, both defined in `results.tex`, and rows need **both**:
+
+- `\pnl{f.pdf}` — `\raisebox{-\height}{\includegraphics{f.pdf}}`. Panels line up by their
+  **tops**, not their baselines. Two canvases holding the same plot box can differ in height,
+  because one carries an x-label and its neighbour only tick labels; on the baseline the
+  shorter one's *plot area* then sits lower than its neighbour's even though the boxes are
+  identical. Always wrap a panel that shares a row.
+- `\widerow{...}` — centres a row wider than `\textwidth` so it overhangs both margins evenly.
+  Only needed above 6.5 in; harmless below.
 
 Three panels forced into a 2x2 leave a hole where the fourth would go, and that hole is the
 first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
