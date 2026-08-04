@@ -59,6 +59,17 @@ import matplotlib.pyplot as plt
 #: \textwidth of docs/results.tex, in inches (11pt article, margin=1in -> 469.755pt).
 TEXTWIDTH_IN = 6.5
 
+#: How wide a figure may actually be. NOT \textwidth: a figure is allowed to overhang the
+#: MARGINS, which are 1in of blank paper on each side of an 8.5in page, and it is centred on
+#: the text block so it overhangs both equally. What it may not do is run off the PAPER, which
+#: is where content is genuinely lost. 8.2in leaves ~0.15in of paper each side.
+#:
+#: This is the trade, chosen deliberately: two panels side by side, each at the standard plot
+#: box, come to ~7.9in once both carry a colourbar. Holding them to 6.5in would mean either
+#: shrinking the plots (which the invariant forbids) or stacking them one per line (which makes
+#: a set of maps three pages long). Overhanging the margin costs nothing but white space.
+MAX_FIG_IN = 8.2
+
 #: Body font size of docs/results.tex. Figures use this everywhere.
 BASE_PT = 11
 
@@ -365,9 +376,9 @@ def _fits_textwidth(verbose: bool = True) -> bool:
     w = fig.get_size_inches()[0]
     _plt.close(fig)
     if verbose:
-        print(f"worst-case 2-column canvas: {w:.2f}in (limit {TEXTWIDTH_IN})"
-              f" -> {'OK' if w <= TEXTWIDTH_IN + 0.01 else 'TOO WIDE, reduce PLOT_W_IN'}")
-    return w <= TEXTWIDTH_IN + 0.01
+        print(f"worst-case 2-column canvas: {w:.2f}in (limit {MAX_FIG_IN})"
+              f" -> {'OK' if w <= MAX_FIG_IN + 0.01 else 'TOO WIDE, reduce PLOT_W_IN'}")
+    return w <= MAX_FIG_IN + 0.01
 
 
 def _measure_panels(grids=((1, 1), (2, 1), (3, 1), (1, 2), (2, 2), (3, 2))) -> None:
@@ -1073,10 +1084,10 @@ def _warn_if_squeezed(fig, base: str) -> None:
                       f"not the {PLOT_W_IN:.2f}x{PLOT_H_IN:.2f}in standard -- layout() did not "
                       f"run or was overridden (tight_layout/constrained_layout after save?)")
         fw, fh = fig.get_size_inches()
-        if fw > TEXTWIDTH_IN + 0.01:
-            print(f"  !! {name}: canvas {fw:.2f}in exceeds \\textwidth ({TEXTWIDTH_IN}in) -- "
-                  f"too many columns for the standard plot box, or an outside legend that "
-                  f"should be inside the axes")
+        if fw > MAX_FIG_IN + 0.01:
+            print(f"  !! {name}: canvas {fw:.2f}in exceeds the printable width "
+                  f"({MAX_FIG_IN}in incl. the margins) -- it will run off the PAPER and be "
+                  f"clipped. Fewer columns; do not shrink the plot box")
         tb = fig.get_tightbbox(rend)
         if tb.x0 < -0.02 or tb.y0 < -0.02 or tb.x1 > fw + 0.02 or tb.y1 > fh + 0.02:
             print(f"  !! {name}: content overhangs the canvas ({tb.x0:.2f}..{tb.x1:.2f} x "

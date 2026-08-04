@@ -21,7 +21,7 @@ import sys
 from PIL import Image
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEXTWIDTH_IN = 6.5
+MAX_ROW_IN = 8.2      # \textwidth 6.5 + the two 1in margins, less a little paper
 SAVEFIG_DPI = 200
 
 # Where \graphicspath points. Cheaper and more predictable than a recursive glob.
@@ -62,10 +62,10 @@ def main():
             continue
         rows += 1
         total = sum(widths)
-        if total > TEXTWIDTH_IN:
+        if total > MAX_ROW_IN:
             over += 1
             print(f"OVER {total:5.2f}in  {[round(w, 2) for w in widths]}  {gs[0]}\n"
-                  f"     -> LaTeX will drop the last panel onto its own line. Shorten the "
+                  f"     -> wider than the paper ({MAX_ROW_IN}in incl. margins). Shorten the "
                   f"longest tick or legend label in the wider panel.")
     print(f"{rows} multi-panel rows checked, {over} overflowing, {missing} with no PNG")
     return 1 if (over or missing) else 0

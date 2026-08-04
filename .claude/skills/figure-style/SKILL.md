@@ -41,17 +41,28 @@ others, and colourbars on the right, the bottom and the top. It trades a size in
 a placement inconsistency and makes both visible at once. If a figure does not fit, the answer
 is **fewer columns**, never a smaller plot and never a relocated decoration.
 
-### What "does not fit" looks like
+### The width budget: the margins are fair game, the paper is not
 
-`ps.save()` prints `!! <name>: canvas 7.54in exceeds \textwidth`. That means the grid cannot
-hold standard plot boxes at that column count. Fix it structurally:
+**A figure may be wider than `\textwidth`.** The text block is 6.5 in but the paper is 8.5 in,
+so there is 1 in of blank margin on each side; a row is centred on the text block and overhangs
+both equally, via the `\widerow` macro in `results.tex`. `MAX_FIG_IN` is **8.2 in** — past that
+the content runs off the *sheet* and is genuinely lost, which is the only hard limit.
+
+This is the deliberate trade. Two panels side by side, each at the standard plot box, come to
+~7.9 in once both carry a colourbar. Holding that to `\textwidth` would mean either shrinking
+the plots (the invariant forbids it) or stacking them one per line, which turns a set of maps
+into three pages. **Blank margin is cheaper than either.** So: never split a figure or stack a
+row just because a colourbar pushed it past 6.5 in.
+
+`ps.save()` prints `!! <name>: canvas 8.6in exceeds the printable width`. *That* means the grid
+cannot hold standard plot boxes at that column count. Fix it structurally:
 
 | symptom | fix |
 |---|---|
-| 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels` |
-| a colourbar on any panel of a multi-panel row | separate panel files; the bar costs ~0.8 in of column |
+| 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels`, two per row |
+| a row between 6.5 and 8.2 in | nothing — wrap it in `\widerow` and let it overhang the margins |
+| a row over 8.2 in | shorten the longest tick or legend label; only then fewer columns |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
-| a 2x2 that still measures over 6.5 in | separate panel files, two per line |
 | legend outside the axes | put it inside; use `ps.make_room` to open space |
 | a panel spanning two cells | split the figure; every panel is one cell |
 
@@ -79,11 +90,10 @@ ps.save_panels(figs, "analysis/divergences/figs/my_set")   # prints the LaTeX to
 Three panels forced into a 2x2 leave a hole where the fourth would go, and that hole is the
 first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
 
-Two panels share a line only if their canvases add to under 6.5 in — about 3.2 in each;
-`ps.save` prints each canvas width and `scripts/check_tex_figure_rows.py` checks the sums. A
-panel carrying a colourbar is ~3.9 in and will sit one per line; that is expected, not a
-failure. If a pair *nearly* fits, shorten the longest tick or legend label — otherwise LaTeX
-drops the second panel onto its own line.
+Two panels share a line whenever their canvases add to under **8.2 in** — the text block
+plus both margins. A panel carrying a colourbar is ~3.9 in, so a pair of maps is ~7.9 in and
+still goes on one row, overhanging the margin. `ps.save` prints each canvas width and
+`scripts/check_tex_figure_rows.py` checks every row's sum against 8.2 in.
 
 Group panels into one figure only when they are the same quantity over one swept parameter.
 Unrelated plots that happen to be discussed together go in separate figures.
@@ -149,11 +159,9 @@ two panels while a third had its own, a bar *above* a panel because that was the
 fitted. So: one rule, no exceptions, one bar per panel. Sharing a bar across panels is what
 looked arbitrary, not the bar.
 
-The cost is real and accepted: a vertical bar takes ~0.8 in of *column*, so a panel carrying
-one lands near 3.9 in and two of them cannot share a line — those figures stack one per line,
-and a 1x2 where only one panel has a bar has to become two panel files. That is the price of
-the bar always being in the same place, and it is the right trade. Do **not** turn a bar
-sideways to make a row fit.
+A vertical bar takes ~0.8 in of *column*, so a panel carrying one is ~3.9 in and a pair is
+~7.9 in. That is fine: the row overhangs the margins (see the width budget above). Do **not**
+turn a bar sideways, shrink a plot, or split a figure to bring a row back under `\textwidth`.
 
 `ps.save` also thins colourbar ticks to four and switches them to mathtext scientific notation;
 six labels at full decimal precision ran into each other under a 2.40 in panel.

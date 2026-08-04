@@ -45,6 +45,12 @@
 \author{Joaqu\'in Iturriza}
 \date{\today}
 
+% A row of panels may be wider than \textwidth: it is centred on the text block and
+% overhangs both 1in margins equally. Holding a row to \textwidth would mean either
+% shrinking the plots or stacking them one per line, and blank margin is cheaper than
+% either. LaTeX reports these as Overfull \hbox; that is the intent, not a defect.
+\newcommand{\widerow}[1]{\noindent\makebox[\textwidth][c]{#1}}
+
 \begin{document}
 \maketitle
 
@@ -477,12 +483,11 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
 
 \begin{figure}[p]
   \centering
-  \includegraphics{lr_2d_disentangled_a.pdf} \\[1ex]
-  \includegraphics{lr_2d_disentangled_b.pdf} \\[1ex]
+  \widerow{\includegraphics{lr_2d_disentangled_a.pdf}\hfill\includegraphics{lr_2d_disentangled_b.pdf}} \\[1ex]
   \includegraphics{lr_2d_disentangled_c.pdf}
-  \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top:}
+  \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
   $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
-  $\sim3$k steps independent of $D$. \emph{Middle:} $\eta^\ast$ vs $D$ at fixed horizon
+  $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
   (colour): weak, $\propto D^{+0.15\ldots0.3}$, saturating. \emph{Bottom:} learning curves
   flooring later as $D$ grows, stars marking the $t$ of peak $\eta$: the peak is not the floor.}
   \label{fig:2d}
@@ -1103,8 +1108,7 @@ $e^+e^-\to u\bar u$ & $6.1\mathrm{e}{-}9$ & $s$-channel $\sim(1+\cos^2\theta)$, 
 
 \begin{figure}[p]
   \centering
-  \includegraphics{phase_space_pretrain_aa_a.pdf} \\[1ex]
-  \includegraphics{phase_space_pretrain_aa_b.pdf} \\[1ex]
+  \widerow{\includegraphics{phase_space_pretrain_aa_a.pdf}\hfill\includegraphics{phase_space_pretrain_aa_b.pdf}} \\[1ex]
   \includegraphics{phase_space_pretrain_aa_c.pdf}
   \caption{\textbf{$e^+e^-\to\gamma\gamma$, jointly pretrained, without fine-tuning: the maps.}
   $\langle\log|\mathcal{M}|^2\rangle$ over $(\sqrt{s},\cos\theta^*)$ for truth and model,
@@ -1205,24 +1209,15 @@ $y_{\min}\sim10^{-4}$ (Fig.~\ref{fig:div_uugg}).
 
 \begin{figure}[p]
   \centering
-  \includegraphics{ir_pretrain_uug_dalitz_a.pdf} \\[1ex]
-  \includegraphics{ir_pretrain_uug_dalitz_b.pdf}
-  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$: the analytic LO
-  $C_F$-antenna and the truth. The collinear poles lie on the $x_q\to1$ and $x_{\bar q}\to1$
-  edges and meet at the soft-gluon $(1,1)$ corner; the white lines are the analytic
-  iso-$|\mathcal{M}|^2$ contours. Analytic-vs-truth Pearson $0.995$. The model and its residual
-  are Fig.~\ref{fig:div_dalitz_model}.}
+  \widerow{\includegraphics{ir_pretrain_uug_dalitz_a.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_b.pdf}} \\[1ex]
+  \widerow{\includegraphics{ir_pretrain_uug_dalitz_c.pdf}\hfill\includegraphics{ir_pretrain_uug_dalitz_d.pdf}}
+  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane}, $x_i=2E_i/\sqrt{s}$. Panels:
+  analytic LO $C_F$-antenna, truth, model, absolute error. The collinear poles lie on the
+  $x_q\to1$ and $x_{\bar q}\to1$ edges and meet at the soft-gluon $(1,1)$ corner; white
+  lines on the truth/model panels are the analytic iso-$|\mathcal{M}|^2$ contours. The
+  model reproduces truth (analytic-vs-truth Pearson $0.995$) with a residual small even
+  along the singular edges.}
   \label{fig:div_dalitz}
-\end{figure}
-
-\begin{figure}[p]
-  \centering
-  \includegraphics{ir_pretrain_uug_dalitz_c.pdf} \\[1ex]
-  \includegraphics{ir_pretrain_uug_dalitz_d.pdf}
-  \caption{\textbf{$e^+e^-\to u\bar u g$ Dalitz plane: the model and its error.} The same plane
-  and colour scale as Fig.~\ref{fig:div_dalitz}. The model reproduces truth with a residual
-  small even along the singular edges.}
-  \label{fig:div_dalitz_model}
 \end{figure}
 
 \paragraph{Separating the soft and collinear axes.} Because $y_{\min}$ folds the two limits
@@ -1253,8 +1248,7 @@ $\langle|\Delta\log|\mathcal{M}|^2|\rangle\lesssim10^{-2}$ into the collinear li
 
 \begin{figure}[p]
   \centering
-  \includegraphics{ir_pretrain_uugg_a.pdf} \\[1ex]
-  \includegraphics{ir_pretrain_uugg_b.pdf} \\[1ex]
+  \widerow{\includegraphics{ir_pretrain_uugg_a.pdf}\hfill\includegraphics{ir_pretrain_uugg_b.pdf}} \\[1ex]
   \includegraphics{ir_pretrain_uugg_c.pdf}
   \caption{\textbf{$e^+e^-\to u\bar u gg$, the hardest process: the maps.}
   $\langle\log|\mathcal{M}|^2\rangle$ over the IR resolution variables of Eq.~\eqref{eq:ir},
@@ -1362,8 +1356,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[p]
   \centering
-  \includegraphics{heldout_resid_f000_a.pdf} \\[1ex]
-  \includegraphics{heldout_resid_f000_b.pdf} \\[1ex]
+  \widerow{\includegraphics{heldout_resid_f000_a.pdf}\hfill\includegraphics{heldout_resid_f000_b.pdf}} \\[1ex]
   \includegraphics{heldout_resid_f000_c.pdf}
   \caption{\textbf{Pure extrapolation ($f\!=\!0$), held-out region: the maps}, in the IR plane
   of Eq.~\eqref{eq:ir}. Truth and model on a common scale, with the absolute error below: the
@@ -1385,8 +1378,7 @@ MSE $\Delta\log|\mathcal{M}|^2$ (all held-out) & $0.709$ & $0.030$ & $0.011$ & $
 
 \begin{figure}[p]
   \centering
-  \includegraphics{heldout_resid_f100_a.pdf} \\[1ex]
-  \includegraphics{heldout_resid_f100_b.pdf} \\[1ex]
+  \widerow{\includegraphics{heldout_resid_f100_a.pdf}\hfill\includegraphics{heldout_resid_f100_b.pdf}} \\[1ex]
   \includegraphics{heldout_resid_f100_c.pdf}
   \caption{\textbf{In-support baseline ($f\!=\!1$), same held-out region: the maps.} With the
   divergent region back in the training support the error is flat and small across the plane
@@ -2192,10 +2184,9 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 
 \begin{figure}[H]
   \centering
-  \includegraphics{l2_bbb_sweep_a.pdf} \\[1ex]
-  \includegraphics{l2_bbb_sweep_b.pdf}
+  \widerow{\includegraphics{l2_bbb_sweep_a.pdf}\hfill\includegraphics{l2_bbb_sweep_b.pdf}}
   \caption{\textbf{The fair BBB HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
-  the initial posterior width $\sigma_{\rm rel}$ (top) and the ELBO KL weight $\beta_{\rm KL}$ (bottom),
+  the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
   coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
   $\sigma_{\rm rel}$ alone sets the outcome (Spearman $+0.965$) and its optimum lands \emph{on the search
   lower bound} (the optimiser drives the weight posterior toward the deterministic limit to buy back
@@ -2240,8 +2231,7 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
 
 \begin{figure}[H]
   \centering
-  \includegraphics{l2_poly_keep_a.pdf} \\[1ex]
-  \includegraphics{l2_poly_keep_b.pdf}
+  \widerow{\includegraphics{l2_poly_keep_a.pdf}\hfill\includegraphics{l2_poly_keep_b.pdf}}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
   nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
