@@ -6,3 +6,4 @@
 #
 # Example:
 #   analysis/hpo_optima/FINDINGS.md
+talks/progress_sep2026/main.tex

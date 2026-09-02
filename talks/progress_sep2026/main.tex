@@ -1,0 +1,194 @@
+%=========================================================================
+%  Foundational Amplitudes -- informal weekly update
+%  Coverage / emphasis / steering near amplitude divergences
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}{../../analysis/divergences/figs/}{../../analysis/divergences/}}
+
+%---------- same theme as the July deck ----------------------------------
+\definecolor{navy}{RGB}{38,38,110}
+\definecolor{good}{RGB}{20,120,40}
+\definecolor{warn}{RGB}{190,70,20}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{title}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+% one short grey line under a figure, for the number I want on screen
+\newcommand{\fignote}[1]{\\[0.5em]{\footnotesize\color{gray} #1}}
+\newcommand{\prov}[1]{\\[0.5em]{\footnotesize\color{warn} #1}}
+\newcommand{\Amp}{\ensuremath{|\mathcal{M}|^2}}
+
+\title{Coverage, emphasis, steering}
+\author{Joaqu\'in Iturriza Ramirez}
+
+%=========================================================================
+\begin{document}
+
+%---------------------------------------------------------------- TITLE
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\Large\bfseries\color{navy} Training density near amplitude divergences}\\[0.4em]
+    {\large\color{navy} coverage \ $\rightarrow$ \ emphasis \ $\rightarrow$ \ steering}\\[1.4em]
+    {\large Joaqu\'in Iturriza Ramirez}\\[0.4em]
+    {\footnotesize\color{gray} September 2026}
+  \end{center}
+  \vfill
+\end{frame}
+
+%---------------------------------------------------------------- FRAMING
+\begin{frame}{The question}
+  \vfill
+  \begin{center}
+    {\large Where should training events \emph{sit} so the surrogate is accurate\\[0.3em]
+     in the soft / collinear / resonant regions?}\\[2.2em]
+    {\large\color{navy}
+      \textbf{coverage} \quad\textbar\quad \textbf{emphasis} \quad\textbar\quad \textbf{steering}}\\[0.8em]
+    {\footnotesize\color{gray} where the events are drawn \quad\textbar\quad how they are weighted \quad\textbar\quad what gets generated next}
+  \end{center}
+  \vfill
+\end{frame}
+
+%---------------------------------------------------------------- COVERAGE 1
+\begin{frame}{Coverage: antenna sampling crushes the pole}
+  \centering
+  \includegraphics[height=0.62\textheight]{deep_sampling_uniform_vs_antenna_a.pdf}\hfill
+  \includegraphics[height=0.62\textheight]{deep_sampling_uniform_vs_antenna_b.pdf}
+  \fignote{$e^+e^-\to u\bar u g$, $y_{\min}\in[10^{-6},10^{-5})$: median relative error $47.9\%\to1.4\%$; MSE $\sim62\times$. No reweighting --- we fit $\log\Amp$ pointwise.}
+\end{frame}
+
+%---------------------------------------------------------------- COVERAGE 2
+\begin{frame}{Coverage: mix it in, don't adopt it}
+  \centering
+  \includegraphics[height=0.64\textheight]{deep_sampling_fraction_sweep.pdf}
+  \fignote{Broad interior basin $f\in[0.25,0.75]$. $f{=}0$ catastrophic ($\sim200\times$), $f{=}1$ $\sim2\times$ worse --- pure antenna starves the $O(1)$ bulk.}
+\end{frame}
+
+%---------------------------------------------------------------- COVERAGE 3
+\begin{frame}{Coverage: same shape on a resonance}
+  \centering
+  \includegraphics[height=0.64\textheight]{eeuu_genmix_fraction_sweep.pdf}
+  \fignote{$ee\to u\bar u$, $s$-channel $Z$: different singularity, same interior optimum. And it must be \emph{generated} --- resampling only duplicates.}
+\end{frame}
+
+%---------------------------------------------------------------- EMPHASIS 1
+\begin{frame}{Emphasis: the coupled $(\mu,\sigma)$ fit fails structurally}
+  \vfill
+  \begin{center}
+    {\large Amplitudes are \textbf{deterministic} $\Rightarrow$ true $\sigma\to0$,\\[0.4em]
+     the $\sigma$ gradient $\sigma^{-1}(1-r^2/\sigma^2)$ blows up,\\[0.4em]
+     and \texttt{clip\_grad\_norm} is \textbf{global} --- so it throttles $\mu$ too.}\\[1.6em]
+    {\footnotesize\color{gray} binds on 97.5\% of steps (median grad-norm 51 vs clip 5)}\\[2.0em]
+    {\large\color{good} Fix: two-stage --- train $\mu$ with MSE, freeze, then fit the 258-param $\sigma$ readout.}\\[0.6em]
+    {\footnotesize\color{gray} calibrated $\sigma$ at zero accuracy cost, $\sim$1--3 min}
+  \end{center}
+  \vfill
+\end{frame}
+
+%---------------------------------------------------------------- EMPHASIS 2
+\begin{frame}{Emphasis: $\sigma$ is good enough, if the metric is equal-footing}
+  \centering
+  \includegraphics[height=0.62\textheight]{q2_logflat.pdf}
+  \fignote{The $\sigma$ head recovers ${\sim}80\%$ of the oracle's gain; a degraded $\sigma$ ($\rho{=}0.29$) recovers nothing. Only pays where coverage is \emph{capped}.}
+\end{frame}
+
+%---------------------------------------------------------------- STEERING 1
+\begin{frame}{Steering: let the live $\sigma$ decide what to generate next}
+  \centering
+  \includegraphics[height=0.62\textheight]{l2_uugg_gamma.pdf}
+  \fignote{$ee\to u\bar u gg$, keep $\propto\sigma^\gamma$. Deep-IR MSE ratio $0.90\to0.55$ as $\gamma:1\to10$; the bulk pays for it. Coordinate-free base proposal --- no antenna, no $y_{\min}$ anywhere.}
+\end{frame}
+
+%---------------------------------------------------------------- STEERING 2
+\begin{frame}{Steering: it needs the hardness to be \emph{concentrated}}
+  \centering
+  \includegraphics[height=0.60\textheight]{l2_uuggg_perdecade.pdf}
+  \fignote{$ee\to u\bar u ggg$: difficulty is diffuse, so harder concentration makes it \emph{worse}. A flat or turning $\gamma$-response is the signal to add capacity, not to allocate more cleverly.}
+\end{frame}
+
+%---------------------------------------------------------------- STEERING 3
+\begin{frame}{Steering: and you can tell in advance, for free}
+  \centering
+  \includegraphics[height=0.60\textheight]{l2_sigma_vs_divergence_d.pdf}
+  \fignote{$\sigma$-contrast $\langle\sigma\rangle_{\rm sing}/\langle\sigma\rangle_{\rm bulk}$ from the \emph{base} arm alone --- one forward pass, no A/B --- orders the gain correctly.}
+\end{frame}
+
+%---------------------------------------------------------------- STEERING 4
+\begin{frame}{Out-of-sample test: a massive final state}
+  \centering
+  \includegraphics[height=0.60\textheight]{l2_bbbarg.pdf}
+  \fignote{$ee\to b\bar b g$. Predictions recorded \emph{before} the run: $Z$-driven gain, weak IR ($m_b$ dead cone). Measured $0.56\times$ at the $Z$, predicted ${\sim}0.50$. \textcolor{warn}{Single seed.}}
+\end{frame}
+
+%---------------------------------------------------------------- NEGATIVES
+\begin{frame}{Two things that did not pay off}
+  \centering
+  \includegraphics[height=0.55\textheight]{l2_uugg_bbb_vs_het.pdf}\hfill
+  \includegraphics[height=0.55\textheight]{l2_poly_keep_b.pdf}
+  \fignote{\textbf{Left:} BBB \emph{loses} to the cheap detached head ($2.87$ vs $2.65\times10^{-2}$) --- the keep rule only needs a \emph{ranking}. \textbf{Right:} polynomial keep rule --- a wash over seeds; $\sigma^\gamma$ stays.}
+\end{frame}
+
+%---------------------------------------------------------------- SATURATION
+\begin{frame}{When to stop generating}
+  \centering
+  \includegraphics[height=0.58\textheight]{l2_saturation.pdf}
+  \fignote{The $\sigma$-$p99$ tail \textbf{floors}: $8\times$ more data does not move it. Gives a machine-checkable stopping rule. \textcolor{warn}{But every budget ran the same 4000 steps --- data and compute are confounded, so this is ``at fixed optimizer budget''.}}
+\end{frame}
+
+%---------------------------------------------------------------- LOOSE END 1
+\begin{frame}{Where I stopped: \emph{why} does it work?}
+  \centering
+  \includegraphics[height=0.55\textheight]{l2_starved_mechanism.pdf}
+  \prov{Provisional --- this ran \emph{before} a fairness fix (static arms must draw a fresh pool each round, so every arm sees the same total unique data). Never re-run.}
+  \fignote{Reweighting the objective vs.\ $\sigma$ adding pole samples. At face value the IS correction does the work --- which would rewrite the story.}
+\end{frame}
+
+%---------------------------------------------------------------- LOOSE END 2
+\begin{frame}{Where I stopped: coordinate-free, no hand-tuning}
+  \centering
+  \includegraphics[height=0.55\textheight]{l2_adapt_final.pdf}
+  \prov{Also provisional --- same pre-fix caveat, 3 seeds.}
+  \fignote{Pure per-event $p(x)\propto\sigma(x)^\gamma$: no bins, no physics coordinate. It converges into the hand-tuned $f{=}0.25$ band on its own --- a tie ($1.8$ vs $2.1\times10^{-5}$), i.e.\ it \emph{finds} the coverage a human had to design.}
+\end{frame}
+
+%---------------------------------------------------------------- OPEN
+\begin{frame}{Open ends}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.92\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.7em}
+        \item[--] Re-run the mechanism decomposition after the fairness fix
+        \item[--] Saturation: fixed-\emph{epoch} sweep to break the compute confound
+        \item[--] $b\bar b g$ at 3 seeds; a process with soft $+$ collinear $+$ resonant at once
+        \item[--] Cheap epistemic $\sigma$ (MC-dropout, Laplace) --- BBB lost on \emph{accuracy}, not ranking
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\end{document}
