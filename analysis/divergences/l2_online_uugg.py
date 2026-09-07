@@ -476,7 +476,12 @@ def main():
     # so the warm start matches the 2-ch net AND keeps base22's converged mu head.
     # bbb arm is a pure-MSE (1-ch) net that gets variationalized post-init, so it warm-starts from the
     # ORIGINAL 1-ch base22 directly (its weights become the posterior means) -- no grow needed.
-    if args.arm == "bbb":
+    if NO_PRETRAIN:
+        # Width sweep: BASE22 is num_heads=8, so there is nothing loadable to warm-start from at
+        # another width. Skip the grow step too -- it only exists to turn the 1-ch BASE22 checkpoint
+        # into a 2-ch one, and a fresh HETEROSC init already emits both channels.
+        pretrained = None
+    elif args.arm == "bbb":
         pretrained = BASE22
     else:
         grown = os.path.join(REPO, f"data_l2{args.process}/{run_name}_base_grown.pt")
@@ -490,6 +495,13 @@ def main():
     from experiment import AmplitudeExperiment
     torch.set_default_dtype(torch.float32)
     cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained)
+    # Assert rather than trust the override chain: at num_heads=8 a leftover warm start LOADS
+    # CLEANLY (shapes happen to match) and the run silently becomes warm-started while the sweep
+    # reports it as fresh-init. Only the other widths would have failed loudly.
+    _pp = cfg.fine_tune.get("pretrained_path", None)
+    if NO_PRETRAIN and _pp not in (None, "", "null"):
+        raise RuntimeError(f"--no_pretrain requested but fine_tune.pretrained_path resolved to {_pp!r}")
+    print(f"[cfg] num_heads={cfg.model.net.num_heads} pretrained_path={_pp}", flush=True)
     # idempotent rerun: base_experiment aborts on an existing run dir, so clear THIS run's dir first
     # (disposable L2 run; the round-0 data dir + grown ckpt above are reused, not cleared).
     import shutil
