@@ -121,7 +121,7 @@ class BaseExperiment:
 
         # save config
         LOGGER.debug(OmegaConf.to_yaml(self.cfg))
-        self._save_config("config.yaml", to_mlflow=True)
+        self._save_config("config.yaml")
         self._save_config(f"config_{self.cfg.run_idx}.yaml")
 
         self.init_physics()
@@ -135,7 +135,12 @@ class BaseExperiment:
         # inverted claims about what was held out. The early save is kept so a
         # crash inside init_physics still leaves a record; this one makes the
         # persisted config true. No-op for non-recipe runs.
-        self._save_config("config.yaml")
+        #
+        # MLflow logs from HERE, not from the early save: params are write-once
+        # per run, so logging before the recipe resolves would pin the stale
+        # 8-entry data.dataset/data.amp_orders into the tracking DB where no
+        # later save can correct it, leaving MLflow disagreeing with the run dir.
+        self._save_config("config.yaml", to_mlflow=True)
         self._save_config(f"config_{self.cfg.run_idx}.yaml")
         self.init_geometric_algebra()
         self.init_data()

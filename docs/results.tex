@@ -805,8 +805,11 @@ identity, is what makes transfer to new processes possible. This is measured on 
 reduced} foundation (\code{pretrain25\_zs}: $25$ LO processes at $20$k events/process, with
 $ee\to u\bar u$ and $ee\to t\bar t$ removed so that neither target, nor the top quark, ever
 enters training), \emph{not} on the maintained joint set of \S\ref{sec:system}, which contains
-both. Which datasets a run saw is read from its recipe (\code{data.processes\_file}); the
-\code{data.dataset} key in a run config is an inherited default and does not report it.
+both. Which datasets a run saw is read from its recipe (\code{data.processes\_file}). In run dirs
+written before the resolved-config save, the \code{data.dataset} key is an inherited default and
+does \emph{not} report it; \code{full\_run} now re-saves the config after \code{init\_physics} (and
+logs that save, not the pre-resolution one, to MLflow), so a current run dir and its tracking entry
+both record the processes and coupling orders the run actually resolved to.
 \end{principle}
 
 % ==========================================================================
@@ -2303,16 +2306,6 @@ generating and grow the model or the horizon.
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
-  \item \textbf{\code{data.amp\_orders} is still stale in every backfilled run config, and is now
-    \emph{length-mismatched}.} The backfill repaired \code{data.dataset} on $1170$ recipe runs but not
-    \code{data.amp\_orders}, which resolving requires an \code{mg5.PROCESSES} lookup rather than the
-    recipe alone. Those configs previously carried $8$ datasets and $8$ orders, wrong but consistent;
-    they now carry the true $25$ datasets against the inherited $8$ orders, so
-    \code{zip(data.dataset, data.amp\_orders)} silently truncates to $8$ and mispairs
-    $[n_{\rm loops}, \alpha_s^{\rm power}]$. The \code{dataset\_backfilled: true} marker does not
-    record that orders were left alone. MLflow is a second unrepaired read surface: \code{full\_run}
-    keeps \code{to\_mlflow} only on the save that happens \emph{before} \code{init\_physics}, so the
-    logged \code{data.dataset} parameter is still the stale $8$-entry default.
   \item \textbf{Disentangle data from compute in the saturation result.} The $\sigma$-tail floor is flat
     in the data budget, but every run held the step count fixed at $4000$, so more data meant less
     optimisation per event and the two axes are confounded (see the saturation paragraph). Two clean
