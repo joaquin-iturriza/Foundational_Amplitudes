@@ -327,6 +327,17 @@ def _make_train_loader(exp, pool):
 
 
 # ---------------------------------------------------------------- cfg build
+# Capacity axis (--num_heads / --no_pretrain), set once from argv in main().
+# num_heads is the muP width axis, so a width change makes every backbone tensor a different
+# shape and BASE22 (num_heads=8) is no longer loadable: strict load_state_dict raises, and the
+# reset_output_head path would silently shape-filter almost the whole checkpoint away and train
+# from scratch while still logging "loading pretrained weights". So a width sweep MUST also pass
+# --no_pretrain and is a fresh-init regime, not comparable in absolute level to the warm-started
+# saturation runs; only the trend across widths is.
+NUM_HEADS = None
+NO_PRETRAIN = False
+
+
 def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained=None):
     from hydra import compose, initialize_config_dir
     # BOTH arms train the identical HETEROSC(detach, beta=1) model (same mu training, same sigma head);
@@ -335,8 +346,16 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
     # bbb arm is a pure-MSE net (variationalized post-init); base/sigma are HETEROSC(detach,beta=1).
     arm_ov = [] if arm == "bbb" else SIG_ARM_OVERRIDES
     # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
-    pre_ov = [f"fine_tune.pretrained_path={pretrained}"] if pretrained else []
-    overrides = data_overrides() + MU_OVERRIDES + arm_ov + pre_ov + [
+    # Rounds >= 1 always chain from THIS run's own previous checkpoint, which is already at the
+    # right width, so --no_pretrain only has to suppress the round-0 BASE22 warm start.
+    if pretrained:
+        pre_ov = [f"fine_tune.pretrained_path={pretrained}"]
+    elif NO_PRETRAIN:
+        pre_ov = ["fine_tune.pretrained_path=null"]
+    else:
+        pre_ov = []
+    width_ov = [f"model.net.num_heads={NUM_HEADS}"] if NUM_HEADS else []
+    overrides = data_overrides() + MU_OVERRIDES + width_ov + arm_ov + pre_ov + [
         f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
         f"data.data_path={round0_dir}/",
         f"training.iterations={total_steps}",
@@ -383,6 +402,12 @@ def main():
                     help="write per-round saturation diagnostics (pool size, sigma percentiles) to this json")
     ap.add_argument("--stop_on_saturation", action="store_true",
                     help="stop GROWING the pool (training continues) once the sigma tail plateaus")
+    # Capacity axis: does the sigma tail floor fall when the model gets wider at fixed data?
+    ap.add_argument("--num_heads", type=int, default=None,
+                    help="muP width axis. Overrides the default 8. Requires --no_pretrain: BASE22 is "
+                         "num_heads=8 and cannot be loaded into another width.")
+    ap.add_argument("--no_pretrain", action="store_true",
+                    help="fresh init instead of the round-0 BASE22 warm start (needed for a width sweep)")
     ap.add_argument("--sat_tol", type=float, default=0.02,
                     help="relative fall in the sigma p99 below which a round counts as saturated")
     ap.add_argument("--sat_patience", type=int, default=2,
@@ -408,6 +433,12 @@ def main():
     ap.add_argument("--validate_prep", action="store_true",
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
+
+    global NUM_HEADS, NO_PRETRAIN
+    if args.num_heads is not None and not args.no_pretrain:
+        ap.error("--num_heads requires --no_pretrain: BASE22 is num_heads=8, so at any other width "
+                 "the warm start either raises or silently drops the whole backbone.")
+    NUM_HEADS, NO_PRETRAIN = args.num_heads, args.no_pretrain
 
     if args.keep_c1 is None:
         args.keep_c1 = args.gamma             # degree-1 default == the plain sigma^gamma power law

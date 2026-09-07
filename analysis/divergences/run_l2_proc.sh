@@ -28,6 +28,10 @@ EXTRA=""; [ -n "$SAT_LOG" ] && EXTRA="--sat_log $SAT_LOG"
 [ -n "${KEEP_C2:-}" ] && EXTRA="$EXTRA --keep_c2 $KEEP_C2"
 [ -n "${KEEP_C3:-}" ] && EXTRA="$EXTRA --keep_c3 $KEEP_C3"
 [ -n "${OBJECTIVE:-}" ] && EXTRA="$EXTRA --objective $OBJECTIVE"
+# Capacity axis: NUM_HEADS implies fresh init (BASE22 is num_heads=8 and cannot be loaded
+# into another width); the driver refuses the combination without --no_pretrain anyway.
+[ -n "${NUM_HEADS:-}" ] && EXTRA="$EXTRA --num_heads $NUM_HEADS --no_pretrain"
+[ -z "${NUM_HEADS:-}" ] && [ -n "${NO_PRETRAIN:-}" ] && EXTRA="$EXTRA --no_pretrain"
 [ -n "${HLABEL:-}" ] && EXTRA="$EXTRA --heldout_label $HLABEL"
 python analysis/divergences/l2_online_uugg.py \
   --process $PROCESS --arm $ARM --tag $TAG --seed $SEED $EXTRA \
