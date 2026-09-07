@@ -127,6 +127,13 @@ class BaseExperiment:
         self.init_physics()
         self.init_geometric_algebra()
         self.init_data()
+        # config.yaml above is dumped BEFORE init_physics/init_data, so its
+        # data.dataset and data.amp_orders are the pre-resolution inherited
+        # defaults: on a recipe run they name neither the processes actually
+        # trained on nor their coupling orders. Dump the RESOLVED config too, so
+        # the run dir records what the run really saw instead of forcing every
+        # later reader back through data.processes_file.
+        self._save_config("config_resolved.yaml")
         self._init_dataloader()
         self.init_model()
         self._init_loss()
