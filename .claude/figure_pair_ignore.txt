@@ -4,6 +4,7 @@
 # Only add here when a figure genuinely should exist in a single format.
 docs/results.pdf
 talks/progress_jul2026/main.pdf
+talks/progress_sep2026/main.pdf
 talks/progress_jul2026/figs/alphas_panels.png
 talks/progress_jul2026/figs/amp_surface_pts.png
 talks/progress_jul2026/figs/lloca_white.png
