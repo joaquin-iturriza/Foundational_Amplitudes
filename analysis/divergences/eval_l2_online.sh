@@ -17,13 +17,22 @@ WT=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt
 cd "$WT"
 TAG=${1:-run}
 ROUNDS=${2:-3}
+# TAGLIST lets one job cover several run tags (e.g. the 3 seeds of one study); ARMS and SUMMARY
+# make the arm set and the destination explicit, since not every study uses static/l2/oracle
+# (the mechanism decomposition adds 'reweight', the coordinate-free one uses 'adapt').
+TAGLIST=${TAGLIST:-$TAG}
+ARMS=${ARMS:-"static l2 oracle"}
+SUMMARY=${SUMMARY:-l2_online_summary.json}
 TAGS=""
-for arm in static l2 oracle; do
-  for ((r=0; r<ROUNDS; r++)); do TAGS="$TAGS,${TAG}_${arm}_mu_r${r}"; done
+for t in $TAGLIST; do
+  for arm in $ARMS; do
+    for ((r=0; r<ROUNDS; r++)); do TAGS="$TAGS,${t}_${arm}_mu_r${r}"; done
+  done
 done
 TAGS=${TAGS#,}
+echo "[eval] summary=$SUMMARY arms='$ARMS' tags=$TAGS"
 python analysis/divergences/eval_eeuu_resonance.py \
   --runs_root "$WT/runs/eeuu_l2" --run_prefix "" --tags "$TAGS" \
   --test /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data_test_eeuu/ee_uu_91-1000GeV_amplitudes.npy \
-  --out_prefix "l2_online_${TAG}_" --summary "l2_online_summary.json"
+  --out_prefix "l2_online_${TAG}_" --summary "$SUMMARY"
 echo "DONE eval_l2_online $TAG"
