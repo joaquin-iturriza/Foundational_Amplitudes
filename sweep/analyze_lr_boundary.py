@@ -424,6 +424,7 @@ def _apply_extension(sweep_dir, direction, new_bound,
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:{cluster["request_gpus"]}
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
 #SBATCH --time={cluster.get("time", "02:00:00")}
 #SBATCH --output={lustre_dir}/output/trial_{i:04d}_%j.out

@@ -23,11 +23,11 @@ cluster:
   time: "01:00:00"
 
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
     - "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
 
 sweep_name: finetune_lora_scaling_virt
@@ -49,13 +49,13 @@ dyhpo:
   n_startup: 4
 
 fixed_params:
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.subsample: 100000
   data.train_test_val: "[0.7, 0.2, 0.1]"
   model: lloca
   model.net.num_blocks: 8
   model.net.num_heads: 8
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
   fine_tune.lora.enabled: 'true'
   training.lr: 0.001081750557879577
   training.batchsize: 16384

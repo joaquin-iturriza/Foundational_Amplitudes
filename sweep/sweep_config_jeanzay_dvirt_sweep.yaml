@@ -17,8 +17,8 @@ fidelity_schedule:
 n_trials: 20
 fixed_params:
   data.source: recipes
-  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25_short.yaml
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain25_short.yaml
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
   data.seed: 42
@@ -46,12 +46,11 @@ fixed_params:
   model.virt_standardize: 'false'
   model.d_diag: 32
 paths:
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/dvirt_sweep
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/dvirt_sweep
   setup_commands:
-  - module load anaconda-py3/2023.09
-  - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
-  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 range_extension:
   enabled: false
 search_space:

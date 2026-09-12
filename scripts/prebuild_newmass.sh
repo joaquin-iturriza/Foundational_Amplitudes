@@ -2,20 +2,20 @@
 # Prebuild ONLY the new internal-mass datasets (Z-mass + exotic top/Higgs/Z-4ℓ) with
 # fiducial cuts on, into a dedicated cut-tagged cache. CPU prepost (weight 0, no GPU).
 #SBATCH --job-name=prebuild_newmass
-#SBATCH --partition=prepost
-#SBATCH --account=itg@v100
+#SBATCH --partition=htc
+#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=48
+#SBATCH --mem-per-cpu=2G
 #SBATCH --time=08:00:00
 #SBATCH --hint=nomultithread
 #SBATCH --output=prebuild_newmass_%j.out
 #SBATCH --error=prebuild_newmass_%j.err
 set -euo pipefail
-module load anaconda-py3/2023.09
-source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 
 # Dedicated cut-tagged cache (kept separate from the old pre-cut datasets_scanbig).
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut

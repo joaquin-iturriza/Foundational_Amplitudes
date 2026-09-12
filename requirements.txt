@@ -20,7 +20,7 @@ lion_pytorch==0.2.3
 matplotlib
 mock==5.2.0
 mlflow
-numpy
+numpy==1.26.4  # torch 2.1.2 is built against NumPy 1.x; 2.x breaks interop
 omegaconf==2.3.0
 opt_einsum==3.4.0
 optuna>=3.1

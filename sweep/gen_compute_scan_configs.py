@@ -18,7 +18,7 @@ import os, yaml
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "compute_scan")
 os.makedirs(OUT, exist_ok=True)
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 
 def f_step(bs):                       # MACs/step for nh8 n_avg4
     return 3.0 * bs * 13139968
@@ -36,11 +36,12 @@ C_GRID_1K = [1e13, 3e13, 1e14, 3e14, 1e15, 2e15]   # small batch is FLOP-ineffic
 
 DATASETS = ["ee_uu_nlo_virt_e4", "ee_ttbar_nlo_virt_e4"]
 
-CLUSTER = {"scheduler": "slurm", "auto_submit": False, "partition": "gpu_p2",
-           "account": "itg@v100", "request_gpus": 1, "cpus_per_task": 8, "time": "02:00:00"}
+CLUSTER = {"scheduler": "slurm", "auto_submit": False, "partition": "gpu_v100",
+           "account": "lpnhe", "request_gpus": 1, "cpus_per_task": 8, "time": "02:00:00"}
 PATHS = {"sweep_dir": f"{ROOT}/sweeps", "project_dir": ROOT,
-         "setup_commands": ["module load anaconda-py3/2023.09",
-                            "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
+         "setup_commands": [
+                            "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
+                            "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
                             "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"]}
 
 BASE_FIXED = {

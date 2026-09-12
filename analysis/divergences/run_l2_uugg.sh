@@ -1,16 +1,18 @@
 #!/bin/bash
 #SBATCH --job-name=l2uugg
-#SBATCH --account=itg@v100
-#SBATCH --partition=gpu_p2
-#SBATCH --gres=gpu:1
+#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=analysis/divergences/l2uugg_%x_%j.out
 #SBATCH --error=analysis/divergences/l2uugg_%x_%j.out
 set -e
-module purge; module load anaconda-py3/2023.09
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/worktrees/wt-l2-uugg
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/worktrees/wt-l2-uugg
 export PYTHONDONTWRITEBYTECODE=1
 ARM=${ARM:-sigma}; SEED=${SEED:-0}; TAG=${TAG:-run}
 python analysis/divergences/l2_online_uugg.py \

@@ -22,7 +22,7 @@ fidelity_schedule:
 fixed_params:
   # --- identical 25-process recipe data to pretrain25 (the LLoCa baseline) ---
   data.source: recipes
-  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain25.yaml
+  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain25.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
   # 500k/process (12.5M pool): identical to the LLoCa pretrain25 baseline, so every
@@ -33,7 +33,7 @@ fixed_params:
   data.train_subsample: 500000
   data.eval_subsample: 20000
   data.seed: 42
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   # --- model: L-GATr-slim muP, ~1.57M params (matched to LLoCa's 1.61M) ---
   model: lgatr_slim
   model.net.num_blocks: 8
@@ -54,11 +54,11 @@ fixed_params:
   training.validate_frac: 0.1
 n_trials: 20
 paths:
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-  - module load anaconda-py3/2023.09
-  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/pretrain25_slim_eqc
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/pretrain25_slim_eqc
 range_extension:
   enabled: false
 search_space:

@@ -99,6 +99,7 @@ def _write_slurm_script(job_name, cfg, sweep_dir, config_path, hp_idx, t_steps):
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:{cluster["request_gpus"]}
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
 #SBATCH --time={cluster.get("time", "20:00:00")}
 {mem_line}#SBATCH --output={sweep_dir}/output/{job_name}_%j.out

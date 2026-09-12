@@ -7,11 +7,11 @@ cluster:
   cpus_per_task: 8
   time: 02:00:00
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-  - module load anaconda-py3/2023.09
-  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
   - export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 sweep_name: cscan_ft416best_D10k_hpo
 seed: 42
@@ -32,7 +32,7 @@ dyhpo:
   seed: 42
   n_startup: 10
 fixed_params:
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.train_test_val: '[0.7, 0.2, 0.1]'
   model: lloca
   model.net.num_blocks: 8
@@ -48,7 +48,7 @@ fixed_params:
   training.validate_frac: 0.01
   plot: 'true'
   seed: 42
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/compare_models/_ftfig_pre_best416/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/compare_models/_ftfig_pre_best416/models/model_run0_best.pt.gz
   training.lr: 0.008322839
   data.subsample: 10000
   training.cosanneal_eta_min: 1.0e-08

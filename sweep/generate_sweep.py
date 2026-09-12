@@ -159,15 +159,18 @@ def write_slurm_script(i, cfg, sweep_dir, config_abs_path, t_steps_cap=None):
     trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
 
+    # CC-IN2P3 rejects a job without an explicit memory request; qos/gres strings are cluster-specific.
     mem_line = f"#SBATCH --mem={cluster['mem']}\n" if "mem" in cluster else ""
+    qos_line = f"#SBATCH --qos={cluster['qos']}\n" if "qos" in cluster else ""
+    gres = cluster.get("gres", f"gpu:{cluster['request_gpus']}")
     content = f"""\
 #!/bin/bash
 #SBATCH --job-name=trial_{i:04d}
 #SBATCH --partition={cluster["partition"]}
-#SBATCH --account={cluster["account"]}
+{qos_line}#SBATCH --account={cluster["account"]}
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:{cluster["request_gpus"]}
+#SBATCH --gres={gres}
 #SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
 #SBATCH --time={cluster.get("time", "20:00:00")}
 {mem_line}#SBATCH --output={sweep_dir}/output/trial_{i:04d}_%j.out

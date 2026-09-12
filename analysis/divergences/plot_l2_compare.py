@@ -23,7 +23,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 import plot_style as ps  # noqa: E402
 
@@ -32,7 +32,7 @@ MZ = 91.1876
 
 
 # heldout_eval_*.npz are written to the MAIN repo (score_and_save uses REPO), not the worktree copy.
-NPZ_DIR = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/divergences"
+NPZ_DIR = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/divergences"
 
 
 def load(path):

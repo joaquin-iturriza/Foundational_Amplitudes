@@ -13,7 +13,7 @@ import glob, json, os, re, yaml
 from datetime import datetime, timedelta
 import numpy as np
 
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 TS_RE = re.compile(r"\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)")
 N_STARTUP = 4
 

@@ -17,7 +17,7 @@ fidelity_schedule:
 n_trials: 20
 fixed_params:
   data.source: files
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data_small_encab/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data_small_encab/
   data.preprocess_per_dataset: 'true'
   data.subsample: 'null'
   model: lloca
@@ -39,12 +39,11 @@ fixed_params:
   data.spin_onehot: 'true'
   data.standardize_props: 'true'
 paths:
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/encab_comparison
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/encab_comparison
   setup_commands:
-  - module load anaconda-py3/2023.09
-  - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
-  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 range_extension:
   enabled: false
 search_space:

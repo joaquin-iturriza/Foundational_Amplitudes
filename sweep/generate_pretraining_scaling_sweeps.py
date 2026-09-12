@@ -203,11 +203,14 @@ def needs_32gb(num_heads: int, batch_size: int) -> bool:
 # Config generation
 # ---------------------------------------------------------------------------
 
-LUSTRE_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 
 BASE_CLUSTER = {
     "scheduler": "slurm",
-    "account": "itg@v100",
+    "account": "lpnhe",
+    "qos": "gpu",
+    "gres": "gpu:v100:1",
+    "mem": "32G",
     "request_gpus": 1,
     "cpus_per_task": 8,
 }
@@ -216,8 +219,9 @@ BASE_PATHS = {
     "sweep_dir": f"{LUSTRE_BASE}/sweeps/pretraining_scaling",
     "project_dir": LUSTRE_BASE,
     "setup_commands": [
-        "module load anaconda-py3/2023.09",
-        "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
+        
+        "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
+        "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
     ],
 }
 
@@ -322,7 +326,7 @@ def make_cell_config(
     bs = min(_batch_size(d_total), BS_CAP.get(num_heads, 8192))
     sub = _subsample_per_ds(d_total)
     use_32gb = needs_32gb(num_heads, bs)
-    partition = "gpu_p2l" if use_32gb else "gpu_p2"
+    partition = "gpu_v100"   # every CC-IN2P3 V100 is the 32 GB part; use_32gb is moot here
     slurm_time = slurm_time_str(t_steps, num_heads, bs)
 
     cluster = {**BASE_CLUSTER, "partition": partition, "time": slurm_time, "auto_submit": auto_submit}

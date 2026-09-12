@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 DATASETS = [
     ("ee_aa_10-1000GeV_amplitudes",    r"$ee\to\gamma\gamma$"),
     ("ee_aaa_10-1000GeV_amplitudes",   r"$ee\to\gamma\gamma\gamma$"),

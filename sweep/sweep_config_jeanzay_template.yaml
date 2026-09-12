@@ -1,18 +1,21 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_p2          # V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)
-  account: itg@v100
+  partition: gpu_v100        # CC-IN2P3 V100 32GB nodes (gpu_h100 exists too; untested here)
+  qos: gpu
+  account: lpnhe
   request_gpus: 1
+  gres: gpu:v100:1
+  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "20:00:00"
 
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 
 sweep_name: my_sweep_name
 n_trials: 40
@@ -27,7 +30,7 @@ fidelity_schedule:
   t_steps: [1000, 10000, 40000]
 
 fixed_params:
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.dataset: '[ee_uu_91GeV_amplitudes]'
   model: lloca
   plot: 'true'

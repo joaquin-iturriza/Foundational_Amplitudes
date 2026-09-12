@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 DATASET = {"eeuunlovirte4": "ee_uu_nlo_virt_e4", "eettbarnlovirte4": "ee_ttbar_nlo_virt_e4"}

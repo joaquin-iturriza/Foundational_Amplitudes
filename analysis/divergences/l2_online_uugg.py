@@ -37,7 +37,7 @@ import numpy as np
 import torch
 
 WT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, WT)
 sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
 import gen_ir_democratic as G          # noqa: E402

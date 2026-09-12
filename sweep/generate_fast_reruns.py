@@ -73,6 +73,7 @@ def write_job(fast_dir, cfg, fast_config_path, hp_idx, t_steps):
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:{cluster.get("request_gpus", 1)}
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
 #SBATCH --time={cluster.get("time", "02:00:00")}
 #SBATCH --output={fast_dir}/output/trial_0000_%j.out

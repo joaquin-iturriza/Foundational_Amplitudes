@@ -1,19 +1,21 @@
 #!/bin/bash
 #SBATCH --job-name=l2proc
-#SBATCH --account=itg@v100
-#SBATCH --partition=gpu_p2
-#SBATCH --gres=gpu:1
+#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --output=analysis/divergences/l2proc_%x_%j.out
 #SBATCH --error=analysis/divergences/l2proc_%x_%j.out
 set -e
-module purge; module load anaconda-py3/2023.09
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 # Run from the checkout this script was SUBMITTED from, not a hardcoded path: this file also lives
 # in worktrees, and a hardcoded trunk path silently runs the TRUNK driver instead of the worktree's
 # (which fails on any flag the trunk does not have yet, or worse, quietly runs the wrong code).
-cd "${L2_ROOT:-${SLURM_SUBMIT_DIR:-/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes}}"
+cd "${L2_ROOT:-${SLURM_SUBMIT_DIR:-/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes}}"
 echo "[run_l2_proc] cwd=$(pwd)"
 export PYTHONDONTWRITEBYTECODE=1
 # Process-general L2 online-generation run (uug multi-scale Z-res+IR, uugg, uuggg more-legs).

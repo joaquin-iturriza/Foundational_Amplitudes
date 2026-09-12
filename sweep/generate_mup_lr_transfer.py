@@ -33,7 +33,7 @@ import numpy as np
 import yaml
 
 DEFAULT_REF = (
-    "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/"
+    "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/"
     "sweeps/pretraining_scaling/scaling_p1_nh16_D1e3_t31623/sweep_config.yaml"
 )
 

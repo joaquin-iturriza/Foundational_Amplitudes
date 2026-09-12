@@ -117,7 +117,7 @@ def write_prebuild_script(sweep_dir, cfg):
         return None
     seed    = int(fp.get("data.seed", 42))
     proj    = cfg["paths"]["project_dir"]
-    account = cfg["cluster"].get("account", "itg@v100")
+    account = cfg["cluster"].get("account", "lpnhe")
     setup   = "\n".join(cfg["paths"].get("setup_commands", []))
     name    = cfg.get("sweep_name", os.path.basename(sweep_dir.rstrip("/")))
     script  = os.path.join(sweep_dir, "prebuild.sh")
@@ -126,13 +126,14 @@ def write_prebuild_script(sweep_dir, cfg):
 # SPEC: {spec}
 # SEED: {seed}
 # Auto-emitted CPU prebuild for this recipe sweep — materializes datasets on the
-# prepost partition (CPU billed at weight 0; no GPU hours). Self-skips cached.
+# htc partition (CPU; no GPU hours). Self-skips cached.
 #SBATCH --job-name=prebuild_{name}
-#SBATCH --partition=prepost
+#SBATCH --partition=htc
 #SBATCH --account={account}
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
+#SBATCH --mem-per-cpu=2G
 #SBATCH --time=04:00:00
 #SBATCH --hint=nomultithread
 #SBATCH --output={sweep_dir}/prebuild_%j.out

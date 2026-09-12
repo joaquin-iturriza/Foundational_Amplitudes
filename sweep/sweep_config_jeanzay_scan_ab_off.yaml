@@ -17,7 +17,7 @@ fidelity_schedule:
 n_trials: 15
 fixed_params:
   data.source: recipes
-  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/scan_bigrun.yaml
+  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/scan_bigrun.yaml
   data.require_cache: 'true'
   data.train_subsample: 'null'
   data.eval_subsample: 2000
@@ -45,12 +45,11 @@ fixed_params:
   data.coupling_scalars: 'false'
   model.use_diagrams: 'false'
 paths:
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/scan_ab
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/scan_ab
   setup_commands:
-  - module load anaconda-py3/2023.09
-  - source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
-  - conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
   - export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
   - export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut
   - export AMP_FIDUCIAL_CUTS=on

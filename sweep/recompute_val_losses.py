@@ -33,7 +33,7 @@ from experiment import AmplitudeExperiment
 from base_experiment import _torch_load
 from misc import get_device
 
-LUSTRE_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 
 

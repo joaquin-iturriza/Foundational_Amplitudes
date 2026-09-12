@@ -8,11 +8,11 @@ cluster:
   time: "02:00:00"
 
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 
 sweep_name: finetune_pt25_eettbarnlovirt
 datasets:
@@ -27,9 +27,9 @@ dyhpo:
   total_budget: 200   # generous upper bound (n_trials_per_level * n_levels)
 
 fixed_params:
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.subsample: null
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz
   model: lloca
   model.net.num_blocks: 8
   model.net.num_heads: 8

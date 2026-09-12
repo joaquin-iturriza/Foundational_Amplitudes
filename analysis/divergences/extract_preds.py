@@ -23,7 +23,7 @@ import torch
 from omegaconf import OmegaConf, open_dict
 
 # repo root on path
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 
 from experiment import AmplitudeExperiment  # noqa: E402

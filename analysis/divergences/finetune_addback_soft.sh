@@ -1,8 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=ft_soft_ho
-#SBATCH --account=itg@v100
-#SBATCH --partition=gpu_p2
-#SBATCH --gres=gpu:1
+#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --array=0-3
@@ -11,11 +13,11 @@
 
 set -e
 module purge
-module load anaconda-py3/2023.09
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 
-REPO=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+REPO=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 CKPT=$REPO/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt
 
 # ee->uug SOFT-region hold-out (x_g<c): pure-soft extrapolation, complementary to the

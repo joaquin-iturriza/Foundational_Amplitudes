@@ -16,7 +16,7 @@ import torch
 from omegaconf import OmegaConf, open_dict
 
 WT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, WT)
 sys.path.insert(0, os.path.join(WT, "analysis/divergences"))
 import l2_online_uugg as L                       # preprocess_increment, PDG        # noqa: E402

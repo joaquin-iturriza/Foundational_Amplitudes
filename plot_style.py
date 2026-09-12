@@ -3,7 +3,7 @@
 Every plotting script in this repo imports this module and uses `figure()` + `save()`.
 Importing it applies the style; you do not need to call `use()` yourself.
 
-    import sys; sys.path.insert(0, "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes")
+    import sys; sys.path.insert(0, "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes")
     import plot_style as ps
 
     fig, (axL, axR) = ps.figure(ncols=2)

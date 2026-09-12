@@ -1,8 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=base22_uug
-#SBATCH --account=itg@v100
-#SBATCH --partition=gpu_p2
-#SBATCH --gres=gpu:1
+#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=02:30:00
 #SBATCH --output=analysis/divergences/base22_%j.out
@@ -10,11 +12,11 @@
 
 set -e
 module purge
-module load anaconda-py3/2023.09
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 
-REC=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/pretrain22_heldout_uug.yaml
+REC=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain22_heldout_uug.yaml
 
 # 22-process leave-uug-out foundation base. HPs copied verbatim from the well-trained
 # 25ds reference runs/pretrain25/trial_0009 (recipe path; the trial the ft25 finetunes

@@ -1,10 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=scan_ab_repro
-#SBATCH --partition=gpu_p2
-#SBATCH --account=itg@v100
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:50:00
 #SBATCH --array=0-5
@@ -16,10 +18,9 @@
 # diagram AND off at lr=1e-3 across 3 fresh seeds. If diagram is consistently
 # ~0.60 and off ~0.68, the diagram win is real; if diagram scatters, it was luck.
 
-module load anaconda-py3/2023.09
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
+source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 PROJ=$PWD
 
 ARMS=(diagram off)
