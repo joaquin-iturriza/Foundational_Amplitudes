@@ -990,23 +990,6 @@ diagrams costs nothing and cures that median regression, so the combined
 no-diagrams$+$linear-embed configuration is the adopted candidate: best or tied-best in
 every aggregate view while being the simplest and cheapest of the six.
 
-\paragraph{Open threads.} Two structural problems cap what any feature set can do about the
-$\sim\!50$ stuck processes; both are actionable and unresolved:
-\begin{itemize}
-  \item \textbf{Resonance-aware generation} (data-side fix for Principle~\ref{prin:needle}).
-  Uniform-$\sqrt s$/flat-phase-space sampling starves the pole regions. Options, in increasing
-  invasiveness: drop or window the redundant plain wide-range $2\!\to\!2$ sets (their physics is
-  covered by the scan variants); importance-sample $\sqrt s$ around poles at generation time; for
-  the internal-invariant-mass needles ($4\ell$, $WWb\bar b$, $\mu\mu\tau\tau$), resonance-aware
-  phase-space sampling (\`a la MadGraph channel mapping) is the only real cure.
-  \item \textbf{Taming the $1/\mathrm{MSE}$ gradient weight} (optimizer-side fix for
-  Principle~\ref{prin:gradcomp}). Candidate one-liner: aggregate
-  $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau\sim10^{-4}$, which caps a converged
-  process's weight at $1/\tau$ while leaving processes above $\tau$ on the exact geometric-mean
-  behavior (comparison metrics unchanged). Untested; the decisive check is whether
-  $ee\,\gamma\gamma$'s late-training collapse disappears at otherwise-identical HPs.
-\end{itemize}
-
 \paragraph{Pairwise attention bias: the diagram signal at the pair level (tested, not adopted).}
 Motivated by the delivery-mechanism reading of the diagram results (the off-shellness signal wins
 when it reaches the main transformer, Sec.~\ref{sec:levers}) and by the external evidence that
@@ -1057,6 +1040,31 @@ without taxing the bulk. Code and arms retained: \code{model.use\_pair\_bias} (d
 \code{compare\_models/\_bigrun\_arm\_pairbias*}.
 
 % ==========================================================================
+\subsection{Hand-off: open items}\label{sec:bigrun-open}
+Two structural problems cap what any feature set can do about the $\sim\!50$ stuck processes of
+Table~\ref{tab:bigrun_census}; both are actionable and neither has been tested \emph{on the
+big run}:
+\begin{itemize}
+  \item \textbf{Resonance-aware generation} (data-side fix for Principle~\ref{prin:needle}).
+  Uniform-$\sqrt s$/flat-phase-space sampling starves the pole regions. The sampling question
+  itself was taken up, on single processes, by the divergence line of Sec.~\ref{sec:divergences}:
+  the antenna and ``democratic'' base samplers, the coverage-versus-emphasis result, and the
+  $\sigma$-steered on-the-fly generation of Sec.~\ref{sec:div-sampling} are that thread's
+  follow-up, and the $ee\to u\bar u$ $Z$-resonance study there is the same needle as
+  Principle~\ref{prin:needle} cured by generation rather than resampling. What remains open is
+  carrying it into the $448$-set recipe, in increasing invasiveness: drop or window the redundant
+  plain wide-range $2\!\to\!2$ sets (their physics is covered by the scan variants);
+  importance-sample $\sqrt s$ around poles at generation time; for the internal-invariant-mass
+  needles ($4\ell$, $WWb\bar b$, $\mu\mu\tau\tau$), resonance-aware phase-space sampling
+  (\`a la MadGraph channel mapping), the only real cure.
+  \item \textbf{Taming the $1/\mathrm{MSE}$ gradient weight} (optimizer-side fix for
+  Principle~\ref{prin:gradcomp}). Candidate one-liner: aggregate
+  $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau\sim10^{-4}$, which caps a converged
+  process's weight at $1/\tau$ while leaving processes above $\tau$ on the exact geometric-mean
+  behavior (comparison metrics unchanged). Untested; the decisive check is whether
+  $ee\,\gamma\gamma$'s late-training collapse disappears at otherwise-identical HPs.
+\end{itemize}
+
 \section{Behaviour near amplitude divergences}\label{sec:divergences}
 % ==========================================================================
 
