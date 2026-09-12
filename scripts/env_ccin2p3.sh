@@ -12,3 +12,9 @@
 # Explicit MG5_BIN / MG5_WORK_DIR / MG5_OUTPUT_DIR / AMP_* exports still win.
 export WORK="${WORK:-/sps/lpnhe/jiturrizaramirez01}"
 export SCRATCH="${SCRATCH:-/sps/lpnhe/jiturrizaramirez01/tmp}"
+# MadLoop's matrix2py.so links the HEPTools reduction libraries (Ninja, Collier, OneLoop)
+# dynamically; without this the import fails with "libninja.so.0: cannot open shared object".
+export LD_LIBRARY_PATH="$WORK/mg5amcnlo/HEPTools/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+# f2py must be the venv's (system f2py3 builds a cpython-39 module the venv cannot import);
+# mg5_configuration.txt pins f2py_compiler_py3 to it, and its distutils backend needs this.
+export SETUPTOOLS_USE_DISTUTILS=stdlib
