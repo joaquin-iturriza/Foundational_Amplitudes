@@ -2341,6 +2341,79 @@ Genuinely-unfinished / future work for this line (the completed findings are the
 \end{itemize}
 
 % ==========================================================================
+\subsection{Hand-off: priors and representations (planned, not started)}\label{sec:prior-open}
+Planned next directions, collected while the Jean Zay results were unreachable (CC-IN2P3
+migration, September 2026). They come from two external lines of work read against what this
+project has already tested: LLM-conditioned event generation (arXiv:2606.23791, Bahl, Plehn,
+Schiller, Sivagnanalingam) and the synthetic-prior tabular foundation models TabICL/TabICLv2
+(arXiv:2502.05564, arXiv:2602.11139, Qu, Holzm\"uller, Varoquaux, Le Morvan). Already taken
+from the first and therefore \emph{not} listed again: the graph-transformer diagram encoder
+(Sec.~\ref{sec:levers}, dropped in-distribution at $448$ datasets), the descriptive
+particle encoding (Principle~\ref{prin:zeroshot}), continuous mass conditioning, and the
+fine-tune data-efficiency protocol (Sec.~\ref{sec:transfer}).
+
+The organising question is \textbf{which kind of prior helps amplitude regression}: none,
+physics (our pretraining), language (a pretrained LLM), or a synthetic function class (a
+PFN-style prior). Every arm below is evaluated the same way, on one held-out process, as a
+curve of \vlnr\ against fine-tune events, with the seed bands of Sec.~\ref{sec:transfer}.
+\begin{enumerate}
+  \item \textbf{Pretrained LLM backbone, three arms.} (a) Qwen2.5-0.5B partially fine-tuned
+    as in arXiv:2606.23791 (frozen copy of the weights for the text tokens, trainable copy for
+    the momentum tokens and the event token, KV cache of the frozen prefix; their CFM head
+    replaced by our regression head on standardised $\log|\mathcal{M}|^2$); (b) the \emph{same}
+    architecture from random initialisation, the control that isolates the language prior from
+    the size of the transformer; (c) $\mu$P-LLoCa physics-pretrained, i.e.\ the existing
+    transfer arm. Practicalities: no bf16 on V100 (fp32 or fp16 with loss scaling; the trainable
+    0.5B copy with Adam state is ${\sim}8$\,GB in fp32), $\mu$P does not apply so $\eta$ goes
+    through DyHPO, Lorentz equivariance is given up on purpose, and the final LayerNorm of the
+    LLM is reset to unity as they do. This is the expensive item and deserves its own worktree.
+  \item \textbf{Frozen LLM as a process-text encoder for LLoCa (cheap first step).} Embed the
+    \code{in-interm-out} string (\code{e+ e- > [z, a] > u u~ g}) once per process with a frozen
+    Qwen, cache the vector, and feed it through the \code{d\_diag} slot in place of the diagram
+    encoder's $E(\text{process})$. Zero cost in the training loop; tests the paper's headline
+    modality (their text $\approx$ edge-list on hold-outs) without touching the backbone.
+  \item \textbf{Re-judge the diagram channel on the question it was built for.} The paper's
+    diagram gain is not in-distribution (${\sim}0.01$ AUC, matching our ``static conditioning
+    buys nothing'') but hold-out zero-shot and ${\sim}500\times$ fine-tune data efficiency.
+    Our drop decision (Sec.~\ref{sec:bigrun}) used the converged in-distribution bulk only. One
+    A/B: zero-shot and fine-tune-size curves with \code{use\_diagrams} on/off on a held-out
+    process. The code exists.
+  \item \textbf{Structured hold-out taxonomy.} Our zero-shot evidence is two processes. With the
+    $448$-process catalog, hold out by the symmetry probed (their Table~1): flavour and isospin
+    degeneracy, $e/\mu$ universality, Higgs self-coupling, quartic gauge topologies, $\tau$
+    Yukawa. Gives a map of which structure transfers instead of one number. Recipe design is
+    CPU-only and can be done now; evaluation needs a pretrained model. Sharpest sub-case: their
+    embeddings transferred PDF-driven shape but not the matrix-element-driven threshold; for us
+    the matrix element \emph{is} the target, so novel-vertex hold-outs are the decisive test.
+  \item \textbf{TabICLv2 as a zero-training baseline.} An amplitude dataset is a table
+    ($4n$ momentum components, property vectors, \code{amp\_orders} $\to$ $\log|\mathcal{M}|^2$;
+    ${\le}100$ features, $10^4$--$10^6$ rows, inside its $10^6\times500$ envelope). Inference
+    weights are public, prediction is one forward pass with the training table in context, no
+    gradient step. Expected to lose badly on precision (a generic SCM prior knows nothing of
+    poles or Lorentz structure, and outputs 999 quantiles tuned for RMSE-level noise) but it is
+    the natural competitor in the few-hundred-event regime where the transfer curves live.
+    Also a curious zero-shot test if several processes are concatenated into one table with
+    the property vectors as features.
+  \item \textbf{Synthetic-amplitude prior (the novel one).} The PFN idea transferred to
+    physics: pretrain $\mu$P-LLoCa on unlimited \emph{fake matrix elements}, random rational
+    functions of Mandelstam invariants with random pole positions and widths, random polynomial
+    numerators in the spin-sum style, random masses and multiplicities, Lorentz-invariant by
+    construction and with the right singularity structure but no real process behind them; then
+    fine-tune on real processes. Tests whether what transfers from the $25$/$448$-process
+    pretraining is physics or merely ``smooth function of invariants with poles'', and removes
+    MadGraph from the pretraining loop entirely. The generator is a CPU script and can be
+    written and validated before any GPU budget is allocated.
+  \item \textbf{Smaller items.} Their long-pretraining schedule (grow the per-process pool
+    mid-run, resample per epoch, cosine tail) captured a resonance the short schedule never did
+    and bears on the data-versus-compute item of Sec.~\ref{sec:div-open}. Their frozen-plus-
+    trainable-copy fine-tune is a PEFT variant absent from the \code{fine\_tune} block (LoRA,
+    EWC, freezing, layer decay). Separate per-diagram prefix tokens instead of the pooled
+    readout ranked last: they found pooled marginally better.
+\end{enumerate}
+Suggested order given the compute situation: 2, 3, 4 need only the small recipes we can
+generate here plus a modest pretraining; 5 needs no training at all; 6 starts as a CPU
+generator; 1 waits for a compute plan.
+
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
 
