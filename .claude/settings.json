@@ -13,19 +13,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/figure_pair_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/figure_pair_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/auto_push.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/auto_push.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/slurm_waiter_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/slurm_waiter_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/review_backlog.sh check"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/review_backlog.sh check"
           }
         ]
       }
@@ -36,11 +36,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/worktree_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/worktree_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/review_backlog.sh gate"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/review_backlog.sh gate"
           }
         ]
       },
@@ -49,11 +49,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/md_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/md_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/plot_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/plot_guard.sh"
           }
         ]
       },
@@ -62,15 +62,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/hpo_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/hpo_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/plot_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/plot_guard.sh"
           },
           {
             "type": "command",
-            "command": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/.claude/hooks/worktree_fold_guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/worktree_fold_guard.sh"
           }
         ]
       }

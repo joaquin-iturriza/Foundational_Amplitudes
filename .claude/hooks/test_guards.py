@@ -10,7 +10,7 @@ import os
 import subprocess
 import tempfile
 
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = os.environ.get("CLAUDE_PROJECT_DIR") or os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 HOOKS = os.path.join(REPO, ".claude", "hooks")
 
 # built from pieces so this file contains no literal match either

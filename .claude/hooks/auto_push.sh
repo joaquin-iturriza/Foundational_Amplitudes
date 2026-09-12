@@ -7,7 +7,7 @@
 # commits and never touches `main` (a generated artifact). Failures are non-fatal
 # (printed, exit 0) so a push problem never blocks the session.
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$REPO" 2>/dev/null || exit 0
 
 # Walk every worktree (the main checkout + any ../wt-* feature worktrees) so

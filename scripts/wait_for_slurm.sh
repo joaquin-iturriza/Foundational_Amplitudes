@@ -21,6 +21,17 @@
 set -uo pipefail
 POLL="${POLL:-30}"
 TAIL="${TAIL:-25}"
+
+# Off-cluster (the sshfs-mount workflow): no squeue here, so hand the whole wait to the
+# login node via scripts/remote.sh. Same invocation, same output, still backgroundable.
+if ! command -v squeue >/dev/null 2>&1; then
+  here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -x "$here/remote.sh" ]; then
+    exec "$here/remote.sh" "POLL=$POLL TAIL=$TAIL scripts/wait_for_slurm.sh $*"
+  fi
+  echo "wait_for_slurm.sh: no squeue on this host and no scripts/remote.sh to forward through" >&2
+  exit 1
+fi
 USER_NAME="${USER:-$(whoami)}"
 
 stamp() { date +%H:%M:%S; }

@@ -14,10 +14,18 @@
 # Escape hatch: `touch .claude/.no_waiter_needed` to allow one Stop with jobs in flight
 # (deliberate fire-and-forget, e.g. the user said they'll check themselves). Auto-cleared.
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 BYPASS="$REPO/.claude/.no_waiter_needed"
 
-command -v squeue >/dev/null 2>&1 || exit 0
+# Off-cluster (sshfs mount, jobs go over ssh): route squeue through scripts/remote.sh; if the
+# cluster is unreachable, fail open rather than hang the Stop.
+if command -v squeue >/dev/null 2>&1; then
+  SQUEUE=(squeue)
+elif [ -x "$REPO/scripts/remote.sh" ]; then
+  SQUEUE=("$REPO/scripts/remote.sh" squeue)
+else
+  exit 0
+fi
 
 if [ -f "$BYPASS" ]; then
   rm -f "$BYPASS"
@@ -25,7 +33,7 @@ if [ -f "$BYPASS" ]; then
 fi
 
 USER_NAME="${USER:-$(whoami)}"
-jobs=$(squeue -u "$USER_NAME" -h -o "%i %j %T" 2>/dev/null | grep -viE 'prebuild' || true)
+jobs=$("${SQUEUE[@]}" --me -h -o "%i %j %T" 2>/dev/null | grep -viE 'prebuild' || true)
 [ -z "$jobs" ] && exit 0
 
 # A waiter alive? (wait_for_slurm.sh backgrounded by the harness)

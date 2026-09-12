@@ -20,7 +20,7 @@
 #
 # Escape hatch: .claude/plot_disable_allowlist.txt (one substring/path per line).
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 ALLOWLIST="$REPO/.claude/plot_disable_allowlist.txt"
 
 # Pattern for "plotting turned off", assembled so this file never contains a literal match.

@@ -20,6 +20,8 @@ __pycache__
 */.envs
 */.venv
 */.venv.*
+/.venv/
+/.venv_build.log
 */.tox
 */.tox.*
 */.eggs

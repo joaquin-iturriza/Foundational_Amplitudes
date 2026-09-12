@@ -17,7 +17,7 @@
 # Escape hatch: list basenames or repo-relative paths to skip (one per line) in
 # .claude/figure_pair_ignore.txt  (e.g. a one-off png with no pdf counterpart).
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 MARKER="$REPO/.claude/.figpair_last"
 IGNORE="$REPO/.claude/figure_pair_ignore.txt"
 cd "$REPO" 2>/dev/null || exit 0
@@ -29,7 +29,7 @@ fi
 
 # Figures changed since the last successful check.
 mapfile -t figs < <(
-  find . \( -path ./runs -o -path ./sweeps -o -path ./data -o -path ./conda \
+  find . \( -path ./runs -o -path ./sweeps -o -path ./data -o -path ./conda -o -path ./.venv \
             -o -path ./.git -o -path './worktrees' -o -path './wt-*' -o -path '*/scratchpad' \
             -o -path ./compare_models -o -path './*/IntrinsicDimDeep' -o -path ./IntrinsicDimDeep \) -prune \
        -o \( -name '*.png' -o -name '*.pdf' \) -newer "$MARKER" -print 2>/dev/null \

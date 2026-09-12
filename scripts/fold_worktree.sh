@@ -20,7 +20,7 @@
 # or identical one, so running it twice is safe.
 set -uo pipefail
 
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 WT="${1:-}"
 APPLY=0

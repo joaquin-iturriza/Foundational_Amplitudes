@@ -19,7 +19,7 @@
 # That makes "the user approved this doc" an explicit, auditable act rather than
 # an in-the-moment rationalization.
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 ALLOWLIST="$REPO/.claude/md_allowlist.txt"
 
 input=$(cat)

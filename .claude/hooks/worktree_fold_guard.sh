@@ -14,7 +14,7 @@
 # folded" memo cannot notice an INCOMPLETE fold, which is how a missing extension nearly
 # destroyed 327 config.yaml files while the guard reported everything fine.
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 FOLDER="$REPO/scripts/fold_worktree.sh"
 
 # Single source of truth for WHICH files count as results: read RESULT_EXTS out of the fold

@@ -37,7 +37,7 @@
 # call scoped, which matters on Lustre where a full-tree diff is slow.
 set -uo pipefail
 
-FALLBACK_REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+FALLBACK_REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 STATE_REL=".claude/.review_state"
 
 # --- pillar table -----------------------------------------------------------

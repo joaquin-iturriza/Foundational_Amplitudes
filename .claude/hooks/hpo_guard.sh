@@ -25,7 +25,7 @@
 # Escape hatch (deliberate + auditable): if the user explicitly approves a one-off HP grid, add
 # the script's repo-relative or absolute path to  .claude/hpo_grid_allowlist.txt  (one per line).
 set -uo pipefail
-REPO="/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 ALLOWLIST="$REPO/.claude/hpo_grid_allowlist.txt"
 
 input=$(cat)
