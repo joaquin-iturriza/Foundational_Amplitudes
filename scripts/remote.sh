@@ -30,6 +30,10 @@ fi
 
 # The login shell on the cluster is where the module system and any env live;
 # a bare `ssh host cmd` gets a non-login shell with a minimal PATH.
+# One argument is a shell string, parsed on the cluster (`remote.sh 'a; b | c'`); several
+# arguments are one command whose words are preserved exactly, so a format like
+# `squeue -o "%i %T"` survives the hop instead of being split into three words.
+if [ "$#" -eq 1 ]; then cmd="$1"; else cmd=$(printf '%q ' "$@"); fi
 # BatchMode: a hook or background waiter must fail, not sit on a password prompt.
 exec ssh -o BatchMode=yes -o ConnectTimeout="${CCIN2P3_CONNECT_TIMEOUT:-20}" "$HOST" \
-  "cd '$PROJ' && bash -lc $(printf '%q' "$*")"
+  "cd '$PROJ' && bash -lc $(printf '%q' "$cmd")"
