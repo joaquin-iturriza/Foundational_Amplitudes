@@ -3,6 +3,7 @@
 # per-dataset standardization removes), so zero-shot on it tests exactly one symmetry.
 # Same windows and pools as the training file so fine-tune-size curves are comparable.
 
+sampling: {mode: mixture}   # train pools shaped like catalog_v2_train (fine-tune curves); val/test flat
 processes:
   # flavour / generation relabels (masslessness duplicates)
   - {name: ee_ss,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # d<->s of ee_ddbar

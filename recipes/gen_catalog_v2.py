@@ -454,6 +454,8 @@ def write_recipes(procs, cands):
             out.append(line(n, e, NLO if layer in ("nlo", "loop") else T) + f"   # {e.get('why','')}")
     open(OUT_TRAIN, "w").write("\n".join(out) + "\n")
     hold = open(OUT_HOLD.replace("v2_holdout", "v1_holdout")).read().replace("catalog_v1 hold-outs", "catalog_v2 hold-outs (= v1)")
+    if "sampling:" not in hold:   # the same training-pool policy as the train recipe (val/test stay flat)
+        hold = hold.replace("processes:", "sampling: {mode: mixture}   # train pools shaped like catalog_v2_train (fine-tune curves); val/test flat\nprocesses:", 1)
     open(OUT_HOLD, "w").write(hold)
     n_train = sum(1 for l in out if l.strip().startswith("- {name:"))
     print(f"wrote {OUT_TRAIN}: {n_train} processes; {OUT_HOLD}: v1 hold-outs")
