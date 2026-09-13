@@ -285,6 +285,30 @@ stable, the generator also checks the double pole of every event against the uni
 and redraws the event when it is off (or when the return code marks the point exceptional),
 and refuses the module if more than $2\%$ of its events had to be redrawn.
 
+\paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
+pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
+$2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
+$t\bar t gg$ $2\to4$ finals slowest) even though the mixture labels six candidates per
+stored event; one-loop $2\to2$ and massive $2\to3$ $150$--$800$ events per second; the
+gluonic one-loop $2\to3$ entries ($u\bar u\to Zgg$, $u\bar u\to u\bar u g$, $u\bar u\to
+t\bar t g$) $50$--$100$ events per second, so their $5\times10^4$-event train pools take $8$--$17$
+minutes each and set the tail of every prebuild. At the pool sizes adopted ($10^5$ events per
+LO process, $5\times10^4$ per one-loop process, a tenth of each for val and test) the whole
+$478$-entry recipe is about six CPU-hours of generation plus the $432$ backend compiles,
+i.e.\ well under an hour of wall on one $48$-core \code{htc} node and no GPU, so the sizes
+were not worth trimming. Two things bit on the way: \code{--auto-workers} read the node's
+$512$ logical CPUs instead of the $48$-core allocation and launched $432$ MadGraph outputs
+at once, and with the default OpenBLAS pools every MadLoop subprocess counted $512$
+threads against the per-user process limit of $1024$, so forks failed with \code{EAGAIN}
+after $9281$ of $9569$ chunks. The job scripts now pin one BLAS thread per process, the
+worker count comes from the SLURM allocation, a chunk already on disk with the right row
+count is reused across reruns, and a transient fork failure retries the chunk instead of
+aborting the pool. The rerun picked up the $9281$ chunks and finished the recipe in $25$
+minutes: $478$ train pools of $10^5$ ($5\times10^4$ at one loop) events, val and test
+pools of a tenth each, $11$\,GB of train data and $2.5$\,GB frozen, every amplitude finite
+and non-zero across the $4.5\times10^7$ train events; the $14$ hold-outs and $5$
+interpolation hold-outs were generated the same way.
+
 \paragraph{Sampling policy.} The recipe path now samples the mixture the divergence study
 settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the physical way ($\sqrt s$
 uniform in the window, RAMBO angles, fiducial cuts) and $f=0.35$ kept flat in
@@ -2601,12 +2625,13 @@ generate here plus a modest pretraining; 5 needs no training at all; 6 starts as
 generator; 1 waits for a compute plan.
 
 \section{Hand-off: generating the catalog}\label{sec:catalog-open}
-Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and trained on (the sampling
-policy is in place, Sec.~\ref{sec:catalog}):
+\code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); what is
+still open on its data side:
 \begin{itemize}
-  \item $219$ LO standalones to compile (the prebuild does it in parallel).
-  \item Pool sizes ($10^5$ events per LO process, $5\times10^4$ per one-loop process) are
-    placeholders to be costed on the first prebuild.
+  \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
+    ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
+    make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
+    regenerates every pool; do it together with the next recipe change, not alone.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
