@@ -34,6 +34,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import mg5_pipeline_final as mg
 
+# One-loop strings MadGraph accepts but whose MadLoop module fails the pole certification:
+# the entry stays in the table (certified: false) and out of every recipe. u s > u s and
+# d s > d s return a double pole between 0 and -16/3 on ~30% of the points, flagged stable,
+# and a repeated evaluation of the same point can return a different born; a fresh
+# regeneration reproduces it, the other four-quark channels (uu, dd, ud, cs, u ubar ...) are
+# exact and repeatable. Mechanism not identified (docs/results.tex, catalog validation).
+VIRT_UNCERTIFIED = {
+    "us_us": "MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept",
+    "ds_ds": "MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept",
+}
 CAND = os.path.join(ROOT, "recipes", "catalog_v2_candidates.json")
 OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v2_processes.yaml")
 OUT_TRAIN = os.path.join(ROOT, "recipes", "catalog_v2_train.yaml")
@@ -298,6 +308,9 @@ def main():
                                  "n_loops": 1, "alphas_power": int(e.get("alphas_power", 0)) + 1,
                                  "pdg_ids": list(e["pdg_ids"]), "m_finals": masses_entry(e),
                                  "param_card_patches": {}, "layer": "nlo", "why": f"one-loop QCD of {n}"}
+            if base in VIRT_UNCERTIFIED:
+                virt[base]["certified"] = False; virt[base]["why"] = VIRT_UNCERTIFIED[base]
+                procs[n + "_nlo"]["certified"] = False; procs[n + "_nlo"]["why"] = "NOT certified: " + VIRT_UNCERTIFIED[base]
             n_nlo += 1
         # ---- loop-induced candidates (certification decides; uncertified never enter a recipe).
         # Both are pure-EW top loops in practice (probe: no alpha_s dependence), reached through
@@ -435,6 +448,8 @@ def write_recipes(procs, cands):
             if e.get("layer") != layer or n in seen: continue
             if layer == "loop" and not e.get("certified", False):
                 out.append(f"  # {n}: not certified yet (tools/nlo_virtual_pipeline.py {e['virt_base']} --build --certify)"); continue
+            if layer == "nlo" and e.get("certified") is False:
+                out.append(f"  # {n}: {e['why']}"); continue
             out.append(line(n, e, NLO if layer in ("nlo", "loop") else T) + f"   # {e.get('why','')}")
     open(OUT_TRAIN, "w").write("\n".join(out) + "\n")
     hold = open(OUT_HOLD.replace("v2_holdout", "v1_holdout")).read().replace("catalog_v1 hold-outs", "catalog_v2 hold-outs (= v1)")

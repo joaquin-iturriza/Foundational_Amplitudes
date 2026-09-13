@@ -5417,7 +5417,8 @@ processes:
     - 0.0
     param_card_patches: {}
     layer: nlo
-    why: one-loop QCD of us_us
+    why: 'NOT certified: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept'
+    certified: false
   ee_uua_nlo:
     kind: virt
     virt: true
@@ -5651,7 +5652,8 @@ processes:
     - 0.0
     param_card_patches: {}
     layer: nlo
-    why: one-loop QCD of ds_ds
+    why: 'NOT certified: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept'
+    certified: false
   cs_cs_nlo:
     kind: virt
     virt: true
@@ -6971,6 +6973,8 @@ virt:
     m_finals:
     - 0.0
     - 0.0
+    certified: false
+    why: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept
     exists: true
     diagrams: 0
   ee_uua:
@@ -7133,6 +7137,8 @@ virt:
     m_finals:
     - 0.0
     - 0.0
+    certified: false
+    why: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept
     exists: true
     diagrams: 0
   cs_cs:

@@ -133,6 +133,7 @@ def main():
     ap.add_argument("--dat", default=None, help="optional: read momenta from a .dat instead of sampling")
     ap.add_argument("--dat-order", type=int, nargs="+", default=None)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--dump", action="store_true", help="print every point (diagnostic)")
     args = ap.parse_args()
 
     masses = args.m
@@ -177,6 +178,9 @@ def main():
         rows.append((np.sqrt(r["s"]), r["c2"], c2p, r["c1"],
                      (c1p if c1p is not None else np.nan)))
         rcs.append(r["rc"])
+        if args.dump:
+            print(f"  pt {len(rows)-1:4d} sqrt(s) {np.sqrt(r['s']):9.3f} rc {r['rc']} born {r['born']:.6e} "
+                  f"e2 {r['e2']:.6e} c2 {r['c2']:+.6f} c1 {r['c1']:+.5f}  mom3 {np.asarray(mom)[2]}")
     A = np.array(rows)
     rcs = np.array(rcs, dtype=int)
     # MadLoop return code: hundreds digit 2 = stable, 3 = rescued (rotation / quad

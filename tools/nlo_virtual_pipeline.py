@@ -400,6 +400,12 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         born, c0, s = r["born"], r.get("c0"), r["s"]
         if c0 is None or r["rc"] // 100 == 4:
             return 0.0, False
+        # Per-event pole guard: the double pole is universal (-sum C_i over the massless
+        # coloured legs), so a point whose 1/eps^2 coefficient is off is a MadLoop failure
+        # whatever the return code says (u s > u s returned wrong poles on ~30% of the
+        # points flagged stable). Costs nothing: the coefficient comes with every call.
+        if abs(r["c2"] - c2_pred) > 1e-3 * max(abs(c2_pred), 1.0):
+            return 0.0, False
         shift = C.heavy_quark_scheme_shift(s, heavy_m) if mass_shift else 0.0
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:
@@ -407,6 +413,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return virt_e4 * (asrun / (2.0 * np.pi)), True
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
+    c2_pred, _, _ = PC.predict_poles(1.0, pdg, [0.0, 0.0] + list(m_finals))   # double pole: set of legs only
     bad = 0
     for i, (mom, _) in enumerate(events):
         value, usable = evaluate_point(mom, sqrts[i])
@@ -419,18 +426,21 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             mom, sqrts[i] = ev1[0][0], sq1[0]
             value, usable = evaluate_point(mom, sqrts[i])
         if not usable:
-            raise RuntimeError(f"{process}: 20 consecutive exceptional MadLoop points at event {i}")
+            raise RuntimeError(f"{process}: 20 consecutive unusable MadLoop points at event {i}")
         amp[i] = value
         mom_store[i] = mom.flatten()            # store [e-,e+,finals] order
         if (i + 1) % 50_000 == 0:
             print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
 
+    if bad > 0.02 * n_events:
+        raise RuntimeError(f"{process}: {bad} of {n_events} MadLoop points redrawn (exceptional or wrong "
+                           f"double pole): the module is not trustworthy, certify it again")
     pdg_block = np.tile(np.array(pdg, float), (n_events, 1))
     arr = np.concatenate([mom_store, pdg_block, amp[:, None]], axis=1)
     os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
     np.save(out_file, arr)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
-          f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional)={bad}  "
+          f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional/wrong pole)={bad}  "
           f"mass_shift={'on(m=%.1f)'%heavy_m if (mass_shift and heavy_m) else 'off'}")
     return out_file
 

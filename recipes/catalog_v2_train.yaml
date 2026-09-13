@@ -342,7 +342,7 @@ processes:
   - {name: udbar_Wg_nlo,          sqrts: [  84, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of udbar_Wg
   - {name: uu_uu_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of uu_uu
   - {name: ud_ud_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of ud_ud
-  - {name: us_us_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of us_us
+  # us_us_nlo: NOT certified: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept
   - {name: ee_uua_nlo,            sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of ee_uua
   - {name: ee_ttbarH_nlo,         sqrts: [ 494, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of ee_ttbarH
   - {name: uubar_Zgg_nlo,         sqrts: [  96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of uubar_Zgg
@@ -354,7 +354,7 @@ processes:
   - {name: udbar_enug_nlo,        sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of udbar_enug
   - {name: uubar_aa_nlo,          sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of uubar_aa
   - {name: dd_dd_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of dd_dd
-  - {name: ds_ds_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of ds_ds
+  # ds_ds_nlo: NOT certified: MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept
   - {name: cs_cs_nlo,             sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of cs_cs
   - {name: ee_ssbarg_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of ee_ssbarg
   - {name: uubar_mumug_nlo,       sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of uubar_mumug
