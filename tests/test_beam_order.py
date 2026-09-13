@@ -81,6 +81,45 @@ def test_cpp_driver_physics():
     print("[cpp] ok")
 
 
+def test_stored_pools(recipe="recipes/pretrain8_short.yaml", n_check=5):
+    """Recompute a few stored events of every built train pool of `recipe` with the
+    pipeline's own backend (perm + alpha_s(sqrt s)) and require agreement: catches a
+    stale driver binary, a wrong permutation, or a broken alpha_s protocol."""
+    import yaml
+    import datagen
+    cache = datagen.train_cache_dir()
+    procs = yaml.safe_load(open(os.path.join(ROOT, recipe)))["processes"]
+    checked = 0
+    for pr in procs:
+        name = pr["name"]; cfg = mg.PROCESSES[name]
+        lo, hi = pr["sqrts"]
+        path = f"{cache}/{name}_{lo}-{hi}GeV_train_amplitudes.npy"
+        if not os.path.exists(path):
+            print(f"[pool] {name}: no built pool, skipped"); continue
+        sa = f"{mg.WORK_DIR}/{mg.standalone_name(name)}_standalone"
+        backend, dirs, driver, _ = mg.detect_compiled_backend(sa)
+        if backend != "cpp" or driver is None:
+            print(f"[pool] {name}: no v2 driver, skipped"); continue
+        d = np.load(path)[:n_check]
+        npart = cfg["nfinal"] + 2
+        mom = d[:, :npart * 4].reshape(-1, npart, 4)
+        pdg = d[0, npart * 4:npart * 4 + npart].astype(int)
+        stored = d[:, -1]
+        perm = mg.row_to_slot_perm(pdg, cfg["mg5_generate"])
+        pin = mom[:, 0] + mom[:, 1]
+        sqrts = np.sqrt(pin[:, 0] ** 2 - (pin[:, 1:] ** 2).sum(1))
+        amz = float(cfg.get("alphas_mz", 0.118))
+        events = [(mom[i], pdg) for i in range(len(d))]
+        with mg.CppDriverPipe(driver, sa) as pipe:
+            fresh = pipe.compute(events, perm=perm, alphas=mg.compute_alphas(sqrts, alphas_mz=amz))
+        ok = np.allclose(fresh, stored, rtol=1e-9)
+        print(f"[pool] {name:12s} max rel dev {np.max(np.abs(fresh / stored - 1)):.1e}  {'ok' if ok else 'MISMATCH'}")
+        assert ok, name
+        checked += 1
+    print(f"[pool] {checked} pools agree with a fresh evaluation")
+
+
 if __name__ == "__main__":
     test_perm_builder()
     test_cpp_driver_physics()
+    test_stored_pools()

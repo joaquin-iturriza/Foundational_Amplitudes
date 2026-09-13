@@ -173,8 +173,9 @@ def propose_momenta(n, y_lo, mix_ir, cuts, rng, sqrt_s_lo=91.0, sqrt_s_hi=1000.0
 def label_events(P):
     """Exact tree |M|^2 via the compiled ee_uugg standalone. P: (n,6,4)."""
     events = [(P[i], PDG) for i in range(len(P))]
-    with mp.CppDriverPipe(f"{STANDALONE}/driver", STANDALONE) as pipe:
-        me2 = np.asarray(pipe.compute(events), dtype=np.float64)
+    with mp.CppDriverPipe(f"{STANDALONE}/{mp.CPP_DRIVER_NAME}", STANDALONE) as pipe:
+        # e+e- rows -> MadGraph slots (beams swapped); fixed card alpha_s as before
+        me2 = np.asarray(pipe.compute(events, perm=[1, 0] + list(range(2, len(PDG)))), dtype=np.float64)
     return me2
 
 

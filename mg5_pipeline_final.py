@@ -1531,6 +1531,14 @@ def get_class_name(standalone_dir, subproc_dir):
                     return parts[1].rstrip('{').strip()
     return "CPPProcess"
 
+# Binary name of the pipe-mode C++ driver. Versioned because the stdin protocol is
+# part of the ABI: v2 reads "<4n momenta> <aS>" per line (per-event alpha_s) and its
+# wrappers take (double*, double). A pre-v2 "driver" left in a standalone must never
+# be picked up by detect_compiled_backend, or it would misread every line after the
+# first and label the pool with garbage.
+CPP_DRIVER_NAME = "driver_v2"
+
+
 def parameters_class_name(standalone_dir):
     """Model parameter class of a standalone_cpp output (Parameters_sm, ...)."""
     heads = sorted(glob.glob(f"{standalone_dir}/src/Parameters_*.h"))
@@ -1667,14 +1675,14 @@ def compile_cpp_driver(standalone_dir, subproc_dirs, nparticles):
 
     print(f"  [CXX] Linking driver...")
     lib_flags = [f"-lME_{s}" for s in suffixes]
-    cmd = ["g++", "-O2", "driver.cpp", "-L.", *lib_flags, "-Wl,-rpath,.", "-o", "driver"]
+    cmd = ["g++", "-O2", "driver.cpp", "-L.", *lib_flags, "-Wl,-rpath,.", "-o", CPP_DRIVER_NAME]
     result = subprocess.run(cmd, capture_output=True, text=True, cwd=standalone_dir)
     if result.returncode != 0:
         print(f"  [ERROR] Driver linking failed:\n{result.stderr}")
         sys.exit(1)
 
     print(f"  [CXX] Driver compiled successfully.")
-    return f"{standalone_dir}/driver"
+    return f"{standalone_dir}/{CPP_DRIVER_NAME}"
 
 def compile_backends(standalone_dir, nparticles):
     """
@@ -1729,8 +1737,8 @@ def detect_compiled_backend(standalone_dir):
         ):
             return "matrix2py", m2py_dirs, None, fortran_dir
     cpp_dirs   = get_subprocess_dirs(standalone_dir)
-    driver_bin = f"{standalone_dir}/driver" \
-        if os.path.exists(f"{standalone_dir}/driver") else None
+    driver_bin = f"{standalone_dir}/{CPP_DRIVER_NAME}" \
+        if os.path.exists(f"{standalone_dir}/{CPP_DRIVER_NAME}") else None
     return "cpp", cpp_dirs, driver_bin, standalone_dir
 
 # =============================================================================

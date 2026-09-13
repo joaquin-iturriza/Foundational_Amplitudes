@@ -118,8 +118,8 @@ def sample_mixture(n_events, sqrts_min, sqrts_max, y_lo, cuts, rng, frac_antenna
 
 def build(events, sqrts):
     """Exact tree |M|^2 via the compiled C++ standalone (fixed α_s=0.118)."""
-    with mp.CppDriverPipe(f"{STANDALONE}/driver", STANDALONE) as pipe:
-        me2 = pipe.compute(events)
+    with mp.CppDriverPipe(f"{STANDALONE}/{mp.CPP_DRIVER_NAME}", STANDALONE) as pipe:
+        me2 = pipe.compute(events, perm=[1, 0] + list(range(2, len(PDG))))   # e+e- rows -> MadGraph slots (beams swapped), fixed card alpha_s as before
     mom = np.array([e[0].flatten() for e in events], dtype=np.float64)   # (N,20)
     pdg_block = np.tile(PDG.astype(np.float64), (len(events), 1))         # (N,5)
     rows = np.concatenate([mom, pdg_block, me2.reshape(-1, 1)], axis=1)   # (N,26)
