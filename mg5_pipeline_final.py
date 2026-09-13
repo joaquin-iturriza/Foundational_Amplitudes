@@ -702,9 +702,13 @@ PROCESSES = {
     # parton-level, no PDFs: a single representative flavour where flavour only
     # rescales |M|^2 (per-dataset standardization removes that), separate u/d
     # entries where the gamma/Z interference changes the shape.
-    # alphas_power on MIXED QCD+EW processes (four-quark, ttbar) is the dominant
-    # power only: the analytic alpha_s rescale of a coupling scan is invalid
-    # there, so scans of those must regenerate.
+    # Four-quark and heavy-quark-pair entries carry "QED<=2": MG5's default
+    # coupling-order rule (minimal QED) would keep only the gluon diagrams and
+    # drop the gamma/Z exchange and the s-channel W, which is the structure those
+    # entries are in the catalog for (and would make ud_ud, us_us, udbar_udbar
+    # exact duplicates). Their |M|^2 is therefore MIXED in alpha_s and alpha_ew;
+    # alphas_power is the dominant power only, and the analytic alpha_s rescale of
+    # a coupling scan is invalid there, so scans of those must regenerate.
     # ------------------------------------------------------------------
     "ee_numu": {   # Z only; pair with ee_nnbar (Z + t-channel W)
         "mg5_generate": ["generate e+ e- > vm vm~"],
@@ -774,7 +778,7 @@ PROCESSES = {
         "m_final": [91.188, 125.0],
     },
     "uubar_ttbar": {   # s-channel gluon dominant (+ gamma/Z): mixed
-        "mg5_generate": ["generate u u~ > t t~"],
+        "mg5_generate": ["generate u u~ > t t~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -783,7 +787,7 @@ PROCESSES = {
         "m_final": 173.0,
     },
     "uubar_bbbar": {   # mixed
-        "mg5_generate": ["generate u u~ > b b~"],
+        "mg5_generate": ["generate u u~ > b b~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -792,7 +796,7 @@ PROCESSES = {
         "m_final": 4.7,
     },
     "uubar_uubar": {   # s + t channel gluon/gamma/Z, identical flavours: mixed
-        "mg5_generate": ["generate u u~ > u u~"],
+        "mg5_generate": ["generate u u~ > u u~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -801,7 +805,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "uubar_ddbar": {   # s-channel only: mixed
-        "mg5_generate": ["generate u u~ > d d~"],
+        "mg5_generate": ["generate u u~ > d d~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -810,7 +814,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "udbar_udbar": {   # t-channel g/gamma/Z AND s-channel W: mixed
-        "mg5_generate": ["generate u d~ > u d~"],
+        "mg5_generate": ["generate u d~ > u d~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -868,7 +872,7 @@ PROCESSES = {
         "m_final": [80.419, 0.0],
     },
     "uu_uu": {   # pure t/u-channel, identical quarks (no annihilation): mixed
-        "mg5_generate": ["generate u u > u u"],
+        "mg5_generate": ["generate u u > u u QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -877,7 +881,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "ud_ud": {   # t-channel g/gamma/Z (+ W exchange to d u): mixed
-        "mg5_generate": ["generate u d > u d"],
+        "mg5_generate": ["generate u d > u d QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -886,7 +890,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "us_us": {   # t-channel, no W piece: mixed
-        "mg5_generate": ["generate u s > u s"],
+        "mg5_generate": ["generate u s > u s QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -1003,7 +1007,7 @@ PROCESSES = {
         "m_finals": [0.0, 0.0, 0.0],
     },
     "uubar_uubarg": {   # five-parton QCD: mixed
-        "mg5_generate": ["generate u u~ > u u~ g"],
+        "mg5_generate": ["generate u u~ > u u~ g QED<=2"],
         "nfinal": 3,
         "alphas_power": 3,
         "param_card_patches": {},
@@ -1012,7 +1016,7 @@ PROCESSES = {
         "m_finals": [0.0, 0.0, 0.0],
     },
     "uubar_ttbarg": {   # mixed
-        "mg5_generate": ["generate u u~ > t t~ g"],
+        "mg5_generate": ["generate u u~ > t t~ g QED<=2"],
         "nfinal": 3,
         "alphas_power": 3,
         "param_card_patches": {},
@@ -1079,7 +1083,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "dd_dd": {   # HOLD-OUT: relabel of uu_uu
-        "mg5_generate": ["generate d d > d d"],
+        "mg5_generate": ["generate d d > d d QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -1088,7 +1092,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "ds_ds": {   # HOLD-OUT: relabel of us_us
-        "mg5_generate": ["generate d s > d s"],
+        "mg5_generate": ["generate d s > d s QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
@@ -1097,7 +1101,7 @@ PROCESSES = {
         "m_final": 0.0,
     },
     "cs_cs": {   # HOLD-OUT: relabel of us_us (u<->c)
-        "mg5_generate": ["generate c s > c s"],
+        "mg5_generate": ["generate c s > c s QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
         "param_card_patches": {},
