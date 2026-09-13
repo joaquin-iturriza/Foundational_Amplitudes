@@ -20,8 +20,8 @@ source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 
-# The full virt set (fresh install on CC-IN2P3, nothing pre-built). 2->2 first (cheap), then 2->3.
-PROCS=(ee_uu ee_dd ee_ss ee_cc ee_bb ee_ttbar ee_uug ee_ddg)
+# Every entry of tools.nlo_virtual_pipeline.VIRT_PROCESSES, in table order.
+PROCS=($(python -c "import sys; sys.path.insert(0, 'tools'); from nlo_virtual_pipeline import VIRT_PROCESSES; print(' '.join(VIRT_PROCESSES))"))   # the whole one-loop table
 
 declare -A RESULT
 for P in "${PROCS[@]}"; do

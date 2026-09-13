@@ -177,7 +177,13 @@ def build_virt_standalone(process, force=False):
     param_card to the locked convention, and build matrix2py.so. Idempotent."""
     cfg = VIRT_PROCESSES[process]
     sa = virt_standalone_dir(process)
-    p0_glob = glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so")
+    import sysconfig
+    ext = sysconfig.get_config_var("EXT_SUFFIX")   # e.g. .cpython-311-x86_64-linux-gnu.so
+    p0_glob = glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py{ext}")
+    stale = [f for f in glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so") if not f.endswith(ext)]
+    if stale and not p0_glob:
+        print(f"[BUILD] {process}: module(s) built for another Python ({[os.path.basename(f) for f in stale]}) -- rebuilding")
+        force = True
     if p0_glob and not force:
         print(f"[BUILD] {process}: standalone+module exist ({sa}) — skipping.")
         return sa
@@ -203,7 +209,10 @@ def build_virt_standalone(process, force=False):
     env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
     log = f"{p0}/build_f2py.log"
     with open(log, "w") as lf:
-        rc = subprocess.run(["make", "matrix2py.so"], cwd=p0, env=env,
+        # The standalone's make_opts defaults to the system `f2py3` (a CPython-3.9 module the
+        # venv cannot import) whatever mg5_configuration.txt says; force the venv's f2py.
+        f2py = os.path.join(os.path.dirname(sys.executable), "f2py")
+        rc = subprocess.run(["make", "matrix2py.so", f"F2PY={f2py}"], cwd=p0, env=env,
                             stdout=lf, stderr=lf).returncode
     if rc != 0 or not glob.glob(f"{p0}/matrix2py*.so"):
         sys.exit(f"[BUILD] matrix2py.so build failed for {process} (see {log})")
@@ -254,12 +263,17 @@ def pole_certify(process, n=100, seed=7):
            "--proc-order", *map(str, proc_order), "--m", *map(str, masses),
            "--n", str(n), "--seed", str(seed)]
     print(f"[CERTIFY] {process}: pole check ...")
-    out = subprocess.run(cmd, capture_output=True, text=True,
-                         env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")).stdout
+    res = subprocess.run(cmd, capture_output=True, text=True,
+                         env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
+    out = res.stdout
     tail = [l for l in out.splitlines() if any(k in l for k in
             ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted"))]
-    print("  " + "\n  ".join(tail))
-    return "FAIL" not in out
+    print("  " + ("\n  ".join(tail) if tail else "(no checker output)\n  " + res.stderr.strip()[-600:]))
+    # An explicit PASS is required: a checker that crashed (empty stdout) used to count as
+    # a pass, which certified eight modules the venv could not even import.
+    passed = ("PASS" in out) and ("FAIL" not in out)
+    print(f"[CERTIFY] {process}: {'PASS' if passed else 'FAIL'}")
+    return passed
 
 
 def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
