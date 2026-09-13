@@ -105,10 +105,10 @@ data:
  # internal_mass_scalars=true, offshell_per_event=true, internal_mass_pdgs=[23,6,25].
  # Off by default (opt-in) since it needs the recipe path + diagram sidecars.
  offshell_per_event: false
- # Coupling-order vector per dataset: [n_loops, alpha_s_power].
- # null => auto-derived from each dataset name (experiment.amp_order_for_dataset):
- #   LO=[0,0]  virt_only(*nlo_virt*)=[1,0]  NLO_full(*nlo_full*)=[1,1]  NNLO(*nnlo*)=[2,2]
- # Set an explicit length-matched list only to override the name-keyed default.
+ # Coupling-order vector per dataset: [L_QCD, L_EW, alpha_s_max, alpha_ew_max] of the
+ # stored target (mg5_pipeline_final.order_vector). null => derived from the catalog
+ # entry of each dataset (recipe path), or from the dataset name (files path).
+ # Set an explicit length-matched list only to override; legacy 2-vectors are widened.
  amp_orders: null
 
 train: true
