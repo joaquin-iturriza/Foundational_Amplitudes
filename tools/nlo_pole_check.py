@@ -34,6 +34,10 @@ Usage:
 
 import argparse
 import numpy as np
+import os
+import sys
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 
 import nlo_conventions as C
 import nlo_madloop as ML
@@ -131,8 +135,17 @@ def main():
         pts = list(gen())
     else:
         rng = np.random.default_rng(args.seed)
-        sq = rng.uniform(args.sqrts_min, args.sqrts_max, args.n)
-        pts = [sample_2body(s, masses, rng) for s in sq]
+        if len(masses) == 4:
+            sq = rng.uniform(args.sqrts_min, args.sqrts_max, args.n)
+            pts = [sample_2body(s, masses, rng) for s in sq]
+        else:
+            # n-body (2->3 and up): the pipeline's RAMBO sampler under the fiducial cuts,
+            # rows in the process order handed in (beams first). The check only needs s.
+            import mg5_pipeline_final as mg
+            ev, _ = mg.sample_nbody_phase_space(args.n, args.sqrts_min, args.sqrts_max,
+                                                masses[2:], args.proc_order, rng=rng,
+                                                cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None)
+            pts = [mom for mom, _ in ev]
 
     rows = []
     for mom in pts:
