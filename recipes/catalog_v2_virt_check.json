@@ -1,0 +1,330 @@
+{
+ "uubar_ga": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_Za": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_WW": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_bbbar": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ddbar": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_udbar": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_enu": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_Wa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_Wg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uu_uu": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ud_ud": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "us_us": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_uua": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_ttbarH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_Zgg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ggg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_agg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_uubarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ttbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_Wgg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_enug": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_aa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "dd_dd": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ds_ds": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "cs_cs": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_ssbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_mumug": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_ddbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_bbbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_bbbarZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_bbbarH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_ttbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ee_ttbarZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_gaa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_Zga": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_uubara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ddbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ddbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_udbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_udbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ttbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ttbarZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ttbarH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_bbbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_bbbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_bbbarZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_bbbarH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_Zaa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZaZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZaH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZZg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZZZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZZH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_WpWmg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_WpWma": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_WpWmZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_WpWmH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZHg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uubar_ZHH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_tbbarg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_tbbara": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_tbbarZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_tbbarH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpZg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpZa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpZZ": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpZH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_Wpag": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_Wpaa": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpaH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpHg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "udbar_WpHH": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uu_uug": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "uu_uua": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ud_udg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "ud_uda": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "us_usg": {
+  "exists": true,
+  "diagrams": 0
+ },
+ "us_usa": {
+  "exists": true,
+  "diagrams": 0
+ }
+}
