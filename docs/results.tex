@@ -205,10 +205,13 @@ on CC-IN2P3 the catalog is enumerated by rule and validated by MadGraph
 \code{recipes/catalog\_v2\_processes.yaml}, loaded into the pipeline at import; recipes
 \code{catalog\_v2\_train.yaml} and \code{catalog\_v2\_holdout.yaml}). Beams are $e^+e^-$,
 $u\bar u$, $u\bar d$, $uu$, $ud$, $us$ at parton level, no PDFs; the coupling orders of every
-entry (Def.~\ref{def:coup}) are read off MadGraph's own \code{WEIGHTED} line.
+entry (Def.~\ref{def:coup}) are read off MadGraph's own \code{WEIGHTED} line: its default
+order is minimal QED, so the line fixes the minimal EW power and hence the maximal $\alpha_s$
+power; an explicit \code{QED<=N} raises only the EW maximum, and one that does not enlarge the
+diagram set is dropped as a duplicate of the default-order process.
 
-\paragraph{Layers and rules.} The training recipe holds $403$ processes: $305$ trees ($35$ at
-$2\to2$, $82$ at $2\to3$, $188$ at $2\to4$), $95$ one-loop QCD interferences ($29$ at $2\to2$,
+\paragraph{Layers and rules.} The training recipe holds $400$ processes: $302$ trees ($35$ at
+$2\to2$, $82$ at $2\to3$, $185$ at $2\to4$), $95$ one-loop QCD interferences ($29$ at $2\to2$,
 $66$ at $2\to3$) and $3$ loop-induced amplitudes.
 \begin{itemize}
   \item $2\to2$: enumerated exhaustively and reasoned one by one. Out: loop-induced,
@@ -2534,7 +2537,7 @@ Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and tra
   \item The pole/IR-aware sampler of Sec.~\ref{sec:div-sampling} is not in the recipe path,
     which still samples flat $\sqrt s\times$RAMBO under the fiducial cuts; the $s$-channel
     families would carry the $Z$ needle of Principle~\ref{prin:needle}.
-  \item $222$ LO standalones to compile (the prebuild does it) and $82$ one-loop backends to
+  \item $219$ LO standalones to compile (the prebuild does it) and $82$ one-loop backends to
     build and certify (\code{scripts/build\_nlo\_backends.sh}); the $20$ hand-written ones
     took $4.5$ minutes in total, the $2\to3$ mixed-born ones will be heavier.
   \item Pool sizes ($10^5$ events per LO process, $5\times10^4$ per one-loop process) are
