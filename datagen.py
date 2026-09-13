@@ -266,9 +266,11 @@ def gen_virt_chunk(task):
                 "--alphas-prefactor"]
     import time
     last = None
+    t0 = time.perf_counter()
     for attempt in range(4):
         r = subprocess.run(cmd, env=env, capture_output=True, text=True)
         if r.returncode == 0:
+            _report_chunk_time(task, time.perf_counter() - t0)
             return task["idx"], out_path
         last = r.stderr[-2000:]
         if r.returncode in (2, 3):
@@ -303,10 +305,21 @@ def gen_chunk(task):
     os.makedirs(task["out_dir"], exist_ok=True)
     out_path = os.path.join(task["out_dir"], "chunk.npy")
     rng = np.random.default_rng(task["seed"])
+    import time
+    t0 = time.perf_counter()
     mg.build_dataset_variable_energy(
         task["count"], task["sqrts_min"], task["sqrts_max"],
         eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"))
+    _report_chunk_time(task, time.perf_counter() - t0)
     return task["idx"], out_path
+
+
+def _report_chunk_time(task, dt):
+    """One line per finished chunk with its wall time: the only measured input for costing
+    a recipe (the cost model's weights are relative, this is seconds)."""
+    n = task["count"]
+    print(f"[TIME] {task['process']:28s} {str(task.get('role')):5s} chunk {task['idx']:3d}: "
+          f"{n:7d} events in {dt:8.1f}s  ({n / max(dt, 1e-9):8.1f} ev/s)", flush=True)
 
 
 def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
