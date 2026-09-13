@@ -6845,7 +6845,8 @@ processes:
     - 0.0
     param_card_patches: {}
     layer: loop
-    why: loop-induced candidate
+    certified: false
+    why: loop-induced, NOT certified (spurious MadLoop pole)
   uubar_HH_loop:
     kind: virt
     virt: true
@@ -6869,7 +6870,8 @@ processes:
     - 125.0
     param_card_patches: {}
     layer: loop
-    why: loop-induced candidate
+    certified: true
+    why: loop-induced (pure-EW top loop)
 virt:
   uubar_ga:
     mg5: generate u u~ > g a [virt=QCD]
@@ -7826,7 +7828,7 @@ virt:
     - 0.0
     - 0.0
   uubar_Ha:
-    mg5: generate u u~ > h a [sqrvirt=QED]
+    mg5: generate u u~ > h a [sqrvirt=QCD QED]
     model: loop_qcd_qed_sm
     loopind: true
     pdg_ids: *id001
@@ -7834,10 +7836,10 @@ virt:
     order: *id003
     certified: false
   uubar_HH:
-    mg5: generate u u~ > h h [sqrvirt=QED]
+    mg5: generate u u~ > h h [sqrvirt=QCD QED]
     model: loop_qcd_qed_sm
     loopind: true
     pdg_ids: *id004
     m_finals: *id005
     order: *id006
-    certified: false
+    certified: true

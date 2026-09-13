@@ -84,6 +84,8 @@ def existing_by_canon():
     """canon(generate) -> catalog name, for every tree entry already in PROCESSES."""
     out = {}
     for n, c in mg.PROCESSES.items():
+        if c.get("_v2"):
+            continue      # generated last time: not "existing" for the purpose of re-generation
         if "mg5_generate" in c and c.get("kind") != "virt" and "pdg_ids" in c and len(c["mg5_generate"]) == 1:
             out.setdefault(canon(c["mg5_generate"][0]), n)
     return out
@@ -243,8 +245,9 @@ def main():
         # one-loop entry yet (existing *_nlo entries and their VIRT bases are kept as is)
         sys.path.insert(0, os.path.join(ROOT, "tools"))
         from nlo_virtual_pipeline import VIRT_PROCESSES
-        have_virt = {canon(v["mg5"].replace("[virt=QCD]", "").replace("[sqrvirt=QCD]", "").replace("[sqrvirt=QED]", "").strip()) for v in VIRT_PROCESSES.values()}
-        trees = {n: mg.PROCESSES[n] for n in mg.PROCESSES if mg.PROCESSES[n].get("kind") != "virt" and "mg5_generate" in mg.PROCESSES[n] and "pdg_ids" in mg.PROCESSES[n]}
+        have_virt = {canon(re.sub(r"\s*\[.*?\]\s*$", "", v["mg5"])) for v in VIRT_PROCESSES.values() if not v.get("_v2")}
+        trees = {n: mg.PROCESSES[n] for n in mg.PROCESSES if mg.PROCESSES[n].get("kind") != "virt" and "mg5_generate" in mg.PROCESSES[n]
+                 and "pdg_ids" in mg.PROCESSES[n] and not mg.PROCESSES[n].get("_v2")}
         trees.update({n: e for n, e in procs.items()})
         n_nlo = 0
         for n, e in trees.items():
@@ -258,15 +261,23 @@ def main():
                                  "pdg_ids": list(e["pdg_ids"]), "m_finals": masses_entry(e),
                                  "param_card_patches": {}, "layer": "nlo", "why": f"one-loop QCD of {n}"}
             n_nlo += 1
-        # ---- loop-induced candidates (certification decides; uncertified never enter a recipe)
-        for name, g, model, order, pdg, m in [
-            ("uubar_Ha", "generate u u~ > h a [sqrvirt=QED]", "loop_qcd_qed_sm", [0, 1, 0, 4], [2, -2, 25, 22], [125.0, 0.0]),
-            ("uubar_HH", "generate u u~ > h h [sqrvirt=QED]", "loop_qcd_qed_sm", [0, 1, 0, 4], [2, -2, 25, 25], [125.0, 125.0]),
+        # ---- loop-induced candidates (certification decides; uncertified never enter a recipe).
+        # Pure-QED loops give no diagrams here (the light-quark line has no Yukawa): the top
+        # loop is reached through a gluon, so these are mixed QCD x QED loops; the order vector
+        # [1,1,2,2] is a placeholder until the probe pins the alpha_s scaling.
+        # Both are pure-EW top loops in practice (probe: no alpha_s dependence), reached through
+        # the mixed [sqrvirt=QCD QED] selection. uubar_HH certifies (poles = 0); uubar_Ha shows
+        # the same spurious ~0.2 single pole as ee_aH (an H+gamma final pathology of MadLoop
+        # 3.7.0) and stays uncertified.
+        for name, g, model, order, pdg, m, cert in [
+            ("uubar_Ha", "generate u u~ > h a [sqrvirt=QCD QED]", "loop_qcd_qed_sm", [0, 1, 0, 4], [2, -2, 25, 22], [125.0, 0.0], False),
+            ("uubar_HH", "generate u u~ > h h [sqrvirt=QCD QED]", "loop_qcd_qed_sm", [0, 1, 0, 4], [2, -2, 25, 25], [125.0, 125.0], True),
         ]:
-            virt[name] = {"mg5": g, "model": model, "loopind": True, "pdg_ids": pdg, "m_finals": m, "order": order, "certified": False}
+            virt[name] = {"mg5": g, "model": model, "loopind": True, "pdg_ids": pdg, "m_finals": m, "order": order, "certified": cert}
             procs[name + "_loop"] = {"kind": "virt", "virt": True, "virt_base": name, "nfinal": 2, "n_loops": 1,
                                      "alphas_power": order[2], "loopind": True, "order": order, "pdg_ids": pdg,
-                                     "m_finals": m, "param_card_patches": {}, "layer": "loop", "why": "loop-induced candidate"}
+                                     "m_finals": m, "param_card_patches": {}, "layer": "loop", "certified": cert,
+                                     "why": "loop-induced (pure-EW top loop)" if cert else "loop-induced, NOT certified (spurious MadLoop pole)"}
         yaml.safe_dump({"processes": procs, "virt": virt}, open(OUT_PROC, "w"), sort_keys=False, width=160)
         print(f"wrote {OUT_PROC}: {len(procs) - n_nlo - 2} tree, {n_nlo} one-loop, 2 loop-induced candidates")
         write_recipes(procs, cands)

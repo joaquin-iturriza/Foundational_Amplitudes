@@ -1524,7 +1524,7 @@ def _load_catalog_v2():
     n = 0
     for name, entry in (d.get("processes") or {}).items():
         if name not in PROCESSES:
-            PROCESSES[name] = entry; n += 1
+            PROCESSES[name] = dict(entry, _v2=True); n += 1   # tagged: the generator must not treat these as hand-written
     return n
 
 CATALOG_V2_ENTRIES = _load_catalog_v2()

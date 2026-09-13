@@ -413,4 +413,4 @@ processes:
   - {name: us_usa_nlo,            sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # one-loop QCD of us_usa
   # --- loop-induced candidates (certified only) ---
   # uubar_Ha_loop: not certified yet (tools/nlo_virtual_pipeline.py uubar_Ha --build --certify)
-  # uubar_HH_loop: not certified yet (tools/nlo_virtual_pipeline.py uubar_HH --build --certify)
+  - {name: uubar_HH_loop,         sqrts: [ 262, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # loop-induced (pure-EW top loop)

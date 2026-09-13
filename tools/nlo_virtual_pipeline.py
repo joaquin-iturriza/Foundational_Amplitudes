@@ -101,7 +101,7 @@ def _load_catalog_v2_virt():
     n = 0
     for name, entry in (d.get("virt") or {}).items():
         if name not in VIRT_PROCESSES:
-            VIRT_PROCESSES[name] = entry; n += 1
+            VIRT_PROCESSES[name] = dict(entry, _v2=True); n += 1
     return n
 
 CATALOG_V2_VIRT = _load_catalog_v2_virt()
