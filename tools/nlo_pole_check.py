@@ -17,12 +17,19 @@ WHAT IS CERTIFIED
 * DOUBLE pole  c2 = -sum_i C_i  over MASSLESS colored partons (massive -> 0).
   Color-correlation-free, hence universal for ANY process. This is the primary gate.
 * SINGLE pole  c1  is predicted analytically for the two clean color-trivial cases
-  (the ee->QQ class that dominates the current datasets):
-    - two massless colored partons (mu^2 = s):   c1 = -sum_i gamma_i
-    - a massive Q Qbar pair (only colored partons): c1 = 2 C_F[(1+b^2)/(2b)L - 1],
-      L = ln((1+b)/(1-b)), b = sqrt(1-4 m^2/s)   [calibrated on eett to 0.0000].
-  For >2 colored partons / mixed configs the single pole needs color-correlated
+  (colourless beams, exactly two coloured legs in the final state; any number of
+  colourless final-state particles may accompany them, e.g. ee->qq+gamma/Z/H):
+    - two massless colored partons:  c1 = -sum_i gamma_i - sum_i C_i ln(mu^2/s_qq),
+      s_qq the pair invariant mass (= s when the pair is the whole final state,
+      which is how the mu^2 = s form was calibrated on eeuu)
+    - a massive Q Qbar pair: c1 = 2 C_F[(1+b^2)/(2b)L - 1],
+      L = ln((1+b)/(1-b)), b = sqrt(1-4 m^2/s_QQ)   [calibrated on eett to 0.0000;
+      the eikonal depends only on the pair's relative velocity, hence on s_QQ].
+  For >2 colored partons / coloured beams the single pole needs color-correlated
   Borns; we then certify the double pole only and say so.
+* MadLoop's return code is kept per point: an exceptional point (hundreds digit 4,
+  stability rescue failed) is reported and excluded from the verdict; more than
+  10% of them is itself a FAIL.
 
 Self-contained: samples its OWN 2-body phase space (no reference data needed), or
 reads momenta from a .dat with --dat.
@@ -46,11 +53,13 @@ import nlo_madloop as ML
 # ---------------------------------------------------------------------------
 # Universal pole prediction
 # ---------------------------------------------------------------------------
-def predict_poles(s, proc_pdgs, masses):
+def predict_poles(s, proc_pdgs, masses, mom=None):
     """Predicted (c2 double, c1 single) in alpha_s/2pi, normalized to born, at
     mu^2 = s. The double pole sums the Casimirs of ALL massless coloured legs,
     incoming included (quark-initiated processes). c1 is None when it needs
-    color-correlated Borns; the two closed forms below assume colourless beams."""
+    color-correlated Borns; the two closed forms below assume colourless beams
+    and exactly two coloured final-state legs. ``mom`` (slot order, (n,4)) gives
+    the pair invariant mass; without it the pair is assumed to carry all of s."""
     legs = list(zip(proc_pdgs, masses))
     final = legs[2:]
     colored = [(p, m) for p, m in legs if C.casimir(p) > 0]
@@ -64,17 +73,28 @@ def predict_poles(s, proc_pdgs, masses):
     if len(colored) != len(colored_final):
         note = "coloured incoming partons -> only the double pole is certified"
         return c2, None, note
+    if len(colored) == 2:
+        # invariant mass of the coloured pair (its own eikonal scale)
+        idx = [i for i, (p, m) in enumerate(legs) if i >= 2 and C.casimir(p) > 0]
+        if mom is not None:
+            q = np.asarray(mom)[idx[0]] + np.asarray(mom)[idx[1]]
+            s_pair = q[0]**2 - q[1]**2 - q[2]**2 - q[3]**2
+        else:
+            s_pair = s
+        extra = len(final) - 2
+        tag = f" + {extra} colourless" if extra else ""
     if len(colored) == 2 and len(massless) == 2:
         c1 = -sum(C.gamma_quark() if abs(int(p)) <= 6 else C.gamma_gluon()
                   for p, _ in massless)
-        note = "2 massless colored partons (mu^2=s)"
+        c1 -= sum(C.casimir(p) for p, _ in massless) * np.log(s / s_pair)
+        note = f"2 massless colored partons{tag} (mu^2=s, pair mass from the event)"
     elif len(colored) == 2 and len(massive) == 2 and \
             abs(massive[0][1] - massive[1][1]) < 1e-6:
         m = massive[0][1]
-        b = np.sqrt(max(1.0 - 4.0 * m**2 / s, 0.0))
+        b = np.sqrt(max(1.0 - 4.0 * m**2 / s_pair, 0.0))
         L = np.log((1.0 + b) / (1.0 - b))
         c1 = 2.0 * C.CF * ((1.0 + b**2) / (2.0 * b) * L - 1.0)
-        note = f"massive Q Qbar pair (beta={b:.4f})"
+        note = f"massive Q Qbar pair{tag} (beta from the pair mass)"
     else:
         note = ("single pole needs color-correlated Born (>2 or mixed colored "
                 "partons) -> only the double pole is certified")
@@ -147,32 +167,57 @@ def main():
                                                 cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None)
             pts = [mom for mom, _ in ev]
 
-    rows = []
+    rows, rcs, n_noborn = [], [], 0
     for mom in pts:
         r = ML.evaluate(get_me_full, mom)
         if "c0" not in r:
+            n_noborn += 1
             continue
-        c2p, c1p, note = predict_poles(r["s"], args.proc_order, masses)
+        c2p, c1p, note = predict_poles(r["s"], args.proc_order, masses, mom=mom)
         rows.append((np.sqrt(r["s"]), r["c2"], c2p, r["c1"],
                      (c1p if c1p is not None else np.nan)))
+        rcs.append(r["rc"])
     A = np.array(rows)
+    rcs = np.array(rcs, dtype=int)
+    # MadLoop return code: hundreds digit 2 = stable, 3 = rescued (rotation / quad
+    # precision), 4 = exceptional (rescue failed; the number is not trustworthy).
+    H = rcs // 100
+    ok = H != 4
+    n_exc, n_resc = int((H == 4).sum()), int((H == 3).sum())
+    if len(A) == 0 or ok.sum() == 0:
+        print(f"\nno usable points ({len(pts)} sampled, {n_noborn} with born=0, {n_exc} exceptional) -> FAIL")
+        return
     sqrts, c2_ml, c2_pred, c1_ml, c1_pred = A.T
-
     print(f"\nprocess order {args.proc_order}   masses {masses}")
-    print(f"points: {len(A)}   sqrt(s) in [{sqrts.min():.0f}, {sqrts.max():.0f}]")
-    print(f"\n--- DOUBLE pole c2 = -sum_i C_i  (universal) ---")
+    print(f"points: {len(A)}   sqrt(s) in [{sqrts.min():.0f}, {sqrts.max():.0f}]   "
+          f"MadLoop rc: stable {int((H == 2).sum())}  rescued {n_resc}  exceptional {n_exc}"
+          + (f"  born=0 {n_noborn}" if n_noborn else ""))
+    exc_ok = n_exc <= 0.1 * len(A)
+    if not exc_ok:
+        print("  more than 10% exceptional points -> FAIL")
+    tol = 1e-3   # relative, on the pole coefficients (MadLoop rescues are ~1e-6 accurate)
+    dev2 = np.abs(c2_ml - c2_pred)[ok] / np.maximum(np.abs(c2_pred[ok]), 1e-9)
+    print("\n--- DOUBLE pole c2 = -sum_i C_i  (universal) ---")
     print(f"  predicted (const): {c2_pred[0]:+.5f}")
-    print(f"  MadLoop  mean/std: {c2_ml.mean():+.5f} / {c2_ml.std():.2e}")
-    print(f"  max |c2_ML - pred|: {np.max(np.abs(c2_ml - c2_pred)):.2e}   "
-          f"-> {'PASS' if np.max(np.abs(c2_ml - c2_pred)) < 1e-3 else 'FAIL'}")
+    print(f"  MadLoop  mean/std: {c2_ml[ok].mean():+.5f} / {c2_ml[ok].std():.2e}")
+    print(f"  max |c2_ML - pred|: {np.max(np.abs(c2_ml - c2_pred)[ok]):.2e}   "
+          f"max rel = {dev2.max():.2e}  (95th pct {np.percentile(dev2, 95):.2e})   "
+          f"-> {'PASS' if (dev2.max() < tol and exc_ok) else 'FAIL'}")
+    for i in np.argsort(-np.where(ok, np.abs(c2_ml - c2_pred), -1.0))[:3]:
+        if abs(c2_ml[i] - c2_pred[i]) / max(abs(c2_pred[i]), 1e-9) > 0.1 * tol:
+            print(f"    worst: sqrt(s) {sqrts[i]:7.1f}  rc {rcs[i]}  c2 {c2_ml[i]:+.5f}")
     _, _, note = predict_poles(sqrts[0]**2, args.proc_order, masses)
     print(f"\n--- SINGLE pole c1 ---  [{note}]")
     if np.all(np.isfinite(c1_pred)):
-        rel = np.max(np.abs(c1_ml - c1_pred) / np.maximum(np.abs(c1_pred), 1e-9))
-        print(f"  MadLoop vs prediction:  max |Δ| = {np.max(np.abs(c1_ml - c1_pred)):.2e}  "
-              f"max rel = {rel:.2e}   -> {'PASS' if rel < 1e-3 else 'FAIL'}")
+        dev1 = np.abs(c1_ml - c1_pred)[ok] / np.maximum(np.abs(c1_pred[ok]), 1e-9)
+        print(f"  MadLoop vs prediction:  max |delta| = {np.max(np.abs(c1_ml - c1_pred)[ok]):.2e}  "
+              f"max rel = {dev1.max():.2e}  (95th pct {np.percentile(dev1, 95):.2e})   "
+              f"-> {'PASS' if dev1.max() < tol else 'FAIL'}")
+        for i in np.argsort(-np.where(ok, np.abs(c1_ml - c1_pred), -1.0))[:3]:
+            if abs(c1_ml[i] - c1_pred[i]) / max(abs(c1_pred[i]), 1e-9) > 0.1 * tol:
+                print(f"    worst: sqrt(s) {sqrts[i]:7.1f}  rc {rcs[i]}  c1 {c1_ml[i]:+.5f}  pred {c1_pred[i]:+.5f}")
     else:
-        print("  (not predicted for this multiplicity — double pole certifies setup)")
+        print("  (not predicted for this multiplicity: the double pole certifies the setup)")
 
 
 if __name__ == "__main__":

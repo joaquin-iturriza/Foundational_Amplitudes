@@ -23,6 +23,7 @@ CPU-only (login-node safe). Build is a one-time cost per process.
 import argparse
 import glob
 import os
+import re
 import subprocess
 import sys
 
@@ -287,24 +288,52 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and neg == 0) else "FA
     return "PASS" in out.stdout
 
 
+def _zero_top_width(param_card):
+    """Context: DECAY 6 -> 0 in the standalone's param card, restored on exit.
+
+    MadLoop keeps the card width in the tree-like top propagators of the loop
+    diagrams (helas/coef_construction carry MDL_WT) while the loop integrals
+    cannot, so with an internal top propagator (tt+X, tb+X) the poles miss the
+    universal prediction at O(Gamma_t/m_t) in the soft-boson region (1e-2 on the
+    massive single pole of ee->tta, 1e-3..1e-2 on the double pole of uu->ttg).
+    The pole structure is what the check certifies, so it runs at zero width;
+    the data are generated with the card width, MadGraph's own convention
+    without the complex-mass scheme (see docs/results.tex)."""
+    import contextlib
+
+    @contextlib.contextmanager
+    def ctx():
+        text = open(param_card).read()
+        patched = re.sub(r"^(DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
+        try:
+            open(param_card, "w").write(patched)
+            yield
+        finally:
+            open(param_card, "w").write(text)
+    return ctx()
+
+
 def pole_certify(process, n=100, seed=7):
     """Run the universal pole check on the process's standalone (separate
     Python process: the f2py module chdir's and is a singleton)."""
     cfg = VIRT_PROCESSES[process]
     if cfg.get("loopind"):
         return certify_loop_induced(process, seed=seed)
-    p0 = find_p0(virt_standalone_dir(process))
+    sa = virt_standalone_dir(process)
+    p0 = find_p0(sa)
     proc_order = [cfg["pdg_ids"][1], cfg["pdg_ids"][0]] + cfg["pdg_ids"][2:]  # e+ e- ...
     masses = [0.0, 0.0] + list(cfg["m_finals"])
     cmd = [sys.executable, f"{HERE}/nlo_pole_check.py", "--so-dir", p0,
            "--proc-order", *map(str, proc_order), "--m", *map(str, masses),
            "--n", str(n), "--seed", str(seed)]
-    print(f"[CERTIFY] {process}: pole check ...")
-    res = subprocess.run(cmd, capture_output=True, text=True,
-                         env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
+    print(f"[CERTIFY] {process}: pole check (top width zeroed for the check) ...")
+    with _zero_top_width(os.path.join(sa, "Cards", "param_card.dat")):
+        res = subprocess.run(cmd, capture_output=True, text=True,
+                             env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
     out = res.stdout
     tail = [l for l in out.splitlines() if any(k in l for k in
-            ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted"))]
+            ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted",
+             "points:", "worst:", "exceptional"))]
     print("  " + ("\n  ".join(tail) if tail else "(no checker output)\n  " + res.stderr.strip()[-600:]))
     # An explicit PASS is required: a checker that crashed (empty stdout) used to count as
     # a pass, which certified eight modules the venv could not even import.
@@ -349,35 +378,49 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
 
     mom_store = np.empty((n_events, npart * 4))
     amp = np.empty(n_events)
-    bad = 0
     loopind = bool(cfg.get("loopind"))
-    for i, (mom, _) in enumerate(events):
+
+    def evaluate_point(mom, sq):
+        """(value, usable). MadLoop's return code hundreds digit 4 marks an
+        exceptional point (stability rescue failed): its number is garbage, so
+        the event is redrawn rather than stored."""
         if loopind:
             # |M_1|^2 directly, at the running coupling like a tree (exact in alpha_s);
             # no born, no stripping, no mass-scheme shift.
-            r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sqrts[i], alphas_mz=alphas_mz))
-            if not (r["fin"] > 0.0):
-                bad += 1                     # a non-positive |M_1|^2 is a MadLoop failure, not a value
-            amp[i] = r["fin"]
-            mom_store[i] = mom.flatten()
-            continue
+            r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sq, alphas_mz=alphas_mz))
+            # a non-positive |M_1|^2 is a MadLoop failure, not a value
+            return r["fin"], (r["rc"] // 100 != 4) and (r["fin"] > 0.0)
         # Evaluate MadLoop at the per-event RUNNING α_s(√s) (scale μ=√s) when the
         # physical weighting is wanted, so a born that itself carries α_s (e.g. the
         # 2→3 ee→qqg LO) runs correctly with the energy; the normalized loop
         # coefficient c0 is α_s-independent so it is unaffected. Legacy default
         # (no prefactor) keeps the fixed reference α_s, so existing data is identical.
-        asrun = mg.compute_alphas(sqrts[i], alphas_mz=alphas_mz) if alphas_prefactor else alphas_mz
+        asrun = mg.compute_alphas(sq, alphas_mz=alphas_mz) if alphas_prefactor else alphas_mz
         r = ML.evaluate(get_me_full, mom[swap], alphas=asrun)
         born, c0, s = r["born"], r.get("c0"), r["s"]
-        if c0 is None:
-            bad += 1; born, c0 = 0.0, 0.0
+        if c0 is None or r["rc"] // 100 == 4:
+            return 0.0, False
         shift = C.heavy_quark_scheme_shift(s, heavy_m) if mass_shift else 0.0
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:
             # restore the loop's physical α_s weighting (born already ran above)
-            amp[i] = virt_e4 * (asrun / (2.0 * np.pi))
-        else:
-            amp[i] = virt_e4                    # absolute, no α_s (legacy default)
+            return virt_e4 * (asrun / (2.0 * np.pi)), True
+        return virt_e4, True                    # absolute, no α_s (legacy default)
+
+    bad = 0
+    for i, (mom, _) in enumerate(events):
+        value, usable = evaluate_point(mom, sqrts[i])
+        tries = 0
+        while not usable and tries < 20:
+            # redraw the event from the same sampler (same cuts, same rng stream)
+            bad += 1; tries += 1
+            ev1, sq1 = mg.sample_nbody_phase_space(1, sqrts_min, sqrts_max, m_finals, pdg,
+                                                   rng=rng, cuts=cuts)
+            mom, sqrts[i] = ev1[0][0], sq1[0]
+            value, usable = evaluate_point(mom, sqrts[i])
+        if not usable:
+            raise RuntimeError(f"{process}: 20 consecutive exceptional MadLoop points at event {i}")
+        amp[i] = value
         mom_store[i] = mom.flatten()            # store [e-,e+,finals] order
         if (i + 1) % 50_000 == 0:
             print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
@@ -387,7 +430,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
     np.save(out_file, arr)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
-          f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  bad={bad}  "
+          f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional)={bad}  "
           f"mass_shift={'on(m=%.1f)'%heavy_m if (mass_shift and heavy_m) else 'off'}")
     return out_file
 

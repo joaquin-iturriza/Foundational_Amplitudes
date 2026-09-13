@@ -21,8 +21,12 @@ source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 set -o pipefail   # the per-process verdict pipes through tee: report a crashed build as such
 
-# Every entry of tools.nlo_virtual_pipeline.VIRT_PROCESSES, in table order.
+# Every entry of tools.nlo_virtual_pipeline.VIRT_PROCESSES, in table order; ONLY="a b c"
+# (sbatch --export=ALL,ONLY=...) restricts to those (built standalones are not rebuilt,
+# so this re-certifies).
+if [ -n "${ONLY:-}" ]; then PROCS=($ONLY); else
 PROCS=($(python -c "import sys; sys.path.insert(0, 'tools'); from nlo_virtual_pipeline import VIRT_PROCESSES; print(' '.join(VIRT_PROCESSES))"))   # the whole one-loop table
+fi
 
 # Build + certify in parallel (independent standalone dirs; MadLoop builds are 1-core, ~1-2 GB).
 PAR="${PAR:-$(( ${SLURM_CPUS_PER_TASK:-8} / 2 ))}"; [ "$PAR" -lt 1 ] && PAR=1
