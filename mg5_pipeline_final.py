@@ -1600,6 +1600,16 @@ def generate_mg5_process(process_name, config):
     fortran_dir    = fortran_dir_for(standalone_dir)
     generate_cmds = "\n".join(config["mg5_generate"])
 
+    # Generation is complete only when the standalone tree is: a run killed mid-output
+    # (the 432-way parallel prebuild that died on fork) leaves the events dir and a
+    # partial standalone that would otherwise be "skipped" and then fail to compile forever.
+    complete = (os.path.exists(f"{standalone_dir}/Cards/param_card.dat")
+                and glob.glob(f"{standalone_dir}/SubProcesses/P*/CPPProcess.cc"))
+    if os.path.exists(events_dir) and not complete:
+        print(f"[MG5] {process_name}: incomplete output from an interrupted run, regenerating.")
+        for d in (events_dir, standalone_dir, fortran_dir):
+            if os.path.isdir(d):
+                shutil.rmtree(d)
     if not os.path.exists(events_dir):
         print(f"\n[MG5] Generating process directories for {process_name}...")
         # The Fortran standalone (matrix2py) is only emitted when opted in — by

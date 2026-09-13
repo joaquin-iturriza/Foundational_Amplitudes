@@ -35,6 +35,19 @@ import mg5_pipeline_final as mg
 COUNT_KEY = {"train": "n_train", "val": "n_val", "test": "n_test"}
 
 
+
+def _cores_available():
+    """Cores this process may actually run on: the SLURM allocation, else the affinity
+    mask. os.cpu_count() is the whole node (512 logical CPUs on the htc nodes) and once
+    scaled a 48-core prebuild to 432 simultaneous MadGraph outputs, which died on fork."""
+    env = os.environ.get("SLURM_CPUS_PER_TASK")
+    if env and env.isdigit() and int(env) > 0:
+        return int(env)
+    try:
+        return max(1, len(os.sched_getaffinity(0)))
+    except (AttributeError, OSError):
+        return os.cpu_count() or 1
+
 def _gen_chunk(task):
     return datagen.gen_chunk(task)
 
@@ -43,7 +56,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--workers", type=int, default=min(24, os.cpu_count() or 1),
+    ap.add_argument("--workers", type=int, default=min(24, _cores_available()),
                     help="parallel chunk-generation workers (default: min(24, ncpu))")
     ap.add_argument("--auto-workers", action="store_true",
                     help="raise --workers up to ncpu when the cost estimate shows "
@@ -147,7 +160,7 @@ def main():
         # the single longest chunk (indivisible).
         def makespan(nw):
             return max(total_cost / nw, longest)
-        ncpu = os.cpu_count() or args.workers
+        ncpu = _cores_available()   # the cores THIS job may use, not the node's
         if args.auto_workers and args.workers < ncpu and makespan(ncpu) < makespan(args.workers):
             print(f"\n[auto-workers] {args.workers} → {ncpu} cores "
                   f"(makespan {makespan(args.workers)/1e6:.2f}M → {makespan(ncpu)/1e6:.2f}M units)")
