@@ -166,9 +166,11 @@ def test_stored_pools(recipe="recipes/pretrain8_short.yaml", n_check=5):
     for pr in procs:
         name = pr["name"]; cfg = mg.PROCESSES[name]
         lo, hi = pr["sqrts"]
-        path = f"{cache}/{name}_{lo}-{hi}GeV_train_amplitudes.npy"
+        # the pipeline's own path (a shaped pool carries a _smix tag): never hand-build it
+        rec = mg.variable_energy_recipe(name, lo, hi, pr["n_train"], role="train", seed=42)
+        path = mg.recipe_output_path(rec, cache)
         if not os.path.exists(path):
-            print(f"[pool] {name}: no built pool, skipped"); continue
+            print(f"[pool] {name}: no built pool at {os.path.basename(path)}, skipped"); continue
         sa = f"{mg.WORK_DIR}/{mg.standalone_name(name)}_standalone"
         backend, dirs, driver, _ = mg.detect_compiled_backend(sa)
         if backend != "cpp" or driver is None:
