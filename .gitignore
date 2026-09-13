@@ -121,3 +121,5 @@ talks/**/*_overleaf.zip
 /additional_command
 /scratchpad_jid.txt
 /*.zip
+# MadGraph command dump written next to the cwd on an MG5 error
+MG5_debug

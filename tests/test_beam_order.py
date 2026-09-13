@@ -109,6 +109,10 @@ def test_order_vectors():
     assert mg.order_vector(scan) == [1, 0, 1, 2]
     assert mg.normalize_order_vector([1, 1], mg.PROCESSES["ee_uu_nlo"]) == [1, 0, 1, 2]
     assert mg.normalize_order_vector([0, 1]) == [0, 0, 1, 0]
+    # a registered alpha_s scan of a virt entry restores the physical alpha_s: one power up
+    scan = mg.register_scan_process("ee_ss_nlo__test", "ee_ss_nlo", {"alpha_s": 0.077})
+    assert scan.get("alphas_prefactor") and mg.order_vector(mg.PROCESSES["ee_ss_nlo__test"]) == [1, 0, 1, 2]
+    del mg.PROCESSES["ee_ss_nlo__test"]
     # every catalog entry with a target yields a vector with non-negative powers
     for name, cfg in mg.PROCESSES.items():
         if "nfinal" in cfg and ("pdg_ids" in cfg):

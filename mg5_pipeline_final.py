@@ -276,6 +276,10 @@ def recipe_id(recipe):
     """
     volatile = {"created", "output_file", "provenance", "schema_version",
                 "backend", "effective_seed", "recipe_id",
+                # `amp_orders`: the model's label for the target, fully derived from the
+                # process; the bytes do not depend on it, so a relabelling must not
+                # regenerate every pool.
+                "amp_orders",
                 # `derived_from`: provenance for an NLO α_s dataset reweighted from
                 # its stripped parent — traceability, not "what the data is" (the
                 # content identity already lives in process/alphas_mz/prefactor), so
@@ -422,9 +426,12 @@ def order_vector(cfg):
         born_k = max(k - 1, 0)
         a = k if cfg.get("alphas_prefactor") else born_k
         b = nfinal - born_k
-        base = PROCESSES.get(cfg.get("virt_base", ""), {})    # mixed born: EW max of its tree entry
-        gen = base.get("mg5_generate", [""]); gen = gen[0] if isinstance(gen, (list, tuple)) else gen
-        m = re.search(r"QED\s*<=\s*(\d+)", gen or "")
+        # mixed born: the EW maximum is on the one-loop table's generate string (QED<=N)
+        from tools.nlo_virtual_pipeline import VIRT_PROCESSES
+        vb = cfg.get("virt_base")
+        if vb not in VIRT_PROCESSES:
+            raise KeyError(f"virt entry's base '{vb}' is not in tools.nlo_virtual_pipeline.VIRT_PROCESSES")
+        m = re.search(r"QED\s*<=\s*(\d+)", VIRT_PROCESSES[vb]["mg5"])
         if m:
             b = int(m.group(1))
         return [int(cfg.get("n_loops", 1)), 0, a, b]
@@ -555,7 +562,7 @@ PROCESSES = {
         "param_card_patches": {},
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [11, -11, 24, -24, 5, -5],
-        "m_finals": [80.419, 80.419, 4.7, 4.7],   # b at the card mass (was sampled massless),  # mW, mW, mb=0 (5F); top is internal
+        "m_finals": [80.419, 80.419, 4.7, 4.7],   # mW, mW, mb at the card value (was sampled massless); top is internal
     },
     "ee_mumutautau": {   # Higgs: ee→ZH, Z→μμ, H→ττ — internal H resonates at M(ττ)≈MH.
         # τ is massive (nonzero Yukawa), so H→ττ exists at the physical M_H≈125 (unlike
@@ -2759,8 +2766,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         recipe["alphas_mz"] = float(cfg["alphas_mz"])
     if cfg.get("alphas_prefactor"):
         recipe["alphas_prefactor"] = True   # NLO target carries the physical α_s weight
-    if "scan_base" in cfg:
-        recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", [])]
+    # sampling masses are identity-bearing for every entry (a changed mass changes the
+    # events), not only for mass scans
+    recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", cfg.get("m_final", []) if isinstance(cfg.get("m_final"), (list, tuple)) else [cfg.get("m_final", 0.0)] * int(cfg.get("nfinal", 0)))]
     # Fiducial cuts (when active) change the sampled events → part of the identity, so
     # cut and pre-cut (no-cut) datasets never collide in the cache. Omitted when off,
     # so existing pre-cut datasets keep their recipe_id.

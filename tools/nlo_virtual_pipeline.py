@@ -251,8 +251,8 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and neg == 0) else "FA
 """
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
                          env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
-    print("  " + "\n  ".join(l for l in out.stdout.splitlines() if "[CERTIFY]" in l)
-          or out.stderr[-800:])
+    lines = [l for l in out.stdout.splitlines() if "[CERTIFY]" in l]
+    print("  " + ("\n  ".join(lines) if lines else "(certifier crashed)\n  " + out.stderr.strip()[-800:]))
     return "PASS" in out.stdout
 
 
@@ -325,6 +325,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             # |M_1|^2 directly, at the running coupling like a tree (exact in alpha_s);
             # no born, no stripping, no mass-scheme shift.
             r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sqrts[i], alphas_mz=alphas_mz))
+            if not (r["fin"] > 0.0):
+                bad += 1                     # a non-positive |M_1|^2 is a MadLoop failure, not a value
             amp[i] = r["fin"]
             mom_store[i] = mom.flatten()
             continue

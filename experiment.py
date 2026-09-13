@@ -61,14 +61,22 @@ _AMP_ORDER_BY_NAME = [
     ("nlo_virt", [1, 0, 0, 0]),   # absolute-virt (e4) and the virt/born ratio
 ]
 
-def amp_order_for_dataset(name):
-    """Map a dataset name to its coupling-order vector (see above)."""
+def catalog_cfg_for_dataset(name):
+    """The catalog entry whose key prefixes a (files-path) dataset name, else None."""
     import mg5_pipeline_final as mg   # lazy: keeps the MG5 catalog off the import path
     low = str(name).lower()
     keys = sorted((k for k in mg.PROCESSES if low.startswith(k.lower() + "_") or low == k.lower()),
                   key=len, reverse=True)
-    if keys and "nfinal" in mg.PROCESSES[keys[0]]:
-        return mg.order_vector(mg.PROCESSES[keys[0]])
+    return mg.PROCESSES[keys[0]] if keys and "nfinal" in mg.PROCESSES[keys[0]] else None
+
+
+def amp_order_for_dataset(name):
+    """Map a dataset name to its coupling-order vector (see above)."""
+    import mg5_pipeline_final as mg
+    cfg = catalog_cfg_for_dataset(name)
+    if cfg is not None:
+        return mg.order_vector(cfg)
+    low = str(name).lower()
     for token, order in _AMP_ORDER_BY_NAME:
         if token in low:
             return list(order)
@@ -265,15 +273,10 @@ class AmplitudeExperiment(BaseExperiment):
                 "physics":   physics,
             })
             names.append(name)
-            # Coupling-order vector of the stored target, from the catalog entry of
-            # this dataset (the decorated scan name if registered, else its base, so
-            # virt scans with the alpha_s prefactor restored are labelled as such).
-            # An explicit amp_orders on the spec wins (legacy 2-vectors are widened).
-            ocfg = mg.PROCESSES[name if name in mg.PROCESSES else base]
-            if "amp_orders" in p and p["amp_orders"] is not None:
-                amp_orders.append(mg.normalize_order_vector(p["amp_orders"], ocfg))
-            else:
-                amp_orders.append(mg.order_vector(ocfg))
+            # Coupling-order vector: resolved AFTER register_recipe_processes below, so a
+            # decorated scan name (alphas_prefactor restored, patched masses) is looked
+            # up as itself. An explicit amp_orders on the spec wins (2-vectors widened).
+            amp_orders.append(p.get("amp_orders", None))
             # Per-dataset coupling VALUES {order_key: alpha} for the vertex features
             # and the global scalar fallback. Derived from the physics block; an
             # explicit `couplings` on the spec still wins (manual override).
@@ -294,6 +297,10 @@ class AmplitudeExperiment(BaseExperiment):
         # Register any physics-scan / decorated-base datasets into mg.PROCESSES so
         # generation (inline or prebuild) can address them by dataset name.
         mg.register_recipe_processes(specs)
+        for i, (name, spec) in enumerate(zip(names, specs)):
+            ocfg = mg.PROCESSES[name] if name in mg.PROCESSES else mg.PROCESSES[spec["base"]]
+            amp_orders[i] = (mg.normalize_order_vector(amp_orders[i], ocfg) if amp_orders[i] is not None
+                             else mg.order_vector(ocfg))
 
         self._recipe_specs       = specs
         self._coupling_by_pid    = couplings_by_pid
@@ -355,7 +362,9 @@ class AmplitudeExperiment(BaseExperiment):
         import mg5_pipeline_final as mg
         cfg_orders = self.cfg.data.get("amp_orders", None)
         if cfg_orders is not None and len(cfg_orders) == len(names):
-            return [mg.normalize_order_vector(o) for o in cfg_orders]
+            # a legacy 2-vector takes its EW power from the catalog entry of the dataset,
+            # so an explicit config and the recipe path label the same .npy identically
+            return [mg.normalize_order_vector(o, catalog_cfg_for_dataset(n)) for o, n in zip(cfg_orders, names)]
         derived = [amp_order_for_dataset(n) for n in names]
         if cfg_orders is not None:
             LOGGER.warning(

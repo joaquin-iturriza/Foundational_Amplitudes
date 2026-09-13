@@ -26,15 +26,17 @@ PROCS=($(python -c "import sys; sys.path.insert(0, 'tools'); from nlo_virtual_pi
 declare -A RESULT
 for P in "${PROCS[@]}"; do
   echo "######################## BUILD+CERTIFY $P ########################"
-  if timeout 7200 python tools/nlo_virtual_pipeline.py "$P" --build --certify; then
-    RESULT[$P]="built (see CERTIFY line above for PASS/FAIL)"
+  if timeout 1800 python tools/nlo_virtual_pipeline.py "$P" --build --certify | tee "scripts/build_nlo_${P}.log"; then
+    RESULT[$P]="$(grep -o "\[CERTIFY\] $P: \(PASS\|FAIL\)" "scripts/build_nlo_${P}.log" | tail -1 | sed 's/.*: //')"
+    [ -z "${RESULT[$P]}" ] && RESULT[$P]="built, NO VERDICT"
   else
-    RESULT[$P]="BUILD/CERTIFY FAILED or TIMED OUT"
+    RESULT[$P]="BUILD/CERTIFY CRASHED or TIMED OUT"
   fi
+  rm -f "scripts/build_nlo_${P}.log"
 done
 
 echo "===================== NLO BACKEND BUILD SUMMARY ====================="
 for P in "${PROCS[@]}"; do
   printf "  %-10s %s\n" "$P" "${RESULT[$P]}"
 done
-echo "Look for '[CERTIFY] <proc>: PASS/FAIL' lines above for the pole check verdict."
+echo "(verdicts are the certifier's own PASS/FAIL lines; anything else means no verdict was produced)"
