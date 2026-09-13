@@ -414,12 +414,20 @@ def order_vector(cfg):
     alphas_prefactor (an alpha_s scan) the physical alpha_s/2pi is restored and the
     power is k. The loop itself is counted in L_QCD, which is what tells a stripped
     virt target apart from the LO of the same process at equal alpha_s power."""
+    if cfg.get("order") is not None:          # explicit (loop-induced entries)
+        return [int(x) for x in cfg["order"]]
     nfinal = int(cfg["nfinal"])
     k = int(cfg.get("alphas_power", 0))
     if cfg.get("kind") == "virt":
         born_k = max(k - 1, 0)
         a = k if cfg.get("alphas_prefactor") else born_k
-        return [int(cfg.get("n_loops", 1)), 0, a, nfinal - born_k]
+        b = nfinal - born_k
+        base = PROCESSES.get(cfg.get("virt_base", ""), {})    # mixed born: EW max of its tree entry
+        gen = base.get("mg5_generate", [""]); gen = gen[0] if isinstance(gen, (list, tuple)) else gen
+        m = re.search(r"QED\s*<=\s*(\d+)", gen or "")
+        if m:
+            b = int(m.group(1))
+        return [int(cfg.get("n_loops", 1)), 0, a, b]
     gen = cfg.get("mg5_generate", [""])
     gen = gen[0] if isinstance(gen, (list, tuple)) else gen
     m = re.search(r"QED\s*<=\s*(\d+)", gen)
@@ -1227,6 +1235,222 @@ PROCESSES = {
         "pdg_ids": [2, -2, -13, 13, 21],
         "m_finals": [0.0, 0.0, 0.0],
     },
+    # ------------------------------------------------------------------
+    # catalog_v1, layer 2->4 (multiplicity axis)
+    # ------------------------------------------------------------------
+    "ee_uuuu": {   # identical-flavour four-quark final
+        "mg5_generate": ["generate e+ e- > u u~ u u~"],
+        "nfinal": 4,
+        "alphas_power": 2,   # MG5 default order QED=2 QCD=2: g -> q qbar splitting
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 2, -2, 2, -2],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "ee_uudd": {
+        "mg5_generate": ["generate e+ e- > u u~ d d~"],
+        "nfinal": 4,
+        "alphas_power": 2,   # MG5 default order QED=2 QCD=2: g -> q qbar splitting
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 2, -2, 1, -1],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "ee_ttbargg": {
+        "mg5_generate": ["generate e+ e- > t t~ g g"],
+        "nfinal": 4,
+        "alphas_power": 2,
+        "param_card_patches": dict(TOP_PATCHES),
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 6, -6, 21, 21],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 0, 0],
+    },
+    "ee_ttbarbb": {   # heavy four-quark final: mixed
+        "mg5_generate": ["generate e+ e- > t t~ b b~"],
+        "nfinal": 4,
+        "alphas_power": 2,
+        "param_card_patches": dict(TOP_PATCHES),
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 6, -6, 5, -5],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 4.7, 4.7],
+    },
+    "ee_WWaa": {   # WWgammagamma quartic vertex
+        "mg5_generate": ["generate e+ e- > w+ w- a a"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 24, -24, 22, 22],
+        "m_finals": [80.419, 80.419, 0, 0],
+    },
+    "ee_WWZZ": {   # WWZZ quartic vertex
+        "mg5_generate": ["generate e+ e- > w+ w- z z"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 24, -24, 23, 23],
+        "m_finals": [80.419, 80.419, 91.188, 91.188],
+    },
+    "ee_WWWW": {   # WWWW quartic vertex
+        "mg5_generate": ["generate e+ e- > w+ w- w+ w-"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 24, -24, 24, -24],
+        "m_finals": [80.419, 80.419, 80.419, 80.419],
+    },
+    "ee_nnbarWW": {   # t-channel W fusion to WW
+        "mg5_generate": ["generate e+ e- > ve ve~ w+ w-"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 12, -12, 24, -24],
+        "m_finals": [0, 0, 80.419, 80.419],
+    },
+    "ee_nnbarHH": {   # WW fusion double Higgs: WWHH quartic + HHH
+        "mg5_generate": ["generate e+ e- > ve ve~ h h"],
+        "nfinal": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 12, -12, 25, 25],
+        "m_finals": [0, 0, 125.0, 125.0],
+    },
+    "ee_ddbargg": {   # HOLD-OUT: relabel of ee_uugg
+        "mg5_generate": ["generate e+ e- > d d~ g g"],
+        "nfinal": 4,
+        "alphas_power": 2,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [11, -11, 1, -1, 21, 21],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "uubar_gggg": {   # quartic gluon vertex everywhere
+        "mg5_generate": ["generate u u~ > g g g g"],
+        "nfinal": 4,
+        "alphas_power": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 21, 21, 21, 21],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "uubar_uubargg": {   # mixed
+        "mg5_generate": ["generate u u~ > u u~ g g QED<=2"],
+        "nfinal": 4,
+        "alphas_power": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 2, -2, 21, 21],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "uubar_uubarddbar": {   # mixed
+        "mg5_generate": ["generate u u~ > u u~ d d~ QED<=2"],
+        "nfinal": 4,
+        "alphas_power": 4,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 2, -2, 1, -1],
+        "m_finals": [0, 0, 0, 0],
+    },
+    "uubar_Zggg": {
+        "mg5_generate": ["generate u u~ > z g g g"],
+        "nfinal": 4,
+        "alphas_power": 3,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 23, 21, 21, 21],
+        "m_finals": [91.188, 0, 0, 0],
+    },
+    "udbar_Wggg": {
+        "mg5_generate": ["generate u d~ > w+ g g g"],
+        "nfinal": 4,
+        "alphas_power": 3,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -1, 24, 21, 21, 21],
+        "m_finals": [80.419, 0, 0, 0],
+    },
+    "uubar_ttbargg": {   # mixed
+        "mg5_generate": ["generate u u~ > t t~ g g QED<=2"],
+        "nfinal": 4,
+        "alphas_power": 4,
+        "param_card_patches": dict(TOP_PATCHES),
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 6, -6, 21, 21],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 0, 0],
+    },
+    "uubar_WWgg": {
+        "mg5_generate": ["generate u u~ > w+ w- g g"],
+        "nfinal": 4,
+        "alphas_power": 2,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -2, 24, -24, 21, 21],
+        "m_finals": [80.419, 80.419, 0, 0],
+    },
+    # ------------------------------------------------------------------
+    # catalog_v1, layer NLO: one-loop QCD interference (alpha_s-stripped, like the
+    # existing *_nlo entries) for trees of the catalog, and LOOP-INDUCED targets
+    # (|M_1|^2, no tree; explicit `order`). Backends: tools/nlo_virtual_pipeline.py.
+    # ------------------------------------------------------------------
+    "ee_bbbarg_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "ee_bbg", "nfinal": 3,
+        "n_loops": 1, "alphas_power": 2,
+        "pdg_ids": [11, -11, 5, -5, 21], "m_finals": [4.7, 4.7, 0], "param_card_patches": {},
+    },
+    "ee_ttbarg_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "ee_ttbarg", "nfinal": 3,
+        "n_loops": 1, "alphas_power": 2,
+        "pdg_ids": [11, -11, 6, -6, 21], "m_finals": [LOCKED_MT, LOCKED_MT, 0], "param_card_patches": {},
+    },
+    "uubar_gg_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "uubar_gg", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 3,
+        "pdg_ids": [2, -2, 21, 21], "m_finals": [0, 0], "param_card_patches": {},
+    },
+    "uubar_uubar_nlo": {   # mixed born (QED<=2)
+        "kind": "virt", "virt": True, "virt_base": "uubar_uubar", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 3,
+        "pdg_ids": [2, -2, 2, -2], "m_finals": [0, 0], "param_card_patches": {},
+    },
+    "uubar_ttbar_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "uubar_ttbar", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 3,
+        "pdg_ids": [2, -2, 6, -6], "m_finals": [LOCKED_MT, LOCKED_MT], "param_card_patches": {},
+    },
+    "uubar_mumu_nlo": {   # HOLD-OUT: crossing of ee_uu_nlo
+        "kind": "virt", "virt": True, "virt_base": "uubar_mumu", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [2, -2, -13, 13], "m_finals": [0, 0], "param_card_patches": {},
+    },
+    "uubar_Zg_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "uubar_Zg", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 2,
+        "pdg_ids": [2, -2, 23, 21], "m_finals": [91.188, 0], "param_card_patches": {},
+    },
+    "udbar_tbbar_nlo": {
+        "kind": "virt", "virt": True, "virt_base": "udbar_tbbar", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 1,
+        "pdg_ids": [2, -1, 6, -5], "m_finals": [LOCKED_MT, 4.7], "param_card_patches": {},
+    },
+    "ee_aH_loop": {   # loop-induced, EW loop
+        "kind": "virt", "virt": True, "virt_base": "ee_aH", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 0, "loopind": True, "order": [0, 1, 0, 4],
+        "pdg_ids": [11, -11, 25, 22], "m_finals": [125.0, 0], "param_card_patches": {},
+    },
+    "ee_HH_loop": {   # loop-induced, Higgs self-coupling at one loop
+        "kind": "virt", "virt": True, "virt_base": "ee_HH", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 0, "loopind": True, "order": [0, 1, 0, 4],
+        "pdg_ids": [11, -11, 25, 25], "m_finals": [125.0, 125.0], "param_card_patches": {},
+    },
+    "uubar_Hg_loop": {   # loop-induced, top-loop ggH
+        "kind": "virt", "virt": True, "virt_base": "uubar_Hg", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 3, "loopind": True, "order": [1, 0, 3, 1],
+        "pdg_ids": [2, -2, 25, 21], "m_finals": [125.0, 0], "param_card_patches": {},
+    },
+    "ee_gg_loop": {   # loop-induced, quark box
+        "kind": "virt", "virt": True, "virt_base": "ee_gg", "nfinal": 2,
+        "n_loops": 1, "alphas_power": 2, "loopind": True, "order": [1, 0, 2, 2],
+        "pdg_ids": [11, -11, 21, 21], "m_finals": [0, 0], "param_card_patches": {},
+    },
     # Template for new processes:
     # "ee_NEW": {
     #     "mg5_generate": ["generate e+ e- > X X~"],
@@ -1268,7 +1492,7 @@ PROCESSES = {
                   "m_finals": [0.0, 0.0], "param_card_patches": {}},
     "ee_bb_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_bb", "nfinal": 2,
                   "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 5, -5],
-                  "m_finals": [4.18, 4.18], "param_card_patches": {}},
+                  "m_finals": [4.7, 4.7], "param_card_patches": {}},
     # 2->3 qqg QCD-virtual (born ∝ α_s; target ∝ α_s² → amp_orders [1,2]).
     "ee_uug_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_uug", "nfinal": 3,
                    "n_loops": 1, "alphas_power": 2, "pdg_ids": [11, -11, 2, -2, 21],

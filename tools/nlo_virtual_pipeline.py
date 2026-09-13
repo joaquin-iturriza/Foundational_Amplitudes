@@ -54,6 +54,29 @@ VIRT_PROCESSES = {
     # born scale correctly (target ∝ α_s²).
     "ee_uug":   {"mg5": "generate e+ e- > u u~ g [virt=QCD]", "pdg_ids": [11, -11,  2, -2, 21], "m_finals": [0.0, 0.0, 0.0]},
     "ee_ddg":   {"mg5": "generate e+ e- > d d~ g [virt=QCD]", "pdg_ids": [11, -11,  1, -1, 21], "m_finals": [0.0, 0.0, 0.0]},
+    "ee_bbg":   {"mg5": "generate e+ e- > b b~ g [virt=QCD]", "pdg_ids": [11, -11,  5, -5, 21], "m_finals": [4.7, 4.7, 0.0]},
+    "ee_ttbarg":{"mg5": "generate e+ e- > t t~ g [virt=QCD]", "pdg_ids": [11, -11,  6, -6, 21], "m_finals": [172.5, 172.5, 0.0]},
+    # quark-initiated one-loop QCD interference (parton level, no PDFs). The pole check
+    # certifies the double pole only (coloured beams: no closed-form single pole).
+    "uubar_gg":    {"mg5": "generate u u~ > g g [virt=QCD]",             "pdg_ids": [2, -2, 21, 21],  "m_finals": [0.0, 0.0]},
+    "uubar_uubar": {"mg5": "generate u u~ > u u~ QED<=2 [virt=QCD]",     "pdg_ids": [2, -2, 2, -2],   "m_finals": [0.0, 0.0]},
+    "uubar_ttbar": {"mg5": "generate u u~ > t t~ [virt=QCD]",            "pdg_ids": [2, -2, 6, -6],   "m_finals": [172.5, 172.5]},
+    "uubar_mumu":  {"mg5": "generate u u~ > mu+ mu- [virt=QCD]",         "pdg_ids": [2, -2, -13, 13], "m_finals": [0.0, 0.0]},
+    "uubar_Zg":    {"mg5": "generate u u~ > z g [virt=QCD]",             "pdg_ids": [2, -2, 23, 21],  "m_finals": [91.1880, 0.0]},
+    "udbar_tbbar": {"mg5": "generate u d~ > t b~ [virt=QCD]",            "pdg_ids": [2, -1, 6, -5],   "m_finals": [172.5, 4.7]},
+    # LOOP-INDUCED (no tree): the target is |M_1|^2 itself, evaluated at the running
+    # ([sqrvirt=...]: the [noborn=...] spelling trips an MG5 3.7.0 bug in `output standalone`)
+    # alpha_s(sqrt s) like a tree; certification = the IR poles vanish. EW loops need
+    # the loop_qcd_qed_sm model. `order` is the 4-vector of the stored target
+    # ([L_QCD, L_EW, alpha_s_max, alpha_ew_max], twice the loop amplitude's powers).
+    "ee_aH":     {"mg5": "generate e+ e- > h a [sqrvirt=QED]", "model": "loop_qcd_qed_sm", "loopind": True,
+                  "pdg_ids": [11, -11, 25, 22], "m_finals": [125.0, 0.0], "order": [0, 1, 0, 4]},
+    "ee_HH":     {"mg5": "generate e+ e- > h h [sqrvirt=QED]", "model": "loop_qcd_qed_sm", "loopind": True,
+                  "pdg_ids": [11, -11, 25, 25], "m_finals": [125.0, 125.0], "order": [0, 1, 0, 4]},
+    "uubar_Hg":  {"mg5": "generate u u~ > h g [sqrvirt=QCD]", "loopind": True,
+                  "pdg_ids": [2, -2, 25, 21], "m_finals": [125.0, 0.0], "order": [1, 0, 3, 1]},
+    "ee_gg":     {"mg5": "generate e+ e- > g g [sqrvirt=QCD]", "loopind": True,
+                  "pdg_ids": [11, -11, 21, 21], "m_finals": [0.0, 0.0], "order": [1, 0, 2, 2]},
 }
 
 # Fortran subroutine appended to each standalone's f2py_wrapper.f so the f2py
@@ -162,8 +185,9 @@ def build_virt_standalone(process, force=False):
         import shutil
         shutil.rmtree(sa)
 
-    print(f"[BUILD] {process}: generating [virt=QCD] standalone at {sa}")
-    script = f"import model loop_sm\n{cfg['mg5']}\noutput standalone {sa}\n"
+    model = cfg.get("model", "loop_sm")
+    print(f"[BUILD] {process}: generating one-loop standalone ({model}) at {sa}")
+    script = f"import model {model}\n{cfg['mg5']}\noutput standalone {sa}\n"
     r = subprocess.run([mg.MG5_BIN], input=script, text=True)
     if r.returncode != 0 or not os.path.isdir(sa):
         sys.exit(f"[BUILD] MG5 generation failed for {process}")
@@ -187,10 +211,42 @@ def build_virt_standalone(process, force=False):
     return sa
 
 
+def certify_loop_induced(process, n=50, seed=7, tol=1e-6):
+    """A loop-induced |M_1|^2 is IR/UV finite: MadLoop's single and double poles must
+    vanish relative to the finite part at every point, and the finite part must be
+    positive. Runs in a subprocess (the f2py module chdir's and is a singleton)."""
+    cfg = VIRT_PROCESSES[process]
+    p0 = find_p0(virt_standalone_dir(process))
+    code = f"""
+import sys, numpy as np
+sys.path.insert(0, {HERE!r}); sys.path.insert(0, {ROOT!r})
+import nlo_madloop as ML, mg5_pipeline_final as mg
+cfg = {cfg!r}
+rng = np.random.default_rng({seed})
+ev, sq = mg.sample_nbody_phase_space({n}, 1.05*sum(cfg['m_finals']) + 30.0, 1000.0,
+                                     cfg['m_finals'], cfg['pdg_ids'], rng=rng, cuts=mg.FIDUCIAL_CUTS)
+g = ML.load({p0!r}); perm = mg.row_to_slot_perm(cfg['pdg_ids'], cfg['mg5'])
+worst, neg = 0.0, 0
+for (mom, _), s in zip(ev, sq):
+    r = ML.evaluate(g, mom[perm], alphas=mg.compute_alphas(s))
+    if r['fin'] <= 0: neg += 1
+    worst = max(worst, abs(r['e1']) / abs(r['fin']), abs(r['e2']) / abs(r['fin']))
+print(f"[CERTIFY] {process}: born={{r['born']:.1e}} max |pole|/|fin| = {{worst:.2e}}  non-positive fin: {{neg}}/{n}")
+print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and neg == 0) else "FAIL"))
+"""
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                         env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
+    print("  " + "\n  ".join(l for l in out.stdout.splitlines() if "[CERTIFY]" in l)
+          or out.stderr[-800:])
+    return "PASS" in out.stdout
+
+
 def pole_certify(process, n=100, seed=7):
     """Run the universal pole check on the process's standalone (separate
     Python process: the f2py module chdir's and is a singleton)."""
     cfg = VIRT_PROCESSES[process]
+    if cfg.get("loopind"):
+        return certify_loop_induced(process, seed=seed)
     p0 = find_p0(virt_standalone_dir(process))
     proc_order = [cfg["pdg_ids"][1], cfg["pdg_ids"][0]] + cfg["pdg_ids"][2:]  # e+ e- ...
     masses = [0.0, 0.0] + list(cfg["m_finals"])
@@ -243,7 +299,15 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     mom_store = np.empty((n_events, npart * 4))
     amp = np.empty(n_events)
     bad = 0
+    loopind = bool(cfg.get("loopind"))
     for i, (mom, _) in enumerate(events):
+        if loopind:
+            # |M_1|^2 directly, at the running coupling like a tree (exact in alpha_s);
+            # no born, no stripping, no mass-scheme shift.
+            r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sqrts[i], alphas_mz=alphas_mz))
+            amp[i] = r["fin"]
+            mom_store[i] = mom.flatten()
+            continue
         # Evaluate MadLoop at the per-event RUNNING α_s(√s) (scale μ=√s) when the
         # physical weighting is wanted, so a born that itself carries α_s (e.g. the
         # 2→3 ee→qqg LO) runs correctly with the energy; the normalized loop

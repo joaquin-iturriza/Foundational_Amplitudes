@@ -48,7 +48,8 @@ def evaluate(get_me_full, momenta, alphas=0.118):
     ans, rc = get_me_full(P, alphas, s, -1)
     born, fin, e1, e2 = (float(ans[i]) for i in range(4))
     ao2pi = alphas / (2.0 * np.pi)
-    out = {"s": s, "born": born, "rc": int(rc)}
+    # raw terms too: a loop-induced process has born == 0 and its target IS fin
+    out = {"s": s, "born": born, "rc": int(rc), "fin": fin, "e1": e1, "e2": e2}
     if born != 0.0:
         out["c0"] = fin / born / ao2pi   # finite coefficient (= virt_fin/born)
         out["c1"] = e1 / born / ao2pi    # single pole 1/eps

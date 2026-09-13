@@ -77,7 +77,20 @@ def test_masses_match_card():
         if any(abs(int(q)) == 6 for q in cfg["pdg_ids"][2:]):
             assert patches.get("MT") == mg.LOCKED_MT and patches.get("ymt") == mg.LOCKED_MT, name
         n += 1
-    print(f"[mass] ok: {n} LO entries sample at their card masses")
+    # virt entries: the catalog masses must equal the one-loop table's sampling masses
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from nlo_virtual_pipeline import VIRT_PROCESSES
+    nv = 0
+    for name, cfg in mg.PROCESSES.items():
+        if cfg.get("kind") != "virt":
+            continue
+        v = VIRT_PROCESSES[cfg["virt_base"]]
+        assert list(map(float, cfg["m_finals"])) == list(map(float, v["m_finals"])), name
+        assert list(cfg["pdg_ids"]) == list(v["pdg_ids"]), name
+        if cfg.get("loopind"):
+            assert v.get("loopind") and cfg["order"] == v["order"], name
+        nv += 1
+    print(f"[mass] ok: {n} LO entries sample at their card masses; {nv} virt entries match the one-loop table")
 
 
 def test_order_vectors():
@@ -85,7 +98,10 @@ def test_order_vectors():
     want = {"ee_uu": [0, 0, 0, 2], "ee_uug": [0, 0, 1, 2], "ee_uugg": [0, 0, 2, 2],
             "uubar_gg": [0, 0, 2, 0], "uubar_ga": [0, 0, 1, 1], "uubar_Zg": [0, 0, 1, 1],
             "uubar_uubar": [0, 0, 2, 2], "uubar_uubarg": [0, 0, 3, 2], "ee_ZHH": [0, 0, 0, 3],
-            "ee_WW": [0, 0, 0, 2], "ee_uu_nlo": [1, 0, 0, 2], "ee_uug_nlo": [1, 0, 1, 2]}
+            "ee_WW": [0, 0, 0, 2], "ee_uu_nlo": [1, 0, 0, 2], "ee_uug_nlo": [1, 0, 1, 2],
+            "ee_uuuu": [0, 0, 2, 2], "ee_nnbarHH": [0, 0, 0, 4], "uubar_gggg": [0, 0, 4, 0],
+            "uubar_gg_nlo": [1, 0, 2, 0], "uubar_uubar_nlo": [1, 0, 2, 2],
+            "ee_aH_loop": [0, 1, 0, 4], "uubar_Hg_loop": [1, 0, 3, 1]}
     for name, v in want.items():
         got = mg.order_vector(mg.PROCESSES[name])
         assert got == v, (name, got, v)

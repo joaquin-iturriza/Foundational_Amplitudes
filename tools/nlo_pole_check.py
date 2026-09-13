@@ -44,16 +44,22 @@ import nlo_madloop as ML
 # ---------------------------------------------------------------------------
 def predict_poles(s, proc_pdgs, masses):
     """Predicted (c2 double, c1 single) in alpha_s/2pi, normalized to born, at
-    mu^2 = s. c1 is None when it needs color-correlated Borns. Incoming partons
-    (first two slots) are taken colorless (e+ e-)."""
-    final = list(zip(proc_pdgs[2:], masses[2:]))
-    colored = [(p, m) for p, m in final if C.casimir(p) > 0]
+    mu^2 = s. The double pole sums the Casimirs of ALL massless coloured legs,
+    incoming included (quark-initiated processes). c1 is None when it needs
+    color-correlated Borns; the two closed forms below assume colourless beams."""
+    legs = list(zip(proc_pdgs, masses))
+    final = legs[2:]
+    colored = [(p, m) for p, m in legs if C.casimir(p) > 0]
+    colored_final = [(p, m) for p, m in final if C.casimir(p) > 0]
     massless = [(p, m) for p, m in colored if (m is None or m <= 0)]
     massive  = [(p, m) for p, m in colored if (m is not None and m > 0)]
 
     c2 = -sum(C.casimir(p) for p, _ in massless)
 
     c1, note = None, ""
+    if len(colored) != len(colored_final):
+        note = "coloured incoming partons -> only the double pole is certified"
+        return c2, None, note
     if len(colored) == 2 and len(massless) == 2:
         c1 = -sum(C.gamma_quark() if abs(int(p)) <= 6 else C.gamma_gluon()
                   for p, _ in massless)

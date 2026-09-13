@@ -10,15 +10,13 @@
 # until it is, the s-channel fermion pairs carry the Z-pole needle of the big run
 # (docs/results.tex, prin:needle).
 #
-# Later layers (not in this file): 2->4 trees (multiplicity axis), the one-loop
-# interference of the ee_* pairs (order axis, tools/nlo_virtual_pipeline.py), and the
-# LOOP-INDUCED processes reachable from these initial states, a third target kind
-# (|M_1|^2, no tree) that MadLoop generates directly:
-#   e+ e- > h a [noborn=QED]  (loop_qcd_qed_sm, 65 loop diagrams)
-#   e+ e- > h h [noborn=QED]  (loop_qcd_qed_sm, 82; Higgs self-coupling at one loop)
-#   u u~ > h g  [noborn=QCD]  (loop_sm, 4; top-loop ggH vertex)
-#   e+ e- > g g [noborn=QCD]  (loop_sm, 8; quark box)
-#
+# Layers: 2->2 and 2->3 trees; 2->4 trees (multiplicity axis); one-loop QCD
+# interference *_nlo (order axis; alpha_s-stripped, tools/nlo_virtual_pipeline.py);
+# loop-induced *_loop (|M_1|^2, no tree; MadLoop [sqrvirt], EW loops via loop_qcd_qed_sm).
+# NLO pools are smaller (MadLoop cost). Axis hold-outs are configs, not entries:
+#   multiplicity : drop ee_uugg (keep ee_uu, ee_uug) and uubar_gggg (keep gg, ggg)
+#   order        : drop ee_uu_nlo (keep ee_uu and the other *_nlo pairs)
+#   loop-induced : drop uubar_Hg_loop (keep the other three)
 # Genuine hold-out configs (each removes the listed processes from THIS file; the
 # free hold-outs in catalog_v1_holdout.yaml need no removal):
 #   P1   triple-gluon vertex          : uubar_gg (keep uubar_ggg in: tests 3g given nothing; drop both for the pure test)
@@ -105,3 +103,48 @@ processes:
   - {name: uubar_ttbarg,  sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: udbar_Wgg,     sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: udbar_enug,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->4, e+e-, four-quark and heavy finals
+  - {name: ee_uugg,           sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uuuu,           sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uudd,           sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ttbargg,        sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ttbarbb,        sqrts: [ 372, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->4, e+e-, quartic gauge / Higgs / fusion
+  - {name: ee_WWaa,           sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_WWZZ,           sqrts: [ 360, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_WWWW,           sqrts: [ 338, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbarWW,        sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbarHH,        sqrts: [ 262, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_wwbb,           sqrts: [ 179, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->4, e+e-, four leptons / photons (existing)
+  - {name: ee_mumumumu,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumutautau,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_aaaa,           sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->4, quark-initiated
+  - {name: uubar_gggg,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubargg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubarddbar,  sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_Zggg,        sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggg,        sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbargg,     sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_WWgg,        sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # NLO one-loop QCD interference, e+e- (alpha_s-stripped)
+  - {name: ee_uu_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_dd_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_bb_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_ttbar_nlo,      sqrts: [ 362, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uug_nlo,        sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_ddg_nlo,        sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_bbbarg_nlo,     sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_ttbarg_nlo,     sqrts: [ 362, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  # NLO one-loop QCD interference, quark-initiated
+  - {name: uubar_gg_nlo,      sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_uubar_nlo,   sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ttbar_nlo,   sqrts: [ 362, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_Zg_nlo,      sqrts: [  96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: udbar_tbbar_nlo,   sqrts: [ 186, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  # loop-induced |M_1|^2 (no tree)
+  - {name: ee_aH_loop,        sqrts: [ 131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_HH_loop,        sqrts: [ 262, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_Hg_loop,     sqrts: [ 131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_gg_loop,        sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

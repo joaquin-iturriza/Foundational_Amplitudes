@@ -17,3 +17,8 @@ processes:
   - {name: dd_dd,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of uu_uu
   - {name: ds_ds,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of us_us
   - {name: cs_cs,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of us_us
+  # multiplicity / order relabels and crossings
+  - {name: ee_ddbargg,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of ee_uugg
+  - {name: ee_ss_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # relabel of ee_dd_nlo
+  - {name: ee_cc_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # relabel of ee_uu_nlo
+  - {name: uubar_mumu_nlo,    sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # crossing of ee_uu_nlo
