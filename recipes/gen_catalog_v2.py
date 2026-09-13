@@ -332,7 +332,8 @@ def write_recipes(procs, cands):
            "# coloured tree <= 2->3, and the certified loop-induced entries. Entries beyond v1 are",
            "# defined in recipes/catalog_v2_processes.yaml (loaded by the pipeline at import).",
            "# Axis hold-outs are configs: drop every '+g' at 2->4 (multiplicity), drop the *_nlo of",
-           "# one family (order), drop one loop-induced entry.", "processes:", "  # --- catalog_v1 ---"]
+           "# one family (order), drop one loop-induced entry.", "sampling: {mode: mixture}   # pipeline DEFAULT_SAMPLING: (1-f) uniform-sqrt(s) bulk + f flat-in-log|M|^2, f=0.35",
+           "processes:", "  # --- catalog_v1 ---"]
     seen = set()
     for p in v1:
         out.append(f"  - {{name: {p['name'] + ',':<22} sqrts: [{p['sqrts'][0]:>4}, {p['sqrts'][1]}], n_train: {p['n_train']}, n_val: {p['n_val']}, n_test: {p['n_test']}}}"); seen.add(p["name"])

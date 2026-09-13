@@ -233,6 +233,7 @@ class AmplitudeExperiment(BaseExperiment):
                     procs = yaml.safe_load(f)
                 # Allow either a bare list or {processes: [...]}.
                 if isinstance(procs, dict):
+                    self._recipe_default_sampling = procs.get("sampling") if isinstance(procs, dict) else None
                     procs = procs.get("processes", procs)
                 LOGGER.info(f"Loaded {len(procs)} recipe processes from {pf}")
         assert procs, ("data.source=recipes requires data.processes or "
@@ -271,6 +272,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "n_val":     int(p["n_val"]),
                 "n_test":    int(p["n_test"]),
                 "physics":   physics,
+                "sampling":  p.get("sampling", None),
             })
             names.append(name)
             # Coupling-order vector: resolved AFTER register_recipe_processes below, so a
@@ -296,7 +298,7 @@ class AmplitudeExperiment(BaseExperiment):
 
         # Register any physics-scan / decorated-base datasets into mg.PROCESSES so
         # generation (inline or prebuild) can address them by dataset name.
-        mg.register_recipe_processes(specs)
+        mg.register_recipe_processes(specs, default_sampling=getattr(self, "_recipe_default_sampling", None))
         for i, (name, spec) in enumerate(zip(names, specs)):
             ocfg = mg.PROCESSES[name] if name in mg.PROCESSES else mg.PROCESSES[spec["base"]]
             amp_orders[i] = (mg.normalize_order_vector(amp_orders[i], ocfg) if amp_orders[i] is not None

@@ -57,7 +57,7 @@ def main():
     # Register any per-dataset physics scans / decorated-base entries into
     # mg.PROCESSES so generation can address them by their (decorated) dataset name
     # — same registration the training recipe path does in init_physics.
-    mg.register_recipe_processes(procs)
+    mg.register_recipe_processes(procs, default_sampling=(spec.get("sampling") if isinstance(spec, dict) else None))
 
     print(f"Spec        : {args.spec}")
     print(f"Frozen dir  : {datagen.frozen_dir()}")

@@ -4,6 +4,7 @@
 # defined in recipes/catalog_v2_processes.yaml (loaded by the pipeline at import).
 # Axis hold-outs are configs: drop every '+g' at 2->4 (multiplicity), drop the *_nlo of
 # one family (order), drop one loop-induced entry.
+sampling: {mode: mixture}   # pipeline DEFAULT_SAMPLING: (1-f) uniform-sqrt(s) bulk + f flat-in-log|M|^2, f=0.35
 processes:
   # --- catalog_v1 ---
   - {name: ee_mumu,               sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

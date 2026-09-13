@@ -225,17 +225,21 @@ def standalone_name(process):
     return base if me(cfg) == me(PROCESSES[base]) else process
 
 
-def register_recipe_processes(specs):
+def register_recipe_processes(specs, default_sampling=None):
     """Register every recipe spec carrying a ``physics`` scan (or a decorated
-    ``base``) into PROCESSES, so generation can address them by dataset name.
-    ``specs`` is the experiment's ``_recipe_specs`` list. No-op for plain entries
-    (name already a PROCESSES key and no physics)."""
+    ``base``) into PROCESSES, so generation can address them by dataset name, and
+    attach the sampling policy (per-entry ``sampling``, else the recipe-level
+    ``default_sampling``, else the pipeline default) to the entry generation reads.
+    ``specs`` is the experiment's ``_recipe_specs`` list."""
     for s in specs:
         name = s["name"]
         base = s.get("base", name)
         physics = s.get("physics")
         if physics or base != name:
             register_scan_process(name, base, physics or {})
+        samp = s.get("sampling", default_sampling)
+        if samp is not None and name in PROCESSES:
+            PROCESSES[name]["sampling"] = dict(samp)
 
 
 # =============================================================================
@@ -2574,6 +2578,196 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
     return events, sqrts
 
 
+# =============================================================================
+# SAMPLING POLICY (docs/results.tex, coverage vs. emphasis): a dataset is a MIXTURE of
+#   (1-f)*N events drawn the physical way (sqrt s uniform in the window x RAMBO / isotropic
+#           angles under the fiducial cuts): the bulk;
+#   f*N events kept FLAT IN log|M|^2 from an oversampled, labelled candidate pool, thinned
+#           without replacement: equal training density per amplitude decade, so every
+#           amplitude extreme (s-channel pole, soft/collinear corner, threshold) is covered
+#           by generation, not by resampling what the bulk happens to contain.
+# The candidate pool reaches the extremes through (a) the IR-democratic 1->2 splitter for
+# multi-leg finals (log-uniform intermediate masses) mixed with RAMBO, and (b) an adaptive
+# sqrt(s) proposal: a first pass of candidates shows where log|M|^2 varies steeply in sqrt(s)
+# (a pole, a threshold) and the second pass concentrates candidates there. Nothing here
+# knows which process has which resonance; only |M|^2 is read. f ~ 0.25-0.5 is the measured
+# interior optimum (pure flat starves the bulk, pure uniform starves the pole).
+# `mode: flat` is the legacy uniform-only sampling (keeps old recipe ids).
+# =============================================================================
+DEFAULT_SAMPLING = {
+    "mode":         "mixture",
+    "f_flat":       0.35,    # fraction of the dataset kept flat in log|M|^2
+    "oversample":   6,       # candidates labelled per flat event kept
+    "democratic":   0.5,     # share of multi-leg candidates from the IR-democratic splitter
+    "y_lo":         1e-6,    # deepest intermediate invariant (units of s) the splitter reaches
+    "sqrts_adapt":  True,    # second candidate pass concentrated where log|M|^2 varies in sqrt(s)
+    "n_sqrts_bins": 200,
+}
+
+
+def sampling_policy(cfg):
+    """The effective sampling dict of a catalog entry (defaults filled in)."""
+    pol = dict(DEFAULT_SAMPLING); pol.update(cfg.get("sampling") or {})
+    return pol
+
+
+def _random_dirs(n, rng):
+    """n isotropic unit 3-vectors."""
+    cos_t = rng.uniform(-1.0, 1.0, n); phi = rng.uniform(0.0, 2.0 * np.pi, n)
+    sin_t = np.sqrt(np.clip(1.0 - cos_t ** 2, 0.0, None))
+    return np.stack([sin_t * np.cos(phi), sin_t * np.sin(phi), cos_t], axis=1)
+
+
+def _boost_from_rest(qstar, Pblob):
+    """Boost rest-frame 4-vectors qstar (n,4) into the lab, where the blob has lab
+    4-momentum Pblob (n,4)."""
+    E = Pblob[:, 0]; p3 = Pblob[:, 1:]
+    M = np.sqrt(np.clip(E ** 2 - (p3 ** 2).sum(1), 1e-18, None)); gamma = E / M
+    pmag = np.sqrt(np.clip((p3 ** 2).sum(1), 1e-30, None)); nhat = p3 / pmag[:, None]; beta = pmag / E
+    qE = qstar[:, 0]; q3 = qstar[:, 1:]; ndotq = (nhat * q3).sum(1)
+    lE = gamma * (qE + beta * ndotq)
+    l3 = q3 + nhat * ((gamma - 1.0) * ndotq + gamma * beta * qE)[:, None]
+    return np.concatenate([lE[:, None], l3], axis=1)
+
+
+def _two_body(M, m_a, m_b, rng):
+    """Two-body split of a blob of mass M (n,) into masses m_a, m_b in its rest frame."""
+    n = len(M)
+    Ea = (M ** 2 + m_a ** 2 - m_b ** 2) / (2.0 * M)
+    lam = (M ** 2 - (m_a + m_b) ** 2) * (M ** 2 - (m_a - m_b) ** 2)
+    pmag = np.sqrt(np.clip(lam, 0.0, None)) / (2.0 * M)
+    d = _random_dirs(n, rng)
+    qa = np.concatenate([Ea[:, None], pmag[:, None] * d], axis=1)
+    Eb = np.sqrt(np.clip(pmag ** 2 + m_b ** 2, 0.0, None))
+    qb = np.concatenate([Eb[:, None], -(pmag[:, None] * d)], axis=1)
+    return qa, qb
+
+
+def democratic_draw(nb, sqrts, masses, y_lo, rng):
+    """IR-democratic N-body final state (analysis/divergences/gen_ir_democratic.py, the
+    process-agnostic SARGE/HAAG core): recursive 1->2 splitting of the total invariant
+    mass with the intermediate masses log-uniform, so soft and collinear corners are
+    visited with equal weight per decade of invariant. Momentum conservation and
+    on-shellness are exact by construction. Returns P (nb, N, 4) in the order of `masses`."""
+    masses = np.asarray(masses, float); N = len(masses)
+    Pout = np.zeros((nb, N, 4))
+    blob = np.zeros((nb, 4)); blob[:, 0] = sqrts; M = sqrts.copy()
+    suffix = np.concatenate([np.cumsum(masses[::-1])[::-1], [0.0]])
+    Mfloor = sqrts * np.sqrt(y_lo)
+    for k in range(N - 1):
+        m_k = masses[k]; m_rest = suffix[k + 1]
+        if k == N - 2:
+            Mp = np.full(nb, masses[N - 1])          # the last blob IS the last particle
+        else:
+            Mhi = M - m_k
+            Mlo = np.minimum(np.maximum(m_rest + Mfloor, m_rest + 1e-9), Mhi)
+            lo2 = np.log(np.maximum(Mlo ** 2, 1e-18)); hi2 = np.log(np.maximum(Mhi ** 2, 1e-18))
+            Mp = np.sqrt(np.exp(lo2 + rng.uniform(0.0, 1.0, nb) * (hi2 - lo2)))
+        q_k, q_bp = _two_body(M, m_k, Mp, rng)
+        Pout[:, k, :] = _boost_from_rest(q_k, blob)
+        blob = _boost_from_rest(q_bp, blob); M = Mp
+    Pout[:, N - 1, :] = blob
+    return Pout
+
+
+def _sqrts_proposal_from_pass(sqrts_c, logm_c, lo, hi, n_bins, n_logm_bins=60):
+    """Adaptive sqrt(s) proposal, targeting flatness directly: each first-pass candidate is
+    weighted by 1 / (density of its log|M|^2 in the pass), i.e. by how RARE its amplitude
+    value is, and the weights are accumulated per sqrt(s) bin. A resonance or a threshold
+    is a narrow band of sqrt(s) holding rare (large or small) amplitudes and receives
+    second-pass candidates in proportion; a floor keeps every bin populated. Returns
+    (edges, probabilities)."""
+    v_edges = np.linspace(logm_c.min(), logm_c.max() + 1e-12, n_logm_bins + 1)
+    vb = np.clip(np.searchsorted(v_edges, logm_c, side="right") - 1, 0, n_logm_bins - 1)
+    dens = np.bincount(vb, minlength=n_logm_bins).astype(float)
+    w = 1.0 / dens[vb]
+    edges = np.linspace(lo, hi, n_bins + 1)
+    idx = np.clip(np.searchsorted(edges, sqrts_c, side="right") - 1, 0, n_bins - 1)
+    per_bin = np.bincount(idx, weights=w, minlength=n_bins)
+    per_bin = per_bin + 0.1 * per_bin.mean()          # floor: no sqrt(s) bin starved
+    return edges, per_bin / per_bin.sum()
+
+
+def _draw_sqrts_from_bins(nb, edges, probs, rng):
+    b = rng.choice(len(probs), size=nb, p=probs)
+    return rng.uniform(edges[b], edges[b + 1])
+
+
+def _flat_logm_select(logm, n_keep, rng, n_bins=60):
+    """Indices of n_keep candidates thinned WITHOUT replacement toward a flat histogram in
+    log|M|^2: weight ∝ 1 / (candidate density at that log|M|^2)."""
+    idx_all = np.nonzero(np.isfinite(logm))[0]
+    if len(idx_all) <= n_keep:
+        return idx_all
+    v = logm[idx_all]
+    edges = np.linspace(v.min(), v.max() + 1e-12, n_bins + 1)
+    b = np.clip(np.searchsorted(edges, v, side="right") - 1, 0, n_bins - 1)
+    dens = np.bincount(b, minlength=n_bins).astype(float)
+    w = 1.0 / dens[b]; w /= w.sum()
+    return idx_all[rng.choice(len(idx_all), size=n_keep, replace=False, p=w)]
+
+
+def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo):
+    """nb candidate events with sqrt(s) from `sqrts_draw(n)`: 2->2 isotropic two-body; for
+    n >= 3 a frac_dem share from the democratic splitter, the rest RAMBO. Fiducial cuts by
+    rejection with top-up (the pipeline's _collect_with_cuts)."""
+    m_finals = np.asarray(m_finals, float); N = len(m_finals); pdg = np.asarray(pdg_ids, int)
+    all_zero = np.all(m_finals == 0.0)
+    def draw(n_draw):
+        sq = np.asarray(sqrts_draw(n_draw), float)
+        Eb = sq / 2.0; z = np.zeros(n_draw)
+        beams = np.stack([np.stack([Eb, z, z, Eb], 1), np.stack([Eb, z, z, -Eb], 1)], axis=1)
+        if N == 2:
+            P = democratic_draw(n_draw, sq, m_finals, y_lo, rng)     # N=2: back-to-back, isotropic
+        else:
+            n_dem = int(round(frac_dem * n_draw)); parts = []
+            if n_dem:
+                parts.append(democratic_draw(n_dem, sq[:n_dem], m_finals, y_lo, rng))
+            if n_draw - n_dem:
+                p_ml = _rambo_massless_batch(sq[n_dem:], N, rng)
+                parts.append(p_ml if all_zero else _rambo_massive_batch(sq[n_dem:], m_finals, p_ml))
+            P = np.concatenate(parts, axis=0)
+        return np.concatenate([beams, P], axis=1), sq
+    P, sq = _collect_with_cuts(draw, nb, m_finals, pdg, cuts)
+    return [(P[i], pdg) for i in range(nb)], sq
+
+
+def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng, cuts, pol, label):
+    """The mixture policy above. `label(events, sqrts) -> |M|^2` is the exact matrix
+    element (the pipeline's backend). Returns (events, sqrts, me2) shuffled."""
+    lo, hi = float(sqrts_min), float(sqrts_max)
+    n_flat = int(round(pol["f_flat"] * n_events)); n_bulk = n_events - n_flat
+    uni = lambda n: rng.uniform(lo, hi, n)
+    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"])   # bulk: physical measure
+    me_b = np.asarray(label(ev_b, sq_b), float)
+    ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
+    if n_flat:
+        n_cand = max(int(pol["oversample"]) * n_flat, n_flat)
+        n1 = n_cand // 2 if pol["sqrts_adapt"] else n_cand
+        ev1, sq1 = _candidates(n1, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
+        me1 = np.asarray(label(ev1, sq1), float)
+        cand, sq_c, me_c = ev1, sq1, me1
+        if pol["sqrts_adapt"] and n_cand - n1 > 0:
+            with np.errstate(divide="ignore", invalid="ignore"):
+                lg1 = np.log(np.where(me1 > 0, me1, np.nan))
+            ok = np.isfinite(lg1)
+            edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, int(pol["n_sqrts_bins"]))
+            ev2, sq2 = _candidates(n_cand - n1, lambda n: _draw_sqrts_from_bins(n, edges, probs, rng),
+                                   m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
+            me2 = np.asarray(label(ev2, sq2), float)
+            cand, sq_c, me_c = ev1 + ev2, np.concatenate([sq1, sq2]), np.concatenate([me1, me2])
+        with np.errstate(divide="ignore", invalid="ignore"):
+            logm = np.log(np.where(me_c > 0, me_c, np.nan))
+        keep = _flat_logm_select(logm, n_flat, rng)
+        ev_f = [cand[i] for i in keep]; sq_f = sq_c[keep]; me_f = me_c[keep]
+        print(f"  [SAMPLE] mixture: bulk {n_bulk:,} + flat-log|M|^2 {len(keep):,} kept from {len(cand):,} candidates"
+              f" (adaptive sqrt s: {pol['sqrts_adapt']}, democratic share {pol['democratic']})")
+    events = ev_b + ev_f
+    sqrts = np.concatenate([sq_b, sq_f]); me2 = np.concatenate([me_b, me_f])
+    order = rng.permutation(len(events))
+    return [events[i] for i in order], sqrts[order], me2[order]
+
+
 def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
                                    standalone_dir, backend, subproc_dirs,
                                    driver_bin, config, output_file, rng=None):
@@ -2602,6 +2796,33 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     amz        = float(config.get("alphas_mz", 0.118))
     cuts       = FIDUCIAL_CUTS if FIDUCIAL_CUTS_ENABLED else None
     cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
+    pol        = sampling_policy(config)
+    if pol["mode"] == "mixture" and backend == "cpp":
+        # shaped sampling (DEFAULT_SAMPLING): the backend labels candidates as we go
+        m_list = list(config["m_finals"]) if "m_finals" in config else \
+                 (list(config["m_final"]) if isinstance(config["m_final"], (list, tuple)) else [float(config["m_final"])] * nfinal)
+        perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
+        print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}"
+              f"  policy=mixture f_flat={pol['f_flat']} oversample={pol['oversample']}")
+        with CppDriverPipe(driver_bin, standalone_dir) as pipe:
+            label = lambda ev, sq: pipe.compute(ev, perm=perm, alphas=compute_alphas(np.asarray(sq, float), alphas_mz=amz))
+            events, sqrts_arr, total_me2 = build_mixture_dataset(
+                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label)
+        os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
+        mmap_path = output_file + ".mmap"
+        mmap = np.lib.format.open_memmap(mmap_path, mode="w+", dtype=np.float64, shape=(n_events, ncols))
+        momenta_flat = np.array([e[0].flatten() for e in events], dtype=np.float64)
+        pdg_block    = np.tile(np.array(pdg_ids, dtype=np.float64), (n_events, 1))
+        mmap[:] = np.concatenate([momenta_flat, pdg_block, np.asarray(total_me2, float).reshape(-1, 1)], axis=1)
+        mmap.flush(); del mmap
+        if os.path.exists(output_file):
+            os.remove(output_file)
+        os.rename(mmap_path, output_file)
+        w = np.asarray(total_me2, float)
+        print(f"[DATA] Saved {n_events:,} events → {output_file}  |M|² ∈ [{w.min():.4e}, {w.max():.4e}]  neg: {(w < 0).sum()}")
+        return
+    if pol["mode"] == "mixture":
+        print(f"  [WARN] sampling policy 'mixture' needs the C++ backend; got {backend}: falling back to flat sampling")
 
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
@@ -2794,6 +3015,10 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         recipe["alphas_mz"] = float(cfg["alphas_mz"])
     if cfg.get("alphas_prefactor"):
         recipe["alphas_prefactor"] = True   # NLO target carries the physical α_s weight
+    # the sampling policy shapes the events (mixture vs flat); legacy flat keeps old ids
+    pol = sampling_policy(cfg)
+    if pol["mode"] != "flat":
+        recipe["sampling"] = {k: pol[k] for k in sorted(pol)}
     # sampling masses are identity-bearing for every entry (a changed mass changes the
     # events), not only for mass scans
     recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", cfg.get("m_final", []) if isinstance(cfg.get("m_final"), (list, tuple)) else [cfg.get("m_final", 0.0)] * int(cfg.get("nfinal", 0)))]
