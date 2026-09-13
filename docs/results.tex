@@ -267,18 +267,21 @@ with \code{DECAY 6} set to zero they agree to $10^{-8}$. The certifier therefore
 width (the card is restored afterwards); the data keep the card width, which is what MadGraph
 computes without the complex-mass scheme. The checker also keeps MadLoop's return code per
 point (an exceptional point is excluded from the verdict, more than $10\%$ of them is a FAIL)
-and uses a relative $10^{-3}$ on both poles. Two backends fail for real: $us\to us$ and
-$ds\to ds$ return a double pole anywhere between $0$ and $-16/3$ on about a third of the
-points, all flagged stable, and evaluating the same point twice in one process can return a
-different born; a fresh regeneration reproduces it on the same points, the other four-quark
-channels ($uu$, $dd$, $ud$, $cs$, $u\bar u\to u\bar u$, $u\bar u\to d\bar d$) are exact and
-repeatable, and the same two strings with a pure-QCD born (\code{QED=0}) certify to
-$10^{-13}$. The defect is in MadLoop~3.7.0's mixed-order treatment of these two channels; their
-one-loop entries are marked uncertified and stay out of every recipe (the trees stay), so the
-catalog carries $80$ rule-generated one-loop processes. Because those wrong points came back
-flagged stable, the generator now checks the double pole of every event against the universal
-value and redraws the event when it is off (or when the return code marks the point
-exceptional), and refuses the module if more than $2\%$ of its events had to be redrawn.
+and uses a relative $10^{-3}$ on both poles. The last two failures, $us\to us$ and $ds\to ds$,
+were the checker's orientation: its $2$-body sampler pointed the first beam along $-z$, the
+opposite of the pipeline's convention (row $0$ along $+z$, the orientation every stored event
+and the $n$-body sampler use). In that orientation those two modules return a double pole
+anywhere between $0$ and $-16/3$ on about a third of the points, all flagged stable, and
+evaluating the same point twice in one process can return a different born; a fresh
+regeneration reproduces it, the other four-quark channels are insensitive, and a pure-QCD
+born (\code{QED=0}) is exact either way. With the first beam along $+z$ both modules are exact
+and repeatable on every point ($10^{-13}$ on the pole, identical borns on three evaluations of
+each point), and $300$ generated events carry the right pole on all of them. The checker now
+samples in the data's orientation, so it certifies the setup the generator runs, and all $82$
+rule-generated one-loop processes are in. Because MadLoop can hand back a wrong point flagged
+stable, the generator also checks the double pole of every event against the universal value
+and redraws the event when it is off (or when the return code marks the point exceptional),
+and refuses the module if more than $2\%$ of its events had to be redrawn.
 
 \paragraph{Sampling policy.} The recipe path now samples the mixture the divergence study
 settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the physical way ($\sqrt s$
@@ -2600,11 +2603,7 @@ Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and tra
 policy is in place, Sec.~\ref{sec:catalog}):
 \begin{itemize}
   \item $219$ LO standalones to compile (the prebuild does it in parallel); the one-loop
-    backends are built and certified ($80$ of $82$, Sec.~\ref{sec:catalog}).
-  \item $us\to us$ and $ds\to ds$ at one loop: if their absence matters, the pure-QCD-born
-    strings (\code{QED=0 [virt=QCD]}) certify exactly and could enter as entries with
-    $\alpha_{\rm ew}$ order $0$ in the coupling vector; not done, since it would make the two
-    the only four-quark loops on a different born from their trees.
+    backends are built and certified ($82$ of $82$, Sec.~\ref{sec:catalog}).
   \item Pool sizes ($10^5$ events per LO process, $5\times10^4$ per one-loop process) are
     placeholders to be costed on the first prebuild.
 \end{itemize}

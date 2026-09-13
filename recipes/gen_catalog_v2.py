@@ -35,15 +35,11 @@ sys.path.insert(0, ROOT)
 import mg5_pipeline_final as mg
 
 # One-loop strings MadGraph accepts but whose MadLoop module fails the pole certification:
-# the entry stays in the table (certified: false) and out of every recipe. u s > u s and
-# d s > d s return a double pole between 0 and -16/3 on ~30% of the points, flagged stable,
-# and a repeated evaluation of the same point can return a different born; a fresh
-# regeneration reproduces it, the other four-quark channels (uu, dd, ud, cs, u ubar ...) are
-# exact and repeatable. Mechanism not identified (docs/results.tex, catalog validation).
-VIRT_UNCERTIFIED = {
-    "us_us": "MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept",
-    "ds_ds": "MadLoop 3.7.0 double pole wrong on ~30% of points (history-dependent); LO kept",
-}
+# the entry stays in the table (certified: false) and out of every recipe. Empty at present:
+# u s > u s and d s > d s sat here while the checker's 2-body sampler pointed the first beam
+# along -z, an orientation in which those two modules return wrong, history-dependent poles;
+# in the pipeline's orientation (slot 1 along +z, the one the data use) they are exact.
+VIRT_UNCERTIFIED = {}
 CAND = os.path.join(ROOT, "recipes", "catalog_v2_candidates.json")
 OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v2_processes.yaml")
 OUT_TRAIN = os.path.join(ROOT, "recipes", "catalog_v2_train.yaml")

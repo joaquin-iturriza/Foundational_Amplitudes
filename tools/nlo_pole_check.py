@@ -107,8 +107,13 @@ def predict_poles(s, proc_pdgs, masses, mom=None):
 def sample_2body(sqrts, masses, rng):
     m3, m4 = masses[2], masses[3]
     E = sqrts / 2.0
-    # back-to-back beams along z (slot1 -z, slot2 +z); massless leptons
-    p1 = np.array([E, 0, 0, -E]); p2 = np.array([E, 0, 0, +E])
+    # back-to-back beams along z in the pipeline's convention (slot 1 along +z, like
+    # row 0 of every stored event and mg.sample_nbody_phase_space). Certify the
+    # orientation the data use: MadLoop's u s > u s and d s > d s modules return
+    # wrong, history-dependent poles when slot 1 points along -z and exact ones
+    # along +z, so a checker in the other orientation fails a backend that is
+    # sound for the data (or would pass one that is not).
+    p1 = np.array([E, 0, 0, +E]); p2 = np.array([E, 0, 0, -E])
     # final-state momentum magnitude
     lam = (sqrts**2 - (m3 + m4)**2) * (sqrts**2 - (m3 - m4)**2)
     p = np.sqrt(max(lam, 0.0)) / (2.0 * sqrts)
