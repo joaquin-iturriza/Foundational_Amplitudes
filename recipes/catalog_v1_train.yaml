@@ -148,4 +148,4 @@ processes:
   # process; ee_HH/uubar_Hg/ee_gg certify with poles = 0). Excluded until understood.
   - {name: ee_HH_loop,        sqrts: [ 262, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: uubar_Hg_loop,     sqrts: [ 131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
-  - {name: ee_gg_loop,        sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  # ee_gg_loop: the amplitude vanishes (Furry/Landau-Yang); MadLoop returns ~1e-37 noise. Excluded.

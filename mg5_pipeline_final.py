@@ -1453,7 +1453,7 @@ PROCESSES = {
         "n_loops": 1, "alphas_power": 3, "loopind": True, "order": [1, 0, 3, 1],
         "pdg_ids": [2, -2, 25, 21], "m_finals": [125.0, 0], "param_card_patches": {},
     },
-    "ee_gg_loop": {   # loop-induced, quark box
+    "ee_gg_loop": {   # loop-induced, quark box -- VANISHES (Furry/Landau-Yang), |M|^2 ~ 1e-37 noise; not in any recipe
         "kind": "virt", "virt": True, "virt_base": "ee_gg", "nfinal": 2,
         "n_loops": 1, "alphas_power": 2, "loopind": True, "order": [1, 0, 2, 2],
         "pdg_ids": [11, -11, 21, 21], "m_finals": [0, 0], "param_card_patches": {},

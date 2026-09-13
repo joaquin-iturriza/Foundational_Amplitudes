@@ -81,8 +81,12 @@ VIRT_PROCESSES = {
                   "pdg_ids": [11, -11, 25, 25], "m_finals": [125.0, 125.0], "order": [0, 1, 0, 4]},
     "uubar_Hg":  {"mg5": "generate u u~ > h g [sqrvirt=QCD]", "loopind": True,
                   "pdg_ids": [2, -2, 25, 21], "m_finals": [125.0, 0.0], "order": [1, 0, 3, 1]},
+    # PHYSICALLY VANISHING: the gamma*/Z* -> gg pieces cancel (Furry / Landau-Yang), MadLoop
+    # returns |M_1|^2 ~ 1e-37 with an alpha_s scaling of 2.7-5.1 instead of 4, i.e. numerical
+    # noise. Not a target; kept out of the recipes.
     "ee_gg":     {"mg5": "generate e+ e- > g g [sqrvirt=QCD]", "loopind": True,
-                  "pdg_ids": [11, -11, 21, 21], "m_finals": [0.0, 0.0], "order": [1, 0, 2, 2]},
+                  "pdg_ids": [11, -11, 21, 21], "m_finals": [0.0, 0.0], "order": [1, 0, 2, 2],
+                  "certified": False},
 }
 
 # Fortran subroutine appended to each standalone's f2py_wrapper.f so the f2py
