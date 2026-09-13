@@ -53,6 +53,13 @@ import nlo_madloop as ML
 # ---------------------------------------------------------------------------
 # Universal pole prediction
 # ---------------------------------------------------------------------------
+def double_pole(proc_pdgs, masses):
+    """The universal 1/eps^2 coefficient, -sum C_i over the massless coloured legs:
+    a property of the leg set alone (no kinematics, no single-pole forms)."""
+    return -sum(C.casimir(p) for p, m in zip(proc_pdgs, masses)
+                if C.casimir(p) > 0 and (m is None or m <= 0))
+
+
 def predict_poles(s, proc_pdgs, masses, mom=None):
     """Predicted (c2 double, c1 single) in alpha_s/2pi, normalized to born, at
     mu^2 = s. The double pole sums the Casimirs of ALL massless coloured legs,
@@ -107,12 +114,12 @@ def predict_poles(s, proc_pdgs, masses, mom=None):
 def sample_2body(sqrts, masses, rng):
     m3, m4 = masses[2], masses[3]
     E = sqrts / 2.0
-    # back-to-back beams along z in the pipeline's convention (slot 1 along +z, like
-    # row 0 of every stored event and mg.sample_nbody_phase_space). Certify the
-    # orientation the data use: MadLoop's u s > u s and d s > d s modules return
-    # wrong, history-dependent poles when slot 1 points along -z and exact ones
-    # along +z, so a checker in the other orientation fails a backend that is
-    # sound for the data (or would pass one that is not).
+    # Rows in the STORED convention (row 0 along +z, like every stored event and
+    # mg.sample_nbody_phase_space); main() then applies the same row->slot
+    # permutation the generator applies, so MadLoop is certified on exactly the
+    # momenta it sees in generation. That matters: the u s > u s and d s > d s
+    # modules return wrong, history-dependent poles when their slot 1 points
+    # along -z and exact ones along +z.
     p1 = np.array([E, 0, 0, +E]); p2 = np.array([E, 0, 0, -E])
     # final-state momentum magnitude
     lam = (sqrts**2 - (m3 + m4)**2) * (sqrts**2 - (m3 - m4)**2)
@@ -129,9 +136,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--so-dir", required=True)
     ap.add_argument("--proc-order", type=int, nargs="+", required=True,
-                    help="signed PDG ids in MadGraph process order")
+                    help="signed PDG ids in STORED row order (beams first, row 0 along +z)")
     ap.add_argument("--m", type=float, nargs="+", required=True,
                     help="mass per particle (same order); 0 for massless")
+    ap.add_argument("--perm", type=int, nargs="+", default=None,
+                    help="row->slot permutation (slot i <- row perm[i], as "
+                         "mg5_pipeline_final.row_to_slot_perm); identity by default")
     ap.add_argument("--sqrts-min", type=float, default=None)
     ap.add_argument("--sqrts-max", type=float, default=1000.0)
     ap.add_argument("--n", type=int, default=200)
@@ -142,6 +152,11 @@ def main():
     args = ap.parse_args()
 
     masses = args.m
+    perm = list(args.perm) if args.perm else list(range(len(masses)))
+    if sorted(perm) != list(range(len(masses))):
+        raise SystemExit(f"--perm {perm} is not a permutation of {len(masses)} rows")
+    slot_pdgs = [args.proc_order[j] for j in perm]     # what MadLoop's slots carry
+    slot_masses = [masses[j] for j in perm]
     # threshold for the sampler
     if args.sqrts_min is None:
         args.sqrts_min = 1.05 * sum(masses[2:]) if sum(masses[2:]) > 0 else 50.0
@@ -172,14 +187,15 @@ def main():
                                                 masses[2:], args.proc_order, rng=rng,
                                                 cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None)
             pts = [mom for mom, _ in ev]
-
+    if not args.dat:
+        pts = [mom[perm] for mom in pts]         # stored rows -> MadLoop slots
     rows, rcs, n_noborn = [], [], 0
     for mom in pts:
         r = ML.evaluate(get_me_full, mom)
         if "c0" not in r:
             n_noborn += 1
             continue
-        c2p, c1p, note = predict_poles(r["s"], args.proc_order, masses, mom=mom)
+        c2p, c1p, note = predict_poles(r["s"], slot_pdgs, slot_masses, mom=mom)
         rows.append((np.sqrt(r["s"]), r["c2"], c2p, r["c1"],
                      (c1p if c1p is not None else np.nan)))
         rcs.append(r["rc"])
@@ -197,7 +213,7 @@ def main():
         print(f"\nno usable points ({len(pts)} sampled, {n_noborn} with born=0, {n_exc} exceptional) -> FAIL")
         return
     sqrts, c2_ml, c2_pred, c1_ml, c1_pred = A.T
-    print(f"\nprocess order {args.proc_order}   masses {masses}")
+    print(f"\nslot order {slot_pdgs}   masses {slot_masses}   (rows {args.proc_order}, perm {perm})")
     print(f"points: {len(A)}   sqrt(s) in [{sqrts.min():.0f}, {sqrts.max():.0f}]   "
           f"MadLoop rc: stable {int((H == 2).sum())}  rescued {n_resc}  exceptional {n_exc}"
           + (f"  born=0 {n_noborn}" if n_noborn else ""))
@@ -215,7 +231,7 @@ def main():
     for i in np.argsort(-np.where(ok, np.abs(c2_ml - c2_pred), -1.0))[:3]:
         if abs(c2_ml[i] - c2_pred[i]) / max(abs(c2_pred[i]), 1e-9) > 0.1 * tol:
             print(f"    worst: sqrt(s) {sqrts[i]:7.1f}  rc {rcs[i]}  c2 {c2_ml[i]:+.5f}")
-    _, _, note = predict_poles(sqrts[0]**2, args.proc_order, masses)
+    _, _, note = predict_poles(sqrts[0]**2, slot_pdgs, slot_masses)
     print(f"\n--- SINGLE pole c1 ---  [{note}]")
     if np.all(np.isfinite(c1_pred)):
         dev1 = np.abs(c1_ml - c1_pred)[ok] / np.maximum(np.abs(c1_pred[ok]), 1e-9)

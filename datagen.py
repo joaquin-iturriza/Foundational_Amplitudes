@@ -271,6 +271,10 @@ def gen_virt_chunk(task):
         if r.returncode == 0:
             return task["idx"], out_path
         last = r.stderr[-2000:]
+        if r.returncode in (2, 3):
+            # 2 = certification FAIL, 3 = per-event pole guard: deterministic at this
+            # seed, retrying would only burn hours of MadLoop.
+            raise RuntimeError(f"gen_virt_chunk: {process} refused by the pole guard (exit {r.returncode}):\n{last}")
         time.sleep(1.5 * (attempt + 1))   # brief stagger; race is transient
     raise RuntimeError(f"gen_virt_chunk failed for {process} after 4 tries:\n{last}")
 

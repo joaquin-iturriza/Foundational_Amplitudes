@@ -268,16 +268,18 @@ width (the card is restored afterwards); the data keep the card width, which is 
 computes without the complex-mass scheme. The checker also keeps MadLoop's return code per
 point (an exceptional point is excluded from the verdict, more than $10\%$ of them is a FAIL)
 and uses a relative $10^{-3}$ on both poles. The last two failures, $us\to us$ and $ds\to ds$,
-were the checker's orientation: its $2$-body sampler pointed the first beam along $-z$, the
-opposite of the pipeline's convention (row $0$ along $+z$, the orientation every stored event
-and the $n$-body sampler use). In that orientation those two modules return a double pole
+were the checker's orientation: it sampled its own $2$-body points with MadGraph's slot~$1$
+along $-z$, which is what the generator hands MadLoop for the $e^+e^-$ family (stored row $0$,
+$e^-$, lies along $+z$ and the \code{e+ e-} string puts $e^+$ in slot~$1$) but the mirror of
+what it hands the four-quark modules, whose slot~$1$ is row $0$ itself. In that orientation those two modules return a double pole
 anywhere between $0$ and $-16/3$ on about a third of the points, all flagged stable, and
 evaluating the same point twice in one process can return a different born; a fresh
 regeneration reproduces it, the other four-quark channels are insensitive, and a pure-QCD
 born (\code{QED=0}) is exact either way. With the first beam along $+z$ both modules are exact
 and repeatable on every point ($10^{-13}$ on the pole, identical borns on three evaluations of
-each point), and $300$ generated events carry the right pole on all of them. The checker now
-samples in the data's orientation, so it certifies the setup the generator runs, and all $82$
+each point), and $300$ generated events carry the right pole on all of them. The checker now samples in
+the stored convention and applies the generator's own row-to-slot permutation before calling
+MadLoop, so every module is certified on the momenta it sees in generation, and all $82$
 rule-generated one-loop processes are in. Because MadLoop can hand back a wrong point flagged
 stable, the generator also checks the double pole of every event against the universal value
 and redraws the event when it is off (or when the return code marks the point exceptional),

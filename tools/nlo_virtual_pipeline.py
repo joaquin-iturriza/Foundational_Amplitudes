@@ -288,6 +288,20 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and neg == 0) else "FA
     return "PASS" in out.stdout
 
 
+WIDTH_BACKUP = ".width_backup"
+
+
+def restore_stale_card(param_card):
+    """A run killed inside _zero_top_width (SIGKILL, node failure) leaves the card at
+    zero top width and its backup beside it; put the original back before anything
+    reads the card. Idempotent, no-op without a backup."""
+    bak = param_card + WIDTH_BACKUP
+    if os.path.exists(bak):
+        open(param_card, "w").write(open(bak).read())
+        os.remove(bak)
+        print(f"[CARD] restored {param_card} from a stale width backup")
+
+
 def _zero_top_width(param_card):
     """Context: DECAY 6 -> 0 in the standalone's param card, restored on exit.
 
@@ -298,19 +312,39 @@ def _zero_top_width(param_card):
     massive single pole of ee->tta, 1e-3..1e-2 on the double pole of uu->ttg).
     The pole structure is what the check certifies, so it runs at zero width;
     the data are generated with the card width, MadGraph's own convention
-    without the complex-mass scheme (see docs/results.tex)."""
-    import contextlib
+    without the complex-mass scheme (see docs/results.tex).
+
+    The original is written to <card>.width_backup first and restored from it in
+    `finally`, on SIGTERM (the build job's `timeout` sends one) and, by
+    restore_stale_card, at the next entry of any reader after a hard kill."""
+    import contextlib, signal
 
     @contextlib.contextmanager
     def ctx():
+        restore_stale_card(param_card)
         text = open(param_card).read()
+        bak = param_card + WIDTH_BACKUP
+        open(bak, "w").write(text)
         patched = re.sub(r"^(DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
+        prev = signal.getsignal(signal.SIGTERM)
+
+        def on_term(signum, frame):
+            raise SystemExit(128 + signum)      # unwinds through `finally`
+        signal.signal(signal.SIGTERM, on_term)
         try:
             open(param_card, "w").write(patched)
             yield
         finally:
             open(param_card, "w").write(text)
+            if os.path.exists(bak):
+                os.remove(bak)
+            signal.signal(signal.SIGTERM, prev)
     return ctx()
+
+
+class PoleGuardError(RuntimeError):
+    """The module's MadLoop points fail the per-event pole guard: deterministic at a
+    given seed, so callers must not retry (exit status 3 from the CLI)."""
 
 
 def pole_certify(process, n=100, seed=7):
@@ -321,11 +355,14 @@ def pole_certify(process, n=100, seed=7):
         return certify_loop_induced(process, seed=seed)
     sa = virt_standalone_dir(process)
     p0 = find_p0(sa)
-    proc_order = [cfg["pdg_ids"][1], cfg["pdg_ids"][0]] + cfg["pdg_ids"][2:]  # e+ e- ...
+    # Rows in the stored convention plus the same row->slot permutation the generator
+    # applies (mom[swap]): the checker then certifies exactly what MadLoop sees.
+    pdg = list(cfg["pdg_ids"])
+    perm = mg.row_to_slot_perm(pdg, cfg["mg5"])
     masses = [0.0, 0.0] + list(cfg["m_finals"])
     cmd = [sys.executable, f"{HERE}/nlo_pole_check.py", "--so-dir", p0,
-           "--proc-order", *map(str, proc_order), "--m", *map(str, masses),
-           "--n", str(n), "--seed", str(seed)]
+           "--proc-order", *map(str, pdg), "--m", *map(str, masses),
+           "--perm", *map(str, perm), "--n", str(n), "--seed", str(seed)]
     print(f"[CERTIFY] {process}: pole check (top width zeroed for the check) ...")
     with _zero_top_width(os.path.join(sa, "Cards", "param_card.dat")):
         res = subprocess.run(cmd, capture_output=True, text=True,
@@ -372,7 +409,9 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
 
-    p0 = find_p0(virt_standalone_dir(process))
+    sa = virt_standalone_dir(process)
+    restore_stale_card(os.path.join(sa, "Cards", "param_card.dat"))
+    p0 = find_p0(sa)
     get_me_full = ML.load(p0)   # chdir into p0
     swap = mg.row_to_slot_perm(pdg, cfg["mg5"])   # stored rows -> MadGraph slots
 
@@ -413,7 +452,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return virt_e4 * (asrun / (2.0 * np.pi)), True
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
-    c2_pred, _, _ = PC.predict_poles(1.0, pdg, [0.0, 0.0] + list(m_finals))   # double pole: set of legs only
+    c2_pred = PC.double_pole(pdg, [0.0, 0.0] + list(m_finals))   # the set of legs only
     bad = 0
     for i, (mom, _) in enumerate(events):
         value, usable = evaluate_point(mom, sqrts[i])
@@ -426,15 +465,18 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             mom, sqrts[i] = ev1[0][0], sq1[0]
             value, usable = evaluate_point(mom, sqrts[i])
         if not usable:
-            raise RuntimeError(f"{process}: 20 consecutive unusable MadLoop points at event {i}")
+            raise PoleGuardError(f"{process}: 20 consecutive unusable MadLoop points at event {i}")
+        if i >= 1000 and bad > 0.02 * (i + 1):
+            raise PoleGuardError(f"{process}: {bad} of the first {i+1} MadLoop points redrawn "
+                                 f"(exceptional or wrong double pole): the module is not trustworthy")
         amp[i] = value
         mom_store[i] = mom.flatten()            # store [e-,e+,finals] order
         if (i + 1) % 50_000 == 0:
             print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
 
     if bad > 0.02 * n_events:
-        raise RuntimeError(f"{process}: {bad} of {n_events} MadLoop points redrawn (exceptional or wrong "
-                           f"double pole): the module is not trustworthy, certify it again")
+        raise PoleGuardError(f"{process}: {bad} of {n_events} MadLoop points redrawn (exceptional or wrong "
+                             f"double pole): the module is not trustworthy, certify it again")
     pdg_block = np.tile(np.array(pdg, float), (n_events, 1))
     arr = np.concatenate([mom_store, pdg_block, amp[:, None]], axis=1)
     os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
@@ -469,18 +511,22 @@ def main():
     if args.build or args.force_build:
         build_virt_standalone(args.process, force=args.force_build)
     if args.certify:
-        ok = pole_certify(args.process)
-        print(f"[CERTIFY] {args.process}: {'PASS' if ok else 'FAIL'}")
+        if not pole_certify(args.process):
+            sys.exit(2)                      # a FAIL verdict is an error to callers
     if args.generate:
         cfg = VIRT_PROCESSES[args.process]
         smin = args.sqrts_min
         if smin is None:
             smin = 1.05 * sum(cfg["m_finals"]) if sum(cfg["m_finals"]) > 0 else 50.0
         out = args.out or f"{mg.OUTPUT_DIR}/{args.process}_nlo_virt_e4_{smin:.0f}-{args.sqrts_max:.0f}GeV.npy"
-        generate_virt_dataset(args.process, smin, args.sqrts_max, args.n, out,
-                              seed=args.seed, mass_shift=not args.no_mass_shift,
-                              alphas_mz=args.alphas_mz,
-                              alphas_prefactor=args.alphas_prefactor)
+        try:
+            generate_virt_dataset(args.process, smin, args.sqrts_max, args.n, out,
+                                  seed=args.seed, mass_shift=not args.no_mass_shift,
+                                  alphas_mz=args.alphas_mz,
+                                  alphas_prefactor=args.alphas_prefactor)
+        except PoleGuardError as e:
+            print(f"[POLE GUARD] {e}", file=sys.stderr)
+            sys.exit(3)                      # deterministic: do not retry
 
 
 if __name__ == "__main__":

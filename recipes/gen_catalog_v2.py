@@ -362,13 +362,18 @@ def _tag(physics):
     return f"__{ {6: 'mt', 23: 'mz'}[int(pdg)] }{ms}"
 
 
+_BASE_WINDOWS = None
+
+
 def _base_window(base):
     """The base entry's window as written in the train recipe (a coupling-only variant must
-    keep the phase space bit-identical to its base: the alpha_s axis is the only difference)."""
-    for p in yaml.safe_load(open(OUT_TRAIN))["processes"]:
-        if p["name"] == base:
-            return int(p["sqrts"][0]), int(p["sqrts"][1])
-    raise KeyError(base)
+    keep the phase space bit-identical to its base: the alpha_s axis is the only difference).
+    The recipe is parsed once."""
+    global _BASE_WINDOWS
+    if _BASE_WINDOWS is None:
+        _BASE_WINDOWS = {p["name"]: (int(p["sqrts"][0]), int(p["sqrts"][1]))
+                         for p in yaml.safe_load(open(OUT_TRAIN))["processes"]}
+    return _BASE_WINDOWS[base]
 
 
 def _variant(base, physics, N):

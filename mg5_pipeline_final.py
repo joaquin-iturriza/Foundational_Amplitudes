@@ -3031,6 +3031,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         # them from being reused as cache hits.
         "label_convention":   "mg5_slot_v2",
     }
+    if cfg.get("kind") == "virt" or cfg.get("virt"):
+        # One-loop pools: the generator redraws events whose MadLoop point is exceptional
+        # or carries a wrong double pole (v2), so the bytes differ from an unguarded pool
+        # of the same recipe; the version keeps the two apart as cache keys.
+        recipe["virt_generator"] = 2
     # Per-dataset physics scan (register_scan_process): the reference α_s(M_Z)
     # drives the per-event running but is NOT in param_card_patches, so it must
     # enter the identity explicitly. Only recorded when non-default so existing

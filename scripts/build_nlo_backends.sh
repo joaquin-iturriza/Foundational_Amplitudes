@@ -33,15 +33,16 @@ PAR="${PAR:-$(( ${SLURM_CPUS_PER_TASK:-8} / 2 ))}"; [ "$PAR" -lt 1 ] && PAR=1
 mkdir -p scripts/build_nlo_logs
 one() {
   P="$1"
-  if timeout 1800 python tools/nlo_virtual_pipeline.py "$P" --build --certify > "scripts/build_nlo_logs/$P.log" 2>&1; then
-    v="$(grep -o "\[CERTIFY\] $P: \(PASS\|FAIL\)" "scripts/build_nlo_logs/$P.log" | tail -1 | sed 's/.*: //')"
-    echo "$P ${v:-built, NO VERDICT}"
-  else
-    echo "$P BUILD/CERTIFY CRASHED or TIMED OUT"
-  fi
+  timeout 1800 python tools/nlo_virtual_pipeline.py "$P" --build --certify > "scripts/build_nlo_logs/$P.log" 2>&1
+  rc=$?
+  # the verdict line is authoritative (a FAIL verdict exits 2 on purpose); no verdict = crash/timeout
+  v="$(grep -o "\[CERTIFY\] $P: \(PASS\|FAIL\)" "scripts/build_nlo_logs/$P.log" | tail -1 | sed 's/.*: //')"
+  if [ -n "$v" ]; then echo "$P $v"; else echo "$P BUILD/CERTIFY CRASHED or TIMED OUT (exit $rc)"; fi
 }
 export -f one
-printf '%s\n' "${PROCS[@]}" | xargs -P "$PAR" -I{} bash -c 'one {}' > scripts/build_nlo_verdicts.txt
+# The first process builds alone so MadGraph's per-model caches (loop_sm pickles under the
+# shared install) are warm before the parallel MG5 outputs start; the rest run PAR-wide.
+{ one "${PROCS[0]}"; printf '%s\n' "${PROCS[@]:1}" | xargs -P "$PAR" -I{} bash -c 'one {}'; } > scripts/build_nlo_verdicts.txt
 declare -A RESULT
 while read -r P V; do RESULT[$P]="$V"; done < scripts/build_nlo_verdicts.txt
 for P in "${PROCS[@]}"; do echo "######## $P"; grep -E "^\[(BUILD|CERTIFY)\]|  \[CERTIFY\]|DOUBLE|SINGLE|predicted|MadLoop  mean" "scripts/build_nlo_logs/$P.log" | tail -8; done
