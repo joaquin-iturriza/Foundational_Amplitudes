@@ -28,6 +28,7 @@ To add a new process, add an entry to the PROCESSES dictionary below.
 """
 
 import os
+import glob
 import re
 import sys
 import gzip
@@ -341,6 +342,56 @@ def write_recipe(output_file, recipe):
 #   - param_card_patches:    {parameter: value} overrides for param_card.dat
 #   - run_card_patches:      {parameter: value} overrides beyond STANDARD_RUN_CARD
 # =============================================================================
+
+# MadGraph particle names (sm / loop_sm) -> PDG id, for reading generate strings.
+MG5_PDG = {"e-": 11, "e+": -11, "mu-": 13, "mu+": -13, "ta-": 15, "ta+": -15,
+           "ve": 12, "ve~": -12, "vm": 14, "vm~": -14, "vt": 16, "vt~": -16,
+           "u": 2, "u~": -2, "d": 1, "d~": -1, "s": 3, "s~": -3, "c": 4, "c~": -4,
+           "b": 5, "b~": -5, "t": 6, "t~": -6, "g": 21, "a": 22, "z": 23,
+           "w+": 24, "w-": -24, "h": 25}
+
+
+def generate_slot_pdgs(gen):
+    """(initial, final) PDG lists of one `generate`/`add process` line, in MadGraph
+    SLOT order: the order CPPProcess::setMomenta / matrix2py expect their momenta in.
+    Coupling orders (QED<=2), [virt=QCD], / $ @ suffixes are ignored."""
+    s = gen.strip()
+    for pre in ("generate", "add process"):
+        if s.startswith(pre):
+            s = s[len(pre):]
+    s = re.split(r"[\[/$@]", s)[0]
+    s = re.sub(r"\b[A-Z]+\s*(<=|>=|==|=|<|>)\s*\d+", " ", s)
+    ini, fin = s.split(">", 1)
+    ini, fin = ini.split(), fin.split()
+    unknown = [t for t in ini + fin if t not in MG5_PDG]
+    if unknown:
+        raise ValueError(f"unknown MG5 particle name(s) {unknown} in '{gen}'")
+    return [MG5_PDG[t] for t in ini], [MG5_PDG[t] for t in fin]
+
+
+def row_to_slot_perm(pdg_ids, mg5_generate):
+    """Row permutation taking a stored event (rows in `pdg_ids` order: the two beams
+    first, beam- along +z in row 0) to MadGraph slot order, so `momenta[perm]` is
+    what the matrix element must be fed. Every labelling path (C++ driver, matrix2py,
+    MadLoop) goes through this: the stored label of a row IS the particle the ME saw.
+    Identical particles are assigned in order (|M|^2 is symmetric under exchanging
+    them). Raises if the catalog pdg_ids and the generate string disagree."""
+    gen = mg5_generate[0] if isinstance(mg5_generate, (list, tuple)) else mg5_generate
+    ini, fin = generate_slot_pdgs(gen)
+    pdg = [int(x) for x in pdg_ids]
+    if len(pdg) != len(ini) + len(fin):
+        raise ValueError(f"pdg_ids {pdg} has {len(pdg)} legs, '{gen}' has {len(ini)+len(fin)}")
+    perm = []
+    for slots, rows in ((ini, range(len(ini))), (fin, range(len(ini), len(pdg)))):
+        avail = list(rows)
+        for want in slots:
+            j = next((r for r in avail if pdg[r] == want), None)
+            if j is None:
+                raise ValueError(f"pdg_ids {pdg} do not match '{gen}' (no row for pdg {want})")
+            avail.remove(j)
+            perm.append(j)
+    return perm
+
 
 PROCESSES = {
     # ------------------------------------------------------------------
@@ -1480,6 +1531,14 @@ def get_class_name(standalone_dir, subproc_dir):
                     return parts[1].rstrip('{').strip()
     return "CPPProcess"
 
+def parameters_class_name(standalone_dir):
+    """Model parameter class of a standalone_cpp output (Parameters_sm, ...)."""
+    heads = sorted(glob.glob(f"{standalone_dir}/src/Parameters_*.h"))
+    if not heads:
+        raise FileNotFoundError(f"no src/Parameters_*.h under {standalone_dir}")
+    return os.path.splitext(os.path.basename(heads[0]))[0]
+
+
 def write_wrapper(standalone_dir, subproc_dir, param_card_path, nparticles):
     """Write a wrapper .cc for one subprocess, accepting nparticles momenta."""
     suffix     = subproc_dir
@@ -1488,6 +1547,7 @@ def write_wrapper(standalone_dir, subproc_dir, param_card_path, nparticles):
     obj_name   = f"process_{suffix}"
     init_flag  = f"initialized_{suffix}"
     class_name = get_class_name(standalone_dir, subproc_dir)
+    params_class = parameters_class_name(standalone_dir)
 
     # Build the vector<double*> push_backs from the flat p[] array
     push_backs = "\n    ".join(
@@ -1511,9 +1571,12 @@ void {init_name}() {{
     }}
 }}
 
-// p_flat: flat array of {nparticles} * 4 doubles, ordered (E,px,py,pz) per particle
-double {func_name}(double* p_flat) {{
+// p_flat: flat array of {nparticles} * 4 doubles in MadGraph slot order, (E,px,py,pz)
+// per particle; aS: the strong coupling for this event (sigmaKin recomputes the
+// dependent couplings from it on every call).
+double {func_name}(double* p_flat, double aS) {{
     {init_name}();
+    {params_class}::getInstance()->aS = aS;
     std::vector<double*> p;
     {push_backs}
     {obj_name}.setMomenta(p);
@@ -1534,14 +1597,14 @@ def write_driver(standalone_dir, suffixes, nparticles):
 
     # Forward declarations
     forward_decls = "\n".join(
-        f"double get_ME2_{s}(double*);"
+        f"double get_ME2_{s}(double*, double);"
         for s in suffixes
     )
 
     # Accumulate sum
     sum_lines = "    double total = 0.0;\n"
     for s in suffixes:
-        sum_lines += f"    total += get_ME2_{s}(p);\n"
+        sum_lines += f"    total += get_ME2_{s}(p, aS);\n"
 
     driver = f"""#include <iostream>
 #include <cstdio>
@@ -1554,10 +1617,12 @@ int main() {{
     std::cin.tie(nullptr);
 
     double p[{n_doubles}];
+    double aS;
     while (true) {{
         for (int i = 0; i < {n_doubles}; ++i) {{
             if (!(std::cin >> p[i])) goto done;
         }}
+        if (!(std::cin >> aS)) goto done;
 {sum_lines}
         printf("%.15e\\n", total);
         fflush(stdout);
@@ -1794,19 +1859,28 @@ class CppDriverPipe:
         )
         print(f"  [PIPE] C++ driver started (pid {self._proc.pid})")
 
-    def compute(self, events):
+    def compute(self, events, perm=None, alphas=None):
         """
         Send momenta for a list of events and return array of |M|² values.
-        events: list of (momenta_array, pdg_ids) tuples.
-                momenta_array shape: (nparticles, 4).
+        events: list of (momenta_array, pdg_ids) tuples, momenta (nparticles, 4)
+                in STORED row order.
+        perm:   row -> MadGraph slot permutation (row_to_slot_perm); None = rows
+                already in slot order.
+        alphas: per-event alpha_s (array) or one value; None = the standalone's
+                param-card value (fixed coupling, as the old driver did).
         """
+        if alphas is None:
+            alphas = read_alphas_from_param_card(f"{self.standalone_dir}/Cards/param_card.dat")
+        alphas = np.broadcast_to(np.asarray(alphas, dtype=np.float64), (len(events),))
         amps = []
         stdin  = self._proc.stdin
         stdout = self._proc.stdout
 
-        for momenta, _ in events:
-            # Flatten: E0 px0 py0 pz0  E1 px1 py1 pz1  ...
-            line = " ".join(f"{x:.15e}" for x in momenta.flatten())
+        for (momenta, _), a_s in zip(events, alphas):
+            if perm is not None:
+                momenta = momenta[perm]
+            # Flatten: E0 px0 py0 pz0  E1 px1 py1 pz1  ...  aS
+            line = " ".join(f"{x:.15e}" for x in momenta.flatten()) + f" {a_s:.15e}"
             stdin.write(line + "\n")
             stdin.flush()
             amps.append(float(stdout.readline()))
@@ -2240,7 +2314,7 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     # Compute amplitudes
     # ----------------------------------------------------------------
     total_me2 = np.zeros(n_events)
-
+    perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
     if backend == "matrix2py":
         for subproc_dir in subproc_dirs:
             subproc_path = f"{standalone_dir}/SubProcesses/{subproc_dir}"
@@ -2252,14 +2326,12 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
             import matrix2py
             matrix2py.py_initialisemodel(param_card)
 
-            # Fortran matrix2py expects e+ in row 0, e- in row 1; our phase-space
-            # convention stores e- in row 0, e+ in row 1. Swap the two incoming
-            # rows and leave all final-state rows in place (works for any nfinal).
-            swap_idx = [1, 0] + list(range(2, nparticles))
+            # Stored rows -> MadGraph slot order (row_to_slot_perm); the stored
+            # label of a row is the particle the ME sees, for any initial state.
             me2 = np.empty(n_events)
             for i, (momenta, _) in enumerate(events):
                 alphas = compute_alphas(sqrts_arr[i], alphas_mz=amz)
-                p_mg = momenta[swap_idx]
+                p_mg = momenta[perm]
                 me2[i] = matrix2py.py_get_value(_invert_momenta(p_mg), alphas, -1)
                 if (i + 1) % 100_000 == 0:
                     print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
@@ -2270,21 +2342,17 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
             del sys.modules["matrix2py"]
 
     elif backend == "cpp":
-        # C++ pipe driver runs at the standalone's fixed α_s (param-card value).
-        # At LO |M|² = K(kinematics)·α_sᵏ exactly (k = alphas_power), so we
-        # recover the per-event α_s(√s) result by an exact analytic rescale:
-        #     |M|²(√sᵢ) = |M|²_driver · (α_s(√sᵢ) / α_s_ref)ᵏ
-        # (k=0 ⇒ factor 1, i.e. EW processes are untouched.)
-        k = config.get("alphas_power", 0)
+        # C++ pipe driver, per-event α_s(√s): the wrapper sets the model's aS before
+        # sigmaKin, which recomputes the dependent couplings, so the result is exact
+        # for any coupling structure -- pure α_sᵏ (where it equals the old analytic
+        # rescale of a fixed-α_s evaluation) AND the mixed QCD+EW four-quark entries,
+        # where a global rescale would have misweighted the EW/interference terms.
+        alphas_ev = compute_alphas(sqrts_arr, alphas_mz=amz)
+        print(f"  [AMP] per-event α_s(√s) ∈ [{alphas_ev.min():.4f}, {alphas_ev.max():.4f}]"
+              f"  (rows -> MG5 slots via perm {perm})")
         with CppDriverPipe(driver_bin, standalone_dir) as pipe:
-            total_me2 = pipe.compute(events)
-        if k:
-            alphas_ref = read_alphas_from_param_card(param_card)
-            scale = (compute_alphas(sqrts_arr, alphas_mz=amz) / alphas_ref) ** k
-            print(f"  [AMP] per-event α_s rescale: k={k}, α_s_ref={alphas_ref:.4f}, "
-                  f"α_s(√s)∈[{compute_alphas(sqrts_max, alphas_mz=amz):.4f},"
-                  f"{compute_alphas(sqrts_min, alphas_mz=amz):.4f}]")
-            total_me2 = np.asarray(total_me2, dtype=np.float64) * scale
+            total_me2 = np.asarray(pipe.compute(events, perm=perm, alphas=alphas_ev),
+                                   dtype=np.float64)
 
     # ----------------------------------------------------------------
     # Assemble and save
@@ -2395,6 +2463,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         "alphas_power":       k,
         "amp_orders":         [int(cfg.get("n_loops", 0)), k],
         "per_event_alphas":   True,
+        # Labelling convention v2: rows are mapped to MadGraph slots from the generate
+        # string (row_to_slot_perm) and α_s is set per event inside the ME. Datasets
+        # built before this carried the beams mirrored on the C++ path; the key keeps
+        # them from being reused as cache hits.
+        "label_convention":   "mg5_slot_v2",
     }
     # Per-dataset physics scan (register_scan_process): the reference α_s(M_Z)
     # drives the per-event running but is NOT in param_card_patches, so it must

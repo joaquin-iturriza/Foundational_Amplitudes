@@ -238,7 +238,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
 
     p0 = find_p0(virt_standalone_dir(process))
     get_me_full = ML.load(p0)   # chdir into p0
-    swap = [1, 0] + list(range(2, npart))   # [e-,e+,..] -> MadGraph [e+,e-,..]
+    swap = mg.row_to_slot_perm(pdg, cfg["mg5"])   # stored rows -> MadGraph slots
 
     mom_store = np.empty((n_events, npart * 4))
     amp = np.empty(n_events)
