@@ -10,6 +10,15 @@
 # until it is, the s-channel fermion pairs carry the Z-pole needle of the big run
 # (docs/results.tex, prin:needle).
 #
+# Later layers (not in this file): 2->4 trees (multiplicity axis), the one-loop
+# interference of the ee_* pairs (order axis, tools/nlo_virtual_pipeline.py), and the
+# LOOP-INDUCED processes reachable from these initial states, a third target kind
+# (|M_1|^2, no tree) that MadLoop generates directly:
+#   e+ e- > h a [noborn=QED]  (loop_qcd_qed_sm, 65 loop diagrams)
+#   e+ e- > h h [noborn=QED]  (loop_qcd_qed_sm, 82; Higgs self-coupling at one loop)
+#   u u~ > h g  [noborn=QCD]  (loop_sm, 4; top-loop ggH vertex)
+#   e+ e- > g g [noborn=QCD]  (loop_sm, 8; quark box)
+#
 # Genuine hold-out configs (each removes the listed processes from THIS file; the
 # free hold-outs in catalog_v1_holdout.yaml need no removal):
 #   P1   triple-gluon vertex          : uubar_gg (keep uubar_ggg in: tests 3g given nothing; drop both for the pure test)

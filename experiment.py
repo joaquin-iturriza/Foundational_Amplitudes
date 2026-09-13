@@ -57,7 +57,7 @@ TYPE_TOKEN_DICT = {
 # entry whose key prefixes the dataset name; else the old token map (EW power unknown).
 _AMP_ORDER_BY_NAME = [
     ("nnlo",     [2, 0, 2, 0]),
-    ("nlo_full", [1, 0, 1, 0]),
+    ("nlo_full", [1, 0, 1, 0]),   # legacy name token only: no pointwise "full NLO" target exists
     ("nlo_virt", [1, 0, 0, 0]),   # absolute-virt (e4) and the virt/born ratio
 ]
 
