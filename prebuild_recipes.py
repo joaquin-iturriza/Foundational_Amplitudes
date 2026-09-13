@@ -7,7 +7,7 @@ never burns GPU time generating data.
 
 Pipeline:
   1. Skip any (process, role) already cached (matching recipe_id).
-  2. Serially compile any missing matrix-element backends (avoids workers racing
+  2. Compile any missing matrix-element backends, in parallel over distinct backends (no worker races:
      to compile the same process).
   3. Split every remaining dataset into fixed-size chunks and generate all chunks
      — across ALL datasets — in one flat pool over `--workers` CPUs, so cores
@@ -159,13 +159,9 @@ def main():
         # Longest-processing-time-first so the cheap chunks fill the tail.
         all_tasks.sort(key=lambda t: -t["est_cost"])
 
-        # 2) Compile backends serially (one per unique process to build).
+        # 2) Compile backends, in parallel over distinct backends (each in its own dir).
         names = sorted({m["process"] for m in datasets.values()})
-        print(f"Ensuring {len(names)} backends compiled (serial)...")
-        for name in names:
-            t0 = time.time()
-            datagen.ensure_backend(name)
-            print(f"  backend {name:10s} ready ({time.time()-t0:.1f}s)")
+        datagen.ensure_backends(names, workers=args.workers)
 
         # 3) Generate all chunks across all datasets in one flat pool.
         print(f"\nGenerating {len(all_tasks)} chunks across {args.workers} workers...")

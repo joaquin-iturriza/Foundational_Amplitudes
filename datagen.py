@@ -115,6 +115,39 @@ def ensure_virt_backend(process):
     return sa
 
 
+def _backend_key(process):
+    """What a process compiles: virt entries their [virt=QCD] standalone, LO entries the
+    standalone of mg.standalone_name (a coupling-only scan shares its base's)."""
+    if is_virt(process):
+        return "virt:" + mg.PROCESSES[process]["virt_base"]
+    return "lo:" + mg.standalone_name(process)
+
+
+def ensure_backends(processes, workers=8):
+    """ensure_backend over many processes in parallel: one job per DISTINCT backend
+    (dedup by _backend_key), each in its own subprocess. Backends live in distinct
+    standalone dirs and neither MadGraph output nor g++/f2py share any state, so this is
+    safe; the serial re-patch of a name-keyed own backend still happens in ensure_backend.
+    Returns {process: standalone_dir}."""
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+    import time
+    reps = {}
+    for p in processes:
+        reps.setdefault(_backend_key(p), p)
+    print(f"Ensuring {len(reps)} distinct backends for {len(processes)} processes ({workers} in parallel)...")
+    t0 = time.time(); out = {}
+    with ProcessPoolExecutor(max_workers=max(1, workers)) as ex:
+        futs = {ex.submit(ensure_backend, p): p for p in reps.values()}
+        for fut in as_completed(futs):
+            p = futs[fut]; out[p] = fut.result()
+            print(f"  backend {p:24s} ready  ({time.time()-t0:6.1f}s elapsed)", flush=True)
+    # every process (not only the representatives) gets its param card re-patched
+    for p in processes:
+        if p not in out:
+            out[p] = ensure_backend(p)
+    return out
+
+
 def ensure_backend(process):
     """Compile the matrix-element backend for `process` if it isn't built yet.
 

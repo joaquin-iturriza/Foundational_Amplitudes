@@ -123,3 +123,7 @@ talks/**/*_overleaf.zip
 /*.zip
 # MadGraph command dump written next to the cwd on an MG5 error
 MG5_debug
+
+# per-process logs of the one-loop backend build job
+scripts/build_nlo_logs/
+scripts/build_nlo_verdicts.txt
