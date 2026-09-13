@@ -49,7 +49,18 @@ def _cores_available():
         return os.cpu_count() or 1
 
 def _gen_chunk(task):
-    return datagen.gen_chunk(task)
+    """One chunk, retried on a transient OS failure (EAGAIN on fork when the node's
+    process limit is momentarily hit) so a single hiccup does not abort a pool that has
+    hours of finished chunks in flight."""
+    import time
+    for attempt in range(4):
+        try:
+            return datagen.gen_chunk(task)
+        except OSError as e:
+            if attempt == 3:
+                raise
+            print(f"[RETRY] chunk {task['process']} {task.get('role')} {task['idx']}: {e} (attempt {attempt+1})", flush=True)
+            time.sleep(5.0 * (attempt + 1))
 
 
 def main():

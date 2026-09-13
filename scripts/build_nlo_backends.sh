@@ -18,6 +18,10 @@
 
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+# One thread per process: every worker and every MadLoop/MG5 subprocess otherwise opens an
+# OpenBLAS/OpenMP pool sized to the node (512 logical CPUs), and threads count against the
+# per-user process limit (ulimit -u 1024) -> fork fails with EAGAIN mid-run.
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 set -o pipefail   # the per-process verdict pipes through tee: report a crashed build as such
 

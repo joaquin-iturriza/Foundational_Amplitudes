@@ -265,6 +265,8 @@ def gen_virt_chunk(task):
         cmd += ["--alphas-mz", repr(float(cfg.get("alphas_mz", 0.118))),
                 "--alphas-prefactor"]
     import time
+    if _chunk_done(out_path, task["count"]):
+        return task["idx"], out_path
     last = None
     t0 = time.perf_counter()
     for attempt in range(4):
@@ -304,6 +306,8 @@ def gen_chunk(task):
             f"gen_chunk: backend for {process} not compiled — call ensure_backend first.")
     os.makedirs(task["out_dir"], exist_ok=True)
     out_path = os.path.join(task["out_dir"], "chunk.npy")
+    if _chunk_done(out_path, task["count"]):
+        return task["idx"], out_path
     rng = np.random.default_rng(task["seed"])
     import time
     t0 = time.perf_counter()
@@ -312,6 +316,23 @@ def gen_chunk(task):
         eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"))
     _report_chunk_time(task, time.perf_counter() - t0)
     return task["idx"], out_path
+
+
+def _chunk_done(out_path, count):
+    """A chunk already on disk with the right row count is reused: chunk dirs and seeds
+    are deterministic functions of the recipe, so a rerun after an aborted pool (a fork
+    failure once threw away 9281 finished chunks) only generates what is missing. A
+    truncated file from a killed worker fails the shape check and is regenerated."""
+    if not os.path.exists(out_path):
+        return False
+    try:
+        arr = np.load(out_path, mmap_mode="r")
+        ok = arr.ndim == 2 and arr.shape[0] == count
+    except Exception:
+        ok = False
+    if ok:
+        print(f"[TIME] {os.path.basename(os.path.dirname(out_path))} reused: {count} events already on disk", flush=True)
+    return ok
 
 
 def _report_chunk_time(task, dt):
