@@ -1,0 +1,98 @@
+# catalog_v1 -- the structured 2->2 / 2->3 training set (e+e- and quark-initiated,
+# parton level, no PDFs). Companion: catalog_v1_holdout.yaml (never in a base
+# training set). Each process is one subprocess of mg5_pipeline_final.PROCESSES.
+#
+# sqrts windows: flat in [max(1.05*sum(m_final), 25), 1000] GeV, the convention of
+# recipes/gen_scan_bigrun.py. The recipe pipeline samples flat sqrt(s) x RAMBO under
+# the global fiducial cuts (mg5_pipeline_final.FIDUCIAL_CUTS: pt>10, |cos|<0.9,
+# dR>0.4, m_pair>10 on massless visible finals). NOTE: the pole/IR-aware democratic
+# sampler (analysis/divergences/gen_ir_democratic.py) is NOT wired into this path yet;
+# until it is, the s-channel fermion pairs carry the Z-pole needle of the big run
+# (docs/results.tex, prin:needle).
+#
+# Genuine hold-out configs (each removes the listed processes from THIS file; the
+# free hold-outs in catalog_v1_holdout.yaml need no removal):
+#   P1   triple-gluon vertex          : uubar_gg (keep uubar_ggg in: tests 3g given nothing; drop both for the pure test)
+#   P1b  quartic gluon vertex         : uubar_ggg (uubar_gg stays in)
+#   P2   Higgs couplings              : ee_ZH uubar_ZH udbar_WH ee_ZHH ee_nnbarH ee_eeH ee_ttbarH ee_WWH
+#   P2b  Higgs self-coupling only     : ee_ZHH (rest of the Higgs family stays in)
+#   P3   top Yukawa                   : ee_ttbarH (top family stays in)
+#   P4   top quark                    : ee_ttbar uubar_ttbar udbar_tbbar ee_ttbarg uubar_ttbarg ee_ttbarH
+#   P5   pure t-channel topology      : uu_uu ud_ud us_us
+#   P6   WWV triple-gauge vertex      : ee_WW uubar_WW udbar_WZ udbar_Wa ee_WWa ee_wwz ee_WWH ee_enuW
+
+processes:
+  # 2->2, e+e-, s-channel fermion pairs (Z-pole needle family)
+  - {name: ee_mumu,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_tautau,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ddbar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ttbar,      sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, e+e-, t/u-channel exchange and Bhabha
+  - {name: ee_aa,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_Za,         sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZ,         sqrts: [ 191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bhabha,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, e+e-, gauge cancellation and Higgs
+  - {name: ee_WW,         sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZH,         sqrts: [ 227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, quark-initiated, QCD (colour, 3g vertex)
+  - {name: uubar_gg,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ga,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_Zg,      sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_udbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbar,   sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_bbbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, quark-initiated, electroweak bosons and Higgs
+  - {name: uubar_Za,      sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ZZ,      sqrts: [ 191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_WW,      sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ZH,      sqrts: [ 227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, quark-initiated, charged current
+  - {name: udbar_enu,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_tbbar,   sqrts: [ 187, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_WZ,      sqrts: [ 180, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wa,      sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_WH,      sqrts: [ 216, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wg,      sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->2, quark-quark, pure t-channel (no annihilation)
+  - {name: uu_uu,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ud_ud,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: us_us,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->3, e+e-, radiation off fermion lines
+  - {name: ee_uug,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ddbarg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbarg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ttbarg,     sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumua,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_tautaua,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uua,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbara,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->3, e+e-, three bosons
+  - {name: ee_aaa,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_WWa,        sqrts: [ 169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_wwz,        sqrts: [ 265, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZa,        sqrts: [ 191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZZ,        sqrts: [ 287, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_Zaa,        sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->3, e+e-, Higgs (self-coupling, fusion, Yukawa)
+  - {name: ee_ZHH,        sqrts: [ 358, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbarH,     sqrts: [ 131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_eeH,        sqrts: [ 131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ttbarH,     sqrts: [ 495, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_WWH,        sqrts: [ 300, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->3, e+e-, single W
+  - {name: ee_enuW,       sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  # 2->3, quark-initiated
+  - {name: uubar_Zgg,     sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ggg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_agg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubarg,  sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbarg,  sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wgg,     sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_enug,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
