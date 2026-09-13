@@ -174,8 +174,9 @@ def label_events(P):
     """Exact tree |M|^2 via the compiled ee_uugg standalone. P: (n,6,4)."""
     events = [(P[i], PDG) for i in range(len(P))]
     with mp.CppDriverPipe(f"{STANDALONE}/{mp.CPP_DRIVER_NAME}", STANDALONE) as pipe:
-        # e+e- rows -> MadGraph slots (beams swapped); fixed card alpha_s as before
-        me2 = np.asarray(pipe.compute(events, perm=[1, 0] + list(range(2, len(PDG)))), dtype=np.float64)
+        # stored rows -> MadGraph slots (the catalog key is the standalone name); fixed card alpha_s as before
+        perm = mp.row_to_slot_perm(PDG, mp.PROCESSES[os.path.basename(STANDALONE)[:-len("_standalone")]]["mg5_generate"])
+        me2 = np.asarray(pipe.compute(events, perm=perm), dtype=np.float64)
     return me2
 
 
