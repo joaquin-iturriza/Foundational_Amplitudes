@@ -763,9 +763,11 @@ PROCESSES = {
     # coupling-order rule (minimal QED) would keep only the gluon diagrams and
     # drop the gamma/Z exchange and the s-channel W, which is the structure those
     # entries are in the catalog for (and would make ud_ud, us_us, udbar_udbar
-    # exact duplicates). Their |M|^2 is therefore MIXED in alpha_s and alpha_ew;
-    # alphas_power is the dominant power only, and the analytic alpha_s rescale of
-    # a coupling scan is invalid there, so scans of those must regenerate.
+    # exact duplicates). Their |M|^2 is therefore MIXED in alpha_s and alpha_ew:
+    # alphas_power (hence amp_orders) records the dominant power only, which the
+    # s-channel entries violate at the Z/W pole where the resonant EW term wins.
+    # The stored values are exact anyway: alpha_s is set per event inside the ME
+    # (no reweighting), so coupling scans on these entries need nothing special.
     # ------------------------------------------------------------------
     "ee_numu": {   # Z only; pair with ee_nnbar (Z + t-channel W)
         "mg5_generate": ["generate e+ e- > vm vm~"],

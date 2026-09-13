@@ -134,8 +134,8 @@ def ensure_backend(process):
     # A name-keyed OWN backend (mass/EW scan: sa == process) may be reused across
     # recipe versions with different masses; re-patch its param_card to THIS dataset's
     # physics every time (the compile step only patches on first build). Shared
-    # coupling-only scans (sa == base) keep the base card — α_s is applied by analytic
-    # rescale, not the card — so they are left untouched.
+    # coupling-only scans (sa == base) keep the base card — α_s(√s; α_s(M_Z)) is set
+    # per event inside the ME, not through the card — so they are left untouched.
     if sa == process:
         mg.repatch_standalone_param_cards(standalone_dir, cfg)
     return standalone_dir
