@@ -160,6 +160,30 @@ transform per process ($416$ log / $32$ signed-log across the $448$-dataset big 
 collapses the global preprocessed $\sigma$ from $282$ to $1.06$.
 
 % ==========================================================================
+\paragraph{Beam labelling of the stored events (found and fixed, September 2026).}
+Every stored event lists the two beams first, with the beam-$-$ (the $e^-$, or the first
+quark) along $+z$ in row 0. MadGraph orders the legs as the \code{generate} string does,
+i.e.\ \code{e+ e- > ...} puts the $e^+$ in slot 0. The two labelling backends disagreed on
+this: matrix2py/MadLoop swapped the beams (correct for $e^+e^-$), while the default C++
+driver fed the rows unpermuted, so \emph{every LO dataset built on the C++ path carried
+the $\theta\to\pi-\theta$ image of its own beam labels}. Measured on the compiled
+$e^+e^-\to u\bar u$ standalone at $\sqrt s=200$\,GeV, $|\cos\theta|=0.6$: the two beam
+orders give $4.7\times10^{-2}$ and $5.4\times10^{-3}$, and the physical one (up quark
+forward along the $e^-$, $A_{FB}>0$ above the $Z$) is the one the old driver did
+\emph{not} store. Consequences: every LO-only result in these notes is unaffected, since
+a consistent relabelling is a bijection of the input space and the models learned the
+mirrored function equally well; forward--backward statements read off LO data would be
+sign-flipped; and any training set mixing LO with NLO-virt data (\code{pretrain25\_nlo},
+the LO$\to$NLO map) paired the two conventions on forward--backward-asymmetric
+processes, which caps what such a set could have taught. The fix
+(\code{mg5\_pipeline\_final.row\_to\_slot\_perm}) derives the row$\to$slot permutation
+from \code{pdg\_ids} against the generate string and is used by both backends and the NLO
+pipeline; the C++ wrapper now also sets $\alpha_s$ per event inside the matrix element
+(exact for mixed QCD$+$EW amplitudes, identical to the previous analytic rescale for
+pure $\alpha_s^k$ ones); recipe identities carry \code{label\_convention=mg5\_slot\_v2} so
+no pre-fix cache is ever reused; \code{tests/test\_beam\_order.py} guards the catalog and
+the sign of $A_{FB}$ on the real driver. All data generated on CC-IN2P3 is post-fix.
+
 \section{The model and the physical encoding}\label{sec:model}
 % ==========================================================================
 
