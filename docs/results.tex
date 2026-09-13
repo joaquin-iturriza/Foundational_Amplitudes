@@ -265,8 +265,11 @@ $[25,1000]$\,GeV the $Z$-pole share of a pool goes from $0.7\%$ (flat) to $10\%$
 subset alone sits at ${\sim}27\%$, against $32\%$ for the study's pole-covering proposal), the
 max/min bin ratio of the $\log|\mathcal M|^2$ histogram from $66$ to $12$, the bulk keeps $56\%$
 of the events, and a seed reproduces the pool (\code{tests/test\_sampling.py}). The policy lives
-on the catalog entry (per entry or per recipe), enters the recipe identity, and \code{mode: flat}
-keeps the legacy sampling.
+on the catalog entry (per entry or per recipe; the default is the legacy flat sampling and
+\code{catalog\_v2} opts in), enters the recipe identity, and a shaped pool carries its own file
+name. Shaping is a \emph{training-data} choice only: the frozen val/test sets always sample the
+physical measure, so \vlnr\ keeps meaning the same distribution across runs and against every
+earlier number, and the one-loop (MadLoop) datasets are never shaped.
 
 \paragraph{Hold-outs.} Two kinds. The free ones (relabels, crossings; one at every layer) are
 covered by any base training. Axis removals need one extra pretraining each, and independent
