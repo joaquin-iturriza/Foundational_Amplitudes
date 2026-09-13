@@ -1,0 +1,7843 @@
+processes:
+  ee_ddbara:
+    mg5_generate:
+    - generate e+ e- > d d~ a
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_ddbar+a
+    diagrams: 8
+  ee_bbbara:
+    mg5_generate:
+    - generate e+ e- > b b~ a
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_bbbar+a
+    diagrams: 8
+  ee_bbbarZ:
+    mg5_generate:
+    - generate e+ e- > b b~ z
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_bbbar+z
+    diagrams: 9
+  ee_bbbarH:
+    mg5_generate:
+    - generate e+ e- > b b~ h
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_bbbar+h
+    diagrams: 5
+  ee_ttbara:
+    mg5_generate:
+    - generate e+ e- > t t~ a
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: ee_ttbar+a
+    diagrams: 8
+  ee_ttbarZ:
+    mg5_generate:
+    - generate e+ e- > t t~ z
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: ee_ttbar+z
+    diagrams: 9
+  ee_vmvmbara:
+    mg5_generate:
+    - generate e+ e- > vm vm~ a
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 14
+    - -14
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_numu+a
+    diagrams: 2
+  ee_ZaH:
+    mg5_generate:
+    - generate e+ e- > z a h
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 22
+    - 25
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_Za+h
+    diagrams: 2
+  ee_ZZH:
+    mg5_generate:
+    - generate e+ e- > z z h
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_ZZ+h
+    diagrams: 4
+  ee_epema:
+    mg5_generate:
+    - generate e+ e- > e+ e- a
+    nfinal: 3
+    pdg_ids:
+    - -11
+    - 11
+    - -11
+    - 11
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ee_bhabha+a
+    diagrams: 16
+  uubar_gaa:
+    mg5_generate:
+    - generate u u~ > g a a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ga+a
+    diagrams: 6
+    alphas_power: 1
+  uubar_Zga:
+    mg5_generate:
+    - generate u u~ > z g a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_Zg+a
+    diagrams: 6
+    alphas_power: 1
+  uubar_uubara:
+    mg5_generate:
+    - generate u u~ > u u~ a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_uubar+a
+    diagrams: 8
+    alphas_power: 3
+  uubar_ddbarg:
+    mg5_generate:
+    - generate u u~ > d d~ g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ddbar+g
+    diagrams: 17
+    alphas_power: 3
+  uubar_ddbara:
+    mg5_generate:
+    - generate u u~ > d d~ a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ddbar+a
+    diagrams: 4
+    alphas_power: 3
+  udbar_udbarg:
+    mg5_generate:
+    - generate u d~ > u d~ g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_udbar+g
+    diagrams: 17
+    alphas_power: 3
+  udbar_udbara:
+    mg5_generate:
+    - generate u d~ > u d~ a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_udbar+a
+    diagrams: 4
+    alphas_power: 3
+  uubar_ttbara:
+    mg5_generate:
+    - generate u u~ > t t~ a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: uubar_ttbar+a
+    diagrams: 4
+    alphas_power: 3
+  uubar_ttbarZ:
+    mg5_generate:
+    - generate u u~ > t t~ z QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: uubar_ttbar+z
+    diagrams: 4
+    alphas_power: 3
+  uubar_ttbarH:
+    mg5_generate:
+    - generate u u~ > t t~ h QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 25
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: uubar_ttbar+h
+    diagrams: 2
+    alphas_power: 3
+  uubar_bbbarg:
+    mg5_generate:
+    - generate u u~ > b b~ g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_bbbar+g
+    diagrams: 13
+    alphas_power: 3
+  uubar_bbbara:
+    mg5_generate:
+    - generate u u~ > b b~ a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_bbbar+a
+    diagrams: 4
+    alphas_power: 3
+  uubar_bbbarZ:
+    mg5_generate:
+    - generate u u~ > b b~ z QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_bbbar+z
+    diagrams: 4
+    alphas_power: 3
+  uubar_bbbarH:
+    mg5_generate:
+    - generate u u~ > b b~ h QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_bbbar+h
+    diagrams: 2
+    alphas_power: 3
+  uubar_Zaa:
+    mg5_generate:
+    - generate u u~ > z a a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_Za+a
+    diagrams: 6
+  uubar_ZaZ:
+    mg5_generate:
+    - generate u u~ > z a z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 23
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_Za+z
+    diagrams: 6
+  uubar_ZaH:
+    mg5_generate:
+    - generate u u~ > z a h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 25
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_Za+h
+    diagrams: 2
+  uubar_ZZg:
+    mg5_generate:
+    - generate u u~ > z z g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ZZ+g
+    diagrams: 6
+    alphas_power: 1
+  uubar_ZZZ:
+    mg5_generate:
+    - generate u u~ > z z z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ZZ+z
+    diagrams: 9
+  uubar_ZZH:
+    mg5_generate:
+    - generate u u~ > z z h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ZZ+h
+    diagrams: 4
+  uubar_WpWmg:
+    mg5_generate:
+    - generate u u~ > w+ w- g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 21
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_WW+g
+    diagrams: 7
+    alphas_power: 1
+  uubar_WpWma:
+    mg5_generate:
+    - generate u u~ > w+ w- a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_WW+a
+    diagrams: 15
+  uubar_WpWmZ:
+    mg5_generate:
+    - generate u u~ > w+ w- z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_WW+z
+    diagrams: 16
+  uubar_WpWmH:
+    mg5_generate:
+    - generate u u~ > w+ w- h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_WW+h
+    diagrams: 7
+  uubar_ZHg:
+    mg5_generate:
+    - generate u u~ > z h g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ZH+g
+    diagrams: 2
+    alphas_power: 1
+  uubar_ZHH:
+    mg5_generate:
+    - generate u u~ > z h h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 25
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uubar_ZH+h
+    diagrams: 4
+  udbar_tbbarg:
+    mg5_generate:
+    - generate u d~ > t b~ g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: udbar_tbbar+g
+    diagrams: 4
+    alphas_power: 1
+  udbar_tbbara:
+    mg5_generate:
+    - generate u d~ > t b~ a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: udbar_tbbar+a
+    diagrams: 5
+  udbar_tbbarZ:
+    mg5_generate:
+    - generate u d~ > t b~ z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 23
+    m_finals:
+    - 172.5
+    - 4.7
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: udbar_tbbar+z
+    diagrams: 5
+  udbar_tbbarH:
+    mg5_generate:
+    - generate u d~ > t b~ h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 25
+    m_finals:
+    - 172.5
+    - 4.7
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 3
+    why: udbar_tbbar+h
+    diagrams: 3
+  udbar_WpZg:
+    mg5_generate:
+    - generate u d~ > w+ z g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WZ+g
+    diagrams: 8
+    alphas_power: 1
+  udbar_WpZa:
+    mg5_generate:
+    - generate u d~ > w+ z a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WZ+a
+    diagrams: 13
+  udbar_WpZZ:
+    mg5_generate:
+    - generate u d~ > w+ z z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WZ+z
+    diagrams: 14
+  udbar_WpZH:
+    mg5_generate:
+    - generate u d~ > w+ z h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 25
+    m_finals:
+    - 80.419
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WZ+h
+    diagrams: 7
+  udbar_Wpag:
+    mg5_generate:
+    - generate u d~ > w+ a g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_Wa+g
+    diagrams: 8
+    alphas_power: 1
+  udbar_Wpaa:
+    mg5_generate:
+    - generate u d~ > w+ a a
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_Wa+a
+    diagrams: 13
+  udbar_WpaH:
+    mg5_generate:
+    - generate u d~ > w+ a h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 25
+    m_finals:
+    - 80.419
+    - 0.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_Wa+h
+    diagrams: 4
+  udbar_WpHg:
+    mg5_generate:
+    - generate u d~ > w+ h g
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WH+g
+    diagrams: 2
+    alphas_power: 1
+  udbar_WpHH:
+    mg5_generate:
+    - generate u d~ > w+ h h
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 25
+    m_finals:
+    - 80.419
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: udbar_WH+h
+    diagrams: 4
+  uu_uug:
+    mg5_generate:
+    - generate u u > u u g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uu_uu+g
+    diagrams: 26
+    alphas_power: 3
+  uu_uua:
+    mg5_generate:
+    - generate u u > u u a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: uu_uu+a
+    diagrams: 8
+    alphas_power: 3
+  ud_udg:
+    mg5_generate:
+    - generate u d > u d g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ud_ud+g
+    diagrams: 17
+    alphas_power: 3
+  ud_uda:
+    mg5_generate:
+    - generate u d > u d a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: ud_ud+a
+    diagrams: 4
+    alphas_power: 3
+  us_usg:
+    mg5_generate:
+    - generate u s > u s g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: us_us+g
+    diagrams: 13
+    alphas_power: 3
+  us_usa:
+    mg5_generate:
+    - generate u s > u s a QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 3
+    why: us_us+a
+    diagrams: 4
+    alphas_power: 3
+  ee_mupmumaa:
+    mg5_generate:
+    - generate e+ e- > mu+ mu- a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -13
+    - 13
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_mupmuma+a
+    diagrams: 40
+  ee_taptamaa:
+    mg5_generate:
+    - generate e+ e- > ta+ ta- a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -15
+    - 15
+    - 22
+    - 22
+    m_finals:
+    - 1.777
+    - 1.777
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_taptama+a
+    diagrams: 40
+  ee_uubarga:
+    mg5_generate:
+    - generate e+ e- > u u~ g a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_uubarg+a
+    diagrams: 20
+    alphas_power: 1
+  ee_uubaraa:
+    mg5_generate:
+    - generate e+ e- > u u~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_uubara+a
+    diagrams: 40
+  ee_ddbarga:
+    mg5_generate:
+    - generate e+ e- > d d~ g a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ddbarg+a
+    diagrams: 20
+    alphas_power: 1
+  ee_ddbaraa:
+    mg5_generate:
+    - generate e+ e- > d d~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ddbara+a
+    diagrams: 40
+  ee_bbbargg:
+    mg5_generate:
+    - generate e+ e- > b b~ g g
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 21
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarg+g
+    diagrams: 16
+    alphas_power: 2
+  ee_bbbarga:
+    mg5_generate:
+    - generate e+ e- > b b~ g a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 21
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarg+a
+    diagrams: 20
+    alphas_power: 1
+  ee_bbbaraa:
+    mg5_generate:
+    - generate e+ e- > b b~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 22
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbara+a
+    diagrams: 40
+  ee_bbbarZg:
+    mg5_generate:
+    - generate e+ e- > b b~ z g
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 23
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarZ+g
+    diagrams: 22
+    alphas_power: 1
+  ee_bbbarZa:
+    mg5_generate:
+    - generate e+ e- > b b~ z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 23
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarZ+a
+    diagrams: 44
+  ee_bbbarHg:
+    mg5_generate:
+    - generate e+ e- > b b~ h g
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 25
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarH+g
+    diagrams: 14
+    alphas_power: 1
+  ee_bbbarHa:
+    mg5_generate:
+    - generate e+ e- > b b~ h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 25
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_bbbarH+a
+    diagrams: 24
+  ee_ttbarga:
+    mg5_generate:
+    - generate e+ e- > t t~ g a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 21
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbarg+a
+    diagrams: 20
+    alphas_power: 1
+  ee_ttbaraa:
+    mg5_generate:
+    - generate e+ e- > t t~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 22
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbara+a
+    diagrams: 40
+  ee_ttbarZg:
+    mg5_generate:
+    - generate e+ e- > t t~ z g
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 23
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbarZ+g
+    diagrams: 22
+    alphas_power: 1
+  ee_ttbarZa:
+    mg5_generate:
+    - generate e+ e- > t t~ z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 23
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbarZ+a
+    diagrams: 44
+  ee_ttbarHg:
+    mg5_generate:
+    - generate e+ e- > t t~ h g
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 25
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbarH+g
+    diagrams: 14
+    alphas_power: 1
+  ee_ttbarHa:
+    mg5_generate:
+    - generate e+ e- > t t~ h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 25
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: ee_ttbarH+a
+    diagrams: 24
+  ee_vmvmbaraa:
+    mg5_generate:
+    - generate e+ e- > vm vm~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 14
+    - -14
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_vmvmbara+a
+    diagrams: 6
+  ee_vevebaraa:
+    mg5_generate:
+    - generate e+ e- > ve ve~ a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 12
+    - -12
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_vevebara+a
+    diagrams: 19
+  ee_aaZa:
+    mg5_generate:
+    - generate e+ e- > a a z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 22
+    - 22
+    - 23
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_aaZ+a
+    diagrams: 24
+  ee_ZaZa:
+    mg5_generate:
+    - generate e+ e- > z a z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 22
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ZaZ+a
+    diagrams: 24
+  ee_ZaHa:
+    mg5_generate:
+    - generate e+ e- > z a h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 22
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ZaH+a
+    diagrams: 6
+  ee_ZZZa:
+    mg5_generate:
+    - generate e+ e- > z z z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 23
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ZZZ+a
+    diagrams: 30
+  ee_ZZHa:
+    mg5_generate:
+    - generate e+ e- > z z h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 23
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ZZH+a
+    diagrams: 12
+  ee_epemaa:
+    mg5_generate:
+    - generate e+ e- > e+ e- a a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -11
+    - 11
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_epema+a
+    diagrams: 80
+  ee_WpWmZa:
+    mg5_generate:
+    - generate e+ e- > w+ w- z a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 24
+    - -24
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_WpWmZ+a
+    diagrams: 90
+  ee_WpWmHa:
+    mg5_generate:
+    - generate e+ e- > w+ w- h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 24
+    - -24
+    - 25
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_WpWmH+a
+    diagrams: 39
+  ee_ZHHa:
+    mg5_generate:
+    - generate e+ e- > z h h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 25
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_ZHH+a
+    diagrams: 8
+  uubar_ggga:
+    mg5_generate:
+    - generate u u~ > g g g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 21
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ggg+a
+    diagrams: 50
+    alphas_power: 3
+  uubar_ggaa:
+    mg5_generate:
+    - generate u u~ > g g a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 21
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_gga+a
+    diagrams: 30
+    alphas_power: 2
+  uubar_gaaa:
+    mg5_generate:
+    - generate u u~ > g a a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_gaa+a
+    diagrams: 24
+    alphas_power: 1
+  uubar_Zgga:
+    mg5_generate:
+    - generate u u~ > z g g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 21
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_Zgg+a
+    diagrams: 30
+    alphas_power: 2
+  uubar_Zgaa:
+    mg5_generate:
+    - generate u u~ > z g a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 22
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_Zga+a
+    diagrams: 24
+    alphas_power: 1
+  uubar_uubarga:
+    mg5_generate:
+    - generate u u~ > u u~ g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_uubarg+a
+    diagrams: 48
+    alphas_power: 4
+  uubar_uubaraa:
+    mg5_generate:
+    - generate u u~ > u u~ a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_uubara+a
+    diagrams: 40
+    alphas_power: 4
+  uubar_ddbargg:
+    mg5_generate:
+    - generate u u~ > d d~ g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ddbarg+g
+    diagrams: 108
+    alphas_power: 4
+  uubar_ddbarga:
+    mg5_generate:
+    - generate u u~ > d d~ g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ddbarg+a
+    diagrams: 24
+    alphas_power: 4
+  uubar_ddbaraa:
+    mg5_generate:
+    - generate u u~ > d d~ a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ddbara+a
+    diagrams: 20
+    alphas_power: 4
+  udbar_udbargg:
+    mg5_generate:
+    - generate u d~ > u d~ g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_udbarg+g
+    diagrams: 108
+    alphas_power: 4
+  udbar_udbarga:
+    mg5_generate:
+    - generate u d~ > u d~ g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_udbarg+a
+    diagrams: 24
+    alphas_power: 4
+  udbar_udbaraa:
+    mg5_generate:
+    - generate u d~ > u d~ a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_udbara+a
+    diagrams: 20
+    alphas_power: 4
+  uubar_ttbarga:
+    mg5_generate:
+    - generate u u~ > t t~ g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 21
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbarg+a
+    diagrams: 24
+    alphas_power: 4
+  uubar_ttbaraa:
+    mg5_generate:
+    - generate u u~ > t t~ a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 22
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbara+a
+    diagrams: 20
+    alphas_power: 4
+  uubar_ttbarZg:
+    mg5_generate:
+    - generate u u~ > t t~ z g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 23
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbarZ+g
+    diagrams: 24
+    alphas_power: 4
+  uubar_ttbarZa:
+    mg5_generate:
+    - generate u u~ > t t~ z a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 23
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbarZ+a
+    diagrams: 20
+    alphas_power: 4
+  uubar_ttbarHg:
+    mg5_generate:
+    - generate u u~ > t t~ h g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 25
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbarH+g
+    diagrams: 12
+    alphas_power: 4
+  uubar_ttbarHa:
+    mg5_generate:
+    - generate u u~ > t t~ h a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 25
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: uubar_ttbarH+a
+    diagrams: 10
+    alphas_power: 4
+  uubar_bbbargg:
+    mg5_generate:
+    - generate u u~ > b b~ g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 21
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarg+g
+    diagrams: 84
+    alphas_power: 4
+  uubar_bbbarga:
+    mg5_generate:
+    - generate u u~ > b b~ g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 21
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarg+a
+    diagrams: 24
+    alphas_power: 4
+  uubar_bbbaraa:
+    mg5_generate:
+    - generate u u~ > b b~ a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 22
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbara+a
+    diagrams: 20
+    alphas_power: 4
+  uubar_bbbarZg:
+    mg5_generate:
+    - generate u u~ > b b~ z g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarZ+g
+    diagrams: 24
+    alphas_power: 4
+  uubar_bbbarZa:
+    mg5_generate:
+    - generate u u~ > b b~ z a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarZ+a
+    diagrams: 20
+    alphas_power: 4
+  uubar_bbbarHg:
+    mg5_generate:
+    - generate u u~ > b b~ h g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 25
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarH+g
+    diagrams: 12
+    alphas_power: 4
+  uubar_bbbarHa:
+    mg5_generate:
+    - generate u u~ > b b~ h a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 25
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_bbbarH+a
+    diagrams: 10
+    alphas_power: 4
+  uubar_Zaaa:
+    mg5_generate:
+    - generate u u~ > z a a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 22
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_Zaa+a
+    diagrams: 24
+  uubar_ZaZg:
+    mg5_generate:
+    - generate u u~ > z a z g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 23
+    - 21
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZaZ+g
+    diagrams: 24
+    alphas_power: 1
+  uubar_ZaZa:
+    mg5_generate:
+    - generate u u~ > z a z a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZaZ+a
+    diagrams: 24
+  uubar_ZaHg:
+    mg5_generate:
+    - generate u u~ > z a h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZaH+g
+    diagrams: 6
+    alphas_power: 1
+  uubar_ZaHa:
+    mg5_generate:
+    - generate u u~ > z a h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZaH+a
+    diagrams: 6
+  uubar_ZZgg:
+    mg5_generate:
+    - generate u u~ > z z g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 21
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZZg+g
+    diagrams: 30
+    alphas_power: 2
+  uubar_ZZZg:
+    mg5_generate:
+    - generate u u~ > z z z g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZZZ+g
+    diagrams: 30
+    alphas_power: 1
+  uubar_ZZZa:
+    mg5_generate:
+    - generate u u~ > z z z a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZZZ+a
+    diagrams: 30
+  uubar_ZZHg:
+    mg5_generate:
+    - generate u u~ > z z h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZZH+g
+    diagrams: 12
+    alphas_power: 1
+  uubar_ZZHa:
+    mg5_generate:
+    - generate u u~ > z z h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZZH+a
+    diagrams: 12
+  uubar_WpWmga:
+    mg5_generate:
+    - generate u u~ > w+ w- g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 21
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWmg+a
+    diagrams: 42
+    alphas_power: 1
+  uubar_WpWmaa:
+    mg5_generate:
+    - generate u u~ > w+ w- a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWma+a
+    diagrams: 92
+  uubar_WpWmZg:
+    mg5_generate:
+    - generate u u~ > w+ w- z g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    - 21
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWmZ+g
+    diagrams: 44
+    alphas_power: 1
+  uubar_WpWmZa:
+    mg5_generate:
+    - generate u u~ > w+ w- z a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWmZ+a
+    diagrams: 96
+  uubar_WpWmHg:
+    mg5_generate:
+    - generate u u~ > w+ w- h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWmH+g
+    diagrams: 16
+    alphas_power: 1
+  uubar_WpWmHa:
+    mg5_generate:
+    - generate u u~ > w+ w- h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_WpWmH+a
+    diagrams: 41
+  uubar_ZHgg:
+    mg5_generate:
+    - generate u u~ > z h g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 21
+    - 21
+    m_finals:
+    - 91.188
+    - 125.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZHg+g
+    diagrams: 8
+    alphas_power: 2
+  uubar_ZHHg:
+    mg5_generate:
+    - generate u u~ > z h h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZHH+g
+    diagrams: 8
+    alphas_power: 1
+  uubar_ZHHa:
+    mg5_generate:
+    - generate u u~ > z h h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 25
+    - 22
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uubar_ZHH+a
+    diagrams: 8
+  udbar_tbbargg:
+    mg5_generate:
+    - generate u d~ > t b~ g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 21
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarg+g
+    diagrams: 24
+    alphas_power: 2
+  udbar_tbbarga:
+    mg5_generate:
+    - generate u d~ > t b~ g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 21
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarg+a
+    diagrams: 24
+    alphas_power: 1
+  udbar_tbbaraa:
+    mg5_generate:
+    - generate u d~ > t b~ a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 22
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbara+a
+    diagrams: 31
+  udbar_tbbarZg:
+    mg5_generate:
+    - generate u d~ > t b~ z g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 23
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarZ+g
+    diagrams: 24
+    alphas_power: 1
+  udbar_tbbarZa:
+    mg5_generate:
+    - generate u d~ > t b~ z a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 23
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarZ+a
+    diagrams: 31
+  udbar_tbbarHg:
+    mg5_generate:
+    - generate u d~ > t b~ h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 25
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarH+g
+    diagrams: 14
+    alphas_power: 1
+  udbar_tbbarHa:
+    mg5_generate:
+    - generate u d~ > t b~ h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 25
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: udbar_tbbarH+a
+    diagrams: 18
+  udbar_WpZgg:
+    mg5_generate:
+    - generate u d~ > w+ z g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 21
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZg+g
+    diagrams: 38
+    alphas_power: 2
+  udbar_WpZga:
+    mg5_generate:
+    - generate u d~ > w+ z g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 21
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZg+a
+    diagrams: 42
+    alphas_power: 1
+  udbar_WpZaa:
+    mg5_generate:
+    - generate u d~ > w+ z a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZa+a
+    diagrams: 72
+  udbar_WpZZg:
+    mg5_generate:
+    - generate u d~ > w+ z z g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZZ+g
+    diagrams: 44
+    alphas_power: 1
+  udbar_WpZZa:
+    mg5_generate:
+    - generate u d~ > w+ z z a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZZ+a
+    diagrams: 76
+  udbar_WpZHg:
+    mg5_generate:
+    - generate u d~ > w+ z h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZH+g
+    diagrams: 18
+    alphas_power: 1
+  udbar_WpZHa:
+    mg5_generate:
+    - generate u d~ > w+ z h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 25
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpZH+a
+    diagrams: 35
+  udbar_Wpagg:
+    mg5_generate:
+    - generate u d~ > w+ a g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 21
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_Wpag+g
+    diagrams: 38
+    alphas_power: 2
+  udbar_Wpaga:
+    mg5_generate:
+    - generate u d~ > w+ a g a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 21
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_Wpag+a
+    diagrams: 42
+    alphas_power: 1
+  udbar_Wpaaa:
+    mg5_generate:
+    - generate u d~ > w+ a a a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_Wpaa+a
+    diagrams: 72
+  udbar_WpaHg:
+    mg5_generate:
+    - generate u d~ > w+ a h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpaH+g
+    diagrams: 10
+    alphas_power: 1
+  udbar_WpaHa:
+    mg5_generate:
+    - generate u d~ > w+ a h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 25
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpaH+a
+    diagrams: 22
+  udbar_WpHgg:
+    mg5_generate:
+    - generate u d~ > w+ h g g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 21
+    - 21
+    m_finals:
+    - 80.419
+    - 125.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpHg+g
+    diagrams: 8
+    alphas_power: 2
+  udbar_WpHHg:
+    mg5_generate:
+    - generate u d~ > w+ h h g
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 125.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpHH+g
+    diagrams: 8
+    alphas_power: 1
+  udbar_WpHHa:
+    mg5_generate:
+    - generate u d~ > w+ h h a
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 25
+    - 22
+    m_finals:
+    - 80.419
+    - 125.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: udbar_WpHH+a
+    diagrams: 18
+  uu_uugg:
+    mg5_generate:
+    - generate u u > u u g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uu_uug+g
+    diagrams: 168
+    alphas_power: 4
+  uu_uuga:
+    mg5_generate:
+    - generate u u > u u g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uu_uug+a
+    diagrams: 48
+    alphas_power: 4
+  uu_uuaa:
+    mg5_generate:
+    - generate u u > u u a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: uu_uua+a
+    diagrams: 40
+    alphas_power: 4
+  ud_udgg:
+    mg5_generate:
+    - generate u d > u d g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ud_udg+g
+    diagrams: 108
+    alphas_power: 4
+  ud_udga:
+    mg5_generate:
+    - generate u d > u d g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ud_udg+a
+    diagrams: 24
+    alphas_power: 4
+  ud_udaa:
+    mg5_generate:
+    - generate u d > u d a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ud_uda+a
+    diagrams: 20
+    alphas_power: 4
+  us_usgg:
+    mg5_generate:
+    - generate u s > u s g g QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: us_usg+g
+    diagrams: 84
+    alphas_power: 4
+  us_usga:
+    mg5_generate:
+    - generate u s > u s g a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: us_usg+a
+    diagrams: 24
+    alphas_power: 4
+  us_usaa:
+    mg5_generate:
+    - generate u s > u s a a QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: us_usa+a
+    diagrams: 20
+    alphas_power: 4
+  ee_vevebarHa:
+    mg5_generate:
+    - generate e+ e- > ve ve~ h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 12
+    - -12
+    - 25
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_vevebarH+a
+    diagrams: 6
+  ee_epemHa:
+    mg5_generate:
+    - generate e+ e- > e+ e- h a
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -11
+    - 11
+    - 25
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: ee_epemH+a
+    diagrams: 8
+  ee_uubaruubar:
+    mg5_generate:
+    - generate e+ e- > u u~ u u~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 2
+    - -2
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 16
+    alphas_power: 4
+  uubar_uubaruubar:
+    mg5_generate:
+    - generate u u~ > u u~ u u~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 2
+    - -2
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 186
+    alphas_power: 4
+  ee_uubarddbar:
+    mg5_generate:
+    - generate e+ e- > u u~ d d~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 1
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  ee_uubarbbbar:
+    mg5_generate:
+    - generate e+ e- > u u~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 5
+    - -5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  uubar_uubarbbbar:
+    mg5_generate:
+    - generate u u~ > u u~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 5
+    - -5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 62
+    alphas_power: 4
+  ee_uubarttbar:
+    mg5_generate:
+    - generate e+ e- > u u~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 6
+    - -6
+    m_finals:
+    - 0.0
+    - 0.0
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  uubar_uubarttbar:
+    mg5_generate:
+    - generate u u~ > u u~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 6
+    - -6
+    m_finals:
+    - 0.0
+    - 0.0
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 62
+    alphas_power: 4
+  ee_uubarmupmum:
+    mg5_generate:
+    - generate e+ e- > u u~ mu+ mu-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - -13
+    - 13
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 24
+  uubar_uubarmupmum:
+    mg5_generate:
+    - generate u u~ > u u~ mu+ mu- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - -13
+    - 13
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 16
+    alphas_power: 4
+  ee_uubartaptam:
+    mg5_generate:
+    - generate e+ e- > u u~ ta+ ta-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - -15
+    - 15
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 25
+  uubar_uubartaptam:
+    mg5_generate:
+    - generate u u~ > u u~ ta+ ta- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - -15
+    - 15
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 16
+    alphas_power: 4
+  ee_uubarvevebar:
+    mg5_generate:
+    - generate e+ e- > u u~ ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 2
+    - -2
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 19
+  uubar_uubarvevebar:
+    mg5_generate:
+    - generate u u~ > u u~ ve ve~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 8
+    alphas_power: 4
+  ee_ddbarddbar:
+    mg5_generate:
+    - generate e+ e- > d d~ d d~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 1
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 16
+    alphas_power: 4
+  uubar_ddbarddbar:
+    mg5_generate:
+    - generate u u~ > d d~ d d~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 1
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 78
+    alphas_power: 4
+  ee_ddbarbbbar:
+    mg5_generate:
+    - generate e+ e- > d d~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 5
+    - -5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  uubar_ddbarbbbar:
+    mg5_generate:
+    - generate u u~ > d d~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 5
+    - -5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 35
+    alphas_power: 4
+  ee_ddbarttbar:
+    mg5_generate:
+    - generate e+ e- > d d~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 6
+    - -6
+    m_finals:
+    - 0.0
+    - 0.0
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  uubar_ddbarttbar:
+    mg5_generate:
+    - generate u u~ > d d~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 6
+    - -6
+    m_finals:
+    - 0.0
+    - 0.0
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 35
+    alphas_power: 4
+  ee_ddbarmupmum:
+    mg5_generate:
+    - generate e+ e- > d d~ mu+ mu-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - -13
+    - 13
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 24
+  uubar_ddbarmupmum:
+    mg5_generate:
+    - generate u u~ > d d~ mu+ mu- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - -13
+    - 13
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 8
+    alphas_power: 4
+  ee_ddbartaptam:
+    mg5_generate:
+    - generate e+ e- > d d~ ta+ ta-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - -15
+    - 15
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 25
+  uubar_ddbartaptam:
+    mg5_generate:
+    - generate u u~ > d d~ ta+ ta- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - -15
+    - 15
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 8
+    alphas_power: 4
+  ee_ddbarvevebar:
+    mg5_generate:
+    - generate e+ e- > d d~ ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 19
+  uubar_ddbarvevebar:
+    mg5_generate:
+    - generate u u~ > d d~ ve ve~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 4
+    alphas_power: 4
+  ee_bbbarbbbar:
+    mg5_generate:
+    - generate e+ e- > b b~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 5
+    - -5
+    m_finals:
+    - 4.7
+    - 4.7
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 16
+    alphas_power: 4
+  uubar_bbbarbbbar:
+    mg5_generate:
+    - generate u u~ > b b~ b b~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 5
+    - -5
+    m_finals:
+    - 4.7
+    - 4.7
+    - 4.7
+    - 4.7
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 70
+    alphas_power: 4
+  ee_bbbarttbar:
+    mg5_generate:
+    - generate e+ e- > b b~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 6
+    - -6
+    m_finals:
+    - 4.7
+    - 4.7
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 8
+    alphas_power: 4
+  uubar_bbbarttbar:
+    mg5_generate:
+    - generate u u~ > b b~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 6
+    - -6
+    m_finals:
+    - 4.7
+    - 4.7
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 39
+    alphas_power: 4
+  ee_bbbarmupmum:
+    mg5_generate:
+    - generate e+ e- > b b~ mu+ mu-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - -13
+    - 13
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 25
+  uubar_bbbarmupmum:
+    mg5_generate:
+    - generate u u~ > b b~ mu+ mu- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - -13
+    - 13
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 8
+    alphas_power: 4
+  ee_bbbartaptam:
+    mg5_generate:
+    - generate e+ e- > b b~ ta+ ta-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - -15
+    - 15
+    m_finals:
+    - 4.7
+    - 4.7
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 34
+  uubar_bbbartaptam:
+    mg5_generate:
+    - generate u u~ > b b~ ta+ ta- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - -15
+    - 15
+    m_finals:
+    - 4.7
+    - 4.7
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 10
+    alphas_power: 4
+  ee_bbbarvevebar:
+    mg5_generate:
+    - generate e+ e- > b b~ ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 12
+    - -12
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 21
+  uubar_bbbarvevebar:
+    mg5_generate:
+    - generate u u~ > b b~ ve ve~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 12
+    - -12
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 4
+    alphas_power: 4
+  ee_ttbarttbar:
+    mg5_generate:
+    - generate e+ e- > t t~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 6
+    - -6
+    m_finals:
+    - 172.5
+    - 172.5
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 16
+    alphas_power: 4
+  uubar_ttbarttbar:
+    mg5_generate:
+    - generate u u~ > t t~ t t~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 6
+    - -6
+    m_finals:
+    - 172.5
+    - 172.5
+    - 172.5
+    - 172.5
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 70
+    alphas_power: 4
+  ee_ttbarmupmum:
+    mg5_generate:
+    - generate e+ e- > t t~ mu+ mu-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - -13
+    - 13
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 25
+  uubar_ttbarmupmum:
+    mg5_generate:
+    - generate u u~ > t t~ mu+ mu- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - -13
+    - 13
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 8
+    alphas_power: 4
+  ee_ttbartaptam:
+    mg5_generate:
+    - generate e+ e- > t t~ ta+ ta-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - -15
+    - 15
+    m_finals:
+    - 172.5
+    - 172.5
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 34
+  uubar_ttbartaptam:
+    mg5_generate:
+    - generate u u~ > t t~ ta+ ta- QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - -15
+    - 15
+    m_finals:
+    - 172.5
+    - 172.5
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 10
+    alphas_power: 4
+  ee_ttbarvevebar:
+    mg5_generate:
+    - generate e+ e- > t t~ ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 12
+    - -12
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion
+    diagrams: 21
+  uubar_ttbarvevebar:
+    mg5_generate:
+    - generate u u~ > t t~ ve ve~ QED<=2
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 12
+    - -12
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches:
+      MT: 172.5
+      ymt: 172.5
+    layer: 4
+    why: four-fermion, quark beams
+    diagrams: 4
+    alphas_power: 4
+  ee_mupmumvevebar:
+    mg5_generate:
+    - generate e+ e- > mu+ mu- ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -13
+    - 13
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 19
+  ee_taptamtaptam:
+    mg5_generate:
+    - generate e+ e- > ta+ ta- ta+ ta-
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -15
+    - 15
+    - -15
+    - 15
+    m_finals:
+    - 1.777
+    - 1.777
+    - 1.777
+    - 1.777
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 68
+  ee_taptamvevebar:
+    mg5_generate:
+    - generate e+ e- > ta+ ta- ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - -15
+    - 15
+    - 12
+    - -12
+    m_finals:
+    - 1.777
+    - 1.777
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 21
+  ee_vevebarvevebar:
+    mg5_generate:
+    - generate e+ e- > ve ve~ ve ve~
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 12
+    - -12
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: four-fermion
+    diagrams: 36
+  uubar_WpWmZZ:
+    mg5_generate:
+    - generate u u~ > w+ w- z z
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    - 23
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 109
+  uubar_WpWmWpWm:
+    mg5_generate:
+    - generate u u~ > w+ w- w+ w-
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 24
+    - -24
+    m_finals:
+    - 80.419
+    - 80.419
+    - 80.419
+    - 80.419
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 148
+  ee_ZZZZ:
+    mg5_generate:
+    - generate e+ e- > z z z z
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 23
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson
+    diagrams: 48
+  uubar_ZZZZ:
+    mg5_generate:
+    - generate u u~ > z z z z
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 48
+  ee_WpWmZH:
+    mg5_generate:
+    - generate e+ e- > w+ w- z h
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 24
+    - -24
+    - 23
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson
+    diagrams: 63
+  uubar_WpWmZH:
+    mg5_generate:
+    - generate u u~ > w+ w- z h
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 63
+  ee_ZZHH:
+    mg5_generate:
+    - generate e+ e- > z z h h
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 23
+    - 23
+    - 25
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson
+    diagrams: 20
+  uubar_ZZHH:
+    mg5_generate:
+    - generate u u~ > z z h h
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 20
+  ee_WpWmHH:
+    mg5_generate:
+    - generate e+ e- > w+ w- h h
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 24
+    - -24
+    - 25
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson
+    diagrams: 38
+  uubar_WpWmHH:
+    mg5_generate:
+    - generate u u~ > w+ w- h h
+    nfinal: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: multi-boson, quark beams
+    diagrams: 38
+  ee_vevebarZZ:
+    mg5_generate:
+    - generate e+ e- > ve ve~ z z
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 12
+    - -12
+    - 23
+    - 23
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    - 91.188
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: fusion
+    diagrams: 55
+  ee_vevebarZH:
+    mg5_generate:
+    - generate e+ e- > ve ve~ z h
+    nfinal: 4
+    pdg_ids:
+    - -11
+    - 11
+    - 12
+    - -12
+    - 23
+    - 25
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    - 125.0
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    param_card_patches: {}
+    layer: 4
+    why: fusion
+    diagrams: 19
+  uubar_ga_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ga
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ga
+  uubar_Za_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_Za
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_Za
+  uubar_ZZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZZ
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZZ
+  uubar_WW_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_WW
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    m_finals:
+    - 80.419
+    - 80.419
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_WW
+  uubar_ZH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZH
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZH
+  uubar_ttbar_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ttbar
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    m_finals:
+    - 172.5
+    - 172.5
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ttbar
+  uubar_bbbar_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_bbbar
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    m_finals:
+    - 4.7
+    - 4.7
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_bbbar
+  uubar_ddbar_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ddbar
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ddbar
+  udbar_udbar_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_udbar
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_udbar
+  udbar_enu_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_enu
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_enu
+  udbar_WZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WZ
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    m_finals:
+    - 80.419
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WZ
+  udbar_Wa_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_Wa
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_Wa
+  udbar_WH_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WH
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    m_finals:
+    - 80.419
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WH
+  udbar_Wg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_Wg
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_Wg
+  uu_uu_nlo:
+    kind: virt
+    virt: true
+    virt_base: uu_uu
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uu_uu
+  ud_ud_nlo:
+    kind: virt
+    virt: true
+    virt_base: ud_ud
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ud_ud
+  us_us_nlo:
+    kind: virt
+    virt: true
+    virt_base: us_us
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of us_us
+  ee_uua_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_uua
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 11
+    - -11
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_uua
+  ee_ttbarH_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_ttbarH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 11
+    - -11
+    - 6
+    - -6
+    - 25
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_ttbarH
+  uubar_Zgg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_Zgg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 21
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_Zgg
+  uubar_ggg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ggg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ggg
+  uubar_agg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_agg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_agg
+  uubar_uubarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_uubarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_uubarg
+  uubar_ttbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ttbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ttbarg
+  udbar_Wgg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_Wgg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 21
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_Wgg
+  udbar_enug_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_enug
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_enug
+  uubar_aa_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_aa
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_aa
+  dd_dd_nlo:
+    kind: virt
+    virt: true
+    virt_base: dd_dd
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of dd_dd
+  ds_ds_nlo:
+    kind: virt
+    virt: true
+    virt_base: ds_ds
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ds_ds
+  cs_cs_nlo:
+    kind: virt
+    virt: true
+    virt_base: cs_cs
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 3
+    pdg_ids:
+    - 4
+    - 3
+    - 4
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of cs_cs
+  ee_ssbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_ssbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 11
+    - -11
+    - 3
+    - -3
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_ssbarg
+  uubar_mumug_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_mumug
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - -13
+    - 13
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_mumug
+  ee_ddbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_ddbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_ddbara
+  ee_bbbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_bbbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_bbbara
+  ee_bbbarZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_bbbarZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_bbbarZ
+  ee_bbbarH_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_bbbarH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_bbbarH
+  ee_ttbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_ttbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_ttbara
+  ee_ttbarZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: ee_ttbarZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ee_ttbarZ
+  uubar_gaa_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_gaa
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_gaa
+  uubar_Zga_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_Zga
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_Zga
+  uubar_uubara_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_uubara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_uubara
+  uubar_ddbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ddbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ddbarg
+  uubar_ddbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ddbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ddbara
+  udbar_udbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_udbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_udbarg
+  udbar_udbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_udbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_udbara
+  uubar_ttbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ttbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ttbara
+  uubar_ttbarZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ttbarZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ttbarZ
+  uubar_ttbarH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ttbarH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 25
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ttbarH
+  uubar_bbbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_bbbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_bbbarg
+  uubar_bbbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_bbbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_bbbara
+  uubar_bbbarZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_bbbarZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_bbbarZ
+  uubar_bbbarH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_bbbarH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_bbbarH
+  uubar_Zaa_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_Zaa
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_Zaa
+  uubar_ZaZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZaZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 23
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZaZ
+  uubar_ZaH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZaH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 25
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZaH
+  uubar_ZZg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZZg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZZg
+  uubar_ZZZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZZZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZZZ
+  uubar_ZZH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZZH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZZH
+  uubar_WpWmg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_WpWmg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 21
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_WpWmg
+  uubar_WpWma_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_WpWma
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_WpWma
+  uubar_WpWmZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_WpWmZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_WpWmZ
+  uubar_WpWmH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_WpWmH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_WpWmH
+  uubar_ZHg_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZHg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 125.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZHg
+  uubar_ZHH_nlo:
+    kind: virt
+    virt: true
+    virt_base: uubar_ZHH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 25
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uubar_ZHH
+  udbar_tbbarg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_tbbarg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_tbbarg
+  udbar_tbbara_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_tbbara
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_tbbara
+  udbar_tbbarZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_tbbarZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 23
+    m_finals:
+    - 172.5
+    - 4.7
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_tbbarZ
+  udbar_tbbarH_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_tbbarH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 25
+    m_finals:
+    - 172.5
+    - 4.7
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_tbbarH
+  udbar_WpZg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpZg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpZg
+  udbar_WpZa_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpZa
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpZa
+  udbar_WpZZ_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpZZ
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpZZ
+  udbar_WpZH_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpZH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 25
+    m_finals:
+    - 80.419
+    - 91.188
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpZH
+  udbar_Wpag_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_Wpag
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_Wpag
+  udbar_Wpaa_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_Wpaa
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_Wpaa
+  udbar_WpaH_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpaH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 25
+    m_finals:
+    - 80.419
+    - 0.0
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpaH
+  udbar_WpHg_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpHg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 2
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 125.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpHg
+  udbar_WpHH_nlo:
+    kind: virt
+    virt: true
+    virt_base: udbar_WpHH
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 1
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 25
+    m_finals:
+    - 80.419
+    - 125.0
+    - 125.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of udbar_WpHH
+  uu_uug_nlo:
+    kind: virt
+    virt: true
+    virt_base: uu_uug
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uu_uug
+  uu_uua_nlo:
+    kind: virt
+    virt: true
+    virt_base: uu_uua
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of uu_uua
+  ud_udg_nlo:
+    kind: virt
+    virt: true
+    virt_base: ud_udg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ud_udg
+  ud_uda_nlo:
+    kind: virt
+    virt: true
+    virt_base: ud_uda
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of ud_uda
+  us_usg_nlo:
+    kind: virt
+    virt: true
+    virt_base: us_usg
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of us_usg
+  us_usa_nlo:
+    kind: virt
+    virt: true
+    virt_base: us_usa
+    nfinal: 3
+    n_loops: 1
+    alphas_power: 4
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    param_card_patches: {}
+    layer: nlo
+    why: one-loop QCD of us_usa
+  uubar_Ha_loop:
+    kind: virt
+    virt: true
+    virt_base: uubar_Ha
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 0
+    loopind: true
+    order: &id003
+    - 0
+    - 1
+    - 0
+    - 4
+    pdg_ids: &id001
+    - 2
+    - -2
+    - 25
+    - 22
+    m_finals: &id002
+    - 125.0
+    - 0.0
+    param_card_patches: {}
+    layer: loop
+    why: loop-induced candidate
+  uubar_HH_loop:
+    kind: virt
+    virt: true
+    virt_base: uubar_HH
+    nfinal: 2
+    n_loops: 1
+    alphas_power: 0
+    loopind: true
+    order: &id006
+    - 0
+    - 1
+    - 0
+    - 4
+    pdg_ids: &id004
+    - 2
+    - -2
+    - 25
+    - 25
+    m_finals: &id005
+    - 125.0
+    - 125.0
+    param_card_patches: {}
+    layer: loop
+    why: loop-induced candidate
+virt:
+  uubar_ga:
+    mg5: generate u u~ > g a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+  uubar_Za:
+    mg5: generate u u~ > z a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+  uubar_ZZ:
+    mg5: generate u u~ > z z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+  uubar_WW:
+    mg5: generate u u~ > w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    m_finals:
+    - 80.419
+    - 80.419
+  uubar_ZH:
+    mg5: generate u u~ > z h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 125.0
+  uubar_ttbar:
+    mg5: generate u u~ > t t~ QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    m_finals:
+    - 172.5
+    - 172.5
+  uubar_bbbar:
+    mg5: generate u u~ > b b~ QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    m_finals:
+    - 4.7
+    - 4.7
+  uubar_ddbar:
+    mg5: generate u u~ > d d~ QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+  udbar_udbar:
+    mg5: generate u d~ > u d~ QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    m_finals:
+    - 0.0
+    - 0.0
+  udbar_enu:
+    mg5: generate u d~ > e+ ve [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    m_finals:
+    - 0.0
+    - 0.0
+  udbar_WZ:
+    mg5: generate u d~ > w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    m_finals:
+    - 80.419
+    - 91.188
+  udbar_Wa:
+    mg5: generate u d~ > w+ a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+  udbar_WH:
+    mg5: generate u d~ > w+ h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    m_finals:
+    - 80.419
+    - 125.0
+  udbar_Wg:
+    mg5: generate u d~ > w+ g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+  uu_uu:
+    mg5: generate u u > u u QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    m_finals:
+    - 0.0
+    - 0.0
+  ud_ud:
+    mg5: generate u d > u d QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    m_finals:
+    - 0.0
+    - 0.0
+  us_us:
+    mg5: generate u s > u s QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+  ee_uua:
+    mg5: generate e+ e- > u u~ a [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  ee_ttbarH:
+    mg5: generate e+ e- > t t~ h [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 6
+    - -6
+    - 25
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+  uubar_Zgg:
+    mg5: generate u u~ > z g g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 21
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+  uubar_ggg:
+    mg5: generate u u~ > g g g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_agg:
+    mg5: generate u u~ > a g g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_uubarg:
+    mg5: generate u u~ > u u~ g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_ttbarg:
+    mg5: generate u u~ > t t~ g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 21
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+  udbar_Wgg:
+    mg5: generate u d~ > w+ g g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 21
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+  udbar_enug:
+    mg5: generate u d~ > e+ ve g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_aa:
+    mg5: generate u u~ > a a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+  dd_dd:
+    mg5: generate d d > d d QED<=2 [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    m_finals:
+    - 0.0
+    - 0.0
+  ds_ds:
+    mg5: generate d s > d s QED<=2 [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+  cs_cs:
+    mg5: generate c s > c s QED<=2 [virt=QCD]
+    pdg_ids:
+    - 4
+    - 3
+    - 4
+    - 3
+    m_finals:
+    - 0.0
+    - 0.0
+  ee_ssbarg:
+    mg5: generate e+ e- > s s~ g [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 3
+    - -3
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_mumug:
+    mg5: generate u u~ > mu+ mu- g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -13
+    - 13
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  ee_ddbara:
+    mg5: generate e+ e- > d d~ a [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  ee_bbbara:
+    mg5: generate e+ e- > b b~ a [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+  ee_bbbarZ:
+    mg5: generate e+ e- > b b~ z [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+  ee_bbbarH:
+    mg5: generate e+ e- > b b~ h [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+  ee_ttbara:
+    mg5: generate e+ e- > t t~ a [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+  ee_ttbarZ:
+    mg5: generate e+ e- > t t~ z [virt=QCD]
+    pdg_ids:
+    - -11
+    - 11
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+  uubar_gaa:
+    mg5: generate u u~ > g a a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_Zga:
+    mg5: generate u u~ > z g a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 21
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+  uubar_uubara:
+    mg5: generate u u~ > u u~ a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_ddbarg:
+    mg5: generate u u~ > d d~ g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_ddbara:
+    mg5: generate u u~ > d d~ a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  udbar_udbarg:
+    mg5: generate u d~ > u d~ g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  udbar_udbara:
+    mg5: generate u d~ > u d~ a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 2
+    - -1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_ttbara:
+    mg5: generate u u~ > t t~ a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 22
+    m_finals:
+    - 172.5
+    - 172.5
+    - 0.0
+  uubar_ttbarZ:
+    mg5: generate u u~ > t t~ z QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 23
+    m_finals:
+    - 172.5
+    - 172.5
+    - 91.188
+  uubar_ttbarH:
+    mg5: generate u u~ > t t~ h QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 6
+    - -6
+    - 25
+    m_finals:
+    - 172.5
+    - 172.5
+    - 125.0
+  uubar_bbbarg:
+    mg5: generate u u~ > b b~ g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 21
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+  uubar_bbbara:
+    mg5: generate u u~ > b b~ a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+  uubar_bbbarZ:
+    mg5: generate u u~ > b b~ z QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+  uubar_bbbarH:
+    mg5: generate u u~ > b b~ h QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 25
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+  uubar_Zaa:
+    mg5: generate u u~ > z a a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 22
+    m_finals:
+    - 91.188
+    - 0.0
+    - 0.0
+  uubar_ZaZ:
+    mg5: generate u u~ > z a z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 23
+    m_finals:
+    - 91.188
+    - 0.0
+    - 91.188
+  uubar_ZaH:
+    mg5: generate u u~ > z a h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 22
+    - 25
+    m_finals:
+    - 91.188
+    - 0.0
+    - 125.0
+  uubar_ZZg:
+    mg5: generate u u~ > z z g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 21
+    m_finals:
+    - 91.188
+    - 91.188
+    - 0.0
+  uubar_ZZZ:
+    mg5: generate u u~ > z z z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+  uubar_ZZH:
+    mg5: generate u u~ > z z h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 25
+    m_finals:
+    - 91.188
+    - 91.188
+    - 125.0
+  uubar_WpWmg:
+    mg5: generate u u~ > w+ w- g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 21
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+  uubar_WpWma:
+    mg5: generate u u~ > w+ w- a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 22
+    m_finals:
+    - 80.419
+    - 80.419
+    - 0.0
+  uubar_WpWmZ:
+    mg5: generate u u~ > w+ w- z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+  uubar_WpWmH:
+    mg5: generate u u~ > w+ w- h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 25
+    m_finals:
+    - 80.419
+    - 80.419
+    - 125.0
+  uubar_ZHg:
+    mg5: generate u u~ > z h g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 91.188
+    - 125.0
+    - 0.0
+  uubar_ZHH:
+    mg5: generate u u~ > z h h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 25
+    - 25
+    m_finals:
+    - 91.188
+    - 125.0
+    - 125.0
+  udbar_tbbarg:
+    mg5: generate u d~ > t b~ g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 21
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+  udbar_tbbara:
+    mg5: generate u d~ > t b~ a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 22
+    m_finals:
+    - 172.5
+    - 4.7
+    - 0.0
+  udbar_tbbarZ:
+    mg5: generate u d~ > t b~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 23
+    m_finals:
+    - 172.5
+    - 4.7
+    - 91.188
+  udbar_tbbarH:
+    mg5: generate u d~ > t b~ h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 6
+    - -5
+    - 25
+    m_finals:
+    - 172.5
+    - 4.7
+    - 125.0
+  udbar_WpZg:
+    mg5: generate u d~ > w+ z g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 21
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+  udbar_WpZa:
+    mg5: generate u d~ > w+ z a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 22
+    m_finals:
+    - 80.419
+    - 91.188
+    - 0.0
+  udbar_WpZZ:
+    mg5: generate u d~ > w+ z z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+  udbar_WpZH:
+    mg5: generate u d~ > w+ z h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 25
+    m_finals:
+    - 80.419
+    - 91.188
+    - 125.0
+  udbar_Wpag:
+    mg5: generate u d~ > w+ a g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 21
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+  udbar_Wpaa:
+    mg5: generate u d~ > w+ a a [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 22
+    m_finals:
+    - 80.419
+    - 0.0
+    - 0.0
+  udbar_WpaH:
+    mg5: generate u d~ > w+ a h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 22
+    - 25
+    m_finals:
+    - 80.419
+    - 0.0
+    - 125.0
+  udbar_WpHg:
+    mg5: generate u d~ > w+ h g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 21
+    m_finals:
+    - 80.419
+    - 125.0
+    - 0.0
+  udbar_WpHH:
+    mg5: generate u d~ > w+ h h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 25
+    - 25
+    m_finals:
+    - 80.419
+    - 125.0
+    - 125.0
+  uu_uug:
+    mg5: generate u u > u u g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uu_uua:
+    mg5: generate u u > u u a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  ud_udg:
+    mg5: generate u d > u d g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  ud_uda:
+    mg5: generate u d > u d a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 2
+    - 1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  us_usg:
+    mg5: generate u s > u s g QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  us_usa:
+    mg5: generate u s > u s a QED<=2 [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 2
+    - 3
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+  uubar_Ha:
+    mg5: generate u u~ > h a [sqrvirt=QED]
+    model: loop_qcd_qed_sm
+    loopind: true
+    pdg_ids: *id001
+    m_finals: *id002
+    order: *id003
+    certified: false
+  uubar_HH:
+    mg5: generate u u~ > h h [sqrvirt=QED]
+    model: loop_qcd_qed_sm
+    loopind: true
+    pdg_ids: *id004
+    m_finals: *id005
+    order: *id006
+    certified: false

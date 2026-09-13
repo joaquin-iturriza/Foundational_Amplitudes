@@ -1,0 +1,24 @@
+# catalog_v2 hold-outs (= v1) -- processes that never enter a base training set. Each is a
+# relabel or crossing of a training process (same |M|^2 up to constants that the
+# per-dataset standardization removes), so zero-shot on it tests exactly one symmetry.
+# Same windows and pools as the training file so fine-tune-size curves are comparable.
+
+processes:
+  # flavour / generation relabels (masslessness duplicates)
+  - {name: ee_ss,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # d<->s of ee_ddbar
+  - {name: ee_cc,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # u<->c of ee_uu
+  - {name: ee_nutau,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # nu_mu<->nu_tau of ee_numu
+  - {name: ee_ssbarg,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # d<->s of ee_ddbarg
+  # crossing symmetry
+  - {name: uubar_mumu,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # crossing of ee_uu
+  - {name: uubar_aa,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # crossing of ee_aa
+  - {name: uubar_mumug,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # crossing of ee_uug
+  # light-flavour combinatorics of the t-channel family
+  - {name: dd_dd,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of uu_uu
+  - {name: ds_ds,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of us_us
+  - {name: cs_cs,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of us_us
+  # multiplicity / order relabels and crossings
+  - {name: ee_ddbargg,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # relabel of ee_uugg
+  - {name: ee_ss_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # relabel of ee_dd_nlo
+  - {name: ee_cc_nlo,         sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # relabel of ee_uu_nlo
+  - {name: uubar_mumu_nlo,    sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}   # crossing of ee_uu_nlo

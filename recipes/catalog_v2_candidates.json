@@ -1,0 +1,4822 @@
+[
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "mu+",
+   "mu-",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > mu+ mu- a",
+  "name": "ee_mupmuma",
+  "why": "ee_mumu+a",
+  "existing": "ee_mumua"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "ta+",
+   "ta-",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ta+ ta- a",
+  "name": "ee_taptama",
+  "why": "ee_tautau+a",
+  "existing": "ee_tautaua"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ g",
+  "name": "ee_uubarg",
+  "why": "ee_uu+g",
+  "existing": "ee_uug"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ a",
+  "name": "ee_uubara",
+  "why": "ee_uu+a",
+  "existing": "ee_uua"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ g",
+  "name": "ee_ddbarg",
+  "why": "ee_ddbar+g",
+  "existing": "ee_ddbarg"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ a",
+  "name": "ee_ddbara",
+  "why": "ee_ddbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ g",
+  "name": "ee_bbbarg",
+  "why": "ee_bbbar+g",
+  "existing": "ee_bbbarg"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ a",
+  "name": "ee_bbbara",
+  "why": "ee_bbbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ z",
+  "name": "ee_bbbarZ",
+  "why": "ee_bbbar+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 9,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ h",
+  "name": "ee_bbbarH",
+  "why": "ee_bbbar+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 5,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ g",
+  "name": "ee_ttbarg",
+  "why": "ee_ttbar+g",
+  "existing": "ee_ttbarg"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ a",
+  "name": "ee_ttbara",
+  "why": "ee_ttbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ z",
+  "name": "ee_ttbarZ",
+  "why": "ee_ttbar+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 9,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ h",
+  "name": "ee_ttbarH",
+  "why": "ee_ttbar+h",
+  "existing": "ee_ttbarH"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "vm",
+   "vm~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > vm vm~ a",
+  "name": "ee_vmvmbara",
+  "why": "ee_numu+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ a",
+  "name": "ee_vevebara",
+  "why": "ee_nnbar+a",
+  "existing": "ee_nnbara"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a a",
+  "name": "ee_aaa",
+  "why": "ee_aa+a",
+  "existing": "ee_aaa"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a z",
+  "name": "ee_aaZ",
+  "why": "ee_aa+z",
+  "existing": "ee_Zaa"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a h",
+  "name": "ee_aaH",
+  "why": "ee_aa+h",
+  "existing": null,
+  "exists": false,
+  "diagrams": 0,
+  "weighted": null,
+  "error": "NoDiagramException : No amplitudes generated from process Process: e+ e- > a a h WEIGHTED=6 @1. Please enter a valid process\u001b[0m"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "a",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z a z",
+  "name": "ee_ZaZ",
+  "why": "ee_Za+z",
+  "existing": "ee_ZZa"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "a",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z a h",
+  "name": "ee_ZaH",
+  "why": "ee_Za+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z z",
+  "name": "ee_ZZZ",
+  "why": "ee_ZZ+z",
+  "existing": "ee_ZZZ"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z h",
+  "name": "ee_ZZH",
+  "why": "ee_ZZ+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "e+",
+   "e-",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > e+ e- a",
+  "name": "ee_epema",
+  "why": "ee_bhabha+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- a",
+  "name": "ee_WpWma",
+  "why": "ee_WW+a",
+  "existing": "ee_WWa"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- z",
+  "name": "ee_WpWmZ",
+  "why": "ee_WW+z",
+  "existing": "ee_wwz"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- h",
+  "name": "ee_WpWmH",
+  "why": "ee_WW+h",
+  "existing": "ee_WWH"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z h h",
+  "name": "ee_ZHH",
+  "why": "ee_ZH+h",
+  "existing": "ee_ZHH"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g g g",
+  "name": "uubar_ggg",
+  "why": "uubar_gg+g",
+  "existing": "uubar_ggg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g g a",
+  "name": "uubar_gga",
+  "why": "uubar_gg+a",
+  "existing": "uubar_agg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g a a",
+  "name": "uubar_gaa",
+  "why": "uubar_ga+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z g g",
+  "name": "uubar_Zgg",
+  "why": "uubar_Zg+g",
+  "existing": "uubar_Zgg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z g a",
+  "name": "uubar_Zga",
+  "why": "uubar_Zg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ g QED<=2",
+  "name": "uubar_uubarg",
+  "why": "uubar_uubar+g",
+  "existing": "uubar_uubarg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ a QED<=2",
+  "name": "uubar_uubara",
+  "why": "uubar_uubar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ g QED<=2",
+  "name": "uubar_ddbarg",
+  "why": "uubar_ddbar+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 17,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ a QED<=2",
+  "name": "uubar_ddbara",
+  "why": "uubar_ddbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "u",
+   "d~",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d~ > u d~ g QED<=2",
+  "name": "udbar_udbarg",
+  "why": "udbar_udbar+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 17,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "u",
+   "d~",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d~ > u d~ a QED<=2",
+  "name": "udbar_udbara",
+  "why": "udbar_udbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ g QED<=2",
+  "name": "uubar_ttbarg",
+  "why": "uubar_ttbar+g",
+  "existing": "uubar_ttbarg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ a QED<=2",
+  "name": "uubar_ttbara",
+  "why": "uubar_ttbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "z"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ z QED<=2",
+  "name": "uubar_ttbarZ",
+  "why": "uubar_ttbar+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "h"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ h QED<=2",
+  "name": "uubar_ttbarH",
+  "why": "uubar_ttbar+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ g QED<=2",
+  "name": "uubar_bbbarg",
+  "why": "uubar_bbbar+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 13,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ a QED<=2",
+  "name": "uubar_bbbara",
+  "why": "uubar_bbbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "z"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ z QED<=2",
+  "name": "uubar_bbbarZ",
+  "why": "uubar_bbbar+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "h"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ h QED<=2",
+  "name": "uubar_bbbarH",
+  "why": "uubar_bbbar+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a a",
+  "name": "uubar_Zaa",
+  "why": "uubar_Za+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a z",
+  "name": "uubar_ZaZ",
+  "why": "uubar_Za+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a h",
+  "name": "uubar_ZaH",
+  "why": "uubar_Za+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z g",
+  "name": "uubar_ZZg",
+  "why": "uubar_ZZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z z",
+  "name": "uubar_ZZZ",
+  "why": "uubar_ZZ+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 9,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z h",
+  "name": "uubar_ZZH",
+  "why": "uubar_ZZ+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- g",
+  "name": "uubar_WpWmg",
+  "why": "uubar_WW+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 7,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- a",
+  "name": "uubar_WpWma",
+  "why": "uubar_WW+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 15,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- z",
+  "name": "uubar_WpWmZ",
+  "why": "uubar_WW+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- h",
+  "name": "uubar_WpWmH",
+  "why": "uubar_WW+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 7,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z h g",
+  "name": "uubar_ZHg",
+  "why": "uubar_ZH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z h h",
+  "name": "uubar_ZHH",
+  "why": "uubar_ZH+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ g",
+  "name": "udbar_tbbarg",
+  "why": "udbar_tbbar+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ a",
+  "name": "udbar_tbbara",
+  "why": "udbar_tbbar+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 5,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ z",
+  "name": "udbar_tbbarZ",
+  "why": "udbar_tbbar+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 5,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ h",
+  "name": "udbar_tbbarH",
+  "why": "udbar_tbbar+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 3,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z g",
+  "name": "udbar_WpZg",
+  "why": "udbar_WZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z a",
+  "name": "udbar_WpZa",
+  "why": "udbar_WZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 13,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z z",
+  "name": "udbar_WpZZ",
+  "why": "udbar_WZ+z",
+  "existing": null,
+  "exists": true,
+  "diagrams": 14,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z h",
+  "name": "udbar_WpZH",
+  "why": "udbar_WZ+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 7,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a g",
+  "name": "udbar_Wpag",
+  "why": "udbar_Wa+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a a",
+  "name": "udbar_Wpaa",
+  "why": "udbar_Wa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 13,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a h",
+  "name": "udbar_WpaH",
+  "why": "udbar_Wa+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ h g",
+  "name": "udbar_WpHg",
+  "why": "udbar_WH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 2,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ h h",
+  "name": "udbar_WpHH",
+  "why": "udbar_WH+h",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ g g",
+  "name": "udbar_Wpgg",
+  "why": "udbar_Wg+g",
+  "existing": "udbar_Wgg"
+ },
+ {
+  "layer": 3,
+  "beams": "u u",
+  "finals": [
+   "u",
+   "u",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u > u u g QED<=2",
+  "name": "uu_uug",
+  "why": "uu_uu+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 26,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u u",
+  "finals": [
+   "u",
+   "u",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u > u u a QED<=2",
+  "name": "uu_uua",
+  "why": "uu_uu+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d",
+  "finals": [
+   "u",
+   "d",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d > u d g QED<=2",
+  "name": "ud_udg",
+  "why": "ud_ud+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 17,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u d",
+  "finals": [
+   "u",
+   "d",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d > u d a QED<=2",
+  "name": "ud_uda",
+  "why": "ud_ud+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u s",
+  "finals": [
+   "u",
+   "s",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u s > u s g QED<=2",
+  "name": "us_usg",
+  "why": "us_us+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 13,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "u s",
+  "finals": [
+   "u",
+   "s",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u s > u s a QED<=2",
+  "name": "us_usa",
+  "why": "us_us+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ h",
+  "name": "ee_vevebarH",
+  "why": "v1 explicit",
+  "existing": "ee_nnbarH"
+ },
+ {
+  "layer": 3,
+  "beams": "e+ e-",
+  "finals": [
+   "e+",
+   "e-",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > e+ e- h",
+  "name": "ee_epemH",
+  "why": "v1 explicit",
+  "existing": "ee_eeH"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "mu+",
+   "mu-",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > mu+ mu- a a",
+  "name": "ee_mupmumaa",
+  "why": "ee_mupmuma+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ta+",
+   "ta-",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ta+ ta- a a",
+  "name": "ee_taptamaa",
+  "why": "ee_taptama+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ g g",
+  "name": "ee_uubargg",
+  "why": "ee_uubarg+g",
+  "existing": "ee_uugg"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ g a",
+  "name": "ee_uubarga",
+  "why": "ee_uubarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ a a",
+  "name": "ee_uubaraa",
+  "why": "ee_uubara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ g g",
+  "name": "ee_ddbargg",
+  "why": "ee_ddbarg+g",
+  "existing": "ee_ddbargg"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ g a",
+  "name": "ee_ddbarga",
+  "why": "ee_ddbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ a a",
+  "name": "ee_ddbaraa",
+  "why": "ee_ddbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ g g",
+  "name": "ee_bbbargg",
+  "why": "ee_bbbarg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ g a",
+  "name": "ee_bbbarga",
+  "why": "ee_bbbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ a a",
+  "name": "ee_bbbaraa",
+  "why": "ee_bbbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ z g",
+  "name": "ee_bbbarZg",
+  "why": "ee_bbbarZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 22,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ z a",
+  "name": "ee_bbbarZa",
+  "why": "ee_bbbarZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 44,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ h g",
+  "name": "ee_bbbarHg",
+  "why": "ee_bbbarH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 14,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ h a",
+  "name": "ee_bbbarHa",
+  "why": "ee_bbbarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ g g",
+  "name": "ee_ttbargg",
+  "why": "ee_ttbarg+g",
+  "existing": "ee_ttbargg"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ g a",
+  "name": "ee_ttbarga",
+  "why": "ee_ttbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ a a",
+  "name": "ee_ttbaraa",
+  "why": "ee_ttbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ z g",
+  "name": "ee_ttbarZg",
+  "why": "ee_ttbarZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 22,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ z a",
+  "name": "ee_ttbarZa",
+  "why": "ee_ttbarZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 44,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ h g",
+  "name": "ee_ttbarHg",
+  "why": "ee_ttbarH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 14,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ h a",
+  "name": "ee_ttbarHa",
+  "why": "ee_ttbarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "vm",
+   "vm~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > vm vm~ a a",
+  "name": "ee_vmvmbaraa",
+  "why": "ee_vmvmbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ a a",
+  "name": "ee_vevebaraa",
+  "why": "ee_vevebara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 19,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a a a",
+  "name": "ee_aaaa",
+  "why": "ee_aaa+a",
+  "existing": "ee_aaaa"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a z a",
+  "name": "ee_aaZa",
+  "why": "ee_aaZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "a",
+   "a",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > a a h a",
+  "name": "ee_aaHa",
+  "why": "ee_aaH+a",
+  "existing": null,
+  "exists": false,
+  "diagrams": 0,
+  "weighted": null,
+  "error": "NoDiagramException : No amplitudes generated from process Process: e+ e- > a a h a WEIGHTED=8 @1. Please enter a valid process\u001b[0m"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "a",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z a z a",
+  "name": "ee_ZaZa",
+  "why": "ee_ZaZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "a",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z a h a",
+  "name": "ee_ZaHa",
+  "why": "ee_ZaH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z z a",
+  "name": "ee_ZZZa",
+  "why": "ee_ZZZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z h a",
+  "name": "ee_ZZHa",
+  "why": "ee_ZZH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 12,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "e+",
+   "e-",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > e+ e- a a",
+  "name": "ee_epemaa",
+  "why": "ee_epema+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 80,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- a a",
+  "name": "ee_WpWmaa",
+  "why": "ee_WpWma+a",
+  "existing": "ee_WWaa"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- z a",
+  "name": "ee_WpWmZa",
+  "why": "ee_WpWmZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 90,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- h a",
+  "name": "ee_WpWmHa",
+  "why": "ee_WpWmH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 39,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "h",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z h h a",
+  "name": "ee_ZHHa",
+  "why": "ee_ZHH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "g",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g g g g",
+  "name": "uubar_gggg",
+  "why": "uubar_ggg+g",
+  "existing": "uubar_gggg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "g",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g g g a",
+  "name": "uubar_ggga",
+  "why": "uubar_ggg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 50,
+  "weighted": 5,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "g",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g g a a",
+  "name": "uubar_ggaa",
+  "why": "uubar_gga+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "g",
+   "a",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > g a a a",
+  "name": "uubar_gaaa",
+  "why": "uubar_gaa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "g",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z g g g",
+  "name": "uubar_Zggg",
+  "why": "uubar_Zgg+g",
+  "existing": "uubar_Zggg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "g",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z g g a",
+  "name": "uubar_Zgga",
+  "why": "uubar_Zgg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "g",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z g a a",
+  "name": "uubar_Zgaa",
+  "why": "uubar_Zga+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ g g QED<=2",
+  "name": "uubar_uubargg",
+  "why": "uubar_uubarg+g",
+  "existing": "uubar_uubargg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ g a QED<=2",
+  "name": "uubar_uubarga",
+  "why": "uubar_uubarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 48,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ a a QED<=2",
+  "name": "uubar_uubaraa",
+  "why": "uubar_uubara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ g g QED<=2",
+  "name": "uubar_ddbargg",
+  "why": "uubar_ddbarg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 108,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ g a QED<=2",
+  "name": "uubar_ddbarga",
+  "why": "uubar_ddbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ a a QED<=2",
+  "name": "uubar_ddbaraa",
+  "why": "uubar_ddbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "u",
+   "d~",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d~ > u d~ g g QED<=2",
+  "name": "udbar_udbargg",
+  "why": "udbar_udbarg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 108,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "u",
+   "d~",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d~ > u d~ g a QED<=2",
+  "name": "udbar_udbarga",
+  "why": "udbar_udbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "u",
+   "d~",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d~ > u d~ a a QED<=2",
+  "name": "udbar_udbaraa",
+  "why": "udbar_udbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ g g QED<=2",
+  "name": "uubar_ttbargg",
+  "why": "uubar_ttbarg+g",
+  "existing": "uubar_ttbargg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ g a QED<=2",
+  "name": "uubar_ttbarga",
+  "why": "uubar_ttbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ a a QED<=2",
+  "name": "uubar_ttbaraa",
+  "why": "uubar_ttbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "z",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ z g QED<=2",
+  "name": "uubar_ttbarZg",
+  "why": "uubar_ttbarZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "z",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ z a QED<=2",
+  "name": "uubar_ttbarZa",
+  "why": "uubar_ttbarZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "h",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ h g QED<=2",
+  "name": "uubar_ttbarHg",
+  "why": "uubar_ttbarH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 12,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "h",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ h a QED<=2",
+  "name": "uubar_ttbarHa",
+  "why": "uubar_ttbarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 10,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ g g QED<=2",
+  "name": "uubar_bbbargg",
+  "why": "uubar_bbbarg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 84,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ g a QED<=2",
+  "name": "uubar_bbbarga",
+  "why": "uubar_bbbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ a a QED<=2",
+  "name": "uubar_bbbaraa",
+  "why": "uubar_bbbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "z",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ z g QED<=2",
+  "name": "uubar_bbbarZg",
+  "why": "uubar_bbbarZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "z",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ z a QED<=2",
+  "name": "uubar_bbbarZa",
+  "why": "uubar_bbbarZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "h",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ h g QED<=2",
+  "name": "uubar_bbbarHg",
+  "why": "uubar_bbbarH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 12,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "h",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ h a QED<=2",
+  "name": "uubar_bbbarHa",
+  "why": "uubar_bbbarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 10,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a a a",
+  "name": "uubar_Zaaa",
+  "why": "uubar_Zaa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a z g",
+  "name": "uubar_ZaZg",
+  "why": "uubar_ZaZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a z a",
+  "name": "uubar_ZaZa",
+  "why": "uubar_ZaZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a h g",
+  "name": "uubar_ZaHg",
+  "why": "uubar_ZaH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "a",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z a h a",
+  "name": "uubar_ZaHa",
+  "why": "uubar_ZaH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z g g",
+  "name": "uubar_ZZgg",
+  "why": "uubar_ZZg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z z g",
+  "name": "uubar_ZZZg",
+  "why": "uubar_ZZZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z z a",
+  "name": "uubar_ZZZa",
+  "why": "uubar_ZZZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 30,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z h g",
+  "name": "uubar_ZZHg",
+  "why": "uubar_ZZH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 12,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z h a",
+  "name": "uubar_ZZHa",
+  "why": "uubar_ZZH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 12,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- g g",
+  "name": "uubar_WpWmgg",
+  "why": "uubar_WpWmg+g",
+  "existing": "uubar_WWgg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- g a",
+  "name": "uubar_WpWmga",
+  "why": "uubar_WpWmg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 42,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- a a",
+  "name": "uubar_WpWmaa",
+  "why": "uubar_WpWma+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 92,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- z g",
+  "name": "uubar_WpWmZg",
+  "why": "uubar_WpWmZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 44,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- z a",
+  "name": "uubar_WpWmZa",
+  "why": "uubar_WpWmZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 96,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- h g",
+  "name": "uubar_WpWmHg",
+  "why": "uubar_WpWmH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- h a",
+  "name": "uubar_WpWmHa",
+  "why": "uubar_WpWmH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 41,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "h",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z h g g",
+  "name": "uubar_ZHgg",
+  "why": "uubar_ZHg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "h",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z h h g",
+  "name": "uubar_ZHHg",
+  "why": "uubar_ZHH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "h",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z h h a",
+  "name": "uubar_ZHHa",
+  "why": "uubar_ZHH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ g g",
+  "name": "udbar_tbbargg",
+  "why": "udbar_tbbarg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ g a",
+  "name": "udbar_tbbarga",
+  "why": "udbar_tbbarg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ a a",
+  "name": "udbar_tbbaraa",
+  "why": "udbar_tbbara+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 31,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ z g",
+  "name": "udbar_tbbarZg",
+  "why": "udbar_tbbarZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ z a",
+  "name": "udbar_tbbarZa",
+  "why": "udbar_tbbarZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 31,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ h g",
+  "name": "udbar_tbbarHg",
+  "why": "udbar_tbbarH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 14,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "t",
+   "b~",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > t b~ h a",
+  "name": "udbar_tbbarHa",
+  "why": "udbar_tbbarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 18,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z g g",
+  "name": "udbar_WpZgg",
+  "why": "udbar_WpZg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 38,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z g a",
+  "name": "udbar_WpZga",
+  "why": "udbar_WpZg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 42,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z a a",
+  "name": "udbar_WpZaa",
+  "why": "udbar_WpZa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 72,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "z",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z z g",
+  "name": "udbar_WpZZg",
+  "why": "udbar_WpZZ+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 44,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "z",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z z a",
+  "name": "udbar_WpZZa",
+  "why": "udbar_WpZZ+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 76,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z h g",
+  "name": "udbar_WpZHg",
+  "why": "udbar_WpZH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 18,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "z",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ z h a",
+  "name": "udbar_WpZHa",
+  "why": "udbar_WpZH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 35,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a g g",
+  "name": "udbar_Wpagg",
+  "why": "udbar_Wpag+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 38,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "g",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a g a",
+  "name": "udbar_Wpaga",
+  "why": "udbar_Wpag+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 42,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "a",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a a a",
+  "name": "udbar_Wpaaa",
+  "why": "udbar_Wpaa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 72,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a h g",
+  "name": "udbar_WpaHg",
+  "why": "udbar_WpaH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 10,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "a",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ a h a",
+  "name": "udbar_WpaHa",
+  "why": "udbar_WpaH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 22,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "h",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ h g g",
+  "name": "udbar_WpHgg",
+  "why": "udbar_WpHg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 6,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "h",
+   "h",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ h h g",
+  "name": "udbar_WpHHg",
+  "why": "udbar_WpHH+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 7,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "h",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ h h a",
+  "name": "udbar_WpHHa",
+  "why": "udbar_WpHH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 18,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d~",
+  "finals": [
+   "w+",
+   "g",
+   "g",
+   "g"
+  ],
+  "suffix": "",
+  "generate": "generate u d~ > w+ g g g",
+  "name": "udbar_Wpggg",
+  "why": "udbar_Wpgg+g",
+  "existing": "udbar_Wggg"
+ },
+ {
+  "layer": 4,
+  "beams": "u u",
+  "finals": [
+   "u",
+   "u",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u > u u g g QED<=2",
+  "name": "uu_uugg",
+  "why": "uu_uug+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 168,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u",
+  "finals": [
+   "u",
+   "u",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u > u u g a QED<=2",
+  "name": "uu_uuga",
+  "why": "uu_uug+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 48,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u",
+  "finals": [
+   "u",
+   "u",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u > u u a a QED<=2",
+  "name": "uu_uuaa",
+  "why": "uu_uua+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 40,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d",
+  "finals": [
+   "u",
+   "d",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d > u d g g QED<=2",
+  "name": "ud_udgg",
+  "why": "ud_udg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 108,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d",
+  "finals": [
+   "u",
+   "d",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d > u d g a QED<=2",
+  "name": "ud_udga",
+  "why": "ud_udg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u d",
+  "finals": [
+   "u",
+   "d",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u d > u d a a QED<=2",
+  "name": "ud_udaa",
+  "why": "ud_uda+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u s",
+  "finals": [
+   "u",
+   "s",
+   "g",
+   "g"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u s > u s g g QED<=2",
+  "name": "us_usgg",
+  "why": "us_usg+g",
+  "existing": null,
+  "exists": true,
+  "diagrams": 84,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u s",
+  "finals": [
+   "u",
+   "s",
+   "g",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u s > u s g a QED<=2",
+  "name": "us_usga",
+  "why": "us_usg+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u s",
+  "finals": [
+   "u",
+   "s",
+   "a",
+   "a"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u s > u s a a QED<=2",
+  "name": "us_usaa",
+  "why": "us_usa+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ h a",
+  "name": "ee_vevebarHa",
+  "why": "ee_vevebarH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 6,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "e+",
+   "e-",
+   "h",
+   "a"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > e+ e- h a",
+  "name": "ee_epemHa",
+  "why": "ee_epemH+a",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "u",
+   "u~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > u u~ u u~ QED<=2",
+  "name": "ee_uubaruubar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "u",
+   "u~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ u u~ QED<=2",
+  "name": "uubar_uubaruubar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 186,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "d",
+   "d~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > u u~ d d~ QED<=2",
+  "name": "ee_uubarddbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "d",
+   "d~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ d d~ QED<=2",
+  "name": "uubar_uubarddbar",
+  "why": "four-fermion, quark beams",
+  "existing": "uubar_uubarddbar"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > u u~ b b~ QED<=2",
+  "name": "ee_uubarbbbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ b b~ QED<=2",
+  "name": "uubar_uubarbbbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 62,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > u u~ t t~ QED<=2",
+  "name": "ee_uubarttbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ t t~ QED<=2",
+  "name": "uubar_uubarttbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 62,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ mu+ mu-",
+  "name": "ee_uubarmupmum",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ mu+ mu- QED<=2",
+  "name": "uubar_uubarmupmum",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ ta+ ta-",
+  "name": "ee_uubartaptam",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 25,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ ta+ ta- QED<=2",
+  "name": "uubar_uubartaptam",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "u",
+   "u~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ ve ve~",
+  "name": "ee_uubarvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 19,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "u",
+   "u~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > u u~ ve ve~ QED<=2",
+  "name": "uubar_uubarvevebar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "d",
+   "d~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > d d~ d d~ QED<=2",
+  "name": "ee_ddbarddbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "d",
+   "d~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ d d~ QED<=2",
+  "name": "uubar_ddbarddbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 78,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > d d~ b b~ QED<=2",
+  "name": "ee_ddbarbbbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ b b~ QED<=2",
+  "name": "uubar_ddbarbbbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 35,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > d d~ t t~ QED<=2",
+  "name": "ee_ddbarttbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ t t~ QED<=2",
+  "name": "uubar_ddbarttbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 35,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ mu+ mu-",
+  "name": "ee_ddbarmupmum",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 24,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ mu+ mu- QED<=2",
+  "name": "uubar_ddbarmupmum",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ ta+ ta-",
+  "name": "ee_ddbartaptam",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 25,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ ta+ ta- QED<=2",
+  "name": "uubar_ddbartaptam",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "d",
+   "d~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ ve ve~",
+  "name": "ee_ddbarvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 19,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "d",
+   "d~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > d d~ ve ve~ QED<=2",
+  "name": "uubar_ddbarvevebar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > b b~ b b~ QED<=2",
+  "name": "ee_bbbarbbbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "b",
+   "b~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ b b~ QED<=2",
+  "name": "uubar_bbbarbbbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 70,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > b b~ t t~ QED<=2",
+  "name": "ee_bbbarttbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ t t~ QED<=2",
+  "name": "uubar_bbbarttbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 39,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ mu+ mu-",
+  "name": "ee_bbbarmupmum",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 25,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ mu+ mu- QED<=2",
+  "name": "uubar_bbbarmupmum",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ ta+ ta-",
+  "name": "ee_bbbartaptam",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 34,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ ta+ ta- QED<=2",
+  "name": "uubar_bbbartaptam",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 10,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "b",
+   "b~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ ve ve~",
+  "name": "ee_bbbarvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 21,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "b",
+   "b~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > b b~ ve ve~ QED<=2",
+  "name": "uubar_bbbarvevebar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate e+ e- > t t~ t t~ QED<=2",
+  "name": "ee_ttbarttbar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 16,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "t",
+   "t~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ t t~ QED<=2",
+  "name": "uubar_ttbarttbar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 70,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ mu+ mu-",
+  "name": "ee_ttbarmupmum",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 25,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ mu+ mu- QED<=2",
+  "name": "uubar_ttbarmupmum",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 8,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ ta+ ta-",
+  "name": "ee_ttbartaptam",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 34,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ ta+ ta- QED<=2",
+  "name": "uubar_ttbartaptam",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 10,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "t",
+   "t~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ ve ve~",
+  "name": "ee_ttbarvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 21,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "t",
+   "t~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "QED<=2",
+  "generate": "generate u u~ > t t~ ve ve~ QED<=2",
+  "name": "uubar_ttbarvevebar",
+  "why": "four-fermion, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 4,
+  "weighted": null,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "mu+",
+   "mu-",
+   "mu+",
+   "mu-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > mu+ mu- mu+ mu-",
+  "name": "ee_mupmummupmum",
+  "why": "four-fermion",
+  "existing": "ee_mumumumu"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "mu+",
+   "mu-",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > mu+ mu- ta+ ta-",
+  "name": "ee_mupmumtaptam",
+  "why": "four-fermion",
+  "existing": "ee_mumutautau"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "mu+",
+   "mu-",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > mu+ mu- ve ve~",
+  "name": "ee_mupmumvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 19,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ta+",
+   "ta-",
+   "ta+",
+   "ta-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ta+ ta- ta+ ta-",
+  "name": "ee_taptamtaptam",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 68,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ta+",
+   "ta-",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ta+ ta- ve ve~",
+  "name": "ee_taptamvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 21,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "ve",
+   "ve~"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ ve ve~",
+  "name": "ee_vevebarvevebar",
+  "why": "four-fermion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 36,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- z z",
+  "name": "ee_WpWmZZ",
+  "why": "multi-boson",
+  "existing": "ee_WWZZ"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- z z",
+  "name": "uubar_WpWmZZ",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 109,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "w+",
+   "w-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- w+ w-",
+  "name": "ee_WpWmWpWm",
+  "why": "multi-boson",
+  "existing": "ee_WWWW"
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "w+",
+   "w-"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- w+ w-",
+  "name": "uubar_WpWmWpWm",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 148,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z z z",
+  "name": "ee_ZZZZ",
+  "why": "multi-boson",
+  "existing": null,
+  "exists": true,
+  "diagrams": 48,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z z z",
+  "name": "uubar_ZZZZ",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 48,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- z h",
+  "name": "ee_WpWmZH",
+  "why": "multi-boson",
+  "existing": null,
+  "exists": true,
+  "diagrams": 63,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- z h",
+  "name": "uubar_WpWmZH",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 63,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "z",
+   "z",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > z z h h",
+  "name": "ee_ZZHH",
+  "why": "multi-boson",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "z",
+   "z",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > z z h h",
+  "name": "uubar_ZZHH",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 20,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "w+",
+   "w-",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > w+ w- h h",
+  "name": "ee_WpWmHH",
+  "why": "multi-boson",
+  "existing": null,
+  "exists": true,
+  "diagrams": 38,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "u u~",
+  "finals": [
+   "w+",
+   "w-",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate u u~ > w+ w- h h",
+  "name": "uubar_WpWmHH",
+  "why": "multi-boson, quark beams",
+  "existing": null,
+  "exists": true,
+  "diagrams": 38,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "w+",
+   "w-"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ w+ w-",
+  "name": "ee_vevebarWpWm",
+  "why": "fusion",
+  "existing": "ee_nnbarWW"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "z",
+   "z"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ z z",
+  "name": "ee_vevebarZZ",
+  "why": "fusion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 55,
+  "weighted": 8,
+  "error": ""
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "h",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ h h",
+  "name": "ee_vevebarHH",
+  "why": "fusion",
+  "existing": "ee_nnbarHH"
+ },
+ {
+  "layer": 4,
+  "beams": "e+ e-",
+  "finals": [
+   "ve",
+   "ve~",
+   "z",
+   "h"
+  ],
+  "suffix": "",
+  "generate": "generate e+ e- > ve ve~ z h",
+  "name": "ee_vevebarZH",
+  "why": "fusion",
+  "existing": null,
+  "exists": true,
+  "diagrams": 19,
+  "weighted": 8,
+  "error": ""
+ }
+]

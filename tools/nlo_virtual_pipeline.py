@@ -89,6 +89,23 @@ VIRT_PROCESSES = {
                   "certified": False},
 }
 
+
+def _load_catalog_v2_virt():
+    """Append the generated one-loop table entries (recipes/gen_catalog_v2.py --write)."""
+    import yaml as _yaml
+    path = os.path.join(ROOT, "recipes", "catalog_v2_processes.yaml")
+    if not os.path.exists(path):
+        return 0
+    with open(path) as f:
+        d = _yaml.safe_load(f) or {}
+    n = 0
+    for name, entry in (d.get("virt") or {}).items():
+        if name not in VIRT_PROCESSES:
+            VIRT_PROCESSES[name] = entry; n += 1
+    return n
+
+CATALOG_V2_VIRT = _load_catalog_v2_virt()
+
 # Fortran subroutine appended to each standalone's f2py_wrapper.f so the f2py
 # module exposes the full Laurent array (born, finite, 1/eps, 1/eps^2).
 GET_ME_FULL_F = r"""

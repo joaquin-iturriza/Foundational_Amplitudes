@@ -1458,6 +1458,8 @@ PROCESSES = {
         "n_loops": 1, "alphas_power": 2, "loopind": True, "order": [1, 0, 2, 2],
         "pdg_ids": [11, -11, 21, 21], "m_finals": [0, 0], "param_card_patches": {},
     },
+    # catalog_v2 entries (rule-enumerated, MadGraph-validated) are appended below from
+    # recipes/catalog_v2_processes.yaml by _load_catalog_v2(); see recipes/gen_catalog_v2.py.
     # Template for new processes:
     # "ee_NEW": {
     #     "mg5_generate": ["generate e+ e- > X X~"],
@@ -1508,6 +1510,24 @@ PROCESSES = {
                    "n_loops": 1, "alphas_power": 2, "pdg_ids": [11, -11, 1, -1, 21],
                    "m_finals": [0.0, 0.0, 0.0], "param_card_patches": {}},
 }
+
+
+def _load_catalog_v2():
+    """Append the generated catalog_v2 tree and one-loop entries (recipes/gen_catalog_v2.py
+    --write). Generated entries never override a hand-written one."""
+    import yaml as _yaml
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes", "catalog_v2_processes.yaml")
+    if not os.path.exists(path):
+        return 0
+    with open(path) as f:
+        d = _yaml.safe_load(f) or {}
+    n = 0
+    for name, entry in (d.get("processes") or {}).items():
+        if name not in PROCESSES:
+            PROCESSES[name] = entry; n += 1
+    return n
+
+CATALOG_V2_ENTRIES = _load_catalog_v2()
 
 # =============================================================================
 # STANDARD RUN CARD SETTINGS applied to every process
