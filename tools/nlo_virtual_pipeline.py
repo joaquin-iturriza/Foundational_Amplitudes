@@ -60,7 +60,7 @@ VIRT_PROCESSES = {
     # certifies the double pole only (coloured beams: no closed-form single pole).
     "uubar_gg":    {"mg5": "generate u u~ > g g [virt=QCD]",             "pdg_ids": [2, -2, 21, 21],  "m_finals": [0.0, 0.0]},
     "uubar_uubar": {"mg5": "generate u u~ > u u~ QED<=2 [virt=QCD]",     "pdg_ids": [2, -2, 2, -2],   "m_finals": [0.0, 0.0]},
-    "uubar_ttbar": {"mg5": "generate u u~ > t t~ [virt=QCD]",            "pdg_ids": [2, -2, 6, -6],   "m_finals": [172.5, 172.5]},
+    "uubar_ttbar": {"mg5": "generate u u~ > t t~ QED<=2 [virt=QCD]",     "pdg_ids": [2, -2, 6, -6],   "m_finals": [172.5, 172.5]},   # same mixed born as the tree entry
     "uubar_mumu":  {"mg5": "generate u u~ > mu+ mu- [virt=QCD]",         "pdg_ids": [2, -2, -13, 13], "m_finals": [0.0, 0.0]},
     "uubar_Zg":    {"mg5": "generate u u~ > z g [virt=QCD]",             "pdg_ids": [2, -2, 23, 21],  "m_finals": [91.1880, 0.0]},
     "udbar_tbbar": {"mg5": "generate u d~ > t b~ [virt=QCD]",            "pdg_ids": [2, -1, 6, -5],   "m_finals": [172.5, 4.7]},
@@ -100,8 +100,11 @@ def _load_catalog_v2_virt():
         d = _yaml.safe_load(f) or {}
     n = 0
     for name, entry in (d.get("virt") or {}).items():
-        if name not in VIRT_PROCESSES:
-            VIRT_PROCESSES[name] = dict(entry, _v2=True); n += 1
+        if name in VIRT_PROCESSES:
+            if VIRT_PROCESSES[name]["mg5"] != entry["mg5"]:
+                raise KeyError(f"catalog_v2 one-loop entry {name} collides with a hand-written one ({VIRT_PROCESSES[name]['mg5']} vs {entry['mg5']})")
+            continue
+        VIRT_PROCESSES[name] = dict(entry, _v2=True); n += 1
     return n
 
 CATALOG_V2_VIRT = _load_catalog_v2_virt()
@@ -211,6 +214,12 @@ def build_virt_standalone(process, force=False):
     if stale and not p0_glob:
         print(f"[BUILD] {process}: module(s) built for another Python ({[os.path.basename(f) for f in stale]}) -- rebuilding")
         force = True
+    # a standalone built from a different generate string (e.g. the born changed from pure
+    # QCD to QED<=2) must not be reused: the string is recorded next to the build
+    tag = os.path.join(sa, ".mg5_string")
+    if p0_glob and not force and os.path.exists(tag) and open(tag).read().strip() != cfg["mg5"].strip():
+        print(f"[BUILD] {process}: built from a different generate string ({open(tag).read().strip()!r}) -- rebuilding")
+        force = True
     if p0_glob and not force:
         print(f"[BUILD] {process}: standalone+module exist ({sa}) — skipping.")
         return sa
@@ -224,6 +233,7 @@ def build_virt_standalone(process, force=False):
     r = subprocess.run([mg.MG5_BIN], input=script, text=True)
     if r.returncode != 0 or not os.path.isdir(sa):
         sys.exit(f"[BUILD] MG5 generation failed for {process}")
+    open(os.path.join(sa, ".mg5_string"), "w").write(cfg["mg5"].strip() + "\n")
 
     p0 = find_p0(sa)
     wrapper = f"{p0}/f2py_wrapper.f"

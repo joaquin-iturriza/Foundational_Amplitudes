@@ -543,7 +543,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 8
  },
  {
   "layer": 3,
@@ -561,7 +563,9 @@
   "exists": true,
   "diagrams": 17,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 5
  },
  {
   "layer": 3,
@@ -579,7 +583,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -597,7 +603,9 @@
   "exists": true,
   "diagrams": 17,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 5
  },
  {
   "layer": 3,
@@ -615,7 +623,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -647,7 +657,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -665,7 +677,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -683,7 +697,9 @@
   "exists": true,
   "diagrams": 2,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 2
  },
  {
   "layer": 3,
@@ -701,7 +717,9 @@
   "exists": true,
   "diagrams": 13,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 5
  },
  {
   "layer": 3,
@@ -719,7 +737,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -737,7 +757,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -755,7 +777,9 @@
   "exists": true,
   "diagrams": 2,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 2
  },
  {
   "layer": 3,
@@ -1237,7 +1261,9 @@
   "exists": true,
   "diagrams": 26,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 10
  },
  {
   "layer": 3,
@@ -1255,7 +1281,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 8
  },
  {
   "layer": 3,
@@ -1273,7 +1301,9 @@
   "exists": true,
   "diagrams": 17,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 5
  },
  {
   "layer": 3,
@@ -1291,7 +1321,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -1309,7 +1341,9 @@
   "exists": true,
   "diagrams": 13,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 3,
+  "diagrams_default": 5
  },
  {
   "layer": 3,
@@ -1327,7 +1361,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 4
  },
  {
   "layer": 3,
@@ -2178,7 +2214,9 @@
   "exists": true,
   "diagrams": 48,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 48
  },
  {
   "layer": 4,
@@ -2197,7 +2235,9 @@
   "exists": true,
   "diagrams": 40,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 40
  },
  {
   "layer": 4,
@@ -2216,7 +2256,9 @@
   "exists": true,
   "diagrams": 108,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 36
  },
  {
   "layer": 4,
@@ -2235,7 +2277,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2254,7 +2298,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2273,7 +2319,9 @@
   "exists": true,
   "diagrams": 108,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 36
  },
  {
   "layer": 4,
@@ -2292,7 +2340,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2311,7 +2361,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2345,7 +2397,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2364,7 +2418,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2383,7 +2439,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2402,7 +2460,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2421,7 +2481,9 @@
   "exists": true,
   "diagrams": 12,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 12
  },
  {
   "layer": 4,
@@ -2440,7 +2502,9 @@
   "exists": true,
   "diagrams": 10,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 10
  },
  {
   "layer": 4,
@@ -2459,7 +2523,9 @@
   "exists": true,
   "diagrams": 84,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 36
  },
  {
   "layer": 4,
@@ -2478,7 +2544,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2497,7 +2565,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2516,7 +2586,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -2535,7 +2607,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -2554,7 +2628,9 @@
   "exists": true,
   "diagrams": 12,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 12
  },
  {
   "layer": 4,
@@ -2573,7 +2649,9 @@
   "exists": true,
   "diagrams": 10,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 10
  },
  {
   "layer": 4,
@@ -3401,7 +3479,9 @@
   "exists": true,
   "diagrams": 168,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 72
  },
  {
   "layer": 4,
@@ -3420,7 +3500,9 @@
   "exists": true,
   "diagrams": 48,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 48
  },
  {
   "layer": 4,
@@ -3439,7 +3521,9 @@
   "exists": true,
   "diagrams": 40,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 40
  },
  {
   "layer": 4,
@@ -3458,7 +3542,9 @@
   "exists": true,
   "diagrams": 108,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 36
  },
  {
   "layer": 4,
@@ -3477,7 +3563,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -3496,7 +3584,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -3515,7 +3605,9 @@
   "exists": true,
   "diagrams": 84,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 36
  },
  {
   "layer": 4,
@@ -3534,7 +3626,9 @@
   "exists": true,
   "diagrams": 24,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 5,
+  "diagrams_default": 24
  },
  {
   "layer": 4,
@@ -3553,7 +3647,9 @@
   "exists": true,
   "diagrams": 20,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 20
  },
  {
   "layer": 4,
@@ -3602,15 +3698,11 @@
    "u",
    "u~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > u u~ u u~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ u u~",
   "name": "ee_uubaruubar",
   "why": "four-fermion",
-  "existing": null,
-  "exists": true,
-  "diagrams": 16,
-  "weighted": null,
-  "error": ""
+  "existing": "ee_uuuu"
  },
  {
   "layer": 4,
@@ -3629,7 +3721,9 @@
   "exists": true,
   "diagrams": 186,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 42
  },
  {
   "layer": 4,
@@ -3640,15 +3734,11 @@
    "d",
    "d~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > u u~ d d~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ d d~",
   "name": "ee_uubarddbar",
   "why": "four-fermion",
-  "existing": null,
-  "exists": true,
-  "diagrams": 8,
-  "weighted": null,
-  "error": ""
+  "existing": "ee_uudd"
  },
  {
   "layer": 4,
@@ -3674,14 +3764,14 @@
    "b",
    "b~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > u u~ b b~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ b b~",
   "name": "ee_uubarbbbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 8,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -3701,7 +3791,9 @@
   "exists": true,
   "diagrams": 62,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 14
  },
  {
   "layer": 4,
@@ -3712,14 +3804,14 @@
    "t",
    "t~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > u u~ t t~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > u u~ t t~",
   "name": "ee_uubarttbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 8,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -3739,7 +3831,9 @@
   "exists": true,
   "diagrams": 62,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 14
  },
  {
   "layer": 4,
@@ -3777,7 +3871,9 @@
   "exists": true,
   "diagrams": 16,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 16
  },
  {
   "layer": 4,
@@ -3815,7 +3911,9 @@
   "exists": true,
   "diagrams": 16,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 16
  },
  {
   "layer": 4,
@@ -3853,7 +3951,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 8
  },
  {
   "layer": 4,
@@ -3864,14 +3964,14 @@
    "d",
    "d~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > d d~ d d~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ d d~",
   "name": "ee_ddbarddbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 16,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -3891,7 +3991,9 @@
   "exists": true,
   "diagrams": 78,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 14
  },
  {
   "layer": 4,
@@ -3902,14 +4004,14 @@
    "b",
    "b~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > d d~ b b~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ b b~",
   "name": "ee_ddbarbbbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 8,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -3929,7 +4031,9 @@
   "exists": true,
   "diagrams": 35,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 7
  },
  {
   "layer": 4,
@@ -3940,14 +4044,14 @@
    "t",
    "t~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > d d~ t t~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > d d~ t t~",
   "name": "ee_ddbarttbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 8,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -3967,7 +4071,9 @@
   "exists": true,
   "diagrams": 35,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 7
  },
  {
   "layer": 4,
@@ -4005,7 +4111,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 8
  },
  {
   "layer": 4,
@@ -4043,7 +4151,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 8
  },
  {
   "layer": 4,
@@ -4081,7 +4191,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 4
  },
  {
   "layer": 4,
@@ -4092,14 +4204,14 @@
    "b",
    "b~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > b b~ b b~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ b b~",
   "name": "ee_bbbarbbbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 16,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -4119,7 +4231,9 @@
   "exists": true,
   "diagrams": 70,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 14
  },
  {
   "layer": 4,
@@ -4130,15 +4244,11 @@
    "t",
    "t~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > b b~ t t~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > b b~ t t~",
   "name": "ee_bbbarttbar",
   "why": "four-fermion",
-  "existing": null,
-  "exists": true,
-  "diagrams": 8,
-  "weighted": null,
-  "error": ""
+  "existing": "ee_ttbarbb"
  },
  {
   "layer": 4,
@@ -4157,7 +4267,9 @@
   "exists": true,
   "diagrams": 39,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 7
  },
  {
   "layer": 4,
@@ -4195,7 +4307,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 8
  },
  {
   "layer": 4,
@@ -4233,7 +4347,9 @@
   "exists": true,
   "diagrams": 10,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 10
  },
  {
   "layer": 4,
@@ -4271,7 +4387,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 4
  },
  {
   "layer": 4,
@@ -4282,14 +4400,14 @@
    "t",
    "t~"
   ],
-  "suffix": "QED<=2",
-  "generate": "generate e+ e- > t t~ t t~ QED<=2",
+  "suffix": "",
+  "generate": "generate e+ e- > t t~ t t~",
   "name": "ee_ttbarttbar",
   "why": "four-fermion",
   "existing": null,
   "exists": true,
   "diagrams": 16,
-  "weighted": null,
+  "weighted": 6,
   "error": ""
  },
  {
@@ -4309,7 +4427,9 @@
   "exists": true,
   "diagrams": 70,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 4,
+  "diagrams_default": 14
  },
  {
   "layer": 4,
@@ -4347,7 +4467,9 @@
   "exists": true,
   "diagrams": 8,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 8
  },
  {
   "layer": 4,
@@ -4385,7 +4507,9 @@
   "exists": true,
   "diagrams": 10,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 10
  },
  {
   "layer": 4,
@@ -4423,7 +4547,9 @@
   "exists": true,
   "diagrams": 4,
   "weighted": null,
-  "error": ""
+  "error": "",
+  "weighted_default": 6,
+  "diagrams_default": 4
  },
  {
   "layer": 4,

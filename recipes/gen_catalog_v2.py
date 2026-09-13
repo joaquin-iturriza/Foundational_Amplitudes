@@ -142,8 +142,7 @@ def enumerate_candidates():
     pairs = [["u", "u~"], ["d", "d~"], ["b", "b~"], ["t", "t~"], ["mu+", "mu-"], ["ta+", "ta-"], ["ve", "ve~"]]
     for p1, p2 in itertools.combinations_with_replacement(range(len(pairs)), 2):
         f = pairs[p1] + pairs[p2]
-        suf = "QED<=2" if sum(t.rstrip("~") in QUARKS for t in f) == 4 else ""
-        put(4, "e+ e-", f, suf, "four-fermion")
+        put(4, "e+ e-", f, "", "four-fermion")          # e+e- beams: QED>=2 anyway, no suffix
         if sum(t.rstrip("~") in QUARKS for t in f) >= 2:
             put(4, "u u~", f, "QED<=2", "four-fermion, quark beams")
     for f in [["w+", "w-", "z", "z"], ["w+", "w-", "w+", "w-"], ["w+", "w-", "a", "a"], ["z", "z", "z", "z"],
@@ -160,20 +159,27 @@ def mg5_check(cands, workers=8):
     """One MG5 session per candidate (an error would abort a batch); parse existence,
     diagram count and WEIGHTED. Runs where MG5_BIN exists (the login node)."""
     tmp = os.path.join(mg.WORK_DIR, "..", "tmp", "catv2"); os.makedirs(tmp, exist_ok=True)
-    def one(c):
-        f = os.path.join(tmp, c["name"] + ".in")
-        loop = c["layer"] in ("nlo", "loop")
-        model = c.get("model", "loop_sm") if loop else "sm"
-        open(f, "w").write(f"import model {model}\n{c['generate']}\ndisplay processes\nexit\n")
-        r = subprocess.run([mg.MG5_BIN, f], capture_output=True, text=True, timeout=900)
+    def run_mg5(tag, gen, model):
+        f = os.path.join(tmp, tag + ".in")
+        open(f, "w").write(f"import model {model}\n{gen}\ndisplay processes\nexit\n")
+        r = subprocess.run([mg.MG5_BIN, f], capture_output=True, text=True, timeout=1800)
         out = r.stdout + r.stderr
         m = re.search(r"Process: (.*?)(?: WEIGHTED<=(\d+))?(?: @\d+)?\s*$", out, re.M)
         d = re.search(r"Total: 1 processes with (\d+) diagrams", out)
         ok = m is not None and d is not None
-        c2 = dict(c, exists=ok, diagrams=int(d.group(1)) if d else 0,
-                  weighted=int(m.group(2)) if (m and m.group(2)) else None,
-                  error=("" if ok else (re.search(r"(NoDiagramException|InvalidCmd|Error)[^\n]{0,120}", out).group(0)
-                                        if re.search(r"NoDiagramException|InvalidCmd|Error", out) else "no process line")))
+        err = "" if ok else (re.search(r"(NoDiagramException|InvalidCmd|Error)[^\n]{0,120}", out).group(0)
+                             if re.search(r"NoDiagramException|InvalidCmd|Error", out) else "no process line")
+        return ok, (int(d.group(1)) if d else 0), (int(m.group(2)) if (m and m.group(2)) else None), err
+    def one(c):
+        loop = c["layer"] in ("nlo", "loop")
+        model = c.get("model", "loop_sm") if loop else "sm"
+        ok, diag, W, err = run_mg5(c["name"], c["generate"], model)
+        c2 = dict(c, exists=ok, diagrams=diag, weighted=W, error=err)
+        if ok and c.get("suffix") and not loop:
+            # the unsuffixed (MG5 default = minimal QED) string gives b_min via WEIGHTED, hence
+            # the true alpha_s maximum n - b_min and whether the suffix binds at all
+            ok0, diag0, W0, _ = run_mg5(c["name"] + "__default", c["generate"].replace(" " + c["suffix"], ""), model)
+            c2.update(weighted_default=W0 if ok0 else None, diagrams_default=diag0)
         return c2
     with ThreadPoolExecutor(workers) as ex:
         return list(ex.map(one, cands))
@@ -188,17 +194,34 @@ def masses_entry(e):
 
 
 def orders_tree(c):
-    """[L_QCD, L_EW, a_max, b_max] of a tree from MG5's WEIGHTED (a+2b=W, a+b=n) or,
-    for an explicit QED<=N, b=N and a=n (a pure-QCD contribution exists there)."""
+    """[L_QCD, L_EW, a_max, b_max] of a tree. MG5's default order is minimal QED, so its
+    WEIGHTED line gives the minimal EW power b_min = W - n and the maximal alpha_s power
+    a_max = n - b_min = 2n - W. With an explicit QED<=N the EW maximum is N (N >= b_min, or
+    no diagrams would exist) and a_max is unchanged: it is set by the legs that cannot be
+    QCD (leptons, gamma/Z/W/H, a Yukawa), not by the suffix."""
     n = len(c["finals"])
     if c["suffix"]:
-        return [0, 0, n, int(re.search(r"\d+", c["suffix"]).group(0))]
+        W0 = c.get("weighted_default")
+        if W0 is None:
+            raise ValueError(f"{c['name']}: suffixed candidate without an unsuffixed WEIGHTED (rerun --check)")
+        return [0, 0, 2 * n - W0, int(re.search(r"\d+", c["suffix"]).group(0))]
     W = c["weighted"]; b = W - n; a = 2 * n - W
     return [0, 0, a, b]
+
+
+def suffix_binds(c):
+    """False when QED<=N does not enlarge the default (minimal-QED) diagram set, i.e. when
+    N == b_min: then the candidate IS the default-order process and must dedup against it."""
+    if not c.get("suffix"):
+        return True
+    n = len(c["finals"]); W0 = c.get("weighted_default")
+    return W0 is not None and int(re.search(r"\d+", c["suffix"]).group(0)) > W0 - n
 
 def entry_tree(c):
     b, f = c["beams"], c["finals"]
     pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
+    if pdg_b[1] == -pdg_b[0] and pdg_b[0] < 0:
+        pdg_b = [pdg_b[1], pdg_b[0]]     # stored convention: the particle (e-, quark) in row 0
     masses = [MASS.get(abs(p), 0.0) for p in pdg_f]
     a = orders_tree(c)[2]
     e = {"mg5_generate": [c["generate"]], "nfinal": len(f), "pdg_ids": pdg_b + pdg_f,
@@ -213,6 +236,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--enumerate", action="store_true"); ap.add_argument("--check", action="store_true")
     ap.add_argument("--write", action="store_true"); ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--check-virt", action="store_true", help="run the generated [virt=QCD] strings through MG5 (after --write); non-existent ones are removed from the recipes")
     args = ap.parse_args()
     if args.enumerate:
         cands = enumerate_candidates()
@@ -237,14 +261,24 @@ def main():
     if args.write:
         cands = json.load(open(CAND))
         procs, virt = {}, {}
+        ex = existing_by_canon()
+        dropped = 0
         for c in cands:
             if c.get("existing") or not c.get("exists"):
                 continue
+            if not suffix_binds(c):
+                # same diagram set as the default-order process: either hand-written already
+                # (e+e- > u u~ u u~) or its own unsuffixed candidate; never a second entry
+                c0 = dict(c, suffix="", generate=c["generate"].replace(" " + c["suffix"], ""),
+                          weighted=c.get("weighted_default"), diagrams=c.get("diagrams_default", c["diagrams"]))
+                if ex.get(canon(c0["generate"])) or any(canon(o["generate"]) == canon(c0["generate"]) and o is not c for o in cands if o.get("exists")):
+                    dropped += 1; continue
+                c = c0
             procs[c["name"]] = entry_tree(c)
+        print(f"dropped {dropped} candidates whose QED<=N suffix does not bind (duplicates of default-order processes)")
         # ---- NLO rule: [virt=QCD] of every coloured tree at 2->2 and 2->3 that has no
         # one-loop entry yet (existing *_nlo entries and their VIRT bases are kept as is)
-        sys.path.insert(0, os.path.join(ROOT, "tools"))
-        from nlo_virtual_pipeline import VIRT_PROCESSES
+        from tools.nlo_virtual_pipeline import VIRT_PROCESSES
         have_virt = {canon(re.sub(r"\s*\[.*?\]\s*$", "", v["mg5"])) for v in VIRT_PROCESSES.values() if not v.get("_v2")}
         trees = {n: mg.PROCESSES[n] for n in mg.PROCESSES if mg.PROCESSES[n].get("kind") != "virt" and "mg5_generate" in mg.PROCESSES[n]
                  and "pdg_ids" in mg.PROCESSES[n] and not mg.PROCESSES[n].get("_v2")}
@@ -254,7 +288,9 @@ def main():
             g = e["mg5_generate"][0]; bm, f, suf = split(g)
             if e["nfinal"] > 3 or not has_colour(bm, f) or canon(g) in have_virt:
                 continue
-            base = n if not n.startswith("ee_") else n           # VIRT table key = tree name
+            base = n                                              # VIRT table key = tree name
+            if base in VIRT_PROCESSES and not VIRT_PROCESSES[base].get("_v2"):
+                raise KeyError(f"one-loop key {base} already hand-written with a different string: {VIRT_PROCESSES[base]['mg5']}")
             virt[base] = {"mg5": g + " [virt=QCD]", "pdg_ids": list(e["pdg_ids"]), "m_finals": masses_entry(e)}
             procs[n + "_nlo"] = {"kind": "virt", "virt": True, "virt_base": base, "nfinal": e["nfinal"],
                                  "n_loops": 1, "alphas_power": int(e.get("alphas_power", 0)) + 1,
@@ -262,9 +298,6 @@ def main():
                                  "param_card_patches": {}, "layer": "nlo", "why": f"one-loop QCD of {n}"}
             n_nlo += 1
         # ---- loop-induced candidates (certification decides; uncertified never enter a recipe).
-        # Pure-QED loops give no diagrams here (the light-quark line has no Yukawa): the top
-        # loop is reached through a gluon, so these are mixed QCD x QED loops; the order vector
-        # [1,1,2,2] is a placeholder until the probe pins the alpha_s scaling.
         # Both are pure-EW top loops in practice (probe: no alpha_s dependence), reached through
         # the mixed [sqrvirt=QCD QED] selection. uubar_HH certifies (poles = 0); uubar_Ha shows
         # the same spurious ~0.2 single pole as ee_aH (an H+gamma final pathology of MadLoop
@@ -281,6 +314,8 @@ def main():
         yaml.safe_dump({"processes": procs, "virt": virt}, open(OUT_PROC, "w"), sort_keys=False, width=160)
         print(f"wrote {OUT_PROC}: {len(procs) - n_nlo - 2} tree, {n_nlo} one-loop, 2 loop-induced candidates")
         write_recipes(procs, cands)
+    if args.check_virt:
+        check_virt(args.workers)
 
 
 def write_recipes(procs, cands):
@@ -313,6 +348,34 @@ def write_recipes(procs, cands):
     open(OUT_HOLD, "w").write(hold)
     n_train = sum(1 for l in out if l.strip().startswith("- {name:"))
     print(f"wrote {OUT_TRAIN}: {n_train} processes; {OUT_HOLD}: v1 hold-outs")
+
+
+def check_virt(workers):
+    """Run every generated one-loop string through MG5 `display processes`; drop the failures
+    from catalog_v2_processes.yaml and rewrite the recipes."""
+    d = yaml.safe_load(open(OUT_PROC))
+    todo = [(k, v) for k, v in d["virt"].items() if not v.get("loopind")]
+    tmp = os.path.join(mg.WORK_DIR, "..", "tmp", "catv2"); os.makedirs(tmp, exist_ok=True)
+    def one(kv):
+        k, v = kv
+        f = os.path.join(tmp, k + "__virt.in")
+        open(f, "w").write(f"import model {v.get('model', 'loop_sm')}\n{v['mg5']}\ndisplay processes\nexit\n")
+        r = subprocess.run([mg.MG5_BIN, f], capture_output=True, text=True, timeout=3600)
+        out = r.stdout + r.stderr
+        ok = re.search(r"^Process: ", out, re.M) is not None and not re.search(r"NoDiagramException|InvalidCmd|Error detected", out)
+        loops = re.search(r"Total: 1 processes with (\d+) diagrams", out)
+        return k, ok, (int(loops.group(1)) if loops else 0), ("" if ok else re.sub(r"\s+", " ", out[-300:]))
+    with ThreadPoolExecutor(workers) as ex:
+        res = list(ex.map(one, todo))
+    bad = [k for k, ok, _, _ in res if not ok]
+    for k, ok, n, err in res:
+        d["virt"][k]["exists"] = ok; d["virt"][k]["diagrams"] = n
+        if not ok: print("   MG5 rejects", k, d["virt"][k]["mg5"], "::", err[-160:])
+    for k in bad:
+        d["virt"].pop(k); d["processes"].pop(k + "_nlo", None)
+    yaml.safe_dump(d, open(OUT_PROC, "w"), sort_keys=False, width=160)
+    print(f"one-loop strings: {len(res) - len(bad)} exist, {len(bad)} removed")
+    cands = json.load(open(CAND)); write_recipes(d["processes"], cands)
 
 
 if __name__ == "__main__":

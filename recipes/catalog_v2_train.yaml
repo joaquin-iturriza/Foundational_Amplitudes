@@ -269,9 +269,7 @@ processes:
   - {name: us_usaa,               sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # us_usa+a
   - {name: ee_vevebarHa,          sqrts: [ 131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # ee_vevebarH+a
   - {name: ee_epemHa,             sqrts: [ 131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # ee_epemH+a
-  - {name: ee_uubaruubar,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: uubar_uubaruubar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams
-  - {name: ee_uubarddbar,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: ee_uubarbbbar,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: uubar_uubarbbbar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams
   - {name: ee_uubarttbar,         sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
@@ -296,7 +294,6 @@ processes:
   - {name: uubar_ddbarvevebar,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams
   - {name: ee_bbbarbbbar,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: uubar_bbbarbbbar,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams
-  - {name: ee_bbbarttbar,         sqrts: [ 372, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: uubar_bbbarttbar,      sqrts: [ 372, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams
   - {name: ee_bbbarmupmum,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion
   - {name: uubar_bbbarmupmum,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}   # four-fermion, quark beams

@@ -36,7 +36,12 @@ def test_perm_builder():
         assert sorted(perm) == list(range(len(cfg["pdg_ids"]))), name
         ini = mg.generate_slot_pdgs(cfg["mg5_generate"][0])[0]
         assert [cfg["pdg_ids"][j] for j in perm[:2]] == ini, name
-        if cfg["pdg_ids"][:2] == [11, -11]:
+        b0, b1 = cfg["pdg_ids"][:2]
+        # stored convention: for a particle/antiparticle beam pair the PARTICLE (e-, quark) is
+        # row 0 (along +z); asserted, never branched on, so a mirrored entry cannot pass
+        if b1 == -b0:
+            assert b0 > 0, f"{name}: antiparticle in row 0 ({cfg['pdg_ids'][:2]})"
+        if ini == [-11, 11]:
             assert perm[:2] == [1, 0], (name, perm); n_ee += 1
         else:
             n_q += 1
