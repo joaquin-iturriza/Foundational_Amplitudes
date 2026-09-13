@@ -250,6 +250,24 @@ and both stay out.
 The one-loop entry of $u\bar u\to t\bar t$ now loops the same mixed (\code{QED<=2}) born as its tree; it
 used to loop the pure-QCD born, so its per-process loss is not comparable with any earlier run.
 
+\paragraph{Sampling policy.} The recipe path now samples the mixture the divergence study
+settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the physical way ($\sqrt s$
+uniform in the window, RAMBO angles, fiducial cuts) and $f=0.35$ kept flat in
+$\log|\mathcal M|^2$ from an oversampled ($6\times$), labelled candidate pool thinned without
+replacement, so every amplitude extreme is covered by generation rather than by resampling.
+Candidates reach the extremes through the IR-democratic $1\to2$ splitter for multi-leg finals
+(half of the multi-leg candidates) and an adaptive $\sqrt s$ proposal: a first candidate pass is
+histogrammed in $\log|\mathcal M|^2$, each candidate weighted by the inverse density of its value,
+and the second pass draws $\sqrt s$ where those rare values live. Nothing reads a resonance mass;
+a level criterion (the spread of $\log|\mathcal M|^2$ within a $\sqrt s$ bin) was tried first and
+does not find a pole, which raises the level but not the spread. On $e^+e^-\to u\bar u$ over
+$[25,1000]$\,GeV the $Z$-pole share of a pool goes from $0.7\%$ (flat) to $10\%$ (the flat
+subset alone sits at ${\sim}27\%$, against $32\%$ for the study's pole-covering proposal), the
+max/min bin ratio of the $\log|\mathcal M|^2$ histogram from $66$ to $12$, the bulk keeps $56\%$
+of the events, and a seed reproduces the pool (\code{tests/test\_sampling.py}). The policy lives
+on the catalog entry (per entry or per recipe), enters the recipe identity, and \code{mode: flat}
+keeps the legacy sampling.
+
 \paragraph{Hold-outs.} Two kinds. The free ones (relabels, crossings; one at every layer) are
 covered by any base training. Axis removals need one extra pretraining each, and independent
 removals can share a base: drop every $+g$ at $2\to4$ (multiplicity extrapolation), drop one
@@ -2535,11 +2553,9 @@ generate here plus a modest pretraining; 5 needs no training at all; 6 starts as
 generator; 1 waits for a compute plan.
 
 \section{Hand-off: generating the catalog}\label{sec:catalog-open}
-Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and trained on:
+Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and trained on (the sampling
+policy is in place, Sec.~\ref{sec:catalog}):
 \begin{itemize}
-  \item The pole/IR-aware sampler of Sec.~\ref{sec:div-sampling} is not in the recipe path,
-    which still samples flat $\sqrt s\times$RAMBO under the fiducial cuts; the $s$-channel
-    families would carry the $Z$ needle of Principle~\ref{prin:needle}.
   \item $219$ LO standalones to compile (the prebuild does it) and $82$ one-loop backends to
     build and certify (\code{scripts/build\_nlo\_backends.sh}); the $20$ hand-written ones
     took $4.5$ minutes in total, the $2\to3$ mixed-born ones will be heavier.
