@@ -16,8 +16,8 @@ processes:
   - {name: uubar_ddbar__as150,        base: uubar_ddbar,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: udbar_udbar__as090,        base: udbar_udbar,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: udbar_udbar__as150,        base: udbar_udbar,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
-  - {name: uubar_ttbar__as090,        base: uubar_ttbar,     sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
-  - {name: uubar_ttbar__as150,        base: uubar_ttbar,     sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: uubar_ttbar__as090,        base: uubar_ttbar,     sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: uubar_ttbar__as150,        base: uubar_ttbar,     sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: uubar_bbbar__as090,        base: uubar_bbbar,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: uubar_bbbar__as150,        base: uubar_bbbar,     sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: udbar_Wg__as090,           base: udbar_Wg,        sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
@@ -34,8 +34,8 @@ processes:
   - {name: ee_ddbarg__as150,          base: ee_ddbarg,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: ee_bbbarg__as090,          base: ee_bbbarg,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: ee_bbbarg__as150,          base: ee_bbbarg,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
-  - {name: ee_ttbarg__as090,          base: ee_ttbarg,       sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
-  - {name: ee_ttbarg__as150,          base: ee_ttbarg,       sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: ee_ttbarg__as090,          base: ee_ttbarg,       sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: ee_ttbarg__as150,          base: ee_ttbarg,       sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: uubar_Zgg__as090,          base: uubar_Zgg,       sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: uubar_Zgg__as150,          base: uubar_Zgg,       sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: uubar_ggg__as090,          base: uubar_ggg,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
@@ -44,8 +44,8 @@ processes:
   - {name: uubar_agg__as150,          base: uubar_agg,       sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: uubar_uubarg__as090,       base: uubar_uubarg,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: uubar_uubarg__as150,       base: uubar_uubarg,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
-  - {name: uubar_ttbarg__as090,       base: uubar_ttbarg,    sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
-  - {name: uubar_ttbarg__as150,       base: uubar_ttbarg,    sqrts: [ 362, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: uubar_ttbarg__as090,       base: uubar_ttbarg,    sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: uubar_ttbarg__as150,       base: uubar_ttbarg,    sqrts: [ 363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: udbar_Wgg__as090,          base: udbar_Wgg,       sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
   - {name: udbar_Wgg__as150,          base: udbar_Wgg,       sqrts: [  84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
   - {name: udbar_enug__as090,         base: udbar_enug,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}

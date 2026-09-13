@@ -72,8 +72,8 @@ def test_masses_match_card():
             continue
         patches = cfg.get("param_card_patches", {})
         card = dict(_CARD_DEFAULT_MASS)
-        if "MT" in patches: card[6] = float(patches["MT"])
-        if "MB" in patches: card[5] = float(patches["MB"])
+        for pdg, sym in mg.PDG_TO_MASS_SYM.items():          # any scanned mass on the card
+            if sym in patches: card[abs(int(pdg))] = float(patches[sym])
         m = cfg.get("m_finals", cfg.get("m_final", 0.0))
         m = list(m) if isinstance(m, (list, tuple)) else [float(m)] * cfg["nfinal"]
         for pdg, mf in zip(cfg["pdg_ids"][2:], m):

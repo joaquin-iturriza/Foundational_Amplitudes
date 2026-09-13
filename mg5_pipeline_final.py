@@ -71,7 +71,9 @@ ROLE_SEED_OFFSET = {"train": 0, "val": 1_000_000, "test": 2_000_000}
 # =============================================================================
 
 def compute_alphas(mu, alphas_mz=0.118, mz=91.1876, nf=5):
-    """Run alphas from MZ to scale mu at 1-loop."""
+    """Run alphas from MZ to scale mu at 1-loop. `mz` is the fixed reference scale of the
+    running (the SM Z mass), also for an M_Z scan point: alpha_s(M_Z^SM) is the reference
+    value the coupling feature carries, not the pole of that parameter point."""
     b0 = (11 * 3 - 2 * nf) / (12 * np.pi)
     return alphas_mz / (1 + alphas_mz * b0 * 2 * np.log(mu / mz))
 

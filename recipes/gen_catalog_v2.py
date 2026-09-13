@@ -349,15 +349,29 @@ ZPOLE_FAMILY = ["ee_mumu", "ee_tautau", "ee_uu", "ee_ddbar", "ee_bbbar", "ee_num
 def _tag(physics):
     if "alpha_s" in physics: return f"__as{int(round(physics['alpha_s'] * 1000)):03d}"
     (pdg, m), = physics["masses"].items()
-    return f"__{ {6: 'mt', 23: 'mz'}[int(pdg)] }{int(round(m)):03d}"
+    ms = f"{int(round(m)):03d}" if abs(m - round(m)) < 1e-9 else f"{m:.1f}".replace(".", "p")   # 172.5 -> 172p5, never collapsed
+    return f"__{ {6: 'mt', 23: 'mz'}[int(pdg)] }{ms}"
+
+
+def _base_window(base):
+    """The base entry's window as written in the train recipe (a coupling-only variant must
+    keep the phase space bit-identical to its base: the alpha_s axis is the only difference)."""
+    for p in yaml.safe_load(open(OUT_TRAIN))["processes"]:
+        if p["name"] == base:
+            return int(p["sqrts"][0]), int(p["sqrts"][1])
+    raise KeyError(base)
 
 
 def _variant(base, physics, N):
-    """Recipe line of a decorated variant; the window floor follows the scanned masses."""
+    """Recipe line of a decorated variant: a mass variant's window floor follows the scanned
+    masses, a coupling-only variant inherits the base window unchanged."""
     e = mg.PROCESSES[base]; m = masses_entry(e)
-    for pdg, mv in (physics.get("masses") or {}).items():
-        m = [float(mv) if abs(int(q)) == abs(int(pdg)) else mm for q, mm in zip(e["pdg_ids"][2:], m)]
-    lo = int(round(max(1.05 * sum(m), 25.0)))
+    if physics.get("masses"):
+        for pdg, mv in physics["masses"].items():
+            m = [float(mv) if abs(int(q)) == abs(int(pdg)) else mm for q, mm in zip(e["pdg_ids"][2:], m)]
+        lo = int(round(max(1.05 * sum(m), 25.0)))
+    else:
+        lo = _base_window(base)[0]
     name = base + _tag(physics)
     phys = {k: (v if k != "masses" else {int(pp): float(vv) for pp, vv in v.items()}) for k, v in physics.items()}
     return name, (f"  - {{name: {name + ',':<26} base: {base + ',':<16} sqrts: [{lo:>4}, 1000], n_train: {N[0]}, n_val: {N[1]}, n_test: {N[2]}, "
