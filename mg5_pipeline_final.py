@@ -393,6 +393,12 @@ def row_to_slot_perm(pdg_ids, mg5_generate):
     return perm
 
 
+# Locked heavy-quark convention, identical for LO and NLO-virt (tools/nlo_conventions.py
+# pins MT to the collaborators' ttbar reference; MB stays the model default 4.7):
+# every entry with a top carries these param_card patches AND samples at LOCKED_MT.
+LOCKED_MT = 172.5
+TOP_PATCHES = {"MT": LOCKED_MT, "ymt": LOCKED_MT}
+
 PROCESSES = {
     # ------------------------------------------------------------------
     # e+e- processes
@@ -438,10 +444,10 @@ PROCESSES = {
     "ee_ttbar": {
         "mg5_generate": ["generate e+ e- > t t~"],
         "nfinal": 2,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [11, -11, 6, -6],
-        "m_final": 173.0,   # top quark mass (GeV) — keep in sync with param_card
+        "m_final": LOCKED_MT,   # top quark mass (GeV) — keep in sync with param_card
     },
     "ee_uu": {
         "mg5_generate": ["generate e+ e- > u u~"],
@@ -500,7 +506,7 @@ PROCESSES = {
         "param_card_patches": {},
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [11, -11, 24, -24, 5, -5],
-        "m_finals": [80.419, 80.419, 0.0, 0.0],  # mW, mW, mb=0 (5F); top is internal
+        "m_finals": [80.419, 80.419, 4.7, 4.7],   # b at the card mass (was sampled massless),  # mW, mW, mb=0 (5F); top is internal
     },
     "ee_mumutautau": {   # Higgs: ee→ZH, Z→μμ, H→ττ — internal H resonates at M(ττ)≈MH.
         # τ is massive (nonzero Yukawa), so H→ττ exists at the physical M_H≈125 (unlike
@@ -832,10 +838,10 @@ PROCESSES = {
         "mg5_generate": ["generate u u~ > t t~ QED<=2"],
         "nfinal": 2,
         "alphas_power": 2,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [2, -2, 6, -6],
-        "m_final": 173.0,
+        "m_final": LOCKED_MT,
     },
     "uubar_bbbar": {   # mixed
         "mg5_generate": ["generate u u~ > b b~ QED<=2"],
@@ -884,10 +890,10 @@ PROCESSES = {
     "udbar_tbbar": {   # s-channel single top
         "mg5_generate": ["generate u d~ > t b~"],
         "nfinal": 2,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [2, -1, 6, -5],
-        "m_final": [173.0, 4.7],
+        "m_final": [LOCKED_MT, 4.7],
     },
     "udbar_WZ": {   # WWZ vertex, charged current
         "mg5_generate": ["generate u d~ > w+ z"],
@@ -953,10 +959,10 @@ PROCESSES = {
         "mg5_generate": ["generate e+ e- > t t~ g"],
         "nfinal": 3,
         "alphas_power": 1,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [11, -11, 6, -6, 21],
-        "m_finals": [173.0, 173.0, 0.0],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 0.0],
     },
     "ee_uua": {   # ISR + FSR photon on a quark line
         "mg5_generate": ["generate e+ e- > u u~ a"],
@@ -1009,10 +1015,10 @@ PROCESSES = {
     "ee_ttbarH": {   # top Yukawa
         "mg5_generate": ["generate e+ e- > t t~ h"],
         "nfinal": 3,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [11, -11, 6, -6, 25],
-        "m_finals": [173.0, 173.0, 125.0],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 125.0],
     },
     "ee_WWH": {   # WWH vertex, e+e- side
         "mg5_generate": ["generate e+ e- > w+ w- h"],
@@ -1070,10 +1076,10 @@ PROCESSES = {
         "mg5_generate": ["generate u u~ > t t~ g QED<=2"],
         "nfinal": 3,
         "alphas_power": 3,
-        "param_card_patches": {},
+        "param_card_patches": dict(TOP_PATCHES),
         "run_card_patches": {"lpp1": "0", "lpp2": "0"},
         "pdg_ids": [2, -2, 6, -6, 21],
-        "m_finals": [173.0, 173.0, 0.0],
+        "m_finals": [LOCKED_MT, LOCKED_MT, 0.0],
     },
     "udbar_Wgg": {
         "mg5_generate": ["generate u d~ > w+ g g"],

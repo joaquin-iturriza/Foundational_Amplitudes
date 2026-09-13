@@ -52,6 +52,34 @@ def test_perm_builder():
     print(f"[perm] ok: {n_ee} e+e- entries swap the beams, {n_q} others keep slot order")
 
 
+# sm / loop_sm default masses of the massive particles (restrict_default.dat), by |pdg|;
+# everything else is massless. A catalog entry may override MT/MB via param_card_patches.
+_CARD_DEFAULT_MASS = {5: 4.7, 6: 173.0, 15: 1.777, 23: 91.188, 24: 80.419, 25: 125.0}
+
+
+def test_masses_match_card():
+    """Every LO entry samples its final state at the mass its param card will use:
+    the default, or the patched MT/MB. Catches a sampling mass typed in without the
+    matching card patch (an on-shell momentum the matrix element treats as off-shell)."""
+    n = 0
+    for name, cfg in mg.PROCESSES.items():
+        if "pdg_ids" not in cfg or cfg.get("kind") == "virt":
+            continue
+        patches = cfg.get("param_card_patches", {})
+        card = dict(_CARD_DEFAULT_MASS)
+        if "MT" in patches: card[6] = float(patches["MT"])
+        if "MB" in patches: card[5] = float(patches["MB"])
+        m = cfg.get("m_finals", cfg.get("m_final", 0.0))
+        m = list(m) if isinstance(m, (list, tuple)) else [float(m)] * cfg["nfinal"]
+        for pdg, mf in zip(cfg["pdg_ids"][2:], m):
+            want = card.get(abs(int(pdg)), 0.0)
+            assert abs(mf - want) < 1e-6, f"{name}: pdg {pdg} sampled at {mf}, card has {want}"
+        if any(abs(int(q)) == 6 for q in cfg["pdg_ids"][2:]):
+            assert patches.get("MT") == mg.LOCKED_MT and patches.get("ymt") == mg.LOCKED_MT, name
+        n += 1
+    print(f"[mass] ok: {n} LO entries sample at their card masses")
+
+
 def _event_2to2(sqrts, cos_t, pdg=(11, -11, 2, -2)):
     E = sqrts / 2.0
     st = np.sqrt(1.0 - cos_t ** 2)
@@ -121,5 +149,6 @@ def test_stored_pools(recipe="recipes/pretrain8_short.yaml", n_check=5):
 
 if __name__ == "__main__":
     test_perm_builder()
+    test_masses_match_card()
     test_cpp_driver_physics()
     test_stored_pools()

@@ -184,6 +184,19 @@ pure $\alpha_s^k$ ones); recipe identities carry \code{label\_convention=mg5\_sl
 no pre-fix cache is ever reused; \code{tests/test\_beam\_order.py} guards the catalog and
 the sign of $A_{FB}$ on the real driver. All data generated on CC-IN2P3 is post-fix.
 
+\paragraph{Heavy-quark masses: one convention (September 2026).} The \code{sm} and
+\code{loop\_sm} models share their default parameter card ($m_t=173.0$, $m_b=4.7$\,GeV, same
+electroweak inputs); the NLO-virt pipeline overrides only $m_t\to172.5$ (and \code{ymt}) to
+match the collaborators' $t\bar t$ reference (\code{tools/nlo\_conventions.py}), and the LO
+catalog never received that override. Every catalog entry with a top now carries the same
+patch and samples at \code{LOCKED\_MT}$=172.5$; $m_b$ stays the model default $4.7$ for LO
+and virt alike. Two pre-existing inconsistencies of the same kind surfaced while locking
+this down and are fixed: the virt table sampled $e^+e^-\to b\bar b$ with $m_b=4.18$ against
+a card with $4.7$ (no $b$ reference dataset justified $4.18$), and the LO \code{ee\_wwbb}
+entry sampled its $b$ quarks massless against the same card, so both put external $b$
+momenta slightly off the mass the matrix element used. \code{tests/test\_beam\_order.py}
+now checks every LO entry's sampling masses against the masses its card resolves to.
+
 \section{The model and the physical encoding}\label{sec:model}
 % ==========================================================================
 

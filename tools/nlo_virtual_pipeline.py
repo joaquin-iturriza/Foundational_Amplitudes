@@ -47,7 +47,7 @@ VIRT_PROCESSES = {
     "ee_dd":    {"mg5": "generate e+ e- > d d~ [virt=QCD]", "pdg_ids": [11, -11,  1, -1], "m_finals": [0.0, 0.0]},
     "ee_ss":    {"mg5": "generate e+ e- > s s~ [virt=QCD]", "pdg_ids": [11, -11,  3, -3], "m_finals": [0.0, 0.0]},
     "ee_cc":    {"mg5": "generate e+ e- > c c~ [virt=QCD]", "pdg_ids": [11, -11,  4, -4], "m_finals": [0.0, 0.0]},
-    "ee_bb":    {"mg5": "generate e+ e- > b b~ [virt=QCD]", "pdg_ids": [11, -11,  5, -5], "m_finals": [4.18, 4.18]},
+    "ee_bb":    {"mg5": "generate e+ e- > b b~ [virt=QCD]", "pdg_ids": [11, -11,  5, -5], "m_finals": [4.7, 4.7]},   # MB = model default, matches the card
     "ee_ttbar": {"mg5": "generate e+ e- > t t~ [virt=QCD]", "pdg_ids": [11, -11,  6, -6], "m_finals": [172.5, 172.5]},
     # 2->3 qqg: born already carries α_s — distinct topology (real radiation kinematics
     # + 2->3 one-loop). Heavier to build/generate; the running-α_s evaluation makes the
