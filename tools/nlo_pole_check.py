@@ -36,7 +36,8 @@ reads momenta from a .dat with --dat.
 
 Usage:
     python tools/nlo_pole_check.py --so-dir <P0 dir> \
-        --proc-order -11 11 6 -6  --m 0 0 172.5 172.5  --n 200
+        --proc-order 11 -11 6 -6  --m 0 0 172.5 172.5  --perm 1 0 2 3  --n 200
+    (--proc-order and --m in stored row order; --perm = row_to_slot_perm)
 """
 
 import argparse
@@ -187,8 +188,7 @@ def main():
                                                 masses[2:], args.proc_order, rng=rng,
                                                 cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None)
             pts = [mom for mom, _ in ev]
-    if not args.dat:
-        pts = [mom[perm] for mom in pts]         # stored rows -> MadLoop slots
+    pts = [mom[perm] for mom in pts]             # stored rows -> MadLoop slots (--dat rows too)
     rows, rcs, n_noborn = [], [], 0
     for mom in pts:
         r = ML.evaluate(get_me_full, mom)
