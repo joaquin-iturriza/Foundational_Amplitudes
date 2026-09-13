@@ -197,6 +197,60 @@ entry sampled its $b$ quarks massless against the same card, so both put externa
 momenta slightly off the mass the matrix element used. \code{tests/test\_beam\_order.py}
 now checks every LO entry's sampling masses against the masses its card resolves to.
 
+\section{The process catalog}\label{sec:catalog}
+The joint pretraining sets so far were hand-picked: the $8$- and $25$-process sets, and the
+$448$-set of Sec.~\ref{sec:bigrun}, which is $25$ bases times parameter scans. For the re-run
+on CC-IN2P3 the catalog is enumerated by rule and validated by MadGraph
+(\code{recipes/gen\_catalog\_v2.py}; generated entries in
+\code{recipes/catalog\_v2\_processes.yaml}, loaded into the pipeline at import; recipes
+\code{catalog\_v2\_train.yaml} and \code{catalog\_v2\_holdout.yaml}). Beams are $e^+e^-$,
+$u\bar u$, $u\bar d$, $uu$, $ud$, $us$ at parton level, no PDFs; the coupling orders of every
+entry (Def.~\ref{def:coup}) are read off MadGraph's own \code{WEIGHTED} line.
+
+\paragraph{Layers and rules.} The training recipe holds $403$ processes: $305$ trees ($35$ at
+$2\to2$, $82$ at $2\to3$, $188$ at $2\to4$), $95$ one-loop QCD interferences ($29$ at $2\to2$,
+$66$ at $2\to3$) and $3$ loop-induced amplitudes.
+\begin{itemize}
+  \item $2\to2$: enumerated exhaustively and reasoned one by one. Out: loop-induced,
+    Yukawa-suppressed (massless $e$), $2\to1$, and charge- or colour-violating combinations.
+    Masslessness relabels ($s\bar s$, $c\bar c$, $\nu_\tau$) and pure crossings
+    ($u\bar u\to\mu\mu$, $u\bar u\to\gamma\gamma$) are hold-outs, not training entries.
+  \item $2\to3$: every $2\to2$ base plus one leg wherever it attaches ($+g$ on coloured,
+    $+\gamma$ on all, $+Z$/$+H$ on bosonic and heavy-quark finals), plus the $W$-emission and
+    fusion processes ($e^-\bar\nu W^+$, $\nu\bar\nu H$, $e^+e^-H$, $ZHH$, $t\bar tH$, $WWH$).
+  \item $2\to4$: every $2\to3$ plus $g$ or $\gamma$; all four-fermion finals (pair $\times$
+    pair, identical flavours included); the multi-boson finals carrying the quartic vertices
+    ($WWZZ$, $WWWW$, $WW\gamma\gamma$, $WWZH$, $ZZHH$, \dots); $\nu\bar\nu + XY$ fusion.
+  \item One-loop QCD interference ($\alpha_s$-stripped, Def.~\ref{def:coup}): every coloured
+    tree at $2\to2$ and $2\to3$; at $2\to4$ only the hand-written handful.
+  \item Loop-induced: the candidates reachable from these beams, admitted one by one on
+    certification (below).
+\end{itemize}
+
+\paragraph{Validation.} Of $267$ tree candidates the rules produce, $265$ exist in MadGraph
+$3.7.0$; $e^+e^-\to\gamma\gamma H$ (and its $+\gamma$) has no tree. A one-loop backend enters
+the catalog only with an explicit PASS from the pole certifier (a crashed checker used to
+count as a pass, which had certified modules the environment could not even import; the
+verdict now requires the PASS line). The $20$ hand-written one-loop entries certify: the
+$e^+e^-\to q\bar q$ interferences on both poles, the quark-initiated ones on the double pole
+(coloured beams enter $-\sum_i C_i$; no closed-form single pole), the $2\to3$ ones on the
+double pole with $n$-body phase space ($-(2C_F+C_A)$ for $q\bar q g$, $-C_A$ for $Q\bar Q g$).
+Of the loop-induced candidates, $e^+e^-\to HH$, $u\bar u\to Hg$ and $u\bar u\to HH$ certify
+(poles exactly $0$; $u\bar u\to Hg$ scales as exactly $2^3$ when $\alpha_s$ doubles, the
+$HH$ ones are pure-EW top loops with no $\alpha_s$ dependence). $e^+e^-\to gg$ vanishes
+(Furry / Landau--Yang): MadLoop returns $|\mathcal M|^2\sim10^{-37}$ with an inconsistent
+$\alpha_s$ scaling, i.e.\ noise. $e^+e^-\to\gamma H$ and $u\bar u\to H\gamma$ return a
+single pole of $15$--$20\%$ of the finite part at every point although no tree exists, while
+the $HH$ finals in the same model give exactly zero: an $H\gamma$-final pathology of the tool,
+and both stay out.
+
+\paragraph{Hold-outs.} Two kinds. The free ones (relabels, crossings; one at every layer) are
+covered by any base training. Axis removals need one extra pretraining each, and independent
+removals can share a base: drop every $+g$ at $2\to4$ (multiplicity extrapolation), drop one
+family's interference (the LO$\to$NLO map), drop one loop-induced entry, and the
+vertex/particle/topology removals of the $2\to2$ layer ($ggg$, the Higgs family, the top
+family, the pure $t$-channel family, the $WWV$ family).
+
 \section{The model and the physical encoding}\label{sec:model}
 % ==========================================================================
 
@@ -2474,53 +2528,19 @@ Suggested order given the compute situation: 2, 3, 4 need only the small recipes
 generate here plus a modest pretraining; 5 needs no training at all; 6 starts as a CPU
 generator; 1 waits for a compute plan.
 
-\section{Hand-off: the process catalog (\code{catalog\_v2}, generated, not yet trained on)}\label{sec:catalog-open}
-The joint pretraining sets so far were hand-picked (the $8$/$25$-process sets, and the
-$448$-set of Sec.~\ref{sec:bigrun} being $25$ bases times parameter scans). For the
-re-run on CC-IN2P3 the catalog is instead \emph{enumerated by rule and validated by
-MadGraph} (\code{recipes/gen\_catalog\_v2.py}; entries in
-\code{recipes/catalog\_v2\_processes.yaml}, loaded into the pipeline at import; recipes
-\code{catalog\_v2\_train.yaml}, $403$ processes, and \code{catalog\_v2\_holdout.yaml}).
-Beams are $e^+e^-$, $u\bar u$, $u\bar d$, $uu$, $ud$, $us$ at parton level, no PDFs.
+\section{Hand-off: generating the catalog}\label{sec:catalog-open}
+Open before \code{catalog\_v2} (Sec.~\ref{sec:catalog}) can be generated and trained on:
 \begin{itemize}
-  \item \textbf{$2\to2$} ($36$ trees): enumerated exhaustively and reasoned one by one;
-    loop-induced, Yukawa-suppressed (massless $e$), $2\to1$ and unphysical combinations are
-    out; masslessness relabels ($s\bar s$, $c\bar c$, $\nu_\tau$) and pure crossings
-    ($u\bar u\to\mu\mu$, $u\bar u\to\gamma\gamma$) are hold-outs, not training entries.
-  \item \textbf{$2\to3$} ($80$): every $2\to2$ base plus one leg wherever it attaches
-    ($+g$ on coloured, $+\gamma$ on all, $+Z/+H$ on bosonic and heavy-quark finals) plus the
-    $W$-emission and fusion processes ($e^-\bar\nu W^+$, $\nu\bar\nu H$, $e^+e^-H$, $ZHH$,
-    $t\bar tH$, $WWH$).
-  \item \textbf{$2\to4$} ($185$): every $2\to3$ plus $g$/$\gamma$, all four-fermion finals
-    (pair $\times$ pair, incl.\ identical flavours), the multi-boson finals carrying the
-    quartic vertices ($WWZZ$, $WWWW$, $WW\gamma\gamma$, $WWZH$, $ZZHH$, \dots) and
-    $\nu\bar\nu+XY$ fusion. Of $267$ rule candidates $265$ exist ($e^+e^-\to\gamma\gamma H$
-    has no tree).
-  \item \textbf{One-loop QCD interference} ($97$, $\alpha_s$-stripped as in
-    Sec.~\ref{sec:target}): every coloured tree at $2\to2$ and $2\to3$; $2\to4$ loops only
-    the $v1$ handful. Every backend is built and pole-certified with the strict verdict
-    (Sec.~\ref{sec:target}); the checker samples $n$-body phase space and counts coloured
-    beams in the double pole.
-  \item \textbf{Loop-induced} ($3$ certified: $e^+e^-\to HH$, $u\bar u\to Hg$, $u\bar u\to
-    HH$; poles $=0$, $\alpha_s$ scaling as labelled). $e^+e^-\to gg$ vanishes
-    (Furry/Landau--Yang; MadLoop returns $10^{-37}$ noise). $e^+e^-\to\gamma H$ and
-    $u\bar u\to H\gamma$ get a spurious single pole of $\sim\!15$--$20\%$ of the finite part
-    from MadLoop 3.7.0 at every point, while the $HH$ finals in the same model give exactly
-    zero: an $H\gamma$-final tool pathology, kept out until understood.
+  \item The pole/IR-aware sampler of Sec.~\ref{sec:div-sampling} is not in the recipe path,
+    which still samples flat $\sqrt s\times$RAMBO under the fiducial cuts; the $s$-channel
+    families would carry the $Z$ needle of Principle~\ref{prin:needle}.
+  \item $222$ LO standalones to compile (the prebuild does it) and $82$ one-loop backends to
+    build and certify (\code{scripts/build\_nlo\_backends.sh}); the $20$ hand-written ones
+    took $4.5$ minutes in total, the $2\to3$ mixed-born ones will be heavier.
+  \item Pool sizes ($10^5$ events per LO process, $5\times10^4$ per one-loop process) are
+    placeholders to be costed on the first prebuild.
+  \item The parameter-scan axis of the $448$-set is orthogonal and not yet applied to this base.
 \end{itemize}
-Coupling orders of every entry are read off MadGraph's own \code{WEIGHTED} line. Hold-outs
-are of two kinds: the free ones above (one base training covers them all), and axis
-removals (drop every $+g$ at $2\to4$ for multiplicity extrapolation, drop one family's
-\code{\_nlo} for the LO$\to$NLO map, drop one loop-induced entry) which each need one
-extra pretraining; independent removals can share a base.
-
-Open before generation: (i) the pole/IR-aware sampler (Sec.~\ref{sec:div-sampling}) is not
-in the recipe path, which still samples flat $\sqrt s\times$RAMBO under the fiducial cuts,
-so the $s$-channel families would carry the $Z$ needle of Principle~\ref{prin:needle}; (ii)
-$222$ new LO standalones to compile and $83$ one-loop backends to build and certify
-(\code{scripts/build\_nlo\_backends.sh}); (iii) pool sizes ($10^5$ LO, $5\times10^4$
-one-loop per process) are placeholders to be costed on the first prebuild; (iv) the
-parameter-scan axis of the $448$-set is orthogonal and not yet applied to this base.
 
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
