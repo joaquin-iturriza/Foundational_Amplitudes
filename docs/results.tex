@@ -268,9 +268,15 @@ degrade gracefully to a zero embedding.
 
 \begin{definition}[Coupling / auxiliary scalars]\label{def:coup}
 Per-dataset physics that is \emph{not} a function of the external momenta is broadcast to
-every particle as extra scalar features: the coupling order
-\code{amp\_orders}$=[n_{\mathrm{loops}},\,\alpha_s\text{-power}]$
-(LO $=[0,0]$, NLO-full $=[1,1]$, virtual-only $=[1,0]$), the per-event log-coupling
+every particle as extra scalar features: the coupling-order vector of the stored target
+\code{amp\_orders}$=[L_{\mathrm{QCD}},\,L_{\mathrm{EW}},\,\alpha_s\text{-power}_{\max},\,\alpha_{\mathrm{ew}}\text{-power}_{\max}]$
+(LO $e^+e^-\to u\bar u=[0,0,0,2]$, $+g=[0,0,1,2]$, the mixed four-quark entries $[0,0,2,2]$,
+the $\alpha_s$-stripped QCD-virtual $[1,0,0,2]$; at tree level the total degree is the
+final-state multiplicity, so the two maxima fix which monomials exist, and the loop count per
+coupling is what separates a stripped virtual target from the LO at equal power. Until
+September 2026 this was $[n_{\mathrm{loops}},\alpha_s\text{-power}]$, and the recipe data
+path dropped $n_{\mathrm{loops}}$, so virtual datasets were labelled $[0,k]$ against the LO's
+$[0,k-1]$: distinguishable, but only by the coupling power), the per-event log-coupling
 $\log\alpha$, and, for a scanned propagator/resonance, the internal log-mass
 $\log(m/m_{\mathrm{table}})$. Mixing orders or couplings therefore needs no architecture
 change. These are the ``feature levers'' ablated in \S\ref{sec:levers}.

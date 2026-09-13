@@ -48,24 +48,30 @@ TYPE_TOKEN_DICT = {
     "ee_uu_91-1000GeV_amplitudes":   [0, 1, 2, 3],
 }
 
-# Coupling-order convention (see config/amplitudes.yaml): [n_loops, alpha_s_power].
-#   LO=[0,0]  virt_only=[1,0]  NLO_full=[1,1]  NNLO=[2,2]
-# Name-keyed so a new NLO/NNLO dataset file is labelled correctly without
-# hand-editing positional amp_orders lists in every config. Checked most-specific
-# token first; tree-level datasets (no nlo/nnlo token) fall back to LO.
+# Coupling-order vector of a dataset's stored target (mg5_pipeline_final.order_vector):
+#   [L_QCD, L_EW, alpha_s_power_max, alpha_ew_power_max]
+# e.g. e+e- > u u~ LO = [0,0,0,2], + g = [0,0,1,2], u u~ > g g = [0,0,2,0], the mixed
+# four-quark entries [0,0,2,2], the stripped QCD-virt of e+e- > u u~ = [1,0,0,2].
+# Legacy 2-vectors [n_loops, alpha_s_power] in old recipes/configs are widened by
+# mg.normalize_order_vector. Name-keyed fallback for the files data path: the catalog
+# entry whose key prefixes the dataset name; else the old token map (EW power unknown).
 _AMP_ORDER_BY_NAME = [
-    ("nnlo",     [2, 2]),
-    ("nlo_full", [1, 1]),
-    ("nlo_virt", [1, 0]),   # absolute-virt (e4) and the virt/born ratio
+    ("nnlo",     [2, 0, 2, 0]),
+    ("nlo_full", [1, 0, 1, 0]),
+    ("nlo_virt", [1, 0, 0, 0]),   # absolute-virt (e4) and the virt/born ratio
 ]
 
 def amp_order_for_dataset(name):
-    """Map a dataset name to its coupling-order vector [n_loops, alpha_s_power]."""
+    """Map a dataset name to its coupling-order vector (see above)."""
     low = str(name).lower()
+    keys = sorted((k for k in mg.PROCESSES if low.startswith(k.lower() + "_") or low == k.lower()),
+                  key=len, reverse=True)
+    if keys and "nfinal" in mg.PROCESSES[keys[0]]:
+        return mg.order_vector(mg.PROCESSES[keys[0]])
     for token, order in _AMP_ORDER_BY_NAME:
         if token in low:
             return list(order)
-    return [0, 0]
+    return [0, 0, 0, 0]
 
 def log_memory_usage(tag=""):
     process = psutil.Process(os.getpid())
@@ -258,13 +264,15 @@ class AmplitudeExperiment(BaseExperiment):
                 "physics":   physics,
             })
             names.append(name)
-            # Coupling order from the process definition (LO=[0,0]); explicit
-            # override on the spec wins if given.
+            # Coupling-order vector of the stored target, from the catalog entry of
+            # this dataset (the decorated scan name if registered, else its base, so
+            # virt scans with the alpha_s prefactor restored are labelled as such).
+            # An explicit amp_orders on the spec wins (legacy 2-vectors are widened).
+            ocfg = mg.PROCESSES[name if name in mg.PROCESSES else base]
             if "amp_orders" in p and p["amp_orders"] is not None:
-                amp_orders.append(list(p["amp_orders"]))
+                amp_orders.append(mg.normalize_order_vector(p["amp_orders"], ocfg))
             else:
-                k = mg.PROCESSES[base].get("alphas_power", 0)
-                amp_orders.append([0, int(k)])
+                amp_orders.append(mg.order_vector(ocfg))
             # Per-dataset coupling VALUES {order_key: alpha} for the vertex features
             # and the global scalar fallback. Derived from the physics block; an
             # explicit `couplings` on the spec still wins (manual override).
@@ -339,13 +347,13 @@ class AmplitudeExperiment(BaseExperiment):
         return particles_t.numpy().astype(np.float32)
 
     def _resolve_amp_orders(self, names):
-        """Per-dataset [n_loops, alpha_s_power]. An explicit, length-matched
+        """Per-dataset coupling-order vector (see _AMP_ORDER_BY_NAME). An explicit, length-matched
         data.amp_orders wins (e.g. the recipe path sets it per process); otherwise
         derive from dataset names so NLO/NNLO targets are labelled correctly instead
         of silently inheriting the positional LO default."""
         cfg_orders = self.cfg.data.get("amp_orders", None)
         if cfg_orders is not None and len(cfg_orders) == len(names):
-            return [list(o) for o in cfg_orders]
+            return [mg.normalize_order_vector(o) for o in cfg_orders]
         derived = [amp_order_for_dataset(n) for n in names]
         if cfg_orders is not None:
             LOGGER.warning(
@@ -707,7 +715,7 @@ class AmplitudeExperiment(BaseExperiment):
                     self.cfg.model.net.num_scalars = n_scalars
             LOGGER.info(
                 f"Order encoding: {self.n_order_features} features "
-                f"(e.g. [n_loops, alpha_s_power]) → n_scalars={n_scalars}"
+                f"(e.g. [L_QCD, L_EW, alpha_s_max, alpha_ew_max]) → n_scalars={n_scalars}"
             )
         else:
             with open_dict(self.cfg):

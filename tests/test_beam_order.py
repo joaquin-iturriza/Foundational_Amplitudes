@@ -80,6 +80,26 @@ def test_masses_match_card():
     print(f"[mass] ok: {n} LO entries sample at their card masses")
 
 
+def test_order_vectors():
+    """[L_QCD, L_EW, alpha_s_max, alpha_ew_max] of the stored target, by construction."""
+    want = {"ee_uu": [0, 0, 0, 2], "ee_uug": [0, 0, 1, 2], "ee_uugg": [0, 0, 2, 2],
+            "uubar_gg": [0, 0, 2, 0], "uubar_ga": [0, 0, 1, 1], "uubar_Zg": [0, 0, 1, 1],
+            "uubar_uubar": [0, 0, 2, 2], "uubar_uubarg": [0, 0, 3, 2], "ee_ZHH": [0, 0, 0, 3],
+            "ee_WW": [0, 0, 0, 2], "ee_uu_nlo": [1, 0, 0, 2], "ee_uug_nlo": [1, 0, 1, 2]}
+    for name, v in want.items():
+        got = mg.order_vector(mg.PROCESSES[name])
+        assert got == v, (name, got, v)
+    scan = dict(mg.PROCESSES["ee_uu_nlo"], alphas_prefactor=True)
+    assert mg.order_vector(scan) == [1, 0, 1, 2]
+    assert mg.normalize_order_vector([1, 1], mg.PROCESSES["ee_uu_nlo"]) == [1, 0, 1, 2]
+    assert mg.normalize_order_vector([0, 1]) == [0, 0, 1, 0]
+    # every catalog entry with a target yields a vector with non-negative powers
+    for name, cfg in mg.PROCESSES.items():
+        if "nfinal" in cfg and ("pdg_ids" in cfg):
+            v = mg.order_vector(cfg); assert len(v) == 4 and min(v) >= 0, (name, v)
+    print("[order] ok")
+
+
 def _event_2to2(sqrts, cos_t, pdg=(11, -11, 2, -2)):
     E = sqrts / 2.0
     st = np.sqrt(1.0 - cos_t ** 2)
@@ -150,5 +170,6 @@ def test_stored_pools(recipe="recipes/pretrain8_short.yaml", n_check=5):
 if __name__ == "__main__":
     test_perm_builder()
     test_masses_match_card()
+    test_order_vectors()
     test_cpp_driver_physics()
     test_stored_pools()

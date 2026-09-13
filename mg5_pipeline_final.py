@@ -399,6 +399,47 @@ def row_to_slot_perm(pdg_ids, mg5_generate):
 LOCKED_MT = 172.5
 TOP_PATCHES = {"MT": LOCKED_MT, "ymt": LOCKED_MT}
 
+def order_vector(cfg):
+    """Coupling-order vector of a catalog entry's STORED target:
+        [L_QCD, L_EW, alpha_s_power_max, alpha_ew_power_max].
+    Tree level: |M|^2 is homogeneous of total degree nfinal in (alpha_s, alpha_ew),
+    so a pure entry is [0,0,k,nfinal-k]; a mixed entry ("QED<=N" in the generate
+    string: four-quark, heavy-quark pair) has terms from alpha_s^k down to
+    alpha_ew^N, recorded as the two maxima [0,0,k,N]. The maxima say WHICH monomials
+    exist, not their size; where the EW term dominates (Z/W pole of the s-channel
+    four-quark entries) the kinematics carry that. Yukawa and Higgs self-couplings
+    count as electroweak powers (fixed functions of v and the masses in the SM).
+    NLO virt (kind="virt", one QCD loop): the base dataset stores the alpha_s-STRIPPED
+    coefficient (c0+shift)*born, so its alpha_s power is the born's, k-1; with
+    alphas_prefactor (an alpha_s scan) the physical alpha_s/2pi is restored and the
+    power is k. The loop itself is counted in L_QCD, which is what tells a stripped
+    virt target apart from the LO of the same process at equal alpha_s power."""
+    nfinal = int(cfg["nfinal"])
+    k = int(cfg.get("alphas_power", 0))
+    if cfg.get("kind") == "virt":
+        born_k = max(k - 1, 0)
+        a = k if cfg.get("alphas_prefactor") else born_k
+        return [int(cfg.get("n_loops", 1)), 0, a, nfinal - born_k]
+    gen = cfg.get("mg5_generate", [""])
+    gen = gen[0] if isinstance(gen, (list, tuple)) else gen
+    m = re.search(r"QED\s*<=\s*(\d+)", gen)
+    b = int(m.group(1)) if m else nfinal - k
+    return [0, 0, k, b]
+
+
+def normalize_order_vector(o, cfg=None):
+    """Accept the legacy 2-vector [n_loops, alpha_s_power] (recipes and configs written
+    before the 4-vector) and widen it: the EW power is taken from the catalog entry
+    when one is given, else 0."""
+    o = [int(x) for x in o]
+    if len(o) == 4:
+        return o
+    if len(o) == 2:
+        b = order_vector(cfg)[3] if cfg is not None else 0
+        return [o[0], 0, o[1], b]
+    raise ValueError(f"amp_orders entry must have 2 or 4 components, got {o}")
+
+
 PROCESSES = {
     # ------------------------------------------------------------------
     # e+e- processes
@@ -2477,7 +2518,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         "pdg_ids":            list(cfg["pdg_ids"]),
         "param_card_patches": cfg.get("param_card_patches", {}),
         "alphas_power":       k,
-        "amp_orders":         [int(cfg.get("n_loops", 0)), k],
+        "amp_orders":         order_vector(cfg),
         "per_event_alphas":   True,
         # Labelling convention v2: rows are mapped to MadGraph slots from the generate
         # string (row_to_slot_perm) and α_s is set per event inside the ME. Datasets

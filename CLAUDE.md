@@ -146,8 +146,10 @@ Two modes, selected by `data.use_PIDs`:
 - **`use_PIDs: true` (legacy)** — one-hot token index from `ParticleTokenizer`.
 
 ### Coupling order
-`data.amp_orders` is a per-dataset vector `[n_loops, alpha_s_power]` (LO=`[0,0]`,
-NLO_full=`[1,1]`, virt_only=`[1,0]`, …). It's broadcast to every particle as
+`data.amp_orders` is a per-dataset vector `[L_QCD, L_EW, alpha_s_max, alpha_ew_max]`
+of the stored target (`mg5_pipeline_final.order_vector`; LO `ee→uū`=`[0,0,0,2]`,
+`+g`=`[0,0,1,2]`, mixed four-quark `[0,0,2,2]`, stripped QCD-virt `[1,0,0,2]`; legacy
+2-vectors are widened). It's broadcast to every particle as
 extra scalar features, so mixing perturbative orders needs **no model change**.
 
 ### MuP
