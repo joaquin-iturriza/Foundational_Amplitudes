@@ -44,4 +44,11 @@ if __name__ == "__main__":
     assert bulk(sq_m) > 0.4, "bulk starved"
     assert np.array_equal(mix, mix2), "not reproducible from the seed"
     assert np.all(np.isfinite(lm_m)) and mix.shape == flat.shape
+    # val/test are never shaped, whatever the entry says: same identity and path as flat
+    cfg = dict(mg.PROCESSES["ee_uu"]); cfg["sampling"] = {"mode": "mixture"}
+    assert mg.sampling_policy(cfg, "val")["mode"] == "flat" and mg.sampling_policy(cfg, "train")["mode"] == "mixture"
+    mg.PROCESSES["ee_uu"]["sampling"] = {"mode": "mixture"}
+    rv, rt = mg.variable_energy_recipe("ee_uu", 25, 1000, 100, role="val", seed=1), mg.variable_energy_recipe("ee_uu", 25, 1000, 100, role="train", seed=1)
+    del mg.PROCESSES["ee_uu"]["sampling"]
+    assert "sampling" not in rv and "sampling" in rt and "_smix" in mg.recipe_output_path(rt, ".") and "_smix" not in mg.recipe_output_path(rv, ".")
     print("[sampling] ok")

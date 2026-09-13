@@ -237,7 +237,7 @@ def register_recipe_processes(specs, default_sampling=None):
         physics = s.get("physics")
         if physics or base != name:
             register_scan_process(name, base, physics or {})
-        samp = s.get("sampling", default_sampling)
+        samp = s.get("sampling") or default_sampling
         if samp is not None and name in PROCESSES:
             PROCESSES[name]["sampling"] = dict(samp)
 
@@ -2595,7 +2595,7 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
 # `mode: flat` is the legacy uniform-only sampling (keeps old recipe ids).
 # =============================================================================
 DEFAULT_SAMPLING = {
-    "mode":         "mixture",
+    "mode":         "flat",  # legacy physical-measure sampling; a recipe opts into "mixture"
     "f_flat":       0.35,    # fraction of the dataset kept flat in log|M|^2
     "oversample":   6,       # candidates labelled per flat event kept
     "democratic":   0.5,     # share of multi-leg candidates from the IR-democratic splitter
@@ -2605,9 +2605,14 @@ DEFAULT_SAMPLING = {
 }
 
 
-def sampling_policy(cfg):
-    """The effective sampling dict of a catalog entry (defaults filled in)."""
+def sampling_policy(cfg, role=None):
+    """The effective sampling dict of a catalog entry (defaults filled in). The frozen
+    val/test benchmarks always sample the physical measure (flat), whatever the entry says:
+    shaping is a TRAINING-data choice, and val_loss_no_reg must keep meaning the same
+    distribution across runs and against every earlier number."""
     pol = dict(DEFAULT_SAMPLING); pol.update(cfg.get("sampling") or {})
+    if role in ("val", "test") or cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
+        pol["mode"] = "flat"
     return pol
 
 
@@ -2670,6 +2675,12 @@ def democratic_draw(nb, sqrts, masses, y_lo, rng):
     return Pout
 
 
+def _adaptive_bins(n, cap, per_bin=50, floor=20):
+    """Bin count scaled with the sample size (>= per_bin entries per bin on average): a
+    chunked pool with few candidates must not turn the adaptive proposal into noise."""
+    return int(max(floor, min(cap, n // per_bin)))
+
+
 def _sqrts_proposal_from_pass(sqrts_c, logm_c, lo, hi, n_bins, n_logm_bins=60):
     """Adaptive sqrt(s) proposal, targeting flatness directly: each first-pass candidate is
     weighted by 1 / (density of its log|M|^2 in the pass), i.e. by how RARE its amplitude
@@ -2710,7 +2721,9 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
 def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo):
     """nb candidate events with sqrt(s) from `sqrts_draw(n)`: 2->2 isotropic two-body; for
     n >= 3 a frac_dem share from the democratic splitter, the rest RAMBO. Fiducial cuts by
-    rejection with top-up (the pipeline's _collect_with_cuts)."""
+    rejection with top-up (the pipeline's _collect_with_cuts); the cuts bite the democratic
+    draws hardest (they sit in the corners), so the realised democratic share of the
+    survivors is below frac_dem."""
     m_finals = np.asarray(m_finals, float); N = len(m_finals); pdg = np.asarray(pdg_ids, int)
     all_zero = np.all(m_finals == 0.0)
     def draw(n_draw):
@@ -2751,26 +2764,33 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
             with np.errstate(divide="ignore", invalid="ignore"):
                 lg1 = np.log(np.where(me1 > 0, me1, np.nan))
             ok = np.isfinite(lg1)
-            edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, int(pol["n_sqrts_bins"]))
+            nb_s = _adaptive_bins(int(ok.sum()), int(pol["n_sqrts_bins"]))
+            edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, nb_s, n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
             ev2, sq2 = _candidates(n_cand - n1, lambda n: _draw_sqrts_from_bins(n, edges, probs, rng),
                                    m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
             me2 = np.asarray(label(ev2, sq2), float)
             cand, sq_c, me_c = ev1 + ev2, np.concatenate([sq1, sq2]), np.concatenate([me1, me2])
         with np.errstate(divide="ignore", invalid="ignore"):
             logm = np.log(np.where(me_c > 0, me_c, np.nan))
-        keep = _flat_logm_select(logm, n_flat, rng)
+        keep = _flat_logm_select(logm, n_flat, rng, n_bins=_adaptive_bins(len(cand), 60, 100))
+        if len(keep) < n_flat:
+            # too few finite candidates (non-positive |M|^2 is excluded from the flat part;
+            # the bulk keeps whatever the measure gives): top up from the remaining candidates
+            rest = np.setdiff1d(np.arange(len(cand)), keep)
+            keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
         ev_f = [cand[i] for i in keep]; sq_f = sq_c[keep]; me_f = me_c[keep]
         print(f"  [SAMPLE] mixture: bulk {n_bulk:,} + flat-log|M|^2 {len(keep):,} kept from {len(cand):,} candidates"
               f" (adaptive sqrt s: {pol['sqrts_adapt']}, democratic share {pol['democratic']})")
     events = ev_b + ev_f
     sqrts = np.concatenate([sq_b, sq_f]); me2 = np.concatenate([me_b, me_f])
+    assert len(events) == n_events, (len(events), n_events)
     order = rng.permutation(len(events))
     return [events[i] for i in order], sqrts[order], me2[order]
 
 
 def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
                                    standalone_dir, backend, subproc_dirs,
-                                   driver_bin, config, output_file, rng=None):
+                                   driver_bin, config, output_file, rng=None, role=None):
     """
     Build a variable-√s LO amplitude dataset by direct phase-space sampling.
     Bypasses MadGraph event generation entirely.
@@ -2796,8 +2816,11 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     amz        = float(config.get("alphas_mz", 0.118))
     cuts       = FIDUCIAL_CUTS if FIDUCIAL_CUTS_ENABLED else None
     cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
-    pol        = sampling_policy(config)
-    if pol["mode"] == "mixture" and backend == "cpp":
+    pol        = sampling_policy(config, role)
+    if pol["mode"] == "mixture" and backend != "cpp":
+        raise RuntimeError(f"sampling policy 'mixture' needs the C++ backend (got {backend}); "
+                           f"unset MG5_USE_MATRIX2PY or set the recipe's sampling mode to flat")
+    if pol["mode"] == "mixture":
         # shaped sampling (DEFAULT_SAMPLING): the backend labels candidates as we go
         m_list = list(config["m_finals"]) if "m_finals" in config else \
                  (list(config["m_final"]) if isinstance(config["m_final"], (list, tuple)) else [float(config["m_final"])] * nfinal)
@@ -2821,8 +2844,6 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
         w = np.asarray(total_me2, float)
         print(f"[DATA] Saved {n_events:,} events → {output_file}  |M|² ∈ [{w.min():.4e}, {w.max():.4e}]  neg: {(w < 0).sum()}")
         return
-    if pol["mode"] == "mixture":
-        print(f"  [WARN] sampling policy 'mixture' needs the C++ backend; got {backend}: falling back to flat sampling")
 
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
@@ -3015,8 +3036,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         recipe["alphas_mz"] = float(cfg["alphas_mz"])
     if cfg.get("alphas_prefactor"):
         recipe["alphas_prefactor"] = True   # NLO target carries the physical α_s weight
-    # the sampling policy shapes the events (mixture vs flat); legacy flat keeps old ids
-    pol = sampling_policy(cfg)
+    # the sampling policy shapes the events (mixture vs flat); legacy flat keeps old ids.
+    # Never for val/test (always flat) nor for virt datasets (MadLoop path, never shaped).
+    pol = sampling_policy(cfg, role)
     if pol["mode"] != "flat":
         recipe["sampling"] = {k: pol[k] for k in sorted(pol)}
     # sampling masses are identity-bearing for every entry (a changed mass changes the
@@ -3038,9 +3060,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
 
 def recipe_output_path(recipe, out_dir):
     role_tag = f"_{recipe['role']}" if recipe.get("role") else ""
+    # a shaped (mixture) pool never shares a path with the flat pool of the same spec
+    samp_tag = "_smix" if (recipe.get("sampling") or {}).get("mode", "flat") != "flat" else ""
     return (f"{out_dir}/{recipe['process']}"
             f"_{recipe['sqrts_min']:.0f}-{recipe['sqrts_max']:.0f}GeV"
-            f"{role_tag}_amplitudes.npy")
+            f"{role_tag}{samp_tag}_amplitudes.npy")
 
 def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=True):
     """Materialize the variable-energy dataset described by `recipe` into
@@ -3090,7 +3114,7 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
 
     build_dataset_variable_energy(
         recipe["n_events"], recipe["sqrts_min"], recipe["sqrts_max"],
-        eff_dir, backend, subproc_dirs, driver_bin, cfg, output_file, rng=rng)
+        eff_dir, backend, subproc_dirs, driver_bin, cfg, output_file, rng=rng, role=role)
 
     full = dict(recipe)
     full["effective_seed"] = eff_seed

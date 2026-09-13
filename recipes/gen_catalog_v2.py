@@ -38,6 +38,7 @@ CAND = os.path.join(ROOT, "recipes", "catalog_v2_candidates.json")
 OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v2_processes.yaml")
 OUT_TRAIN = os.path.join(ROOT, "recipes", "catalog_v2_train.yaml")
 OUT_HOLD = os.path.join(ROOT, "recipes", "catalog_v2_holdout.yaml")
+VIRT_CHECK = os.path.join(ROOT, "recipes", "catalog_v2_virt_check.json")   # --check-virt record, merged by --write
 
 MASS = {5: 4.7, 6: mg.LOCKED_MT, 15: 1.777, 23: 91.1880, 24: 80.419, 25: 125.0}
 QUARKS = {"u", "d", "s", "c", "b", "t"}
@@ -311,6 +312,13 @@ def main():
                                      "alphas_power": order[2], "loopind": True, "order": order, "pdg_ids": pdg,
                                      "m_finals": m, "param_card_patches": {}, "layer": "loop", "certified": cert,
                                      "why": "loop-induced (pure-EW top loop)" if cert else "loop-induced, NOT certified (spurious MadLoop pole)"}
+        if os.path.exists(VIRT_CHECK):      # keep the MG5 record of the one-loop strings across re-writes
+            vc = json.load(open(VIRT_CHECK))
+            for k, v in virt.items():
+                if k in vc:
+                    v["exists"] = vc[k]["exists"]; v["diagrams"] = vc[k]["diagrams"]
+            for k in [k for k, v in virt.items() if vc.get(k, {}).get("exists") is False]:
+                virt.pop(k); procs.pop(k + "_nlo", None)
         yaml.safe_dump({"processes": procs, "virt": virt}, open(OUT_PROC, "w"), sort_keys=False, width=160)
         print(f"wrote {OUT_PROC}: {len(procs) - n_nlo - 2} tree, {n_nlo} one-loop, 2 loop-induced candidates")
         write_recipes(procs, cands)
@@ -374,6 +382,7 @@ def check_virt(workers):
         if not ok: print("   MG5 rejects", k, d["virt"][k]["mg5"], "::", err[-160:])
     for k in bad:
         d["virt"].pop(k); d["processes"].pop(k + "_nlo", None)
+    json.dump({k: {"exists": ok, "diagrams": n} for k, ok, n, _ in res}, open(VIRT_CHECK, "w"), indent=1)
     yaml.safe_dump(d, open(OUT_PROC, "w"), sort_keys=False, width=160)
     print(f"one-loop strings: {len(res) - len(bad)} exist, {len(bad)} removed")
     cands = json.load(open(CAND)); write_recipes(d["processes"], cands)

@@ -175,6 +175,10 @@ def _child_seed(base_seed, role, idx):
 
 
 def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
+    # NB: process_gen_weight is the FLAT per-event cost; a mixture pool labels ~3x as many
+    # events (bulk + oversampled candidates). Deliberately not folded into the weight: the
+    # weight sets n_chunks, which is part of the train recipe identity, so changing it would
+    # mint new ids for every existing pool. It only mis-sizes LPT scheduling against virt.
     """Independent chunk work-units for one (process, role) dataset. Each is a
     self-contained dict that gen_chunk() can run in any worker / any order."""
     tasks = []
@@ -189,6 +193,7 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
             "sqrts_max": float(sqrts_max),
             "count":     int(count),
             "seed":      _child_seed(seed, role, idx),
+            "role":      role,                  # val/test always sample flat (sampling_policy)
             "out_dir":   os.path.join(work_dir, f"c{idx:04d}"),
             "idx":       idx,
             # est_cost: relative wall-time of this chunk (events × per-event
@@ -263,7 +268,7 @@ def gen_chunk(task):
     rng = np.random.default_rng(task["seed"])
     mg.build_dataset_variable_energy(
         task["count"], task["sqrts_min"], task["sqrts_max"],
-        eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng)
+        eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"))
     return task["idx"], out_path
 
 

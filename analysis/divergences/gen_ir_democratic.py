@@ -35,84 +35,8 @@ REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 
 
-def _random_dirs(n, rng):
-    """n isotropic unit 3-vectors."""
-    cos_t = rng.uniform(-1.0, 1.0, n)
-    phi = rng.uniform(0.0, 2.0 * np.pi, n)
-    sin_t = np.sqrt(np.clip(1.0 - cos_t ** 2, 0.0, None))
-    return np.stack([sin_t * np.cos(phi), sin_t * np.sin(phi), cos_t], axis=1)  # (n,3)
-
-
-def _boost_from_rest(qstar, Pblob):
-    """Boost rest-frame 4-vectors qstar (n,4) into the lab, where the blob has lab 4-momentum
-    Pblob (n,4) with mass M=sqrt(Pblob^2). Standard active Lorentz boost."""
-    E = Pblob[:, 0]
-    p3 = Pblob[:, 1:]
-    M = np.sqrt(np.clip(E ** 2 - (p3 ** 2).sum(1), 1e-18, None))
-    gamma = E / M
-    # beta vector = p3 / E ; n_hat = p3/|p3|
-    pmag = np.sqrt(np.clip((p3 ** 2).sum(1), 1e-30, None))
-    nhat = p3 / pmag[:, None]
-    beta = pmag / E
-    qE = qstar[:, 0]
-    q3 = qstar[:, 1:]
-    ndotq = (nhat * q3).sum(1)
-    lE = gamma * (qE + beta * ndotq)
-    l3 = q3 + nhat * ((gamma - 1.0) * ndotq + gamma * beta * qE)[:, None]
-    return np.concatenate([lE[:, None], l3], axis=1)
-
-
-def _two_body(M, m_a, m_b, rng):
-    """Two-body decay of a blob mass M (n,) into masses m_a, m_b in the blob REST frame.
-    Returns (qa*, qb*) each (n,4), back-to-back at an isotropic direction."""
-    n = len(M)
-    Ea = (M ** 2 + m_a ** 2 - m_b ** 2) / (2.0 * M)
-    lam = (M ** 2 - (m_a + m_b) ** 2) * (M ** 2 - (m_a - m_b) ** 2)
-    pmag = np.sqrt(np.clip(lam, 0.0, None)) / (2.0 * M)
-    d = _random_dirs(n, rng)
-    qa = np.concatenate([Ea[:, None], (pmag[:, None] * d)], axis=1)
-    Eb = np.sqrt(np.clip(pmag ** 2 + m_b ** 2, 0.0, None))
-    qb = np.concatenate([Eb[:, None], -(pmag[:, None] * d)], axis=1)
-    return qa, qb
-
-
-def democratic_draw(nb, sqrts, masses, y_lo, rng):
-    """Generate nb events of a massless/massive N-body final state by recursive log-uniform-mass
-    splitting. sqrts (nb,); masses (N,) final-state masses. Returns P (nb,N,4) lab momenta ordered
-    as `masses`. y_lo sets the deepest intermediate invariant ~ y_lo (in units of s)."""
-    masses = np.asarray(masses, float)
-    N = len(masses)
-    Pout = np.zeros((nb, N, 4))
-    # blob 4-momentum in the lab (starts at rest: (sqrt(s),0,0,0)); current invariant mass M.
-    blob = np.zeros((nb, 4)); blob[:, 0] = sqrts
-    M = sqrts.copy()
-    # suffix sums of masses: m_rest[k] = sum of masses[k:] (still-unemitted incl. current target)
-    suffix = np.concatenate([np.cumsum(masses[::-1])[::-1], [0.0]])   # suffix[k]=sum masses[k:]
-    Mfloor = sqrts * np.sqrt(y_lo)
-    for k in range(N - 1):                     # emit particle k, leaving N-1-k in the blob
-        m_k = masses[k]
-        m_rest = suffix[k + 1]                  # min invariant mass of the remaining blob
-        if k == N - 2:
-            # LAST split: the remaining blob IS the final particle, so its mass is FIXED (not a
-            # free draw) -- else the last leg comes out off-shell/massive. (For N=2 this is the
-            # only split -> a back-to-back massless pair.)
-            Mp = np.full(nb, masses[N - 1])
-        else:
-            Mhi = M - m_k                        # max remaining-blob mass
-            Mlo = np.maximum(m_rest + Mfloor, m_rest + 1e-9)
-            Mlo = np.minimum(Mlo, Mhi)           # guard (rare: little phase space left)
-            # log-uniform in M'^2
-            lo2 = np.log(np.maximum(Mlo ** 2, 1e-18))
-            hi2 = np.log(np.maximum(Mhi ** 2, 1e-18))
-            u = rng.uniform(0.0, 1.0, nb)
-            Mp = np.sqrt(np.exp(lo2 + u * (hi2 - lo2)))
-        # split blob(M) -> particle(m_k) + blob'(Mp) in blob rest frame, then boost to lab
-        q_k, q_bp = _two_body(M, m_k, Mp, rng)
-        Pout[:, k, :] = _boost_from_rest(q_k, blob)
-        blob = _boost_from_rest(q_bp, blob)
-        M = Mp
-    Pout[:, N - 1, :] = blob                    # last blob is the final particle (mass masses[-1])
-    return Pout
+# The splitter now lives in the pipeline (mg5_pipeline_final: sampling policy); one copy.
+from mg5_pipeline_final import _random_dirs, _boost_from_rest, _two_body, democratic_draw  # noqa: E402,F401
 
 
 def build_full_event(P_final, sqrts, beam_pdg=(11, -11)):
