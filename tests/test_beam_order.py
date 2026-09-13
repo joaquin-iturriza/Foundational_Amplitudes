@@ -80,7 +80,12 @@ def test_masses_match_card():
             want = card.get(abs(int(pdg)), 0.0)
             assert abs(mf - want) < 1e-6, f"{name}: pdg {pdg} sampled at {mf}, card has {want}"
         if any(abs(int(q)) == 6 for q in cfg["pdg_ids"][2:]):
-            assert patches.get("MT") == mg.LOCKED_MT and patches.get("ymt") == mg.LOCKED_MT, name
+            # the top mass on the card, its Yukawa and the sampling mass agree: LOCKED_MT on the
+            # base entries, the scanned value on a registered m_t variant
+            mt = float(patches.get("MT", -1)); mt_sampled = [mf for q, mf in zip(cfg["pdg_ids"][2:], m) if abs(int(q)) == 6][0]
+            assert mt == mt_sampled and float(patches.get("ymt", -1)) == mt, name
+            if not cfg.get("scan_base"):
+                assert mt == mg.LOCKED_MT, name
         n += 1
     # virt entries: the catalog masses must equal the one-loop table's sampling masses
     sys.path.insert(0, os.path.join(ROOT, "tools"))

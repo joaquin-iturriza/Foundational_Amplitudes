@@ -141,6 +141,8 @@ def physics_to_generation(physics):
         sym = PDG_TO_MASS_SYM.get(pdg)
         if sym:
             patches[sym] = m
+            if pdg == 6: patches["ymt"] = m      # the Yukawa follows the pole mass (ttH, tbW)
+            if pdg == 5: patches["ymb"] = m
         else:
             print(f"  [WARN] physics.masses: no param_card symbol for PDG {pdg}; "
                   f"ME mass unchanged (phase-space mass still updated).")

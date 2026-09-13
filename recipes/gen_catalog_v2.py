@@ -238,6 +238,7 @@ def main():
     ap.add_argument("--enumerate", action="store_true"); ap.add_argument("--check", action="store_true")
     ap.add_argument("--write", action="store_true"); ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--check-virt", action="store_true", help="run the generated [virt=QCD] strings through MG5 (after --write); non-existent ones are removed from the recipes")
+    ap.add_argument("--scan", action="store_true", help="write the sparse parameter-scan layer (catalog_v2_scan.yaml, catalog_v2_train_scan.yaml, catalog_v2_holdout_scan.yaml)")
     args = ap.parse_args()
     if args.enumerate:
         cands = enumerate_candidates()
@@ -324,6 +325,75 @@ def main():
         write_recipes(procs, cands)
     if args.check_virt:
         check_virt(args.workers)
+    if args.scan:
+        write_scan()
+
+
+# ---------------------------------------------------------------- sparse parameter scan
+# A few representative, far-apart points per axis (not a dense grid), as decorated variants
+# of the families the axis actually moves; the base point stays in the training set:
+#   alpha_s(M_Z) in {0.09, 0.15} on the hand-reasoned trees with an alpha_s power, <= 2->3
+#   m_t in {150, 195} GeV on the top family (threshold moves; the Yukawa follows)
+#   M_Z in {80, 105} GeV on the s-channel fermion-pair families (the needle moves)
+# Hold-outs on this axis are INTERPOLATION points between the two far points and the base.
+SCAN_ALPHAS = [0.09, 0.15]
+SCAN_MT = [150.0, 195.0]
+SCAN_MZ = [80.0, 105.0]
+SCAN_HOLDOUT = [("uubar_gg", {"alpha_s": 0.13}), ("ee_uug", {"alpha_s": 0.13}), ("ee_ttbar", {"masses": {6: 185.0}}),
+                ("ee_uu", {"masses": {23: 95.0}}), ("ee_mumu", {"masses": {23: 95.0}})]
+TOP_FAMILY = ["ee_ttbar", "uubar_ttbar", "udbar_tbbar", "ee_ttbarg", "ee_ttbarH", "uubar_ttbarg"]
+ZPOLE_FAMILY = ["ee_mumu", "ee_tautau", "ee_uu", "ee_ddbar", "ee_bbbar", "ee_numu", "ee_nnbar",
+                "uubar_uubar", "uubar_ddbar", "uubar_bbbar"]
+
+
+def _tag(physics):
+    if "alpha_s" in physics: return f"__as{int(round(physics['alpha_s'] * 1000)):03d}"
+    (pdg, m), = physics["masses"].items()
+    return f"__{ {6: 'mt', 23: 'mz'}[int(pdg)] }{int(round(m)):03d}"
+
+
+def _variant(base, physics, N):
+    """Recipe line of a decorated variant; the window floor follows the scanned masses."""
+    e = mg.PROCESSES[base]; m = masses_entry(e)
+    for pdg, mv in (physics.get("masses") or {}).items():
+        m = [float(mv) if abs(int(q)) == abs(int(pdg)) else mm for q, mm in zip(e["pdg_ids"][2:], m)]
+    lo = int(round(max(1.05 * sum(m), 25.0)))
+    name = base + _tag(physics)
+    phys = {k: (v if k != "masses" else {int(pp): float(vv) for pp, vv in v.items()}) for k, v in physics.items()}
+    return name, (f"  - {{name: {name + ',':<26} base: {base + ',':<16} sqrts: [{lo:>4}, 1000], n_train: {N[0]}, n_val: {N[1]}, n_test: {N[2]}, "
+                  f"physics: {yaml.safe_dump(phys, default_flow_style=True, width=200).strip()}}}")
+
+
+def write_scan():
+    T = (100000, 10000, 10000)
+    v1 = [p["name"] for p in yaml.safe_load(open(OUT_TRAIN.replace("v2_train", "v1_train")))["processes"]]
+    alphas_family = [n for n in v1 if mg.PROCESSES[n].get("kind") != "virt" and mg.PROCESSES[n]["nfinal"] <= 3 and mg.PROCESSES[n].get("alphas_power", 0) >= 1]
+    lines, names = [], []
+    def add(base, physics):
+        n, l = _variant(base, physics, T); lines.append(l); names.append(n)
+    lines.append("  # alpha_s(M_Z) in {0.09, 0.15}: trees with an alpha_s power (shared backend, alpha_s per event)")
+    for b in alphas_family:
+        for a in SCAN_ALPHAS: add(b, {"alpha_s": a})
+    lines.append("  # m_t in {150, 195} GeV: the top family (own standalone per point; Yukawa follows)")
+    for b in TOP_FAMILY:
+        for m in SCAN_MT: add(b, {"masses": {6: m}})
+    lines.append("  # M_Z in {80, 105} GeV: s-channel fermion pairs (own standalone per point)")
+    for b in ZPOLE_FAMILY:
+        for m in SCAN_MZ: add(b, {"masses": {23: m}})
+    assert len(names) == len(set(names))
+    hdr = ["# catalog_v2 parameter-scan layer: a few far-apart points per axis, decorated variants of",
+           "# the base entries (the base point itself is in catalog_v2_train.yaml). The physics block is",
+           "# the single source of truth for generation (card patches, masses) and the coupling feature.",
+           "sampling: {mode: mixture}", "processes:"]
+    open(OUT_TRAIN.replace("v2_train", "v2_scan"), "w").write("\n".join(hdr + lines) + "\n")
+    tr = open(OUT_TRAIN).read().rstrip("\n")
+    open(OUT_TRAIN.replace("v2_train", "v2_train_scan"), "w").write(tr + "\n  # --- parameter-scan layer (catalog_v2_scan.yaml) ---\n" + "\n".join(lines) + "\n")
+    hl = ["# catalog_v2 scan hold-outs: interpolation points between the far scan points and the base.",
+          "sampling: {mode: mixture}   # (val/test always flat; the train pool of a hold-out is for fine-tune curves)", "processes:"]
+    for b, ph in SCAN_HOLDOUT:
+        n, l = _variant(b, ph, T); hl.append(l + "   # interpolation hold-out")
+    open(OUT_HOLD.replace("v2_holdout", "v2_holdout_scan"), "w").write("\n".join(hl) + "\n")
+    print(f"scan layer: {len(names)} variants ({2*len(alphas_family)} alpha_s, {2*len(TOP_FAMILY)} m_t, {2*len(ZPOLE_FAMILY)} M_Z) + {len(SCAN_HOLDOUT)} interpolation hold-outs")
 
 
 def write_recipes(procs, cands):

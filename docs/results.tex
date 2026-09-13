@@ -271,6 +271,16 @@ name. Shaping is a \emph{training-data} choice only: the frozen val/test sets al
 physical measure, so \vlnr\ keeps meaning the same distribution across runs and against every
 earlier number, and the one-loop (MadLoop) datasets are never shaped.
 
+\paragraph{Parameter axis.} Deliberately sparse: a few far-apart points per axis as decorated
+variants of the families the axis moves, never a dense grid (\code{recipes/catalog\_v2\_scan.yaml};
+\code{catalog\_v2\_train\_scan.yaml} is the base plus the $78$ variants): $\alpha_s(M_Z)\in\{0.09,
+0.15\}$ on the $23$ hand-reasoned trees with an $\alpha_s$ power up to $2\to3$ (the backend is
+shared, $\alpha_s$ enters the matrix element per event), $m_t\in\{150,195\}$\,GeV on the six
+top-family entries (the threshold moves with it and the Yukawa follows the pole mass), and
+$M_Z\in\{80,105\}$\,GeV on the ten $s$-channel fermion-pair entries (the needle moves). The
+hold-outs on this axis are \emph{interpolation} points between the far points and the base
+($\alpha_s=0.13$, $m_t=185$, $M_Z=95$; \code{catalog\_v2\_holdout\_scan.yaml}).
+
 \paragraph{Hold-outs.} Two kinds. The free ones (relabels, crossings; one at every layer) are
 covered by any base training. Axis removals need one extra pretraining each, and independent
 removals can share a base: drop every $+g$ at $2\to4$ (multiplicity extrapolation), drop one
@@ -2564,7 +2574,6 @@ policy is in place, Sec.~\ref{sec:catalog}):
     took $4.5$ minutes in total, the $2\to3$ mixed-born ones will be heavier.
   \item Pool sizes ($10^5$ events per LO process, $5\times10^4$ per one-loop process) are
     placeholders to be costed on the first prebuild.
-  \item The parameter-scan axis of the $448$-set is orthogonal and not yet applied to this base.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}

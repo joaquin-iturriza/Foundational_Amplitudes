@@ -1,0 +1,8 @@
+# catalog_v2 scan hold-outs: interpolation points between the far scan points and the base.
+sampling: {mode: mixture}   # (val/test always flat; the train pool of a hold-out is for fine-tune curves)
+processes:
+  - {name: uubar_gg__as130,           base: uubar_gg,        sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}   # interpolation hold-out
+  - {name: ee_uug__as130,             base: ee_uug,          sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}   # interpolation hold-out
+  - {name: ee_ttbar__mt185,           base: ee_ttbar,        sqrts: [ 388, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {masses: {6: 185.0}}}   # interpolation hold-out
+  - {name: ee_uu__mz095,              base: ee_uu,           sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {masses: {23: 95.0}}}   # interpolation hold-out
+  - {name: ee_mumu__mz095,            base: ee_mumu,         sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {masses: {23: 95.0}}}   # interpolation hold-out
