@@ -127,3 +127,4 @@ MG5_debug
 # per-process logs of the one-loop backend build job
 scripts/build_nlo_logs/
 scripts/build_nlo_verdicts.txt
+.claude/.slurm_monitor_jobs
