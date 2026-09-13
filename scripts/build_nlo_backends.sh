@@ -19,6 +19,7 @@
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+set -o pipefail   # the per-process verdict pipes through tee: report a crashed build as such
 
 # Every entry of tools.nlo_virtual_pipeline.VIRT_PROCESSES, in table order.
 PROCS=($(python -c "import sys; sys.path.insert(0, 'tools'); from nlo_virtual_pipeline import VIRT_PROCESSES; print(' '.join(VIRT_PROCESSES))"))   # the whole one-loop table
