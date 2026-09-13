@@ -69,8 +69,14 @@ VIRT_PROCESSES = {
     # alpha_s(sqrt s) like a tree; certification = the IR poles vanish. EW loops need
     # the loop_qcd_qed_sm model. `order` is the 4-vector of the stored target
     # ([L_QCD, L_EW, alpha_s_max, alpha_ew_max], twice the loop amplitude's powers).
+    # NOT CERTIFIED: MadLoop 3.7.0 returns a non-vanishing single pole (e1/fin ~ 0.14 at every
+    # point, e2/fin ~ 0.008) for this tree-less EW process, while ee_HH in the same model gives
+    # exactly zero. Physically |M_1|^2 must be finite here (no tree => no IR poles), so this is
+    # a tool/model problem to understand before the entry can carry a target. Kept out of the
+    # recipes; build/certify still run so the FAIL is reproducible.
     "ee_aH":     {"mg5": "generate e+ e- > h a [sqrvirt=QED]", "model": "loop_qcd_qed_sm", "loopind": True,
-                  "pdg_ids": [11, -11, 25, 22], "m_finals": [125.0, 0.0], "order": [0, 1, 0, 4]},
+                  "pdg_ids": [11, -11, 25, 22], "m_finals": [125.0, 0.0], "order": [0, 1, 0, 4],
+                  "certified": False},
     "ee_HH":     {"mg5": "generate e+ e- > h h [sqrvirt=QED]", "model": "loop_qcd_qed_sm", "loopind": True,
                   "pdg_ids": [11, -11, 25, 25], "m_finals": [125.0, 125.0], "order": [0, 1, 0, 4]},
     "uubar_Hg":  {"mg5": "generate u u~ > h g [sqrvirt=QCD]", "loopind": True,

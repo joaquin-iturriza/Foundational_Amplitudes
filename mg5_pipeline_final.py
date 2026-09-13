@@ -1431,7 +1431,7 @@ PROCESSES = {
         "n_loops": 1, "alphas_power": 1,
         "pdg_ids": [2, -1, 6, -5], "m_finals": [LOCKED_MT, 4.7], "param_card_patches": {},
     },
-    "ee_aH_loop": {   # loop-induced, EW loop
+    "ee_aH_loop": {   # loop-induced, EW loop -- NOT CERTIFIED (spurious MadLoop pole), not in any recipe
         "kind": "virt", "virt": True, "virt_base": "ee_aH", "nfinal": 2,
         "n_loops": 1, "alphas_power": 0, "loopind": True, "order": [0, 1, 0, 4],
         "pdg_ids": [11, -11, 25, 22], "m_finals": [125.0, 0], "param_card_patches": {},
