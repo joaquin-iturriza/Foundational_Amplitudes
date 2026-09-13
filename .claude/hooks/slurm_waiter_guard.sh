@@ -40,6 +40,19 @@ jobs=$("${SQUEUE[@]}" --me -h -o "%i %j %T" 2>/dev/null | grep -viE 'prebuild' |
 if pgrep -f "wait_for_slurm.sh" >/dev/null 2>&1; then
   exit 0
 fi
+# Or a Monitor-tool watcher: on this WSL2 laptop Claude Code stops background Bash tasks
+# within minutes ("low memory" with 6 GB free), so multi-hour jobs are watched with a
+# persistent Monitor instead. It has no process name to pgrep, so arming one records the
+# watched job ids in .claude/.slurm_monitor_jobs (one per line); every queued job must be
+# listed there. Remove or rewrite the file when the watch ends.
+MON="$REPO/.claude/.slurm_monitor_jobs"
+if [ -f "$MON" ]; then
+  unlisted=""
+  for j in $(awk '{print $1}' <<<"$jobs"); do
+    grep -qx "$j" "$MON" || unlisted="$unlisted $j"
+  done
+  [ -z "$unlisted" ] && exit 0
+fi
 
 n=$(printf '%s\n' "$jobs" | wc -l | tr -d ' ')
 {
