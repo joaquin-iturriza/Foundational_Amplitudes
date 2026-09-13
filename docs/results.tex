@@ -276,7 +276,14 @@ final-state multiplicity, so the two maxima fix which monomials exist, and the l
 coupling is what separates a stripped virtual target from the LO at equal power. Until
 September 2026 this was $[n_{\mathrm{loops}},\alpha_s\text{-power}]$, and the recipe data
 path dropped $n_{\mathrm{loops}}$, so virtual datasets were labelled $[0,k]$ against the LO's
-$[0,k-1]$: distinguishable, but only by the coupling power), the per-event log-coupling
+$[0,k-1]$: distinguishable, but only by the coupling power). One caveat is structural: the
+virtual-only target is a \emph{partial sum} of the expansion, and it is told apart from a
+full NLO target of the same process only because it is stored $\alpha_s$-stripped (power
+$k{-}1$ against $k$). Should NLO-full datasets ever coexist with virtual-only ones, that
+distinction needs an explicit target-kind entry rather than a power that happens to differ;
+loop-induced processes (no tree) are excluded from the catalog and would need the same
+care, their target being $|\mathcal M_1|^2$ rather than an interference. Then the per-event
+log-coupling
 $\log\alpha$, and, for a scanned propagator/resonance, the internal log-mass
 $\log(m/m_{\mathrm{table}})$. Mixing orders or couplings therefore needs no architecture
 change. These are the ``feature levers'' ablated in \S\ref{sec:levers}.
