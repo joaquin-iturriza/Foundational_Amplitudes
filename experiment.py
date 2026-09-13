@@ -63,6 +63,7 @@ _AMP_ORDER_BY_NAME = [
 
 def amp_order_for_dataset(name):
     """Map a dataset name to its coupling-order vector (see above)."""
+    import mg5_pipeline_final as mg   # lazy: keeps the MG5 catalog off the import path
     low = str(name).lower()
     keys = sorted((k for k in mg.PROCESSES if low.startswith(k.lower() + "_") or low == k.lower()),
                   key=len, reverse=True)
@@ -351,6 +352,7 @@ class AmplitudeExperiment(BaseExperiment):
         data.amp_orders wins (e.g. the recipe path sets it per process); otherwise
         derive from dataset names so NLO/NNLO targets are labelled correctly instead
         of silently inheriting the positional LO default."""
+        import mg5_pipeline_final as mg
         cfg_orders = self.cfg.data.get("amp_orders", None)
         if cfg_orders is not None and len(cfg_orders) == len(names):
             return [mg.normalize_order_vector(o) for o in cfg_orders]
