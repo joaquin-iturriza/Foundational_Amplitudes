@@ -204,16 +204,13 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
     relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
     processes of different final-state dimensionality (hence very different MSE
     scale) all keep scaling instead of the high-MSE ones dominating the gradient.
-    **Caveat (measured):** the same `1/MSE` weighting starves any process stuck far above
-    the bulk (the `Z`-resonance needle); a 12-process A/B with `loss_aggregation: mean`
-    recovered it (`ee_uu` 0.27 → 5.7e-4) at a 2–4× cost on the best-learned processes
-    (`docs/results.tex`, `tab:agg_ab`). The aggregation for the next catalog wave is an
-    open decision; the τ-floor `loss_aggregation_tau` at the bulk's scale (1e-4) does
-    nothing (needle unchanged, bulk 2–4× worse), its useful range is `[1e-3, 1]` and it is
-    an HP for the wave's DyHPO. `loss_aggregation` and `loss_aggregation_tau` shape the
-    **gradient only**; the validation aggregate (`val_loss_no_reg`, checkpoint selection,
-    HPO objective) is fixed by `training.val_aggregation` (geometric mean) and must never
-    follow a training-side knob, so aggregation A/Bs stay comparable on it.
+    **Caveat:** the same `1/MSE` weighting starves a process stuck far above the bulk
+    (a resonance needle); the arithmetic mean recovers it at a cost elsewhere, and the
+    τ-floor `loss_aggregation_tau` is an HP for the wave's DyHPO, not a fix with a natural
+    value (`docs/results.tex` `tab:agg_ab` and the catalog hand-off). `loss_aggregation`
+    and `loss_aggregation_tau` shape the **gradient only**; the validation aggregate
+    (`val_loss_no_reg`, checkpoint selection, HPO objective) is fixed by
+    `training.val_aggregation` (geometric mean) and never follows a training-side knob.
 
 ---
 
@@ -412,34 +409,30 @@ being *fair* and *not wasteful*:
 
 ---
 
-## Waiting on jobs (always background, never hand-poll)
+## Waiting on jobs (always a mechanism, never hand-poll)
 
 When I submit a job/test and need its result before continuing, **do not** poll
 `squeue` in a manual loop of tool calls, and **do not** promise "I'll check back"
-without a mechanism. The single standard way:
+without a mechanism. The standard way on this laptop:
 
 1. Submit and capture the id: `jid=$(scripts/remote.sh sbatch --parsable <script>)`.
-2. Launch the waiter **in the background** (Claude Code `run_in_background: true`):
-   `scripts/wait_for_slurm.sh "$jid"`.
+2. Arm the **Monitor tool** on it (`persistent: true`; a loop that polls
+   `sacct`/`squeue` over `scripts/remote.sh` every ~45 s and prints one line per
+   terminal state: COMPLETED, FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL), and
+   list the watched id(s) in `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh`
+   accepts the turn ending. The event notification is the source of truth; clear the
+   marker file when the job is read.
 
-`scripts/wait_for_slurm.sh` blocks (cheaply, `squeue` every `POLL=30`s) until the
-job(s) leave the queue, then prints final `sacct` state/exit/elapsed + a `TAIL=25`
-tail of each job's `*_<jobid>.out` log. Because it's backgrounded, the harness
-**re-invokes me exactly once when it exits** — so I pick the results up
-automatically instead of polling or forgetting.
+Why not a backgrounded Bash waiter: **on this WSL2 laptop Claude Code stops
+background Bash tasks within minutes** ("low memory" with 6 GB free), so
+`scripts/wait_for_slurm.sh "$jid"` under `run_in_background` never survives a real
+job; a foreground Bash call is capped at 10 min. Both are fine only for jobs that
+finish in a few minutes. `scripts/wait_for_slurm.sh` (`POLL=<s>`, `TAIL=<n>`; no id
+⇒ all my jobs; forwards itself to the login node) remains the right waiter on a
+machine that keeps background tasks alive.
 
-- No id ⇒ waits on *all* my current jobs: `scripts/wait_for_slurm.sh`.
-- Knobs: `POLL=<s>` interval, `TAIL=<n>` log lines. From the mount it forwards
-  itself to the login node through `scripts/remote.sh` (no `squeue` here).
-- Don't `sleep`-loop or re-run `squeue` by hand across turns; if I need an
-  interim peek I can read the background task's output, but the completion ping is
-  the source of truth.
-- **On this WSL2 laptop Claude Code stops background Bash tasks within minutes**
-  ("low memory" with 6 GB free), so the backgrounded waiter never survives a real
-  job. Use the **Monitor tool** instead (persistent, polls `squeue` over
-  `scripts/remote.sh`, one line per terminal state) and list the watched job ids in
-  `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh` accepts it. A foreground
-  Bash call is capped at 10 min, so foreground waits are only for short jobs.
+- Don't `sleep`-loop or re-run `squeue` by hand across turns; an interim peek reads
+  the task's output file, the completion event is what I act on.
 - **Quick tests must return quickly**: pass `evaluation.train_subsample=2000` (the
   post-training train-split pass otherwise runs the whole pool; default 10000).
 
