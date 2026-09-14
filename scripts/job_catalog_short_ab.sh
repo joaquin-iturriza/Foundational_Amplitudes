@@ -17,7 +17,8 @@
 # by step ~900), generation one-hot (GEN=true) vs no generation column at all (GEN=none, the
 # encoding the census ran with). GEN=false keeps the column as a scalar. Not an HP search.
 # EXP= names the run; AGG=mean|geometric_mean and TAU=<float> switch the training aggregation
-# (the validation metric stays the geometric mean).
+# (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
+# scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -29,6 +30,7 @@ python run.py \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml \
   data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
+  data.signedlog_quantile="${SLQ:-0.01}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
