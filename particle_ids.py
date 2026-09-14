@@ -61,13 +61,59 @@ class ParticleTokenizer:
 # ---------------------------------------------------------------------------
 # Physical property table
 # ---------------------------------------------------------------------------
-# Feature vector (8 numbers):
+# Feature vector (9 numbers):
 #   [charge, spin, log10_mass_gev, weak_isospin_t3, baryon_number,
-#    lepton_number, color_charge, color_casimir]
+#    lepton_number, color_charge, color_casimir, generation]
 #
 #   charge          — electric charge Q (e.g. -1, +2/3, 0)
 #   spin            — spin quantum number (0, 0.5, 1)
-#   log10_mass_gev  — log10(m/GeV); massless particles get _MASSLESS = -5.0
+#   log10_mass_gev  — log10(m/GeV) OF THE MASS THE GENERATOR USES (the MadGraph
+#                     sm card with restrict_default plus the pipeline's locked
+#                     values, GENERATOR_MASSES_GEV below): u, d, s, c, e, mu and
+#                     the neutrinos are massless there and get _MASSLESS = -5.0;
+#                     tau 1.777, b 4.7, t 172.5 (mg5_pipeline_final.LOCKED_MT),
+#                     Z 91.188, W 80.419, H 125. PDG values do not belong here:
+#                     the table must describe the particles in the events (it
+#                     used to carry PDG masses, so d and s, both generated
+#                     massless, differed by a label the data could not support).
+#   weak_isospin_t3 — T₃, third component of weak SU(2)_L isospin
+#                     quarks: ±1/2 (u-type +1/2, d-type -1/2)
+#                     leptons: -1/2 (charged), +1/2 (neutrino)
+#                     W±: ±1;  Z, γ, g, H: 0
+#                     antiparticles: sign flipped
+#   baryon_number   — B (1/3 quarks, -1/3 antiquarks, 0 else)
+#                     explicit here so leptoquarks (B≠0 and L≠0) are correct
+#   lepton_number   — L (+1 leptons, -1 antileptons, 0 else)
+#   color_charge    — sign of SU(3) fundamental charge:
+#                     +1 triplet (quark), -1 antitriplet (antiquark), 0 else
+#   color_casimir   — quadratic Casimir C₂(R) of the SU(3) representation:
+#                     0 singlet, 4/3 fundamental (3 or 3̄), 3 adjoint (8),
+#                     10/3 sextet, … generalises to any color rep.
+#   generation      — fermion generation 1, 2, 3 (u d e νe / c s μ νμ / t b τ ντ);
+#                     0 for bosons. This is what separates d from s and u from c
+#                     when both are massless: the momenta carry no flavour, and
+#                     same-generation pairs (ud, cs) have W exchange that
+#                     cross-generation pairs (us) lack, so without it the model
+#                     sees ud→ud and us→us, dd→dd and ds→ds as one input with two
+#                     targets (docs/results.tex, catalog_v2 census). Categorical:
+#                     one-hot it (generation_onehot) like spin and color.
+#
+# These 9 numbers identify every SM particle as the generator sees it:
+#   γ vs Z    — by log10_mass_gev
+#   γ vs g    — by color_casimir (0 vs 3)
+#   e vs μ vs τ — by generation (and τ by mass)
+#   u vs c vs t — by generation (and t by mass)
+#   quark vs antiquark — by sign of charge, baryon_number, color_charge
+#   gluino vs gluon — by spin (0.5 vs 1) and log10_mass_gev
+#
+# WHY project through a fixed hidden dim rather than feed directly:
+#   Adding a quantum number changes n_features but NOT d_particle_hidden,
+#   so the transformer architecture (and all its weights) is unchanged.
+#   Only the tiny projection matrix Linear(n_features → d_particle_hidden) needs
+#   to be extended — its new column is initialized to zero so the model's
+#   existing predictions are unaffected before any fine-tuning.
+
+_MASSLESS = -5.0
 #   weak_isospin_t3 — T₃, third component of weak SU(2)_L isospin
 #                     quarks: ±1/2 (u-type +1/2, d-type -1/2)
 #                     leptons: -1/2 (charged), +1/2 (neutrino)
@@ -99,50 +145,59 @@ class ParticleTokenizer:
 
 _MASSLESS = -5.0   # sentinel for log10(mass/GeV); well below electron (-3.3)
 
-N_PARTICLE_FEATURES = 8
+# Masses the generator actually uses (GeV): MadGraph sm, restrict_default, plus
+# the pipeline's locked heavy-quark values. Keep in sync with
+# mg5_pipeline_final.LOCKED_MT / TOP_PATCHES and the m_b card default (4.7);
+# tests/test_particle_encoding.py checks it.
+GENERATOR_MASSES_GEV = {
+    "tau": 1.777, "b": 4.7, "t": 172.5, "Z": 91.188, "W": 80.419, "H": 125.0,
+}
+_LM = {k: float(np.log10(v)) for k, v in GENERATOR_MASSES_GEV.items()}
+
+N_PARTICLE_FEATURES = 9
 PARTICLE_FEATURE_NAMES = [
     "charge", "spin", "log10_mass_gev", "weak_isospin_t3",
-    "baryon_number", "lepton_number", "color_charge", "color_casimir",
+    "baryon_number", "lepton_number", "color_charge", "color_casimir", "generation",
 ]
 
 PARTICLE_PROPERTIES = {
     # fmt: off
     # ── gauge bosons ──────────────────────────────────────────────────────────
-    #         Q     s   log10m       T₃    B     L   col  C₂
-    21: [  0.0,  1.0,  _MASSLESS,  0.0,  0.0,  0.0,  0.0,  3.0  ],  # gluon
-    22: [  0.0,  1.0,  _MASSLESS,  0.0,  0.0,  0.0,  0.0,  0.0  ],  # photon
-    23: [  0.0,  1.0,  np.log10(91.1876),  0.0,  0.0,  0.0,  0.0,  0.0  ],  # Z
-    24: [  1.0,  1.0,  np.log10(80.377),   1.0,  0.0,  0.0,  0.0,  0.0  ],  # W+
-   -24: [ -1.0,  1.0,  np.log10(80.377),  -1.0,  0.0,  0.0,  0.0,  0.0  ],  # W-
+    #         Q     s   log10m       T₃    B     L   col  C₂   gen
+    21: [  0.0,  1.0,  _MASSLESS,  0.0,  0.0,  0.0,  0.0,  3.0,  0.0 ],  # gluon
+    22: [  0.0,  1.0,  _MASSLESS,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0 ],  # photon
+    23: [  0.0,  1.0,  _LM["Z"],   0.0,  0.0,  0.0,  0.0,  0.0,  0.0 ],  # Z
+    24: [  1.0,  1.0,  _LM["W"],   1.0,  0.0,  0.0,  0.0,  0.0,  0.0 ],  # W+
+   -24: [ -1.0,  1.0,  _LM["W"],  -1.0,  0.0,  0.0,  0.0,  0.0,  0.0 ],  # W-
     # ── Higgs ─────────────────────────────────────────────────────────────────
-    25: [  0.0,  0.0,  np.log10(125.25),   0.0,  0.0,  0.0,  0.0,  0.0  ],  # H
-    # ── quarks (T₃: up-type +½, down-type -½) ────────────────────────────────
-     1: [ -1/3,  0.5,  np.log10(4.67e-3),  -0.5,  1/3,  0.0,  1.0,  4/3 ],  # d
-    -1: [  1/3,  0.5,  np.log10(4.67e-3),   0.5, -1/3,  0.0, -1.0,  4/3 ],  # dbar
-     2: [  2/3,  0.5,  np.log10(2.16e-3),   0.5,  1/3,  0.0,  1.0,  4/3 ],  # u
-    -2: [ -2/3,  0.5,  np.log10(2.16e-3),  -0.5, -1/3,  0.0, -1.0,  4/3 ],  # ubar
-     3: [ -1/3,  0.5,  np.log10(9.34e-2),  -0.5,  1/3,  0.0,  1.0,  4/3 ],  # s
-    -3: [  1/3,  0.5,  np.log10(9.34e-2),   0.5, -1/3,  0.0, -1.0,  4/3 ],  # sbar
-     4: [  2/3,  0.5,  np.log10(1.27),      0.5,  1/3,  0.0,  1.0,  4/3 ],  # c
-    -4: [ -2/3,  0.5,  np.log10(1.27),     -0.5, -1/3,  0.0, -1.0,  4/3 ],  # cbar
-     5: [ -1/3,  0.5,  np.log10(4.18),     -0.5,  1/3,  0.0,  1.0,  4/3 ],  # b
-    -5: [  1/3,  0.5,  np.log10(4.18),      0.5, -1/3,  0.0, -1.0,  4/3 ],  # bbar
-     6: [  2/3,  0.5,  np.log10(172.76),    0.5,  1/3,  0.0,  1.0,  4/3 ],  # t
-    -6: [ -2/3,  0.5,  np.log10(172.76),   -0.5, -1/3,  0.0, -1.0,  4/3 ],  # tbar
-    # ── charged leptons (T₃ = -½ for ℓ_L, +½ for ℓ̄_L) ──────────────────────
-    11: [ -1.0,  0.5,  np.log10(5.11e-4),  -0.5,  0.0,  1.0,  0.0,  0.0 ],  # e-
-   -11: [  1.0,  0.5,  np.log10(5.11e-4),   0.5,  0.0, -1.0,  0.0,  0.0 ],  # e+
-    13: [ -1.0,  0.5,  np.log10(1.057e-1), -0.5,  0.0,  1.0,  0.0,  0.0 ],  # μ-
-   -13: [  1.0,  0.5,  np.log10(1.057e-1),  0.5,  0.0, -1.0,  0.0,  0.0 ],  # μ+
-    15: [ -1.0,  0.5,  np.log10(1.777),    -0.5,  0.0,  1.0,  0.0,  0.0 ],  # τ-
-   -15: [  1.0,  0.5,  np.log10(1.777),     0.5,  0.0, -1.0,  0.0,  0.0 ],  # τ+
+    25: [  0.0,  0.0,  _LM["H"],   0.0,  0.0,  0.0,  0.0,  0.0,  0.0 ],  # H
+    # ── quarks (u, d, s, c massless in the generator) ─────────────────────────
+     1: [ -1/3,  0.5,  _MASSLESS,  -0.5,  1/3,  0.0,  1.0,  4/3,  1.0 ],  # d
+    -1: [  1/3,  0.5,  _MASSLESS,   0.5, -1/3,  0.0, -1.0,  4/3,  1.0 ],  # dbar
+     2: [  2/3,  0.5,  _MASSLESS,   0.5,  1/3,  0.0,  1.0,  4/3,  1.0 ],  # u
+    -2: [ -2/3,  0.5,  _MASSLESS,  -0.5, -1/3,  0.0, -1.0,  4/3,  1.0 ],  # ubar
+     3: [ -1/3,  0.5,  _MASSLESS,  -0.5,  1/3,  0.0,  1.0,  4/3,  2.0 ],  # s
+    -3: [  1/3,  0.5,  _MASSLESS,   0.5, -1/3,  0.0, -1.0,  4/3,  2.0 ],  # sbar
+     4: [  2/3,  0.5,  _MASSLESS,   0.5,  1/3,  0.0,  1.0,  4/3,  2.0 ],  # c
+    -4: [ -2/3,  0.5,  _MASSLESS,  -0.5, -1/3,  0.0, -1.0,  4/3,  2.0 ],  # cbar
+     5: [ -1/3,  0.5,  _LM["b"],   -0.5,  1/3,  0.0,  1.0,  4/3,  3.0 ],  # b
+    -5: [  1/3,  0.5,  _LM["b"],    0.5, -1/3,  0.0, -1.0,  4/3,  3.0 ],  # bbar
+     6: [  2/3,  0.5,  _LM["t"],    0.5,  1/3,  0.0,  1.0,  4/3,  3.0 ],  # t
+    -6: [ -2/3,  0.5,  _LM["t"],   -0.5, -1/3,  0.0, -1.0,  4/3,  3.0 ],  # tbar
+    # ── charged leptons (e, mu massless in the generator) ─────────────────────
+    11: [ -1.0,  0.5,  _MASSLESS,  -0.5,  0.0,  1.0,  0.0,  0.0,  1.0 ],  # e-
+   -11: [  1.0,  0.5,  _MASSLESS,   0.5,  0.0, -1.0,  0.0,  0.0,  1.0 ],  # e+
+    13: [ -1.0,  0.5,  _MASSLESS,  -0.5,  0.0,  1.0,  0.0,  0.0,  2.0 ],  # μ-
+   -13: [  1.0,  0.5,  _MASSLESS,   0.5,  0.0, -1.0,  0.0,  0.0,  2.0 ],  # μ+
+    15: [ -1.0,  0.5,  _LM["tau"], -0.5,  0.0,  1.0,  0.0,  0.0,  3.0 ],  # τ-
+   -15: [  1.0,  0.5,  _LM["tau"],  0.5,  0.0, -1.0,  0.0,  0.0,  3.0 ],  # τ+
     # ── neutrinos (massless; T₃ = +½ for ν_L) ────────────────────────────────
-    12: [  0.0,  0.5,  _MASSLESS,           0.5,  0.0,  1.0,  0.0,  0.0 ],  # νe
-   -12: [  0.0,  0.5,  _MASSLESS,          -0.5,  0.0, -1.0,  0.0,  0.0 ],  # ν̄e
-    14: [  0.0,  0.5,  _MASSLESS,           0.5,  0.0,  1.0,  0.0,  0.0 ],  # νμ
-   -14: [  0.0,  0.5,  _MASSLESS,          -0.5,  0.0, -1.0,  0.0,  0.0 ],  # ν̄μ
-    16: [  0.0,  0.5,  _MASSLESS,           0.5,  0.0,  1.0,  0.0,  0.0 ],  # ντ
-   -16: [  0.0,  0.5,  _MASSLESS,          -0.5,  0.0, -1.0,  0.0,  0.0 ],  # ν̄τ
+    12: [  0.0,  0.5,  _MASSLESS,   0.5,  0.0,  1.0,  0.0,  0.0,  1.0 ],  # νe
+   -12: [  0.0,  0.5,  _MASSLESS,  -0.5,  0.0, -1.0,  0.0,  0.0,  1.0 ],  # ν̄e
+    14: [  0.0,  0.5,  _MASSLESS,   0.5,  0.0,  1.0,  0.0,  0.0,  2.0 ],  # νμ
+   -14: [  0.0,  0.5,  _MASSLESS,  -0.5,  0.0, -1.0,  0.0,  0.0,  2.0 ],  # ν̄μ
+    16: [  0.0,  0.5,  _MASSLESS,   0.5,  0.0,  1.0,  0.0,  0.0,  3.0 ],  # ντ
+   -16: [  0.0,  0.5,  _MASSLESS,  -0.5,  0.0, -1.0,  0.0,  0.0,  3.0 ],  # ν̄τ
     # fmt: on
 }
 # To add a BSM particle: append one entry here with its quantum numbers.
@@ -315,6 +370,31 @@ def expand_color_onehot(matrix, names=None):
 
 
 # ---------------------------------------------------------------------------
+# Optional hybrid encoding: one-hot the *categorical* generation column
+# ---------------------------------------------------------------------------
+# Generation is a label (the third generation is not "three times" the first),
+# and what the model needs from it is equality between two legs (same-generation
+# pairs exchange a W). One learnable direction per generation; bosons are all-zero.
+GENERATION_VALUES = (1.0, 2.0, 3.0)
+
+
+def expand_generation_onehot(matrix, names=None):
+    """Replace the scalar ``generation`` column by ``gen_is_1..3`` one-hot columns
+    (bosons all zero). Returns ``(matrix, names)``; padding rows stay zero."""
+    matrix = np.asarray(matrix, dtype=np.float32)
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
+    g = names.index("generation")
+    onehot = np.zeros((matrix.shape[0], len(GENERATION_VALUES)), dtype=np.float32)
+    for i, v in enumerate(GENERATION_VALUES):
+        onehot[:, i] = (np.abs(matrix[:, g] - v) < 1e-6)
+    expanded = np.concatenate([matrix[:, :g], matrix[:, g + 1:], onehot], axis=1)
+    padding = ~np.any(matrix != 0.0, axis=1)
+    expanded[padding] = 0.0
+    names_out = names[:g] + names[g + 1:] + [f"gen_is_{int(v)}" for v in GENERATION_VALUES]
+    return expanded, names_out
+
+
+# ---------------------------------------------------------------------------
 # Optional encoding: explicit "exactly massless" flag
 # ---------------------------------------------------------------------------
 # `log10_mass_gev` uses a _MASSLESS = -5.0 sentinel, which (a) conflates the
@@ -352,7 +432,7 @@ def add_is_massless_flag(matrix, names=None):
 # embedding and gradients. Z-score the continuous columns across the real
 # (non-padding) species. Categorical / one-hot / binary columns are left as-is
 # (standardizing them would break their 0/1 sparsity and the all-zero padding).
-_STD_SKIP_PREFIXES = ("spin_is_", "spin_overflow", "color_is_", "color_overflow", "is_massless")
+_STD_SKIP_PREFIXES = ("spin_is_", "spin_overflow", "color_is_", "color_overflow", "is_massless", "gen_is_")
 
 
 # FROZEN standardization constants (per physical feature), computed ONCE over the
@@ -364,19 +444,21 @@ _STD_SKIP_PREFIXES = ("spin_is_", "spin_overflow", "color_is_", "color_overflow"
 # (the massless sentinel replaced by the massive mean), matching the
 # prop_is_massless pipeline that runs before standardize.
 #
-# Regenerate intentionally (only if the canonical feature set changes), via:
+# Regenerated when the table changed to the generator's masses and gained the
+# generation column (catalog_v2 census, docs/results.tex). Regenerate via:
 #   mat, names = add_is_massless_flag(GLOBAL_PROPERTY_MATRIX)
 #   real = np.any(GLOBAL_PROPERTY_MATRIX != 0, axis=1)
 #   {f: (mat[real, names.index(f)].mean(), mat[real, names.index(f)].std()) for f in CONT}
 _FROZEN_STD_STATS = {
     "charge":          (0.00000000, 0.61463630),
     "spin":            (0.56666666, 0.21343747),
-    "log10_mass_gev":  (-0.28611699, 1.58533919),
+    "log10_mass_gev":  (1.41847146, 0.46235374),   # generator masses; massless rows neutralised
     "weak_isospin_t3": (0.00000000, 0.51639777),
     "baryon_number":   (0.00000000, 0.21081853),
     "lepton_number":   (0.00000000, 0.63245553),
     "color_charge":    (0.00000000, 0.63245553),
     "color_casimir":   (0.63333333, 0.78102499),
+    "generation":      (1.60000002, 1.08320510),   # used only when generation_onehot is off
 }
 
 
@@ -408,9 +490,10 @@ def standardize_property_columns(matrix, names=None):
 
 
 def build_property_matrix(spin_onehot=False, color_onehot=False,
-                          is_massless=False, standardize=False):
+                          is_massless=False, standardize=False,
+                          generation_onehot=False):
     """Assemble the particle property matrix with the requested smart-encoding
-    transforms, applied in a fixed order (spin → color → mass-flag →
+    transforms, applied in a fixed order (spin → color → generation → mass-flag →
     standardize). Returns ``(matrix, feature_names)``. With all flags False this
     is exactly ``(GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES)``."""
     mat, names = GLOBAL_PROPERTY_MATRIX, list(PARTICLE_FEATURE_NAMES)
@@ -418,6 +501,8 @@ def build_property_matrix(spin_onehot=False, color_onehot=False,
         mat, names = expand_spin_onehot(mat)
     if color_onehot:
         mat, names = expand_color_onehot(mat, names)
+    if generation_onehot:
+        mat, names = expand_generation_onehot(mat, names)
     if is_massless:
         mat, names = add_is_massless_flag(mat, names)
     if standardize:
@@ -445,7 +530,7 @@ MASS_MASSLESS_LOG10_THR = -4.0
 
 
 def mass_feature_spec(spin_onehot=False, color_onehot=False,
-                      is_massless=False, standardize=False):
+                      is_massless=False, standardize=False, generation_onehot=False):
     """Metadata for the data-derived mass column (see ``data.mass_from_momenta``).
 
     Returns a dict the wrapper uses to map a per-particle physical mass onto the
@@ -464,6 +549,7 @@ def mass_feature_spec(spin_onehot=False, color_onehot=False,
     _, names = build_property_matrix(
         spin_onehot=spin_onehot, color_onehot=color_onehot,
         is_massless=is_massless, standardize=standardize,
+        generation_onehot=generation_onehot,
     )
     mass_col = names.index("log10_mass_gev")
     is_massless_col = names.index("is_massless") if "is_massless" in names else None

@@ -416,16 +416,27 @@ for the base-shape file); \code{attn\_reps} is held fixed between base and delta
 
 \begin{definition}[Physical particle encoding]\label{def:enc}
 With \code{use\_PIDs: false} (the default) each PDG id maps through a fixed global table
-to an $8$-dimensional \emph{physical property vector}
+to a $9$-dimensional \emph{physical property vector}
 \[
-  \bigl[\,Q,\ \text{spin},\ \log_{10}(m/\mathrm{GeV}),\ T_3,\ B,\ L,\ \text{color charge},\ C_2(R)\,\bigr]
+  \bigl[\,Q,\ \text{spin},\ \log_{10}(m/\mathrm{GeV}),\ T_3,\ B,\ L,\ \text{color charge},\ C_2(R),\ \text{generation}\,\bigr]
 \]
-(electric charge, spin, log-mass, weak isospin, baryon and lepton number, and the SU(3)
-color charge and quadratic Casimir). The two \emph{categorical} columns, spin and the SU(3)
-color representation, are \textbf{one-hot} encoded rather than passed as scalars, because
-they are labels, not magnitudes (spin-$1$ is not ``twice'' spin-$\tfrac12$), so a scalar column
-would force every value onto one line through the origin; the continuous columns are
-standardized, and an explicit ``exactly massless'' flag neutralizes the log-mass sentinel. A
+(electric charge, spin, log-mass, weak isospin, baryon and lepton number, the SU(3) color
+charge and quadratic Casimir, and the fermion generation, $0$ for bosons). The mass column
+holds the mass \emph{the generator uses}: $u,d,s,c,e,\mu$ and the neutrinos are massless in
+the MadGraph card and get the massless sentinel, $\tau$, $b$ and $t$ their card values
+($1.777$, $4.7$, $172.5$\,GeV, the last the pipeline's locked value), $Z$, $W$, $H$ theirs. It
+used to hold PDG masses ($d$ at $4.7$\,MeV, $s$ at $93$\,MeV, $b$ at $4.18$\,GeV), a label
+inconsistent with the events (Sec.~\ref{sec:catv2-census}); with \code{mass\_from\_momenta}
+on, the production setting, the column is replaced per particle by the on-shell mass of its
+four-momentum anyway, so $d$ and $s$ were identical inputs. The generation column is what
+now separates them: the momenta carry no flavour, and same-generation pairs ($ud$, $cs$)
+exchange a $W$ that cross-generation pairs ($us$) do not. The three \emph{categorical}
+columns, spin, the SU(3) color representation and the generation, are \textbf{one-hot}
+encoded rather than passed as scalars, because they are labels, not magnitudes (spin-$1$
+is not ``twice'' spin-$\tfrac12$, the third generation is not three times the first), so a
+scalar column would force every value onto one line through the origin; the continuous
+columns are standardized (frozen constants, regenerated for the corrected table), and an
+explicit ``exactly massless'' flag neutralizes the log-mass sentinel. A
 learned encoder, by default a $2$-layer MLP ($\operatorname{Linear}\!\to\!\text{GELU}\!\to\!\operatorname{Linear}$,
 so it can form nonlinear products of quantum numbers), projects the resulting
 $n_{\mathrm{feat}}$-vector to the $16$-D particle embedding. Because the input dimension depends
@@ -2657,13 +2668,10 @@ generator; 1 waits for a compute plan.
 \code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); the first
 pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the next one:
 \begin{itemize}
-  \item \textbf{Flavour in the encoding.} The property vector separates $d$ from $s$ and $u$
-    from $c$ only by mass, which the model ignores; a generation feature (or an explicit
-    same-generation flag on the pair) is the smallest change that keeps the vocabulary-free
-    design and makes $W$-exchange structure representable. Until then the catalog must not
-    contain two entries that collide under $u\equiv c$, $d\equiv s$ with different functions
-    (the $ud/us/cs$ and $dd/ds$ families and their towers, $27$ keys); the generator's dedup
-    rule needs the generation structure, not just the flavour multiset.
+  \item \textbf{Re-measure with the generation feature.} The encoding fix
+    (Sec.~\ref{sec:catv2-census}) is in but untested at scale: one three-trial wave at the
+    wave-0 setup shows whether the $27$ colliding keys ($ud/us/cs$, $dd/ds$ and their towers)
+    now learn, before any full sweep.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
@@ -2764,7 +2772,21 @@ $u\bar u\to\gamma\gamma$), the reverse of the order-axis hold-out.
 
 The remaining waves of the sweep were cancelled after wave 0: the objective is dominated by
 these three effects, none of which a hyperparameter fixes, and the catalog has to change
-before the sweep means anything. Open decisions are in Sec.~\ref{sec:catalog-open}.
+before the sweep means anything.
+
+\paragraph{Fix: the table says what the generator says, and carries the generation.} Two
+changes to the encoding (Def.~\ref{def:enc}). The property table's masses are now the
+generator's, taken from the same constants the pipeline locks, with a test pinning them
+(\code{tests/test\_particle\_encoding.py}); this also removes a silent inconsistency in the
+scan machinery, which rebuilt final-state masses from the table. And a ninth column, the
+fermion generation, one-hot encoded like spin and color (\code{data.generation\_onehot}),
+gives $d$ versus $s$ and $u$ versus $c$ an input difference the data can support: under the
+new table a $d$ and an $s$ row differ in exactly the generation columns and nothing else.
+The projection from the property vector is the only layer whose input width changes, so
+$\mu$P shapes and the transformer are untouched; earlier checkpoints cannot warm-start,
+which costs nothing since the catalog run restarts. The catalog's colliding entries become
+distinguishable inputs, so the dedup rule can stay; whether they should also be pruned, and
+the hold-out fixes, remain open (Sec.~\ref{sec:catalog-open}).
 
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================

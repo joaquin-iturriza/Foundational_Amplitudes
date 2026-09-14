@@ -55,7 +55,7 @@ data:
   - log
   - standardization
  incl_fvs: false
- use_PIDs: false  # false: 8D physical property vector; true: one-hot PDG token index (legacy)
+ use_PIDs: false  # false: 9D physical property vector; true: one-hot PDG token index (legacy)
  # Smart-encoding transforms of the physical property vector (use_PIDs: false only).
  # These widen the encoder's INPUT, not n_scalars (see particle_ids.build_property_matrix),
  # so changing them invalidates warm-start from checkpoints trained under a different set.
@@ -69,6 +69,10 @@ data:
                            # on by default. It was neutral on short/small A/B runs, but is
                            # expected to help on richer data / longer training (open — drop
                            # only if a rigorous test shows it hurts).
+ generation_onehot: true   # one-hot the fermion generation. The table's masses are the
+                           # generator's (u,d,s,c,e,mu massless), so generation is the only
+                           # thing separating d from s and u from c; same-generation pairs
+                           # (ud, cs) exchange a W, cross-generation ones (us) do not.
  prop_is_massless: true    # explicit "exactly massless" flag + neutralise mass sentinel
  standardize_props: true   # z-score the continuous property columns
  # Replace the frozen log10_mass_gev table column with each particle's on-shell mass

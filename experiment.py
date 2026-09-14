@@ -657,9 +657,13 @@ class AmplitudeExperiment(BaseExperiment):
                 color_onehot  = self.cfg.data.get("color_onehot", False)
                 is_massless   = self.cfg.data.get("prop_is_massless", False)
                 standardize   = self.cfg.data.get("standardize_props", False)
+                #   generation_onehot — one-hot the fermion generation (separates d from s,
+                #                       u from c, which are both massless in the generator)
+                generation_onehot = self.cfg.data.get("generation_onehot", False)
                 self.property_matrix, _ = build_property_matrix(
                     spin_onehot=spin_onehot, color_onehot=color_onehot,
                     is_massless=is_massless, standardize=standardize,
+                    generation_onehot=generation_onehot,
                 )
                 # d_particle_hidden is the fixed projection output dim.
                 # in_channels and num_scalars use this fixed dim — they never
@@ -670,6 +674,7 @@ class AmplitudeExperiment(BaseExperiment):
                 _enc = "+".join(
                     [n for n, on in (("spin1hot", spin_onehot),
                                      ("color1hot", color_onehot),
+                                     ("gen1hot", generation_onehot),
                                      ("masslessflag", is_massless),
                                      ("std", standardize)) if on]
                 ) or "raw"
@@ -695,6 +700,7 @@ class AmplitudeExperiment(BaseExperiment):
                     list(self.cfg.data.dataset),
                     spin_onehot=spin_onehot, color_onehot=color_onehot,
                     is_massless=is_massless, standardize=standardize,
+                    generation_onehot=generation_onehot,
                     build_virtuality=self._use_diag_virt,
                     couplings_by_pid=getattr(self, "_coupling_by_pid", None),
                     internal_mass_by_pid=getattr(self, "_internal_mass_by_proc", None),
@@ -787,6 +793,7 @@ class AmplitudeExperiment(BaseExperiment):
             color_onehot=bool(self.cfg.data.get("color_onehot", False)),
             is_massless=bool(self.cfg.data.get("prop_is_massless", True)),
             standardize=bool(self.cfg.data.get("standardize_props", True)),
+            generation_onehot=bool(self.cfg.data.get("generation_onehot", False)),
         )
         k_pe = int((self.cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8))
         slot_map = getattr(self, "_slot_pdgs_by_name", {})
@@ -857,6 +864,7 @@ class AmplitudeExperiment(BaseExperiment):
             color_onehot=bool(self.cfg.data.get("color_onehot", False)),
             is_massless=bool(self.cfg.data.get("prop_is_massless", True)),
             standardize=bool(self.cfg.data.get("standardize_props", True)),
+            generation_onehot=bool(self.cfg.data.get("generation_onehot", False)),
         )
         k_pe = int((self.cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8))
         max_props = int(self.cfg.model.get("pair_bias_max_props", 48))
@@ -942,7 +950,7 @@ class AmplitudeExperiment(BaseExperiment):
         return by_proc
 
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
-                                is_massless, standardize, build_virtuality=False,
+                                is_massless, standardize, generation_onehot=False, build_virtuality=False,
                                 couplings_by_pid=None,
                                 internal_mass_by_pid=None, internal_mass_pdgs=None,
                                 scanned_mass=False):
@@ -971,6 +979,7 @@ class AmplitudeExperiment(BaseExperiment):
         prop_matrix, _ = build_property_matrix(
             spin_onehot=spin_onehot, color_onehot=color_onehot,
             is_massless=is_massless, standardize=standardize,
+            generation_onehot=generation_onehot,
         )
         # Couplings on vertices: if ANY dataset carries coupling values, every
         # process gets the coupling columns (0-filled where absent) so the batched
@@ -989,7 +998,8 @@ class AmplitudeExperiment(BaseExperiment):
         if scanned_mass and im_pdgs and any(im_by_pid):
             from particle_ids import mass_feature_spec, GLOBAL_PDG_IDX
             mass_spec = mass_feature_spec(spin_onehot=spin_onehot, color_onehot=color_onehot,
-                                          is_massless=is_massless, standardize=standardize)
+                                          is_massless=is_massless, standardize=standardize,
+                                          generation_onehot=generation_onehot)
 
         def _encode_mass(m):
             s = mass_spec
@@ -1097,6 +1107,7 @@ class AmplitudeExperiment(BaseExperiment):
                     color_onehot=self.cfg.data.get("color_onehot", False),
                     is_massless=self.cfg.data.get("prop_is_massless", False),
                     standardize=self.cfg.data.get("standardize_props", False),
+                    generation_onehot=bool(self.cfg.data.get("generation_onehot", False)),
                 )
                 model.setup_mass_from_momenta(self.mom_div, spec)
                 LOGGER.info(
