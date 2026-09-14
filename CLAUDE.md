@@ -139,8 +139,11 @@ Config `config/model/lloca.yaml`:
 ### Particle encoding (important design choice)
 Two modes, selected by `data.use_PIDs`:
 - **`use_PIDs: false` (default, preferred)** — each PDG id maps via a fixed
-  global table `GLOBAL_PROPERTY_MATRIX` (in `particle_ids.py`) to an 8-D physical
-  property vector, then a learned `Linear(n_features → d_particle_hidden=16)`.
+  global table `GLOBAL_PROPERTY_MATRIX` (in `particle_ids.py`) to a 9-D physical
+  property vector (charge, spin, log-mass, T3, B, L, colour charge, Casimir,
+  generation), then a learned `Linear(n_features → d_particle_hidden=16)`. The
+  table's masses are the **generator's** (u, d, s, c, e, μ massless; b 4.7, t 172.5),
+  never PDG values, and the generation column is what tells d from s and u from c.
   `in_channels` depends only on `d_particle_hidden`, **not** on the vocabulary,
   so adding a new particle/feature never forces retraining the transformer.
 - **`use_PIDs: true` (legacy)** — one-hot token index from `ParticleTokenizer`.
@@ -232,7 +235,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | `particle_encoder_hidden` (MLP embed) | `32` (on) | fixed, open |
 | `use_diagrams` / `d_diag` | `true` / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
-| `spin_onehot`/`color_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
+| `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
 | physics levers `mass_from_momenta`/`coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run; `internal_mass_pdgs=[23,6,25]` | per-run (need recipe+sidecars) |
 | `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |

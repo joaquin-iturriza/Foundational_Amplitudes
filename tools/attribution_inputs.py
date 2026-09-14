@@ -425,22 +425,23 @@ def main():
     out_prefix = args.out_prefix or os.path.join(args.run_dir, "attribution", "shap")
     os.makedirs(os.path.dirname(out_prefix), exist_ok=True)
 
-    from particle_ids import (
-        GLOBAL_PDG_IDX, PARTICLE_FEATURE_NAMES, GLOBAL_PROPERTY_MATRIX,
-        expand_spin_onehot,
-    )
+    from particle_ids import GLOBAL_PDG_IDX, build_property_matrix
     idx2pdg = {v: k for k, v in GLOBAL_PDG_IDX.items()}
 
     exp = load_experiment(args.run_dir, args.ckpt, args.frame)
 
-    # Feature names must match the run's property-vector width: the spin-one-hot
-    # encoding (data.spin_onehot) replaces the scalar "spin" column with a one-hot
-    # block + overflow (8D -> 13D). Derive names from the run config so indexing
-    # and labels line up regardless of which encoding the run used.
-    if exp.cfg.data.get("spin_onehot", False):
-        _, prop_names = expand_spin_onehot(GLOBAL_PROPERTY_MATRIX)
-    else:
-        prop_names = list(PARTICLE_FEATURE_NAMES)
+    # Feature names must match the run's property-vector width, so build them with
+    # the run's own encoding flags (spin/color/generation one-hot, massless flag);
+    # deriving them from spin_onehot alone tripped the assert on every run with
+    # color_onehot on, i.e. every production run.
+    d = exp.cfg.data
+    _, prop_names = build_property_matrix(
+        spin_onehot=bool(d.get("spin_onehot", False)),
+        color_onehot=bool(d.get("color_onehot", False)),
+        is_massless=bool(d.get("prop_is_massless", False)),
+        standardize=bool(d.get("standardize_props", False)),
+        generation_onehot=bool(d.get("generation_onehot", False)),
+    )
     assert len(prop_names) == exp.property_matrix.shape[1], (
         f"prop_names ({len(prop_names)}) != property dim "
         f"({exp.property_matrix.shape[1]})")
