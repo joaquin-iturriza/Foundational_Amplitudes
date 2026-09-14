@@ -18,7 +18,7 @@ for ax, y, title in ((axes[0], g, "geometric mean"), (axes[1], m, "arithmetic me
     for k, mk in ((4, "o"), (5, "s"), (6, "^")):
         sel = npart == k
         ax.scatter(sp[sel], y[sel], s=14, marker=mk, alpha=0.7, label=f"2$\\to${k-2}")
-    ax.axhline(0.05, color="k", lw=0.8, ls="--"); ax.set_yscale("log"); ax.set_xlabel(r"range of $\ln|\mathcal M|^2$ in the train pool")
+    ax.axhline(0.05, color="k", lw=0.8, ls="--"); ax.set_yscale("log"); ax.set_xlabel("range of ln|M|^2 in the train pool")
     ax.set_title(f"{title}: {int((y > 0.05).sum())}/{len(y)} above 0.05"); ax.grid(alpha=0.3)
 axes[0].set_ylabel("validation MSE (standardized target)"); axes[0].legend(title="multiplicity", fontsize=8)
 fig.suptitle("catalog_v2, 1000 steps, shaped measure: loss against the target's dynamic range")

@@ -2990,6 +2990,42 @@ failures in every class ($224$ against $295$; signed one-loop $38$ of $50$ again
 positive one-loop $12$ against $26$) and costs the best-learned tail ($41$ processes below
 $10^{-3}$ against none). Every catalog\_v2 number from here on is on this measure.
 
+\paragraph{What fails: two mechanisms, told apart by the two arms.} Joining each
+process's loss with its pool's dynamic range, the span of $\ln|\mathcal M|^2$ over the
+train pool (Fig.~\ref{fig:loss_vs_range}; \code{analysis/catalog\_v2/loss\_vs\_range.py}),
+sorts the catalog into three groups. The $183$ processes that pass under both aggregations
+have a median range of $9$ and only two above $20$. The $224$ that fail under both have a
+median range of $20$; a range of $20$ or more fails $112$ times out of $114$ whatever the
+aggregation, in every multiplicity (within $2\to2$, $2\to3$ and $2\to4$ trees alone the
+correlation of the log-loss with the range is $+0.4$ to $+0.5$), and the $29$ low-range
+members of this group are the resonances, $ee\to\mu\mu$ with a range of $9.5$ but a
+$2.5$\,GeV pole in a $975$\,GeV window, and the $2\to4$ neutrino finals with internal $W$
+and $Z$ poles. What fails under both is a pole or an infrared singularity in the window:
+the mixture places $35\%$ of the training points there, the loss is dominated by that part,
+and the model at this horizon does not resolve it (the prediction of a resonant process
+never leaves a narrow band, Sec.~\ref{sec:catalog}). The $71$ that fail under the geometric
+mean only are a different thing: starvation. Sixteen of them have a range below $10$, and
+$u\bar u\to t\bar t$ at one loop, with a range of $1$, sits at $0.96$ under the geometric
+mean and at $0.013$ under the arithmetic one; $ee\to u\bar u$ and $ee\to b\bar b$ at one
+loop, $ds\to ds$ at one loop, $u\bar u\to Hg$ and $ee\to WWH$ are the same. A process that
+does not fall in the first steps keeps a weight of order one while the converged bulk
+reaches $10^4$, and it never trains, which is the run-to-run flakiness of
+Prin.~\ref{prin:gradcomp} seen at the process level. So ``nothing works'' is two things:
+the aggregation starves a seventh of the catalog outright, and the sharp structure of
+half of it is not resolved at $1000$ steps in company, although the $s$-channel family
+resolves its pole alone.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/loss_vs_range.pdf}
+\caption{catalog\_v2 at $1000$ steps on the shaped measure: per-process validation loss
+against the range of $\ln|\mathcal M|^2$ in the train pool, under the geometric mean (left)
+and the arithmetic mean (right); the dashed line is the failing threshold. The range
+predicts failure within every multiplicity; the low-range failures on the left that
+disappear on the right are the starved processes.}
+\label{fig:loss_vs_range}
+\end{figure}
+
 \begin{table}[H]
 \centering
 \caption{As Table~\ref{tab:catv2_short}, with validation and test drawn from the shaped
