@@ -2684,7 +2684,9 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
 
 The first DyHPO wave on \code{catalog\_v2} (three trials of the bigrun setup, Sec.~\ref{sec:bigrun},
 with the two adopted ablations, $8601$ steps at $\mathrm{bs}=16384$, lr $1.9$--$9.7\times10^{-3}$)
-trains cleanly ($0.9$\,s per step, $2.2$\,h per trial, $9$\,GB of VRAM) and is a diagnostic
+trains cleanly ($0.9$\,s per step, $2.9$--$3.2$\,h per trial with evaluation, $9$\,GB of VRAM;
+objectives $3.1\times10^{-3}$, $8.9\times10^{-3}$, $9.8\times10^{-3}$ for lr $9.7$, $2.4$,
+$1.9\times10^{-3}$) and is a diagnostic
 of the catalog more than of the hyperparameters: the best trial (lr $9.7\times10^{-3}$, no EMA)
 ends at a geometric-mean $\vlnr=3.1\times10^{-3}$ with a median per-process loss of
 $5\times10^{-3}$ and $104/478$ processes above $0.05$, and the failing set is the same in all
