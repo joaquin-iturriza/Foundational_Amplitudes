@@ -180,6 +180,14 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
   inverts claims about what was held out, hence what "zero-shot", "held-out", or
   "never seen" mean in `docs/results.tex`.
 
+- **Every role of a process samples the same distribution.** A recipe entry's
+  `sampling` policy (catalog_v2: the mixture) shapes train, val and test alike; the
+  shaped pools carry `_smix` in their file names. Validation and test were once forced
+  onto uniform √s while training was shaped, which scored the model on a measure it
+  never trained on (a finite-sample fit's error follows the training density; a
+  validation set estimates the trained risk only from the same measure). Never
+  reintroduce a train/eval measure split; the uniform-√s window is a dataset
+  convention, not a "physical measure".
 - Datasets are `.npy` files in `data/`, named like
   `ee_ttbar_346-1000GeV_amplitudes.npy`. Each row: flat 4-momenta
   (`n_particles*4`) + PDG ids (`n_particles`) + amplitude (last col).
