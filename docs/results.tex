@@ -365,6 +365,22 @@ the scan hold-outs were shaped; the header is now written by the generator and t
 regenerated. Val and test are flat by construction, so the audit reports them only for
 window coverage, which is complete everywhere.
 
+\paragraph{The needle is not in the data.} The audit above measured the sampling, not
+the learning outcome, and the first catalog_v2 wave (Sec.~\ref{sec:catv2-census}) found the
+$s$-channel $2\to2$ family still failing on the flat validation measure. The check that
+should have preceded the sweep is a learnability probe, and it is decisive: the seven
+$s$-channel pools ($ee\to\mu\mu,\tau\tau,u\bar u,d\bar d,b\bar b,\nu_\mu\bar\nu_\mu,
+\nu_e\bar\nu_e$) trained \emph{alone} for $3000$ steps at $\mathrm{bs}=4096$ (lr
+$4.1\times10^{-3}$, the catalog encoding) reach $2$--$4\times10^{-4}$ on their flat validation
+pools, the pure-$Z$ $ee\to\nu_\mu\bar\nu_\mu$ included, which sat at $0.56$ in the
+$478$-process run. The same $ee\to u\bar u$ with the same hyperparameters and horizon reached
+only $0.26$ inside a twelve-process recipe of four-quark families
+(\code{recipes/collision\_ab.yaml}). So the pools support the resonance and the residual
+failure is an interaction with the other processes in the batch, not a sampling defect;
+the suspect is the loss aggregation (Prin.~\ref{prin:geomean}: the geometric mean scales a
+process's gradient by the inverse of its own MSE, so the worst-fitted processes get the
+least push), which the twelve-process recipe tests directly with the arithmetic mean.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../analysis/catalog_v2/pool_audit.pdf}
