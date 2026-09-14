@@ -424,6 +424,14 @@ automatically instead of polling or forgetting.
 - Don't `sleep`-loop or re-run `squeue` by hand across turns; if I need an
   interim peek I can read the background task's output, but the completion ping is
   the source of truth.
+- **On this WSL2 laptop Claude Code stops background Bash tasks within minutes**
+  ("low memory" with 6 GB free), so the backgrounded waiter never survives a real
+  job. Use the **Monitor tool** instead (persistent, polls `squeue` over
+  `scripts/remote.sh`, one line per terminal state) and list the watched job ids in
+  `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh` accepts it. A foreground
+  Bash call is capped at 10 min, so foreground waits are only for short jobs.
+- **Quick tests must return quickly**: pass `evaluation.train_subsample=2000` (the
+  post-training train-split pass otherwise runs the whole pool; default 10000).
 
 ---
 
@@ -446,6 +454,8 @@ automatically instead of polling or forgetting.
 - **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
   freezing are all in the `fine_tune` config block.
 - `.fuse_hidden*` and `._*` files are leftover filesystem artifacts — ignore them.
+- A stray generated `py.py` at the root shadows the `py` module and breaks `pytest`
+  in the venv; test modules carry a `__main__` runner (`python tests/<file>.py`).
 - **Per-step LLoCa hot-path vectorizations** — `LLOCA_*` env toggles (default =
   fast path; original impls kept for A/B). Attention mask built once/forward not
   per-block (`models/transformer_lloca_mup.py`, `LLOCA_ATTN_MASK`); per-process

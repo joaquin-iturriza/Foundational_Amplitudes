@@ -2684,10 +2684,10 @@ generator; 1 waits for a compute plan.
 \code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); the first
 pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the next one:
 \begin{itemize}
-  \item \textbf{Re-measure with the generation feature.} The encoding fix
-    (Sec.~\ref{sec:catv2-census}) is in but untested at scale: one three-trial wave at the
-    wave-0 setup shows whether the $27$ colliding keys ($ud/us/cs$, $dd/ds$ and their towers)
-    now learn, before any full sweep.
+  \item \textbf{Re-measure with the generation feature at the full horizon.} The
+    $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
+    at one loop representable but not held; whether $8601$ steps hold both is open. Do it
+    after the signed-log scale, so the wave does not re-measure $17$ known failures.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
@@ -2695,10 +2695,13 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     ($\mathrm{sgn}(x)\log(1+|x|/s)$, stored with the standardization statistics) for the
     $27$ sign-changing pools; the plain log stays for positive pools, so no earlier number
     moves.
-  \item \textbf{The needle.} The mixture halves the problem but the resonance shape on the
-    flat validation measure is still the dominant $2\to2$ error; a larger flat share for the
-    $s$-channel families, or more steps, is the next lever, and the $M_Z$ scan family is the
-    cleanest place to measure it.
+  \item \textbf{The needle is a multi-task effect, not a data one} (Sec.~\ref{sec:catalog},
+    the probe): the $s$-channel family learns alone to $3\times10^{-4}$ and fails in company.
+    Pending: the twelve-process recipe (\code{recipes/collision\_ab.yaml},
+    \code{scripts/job\_needle\_probe.sh} with \code{AGG=mean}) under the arithmetic mean
+    against the geometric mean, $ee\to u\bar u$ being the read-out ($0.26$ under the
+    geometric mean); if the aggregation is the cause, Prin.~\ref{prin:geomean} needs
+    revisiting at this scale.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
