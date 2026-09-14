@@ -400,31 +400,48 @@ $2\to4$ process at $10^{-2}$ must not swamp a $2\to2$ at $10^{-6}$) still holds,
 $2\to2$ needle at $0.5$ is above every $2\to4$ plateau, so on this catalog the arithmetic
 mean's emphasis lands on the failures.
 
+\paragraph{The floor at the bulk's scale does nothing.} The $\tau$-floored geometric mean
+(\code{training.loss\_aggregation\_tau}), proposed for the $448$ run as the minimal repair of
+Prin.~\ref{prin:gradcomp} with $\tau$ set just above where the bulk converges, was run on the
+same recipe at $\tau=10^{-4}$ (third column of Table~\ref{tab:agg_ab}): $ee\to u\bar u$ stays at
+$0.30$, the two one-loop laggards stay at $10^{-3}$, and the bulk ends $2$--$4\times$ worse
+than under the exact geometric mean. The weights say why. The floor caps a converged process
+at $1/\tau$ but leaves the laggard at $1/m_{\rm lag}$, so their ratio is $m_{\rm lag}/\tau$,
+here $3000$ against $30\,000$ unfloored; a factor of ten out of four decades does not change
+who gets the steps. The floor acts only once $\tau$ reaches the laggard's own scale, and then
+it is the arithmetic mean for every process below $\tau$. So $\tau$ is not a repair with a
+natural value but the threshold that decides which processes count as done, with a useful
+range of $10^{-3}$ to $1$ on this catalog; it is a hyperparameter of the wave (hand-off,
+Sec.~\ref{sec:catalog-open}).
+
 \begin{table}[H]
 \centering
 \caption{Twelve-process recipe (\code{recipes/collision\_ab.yaml}), $3000$ steps at
 $\mathrm{bs}=4096$, lr $4.1\times10^{-3}$, one seed: validation MSE on the preprocessed target
-per process under the two loss aggregations. Same data, same encoding (generation one-hot),
-same checkpoint rule (best aggregated validation loss).}
+per process under three training-loss aggregations: the geometric mean, the $\tau$-floored
+geometric mean $\frac1P\sum_p\log(m_p+\tau)$ at $\tau=10^{-4}$, and the arithmetic mean. Same
+data, same encoding (generation one-hot); the checkpoint is the best aggregated validation loss,
+which for the two earlier arms followed the training aggregation (the metric was decoupled
+afterwards, see the hand-off) and for the $\tau$ arm is the geometric mean.}
 \label{tab:agg_ab}
-\begin{tabular}{@{}lrr@{}}
+\begin{tabular}{@{}lrrr@{}}
 \toprule
-process & geometric mean & arithmetic mean \\
+process & geometric mean & $\tau=10^{-4}$ floor & arithmetic mean \\
 \midrule
-$ee\to u\bar u$ & $2.7\times10^{-1}$ & $5.7\times10^{-4}$ \\
-$ud\to ud$ (1-loop) & $1.2\times10^{-3}$ & $4.7\times10^{-5}$ \\
-$cs\to cs$ (1-loop) & $1.3\times10^{-3}$ & $4.1\times10^{-5}$ \\
-$dd\to dd$ & $3.5\times10^{-5}$ & $4.5\times10^{-5}$ \\
-$uu\to uu$ & $3.3\times10^{-5}$ & $2.7\times10^{-5}$ \\
-$dd\to dd$ (1-loop) & $2.4\times10^{-5}$ & $3.4\times10^{-5}$ \\
-$ud\to ud$ & $2.2\times10^{-5}$ & $3.3\times10^{-5}$ \\
-$cs\to cs$ & $1.8\times10^{-5}$ & $3.3\times10^{-5}$ \\
-$ds\to ds$ & $1.1\times10^{-5}$ & $3.9\times10^{-5}$ \\
-$us\to us$ & $1.1\times10^{-5}$ & $2.6\times10^{-5}$ \\
-$us\to us$ (1-loop) & $6.2\times10^{-6}$ & $2.8\times10^{-5}$ \\
-$ds\to ds$ (1-loop) & $5.7\times10^{-6}$ & $2.2\times10^{-5}$ \\
+$ee\to u\bar u$ & $2.7\times10^{-1}$ & $3.0\times10^{-1}$ & $5.7\times10^{-4}$ \\
+$ud\to ud$ (1-loop) & $1.2\times10^{-3}$ & $1.4\times10^{-3}$ & $4.7\times10^{-5}$ \\
+$cs\to cs$ (1-loop) & $1.3\times10^{-3}$ & $1.4\times10^{-3}$ & $4.1\times10^{-5}$ \\
+$dd\to dd$ & $3.5\times10^{-5}$ & $9.3\times10^{-5}$ & $4.5\times10^{-5}$ \\
+$uu\to uu$ & $3.3\times10^{-5}$ & $6.4\times10^{-5}$ & $2.7\times10^{-5}$ \\
+$dd\to dd$ (1-loop) & $2.4\times10^{-5}$ & $6.1\times10^{-5}$ & $3.4\times10^{-5}$ \\
+$ud\to ud$ & $2.2\times10^{-5}$ & $8.5\times10^{-5}$ & $3.3\times10^{-5}$ \\
+$cs\to cs$ & $1.8\times10^{-5}$ & $5.8\times10^{-5}$ & $3.3\times10^{-5}$ \\
+$ds\to ds$ & $1.1\times10^{-5}$ & $4.1\times10^{-5}$ & $3.9\times10^{-5}$ \\
+$us\to us$ & $1.1\times10^{-5}$ & $4.2\times10^{-5}$ & $2.6\times10^{-5}$ \\
+$us\to us$ (1-loop) & $6.2\times10^{-6}$ & $2.0\times10^{-5}$ & $2.8\times10^{-5}$ \\
+$ds\to ds$ (1-loop) & $5.7\times10^{-6}$ & $2.1\times10^{-5}$ & $2.2\times10^{-5}$ \\
 \midrule
-combined (all events) & $2.3\times10^{-2}$ & $8.8\times10^{-5}$ \\
+combined (all events) & $2.3\times10^{-2}$ & $3.0\times10^{-2}$ & $8.8\times10^{-5}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2755,17 +2772,21 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     moves.
   \item \textbf{Which aggregation for the wave.} The needle is the geometric mean's doing
     (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), so the wave should not run with it
-    unchanged. Options: the arithmetic mean as tested (one flag, costs a factor $2$--$4$
-    on the best-learned processes at twelve; at $478$ the $2\to4$ plateaus at $10^{-2}$
-    will take most of the gradient once the needles are down), or the floored log
-    $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ (\code{training.loss\_aggregation\_tau}) with
-    $\tau$ swept by DyHPO. Both are training-side knobs: they shape the gradient and must
-    not move the metric, so the validation aggregate is now fixed separately
-    (\code{training.val\_aggregation}, geometric mean by default) and
-    \code{val\_loss\_no\_reg} stays comparable across arms; the census (failing count,
-    median) is the other read-out. The twelve-process arm of Table~\ref{tab:agg_ab}
-    predates this split, so its checkpoint was selected on the arithmetic-mean aggregate;
-    its per-process numbers stand.
+    unchanged. The arithmetic mean works at twelve at a factor $2$--$4$ on the
+    best-learned processes; at $478$ the $2\to4$ plateaus at $10^{-2}$ will take most of the
+    gradient once the needles are down, which is what the floor
+    $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ (\code{training.loss\_aggregation\_tau}) is
+    for, but at the bulk's scale it does nothing (Table~\ref{tab:agg_ab}) and its useful
+    range, $\tau\in[10^{-3},1]$, is the threshold between ``done'' and ``still counts''.
+    That is a hyperparameter, and the wave is a DyHPO sweep already: put $\tau$ in its
+    search space (log-uniform over that range; $\tau\to\infty$ is the arithmetic mean)
+    rather than choosing it by hand or sweeping it at twelve processes, where there is no
+    $2\to4$ bulk to protect. Training-side knobs shape the gradient and must not move the
+    metric: the validation aggregate is fixed separately
+    (\code{training.val\_aggregation}, geometric mean) so \code{val\_loss\_no\_reg} stays
+    comparable across arms, with the census (failing count, median) as the other read-out.
+    The first two arms of Table~\ref{tab:agg_ab} predate this split, so their checkpoints
+    were selected on their own training aggregate; the per-process numbers stand.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
