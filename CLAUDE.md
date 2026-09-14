@@ -533,8 +533,8 @@ Three pillars each have a reviewer subagent in `.claude/agents/`:
 **repo-reviewer**. Review is **batched, not per-change**: each pillar carries a
 watermark (the commit it was last reviewed at, plus the size of the change reviewed
 then), and the `Stop` hook `review_backlog.sh check` only asks for a reviewer once
-that pillar's accumulated backlog crosses its threshold (80 changed lines or 8
-commits for `CLAUDE.md`/`.tex`, 200/12 for code). The reviewer then reads the
+that pillar's accumulated backlog crosses its threshold (200 changed lines or 20
+commits for `CLAUDE.md`/`.tex`, 600/30 for code). The reviewer then reads the
 **whole backlog at once**, which is the point: cross-edit problems (a rule now
 stated twice, a config default whose callers were not updated, a section that no
 longer reads as one argument) are invisible to a per-hunk review.

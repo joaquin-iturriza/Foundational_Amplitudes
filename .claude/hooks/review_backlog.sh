@@ -47,9 +47,9 @@ STATE_REL=".claude/.review_state"
 # git, so they already cover analysis/, compare_models/, etc. without listing them; the
 # :(exclude) terms drop the generated companions that share those trees (result JSONs, job
 # logs, run/sweep output), which would otherwise swamp the line count with data churn.
-PILLARS='claudemd-keeper|80|8|CLAUDE.md
-notes-editor|80|8|docs/*.tex
-repo-reviewer|200|12|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
+PILLARS='claudemd-keeper|200|20|CLAUDE.md
+notes-editor|200|20|docs/*.tex
+repo-reviewer|600|30|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
 
 pillar_field() { printf '%s\n' "$PILLARS" | awk -F'|' -v n="$1" -v f="$2" '$1==n{print $f}'; }
 pillar_names() { printf '%s\n' "$PILLARS" | awk -F'|' '{print $1}'; }
