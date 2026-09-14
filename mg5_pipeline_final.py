@@ -2620,12 +2620,13 @@ DEFAULT_SAMPLING = {
 
 
 def sampling_policy(cfg, role=None):
-    """The effective sampling dict of a catalog entry (defaults filled in). The frozen
-    val/test benchmarks always sample the physical measure (flat), whatever the entry says:
-    shaping is a TRAINING-data choice, and val_loss_no_reg must keep meaning the same
-    distribution across runs and against every earlier number."""
+    """The effective sampling dict of a catalog entry (defaults filled in). Every role
+    samples the same distribution: a shaped (mixture) entry shapes its val/test pools
+    exactly like its train pool, so the loss that is measured is the loss that is
+    trained (until this change val/test were forced flat, and the model was scored on
+    a measure it never trained on). One-loop (MadLoop) entries are never shaped."""
     pol = dict(DEFAULT_SAMPLING); pol.update(cfg.get("sampling") or {})
-    if role in ("val", "test") or cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
+    if cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
         pol["mode"] = "flat"
     return pol
 

@@ -302,9 +302,14 @@ max/min bin ratio of the $\log|\mathcal M|^2$ histogram from $66$ to $12$, the b
 of the events, and a seed reproduces the pool (\code{tests/test\_sampling.py}). The policy lives
 on the catalog entry (per entry or per recipe; the default is the legacy flat sampling and
 \code{catalog\_v2} opts in), enters the recipe identity, and a shaped pool carries its own file
-name. Shaping is a \emph{training-data} choice only: the frozen val/test sets always sample the
-physical measure, so \vlnr\ keeps meaning the same distribution across runs and against every
-earlier number, and the one-loop (MadLoop) datasets are never shaped.
+name. Until the first catalog\_v2 short tests the frozen val/test sets were forced onto the
+physical measure while the train pool was shaped, so the model was scored on a distribution
+it never trained on (the train/test histograms of an $s$-channel pool made this plain: $10$--$15\%$
+of train events on the $Z$ pole against $2.6\%$ in test, and a low tail only in train). That
+is wrong and is gone: a shaped entry now shapes train, val and test alike, the loss measured
+is the loss trained, and every catalog\_v2 number from here on is on the shaped measure
+(the earlier catalog\_v2 numbers, Sec.~\ref{sec:catv2-census}, are on the physical one and
+compare only by failing status). The one-loop (MadLoop) datasets are never shaped.
 
 \paragraph{Parameter axis.} Deliberately sparse: a few far-apart points per axis as decorated
 variants of the families the axis moves, never a dense grid (\code{recipes/catalog\_v2\_scan.yaml};

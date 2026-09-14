@@ -16,6 +16,8 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
     `scale_quantile` quantile of the nonzero |x| of the data the transform is
     resolved on (the train pool), written into the transform string so it travels
     with `amp_trafos` (frozen stats, config dump) and the inverse reads it back.
+    `scale_quantile=None` is the legacy resolution (bare 'signedlog', s = 1), used
+    to reproduce runs whose frozen stats predate the scale.
     Without it the transform is linear below |x| = 1, and a signed one-loop pool
     whose median |x| is 1e-5 over tens of decades standardizes to a kurtosis of
     thousands.  The caller must store the returned list and use it for BOTH the
@@ -25,6 +27,8 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
         return list(trafos) if trafos else trafos
     if float(np.min(amplitude)) > 0.0:
         return list(trafos)
+    if scale_quantile is None:
+        return ["signedlog" if t == "log" else t for t in trafos]
     a = np.abs(np.asarray(amplitude, dtype=np.float64)).ravel()
     a = a[a > 0]
     s = float(np.quantile(a, scale_quantile)) if a.size else 1.0

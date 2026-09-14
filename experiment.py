@@ -1437,6 +1437,19 @@ class AmplitudeExperiment(BaseExperiment):
             assert len(amp_trafos_pp) == len(names), (
                 f"frozen amp_trafos_pp has {len(amp_trafos_pp)} entries for {len(names)} datasets")
             self._amp_trafos_pp = [list(t) for t in amp_trafos_pp]
+        elif per_dataset:
+            # Frozen stats that predate the stored per-process transforms: the parent
+            # resolved each pool in legacy mode (plain `log` for a positive pool, bare
+            # `signedlog` with s = 1 for a signed one) and fitted its mean/std on that,
+            # so reproduce exactly that; re-resolving with the scale would change the
+            # target under the parent's statistics.
+            self._amp_trafos_pp = [
+                resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
+                                   scale_quantile=None)
+                for n in names]
+            LOGGER.warning(
+                "Frozen data stats carry no per-process amplitude transforms (written before "
+                "the signed-log scale); re-resolved per pool in legacy mode (unscaled signedlog).")
         self.cfg.data.amp_trafos = amp_trafos
         if prepd_means is None:
             if per_dataset:
@@ -1745,8 +1758,10 @@ class AmplitudeExperiment(BaseExperiment):
         # followed (35 min for 42.7M events after a 20-min catalog_v2 run).
         _tcap = self.cfg.evaluation.get("train_subsample", None)
         _tcap = int(_tcap) if _tcap not in (None, "null", "none") else None
-        train_eval_bs = min(self.cfg.evaluation.batchsize, max(len(train_idx) // 2, 1))
         train_eval_idx = train_idx if (_tcap is None or self.n_datasets > 1) else train_idx[:_tcap]
+        # batch size from the CAPPED index set: with drop_last a batch larger than the
+        # capped split yields zero batches and the evaluation has nothing to concatenate
+        train_eval_bs = min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1))
         self.train_eval_loader = make_loader(train_eval_idx, shuffle=False, batchsize=train_eval_bs,
                                              workers=0)
 
@@ -1802,8 +1817,10 @@ class AmplitudeExperiment(BaseExperiment):
             if _tcap is not None and _capped:
                 # the combined train-split loader mirrors the per-process cap
                 train_eval_idx = np.concatenate(_capped)
-                self.train_eval_loader = make_loader(train_eval_idx, shuffle=False,
-                                                     batchsize=train_eval_bs, workers=0)
+                self.train_eval_loader = make_loader(
+                    train_eval_idx, shuffle=False,
+                    batchsize=min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1)),
+                    workers=0)
     
         LOGGER.info(
             f"Constructed dataloaders: train={n_train}, val={n_val}, "
@@ -1871,7 +1888,7 @@ class AmplitudeExperiment(BaseExperiment):
                           "val":   self.val_loader,
                           "test":  self.test_loader}[split]
                 pred, truth, sigmas = collect(loader)
-                return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0]
+                return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0], None
             pred   = np.concatenate([proc_preds[n][split][0] for n in available], axis=0)
             truth  = np.concatenate([proc_preds[n][split][1] for n in available], axis=0)
             first_sig = proc_preds[available[0]][split][2]
@@ -1886,17 +1903,26 @@ class AmplitudeExperiment(BaseExperiment):
             ps = np.concatenate([
                 np.full((proc_preds[n][split][1].shape[0], 1), _amp_stats(n)[1])
                 for n in available], axis=0)
-            return pred, truth, sigmas, pm, ps
+            # The TRANSFORM is per process too (a positive pool under `log`, a signed one
+            # under `signedlog:<s>` with its own scale), so the combined raw-space arrays
+            # are assembled from per-process inverses rather than undone with one list.
+            raw_truth = np.concatenate([
+                undo_preprocess_amplitude(proc_preds[n][split][1], *_amp_stats(n),
+                                          trafos=_amp_trafo(n)) for n in available], axis=0)
+            raw_pred = np.concatenate([
+                undo_preprocess_amplitude(proc_preds[n][split][0], *_amp_stats(n),
+                                          trafos=_amp_trafo(n)) for n in available], axis=0)
+            return pred, truth, sigmas, pm, ps, (raw_truth, raw_pred)
 
         # ------------------------------------------------------------------
         # Compute metrics (pure numpy, fast)
         # ------------------------------------------------------------------
         LOGGER.info("### Computing combined metrics ###")
         for split, attr in [("train", "results_train"), ("val", "results_val"), ("test", "results_test")]:
-            pred, truth, sigmas, pm, ps = concat_split(split)
+            pred, truth, sigmas, pm, ps, raw = concat_split(split)
             setattr(self, attr,
                     self._metrics_from_arrays(pred, truth, split, combined_key, sigmas,
-                                              prepd_mean=pm, prepd_std=ps))
+                                              prepd_mean=pm, prepd_std=ps, raw_arrays=raw))
 
         self.results = {
             combined_key: {
@@ -2031,8 +2057,13 @@ class AmplitudeExperiment(BaseExperiment):
         return amp_pred_prepd, amp_truth_prepd, sigmas
 
     def _metrics_from_arrays(self, amp_pred_prepd, amp_truth_prepd, title, result_key,
-                             sigmas=None, prepd_mean=None, prepd_std=None, prepd_trafos=None):
+                             sigmas=None, prepd_mean=None, prepd_std=None, prepd_trafos=None,
+                             raw_arrays=None):
         """Compute metrics from preprocessed arrays (no model call). Pure numpy.
+
+        `raw_arrays=(truth, pred)` supplies the raw-space arrays already inverted
+        (per process, when the transform differs between processes) and skips the
+        inverse here.
 
         `prepd_mean`/`prepd_std` override the standardization stats used to undo
         the amplitude preprocessing. They may be scalars or per-event arrays
@@ -2055,12 +2086,15 @@ class AmplitudeExperiment(BaseExperiment):
         LOGGER.info(f"L1  (prepd) {title} {result_key}: {l1_prepd:.4e}")
         LOGGER.info(f"L1r (prepd) {title} {result_key}: {l1_rel_prepd:.4e}")
 
-        amp_truth = undo_preprocess_amplitude(
-            amp_truth_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
-        )
-        amp_pred = undo_preprocess_amplitude(
-            amp_pred_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
-        )
+        if raw_arrays is not None:
+            amp_truth, amp_pred = raw_arrays
+        else:
+            amp_truth = undo_preprocess_amplitude(
+                amp_truth_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
+            )
+            amp_pred = undo_preprocess_amplitude(
+                amp_pred_prepd, prepd_mean, prepd_std, trafos=prepd_trafos,
+            )
 
         mse    = np.mean((amp_truth - amp_pred) ** 2)
         l1     = np.mean(np.abs(amp_truth - amp_pred))
