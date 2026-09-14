@@ -374,7 +374,7 @@ $s$-channel pools ($ee\to\mu\mu,\tau\tau,u\bar u,d\bar d,b\bar b,\nu_\mu\bar\nu_
 $4.1\times10^{-3}$, the catalog encoding) reach $2$--$4\times10^{-4}$ on their flat validation
 pools, the pure-$Z$ $ee\to\nu_\mu\bar\nu_\mu$ included, which sat at $0.56$ in the
 $478$-process run. The same $ee\to u\bar u$ with the same hyperparameters and horizon reached
-only $0.26$ inside a twelve-process recipe of four-quark families
+only $0.27$ inside a twelve-process recipe of four-quark families
 (\code{recipes/collision\_ab.yaml}). So the pools support the resonance and the residual
 failure is an interaction with the other processes in the batch, not a sampling defect;
 the suspect is the loss aggregation (Prin.~\ref{prin:geomean}: the geometric mean scales a
@@ -1374,8 +1374,9 @@ big run}:
   Principle~\ref{prin:gradcomp}). The crudest form, the plain arithmetic mean, is tested at
   twelve processes and recovers the stuck one (Table~\ref{tab:agg_ab}). The floored variant
   $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$, which caps a converged process's weight at
-  $1/\tau$ and keeps the geometric mean above $\tau$, is untested; $\tau$ is an HP
-  (DyHPO). The decisive check at scale is whether $ee\,\gamma\gamma$'s late-training
+  $1/\tau$ and keeps the geometric mean above $\tau$, is implemented
+  (\code{training.loss\_aggregation\_tau}, training loss only) and untested; $\tau$ is an
+  HP (DyHPO). The decisive check at scale is whether $ee\,\gamma\gamma$'s late-training
   collapse disappears at otherwise-identical HPs.
 \end{itemize}
 
@@ -2754,12 +2755,17 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     moves.
   \item \textbf{Which aggregation for the wave.} The needle is the geometric mean's doing
     (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), so the wave should not run with it
-    unchanged. Options: the arithmetic mean as tested (implemented, one flag, costs a
-    factor $2$--$4$ on the best-learned processes at twelve; at $478$ the $2\to4$ plateaus
-    at $10^{-2}$ will take most of the gradient once the needles are down), or the floored
-    log $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau$ swept by DyHPO. Either way the
-    comparison against wave 0 is the census (failing count, median), never
-    \code{val\_loss\_no\_reg}, which is the aggregate itself and changes meaning with it.
+    unchanged. Options: the arithmetic mean as tested (one flag, costs a factor $2$--$4$
+    on the best-learned processes at twelve; at $478$ the $2\to4$ plateaus at $10^{-2}$
+    will take most of the gradient once the needles are down), or the floored log
+    $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ (\code{training.loss\_aggregation\_tau}) with
+    $\tau$ swept by DyHPO. Both are training-side knobs: they shape the gradient and must
+    not move the metric, so the validation aggregate is now fixed separately
+    (\code{training.val\_aggregation}, geometric mean by default) and
+    \code{val\_loss\_no\_reg} stays comparable across arms; the census (failing count,
+    median) is the other read-out. The twelve-process arm of Table~\ref{tab:agg_ab}
+    predates this split, so its checkpoint was selected on the arithmetic-mean aggregate;
+    its per-process numbers stand.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration

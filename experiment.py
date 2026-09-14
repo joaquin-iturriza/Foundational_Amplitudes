@@ -2754,7 +2754,11 @@ class AmplitudeExperiment(BaseExperiment):
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-        loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+        # The validation aggregate is a fixed METRIC (training.val_aggregation, default
+        # geometric_mean), decoupled from training.loss_aggregation / loss_aggregation_tau,
+        # which shape the gradient only: an aggregation A/B must not move the number it is
+        # judged by (val_loss_no_reg, checkpoint selection, the HPO objective).
+        loss_agg = self.cfg.training.get("val_aggregation", "geometric_mean")
         # HETEROSC NLL is SIGNED: geometric_mean's log(clip(·,1e-10)) collapses every
         # well-fit (negative) process to a constant → val_loss ≡ ~0, so best-checkpoint
         # selection NEVER updates and a barely-trained model is saved. Match the training

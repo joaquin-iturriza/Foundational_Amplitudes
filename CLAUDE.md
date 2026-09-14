@@ -208,7 +208,10 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
     the bulk (the `Z`-resonance needle); a 12-process A/B with `loss_aggregation: mean`
     recovered it (`ee_uu` 0.27 → 5.7e-4) at a 2–4× cost on the best-learned processes
     (`docs/results.tex`, `tab:agg_ab`). The aggregation for the next catalog wave is an
-    open decision; compare aggregations on the per-process census, not `val_loss_no_reg`.
+    open decision. `loss_aggregation` and the τ-floor `loss_aggregation_tau` shape the
+    **gradient only**; the validation aggregate (`val_loss_no_reg`, checkpoint selection,
+    HPO objective) is fixed by `training.val_aggregation` (geometric mean) and must never
+    follow a training-side knob, so aggregation A/Bs stay comparable on it.
 
 ---
 

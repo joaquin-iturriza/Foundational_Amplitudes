@@ -140,6 +140,11 @@ training:
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
                         # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact
                         # geometric mean; validation/checkpoint metrics are never floored.
+ val_aggregation: geometric_mean   # mean | geometric_mean. How per-process validation MSEs
+                        # combine into val_loss / val_loss_no_reg (checkpoint selection, HPO
+                        # objective). A fixed METRIC, deliberately decoupled from
+                        # loss_aggregation(_tau): those change the gradient, never the number
+                        # a run is judged by. HETEROSC forces mean (signed NLL).
  dtype: float32
 
  regularization: L2       # decided default (was null): L2 penalty folded into loss_no_reg /
