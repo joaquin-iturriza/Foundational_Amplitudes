@@ -17,20 +17,26 @@
 # a short horizon. Not an HP search: the only difference between the two jobs is the flag.
 #   GEN=true  scripts/remote.sh sbatch --export=ALL,GEN=true  scripts/job_collision_ab.sh
 #   GEN=false scripts/remote.sh sbatch --export=ALL,GEN=false scripts/job_collision_ab.sh
+#   add LEVERS=off to either to drop the per-process physics levers (see below).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 GEN="${GEN:-true}"
+# LEVERS=off drops the per-process physics levers (off-shellness, internal masses, couplings),
+# which are built from each process's propagator list and by themselves separate dd->dd from
+# ds->ds at small scale; off, the twins' inputs are identical unless the generation column is on.
+LEVERS="${LEVERS:-on}"
+if [ "$LEVERS" = "off" ]; then LEV="false"; else LEV="true"; fi
 python run.py \
-  exp_name="collision_ab_gen_${GEN}" \
+  exp_name="collision_ab_gen_${GEN}_levers_${LEVERS}" \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/collision_ab.yaml \
   data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GEN}" \
-  data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
-  data.offshell_per_event=true 'data.internal_mass_pdgs=[23,6,25]' \
+  data.mass_from_momenta=true data.coupling_scalars="$LEV" data.internal_mass_scalars="$LEV" \
+  data.offshell_per_event="$LEV" 'data.internal_mass_pdgs=[23,6,25]' \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads=8 model.net.num_blocks=8 seed=42 \
   training.iterations=3000 training.batchsize=4096 evaluation.batchsize=4096 \
