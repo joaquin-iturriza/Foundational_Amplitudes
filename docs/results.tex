@@ -2852,7 +2852,8 @@ $|x|\sim10^{-5}$ over $28$ decades, so after standardization the target has a ku
 $1000$--$3000$ with single events at $70$--$90\sigma$. Dividing by a per-dataset scale before
 the log ($\mathrm{sgn}(x)\log(1+|x|/s)$, $s$ the median $|x|$ of the train pool, or a
 hundredth of it) brings the kurtosis to $3$--$7$ and the largest event to $4$--$6\sigma$;
-the other $68$ one-loop pools are fine (median $4\times10^{-3}$). This never showed before
+the other $68$ one-loop pools, with at most $5\%$ negative events ($45$ of them positive
+throughout and on the plain log), have a median of $4\times10^{-3}$. This never showed before
 because every earlier one-loop pool was positive. The scale is
 now in: \code{data.signedlog\_quantile} (default $0.01$) makes $s$ the $1\%$ quantile of
 $|x|$ on the train pool, carried in the transform string as \code{signedlog:<s>} so the
