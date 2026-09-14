@@ -1,0 +1,14 @@
+# Needle probe: the s-channel 2->2 family that lost the Z resonance in the 448 run and still
+# sits at 0.04-0.09 (0.56 for the pure-Z ee->numu) on catalog_v2. Alone, at a short horizon,
+# with per-event validation predictions saved, so the residual can be binned in sqrt(s):
+# is the error the peak height, its width, the off-peak tails; does it move with the flat share.
+# Pools are the catalog's (cache hits).
+sampling: {mode: mixture}
+processes:
+  - {name: ee_mumu,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_tautau,  sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ddbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu,    sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_nnbar,   sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
