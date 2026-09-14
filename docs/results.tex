@@ -2774,7 +2774,8 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
   \item \textbf{Re-measure with the generation feature at the full horizon.} The
     $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
     at one loop representable but not held; whether $8601$ steps hold both is open. At
-    $1000$ steps the three fixes together are measured (Table~\ref{tab:catv2_short}); what
+    $1000$ steps the three fixes together are measured (Tables~\ref{tab:catv2_short} and
+    \ref{tab:catv2_short_smix}, the latter on the shaped measure every run uses from now on); what
     only the full horizon can tell is whether the signed one-loop $2\to3$ class learns with
     more steps, and where $\tau$ lands the failing-count against best-tail trade. Three
     trials at the full horizon are $\sim9$ GPU-hours. It is a fresh sweep, not an extension: wave 0's DyHPO state holds
@@ -2973,6 +2974,44 @@ failure reads as the difficulty of a one-loop function with a soft or collinear 
 not as the transform; only the full horizon can separate the two. The scale stays at the
 $1\%$ quantile (the median arm is not better overall, $272$ failing against $254$, one
 seed). The $M_Z$-shifted family stays hard under every arm ($16$--$18$ of $20$).
+
+\paragraph{The same on the shaped measure.} Table~\ref{tab:catv2_short} is on the
+uniform-$\sqrt s$ validation pools the model never trained on (Sec.~\ref{sec:catalog}, the
+sampling policy). Rerun with validation and test drawn from the shaped measure
+(Table~\ref{tab:catv2_short_smix}), train, validation and test losses agree per process
+($ee\to\mu\mu$ under the geometric mean: $0.46$, $0.41$, $0.41$; before: $0.45$ against $0.12$),
+and the census reads harder, as it must once the pole and the tails carry their training
+weight in the metric: $295$ failing against $254$, and the $s$-channel family fully failing
+at $0.24$ under the geometric mean, which is the needle as it is. The histogram of a
+resonant process shows why: the prediction never exceeds $\log A\approx-1.5$, where it
+piles up, so the network emits one capped value for the whole pole region. The
+aggregation result survives the change of measure unchanged: the arithmetic mean cuts
+failures in every class ($224$ against $295$; signed one-loop $38$ of $50$ against $50$;
+positive one-loop $12$ against $26$) and costs the best-learned tail ($41$ processes below
+$10^{-3}$ against none). Every catalog\_v2 number from here on is on this measure.
+
+\begin{table}[H]
+\centering
+\caption{As Table~\ref{tab:catv2_short}, with validation and test drawn from the shaped
+measure (the same distribution as training), signed-log scale at the $1\%$ quantile, one
+seed. The one-loop pools are unshaped in every role, so their columns are on the same
+measure as before.}
+\label{tab:catv2_short_smix}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+class & geometric mean & arithmetic mean \\
+\midrule
+all $478$ & $295$ / $0.095$ & $224$ / $0.045$ \\
+tree, shaped ($380$) & $219$ / $0.080$ & $174$ / $0.042$ \\
+signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ \\
+positive one-loop ($48$) & $26$ / $0.059$ & $12$ / $0.021$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ \\
+$M_Z$ family ($20$) & $18$ / $0.24$ & $16$ / $0.15$ \\
+flavour twins ($9$) & $3$ / $0.0015$ & $0$ / $0.0079$ \\
+below $10^{-3}$ & $41$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[H]
 \centering
