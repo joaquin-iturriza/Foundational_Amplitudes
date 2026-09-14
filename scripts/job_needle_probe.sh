@@ -16,6 +16,8 @@
 # eval on the full 10k validation pools so the Z-pole region has ~260 events per process;
 # final-step per-event predictions are saved (preds/) for binning the residual in sqrt(s).
 #   scripts/remote.sh sbatch --export=ALL,GEN=true,EXP=needle_probe scripts/job_needle_probe.sh
+# AGG=mean|geometric_mean and TAU=<float> (tau-floored geometric mean, training loss only)
+# switch the training aggregation; the validation metric stays the geometric mean.
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -40,6 +42,7 @@ python run.py \
   model.net.num_heads=8 model.net.num_blocks=8 seed=42 \
   training.iterations=3000 training.batchsize=4096 evaluation.batchsize=4096 \
   training.lr=4.1e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
-  training.loss_aggregation="${AGG:-geometric_mean}" training.regularization=L2 \
+  training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
+  training.regularization=L2 \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
   training.validate_frac=0.02 evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false
