@@ -2594,7 +2594,7 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
 
 # =============================================================================
 # SAMPLING POLICY (docs/results.tex, coverage vs. emphasis): a dataset is a MIXTURE of
-#   (1-f)*N events drawn the physical way (sqrt s uniform in the window x RAMBO / isotropic
+#   (1-f)*N events drawn the legacy way (sqrt s uniform in the window x RAMBO / isotropic
 #           angles under the fiducial cuts): the bulk;
 #   f*N events kept FLAT IN log|M|^2 from an oversampled, labelled candidate pool, thinned
 #           without replacement: equal training density per amplitude decade, so every
@@ -2609,7 +2609,7 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
 # `mode: flat` is the legacy uniform-only sampling (keeps old recipe ids).
 # =============================================================================
 DEFAULT_SAMPLING = {
-    "mode":         "flat",  # legacy physical-measure sampling; a recipe opts into "mixture"
+    "mode":         "flat",  # legacy uniform-sqrt(s) sampling; a recipe opts into "mixture"
     "f_flat":       0.35,    # fraction of the dataset kept flat in log|M|^2
     "oversample":   6,       # candidates labelled per flat event kept
     "democratic":   0.5,     # share of multi-leg candidates from the IR-democratic splitter
@@ -2766,7 +2766,7 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
     lo, hi = float(sqrts_min), float(sqrts_max)
     n_flat = int(round(pol["f_flat"] * n_events)); n_bulk = n_events - n_flat
     uni = lambda n: rng.uniform(lo, hi, n)
-    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"])   # bulk: physical measure
+    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"])   # bulk: uniform-sqrt(s) measure
     me_b = np.asarray(label(ev_b, sq_b), float)
     ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
     if n_flat:
@@ -3016,7 +3016,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     SCOPE: this byte-strict chunk identity applies to TRAIN only, where recipe_id
     is the $SCRATCH cache key and we want exact-bytes reuse within a sweep. For the
     FROZEN val/test benchmark, chunking is a pure generation-parallelism detail:
-    any valid sample of the physical spec is an equally good benchmark, so we do
+    any valid sample of the spec is an equally good benchmark, so we do
     NOT want a different chunk policy to mint a second, physically-identical frozen
     dataset. Hence `n_chunks` is left out of the val/test identity entirely — one
     test set serves regardless of how it was sliced for generation."""

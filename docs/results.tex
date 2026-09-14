@@ -286,8 +286,9 @@ and redraws the event when it is off (or when the return code marks the point ex
 and refuses the module if more than $2\%$ of its events had to be redrawn.
 
 \paragraph{Sampling policy.} The recipe path now samples the mixture the divergence study
-settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the physical way ($\sqrt s$
-uniform in the window, RAMBO angles, fiducial cuts) and $f=0.35$ kept flat in
+settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the legacy way ($\sqrt s$
+uniform in the window, RAMBO angles, fiducial cuts; this is a dataset convention, not a
+physical measure, and the notes called it one until now) and $f=0.35$ kept flat in
 $\log|\mathcal M|^2$ from an oversampled ($6\times$), labelled candidate pool thinned without
 replacement, so every amplitude extreme is covered by generation rather than by resampling.
 Candidates reach the extremes through the IR-democratic $1\to2$ splitter for multi-leg finals
@@ -303,13 +304,18 @@ of the events, and a seed reproduces the pool (\code{tests/test\_sampling.py}). 
 on the catalog entry (per entry or per recipe; the default is the legacy flat sampling and
 \code{catalog\_v2} opts in), enters the recipe identity, and a shaped pool carries its own file
 name. Until the first catalog\_v2 short tests the frozen val/test sets were forced onto the
-physical measure while the train pool was shaped, so the model was scored on a distribution
-it never trained on (the train/test histograms of an $s$-channel pool made this plain: $10$--$15\%$
-of train events on the $Z$ pole against $2.6\%$ in test, and a low tail only in train). That
-is wrong and is gone: a shaped entry now shapes train, val and test alike, the loss measured
-is the loss trained, and every catalog\_v2 number from here on is on the shaped measure
-(the earlier catalog\_v2 numbers, Sec.~\ref{sec:catv2-census}, are on the physical one and
-compare only by failing status). The one-loop (MadLoop) datasets are never shaped.
+uniform-$\sqrt s$ measure while the train pool was shaped, so the model was scored on a
+distribution it never trained on; the train/test histograms of an $s$-channel pool made this
+plain ($10$--$15\%$ of train events on the $Z$ pole against $2.6\%$ in test, a low tail only
+in train). That was wrong. A fit from finitely many points carries an error field set by the
+local sampling density, the training loss is that error integrated over the training measure,
+and a validation set estimates that risk without bias only if it is drawn from the same
+measure; the old validation estimated a different integral, weighted exactly where the
+training density was not, and checkpoint selection, the HPO objective and the census all read
+it. A shaped entry now shapes train, val and test alike, and every catalog\_v2 number from
+here on is on the shaped measure; the earlier ones (Sec.~\ref{sec:catv2-census},
+Table~\ref{tab:catv2_short}) are on the uniform one and compare only by failing status. The
+one-loop (MadLoop) datasets are never shaped, so their roles always agreed.
 
 \paragraph{Parameter axis.} Deliberately sparse: a few far-apart points per axis as decorated
 variants of the families the axis moves, never a dense grid (\code{recipes/catalog\_v2\_scan.yaml};
