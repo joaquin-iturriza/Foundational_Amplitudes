@@ -2788,6 +2788,31 @@ which costs nothing since the catalog run restarts. The catalog's colliding entr
 distinguishable inputs, so the dedup rule can stay; whether they should also be pruned, and
 the hold-out fixes, remain open (Sec.~\ref{sec:catalog-open}).
 
+\paragraph{Test of the fix at the catalog's scale.} Two runs of the wave-0 setup on the full
+recipe, $1000$ steps, lr $9.7\times10^{-3}$: the generation one-hot against the encoding the
+census ran with, reproduced by dropping the column (\code{data.generation\_feature: false};
+the table's masses are already the generator's, so $d$ and $s$ rows are then identical). A
+first attempt on a twelve-process recipe of the colliding families alone was uninformative
+and is recorded here so it is not repeated: its ``off'' arm kept the generation as a scalar
+column (only the one-hot form was switched), so both arms carried the flavour and both
+learned every process to $10^{-4}$; and the per-process levers cannot be the cue at any
+scale, since the off-shellness masks are built for $0$ of the processes here (no diagram
+sidecars on this cluster) and the coupling and internal-mass scalars are equal for twins.
+At the catalog's scale the baseline reproduces the census to three digits, $ds\to ds$ at one
+loop at $1.57$, never below $1.0$ during training, and $ud\to ud$ on a plateau at $0.097$
+from step $300$ on while $us\to us$ reaches $2\times10^{-4}$; with the one-hot, $ud\to ud$
+learns to $2\times10^{-3}$ and $ds\to ds$ at one loop reaches $7\times10^{-3}$ at step
+$550$, i.e.\ the function is representable and found, but at this learning rate and horizon
+it does not hold it: it drifts back to $0.7$ over the last $400$ steps while $dd\to dd$ at one
+loop settles at $4\times10^{-3}$, so the two twins still compete late in training. The
+overall census moves the right way ($265$ against $273$ failing of $478$, median $0.068$
+against $0.076$). Whether the full $8601$-step horizon (and its lower final learning rate)
+holds both twins is what the re-measure wave has to show. One more thing the baseline run
+exposed: its evaluation aborted on the inverse of the signed log
+(\code{AssertionError: signedlog failed}), the overflow of $\exp|y|$ on a prediction far
+from the sign-changing pools' range, the same defect as the training-side one; the
+per-dataset scale fixes both ends.
+
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
 
