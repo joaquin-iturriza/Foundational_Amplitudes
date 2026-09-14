@@ -2762,10 +2762,11 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
 \begin{itemize}
   \item \textbf{Re-measure with the generation feature at the full horizon.} The
     $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
-    at one loop representable but not held; whether $8601$ steps hold both is open. The
-    signed-log scale is in and $\tau$ is in the sweep's search space, so the same wave
-    measures the three fixes together; three trials at the full horizon are $\sim9$
-    GPU-hours. It is a fresh sweep, not an extension: wave 0's DyHPO state holds
+    at one loop representable but not held; whether $8601$ steps hold both is open. At
+    $1000$ steps the three fixes together are measured (Table~\ref{tab:catv2_short}); what
+    only the full horizon can tell is whether the signed one-loop $2\to3$ class learns with
+    more steps, and where $\tau$ lands the failing-count against best-tail trade. Three
+    trials at the full horizon are $\sim9$ GPU-hours. It is a fresh sweep, not an extension: wave 0's DyHPO state holds
     observations under the old target and without the $\tau$ dimension.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
@@ -2938,6 +2939,52 @@ exposed: its evaluation aborted on the inverse of the signed log
 (\code{AssertionError: signedlog failed}), the overflow of $\exp|y|$ on a prediction far
 from the sign-changing pools' range, the same defect as the training-side one; the
 per-dataset scale fixes both ends.
+
+\paragraph{The signed-log scale and the aggregation at the catalog's scale.} The same
+$1000$-step setup, generation one-hot throughout, run with the three fixes
+(Table~\ref{tab:catv2_short}; census by \code{analysis/catalog\_v2/census.py} from the
+in-training validation lines, failing $=$ loss above $0.05$). The scale re-bases the signed
+pools' target, so their losses compare across arms by failing status. Three readings. The
+aggregation moves everything: under the arithmetic mean the census drops from $254$ to
+$189$ failing and every class improves, the $s$-channel family from six failing to two,
+and the price is again the best-learned tail, $47$ processes below $10^{-3}$ under the
+geometric mean against none, the $10\%$ quantile $1.1\times10^{-3}$ against
+$4.2\times10^{-3}$; the twelve-process result (Sec.~\ref{sec:catalog},
+Table~\ref{tab:agg_ab}) transfers to $478$ processes unchanged, and $\tau$ in the wave's
+search space is the right place to set the trade. The signed-log scale does what it was
+built for and no more: the standardized target is sane, the signed $2\to2$ pools learn
+($cs\to cs$ at one loop $0.26\to0.025$, $u\bar u\to\gamma g$ $0.95\to0.23$, and to
+$4\times10^{-3}$ and $1.5\times10^{-2}$ with the scale at the median), but the class as a
+whole still fails ($46$ of $50$ at the $1\%$ quantile, $45$ at the median, against $20$ of
+$48$ for the positive one-loop pools), and the pools that fail under every scale are the
+one-loop $2\to3$ with a gluon or photon, all of which change sign, so at $1000$ steps their
+failure reads as the difficulty of a one-loop function with a soft or collinear emission,
+not as the transform; only the full horizon can separate the two. The scale stays at the
+$1\%$ quantile (the median arm is not better overall, $272$ failing against $254$, one
+seed). The $M_Z$-shifted family stays hard under every arm ($16$--$18$ of $20$).
+
+\begin{table}[H]
+\centering
+\caption{catalog\_v2, $1000$ steps at $\mathrm{bs}=16384$, lr $9.7\times10^{-3}$, generation
+one-hot, one seed: failing count (loss $>0.05$) and median of the per-process validation
+loss at the last validation, by class. ``Old'' is the encoding A/B's one-hot arm before the
+signed-log scale; $q$ is the quantile of $|x|$ that sets the scale. Signed pools are on a
+different target scale in the ``old'' column.}
+\label{tab:catv2_short}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+class & old & geo., $q=0.01$ & geo., $q=0.5$ & arith., $q=0.01$ \\
+\midrule
+all $478$ & $265$ / $0.068$ & $254$ / $0.059$ & $272$ / $0.062$ & $189$ / $0.038$ \\
+signed one-loop ($50$) & $49$ / $0.43$ & $46$ / $0.31$ & $45$ / $0.25$ & $39$ / $0.10$ \\
+positive one-loop ($48$) & $25$ / $0.057$ & $20$ / $0.024$ & $23$ / $0.040$ & $13$ / $0.021$ \\
+$s$-channel family ($7$) & $4$ / $0.065$ & $6$ / $0.080$ & $6$ / $0.19$ & $2$ / $0.037$ \\
+$M_Z$ family ($20$) & $17$ / $0.096$ & $18$ / $0.10$ & $18$ / $0.13$ & $16$ / $0.086$ \\
+flavour twins ($9$) & $3$ / $0.0024$ & $1$ / $0.0008$ & $1$ / $0.0023$ & $0$ / $0.0037$ \\
+below $10^{-3}$ & $-$ & $47$ & $41$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
