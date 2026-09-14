@@ -232,7 +232,7 @@ _SPIN_TOL = 1e-6
 _SPIN_COL = PARTICLE_FEATURE_NAMES.index("spin")   # == 1
 
 
-def expand_spin_onehot(matrix):
+def expand_spin_onehot(matrix, names=None):
     """Replace the scalar spin column of a property matrix with a one-hot over
     SPIN_ONEHOT_VALUES plus a scalar overflow channel.
 
@@ -244,6 +244,7 @@ def expand_spin_onehot(matrix):
     """
     matrix = np.asarray(matrix, dtype=np.float32)
     n      = matrix.shape[0]
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
     spin   = matrix[:, _SPIN_COL]
 
     onehot   = np.zeros((n, len(SPIN_ONEHOT_VALUES)), dtype=np.float32)
@@ -264,10 +265,10 @@ def expand_spin_onehot(matrix):
     expanded[padding] = 0.0
 
     names = (
-        PARTICLE_FEATURE_NAMES[:_SPIN_COL]
+        names[:_SPIN_COL]
         + [f"spin_is_{v:g}" for v in SPIN_ONEHOT_VALUES]
         + ["spin_overflow"]
-        + PARTICLE_FEATURE_NAMES[_SPIN_COL + 1:]
+        + names[_SPIN_COL + 1:]
     )
     return expanded, names
 
@@ -459,16 +460,30 @@ def standardize_property_columns(matrix, names=None):
     return matrix, names
 
 
+def drop_generation(matrix, names=None):
+    """Remove the ``generation`` column: the encoding as it was before the column
+    existed (d ≡ s, u ≡ c once the masses are the generator's). For A/B baselines
+    only (``data.generation_feature: false``)."""
+    matrix = np.asarray(matrix, dtype=np.float32)
+    names  = list(names) if names is not None else list(PARTICLE_FEATURE_NAMES)
+    g = names.index("generation")
+    return np.concatenate([matrix[:, :g], matrix[:, g + 1:]], axis=1), names[:g] + names[g + 1:]
+
+
 def build_property_matrix(spin_onehot=False, color_onehot=False,
                           is_massless=False, standardize=False,
-                          generation_onehot=False):
+                          generation_onehot=False, generation_feature=True):
     """Assemble the particle property matrix with the requested smart-encoding
     transforms, applied in a fixed order (spin → color → generation → mass-flag →
     standardize). Returns ``(matrix, feature_names)``. With all flags False this
-    is exactly ``(GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES)``."""
+    is exactly ``(GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES)``;
+    ``generation_feature=False`` drops the generation column altogether."""
     mat, names = GLOBAL_PROPERTY_MATRIX, list(PARTICLE_FEATURE_NAMES)
+    if not generation_feature:
+        mat, names = drop_generation(mat, names)
+        generation_onehot = False
     if spin_onehot:
-        mat, names = expand_spin_onehot(mat)
+        mat, names = expand_spin_onehot(mat, names)
     if color_onehot:
         mat, names = expand_color_onehot(mat, names)
     if generation_onehot:
@@ -500,7 +515,8 @@ MASS_MASSLESS_LOG10_THR = -4.0
 
 
 def mass_feature_spec(spin_onehot=False, color_onehot=False,
-                      is_massless=False, standardize=False, generation_onehot=False):
+                      is_massless=False, standardize=False, generation_onehot=False,
+                      generation_feature=True):
     """Metadata for the data-derived mass column (see ``data.mass_from_momenta``).
 
     Returns a dict the wrapper uses to map a per-particle physical mass onto the
@@ -519,7 +535,7 @@ def mass_feature_spec(spin_onehot=False, color_onehot=False,
     _, names = build_property_matrix(
         spin_onehot=spin_onehot, color_onehot=color_onehot,
         is_massless=is_massless, standardize=standardize,
-        generation_onehot=generation_onehot,
+        generation_onehot=generation_onehot, generation_feature=generation_feature,
     )
     mass_col = names.index("log10_mass_gev")
     is_massless_col = names.index("is_massless") if "is_massless" in names else None

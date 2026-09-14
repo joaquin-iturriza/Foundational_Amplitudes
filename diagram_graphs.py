@@ -504,7 +504,7 @@ def build_diagram_batch(pd_by_pid):
 
 def load_diagram_registry(diagrams_dir, process_names, spin_onehot=False,
                           color_onehot=False, is_massless=False, standardize=False,
-                          generation_onehot=False, k_pe=8, order_keys=DEFAULT_ORDER_KEYS, max_diagrams=None,
+                          generation_onehot=False, generation_feature=True, k_pe=8, order_keys=DEFAULT_ORDER_KEYS, max_diagrams=None,
                           logger=None, couplings_by_process=None):
     """Load a ``{process_name: ProcessDiagrams}`` registry for the given processes.
 
@@ -522,7 +522,7 @@ def load_diagram_registry(diagrams_dir, process_names, spin_onehot=False,
     prop_matrix, _ = build_property_matrix(
         spin_onehot=spin_onehot, color_onehot=color_onehot,
         is_massless=is_massless, standardize=standardize,
-        generation_onehot=generation_onehot,
+        generation_onehot=generation_onehot, generation_feature=generation_feature,
     )
     registry = {}
     for name in process_names:

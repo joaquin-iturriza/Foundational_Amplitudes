@@ -14,19 +14,21 @@
 #
 # Encoding A/B at the catalog's own scale: the full catalog_v2 train+scan recipe (478 pools),
 # the wave-0 sweep setup, 1000 steps (the ds->ds one-loop anti-learning of the census showed
-# by step ~900), generation one-hot on (GEN=true) vs off (GEN=false). Not an HP search.
+# by step ~900), generation one-hot (GEN=true) vs no generation column at all (GEN=none, the
+# encoding the census ran with). GEN=false keeps the column as a scalar. Not an HP search.
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
 cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
-GEN="${GEN:-true}"
+GEN="${GEN:-true}"        # true: one-hot | false: scalar column | none: no generation column (the old encoding)
+if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi
 python run.py \
   exp_name="catalog_short_ab_gen_${GEN}" \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml \
   data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
-  data.standardize_props=true data.generation_onehot="${GEN}" \
+  data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
   data.offshell_per_event=true 'data.internal_mass_pdgs=[23,6,25]' \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \

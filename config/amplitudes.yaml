@@ -69,6 +69,7 @@ data:
                            # on by default. It was neutral on short/small A/B runs, but is
                            # expected to help on richer data / longer training (open — drop
                            # only if a rigorous test shows it hurts).
+ generation_feature: true  # keep the generation column at all (false = the pre-generation encoding, for A/Bs)
  generation_onehot: true   # one-hot the fermion generation. The table's masses are the
                            # generator's (u,d,s,c,e,mu massless), so generation is the only
                            # thing separating d from s and u from c; same-generation pairs

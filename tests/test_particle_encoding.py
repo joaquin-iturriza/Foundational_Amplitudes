@@ -74,6 +74,19 @@ def test_generation_onehot_columns():
     assert names[spec["mass_col"]] == "log10_mass_gev" and names[spec["is_massless_col"]] == "is_massless"
 
 
+def test_generation_feature_off_is_the_old_encoding():
+    """generation_feature=False drops the column: d and s (u and c) become identical
+    inputs, which is exactly the collision the census found; used for A/B baselines."""
+    flags = dict(spin_onehot=True, color_onehot=True, is_massless=True, standardize=True)
+    mat, names = P.build_property_matrix(**flags, generation_feature=False)
+    assert "generation" not in names and not any(n.startswith("gen_is_") for n in names)
+    assert mat.shape[1] == len(names)
+    for a, b in ((1, 3), (2, 4), (11, 13)):
+        assert np.allclose(mat[P.GLOBAL_PDG_IDX[a]], mat[P.GLOBAL_PDG_IDX[b]]), (a, b)
+    spec = P.mass_feature_spec(**flags, generation_feature=False)
+    assert names[spec["mass_col"]] == "log10_mass_gev"
+
+
 def test_frozen_standardization_matches_the_table():
     m2, n2 = P.add_is_massless_flag(P.GLOBAL_PROPERTY_MATRIX)
     real = np.any(P.GLOBAL_PROPERTY_MATRIX != 0, axis=1)
