@@ -204,6 +204,11 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
     relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
     processes of different final-state dimensionality (hence very different MSE
     scale) all keep scaling instead of the high-MSE ones dominating the gradient.
+    **Caveat (measured):** the same `1/MSE` weighting starves any process stuck far above
+    the bulk (the `Z`-resonance needle); a 12-process A/B with `loss_aggregation: mean`
+    recovered it (`ee_uu` 0.27 → 5.7e-4) at a 2–4× cost on the best-learned processes
+    (`docs/results.tex`, `tab:agg_ab`). The aggregation for the next catalog wave is an
+    open decision; compare aggregations on the per-process census, not `val_loss_no_reg`.
 
 ---
 

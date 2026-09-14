@@ -379,7 +379,55 @@ only $0.26$ inside a twelve-process recipe of four-quark families
 failure is an interaction with the other processes in the batch, not a sampling defect;
 the suspect is the loss aggregation (Prin.~\ref{prin:geomean}: the geometric mean scales a
 process's gradient by the inverse of its own MSE, so the worst-fitted processes get the
-least push), which the twelve-process recipe tests directly with the arithmetic mean.
+least push).
+
+\paragraph{The aggregation is the cause.} The twelve-process recipe rerun with the
+arithmetic mean (\code{loss\_aggregation: mean}), everything else identical (same seed,
+horizon, batch and learning rate; \code{scripts/job\_needle\_probe.sh} with \code{AGG=mean}),
+settles the question (Table~\ref{tab:agg_ab}). $ee\to u\bar u$ goes from $0.27$ to
+$5.7\times10^{-4}$, i.e.\ to what the family reaches alone, and the two one-loop processes
+the geometric mean had left at $10^{-3}$ come down by $25\times$; the price is a factor
+$2$--$4$ on the processes the geometric mean had pushed furthest ($10^{-5}$ to a few
+$10^{-5}$). Under the arithmetic mean every process ends within $[2\times10^{-5},
+6\times10^{-4}]$; under the geometric mean the spread is five decades. This is
+Prin.~\ref{prin:gradcomp} seen directly: a laggard's gradient is divided by its own large
+loss, so in company it never gets the steps the resonance needs, and no amount of sampling
+can hand them back. The wave-0 census (Sec.~\ref{sec:catv2-census}), where the failing
+$s$-channel and $M_Z$ pools sit at $0.04$--$0.6$ while the bulk is at $10^{-2}$ and below,
+is the same mechanism at $478$ processes. What to aggregate with at that scale is a decision
+for the re-measure wave (Sec.~\ref{sec:catalog-open}); the geometric mean's rationale (a
+$2\to4$ process at $10^{-2}$ must not swamp a $2\to2$ at $10^{-6}$) still holds, but a
+$2\to2$ needle at $0.5$ is above every $2\to4$ plateau, so on this catalog the arithmetic
+mean's emphasis lands on the failures.
+
+\begin{table}[H]
+\centering
+\caption{Twelve-process recipe (\code{recipes/collision\_ab.yaml}), $3000$ steps at
+$\mathrm{bs}=4096$, lr $4.1\times10^{-3}$, one seed: validation MSE on the preprocessed target
+per process under the two loss aggregations. Same data, same encoding (generation one-hot),
+same checkpoint rule (best aggregated validation loss).}
+\label{tab:agg_ab}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+process & geometric mean & arithmetic mean \\
+\midrule
+$ee\to u\bar u$ & $2.7\times10^{-1}$ & $5.7\times10^{-4}$ \\
+$ud\to ud$ (1-loop) & $1.2\times10^{-3}$ & $4.7\times10^{-5}$ \\
+$cs\to cs$ (1-loop) & $1.3\times10^{-3}$ & $4.1\times10^{-5}$ \\
+$dd\to dd$ & $3.5\times10^{-5}$ & $4.5\times10^{-5}$ \\
+$uu\to uu$ & $3.3\times10^{-5}$ & $2.7\times10^{-5}$ \\
+$dd\to dd$ (1-loop) & $2.4\times10^{-5}$ & $3.4\times10^{-5}$ \\
+$ud\to ud$ & $2.2\times10^{-5}$ & $3.3\times10^{-5}$ \\
+$cs\to cs$ & $1.8\times10^{-5}$ & $3.3\times10^{-5}$ \\
+$ds\to ds$ & $1.1\times10^{-5}$ & $3.9\times10^{-5}$ \\
+$us\to us$ & $1.1\times10^{-5}$ & $2.6\times10^{-5}$ \\
+$us\to us$ (1-loop) & $6.2\times10^{-6}$ & $2.8\times10^{-5}$ \\
+$ds\to ds$ (1-loop) & $5.7\times10^{-6}$ & $2.2\times10^{-5}$ \\
+\midrule
+combined (all events) & $2.3\times10^{-2}$ & $8.8\times10^{-5}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
 \centering
@@ -522,7 +570,12 @@ $2\!\to\!2$ process vs.\ $\sim\!10^{-2}$ for a $2\!\to\!4$ one). An arithmetic m
 dominated by the few high-MSE processes and their gradient, freezing the already-well-learned
 ones; the geometric mean weights each process's \emph{relative} improvement equally: a $10\%$
 drop on a $10^{-6}$ process counts the same as a $10\%$ drop on a $10^{-2}$ one, so every
-process keeps scaling regardless of its absolute loss.
+process keeps scaling regardless of its absolute loss. The same weighting starves a process
+that is stuck high: a resonance needle at $0.3$ gets $10^{4}$ times less gradient than a
+converged neighbour, and the twelve-process A/B of Sec.~\ref{sec:catalog}
+(Table~\ref{tab:agg_ab}) shows the arithmetic mean recovering it at a factor $2$--$4$ cost
+on the best-learned processes. The principle is therefore conditional on no process being
+stuck far above the bulk, which the catalog census violates (Prin.~\ref{prin:gradcomp}).
 \end{principle}
 
 \paragraph{The training sampler: balanced vs.\ equal.} A batch's per-process composition is set
@@ -1203,7 +1256,9 @@ validation), and fragile \emph{learned} processes get overwritten late in traini
 $ee\,\gamma\gamma$ (no resonance at all) trains down to $7\times10^{-4}$ by step $\sim\!7$k and
 then regresses to $0.1$--$0.7$. Re-balancing the \emph{sampler} cannot fix this: it changes
 process frequency by $O(1)$ factors against a $10^4$ gradient-scale imbalance (consistent with the
-balanced-sampler A/B of Sec.~\ref{sec:loss} finding no gain).
+balanced-sampler A/B of Sec.~\ref{sec:loss} finding no gain). Confirmed on a twelve-process
+recipe where switching to the arithmetic mean alone takes the stuck $ee\to u\bar u$ from
+$0.27$ to $5.7\times10^{-4}$ (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}).
 \end{principle}
 
 \paragraph{Feature ablation at scale (one-factor-out arms).} Five single-GPU arms re-ran the best
@@ -1316,11 +1371,12 @@ big run}:
   needles ($4\ell$, $WWb\bar b$, $\mu\mu\tau\tau$), resonance-aware phase-space sampling
   (\`a la MadGraph channel mapping), the only real cure.
   \item \textbf{Taming the $1/\mathrm{MSE}$ gradient weight} (optimizer-side fix for
-  Principle~\ref{prin:gradcomp}). Candidate one-liner: aggregate
-  $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau\sim10^{-4}$, which caps a converged
-  process's weight at $1/\tau$ while leaving processes above $\tau$ on the exact geometric-mean
-  behavior (comparison metrics unchanged). Untested; the decisive check is whether
-  $ee\,\gamma\gamma$'s late-training collapse disappears at otherwise-identical HPs.
+  Principle~\ref{prin:gradcomp}). The crudest form, the plain arithmetic mean, is tested at
+  twelve processes and recovers the stuck one (Table~\ref{tab:agg_ab}). The floored variant
+  $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$, which caps a converged process's weight at
+  $1/\tau$ and keeps the geometric mean above $\tau$, is untested; $\tau$ is an HP
+  (DyHPO). The decisive check at scale is whether $ee\,\gamma\gamma$'s late-training
+  collapse disappears at otherwise-identical HPs.
 \end{itemize}
 
 \section{Behaviour near amplitude divergences}\label{sec:divergences}
@@ -2687,7 +2743,8 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
   \item \textbf{Re-measure with the generation feature at the full horizon.} The
     $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
     at one loop representable but not held; whether $8601$ steps hold both is open. Do it
-    after the signed-log scale, so the wave does not re-measure $17$ known failures.
+    after the signed-log scale and with the aggregation decided (next two items), so the
+    wave does not re-measure $17$ known failures nor the needle.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
@@ -2695,13 +2752,14 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     ($\mathrm{sgn}(x)\log(1+|x|/s)$, stored with the standardization statistics) for the
     $27$ sign-changing pools; the plain log stays for positive pools, so no earlier number
     moves.
-  \item \textbf{The needle is a multi-task effect, not a data one} (Sec.~\ref{sec:catalog},
-    the probe): the $s$-channel family learns alone to $3\times10^{-4}$ and fails in company.
-    Pending: the twelve-process recipe (\code{recipes/collision\_ab.yaml},
-    \code{scripts/job\_needle\_probe.sh} with \code{AGG=mean}) under the arithmetic mean
-    against the geometric mean, $ee\to u\bar u$ being the read-out ($0.26$ under the
-    geometric mean); if the aggregation is the cause, Prin.~\ref{prin:geomean} needs
-    revisiting at this scale.
+  \item \textbf{Which aggregation for the wave.} The needle is the geometric mean's doing
+    (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), so the wave should not run with it
+    unchanged. Options: the arithmetic mean as tested (implemented, one flag, costs a
+    factor $2$--$4$ on the best-learned processes at twelve; at $478$ the $2\to4$ plateaus
+    at $10^{-2}$ will take most of the gradient once the needles are down), or the floored
+    log $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ with $\tau$ swept by DyHPO. Either way the
+    comparison against wave 0 is the census (failing count, median), never
+    \code{val\_loss\_no\_reg}, which is the aggregate itself and changes meaning with it.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
@@ -2753,7 +2811,9 @@ $0.04$--$0.09$; $ee\,\mu\mu$ sits at $0.09$, and the pure-$Z$ $ee\,\nu_\mu\bar\n
 $0.56$, rising from $0.3$ over training. The $M_Z$ family is the same needle shifted
 ($16/20$ failing at a median $0.08$). Shaping the training measure moved these from
 ``nothing learned'' to ``the bulk learned, the peak not''; the remaining error is the
-resonance shape on the flat validation measure.
+resonance shape on the flat validation measure. Its cause is not the data but the loss
+aggregation: the family learns alone, and it learns in company under the arithmetic mean
+(Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}).
 
 \paragraph{Signed one-loop targets and the signed log.} $27$ of the $95$ one-loop pools have a
 finite part that changes sign ($2\to3$ with a gluon or photon: $u\bar d\to e\nu g$ is $81\%$
