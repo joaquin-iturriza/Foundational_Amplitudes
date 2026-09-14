@@ -15,6 +15,7 @@ from preprocessing import (
     preprocess_amplitude,
     undo_preprocess_amplitude,
     resolve_amp_trafos,
+    SIGNEDLOG_QUANTILE,
 )
 from plots import plot_mixer, short_ds_name
 from logger import LOGGER
@@ -566,7 +567,8 @@ class AmplitudeExperiment(BaseExperiment):
         # Swap 'log' -> 'signedlog' when amplitudes contain non-positive values
         # (e.g. virtual corrections / virt-born ratios). Store the resolved list back
         # on the config so the inverse (undo_preprocess_amplitude) uses the same one.
-        amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, all_amplitudes_raw)
+        amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, all_amplitudes_raw,
+                                        scale_quantile=self._signedlog_quantile())
         self.cfg.data.amp_trafos = amp_trafos
         LOGGER.info(
             f"Preprocessing amplitudes globally using trafos={amp_trafos}"
@@ -1322,6 +1324,10 @@ class AmplitudeExperiment(BaseExperiment):
             mom_mean   = float(stats["mom_mean"])
             mom_std    = float(stats["mom_std"])
             amp_trafos = stats["amp_trafos"]
+            # per-process transforms (per-dataset scope): a positive pool keeps `log`,
+            # a signed one carries `signedlog:<s>` with its own scale, so they must be
+            # reloaded with the stats, not re-resolved from whatever data is present.
+            amp_trafos_pp = stats.get("amp_trafos_pp")
             # prepd_mean/std stored as a list: length 1 (global) or n_proc
             # (per-dataset, aligned with data.dataset order).
             prepd_means = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_mean"], dtype=np.float64))]
@@ -1331,6 +1337,7 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             mom_div = mom_mean = mom_std = None
             amp_trafos = None
+            amp_trafos_pp = None
             prepd_means = prepd_stds = None
 
         amp_orders       = self._resolve_amp_orders(self.cfg.data.dataset)
@@ -1418,12 +1425,18 @@ class AmplitudeExperiment(BaseExperiment):
         # amp_trafos keeps a representative resolution; per-process trafos in _amp_trafos_pp.
         base_trafos = list(self.cfg.data.amp_trafos)
         self._amp_trafos_pp = None
+        q = self._signedlog_quantile()
         if amp_trafos is None:                       # fresh run: resolve from raw amps
-            amp_trafos = resolve_amp_trafos(base_trafos, train_raw)
+            amp_trafos = resolve_amp_trafos(base_trafos, train_raw, scale_quantile=q)
             if per_dataset:
                 self._amp_trafos_pp = [
-                    resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"])
+                    resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
+                                       scale_quantile=q)
                     for n in names]
+        elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
+            assert len(amp_trafos_pp) == len(names), (
+                f"frozen amp_trafos_pp has {len(amp_trafos_pp)} entries for {len(names)} datasets")
+            self._amp_trafos_pp = [list(t) for t in amp_trafos_pp]
         self.cfg.data.amp_trafos = amp_trafos
         if prepd_means is None:
             if per_dataset:
@@ -1601,6 +1614,8 @@ class AmplitudeExperiment(BaseExperiment):
                     "mom_mean":   float(self.mom_mean[0]),
                     "mom_std":    float(self.mom_std[0]),
                     "amp_trafos": list(amp_trafos) if amp_trafos else amp_trafos,
+                    "amp_trafos_pp": ([list(t) for t in self._amp_trafos_pp]
+                                      if self._amp_trafos_pp else None),
                     "preprocess_per_dataset": per_dataset,
                     "prepd_mean": [float(x) for x in self.prepd_mean],
                     "prepd_std":  [float(x) for x in self.prepd_std],
@@ -1608,6 +1623,10 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"Saved frozen data stats to {stats_path}")
 
         self._finalize_data_sizing()
+
+    def _signedlog_quantile(self):
+        """Quantile of |x| that sets the signed-log scale (data.signedlog_quantile)."""
+        return float(self.cfg.data.get("signedlog_quantile", SIGNEDLOG_QUANTILE))
 
     def _init_dataloader(self):
         from dataset import AmplitudeDataset, collate_variable_length, ProcessBalancedSampler

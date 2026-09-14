@@ -23,6 +23,12 @@ data:
  # small/complex processes by letting large-amplitude ones dominate the loss);
  # the advantage grows with data. See sweeps/preproc_comparison.
  preprocess_per_dataset: true
+ signedlog_quantile: 0.01   # signed pools (one-loop finite parts that change sign) use
+                            # sgn(x) log(1+|x|/s) with s this quantile of |x| on the train
+                            # pool, stored in the transform string (signedlog:<s>); without
+                            # the scale the transform is linear below |x|=1 and the
+                            # standardized target has a kurtosis of thousands. Positive
+                            # pools keep the plain log, so their numbers do not move.
  # Per-process recipe spec. Either inline as `processes` (a list of dicts) or via
  # `processes_file` (path to a YAML/JSON list — easier to thread through a sweep).
  # Each entry: {name, sqrts: [min, max], n_train, n_val, n_test[, amp_orders]}.

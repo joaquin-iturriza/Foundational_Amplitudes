@@ -4,20 +4,42 @@ from scipy.stats import boxcox
 from sklearn.preprocessing import QuantileTransformer
 
 
-def resolve_amp_trafos(trafos, amplitude):
-    """Swap 'log' -> 'signedlog' when the amplitude contains non-positive values.
+SIGNEDLOG_QUANTILE = 0.01   # default scale: the 1% quantile of |x| on the train pool
+
+
+def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
+    """Swap 'log' -> 'signedlog:<s>' when the amplitude contains non-positive values.
 
     Plain log is undefined for x <= 0 (e.g. virtual corrections or virt/born ratios
-    that go negative).  signedlog, f(x) = sgn(x) * log(1 + |x|), is total and
-    invertible (inverse sgn(y) * (exp(|y|) - 1)).  The caller must store the returned
-    list and use it for BOTH the forward preprocessing and the inverse so the two
-    stay consistent.  Positive-only data is left untouched (keeps plain 'log').
+    that go negative).  signedlog, f(x) = sgn(x) * log(1 + |x|/s), is total and
+    invertible (inverse s * sgn(y) * (exp(|y|) - 1)).  The scale s is the
+    `scale_quantile` quantile of the nonzero |x| of the data the transform is
+    resolved on (the train pool), written into the transform string so it travels
+    with `amp_trafos` (frozen stats, config dump) and the inverse reads it back.
+    Without it the transform is linear below |x| = 1, and a signed one-loop pool
+    whose median |x| is 1e-5 over tens of decades standardizes to a kurtosis of
+    thousands.  The caller must store the returned list and use it for BOTH the
+    forward preprocessing and the inverse.  Positive-only data keeps plain 'log'.
     """
     if not trafos or "log" not in trafos:
         return list(trafos) if trafos else trafos
     if float(np.min(amplitude)) > 0.0:
         return list(trafos)
-    return ["signedlog" if t == "log" else t for t in trafos]
+    a = np.abs(np.asarray(amplitude, dtype=np.float64)).ravel()
+    a = a[a > 0]
+    s = float(np.quantile(a, scale_quantile)) if a.size else 1.0
+    if not np.isfinite(s) or s <= 0.0:
+        s = 1.0
+    return [f"signedlog:{s:.6e}" if t == "log" else t for t in trafos]
+
+
+def signedlog_scale(fn_str):
+    """Scale s of a 'signedlog' / 'signedlog:<s>' transform string (1.0 if absent)."""
+    if fn_str == "signedlog":
+        return 1.0
+    if fn_str.startswith("signedlog:"):
+        return float(fn_str.split(":", 1)[1])
+    raise ValueError(f"Not a signedlog transform: {fn_str}")
 
 
 def preprocess_amplitude(amplitude, trafos=None, mean=None, std=None):
@@ -56,7 +78,7 @@ def undo_preprocess_amplitude(amplitude, mean, std, trafos=None):
                 amplitude = amplitude * std + mean
             else:
                 inv_fn = get_inv_fn(fn_str)
-                amplitude = np.minimum(30, inv_fn(amplitude, None))
+                amplitude = inv_fn(amplitude, None)
 
             assert np.isfinite(amplitude).all(), f'{fn_str} failed'
 
@@ -177,13 +199,14 @@ def apply_quantile_transform(particles):
 
 def get_fn(fn_str):
     # get functions from string
+    if fn_str.startswith("signedlog"):
+        s = signedlog_scale(fn_str)
+        return lambda p, t: np.sign(p) * np.log1p(np.abs(p) / s)
     match fn_str:
         case "None":
             return lambda p, t: p
         case "log":
             return lambda p, t: np.log(p)
-        case "signedlog":
-            return lambda p, t: np.sign(p) * np.log1p(np.abs(p))
         case "exp":
             return lambda p, t: np.exp(p)
         case "sqrt":
@@ -207,15 +230,16 @@ def get_fn(fn_str):
 
 
 def get_inv_fn(fn_str):
-    # get inverse functions from string
+    # get inverse functions from string. The exponentials clamp their ARGUMENT so a
+    # prediction far outside a pool's range stays finite (a raw-space inf tripped the
+    # finiteness assert in undo_preprocess_amplitude and aborted evaluation); the
+    # raw-space metrics of such an event are then merely wrong, not fatal.
+    if fn_str.startswith("signedlog"):
+        s = signedlog_scale(fn_str)
+        return lambda p, t: s * np.sign(p) * np.expm1(np.minimum(np.abs(p), 80.0))
     match fn_str:
         case "log":
-            return lambda p, t: np.exp(p)
-        case "signedlog":
-            # clamp BEFORE the exponential: a prediction far outside a sign-changing
-            # pool's range (|y| > ~700) overflowed to inf and tripped the finiteness
-            # assert in undo_preprocess_amplitude, aborting evaluation (catalog_v2 A/B)
-            return lambda p, t: np.sign(p) * np.expm1(np.minimum(np.abs(p), 30.0))
+            return lambda p, t: np.exp(np.minimum(p, 80.0))
         case "exp":
             return lambda p, t: np.log(p)
         case "sqrt":
