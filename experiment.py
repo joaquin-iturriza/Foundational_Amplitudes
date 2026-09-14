@@ -1719,9 +1719,16 @@ class AmplitudeExperiment(BaseExperiment):
                 )
 
         # Plain train loader for evaluation — always reflects the true data distribution,
-        # regardless of whether a balanced sampler is used for training.
+        # regardless of whether a balanced sampler is used for training. Capped per process
+        # by evaluation.train_subsample (train_idx is already shuffled, so the first N of a
+        # process are a random subset): the train-split pass is for the train-side metrics
+        # and plots only, and over the whole pool it took longer than the training it
+        # followed (35 min for 42.7M events after a 20-min catalog_v2 run).
+        _tcap = self.cfg.evaluation.get("train_subsample", None)
+        _tcap = int(_tcap) if _tcap not in (None, "null", "none") else None
         train_eval_bs = min(self.cfg.evaluation.batchsize, max(len(train_idx) // 2, 1))
-        self.train_eval_loader = make_loader(train_idx, shuffle=False, batchsize=train_eval_bs,
+        train_eval_idx = train_idx if (_tcap is None or self.n_datasets > 1) else train_idx[:_tcap]
+        self.train_eval_loader = make_loader(train_eval_idx, shuffle=False, batchsize=train_eval_bs,
                                              workers=0)
 
         eval_bs = min(self.cfg.evaluation.batchsize, max(len(val_idx) // 2, 1))
@@ -1740,6 +1747,7 @@ class AmplitudeExperiment(BaseExperiment):
             test_proc_ids  = self.all_process_ids[test_idx]
             train_proc_ids = self.all_process_ids[train_idx]
             test_bs        = min(self.cfg.evaluation.batchsize, max(len(test_idx) // 2, 1))
+            _capped        = []
             for p, name in enumerate(self.cfg.data.dataset):
                 # val
                 mask  = val_proc_ids == p
@@ -1760,15 +1768,23 @@ class AmplitudeExperiment(BaseExperiment):
                         batchsize=min(test_bs, max(len(p_idx) // 2, 1)),
                         workers=0,
                     )
-                # train (plain, for evaluation only)
+                # train (plain, for evaluation only; capped per process, see above)
                 mask  = train_proc_ids == p
                 p_idx = train_idx[mask]
+                if _tcap is not None:
+                    p_idx = p_idx[:_tcap]
                 if len(p_idx) >= 2:
                     self.proc_train_eval_loaders[name] = make_loader(
                         p_idx, shuffle=False,
                         batchsize=min(train_eval_bs, max(len(p_idx) // 2, 1)),
                         workers=0,
                     )
+                    _capped.append(p_idx)
+            if _tcap is not None and _capped:
+                # the combined train-split loader mirrors the per-process cap
+                train_eval_idx = np.concatenate(_capped)
+                self.train_eval_loader = make_loader(train_eval_idx, shuffle=False,
+                                                     batchsize=train_eval_bs, workers=0)
     
         LOGGER.info(
             f"Constructed dataloaders: train={n_train}, val={n_val}, "

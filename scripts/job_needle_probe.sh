@@ -42,4 +42,4 @@ python run.py \
   training.lr=4.1e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation=geometric_mean training.regularization=L2 \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
-  training.validate_frac=0.02 training.dtype=float32 plot=true use_mlflow=false
+  training.validate_frac=0.02 evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false

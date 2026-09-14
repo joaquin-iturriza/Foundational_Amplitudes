@@ -156,6 +156,11 @@ evaluate: true
 evaluation:
  batchsize: 16384        # eval is forward-only (less memory than a train step) -> match train BS,
                          # never eval slower for no reason.
+ train_subsample: 10000  # per process, events of the TRAIN split used for the train-split metrics
+                         # and per-dataset plots (null = all). The full split is the whole pool:
+                         # 42.7M events on catalog_v2, 35 min of evaluation after a 20-min run.
+                         # Selection and the tracked losses use the val split; this only bounds
+                         # the post-training train-split pass. Quick tests set 2000.
 
 find_BS: false
 BS_finding:

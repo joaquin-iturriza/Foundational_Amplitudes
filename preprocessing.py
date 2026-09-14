@@ -212,7 +212,10 @@ def get_inv_fn(fn_str):
         case "log":
             return lambda p, t: np.exp(p)
         case "signedlog":
-            return lambda p, t: np.sign(p) * np.expm1(np.abs(p))
+            # clamp BEFORE the exponential: a prediction far outside a sign-changing
+            # pool's range (|y| > ~700) overflowed to inf and tripped the finiteness
+            # assert in undo_preprocess_amplitude, aborting evaluation (catalog_v2 A/B)
+            return lambda p, t: np.sign(p) * np.expm1(np.minimum(np.abs(p), 30.0))
         case "exp":
             return lambda p, t: np.log(p)
         case "sqrt":
