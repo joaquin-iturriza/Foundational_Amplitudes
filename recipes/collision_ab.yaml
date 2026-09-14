@@ -1,0 +1,19 @@
+# Encoding A/B on the flavour collisions of the catalog_v2 census (docs/results.tex): the
+# same-generation pairs with W exchange (ud, cs) against the cross-generation one (us), and
+# identical- against distinct-flavour down-type pairs (dd, ds), at tree level and one loop,
+# plus two controls. Pools are the catalog's (same windows and sizes, so they are cache hits).
+# Run twice: data.generation_onehot=true / false (scripts/job_collision_ab.sh).
+sampling: {mode: mixture}
+processes:
+  - {name: ud_ud,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: us_us,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: cs_cs,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: dd_dd,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ds_ds,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uu_uu,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ud_ud_nlo,  sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: us_us_nlo,  sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: cs_cs_nlo,  sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: dd_dd_nlo,  sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ds_ds_nlo,  sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
