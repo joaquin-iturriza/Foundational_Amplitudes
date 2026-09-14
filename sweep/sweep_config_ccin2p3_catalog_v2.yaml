@@ -1,6 +1,8 @@
 # catalog_v2 joint pretraining: the bigrun_baseline setup (448-process run, docs/results.tex
 # sec:bigrun) carried over unchanged except for the two adopted ablations (no diagram encoder,
-# no MLP embedder) and the data: recipes/catalog_v2_train_scan.yaml (478 pools, mixture sampling).
+# no MLP embedder), the data: recipes/catalog_v2_train_scan.yaml (478 pools, mixture sampling), and
+# the encoding: the property table with the generator's masses and the generation one-hot
+# (data.generation_onehot, a third difference from the bigrun; see docs/results.tex, catalog_v2 census).
 # Horizon and batch size are the bigrun's (t = 8601 steps at bs 16384, ~3.3 passes over the
 # 42.7M train events), so the lr centre is the bigrun's best trial, 4.1e-3, swept +/- half a decade.
 cluster:
@@ -42,6 +44,7 @@ fixed_params:
   data.color_onehot: 'true'
   data.prop_is_massless: 'true'
   data.standardize_props: 'true'
+  data.generation_onehot: 'true'      # fermion generation one-hot (d vs s, u vs c)
   data.mass_from_momenta: 'true'
   data.coupling_scalars: 'true'
   data.internal_mass_scalars: 'true'

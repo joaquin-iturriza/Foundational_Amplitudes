@@ -113,36 +113,6 @@ class ParticleTokenizer:
 #   to be extended — its new column is initialized to zero so the model's
 #   existing predictions are unaffected before any fine-tuning.
 
-_MASSLESS = -5.0
-#   weak_isospin_t3 — T₃, third component of weak SU(2)_L isospin
-#                     quarks: ±1/2 (u-type +1/2, d-type -1/2)
-#                     leptons: -1/2 (charged), +1/2 (neutrino)
-#                     W±: ±1;  Z, γ, g, H: 0
-#                     antiparticles: sign flipped
-#   baryon_number   — B (1/3 quarks, -1/3 antiquarks, 0 else)
-#                     explicit here so leptoquarks (B≠0 and L≠0) are correct
-#   lepton_number   — L (+1 leptons, -1 antileptons, 0 else)
-#   color_charge    — sign of SU(3) fundamental charge:
-#                     +1 triplet (quark), -1 antitriplet (antiquark), 0 else
-#   color_casimir   — quadratic Casimir C₂(R) of the SU(3) representation:
-#                     0 singlet, 4/3 fundamental (3 or 3̄), 3 adjoint (8),
-#                     10/3 sextet, … generalises to any color rep.
-#
-# These 8 numbers uniquely identify every SM particle, including:
-#   γ vs Z    — by log10_mass_gev
-#   γ vs g    — by color_casimir (0 vs 3)
-#   e vs μ vs τ — by log10_mass_gev
-#   u vs c vs t — by log10_mass_gev
-#   quark vs antiquark — by sign of charge, baryon_number, color_charge
-#   gluino vs gluon — by spin (0.5 vs 1) and log10_mass_gev
-#
-# WHY project through a fixed hidden dim rather than feed directly:
-#   Adding an 9th quantum number changes n_features but NOT d_particle_hidden,
-#   so the transformer architecture (and all its weights) is unchanged.
-#   Only the tiny projection matrix Linear(n_features → d_particle_hidden) needs
-#   to be extended — its new column is initialized to zero so the model's
-#   existing predictions are unaffected before any fine-tuning.
-
 _MASSLESS = -5.0   # sentinel for log10(mass/GeV); well below electron (-3.3)
 
 # Masses the generator actually uses (GeV): MadGraph sm, restrict_default, plus
