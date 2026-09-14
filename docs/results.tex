@@ -285,57 +285,6 @@ stable, the generator also checks the double pole of every event against the uni
 and redraws the event when it is off (or when the return code marks the point exceptional),
 and refuses the module if more than $2\%$ of its events had to be redrawn.
 
-\paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
-pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
-$2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
-$t\bar t gg$ $2\to4$ finals slowest) even though the mixture labels six candidates per
-stored event; one-loop $2\to2$ and massive $2\to3$ $150$--$800$ events per second; the
-gluonic one-loop $2\to3$ entries ($u\bar u\to Zgg$, $u\bar u\to u\bar u g$, $u\bar u\to
-t\bar t g$) $50$--$100$ events per second, so their $5\times10^4$-event train pools take $8$--$17$
-minutes each and set the tail of every prebuild. At the pool sizes adopted ($10^5$ events per
-LO process, $5\times10^4$ per one-loop process, a tenth of each for val and test) the whole
-$478$-entry recipe is about six CPU-hours of generation plus the $432$ backend compiles,
-i.e.\ well under an hour of wall on one $48$-core \code{htc} node and no GPU, so the sizes
-were not worth trimming. Two things bit on the way: \code{--auto-workers} read the node's
-$512$ logical CPUs instead of the $48$-core allocation and launched $432$ MadGraph outputs
-at once, and with the default OpenBLAS pools every MadLoop subprocess counted $512$
-threads against the per-user process limit of $1024$, so forks failed with \code{EAGAIN}
-after $9281$ of $9569$ chunks. The job scripts now pin one BLAS thread per process, the
-worker count comes from the SLURM allocation, a chunk already on disk with the right row
-count is reused across reruns, and a transient fork failure retries the chunk instead of
-aborting the pool. The rerun picked up the $9281$ chunks and finished the recipe in $25$
-minutes: $478$ train pools of $10^5$ ($5\times10^4$ at one loop) events, val and test
-pools of a tenth each, $11$\,GB of train data and $2.5$\,GB frozen, every amplitude finite
-and non-zero across the $4.5\times10^7$ train events; the $14$ hold-outs and $5$
-interpolation hold-outs were generated the same way.
-
-\paragraph{Audit of the generated pools.} Since the $448$-run failures were distributional
-(Sec.~\ref{sec:bigrun}), every train and val pool was audited before training
-(\code{analysis/catalog\_v2/check\_pools.py}, Fig.~\ref{fig:pool_audit}): the sampling
-policy actually recorded, the share of events within $10$\,GeV of $M_Z$ where the window
-contains it, the flatness of the $\log|\mathcal M|^2$ histogram (largest over smallest bin
-count across the central $98\%$) and the standardized-log tail. Every train pool of the recipe
-carries the mixture: the $2\to2$ $s$-channel pools that lost the $Z$ needle last time now put
-$13$--$19\%$ of their events within $10$\,GeV of the pole ($ee\to\mu\mu$ $17\%$, $ee\to u\bar
-u$ $19\%$, against $2.6\%$ flat), no mixture pool has a standardized-log event beyond $6\sigma$
-(median maximum $3.4\sigma$, where the flat pools reached $7\sigma$), and the flatness sits
-at a median of $10$ (the $m_t$ family $6$, the $M_Z$ family $20$, the worst the leptonic
-$Z$-peak pools at $65$, halved from their flat versions). The one gap the audit found was
-the $14$ hold-outs: their recipe had no sampling header, so their train pools were flat while
-the scan hold-outs were shaped; the header is now written by the generator and the pools
-regenerated. Val and test are flat by construction, so the audit reports them only for
-window coverage, which is complete everywhere.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{../analysis/catalog_v2/pool_audit.pdf}
-\caption{Audit of the $508$ generated train pools: share of events within $10$\,GeV of $M_Z$
-for the pools whose window contains it (left), flatness of the $\log|\mathcal M|^2$
-histogram (middle), and the needle measure, the largest standardized log-amplitude per pool
-(right).}
-\label{fig:pool_audit}
-\end{figure}
-
 \paragraph{Sampling policy.} The recipe path now samples the mixture the divergence study
 settled on (Sec.~\ref{sec:div-sampling}): $(1-f)$ of a pool drawn the physical way ($\sqrt s$
 uniform in the window, RAMBO angles, fiducial cuts) and $f=0.35$ kept flat in
@@ -373,6 +322,59 @@ removals can share a base: drop every $+g$ at $2\to4$ (multiplicity extrapolatio
 family's interference (the LO$\to$NLO map), drop one loop-induced entry, and the
 vertex/particle/topology removals of the $2\to2$ layer ($ggg$, the Higgs family, the top
 family, the pure $t$-channel family, the $WWV$ family).
+
+\paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
+pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
+$2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
+$t\bar t gg$ $2\to4$ finals slowest) even though the mixture labels six candidates per
+stored event; one-loop $2\to2$ and massive $2\to3$ $150$--$800$ events per second; the
+gluonic one-loop $2\to3$ entries ($u\bar u\to Zgg$, $u\bar u\to u\bar u g$, $u\bar u\to
+t\bar t g$) $50$--$100$ events per second, so their $5\times10^4$-event train pools take $8$--$17$
+minutes each and set the tail of every prebuild. At the pool sizes adopted ($10^5$ events per
+LO process, $5\times10^4$ per one-loop process, a tenth of each for val and test) the whole
+$478$-entry recipe is about six CPU-hours of generation plus the $432$ backend compiles,
+i.e.\ well under an hour of wall on one $48$-core \code{htc} node and no GPU, so the sizes
+were not worth trimming. Two things bit on the way: \code{--auto-workers} read the node's
+$512$ logical CPUs instead of the $48$-core allocation and launched $432$ MadGraph outputs
+at once, and with the default OpenBLAS pools every MadLoop subprocess counted $512$
+threads against the per-user process limit of $1024$, so forks failed with \code{EAGAIN}
+after $9281$ of $9569$ chunks. The job scripts now pin one BLAS thread per process, the
+worker count comes from the SLURM allocation, a chunk already on disk with the right row
+count is reused across reruns, and a transient fork failure retries the chunk instead of
+aborting the pool. The rerun picked up the $9281$ chunks and finished the recipe in $25$
+minutes: $478$ train pools of $10^5$ ($5\times10^4$ at one loop) events, val and test
+pools of a tenth each, $11$\,GB of train data and $2.5$\,GB frozen, every amplitude finite
+and non-zero across the $4.5\times10^7$ train events; the $14$ hold-outs and $5$
+interpolation hold-outs were generated the same way.
+
+\paragraph{Audit of the generated pools.} Since the $448$-run failures were distributional
+(Sec.~\ref{sec:bigrun}), every train and val pool was audited before training
+(\code{analysis/catalog\_v2/check\_pools.py}, Fig.~\ref{fig:pool_audit}; it scans every
+train pool on disk, $508$ with the hold-outs and the leftovers of earlier short recipes): the sampling
+policy actually recorded, the share of events within $10$\,GeV of $M_Z$ where the window
+contains it, the flatness of the $\log|\mathcal M|^2$ histogram (largest over smallest bin
+count across the central $98\%$) and the standardized-log tail. Every train pool of the recipe
+carries the mixture: the $2\to2$ $s$-channel pools that lost the $Z$ needle last time now put
+$13$--$19\%$ of their events within $10$\,GeV of the pole ($ee\to\mu\mu$ $17\%$, $ee\to u\bar
+u$ $19\%$, against $2.6\%$ flat), no mixture pool has a standardized-log event beyond $6\sigma$
+(median maximum $3.4\sigma$, where the flat pools reached $7\sigma$), and the flatness sits
+at a median of $10$ (the $m_t$ family $6$, the $M_Z$ family $20$, the worst the leptonic
+$Z$-peak pools at $65$, halved from their flat versions). The one gap the audit found was
+the $14$ hold-outs: their recipe had no sampling header, so their train pools were flat while
+the scan hold-outs were shaped; the header is now written by the generator and the pools
+regenerated. Val and test are flat by construction, so the audit reports them only for
+window coverage, which is complete everywhere.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../analysis/catalog_v2/pool_audit.pdf}
+\caption{Audit of the $508$ train pools on disk (the recipe's $478$, the $19$ hold-outs and
+$11$ leftovers of earlier short recipes): share of events within $10$\,GeV of $M_Z$
+for the pools whose window contains it (left), flatness of the $\log|\mathcal M|^2$
+histogram (middle), and the needle measure, the largest standardized log-amplitude per pool
+(right).}
+\label{fig:pool_audit}
+\end{figure}
 
 \section{The model and the physical encoding}\label{sec:model}
 % ==========================================================================
@@ -2683,7 +2685,8 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
 % ==========================================================================
 
 The first DyHPO wave on \code{catalog\_v2} (three trials of the bigrun setup, Sec.~\ref{sec:bigrun},
-with the two adopted ablations, $8601$ steps at $\mathrm{bs}=16384$, lr $1.9$--$9.7\times10^{-3}$)
+with the two ablations adopted there, no diagram encoder and no MLP embedder
+(Tab.~\ref{tab:bigrun_arms}), $8601$ steps at $\mathrm{bs}=16384$, lr $1.9$--$9.7\times10^{-3}$)
 trains cleanly ($0.9$\,s per step, $2.9$--$3.2$\,h per trial with evaluation, $9$\,GB of VRAM;
 objectives $3.1\times10^{-3}$, $8.9\times10^{-3}$, $9.8\times10^{-3}$ for lr $9.7$, $2.4$,
 $1.9\times10^{-3}$) and is a diagnostic
