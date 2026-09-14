@@ -2,7 +2,8 @@
 # same-generation pairs with W exchange (ud, cs) against the cross-generation one (us), and
 # identical- against distinct-flavour down-type pairs (dd, ds), at tree level and one loop,
 # plus two controls. Pools are the catalog's (same windows and sizes, so they are cache hits).
-# Run twice: data.generation_onehot=true / false (scripts/job_collision_ab.sh).
+# Run with GEN=true / none (scripts/job_collision_ab.sh). dd_dd, ds_ds and cs_cs are catalog_v2
+# hold-outs: these standalone runs say nothing about the catalog's zero-shot set.
 sampling: {mode: mixture}
 processes:
   - {name: ud_ud,      sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

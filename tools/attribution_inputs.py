@@ -441,6 +441,7 @@ def main():
         is_massless=bool(d.get("prop_is_massless", False)),
         standardize=bool(d.get("standardize_props", False)),
         generation_onehot=bool(d.get("generation_onehot", False)),
+        generation_feature=bool(d.get("generation_feature", True)),
     )
     assert len(prop_names) == exp.property_matrix.shape[1], (
         f"prop_names ({len(prop_names)}) != property dim "

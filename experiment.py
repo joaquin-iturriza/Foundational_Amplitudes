@@ -675,6 +675,7 @@ class AmplitudeExperiment(BaseExperiment):
                 _enc = "+".join(
                     [n for n, on in (("spin1hot", spin_onehot),
                                      ("color1hot", color_onehot),
+                                     ("nogen", not generation_feature),
                                      ("gen1hot", generation_onehot),
                                      ("masslessflag", is_massless),
                                      ("std", standardize)) if on]
@@ -1111,7 +1112,7 @@ class AmplitudeExperiment(BaseExperiment):
                     is_massless=self.cfg.data.get("prop_is_massless", False),
                     standardize=self.cfg.data.get("standardize_props", False),
                     generation_onehot=bool(self.cfg.data.get("generation_onehot", False)),
-            generation_feature=bool(self.cfg.data.get("generation_feature", True)),
+                    generation_feature=bool(self.cfg.data.get("generation_feature", True)),
                 )
                 model.setup_mass_from_momenta(self.mom_div, spec)
                 LOGGER.info(
