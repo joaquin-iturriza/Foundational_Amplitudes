@@ -16,6 +16,8 @@
 # the wave-0 sweep setup, 1000 steps (the ds->ds one-loop anti-learning of the census showed
 # by step ~900), generation one-hot (GEN=true) vs no generation column at all (GEN=none, the
 # encoding the census ran with). GEN=false keeps the column as a scalar. Not an HP search.
+# EXP= names the run; AGG=mean|geometric_mean and TAU=<float> switch the training aggregation
+# (the validation metric stays the geometric mean).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -23,7 +25,7 @@ cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column | none: no generation column (the old encoding)
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi
 python run.py \
-  exp_name="catalog_short_ab_gen_${GEN}" \
+  exp_name="${EXP:-catalog_short_ab_gen_${GEN}}" \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml \
   data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
@@ -35,6 +37,7 @@ python run.py \
   model.net.num_heads=8 model.net.num_blocks=8 seed=42 \
   training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
   training.lr=9.7e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
-  training.loss_aggregation=geometric_mean training.regularization=L2 \
+  training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
+  training.regularization=L2 \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
   training.validate_frac=0.05 evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false
