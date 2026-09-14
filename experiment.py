@@ -676,7 +676,7 @@ class AmplitudeExperiment(BaseExperiment):
                     [n for n, on in (("spin1hot", spin_onehot),
                                      ("color1hot", color_onehot),
                                      ("nogen", not generation_feature),
-                                     ("gen1hot", generation_onehot),
+                                     ("gen1hot", generation_onehot and generation_feature),
                                      ("masslessflag", is_massless),
                                      ("std", standardize)) if on]
                 ) or "raw"
