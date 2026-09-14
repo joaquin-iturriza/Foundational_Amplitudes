@@ -2652,14 +2652,114 @@ generate here plus a modest pretraining; 5 needs no training at all; 6 starts as
 generator; 1 waits for a compute plan.
 
 \section{Hand-off: generating the catalog}\label{sec:catalog-open}
-\code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); what is
-still open on its data side:
+\code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); the first
+pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the next one:
 \begin{itemize}
+  \item \textbf{Flavour in the encoding.} The property vector separates $d$ from $s$ and $u$
+    from $c$ only by mass, which the model ignores; a generation feature (or an explicit
+    same-generation flag on the pair) is the smallest change that keeps the vocabulary-free
+    design and makes $W$-exchange structure representable. Until then the catalog must not
+    contain two entries that collide under $u\equiv c$, $d\equiv s$ with different functions
+    (the $ud/us/cs$ and $dd/ds$ families and their towers, $27$ keys); the generator's dedup
+    rule needs the generation structure, not just the flavour multiset.
+  \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
+    us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
+    must enter it), whichever the order-axis test wants.
+  \item \textbf{Signed one-loop targets.} A per-dataset scale before the signed log
+    ($\mathrm{sgn}(x)\log(1+|x|/s)$, stored with the standardization statistics) for the
+    $27$ sign-changing pools; the plain log stays for positive pools, so no earlier number
+    moves.
+  \item \textbf{The needle.} The mixture halves the problem but the resonance shape on the
+    flat validation measure is still the dominant $2\to2$ error; a larger flat share for the
+    $s$-channel families, or more steps, is the next lever, and the $M_Z$ scan family is the
+    cleanest place to measure it.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
     regenerates every pool; do it together with the next recipe change, not alone.
 \end{itemize}
+
+\section{catalog\_v2, first pretraining: the census and what it exposes}\label{sec:catv2-census}
+% ==========================================================================
+
+The first DyHPO wave on \code{catalog\_v2} (three trials of the bigrun setup, Sec.~\ref{sec:bigrun},
+with the two adopted ablations, $8601$ steps at $\mathrm{bs}=16384$, lr $1.9$--$9.7\times10^{-3}$)
+trains cleanly ($0.9$\,s per step, $2.2$\,h per trial, $9$\,GB of VRAM) and is a diagnostic
+of the catalog more than of the hyperparameters: the best trial (lr $9.7\times10^{-3}$, no EMA)
+ends at a geometric-mean $\vlnr=3.1\times10^{-3}$ with a median per-process loss of
+$5\times10^{-3}$ and $104/478$ processes above $0.05$, and the failing set is the same in all
+three trials, so it is structural.
+
+\begin{table}[H]
+\centering
+\caption{catalog\_v2 census (best wave-0 trial; failing $=$ per-process $\vlnr>0.05$).}
+\label{tab:catv2_census}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Category & failing & total & median $\vlnr$ \\
+\midrule
+$2\to2$ trees (v1 layer) & $15$ & $83$ & $1.8\times10^{-3}$ \\
+$2\to3$ trees by rule & $4$ & $55$ & $2.2\times10^{-3}$ \\
+$2\to4$ trees by rule & $33$ & $164$ & $1.5\times10^{-2}$ \\
+one-loop QCD & $34$ & $95$ & $9.4\times10^{-3}$ \\
+loop-induced & $0$ & $3$ & $1.4\times10^{-3}$ \\
+$\alpha_s$ scan & $2$ & $46$ & $8.5\times10^{-4}$ \\
+$m_t$ scan & $0$ & $12$ & $7.0\times10^{-4}$ \\
+$M_Z$ scan & $16$ & $20$ & $7.8\times10^{-2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pools themselves are sound: $200$ stored events of three one-loop pools, including the
+worst, recompute with MadLoop to machine precision, and the audit of Sec.~\ref{sec:catalog}
+holds. Three mechanisms account for the failures, each isolated against the data.
+
+\paragraph{The needle is smaller, not gone.} The $s$-channel $2\to2$ pools that lost the $Z$
+resonance in the $448$ run (Prin.~\ref{prin:needle}) now train on the mixture and improve by
+$30\times$ ($ee\,d\bar d$ $1.6\to0.05$, $ee\,b\bar b$ $1.6\to0.04$) but stop at
+$0.04$--$0.09$; $ee\,\mu\mu$ sits at $0.09$, and the pure-$Z$ $ee\,\nu_\mu\bar\nu_\mu$ at
+$0.56$, rising from $0.3$ over training. The $M_Z$ family is the same needle shifted
+($16/20$ failing at a median $0.08$). Shaping the training measure moved these from
+``nothing learned'' to ``the bulk learned, the peak not''; the remaining error is the
+resonance shape on the flat validation measure.
+
+\paragraph{Signed one-loop targets and the signed log.} $27$ of the $95$ one-loop pools have a
+finite part that changes sign ($2\to3$ with a gluon or photon: $u\bar d\to e\nu g$ is $81\%$
+negative, $u\bar u\to\mu\mu g$ $90\%$), and they fail as a class (median $0.09$, $17$ failing,
+losses up to $3.7$, i.e.\ worse than the constant). The cause is the transform: the signed
+log $\mathrm{sgn}(x)\log(1+|x|)$ is linear below $|x|=1$, and these targets have a median
+$|x|\sim10^{-5}$ over $28$ decades, so after standardization the target has a kurtosis of
+$1000$--$3000$ with single events at $70$--$90\sigma$. Dividing by a per-dataset scale before
+the log ($\mathrm{sgn}(x)\log(1+|x|/s)$, $s$ the median $|x|$ of the train pool, or a
+hundredth of it) brings the kurtosis to $3$--$7$ and the largest event to $4$--$6\sigma$;
+the positive-only one-loop pools that use the plain log are fine (median $4\times10^{-3}$).
+This never showed before because every earlier one-loop pool was positive.
+
+\paragraph{The encoding does not tell $d$ from $s$ or $u$ from $c$.} $ds\to ds$ at one loop
+ends at $\vlnr=1.58$, rising from $1.0$ during training (anti-learned), while $us\to us$ at
+one loop is among the best ($6\times10^{-4}$) and its stripped target is the same function as
+$ds\to ds$'s (correlation $1.000$ on the same momenta). Evaluating the $dd\to dd$ one-loop
+target on the $ds\to ds$ validation momenta, standardized with $dd\to dd$'s train statistics,
+gives an MSE of $1.580$: the model returns $dd\to dd$ for $ds\to ds$, because in the
+property encoding $d$ and $s$ differ only in \code{log10\_mass\_gev} and the model ignores it,
+so $dd\to dd$ ($t$- and $u$-channel) and $ds\to ds$ ($t$-channel only) are the same input with
+two targets. Under the equivalence $u\equiv c$, $d\equiv s$, $e\equiv\mu\equiv\tau$ the $400$
+base train entries fall on $368$ distinct inputs; the $27$ collisions split into harmless
+same-function twins ($\mu\leftrightarrow\tau$ finals) and genuinely different functions that
+differ by generation structure: the same-generation pairs with $W$ exchange against the
+cross-generation ones without ($ud\to ud$ $0.10$ vs $us\to us$ $6\times10^{-4}$; $ud\to ud$,
+$us\to us$, $cs\to cs$ at one loop $0.33/6\times10^{-4}/0.33$; $dd\to dd$ vs $ds\to ds$ at
+one loop), plus their $+g$, $+\gamma$, $+gg$, $+\gamma\gamma$ towers. The v1 dedup rule treated
+these relabels as the same function, which is true only for $s$-channel pair production. The
+same rule makes several hold-outs untestable as designed: $ds\to ds$ and $cs\to cs$ (``relabels
+of $us\to us$'') are seen as $dd\to dd$ and $ud\to ud$, whose functions differ; and the
+one-loop layer, built from every coloured tree, put the loops of six hold-out trees into
+training ($ds\to ds$, $cs\to cs$, $dd\to dd$, $ee\to s\bar sg$, $u\bar u\to\mu\mu g$,
+$u\bar u\to\gamma\gamma$), the reverse of the order-axis hold-out.
+
+The remaining waves of the sweep were cancelled after wave 0: the objective is dominated by
+these three effects, none of which a hyperparameter fixes, and the catalog has to change
+before the sweep means anything. Open decisions are in Sec.~\ref{sec:catalog-open}.
 
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
