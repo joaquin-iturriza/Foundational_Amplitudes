@@ -59,6 +59,8 @@ fixed_params:
   training.batchsize: 16384
   evaluation.batchsize: 16384
   training.loss_aggregation: geometric_mean
+  training.val_aggregation: geometric_mean   # the metric (val_loss_no_reg, objective) never
+                                             # follows the training-side aggregation knobs
   training.regularization: L2
   training.scheduler: CosineAnnealingLR
   training.get_ID: 'false'
@@ -93,3 +95,7 @@ search_space:
   type: float_uniform
   low: 0.9
   high: 0.9999
+- name: training.loss_aggregation_tau   # tau-floored geometric mean, TRAINING loss only
+  type: float_log                        # (docs/results.tex tab:agg_ab): the threshold between
+  low: 1.0e-03                           # "done" and "still counts"; tau -> large is the
+  high: 1.0                              # arithmetic mean. The validation metric stays fixed.

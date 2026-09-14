@@ -2760,16 +2760,13 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
 \begin{itemize}
   \item \textbf{Re-measure with the generation feature at the full horizon.} The
     $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
-    at one loop representable but not held; whether $8601$ steps hold both is open. Do it
-    after the signed-log scale and with the aggregation decided (next two items), so the
-    wave does not re-measure $17$ known failures nor the needle.
+    at one loop representable but not held; whether $8601$ steps hold both is open. The
+    signed-log scale is in and $\tau$ is in the sweep's search space, so the same wave
+    measures the three fixes together; three trials at the full horizon are $\sim9$
+    GPU-hours.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
-  \item \textbf{Signed one-loop targets.} A per-dataset scale before the signed log
-    ($\mathrm{sgn}(x)\log(1+|x|/s)$, stored with the standardization statistics) for the
-    $27$ sign-changing pools; the plain log stays for positive pools, so no earlier number
-    moves.
   \item \textbf{Which aggregation for the wave.} The needle is the geometric mean's doing
     (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), so the wave should not run with it
     unchanged. The arithmetic mean works at twelve at a factor $2$--$4$ on the
@@ -2778,10 +2775,10 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ (\code{training.loss\_aggregation\_tau}) is
     for, but at the bulk's scale it does nothing (Table~\ref{tab:agg_ab}) and its useful
     range, $\tau\in[10^{-3},1]$, is the threshold between ``done'' and ``still counts''.
-    That is a hyperparameter, and the wave is a DyHPO sweep already: put $\tau$ in its
-    search space (log-uniform over that range; $\tau\to\infty$ is the arithmetic mean)
-    rather than choosing it by hand or sweeping it at twelve processes, where there is no
-    $2\to4$ bulk to protect. Training-side knobs shape the gradient and must not move the
+    That is a hyperparameter, and the wave is a DyHPO sweep already, so $\tau$ is in its
+    search space (\code{sweep/sweep\_config\_ccin2p3\_catalog\_v2.yaml}, log-uniform over
+    that range; $\tau\to\infty$ is the arithmetic mean) rather than chosen by hand or swept
+    at twelve processes, where there is no $2\to4$ bulk to protect. Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
     (\code{training.val\_aggregation}, geometric mean) so \code{val\_loss\_no\_reg} stays
     comparable across arms, with the census (failing count, median) as the other read-out.
@@ -2852,7 +2849,19 @@ $1000$--$3000$ with single events at $70$--$90\sigma$. Dividing by a per-dataset
 the log ($\mathrm{sgn}(x)\log(1+|x|/s)$, $s$ the median $|x|$ of the train pool, or a
 hundredth of it) brings the kurtosis to $3$--$7$ and the largest event to $4$--$6\sigma$;
 the positive-only one-loop pools that use the plain log are fine (median $4\times10^{-3}$).
-This never showed before because every earlier one-loop pool was positive.
+This never showed before because every earlier one-loop pool was positive. The scale is
+now in: \code{data.signedlog\_quantile} (default $0.01$) makes $s$ the $1\%$ quantile of
+$|x|$ on the train pool, carried in the transform string as \code{signedlog:<s>} so the
+frozen statistics and the inverse read the same value; the per-process transforms are saved
+and reloaded with the statistics, which they were not before (a frozen-stats reload of a
+mixed catalog used one transform for every pool). Measured on the $51$ sign-changing pools
+of the train cache (\code{analysis/catalog\_v2/signed\_pools.py}): the standardized target's
+kurtosis goes from a median of $188$ ($28$ pools above $100$, the worst $9700$) to $4.6$,
+and the largest event from a median $31\sigma$ (up to $148\sigma$) to $4.8\sigma$ (up to
+$12\sigma$). Four pools stay above $10$; two of them, $u\bar d\to Wg$ and $u\bar u\to Zg$ at
+$36$ and $39$, have $1\%$ negative events against a narrow positive bulk, a bimodal target
+no scalar transform flattens. Positive pools keep the plain log, so no earlier number
+moves; what the scale does for the learning is for the re-measure wave to show.
 
 \paragraph{The encoding does not tell $d$ from $s$ or $u$ from $c$.} $ds\to ds$ at one loop
 ends at $\vlnr=1.58$, rising from $1.0$ during training (anti-learned), while $us\to us$ at
