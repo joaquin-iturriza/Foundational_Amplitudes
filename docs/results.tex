@@ -1392,9 +1392,11 @@ big run}:
   twelve processes and recovers the stuck one (Table~\ref{tab:agg_ab}). The floored variant
   $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$, which caps a converged process's weight at
   $1/\tau$ and keeps the geometric mean above $\tau$, is implemented
-  (\code{training.loss\_aggregation\_tau}, training loss only) and untested; $\tau$ is an
-  HP (DyHPO). The decisive check at scale is whether $ee\,\gamma\gamma$'s late-training
-  collapse disappears at otherwise-identical HPs.
+  (\code{training.loss\_aggregation\_tau}, training loss only); at twelve processes and
+  $\tau=10^{-4}$ it does nothing (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), and the
+  catalog sweep now searches $\tau\in[10^{-3},1]$ (Sec.~\ref{sec:catalog-open}). The
+  decisive check at the $448$ scale, whether $ee\,\gamma\gamma$'s late-training collapse
+  disappears at otherwise-identical HPs, is still open.
 \end{itemize}
 
 \section{Behaviour near amplitude divergences}\label{sec:divergences}
@@ -2763,7 +2765,8 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     at one loop representable but not held; whether $8601$ steps hold both is open. The
     signed-log scale is in and $\tau$ is in the sweep's search space, so the same wave
     measures the three fixes together; three trials at the full horizon are $\sim9$
-    GPU-hours.
+    GPU-hours. It is a fresh sweep, not an extension: wave 0's DyHPO state holds
+    observations under the old target and without the $\tau$ dimension.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
@@ -2839,29 +2842,36 @@ resonance shape on the flat validation measure. Its cause is not the data but th
 aggregation: the family learns alone, and it learns in company under the arithmetic mean
 (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}).
 
-\paragraph{Signed one-loop targets and the signed log.} $27$ of the $95$ one-loop pools have a
-finite part that changes sign ($2\to3$ with a gluon or photon: $u\bar d\to e\nu g$ is $81\%$
-negative, $u\bar u\to\mu\mu g$ $90\%$), and they fail as a class (median $0.09$, $17$ failing,
-losses up to $3.7$, i.e.\ worse than the constant). The cause is the transform: the signed
+\paragraph{Signed one-loop targets and the signed log.} $50$ of the $95$ one-loop pools of the
+training recipe have a finite part that changes sign somewhere in the window, so they train
+under the signed log; the $27$ with more than $5\%$ negative events ($2\to3$ with a gluon or
+photon: $u\bar d\to e\nu g$ is $81\%$ negative, $u\bar u\to\mu\mu g$ $90\%$) fail as a class
+(median $0.09$, $17$ failing, losses up to $3.7$, i.e.\ worse than the constant). The cause is the transform: the signed
 log $\mathrm{sgn}(x)\log(1+|x|)$ is linear below $|x|=1$, and these targets have a median
 $|x|\sim10^{-5}$ over $28$ decades, so after standardization the target has a kurtosis of
 $1000$--$3000$ with single events at $70$--$90\sigma$. Dividing by a per-dataset scale before
 the log ($\mathrm{sgn}(x)\log(1+|x|/s)$, $s$ the median $|x|$ of the train pool, or a
 hundredth of it) brings the kurtosis to $3$--$7$ and the largest event to $4$--$6\sigma$;
-the positive-only one-loop pools that use the plain log are fine (median $4\times10^{-3}$).
-This never showed before because every earlier one-loop pool was positive. The scale is
+the other $68$ one-loop pools are fine (median $4\times10^{-3}$). This never showed before
+because every earlier one-loop pool was positive. The scale is
 now in: \code{data.signedlog\_quantile} (default $0.01$) makes $s$ the $1\%$ quantile of
 $|x|$ on the train pool, carried in the transform string as \code{signedlog:<s>} so the
 frozen statistics and the inverse read the same value; the per-process transforms are saved
 and reloaded with the statistics, which they were not before (a frozen-stats reload of a
 mixed catalog used one transform for every pool). Measured on the $51$ sign-changing pools
-of the train cache (\code{analysis/catalog\_v2/signed\_pools.py}): the standardized target's
+of the train cache, the recipe's $50$ plus one hold-out window
+(\code{analysis/catalog\_v2/signed\_pools.py}): the standardized target's
 kurtosis goes from a median of $188$ ($28$ pools above $100$, the worst $9700$) to $4.6$,
 and the largest event from a median $31\sigma$ (up to $148\sigma$) to $4.8\sigma$ (up to
 $12\sigma$). Four pools stay above $10$; two of them, $u\bar d\to Wg$ and $u\bar u\to Zg$ at
 $36$ and $39$, have $1\%$ negative events against a narrow positive bulk, a bimodal target
 no scalar transform flattens. Positive pools keep the plain log, so no earlier number
-moves; what the scale does for the learning is for the re-measure wave to show.
+moves; what the scale does for the learning is for the re-measure wave to show. Two
+comparability consequences: the $50$ signed pools' losses are on a new target scale, so
+against wave 0 they compare by failing status, not by value; and the raw-space inverse,
+which had clamped every amplitude at $30$ since the first commit, now clamps the exponent
+instead, so raw-space metrics of old and new runs differ for large amplitudes (the
+log-space losses every comparison uses are untouched).
 
 \paragraph{The encoding does not tell $d$ from $s$ or $u$ from $c$.} $ds\to ds$ at one loop
 ends at $\vlnr=1.58$, rising from $1.0$ during training (anti-learned), while $us\to us$ at
