@@ -1,12 +1,20 @@
 """Paired comparison of the PID one-hot vs quantum-number (physics) particle
 encoding on the 25-process joint pretrain: sweeps pretrain25_zs_pid_002 /
-pretrain25_zs_phys_002 share trial ids and HPs, so trials pair exactly."""
-import re, glob, os
+pretrain25_zs_phys_002 share trial ids and HPs, so trials pair exactly.
+Left: validation curve of the best trial of each encoding. Right: best
+validation loss of every paired trial, one against the other."""
+import re, glob, os, sys
 import numpy as np
-import matplotlib.pyplot as plt
 
-ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "runs")
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
+sys.path.insert(0, REPO)
+import plot_style as ps  # noqa: E402
+
+ROOT = os.path.join(REPO, "runs")
 PAT = re.compile(r"Val loss \(combined\): ([0-9.eE+-]+)")
+STEPS = 3000
+
 
 def curves(sweep):
     out = {}
@@ -16,6 +24,7 @@ def curves(sweep):
             out[log.split(os.sep)[-2]] = np.array(vals)
     return out
 
+
 pid, phys = curves("pretrain25_zs_pid_002"), curves("pretrain25_zs_phys_002")
 common = sorted(set(pid) & set(phys))
 best_pid = np.array([pid[t].min() for t in common])
@@ -24,22 +33,19 @@ print(f"{len(common)} paired trials; phys better in {np.sum(best_phys < best_pid
 print(f"best-vs-best: pid {best_pid.min():.4g}  phys {best_phys.min():.4g}  "
       f"ratio {best_pid.min()/best_phys.min():.2f}x; median ratio {np.median(best_pid/best_phys):.2f}x")
 
-fig, (a, b) = plt.subplots(1, 2, figsize=(10, 3.8))
+fig, (a, b) = ps.figure(ncols=2)
 tp, tf = common[int(np.argmin(best_pid))], common[int(np.argmin(best_phys))]
-a.plot(np.linspace(0, 3000, len(pid[tp])), pid[tp], color="#d62728", label="particle-ID one-hot")
-a.plot(np.linspace(0, 3000, len(phys[tf])), phys[tf], color="#1f77b4", label="quantum numbers")
-a.set(yscale="log", xlabel="training step", ylabel="validation loss (25-process joint)")
-a.legend(frameon=False); a.set_title("best trial of each encoding")
+a.plot(np.linspace(0, STEPS, len(pid[tp])), pid[tp], color=ps.C.blue, label="one-hot PID")
+a.plot(np.linspace(0, STEPS, len(phys[tf])), phys[tf], color=ps.C.vermillion, label="quantum numbers")
+a.set(yscale="log", xlabel="training step", ylabel="validation loss")
+ps.legend(a, "upper right")
+
 lo = min(best_pid.min(), best_phys.min()) * 0.7
 hi = max(best_pid.max(), best_phys.max()) * 1.4
-b.scatter(best_pid, best_phys, s=28, color="#1f77b4", zorder=3)
-b.plot([lo, hi], [lo, hi], "--", color="gray", lw=1)
+b.plot([lo, hi], [lo, hi], "--", color=ps.C.grey, label=r"$y=x$")
+b.scatter(best_pid, best_phys, color=ps.C.blue, zorder=3, label="paired trials")
 b.set(xscale="log", yscale="log", xlim=(lo, hi), ylim=(lo, hi),
-      xlabel="best val loss, particle-ID one-hot", ylabel="best val loss, quantum numbers")
-b.set_title(f"{len(common)} paired trials (same hyperparameters)")
-b.text(0.96, 0.08, "below the line:\nquantum numbers better", transform=b.transAxes,
-       ha="right", fontsize=8, color="gray")
-fig.tight_layout()
-base = os.path.join(os.path.dirname(__file__), "pid_vs_phys")
-fig.savefig(base + ".png", dpi=200); fig.savefig(base + ".pdf")
-print("saved", base + ".{png,pdf}")
+      xlabel="best validation loss, one-hot PID",
+      ylabel="best validation loss, quantum numbers")
+ps.legend(b, "upper left")
+ps.save(fig, os.path.join(HERE, "pid_vs_phys"))
