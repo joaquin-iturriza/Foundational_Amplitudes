@@ -32,7 +32,9 @@ def draw(ax, mlabel, t, p, proc):
     ax.set_ylabel(r"predicted $\log|\mathcal{M}|^2$")
     ps.colorbar(ax, hb, "events")
     ps.legend(ax, "upper left")
-    ps.process_label(ax, proc, loc="lower right")
+    # the process label is the one in-axes text; it names the model too, since the
+    # panels of one figure differ only in which model produced them
+    ps.process_label(ax, proc + "\n" + mlabel, loc="lower right")
     rho = np.corrcoef(t, p)[0, 1]
     print(f"  {proc} {mlabel}: rho={rho:.2f} sigma_pred/sigma_true={p.std()/t.std():.2f}")
 

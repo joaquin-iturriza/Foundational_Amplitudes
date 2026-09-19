@@ -333,7 +333,10 @@ def _make_train_loader(exp, pool):
 # reset_output_head path would silently shape-filter almost the whole checkpoint away and train
 # from scratch while still logging "loading pretrained weights". So a width sweep MUST also pass
 # --no_pretrain and is a fresh-init regime, not comparable in absolute level to the warm-started
-# saturation runs; only the trend across widths is.
+# saturation runs; only the trend across widths is. A second reason for the incomparability:
+# base_experiment._init_optimizer gates fine_tune.lr_scale / layer_decay on pretrained_path, so
+# with --no_pretrain the MU_OVERRIDES lr_scale=0.339 and layer_decay=0.999 are inert and the run
+# trains at the flat training.lr with no layer decay. All widths share that, so the trend holds.
 NUM_HEADS = None
 NO_PRETRAIN = False
 
@@ -346,8 +349,8 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
     # bbb arm is a pure-MSE net (variationalized post-init); base/sigma are HETEROSC(detach,beta=1).
     arm_ov = [] if arm == "bbb" else SIG_ARM_OVERRIDES
     # later overrides win: a grown 2-ch checkpoint (sigma arm) supersedes the 1-ch BASE22 in MU_OVERRIDES.
-    # Rounds >= 1 always chain from THIS run's own previous checkpoint, which is already at the
-    # right width, so --no_pretrain only has to suppress the round-0 BASE22 warm start.
+    # build_cfg runs once (rounds are boundaries inside the single train() via the _cycle patch),
+    # so --no_pretrain only has to suppress the BASE22 warm start here.
     if pretrained:
         pre_ov = [f"fine_tune.pretrained_path={pretrained}"]
     elif NO_PRETRAIN:
@@ -501,7 +504,10 @@ def main():
     _pp = cfg.fine_tune.get("pretrained_path", None)
     if NO_PRETRAIN and _pp not in (None, "", "null"):
         raise RuntimeError(f"--no_pretrain requested but fine_tune.pretrained_path resolved to {_pp!r}")
-    print(f"[cfg] num_heads={cfg.model.net.num_heads} pretrained_path={_pp}", flush=True)
+    _ft_active = _pp not in (None, "", "null")
+    _eff_lr = cfg.training.lr * (cfg.fine_tune.lr_scale if _ft_active else 1.0)
+    print(f"[cfg] num_heads={cfg.model.net.num_heads} pretrained_path={_pp} "
+          f"effective_lr={_eff_lr:.3g} layer_decay={'on' if _ft_active else 'off'}", flush=True)
     # idempotent rerun: base_experiment aborts on an existing run dir, so clear THIS run's dir first
     # (disposable L2 run; the round-0 data dir + grown ckpt above are reused, not cleared).
     import shutil
