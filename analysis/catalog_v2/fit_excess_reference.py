@@ -16,11 +16,18 @@ NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 
 
 def load(run):
-    f = sorted(glob.glob(os.path.join(run, "**", "per_process_metrics.json"), recursive=True))[-1]
-    d = json.load(open(f)); name = d["dataset_order"][0]
-    L = np.array(d["proc_val_losses_no_reg"][name], dtype=float)
-    t = (np.arange(len(L)) + 1) * d["validate_every_n_steps"]
-    return name, t, L
+    """Validation history of a single-process run from its log ("Val loss: <x> | step <t>"
+    lines, written by the base validation path) and its name from the recipe."""
+    import re, yaml
+    log = sorted(glob.glob(os.path.join(run, "**", "out_0.log"), recursive=True))[-1]
+    cfg = yaml.safe_load(open(os.path.join(os.path.dirname(log), "config.yaml")))
+    name = yaml.safe_load(open(cfg["data"]["processes_file"]))["processes"][0]["name"]
+    t, L = [], []
+    for line in open(log, errors="replace"):
+        m = re.search(r"Val loss: ([0-9.eE+-]+) \| step (\d+)", line)
+        if m:
+            L.append(float(m.group(1))); t.append(int(m.group(2)))
+    return name, np.array(t, dtype=float), np.array(L, dtype=float)
 
 
 def fit(t, L):

@@ -1334,6 +1334,10 @@ class BaseExperiment:
                 self.val_mse.append(np.mean(mse_vals))
             if self.cfg.use_mlflow:
                 log_mlflow("val.loss", val_loss, step=step)
+            # the single-dataset validation history in the log (the multi-process override
+            # logs its own line); read by analysis/catalog_v2/fit_excess_reference.py
+            LOGGER.info(f"Val loss: {(np.mean(losses_no_reg) if losses_no_reg else val_loss):.6e} "
+                        f"| step {step + 1}")
 
         # σ-ranking SPEED probe. Called here for the single-dataset path; the
         # multi-process AmplitudeExperiment._validate override calls it too (it does
