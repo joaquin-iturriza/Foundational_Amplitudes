@@ -20,7 +20,7 @@
 # AGG=excess needs REF=4=<L_ref>_5=<L_ref>_6=<L_ref> (solo loss per particle count; underscores,
 # since sbatch --export splits on commas) and
 # takes BETA= (training.excess_beta). HEADS= sets the width (num_heads, the muP axis; lr transfers).
-# LR= sets the learning rate; the default 5.8e-3 is the horizon law's centre at 1000 steps
+# TRAIN_SUB= caps the train events per process (small-pool, data-limited runs). LR= sets the learning rate; the default 5.8e-3 is the horizon law's centre at 1000 steps
 # (lr_c(t) = 1e-2 (t/3000)^0.5 below t* = 3000; the earlier arms ran at the 8601-step best, 9.7e-3).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
@@ -34,7 +34,7 @@ python run.py \
   exp_name="${EXP:-catalog_short_ab_gen_${GEN}}" \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml \
-  data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
+  data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \

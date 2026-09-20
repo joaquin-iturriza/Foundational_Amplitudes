@@ -18,7 +18,7 @@
 #   scripts/remote.sh sbatch --export=ALL,GEN=true,EXP=needle_probe scripts/job_needle_probe.sh
 # AGG=mean|geometric_mean and TAU=<float> (tau-floored geometric mean, training loss only)
 # switch the training aggregation; the validation metric stays the geometric mean.
-# BS= and STEPS= set the batch size and horizon (solo reference runs: BS=34, the joint run's bs/P).
+# TRAIN_SUB= caps the train events per process. BS= and STEPS= set the batch size and horizon (solo reference runs: BS=34, the joint run's bs/P).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -34,7 +34,7 @@ python run.py \
   exp_name="${EXP:-needle_probe}" \
   data.source=recipes data.require_cache=true data.seed=42 \
   data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/${RECIPE:-needle_probe.yaml} \
-  data.train_subsample=null data.eval_subsample=10000 data.preprocess_per_dataset=true \
+  data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=10000 data.preprocess_per_dataset=true \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars="$LEV" data.internal_mass_scalars="$LEV" \
