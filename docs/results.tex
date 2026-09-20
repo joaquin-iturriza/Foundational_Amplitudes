@@ -2820,7 +2820,12 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     That is a hyperparameter, and the wave is a DyHPO sweep already, so $\tau$ is in its
     search space (\code{sweep/sweep\_config\_ccin2p3\_catalog\_v2.yaml}, log-uniform over
     that range; $\tau\to\infty$ is the arithmetic mean) rather than chosen by hand or swept
-    at twelve processes, where there is no $2\to4$ bulk to protect. Training-side knobs shape the gradient and must not move the
+    at twelve processes, where there is no $2\to4$ bulk to protect. The reference-weighted
+    aggregation (Table~\ref{tab:catv2_excess}) is a third candidate, the best census at
+    $1000$ steps; a class's gradient share acts as its learning rate, so the aggregation
+    choice and \code{training.lr} must be swept together, and the reference must be
+    re-measured at the wave's horizon (three solo runs at $\mathrm{bs}/P$ for $8601$
+    steps). Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
     (\code{training.val\_aggregation}, geometric mean) so \code{val\_loss\_no\_reg} stays
     comparable across arms, with the census (failing count, median) as the other read-out.
@@ -3040,6 +3045,55 @@ Prin.~\ref{prin:gradcomp} seen at the process level. So ``nothing works'' is two
 the aggregation starves a seventh of the catalog outright, and the sharp structure of
 half of it is not resolved at $1000$ steps in company, although the $s$-channel family
 resolves its pole alone.
+
+\paragraph{Weighting by a reference, and width.} Two more $1000$-step arms
+(Table~\ref{tab:catv2_excess}). The first replaces the current-loss weighting by a
+reference: each process is scored as $m_p/L_{\rm ref}(n_p)$, with $L_{\rm ref}(n)$ the loss a
+process of multiplicity $n$ reaches \emph{alone} on the compute this run gives every process
+($1000$ steps at $\mathrm{bs}/P=34$ events per step; same multiplicity, same scaling, so one
+number per multiplicity: $1.7\times10^{-3}$, $1.0\times10^{-2}$, $1.8\times10^{-2}$ from three
+solo runs of two minutes each), the weights $1/L_{\rm ref}$ normalised to mean one
+(\code{training.loss\_aggregation: excess}, \code{excess\_reference}; unnormalised, the loss
+sits $250\times$ higher, the gradient is clipped on every step, median pre-clip norm $131$
+against $0.65$, and the outputs blow up in the first fifty steps). The gradient weight of a
+process is then set by its multiplicity, $2.4:0.39:0.22$, not by its own loss, so there is
+neither the geometric mean's veto nor the arithmetic mean's domination by the largest raw
+MSE. It gives the best census of any arm, $163$ failing against $224$ and $295$, median
+$0.031$, but not the way it was meant to: the $2\to4$ class, whose weight fell from $1$ to
+$0.22$, improves from $112$ failing to $43$, while the $2\to2$ class, whose weight rose to
+$2.4$, goes from $29$ failing to $41$ and the $s$-channel needles from $0.14$ to $0.42$. A
+class does worse when it holds more of the gradient. Adam normalises the total step, so a
+class's share of the gradient is a class-wise learning rate, and both readings say the
+effective rate was already too high for the sharp functions: the learning rate of these
+short arms is the big run's best at $8601$ steps, $9.7\times10^{-3}$, above the horizon
+law's $\sim6\times10^{-3}$ at $1000$ steps (Sec.~\ref{sec:scaling}). The aggregation and the
+learning rate are coupled and the sweep has to carry both. The second arm doubles the width
+at the same hyperparameters (sixteen heads, $\mu$P, arithmetic mean): $219$ failing against
+$224$, every class within noise, at twice the step time. The short runs are not
+capacity-limited.
+
+\begin{table}[H]
+\centering
+\caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:
+failing count (loss $>0.05$) and median by class under the geometric mean, the arithmetic
+mean, the reference-weighted (excess) aggregation, and the arithmetic mean at twice the
+width.}
+\label{tab:catv2_excess}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
+\midrule
+all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $163$ / $0.031$ & $219$ / $0.044$ \\
+$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $41$ / $0.010$ & $31$ / $0.0097$ \\
+$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $79$ / $0.040$ & $82$ / $0.043$ \\
+$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $43$ / $0.030$ & $106$ / $0.059$ \\
+signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $41$ / $0.090$ & $40$ / $0.11$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $7$ / $0.42$ & $6$ / $0.12$ \\
+flavour twins ($9$) & $3$ & $0$ & $0$ & $0$ \\
+below $10^{-3}$ & $41$ & $0$ & $0$ & $1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
 \centering
