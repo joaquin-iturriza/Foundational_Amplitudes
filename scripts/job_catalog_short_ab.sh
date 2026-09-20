@@ -19,7 +19,7 @@
 # EXP= names the run; AGG=mean|geometric_mean and TAU=<float> switch the training aggregation
 # AGG=excess needs REF=4=<L_ref>_5=<L_ref>_6=<L_ref> (solo loss per particle count; underscores,
 # since sbatch --export splits on commas) and
-# takes BETA= (training.excess_beta).
+# takes BETA= (training.excess_beta). HEADS= sets the width (num_heads, the muP axis; lr transfers).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
 set -euo pipefail
@@ -39,7 +39,7 @@ python run.py \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
   data.offshell_per_event=true 'data.internal_mass_pdgs=[23,6,25]' \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
-  model.net.num_heads=8 model.net.num_blocks=8 seed=42 \
+  model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed=42 \
   training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
   training.lr=9.7e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
