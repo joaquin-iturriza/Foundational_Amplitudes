@@ -20,6 +20,8 @@
 # AGG=excess needs REF=4=<L_ref>_5=<L_ref>_6=<L_ref> (solo loss per particle count; underscores,
 # since sbatch --export splits on commas) and
 # takes BETA= (training.excess_beta). HEADS= sets the width (num_heads, the muP axis; lr transfers).
+# LR= sets the learning rate; the default 5.8e-3 is the horizon law's centre at 1000 steps
+# (lr_c(t) = 1e-2 (t/3000)^0.5 below t* = 3000; the earlier arms ran at the 8601-step best, 9.7e-3).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
 set -euo pipefail
@@ -41,7 +43,7 @@ python run.py \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed=42 \
   training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
-  training.lr=9.7e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
+  training.lr="${LR:-5.8e-3}" training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference={$(echo "$REF" | sed 's/_/,/g; s/=/:/g')}"} \
   training.regularization=L2 \
