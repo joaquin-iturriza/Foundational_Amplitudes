@@ -1278,16 +1278,26 @@ family-average level regardless of the scanned mass value.
 \begin{principle}[Gradient competition under the geometric mean]\label{prin:gradcomp}
 The log-space aggregation (Principle~\ref{prin:geomean}) weights each process's gradient by
 $1/\mathrm{MSE}_p$: once the bulk of $448$ processes reaches $10^{-4}$, a converged process
-outweighs a laggard at $\mathrm{MSE}\sim1$ by $\sim\!10^4$. Precisely: with $m_p$ a mean of
-squared residuals of scale $r_p=\sqrt{m_p}$, $\nabla m_p\approx2r_p|\nabla f|$ along the
-residual-reducing direction, so $|\nabla\ln m_p|\approx2|\nabla f|/r_p$. The log-gradient of a
-process is inversely proportional to its own residual scale; this is the exact content of
-``a $10\%$ relative gain counts equally'': the gain is cheapest in parameter motion where
-the fit is already best, and the gradient says so. Adam normalises the sum per parameter,
-so the update direction is set by the best-fitted processes and a laggard's share of every
-step is of order $r_{\rm bulk}/r_{\rm lag}$: whichever process falls slower in the first
-steps gets less of each later step and never catches up (positive feedback), where the
-arithmetic mean, $|\nabla m_p|\propto r_p$, has the opposite sign of feedback. Two
+outweighs a laggard at $\mathrm{MSE}\sim1$ by $\sim\!10^4$. Precisely, the objective is
+$\ell=\frac1P\sum_p\ln m_p$ (the geometric mean has the same minimiser), so a parameter step
+that changes the process losses by $\Delta m_p$ changes it by
+$\Delta\ell=\frac1P\sum_p\Delta m_p/m_p$ against $\Delta L=\frac1P\sum_p\Delta m_p$ for the
+arithmetic mean. Every process is scored on its relative change, which is the motivation;
+differentiated, it also says that a factor-two degradation of any one converged process
+costs exactly what a factor-two gain on the laggard is worth. A converged process does not
+pull harder (its residuals are no longer aligned with the Jacobian, so $\nabla m_p\to0$
+whatever its scale) and cannot cheaply improve; what it can do is veto. A step that takes a
+laggard from $1$ to $0.5$ and disturbs each of $B=400$ converged processes at $10^{-4}$ by
+$10\%$ scores $-0.5+0.004$ under the arithmetic mean and $-0.5+40$ under the geometric one:
+the laggard's own gradient $\nabla m_{\rm lag}/m_{\rm lag}$ is not small, it is outvoted
+$B$ to one by the bulk's interference terms, each amplified by $1/m_b$, and Adam's
+normalised step goes wherever the bulk stays put. Processes are learned at different
+speeds, the simple ones reach $10^{-2}$ within the first hundred steps, and from then on
+a process whose improvement direction conflicts with the bulk freezes at whatever it had;
+the feedback is positive because the price of disturbing the bulk is fixed per relative
+unit while the room to move without disturbing it shrinks as the bulk converges. The
+arithmetic mean pays the bulk's degradation at face value and lets it settle higher
+($3\times10^{-3}$ against $10^{-4}$ in Table~\ref{tab:catv2_short_smix}). Two
 consequences are visible in catalog\_v2 at $1000$ steps (Fig.~\ref{fig:loss_vs_range}): the
 losses are bimodal under the geometric mean ($12\%$ of processes below $3\times10^{-3}$,
 $21\%$ in the gap to $3\times10^{-2}$, $67\%$ above) and unimodal under the arithmetic one
