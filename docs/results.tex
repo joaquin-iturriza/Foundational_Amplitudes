@@ -2823,8 +2823,8 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     that range; $\tau\to\infty$ is the arithmetic mean) rather than chosen by hand or swept
     at twelve processes, where there is no $2\to4$ bulk to protect. The reference-weighted
     aggregation (Table~\ref{tab:catv2_excess}) is a third candidate, the best census at
-    $1000$ steps; a class's gradient share acts as its learning rate, so the aggregation
-    choice and \code{training.lr} must be swept together, and the reference must be
+    $1000$ steps, and the best at two learning rates; the aggregation choice and
+    \code{training.lr} are swept together (their optimum is joint), and the reference must be
     re-measured at the wave's horizon (three solo runs at $\mathrm{bs}/P$ for $8601$
     steps). Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
@@ -3063,12 +3063,20 @@ MSE. It gives the best census of any arm, $163$ failing against $224$ and $295$,
 $0.031$, but not the way it was meant to: the $2\to4$ class, whose weight fell from $1$ to
 $0.22$, improves from $112$ failing to $43$, while the $2\to2$ class, whose weight rose to
 $2.4$, goes from $29$ failing to $41$ and the $s$-channel needles from $0.14$ to $0.42$. A
-class does worse when it holds more of the gradient. Adam normalises the total step, so a
-class's share of the gradient is a class-wise learning rate, and both readings say the
-effective rate was already too high for the sharp functions: the learning rate of these
-short arms is the big run's best at $8601$ steps, $9.7\times10^{-3}$, above the horizon
-law's $\sim6\times10^{-3}$ at $1000$ steps (Sec.~\ref{sec:scaling}). The aggregation and the
-learning rate are coupled and the sweep has to carry both. The second arm doubles the width
+class does worse when it holds more of the gradient. The first reading of this, that a
+class's gradient share acts as a class-wise learning rate and the rate was too high (the
+short arms run at the big run's best for $8601$ steps, $9.7\times10^{-3}$, above the horizon
+law's $\sim6\times10^{-3}$ at $1000$ steps, Sec.~\ref{sec:scaling}), was tested and is
+wrong: the three aggregations rerun at $5.8\times10^{-3}$ are all worse at this horizon
+($287$, $250$ and $224$ failing against $295$, $224$ and $163$; the $2\to2$ class worse in
+every arm, $51$, $35$ and $50$ failing), and the reference weighting's pattern is the same
+at both rates, $2\to4$ gaining most ($73$ against $121$ failing at the lower rate) and
+$2\to2$ losing. The pattern is a property of the weighting, not of the rate: cutting the
+$2\to4$ share to a fifth reduces the interference among $185$ high-dimensional functions
+competing for the same parameters more than it costs them in gradient, and concentrating
+the gradient on the $2\to2$ functions does not buy them anything at $1000$ steps. The
+aggregation and the learning rate still have to be swept together, since their optimum is
+joint, but the short arms' rate stands. The second arm doubles the width
 at the same hyperparameters (sixteen heads, $\mu$P, arithmetic mean): $219$ failing against
 $224$, every class within noise, at twice the step time. The short runs are not
 capacity-limited.
