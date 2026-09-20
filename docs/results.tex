@@ -3138,6 +3138,25 @@ disappear on the right are the starved processes.}
 \label{fig:loss_vs_range}
 \end{figure}
 
+\paragraph{The pole is detected, not resolved, and the input meant to resolve it was never
+there.} The amplitude histograms of the resonant $2\to2$ pools tell the same story in every
+arm: the bulk is reproduced, and the whole pole plateau, $\log A$ from $-2$ to $+2$ and
+$15\%$ of the events, is predicted as one narrow spike ($-1.6$ for $ee\to\mu\mu$, $-0.5$ for
+$ee\to u\bar u$, $0$ for $ee\to b\bar b$) with an empty gap to the bulk. The network knows
+an event sits on the resonance and emits one value for all of them; the pole's coordinate,
+$(s-M_Z^2)/(M_Z\Gamma_Z)$, a $2.5$\,GeV feature in a $975$\,GeV window, $0.008$ of the
+standardized input scale, is not resolved from the momenta at this horizon. That coordinate
+is what the off-shellness lever supplies as an input, the flagship feature of the big run
+(Table~\ref{tab:levers}, a $50\times$ gain on the resonant sets), and it was on in every
+catalog\_v2 configuration; but its per-event masks are built from the diagram sidecars
+(\code{data/diagrams/<process>.diagrams.json}, \code{tools/dump\_diagrams.py}), and none
+existed on this cluster: every run's log says \code{offshell\_per\_event: built propagator
+masks for 0/478 processes}. So every catalog\_v2 number above, wave 0 included, was taken
+without the one input designed for the needle, and the ``needle as a multi-task effect''
+reading stands only with that caveat: the family resolves its pole alone without the
+input, and fails in company without it. The sidecars are being generated for the whole
+registry and the short arms rerun with the masks in place.
+
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:

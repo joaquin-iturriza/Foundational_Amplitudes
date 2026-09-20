@@ -251,7 +251,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | `use_diagrams` / `d_diag` | `true` / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
-| physics levers `mass_from_momenta`/`coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run; `internal_mass_pdgs=[23,6,25]` | per-run (need recipe+sidecars) |
+| physics levers `mass_from_momenta`/`coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run; `internal_mass_pdgs=[23,6,25]`. **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |
 | `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
 | `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` / `L2` | fixed |
