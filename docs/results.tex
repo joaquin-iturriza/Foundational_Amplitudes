@@ -2810,9 +2810,10 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
     us$''; the one-loop entries of hold-out trees must leave the train recipe (or the trees
     must enter it), whichever the order-axis test wants.
-  \item \textbf{Which aggregation for the wave.} The needle is the geometric mean's doing
-    (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}), so the wave should not run with it
-    unchanged. The arithmetic mean works at twelve at a factor $2$--$4$ on the
+  \item \textbf{Which aggregation for the wave.} The needle was a missing input
+    (Table~\ref{tab:catv2_offshell}; the wave needs the diagram sidecars present, masks
+    $478/478$ in the log); what the aggregation decides is the starvation and the
+    $2\to4$ class, and the wave should not run with the geometric mean unchanged. The arithmetic mean works at twelve at a factor $2$--$4$ on the
     best-learned processes; at $478$ the $2\to4$ plateaus at $10^{-2}$ will take most of the
     gradient once the needles are down, which is what the floor
     $\frac1P\sum_p\log(\mathrm{MSE}_p+\tau)$ (\code{training.loss\_aggregation\_tau}) is
@@ -3154,8 +3155,46 @@ existed on this cluster: every run's log says \code{offshell\_per\_event: built 
 masks for 0/478 processes}. So every catalog\_v2 number above, wave 0 included, was taken
 without the one input designed for the needle, and the ``needle as a multi-task effect''
 reading stands only with that caveat: the family resolves its pole alone without the
-input, and fails in company without it. The sidecars are being generated for the whole
-registry and the short arms rerun with the masks in place.
+input, and fails in company without it.
+
+\paragraph{With the input, the needle is gone.} The sidecars generated for the whole
+registry (\code{tools/dump\_diagrams.py --all}, $424$ processes, three minutes of CPU) and
+the three aggregation arms rerun with the masks built for $478/478$ processes
+(Table~\ref{tab:catv2_offshell}): $ee\to\mu\mu$ goes from $0.41$ to $0.012$ under the
+geometric mean and from $0.26$ to $0.012$ under the arithmetic one, the whole $s$-channel
+family passes under both, the $M_Z$ family from $16$--$18$ failing to $3$--$5$, and the
+$2\to2$ class under the arithmetic mean from $29$ failing to $5$. What the family learned
+alone in the probe it learned from thirty times the exposure; in company it needed its
+coordinate, and the coordinate was not there. The multi-task reading of the needle is
+superseded: the needle was a missing input. What the input does not touch is as clear:
+the starved processes under the geometric mean ($u\bar u\to t\bar t$ at one loop still at
+$0.92$), the signed one-loop class ($50$ of $50$ under the geometric mean, about $40$ under
+the others) and most of the $2\to3$ and $2\to4$ sharp structure; those remain the
+aggregation and horizon questions. The reference weighting stays the best overall census
+with the input ($131$ failing) and keeps its $2\to4$ gain ($26$ failing against $94$); its
+cost on the resonant $2\to2$ pools is smaller but present, and it is the one arm where the
+$M_Z$ family stays mostly failing, so the weighting and the resonance input interact.
+
+\begin{table}[H]
+\centering
+\caption{catalog\_v2, $1000$ steps at $9.7\times10^{-3}$ on the shaped measure, one seed:
+the three aggregations without and with the off-shellness input (diagram sidecars present,
+masks built for every process). Failing count (loss $>0.05$) and median by class.}
+\label{tab:catv2_offshell}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+class & geo. & geo.+off & arith. & arith.+off & excess & excess+off \\
+\midrule
+all $478$ & $295$ / $0.095$ & $245$ / $0.053$ & $224$ / $0.045$ & $170$ / $0.030$ & $163$ / $0.031$ & $131$ / $0.028$ \\
+$2\to2$ ($117$) & $51$ & $26$ & $29$ & $5$ & $41$ & $27$ \\
+$2\to3$ ($176$) & $114$ & $98$ & $83$ & $71$ & $79$ & $78$ \\
+$2\to4$ ($185$) & $130$ & $121$ & $112$ & $94$ & $43$ & $26$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $0$ / $0.012$ & $6$ / $0.14$ & $0$ / $0.006$ & $7$ / $0.42$ & $1$ / $0.020$ \\
+$M_Z$ family ($20$) & $18$ / $0.24$ & $5$ / $0.032$ & $16$ / $0.15$ & $3$ / $0.020$ & $18$ / $0.42$ & $16$ / $0.067$ \\
+signed one-loop ($50$) & $50$ & $50$ & $38$ & $39$ & $41$ & $41$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[H]
 \centering
