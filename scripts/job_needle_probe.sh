@@ -18,6 +18,7 @@
 #   scripts/remote.sh sbatch --export=ALL,GEN=true,EXP=needle_probe scripts/job_needle_probe.sh
 # AGG=mean|geometric_mean and TAU=<float> (tau-floored geometric mean, training loss only)
 # switch the training aggregation; the validation metric stays the geometric mean.
+# BS= and STEPS= set the batch size and horizon (solo reference runs: BS=34, the joint run's bs/P).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -40,7 +41,7 @@ python run.py \
   data.offshell_per_event="$LEV" 'data.internal_mass_pdgs=[23,6,25]' \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads=8 model.net.num_blocks=8 seed=42 \
-  training.iterations=3000 training.batchsize=4096 evaluation.batchsize=4096 \
+  training.iterations="${STEPS:-3000}" training.batchsize="${BS:-4096}" evaluation.batchsize=4096 \
   training.lr=4.1e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.regularization=L2 \

@@ -1,0 +1,5 @@
+# Solo reference for the excess-loss aggregation: one process per multiplicity, trained alone at
+# the joint run's per-process batch (bs/P), so its validation curve is the reference L_ref(t).
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
