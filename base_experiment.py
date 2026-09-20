@@ -1197,6 +1197,7 @@ class BaseExperiment:
             
     def _step(self, data, step):
         # actual update step
+        self._train_step = step          # read by step-dependent loss aggregations (excess)
         loss, loss_no_reg, mse_val = self._batch_loss(data)
         if self.ewc is not None:
             ewc_lambda = self.cfg.fine_tune.ewc.get("lambda", 1000.0)

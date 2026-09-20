@@ -17,6 +17,8 @@
 # by step ~900), generation one-hot (GEN=true) vs no generation column at all (GEN=none, the
 # encoding the census ran with). GEN=false keeps the column as a scalar. Not an HP search.
 # EXP= names the run; AGG=mean|geometric_mean and TAU=<float> switch the training aggregation
+# AGG=excess needs REF='{4:{A:..,alpha:..,Linf:..},5:{..},6:{..}}' (per particle count) and
+# takes BETA= (training.excess_beta).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
 set -euo pipefail
@@ -40,6 +42,7 @@ python run.py \
   training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
   training.lr=9.7e-3 training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
+  training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference=$REF"} \
   training.regularization=L2 \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
   training.validate_frac=0.05 evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false

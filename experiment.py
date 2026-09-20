@@ -165,6 +165,9 @@ class AmplitudeExperiment(BaseExperiment):
             self._resolve_recipe_config()
 
         self.n_datasets = len(self.cfg.data.dataset)
+        # particles per event of each process (initial + final), filled by the data path;
+        # the excess aggregation keys its per-multiplicity reference on it
+        self._proc_npart = np.zeros(self.n_datasets, dtype=np.int64)
 
         self.modelname = self.cfg.model.net._target_.rsplit(".", 1)[-1]
 
@@ -553,6 +556,7 @@ class AmplitudeExperiment(BaseExperiment):
             all_tokens_list.extend([toks[j] for j in range(N)])
             all_amplitudes_raw.append(amps)
             all_process_ids.extend([proc_idx] * N)
+            self._proc_npart[proc_idx] = int(parts.shape[1])
             order_row = self._order_row(proc_idx, amp_orders)
             all_order_labels.append(np.tile(order_row, (N, 1)))  # (N, n_order_features)
 
@@ -1506,6 +1510,7 @@ class AmplitudeExperiment(BaseExperiment):
                 parts = rec["momenta"]          # (N, P, 4)
                 toks  = rec["tokens"]           # (N, P)
                 N, P  = parts.shape[0], parts.shape[1]
+                self._proc_npart[proc_idx] = int(P)
                 m = prepd_means[proc_idx] if per_dataset else prepd_means[0]
                 s = prepd_stds[proc_idx]  if per_dataset else prepd_stds[0]
                 tr = self._amp_trafos_pp[proc_idx] if self._amp_trafos_pp else amp_trafos
@@ -2498,7 +2503,7 @@ class AmplitudeExperiment(BaseExperiment):
         # Force arithmetic mean for HETEROSC.
         if self.cfg.training.loss == "HETEROSC":
             loss_agg = "mean"
-        if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop":
+        if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop" and loss_agg != "excess":
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
                         for p in unique_procs]
@@ -2520,7 +2525,49 @@ class AmplitudeExperiment(BaseExperiment):
             log_pm = torch.where(present, (proc_mean + tau).clamp(min=1e-30).log(),
                                  torch.zeros_like(proc_mean))
             return (log_pm.sum() / n_present).exp()
+        if loss_agg == "excess":
+            # Excess-loss aggregation (training.excess_reference, excess_beta): each process
+            # is scored by its ratio e_p = m_p / L_ref(n_p, t) to a per-multiplicity reference
+            # curve (the solo loss at the same per-process budget, a fitted scaling law), and
+            # the loss is mean_p e_p^beta (detached) * e_p. The gradient weight of a process is
+            # set by the REFERENCE, not by its own current loss: no 1/m_p veto of the converged
+            # bulk (geometric mean), no domination by the largest raw MSE (arithmetic mean);
+            # beta > 0 adds DoReMi-style emphasis on the processes furthest above their reference.
+            ref = self._excess_reference().to(proc_mean)
+            e = proc_mean / ref
+            beta = float(self.cfg.training.get("excess_beta", 0.0) or 0.0)
+            w = e.detach().clamp(min=1e-12) ** beta if beta > 0 else torch.ones_like(e)
+            e = torch.where(present, w * e, torch.zeros_like(e))
+            return e.sum() / n_present
         return proc_mean.sum() / n_present
+
+    def _excess_reference(self):
+        """Per-process reference loss L_ref(n_p, t) for the excess aggregation.
+
+        training.excess_reference maps the particle count of an event (initial + final,
+        as a string or int key) to {A, alpha, Linf}: L_ref(t) = A * t**(-alpha) + Linf with
+        t = training step + 1, the solo loss curve at the joint run's per-process budget
+        (fitted from one solo run per multiplicity at bs/P). A missing multiplicity falls
+        back to the nearest one present. Cached per step."""
+        step = int(getattr(self, "_train_step", 0)) + 1
+        cache = getattr(self, "_excess_ref_cache", None)
+        if cache is not None and cache[0] == step:
+            return cache[1]
+        ref_cfg = self.cfg.training.get("excess_reference", None)
+        if not ref_cfg:
+            raise ValueError("loss_aggregation=excess needs training.excess_reference "
+                             "({n_particles: {A, alpha, Linf}} per multiplicity)")
+        table = {int(k): dict(v) for k, v in dict(ref_cfg).items()}
+        keys = np.array(sorted(table))
+        out = np.empty(self.n_datasets, dtype=np.float64)
+        for p in range(self.n_datasets):
+            n = int(self._proc_npart[p]) if self._proc_npart[p] > 0 else int(keys[0])
+            k = int(keys[np.argmin(np.abs(keys - n))])
+            c = table[k]
+            out[p] = float(c["A"]) * step ** (-float(c["alpha"])) + float(c["Linf"])
+        ref = torch.as_tensor(np.maximum(out, 1e-8), dtype=torch.float32)
+        self._excess_ref_cache = (step, ref)
+        return ref
 
 
     def _init_metrics(self):
