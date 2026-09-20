@@ -1278,7 +1278,23 @@ family-average level regardless of the scanned mass value.
 \begin{principle}[Gradient competition under the geometric mean]\label{prin:gradcomp}
 The log-space aggregation (Principle~\ref{prin:geomean}) weights each process's gradient by
 $1/\mathrm{MSE}_p$: once the bulk of $448$ processes reaches $10^{-4}$, a converged process
-outweighs a laggard at $\mathrm{MSE}\sim1$ by $\sim\!10^4$. Consequences observed in every trial,
+outweighs a laggard at $\mathrm{MSE}\sim1$ by $\sim\!10^4$. Precisely: with $m_p$ a mean of
+squared residuals of scale $r_p=\sqrt{m_p}$, $\nabla m_p\approx2r_p|\nabla f|$ along the
+residual-reducing direction, so $|\nabla\ln m_p|\approx2|\nabla f|/r_p$. The log-gradient of a
+process is inversely proportional to its own residual scale; this is the exact content of
+``a $10\%$ relative gain counts equally'': the gain is cheapest in parameter motion where
+the fit is already best, and the gradient says so. Adam normalises the sum per parameter,
+so the update direction is set by the best-fitted processes and a laggard's share of every
+step is of order $r_{\rm bulk}/r_{\rm lag}$: whichever process falls slower in the first
+steps gets less of each later step and never catches up (positive feedback), where the
+arithmetic mean, $|\nabla m_p|\propto r_p$, has the opposite sign of feedback. Two
+consequences are visible in catalog\_v2 at $1000$ steps (Fig.~\ref{fig:loss_vs_range}): the
+losses are bimodal under the geometric mean ($12\%$ of processes below $3\times10^{-3}$,
+$21\%$ in the gap to $3\times10^{-2}$, $67\%$ above) and unimodal under the arithmetic one
+($5\%$, $36\%$, $59\%$); and a starved process is flat from its first validation, not
+trained and then lost: $u\bar u\to t\bar t$ at one loop sits between $1.0$ and $2.0$ at all
+twenty validations under the geometric mean and is at $0.06$ by the eighth and $0.013$ at the
+end under the arithmetic one, with $ds\to ds$ and $ee\to u\bar u$ at one loop the same. Consequences observed in every trial,
 EMA on or off: laggards never gain traction ($ee\,d\bar d$ flat at $1.6$ from the first
 validation), and fragile \emph{learned} processes get overwritten late in training:
 $ee\,\gamma\gamma$ (no resonance at all) trains down to $7\times10^{-4}$ by step $\sim\!7$k and
