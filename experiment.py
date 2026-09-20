@@ -2534,11 +2534,19 @@ class AmplitudeExperiment(BaseExperiment):
             # set by the reference, not by its own current loss: no 1/m_p veto of the converged
             # bulk (geometric mean), no domination by the largest raw MSE (arithmetic mean);
             # beta > 0 adds DoReMi-style emphasis on the processes furthest above their reference.
+            # The reference weights 1/L_ref are normalised to mean one over the processes,
+            # so the loss has the arithmetic mean's scale (~1 at initialisation) and differs
+            # from it only in direction: unnormalised, the loss sat ~250x higher, the
+            # gradient was clipped on every step (median pre-clip norm 131 against 0.65)
+            # and the outputs blew up within the first 50 steps.
             ref = self._excess_reference().to(proc_mean)
-            e = proc_mean / ref
+            inv = 1.0 / ref
+            e = proc_mean * (inv / inv.mean())
             beta = float(self.cfg.training.get("excess_beta", 0.0) or 0.0)
-            w = e.detach().clamp(min=1e-12) ** beta if beta > 0 else torch.ones_like(e)
-            e = torch.where(present, w * e, torch.zeros_like(e))
+            if beta > 0:
+                w = (proc_mean.detach() / ref).clamp(min=1e-12) ** beta
+                e = e * (w / w[present].mean().clamp(min=1e-12))
+            e = torch.where(present, e, torch.zeros_like(e))
             return e.sum() / n_present
         return proc_mean.sum() / n_present
 
