@@ -136,13 +136,15 @@ training:
                         # and a plain mean lets the high-MSE processes dominate the gradient. The
                         # geometric mean makes a 10% relative improvement on a 1e-6 process count
                         # equally with a 10% improvement on a 1e-2 one, so every process keeps scaling.
- excess_reference: null   # for loss_aggregation: excess. {n_particles: {A, alpha, Linf}} per
-                        # multiplicity (initial + final particles): the solo loss curve at the
-                        # joint run's per-process budget, L_ref(t) = A t^-alpha + Linf. Each
-                        # process is scored as m_p / L_ref(n_p, t) (mean over processes), so its
-                        # gradient weight comes from the reference, not from its own loss: no
-                        # veto of a laggard by the converged bulk (docs/results.tex, gradient
-                        # competition), no domination by the largest raw MSE.
+ excess_reference: null   # for loss_aggregation: excess. {n_particles: L_ref} per multiplicity
+                        # (initial + final particles): the validation loss a process of that
+                        # multiplicity reaches ALONE on the compute this run gives each process
+                        # (a solo run at bs/P for the same steps; same multiplicity, same
+                        # scaling). Each process is scored as m_p / L_ref(n_p) (mean over
+                        # processes), so its gradient weight comes from the reference, not from
+                        # its own loss: no veto of a laggard by the converged bulk
+                        # (docs/results.tex, gradient competition), no domination by the largest
+                        # raw MSE.
  excess_beta: 0.0         # excess: weight each process by (m_p/L_ref)^beta (detached) on top;
                         # 0 = plain normalised mean, >0 = emphasis on the furthest-behind (HP)
  loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate

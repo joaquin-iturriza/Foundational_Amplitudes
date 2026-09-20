@@ -2527,10 +2527,11 @@ class AmplitudeExperiment(BaseExperiment):
             return (log_pm.sum() / n_present).exp()
         if loss_agg == "excess":
             # Excess-loss aggregation (training.excess_reference, excess_beta): each process
-            # is scored by its ratio e_p = m_p / L_ref(n_p, t) to a per-multiplicity reference
-            # curve (the solo loss at the same per-process budget, a fitted scaling law), and
-            # the loss is mean_p e_p^beta (detached) * e_p. The gradient weight of a process is
-            # set by the REFERENCE, not by its own current loss: no 1/m_p veto of the converged
+            # is scored by its ratio e_p = m_p / L_ref(n_p) to a per-multiplicity reference,
+            # the loss a process of that multiplicity reaches ALONE on the compute this run
+            # gives every process (T steps at bs/P; same multiplicity, same scaling), and the
+            # loss is mean_p e_p^beta (detached) * e_p. The gradient weight of a process is
+            # set by the reference, not by its own current loss: no 1/m_p veto of the converged
             # bulk (geometric mean), no domination by the largest raw MSE (arithmetic mean);
             # beta > 0 adds DoReMi-style emphasis on the processes furthest above their reference.
             ref = self._excess_reference().to(proc_mean)
@@ -2542,32 +2543,28 @@ class AmplitudeExperiment(BaseExperiment):
         return proc_mean.sum() / n_present
 
     def _excess_reference(self):
-        """Per-process reference loss L_ref(n_p, t) for the excess aggregation.
+        """Per-process reference loss L_ref(n_p) for the excess aggregation.
 
         training.excess_reference maps the particle count of an event (initial + final,
-        as a string or int key) to {A, alpha, Linf}: L_ref(t) = A * t**(-alpha) + Linf with
-        t = training step + 1, the solo loss curve at the joint run's per-process budget
-        (fitted from one solo run per multiplicity at bs/P). A missing multiplicity falls
-        back to the nearest one present. Cached per step."""
-        step = int(getattr(self, "_train_step", 0)) + 1
+        string or int key) to one number: the validation loss a process of that
+        multiplicity reaches alone on this run's per-process compute (a solo run at
+        bs/P for the same steps). A missing multiplicity falls back to the nearest one
+        present. Built once."""
         cache = getattr(self, "_excess_ref_cache", None)
-        if cache is not None and cache[0] == step:
-            return cache[1]
+        if cache is not None:
+            return cache
         ref_cfg = self.cfg.training.get("excess_reference", None)
         if not ref_cfg:
             raise ValueError("loss_aggregation=excess needs training.excess_reference "
-                             "({n_particles: {A, alpha, Linf}} per multiplicity)")
-        table = {int(k): dict(v) for k, v in dict(ref_cfg).items()}
+                             "({n_particles: solo loss at this run's compute} per multiplicity)")
+        table = {int(k): float(v) for k, v in dict(ref_cfg).items()}
         keys = np.array(sorted(table))
         out = np.empty(self.n_datasets, dtype=np.float64)
         for p in range(self.n_datasets):
             n = int(self._proc_npart[p]) if self._proc_npart[p] > 0 else int(keys[0])
-            k = int(keys[np.argmin(np.abs(keys - n))])
-            c = table[k]
-            out[p] = float(c["A"]) * step ** (-float(c["alpha"])) + float(c["Linf"])
-        ref = torch.as_tensor(np.maximum(out, 1e-8), dtype=torch.float32)
-        self._excess_ref_cache = (step, ref)
-        return ref
+            out[p] = table[int(keys[np.argmin(np.abs(keys - n))])]
+        self._excess_ref_cache = torch.as_tensor(np.maximum(out, 1e-8), dtype=torch.float32)
+        return self._excess_ref_cache
 
 
     def _init_metrics(self):

@@ -17,7 +17,7 @@
 # by step ~900), generation one-hot (GEN=true) vs no generation column at all (GEN=none, the
 # encoding the census ran with). GEN=false keeps the column as a scalar. Not an HP search.
 # EXP= names the run; AGG=mean|geometric_mean and TAU=<float> switch the training aggregation
-# AGG=excess needs REF='{4:{A:..,alpha:..,Linf:..},5:{..},6:{..}}' (per particle count) and
+# AGG=excess needs REF='{4:<L_ref>,5:<L_ref>,6:<L_ref>}' (solo loss per particle count) and
 # takes BETA= (training.excess_beta).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
