@@ -1297,14 +1297,15 @@ a process whose improvement direction conflicts with the bulk freezes at whateve
 the feedback is positive because the price of disturbing the bulk is fixed per relative
 unit while the room to move without disturbing it shrinks as the bulk converges. The
 arithmetic mean pays the bulk's degradation at face value and lets it settle higher
-($3\times10^{-3}$ against $10^{-4}$ in Table~\ref{tab:catv2_short_smix}). Two
-consequences are visible in catalog\_v2 at $1000$ steps (Fig.~\ref{fig:loss_vs_range}): the
-losses are bimodal under the geometric mean ($12\%$ of processes below $3\times10^{-3}$,
-$21\%$ in the gap to $3\times10^{-2}$, $67\%$ above) and unimodal under the arithmetic one
-($5\%$, $36\%$, $59\%$); and a starved process is flat from its first validation, not
-trained and then lost: $u\bar u\to t\bar t$ at one loop sits between $1.0$ and $2.0$ at all
-twenty validations under the geometric mean and is at $0.06$ by the eighth and $0.013$ at the
-end under the arithmetic one, with $ds\to ds$ and $ee\to u\bar u$ at one loop the same. Consequences observed in every trial,
+($41$ processes below $10^{-3}$ under the geometric mean against none,
+Table~\ref{tab:catv2_short_smix}). Two consequences are visible in catalog\_v2 at $1000$
+steps (Fig.~\ref{fig:loss_vs_range}): the losses are bimodal under the geometric mean
+($12\%$ of processes below $3\times10^{-3}$, $21\%$ in the gap to $3\times10^{-2}$, $67\%$
+above) and unimodal under the arithmetic one ($5\%$, $36\%$, $59\%$); and a starved process
+is flat from its first validation, not trained and then lost ($u\bar u\to t\bar t$ at one
+loop: between $0.96$ and $2.0$ at all twenty validations under the geometric mean, $0.013$
+at the end under the arithmetic one; the per-process record is in
+Sec.~\ref{sec:catv2-census}). Consequences observed in every trial,
 EMA on or off: laggards never gain traction ($ee\,d\bar d$ flat at $1.6$ from the first
 validation), and fragile \emph{learned} processes get overwritten late in training:
 $ee\,\gamma\gamma$ (no resonance at all) trains down to $7\times10^{-4}$ by step $\sim\!7$k and
@@ -3074,37 +3075,26 @@ capacity-limited.
 
 \begin{table}[H]
 \centering
-\caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:
-failing count (loss $>0.05$) and median by class under the geometric mean, the arithmetic
-mean, the reference-weighted (excess) aggregation, and the arithmetic mean at twice the
-width.}
-\label{tab:catv2_excess}
+\caption{catalog\_v2, $1000$ steps at $\mathrm{bs}=16384$, lr $9.7\times10^{-3}$, generation
+one-hot, one seed: failing count (loss $>0.05$) and median of the per-process validation
+loss at the last validation, by class. ``Old'' is the encoding A/B's one-hot arm before the
+signed-log scale; $q$ is the quantile of $|x|$ that sets the scale. Signed pools are on a
+different target scale in the ``old'' column.}
+\label{tab:catv2_short}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
+class & old & geo., $q=0.01$ & geo., $q=0.5$ & arith., $q=0.01$ \\
 \midrule
-all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $163$ / $0.031$ & $219$ / $0.044$ \\
-$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $41$ / $0.010$ & $31$ / $0.0097$ \\
-$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $79$ / $0.040$ & $82$ / $0.043$ \\
-$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $43$ / $0.030$ & $106$ / $0.059$ \\
-signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $41$ / $0.090$ & $40$ / $0.11$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $7$ / $0.42$ & $6$ / $0.12$ \\
-flavour twins ($9$) & $3$ & $0$ & $0$ & $0$ \\
-below $10^{-3}$ & $41$ & $0$ & $0$ & $1$ \\
+all $478$ & $265$ / $0.068$ & $254$ / $0.059$ & $272$ / $0.062$ & $189$ / $0.038$ \\
+signed one-loop ($50$) & $49$ / $0.43$ & $46$ / $0.31$ & $45$ / $0.25$ & $39$ / $0.10$ \\
+positive one-loop ($48$) & $25$ / $0.057$ & $20$ / $0.024$ & $23$ / $0.040$ & $13$ / $0.021$ \\
+$s$-channel family ($7$) & $4$ / $0.065$ & $6$ / $0.080$ & $6$ / $0.19$ & $2$ / $0.037$ \\
+$M_Z$ family ($20$) & $17$ / $0.096$ & $18$ / $0.10$ & $18$ / $0.13$ & $16$ / $0.086$ \\
+flavour twins ($9$) & $3$ / $0.0024$ & $1$ / $0.0008$ & $1$ / $0.0023$ & $0$ / $0.0037$ \\
+below $10^{-3}$ & $-$ & $47$ & $41$ & $0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/loss_vs_range.pdf}
-\caption{catalog\_v2 at $1000$ steps on the shaped measure: per-process validation loss
-against the range of $\ln|\mathcal M|^2$ in the train pool, under the geometric mean (left)
-and the arithmetic mean (right); the dashed line is the failing threshold. The range
-predicts failure within every multiplicity; the low-range failures on the left that
-disappear on the right are the starved processes.}
-\label{fig:loss_vs_range}
-\end{figure}
 
 \begin{table}[H]
 \centering
@@ -3129,25 +3119,36 @@ below $10^{-3}$ & $41$ & $0$ \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/loss_vs_range.pdf}
+\caption{catalog\_v2 at $1000$ steps on the shaped measure: per-process validation loss
+against the range of $\ln|\mathcal M|^2$ in the train pool, under the geometric mean (left)
+and the arithmetic mean (right); the dashed line is the failing threshold. The range
+predicts failure within every multiplicity; the low-range failures on the left that
+disappear on the right are the starved processes.}
+\label{fig:loss_vs_range}
+\end{figure}
+
 \begin{table}[H]
 \centering
-\caption{catalog\_v2, $1000$ steps at $\mathrm{bs}=16384$, lr $9.7\times10^{-3}$, generation
-one-hot, one seed: failing count (loss $>0.05$) and median of the per-process validation
-loss at the last validation, by class. ``Old'' is the encoding A/B's one-hot arm before the
-signed-log scale; $q$ is the quantile of $|x|$ that sets the scale. Signed pools are on a
-different target scale in the ``old'' column.}
-\label{tab:catv2_short}
+\caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:
+failing count (loss $>0.05$) and median by class under the geometric mean, the arithmetic
+mean, the reference-weighted (excess) aggregation, and the arithmetic mean at twice the
+width.}
+\label{tab:catv2_excess}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-class & old & geo., $q=0.01$ & geo., $q=0.5$ & arith., $q=0.01$ \\
+class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
 \midrule
-all $478$ & $265$ / $0.068$ & $254$ / $0.059$ & $272$ / $0.062$ & $189$ / $0.038$ \\
-signed one-loop ($50$) & $49$ / $0.43$ & $46$ / $0.31$ & $45$ / $0.25$ & $39$ / $0.10$ \\
-positive one-loop ($48$) & $25$ / $0.057$ & $20$ / $0.024$ & $23$ / $0.040$ & $13$ / $0.021$ \\
-$s$-channel family ($7$) & $4$ / $0.065$ & $6$ / $0.080$ & $6$ / $0.19$ & $2$ / $0.037$ \\
-$M_Z$ family ($20$) & $17$ / $0.096$ & $18$ / $0.10$ & $18$ / $0.13$ & $16$ / $0.086$ \\
-flavour twins ($9$) & $3$ / $0.0024$ & $1$ / $0.0008$ & $1$ / $0.0023$ & $0$ / $0.0037$ \\
-below $10^{-3}$ & $-$ & $47$ & $41$ & $0$ \\
+all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $163$ / $0.031$ & $219$ / $0.044$ \\
+$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $41$ / $0.010$ & $31$ / $0.0097$ \\
+$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $79$ / $0.040$ & $82$ / $0.043$ \\
+$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $43$ / $0.030$ & $106$ / $0.059$ \\
+signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $41$ / $0.090$ & $40$ / $0.11$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $7$ / $0.42$ & $6$ / $0.12$ \\
+flavour twins ($9$) & $3$ & $0$ & $0$ & $0$ \\
+below $10^{-3}$ & $41$ & $0$ & $0$ & $1$ \\
 \bottomrule
 \end{tabular}
 \end{table}
