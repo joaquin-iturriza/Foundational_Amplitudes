@@ -3175,6 +3175,19 @@ with the input ($131$ failing) and keeps its $2\to4$ gain ($26$ failing against 
 cost on the resonant $2\to2$ pools is smaller but present, and it is the one arm where the
 $M_Z$ family stays mostly failing, so the weighting and the resonance input interact.
 
+\paragraph{The short runs are step-limited, not data-limited.} The same three arms with the
+train pools cut to $5000$ events per process, so that $1000$ steps are seven passes over
+the pool instead of a third of one: the geometric mean ends where it ends with the full
+pools ($245$ failing against $245$, median $0.057$ against $0.053$), the reference
+weighting slightly better ($117$ against $131$), and in both the train and validation
+losses are equal per process (ratio $1.0$ at the median, $1.1$ at the $90$th percentile),
+so nothing has been fitted to the point of overfitting: at this compute the per-step
+optimisation sets every number and the data is not reached, and $5000$ events are still far
+from a saturating pool. The arithmetic arm on the small pools diverged (a non-finite
+gradient early, pre-clip norms to $10^{11}$, every process at loss $1$), where the
+geometric arm on the same data ran normally; one seed, recorded as the arithmetic mean's
+exposure to a single extreme standardized target, not diagnosed further.
+
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps at $9.7\times10^{-3}$ on the shaped measure, one seed:
