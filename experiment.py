@@ -1431,11 +1431,17 @@ class AmplitudeExperiment(BaseExperiment):
         self._amp_trafos_pp = None
         q = self._signedlog_quantile()
         if amp_trafos is None:                       # fresh run: resolve from raw amps
-            amp_trafos = resolve_amp_trafos(base_trafos, train_raw, scale_quantile=q)
+            # the sign decision (positive -> log, signed -> signedlog) looks at every role
+            # of a process; the scale and the statistics stay train-only
+            all_roles = lambda n: np.concatenate(
+                [store[(r, n)]["raw_amp"] for r in roles if (r, n) in store], axis=0)
+            amp_trafos = resolve_amp_trafos(
+                base_trafos, train_raw, scale_quantile=q,
+                sign_data=np.concatenate([all_roles(n) for n in names], axis=0))
             if per_dataset:
                 self._amp_trafos_pp = [
                     resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
-                                       scale_quantile=q)
+                                       scale_quantile=q, sign_data=all_roles(n))
                     for n in names]
         elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
             assert len(amp_trafos_pp) == len(names), (
@@ -1450,7 +1456,7 @@ class AmplitudeExperiment(BaseExperiment):
             self._amp_trafos_pp = [
                 resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
                                    scale_quantile=None)
-                for n in names]
+                for n in names]      # legacy: train-only sign decision, as the parent did
             LOGGER.warning(
                 "Frozen data stats carry no per-process amplitude transforms (written before "
                 "the signed-log scale); re-resolved per pool in legacy mode (unscaled signedlog).")

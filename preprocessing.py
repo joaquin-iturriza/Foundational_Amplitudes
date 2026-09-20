@@ -7,7 +7,7 @@ from sklearn.preprocessing import QuantileTransformer
 SIGNEDLOG_QUANTILE = 0.01   # default scale: the 1% quantile of |x| on the train pool
 
 
-def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
+def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sign_data=None):
     """Swap 'log' -> 'signedlog:<s>' when the amplitude contains non-positive values.
 
     Plain log is undefined for x <= 0 (e.g. virtual corrections or virt/born ratios
@@ -17,7 +17,10 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
     resolved on (the train pool), written into the transform string so it travels
     with `amp_trafos` (frozen stats, config dump) and the inverse reads it back.
     `scale_quantile=None` is the legacy resolution (bare 'signedlog', s = 1), used
-    to reproduce runs whose frozen stats predate the scale.
+    to reproduce runs whose frozen stats predate the scale.  `sign_data`, when given,
+    is what decides positive vs signed (e.g. every role of the process concatenated):
+    a subsampled train pool of a pool with rare negative events can hold none, resolve
+    to the plain log, and the inverse then meets a negative value in validation.
     Without it the transform is linear below |x| = 1, and a signed one-loop pool
     whose median |x| is 1e-5 over tens of decades standardizes to a kurtosis of
     thousands.  The caller must store the returned list and use it for BOTH the
@@ -25,7 +28,7 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE):
     """
     if not trafos or "log" not in trafos:
         return list(trafos) if trafos else trafos
-    if float(np.min(amplitude)) > 0.0:
+    if float(np.min(amplitude if sign_data is None else sign_data)) > 0.0:
         return list(trafos)
     if scale_quantile is None:
         return ["signedlog" if t == "log" else t for t in trafos]
