@@ -2848,7 +2848,11 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     runs; the arithmetic mean's exposure, to be settled with lr and aggregation swept
     jointly at this working point, and the geometric mean re-checked with the new targets);
     the signed class is still the worst by five, now a magnitude problem; and the
-    $2\to4$ class at eight to eleven times solo, the plain scaling question for the wave.
+    joint-training gap is now measured (the paragraph on the difference of exponents): the
+    high-multiplicity classes close on solo with steps, the $2\to2$ classes fall behind, and
+    sharing across multiplicities costs $25$--$45\%$ at $1000$ steps. The next decision is
+    structural: capacity or routing by multiplicity class, or a per-class fine-tune after the
+    pretraining, tested at $1000$ steps with three seeds against the subset-alone numbers.
     Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
     sweep's best HPs; \code{analysis/catalog\_v2/seed\_arms.py} is the read-out.
     Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
@@ -3434,6 +3438,41 @@ property of the factor itself.
 on the $2\to2$ processes only (its two seeds that did not diverge), against the $s$-channel
 subtraction alone; per-class ECDF with the seed band.}
 \label{fig:seed_arms_tch22}
+\end{figure}
+
+\paragraph{The joint-training gap: a difference of exponents, plus a cross-class cost.}
+With the target changes in, every class still sits above what its multiplicity reaches
+alone at the same per-process compute. Two measurements say what that gap is
+(\code{analysis/catalog\_v2/joint\_vs\_solo.py}, Fig.~\ref{fig:joint_vs_solo}; three seeds
+each, the solo reference the best trial of a small sweep per process and horizon, at
+$\mathrm{bs}/P=34$ with the same targets). First, against the horizon at $1000$, $2000$ and
+$4000$ steps, the joint run halves every class per doubling (combined $0.0185$, $0.0097$,
+$0.0055$; tree $2\to4$ $0.050$, $0.031$, $0.017$), an exponent near one in steps for every
+class, while the solo curves follow Prin.~\ref{prin:mult}: $2\to3$ and $2\to4$ alone gain
+only $0.5$--$0.6$ per doubling, $2\to2$ alone gains $1.4$ then $5.6$. So the ratio to solo
+falls for the classes that dominate the catalog, tree $2\to3$ from $3.8$ to $1.8$ and
+tree $2\to4$ from $4.3$ to $2.8$, the signed one-loop class from $12$ to $7$, and rises for
+the $2\to2$ classes, tree $2\to2$ from $1.5$ through $0.9$ to $2.6$ and the resonant pools
+from $9$ to $34$, because a $2\to2$ process alone learns at an exponent of two that the
+shared model does not deliver. The gap is not a fixed penalty of joint training; it is the
+joint model scaling like its hardest class, ahead of the high-multiplicity solos and behind
+the low-multiplicity ones, and the full horizon closes it for the former and not the latter.
+Second, at $1000$ steps each multiplicity trained alone at the same per-process compute
+(\code{recipes/catalog\_v2\_train\_scan\_2to*.yaml}, batch $34\times$ the subset's size, the
+rate not retuned) beats its loss in the full catalog on nearly every process: $2\to3$ alone at
+$0.56$ of its joint loss ($176$ of $176$), $2\to4$ at $0.74$ ($184$ of $185$), $2\to2$ at
+$0.79$ ($98$ of $117$). Sharing one network across multiplicities costs $25$--$45\%$ at this
+horizon, on top of the exponent effect. What follows for the $2\to2$ classes is capacity or
+routing by class, or fine-tuning them after the pretraining; for the rest, steps.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\linewidth]{../analysis/catalog_v2/joint_vs_solo.pdf}
+\caption{Left: joint loss over the tuned solo loss at equal per-process compute, class
+median over three seeds, against the horizon. Middle and right: each multiplicity trained
+alone at the same per-process compute against the full catalog at $1000$ steps, as the ECDF
+of the ratio per process and per process.}
+\label{fig:joint_vs_solo}
 \end{figure}
 
 \paragraph{The sign head: a real but modest gain on the signed class.} With
