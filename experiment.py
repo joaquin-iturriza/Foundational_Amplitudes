@@ -1431,9 +1431,25 @@ class AmplitudeExperiment(BaseExperiment):
                       dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
             tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs)
             n_ok, red_before, red_after, n_props = 0, [], [], 0
+            straddle = float(self.cfg.data.get("target_propagator_straddle", 0.005))
+            n_cand = 0
             for proc_idx, name in enumerate(names):
                 sel = tp_masks[proc_idx] if tp_masks else None
-                props = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst if mm > 0]
+                cand = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst if mm > 0]
+                n_cand += len(cand)
+                # keep a propagator only if its pole is reached inside the pool: the train
+                # pool's s_k must straddle M² (a fraction of events on each side above
+                # `straddle`). A t-channel exchange (s_k < 0) or a sub-system pole out of
+                # kinematic reach never straddles, and its factor would only add range.
+                props = []
+                if cand and ("train", name) in store:
+                    pp = store[("train", name)]["momenta"].astype(np.float64)
+                    for pdg, mrow, mm in cand:
+                        q = np.einsum("s,nsc->nc", mrow, pp) * mom_div
+                        s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                        above = float(np.mean(s_prop > mm))
+                        if straddle < above < 1.0 - straddle:
+                            props.append((pdg, mrow, mm))
                 for role in roles:
                     if (role, name) not in store:
                         continue
@@ -1457,7 +1473,8 @@ class AmplitudeExperiment(BaseExperiment):
                 if props:
                     n_ok += 1; n_props += len(props)
             LOGGER.info(f"target_propagators ON: {n_ok}/{len(names)} processes carry a factor "
-                        f"({n_props} propagators, pdgs {tp_pdgs}, widths {widths}); median range of "
+                        f"({n_props} of {n_cand} propagators reach their pole in the pool, pdgs {tp_pdgs}, "
+                        f"widths {widths}); median range of "
                         f"ln|M|² on the train pools {np.median(red_before) if red_before else float('nan'):.2f} "
                         f"-> {np.median(red_after) if red_after else float('nan'):.2f}")
         # The amp_trafos list (e.g. signedlog) is always resolved globally so the
