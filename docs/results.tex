@@ -3175,6 +3175,37 @@ with the input ($131$ failing) and keeps its $2\to4$ gain ($26$ failing against 
 cost on the resonant $2\to2$ pools is smaller but present, and it is the one arm where the
 $M_Z$ family stays mostly failing, so the weighting and the resonance input interact.
 
+\paragraph{Distance from the reference instead of a threshold.} The per-process curves of
+the reference-weighted arm look unlike the other two: every process comes down at about the
+same rate and settles over a wide band, where the geometric and arithmetic arms have
+processes that learn and processes that never move. A pass/fail line at $0.05$ does not see
+that, so the better reading is each process's distance from what its multiplicity reaches
+alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
+Fig.~\ref{fig:excess_ratio}). With the input, the medians are $4.4$, $3.1$ and $2.7$ for the
+geometric, arithmetic and reference-weighted arms, and the fraction above ten times the
+reference $28\%$, $13\%$ and $17\%$. Two patterns among the processes furthest from their
+reference, common to all three arms: the $W$-channel $2\to2$ processes ($u\bar d\to e\nu$,
+$u\bar d\to W\gamma$, $u\bar d\to Wg$ and their one-loop versions) at $30$--$90$ times,
+because the $W$ (PDG $24$) is not in the propagator list the masks are built for, so these
+have no coordinate for their pole; and the $M_Z$-scan variants alone among the scans, at
+$12$--$40$ times against $0.7$--$3$ for the $\alpha_s$ and $m_t$ scans, with the mask
+verified to place the pole at the scanned mass and the pools verified to cover it ($13$--$16\%$
+of events within $5$\,GeV of their own pole), so what remains is that a shifted pool is a
+twin of its nominal pool with the same momenta and a different pole, told apart by the
+coordinate and the internal-mass scalar, and the arm that pushes the $2\to2$ hardest is the
+worst on them. The references themselves were measured before the sidecars existed and are
+being re-measured with the input; the $W$ is being added to the propagator list.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/excess_ratio.pdf}
+\caption{catalog\_v2 at $1000$ steps with the off-shellness input: each process's loss
+divided by the solo loss of its multiplicity at the same compute, against the range of
+$\ln|\mathcal M|^2$ in its train pool, for the three aggregations; the dashed line is the
+reference.}
+\label{fig:excess_ratio}
+\end{figure}
+
 \paragraph{The short runs are step-limited, not data-limited.} The same three arms with the
 train pools cut to $5000$ events per process, so that $1000$ steps are seven passes over
 the pool instead of a third of one: the geometric mean ends where it ends with the full
