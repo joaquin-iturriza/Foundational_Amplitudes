@@ -3,6 +3,7 @@ import math
 import numpy as np
 import torch
 
+import contextlib
 import os
 import json
 import time
@@ -1702,7 +1703,7 @@ class AmplitudeExperiment(BaseExperiment):
                 dtype          = self.dtype,
             )
 
-        def make_loader(indices, shuffle, batchsize, sampler=None, workers=None):
+        def make_loader(indices, shuffle, batchsize, sampler=None, workers=None, drop_last=True):
             # workers defaults to nw (cfg.training.num_workers); eval / per-process loaders
             # pass workers=0 so the large in-memory dataset isn't forked into many worker
             # sets (one per loader), whose copy-on-write pages creep the RSS up.
@@ -1723,7 +1724,7 @@ class AmplitudeExperiment(BaseExperiment):
                 batch_size  = batchsize,
                 shuffle     = shuffle if sampler is None else False,
                 sampler     = sampler,
-                drop_last   = True,
+                drop_last   = drop_last,
                 collate_fn  = collate_variable_length,
                 pin_memory         = False,
                 num_workers        = w,
@@ -1773,15 +1774,19 @@ class AmplitudeExperiment(BaseExperiment):
         # batch size from the CAPPED index set: with drop_last a batch larger than the
         # capped split yields zero batches and the evaluation has nothing to concatenate
         train_eval_bs = min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1))
+        # The combined eval loaders keep their last partial batch (drop_last=False): the
+        # LLoCa validation and evaluation run over them once and split per process by
+        # process id, so every process's events must be present.
         self.train_eval_loader = make_loader(train_eval_idx, shuffle=False, batchsize=train_eval_bs,
-                                             workers=0)
+                                             workers=0, drop_last=False)
 
         eval_bs = min(self.cfg.evaluation.batchsize, max(len(val_idx) // 2, 1))
-        self.val_loader  = make_loader(val_idx,  shuffle=False, batchsize=eval_bs, workers=0)
+        self.val_loader  = make_loader(val_idx,  shuffle=False, batchsize=eval_bs, workers=0,
+                                       drop_last=False)
         self.test_loader = make_loader(test_idx, shuffle=False,
                                        batchsize=min(self.cfg.evaluation.batchsize,
                                                      max(len(test_idx) // 2, 1)),
-                                       workers=0)
+                                       workers=0, drop_last=False)
 
         # --- per-process loaders (val for loss tracking; test+train for per-dataset plots) ---
         self.proc_val_loaders        = {}
@@ -1831,7 +1836,7 @@ class AmplitudeExperiment(BaseExperiment):
                 self.train_eval_loader = make_loader(
                     train_eval_idx, shuffle=False,
                     batchsize=min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1)),
-                    workers=0)
+                    workers=0, drop_last=False)
     
         LOGGER.info(
             f"Constructed dataloaders: train={n_train}, val={n_val}, "
@@ -1864,12 +1869,12 @@ class AmplitudeExperiment(BaseExperiment):
                 return pp[list(self.cfg.data.dataset).index(name)]
             return self.cfg.data.amp_trafos
 
-        def collect(loader):
+        def collect(loader, **kw):
             with torch.no_grad():
                 if self.ema is not None:
                     with self.ema.average_parameters():
-                        return self._collect_predictions(loader)
-                return self._collect_predictions(loader)
+                        return self._collect_predictions(loader, **kw)
+                return self._collect_predictions(loader, **kw)
 
         # ------------------------------------------------------------------
         # Collect per-process predictions (single forward pass per process)
@@ -1881,12 +1886,38 @@ class AmplitudeExperiment(BaseExperiment):
             ("train", self.proc_train_eval_loaders),
             ("val",   self.proc_val_loaders),
         ]
-        for split, loader_dict in loaders_by_split:
-            for name, loader in loader_dict.items():
-                LOGGER.info(f"### Evaluating {split} [{name}] ###")
-                if name not in proc_preds:
-                    proc_preds[name] = {}
-                proc_preds[name][split] = collect(loader)
+        is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
+        if is_lloca and self.proc_val_loaders and os.environ.get("LLOCA_VAL", "combined") != "loop":
+            # One forward pass per split over the COMBINED loader (evaluation.batchsize
+            # events per batch), then split the arrays by process id. The per-process
+            # loaders hold at most a few thousand events each, so iterating them meant
+            # ~3 forward passes of ~1000 events per process and split (2900 for the
+            # 478-pool catalog, 95 s of a 1000-step run's 30 min); the combined pass is
+            # ~60 batches per split. Same events, same per-process arrays (the combined
+            # loader keeps drop_last=False and iterates in index order, the per-process
+            # index sets are the same events in the same relative order). LLOCA_VAL=loop
+            # keeps the per-process loop for A/B checks.
+            combined = {"test": self.test_loader, "train": self.train_eval_loader,
+                        "val": self.val_loader}
+            names = list(self.cfg.data.dataset)
+            for split, loader_dict in loaders_by_split:
+                LOGGER.info(f"### Evaluating {split} (combined pass, split per process) ###")
+                pred, truth, sigmas, pids = collect(combined[split], return_process_ids=True)
+                for p, name in enumerate(names):
+                    if name not in loader_dict:
+                        continue
+                    m = pids == p
+                    if m.sum() < 2:
+                        continue
+                    proc_preds.setdefault(name, {})[split] = (
+                        pred[m], truth[m], sigmas[m] if sigmas is not None else None)
+        else:
+            for split, loader_dict in loaders_by_split:
+                for name, loader in loader_dict.items():
+                    LOGGER.info(f"### Evaluating {split} [{name}] ###")
+                    if name not in proc_preds:
+                        proc_preds[name] = {}
+                    proc_preds[name][split] = collect(loader)
 
         # ------------------------------------------------------------------
         # Build combined arrays by concatenation (no second forward pass)
@@ -1986,7 +2017,7 @@ class AmplitudeExperiment(BaseExperiment):
                 ),
             )
 
-    def _collect_predictions(self, loader):
+    def _collect_predictions(self, loader, return_process_ids=False):
         """Run model forward pass over a loader.
 
         Caller is responsible for torch.no_grad() and EMA context.
@@ -1996,11 +2027,13 @@ class AmplitudeExperiment(BaseExperiment):
         amp_pred_prepd  : np.ndarray  (N, 1)
         amp_truth_prepd : np.ndarray  (N, 1)
         sigmas          : np.ndarray | None   (only for HETEROSC loss)
+        process_ids     : np.ndarray  (N,)  only with return_process_ids=True
         """
         is_lloca  = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
         all_pred  = []
         all_truth = []
         all_sigma = [] if self.cfg.training.loss == "HETEROSC" else None
+        all_pids  = [] if return_process_ids else None
 
         t0 = time.time()
         for data in loader:
@@ -2058,6 +2091,8 @@ class AmplitudeExperiment(BaseExperiment):
             all_pred.append(y_pred[:, :1].cpu().float().numpy() if not is_lloca
                             else y_pred.cpu().float().numpy())
             all_truth.append(y.cpu().float().numpy())
+            if all_pids is not None:
+                all_pids.append(np.asarray(process_ids.cpu().numpy()).reshape(-1))
 
         LOGGER.info(
             f"Collected {sum(len(p) for p in all_pred)} predictions in {time.time()-t0:.2f}s"
@@ -2065,6 +2100,8 @@ class AmplitudeExperiment(BaseExperiment):
         amp_pred_prepd  = np.concatenate(all_pred,  axis=0)
         amp_truth_prepd = np.concatenate(all_truth, axis=0)
         sigmas = np.concatenate(all_sigma, axis=0) if all_sigma else None
+        if return_process_ids:
+            return amp_pred_prepd, amp_truth_prepd, sigmas, np.concatenate(all_pids, axis=0)
         return amp_pred_prepd, amp_truth_prepd, sigmas
 
     def _metrics_from_arrays(self, amp_pred_prepd, amp_truth_prepd, title, result_key,
@@ -2366,7 +2403,14 @@ class AmplitudeExperiment(BaseExperiment):
             assert torch.isfinite(loss).all()
         return loss, loss_no_reg, mse_val
 
-    def _batch_loss_lloca(self, data):
+    def _forward_lloca(self, data):
+        """Forward of one collated batch on the LLoCa/L-GATr path.
+
+        Returns (y_pred, y, process_ids, sigma, mse_val): the prediction with the
+        HETEROSC sigma split off (None otherwise), the target, the per-event process
+        ids on the device, and the detached mu-MSE for HETEROSC (None otherwise).
+        Shared by the training loss, the validation pass and the evaluation collector.
+        """
         particles, y, tokens, order_labels, ptr, process_ids = data
 
         # Compute the per-event particle counts on the CPU (ptr is born on the CPU
@@ -2409,6 +2453,11 @@ class AmplitudeExperiment(BaseExperiment):
             y_pred = y_pred[..., :-out_shape]
             # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
             mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
+        return y_pred, y, process_ids, sigma, mse_val
+
+    def _batch_loss_lloca(self, data):
+        sync_blocking = os.environ.get("LLOCA_SYNC", "deferred") == "blocking"
+        y_pred, y, process_ids, sigma, mse_val = self._forward_lloca(data)
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
         loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma)
@@ -2844,7 +2893,45 @@ class AmplitudeExperiment(BaseExperiment):
         proc_losses_no_reg = {}
         proc_mse_vals      = {}
 
-        with torch.no_grad():
+        is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
+        if is_lloca and os.environ.get("LLOCA_VAL", "combined") != "loop":
+            # One pass over the COMBINED val loader (evaluation.batchsize events per batch)
+            # with the per-process means accumulated by index_add_, as the training loss
+            # does. The per-process loaders capped their batch at half a process's val
+            # pool (1000 events for the catalog's 2000), so a validation was ~2 forward
+            # passes per process plus a sync each: 956 batches and 32 s for 478 processes,
+            # against 58 batches here; twenty validations were 11 of a 1000-step run's 30
+            # minutes. The per-process mean over all of a process's events is what the
+            # loop computed too (equal-size batches, drop_last on a pool of 2000 drops
+            # nothing), so the numbers are the same up to summation order. LLOCA_VAL=loop
+            # keeps the loop for A/B checks. The loss with reg is the no-reg loss plus the
+            # whole-model reg term, as in the loop (reg does not depend on the batch).
+            n_proc = self.n_datasets
+            sums   = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
+            counts = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
+            mse_sums = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
+            ema_ctx = self.ema.average_parameters() if self.ema is not None else contextlib.nullcontext()
+            with torch.no_grad(), ema_ctx:
+                for data in self.val_loader:
+                    y_pred, y, pids, sigma, _ = self._forward_lloca(data)
+                    per_event = self._per_event_loss(y_pred, y, sigma=sigma).to(torch.float64)
+                    sums.index_add_(0, pids, per_event)
+                    counts.index_add_(0, pids, torch.ones_like(per_event))
+                    if sigma is not None:
+                        mse_e = ((y_pred - y) ** 2).flatten(1).mean(dim=1).to(torch.float64)
+                        mse_sums.index_add_(0, pids, mse_e)
+                reg_val = float(self.regularization_lambda * self.regularization(self.model))
+            sums, counts, mse_sums = sums.cpu().numpy(), counts.cpu().numpy(), mse_sums.cpu().numpy()
+            het = self.cfg.training.loss == "HETEROSC"
+            for p, name in enumerate(self.cfg.data.dataset):
+                if name not in self.proc_val_loaders or counts[p] == 0:
+                    continue
+                m = float(sums[p] / counts[p])
+                proc_losses_no_reg[name] = m
+                proc_losses[name]        = m + reg_val
+                proc_mse_vals[name]      = float(mse_sums[p] / counts[p]) if het else None
+        else:
+          with torch.no_grad():
             for name, loader in self.proc_val_loaders.items():
                 losses, losses_no_reg, mse_vals = [], [], []
                 for data in loader:

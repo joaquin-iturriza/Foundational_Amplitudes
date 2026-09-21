@@ -310,8 +310,13 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 logy=True,
             )
 
-            # Per-dataset pages
-            for ds_name, ds_results in plot_dict.get("results_per_proc", {}).items():
+            # Per-dataset pages (plotting.per_process_pages caps them: ~0.25 s a page,
+            # 478 pages were 2 of a short catalog run's 30 minutes; null = all)
+            _cap = cfg.plotting.get("per_process_pages", None)
+            _items = list(plot_dict.get("results_per_proc", {}).items())
+            if _cap is not None:
+                _items = _items[:int(_cap)]
+            for ds_name, ds_results in _items:
                 ds_data = [
                     _slog(ds_results["test"]["raw"]["truth"]),
                     _slog(ds_results["train"]["raw"]["truth"]),

@@ -19,6 +19,8 @@ Typical usage in run_trial.py:
 """
 
 import fcntl
+import time
+import errno
 import itertools
 import math
 import os
@@ -626,7 +628,16 @@ class DyHPOSampler:
         """
         lock_path = state_path + '.lock'
         with open(lock_path, 'w') as lf:
-            fcntl.flock(lf, fcntl.LOCK_EX)
+            # flock on the shared FS can fail transiently with ENOLCK ("No locks
+            # available"); one such failure lost a finished trial's observation.
+            for attempt in range(30):
+                try:
+                    fcntl.flock(lf, fcntl.LOCK_EX)
+                    break
+                except OSError as e:
+                    if e.errno != errno.ENOLCK or attempt == 29:
+                        raise
+                    time.sleep(5.0 + 5.0 * attempt)
             try:
                 sampler = DyHPOSampler.load(state_path, output_path)
                 yield sampler

@@ -24,6 +24,7 @@
 # (lr_c(t) = 1e-2 (t/3000)^0.5 below t* = 3000; the earlier arms ran at the 8601-step best, 9.7e-3).
 # (the validation metric stays the geometric mean). SLQ= sets data.signedlog_quantile (the
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
+# STEPS= sets the horizon (default 1000) and VF= the validation fraction (default 0.05).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -42,10 +43,10 @@ python run.py \
   data.offshell_per_event=true "data.internal_mass_pdgs=[$(echo "${PDGS:-23_6_25}" | tr _ ,)]" \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed=42 \
-  training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
+  training.iterations="${STEPS:-1000}" training.batchsize=16384 evaluation.batchsize=16384 \
   training.lr="${LR:-5.8e-3}" training.regularization_lambda=1e-8 training.cosanneal_warmup_frac=0.1 \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference={$(echo "$REF" | sed 's/_/,/g; s/=/:/g')}"} \
   training.regularization=L2 \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
-  training.validate_frac=0.05 evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false
+  training.validate_frac="${VF:-0.05}" evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false
