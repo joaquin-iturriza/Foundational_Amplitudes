@@ -630,12 +630,12 @@ class DyHPOSampler:
         with open(lock_path, 'w') as lf:
             # flock on the shared FS can fail transiently with ENOLCK ("No locks
             # available"); one such failure lost a finished trial's observation.
-            for attempt in range(30):
+            for attempt in range(8):             # ~3 min in total, well inside a trial's wall time
                 try:
                     fcntl.flock(lf, fcntl.LOCK_EX)
                     break
                 except OSError as e:
-                    if e.errno != errno.ENOLCK or attempt == 29:
+                    if e.errno != errno.ENOLCK or attempt == 7:
                         raise
                     time.sleep(5.0 + 5.0 * attempt)
             try:

@@ -317,6 +317,8 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             if _cap is not None:
                 _items = _items[:int(_cap)]
             for ds_name, ds_results in _items:
+                if not all(k in ds_results for k in ("test", "train")):
+                    continue     # a process with under two events in a split has no page
                 ds_data = [
                     _slog(ds_results["test"]["raw"]["truth"]),
                     _slog(ds_results["train"]["raw"]["truth"]),

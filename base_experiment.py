@@ -1334,7 +1334,7 @@ class BaseExperiment:
             if self.cfg.use_mlflow:
                 log_mlflow("val.loss", val_loss, step=step)
             # the single-dataset validation history in the log (the multi-process override
-            # logs its own line); read by analysis/catalog_v2/fit_excess_reference.py
+            # logs its own line); the solo reference runs are read from these lines
             LOGGER.info(f"Val loss: {(np.mean(losses_no_reg) if losses_no_reg else val_loss):.6e} "
                         f"| step {step + 1}")
 

@@ -2623,9 +2623,19 @@ class AmplitudeExperiment(BaseExperiment):
         table = {int(k): float(v) for k, v in dict(ref_cfg).items()}
         keys = np.array(sorted(table))
         out = np.empty(self.n_datasets, dtype=np.float64)
+        if not np.any(np.asarray(self._proc_npart) > 0):
+            raise ValueError("excess reference: the per-process particle counts are unfilled, "
+                             "every process would take the smallest multiplicity's reference")
+        snapped = []
         for p in range(self.n_datasets):
             n = int(self._proc_npart[p]) if self._proc_npart[p] > 0 else int(keys[0])
-            out[p] = table[int(keys[np.argmin(np.abs(keys - n))])]
+            k = int(keys[np.argmin(np.abs(keys - n))])
+            if k != n:
+                snapped.append((self.cfg.data.dataset[p], n, k))
+            out[p] = table[k]
+        if snapped:
+            LOGGER.warning(f"excess reference: {len(snapped)} processes have no reference at their "
+                           f"multiplicity and take the nearest one, e.g. {snapped[:3]}")
         self._excess_ref_cache = torch.as_tensor(np.maximum(out, 1e-8), dtype=torch.float32)
         return self._excess_ref_cache
 
@@ -2935,15 +2945,28 @@ class AmplitudeExperiment(BaseExperiment):
             _combined = (proc_losses, proc_losses_no_reg, proc_mse_vals)
             proc_losses, proc_losses_no_reg, proc_mse_vals = {}, {}, {}
         if not is_lloca or val_mode in ("loop", "check"):
+          # The per-process value is the plain mean of the per-event loss. It must never go
+          # through _batch_loss: that applies training.loss_aggregation to the single-process
+          # batch, which is the mean only for mean/geometric_mean at tau = 0; with tau > 0 it
+          # is m_p + tau and under `excess` it is m_p times the process's reference weight,
+          # so the recorded validation would follow a training-side knob (the earlier
+          # reference-weighted arms recorded exactly that; docs/results.tex, catalog census).
+          def _loop_loss(data):
+              if is_lloca:
+                  y_pred, y, _, sigma, mse_val = self._forward_lloca(data)
+                  loss_no_reg = self._per_event_loss(y_pred, y, sigma=sigma).mean().detach()
+                  reg = self.regularization_lambda * self.regularization(self.model)
+                  return loss_no_reg + reg, loss_no_reg, mse_val
+              return self._batch_loss(data)      # legacy models: single-process batch, mean loss
           with torch.no_grad():
             for name, loader in self.proc_val_loaders.items():
                 losses, losses_no_reg, mse_vals = [], [], []
                 for data in loader:
                     if self.ema is not None:
                         with self.ema.average_parameters():
-                            loss, loss_no_reg, mse_val = self._batch_loss(data)
+                            loss, loss_no_reg, mse_val = _loop_loss(data)
                     else:
-                        loss, loss_no_reg, mse_val = self._batch_loss(data)
+                        loss, loss_no_reg, mse_val = _loop_loss(data)
                     losses.append(loss.cpu().item())
                     if loss_no_reg is not None:
                         losses_no_reg.append(loss_no_reg.item())   # now a detached tensor
@@ -2952,7 +2975,7 @@ class AmplitudeExperiment(BaseExperiment):
                 proc_losses[name]        = float(np.mean(losses))
                 proc_losses_no_reg[name] = float(np.mean(losses_no_reg)) if losses_no_reg else None
                 proc_mse_vals[name]      = float(np.mean(mse_vals))      if mse_vals      else None
-        if val_mode == "check":
+        if val_mode == "check" and is_lloca:
             # same model, both paths: report the largest per-process deviation, keep the combined
             devs = sorted(((abs(_combined[1][n] - proc_losses_no_reg[n]) / max(abs(proc_losses_no_reg[n]), 1e-30), n)
                            for n in proc_losses_no_reg if n in _combined[1]), reverse=True)
