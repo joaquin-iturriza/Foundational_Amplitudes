@@ -3181,9 +3181,15 @@ same rate and settles over a wide band, where the geometric and arithmetic arms 
 processes that learn and processes that never move. A pass/fail line at $0.05$ does not see
 that, so the better reading is each process's distance from what its multiplicity reaches
 alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
-Fig.~\ref{fig:excess_ratio}). With the input, the medians are $4.4$, $3.1$ and $2.7$ for the
-geometric, arithmetic and reference-weighted arms, and the fraction above ten times the
-reference $28\%$, $13\%$ and $17\%$. Two patterns among the processes furthest from their
+Fig.~\ref{fig:excess_ratio}). With the references measured with the input ($9.9\times10^{-4}$,
+$4.4\times10^{-3}$, $5.4\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$ alone at $\mathrm{bs}/P$
+for $1000$ steps), almost no process in company reaches what it reaches alone at the same
+compute: $1\%$ are below their reference under the arithmetic and reference-weighted arms,
+$13\%$ under the geometric one (its converged $2\to2$ tail, the one place where company
+beats solo), and the medians are $13$, $8.8$ and $7.3$. By class the trade the aggregations
+make is explicit: $2\to4$ at $15$, $9.5$ and $5.6$ times its reference, tree $2\to2$ at
+$0.75$, $3.8$ and $9.1$, resonant $2\to2$ at $24$, $17$ and $59$. Two patterns among the
+processes furthest from their
 reference, common to all three arms: the $W$-channel $2\to2$ processes ($u\bar d\to e\nu$,
 $u\bar d\to W\gamma$, $u\bar d\to Wg$ and their one-loop versions) at $30$--$90$ times,
 because the $W$ (PDG $24$) is not in the propagator list the masks are built for, so these
@@ -3193,8 +3199,7 @@ verified to place the pole at the scanned mass and the pools verified to cover i
 of events within $5$\,GeV of their own pole), so what remains is that a shifted pool is a
 twin of its nominal pool with the same momenta and a different pole, told apart by the
 coordinate and the internal-mass scalar, and the arm that pushes the $2\to2$ hardest is the
-worst on them. The references themselves were measured before the sidecars existed and are
-being re-measured with the input; the $W$ is being added to the propagator list.
+worst on them. The $W$ is being added to the propagator list.
 
 \begin{figure}[H]
 \centering
