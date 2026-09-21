@@ -177,6 +177,8 @@ evaluation:
                          # 42.7M events on catalog_v2, 35 min of evaluation after a 20-min run.
                          # Selection and the tracked losses use the val split; this only bounds
                          # the post-training train-split pass. Quick tests set 2000.
+ save_predictions: false # dump per-event (prediction, truth, raw truth, process id) per split
+                         # to preds_<split>.npz in the run dir
 
 find_BS: false
 BS_finding:

@@ -1986,6 +1986,27 @@ class AmplitudeExperiment(BaseExperiment):
                     prepd_mean=pm, prepd_std=ps, prepd_trafos=tr,
                 )[name]
 
+        # evaluation.save_predictions: dump the per-event (prediction, truth) pairs on the
+        # standardized target per split, with the process id and the raw truth, to
+        # preds_<split>.npz in the run dir, for analyses that need the residual per event
+        # (its dependence on the target's own scale, on sqrt(s), ...).
+        if bool(self.cfg.evaluation.get("save_predictions", False)):
+            names = list(self.cfg.data.dataset)
+            for split in ("val", "test", "train"):
+                have = [n for n in names if n in proc_preds and split in proc_preds[n]]
+                if not have:
+                    continue
+                pid = np.concatenate([np.full(proc_preds[n][split][1].shape[0], names.index(n)) for n in have])
+                pred = np.concatenate([proc_preds[n][split][0] for n in have], axis=0)
+                truth = np.concatenate([proc_preds[n][split][1] for n in have], axis=0)
+                raw_truth = np.concatenate([
+                    undo_preprocess_amplitude(proc_preds[n][split][1], *_amp_stats(n), trafos=_amp_trafo(n))
+                    for n in have], axis=0)
+                out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
+                np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth,
+                                    process_id=pid, names=np.array(names))
+                LOGGER.info(f"Saved {pred.shape[0]} {split} predictions to {out}")
+
         # Optionally log noema metrics (no extra forward pass — just re-use arrays)
         if self.ema is not None:
             LOGGER.info("### Evaluating without EMA (reusing predictions not possible — skipping noema) ###")
