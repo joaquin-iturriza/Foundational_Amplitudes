@@ -3398,6 +3398,25 @@ build (power one for a fermion exchange, two for a boson, since $|\mathcal M|^2$
 $1/t$ and $1/t^2$ respectively). The signed class moves from $0.112$ to $0.097$, inside its
 band; its sign structure stays the open move.
 
+\paragraph{The sign head: a real but modest gain on the signed class.} With
+\code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
+(\code{abslog:<s>}, floored at the signed-log scale) and the network's second output
+channel is a sign logit trained per event by a binary cross-entropy on those pools only
+(weight one); validation stays the MSE on the magnitude target with the sign accuracy logged,
+and the raw-space metrics apply the predicted sign. Three seeds on top of the $s$-channel
+subtraction: the sign is learned, $98\%$ accuracy at the median over the $48$ pools and
+$88$--$89\%$ on the worst ($u\bar u\to d\bar dg$ at one loop), against $98.7\%$ and $86\%$ for
+the sign of the inverted signed-log prediction. The magnitude has to be compared on a
+common footing since the two arms have different targets
+(\code{analysis/catalog\_v2/signed\_compare.py}: the absolute error of $\log|x|$ over the
+$95\%$ of events above the scale): the median over pools goes from $0.38$ to $0.32$ and the
+per-pool $90$th percentile of events from $1.16$ to $0.94$, a $15$--$20\%$ gain; every other
+class stays inside its band ($0.0237\pm0.0021$ combined against $0.0223\pm0.0024$). The
+sign structure was the right diagnosis but not the large lever: the signed class remains
+the worst by a factor of five over the next one, so its remaining error is in the
+magnitude of a target that spans tens of decades on either side of zero, and the
+per-class read-out stays the same with the sign taken out.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_tprop.pdf}
