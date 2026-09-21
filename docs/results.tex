@@ -2823,11 +2823,11 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     search space (\code{sweep/sweep\_config\_ccin2p3\_catalog\_v2.yaml}, log-uniform over
     that range; $\tau\to\infty$ is the arithmetic mean) rather than chosen by hand or swept
     at twelve processes, where there is no $2\to4$ bulk to protect. The reference-weighted
-    aggregation (Table~\ref{tab:catv2_excess}) is a third candidate, the best census at
-    $1000$ steps, and the best at two learning rates; the aggregation choice and
-    \code{training.lr} are swept together (their optimum is joint), and the reference must be
-    re-measured at the wave's horizon (three solo runs at $\mathrm{bs}/P$ for $8601$
-    steps). Training-side knobs shape the gradient and must not move the
+    aggregation is out: corrected, it is the worst census at $1000$ steps at both learning
+    rates and loses again at the quick working point (Table~\ref{tab:catv2_excess} and the
+    quick-working-point paragraph). The aggregation choice and \code{training.lr} are swept
+    together (their optimum is joint), and the wave needs the diagram sidecars present
+    (masks $478/478$). Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
     (\code{training.val\_aggregation}, geometric mean) so \code{val\_loss\_no\_reg} stays
     comparable across arms, with the census (failing count, median) as the other read-out.
@@ -2839,15 +2839,18 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     read (the paragraph above); the sweep configs still carry \code{[23,6,25]}, and the
     run-to-run spread at $1000$ steps, needed to call its $13\%$ a cost, is unmeasured. (c) The reference weighting is
     settled at this working point (it loses to the arithmetic mean once its validation is
-    recorded correctly; the quick-working-point paragraph); what is still owed is the
-    geometric mean swept at the same working point, and a seed spread for any comparison
-    finer than tens of percent. What sets the dependence of the final loss on the span of
-    the target remains the open question, with the fix at the target's scale as the lead.
+    recorded correctly; the quick-working-point paragraph), and the geometric and arithmetic
+    means tie on the combined number there while differing in shape. The next tests are the
+    two preprocessing moves of ``Where in the target the error sits'': the propagator
+    subtraction on the target for the resonant and $t$-channel pools, and a near-zero
+    resolving transform for the signed class.
     Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
     $ee\to\nu\bar\nu\nu\bar\nu$) have numerically unstable outputs early in training
     (Sec.~\ref{sec:throughput}); worth a look as a struggler pattern. (d) The arithmetic mean diverged once on the
-    small pools (non-finite gradient); one seed, undiagnosed. (e) The wave needs the
-    sidecars present and the reference re-measured at its horizon.
+    small pools (non-finite gradient); one seed, undiagnosed. (e) Any comparison between arms finer than about $25\%$ needs
+    repeats: the best arithmetic-mean trial rerun at its own HPs and seed ended at $0.068$
+    against the trial's $0.054$ (GPU nondeterminism at $500$ steps), so three repeats per
+    arm before the next A/B.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
@@ -3289,10 +3292,58 @@ fixed-lr solos, on a broad lr plateau. The arithmetic mean's best trial reaches 
 trials all at lr $8$--$11\times10^{-3}$), the weighted arm's $0.068$ (lr $1.1\times10^{-2}$,
 $\beta=0.05$); every weighted trial with $\beta>1$ is at $0.17$ or worse. With the
 validation recorded correctly the weighting loses to the arithmetic mean at this working
-point too, and the emphasis $\beta$ only makes it worse. Two open items from these
-sweeps: the geometric mean has not been swept at this working point (the canonical
-default still has to be beaten here, not only at $1000$ steps), and no seed spread is
-measured, so differences of a few percent between trials are not resolved.
+point too, and the emphasis $\beta$ only makes it worse. The geometric mean swept the
+same way (\code{sweeps/catalog\_q\_geo}) reaches $0.053$ (lr $1.2\times10^{-2}$, the top of
+the window, EMA on), a tie with the arithmetic mean on the combined number. The tie is
+inside the run-to-run spread: the arithmetic mean's best trial rerun at its own HPs and
+seed ended at $0.068$ against $0.054$, a $25\%$ spread from GPU nondeterminism at this
+horizon, so no single-run difference of that size means anything. Where the two differ is
+the shape of the census (\code{analysis/catalog\_v2/arms\_compare.py},
+Fig.~\ref{fig:arms_compare_q}): the geometric mean has $27$ processes below $10^{-3}$ and
+$50$ stuck above $0.5$, the starvation of Prin.~\ref{prin:gradcomp} in its bimodal form,
+where the arithmetic mean has none below $10^{-3}$ and one above $0.5$; the failing counts
+are $274$, $259$ and $312$ for the geometric, arithmetic and weighted arms, the signed
+one-loop class fails under all three ($50$, $47$, $48$ of $50$).
+
+\paragraph{Where in the target the error sits.} With the per-event predictions saved
+(\code{evaluation.save\_predictions}), the squared residual of the arithmetic arm at its best
+HPs was binned in deciles of each process's own standardized target
+(\code{analysis/catalog\_v2/residual\_vs\_target.py}, Fig.~\ref{fig:residual_vs_target}). For
+the bulk the error is spread over the target (median share $0.13$ in the lowest decile and
+$0.16$ in the highest, against $0.10$ for flat), so the range of the target is not, for
+most of the catalog, one end being unlearned. Two groups are, and they are the two
+struggler classes. The signed one-loop pools put $65$--$75\%$ of their MSE in the lowest
+decile ($u\bar d\to t\bar bg$, $ud\to ud\gamma$, $uu\to uu\gamma$ at one loop): the region
+around the sign change, where the signed log is linear and the standardized target is near
+zero, is where the error lives, and the transform chosen for this class flattens exactly
+that region. The resonant and $t$-channel $2\to2$ pools put $50$--$86\%$ in the highest
+decile ($ee\to u\bar u$ and $ee\to d\bar d$ at one loop $80$--$86\%$; $u\bar u\to ZZ$,
+$u\bar u\to Z\gamma$, $ee\to ZZ$, $ee\to Z\gamma$, $u\bar u\to WW$ at one loop $50$--$70\%$):
+the pole, or the forward peak of a $t$-channel exchange, which the $s$-channel off-shellness
+input does not describe. So ``better preprocessing'' is two concrete moves, one per
+class: a target-side subtraction of the known propagator factors, $s$- and $t$-channel,
+for the resonant pools (the target's version of the input that removed the LO needle,
+built from the same sidecars), and a transform with resolution near zero for the signed
+class (or a separate sign prediction). Each is a $500$-step test at this working point with
+three repeats per arm.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/arms_compare_q.pdf}
+\caption{Quick working point ($500$ steps, $5$k pools, off-shellness on), best DyHPO trial
+of each aggregation: the combined validation curve, every process's curve, the final loss
+against the target's range, and the final loss by class.}
+\label{fig:arms_compare_q}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/residual_vs_target.pdf}
+\caption{Share of each process's MSE per decile of its own standardized log target
+(arithmetic mean at its best HPs, $500$ steps); left a few processes, right the lowest and
+highest deciles of every process against the pool's range. Flat is $0.1$.}
+\label{fig:residual_vs_target}
+\end{figure}
 
 \begin{table}[H]
 \centering
