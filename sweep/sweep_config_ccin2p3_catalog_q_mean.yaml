@@ -1,0 +1,102 @@
+# catalog_v2 quick working point (docs/results.tex, catalog census): the 478-pool train+scan recipe on
+# the 5k-event pools (data.train_subsample), a 500-step horizon (~5 min of training at bs 16384),
+# the off-shellness input on (sidecars present: the masks line must read 478/478). Two sweeps share
+# this setup and differ only in the TRAINING aggregation: catalog_q_mean (arithmetic mean) and
+# catalog_q_excess (reference-weighted, with training.excess_beta swept). The validation metric,
+# checkpoint selection and the DyHPO objective are training.val_aggregation (geometric mean) in
+# both, so the two sweeps' objectives are the same quantity and compare directly.
+# lr centre: lr_c(500) = 1e-2 (500/3000)^0.5 = 4.1e-3, swept +/- half a decade.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  partition: gpu_v100
+  qos: gpu
+  account: lpnhe
+  request_gpus: 1
+  gres: gpu:v100:1
+  mem: 64G
+  cpus_per_task: 8
+  time: "00:50:00"           # ~5 min load + ~4 min train + validations/eval/plots: ~15 min per trial
+paths:
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  setup_commands:
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
+sweep_name: catalog_q_mean
+n_trials: 12
+dyhpo:
+  n_candidates: 300
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps: [500]
+fixed_params:
+  data.source: recipes
+  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml
+  data.require_cache: 'true'
+  data.train_subsample: 5000
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.loss_aggregation_tau: 0.0
+  training.val_aggregation: geometric_mean   # the metric never follows the training-side knobs
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.1'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.4e-03
+  high: 1.2e-02
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.9999
+
