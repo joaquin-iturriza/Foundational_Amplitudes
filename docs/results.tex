@@ -2840,10 +2840,11 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     run-to-run spread at $1000$ steps, needed to call its $13\%$ a cost, is unmeasured. (c) The reference weighting is
     settled at this working point (it loses to the arithmetic mean once its validation is
     recorded correctly; the quick-working-point paragraph), and the geometric and arithmetic
-    means tie on the combined number there while differing in shape. The next tests are the
-    two preprocessing moves of ``Where in the target the error sits'': the propagator
-    subtraction on the target for the resonant and $t$-channel pools, and a near-zero
-    resolving transform for the signed class.
+    means tie on the combined number there while differing in shape. The propagator subtraction on the
+    target is in and adopted for the massive $s$-channel poles (three seeds, outside the
+    band); still to build: the massless $t$-channel factor (fermion power one, boson power
+    two) for the $ZZ$/$WW$/$Z\gamma$/$WZ$ pools, and a separate sign prediction for the
+    signed one-loop class, since the signed-log scale is not its lever.
     Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
     $ee\to\nu\bar\nu\nu\bar\nu$) have numerically unstable outputs early in training
     (Sec.~\ref{sec:throughput}); worth a look as a struggler pattern. (d) The arithmetic mean diverged once on the
@@ -3369,6 +3370,50 @@ way, median $0.112\pm0.030$, $0.123\pm0.013$, $0.147\pm0.012$. Enlarging the log
 does not help and shrinking the linear one hurts, so the error near zero is the sign
 structure, not the flat region; a separate sign prediction (a classification head next to
 $\log|x|$) is the remaining move for this class, and it is a model change.
+
+\paragraph{The propagator subtraction on the target works.} The second move takes the
+known pole out of the target: every event's $|\mathcal M|^2$ is multiplied by
+$\prod_k\big((s_k-M_k^2)^2+M_k^2\Gamma_k^2\big)/M_k^4$ over the process's massive propagators
+(\code{data.target\_propagators}; $Z$, $W$, $t$, $H$ with the MadGraph widths; the scanned
+mass where a scan sets it), built from the same sidecar masks as the off-shellness input,
+so the network learns the smooth remainder and the factor is divided back out at
+evaluation. Only propagators whose $s_k$ straddles $M^2$ on the train pool carry a factor:
+a $t$-channel exchange or a sub-system pole out of reach never does, and on a first
+attempt with every massive propagator the factor doubled the median range of the target
+instead of removing a peak. With the rule, $178$ of $478$ processes carry one ($376$ of
+$1657$ candidate propagators). Three seeds at $1000$ steps against the baseline's three
+(Fig.~\ref{fig:seed_arms_tprop}): the combined loss goes from $0.0286\pm0.0060$ to
+$0.0223\pm0.0024$, $378$ processes improve and $100$ worsen (geometric mean of the ratio
+$0.78$), and the class the move was aimed at halves, resonant $2\to2$ from $0.0227$ to
+$0.0106$ at the median and from $0.058$ to $0.018$ at the $90$th percentile. The one-loop
+resonant pools gain most ($ee\to u\bar u$, $d\bar d$, $b\bar b$ at one loop $5$--$9\times$;
+$u\bar d\to e\nu$ and its one-loop twin $14$--$17\times$; the $M_Z$-scan variants $2$--$10\times$),
+every other class moves down inside or at the edge of its band, and nothing is worse
+outside it. The residual profile with the subtraction on
+(Fig.~\ref{fig:residual_vs_target_tprop}) has $23$ processes left with over a third of their
+error in the highest decile, against $45$ before, and they are now the $t$-channel pools
+($u\bar u\to ZZ$, $WW$, $Z\gamma$, $u\bar d\to WZ$, $ee\to ZZ$, $ee\to WW$ and their one-loop
+versions): the massless exchange the straddle rule leaves alone, and the next factor to
+build (power one for a fermion exchange, two for a boson, since $|\mathcal M|^2$ goes like
+$1/t$ and $1/t^2$ respectively). The signed class moves from $0.112$ to $0.097$, inside its
+band; its sign structure stays the open move.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_tprop.pdf}
+\caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
+per-class ECDF of the final per-process validation loss with and without the target-side
+propagator subtraction; the band is the min/max over seeds.}
+\label{fig:seed_arms_tprop}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/residual_vs_target_tprop.pdf}
+\caption{Where the error sits with the propagator subtraction on (one seed): share of each
+process's MSE per decile of its own standardized target.}
+\label{fig:residual_vs_target_tprop}
+\end{figure}
 
 \begin{figure}[H]
 \centering
