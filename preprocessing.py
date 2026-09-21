@@ -7,7 +7,8 @@ from sklearn.preprocessing import QuantileTransformer
 SIGNEDLOG_QUANTILE = 0.01   # default scale: the 1% quantile of |x| on the train pool
 
 
-def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sign_data=None):
+def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sign_data=None,
+                       sign_head=False):
     """Swap 'log' -> 'signedlog:<s>' when the amplitude contains non-positive values.
 
     Plain log is undefined for x <= 0 (e.g. virtual corrections or virt/born ratios
@@ -25,6 +26,9 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sig
     whose median |x| is 1e-5 over tens of decades standardizes to a kurtosis of
     thousands.  The caller must store the returned list and use it for BOTH the
     forward preprocessing and the inverse.  Positive-only data keeps plain 'log'.
+    `sign_head=True` resolves a signed pool to 'abslog:<s>' instead, f(x) = log(max(|x|, s)):
+    the magnitude alone, with the sign carried by a separate classification target
+    (training.sign_head); the inverse returns |x| and the caller applies the sign.
     """
     if not trafos or "log" not in trafos:
         return list(trafos) if trafos else trafos
@@ -37,16 +41,17 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sig
     s = float(np.quantile(a, scale_quantile)) if a.size else 1.0
     if not np.isfinite(s) or s <= 0.0:
         s = 1.0
-    return [f"signedlog:{s:.6e}" if t == "log" else t for t in trafos]
+    kind = "abslog" if sign_head else "signedlog"
+    return [f"{kind}:{s:.6e}" if t == "log" else t for t in trafos]
 
 
 def signedlog_scale(fn_str):
     """Scale s of a 'signedlog' / 'signedlog:<s>' transform string (1.0 if absent)."""
     if fn_str == "signedlog":
         return 1.0
-    if fn_str.startswith("signedlog:"):
+    if fn_str.startswith("signedlog:") or fn_str.startswith("abslog:"):
         return float(fn_str.split(":", 1)[1])
-    raise ValueError(f"Not a signedlog transform: {fn_str}")
+    raise ValueError(f"Not a signedlog/abslog transform: {fn_str}")
 
 
 def preprocess_amplitude(amplitude, trafos=None, mean=None, std=None):
@@ -209,6 +214,9 @@ def get_fn(fn_str):
     if fn_str.startswith("signedlog"):
         s = signedlog_scale(fn_str)
         return lambda p, t: np.sign(p) * np.log1p(np.abs(p) / s)
+    if fn_str.startswith("abslog:"):
+        s = signedlog_scale(fn_str)
+        return lambda p, t: np.log(np.maximum(np.abs(p), s))
     match fn_str:
         case "None":
             return lambda p, t: p
@@ -244,6 +252,8 @@ def get_inv_fn(fn_str):
     if fn_str.startswith("signedlog"):
         s = signedlog_scale(fn_str)
         return lambda p, t: s * np.sign(p) * np.expm1(np.minimum(np.abs(p), 80.0))
+    if fn_str.startswith("abslog:"):
+        return lambda p, t: np.exp(np.minimum(p, 80.0))      # the magnitude; sign applied by the caller
     match fn_str:
         case "log":
             return lambda p, t: np.exp(np.minimum(p, 80.0))

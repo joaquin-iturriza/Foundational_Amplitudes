@@ -90,6 +90,22 @@ def test_inverse_is_finite_for_wild_predictions():
     assert np.isfinite(out).all()
 
 
+def test_abslog_for_the_sign_head():
+    x = _signed_pool()
+    tr = resolve_amp_trafos(["log", "standardization"], x, sign_head=True)
+    assert tr[0].startswith("abslog:") and tr[1] == "standardization"
+    assert np.isclose(signedlog_scale(tr[0]), np.quantile(np.abs(x[x != 0]), SIGNEDLOG_QUANTILE), rtol=1e-5)
+    y, m, s = preprocess_amplitude(x, trafos=tr)
+    mag = undo_preprocess_amplitude(y, m, s, trafos=tr)
+    assert (mag > 0).all()
+    big = np.abs(x) >= signedlog_scale(tr[0])
+    assert np.allclose(mag[big], np.abs(x)[big], rtol=1e-6)
+    assert np.allclose(mag * np.sign(x), x, rtol=1e-6, atol=signedlog_scale(tr[0]) * 1.01)
+    # positive pools are untouched by the flag
+    pos = np.exp(np.random.default_rng(2).normal(size=(500, 1)))
+    assert resolve_amp_trafos(["log", "standardization"], pos, sign_head=True) == ["log", "standardization"]
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     failed = 0

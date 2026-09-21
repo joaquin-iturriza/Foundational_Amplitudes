@@ -1510,6 +1510,13 @@ class AmplitudeExperiment(BaseExperiment):
         # amp_trafos keeps a representative resolution; per-process trafos in _amp_trafos_pp.
         base_trafos = list(self.cfg.data.amp_trafos)
         self._amp_trafos_pp = None
+        self._sign_head = bool(self.cfg.training.get("sign_head", False))
+        if self._sign_head:
+            assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
+            assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \
+                "sign_head is implemented on the LLoCa path"
+            with open_dict(self.cfg):
+                self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
         q = self._signedlog_quantile()
         if amp_trafos is None:                       # fresh run: resolve from raw amps
             # the sign decision (positive -> log, signed -> signedlog) looks at every role
@@ -1522,7 +1529,8 @@ class AmplitudeExperiment(BaseExperiment):
             if per_dataset:
                 self._amp_trafos_pp = [
                     resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
-                                       scale_quantile=q, sign_data=all_roles(n))
+                                       scale_quantile=q, sign_data=all_roles(n),
+                                       sign_head=self._sign_head)
                     for n in names]
         elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
             assert len(amp_trafos_pp) == len(names), (
@@ -1584,6 +1592,7 @@ class AmplitudeExperiment(BaseExperiment):
         offshell_masks = self._setup_offshell_masks(names) if _want_offshell else None
         role_offshell = []   # per-event propagator off-shellness (s_prop − M²)
         role_factor = []     # per-event target factor (data.target_propagators; 1 when off)
+        role_sign = []       # per-event sign target (1 for x >= 0), used by training.sign_head
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
@@ -1593,6 +1602,7 @@ class AmplitudeExperiment(BaseExperiment):
             ev_resarg = []
             ev_offshell = []
             ev_factor = []
+            ev_sign = []
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
@@ -1616,6 +1626,7 @@ class AmplitudeExperiment(BaseExperiment):
                 amp_blocks.append(amp_prepd)
                 ev_factor.append(np.asarray(rec.get("amp_factor", np.ones_like(rec["raw_amp"])),
                                             dtype=np.float64).reshape(-1))
+                ev_sign.append((np.asarray(rec["raw_amp"]).reshape(-1) >= 0).astype(np.float32))
                 if _want_resarg:
                     # per-event √s (physical) from the initial pair (parts are /mom_div)
                     q  = parts[:, 0, :] + parts[:, 1, :]                    # (N,4)
@@ -1666,6 +1677,7 @@ class AmplitudeExperiment(BaseExperiment):
             role_pid.append(pid[perm])
             role_order.append(order[perm])
             role_factor.append(np.concatenate(ev_factor, axis=0)[perm])
+            role_sign.append(np.concatenate(ev_sign, axis=0)[perm])
             if _want_resarg:
                 role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
             if _want_offshell:
@@ -1682,6 +1694,17 @@ class AmplitudeExperiment(BaseExperiment):
         self.all_order_labels = np.concatenate(role_order, axis=0).astype(np.float32, copy=False)
         self.all_amp_factor   = (np.concatenate(role_factor, axis=0)
                                  if getattr(self, "_target_factor_on", False) else None)
+        if getattr(self, "_sign_head", False):
+            # second target column: the sign; the per-process flag says where the sign loss
+            # applies (the pools resolved to abslog, i.e. the sign-changing ones)
+            sign = np.concatenate(role_sign, axis=0).astype(np.float32)
+            self.all_amplitudes = np.concatenate([self.all_amplitudes.reshape(-1, 1), sign[:, None]], axis=1)
+            pp_tr = self._amp_trafos_pp or [list(amp_trafos)] * self.n_datasets
+            self._proc_signed = np.array([bool(t and str(t[0]).startswith("abslog")) for t in pp_tr],
+                                         dtype=np.float32)
+            LOGGER.info(f"sign_head ON: {int(self._proc_signed.sum())}/{self.n_datasets} sign-changing pools "
+                        f"carry the sign loss (weight {float(self.cfg.training.get('sign_loss_weight', 1.0))}); "
+                        f"their target is log|x|")
         if _want_resarg:
             # Replace the internal-mass slot (last n_pdg cols) with the PER-EVENT
             # resonance argument (√s − m), standardized to O(1). This hands the model
@@ -1971,12 +1994,20 @@ class AmplitudeExperiment(BaseExperiment):
         # ------------------------------------------------------------------
         proc_preds = {}   # name -> {"train": (pred,truth,sig), "test": ..., "val": ...}
         proc_factor = {}  # name -> {split: (N,1) per-event target factor} (data.target_propagators)
-        def _raw(name, split, arr):
+        proc_sign = {}    # name -> {split: (N,2) [predicted, true] sign > 0} (training.sign_head)
+        def _raw(name, split, arr, which="truth"):
             """Raw-space |M|² from a standardized-log array: undo the transform, then divide
-            the target factor out (data.target_propagators), so metrics see the true |M|²."""
+            the target factor out (data.target_propagators) and, with the sign head, apply the
+            true sign to a truth array and the predicted sign to a prediction."""
             out = undo_preprocess_amplitude(arr, *_amp_stats(name), trafos=_amp_trafo(name))
             F = proc_factor.get(name, {}).get(split)
-            return out / F if F is not None else out
+            if F is not None:
+                out = out / F
+            sg = proc_sign.get(name, {}).get(split)
+            if sg is not None:
+                col = 1 if which == "truth" else 0
+                out = out * np.where(sg[:, col], 1.0, -1.0).reshape(out.shape)
+            return out
 
         loaders_by_split = [
             ("test",  self.proc_test_loaders),
@@ -2000,7 +2031,7 @@ class AmplitudeExperiment(BaseExperiment):
             factors = getattr(self, "all_amp_factor", None)
             for split, loader_dict in loaders_by_split:
                 LOGGER.info(f"### Evaluating {split} (combined pass, split per process) ###")
-                pred, truth, sigmas, pids = collect(combined[split], return_process_ids=True)
+                pred, truth, sigmas, pids, signs = collect(combined[split], return_process_ids=True)
                 # the combined loader iterates its index set in order (shuffle=False,
                 # drop_last=False), so the per-event target factor aligns with the predictions
                 F = factors[self._split_indices[split]] if factors is not None else None
@@ -2016,7 +2047,11 @@ class AmplitudeExperiment(BaseExperiment):
                         pred[m], truth[m], sigmas[m] if sigmas is not None else None)
                     if F is not None:
                         proc_factor.setdefault(name, {})[split] = F[m].reshape(-1, 1)
+                    if signs is not None:
+                        proc_sign.setdefault(name, {})[split] = signs[m]
         else:
+            if getattr(self, "_sign_head", False):
+                raise NotImplementedError("the per-process evaluation loop does not carry the sign head")
             if getattr(self, "all_amp_factor", None) is not None:
                 LOGGER.warning("target_propagators is on but the per-process evaluation loop carries "
                                "no per-event factor: raw-space metrics are on the modified target")
@@ -2056,8 +2091,8 @@ class AmplitudeExperiment(BaseExperiment):
             # The TRANSFORM is per process too (a positive pool under `log`, a signed one
             # under `signedlog:<s>` with its own scale), so the combined raw-space arrays
             # are assembled from per-process inverses rather than undone with one list.
-            raw_truth = np.concatenate([_raw(n, split, proc_preds[n][split][1]) for n in available], axis=0)
-            raw_pred  = np.concatenate([_raw(n, split, proc_preds[n][split][0]) for n in available], axis=0)
+            raw_truth = np.concatenate([_raw(n, split, proc_preds[n][split][1], "truth") for n in available], axis=0)
+            raw_pred  = np.concatenate([_raw(n, split, proc_preds[n][split][0], "pred") for n in available], axis=0)
             return pred, truth, sigmas, pm, ps, (raw_truth, raw_pred)
 
         # ------------------------------------------------------------------
@@ -2088,7 +2123,7 @@ class AmplitudeExperiment(BaseExperiment):
                 self.results_per_proc[name][split] = self._metrics_from_arrays(
                     pred, truth, f"{split}_{name}", name, sigmas,
                     prepd_mean=pm, prepd_std=ps, prepd_trafos=tr,
-                    raw_arrays=(_raw(name, split, truth), _raw(name, split, pred)),
+                    raw_arrays=(_raw(name, split, truth, "truth"), _raw(name, split, pred, "pred")),
                 )[name]
 
         # evaluation.save_predictions: dump the per-event (prediction, truth) pairs on the
@@ -2158,6 +2193,7 @@ class AmplitudeExperiment(BaseExperiment):
         all_truth = []
         all_sigma = [] if self.cfg.training.loss == "HETEROSC" else None
         all_pids  = [] if return_process_ids else None
+        all_signs = []          # (N,2) bool [predicted sign > 0, true sign > 0] with the sign head
 
         t0 = time.time()
         for data in loader:
@@ -2211,6 +2247,10 @@ class AmplitudeExperiment(BaseExperiment):
             if self.cfg.training.loss == "HETEROSC":
                 all_sigma.append(y_pred[..., -out_shape:].cpu().float().numpy())
                 y_pred = y_pred[..., :-out_shape]
+            if getattr(self, "_sign_head", False):
+                all_signs.append(np.stack([(y_pred[..., -1] > 0).cpu().numpy(),
+                                           (y[..., 1] > 0.5).cpu().numpy()], axis=1))
+                y_pred, y = y_pred[..., :-1], y[..., :1]
 
             all_pred.append(y_pred[:, :1].cpu().float().numpy() if not is_lloca
                             else y_pred.cpu().float().numpy())
@@ -2225,7 +2265,8 @@ class AmplitudeExperiment(BaseExperiment):
         amp_truth_prepd = np.concatenate(all_truth, axis=0)
         sigmas = np.concatenate(all_sigma, axis=0) if all_sigma else None
         if return_process_ids:
-            return amp_pred_prepd, amp_truth_prepd, sigmas, np.concatenate(all_pids, axis=0)
+            signs = np.concatenate(all_signs, axis=0) if all_signs else None
+            return amp_pred_prepd, amp_truth_prepd, sigmas, np.concatenate(all_pids, axis=0), signs
         return amp_pred_prepd, amp_truth_prepd, sigmas
 
     def _metrics_from_arrays(self, amp_pred_prepd, amp_truth_prepd, title, result_key,
@@ -2577,6 +2618,11 @@ class AmplitudeExperiment(BaseExperiment):
             y_pred = y_pred[..., :-out_shape]
             # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
             mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
+        # sign head: last output channel is the sign logit, second target column the sign
+        self._last_sign = None
+        if getattr(self, "_sign_head", False):
+            self._last_sign = (y_pred[..., -1:], y[..., 1:])
+            y_pred, y = y_pred[..., :-1], y[..., :1]
         return y_pred, y, process_ids, sigma, mse_val
 
     def _batch_loss_lloca(self, data):
@@ -2584,7 +2630,8 @@ class AmplitudeExperiment(BaseExperiment):
         y_pred, y, process_ids, sigma, mse_val = self._forward_lloca(data)
 
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
-        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma)
+        loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma,
+                                                sign=self._last_sign)
 
         reg         = self.regularization_lambda * self.regularization(self.model)
         # Keep the no-reg loss as a detached tensor instead of syncing here with
@@ -2654,7 +2701,7 @@ class AmplitudeExperiment(BaseExperiment):
         # mean over feature dims → (B,)
         return elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
 
-    def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None):
+    def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None, sign=None):
         """Mean (or geometric mean) over per-process mean losses.
 
         Vectorised replacement for the old
@@ -2691,6 +2738,16 @@ class AmplitudeExperiment(BaseExperiment):
             return torch.stack(per_proc).mean()
 
         per_event = self._per_event_loss(y_pred, y, sigma=sigma)        # (B,)
+        if sign is not None:
+            # training.sign_head: per-event binary cross-entropy on the sign logit, on the
+            # sign-changing pools only (training loss; the validation metric stays the MSE)
+            logit, target = sign
+            bce = torch.nn.functional.binary_cross_entropy_with_logits(
+                logit.reshape(-1), target.reshape(-1), reduction="none")
+            w = float(self.cfg.training.get("sign_loss_weight", 1.0))
+            if not hasattr(self, "_proc_signed_t"):
+                self._proc_signed_t = torch.as_tensor(self._proc_signed, device=per_event.device)
+            per_event = per_event + w * bce * self._proc_signed_t.to(per_event.dtype)[process_ids]
         n_proc = self.n_datasets
         sums   = per_event.new_zeros(n_proc)
         counts = per_event.new_zeros(n_proc)
@@ -3045,6 +3102,7 @@ class AmplitudeExperiment(BaseExperiment):
             sums   = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             counts = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             mse_sums = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
+            sign_ok = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             ema_ctx = self.ema.average_parameters() if self.ema is not None else contextlib.nullcontext()
             with torch.no_grad(), ema_ctx:
                 for data in self.val_loader:
@@ -3052,11 +3110,22 @@ class AmplitudeExperiment(BaseExperiment):
                     per_event = self._per_event_loss(y_pred, y, sigma=sigma).to(torch.float64)
                     sums.index_add_(0, pids, per_event)
                     counts.index_add_(0, pids, torch.ones_like(per_event))
+                    if getattr(self, "_last_sign", None) is not None:
+                        logit, target = self._last_sign
+                        ok = ((logit.reshape(-1) > 0) == (target.reshape(-1) > 0.5)).to(torch.float64)
+                        sign_ok.index_add_(0, pids, ok)
                     if sigma is not None:
                         mse_e = ((y_pred - y) ** 2).flatten(1).mean(dim=1).to(torch.float64)
                         mse_sums.index_add_(0, pids, mse_e)
                 reg_val = float(self.regularization_lambda * self.regularization(self.model))
             sums, counts, mse_sums = sums.cpu().numpy(), counts.cpu().numpy(), mse_sums.cpu().numpy()
+            if getattr(self, "_sign_head", False):
+                acc = sign_ok.cpu().numpy() / np.maximum(counts, 1)
+                signed = np.asarray(self._proc_signed) > 0
+                if signed.any():
+                    LOGGER.info(f"sign_head: sign accuracy on the {int(signed.sum())} signed pools: "
+                                f"median {np.median(acc[signed]):.4f}, min {acc[signed].min():.4f} "
+                                f"({self.cfg.data.dataset[int(np.argmin(np.where(signed, acc, 2)))]})")
             het = self.cfg.training.loss == "HETEROSC"
             for p, name in enumerate(self.cfg.data.dataset):
                 if name not in self.proc_val_loaders or counts[p] == 0:
@@ -3075,6 +3144,8 @@ class AmplitudeExperiment(BaseExperiment):
           # is m_p + tau and under `excess` it is m_p times the process's reference weight,
           # so the recorded validation would follow a training-side knob (the earlier
           # reference-weighted arms recorded exactly that; docs/results.tex, catalog census).
+          if getattr(self, "_sign_head", False):
+              raise NotImplementedError("LLOCA_VAL=loop/check does not carry the sign head")
           def _loop_loss(data):
               if is_lloca:
                   y_pred, y, _, sigma, mse_val = self._forward_lloca(data)

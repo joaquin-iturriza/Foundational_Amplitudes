@@ -145,7 +145,13 @@ training:
                         # its own loss: no veto of a laggard by the converged bulk
                         # (docs/results.tex, gradient competition), no domination by the largest
                         # raw MSE.
- excess_beta: 0.0         # excess: weight each process by (m_p/L_ref)^beta (detached) on top;
+ excess_beta: 0.0
+ # Sign head (sign-changing pools): the target is log|x| ('abslog:<s>') and the net's second
+ # output channel is a sign logit trained per event with a binary cross-entropy on the signed
+ # pools only (weight sign_loss_weight); validation stays the MSE on the log-magnitude target,
+ # with the sign accuracy on the signed pools logged. LLoCa path only.
+ sign_head: false
+ sign_loss_weight: 1.0         # excess: weight each process by (m_p/L_ref)^beta (detached) on top;
                         # 0 = plain normalised mean, >0 = emphasis on the furthest-behind (HP)
  loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
