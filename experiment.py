@@ -2152,8 +2152,12 @@ class AmplitudeExperiment(BaseExperiment):
                 truth = np.concatenate([proc_preds[n][split][1] for n in have], axis=0)
                 raw_truth = np.concatenate([_raw(n, split, proc_preds[n][split][1]) for n in have], axis=0)
                 out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
+                extra = {}
+                if proc_sign:
+                    extra["sign"] = np.concatenate([proc_sign[n][split] for n in have], axis=0)   # (N,2) [pred, true] > 0
                 np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth,
-                                    process_id=pid, names=np.array(names))
+                                    raw_pred=np.concatenate([_raw(n, split, proc_preds[n][split][0], "pred") for n in have], axis=0),
+                                    process_id=pid, names=np.array(names), **extra)
                 LOGGER.info(f"Saved {pred.shape[0]} {split} predictions to {out}")
 
         # Optionally log noema metrics (no extra forward pass — just re-use arrays)
