@@ -1429,38 +1429,54 @@ class AmplitudeExperiment(BaseExperiment):
             tp_pdgs = [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])]
             widths = {int(k): float(v) for k, v in
                       dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
-            tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs)
-            n_ok, red_before, red_after, n_props = 0, [], [], 0
+            # massless t-channel exchanges (data.target_propagator_tchannel): a massless
+            # propagator whose s_k is spacelike on the whole train pool is a t-channel
+            # exchange; |M|² goes like 1/|t| for a fermion and 1/t² for a boson, so the
+            # factor is (|t|/median|t|)^p with p = 1 or 2 (normalised to stay O(1)).
+            tch_on = bool(self.cfg.data.get("target_propagator_tchannel", False))
+            massless = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on else []
+            tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs + massless)
+            n_ok, red_before, red_after, n_props, n_tch = 0, [], [], 0, 0
             straddle = float(self.cfg.data.get("target_propagator_straddle", 0.005))
             n_cand = 0
             for proc_idx, name in enumerate(names):
                 sel = tp_masks[proc_idx] if tp_masks else None
-                cand = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst if mm > 0]
+                cand = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst]
                 n_cand += len(cand)
-                # keep a propagator only if its pole is reached inside the pool: the train
-                # pool's s_k must straddle M² (a fraction of events on each side above
-                # `straddle`). A t-channel exchange (s_k < 0) or a sub-system pole out of
-                # kinematic reach never straddles, and its factor would only add range.
-                props = []
+                # keep a massive propagator only if its pole is reached inside the pool: the
+                # train pool's s_k must straddle M² (a fraction of events on each side above
+                # `straddle`); a sub-system pole out of kinematic reach never straddles, and its
+                # factor would only add range. A massless one counts only as a t-channel
+                # exchange (s_k <= 0 on the whole pool); an s-channel massless propagator has
+                # no reachable pole.
+                props = []      # (pdg, mask, M², power, norm): massive -> BW, massless -> |t|^p
                 if cand and ("train", name) in store:
                     pp = store[("train", name)]["momenta"].astype(np.float64)
                     for pdg, mrow, mm in cand:
                         q = np.einsum("s,nsc->nc", mrow, pp) * mom_div
                         s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                        above = float(np.mean(s_prop > mm))
-                        if straddle < above < 1.0 - straddle:
-                            props.append((pdg, mrow, mm))
+                        if mm > 0:
+                            above = float(np.mean(s_prop > mm))
+                            if straddle < above < 1.0 - straddle:
+                                props.append((pdg, mrow, mm, 2.0, None))
+                        elif tch_on and np.all(s_prop <= 1e-6 * np.abs(s_prop).max()):
+                            power = 1.0 if abs(int(pdg)) < 17 else 2.0
+                            props.append((pdg, mrow, 0.0, power, float(np.median(np.abs(s_prop)) or 1.0)))
+                            n_tch += 1
                 for role in roles:
                     if (role, name) not in store:
                         continue
                     rec = store[(role, name)]
                     pp = rec["momenta"].astype(np.float64)                      # (N,P,4), /mom_div
                     logF = np.zeros(pp.shape[0], dtype=np.float64)
-                    for pdg, mrow, mm in props:
-                        g = widths.get(abs(int(pdg)), 0.0)
+                    for pdg, mrow, mm, power, norm in props:
                         q = np.einsum("s,nsc->nc", mrow, pp) * mom_div         # (N,4) physical
                         s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                        logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
+                        if mm > 0:
+                            g = widths.get(abs(int(pdg)), 0.0)
+                            logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
+                        else:
+                            logF += power * np.log(np.maximum(np.abs(s_prop), 1e-12) / norm)
                     F = np.exp(logF).reshape(rec["raw_amp"].shape)
                     if role == "train" and props:
                         pos = rec["raw_amp"] > 0
@@ -1473,8 +1489,8 @@ class AmplitudeExperiment(BaseExperiment):
                 if props:
                     n_ok += 1; n_props += len(props)
             LOGGER.info(f"target_propagators ON: {n_ok}/{len(names)} processes carry a factor "
-                        f"({n_props} of {n_cand} propagators reach their pole in the pool, pdgs {tp_pdgs}, "
-                        f"widths {widths}); median range of "
+                        f"({n_props} of {n_cand} propagators reach their pole in the pool, of which "
+                        f"{n_tch} massless t-channel; pdgs {tp_pdgs}, widths {widths}); median range of "
                         f"ln|M|² on the train pools {np.median(red_before) if red_before else float('nan'):.2f} "
                         f"-> {np.median(red_after) if red_after else float('nan'):.2f}")
         # The amp_trafos list (e.g. signedlog) is always resolved globally so the
