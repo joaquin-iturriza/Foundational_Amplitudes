@@ -2837,20 +2837,15 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     spread of final losses in every arm (Fig.~\ref{fig:loss_vs_range}); a fix at the level
     of the target's scale is the lead to try before more aggregation work. (b) The $W$ arm is
     read (the paragraph above); the sweep configs still carry \code{[23,6,25]}, and the
-    run-to-run spread at $1000$ steps, needed to call its $13\%$ a cost, is unmeasured. (c) The reference-weighted arm was
-    trained with references measured without the input. Two open questions remain once the
-    rest is fixed: why the $2\to4$ class gains most from the reference weighting, and what
-    sets the dependence of the final loss on the span of the target. To iterate on them at a
-    working point instead of at the wave's, two DyHPO sweeps run at $500$ steps on the $5$k
-    pools (\code{sweeps/catalog\_q\_mean}, \code{sweeps/catalog\_q\_excess}; $12$ trials each,
-    three waves; lr, $\lambda$, warm-up, $\eta_{\min}$, EMA, and for the weighted arm
-    \code{excess\_beta}$\in[0,2]$). They differ only in the training aggregation; the
-    objective, checkpoint selection and the comparison are the validation geometric mean in
-    both. The references are the solo runs at this working point
-    (\code{runs/ref\_solo\_*\_t500\_5k}: $4.95\times10^{-3}$, $1.11\times10^{-2}$,
-    $9.31\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$; the $2\to3$ above the $2\to4$ at this
-    horizon is one seed at a fixed solo lr, so the ratios carry that noise). Then move to a
-    reference per (multiplicity, resonant) class. (d) The arithmetic mean diverged once on the
+    run-to-run spread at $1000$ steps, needed to call its $13\%$ a cost, is unmeasured. (c) The reference weighting is
+    settled at this working point (it loses to the arithmetic mean once its validation is
+    recorded correctly; the quick-working-point paragraph); what is still owed is the
+    geometric mean swept at the same working point, and a seed spread for any comparison
+    finer than tens of percent. What sets the dependence of the final loss on the span of
+    the target remains the open question, with the fix at the target's scale as the lead.
+    Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
+    $ee\to\nu\bar\nu\nu\bar\nu$) have numerically unstable outputs early in training
+    (Sec.~\ref{sec:throughput}); worth a look as a struggler pattern. (d) The arithmetic mean diverged once on the
     small pools (non-finite gradient); one seed, undiagnosed. (e) The wave needs the
     sidecars present and the reference re-measured at its horizon.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
@@ -3078,29 +3073,39 @@ solo runs of two minutes each), the weights $1/L_{\rm ref}$ normalised to mean o
 (\code{training.loss\_aggregation: excess}, \code{excess\_reference}; unnormalised, the loss
 sits $250\times$ higher, the gradient is clipped on every step, median pre-clip norm $131$
 against $0.65$, and the outputs blow up in the first fifty steps). The gradient weight of a
-process is then set by its multiplicity, $2.4:0.39:0.22$, not by its own loss, so there is
+process is then set by its multiplicity, $2.9:0.48:0.27$, not by its own loss, so there is
 neither the geometric mean's veto nor the arithmetic mean's domination by the largest raw
-MSE. It gives the best census of any arm, $163$ failing against $224$ and $295$, median
-$0.031$, but not the way it was meant to: the $2\to4$ class, whose weight fell from $1$ to
-$0.22$, improves from $112$ failing to $43$, while the $2\to2$ class, whose weight rose to
-$2.4$, goes from $29$ failing to $41$ and the $s$-channel needles from $0.14$ to $0.42$. A
-class does worse when it holds more of the gradient. The first reading of this, that a
-class's gradient share acts as a class-wise learning rate and the rate was too high (the
-short arms run at the big run's best for $8601$ steps, $9.7\times10^{-3}$, above the horizon
-law's $\sim6\times10^{-3}$ at $1000$ steps, Sec.~\ref{sec:scaling}), was tested and is
-wrong: the three aggregations rerun at $5.8\times10^{-3}$ are all worse at this horizon
-($287$, $250$ and $224$ failing against $295$, $224$ and $163$; the $2\to2$ class worse in
-every arm, $51$, $35$ and $50$ failing), and the reference weighting's pattern is the same
-at both rates, $2\to4$ gaining most ($73$ against $121$ failing at the lower rate) and
-$2\to2$ losing. The pattern is a property of the weighting, not of the rate: cutting the
-$2\to4$ share to a fifth reduces the interference among $185$ high-dimensional functions
-competing for the same parameters more than it costs them in gradient, and concentrating
-the gradient on the $2\to2$ functions does not buy them anything at $1000$ steps. The
-aggregation and the learning rate still have to be swept together, since their optimum is
-joint, but the short arms' rate stands. The second arm doubles the width
-at the same hyperparameters (sixteen heads, $\mu$P, arithmetic mean): $219$ failing against
-$224$, every class within noise, at twice the step time. The short runs are not
-capacity-limited.
+MSE.
+
+\textbf{A bookkeeping error, and its correction.} Until commit \code{5a6a7b7} the
+multi-process validation scored each process by running its batches through
+\code{\_batch\_loss}, i.e.\ through the \emph{training} aggregation. For the mean and the
+geometric mean of a single-process batch that is the process's mean loss; under the
+reference weighting it is $m_p w_p$, the loss times the process's gradient weight, and the
+combined value is $\mathrm{GM}_p(m_p w_p)=\mathrm{GM}(m)\,\mathrm{GM}(w)$ with
+$\mathrm{GM}(w)=0.60$ at these weights. Every per-process number, census count, curve and
+figure of the reference-weighted arms recorded before that commit carried the weight:
+$2\to2$ losses $2.9\times$ too high, $2\to4$ losses $3.7\times$ too low. The weights are
+known exactly from each run's references and multiplicities, so
+\code{analysis/catalog\_v2/unweight\_excess.py} divides them back out of the logs
+(\code{runs/\_unweighted/}); every reference-weighted number in this section is the corrected
+one, and the earlier reading of these arms, that the weighting gave the best census through
+a $2\to4$ gain at a $2\to2$ cost, was the weight and nothing else. The validation loop now
+takes the plain per-event mean, and the single-pass validation
+(Sec.~\ref{sec:throughput}) never went through the aggregator.
+
+Corrected, the weighting does what its weights say. It puts $2.9\times$ the gradient on the
+$2\to2$ class and a quarter on the $2\to4$ class, and the census follows: the $2\to2$
+class improves from $29$ failing to $28$ ($5$ to $4$ with the off-shellness input) while the
+$2\to4$ class goes from $112$ failing to $141$ ($94$ to $137$ with the input), the $2\to3$
+class from $83$ to $126$, and the overall census is the worst of the three
+aggregations, $295$ failing against $224$ and $295$, median $0.076$. Cutting a class's
+gradient share starves it; concentrating the gradient on the $2\to2$ functions, already the
+best-learned, buys them nothing. The rerun at $5.8\times10^{-3}$ says the same ($339$
+failing against $250$ and $287$), so it is the weighting, not the rate. The second arm
+doubles the width at the same hyperparameters (sixteen heads, $\mu$P, arithmetic mean):
+$219$ failing against $224$, every class within noise, at twice the step time. The short
+runs are not capacity-limited.
 
 \begin{table}[H]
 \centering
@@ -3190,10 +3195,11 @@ superseded: the needle was a missing input. What the input does not touch is as 
 the starved processes under the geometric mean ($u\bar u\to t\bar t$ at one loop still at
 $0.92$), the signed one-loop class ($50$ of $50$ under the geometric mean, about $40$ under
 the others) and most of the $2\to3$ and $2\to4$ sharp structure; those remain the
-aggregation and horizon questions. The reference weighting stays the best overall census
-with the input ($131$ failing) and keeps its $2\to4$ gain ($26$ failing against $94$); its
-cost on the resonant $2\to2$ pools is smaller but present, and it is the one arm where the
-$M_Z$ family stays mostly failing, so the weighting and the resonance input interact.
+aggregation and horizon questions. The reference weighting with the input (corrected)
+is at $253$ failing against the arithmetic mean's $170$: its $2\to2$ class is the best of
+any arm ($4$ failing) and the $s$-channel and $M_Z$ families pass as under the mean, but the
+$2\to3$ and $2\to4$ classes, at a quarter of the gradient, are worse than under either
+other aggregation.
 
 \paragraph{The $W$ in the propagator list.} The $W$ (PDG $24$) was not in
 \code{internal\_mass\_pdgs}, so the $W$-channel processes had no pole coordinate. The
@@ -3209,22 +3215,19 @@ the run-to-run spread at this horizon is not measured, so the $13\%$ is not esta
 a cost, while the factor of five on the resonant $W$ processes is well outside it. The
 coordinate belongs in the list for the same reason the $Z$'s does.
 
-\paragraph{Distance from the reference instead of a threshold.} The per-process curves of
-the reference-weighted arm look unlike the other two: every process comes down at about the
-same rate and settles over a wide band, where the geometric and arithmetic arms have
-processes that learn and processes that never move. A pass/fail line at $0.05$ does not see
-that, so the better reading is each process's distance from what its multiplicity reaches
-alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
+\paragraph{Distance from the reference instead of a threshold.} A pass/fail line at
+$0.05$ hides how far a process is from what it can do, so the better reading is each
+process's distance from what its multiplicity reaches alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
 Fig.~\ref{fig:excess_ratio}). With the references measured with the input ($9.9\times10^{-4}$,
 $4.4\times10^{-3}$, $5.4\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$ alone at $\mathrm{bs}/P$
 for $1000$ steps), almost no process in company reaches what it reaches alone at the same
 compute: $1\%$ are below their reference under the arithmetic and reference-weighted arms,
 $13\%$ under the geometric one (its converged $2\to2$ tail, the one place where company
-beats solo), and the medians are $13$, $8.8$ and $7.3$. By class the trade the aggregations
-make is explicit: $2\to4$ at $15$, $9.5$ and $5.6$ times its reference, tree $2\to2$ at
-$0.75$, $3.8$ and $9.1$, resonant $2\to2$ at $24$, $17$ and $59$. Two patterns among the
+beats solo), and the medians are $13$, $8.8$ and $15$. By class the trade the aggregations
+make is explicit: $2\to4$ at $15$, $9.4$ and $20$ times its reference, tree $2\to2$ at
+$0.76$, $3.8$ and $3.1$, resonant $2\to2$ at $24$, $17$ and $20$. Two patterns among the
 processes furthest from their
-reference, common to all three arms: the $W$-channel $2\to2$ processes ($u\bar d\to e\nu$,
+reference under the geometric and arithmetic means: the $W$-channel $2\to2$ processes ($u\bar d\to e\nu$,
 $u\bar d\to W\gamma$, $u\bar d\to Wg$ and their one-loop versions) at $30$--$90$ times,
 because the $W$ (PDG $24$) is not in the propagator list the masks are built for, so these
 have no coordinate for their pole; and the $M_Z$-scan variants alone among the scans, at
@@ -3232,8 +3235,10 @@ $12$--$40$ times against $0.7$--$3$ for the $\alpha_s$ and $m_t$ scans, with the
 verified to place the pole at the scanned mass and the pools verified to cover it ($13$--$16\%$
 of events within $5$\,GeV of their own pole), so what remains is that a shifted pool is a
 twin of its nominal pool with the same momenta and a different pole, told apart by the
-coordinate and the internal-mass scalar, and the arm that pushes the $2\to2$ hardest is the
-worst on them. The $W$ is being added to the propagator list. One caveat on the
+coordinate and the internal-mass scalar. The $W$ is being added to the propagator list.
+Under the reference weighting the furthest processes are instead the signed one-loop and
+the $2\to3$ pools ($u\bar u\to b\bar bH$ at $117$, $ee\to e\nu W$ at $84$), the classes it
+starves. One caveat on the
 reference itself: the three solo processes chosen for it ($ee\to u\bar u$, $u\bar ug$,
 $u\bar ugg$) all carry the $Z$ pole, and their solo loss fell by $1.7$--$3.4\times$ once the
 input existed, where a non-resonant process of the same multiplicity would have moved
@@ -3250,8 +3255,8 @@ at the level of the target's scale, rather than of the aggregation, is the open 
 \includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/excess_ratio.pdf}
 \caption{catalog\_v2 at $1000$ steps with the off-shellness input: each process's loss
 divided by the solo loss of its multiplicity at the same compute, against the range of
-$\ln|\mathcal M|^2$ in its train pool, for the three aggregations; the dashed line is the
-reference.}
+$\ln|\mathcal M|^2$ in its train pool, for the three aggregations (reference-weighted arm
+corrected); the dashed line is the reference.}
 \label{fig:excess_ratio}
 \end{figure}
 
@@ -3259,7 +3264,7 @@ reference.}
 train pools cut to $5000$ events per process, so that $1000$ steps are seven passes over
 the pool instead of a third of one: the geometric mean ends where it ends with the full
 pools ($245$ failing against $245$, median $0.057$ against $0.053$), the reference
-weighting slightly better ($117$ against $131$), and in both the train and validation
+weighting better ($193$ against $253$, corrected), and in both the train and validation
 losses are equal per process (ratio $1.0$ at the median, $1.1$ at the $90$th percentile),
 so nothing has been fitted to the point of overfitting: at this compute the per-step
 optimisation sets every number and the data is not reached, and $5000$ events are still far
@@ -3268,23 +3273,45 @@ gradient early, pre-clip norms to $10^{11}$, every process at loss $1$), where t
 geometric arm on the same data ran normally; one seed, recorded as the arithmetic mean's
 exposure to a single extreme standardized target, not diagnosed further.
 
+\paragraph{The quick working point: the two aggregations swept.} To iterate faster the
+working point moved to $500$ steps on the $5$k-event pools with the input on, and the
+evaluation overhead was removed (Sec.~\ref{sec:throughput}; a trial is $8$ minutes of wall
+time). Two DyHPO sweeps of $12$ trials in three waves, identical except for the training
+aggregation (\code{sweeps/catalog\_q\_mean}, \code{sweeps/catalog\_q\_excess}), over lr in
+$[1.4\times10^{-3},1.2\times10^{-2}]$, $\lambda$, warm-up, $\eta_{\min}$, EMA, and for the
+weighted arm $\beta\in[0,2]$; the objective, checkpoint selection and this comparison are the
+validation geometric mean in both. The references for the weighted arm are the best trials
+of one small DyHPO per solo process at $\mathrm{bs}/P=34$ and $500$ steps
+(\code{sweeps/ref\_q\_*}; lr over two decades, $\lambda$, warm-up): $4.3\times10^{-3}$,
+$1.1\times10^{-2}$, $1.1\times10^{-2}$ for $2\to2$, $2\to3$, $2\to4$, within $15\%$ of the
+fixed-lr solos, on a broad lr plateau. The arithmetic mean's best trial reaches $0.054$
+(lr $9.7\times10^{-3}$, $\lambda=3.8\times10^{-8}$, warm-up $0.17$, no EMA; the five best
+trials all at lr $8$--$11\times10^{-3}$), the weighted arm's $0.068$ (lr $1.1\times10^{-2}$,
+$\beta=0.05$); every weighted trial with $\beta>1$ is at $0.17$ or worse. With the
+validation recorded correctly the weighting loses to the arithmetic mean at this working
+point too, and the emphasis $\beta$ only makes it worse. Two open items from these
+sweeps: the geometric mean has not been swept at this working point (the canonical
+default still has to be beaten here, not only at $1000$ steps), and no seed spread is
+measured, so differences of a few percent between trials are not resolved.
+
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps at $9.7\times10^{-3}$ on the shaped measure, one seed:
 the three aggregations without and with the off-shellness input (diagram sidecars present,
-masks built for every process). Failing count (loss $>0.05$) and median by class.}
+masks built for every process). Failing count (loss $>0.05$) and median by class; the
+reference-weighted columns are the corrected values.}
 \label{tab:catv2_offshell}
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 class & geo. & geo.+off & arith. & arith.+off & excess & excess+off \\
 \midrule
-all $478$ & $295$ / $0.095$ & $245$ / $0.053$ & $224$ / $0.045$ & $170$ / $0.030$ & $163$ / $0.031$ & $131$ / $0.028$ \\
-$2\to2$ ($117$) & $51$ & $26$ & $29$ & $5$ & $41$ & $27$ \\
-$2\to3$ ($176$) & $114$ & $98$ & $83$ & $71$ & $79$ & $78$ \\
-$2\to4$ ($185$) & $130$ & $121$ & $112$ & $94$ & $43$ & $26$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $0$ / $0.012$ & $6$ / $0.14$ & $0$ / $0.006$ & $7$ / $0.42$ & $1$ / $0.020$ \\
-$M_Z$ family ($20$) & $18$ / $0.24$ & $5$ / $0.032$ & $16$ / $0.15$ & $3$ / $0.020$ & $18$ / $0.42$ & $16$ / $0.067$ \\
-signed one-loop ($50$) & $50$ & $50$ & $38$ & $39$ & $41$ & $41$ \\
+all $478$ & $295$ / $0.095$ & $245$ / $0.053$ & $224$ / $0.045$ & $170$ / $0.030$ & $295$ / $0.076$ & $253$ / $0.058$ \\
+$2\to2$ ($117$) & $51$ & $26$ & $29$ & $5$ & $28$ & $4$ \\
+$2\to3$ ($176$) & $114$ & $98$ & $83$ & $71$ & $126$ & $112$ \\
+$2\to4$ ($185$) & $130$ & $121$ & $112$ & $94$ & $141$ & $137$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $0$ / $0.012$ & $6$ / $0.14$ & $0$ / $0.006$ & $6$ / $0.14$ & $0$ / $0.007$ \\
+$M_Z$ family ($20$) & $18$ / $0.24$ & $5$ / $0.032$ & $16$ / $0.15$ & $3$ / $0.020$ & $16$ / $0.14$ & $3$ / $0.023$ \\
+signed one-loop ($50$) & $50$ & $50$ & $38$ & $39$ & $42$ & $42$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3293,21 +3320,21 @@ signed one-loop ($50$) & $50$ & $50$ & $38$ & $39$ & $41$ & $41$ \\
 \centering
 \caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:
 failing count (loss $>0.05$) and median by class under the geometric mean, the arithmetic
-mean, the reference-weighted (excess) aggregation, and the arithmetic mean at twice the
-width.}
+mean, the reference-weighted (excess) aggregation (corrected, see the text), and the arithmetic
+mean at twice the width.}
 \label{tab:catv2_excess}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
 \midrule
-all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $163$ / $0.031$ & $219$ / $0.044$ \\
-$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $41$ / $0.010$ & $31$ / $0.0097$ \\
-$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $79$ / $0.040$ & $82$ / $0.043$ \\
-$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $43$ / $0.030$ & $106$ / $0.059$ \\
-signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $41$ / $0.090$ & $40$ / $0.11$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $7$ / $0.42$ & $6$ / $0.12$ \\
+all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $295$ / $0.076$ & $219$ / $0.044$ \\
+$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $28$ / $0.0034$ & $31$ / $0.0097$ \\
+$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $126$ / $0.085$ & $82$ / $0.043$ \\
+$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $141$ / $0.11$ & $106$ / $0.059$ \\
+signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $42$ / $0.19$ & $40$ / $0.11$ \\
+$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $6$ / $0.14$ & $6$ / $0.12$ \\
 flavour twins ($9$) & $3$ & $0$ & $0$ & $0$ \\
-below $10^{-3}$ & $41$ & $0$ & $0$ & $1$ \\
+below $10^{-3}$ & $41$ & $0$ & $9$ & $1$ \\
 \bottomrule
 \end{tabular}
 \end{table}
