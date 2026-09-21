@@ -2837,8 +2837,11 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     spread of final losses in every arm (Fig.~\ref{fig:loss_vs_range}); a fix at the level
     of the target's scale is the lead to try before more aggregation work. (b) The $W$ (PDG
     $24$) is absent from \code{internal\_mass\_pdgs}, so $W$-channel processes have no pole
-    coordinate; an arithmetic arm with the $W$ added ran (\code{runs/catalog\_short\_offshW\_mean},
-    read it against \code{catalog\_short\_offsh\_mean}). (c) The reference-weighted arm was
+    coordinate. A first arm meant to add it ran with the $Z$ alone (the comma list was
+    truncated by \code{sbatch --export}; \code{runs/catalog\_short\_offshW\_mean} is that,
+    slightly worse everywhere, $201$ failing against $170$); the corrected arm is
+    \code{runs/catalog\_short\_offshW2\_mean}, to be read against
+    \code{catalog\_short\_offsh\_mean} with the masks line showing \code{[23, 6, 25, 24]}. (c) The reference-weighted arm was
     trained with references measured without the input; rerun with the corrected ones
     ($9.9\times10^{-4}$, $4.4\times10^{-3}$, $5.4\times10^{-3}$), and move to a reference
     per (multiplicity, resonant) class. (d) The arithmetic mean diverged once on the
