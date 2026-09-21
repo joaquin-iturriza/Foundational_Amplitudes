@@ -72,6 +72,7 @@ fixed_params:
   training.validate_frac: '0.1'
   training.dtype: float32
   plot: 'true'
+  plotting.per_process_pages: 8       # per-process histogram pages (478 pages cost ~2 min a trial)
   use_mlflow: 'false'
 range_extension:
   enabled: false

@@ -64,7 +64,7 @@ fixed_params:
   evaluation.train_subsample: 2000
   training.loss_aggregation: excess
   training.loss_aggregation_tau: 0.0
-  training.excess_reference: '{4:4.95e-3,5:1.11e-2,6:9.31e-3}'   # solo loss per particle count at this working point (ref_solo_*_t500_5k)
+  training.excess_reference: '{4:4.29e-3,5:1.14e-2,6:1.06e-2}'   # solo loss per particle count at this working point (best trials of sweeps/ref_q_*)
   training.val_aggregation: geometric_mean   # the metric never follows the training-side knobs
   training.regularization: L2
   training.scheduler: CosineAnnealingLR
@@ -73,6 +73,7 @@ fixed_params:
   training.validate_frac: '0.1'
   training.dtype: float32
   plot: 'true'
+  plotting.per_process_pages: 8       # per-process histogram pages (478 pages cost ~2 min a trial)
   use_mlflow: 'false'
 range_extension:
   enabled: false

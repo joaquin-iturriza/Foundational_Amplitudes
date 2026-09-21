@@ -2954,10 +2954,13 @@ class AmplitudeExperiment(BaseExperiment):
                 proc_mse_vals[name]      = float(np.mean(mse_vals))      if mse_vals      else None
         if val_mode == "check":
             # same model, both paths: report the largest per-process deviation, keep the combined
-            dev = max(abs(_combined[1][n] - proc_losses_no_reg[n]) / max(abs(proc_losses_no_reg[n]), 1e-30)
-                      for n in proc_losses_no_reg if n in _combined[1])
-            LOGGER.info(f"LLOCA_VAL=check: max per-process |combined - loop| / loop = {dev:.3e} "
-                        f"over {len(proc_losses_no_reg)} processes")
+            devs = sorted(((abs(_combined[1][n] - proc_losses_no_reg[n]) / max(abs(proc_losses_no_reg[n]), 1e-30), n)
+                           for n in proc_losses_no_reg if n in _combined[1]), reverse=True)
+            LOGGER.info(f"LLOCA_VAL=check: max per-process |combined - loop| / loop = {devs[0][0]:.3e} "
+                        f"over {len(devs)} processes; largest: "
+                        + ", ".join(f"{n}={d:.2e} (combined {_combined[1][n]:.4e}, loop {proc_losses_no_reg[n]:.4e}, "
+                                    f"n_val={int(counts[list(self.cfg.data.dataset).index(n)])})"
+                                    for d, n in devs[:5]))
             proc_losses, proc_losses_no_reg, proc_mse_vals = _combined
 
         if torch.cuda.is_available():
