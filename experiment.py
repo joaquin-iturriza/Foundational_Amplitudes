@@ -1465,7 +1465,13 @@ class AmplitudeExperiment(BaseExperiment):
                             # peak); the other spacelike internal lines of a multi-leg process
                             # are not poles the target reaches, and their factors only add range
                             power = 1.0 if abs(int(pdg)) < 17 else 2.0
-                            props.append((pdg, mrow, 0.0, power, float(np.median(np.abs(s_prop)) or 1.0)))
+                            # norm = (median |t|, floor): |t| is floored at the pool's 1e-3
+                            # quantile so the forward edge cannot put an outlier of tens of
+                            # units into the standardized target (one seed in three diverged
+                            # with a 1e-12 floor)
+                            at = np.abs(s_prop)
+                            props.append((pdg, mrow, 0.0, power,
+                                          (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12)))
                             n_tch += 1
                 for role in roles:
                     if (role, name) not in store:
@@ -1480,7 +1486,8 @@ class AmplitudeExperiment(BaseExperiment):
                             g = widths.get(abs(int(pdg)), 0.0)
                             logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
                         else:
-                            logF += power * np.log(np.maximum(np.abs(s_prop), 1e-12) / norm)
+                            med, floor = norm
+                            logF += power * np.log(np.maximum(np.abs(s_prop), floor) / med)
                     F = np.exp(logF).reshape(rec["raw_amp"].shape)
                     if role == "train" and props:
                         pos = rec["raw_amp"] > 0
