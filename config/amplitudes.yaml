@@ -116,6 +116,14 @@ data:
  # internal_mass_scalars=true, offshell_per_event=true, internal_mass_pdgs=[23,6,25].
  # Off by default (opt-in) since it needs the recipe path + diagram sidecars.
  offshell_per_event: false
+ # Target-side propagator subtraction: every event's |M|² is multiplied by
+ # Π_k ((s_k − M²)² + M²Γ²)/M⁴ over the process's propagators carrying target_propagator_pdgs
+ # (Breit–Wigner denominators; the scanned mass where a scan sets it), so the log target is the
+ # smooth remainder; undone exactly at evaluation (raw metrics on the true |M|²). Needs the
+ # diagram sidecars like offshell_per_event. Widths: the MadGraph sm model defaults.
+ target_propagators: false
+ target_propagator_pdgs: [23, 24, 6, 25]
+ target_propagator_widths: {23: 2.4414, 24: 2.0476, 6: 1.5083, 25: 0.006382}
  # Coupling-order vector per dataset: [L_QCD, L_EW, alpha_s_max, alpha_ew_max] of the
  # stored target (mg5_pipeline_final.order_vector). null => derived from the catalog
  # entry of each dataset (recipe path), or from the dataset name (files path).

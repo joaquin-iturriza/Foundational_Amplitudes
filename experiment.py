@@ -778,7 +778,7 @@ class AmplitudeExperiment(BaseExperiment):
                 return p
         return None
 
-    def _setup_offshell_masks(self, names):
+    def _setup_offshell_masks(self, names, pdgs=None):
         """Per-process propagator masks for the DIRECT off-shellness feature.
 
         Returns a list aligned with ``names``; each entry is
@@ -791,7 +791,7 @@ class AmplitudeExperiment(BaseExperiment):
         the main transformer directly, which is where the signal survives."""
         from diagram_graphs import build_process_diagrams, build_process_virtuality
         from particle_ids import build_property_matrix
-        pdgs = [int(p) for p in (self._internal_mass_pdgs or [])]
+        pdgs = [int(p) for p in (self._internal_mass_pdgs if pdgs is None else pdgs) or []]
         if not pdgs:
             return None
         diagrams_dir = self.cfg.model.get("diagrams_dir", "data/diagrams")
@@ -1413,6 +1413,51 @@ class AmplitudeExperiment(BaseExperiment):
             store[k]["momenta"] = store[k]["momenta"] / mom_div
 
         # --- amplitude preprocessing: stats fitted on TRAIN, applied to all ---
+        # --- target-side propagator subtraction (data.target_propagators): every event's
+        #     |M|² is multiplied by Π_k ((s_k − M_k²)² + M_k²Γ_k²)/M_k⁴ over the process's
+        #     propagators carrying data.target_propagator_pdgs (massive; Breit–Wigner
+        #     denominators, the scanned mass where a scan sets it), so the log target is the
+        #     smooth remainder and the pole is no longer the network's to resolve. The
+        #     per-event factor is kept (self.all_amp_factor) and divided out of the raw
+        #     predictions at evaluation, so raw-space metrics and plots are on the true
+        #     |M|². The transform resolution, the signed-log scale and the standardization
+        #     all see the modified target. Same masks as the off-shellness input. ---
+        self._target_factor_on = bool(self.cfg.data.get("target_propagators", False))
+        if self._target_factor_on:
+            tp_pdgs = [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])]
+            widths = {int(k): float(v) for k, v in
+                      dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
+            tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs)
+            n_ok, red_before, red_after, n_props = 0, [], [], 0
+            for proc_idx, name in enumerate(names):
+                sel = tp_masks[proc_idx] if tp_masks else None
+                props = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst if mm > 0]
+                for role in roles:
+                    if (role, name) not in store:
+                        continue
+                    rec = store[(role, name)]
+                    pp = rec["momenta"].astype(np.float64)                      # (N,P,4), /mom_div
+                    logF = np.zeros(pp.shape[0], dtype=np.float64)
+                    for pdg, mrow, mm in props:
+                        g = widths.get(abs(int(pdg)), 0.0)
+                        q = np.einsum("s,nsc->nc", mrow, pp) * mom_div         # (N,4) physical
+                        s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                        logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
+                    F = np.exp(logF).reshape(rec["raw_amp"].shape)
+                    if role == "train" and props:
+                        pos = rec["raw_amp"] > 0
+                        if pos.sum() > 10:
+                            la = np.log(rec["raw_amp"][pos])
+                            red_before.append(float(np.ptp(la)))
+                            red_after.append(float(np.ptp(la + logF.reshape(rec["raw_amp"].shape)[pos])))
+                    rec["amp_factor"] = F
+                    rec["raw_amp"] = rec["raw_amp"] * F
+                if props:
+                    n_ok += 1; n_props += len(props)
+            LOGGER.info(f"target_propagators ON: {n_ok}/{len(names)} processes carry a factor "
+                        f"({n_props} propagators, pdgs {tp_pdgs}, widths {widths}); median range of "
+                        f"ln|M|² on the train pools {np.median(red_before) if red_before else float('nan'):.2f} "
+                        f"-> {np.median(red_after) if red_after else float('nan'):.2f}")
         # The amp_trafos list (e.g. signedlog) is always resolved globally so the
         # same transform is used for every process; only the standardization
         # mean/std differ between the global and per-dataset scopes.
@@ -1503,6 +1548,7 @@ class AmplitudeExperiment(BaseExperiment):
                         and bool(self._internal_mass_pdgs) and not _want_offshell)
         offshell_masks = self._setup_offshell_masks(names) if _want_offshell else None
         role_offshell = []   # per-event propagator off-shellness (s_prop − M²)
+        role_factor = []     # per-event target factor (data.target_propagators; 1 when off)
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
@@ -1511,6 +1557,7 @@ class AmplitudeExperiment(BaseExperiment):
             ev_starts, ev_pid, ev_order, amp_blocks = [], [], [], []
             ev_resarg = []
             ev_offshell = []
+            ev_factor = []
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
@@ -1532,6 +1579,8 @@ class AmplitudeExperiment(BaseExperiment):
                 ev_order.append(np.tile(
                     self._order_row(proc_idx, amp_orders), (N, 1)))
                 amp_blocks.append(amp_prepd)
+                ev_factor.append(np.asarray(rec.get("amp_factor", np.ones_like(rec["raw_amp"])),
+                                            dtype=np.float64).reshape(-1))
                 if _want_resarg:
                     # per-event √s (physical) from the initial pair (parts are /mom_div)
                     q  = parts[:, 0, :] + parts[:, 1, :]                    # (N,4)
@@ -1581,6 +1630,7 @@ class AmplitudeExperiment(BaseExperiment):
             role_amp.append(amp[perm])
             role_pid.append(pid[perm])
             role_order.append(order[perm])
+            role_factor.append(np.concatenate(ev_factor, axis=0)[perm])
             if _want_resarg:
                 role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
             if _want_offshell:
@@ -1595,6 +1645,8 @@ class AmplitudeExperiment(BaseExperiment):
         self.all_amplitudes   = np.concatenate(role_amp, axis=0).astype(np.float32, copy=False)
         self.all_process_ids  = np.concatenate(role_pid, axis=0).astype(np.int64, copy=False)
         self.all_order_labels = np.concatenate(role_order, axis=0).astype(np.float32, copy=False)
+        self.all_amp_factor   = (np.concatenate(role_factor, axis=0)
+                                 if getattr(self, "_target_factor_on", False) else None)
         if _want_resarg:
             # Replace the internal-mass slot (last n_pdg cols) with the PER-EVENT
             # resonance argument (√s − m), standardized to O(1). This hands the model
@@ -1642,6 +1694,7 @@ class AmplitudeExperiment(BaseExperiment):
                     "amp_trafos_pp": ([list(t) for t in self._amp_trafos_pp]
                                       if self._amp_trafos_pp else None),
                     "preprocess_per_dataset": per_dataset,
+                    "target_propagators": bool(getattr(self, "_target_factor_on", False)),
                     "prepd_mean": [float(x) for x in self.prepd_mean],
                     "prepd_std":  [float(x) for x in self.prepd_std],
                 }, f, indent=2)
@@ -1780,6 +1833,7 @@ class AmplitudeExperiment(BaseExperiment):
         self.train_eval_loader = make_loader(train_eval_idx, shuffle=False, batchsize=train_eval_bs,
                                              workers=0, drop_last=False)
 
+        self._split_indices = {"train": train_eval_idx, "val": val_idx, "test": test_idx}
         eval_bs = min(self.cfg.evaluation.batchsize, max(len(val_idx) // 2, 1))
         self.val_loader  = make_loader(val_idx,  shuffle=False, batchsize=eval_bs, workers=0,
                                        drop_last=False)
@@ -1833,6 +1887,7 @@ class AmplitudeExperiment(BaseExperiment):
             if _tcap is not None and _capped:
                 # the combined train-split loader mirrors the per-process cap
                 train_eval_idx = np.concatenate(_capped)
+                self._split_indices["train"] = train_eval_idx
                 self.train_eval_loader = make_loader(
                     train_eval_idx, shuffle=False,
                     batchsize=min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1)),
@@ -1880,6 +1935,13 @@ class AmplitudeExperiment(BaseExperiment):
         # Collect per-process predictions (single forward pass per process)
         # ------------------------------------------------------------------
         proc_preds = {}   # name -> {"train": (pred,truth,sig), "test": ..., "val": ...}
+        proc_factor = {}  # name -> {split: (N,1) per-event target factor} (data.target_propagators)
+        def _raw(name, split, arr):
+            """Raw-space |M|² from a standardized-log array: undo the transform, then divide
+            the target factor out (data.target_propagators), so metrics see the true |M|²."""
+            out = undo_preprocess_amplitude(arr, *_amp_stats(name), trafos=_amp_trafo(name))
+            F = proc_factor.get(name, {}).get(split)
+            return out / F if F is not None else out
 
         loaders_by_split = [
             ("test",  self.proc_test_loaders),
@@ -1900,9 +1962,15 @@ class AmplitudeExperiment(BaseExperiment):
             combined = {"test": self.test_loader, "train": self.train_eval_loader,
                         "val": self.val_loader}
             names = list(self.cfg.data.dataset)
+            factors = getattr(self, "all_amp_factor", None)
             for split, loader_dict in loaders_by_split:
                 LOGGER.info(f"### Evaluating {split} (combined pass, split per process) ###")
                 pred, truth, sigmas, pids = collect(combined[split], return_process_ids=True)
+                # the combined loader iterates its index set in order (shuffle=False,
+                # drop_last=False), so the per-event target factor aligns with the predictions
+                F = factors[self._split_indices[split]] if factors is not None else None
+                if F is not None:
+                    assert F.shape[0] == pred.shape[0], (F.shape, pred.shape)
                 for p, name in enumerate(names):
                     if name not in loader_dict:
                         continue
@@ -1911,7 +1979,12 @@ class AmplitudeExperiment(BaseExperiment):
                         continue
                     proc_preds.setdefault(name, {})[split] = (
                         pred[m], truth[m], sigmas[m] if sigmas is not None else None)
+                    if F is not None:
+                        proc_factor.setdefault(name, {})[split] = F[m].reshape(-1, 1)
         else:
+            if getattr(self, "all_amp_factor", None) is not None:
+                LOGGER.warning("target_propagators is on but the per-process evaluation loop carries "
+                               "no per-event factor: raw-space metrics are on the modified target")
             for split, loader_dict in loaders_by_split:
                 for name, loader in loader_dict.items():
                     LOGGER.info(f"### Evaluating {split} [{name}] ###")
@@ -1948,12 +2021,8 @@ class AmplitudeExperiment(BaseExperiment):
             # The TRANSFORM is per process too (a positive pool under `log`, a signed one
             # under `signedlog:<s>` with its own scale), so the combined raw-space arrays
             # are assembled from per-process inverses rather than undone with one list.
-            raw_truth = np.concatenate([
-                undo_preprocess_amplitude(proc_preds[n][split][1], *_amp_stats(n),
-                                          trafos=_amp_trafo(n)) for n in available], axis=0)
-            raw_pred = np.concatenate([
-                undo_preprocess_amplitude(proc_preds[n][split][0], *_amp_stats(n),
-                                          trafos=_amp_trafo(n)) for n in available], axis=0)
+            raw_truth = np.concatenate([_raw(n, split, proc_preds[n][split][1]) for n in available], axis=0)
+            raw_pred  = np.concatenate([_raw(n, split, proc_preds[n][split][0]) for n in available], axis=0)
             return pred, truth, sigmas, pm, ps, (raw_truth, raw_pred)
 
         # ------------------------------------------------------------------
@@ -1984,6 +2053,7 @@ class AmplitudeExperiment(BaseExperiment):
                 self.results_per_proc[name][split] = self._metrics_from_arrays(
                     pred, truth, f"{split}_{name}", name, sigmas,
                     prepd_mean=pm, prepd_std=ps, prepd_trafos=tr,
+                    raw_arrays=(_raw(name, split, truth), _raw(name, split, pred)),
                 )[name]
 
         # evaluation.save_predictions: dump the per-event (prediction, truth) pairs on the
@@ -1999,9 +2069,7 @@ class AmplitudeExperiment(BaseExperiment):
                 pid = np.concatenate([np.full(proc_preds[n][split][1].shape[0], names.index(n)) for n in have])
                 pred = np.concatenate([proc_preds[n][split][0] for n in have], axis=0)
                 truth = np.concatenate([proc_preds[n][split][1] for n in have], axis=0)
-                raw_truth = np.concatenate([
-                    undo_preprocess_amplitude(proc_preds[n][split][1], *_amp_stats(n), trafos=_amp_trafo(n))
-                    for n in have], axis=0)
+                raw_truth = np.concatenate([_raw(n, split, proc_preds[n][split][1]) for n in have], axis=0)
                 out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
                 np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth,
                                     process_id=pid, names=np.array(names))
