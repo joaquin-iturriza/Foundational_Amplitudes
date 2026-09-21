@@ -3301,9 +3301,37 @@ horizon, so no single-run difference of that size means anything. Where the two 
 the shape of the census (\code{analysis/catalog\_v2/arms\_compare.py},
 Fig.~\ref{fig:arms_compare_q}): the geometric mean has $27$ processes below $10^{-3}$ and
 $50$ stuck above $0.5$, the starvation of Prin.~\ref{prin:gradcomp} in its bimodal form,
-where the arithmetic mean has none below $10^{-3}$ and one above $0.5$; the failing counts
-are $274$, $259$ and $312$ for the geometric, arithmetic and weighted arms, the signed
-one-loop class fails under all three ($50$, $47$, $48$ of $50$).
+where the arithmetic mean has none below $10^{-3}$ and one above $0.5$. Read as the
+distance from the tuned solo loss of each multiplicity (Table~\ref{tab:catv2_q_classes}; no
+pass/fail line, which says nothing about how far a process is from what it can do): the
+tree $2\to2$ class is the one place where company beats solo, and only under the geometric
+mean ($0.39\times$ solo at the median, its converged tail); the resonant $2\to2$ pools sit
+at $9$--$11\times$ solo under every arm, the $2\to4$ class at $8$--$11\times$, the signed
+one-loop class at $19\times$ under the arithmetic mean and $82\times$ under the geometric
+one. The weighting is worst on the $2\to3$ class ($6.2\times$ against $3.4$). The
+arithmetic mean has the lowest $90$th percentile in every class but the tree $2\to2$.
+
+\begin{table}[H]
+\centering
+\caption{Quick working point, best trial of each aggregation sweep: median and $90$th
+percentile of the final per-process validation loss by class, and the median ratio to the
+tuned solo loss of the class's multiplicity ($4.3\times10^{-3}$, $1.1\times10^{-2}$,
+$1.1\times10^{-2}$ for $2\to2$, $2\to3$, $2\to4$).}
+\label{tab:catv2_q_classes}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+class & \multicolumn{2}{c}{geometric} & \multicolumn{2}{c}{arithmetic} & \multicolumn{2}{c}{weighted} \\
+ & med. / $90\%$ & $\times$solo & med. / $90\%$ & $\times$solo & med. / $90\%$ & $\times$solo \\
+\midrule
+tree $2\to2$ ($58$) & $0.0017$ / $0.040$ & $0.39$ & $0.010$ / $0.044$ & $2.3$ & $0.0089$ / $0.031$ & $2.1$ \\
+resonant $2\to2$ ($27$) & $0.046$ / $0.090$ & $11$ & $0.040$ / $0.078$ & $9.4$ & $0.043$ / $0.070$ & $10$ \\
+tree $2\to3$ ($110$) & $0.041$ / $0.20$ & $3.6$ & $0.039$ / $0.12$ & $3.4$ & $0.070$ / $0.19$ & $6.2$ \\
+tree $2\to4$ ($185$) & $0.12$ / $0.30$ & $11$ & $0.089$ / $0.16$ & $8.4$ & $0.12$ / $0.22$ & $11$ \\
+positive one-loop ($48$) & $0.079$ / $0.35$ & $7.2$ & $0.059$ / $0.15$ & $6.2$ & $0.060$ / $0.21$ & $7.5$ \\
+signed one-loop ($50$) & $0.85$ / $1.6$ & $82$ & $0.19$ / $0.36$ & $19$ & $0.29$ / $0.55$ & $25$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Where in the target the error sits.} With the per-event predictions saved
 (\code{evaluation.save\_predictions}), the squared residual of the arithmetic arm at its best
@@ -3332,7 +3360,8 @@ three repeats per arm.
 \includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/arms_compare_q.pdf}
 \caption{Quick working point ($500$ steps, $5$k pools, off-shellness on), best DyHPO trial
 of each aggregation: the combined validation curve, every process's curve, the final loss
-against the target's range, and the final loss by class.}
+against the target's range (dashed: the tuned solo loss of each multiplicity), and the
+final loss by class.}
 \label{fig:arms_compare_q}
 \end{figure}
 

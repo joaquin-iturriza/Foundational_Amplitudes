@@ -1,7 +1,8 @@
 """The aggregation arms side by side, one column per arm: the combined validation curve, every
 process's validation curve, the final loss against the pool's ln|M|^2 range, and the final
 loss by class (ECDF). Reads plots_0/per_process_metrics.json of each run.
-    python analysis/catalog_v2/arms_compare.py "label=runs/<run>" ["label=runs/<run>" ...] [--out=name] [--title=...]
+    python analysis/catalog_v2/arms_compare.py "label=runs/<run>" ["label=runs/<run>" ...] [--out=name] [--title=...] [--ref=4=<L>_5=<L>_6=<L>]
+The scatter carries no pass/fail line; with --ref the solo loss per multiplicity is drawn and the median ratio to it printed.
 Writes analysis/catalog_v2/<out>.{png,pdf} (default arms_compare)."""
 import csv, glob, json, os, re, sys
 import numpy as np
@@ -38,8 +39,13 @@ for j, (label, path) in enumerate(runs):
     sp = np.array([float(aud[n]["logspread"]) for n in names]); y = np.array([final[n] for n in names]); npart = np.array([NP[n] for n in names])
     for k, mk in ((4, "o"), (5, "s"), (6, "^")):
         sel = npart == k; ax.scatter(sp[sel], y[sel], s=12, marker=mk, alpha=0.7, color=COL[k], label=f"2->{k-2}")
-    ax.axhline(0.05, color="k", lw=0.8, ls="--"); ax.set_yscale("log"); ax.set_xlabel("range of ln|M|^2 in the train pool"); ax.grid(alpha=0.3)
-    ax.set_title(f"final loss against the target's range: {int((y > 0.05).sum())}/{len(y)} above 0.05", fontsize=10)
+    ax.set_yscale("log"); ax.set_xlabel("range of ln|M|^2 in the train pool"); ax.grid(alpha=0.3)
+    ax.set_title(f"final loss against the target's range: median {np.median(y):.3g}, 90% {np.percentile(y, 90):.3g}", fontsize=10)
+    if "ref" in opts:   # --ref=4=..._5=..._6=...: the solo loss per multiplicity at this working point
+        REF = {int(k): float(v) for k, v in (t.split("=") for t in opts["ref"].split("_"))}
+        for k in (4, 5, 6): ax.axhline(REF[k], color=COL[k], lw=0.8, ls="--")
+        e = y / np.array([REF[k] for k in npart])
+        ax.set_title(ax.get_title() + "\n" + ", ".join(f"2->{k-2}: median {np.median(e[npart == k]):.2g}x solo" for k in (4, 5, 6)), fontsize=9)
     ax = axes[3, j]
     for c in CLASSES:
         v = np.sort([final[n] for n in names if cls(n) == c])
