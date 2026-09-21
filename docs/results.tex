@@ -3355,6 +3355,30 @@ built from the same sidecars), and a transform with resolution near zero for the
 class (or a separate sign prediction). Each is a $500$-step test at this working point with
 three repeats per arm.
 
+\paragraph{Back to $1000$ steps, with repeats: the signed-log scale is not the lever.}
+The working point returns to $1000$ steps on the $5$k pools (with the evaluation overhead
+gone a run is $17$ minutes), the arithmetic mean at the sweep's best HPs, and every arm
+runs three init seeds (\code{analysis/catalog\_v2/seed\_arms.py}, Fig.~\ref{fig:seed_arms_slq}).
+The seed spread at this horizon is about $20\%$ on the combined number ($0.0286\pm0.0060$
+for the baseline) and $10$--$30\%$ per class. The first test is the scale of the signed log
+for the sign-changing pools (\code{data.signedlog\_quantile}), since the residual profile put
+their error at the sign change where the transform is linear below the scale: at the $10^{-3}$
+and $10^{-4}$ quantiles instead of $10^{-2}$ the combined number is unchanged ($0.0283$,
+$0.0290$), every other class is inside its band, and the signed class itself goes the wrong
+way, median $0.112\pm0.030$, $0.123\pm0.013$, $0.147\pm0.012$. Enlarging the log-like region
+does not help and shrinking the linear one hurts, so the error near zero is the sign
+structure, not the flat region; a separate sign prediction (a classification head next to
+$\log|x|$) is the remaining move for this class, and it is a model change.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_slq.pdf}
+\caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
+per-class ECDF of the final per-process validation loss for the signed-log scale at the
+$10^{-2}$ (current), $10^{-3}$ and $10^{-4}$ quantiles; the band is the min/max over seeds.}
+\label{fig:seed_arms_slq}
+\end{figure}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/arms_compare_q.pdf}
