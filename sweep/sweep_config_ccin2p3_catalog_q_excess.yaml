@@ -64,7 +64,7 @@ fixed_params:
   evaluation.train_subsample: 2000
   training.loss_aggregation: excess
   training.loss_aggregation_tau: 0.0
-  training.excess_reference: '{4:REF4,5:REF5,6:REF6}'   # solo loss per particle count at this working point (ref_solo_*_t500_5k), filled in before generation
+  training.excess_reference: '{4:4.95e-3,5:1.11e-2,6:9.31e-3}'   # solo loss per particle count at this working point (ref_solo_*_t500_5k)
   training.val_aggregation: geometric_mean   # the metric never follows the training-side knobs
   training.regularization: L2
   training.scheduler: CosineAnnealingLR

@@ -2842,9 +2842,19 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     slightly worse everywhere, $201$ failing against $170$); the corrected arm is
     \code{runs/catalog\_short\_offshW2\_mean}, to be read against
     \code{catalog\_short\_offsh\_mean} with the masks line showing \code{[23, 6, 25, 24]}. (c) The reference-weighted arm was
-    trained with references measured without the input; rerun with the corrected ones
-    ($9.9\times10^{-4}$, $4.4\times10^{-3}$, $5.4\times10^{-3}$), and move to a reference
-    per (multiplicity, resonant) class. (d) The arithmetic mean diverged once on the
+    trained with references measured without the input. Two open questions remain once the
+    rest is fixed: why the $2\to4$ class gains most from the reference weighting, and what
+    sets the dependence of the final loss on the span of the target. To iterate on them at a
+    working point instead of at the wave's, two DyHPO sweeps run at $500$ steps on the $5$k
+    pools (\code{sweeps/catalog\_q\_mean}, \code{sweeps/catalog\_q\_excess}; $12$ trials each,
+    three waves; lr, $\lambda$, warm-up, $\eta_{\min}$, EMA, and for the weighted arm
+    \code{excess\_beta}$\in[0,2]$). They differ only in the training aggregation; the
+    objective, checkpoint selection and the comparison are the validation geometric mean in
+    both. The references are the solo runs at this working point
+    (\code{runs/ref\_solo\_*\_t500\_5k}: $4.95\times10^{-3}$, $1.11\times10^{-2}$,
+    $9.31\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$; the $2\to3$ above the $2\to4$ at this
+    horizon is one seed at a fixed solo lr, so the ratios carry that noise). Then move to a
+    reference per (multiplicity, resonant) class. (d) The arithmetic mean diverged once on the
     small pools (non-finite gradient); one seed, undiagnosed. (e) The wave needs the
     sidecars present and the reference re-measured at its horizon.
   \item The chunk cost model puts a one-loop $2\to3$ at $48$ LO-$2\to2$ units; the measured
