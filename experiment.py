@@ -1459,7 +1459,11 @@ class AmplitudeExperiment(BaseExperiment):
                             above = float(np.mean(s_prop > mm))
                             if straddle < above < 1.0 - straddle:
                                 props.append((pdg, mrow, mm, 2.0, None))
-                        elif tch_on and np.all(s_prop <= 1e-6 * np.abs(s_prop).max()):
+                        elif (tch_on and np.all(s_prop <= 1e-6 * np.abs(s_prop).max())
+                              and int(np.count_nonzero(mrow)) == 2 and mrow.min() < 0 < mrow.max()):
+                            # the exchange between ONE initial and ONE final leg (the forward
+                            # peak); the other spacelike internal lines of a multi-leg process
+                            # are not poles the target reaches, and their factors only add range
                             power = 1.0 if abs(int(pdg)) < 17 else 2.0
                             props.append((pdg, mrow, 0.0, power, float(np.median(np.abs(s_prop)) or 1.0)))
                             n_tch += 1
