@@ -1434,6 +1434,7 @@ class AmplitudeExperiment(BaseExperiment):
             # exchange; |M|² goes like 1/|t| for a fermion and 1/t² for a boson, so the
             # factor is (|t|/median|t|)^p with p = 1 or 2 (normalised to stay O(1)).
             tch_on = bool(self.cfg.data.get("target_propagator_tchannel", False))
+            tch_max_final = int(self.cfg.data.get("target_propagator_tchannel_max_final", 99))
             massless = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on else []
             tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs + massless)
             n_ok, red_before, red_after, n_props, n_tch = 0, [], [], 0, 0
@@ -1460,7 +1461,8 @@ class AmplitudeExperiment(BaseExperiment):
                             if straddle < above < 1.0 - straddle:
                                 props.append((pdg, mrow, mm, 2.0, None))
                         elif (tch_on and np.all(s_prop <= 1e-6 * np.abs(s_prop).max())
-                              and int(np.count_nonzero(mrow)) == 2 and mrow.min() < 0 < mrow.max()):
+                              and int(np.count_nonzero(mrow)) == 2 and mrow.min() < 0 < mrow.max()
+                              and pp.shape[1] - 2 <= tch_max_final):
                             # the exchange between ONE initial and ONE final leg (the forward
                             # peak); the other spacelike internal lines of a multi-leg process
                             # are not poles the target reaches, and their factors only add range
