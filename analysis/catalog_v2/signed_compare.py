@@ -21,7 +21,7 @@ def one_run(d):
         if n not in all50: continue
         tr = st["amp_trafos_pp"][p]; m, sd = st["prepd_mean"][p], st["prepd_std"][p]
         sel = pid == p
-        if not sel.any(): continue
+        if not sel.any() or tr[0] == "log": continue     # positive in these pools: no sign to predict
         scale = signedlog_scale(tr[0])
         if tr[0].startswith("abslog"):
             logmag_pred = np.log(undo_preprocess_amplitude(pred[sel].reshape(-1, 1), m, sd, trafos=tr).reshape(-1))
