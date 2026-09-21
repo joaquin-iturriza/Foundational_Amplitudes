@@ -26,6 +26,7 @@
 # scale of the signed log for sign-changing pools; 0.01 default, 0.5 = the median).
 # STEPS= sets the horizon (default 1000), VF= the validation fraction (default 0.05), EVBS= the evaluation batch size.
 # LAM= and WU= set the regularization and warm-up fraction; EXTRA= appends further overrides verbatim.
+# SEED= sets the init seed (repeats; data.seed stays 42).
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -43,7 +44,7 @@ python run.py \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
   data.offshell_per_event=true "data.internal_mass_pdgs=[$(echo "${PDGS:-23_6_25}" | tr _ ,)]" \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
-  model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed=42 \
+  model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed="${SEED:-42}" \
   training.iterations="${STEPS:-1000}" training.batchsize=16384 evaluation.batchsize="${EVBS:-16384}" \
   training.lr="${LR:-5.8e-3}" training.regularization_lambda="${LAM:-1e-8}" training.cosanneal_warmup_frac="${WU:-0.1}" \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
