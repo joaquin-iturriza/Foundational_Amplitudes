@@ -27,6 +27,7 @@
 # STEPS= sets the horizon (default 1000), VF= the validation fraction (default 0.05), EVBS= the evaluation batch size.
 # LAM= and WU= set the regularization and warm-up fraction; EXTRA= appends further overrides verbatim.
 # SEED= sets the init seed (repeats; data.seed stays 42).
+# RECIPE= picks the recipe file under recipes/ (default the full catalog); BS= the training batch size.
 set -euo pipefail
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
 source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
@@ -36,7 +37,7 @@ if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GE
 python run.py \
   exp_name="${EXP:-catalog_short_ab_gen_${GEN}}" \
   data.source=recipes data.require_cache=true data.seed=42 \
-  data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml \
+  data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
   data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
@@ -45,7 +46,7 @@ python run.py \
   data.offshell_per_event=true "data.internal_mass_pdgs=[$(echo "${PDGS:-23_6_25}" | tr _ ,)]" \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed="${SEED:-42}" \
-  training.iterations="${STEPS:-1000}" training.batchsize=16384 evaluation.batchsize="${EVBS:-16384}" \
+  training.iterations="${STEPS:-1000}" training.batchsize="${BS:-16384}" evaluation.batchsize="${EVBS:-16384}" \
   training.lr="${LR:-5.8e-3}" training.regularization_lambda="${LAM:-1e-8}" training.cosanneal_warmup_frac="${WU:-0.1}" \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference={$(echo "$REF" | sed 's/_/,/g; s/=/:/g')}"} \
