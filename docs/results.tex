@@ -2835,13 +2835,9 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     were selected on their own training aggregate; the per-process numbers stand.
   \item \textbf{Open after the off-shellness arms.} (a) The range of the target drives the
     spread of final losses in every arm (Fig.~\ref{fig:loss_vs_range}); a fix at the level
-    of the target's scale is the lead to try before more aggregation work. (b) The $W$ (PDG
-    $24$) is absent from \code{internal\_mass\_pdgs}, so $W$-channel processes have no pole
-    coordinate. A first arm meant to add it ran with the $Z$ alone (the comma list was
-    truncated by \code{sbatch --export}; \code{runs/catalog\_short\_offshW\_mean} is that,
-    slightly worse everywhere, $201$ failing against $170$); the corrected arm is
-    \code{runs/catalog\_short\_offshW2\_mean}, to be read against
-    \code{catalog\_short\_offsh\_mean} with the masks line showing \code{[23, 6, 25, 24]}. (c) The reference-weighted arm was
+    of the target's scale is the lead to try before more aggregation work. (b) The $W$ arm is
+    read (the paragraph above); the sweep configs still carry \code{[23,6,25]}, and the
+    run-to-run spread at $1000$ steps, needed to call its $13\%$ a cost, is unmeasured. (c) The reference-weighted arm was
     trained with references measured without the input. Two open questions remain once the
     rest is fixed: why the $2\to4$ class gains most from the reference weighting, and what
     sets the dependence of the final loss on the span of the target. To iterate on them at a
@@ -3198,6 +3194,20 @@ aggregation and horizon questions. The reference weighting stays the best overal
 with the input ($131$ failing) and keeps its $2\to4$ gain ($26$ failing against $94$); its
 cost on the resonant $2\to2$ pools is smaller but present, and it is the one arm where the
 $M_Z$ family stays mostly failing, so the weighting and the resonance input interact.
+
+\paragraph{The $W$ in the propagator list.} The $W$ (PDG $24$) was not in
+\code{internal\_mass\_pdgs}, so the $W$-channel processes had no pole coordinate. The
+arithmetic arm rerun with \code{[23,6,25,24]} (\code{runs/catalog\_short\_offshW2\_mean},
+masks $478/478$; a first attempt ran with the $Z$ alone because \code{sbatch --export}
+truncated the comma list) does for the $s$-channel $W$ what the $Z$ coordinate did for the
+$Z$ pole: $u\bar d\to e\nu$ from $0.052$ to $0.011$, its one-loop twin from $0.035$ to
+$0.011$, $u\bar d\to e\nu g$ and its $\alpha_s$ variants from $0.13$--$0.16$ to $0.03$--$0.04$.
+Everything else moves little and mostly up: over the $478$ processes the geometric mean of
+the ratio to the $Z$-only arm is $1.13$ ($337$ worse, $137$ better; $182$ above $0.05$
+against $170$), over the $117$ processes with a $W$ in them $1.04$. One seed, $1000$ steps;
+the run-to-run spread at this horizon is not measured, so the $13\%$ is not established as
+a cost, while the factor of five on the resonant $W$ processes is well outside it. The
+coordinate belongs in the list for the same reason the $Z$'s does.
 
 \paragraph{Distance from the reference instead of a threshold.} The per-process curves of
 the reference-weighted arm look unlike the other two: every process comes down at about the
