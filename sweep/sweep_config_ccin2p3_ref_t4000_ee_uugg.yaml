@@ -1,5 +1,5 @@
 # Solo reference at 4000 steps with the target changes (propagator subtraction, t-channel on 2->2): ee_uugg alone at bs 34.
-# at the joint run's per-process batch (bs/P = 16384/478 = 34 events per step), 500 steps, the 5k
+# at the joint run's per-process batch (bs/P = 16384/478 = 34 events per step), 4000 steps, the 5k
 # pool, off-shellness on. The reference is the BEST trial's val_loss_no_reg: a reference has to
 # be the loss the process reaches alone when its own HPs are tuned, not at an lr borrowed from
 # bs 16384. lr window two decades wide, since no measured lr optimum exists at this batch size.

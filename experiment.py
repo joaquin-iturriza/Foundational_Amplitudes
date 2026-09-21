@@ -1340,6 +1340,14 @@ class AmplitudeExperiment(BaseExperiment):
             prepd_means = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_mean"], dtype=np.float64))]
             prepd_stds  = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_std"],  dtype=np.float64))]
             per_dataset = bool(stats.get("preprocess_per_dataset", len(prepd_means) > 1))
+            # the target factor (data.target_propagators) is part of the target these stats
+            # were fitted on: a mismatch would rescale the target under the parent's
+            # standardization without a trace
+            _tp_stats = bool(stats.get("target_propagators", False))
+            _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
+            assert _tp_stats == _tp_cfg, (
+                f"frozen data stats were fitted with target_propagators={_tp_stats}, "
+                f"this run sets {_tp_cfg}")
             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
         else:
             mom_div = mom_mean = mom_std = None
@@ -1712,7 +1720,12 @@ class AmplitudeExperiment(BaseExperiment):
             # applies (the pools resolved to abslog, i.e. the sign-changing ones)
             sign = np.concatenate(role_sign, axis=0).astype(np.float32)
             self.all_amplitudes = np.concatenate([self.all_amplitudes.reshape(-1, 1), sign[:, None]], axis=1)
-            pp_tr = self._amp_trafos_pp or [list(amp_trafos)] * self.n_datasets
+            assert per_dataset and self._amp_trafos_pp, \
+                "sign_head needs data.preprocess_per_dataset (the sign-changing pools are resolved per pool)"
+            pp_tr = self._amp_trafos_pp
+            leftover = [self.cfg.data.dataset[i] for i, t in enumerate(pp_tr) if str(t[0]).startswith("signedlog")]
+            assert not leftover, (f"sign_head is on but {len(leftover)} pools carry a signedlog transform "
+                                  f"(frozen stats from a run without the sign head?), e.g. {leftover[:3]}")
             self._proc_signed = np.array([bool(t and str(t[0]).startswith("abslog")) for t in pp_tr],
                                          dtype=np.float32)
             LOGGER.info(f"sign_head ON: {int(self._proc_signed.sum())}/{self.n_datasets} sign-changing pools "
@@ -2018,8 +2031,13 @@ class AmplitudeExperiment(BaseExperiment):
                 out = out / F
             sg = proc_sign.get(name, {}).get(split)
             if sg is not None:
-                col = 1 if which == "truth" else 0
-                out = out * np.where(sg[:, col], 1.0, -1.0).reshape(out.shape)
+                # the true sign always; the predicted sign only where the logit was trained
+                # (the signed pools): a positive pool's logit carries no gradient and its
+                # sign would be arbitrary
+                signed = bool(self._proc_signed[list(self.cfg.data.dataset).index(name)] > 0)
+                if which == "truth" or signed:
+                    col = 1 if which == "truth" else 0
+                    out = out * np.where(sg[:, col], 1.0, -1.0).reshape(out.shape)
             return out
 
         loaders_by_split = [
