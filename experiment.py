@@ -817,7 +817,9 @@ class AmplitudeExperiment(BaseExperiment):
             pd = build_process_diagrams(path, prop_matrix, k_pe=k_pe)
             n_initial = sum(1 for leg in (pd.external or []) if leg["state"] == "in")
             # scanned propagator masses for this dataset → the pole is at the SCANNED M²
-            mo = {pdg: float(imp[i][j]) for j, pdg in enumerate(pdgs)} \
+            # (the table is aligned with internal_mass_pdgs, whatever list is requested here)
+            im_list = [int(x) for x in (self._internal_mass_pdgs or [])]
+            mo = {pdg: float(imp[i][j]) for j, pdg in enumerate(im_list) if j < len(imp[i])} \
                 if (imp and i < len(imp) and imp[i]) else None
             vt = build_process_virtuality(pd, [int(x) for x in slot_pdgs], n_initial,
                                           mass_override=mo, offshell=True)
