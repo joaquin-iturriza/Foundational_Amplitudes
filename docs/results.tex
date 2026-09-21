@@ -3390,8 +3390,11 @@ of $478$ per-process losses agree to $2\times10^{-4}$ or better; the three that 
 ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$, $ee\to\nu\bar\nu\nu\bar\nu$) sit at losses of
 $30$--$850$ twenty steps into training and move by factors of three between two validations
 of the same model on either path, so their outputs are numerically unstable at that stage
-and rounding differences between a mixed and a single-process batch are amplified; not a
-property of the validation code, and worth a look as a struggler pattern of its own. The
+and rounding differences between a mixed and a single-process batch are amplified (the
+same three, and only they, deviate with the combined batches cut to the loop's $1000$
+events, so it is the composition of the batch, not its size, acting on near-divergent
+outputs); not a property of the validation code, and worth a look as a struggler pattern
+of its own. The
 per-item fetch and the per-process loop stay behind \code{LLOCA\_FETCH=item} and
 \code{LLOCA\_VAL=loop}. A $500$-step trial on the $5$k pools now takes about $6$ minutes of
 wall time.
