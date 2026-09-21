@@ -2894,7 +2894,8 @@ class AmplitudeExperiment(BaseExperiment):
         proc_mse_vals      = {}
 
         is_lloca = self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim")
-        if is_lloca and os.environ.get("LLOCA_VAL", "combined") != "loop":
+        val_mode = os.environ.get("LLOCA_VAL", "combined")   # combined | loop | check (both, log the deviation)
+        if is_lloca and val_mode != "loop":
             # One pass over the COMBINED val loader (evaluation.batchsize events per batch)
             # with the per-process means accumulated by index_add_, as the training loss
             # does. The per-process loaders capped their batch at half a process's val
@@ -2930,7 +2931,10 @@ class AmplitudeExperiment(BaseExperiment):
                 proc_losses_no_reg[name] = m
                 proc_losses[name]        = m + reg_val
                 proc_mse_vals[name]      = float(mse_sums[p] / counts[p]) if het else None
-        else:
+        if val_mode == "check":
+            _combined = (proc_losses, proc_losses_no_reg, proc_mse_vals)
+            proc_losses, proc_losses_no_reg, proc_mse_vals = {}, {}, {}
+        if not is_lloca or val_mode in ("loop", "check"):
           with torch.no_grad():
             for name, loader in self.proc_val_loaders.items():
                 losses, losses_no_reg, mse_vals = [], [], []
@@ -2948,6 +2952,13 @@ class AmplitudeExperiment(BaseExperiment):
                 proc_losses[name]        = float(np.mean(losses))
                 proc_losses_no_reg[name] = float(np.mean(losses_no_reg)) if losses_no_reg else None
                 proc_mse_vals[name]      = float(np.mean(mse_vals))      if mse_vals      else None
+        if val_mode == "check":
+            # same model, both paths: report the largest per-process deviation, keep the combined
+            dev = max(abs(_combined[1][n] - proc_losses_no_reg[n]) / max(abs(proc_losses_no_reg[n]), 1e-30)
+                      for n in proc_losses_no_reg if n in _combined[1])
+            LOGGER.info(f"LLOCA_VAL=check: max per-process |combined - loop| / loop = {dev:.3e} "
+                        f"over {len(proc_losses_no_reg)} processes")
+            proc_losses, proc_losses_no_reg, proc_mse_vals = _combined
 
         if torch.cuda.is_available():
             torch.cuda.empty_cache()

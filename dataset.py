@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset, Sampler
@@ -48,6 +49,41 @@ class AmplitudeDataset(Dataset):
     def __len__(self):
         return len(self.amplitudes)
 
+    def __getitems__(self, indices):
+        """Fetch a whole batch with one gather from the flat arrays.
+
+        torch's map-style fetcher calls this with the batch's index list when it
+        exists, instead of `[self[i] for i in indices]` (16384 Python calls and a
+        16384-slice `torch.cat` in the collate per batch, ~0.5 s of CPU per batch:
+        the dataloading bottleneck of training and the whole cost of an evaluation
+        pass on the workers=0 loaders). The result is the collated batch already,
+        wrapped so `collate_variable_length` passes it through; the tensors are the
+        same as the per-item path's. LLOCA_FETCH=item restores the per-item path.
+        """
+        if os.environ.get("LLOCA_FETCH", "batch") == "item":
+            return [self[i] for i in indices]
+        idx    = np.asarray(indices, dtype=np.int64)
+        starts = self.offsets[idx, 0].astype(np.int64)
+        counts = (self.offsets[idx, 1] - self.offsets[idx, 0]).astype(np.int64)
+        csum   = np.cumsum(counts)
+        total  = int(csum[-1]) if len(csum) else 0
+        # gather[k] = start of the event k belongs to + k's rank within it
+        gather = np.repeat(starts - (csum - counts), counts) + np.arange(total, dtype=np.int64)
+        gather = torch.from_numpy(gather)
+        idx_t  = torch.from_numpy(idx)
+        ptr    = torch.zeros(len(idx) + 1, dtype=torch.long)
+        ptr[1:] = torch.from_numpy(csum)
+        pids = (self.process_ids[idx_t] if self.process_ids is not None
+                else torch.full((len(idx),), -1, dtype=torch.long))
+        return [_Prebatched((
+            self.particles_flat[gather],
+            self.amplitudes[idx_t],
+            self.tokens_flat[gather],
+            self.order_labels[idx_t],
+            ptr,
+            pids,
+        ))]
+
     def __getitem__(self, idx):
         start, end = int(self.offsets[idx, 0]), int(self.offsets[idx, 1])
         return (
@@ -85,9 +121,18 @@ def build_flat_arrays(particles_list, tokens_list):
     return particles_flat, tokens_flat, offsets
  
  
+class _Prebatched:
+    """A batch already collated by AmplitudeDataset.__getitems__."""
+    __slots__ = ("data",)
+
+    def __init__(self, data):
+        self.data = data
+
+
 def collate_variable_length(batch):
     """
     Collate (particles, amplitude, tokens, order_labels) tuples into a sparse batch.
+    A single _Prebatched element (from AmplitudeDataset.__getitems__) passes through.
 
     Returns
     -------
@@ -97,6 +142,8 @@ def collate_variable_length(batch):
     order_labels : (B, n_order_features)     one coupling-order vector per event
     ptr          : (B+1,)                    ptr[i] = start of event i in flat tensors
     """
+    if len(batch) == 1 and isinstance(batch[0], _Prebatched):
+        return batch[0].data
     particles_list    = [item[0] for item in batch]
     amplitudes_list   = [item[1] for item in batch]
     tokens_list       = [item[2] for item in batch]
