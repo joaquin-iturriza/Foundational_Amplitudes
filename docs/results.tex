@@ -402,7 +402,7 @@ $2$--$4$ on the processes the geometric mean had pushed furthest ($10^{-5}$ to a
 $10^{-5}$). Under the arithmetic mean every process ends within $[2\times10^{-5},
 6\times10^{-4}]$; under the geometric mean the spread is five decades. This is
 Prin.~\ref{prin:gradcomp} seen directly: a laggard's gradient is divided by its own large
-loss, so in company it never gets the steps the resonance needs, and no amount of sampling
+loss, so in the joint run it never gets the steps the resonance needs, and no amount of sampling
 can hand them back. The wave-0 census (Sec.~\ref{sec:catv2-census}), where the failing
 $s$-channel and $M_Z$ pools sit at $0.04$--$0.6$ while the bulk is at $10^{-2}$ and below,
 is the same mechanism at $478$ processes. What to aggregate with at that scale is a decision
@@ -2903,7 +2903,7 @@ $0.56$, rising from $0.3$ over training. The $M_Z$ family is the same needle shi
 ($16/20$ failing at a median $0.08$). Shaping the training measure moved these from
 ``nothing learned'' to ``the bulk learned, the peak not''; the remaining error is the
 resonance shape on the flat validation measure. Its cause is not the data but the loss
-aggregation: the family learns alone, and it learns in company under the arithmetic mean
+aggregation: the family learns alone, and it learns in the joint run under the arithmetic mean
 (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}).
 
 \paragraph{Signed one-loop targets and the signed log.} $50$ of the $95$ one-loop pools of the
@@ -3063,7 +3063,7 @@ does not fall in the first steps keeps a weight of order one while the converged
 reaches $10^4$, and it never trains, which is the run-to-run flakiness of
 Prin.~\ref{prin:gradcomp} seen at the process level. So ``nothing works'' is two things:
 the aggregation starves a seventh of the catalog outright, and the sharp structure of
-half of it is not resolved at $1000$ steps in company, although the $s$-channel family
+half of it is not resolved at $1000$ steps in the joint run, although the $s$-channel family
 resolves its pole alone.
 
 \paragraph{Weighting by a reference, and width.} Two more $1000$-step arms
@@ -3183,7 +3183,7 @@ existed on this cluster: every run's log says \code{offshell\_per\_event: built 
 masks for 0/478 processes}. So every catalog\_v2 number above, wave 0 included, was taken
 without the one input designed for the needle, and the ``needle as a multi-task effect''
 reading stands only with that caveat: the family resolves its pole alone without the
-input, and fails in company without it.
+input, and fails in the joint run without it.
 
 \paragraph{With the input, the needle is gone.} The sidecars generated for the whole
 registry (\code{tools/dump\_diagrams.py --all}, $424$ processes, three minutes of CPU) and
@@ -3192,7 +3192,7 @@ the three aggregation arms rerun with the masks built for $478/478$ processes
 geometric mean and from $0.26$ to $0.012$ under the arithmetic one, the whole $s$-channel
 family passes under both, the $M_Z$ family from $16$--$18$ failing to $3$--$5$, and the
 $2\to2$ class under the arithmetic mean from $29$ failing to $5$. What the family learned
-alone in the probe it learned from thirty times the exposure; in company it needed its
+alone in the probe it learned from thirty times the exposure; in the joint run it needed its
 coordinate, and the coordinate was not there. The multi-task reading of the needle is
 superseded: the needle was a missing input. What the input does not touch is as clear:
 the starved processes under the geometric mean ($u\bar u\to t\bar t$ at one loop still at
@@ -3223,9 +3223,9 @@ $0.05$ hides how far a process is from what it can do, so the better reading is 
 process's distance from what its multiplicity reaches alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
 Fig.~\ref{fig:excess_ratio}). With the references measured with the input ($9.9\times10^{-4}$,
 $4.4\times10^{-3}$, $5.4\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$ alone at $\mathrm{bs}/P$
-for $1000$ steps), almost no process in company reaches what it reaches alone at the same
+for $1000$ steps), almost no process in the joint run reaches what it reaches alone at the same
 compute: $1\%$ are below their reference under the arithmetic and reference-weighted arms,
-$13\%$ under the geometric one (its converged $2\to2$ tail, the one place where company
+$13\%$ under the geometric one (its converged $2\to2$ tail, the one place where joint training
 beats solo), and the medians are $13$, $8.8$ and $15$. By class the trade the aggregations
 make is explicit: $2\to4$ at $15$, $9.4$ and $20$ times its reference, tree $2\to2$ at
 $0.76$, $3.8$ and $3.1$, resonant $2\to2$ at $24$, $17$ and $20$. Two patterns among the
@@ -3304,7 +3304,7 @@ $50$ stuck above $0.5$, the starvation of Prin.~\ref{prin:gradcomp} in its bimod
 where the arithmetic mean has none below $10^{-3}$ and one above $0.5$. Read as the
 distance from the tuned solo loss of each multiplicity (Table~\ref{tab:catv2_q_classes}; no
 pass/fail line, which says nothing about how far a process is from what it can do): the
-tree $2\to2$ class is the one place where company beats solo, and only under the geometric
+tree $2\to2$ class is the one place where joint training beats solo, and only under the geometric
 mean ($0.39\times$ solo at the median, its converged tail); the resonant $2\to2$ pools sit
 at $9$--$11\times$ solo under every arm, the $2\to4$ class at $8$--$11\times$, the signed
 one-loop class at $19\times$ under the arithmetic mean and $82\times$ under the geometric
