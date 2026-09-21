@@ -2843,14 +2843,14 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     means tie on the combined number there while differing in shape. The propagator subtraction on the
     target is in and adopted: the massive $s$-channel poles for every process and the
     massless $t$-channel exchange for the $2\to2$ processes (three seeds each, outside the
-    band where it matters); the sign head is in and a modest gain on the signed class.
+    band where it matters); the sign head is in, for a modest gain on the signed class.
     Open: the divergence at peak learning rate with the $t$-channel factor (two of nine
     runs; the arithmetic mean's exposure, to be settled with lr and aggregation swept
     jointly at this working point, and the geometric mean re-checked with the new targets);
     the signed class is still the worst by five, now a magnitude problem; and the
     joint-training gap is now measured (the paragraph on the difference of exponents): the
     high-multiplicity classes close on solo with steps, the $2\to2$ classes fall behind, and
-    sharing across multiplicities costs $25$--$45\%$ at $1000$ steps. The next decision is
+    sharing across multiplicities costs $20$--$45\%$ at $1000$ steps. The next decision is
     structural: capacity or routing by multiplicity class, or a per-class fine-tune after the
     pretraining, tested at $1000$ steps with three seeds against the subset-alone numbers.
     Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
@@ -3320,7 +3320,7 @@ mean ($0.39\times$ solo at the median, its converged tail); the resonant $2\to2$
 at $9$--$11\times$ solo under every arm, the $2\to4$ class at $8$--$11\times$, the signed
 one-loop class at $19\times$ under the arithmetic mean and $82\times$ under the geometric
 one. The weighting is worst on the $2\to3$ class ($6.2\times$ against $3.4$). The
-arithmetic mean has the lowest $90$th percentile in every class but the tree $2\to2$.
+arithmetic mean has the lowest $90$th percentile in every class but the two $2\to2$ ones.
 
 \begin{table}[H]
 \centering
@@ -3428,7 +3428,7 @@ the nine runs with the factor diverged (one under each rule, none of the fifteen
 both the same way, a normal descent to step $200$--$250$ and then a jump by five to ten at the
 end of the $170$-step warm-up, at peak learning rate, never recovered; no non-finite
 gradient in the second case. The factor widens the $2\to2$ targets and that tips the
-arithmetic mean at this rate, which is the joint lr/aggregation question of the wave, not a
+arithmetic mean at this rate, which is the joint lr/aggregation question of the full-horizon pretraining sweep, not a
 property of the factor itself.
 
 \begin{figure}[H]
@@ -3461,7 +3461,7 @@ Second, at $1000$ steps each multiplicity trained alone at the same per-process 
 (\code{recipes/catalog\_v2\_train\_scan\_2to*.yaml}, batch $34\times$ the subset's size, the
 rate not retuned) beats its loss in the full catalog on nearly every process: $2\to3$ alone at
 $0.56$ of its joint loss ($176$ of $176$), $2\to4$ at $0.74$ ($184$ of $185$), $2\to2$ at
-$0.79$ ($98$ of $117$). Sharing one network across multiplicities costs $25$--$45\%$ at this
+$0.79$ ($98$ of $117$). Sharing one network across multiplicities costs $20$--$45\%$ at this
 horizon, on top of the exponent effect. What follows for the $2\to2$ classes is capacity or
 routing by class, or fine-tuning them after the pretraining; for the rest, steps.
 
