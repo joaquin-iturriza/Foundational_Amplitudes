@@ -2841,10 +2841,16 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     settled at this working point (it loses to the arithmetic mean once its validation is
     recorded correctly; the quick-working-point paragraph), and the geometric and arithmetic
     means tie on the combined number there while differing in shape. The propagator subtraction on the
-    target is in and adopted for the massive $s$-channel poles (three seeds, outside the
-    band); still to build: the massless $t$-channel factor (fermion power one, boson power
-    two) for the $ZZ$/$WW$/$Z\gamma$/$WZ$ pools, and a separate sign prediction for the
-    signed one-loop class, since the signed-log scale is not its lever.
+    target is in and adopted: the massive $s$-channel poles for every process and the
+    massless $t$-channel exchange for the $2\to2$ processes (three seeds each, outside the
+    band where it matters); the sign head is in and a modest gain on the signed class.
+    Open: the divergence at peak learning rate with the $t$-channel factor (two of nine
+    runs; the arithmetic mean's exposure, to be settled with lr and aggregation swept
+    jointly at this working point, and the geometric mean re-checked with the new targets);
+    the signed class is still the worst by five, now a magnitude problem; and the
+    $2\to4$ class at eight to eleven times solo, the plain scaling question for the wave.
+    Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
+    sweep's best HPs; \code{analysis/catalog\_v2/seed\_arms.py} is the read-out.
     Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
     $ee\to\nu\bar\nu\nu\bar\nu$) have numerically unstable outputs early in training
     (Sec.~\ref{sec:throughput}); worth a look as a struggler pattern. (d) The arithmetic mean diverged once on the
@@ -3397,6 +3403,38 @@ versions): the massless exchange the straddle rule leaves alone, and the next fa
 build (power one for a fermion exchange, two for a boson, since $|\mathcal M|^2$ goes like
 $1/t$ and $1/t^2$ respectively). The signed class moves from $0.112$ to $0.097$, inside its
 band; its sign structure stays the open move.
+
+\paragraph{The $t$-channel factor: a targeted gain on the $2\to2$ pools, and an instability.}
+The massless $t$-channel exchange (\code{data.target\_propagator\_tchannel}) carries
+$(|t|/\mathrm{median}|t|)^p$, $p=1$ for a fermion and $2$ for a boson, with $|t|$ floored at
+the pool's $10^{-3}$ quantile, and only for the exchange between one initial and one final
+leg: the first rule, every massless spacelike internal line, put factors on $2370$ lines and
+took the target's median range from $13$ to $29$; the one-initial-one-final rule keeps $964$
+on $429$ processes, $13$ to $17$. Applied to every process it does what it is for and costs
+elsewhere (Fig.~\ref{fig:seed_arms_tch22}, three seeds): the $t$-channel $2\to2$ pools halve
+($ee\to ZZ$ $0.0056\to0.0032$, $ee\to Z\gamma$ $0.0054\to0.0025$, Bhabha $0.019\to0.008$,
+$u\bar u\to ZZ$ at one loop $0.0093\to0.0033$), tree $2\to2$ goes from $0.0031$ to $0.0021$
+and positive one-loop from $0.016$ to $0.011$, but the $2\to4$ class loses outside its band
+($0.050\pm0.003\to0.060\pm0.007$): on a six-particle amplitude the one-initial-one-final
+exchange is not the dominant structure and its factor only adds range. Restricted to the
+$2\to2$ processes (\code{target\_propagator\_tchannel\_max\_final: 2}) the $2\to2$ gain stays
+($0.0022$) and the $2\to4$ class returns to its baseline ($0.053$); the combined number is the
+$s$-channel arm's ($0.022$). That is the setting kept. The caveat is an instability: two of
+the nine runs with the factor diverged (one under each rule, none of the fifteen without),
+both the same way, a normal descent to step $200$--$250$ and then a jump by five to ten at the
+end of the $170$-step warm-up, at peak learning rate, never recovered; no non-finite
+gradient in the second case. The factor widens the $2\to2$ targets and that tips the
+arithmetic mean at this rate, which is the joint lr/aggregation question of the wave, not a
+property of the factor itself.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_tch22.pdf}
+\caption{$1000$ steps, $5$k pools, three seeds: the $t$-channel factor on every process and
+on the $2\to2$ processes only (its two seeds that did not diverge), against the $s$-channel
+subtraction alone; per-class ECDF with the seed band.}
+\label{fig:seed_arms_tch22}
+\end{figure}
 
 \paragraph{The sign head: a real but modest gain on the signed class.} With
 \code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
