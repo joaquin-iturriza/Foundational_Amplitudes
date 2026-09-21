@@ -39,7 +39,7 @@ python run.py \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
-  data.offshell_per_event=true 'data.internal_mass_pdgs=[23,6,25]' \
+  data.offshell_per_event=true "data.internal_mass_pdgs=[${PDGS:-23,6,25}]" \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed=42 \
   training.iterations=1000 training.batchsize=16384 evaluation.batchsize=16384 \
