@@ -35,7 +35,7 @@ SETUP_COMMANDS = [
     "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
     "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
 ]
-BASE_CLUSTER = {"scheduler": "slurm", "account": "itg@v100",
+BASE_CLUSTER = {"scheduler": "slurm", "account": "lpnhe",
                 "request_gpus": 1, "cpus_per_task": 8}
 
 

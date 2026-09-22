@@ -25,9 +25,12 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_p2
-  account: itg@v100
+  partition: gpu_v100
+  qos: gpu
+  account: lpnhe
   request_gpus: 1
+  gres: gpu:v100:1
+  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:10:00"
 
