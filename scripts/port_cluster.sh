@@ -4,7 +4,9 @@
 # The trunk (ccin2p3) and the Jean Zay branch (jeanzay) carry the same code; they
 # differ ONLY by the rule table below: project/scratch paths, the python env lines
 # in job scripts and sweep `setup_commands`, and the SLURM header directives
-# (partition/account/qos/gres/mem). Syncing the two branches is therefore
+# (partition/account/qos/gres/mem; Jean Zay rejects any --mem, so every memory
+# directive is dropped there and comes back as the 32G/2G-per-cpu defaults).
+# Syncing the two branches is therefore
 #
 #   git merge ccin2p3            # on jeanzay: take every change from the trunk
 #   scripts/port_cluster.sh --to jeanzay
@@ -56,15 +58,15 @@ s#^([[:space:]]*)\#SBATCH --partition=gpu_v100[[:space:]]*\$#\1\#SBATCH --partit
 s#^([[:space:]]*)\#SBATCH --account=lpnhe[[:space:]]*\$#\1\#SBATCH --account=itg@v100#
 s#^([[:space:]]*)\#SBATCH --gres=gpu:v100:1[[:space:]]*\$#\1\#SBATCH --gres=gpu:1#
 /^[[:space:]]*\#SBATCH --qos=gpu[[:space:]]*\$/d
-/^[[:space:]]*\#SBATCH --mem=32G[[:space:]]*\$/d
+/^[[:space:]]*\#SBATCH --mem=[0-9]+[GM]B?[[:space:]]*\$/d
 s#^([[:space:]]*)\#SBATCH --partition=htc[[:space:]]*\$#\1\#SBATCH --partition=prepost#
-/^[[:space:]]*\#SBATCH --mem-per-cpu=2G[[:space:]]*\$/d
+/^[[:space:]]*\#SBATCH --mem-per-cpu=[0-9]+[GM]B?[[:space:]]*\$/d
 s#^([[:space:]]*)partition: gpu_v100 +\# CC-IN2P3 V100 32GB nodes \(gpu_h100 exists too; untested here\)[[:space:]]*\$#\1partition: gpu_p2          \# V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)#
 s#^([[:space:]]*)partition: gpu_v100([[:space:]]*(\#.*)?)\$#\1partition: gpu_p2\2#
 s#^([[:space:]]*)account: lpnhe[[:space:]]*\$#\1account: itg@v100#
 /^[[:space:]]*qos: gpu[[:space:]]*\$/d
 /^[[:space:]]*gres: gpu:v100:1[[:space:]]*\$/d
-/^[[:space:]]*mem: 32G([[:space:]]*\#.*)?\$/d
+/^[[:space:]]*mem: [0-9]+[GM]B?([[:space:]]*\#.*)?\$/d
 s#"account", "lpnhe"#"account", "itg@v100"#g
 s#"account": "lpnhe"#"account": "itg@v100"#g
 s#"partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G"#"partition": "gpu_p2"#g
@@ -92,8 +94,7 @@ s#^([[:space:]]*)\#SBATCH --partition=gpu_p2[[:space:]]*\$#\1\#SBATCH --partitio
 s#^([[:space:]]*)\#SBATCH --account=itg@v100[[:space:]]*\$#\1\#SBATCH --account=lpnhe#
 s#^([[:space:]]*)\#SBATCH --gres=gpu:1[[:space:]]*\$#\1\#SBATCH --gres=gpu:v100:1\n\1\#SBATCH --mem=32G#
 s#^([[:space:]]*)\#SBATCH --gres=gpu:(\{[^}]*\})[[:space:]]*\$#\1\#SBATCH --gres=gpu:\2\n\1\#SBATCH --mem=32G#
-s#^([[:space:]]*)\#SBATCH --partition=prepost[[:space:]]*\$#\1\#SBATCH --partition=htc#
-s#^([[:space:]]*)\#SBATCH --cpus-per-task=(32|48)[[:space:]]*\$#\1\#SBATCH --cpus-per-task=\2\n\1\#SBATCH --mem-per-cpu=2G#
+s#^([[:space:]]*)\#SBATCH --partition=prepost[[:space:]]*\$#\1\#SBATCH --partition=htc\n\1\#SBATCH --mem-per-cpu=2G#
 s#^([[:space:]]*)partition: gpu_p2 +\# V100 32GB \(15k hours\); try gpu_p13 \+ itg@a100 for A100 \(5k hours\)[[:space:]]*\$#\1partition: gpu_v100        \# CC-IN2P3 V100 32GB nodes (gpu_h100 exists too; untested here)\n\1qos: gpu#
 s#^([[:space:]]*)partition: gpu_p2([[:space:]]*(\#.*)?)\$#\1partition: gpu_v100\2\n\1qos: gpu#
 s#^([[:space:]]*)account: itg@v100[[:space:]]*\$#\1account: lpnhe#
