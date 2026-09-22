@@ -44,7 +44,7 @@ case "$CCORCH_SITE" in
     source "$PROJECT_DIR/.venv/bin/activate"
     export WORK="${WORK:-/eos/user/j/joiturri}"
     export SCRATCH="${SCRATCH:-/eos/user/j/joiturri/tmp}"
-    export DATA_DIR="${DATA_DIR:-/eos/user/j/joiturri/jitu/lorentz-gatr/data/data}"
+    export DATA_DIR="${DATA_DIR:-/eos/user/j/joiturri/datasets}"
     export SUBMIT_DIR="${SUBMIT_DIR:-/afs/cern.ch/user/j/joiturri/Foundational_Amplitudes}"
     ;;
   *)

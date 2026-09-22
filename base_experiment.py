@@ -83,13 +83,16 @@ class BaseExperiment:
 
     def __call__(self):
         # pass all exceptions to the logger
+        failed = False
         try:
             self.run_mlflow()
         except errors.ConfigAttributeError:
+            failed = True
             LOGGER.exception(
                 "Tried to access key that is not specified in the config files"
             )
         except:
+            failed = True
             LOGGER.exception("Exiting with error")
 
         # print buffered logger messages if failed
@@ -98,6 +101,10 @@ class BaseExperiment:
             stream_handler.setLevel(logging.DEBUG)
             MEMORY_HANDLER.setTarget(stream_handler)
             MEMORY_HANDLER.close()
+        # The exception is logged above; the PROCESS must still fail, or the
+        # scheduler, the site registry and every waiter record a crash as COMPLETED.
+        if failed:
+            raise SystemExit(1)
 
     def is_main_process(self):
         return (not dist.is_initialized()) or dist.get_rank() == 0

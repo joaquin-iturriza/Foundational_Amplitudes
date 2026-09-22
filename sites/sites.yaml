@@ -58,7 +58,7 @@ lxplus:
   sweep_dir:   /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps   # AFS: fcntl locks + condor submit
   results_dir: /eos/user/j/joiturri/Foundational_Amplitudes/sweeps           # EOS: bulk outputs
   scratch:     /eos/user/j/joiturri/tmp
-  data_dir:    /eos/user/j/joiturri/jitu/lorentz-gatr/data/data
+  data_dir:    /eos/user/j/joiturri/datasets
   setup_commands:
     - source /eos/user/j/joiturri/Foundational_Amplitudes/sites/activate.sh
   cluster:

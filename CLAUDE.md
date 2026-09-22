@@ -124,8 +124,10 @@ site-owned half of a sweep config (paths, `cluster` directives, `${PROJECT_DIR}`
 `${SWEEP_DIR}` / `${DATA_DIR}` / `${SCRATCH}` expansion, re-rooting of a config
 generated on another site); `siteconf.slurm_header(cluster, job_name, out, err)`
 renders the whole `#SBATCH` block for the site it runs on, and
-`siteconf.cpu_header(...)` the CPU-partition one. Hydra data paths are
-`${oc.env:DATA_DIR}`. Every job script starts with
+`siteconf.cpu_header(...)` the CPU-partition one. Data is found through the environment `sites/activate.sh` exports: recipe runs
+read `$WORK/datasets` and the cache under `$SCRATCH`; `DATA_DIR` is the same
+`datasets` dir on every site. The old `data_path: data/` default in the configs is
+per-checkout and empty on the clusters -- use recipes. Every job script starts with
 
 ```bash
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"

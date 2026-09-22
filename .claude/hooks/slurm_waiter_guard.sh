@@ -8,7 +8,7 @@
 # that — no waiter, just a promise. That silently drops the result on the floor: the turn ends,
 # nothing re-invokes me, and the user has to notice and prod.
 #
-# Rule enforced: if `squeue -u $USER` shows any of my jobs RUNNING/PENDING and no
+# Rule enforced: if the site registry shows any of my runs queued/running and no
 # wait_for_slurm.sh process is alive, block the Stop and make me launch the waiter.
 #
 # Escape hatch: `touch .claude/.no_waiter_needed` to allow one Stop with jobs in flight
@@ -17,27 +17,24 @@ set -uo pipefail
 REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 BYPASS="$REPO/.claude/.no_waiter_needed"
 
-# Off-cluster (sshfs mount, jobs go over ssh): route squeue through scripts/remote.sh; if the
-# cluster is unreachable, fail open rather than hang the Stop.
-if command -v squeue >/dev/null 2>&1; then
-  SQUEUE=(squeue)
-elif [ -x "$REPO/scripts/remote.sh" ]; then
-  SQUEUE=("$REPO/scripts/remote.sh" squeue)
-else
-  exit 0
-fi
-
 if [ -f "$BYPASS" ]; then
   rm -f "$BYPASS"
   exit 0
 fi
 
-USER_NAME="${USER:-$(whoami)}"
-jobs=$("${SQUEUE[@]}" --me -h -o "%i %j %T" 2>/dev/null | grep -viE 'prebuild' || true)
+# Jobs live on three sites now; the `site` registry is the one place that knows
+# them all. Refresh it (bounded), then list this project's non-terminal runs as
+# "<run-id> <job> <STATE>". If the tool is missing or the sites are unreachable,
+# fail open rather than hang the Stop.
+command -v site >/dev/null 2>&1 || exit 0
+timeout 90 site poll >/dev/null 2>&1 || true
+jobs=$(timeout 30 site runs --project FA --limit 100 2>/dev/null \
+       | awk '$4 ~ /^(SUBMITTED|PENDING|RUNNING|IDLE|CONFIGURING|UNKNOWN)$/ {print $1, $6, $4}' \
+       | grep -viE 'prebuild' || true)
 [ -z "$jobs" ] && exit 0
 
-# A waiter alive? (wait_for_slurm.sh backgrounded by the harness)
-if pgrep -f "wait_for_slurm.sh" >/dev/null 2>&1; then
+# A waiter alive? (a background `site poll` loop, or the on-site wait_for_slurm.sh)
+if pgrep -f "site poll|wait_for_slurm.sh" >/dev/null 2>&1; then
   exit 0
 fi
 # Or a Monitor-tool watcher: on this WSL2 laptop Claude Code stops background Bash tasks
@@ -64,9 +61,10 @@ n=$(printf '%s\n' "$jobs" | wc -l | tr -d ' ')
   [ "$n" -gt 8 ] && echo "    ... ($n total)"
   echo ""
   echo "CLAUDE.md (Waiting on jobs): submit, then launch the waiter IN THE BACKGROUND —"
-  echo "    scripts/wait_for_slurm.sh <jid> [<jid> ...]        # run_in_background: true"
-  echo "  (pass job ids as SEPARATE args, not one comma-joined string.)"
-  echo "Do NOT promise 'I'll report when they land' without that mechanism, and do NOT hand-poll squeue."
+  echo "    a background shell (run_in_background) that repeats \`site poll <run>\` every"
+  echo "    30-60 s until the state is terminal, then reads \`site logs <run>\`;"
+  echo "    or a persistent Monitor listing the run id(s) in .claude/.slurm_monitor_jobs."
+  echo "Do NOT promise 'I'll report when they land' without that mechanism, and do NOT hand-poll."
   echo ""
   echo "If the jobs are genuinely fire-and-forget: touch .claude/.no_waiter_needed and stop again."
 } >&2

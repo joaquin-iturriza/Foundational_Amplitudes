@@ -23,7 +23,7 @@ POLL="${POLL:-30}"
 TAIL="${TAIL:-25}"
 
 # Off-cluster (the sshfs-mount workflow): no squeue here, so hand the whole wait to the
-# login node via scripts/remote.sh. Same invocation, same output, still backgroundable.
+# login node via site run <site> FA --. Same invocation, same output, still backgroundable.
 if ! command -v squeue >/dev/null 2>&1; then
   here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   if [ -x "$here/remote.sh" ]; then

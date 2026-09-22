@@ -11,7 +11,7 @@
 # Needle probe (recipes/needle_probe.yaml): the s-channel 2->2 family alone, short horizon,
 # eval on the full 10k validation pools so the Z-pole region has ~260 events per process;
 # final-step per-event predictions are saved (preds/) for binning the residual in sqrt(s).
-#   scripts/remote.sh sbatch --export=ALL,GEN=true,EXP=needle_probe scripts/job_needle_probe.sh
+#   site submit <site> FA --export=ALL,GEN=true,EXP=needle_probe scripts/job_needle_probe.sh
 # AGG=mean|geometric_mean and TAU=<float> (tau-floored geometric mean, training loss only)
 # switch the training aggregation; the validation metric stays the geometric mean.
 # TRAIN_SUB= caps the train events per process. BS= and STEPS= set the batch size and horizon (solo reference runs: BS=34, the joint run's bs/P).
