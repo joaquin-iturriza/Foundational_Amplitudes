@@ -6,7 +6,8 @@
 #SBATCH --error=analysis/divergences/evalTrackA_%j.out
 #SBATCH --gres=gpu:1
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"/worktrees/wt-harder-div
 export PYTHONDONTWRITEBYTECODE=1
 # Re-score the 4 completed Track A runs with the CORRECT process (the fold-in eval had used the

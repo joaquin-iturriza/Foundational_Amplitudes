@@ -11,7 +11,8 @@
 # A/B the DataLoader num_workers (lever #6). SUBMIT WITH:  sbatch bench_workers_ab.sh
 # (needs a GPU; xformers attention is CUDA-only, so it will crash on a login node.)
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA=$PWD/data/

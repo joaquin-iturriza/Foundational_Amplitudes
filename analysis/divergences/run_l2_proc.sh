@@ -6,7 +6,8 @@
 #SBATCH --error=analysis/divergences/l2proc_%x_%j.out
 #SBATCH --gres=gpu:1
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 # Run from the checkout this script was SUBMITTED from, not a hardcoded path: this file also lives
 # in worktrees, and a hardcoded trunk path silently runs the TRUNK driver instead of the worktree's
 # (which fails on any flag the trunk does not have yet, or worse, quietly runs the wrong code).

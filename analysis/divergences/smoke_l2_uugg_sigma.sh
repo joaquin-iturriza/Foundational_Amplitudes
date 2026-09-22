@@ -6,7 +6,8 @@
 #SBATCH --error=analysis/divergences/smoke_l2sig_%j.out
 #SBATCH --gres=gpu:1
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"/worktrees/wt-l2-uugg
 export PYTHONDONTWRITEBYTECODE=1
 python analysis/divergences/l2_online_uugg.py \

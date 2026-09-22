@@ -15,7 +15,8 @@
 # Same training config as bench_isolate_ab.sh (hp_0266, seed 42), so traintime
 # is comparable to the other isolated benchmarks.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA="$PROJECT_DIR"/data/

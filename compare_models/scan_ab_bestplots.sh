@@ -12,7 +12,8 @@
 # Re-run the BEST HP config of each A/B arm with plot=true so the run dirs finally
 # have plots (the sweeps wrongly ran plot=false). Same data/preproc as the sweep.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 

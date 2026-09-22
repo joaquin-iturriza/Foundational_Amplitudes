@@ -18,7 +18,8 @@
 #   GEN=false scripts/remote.sh sbatch --export=ALL,GEN=false scripts/job_collision_ab.sh
 #   add LEVERS=off to either to drop the per-process physics levers (see below).
 set -euo pipefail
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column (still separates d from s) | none: no column
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi

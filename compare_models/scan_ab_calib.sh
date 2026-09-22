@@ -13,7 +13,8 @@
 # full dataset trains end-to-end with require_cache=true, (b) measure per-step time
 # so the A/B sweep can be sized. LLOCA_PROFILE_STEP prints a data-vs-compute split.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 export LLOCA_PROFILE_STEP=1

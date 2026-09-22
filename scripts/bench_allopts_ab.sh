@@ -18,7 +18,8 @@
 # Toggles: LLOCA_POOL (loop|vectorized), LLOCA_ATTN_MASK (per_block|per_forward),
 #          LLOCA_REG (loop|foreach), LLOCA_PROC_LOSS (loop|vectorized).
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA="$PROJECT_DIR"/data/

@@ -16,7 +16,8 @@
 # Each arm gets its OWN short lr sweep (6 lrs); compare best-vs-best on the
 # non-regularized val loss (val_loss_no_reg) saved in per_process_metrics.json.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 

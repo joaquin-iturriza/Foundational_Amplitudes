@@ -15,7 +15,8 @@
 # 8601 (override for 1h ladder rungs). Ladder rungs (1h, 416 sets):
 #   raw416 -> rung2 (+onehots/standardize) -> rung3 (+mass/coupling) -> best416
 # (rung4 == best416 flags at ITERS=3400; raw rung == raw416 at ITERS=3400).
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut

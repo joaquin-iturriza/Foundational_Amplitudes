@@ -11,7 +11,8 @@
 # Integrated-Gradients input importance for a trained LLoCa-μP model.
 # Needs a GPU (xformers attention is CUDA-only). SUBMIT WITH: sbatch job_attribution.sh
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 python attribution_inputs.py \

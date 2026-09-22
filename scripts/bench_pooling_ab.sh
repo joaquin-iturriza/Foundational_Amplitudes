@@ -13,7 +13,8 @@
 # on the same GPU: LLOCA_POOL=loop (old Python loop) vs vectorised (default).
 # Compare the "avg N.NNNNs/iter" line and the val_loss in each result.json.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA="$PROJECT_DIR"/data/

@@ -16,7 +16,8 @@
 # switch the training aggregation; the validation metric stays the geometric mean.
 # TRAIN_SUB= caps the train events per process. BS= and STEPS= set the batch size and horizon (solo reference runs: BS=34, the joint run's bs/P).
 set -euo pipefail
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column (still separates d from s) | none: no column
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi

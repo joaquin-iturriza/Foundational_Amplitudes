@@ -8,7 +8,8 @@
 #SBATCH --error=%x_%j.err
 #SBATCH --gres=gpu:1
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 COMMON="data.dataset=[ee_ttbar_346-1000GeV_amplitudes] \

@@ -16,7 +16,8 @@
 # can't resolve, the internal-mass off-shellness feature works (generalising reson to
 # top/Higgs/Z-4l). Per-dataset preprocessing; cut-tagged cache.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut

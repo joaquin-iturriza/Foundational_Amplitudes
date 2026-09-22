@@ -17,7 +17,8 @@
 # provenance instead of mixing a July f000 with a fresh f100.
 set -e
 module purge
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 python analysis/divergences/eval_heldout.py \

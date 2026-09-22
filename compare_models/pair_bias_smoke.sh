@@ -15,7 +15,8 @@
 # Config = the adopted big-run candidate (no diagram encoder, linear embed) + bias.
 # A bias-OFF twin guards the untouched default path through the same merged code.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 

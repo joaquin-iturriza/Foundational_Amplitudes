@@ -14,7 +14,8 @@
 # diagram AND off at lr=1e-3 across 3 fresh seeds. If diagram is consistently
 # ~0.60 and off ~0.68, the diagram win is real; if diagram scatters, it was luck.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 

@@ -17,7 +17,8 @@
 # so no prepost prebuild dependency. Pre-init: make_scan_ab_sweeps.py + generate_sweep.
 
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 export OMP_NUM_THREADS=1

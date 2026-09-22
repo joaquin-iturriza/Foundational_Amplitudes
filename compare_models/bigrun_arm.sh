@@ -8,7 +8,8 @@
 #SBATCH --error=compare_models/bigrun_arm_%x_%j.err
 #SBATCH --gres=gpu:1
 # One feature-ablation arm at H* (baseline all-on minus one feature). $ARM_OVR passed via --export.
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut

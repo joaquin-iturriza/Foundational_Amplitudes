@@ -2,7 +2,8 @@
 #
 # Source this from any job script instead of hardcoding a cluster path:
 #
-#     source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+#     _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 #
 # and the same script runs unchanged at every site. PROJECT_DIR comes from this
 # file's own location, so it is right wherever the checkout happens to live;

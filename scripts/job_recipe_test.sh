@@ -15,7 +15,8 @@
 # Reads the real pools ($WORK/datasets, $SCRATCH/amp_data_cache via env_ccin2p3.sh).
 
 set -euo pipefail
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 RECIPE="${RECIPE:-recipes/pretrain8_short.yaml}"

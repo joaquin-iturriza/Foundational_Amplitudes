@@ -13,7 +13,8 @@
 # (Z/top/Higgs internal-mass features on) so the mass-scan datasets can actually
 # resolve their mass. Frequent validation (every 500 steps) for readable curves.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut

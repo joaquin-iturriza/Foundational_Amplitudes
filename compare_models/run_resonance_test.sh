@@ -14,7 +14,8 @@
 # it's absent from the momenta -> like alpha, it's new info the net can't derive.
 # Non-diagram model (the diagram model would carry a STALE table M_Z). Per-dataset std.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_imz

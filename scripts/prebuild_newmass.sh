@@ -10,7 +10,8 @@
 #SBATCH --output=prebuild_newmass_%j.out
 #SBATCH --error=prebuild_newmass_%j.err
 set -euo pipefail
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 # Dedicated cut-tagged cache (kept separate from the old pre-cut datasets_scanbig).

@@ -6,7 +6,8 @@
 #SBATCH --error=analysis/divergences/evalho_%j.out
 #SBATCH --gres=gpu:1
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"/worktrees/wt-l2-uugg
 export PYTHONDONTWRITEBYTECODE=1
 # args: space-separated "run_dir:label" pairs via $RUNS

@@ -18,7 +18,8 @@
 # Submit with:  sbatch bench_pretrain_iter_time.sh
 # Both cells fit on gpu_p2 (V100 32GB): nh=4 ~6.8GB, nh=8 ~12GB peak at BS=16384.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA=$PWD/data/

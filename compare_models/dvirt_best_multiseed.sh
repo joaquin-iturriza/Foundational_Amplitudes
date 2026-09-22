@@ -11,7 +11,8 @@
 # Stability test of the Tier B HPO-sweep OPTIMUM: re-run the sweep's single best
 # config across 5 seeds. Tells us if the best Tier B point is reproducibly stable.
 set -e
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 SEED=$SLURM_ARRAY_TASK_ID

@@ -12,7 +12,8 @@
 # (fwd+bwd) for each architecture on the real 25-process recipe pipeline, matched
 # to ~1.61M params. Output -> compare_models/flops.txt   SUBMIT: sbatch compare_models/profile_flops.sh
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 OUT=compare_models/flops.txt

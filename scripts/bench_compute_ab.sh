@@ -16,7 +16,8 @@
 # Cells: baseline (both off) / +fused / +tf32 / +both. num_workers=2 so the step is
 # compute-bound (otherwise dataloading hides the compute deltas).
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 
 DATA=$PWD/data/

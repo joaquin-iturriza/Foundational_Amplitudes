@@ -25,7 +25,8 @@
 # SEED= sets the init seed (repeats; data.seed stays 42).
 # RECIPE= picks the recipe file under recipes/ (default the full catalog); BS= the training batch size.
 set -euo pipefail
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column | none: no generation column (the old encoding)
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi

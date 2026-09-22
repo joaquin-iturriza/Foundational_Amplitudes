@@ -12,7 +12,8 @@
 # divergence-abort fires cleanly: ~diverge_patience consecutive skips -> RuntimeError
 # -> non-zero exit, and NO CUDA device-side assert / index-OOB crash.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROJ=$PWD
 

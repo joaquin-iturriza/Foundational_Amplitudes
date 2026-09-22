@@ -13,7 +13,8 @@
 # attempted independently and the PASS/FAIL is reported so the recipe can use
 # whatever certifies.
 
-source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
 # One thread per process: every worker and every MadLoop/MG5 subprocess otherwise opens an
 # OpenBLAS/OpenMP pool sized to the node (512 logical CPUs), and threads count against the
 # per-user process limit (ulimit -u 1024) -> fork fails with EAGAIN mid-run.
