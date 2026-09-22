@@ -1,6 +1,6 @@
 {
-  "ckpt_run_dir": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25/trial_0009",
-  "weights": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz",
+  "ckpt_run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25/trial_0009",
+  "weights": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz",
   "dataset": "ee_uu_91-1000GeV_amplitudes",
   "use_PIDs": false,
   "held_out_pdgs": [

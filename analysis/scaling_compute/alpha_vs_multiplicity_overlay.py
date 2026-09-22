@@ -15,11 +15,11 @@ import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
 
-ROOT_FOR_STYLE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT_FOR_STYLE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, ROOT_FOR_STYLE)
 import plot_style as ps  # noqa: E402
 
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 SOLO = os.path.join(ROOT, "sweeps/scaling_solo_full/scaling_law_params.json")
 FT   = os.path.join(ROOT, "sweeps/finetune_scaling_virt_002/scaling_law_params.json")
 out  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(

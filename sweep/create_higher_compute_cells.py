@@ -27,18 +27,18 @@ from sweep.generate_pretraining_scaling_sweeps import (
     DATASET_LIST_STR, AMP_ORDERS_STR, SEARCH_SPACE,
 )
 
-LUSTRE_BASE  = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+LUSTRE_BASE  = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 N_TRIALS     = 10
 SETUP_COMMANDS = [
     
-    "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh",
-    "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
+    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
+    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
 ]
-BASE_CLUSTER = {"scheduler": "slurm", "account": "itg@v100",
-                #PORT "qos": "gpu",
-                #PORT "gres": "gpu:v100:1",
-                #PORT "mem": "32G",
+BASE_CLUSTER = {"scheduler": "slurm", "account": "lpnhe",
+                "qos": "gpu",
+                "gres": "gpu:v100:1",
+                "mem": "32G",
                 "request_gpus": 1, "cpus_per_task": 8}
 
 
@@ -93,7 +93,7 @@ def main():
         cell_name = f"scaling_p1ext_nh{nh}_{d_key}_t{t_new}"
         cell_dir  = os.path.join(SWEEP_BASE, cell_name)
 
-        gpu     = "gpu_p2l" if needs_32gb(nh, bs_new) else "gpu_p2"
+        gpu     = "gpu_v100"   # every CC-IN2P3 V100 is the 32 GB part
         slurm_t = slurm_time_str(t_new, nh, bs_new)
 
         # Skip cells that would exceed the QOS wall time limit

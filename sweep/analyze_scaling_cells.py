@@ -23,7 +23,7 @@ if _project_dir not in sys.path:
     sys.path.insert(0, _project_dir)
 
 # Support both Jean-Zay Lustre and the local SSHFS mount
-_LUSTRE_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+_LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 _MOUNT_BASE  = "/home/joaquin/mnt/jeanzay/Foundational_Amplitudes"
 LUSTRE_BASE  = _LUSTRE_BASE if os.path.isdir(_LUSTRE_BASE) else _MOUNT_BASE
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")

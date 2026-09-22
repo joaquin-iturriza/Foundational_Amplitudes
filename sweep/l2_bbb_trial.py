@@ -18,7 +18,7 @@ import sys
 
 import yaml
 
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 from sweep.dyhpo_sampler import DyHPOSampler          # noqa: E402
 

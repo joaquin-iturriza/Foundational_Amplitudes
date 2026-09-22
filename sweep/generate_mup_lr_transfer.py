@@ -33,7 +33,7 @@ import numpy as np
 import yaml
 
 DEFAULT_REF = (
-    "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/"
+    "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/"
     "sweeps/pretraining_scaling/scaling_p1_nh16_D1e3_t31623/sweep_config.yaml"
 )
 
@@ -105,9 +105,9 @@ def slurm_header(cluster, name, out_dir, err_dir, setup_commands, time):
     lines = [
         "#!/bin/bash",
         f"#SBATCH --job-name={name}",
-        f"#SBATCH --partition={cluster.get('partition', 'gpu_p2')}",
+        f"#SBATCH --partition={cluster.get('partition', 'gpu_v100')}",
         *([f"#SBATCH --qos={cluster['qos']}"] if "qos" in cluster else []),
-        f"#SBATCH --account={cluster.get('account', 'itg@v100')}",
+        f"#SBATCH --account={cluster.get('account', 'lpnhe')}",
         "#SBATCH --nodes=1",
         "#SBATCH --ntasks-per-node=1",
         f"#SBATCH --gres={cluster.get('gres', 'gpu:' + str(cluster.get('request_gpus', 1)))}",

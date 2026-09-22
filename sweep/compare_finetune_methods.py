@@ -488,7 +488,7 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import sys as _sys
-    _sys.path.insert(0, "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes")
+    _sys.path.insert(0, "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes")
     import plot_style as ps
     cmap = plt.get_cmap("tab10")
 

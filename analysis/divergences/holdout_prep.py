@@ -17,7 +17,7 @@ import os
 import sys
 import numpy as np
 
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, os.path.join(REPO, "analysis/divergences"))
 from extract_ir import ir_observables  # noqa
 

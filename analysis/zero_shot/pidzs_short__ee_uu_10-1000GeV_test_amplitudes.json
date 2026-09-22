@@ -1,6 +1,6 @@
 {
-  "ckpt_run_dir": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110",
-  "weights": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110/models/model_run0_best.pt.gz",
+  "ckpt_run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110",
+  "weights": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25_zs_pid_002/trial_0110/models/model_run0_best.pt.gz",
   "dataset": "ee_uu_10-1000GeV_test_amplitudes",
   "use_PIDs": true,
   "held_out_pdgs": [
@@ -49,6 +49,6 @@
     "raw_mse": 0.12076153599401745,
     "n_events": 10000
   },
-  "arrays_npz": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/zero_shot/pidzs_short__ee_uu_10-1000GeV_test_amplitudes_arrays.npz",
+  "arrays_npz": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/zero_shot/pidzs_short__ee_uu_10-1000GeV_test_amplitudes_arrays.npz",
   "trivial_mse_prepd": 1.0
 }

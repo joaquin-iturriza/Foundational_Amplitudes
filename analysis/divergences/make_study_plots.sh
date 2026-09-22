@@ -2,8 +2,8 @@
 # CPU-only: build all figures for the uugg add-back and soft/collinear-cut studies from
 # the eval npz files (run AFTER eval_heldout_studies.sh completes). Login-node safe.
 set -e
-cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
-PY=/lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational/bin/python
+cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+PY=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/python
 D=analysis/divergences
 
 echo "===== uugg add-back curve ====="

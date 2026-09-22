@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=fa_smoke
-#SBATCH --partition=gpu_p2
-#PORT #SBATCH --qos=gpu
-#SBATCH --account=itg@v100
-#SBATCH --gres=gpu:1
+#SBATCH --partition=gpu_v100
+#SBATCH --qos=gpu
+#SBATCH --account=lpnhe
+#SBATCH --gres=gpu:v100:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#PORT #SBATCH --mem=16G
+#SBATCH --mem=16G
 #SBATCH --time=00:10:00
 #SBATCH --output=runs/_logs/%x_%j.out
 #SBATCH --error=runs/_logs/%x_%j.out
@@ -14,9 +14,9 @@
 # the directives, the venv runs on a compute node, CUDA is visible, and the
 # project + lloca import there. Not a training run; safe to delete.
 set -e
-PROJ=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+PROJ=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
 cd "$PROJ"
-PY=$WORK/conda/envs/foundational/bin/python
+PY=$PROJ/.venv/bin/python
 "$PY" - <<'PY'
 import torch, numpy as np
 print("torch", torch.__version__, "| numpy", np.__version__)

@@ -19,7 +19,7 @@ import sys
 
 import yaml
 
-LUSTRE_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 
 _TIME_RE = re.compile(r"Finished training:.*?in\s+([\d.]+)min")

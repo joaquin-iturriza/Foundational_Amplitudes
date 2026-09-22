@@ -17,7 +17,7 @@ Prints a line:  FLOPS_STEP <model> <flops>
 """
 import sys
 
-PROJECT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+PROJECT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, PROJECT)  # script lives in compare_models/; put project root on path
 
 import torch

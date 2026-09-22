@@ -39,7 +39,7 @@ if _proj not in sys.path:
 
 from sweep.generate_scaling_sweep import _make_cell_cfg, _ds_tag, _sweep_dirs
 
-LUSTRE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+LUSTRE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 SWEEPS_BASE = os.path.join(LUSTRE, "sweeps")
 
 # Live method sweeps to extend (the saved outer config of each is the source of truth).

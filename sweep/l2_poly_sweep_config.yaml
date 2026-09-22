@@ -25,12 +25,12 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_p2
-  #PORT qos: gpu
-  account: itg@v100
+  partition: gpu_v100
+  qos: gpu
+  account: lpnhe
   request_gpus: 1
-  #PORT gres: gpu:v100:1
-  #PORT mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
+  gres: gpu:v100:1
+  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:10:00"
 
@@ -40,17 +40,17 @@ cluster:
 # forcing this re-run. Sweep results are gitignored, so a worktree is exactly the wrong place
 # for them; see scripts/fold_worktree.sh and the guard that now blocks such a removal.
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 
 sweep_name: l2_poly_uugg
 n_trials: 12
 # drive the L2 online-generation loop, not run.py:
 trial_script: sweep/l2_bbb_trial.py
-l2_driver: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/analysis/divergences/l2_online_uugg.py
+l2_driver: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/divergences/l2_online_uugg.py
 
 dyhpo:
   n_candidates: 200

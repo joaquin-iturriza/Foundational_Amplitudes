@@ -14,7 +14,7 @@ import os
 import subprocess
 import sys
 
-SWEEP_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps/pretraining_scaling"
+SWEEP_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/pretraining_scaling"
 
 
 def get_queued_scaling_jobs():

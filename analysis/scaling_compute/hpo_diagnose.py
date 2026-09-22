@@ -13,7 +13,7 @@ import glob, json, os, re, yaml
 from datetime import datetime
 import numpy as np
 
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 
 FAMILIES = {
     "solo 10k":    ("solo_nh8_10k_virt_{k}", "lr"),

@@ -23,7 +23,7 @@ import numpy as np
 import torch
 from omegaconf import OmegaConf, open_dict
 
-REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 from experiment import AmplitudeExperiment  # noqa
 from dataset import AmplitudeDataset, collate_variable_length  # noqa

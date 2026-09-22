@@ -6,20 +6,20 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_p2
-  #PORT qos: gpu
-  account: itg@v100
+  partition: gpu_v100
+  qos: gpu
+  account: lpnhe
   request_gpus: 1
-  #PORT gres: gpu:v100:1
-  #PORT mem: 16G
+  gres: gpu:v100:1
+  mem: 16G
   cpus_per_task: 4
   time: "00:40:00"
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 sweep_name: ref_t1000_ee_uugg
 n_trials: 6
 dyhpo:
@@ -31,7 +31,7 @@ fidelity_schedule:
   t_steps: [1000]
 fixed_params:
   data.source: recipes
-  data.processes_file: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/ref_solo_ee_uugg.yaml
+  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/ref_solo_ee_uugg.yaml
   data.require_cache: 'true'
   data.train_subsample: 5000
   data.eval_subsample: 2000

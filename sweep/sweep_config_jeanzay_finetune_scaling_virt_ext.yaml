@@ -13,21 +13,21 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_p2
-  #PORT qos: gpu
-  account: itg@v100
+  partition: gpu_v100
+  qos: gpu
+  account: lpnhe
   request_gpus: 1
-  #PORT gres: gpu:v100:1
-  #PORT mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
+  gres: gpu:v100:1
+  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "02:00:00"           # covers the largest cell (t=8000, ~1.2h)
 
 paths:
-  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
-  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-    - "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh"
-    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
+    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
     - "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
 
 sweep_name: finetune_scaling_virt_ext
@@ -47,13 +47,13 @@ dyhpo:
   n_startup: 4
 
 fixed_params:
-  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
+  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
   data.subsample: 100000
   data.train_test_val: "[0.7, 0.2, 0.1]"
   model: lloca
   model.net.num_blocks: 8
   model.net.num_heads: 8
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
   training.lr: 0.001081750557879577
   training.batchsize: 16384
   evaluation.batchsize: 8192

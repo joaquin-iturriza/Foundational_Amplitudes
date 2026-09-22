@@ -6,7 +6,7 @@ differ per family (flags copied from analysis/scaling_compute/gen_ftfig_cells.py
 import copy, os, yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
+ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 
 RAW = {"data.spin_onehot": "false", "data.color_onehot": "false",
        "data.prop_is_massless": "false", "data.standardize_props": "false",
