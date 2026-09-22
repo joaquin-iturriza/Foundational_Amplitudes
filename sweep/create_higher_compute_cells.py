@@ -36,6 +36,9 @@ SETUP_COMMANDS = [
     "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
 ]
 BASE_CLUSTER = {"scheduler": "slurm", "account": "lpnhe",
+                "qos": "gpu",
+                "gres": "gpu:v100:1",
+                "mem": "32G",
                 "request_gpus": 1, "cpus_per_task": 8}
 
 
@@ -90,7 +93,7 @@ def main():
         cell_name = f"scaling_p1ext_nh{nh}_{d_key}_t{t_new}"
         cell_dir  = os.path.join(SWEEP_BASE, cell_name)
 
-        gpu     = "gpu_p2l" if needs_32gb(nh, bs_new) else "gpu_p2"
+        gpu     = "gpu_v100"   # every CC-IN2P3 V100 is the 32 GB part
         slurm_t = slurm_time_str(t_new, nh, bs_new)
 
         # Skip cells that would exceed the QOS wall time limit
