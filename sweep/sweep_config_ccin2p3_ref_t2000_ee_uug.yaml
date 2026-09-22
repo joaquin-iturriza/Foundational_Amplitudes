@@ -9,7 +9,6 @@ cluster:
   partition: gpu_p2
   account: itg@v100
   request_gpus: 1
-  mem: 16G
   cpus_per_task: 4
   time: "00:40:00"
 paths:

@@ -11,7 +11,6 @@ cluster:
   partition: gpu_p2
   account: itg@v100
   request_gpus: 1
-  mem: 64G                   # 42.7M events in memory + per-dataset preprocessing copies
   cpus_per_task: 8
   time: "06:00:00"           # bigrun took ~3.5 h per trial on Jean Zay V100s; margin for this node class
 paths:

@@ -5,7 +5,6 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/catalog_short_ab_%j.out
