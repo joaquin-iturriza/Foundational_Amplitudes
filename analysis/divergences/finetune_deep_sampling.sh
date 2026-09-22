@@ -5,6 +5,7 @@
 #SBATCH --array=0-4
 #SBATCH --output=analysis/divergences/ft_deep_%A_%a.out
 #SBATCH --error=analysis/divergences/ft_deep_%A_%a.out
+#SBATCH --gres=gpu:1
 
 set -e
 module purge

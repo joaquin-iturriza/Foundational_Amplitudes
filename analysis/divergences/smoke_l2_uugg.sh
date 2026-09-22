@@ -4,6 +4,7 @@
 #SBATCH --time=00:20:00
 #SBATCH --output=analysis/divergences/smoke_l2uugg_%j.out
 #SBATCH --error=analysis/divergences/smoke_l2uugg_%j.out
+#SBATCH --gres=gpu:1
 
 set -e
 module purge

@@ -9,6 +9,7 @@
 #SBATCH --time=00:25:00
 #SBATCH --output=zshot_%j.out
 #SBATCH --error=zshot_%j.err
+#SBATCH --gres=gpu:1
 
 set -uo pipefail
 PY=$PROJECT_DIR/.venv/bin/python

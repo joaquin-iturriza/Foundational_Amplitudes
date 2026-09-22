@@ -6,6 +6,7 @@
 #SBATCH --time=00:20:00
 #SBATCH --output=compare_models/ab_oob_%j.out
 #SBATCH --error=compare_models/ab_oob_%j.err
+#SBATCH --gres=gpu:1
 #
 # Reproduce the scalar-arm CUDA device-side assert (ScatterGatherKernel index OOB)
 # under CUDA_LAUNCH_BLOCKING=1 so the traceback points at the REAL bad kernel

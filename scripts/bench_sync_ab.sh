@@ -6,6 +6,7 @@
 #SBATCH --time=00:50:00
 #SBATCH --output=sync_ab_%j.out
 #SBATCH --error=sync_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # A/B the per-step host/device sync cleanup (optimizations #1-#5).
 #   LLOCA_SYNC=blocking  -> original: 4 syncs/step + per-forward ptr.tolist()

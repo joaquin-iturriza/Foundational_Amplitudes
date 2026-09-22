@@ -7,6 +7,7 @@
 #SBATCH --array=0-1
 #SBATCH --output=compare_models/mass_tau_%A_%a.out
 #SBATCH --error=compare_models/mass_tau_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Mass honest test: off vs data.mass_from_momenta on near-threshold wide-m_t
 # ee_ttbar (private cache). Production per-dataset standardization (the mass effect

@@ -6,6 +6,7 @@
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/needle_probe_%j.out
 #SBATCH --error=runs/_logs/needle_probe_%j.err
+#SBATCH --gres=gpu:1
 #
 # Needle probe (recipes/needle_probe.yaml): the s-channel 2->2 family alone, short horizon,
 # eval on the full 10k validation pools so the Z-pole region has ~260 events per process;

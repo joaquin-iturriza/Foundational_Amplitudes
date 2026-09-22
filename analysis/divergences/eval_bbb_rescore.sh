@@ -4,6 +4,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=analysis/divergences/bbbRescore_%j.out
 #SBATCH --error=analysis/divergences/bbbRescore_%j.out
+#SBATCH --gres=gpu:1
 set -e
 source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
 cd "$PROJECT_DIR"/worktrees/wt-harder-div

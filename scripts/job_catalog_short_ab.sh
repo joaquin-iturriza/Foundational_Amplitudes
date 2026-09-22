@@ -6,6 +6,7 @@
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/catalog_short_ab_%j.out
 #SBATCH --error=runs/_logs/catalog_short_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # Encoding A/B at the catalog's own scale: the full catalog_v2 train+scan recipe (478 pools),
 # the wave-0 sweep setup, 1000 steps (the ds->ds one-loop anti-learning of the census showed

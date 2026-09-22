@@ -7,6 +7,7 @@
 #SBATCH --array=0-17
 #SBATCH --output=compare_models/scan_ab_%A_%a.out
 #SBATCH --error=compare_models/scan_ab_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # 3-way coupling+mass A/B on the full 385-dataset scan set.
 #   arms : off       (no coupling/mass info)

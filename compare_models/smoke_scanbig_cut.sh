@@ -6,6 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=compare_models/smoke_cut_%j.out
 #SBATCH --error=compare_models/smoke_cut_%j.err
+#SBATCH --gres=gpu:1
 #
 # Quick smoke on the NEW cut big-run data: does it TRAIN, and does every dataset
 # learn (per-dataset val loss) now that the IR/forward outliers are cut? offshell arm

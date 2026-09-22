@@ -7,6 +7,7 @@
 #SBATCH --array=0-1
 #SBATCH --output=compare_models/levab_%A_%a.out
 #SBATCH --error=compare_models/levab_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Focused off-vs-offshell A/B on the internal-mass levers only (44 datasets: ee_mumu
 # Z-scan, ee_mumumumu Z-4l, ee_wwbb top, ee_mumutautau Higgs), FULL train data (no

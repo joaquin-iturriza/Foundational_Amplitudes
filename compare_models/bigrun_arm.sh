@@ -6,6 +6,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --output=compare_models/bigrun_arm_%x_%j.out
 #SBATCH --error=compare_models/bigrun_arm_%x_%j.err
+#SBATCH --gres=gpu:1
 # One feature-ablation arm at H* (baseline all-on minus one feature). $ARM_OVR passed via --export.
 source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
 cd "$PROJECT_DIR"

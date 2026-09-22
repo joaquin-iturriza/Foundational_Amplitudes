@@ -5,6 +5,7 @@
 #SBATCH --time=00:10:00
 #SBATCH --output=runs/_logs/%x_%j.out
 #SBATCH --error=runs/_logs/%x_%j.out
+#SBATCH --gres=gpu:1
 # Migration smoke test: proves the CC-IN2P3 chain end to end — scheduler accepts
 # the directives, the venv runs on a compute node, CUDA is visible, and the
 # project + lloca import there. Not a training run; safe to delete.

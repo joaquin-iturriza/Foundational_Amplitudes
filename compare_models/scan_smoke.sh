@@ -6,6 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=compare_models/scan_smoke_%j.out
 #SBATCH --error=compare_models/scan_smoke_%j.err
+#SBATCH --gres=gpu:1
 #
 # End-to-end smoke of the coupling+mass features on the μP LLoCa model: full
 # recipe path (inline scan generation) -> train/validate/save/plot with the real

@@ -6,6 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=compare_models/pb_smoke_%j.out
 #SBATCH --error=compare_models/pb_smoke_%j.err
+#SBATCH --gres=gpu:1
 #
 # End-to-end smoke of the pairwise attention bias (model.use_pair_bias) on GPU:
 # spec build from sidecars, setup_pair_bias, padded-SDPA attention path (replaces

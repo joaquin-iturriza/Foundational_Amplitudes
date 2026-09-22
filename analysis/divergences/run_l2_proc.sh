@@ -4,6 +4,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=analysis/divergences/l2proc_%x_%j.out
 #SBATCH --error=analysis/divergences/l2proc_%x_%j.out
+#SBATCH --gres=gpu:1
 set -e
 source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
 # Run from the checkout this script was SUBMITTED from, not a hardcoded path: this file also lives

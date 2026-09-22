@@ -7,6 +7,7 @@
 #SBATCH --array=0-2
 #SBATCH --output=compare_models/ab_bestplot_%A_%a.out
 #SBATCH --error=compare_models/ab_bestplot_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Re-run the BEST HP config of each A/B arm with plot=true so the run dirs finally
 # have plots (the sweeps wrongly ran plot=false). Same data/preproc as the sweep.

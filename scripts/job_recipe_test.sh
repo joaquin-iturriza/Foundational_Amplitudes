@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
+#SBATCH --gres=gpu:1
 #
 # End-to-end smoke test of the recipe data path (source: recipes) against a
 # PREBUILT recipe: train-only frozen stats -> train -> eval -> plot. Training jobs

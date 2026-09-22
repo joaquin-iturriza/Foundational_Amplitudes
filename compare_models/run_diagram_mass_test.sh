@@ -7,6 +7,7 @@
 #SBATCH --array=0-1
 #SBATCH --output=compare_models/dmass_%A_%a.out
 #SBATCH --error=compare_models/dmass_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Diagram-native internal-mass test: diagram + Tier-B virtuality on ee_mumu across
 # the Z peak, M_Z scanned. Compare STALE propagator mass (table, current) vs SCANNED

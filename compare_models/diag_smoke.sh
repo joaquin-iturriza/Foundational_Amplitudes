@@ -6,6 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=compare_models/diag_smoke_%j.out
 #SBATCH --error=compare_models/diag_smoke_%j.err
+#SBATCH --gres=gpu:1
 #
 # End-to-end smoke of Feynman-diagram conditioning on the μP LLoCa model: the full
 # train->validate->save->plot path on the tiny 8-process short recipe, ~40 steps,

@@ -6,6 +6,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
+#SBATCH --gres=gpu:1
 
 source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
 cd "$PROJECT_DIR"

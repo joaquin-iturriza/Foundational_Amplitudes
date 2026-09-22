@@ -7,6 +7,7 @@
 #SBATCH --array=0-5
 #SBATCH --output=compare_models/scan_ab_repro_%A_%a.out
 #SBATCH --error=compare_models/scan_ab_repro_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Reproducibility check for the A/B diagram result: the ~0.60 val_loss_no_reg was
 # an ISOLATED lr=1e-3 minimum (neighbours sat at baseline ~0.68), so re-run

@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=compute_ab_%j.out
 #SBATCH --error=compute_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # A/B the compute knobs: #9 fused optimizer and #8 TF32.
 #   - This runs on V100 (gpu_p2). TF32 is a NO-OP on V100 (Volta has no TF32), so the

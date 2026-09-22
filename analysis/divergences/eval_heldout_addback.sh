@@ -4,6 +4,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/ho_eval_addback_%j.out
 #SBATCH --error=analysis/divergences/ho_eval_addback_%j.out
+#SBATCH --gres=gpu:1
 #
 # Regenerate the BASE ee->uug add-back eval (heldout_eval_ft_f<tag>.npz) for every add-back
 # fraction. This is the companion of eval_heldout_studies.sh (uugg / soft / collinear), which

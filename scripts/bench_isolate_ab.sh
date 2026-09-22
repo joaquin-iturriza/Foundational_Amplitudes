@@ -6,6 +6,7 @@
 #SBATCH --time=00:50:00
 #SBATCH --output=iso_ab_%j.out
 #SBATCH --error=iso_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # Isolate the marginal speedup of each LLoCa hot-path optimization.
 # Same training as the earlier benchmarks (hp_0266, seed 42). Each run turns ON

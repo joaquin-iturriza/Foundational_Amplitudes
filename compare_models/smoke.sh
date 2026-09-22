@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=compare_models/smoke_%j.out
 #SBATCH --error=compare_models/smoke_%j.err
+#SBATCH --gres=gpu:1
 #
 # End-to-end smoke of the full train->validate->save->plot path for both geometric
 # models, ~40 steps on a small subsample, before launching the 40-trial sweeps.

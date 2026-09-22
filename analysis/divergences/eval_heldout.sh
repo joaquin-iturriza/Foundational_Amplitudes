@@ -4,6 +4,7 @@
 #SBATCH --time=00:20:00
 #SBATCH --output=analysis/divergences/evalho_%j.out
 #SBATCH --error=analysis/divergences/evalho_%j.out
+#SBATCH --gres=gpu:1
 set -e
 source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
 cd "$PROJECT_DIR"/worktrees/wt-l2-uugg

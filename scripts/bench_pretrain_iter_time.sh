@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=pretrain_iter_time_%j.out
 #SBATCH --error=pretrain_iter_time_%j.err
+#SBATCH --gres=gpu:1
 #
 # Real-conditions iteration-time benchmark for the full-dataset pretraining sweep.
 #   - FULL datasets, NO subsampling (data.subsample=null -> all 8 x 12500 = 100k events).

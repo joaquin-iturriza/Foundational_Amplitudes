@@ -6,6 +6,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --output=compare_models/cmp_%x_%j.out
 #SBATCH --error=compare_models/cmp_%x_%j.err
+#SBATCH --gres=gpu:1
 #
 # Stage B: one comparison run. Args: $1 = model key {lloca|lgatr|slim}, $2 = iterations.
 # All three share an IDENTICAL recipe + HPs (25-process pretrain set, batch=1024,

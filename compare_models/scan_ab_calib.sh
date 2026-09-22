@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=compare_models/scan_ab_calib_%j.out
 #SBATCH --error=compare_models/scan_ab_calib_%j.err
+#SBATCH --gres=gpu:1
 #
 # Calibration for the 3-way coupling+mass A/B on the full 385-dataset scan set:
 # one BASELINE run (all features off) over the prebuilt cache to (a) confirm the

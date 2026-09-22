@@ -6,6 +6,7 @@
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/collision_ab_%j.out
 #SBATCH --error=runs/_logs/collision_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # Encoding A/B on the flavour-collision recipe (recipes/collision_ab.yaml): one run with the
 # generation one-hot on, one with it off, everything else the catalog_v2 sweep's fixed setup at

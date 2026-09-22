@@ -7,6 +7,7 @@
 #SBATCH --array=0-2
 #SBATCH --output=compare_models/scan_ab_bo_%A_%a.out
 #SBATCH --error=compare_models/scan_ab_bo_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Proper DyHPO HPO for the 3-way coupling+mass A/B (mirrors encab_bo_run.sh):
 # one GPU job per arm, 15 trials looped SEQUENTIALLY so every observe() lands

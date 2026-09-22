@@ -7,6 +7,7 @@
 #SBATCH --array=0-1
 #SBATCH --output=compare_models/coup_test_%A_%a.out
 #SBATCH --error=compare_models/coup_test_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Coupling capability test: off vs data.coupling_scalars on flat wide-alpha
 # ee_uuggg (identical kinematics, alpha only differs; private cache). POOLED

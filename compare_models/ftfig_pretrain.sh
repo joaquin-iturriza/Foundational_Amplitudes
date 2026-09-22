@@ -6,6 +6,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --output=compare_models/ftfig_pre_%x_%j.out
 #SBATCH --error=compare_models/ftfig_pre_%x_%j.err
+#SBATCH --gres=gpu:1
 # Pretrained models for the fine-tune compute-scan figure (leak-free recipes:
 # 416 = bigrun minus ee_ttbar_nlo*/ee_cc_nlo* [full-NLO twins of the two virt
 # fine-tune targets], lo352 = LO only). $RECIPE + $ARM via --export; the feature

@@ -6,6 +6,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=compare_models/flops_%j.out
 #SBATCH --error=compare_models/flops_%j.err
+#SBATCH --gres=gpu:1
 #
 # Stage A of the lloca-vs-lgatr-vs-slim comparison: measure training FLOPs/step
 # (fwd+bwd) for each architecture on the real 25-process recipe pipeline, matched

@@ -7,6 +7,7 @@
 #SBATCH --array=0-2
 #SBATCH --output=compare_models/offsh_%A_%a.out
 #SBATCH --error=compare_models/offsh_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Production internal-mass conditioning: propagator OFF-SHELLNESS s_prop − M² fed
 # DIRECTLY to the main transformer (data.offshell_per_event), the general form of the

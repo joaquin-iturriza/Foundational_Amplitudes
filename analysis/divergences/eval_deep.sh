@@ -4,6 +4,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --output=analysis/divergences/ev_deep_%j.out
 #SBATCH --error=analysis/divergences/ev_deep_%j.out
+#SBATCH --gres=gpu:1
 
 set -e
 module purge

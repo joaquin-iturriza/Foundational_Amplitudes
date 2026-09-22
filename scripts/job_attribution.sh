@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=attrib_ig_%j.out
 #SBATCH --error=attrib_ig_%j.err
+#SBATCH --gres=gpu:1
 #
 # Integrated-Gradients input importance for a trained LLoCa-μP model.
 # Needs a GPU (xformers attention is CUDA-only). SUBMIT WITH: sbatch job_attribution.sh

@@ -6,6 +6,7 @@
 #SBATCH --time=00:50:00
 #SBATCH --output=workers_ab_%j.out
 #SBATCH --error=workers_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # A/B the DataLoader num_workers (lever #6). SUBMIT WITH:  sbatch bench_workers_ab.sh
 # (needs a GPU; xformers attention is CUDA-only, so it will crash on a login node.)

@@ -7,6 +7,7 @@
 #SBATCH --array=0-4%5
 #SBATCH --output=compare_models/dvbestms_%A_%a.out
 #SBATCH --error=compare_models/dvbestms_%A_%a.err
+#SBATCH --gres=gpu:1
 # Stability test of the Tier B HPO-sweep OPTIMUM: re-run the sweep's single best
 # config across 5 seeds. Tells us if the best Tier B point is reproducibly stable.
 set -e

@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=pool_ab_%j.out
 #SBATCH --error=pool_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # A/B benchmark for the vectorised event pooling in wrappers.py.
 # Runs the SAME training (best trial of scaling_p1ext_nh4_D1e5_t316, hp_0266) twice

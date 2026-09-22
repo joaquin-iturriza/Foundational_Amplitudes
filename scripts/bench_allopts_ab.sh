@@ -6,6 +6,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --output=allopts_ab_%j.out
 #SBATCH --error=allopts_ab_%j.err
+#SBATCH --gres=gpu:1
 #
 # Cumulative A/B for ALL LLoCa hot-path vectorizations.
 # Same training as bench_pooling_ab.sh (best trial of scaling_p1ext_nh4_D1e5_t316,

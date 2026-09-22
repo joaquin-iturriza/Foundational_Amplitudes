@@ -7,6 +7,7 @@
 #SBATCH --array=0-1
 #SBATCH --output=compare_models/imz_test_%A_%a.out
 #SBATCH --error=compare_models/imz_test_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Internal-mass test: off vs data.internal_mass_scalars on ee_mumu across the Z peak
 # with M_Z scanned per dataset. M_Z is INTERNAL (s-channel Z, not an external leg) so

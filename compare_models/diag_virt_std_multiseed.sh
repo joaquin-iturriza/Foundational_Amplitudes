@@ -7,6 +7,7 @@
 #SBATCH --array=0-4%5
 #SBATCH --output=compare_models/dvstdms_%A_%a.out
 #SBATCH --error=compare_models/dvstdms_%A_%a.err
+#SBATCH --gres=gpu:1
 #
 # Diagram-conditioning A/B (cheap-shortcut, CLAUDE.md A/B protocol step 3):
 # re-run the BEST encoding baseline ("combo": spin one-hot + massless flag + std)

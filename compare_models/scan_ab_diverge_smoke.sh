@@ -6,6 +6,7 @@
 #SBATCH --time=00:15:00
 #SBATCH --output=compare_models/ab_dvsmoke_%j.out
 #SBATCH --error=compare_models/ab_dvsmoke_%j.err
+#SBATCH --gres=gpu:1
 #
 # Force a hard divergence (absurd lr) with the scalar features and verify the new
 # divergence-abort fires cleanly: ~diverge_patience consecutive skips -> RuntimeError
