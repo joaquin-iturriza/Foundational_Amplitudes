@@ -8,40 +8,7 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 
 ---
 
-## Where this runs — projects above sites (2026-09-22; read before anything below)
-
-This repo is one of six projects that can run at **any** of three sites: CC-IN2P3
-(SLURM, V100), Jean Zay (SLURM, V100/A100, **hours limited**) and lxplus (HTCondor).
-The working copy is the **local checkout `~/work/FA`**. Nothing is edited on a
-cluster: no sshfs mount, no `scripts/remote.sh`, no `lxplus-run`, no `ssh` by hand.
-Code reaches a site by git, jobs by the `site` tool. **Read `~/work/CLAUDE.md`** for
-the rules and the verbs (`site pick / env / sync / submit / poll / logs / fetch / where`).
-
-- **One branch: `trunk`.** The old per-cluster branches (`ccin2p3` / `jeanzay`) are retired: they
-  had no commits `trunk` lacks. `main` stays a generated publish artifact where the
-  repo has one.
-- **Site facts live in `sites/sites.yaml`** (paths, scheduler flags, env recipe) and
-  `sites/activate.sh`. Python asks `siteconf` (`siteconf.PROJECT_DIR`,
-  `siteconf.slurm_header(...)`, `siteconf.resolve(cfg)`); every job script starts with
-  `source "$_CCORCH_ROOT/sites/activate.sh"`. **Never hardcode a cluster path**; Hydra
-  data paths are `${oc.env:DATA_DIR}`.
-- **Jean Zay is never picked automatically** — only when the work needs it or the
-  user asks (`--allow-jeanzay`). Over ~10 GPU-hours: confirm first.
-- **Infrastructure checks use `scripts/job_probe.sh`** (10 s), never a training run.
-- **Results:** `site fetch <run>` mirrors tier-0 (metrics, small plots, configs) to
-  `~/.local/share/ccorch/artifacts/FA/<run>/`; heavy artefacts stay on the site;
-  `site where <run>` prints both. The registry records the deployed commit of every run.
-- **Never delete anything on a cluster you did not create in the same command.**
-
-Sections below that mention the sshfs mount, `remote.sh` / `lxplus-run`, a per-cluster
-branch, or absolute cluster paths describe the old model and carry a supersession note.
-The AFS/EOS split, the hooks, the science and the conventions are unchanged.
-
----
-
 ## Ground rules (read first)
-
-> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
@@ -59,24 +26,41 @@ The AFS/EOS split, the hooks, the science and the conventions are unchanged.
    be ignored** unless I explicitly ask. Don't refactor, "fix", or reference the
    legacy models in solutions by default.
 
-2. **You work on CC-IN2P3 through an sshfs mount.** Claude Code runs on the
-   laptop (WSL2); this project dir **is** the cluster's
-   `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` (same bytes), so all
-   file work — read, grep, edit, tail logs — happens on the mount with no ssh.
-   Only the scheduler crosses the wire: `scripts/remote.sh <cmd>` runs `<cmd>` in
-   the project dir on a login node (`scripts/remote.sh sbatch --parsable x.sh`,
-   `scripts/remote.sh squeue --me`, `scripts/remote.sh python sweep/generate_sweep.py …`).
-   There is no project python env on this side (no torch): anything that imports
-   the project runs through `remote.sh` or inside a job. `git` runs locally.
+2. **The working copy is the local checkout `~/work/FA`; clusters are sites.**
+   Claude Code runs on the laptop (WSL2) and this checkout is where all file work
+   happens — read, grep, edit, commit. Nothing is edited on a cluster: no sshfs
+   mount, no `scripts/remote.sh`, no `ssh` by hand. Code reaches a site by git
+   (`site sync <site> FA`), jobs by `site submit <site|auto> FA <job.sh>`, state
+   comes back by `site poll` / `site logs <run>` / `site fetch <run>` /
+   `site where <run>`, and placement is `site pick FA`. The rules and the full verb
+   list live in `~/work/CLAUDE.md`; this file only adds what is FA-specific. There
+   is no project python env on the laptop (no torch): anything that imports the
+   project runs inside a job on a site, or on the local checkout only as a CPU
+   dry-run of the sweep generators.
+   - **The sites.** CC-IN2P3: SLURM, V100; it wants `--gpus=N`, a mandatory
+     `--mem`, and at most 5 CPUs per GPU — all added at submit time, never written
+     into a job script. Jean Zay: SLURM, V100 through `itg@v100`/`gpu_p2` for FA;
+     compute nodes have **no internet** (stage data first). lxplus: HTCondor; code
+     on EOS, submission from AFS; its ssh master needs a 2FA code, so I open it —
+     you cannot.
+   - **Jean Zay hours are limited.** `site pick` never chooses it on its own; use it
+     only when the work does not fit elsewhere or I explicitly ask
+     (`--allow-jeanzay`).
    - **Login nodes have no GPU.** Don't run training or any GPU/CUDA code there
      (xformers attention is CUDA-only and crashes off-GPU); GPU work goes through
-     `sbatch`. Quick CPU-only python/imports via `remote.sh` are fine.
+     `site submit`.
+   - **Infrastructure checks use `scripts/job_probe.sh`** (ten seconds: site, host,
+     python, torch, GPU) — never a training run. A job has run only once you have
+     read its log (`site logs <run>`); a RUNNING job with an empty log is not
+     working, and you don't report it as such.
+   - **Never delete anything on a cluster you did not create in the same command.**
    - **Submitting jobs is gated by GPU budget, not a blanket confirm.** You may
      submit quick tests on your own — **always be mindful of the GPU budget**.
      The rule: estimate the **total GPU-hours** of everything you're about to
      submit; if it's **> 10 GPU-hours, stop and confirm with me first** (show the
      command + your estimate). Under that, just run it (still show me what you ran).
-     Inspecting state (`squeue`, `scontrol`, reading logs) you can always just do.
+     Inspecting state (`site poll`, `site status <site>`, reading logs) you can
+     always just do.
      - Estimate wall-time × GPUs across *all* jobs, and size the request to what I
        actually asked for. Many runs train in seconds to minutes, so a short sweep
        over those is well under half a GPU-hour; don't inflate a quick check into a
@@ -102,10 +86,13 @@ The AFS/EOS split, the hooks, the science and the conventions are unchanged.
    goes in its results section and its hand-off item is deleted; the hand-off holds
    only open/future work.
 
-4. **Go easy on `find` and bulk git over the mount.** Every stat is an ssh
-   round trip: a tree-wide `find`, or a `git diff` touching hundreds of files,
-   takes minutes. Prefer `ls`, targeted `grep`, direct paths and pathspec-scoped
-   git; run genuinely tree-wide scans on the cluster via `scripts/remote.sh`.
+4. **Cluster state is read through `site`, never by hand.** `site status <site>`
+   for the queue, `site logs <run>` for a job's log, `site fetch <run>` to bring
+   the tier-0 results (metrics, small plots, configs) home to
+   `~/.local/share/ccorch/artifacts/FA/<run>/`; heavy artefacts stay on the site
+   and `site where <run>` prints both locations. The registry
+   (`site runs --project FA`) records the deployed commit of every run, so a
+   result can always be tied to the code that produced it.
 
 5. **Never attribute work to yourself — anywhere, ever.** Do not add
    `Co-Authored-By: Claude`, `Generated with Claude Code`, or any mention of
@@ -121,18 +108,38 @@ The AFS/EOS split, the hooks, the science and the conventions are unchanged.
 
 ## Paths
 
-> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
-
 | What | Path |
 |------|------|
-| Project root (cluster) | `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` |
-| Project root (this machine, sshfs) | `/home/joaquin/mnt/ccin2p3/Foundational_Amplitudes` |
-| Python env | `.venv/` in the project (python 3.11 from `/pbs/software/redhat-9-x86_64/anaconda/3.11`; torch 2.1.2+cu118, numpy pinned 1.26.4, xformers, lloca) — self-contained, **no `module load`** |
-| Env stand-ins | `scripts/env_ccin2p3.sh` — sets `$WORK`/`$SCRATCH` (Jean Zay vars the data pipeline keys on); source it after the venv in every job |
-| ssh alias | `ccin2p3` (`cca.in2p3.fr`) |
+| Working copy (where you edit) | `~/work/FA`, branch `trunk` |
+| Checkout on CC-IN2P3 | `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` — `.venv/` (python 3.11, torch 2.1.2+cu118, numpy pinned 1.26.4, xformers, lloca) |
+| Checkout on Jean Zay | `/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes` — conda env `foundational` (same torch stack) |
+| Checkout on lxplus | `/eos/user/j/joiturri/Foundational_Amplitudes` — `.venv/` (python 3.11) on EOS; sweeps and Condor submission under `/afs/cern.ch/user/j/joiturri/Foundational_Amplitudes` |
+| Site facts | `sites/sites.yaml` — per site: `project_dir`, `sweep_dir`, `scratch`, `data_dir`, the env recipe, and the `cluster` block (scheduler, partition, account, qos, gpu flag, mem, CPU ceiling). The only file, with `sites/activate.sh`, that names a cluster |
+| Env activation | `sites/activate.sh` — resolves the site (`CCORCH_SITE`, exported by `site submit`, else sniffed from its own path), activates that site's env, exports `PROJECT_DIR`, `WORK`, `SCRATCH`, `DATA_DIR`, `SUBMIT_DIR` |
+| Tier-0 mirror | `~/.local/share/ccorch/artifacts/FA/<run>/` (`site fetch`) |
 
-Sweep configs and job scripts use the `/sps/...` absolute paths, since that's
-where jobs actually run.
+**Nothing hardcodes a cluster path.** Python asks `siteconf`: `siteconf.PROJECT_DIR`,
+`siteconf.SWEEP_DIR`, `siteconf.DATA_DIR`; `siteconf.resolve(cfg)` fills the
+site-owned half of a sweep config (paths, `cluster` directives, `${PROJECT_DIR}` /
+`${SWEEP_DIR}` / `${DATA_DIR}` / `${SCRATCH}` expansion, re-rooting of a config
+generated on another site); `siteconf.slurm_header(cluster, job_name, out, err)`
+renders the whole `#SBATCH` block for the site it runs on, and
+`siteconf.cpu_header(...)` the CPU-partition one. Hydra data paths are
+`${oc.env:DATA_DIR}`. Every job script starts with
+
+```bash
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
+cd "$PROJECT_DIR"
+```
+
+(SLURM runs a *copy* of the script out of its spool, so `$0` cannot locate the
+checkout; `site submit` exports `CCORCH_SITE` and `CCORCH_PROJECT_DIR`.) A job
+script keeps only what is the job's business: `--job-name`, `--cpus-per-task`,
+`--time`, `--output`/`--error`, and `--gres=gpu:N` as a plain count. Partition,
+account, qos, `--gpus` vs `--gres`, `--mem` and the CPU ceiling are the site's
+business and are added at submit time from `sites/sites.yaml` and
+`~/.config/ccorch/sites.toml`.
 
 SLURM (from the sweep template): `account: lpnhe`, `partition: gpu_v100`,
 `qos: gpu`, `gres: gpu:v100:1` (V100 32GB) — **the only validated setup**.
@@ -338,14 +345,17 @@ goes through `sweep_manager.py` (see below) so trials interleave round-robin
 across sweeps — do **not** hand-loop `sbatch` over `jobs/*.sh`. The generators
 call it for you:
 ```bash
-# all of these shell out to sbatch, so they run on the login node via remote.sh
+# the generators render the #SBATCH block for the site they run on
+# (siteconf.slurm_header) and submit through sweep_manager.py, so they run on the
+# site where the sweep lives -- as a job you `site submit`, never by hand over ssh.
+# On the local checkout they are dry-runs only (no scheduler, no torch).
 # generate; it then prompts to submit (or set cluster.auto_submit / pass --auto-submit)
-scripts/remote.sh python sweep/generate_sweep.py --config sweep/<my_config>.yaml
+python sweep/generate_sweep.py --config sweep/<my_config>.yaml
 # scaling generators submit all their cells interleaved in one batch:
-scripts/remote.sh python sweep/generate_scaling_sweep.py --config sweep/<scaling_config>.yaml
-scripts/remote.sh python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
+python sweep/generate_scaling_sweep.py --config sweep/<scaling_config>.yaml
+python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
 # submit manually later (interleaves with whatever is already queued):
-scripts/remote.sh python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
+python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
 ```
 
 **Known coupling issue (relevant to job ordering):** jobs share DyHPO state, but
@@ -459,23 +469,23 @@ When I submit a job/test and need its result before continuing, **do not** poll
 `squeue` in a manual loop of tool calls, and **do not** promise "I'll check back"
 without a mechanism. The standard way on this laptop:
 
-1. Submit and capture the id: `jid=$(scripts/remote.sh sbatch --parsable <script>)`.
-2. Arm the **Monitor tool** on it (`persistent: true`; a loop that polls
-   `sacct`/`squeue` over `scripts/remote.sh` every ~45 s and prints one line per
-   terminal state: COMPLETED, FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL), and
-   list the watched id(s) in `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh`
-   accepts the turn ending. The event notification is the source of truth; clear the
-   marker file when the job is read.
+1. Submit and capture the run id: `site submit <site|auto> FA <script>` prints
+   `run FA-<site>-<id>` (and the scheduler's job id); the registry keeps both.
+2. Arm the **Monitor tool** on it (`persistent: true`; a loop that runs
+   `site poll <run>` every ~45 s and prints one line per terminal state: COMPLETED,
+   FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL), and list the watched id(s) in
+   `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh` accepts the turn ending.
+   The event notification is the source of truth; clear the marker file when the
+   job is read — and read it (`site logs <run>`) before reporting anything.
 
 Why not a backgrounded Bash waiter: **on this WSL2 laptop Claude Code stops
 background Bash tasks within minutes** ("low memory" with 6 GB free), so
 `scripts/wait_for_slurm.sh "$jid"` under `run_in_background` never survives a real
 job; a foreground Bash call is capped at 10 min. Both are fine only for jobs that
 finish in a few minutes. `scripts/wait_for_slurm.sh` (`POLL=<s>`, `TAIL=<n>`; no id
-⇒ all my jobs; forwards itself to the login node) remains the right waiter on a
-machine that keeps background tasks alive.
+⇒ all my jobs) is a waiter for a session running *on* a site, not for the laptop.
 
-- Don't `sleep`-loop or re-run `squeue` by hand across turns; an interim peek reads
+- Don't `sleep`-loop or re-run `site poll` by hand across turns; an interim peek reads
   the task's output file, the completion event is what I act on.
 - **Quick tests must return quickly**: pass `evaluation.train_subsample=2000` (the
   post-training train-split pass otherwise runs the whole pool; default 10000).
@@ -545,9 +555,7 @@ machine that keeps background tasks alive.
 
 ---
 
-## Git & release workflow (ccin2p3 trunk → published main)
-
-> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
+## Git & release workflow (trunk → published main)
 
 This repo uses a **development trunk + generated public branch** model. Claude
 handles git: commit and push as work progresses, keep a readable timeline.
@@ -556,10 +564,10 @@ handles git: commit and push as work progresses, keep a readable timeline.
 work lands and push without asking — pushing is *not* an outward action that needs
 confirmation (see ground rule #2). Hooks back the workflow (and other rules) up
 so they can't be silently forgotten (`.claude/settings.json` → `.claude/hooks/`):
-a **`Stop` hook (`auto_push.sh`)** pushes any unpushed `ccin2p3`/feature-branch
+a **`Stop` hook (`auto_push.sh`)** pushes any unpushed `trunk`/feature-branch
 commits to origin at the end of every turn (already-committed work only; never
 `main`); a **`PreToolUse` hook (`worktree_guard.sh`)** reminds me to open a
-worktree when I start editing trunk code on `ccin2p3`. Two more enforce rules
+worktree when I start editing trunk code on `trunk`. Two more enforce rules
 above: **`md_guard.sh`** (`PreToolUse(Write)`) blocks creation of new
 `.md`/`.tex`/`.rst` files (ground rule #3; allowlist
 `.claude/md_allowlist.txt`), and
@@ -599,35 +607,28 @@ leaves its lock held on purpose, so the fixes it demanded can be applied. Waterm
 `.claude/.review_state/` (gitignored, per-checkout).
 
 **Branches**
-- **`ccin2p3`** — the development trunk and default working branch. *Everything*
+- **`trunk`** — the development trunk and the only working branch. *Everything*
   lives here: the core code plus all tooling (`tools/`, `tests/`, `sweep/`,
-  `scripts/`, `attribution/`, `data/` scripts, `notes/`, `CLAUDE.md`, recipes).
-  This is where development happens.
-- **`jeanzay`** — the Jean Zay overlay of the trunk: the same content, with only
-  the cluster-specific lines rewritten by `scripts/port_cluster.sh` (project and
-  scratch paths, the python-env lines of job scripts and sweep `setup_commands`,
-  the SLURM `partition`/`account`/`qos`/`gres`/`mem` directives). Its CLAUDE.md
-  carries the Jean Zay paths and scheduler facts in the same sections as this one.
-  Sync it from the trunk with `git checkout jeanzay && git merge ccin2p3 &&
-  scripts/port_cluster.sh --to jeanzay`, then commit; work done on Jean Zay comes
-  back through `scripts/port_cluster.sh --to ccin2p3` before it is merged into the
-  trunk. Never hand-edit headers or paths to move between the two: extend the rule
-  table in the script instead, so `git diff ccin2p3 jeanzay` stays cluster-only.
+  `scripts/`, `attribution/`, `data/` scripts, `notes/`, `CLAUDE.md`, recipes,
+  `sites/`). This is where development happens, and it is what every site checks
+  out: `site sync <site> FA` pushes it and fast-forwards the site's copy. There
+  are no per-site branches — a site's differences live in `sites/sites.yaml`, not
+  in git.
 - **`main`** — the **public, stripped-down core**. It is a *build artifact* of
-  `ccin2p3`, regenerated by `scripts/publish_main.sh` from the `PUBLIC_PATHS`
+  `trunk`, regenerated by `scripts/publish_main.sh` from the `PUBLIC_PATHS`
   allowlist (core run path + `config/` + `models/` + `IntrinsicDimDeep/` +
   example `recipes/` + README). **Never edit `main` by hand**; never merge
-  `ccin2p3 → main`. To change what's public, edit the allowlist and re-publish.
-- **`lxplus`** (and future env branches) — same model as `jeanzay`: branch off the
-  trunk, carry only that environment's specifics (submission headers, paths, env
-  setup), and stay in sync via `git checkout lxplus && git merge ccin2p3`. Never
-  merged back to the trunk wholesale.
+  `trunk → main`. To change what's public, edit the allowlist and re-publish.
+- **Retired: `ccin2p3`, `jeanzay`.** The former per-cluster branches still exist
+  on GitHub, have no commits `trunk` lacks, and are not to be checked out, merged
+  or ported to. `scripts/port_cluster.sh`, which rewrote a tree from one cluster
+  to the other, belongs to that model and is unused.
 
 **Working rules**
-1. **Do work on `ccin2p3`** (or a feature branch off it).
+1. **Do work on `trunk`** (or a feature branch off it).
 2. **Open a worktree for new work, always under this repo:**
-   `git worktree add worktrees/wt-<feat> -b <feat> ccin2p3`, implement and verify
-   there, then merge back into `ccin2p3` and `git worktree remove` it. Never
+   `git worktree add worktrees/wt-<feat> -b <feat> trunk`, implement and verify
+   there, then merge back into `trunk` and `git worktree remove` it. Never
    `../wt-<feat>` or any path outside the project root — keep them in `worktrees/`
    (gitignored) so parallel experiments don't clobber the trunk checkout.
    `worktree_guard.sh` nudges when I edit trunk code without one; for quick standalone
@@ -650,11 +651,10 @@ leaves its lock held on purpose, so the fixes it demanded can be applied. Waterm
    ask permission to push; to push mid-turn just run `git push` (allowlisted).
 4. **Publish the public core** with `scripts/publish_main.sh` (regenerates `main`
    from the allowlist and pushes). Run it after core-facing changes land on
-   `ccin2p3`. Use `--no-push` to review first.
-5. **Sync an env branch:** `git checkout lxplus && git merge ccin2p3`.
+   `trunk`. Use `--no-push` to review first.
 
 **Visibility caveat:** it's a *single* GitHub repo, so all branches share
-visibility — making the repo public exposes `ccin2p3`/`jeanzay`/`lxplus` too. Only `main`'s
+visibility — making the repo public exposes `trunk` and the retired branches too. Only `main`'s
 *tree* is stripped, not the other branches. If a dev branch ever needs to be
 truly private, that forces a separate-repo split.
 
