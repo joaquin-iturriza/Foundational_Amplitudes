@@ -29,6 +29,7 @@ case "$CCORCH_SITE" in
     export WORK="${WORK:-/sps/lpnhe/jiturrizaramirez01}"
     export SCRATCH="${SCRATCH:-/sps/lpnhe/jiturrizaramirez01/tmp}"
     export DATA_DIR="${DATA_DIR:-/sps/lpnhe/jiturrizaramirez01/datasets}"
+    export SUBMIT_DIR="${SUBMIT_DIR:-/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes}"
     ;;
   jeanzay)
     module load anaconda-py3/2023.09 2>/dev/null || true
@@ -37,12 +38,14 @@ case "$CCORCH_SITE" in
     export WORK="${WORK:-/lustre/fswork/projects/rech/itg/ulm49ia}"
     export SCRATCH="${SCRATCH:-/lustre/fsn1/projects/rech/itg/ulm49ia}"
     export DATA_DIR="${DATA_DIR:-/lustre/fswork/projects/rech/itg/ulm49ia/datasets}"
+    export SUBMIT_DIR="${SUBMIT_DIR:-/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes}"
     ;;
   lxplus)
     source "$PROJECT_DIR/.venv/bin/activate"
     export WORK="${WORK:-/eos/user/j/joiturri}"
     export SCRATCH="${SCRATCH:-/eos/user/j/joiturri/tmp}"
     export DATA_DIR="${DATA_DIR:-/eos/user/j/joiturri/jitu/lorentz-gatr/data/data}"
+    export SUBMIT_DIR="${SUBMIT_DIR:-/afs/cern.ch/user/j/joiturri/Foundational_Amplitudes}"
     ;;
   *)
     [ -d "$PROJECT_DIR/.venv" ] && source "$PROJECT_DIR/.venv/bin/activate"
