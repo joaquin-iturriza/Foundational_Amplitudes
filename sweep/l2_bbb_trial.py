@@ -17,8 +17,12 @@ import subprocess
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 from sweep.dyhpo_sampler import DyHPOSampler          # noqa: E402
 
@@ -66,7 +70,7 @@ def main():
     args = ap.parse_args()
 
     with open(args.sweep_config) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
     sweep_name = cfg["sweep_name"]
     sweep_dir, eos_dir = _sweep_dirs(cfg, sweep_name)
     state_path = os.path.join(sweep_dir, "dyhpo_state.pkl")

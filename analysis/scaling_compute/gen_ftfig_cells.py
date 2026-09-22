@@ -18,8 +18,12 @@ params mirror the cscan_ft25 cells (training.lr=0.008322839, bs 16384, ttv
 Ladder (one job): raw1h/rung2_1h/rung3_1h/best1h fine-tuned at D=100k, t=6193 only.
 """
 import json, os, stat, sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+ROOT = siteconf.PROJECT_DIR
 HPS = json.load(open(f"{ROOT}/analysis/scaling_compute/ftfig_cell_hps.json"))
 JOBDIR = f"{ROOT}/sweeps/ftfig_jobs"
 os.makedirs(JOBDIR, exist_ok=True)
@@ -53,23 +57,11 @@ LADDER = {"ftraw1h": ("raw1h", RAW_FLAGS), "ftrung2": ("rung2_1h",
           "data.internal_mass_scalars=false data.offshell_per_event=false"),
           "ftbest1h": ("best1h", BEST_FLAGS)}
 
-HEADER = """#!/bin/bash
-#SBATCH --job-name={name}
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=8
-#SBATCH --time={hours}:00:00
-#SBATCH --output={jobdir}/{name}_%j.out
-#SBATCH --error={jobdir}/{name}_%j.err
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd {root}
-"""
+# the site half (partition/account/qos/gpu flag/mem) is rendered by siteconf;
+# {name}/{hours}/{jobdir}/{root} stay as .format placeholders
+HEADER = siteconf.slurm_header({"time": "{hours}:00:00", "cpus_per_task": 8}, "{name}",
+                               "{jobdir}/{name}_%j.out", "{jobdir}/{name}_%j.err") + \
+    "source ${{CCORCH_PROJECT_DIR:-${{SLURM_SUBMIT_DIR}}}}/sites/activate.sh\ncd {root}\n"
 
 def run_cmd(fam, arm, flags, key, D, t, hp):
     cell = f"{ROOT}/sweeps/cscan_{fam}_D{D}_{key}_t{t:05d}"

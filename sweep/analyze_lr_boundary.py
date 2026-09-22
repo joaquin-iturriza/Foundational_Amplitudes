@@ -26,6 +26,10 @@ import sys
 
 import numpy as np
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -403,7 +407,7 @@ def _apply_extension(sweep_dir, direction, new_bound,
         return []
 
     with open(cfg_path) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
 
     jobs_dir    = os.path.join(sweep_dir, 'jobs')
     existing    = len([fn for fn in os.listdir(jobs_dir)
@@ -416,20 +420,12 @@ def _apply_extension(sweep_dir, direction, new_bound,
 
     new_scripts = []
     for i in range(existing, existing + n_new_jobs):
+        header = siteconf.slurm_header({**cluster, "time": cluster.get("time", "02:00:00")},
+                                       f"trial_{i:04d}",
+                                       f"{lustre_dir}/output/trial_{i:04d}_%j.out",
+                                       f"{lustre_dir}/error/trial_{i:04d}_%j.err")
         content = f"""\
-#!/bin/bash
-#SBATCH --job-name=trial_{i:04d}
-#SBATCH --partition={cluster["partition"]}
-#SBATCH --account={cluster["account"]}
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:{cluster["request_gpus"]}
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
-#SBATCH --time={cluster.get("time", "02:00:00")}
-#SBATCH --output={lustre_dir}/output/trial_{i:04d}_%j.out
-#SBATCH --error={lustre_dir}/error/trial_{i:04d}_%j.err
-
+{header}
 {setup_lines}
 
 python {trial_script} \\

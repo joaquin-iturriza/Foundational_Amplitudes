@@ -17,6 +17,10 @@ import re
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -99,7 +103,7 @@ def main():
 
     config_abs_path = os.path.abspath(args.config)
     with open(config_abs_path) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
 
     # Fix the init seed by default so trials differ only by hyperparameters
     # (a config may override by setting its own fixed_params.seed).

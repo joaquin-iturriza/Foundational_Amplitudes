@@ -12,9 +12,12 @@ start time of its SLURM job (first log line). Report:
 import glob, json, os, re, yaml
 from datetime import datetime
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 
+ROOT = siteconf.PROJECT_DIR
 FAMILIES = {
     "solo 10k":    ("solo_nh8_10k_virt_{k}", "lr"),
     "solo 100k":   (["scaling_solo_nh8_lowt_virt_{k}", "scaling_solo_nh8_anchor_virt_002_{k}",

@@ -13,12 +13,16 @@ import argparse
 import numpy as np
 import sys
 import matplotlib
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from scipy.stats import binned_statistic_2d
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 import plot_style as ps  # noqa: E402
 

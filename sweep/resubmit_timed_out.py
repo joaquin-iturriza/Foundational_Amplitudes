@@ -18,13 +18,17 @@ import math
 import os
 import re
 import sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
     sys.path.insert(0, _project_dir)
 
 # Support both Jean-Zay (Lustre) and the local SSHFS mount used for editing
-_LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+_LUSTRE_BASE = siteconf.PROJECT_DIR
 _MOUNT_BASE  = "/home/joaquin/mnt/jeanzay/Foundational_Amplitudes"
 LUSTRE_BASE  = _LUSTRE_BASE if os.path.isdir(_LUSTRE_BASE) else _MOUNT_BASE
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
@@ -57,7 +61,7 @@ def infer_time_limit(sweep_dir: str) -> str | None:
     if not os.path.exists(cfg_path):
         return None
     with open(cfg_path) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
     t_steps  = cfg.get("fidelity_schedule", {}).get("t_steps", [None])[-1]
     num_heads = cfg.get("fixed_params", {}).get("model.net.num_heads", 16)
     bs        = cfg.get("fixed_params", {}).get("training.batchsize", 8192)

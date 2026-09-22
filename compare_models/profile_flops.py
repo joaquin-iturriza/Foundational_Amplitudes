@@ -16,8 +16,12 @@ Usage (one GPU job loops over the three):
 Prints a line:  FLOPS_STEP <model> <flops>
 """
 import sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-PROJECT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+PROJECT = siteconf.PROJECT_DIR
 sys.path.insert(0, PROJECT)  # script lives in compare_models/; put project root on path
 
 import torch

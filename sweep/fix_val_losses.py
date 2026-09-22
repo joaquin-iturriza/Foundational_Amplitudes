@@ -19,8 +19,12 @@ import os
 import sys
 
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+LUSTRE_BASE = siteconf.PROJECT_DIR
 SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 
 

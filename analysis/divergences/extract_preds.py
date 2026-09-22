@@ -21,9 +21,13 @@ import sys
 import numpy as np
 import torch
 from omegaconf import OmegaConf, open_dict
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 # repo root on path
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 
 from experiment import AmplitudeExperiment  # noqa: E402

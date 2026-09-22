@@ -14,9 +14,13 @@ import sys
 
 import numpy as np
 import matplotlib
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 matplotlib.use("Agg")
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import plot_style as ps          # noqa: E402

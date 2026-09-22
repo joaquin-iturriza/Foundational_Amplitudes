@@ -31,10 +31,14 @@ import sys
 
 import numpy as np
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-DEFAULT_REF = (
-    "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/"
-    "sweeps/pretraining_scaling/scaling_p1_nh16_D1e3_t31623/sweep_config.yaml"
+
+DEFAULT_REF = os.path.join(
+    siteconf.PROJECT_DIR,
+    "sweeps/pretraining_scaling/scaling_p1_nh16_D1e3_t31623/sweep_config.yaml",
 )
 
 
@@ -102,22 +106,9 @@ def build_run_cmd(project_dir, fixed_params, shared_hps, num_heads, lr,
 def slurm_header(cluster, name, out_dir, err_dir, setup_commands, time):
     # qos/mem are cluster-specific (CC-IN2P3 needs both, Jean Zay rejects --mem):
     # emitted only when the reference config's cluster block carries them.
-    lines = [
-        "#!/bin/bash",
-        f"#SBATCH --job-name={name}",
-        f"#SBATCH --partition={cluster.get('partition', 'gpu_v100')}",
-        *([f"#SBATCH --qos={cluster['qos']}"] if "qos" in cluster else []),
-        f"#SBATCH --account={cluster.get('account', 'lpnhe')}",
-        "#SBATCH --nodes=1",
-        "#SBATCH --ntasks-per-node=1",
-        f"#SBATCH --gres={cluster.get('gres', 'gpu:' + str(cluster.get('request_gpus', 1)))}",
-        *([f"#SBATCH --mem={cluster['mem']}"] if "mem" in cluster else []),
-        f"#SBATCH --cpus-per-task={cluster.get('cpus_per_task', 8)}",
-        f"#SBATCH --time={time}",
-        f"#SBATCH --output={out_dir}/{name}_%j.out",
-        f"#SBATCH --error={err_dir}/{name}_%j.err",
-        "",
-    ]
+    lines = siteconf.slurm_header({**cluster, "time": time}, name,
+                                  f"{out_dir}/{name}_%j.out",
+                                  f"{err_dir}/{name}_%j.err").splitlines() + [""]
     lines += list(setup_commands) + [""]
     return "\n".join(lines)
 
@@ -135,7 +126,7 @@ def main():
     args = ap.parse_args()
 
     with open(args.ref_config) as f:
-        ref = yaml.safe_load(f)
+        ref = siteconf.resolve(yaml.safe_load(f))
 
     paths = ref["paths"]
     project_dir = paths["project_dir"]

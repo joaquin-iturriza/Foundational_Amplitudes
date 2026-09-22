@@ -22,13 +22,16 @@ import json
 import os
 
 import matplotlib
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
-
+ROOT = siteconf.PROJECT_DIR
 # Per-step cost + size from the shared profiling run (compare_models/profile_flops):
 # batchsize 1024, sparse block-diagonal xformers attention, V100.
 PROFILE = {

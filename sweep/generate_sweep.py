@@ -18,6 +18,10 @@ import subprocess
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 # Make sweep/ importable from the project root
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +31,7 @@ if _project_dir not in sys.path:
 
 def load_config(path):
     with open(path) as f:
-        return yaml.safe_load(f)
+        return siteconf.resolve(yaml.safe_load(f))
 
 
 def _sweep_dirs(cfg, sweep_name):
@@ -159,23 +163,12 @@ def write_slurm_script(i, cfg, sweep_dir, config_abs_path, t_steps_cap=None):
     trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
 
-    # CC-IN2P3 rejects a job without an explicit memory request; qos/gres strings are cluster-specific.
-    mem_line = f"#SBATCH --mem={cluster['mem']}\n" if "mem" in cluster else ""
-    qos_line = f"#SBATCH --qos={cluster['qos']}\n" if "qos" in cluster else ""
-    gres = cluster.get("gres", f"gpu:{cluster['request_gpus']}")
+    # partition/account/qos/gpu flag/mem policy are the SITE's: siteconf renders them.
+    header = siteconf.slurm_header(cluster, f"trial_{i:04d}",
+                                   f"{sweep_dir}/output/trial_{i:04d}_%j.out",
+                                   f"{sweep_dir}/error/trial_{i:04d}_%j.err")
     content = f"""\
-#!/bin/bash
-#SBATCH --job-name=trial_{i:04d}
-#SBATCH --partition={cluster["partition"]}
-{qos_line}#SBATCH --account={cluster["account"]}
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --gres={gres}
-#SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
-#SBATCH --time={cluster.get("time", "20:00:00")}
-{mem_line}#SBATCH --output={sweep_dir}/output/trial_{i:04d}_%j.out
-#SBATCH --error={sweep_dir}/error/trial_{i:04d}_%j.err
-
+{header}
 {_env_setup_lines(cfg)}
 
 python {trial_script} \\

@@ -62,12 +62,16 @@ import sys
 
 import numpy as np
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
     sys.path.insert(0, _project_dir)
 
-LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE_BASE = siteconf.PROJECT_DIR
 SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 SOLO_BASE   = os.path.join(LUSTRE_BASE, "sweeps")
 DATA_DIR    = os.path.join(LUSTRE_BASE, "data")

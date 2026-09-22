@@ -4,10 +4,13 @@ same t-grids per D) — only the pretrained checkpoint and the encoding fixed_pa
 differ per family (flags copied from analysis/scaling_compute/gen_ftfig_cells.py).
 """
 import copy, os, yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
-
+ROOT = siteconf.PROJECT_DIR
 RAW = {"data.spin_onehot": "false", "data.color_onehot": "false",
        "data.prop_is_massless": "false", "data.standardize_props": "false",
        "data.mass_from_momenta": "false", "data.coupling_scalars": "false",

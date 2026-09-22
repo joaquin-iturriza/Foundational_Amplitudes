@@ -27,6 +27,10 @@ import time
 
 import numpy as np
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -139,7 +143,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.config) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
 
     fidelity     = cfg["fidelity_schedule"]
     dataset_names = list(fidelity["n_data"].keys())

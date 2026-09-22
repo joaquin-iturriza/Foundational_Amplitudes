@@ -21,9 +21,13 @@ import sys
 
 import numpy as np
 import matplotlib
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 matplotlib.use("Agg")
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 import plot_style as ps  # noqa: E402
 
@@ -32,9 +36,7 @@ MZ = 91.1876
 
 
 # heldout_eval_*.npz are written to the MAIN repo (score_and_save uses REPO), not the worktree copy.
-NPZ_DIR = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/divergences"
-
-
+NPZ_DIR = os.path.join(siteconf.PROJECT_DIR, "analysis/divergences")
 def load(path):
     if not path.endswith(".npz"):
         path += ".npz"

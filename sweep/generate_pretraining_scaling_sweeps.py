@@ -27,6 +27,10 @@ import os
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -203,14 +207,11 @@ def needs_32gb(num_heads: int, batch_size: int) -> bool:
 # Config generation
 # ---------------------------------------------------------------------------
 
-LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE_BASE = siteconf.PROJECT_DIR
 
 BASE_CLUSTER = {
     "scheduler": "slurm",
-    "account": "lpnhe",
-    "qos": "gpu",
-    "gres": "gpu:v100:1",
-    "mem": "32G",
+    # partition/account/qos/gpu flag/mem come from siteconf at emit time
     "request_gpus": 1,
     "cpus_per_task": 8,
 }
@@ -218,11 +219,7 @@ BASE_CLUSTER = {
 BASE_PATHS = {
     "sweep_dir": f"{LUSTRE_BASE}/sweeps/pretraining_scaling",
     "project_dir": LUSTRE_BASE,
-    "setup_commands": [
-        
-        "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
-        "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
-    ],
+    "setup_commands": list(siteconf.SETUP_COMMANDS),
 }
 
 DYHPO = {
@@ -326,7 +323,7 @@ def make_cell_config(
     bs = min(_batch_size(d_total), BS_CAP.get(num_heads, 8192))
     sub = _subsample_per_ds(d_total)
     use_32gb = needs_32gb(num_heads, bs)
-    partition = "gpu_v100"   # every CC-IN2P3 V100 is the 32 GB part; use_32gb is moot here
+    partition = siteconf.CLUSTER["partition"]   # the site's GPU partition; use_32gb is moot here
     slurm_time = slurm_time_str(t_steps, num_heads, bs)
 
     cluster = {**BASE_CLUSTER, "partition": partition, "time": slurm_time, "auto_submit": auto_submit}

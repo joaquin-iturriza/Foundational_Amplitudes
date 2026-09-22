@@ -32,6 +32,10 @@ import shutil
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BASE = os.path.join(_project_dir, "sweeps", "pretraining_scaling")
@@ -65,20 +69,11 @@ def write_job(fast_dir, cfg, fast_config_path, hp_idx, t_steps):
     trial_script = os.path.join(project_dir, "sweep", "run_trial.py")
     setup        = "\n".join(cfg["paths"].get("setup_commands", []))
     name         = os.path.basename(fast_dir)
+    header = siteconf.slurm_header({**cluster, "time": cluster.get("time", "02:00:00")}, name,
+                                   f"{fast_dir}/output/trial_0000_%j.out",
+                                   f"{fast_dir}/error/trial_0000_%j.err")
     content = f"""\
-#!/bin/bash
-#SBATCH --job-name={name}
-#SBATCH --partition={cluster["partition"]}
-#SBATCH --account={cluster["account"]}
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:{cluster.get("request_gpus", 1)}
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
-#SBATCH --time={cluster.get("time", "02:00:00")}
-#SBATCH --output={fast_dir}/output/trial_0000_%j.out
-#SBATCH --error={fast_dir}/error/trial_0000_%j.err
-
+{header}
 {setup}
 
 python {trial_script} \\
@@ -129,7 +124,7 @@ def main():
         for d in ("jobs", "output", "error", "results", "dyhpo_surrogate"):
             os.makedirs(os.path.join(fast_dir, d), exist_ok=True)
         with open(cfg_path) as f:
-            cfg = yaml.safe_load(f)
+            cfg = siteconf.resolve(yaml.safe_load(f))
         cfg["sweep_name"] = fast_name
         cfg.setdefault("fixed_params", {})["seed"] = 42
         fast_cfg_path = os.path.join(fast_dir, "sweep_config.yaml")

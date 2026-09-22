@@ -9,20 +9,11 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_v100
-  qos: gpu
-  account: lpnhe
   request_gpus: 1
-  gres: gpu:v100:1
   mem: 64G
   cpus_per_task: 8
   time: "00:50:00"           # ~5 min load + ~4 min train + validations/eval/plots: ~15 min per trial
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
-  setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 sweep_name: catalog_q_excess
 n_trials: 12
 dyhpo:
@@ -34,7 +25,7 @@ fidelity_schedule:
   t_steps: [500]
 fixed_params:
   data.source: recipes
-  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_v2_train_scan.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v2_train_scan.yaml
   data.require_cache: 'true'
   data.train_subsample: 5000
   data.eval_subsample: 2000

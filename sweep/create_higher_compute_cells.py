@@ -16,6 +16,10 @@ import subprocess
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -27,18 +31,11 @@ from sweep.generate_pretraining_scaling_sweeps import (
     DATASET_LIST_STR, AMP_ORDERS_STR, SEARCH_SPACE,
 )
 
-LUSTRE_BASE  = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE_BASE  = siteconf.PROJECT_DIR
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 N_TRIALS     = 10
-SETUP_COMMANDS = [
-    
-    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
-    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
-]
-BASE_CLUSTER = {"scheduler": "slurm", "account": "lpnhe",
-                "qos": "gpu",
-                "gres": "gpu:v100:1",
-                "mem": "32G",
+SETUP_COMMANDS = list(siteconf.SETUP_COMMANDS)
+BASE_CLUSTER = {"scheduler": "slurm",   # site half rendered by siteconf
                 "request_gpus": 1, "cpus_per_task": 8}
 
 
@@ -93,7 +90,7 @@ def main():
         cell_name = f"scaling_p1ext_nh{nh}_{d_key}_t{t_new}"
         cell_dir  = os.path.join(SWEEP_BASE, cell_name)
 
-        gpu     = "gpu_v100"   # every CC-IN2P3 V100 is the 32 GB part
+        gpu     = siteconf.CLUSTER["partition"]   # the site's GPU partition
         slurm_t = slurm_time_str(t_new, nh, bs_new)
 
         # Skip cells that would exceed the QOS wall time limit

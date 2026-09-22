@@ -1,12 +1,7 @@
 cluster:
-  account: lpnhe
   auto_submit: false
   cpus_per_task: 8
-  partition: gpu_v100
-  qos: gpu
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   scheduler: slurm
   time: "01:30:00"
 dyhpo:
@@ -23,13 +18,13 @@ fixed_params:
   #     (one-hot PDG token encoding) vs the physics 8-D property-vector encoding.
   #     Used to A/B zero-shot transfer to held-out processes (ee_uu, ee_ttbar). ---
   data.source: recipes
-  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain25.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/pretrain25.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
   data.train_subsample: 500000
   data.eval_subsample: 20000
   data.seed: 42
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: ${PROJECT_DIR}/data/
   data.use_PIDs: 'true'
   # --- model / training ---
   model: lloca
@@ -47,11 +42,8 @@ fixed_params:
   training.validate_frac: 0.02
 n_trials: 20
 paths:
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/pretrain25_pid
+  sweep_dir: ${PROJECT_DIR}/sweeps/pretrain25_pid
 range_extension:
   enabled: false
 search_space:

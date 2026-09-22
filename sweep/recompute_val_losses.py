@@ -24,6 +24,10 @@ import numpy as np
 import torch
 import yaml
 from omegaconf import OmegaConf, open_dict
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -33,7 +37,7 @@ from experiment import AmplitudeExperiment
 from base_experiment import _torch_load
 from misc import get_device
 
-LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE_BASE = siteconf.PROJECT_DIR
 SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 
 

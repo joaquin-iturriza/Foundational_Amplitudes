@@ -17,6 +17,10 @@ import subprocess
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -25,7 +29,7 @@ if _project_dir not in sys.path:
 
 def load_config(path):
     with open(path) as f:
-        return yaml.safe_load(f)
+        return siteconf.resolve(yaml.safe_load(f))
 
 
 def _sweep_dirs(cfg, sweep_name):
@@ -89,22 +93,12 @@ def _write_slurm_script(job_name, cfg, sweep_dir, config_path, hp_idx, t_steps):
     cluster      = cfg["cluster"]
     project_dir  = cfg["paths"]["project_dir"]
     trial_script = os.path.join(project_dir, "sweep", "run_trial.py")
-    mem_line = f"#SBATCH --mem={cluster['mem']}\n" if "mem" in cluster else ""
+    header = siteconf.slurm_header(cluster, job_name,
+                                   f"{sweep_dir}/output/{job_name}_%j.out",
+                                   f"{sweep_dir}/error/{job_name}_%j.err")
 
     content = f"""\
-#!/bin/bash
-#SBATCH --job-name={job_name}
-#SBATCH --partition={cluster["partition"]}
-#SBATCH --account={cluster["account"]}
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:{cluster["request_gpus"]}
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task={cluster.get("cpus_per_task", 8)}
-#SBATCH --time={cluster.get("time", "20:00:00")}
-{mem_line}#SBATCH --output={sweep_dir}/output/{job_name}_%j.out
-#SBATCH --error={sweep_dir}/error/{job_name}_%j.err
-
+{header}
 {_env_setup_lines(cfg)}
 
 python {trial_script} \\

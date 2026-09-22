@@ -1,22 +1,11 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_v100        # CC-IN2P3 V100 32GB nodes (gpu_h100 exists too; untested here)
-  qos: gpu
-  account: lpnhe
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "02:00:00"
 
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
-  setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
-
 sweep_name: finetune_pt25_eeuunlovirt
 datasets:
   - ee_uu_nlo_virt_e4
@@ -30,9 +19,9 @@ dyhpo:
   total_budget: 200   # generous upper bound (n_trials_per_level * n_levels)
 
 fixed_params:
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: ${PROJECT_DIR}/data/
   data.subsample: null
-  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/pretrain25/trial_0009/models/model_run0_best.pt.gz
   model: lloca
   model.net.num_blocks: 8
   model.net.num_heads: 8

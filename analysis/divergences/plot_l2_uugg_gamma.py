@@ -6,8 +6,12 @@ gamma -- deepest decade, log-flat overall, and shallowest decade. png+pdf."""
 import sys
 
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, REPO)
 import plot_style as ps  # noqa: E402
 

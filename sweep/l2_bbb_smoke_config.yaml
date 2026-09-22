@@ -5,27 +5,17 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_v100
-  qos: gpu
-  account: lpnhe
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:10:00"
 
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/worktrees/wt-harder-div/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/worktrees/wt-harder-div
-  setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
-
+  sweep_dir: ${PROJECT_DIR}/worktrees/wt-harder-div/sweeps
 sweep_name: l2_bbb_smoke
 n_trials: 1
 # drive the L2 online-generation BBB loop, not run.py:
 trial_script: sweep/l2_bbb_trial.py
-l2_driver: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/worktrees/wt-harder-div/analysis/divergences/l2_online_uugg.py
+l2_driver: ${PROJECT_DIR}/worktrees/wt-harder-div/analysis/divergences/l2_online_uugg.py
 
 dyhpo:
   n_candidates: 200

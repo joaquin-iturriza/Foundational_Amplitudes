@@ -24,6 +24,10 @@ import sys
 import time
 
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 # Make the project root importable (sweep/ lives one level below the root)
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,7 +39,7 @@ import yaml
 
 def load_config(path):
     with open(path) as f:
-        return yaml.safe_load(f)
+        return siteconf.resolve(yaml.safe_load(f))
 
 
 def test_sweep_name(cfg):

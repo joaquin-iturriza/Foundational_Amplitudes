@@ -1,0 +1,61 @@
+# Per-site facts for Foundational_Amplitudes. THE ONLY FILE (with
+# sites/activate.sh) THAT NAMES A CLUSTER.
+#
+# Read by siteconf.py at import time; the site is CCORCH_SITE (exported by
+# `site submit`) or sniffed from where this checkout lives. Sweep configs and
+# job scripts carry only job-owned settings (time, cpus, gpu count, mem if
+# non-default); everything below is filled in at generation/submit time.
+ccin2p3:
+  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir:   /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
+  scratch:     /sps/lpnhe/jiturrizaramirez01/tmp
+  data_dir:    /sps/lpnhe/jiturrizaramirez01/datasets
+  setup_commands:
+    - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sites/activate.sh
+  cluster:
+    scheduler: slurm
+    partition: gpu_v100
+    account:   lpnhe
+    qos:       gpu
+    gpu_flag:  "--gpus={n}"        # job_submit.lua dies on a typed --gres; --gpus is what it reads
+    mem:       32G                 # MANDATORY here; a job without --mem is rejected
+    max_cpus_per_gpu: 5            # "Max allowed cpus per gpu (v100): 5"
+  cpu:                             # CPU-only work (dataset prebuild): no GPU hours
+    partition: htc
+    account:   lpnhe
+    mem_per_cpu: 2G
+
+jeanzay:
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
+  sweep_dir:   /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  scratch:     /lustre/fsn1/projects/rech/itg/ulm49ia
+  data_dir:    /lustre/fswork/projects/rech/itg/ulm49ia/datasets
+  setup_commands:
+    - source /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sites/activate.sh
+  cluster:
+    scheduler: slurm
+    partition: gpu_p2
+    account:   itg@v100
+    gpu_flag:  "--gres=gpu:{n}"
+    # no qos, no mem: Jean Zay rejects both. Host RAM scales with --cpus-per-task.
+  cpu:
+    partition: prepost               # weight 0: does not touch the GPU allocation
+    account:   itg@v100
+
+lxplus:
+  project_dir: /eos/user/j/joiturri/Foundational_Amplitudes
+  sweep_dir:   /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps   # AFS: fcntl locks + condor submit
+  results_dir: /eos/user/j/joiturri/Foundational_Amplitudes/sweeps           # EOS: bulk outputs
+  scratch:     /eos/user/j/joiturri/tmp
+  data_dir:    /eos/user/j/joiturri/jitu/lorentz-gatr/data/data
+  setup_commands:
+    - source /eos/user/j/joiturri/Foundational_Amplitudes/sites/activate.sh
+  cluster:
+    scheduler: htcondor
+    flavour:   tomorrow
+    mem:       32G
+
+local:
+  # a laptop / WSL checkout: paths are relative to the checkout; no scheduler
+  cluster:
+    scheduler: none

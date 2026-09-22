@@ -18,6 +18,10 @@ import subprocess
 import time
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
@@ -35,7 +39,7 @@ def _sweep_dirs(cfg, sweep_name):
 
 def load_config(path):
     with open(path) as f:
-        return yaml.safe_load(f)
+        return siteconf.resolve(yaml.safe_load(f))
 
 
 def format_value(v):

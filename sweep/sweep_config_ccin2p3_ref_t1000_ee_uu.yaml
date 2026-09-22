@@ -6,20 +6,11 @@
 cluster:
   scheduler: slurm
   auto_submit: false
-  partition: gpu_v100
-  qos: gpu
-  account: lpnhe
   request_gpus: 1
-  gres: gpu:v100:1
   mem: 16G
   cpus_per_task: 4
   time: "00:40:00"
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
-  setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
 sweep_name: ref_t1000_ee_uu
 n_trials: 6
 dyhpo:
@@ -31,7 +22,7 @@ fidelity_schedule:
   t_steps: [1000]
 fixed_params:
   data.source: recipes
-  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/ref_solo_ee_uu.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/ref_solo_ee_uu.yaml
   data.require_cache: 'true'
   data.train_subsample: 5000
   data.eval_subsample: 2000

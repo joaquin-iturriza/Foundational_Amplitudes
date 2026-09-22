@@ -13,10 +13,12 @@ import argparse
 import os
 import subprocess
 import sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-SWEEP_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/pretraining_scaling"
 
-
+SWEEP_BASE = os.path.join(siteconf.PROJECT_DIR, "sweeps/pretraining_scaling")
 def get_queued_scaling_jobs():
     """Returns list of (job_id, job_name, output_path) for all running/pending jobs
     whose output file is under SWEEP_BASE."""

@@ -15,11 +15,14 @@ solo reuses existing 10k/100k sweeps; here it only emits the NEW sizes (1k, 1M) 
 a single ~1h extension point for 10k. ft8/ft25 are emitted for all of 1k/10k/100k/1M.
 """
 import os, yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "compute_scan")
 os.makedirs(OUT, exist_ok=True)
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
-
+ROOT = siteconf.PROJECT_DIR
 def f_step(bs):                       # MACs/step for nh8 n_avg4
     return 3.0 * bs * 13139968
 def perstep_flop(bs):                 # 2x: MACs -> FLOP
@@ -36,12 +39,11 @@ C_GRID_1K = [1e13, 3e13, 1e14, 3e14, 1e15, 2e15]   # small batch is FLOP-ineffic
 
 DATASETS = ["ee_uu_nlo_virt_e4", "ee_ttbar_nlo_virt_e4"]
 
-CLUSTER = {"scheduler": "slurm", "auto_submit": False, "partition": "gpu_v100",
-           "account": "lpnhe", "request_gpus": 1, "cpus_per_task": 8, "time": "02:00:00"}
+CLUSTER = {"scheduler": "slurm", "auto_submit": False,   # site half from siteconf
+           "request_gpus": 1, "cpus_per_task": 8, "time": "02:00:00"}
 PATHS = {"sweep_dir": f"{ROOT}/sweeps", "project_dir": ROOT,
          "setup_commands": [
-                            "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
-                            "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
+                            *siteconf.SETUP_COMMANDS,
                             "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"]}
 
 BASE_FIXED = {

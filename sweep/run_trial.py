@@ -24,6 +24,10 @@ import time
 
 import numpy as np
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 # Make sweep/ importable from the project root
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -73,7 +77,7 @@ RETRY_DELAY_S  = 30
 
 def load_config(path):
     with open(path) as f:
-        return yaml.safe_load(f)
+        return siteconf.resolve(yaml.safe_load(f))
 
 
 def compute_hpo_objective(result: dict, scaling_law_cfg: dict) -> float | None:

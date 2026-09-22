@@ -12,8 +12,12 @@ per cell:
 import glob, json, os, re, yaml
 from datetime import datetime, timedelta
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+ROOT = siteconf.PROJECT_DIR
 TS_RE = re.compile(r"\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)")
 N_STARTUP = 4
 

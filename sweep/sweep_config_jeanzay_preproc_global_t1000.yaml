@@ -1,12 +1,7 @@
 cluster:
-  account: lpnhe
   auto_submit: false
   cpus_per_task: 8
-  partition: gpu_v100
-  qos: gpu
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   scheduler: slurm
   time: 01:00:00
 dyhpo:
@@ -20,10 +15,10 @@ fidelity_schedule:
 fixed_params:
   # --- on-demand recipe data source (8-process pretrain-scaling D1e3p5 short cell) ---
   data.source: recipes
-  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain8_short.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/pretrain8_short.yaml
   data.preprocess_per_dataset: 'false'   # GLOBAL amplitude scale (keeps relative magnitudes)
   data.seed: 42
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: ${PROJECT_DIR}/data/
   # --- model / training (identical to scaling_p1_nh16_D1e3p5_t100_fast) ---
   model: lloca
   model.net.num_blocks: 8
@@ -40,11 +35,8 @@ fixed_params:
   training.validate_frac: 0.01
 n_trials: 20
 paths:
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/preproc_comparison
+  sweep_dir: ${PROJECT_DIR}/sweeps/preproc_comparison
 range_extension:
   boundary_frac: 0.2
   enabled: false

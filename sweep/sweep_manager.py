@@ -58,6 +58,10 @@ import os
 import subprocess
 import sys
 from collections import defaultdict
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 DEFAULT_REGISTRY = os.path.expanduser("~/.sweep_manager/registry.json")
 DEFAULT_ROUND_GAP = 100_000   # priority penalty per round; bump if fairshare swings dominate
@@ -116,28 +120,18 @@ def write_prebuild_script(sweep_dir, cfg):
     if not spec:
         return None
     seed    = int(fp.get("data.seed", 42))
+    cfg     = siteconf.resolve(cfg)
     proj    = cfg["paths"]["project_dir"]
-    account = cfg["cluster"].get("account", "lpnhe")
     setup   = "\n".join(cfg["paths"].get("setup_commands", []))
     name    = cfg.get("sweep_name", os.path.basename(sweep_dir.rstrip("/")))
     script  = os.path.join(sweep_dir, "prebuild.sh")
+    header  = siteconf.cpu_header(f"prebuild_{name}", f"{sweep_dir}/prebuild_%j.out",
+                                  f"{sweep_dir}/prebuild_%j.err")
     with open(script, "w") as f:
-        f.write(f"""#!/bin/bash
-# SPEC: {spec}
+        f.write(f"""{header}# SPEC: {spec}
 # SEED: {seed}
 # Auto-emitted CPU prebuild for this recipe sweep — materializes datasets on the
-# htc partition (CPU; no GPU hours). Self-skips cached.
-#SBATCH --job-name=prebuild_{name}
-#SBATCH --partition=htc
-#SBATCH --account={account}
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem-per-cpu=2G
-#SBATCH --time=04:00:00
-#SBATCH --hint=nomultithread
-#SBATCH --output={sweep_dir}/prebuild_%j.out
-#SBATCH --error={sweep_dir}/prebuild_%j.err
+# site's CPU partition (no GPU hours). Self-skips cached.
 set -euo pipefail
 {setup}
 cd {proj}
@@ -159,7 +153,7 @@ def ensure_prebuild_script(sweep_dir):
         return None
     import yaml
     with open(cfg_path) as f:
-        cfg = yaml.safe_load(f)
+        cfg = siteconf.resolve(yaml.safe_load(f))
     res = write_prebuild_script(sweep_dir, cfg)
     return res[0] if res else None
 

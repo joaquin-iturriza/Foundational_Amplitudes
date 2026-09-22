@@ -14,12 +14,16 @@ import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-ROOT_FOR_STYLE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+ROOT_FOR_STYLE = siteconf.PROJECT_DIR
 sys.path.insert(0, ROOT_FOR_STYLE)
 import plot_style as ps  # noqa: E402
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+ROOT = siteconf.PROJECT_DIR
 SOLO = os.path.join(ROOT, "sweeps/scaling_solo_full/scaling_law_params.json")
 FT   = os.path.join(ROOT, "sweeps/finetune_scaling_virt_002/scaling_law_params.json")
 out  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(

@@ -17,13 +17,17 @@ import os
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _project_dir not in sys.path:
     sys.path.insert(0, _project_dir)
 
 # Support both Jean-Zay Lustre and the local SSHFS mount
-_LUSTRE_BASE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+_LUSTRE_BASE = siteconf.PROJECT_DIR
 _MOUNT_BASE  = "/home/joaquin/mnt/jeanzay/Foundational_Amplitudes"
 LUSTRE_BASE  = _LUSTRE_BASE if os.path.isdir(_LUSTRE_BASE) else _MOUNT_BASE
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")

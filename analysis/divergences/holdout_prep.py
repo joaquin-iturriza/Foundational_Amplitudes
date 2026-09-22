@@ -16,8 +16,12 @@ import argparse
 import os
 import sys
 import numpy as np
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+REPO = siteconf.PROJECT_DIR
 sys.path.insert(0, os.path.join(REPO, "analysis/divergences"))
 from extract_ir import ir_observables  # noqa
 

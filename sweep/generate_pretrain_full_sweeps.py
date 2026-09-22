@@ -33,6 +33,9 @@ WORKFLOW (run on Jean Zay)
 """
 
 import argparse
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+import siteconf
 import math
 import os
 import re
@@ -63,7 +66,7 @@ BATCH_SIZE   = 1 << 14        # 2**14 = 16384
 N_TRIALS     = 15
 N_STARTUP    = 4              # Sobol startup points
 BUDGET_H     = 10.0           # target TRAINING wall-clock per run (hours)
-PARTITION    = "gpu_v100"     # every CC-IN2P3 V100 is the 32 GB part
+PARTITION    = siteconf.CLUSTER["partition"]   # the site's GPU partition
 # NOTE: on Jean Zay --mem/--mem-per-cpu are forbidden and host RAM scales with --cpus-per-task;
 # on CC-IN2P3 --mem is mandatory and comes from BASE_CLUSTER["mem"].
 # The earlier OOM was caused by the eval/per-process loaders forking the full 8M-event

@@ -11,8 +11,12 @@ import glob, json, os, re
 import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))))  # repo root, so siteconf imports from anywhere
+import siteconf
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+
+ROOT = siteconf.PROJECT_DIR
 DATASET = {"eeuunlovirte4": "ee_uu_nlo_virt_e4", "eettbarnlovirte4": "ee_ttbar_nlo_virt_e4"}
 SUB = {"1k": 1000, "10k": 10000, "100k": 100000, "1M": 1000000}
 

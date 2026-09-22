@@ -32,6 +32,10 @@ import os
 import sys
 
 import yaml
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
+import siteconf
+
 
 _proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _proj not in sys.path:
@@ -39,7 +43,7 @@ if _proj not in sys.path:
 
 from sweep.generate_scaling_sweep import _make_cell_cfg, _ds_tag, _sweep_dirs
 
-LUSTRE = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE = siteconf.PROJECT_DIR
 SWEEPS_BASE = os.path.join(LUSTRE, "sweeps")
 
 # Live method sweeps to extend (the saved outer config of each is the source of truth).
@@ -78,7 +82,7 @@ def main():
         if not os.path.exists(outer_path):
             print(f"[skip] no saved config: {outer_path}")
             continue
-        outer = yaml.safe_load(open(outer_path))
+        outer = siteconf.resolve(yaml.safe_load(open(outer_path)))
         if outer.get("sweep_name") != name:
             print(f"[warn] {name}: saved sweep_name={outer.get('sweep_name')!r} (using it for cell names)")
             name = outer["sweep_name"]

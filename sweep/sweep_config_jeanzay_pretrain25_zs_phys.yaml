@@ -1,12 +1,7 @@
 cluster:
-  account: lpnhe
   auto_submit: false
   cpus_per_task: 8
-  partition: gpu_v100
-  qos: gpu
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   scheduler: slurm
   time: "01:30:00"
 dyhpo:
@@ -22,13 +17,13 @@ fixed_params:
   #     25-process LO set @ 20k/process (recipes/pretrain25_zs.yaml), t_steps=3000.
   #     Matched twin of the PID arm; zero-shot-eval on held-out ee_uu/ee_ttbar. ---
   data.source: recipes
-  data.processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain25_zs.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/pretrain25_zs.yaml
   data.preprocess_per_dataset: 'true'
   data.require_cache: 'true'
   data.train_subsample: 20000
   data.eval_subsample: 2000
   data.seed: 42
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: ${PROJECT_DIR}/data/
   data.use_PIDs: 'false'
   # --- model / training ---
   model: lloca
@@ -46,11 +41,8 @@ fixed_params:
   training.validate_frac: 0.02
 n_trials: 20
 paths:
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   setup_commands:
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-  - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps/pretrain25_zs_phys
+  sweep_dir: ${PROJECT_DIR}/sweeps/pretrain25_zs_phys
 range_extension:
   enabled: false
 search_space:
