@@ -1,11 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=probe
 #SBATCH --cpus-per-task=1
-#SBATCH --time=00:03:00
+#SBATCH --time=00:10:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 #SBATCH --gres=gpu:1
 # Ten-second infrastructure check: env activates, GPU visible. Not a training run.
+# The limit is 10 min, not 3: a cold node on CC-IN2P3 takes ~2.5 min to import torch from /sps.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
