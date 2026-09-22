@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # remote.sh — run a job-control command in the Foundational_Amplitudes project
-# dir on CC-IN2P3.
+# dir on the cluster (over ssh from the laptop; directly when already on a login node).
 #
 # Same model as madgrav/Fin_ML on this cluster: the assistant runs LOCALLY
 # against an sshfs mount of the project, so local
@@ -34,6 +34,12 @@ fi
 # arguments are one command whose words are preserved exactly, so a format like
 # `squeue -o "%i %T"` survives the hop instead of being split into three words.
 if [ "$#" -eq 1 ]; then cmd="$1"; else cmd=$(printf '%q ' "$@"); fi
+# Already on a cluster login node (the scheduler is on PATH and the project dir is
+# local): run the command right here, so the same invocation works on every cluster
+# and from the laptop alike.
+if command -v sbatch >/dev/null 2>&1 && [ -d "$PROJ" ]; then
+  cd "$PROJ" && exec bash -lc "$cmd"
+fi
 # BatchMode: a hook or background waiter must fail, not sit on a password prompt.
 exec ssh -o BatchMode=yes -o ConnectTimeout="${CCIN2P3_CONNECT_TIMEOUT:-20}" "$HOST" \
   "cd '$PROJ' && bash -lc $(printf '%q' "$cmd")"
