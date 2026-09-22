@@ -132,7 +132,7 @@ cd "$ROOT"
 if [ ${#FILES[@]} -eq 0 ]; then
   args=(); for m in "${MARK[@]}"; do args+=(-e "$m"); done
   mapfile -t FILES < <(git grep -l -I "${args[@]}" -- . \
-    ':!CLAUDE.md' ':!README*' ':!docs/*' ':!scripts/port_cluster.sh' ':!*.tex' ':!*.md')
+    ':!CLAUDE.md' ':!README*' ':!docs/*' ':!scripts/port_cluster.sh' ':!*.tex' ':!*.md' ':!sites/activate.sh')
 fi
 [ ${#FILES[@]} -eq 0 ] && { echo "port_cluster.sh: nothing to port"; exit 0; }
 
