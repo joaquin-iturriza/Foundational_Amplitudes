@@ -347,8 +347,10 @@ call it for you:
 ```bash
 # the generators render the #SBATCH block for the site they run on
 # (siteconf.slurm_header) and submit through sweep_manager.py, so they run on the
-# site where the sweep lives -- as a job you `site submit`, never by hand over ssh.
-# On the local checkout they are dry-runs only (no scheduler, no torch).
+# login node of the site where the sweep lives, through
+#   site run <site> FA -- python sweep/generate_sweep.py --config sweep/<my_config>.yaml
+# (checkout, env activated; never an ssh by hand). On the local checkout they are
+# dry-runs only (no scheduler, no torch).
 # generate; it then prompts to submit (or set cluster.auto_submit / pass --auto-submit)
 python sweep/generate_sweep.py --config sweep/<my_config>.yaml
 # scaling generators submit all their cells interleaved in one batch:
