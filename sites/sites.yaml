@@ -6,6 +6,9 @@
 # job scripts carry only job-owned settings (time, cpus, gpu count, mem if
 # non-default); everything below is filled in at generation/submit time.
 ccin2p3:
+  env:
+    kind: venv
+    python: module load Programming_Languages/anaconda/3.11
   project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   sweep_dir:   /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
   scratch:     /sps/lpnhe/jiturrizaramirez01/tmp
@@ -26,6 +29,11 @@ ccin2p3:
     mem_per_cpu: 2G
 
 jeanzay:
+  env:
+    kind: shared
+    path: /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+    activate: source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh &&
+      conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
   project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   sweep_dir:   /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
   scratch:     /lustre/fsn1/projects/rech/itg/ulm49ia
@@ -43,6 +51,9 @@ jeanzay:
     account:   itg@v100
 
 lxplus:
+  env:
+    kind: venv
+    python_bin: /usr/bin/python3.11
   project_dir: /eos/user/j/joiturri/Foundational_Amplitudes
   sweep_dir:   /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps   # AFS: fcntl locks + condor submit
   results_dir: /eos/user/j/joiturri/Foundational_Amplitudes/sweeps           # EOS: bulk outputs
