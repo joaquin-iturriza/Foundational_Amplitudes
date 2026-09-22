@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
 # publish_main.sh — regenerate the public `main` branch as a curated subset of
-# the `jeanzay` development trunk, then push it.
+# the `trunk` development trunk, then push it.
 #
-# `main` is a BUILD ARTIFACT of `jeanzay`: never edit `main` by hand. To change
+# `main` is a BUILD ARTIFACT of `trunk`: never edit `main` by hand. To change
 # what is public, edit the PUBLIC_PATHS allowlist below and re-run this script.
 # Anything not in the allowlist is removed from `main`; everything in it is
-# synced from `jeanzay`. History on `main` is preserved (each publish is a new
+# synced from `trunk`. History on `main` is preserved (each publish is a new
 # commit on top).
 #
 # Usage:  scripts/publish_main.sh [--no-push]
 #
 set -euo pipefail
 
-SRC="jeanzay"          # development trunk (source of truth)
+SRC="trunk"          # development trunk (source of truth)
 DST="main"             # public branch (generated)
 PUSH=1
 [[ "${1:-}" == "--no-push" ]] && PUSH=0
