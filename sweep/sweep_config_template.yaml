@@ -7,12 +7,6 @@ cluster:
   priority: null           # HTCondor job priority — higher = runs first. null = default.
   request_memory: 8000    # MB of RAM to request per job (default cgroup limit is 3000 — raise if OOM).
 
-paths:
-  afs_sweep_dir: /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps
-  eos_sweep_dir: /eos/user/j/joiturri/Foundational_Amplitudes/sweeps
-  project_dir: /eos/user/j/joiturri/Foundational_Amplitudes
-  python_env: /eos/user/j/joiturri/jitu/amplitude_DSI/amplitudes_env/bin/activate
-
 sweep_name: my_sweep_name
 n_trials: 40
 
@@ -28,7 +22,7 @@ fidelity_schedule:
   t_steps: [1000, 10000, 40000]
 
 fixed_params:
-  data.data_path: /eos/user/j/joiturri/Foundational_Amplitudes/data/
+  data.data_path: ${PROJECT_DIR}/data/
   data.dataset: '[ee_uu_91GeV_amplitudes]'
   model: lloca
   plot: 'true'

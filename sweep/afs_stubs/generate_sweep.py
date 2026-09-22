@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
-"""AFS stub — delegates to canonical EOS version. Copy to AFS once; never edit here."""
+# AFS-side stub: runs the real script from this checkout (wherever it lives).
+import os
 import runpy
-runpy.run_path("/eos/user/j/joiturri/Foundational_Amplitudes/sweep/generate_sweep.py", run_name="__main__")
+_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+runpy.run_path(os.path.join(_root, "sweep/generate_sweep.py"), run_name="__main__")

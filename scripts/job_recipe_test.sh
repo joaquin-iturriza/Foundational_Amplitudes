@@ -12,7 +12,7 @@
 # PREBUILT recipe: train-only frozen stats -> train -> eval -> plot. Training jobs
 # never generate (data.require_cache: true), so run the CPU prebuild first:
 #   scripts/remote.sh sbatch scripts/prebuild_recipes.sh recipes/pretrain8_short.yaml
-# Reads the real pools ($WORK/datasets, $SCRATCH/amp_data_cache via env_ccin2p3.sh).
+# Reads the real pools ($WORK/datasets, $SCRATCH/amp_data_cache via sites/activate.sh).
 
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
