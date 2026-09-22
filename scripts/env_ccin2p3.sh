@@ -1,20 +1,9 @@
-#!/usr/bin/env bash
-# env_ccin2p3.sh — CC-IN2P3 stand-ins for the Jean Zay environment variables the data
-# pipeline keys on. Source it AFTER activating the venv, in every job script.
+# Compatibility shim.
 #
-# datagen.py / mg5_pipeline_final.py locate the MadGraph install and the dataset pools
-# through $WORK and $SCRATCH (Jean Zay conventions); CC-IN2P3 sets neither, so without
-# this they fall back to the laptop layout (/home/joaquin/...) and fail on a node.
-#   $WORK/mg5amcnlo      MadGraph install (MG5_BIN / MG5_WORK_DIR default from it)
-#   $WORK/datasets       frozen val/test pools + recipe sidecars (AMP_FROZEN_DIR)
-#   $SCRATCH/amp_data_cache   purgeable, sweep-shared train cache (AMP_TRAIN_CACHE_DIR)
-# Both must be on the shared /sps filesystem: a sweep's trials share the cache.
-# Explicit MG5_BIN / MG5_WORK_DIR / MG5_OUTPUT_DIR / AMP_* exports still win.
-export WORK="${WORK:-/sps/lpnhe/jiturrizaramirez01}"
-export SCRATCH="${SCRATCH:-/sps/lpnhe/jiturrizaramirez01/tmp}"
-# MadLoop's matrix2py.so links the HEPTools reduction libraries (Ninja, Collier, OneLoop)
-# dynamically; without this the import fails with "libninja.so.0: cannot open shared object".
-export LD_LIBRARY_PATH="$WORK/mg5amcnlo/HEPTools/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-# f2py must be the venv's (system f2py3 builds a cpython-39 module the venv cannot import);
-# mg5_configuration.txt pins f2py_compiler_py3 to it, and its distutils backend needs this.
-export SETUPTOOLS_USE_DISTUTILS=stdlib
+# The per-site environment now lives in sites/activate.sh, which is the single
+# file in this repo allowed to name a cluster. This shim stays because 95 sweep
+# configs and compare_models/make_scan_ab_sweeps.py still source this path by
+# its absolute name; it will go when those move to sites/activate.sh too.
+_here="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
+# shellcheck source=../sites/activate.sh
+source "$_here/sites/activate.sh"

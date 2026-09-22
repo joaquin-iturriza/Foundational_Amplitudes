@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=allopts_ab
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=allopts_ab_%j.out
@@ -22,11 +17,10 @@
 # Toggles: LLOCA_POOL (loop|vectorized), LLOCA_ATTN_MASK (per_block|per_forward),
 #          LLOCA_REG (loop|foreach), LLOCA_PROC_LOSS (loop|vectorized).
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 
-DATA=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+DATA="$PROJECT_DIR"/data/
 
 COMMON=(
   local=none

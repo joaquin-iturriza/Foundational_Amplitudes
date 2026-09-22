@@ -1,10 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=div_extract
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/extract_%j.out
@@ -12,10 +7,8 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"
 
 echo "=== eeuu NLO virt: extract ==="
 python analysis/divergences/extract_preds.py \

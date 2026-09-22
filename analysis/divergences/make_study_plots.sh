@@ -2,8 +2,8 @@
 # CPU-only: build all figures for the uugg add-back and soft/collinear-cut studies from
 # the eval npz files (run AFTER eval_heldout_studies.sh completes). Login-node safe.
 set -e
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
-PY=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/python
+cd $PROJECT_DIR
+PY=$PROJECT_DIR/.venv/bin/python
 D=analysis/divergences
 
 echo "===== uugg add-back curve ====="

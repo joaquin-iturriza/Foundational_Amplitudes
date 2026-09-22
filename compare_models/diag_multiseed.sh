@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=diagms
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:25:00
 #SBATCH --array=0-4%5
@@ -21,9 +16,8 @@
 # best-vs-best on val_loss_no_reg via aggregate_diag.py.
 
 set -e
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 
 SEED=$SLURM_ARRAY_TASK_ID

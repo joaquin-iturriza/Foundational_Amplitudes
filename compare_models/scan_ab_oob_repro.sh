@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=ab_oob
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:20:00
 #SBATCH --output=compare_models/ab_oob_%j.out
@@ -17,9 +12,8 @@
 # (not the downstream torch.stack().tolist() where it currently surfaces).
 # Uses the exact HPs of failed trial hp0154 + the scalar feature flags.
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 
 export CUDA_LAUNCH_BLOCKING=1

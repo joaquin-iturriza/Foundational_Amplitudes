@@ -1,10 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=ho_eval_addback
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/ho_eval_addback_%j.out
@@ -21,9 +16,8 @@
 # provenance instead of mixing a July f000 with a fresh f100.
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"
 
 python analysis/divergences/eval_heldout.py \
   --tags 000,005,015,050,100 \

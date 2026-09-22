@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=fa_smoke
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
-#SBATCH --gres=gpu:v100:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=16G
 #SBATCH --time=00:10:00
 #SBATCH --output=runs/_logs/%x_%j.out
 #SBATCH --error=runs/_logs/%x_%j.out
@@ -14,7 +9,7 @@
 # the directives, the venv runs on a compute node, CUDA is visible, and the
 # project + lloca import there. Not a training run; safe to delete.
 set -e
-PROJ=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+PROJ=$PROJECT_DIR
 cd "$PROJ"
 PY=$PROJ/.venv/bin/python
 "$PY" - <<'PY'

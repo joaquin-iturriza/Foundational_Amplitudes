@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=pretrain_iter_time
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=pretrain_iter_time_%j.out
@@ -22,9 +17,8 @@
 # Submit with:  sbatch bench_pretrain_iter_time.sh
 # Both cells fit on gpu_p2 (V100 32GB): nh=4 ~6.8GB, nh=8 ~12GB peak at BS=16384.
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 
 DATA=$PWD/data/
 ITERS=300

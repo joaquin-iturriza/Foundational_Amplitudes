@@ -1,10 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=ft_coll_ho
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --array=0-3
@@ -13,11 +8,10 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"
 
-REPO=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+REPO=$PROJECT_DIR
 CKPT=$REPO/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt
 
 # ee->uug COLLINEAR-region hold-out (y_min<c at hard x_g): pure-collinear extrapolation, complementary to the

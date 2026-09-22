@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=collision_ab
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/collision_ab_%j.out
@@ -22,9 +17,8 @@
 #   GEN=false scripts/remote.sh sbatch --export=ALL,GEN=false scripts/job_collision_ab.sh
 #   add LEVERS=off to either to drop the per-process physics levers (see below).
 set -euo pipefail
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column (still separates d from s) | none: no column
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi
 # LEVERS=off drops the per-process physics levers (off-shellness, internal masses, couplings),
@@ -35,7 +29,7 @@ if [ "$LEVERS" = "off" ]; then LEV="false"; else LEV="true"; fi
 python run.py \
   exp_name="collision_ab_gen_${GEN}_levers_${LEVERS}" \
   data.source=recipes data.require_cache=true data.seed=42 \
-  data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/collision_ab.yaml \
+  data.processes_file="$PROJECT_DIR"/recipes/collision_ab.yaml \
   data.train_subsample=null data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \

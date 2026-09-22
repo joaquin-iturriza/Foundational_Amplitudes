@@ -1,10 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=div_ir
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/ir_%j.out
@@ -12,9 +7,8 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"
 
 # 2->3 / 2->4 gluon channels from the 8-process joint pretrain (NOT fine-tuned):
 #   ee->uug  : soft + single-collinear IR   (pretrain test MSE 4.4e-6, well learned)

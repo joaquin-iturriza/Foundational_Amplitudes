@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=coup_pd
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --array=0-1
@@ -19,9 +14,8 @@
 # removed -> off CANNOT resolve alpha (identical kinematics+amp_orders across the
 # 8 datasets); the coupling feature can. Same HP both arms (off-best).
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_couptest
 export AMP_FROZEN_DIR=$SCRATCH/datasets_couptest

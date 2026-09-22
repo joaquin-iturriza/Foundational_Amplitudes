@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=levab
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:55:00
 #SBATCH --array=0-1
@@ -20,9 +15,8 @@
 # can't resolve, the internal-mass off-shellness feature works (generalising reson to
 # top/Higgs/Z-4l). Per-dataset preprocessing; cut-tagged cache.
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut
 export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut

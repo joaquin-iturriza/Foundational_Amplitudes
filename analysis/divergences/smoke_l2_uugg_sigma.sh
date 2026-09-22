@@ -1,18 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=smoke_l2sig
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:20:00
 #SBATCH --output=analysis/divergences/smoke_l2sig_%j.out
 #SBATCH --error=analysis/divergences/smoke_l2sig_%j.out
 set -e
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/worktrees/wt-l2-uugg
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"/worktrees/wt-l2-uugg
 export PYTHONDONTWRITEBYTECODE=1
 python analysis/divergences/l2_online_uugg.py \
   --arm sigma --tag smoke --total_steps 12 --rounds 3 --n_total 1500 \

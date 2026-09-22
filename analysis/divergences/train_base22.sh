@@ -1,10 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=base22_uug
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=02:30:00
 #SBATCH --output=analysis/divergences/base22_%j.out
@@ -12,11 +7,10 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../../sites/activate.sh"
+cd "$PROJECT_DIR"
 
-REC=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/pretrain22_heldout_uug.yaml
+REC="$PROJECT_DIR"/recipes/pretrain22_heldout_uug.yaml
 
 # 22-process leave-uug-out foundation base. HPs copied verbatim from the well-trained
 # 25ds reference runs/pretrain25/trial_0009 (recipe path; the trial the ft25 finetunes

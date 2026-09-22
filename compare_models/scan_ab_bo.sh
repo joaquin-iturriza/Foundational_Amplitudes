@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=scan_ab_bo
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=06:00:00
 #SBATCH --array=0-2
@@ -21,9 +16,8 @@
 # so no prepost prebuild dependency. Pre-init: make_scan_ab_sweeps.py + generate_sweep.
 
 set -e
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 export OMP_NUM_THREADS=1
 

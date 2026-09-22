@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=scan_ab_calib
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=compare_models/scan_ab_calib_%j.out
@@ -17,9 +12,8 @@
 # full dataset trains end-to-end with require_cache=true, (b) measure per-step time
 # so the A/B sweep can be sized. LLOCA_PROFILE_STEP prints a data-vs-compute split.
 
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 PROJ=$PWD
 export LLOCA_PROFILE_STEP=1
 

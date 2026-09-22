@@ -1,12 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=catalog_short_ab
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:30:00
 #SBATCH --output=runs/_logs/catalog_short_ab_%j.out
@@ -29,15 +24,14 @@
 # SEED= sets the init seed (repeats; data.seed stays 42).
 # RECIPE= picks the recipe file under recipes/ (default the full catalog); BS= the training batch size.
 set -euo pipefail
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+source "$(dirname "${BASH_SOURCE[0]:-$0}")/../sites/activate.sh"
+cd "$PROJECT_DIR"
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column | none: no generation column (the old encoding)
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi
 python run.py \
   exp_name="${EXP:-catalog_short_ab_gen_${GEN}}" \
   data.source=recipes data.require_cache=true data.seed=42 \
-  data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
+  data.processes_file="$PROJECT_DIR"/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
   data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
