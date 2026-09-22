@@ -11,7 +11,7 @@
 # End-to-end smoke test of the recipe data path (source: recipes) against a
 # PREBUILT recipe: train-only frozen stats -> train -> eval -> plot. Training jobs
 # never generate (data.require_cache: true), so run the CPU prebuild first:
-#   site submit <site> FA scripts/prebuild_recipes.sh recipes/pretrain8_short.yaml
+#   site submit <site> FA scripts/prebuild_recipes.sh -- recipes/pretrain8_short.yaml
 # Reads the real pools ($WORK/datasets, $SCRATCH/amp_data_cache via sites/activate.sh).
 
 set -euo pipefail

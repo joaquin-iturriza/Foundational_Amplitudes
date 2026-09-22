@@ -14,8 +14,8 @@
 # GEN=false keeps the generation as a scalar column, which still separates d from s: the
 # informative baseline is GEN=none (no column). At this scale both learn everything anyway;
 # the collision only shows on the full recipe (scripts/job_catalog_short_ab.sh).
-#   GEN=true  site submit <site> FA --export=ALL,GEN=true  scripts/job_collision_ab.sh
-#   GEN=false site submit <site> FA --export=ALL,GEN=false scripts/job_collision_ab.sh
+#   GEN=true  site submit <site> FA --env GEN=true  scripts/job_collision_ab.sh
+#   GEN=false site submit <site> FA --env GEN=false scripts/job_collision_ab.sh
 #   add LEVERS=off to either to drop the per-process physics levers (see below).
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
