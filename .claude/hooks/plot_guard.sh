@@ -88,7 +88,7 @@ if printf '%s' "$cmd" | grep -q "run\.py"; then
   [ -n "$hit" ] && emit "run.py invocation" "$hit"
 fi
 
-if printf '%s' "$cmd" | grep -qE '(^|[^[:alnum:]_])sbatch([^[:alnum:]_]|$)'; then
+if printf '%s' "$cmd" | grep -qE '(^|[^[:alnum:]_])(sbatch|site +submit)([^[:alnum:]_]|$)'; then
   for s in $(printf '%s' "$cmd" | tr ' \t\n' '\n\n\n' | grep -E '\.sh$' || true); do
     path="$s"; [ -f "$path" ] || path="$REPO/$s"
     [ -f "$path" ] || continue

@@ -22,15 +22,12 @@ set -uo pipefail
 POLL="${POLL:-30}"
 TAIL="${TAIL:-25}"
 
-# Off-cluster (the sshfs-mount workflow): no squeue here, so hand the whole wait to the
-# login node via site run <site> FA --. Same invocation, same output, still backgroundable.
+# This waiter runs WHERE squeue is: on the site. From the laptop, run it there
+# (site run <site> FA -- POLL=$POLL scripts/wait_for_slurm.sh <jid>...) or, better,
+# poll the registry: a background loop over `site poll <run>` (see CLAUDE.md).
 if ! command -v squeue >/dev/null 2>&1; then
-  here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  if [ -x "$here/remote.sh" ]; then
-    exec "$here/remote.sh" "POLL=$POLL TAIL=$TAIL scripts/wait_for_slurm.sh $*"
-  fi
-  echo "wait_for_slurm.sh: no squeue on this host and no scripts/remote.sh to forward through" >&2
-  exit 1
+  echo "wait_for_slurm.sh: no squeue on this host; run it on the site via \`site run\`, or use \`site poll <run>\`" >&2
+  exit 2
 fi
 USER_NAME="${USER:-$(whoami)}"
 

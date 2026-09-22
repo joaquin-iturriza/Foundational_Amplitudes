@@ -625,8 +625,7 @@ leaves its lock held on purpose, so the fixes it demanded can be applied. Waterm
   `trunk → main`. To change what's public, edit the allowlist and re-publish.
 - **Retired: `ccin2p3`, `jeanzay`.** The former per-cluster branches still exist
   on GitHub, have no commits `trunk` lacks, and are not to be checked out, merged
-  or ported to. `scripts/port_cluster.sh`, which rewrote a tree from one cluster
-  to the other, belongs to that model and is unused.
+  or ported to.
 
 **Working rules**
 1. **Do work on `trunk`** (or a feature branch off it).

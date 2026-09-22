@@ -37,7 +37,7 @@ except Exception:
 [ -z "$cmd" ] && exit 0
 
 # Only interested in sbatch submissions.
-printf '%s' "$cmd" | grep -qE '(^|[^[:alnum:]_])sbatch([^[:alnum:]_]|$)' || exit 0
+printf '%s' "$cmd" | grep -qE '(^|[^[:alnum:]_])(sbatch|site +submit)([^[:alnum:]_]|$)' || exit 0
 
 # Hyperparameters, per CLAUDE.md's search spaces. Deliberately EXCLUDES run-design/scaling axes
 # (num_heads, num_blocks, iterations, dataset size) and ablation flags — arrays over those are fine.
