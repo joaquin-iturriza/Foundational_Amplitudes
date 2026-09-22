@@ -72,7 +72,7 @@ SEARCH_SPACE = [
 
 def make(arm, feat):
     return {
-        "cluster": {"account": "itg@v100", "partition": "gpu_p2", "request_gpus": 1,
+        "cluster": {"account": "itg@v100", "partition": "gpu_p2", "request_gpus": 1,  # PORT: qos/gres/mem
                     "cpus_per_task": 8, "scheduler": "slurm", "time": "06:00:00",
                     "auto_submit": False},
         "dyhpo": {"n_candidates": 300, "n_startup": 8, "seed": 42, "total_budget": 10000},

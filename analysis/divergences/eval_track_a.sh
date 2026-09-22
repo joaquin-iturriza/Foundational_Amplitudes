@@ -2,7 +2,9 @@
 #SBATCH --job-name=evalTrackA
 #SBATCH --account=itg@v100
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
+#PORT #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:30:00
 #SBATCH --output=analysis/divergences/evalTrackA_%j.out

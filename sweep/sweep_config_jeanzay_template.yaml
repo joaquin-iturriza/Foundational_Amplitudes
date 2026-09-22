@@ -2,8 +2,11 @@ cluster:
   scheduler: slurm
   auto_submit: false
   partition: gpu_p2          # V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)
+  #PORT qos: gpu
   account: itg@v100
   request_gpus: 1
+  #PORT gres: gpu:v100:1
+  #PORT mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "20:00:00"
 

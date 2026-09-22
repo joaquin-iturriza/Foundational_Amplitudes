@@ -2,7 +2,9 @@
 #SBATCH --job-name=ft_deep_smp
 #SBATCH --account=itg@v100
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
+#PORT #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --array=0-4

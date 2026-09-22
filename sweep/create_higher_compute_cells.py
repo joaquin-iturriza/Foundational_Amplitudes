@@ -36,6 +36,9 @@ SETUP_COMMANDS = [
     "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
 ]
 BASE_CLUSTER = {"scheduler": "slurm", "account": "itg@v100",
+                #PORT "qos": "gpu",
+                #PORT "gres": "gpu:v100:1",
+                #PORT "mem": "32G",
                 "request_gpus": 1, "cpus_per_task": 8}
 
 

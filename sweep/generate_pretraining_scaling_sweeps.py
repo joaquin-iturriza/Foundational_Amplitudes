@@ -208,6 +208,9 @@ LUSTRE_BASE = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 BASE_CLUSTER = {
     "scheduler": "slurm",
     "account": "itg@v100",
+    #PORT "qos": "gpu",
+    #PORT "gres": "gpu:v100:1",
+    #PORT "mem": "32G",
     "request_gpus": 1,
     "cpus_per_task": 8,
 }

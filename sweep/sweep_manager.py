@@ -133,6 +133,7 @@ def write_prebuild_script(sweep_dir, cfg):
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
+#PORT #SBATCH --mem-per-cpu=2G
 #SBATCH --time=04:00:00
 #SBATCH --hint=nomultithread
 #SBATCH --output={sweep_dir}/prebuild_%j.out

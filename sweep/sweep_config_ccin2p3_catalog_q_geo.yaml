@@ -10,8 +10,11 @@ cluster:
   scheduler: slurm
   auto_submit: false
   partition: gpu_p2
+  #PORT qos: gpu
   account: itg@v100
   request_gpus: 1
+  #PORT gres: gpu:v100:1
+  #PORT mem: 64G
   cpus_per_task: 8
   time: "00:50:00"           # ~5 min load + ~4 min train + validations/eval/plots: ~15 min per trial
 paths:

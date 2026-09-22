@@ -4,10 +4,12 @@
 #   e.g. sbatch tools/run_zero_shot.sh runs/pretrain25/trial_0009 phys25_500k
 #SBATCH --job-name=zshot
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --account=itg@v100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
+#PORT #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:25:00
 #SBATCH --output=zshot_%j.out

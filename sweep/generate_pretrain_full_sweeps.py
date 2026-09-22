@@ -64,7 +64,8 @@ N_TRIALS     = 15
 N_STARTUP    = 4              # Sobol startup points
 BUDGET_H     = 10.0           # target TRAINING wall-clock per run (hours)
 PARTITION    = "gpu_p2"       # V100 32GB; nh=4 ~6.8GB, nh=8 ~12GB at BS=16384 -> fits
-# NOTE: Jean Zay forbids --mem/--mem-per-cpu; host RAM scales with --cpus-per-task.
+# NOTE: on Jean Zay --mem/--mem-per-cpu are forbidden and host RAM scales with --cpus-per-task;
+# on CC-IN2P3 --mem is mandatory and comes from BASE_CLUSTER["mem"].
 # The earlier OOM was caused by the eval/per-process loaders forking the full 8M-event
 # dataset into ~50 persistent workers (now fixed: those loaders use num_workers=0), not
 # by too little RAM. If more RAM is ever needed, raise cpus_per_task (not --mem).

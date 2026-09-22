@@ -17,8 +17,11 @@ cluster:
   scheduler: slurm
   auto_submit: true          # generate -> submit cells interleaved via sweep_manager
   partition: gpu_p2
+  #PORT qos: gpu
   account: itg@v100
   request_gpus: 1
+  #PORT gres: gpu:v100:1
+  #PORT mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:00:00"
 

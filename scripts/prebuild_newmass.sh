@@ -7,6 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=48
+#PORT #SBATCH --mem-per-cpu=2G
 #SBATCH --time=08:00:00
 #SBATCH --hint=nomultithread
 #SBATCH --output=prebuild_newmass_%j.out

@@ -3,16 +3,22 @@
 #
 # The trunk (ccin2p3) and the Jean Zay branch (jeanzay) carry the same code; they
 # differ ONLY by the rule table below: project/scratch paths, the python env lines
-# in job scripts and sweep `setup_commands`, and the SLURM header directives
-# (partition/account/qos/gres/mem; Jean Zay rejects any --mem, so every memory
-# directive is dropped there and comes back as the 32G/2G-per-cpu defaults).
-# Syncing the two branches is therefore
+# in job scripts and sweep `setup_commands`, and the SLURM directives
+# (partition/account/qos/gres/mem). Directives that have no Jean Zay counterpart
+# (`--qos`, `--mem`, `--mem-per-cpu`, and the `qos:`/`gres:`/`mem:` keys of a
+# sweep's cluster block, in shell, YAML or a Python dict) are not deleted on the
+# Jean Zay side: they are kept as `#PORT <original line>` comment lines, which
+# sbatch, YAML and Python all ignore, and the reverse port uncomments them. The
+# round trip is therefore lossless (a 64G request comes back as 64G) and both
+# directions are idempotent. Syncing the two branches is
 #
 #   git merge ccin2p3            # on jeanzay: take every change from the trunk
 #   scripts/port_cluster.sh --to jeanzay
 #   git commit -am "jeanzay: cluster overlay re-applied"
 #
-# and the reverse direction ports a file written on Jean Zay back to the trunk.
+# and the reverse direction ports a file written on Jean Zay back to the trunk
+# (a file born on Jean Zay carries no #PORT lines, so add the CC-IN2P3 `--mem`
+# and `--qos` by hand once; from then on they travel with the file).
 # Prose (CLAUDE.md, docs/, README) is left alone: it names both clusters on
 # purpose and is maintained by hand.
 #
@@ -29,7 +35,7 @@ while [ $# -gt 0 ]; do
     --to) TO="$2"; shift 2 ;;
     --check) CHECK=1; shift ;;
     --stdin) STDIN=1; shift ;;
-    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,28p' "$0"; exit 0 ;;
     *) FILES+=("$1"); shift ;;
   esac
 done
@@ -44,6 +50,7 @@ JZ_PROJ="$JZ_ROOT/Foundational_Amplitudes"
 JZ_SCRATCH='/lustre/fsn1/projects/rech/itg/ulm49ia'
 JZ_CONDA="$JZ_ROOT/conda/envs/foundational"
 JZ_MODULE='module load anaconda-py3/2023.09 \&\& source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh'
+SP='[[:space:]]'
 
 # sed -E programs. Order matters: the specific env lines go before the generic path rule.
 to_jeanzay() {
@@ -54,61 +61,68 @@ s#$CC_PROJ/\.venv/bin/#$JZ_CONDA/bin/#g
 s#\\\$PROJ/\.venv/bin/python#\$WORK/conda/envs/foundational/bin/python#g
 s#$CC_SCRATCH#$JZ_SCRATCH#g
 s#$CC_ROOT#$JZ_ROOT#g
-s#^([[:space:]]*)\#SBATCH --partition=gpu_v100[[:space:]]*\$#\1\#SBATCH --partition=gpu_p2#
-s#^([[:space:]]*)\#SBATCH --account=lpnhe[[:space:]]*\$#\1\#SBATCH --account=itg@v100#
-s#^([[:space:]]*)\#SBATCH --gres=gpu:v100:1[[:space:]]*\$#\1\#SBATCH --gres=gpu:1#
-/^[[:space:]]*\#SBATCH --qos=gpu[[:space:]]*\$/d
-/^[[:space:]]*\#SBATCH --mem=[0-9]+[GM]B?[[:space:]]*\$/d
-s#^([[:space:]]*)\#SBATCH --partition=htc[[:space:]]*\$#\1\#SBATCH --partition=prepost#
-/^[[:space:]]*\#SBATCH --mem-per-cpu=[0-9]+[GM]B?[[:space:]]*\$/d
-s#^([[:space:]]*)partition: gpu_v100 +\# CC-IN2P3 V100 32GB nodes \(gpu_h100 exists too; untested here\)[[:space:]]*\$#\1partition: gpu_p2          \# V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)#
-s#^([[:space:]]*)partition: gpu_v100([[:space:]]*(\#.*)?)\$#\1partition: gpu_p2\2#
-s#^([[:space:]]*)account: lpnhe[[:space:]]*\$#\1account: itg@v100#
-/^[[:space:]]*qos: gpu[[:space:]]*\$/d
-/^[[:space:]]*gres: gpu:v100:1[[:space:]]*\$/d
-/^[[:space:]]*mem: [0-9]+[GM]B?([[:space:]]*\#.*)?\$/d
+s#^($SP*)\#SBATCH --partition=gpu_v100$SP*\$#\1\#SBATCH --partition=gpu_p2#
+s#^($SP*)\#SBATCH --account=lpnhe$SP*\$#\1\#SBATCH --account=itg@v100#
+s#^($SP*)\#SBATCH --gres=gpu:v100:1$SP*\$#\1\#SBATCH --gres=gpu:1#
+s#^($SP*)\#SBATCH --partition=htc$SP*\$#\1\#SBATCH --partition=prepost#
+s#^($SP*)(\#SBATCH --(qos|mem|mem-per-cpu)=[^ ]+)$SP*\$#\1\#PORT \2#
+s#^($SP*)partition: gpu_v100 +\# CC-IN2P3 V100 32GB nodes \(gpu_h100 exists too; untested here\)$SP*\$#\1partition: gpu_p2          \# V100 32GB (15k hours); try gpu_p13 + itg@a100 for A100 (5k hours)#
+s#^($SP*)partition: gpu_v100($SP*(\#.*)?)\$#\1partition: gpu_p2\2#
+s#^($SP*)account: lpnhe$SP*\$#\1account: itg@v100#
+s#^($SP*)((qos|gres|mem): [^ ]+($SP*\#.*)?)\$#\1\#PORT \2#
 s#"account", "lpnhe"#"account", "itg@v100"#g
 s#"account": "lpnhe"#"account": "itg@v100"#g
-s#"partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G"#"partition": "gpu_p2"#g
+s#^(.*)"partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G"(.*)\$#\1"partition": "gpu_p2"\2  \# PORT: qos/gres/mem#
 s#"partition": "gpu_v100"#"partition": "gpu_p2"#g
-/^[[:space:]]*"qos": "gpu",[[:space:]]*\$/d
-/^[[:space:]]*"gres": "gpu:v100:1",[[:space:]]*\$/d
-/^[[:space:]]*"mem": "32G",[[:space:]]*\$/d
-s#^([[:space:]]*)partition = "gpu_v100"[[:space:]]*\#.*\$#\1partition = "gpu_p2l" if use_32gb else "gpu_p2"#
+s#^($SP*)("(qos|gres|mem)": "[^"]+",)$SP*\$#\1\#PORT \2#
+s#^($SP*)partition = "gpu_v100"$SP*\#.*\$#\1partition = "gpu_p2l" if use_32gb else "gpu_p2"#
+s#^($SP*)PARTITION$SP*= "gpu_v100".*\$#\1PARTITION    = "gpu_p2"       \# V100 32GB; nh=4 ~6.8GB, nh=8 ~12GB at BS=16384 -> fits#
+s#^($SP*)gpu$SP*= "gpu_v100".*\$#\1gpu     = "gpu_p2l" if needs_32gb(nh, bs_new) else "gpu_p2"#
+s#cluster\.get\('partition', 'gpu_v100'\)#cluster.get('partition', 'gpu_p2')#g
+s#cluster\.get\('account', 'lpnhe'\)#cluster.get('account', 'itg@v100')#g
 s#^\# htc partition \(CPU; no GPU hours\)\. Self-skips cached\.\$#\# prepost partition (CPU billed at weight 0; no GPU hours). Self-skips cached.#
 EOF
 }
 
 to_ccin2p3() {
   cat <<EOF
+s#^($SP*)\#PORT (.*)\$#\1\2#
 s#$JZ_MODULE#source $CC_PROJ/.venv/bin/activate#g
 s#module purge; module load anaconda-py3/2023.09#source $CC_PROJ/.venv/bin/activate#g
 s#module load anaconda-py3/2023.09( 2>/dev/null [|][|] true)?#source $CC_PROJ/.venv/bin/activate#g
-\#^[[:space:]]*(- )?"?source (/gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda[.]sh|"[$][(]conda info --base[)]/etc/profile[.]d/conda[.]sh")"?,?[[:space:]]*\$#d
+\#^$SP*(- )?"?source (/gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda[.]sh|"[$][(]conda info --base[)]/etc/profile[.]d/conda[.]sh")"?,?$SP*\$#d
 s#conda activate $JZ_CONDA#source $CC_PROJ/scripts/env_ccin2p3.sh#g
 s#$JZ_CONDA/bin/#$CC_PROJ/.venv/bin/#g
 s#\\\$WORK/conda/envs/foundational/bin/python#\$PROJ/.venv/bin/python#g
 s#$JZ_SCRATCH#$CC_SCRATCH#g
 s#$JZ_ROOT#$CC_ROOT#g
-s#^([[:space:]]*)\#SBATCH --partition=gpu_p2[[:space:]]*\$#\1\#SBATCH --partition=gpu_v100\n\1\#SBATCH --qos=gpu#
-s#^([[:space:]]*)\#SBATCH --account=itg@v100[[:space:]]*\$#\1\#SBATCH --account=lpnhe#
-s#^([[:space:]]*)\#SBATCH --gres=gpu:1[[:space:]]*\$#\1\#SBATCH --gres=gpu:v100:1\n\1\#SBATCH --mem=32G#
-s#^([[:space:]]*)\#SBATCH --gres=gpu:(\{[^}]*\})[[:space:]]*\$#\1\#SBATCH --gres=gpu:\2\n\1\#SBATCH --mem=32G#
-s#^([[:space:]]*)\#SBATCH --partition=prepost[[:space:]]*\$#\1\#SBATCH --partition=htc\n\1\#SBATCH --mem-per-cpu=2G#
-s#^([[:space:]]*)partition: gpu_p2 +\# V100 32GB \(15k hours\); try gpu_p13 \+ itg@a100 for A100 \(5k hours\)[[:space:]]*\$#\1partition: gpu_v100        \# CC-IN2P3 V100 32GB nodes (gpu_h100 exists too; untested here)\n\1qos: gpu#
-s#^([[:space:]]*)partition: gpu_p2([[:space:]]*(\#.*)?)\$#\1partition: gpu_v100\2\n\1qos: gpu#
-s#^([[:space:]]*)account: itg@v100[[:space:]]*\$#\1account: lpnhe#
-s#^([[:space:]]*)request_gpus: 1[[:space:]]*\$#\1request_gpus: 1\n\1gres: gpu:v100:1\n\1mem: 32G                   \# mandatory on CC-IN2P3: the scheduler rejects a job without --mem#
-s#^([[:space:]]*)"account": "itg@v100",[[:space:]]*\$#\1"account": "lpnhe",\n\1"qos": "gpu",\n\1"gres": "gpu:v100:1",\n\1"mem": "32G",#
+s#^($SP*)\#SBATCH --partition=gpu_p2$SP*\$#\1\#SBATCH --partition=gpu_v100#
+s#^($SP*)\#SBATCH --account=itg@v100$SP*\$#\1\#SBATCH --account=lpnhe#
+s#^($SP*)\#SBATCH --gres=gpu:1$SP*\$#\1\#SBATCH --gres=gpu:v100:1#
+s#^($SP*)\#SBATCH --partition=prepost$SP*\$#\1\#SBATCH --partition=htc#
+s#^($SP*)partition: gpu_p2 +\# V100 32GB \(15k hours\); try gpu_p13 \+ itg@a100 for A100 \(5k hours\)$SP*\$#\1partition: gpu_v100        \# CC-IN2P3 V100 32GB nodes (gpu_h100 exists too; untested here)#
+s#^($SP*)partition: gpu_p2($SP*(\#.*)?)\$#\1partition: gpu_v100\2#
+s#^($SP*)account: itg@v100$SP*\$#\1account: lpnhe#
 s#"account", "itg@v100"#"account", "lpnhe"#g
 s#"account": "itg@v100"#"account": "lpnhe"#g
-s#"partition": "gpu_p2"#"partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G"#g
-s#^([[:space:]]*)partition = "gpu_p2l" if use_32gb else "gpu_p2"[[:space:]]*\$#\1partition = "gpu_v100"   \# every CC-IN2P3 V100 is the 32 GB part; use_32gb is moot here#
+s#^(.*)"partition": "gpu_p2"(.*)  \# PORT: qos/gres/mem\$#\1"partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G"\2#
+s#"partition": "gpu_p2"#"partition": "gpu_v100"#g
+s#^($SP*)partition = "gpu_p2l" if use_32gb else "gpu_p2"$SP*\$#\1partition = "gpu_v100"   \# every CC-IN2P3 V100 is the 32 GB part; use_32gb is moot here#
+s#^($SP*)PARTITION$SP*= "gpu_p2".*\$#\1PARTITION    = "gpu_v100"     \# every CC-IN2P3 V100 is the 32 GB part#
+s#^($SP*)gpu$SP*= "gpu_p2l" if needs_32gb\(nh, bs_new\) else "gpu_p2"$SP*\$#\1gpu     = "gpu_v100"   \# every CC-IN2P3 V100 is the 32 GB part#
+s#cluster\.get\('partition', 'gpu_p2'\)#cluster.get('partition', 'gpu_v100')#g
+s#cluster\.get\('account', 'itg@v100'\)#cluster.get('account', 'lpnhe')#g
 s#^\# prepost partition \(CPU billed at weight 0; no GPU hours\)\. Self-skips cached\.\$#\# htc partition (CPU; no GPU hours). Self-skips cached.#
 EOF
 }
 
-if [ "$TO" = jeanzay ]; then PROG=$(to_jeanzay); MARK=("$CC_ROOT" "gpu_v100" "account=lpnhe" "account: lpnhe" '"lpnhe"' "partition=htc" "#SBATCH --mem" "^ *mem: [0-9]"); else PROG=$(to_ccin2p3); MARK=("$JZ_ROOT" "gpu_p2" "itg@v100" "anaconda-py3" "partition=prepost"); fi
+if [ "$TO" = jeanzay ]; then
+  PROG=$(to_jeanzay)
+  MARK=("$CC_ROOT" "gpu_v100" "account=lpnhe" "account: lpnhe" "'lpnhe'" '"lpnhe"' "partition=htc" "#SBATCH --qos" "#SBATCH --mem" "^ *qos: " "^ *gres: " "^ *mem: [0-9]" '^ *"\(qos\|gres\|mem\)": ')
+else
+  PROG=$(to_ccin2p3)
+  MARK=("$JZ_ROOT" "gpu_p2" "itg@v100" "anaconda-py3" "partition=prepost" "#PORT " "# PORT: ")
+fi
 
 if [ "$STDIN" = 1 ]; then sed -E "$PROG"; exit 0; fi
 

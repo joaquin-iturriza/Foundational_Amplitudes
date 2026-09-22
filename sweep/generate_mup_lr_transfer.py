@@ -100,14 +100,18 @@ def build_run_cmd(project_dir, fixed_params, shared_hps, num_heads, lr,
 
 
 def slurm_header(cluster, name, out_dir, err_dir, setup_commands, time):
+    # qos/mem are cluster-specific (CC-IN2P3 needs both, Jean Zay rejects --mem):
+    # emitted only when the reference config's cluster block carries them.
     lines = [
         "#!/bin/bash",
         f"#SBATCH --job-name={name}",
         f"#SBATCH --partition={cluster.get('partition', 'gpu_p2')}",
+        *([f"#SBATCH --qos={cluster['qos']}"] if "qos" in cluster else []),
         f"#SBATCH --account={cluster.get('account', 'itg@v100')}",
         "#SBATCH --nodes=1",
         "#SBATCH --ntasks-per-node=1",
-        f"#SBATCH --gres=gpu:{cluster.get('request_gpus', 1)}",
+        f"#SBATCH --gres={cluster.get('gres', 'gpu:' + str(cluster.get('request_gpus', 1)))}",
+        *([f"#SBATCH --mem={cluster['mem']}"] if "mem" in cluster else []),
         f"#SBATCH --cpus-per-task={cluster.get('cpus_per_task', 8)}",
         f"#SBATCH --time={time}",
         f"#SBATCH --output={out_dir}/{name}_%j.out",

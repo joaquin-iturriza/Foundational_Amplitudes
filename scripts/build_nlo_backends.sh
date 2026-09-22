@@ -5,6 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
+#PORT #SBATCH --mem-per-cpu=2G
 #SBATCH --time=10:00:00
 #SBATCH --output=scripts/build_nlo_%j.out
 #SBATCH --error=scripts/build_nlo_%j.err

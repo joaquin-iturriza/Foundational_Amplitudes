@@ -1,10 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=fa_smoke
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --account=itg@v100
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
+#PORT #SBATCH --mem=16G
 #SBATCH --time=00:10:00
 #SBATCH --output=runs/_logs/%x_%j.out
 #SBATCH --error=runs/_logs/%x_%j.out

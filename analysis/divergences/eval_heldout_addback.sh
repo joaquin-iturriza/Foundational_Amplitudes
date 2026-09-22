@@ -2,7 +2,9 @@
 #SBATCH --job-name=ho_eval_addback
 #SBATCH --account=itg@v100
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
+#PORT #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/ho_eval_addback_%j.out

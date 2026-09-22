@@ -1,10 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=levab
 #SBATCH --partition=gpu_p2
+#PORT #SBATCH --qos=gpu
 #SBATCH --account=itg@v100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
+#PORT #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:55:00
 #SBATCH --array=0-1
