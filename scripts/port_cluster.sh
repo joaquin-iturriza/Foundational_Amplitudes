@@ -108,7 +108,7 @@ s#^\# prepost partition \(CPU billed at weight 0; no GPU hours\)\. Self-skips ca
 EOF
 }
 
-if [ "$TO" = jeanzay ]; then PROG=$(to_jeanzay); MARK=("$CC_ROOT" "gpu_v100" "account=lpnhe" "account: lpnhe" '"lpnhe"' "partition=htc"); else PROG=$(to_ccin2p3); MARK=("$JZ_ROOT" "gpu_p2" "itg@v100" "anaconda-py3" "partition=prepost"); fi
+if [ "$TO" = jeanzay ]; then PROG=$(to_jeanzay); MARK=("$CC_ROOT" "gpu_v100" "account=lpnhe" "account: lpnhe" '"lpnhe"' "partition=htc" "#SBATCH --mem" "^ *mem: [0-9]"); else PROG=$(to_ccin2p3); MARK=("$JZ_ROOT" "gpu_p2" "itg@v100" "anaconda-py3" "partition=prepost"); fi
 
 if [ "$STDIN" = 1 ]; then sed -E "$PROG"; exit 0; fi
 
