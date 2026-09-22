@@ -8,7 +8,40 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 
 ---
 
+## Where this runs — projects above sites (2026-09-22; read before anything below)
+
+This repo is one of six projects that can run at **any** of three sites: CC-IN2P3
+(SLURM, V100), Jean Zay (SLURM, V100/A100, **hours limited**) and lxplus (HTCondor).
+The working copy is the **local checkout `~/work/FA`**. Nothing is edited on a
+cluster: no sshfs mount, no `scripts/remote.sh`, no `lxplus-run`, no `ssh` by hand.
+Code reaches a site by git, jobs by the `site` tool. **Read `~/work/CLAUDE.md`** for
+the rules and the verbs (`site pick / env / sync / submit / poll / logs / fetch / where`).
+
+- **One branch: `trunk`.** The old per-cluster branches (`ccin2p3` / `jeanzay`) are retired: they
+  had no commits `trunk` lacks. `main` stays a generated publish artifact where the
+  repo has one.
+- **Site facts live in `sites/sites.yaml`** (paths, scheduler flags, env recipe) and
+  `sites/activate.sh`. Python asks `siteconf` (`siteconf.PROJECT_DIR`,
+  `siteconf.slurm_header(...)`, `siteconf.resolve(cfg)`); every job script starts with
+  `source "$_CCORCH_ROOT/sites/activate.sh"`. **Never hardcode a cluster path**; Hydra
+  data paths are `${oc.env:DATA_DIR}`.
+- **Jean Zay is never picked automatically** — only when the work needs it or the
+  user asks (`--allow-jeanzay`). Over ~10 GPU-hours: confirm first.
+- **Infrastructure checks use `scripts/job_probe.sh`** (10 s), never a training run.
+- **Results:** `site fetch <run>` mirrors tier-0 (metrics, small plots, configs) to
+  `~/.local/share/ccorch/artifacts/FA/<run>/`; heavy artefacts stay on the site;
+  `site where <run>` prints both. The registry records the deployed commit of every run.
+- **Never delete anything on a cluster you did not create in the same command.**
+
+Sections below that mention the sshfs mount, `remote.sh` / `lxplus-run`, a per-cluster
+branch, or absolute cluster paths describe the old model and carry a supersession note.
+The AFS/EOS split, the hooks, the science and the conventions are unchanged.
+
+---
+
 ## Ground rules (read first)
+
+> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
@@ -87,6 +120,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 ---
 
 ## Paths
+
+> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
 
 | What | Path |
 |------|------|
@@ -511,6 +546,8 @@ machine that keeps background tasks alive.
 ---
 
 ## Git & release workflow (ccin2p3 trunk → published main)
+
+> **Superseded on 2026-09-22** — see *Where this runs* at the top: local checkout `~/work/FA`, one branch (`trunk`), sites via the `site` tool. Kept for history.
 
 This repo uses a **development trunk + generated public branch** model. Claude
 handles git: commit and push as work progresses, keep a readable timeline.
