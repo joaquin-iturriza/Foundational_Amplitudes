@@ -1,11 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=catalog_short_ab
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_p2
+#SBATCH --account=itg@v100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:30:00
@@ -29,15 +28,15 @@
 # SEED= sets the init seed (repeats; data.seed stays 42).
 # RECIPE= picks the recipe file under recipes/ (default the full catalog); BS= the training batch size.
 set -euo pipefail
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 GEN="${GEN:-true}"        # true: one-hot | false: scalar column | none: no generation column (the old encoding)
 if [ "$GEN" = "none" ]; then GFEAT=false; GHOT=false; else GFEAT=true; GHOT="$GEN"; fi
 python run.py \
   exp_name="${EXP:-catalog_short_ab_gen_${GEN}}" \
   data.source=recipes data.require_cache=true data.seed=42 \
-  data.processes_file=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
+  data.processes_file=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
   data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \

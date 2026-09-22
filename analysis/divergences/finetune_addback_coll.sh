@@ -1,10 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=ft_coll_ho
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
+#SBATCH --account=itg@v100
+#SBATCH --partition=gpu_p2
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=01:00:00
 #SBATCH --array=0-3
@@ -13,11 +11,11 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
-REPO=/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+REPO=/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 CKPT=$REPO/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt
 
 # ee->uug COLLINEAR-region hold-out (y_min<c at hard x_g): pure-collinear extrapolation, complementary to the

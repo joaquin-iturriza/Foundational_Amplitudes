@@ -19,21 +19,18 @@
 cluster:
   scheduler: slurm
   auto_submit: false          # submit via sweep_manager (interleaved across cells)
-  partition: gpu_v100           # V100 32GB; nh=4 BS=16384 ~6.8GB
-  qos: gpu
-  account: lpnhe
+  partition: gpu_p2           # V100 32GB; nh=4 BS=16384 ~6.8GB
+  account: itg@v100
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:00:00"            # covers the largest cell (t=4000 ~19min train + eval)
 
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
+    - "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
 
 sweep_name: scaling_solo_full
 seed: 42
@@ -65,7 +62,7 @@ dyhpo:
   n_startup: 4                # Sobol startup trials before the surrogate activates
 
 fixed_params:
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
   data.subsample: 100000
   data.train_test_val: "[0.7, 0.2, 0.1]"
   model: lloca

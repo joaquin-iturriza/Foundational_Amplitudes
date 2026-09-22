@@ -1,10 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=div_extract
-#SBATCH --account=lpnhe
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
+#SBATCH --account=itg@v100
+#SBATCH --partition=gpu_p2
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=00:40:00
 #SBATCH --output=analysis/divergences/extract_%j.out
@@ -12,10 +10,10 @@
 
 set -e
 module purge
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 
 echo "=== eeuu NLO virt: extract ==="
 python analysis/divergences/extract_preds.py \

@@ -19,21 +19,18 @@
 cluster:
   scheduler: slurm
   auto_submit: true          # generate -> submit cells interleaved via sweep_manager
-  partition: gpu_v100
-  qos: gpu
-  account: lpnhe
+  partition: gpu_p2
+  account: itg@v100
   request_gpus: 1
-  gres: gpu:v100:1
-  mem: 32G                   # mandatory on CC-IN2P3: the scheduler rejects a job without --mem
   cpus_per_task: 8
   time: "01:00:00"            # covers the largest cell (t=4000)
 
 paths:
-  sweep_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
-  project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+  sweep_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sweeps
+  project_dir: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
   setup_commands:
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate"
-    - "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh"
+    - "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh"
+    - "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational"
     - "export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
 
 sweep_name: finetune_scaling_virt
@@ -55,13 +52,13 @@ dyhpo:
   n_startup: 4
 
 fixed_params:
-  data.data_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/data/
+  data.data_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/data/
   data.subsample: 100000
   data.train_test_val: "[0.7, 0.2, 0.1]"
   model: lloca
   model.net.num_blocks: 8
   model.net.num_heads: 8                  # MUST match the pretrained model (nh=8)
-  fine_tune.pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/pretrain_full_nh8/trial_0271/models/model_run0_best.pt.gz
   training.lr: 0.001081750557879577        # nh8 best base LR; fine_tune.lr_scale sweeps on top
   training.batchsize: 16384
   evaluation.batchsize: 8192

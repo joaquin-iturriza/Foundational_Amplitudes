@@ -27,15 +27,15 @@ from sweep.generate_pretraining_scaling_sweeps import (
     DATASET_LIST_STR, AMP_ORDERS_STR, SEARCH_SPACE,
 )
 
-LUSTRE_BASE  = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+LUSTRE_BASE  = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 SWEEP_BASE   = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 N_TRIALS     = 10
 SETUP_COMMANDS = [
     
-    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
-    "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
+    "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh",
+    "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
 ]
-BASE_CLUSTER = {"scheduler": "slurm", "account": "lpnhe",
+BASE_CLUSTER = {"scheduler": "slurm", "account": "itg@v100",
                 "request_gpus": 1, "cpus_per_task": 8}
 
 

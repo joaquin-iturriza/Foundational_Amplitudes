@@ -5,7 +5,7 @@
 # Same model as madgrav/Fin_ML on this cluster: the assistant runs LOCALLY
 # against an sshfs mount of the project, so local
 # /home/joaquin/mnt/ccin2p3/Foundational_Amplitudes IS remote
-# /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes (same bytes). All file
+# /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes (same bytes). All file
 # work — read, search, edit, tail logs — happens on the mount with no ssh at
 # all. Only commands that genuinely need the scheduler cross the wire.
 #
@@ -21,7 +21,7 @@
 #                CCIN2P3_PROJ (remote project dir).
 set -euo pipefail
 HOST="${CCIN2P3_HOST:-ccin2p3}"
-PROJ="${CCIN2P3_PROJ:-/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes}"
+PROJ="${CCIN2P3_PROJ:-/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes}"
 
 if [ "$#" -eq 0 ]; then
   echo "usage: scripts/remote.sh <command to run in the project dir on the cluster>" >&2

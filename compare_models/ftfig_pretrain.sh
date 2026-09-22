@@ -1,12 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=ftfig_pre
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_p2
+#SBATCH --account=itg@v100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=03:00:00
 #SBATCH --output=compare_models/ftfig_pre_%x_%j.out
@@ -19,9 +17,9 @@
 # 8601 (override for 1h ladder rungs). Ladder rungs (1h, 416 sets):
 #   raw416 -> rung2 (+onehots/standardize) -> rung3 (+mass/coupling) -> best416
 # (rung4 == best416 flags at ITERS=3400; raw rung == raw416 at ITERS=3400).
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
-cd /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
+cd /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes
 export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut
 export AMP_TRAIN_CACHE_DIR=$SCRATCH/amp_cache_scanbig_cut
 export AMP_FIDUCIAL_CUTS=on

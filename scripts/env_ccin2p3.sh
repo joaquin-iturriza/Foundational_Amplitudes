@@ -10,8 +10,8 @@
 #   $SCRATCH/amp_data_cache   purgeable, sweep-shared train cache (AMP_TRAIN_CACHE_DIR)
 # Both must be on the shared /sps filesystem: a sweep's trials share the cache.
 # Explicit MG5_BIN / MG5_WORK_DIR / MG5_OUTPUT_DIR / AMP_* exports still win.
-export WORK="${WORK:-/sps/lpnhe/jiturrizaramirez01}"
-export SCRATCH="${SCRATCH:-/sps/lpnhe/jiturrizaramirez01/tmp}"
+export WORK="${WORK:-/lustre/fswork/projects/rech/itg/ulm49ia}"
+export SCRATCH="${SCRATCH:-/lustre/fsn1/projects/rech/itg/ulm49ia}"
 # MadLoop's matrix2py.so links the HEPTools reduction libraries (Ninja, Collier, OneLoop)
 # dynamically; without this the import fails with "libninja.so.0: cannot open shared object".
 export LD_LIBRARY_PATH="$WORK/mg5amcnlo/HEPTools/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"

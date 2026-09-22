@@ -9,7 +9,7 @@ Writes sweep/sweep_config_jeanzay_scan_ab_<arm>.yaml.
 """
 import os, yaml
 
-PROJ = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+PROJ = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 
 ARMS = {
     "off":     {"data.mass_from_momenta": "false", "data.coupling_scalars": "false",
@@ -72,7 +72,7 @@ SEARCH_SPACE = [
 
 def make(arm, feat):
     return {
-        "cluster": {"account": "lpnhe", "partition": "gpu_v100", "qos": "gpu", "gres": "gpu:v100:1", "mem": "32G", "request_gpus": 1,
+        "cluster": {"account": "itg@v100", "partition": "gpu_p2", "request_gpus": 1,
                     "cpus_per_task": 8, "scheduler": "slurm", "time": "06:00:00",
                     "auto_submit": False},
         "dyhpo": {"n_candidates": 300, "n_startup": 8, "seed": 42, "total_budget": 10000},
@@ -88,8 +88,8 @@ def make(arm, feat):
             "setup_commands": [
                 
                 
-                "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate",
-                "source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh",
+                "module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh",
+                "conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational",
                 # Cut-tagged big-run cache (fiducial cuts on): the recipe datasets are
                 # prebuilt here, so require_cache hits without any GPU-side generation.
                 "export AMP_FROZEN_DIR=$SCRATCH/datasets_scanbig_cut",

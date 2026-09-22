@@ -24,7 +24,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-REPO = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+REPO = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 sys.path.insert(0, REPO)
 import plot_style as ps  # noqa: E402
 

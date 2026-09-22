@@ -26,18 +26,18 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    be ignored** unless I explicitly ask. Don't refactor, "fix", or reference the
    legacy models in solutions by default.
 
-2. **You work on CC-IN2P3 through an sshfs mount.** Claude Code runs on the
-   laptop (WSL2); this project dir **is** the cluster's
-   `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` (same bytes), so all
-   file work — read, grep, edit, tail logs — happens on the mount with no ssh.
-   Only the scheduler crosses the wire: `scripts/remote.sh <cmd>` runs `<cmd>` in
-   the project dir on a login node (`scripts/remote.sh sbatch --parsable x.sh`,
-   `scripts/remote.sh squeue --me`, `scripts/remote.sh python sweep/generate_sweep.py …`).
-   There is no project python env on this side (no torch): anything that imports
-   the project runs through `remote.sh` or inside a job. `git` runs locally.
+2. **You work directly on Jean Zay.** This project dir is the cluster's
+   `/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes`; all file work
+   (read, grep, edit, tail logs) and the scheduler (`sbatch`, `squeue`, `sacct`) are
+   local. `scripts/remote.sh <cmd>` still works and simply runs `<cmd>` in the
+   project dir here (it only crosses ssh when there is no scheduler on the host), so
+   the commands in this file are the same on every cluster. The project python is the
+   conda env (`module load anaconda-py3/2023.09`, then `source
+   /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh` and `conda activate
+   /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational`); `git` runs here.
    - **Login nodes have no GPU.** Don't run training or any GPU/CUDA code there
      (xformers attention is CUDA-only and crashes off-GPU); GPU work goes through
-     `sbatch`. Quick CPU-only python/imports via `remote.sh` are fine.
+     `sbatch`. Quick CPU-only python/imports on a login node are fine.
    - **Submitting jobs is gated by GPU budget, not a blanket confirm.** You may
      submit quick tests on your own — **always be mindful of the GPU budget**.
      The rule: estimate the **total GPU-hours** of everything you're about to
@@ -69,10 +69,10 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    goes in its results section and its hand-off item is deleted; the hand-off holds
    only open/future work.
 
-4. **Go easy on `find` and bulk git over the mount.** Every stat is an ssh
-   round trip: a tree-wide `find`, or a `git diff` touching hundreds of files,
-   takes minutes. Prefer `ls`, targeted `grep`, direct paths and pathspec-scoped
-   git; run genuinely tree-wide scans on the cluster via `scripts/remote.sh`.
+4. **Go easy on `find` over large trees.** This is Lustre, not a network mount,
+   but a tree-wide `find` or a `git diff` touching hundreds of files still stats
+   every entry of `runs/`, `sweeps/` and `data*/`. Prefer `ls`, targeted `grep`,
+   direct paths and pathspec-scoped git.
 
 5. **Never attribute work to yourself — anywhere, ever.** Do not add
    `Co-Authored-By: Claude`, `Generated with Claude Code`, or any mention of
@@ -90,21 +90,21 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 
 | What | Path |
 |------|------|
-| Project root (cluster) | `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` |
-| Project root (this machine, sshfs) | `/home/joaquin/mnt/ccin2p3/Foundational_Amplitudes` |
-| Python env | `.venv/` in the project (python 3.11 from `/pbs/software/redhat-9-x86_64/anaconda/3.11`; torch 2.1.2+cu118, numpy pinned 1.26.4, xformers, lloca) — self-contained, **no `module load`** |
-| Env stand-ins | `scripts/env_ccin2p3.sh` — sets `$WORK`/`$SCRATCH` (Jean Zay vars the data pipeline keys on); source it after the venv in every job |
-| ssh alias | `ccin2p3` (`cca.in2p3.fr`) |
+| Project root | `/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes` |
+| Python env | conda env `/lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational` (`module load anaconda-py3/2023.09`; torch 2.1.2+cu118, numpy 1.26.4, xformers, lloca); every job script loads the module, sources conda.sh and activates it |
+| Env stand-ins | none needed: `$WORK`/`$SCRATCH` are native here (`scripts/env_ccin2p3.sh` is the CC-IN2P3 stand-in for them and is not sourced on Jean Zay) |
+| ssh alias | `jean-zay` (`jean-zay.idris.fr`, via `lpnclaude03`) |
 
-Sweep configs and job scripts use the `/sps/...` absolute paths, since that's
+Sweep configs and job scripts use the `/lustre/...` absolute paths, since that's
 where jobs actually run.
 
-SLURM (from the sweep template): `account: lpnhe`, `partition: gpu_v100`,
-`qos: gpu`, `gres: gpu:v100:1` (V100 32GB) — **the only validated setup**.
-**`--mem` is mandatory on CC-IN2P3**: the scheduler rejects any job without an
-explicit memory request (template `mem: 32G`; CPU jobs go to `htc` with
-`--mem-per-cpu`). `gpu_h100` exists but is untested; don't assume it works
-(relevant for the `allow_tf32` knob, which is a no-op on V100).
+SLURM (from the sweep template): `account: itg@v100`, `partition: gpu_p2`,
+`gres: gpu:1` (V100 32GB) — **the only validated setup**. **Never pass `--mem` or
+`--mem-per-cpu` on Jean Zay**: host memory follows `--cpus-per-task` and the scheduler
+rejects an explicit request (CPU prebuilds go to `prepost`, billed at weight 0).
+A100 (`gpu_p13` + `itg@a100`) is untested and the account isn't entitled to it
+("Invalid job type for the account"); don't assume it works (relevant for the
+`allow_tf32` knob, which is a no-op on V100).
 
 ---
 
@@ -303,7 +303,7 @@ goes through `sweep_manager.py` (see below) so trials interleave round-robin
 across sweeps — do **not** hand-loop `sbatch` over `jobs/*.sh`. The generators
 call it for you:
 ```bash
-# all of these shell out to sbatch, so they run on the login node via remote.sh
+# all of these shell out to sbatch; remote.sh runs them in place on a login node
 # generate; it then prompts to submit (or set cluster.auto_submit / pass --auto-submit)
 scripts/remote.sh python sweep/generate_sweep.py --config sweep/<my_config>.yaml
 # scaling generators submit all their cells interleaved in one batch:

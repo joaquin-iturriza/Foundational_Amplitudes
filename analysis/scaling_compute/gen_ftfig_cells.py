@@ -19,7 +19,7 @@ Ladder (one job): raw1h/rung2_1h/rung3_1h/best1h fine-tuned at D=100k, t=6193 on
 """
 import json, os, stat, sys
 
-ROOT = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
+ROOT = "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes"
 HPS = json.load(open(f"{ROOT}/analysis/scaling_compute/ftfig_cell_hps.json"))
 JOBDIR = f"{ROOT}/sweeps/ftfig_jobs"
 os.makedirs(JOBDIR, exist_ok=True)
@@ -55,19 +55,17 @@ LADDER = {"ftraw1h": ("raw1h", RAW_FLAGS), "ftrung2": ("rung2_1h",
 
 HEADER = """#!/bin/bash
 #SBATCH --job-name={name}
-#SBATCH --partition=gpu_v100
-#SBATCH --qos=gpu
-#SBATCH --account=lpnhe
+#SBATCH --partition=gpu_p2
+#SBATCH --account=itg@v100
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:v100:1
-#SBATCH --mem=32G
+#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --time={hours}:00:00
 #SBATCH --output={jobdir}/{name}_%j.out
 #SBATCH --error={jobdir}/{name}_%j.err
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/activate
-source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/scripts/env_ccin2p3.sh
+module load anaconda-py3/2023.09 && source /gpfslocalsup/pub/anaconda-py3/2023.09/etc/profile.d/conda.sh
+conda activate /lustre/fswork/projects/rech/itg/ulm49ia/conda/envs/foundational
 cd {root}
 """
 
