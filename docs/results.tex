@@ -858,11 +858,12 @@ The experiments (Table~\ref{tab:levers}) each toggle one feature (off $=$ baseli
 HPs on a targeted process:
 \begin{itemize}
   \item \textbf{Coupling order} (\code{coupling\_scalars}: the per-event $\log\alpha$ and the
-  order labels). When per-dataset standardization removes the constant amplitude offset and the
-  kinematics are identical across couplings, the net cannot infer $\alpha$ at all; supplying it
-  then cuts $\vlnr$ by $\sim18\times$ ($0.0573\!\to\!0.0031$). With the offset left intact it is
-  neutral ($-6.5\%$); where a per-event shape survives (steep running, wide $\alpha$) it wins
-  modestly ($-19\%$). This is exactly Principle~\ref{prin:levers}.
+  order labels). Under a \emph{pooled} standardization the constant amplitude offset between the
+  $\alpha$-scan datasets stays in the target; with identical kinematics across couplings the net
+  then has nothing in the momenta to infer $\alpha$ from, and supplying it cuts $\vlnr$ by
+  $\sim18\times$ ($0.0573\!\to\!0.0031$). With per-dataset standardization the offset is removed
+  and the feature is neutral ($-6.5\%$); where a per-event shape survives (steep running, wide
+  $\alpha$) it wins modestly ($-19\%$). This is exactly Principle~\ref{prin:levers}.
   \item \textbf{External mass} (\code{mass\_from\_momenta}, the invariant mass of a leg system)
   is \emph{redundant}: the mass \emph{is} in the four-momenta; both arms already sit at
   $\vlnr\!\sim\!2\times10^{-5}$.
