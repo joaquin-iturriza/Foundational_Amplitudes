@@ -16,7 +16,13 @@ verify() {
   [ -x "$BIN" ] || miss+=("MadGraph at $ROOT")
   [ -d "$WORK/datasets" ] || miss+=("$WORK/datasets")
   if [ ${#miss[@]} -gt 0 ]; then echo "missing: ${miss[*]}"; return 1; fi
-  echo "ok: MG5 $(sed -n 's/^version = //p' "$ROOT/VERSION" 2>/dev/null | head -1), gfortran, $WORK/datasets ($(ls "$WORK/datasets" | wc -l) files)"
+  # what a catalog run needs beyond the tools: the env's packages, every pool prebuilt
+  # (require_cache), every diagram sidecar (off-shellness, target propagators)
+  local data rc
+  data=$(python "$PROJECT_DIR/tools/check_site_data.py" 2>&1); rc=$?
+  data=$(echo "$data" | tail -3 | tr '\n' ' ')
+  [ "$rc" = 0 ] || { echo "not runnable: $data"; return 1; }
+  echo "ok: MG5 $(sed -n 's/^version = //p' "$ROOT/VERSION" 2>/dev/null | head -1), gfortran, $data"
 }
 [ "${1:-}" = "--verify" ] && { verify; exit $?; }
 
