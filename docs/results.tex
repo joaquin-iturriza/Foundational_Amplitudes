@@ -377,7 +377,8 @@ regenerated. Val and test are flat by construction, so the audit reports them on
 window coverage, which is complete everywhere.
 
 \paragraph{The needle is not in the data.} The audit above measured the sampling, not
-the learning outcome, and the first catalog_v2 wave (Sec.~\ref{sec:catv2-census}) found the $s$-channel $2\to2$ family still far above the bulk on the flat validation measure. The check that
+the learning outcome, and the first catalog\_v2 wave (Sec.~\ref{sec:catv2-census}) found the
+$s$-channel $2\to2$ family still far above the bulk on the flat validation measure. The check that
 should have preceded the sweep is a learnability probe, and it is decisive: the seven
 $s$-channel pools ($ee\to\mu\mu,\tau\tau,u\bar u,d\bar d,b\bar b,\nu_\mu\bar\nu_\mu,
 \nu_e\bar\nu_e$) trained \emph{alone} for $3000$ steps at $\mathrm{bs}=4096$ (lr
@@ -2823,9 +2824,10 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     search space (\code{sweep/sweep\_config\_ccin2p3\_catalog\_v2.yaml}, log-uniform over
     that range; $\tau\to\infty$ is the arithmetic mean) rather than chosen by hand or swept
     at twelve processes, where there is no $2\to4$ bulk to protect. The reference-weighted
-    aggregation is out: corrected, it is the worst census at $1000$ steps at both learning
-    rates and loses again at the quick working point (Table~\ref{tab:catv2_excess} and the
-    quick-working-point paragraph). The aggregation choice and \code{training.lr} are swept
+    aggregation is out: corrected, it is worse than the arithmetic mean at $1000$ steps at both
+    learning rates (worst of the three at $5.8\times10^{-3}$ and with the off-shellness input,
+    between the two means at $9.7\times10^{-3}$) and loses again at the quick working point
+    (Table~\ref{tab:catv2_excess} and the quick-working-point paragraph). The aggregation choice and \code{training.lr} are swept
     together (their optimum is joint), and the wave needs the diagram sidecars present
     (masks $478/478$). Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
