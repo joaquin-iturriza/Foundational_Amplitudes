@@ -3593,6 +3593,32 @@ during training, every seed; the floored arm's third seed diverges between steps
 \label{fig:steps_agg_curves}
 \end{figure}
 
+\paragraph{Starting worse or scaling worse.} A power law $L\propto t^{-\alpha}$ fitted to each
+class median over the three horizons, per seed, separates the two
+(Fig.~\ref{fig:steps_agg_fit}; \code{steps\_agg.py}). Against the multiplicity alone, the
+multi-particle classes start worse and scale \emph{better}: tree $2\to3$ starts $4$--$5$ times above
+its solo reference at $1000$ steps and falls with $\alpha=1.0$--$1.3$ against $0.47$, tree $2\to4$
+starts $4$--$9$ times above and falls with $0.70$--$0.78$ against $0.44$, in every arm; their gap is
+an offset that closes with steps. The resonant $2\to2$ pools are the one class that scales worse,
+$\alpha=0.34$--$0.49$ against $1.47$, from a start $5$--$7$ times above, so their gap widens with
+steps under every aggregation. Tree $2\to2$ scales like its reference under the geometric mean
+($1.78$) and slower under the other two ($1.03$--$1.09$). Between the aggregations, the $2\to4$ and
+signed classes differ only in the start (same $\alpha$ within the seeds, $0.70$--$0.78$ and
+$0.83$--$0.91$; the geometric mean starts $1.9$ and $3.2$ times higher), while the geometric mean
+buys a steeper $\alpha$ on tree $2\to2$, $2\to3$ and positive one-loop. The one solo reference for
+$2\to2$ is $ee\to u\bar u$, which carries the $Z$ pole, and its curve is bent ($1.4$ then $5.6$ per
+doubling), so its $\alpha$ is a three-point average of the two.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/steps_agg_alpha.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_start.pdf}}
+\caption{Power-law fit $L=L_{1000}\,(t/1000)^{-\alpha}$ of each class median over $1000$--$4000$
+steps, per seed (bar: min to max over seeds), under the three aggregations, and the same fit to the
+tuned solo reference of the class's multiplicity. (a) The exponent $\alpha$, (b) the fitted loss at
+$1000$ steps.}
+\label{fig:steps_agg_fit}
+\end{figure}
+
 \paragraph{The sign head: a real but modest gain on the signed class.} With
 \code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
 (\code{abslog:<s>}, floored at the signed-log scale) and the network's second output

@@ -107,3 +107,45 @@ ax.set_yscale("log"); ax.set_xlabel("training step")
 ax.set_ylabel(r"validation GM$_p$ MSE($\log|\mathcal{M}|^2$)")
 ps.shared_legend(fig, ax, ncol=1)
 ps.save(fig, "analysis/catalog_v2/steps_agg_curves")
+
+# power-law fit per class: log L = log L_1000 - alpha log(t/1000) over the three horizons, per seed
+# (the floored arm on the seeds that did not diverge at every horizon); solo from its one value per horizon
+x = np.log(np.array(STEPS) / STEPS[0])
+def fit(y):
+    a, b = np.polyfit(x, np.log(y), 1); return -a, np.exp(b)
+FIT = {}
+for key, _, _ in ARMS:
+    ok = [s for s in range(1, seeds + 1) if all(any(r["arm"] == key and r["steps"] == N and r["seed"] == s for r in good) for N in STEPS)]
+    for c in C.CLASSES:
+        per = []
+        for s in ok:
+            y = [np.median([v for n, v in r["final"].items() if cls(n) == c]) for N in STEPS
+                 for r in good if r["arm"] == key and r["steps"] == N and r["seed"] == s]
+            per.append(fit(y))
+        FIT[key, c] = np.array(per)
+for c, k in SOLO_K.items():
+    FIT["solo", c] = np.array([fit([D["solo"][f"{N}_{k}"] for N in STEPS])])
+print(f"\n{'class':16s} " + " | ".join(f"{k:>22s}" for k in ("arith", "geo", "tau", "solo")) + "   (alpha, L at 1000 from the fit)")
+for c in C.CLASSES:
+    cells = []
+    for k in ("arith", "geo", "tau", "solo"):
+        f = FIT.get((k, c))
+        cells.append("" if f is None else f"{f[:,0].mean():.2f}±{f[:,0].std(ddof=1) if len(f) > 1 else 0:.2f}  {np.exp(np.log(f[:,1]).mean()):.2g}")
+    print(f"{c:16s} " + " | ".join(f"{s:>22s}" for s in cells))
+# two dot plots, classes down the y axis, one marker per arm (bar = min to max over seeds), solo in grey
+yy = np.arange(len(C.CLASSES))[::-1]
+SERIES = [(k, COL[k], lab, "o") for k, _, lab in ARMS] + [("solo", ps.C.grey, "multiplicity alone", "s")]
+off = dict(zip([s[0] for s in SERIES], (-0.21, -0.07, 0.07, 0.21)))
+for j, (base, xlab, logx) in enumerate((("steps_agg_alpha", r"exponent $\alpha$, $L\propto t^{-\alpha}$", False),
+                                         ("steps_agg_start", r"fitted MSE($\log|\mathcal{M}|^2$) at 1000 steps", True))):
+    fig, ax = ps.figure()
+    for k, col, lab, mk in SERIES:
+        pts = [(yy[i], FIT[k, c][:, j]) for i, c in enumerate(C.CLASSES) if (k, c) in FIT]
+        m = [np.exp(np.log(v).mean()) if logx else v.mean() for _, v in pts]
+        lo = [mi - v.min() for mi, (_, v) in zip(m, pts)]; hi = [v.max() - mi for mi, (_, v) in zip(m, pts)]
+        ax.errorbar(m, [p + off[k] for p, _ in pts], xerr=[lo, hi], fmt=mk, color=col, capsize=2, ls="none", label=lab)
+    ax.set_yticks(yy, [C.CLASS_LABEL[c] for c in C.CLASSES]); ax.set_ylim(-0.6, len(C.CLASSES) - 0.4)
+    if logx: ax.set_xscale("log")
+    ax.set_xlabel(xlab)
+    ps.shared_legend(fig, ax, ncol=2)
+    ps.save(fig, f"analysis/catalog_v2/{base}")
