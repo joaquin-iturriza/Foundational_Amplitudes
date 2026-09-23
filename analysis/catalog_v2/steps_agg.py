@@ -21,8 +21,15 @@ REFP = {4: "ee_uu", 5: "ee_uug", 6: "ee_uugg"}
 JSON = os.path.join(HERE, "steps_agg.json")
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 
-if "--collect" in sys.argv:
-    out = {"runs": [], "solo": {}}
+
+if "--collect" in sys.argv:   # the class needs signed_pools.csv, which lives where the pools are
+    s27, all50 = C.signed_classes()
+    def cls(n):
+        if n in all50: return "signed 1-loop"
+        if n.endswith("_nlo") or n.endswith("_loop"): return "positive 1-loop"
+        if n in C.NEEDLE or "__mz" in n: return "resonant 2->2"
+        return f"tree 2->{NP[n]-2}"
+    out = {"runs": [], "solo": {}, "cls": {n: cls(n) for n in NP}}
     for key, pre, _ in ARMS:
         for N in STEPS:
             for r in sorted(glob.glob(os.path.join(ROOT, "runs", f"{pre}t{N}_s*"))):
@@ -40,15 +47,10 @@ if "--collect" in sys.argv:
     print(json.dumps(out)); sys.exit()
 
 import plot_style as ps
-s27, all50 = C.signed_classes()
-def cls(n):
-    if n in all50: return "signed 1-loop"
-    if n.endswith("_nlo") or n.endswith("_loop"): return "positive 1-loop"
-    if n in C.NEEDLE or "__mz" in n: return "resonant 2->2"
-    return f"tree 2->{NP[n]-2}"
 SOLO_K = {"tree 2->2": 4, "resonant 2->2": 4, "tree 2->3": 5, "tree 2->4": 6}
 COL = {"arith": ps.C.blue, "geo": ps.C.vermillion, "tau": ps.C.green}
 D = json.load(open(JSON))
+cls = D["cls"].get
 runs = D["runs"]
 for r in runs: r["diverged"] = float(np.median(list(r["final"].values()))) > 0.5
 div = [r for r in runs if r["diverged"]]
