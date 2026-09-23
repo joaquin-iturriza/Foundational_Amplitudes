@@ -314,7 +314,7 @@ measure; the old validation estimated a different integral, weighted exactly whe
 training density was not, and checkpoint selection, the HPO objective and the census all read
 it. A shaped entry now shapes train, val and test alike, and every catalog\_v2 number from
 here on is on the shaped measure; the earlier ones (Sec.~\ref{sec:catv2-census},
-Table~\ref{tab:catv2_short}) are on the uniform one and compare only by failing status. The
+Table~\ref{tab:catv2_short}) are on the uniform one and compare with the later ones only in rank, not in value. The
 one-loop (MadLoop) datasets are never shaped, so their roles always agreed.
 
 \paragraph{Parameter axis.} Deliberately sparse: a few far-apart points per axis as decorated
@@ -377,8 +377,7 @@ regenerated. Val and test are flat by construction, so the audit reports them on
 window coverage, which is complete everywhere.
 
 \paragraph{The needle is not in the data.} The audit above measured the sampling, not
-the learning outcome, and the first catalog_v2 wave (Sec.~\ref{sec:catv2-census}) found the
-$s$-channel $2\to2$ family still failing on the flat validation measure. The check that
+the learning outcome, and the first catalog_v2 wave (Sec.~\ref{sec:catv2-census}) found the $s$-channel $2\to2$ family still far above the bulk on the flat validation measure. The check that
 should have preceded the sweep is a learnability probe, and it is decisive: the seven
 $s$-channel pools ($ee\to\mu\mu,\tau\tau,u\bar u,d\bar d,b\bar b,\nu_\mu\bar\nu_\mu,
 \nu_e\bar\nu_e$) trained \emph{alone} for $3000$ steps at $\mathrm{bs}=4096$ (lr
@@ -403,8 +402,7 @@ $10^{-5}$). Under the arithmetic mean every process ends within $[2\times10^{-5}
 6\times10^{-4}]$; under the geometric mean the spread is five decades. This is
 Prin.~\ref{prin:gradcomp} seen directly: a laggard's gradient is divided by its own large
 loss, so in the joint run it never gets the steps the resonance needs, and no amount of sampling
-can hand them back. The wave-0 census (Sec.~\ref{sec:catv2-census}), where the failing
-$s$-channel and $M_Z$ pools sit at $0.04$--$0.6$ while the bulk is at $10^{-2}$ and below,
+can hand them back. The wave-0 census (Sec.~\ref{sec:catv2-census}), where the $s$-channel and $M_Z$ pools sit at $0.04$--$0.6$ while the bulk is at $10^{-2}$ and below,
 is the same mechanism at $478$ processes. What to aggregate with at that scale is a decision
 for the re-measure wave (Sec.~\ref{sec:catalog-open}); the geometric mean's rationale (a
 $2\to4$ process at $10^{-2}$ must not swamp a $2\to2$ at $10^{-6}$) still holds, but a
@@ -2891,25 +2889,28 @@ objectives $3.1\times10^{-3}$, $8.9\times10^{-3}$, $9.8\times10^{-3}$ for lr $9.
 $1.9\times10^{-3}$) and is a diagnostic
 of the catalog more than of the hyperparameters: the best trial (lr $9.7\times10^{-3}$, no EMA)
 ends at a geometric-mean $\vlnr=3.1\times10^{-3}$ with a median per-process loss of
-$5\times10^{-3}$ and $104/478$ processes above $0.05$, and the failing set is the same in all
-three trials, so it is structural.
+$5\times10^{-3}$ and a $90$th percentile of $0.12$ (Table~\ref{tab:catv2_census}), and the
+worst-fitted processes are the same across the three trials ($38$ of the worst $48$ in all
+three), so the tail is structural.
 
 \begin{table}[H]
 \centering
-\caption{catalog\_v2 census (best wave-0 trial; failing $=$ per-process $\vlnr>0.05$).}
+\caption{catalog\_v2 census (best wave-0 trial): median and $90$th percentile of the
+per-process $\vlnr$ by catalog layer.}
 \label{tab:catv2_census}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrr@{}}
 \toprule
-Category & failing & total & median $\vlnr$ \\
+layer & processes & median / $90\%$ \\
 \midrule
-$2\to2$ trees (v1 layer) & $15$ & $83$ & $1.8\times10^{-3}$ \\
-$2\to3$ trees by rule & $4$ & $55$ & $2.2\times10^{-3}$ \\
-$2\to4$ trees by rule & $33$ & $164$ & $1.5\times10^{-2}$ \\
-one-loop QCD & $34$ & $95$ & $9.4\times10^{-3}$ \\
-loop-induced & $0$ & $3$ & $1.4\times10^{-3}$ \\
-$\alpha_s$ scan & $2$ & $46$ & $8.5\times10^{-4}$ \\
-$m_t$ scan & $0$ & $12$ & $7.0\times10^{-4}$ \\
-$M_Z$ scan & $16$ & $20$ & $7.8\times10^{-2}$ \\
+all & $478$ & $0.0052$ / $0.12$ \\
+$2\to2$ trees & $35$ & $0.0006$ / $0.077$ \\
+$2\to3$ trees & $82$ & $0.0019$ / $0.047$ \\
+$2\to4$ trees & $185$ & $0.013$ / $0.081$ \\
+one-loop QCD & $95$ & $0.0094$ / $0.33$ \\
+loop-induced & $3$ & $0.0014$ / $0.0014$ \\
+$\alpha_s$ scan & $46$ & $0.00085$ / $0.0038$ \\
+$m_t$ scan & $12$ & $0.0007$ / $0.0018$ \\
+$M_Z$ scan & $20$ & $0.078$ / $0.19$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2923,7 +2924,7 @@ resonance in the $448$ run (Prin.~\ref{prin:needle}) now train on the mixture an
 $30\times$ ($ee\,d\bar d$ $1.6\to0.05$, $ee\,b\bar b$ $1.6\to0.04$) but stop at
 $0.04$--$0.09$; $ee\,\mu\mu$ sits at $0.09$, and the pure-$Z$ $ee\,\nu_\mu\bar\nu_\mu$ at
 $0.56$, rising from $0.3$ over training. The $M_Z$ family is the same needle shifted
-($16/20$ failing at a median $0.08$). Shaping the training measure moved these from
+(median $0.08$, $90$th percentile $0.19$ over its $20$ pools). Shaping the training measure moved these from
 ``nothing learned'' to ``the bulk learned, the peak not''; the remaining error is the
 resonance shape on the flat validation measure. Its cause is not the data but the loss
 aggregation: the family learns alone, and it learns in the joint run under the arithmetic mean
@@ -2933,7 +2934,7 @@ aggregation: the family learns alone, and it learns in the joint run under the a
 training recipe have a finite part that changes sign somewhere in the window, so they train
 under the signed log; the $27$ with more than $5\%$ negative events ($2\to3$ with a gluon or
 photon: $u\bar d\to e\nu g$ is $81\%$ negative, $u\bar u\to\mu\mu g$ $90\%$) fail as a class
-(median $0.09$, $17$ failing, losses up to $3.7$, i.e.\ worse than the constant). The cause is the transform: the signed
+(median $0.09$, losses up to $3.7$, i.e.\ worse than the constant). The cause is the transform: the signed
 log $\mathrm{sgn}(x)\log(1+|x|)$ is linear below $|x|=1$, and these targets have a median
 $|x|\sim10^{-5}$ over $28$ decades, so after standardization the target has a kurtosis of
 $1000$--$3000$ with single events at $70$--$90\sigma$. Dividing by a per-dataset scale before
@@ -2956,7 +2957,7 @@ $36$ and $39$, have $1\%$ negative events against a narrow positive bulk, a bimo
 no scalar transform flattens. Positive pools keep the plain log, so no earlier number
 moves; what the scale does for the learning is for the re-measure wave to show. Two
 comparability consequences: the $50$ signed pools' losses are on a new target scale, so
-against wave 0 they compare by failing status, not by value; and the raw-space inverse,
+against wave 0 they compare only in rank, not by value; and the raw-space inverse,
 which had clamped every amplitude at $30$ since the first commit, now clamps the exponent
 instead, so raw-space metrics of old and new runs differ for large amplitudes (the
 log-space losses every comparison uses are untouched).
@@ -3018,8 +3019,7 @@ learns to $2\times10^{-3}$ and $ds\to ds$ at one loop reaches $7\times10^{-3}$ a
 $550$, i.e.\ the function is representable and found, but at this learning rate and horizon
 it does not hold it: it drifts back to $0.7$ over the last $400$ steps while $dd\to dd$ at one
 loop settles at $4\times10^{-3}$, so the two twins still compete late in training. The
-overall census moves the right way ($265$ against $273$ failing of $478$, median $0.068$
-against $0.076$). Whether the full $8601$-step horizon (and its lower final learning rate)
+overall median moves the right way ($0.068$ against $0.076$). Whether the full $8601$-step horizon (and its lower final learning rate)
 holds both twins is what the re-measure wave has to show. One more thing the baseline run
 exposed: its evaluation aborted on the inverse of the signed log
 (\code{AssertionError: signedlog failed}), the overflow of $\exp|y|$ on a prediction far
@@ -3028,26 +3028,26 @@ per-dataset scale fixes both ends.
 
 \paragraph{The signed-log scale and the aggregation at the catalog's scale.} The same
 $1000$-step setup, generation one-hot throughout, run with the three fixes
-(Table~\ref{tab:catv2_short}; census by \code{analysis/catalog\_v2/census.py} from the
-in-training validation lines, failing $=$ loss above $0.05$). The scale re-bases the signed
-pools' target, so their losses compare across arms by failing status. Three readings. The
-aggregation moves everything: under the arithmetic mean the census drops from $254$ to
-$189$ failing and every class improves, the $s$-channel family from six failing to two,
-and the price is again the best-learned tail, $47$ processes below $10^{-3}$ under the
-geometric mean against none, the $10\%$ quantile $1.1\times10^{-3}$ against
-$4.2\times10^{-3}$; the twelve-process result (Sec.~\ref{sec:catalog},
+(Table~\ref{tab:catv2_short}; median and $90$th percentile by class from the in-training
+validation lines, \code{analysis/catalog\_v2/census.py}). The scale re-bases the signed pools'
+target, so their losses compare across arms only in rank. Three readings. The aggregation
+moves everything: under the arithmetic mean the median over all processes goes from $0.059$
+to $0.038$ and the $90$th percentile from $0.32$ to $0.13$, every class but tree $2\to2$
+improves, the $s$-channel family from $0.080$ to $0.036$, and the price is again the
+best-learned tail, tree $2\to2$ at a median of $4\times10^{-4}$ under the geometric mean
+against $3.1\times10^{-3}$; the twelve-process result (Sec.~\ref{sec:catalog},
 Table~\ref{tab:agg_ab}) transfers to $478$ processes unchanged, and $\tau$ in the wave's
 search space is the right place to set the trade. The signed-log scale does what it was
 built for and no more: the standardized target is sane, the signed $2\to2$ pools learn
 ($cs\to cs$ at one loop $0.26\to0.025$, $u\bar u\to\gamma g$ $0.95\to0.23$, and to
-$4\times10^{-3}$ and $1.5\times10^{-2}$ with the scale at the median), but the class as a
-whole still fails ($46$ of $50$ at the $1\%$ quantile, $45$ at the median, against $20$ of
-$48$ for the positive one-loop pools), and the pools that fail under every scale are the
+$4\times10^{-3}$ and $1.5\times10^{-2}$ with the scale at the median), but the class as a whole stays far behind (median $0.31$ at the $1\%$ quantile, $0.25$ at the
+median, against $0.024$ for the positive one-loop pools), and the worst pools under every scale
+are the
 one-loop $2\to3$ with a gluon or photon, all of which change sign, so at $1000$ steps their
 failure reads as the difficulty of a one-loop function with a soft or collinear emission,
 not as the transform; only the full horizon can separate the two. The scale stays at the
-$1\%$ quantile (the median arm is not better overall, $272$ failing against $254$, one
-seed). The $M_Z$-shifted family stays hard under every arm ($16$--$18$ of $20$).
+$1\%$ quantile (the median arm is not better overall, median $0.062$ against $0.059$, one seed). The
+$M_Z$-shifted family stays hard under every arm (median $0.085$--$0.18$).
 
 \paragraph{The same on the shaped measure.} Table~\ref{tab:catv2_short} is on the
 uniform-$\sqrt s$ validation pools the model never trained on (Sec.~\ref{sec:catalog}, the
@@ -3055,39 +3055,40 @@ sampling policy). Rerun with validation and test drawn from the shaped measure
 (Table~\ref{tab:catv2_short_smix}), train, validation and test losses agree per process
 ($ee\to\mu\mu$ under the geometric mean: $0.46$, $0.41$, $0.41$; before: $0.45$ against $0.12$),
 and the census reads harder, as it must once the pole and the tails carry their training
-weight in the metric: $295$ failing against $254$, and the $s$-channel family fully failing
-at $0.24$ under the geometric mean, which is the needle as it is. The histogram of a
+weight in the metric: median $0.095$ against $0.059$, $90$th percentile $0.42$ against $0.32$,
+and the $s$-channel family at a median of $0.24$ under the geometric mean, which is the needle
+as it is. The histogram of a
 resonant process shows why: the prediction never exceeds $\log A\approx-1.5$, where it
-piles up, so the network emits one capped value for the whole pole region. The
-aggregation result survives the change of measure unchanged: the arithmetic mean cuts
-failures in every class ($224$ against $295$; signed one-loop $38$ of $50$ against $50$;
-positive one-loop $12$ against $26$) and costs the best-learned tail ($41$ processes below
-$10^{-3}$ against none). Every catalog\_v2 number from here on is on this measure.
+piles up, so the network emits one capped value for the whole pole region. The aggregation result survives the change of measure unchanged: the arithmetic mean lowers
+the median of every class but tree $2\to2$ (all processes $0.045$ against $0.095$; signed
+one-loop $0.11$ against $0.31$; positive one-loop $0.021$ against $0.059$) and costs the
+best-learned tail (tree $2\to2$ at $4.1\times10^{-3}$ against $7.5\times10^{-4}$). Every catalog\_v2 number from here on is on this measure.
 
 \paragraph{What fails: two mechanisms, told apart by the two arms.} Joining each
 process's loss with its pool's dynamic range, the span of $\ln|\mathcal M|^2$ over the
 train pool (Fig.~\ref{fig:loss_vs_range}; \code{analysis/catalog\_v2/loss\_vs\_range.py}),
-sorts the catalog into three groups. The $183$ processes that pass under both aggregations
-have a median range of $9$ and only two above $20$. The $224$ that fail under both have a
-median range of $20$; a range of $20$ or more fails $112$ times out of $114$ whatever the
-aggregation, in every multiplicity (within $2\to2$, $2\to3$ and $2\to4$ trees alone the
-correlation of the log-loss with the range is $+0.4$ to $+0.5$), and the $29$ low-range
-members of this group are the resonances, $ee\to\mu\mu$ with a range of $9.5$ but a
+sorts the catalog. The loss grows with the range under both aggregations and in every
+multiplicity (the correlation of the log-loss with the range is $+0.4$ to $+0.6$ within the
+$2\to2$, $2\to3$ and $2\to4$ processes alone): below a range of $10$ ($142$ processes) the median
+is $0.015$ under the geometric mean and $0.014$ under the arithmetic one, between $10$ and $20$
+($213$) $0.081$ and $0.037$, above $20$ ($123$) $0.21$ and $0.10$. The low-range processes with a
+high loss under both are the resonances, $ee\to\mu\mu$ with a range of $9.5$ but a
 $2.5$\,GeV pole in a $975$\,GeV window, and the $2\to4$ neutrino finals with internal $W$
-and $Z$ poles. What fails under both is a pole or an infrared singularity in the window:
+and $Z$ poles. What the range measures is a pole or an infrared singularity in the window:
 the mixture places $35\%$ of the training points there, the loss is dominated by that part,
 and the model at this horizon does not resolve it (the prediction of a resonant process
-never leaves a narrow band, Sec.~\ref{sec:catalog}). The $71$ that fail under the geometric
-mean only are a different thing: starvation. Sixteen of them have a range below $10$, and
-$u\bar u\to t\bar t$ at one loop, with a range of $1$, sits at $0.96$ under the geometric
-mean and at $0.013$ under the arithmetic one; $ee\to u\bar u$ and $ee\to b\bar b$ at one
-loop, $ds\to ds$ at one loop, $u\bar u\to Hg$ and $ee\to WWH$ are the same. A process that
-does not fall in the first steps keeps a weight of order one while the converged bulk
-reaches $10^4$, and it never trains, which is the run-to-run flakiness of
-Prin.~\ref{prin:gradcomp} seen at the process level. So ``nothing works'' is two things:
-the aggregation starves a seventh of the catalog outright, and the sharp structure of
-half of it is not resolved at $1000$ steps in the joint run, although the $s$-channel family
-resolves its pole alone.
+never leaves a narrow band, Sec.~\ref{sec:catalog}). The second mechanism shows only in the
+difference between the arms: starvation. Twelve processes end more than ten times worse
+under the geometric mean than under the arithmetic one (none a hundred times), seven of them
+with a range below $10$: $u\bar u\to t\bar t$ at one loop, with a range of $1$, sits at $0.96$
+under the geometric mean and at $0.013$ under the arithmetic one; $ds\to ds$, $u\bar d\to Wg$,
+$u\bar u\to b\bar b$ and $u\bar u\to Zg$ at one loop and the loop-induced $u\bar u\to HH$ are
+the same. A process that does not fall in the first steps keeps a weight of order one while
+the converged bulk reaches $10^4$, and it never trains, which is the run-to-run flakiness of
+Prin.~\ref{prin:gradcomp} seen at the process level. So ``nothing works'' is two things: the
+aggregation starves a dozen processes outright, and the sharp structure of the high-range
+half of the catalog is not resolved at $1000$ steps in the joint run, although the $s$-channel
+family resolves its pole alone.
 
 \paragraph{Weighting by a reference, and width.} Two more $1000$-step arms
 (Table~\ref{tab:catv2_excess}). The first replaces the current-loss weighting by a
@@ -3121,37 +3122,42 @@ takes the plain per-event mean, and the single-pass validation
 (Sec.~\ref{sec:throughput}) never went through the aggregator.
 
 Corrected, the weighting does what its weights say. It puts $2.9\times$ the gradient on the
-$2\to2$ class and a quarter on the $2\to4$ class, and the census follows: the $2\to2$
-class improves from $29$ failing to $28$ ($5$ to $4$ with the off-shellness input) while the
-$2\to4$ class goes from $112$ failing to $141$ ($94$ to $137$ with the input), the $2\to3$
-class from $83$ to $126$, and the overall census is the worst of the three
-aggregations, $295$ failing against $224$ and $295$, median $0.076$. Cutting a class's
-gradient share starves it; concentrating the gradient on the $2\to2$ functions, already the
-best-learned, buys them nothing. The rerun at $5.8\times10^{-3}$ says the same ($339$
-failing against $250$ and $287$), so it is the weighting, not the rate. The second arm
+$2\to2$ class and a quarter on the $2\to4$ class, and the census follows, against the
+arithmetic mean: tree $2\to2$ from a median of $4.1\times10^{-3}$ to $2.0\times10^{-3}$
+($3.7$ to $3.1\times10^{-3}$ with the off-shellness input), while tree $2\to4$ goes from $0.062$
+to $0.11$ ($0.051$ to $0.11$ with the input) and tree $2\to3$ from $0.027$ to $0.059$; over all
+processes its median, $0.076$, sits between the arithmetic mean's $0.045$ and the geometric
+mean's $0.095$ (Table~\ref{tab:catv2_excess}). Cutting a class's gradient share starves it;
+concentrating the gradient on the $2\to2$ functions, already the best-learned, buys them a
+factor of two at twice the loss on the classes that make up most of the catalog. The rerun at $5.8\times10^{-3}$ says the same (median $0.11$ against $0.054$ for the arithmetic mean and $0.098$ for the
+geometric one), so it is the weighting, not the rate. The second arm
 doubles the width at the same hyperparameters (sixteen heads, $\mu$P, arithmetic mean):
-$219$ failing against $224$, every class within noise, at twice the step time. The short
+median $0.043$ against $0.045$, every class within noise, at twice the step time. The short
 runs are not capacity-limited.
 
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps at $\mathrm{bs}=16384$, lr $9.7\times10^{-3}$, generation
-one-hot, one seed: failing count (loss $>0.05$) and median of the per-process validation
-loss at the last validation, by class. ``Old'' is the encoding A/B's one-hot arm before the
-signed-log scale; $q$ is the quantile of $|x|$ that sets the scale. Signed pools are on a
-different target scale in the ``old'' column.}
+one-hot, one seed: median / $90$th percentile of the per-process validation loss at the last
+validation, by class. ``Old'' is the encoding A/B's one-hot arm before the signed-log scale; $q$
+is the quantile of $|x|$ that sets the scale. Signed pools are on a different target scale in
+the ``old'' column.}
 \label{tab:catv2_short}
+\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 class & old & geo., $q=0.01$ & geo., $q=0.5$ & arith., $q=0.01$ \\
 \midrule
-all $478$ & $265$ / $0.068$ & $254$ / $0.059$ & $272$ / $0.062$ & $189$ / $0.038$ \\
-signed one-loop ($50$) & $49$ / $0.43$ & $46$ / $0.31$ & $45$ / $0.25$ & $39$ / $0.10$ \\
-positive one-loop ($48$) & $25$ / $0.057$ & $20$ / $0.024$ & $23$ / $0.040$ & $13$ / $0.021$ \\
-$s$-channel family ($7$) & $4$ / $0.065$ & $6$ / $0.080$ & $6$ / $0.19$ & $2$ / $0.037$ \\
-$M_Z$ family ($20$) & $17$ / $0.096$ & $18$ / $0.10$ & $18$ / $0.13$ & $16$ / $0.086$ \\
-flavour twins ($9$) & $3$ / $0.0024$ & $1$ / $0.0008$ & $1$ / $0.0023$ & $0$ / $0.0037$ \\
-below $10^{-3}$ & $-$ & $47$ & $41$ & $0$ \\
+all $478$ & $0.068$ / $0.39$ & $0.059$ / $0.32$ & $0.062$ / $0.33$ & $0.038$ / $0.13$ \\
+tree $2\to2$ ($58$) & $0.0005$ / $0.048$ & $0.0004$ / $0.053$ & $0.00055$ / $0.053$ & $0.0031$ / $0.025$ \\
+resonant $2\to2$ ($27$) & $0.082$ / $0.13$ & $0.10$ / $0.15$ & $0.18$ / $0.24$ & $0.067$ / $0.10$ \\
+tree $2\to3$ ($110$) & $0.031$ / $0.19$ & $0.025$ / $0.21$ & $0.031$ / $0.23$ & $0.023$ / $0.097$ \\
+tree $2\to4$ ($185$) & $0.086$ / $0.25$ & $0.079$ / $0.28$ & $0.081$ / $0.30$ & $0.050$ / $0.15$ \\
+positive one-loop ($48$) & $0.057$ / $0.35$ & $0.024$ / $0.25$ & $0.040$ / $0.40$ & $0.021$ / $0.084$ \\
+signed one-loop ($50$) & $0.43$ / $0.77$ & $0.31$ / $0.97$ & $0.25$ / $1.2$ & $0.10$ / $0.25$ \\
+$s$-channel family ($7$) & $0.065$ / $0.12$ & $0.080$ / $0.12$ & $0.19$ / $0.23$ & $0.036$ / $0.062$ \\
+$M_Z$ family ($20$) & $0.096$ / $0.14$ & $0.10$ / $0.15$ & $0.18$ / $0.24$ & $0.085$ / $0.10$ \\
+flavour twins ($9$) & $0.0024$ / $0.52$ & $0.0008$ / $0.092$ & $0.0023$ / $0.029$ & $0.0037$ / $0.0096$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3160,21 +3166,23 @@ below $10^{-3}$ & $-$ & $47$ & $41$ & $0$ \\
 \centering
 \caption{As Table~\ref{tab:catv2_short}, with validation and test drawn from the shaped
 measure (the same distribution as training), signed-log scale at the $1\%$ quantile, one
-seed. The one-loop pools are unshaped in every role, so their columns are on the same
-measure as before.}
+seed. The one-loop pools are unshaped in every role, so their rows are on the same measure as
+before.}
 \label{tab:catv2_short_smix}
 \begin{tabular}{@{}lrr@{}}
 \toprule
 class & geometric mean & arithmetic mean \\
 \midrule
-all $478$ & $295$ / $0.095$ & $224$ / $0.045$ \\
-tree, shaped ($380$) & $219$ / $0.080$ & $174$ / $0.042$ \\
-signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ \\
-positive one-loop ($48$) & $26$ / $0.059$ & $12$ / $0.021$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ \\
-$M_Z$ family ($20$) & $18$ / $0.24$ & $16$ / $0.15$ \\
-flavour twins ($9$) & $3$ / $0.0015$ & $0$ / $0.0079$ \\
-below $10^{-3}$ & $41$ & $0$ \\
+all $478$ & $0.095$ / $0.42$ & $0.045$ / $0.19$ \\
+tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.0041$ / $0.041$ \\
+resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.14$ / $0.31$ \\
+tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.027$ / $0.14$ \\
+tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.062$ / $0.20$ \\
+positive one-loop ($48$) & $0.059$ / $0.36$ & $0.021$ / $0.073$ \\
+signed one-loop ($50$) & $0.31$ / $0.92$ & $0.11$ / $0.22$ \\
+$s$-channel family ($7$) & $0.24$ / $0.48$ & $0.14$ / $0.27$ \\
+$M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.15$ / $0.33$ \\
+flavour twins ($9$) & $0.0015$ / $0.17$ & $0.0079$ / $0.024$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3211,20 +3219,21 @@ input, and fails in the joint run without it.
 registry (\code{tools/dump\_diagrams.py --all}, $424$ processes, three minutes of CPU) and
 the three aggregation arms rerun with the masks built for $478/478$ processes
 (Table~\ref{tab:catv2_offshell}): $ee\to\mu\mu$ goes from $0.41$ to $0.012$ under the
-geometric mean and from $0.26$ to $0.012$ under the arithmetic one, the whole $s$-channel
-family passes under both, the $M_Z$ family from $16$--$18$ failing to $3$--$5$, and the
-$2\to2$ class under the arithmetic mean from $29$ failing to $5$. What the family learned
+geometric mean and from $0.26$ to $0.012$ under the arithmetic one, the $s$-channel family
+from a median of $0.24$ to $0.012$ and from $0.14$ to $0.0062$, the $M_Z$ family from $0.23$ to
+$0.032$ and from $0.15$ to $0.020$, and the resonant $2\to2$ class under the arithmetic mean from
+$0.14$ to $0.017$. What the family learned
 alone in the probe it learned from thirty times the exposure; in the joint run it needed its
 coordinate, and the coordinate was not there. The multi-task reading of the needle is
 superseded: the needle was a missing input. What the input does not touch is as clear:
 the starved processes under the geometric mean ($u\bar u\to t\bar t$ at one loop still at
-$0.92$), the signed one-loop class ($50$ of $50$ under the geometric mean, about $40$ under
+$0.92$), the signed one-loop class (median $0.44$ under the geometric mean, $0.09$--$0.21$ under
 the others) and most of the $2\to3$ and $2\to4$ sharp structure; those remain the
 aggregation and horizon questions. The reference weighting with the input (corrected)
-is at $253$ failing against the arithmetic mean's $170$: its $2\to2$ class is the best of
-any arm ($4$ failing) and the $s$-channel and $M_Z$ families pass as under the mean, but the
-$2\to3$ and $2\to4$ classes, at a quarter of the gradient, are worse than under either
-other aggregation.
+is at a median of $0.058$ against the arithmetic mean's $0.030$: its $s$-channel and $M_Z$
+families come down as under the mean, but the $2\to3$ and $2\to4$ classes, at a quarter of the
+gradient, are worse than under either other aggregation (tree $2\to4$ median $0.11$ against
+$0.051$ and $0.079$).
 
 \paragraph{The $W$ in the propagator list.} The $W$ (PDG $24$) was not in
 \code{internal\_mass\_pdgs}, so the $W$-channel processes had no pole coordinate. The
@@ -3234,14 +3243,13 @@ truncated the comma list) does for the $s$-channel $W$ what the $Z$ coordinate d
 $Z$ pole: $u\bar d\to e\nu$ from $0.052$ to $0.011$, its one-loop twin from $0.035$ to
 $0.011$, $u\bar d\to e\nu g$ and its $\alpha_s$ variants from $0.13$--$0.16$ to $0.03$--$0.04$.
 Everything else moves little and mostly up: over the $478$ processes the geometric mean of
-the ratio to the $Z$-only arm is $1.13$ ($337$ worse, $137$ better; $182$ above $0.05$
-against $170$), over the $117$ processes with a $W$ in them $1.04$. One seed, $1000$ steps;
+the ratio to the $Z$-only arm is $1.13$ ($337$ worse, $137$ better), over the $117$ processes with a $W$ in them $1.04$. One seed, $1000$ steps;
 the run-to-run spread at this horizon is not measured, so the $13\%$ is not established as
 a cost, while the factor of five on the resonant $W$ processes is well outside it. The
 coordinate belongs in the list for the same reason the $Z$'s does.
 
-\paragraph{Distance from the reference instead of a threshold.} A pass/fail line at
-$0.05$ hides how far a process is from what it can do, so the better reading is each
+\paragraph{Distance from the reference instead of a threshold.} A threshold on the loss
+hides how far a process is from what it can do, so the better reading is each
 process's distance from what its multiplicity reaches alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
 Fig.~\ref{fig:excess_ratio}). With the references measured with the input ($9.9\times10^{-4}$,
 $4.4\times10^{-3}$, $5.4\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$ alone at $\mathrm{bs}/P$
@@ -3289,8 +3297,8 @@ the reference weighting (c, corrected).}
 \paragraph{The short runs are step-limited, not data-limited.} The same three arms with the
 train pools cut to $5000$ events per process, so that $1000$ steps are seven passes over
 the pool instead of a third of one: the geometric mean ends where it ends with the full
-pools ($245$ failing against $245$, median $0.057$ against $0.053$), the reference
-weighting better ($193$ against $253$, corrected), and in both the train and validation
+pools (median $0.057$ against $0.053$, $90$th percentile $0.44$ against $0.38$), the
+reference weighting better (median $0.030$ against $0.058$, corrected), and in both the train and validation
 losses are equal per process (ratio $1.0$ at the median, $1.1$ at the $90$th percentile),
 so nothing has been fitted to the point of overfitting: at this compute the per-step
 optimisation sets every number and the data is not reached, and $5000$ events are still far
@@ -3586,43 +3594,47 @@ share is $0.1$.}
 \centering
 \caption{catalog\_v2, $1000$ steps at $9.7\times10^{-3}$ on the shaped measure, one seed:
 the three aggregations without and with the off-shellness input (diagram sidecars present,
-masks built for every process). Failing count (loss $>0.05$) and median by class; the
-reference-weighted columns are the corrected values.}
+masks built for every process). Median / $90$th percentile of the per-process validation loss
+by class; the reference-weighted columns are the corrected values.}
 \label{tab:catv2_offshell}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
 class & geo. & geo.+off & arith. & arith.+off & excess & excess+off \\
 \midrule
-all $478$ & $295$ / $0.095$ & $245$ / $0.053$ & $224$ / $0.045$ & $170$ / $0.030$ & $295$ / $0.076$ & $253$ / $0.058$ \\
-$2\to2$ ($117$) & $51$ & $26$ & $29$ & $5$ & $28$ & $4$ \\
-$2\to3$ ($176$) & $114$ & $98$ & $83$ & $71$ & $126$ & $112$ \\
-$2\to4$ ($185$) & $130$ & $121$ & $112$ & $94$ & $141$ & $137$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $0$ / $0.012$ & $6$ / $0.14$ & $0$ / $0.006$ & $6$ / $0.14$ & $0$ / $0.007$ \\
-$M_Z$ family ($20$) & $18$ / $0.24$ & $5$ / $0.032$ & $16$ / $0.15$ & $3$ / $0.020$ & $16$ / $0.14$ & $3$ / $0.023$ \\
-signed one-loop ($50$) & $50$ & $50$ & $38$ & $39$ & $42$ & $42$ \\
+all $478$ & $0.095$ / $0.42$ & $0.053$ / $0.38$ & $0.045$ / $0.19$ & $0.030$ / $0.10$ & $0.076$ / $0.26$ & $0.058$ / $0.22$ \\
+tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.00075$ / $0.0082$ & $0.0041$ / $0.041$ & $0.0037$ / $0.016$ & $0.0020$ / $0.031$ & $0.0031$ / $0.012$ \\
+resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.024$ / $0.073$ & $0.14$ / $0.31$ & $0.017$ / $0.052$ & $0.14$ / $0.30$ & $0.020$ / $0.054$ \\
+tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.025$ / $0.16$ & $0.027$ / $0.14$ & $0.021$ / $0.074$ & $0.059$ / $0.21$ & $0.047$ / $0.15$ \\
+tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.079$ / $0.23$ & $0.062$ / $0.20$ & $0.051$ / $0.11$ & $0.11$ / $0.27$ & $0.11$ / $0.21$ \\
+positive one-loop ($48$) & $0.059$ / $0.36$ & $0.049$ / $0.29$ & $0.021$ / $0.073$ & $0.021$ / $0.064$ & $0.028$ / $0.16$ & $0.029$ / $0.14$ \\
+signed one-loop ($50$) & $0.31$ / $0.92$ & $0.44$ / $1.0$ & $0.11$ / $0.22$ & $0.094$ / $0.23$ & $0.19$ / $0.36$ & $0.21$ / $0.37$ \\
+$s$-channel family ($7$) & $0.24$ / $0.48$ & $0.012$ / $0.022$ & $0.14$ / $0.27$ & $0.0062$ / $0.016$ & $0.14$ / $0.30$ & $0.0068$ / $0.016$ \\
+$M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.032$ / $0.092$ & $0.15$ / $0.33$ & $0.020$ / $0.058$ & $0.14$ / $0.30$ & $0.023$ / $0.062$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed:
-failing count (loss $>0.05$) and median by class under the geometric mean, the arithmetic
-mean, the reference-weighted (excess) aggregation (corrected, see the text), and the arithmetic
-mean at twice the width.}
+\caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed: median
+/ $90$th percentile of the per-process validation loss by class under the geometric mean, the
+arithmetic mean, the reference-weighted (excess) aggregation (corrected, see the text), and the
+arithmetic mean at twice the width.}
 \label{tab:catv2_excess}
+\small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
 \midrule
-all $478$ & $295$ / $0.095$ & $224$ / $0.045$ & $295$ / $0.076$ & $219$ / $0.044$ \\
-$2\to2$ ($117$) & $51$ / $0.0046$ & $29$ / $0.007$ & $28$ / $0.0034$ & $31$ / $0.0097$ \\
-$2\to3$ ($176$) & $114$ / $0.097$ & $83$ / $0.046$ & $126$ / $0.085$ & $82$ / $0.043$ \\
-$2\to4$ ($185$) & $130$ / $0.11$ & $112$ / $0.063$ & $141$ / $0.11$ & $106$ / $0.059$ \\
-signed one-loop ($50$) & $50$ / $0.31$ & $38$ / $0.11$ & $42$ / $0.19$ & $40$ / $0.11$ \\
-$s$-channel family ($7$) & $7$ / $0.24$ & $6$ / $0.14$ & $6$ / $0.14$ & $6$ / $0.12$ \\
-flavour twins ($9$) & $3$ & $0$ & $0$ & $0$ \\
-below $10^{-3}$ & $41$ & $0$ & $9$ & $1$ \\
+all $478$ & $0.095$ / $0.42$ & $0.045$ / $0.19$ & $0.076$ / $0.26$ & $0.043$ / $0.17$ \\
+tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.0041$ / $0.041$ & $0.0020$ / $0.031$ & $0.0046$ / $0.053$ \\
+resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.14$ / $0.31$ & $0.14$ / $0.30$ & $0.16$ / $0.34$ \\
+tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.027$ / $0.14$ & $0.059$ / $0.21$ & $0.029$ / $0.13$ \\
+tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.062$ / $0.20$ & $0.11$ / $0.27$ & $0.059$ / $0.20$ \\
+positive one-loop ($48$) & $0.059$ / $0.36$ & $0.021$ / $0.073$ & $0.028$ / $0.16$ & $0.029$ / $0.070$ \\
+signed one-loop ($50$) & $0.31$ / $0.92$ & $0.11$ / $0.22$ & $0.19$ / $0.36$ & $0.11$ / $0.23$ \\
 \bottomrule
 \end{tabular}
 \end{table}
