@@ -2849,22 +2849,18 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     Open: the divergence at peak learning rate with the $t$-channel factor (two of nine
     runs; the arithmetic mean's exposure, to be settled with lr and aggregation swept
     jointly at this working point, and the geometric mean re-checked with the new targets);
-    the signed class is still the worst by five, now a magnitude problem; and the
-    joint-training gap is measured (the paragraph on the difference of exponents) and it
-    contradicts the earlier pretraining scaling: under the arithmetic mean every class scales
-    at the same exponent, where the geometric-mean curves of Prin.~\ref{prin:mult} carried
-    the multiplicity dependence. First test, before anything structural: the same steps
-    curve ($1000$--$4000$, three seeds, target changes on) under the geometric mean, to
-    settle whether the equal exponents are the arithmetic mean's domination by the
-    largest-MSE class. If they are, the next lever is a per-process gradient weight driven
-    by the deficit of each process's local exponent against its multiplicity's solo
-    exponent (the balanced sampler's logic on the loss weights rather than the sampling),
-    which is a direct intervention where the sampler was an indirect one. Caveats to carry:
-    the learning rate was the $1000$-step best at every horizon, and the $5$k pools are $27$
-    passes at $4000$ steps, so the solo references there may be data-limited. Sharing across
-    multiplicities costs $20$--$45\%$ at $1000$ steps on top; the structural options for the
-    $2\to2$ classes (capacity or routing by class, a per-class fine-tune) come after the
-    aggregation question.
+    the signed class is still the worst by five, now a magnitude problem. The aggregation
+    question of the joint-training gap is answered (Table~\ref{tab:steps_agg}): the aggregation
+    sets the $2\to2$ and positive one-loop slopes and not the $2\to4$ one, so the
+    exponent-deficit loss weight is not pursued. Open: the resonant $2\to2$ pools stall at
+    $1.2$--$1.6$ per doubling under every aggregation while their solo reference gains $5.6$,
+    with validation equal to train, so the stall is optimisation or representation, not data;
+    what the residual profile of these pools looks like at $4000$ steps is the first look.
+    The $\tau$ floor diverged once in three at $4000$ steps. Caveat to carry: the learning
+    rate is the $1000$-step best at every horizon (the horizon law puts the $2000$ and $4000$
+    optima about $1.4\times$ higher). Sharing across multiplicities costs $20$--$45\%$ at
+    $1000$ steps on top; the structural options for the $2\to2$ classes (capacity or routing by
+    class, a per-class fine-tune) are next now that the aggregation question is settled.
     Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
     sweep's best HPs; \code{analysis/catalog\_v2/seed\_arms.py} is the read-out.
     Three $2\to4$ pools with neutrino pairs ($ee\to u\bar u\nu\bar\nu$, $ee\to d\bar d\nu\bar\nu$,
@@ -3517,6 +3513,61 @@ trained, at the same per-process compute and $1000$ steps: (b) the ECDF of the r
 process.}
 \label{fig:joint_vs_solo}
 \end{figure}
+
+\paragraph{The same curve under the geometric mean: the aggregation sets the $2\to2$ slope,
+not the $2\to4$ one.} The horizon runs repeated at identical settings (lr $9.7\times10^{-3}$,
+$\lambda=3.8\times10^{-8}$, warm-up $0.17$, no EMA, $5$k pools, both propagator factors, sign
+head; three seeds per point) with only the training aggregation changed: the geometric mean,
+and the geometric mean floored at $\tau=10^{-2}$ (\code{runs/steps\_geo\_t*},
+\code{runs/steps\_tau1e-2\_t*}; \code{joint\_vs\_solo.py --arm}), Table~\ref{tab:steps_agg}.
+The equal slopes were partly the arithmetic mean: under the geometric mean the gain per
+doubling spreads from $1.3$ to $3$--$6$ by class, where under the arithmetic mean it sits
+between $1.2$ and $2.3$; tree $2\to2$ gains $3.5$ and $3.2$ per doubling against $2.3$ and
+$1.9$ and ends nine times lower ($4.1\times10^{-5}$ against $3.6\times10^{-4}$, below its
+solo reference), and positive one-loop gains $6.0$ and $3.9$ against $2.3$. But the class
+that makes up most of the catalog does not move: tree $2\to4$ gains $1.6$--$1.7$ per doubling
+under all three aggregations, already faster than $2\to4$ alone ($1.5$, $1.25$), so its
+distance from solo closes by itself whatever the weighting, and the geometric mean keeps it
+twice higher at every horizon. The resonant $2\to2$ pools stall under all three at $1.2$--$1.6$
+per doubling, $5\times10^{-3}$ at $4000$ steps, while the $2\to2$ solo reference gains $5.6$
+over the last doubling; their ratio to solo climbs to $34$--$43$ in every arm. It is not the
+data: validation over train MSE is $1.00$ for the class at $4000$ steps ($1.06$--$1.12$ for the
+multi-particle classes). The trade is the familiar one at every horizon: at $4000$ steps the
+geometric mean has $21$--$39$ processes above $0.1$ against none, a combined median of
+$0.0097$ against $0.0071$, and the signed class $3.3$ times higher. The floor sits between the
+two means on every class and ties the arithmetic mean on the combined number ($0.0076$, two
+seeds), but one of its three $4000$-step runs diverged (non-finite gradients from about step
+$1900$, never recovered; none of the eighteen runs under either mean did), joining the
+$t$-channel runs as the second instability at this rate. A per-process weight driven by each
+process's exponent deficit would redistribute the gradient between the $2\to2$ and $2\to4$
+classes, which these three arms already show is a trade, and would leave the two things none
+of them moves: the $2\to4$ slope and the resonant stall.
+
+\begin{table}[H]
+\centering
+\caption{The steps curve under three training aggregations at identical settings: class
+median of the final per-process validation loss (mean over three seeds; the floored arm at
+$4000$ steps over its two seeds that did not diverge), and the gain per doubling of steps
+($1000\to2000$, $2000\to4000$). Solo gains per doubling: $2\to2$ $1.4$, $5.6$; $2\to3$ $1.3$,
+$1.5$; $2\to4$ $1.5$, $1.25$.}
+\label{tab:steps_agg}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+class & \multicolumn{2}{c}{arithmetic} & \multicolumn{2}{c}{geometric} & \multicolumn{2}{c}{geometric, $\tau=10^{-2}$} \\
+ & $4000$ steps & gain & $4000$ steps & gain & $4000$ steps & gain \\
+\midrule
+all $478$ & $0.0071$ & $1.8$, $1.7$ & $0.0097$ & $1.8$, $1.9$ & $0.0076$ & $2.2$, $1.6$ \\
+tree $2\to2$ & $3.6\times10^{-4}$ & $2.3$, $1.9$ & $4.1\times10^{-5}$ & $3.5$, $3.2$ & $2.3\times10^{-4}$ & $2.9$, $1.4$ \\
+resonant $2\to2$ & $0.0048$ & $1.6$, $1.2$ & $0.0060$ & $1.3$, $1.3$ & $0.0044$ & $1.3$, $1.3$ \\
+tree $2\to3$ & $0.0041$ & $2.1$, $2.0$ & $0.0037$ & $2.3$, $2.7$ & $0.0039$ & $3.2$, $1.5$ \\
+tree $2\to4$ & $0.017$ & $1.6$, $1.8$ & $0.036$ & $1.6$, $1.7$ & $0.024$ & $1.9$, $1.6$ \\
+positive one-loop & $0.0025$ & $2.3$, $2.3$ & $0.0010$ & $6.0$, $3.9$ & $0.0019$ & $4.2$, $1.8$ \\
+signed one-loop & $0.015$ & $2.0$, $1.8$ & $0.049$ & $1.7$, $1.9$ & $0.033$ & $2.0$, $1.7$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{The sign head: a real but modest gain on the signed class.} With
 \code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
