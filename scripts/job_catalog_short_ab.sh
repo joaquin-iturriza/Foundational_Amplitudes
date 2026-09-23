@@ -24,6 +24,9 @@
 # LAM= and WU= set the regularization and warm-up fraction; EXTRA= appends further overrides verbatim.
 # SEED= sets the init seed (repeats; data.seed stays 42).
 # RECIPE= picks the recipe file under recipes/ (default the full catalog); BS= the training batch size.
+# TPROP=true divides the massive s-channel propagators out of the target, TCH=true adds the t-channel
+# factor, TCHMAX= its max final-state count (2 = the adopted 2->2-only rule), SIGN=true the sign head.
+# (Separate variables because an EXTRA with spaces does not survive the --export of `site submit`.)
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -36,6 +39,8 @@ python run.py \
   data.processes_file="$PROJECT_DIR"/recipes/${RECIPE:-catalog_v2_train_scan.yaml} \
   data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
+  data.target_propagators="${TPROP:-false}" data.target_propagator_tchannel="${TCH:-false}" \
+  data.target_propagator_tchannel_max_final="${TCHMAX:-99}" training.sign_head="${SIGN:-false}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
