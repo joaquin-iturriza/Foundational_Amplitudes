@@ -43,4 +43,9 @@ if [ ! -x "$BIN" ]; then
 fi
 # non-interactive smoke: MG5 starts and quits (writes its configuration on first run)
 echo quit | timeout 600 "$BIN" >/dev/null 2>&1 || { echo "mg5_aMC does not start"; exit 1; }
+# diagram sidecars (data/diagrams/, gitignored): regenerable, ~3 CPU-minutes, needed by every
+# catalog run. The train/val/test pools are NOT generated here: MG5 differs per site
+# (3.7.0 at CC-IN2P3, 3.6.7 elsewhere) and a pool's recipe id does not record the version,
+# so every site gets a copy of CC-IN2P3's pools instead ($SCRATCH/amp_data_cache, $WORK/datasets).
+python "$PROJECT_DIR/tools/dump_diagrams.py" --all --skip-existing >/dev/null 2>&1   || echo "warning: some diagram sidecars could not be generated (tools/dump_diagrams.py --all)"
 verify
