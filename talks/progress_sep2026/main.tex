@@ -36,7 +36,7 @@
 \begin{frame}[plain]
   \vfill
   \begin{center}
-    {\Large\bfseries\color{navy} Divergence sampling updates}\\[1.4em]
+    {\Large\bfseries\color{navy} Divergence sampling and the process catalog}\\[1.4em]
     {\large Joaqu\'in Iturriza Ramirez}\\[0.4em]
     {\footnotesize\color{gray} September 2026}
   \end{center}
@@ -109,16 +109,96 @@
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{l2_adapt_final.pdf}
 \end{frame}
 
+\begin{frame}{A catalog by rule}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.8\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.9em}
+        \item $478$ processes, enumerated by rule, every one checked in MadGraph
+        \item $302$ trees up to $2\to4$, $95$ one loop, $3$ loop induced, $78$ scan variants
+        \item Every tree pool sampled with the mixture, $f=0.35$
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\begin{frame}{Mixture on every pool}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{pool_audit.pdf}
+\end{frame}
+
+\begin{frame}{Failure tracks the target's range}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loss_vs_range.pdf}
+\end{frame}
+
+\begin{frame}{Geometric mean starves, arithmetic mean does not}
+  \centering
+  \includegraphics[trim=0 504 0 0,clip,width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_compare_q.pdf}
+\end{frame}
+
+\begin{frame}{Geometric mean starves, arithmetic mean does not}
+  \centering
+  \includegraphics[trim=0 0 0 516,clip,width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_compare_q.pdf}
+\end{frame}
+
+\begin{frame}{The needle was a missing input}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.8\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.9em}
+        \item Off shellness masks built for $0/478$ processes, no diagram sidecars
+        \item With them, $ee\to\mu\mu$ goes from $0.41$ to $0.012$
+        \item $s$ channel family $7/7 \to 0/7$ failing, $M_Z$ family $18/20 \to 5/20$
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\begin{frame}{Distance from solo}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{excess_ratio.pdf}
+\end{frame}
+
+\begin{frame}{Where the error sits}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{residual_vs_target.pdf}
+\end{frame}
+
+\begin{frame}{Propagator subtraction on the target}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{seed_arms_tprop.pdf}
+\end{frame}
+
+\begin{frame}{t channel factor, kept for $2\to2$ only}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{seed_arms_tch22.pdf}
+\end{frame}
+
+\begin{frame}{Signed log scale is not the lever}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{seed_arms_slq.pdf}
+\end{frame}
+
+\begin{frame}{Joint vs solo}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{joint_vs_solo.pdf}
+\end{frame}
+
 \begin{frame}{Open ends}
   \vfill
   \begin{center}
     \begin{minipage}{0.8\textwidth}
       \large
       \begin{itemize}\setlength{\itemsep}{0.9em}
-        \item Last two plots predate a fairness fix, never re-run
-        \item Saturation confounds data with compute
-        \item $b\bar b g$ is single seed
-        \item Cheap epistemic $\sigma$ untried
+        \item Divergence plots before the fairness fix, never re-run
+        \item Equal exponents in the joint run, geometric mean untested
+        \item Signed one loop class still five times worse
+        \item t channel factor diverges at peak learning rate
       \end{itemize}
     \end{minipage}
   \end{center}
