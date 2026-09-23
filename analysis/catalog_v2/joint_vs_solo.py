@@ -79,7 +79,7 @@ for lab, k in (("2to2", 4), ("2to3", 5), ("2to4", 6)):
 axb.axvline(1, color=ps.C.grey, ls="--", label="equal")
 axb.set_xscale("log"); axb.set_xticks([0.5, 1, 2], ["0.5", "1", "2"]); axb.xaxis.set_minor_formatter(NullFormatter()); axb.set_xlabel(r"$\mathrm{MSE}_{\rm full\ catalog}\,/\,\mathrm{MSE}_{\rm multiplicity\ alone}$")
 axb.set_ylabel("fraction of processes")
-ps.legend(axb, "upper left")
+ps.shared_legend(fb, axb, ncol=2)
 lim = [1e-4, 1e1]; axc.plot(lim, lim, color=ps.C.grey, ls="--", label="equal")
 axc.set_xscale("log"); axc.set_yscale("log")
 axc.set_xlabel(r"MSE, multiplicity trained alone"); axc.set_ylabel(r"MSE, full catalog")
