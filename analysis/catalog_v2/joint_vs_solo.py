@@ -6,7 +6,10 @@ is joint over solo, so above one means the joint run is worse.
 (2) interference: each process in the full run (runs/steps_t1000_s*) over the same process in
     its multiplicity subset trained alone at the same per-process compute
     (runs/subset_<2to2|2to3|2to4>_s*).
-    python analysis/catalog_v2/joint_vs_solo.py [--steps=1000,2000,4000]
+    python analysis/catalog_v2/joint_vs_solo.py [--steps=1000,2000,4000] [--arm=geo]
+--arm=<name> reads the joint runs runs/steps_<name>_t<N>_s* instead (the same curve under another
+training aggregation) and writes joint_vs_solo_<name>_*; without it, the arithmetic-mean runs.
+Also prints each class's median joint loss per horizon and its slope per doubling of steps.
 Writes analysis/catalog_v2/joint_vs_solo_a (steps), _b (ECDF of the ratio), _c (per process)."""
 import glob, json, os, re, sys
 import numpy as np
@@ -17,6 +20,7 @@ import census as C
 import plot_style as ps
 opts = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--"))
 STEPS = [int(x) for x in opts.get("steps", "1000,2000,4000").split(",")]
+ARM = opts.get("arm", ""); PRE = f"steps_{ARM}_" if ARM else "steps_"
 NP = json.load(open(os.path.join(HERE, "n_particles.json"))); s27, all50 = C.signed_classes()
 def cls(n):
     if n in all50: return "signed 1-loop"
@@ -43,14 +47,24 @@ def solo(N, k):
 print("== joint / solo at equal per-process compute, median over the class (mean over seeds ± spread)")
 print(f"{'class':16s} " + " | ".join(f"{N:>14d}" for N in STEPS))
 curves = {c: [] for c in CLASSES}
+absm = {c: [] for c in CLASSES}
 for N in STEPS:
-    rs = runs(f"runs/steps_t{N}_s*"); ref = {k: solo(N, k) for k in REFP}
+    rs = runs(f"runs/{PRE}t{N}_s*"); ref = {k: solo(N, k) for k in REFP}
+    for c in CLASSES:
+        v = [np.median([r[n] for n in r if cls(n) == c]) for r in rs]
+        absm[c].append((np.mean(v), np.std(v, ddof=1)) if len(v) > 1 else (np.mean(v) if v else np.nan, 0.0))
     for c in CLASSES:
         per_seed = [np.median([r[n] / ref[NP[n]] for n in r if cls(n) == c]) for r in rs] if rs else []
         curves[c].append((np.mean(per_seed) if per_seed else np.nan, np.std(per_seed, ddof=1) if len(per_seed) > 1 else 0.0, len(per_seed)))
     print(f"  solo refs at {N}: " + ", ".join(f"2->{k-2} {ref[k]:.3g}" for k in REFP) + f"  ({len(rs)} joint seeds)")
 for c in CLASSES:
     print(f"{c:16s} " + " | ".join(f"{m:6.2f} ±{s:4.2f} ({k})" for m, s, k in curves[c]))
+print("\n== joint class median (mean over seeds ± spread), and the gain per doubling of steps")
+print(f"{'class':16s} " + " | ".join(f"{N:>16d}" for N in STEPS) + " | gain/doubling")
+for c in CLASSES:
+    m = np.array([x[0] for x in absm[c]])
+    g = " ".join(f"{a/b:4.2f}" for a, b in zip(m[:-1], m[1:]))
+    print(f"{c:16s} " + " | ".join(f"{a:8.3g} ±{s:6.2g}" for a, s in absm[c]) + f" | {g}")
 for c, col in zip(CLASSES, COLS):
     m = np.array([x[0] for x in curves[c]]); s = np.array([x[1] for x in curves[c]])
     axa.errorbar(STEPS, m, yerr=s, marker="o", capsize=3, color=col, label=C.CLASS_LABEL[c])
@@ -60,7 +74,7 @@ axa.set_xticks(STEPS, [str(n) for n in STEPS]); axa.xaxis.set_minor_formatter(Nu
 axa.set_ylabel(r"$\mathrm{MSE}_{\rm joint}\,/\,\mathrm{MSE}_{\rm solo}$ (class median)")
 ps.shared_legend(fa, axa, ncol=2)   # seven entries do not fit inside the box
 # (2) interference
-full = runs("runs/steps_t1000_s*")
+full = [] if ARM else runs("runs/steps_t1000_s*")   # the subset runs are under the arithmetic mean
 fullm = {n: np.mean([r[n] for r in full]) for n in full[0]} if full else {}
 print("\n== full run / subset alone, same per-process compute (1000 steps), seed means")
 for lab, k in (("2to2", 4), ("2to3", 5), ("2to4", 6)):
@@ -84,4 +98,4 @@ lim = [1e-4, 1e1]; axc.plot(lim, lim, color=ps.C.grey, ls="--", label="equal")
 axc.set_xscale("log"); axc.set_yscale("log")
 axc.set_xlabel(r"MSE, multiplicity trained alone"); axc.set_ylabel(r"MSE, full catalog")
 ps.legend(axc, "upper left")
-ps.save_panels([fa, fb, fc], "analysis/catalog_v2/joint_vs_solo")
+ps.save_panels([fa, fb, fc], "analysis/catalog_v2/joint_vs_solo" + (f"_{ARM}" if ARM else ""))
