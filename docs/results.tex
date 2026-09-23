@@ -2856,9 +2856,13 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     $1.2$--$1.6$ per doubling under every aggregation while their solo reference gains $5.6$,
     with validation equal to train, so the stall is optimisation or representation, not data;
     what the residual profile of these pools looks like at $4000$ steps is the first look.
-    The $\tau$ floor diverged once in three at $4000$ steps. Caveat to carry: the learning
-    rate is the $1000$-step best at every horizon (the horizon law puts the $2000$ and $4000$
-    optima about $1.4\times$ higher). Sharing across multiplicities costs $20$--$45\%$ at
+    The $\tau$ floor diverged once in three at $4000$ steps. Caveat to carry: every joint run of
+    the steps curve so far ran at $9.7\times10^{-3}$, the $500$-step optimum of the quick-point
+    sweep (\code{catalog\_q\_mean}), at every horizon, where the measured $\eta^*(t,D)$ surface at
+    these pools puts the $1000$--$4000$-step optima $1.7$--$2\times$ higher, while the solo
+    references are tuned per horizon; the curve is being redone with the joint run tuned per
+    horizon too (\code{catalog\_steps\_t<N>\_mean}, $500$--$8000$ steps) against references
+    of two processes per class (\code{solo\_t<N>\_<process>}). Sharing across multiplicities costs $20$--$45\%$ at
     $1000$ steps on top; the structural options for the $2\to2$ classes (capacity or routing by
     class, a per-class fine-tune) are next now that the aggregation question is settled.
     Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
@@ -3484,7 +3488,7 @@ owned by the largest-MSE class once the others are small (the domination this se
 chose the arithmetic mean to avoid the mirror image of, starvation, at $1000$ steps). The
 equal exponents are then the arithmetic mean's failure mode appearing at longer horizons,
 not a property of joint training; that reading is untested. Two further caveats: the
-learning rate is the $1000$-step best at every horizon, and at $4000$ steps the $5$k pools
+learning rate is the $500$-step optimum at every horizon (the quick-point sweep), and at $4000$ steps the $5$k pools
 are $27$ passes for the joint run and the solo references alike, so the solo $2\to3$ and
 $2\to4$ curves may be data-limited there and their exponents understated.
 Second, at $1000$ steps each multiplicity trained alone at the same per-process compute
