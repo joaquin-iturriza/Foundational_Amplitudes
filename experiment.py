@@ -2114,8 +2114,9 @@ class AmplitudeExperiment(BaseExperiment):
                     proc_factor.setdefault(name, {})[split] = F.reshape(-1, 1)
                 if signs is not None:
                     proc_sign.setdefault(name, {})[split] = signs
-                raw = ((_raw(name, split, truth, "truth"), _raw(name, split, pred, "pred"))
-                       if factors is not None or signs is not None else None)
+                # always through _raw: it inverts with this pool's own transform (a single
+                # signed pool is under signedlog, not the global amp_trafos)
+                raw = (_raw(name, split, truth, "truth"), _raw(name, split, pred, "pred"))
                 return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0], raw
             pred   = np.concatenate([proc_preds[n][split][0] for n in available], axis=0)
             truth  = np.concatenate([proc_preds[n][split][1] for n in available], axis=0)
