@@ -88,9 +88,9 @@ for key, _, label in ARMS:
     names = rs[0]["final"].keys()
     v = np.sort([np.exp(np.mean([np.log(r["final"][n]) for r in rs])) for n in names])
     ax.step(v, np.arange(1, len(v) + 1) / len(v), where="post", color=COL[key], label=f"{label} ({len(rs)} seeds)")
-ax.set_xscale("log"); ax.set_xlabel(rf"per-process MSE($\log|\mathcal{{M}}|^2$), {T} steps")
+ax.set_xscale("log"); ax.set_xlabel(r"per-process MSE($\log|\mathcal{M}|^2$)")
 ax.set_ylabel("fraction of processes")
-ps.legend(ax, "upper left")
+ps.shared_legend(fig, ax, ncol=1)
 ps.save(fig, "analysis/catalog_v2/steps_agg_ecdf")
 
 # combined validation loss during training at the longest horizon, every seed; the diverged run dashed

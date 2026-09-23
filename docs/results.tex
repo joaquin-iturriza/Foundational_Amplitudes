@@ -3519,7 +3519,8 @@ not the $2\to4$ one.} The horizon runs repeated at identical settings (lr $9.7\t
 $\lambda=3.8\times10^{-8}$, warm-up $0.17$, no EMA, $5$k pools, both propagator factors, sign
 head; three seeds per point) with only the training aggregation changed: the geometric mean,
 and the geometric mean floored at $\tau=10^{-2}$ (\code{runs/steps\_geo\_t*},
-\code{runs/steps\_tau1e-2\_t*}; \code{joint\_vs\_solo.py --arm}), Table~\ref{tab:steps_agg}.
+\code{runs/steps\_tau1e-2\_t*}; \code{joint\_vs\_solo.py --arm}, \code{steps\_agg.py}),
+Table~\ref{tab:steps_agg} and Fig.~\ref{fig:steps_agg}.
 The equal slopes were partly the arithmetic mean: under the geometric mean the gain per
 doubling spreads from $1.3$ to $3$--$6$ by class, where under the arithmetic mean it sits
 between $1.2$ and $2.3$; tree $2\to2$ gains $3.5$ and $3.2$ per doubling against $2.3$ and
@@ -3532,13 +3533,14 @@ twice higher at every horizon. The resonant $2\to2$ pools stall under all three 
 per doubling, $5\times10^{-3}$ at $4000$ steps, while the $2\to2$ solo reference gains $5.6$
 over the last doubling; their ratio to solo climbs to $34$--$43$ in every arm. It is not the
 data: validation over train MSE is $1.00$ for the class at $4000$ steps ($1.06$--$1.12$ for the
-multi-particle classes). The trade is the familiar one at every horizon: at $4000$ steps the
+multi-particle classes). The trade is the familiar one at every horizon (Fig.~\ref{fig:steps_agg_curves}): at $4000$ steps the
 geometric mean has $21$--$39$ processes above $0.1$ against none, a combined median of
 $0.0097$ against $0.0071$, and the signed class $3.3$ times higher. The floor sits between the
 two means on every class and ties the arithmetic mean on the combined number ($0.0076$, two
-seeds), but one of its three $4000$-step runs diverged (non-finite gradients from about step
-$1900$, never recovered; none of the eighteen runs under either mean did), joining the
-$t$-channel runs as the second instability at this rate. A per-process weight driven by each
+seeds), but one of its three $4000$-step runs diverged (Fig.~\ref{fig:steps_agg_curves}: the combined loss
+jumps from $0.057$ to $1.8$ between steps $1200$ and $1400$ with finite gradients, non-finite ones
+follow from about step $1900$, and it never recovers; none of the eighteen runs under either
+mean did), the same signature as the $t$-channel runs and the second instability at this rate. A per-process weight driven by each
 process's exponent deficit would redistribute the gradient between the $2\to2$ and $2\to4$
 classes, which these three arms already show is a trade, and would leave the two things none
 of them moves: the $2\to4$ slope and the resonant stall.
@@ -3568,6 +3570,28 @@ signed one-loop & $0.015$ & $2.0$, $1.8$ & $0.049$ & $1.7$, $1.9$ & $0.033$ & $2
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/steps_agg_a.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/steps_agg_c.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/steps_agg_e.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_f.pdf}}
+\caption{The steps curve under three training aggregations at identical settings: class median of
+the final per-process validation loss against the horizon, mean over seeds with the min/max band
+(the floored arm at $4000$ steps over its two seeds that did not diverge), and the tuned solo
+reference of the class's multiplicity where one exists. (a) tree $2\to2$, (b) resonant $2\to2$,
+(c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
+\label{fig:steps_agg}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/steps_agg_ecdf.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_curves.pdf}}
+\caption{The three aggregations at $4000$ steps. (a) Distribution of the final per-process
+validation loss, each process at its geometric mean over seeds. (b) Combined validation loss
+during training, every seed; the floored arm's third seed diverges between steps $1200$ and $1400$.}
+\label{fig:steps_agg_curves}
+\end{figure}
 
 \paragraph{The sign head: a real but modest gain on the signed class.} With
 \code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
