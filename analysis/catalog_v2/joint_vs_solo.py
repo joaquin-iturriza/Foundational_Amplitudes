@@ -10,6 +10,7 @@ is joint over solo, so above one means the joint run is worse.
 Writes analysis/catalog_v2/joint_vs_solo_a (steps), _b (ECDF of the ratio), _c (per process)."""
 import glob, json, os, re, sys
 import numpy as np
+from matplotlib.ticker import NullFormatter
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE); sys.path.insert(0, ROOT)
 import census as C
@@ -55,6 +56,7 @@ for c, col in zip(CLASSES, COLS):
     axa.errorbar(STEPS, m, yerr=s, marker="o", capsize=3, color=col, label=C.CLASS_LABEL[c])
 axa.axhline(1, color=ps.C.grey, ls="--", label="equal to solo")
 axa.set_xscale("log"); axa.set_yscale("log"); axa.set_xlabel("training steps")
+axa.set_xticks(STEPS, [str(n) for n in STEPS]); axa.xaxis.set_minor_formatter(NullFormatter())
 axa.set_ylabel(r"$\mathrm{MSE}_{\rm joint}\,/\,\mathrm{MSE}_{\rm solo}$ (class median)")
 ps.shared_legend(fa, axa, ncol=2)   # seven entries do not fit inside the box
 # (2) interference
@@ -75,7 +77,7 @@ for lab, k in (("2to2", 4), ("2to3", 5), ("2to4", 6)):
         if vv: print(f"      {c:16s} n={len(vv):3d} median {np.median(vv):.2f}")
     axc.scatter([sub[n] for n in sub], [fullm[n] for n in sub], color=col, alpha=0.6, label=rf"$2\to{k-2}$")
 axb.axvline(1, color=ps.C.grey, ls="--", label="equal")
-axb.set_xscale("log"); axb.set_xlabel(r"$\mathrm{MSE}_{\rm full\ catalog}\,/\,\mathrm{MSE}_{\rm multiplicity\ alone}$")
+axb.set_xscale("log"); axb.set_xticks([0.5, 1, 2], ["0.5", "1", "2"]); axb.xaxis.set_minor_formatter(NullFormatter()); axb.set_xlabel(r"$\mathrm{MSE}_{\rm full\ catalog}\,/\,\mathrm{MSE}_{\rm multiplicity\ alone}$")
 axb.set_ylabel("fraction of processes")
 ps.legend(axb, "upper left")
 lim = [1e-4, 1e1]; axc.plot(lim, lim, color=ps.C.grey, ls="--", label="equal")

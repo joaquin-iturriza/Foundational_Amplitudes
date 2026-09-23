@@ -6,7 +6,6 @@ arms_compare), one panel per arm, the arm as the legend title; the combined numb
 per-class medians are printed."""
 import glob, json, os, sys
 import numpy as np
-from matplotlib.lines import Line2D
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import census as C
@@ -34,8 +33,9 @@ for (fc, axc), (fe, axe), (label, path) in zip(curves_figs, ecdf_figs, runs):
             # 478 overlapping curves: the thin translucent line is what keeps the density readable
             axc.plot(every * np.arange(1, len(v) + 1), v, color=MCOL[NP[n]], lw=0.4, alpha=0.35)
     axc.set_yscale("log"); axc.set_xlabel("step"); axc.set_ylabel(r"validation MSE($\log|\mathcal{M}|^2$)")
-    ps.legend(axc, "upper right", title=label,
-              handles=[Line2D([], [], color=MCOL[k], label=rf"$2\to{k-2}$") for k in (4, 5, 6)])
+    for k in (4, 5, 6): axc.plot([], [], color=MCOL[k], label=rf"$2\to{k-2}$")   # legend handles
+    ps.process_label(axc, label, loc="upper right")
+    ps.shared_legend(fc, axc, ncol=3)
     print(f"{label}: combined validation {d['val_loss_no_reg'][-1]:.3g}")
     for c, col in zip(CLASSES, CCOL):
         v = np.sort([final[n] for n in final if cls(n) == c])
@@ -44,7 +44,8 @@ for (fc, axc), (fe, axe), (label, path) in zip(curves_figs, ecdf_figs, runs):
             print(f"   {c:16s} n={len(v):3d} median {np.median(v):.3g} 90% {np.percentile(v, 90):.3g}")
     axe.set_xscale("log"); axe.set_xlabel(r"final validation MSE($\log|\mathcal{M}|^2$) per process")
     axe.set_ylabel("fraction of processes")
-    ps.legend(axe, "upper left", title=label)
+    ps.process_label(axe, label, loc="upper left")
+    ps.shared_legend(fe, axe, ncol=2)
 # common axes across arms, so the panels compare by eye
 for figs, attr in ((curves_figs, "ylim"), (ecdf_figs, "xlim")):
     lims = [getattr(ax, f"get_{attr}")() for _, ax in figs]

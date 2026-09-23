@@ -33,7 +33,8 @@ for (fig, ax), (label, path) in zip(figs, runs):
     ax.axhline(1, color=ps.C.grey, ls="--", label="solo, same compute")
     ax.set_yscale("log"); ax.set_xlabel(r"range of $\ln|\mathcal{M}|^2$ in the train pool")
     ax.set_ylabel(r"$\mathrm{MSE}_p\,/\,\mathrm{MSE}_{\rm solo}(n_p)$")
-    ps.legend(ax, "upper left", title=label)
+    ps.process_label(ax, label, loc="upper left")
+    ps.shared_legend(fig, ax, ncol=2)
     print(f"\n== {label}: e_p = m_p / L_ref(n_p); median {np.median(ev):.2g}, quartiles {np.percentile(ev,25):.2g}-{np.percentile(ev,75):.2g}, below 1: {np.mean(ev<1):.0%}, above 10: {np.mean(ev>10):.0%}")
     groups = {}
     for n in names: groups.setdefault(cls(n), []).append(e[n])

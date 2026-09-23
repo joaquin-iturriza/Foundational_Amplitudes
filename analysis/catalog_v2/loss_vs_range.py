@@ -28,6 +28,7 @@ for (fig, ax), path, label in zip(figs, args, labels):
     ax.set_yscale("log")
     ax.set_xlabel(r"range of $\ln|\mathcal{M}|^2$ in the train pool")
     ax.set_ylabel(r"validation MSE($\log|\mathcal{M}|^2$)")
-    ps.legend(ax, "upper left", title=label)
+    ps.process_label(ax, label, loc="upper left")
+    ps.shared_legend(fig, ax, ncol=3)
     print(f"{label}: median {np.median(y):.3g}, 90% {np.percentile(y, 90):.3g}")
 ps.save_panels(figs, f"analysis/catalog_v2/{outname}")

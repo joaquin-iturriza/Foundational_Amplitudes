@@ -28,7 +28,7 @@ $P/residual_vs_target.py runs/t1000_tprop_s1 --out=residual_vs_target_tprop \
 
 $P/seed_arms.py --out=seed_arms_tprop \
   'target $\log|\mathcal{M}|^2$=runs/t1000_slq1e-2_s*' \
-  'massive propagators divided out=runs/t1000_tprop_s*'
+  'massive propagators divided out=runs/t1000_tprop_s[123]'
 
 $P/seed_arms.py --out=seed_arms_tch22 \
   'massive propagators divided out=runs/t1000_tprop_s[123]' \
