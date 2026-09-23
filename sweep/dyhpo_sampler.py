@@ -655,8 +655,11 @@ class DyHPOSampler:
                 # the load below then reads what the last holder wrote, not a stale copy.
                 if os.path.exists(state_path):
                     with open(state_path, 'rb') as sf:
-                        fcntl.lockf(sf, fcntl.LOCK_SH)
-                        fcntl.lockf(sf, fcntl.LOCK_UN)
+                        try:        # a cache refresh only: the flock on .lock serializes access,
+                            fcntl.lockf(sf, fcntl.LOCK_SH)   # so a transient ENOLCK here must not
+                            fcntl.lockf(sf, fcntl.LOCK_UN)   # fail a finished trial's observe()
+                        except OSError:
+                            pass
                 sampler = DyHPOSampler.load(state_path, output_path)
                 yield sampler
                 sampler.save(state_path)
