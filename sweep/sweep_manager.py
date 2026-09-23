@@ -186,6 +186,8 @@ def _spec_fully_cached(spec, seed):
     with open(spec) as f:
         doc = yaml.safe_load(f)
     procs = doc["processes"] if isinstance(doc, dict) else doc
+    # as training does: scan variants registered, the recipe's sampling attached (both enter the recipe id)
+    mg.register_recipe_processes(procs, default_sampling=doc.get("sampling") if isinstance(doc, dict) else None)
     ck = {"train": "n_train", "val": "n_val", "test": "n_test"}
     for role in ("train", "val", "test"):
         dest = datagen.dest_for_role(role)

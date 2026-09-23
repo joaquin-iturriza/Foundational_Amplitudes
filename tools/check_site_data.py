@@ -24,6 +24,9 @@ import mg5_pipeline_final as mg
 for spec in sys.argv[1:] or DEFAULT:
     doc = yaml.safe_load(open(os.path.join(ROOT, spec)))
     procs = doc["processes"] if isinstance(doc, dict) else doc
+    # as training does: scan variants into the registry, the recipe's sampling onto every
+    # entry (both are part of a pool's recipe id)
+    mg.register_recipe_processes(procs, default_sampling=doc.get("sampling") if isinstance(doc, dict) else None)
     n_key = {"train": "n_train", "val": "n_val", "test": "n_test"}
     uncached, nosidecar = [], []
     for p in procs:
