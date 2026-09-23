@@ -518,16 +518,27 @@ class DyHPOSampler:
             'extension_count':       self._extension_count,
             'in_flight':             self._in_flight,
         }
-        tmp = path + '.tmp'
-        with open(tmp, 'wb') as f:
-            pickle.dump(state, f, protocol=pickle.HIGHEST_PROTOCOL)
-        os.replace(tmp, path)
+        # Written IN PLACE under the caller's lock, not tmp + rename: on NFS another node can keep
+        # resolving the name to the replaced file for seconds after a rename, load the state from
+        # before this save, and suggest a configuration that is already in flight (seen on
+        # CC-IN2P3: two wave-1 trials released together got the same hp index). A backup copy
+        # guards against a crash mid-write; load() falls back to it.
+        blob = pickle.dumps(state, protocol=pickle.HIGHEST_PROTOCOL)
+        if os.path.exists(path):
+            with open(path + '.bak', 'wb') as f:
+                f.write(open(path, 'rb').read()); f.flush(); os.fsync(f.fileno())
+        with open(path, 'r+b' if os.path.exists(path) else 'wb') as f:
+            f.write(blob); f.truncate(); f.flush(); os.fsync(f.fileno())
 
     @classmethod
     def load(cls, path: str, output_path: str = '.', force_cpu: bool = False) -> 'DyHPOSampler':
         """Restore a previously saved DyHPOSampler from a pickle file."""
-        with open(path, 'rb') as f:
-            state = pickle.load(f)
+        try:
+            with open(path, 'rb') as f:
+                state = pickle.load(f)
+        except (EOFError, pickle.UnpicklingError):
+            with open(path + '.bak', 'rb') as f:      # a save interrupted mid-write
+                state = pickle.load(f)
 
         obj = cls.__new__(cls)
         obj.hp_space         = state['hp_space']

@@ -200,8 +200,11 @@ def write_sub(i, cfg, afs_dir, sh_path, low_fidelity=False):
     priority = cluster.get("priority", None)
     priority_line = f"priority              = {priority}\n" if priority is not None else ""
 
-    request_memory = cluster.get("request_memory", None)
+    # site facts arrive from sites.yaml as `flavour` / `mem` (siteconf.resolve); the old
+    # hand-written configs spelled them job_flavour / request_memory
+    request_memory = cluster.get("request_memory", cluster.get("mem"))
     memory_line = f"request_memory        = {request_memory}\n" if request_memory is not None else ""
+    flavour = cluster.get("job_flavour", cluster.get("flavour", "tomorrow"))
 
     name = f"trial_{i:04d}"
     content = f"""\
@@ -214,7 +217,7 @@ error       = {afs_dir}/error/{name}.$(ClusterId).$(ProcId).err
 log         = {afs_dir}/log/{name}.$(ClusterId).$(ProcId).log
 
 request_gpus          = {cluster["request_gpus"]}
-{gpu_mem_line}{memory_line}+JobFlavour           = "{cluster["job_flavour"]}"
+{gpu_mem_line}{memory_line}+JobFlavour           = "{flavour}"
 requirements          = {requirements}
 max_retries           = 3
 {priority_line}{extra}
@@ -223,6 +226,21 @@ queue
     path = os.path.join(afs_dir, "subs", f"{name}.sub")
     with open(path, "w") as f:
         f.write(content)
+    return path
+
+
+def write_dag(cfg, afs_dir, sub_paths):
+    """HTCondor counterpart of sweep_manager's sequential waves: the startup trials first, the
+    surrogate-guided ones only after every startup trial has observe()d, so DyHPO fits on data
+    instead of every trial suggesting against an empty state at once."""
+    n_first = max(1, min(int(cfg.get("dyhpo", {}).get("n_startup", 3)), len(sub_paths)))
+    names = [os.path.splitext(os.path.basename(p))[0] for p in sub_paths]
+    lines = [f"JOB {n} {p}" for n, p in zip(names, sub_paths)]
+    if len(names) > n_first:
+        lines.append(f"PARENT {' '.join(names[:n_first])} CHILD {' '.join(names[n_first:])}")
+    path = os.path.join(afs_dir, "sweep.dag")
+    with open(path, "w") as f:
+        f.write("\n".join(lines) + "\n")
     return path
 
 
@@ -354,14 +372,9 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
             from sweep.sweep_manager import submit_sweeps
             submit_sweeps([afs_dir])
         else:
-            submitted = 0
-            for job_path in job_paths:
-                try:
-                    subprocess.run(["condor_submit", job_path], check=True)
-                    submitted += 1
-                except subprocess.CalledProcessError as e:
-                    print(f"  Failed to submit {job_path}: {e}", file=sys.stderr)
-            print(f"\nSubmitted {submitted}/{n_trials} jobs.")
+            dag = write_dag(cfg, afs_dir, job_paths)
+            subprocess.run(["condor_submit_dag", "-batch-name", cfg["sweep_name"], dag], check=True, cwd=afs_dir)
+            print(f"\nSubmitted {n_trials} jobs as a DAG ({dag}).")
     elif submit is None:
         # Standalone/interactive use: tell the user how to submit later.
         # (When a caller passes submit=False it batches submission itself, so stay quiet.)
@@ -370,7 +383,7 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
             print(f"  python sweep/sweep_manager.py submit {afs_dir}")
         else:
             print("\nSkipping submission. Submit later with:")
-            print(f"  for f in {afs_dir}/subs/trial_*.sub; do condor_submit $f; done")
+            print(f"  cd {afs_dir} && condor_submit_dag -batch-name {cfg['sweep_name']} sweep.dag   (after writing it with --auto-submit's write_dag)")
 
     return afs_dir
 
