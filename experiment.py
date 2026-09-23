@@ -2083,7 +2083,7 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             if getattr(self, "_sign_head", False) and self.proc_val_loaders:
                 raise NotImplementedError("the per-process evaluation loop does not carry the sign head")
-            if getattr(self, "all_amp_factor", None) is not None:
+            if getattr(self, "all_amp_factor", None) is not None and self.proc_val_loaders:
                 LOGGER.warning("target_propagators is on but the per-process evaluation loop carries "
                                "no per-event factor: raw-space metrics are on the modified target")
             for split, loader_dict in loaders_by_split:
