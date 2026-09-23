@@ -7,7 +7,6 @@ The first arm is the baseline. Writes analysis/catalog_v2/<out>_a ... _f (png+pd
 seed_arms), one panel per class in the order of CLASSES, the class as the legend title."""
 import glob, json, os, sys
 import numpy as np
-from matplotlib.patches import Patch
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import census as C
@@ -58,12 +57,12 @@ for (fig, ax), c in zip(figs, CLASSES):
             lo_all.append(v[0]); hi_all.append(v[-1])
         ecdfs = np.array(ecdfs); ax.plot(grid, ecdfs.mean(0), color=col, label=l)
         if len(runs) > 1: ax.fill_between(grid, ecdfs.min(0), ecdfs.max(0), color=col, alpha=0.2)
-    handles = ax.get_legend_handles_labels()[0]
-    if nseeds > 1:
-        handles.append(Patch(color=ps.C.grey, alpha=0.2, label=f"min to max over {nseeds} seeds"))
+    if nseeds > 1:   # legend entry for the shaded bands (an empty artist carrying the label)
+        ax.fill_between([], [], [], color=ps.C.grey, alpha=0.2, label=f"min to max over {nseeds} seeds")
     ax.set_xscale("log"); ax.set_xlim(min(lo_all) / 2, max(hi_all) * 2)
     ax.set_xlabel(r"final validation MSE($\log|\mathcal{M}|^2$) per process")
     ax.set_ylabel("fraction of processes")
-    ps.legend(ax, "upper left", handles=handles,
-              title=f"{C.CLASS_LABEL[c]} ({sum(cls(n) == c for n in names)} processes)")
+    # the arm names are too long for a legend inside a 2.4in box: one strip above the plot
+    ps.process_label(ax, f"{C.CLASS_LABEL[c]} ({sum(cls(n) == c for n in names)})", loc="upper left")
+    ps.shared_legend(fig, ax, ncol=1)
 ps.save_panels(figs, f"analysis/catalog_v2/{opts.get('out', 'seed_arms')}")

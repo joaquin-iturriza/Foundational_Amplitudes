@@ -56,7 +56,7 @@ for c, col in zip(CLASSES, COLS):
 axa.axhline(1, color=ps.C.grey, ls="--", label="equal to solo")
 axa.set_xscale("log"); axa.set_yscale("log"); axa.set_xlabel("training steps")
 axa.set_ylabel(r"$\mathrm{MSE}_{\rm joint}\,/\,\mathrm{MSE}_{\rm solo}$ (class median)")
-ps.legend(axa, "upper left", ncol=2)
+ps.shared_legend(fa, axa, ncol=2)   # seven entries do not fit inside the box
 # (2) interference
 full = runs("runs/steps_t1000_s*")
 fullm = {n: np.mean([r[n] for r in full]) for n in full[0]} if full else {}
