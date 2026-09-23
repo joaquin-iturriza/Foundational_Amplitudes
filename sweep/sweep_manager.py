@@ -371,7 +371,17 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         if deps:
             cmd.append("--dependency=" + ",".join(deps))
         cmd.append(script)
-        out = _run(cmd, dry_run=dry_run)
+        try:
+            out = _run(cmd, dry_run=dry_run)
+        except RuntimeError as e:
+            # The scheduler's per-user submit cap (CC-IN2P3 gpu qos: 100). Keep what went in,
+            # leave the rest unsubmitted; `submit` again once the queue drains picks them up.
+            if "SubmitJobPerUserLimit" not in str(e):
+                if not dry_run: save_registry(registry, reg)
+                raise
+            print(f"  submit limit reached after {i} of {len(ordered)} trials; "
+                  f"{len(ordered) - i} left unsubmitted, `submit` again when the queue drains")
+            break
         jid = out.split(";")[0].strip() if out else f"DRY{idx}"
         cur_batch_jids.append(jid)
         # Only record the submission when it actually happened: a dry-run must not
@@ -382,6 +392,7 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
                 "trial_idx": idx, "script": script, "round": rnd, "nice": nice, "wave": b,
             }
             reg["sweeps"][sweep]["submitted_scripts"].append(script)
+            save_registry(registry, reg)   # per job: a failure later in the loop must not lose these
         wtag = f"wave {b} " if seq_batches > 1 else ""
         print(f"  {wtag}round {rnd:>3}  {sweep}  trial_{idx:04d}  nice={nice}  job={jid}")
 
@@ -390,6 +401,30 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     if not dry_run:
         save_registry(registry, reg)
         _rebalance(reg, registry, gap, dry_run=dry_run)
+
+
+def adopt(sweep_dirs, registry=DEFAULT_REGISTRY):
+    """Record trials that are in the queue but not in the registry (a submission that died
+    before saving), matched by script path, so a later `submit` does not queue them twice."""
+    reg = load_registry(registry)
+    user = os.environ.get("USER") or os.environ.get("LOGNAME") or ""
+    out = subprocess.run(["squeue", "-h", "-u", user, "-o", "%i %o"], capture_output=True, text=True)
+    if out.returncode != 0:
+        raise RuntimeError(f"squeue failed: {out.stderr.strip()}")
+    queued = {}
+    for line in out.stdout.splitlines():
+        jid, _, cmd = line.strip().partition(" ")
+        if cmd: queued[cmd.split()[0]] = jid
+    for d in sweep_dirs:
+        d = os.path.abspath(d); name = sweep_name_from_dir(d)
+        entry = reg["sweeps"].setdefault(name, {"dir": d, "weight": 1, "jobs": {}, "submitted_scripts": []})
+        n = 0
+        for idx, script in discover_trial_scripts(d):
+            if script in queued and script not in entry["submitted_scripts"]:
+                entry["jobs"][queued[script]] = {"trial_idx": idx, "script": script, "round": 0, "nice": 0, "wave": 0}
+                entry["submitted_scripts"].append(script); n += 1
+        print(f"  {name}: adopted {n} queued trial(s)")
+    save_registry(registry, reg)
 
 
 def rebalance(registry=DEFAULT_REGISTRY, dry_run=False):
@@ -525,6 +560,10 @@ def build_parser():
     s.add_argument("--weight", type=int, default=None,
                    help="trials per round for these sweeps (default keeps existing/1)")
     s.set_defaults(func=cmd_submit)
+
+    s = sub.add_parser("adopt", help="record queued trials missing from the registry")
+    s.add_argument("sweep_dirs", nargs="+")
+    s.set_defaults(func=lambda a: adopt(a.sweep_dirs, registry=a.registry))
 
     s = sub.add_parser("rebalance", help="re-interleave all pending jobs")
     s.set_defaults(func=cmd_rebalance)
