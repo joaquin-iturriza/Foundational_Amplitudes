@@ -15,6 +15,11 @@ verify() {
   command -v g++ >/dev/null 2>&1 || miss+=("g++")
   [ -x "$BIN" ] || miss+=("MadGraph at $ROOT")
   [ -d "$WORK/datasets" ] || miss+=("$WORK/datasets")
+  # where jobs are submitted from must be writable (lxplus: AFS, which needs a live token;
+  # without one every sweep generation fails with Permission denied)
+  local sd="${SUBMIT_DIR:-$PROJECT_DIR}/sweeps" probe
+  probe="$sd/.zz_probe_verify_$$"
+  if mkdir -p "$sd" 2>/dev/null && touch "$probe" 2>/dev/null; then rm -f "$probe"; else miss+=("writable $sd (AFS token?)"); fi
   if [ ${#miss[@]} -gt 0 ]; then echo "missing: ${miss[*]}"; return 1; fi
   # what a catalog run needs beyond the tools: the env's packages, every pool prebuilt
   # (require_cache), every diagram sidecar (off-shellness, target propagators)

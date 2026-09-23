@@ -525,8 +525,8 @@ class DyHPOSampler:
         # guards against a crash mid-write; load() falls back to it.
         blob = pickle.dumps(state, protocol=pickle.HIGHEST_PROTOCOL)
         if os.path.exists(path):
-            with open(path + '.bak', 'wb') as f:
-                f.write(open(path, 'rb').read()); f.flush(); os.fsync(f.fileno())
+            with open(path, 'rb') as src, open(path + '.bak', 'wb') as f:
+                f.write(src.read()); f.flush(); os.fsync(f.fileno())
         with open(path, 'r+b' if os.path.exists(path) else 'wb') as f:
             f.write(blob); f.truncate(); f.flush(); os.fsync(f.fileno())
 
@@ -650,6 +650,13 @@ class DyHPOSampler:
                         raise
                     time.sleep(5.0 + 5.0 * attempt)
             try:
+                # A lock on the state file's own inode makes the NFS client drop its cached pages
+                # for it (the flock above is on .lock, which says nothing about the pkl's cache):
+                # the load below then reads what the last holder wrote, not a stale copy.
+                if os.path.exists(state_path):
+                    with open(state_path, 'rb') as sf:
+                        fcntl.lockf(sf, fcntl.LOCK_SH)
+                        fcntl.lockf(sf, fcntl.LOCK_UN)
                 sampler = DyHPOSampler.load(state_path, output_path)
                 yield sampler
                 sampler.save(state_path)

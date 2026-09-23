@@ -34,8 +34,9 @@ if "--collect" in sys.argv:
                 sw = next((s for s in (f"solo_t{N}_{p}", f"ref_t{N}_{p}") if os.path.exists(os.path.join(ROOT, "sweeps", s, "summary.txt"))), None)
                 if sw is None: continue
                 best = re.search(r"^\s+(hp_\d+)\s+val_loss", open(os.path.join(ROOT, "sweeps", sw, "summary.txt")).read(), re.M)
+                if not best: continue
                 log = os.path.join(ROOT, "runs", sw, best.group(1).replace("hp_", "trial_"), "out_0.log")
-                if best and os.path.exists(log):
+                if os.path.exists(log):
                     v = mse(log).get(p)
                     if v: solo[f"{p}|{N}"] = dict(v, sweep=sw)
     joint = {}
