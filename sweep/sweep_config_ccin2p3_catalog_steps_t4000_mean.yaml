@@ -1,0 +1,97 @@
+# catalog_v2 steps curve, horizon 4000: the arithmetic-mean joint run at the settings of the steps_t*
+# arms (478-pool train+scan recipe, 5k pools, off-shellness, massive propagators divided out of the
+# target, t-channel factor on 2->2, sign head, validate_frac 0.05) with its HPs tuned at THIS horizon,
+# so the joint curve and the solo references (solo_t*) are both tuned per horizon.
+# lr centre: the measured lr*(t,D) surface (analysis/hpo_optima, scaling_p rows D=2212/7000 around the
+# 5k pools, interpolated in log t) relative to t=500, anchored at the catalog's measured 500-step
+# optimum 9.7e-3 (catalog_q_mean): 1.9e-02, swept over [c/3, 3c].
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 64G
+  cpus_per_task: 8
+  time: "01:40:00"
+paths:
+sweep_name: catalog_steps_t4000_mean
+n_trials: 6
+dyhpo:
+  n_candidates: 300
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps: [4000]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v2_train_scan.yaml
+  data.require_cache: 'true'
+  data.train_subsample: 5000
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.internal_mass_pdgs: '[23,6,25]'
+  data.target_propagators: 'true'
+  data.target_propagator_tchannel: 'true'
+  data.target_propagator_tchannel_max_final: 2
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'true'
+  training.loss_aggregation_tau: 0.0
+  training.val_aggregation: geometric_mean   # the metric never follows the training-side knobs
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.05'
+  training.dtype: float32
+  plot: 'true'
+  plotting.per_process_pages: 8       # per-process histogram pages (478 pages cost ~2 min a trial)
+  use_mlflow: 'false'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 6.33e-03
+  high: 5.70e-02
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.9999
+
