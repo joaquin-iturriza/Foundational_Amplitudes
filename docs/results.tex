@@ -459,12 +459,13 @@ combined (all events) & $2.3\times10^{-2}$ & $3.0\times10^{-2}$ & $8.8\times10^{
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\linewidth]{../analysis/catalog_v2/pool_audit.pdf}
+\widerow{\pnl{../analysis/catalog_v2/pool_audit_a.pdf}\hfill\pnl{../analysis/catalog_v2/pool_audit_b.pdf}} \\[1ex]
+\pnl{../analysis/catalog_v2/pool_audit_c.pdf}
 \caption{Audit of the $508$ train pools on disk (the recipe's $478$, the $19$ hold-outs and
-$11$ leftovers of earlier short recipes): share of events within $10$\,GeV of $M_Z$
-for the pools whose window contains it (left), flatness of the $\log|\mathcal M|^2$
-histogram (middle), and the needle measure, the largest standardized log-amplitude per pool
-(right).}
+$11$ leftovers of earlier short recipes): (a) share of events within $10$\,GeV of $M_Z$ for the
+pools whose window contains it, (b) flatness of the $\log|\mathcal M|^2$ histogram (largest over
+smallest bin count across the central $98\%$), (c) the needle measure, the largest standardized
+log-amplitude per pool.}
 \label{fig:pool_audit}
 \end{figure}
 
@@ -3180,12 +3181,11 @@ below $10^{-3}$ & $41$ & $0$ \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/loss_vs_range.pdf}
+\widerow{\pnl{../analysis/catalog_v2/loss_vs_range_a.pdf}\hfill\pnl{../analysis/catalog_v2/loss_vs_range_b.pdf}}
 \caption{catalog\_v2 at $1000$ steps on the shaped measure: per-process validation loss
-against the range of $\ln|\mathcal M|^2$ in the train pool, under the geometric mean (left)
-and the arithmetic mean (right); the dashed line is the failing threshold. The range
-predicts failure within every multiplicity; the low-range failures on the left that
-disappear on the right are the starved processes.}
+against the range of $\ln|\mathcal M|^2$ in the train pool, under the geometric mean (a) and the
+arithmetic mean (b). The range predicts the loss within every multiplicity; the low-range
+processes with a high loss in (a) that come down in (b) are the starved ones.}
 \label{fig:loss_vs_range}
 \end{figure}
 
@@ -3277,11 +3277,12 @@ at the level of the target's scale, rather than of the aggregation, is the open 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/excess_ratio.pdf}
+\widerow{\pnl{../analysis/catalog_v2/excess_ratio_a.pdf}\hfill\pnl{../analysis/catalog_v2/excess_ratio_b.pdf}} \\[1ex]
+\pnl{../analysis/catalog_v2/excess_ratio_c.pdf}
 \caption{catalog\_v2 at $1000$ steps with the off-shellness input: each process's loss
-divided by the solo loss of its multiplicity at the same compute, against the range of
-$\ln|\mathcal M|^2$ in its train pool, for the three aggregations (reference-weighted arm
-corrected); the dashed line is the reference.}
+divided by the solo loss of its multiplicity at the same compute (dashed), against the range of
+$\ln|\mathcal M|^2$ in its train pool, under the geometric mean (a), the arithmetic mean (b) and
+the reference weighting (c, corrected).}
 \label{fig:excess_ratio}
 \end{figure}
 
@@ -3444,10 +3445,13 @@ property of the factor itself.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_tch22.pdf}
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tch22_a.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tch22_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tch22_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tch22_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tch22_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tch22_f.pdf}}
 \caption{$1000$ steps, $5$k pools, three seeds: the $t$-channel factor on every process and
-on the $2\to2$ processes only (its two seeds that did not diverge), against the $s$-channel
-subtraction alone; per-class ECDF with the seed band.}
+on the $2\to2$ processes only (its two seeds that did not diverge), on top of the massive
+propagators divided out of the target; per-class ECDF of the final per-process validation loss,
+the band the min/max over seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_tch22}
 \end{figure}
 
@@ -3493,11 +3497,14 @@ under the geometric mean to settle first whether the aggregation is the cause.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\linewidth]{../analysis/catalog_v2/joint_vs_solo.pdf}
-\caption{Left: joint loss over the tuned solo loss at equal per-process compute, class
-median over three seeds, against the horizon. Middle and right: each multiplicity trained
-alone at the same per-process compute against the full catalog at $1000$ steps, as the ECDF
-of the ratio per process and per process.}
+\widerow{\pnl{../analysis/catalog_v2/joint_vs_solo_a.pdf}\hfill\pnl{../analysis/catalog_v2/joint_vs_solo_b.pdf}} \\[1ex]
+\pnl{../analysis/catalog_v2/joint_vs_solo_c.pdf}
+\caption{The joint-training gap; every ratio is joint over solo, so above one means the joint
+run is worse. (a) The joint loss over the tuned single-process solo loss of the same
+multiplicity at equal per-process compute, class median over three seeds, against the horizon.
+(b, c) Each process in the full catalog against the same process with only its multiplicity
+trained, at the same per-process compute and $1000$ steps: (b) the ECDF of the ratio, (c) per
+process.}
 \label{fig:joint_vs_solo}
 \end{figure}
 
@@ -3522,46 +3529,56 @@ per-class read-out stays the same with the sign taken out.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_tprop.pdf}
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tprop_a.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tprop_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tprop_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tprop_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_tprop_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tprop_f.pdf}}
 \caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
-per-class ECDF of the final per-process validation loss with and without the target-side
-propagator subtraction; the band is the min/max over seeds.}
+per-class ECDF of the final per-process validation loss with and without the massive propagators
+divided out of the target; the band is the min/max over seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_tprop}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/residual_vs_target_tprop.pdf}
-\caption{Where the error sits with the propagator subtraction on (one seed): share of each
-process's MSE per decile of its own standardized target.}
+\widerow{\pnl{../analysis/catalog_v2/residual_vs_target_tprop_a.pdf}\hfill\pnl{../analysis/catalog_v2/residual_vs_target_tprop_b.pdf}}
+\caption{Where the error sits with the massive propagators divided out of the target (one
+seed): (a) share of the MSE per decile of the process's own standardized target for a few
+processes, (b) the share in the lowest and highest deciles of every process against its pool's
+range.}
 \label{fig:residual_vs_target_tprop}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/seed_arms_slq.pdf}
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_slq_a.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_slq_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_slq_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_slq_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/seed_arms_slq_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_slq_f.pdf}}
 \caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
-per-class ECDF of the final per-process validation loss for the signed-log scale at the
-$10^{-2}$ (current), $10^{-3}$ and $10^{-4}$ quantiles; the band is the min/max over seeds.}
+per-class ECDF of the final per-process validation loss for the signed-log scale $s$ at the
+$10^{-2}$ (current), $10^{-3}$ and $10^{-4}$ quantiles of $|x|$; the band is the min/max over
+seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_slq}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/arms_compare_q.pdf}
-\caption{Quick working point ($500$ steps, $5$k pools, off-shellness on), best DyHPO trial
-of each aggregation: the combined validation curve, every process's curve, the final loss
-against the target's range (dashed: the tuned solo loss of each multiplicity), and the
-final loss by class.}
+\widerow{\pnl{../analysis/catalog_v2/arms_compare_q_curves_a.pdf}\hfill\pnl{../analysis/catalog_v2/arms_compare_q_ecdf_a.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/arms_compare_q_curves_b.pdf}\hfill\pnl{../analysis/catalog_v2/arms_compare_q_ecdf_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/arms_compare_q_curves_c.pdf}\hfill\pnl{../analysis/catalog_v2/arms_compare_q_ecdf_c.pdf}}
+\caption{Quick working point ($500$ steps, $5$k pools, off-shellness on), best DyHPO trial of
+each aggregation, one row per arm (geometric mean, arithmetic mean, reference weighting): every
+process's validation curve coloured by multiplicity, and the final per-process loss by class
+(ECDF).}
 \label{fig:arms_compare_q}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../analysis/catalog_v2/residual_vs_target.pdf}
-\caption{Share of each process's MSE per decile of its own standardized log target
-(arithmetic mean at its best HPs, $500$ steps); left a few processes, right the lowest and
-highest deciles of every process against the pool's range. Flat is $0.1$.}
+\widerow{\pnl{../analysis/catalog_v2/residual_vs_target_a.pdf}\hfill\pnl{../analysis/catalog_v2/residual_vs_target_b.pdf}}
+\caption{Where the error sits (arithmetic mean at its best HPs, $500$ steps): (a) share of
+each process's MSE per decile of its own standardized log target for a few processes, (b) the
+share in the lowest and highest deciles of every process against its pool's range; an equal
+share is $0.1$.}
 \label{fig:residual_vs_target}
 \end{figure}
 
