@@ -2081,7 +2081,7 @@ class AmplitudeExperiment(BaseExperiment):
                     if signs is not None:
                         proc_sign.setdefault(name, {})[split] = signs[m]
         else:
-            if getattr(self, "_sign_head", False):
+            if getattr(self, "_sign_head", False) and self.proc_val_loaders:
                 raise NotImplementedError("the per-process evaluation loop does not carry the sign head")
             if getattr(self, "all_amp_factor", None) is not None:
                 LOGGER.warning("target_propagators is on but the per-process evaluation loop carries "
@@ -2099,12 +2099,24 @@ class AmplitudeExperiment(BaseExperiment):
         def concat_split(split):
             available = [n for n in proc_preds if split in proc_preds[n]]
             if not available:
-                # single-dataset fallback: collect directly
+                # single-dataset fallback: collect directly. The loaders iterate their index
+                # set in order, so the per-event target factor aligns as in the combined pass,
+                # and the raw-space arrays divide it out and apply the sign head's signs.
                 loader = {"train": self.train_eval_loader,
                           "val":   self.val_loader,
                           "test":  self.test_loader}[split]
-                pred, truth, sigmas = collect(loader)
-                return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0], None
+                pred, truth, sigmas, _, signs = collect(loader, return_process_ids=True)
+                name = self.cfg.data.dataset[0]
+                factors = getattr(self, "all_amp_factor", None)
+                if factors is not None:
+                    F = factors[self._split_indices[split]]
+                    assert F.shape[0] == pred.shape[0], (F.shape, pred.shape)
+                    proc_factor.setdefault(name, {})[split] = F.reshape(-1, 1)
+                if signs is not None:
+                    proc_sign.setdefault(name, {})[split] = signs
+                raw = ((_raw(name, split, truth, "truth"), _raw(name, split, pred, "pred"))
+                       if factors is not None or signs is not None else None)
+                return pred, truth, sigmas, self.prepd_mean[0], self.prepd_std[0], raw
             pred   = np.concatenate([proc_preds[n][split][0] for n in available], axis=0)
             truth  = np.concatenate([proc_preds[n][split][1] for n in available], axis=0)
             first_sig = proc_preds[available[0]][split][2]
