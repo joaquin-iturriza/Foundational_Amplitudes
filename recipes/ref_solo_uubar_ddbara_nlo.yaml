@@ -1,0 +1,5 @@
+# Solo reference (signed one-loop): the process trained alone at the joint run's per-process batch (bs/P),
+# so its best loss per horizon is the class reference for the joint-vs-solo scaling curves.
+sampling: {mode: mixture}
+processes:
+  - {name: uubar_ddbara_nlo,      sqrts: [  25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

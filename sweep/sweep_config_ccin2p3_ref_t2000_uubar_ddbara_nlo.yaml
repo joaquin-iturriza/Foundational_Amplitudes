@@ -1,0 +1,82 @@
+# Solo reference at 2000 steps with the target changes (propagator subtraction, t-channel on 2->2): uubar_ddbara_nlo alone at bs 34.
+# at the joint run's per-process batch (bs/P = 16384/478 = 34 events per step), 2000 steps, the 5k
+# pool, off-shellness on. The reference is the BEST trial's val_loss_no_reg: a reference has to
+# be the loss the process reaches alone when its own HPs are tuned, not at an lr borrowed from
+# bs 16384. lr window two decades wide, since no measured lr optimum exists at this batch size.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 16G
+  cpus_per_task: 4
+  time: "00:30:00"
+paths:
+sweep_name: ref_t2000_uubar_ddbara_nlo
+n_trials: 6
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps: [2000]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/ref_solo_uubar_ddbara_nlo.yaml
+  data.require_cache: 'true'
+  data.train_subsample: 5000
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'true'
+  data.target_propagator_tchannel: 'true'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 34
+  evaluation.batchsize: 4096
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'true'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.1'
+  training.dtype: float32
+  ema: 'false'
+  plot: 'true'
+  use_mlflow: 'false'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 3.0e-04
+  high: 3.0e-02
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2

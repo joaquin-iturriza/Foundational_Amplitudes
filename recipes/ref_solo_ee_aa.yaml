@@ -1,0 +1,5 @@
+# Solo reference (tree 2->2): the process trained alone at the joint run's per-process batch (bs/P),
+# so its best loss per horizon is the class reference for the joint-vs-solo scaling curves.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_aa,                 sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
