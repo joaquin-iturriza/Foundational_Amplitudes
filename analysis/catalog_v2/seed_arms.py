@@ -1,14 +1,17 @@
 """Arms with repeats: each arm is a glob of run dirs (one per seed). Per arm, the combined
 validation loss (mean and spread over seeds), and per class the median and 90th percentile
 of the per-process final loss with its spread over seeds; figure: per-class ECDF per arm
-with the seed band, and the per-process loss of each arm against the baseline (seed-mean).
-    python analysis/catalog_v2/seed_arms.py "baseline=runs/t1000_slq1e-2_s*" "slq 1e-3=runs/t1000_slq1e-3_s*" ... [--out=name] [--title=...]
-The first arm is the baseline. Writes analysis/catalog_v2/<out>.{png,pdf} (default seed_arms)."""
+with the seed band.
+    python analysis/catalog_v2/seed_arms.py "baseline=runs/t1000_slq1e-2_s*" "slq 1e-3=runs/t1000_slq1e-3_s*" ... [--out=name]
+The first arm is the baseline. Writes analysis/catalog_v2/<out>_a ... _f (png+pdf, default
+seed_arms), one panel per class in the order of CLASSES, the class as the legend title."""
 import glob, json, os, sys
 import numpy as np
-import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import census as C
+import plot_style as ps
 opts = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--"))
 arms = [(a.split("=", 1)[0], a.split("=", 1)[1]) for a in sys.argv[1:] if not a.startswith("--")]
 NP = json.load(open(os.path.join(HERE, "n_particles.json"))); s27, all50 = C.signed_classes()
@@ -28,6 +31,7 @@ def load(pattern):
     return out
 data = {label: load(pat) for label, pat in arms}
 names = sorted(set.intersection(*[set(p.keys()) for runs in data.values() for _, p in runs]))
+nseeds = max(len(r) for r in data.values())
 print(f"{len(names)} processes; arms: " + ", ".join(f"{l} ({len(r)} seeds)" for l, r in data.items()))
 print(f"{'arm':22s} combined (mean ± spread over seeds)")
 for l, runs in data.items():
@@ -41,18 +45,25 @@ for c in CLASSES:
         p90 = [np.percentile([p[n] for n in names if cls(n) == c], 90) for _, p in runs]
         cells.append(f"{np.mean(meds):.3g} (±{np.std(meds, ddof=1) if len(meds) > 1 else 0:.2g}) / {np.mean(p90):.3g}")
     print(f"{c:16s} " + " | ".join(f"{x:>26s}" for x in cells))
-# figure
-fig, axes = plt.subplots(2, 3, figsize=(15, 8.5)); axes = axes.ravel()
-for k, c in enumerate(CLASSES):
-    ax = axes[k]
-    for l, runs in data.items():
-        grid = np.logspace(-4, 1, 200); ecdfs = []
+# figure: one panel per class
+figs = ps.panels(len(CLASSES))
+cols = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple]
+grid = np.logspace(-4, 1, 200)
+for (fig, ax), c in zip(figs, CLASSES):
+    lo_all, hi_all = [], []
+    for (l, runs), col in zip(data.items(), cols):
+        ecdfs = []
         for _, p in runs:
             v = np.sort([p[n] for n in names if cls(n) == c]); ecdfs.append(np.searchsorted(v, grid, side="right") / len(v))
-        ecdfs = np.array(ecdfs); line, = ax.plot(grid, ecdfs.mean(0), label=l)
-        if len(runs) > 1: ax.fill_between(grid, ecdfs.min(0), ecdfs.max(0), color=line.get_color(), alpha=0.2)
-    ax.set_xscale("log"); ax.set_title(f"{c} ({sum(cls(n) == c for n in names)})", fontsize=10); ax.grid(alpha=0.3)
-    ax.set_xlim(1e-4, 1e1); ax.set_xlabel("final validation loss (per process)")
-axes[0].legend(fontsize=8); axes[0].set_ylabel("fraction of processes"); axes[3].set_ylabel("fraction of processes")
-fig.suptitle(opts.get("title", "arms with repeats: per-class ECDF, band = min/max over seeds"), fontsize=12); fig.tight_layout()
-base = os.path.join(HERE, opts.get("out", "seed_arms")); fig.savefig(base + ".png", dpi=130); fig.savefig(base + ".pdf"); print("wrote", base + ".{png,pdf}")
+            lo_all.append(v[0]); hi_all.append(v[-1])
+        ecdfs = np.array(ecdfs); ax.plot(grid, ecdfs.mean(0), color=col, label=l)
+        if len(runs) > 1: ax.fill_between(grid, ecdfs.min(0), ecdfs.max(0), color=col, alpha=0.2)
+    handles = ax.get_legend_handles_labels()[0]
+    if nseeds > 1:
+        handles.append(Patch(color=ps.C.grey, alpha=0.2, label=f"min to max over {nseeds} seeds"))
+    ax.set_xscale("log"); ax.set_xlim(min(lo_all) / 2, max(hi_all) * 2)
+    ax.set_xlabel(r"final validation MSE($\log|\mathcal{M}|^2$) per process")
+    ax.set_ylabel("fraction of processes")
+    ps.legend(ax, "upper left", handles=handles,
+              title=f"{C.CLASS_LABEL[c]} ({sum(cls(n) == c for n in names)} processes)")
+ps.save_panels(figs, f"analysis/catalog_v2/{opts.get('out', 'seed_arms')}")

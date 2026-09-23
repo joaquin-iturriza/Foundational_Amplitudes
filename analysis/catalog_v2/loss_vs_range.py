@@ -1,31 +1,33 @@
-"""Per-process validation loss against the pool's log|M|^2 range, two runs side by side.
+"""Per-process validation loss against the pool's ln|M|^2 range, one panel per run.
     python analysis/catalog_v2/loss_vs_range.py runs/<run A> runs/<run B> [--labels=A,B] [--out=name]
-Writes analysis/catalog_v2/loss_vs_range.{png,pdf}."""
+Writes analysis/catalog_v2/<out>_a, _b, ... (png+pdf), one panel per run, the run's label as the
+legend title. No pass/fail line: the loss is read against the range, not against a threshold."""
 import csv, json, os, re, sys
 import numpy as np
-import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import census as C
+import plot_style as ps
 args = [a for a in sys.argv[1:] if not a.startswith("--")]
 opts = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--"))
 labels = opts.get("labels", "geometric mean,arithmetic mean").split(",")
 outname = opts.get("out", "loss_vs_range")
-G = C.read_run(args[0])[1][-1][1]; M = C.read_run(args[1])[1][-1][1]
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 aud = {re.sub(r"_\d+-\d+GeV_train(_smix)?$", "", r["name"]): r
        for r in csv.DictReader(open(os.path.join(HERE, "pool_audit.csv"))) if r["role"] == "train"}
-names = [n for n in G if n in aud and n in NP]
-sp = np.array([float(aud[n]["logspread"]) for n in names]); g = np.array([G[n] for n in names]); m = np.array([M[n] for n in names])
-npart = np.array([NP[n] for n in names])
-fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
-for ax, y, title in ((axes[0], g, labels[0]), (axes[1], m, labels[1])):
-    for k, mk in ((4, "o"), (5, "s"), (6, "^")):
+MULT = ((4, "o", ps.C.blue), (5, "s", ps.C.vermillion), (6, "^", ps.C.green))
+figs = ps.panels(len(args))
+for (fig, ax), path, label in zip(figs, args, labels):
+    d = C.read_run(path)[1][-1][1]
+    names = [n for n in d if n in aud and n in NP]
+    sp = np.array([float(aud[n]["logspread"]) for n in names]); y = np.array([d[n] for n in names])
+    npart = np.array([NP[n] for n in names])
+    for k, mk, col in MULT:
         sel = npart == k
-        ax.scatter(sp[sel], y[sel], s=14, marker=mk, alpha=0.7, label=f"2$\\to${k-2}")
-    ax.axhline(0.05, color="k", lw=0.8, ls="--"); ax.set_yscale("log"); ax.set_xlabel("range of ln|M|^2 in the train pool")
-    ax.set_title(f"{title}: {int((y > 0.05).sum())}/{len(y)} above 0.05"); ax.grid(alpha=0.3)
-axes[0].set_ylabel("validation MSE (standardized target)"); axes[0].legend(title="multiplicity", fontsize=8)
-fig.suptitle("catalog_v2, 1000 steps, shaped measure: loss against the target's dynamic range")
-fig.tight_layout()
-base = os.path.join(HERE, outname); fig.savefig(base + ".png", dpi=150); fig.savefig(base + ".pdf")
-print("wrote", base + ".{png,pdf}")
+        ax.scatter(sp[sel], y[sel], marker=mk, color=col, alpha=0.7, label=rf"$2\to{k-2}$")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"range of $\ln|\mathcal{M}|^2$ in the train pool")
+    ax.set_ylabel(r"validation MSE($\log|\mathcal{M}|^2$)")
+    ps.legend(ax, "upper left", title=label)
+    print(f"{label}: median {np.median(y):.3g}, 90% {np.percentile(y, 90):.3g}")
+ps.save_panels(figs, f"analysis/catalog_v2/{outname}")

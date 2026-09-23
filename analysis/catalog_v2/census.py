@@ -20,6 +20,12 @@ TWINS = ["uu_uu", "ud_ud", "us_us", "dd_dd_nlo", "ds_ds_nlo", "cs_cs_nlo", "uu_u
          "ud_ud_nlo", "us_us_nlo"]
 
 
+#: Figure labels for the per-class keys the plotting scripts use (mathtext arrows, no "->").
+CLASS_LABEL = {"tree 2->2": r"tree $2\to2$", "resonant 2->2": r"resonant $2\to2$",
+               "tree 2->3": r"tree $2\to3$", "tree 2->4": r"tree $2\to4$",
+               "positive 1-loop": "positive one-loop", "signed 1-loop": "signed one-loop"}
+
+
 def signed_classes():
     rows = list(csv.DictReader(open(os.path.join(HERE, "signed_pools.csv"))))
     name = lambda r: re.sub(r"_\d+-\d+GeV_train$", "", r["name"])

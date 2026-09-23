@@ -34,8 +34,9 @@ def audit(npy, role):
                 tail3=float(np.mean(np.abs(z) > 3)), zmax=float(np.abs(z).max()),
                 neg=int(np.sum(amp < 0)), zero=int(np.sum(amp == 0)))
 
+PLOT_ONLY = "--plot-only" in sys.argv     # redraw the figure from pool_audit.csv, no pool scan
 rows = []
-for role, d in (("train", datagen.train_cache_dir()), ("val", datagen.frozen_dir())):
+for role, d in (() if PLOT_ONLY else (("train", datagen.train_cache_dir()), ("val", datagen.frozen_dir()))):
     files = sorted(glob.glob(os.path.join(d, "*_amplitudes.npy")))
     files = [f for f in files if (role == "train") or ("val" in os.path.basename(f) or "_val_" in os.path.basename(f) or True)]
     for f in files:
@@ -44,9 +45,14 @@ for role, d in (("train", datagen.train_cache_dir()), ("val", datagen.frozen_dir
         except Exception as e:
             print("ERR", f, e)
 import csv
-keys = list(rows[0].keys())
-with open(os.path.join(OUT, "pool_audit.csv"), "w", newline="") as fh:
-    w = csv.DictWriter(fh, fieldnames=keys); w.writeheader(); w.writerows(rows)
+if PLOT_ONLY:
+    num = lambda v: float(v) if v not in ("", "nan") else np.nan
+    rows = [{k: (v if k in ("name", "role", "mode") else num(v)) for k, v in r.items()}
+            for r in csv.DictReader(open(os.path.join(OUT, "pool_audit.csv")))]
+else:
+    keys = list(rows[0].keys())
+    with open(os.path.join(OUT, "pool_audit.csv"), "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=keys); w.writeheader(); w.writerows(rows)
 tr = [r for r in rows if r["role"] == "train"]
 print(f"pools: {len(rows)} ({len(tr)} train)")
 print("train sampling modes:", {m: sum(1 for r in tr if r['mode'] == m) for m in set(r['mode'] for r in tr)})
@@ -62,10 +68,13 @@ print(f"standardized-log tail >3 sigma: median {np.median([r['tail3'] for r in t
 print("window coverage gaps (sampled sqrt(s) range narrower than the window by >5%):",
       [(r['name'], round(r['sq_lo']), round(r['sq_hi'])) for r in tr if (r['sq_lo'] - r['win_lo']) > 0.05 * (r['win_hi'] - r['win_lo']) or (r['win_hi'] - r['sq_hi']) > 0.05 * (r['win_hi'] - r['win_lo'])][:10])
 print("negative amplitudes (pools, events):", sum(1 for r in tr if r['neg']), sum(r['neg'] for r in tr))
-import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
-fig, ax = plt.subplots(1, 3, figsize=(13, 3.6))
-ax[0].hist([r["z_cover"] for r in zc], bins=30); ax[0].set_xlabel("share of events within 10 GeV of $M_Z$"); ax[0].set_title(f"{len(zc)} train pools with $M_Z$ in window")
-ax[1].hist(np.log10([r["flatness"] for r in tr]), bins=30); ax[1].set_xlabel("log10 flatness of log|M|$^2$ (max/min bin)"); ax[1].set_title("train pools")
-ax[2].hist([r["zmax"] for r in tr], bins=30); ax[2].set_xlabel("max |z| of standardized log|M|$^2$"); ax[2].set_title("needle measure")
-fig.tight_layout(); base = os.path.join(OUT, "pool_audit"); fig.savefig(base + ".png", dpi=130); fig.savefig(base + ".pdf")
-print("figures:", base + ".png/.pdf")
+sys.path.insert(0, os.path.dirname(os.path.dirname(OUT)))
+import plot_style as ps
+(fa, axa), (fb, axb), (fc, axc) = ps.panels(3)
+axa.hist([r["z_cover"] for r in zc], bins=30, color=ps.C.blue)
+axa.set_xlabel(r"share of events within 10 GeV of $M_Z$"); axa.set_ylabel(r"train pools with $M_Z$ in the window")
+axb.hist(np.log10([r["flatness"] for r in tr]), bins=30, color=ps.C.blue)
+axb.set_xlabel(r"$\log_{10}$ (max / min bin of the $\log|\mathcal{M}|^2$ histogram)"); axb.set_ylabel("train pools")
+axc.hist([r["zmax"] for r in tr], bins=30, color=ps.C.blue)
+axc.set_xlabel(r"largest $|z|$ of the standardized $\log|\mathcal{M}|^2$"); axc.set_ylabel("train pools")
+ps.save_panels([fa, fb, fc], "analysis/catalog_v2/pool_audit")
