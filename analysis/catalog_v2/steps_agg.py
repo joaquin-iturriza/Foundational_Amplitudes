@@ -104,7 +104,7 @@ for key, _, label in ARMS:
     for r in [r for r in runs if r["arm"] == key and r["steps"] == T]:
         x = r["every"] * np.arange(1, len(r["combined"]) + 1)
         if r.get("best_not_last"):
-            ax.plot(x, r["combined"], color=COL[key], ls="--", label="rose after its best checkpoint")
+            ax.plot(x, r["combined"], color=COL[key], ls="--", label="rose after its best")
         else:
             ax.plot(x, r["combined"], color=COL[key], label=label if first else None); first = False
 ax.set_yscale("log"); ax.set_xlabel("training step")

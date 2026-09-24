@@ -124,7 +124,7 @@ for (fig, ax), (c, procs) in zip(figs, REFS.items()):
             ax.plot(g, f["A"] * g ** -f["alpha"] + f["Linf"], color=ps.C.grey, ls=":")
     ax.plot([], [], color="black", ls="--", label=r"fits $A\,C^{-\alpha}+L_\infty$")
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"per-process training compute $C_p$ [FLOP]"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
+    ax.set_xlabel(r"per-process compute $C_p$ [FLOP]"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
     ps.legend(ax, "upper right")
 ps.save_panels(figs, "analysis/catalog_v2/steps_tuned")
