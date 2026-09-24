@@ -7,8 +7,8 @@ Solo: two reference processes per class trained alone on the FULL pools, DyHPO p
     python analysis/catalog_v2/steps_tuned.py --collect > analysis/catalog_v2/steps_tuned.json   (where the runs are)
     python analysis/catalog_v2/steps_tuned.py                                                    (plots from the json)
 Writes steps_tuned_a ... _f (class median against steps: both joint arms with the seed band, the two
-solo processes), steps_tuned_alpha and steps_tuned_start (power-law fit per class: exponent and the
-fitted loss at 1000 steps, joint arms per seed, solo per process)."""
+solo processes), steps_tuned_alpha and steps_tuned_start (power-law fit per class over 1000-8000 steps:
+exponent and the fitted loss at 1000 steps, joint arms per seed, solo per process). Diverged runs are left out."""
 import glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -47,20 +47,32 @@ import plot_style as ps
 import census as C
 D = json.load(open(JSON))
 cls = json.load(open(os.path.join(HERE, "steps_agg.json")))["cls"].get
+# a run whose median per-process loss ends above 0.5 diverged (at 500 steps the DyHPO-best lr,
+# 2.3e-2, sits on the edge of stability: four of its five reseeds blow up); it is left out of the
+# curves, and the power laws are fitted over FIT_STEPS, where every run is sound
+DIV = [r for r in D["joint"] if np.median(list(r["final"].values())) > 0.5]
+D["joint"] = [r for r in D["joint"] if r not in DIV]
+print("diverged, left out: " + ", ".join(f"{r['arm']} t{r['steps']} s{r['seed']}" for r in DIV))
+FIT_STEPS = [1000, 2000, 4000, 8000]
+from solo_datalimit_labels import LABEL
 ARMS = [("arith", ps.C.blue, "joint, arithmetic mean"), ("geo", ps.C.vermillion, "joint, geometric mean")]
 x = np.log(np.array(STEPS) / 1000.0)
 
 def fit(t, y):
     a, b = np.polyfit(np.log(np.array(t) / 1000.0), np.log(y), 1); return -a, np.exp(b)
 
-def joint_curve(arm, c):
-    """{seed: [class median per horizon]} for seeds present at every horizon."""
+def joint_by_seed(arm, c):
+    """{seed: {steps: class median}} over the runs that did not diverge."""
     by = {}
     for r in D["joint"]:
         if r["arm"] == arm:
             v = [x for n, x in r["final"].items() if cls(n) == c]
             if v: by.setdefault(r["seed"], {})[r["steps"]] = np.median(v)
-    return {s: [d[N] for N in STEPS] for s, d in by.items() if all(N in d for N in STEPS)}
+    return by
+
+def joint_curve(arm, c, steps=FIT_STEPS):
+    """{seed: [class median per horizon]} for the seeds present at every horizon of `steps`."""
+    return {s: [d[N] for N in steps] for s, d in joint_by_seed(arm, c).items() if all(N in d for N in steps)}
 
 def solo_curve(p):
     t = [N for N in STEPS if f"{p}|{N}" in D["solo"]]
@@ -70,14 +82,16 @@ def solo_curve(p):
 figs = ps.panels(len(REFS))
 for (fig, ax), (c, procs) in zip(figs, REFS.items()):
     for arm, col, lab in ARMS:
-        cur = joint_curve(arm, c)
-        if not cur: continue
-        a = np.array(list(cur.values()))
-        ax.plot(STEPS, np.exp(np.log(a).mean(0)), marker="o", color=col, label=f"{lab} ({len(cur)} seeds)")
-        ax.fill_between(STEPS, a.min(0), a.max(0), color=col, alpha=0.2)
+        by = joint_by_seed(arm, c)
+        t = [N for N in STEPS if any(N in d for d in by.values())]
+        v = [[d[N] for d in by.values() if N in d] for N in t]
+        n = min(len(x) for x in v)
+        ax.plot(t, [np.exp(np.mean(np.log(x))) for x in v], marker="o", color=col,
+                label=f"{lab} ({n}-{max(len(x) for x in v)} seeds)")
+        ax.fill_between(t, [min(x) for x in v], [max(x) for x in v], color=col, alpha=0.2)
     for p, mk in zip(procs, ("s", "D")):
         t, y = solo_curve(p)
-        ax.plot(t, y, marker=mk, color=ps.C.grey, ls="--", label=f"{p.replace('_', ' ')} alone, full pool")
+        ax.plot(t, y, marker=mk, color=ps.C.grey, ls="--", label=f"{LABEL[p]} alone, full pool")
     ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xticks(STEPS, [str(n) for n in STEPS]); ax.minorticks_off()
     ax.set_xlabel("training steps"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
@@ -86,15 +100,16 @@ ps.save_panels(figs, "analysis/catalog_v2/steps_tuned")
 
 # power-law fits: joint per seed (median over seeds, bar = min to max), solo per process
 FIT = {}
+print(f"fits over {FIT_STEPS}")
 print(f"{'class':16s} " + " | ".join(f"{k:>22s}" for k in ("joint arith", "joint geo", "solo (2 processes)")) + "   (alpha, L at 1000)")
 for c, procs in REFS.items():
     cells = []
     for arm, _, _ in ARMS:
         cur = joint_curve(arm, c)
-        FIT[arm, c] = np.array([fit(STEPS, y) for y in cur.values()]) if cur else np.zeros((0, 2))
+        FIT[arm, c] = np.array([fit(FIT_STEPS, y) for y in cur.values()]) if cur else np.zeros((0, 2))
         f = FIT[arm, c]
         cells.append(f"{f[:,0].mean():.2f}±{np.ptp(f[:,0])/2:.2f} {np.exp(np.log(f[:,1]).mean()):.2g}" if len(f) else "")
-    FIT["solo", c] = np.array([fit(*solo_curve(p)) for p in procs])
+    FIT["solo", c] = np.array([fit(FIT_STEPS, [D["solo"][f"{p}|{N}"] for N in FIT_STEPS]) for p in procs])
     f = FIT["solo", c]
     cells.append(" ".join(f"{a:.2f}/{b:.2g}" for a, b in f))
     print(f"{c:16s} " + " | ".join(f"{s:>22s}" for s in cells))
