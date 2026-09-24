@@ -1,11 +1,13 @@
 """The steps curve with every point tuned at its own horizon (docs/results.tex, steps curve).
-Joint: the arithmetic-mean DyHPO best per horizon (sweeps/catalog_steps_t<N>_mean, its best trial
-is seed 42) plus runs/steps_tuned_t<N>_s{1,2} at the same HPs, and the geometric mean at those HPs
-(runs/steps_tunedgeo_t<N>_s{1,2,42}); 5k pools, both propagator factors, sign head.
+Joint: the FULL pools, at the arithmetic-mean DyHPO best per horizon of the 5k-pool sweeps
+(sweeps/catalog_steps_t<N>_mean), seeds 1, 2, 42, under the arithmetic mean (runs/steps_full_t<N>_s*)
+and the geometric mean (runs/steps_fullgeo_t<N>_s*); both propagator factors, sign head. (The 5k-pool
+joint runs, steps_tuned*, are superseded: the joint and solo curves must see the same pools.)
 Solo: two reference processes per class trained alone on the FULL pools at bs 1024, DyHPO per step
-count (sweeps/solob1k_t<S>_<process>, S = 33 ... 1072). The axis is events seen per process: 16384/478
-per step for the joint run, 1024 per step alone. (The bs-34 references, solofull_t* and the 5k-pool
-solo_t*, are superseded: 34-event gradients made them noise.)
+count (sweeps/solob1k_t<S>_<process>, S = 33 ... 1072). The axis is training compute,
+C = flops_per_step(8 heads, mean particles per event, batch) x steps (sweep/analyze_pretraining_scaling):
+the joint run at bs 16384 over the catalog's mean multiplicity, a solo run at bs 1024 over its own. (The
+bs-34 references, solofull_t* and the 5k-pool solo_t*, are superseded: 34-event gradients made them noise.)
     python analysis/catalog_v2/steps_tuned.py --collect > analysis/catalog_v2/steps_tuned.json   (where the runs are)
     python analysis/catalog_v2/steps_tuned.py                                                    (plots from the json)
 Every curve is fitted with the floor-aware law L = A C^-alpha + L_inf (CLAUDE.md, Scaling fits; the
@@ -13,15 +15,16 @@ profiled fit of sweep/analyze_pretraining_scaling.py): the joint arms on all the
 pooled over 1000-8000 steps (500 is on the edge of stability; plotted, not fitted), the uncertainty the
 spread of leave-one-seed-out refits; each solo process on its six points. Both sides are the LAST
 validation of the chosen run: the joint seeds, and the solo DyHPO best trial per step count.
-Writes steps_tuned_a ... _f (class median against events per process, fits dashed), steps_tuned_alpha
-and steps_tuned_floor (the fitted alpha and L_inf per class). Diverged runs are left out."""
+Writes steps_tuned_a ... _f (class median against compute, fits dashed) and steps_tuned_alpha (the fitted
+alpha per class); the floors are printed, "unconstrained" where the fit puts them at 0. Diverged runs are
+left out."""
 import glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE); sys.path.insert(0, ROOT)
 STEPS = [500, 1000, 2000, 4000, 8000]
 SOLO_STEPS = [33, 67, 134, 268, 536, 1072]
-EV_JOINT, EV_SOLO = 16384 / 478, 1024        # events per process per step
+BS_JOINT, BS_SOLO, HEADS = 16384, 1024, 8
 REFS = {"tree 2->2": ["ee_aa", "uubar_uubar"], "resonant 2->2": ["ee_uu", "ee_ddbar"],
         "tree 2->3": ["ee_uug", "udbar_WpZZ"], "tree 2->4": ["ee_uugg", "udbar_WpZaa"],
         "positive 1-loop": ["uubar_ZaZ_nlo", "ee_bb_nlo"], "signed 1-loop": ["udbar_Wgg_nlo", "uubar_ddbara_nlo"]}
@@ -36,11 +39,8 @@ def final(run_dir):
 if "--collect" in sys.argv:
     out = {"joint": [], "solo": {}}
     for N in STEPS:
-        s = open(os.path.join(ROOT, "sweeps", f"catalog_steps_t{N}_mean", "summary.txt")).read()
-        best = re.search(r"^\s+(hp_\d+)\s+val_loss", s, re.M).group(1).replace("hp_", "trial_")
-        runs = [("arith", 42, os.path.join(ROOT, "runs", f"catalog_steps_t{N}_mean", best))]
-        runs += [("arith", S, r) for S in (1, 2) for r in glob.glob(os.path.join(ROOT, "runs", f"steps_tuned_t{N}_s{S}"))]
-        runs += [("geo", S, r) for S in (1, 2, 42) for r in glob.glob(os.path.join(ROOT, "runs", f"steps_tunedgeo_t{N}_s{S}"))]
+        runs = [("arith", S, r) for S in (1, 2, 42) for r in glob.glob(os.path.join(ROOT, "runs", f"steps_full_t{N}_s{S}"))]
+        runs += [("geo", S, r) for S in (1, 2, 42) for r in glob.glob(os.path.join(ROOT, "runs", f"steps_fullgeo_t{N}_s{S}"))]
         for arm, S, r in runs:
             f = final(r)
             if f: out["joint"].append({"arm": arm, "steps": N, "seed": S, "final": f})
@@ -71,7 +71,12 @@ FIT_STEPS = [1000, 2000, 4000, 8000]
 from solo_datalimit_labels import LABEL
 ARMS = [("arith", ps.C.blue, "joint, arithmetic mean"), ("geo", ps.C.vermillion, "joint, geometric mean")]
 sys.path.insert(0, os.path.join(ROOT, "sweep"))
-from analyze_pretraining_scaling import fit_power_law_with_floor
+from analyze_pretraining_scaling import fit_power_law_with_floor, flops_per_step
+NP = json.load(open(os.path.join(HERE, "n_particles.json")))
+_JN = sorted({n for r in D["joint"] for n in r["final"]})
+N_JOINT = float(np.mean([NP[n] for n in _JN if n in NP]))   # mean multiplicity over the trained catalog (uniform sampler)
+C_JOINT = lambda steps: flops_per_step(HEADS, N_JOINT, BS_JOINT) * steps
+C_SOLO = lambda p, steps: flops_per_step(HEADS, NP[p], BS_SOLO) * steps
 
 def fitf(c, l):
     r = fit_power_law_with_floor(c, l)
@@ -84,12 +89,12 @@ def joint_points(arm, c, steps=None):
     for r in D["joint"]:
         if r["arm"] == arm and (steps is None or r["steps"] in steps):
             v = [x for n, x in r["final"].items() if cls(n) == c]
-            if v: pts.append((r["seed"], r["steps"] * EV_JOINT, float(np.median(v))))
+            if v: pts.append((r["seed"], C_JOINT(r["steps"]), float(np.median(v))))
     return pts
 
 def solo_points(p):
     t = [S for S in SOLO_STEPS if f"{p}|{S}" in D["solo"]]
-    return [S * EV_SOLO for S in t], [D["solo"][f"{p}|{S}"] for S in t]
+    return [C_SOLO(p, S) for S in t], [D["solo"][f"{p}|{S}"] for S in t]
 
 FIT = {}
 for c, procs in REFS.items():
@@ -105,7 +110,7 @@ for c, procs in REFS.items():
     for p in procs:
         FIT["solo", p] = fitf(*solo_points(p))
 
-cgrid = np.geomspace(1e4, 2e6, 200)
+cgrid = np.geomspace(min(C_SOLO(p, SOLO_STEPS[0]) for ps_ in REFS.values() for p in ps_) / 2, C_JOINT(STEPS[-1]) * 2, 300)
 figs = ps.panels(len(REFS))
 for (fig, ax), (c, procs) in zip(figs, REFS.items()):
     for arm, col, lab in ARMS:
@@ -125,23 +130,23 @@ for (fig, ax), (c, procs) in zip(figs, REFS.items()):
     ax.plot([], [], color="black", ls="--", label=r"fit $A\,C^{-\alpha}+L_\infty$, joint")
     ax.plot([], [], color=ps.C.grey, ls=":", label=r"fit $A\,C^{-\alpha}+L_\infty$, alone")
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("events seen per process"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
+    ax.set_xlabel(r"training compute $C$ [FLOP]"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
     ps.shared_legend(fig, ax, ncol=1)
 ps.save_panels(figs, "analysis/catalog_v2/steps_tuned")
 
+lfmt = lambda v: "unconstr." if v <= 0 else f"{v:.2g}"
 print(f"{'class':16s} " + " | ".join(f"{k:>30s}" for k in ("joint arith  a [loo] Linf chi2r", "joint geo", "alone (2 processes) a Linf")))
 for c, procs in REFS.items():
     cells = []
     for arm, _, _ in ARMS:
         f = FIT[arm, c]
-        cells.append(f"{f['alpha']:.2f} [{f['alpha_rng'][0]:.2f},{f['alpha_rng'][1]:.2f}] {f['Linf']:.2g} {f['chi2r']:.1f}" if f else "no fit")
-    cells.append("  ".join(f"{FIT['solo', p]['alpha']:.2f}/{FIT['solo', p]['Linf']:.2g}" if FIT["solo", p] else "no fit" for p in procs))
+        cells.append(f"{f['alpha']:.2f} [{f['alpha_rng'][0]:.2f},{f['alpha_rng'][1]:.2f}] {lfmt(f['Linf'])} {f['chi2r']:.1f}" if f else "no fit")
+    cells.append("  ".join(f"{FIT['solo', p]['alpha']:.2f}/{lfmt(FIT['solo', p]['Linf'])}" if FIT["solo", p] else "no fit" for p in procs))
     print(f"{c:16s} " + " | ".join(f"{x:>30s}" for x in cells))
 
 yy = np.arange(len(REFS))[::-1]
-for base, key, xlab, logx in (("steps_tuned_alpha", "alpha", r"exponent $\alpha$ in $A\,C^{-\alpha}+L_\infty$", False),
-                               ("steps_tuned_floor", "Linf", r"floor $L_\infty$, MSE($\log|\mathcal{M}|^2$)", True)):
+for base, key, xlab, logx in (("steps_tuned_alpha", "alpha", r"exponent $\alpha$ in $A\,C^{-\alpha}+L_\infty$", False),):
     fig, ax = ps.figure()
     for k, (arm, col, lab) in enumerate(ARMS):
         m, lo, hi, y = [], [], [], []
