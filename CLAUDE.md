@@ -441,6 +441,13 @@ laws); the settled rules that govern how sweeps are set up:
    Job arrays stay right for **non-HP** ablations (loss type, data tag, warm-start
    checkpoint, ablation flags, seeds). Enforced by `hpo_guard.sh`.
 
+### Scaling fits
+
+**Every scaling fit uses the floor-aware law `L(C) = A·C^(−α) + L_∞`** (`docs/results.tex`
+`eq:scaling`), for learning curves in steps as much as in compute: an exponent quoted from
+the bare power law `L ∝ C^(−α)` is wrong whenever the curve plateaus, and most of ours do.
+The bare law is a diagnostic only, far above the floor, and says so where it is used.
+
 ---
 
 ## A/B testing a new feature (how I want comparisons run)
