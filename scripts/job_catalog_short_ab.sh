@@ -3,7 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=01:30:00
+#SBATCH --time=03:00:00
+#SBATCH --mem=64G        # the job's own need: the full catalog pools take ~31 GB of host RAM (a full-pool run peaked at 31.3 GB)
 #SBATCH --output=runs/_logs/catalog_short_ab_%j.out
 #SBATCH --error=runs/_logs/catalog_short_ab_%j.err
 #SBATCH --gres=gpu:1
