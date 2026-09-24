@@ -1215,8 +1215,9 @@ reason to hurt asymptotically. We therefore keep both \textbf{on by default} (as
 recipes) and treat them as \emph{open}, to be re-tested on richer data and longer schedules; we
 would drop them only if a rigorous test in that regime showed a real regression.
 That re-test has since been run at full scale ($448$ datasets, Sec.~\ref{sec:bigrun}): the color
-one-hot \emph{confirms its keep} (removing it costs $\sim\!17\%$ on the converged bulk), while the
-MLP embedder does not pull its weight and is dropped together with the diagram encoder.
+one-hot \emph{confirms its keep} (removing it raises the geometric mean by $18\%$ and the median
+by $25\%$), while the MLP embedder was dropped together with the diagram encoder, a trade of the
+tail for the bulk (Table~\ref{tab:bigrun_arms}).
 
 \begin{table}[H]
 \centering
@@ -1247,23 +1248,24 @@ $\vlnr=5.8\times10^{-4}$ at $\eta=4.1\times10^{-3}$ with EMA) doubles as a diagn
 processes a joint model of this size actually learns, and which of the physics levers of
 Secs.~\ref{sec:levers}--\ref{sec:arch} still earn their keep at scale.
 
-\paragraph{Failure taxonomy.} The median per-process $\vlnr$ is $2\times10^{-4}$, but $50/448$
-datasets sit above $0.05$, \emph{the same ones in every top trial}, so the failures are
-systematic, not seed noise:
+\paragraph{Failure taxonomy.} The median per-process $\vlnr$ is $2\times10^{-4}$ and the $90$th
+percentile $0.085$; the worst-fitted processes are \emph{the same ones in every top trial}, so the
+tail is systematic, not seed noise:
 
 \begin{table}[H]
 \centering
-\caption{Big-run failure census (best trial; ``failing'' $=$ per-process $\vlnr>0.05$; a loss of
-$\sim\!1$ on the standardized log-amplitude means nothing was learned).}
+\caption{Big-run census (best trial, \code{hp0226}): median and $90$th percentile of the
+per-process $\vlnr$ at the best checkpoint by category (\code{analysis/bigrun/arms\_best.py}); a
+loss of $\sim\!1$ on the standardized log-amplitude means nothing was learned.}
 \label{tab:bigrun_census}
 \begin{tabular}{@{}lrrl@{}}
 \toprule
-Dataset category & failing & total & note \\
+Dataset category & processes & median / $90\%$ & note \\
 \midrule
-$\alpha_s$-scan variants (\code{\_\_sXX}) & $0$ & $336$ & all learn, down to $10^{-4}$ \\
-$M_Z$-scan variants of $2\!\to\!2$ (\code{\_\_mzXX}) & $3$ & $60$ & only the widest-window \code{\_\_mz00}s \\
-$m_t/m_H/M_Z^{4\ell}$-scan families & $32$ & $32$ & whole families plateau at $0.1$--$0.3$ \\
-plain processes & $15$ & $20$ & worst: $ee\,d\bar d$, $ee\,b\bar b$ at $\vlnr\!\sim\!1.6$ \\
+$\alpha_s$-scan variants (\code{\_\_sXX}) & $336$ & $1.6\text{e-}4$ / $1.7\text{e-}3$ & all learn, down to $10^{-4}$ \\
+$M_Z$-scan variants of $2\!\to\!2$ (\code{\_\_mzXX}) & $60$ & $3.6\text{e-}3$ / $0.035$ & the tail is the widest-window \code{\_\_mz00}s \\
+$m_t/m_H/M_Z^{4\ell}$-scan families & $32$ & $0.16$ / $0.20$ & whole families plateau at $0.1$--$0.3$ \\
+plain processes & $20$ & $0.18$ / $0.95$ & worst: $ee\,d\bar d$, $ee\,b\bar b$ at $\vlnr\!\sim\!1.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1331,45 +1333,53 @@ $0.27$ to $5.7\times10^{-4}$ (Sec.~\ref{sec:catalog}, Table~\ref{tab:agg_ab}).
 
 \paragraph{Feature ablation at scale (one-factor-out arms).} Five single-GPU arms re-ran the best
 trial's exact HPs with one feature removed (plus one combined arm), the protocol's cheap-shortcut
-direction: an ablation that wins at HPs tuned \emph{for the baseline} wins conservatively. Since
-the number of stuck processes itself differs between arms and biases the pooled geometric mean,
-the decisive column is the geometric mean over the $390$ processes that converged
-($\vlnr\le0.05$) in \emph{all six} configurations.
+direction: an ablation that wins at HPs tuned \emph{for the baseline} wins conservatively. Each
+arm is read on three statistics over all $448$ processes at the best checkpoint, none of them a
+pass/fail count: the geometric mean, the median and the $90$th percentile of the per-process
+$\vlnr$ (\code{analysis/bigrun/arms\_best.py}). The arms were first judged on the geometric mean
+over the $390$ processes below $\vlnr=0.05$ in all six configurations; that subset is defined by a
+threshold and is no longer used, and the readings below are the ones without it.
 
 \begin{table}[H]
 \centering
-\caption{Big-run feature arms at the baseline's best HPs (single seed, $8601$ steps). ``GM
-conv.''\ $=$ geometric-mean $\vlnr$ over the $390$-process everywhere-converged subset (the
-stuck-dataset--robust comparison); median is over all $448$. Per-process tail values are
-run-to-run flaky (e.g.\ $ee\,d\bar d$: $1.63/0.62/1.34$ across baseline/no-diagram/combined);
-only the aggregates are trusted.}
+\caption{Big-run feature arms at the baseline's best HPs (single seed, $8601$ steps): geometric
+mean, median and $90$th percentile of the per-process $\vlnr$ at the best checkpoint over all
+$448$ processes, and the change against the baseline. Per-process tail values are run-to-run
+flaky (e.g.\ $ee\,d\bar d$: $1.63/0.62/1.34$ across baseline/no-diagram/combined); only the
+aggregates are trusted.}
 \label{tab:bigrun_arms}
-\begin{tabular}{@{}lrrrrl@{}}
+\begin{tabular}{@{}lrrrl@{}}
 \toprule
-Arm & GM all & GM conv. & median & $n_{>0.05}$ & verdict \\
+Arm & GM all & median & $90\%$ & against the baseline \\
 \midrule
-baseline (all on)            & $5.79\text{e-}4$ & $2.56\text{e-}4$ & $1.98\text{e-}4$ & $50$ & reference \\
-no \code{use\_diagrams}      & $3.88\text{e-}4$ & $1.65\text{e-}4$ & $1.90\text{e-}4$ & $49$ & \textbf{drop diagrams} ($-35\%$, all views) \\
-no MLP embedder              & $4.86\text{e-}4$ & $2.21\text{e-}4$ & $3.13\text{e-}4$ & $45$ & tail-driven win; median worse \\
-no \code{color\_onehot}      & $6.81\text{e-}4$ & $3.00\text{e-}4$ & $2.47\text{e-}4$ & $57$ & \textbf{keep color} ($+17\%$ if removed) \\
-no \code{offshell\_per\_event} & $8.63\text{e-}4$ & $3.74\text{e-}4$ & $4.55\text{e-}4$ & $48$ & \textbf{keep off-shellness} ($+46\%$) \\
-no diagrams $+$ no MLP       & $\mathbf{3.85\text{e-}4}$ & $\mathbf{1.59\text{e-}4}$ & $\mathbf{1.88\text{e-}4}$ & $51$ & \textbf{adopted candidate} \\
+baseline (all on)            & $5.79\text{e-}4$ & $1.98\text{e-}4$ & $0.085$ & reference \\
+no \code{use\_diagrams}      & $3.88\text{e-}4$ & $1.90\text{e-}4$ & $0.10$ & GM $-33\%$, median $-4\%$, $90\%$ $+18\%$ \\
+no MLP embedder              & $4.86\text{e-}4$ & $3.13\text{e-}4$ & $0.056$ & GM $-16\%$, median $+58\%$, $90\%$ $-34\%$ \\
+no \code{color\_onehot}      & $6.81\text{e-}4$ & $2.47\text{e-}4$ & $0.094$ & GM $+18\%$, median $+25\%$, $90\%$ $+11\%$ \\
+no \code{offshell\_per\_event} & $8.63\text{e-}4$ & $4.55\text{e-}4$ & $0.067$ & GM $+49\%$, median $+130\%$, $90\%$ $-21\%$ \\
+no diagrams $+$ no MLP       & $3.85\text{e-}4$ & $1.88\text{e-}4$ & $0.12$ & GM $-34\%$, median $-5\%$, $90\%$ $+42\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Readings. (i)~\textbf{Off-shellness reconfirms its flagship status} (Sec.~\ref{sec:levers}) in the
-$448$-process regime, and the damage from removing it localizes exactly where the physics says:
-the internal-resonance families ($m_t/m_H/M_Z^{4\ell}$ group GM $0.156\!\to\!0.454$;
-$ee\,ZH$ $0.08\!\to\!1.32$). (ii)~\textbf{Color one-hot flips from ``open'' to ``keep''}: the
-short-run $+12\%$ of Table~\ref{tab:enc} was undertraining noise; at scale removing it hurts
-everywhere. (iii)~\textbf{The diagram encoder actively hurts} at scale ($-35\%$ from removing it,
-robust in every view and at both failure thresholds), consistent with the earlier finding that
-diagram-routed signals are weak (Table~\ref{tab:levers}); (iv)~the \textbf{MLP embedder} is not
-load-bearing (its solo win is tail-driven, median worse), and dropping it \emph{with} the
-diagrams costs nothing and cures that median regression, so the combined
-no-diagrams$+$linear-embed configuration is the adopted candidate: best or tied-best in
-every aggregate view while being the simplest and cheapest of the six.
+$448$-process regime on the bulk (geometric mean $+49\%$, median $+130\%$ without it), and the
+damage localizes exactly where the physics says: the internal-resonance families
+($m_t/m_H/M_Z^{4\ell}$ group GM $0.156\!\to\!0.454$; $ee\,ZH$ $0.08\!\to\!1.32$); the $90$th
+percentile is lower without it ($0.067$ against $0.085$). (ii)~\textbf{Color one-hot flips from
+``open'' to ``keep''}: the short-run $+12\%$ of Table~\ref{tab:enc} was undertraining noise; at
+scale removing it raises all three statistics ($+11$ to $+25\%$). (iii)~\textbf{The diagram
+encoder}: removing it lowers the geometric mean by a third, most of it from the $M_Z$-scan
+variants (median $3.6\times10^{-3}\to7.4\times10^{-4}$) with the $\alpha_s$ bulk $16\%$ lower,
+moves the median by $4\%$, and raises the $90$th percentile from $0.085$ to $0.10$; so the
+gain is in the bulk and the scan variants, not in the tail, consistent with the earlier finding
+that diagram-routed signals are weak (Table~\ref{tab:levers}). (iv)~\textbf{The MLP embedder}:
+removing it alone lowers the geometric mean by $16\%$ and the $90$th percentile by $34\%$ and
+raises the median by $58\%$; removing it with the diagram encoder gives the lowest geometric
+mean and median of the six arms and the highest $90$th percentile ($0.12$). That combined
+configuration (no diagram encoder, linear embed) was adopted as the candidate on the
+converged-subset geometric mean; without the subset it trades the tail for the bulk, a single
+seed each.
 
 \paragraph{Pairwise attention bias: the diagram signal at the pair level (tested, not adopted).}
 Motivated by the delivery-mechanism reading of the diagram results (the off-shellness signal wins
@@ -1390,18 +1400,18 @@ Three single-seed arms at the adopted candidate config (baseline best HPs unless
 
 \begin{center}\begin{tabular}{@{}lrrrr@{}}
 \toprule
-Arm & GM all & $\alpha_s$-bulk GM & plain GM & $n_{>0.05}$ \\
+Arm & GM all & $\alpha_s$-bulk GM & plain GM & $90\%$ \\
 \midrule
-adopted baseline (no bias)          & $\mathbf{3.85\text{e-}4}$ & $\mathbf{1.24\text{e-}4}$ & $0.209$ & $51$ \\
-pair-bias v1 (unbounded, 1-D head)  & $5.26\text{e-}4$ & $1.60\text{e-}4$ & $0.193$ & $52$ \\
-pair-bias v2 ($+$identity, cap 8)   & $5.74\text{e-}4$ & $1.89\text{e-}4$ & $\mathbf{0.097}$ & $\mathbf{48}$ \\
-pair-bias v2 at $\eta/2$ (lr probe) & $7.37\text{e-}4$ & $2.57\text{e-}4$ & $0.215$ & $53$ \\
+adopted baseline (no bias)          & $\mathbf{3.85\text{e-}4}$ & $\mathbf{1.24\text{e-}4}$ & $0.209$ & $0.12$ \\
+pair-bias v1 (unbounded, 1-D head)  & $5.26\text{e-}4$ & $1.60\text{e-}4$ & $0.193$ & $0.084$ \\
+pair-bias v2 ($+$identity, cap 8)   & $5.74\text{e-}4$ & $1.89\text{e-}4$ & $\mathbf{0.097}$ & $\mathbf{0.077}$ \\
+pair-bias v2 at $\eta/2$ (lr probe) & $7.37\text{e-}4$ & $2.57\text{e-}4$ & $0.215$ & $0.080$ \\
 \bottomrule
 \end{tabular}\end{center}
 
 The signature is consistent and two-sided. (i)~\emph{The mechanism works on its targets}: every
-pair-bias arm improves the stuck-tail population (v2: plain GM halved, fewest stuck processes of
-any big-run arm), with per-run categorical rescues of exactly the predicted physics:
+pair-bias arm improves the tail ($90$th percentile $0.077$--$0.084$ against $0.12$; v2: plain GM
+halved), with per-run categorical rescues of exactly the predicted physics:
 $ee\,\text{bhabha}$ $0.81\!\to\!0.012$ and $ee\,\bar\nu\nu$ $0.39\!\to\!0.10$ in v1 (t-channel
 poles), $ee\,ZH$ $0.31\!\to\!0.0009$ and $ee\,\gamma\gamma$ $0.41\!\to\!0.009$ in v2, but
 \emph{which} process gets rescued is run-dependent (the known tail flakiness). (ii)~\emph{The
