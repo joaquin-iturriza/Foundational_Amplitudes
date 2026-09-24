@@ -55,7 +55,7 @@ RESULTS_DIR = _S.get("results_dir", SWEEP_DIR)
 # job-owned cluster keys: these may legitimately appear in a sweep config
 JOB_KEYS = ("time", "cpus_per_task", "request_gpus", "auto_submit", "mem", "scheduler")
 # site-owned: never in a sweep config; always from here
-SITE_KEYS = ("partition", "account", "qos", "gres", "gpu_flag", "constraint",
+SITE_KEYS = ("scheduler", "partition", "account", "qos", "gres", "gpu_flag", "constraint",
              "max_cpus_per_gpu", "python_bin")
 
 _VARS = {"PROJECT_DIR": lambda: _S["project_dir"], "SWEEP_DIR": lambda: SWEEP_DIR,
