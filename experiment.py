@@ -2687,6 +2687,12 @@ class AmplitudeExperiment(BaseExperiment):
         # and the CPU to wait before backward is even queued. Callers materialise it
         # later (post-step, fused into one sync). See base_experiment._step.
         loss_no_reg = loss.detach()
+        if not self.model.training:
+            # single-dataset validation (base_experiment._validate) scores the plain per-event
+            # mean, as the multi-process _validate does: never the sign head's cross-entropy
+            # nor a training-side aggregation (tau), which made a signed pool's recorded
+            # validation (and its HPO objective) MSE + BCE, 6-10x the MSE
+            loss_no_reg = self._per_event_loss(y_pred, y, sigma=sigma).mean().detach()
         loss        = loss + reg
         if sync_blocking:
             assert torch.isfinite(loss).all()   # original per-step guard (D2H sync)

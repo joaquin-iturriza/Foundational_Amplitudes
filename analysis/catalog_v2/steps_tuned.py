@@ -13,8 +13,10 @@ bs-34 references, solofull_t* and the 5k-pool solo_t*, are superseded: 34-event 
 Every curve is fitted with the floor-aware law L = A C^-alpha + L_inf (CLAUDE.md, Scaling fits; the
 profiled fit of sweep/analyze_pretraining_scaling.py): the joint arms on all their non-diverged runs
 pooled over 1000-8000 steps (500 is on the edge of stability; plotted, not fitted), the uncertainty the
-spread of leave-one-seed-out refits; each solo process on its six points. Both sides are the LAST
-validation of the chosen run: the joint seeds, and the solo DyHPO best trial per step count.
+spread of leave-one-seed-out refits; each solo process on its six points. Both sides are the
+validation MSE at the end of training: the joint seeds' last validation, and per solo sweep the
+trial with the lowest post-training MSE (solo_b1k.solo_mse; the DyHPO results carried the sign
+head's cross-entropy on the signed pools).
 Writes steps_tuned_a ... _f (class median against compute, fits dashed) and steps_tuned_alpha (the fitted
 alpha per class); the floors are printed, "unconstrained" where the fit puts them at 0. Diverged runs are
 left out."""
@@ -60,6 +62,8 @@ if "--collect" in sys.argv:
 import plot_style as ps
 import census as C
 D = json.load(open(JSON))
+from solo_b1k import solo_mse
+D["solo"] = solo_mse()
 cls = json.load(open(os.path.join(HERE, "steps_agg.json")))["cls"].get
 # a run whose median per-process loss ends above 0.5 diverged (at 500 steps the DyHPO-best lr,
 # 2.3e-2, sits on the edge of stability: four of its five reseeds blow up); it is left out of the

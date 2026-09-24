@@ -5,7 +5,7 @@ with a shaded wedge below and its label along the line -- for the twelve referen
 ones trained both jointly and alone, coloured by kind (tree, resonant, positive and signed one-loop).
 Dots: the process in the joint run (full pools, 1000-8000 steps x three seeds; steps_tuned.json),
 fitted on its own points with the floor-aware law A C^-alpha + L_inf. Open squares: the same process
-trained alone (bs 1024, full pool, sweeps/solob1k_t*); a thin line joins the two. One panel per training
+trained alone (bs 1024, full pool, sweeps/solob1k_t*; solo_b1k.solo_mse); a thin line joins the two. One panel per training
 aggregation: (a) arithmetic mean, (b) geometric mean.
     python analysis/catalog_v2/alpha_vs_multiplicity_steps.py
 Writes analysis/catalog_v2/alpha_vs_multiplicity_steps (png + pdf)."""
@@ -20,6 +20,8 @@ from analyze_pretraining_scaling import fit_power_law_with_floor, flops_per_step
 
 D = json.load(open(os.path.join(HERE, "steps_tuned.json")))
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
+from solo_b1k import solo_mse
+D["solo"] = solo_mse()      # the post-training MSE (no sign-head term)
 FIT_STEPS, SOLO_STEPS = [1000, 2000, 4000, 8000], [33, 67, 134, 268, 536, 1072]
 runs = [r for r in D["joint"] if np.median(list(r["final"].values())) <= 0.5 and r["steps"] in FIT_STEPS]
 nbar = float(np.mean([NP[n] for n in {n for r in runs for n in r["final"]} if n in NP]))
