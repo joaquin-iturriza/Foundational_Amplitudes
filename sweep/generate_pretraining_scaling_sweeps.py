@@ -249,7 +249,7 @@ SEARCH_SPACE = [
     {"name": "training.regularization_lambda","type": "float_log",     "low": 1e-11, "high": 1e-6},
     {"name": "training.cosanneal_warmup_frac","type": "float_uniform", "low": 0.0,   "high": 0.2},
     {"name": "training.cosanneal_eta_min",    "type": "float_log",     "low": 1e-11, "high": 1e-6},
-    {"name": "training.ema_decay",            "type": "float_uniform", "low": 0.9,   "high": 0.9999},
+    {"name": "training.ema_decay",            "type": "float_uniform", "low": 0.9,   "high": 0.999},
     {"name": "training.sampler_alpha_ema",    "type": "float_uniform", "low": 0.3,   "high": 0.95},
     {"name": "training.sampler_min_alpha_frac","type": "float_uniform","low": 0.05,  "high": 0.5},
 ]

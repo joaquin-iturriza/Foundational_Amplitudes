@@ -1,4 +1,5 @@
-"""The solo references at bs 1024 on the full pools (sweeps/solob1k_t<S>_<process>), trial by trial.
+"""The solo references at bs 1024 on the full pools (sweeps/solob1k_t<S>_<process>; the two signed pools
+from their rerun solob1kv_t<S>_<process>, solo_b1k.py), trial by trial.
     python analysis/catalog_v2/solo_b1k_inspect.py --collect > analysis/catalog_v2/solo_b1k_inspect.json   (where the runs are)
     python analysis/catalog_v2/solo_b1k_inspect.py                                                         (plots from the json)
 Per trial: its HPs (config.yaml), the DyHPO result (best validation loss, results/hp*_t<S>_*.json),
@@ -12,10 +13,9 @@ is the record. Writes
   solo_b1k_hp_a..e            each HP's effect: partial residuals of log10 MSE over all trials (sweep
                               fixed effects, a quadratic in log lr with its optimum per step count,
                               linear in the others), with the share of within-sweep variance it explains
-Every value is the trial's best validation MSE, except on the signed pools, where it is the end-of-training MSE. The
-logged validation curve of a signed pool (udbar_Wgg_nlo, uubar_ddbara_nlo) and the DyHPO result carried
-the sign head's cross-entropy on top of the MSE (fixed in experiment._batch_loss_lloca): their curves sit
-6-10x above the end-of-training MSE, which is marked as well."""
+Every value is the trial's best validation MSE, the DyHPO result (CLAUDE.md, Reported values). The
+post-training MSE (train circle, val cross) is the best checkpoint's, reloaded before evaluation
+(training.es_load_best_model), on the evaluation subsample."""
 import glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -29,6 +29,7 @@ KIND = {"ee_aa": "tree", "uubar_uubar": "tree", "ee_uu": "resonant", "ee_ddbar":
 JSON = os.path.join(HERE, "solo_b1k_inspect.json")
 LR_WINDOW = (3e-4, 3e-2)
 
+from solo_b1k import SIGNED, SWEEP
 if "--collect" in sys.argv:
     import yaml
     out = {}
@@ -36,7 +37,7 @@ if "--collect" in sys.argv:
     MSE = re.compile(r"MSE \(prepd\) (train|val)\S* \S+: ([0-9.eE+-]+)")
     for p in PROCS:
         for S in STEPS:
-            sw = f"solob1k_t{S}_{p}"
+            sw = SWEEP(p, S)
             for f in glob.glob(os.path.join(ROOT, "sweeps", sw, "results", f"hp*_t{S}_*.json")):
                 hp = int(re.search(r"hp(\d+)_", os.path.basename(f)).group(1))
                 rd = os.path.join(ROOT, "runs", sw, f"trial_{hp:04d}")
@@ -60,9 +61,8 @@ sys.path.insert(0, os.path.join(ROOT, "sweep"))
 from analyze_pretraining_scaling import fit_power_law_with_floor
 from solo_datalimit_labels import LABEL
 D = json.load(open(JSON))
-from solo_b1k import SIGNED
-for v in D.values():      # a trial's best validation MSE (signed pools: the end-of-training MSE, see solo_b1k)
-    for t in v: t["mse"] = t.get("final_val", t["val_loss"]) if t["p"] in SIGNED else t["val_loss"]
+for v in D.values():      # a trial's value: its best validation MSE, the DyHPO result (solo_b1k)
+    for t in v: t["mse"] = t["val_loss"]
 best = {k: min(v, key=lambda t: t["mse"]) for k, v in D.items()}
 print(f"{sum(len(v) for v in D.values())} trials over {len(D)} sweeps")
 

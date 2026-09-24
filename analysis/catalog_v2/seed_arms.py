@@ -1,6 +1,6 @@
 """Arms with repeats: each arm is a glob of run dirs (one per seed). Per arm, the combined
 validation loss (mean and spread over seeds), and per class the median and 90th percentile
-of the per-process final loss with its spread over seeds; figure: per-class ECDF per arm
+of the per-process loss at the best checkpoint (census.at_best) with its spread over seeds; figure: per-class ECDF per arm
 with the seed band.
     python analysis/catalog_v2/seed_arms.py "baseline=runs/t1000_slq1e-2_s*" "slq 1e-3=runs/t1000_slq1e-3_s*" ... [--out=name]
 The first arm is the baseline. Writes analysis/catalog_v2/<out>_a ... _f (png+pdf, default
@@ -21,12 +21,15 @@ def cls(n):
     return f"tree 2->{NP[n]-2}"
 CLASSES = ["tree 2->2", "resonant 2->2", "tree 2->3", "tree 2->4", "positive 1-loop", "signed 1-loop"]
 def load(pattern):
+    """Every seed of an arm at its best checkpoint (census.at_best); a seed without a metrics
+    record is an error, not a silent drop, and one whose best step is not its last is listed."""
     out = []
     for r in sorted(glob.glob(pattern)):
-        js = sorted(glob.glob(os.path.join(r, "**", "per_process_metrics.json"), recursive=True))
-        if not js: continue
-        d = json.load(open(js[-1]))
-        out.append((d["val_loss_no_reg"][-1], {n: v[-1] for n, v in d["proc_val_losses_no_reg"].items() if v and n in NP}))
+        d = C.metrics(r)
+        _, comb, proc = C.at_best(d)
+        bl = C.best_not_last(d)
+        if bl: print(f"  {r}: best checkpoint at validation {bl[0] + 1} of {bl[1]}, last/best {bl[2]:.3g}")
+        out.append((comb, {n: v for n, v in proc.items() if n in NP}))
     return out
 data = {label: load(pat) for label, pat in arms}
 names = sorted(set.intersection(*[set(p.keys()) for runs in data.values() for _, p in runs]))
@@ -60,7 +63,7 @@ for (fig, ax), c in zip(figs, CLASSES):
     if nseeds > 1:   # legend entry for the shaded bands (an empty artist carrying the label)
         ax.fill_between([], [], [], color=ps.C.grey, alpha=0.2, label=f"min to max over {nseeds} seeds")
     ax.set_xscale("log"); ax.set_xlim(min(lo_all) / 2, max(hi_all) * 2)
-    ax.set_xlabel(r"final validation MSE($\log|\mathcal{M}|^2$) per process")
+    ax.set_xlabel(r"validation MSE($\log|\mathcal{M}|^2$) per process")
     ax.set_ylabel("fraction of processes")
     # the arm names are too long for a legend inside a 2.4in box: one strip above the plot
     ps.process_label(ax, f"{C.CLASS_LABEL[c]} ({sum(cls(n) == c for n in names)})", loc="upper left")

@@ -1,5 +1,5 @@
-"""Distance of every process from its multiplicity reference, e_p = m_p / L_ref(n_p), without a
-pass/fail threshold: figure e_p against the pool's ln|M|^2 range per arm, quantiles by class,
+"""Distance of every process from its multiplicity reference, e_p = m_p / L_ref(n_p) (m_p at the run's
+best checkpoint), without a pass/fail threshold: figure e_p against the pool's ln|M|^2 range per arm, quantiles by class,
 and the processes furthest above their reference with their attributes.
     python analysis/catalog_v2/excess_ratio.py --ref=4=1.66e-3_5=1.03e-2_6=1.81e-2 label=run_dir [label=run_dir ...] [--out=name]
 Writes analysis/catalog_v2/<out>_a, _b, ... (png+pdf, default excess_ratio), one panel per arm,
@@ -24,7 +24,7 @@ def cls(n):
 MULT = ((4, "o", ps.C.blue), (5, "s", ps.C.vermillion), (6, "^", ps.C.green))
 figs = ps.panels(len(runs))
 for (fig, ax), (label, path) in zip(figs, runs):
-    d = C.read_run(path)[1][-1][1]
+    d = C.at_best(C.metrics(path))[2]   # the best checkpoint
     names = [n for n in d if n in aud and n in NP]
     e = {n: d[n] / REF[NP[n]] for n in names}
     sp = np.array([float(aud[n]["logspread"]) for n in names]); ev = np.array([e[n] for n in names]); npart = np.array([NP[n] for n in names])
@@ -35,7 +35,7 @@ for (fig, ax), (label, path) in zip(figs, runs):
     ax.set_ylabel(r"$\mathrm{MSE}_p\,/\,\mathrm{MSE}_{\rm solo}(n_p)$")
     ps.process_label(ax, label, loc="upper left")
     ps.shared_legend(fig, ax, ncol=2)
-    print(f"\n== {label}: e_p = m_p / L_ref(n_p); median {np.median(ev):.2g}, quartiles {np.percentile(ev,25):.2g}-{np.percentile(ev,75):.2g}, below 1: {np.mean(ev<1):.0%}, above 10: {np.mean(ev>10):.0%}")
+    print(f"\n== {label}: e_p = m_p / L_ref(n_p); median {np.median(ev):.2g}, quartiles {np.percentile(ev,25):.2g}-{np.percentile(ev,75):.2g}, below the reference (e_p < 1): {np.mean(ev<1):.0%}")
     groups = {}
     for n in names: groups.setdefault(cls(n), []).append(e[n])
     for g, v in sorted(groups.items()): v = np.array(v); print(f"   {g:16s} n={len(v):3d}  median {np.median(v):6.2g}  90% {np.percentile(v,90):6.2g}  max {v.max():6.2g}")

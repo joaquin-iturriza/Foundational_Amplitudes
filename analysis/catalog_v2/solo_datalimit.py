@@ -4,8 +4,11 @@ for the three original references at 1000-4000), next to the joint arithmetic-me
 (runs/steps_t<N>_s*) on the same pools.
     python analysis/catalog_v2/solo_datalimit.py --collect > analysis/catalog_v2/solo_datalimit.json   (where the runs are)
     python analysis/catalog_v2/solo_datalimit.py                                                      (plots from the json)
-The MSE is the post-training evaluation of the saved model on the train and validation pools
-(`MSE (prepd)` lines of out_0.log). Writes analysis/catalog_v2/solo_datalimit_a ... _f (one class per
+The MSE is the post-training evaluation on the train and validation pools (`MSE (prepd)` lines of
+out_0.log) of the best checkpoint, which training.es_load_best_model (default true, not overridden in
+these sweeps) reloads before evaluation. On the signed pools of the solo_t sweeps that checkpoint was
+selected on MSE + sign-head BCE (fixed in 6939d77); their train/validation ratio is unaffected, their
+level is not the best-MSE one. Writes analysis/catalog_v2/solo_datalimit_a ... _f (one class per
 panel: the two reference processes, validation solid, train dashed) and solo_datalimit_ratio
 (validation over train against steps, every reference process and the joint run's class medians)."""
 import glob, json, os, re, sys

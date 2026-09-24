@@ -1,4 +1,4 @@
-"""Per-process validation loss against the pool's ln|M|^2 range, one panel per run.
+"""Per-process validation loss at the best checkpoint against the pool's ln|M|^2 range, one panel per run.
     python analysis/catalog_v2/loss_vs_range.py runs/<run A> runs/<run B> [--labels=A,B] [--out=name]
 Writes analysis/catalog_v2/<out>_a, _b, ... (png+pdf), one panel per run, the run's label as the
 legend title. No pass/fail line: the loss is read against the range, not against a threshold."""
@@ -18,7 +18,7 @@ aud = {re.sub(r"_\d+-\d+GeV_train(_smix)?$", "", r["name"]): r
 MULT = ((4, "o", ps.C.blue), (5, "s", ps.C.vermillion), (6, "^", ps.C.green))
 figs = ps.panels(len(args))
 for (fig, ax), path, label in zip(figs, args, labels):
-    d = C.read_run(path)[1][-1][1]
+    d = C.at_best(C.metrics(path))[2]   # the best checkpoint
     names = [n for n in d if n in aud and n in NP]
     sp = np.array([float(aud[n]["logspread"]) for n in names]); y = np.array([d[n] for n in names])
     npart = np.array([NP[n] for n in names])

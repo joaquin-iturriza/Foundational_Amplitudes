@@ -1,5 +1,5 @@
 """The aggregation arms side by side: every process's validation curve, and the final loss by
-class (ECDF). Reads plots_0/per_process_metrics.json of each run.
+class (ECDF), at the run's best checkpoint (census.at_best). Reads per_process_metrics.json of each run.
     python analysis/catalog_v2/arms_compare.py "label=runs/<run>" ["label=runs/<run>" ...] [--out=name]
 Writes analysis/catalog_v2/<out>_curves_a, _b, ... and <out>_ecdf_a, _b, ... (png+pdf, default
 arms_compare), one panel per arm, the arm as the legend title; the combined number and the
@@ -25,9 +25,9 @@ CCOL = [ps.C.blue, ps.C.sky, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purp
 MCOL = {4: ps.C.blue, 5: ps.C.vermillion, 6: ps.C.green}
 curves_figs, ecdf_figs = ps.panels(len(runs)), ps.panels(len(runs))
 for (fc, axc), (fe, axe), (label, path) in zip(curves_figs, ecdf_figs, runs):
-    js = sorted(glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True))[-1]
-    d = json.load(open(js)); every = d["validate_every_n_steps"]
-    curves = d["proc_val_losses_no_reg"]; final = {n: v[-1] for n, v in curves.items() if v and n in NP}
+    d = C.metrics(path); every = d["validate_every_n_steps"]
+    ibest, comb, best = C.at_best(d)
+    curves = d["proc_val_losses_no_reg"]; final = {n: v for n, v in best.items() if n in NP}
     for n, v in curves.items():
         if n in NP:
             # 478 overlapping curves: the thin translucent line is what keeps the density readable
@@ -36,13 +36,15 @@ for (fc, axc), (fe, axe), (label, path) in zip(curves_figs, ecdf_figs, runs):
     for k in (4, 5, 6): axc.plot([], [], color=MCOL[k], label=rf"$2\to{k-2}$")   # legend handles
     ps.process_label(axc, label, loc="upper right")
     ps.shared_legend(fc, axc, ncol=3)
-    print(f"{label}: combined validation {d['val_loss_no_reg'][-1]:.3g}")
+    bl = C.best_not_last(d)
+    print(f"{label}: combined validation {comb:.3g} at the best checkpoint (validation {ibest + 1} of {len(d['val_loss_no_reg'])}"
+          + (f"; last/best {bl[2]:.3g})" if bl else ", the last)"))
     for c, col in zip(CLASSES, CCOL):
         v = np.sort([final[n] for n in final if cls(n) == c])
         if len(v):
             axe.step(v, np.arange(1, len(v) + 1) / len(v), where="post", color=col, label=f"{C.CLASS_LABEL[c]} ({len(v)})")
             print(f"   {c:16s} n={len(v):3d} median {np.median(v):.3g} 90% {np.percentile(v, 90):.3g}")
-    axe.set_xscale("log"); axe.set_xlabel(r"final validation MSE($\log|\mathcal{M}|^2$) per process")
+    axe.set_xscale("log"); axe.set_xlabel(r"validation MSE($\log|\mathcal{M}|^2$) per process")
     axe.set_ylabel("fraction of processes")
     ps.process_label(axe, label, loc="upper left")
     ps.shared_legend(fe, axe, ncol=2)

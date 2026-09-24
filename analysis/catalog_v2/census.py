@@ -108,10 +108,8 @@ def main(argv):
     runs = []
     for p in paths:
         name, vals = read_run(p)
-        if not vals:
-            print(f"{name}: no validation lines"); continue
-        idx = int(np.argmin([c for c, _ in vals]))   # the best checkpoint
-        runs.append((name, idx, len(vals), vals[idx][0], vals[idx][1]))
+        idx, comb, proc = at_best(metrics(p))
+        runs.append((name, idx, len(vals), comb, proc))
     if not runs:
         return
     keys = list(groups(runs[0][4], all50, layers))

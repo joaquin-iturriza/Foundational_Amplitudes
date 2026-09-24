@@ -34,9 +34,9 @@ REFP = {4: "ee_uu", 5: "ee_uug", 6: "ee_uugg"}
 def runs(pat):
     out = []
     for r in sorted(glob.glob(os.path.join(ROOT, pat))):
-        js = sorted(glob.glob(os.path.join(r, "**", "per_process_metrics.json"), recursive=True))
-        if js:
-            d = json.load(open(js[-1])); out.append({n: v[-1] for n, v in d["proc_val_losses_no_reg"].items() if v and n in NP})
+        d = C.metrics(r); proc = C.at_best(d)[2]; bl = C.best_not_last(d)
+        if bl: print(f"  {os.path.relpath(r, ROOT)}: best checkpoint at validation {bl[0] + 1} of {bl[1]}, last/best {bl[2]:.3g}")
+        out.append({n: v for n, v in proc.items() if n in NP})
     return out
 def solo(N, k):
     f = os.path.join(ROOT, "sweeps", f"ref_t{N}_{REFP[k]}", "summary.txt")

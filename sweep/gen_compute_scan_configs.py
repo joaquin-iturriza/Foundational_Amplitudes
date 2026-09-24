@@ -66,7 +66,7 @@ SS_COMMON = [
 def solo_family():
     fixed = dict(BASE_FIXED)
     ss = [{"name": "training.lr", "type": "float_log", "low": 3.1622776601683795e-05, "high": 0.3}] \
-         + SS_COMMON + [{"name": "training.ema_decay", "type": "float_uniform", "low": 0.9, "high": 0.9999}]
+         + SS_COMMON + [{"name": "training.ema_decay", "type": "float_uniform", "low": 0.9, "high": 0.999}]
     return fixed, ss
 
 def ft_family(pretrained, base_lr, lr_scale_high):

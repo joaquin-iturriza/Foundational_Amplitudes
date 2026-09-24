@@ -3,8 +3,9 @@ analysis/scaling_compute/alpha_vs_multiplicity_overlay.py (fig:alphamult) -- log
 phase-space DOF = 3 n_fs - 4 on a log axis (ticks by n_fs), the bound alpha = 4/DOF corner to corner
 with a shaded wedge below and its label along the line -- for the twelve reference processes, the
 ones trained both jointly and alone, coloured by kind (tree, resonant, positive and signed one-loop).
-Dots: the process in the joint run (full pools, 1000-8000 steps x three seeds; steps_tuned.json),
-fitted on its own points with the floor-aware law A C^-alpha + L_inf. Open squares: the same process
+Dots: the process in the joint run (full pools, every horizon x three seeds, each run at its best
+checkpoint; steps_tuned.json), fitted on its own points with the floor-aware law A C^-alpha + L_inf
+over its per-process compute (steps_tuned.py: events of the process seen x FLOPs per event). Open squares: the same process
 trained alone (bs 1024, full pool, sweeps/solob1k_t*; solo_b1k.solo_mse); a thin line joins the two. One panel per training
 aggregation: (a) arithmetic mean, (b) geometric mean.
     python analysis/catalog_v2/alpha_vs_multiplicity_steps.py
@@ -22,9 +23,11 @@ D = json.load(open(os.path.join(HERE, "steps_tuned.json")))
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 from solo_b1k import solo_mse
 D["solo"] = solo_mse()      # best validation MSE per sweep (solo_b1k)
-FIT_STEPS, SOLO_STEPS = [1000, 2000, 4000, 8000], [33, 67, 134, 268, 536, 1072]
-runs = [r for r in D["joint"] if np.median(list(r["final"].values())) <= 0.5 and r["steps"] in FIT_STEPS]
-nbar = float(np.mean([NP[n] for n in {n for r in runs for n in r["final"]} if n in NP]))
+rose = [r for r in D["joint"] if r.get("best_not_last")]
+print("loss rose after the best checkpoint (kept at it): " + (", ".join(f"{r['arm']} t{r['steps']} s{r['seed']}" for r in rose) or "none"))
+SOLO_STEPS = [33, 67, 134, 268, 536, 1072]
+runs = D["joint"]                           # every run, at its best checkpoint (no run left out)
+POOL = D["pool"]; POOL_SUM = float(sum(POOL.values()))
 # the reference processes, by kind (the colours of the class panels)
 KIND = {"tree": ("tree", ps.C.blue), "res": ("resonant", ps.C.sky), "pos": ("positive one-loop", ps.C.orange),
         "sgn": ("signed one-loop", ps.C.purple)}
@@ -37,12 +40,13 @@ def alpha(c, l):
     return None if f is None else f[1]
 
 def joint_alpha(arm, n):
-    pts = [(flops_per_step(8, nbar, 16384) * r["steps"], r["final"][n]) for r in runs if r["arm"] == arm and n in r["final"]]
+    ev = 16384 * POOL[n] / POOL_SUM          # events of n per joint step (uniform sampler)
+    pts = [(flops_per_step(8, NP[n], 1) * ev * r["steps"], r["final"][n]) for r in runs if r["arm"] == arm and n in r["final"]]
     return alpha([p[0] for p in pts], [p[1] for p in pts])
 
 def solo_alpha(n):
     t = [s for s in SOLO_STEPS if f"{n}|{s}" in D["solo"]]
-    return alpha([flops_per_step(8, NP[n], 1024) * s for s in t], [D["solo"][f"{n}|{s}"] for s in t]) if t else None
+    return alpha([flops_per_step(8, NP[n], 1) * 1024 * s for s in t], [D["solo"][f"{n}|{s}"] for s in t]) if t else None
 
 dofx = lambda n: 3.0 * n - 4.0
 XLIM = (1.55, 10.5); YLIM = (4.0 / XLIM[1], 4.0 / XLIM[0])     # the bound runs corner to corner

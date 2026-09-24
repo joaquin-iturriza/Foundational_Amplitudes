@@ -28,7 +28,9 @@
 # TPROP=true divides the massive s-channel propagators out of the target, TCH=true adds the t-channel
 # factor, TCHMAX= its max final-state count (2 = the adopted 2->2-only rule), SIGN=true the sign head.
 # (Separate variables because an EXTRA with spaces does not survive the --export of `site submit`.)
-# ETA= sets training.cosanneal_eta_min, EMA=true|false the weight EMA and EMAD= its decay.
+# ETA= sets training.cosanneal_eta_min (default 1e-8, CLAUDE.md), EMA=true|false the weight EMA and EMAD= its decay.
+# MFM=true turns data.mass_from_momenta on (default off, CLAUDE.md canonical table; every catalog_v2 run
+# before 2026-09-25 ran with it on and with eta_min 0, so pass MFM=true ETA=0 to continue that series).
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -45,7 +47,7 @@ python run.py \
   data.target_propagator_tchannel_max_final="${TCHMAX:-2}" training.sign_head="${SIGN:-false}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
-  data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \
+  data.mass_from_momenta="${MFM:-false}" data.coupling_scalars=true data.internal_mass_scalars=true \
   data.offshell_per_event=true "data.internal_mass_pdgs=[$(echo "${PDGS:-23_6_25}" | tr _ ,)]" \
   model=lloca model.use_diagrams=false model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed="${SEED:-42}" \
@@ -54,6 +56,6 @@ python run.py \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference={$(echo "$REF" | sed 's/_/,/g; s/=/:/g')}"} \
   training.regularization=L2 \
-  training.cosanneal_eta_min="${ETA:-0}" ema="${EMA:-false}" training.ema_decay="${EMAD:-0.99}" \
+  training.cosanneal_eta_min="${ETA:-1e-8}" ema="${EMA:-false}" training.ema_decay="${EMAD:-0.99}" \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
   training.validate_frac="${VF:-0.05}" evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false ${EXTRA:-}
