@@ -1,0 +1,92 @@
+# Solo reference for the joint steps curve at the canonical-style batch: udbar_Wgg_nlo alone at bs 1024 on
+# the full pool, 134 steps. The joint run gives each process 16384/478 = 34.3 events per step, so
+# 33/67/134/268 steps here match its 1000/2000/4000/8000 steps in events seen; 536 and 1072 reach
+# the floor for the floor-aware fit L = A C^-a + L_inf. Search space as the joint sweeps
+# (catalog_steps_t*_mean), lr over two decades (no measured optimum at this batch).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 16G
+  cpus_per_task: 4
+  time: "00:30:00"
+paths:
+sweep_name: solob1k_t134_udbar_Wgg_nlo
+n_trials: 6
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps: [134]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/ref_solo_udbar_Wgg_nlo.yaml
+  data.require_cache: 'true'
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'true'
+  data.target_propagator_tchannel: 'true'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 1024
+  evaluation.batchsize: 4096
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'true'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.05'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 3.0e-04
+  high: 3.0e-02
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.9999
+
