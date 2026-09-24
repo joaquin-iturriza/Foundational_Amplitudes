@@ -12,6 +12,7 @@ Writes analysis/catalog_v2/alpha_vs_multiplicity_steps (png + pdf)."""
 import json, os, sys
 import numpy as np
 from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
+import matplotlib.transforms as mtransforms
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE); sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "sweep"))
 import plot_style as ps
@@ -76,8 +77,11 @@ for ax, arm in zip(axes, ("arith", "geo")):
     # It runs corner to corner, so its on-page angle is fixed by the plot box (PLOT_W_IN x PLOT_H_IN,
     # which ps.save enforces); placed in axes coordinates, the label stays on the line after layout.
     ang = np.degrees(np.arctan2(-ps.PLOT_H_IN, ps.PLOT_W_IN))
-    ax.text(0.5, 0.5, "Theoretical lower bound", color="0.55", transform=ax.transAxes, rotation=ang,
-            rotation_mode="anchor", ha="center", va="top", zorder=1)
+    nx, ny = -ps.PLOT_H_IN, -ps.PLOT_W_IN                 # the normal pointing below the line
+    k = 4.0 / np.hypot(nx, ny)                             # 4 pt clear of it
+    ax.text(0.5, 0.5, "Theoretical lower bound", color="0.55", rotation=ang, rotation_mode="anchor",
+            transform=mtransforms.offset_copy(ax.transAxes, fig=fig, x=nx * k, y=ny * k, units="points"),
+            ha="center", va="top", zorder=1)
 # four kinds and the marker key do not fit inside a 2.40in box: one strip above
 # the two panels, as fig:alphamult does
 H = [axes[0].plot([], [], ls="none", marker="o", color=c)[0] for _, c in KIND.values()]
