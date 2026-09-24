@@ -960,8 +960,8 @@ objective; it does not scale meaningfully and is excluded from what follows.
 
 \begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
 The compute-scaling exponent $\alpha_C$ decreases with the number of final-state particles:
-$\alpha_C\approx1.7$--$2.2$ for $2\!\to\!2$, $\approx1.1$--$1.3$ for $2\!\to\!3$, and
-$\approx0.96$ for $2\!\to\!4$ (Table~\ref{tab:scaling}), tracking the theoretical lower bound
+$\alpha_C\approx1.7$--$2.4$ for $2\!\to\!2$, $\approx1.2$--$1.3$ for $2\!\to\!3$, and
+$\approx0.97$ for $2\!\to\!4$ (Table~\ref{tab:scaling}), tracking the theoretical lower bound
 $\alpha=4/\mathrm{DOF}$ with $\mathrm{DOF}=3n_{\mathrm{fs}}-4$ (Fig.~\ref{fig:alphamult}):
 harder, higher-dimensional targets learn more slowly per FLOP.
 \end{principle}
@@ -976,23 +976,28 @@ process).
 
 \begin{table}[H]
 \centering
-\caption{From-scratch (solo) compute-scaling exponents $\alpha_C$, grouped by final-state
-multiplicity, and the theoretical bound $\alpha=4/\mathrm{DOF}$ for that multiplicity.}
+\caption{From-scratch (solo) compute-scaling exponents $\alpha_C$ of Eq.~\eqref{eq:scaling},
+grouped by final-state multiplicity, and the theoretical bound $\alpha=4/\mathrm{DOF}$ for that
+multiplicity. Each is fitted to the best trial of five compute cells
+(\code{sweep/fit\_scaling\_law.py}, \code{sweeps/scaling\_solo\_full}); the floor comes out at
+zero or below $2\times10^{-4}$ for every process, so over this range the exponent is the bare
+law's within $0.16$, and the reduced $\chi^2$ is $10^3$--$4\times10^4$: the cells scatter about
+a single power law far beyond the assumed $\sigma$.}
 \label{tab:scaling}
 \begin{tabular}{@{}llrr@{}}
 \toprule
 Process & Type & $\alpha_C$ & $4/\mathrm{DOF}$ \\
 \midrule
-$ee\to\gamma\gamma$        & QED $2\!\to\!2$ & $2.21$ & \multirow{4}{*}{$2.00$} \\
-$ee\to t\bar t$            & EW  $2\!\to\!2$ & $1.95$ & \\
-$ee\to WW$                 & EW  $2\!\to\!2$ & $1.81$ & \\
+$ee\to\gamma\gamma$        & QED $2\!\to\!2$ & $2.37$ & \multirow{4}{*}{$2.00$} \\
+$ee\to t\bar t$            & EW  $2\!\to\!2$ & $2.01$ & \\
+$ee\to WW$                 & EW  $2\!\to\!2$ & $1.86$ & \\
 $ee\to u\bar u$            & QCD $2\!\to\!2$ & $1.74$ & \\
 \addlinespace
 $ee\to u\bar ug$           & QCD $2\!\to\!3$ & $1.34$ & \multirow{3}{*}{$0.80$} \\
-$ee\to \gamma\gamma\gamma$ & QED $2\!\to\!3$ & $1.21$ & \\
-$ee\to WWZ$                & EW  $2\!\to\!3$ & $1.15$ & \\
+$ee\to \gamma\gamma\gamma$ & QED $2\!\to\!3$ & $1.30$ & \\
+$ee\to WWZ$                & EW  $2\!\to\!3$ & $1.16$ & \\
 \addlinespace
-$ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.96$ & $0.50$ \\
+$ee\to u\bar ugg$          & QCD $2\!\to\!4$ & $0.97$ & $0.50$ \\
 \bottomrule
 \end{tabular}
 \end{table}

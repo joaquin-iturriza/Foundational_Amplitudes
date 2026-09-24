@@ -5,8 +5,8 @@ shaded wedge below the theoretical lower bound alpha = 4/DOF (DOF = 3*n_fs - 4)
 with the label rotated along the dashed line, one tab10 colour per process
 family joined by dotted lines, fine-tuned (full, layer-decay) targets as stars.
 
-Exponents are read from the two scaling_law_params.json files so the figure
-tracks the actual fits; the ratio (virt/Born) targets are excluded as nonsense.
+Exponents are read from the two floor-aware scaling_law_params.json refits so the figure
+tracks the actual fits (a process without a floor-aware fit is left out); the ratio (virt/Born) targets are excluded as nonsense.
 Usage: python alpha_vs_multiplicity_overlay.py [out_basename]
 """
 import json, os, sys
@@ -24,8 +24,10 @@ sys.path.insert(0, ROOT_FOR_STYLE)
 import plot_style as ps  # noqa: E402
 
 ROOT = siteconf.PROJECT_DIR
-SOLO = os.path.join(ROOT, "sweeps/scaling_solo_full/scaling_law_params.json")
-FT   = os.path.join(ROOT, "sweeps/finetune_scaling_virt_002/scaling_law_params.json")
+# the floor-aware refits (sweep/fit_scaling_law.py --out-dir; CLAUDE.md, Scaling fits), not the
+# sweeps' own June params, which hold the bare law
+SOLO = os.path.join(ROOT, "analysis/scaling_compute/floorfit/scaling_solo_full/scaling_law_params.json")
+FT   = os.path.join(ROOT, "analysis/scaling_compute/floorfit/finetune_scaling_virt_002/scaling_law_params.json")
 out  = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
     ROOT, "analysis/scaling_compute/alpha_vs_multiplicity_overlay")
 
