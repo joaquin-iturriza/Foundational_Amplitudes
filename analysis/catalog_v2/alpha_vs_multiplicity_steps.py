@@ -6,7 +6,7 @@ ones trained both jointly and alone, coloured by kind (tree, resonant, positive 
 Dots: the process in the joint run (full pools, every horizon x three seeds, each run at its best
 checkpoint; steps_tuned.json), fitted on its own points with the floor-aware law A C^-alpha + L_inf
 over its per-process compute (steps_tuned.py: events of the process seen x FLOPs per event). Open squares: the same process
-trained alone (bs 1024, full pool, sweeps/solob1k_t*; solo_b1k.solo_mse); a thin line joins the two. One panel per training
+trained alone (bs 1024, full pool, sweeps/solob1k_t*, the signed pools from their rerun solob1kv_t*; solo_b1k.solo_mse); a thin line joins the two. One panel per training
 aggregation: (a) arithmetic mean, (b) geometric mean.
     python analysis/catalog_v2/alpha_vs_multiplicity_steps.py
 Writes analysis/catalog_v2/alpha_vs_multiplicity_steps (png + pdf)."""
