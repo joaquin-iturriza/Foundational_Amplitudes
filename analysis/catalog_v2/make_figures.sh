@@ -35,7 +35,7 @@ $P/seed_arms.py --out=seed_arms_tprop \
 $P/seed_arms.py --out=seed_arms_tch22 \
   'massive propagators divided out=runs/t1000_tprop_s[123]' \
   '+ $t$-channel factor, every process=runs/t1000_tprop_tch2_s*' \
-  '+ $t$-channel factor, $2\to2$ only (2 seeds)=runs/t1000_tprop_tch22_s[13]'
+  '+ $t$-channel factor, $2\to2$ only=runs/t1000_tprop_tch22_s*'
 
 $P/seed_arms.py --out=seed_arms_slq \
   'signed log, $s$ at the $10^{-2}$ quantile=runs/t1000_slq1e-2_s*' \
