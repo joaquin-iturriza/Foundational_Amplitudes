@@ -1,9 +1,9 @@
-"""Per-process census of catalog_v2 runs from their in-training validation lines.
+"""Per-process census of catalog_v2 runs from their in-training validation record.
 
-    python analysis/catalog_v2/census.py runs/<exp>[/<run>] [runs/<exp2> ...] [--last] [--layers]
+    python analysis/catalog_v2/census.py runs/<exp>[/<run>] [runs/<exp2> ...] [--layers]
 
-For each run: the per-process validation loss at the best combined validation (default) or
-the last one (--last), and per group the median and 90th percentile of that loss with the group
+For each run: the per-process validation loss (val_loss_no_reg, per_process_metrics.json) at the
+best checkpoint, the validation with the lowest aggregate val_loss_no_reg, and per group the median and 90th percentile of that loss with the group
 size. Groups are the classes the figures use (tree 2->2, resonant 2->2, tree 2->3, tree 2->4,
 positive and signed one-loop) and the families the notes discuss (the s-channel 2->2 family, its
 M_Z-shifted copies, the flavour twins); --layers groups by catalog layer instead (base trees by
@@ -36,25 +36,37 @@ def signed_classes():
     return s27, all50
 
 
+def metrics(path):
+    """The run's per_process_metrics.json (the last one under `path`, i.e. the run's own)."""
+    js = sorted(glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True))
+    if not js:
+        raise SystemExit(f"no per_process_metrics.json under {path}")
+    return json.load(open(js[-1]))
+
+
+def at_best(d):
+    """(index, combined val_loss_no_reg, {process: val_loss_no_reg}) at the run's best checkpoint:
+    the validation with the lowest aggregate val_loss_no_reg, every process at that same step
+    (the checkpoint selection, experiment._result_extra; CLAUDE.md "Reported values")."""
+    i = int(np.argmin(d["val_loss_no_reg"]))
+    return i, float(d["val_loss_no_reg"][i]), {n: float(v[i]) for n, v in d["proc_val_losses_no_reg"].items() if len(v) > i}
+
+
+def best_not_last(d):
+    """None when the best checkpoint is the run's last validation, else (best index, number of
+    validations, last / best combined): a run whose loss went back up is listed, never dropped."""
+    v = d["val_loss_no_reg"]; i = int(np.argmin(v))
+    return None if i == len(v) - 1 else (i, len(v), float(v[-1] / v[i]))
+
+
 def read_run(path):
-    logs = sorted(glob.glob(os.path.join(path, "**", "out_0.log"), recursive=True))
-    if not logs:
-        raise SystemExit(f"no out_0.log under {path}")
-    log = logs[-1]
-    vals = []   # (combined, {name: loss})
-    for line in open(log, errors="replace"):
-        m = re.search(r"Val loss \(combined\): ([0-9.eE+-]+) \| (.*)$", line)
-        if not m:
-            continue
-        d = {}
-        for tok in m.group(2).split(", "):
-            k, _, v = tok.partition("=")
-            try:
-                d[k.strip()] = float(v)
-            except ValueError:
-                pass
-        vals.append((float(m.group(1)), d))
-    return os.path.relpath(os.path.dirname(log), ROOT), vals
+    """(run dir, [(combined val_loss_no_reg, {process: val_loss_no_reg}) per validation]) from the
+    run's per_process_metrics.json; the no-reg losses, never the log's regularized line."""
+    d = metrics(path)
+    agg, proc = d["val_loss_no_reg"], d["proc_val_losses_no_reg"]
+    vals = [(float(agg[i]), {n: float(v[i]) for n, v in proc.items() if len(v) > i}) for i in range(len(agg))]
+    js = sorted(glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True))[-1]
+    return os.path.relpath(os.path.dirname(js), ROOT), vals
 
 
 def groups(d, all50, layers=False):
@@ -90,7 +102,7 @@ def stats(d, names):
 
 
 def main(argv):
-    last = "--last" in argv; layers = "--layers" in argv
+    layers = "--layers" in argv
     paths = [a for a in argv if not a.startswith("--")]
     _, all50 = signed_classes()
     runs = []
@@ -98,7 +110,7 @@ def main(argv):
         name, vals = read_run(p)
         if not vals:
             print(f"{name}: no validation lines"); continue
-        idx = len(vals) - 1 if last else int(np.argmin([c for c, _ in vals]))
+        idx = int(np.argmin([c for c, _ in vals]))   # the best checkpoint
         runs.append((name, idx, len(vals), vals[idx][0], vals[idx][1]))
     if not runs:
         return
