@@ -291,15 +291,15 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 |---|---|---|
 | `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
 | `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
-| `particle_encoder_hidden` (MLP embed) | `32` (on) | fixed, open |
+| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`: not load-bearing at 448 processes, dropped with the diagram encoder) | fixed |
 | `use_diagrams` / `d_diag` | `true` / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
-| physics levers `mass_from_momenta`/`coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run; `internal_mass_pdgs=[23,6,25]`. **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |
+| physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`. `mass_from_momenta` stays `false` (redundant, `tab:levers`). **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |
 | `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
 | target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (`docs/results.tex` catalog census, three seeds each; off by default, **switch on for the full-horizon catalog sweep**); they change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
-| `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` / `L2` | fixed |
+| `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` (default) / `L2` | `MSE`, `L2` fixed; the aggregation is **open at catalog scale**: the arithmetic mean wins there (`tab:agg_ab`, `tab:catv2_short_smix`, catalog hand-off) |
 | **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
 | **`evaluation.batchsize`** | **`16384`** (eval forward-only → match train BS) | fixed |
 | `num_workers` | `2` | fixed |
@@ -307,12 +307,12 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | optimizer / betas / eps / weight_decay | `AdamW` / `[0.9,0.999]` / `1e-8` / `0` | fixed |
 | `scheduler` / `clip_grad_norm` | `CosineAnnealingLR` / `5` | fixed |
 | `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (see rule #2) | per-run |
-| **EMA** (`ema` top-level flag) | **UNTESTED — has always been `false`.** Now swept `{false,true}` × `ema_decay∈[0.9,0.9999]`; settle before fixing | open |
+| **EMA** (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; the big-run DyHPO and the catalog quick sweeps chose it on for their best trial (`docs/results.tex`, sec:bigrun, catalog quick sweeps), the catalog wave's best had it off; not settled | open |
 | fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
 
 Sweep search ranges (redesigned): `regularization_lambda [1e-10,1e-6]`,
 `cosanneal_warmup_frac [0.05,0.2]`, `cosanneal_eta_min` fix ~`1e-8`, `ema_decay
-[0.9,0.9999]` (+ `ema` categorical), `sampler_alpha_ema [0.3,0.95]` only if the
+[0.9,0.999]` (+ `ema` categorical), `sampler_alpha_ema [0.3,0.95]` only if the
 balanced sampler is on. Drop the exotic sampler variants.
 
 ---
@@ -440,6 +440,16 @@ laws); the settled rules that govern how sweeps are set up:
    manufacturing a **false** "it doesn't work at any `lr`". Sweep the coupled space.
    Job arrays stay right for **non-HP** ablations (loss type, data tag, warm-start
    checkpoint, ablation flags, seeds). Enforced by `hpo_guard.sh`.
+
+### Reported values
+
+**Every reported loss is read at the best checkpoint**: the validation step with the lowest aggregate
+`val_loss_no_reg` (the checkpoint selection, `experiment._result_extra`; `docs/results.tex`
+`def:metric`), each process at that same step. Never the last validation, never the regularized
+loss, never a per-process minimum over steps. A post-training evaluation is the best checkpoint
+only when `training.es_load_best_model` is true; say which it is. **A run that blows up is reported
+separately** (listed, with where it blew up), never dropped silently and never by a loss
+threshold; its best checkpoint is still its value wherever the run is reported.
 
 ### Scaling fits
 

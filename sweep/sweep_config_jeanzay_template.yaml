@@ -73,4 +73,4 @@ search_space:
 - name: training.ema_decay
   type: float_uniform
   low: 0.9          # inert on ema=false trials; ~100-10000 step averaging horizon when on
-  high: 0.9999
+  high: 0.999

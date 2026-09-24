@@ -42,7 +42,7 @@ python run.py \
   data.train_subsample="${TRAIN_SUB:-null}" data.eval_subsample=2000 data.preprocess_per_dataset=true \
   data.signedlog_quantile="${SLQ:-0.01}" \
   data.target_propagators="${TPROP:-false}" data.target_propagator_tchannel="${TCH:-false}" \
-  data.target_propagator_tchannel_max_final="${TCHMAX:-99}" training.sign_head="${SIGN:-false}" \
+  data.target_propagator_tchannel_max_final="${TCHMAX:-2}" training.sign_head="${SIGN:-false}" \
   data.use_PIDs=false data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta=true data.coupling_scalars=true data.internal_mass_scalars=true \

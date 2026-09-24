@@ -5,7 +5,7 @@ d_particle_hidden: 16  # fixed projection dim: encoder(n_features → d_particle
                         # in_channels = d_particle_hidden + 4 is constant regardless of
                         # how many quantum numbers are in PARTICLE_PROPERTIES, so adding
                         # a 9th feature never requires retraining the transformer.
-particle_encoder_hidden: 32  # >0 → 2-layer MLP encoder (Linear→GELU→Linear) instead of a
+particle_encoder_hidden: 0   # off (docs/results.tex tab:bigrun_arms). >0 → 2-layer MLP encoder (Linear→GELU→Linear) instead of a
                              # single Linear, so it can form nonlinear products of quantum
                              # numbers. 0 = legacy single Linear.
 
