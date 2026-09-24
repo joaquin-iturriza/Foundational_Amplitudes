@@ -348,7 +348,7 @@ def build_solo_curve(config_paths, plot_only_paths=None):
     label says so). chi2 is the profiled fit's reduced chi^2.
 
     Returns (ref, points, points_excluded):
-      ref    = { ds: (A, alpha, L_inf, chi2_red) }
+      ref    = { ds: (A, alpha, L_inf, chi2_red, alpha_bare) }
       points = { ds: [(flops, loss), ...] }  ;  points_excluded = {} (everything is fit)."""
     merged = _merge_best(config_paths)
     for ds, cell in _merge_best(plot_only_paths).items():
@@ -360,10 +360,11 @@ def build_solo_curve(config_paths, plot_only_paths=None):
             continue
         cs = sorted(pts); vs = [pts[c] for c in cs]
         f = fit_scaling(cs, vs)
+        # the fifth element is the bare slope, for the branches that draw a borrowed slope with no floor
         if f["alpha"] is not None:
-            ref[ds] = (f["A"], f["alpha"], f["L_inf"], f["chi2r"])
+            ref[ds] = (f["A"], f["alpha"], f["L_inf"], f["chi2r"], f["alpha_bare"])
         else:
-            ref[ds] = (f["A_bare"], f["alpha_bare"], 0.0, float("nan"))
+            ref[ds] = (f["A_bare"], f["alpha_bare"], 0.0, float("nan"), f["alpha_bare"])
         points[ds] = [(c, pts[c]) for c in cs]
         print(f"  {ds}: solo {'floor-aware' if f['alpha'] is not None else 'bare (diagnostic)'} fit from "
               f"{len(cs)} cells  alpha={ref[ds][1]:.3f}  L_inf={ref[ds][2]:.2e}  chi2r={ref[ds][3]:.2f}  "
@@ -784,7 +785,9 @@ def main():
                 _solo_scatter(ax, [(p[0], p[1]) for p in wall_excl.get(ds, [])], fitted=False)
             elif solo_pts and ds in solo_ref:
                 t_a, v_a = solo_pts[0][0], solo_pts[0][1]      # OLD anchor (lowest t_steps)
-                alpha_s = solo_ref[ds][1]
+                # drawn with no floor through one anchor: the bare slope (the floor-aware alpha is the
+                # exponent of L - L_inf and would fall too steeply here)
+                alpha_s = solo_ref[ds][4] if len(solo_ref[ds]) > 4 else solo_ref[ds][1]
                 span = [p[0] for _, d in wall if ds in d for p in d[ds]] + [p[0] for p in solo_pts]
                 tf = np.logspace(math.log10(min(span)), math.log10(max(span)), 200)
                 ax.plot(tf, v_a * (tf / t_a) ** (-alpha_s), color=SOLO_STYLE["color"],
