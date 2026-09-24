@@ -110,7 +110,6 @@ for c, procs in REFS.items():
     for p in procs:
         FIT["solo", p] = fitf(*solo_points(p))
 
-cgrid = np.geomspace(min(C_SOLO(p, SOLO_STEPS[0]) for ps_ in REFS.values() for p in ps_) / 2, C_JOINT(STEPS[-1]) * 2, 300)
 figs = ps.panels(len(REFS))
 for (fig, ax), (c, procs) in zip(figs, REFS.items()):
     for arm, col, lab in ARMS:
@@ -121,12 +120,16 @@ for (fig, ax), (c, procs) in zip(figs, REFS.items()):
         ax.plot(e, [np.exp(np.mean(np.log(by[k]))) for k in e], marker="o", ls="none", color=col, label=lab)
         ax.fill_between(e, [min(by[k]) for k in e], [max(by[k]) for k in e], color=col, alpha=0.2)
         f = FIT[arm, c]
-        if f: ax.plot(cgrid, f["A"] * cgrid ** -f["alpha"] + f["Linf"], color=col, ls="--")
+        if f:     # each fit drawn over its own data only (a fit is not an extrapolation)
+            g = np.geomspace(min(e) / 1.3, max(e) * 1.3, 100)
+            ax.plot(g, f["A"] * g ** -f["alpha"] + f["Linf"], color=col, ls="--")
     for p, mk in zip(procs, ("s", "D")):
         e, y = solo_points(p)
         ax.plot(e, y, marker=mk, ls="none", color=ps.C.grey, label=f"{LABEL[p]} alone")
         f = FIT["solo", p]
-        if f: ax.plot(cgrid, f["A"] * cgrid ** -f["alpha"] + f["Linf"], color=ps.C.grey, ls=":")
+        if f:
+            g = np.geomspace(min(e) / 1.3, max(e) * 1.3, 100)
+            ax.plot(g, f["A"] * g ** -f["alpha"] + f["Linf"], color=ps.C.grey, ls=":")
     ax.plot([], [], color="black", ls="--", label=r"fit $A\,C^{-\alpha}+L_\infty$, joint")
     ax.plot([], [], color=ps.C.grey, ls=":", label=r"fit $A\,C^{-\alpha}+L_\infty$, alone")
     ax.set_xscale("log"); ax.set_yscale("log")
