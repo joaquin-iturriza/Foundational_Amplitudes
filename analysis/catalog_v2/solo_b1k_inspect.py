@@ -5,10 +5,10 @@ Per trial: its HPs (config.yaml), the DyHPO result (best validation loss, result
 the validation curve (the "Val loss: ... | step N" lines of out_0.log) and the post-training MSE on
 the train and validation pools. Single-process runs write no per_process_metrics.json, so the log
 is the record. Writes
-  solo_b1k_scaling_a ... _l   every trial's result against steps, coloured by lr; the best per step
+  solo_b1k_scaling_{1,2}_a..f every trial's result against steps, coloured by lr; the best per step
                               count joined; the floor-aware fit A C^-alpha + L_inf over the best
   solo_b1k_lr                 the best trial's lr per step count, every process, with the search window
-  solo_b1k_curves_a ... _l    the best trial's validation curve at each step count, final train MSE marked"""
+  solo_b1k_curves_{1,2}_a..f  the best trial's validation curve at each step count, final train MSE marked"""
 import glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -76,7 +76,8 @@ for (fig, ax), p in zip(figs, PROCS):
     ps.process_label(ax, LABEL[p], loc="lower left")
     ps.legend(ax, "upper right")
     ps.colorbar(ax, sc, "learning rate")
-ps.save_panels(figs, "analysis/catalog_v2/solo_b1k_scaling")
+for i in (0, 1):   # six panels per file set (save_panels letters a-f)
+    ps.save_panels(figs[6 * i:6 * i + 6], f"analysis/catalog_v2/solo_b1k_scaling_{i + 1}")
 
 # (2) the chosen lr per step count
 fig, ax = ps.figure()
@@ -92,7 +93,7 @@ for y in LR_WINDOW:
 ax.plot([], [], color=ps.C.grey, ls=":", label="search window")
 ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xticks(STEPS, [str(s) for s in STEPS]); ax.minorticks_off()
 ax.set_xlabel("training steps, bs 1024"); ax.set_ylabel("learning rate of the best trial")
-ps.legend(ax, "lower left")
+ps.legend(ax, "lower right")
 ps.save(fig, "analysis/catalog_v2/solo_b1k_lr")
 
 # (3) the best trial's validation curve at every step count, final train MSE marked
@@ -106,9 +107,10 @@ for (fig, ax), p in zip(figs, PROCS):
         ax.plot(x, y, color=col, label=str(S))
         if "final_train" in t:
             ax.plot([S], [t["final_train"]], marker="o", mfc="none", color=col, ls="none")
-    ax.plot([], [], marker="o", mfc="none", color=ps.C.grey, ls="none", label="final train MSE")
+    ax.plot([], [], marker="o", mfc="none", color=ps.C.grey, ls="none", label="train, end")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("step"); ax.set_ylabel(r"validation MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, LABEL[p], loc="lower left")
     ps.legend(ax, "upper right", ncol=2)
-ps.save_panels(figs, "analysis/catalog_v2/solo_b1k_curves")
+for i in (0, 1):
+    ps.save_panels(figs[6 * i:6 * i + 6], f"analysis/catalog_v2/solo_b1k_curves_{i + 1}")
