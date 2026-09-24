@@ -833,7 +833,9 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
   \widerow{\pnl{lr_2d_disentangled_a.pdf}\hfill\pnl{lr_2d_disentangled_b.pdf}} \\[1ex]
   \includegraphics{lr_2d_disentangled_c.pdf}
   \caption{\textbf{Disentangling horizon from data size} on the clean 2D grid. \emph{Top left:}
-  $\eta^\ast$ vs horizon at fixed $D$ (colour): an inverted-$U$ at every $D$, peak pinned to
+  $\eta^\ast$ vs horizon at fixed $D$ (colour; $D$ is the train set summed over the $8$ processes
+  of every sweep on this grid, $700$--$70{,}000$, i.e.\ $88$--$8750$ events per process): an
+  inverted-$U$ at every $D$, peak pinned to
   $\sim3$k steps independent of $D$. \emph{Top right:} $\eta^\ast$ vs $D$ at fixed horizon
   (colour): weak, $\propto D^{+0.15\ldots0.3}$, saturating. \emph{Bottom:} learning curves
   flooring later as $D$ grows, stars marking the $t$ of peak $\eta$: the peak is not the floor.}

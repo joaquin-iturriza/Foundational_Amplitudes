@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Disentangle dataset-size vs iterations on the clean scaling_p 2D grid, and
-show that the optimal-lr hump peaks at the convergence horizon (val_loss floor).
+"""Disentangle dataset-size vs iterations on the clean scaling_p 2D grid: the optimal lr against the
+horizon t at each D, against D at each t, and the best validation loss against t with the t of the
+peak lr marked. D is the TRAIN SET SIZE of the run, n_train summed over its 8 processes (every
+scaling_p sweep trains 8 datasets), so D/8 is the events per process.
 
 Ordered series (dataset size D, step budget t) are keyed by a colourbar rather than a
 legend: at 11pt a five-entry legend does not fit a third of \\textwidth, and a colourbar
@@ -85,7 +87,7 @@ for i, t in enumerate(good_t):
     ys = [10**np.mean(pts[d]) for d in ds]
     a.plot(ds, ys, 's-', color=cols_g[i])
 a.set_xscale('log'); a.set_yscale('log')
-a.set_xlabel(r'training set size $D$'); a.set_ylabel(r'optimal learning rate')
+a.set_xlabel(r'training set size $D$ (8 processes)'); a.set_ylabel(r'optimal learning rate')
 ramp_bar(a, norm_T, r'$t$')
 
 # C: learning curves — best val loss vs t_steps per D, with the lr-peak t marked
