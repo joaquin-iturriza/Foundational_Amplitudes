@@ -24,6 +24,8 @@ numpy==1.26.4  # torch 2.1.2 is built against NumPy 1.x; 2.x breaks interop
 omegaconf==2.3.0
 opt_einsum==3.4.0
 optuna>=3.1
+gpytorch==1.11          # DyHPO surrogate (sweep/dyhpo); every sweep imports it
+linear_operator==0.6.1  # gpytorch 1.11's backend; later versions need a newer torch
 Pillow==11.1.0
 protobuf==6.30.1
 pyOpenSSL==25.0.0

@@ -5,7 +5,7 @@ For every process of each recipe: the train/val/test pools are prebuilt (the che
 exists (data/diagrams/<process>.diagrams.json, resolved through the recipe's `base` for a
 scan variant, as the off-shellness masks and the target propagators resolve it; without it
 those features are silently off for that process). Also that the env has the packages
-a run imports. Prints one line per recipe and exits non-zero if anything is missing.
+a run and a sweep trial import. Prints one line per recipe and exits non-zero if anything is missing.
     python tools/check_site_data.py [recipes/<spec>.yaml ...]     (default: the catalog recipe)
 Used by sites/setup.sh --verify, so `site pick` only picks a site that can run the catalog."""
 import importlib.util, os, sys
@@ -16,7 +16,9 @@ DEFAULT = ["recipes/catalog_v2_train_scan.yaml"]
 SEED = 42                      # data.seed of every catalog run
 
 ok = True
-env_missing = [m for m in ("torch", "lloca", "xformers") if importlib.util.find_spec(m) is None]
+# what a training run imports, and what every DyHPO sweep's run_trial imports on top
+env_missing = [m for m in ("torch", "lloca", "xformers", "gpytorch", "sklearn", "scipy")
+               if importlib.util.find_spec(m) is None]
 if env_missing:
     print(f"env: missing {' '.join(env_missing)}"); ok = False
 import datagen
