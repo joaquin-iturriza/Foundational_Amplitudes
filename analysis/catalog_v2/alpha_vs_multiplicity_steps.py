@@ -1,12 +1,13 @@
 """Scaling exponent against final-state multiplicity for the catalog steps curve: the same figure as
 analysis/scaling_compute/alpha_vs_multiplicity_overlay.py (fig:alphamult) -- log alpha against the
 phase-space DOF = 3 n_fs - 4 on a log axis (ticks by n_fs), the bound alpha = 4/DOF corner to corner
-with a shaded wedge below and its label along the line, one colour per family joined by
-dotted lines -- for the families of that figure as they appear in catalog_v2.
+with a shaded wedge below and its label along the line -- for the twelve reference processes, the
+ones trained both jointly and alone, coloured by kind (tree, resonant, positive and signed one-loop).
 Dots: the process in the joint run (full pools, 1000-8000 steps x three seeds; steps_tuned.json),
 fitted on its own points with the floor-aware law A C^-alpha + L_inf. Open squares: the same process
-trained alone (bs 1024, full pool, sweeps/solob1k_t*), where there is such a reference. One panel
-per training aggregation: (a) arithmetic mean, (b) geometric mean.
+trained alone (bs 1024, full pool, sweeps/solob1k_t*); a thin line joins the two. The one family
+among them, ee -> u ubar (+g, +gg), is joined across multiplicity (dotted). One panel per training
+aggregation: (a) arithmetic mean, (b) geometric mean.
     python analysis/catalog_v2/alpha_vs_multiplicity_steps.py
 Writes analysis/catalog_v2/alpha_vs_multiplicity_steps (png + pdf)."""
 import json, os, sys
@@ -22,15 +23,13 @@ NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 FIT_STEPS, SOLO_STEPS = [1000, 2000, 4000, 8000], [33, 67, 134, 268, 536, 1072]
 runs = [r for r in D["joint"] if np.median(list(r["final"].values())) <= 0.5 and r["steps"] in FIT_STEPS]
 nbar = float(np.mean([NP[n] for n in {n for r in runs for n in r["final"]} if n in NP]))
-# the families of fig:alphamult, same tab10 colours, followed through catalog_v2's multiplicities
-FAMILIES = [
-    (r"$ee\to q\bar q(+ng)$", "#2ca02c", ["ee_uu", "ee_uug", "ee_uugg"]),
-    (r"$ee\to\gamma\gamma(+n\gamma)$", "#9467bd", ["ee_aa", "ee_aaa", "ee_aaaa"]),
-    (r"$ee\to WW(+Z,ZZ)$", "#1f77b4", ["ee_WW", "ee_wwz", "ee_WWZZ"]),
-    (r"$ee\to t\bar t(+ng)$", "#e377c2", ["ee_ttbar", "ee_ttbarg", "ee_ttbargg"]),
-    (r"$ee\to t\bar t(+g)$, 1-loop", "#d62728", ["ee_ttbar_nlo", "ee_ttbarg_nlo"]),
-    (r"$ee\to q\bar q(+g)$, 1-loop", "#ff7f0e", ["ee_uu_nlo", "ee_uug_nlo"]),
-]
+# the reference processes, by kind (the colours of the class panels)
+KIND = {"tree": ("tree", ps.C.blue), "res": ("resonant", ps.C.sky), "pos": ("positive one-loop", ps.C.orange),
+        "sgn": ("signed one-loop", ps.C.purple)}
+PROCS = [("ee_aa", "tree"), ("uubar_uubar", "tree"), ("ee_uu", "res"), ("ee_ddbar", "res"),
+         ("ee_uug", "tree"), ("udbar_WpZZ", "tree"), ("ee_uugg", "tree"), ("udbar_WpZaa", "tree"),
+         ("uubar_ZaZ_nlo", "pos"), ("ee_bb_nlo", "pos"), ("udbar_Wgg_nlo", "sgn"), ("uubar_ddbara_nlo", "sgn")]
+CHAIN = ["ee_uu", "ee_uug", "ee_uugg"]
 
 def alpha(c, l):
     f = fit_power_law_with_floor(c, l) if len(c) >= 4 else None
@@ -53,18 +52,23 @@ for ax, arm in zip(axes, ("arith", "geo")):
     ax.plot(dd, 4.0 / dd, color="0.65", ls="--", zorder=1)
     ax.fill_between(dd, 1e-3, 4.0 / dd, color="0.5", alpha=0.14, zorder=0, lw=0)
     print(f"== {arm}")
-    for j, (lab, col, members) in enumerate(FAMILIES):
-        jit = 1 + 0.03 * (j - 2.5)
-        pts = [(dofx(NP[n] - 2) * jit, joint_alpha(arm, n), n) for n in members if n in NP]
-        pts = [q for q in pts if q[1] is not None]
-        if pts:
-            ax.plot([q[0] for q in pts], [q[1] for q in pts], ls=":", marker="o", color=col, zorder=3, label=lab)
-        for n in members:
-            a = solo_alpha(n)
-            if a is not None:
-                ax.scatter([dofx(NP[n] - 2) * jit], [a], s=40, marker="s", facecolors="none", edgecolors=col, zorder=4)
-        print("  " + lab + ": " + ", ".join(f"{q[2]} {q[1]:.2f}" for q in pts)
-              + "".join(f" | {n} alone {solo_alpha(n):.2f}" for n in members if solo_alpha(n) is not None))
+    # spread the processes that share a multiplicity so each joint/alone pair stands apart
+    slot = {}
+    for n, k in PROCS:
+        m = NP[n] - 2; slot.setdefault(m, []).append(n)
+    X = {n: dofx(m) * (1 + 0.07 * (i - (len(v) - 1) / 2)) for m, v in slot.items() for i, n in enumerate(v)}
+    J = {n: joint_alpha(arm, n) for n, _ in PROCS}; S = {n: solo_alpha(n) for n, _ in PROCS}
+    for n, k in PROCS:
+        col = KIND[k][1]
+        if J[n] is not None and S[n] is not None:
+            ax.plot([X[n]] * 2, [J[n], S[n]], color=col, alpha=0.5, zorder=2)
+        if J[n] is not None:
+            ax.plot([X[n]], [J[n]], ls="none", marker="o", color=col, zorder=3)
+        if S[n] is not None:
+            ax.scatter([X[n]], [S[n]], s=40, marker="s", facecolors="none", edgecolors=col, zorder=4)
+        print(f"  {n:18s} n_fs={NP[n]-2}  joint {J[n] if J[n] is None else round(J[n], 2)}  alone {S[n] if S[n] is None else round(S[n], 2)}")
+    for src in (J, S):
+        ax.plot([X[n] for n in CHAIN], [src[n] for n in CHAIN], ls=":", color=KIND["tree"][1], zorder=2)
     ax.xaxis.set_major_locator(FixedLocator([dofx(n) for n in (2, 3, 4)])); ax.xaxis.set_minor_locator(FixedLocator([]))
     ax.set_xticklabels(["2", "3", "4"]); ax.xaxis.set_minor_formatter(NullFormatter())
     ax.yaxis.set_major_locator(FixedLocator([0.5, 1, 2])); ax.yaxis.set_major_formatter(ScalarFormatter())
@@ -78,10 +82,13 @@ for ax, arm in zip(axes, ("arith", "geo")):
     (dx, dy) = p(x0 * 1.3) - p(x0 / 1.3)
     ax.text(x0, (4.0 / x0) * 0.86, "Theoretical lower bound", color="0.55",
             rotation=np.degrees(np.arctan2(dy, dx)), rotation_mode="anchor", ha="center", va="center", zorder=1)
-# six family labels and the marker key cannot sit inside a 2.40in box (fig:alphamult hit the same
-# with eight): one strip above the two panels, paid for by the canvas, as that figure does
-h0, l0 = axes[0].get_legend_handles_labels()
-k1 = axes[0].plot([], [], ls="none", marker="o", color="0.3")[0]
-k2 = axes[0].scatter([], [], s=40, marker="s", facecolors="none", edgecolors="0.3")
-ps.shared_legend(fig, axes[0], ncol=4, handles=h0 + [k1, k2], labels=l0 + ["joint run", "trained alone"])
+# four kinds, the marker key and the family line do not fit inside a 2.40in box: one strip above
+# the two panels, as fig:alphamult does
+H = [axes[0].plot([], [], ls="none", marker="o", color=c)[0] for _, c in KIND.values()]
+L = [lab for lab, _ in KIND.values()]
+H += [axes[0].plot([], [], ls="none", marker="o", color="0.3")[0],
+      axes[0].scatter([], [], s=40, marker="s", facecolors="none", edgecolors="0.3"),
+      axes[0].plot([], [], ls=":", color=KIND["tree"][1])[0]]
+L += ["joint run", "trained alone", r"$ee\to u\bar u(+g,gg)$"]
+ps.shared_legend(fig, axes[0], ncol=4, handles=H, labels=L)
 ps.save(fig, os.path.join(HERE, "alpha_vs_multiplicity_steps"))
