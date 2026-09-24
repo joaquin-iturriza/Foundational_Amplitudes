@@ -373,8 +373,9 @@ at a median of $10$ (the $m_t$ family $6$, the $M_Z$ family $20$, the worst the 
 $Z$-peak pools at $65$, halved from their flat versions). The one gap the audit found was
 the $14$ hold-outs: their recipe had no sampling header, so their train pools were flat while
 the scan hold-outs were shaped; the header is now written by the generator and the pools
-regenerated. Val and test are flat by construction, so the audit reports them only for
-window coverage, which is complete everywhere.
+regenerated. At the time of this audit val and test were flat by construction, so it reports
+them only for window coverage, which is complete everywhere; they have since been shaped like
+train (Sec.~\ref{sec:catalog}, the sampling policy).
 
 \paragraph{The needle is not in the data.} The audit above measured the sampling, not
 the learning outcome, and the first catalog\_v2 wave (Sec.~\ref{sec:catv2-census}) found the
@@ -1105,7 +1106,13 @@ $40000$ & $\mathbf{2.7\times10^{-9}}$ & $2.7\times10^{-9}$ & $4.8\times10^{-9}$ 
   whether NLO pretraining data matters for NLO-virtual transfer. The $1$h-pretrain feature-ladder
   markers ($D{=}10^5$ panel) walk raw $\to$ +one-hots $\to$ +mass/coupling scalars $\to$ full
   adopted config at fixed pretrain compute. (Full compute-axis version:
-  \code{plots/compute\_scan\_*\_big.pdf}.)}
+  \code{plots/compute\_scan\_*\_big.pdf}.) Read-out: each cell is its best trial by validation,
+  but the test MSE shown is that trial's last step for the compute-scan and fine-tune cells, which
+  ran without reloading the best checkpoint (\code{es\_load\_best\_model: false}), and its best
+  checkpoint for the older single-process cells; where cells coincide the lower test loss is kept,
+  a selection on test. The best-checkpoint test loss of those cells was not recorded, so this
+  figure does not follow the reported-value convention and cannot be brought to it without
+  rerunning them.}
   \label{fig:transfer}
 \end{figure}
 
@@ -2805,7 +2812,7 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     $1000$ steps the three fixes together are measured (Tables~\ref{tab:catv2_short} and
     \ref{tab:catv2_short_smix}, the latter on the shaped measure every run uses from now on); what
     only the full horizon can tell is whether the signed one-loop $2\to3$ class learns with
-    more steps, and where $\tau$ lands the failing-count against best-tail trade. Three
+    more steps, and where $\tau$ lands the trade between the bulk and the best-learned tail. Three
     trials at the full horizon are $\sim9$ GPU-hours. It is a fresh sweep, not an extension: wave 0's DyHPO state holds
     observations under the old target and without the $\tau$ dimension.
   \item \textbf{Hold-outs.} $ds\to ds$ and $cs\to cs$ test nothing as ``relabels of $us\to
@@ -2832,7 +2839,7 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     (masks $478/478$). Training-side knobs shape the gradient and must not move the
     metric: the validation aggregate is fixed separately
     (\code{training.val\_aggregation}, geometric mean) so \code{val\_loss\_no\_reg} stays
-    comparable across arms, with the census (failing count, median) as the other read-out.
+    comparable across arms, with the census (median and $90$th percentile by class) as the other read-out.
     The first two arms of Table~\ref{tab:agg_ab} predate this split, so their checkpoints
     were selected on their own training aggregate; the per-process numbers stand.
   \item \textbf{Open after the off-shellness arms.} (a) The range of the target drives the
@@ -2846,23 +2853,21 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     target is in and adopted: the massive $s$-channel poles for every process and the
     massless $t$-channel exchange for the $2\to2$ processes (three seeds each, outside the
     band where it matters); the sign head is in, for a modest gain on the signed class.
-    Open: the divergence at peak learning rate with the $t$-channel factor (two of nine
+    Open: whether to keep the $2\to2$-only $t$-channel rule, which was adopted on two of its three
+    seeds (the third blew up; at its best checkpoint the arm is $0.091\pm0.12$ against $0.022$);
+    the divergence at peak learning rate with the $t$-channel factor (two of nine
     runs; the arithmetic mean's exposure, to be settled with lr and aggregation swept
     jointly at this working point, and the geometric mean re-checked with the new targets);
     the signed class is still the worst by five, now a magnitude problem. The aggregation
     question of the joint-training gap is answered (Table~\ref{tab:steps_agg}): the aggregation
     sets the $2\to2$ and positive one-loop slopes and not the $2\to4$ one, so the
-    exponent-deficit loss weight is not pursued. Open: the resonant $2\to2$ pools stall at
-    $1.2$--$1.6$ per doubling under every aggregation while their solo reference gains $5.6$,
-    with validation equal to train, so the stall is optimisation or representation, not data;
-    what the residual profile of these pools looks like at $4000$ steps is the first look.
-    The $\tau$ floor diverged once in three at $4000$ steps. Caveat to carry: every joint run of
-    the steps curve so far ran at $9.7\times10^{-3}$, the $500$-step optimum of the quick-point
-    sweep (\code{catalog\_q\_mean}), at every horizon, where the measured $\eta^*(t,D)$ surface at
-    these pools puts the $1000$--$4000$-step optima $1.7$--$2\times$ higher, while the solo
-    references are tuned per horizon; the curve is being redone with the joint run tuned per
-    horizon too (\code{catalog\_steps\_t<N>\_mean}, $500$--$8000$ steps) against references
-    of two processes per class (\code{solo\_t<N>\_<process>}). Sharing across multiplicities costs $20$--$45\%$ at
+    exponent-deficit loss weight is not pursued. Open: on the full pools with every horizon
+    tuned (Fig.~\ref{fig:steps_tuned}) the resonant $2\to2$ pools scale with $\alpha=0.39$
+    (arithmetic) and $0.21$ (geometric) against $1.34$--$1.69$ alone, with validation equal to
+    train, so the stall is optimisation or representation, not data; what the residual profile
+    of these pools looks like at $4000$ steps is the first look. The solo references' HPO is
+    thin (six trials, the same three start-up configurations in every sweep); their exponents
+    carry that noise. The $\tau$ floor diverged once in three at $4000$ steps. Sharing across multiplicities costs $20$--$45\%$ at
     $1000$ steps on top; the structural options for the $2\to2$ classes (capacity or routing by
     class, a per-class fine-tune) are next now that the aggregation question is settled.
     Every 1000-step arm since the overhead fix is three seeds on the $5$k pools at the
@@ -3036,8 +3041,8 @@ target, so their losses compare across arms only in rank. Three readings. The ag
 moves everything: under the arithmetic mean the median over all processes goes from $0.059$
 to $0.038$ and the $90$th percentile from $0.32$ to $0.13$, every class but tree $2\to2$
 improves, the $s$-channel family from $0.080$ to $0.036$, and the price is again the
-best-learned tail, tree $2\to2$ at a median of $4\times10^{-4}$ under the geometric mean
-against $3.1\times10^{-3}$; the twelve-process result (Sec.~\ref{sec:catalog},
+best-learned tail, tree $2\to2$ at a median of $2.7\times10^{-4}$ under the geometric mean
+against $3.0\times10^{-3}$; the twelve-process result (Sec.~\ref{sec:catalog},
 Table~\ref{tab:agg_ab}) transfers to $478$ processes unchanged, and $\tau$ in the wave's
 search space is the right place to set the trade. The signed-log scale does what it was
 built for and no more: the standardized target is sane, the signed $2\to2$ pools learn
@@ -3125,8 +3130,8 @@ takes the plain per-event mean, and the single-pass validation
 
 Corrected, the weighting does what its weights say. It puts $2.9\times$ the gradient on the
 $2\to2$ class and a quarter on the $2\to4$ class, and the census follows, against the
-arithmetic mean: tree $2\to2$ from a median of $4.1\times10^{-3}$ to $2.0\times10^{-3}$
-($3.7$ to $3.1\times10^{-3}$ with the off-shellness input), while tree $2\to4$ goes from $0.062$
+arithmetic mean: tree $2\to2$ from a median of $4.0\times10^{-3}$ to $2.0\times10^{-3}$
+($3.6$ to $3.0\times10^{-3}$ with the off-shellness input), while tree $2\to4$ goes from $0.062$
 to $0.11$ ($0.051$ to $0.11$ with the input) and tree $2\to3$ from $0.027$ to $0.059$; over all
 processes its median, $0.076$, sits between the arithmetic mean's $0.045$ and the geometric
 mean's $0.095$ (Table~\ref{tab:catv2_excess}). Cutting a class's gradient share starves it;
@@ -3140,10 +3145,11 @@ runs are not capacity-limited.
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps at $\mathrm{bs}=16384$, lr $9.7\times10^{-3}$, generation
-one-hot, one seed: median / $90$th percentile of the per-process validation loss at the last
-validation, by class. ``Old'' is the encoding A/B's one-hot arm before the signed-log scale; $q$
-is the quantile of $|x|$ that sets the scale. Signed pools are on a different target scale in
-the ``old'' column.}
+one-hot, one seed: median / $90$th percentile of the per-process $\vlnr$ at the best checkpoint
+(the validation with the lowest combined $\vlnr$), by class. ``Old'' is the encoding A/B's one-hot
+arm before the signed-log scale; that run kept no per-process record, so its column is read from
+its log at the best combined validation and includes the regularization term. $q$ is the quantile
+of $|x|$ that sets the scale. Signed pools are on a different target scale in the ``old'' column.}
 \label{tab:catv2_short}
 \small
 \begin{tabular}{@{}lrrrr@{}}
@@ -3151,15 +3157,15 @@ the ``old'' column.}
 class & old & geo., $q=0.01$ & geo., $q=0.5$ & arith., $q=0.01$ \\
 \midrule
 all $478$ & $0.068$ / $0.39$ & $0.059$ / $0.32$ & $0.062$ / $0.33$ & $0.038$ / $0.13$ \\
-tree $2\to2$ ($58$) & $0.0005$ / $0.048$ & $0.0004$ / $0.053$ & $0.00055$ / $0.053$ & $0.0031$ / $0.025$ \\
+tree $2\to2$ ($58$) & $0.0005$ / $0.048$ & $0.00027$ / $0.053$ & $0.00042$ / $0.053$ & $0.0030$ / $0.025$ \\
 resonant $2\to2$ ($27$) & $0.082$ / $0.13$ & $0.10$ / $0.15$ & $0.18$ / $0.24$ & $0.067$ / $0.10$ \\
 tree $2\to3$ ($110$) & $0.031$ / $0.19$ & $0.025$ / $0.21$ & $0.031$ / $0.23$ & $0.023$ / $0.097$ \\
-tree $2\to4$ ($185$) & $0.086$ / $0.25$ & $0.079$ / $0.28$ & $0.081$ / $0.30$ & $0.050$ / $0.15$ \\
+tree $2\to4$ ($185$) & $0.086$ / $0.25$ & $0.078$ / $0.28$ & $0.081$ / $0.30$ & $0.050$ / $0.15$ \\
 positive one-loop ($48$) & $0.057$ / $0.35$ & $0.024$ / $0.25$ & $0.040$ / $0.40$ & $0.021$ / $0.084$ \\
 signed one-loop ($50$) & $0.43$ / $0.77$ & $0.31$ / $0.97$ & $0.25$ / $1.2$ & $0.10$ / $0.25$ \\
-$s$-channel family ($7$) & $0.065$ / $0.12$ & $0.080$ / $0.12$ & $0.19$ / $0.23$ & $0.036$ / $0.062$ \\
+$s$-channel family ($7$) & $0.065$ / $0.12$ & $0.080$ / $0.12$ & $0.19$ / $0.23$ & $0.036$ / $0.061$ \\
 $M_Z$ family ($20$) & $0.096$ / $0.14$ & $0.10$ / $0.15$ & $0.18$ / $0.24$ & $0.085$ / $0.10$ \\
-flavour twins ($9$) & $0.0024$ / $0.52$ & $0.0008$ / $0.092$ & $0.0023$ / $0.029$ & $0.0037$ / $0.0096$ \\
+flavour twins ($9$) & $0.0024$ / $0.52$ & $0.00064$ / $0.092$ & $0.0022$ / $0.029$ & $0.0036$ / $0.0095$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3168,7 +3174,7 @@ flavour twins ($9$) & $0.0024$ / $0.52$ & $0.0008$ / $0.092$ & $0.0023$ / $0.029
 \centering
 \caption{As Table~\ref{tab:catv2_short}, with validation and test drawn from the shaped
 measure (the same distribution as training), signed-log scale at the $1\%$ quantile, one
-seed. The one-loop pools are unshaped in every role, so their rows are on the same measure as
+seed, at the best checkpoint. The one-loop pools are unshaped in every role, so their rows are on the same measure as
 before.}
 \label{tab:catv2_short_smix}
 \begin{tabular}{@{}lrr@{}}
@@ -3176,7 +3182,7 @@ before.}
 class & geometric mean & arithmetic mean \\
 \midrule
 all $478$ & $0.095$ / $0.42$ & $0.045$ / $0.19$ \\
-tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.0041$ / $0.041$ \\
+tree $2\to2$ ($58$) & $0.00065$ / $0.11$ & $0.0040$ / $0.041$ \\
 resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.14$ / $0.31$ \\
 tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.027$ / $0.14$ \\
 tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.062$ / $0.20$ \\
@@ -3184,7 +3190,7 @@ positive one-loop ($48$) & $0.059$ / $0.36$ & $0.021$ / $0.073$ \\
 signed one-loop ($50$) & $0.31$ / $0.92$ & $0.11$ / $0.22$ \\
 $s$-channel family ($7$) & $0.24$ / $0.48$ & $0.14$ / $0.27$ \\
 $M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.15$ / $0.33$ \\
-flavour twins ($9$) & $0.0015$ / $0.17$ & $0.0079$ / $0.024$ \\
+flavour twins ($9$) & $0.0014$ / $0.17$ & $0.0078$ / $0.023$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3299,13 +3305,14 @@ the reference weighting (c, corrected).}
 \paragraph{The short runs are step-limited, not data-limited.} The same three arms with the
 train pools cut to $5000$ events per process, so that $1000$ steps are seven passes over
 the pool instead of a third of one: the geometric mean ends where it ends with the full
-pools (median $0.057$ against $0.053$, $90$th percentile $0.44$ against $0.38$), the
+pools (median $0.056$ against $0.053$, $90$th percentile $0.44$ against $0.38$), the
 reference weighting better (median $0.030$ against $0.058$, corrected), and in both the train and validation
 losses are equal per process (ratio $1.0$ at the median, $1.1$ at the $90$th percentile),
 so nothing has been fitted to the point of overfitting: at this compute the per-step
 optimisation sets every number and the data is not reached, and $5000$ events are still far
 from a saturating pool. The arithmetic arm on the small pools diverged (a non-finite
-gradient early, pre-clip norms to $10^{11}$, every process at loss $1$), where the
+gradient early, pre-clip norms to $10^{11}$, every process at loss $1$ by the end; at its best
+checkpoint, validation $8$ of $20$, the median is $0.12$ and the $90$th percentile $0.33$), where the
 geometric arm on the same data ran normally; one seed, recorded as the arithmetic mean's
 exposure to a single extreme standardized target, not diagnosed further.
 
@@ -3347,7 +3354,7 @@ arithmetic mean has the lowest $90$th percentile in every class but the two $2\t
 \begin{table}[H]
 \centering
 \caption{Quick working point, best trial of each aggregation sweep: median and $90$th
-percentile of the final per-process validation loss by class, and the median ratio to the
+percentile of the per-process $\vlnr$ at the best checkpoint by class, and the median ratio to the
 tuned solo loss of the class's multiplicity ($4.3\times10^{-3}$, $1.1\times10^{-2}$,
 $1.1\times10^{-2}$ for $2\to2$, $2\to3$, $2\to4$).}
 \label{tab:catv2_q_classes}
@@ -3445,9 +3452,12 @@ and positive one-loop from $0.016$ to $0.011$, but the $2\to4$ class loses outsi
 exchange is not the dominant structure and its factor only adds range. Restricted to the
 $2\to2$ processes (\code{target\_propagator\_tchannel\_max\_final: 2}) the $2\to2$ gain stays
 ($0.0022$) and the $2\to4$ class returns to its baseline ($0.053$); the combined number is the
-$s$-channel arm's ($0.022$). That is the setting kept. The caveat is an instability: two of
-the nine runs with the factor diverged (one under each rule, none of the fifteen without),
-both the same way, a normal descent to step $200$--$250$ and then a jump by five to ten at the
+$s$-channel arm's ($0.022$), on the two seeds that trained. That is the setting kept. The caveat
+is an instability: two of the nine runs with the factor diverged (one under each rule, none of
+the fifteen without). Counted at its best checkpoint (validation $4$ of $20$, combined $0.23$),
+the $2\to2$-only arm's diverged seed puts the arm at $0.091\pm0.12$ over three seeds, its tree
+$2\to2$ median at $0.037\pm0.061$; the rule was kept on the other two. Both diverged runs went
+the same way, a normal descent to step $200$--$250$ and then a jump by five to ten at the
 end of the $170$-step warm-up, at peak learning rate, never recovered; no non-finite
 gradient in the second case. The factor widens the $2\to2$ targets and that tips the
 arithmetic mean at this rate, which is the joint lr/aggregation question of the full-horizon pretraining sweep, not a
@@ -3459,62 +3469,99 @@ property of the factor itself.
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_tch22_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tch22_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_tch22_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tch22_f.pdf}}
 \caption{$1000$ steps, $5$k pools, three seeds: the $t$-channel factor on every process and
-on the $2\to2$ processes only (its two seeds that did not diverge), on top of the massive
-propagators divided out of the target; per-class ECDF of the final per-process validation loss,
+on the $2\to2$ processes only (three seeds; the second rose after its best checkpoint at
+validation $4$ of $20$ and enters there), on top of the massive propagators divided out of the
+target; per-class ECDF of the per-process $\vlnr$ at the best checkpoint,
 the band the min/max over seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_tch22}
 \end{figure}
 
 \paragraph{The joint-training gap: a difference of exponents, plus a cross-class cost.}
-With the target changes in, every class still sits above what its multiplicity reaches
-alone at the same per-process compute. Two measurements say what that gap is
-(\code{analysis/catalog\_v2/joint\_vs\_solo.py}, Fig.~\ref{fig:joint_vs_solo}; three seeds
-each, the solo reference the best trial of a small sweep per process and horizon, at
-$\mathrm{bs}/P=34$ with the same targets). First, against the horizon at $1000$, $2000$ and
-$4000$ steps, the joint run halves every class per doubling (combined $0.0185$, $0.0097$,
-$0.0055$; tree $2\to4$ $0.050$, $0.031$, $0.017$; tree $2\to2$ $0.0016$, $0.0007$, $0.0004$),
-the same exponent, near one in steps, for every class, while the solo curves keep their
-multiplicity dependence, $2\to2$ alone gaining $1.4$ then $5.6$ per doubling and $2\to3$,
-$2\to4$ alone $0.5$--$0.6$. So the ratio to solo falls for the classes that dominate the
-catalog, tree $2\to3$ from $3.8$ to $1.8$ and tree $2\to4$ from $4.3$ to $2.8$, the signed
-one-loop class from $12$ to $7$, and rises for the $2\to2$ classes, tree $2\to2$ from $1.5$
-through $0.9$ to $2.6$ and the resonant pools from $9$ to $34$. \textbf{This contradicts the
-earlier pretraining scaling}, where the joint learning curves carried the class-dependent
-exponents of Prin.~\ref{prin:mult} ($\alpha_C\approx2$ for $2\to2$ down to $\approx1$ for
-$2\to4$). The difference in setup points at the cause: those curves were under the
-geometric mean, whose equal weight on relative improvement is what lets a converged
-$2\to2$ process keep scaling, and these are under the arithmetic mean, whose gradient is
-owned by the largest-MSE class once the others are small (the domination this section
-chose the arithmetic mean to avoid the mirror image of, starvation, at $1000$ steps). The
-equal exponents are then the arithmetic mean's failure mode appearing at longer horizons,
-not a property of joint training; that reading is untested. Two further caveats: the
-learning rate is the $500$-step optimum at every horizon (the quick-point sweep), and at $4000$ steps the $5$k pools
-are $27$ passes for the joint run and the solo references alike, so the solo $2\to3$ and
-$2\to4$ curves may be data-limited there and their exponents understated.
+With the target changes in, every class still sits above what its processes reach alone at
+the same per-process compute. Two measurements say what that gap is. First, the steps curve on
+the full pools with every horizon tuned: one single-fidelity DyHPO per horizon
+(\code{sweeps/catalog\_steps\_t<N>\_mean}, $500$--$8000$ steps), then three seeds at each best on
+the full pools under the arithmetic and the geometric mean (\code{runs/steps\_full\_t*},
+\code{runs/steps\_fullgeo\_t*}; $1000$--$8000$ steps, both propagator factors, sign head), against
+two reference processes per class trained alone on their full pools at $\mathrm{bs}=1024$, one
+single-fidelity DyHPO of six trials per step count ($33$--$1072$ steps,
+\code{sweeps/solob1k\_t<S>\_<process>}). Every value is at the run's best checkpoint. The axis is
+per-process compute, $C_p$ = the events of process $p$ seen times the FLOPs per event at its
+multiplicity: in the joint run the uniform sampler draws events in proportion to pool size, so a
+tree process ($10^5$ train events) sees $38$ events per step and a one-loop process
+($5\times10^4$) $19$, where the step grid of the references assumed $34$ for every process; on
+$C_p$ both sides sit at the compute they actually had. Each curve is fitted with
+Eq.~\eqref{eq:scaling} (\code{analysis/catalog\_v2/steps\_tuned.py},
+Figs.~\ref{fig:steps_tuned} and \ref{fig:steps_tuned_alpha}). The joint exponent is below both
+references of its class in every class under the arithmetic mean ($\alpha=0.39$ for the resonant
+$2\to2$ pools, $0.68$ for tree $2\to4$, $0.85$ for signed one-loop, $0.95$ for tree $2\to3$, $1.00$
+for tree $2\to2$, $1.19$ for positive one-loop, against $1.13$--$2.09$ alone) and in every class
+but positive one-loop under the geometric mean ($0.21$ to $1.52$; positive one-loop $1.81$ against
+$1.65$ and $1.25$). The resonant $2\to2$ pools are the extreme: $0.39$ and $0.21$ against $1.69$
+($ee\to u\bar u$) and $1.34$ ($ee\to d\bar d$) alone. The joint floors fit at zero in every class
+(no curvature over $1000$--$8000$ steps), and the reduced $\chi^2$ is $50$--$290$ under the
+arithmetic mean and $330$--$6900$ under the geometric one, so the class median is not described
+within its seed spread by a single power law; the geometric-mean fits include the
+$4000$-step seed whose loss rose $78$-fold after its best checkpoint (validation $8$ of $20$).
+Per process, the joint exponent is below its alone value for $11$ of the $12$ references under the
+arithmetic mean ($ee\to b\bar b$ at one loop equal, $1.25$) and for $9$ of $12$ under the geometric
+mean (above: $ee\to u\bar u$, $ee\to d\bar d$, $ee\to b\bar b$ at one loop), and neither side falls
+with multiplicity as Prin.~\ref{prin:mult} would have it (Fig.~\ref{fig:alpha_mult_steps}; alone
+$1.25$--$2.09$ at two final particles, $1.46$--$2.04$ at three, $1.13$ and $1.72$ at four). Two
+caveats on the references. Their HPO is thin: six trials per sweep, and DyHPO's fixed seed puts
+the same three start-up configurations in every sweep, which are the best trial in $36$ of the
+$72$ sweeps; the loss spreads by $0.27$ decades within a sweep, a third of it explained by the
+learning rate and $6\%$ by the other hyperparameters together
+(\code{analysis/catalog\_v2/solo\_b1k\_inspect.py}). And the two signed references were rerun
+(\code{sweeps/solob1kv\_t<S>\_<process>}): until \code{6939d77} the single-process validation of a
+signed pool included the sign head's cross-entropy, so its recorded validation, checkpoint and
+HPO objective were $6$--$10$ times the MSE.
 Second, at $1000$ steps each multiplicity trained alone at the same per-process compute
 (\code{recipes/catalog\_v2\_train\_scan\_2to*.yaml}, batch $34\times$ the subset's size, the
-rate not retuned) beats its loss in the full catalog on nearly every process: $2\to3$ alone at
-$0.56$ of its joint loss ($176$ of $176$), $2\to4$ at $0.74$ ($184$ of $185$), $2\to2$ at
-$0.79$ ($98$ of $117$). Sharing one network across multiplicities costs $20$--$45\%$ at this
-horizon, on top of the exponent effect. What follows is not decided: if the equal exponents
-are the aggregation's doing, the lever is the per-process gradient weight, and the direct
-form of it is the balanced sampler's deficit-to-solo logic (Sec.~\ref{sec:catalog-open}
-and the sampler's description) applied to the loss weights instead of the sampling: each
-process weighted by how far its local exponent falls below the solo exponent of its
-multiplicity, so that every process follows its own scaling law inside the joint run. That
-is the next thing to test, at $2000$--$4000$ steps with three seeds, against the same runs
-under the geometric mean to settle first whether the aggregation is the cause.
+rate not retuned, $5$k pools) beats its loss in the full catalog on nearly every process:
+$2\to3$ alone at $0.56$ of its joint loss ($176$ of $176$), $2\to4$ at $0.74$ ($184$ of $185$),
+$2\to2$ at $0.79$ ($98$ of $117$), each process at its run's best checkpoint
+(Fig.~\ref{fig:joint_vs_solo}). Sharing one network across multiplicities costs $20$--$45\%$ at
+this horizon, on top of the exponent effect.
 
 \begin{figure}[H]
 \centering
-\widerow{\pnl{../analysis/catalog_v2/joint_vs_solo_a.pdf}\hfill\pnl{../analysis/catalog_v2/joint_vs_solo_b.pdf}} \\[1ex]
-\pnl{../analysis/catalog_v2/joint_vs_solo_c.pdf}
-\caption{The joint-training gap; every ratio is joint over solo, so above one means the joint
-run is worse. (a) The joint loss over the tuned single-process solo loss of the same
-multiplicity at equal per-process compute, class median over three seeds, against the horizon.
-(b, c) Each process in the full catalog against the same process with only its multiplicity
-trained, at the same per-process compute and $1000$ steps: (b) the ECDF of the ratio, (c) per
-process.}
+\widerow{\pnl{../analysis/catalog_v2/steps_tuned_a.pdf}\hfill\pnl{../analysis/catalog_v2/steps_tuned_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/steps_tuned_c.pdf}\hfill\pnl{../analysis/catalog_v2/steps_tuned_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/steps_tuned_e.pdf}\hfill\pnl{../analysis/catalog_v2/steps_tuned_f.pdf}}
+\caption{Joint against alone on the full pools, every horizon tuned: class median of the
+per-process $\vlnr$ at the best checkpoint in the joint run ($1000$--$8000$ steps, geometric mean
+over three seeds, band min to max) under the arithmetic and the geometric mean, and the class's two
+reference processes trained alone ($\mathrm{bs}=1024$, $33$--$1072$ steps, best trial of a DyHPO
+per step count), against per-process compute $C_p$; dashed and dotted, the fits of
+Eq.~\eqref{eq:scaling} over each series' own range. (a) tree $2\to2$, (b) resonant $2\to2$,
+(c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
+\label{fig:steps_tuned}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v2/steps_tuned_alpha.pdf}
+\caption{The exponents of Fig.~\ref{fig:steps_tuned} per class: the joint arms (bar: the range
+of leave-one-seed-out refits) and the two references alone.}
+\label{fig:steps_tuned_alpha}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v2/alpha_vs_multiplicity_steps.pdf}
+\caption{The exponents of Fig.~\ref{fig:steps_tuned} per reference process against its
+final-state multiplicity, as in Fig.~\ref{fig:alphamult}: the process in the joint run (dot,
+fitted on its own per-process losses) and alone (square); (a) arithmetic, (b) geometric mean.}
+\label{fig:alpha_mult_steps}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/joint_vs_solo_b.pdf}\hfill\pnl{../analysis/catalog_v2/joint_vs_solo_c.pdf}}
+\caption{The cross-class cost: each process in the full catalog against the same process with
+only its multiplicity trained, at the same per-process compute and $1000$ steps, each at its run's
+best checkpoint; above one the full run is worse. (a) The ECDF of the ratio, (b) per process.}
 \label{fig:joint_vs_solo}
 \end{figure}
 
@@ -3525,37 +3572,36 @@ head; three seeds per point) with only the training aggregation changed: the geo
 and the geometric mean floored at $\tau=10^{-2}$ (\code{runs/steps\_geo\_t*},
 \code{runs/steps\_tau1e-2\_t*}; \code{joint\_vs\_solo.py --arm}, \code{steps\_agg.py}),
 Table~\ref{tab:steps_agg} and Fig.~\ref{fig:steps_agg}.
-The equal slopes were partly the arithmetic mean: under the geometric mean the gain per
-doubling spreads from $1.3$ to $3$--$6$ by class, where under the arithmetic mean it sits
-between $1.2$ and $2.3$; tree $2\to2$ gains $3.5$ and $3.2$ per doubling against $2.3$ and
-$1.9$ and ends nine times lower ($4.1\times10^{-5}$ against $3.6\times10^{-4}$, below its
-solo reference), and positive one-loop gains $6.0$ and $3.9$ against $2.3$. But the class
-that makes up most of the catalog does not move: tree $2\to4$ gains $1.6$--$1.7$ per doubling
-under all three aggregations, already faster than $2\to4$ alone ($1.5$, $1.25$), so its
-distance from solo closes by itself whatever the weighting, and the geometric mean keeps it
-twice higher at every horizon. The resonant $2\to2$ pools stall under all three at $1.2$--$1.6$
-per doubling, $5\times10^{-3}$ at $4000$ steps, while the $2\to2$ solo reference gains $5.6$
-over the last doubling; their ratio to solo climbs to $34$--$43$ in every arm. It is not the
-data: validation over train MSE is $1.00$ for the class at $4000$ steps ($1.06$--$1.12$ for the
-multi-particle classes). The trade is the familiar one at every horizon (Fig.~\ref{fig:steps_agg_curves}): at $4000$ steps the
-geometric mean has $21$--$39$ processes above $0.1$ against none, a combined median of
-$0.0097$ against $0.0071$, and the signed class $3.3$ times higher. The floor sits between the
-two means on every class and ties the arithmetic mean on the combined number ($0.0076$, two
-seeds), but one of its three $4000$-step runs diverged (Fig.~\ref{fig:steps_agg_curves}: the combined loss
-jumps from $0.057$ to $1.8$ between steps $1200$ and $1400$ with finite gradients, non-finite ones
-follow from about step $1900$, and it never recovers; none of the eighteen runs under either
-mean did), the same signature as the $t$-channel runs and the second instability at this rate. A per-process weight driven by each
-process's exponent deficit would redistribute the gradient between the $2\to2$ and $2\to4$
-classes, which these three arms already show is a trade, and would leave the two things none
-of them moves: the $2\to4$ slope and the resonant stall.
+Under the geometric mean the gain per doubling spreads from $1.3$ to $3$--$6$ by class, where
+under the arithmetic mean it sits between $1.2$ and $2.4$; tree $2\to2$ gains $3.5$ and $3.2$
+per doubling against $2.4$ and $1.9$ and ends nine times lower ($4.1\times10^{-5}$ against
+$3.6\times10^{-4}$), and positive one-loop gains $5.9$ and $3.9$ against $2.3$. But the class
+that makes up most of the catalog does not move: tree $2\to4$ gains $1.5$--$1.8$ per doubling
+under both means, and the geometric mean keeps it twice higher at every horizon. The resonant
+$2\to2$ pools stall under both at $1.2$--$1.6$ per doubling, $5\times10^{-3}$ at $4000$ steps.
+It is not the data: validation over train MSE is $1.00$ for the class at $4000$ steps
+($1.06$--$1.12$ for the multi-particle classes). The trade is the familiar one at every horizon
+(Fig.~\ref{fig:steps_agg_curves}): at $4000$ steps a combined median of $0.0097$ against
+$0.0071$, and the signed class $3.3$ times higher. The floored arm's third seed at $4000$ steps
+rose after its best checkpoint and never recovered (Fig.~\ref{fig:steps_agg_curves}: best at
+validation $4$ of $20$, step $800$, then the combined loss jumps from $0.057$ to $1.8$ between
+steps $1200$ and $1400$ with finite gradients, non-finite ones follow from about step $1900$; it
+ends $34$ times above its best; none of the eighteen runs under either mean did), the same
+signature as the $t$-channel runs and the second instability at this rate. At its best
+checkpoint that seed is at the loss of an $800$-step run, so the floored arm's $4000$-step
+column (Table~\ref{tab:steps_agg}) is above its $2000$-step one in every class; over its other
+two seeds it sits between the two means. A per-process weight driven by each process's exponent
+deficit would redistribute the gradient between the $2\to2$ and $2\to4$ classes, which these
+arms already show is a trade, and would leave the two things none of them moves: the $2\to4$
+slope and the resonant stall.
 
 \begin{table}[H]
 \centering
-\caption{The steps curve under three training aggregations at identical settings: class
-median of the final per-process validation loss (mean over three seeds; the floored arm at
-$4000$ steps over its two seeds that did not diverge), and the gain per doubling of steps
-($1000\to2000$, $2000\to4000$). Solo gains per doubling: $2\to2$ $1.4$, $5.6$; $2\to3$ $1.3$,
-$1.5$; $2\to4$ $1.5$, $1.25$.}
+\caption{The steps curve under three training aggregations at identical settings ($5$k pools,
+lr $9.7\times10^{-3}$ at every horizon): class median of the per-process $\vlnr$ at the best
+checkpoint (mean over three seeds; the floored arm's third seed at $4000$ steps rose after its
+best checkpoint at validation $4$ of $20$ and enters there), and the gain per doubling of steps
+($1000\to2000$, $2000\to4000$).}
 \label{tab:steps_agg}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -3564,13 +3610,13 @@ $1.5$; $2\to4$ $1.5$, $1.25$.}
 class & \multicolumn{2}{c}{arithmetic} & \multicolumn{2}{c}{geometric} & \multicolumn{2}{c}{geometric, $\tau=10^{-2}$} \\
  & $4000$ steps & gain & $4000$ steps & gain & $4000$ steps & gain \\
 \midrule
-all $478$ & $0.0071$ & $1.8$, $1.7$ & $0.0097$ & $1.8$, $1.9$ & $0.0076$ & $2.2$, $1.6$ \\
-tree $2\to2$ & $3.6\times10^{-4}$ & $2.3$, $1.9$ & $4.1\times10^{-5}$ & $3.5$, $3.2$ & $2.3\times10^{-4}$ & $2.9$, $1.4$ \\
-resonant $2\to2$ & $0.0048$ & $1.6$, $1.2$ & $0.0060$ & $1.3$, $1.3$ & $0.0044$ & $1.3$, $1.3$ \\
-tree $2\to3$ & $0.0041$ & $2.1$, $2.0$ & $0.0037$ & $2.3$, $2.7$ & $0.0039$ & $3.2$, $1.5$ \\
-tree $2\to4$ & $0.017$ & $1.6$, $1.8$ & $0.036$ & $1.6$, $1.7$ & $0.024$ & $1.9$, $1.6$ \\
-positive one-loop & $0.0025$ & $2.3$, $2.3$ & $0.0010$ & $6.0$, $3.9$ & $0.0019$ & $4.2$, $1.8$ \\
-signed one-loop & $0.015$ & $2.0$, $1.8$ & $0.049$ & $1.7$, $1.9$ & $0.033$ & $2.0$, $1.7$ \\
+all $478$ & $0.0071$ & $1.8$, $1.7$ & $0.0097$ & $1.8$, $1.9$ & $0.021$ & $2.2$, $0.58$ \\
+tree $2\to2$ & $3.6\times10^{-4}$ & $2.4$, $1.9$ & $4.1\times10^{-5}$ & $3.5$, $3.2$ & $1.4\times10^{-3}$ & $2.9$, $0.25$ \\
+resonant $2\to2$ & $0.0048$ & $1.6$, $1.2$ & $0.0060$ & $1.3$, $1.3$ & $0.0074$ & $1.3$, $0.75$ \\
+tree $2\to3$ & $0.0041$ & $2.1$, $2.0$ & $0.0037$ & $2.3$, $2.7$ & $0.016$ & $3.2$, $0.37$ \\
+tree $2\to4$ & $0.017$ & $1.6$, $1.8$ & $0.036$ & $1.5$, $1.7$ & $0.052$ & $1.9$, $0.75$ \\
+positive one-loop & $0.0025$ & $2.3$, $2.3$ & $0.0010$ & $5.9$, $3.9$ & $0.015$ & $4.2$, $0.22$ \\
+signed one-loop & $0.015$ & $2.0$, $1.8$ & $0.049$ & $1.7$, $1.9$ & $0.080$ & $2.0$, $0.69$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3581,9 +3627,9 @@ signed one-loop & $0.015$ & $2.0$, $1.8$ & $0.049$ & $1.7$, $1.9$ & $0.033$ & $2
 \widerow{\pnl{../analysis/catalog_v2/steps_agg_c.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_v2/steps_agg_e.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_f.pdf}}
 \caption{The steps curve under three training aggregations at identical settings: class median of
-the final per-process validation loss against the horizon, mean over seeds with the min/max band
-(the floored arm at $4000$ steps over its two seeds that did not diverge), and the tuned solo
-reference of the class's multiplicity where one exists. (a) tree $2\to2$, (b) resonant $2\to2$,
+the per-process $\vlnr$ at the best checkpoint against the horizon, mean over seeds with the min/max
+band (every seed; the floored arm's third seed at $4000$ steps at its best checkpoint, validation
+$4$ of $20$); the references alone are in Fig.~\ref{fig:steps_tuned}. (a) tree $2\to2$, (b) resonant $2\to2$,
 (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:steps_agg}
 \end{figure}
@@ -3591,38 +3637,12 @@ reference of the class's multiplicity where one exists. (a) tree $2\to2$, (b) re
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/catalog_v2/steps_agg_ecdf.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_curves.pdf}}
-\caption{The three aggregations at $4000$ steps. (a) Distribution of the final per-process
-validation loss, each process at its geometric mean over seeds. (b) Combined validation loss
-during training, every seed; the floored arm's third seed diverges between steps $1200$ and $1400$.}
+\caption{The three aggregations at $4000$ steps. (a) Distribution of the per-process $\vlnr$ at the
+best checkpoint, each process at its geometric mean over seeds. (b) Combined validation loss
+during training, every seed; dashed, the floored arm's third seed, which rises after its best
+checkpoint and jumps between steps $1200$ and $1400$.}
 \label{fig:steps_agg_curves}
 \end{figure}
-
-\paragraph{Starting worse or scaling worse.} A power law $L\propto t^{-\alpha}$ fitted to each
-class median over the three horizons, per seed, separates the two
-(Fig.~\ref{fig:steps_agg_fit}; \code{steps\_agg.py}). Against the multiplicity alone, the
-multi-particle classes start worse and scale \emph{better}: tree $2\to3$ starts $4$--$5$ times above
-its solo reference at $1000$ steps and falls with $\alpha=1.0$--$1.3$ against $0.47$, tree $2\to4$
-starts $4$--$9$ times above and falls with $0.70$--$0.78$ against $0.44$, in every arm; their gap is
-an offset that closes with steps. The resonant $2\to2$ pools are the one class that scales worse,
-$\alpha=0.34$--$0.49$ against $1.47$, from a start $5$--$7$ times above, so their gap widens with
-steps under every aggregation. Tree $2\to2$ scales like its reference under the geometric mean
-($1.78$) and slower under the other two ($1.03$--$1.09$). Between the aggregations, the $2\to4$ and
-signed classes differ only in the start (same $\alpha$ within the seeds, $0.70$--$0.78$ and
-$0.83$--$0.91$; the geometric mean starts $1.9$ and $3.2$ times higher), while the geometric mean
-buys a steeper $\alpha$ on tree $2\to2$, $2\to3$ and positive one-loop. The one solo reference for
-$2\to2$ is $ee\to u\bar u$, which carries the $Z$ pole, and its curve is bent ($1.4$ then $5.6$ per
-doubling), so its $\alpha$ is a three-point average of the two.
-
-\begin{figure}[H]
-\centering
-\widerow{\pnl{../analysis/catalog_v2/steps_agg_alpha.pdf}\hfill\pnl{../analysis/catalog_v2/steps_agg_start.pdf}}
-\caption{Power-law fit $L=L_{1000}\,(t/1000)^{-\alpha}$ of each class median over $1000$--$4000$
-steps, per seed (bar: min to max over seeds), under the three aggregations, and the same fit to the
-tuned solo reference of the class's multiplicity. (a) The exponent $\alpha$, (b) the fitted loss at
-$1000$ steps.}
-\label{fig:steps_agg_fit}
-\end{figure}
-
 \paragraph{The sign head: a real but modest gain on the signed class.} With
 \code{training.sign\_head} the sign-changing pools take $\log|x|$ as their target
 (\code{abslog:<s>}, floored at the signed-log scale) and the network's second output
@@ -3648,7 +3668,7 @@ per-class read-out stays the same with the sign taken out.
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_tprop_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tprop_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_tprop_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_tprop_f.pdf}}
 \caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
-per-class ECDF of the final per-process validation loss with and without the massive propagators
+per-class ECDF of the per-process $\vlnr$ at the best checkpoint with and without the massive propagators
 divided out of the target; the band is the min/max over seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_tprop}
 \end{figure}
@@ -3669,7 +3689,7 @@ range.}
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_slq_c.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_slq_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_v2/seed_arms_slq_e.pdf}\hfill\pnl{../analysis/catalog_v2/seed_arms_slq_f.pdf}}
 \caption{$1000$ steps, $5$k pools, arithmetic mean at its best HPs, three seeds per arm:
-per-class ECDF of the final per-process validation loss for the signed-log scale $s$ at the
+per-class ECDF of the per-process $\vlnr$ at the best checkpoint for the signed-log scale $s$ at the
 $10^{-2}$ (current), $10^{-3}$ and $10^{-4}$ quantiles of $|x|$; the band is the min/max over
 seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop, (f) signed one-loop.}
 \label{fig:seed_arms_slq}
@@ -3682,7 +3702,7 @@ seeds. (a) tree $2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4
 \widerow{\pnl{../analysis/catalog_v2/arms_compare_q_curves_c.pdf}\hfill\pnl{../analysis/catalog_v2/arms_compare_q_ecdf_c.pdf}}
 \caption{Quick working point ($500$ steps, $5$k pools, off-shellness on), best DyHPO trial of
 each aggregation, one row per arm (geometric mean, arithmetic mean, reference weighting): every
-process's validation curve coloured by multiplicity, and the final per-process loss by class
+process's validation curve coloured by multiplicity, and the per-process $\vlnr$ at the best checkpoint by class
 (ECDF).}
 \label{fig:arms_compare_q}
 \end{figure}
@@ -3701,8 +3721,8 @@ share is $0.1$.}
 \centering
 \caption{catalog\_v2, $1000$ steps at $9.7\times10^{-3}$ on the shaped measure, one seed:
 the three aggregations without and with the off-shellness input (diagram sidecars present,
-masks built for every process). Median / $90$th percentile of the per-process validation loss
-by class; the reference-weighted columns are the corrected values.}
+masks built for every process). Median / $90$th percentile of the per-process $\vlnr$ at the
+best checkpoint by class; the reference-weighted columns are the corrected values.}
 \label{tab:catv2_offshell}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -3711,14 +3731,14 @@ by class; the reference-weighted columns are the corrected values.}
 class & geo. & geo.+off & arith. & arith.+off & excess & excess+off \\
 \midrule
 all $478$ & $0.095$ / $0.42$ & $0.053$ / $0.38$ & $0.045$ / $0.19$ & $0.030$ / $0.10$ & $0.076$ / $0.26$ & $0.058$ / $0.22$ \\
-tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.00075$ / $0.0082$ & $0.0041$ / $0.041$ & $0.0037$ / $0.016$ & $0.0020$ / $0.031$ & $0.0031$ / $0.012$ \\
+tree $2\to2$ ($58$) & $0.00065$ / $0.11$ & $0.00064$ / $0.0083$ & $0.0040$ / $0.041$ & $0.0036$ / $0.016$ & $0.0020$ / $0.031$ & $0.0030$ / $0.012$ \\
 resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.024$ / $0.073$ & $0.14$ / $0.31$ & $0.017$ / $0.052$ & $0.14$ / $0.30$ & $0.020$ / $0.054$ \\
-tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.025$ / $0.16$ & $0.027$ / $0.14$ & $0.021$ / $0.074$ & $0.059$ / $0.21$ & $0.047$ / $0.15$ \\
+tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.025$ / $0.16$ & $0.027$ / $0.14$ & $0.021$ / $0.074$ & $0.059$ / $0.21$ & $0.046$ / $0.15$ \\
 tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.079$ / $0.23$ & $0.062$ / $0.20$ & $0.051$ / $0.11$ & $0.11$ / $0.27$ & $0.11$ / $0.21$ \\
-positive one-loop ($48$) & $0.059$ / $0.36$ & $0.049$ / $0.29$ & $0.021$ / $0.073$ & $0.021$ / $0.064$ & $0.028$ / $0.16$ & $0.029$ / $0.14$ \\
+positive one-loop ($48$) & $0.059$ / $0.36$ & $0.048$ / $0.28$ & $0.021$ / $0.073$ & $0.021$ / $0.064$ & $0.028$ / $0.16$ & $0.028$ / $0.14$ \\
 signed one-loop ($50$) & $0.31$ / $0.92$ & $0.44$ / $1.0$ & $0.11$ / $0.22$ & $0.094$ / $0.23$ & $0.19$ / $0.36$ & $0.21$ / $0.37$ \\
-$s$-channel family ($7$) & $0.24$ / $0.48$ & $0.012$ / $0.022$ & $0.14$ / $0.27$ & $0.0062$ / $0.016$ & $0.14$ / $0.30$ & $0.0068$ / $0.016$ \\
-$M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.032$ / $0.092$ & $0.15$ / $0.33$ & $0.020$ / $0.058$ & $0.14$ / $0.30$ & $0.023$ / $0.062$ \\
+$s$-channel family ($7$) & $0.24$ / $0.48$ & $0.012$ / $0.023$ & $0.14$ / $0.27$ & $0.0061$ / $0.016$ & $0.14$ / $0.30$ & $0.0067$ / $0.016$ \\
+$M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.032$ / $0.091$ & $0.15$ / $0.33$ & $0.020$ / $0.057$ & $0.14$ / $0.30$ & $0.023$ / $0.062$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3726,7 +3746,7 @@ $M_Z$ family ($20$) & $0.23$ / $0.46$ & $0.032$ / $0.092$ & $0.15$ / $0.33$ & $0
 \begin{table}[H]
 \centering
 \caption{catalog\_v2, $1000$ steps on the shaped measure, generation one-hot, one seed: median
-/ $90$th percentile of the per-process validation loss by class under the geometric mean, the
+/ $90$th percentile of the per-process $\vlnr$ at the best checkpoint by class under the geometric mean, the
 arithmetic mean, the reference-weighted (excess) aggregation (corrected, see the text), and the
 arithmetic mean at twice the width.}
 \label{tab:catv2_excess}
@@ -3736,11 +3756,11 @@ arithmetic mean at twice the width.}
 class & geometric & arithmetic & excess & arithmetic, $16$ heads \\
 \midrule
 all $478$ & $0.095$ / $0.42$ & $0.045$ / $0.19$ & $0.076$ / $0.26$ & $0.043$ / $0.17$ \\
-tree $2\to2$ ($58$) & $0.00075$ / $0.11$ & $0.0041$ / $0.041$ & $0.0020$ / $0.031$ & $0.0046$ / $0.053$ \\
+tree $2\to2$ ($58$) & $0.00065$ / $0.11$ & $0.0040$ / $0.041$ & $0.0020$ / $0.031$ & $0.0043$ / $0.053$ \\
 resonant $2\to2$ ($27$) & $0.24$ / $0.46$ & $0.14$ / $0.31$ & $0.14$ / $0.30$ & $0.16$ / $0.34$ \\
 tree $2\to3$ ($110$) & $0.055$ / $0.31$ & $0.027$ / $0.14$ & $0.059$ / $0.21$ & $0.029$ / $0.13$ \\
 tree $2\to4$ ($185$) & $0.11$ / $0.34$ & $0.062$ / $0.20$ & $0.11$ / $0.27$ & $0.059$ / $0.20$ \\
-positive one-loop ($48$) & $0.059$ / $0.36$ & $0.021$ / $0.073$ & $0.028$ / $0.16$ & $0.029$ / $0.070$ \\
+positive one-loop ($48$) & $0.059$ / $0.36$ & $0.021$ / $0.073$ & $0.028$ / $0.16$ & $0.028$ / $0.070$ \\
 signed one-loop ($50$) & $0.31$ / $0.92$ & $0.11$ / $0.22$ & $0.19$ / $0.36$ & $0.11$ / $0.23$ \\
 \bottomrule
 \end{tabular}

@@ -1,7 +1,8 @@
 """The steps curve under three training aggregations (docs/results.tex, tab:steps_agg).
 Joint runs runs/steps_t<N>_s* (arithmetic mean), runs/steps_geo_t<N>_s* (geometric mean),
-runs/steps_tau1e-2_t<N>_s* (geometric mean floored at tau = 1e-2); solo references
-sweeps/ref_t<N>_<process> as in joint_vs_solo.py.
+runs/steps_tau1e-2_t<N>_s* (geometric mean floored at tau = 1e-2). The bs/P = 34 solo references
+(sweeps/ref_t<N>_<process>) are collected but not drawn: they are superseded by the full-pool
+bs-1024 references of steps_tuned.py.
     python analysis/catalog_v2/steps_agg.py --collect > analysis/catalog_v2/steps_agg.json   (where the runs are)
     python analysis/catalog_v2/steps_agg.py                                                (plots from the json)
 Every run enters at its best checkpoint (census.at_best: each process at the validation with the
@@ -49,7 +50,6 @@ if "--collect" in sys.argv:   # the class needs signed_pools.csv, which lives wh
     print(json.dumps(out)); sys.exit()
 
 import plot_style as ps
-SOLO_K = {"tree 2->2": 4, "resonant 2->2": 4, "tree 2->3": 5, "tree 2->4": 6}
 COL = {"arith": ps.C.blue, "geo": ps.C.vermillion, "tau": ps.C.green}
 D = json.load(open(JSON))
 cls = D["cls"].get
@@ -61,7 +61,7 @@ print("loss rose after the best checkpoint (reported, kept at their best checkpo
 good = runs
 seeds = max(r["seed"] for r in runs)
 
-# (a-f) class median against steps, band = min to max over seeds, solo reference where one exists
+# (a-f) class median against steps, band = min to max over seeds
 figs = ps.panels(len(C.CLASSES))
 for (fig, ax), c in zip(figs, C.CLASSES):
     for key, _, label in ARMS:
@@ -71,10 +71,6 @@ for (fig, ax), c in zip(figs, C.CLASSES):
             m.append(np.mean(v)); lo.append(min(v)); hi.append(max(v))
         ax.plot(STEPS, m, marker="o", color=COL[key], label=label)
         ax.fill_between(STEPS, lo, hi, color=COL[key], alpha=0.2)
-    if c in SOLO_K:
-        k = SOLO_K[c]
-        ax.plot(STEPS, [D["solo"][f"{N}_{k}"] for N in STEPS], marker="s", color=ps.C.grey, ls="--",
-                label=rf"$2\to{k-2}$ alone, same compute")
     ax.fill_between([], [], [], color=ps.C.grey, alpha=0.2, label=f"min to max over {seeds} seeds")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xticks(STEPS, [str(n) for n in STEPS]); ax.minorticks_off()
