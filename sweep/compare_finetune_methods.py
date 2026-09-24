@@ -56,7 +56,7 @@ from scipy.optimize import curve_fit
 _proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _proj not in sys.path:
     sys.path.insert(0, _proj)
-from sweep.fit_scaling_law import (collect_best_from_config, fit_power_law,
+from sweep.fit_scaling_law import (collect_best_from_config, fit_power_law, fit_scaling,
                                    build_solo_reference, _ds_tag, _n_particles,
                                    _sweep_dirs_for, load_results_from_dir)
 from sweep.generate_pretraining_scaling_sweeps import flops_per_step
@@ -210,13 +210,21 @@ def build_method_styles(label_keys):
 
 
 def _fit_pos(xs, ys):
-    """fit_power_law on only the strictly-positive (x, y) pairs (log fit can't take
-    a 0/neg val_loss — saturated points hit the floor). Returns (A, alpha) or None."""
+    """Scaling fit on the strictly-positive (x, y) pairs: the floor-aware law A x^-alpha + L_inf
+    (CLAUDE.md, Scaling fits; fit_scaling_law.fit_scaling) when there are >= 4 of them, else the
+    bare law as a diagnostic. Returns (A, alpha, L_inf, bare) or None; `bare` is True for the
+    diagnostic, and a legend built from it must say so (_alpha_label)."""
     pairs = [(x, y) for x, y in zip(xs, ys) if x > 0 and y > 0]
     if len(pairs) < 2:
         return None
-    A, alpha, _ = fit_power_law([p[0] for p in pairs], [p[1] for p in pairs])
-    return A, alpha
+    f = fit_scaling([p[0] for p in pairs], [p[1] for p in pairs])
+    if f["alpha"] is not None:
+        return f["A"], f["alpha"], f["L_inf"], False
+    return f["A_bare"], f["alpha_bare"], 0.0, True
+
+
+def _alpha_label(label, alpha, bare):
+    return rf"{label} ($\alpha$={alpha:.3f}" + (", bare law, diagnostic)" if bare else ")")
 
 
 def _solo_curve_y(x, ref_tuple):
@@ -226,10 +234,12 @@ def _solo_curve_y(x, ref_tuple):
 
 
 def _solo_label(ref_tuple, prefix="solo"):
+    """A NaN chi2 marks a bare-law reference (fewer than four cells, two anchors, or a borrowed
+    slope): the label says it is a diagnostic."""
     A, alpha, C = ref_tuple[:3]
     chi2 = ref_tuple[3] if len(ref_tuple) > 3 else float("nan")
     floor = rf", floor$={C:.1e}$" if C > 0 else ""
-    gof = rf", $\chi^2$/ndf$={chi2:.1f}$" if chi2 == chi2 else ""   # NaN check
+    gof = rf", $\chi^2$/ndf$={chi2:.1f}$" if chi2 == chi2 else ", bare law, diagnostic"   # NaN check
     return rf"{prefix} ($\alpha$={alpha:.2f}{floor}{gof})"
 
 
@@ -269,8 +279,8 @@ def build_solo_reference_two_anchors(anchor_config_path, anchor2_config_path):
     different fidelities (e.g. t=126 and t=8000), so the slope is fit directly from
     nh=8 data instead of borrowed from an nh=4 sweep.
 
-    Returns { dataset: (A, alpha, C=0.0) } — a pure power law (only 2 points, so no
-    floor term can be fit). Datasets present in only one anchor are skipped."""
+    Returns { dataset: (A, alpha, C=0.0) } — the bare law, a diagnostic (only 2 points, so no
+    floor term can be fit; its label says so). Datasets present in only one anchor are skipped."""
     with open(anchor_config_path) as f:
         a1 = yaml.safe_load(f)
     with open(anchor2_config_path) as f:
@@ -332,13 +342,13 @@ def _merge_best(config_paths):
 
 
 def build_solo_curve(config_paths, plot_only_paths=None):
-    """Matched-architecture nh=8 solo reference: a PURE power law L = A·c^-alpha fit
-    through ALL measured solo cells — the same model `fit_scaling_law` used for the
-    nh=4 scaling_solo_full reference (no floor term; these curves are clean power laws,
-    r^2~0.95, over the measured range). chi2/ndf uses the assumed ±10% log uncertainty.
+    """Matched-architecture nh=8 solo reference: the floor-aware law L = A·c^-alpha + L_inf
+    (fit_scaling_law.fit_scaling, as for the scaling_solo_full reference) through ALL measured
+    solo cells; with fewer than four cells the bare law, a diagnostic (its chi2 is NaN and the
+    label says so). chi2 is the profiled fit's reduced chi^2.
 
     Returns (ref, points, points_excluded):
-      ref    = { ds: (A, alpha, 0.0, chi2_ndf) }
+      ref    = { ds: (A, alpha, L_inf, chi2_red) }
       points = { ds: [(flops, loss), ...] }  ;  points_excluded = {} (everything is fit)."""
     merged = _merge_best(config_paths)
     for ds, cell in _merge_best(plot_only_paths).items():
@@ -349,15 +359,15 @@ def build_solo_curve(config_paths, plot_only_paths=None):
             print(f"  [warn] solo curve: <2 compute points for {ds}, skipping")
             continue
         cs = sorted(pts); vs = [pts[c] for c in cs]
-        A, alpha, r2 = fit_power_law(cs, vs)
-        lc = np.log(cs); lv = np.log(vs)
-        ndf = len(cs) - 2
-        chi2 = (float(np.sum(((lv - (math.log(A) - alpha * lc)) / SOLO_LOG_SIGMA) ** 2)) / ndf
-                if ndf > 0 else float("nan"))
-        ref[ds] = (A, alpha, 0.0, chi2)
+        f = fit_scaling(cs, vs)
+        if f["alpha"] is not None:
+            ref[ds] = (f["A"], f["alpha"], f["L_inf"], f["chi2r"])
+        else:
+            ref[ds] = (f["A_bare"], f["alpha_bare"], 0.0, float("nan"))
         points[ds] = [(c, pts[c]) for c in cs]
-        print(f"  {ds}: solo pure power law from {len(cs)} cells  alpha={alpha:.3f}  "
-              f"r2={r2:.3f}  chi2/ndf={chi2:.2f}  (c={cs[0]:.2e}->{cs[-1]:.2e})")
+        print(f"  {ds}: solo {'floor-aware' if f['alpha'] is not None else 'bare (diagnostic)'} fit from "
+              f"{len(cs)} cells  alpha={ref[ds][1]:.3f}  L_inf={ref[ds][2]:.2e}  chi2r={ref[ds][3]:.2f}  "
+              f"(c={cs[0]:.2e}->{cs[-1]:.2e})")
     return ref, points, {}
 
 
@@ -431,8 +441,8 @@ def main():
         for ds, cell in best.items():
             if len(cell) >= 2:
                 cs = sorted(cell); vs = [cell[c] for c in cs]
-                A, alpha, r2 = fit_power_law(cs, vs)
-                params[ds] = {"A": A, "alpha": alpha, "r2": r2}
+                A, alpha, L_inf, bare = _fit_pos(cs, vs)
+                params[ds] = {"A": A, "alpha": alpha, "L_inf": L_inf, "bare": bare}
         methods.append((label, best, params))
         raw_methods.append((label, _method_label(name), cfg, name))
 
@@ -511,8 +521,8 @@ def main():
             if ds in params:
                 p = params[ds]
                 cfit = np.logspace(math.log10(cs[0]), math.log10(cs[-1]), 200)
-                ax.plot(cfit, p["A"] * cfit ** (-p["alpha"]), color=st["color"], ls=st["ls"],
-                        lw=st["lw"], alpha=st["alpha"], label=rf"{label} ($\alpha$={p['alpha']:.3f})")
+                ax.plot(cfit, p["A"] * cfit ** (-p["alpha"]) + p["L_inf"], color=st["color"], ls=st["ls"],
+                        lw=st["lw"], alpha=st["alpha"], label=_alpha_label(label, p["alpha"], p["bare"]))
             else:
                 ax.plot(cs, vs, color=st["color"], ls=st["ls"], lw=st["lw"],
                         alpha=st["alpha"], label=label)
@@ -581,10 +591,10 @@ def main():
                            s=22, zorder=st["z"])
                 fit = _fit_pos(cs, vs)
                 if fit:
-                    A, alpha = fit
+                    A, alpha, L_inf, bare = fit
                     cfit = np.logspace(math.log10(cs[0]), math.log10(cs[-1]), 200)
-                    ax.plot(cfit, A * cfit ** (-alpha), color=st["color"], ls=st["ls"],
-                            lw=st["lw"], alpha=st["alpha"], label=rf"{label} ($\alpha$={alpha:.3f})")
+                    ax.plot(cfit, A * cfit ** (-alpha) + L_inf, color=st["color"], ls=st["ls"],
+                            lw=st["lw"], alpha=st["alpha"], label=_alpha_label(label, alpha, bare))
                 else:
                     ax.plot(cs, vs, color=st["color"], ls=st["ls"], lw=st["lw"],
                             alpha=st["alpha"], label=label)
@@ -663,12 +673,12 @@ def main():
             ax.scatter(new, vs, color=color, marker=st["marker"], s=26, alpha=al, zorder=st["z"] + 1)
             fo, fn = _fit_pos(old, vs), _fit_pos(new, vs)
             if fo and fn:
-                Ao, ao = fo; An, an = fn
+                Ao, ao, Lo, bo = fo; An, an, Ln, bn = fn
                 xo = np.logspace(math.log10(min(old)), math.log10(max(old)), 100)
                 xn = np.logspace(math.log10(min(new)), math.log10(max(new)), 100)
-                ax.plot(xo, Ao * xo ** (-ao), color=color, lw=1.0, ls=":", alpha=0.5 * al)
-                ax.plot(xn, An * xn ** (-an), color=color, lw=st["lw"], ls=st["ls"], alpha=al,
-                        label=rf"{label} ($\alpha$: {ao:.2f}→{an:.2f})")
+                ax.plot(xo, Ao * xo ** (-ao) + Lo, color=color, lw=1.0, ls=":", alpha=0.5 * al)
+                ax.plot(xn, An * xn ** (-an) + Ln, color=color, lw=st["lw"], ls=st["ls"], alpha=al,
+                        label=rf"{label} ($\alpha$: {ao:.2f}→{an:.2f}" + (", bare law, diagnostic)" if bo or bn else ")"))
         if ds in solo_ref:
             span = [r[k] for _, _, d in corr if ds in d for r in d[ds]
                     for k in ("flops", "flops_naive")]
@@ -707,11 +717,11 @@ def main():
                    alpha=st.get("alpha", 1.0), s=22, zorder=st.get("z", 3))
         fit = _fit_pos(ts, vs)
         if fit:
-            A, alpha = fit
+            A, alpha, L_inf, bare = fit
             tf = np.logspace(math.log10(ts[0]), math.log10(ts[-1]), 200)
-            ax.plot(tf, A * tf ** (-alpha), color=st["color"], ls=st.get("ls", "-"),
+            ax.plot(tf, A * tf ** (-alpha) + L_inf, color=st["color"], ls=st.get("ls", "-"),
                     lw=st.get("lw", 1.3), alpha=st.get("alpha", 1.0),
-                    label=rf"{label} ($\alpha$={alpha:.3f})")
+                    label=_alpha_label(label, alpha, bare))
         else:
             ax.plot(ts, vs, color=st["color"], ls=st.get("ls", "-"),
                     lw=st.get("lw", 1.3), alpha=st.get("alpha", 1.0), label=label)
@@ -764,7 +774,7 @@ def main():
             elif two_anchor_fit:
                 pf = _fit_pos(ts_pts, vs_pts)
                 if pf:
-                    wall_ref = (pf[0], pf[1], 0.0, float("nan"))
+                    wall_ref = (pf[0], pf[1], pf[2], float("nan"))
             if wall_ref:
                 tf = np.logspace(math.log10(min(ts_pts)), math.log10(max(ts_pts)), 200)
                 ax.plot(tf, _solo_curve_y(tf, wall_ref), color=SOLO_STYLE["color"],
@@ -779,7 +789,7 @@ def main():
                 tf = np.logspace(math.log10(min(span)), math.log10(max(span)), 200)
                 ax.plot(tf, v_a * (tf / t_a) ** (-alpha_s), color=SOLO_STYLE["color"],
                         ls=SOLO_STYLE["ls"], lw=SOLO_STYLE["lw"],
-                        label=rf"solo nh8 ($\alpha$={alpha_s:.3f})")
+                        label=rf"solo nh8 ($\alpha$={alpha_s:.3f}, borrowed bare slope, diagnostic)")
                 ax.scatter([t_a], [v_a], color=SOLO_STYLE["color"], marker="s", s=40, zorder=4)
                 for tn, vn, _ in solo_pts[1:]:                 # newer anchor(s) as open stars
                     ax.scatter([tn], [vn], edgecolors=NEW_SOLO_STYLE["edgecolor"],

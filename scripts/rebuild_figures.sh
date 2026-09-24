@@ -152,6 +152,11 @@ run phase1_scaling           $PY sweep/analyze_pretraining_scaling.py --dry-run
 
 echo "== scaling =="
 run compute_scan_wt          $PY analysis/scaling_compute/build_compute_scan_walltime.py
+# the floor-aware refits the overlay reads (never written into the sweeps' own dirs)
+for sw in scaling_solo_full finetune_scaling_virt_002; do
+  run floorfit_$sw           $PY sweep/fit_scaling_law.py --config sweeps/$sw/sweep_config.yaml \
+                                 --out-dir analysis/scaling_compute/floorfit/$sw
+done
 run alpha_vs_multiplicity    $PY analysis/scaling_compute/alpha_vs_multiplicity_overlay.py \
                                  analysis/scaling_compute/alpha_vs_multiplicity_overlay
 

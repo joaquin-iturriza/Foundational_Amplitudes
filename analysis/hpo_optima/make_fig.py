@@ -113,7 +113,8 @@ a.legend(loc='upper left')
 
 # 5. HP importance bars (sampler knobs excluded: the balanced sampler is no longer used)
 a = ax[2, 0]
-# typed in by 425e19c; the computation that produced them is not in the repository (the caption says so)
+# the output of analysis/hpo_optima/hp_importance.py (mean |Spearman(HP, log val_loss)| over the 337
+# converged training.lr sweeps; it needs the sweeps' dyhpo_state.pkl, on Jean Zay), reproduced 2026-09-25
 imp_raw = {r'$\eta$': 0.285, r'$\lambda$': 0.233, 'warmup frac': 0.219,
            'EMA decay': 0.199, r'$\eta_{\min}$': 0.198}
 names = list(imp_raw); vals = [imp_raw[n] for n in names]

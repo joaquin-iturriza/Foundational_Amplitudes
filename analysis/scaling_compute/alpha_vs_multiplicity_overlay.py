@@ -49,10 +49,10 @@ FT_STARS = [("ee_ttbar_nlo_virt_e4", 2, "#d62728"),
             ("ee_uu_nlo_virt_e4", 2, "#ff7f0e")]
 
 def load(path):
-    try:
-        d = json.load(open(path))
-    except Exception as e:
-        print("WARN could not read", path, e); return {}
+    if not os.path.exists(path):   # a missing refit must fail, never draw an empty figure
+        sys.exit(f"missing {path}: run sweep/fit_scaling_law.py --config sweeps/<sweep>/sweep_config.yaml "
+                 f"--out-dir analysis/scaling_compute/floorfit/<sweep> first (scripts/rebuild_figures.sh does)")
+    d = json.load(open(path))
     def norm(k):
         return k[:-len("_amplitudes")] if k.endswith("_amplitudes") else k
     return {norm(k): float(v["alpha"]) for k, v in d.items()

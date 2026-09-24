@@ -198,11 +198,10 @@ def build_solo_reference(anchor_config_path, slope_config_path):
         sb = slope_best.get(ds, {})
         if len(sb) >= 2:
             cs = sorted(sb); vs = [sb[c] for c in cs]
-            alpha_solo = fit_scaling(cs, vs)["alpha"]
-            if alpha_solo is None:
-                print(f"  [warn] solo reference: no floor-aware fit for {ds} ({len(sb)} cells), skipping")
-                continue
-            ref[ds] = (c_a, v_a, alpha_solo)
+            # the line goes through one anchor with no floor term, so its slope is the bare law's,
+            # a diagnostic (the label says so); the floor-aware alpha is the exponent of L - L_inf
+            # and would fall too steeply drawn without that floor
+            ref[ds] = (c_a, v_a, fit_scaling(cs, vs)["alpha_bare"])
         else:
             print(f"  [warn] solo reference: no >=2-point slope for {ds}, skipping")
     return ref
@@ -443,7 +442,7 @@ def main():
                 c_a, v_a, alpha_s = solo_ref[ds]
                 v_solo = v_a * (c_fit / c_a) ** (-alpha_s)
                 ax.plot(c_fit, v_solo, color="gray", ls="--",
-                        label=rf"solo (anchor+slope) $\alpha={alpha_s:.3f}$")
+                        label=rf"solo (anchor + borrowed bare slope, diagnostic) $\alpha={alpha_s:.3f}$")
                 ax.scatter([c_a], [v_a], color="gray", marker="s", s=40, zorder=4)
             ax.set_xscale("log")
             ax.set_yscale("log")
