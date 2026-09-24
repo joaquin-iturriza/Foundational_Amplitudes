@@ -3,9 +3,14 @@
 fit_scaling_law.py  —  Fit power-law scaling curves from scaling sweep results.
 
 For each dataset, finds the best val_loss across HP trials at each compute
-budget, then fits:
+budget, then fits the floor-aware law (CLAUDE.md, Scaling fits):
 
-    val_loss = A * compute^{-alpha}
+    val_loss = A * compute^{-alpha} + L_inf
+
+(the profiled fit of analyze_pretraining_scaling.fit_power_law_with_floor; it needs four
+cells, a dataset with fewer gets alpha = null). The bare law val_loss = A * compute^{-alpha}
+is kept as a diagnostic only, as alpha_bare / A_bare / r2_bare in scaling_law_params.json.
+--out-dir writes the params and figures elsewhere than the sweep directory.
 
 Usage (new DyHPO-based scaling sweep):
     python sweep/fit_scaling_law.py --config sweeps/my_scaling_sweep/sweep_config.yaml
@@ -30,6 +35,7 @@ _proj = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _proj not in sys.path:
     sys.path.insert(0, _proj)
 from sweep.generate_pretraining_scaling_sweeps import flops_per_step
+from sweep.analyze_pretraining_scaling import fit_power_law_with_floor
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +147,19 @@ def collect_best_from_dir(results_dir):
 # Fitting
 # ---------------------------------------------------------------------------
 
+def fit_scaling(compute_vals, val_losses):
+    """{"A", "alpha", "L_inf", "chi2r"} of the floor-aware law (None each when it cannot be fitted:
+    fewer than four cells or no valid floor), plus the bare law as A_bare / alpha_bare / r2_bare."""
+    A_b, a_b, r2_b = fit_power_law(compute_vals, val_losses)
+    f = fit_power_law_with_floor(compute_vals, val_losses) if len(compute_vals) >= 4 else None
+    out = dict(A=None, alpha=None, L_inf=None, chi2r=None) if f is None else \
+        dict(A=f[0], alpha=f[1], L_inf=f[2], chi2r=f[3])
+    out.update(A_bare=A_b, alpha_bare=a_b, r2_bare=r2_b, n=len(compute_vals))
+    return out
+
+
 def fit_power_law(compute_vals, val_losses):
+    """The bare law, a diagnostic only (fit_scaling carries the floor-aware exponent)."""
     log_c = np.array([math.log(c) for c in compute_vals])
     log_v = np.array([math.log(v) for v in val_losses])
     X = np.column_stack([np.ones_like(log_c), log_c])
@@ -180,7 +198,10 @@ def build_solo_reference(anchor_config_path, slope_config_path):
         sb = slope_best.get(ds, {})
         if len(sb) >= 2:
             cs = sorted(sb); vs = [sb[c] for c in cs]
-            _, alpha_solo, _ = fit_power_law(cs, vs)
+            alpha_solo = fit_scaling(cs, vs)["alpha"]
+            if alpha_solo is None:
+                print(f"  [warn] solo reference: no floor-aware fit for {ds} ({len(sb)} cells), skipping")
+                continue
             ref[ds] = (c_a, v_a, alpha_solo)
         else:
             print(f"  [warn] solo reference: no >=2-point slope for {ds}, skipping")
@@ -244,7 +265,7 @@ def plot_alpha_vs_multiplicity(best, params_out, cfg, out_dir, skip_ratio=False)
 
     info = {}   # ds -> (n_fs, dof, alpha)
     for ds, p in params_out.items():
-        if skip_ratio and "ratio" in ds:
+        if (skip_ratio and "ratio" in ds) or p["alpha"] is None:
             continue
         nfs = _n_final_state(cfg, ds)
         if nfs is not None:
@@ -330,6 +351,8 @@ def main():
     parser.add_argument("--skip-ratio-alpha", action="store_true",
                         help="Exclude the virt/born ratio datasets from the "
                              "alpha-vs-multiplicity plot (other plots unaffected)")
+    parser.add_argument("--out-dir", default=None,
+                        help="Write scaling_law_params.json and the figures here instead of the sweep dir")
     parser.add_argument("--compare-anchor", default=None,
                         help="Outer config of the nh=8 SOLO anchor sweep (single t_steps). "
                              "Overlays a matched-architecture solo line on each dataset plot.")
@@ -360,12 +383,14 @@ def main():
     else:
         sys.exit("Provide either --config or --sweep-dir.")
 
+    if args.out_dir:
+        out_dir = args.out_dir
     if not best:
         sys.exit("No valid results found.")
 
     print()
-    print(f"{'Dataset':<35}  {'A':>10}  {'alpha':>8}  {'R²':>6}  {'N':>4}")
-    print("-" * 68)
+    print(f"{'Dataset':<35}  {'alpha':>8}  {'L_inf':>10}  {'chi2r':>8}  {'N':>4}  {'alpha_bare':>10}")
+    print("-" * 84)
 
     params_out = {}
     for ds in sorted(best):
@@ -375,9 +400,11 @@ def main():
             continue
         computes   = sorted(cell)
         val_losses = [cell[c] for c in computes]
-        A, alpha, r2 = fit_power_law(computes, val_losses)
-        params_out[ds] = {"A": A, "alpha": alpha, "r2": r2}
-        print(f"{ds:<35}  {A:>10.4e}  {alpha:>8.4f}  {r2:>6.3f}  {len(cell):>4}")
+        p = fit_scaling(computes, val_losses)
+        params_out[ds] = p
+        fmt = lambda v, f: "none" if v is None else format(v, f)
+        print(f"{ds:<35}  {fmt(p['alpha'], '8.4f'):>8}  {fmt(p['L_inf'], '10.3e'):>10}  "
+              f"{fmt(p['chi2r'], '8.2f'):>8}  {len(cell):>4}  {p['alpha_bare']:>10.4f}")
 
     os.makedirs(out_dir, exist_ok=True)
     params_path = os.path.join(out_dir, "scaling_law_params.json")
@@ -404,10 +431,12 @@ def main():
             computes   = sorted(cell)
             val_losses = [cell[c] for c in computes]
             p          = params_out[ds]
+            if p["alpha"] is None:
+                continue
 
             ax.scatter(computes, val_losses, color="steelblue", zorder=3, label="best per cell")
             c_fit = np.logspace(math.log10(computes[0]), math.log10(computes[-1]), 200)
-            v_fit = p["A"] * c_fit ** (-p["alpha"])
+            v_fit = p["A"] * c_fit ** (-p["alpha"]) + p["L_inf"]
             ax.plot(c_fit, v_fit, color="tomato",
                     label=rf"fit  $\alpha={p['alpha']:.3f}$")
             if ds in solo_ref:
@@ -441,10 +470,12 @@ def main():
             computes   = sorted(cell)
             val_losses = [cell[c] for c in computes]
             p          = params_out[ds]
+            if p["alpha"] is None:
+                continue
             color      = cmap(i % cmap.N)
             axc.scatter(computes, val_losses, color=color, s=25, zorder=3)
             c_fit = np.logspace(math.log10(computes[0]), math.log10(computes[-1]), 200)
-            v_fit = p["A"] * c_fit ** (-p["alpha"])
+            v_fit = p["A"] * c_fit ** (-p["alpha"]) + p["L_inf"]
             axc.plot(c_fit, v_fit, color=color,
                      label=rf"{ds.replace('_amplitudes','')}  ($\alpha$={p['alpha']:.3f})")
             if ds in solo_ref:
