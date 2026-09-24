@@ -10,7 +10,9 @@ solo_t*, are superseded: 34-event gradients made them noise.)
     python analysis/catalog_v2/steps_tuned.py                                                    (plots from the json)
 Every curve is fitted with the floor-aware law L = A C^-alpha + L_inf (CLAUDE.md, Scaling fits; the
 profiled fit of sweep/analyze_pretraining_scaling.py): the joint arms on all their non-diverged runs
-pooled, the uncertainty the spread of leave-one-seed-out refits; each solo process on its six points.
+pooled over 1000-8000 steps (500 is on the edge of stability; plotted, not fitted), the uncertainty the
+spread of leave-one-seed-out refits; each solo process on its six points. Both sides are the LAST
+validation of the chosen run: the joint seeds, and the solo DyHPO best trial per step count.
 Writes steps_tuned_a ... _f (class median against events per process, fits dashed), steps_tuned_alpha
 and steps_tuned_floor (the fitted alpha and L_inf per class). Diverged runs are left out."""
 import glob, json, os, re, sys
@@ -45,9 +47,14 @@ if "--collect" in sys.argv:
     for S in SOLO_STEPS:
         for procs in REFS.values():
             for p in procs:
-                sw = os.path.join(ROOT, "sweeps", f"solob1k_t{S}_{p}", "summary.txt")
-                m = re.search(r"Best val_loss: ([0-9.eE+-]+)", open(sw).read()) if os.path.exists(sw) else None
-                if m: out["solo"][f"{p}|{S}"] = float(m.group(1))
+                # the best trial from the per-trial results (full precision: summary.txt keeps six
+                # decimals), then that trial's LAST validation, read like the joint runs'
+                res = glob.glob(os.path.join(ROOT, "sweeps", f"solob1k_t{S}_{p}", "results", f"hp*_t{S}_*.json"))
+                if not res: continue
+                vl = {int(re.search(r"hp(\d+)_", os.path.basename(f)).group(1)): json.load(open(f))["val_loss"] for f in res}
+                hp = min(vl, key=vl.get)
+                f = final(os.path.join(ROOT, "runs", f"solob1k_t{S}_{p}", f"trial_{hp:04d}"))
+                out["solo"][f"{p}|{S}"] = f[p] if f and p in f else vl[hp]
     print(json.dumps(out)); sys.exit()
 
 import plot_style as ps
@@ -70,11 +77,12 @@ def fitf(c, l):
     r = fit_power_law_with_floor(c, l)
     return None if r is None else dict(A=r[0], alpha=r[1], Linf=r[2], chi2r=r[3])
 
-def joint_points(arm, c):
-    """[(seed, events per process, class median)] over the runs that did not diverge."""
+def joint_points(arm, c, steps=None):
+    """[(seed, events per process, class median)] over the runs that did not diverge (and, with
+    `steps`, only those horizons)."""
     pts = []
     for r in D["joint"]:
-        if r["arm"] == arm:
+        if r["arm"] == arm and (steps is None or r["steps"] in steps):
             v = [x for n, x in r["final"].items() if cls(n) == c]
             if v: pts.append((r["seed"], r["steps"] * EV_JOINT, float(np.median(v))))
     return pts
@@ -86,10 +94,13 @@ def solo_points(p):
 FIT = {}
 for c, procs in REFS.items():
     for arm, _, _ in ARMS:
-        pts = joint_points(arm, c)
+        pts = joint_points(arm, c, steps=FIT_STEPS)    # 500 steps is on the edge of stability
         f = fitf([q[1] for q in pts], [q[2] for q in pts])
         loo = [fitf([q[1] for q in pts if q[0] != sd], [q[2] for q in pts if q[0] != sd]) for sd in sorted({q[0] for q in pts})]
-        if f: f["alpha_rng"] = [min(x["alpha"] for x in loo if x), max(x["alpha"] for x in loo if x)]; f["Linf_rng"] = [min(x["Linf"] for x in loo if x), max(x["Linf"] for x in loo if x)]
+        ok = [x for x in loo if x]
+        if f:
+            for k in ("alpha", "Linf"):
+                f[k + "_rng"] = [min(x[k] for x in ok), max(x[k] for x in ok)] if ok else [f[k], f[k]]
         FIT[arm, c] = f
     for p in procs:
         FIT["solo", p] = fitf(*solo_points(p))

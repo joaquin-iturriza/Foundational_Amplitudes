@@ -204,7 +204,7 @@ def _write_summary(cfg, sampler, eos_dir):
     ]
     if best:
         params, loss = best
-        lines += [f"Best val_loss: {loss:.6f}", "Best params:"]
+        lines += [f"Best val_loss: {loss:.6g}", "Best params:"]
         for k, v in params.items():
             lines.append(f"  {k} = {v}")
     lines.append("")

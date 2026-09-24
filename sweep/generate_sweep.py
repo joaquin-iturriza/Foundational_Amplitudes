@@ -61,7 +61,9 @@ def setup_dirs(cfg, sweep_name):
 
 
 def _scheduler(cfg):
-    return cfg["cluster"].get("scheduler", "htcondor")
+    # the site's scheduler (siteconf.resolve); a local checkout ("none") dry-runs the SLURM path
+    s = cfg["cluster"].get("scheduler", "htcondor")
+    return "slurm" if s == "none" else s
 
 
 def emit_prebuild_script(cfg, afs_dir):
