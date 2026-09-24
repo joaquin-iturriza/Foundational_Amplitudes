@@ -12,6 +12,8 @@ $P/check_pools.py --plot-only >/dev/null
 $P/loss_vs_range.py runs/catalog_short_smix_geo runs/catalog_short_smix_mean \
   "--labels=geometric mean,arithmetic mean"
 
+# the reference-weighted arm recorded m_p w_p before 5a6a7b7; unweight_excess writes its corrected record
+$P/unweight_excess.py runs/catalog_short_offsh_excess
 $P/excess_ratio.py --ref=4=9.9e-4_5=4.4e-3_6=5.4e-3 \
   "geometric mean=runs/catalog_short_offsh_geo" \
   "arithmetic mean=runs/catalog_short_offsh_mean" \
