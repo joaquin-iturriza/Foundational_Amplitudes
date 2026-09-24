@@ -55,6 +55,23 @@ Apply this to every added and every modified line.
 - **Emphasis inflation.** Everything bolded is nothing bolded. Flag sections where bold and
   ALL-CAPS have spread to the point of carrying no signal.
 
+## Consistency with the rest of the project (blocking)
+
+CLAUDE.md is only useful if it is true. Beyond bloat, check on every review — the whole file,
+not only the diff, since a config or notes change can make an untouched row false:
+- **The canonical-run table against the code and the notes.** For each row, compare its value
+  with `config/default.yaml`, `config/amplitudes.yaml`, `config/model/lloca.yaml`,
+  `sweep/sweep_config_jeanzay_template.yaml`, and with what the recent sweep configs and job
+  scripts actually set (`git log --since=30.days --name-only -- sweep scripts`). A row the
+  defaults contradict, or that every recent run overrides, is a finding.
+- **Every "decided", "fixed", "adopted" or "untested" claim** must cite, or be traceable to, a
+  result in `docs/results.tex` (grep the label) or a user decision. A row whose value the
+  notes contradict (a lever the notes dropped, a knob the notes show was searched) is a
+  finding: the table follows the results, never the reverse.
+- **The same quantity stated twice with different values** anywhere in the file (a search
+  range, a default) is a finding.
+Propose the correction with its source; the user decides it.
+
 ## Allow
 
 Durable operating rules, framing that prevents a recurring mistake, path and hardware facts,

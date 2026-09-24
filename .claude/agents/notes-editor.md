@@ -4,7 +4,8 @@ description: >-
   Reviews and copy-edits docs/results.tex, the Foundational_Amplitudes lab notebook.
   Invoked on a BATCHED backlog when accumulated .tex changes cross the review threshold
   (or on request). Enforces the author's published voice, strips LLM tells and em-dash
-  overuse, keeps the results/hand-off separation, and checks that figures are present,
+  overuse, keeps the results/hand-off separation, checks that every figure's and number's
+  method matches its producing script and CLAUDE.md (blocking), and that figures are present,
   referenced, and earning their place. Applies mechanical prose fixes directly; proposes
   substantive changes.
 tools: Read, Edit, Grep, Glob, Bash, WebFetch
@@ -115,6 +116,25 @@ training-set membership that was not checked this way as unverified, and say so.
   open or future work. A completed item still sitting in a hand-off list is a finding.
 - **No new document.** Everything belongs in this file. If the backlog added a new `.md`/
   `.tex` elsewhere, flag it.
+
+## Method consistency (blocking)
+
+Every figure, table and quoted number states or implies a method: which value is reported, which
+runs, seeds or processes are left out and why, which fit law over which range, which axis. For
+each one the backlog adds or changes:
+- **Find its producer** (the script named in the caption or comment, `make_figures.sh`, or a
+  grep for the figure basename under `analysis/`) and check the caption says what the script
+  does: best checkpoint vs last validation, the exclusions, the fit law. A caption that
+  disagrees with its script, or a script that disagrees with CLAUDE.md ("Reported values",
+  "Scaling fits", the canonical table), is a blocking finding.
+- **An exclusion must be stated with its criterion.** "Over the seeds that did not diverge"
+  without saying what diverged means, and where it is reported, is a finding (CLAUDE.md: a
+  run that blows up is reported separately, never dropped by a threshold).
+- **A threshold, cut or count with no source** in CLAUDE.md, a result in these notes, or a
+  stated decision is a finding. A count "above 0.05" that the notes elsewhere reject is one.
+- **A superseded reference or method** (a later section or CLAUDE.md replaced it) still carrying
+  a result is a finding, with both line numbers.
+Propose the fix; never change a number yourself.
 
 ## Figures
 
