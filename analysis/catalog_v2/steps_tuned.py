@@ -69,7 +69,7 @@ D["joint"] = [r for r in D["joint"] if r not in DIV]
 print("diverged, left out: " + ", ".join(f"{r['arm']} t{r['steps']} s{r['seed']}" for r in DIV))
 FIT_STEPS = [1000, 2000, 4000, 8000]
 from solo_datalimit_labels import LABEL
-ARMS = [("arith", ps.C.blue, "joint, arithmetic mean"), ("geo", ps.C.vermillion, "joint, geometric mean")]
+ARMS = [("arith", ps.C.blue, "joint, arithmetic"), ("geo", ps.C.vermillion, "joint, geometric")]
 sys.path.insert(0, os.path.join(ROOT, "sweep"))
 from analyze_pretraining_scaling import fit_power_law_with_floor, flops_per_step
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
@@ -130,12 +130,11 @@ for (fig, ax), (c, procs) in zip(figs, REFS.items()):
         if f:
             g = np.geomspace(min(e) / 1.3, max(e) * 1.3, 100)
             ax.plot(g, f["A"] * g ** -f["alpha"] + f["Linf"], color=ps.C.grey, ls=":")
-    ax.plot([], [], color="black", ls="--", label=r"fit $A\,C^{-\alpha}+L_\infty$, joint")
-    ax.plot([], [], color=ps.C.grey, ls=":", label=r"fit $A\,C^{-\alpha}+L_\infty$, alone")
+    ax.plot([], [], color="black", ls="--", label=r"fits $A\,C^{-\alpha}+L_\infty$")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"training compute $C$ [FLOP]"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
-    ps.shared_legend(fig, ax, ncol=1)
+    ps.legend(ax, "upper right")
 ps.save_panels(figs, "analysis/catalog_v2/steps_tuned")
 
 lfmt = lambda v: "unconstr." if v <= 0 else f"{v:.2g}"
@@ -159,14 +158,14 @@ for base, key, xlab, logx in (("steps_tuned_alpha", "alpha", r"exponent $\alpha$
             rng = f[key + "_rng"]; v = f[key]
             m.append(v); lo.append(max(v - rng[0], 0)); hi.append(max(rng[1] - v, 0)); y.append(yy[i] + (-0.18 if k == 0 else 0.0))
         ax.errorbar(m, y, xerr=[lo, hi], fmt="o", color=col, capsize=2, ls="none", label=lab)
-    for j, mk in enumerate(("s", "D")):
-        m, y = [], []
-        for i, (c, procs) in enumerate(REFS.items()):
-            f = FIT["solo", procs[j]]
+    m, y = [], []            # both reference processes of a class, one marker: "alone" is one series
+    for i, (c, procs) in enumerate(REFS.items()):
+        for p_ in procs:
+            f = FIT["solo", p_]
             if f: m.append(f[key]); y.append(yy[i] + 0.18)
-        ax.plot(m, y, marker=mk, ls="none", color=ps.C.grey, label="alone, " + ("first" if j == 0 else "second") + " reference process")
+    ax.plot(m, y, marker="s", ls="none", color=ps.C.grey, label="alone (2 processes)")
     ax.set_yticks(yy, [C.CLASS_LABEL[c] for c in REFS]); ax.set_ylim(-0.6, len(REFS) - 0.4)
     if logx: ax.set_xscale("log")
     ax.set_xlabel(xlab)
-    ps.shared_legend(fig, ax, ncol=1)
+    ps.legend(ax, "lower right")
     ps.save(fig, f"analysis/catalog_v2/{base}")

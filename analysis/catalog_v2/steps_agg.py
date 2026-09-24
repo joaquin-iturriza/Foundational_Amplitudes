@@ -15,8 +15,8 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.pat
 sys.path.insert(0, HERE); sys.path.insert(0, ROOT)
 import census as C
 STEPS = [1000, 2000, 4000]
-ARMS = [("arith", "steps_", "arithmetic mean"), ("geo", "steps_geo_", "geometric mean"),
-        ("tau", "steps_tau1e-2_", r"geometric, $\tau=10^{-2}$")]
+ARMS = [("arith", "steps_", "arithmetic"), ("geo", "steps_geo_", "geometric"),
+        ("tau", "steps_tau1e-2_", r"geom., $\tau=10^{-2}$")]
 REFP = {4: "ee_uu", 5: "ee_uug", 6: "ee_uugg"}
 JSON = os.path.join(HERE, "steps_agg.json")
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
@@ -77,7 +77,7 @@ for (fig, ax), c in zip(figs, C.CLASSES):
     ax.set_xticks(STEPS, [str(n) for n in STEPS]); ax.minorticks_off()
     ax.set_xlabel("training steps"); ax.set_ylabel(r"median MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
-    ps.shared_legend(fig, ax, ncol=1)
+    ps.legend(ax, "upper right")
 ps.save_panels(figs, "analysis/catalog_v2/steps_agg")
 
 # distribution of the per-process loss at the longest horizon: seed geometric mean per process
@@ -87,10 +87,10 @@ for key, _, label in ARMS:
     rs = [r for r in good if r["arm"] == key and r["steps"] == T]
     names = rs[0]["final"].keys()
     v = np.sort([np.exp(np.mean([np.log(r["final"][n]) for r in rs])) for n in names])
-    ax.step(v, np.arange(1, len(v) + 1) / len(v), where="post", color=COL[key], label=f"{label} ({len(rs)} seeds)")
+    ax.step(v, np.arange(1, len(v) + 1) / len(v), where="post", color=COL[key], label=label)
 ax.set_xscale("log"); ax.set_xlabel(r"per-process MSE($\log|\mathcal{M}|^2$)")
 ax.set_ylabel("fraction of processes")
-ps.shared_legend(fig, ax, ncol=1)
+ps.legend(ax, "upper left")
 ps.save(fig, "analysis/catalog_v2/steps_agg_ecdf")
 
 # combined validation loss during training at the longest horizon, every seed; the diverged run dashed
@@ -100,12 +100,12 @@ for key, _, label in ARMS:
     for r in [r for r in runs if r["arm"] == key and r["steps"] == T]:
         x = r["every"] * np.arange(1, len(r["combined"]) + 1)
         if r["diverged"]:
-            ax.plot(x, r["combined"], color=COL[key], ls="--", label=f"{label}, diverged seed")
+            ax.plot(x, r["combined"], color=COL[key], ls="--", label="diverged seed")
         else:
             ax.plot(x, r["combined"], color=COL[key], label=label if first else None); first = False
 ax.set_yscale("log"); ax.set_xlabel("training step")
 ax.set_ylabel(r"validation GM$_p$ MSE($\log|\mathcal{M}|^2$)")
-ps.shared_legend(fig, ax, ncol=1)
+ps.legend(ax, "upper right")
 ps.save(fig, "analysis/catalog_v2/steps_agg_curves")
 
 # power-law fit per class: log L = log L_1000 - alpha log(t/1000) over the three horizons, per seed
@@ -147,5 +147,5 @@ for j, (base, xlab, logx) in enumerate((("steps_agg_alpha", r"exponent $\alpha$,
     ax.set_yticks(yy, [C.CLASS_LABEL[c] for c in C.CLASSES]); ax.set_ylim(-0.6, len(C.CLASSES) - 0.4)
     if logx: ax.set_xscale("log")
     ax.set_xlabel(xlab)
-    ps.shared_legend(fig, ax, ncol=2)
+    ps.legend(ax, "lower right")
     ps.save(fig, f"analysis/catalog_v2/{base}")

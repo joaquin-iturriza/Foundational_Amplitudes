@@ -67,7 +67,7 @@ for (fig, ax), (c, procs) in zip(figs, REFS.items()):
     ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xticks(STEPS, [str(n) for n in STEPS]); ax.minorticks_off()
     ax.set_xlabel("training steps, trained alone"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
     ps.process_label(ax, C.CLASS_LABEL[c], loc="lower left")
-    ps.shared_legend(fig, ax, ncol=2)
+    ps.legend(ax, "upper right")
 ps.save_panels(figs, "analysis/catalog_v2/solo_datalimit")
 
 # validation over train against steps: every reference process, and the joint run's class medians
@@ -77,15 +77,15 @@ for c, procs in REFS.items():
     for i, p in enumerate(procs):
         t = [N for N in STEPS if f"{p}|{N}" in D["solo"]]
         r = [D["solo"][f"{p}|{N}"]["val"] / D["solo"][f"{p}|{N}"]["train"] for N in t]
-        ax.plot(t, r, marker="o", color=CCOL[c], alpha=0.8, label=f"{C.CLASS_LABEL[c]}, alone" if i == 0 else None)
+        ax.plot(t, r, marker="o", color=CCOL[c], alpha=0.8, label=C.CLASS_LABEL[c] if i == 0 else None)
 jt = [1000, 2000, 4000]
 jr = []
 for N in jt:
     runs = [v for k, v in D["joint"].items() if k.startswith(f"steps_t{N}_s")]
     jr.append(np.mean([np.median([x["val"] / x["train"] for n, x in r.items() if "train" in x and "val" in x and cls(n)]) for r in runs]))
-ax.plot(jt, jr, marker="s", color="black", label="joint run, median over 478")
+ax.plot(jt, jr, marker="s", color="black", label="joint run")
 ax.axhline(1, color=ps.C.grey, ls=":", label="validation = train")
 ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xticks(STEPS, [str(n) for n in STEPS]); ax.minorticks_off()
 ax.set_xlabel("training steps"); ax.set_ylabel(r"validation MSE / train MSE")
-ps.shared_legend(fig, ax, ncol=2)
+ps.legend(ax, "upper left")
 ps.save(fig, "analysis/catalog_v2/solo_datalimit_ratio")
