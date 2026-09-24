@@ -14,9 +14,8 @@ Every curve is fitted with the floor-aware law L = A C^-alpha + L_inf (CLAUDE.md
 profiled fit of sweep/analyze_pretraining_scaling.py): the joint arms on all their non-diverged runs
 pooled over 1000-8000 steps (500 is on the edge of stability; plotted, not fitted), the uncertainty the
 spread of leave-one-seed-out refits; each solo process on its six points. Both sides are the
-validation MSE at the end of training: the joint seeds' last validation, and per solo sweep the
-trial with the lowest post-training MSE (solo_b1k.solo_mse; the DyHPO results carried the sign
-head's cross-entropy on the signed pools).
+validation MSE at the best checkpoint: a joint run's per-process loss at its best aggregate
+validation step, and per solo sweep the best trial's best validation (solo_b1k.solo_mse).
 Writes steps_tuned_a ... _f (class median against compute, fits dashed) and steps_tuned_alpha (the fitted
 alpha per class); the floors are printed, "unconstrained" where the fit puts them at 0. Diverged runs are
 left out."""
@@ -33,10 +32,13 @@ REFS = {"tree 2->2": ["ee_aa", "uubar_uubar"], "resonant 2->2": ["ee_uu", "ee_dd
 JSON = os.environ.get("STEPS_TUNED_JSON", os.path.join(HERE, "steps_tuned.json"))   # override: test on a subset
 
 def final(run_dir):
+    """Every process's validation loss at the run's best checkpoint: the validation step with the
+    lowest aggregate val_loss_no_reg (the checkpoint selection; experiment._result_extra)."""
     js = sorted(glob.glob(os.path.join(run_dir, "**", "per_process_metrics.json"), recursive=True))
     if not js: return None
     d = json.load(open(js[-1]))
-    return {n: v[-1] for n, v in d["proc_val_losses_no_reg"].items() if v}
+    i = int(np.argmin(d["val_loss_no_reg"] or d["val_loss"]))
+    return {n: v[i] for n, v in d["proc_val_losses_no_reg"].items() if len(v) > i}
 
 if "--collect" in sys.argv:
     out = {"joint": [], "solo": {}}
