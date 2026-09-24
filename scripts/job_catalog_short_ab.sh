@@ -27,6 +27,7 @@
 # TPROP=true divides the massive s-channel propagators out of the target, TCH=true adds the t-channel
 # factor, TCHMAX= its max final-state count (2 = the adopted 2->2-only rule), SIGN=true the sign head.
 # (Separate variables because an EXTRA with spaces does not survive the --export of `site submit`.)
+# ETA= sets training.cosanneal_eta_min, EMA=true|false the weight EMA and EMAD= its decay.
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -52,5 +53,6 @@ python run.py \
   training.loss_aggregation="${AGG:-geometric_mean}" training.loss_aggregation_tau="${TAU:-0.0}" \
   training.excess_beta="${BETA:-0.0}" ${REF:+"training.excess_reference={$(echo "$REF" | sed 's/_/,/g; s/=/:/g')}"} \
   training.regularization=L2 \
+  training.cosanneal_eta_min="${ETA:-0}" ema="${EMA:-false}" training.ema_decay="${EMAD:-0.99}" \
   training.scheduler=CosineAnnealingLR training.get_ID=false training.save_intermediate=false \
   training.validate_frac="${VF:-0.05}" evaluation.train_subsample=2000 training.dtype=float32 plot=true use_mlflow=false ${EXTRA:-}
