@@ -5,7 +5,8 @@ Laid out 2 wide x 3 tall rather than 3 x 2: six panels across \\textwidth would 
 2.2in, which cannot carry 11pt axis labels. What each panel shows, and the rules read off
 them, live in the results.tex caption and body text.
 """
-import json, sys, math, collections
+import json, sys, math, os
+import yaml, collections
 import numpy as np
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -22,6 +23,13 @@ recs = json.load(open(sys.argv[1])); out = sys.argv[2]
 raw = [r for r in recs if r['converged'] and r['lr_key'] == 'training.lr']
 # NOTE: the finetune lr_scale panel this fed was dropped from the figure; the caption in
 # docs/results.tex no longer promises it. Left out rather than left dangling.
+
+
+def ps_sci(x):
+    """x as mathtext m\\times10^{e}, one significant figure."""
+    e = int(math.floor(math.log10(x))); m = round(x / 10 ** e)
+    if m == 10: m, e = 1, e + 1
+    return rf"{m}\times10^{{{e}}}" if m != 1 else rf"10^{{{e}}}"
 
 
 def bv(r, k):
@@ -92,14 +100,20 @@ a.legend(loc='upper left')
 a = ax[1, 1]
 ys = np.log10([bv(r, 'training.lr') for r in raw if bv(r, 'training.lr')])
 a.hist(ys, bins=30, color=ps.C.blue, label='converged sweeps')
-a.axvspan(math.log10(1e-3), math.log10(1e-2), color=ps.C.green, alpha=0.2,
-          label=r'recommended $[10^{-3},10^{-2}]$')
-a.axvline(math.log10(3e-3), color=ps.C.vermillion, ls='--', label=r'median $3\times10^{-3}$')
+# the template's lr window (sweep/sweep_config_jeanzay_template.yaml) and the median of these sweeps,
+# both from their sources rather than typed in
+_tpl = yaml.safe_load(open(os.path.join(REPO, "sweep", "sweep_config_jeanzay_template.yaml")))
+_lr = next(e for e in _tpl["search_space"] if e["name"] == "training.lr")
+a.axvspan(math.log10(_lr["low"]), math.log10(_lr["high"]), color=ps.C.green, alpha=0.2,
+          label=rf'template window $[{ps_sci(_lr["low"])},{ps_sci(_lr["high"])}]$')
+_med = 10 ** float(np.median(ys))
+a.axvline(math.log10(_med), color=ps.C.vermillion, ls='--', label=rf'median ${ps_sci(_med)}$')
 a.set_xlabel(r'$\log_{10}$ optimal learning rate'); a.set_ylabel('sweeps')
 a.legend(loc='upper left')
 
 # 5. HP importance bars (sampler knobs excluded: the balanced sampler is no longer used)
 a = ax[2, 0]
+# typed in by 425e19c; the computation that produced them is not in the repository (the caption says so)
 imp_raw = {r'$\eta$': 0.285, r'$\lambda$': 0.233, 'warmup frac': 0.219,
            'EMA decay': 0.199, r'$\eta_{\min}$': 0.198}
 names = list(imp_raw); vals = [imp_raw[n] for n in names]

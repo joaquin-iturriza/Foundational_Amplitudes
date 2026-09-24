@@ -807,12 +807,15 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
   \pnl{hpo_optima_summary_a.pdf}\hfill\pnl{hpo_optima_summary_b.pdf} \\[1ex]
   \pnl{hpo_optima_summary_c.pdf}\hfill\pnl{hpo_optima_summary_d.pdf} \\[1ex]
   \pnl{hpo_optima_summary_e.pdf}\hfill\pnl{hpo_optima_summary_f.pdf}
-  \caption{\textbf{HPO optima across 422 converged sweeps.} $\eta^\ast$ vs width (flat,
-  $\mu$P transfers) and vs batch (entangled with horizon; do not read as causal) on the top
-  row; vs horizon (the inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with
-  the recommended band in the middle; and on the bottom row the mean $|\rho_{\mathrm{Spearman}}|$
-  of each HP against val loss, ranking $\eta$ first, beside each HP's declared search range
-  against where its optima actually landed.}
+  \caption{\textbf{HPO optima across 422 converged sweeps} (the $\eta$ panels: the $338$ of them
+  that sweep \code{training.lr}). $\eta^\ast$ vs width (flat, $\mu$P transfers) and vs batch
+  (entangled with horizon; do not read as causal) on the top row; vs horizon (the
+  inverted-$U$, with $\tstar$ marked) and the $\eta^\ast$ histogram with its median
+  ($4.2\times10^{-3}$) and the template's search window in the middle; and on the bottom row the
+  mean $|\rho_{\mathrm{Spearman}}|$ of each HP against val loss, ranking $\eta$ first, beside
+  each HP's declared search range against where its optima actually landed. The $|\rho|$ values
+  were typed into the plotting script when the harvester was added (\code{425e19c}); the
+  computation behind them is not in the repository and they are not reproduced here.}
   \label{fig:hpo}
 \end{figure}
 
