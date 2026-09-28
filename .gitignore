@@ -131,3 +131,4 @@ scripts/build_nlo_verdicts.txt
 
 # sweep/drive.py: local DyHPO state + results of cross-site sweeps (data, not code)
 sweeps_local/
+.venv-driver/

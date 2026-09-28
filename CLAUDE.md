@@ -700,4 +700,6 @@ keeps that state on the laptop and sends stateless trials wherever `site pick` s
   missing, built by `scripts/prebuild_recipes.sh` as a CPU job on that site (SLURM or HTCondor).
 - Detached trials cold-start (no cross-fidelity warm start); fine for single-fidelity sweeps.
 - Code must be committed: the driver syncs each site once at start and submits with --no-sync.
+- The driver runs on the laptop in `.venv-driver` (CPU torch + scikit-learn); it builds it
+  itself on first use via `sweep/driver_env.sh`.
 Use the classic path only for a sweep that must stay on one site (multi-fidelity warm starts).
