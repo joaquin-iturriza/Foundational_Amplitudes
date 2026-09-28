@@ -217,7 +217,8 @@ class Sweep:
         args += ["--", "--sweep-config", self.config_rel, "--detached", "--trial-idx", str(idx),
                  "--hp-idx", str(hp_idx), "--t-steps", str(t_steps)]
         for k, v in hp.items():
-            args += ["--hp", "%s=%s" % (k, repr(v) if isinstance(v, float) else v)]
+            v = v.item() if hasattr(v, "item") else v            # numpy scalars -> python
+            args += ["--hp", "%s=%s" % (k, repr(float(v)) if isinstance(v, float) else v)]
         if a.dry_run:
             log("[dry-run] site " + " ".join(map(str, args)))
             self.sampler.report_failure(hp_idx)        # give the candidate back
