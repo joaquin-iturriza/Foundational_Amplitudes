@@ -17,6 +17,6 @@ if ! "$PY" -m pip --version >/dev/null 2>&1; then
   else curl -sSL -o "$tmp" https://bootstrap.pypa.io/get-pip.py; fi
   "$PY" "$tmp" -q; rm -f "$tmp"
 fi
-"$PY" -m pip install -q scikit-learn scipy numpy pyyaml
+"$PY" -m pip install -q scikit-learn scipy numpy pyyaml gpytorch
 "$PY" -c "import torch" 2>/dev/null || "$PY" -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
-"$PY" -c "import torch, sklearn, scipy, yaml; print('driver env ok: torch', torch.__version__, 'sklearn', sklearn.__version__)"
+"$PY" -c "import torch, sklearn, scipy, yaml, gpytorch; print('driver env ok: torch', torch.__version__, 'sklearn', sklearn.__version__)"
