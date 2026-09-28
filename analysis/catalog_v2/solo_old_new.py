@@ -8,7 +8,10 @@ The old set also has a different target and inputs: log|M|^2 as is (no massive p
 no t-channel factor, no sign head) and the old feature set (no coupling, internal-mass or off-shell
 inputs). Its loss LEVELS are therefore not on the catalog sets' scale (CLAUDE.md: target-side levers
 make val_loss_no_reg incomparable); only the exponents and the shapes of the curves compare across sets.
-The catalog sets at bs 1024 and 16384 share one target and compare in level too.
+The catalog sets at bs 1024 and 16384 share one target and compare in level too. A fourth series is the
+old set's pools with the catalog setup (target, inputs, 8 heads) at the old set's best HPs per step count,
+one run per cell (sweep/run_fixed_hp.py, scripts/job_fixed_hp_old.sh; solo16kflatold.json): same target
+as the catalog sets, same pool and HPs as the old set.
     python analysis/catalog_v2/solo_old_new.py
 Writes solo_old_new (2x2, one panel per process, png + pdf)."""
 import json, os, sys
@@ -22,8 +25,10 @@ from analyze_pretraining_scaling import fit_power_law_with_floor, flops_per_step
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 OLD = json.load(open(os.path.join(HERE, "solo_full_old.json")))
 S16 = json.load(open(os.path.join(HERE, "solo16k.json"))); B1K = solo_mse()
+FLO = json.load(open(os.path.join(HERE, "solo16kflatold.json")))
 SETS = [  # label, heads, batch, steps, value(p, S), marker, filled, colour
     ("old set (tab:scaling): other target, uniform $\\sqrt{s}$, 70k, 4 heads", 4, 16384, [4, 126, 400, 1265, 4000], lambda p, S: min(OLD[f"{p}|{S}"]), "D", True, ps.C.grey),
+    ("old pool, catalog setup, old best HPs", 8, 16384, [4, 126, 400, 1265, 4000], lambda p, S: FLO[f"{p}|{S}"], "^", True, ps.C.green),
     ("catalog pool, bs 1024", 8, 1024, [33, 67, 134, 268, 536, 1072], lambda p, S: B1K[f"{p}|{S}"], "s", False, ps.C.blue),
     ("catalog pool, bs 16384", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(S16[f"{p}|{S}"]), "o", True, ps.C.vermillion)]
 PROCS = ["ee_aa", "ee_uu", "ee_uug", "ee_uugg"]
