@@ -235,7 +235,18 @@ def main():
                         help="Skip DyHPO suggest and run this specific HP config")
     parser.add_argument("--fixed-t-steps", type=int, default=None,
                         help="Fixed t_steps for finalization jobs (requires --fixed-hp-idx)")
+    # Detached mode (sweep/drive.py): the driver holds the DyHPO state and hands this job
+    # its configuration; the job never touches a shared state file and reports back with
+    # one RESULT_JSON line on stdout. That is what lets one sweep run on several sites.
+    parser.add_argument("--detached", action="store_true",
+                        help="No shared state: --hp-idx/--t-steps/--hp given, result printed as RESULT_JSON")
+    parser.add_argument("--hp-idx", type=int, default=None)
+    parser.add_argument("--t-steps", type=int, default=None)
+    parser.add_argument("--hp", action="append", default=[], metavar="KEY=VALUE",
+                        help="one hyper-parameter (repeatable); values parsed as YAML")
     args = parser.parse_args()
+    if args.detached and (args.hp_idx is None or args.t_steps is None):
+        parser.error("--detached needs --hp-idx and --t-steps")
 
     cfg        = load_config(args.sweep_config)
     sweep_name = cfg["sweep_name"]
@@ -257,7 +268,14 @@ def main():
     eos_output_path = os.path.join(eos_dir, "dyhpo_surrogate")
     os.makedirs(eos_output_path, exist_ok=True)
 
-    if args.fixed_hp_idx is not None:
+    if args.detached:
+        hp_idx, t_steps = args.hp_idx, args.t_steps
+        hp_params = {}
+        for kv in args.hp:
+            k, _, v = kv.partition("=")
+            hp_params[k] = yaml.safe_load(v)
+        print(f"[run_trial] DETACHED hp_idx={hp_idx}  t_steps={t_steps}")
+    elif args.fixed_hp_idx is not None:
         t_steps = args.fixed_t_steps
         with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
             hp_idx    = args.fixed_hp_idx
@@ -281,14 +299,17 @@ def main():
     # Arm SIGTERM handler now that we know which trial to report as failed
     global _sigterm_hp_idx, _sigterm_state, _sigterm_eos
     _sigterm_hp_idx = hp_idx
-    _sigterm_state  = state_path
+    _sigterm_state  = None if args.detached else state_path      # detached: nothing shared to report to
     _sigterm_eos    = eos_output_path
 
     # ---------------------------------------------------------------
     # 2. Check checkpoint index — resume or cold start?
     # ---------------------------------------------------------------
-    with CheckpointIndex(ckpt_index_path) as idx:
-        prev = idx.lookup(hp_idx)
+    if args.detached:
+        prev = None                                   # detached trials cold-start
+    else:
+        with CheckpointIndex(ckpt_index_path) as idx:
+            prev = idx.lookup(hp_idx)
 
     run_dir = os.path.join(project_dir, "runs", sweep_name, f"trial_{hp_idx:04d}")
 
@@ -340,8 +361,15 @@ def main():
               + (f"  hpo_obj={hpo_obj:.4f}" if hpo_obj is not None else ""))
 
         # -----------------------------------------------------------
-        # 4. Report result to DyHPO surrogate
+        # 4. Report result to DyHPO surrogate (detached: to the driver, via stdout)
         # -----------------------------------------------------------
+        if args.detached:
+            print("RESULT_JSON " + json.dumps({
+                "hp_idx": hp_idx, "t_steps": t_steps, "trial_idx": args.trial_idx,
+                "val_loss": val_loss, "observe_loss": float(observe_loss),
+                "hpo_obj": hpo_obj, "proc_val_losses": proc_val_losses,
+                "result_path": result_path, "run_dir": run_dir}), flush=True)
+            return
         with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
             sampler.observe(hp_idx, t_steps, observe_loss, proc_val_losses)
 
@@ -367,6 +395,11 @@ def main():
 
     except Exception as e:
         print(f"[run_trial] Trial FAILED: {e}", file=sys.stderr)
+        if args.detached:
+            print("RESULT_JSON " + json.dumps({"hp_idx": hp_idx, "t_steps": t_steps,
+                                              "trial_idx": args.trial_idx, "failed": True,
+                                              "error": str(e)[:300]}), flush=True)
+            sys.exit(1)
         if args.fixed_hp_idx is None:
             try:
                 with DyHPOSampler.locked(state_path, eos_output_path) as sampler:

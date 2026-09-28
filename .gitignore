@@ -128,3 +128,6 @@ MG5_debug
 scripts/build_nlo_logs/
 scripts/build_nlo_verdicts.txt
 .claude/.slurm_monitor_jobs
+
+# sweep/drive.py: local DyHPO state + results of cross-site sweeps (data, not code)
+sweeps_local/

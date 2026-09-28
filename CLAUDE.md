@@ -679,3 +679,25 @@ visibility — making the repo public exposes `trunk` and the retired branches t
 truly private, that forces a separate-repo split.
 
 (Ground rule #5 still holds everywhere: never attribute commits/PRs to Claude.)
+
+## Sweeps across sites: `sweep/drive.py`
+
+A sweep no longer has to live on one cluster. `generate_sweep` + `sweep_manager` keep the
+DyHPO state in a file that every trial locks on one site's filesystem; `sweep/drive.py`
+keeps that state on the laptop and sends stateless trials wherever `site pick` says:
+
+    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] \
+        [--n-trials N] [--parallel P] [--mem 8G] [--cpus 4] [--hours 0.5] \
+        [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60]
+
+- State and results: `sweeps_local/<sweep_name>/` (dyhpo_state.pkl, driver_state.json,
+  results/*.json, summary.txt). Resumable: run the same command again.
+- Placement per trial through `site pick` (fitting free GPUs, submit caps, expected waits);
+  `--sites` restricts, Jean Zay only with `--allow-jeanzay`.
+- Trials run `sweep/trial_job.sh` via `site submit` with `--detached --hp-idx --t-steps --hp k=v`
+  (`run_trial.py --detached`): no shared state, result returned as one RESULT_JSON log line.
+- Pools: before the first trial on a site the recipe's datasets are checked there and, if
+  missing, built by `scripts/prebuild_recipes.sh` as a CPU job on that site (SLURM or HTCondor).
+- Detached trials cold-start (no cross-fidelity warm start); fine for single-fidelity sweeps.
+- Code must be committed: the driver syncs each site once at start and submits with --no-sync.
+Use the classic path only for a sweep that must stay on one site (multi-fidelity warm starts).
