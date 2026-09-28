@@ -29,7 +29,7 @@ fi
 
 # Figures changed since the last successful check.
 mapfile -t figs < <(
-  find . \( -path ./runs -o -path ./sweeps -o -path ./data -o -path ./conda -o -path ./.venv \
+  find . \( -path ./runs -o -path ./sweeps -o -path ./data -o -path ./conda -o -path ./.venv -o -path "./.venv-*" \
             -o -path ./.git -o -path './worktrees' -o -path './wt-*' -o -path '*/scratchpad' \
             -o -path ./compare_models -o -path './*/IntrinsicDimDeep' -o -path ./IntrinsicDimDeep \) -prune \
        -o \( -name '*.png' -o -name '*.pdf' \) -newer "$MARKER" -print 2>/dev/null \
