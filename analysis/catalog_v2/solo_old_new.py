@@ -4,6 +4,11 @@ four processes they share: ee->aa, ee->uu, ee->uug, ee->uugg. Each cell at its b
 DyHPO result; CLAUDE.md, Reported values); each curve with its floor-aware fit A C^-alpha + L_inf (CLAUDE.md,
 Scaling fits). Compute = flops_per_step(heads, n_p, batch) x steps with each set's own heads (4 old, 8 new)
 and batch (16384 old, 1024 / 16384 new).
+The old set also has a different target and inputs: log|M|^2 as is (no massive propagators divided out,
+no t-channel factor, no sign head) and the old feature set (no coupling, internal-mass or off-shell
+inputs). Its loss LEVELS are therefore not on the catalog sets' scale (CLAUDE.md: target-side levers
+make val_loss_no_reg incomparable); only the exponents and the shapes of the curves compare across sets.
+The catalog sets at bs 1024 and 16384 share one target and compare in level too.
     python analysis/catalog_v2/solo_old_new.py
 Writes solo_old_new (2x2, one panel per process, png + pdf)."""
 import json, os, sys
@@ -18,7 +23,7 @@ NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 OLD = json.load(open(os.path.join(HERE, "solo_full_old.json")))
 S16 = json.load(open(os.path.join(HERE, "solo16k.json"))); B1K = solo_mse()
 SETS = [  # label, heads, batch, steps, value(p, S), marker, filled, colour
-    ("old set (tab:scaling): uniform $\\sqrt{s}$, 70k, 4 heads", 4, 16384, [4, 126, 400, 1265, 4000], lambda p, S: min(OLD[f"{p}|{S}"]), "D", True, ps.C.grey),
+    ("old set (tab:scaling): other target, uniform $\\sqrt{s}$, 70k, 4 heads", 4, 16384, [4, 126, 400, 1265, 4000], lambda p, S: min(OLD[f"{p}|{S}"]), "D", True, ps.C.grey),
     ("catalog pool, bs 1024", 8, 1024, [33, 67, 134, 268, 536, 1072], lambda p, S: B1K[f"{p}|{S}"], "s", False, ps.C.blue),
     ("catalog pool, bs 16384", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(S16[f"{p}|{S}"]), "o", True, ps.C.vermillion)]
 PROCS = ["ee_aa", "ee_uu", "ee_uug", "ee_uugg"]

@@ -10,7 +10,8 @@ trained alone (bs 1024, full pool, sweeps/solob1k_t*, the signed pools from thei
 aggregation: (a) arithmetic mean, (b) geometric mean.
 With --solo=16k the open squares are the batch-16384 references instead (sweeps/solo16k_t*, 63 ... 4000
 steps; solo16k.json), and grey diamonds add the old from-scratch set of tab:scaling for the four processes
-both sets share (solo_full_old.json, refitted here with the same law; it reproduces tab:scaling).
+both sets share (solo_full_old.json, refitted here with the same law; it reproduces tab:scaling). That set
+has another target (no propagators divided out, no sign head) and the old inputs: only its exponent compares.
     python analysis/catalog_v2/alpha_vs_multiplicity_steps.py [--solo=16k]
 Writes analysis/catalog_v2/alpha_vs_multiplicity_steps[_16k] (png + pdf)."""
 import json, os, sys
@@ -113,6 +114,6 @@ H += [axes[0].plot([], [], ls="none", marker="o", color="0.3")[0],
       axes[0].scatter([], [], s=40, marker="s", facecolors="none", edgecolors="0.3")]
 L += ["joint run", "alone, bs 16384" if SOLO16K else "trained alone"]
 if SOLO16K:
-    H.append(axes[0].scatter([], [], s=40, marker="D", facecolors="none", edgecolors="0.35")); L.append("alone, tab:scaling set")
+    H.append(axes[0].scatter([], [], s=40, marker="D", facecolors="none", edgecolors="0.35")); L.append("alone, tab:scaling set (other target)")
 ps.shared_legend(fig, axes[0], ncol=4, handles=H, labels=L)
 ps.save(fig, os.path.join(HERE, "alpha_vs_multiplicity_steps" + ("_16k" if SOLO16K else "")))
