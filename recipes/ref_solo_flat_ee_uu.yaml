@@ -1,0 +1,6 @@
+# Solo reference on the pool of the old from-scratch set (tab:scaling, sweeps/scaling_solo_full): ee_uu alone,
+# uniform sqrt(s) over 91-1000 GeV (flat, no mixture), 70k train / 10k val as that set's 100k split 70/20/10.
+# Everything else as the catalog solo references (sweep/gen_solo16k_configs.py --flat), so pool is the one change.
+sampling: {mode: flat}
+processes:
+  - {name: ee_uu, sqrts: [91, 1000], n_train: 70000, n_val: 10000, n_test: 10000}

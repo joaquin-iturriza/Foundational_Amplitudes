@@ -12,8 +12,12 @@ lambda 0.2%, eta_min 0.1%):
   training.cosanneal_warmup_frac [0.05, 0.2]
   fixed: cosanneal_eta_min 0, regularization_lambda 1e-8 (job_catalog_short_ab.sh default), ema off.
     python sweep/gen_solo16k_configs.py            writes sweep/sweep_config_solo16k_t<T>_<process>.yaml
+    python sweep/gen_solo16k_configs.py --flat     the same for ee_aa, ee_uu, ee_uug, ee_uugg on the pools of the
+                                                   old from-scratch set (tab:scaling: uniform sqrt(s), 70k train;
+                                                   recipes/ref_solo_flat_<process>.yaml), the pool the one change:
+                                                   sweep/sweep_config_solo16kflat_t<T>_<process>.yaml
 """
-import collections, glob, json, os, re
+import collections, glob, json, os, re, sys
 import numpy as np
 import yaml
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
@@ -31,11 +35,15 @@ for r in recs:
 ts = np.array(sorted(row)); lr_row = np.array([np.mean(row[t]) for t in ts])
 lr_star = lambda t: float(np.exp(np.interp(np.log(t), np.log(ts), lr_row)))
 
-for p in PROCS:
+FLAT = "--flat" in sys.argv
+NAME = "solo16kflat" if FLAT else "solo16k"
+for p in (["ee_aa", "ee_uu", "ee_uug", "ee_uugg"] if FLAT else PROCS):
     base = yaml.safe_load(open(os.path.join(HERE, f"sweep_config_solob1k_t33_{p}.yaml")))
     for T in STEPS:
         c = dict(base); c["fixed_params"] = dict(base["fixed_params"])
-        c["sweep_name"] = f"solo16k_t{T}_{p}"
+        c["sweep_name"] = f"{NAME}_t{T}_{p}"
+        if FLAT:
+            c["fixed_params"]["data.processes_file"] = f"${{PROJECT_DIR}}/recipes/ref_solo_flat_{p}.yaml"
         c["fidelity_schedule"] = {"t_steps": [T]}
         c["cluster"] = dict(base["cluster"], mem="8G",   # measured peak RSS 1.7 GB at this batch
                             time="%02d:%02d:00" % divmod(int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN), 60))
@@ -46,8 +54,9 @@ for p in PROCS:
         c["search_space"] = [
             {"name": "training.lr", "type": "float_log", "low": float(f"{centre / 10 ** 0.5:.3g}"), "high": float(f"{centre * 10 ** 0.5:.3g}")},
             {"name": "training.cosanneal_warmup_frac", "type": "float_uniform", "low": 0.05, "high": 0.2}]
-        head = (f"# Solo reference at the canonical batch: {p} alone on its full catalog pool, bs 16384, {T} steps.\n"
+        head = (f"# Solo reference at the canonical batch: {p} alone on "
+                + ("the old set's uniform-sqrt(s) pool" if FLAT else "its full catalog pool") + f", bs 16384, {T} steps.\n"
                 f"# Written by sweep/gen_solo16k_configs.py (lr window +-1/2 decade around lr*(t={T}, high D) = {centre:.2g}).\n")
-        open(os.path.join(HERE, f"sweep_config_solo16k_t{T}_{p}.yaml"), "w").write(head + yaml.safe_dump(c, sort_keys=False))
+        open(os.path.join(HERE, f"sweep_config_{NAME}_t{T}_{p}.yaml"), "w").write(head + yaml.safe_dump(c, sort_keys=False))
     print(p, "done")
 print("lr* centres:", {T: f"{lr_star(T):.2g}" for T in STEPS})
