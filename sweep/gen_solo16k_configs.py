@@ -1,5 +1,6 @@
 """Emit the batch-16384 solo references: the 12 reference processes of the steps curve alone on their full
-catalog pools at the canonical batch, 500 / 1000 / 2000 / 4000 steps (the joint horizons without 8000),
+catalog pools at the canonical batch, 63 ... 4000 steps (the joint horizons without 8000, and 63 / 125 / 250 below them so the
+floor-aware fit has points before the curves bend),
 one single-fidelity DyHPO sweep per (steps, process), 6 trials. Written from the batch-1024 configs
 (sweep/sweep_config_solob1k_t33_<process>.yaml: recipe, encoding, target levers, as the joint steps runs)
 with the batch at 16384 and the search reduced to the knobs that mattered there
@@ -16,7 +17,7 @@ import collections, glob, json, os, re
 import numpy as np
 import yaml
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
-STEPS = [500, 1000, 2000, 4000]
+STEPS = [63, 125, 250, 500, 1000, 2000, 4000]
 PROCS = ["ee_aa", "uubar_uubar", "ee_uu", "ee_ddbar", "ee_uug", "udbar_WpZZ", "ee_uugg", "udbar_WpZaa",
          "uubar_ZaZ_nlo", "ee_bb_nlo", "udbar_Wgg_nlo", "uubar_ddbara_nlo"]
 HIGH_D = 70000

@@ -1,5 +1,5 @@
 """The batch-16384 solo references (sweeps/solo16k_t<T>_<process>, sweep/gen_solo16k_configs.py): the 12
-reference processes of the steps curve alone on their full catalog pools at the canonical batch, 500 ...
+reference processes of the steps curve alone on their full catalog pools at the canonical batch, 63 ...
 4000 steps, 6 DyHPO trials per (steps, process).
     python analysis/catalog_v2/solo16k.py --collect > analysis/catalog_v2/solo16k.json   (on the site of the sweeps)
     python analysis/catalog_v2/solo16k.py                                              (plots from the json)
@@ -13,7 +13,7 @@ import glob, json, os, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path[:0] = [HERE, ROOT, os.path.join(ROOT, "sweep")]
-STEPS = [500, 1000, 2000, 4000]
+STEPS = [63, 125, 250, 500, 1000, 2000, 4000]
 REFS = {"tree 2->2": ["ee_aa", "uubar_uubar"], "resonant 2->2": ["ee_uu", "ee_ddbar"],
         "tree 2->3": ["ee_uug", "udbar_WpZZ"], "tree 2->4": ["ee_uugg", "udbar_WpZaa"],
         "positive 1-loop": ["uubar_ZaZ_nlo", "ee_bb_nlo"], "signed 1-loop": ["udbar_Wgg_nlo", "uubar_ddbara_nlo"]}
