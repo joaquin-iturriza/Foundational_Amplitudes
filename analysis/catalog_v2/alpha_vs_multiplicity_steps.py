@@ -8,8 +8,11 @@ checkpoint; steps_tuned.json), fitted on its own points with the floor-aware law
 over its per-process compute (steps_tuned.py: events of the process seen x FLOPs per event). Open squares: the same process
 trained alone (bs 1024, full pool, sweeps/solob1k_t*, the signed pools from their rerun solob1kv_t*; solo_b1k.solo_mse); a thin line joins the two. One panel per training
 aggregation: (a) arithmetic mean, (b) geometric mean.
-    python analysis/catalog_v2/alpha_vs_multiplicity_steps.py
-Writes analysis/catalog_v2/alpha_vs_multiplicity_steps (png + pdf)."""
+With --solo=16k the open squares are the batch-16384 references instead (sweeps/solo16k_t*, 63 ... 4000
+steps; solo16k.json), and grey diamonds add the old from-scratch set of tab:scaling for the four processes
+both sets share (solo_full_old.json, refitted here with the same law; it reproduces tab:scaling).
+    python analysis/catalog_v2/alpha_vs_multiplicity_steps.py [--solo=16k]
+Writes analysis/catalog_v2/alpha_vs_multiplicity_steps[_16k] (png + pdf)."""
 import json, os, sys
 import numpy as np
 from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
@@ -25,7 +28,13 @@ from solo_b1k import solo_mse
 D["solo"] = solo_mse()      # best validation MSE per sweep (solo_b1k)
 rose = [r for r in D["joint"] if r.get("best_not_last")]
 print("loss rose after the best checkpoint (kept at it): " + (", ".join(f"{r['arm']} t{r['steps']} s{r['seed']}" for r in rose) or "none"))
-SOLO_STEPS = [33, 67, 134, 268, 536, 1072]
+SOLO16K = "--solo=16k" in sys.argv
+SOLO_STEPS, SOLO_BS = [33, 67, 134, 268, 536, 1072], 1024
+if SOLO16K:
+    D["solo"] = {k: min(v) for k, v in json.load(open(os.path.join(HERE, "solo16k.json"))).items() if v}
+    SOLO_STEPS, SOLO_BS = [63, 125, 250, 500, 1000, 2000, 4000], 16384
+    OLD = json.load(open(os.path.join(HERE, "solo_full_old.json")))
+    OLD_STEPS = [4, 126, 400, 1265, 4000]
 runs = D["joint"]                           # every run, at its best checkpoint (no run left out)
 POOL = D["pool"]; POOL_SUM = float(sum(POOL.values()))
 # the reference processes, by kind (the colours of the class panels)
@@ -46,7 +55,11 @@ def joint_alpha(arm, n):
 
 def solo_alpha(n):
     t = [s for s in SOLO_STEPS if f"{n}|{s}" in D["solo"]]
-    return alpha([flops_per_step(8, NP[n], 1) * 1024 * s for s in t], [D["solo"][f"{n}|{s}"] for s in t]) if t else None
+    return alpha([flops_per_step(8, NP[n], 1) * SOLO_BS * s for s in t], [D["solo"][f"{n}|{s}"] for s in t]) if t else None
+
+def old_alpha(n):
+    if not SOLO16K or f"{n}|4" not in OLD: return None
+    return alpha([float(s) for s in OLD_STEPS], [min(OLD[f"{n}|{s}"]) for s in OLD_STEPS])
 
 dofx = lambda n: 3.0 * n - 4.0
 XLIM = (1.55, 10.5); YLIM = (4.0 / XLIM[1], 4.0 / XLIM[0])     # the bound runs corner to corner
@@ -71,7 +84,11 @@ for ax, arm in zip(axes, ("arith", "geo")):
             ax.plot([X[n]], [J[n]], ls="none", marker="o", color=col, zorder=3)
         if S[n] is not None:
             ax.scatter([X[n]], [S[n]], s=40, marker="s", facecolors="none", edgecolors=col, zorder=4)
-        print(f"  {n:18s} n_fs={NP[n]-2}  joint {J[n] if J[n] is None else round(J[n], 2)}  alone {S[n] if S[n] is None else round(S[n], 2)}")
+        O = old_alpha(n)
+        if O is not None:
+            ax.scatter([X[n]], [O], s=40, marker="D", facecolors="none", edgecolors="0.35", zorder=4)
+        print(f"  {n:18s} n_fs={NP[n]-2}  joint {J[n] if J[n] is None else round(J[n], 2)}  alone {S[n] if S[n] is None else round(S[n], 2)}"
+              + (f"  old set {O:.2f}" if O is not None else ""))
     ax.xaxis.set_major_locator(FixedLocator([dofx(n) for n in (2, 3, 4)])); ax.xaxis.set_minor_locator(FixedLocator([]))
     ax.set_xticklabels(["2", "3", "4"]); ax.xaxis.set_minor_formatter(NullFormatter())
     ax.yaxis.set_major_locator(FixedLocator([0.5, 1, 2])); ax.yaxis.set_major_formatter(ScalarFormatter())
@@ -94,6 +111,8 @@ H = [axes[0].plot([], [], ls="none", marker="o", color=c)[0] for _, c in KIND.va
 L = [lab for lab, _ in KIND.values()]
 H += [axes[0].plot([], [], ls="none", marker="o", color="0.3")[0],
       axes[0].scatter([], [], s=40, marker="s", facecolors="none", edgecolors="0.3")]
-L += ["joint run", "trained alone"]
+L += ["joint run", "alone, bs 16384" if SOLO16K else "trained alone"]
+if SOLO16K:
+    H.append(axes[0].scatter([], [], s=40, marker="D", facecolors="none", edgecolors="0.35")); L.append("alone, tab:scaling set")
 ps.shared_legend(fig, axes[0], ncol=4, handles=H, labels=L)
-ps.save(fig, os.path.join(HERE, "alpha_vs_multiplicity_steps"))
+ps.save(fig, os.path.join(HERE, "alpha_vs_multiplicity_steps" + ("_16k" if SOLO16K else "")))
