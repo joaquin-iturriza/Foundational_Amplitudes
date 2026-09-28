@@ -3285,34 +3285,34 @@ coordinate belongs in the list for the same reason the $Z$'s does.
 \paragraph{Distance from the reference instead of a threshold.} A threshold on the loss
 hides how far a process is from what it can do, so the better reading is each
 process's distance from what its multiplicity reaches alone, $e_p=m_p/L_{\rm ref}(n_p)$ (\code{analysis/catalog\_v2/excess\_ratio.py},
-Fig.~\ref{fig:excess_ratio}). With the references measured with the input ($9.9\times10^{-4}$,
-$4.4\times10^{-3}$, $5.4\times10^{-3}$ for $2\to2$, $2\to3$, $2\to4$ alone at $\mathrm{bs}/P$
-for $1000$ steps), almost no process in the joint run reaches what it reaches alone at the same
-compute: $1\%$ are below their reference under the arithmetic and reference-weighted arms,
-$13\%$ under the geometric one (its converged $2\to2$ tail, the one place where joint training
-beats solo), and the medians are $13$, $8.8$ and $15$. By class the trade the aggregations
-make is explicit: $2\to4$ at $15$, $9.4$ and $20$ times its reference, tree $2\to2$ at
-$0.76$, $3.8$ and $3.1$, resonant $2\to2$ at $24$, $17$ and $20$. Two patterns among the
-processes furthest from their
-reference under the geometric and arithmetic means: the $W$-channel $2\to2$ processes ($u\bar d\to e\nu$,
-$u\bar d\to W\gamma$, $u\bar d\to Wg$ and their one-loop versions) at $30$--$90$ times,
-because the $W$ (PDG $24$) is not in the propagator list the masks are built for, so these
-have no coordinate for their pole; and the $M_Z$-scan variants alone among the scans, at
-$12$--$40$ times against $0.7$--$3$ for the $\alpha_s$ and $m_t$ scans, with the mask
-verified to place the pole at the scanned mass and the pools verified to cover it ($13$--$16\%$
-of events within $5$\,GeV of their own pole), so what remains is that a shifted pool is a
-twin of its nominal pool with the same momenta and a different pole, told apart by the
-coordinate and the internal-mass scalar. The $W$ is being added to the propagator list.
-Under the reference weighting the furthest processes are instead the signed one-loop and
-the $2\to3$ pools ($u\bar u\to b\bar bH$ at $117$, $ee\to e\nu W$ at $84$), the classes it
-starves. One caveat on the
-reference itself: the three solo processes chosen for it ($ee\to u\bar u$, $u\bar ug$,
-$u\bar ugg$) all carry the $Z$ pole, and their solo loss fell by $1.7$--$3.4\times$ once the
-input existed, where a non-resonant process of the same multiplicity would have moved
-little. Within a multiplicity the exponent is shared but the prefactor is not, and the
-prefactor is where a pole or an emission shows up, so a reference from one process is only
-as good as that process; a reference per (multiplicity, resonant or not) class, from a few
-two-minute solo runs each, is the next step before the ratios by class are trusted further.
+Fig.~\ref{fig:excess_ratio}). The reference is the batch-$1024$ solo set of the steps curve
+below: for each multiplicity the geometric mean over its two tree reference processes
+($ee\to\gamma\gamma$ and $u\bar u\to u\bar u$; $ee\to u\bar ug$ and $u\bar d\to W^+ZZ$;
+$ee\to u\bar ugg$ and $u\bar d\to W^+Z\gamma\gamma$), each at its sweep's best validation, at
+$33$ steps, the grid point matched to the $1000$-step joint runs in events seen
+($33\,800$ against the $38\,200$ a tree pool of the full-pool catalog gets; \code{solo\_b1k.tree\_reference}):
+$L_{\rm ref}=0.045$, $0.12$ and $0.33$ for $2\to2$, $2\to3$, $2\to4$. Against it most processes
+in the joint run are below what their multiplicity reaches alone on the same number of events:
+$78\%$ under the geometric mean, $94\%$ under the arithmetic one, $85\%$ under the reference
+weighting, with medians $0.26$, $0.18$ and $0.35$. The joint run takes $1000$ optimizer steps
+where the solo run takes $33$ on the same events, and that is what the ratio below one measures.
+By class: tree $2\to2$ at $0.014$, $0.08$ and $0.067$ times its reference, $2\to4$ at $0.24$,
+$0.15$ and $0.33$, resonant $2\to2$ at $0.52$, $0.37$ and $0.44$, and the signed one-loop class
+the one above it, at $4.4$, $0.83$ and $1.7$. Within the $2\to2$ processes the same two groups
+stand out as before, since the reference is one number per multiplicity: the $W$-channel
+processes ($u\bar d\to e\nu$, $u\bar d\to W\gamma$, $u\bar d\to Wg$ and their one-loop versions,
+median $6.9$ under the geometric mean, $0.73$ under the arithmetic one), because the $W$ (PDG
+$24$) is not in the propagator list the masks are built for, so these have no coordinate for
+their pole; and the $M_Z$-scan variants (median $0.70$ and $0.43$, against $0.055$ and $0.088$
+for the other scan families), with the mask verified to place the pole at the scanned mass and
+the pools verified to cover it ($13$--$16\%$ of events within $5$\,GeV of their own pole), so
+what remains is that a shifted pool is a twin of its nominal pool with the same momenta and a
+different pole, told apart by the coordinate and the internal-mass scalar. The $W$ is being
+added to the propagator list. Under the reference weighting the furthest processes are the
+signed one-loop and the $2\to3$ pools ($u\bar u\to b\bar bH$ at $4.1$, $ee\to e\nu W$ at
+$3.0$), the classes it starves. The reference is two processes per multiplicity, one number
+for resonant and non-resonant pools alike, so the ratios by class carry the prefactor
+differences within a multiplicity.
 And across every arm the dominant driver of the spread of final losses is the range of the
 target (Fig.~\ref{fig:loss_vs_range}), resonance being one way to have a large range; a fix
 at the level of the target's scale, rather than of the aggregation, is the open lead.
@@ -3322,7 +3322,8 @@ at the level of the target's scale, rather than of the aggregation, is the open 
 \widerow{\pnl{../analysis/catalog_v2/excess_ratio_a.pdf}\hfill\pnl{../analysis/catalog_v2/excess_ratio_b.pdf}} \\[1ex]
 \pnl{../analysis/catalog_v2/excess_ratio_c.pdf}
 \caption{catalog\_v2 at $1000$ steps with the off-shellness input: each process's loss
-divided by the solo loss of its multiplicity at the same compute (dashed), against the range of
+divided by the solo loss of its multiplicity on the same number of events (batch-$1024$ references
+at $33$ steps; dashed), against the range of
 $\ln|\mathcal M|^2$ in its train pool, under the geometric mean (a), the arithmetic mean (b) and
 the reference weighting (c, corrected).}
 \label{fig:excess_ratio}
