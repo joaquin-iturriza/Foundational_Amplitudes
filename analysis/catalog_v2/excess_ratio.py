@@ -1,7 +1,12 @@
 """Distance of every process from its multiplicity reference, e_p = m_p / L_ref(n_p) (m_p at the run's
 best checkpoint), without a pass/fail threshold: figure e_p against the pool's ln|M|^2 range per arm, quantiles by class,
 and the processes furthest above their reference with their attributes.
-    python analysis/catalog_v2/excess_ratio.py --ref=4=1.66e-3_5=1.03e-2_6=1.81e-2 label=run_dir [label=run_dir ...] [--out=name]
+    python analysis/catalog_v2/excess_ratio.py --solo-steps=S label=run_dir [label=run_dir ...] [--out=name]
+L_ref(n) is what multiplicity n reaches alone at the same per-process events seen: the batch-1024 solo
+references (solo_b1k.tree_reference) at S steps, the geometric mean over the two tree reference processes
+of that multiplicity, each at its sweep's best validation (CLAUDE.md, Reported values). S = 33 is the
+grid point of the 1000-step joint runs (33 x 1024 events; a tree process of the full-pool catalog sees
+1000 x 16384 x 100k / sum of the pools = 38k).
 Writes analysis/catalog_v2/<out>_a, _b, ... (png+pdf, default excess_ratio), one panel per arm,
 the arm as the legend title."""
 import csv, json, os, re, sys
@@ -11,7 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import census as C
 import plot_style as ps
 opts = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--"))
-REF = {int(k): float(v) for k, v in (t.split("=") for t in opts["ref"].split("_"))}
+from solo_b1k import tree_reference
+REF = tree_reference(int(opts["solo-steps"]))
+print("L_ref: " + ", ".join(f"2->{k-2} {v:.3g}" for k, v in sorted(REF.items())))
 runs = [(a.split("=", 1)[0], a.split("=", 1)[1]) for a in sys.argv[1:] if not a.startswith("--")]
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 aud = {re.sub(r"_\d+-\d+GeV_train(_smix)?$", "", r["name"]): r for r in csv.DictReader(open(os.path.join(HERE, "pool_audit.csv"))) if r["role"] == "train"}
@@ -30,7 +37,7 @@ for (fig, ax), (label, path) in zip(figs, runs):
     sp = np.array([float(aud[n]["logspread"]) for n in names]); ev = np.array([e[n] for n in names]); npart = np.array([NP[n] for n in names])
     for k, mk, col in MULT:
         sel = npart == k; ax.scatter(sp[sel], ev[sel], marker=mk, color=col, alpha=0.7, label=rf"$2\to{k-2}$")
-    ax.axhline(1, color=ps.C.grey, ls="--", label="solo, same compute")
+    ax.axhline(1, color=ps.C.grey, ls="--", label="alone, same events seen")
     ax.set_yscale("log"); ax.set_xlabel(r"range of $\ln|\mathcal{M}|^2$ in the train pool")
     ax.set_ylabel(r"$\mathrm{MSE}_p\,/\,\mathrm{MSE}_{\rm solo}(n_p)$")
     ps.process_label(ax, label, loc="upper left")
