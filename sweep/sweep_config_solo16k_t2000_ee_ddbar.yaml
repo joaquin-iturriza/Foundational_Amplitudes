@@ -1,0 +1,77 @@
+# Solo reference at the canonical batch: ee_ddbar alone on its full catalog pool, bs 16384, 2000 steps.
+# Written by sweep/gen_solo16k_configs.py (lr window +-1/2 decade around lr*(t=2000, high D) = 0.009).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 32G
+  cpus_per_task: 4
+  time: 00:37:00
+paths: null
+sweep_name: solo16k_t2000_ee_ddbar
+n_trials: 6
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 2000
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/ref_solo_ee_ddbar.yaml
+  data.require_cache: 'true'
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'true'
+  data.target_propagator_tchannel: 'true'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'true'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.05'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+  training.cosanneal_eta_min: 0.0
+  training.regularization_lambda: 1.0e-08
+  ema: 'false'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.00284
+  high: 0.0284
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
