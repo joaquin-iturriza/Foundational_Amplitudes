@@ -36,7 +36,7 @@ for p in PROCS:
         c = dict(base); c["fixed_params"] = dict(base["fixed_params"])
         c["sweep_name"] = f"solo16k_t{T}_{p}"
         c["fidelity_schedule"] = {"t_steps": [T]}
-        c["cluster"] = dict(base["cluster"], mem="32G",
+        c["cluster"] = dict(base["cluster"], mem="8G",   # measured peak RSS 1.7 GB at this batch
                             time="%02d:%02d:00" % divmod(int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN), 60))
         c["fixed_params"].update({"training.batchsize": 16384, "evaluation.batchsize": 16384,
                                   "training.cosanneal_eta_min": 0.0, "training.regularization_lambda": 1.0e-8,

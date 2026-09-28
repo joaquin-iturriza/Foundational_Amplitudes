@@ -4,7 +4,7 @@ cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  mem: 32G
+  mem: 8G
   cpus_per_task: 4
   time: 01:00:00
 paths: null
