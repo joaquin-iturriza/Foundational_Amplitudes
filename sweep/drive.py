@@ -49,8 +49,9 @@ except ImportError:
     if not os.path.exists(_venv_py) and not os.environ.get("DRIVE_NO_REEXEC"):
         import subprocess as _sp
         _sp.run(["bash", os.path.join(ROOT, "sweep", "driver_env.sh")], check=True)
-    if os.path.exists(_venv_py) and os.path.realpath(sys.executable) != os.path.realpath(_venv_py):
-        os.execv(_venv_py, [_venv_py] + sys.argv)
+    _venv = os.path.dirname(os.path.dirname(_venv_py))
+    if os.path.exists(_venv_py) and os.path.abspath(sys.prefix) != os.path.abspath(_venv):
+        os.execv(_venv_py, [_venv_py] + sys.argv)      # (the venv's python is a symlink: compare prefixes)
     raise SystemExit("sweep/drive.py: no torch here and no .venv-driver; run bash sweep/driver_env.sh")
 import siteconf                                   # noqa: E402
 from sweep.dyhpo_sampler import DyHPOSampler     # noqa: E402
