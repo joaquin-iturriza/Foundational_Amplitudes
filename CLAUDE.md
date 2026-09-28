@@ -291,7 +291,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 |---|---|---|
 | `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
 | `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
-| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`: not load-bearing at 448 processes, dropped with the diagram encoder) | fixed |
+| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`: not load-bearing at 448 processes) | fixed |
 | `use_diagrams` / `d_diag` | `true` / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
@@ -404,7 +404,7 @@ laws); the settled rules that govern how sweeps are set up:
    Both axes are set by the run design, so both are known inputs, not uncertainty:
    - **`t`-axis (horizon):** every real run sits past the peak (`t ≫ t*=3000`), so
      `lr*` is on the `t^-0.55`-ish decay — a **longer run takes a lower center**.
-   - **`D`-axis (per-process events):** measured `lr* ∝ D^{~0.17}`, **saturating**
+   - **`D`-axis (training events, summed over the 8 processes of each grid sweep, i.e. 88–8750 per process):** measured `lr* ∝ D^{~0.17}`, **saturating**
      (~2.2× from D=700→70k at t=3162, most of it by D~2k). A large-`D` run sits at
      the **high-D asymptote → center ABOVE the D-pooled value**; read it off the
      grid's high-D row at your `t`. Do NOT collapse `D` into "a nudge the window
