@@ -10,14 +10,16 @@ particle_encoder_hidden: 0   # off (docs/results.tex tab:bigrun_arms, not load-b
                              # numbers. 0 = legacy single Linear.
 
 # --- Feynman-diagram conditioning (arXiv:2606.23791 graph route) ---------------
-# On by default. A graph encoder embeds each process's diagram set into a d_diag
+# Off by default (docs/results.tex tab:bigrun_arms: removing it lowers the geometric mean by a
+# third and raises the 90th percentile; to be retried once the catalog pretraining is understood,
+# catalog hand-off). A graph encoder embeds each process's diagram set into a d_diag
 # vector E(process), broadcast to every particle and concatenated into the scalar
 # features exactly like the coupling-order labels (equivariant: E is a Lorentz
 # scalar). Requires use_PIDs=false and data/diagrams/<process>.diagrams.json
 # (tools/dump_diagrams.py); processes with a missing sidecar degrade gracefully to a
-# zero embedding. Set false for a diagram-free ablation (also changes in_channels, so
+# zero embedding. Set true to try it (also changes in_channels, so
 # a checkpoint trained with one setting cannot warm-start the other).
-use_diagrams: true
+use_diagrams: false
 # --- Pairwise attention bias (diagram-derived, independent of use_diagrams) -----
 # Reads the same data/diagrams/*.diagrams.json sidecars, but instead of an input
 # embedding, each internal propagator's per-event off-shellness s−m² (signed-log,

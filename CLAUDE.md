@@ -292,7 +292,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
 | `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
 | `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`: not load-bearing at 448 processes) | fixed |
-| `use_diagrams` / `d_diag` | `true` / `32` | fixed |
+| `use_diagrams` / `d_diag` | `false` (`tab:bigrun_arms`: off lowers the geometric mean by a third, raises the 90th percentile; retry once the catalog pretraining is understood, catalog hand-off) / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
 | physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`. `mass_from_momenta` stays `false` (redundant, `tab:levers`). **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |

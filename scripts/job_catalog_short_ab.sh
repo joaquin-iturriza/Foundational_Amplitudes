@@ -30,8 +30,8 @@
 # (Separate variables because an EXTRA with spaces does not survive the --export of `site submit`.)
 # ETA= sets training.cosanneal_eta_min (default 1e-8, CLAUDE.md), EMA=true|false the weight EMA and EMAD= its decay.
 # MFM=true turns data.mass_from_momenta on (default off, CLAUDE.md canonical table; every catalog_v2 run
-# before 2026-09-25 ran with it on, with eta_min 0 and with the diagram encoder off, so pass
-# MFM=true ETA=0 DIAG=false to continue that series).
+# before 2026-09-25 ran with it on and with eta_min 0, so pass MFM=true ETA=0 to continue that series;
+# DIAG=true turns the diagram encoder on).
 set -euo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -50,7 +50,7 @@ python run.py \
   data.standardize_props=true data.generation_onehot="${GHOT}" data.generation_feature="${GFEAT}" \
   data.mass_from_momenta="${MFM:-false}" data.coupling_scalars=true data.internal_mass_scalars=true \
   data.offshell_per_event=true "data.internal_mass_pdgs=[$(echo "${PDGS:-23_6_25}" | tr _ ,)]" \
-  model=lloca model.use_diagrams="${DIAG:-true}" model.particle_encoder_hidden=0 \
+  model=lloca model.use_diagrams="${DIAG:-false}" model.particle_encoder_hidden=0 \
   model.net.num_heads="${HEADS:-8}" model.net.num_blocks=8 seed="${SEED:-42}" \
   training.iterations="${STEPS:-1000}" training.batchsize="${BS:-16384}" evaluation.batchsize="${EVBS:-16384}" \
   training.lr="${LR:-5.8e-3}" training.regularization_lambda="${LAM:-1e-8}" training.cosanneal_warmup_frac="${WU:-0.1}" \

@@ -2903,6 +2903,12 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     ratio is $100$--$200$, so those pools come out as single $5\times10^4$-event chunks and
     make the prebuild tail. The chunk policy is part of the recipe identity, so a recalibration
     regenerates every pool; do it together with the next recipe change, not alone.
+  \item \textbf{The diagram encoder, once the pretraining is understood.} It is off
+    (\code{model.use\_diagrams: false}): on the $448$-process big run removing it lowers the
+    geometric mean by a third and the median by $4\%$ but raises the $90$th percentile from
+    $0.085$ to $0.10$, one seed each (Table~\ref{tab:bigrun_arms}), and every catalog run so far
+    trained without it. Once the joint-training gap of the catalog pretraining is explained,
+    try it again on the catalog, three seeds, read on the same three statistics.
 \end{itemize}
 
 \section{catalog\_v2, first pretraining: the census and what it exposes}\label{sec:catv2-census}
