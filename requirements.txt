@@ -46,5 +46,6 @@ urllib3_secure_extra==0.1.0
 wget==3.2
 xformers
 mup
-lloca
+# the mup-parametrization build (models.lloca imports lloca.mup; the PyPI release has no mup)
+lloca @ git+https://github.com/joaquin-iturriza/lloca.git@111caa040113179b29d3695e79c52dfcec7d586f
 # xmlrpclib==1.0.1

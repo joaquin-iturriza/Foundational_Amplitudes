@@ -16,8 +16,9 @@ DEFAULT = ["recipes/catalog_v2_train_scan.yaml"]
 SEED = 42                      # data.seed of every catalog run
 
 ok = True
-# what a training run imports, and what every DyHPO sweep's run_trial imports on top
-env_missing = [m for m in ("torch", "lloca", "xformers", "gpytorch", "sklearn", "scipy")
+# what a training run imports, and what every DyHPO sweep's run_trial imports on top; lloca.mup exists only
+# in the mup-parametrization build (requirements.txt), not in the PyPI release
+env_missing = [m for m in ("torch", "lloca", "lloca.mup", "xformers", "gpytorch", "sklearn", "scipy")
                if importlib.util.find_spec(m) is None]
 if env_missing:
     print(f"env: missing {' '.join(env_missing)}"); ok = False
