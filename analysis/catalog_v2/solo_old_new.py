@@ -17,7 +17,7 @@ from the catalog pool, bs 16384 series.
     python analysis/catalog_v2/solo_old_new.py --collect > analysis/catalog_v2/solo16kflatold.json   (on CC: the
         fixed-HP runs' results/fixed.json val_loss, the best checkpoint)
     python analysis/catalog_v2/solo_old_new.py
-Writes solo_old_new (2x2, one panel per process, png + pdf)."""
+Writes solo_old_new (2x2, one panel per process, png + pdf); --no-b1k leaves the bs-1024 series out (solo_old_new_no1k)."""
 import json, os, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -44,6 +44,7 @@ SETS = [  # label, heads, batch, steps, value(p, S), marker, filled, colour
     ("old pool, catalog setup, swept", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(FLS[f"{p}|{S}"]), "D", False, ps.C.purple),
     ("catalog pool, bs 1024", 8, 1024, [33, 67, 134, 268, 536, 1072], lambda p, S: B1K[f"{p}|{S}"], "s", False, ps.C.blue),
     ("catalog pool, bs 16384", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(S16[f"{p}|{S}"]), "o", True, ps.C.vermillion)]
+if "--no-b1k" in sys.argv: SETS = [x for x in SETS if x[2] != 1024]   # the bs-1024 series left out (talk version)
 PROCS = ["ee_aa", "ee_uu", "ee_uug", "ee_uugg"]
 fig, axes = ps.figure(ncols=2, nrows=2)
 for ax, p in zip(np.ravel(axes), PROCS):
@@ -61,4 +62,4 @@ for ax, p in zip(np.ravel(axes), PROCS):
 H, L = np.ravel(axes)[0].get_legend_handles_labels()
 H.append(np.ravel(axes)[0].plot([], [], color="black", ls="--")[0]); L.append(r"fit $A\,C^{-\alpha}+L_\infty$")
 ps.shared_legend(fig, np.ravel(axes)[0], ncol=2, handles=H, labels=L)
-ps.save(fig, os.path.join(HERE, "solo_old_new"))
+ps.save(fig, os.path.join(HERE, "solo_old_new" + ("_no1k" if "--no-b1k" in sys.argv else "")))

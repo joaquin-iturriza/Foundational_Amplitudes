@@ -14,7 +14,8 @@ out refits.
 dashed segment per group; (b) alpha against ID, the bound alpha = 4 / ID dashed (fig:alphamult's 4/DOF with the
 measured ID in place of DOF).
     python analysis/catalog_v2/id_solo.py --inv   writes id_solo_inv: (b) against 4 / ID instead (the bound is the
-        diagonal; x uncertainty 4 sd / ID^2, first-order propagation of the spread over step counts)"""
+        diagonal; x uncertainty 4 sd / ID^2, first-order propagation of the spread over step counts)
+    --no-b1k    leaves the bs-1024 set out (file suffix _no1k)"""
 import collections, glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -33,6 +34,7 @@ SETS = [  # key, label, marker, filled, colour, heads, batch, steps
     ("solo16kflat", "old pool, swept", "D", True, ps.C.green, 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000]),
     ("solo16kflatold", "old pool, old best HPs", "^", False, ps.C.grey, 8, 16384, [4, 126, 400, 1265, 4000])]
 INV = "--inv" in sys.argv
+if "--no-b1k" in sys.argv: SETS = [x for x in SETS if x[0] != "b1k"]   # the bs-1024 set left out (talk version)
 dof = lambda p: 3 * (NP[p] - 2) - 4
 
 ID = collections.defaultdict(dict)                   # (set, process) -> {steps: (id_mean, id_std)}
@@ -106,4 +108,4 @@ else:
     axB.set_xscale("log"); axB.set_ylim(0, 3.3); axB.set_xlabel("intrinsic dimension")
 axB.set_ylabel(r"$\alpha$ in $A\,C^{-\alpha}+L_\infty$")
 ps.legend(axB, "upper right")
-ps.save(fig, os.path.join(HERE, "id_solo_inv" if INV else "id_solo"))
+ps.save(fig, os.path.join(HERE, ("id_solo_inv" if INV else "id_solo") + ("_no1k" if "--no-b1k" in sys.argv else "")))
