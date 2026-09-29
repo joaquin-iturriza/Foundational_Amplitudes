@@ -46,12 +46,13 @@ def measure(run_dir, n_events, n_rep, seed=0):
     cfg.save = False; cfg.train = False; cfg.evaluate = False; cfg.plot = False
     # warm_start_idx = the run's own index: init_data then reads the run's data_stats.json and tokenizer, so the
     # inputs are normalized exactly as in training; the best checkpoint is loaded on top below.
-    cfg.warm_start_idx = cfg.run_idx; cfg.use_mlflow = False; cfg.run_dir = run_dir
+    idx = int(cfg.run_idx)                      # the warm-start path bumps cfg.run_idx; the checkpoint is the run's own
+    cfg.warm_start_idx = idx; cfg.use_mlflow = False; cfg.run_dir = run_dir
     torch.set_default_dtype({"float16": torch.float16, "float64": torch.float64}.get(cfg.training.dtype, torch.float32))
     exp = AmplitudeExperiment(cfg)
     exp._init()
     exp.init_physics(); exp.init_data(); exp.init_model()
-    ck = _torch_load(os.path.join(run_dir, "models", f"model_run{cfg.run_idx}_best.pt.gz"), map_location=exp.device, weights_only=False)
+    ck = _torch_load(os.path.join(run_dir, "models", f"model_run{idx}_best.pt.gz"), map_location=exp.device, weights_only=False)
     exp.model.load_state_dict(ck["model"])
     if exp.ema is not None and ck.get("ema") is not None:
         exp.ema.load_state_dict(ck["ema"])
