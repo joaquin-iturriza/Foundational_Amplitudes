@@ -11,7 +11,9 @@ make val_loss_no_reg incomparable); only the exponents and the shapes of the cur
 The catalog sets at bs 1024 and 16384 share one target and compare in level too. A fourth series is the
 old set's pools with the catalog setup (target, inputs, 8 heads) at the old set's best HPs per step count,
 one run per cell (sweep/run_fixed_hp.py, scripts/job_fixed_hp_old.sh; solo16kflatold.json): same target
-as the catalog sets, same pool and HPs as the old set.
+as the catalog sets, same pool and HPs as the old set. A fifth is the old set's pools with the catalog setup,
+swept like the catalog references (solo16kflat.json, gen_solo16k_configs.py --flat): the pool the one difference
+from the catalog pool, bs 16384 series.
     python analysis/catalog_v2/solo_old_new.py --collect > analysis/catalog_v2/solo16kflatold.json   (on CC: the
         fixed-HP runs' results/fixed.json val_loss, the best checkpoint)
     python analysis/catalog_v2/solo_old_new.py
@@ -35,9 +37,11 @@ NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 OLD = json.load(open(os.path.join(HERE, "solo_full_old.json")))
 S16 = json.load(open(os.path.join(HERE, "solo16k.json"))); B1K = solo_mse()
 FLO = json.load(open(os.path.join(HERE, "solo16kflatold.json")))
+FLS = json.load(open(os.path.join(HERE, "solo16kflat.json")))
 SETS = [  # label, heads, batch, steps, value(p, S), marker, filled, colour
     ("old set (tab:scaling): other target, uniform $\\sqrt{s}$, 70k, 4 heads", 4, 16384, [4, 126, 400, 1265, 4000], lambda p, S: min(OLD[f"{p}|{S}"]), "D", True, ps.C.grey),
     ("old pool, catalog setup, old best HPs", 8, 16384, [4, 126, 400, 1265, 4000], lambda p, S: FLO[f"{p}|{S}"], "^", True, ps.C.green),
+    ("old pool, catalog setup, swept", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(FLS[f"{p}|{S}"]), "D", False, ps.C.purple),
     ("catalog pool, bs 1024", 8, 1024, [33, 67, 134, 268, 536, 1072], lambda p, S: B1K[f"{p}|{S}"], "s", False, ps.C.blue),
     ("catalog pool, bs 16384", 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000], lambda p, S: min(S16[f"{p}|{S}"]), "o", True, ps.C.vermillion)]
 PROCS = ["ee_aa", "ee_uu", "ee_uug", "ee_uugg"]
