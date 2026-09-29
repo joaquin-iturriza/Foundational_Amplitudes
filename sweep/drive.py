@@ -194,7 +194,7 @@ class Sweep:
             log("[dry-run] would submit prebuild of %s on %s" % (self.spec, s)); return False
         cpus = 8 if s == "lxplus" else 32
         out = site("submit", s, PROJECT, PREBUILD, "--no-sync", "--note", "prebuild %s" % self.name,
-                   "--hdr", "--cpus-per-task=%d" % cpus, "--hdr", "--time=04:00:00",
+                   "--hdr=--cpus-per-task=%d" % cpus, "--hdr=--time=04:00:00",
                    "--", self.spec, "--seed", str(self.seed), timeout=300)
         m = re.search(r"\brun\s+(\S+)", out)
         if not m:
@@ -209,9 +209,9 @@ class Sweep:
         idx = self.issued()
         args = ["submit", s, PROJECT, JOB, "--no-sync",
                 "--note", "%s hp%04d t%d" % (self.name, hp_idx, t_steps),
-                "--hdr", "--mem=%s" % self.mem, "--hdr", "--time=%s" % self.time,
-                "--hdr", "--cpus-per-task=%d" % self.cpus,
-                "--hdr", "--job-name=%s_%04d" % (self.name[:20], idx)]
+                "--hdr=--mem=%s" % self.mem, "--hdr=--time=%s" % self.time,
+                "--hdr=--cpus-per-task=%d" % self.cpus,
+                "--hdr=--job-name=%s_%04d" % (self.name[:20], idx)]
         if s == "jeanzay":
             args += ["--est-gpu-hours", "%.2f" % self.hours, "--allow-jeanzay"]
         args += ["--", "--sweep-config", self.config_rel, "--detached", "--trial-idx", str(idx),
