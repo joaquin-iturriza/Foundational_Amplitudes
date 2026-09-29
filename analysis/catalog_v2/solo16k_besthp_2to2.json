@@ -1,0 +1,282 @@
+{
+"ee_aa|63": {
+"val_loss": 0.008170346030965447,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t63_ee_aa/trial_0030",
+"hp": {
+"training.lr": 0.005377576,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_aa|125": {
+"val_loss": 0.001989927317481488,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t125_ee_aa/trial_0030",
+"hp": {
+"training.lr": 0.006576757,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_aa|500": {
+"val_loss": 7.995088890311308e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t500_ee_aa/trial_0030",
+"hp": {
+"training.lr": 0.02229727,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_aa|1000": {
+"val_loss": 3.0637344025308266e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t1000_ee_aa/trial_0033",
+"hp": {
+"training.lr": 0.0241925,
+"training.cosanneal_warmup_frac": 0.05137398
+}
+},
+"ee_aa|2000": {
+"val_loss": 1.984727623494109e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t2000_ee_aa/trial_0015",
+"hp": {
+"training.lr": 0.008184438,
+"training.cosanneal_warmup_frac": 0.07281226
+}
+},
+"ee_aa|4000": {
+"val_loss": 1.480743958381936e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t4000_ee_aa/trial_0015",
+"hp": {
+"training.lr": 0.005331412,
+"training.cosanneal_warmup_frac": 0.07281226
+}
+},
+"uubar_uubar|63": {
+"val_loss": 0.006938973208889365,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t63_uubar_uubar/trial_0142",
+"hp": {
+"training.lr": 0.004885902,
+"training.cosanneal_warmup_frac": 0.1904498
+}
+},
+"uubar_uubar|125": {
+"val_loss": 0.0026025938568636775,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t125_uubar_uubar/trial_0030",
+"hp": {
+"training.lr": 0.006576757,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"uubar_uubar|250": {
+"val_loss": 0.0006710636371280998,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t250_uubar_uubar/trial_0046",
+"hp": {
+"training.lr": 0.01367984,
+"training.cosanneal_warmup_frac": 0.1934378
+}
+},
+"uubar_uubar|500": {
+"val_loss": 0.0004386114305816591,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t500_uubar_uubar/trial_0095",
+"hp": {
+"training.lr": 0.006010467,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"uubar_uubar|1000": {
+"val_loss": 0.00026746712683234364,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t1000_uubar_uubar/trial_0095",
+"hp": {
+"training.lr": 0.006288261,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"uubar_uubar|2000": {
+"val_loss": 7.651250052731484e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t2000_uubar_uubar/trial_0095",
+"hp": {
+"training.lr": 0.007172153,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"uubar_uubar|4000": {
+"val_loss": 2.6657309717847966e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t4000_uubar_uubar/trial_0015",
+"hp": {
+"training.lr": 0.005331412,
+"training.cosanneal_warmup_frac": 0.07281226
+}
+},
+"ee_uu|63": {
+"val_loss": 0.01673262659460306,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t63_ee_uu/trial_0046",
+"hp": {
+"training.lr": 0.004591946,
+"training.cosanneal_warmup_frac": 0.1934378
+}
+},
+"ee_uu|125": {
+"val_loss": 0.005122148664668202,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t125_ee_uu/trial_0033",
+"hp": {
+"training.lr": 0.006820536,
+"training.cosanneal_warmup_frac": 0.05137398
+}
+},
+"ee_uu|250": {
+"val_loss": 0.0016133948811329901,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t250_ee_uu/trial_0086",
+"hp": {
+"training.lr": 0.01124932,
+"training.cosanneal_warmup_frac": 0.1991901
+}
+},
+"ee_uu|500": {
+"val_loss": 0.0008778877381701022,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t500_ee_uu/trial_0030",
+"hp": {
+"training.lr": 0.02229727,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_uu|1000": {
+"val_loss": 5.13744744239375e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t1000_ee_uu/trial_0030",
+"hp": {
+"training.lr": 0.02332781,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_uu|2000": {
+"val_loss": 5.323845471139066e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t2000_ee_uu/trial_0015",
+"hp": {
+"training.lr": 0.008184438,
+"training.cosanneal_warmup_frac": 0.07281226
+}
+},
+"ee_uu|4000": {
+"val_loss": 2.463779310346581e-06,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t4000_ee_uu/trial_0030",
+"hp": {
+"training.lr": 0.01733191,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_ddbar|63": {
+"val_loss": 0.013012200593948364,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t63_ee_ddbar/trial_0046",
+"hp": {
+"training.lr": 0.004591946,
+"training.cosanneal_warmup_frac": 0.1934378
+}
+},
+"ee_ddbar|125": {
+"val_loss": 0.004571069497615099,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t125_ee_ddbar/trial_0033",
+"hp": {
+"training.lr": 0.006820536,
+"training.cosanneal_warmup_frac": 0.05137398
+}
+},
+"ee_ddbar|250": {
+"val_loss": 0.0025843121111392975,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t250_ee_ddbar/trial_0030",
+"hp": {
+"training.lr": 0.01602031,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_ddbar|500": {
+"val_loss": 0.0011911799665540457,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t500_ee_ddbar/trial_0033",
+"hp": {
+"training.lr": 0.02312375,
+"training.cosanneal_warmup_frac": 0.05137398
+}
+},
+"ee_ddbar|1000": {
+"val_loss": 0.00016541663353564218,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t1000_ee_ddbar/trial_0030",
+"hp": {
+"training.lr": 0.02332781,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_ddbar|2000": {
+"val_loss": 2.2803132196713705e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t2000_ee_ddbar/trial_0095",
+"hp": {
+"training.lr": 0.007172153,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"ee_ddbar|4000": {
+"val_loss": 6.064070248612552e-06,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t4000_ee_ddbar/trial_0030",
+"hp": {
+"training.lr": 0.01733191,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+},
+"ee_bb_nlo|63": {
+"val_loss": 0.0030441643903031945,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t63_ee_bb_nlo/trial_0048",
+"hp": {
+"training.lr": 0.001598183,
+"training.cosanneal_warmup_frac": 0.1977056
+}
+},
+"ee_bb_nlo|125": {
+"val_loss": 0.0016086327959783375,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t125_ee_bb_nlo/trial_0129",
+"hp": {
+"training.lr": 0.006412015,
+"training.cosanneal_warmup_frac": 0.06473952
+}
+},
+"ee_bb_nlo|250": {
+"val_loss": 0.0010454035073053092,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t250_ee_bb_nlo/trial_0033",
+"hp": {
+"training.lr": 0.01661413,
+"training.cosanneal_warmup_frac": 0.05137398
+}
+},
+"ee_bb_nlo|500": {
+"val_loss": 0.0007607671432197094,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t500_ee_bb_nlo/trial_0095",
+"hp": {
+"training.lr": 0.006010467,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"ee_bb_nlo|1000": {
+"val_loss": 0.0004507621197262779,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t1000_ee_bb_nlo/trial_0095",
+"hp": {
+"training.lr": 0.006288261,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"ee_bb_nlo|2000": {
+"val_loss": 0.000283982401015237,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t2000_ee_bb_nlo/trial_0095",
+"hp": {
+"training.lr": 0.007172153,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"ee_bb_nlo|4000": {
+"val_loss": 2.29800737088226e-05,
+"run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/solo16k_t4000_ee_bb_nlo/trial_0095",
+"hp": {
+"training.lr": 0.004672001,
+"training.cosanneal_warmup_frac": 0.07974103
+}
+},
+"ee_aa|250": {
+"val_loss": 0.00044168264139443636,
+"run_dir": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/solo16k_t250_ee_aa/trial_0030",
+"hp": {
+"training.lr": 0.01602031,
+"training.cosanneal_warmup_frac": 0.1769358
+}
+}
+}

@@ -17,7 +17,7 @@ ap.add_argument("--steps", type=int, required=True); ap.add_argument("hp", nargs
 a = ap.parse_args()
 cfg = siteconf.resolve(yaml.safe_load(open(a.config)))
 cfg["sweep_name"] = a.name
-hp = {k: float(v) for k, v in (x.split("=", 1) for x in a.hp)}
+hp = {k: (int(v) if v.lstrip("-").isdigit() else float(v)) for k, v in (x.split("=", 1) for x in a.hp)}   # integers (seed) stay integers
 out = os.path.join(siteconf.SWEEP_DIR, a.name); os.makedirs(os.path.join(out, "results"), exist_ok=True)
 run_dir = os.path.join(siteconf.PROJECT_DIR, "runs", a.name)
 cmd = build_command(cfg, hp, run_dir, 0, os.path.join(out, "results", "fixed.json"), a.steps, increment_steps=a.steps)
