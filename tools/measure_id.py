@@ -28,13 +28,13 @@ def best_run(sweep_dir):
         v = json.load(open(f)).get("val_loss")
         e = idx.get(str(int(m.group(1)))) if m else None
         if e is not None and v is not None and (best is None or v < best[0]):
-            # the checkpoint on disk is the hp's LAST fidelity: a result at a lower t is not what gets measured
-            if int(e["t_steps"]) != int(m.group(2)):
-                raise SystemExit(f"{sweep_dir}: best result hp{m.group(1)} is at t={m.group(2)}, its checkpoint at t={e['t_steps']}")
-            best = (float(v), e["run_dir"])
+            best = (float(v), e["run_dir"], m.group(1), int(m.group(2)), int(e["t_steps"]))
     if best is None:
         raise SystemExit(f"{sweep_dir}: no result matched to a checkpoint")
-    return best
+    # the checkpoint on disk is the hp's LAST fidelity: a best result at a lower t is not what would be measured
+    if best[3] != best[4]:
+        raise SystemExit(f"{sweep_dir}: best result hp{best[2]} is at t={best[3]}, its checkpoint at t={best[4]}")
+    return best[:2]
 
 
 def measure(run_dir, n_events, n_rep, seed=0):
