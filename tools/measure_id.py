@@ -23,7 +23,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.ins
 def best_run(sweep_dir):
     idx = json.load(open(os.path.join(sweep_dir, "checkpoint_index.json")))
     best = None
-    for f in glob.glob(os.path.join(sweep_dir, "results", "*.json")):
+    import siteconf                           # on HTCondor sites the results live on EOS (siteconf.RESULTS_DIR), the index on AFS
+    res = {os.path.join(sweep_dir, "results"), os.path.join(siteconf.RESULTS_DIR, os.path.basename(sweep_dir.rstrip("/")), "results")}
+    for f in sorted({g for r in res for g in glob.glob(os.path.join(r, "*.json"))}):
         m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(f))
         v = json.load(open(f)).get("val_loss")
         e = idx.get(str(int(m.group(1)))) if m else None
