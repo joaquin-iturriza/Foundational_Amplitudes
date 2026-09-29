@@ -12,7 +12,8 @@ under the EMA weights when the run used EMA (as evaluation does), with save=Fals
 
     python tools/measure_id.py --sweep <sweep_dir> [--sweep ...] [--run <run_dir> ...] --out <file.jsonl>
 A --sweep resolves to its best trial (results/hp<ID>_t<T>_*.json with the lowest val_loss -> checkpoint_index
-run_dir). One JSON line per run: {"sweep", "run_dir", "val_loss", "id_mean", "id_std", "n_events"}.
+run_dir). One JSON line per run: {"sweep", "run_dir", "val_loss", "id_mean", "id_std", "n_events", "test_mse"}; test_mse
+(the loaded model on the whole test pool) is the check that the right weights were measured.
 """
 import argparse, glob, inspect, json, os, re, sys
 import numpy as np
@@ -71,7 +72,8 @@ def measure(run_dir, n_events, n_rep, seed=0):
     ctx = exp.ema.average_parameters() if exp.ema is not None else contextlib.nullcontext()
     exp.model.eval()
     with torch.no_grad(), ctx:
-        exp._collect_predictions(exp.test_loader)
+        out = exp._collect_predictions(exp.test_loader)
+    test_mse = float(np.mean((np.asarray(out[0], dtype=np.float64) - np.asarray(out[1], dtype=np.float64)) ** 2))
     if len(feats) != len(ptrs):
         raise SystemExit(f"{run_dir}: {len(feats)} readout calls against {len(ptrs)} forward calls")
     ev = []
@@ -84,7 +86,7 @@ def measure(run_dir, n_events, n_rep, seed=0):
     for _ in range(n_rep):
         sel = rng.permutation(len(X))[: int(0.9 * len(X))]
         ids.append(float(estimate(squareform(pdist(X[sel])), verbose=False)[2]))
-    return float(np.mean(ids)), float(np.std(ids)), len(X)
+    return float(np.mean(ids)), float(np.std(ids)), len(X), test_mse
 
 
 if __name__ == "__main__":
@@ -100,8 +102,9 @@ if __name__ == "__main__":
         if rd in done:
             continue
         try:
-            m, s, n = measure(rd, a.n, a.rep)
-            rec = {"sweep": name, "run_dir": rd, "val_loss": v, "id_mean": m, "id_std": s, "n_events": n}
+            m, s, n, t = measure(rd, a.n, a.rep)
+            rec = {"sweep": name, "run_dir": rd, "val_loss": v, "id_mean": m, "id_std": s, "n_events": n,
+                   "test_mse": t}   # MSE of the loaded model on the test pool: must match the run's recorded test_loss
         except BaseException as e:           # one bad run must not lose the others; recorded, not dropped
             rec = {"sweep": name, "run_dir": rd, "val_loss": v, "error": f"{type(e).__name__}: {e}"[:300]}
         print(json.dumps(rec), flush=True)
