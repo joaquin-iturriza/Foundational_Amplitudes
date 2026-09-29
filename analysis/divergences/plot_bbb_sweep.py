@@ -48,9 +48,9 @@ def main():
     axes = [f[1] for f in figs]
     for ax, x, lab, logx in ((axes[0], srel, r"$\sigma_{\rm rel}$", True),
                              (axes[1], beta, r"$\beta_{\rm KL}$", True)):
-        sc = ax.scatter(x, obj, c=gam, cmap=ps.CMAP, s=40, zorder=3, label="BBB trial")
+        sc = ax.scatter(x, obj, c=gam, cmap=ps.CMAP, s=40, zorder=3, label="Bayesian net trial")
         ax.scatter([x[best]], [obj[best]], marker="*", s=220, color=ps.C.vermillion,
-                   zorder=4, label="best BBB trial")
+                   zorder=4, label="best Bayesian net trial")
         ax.axhline(HET_SIGMA_G3, color=ps.C.vermillion, ls="--",
                    label=r"het-head $\sigma^{\gamma=3}$")
         ax.axhline(BASE_UNIFORM, color=ps.C.grey, ls=":", label="uniform")

@@ -2566,7 +2566,7 @@ Proposals are kept $\propto\sigma_{\rm epi}^\gamma$ with $\sigma_{\rm epi}$ the 
 
 \emph{Fair best-vs-best (12-trial single-fidelity DyHPO sweep over $\beta_{\rm KL}\!\in\![10^{-5},10^{-1}]$,
 $\sigma_{\rm rel}\!\in\![5\!\times\!10^{-3},0.15]$, $\gamma\!\in\![1,5]$; objective = held-out deep-IR MSE).}
-The tuned BBB arm reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
+The tuned Bayesian network reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
 ($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
 $\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
@@ -2581,7 +2581,7 @@ under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi
 only $\rho\!\approx\!0.17$--$0.20$, barely above the het-head's $0.11$--$0.16$, so it never earns back
 the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
 \emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter, so the safe
-claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is marginal
+claim is ``no evidence the Bayesian network beats the het head'', and ``it beats uniform'' is marginal
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
 \code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the steering loop via
 \code{generate\_sweep}'s new \code{trial\_script} hook).
@@ -2589,7 +2589,7 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 \begin{figure}[H]
   \centering
   \includegraphics{l2_uugg_bbb_vs_het.pdf}
-  \caption{\textbf{Epistemic (BBB) vs the het-head $\sigma$ on $e^+e^-\to u\bar u gg$.} Held-out MSE per
+  \caption{\textbf{Epistemic (Bayesian network) vs the het-head $\sigma$ on $e^+e^-\to u\bar u gg$.} Held-out MSE per
   $y_{\min}$ decade. The full-network Bayes-by-backprop arm sits \emph{above} both the het-head
   $\sigma^\gamma$ and the uniform baseline across essentially every decade: training under sampled
   weights costs point accuracy, and the epistemic $\sigma$ does not rank the error well enough
@@ -2600,12 +2600,12 @@ claim is ``no evidence BBB beats the het head'', and ``BBB beats uniform'' is ma
 \begin{figure}[H]
   \centering
   \widerow{\pnl{l2_bbb_sweep_a.pdf}\hfill\pnl{l2_bbb_sweep_b.pdf}}
-  \caption{\textbf{The fair BBB HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
+  \caption{\textbf{The fair Bayesian-network HP sweep ($12$ single-fidelity DyHPO trials).} Held-out deep-IR MSE vs
   the initial posterior width $\sigma_{\rm rel}$ (left) and the ELBO KL weight $\beta_{\rm KL}$ (right),
   coloured by the keep exponent $\gamma$; dashed/dotted lines are the het-head and uniform baselines.
   $\sigma_{\rm rel}$ alone sets the outcome (Spearman $+0.965$) and its optimum lands \emph{on the search
   lower bound} (the optimiser drives the weight posterior toward the deterministic limit to buy back
-  accuracy), while $\beta_{\rm KL}$ ($-0.05$) and $\gamma$ ($-0.07$) are noise. The best tuned BBB
+  accuracy), while $\beta_{\rm KL}$ ($-0.05$) and $\gamma$ ($-0.07$) are noise. The best tuned Bayesian network
   (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
   structural, not a tuning artefact.}
   \label{fig:l2_bbb_sweep}
@@ -2736,13 +2736,13 @@ Genuinely-unfinished / future work for this line (the completed findings are the
     knob can budget across three competing extremes rather than two.
   \item \textbf{The \emph{cheap} epistemic approximations, and a seed-replicated confirmation}
     (full-network Bayes-by-backprop lost; see the ``ranking'' principle above).
-    Two loose ends. (i) BBB was the most expensive way to get an epistemic $\sigma$; the cheap
+    Two loose ends. (i) The Bayesian network was the most expensive way to get an epistemic $\sigma$; the cheap
     approximations were never tried: \textbf{MC-dropout} and a \textbf{Laplace/last-layer} posterior are
     $\approx$free (no $2\times$ parameters, no training under weight noise, so they should \emph{not} pay
-    BBB's point-accuracy penalty), and a \textbf{deep ensemble} ($k\times$ training) is the quality ceiling.
-    Since the diagnosis was ``BBB's accuracy loss, not its ranking, is what sinks it'', an epistemic
+    the Bayesian network's point-accuracy penalty), and a \textbf{deep ensemble} ($k\times$ training) is the quality ceiling.
+    Since the diagnosis was ``the Bayesian network's accuracy loss, not its ranking, is what sinks it'', an epistemic
     $\sigma$ that costs \emph{no} accuracy is the obvious next probe: does it keep the
-    $\rho\!\approx\!0.2$ ranking without the penalty? (ii) The BBB verdict rests on single-seed trials with
+    $\rho\!\approx\!0.2$ ranking without the penalty? (ii) The Bayesian-network verdict rests on single-seed trials with
     $5$--$8\%$ gaps, comparable to seed scatter; $3$ seeds at the swept optimum would firm ``loses to the
     het head'' from suggestive to settled. Also untested: the claimed \emph{annealing} property, that epistemic
     $\sigma$ should \emph{shrink} as coverage improves, giving a natural stopping signal the point head lacks.

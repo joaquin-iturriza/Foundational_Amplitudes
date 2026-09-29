@@ -90,7 +90,7 @@ run l2_uugg_bbb_vs_het       $PY $D/plot_l2_compare.py \
                                  --process '$e^+e^-\to u\bar u gg$' \
                                  --npz 'uniform=heldout_eval_base_s0' \
                                        'het $\sigma$, $\gamma=3$=heldout_eval_g3_s0' \
-                                       'BBB $\sigma$, $\gamma=3$=heldout_eval_uugg_bbb_g3_s0'
+                                       'Bayesian net $\sigma$, $\gamma=3$=heldout_eval_uugg_bbb_g3_s0'
 
 echo "== sigma reweighting (Q2) =="
 # Both read the q2rw_eval_*.npz on disk; the shared metric layer is $D/q2_metrics.py, which
