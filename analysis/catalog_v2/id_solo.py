@@ -12,7 +12,9 @@ out refits.
     python analysis/catalog_v2/id_solo.py        writes analysis/catalog_v2/id_solo (png + pdf)
 (a) ID per process, grouped by final-state multiplicity, one marker per set, the invariant count 3 n_fs - 4 as a
 dashed segment per group; (b) alpha against ID, the bound alpha = 4 / ID dashed (fig:alphamult's 4/DOF with the
-measured ID in place of DOF)."""
+measured ID in place of DOF).
+    python analysis/catalog_v2/id_solo.py --inv   writes id_solo_inv: (b) against 4 / ID instead (the bound is the
+        diagonal; x uncertainty 4 sd / ID^2, first-order propagation of the spread over step counts)"""
 import collections, glob, json, os, re, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -30,6 +32,7 @@ SETS = [  # key, label, marker, filled, colour, heads, batch, steps
     ("b1k", "catalog pool, bs 1024", "s", False, ps.C.blue, 8, 1024, [33, 67, 134, 268, 536, 1072]),
     ("solo16kflat", "old pool, swept", "D", True, ps.C.green, 8, 16384, [63, 125, 250, 500, 1000, 2000, 4000]),
     ("solo16kflatold", "old pool, old best HPs", "^", False, ps.C.grey, 8, 16384, [4, 126, 400, 1265, 4000])]
+INV = "--inv" in sys.argv
 dof = lambda p: 3 * (NP[p] - 2) - 4
 
 ID = collections.defaultdict(dict)                   # (set, process) -> {steps: (id_mean, id_std)}
@@ -76,7 +79,7 @@ for j, (key, lab, mk, filled, col, h, bs, T) in enumerate(SETS):
         xa.append(xpos[p] + off[j]); ya.append(m); ea.append(s)
         a = alpha(key, p, h, bs, T)
         if a:
-            xb.append(m); yb.append(a[0]); exb.append(s); eyb.append([a[0] - a[1], a[2] - a[0]])
+            xb.append(4 / m if INV else m); yb.append(a[0]); exb.append(4 * s / m**2 if INV else s); eyb.append([a[0] - a[1], a[2] - a[0]])
     if xa:
         axA.errorbar(xa, ya, yerr=ea, fmt=mk, color=col, mfc=col if filled else "none", capsize=2, label=lab)
     if xb:
@@ -95,8 +98,12 @@ axA.set_xticks([np.mean([xpos[p] for p in PROCS if NP[p] - 2 == n]) for n in (2,
 axA.set_ylabel("intrinsic dimension")
 axA.plot([], [], color="black", ls="--", label=r"$3n_{\rm fs}-4$")
 ps.legend(axA, "upper left")
-g = np.geomspace(1.7, 14, 100); axB.plot(g, 4 / g, color="black", ls="--", label=r"$\alpha=4/{\rm ID}$")
-axB.set_xscale("log"); axB.set_ylim(0, 3.3)
-axB.set_xlabel("intrinsic dimension"); axB.set_ylabel(r"$\alpha$ in $A\,C^{-\alpha}+L_\infty$")
+if INV:
+    axB.plot([0, 3.3], [0, 3.3], color="black", ls="--", label=r"$\alpha=4/{\rm ID}$")
+    axB.set_xlim(0, 2.4); axB.set_ylim(0, 3.3); axB.set_xlabel(r"$4\,/\,$intrinsic dimension")
+else:
+    g = np.geomspace(1.7, 14, 100); axB.plot(g, 4 / g, color="black", ls="--", label=r"$\alpha=4/{\rm ID}$")
+    axB.set_xscale("log"); axB.set_ylim(0, 3.3); axB.set_xlabel("intrinsic dimension")
+axB.set_ylabel(r"$\alpha$ in $A\,C^{-\alpha}+L_\infty$")
 ps.legend(axB, "upper right")
-ps.save(fig, os.path.join(HERE, "id_solo"))
+ps.save(fig, os.path.join(HERE, "id_solo_inv" if INV else "id_solo"))
