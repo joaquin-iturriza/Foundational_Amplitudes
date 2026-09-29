@@ -2909,6 +2909,19 @@ pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the
     $0.085$ to $0.10$, one seed each (Table~\ref{tab:bigrun_arms}), and every catalog run so far
     trained without it. Once the joint-training gap of the catalog pretraining is explained,
     try it again on the catalog, three seeds, read on the same three statistics.
+  \item \textbf{Seed-averaged references for the other classes.} The $2\to2$ references were
+    rerun with three more seeds at their best HPs (Fig.~\ref{fig:solo16k_seeds}); the other seven
+    references are still best-of-trials single runs, biased toward steep exponents and uncertain by
+    $0.1$--$0.4$. The same three seeds per cell ($\sim20$ GPU-hours) turn the multiplicity comparison
+    of Fig.~\ref{fig:alpha_mult_16k} into one with error bars.
+  \item \textbf{The $ee\to\gamma\gamma$ floor.} Under the catalog setup $ee\to\gamma\gamma$ levels
+    off at $1.5\times10^{-5}$ on either pool, where the from-scratch set reached $2.2\times10^{-7}$
+    (Fig.~\ref{fig:solo_old_new}). One setup change at a time switched off on that process alone
+    (the $t$-channel factors, the sign head, the added inputs, $4$ heads) says which one sets it.
+  \item \textbf{Intrinsic dimension of the from-scratch set.} Its checkpoints predate the ninth
+    particle property and do not load in the current model; measuring them needs the code of that
+    time, and the old pools under the current setup (Fig.~\ref{fig:id_solo}) already stand in for
+    the pool comparison.
 \end{itemize}
 
 \section{catalog\_v2, first pretraining: the census and what it exposes}\label{sec:catv2-census}
@@ -3532,9 +3545,11 @@ within its seed spread by a single power law; the geometric-mean fits include th
 $4000$-step seed whose loss rose $78$-fold after its best checkpoint (validation $8$ of $20$).
 Per process, the joint exponent is below its alone value for $11$ of the $12$ references under the
 arithmetic mean ($ee\to b\bar b$ at one loop equal, $1.25$) and for $9$ of $12$ under the geometric
-mean (above: $ee\to u\bar u$, $ee\to d\bar d$, $ee\to b\bar b$ at one loop), and neither side falls
-with multiplicity as Prin.~\ref{prin:mult} would have it (Fig.~\ref{fig:alpha_mult_steps}; alone
-$1.25$--$2.09$ at two final particles, $1.46$--$2.04$ at three, $1.13$ and $1.72$ at four). Two
+mean (above: $ee\to u\bar u$, $ee\to d\bar d$, $ee\to b\bar b$ at one loop). The joint exponent
+falls with multiplicity as Prin.~\ref{prin:mult} has it (tree classes $1.00$, $0.95$, $0.68$ under
+the arithmetic mean, $1.52$, $1.24$, $0.68$ under the geometric one); the references alone do not
+(Fig.~\ref{fig:alpha_mult_steps}; $1.25$--$2.09$ at two final particles, $1.46$--$2.04$ at three,
+$1.13$ and $1.72$ at four), which is what the paragraphs below take apart. Two
 caveats on the references. Their HPO is thin: six trials per sweep, and DyHPO's fixed seed puts
 the same three start-up configurations in every sweep, which are the best trial in $36$ of the
 $72$ sweeps; the loss spreads by $0.27$ decades within a sweep, a third of it explained by the
@@ -3590,6 +3605,145 @@ fitted on its own per-process losses) and alone (square); (a) arithmetic, (b) ge
 only its multiplicity trained, at the same per-process compute and $1000$ steps, each at its run's
 best checkpoint; above one the full run is worse. (a) The ECDF of the ratio, (b) per process.}
 \label{fig:joint_vs_solo}
+\end{figure}
+
+\paragraph{The references at the canonical batch: the exponent does not fall with multiplicity.}
+The $\mathrm{bs}=1024$ references cover only the start of training ($33$--$1072$ steps, at most
+$1.1\times10^6$ events), so they were repeated at $\mathrm{bs}=16384$ over $63$--$4000$ steps
+(\code{sweeps/solo16k\_t<T>\_<process>}, \code{sweep/gen\_solo16k\_configs.py}), everything else as
+the $\mathrm{bs}=1024$ configs, which match the joint steps runs (diagram encoder off,
+\code{mass\_from\_momenta} on, arithmetic mean). The search is reduced to the knobs that mattered
+at $\mathrm{bs}=1024$ (the learning rate explained $34\%$ of the within-sweep variance, the warm-up
+$3\%$, EMA $1\%$, $\lambda$ and $\eta_{\min}$ $0.2\%$ and $0.1\%$): $\mathrm{lr}$ within $\pm\frac12$
+decade of $\mathrm{lr}^*(t,D)$ on the high-$D$ row of the measured surface, the warm-up in
+$[0.05,0.2]$, $\eta_{\min}=0$, $\lambda=10^{-8}$, EMA off; six trials per step count, twelve at
+$63$--$250$ steps. Doubling the trials at the low end moved the best value by at most a factor
+$1.7$ and left half the cells unchanged. With the floor-aware law over the seven step counts
+(Figs.~\ref{fig:solo16k} and \ref{fig:alpha_mult_16k}; the bracket is the range of leave-one-point-out
+refits) the tree references give $2.27\,[2.20,2.33]$ and $1.27\,[1.23,1.35]$ at $2\to2$,
+$1.78\,[1.73,1.85]$ and $1.76\,[1.71,1.96]$ at $2\to3$, $1.60\,[1.44,1.69]$ and $1.33\,[1.27,1.38]$ at
+$2\to4$; the resonant $2\to2$ pools $2.01$ and $1.88$, positive one-loop $1.71$ and $0.98$, signed
+one-loop $2.14$ and $1.23$. The joint exponents stay below the references in every class. What
+multiplicity changes is where a curve levels off: at $4000$ steps the $2\to2$ pools are at
+$2.5\times10^{-6}$--$2.7\times10^{-5}$, $2\to3$ at $5\times10^{-5}$--$9\times10^{-5}$, $2\to4$ at
+$6.5\times10^{-4}$--$2.1\times10^{-3}$, and the two $2\to4$ processes and the signed loops fit
+floors near $10^{-3}$.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/solo16k_a.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/solo16k_c.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/solo16k_e.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_f.pdf}}
+\caption{The references trained alone at $\mathrm{bs}=16384$ ($63$--$4000$ steps, filled, the
+floor-aware fit dashed) and at $\mathrm{bs}=1024$ (open), each point the best trial's best
+checkpoint, against per-process compute (\code{analysis/catalog\_v2/solo16k.py}). (a) tree
+$2\to2$, (b) resonant $2\to2$, (c) tree $2\to3$, (d) tree $2\to4$, (e) positive one-loop,
+(f) signed one-loop.}
+\label{fig:solo16k}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v2/alpha_vs_multiplicity_steps_16k.pdf}
+\caption{As Fig.~\ref{fig:alpha_mult_steps} with the $\mathrm{bs}=16384$ references (open squares),
+and the from-scratch set of Table~\ref{tab:scaling} for the four processes both share (grey
+diamonds; a different target and inputs, so only its exponent compares).}
+\label{fig:alpha_mult_16k}
+\end{figure}
+
+\paragraph{Against the from-scratch set of Table~\ref{tab:scaling}: not the pool.}
+Table~\ref{tab:scaling} measured the same four processes ($ee\to\gamma\gamma$, $u\bar u$, $u\bar ug$,
+$u\bar ugg$) falling with multiplicity ($2.37$, $1.74$, $1.34$, $0.97$). That set differs from the
+references in its pools (uniform $\sqrt s$ over $91$--$1000$\,GeV, $10$--$1000$ for $ee\to\gamma\gamma$,
+$70$k train events, against the catalog's mixture-shaped pools over $25$--$1000$\,GeV, $100$k), its
+target (no propagators divided out, no $t$-channel factor, no sign head), its inputs (the nine
+properties only), its width ($4$ heads) and its search ($15$ trials, $\mathrm{lr}$ over
+$4.5$ decades). Its exponents lean on a first point at $4$ steps, a practically untrained model
+($0.6$--$1.0$): without it they are $2.61$, $2.90$, $2.16$, $1.37$, still falling with
+multiplicity, the references much less (Fig.~\ref{fig:solo_old_new}). The pool was tested
+directly. At the old set's best HPs per step count, the old pools under the catalog setup do not
+reproduce its curves ($ee\to\gamma\gamma$ rises from $9\times10^{-5}$ at $1265$ steps to
+$3.3\times10^{-4}$ at $4000$, $ee\to u\bar ug$ and $u\bar ugg$ stall at $7\times10^{-4}$ and
+$1.8\times10^{-3}$; only $ee\to u\bar u$ matches), so the old HPs do not carry over to the new setup
+(\code{sweep/run\_fixed\_hp.py}, \code{scripts/job\_fixed\_hp\_old.sh}). Swept like the references
+(\code{sweeps/solo16kflat\_t<T>\_<process>}, the pool the one difference), the old pools give
+$1.71\,[1.45,2.66]$, $1.94\,[1.56,2.59]$, $1.74\,[1.63,2.13]$, $1.50\,[1.36,1.87]$ against the
+catalog pools' $2.27$, $2.01$, $1.78$, $1.60$, and the two sets of curves lie on each other. The
+pool is not what flattens the multiplicity dependence. The one place the old set is far ahead is
+$ee\to\gamma\gamma$: it reached $2.2\times10^{-7}$, where the catalog setup levels off at
+$1.5\times10^{-5}$ on either pool, a floor set by something in the setup ($ee\to\gamma\gamma$
+carries two $t$-channel factors, the sign head and the new inputs).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v2/solo_old_new.pdf}
+\caption{The four processes shared with Table~\ref{tab:scaling}, on one compute axis: that set
+(grey; another target, so its level does not compare), the catalog references at $\mathrm{bs}=1024$
+and $16384$, the old pools under the catalog setup at the old set's best HPs, and the old pools
+swept like the references; each with its floor-aware fit
+(\code{analysis/catalog\_v2/solo\_old\_new.py}).}
+\label{fig:solo_old_new}
+\end{figure}
+
+\paragraph{Seed noise and the best-of-trials bias.}
+Each reference point is one training run, the best of six to twelve trials. The five $2\to2$
+references were rerun at every step count at their best trial's HPs with three more seeds
+(\code{scripts/job\_seed\_2to2.sh}, $105$ runs; \code{analysis/catalog\_v2/solo16k\_seeds.py},
+Fig.~\ref{fig:solo16k_seeds}). At fixed HPs the loss of a cell spreads by a factor $1.1$--$30$
+across seeds, most at the long horizons of the resonant pools: at $4000$ steps $ee\to d\bar d$
+ends at $2.4\times10^{-6}$ and $6.1\times10^{-6}$ for two seeds and at $2.9\times10^{-4}$ and
+$4.6\times10^{-4}$ for the other two. One run never trained: $ee\to\gamma\gamma$ at $1000$ steps,
+seed $3$, at $0.42$--$0.45$ from step $450$ to the end (kept at its best checkpoint, $0.42$). The
+exponent of a single seed's curve moves by up to $1.1$ ($ee\to\gamma\gamma$: $1.19$ to $2.27$); the
+means over the four seeds are $1.76\pm0.42$ ($ee\to\gamma\gamma$), $1.43\pm0.12$ ($u\bar u\to u\bar
+u$), $1.53\pm0.30$ ($ee\to u\bar u$), $1.41\pm0.42$ ($ee\to d\bar d$) and $1.10\pm0.09$ ($ee\to
+b\bar b$ at one loop), so the spread of the $2\to2$ exponents seen in the sweeps ($0.98$--$2.27$) is
+mostly run-to-run noise; $ee\to b\bar b$ at one loop is the one clearly lower. The sweep's best
+trial gives the steepest exponent in three of the five ($2.27$, $2.01$, $1.88$ against fresh-seed
+means $1.59$, $1.37$, $1.25$): the long horizons scatter most, so taking the best of several trials
+lowers them most and steepens the fit. Every exponent in this section from a best-of-trials
+reference carries that bias and an uncertainty of $0.1$--$0.4$ that leave-one-point-out does not
+capture; the joint exponents, fitted over three seeds, do not.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v2/solo16k_seeds_a.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_seeds_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/solo16k_seeds_c.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_seeds_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v2/solo16k_seeds_e.pdf}\hfill\pnl{../analysis/catalog_v2/solo16k_seeds_f.pdf}}
+\caption{The $2\to2$ references at each cell's best HPs with seeds $1$--$3$ (dotted) and the sweep's
+best trial (seed $42$, black), every run at its best checkpoint and none left out:
+(a) $ee\to\gamma\gamma$, (b) $u\bar u\to u\bar u$, (c) $ee\to u\bar u$, (d) $ee\to d\bar d$,
+(e) $ee\to b\bar b$ at one loop; (f) the exponent fitted to each seed's curve and their mean and
+standard deviation.}
+\label{fig:solo16k_seeds}
+\end{figure}
+
+\paragraph{Intrinsic dimension of the learned representation: the kinematic count.}
+The intrinsic dimension of what a trained model represents was measured on the best checkpoint of
+every reference cell (\code{tools/measure\_id.py}): the representation the output reads is the
+event mean of the per-particle features entering the backbone's readout (the readout and the pool
+are both linear), and its dimension on the first $1000$ test events is the TwoNN estimate of
+\code{IntrinsicDimDeep}, averaged over three random $90\%$ subsets. The loaded models reproduce their
+runs (test MSE over validation loss $1.00$ at the median, $0.84$--$1.19$ for $80\%$ of the cells).
+The dimension is the number of independent kinematic invariants, $3n_{\rm fs}-4$ with $\sqrt s$
+varying (Fig.~\ref{fig:id_solo}): $2.0$--$2.4$ for every $2\to2$ process, $5.0\pm0.6$
+($u\bar d\to W^+ZZ$) to $7.1\pm0.6$ ($ee\to u\bar ug$) at $2\to3$ (count $5$), $8.3$--$9.6$ at
+$2\to4$ (count $8$), the uncertainty the spread over step counts, larger than each measurement's
+own resampling spread ($0.02$--$0.23$). It is set within the first hundred steps and is the same at
+both batches and on the old pools. Against it, the $2\to2$ references sit near
+$\alpha=4/\mathrm{ID}$, and the $2\to3$ and $2\to4$ ones far above it ($1.2$--$2.1$ at an ID of
+$5$--$10$, where $4/\mathrm{ID}$ is $0.4$--$0.8$): the representation grows with multiplicity as
+the phase space does, the exponent does not. The set of Table~\ref{tab:scaling} could not be
+measured: its checkpoints predate the ninth particle property and do not load in the current model.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v2/id_solo.pdf}
+\caption{(a) Intrinsic dimension of the learned per-event representation per reference process,
+grouped by multiplicity, for each set (bar: the spread over step counts); dashed, $3n_{\rm fs}-4$.
+(b) The exponent (bar: leave-one-point-out range) against the intrinsic dimension; dashed,
+$\alpha=4/\mathrm{ID}$ (\code{analysis/catalog\_v2/id\_solo.py}).}
+\label{fig:id_solo}
 \end{figure}
 
 \paragraph{The same curve under the geometric mean: the aggregation sets the $2\to2$ slope,
