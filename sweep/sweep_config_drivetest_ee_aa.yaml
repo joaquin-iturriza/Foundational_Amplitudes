@@ -46,8 +46,8 @@ fixed_params:
   model.net.num_heads: 8
   model.net.num_blocks: 8
   seed: 42
-  training.batchsize: 1024
-  evaluation.batchsize: 1024
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
   evaluation.train_subsample: 2000
   training.loss_aggregation: mean
   training.sign_head: 'true'
@@ -58,7 +58,7 @@ fixed_params:
   training.save_intermediate: 'false'
   training.validate_frac: '0.05'
   training.dtype: float32
-  plot: 'false'
+  plot: 'true'
   use_mlflow: 'false'
   training.cosanneal_eta_min: 0.0
   training.regularization_lambda: 1.0e-08

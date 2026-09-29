@@ -11,6 +11,9 @@ lambda 0.2%, eta_min 0.1%):
                                  D = 70000) interpolated log-log in t
   training.cosanneal_warmup_frac [0.05, 0.2]
   fixed: cosanneal_eta_min 0, regularization_lambda 1e-8 (job_catalog_short_ab.sh default), ema off.
+Inherited from solob1k and deliberately kept: data.mass_from_momenta true, the diagram encoder off, the arithmetic
+mean, as the joint steps runs these references are compared with (the canonical table has mass_from_momenta false;
+changing it here alone would break comparability with those runs).
     python sweep/gen_solo16k_configs.py            writes sweep/sweep_config_solo16k_t<T>_<process>.yaml
     python sweep/gen_solo16k_configs.py --flat     the same for ee_aa, ee_uu, ee_uug, ee_uugg on the pools of the
                                                    old from-scratch set (tab:scaling: uniform sqrt(s), 70k train;

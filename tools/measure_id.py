@@ -24,10 +24,14 @@ def best_run(sweep_dir):
     idx = json.load(open(os.path.join(sweep_dir, "checkpoint_index.json")))
     best = None
     for f in glob.glob(os.path.join(sweep_dir, "results", "*.json")):
-        m = re.match(r"hp(\d+)_t\d+_", os.path.basename(f))
+        m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(f))
         v = json.load(open(f)).get("val_loss")
-        if m and v is not None and (best is None or v < best[0]) and str(int(m.group(1))) in idx:
-            best = (float(v), idx[str(int(m.group(1)))]["run_dir"])
+        e = idx.get(str(int(m.group(1)))) if m else None
+        if e is not None and v is not None and (best is None or v < best[0]):
+            # the checkpoint on disk is the hp's LAST fidelity: a result at a lower t is not what gets measured
+            if int(e["t_steps"]) != int(m.group(2)):
+                raise SystemExit(f"{sweep_dir}: best result hp{m.group(1)} is at t={m.group(2)}, its checkpoint at t={e['t_steps']}")
+            best = (float(v), e["run_dir"])
     if best is None:
         raise SystemExit(f"{sweep_dir}: no result matched to a checkpoint")
     return best

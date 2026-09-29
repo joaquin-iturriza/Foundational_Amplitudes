@@ -12,6 +12,8 @@ The catalog sets at bs 1024 and 16384 share one target and compare in level too.
 old set's pools with the catalog setup (target, inputs, 8 heads) at the old set's best HPs per step count,
 one run per cell (sweep/run_fixed_hp.py, scripts/job_fixed_hp_old.sh; solo16kflatold.json): same target
 as the catalog sets, same pool and HPs as the old set.
+    python analysis/catalog_v2/solo_old_new.py --collect > analysis/catalog_v2/solo16kflatold.json   (on CC: the
+        fixed-HP runs' results/fixed.json val_loss, the best checkpoint)
     python analysis/catalog_v2/solo_old_new.py
 Writes solo_old_new (2x2, one panel per process, png + pdf)."""
 import json, os, sys
@@ -22,6 +24,13 @@ import plot_style as ps
 from solo_b1k import solo_mse
 from solo_datalimit_labels import LABEL
 from analyze_pretraining_scaling import fit_power_law_with_floor, flops_per_step
+if "--collect" in sys.argv:
+    import glob, siteconf
+    out = {}
+    for f in glob.glob(os.path.join(siteconf.SWEEP_DIR, "solo16kflatold_t*_*", "results", "fixed.json")):
+        T, p = os.path.basename(os.path.dirname(os.path.dirname(f)))[len("solo16kflatold_t"):].split("_", 1)
+        out[f"{p}|{T}"] = json.load(open(f))["val_loss"]
+    print(json.dumps(out)); sys.exit()
 NP = json.load(open(os.path.join(HERE, "n_particles.json")))
 OLD = json.load(open(os.path.join(HERE, "solo_full_old.json")))
 S16 = json.load(open(os.path.join(HERE, "solo16k.json"))); B1K = solo_mse()
