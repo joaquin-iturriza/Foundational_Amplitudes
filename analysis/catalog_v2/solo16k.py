@@ -1,7 +1,7 @@
 """The batch-16384 solo references (sweeps/solo16k_t<T>_<process>, sweep/gen_solo16k_configs.py): the 12
 reference processes of the steps curve alone on their full catalog pools at the canonical batch, 63 ...
 4000 steps, 6 DyHPO trials per (steps, process).
-    python analysis/catalog_v2/solo16k.py --collect > <site>.json   (on each site holding solo16k sweeps; merge the
+    python analysis/catalog_v2/solo16k.py --collect [--prefix=solo16kflat] > <site>.json   (on each site holding solo16k sweeps; merge the
                                                                   per-site json into analysis/catalog_v2/solo16k.json)
     python analysis/catalog_v2/solo16k.py                                              (plots from the json)
 Values: per sweep, the best trial's val_loss (the DyHPO result: the best checkpoint's val_loss_no_reg;
@@ -21,12 +21,18 @@ REFS = {"tree 2->2": ["ee_aa", "uubar_uubar"], "resonant 2->2": ["ee_uu", "ee_dd
 JSON = os.path.join(HERE, "solo16k.json")
 
 if "--collect" in sys.argv:
+    # --prefix=solo16kflat collects the old-pool sweeps instead; each site's sweeps, results from the sweep dir or,
+    # on HTCondor sites, from siteconf.RESULTS_DIR (EOS); cells with no results on this site are left out, and the
+    # per-site outputs are merged
     import siteconf
+    opts = dict(a[2:].split("=", 1) for a in sys.argv[1:] if a.startswith("--") and "=" in a)
+    pre = opts.get("prefix", "solo16k")
     out = {}
     for p in sum(REFS.values(), []):
         for T in STEPS:
-            v = [json.load(open(f))["val_loss"] for f in glob.glob(os.path.join(siteconf.SWEEP_DIR, f"solo16k_t{T}_{p}", "results", "*.json"))]
-            out[f"{p}|{T}"] = sorted(float(x) for x in v)
+            fs = {f for d in (siteconf.SWEEP_DIR, siteconf.RESULTS_DIR)
+                  for f in glob.glob(os.path.join(d, f"{pre}_t{T}_{p}", "results", "hp*.json"))}
+            if fs: out[f"{p}|{T}"] = sorted(float(json.load(open(f))["val_loss"]) for f in fs)
     print(json.dumps(out)); sys.exit()
 
 import plot_style as ps
