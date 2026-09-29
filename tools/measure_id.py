@@ -15,7 +15,7 @@ A --sweep resolves to its best trial (results/hp<ID>_t<T>_*.json with the lowest
 run_dir). One JSON line per run: {"sweep", "run_dir", "val_loss", "id_mean", "id_std", "n_events", "test_mse"}; test_mse
 (the loaded model on the whole test pool) is the check that the right weights were measured.
 """
-import argparse, glob, inspect, json, os, re, sys
+import argparse, fcntl, glob, inspect, json, os, re, sys
 import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 
@@ -108,4 +108,5 @@ if __name__ == "__main__":
         except BaseException as e:           # one bad run must not lose the others; recorded, not dropped
             rec = {"sweep": name, "run_dir": rd, "val_loss": v, "error": f"{type(e).__name__}: {e}"[:300]}
         print(json.dumps(rec), flush=True)
-        open(a.out, "a").write(json.dumps(rec) + "\n")
+        with open(a.out, "a") as f:          # several jobs append to one file: lock, or concurrent writes interleave
+            fcntl.flock(f, fcntl.LOCK_EX); f.write(json.dumps(rec) + "\n"); f.flush(); fcntl.flock(f, fcntl.LOCK_UN)
