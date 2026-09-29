@@ -5,8 +5,9 @@ best checkpoint), next to the sweep's own best trial (seed 42; solo16k.json).
     python analysis/catalog_v2/solo16k_seeds.py
 The exponent: the floor-aware law A C^-alpha + L_inf (CLAUDE.md, Scaling fits) fitted to each seed's curve (seed 42
 is the sweep's best trial, so it is the selected one, not a draw like 1-3); alpha = the mean over the four
-fits, the uncertainty their standard deviation. Writes solo16k_seeds (a: loss against steps, every seed, per
-process; b: alpha per process, each seed's fit and the mean)."""
+fits, the uncertainty their standard deviation. Writes solo16k_seeds_a ... _f: (a-e) one process each, loss against steps for every seed, every run at its
+best checkpoint and none left out (the printout lists each cell's four values); (f) alpha per process, each
+seed's fit and mean +- sd."""
 import json, os, sys
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -29,28 +30,33 @@ import plot_style as ps
 from solo_datalimit_labels import LABEL
 from analyze_pretraining_scaling import fit_power_law_with_floor
 D = json.load(open(JSON)); S42 = json.load(open(os.path.join(HERE, "solo16k.json")))
-COL = dict(zip(PROCS, (ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple)))
+COLS = {42: "black", 1: ps.C.blue, 2: ps.C.vermillion, 3: ps.C.green}
 curve = lambda p, s: np.array([min(S42[f"{p}|{T}"]) if s == 42 else D.get(f"{p}|{T}|{s}", np.nan) for T in STEPS], float)
-fig, (a, b) = ps.figure(ncols=2)
-print(f"{'process':17s} alpha per seed (42 = sweep best; 1, 2, 3)      mean +- sd   | loss spread over seeds per step count (max/min)")
-for i, p in enumerate(PROCS):
+figs = ps.panels(len(PROCS) + 1)
+ALPHA = {}
+print(f"{'process':17s} alpha per seed (42 = sweep best; 1, 2, 3)      mean +- sd")
+for (fig, ax), p in zip(figs, PROCS):
+    Y = np.array([curve(p, s) for s in [42] + SEEDS]); med = np.nanmedian(Y, 0)
     al = []
-    for s in [42] + SEEDS:
-        y = curve(p, s); ok = np.isfinite(y); t = np.array(STEPS, float)[ok]
-        a.plot(t, y[ok], marker="o" if s == 42 else ".", ls="-" if s == 42 else ":", color=COL[p], label=LABEL.get(p, p) if s == 42 else None)
-        f = fit_power_law_with_floor(t, y[ok]) if ok.sum() >= 4 else None
+    for k, s in enumerate([42] + SEEDS):
+        y = Y[k]; t = np.array(STEPS, float)
+        ax.plot(t, y, marker="o", ls="-" if s == 42 else ":", color=COLS[s], label="sweep best (seed 42)" if s == 42 else f"seed {s}")
+        f = fit_power_law_with_floor(t, y) if np.isfinite(y).sum() >= 4 else None
         al.append(f[1] if f else np.nan)
-    al = np.array(al); m, sd = np.nanmean(al), np.nanstd(al)
-    b.plot([i] * 4, al, ls="none", marker="o", mfc="none", color=COL[p])
-    b.errorbar([i], [m], yerr=[sd], fmt="s", color=COL[p], capsize=3)
-    Y = np.array([curve(p, s) for s in [42] + SEEDS])
-    spread = np.nanmax(Y, 0) / np.nanmin(Y, 0)
-    print(f"{p:17s} " + " ".join(f"{x:.2f}" for x in al) + f"   {m:.2f} +- {sd:.2f}   | " + " ".join(f"{x:.1f}" for x in spread))
-a.set_xscale("log"); a.set_yscale("log"); a.set_xlabel("optimizer steps (bs 16384)"); a.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
-H = [a.plot([], [], color="black", marker="o", ls="-")[0], a.plot([], [], color="black", marker=".", ls=":")[0]]
-ps.legend(a, "lower left", handles=a.get_legend_handles_labels()[0] + H, labels=a.get_legend_handles_labels()[1] + ["sweep best (seed 42)", "seeds 1, 2, 3"])
-b.set_xticks(range(len(PROCS)), [LABEL.get(p, p) for p in PROCS]); b.set_xlim(-0.6, len(PROCS) - 0.4)
-b.set_ylabel(r"$\alpha$ in $A\,C^{-\alpha}+L_\infty$")
-Hb = [b.plot([], [], ls="none", marker="o", mfc="none", color="black")[0], b.errorbar([], [], yerr=[], fmt="s", color="black", capsize=3)]
-ps.legend(b, "upper right", handles=Hb, labels=["each seed's fit", "mean $\\pm$ sd"])
-ps.save(fig, os.path.join(HERE, "solo16k_seeds"))
+    ALPHA[p] = np.array(al)
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("optimizer steps (bs 16384)"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")
+    ps.process_label(ax, LABEL.get(p, p), loc="lower left")
+    ps.legend(ax, "upper right")
+    print(f"{p:17s} " + " ".join(f"{x:.2f}" for x in ALPHA[p]) + f"   {np.nanmean(ALPHA[p]):.2f} +- {np.nanstd(ALPHA[p]):.2f}   | per step, seeds 42/1/2/3: "
+          + "  ".join(f"t{T}:" + "/".join(f"{v:.1g}" for v in Y[:, j]) for j, T in enumerate(STEPS)))
+fig, ax = figs[-1]
+yy = np.arange(len(PROCS))[::-1]
+for y, p in zip(yy, PROCS):
+    for k, s in enumerate([42] + SEEDS):
+        ax.plot([ALPHA[p][k]], [y], ls="none", marker="o", mfc="none", color=COLS[s])
+    ax.errorbar([np.nanmean(ALPHA[p])], [y], xerr=[np.nanstd(ALPHA[p])], fmt="s", color="black", capsize=3)
+ax.set_yticks(yy, [LABEL.get(p, p) for p in PROCS]); ax.set_ylim(-0.6, len(PROCS) - 0.4)
+ax.set_xlabel(r"$\alpha$ in $A\,C^{-\alpha}+L_\infty$")
+H = [ax.plot([], [], ls="none", marker="o", mfc="none", color=COLS[s])[0] for s in [42] + SEEDS] + [ax.errorbar([], [], xerr=[], fmt="s", color="black", capsize=3)]
+ps.legend(ax, "lower right", handles=H, labels=["seed 42 (sweep best)", "seed 1", "seed 2", "seed 3", r"mean $\pm$ sd"], ncol=2)
+ps.save_panels(figs, os.path.join(HERE, "solo16k_seeds"))
