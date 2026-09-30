@@ -318,7 +318,7 @@ def duration_nice(minutes, longest):
 # Commands
 # --------------------------------------------------------------------------- #
 def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=False,
-                  seq_batches=None, chain=True, capacity=None):
+                  seq_batches=None, chain=False, capacity=None):
     """Submit one or more sweeps, interleaved across them by round.
 
     Importable entry point used by the generate_*.py scripts. `sweep_dirs` are
@@ -337,14 +337,15 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     waves when a single sweep is submitted (no cross-sweep interleaving to rely on),
     1 (off) when several sweeps are co-submitted. Pass an int to force, or 1 to disable.
 
-    Chained submission (`chain`, the default): `nice` only orders the queue, so with free GPUs
+    Chained submission (`chain`, opt-in, `submit --chain`; the waves above stay the default):
+    `nice` only orders the queue, so with free GPUs
     every round starts at once and DyHPO suggests blind. Instead each sweep's trials are chained:
     its `n_startup` random trials run together, the first informed trial waits for all of them,
     and every later trial waits (afterany) for the trial `W` places before it in the same sweep.
     W = min(3, ceil(capacity / n_sweeps)), so the batch still keeps `capacity` GPUs busy and finishes in
     about the same time, while every suggestion sees all but the W-1 most recent results. Queue
     order is then by trial length, longest first (duration_nice), not by round. `seq_batches`
-    applies only with chain=False.
+    applies only without chaining.
     """
     reg = load_registry(registry)
     gap = reg["round_gap"]
@@ -663,9 +664,10 @@ def build_parser():
                         "multi-sweep; pass 1 to disable)")
     s.add_argument("--weight", type=int, default=None,
                    help="trials per round for these sweeps (default keeps existing/1); "
-                        "only with --no-chain: chained jobs are ordered by trial length")
-    s.add_argument("--no-chain", dest="chain", action="store_false",
-                   help="the old round-robin nice ordering without per-sweep chaining")
+                        "not with --chain: chained jobs are ordered by trial length")
+    s.add_argument("--chain", action="store_true",
+                   help="chain each sweep's trials (start-up together, then each waits for the one W "
+                        "back) and order the queue longest trials first; default: the waves")
     s.add_argument("--capacity", type=int, default=None,
                    help=f"GPUs the chained batch should keep busy (default {DEFAULT_CAPACITY}; "
                         "site pick's 'at once' for the site)")

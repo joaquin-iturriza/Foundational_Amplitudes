@@ -6,6 +6,7 @@ cluster:
   request_gpus: 1
   mem: 8G
   cpus_per_task: 4
+  chain_width: 2
   time: 01:45:00
 paths: null
 sweep_name: tp2_scr_ee_nnbar_d7

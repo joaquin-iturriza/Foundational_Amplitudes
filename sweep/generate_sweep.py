@@ -244,21 +244,28 @@ queue
 
 
 def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
-    """HTCondor counterpart of sweep_manager's chained submission: the startup trials run
-    together; the first `width` surrogate-guided trials wait for every startup trial, and each
-    later one for the trial `width` places before it, so every suggestion sees all but the
-    width-1 most recent results. width = cluster.chain_width (default 2: a few sweeps side by
-    side then fill a site's free GPUs). A POST script that always succeeds makes each edge
+    """HTCondor counterpart of sweep_manager's waves / chained submission. By default two waves:
+    the startup trials first, the surrogate-guided ones after every startup trial has ended. With
+    cluster.chain_width = W set, chained: the first W guided trials wait for every startup trial
+    and each later one for the trial W places before it, so every suggestion sees all but the
+    W-1 most recent results. A POST script that always succeeds makes each edge
     `afterany`: a failed or removed trial still releases the next. One DAG file per submission,
     so --extend can submit again."""
     n_first = max(1, min(int(cfg.get("dyhpo", {}).get("n_startup", 3)), len(sub_paths)))
-    width = max(1, int(cfg.get("cluster", {}).get("chain_width", 2)))
+    width = cfg.get("cluster", {}).get("chain_width")
     names = [os.path.splitext(os.path.basename(p))[0] for p in sub_paths]
     lines = [f"JOB {n} {p}" for n, p in zip(names, sub_paths)]
-    lines += [f"SCRIPT POST {n} /bin/true" for n in names[:-1]]
-    for j in range(n_first, len(names)):
-        parents = names[:n_first] if j - width < n_first else [names[j - width]]
-        lines.append(f"PARENT {' '.join(parents)} CHILD {names[j]}")
+    if width is None:
+        # the default: two waves, the startup trials, then every other trial once they have ended
+        if len(names) > n_first:
+            lines += [f"SCRIPT POST {n} /bin/true" for n in names[:n_first]]
+            lines.append(f"PARENT {' '.join(names[:n_first])} CHILD {' '.join(names[n_first:])}")
+    else:
+        width = max(1, int(width))
+        lines += [f"SCRIPT POST {n} /bin/true" for n in names[:-1]]
+        for j in range(n_first, len(names)):
+            parents = names[:n_first] if j - width < n_first else [names[j - width]]
+            lines.append(f"PARENT {' '.join(parents)} CHILD {names[j]}")
     path = os.path.join(afs_dir, f"sweep_{first_idx:04d}.dag")
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")

@@ -113,7 +113,7 @@ def lr_space(T, k=None):
 def write(name, recipe, T, space, extra=None, head=""):
     fixed = dict(FIXED, **{"data.processes_file": f"${{PROJECT_DIR}}/recipes/{recipe}"}, **(extra or {}))
     c = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "8G",
-                     "cpus_per_task": 4,
+                     "cpus_per_task": 4, "chain_width": 2,   # HTCondor DAG chained; SLURM: submit --chain
                      "time": "%02d:%02d:00" % divmod(max(30, int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN)), 60)},
          "paths": None, "sweep_name": name, "n_trials": N_TRIALS,
          "dyhpo": {"n_candidates": 200, "seed": 42, "n_startup": N_STARTUP, "total_budget": 10000},
