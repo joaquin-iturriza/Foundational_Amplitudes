@@ -3976,7 +3976,7 @@ ladder, which shows what adding more and more structure does. The finale is the 
 structure against scratch on every held-out probe.
 
 \paragraph{Protocol.} Every pretraining process has $10^5$ training events (to be revisited if
-$2\times$ or $3\times$ that changes a rung) and every pretraining is trained to convergence. The
+$2\times$ or $3\times$ that changes a rung) and every pretraining is meant to run to convergence, capped at $64$k steps. The
 probes run on $D=10^{k/2}$, $k=2,\dots,10$ ($10$ to $10^5$), prefixes of one shuffled $10^5$
 pool, so the smaller sets are nested in the larger; validation and test are fixed $10^4$-event
 splits at every $D$ (one-loop pools hold $5\times10^4$ training events, so their grid stops at
@@ -4166,7 +4166,7 @@ replaced them.}
 \paragraph{Chapter one: the near probe gains, the far probe loses at small $D$.} The $ee\to u\bar u$
 pretraining (one DyHPO, $8$ trials, $32$k steps, $10^5$ events; best trial lr
 $6.7\times10^{-4}$, $\vlnr=1.6\times10^{-8}$, $2.6\times10^{-7}$ in MSE of $\log|\mathcal M|^2$,
-best checkpoint at the last step) is fine-tuned on both chapter-one probes, the same cells and
+best checkpoint at the last step, so not converged) is fine-tuned on both chapter-one probes, the same cells and
 horizons as scratch, the full model retrained with layer decay (Fig.~\ref{fig:ladder_ch1}).
 $ee\to d\bar d$ gains at every $D$: $5$--$6\times$ at $10$--$10^{1.5}$, $16$--$19\times$ at
 $10^2$--$10^{2.5}$, $5\times$ at $10^3$ and $2\times$ at $10^{3.5}$--$10^4$ ($6.4\times10^{-7}$
