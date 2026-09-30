@@ -1,8 +1,8 @@
 """Transfer pilot, longer horizons: fixed-HP scratch runs (scripts/job_transfer_calib.sh) of one
 probe at one D, at 8k/16k/32k steps, against the cell's 8k HPO best (tp_scr sweeps). Loss is MSE of
 log|M|^2 at the best checkpoint (val_loss_no_reg times the run's prepd_std^2).
-  <base>_a  ee->dd~ : loss vs horizon per D; marker fill = the run's lr (the 32k runs took a
-            1.8x higher lr than the 16k runs, so that step is not a clean horizon comparison)
+  <base>_a  ee->dd~ : loss vs horizon per D; marker = the run's lr, circles 0.9-1.6e-3 (8k, 16k),
+            squares 3.0e-3 (32k, 64k), so only 32k -> 64k is a clean horizon comparison
   <base>_b  uu~->gg : loss vs horizon per D (fixed HPs at 16k/32k = the cell's 8k HPO best for
             D = 10^3.5, 10^4; the window centre for 10^4.5, 10^5); open = the 8k HPO best
   <curves>  uu~->gg : the long runs' validation curves
@@ -15,6 +15,7 @@ analysis/transfer/scratch_sweeps.json.
 """
 import json, os, re, sys
 import numpy as np
+from matplotlib.ticker import NullLocator
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 import plot_style as ps
@@ -58,10 +59,12 @@ for (fig, ax), p, lab, ks in ((figs[0], "ee_ddbar", r"$e^+e^-\to d\bar d$", (8, 
         if hb:
             ax.plot(*hb, "o", mfc="none", color=col, ls="none")
     if p == "ee_ddbar":
-        ax.plot([], [], "o", color="k", ls="none", label=r"lr $\approx1.6\times10^{-3}$")
+        ax.plot([], [], "o", color="k", ls="none", label=r"lr $0.9$-$1.6\times10^{-3}$")
         ax.plot([], [], "s", color="k", ls="none", label=r"lr $\approx3.0\times10^{-3}$")
     ax.plot([], [], "o", mfc="none", color="k", ls="none", label="8k HPO best")
     ax.set_xscale("log"); ax.set_yscale("log")
+    T = [8000, 16000, 32000, 64000] if p == "ee_ddbar" else [8000, 16000, 32000]
+    ax.set_xticks(T, [f"{t // 1000}k" for t in T]); ax.xaxis.set_minor_locator(NullLocator())
     ax.set_xlabel("horizon (steps)"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(ax, lab)
     ps.legend(ax, "lower left")
