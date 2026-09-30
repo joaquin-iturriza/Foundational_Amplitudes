@@ -4104,8 +4104,15 @@ the range at $1$\,TeV. The worst $1\%$ of the events carry $99\%$ of the squared
 worst, both at $\cos\theta=-1.000$ and $\sqrt s\approx890$\,GeV, off by $0.5$ in
 $\log|\mathcal M|^2$, $86\%$ of it. $ee\to Z\gamma$ (factor off) spreads its error: the worst $1\%$
 carry $24\%$. A larger $D$ adds almost no events to that corner, which is why the curve is flat in
-$D$. A candidate cause, unchecked: the factor floors $|t|$ at the pool's $10^{-3}$ quantile, and
-events that far forward may lie below the floor, where it stops removing the peak.
+$D$. The cause is the factor's floor together with the sampling (\code{ww\_corner.py},
+\code{ww\_corner\_ee\_WW.json}): the factor floors $|t|$ at the pool's $10^{-3}$ quantile
+($349$\,GeV$^2$, against a kinematic minimum of $69$\,GeV$^2$ set by $m_W$), so below it the target
+keeps the full $1/|t|$ spike, and the $11$ validation events there ($0.1\%$) carry $98\%$ of the
+squared error; the nine worst all sit below it. The training pool has $100$ such events in $10^5$,
+$9$ in the first $10^4$. The mixture sampling cannot fix this by selection: its flat-in-$\log|\mathcal
+M|^2$ part keeps what the candidates contain, the $2\to2$ candidates are uniform in $\cos\theta$ and
+the adaptive proposal acts on $\sqrt s$ only, and these events already sit at the top $0.04\%$ of the
+pool's $\log|\mathcal M|^2$.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/residual_map_a.pdf}\hfill\pnl{../analysis/transfer/figs/residual_map_b.pdf}}
@@ -4194,9 +4201,10 @@ Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor o
     redoing the scratch and fine-tune sweeps of the probes where it applies ($ee\to d\bar d$,
     $ee\to\nu_e\bar\nu_e$, and any other probe whose run log lists a massive factor). Waits on the
     user's decision.
-  \item \textbf{$ee\to W^+W^-$.} Check on CPU whether the worst validation events are exactly
-    those below the $|t|$ floor, and count the training events in the forward corner per $D$,
-    before deciding how the probe enters the study (the one probe the $t$-channel factor helps).
+  \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
+    Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
+    drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
+    IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
     $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
