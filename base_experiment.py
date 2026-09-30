@@ -1010,7 +1010,8 @@ class BaseExperiment:
             # β-invariant μ-MSE for HETEROSC, never the β-scaled NLL (which is monotone in
             # β and would make any sweep over heterosc_beta a pure argmin-β).
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
-            result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0}
+            result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0,
+                      "best_step": int(smallest_val_loss_step) + 1}
             result.update(self._result_extra())
             with open(result_path, "w") as _f:
                 json.dump(result, _f)
