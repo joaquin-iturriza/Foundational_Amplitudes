@@ -6,7 +6,9 @@ log|M|^2 at the best checkpoint (val_loss_no_reg times the run's prepd_std^2).
   <base>_b  uu~->gg : loss vs horizon per D (fixed HPs at 16k/32k = the cell's 8k HPO best for
             D = 10^3.5, 10^4; the window centre for 10^4.5, 10^5); open = the 8k HPO best
   <curves>  uu~->gg : the long runs' validation curves
-Only runs with the t-channel factor on (as the tp_scr sweeps they are compared with).
+Only runs with the t-channel factor on (as the tp_scr sweeps they are compared with), read from each
+run's recorded flags; a run without them is an error. Factor-off runs are excluded by design, also for
+ee->dd~ where the factor is never applied.
 Data: analysis/transfer/long_runs.json (analysis/transfer/collect_calib.py on each site, merged),
 analysis/transfer/scratch_sweeps.json.
     python analysis/transfer/long_runs.py
@@ -26,8 +28,10 @@ for n, r in L.items():
     m = re.match(r"tp2?_calib_(\w+?)_d(\d+)_t(\d+)", n)
     # this figure is the factor-on pilot (the horizon question): the arm is read from what ran
     # (collect_calib.py records the run's own target_propagator_tchannel), never from the name
-    if m and r.get("std") and str(r.get("tchannel", True)).lower() == "true" \
-            and not re.search(r"target_propagators-false", n):
+    if r.get("failed"):
+        print(f"not plotted, run failed: {n} ({r['failed']})")
+        continue
+    if m and str(r["tchannel"]).lower() == "true" and str(r["target_propagators"]).lower() == "true":
         runs.append(dict(p=m.group(1), k=int(m.group(2)), T=int(m.group(3)), **r))
 
 
