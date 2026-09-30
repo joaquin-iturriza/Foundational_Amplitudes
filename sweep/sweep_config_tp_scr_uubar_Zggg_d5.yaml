@@ -1,4 +1,4 @@
-# Transfer pilot pretrain: ee_uu alone, 100k events, 32000 steps.
+# Transfer pilot, scratch: uubar_Zggg on D = 10^2.5 events.
 # Written by sweep/gen_transfer_pilot.py.
 cluster:
   scheduler: slurm
@@ -6,9 +6,9 @@ cluster:
   request_gpus: 1
   mem: 8G
   cpus_per_task: 4
-  time: 06:15:00
+  time: 01:06:00
 paths: null
-sweep_name: tp_pre_ee_uu
+sweep_name: tp_scr_uubar_Zggg_d5
 n_trials: 8
 dyhpo:
   n_candidates: 200
@@ -17,7 +17,7 @@ dyhpo:
   total_budget: 10000
 fidelity_schedule:
   t_steps:
-  - 32000
+  - 4576
 fixed_params:
   data.source: recipes
   data.require_cache: 'false'
@@ -62,14 +62,15 @@ fixed_params:
   training.dtype: float32
   plot: 'true'
   use_mlflow: 'false'
-  data.processes_file: ${PROJECT_DIR}/recipes/ref_solo_ee_uu.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zggg.yaml
+  data.train_subsample: 316
 range_extension:
   enabled: false
 search_space:
 - name: training.lr
   type: float_log
-  low: 0.000368
-  high: 0.0368
+  low: 4.27e-05
+  high: 0.00427
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10
