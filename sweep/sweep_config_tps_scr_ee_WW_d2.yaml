@@ -65,6 +65,7 @@ fixed_params:
   use_mlflow: 'false'
   data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_WW_steered.yaml
   data.train_subsample: 10
+  data.target_propagator_tchannel_norm: '[112645.69616849617,348.79365946052116]'
 range_extension:
   enabled: false
 search_space:

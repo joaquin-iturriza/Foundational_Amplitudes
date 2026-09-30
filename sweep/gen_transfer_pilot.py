@@ -50,10 +50,16 @@ LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb
 K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9}
 # sigma-steered pools (tools/steer_pool.py; the user's call, 2026-09-30, after the ee->WW forward corner):
 # the same probe on a pool built once from a reference model's sigma, scratch only, D <= 1e4, on the
-# target of the probe's existing sweeps (ee->WW keeps the t-channel factor on, as its tp_scr sweeps),
-# so the sampling is the only difference. The DyHPO candidate seed is shared, so both arms search the
-# same HP points.
-STEERED = {"ee_WW": ("transfer_probe_ee_WW_steered.yaml", {"data.target_propagator_tchannel": "true"})}
+# target of the probe's existing sweeps: ee->WW keeps the t-channel factor on, as its tp_scr sweeps, and
+# its normalisation (median |t|, floor at the 1e-3 quantile) is pinned to the mixture pool's
+# (analysis/transfer/ww_corner_ee_WW.json), since a pool steered into the forward corner would
+# otherwise lower its own floor and change the target there. The DyHPO candidate seed is shared, so
+# both arms search the same HP points. A/B order (CLAUDE.md): first the steered pool at each cell's
+# baseline-best HPs (scripts/job_transfer_calib.sh fam=tps_scr), sweeps only where that loses.
+_WW = json.load(open(os.path.join(ROOT, "analysis", "transfer", "ww_corner_ee_WW.json")))
+STEERED = {"ee_WW": ("transfer_probe_ee_WW_steered.yaml",
+                     {"data.target_propagator_tchannel": "true",
+                      "data.target_propagator_tchannel_norm": f"[{_WW['median']!r},{_WW['floor']!r}]"})}
 KS = range(2, 11)                                  # D = 10^(k/2)
 T_PRE = 32000                                     # ee->dd~ at 1e5 events still improved at 16k
 # Horizons from the calibration (analysis/transfer/calib_ee_ddbar.json, one fixed-HP run per D):

@@ -128,6 +128,7 @@ data:
  target_propagator_straddle: 0.005   # a propagator counts only if its s_k straddles M² on the train pool
  target_propagator_tchannel: false   # also |t|^p for massless t-channel exchanges (p = 1 fermion, 2 boson)
  target_propagator_tchannel_max_final: 2    # t-channel factor only for processes with up to this many final particles
+ target_propagator_tchannel_norm: null   # [median |t|, floor] pinned instead of fitted on the train pool (a steered pool keeps its baseline's target)
  # Coupling-order vector per dataset: [L_QCD, L_EW, alpha_s_max, alpha_ew_max] of the
  # stored target (mg5_pipeline_final.order_vector). null => derived from the catalog
  # entry of each dataset (recipe path), or from the dataset name (files path).

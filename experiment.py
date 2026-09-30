@@ -1503,8 +1503,13 @@ class AmplitudeExperiment(BaseExperiment):
                             # units into the standardized target (one seed in three diverged
                             # with a 1e-12 floor)
                             at = np.abs(s_prop)
-                            props.append((pdg, mrow, 0.0, power,
-                                          (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12)))
+                            pinned = self.cfg.data.get("target_propagator_tchannel_norm", None)
+                            norm = ((float(pinned[0]), float(pinned[1])) if pinned is not None else
+                                    (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12))
+                            self._tch_norm = [float(norm[0]), float(norm[1])]
+                            LOGGER.info(f"t-channel factor {name}: median |t| {norm[0]:.6g}, floor {norm[1]:.6g}"
+                                        f"{' (pinned)' if pinned is not None else ''}")
+                            props.append((pdg, mrow, 0.0, power, norm))
                             n_tch += 1
                 for role in roles:
                     if (role, name) not in store:
@@ -1817,6 +1822,7 @@ class AmplitudeExperiment(BaseExperiment):
                                       if self._amp_trafos_pp else None),
                     "preprocess_per_dataset": per_dataset,
                     "target_propagators": bool(getattr(self, "_target_factor_on", False)),
+                    "tchannel_norm": getattr(self, "_tch_norm", None),
                     "prepd_mean": [float(x) for x in self.prepd_mean],
                     "prepd_std":  [float(x) for x in self.prepd_std],
                 }, f, indent=2)
