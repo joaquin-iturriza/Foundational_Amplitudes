@@ -1504,6 +1504,8 @@ class AmplitudeExperiment(BaseExperiment):
                             # with a 1e-12 floor)
                             at = np.abs(s_prop)
                             pinned = self.cfg.data.get("target_propagator_tchannel_norm", None)
+                            assert pinned is None or len(names) == 1, \
+                                "data.target_propagator_tchannel_norm is one [median, floor] pair: single-process runs only"
                             norm = ((float(pinned[0]), float(pinned[1])) if pinned is not None else
                                     (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12))
                             self._tch_norm = [float(norm[0]), float(norm[1])]
