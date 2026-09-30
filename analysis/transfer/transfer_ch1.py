@@ -3,7 +3,8 @@ probe on D = 10^(k/2) events, against the same probe from scratch. Best trial of
 single-fidelity DyHPO, MSE of log|M|^2 at the best checkpoint (val_loss_no_reg times the run's
 prepd_std^2). Scratch and fine-tune of a probe share the target: ee->dd~ the tp_ sweeps (the
 Breit-Wigner factor on in both, the t-channel factor never applies), uu~->gg the tp2_ sweeps (the
-t-channel factor off in both). Open markers: cells with fewer than 7 trials in.
+t-channel factor off in both). Only the D values where both arms have a cell are drawn (a fine-tune
+is compared with its scratch cell, nothing else). Open markers: cells with fewer than 7 trials in.
   <base>_a  ee->dd~ (near probe)
   <base>_b  uu~->gg (far probe)
 Data: analysis/transfer/scratch_sweeps.json (collect_sweeps.py tp on each site, merged).
@@ -30,8 +31,9 @@ def cells(fam, p):
 figs = ps.panels(2)
 for (fig, ax), (p, gen, lab) in zip(figs, (("ee_ddbar", "tp", r"$e^+e^-\to d\bar d$"),
                                             ("uubar_gg", "tp2", r"$u\bar u\to gg$"))):
+    both = set(cells(f"{gen}_scr", p)) & set(cells(f"{gen}_ft", p))
     for arm, col, name in (("scr", ps.C.blue, "from scratch"), ("ft", ps.C.vermillion, "fine-tuned")):
-        C = {k: t for k, t in cells(f"{gen}_{arm}", p).items() if k <= 8}
+        C = {k: t for k, t in cells(f"{gen}_{arm}", p).items() if k in both}
         D = np.array([10 ** (k / 2) for k in C])
         L = np.array([min(r["val_loss"] * r["prepd_std"] ** 2 for r in t) for t in C.values()])
         done = np.array([len(t) >= 7 for t in C.values()])
