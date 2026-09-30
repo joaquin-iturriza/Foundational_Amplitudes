@@ -27,6 +27,8 @@ ap.add_argument("run_dirs", nargs="+")
 ap.add_argument("--recipe", required=True, help="the recipe whose split the runs are scored on")
 ap.add_argument("--role", default="test", choices=["val", "test"])
 ap.add_argument("--seed", type=int, default=42, help="the recipe pools' seed (data.seed of the study)")
+ap.add_argument("--dump", action="store_true",
+                help="also save each event's residual with its pool row, sqrt(s) and raw |M|^2 to <run>/cross_eval_<role>.npz")
 a = ap.parse_args()
 
 rec = yaml.safe_load(open(a.recipe))
@@ -47,6 +49,15 @@ for run in a.run_dirs:
     with torch.no_grad():
         pred, truth, _ = exp._collect_predictions(loader)
     res = (np.asarray(pred, np.float64).reshape(-1) - np.asarray(truth, np.float64).reshape(-1)) * float(exp.prepd_std[0])
+    if a.dump:
+        perm = exp._role_perm[a.role][:len(res)]                  # position -> row of the eval pool file
+        rows = np.asarray(np.load(path, mmap_mode="r")[perm])
+        npart = (rows.shape[1] - 1) // 5
+        mom = rows[:, :npart * 4].reshape(-1, npart, 4)
+        tot = mom[:, 0] + mom[:, 1]
+        np.savez_compressed(os.path.join(run, f"cross_eval_{a.role}.npz"), res=res, pool_row=perm,
+                            sqrts=np.sqrt(np.maximum(tot[:, 0] ** 2 - (tot[:, 1:] ** 2).sum(1), 0)),
+                            raw=rows[:, -1], momenta=mom, eval_pool=path)
     sq = np.sort(res ** 2)[::-1]
     print("CROSS_EVAL " + json.dumps(dict(run=os.path.abspath(run), recipe=os.path.abspath(a.recipe), eval_pool=path,
                                          role=a.role, n=int(len(sq)), mse=float(sq.mean()),
