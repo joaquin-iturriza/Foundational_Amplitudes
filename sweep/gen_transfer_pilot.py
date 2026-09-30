@@ -2,8 +2,12 @@
 two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-tuned.
 
   pretrain   tp_pre_ee_uu              ee_uu, 100k train events, T_PRE steps
-  scratch    tp_scr_<probe>_d<k>       probe alone on the first D train events
-  fine-tune  tp_ft_<probe>_d<k>        the same, from the pretrain's best checkpoint
+  scratch    tp2_scr_<probe>_d<k>      probe alone on the first D train events
+  fine-tune  tp2_ft_<probe>_d<k>       the same, from the pretrain's best checkpoint
+The t-channel target factor is off (tp2_): on uu~->gg, uu~->Zg, ee->Za it set a floor near 1e-5
+that switching it off removes, 10-290x lower at the same HPs (analysis/transfer/tchannel_ab.py);
+the tp_ sweeps ran with it on and stay valid only for probes without a massless t/u-channel
+exchange (ee->dd~, ee->tt~, the 2->3/2->4 and one-loop probes, where the factor is never applied).
 
 D = 10^(k/2), k = 2..10 (10 ... 1e5), prefixes of one 100k pool (the pool is shuffled, so
 each prefix is a random subset and the smaller sets are nested in the larger); val and test
@@ -75,7 +79,7 @@ FIXED = {
     "data.generation_onehot": "true", "data.generation_feature": "true",
     "data.mass_from_momenta": "false", "data.coupling_scalars": "true",
     "data.internal_mass_scalars": "true", "data.offshell_per_event": "true",
-    "data.target_propagators": "true", "data.target_propagator_tchannel": "true",
+    "data.target_propagators": "true", "data.target_propagator_tchannel": "false",
     "data.target_propagator_tchannel_max_final": 2, "data.internal_mass_pdgs": "[23,6,25]",
     "model": "lloca", "model.use_diagrams": "false", "model.particle_encoder_hidden": 0,
     "model.net.num_heads": 8, "model.net.num_blocks": 8, "seed": 42,
@@ -124,16 +128,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ft", help="best checkpoint of the pretrain (absolute path on the site)")
     ap.add_argument("--lr", type=float, help="the pretrain's best training.lr")
+    ap.add_argument("--probes", nargs="*", help="only these probes (default: all)")
+    ap.add_argument("--pretrain", action="store_true", help="also (re)write the pretrain config")
     a = ap.parse_args()
+    only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
     if a.ft is None:
-        out.append(write(f"tp_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
-                         head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
-        for p in PROBES + Z_FAMILY + LADDER:
+        if a.pretrain:
+            out.append(write(f"tp_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
+                             head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
+        for p in only(PROBES + Z_FAMILY + LADDER):
             for k in KS:
                 if k > K_MAX.get(p, 10):
                     continue
-                out.append(write(f"tp_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
+                out.append(write(f"tp2_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
@@ -141,9 +149,9 @@ def main():
         assert a.lr, "--lr (the pretrain's best lr) is needed with --ft"
         ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.1, "high": 10.0},
                     {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
-        for p in PROBES:
+        for p in only(PROBES):
             for k in KS:
-                out.append(write(f"tp_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
+                out.append(write(f"tp2_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own"},
                                  head=f"Transfer pilot, fine-tune from {PRE}: {p} on D = 10^{k / 2:g} events."))
