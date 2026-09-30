@@ -1,0 +1,23 @@
+# Transfer study, pretraining ladder rung 8: + multiplicity, 2->4. Cumulative: every earlier rung's processes plus
+# this rung's. No probe is in any rung, nor any process in a probe's equality class
+# (analysis/process_equality/equal_processes.json; e.g. uubar_Za = ee_Za, uubar_aa = ee_aa, uubar_ZZ = ee_ZZ).
+# 1e5 train events per tree process (5e4 per one-loop), mixture sampling (one-loop pools are never shaped);
+# sqrt(s) windows start ~5% above threshold, else at 25 GeV, as the probes' recipes.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bhabha, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_aa, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uu_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: dd_dd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbar, sqrts: [363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZ, sqrts: [192, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZH, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
