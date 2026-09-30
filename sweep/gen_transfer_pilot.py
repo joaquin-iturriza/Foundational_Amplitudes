@@ -7,11 +7,18 @@ two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-
 
 D = 10^(k/2), k = 2..10 (10 ... 1e5), prefixes of one 100k pool (the pool is shuffled, so
 each prefix is a random subset and the smaller sets are nested in the larger); val and test
-are the fixed 10k splits at every D. One single-fidelity DyHPO per cell, N_TRIALS trials.
+are the fixed 10k splits at every D. Normalization and target (amplitude transform, mean/std,
+propagator factors) are fitted on the whole 100k train pool at every D (data.fit_stats_on_pool),
+so every cell has the same target and the same loss unit. The train batch is min(16384, D/2)
+(experiment.py caps it at half the train split), so below D = 32768 the batch shrinks with D.
+One single-fidelity DyHPO per cell, N_TRIALS trials, one seed (the user's call for the pilot:
+see how noisy a single seed is before adding more).
 
 The horizon is deliberately generous (T_CELL): the pilot measures where each D stops
 improving (the best checkpoint's step), and that sets the horizons of the full study.
-Search spaces are the canonical template's, wide:
+Search spaces are wide, at the user's request for this study (2026-09-30: "general and wide,
+like the ones we were doing before", to be narrowed once patterns show), so the lr window is
+one decade either side instead of CLAUDE.md's half decade:
   scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima), the
                       template's lambda, warm-up, eta_min, EMA
   fine-tune           training.lr fixed at the pretrain's best, fine_tune.lr_scale [0.1, 10],
@@ -43,6 +50,7 @@ lr_star = lambda t: float(np.exp(np.interp(np.log(t), np.log(ts), lr_row)))
 
 FIXED = {
     "data.source": "recipes", "data.require_cache": "false", "data.eval_subsample": 10000,
+    "data.fit_stats_on_pool": "true",
     "data.preprocess_per_dataset": "true", "data.signedlog_quantile": 0.01, "data.seed": 42,
     "data.use_PIDs": "false", "data.spin_onehot": "true", "data.color_onehot": "true",
     "data.prop_is_massless": "true", "data.standardize_props": "true",

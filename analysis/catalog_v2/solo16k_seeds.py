@@ -41,7 +41,8 @@ for (fig, ax), p in zip(figs, PROCS):
     for k, s in enumerate([42] + SEEDS):
         y = Y[k]; t = np.array(STEPS, float)
         ax.plot(t, y, marker="o", ls="-" if s == 42 else ":", color=COLS[s], label="sweep best (seed 42)" if s == 42 else f"seed {s}")
-        f = fit_power_law_with_floor(t, y) if np.isfinite(y).sum() >= 4 else None
+        ok = np.isfinite(y)
+        f = fit_power_law_with_floor(t[ok], y[ok]) if ok.sum() >= 4 else None
         al.append(f[1] if f else np.nan)
     ALPHA[p] = np.array(al)
     ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("optimizer steps (bs 16384)"); ax.set_ylabel(r"MSE($\log|\mathcal{M}|^2$)")

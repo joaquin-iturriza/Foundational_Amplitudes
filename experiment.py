@@ -1374,6 +1374,16 @@ class AmplitudeExperiment(BaseExperiment):
         # (mmap slice — the full file is never read). None = load all.
         train_cap = self.cfg.data.get("train_subsample", None)
         eval_cap  = self.cfg.data.get("eval_subsample", None)
+        # data.fit_stats_on_pool: every normalization and target decision (momentum scale,
+        # amplitude transform and mean/std, the propagator factors) is fitted on the whole
+        # train pool, and only then is the train split cut to its first `train_subsample`
+        # events. A data-scaling grid over train_subsample then keeps ONE target and one
+        # loss unit at every D instead of refitting them on D events.
+        stats_on_pool = bool(self.cfg.data.get("fit_stats_on_pool", False)) \
+            and train_cap not in (None, "null", "none")
+        train_keep = int(train_cap) if stats_on_pool else None
+        if stats_on_pool:
+            train_cap = None
         cap_for   = {"train": train_cap, "val": eval_cap, "test": eval_cap}
 
         # --- load every (role, process); boost+augment momenta (no scale yet) ---
@@ -1600,6 +1610,16 @@ class AmplitudeExperiment(BaseExperiment):
             f"using trafos={amp_trafos} (train-only stats); "
             f"means={[f'{m:.3f}' for m in prepd_means]}"
         )
+
+        if train_keep is not None:
+            for n in names:
+                rec = store[("train", n)]
+                N = rec["raw_amp"].shape[0]
+                for key, val in list(rec.items()):
+                    if isinstance(val, np.ndarray) and val.shape[:1] == (N,):
+                        rec[key] = val[:train_keep]
+            LOGGER.info(f"fit_stats_on_pool: stats and target fitted on the full train pools, "
+                        f"train split cut to the first {train_keep} events per process")
 
         # --- assemble combined flat arrays, role-contiguous (train|val|test) ---
         # Vectorized per dataset (no per-event Python list), so this scales to
