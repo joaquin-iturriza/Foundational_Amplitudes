@@ -39,6 +39,11 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 PRE, PROBES = "ee_uu", ["ee_ddbar", "uubar_gg"]
 # the multiplicity chapter's fine-tune targets (the user's choice): scratch curves only, for now
 Z_FAMILY = ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
+# the ladder's probes, one or two per structure (EW t-channel, external photon, gluon exchange,
+# masses, one loop): scratch curves only, for now. The one-loop pools hold 5e4 train events, so
+# their grid stops at k = 9.
+LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo"]
+K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9}
 KS = range(2, 11)                                  # D = 10^(k/2)
 T_PRE = 32000                                     # ee->dd~ at 1e5 events still improved at 16k
 # Horizons from the calibration (analysis/transfer/calib_ee_ddbar.json, one fixed-HP run per D):
@@ -122,8 +127,10 @@ def main():
     if a.ft is None:
         out.append(write(f"tp_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
                          head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
-        for p in PROBES + Z_FAMILY:
+        for p in PROBES + Z_FAMILY + LADDER:
             for k in KS:
+                if k > K_MAX.get(p, 10):
+                    continue
                 out.append(write(f"tp_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
