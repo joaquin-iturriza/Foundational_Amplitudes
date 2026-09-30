@@ -14,7 +14,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.000157,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 3,
@@ -31,7 +37,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.000281,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 4,
@@ -48,7 +60,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.000497,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 5,
@@ -65,7 +83,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.000883,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 6,
@@ -82,7 +106,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.00102,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 7,
@@ -99,7 +129,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.00182,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 8,
@@ -116,7 +152,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.000912,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 9,
@@ -133,7 +175,13 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.00162,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  },
  {
   "k": 10,
@@ -150,6 +198,12 @@
     "log",
     "standardization"
    ]
-  ]
+  ],
+  "hp": {
+   "lr": 0.00165,
+   "cosanneal_warmup_frac": 0.1,
+   "regularization_lambda": 1e-08,
+   "cosanneal_eta_min": 1e-08
+  }
  }
 ]

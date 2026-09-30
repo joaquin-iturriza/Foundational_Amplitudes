@@ -28,7 +28,7 @@ def cells(p):
     for name, trials in S.items():
         if name.startswith(f"tp_scr_{p}_d") and trials:
             k = int(name.split("_d")[-1].split("_")[0])
-            out[k] = trials
+            out.setdefault(k, []).extend(trials)       # a resubmitted cell (_002) adds its trials
     return dict(sorted(out.items()))
 
 

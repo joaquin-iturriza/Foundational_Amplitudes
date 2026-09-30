@@ -50,7 +50,9 @@ T_PRE = 32000                                     # ee->dd~ at 1e5 events still 
 # a cell whose best checkpoint came early, while the lr was still high, gets 1.1x that step, so the
 # cosine anneal lands where it had converged (the user's rule, 2026-09-30); a cell whose best
 # checkpoint was at the end of its 8000 steps keeps 8000. k = 9, 10 were limited by the horizon and
-# wait on the 32k/64k ladder.
+# wait on the 32k/64k ladder. The horizons are measured on ee->dd~ and applied to every probe: the
+# user's call (2026-09-30: "once we figure it out for one I don't expect that to change much for the
+# other targets"), to be revisited where a probe's best trials all sit at the end of the horizon.
 T_CELL = {2: 176, 3: 704, 4: 2816, 5: 4576, 6: 8000, 7: 8000, 8: 8000, 9: 16000, 10: 16000}
 SETTLED = [2, 3, 4, 5, 6, 7, 8]
 N_TRIALS, N_STARTUP = 8, 3
