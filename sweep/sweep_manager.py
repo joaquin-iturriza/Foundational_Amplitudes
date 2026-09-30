@@ -54,6 +54,7 @@ them. Registry defaults to ~/.sweep_manager/registry.json (override --registry).
 
 import argparse
 import json
+import math
 import os
 import subprocess
 import sys
@@ -65,6 +66,9 @@ import siteconf
 
 DEFAULT_REGISTRY = os.path.expanduser("~/.sweep_manager/registry.json")
 DEFAULT_ROUND_GAP = 100_000   # priority penalty per round; bump if fairshare swings dominate
+DURATION_NICE_PER_MIN = 1_000 # chained submissions: nice per minute a sweep's trials are shorter than the longest
+DEFAULT_CAPACITY = 30         # GPUs a chained batch should keep busy (site pick's "at once"; override --capacity)
+MAX_CHAIN_WIDTH = 3           # a lone sweep must not run every trial at once just because GPUs are free
 
 
 # --------------------------------------------------------------------------- #
@@ -284,11 +288,37 @@ def assign_rounds(items_by_sweep, weights):
     return tagged
 
 
+def _sweep_facts(sweep_dir):
+    """(n_startup, expected trial minutes) from the sweep's own config: DyHPO's random start-up
+    count, and the job's time limit (the trial length the generator sized it for)."""
+    import yaml
+    cfg = {}
+    path = os.path.join(sweep_dir, "sweep_config.yaml")
+    if os.path.exists(path):
+        with open(path) as f:
+            cfg = yaml.safe_load(f) or {}
+    n_startup = int((cfg.get("dyhpo") or {}).get("n_startup", 3))
+    t = str((cfg.get("cluster") or {}).get("time", "01:00:00"))
+    days = 0
+    if "-" in t:
+        d, t = t.split("-", 1); days = int(d)
+    hms = [int(x) for x in t.split(":")]
+    while len(hms) < 3:
+        hms.insert(0, 0)
+    return n_startup, days * 1440 + hms[0] * 60 + hms[1] + hms[2] / 60
+
+
+def duration_nice(minutes, longest):
+    """Longer trials first: a sweep's nice grows with how much shorter its trials are than the
+    longest in the batch, so a GPU that frees up takes an hour-long trial before a 5-minute one."""
+    return int(max(0.0, longest - minutes) * DURATION_NICE_PER_MIN)
+
+
 # --------------------------------------------------------------------------- #
 # Commands
 # --------------------------------------------------------------------------- #
 def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=False,
-                  seq_batches=None):
+                  seq_batches=None, chain=True, capacity=None):
     """Submit one or more sweeps, interleaved across them by round.
 
     Importable entry point used by the generate_*.py scripts. `sweep_dirs` are
@@ -306,6 +336,15 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     k+1 only starts once wave k has finished (and therefore observed). Default: 3
     waves when a single sweep is submitted (no cross-sweep interleaving to rely on),
     1 (off) when several sweeps are co-submitted. Pass an int to force, or 1 to disable.
+
+    Chained submission (`chain`, the default): `nice` only orders the queue, so with free GPUs
+    every round starts at once and DyHPO suggests blind. Instead each sweep's trials are chained:
+    its `n_startup` random trials run together, the first informed trial waits for all of them,
+    and every later trial waits (afterany) for the trial `W` places before it in the same sweep.
+    W = min(3, ceil(capacity / n_sweeps)), so the batch still keeps `capacity` GPUs busy and finishes in
+    about the same time, while every suggestion sees all but the W-1 most recent results. Queue
+    order is then by trial length, longest first (duration_nice), not by round. `seq_batches`
+    applies only with chain=False.
     """
     reg = load_registry(registry)
     gap = reg["round_gap"]
@@ -339,6 +378,13 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
 
     weights = {s: reg["sweeps"][s]["weight"] for s in new_items}
     ordered = assign_rounds(new_items, weights)
+
+    if chain:
+        _submit_chained(new_items, reg, registry, sweep_dep, capacity or DEFAULT_CAPACITY, dry_run)
+        if not dry_run:
+            save_registry(registry, reg)
+            _rebalance(reg, registry, gap, dry_run=dry_run)
+        return
 
     # Sequential-batch fallback: default 3 waves for a lone sweep, off for multi-sweep.
     if seq_batches is None:
@@ -405,6 +451,62 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         _rebalance(reg, registry, gap, dry_run=dry_run)
 
 
+def _submit_chained(new_items, reg, registry, sweep_dep, capacity, dry_run):
+    """Chained submission (see submit_sweeps). Trials are submitted longest sweep first, round by
+    round across sweeps, so a submit cap cuts the tail of every sweep evenly."""
+    facts = {sw: _sweep_facts(reg["sweeps"][sw]["dir"]) for sw in new_items}
+    longest = max(m for _, m in facts.values())
+    width = max(1, min(MAX_CHAIN_WIDTH, math.ceil(capacity / len(new_items))))
+    order = sorted(new_items, key=lambda sw: -facts[sw][1])
+    print(f"Submitting {sum(len(v) for v in new_items.values())} trials across {len(new_items)} "
+          f"sweep(s), chained: start-up trials together, then width {width} per sweep "
+          f"(capacity {capacity}), longest trials first:")
+    jobs_of = {sw: [] for sw in new_items}      # submitted job ids by position in the sweep
+    # trials already submitted earlier (a resumed submit): chain onto the last ones
+    for sw in new_items:
+        prev = sorted(reg["sweeps"][sw]["jobs"].items(), key=lambda kv: kv[1]["trial_idx"])
+        jobs_of[sw] = [jid for jid, _ in prev]
+    depth = max(len(v) for v in new_items.values())
+    for j in range(depth):
+        for sw in order:
+            items = new_items[sw]
+            if j >= len(items):
+                continue
+            idx, script = items[j]
+            n_startup, minutes = facts[sw]
+            pos = len(jobs_of[sw])                     # this trial's position in the sweep
+            nice = duration_nice(minutes, longest)
+            deps = []
+            if sweep_dep.get(sw):
+                deps.append(f"afterok:{sweep_dep[sw]}")
+            if pos >= n_startup:
+                # the first `width` informed trials wait for every start-up trial; later ones
+                # for the trial `width` places back
+                before = jobs_of[sw][:n_startup] if pos - width < n_startup else [jobs_of[sw][pos - width]]
+                if before:
+                    deps.append("afterany:" + ":".join(before))
+            cmd = ["sbatch", "--parsable", f"--nice={nice}"]
+            if deps:
+                cmd.append("--dependency=" + ",".join(deps))
+            cmd.append(script)
+            try:
+                out = _run(cmd, dry_run=dry_run)
+            except RuntimeError as e:
+                if "SubmitJobPerUserLimit" not in str(e):
+                    if not dry_run: save_registry(registry, reg)
+                    raise
+                print("  submit limit reached; the rest stays unsubmitted, `submit` again when the queue drains")
+                return
+            jid = out.split(";")[0].strip() if out else f"DRY{sw}{idx}"
+            jobs_of[sw].append(jid)
+            if not dry_run:
+                reg["sweeps"][sw]["jobs"][jid] = {"trial_idx": idx, "script": script, "round": pos,
+                                                  "nice": nice, "chained": True}
+                reg["sweeps"][sw]["submitted_scripts"].append(script)
+                save_registry(registry, reg)
+            print(f"  {sw}  trial_{idx:04d}  pos {pos}  nice={nice}  deps={','.join(deps) or '-'}  job={jid}")
+
+
 def adopt(sweep_dirs, registry=DEFAULT_REGISTRY):
     """Record trials that are in the queue but not in the registry (a submission that died
     before saving), matched by script path, so a later `submit` does not queue them twice."""
@@ -438,7 +540,7 @@ def rebalance(registry=DEFAULT_REGISTRY, dry_run=False):
 def cmd_submit(args):
     submit_sweeps(args.sweep_dirs, weight=args.weight,
                   registry=args.registry, dry_run=args.dry_run,
-                  seq_batches=args.seq_batches)
+                  seq_batches=args.seq_batches, chain=args.chain, capacity=args.capacity)
 
 
 def cmd_rebalance(args):
@@ -454,7 +556,7 @@ def _rebalance(reg, registry_path, gap, dry_run=False):
         pend = [
             (info["trial_idx"], jid)
             for jid, info in entry["jobs"].items()
-            if states.get(jid) == "PENDING"
+            if states.get(jid) == "PENDING" and not info.get("chained")   # chained: nice set by duration
         ]
         if pend:
             pending_by_sweep[sweep] = sorted(pend, key=lambda x: x[0])
@@ -561,6 +663,11 @@ def build_parser():
                         "multi-sweep; pass 1 to disable)")
     s.add_argument("--weight", type=int, default=None,
                    help="trials per round for these sweeps (default keeps existing/1)")
+    s.add_argument("--no-chain", dest="chain", action="store_false",
+                   help="the old round-robin nice ordering without per-sweep chaining")
+    s.add_argument("--capacity", type=int, default=None,
+                   help=f"GPUs the chained batch should keep busy (default {DEFAULT_CAPACITY}; "
+                        "site pick's 'at once' for the site)")
     s.set_defaults(func=cmd_submit)
 
     s = sub.add_parser("adopt", help="record queued trials missing from the registry")

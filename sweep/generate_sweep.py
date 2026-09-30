@@ -199,7 +199,17 @@ def write_sub(i, cfg, afs_dir, sh_path, low_fidelity=False):
     if "gpus_minimum_memory" in cluster:
         gpu_mem_line = f"gpus_minimum_memory     = {cluster['gpus_minimum_memory']}\n"
 
+    # longer trials first among my jobs (HTCondor: higher priority runs first); the trial's
+    # time limit in minutes, unless the config sets one
     priority = cluster.get("priority", None)
+    if priority is None and cluster.get("time"):
+        t = str(cluster["time"]); days = 0
+        if "-" in t:
+            d, t = t.split("-", 1); days = int(d)
+        hms = [int(x) for x in t.split(":")]
+        while len(hms) < 3:
+            hms.insert(0, 0)
+        priority = days * 1440 + hms[0] * 60 + hms[1]
     priority_line = f"priority              = {priority}\n" if priority is not None else ""
 
     # site facts arrive from sites.yaml as `flavour` / `mem` (siteconf.resolve); the old
@@ -234,17 +244,21 @@ queue
 
 
 def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
-    """HTCondor counterpart of sweep_manager's sequential waves: the startup trials first, the
-    surrogate-guided ones only after every startup trial has ended, so DyHPO fits on data
-    instead of every trial suggesting against an empty state at once. A POST script that always
-    succeeds makes the edge `afterany` (as the SLURM waves): a failed or removed startup trial
-    still releases the rest. One DAG file per submission, so --extend can submit again."""
+    """HTCondor counterpart of sweep_manager's chained submission: the startup trials run
+    together; the first `width` surrogate-guided trials wait for every startup trial, and each
+    later one for the trial `width` places before it, so every suggestion sees all but the
+    width-1 most recent results. width = cluster.chain_width (default 2: a few sweeps side by
+    side then fill a site's free GPUs). A POST script that always succeeds makes each edge
+    `afterany`: a failed or removed trial still releases the next. One DAG file per submission,
+    so --extend can submit again."""
     n_first = max(1, min(int(cfg.get("dyhpo", {}).get("n_startup", 3)), len(sub_paths)))
+    width = max(1, int(cfg.get("cluster", {}).get("chain_width", 2)))
     names = [os.path.splitext(os.path.basename(p))[0] for p in sub_paths]
     lines = [f"JOB {n} {p}" for n, p in zip(names, sub_paths)]
-    if len(names) > n_first:
-        lines += [f"SCRIPT POST {n} /bin/true" for n in names[:n_first]]
-        lines.append(f"PARENT {' '.join(names[:n_first])} CHILD {' '.join(names[n_first:])}")
+    lines += [f"SCRIPT POST {n} /bin/true" for n in names[:-1]]
+    for j in range(n_first, len(names)):
+        parents = names[:n_first] if j - width < n_first else [names[j - width]]
+        lines.append(f"PARENT {' '.join(parents)} CHILD {names[j]}")
     path = os.path.join(afs_dir, f"sweep_{first_idx:04d}.dag")
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
