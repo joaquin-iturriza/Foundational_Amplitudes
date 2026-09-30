@@ -12,7 +12,7 @@ import siteconf
 
 prefix = sys.argv[1]
 out = {}
-for sdir in sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, prefix + "*"))):
+for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):   # = SWEEP_DIR except on lxplus (EOS)
     name = os.path.basename(sdir)
     trials = []
     for rp in sorted(glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))):
