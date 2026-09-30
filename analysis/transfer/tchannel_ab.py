@@ -6,7 +6,8 @@ data.target_propagator_tchannel=true/false). Loss is MSE of log|M|^2 at the best
 compare directly).
   <base>_a  loss per probe and D, factor on vs off
   <base>_b  validation curves of uu~->gg at D = 10^4, on vs off
-Data: analysis/transfer/tchannel_ab.json (the *tchannel* runs of collect_calib.py on lxplus).
+Data: analysis/transfer/tchannel_ab.json: the 16 A/B runs, collect_calib.py on lxplus, names with a
+target_propagator_tchannel override at 8000 steps.
     python analysis/transfer/tchannel_ab.py
 """
 import json, os, re, sys
