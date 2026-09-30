@@ -206,7 +206,8 @@ def write_sub(i, cfg, afs_dir, sh_path, low_fidelity=False):
     # hand-written configs spelled them job_flavour / request_memory
     request_memory = cluster.get("request_memory", cluster.get("mem"))
     memory_line = f"request_memory        = {request_memory}\n" if request_memory is not None else ""
-    flavour = cluster.get("job_flavour", cluster.get("flavour", "tomorrow"))
+    flavour = cluster.get("job_flavour") or condor_flavour(cluster.get("time")) \
+        or cluster.get("flavour", "tomorrow")
 
     name = f"trial_{i:04d}"
     content = f"""\
@@ -248,6 +249,28 @@ def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
     return path
+
+
+# lxplus HTCondor flavours and their wall-time limits (seconds): a trial is sent to the shortest
+# one its `time` fits, since the long flavours get far fewer GPU slots (a 30-min trial sent as
+# `tomorrow` sat idle while `workday` jobs started at once).
+CONDOR_FLAVOURS = [("espresso", 1200), ("microcentury", 3600), ("longlunch", 7200),
+                   ("workday", 28800), ("tomorrow", 86400), ("testmatch", 259200), ("nextweek", 604800)]
+
+
+def condor_flavour(time_str):
+    """Shortest flavour whose limit covers `time_str` ("HH:MM:SS" or "D-HH:MM:SS"); None if unset."""
+    if not time_str:
+        return None
+    t = str(time_str)
+    days = 0
+    if "-" in t:
+        d, t = t.split("-", 1); days = int(d)
+    parts = [int(x) for x in t.split(":")]
+    while len(parts) < 3:
+        parts.insert(0, 0)
+    secs = days * 86400 + parts[0] * 3600 + parts[1] * 60 + parts[2]
+    return next((f for f, lim in CONDOR_FLAVOURS if secs <= lim), CONDOR_FLAVOURS[-1][0])
 
 
 def prompt_yes_no(msg):
