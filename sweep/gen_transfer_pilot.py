@@ -143,9 +143,15 @@ def main():
     ap.add_argument("--probes", nargs="*", help="only these probes (default: all)")
     ap.add_argument("--pretrain", action="store_true", help="also (re)write the pretrain config")
     ap.add_argument("--steered", action="store_true", help="write the steered-pool scratch configs (tps_scr_)")
+    ap.add_argument("--bw-off", action="store_true",
+                    help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
+                         "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
+    pfx = "tp3" if a.bw_off else "tp2"
+    if a.bw_off:
+        FIXED["data.target_propagators"] = "false"
     if a.steered:
         for p, (recipe, extra) in STEERED.items():
             for k in SETTLED:
@@ -154,13 +160,13 @@ def main():
                                  head=f"Transfer study, scratch on the sigma-steered pool: {p} on D = 10^{k / 2:g} events."))
     elif a.ft is None:
         if a.pretrain:
-            out.append(write(f"tp_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
+            out.append(write(f"{'tp' if pfx == 'tp2' else pfx}_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
                              head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
         for p in only(PROBES + Z_FAMILY + LADDER):
             for k in KS:
                 if k > K_MAX.get(p, 10):
                     continue
-                out.append(write(f"tp2_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
+                out.append(write(f"{pfx}_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
@@ -170,7 +176,7 @@ def main():
                     {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
         for p in only(PROBES):
             for k in KS:
-                out.append(write(f"tp2_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
+                out.append(write(f"{pfx}_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own"},
                                  head=f"Transfer pilot, fine-tune from {PRE}: {p} on D = 10^{k / 2:g} events."))
