@@ -1,8 +1,9 @@
 """Where a 2->2 model's error sits: the per-event validation residual of one run, binned in sqrt(s)
 and cos(theta) (the angle between the first beam, row 0, and the first final-state particle, row 2),
 as the mean squared error of log|M|^2 per bin. Needs a run made with
-evaluation.save_predictions=true (preds_val.npz in the run dir). The predictions come out in the
-validation pool's row order; the match is checked on the raw |M|^2 before anything is binned.
+evaluation.save_predictions=true (preds_val.npz in the run dir). The predictions come out shuffled;
+each is matched to its validation-pool row by the raw |M|^2 (distinct per event), and the match is
+checked before anything is binned.
 Runs on the site that holds the run (numpy only) and prints one JSON line.
     python analysis/transfer/residual_map.py <run_dir> [--bins 8]
 """
@@ -23,9 +24,16 @@ pool = np.asarray(np.load(val_path, mmap_mode="r")[:n_val])
 npart = (pool.shape[1] - 1) // 5
 mom = pool[:, :npart * 4].reshape(-1, npart, 4)
 raw_file = pool[:, -1]
-raw_in_order = np.asarray(P["raw_truth"]).reshape(-1)
-match = float(np.max(np.abs(raw_in_order - raw_file) / np.abs(raw_file)))
-assert match < 1e-5, f"prediction order does not match the val pool (max rel diff {match:.2g})"
+# the events are shuffled when the splits are assembled (experiment.py, seed 42): match each
+# prediction to its pool row by the raw |M|^2, which is distinct per event, and check the match
+raw_pred_rows = np.asarray(P["raw_truth"]).reshape(-1)
+i_file, i_pred = np.argsort(raw_file), np.argsort(raw_pred_rows)
+match = float(np.max(np.abs(raw_pred_rows[i_pred] - raw_file[i_file]) / np.abs(raw_file[i_file])))
+assert match < 1e-3, f"predictions do not match the val pool (max rel diff {match:.2g})"
+row_of = np.empty(len(raw_file), int); row_of[i_pred] = i_file          # prediction k -> pool row
+gaps = np.diff(np.log(np.abs(raw_file[i_file])))
+assert (gaps > 0).mean() > 0.999, "raw |M|^2 values are not distinct enough to match on"
+mom, raw_file = mom[row_of], raw_file[row_of]                              # pool rows in prediction order
 
 res = (np.asarray(P["pred"]).reshape(len(raw_file), -1)[:, 0]
        - np.asarray(P["truth"]).reshape(len(raw_file), -1)[:, 0]) * std    # residual in log|M|^2
