@@ -4,6 +4,8 @@ two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-
   pretrain   tp_pre_ee_uu              ee_uu, 100k train events, T_PRE steps
   scratch    tp2_scr_<probe>_d<k>      probe alone on the first D train events
   fine-tune  tp2_ft_<probe>_d<k>       the same, from the pretrain's best checkpoint
+  tp3_       the same with data.target_propagators off, no Breit-Wigner factor either (--bw-off)
+  tps_scr_   scratch on a sigma-steered pool (--steered)
 The t-channel target factor is off (tp2_): on uu~->gg, uu~->Zg, ee->Za it set a floor near 1e-5
 that switching it off removes, 10-290x lower at the same HPs (analysis/transfer/tchannel_ab.py);
 the tp_ sweeps ran with it on and stay valid only for probes without a massless t/u-channel
@@ -149,6 +151,9 @@ def main():
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
+    # the steered arm keeps its probe's current target (ee_WW: the t-channel factor on), so --bw-off never
+    # rewrites it
+    assert not (a.bw_off and a.steered), "--bw-off and --steered write different families; run them apart"
     pfx = "tp3" if a.bw_off else "tp2"
     if a.bw_off:
         FIXED["data.target_propagators"] = "false"
