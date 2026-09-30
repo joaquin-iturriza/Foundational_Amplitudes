@@ -1011,7 +1011,9 @@ class BaseExperiment:
             # β and would make any sweep over heterosc_beta a pure argmin-β).
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
             result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0,
-                      "best_step": int(smallest_val_loss_step) + 1}
+                      "best_step": int(smallest_val_loss_step) + 1,
+                      "validate_every": int(self.cfg.training.validate_every_n_steps),
+                      "val_curve": [float(x) for x in self.val_loss_no_reg]}
             result.update(self._result_extra())
             with open(result_path, "w") as _f:
                 json.dump(result, _f)
