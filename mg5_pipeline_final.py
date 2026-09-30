@@ -3081,7 +3081,10 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
 def recipe_output_path(recipe, out_dir):
     role_tag = f"_{recipe['role']}" if recipe.get("role") else ""
     # a shaped (mixture) pool never shares a path with the flat pool of the same spec
-    samp_tag = "_smix" if (recipe.get("sampling") or {}).get("mode", "flat") != "flat" else ""
+    mode = (recipe.get("sampling") or {}).get("mode", "flat")
+    # a steered pool (tools/steer_pool.py) has its own tag: it is built from a reference model's
+    # sigma, never by this generator, and must not shadow the mixture pool of the same spec
+    samp_tag = {"flat": "", "steered": "_ssteer"}.get(mode, "_smix")
     return (f"{out_dir}/{recipe['process']}"
             f"_{recipe['sqrts_min']:.0f}-{recipe['sqrts_max']:.0f}GeV"
             f"{role_tag}{samp_tag}_amplitudes.npy")
@@ -3112,6 +3115,10 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
+    if (recipe.get("sampling") or {}).get("mode") == "steered":
+        raise RuntimeError(
+            f"{output_file}: a steered pool is not generated here; build it with tools/steer_pool.py "
+            f"(recipe_id {wanted_id})")
     seed, role = recipe.get("seed"), recipe.get("role")
     if seed is None:
         print("[WARN] recipe has no seed: dataset will NOT be reproducible.")

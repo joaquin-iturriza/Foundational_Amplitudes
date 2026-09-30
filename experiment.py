@@ -1638,6 +1638,9 @@ class AmplitudeExperiment(BaseExperiment):
         role_amp, role_pid, role_order = [], [], []
         role_resarg = []   # per-event resonance arg (√s − m), when resonance_per_event
         role_counts = {}
+        # each role's shuffle: position i of the role holds row _role_perm[role][i] of the role's
+        # concatenated pools (save_predictions writes it as pool_row)
+        self._role_perm = {}
         # Production off-shellness feed (s_prop − M², direct) takes precedence over the
         # s-channel √s−m diagnostic when both are on.
         _want_offshell = (self._offshell_per_event and self._use_internal_mass_scalars
@@ -1738,6 +1741,7 @@ class AmplitudeExperiment(BaseExperiment):
             if _want_offshell:
                 role_offshell.append(np.concatenate(ev_offshell, axis=0)[perm])
             role_counts[role] = offs.shape[0]
+            self._role_perm[role] = perm
 
         # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
         # zero-copy across all loaders instead of copying per loader.
@@ -2215,12 +2219,14 @@ class AmplitudeExperiment(BaseExperiment):
                 if not have and self.n_datasets == 1:
                     # a single process never fills proc_preds (no per-process loaders): take the
                     # single-dataset pass concat_split falls back to. The events come in the
-                    # split's shuffled order (seed 42), not the pool's: analysis/transfer/
-                    # residual_map.py matches them back to pool rows by the raw |M|^2
+                    # split's shuffled order (seed 42), not the pool's; pool_row maps each back
+                    # to its row in the split's pool file (the loaders iterate each split in order)
                     pred, truth, _, _, _, (raw_truth, raw_pred) = concat_split(split)
+                    perm = getattr(self, "_role_perm", {}).get(split)
+                    extra = dict(pool_row=perm[:pred.shape[0]]) if perm is not None else {}
                     out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
                     np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth, raw_pred=raw_pred,
-                                        process_id=np.zeros(pred.shape[0], int), names=np.array(names[:1]))
+                                        process_id=np.zeros(pred.shape[0], int), names=np.array(names[:1]), **extra)
                     LOGGER.info(f"Saved {pred.shape[0]} {split} predictions to {out}")
                     continue
                 if not have:

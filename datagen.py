@@ -433,6 +433,10 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
             f"not prebuilt at {out} (recipe_id={wanted}). Run the prebuild "
             f"job first: sbatch prebuild_recipes.sh <spec.yaml>.")
 
+    if (recipe.get("sampling") or {}).get("mode") == "steered":
+        raise RuntimeError(f"{out}: a steered pool is not generated here; build it with "
+                           f"tools/steer_pool.py (recipe_id {wanted})")
+
     # NLO α_s scan: derive from the stripped base by reweighting (ONE MadLoop run
     # per base feeds all its α_s points) instead of re-running MadLoop per point.
     if is_reweightable_virt_scan(process):

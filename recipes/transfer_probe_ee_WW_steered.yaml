@@ -1,0 +1,9 @@
+# Transfer study probe: ee_WW alone on a sigma-steered pool (tools/steer_pool.py), built once from a
+# reference model and then fixed, so every cell of the data-scaling grid trains on prefixes of the
+# same pool (docs/results.tex, sec:ladder). Candidates from the flat proposal, 20x the kept events,
+# kept prop. to sigma^3 of the reference (gamma ~ 3 is the overall optimum of the steering study,
+# sec:div-sampling); the reference is a HETEROSC scratch run on the mixture pool at D = 1e5 with the
+# t-channel factor on. val and test are steered like train.
+sampling: {mode: steered, steer_ref: tp2_calib_ee_WW_d10_t16000_lr0.003788074_target_propagator_tchannel-true_het, steer_gamma: 3, steer_oversample: 20}
+processes:
+  - {name: ee_WW, sqrts: [169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
