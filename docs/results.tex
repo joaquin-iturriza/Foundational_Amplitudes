@@ -3497,7 +3497,9 @@ the same way, a normal descent to step $200$--$250$ and then a jump by five to t
 end of the $170$-step warm-up, at peak learning rate, never recovered; no non-finite
 gradient in the second case. The factor widens the $2\to2$ targets and that tips the
 arithmetic mean at this rate, which is the joint lr/aggregation question of the full-horizon pretraining sweep, not a
-property of the factor itself.
+property of the factor itself. On a single process the factor is not a gain: fitted alone, the
+$t/u$-channel $2\to2$ probes of Sec.~\ref{sec:ladder} are $11$--$290\times$ lower without it, and
+only $ee\to W^+W^-$ (a single $\nu$ exchange) is better with it.
 
 \begin{figure}[H]
 \centering
@@ -3942,6 +3944,289 @@ signed one-loop ($50$) & $0.31$ / $0.92$ & $0.11$ / $0.22$ & $0.19$ / $0.36$ & $
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{Structure transfer: one process to one process, and the ladder}\label{sec:ladder}
+% ==========================================================================
+
+The catalog pretraining (Sec.~\ref{sec:catv2-census}) is set aside for a study built to tell
+one story with data-scaling curves. The question every part answers: if the pretraining gains a
+structure $S$, does fine-tuning improve on the targets that need $S$, and stay where it was on
+the targets that already worked? Every answer is the same measurement: for a fixed panel of
+\emph{probe} targets, never in any pretraining set, the fine-tuned loss $L(D)$ against the
+from-scratch $L(D)$ over the number of training events $D$.
+
+\paragraph{Design.} Chapter one pretrains on one $2\to2$ process ($ee\to u\bar u$) and
+fine-tunes a near probe ($ee\to d\bar d$, same topology, other couplings) and a far one
+($u\bar u\to gg$: gluons, $t/u$-channel exchange, the gluon self-coupling). The ladder then
+adds one kind of structure per rung, each probed by a target that needs it: massless
+$s$-channel; electroweak $t$-channel ($ee\to\nu_e\bar\nu_e$); external photons ($ee\to Z\gamma$);
+gluon exchange and colour ($ud\to ud$ near, $u\bar u\to gg$ far); masses ($ee\to t\bar t$,
+$ee\to W^+W^-$); multiplicity; one loop (tree/loop pairs; $ee\to b\bar b$ at one loop, whose
+tree is pretrained on, and $ee\to d\bar d$ at one loop, whose tree is not); divergences.
+The $t/u$-channel, gluon and photon structures are separate rungs, not one. Multiplicity
+is probed on the $Z+ng$ family ($u\bar u\to Zg$, $Zgg$, $Zggg$, the fine-tune targets), with
+the $W+ng$ family on the pretraining side, added one multiplicity at a time; pretraining up to
+$2\to3$ and fine-tuning $Zggg$ tests extrapolation in multiplicity. Divergences are several
+types, not only the deep-IR pools: soft and collinear emission, initial-state collinear
+($u\bar u\to Zg$ at small $p_{T,Z}$), the $t$-channel forward peak, the quasi-collinear massive
+limit (the dead cone, $ee\to b\bar bg$), narrow resonances, the $t\bar t$ threshold (Coulomb
+$1/\beta$ at one loop) and Sudakov logarithms in the one-loop finite parts. Each enters as a star
+arm (the first rung plus one axis, scored on its own probe and on the first rung's) next to the
+ladder, which shows what adding more and more structure does. The finale is the model with every
+structure against scratch on every held-out probe.
+
+\paragraph{Protocol.} Every pretraining process has $10^5$ training events (to be revisited if
+$2\times$ or $3\times$ that changes a rung) and every pretraining is trained to convergence. The
+probes run on $D=10^{k/2}$, $k=2,\dots,10$ ($10$ to $10^5$), prefixes of one shuffled $10^5$
+pool, so the smaller sets are nested in the larger; validation and test are fixed $10^4$-event
+splits at every $D$ (one-loop pools hold $5\times10^4$ training events, so their grid stops at
+$k=9$). Each $(\text{probe},D)$ cell is one single-fidelity DyHPO of $8$ trials
+(\code{sweep/gen\_transfer\_pilot.py}), searched wide at first, to be narrowed once
+patterns show: the lr window is one decade either side of $\eta^\ast(t)$ of the high-$D$
+row (Sec.~\ref{sec:lrlaw}) times $\sqrt{B/16384}$, Adam's square-root batch rule, with the
+batch $B=\min(16384,D/2)$, so the batch moves with $D$ (both the user's choice). One seed per
+cell, until the noise is known. What depends on the momenta only (their scale, and which
+propagator factors the target divides out) is fitted on the whole pool's phase-space points,
+which carry no labels (\code{data.phase\_space\_on\_pool}); the amplitude transform and its
+mean and standard deviation on the $D$ training events. A fine-tune fits its own target's
+amplitude statistics (\code{fine\_tune.target\_stats: own}); it used to inherit the parent's,
+which would have standardized $ee\to d\bar d$ with $ee\to u\bar u$'s numbers. Every loss below
+is the MSE of $\log|\mathcal M|^2$ at the best checkpoint, $\vlnr\cdot\sigma^2$ with $\sigma$
+the run's \code{prepd\_std}, the one unit across cells. Several sweeps side by side are
+submitted chained (\code{sweep\_manager submit --chain}): each sweep's three random start-up
+trials together, then every guided trial once the one $W$ places back in its sweep has
+reported, longest trials first. Before that, with free GPUs every round started at once and the
+searches were close to random over their candidate sets.
+
+\paragraph{Datasets that are the same process count once.} Two catalog trees are the same
+dataset if one $|\mathcal M|^2$ is a constant multiple of the other at every phase-space point
+up to a relabelling of the legs, since per-dataset standardization removes the constant.
+\code{tools/equal\_processes.py} evaluates both on $48$ shared points per pair ($2221$ pairs)
+and finds $18$ classes (\code{analysis/process\_equality/equal\_processes.json}), with a clean
+gap: the equal pairs agree to $2.5\times10^{-15}$, the nearest unequal pair differs by
+$2.3\times10^{-5}$. The classes: the massless flavour relabels ($ee\to u\bar u=c\bar c$, also
+$=u\bar u\to\mu^+\mu^-$ by crossing; $d\bar d=s\bar s$ with and without a gluon; $ud\to ud=cs\to
+cs$; $\nu_\mu=\nu_\tau$; $ud\to ud+\{\gamma,\gamma\gamma,g\gamma\}=us\to us+\dots$),
+$ee\to\gamma\gamma=u\bar u\to\gamma\gamma$, and $ee\to X=u\bar u\to X$ for nine colourless
+boson final states where the fermion line's couplings factor out ($ZZ$, $Z\gamma$, $ZH$,
+$Z\gamma\gamma$, \dots; not with a Higgs and more than one other boson, $\sim10^{-4}$ apart). So a
+probe's class is held out whole: with $ee\to Z\gamma$ a probe, $u\bar u\to Z\gamma$ is in no
+pretraining set. The $448$-process catalog carries about ten such duplicates.
+
+\paragraph{Horizons: calibrated on $ee\to d\bar d$, applied to every probe.} One fixed-HP run
+per $D$ at a long horizon (Fig.~\ref{fig:ladder_calib}, \code{calib\_ee\_ddbar.json}): up to
+$D=316$ the best checkpoint comes early and grows with $D$ ($160$, $640$, $2560$, $4160$ steps of
+$8000$); from $10^3$ on it is at the end of the horizon, which with the cosine anneal does not by
+itself mean undertrained. The cells that converged early, while the lr was still high, get
+$1.1\times$ their best step, so the anneal lands where they had converged ($176$, $704$, $2816$,
+$4576$ steps for $k=2$--$5$); $10^3$--$10^4$ keep $8000$ (the user's rule). The same horizons
+serve every probe (the user's call, unverified per probe). At large $D$
+(Fig.~\ref{fig:ladder_long}) $ee\to d\bar d$ keeps improving to $64$k steps
+($3.1\times10^{-7}$ at $10^{4.5}$, $1.1\times10^{-7}$ at $10^5$); the $16$k points used lr
+$1.6\times10^{-3}$, the $32$k and $64$k ones $3.0\times10^{-3}$, so only $32\to64$k is a clean
+horizon step ($1.5\times$ and $22\times$). $64$k steps is the cap for this study. On $u\bar u\to
+gg$ (the $t$-channel factor on) $16$k and $32$k steps at the search's best HPs land where $8$k did
+($0.8$--$2.3\times10^{-5}$ at $10^{3.5}$ and $10^4$): its flattening was not the horizon, and
+the validation curves jump between $10^{-5}$ and $10^{-2}$ until the anneal. The next paragraph
+finds the cause.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/calib_scaling_ee_ddbar.pdf}
+\caption{$ee\to d\bar d$ from scratch, one run per $D$ at fixed HPs (the centre of each cell's
+lr window) and a long horizon: MSE of $\log|\mathcal M|^2$ at the best checkpoint.}
+\label{fig:ladder_calib}
+\end{figure}
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/long_runs_a.pdf}\hfill\pnl{../analysis/transfer/figs/long_runs_b.pdf}}
+\caption{Loss at the best checkpoint against the horizon at large $D$, one run per point; open
+markers the $8$k-step search best of the cell. (a) $ee\to d\bar d$ at fixed HPs, the marker the
+run's lr; (b) $u\bar u\to gg$ with the $t$-channel factor on, at the cell's best search HPs for
+$10^{3.5}$ and $10^4$ and at the window centre above.}
+\label{fig:ladder_long}
+\end{figure}
+
+\paragraph{The target factors: off.} The $t$-channel factor
+(\code{data.target\_propagator\_tchannel}, adopted at the catalog working point,
+Sec.~\ref{sec:catv2-census}) set the $\sim10^{-5}$ floor of the $t/u$-channel $2\to2$ probes. At
+each cell's search HPs switching it off lowers the loss $11$--$290\times$ in all six cells of
+$u\bar u\to gg$, $u\bar u\to Zg$ and $ee\to Z\gamma$ at $D=10^3$ and $10^4$
+(\code{tchannel\_ab.json}), and three seeds per arm at $D=10^4$ do not overlap
+(Fig.~\ref{fig:ladder_ab}b; $u\bar u\to gg$ $4.6\times10^{-6}$--$1.9\times10^{-5}$ on,
+$2.0$--$9.3\times10^{-7}$ off; $ee\to Z\gamma$ $1.5$--$3.5\times10^{-5}$ against
+$4.5\times10^{-7}$--$1.1\times10^{-6}$). The spread of $\ln|\mathcal M|^2$ over the pool, which
+the run log prints before and after the factors, says why: two massless exchanges ($t$ and $u$)
+divided out of a target that does not carry the full $1/(tu)$ they assume widen it ($ud\to ud$
+$6.4\to34.4$, $u\bar u\to gg$ $3.8\to15.0$, $ee\to Z\gamma$ $4.5\to8.6$, $u\bar u\to Zg$
+$4.7\to8.3$). The one probe where it narrows the target is $ee\to W^+W^-$ ($12.9\to5.0$, the
+single $\nu$ exchange), and there it helps ($2.8\times$ at $10^3$, $4.8\times$ at $10^4$). The
+Breit--Wigner factor widens the target too (it is normalized by $M_Z^4$: $ee\to\nu_e\bar\nu_e$
+$17.7\to27.6$, $ee\to d\bar d$ $9.1\to13.2$), and with three seeds at each cell's best HPs
+(Fig.~\ref{fig:ladder_ab}a) switching it off is better in all four cells: the geometric mean
+over seeds moves by $0.67$ and $0.44$ for $ee\to d\bar d$ at $10^3$ and $10^4$ (the arms overlap)
+and by $0.41$ and $0.08$ for $ee\to\nu_e\bar\nu_e$ (at $10^4$ they do not). The factors change the
+target, so each arm is re-based to MSE of $\log|\mathcal M|^2$ with its own $\sigma$. From here on
+the study's sweeps run with the $t$-channel factor off (\code{tp2\_}); whether the Breit--Wigner
+factor goes too is open (hand-off).
+
+\paragraph{One seed is not a measurement at a cell.} The same A/B gives the seed spread at fixed
+HPs: $ee\to d\bar d$ at $D=10^4$ lands between $2.0\times10^{-6}$ and $1.5\times10^{-4}$ over
+three seeds ($75\times$) with the factor on and over $45\times$ with it off; a single-run A/B at
+default warm-up and $\lambda$ put that cell's factor-on arm at $1.7\times10^{-4}$, $100\times$
+the search's best at the same lr. Two independent $8$-trial searches of $ee\to\nu_e\bar\nu_e$,
+whose target the $t$-channel flag leaves unchanged, differ by up to $5\times$ per cell. Six of the
+$36$ seeded runs blew up after their best checkpoint (a jump of five-fold or more between two
+validations, as the catalog's $t$-channel seeds did, Sec.~\ref{sec:catv2-census}), five of them in
+a factor-off arm: $ee\to\nu_e\bar\nu_e$ at $10^3$ seeds one and two (step $3680$; the first ends
+$23\times$ above its best and never recovers), at $10^4$ seed two (step $3040$, ending $7\times$
+above), $ee\to d\bar d$ at $10^4$ seed one in both arms (steps $1760$ off, $3040$ on, ending
+$2\times$ above) and $u\bar u\to gg$ seed three off (step $3600$, $1.3\times$). They enter at their
+best checkpoint, filled in Fig.~\ref{fig:ladder_ab}. So every point of the curves below is one
+seed, a $10\times$ wiggle between neighbouring cells can be noise, and the final curves need seeds.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/seeded_ab_a.pdf}\hfill\pnl{../analysis/transfer/figs/seeded_ab_b.pdf}}
+\caption{The target factors on and off, three seeds per arm, each cell at its search's best HPs,
+$8000$ steps; the bar is the geometric mean over seeds, filled circles the seeds that blew up
+after their best checkpoint. (a) the Breit--Wigner factor, $ee\to d\bar d$ and
+$ee\to\nu_e\bar\nu_e$ at $D=10^3$ and $10^4$; (b) the $t$-channel factor, $u\bar u\to gg$ and
+$ee\to Z\gamma$ at $D=10^4$.}
+\label{fig:ladder_ab}
+\end{figure}
+
+\paragraph{$ee\to W^+W^-$: the floor is a corner.} With the $t$-channel factor on, $ee\to W^+W^-$
+barely moves from $D=10^{3.5}$ to $10^4$ ($2.8\to2.3\times10^{-5}$) while its train loss sits
+$8\times$ below test. Its validation error binned in $(\sqrt s,\cos\theta)$ ($\theta$ between the
+$e^-$ and the $W^+$; \code{residual\_map.py}, Fig.~\ref{fig:ladder_resid}) is $10^{-6}$--$10^{-7}$
+per bin except in one corner: $\cos\theta\to-1$ at the top of the $\sqrt s$ range, the $W^-$ along
+the $e^-$, the $\nu$-exchange forward peak, whose angular width $\sim m_W^2/s$ is about $1\%$ of
+the range at $1$\,TeV. The worst $1\%$ of the events carry $99\%$ of the squared error and the two
+worst, both at $\cos\theta=-1.000$ and $\sqrt s\approx890$\,GeV, off by $0.5$ in
+$\log|\mathcal M|^2$, $86\%$ of it. $ee\to Z\gamma$ (factor off) spreads its error: the worst $1\%$
+carry $24\%$. A larger $D$ adds almost no events to that corner, which is why the curve is flat in
+$D$. A candidate cause, unchecked: the factor floors $|t|$ at the pool's $10^{-3}$ quantile, and
+events that far forward may lie below the floor, where it stops removing the peak.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/residual_map_a.pdf}\hfill\pnl{../analysis/transfer/figs/residual_map_b.pdf}}
+\caption{Validation MSE of $\log|\mathcal M|^2$ per $(\sqrt s,\cos\theta)$ bin at $D=10^4$, the
+cell's best trial retrained with its predictions saved: (a) $ee\to W^+W^-$, $t$-channel factor
+on; (b) $ee\to Z\gamma$, factor off.}
+\label{fig:ladder_resid}
+\end{figure}
+
+\paragraph{The scratch curves.} Table~\ref{tab:ladder_scratch} and Fig.~\ref{fig:ladder_scratch}
+give the best trial of every cell up to $D=10^4$, with the $t$-channel factor off wherever it
+applies (the $2\to2$ probes with a massless $t/u$-channel exchange; $ee\to W^+W^-$ is shown with
+it on, pending the corner) and the Breit--Wigner factor on. Multiplicity costs the most data: at
+$D=10^4$ $u\bar u\to Zg$ is at $2.1\times10^{-7}$, $Zgg$ $1600\times$ above it and $Zggg$ another
+$13\times$ above that, both still falling steadily. The $2\to2$ trees reach
+$10^{-7}$--$10^{-6}$ by $10^4$, except $ee\to\nu_e\bar\nu_e$ ($1.2\times10^{-4}$, the widest
+target of the panel with the Breit--Wigner factor, the probe where switching it off gained
+$12\times$) and $ee\to W^+W^-$. The one-loop probes fall steeply late ($ee\to d\bar d$ at one loop
+$30\times$ from $10^3$ to $10^{3.5}$). Before the $t$-channel factor was switched off, the four
+$t/u$-channel $2\to2$ probes all flattened near $10^{-5}$ from $D\approx300$: that was the target,
+not the data.
+\begin{table}[H]
+\centering
+\caption{Scratch curves: MSE of $\log|\mathcal M|^2$ at the best checkpoint of the best of $8$
+trials per cell (\code{scratch\_sweeps.json}). $t$-channel factor off where it applies ($\dagger$),
+on for $ee\to W^+W^-$ ($\ast$); the Breit--Wigner factor on throughout.}
+\label{tab:ladder_scratch}
+\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+probe & $10$ & $10^{1.5}$ & $10^2$ & $10^{2.5}$ & $10^3$ & $10^{3.5}$ & $10^4$ \\
+\midrule
+$ee\to d\bar d$ & $0.50$ & $0.24$ & $1.8\text{e-}2$ & $2.8\text{e-}3$ & $5.4\text{e-}5$ & $4.0\text{e-}6$ & $1.4\text{e-}6$ \\
+$u\bar u\to gg^\dagger$ & $6.3\text{e-}3$ & $7.3\text{e-}4$ & $8.1\text{e-}5$ & $3.8\text{e-}6$ & $7.4\text{e-}7$ & $3.8\text{e-}7$ & $1.0\text{e-}7$ \\
+$u\bar u\to Zg^\dagger$ & $0.15$ & $1.0\text{e-}2$ & $2.5\text{e-}4$ & $8.5\text{e-}6$ & $5.8\text{e-}7$ & $5.8\text{e-}7$ & $2.1\text{e-}7$ \\
+$u\bar u\to Zgg$ & $1.1$ & $0.60$ & $0.14$ & $2.4\text{e-}2$ & $6.5\text{e-}3$ & $1.2\text{e-}3$ & $3.4\text{e-}4$ \\
+$u\bar u\to Zggg$ & $2.2$ & $0.80$ & $0.30$ & $0.10$ & $4.0\text{e-}2$ & $1.5\text{e-}2$ & $4.5\text{e-}3$ \\
+$ee\to\nu_e\bar\nu_e$ & $3.8$ & $1.5$ & $1.1$ & $8.9\text{e-}2$ & $5.3\text{e-}2$ & $4.0\text{e-}3$ & $1.2\text{e-}4$ \\
+$ee\to Z\gamma^\dagger$ & $8.9\text{e-}2$ & $1.0\text{e-}2$ & $5.0\text{e-}5$ & $1.4\text{e-}5$ & $1.0\text{e-}6$ & $3.9\text{e-}7$ & $2.3\text{e-}7$ \\
+$ud\to ud^\dagger$ & $3.1\text{e-}2$ & $2.2\text{e-}3$ & $4.4\text{e-}4$ & $4.8\text{e-}5$ & $6.8\text{e-}6$ & $2.9\text{e-}6$ & $2.2\text{e-}6$ \\
+$ee\to t\bar t$ & $5.5\text{e-}3$ & $2.8\text{e-}4$ & $2.2\text{e-}5$ & $3.1\text{e-}6$ & $2.6\text{e-}7$ & $2.2\text{e-}7$ & $1.3\text{e-}7$ \\
+$ee\to W^+W^{-\ast}$ & $3.7\text{e-}2$ & $2.9\text{e-}3$ & $6.4\text{e-}4$ & $3.5\text{e-}4$ & $2.3\text{e-}4$ & $2.8\text{e-}5$ & $2.3\text{e-}5$ \\
+$ee\to d\bar d$ (1-loop) & $4.2$ & $0.13$ & $2.2\text{e-}2$ & $8.6\text{e-}3$ & $1.3\text{e-}3$ & $4.1\text{e-}5$ & $2.0\text{e-}5$ \\
+$ee\to b\bar b$ (1-loop) & $4.4$ & $0.33$ & $0.14$ & $3.5\text{e-}2$ & $3.9\text{e-}3$ & $2.5\text{e-}5$ & $1.1\text{e-}4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/scratch_overview_a.pdf}\hfill\pnl{../analysis/transfer/figs/scratch_overview_b.pdf}}
+\caption{Scratch curves of Table~\ref{tab:ladder_scratch}, best trial per cell: (a) the chapter-one
+probes and the $Z+ng$ family, (b) the ladder probes. The open $ee\to d\bar d$ points at
+$10^{4.5}$ and $10^5$ are $16$k-step sweeps stopped after three trials, when the $64$k runs
+replaced them.}
+\label{fig:ladder_scratch}
+\end{figure}
+
+\paragraph{Chapter one: the near probe gains, the far probe loses at small $D$.} The $ee\to u\bar u$
+pretraining (one DyHPO, $8$ trials, $32$k steps, $10^5$ events; best trial lr
+$6.7\times10^{-4}$, $\vlnr=1.6\times10^{-8}$, $2.6\times10^{-7}$ in MSE of $\log|\mathcal M|^2$,
+best checkpoint at the last step) is fine-tuned on both chapter-one probes, the same cells and
+horizons as scratch, the full model retrained with layer decay (Fig.~\ref{fig:ladder_ch1}).
+$ee\to d\bar d$ gains at every $D$: $5$--$6\times$ at $10$--$10^{1.5}$, $16$--$19\times$ at
+$10^2$--$10^{2.5}$, $5\times$ at $10^3$ and $2\times$ at $10^{3.5}$--$10^4$ ($6.4\times10^{-7}$
+against $1.4\times10^{-6}$). $u\bar u\to gg$ (both arms with the $t$-channel factor off) loses
+$5$--$8\times$ at every $D$ up to $10^{2.5}$ and $1.8\times$ at $10^3$, and gains only at
+$10^{3.5}$ ($3.5\times$) and $10^4$ ($1.3\times$, $7.6\times10^{-8}$). Four consecutive cells
+losing by a similar factor is not the seed noise above, but whether it is transfer or the
+fine-tune's search (its lr is fixed at the pretraining's times $\sqrt{B/16384}$, and only
+\code{lr\_scale}$\in[0.1,10]$ and the layer decay move it) is not yet separated. The expected
+ordering, gain falling with distance, holds; that it goes negative at small $D$ was not expected.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/transfer_ch1_a.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_ch1_b.pdf}}
+\caption{Chapter one: best trial per cell from scratch and fine-tuned from the $ee\to u\bar u$
+pretraining, MSE of $\log|\mathcal M|^2$ at the best checkpoint. (a) $ee\to d\bar d$ (the
+Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor off in both).}
+\label{fig:ladder_ch1}
+\end{figure}
+
+\subsection{Hand-off: open items}\label{sec:ladder-open}
+\begin{itemize}
+  \item \textbf{The Breit--Wigner factor.} Off wins in all four seeded cells. Switching
+    \code{data.target\_propagators} off for the study means a new $ee\to u\bar u$ pretraining (a
+    fine-tune asserts the parent's flag equals its own; $8\times32$k steps, $\sim26$ GPU-h) and
+    redoing the scratch and fine-tune sweeps of the probes where it applies ($ee\to d\bar d$,
+    $ee\to\nu_e\bar\nu_e$, and any other probe whose run log lists a massive factor). Waits on the
+    user's decision.
+  \item \textbf{$ee\to W^+W^-$.} Check on CPU whether the worst validation events are exactly
+    those below the $|t|$ floor, and count the training events in the forward corner per $D$,
+    before deciding how the probe enters the study (the one probe the $t$-channel factor helps).
+  \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
+    ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
+    $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
+    (\code{analysis/hpo\_optima}) predicts a smaller batch correction than $\sqrt{B/16384}$
+    ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$).
+    Re-run the pinned cells half a decade higher, or re-centre on the surface.
+  \item \textbf{Candidate seeds.} Every sweep draws its candidate set with one seed, so all probes
+    are searched on the same points; a per-sweep seed would diversify the search at no cost.
+  \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
+    reads the validation and test amplitudes as well as the $D$ training events; with
+    \code{phase\_space\_on\_pool} it should read the training events only.
+  \item \textbf{Seeds.} The final curves need several seeds per cell (spread up to $75\times$).
+  \item \textbf{Large $D$.} One $64$k-step run per probe at $10^{4.5}$ and $10^5$ ($t$-channel
+    factor off, lr $1.2\times10^{-3}$) is running on Jean Zay and lxplus; it decides per probe
+    whether those cells get a search or already plateau. The short cells come first: the story
+    holds to $10^4$.
+  \item \textbf{Horizons per probe.} The $ee\to d\bar d$ horizons are applied to every probe
+    unverified; revisit where a probe's best trials all end at the horizon.
+  \item \textbf{$u\bar u\to gg$ at small $D$.} Separate transfer from the fine-tune search (the
+    best trials' \code{lr\_scale} and layer decay against their window edges; a wider or
+    re-centred window), and measure each probe's zero-shot loss as its distance from the
+    pretraining.
+  \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
+    order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
+    events ambiguous). Saving the pool row would remove the matching.
+  \item \textbf{The ladder rungs, the $W+ng$ pools and the star arms} are not started; the
+    pretrainings run at up to $64$k steps.
+  \item \textbf{CC} rejected three single-GPU submissions with ``Requested node configuration is
+    not available'' (they ran on Jean Zay); not investigated.
+\end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================

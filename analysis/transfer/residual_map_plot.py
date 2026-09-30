@@ -8,6 +8,7 @@ Data: analysis/transfer/residual_map_ee_WW.json, residual_map_ee_Za.json.
 """
 import json, os, sys
 import numpy as np
+from matplotlib.ticker import NullFormatter
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 import plot_style as ps
@@ -18,6 +19,8 @@ for (fig, ax), (p, lab) in zip(figs, (("ee_WW", r"$e^+e^-\to W^+W^-$"), ("ee_Za"
     M = np.array(d["mse_map"], float); M[M <= 0] = np.nan
     im = ax.pcolormesh(d["cos_edges"], d["sqrts_edges"], np.log10(M), cmap="viridis")
     ax.set_yscale("log")
+    # plain GeV ticks: the mathtext 6x10^2 labels made the pair wider than the page
+    ax.set_yticks([200, 400, 800], ["200", "400", "800"]); ax.yaxis.set_minor_formatter(NullFormatter())
     ax.set_xlabel(r"$\cos\theta$"); ax.set_ylabel(r"$\sqrt{s}$ [GeV]")
     ps.process_label(ax, lab)
     ps.colorbar(ax, im, r"$\log_{10}$ MSE$(\log|\mathcal{M}|^2)$")

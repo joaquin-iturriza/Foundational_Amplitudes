@@ -224,6 +224,10 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
   inverts claims about what was held out, hence what "zero-shot", "held-out", or
   "never seen" mean in `docs/results.tex`.
 
+- **Processes equal up to relabelling are one dataset.** `tools/equal_processes.py` (CPU, CC) finds
+  the catalog trees whose |M|² is a constant multiple of another's up to a leg relabelling (18 classes,
+  `analysis/process_equality/equal_processes.json`: massless flavour relabels, `ee_X = uubar_X` for
+  colourless bosons, ...). A held-out process is held out with its whole class.
 - **Every role of a process samples the same distribution.** A recipe entry's
   `sampling` policy (catalog_v2: the mixture) shapes train, val and test alike; the
   shaped pools carry `_smix` in their file names. Validation and test were once forced
@@ -297,7 +301,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
 | physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`. `mass_from_momenta` stays `false` (redundant, `tab:levers`). **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |
 | `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
-| target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (`docs/results.tex` catalog census, three seeds each; off by default, **switch on for the full-horizon catalog sweep**); they change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
+| target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (`docs/results.tex` catalog census, three seeds each; off by default, **switch on for the full-horizon catalog sweep**). **Not for single-process runs:** in the transfer study (`docs/results.tex` `sec:ladder`) the t-channel factor sets a ~1e-5 floor (off: 11-290x lower) and the Breit-Wigner factor loses in all four seeded cells, so the study runs the t-channel factor off (`tp2_`); they change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
 | `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` (default) / `L2` | `MSE`, `L2` fixed; the aggregation is **open at catalog scale**: the arithmetic mean wins there (`tab:agg_ab`, `tab:catv2_short_smix`, catalog hand-off) |
 | **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
