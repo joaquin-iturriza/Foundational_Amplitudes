@@ -2,8 +2,10 @@
 and cos(theta) (the angle between the first beam, row 0, and the first final-state particle, row 2),
 as the mean squared error of log|M|^2 per bin. Needs a run made with
 evaluation.save_predictions=true (preds_val.npz in the run dir). The predictions come out shuffled;
-each is matched to its validation-pool row by the raw |M|^2 (distinct per event), and the match is
-checked before anything is binned.
+each is matched to its validation-pool row by rank of the raw |M|^2, and the match is checked before
+anything is binned. Rank matching can only swap two events whose |M|^2 differ by less than the
+match precision (the saved raw_truth is float32): those are counted (n_ambiguous, the events with a
+neighbour in |M|^2 closer than twice the largest matching error) and the map is refused above 1%.
 Runs on the site that holds the run (numpy only) and prints one JSON line.
     python analysis/transfer/residual_map.py <run_dir> [--bins 8]
 """
@@ -32,7 +34,10 @@ match = float(np.max(np.abs(raw_pred_rows[i_pred] - raw_file[i_file]) / np.abs(r
 assert match < 1e-3, f"predictions do not match the val pool (max rel diff {match:.2g})"
 row_of = np.empty(len(raw_file), int); row_of[i_pred] = i_file          # prediction k -> pool row
 gaps = np.diff(np.log(np.abs(raw_file[i_file])))
-assert (gaps > 0).mean() > 0.999, "raw |M|^2 values are not distinct enough to match on"
+close = gaps < 2 * match                                                    # a swap is possible here
+amb = np.zeros(len(raw_file), bool); amb[:-1] |= close; amb[1:] |= close
+n_amb = int(amb.sum())
+assert n_amb <= 0.01 * len(raw_file), f"{n_amb} events are closer in |M|^2 than the match precision"
 mom, raw_file = mom[row_of], raw_file[row_of]                              # pool rows in prediction order
 
 res = (np.asarray(P["pred"]).reshape(len(raw_file), -1)[:, 0]
@@ -59,7 +64,8 @@ for i in range(a.bins):
             share[i, j] = sq[sel].sum() / sq.sum()
 top = np.argsort(sq)[::-1][:20]
 print(json.dumps(dict(
-    process=name, n=int(len(sq)), mse=float(sq.mean()), order_match=match,
+    run_dir=os.path.abspath(a.run_dir), process=name, n=int(len(sq)), mse=float(sq.mean()),
+    order_match=match, n_ambiguous=n_amb,
     sqrts_edges=se.tolist(), cos_edges=ce.tolist(), mse_map=np.nan_to_num(mse, nan=-1).tolist(),
     count_map=cnt.tolist(), share_map=share.tolist(),
     share_top1pct=float(np.sort(sq)[::-1][:max(1, len(sq) // 100)].sum() / sq.sum()),

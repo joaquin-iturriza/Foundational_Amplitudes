@@ -2214,7 +2214,9 @@ class AmplitudeExperiment(BaseExperiment):
                 have = [n for n in names if n in proc_preds and split in proc_preds[n]]
                 if not have and self.n_datasets == 1:
                     # a single process never fills proc_preds (no per-process loaders): take the
-                    # single-dataset pass concat_split falls back to, in the pool's row order
+                    # single-dataset pass concat_split falls back to. The events come in the
+                    # split's shuffled order (seed 42), not the pool's: analysis/transfer/
+                    # residual_map.py matches them back to pool rows by the raw |M|^2
                     pred, truth, _, _, _, (raw_truth, raw_pred) = concat_split(split)
                     out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
                     np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth, raw_pred=raw_pred,
