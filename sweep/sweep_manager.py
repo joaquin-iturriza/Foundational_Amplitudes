@@ -662,7 +662,8 @@ def build_parser():
                         "observes between waves (default: 3 for a lone sweep, 1 for "
                         "multi-sweep; pass 1 to disable)")
     s.add_argument("--weight", type=int, default=None,
-                   help="trials per round for these sweeps (default keeps existing/1)")
+                   help="trials per round for these sweeps (default keeps existing/1); "
+                        "only with --no-chain: chained jobs are ordered by trial length")
     s.add_argument("--no-chain", dest="chain", action="store_false",
                    help="the old round-robin nice ordering without per-sweep chaining")
     s.add_argument("--capacity", type=int, default=None,
@@ -677,7 +678,7 @@ def build_parser():
     s = sub.add_parser("rebalance", help="re-interleave all pending jobs")
     s.set_defaults(func=cmd_rebalance)
 
-    s = sub.add_parser("boost", help="change a sweep's weight, then rebalance")
+    s = sub.add_parser("boost", help="change a sweep's weight, then rebalance (no effect on chained submissions)")
     s.add_argument("sweep", help="sweep name")
     s.add_argument("--weight", type=int, required=True, help="new trials-per-round")
     s.set_defaults(func=cmd_boost)

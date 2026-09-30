@@ -20,6 +20,6 @@ TAG="_lr$(printf '%s\n' "$@" | sed -n 's/^training.lr=//p' | head -1)"
 # data.* overrides (an A/B arm, e.g. data.target_propagator_tchannel=false) go into the name too
 TAG="$TAG$(printf '%s\n' "$@" | sed -n 's/^data\.\([^=]*\)=\(.*\)$/_\1-\2/p' | tr -d '\n')"
 CFG=sweep/sweep_config_tp2_scr_${P}_d${K}.yaml   # t-channel factor off (tp2_)
-python sweep/run_fixed_hp.py --config "$CFG" --name tp_calib_${P}_d${K}_t${T}${TAG} --steps "$T" \
+python sweep/run_fixed_hp.py --config "$CFG" --name tp2_calib_${P}_d${K}_t${T}${TAG} --steps "$T" \
   training.cosanneal_warmup_frac=0.1 training.regularization_lambda=1e-8 \
   training.cosanneal_eta_min=1e-8 "$@"
