@@ -31,4 +31,11 @@ for f in sorted(p for d in dirs for p in glob.glob(os.path.join(d, "tp*_calib_*"
         print(f"collect_calib: {name}: unreadable ({type(e).__name__}: {e})", file=sys.stderr)
         out[name] = dict(failed=f"{type(e).__name__}: {e}", site=siteconf.SITE)
         continue
+    t, d = c["training"], c["data"]
+    out[name] = dict(val=r["val_loss"], best_step=r.get("best_step"), hours=r["traintime_hours"],
+                     std=std, curve=r.get("val_curve"), every=r.get("validate_every"),
+                     lr=t["lr"], warmup=t["cosanneal_warmup_frac"], lam=t["regularization_lambda"],
+                     eta_min=t["cosanneal_eta_min"], ema=c.get("ema"),
+                     target_propagators=d.get("target_propagators"),
+                     tchannel=d.get("target_propagator_tchannel"), site=siteconf.SITE)
 json.dump(out, sys.stdout)
