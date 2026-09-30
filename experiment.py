@@ -2212,6 +2212,15 @@ class AmplitudeExperiment(BaseExperiment):
             names = list(self.cfg.data.dataset)
             for split in ("val", "test", "train"):
                 have = [n for n in names if n in proc_preds and split in proc_preds[n]]
+                if not have and self.n_datasets == 1:
+                    # a single process never fills proc_preds (no per-process loaders): take the
+                    # single-dataset pass concat_split falls back to, in the pool's row order
+                    pred, truth, _, _, _, (raw_truth, raw_pred) = concat_split(split)
+                    out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
+                    np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth, raw_pred=raw_pred,
+                                        process_id=np.zeros(pred.shape[0], int), names=np.array(names[:1]))
+                    LOGGER.info(f"Saved {pred.shape[0]} {split} predictions to {out}")
+                    continue
                 if not have:
                     continue
                 pid = np.concatenate([np.full(proc_preds[n][split][1].shape[0], names.index(n)) for n in have])
