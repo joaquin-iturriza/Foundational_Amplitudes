@@ -4029,6 +4029,27 @@ gg$ (the $t$-channel factor on) $16$k and $32$k steps at the search's best HPs l
 ($0.8$--$2.3\times10^{-5}$ at $10^{3.5}$ and $10^4$): its flattening was not the horizon, and
 the validation curves jump between $10^{-5}$ and $10^{-2}$ until the anneal. The next paragraph
 finds the cause.
+
+\paragraph{From $D=10^{3}$ up the curves are at fixed compute.} The $ee\to d\bar d$ horizons do not
+carry over to every probe. Four probes re-run at $32$k steps at each cell's best HPs
+(Fig.~\ref{fig:ladder_horizon}, \code{horizon\_test.py}): at $D=10^{3.5}$ $ud\to ud$, $ee\to t\bar t$
+and $ee\to Z\gamma$ drop $4.3$--$4.5\times$, at $10^4$ $ee\to t\bar t$ drops $4.8\times$ and $ee\to
+Z\gamma$ $1.2\times$, and $u\bar u\to Zg$ at $10^4$ does not move; the best checkpoints sit at the last
+step, and nearly all of the gain comes in the last fifth of the anneal. Two runs diverged, both at the
+largest learning rates of the eight (tuned for $8$k steps, where the lr law wants a lower one for a
+longer horizon): $ud\to ud$ at $10^4$ at step $21851$ and $u\bar u\to Zg$ at $10^{3.5}$ at step $24794$,
+before the anneal; they are drawn at their best validation before diverging. So the flattening of the
+scratch curves between $10^{3.5}$ and $10^4$ is mostly the common $8$k-step horizon, not the data. The
+study keeps that horizon for $D=10^3$--$10^4$ (the user's call): the curves there are compared at fixed
+compute, scratch and fine-tune alike, and longer runs come only after everything else.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/horizon_test_a.pdf}\hfill\pnl{../analysis/transfer/figs/horizon_test_b.pdf}}
+\caption{The best trial of the $8$k-step search re-run at $32$k steps with the same HPs, (a) $D=10^{3.5}$,
+(b) $D=10^4$: MSE of $\log|\mathcal M|^2$ at the best checkpoint; a cross marks a run that diverged,
+at its best validation before the divergence.}
+\label{fig:ladder_horizon}
+\end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/calib_scaling_ee_ddbar.pdf}
@@ -4221,8 +4242,8 @@ Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor o
     factor off, lr $1.2\times10^{-3}$) is running on Jean Zay and lxplus; it decides per probe
     whether those cells get a search or already plateau. The short cells come first: the story
     holds to $10^4$.
-  \item \textbf{Horizons per probe.} The $ee\to d\bar d$ horizons are applied to every probe
-    unverified; revisit where a probe's best trials all end at the horizon.
+  \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
+    $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{$u\bar u\to gg$ at small $D$.} Separate transfer from the fine-tune search (the
     best trials' \code{lr\_scale} and layer decay against their window edges; a wider or
     re-centred window), and measure each probe's zero-shot loss as its distance from the
