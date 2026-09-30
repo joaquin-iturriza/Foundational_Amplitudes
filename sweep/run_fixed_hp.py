@@ -17,7 +17,15 @@ ap.add_argument("--steps", type=int, required=True); ap.add_argument("hp", nargs
 a = ap.parse_args()
 cfg = siteconf.resolve(yaml.safe_load(open(a.config)))
 cfg["sweep_name"] = a.name
-hp = {k: (int(v) if v.lstrip("-").isdigit() else float(v)) for k, v in (x.split("=", 1) for x in a.hp)}   # integers (seed) stay integers
+def _val(v):
+    """integers (seed) stay integers, numbers become floats, anything else (true/false) stays a string"""
+    if v.lstrip("-").isdigit():
+        return int(v)
+    try:
+        return float(v)
+    except ValueError:
+        return v
+hp = {k: _val(v) for k, v in (x.split("=", 1) for x in a.hp)}
 out = os.path.join(siteconf.SWEEP_DIR, a.name); os.makedirs(os.path.join(out, "results"), exist_ok=True)
 run_dir = os.path.join(siteconf.PROJECT_DIR, "runs", a.name)
 cmd = build_command(cfg, hp, run_dir, 0, os.path.join(out, "results", "fixed.json"), a.steps, increment_steps=a.steps)
