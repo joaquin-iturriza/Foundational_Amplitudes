@@ -22,7 +22,7 @@ fixed_params:
   data.source: recipes
   data.require_cache: 'false'
   data.eval_subsample: 10000
-  data.fit_stats_on_pool: 'true'
+  data.phase_space_on_pool: 'true'
   data.preprocess_per_dataset: 'true'
   data.signedlog_quantile: 0.01
   data.seed: 42
@@ -69,8 +69,8 @@ range_extension:
 search_space:
 - name: training.lr
   type: float_log
-  low: 0.000165
-  high: 0.0165
+  low: 0.000162
+  high: 0.0162
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10

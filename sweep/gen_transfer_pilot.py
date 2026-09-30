@@ -7,10 +7,12 @@ two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-
 
 D = 10^(k/2), k = 2..10 (10 ... 1e5), prefixes of one 100k pool (the pool is shuffled, so
 each prefix is a random subset and the smaller sets are nested in the larger); val and test
-are the fixed 10k splits at every D. Normalization and target (amplitude transform, mean/std,
-propagator factors) are fitted on the whole 100k train pool at every D (data.fit_stats_on_pool),
-so every cell has the same target and the same loss unit. The train batch is min(16384, D/2)
-(experiment.py caps it at half the train split), so below D = 32768 the batch shrinks with D.
+are the fixed 10k splits at every D. What depends on the momenta alone (momentum scale, which
+propagator factors the target divides out) is fitted on the whole 100k pool's phase-space
+points, which carry no labels; the amplitude transform and mean/std are fitted on the D train
+events (data.phase_space_on_pool). Every cell trains on one target, and its loss converts to
+one unit, MSE of log|M|^2 = val_loss_no_reg * prepd_std^2 (data_stats.json). The train batch is
+B = min(16384, D/2) (experiment.py caps it at half the train split): the batch moves with D.
 One single-fidelity DyHPO per cell, N_TRIALS trials, one seed (the user's call for the pilot:
 see how noisy a single seed is before adding more).
 
@@ -19,9 +21,10 @@ improving (the best checkpoint's step), and that sets the horizons of the full s
 Search spaces are wide, at the user's request for this study (2026-09-30: "general and wide,
 like the ones we were doing before", to be narrowed once patterns show), so the lr window is
 one decade either side instead of CLAUDE.md's half decade:
-  scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima), the
-                      template's lambda, warm-up, eta_min, EMA
-  fine-tune           training.lr fixed at the pretrain's best, fine_tune.lr_scale [0.1, 10],
+  scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima, measured
+                      at batch 16384) * sqrt(B/16384), Adam's square-root batch rule (the user's
+                      choice, 2026-09-30); the template's lambda, warm-up, eta_min, EMA
+  fine-tune           training.lr = the pretrain's best * sqrt(B/16384), fine_tune.lr_scale [0.1, 10],
                       fine_tune.layer_decay [0.75, 1], lambda, warm-up, eta_min, EMA;
                       amplitude stats fitted on the probe (fine_tune.target_stats=own)
 The fine-tune configs need the pretrain's best checkpoint:
@@ -50,7 +53,7 @@ lr_star = lambda t: float(np.exp(np.interp(np.log(t), np.log(ts), lr_row)))
 
 FIXED = {
     "data.source": "recipes", "data.require_cache": "false", "data.eval_subsample": 10000,
-    "data.fit_stats_on_pool": "true",
+    "data.phase_space_on_pool": "true",
     "data.preprocess_per_dataset": "true", "data.signedlog_quantile": 0.01, "data.seed": 42,
     "data.use_PIDs": "false", "data.spin_onehot": "true", "data.color_onehot": "true",
     "data.prop_is_massless": "true", "data.standardize_props": "true",
@@ -78,8 +81,12 @@ COMMON_SPACE = [
 ]
 
 
-def lr_space(T):
-    c = lr_star(T)
+def batch(k):
+    return int(min(16384, round(10 ** (k / 2)) / 2))
+
+
+def lr_space(T, k=None):
+    c = lr_star(T) * (np.sqrt(batch(k) / 16384) if k is not None else 1.0)
     return {"name": "training.lr", "type": "float_log",
             "low": float(f"{c / 10:.3g}"), "high": float(f"{c * 10:.3g}")}
 
@@ -110,7 +117,7 @@ def main():
         for p in PROBES:
             for k in KS:
                 out.append(write(f"tp_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
-                                 [lr_space(T_CELL[k])] + COMMON_SPACE,
+                                 [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
     else:
@@ -120,7 +127,7 @@ def main():
         for p in PROBES:
             for k in KS:
                 out.append(write(f"tp_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
-                                 {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": a.lr,
+                                 {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own"},
                                  head=f"Transfer pilot, fine-tune from {PRE}: {p} on D = 10^{k / 2:g} events."))
     print("\n".join(os.path.relpath(p, ROOT) for p in out))

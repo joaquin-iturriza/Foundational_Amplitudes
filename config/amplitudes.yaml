@@ -46,7 +46,7 @@ data:
  # null = load the whole pool.
  train_subsample: null
  eval_subsample: null
- fit_stats_on_pool: false   # fit stats + target on the whole train pool, then cut train to train_subsample (data-scaling grids)
+ phase_space_on_pool: false   # momentum scale + target propagators from the whole train pool's momenta, amplitude stats from the train_subsample events (data-scaling grids)
  # Example inline form:
  #   - {name: ee_uu,    sqrts: [91, 1000],  n_train: 1_000_000, n_val: 100_000, n_test: 100_000}
  #   - {name: ee_uug,   sqrts: [91, 1000],  n_train: 2_000_000, n_val: 100_000, n_test: 100_000}

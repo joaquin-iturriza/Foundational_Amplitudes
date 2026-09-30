@@ -1374,12 +1374,15 @@ class AmplitudeExperiment(BaseExperiment):
         # (mmap slice — the full file is never read). None = load all.
         train_cap = self.cfg.data.get("train_subsample", None)
         eval_cap  = self.cfg.data.get("eval_subsample", None)
-        # data.fit_stats_on_pool: every normalization and target decision (momentum scale,
-        # amplitude transform and mean/std, the propagator factors) is fitted on the whole
-        # train pool, and only then is the train split cut to its first `train_subsample`
-        # events. A data-scaling grid over train_subsample then keeps ONE target and one
-        # loss unit at every D instead of refitting them on D events.
-        stats_on_pool = bool(self.cfg.data.get("fit_stats_on_pool", False)) \
+        # data.phase_space_on_pool: what depends on the momenta alone (the momentum scale,
+        # which propagator factors the target divides out and their t-channel scale) is
+        # fitted on the whole train pool, whose phase-space points cost nothing without
+        # their amplitudes; the train split is then cut to its first `train_subsample`
+        # events, and everything that reads an amplitude (transform, mean/std) is fitted on
+        # those alone. A data-scaling grid over train_subsample then trains every cell on
+        # one target, and its loss converts to one unit (MSE of log|M|^2 = the
+        # standardized loss times prepd_std^2) without any cell seeing extra labels.
+        stats_on_pool = bool(self.cfg.data.get("phase_space_on_pool", False)) \
             and train_cap not in (None, "null", "none")
         train_keep = int(train_cap) if stats_on_pool else None
         if stats_on_pool:
@@ -1534,6 +1537,17 @@ class AmplitudeExperiment(BaseExperiment):
                         f"{n_tch} massless t-channel; pdgs {tp_pdgs}, widths {widths}); median range of "
                         f"ln|M|² on the train pools {np.median(red_before) if red_before else float('nan'):.2f} "
                         f"-> {np.median(red_after) if red_after else float('nan'):.2f}")
+        if train_keep is not None:
+            for n in names:
+                rec = store[("train", n)]
+                N = rec["raw_amp"].shape[0]
+                for key, val in list(rec.items()):
+                    if isinstance(val, np.ndarray) and val.shape[:1] == (N,):
+                        rec[key] = val[:train_keep]
+            LOGGER.info(f"phase_space_on_pool: momentum scale and target propagators fitted on the "
+                        f"full train pools' momenta, train split cut to the first {train_keep} "
+                        f"events per process before the amplitude statistics")
+
         # The amp_trafos list (e.g. signedlog) is always resolved globally so the
         # same transform is used for every process; only the standardization
         # mean/std differ between the global and per-dataset scopes.
@@ -1610,16 +1624,6 @@ class AmplitudeExperiment(BaseExperiment):
             f"using trafos={amp_trafos} (train-only stats); "
             f"means={[f'{m:.3f}' for m in prepd_means]}"
         )
-
-        if train_keep is not None:
-            for n in names:
-                rec = store[("train", n)]
-                N = rec["raw_amp"].shape[0]
-                for key, val in list(rec.items()):
-                    if isinstance(val, np.ndarray) and val.shape[:1] == (N,):
-                        rec[key] = val[:train_keep]
-            LOGGER.info(f"fit_stats_on_pool: stats and target fitted on the full train pools, "
-                        f"train split cut to the first {train_keep} events per process")
 
         # --- assemble combined flat arrays, role-contiguous (train|val|test) ---
         # Vectorized per dataset (no per-event Python list), so this scales to
