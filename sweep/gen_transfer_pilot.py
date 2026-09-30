@@ -48,6 +48,12 @@ Z_FAMILY = ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
 # their grid stops at k = 9.
 LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo"]
 K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9}
+# sigma-steered pools (tools/steer_pool.py; the user's call, 2026-09-30, after the ee->WW forward corner):
+# the same probe on a pool built once from a reference model's sigma, scratch only, D <= 1e4, on the
+# target of the probe's existing sweeps (ee->WW keeps the t-channel factor on, as its tp_scr sweeps),
+# so the sampling is the only difference. The DyHPO candidate seed is shared, so both arms search the
+# same HP points.
+STEERED = {"ee_WW": ("transfer_probe_ee_WW_steered.yaml", {"data.target_propagator_tchannel": "true"})}
 KS = range(2, 11)                                  # D = 10^(k/2)
 T_PRE = 32000                                     # ee->dd~ at 1e5 events still improved at 16k
 # Horizons from the calibration (analysis/transfer/calib_ee_ddbar.json, one fixed-HP run per D):
@@ -130,10 +136,17 @@ def main():
     ap.add_argument("--lr", type=float, help="the pretrain's best training.lr")
     ap.add_argument("--probes", nargs="*", help="only these probes (default: all)")
     ap.add_argument("--pretrain", action="store_true", help="also (re)write the pretrain config")
+    ap.add_argument("--steered", action="store_true", help="write the steered-pool scratch configs (tps_scr_)")
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
-    if a.ft is None:
+    if a.steered:
+        for p, (recipe, extra) in STEERED.items():
+            for k in SETTLED:
+                out.append(write(f"tps_scr_{p}_d{k}", recipe, T_CELL[k], [lr_space(T_CELL[k], k)] + COMMON_SPACE,
+                                 dict({"data.train_subsample": int(round(10 ** (k / 2)))}, **extra),
+                                 head=f"Transfer study, scratch on the sigma-steered pool: {p} on D = 10^{k / 2:g} events."))
+    elif a.ft is None:
         if a.pretrain:
             out.append(write(f"tp_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
                              head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
