@@ -375,6 +375,16 @@ SLURM `afterany` dependencies, so wave *k+1* only starts after wave *k* has
 `observe()`d and the (single-fidelity) Bayesian optimiser actually has data to fit.
 Multi-sweep submissions default to `--seq-batches 1` (rely on interleaving); pass
 `--seq-batches N` to force, `1` to disable.
+**Chained submission (opt-in, `sweep_manager submit --chain [--capacity N]`).** `nice` only
+orders the queue: with free GPUs every round starts at once and the guided trials suggest
+blind. `--chain` starts each sweep's `n_startup` random trials together, holds the first
+guided trials until all of them end, then each later trial until the one `W` places back ends
+(`afterany`), `W = min(3, ceil(capacity/n_sweeps))`, so many sweeps side by side still fill the
+GPUs; the queue is ordered by trial length, longest first. `--weight`/`boost` do not apply to
+chained jobs. On HTCondor the same chain is the DAG when the config sets `cluster.chain_width`
+(default: the two waves). The transfer study (`sweep/gen_transfer_pilot.py`) uses both.
+On lxplus the trial's `+JobFlavour` is the shortest that fits its `time` (a short trial as
+`tomorrow` sits idle); HTCondor priority follows the trial length.
 
 **Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
 trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
@@ -492,19 +502,18 @@ without a mechanism. The standard way on this laptop:
 
 1. Submit and capture the run id: `site submit <site|auto> FA <script>` prints
    `run FA-<site>-<id>` (and the scheduler's job id); the registry keeps both.
-2. Arm the **Monitor tool** on it (`persistent: true`; a loop that runs
-   `site poll <run>` every ~45 s and prints one line per terminal state: COMPLETED,
-   FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL), and list the watched id(s) in
-   `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh` accepts the turn ending.
-   The event notification is the source of truth; clear the marker file when the
-   job is read — and read it (`site logs <run>`) before reporting anything.
+2. Start a **background Bash waiter** (`run_in_background`): a loop that runs
+   `site poll <run>` every 60–300 s and exits once every watched run is terminal
+   (COMPLETED, FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL, HELD, REMOVED), and
+   list the watched id(s) in `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh`
+   accepts the turn ending. It notifies only when it exits, so give each event you must
+   act on (a sweep that unlocks the next step) its own waiter. Read the run
+   (`site logs <run>`) before reporting anything, and clear the marker file.
+   Background waiters survive for hours on this laptop (2026-09-30, several of 3–7 h);
+   the Monitor tool is capped at 30 min per watch, so it suits only short waits.
 
-Why not a backgrounded Bash waiter: **on this WSL2 laptop Claude Code stops
-background Bash tasks within minutes** ("low memory" with 6 GB free), so
-`scripts/wait_for_slurm.sh "$jid"` under `run_in_background` never survives a real
-job; a foreground Bash call is capped at 10 min. Both are fine only for jobs that
-finish in a few minutes. `scripts/wait_for_slurm.sh` (`POLL=<s>`, `TAIL=<n>`; no id
-⇒ all my jobs) is a waiter for a session running *on* a site, not for the laptop.
+A foreground Bash call is capped at 10 min. `scripts/wait_for_slurm.sh` (`POLL=<s>`,
+`TAIL=<n>`; no id ⇒ all my jobs) is a waiter for a session running *on* a site.
 
 - Don't `sleep`-loop or re-run `site poll` by hand across turns; an interim peek reads
   the task's output file, the completion event is what I act on.
