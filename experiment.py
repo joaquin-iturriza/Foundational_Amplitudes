@@ -1349,6 +1349,16 @@ class AmplitudeExperiment(BaseExperiment):
                 f"frozen data stats were fitted with target_propagators={_tp_stats}, "
                 f"this run sets {_tp_cfg}")
             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
+            if ft_path is not None and not self.warm_start \
+                    and str(ft.get("target_stats", "parent")) == "own":
+                # fine-tune onto a process the parent never standardized: keep the parent's
+                # momentum scale (the backbone's inputs), fit the target's own amplitude
+                # transform and mean/std on this run's train split, as a scratch run does
+                amp_trafos = amp_trafos_pp = None
+                prepd_means = prepd_stds = None
+                per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
+                LOGGER.info("Fine-tuning: amplitude stats fitted on this run's train split "
+                            "(fine_tune.target_stats=own); momentum stats from the parent")
         else:
             mom_div = mom_mean = mom_std = None
             amp_trafos = None
