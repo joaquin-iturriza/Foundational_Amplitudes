@@ -39,7 +39,13 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 PRE, PROBES = "ee_uu", ["ee_ddbar", "uubar_gg"]
 KS = range(2, 11)                                  # D = 10^(k/2)
 T_PRE = 16000
-T_CELL = {k: (2000 if k <= 5 else 4000 if k <= 7 else 8000) for k in KS}
+# Horizons from the calibration (analysis/transfer/calib_ee_ddbar.json, one fixed-HP run per D):
+# a cell whose best checkpoint came early, while the lr was still high, gets 1.1x that step, so the
+# cosine anneal lands where it had converged (the user's rule, 2026-09-30); a cell whose best
+# checkpoint was at the end of its 8000 steps keeps 8000. k = 9, 10 were limited by the horizon and
+# wait on the 32k/64k ladder.
+T_CELL = {2: 176, 3: 704, 4: 2816, 5: 4576, 6: 8000, 7: 8000, 8: 8000, 9: 16000, 10: 16000}
+SETTLED = [2, 3, 4, 5, 6, 7, 8]
 N_TRIALS, N_STARTUP = 8, 3
 SEC_PER_STEP, OVERHEAD_MIN = 0.45, 15              # bs 16384 on a V100 (gen_solo16k_configs)
 
@@ -95,7 +101,7 @@ def write(name, recipe, T, space, extra=None, head=""):
     fixed = dict(FIXED, **{"data.processes_file": f"${{PROJECT_DIR}}/recipes/{recipe}"}, **(extra or {}))
     c = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "8G",
                      "cpus_per_task": 4,
-                     "time": "%02d:%02d:00" % divmod(int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN), 60)},
+                     "time": "%02d:%02d:00" % divmod(max(30, int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN)), 60)},
          "paths": None, "sweep_name": name, "n_trials": N_TRIALS,
          "dyhpo": {"n_candidates": 200, "seed": 42, "n_startup": N_STARTUP, "total_budget": 10000},
          "fidelity_schedule": {"t_steps": [T]}, "fixed_params": fixed,

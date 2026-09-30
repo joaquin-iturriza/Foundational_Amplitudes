@@ -6,7 +6,7 @@ cluster:
   request_gpus: 1
   mem: 8G
   cpus_per_task: 4
-  time: 00:37:00
+  time: 00:30:00
 paths: null
 sweep_name: tp_scr_ee_ddbar_d2
 n_trials: 8
@@ -17,7 +17,7 @@ dyhpo:
   total_budget: 10000
 fidelity_schedule:
   t_steps:
-  - 2000
+  - 176
 fixed_params:
   data.source: recipes
   data.require_cache: 'false'
@@ -69,8 +69,8 @@ range_extension:
 search_space:
 - name: training.lr
   type: float_log
-  low: 1.57e-05
-  high: 0.00157
+  low: 6.02e-06
+  high: 0.000602
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10
