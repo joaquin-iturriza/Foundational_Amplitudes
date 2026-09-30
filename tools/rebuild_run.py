@@ -46,8 +46,11 @@ def rebuild(run_dir, role, path, n_events):
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
     real = datagen.ensure_split_set
 
-    def split(specs, r, seed, dest_dir=None, require_cache=False):
-        return {name: path} if r == role else real(specs, r, seed, dest_dir=dest_dir, require_cache=require_cache)
+    swap = role
+
+    def split(specs, role, seed, dest_dir=None, require_cache=False):     # the loader's own signature
+        return ({name: path} if role == swap else
+                real(specs, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
     datagen.ensure_split_set = split
     try:
         torch.set_default_dtype(torch.float32)
