@@ -11,4 +11,4 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 R="$1"; shift
-python analysis/transfer/cross_eval.py "$@" --recipe "$R" --role test
+python analysis/transfer/cross_eval.py --recipe "$R" "$@"          # --role test by default; --dump saves residuals
