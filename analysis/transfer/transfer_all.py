@@ -40,6 +40,15 @@ def scratch(p, k):
     return (min(vals), None) if vals else (None, None)
 
 
+def finetune(p, k):
+    """The cell's fine-tune value, chosen as scratch's: the best over its search (tp3_ftp where the probe has an internal
+    Z, else tp3_ft) and, where its best lr_scale sat at the top of [1, 100], the re-search over [10, 1000] (tp3_ftph)."""
+    ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
+    got = [best(n) for n in (ft, f"tp3_ftph_{p}_d{k}")]
+    got = [g for g in got if g[0] is not None]
+    return min(got, key=lambda g: g[0]) if got else (None, None)
+
+
 def best(name):
     tr = [t for t in S.get(name, []) if t.get("val_loss") is not None and t.get("prepd_std")]
     if not tr:
@@ -53,8 +62,7 @@ for ax, group in zip(axes.flat, GROUPS):
     for p, col in zip(group, ps.CYCLE):
         D, G, scale = [], [], []
         for k in range(2, 9):
-            ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-            (ls, _), (lf, bf) = scratch(p, k), best(ft)
+            (ls, _), (lf, bf) = scratch(p, k), finetune(p, k)
             if ls is None or lf is None:
                 continue
             D.append(10 ** (k / 2)); G.append(ls / lf); scale.append((bf.get("fine_tune") or {}).get("lr_scale"))
@@ -74,8 +82,7 @@ for part, order in (("ee", GROUPS[0] + GROUPS[1]), ("qcd", GROUPS[2] + GROUPS[3]
       for arm, col, name in (("scratch", ps.C.blue, "from scratch"), ("fine-tune", ps.C.vermillion, "fine-tuned")):
           D, L = [], []
           for k in range(2, 9):
-              ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-              l, _ = scratch(p, k) if arm == "scratch" else best(ft)
+              l, _ = scratch(p, k) if arm == "scratch" else finetune(p, k)
               if l is not None:
                   D.append(10 ** (k / 2)); L.append(l)
           ax.plot(D, L, "o-", color=col, label=name)
