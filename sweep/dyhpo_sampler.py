@@ -423,6 +423,48 @@ class DyHPOSampler:
 
         return extended
 
+    def _reencode(self):
+        """Re-encode the whole candidate pool after it or hp_space changed (features stay in [0, 1])."""
+        self.candidates_array, self.log_indicator = _encode_candidates(self.hp_space, self.candidates_raw)
+        self.algorithm.hp_candidates = _preprocess_candidates(self.candidates_array, self.log_indicator)
+        self.algorithm.nr_features = self.candidates_array.shape[1]
+
+    def extend_range(self, name: str, low: float = None, high: float = None, n_new: int = 50) -> dict:
+        """Widen one continuous HP's range on demand (check_and_extend_ranges needs more observations than a
+        short search has) and sample ``n_new`` candidates in the added zone only, the other HPs over their
+        full range. Observations are kept. Returns {'old': (low, high), 'new': (low, high)}, {} if unchanged."""
+        entry = next(e for e in self.hp_space if e['name'] == name)
+        assert entry['type'] != 'categorical', name
+        old = (entry['low'], entry['high'])
+        zones = []
+        if high is not None and high > entry['high']:
+            zones.append((entry['high'], high)); entry['high'] = high
+        if low is not None and low < entry['low']:
+            zones.append((low, entry['low'])); entry['low'] = low
+        if not zones:
+            return {}
+        self._extension_count[name] = self._extension_count.get(name, 0) + 1
+        for z, (lo, hi) in enumerate(zones):
+            space = [dict(e, low=lo, high=hi) if e['name'] == name else e for e in self.hp_space]
+            seed = (self.seed * 997 + sum(self._extension_count.values()) * 31 + z) % (2 ** 31)
+            self.candidates_raw.extend(_sample_candidates(space, n_new, seed))
+        self._reencode()
+        return {'old': old, 'new': (entry['low'], entry['high'])}
+
+    def add_observed(self, params: dict, t_steps: int, val_loss: float,
+                     proc_val_losses: Optional[dict] = None) -> int:
+        """Add a point evaluated outside this sweep (same target and fidelity) as a new candidate with its
+        result, so the surrogate learns from it. Every HP must lie inside the current ranges."""
+        for e in self.hp_space:
+            v = params[e['name']]
+            if e['type'] != 'categorical':
+                assert e['low'] * (1 - 1e-9) <= v <= e['high'] * (1 + 1e-9), (e['name'], v, e['low'], e['high'])
+        self.candidates_raw.append({e['name']: params[e['name']] for e in self.hp_space})
+        self._reencode()
+        hp_idx = len(self.candidates_raw) - 1
+        self.observe(hp_idx, t_steps, val_loss, proc_val_losses)
+        return hp_idx
+
     def report_failure(self, hp_idx: int):
         """
         Called when a trial fails before observe().  Removes hp_idx from the
