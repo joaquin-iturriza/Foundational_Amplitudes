@@ -36,14 +36,15 @@ def _pick(names):
     return min(got, key=lambda g: g[0]) if got else (None, None)
 
 
-def scratch(p, k):
-    if k >= STEERED_FROM.get(p, 99):
+def scratch(p, k, steered=True):
+    """steered=False keeps ee->WW on the mixture pool at every D (a comparison across D on one measure)."""
+    if steered and k >= STEERED_FROM.get(p, 99):
         return _pick([f"tp3s_scr_{p}_d{k}"])
     return _pick([f"{ARM[p]}_{p}_d{k}", f"tp3_scrh_{p}_d{k}", f"tp3_scrh10_{p}_d{k}"])
 
 
-def finetune(p, k):
-    if k >= STEERED_FROM.get(p, 99):
+def finetune(p, k, steered=True):
+    if steered and k >= STEERED_FROM.get(p, 99):
         return _pick([f"tp3s_ftp_{p}_d{k}"])
     if f"tp3_ftp_{p}_d{k}" in S:          # internal Z: the pretraining's off-shellness scale
         return _pick([f"tp3_ftp_{p}_d{k}", f"tp3_ftph_{p}_d{k}"])
