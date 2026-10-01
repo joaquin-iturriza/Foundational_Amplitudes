@@ -1,4 +1,4 @@
-# Transfer pilot, fine-tune from ee_uu: ee_WW on D = 10^4 events.
+# Transfer pilot, fine-tune from runs/tp3_pre_ee_uu_calib_t32000_lr0.0006702359: ee_WW on D = 10^4 events.
 # Written by sweep/gen_transfer_pilot.py.
 cluster:
   scheduler: slurm
@@ -66,7 +66,7 @@ fixed_params:
   data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_WW_steered.yaml
   data.train_subsample: 10000
   training.lr: 0.00037
-  fine_tune.pretrained_path: /eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_pre_ee_uu_calib_t32000_lr0.0006702359/models/model_run0_best.pt
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre_ee_uu_calib_t32000_lr0.0006702359/models/model_run0_best.pt
   fine_tune.target_stats: own
   fine_tune.offshell_stats: parent
   fine_tune.parent_offshell_stats: '[[8.838823743095066,0.0,0.0],[6.652852064529154,1.0,1.0]]'
