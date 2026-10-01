@@ -31,6 +31,15 @@ GROUPS = [["ee_ddbar", "ee_nnbar", "ee_ttbar", "ee_WW"], ["ee_dd_nlo", "ee_bb_nl
           ["ee_Za", "ud_ud", "uubar_gg"], ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]]
 
 
+def scratch(p, k):
+    """The cell's scratch value: the best over its search and, where its best sat at the lr window's top, the searches
+    re-run half a decade and a decade higher (tp3_scrh, tp3_scrh10; same target, checked by prepd_std). 16-24
+    trials against the fine-tune's 8, so the selection favours scratch: conservative for the gain."""
+    vals = [best(n)[0] for n in (f"{ARM[p]}_{p}_d{k}", f"tp3_scrh_{p}_d{k}", f"tp3_scrh10_{p}_d{k}")]
+    vals = [v for v in vals if v is not None]
+    return (min(vals), None) if vals else (None, None)
+
+
 def best(name):
     tr = [t for t in S.get(name, []) if t.get("val_loss") is not None and t.get("prepd_std")]
     if not tr:
@@ -45,7 +54,7 @@ for ax, group in zip(axes.flat, GROUPS):
         D, G, scale = [], [], []
         for k in range(2, 9):
             ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-            (ls, _), (lf, bf) = best(f"{ARM[p]}_{p}_d{k}"), best(ft)
+            (ls, _), (lf, bf) = scratch(p, k), best(ft)
             if ls is None or lf is None:
                 continue
             D.append(10 ** (k / 2)); G.append(ls / lf); scale.append((bf.get("fine_tune") or {}).get("lr_scale"))
@@ -66,7 +75,7 @@ for part, order in (("ee", GROUPS[0] + GROUPS[1]), ("qcd", GROUPS[2] + GROUPS[3]
           D, L = [], []
           for k in range(2, 9):
               ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-              l, _ = best(f"{ARM[p]}_{p}_d{k}" if arm == "scratch" else ft)
+              l, _ = scratch(p, k) if arm == "scratch" else best(ft)
               if l is not None:
                   D.append(10 ** (k / 2)); L.append(l)
           ax.plot(D, L, "o-", color=col, label=name)
