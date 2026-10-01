@@ -4383,7 +4383,9 @@ luck: its best trial is $5\times$ below its second. Neither the massive $s$-chan
 pretraining's topology with a mass, mean $1.2$) nor $ee\to d\bar d$ at one loop (mean $1.7$, against $6.5$ for its
 tree) inherits the near probe's gain. Away from $ee\to d\bar d$ the fine-tune runs near scratch's lr: the
 best \code{lr\_scale} is $30$ or more in $58$ of the other $77$ cells (in $ee\to d\bar d$, $2$--$8$), so for those
-probes the pretraining is little more than an initialisation that the search chooses to train away from.
+probes the pretraining is little more than an initialisation that the search chooses to train away from. These
+fine-tunes refitted the off-shellness input on the probe, which shifts it under the pretrained weights for the
+seven probes with an internal $Z$; they are being re-run with the pretraining's scale (hand-off).
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/transfer_all.pdf}
