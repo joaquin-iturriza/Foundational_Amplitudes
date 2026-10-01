@@ -214,7 +214,8 @@ def main():
             for k in KS:
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
-                out.append(write(f"{pfx}_scr{'h' if a.lr_shift else ''}_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
+                tag = "" if not a.lr_shift else "h" if a.lr_shift == 0.5 else f"h{round(a.lr_shift * 10)}"   # scrh: +0.5, scrh10: +1
+                out.append(write(f"{pfx}_scr{tag}_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
