@@ -169,14 +169,16 @@ def main():
                     help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
                          "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
     ap.add_argument("--parent-offshell",
-                    help="the pretrain's off-shellness stats as JSON [mean, std] (tools/offshell_stats.py): fine-tunes "
-                         "keep that input scale (*_ftp_) instead of refitting it on the probe")
+                    help="the pretrain's off-shellness stats as JSON [mean, std] (tools/offshell_stats.py), or auto for a "
+                         "pretrain that recorded them: fine-tunes keep that input scale (*_ftp_) instead of refitting it")
     ap.add_argument("--cells", nargs="*",
                     help="configs only for these cells, probe:k (with --lr-shift: the cells whose best lr sat at "
                          "the window's top)")
     ap.add_argument("--lr-shift", type=float, default=0.0,
                     help="move the scratch lr window up by this many decades (*_scrh_): 31 of 84 scratch cells had their "
                          "best trial in the window's top 15%%, none at the bottom (docs/results.tex sec:ladder)")
+    ap.add_argument("--family", help="fine-tune sweep name prefix instead of the default (e.g. tp3_r4ftp for "
+                                      "fine-tunes from ladder rung 4)")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
@@ -231,17 +233,21 @@ def main():
         # *_ftph_: the cells whose best lr_scale sat at the top of [1, 100], re-searched over [10, 1000] (--lr-scale
         # 10,1000 --cells), as the scratch cells pinned at their window's top were (scrh)
         tag = ("ftp" if a.parent_offshell else "ft") + ("h" if cells is not None and ls_lo >= 10 else "")
-        osh = ({"fine_tune.offshell_stats": "parent", "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))}
-               if a.parent_offshell else {"fine_tune.offshell_stats": "own"})
+        # "auto": the parent records its own stats in data_stats.json (runs since 2026-10-01), nothing to pass
+        osh = ({"fine_tune.offshell_stats": "own"} if not a.parent_offshell else
+               {"fine_tune.offshell_stats": "parent"} if a.parent_offshell == "auto" else
+               {"fine_tune.offshell_stats": "parent",
+                "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))})
         for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER)):
             for k in (steer_ks if a.steered else KS):
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
-                out.append(write(f"{pfx}{'s' if a.steered else ''}_{tag}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
+                fam = a.family or f"{pfx}{'s' if a.steered else ''}_{tag}"
+                out.append(write(f"{fam}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own", **osh},
-                                 head=f"Transfer pilot, fine-tune from {PRE}: {p} on D = 10^{k / 2:g} events."))
+                                 head=f"Transfer pilot, fine-tune from {os.path.basename(os.path.dirname(os.path.dirname(a.ft)))}: {p} on D = 10^{k / 2:g} events."))
     print("\n".join(os.path.relpath(p, ROOT) for p in out))
     print("lr* centres:", {T: f"{lr_star(T):.2g}" for T in sorted({T_PRE, *T_CELL.values()})})
 
