@@ -1,4 +1,4 @@
-# Transfer pilot, fine-tune from trial_0015: ee_nnbar on D = 10^3 events.
+# Transfer pilot, fine-tune from tp3_ladder_r9_lx/trial_0015: ee_nnbar on D = 10^3 events.
 # Written by sweep/gen_transfer_pilot.py.
 cluster:
   scheduler: slurm
@@ -66,7 +66,7 @@ fixed_params:
   data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_nnbar.yaml
   data.train_subsample: 1000
   training.lr: 0.000162
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0015/models/model_run0_best.pt
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r9_lx/trial_0015/models/model_run0_best.pt
   fine_tune.target_stats: own
   fine_tune.offshell_stats: parent
 range_extension:

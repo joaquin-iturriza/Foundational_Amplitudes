@@ -247,7 +247,7 @@ def main():
                 out.append(write(f"{fam}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own", **osh},
-                                 head=f"Transfer pilot, fine-tune from {os.path.basename(os.path.dirname(os.path.dirname(a.ft)))}: {p} on D = 10^{k / 2:g} events."))
+                                 head=f"Transfer pilot, fine-tune from {os.path.relpath(os.path.dirname(os.path.dirname(a.ft)), os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(a.ft)))))}: {p} on D = 10^{k / 2:g} events."))
     print("\n".join(os.path.relpath(p, ROOT) for p in out))
     print("lr* centres:", {T: f"{lr_star(T):.2g}" for T in sorted({T_PRE, *T_CELL.values()})})
 
