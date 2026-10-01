@@ -4437,7 +4437,10 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
     (\code{analysis/hpo\_optima}) predicts a smaller batch correction than $\sqrt{B/16384}$
     ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$).
-    Re-run the pinned cells half a decade higher, or re-centre on the surface.
+    Counted on the study's arms, $31$ of the $84$ scratch cells have their best trial in the window's top $15\%$ and
+    none at the bottom, while the fine-tunes reach high lr through \code{lr\_scale}: a bias in favour of fine-tuning.
+    The $31$ cells are re-searched half a decade higher (\code{tp3\_scrh}, running); a cell's scratch value is then the
+    shifted search's best.
   \item \textbf{Candidate seeds.} Every sweep draws its candidate set with one seed, so all probes
     are searched on the same points; a per-sweep seed would diversify the search at no cost.
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
