@@ -1,0 +1,95 @@
+# Transfer pilot, scratch: ee_WW on D = 10^3.5 events.
+# Written by sweep/gen_transfer_pilot.py.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 8G
+  cpus_per_task: 4
+  chain_width: 2
+  time: 01:45:00
+paths: null
+sweep_name: tp3_scr_ee_WW_d7
+n_trials: 8
+dyhpo:
+  n_candidates: 200
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 8000
+fixed_params:
+  data.source: recipes
+  data.require_cache: 'false'
+  data.eval_subsample: 10000
+  data.phase_space_on_pool: 'true'
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'false'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'false'
+  data.target_propagator_tchannel: 'false'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'true'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.01'
+  training.es_load_best_model: 'true'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_WW.yaml
+  data.train_subsample: 3162
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 5.13e-05
+  high: 0.00513
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999

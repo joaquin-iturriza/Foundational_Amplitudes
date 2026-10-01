@@ -183,8 +183,13 @@ def main():
         ls_lo, ls_hi = (float(x) for x in a.lr_scale.split(","))
         ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": ls_lo, "high": ls_hi},
                     {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
-        for p in only(PROBES):
+        # every probe is fine-tuned from the one pretrain (the plan, 2026-10-01); a probe's scratch arm must
+        # share its target, so with --bw-off the probes whose target the factors change (the Z-window ones,
+        # whose pools straddle the pole, and ee_WW, whose scratch arm kept the t-channel factor) need tp3_scr
+        for p in only(PROBES + Z_FAMILY + LADDER):
             for k in KS:
+                if k > K_MAX.get(p, 10):
+                    continue
                 out.append(write(f"{pfx}_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own"},
