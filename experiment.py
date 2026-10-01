@@ -1797,8 +1797,17 @@ class AmplitudeExperiment(BaseExperiment):
             # general form of the proven s-channel reson result.
             osh = np.concatenate(role_offshell, axis=0).astype(np.float64)
             osh = np.sign(osh) * np.log1p(np.abs(osh))
-            mu, sd = osh.mean(0), osh.std(0)
-            sd[sd < 1e-8] = 1.0
+            # the column stats are fitted on every role together, so they move with the val/test pools;
+            # a run rebuilt on another pool (tools/rebuild_run.py) pins the run's own through
+            # data.offshell_stats, else the swapped split shifts the input of every event
+            pinned = self.cfg.data.get("offshell_stats", None)
+            if pinned is not None:
+                mu, sd = np.asarray(pinned[0], np.float64), np.asarray(pinned[1], np.float64)
+                assert mu.shape == (osh.shape[1],) == sd.shape, f"data.offshell_stats {pinned} for {osh.shape[1]} columns"
+            else:
+                mu, sd = osh.mean(0), osh.std(0)
+                sd[sd < 1e-8] = 1.0
+            self._offshell_stats = [mu.tolist(), sd.tolist()]
             osh = ((osh - mu) / sd).astype(np.float32)
             n_pdg = len(self._internal_mass_pdgs)
             self.all_order_labels[:, -n_pdg:] = osh
@@ -1825,6 +1834,7 @@ class AmplitudeExperiment(BaseExperiment):
                     "preprocess_per_dataset": per_dataset,
                     "target_propagators": bool(getattr(self, "_target_factor_on", False)),
                     "tchannel_norm": getattr(self, "_tch_norm", None),
+                    "offshell_stats": getattr(self, "_offshell_stats", None),
                     "prepd_mean": [float(x) for x in self.prepd_mean],
                     "prepd_std":  [float(x) for x in self.prepd_std],
                 }, f, indent=2)

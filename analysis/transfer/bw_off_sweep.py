@@ -18,7 +18,7 @@ S = json.load(open(os.path.join(ROOT, "analysis", "transfer", "scratch_sweeps.js
 
 
 def best(fam, k):
-    tr = [t for n, v in S.items() if n == f"{fam}_{p}_d{k}" or n.startswith(f"{fam}_{p}_d{k}_") for t in v]
+    tr = S.get(f"{fam}_{p}_d{k}", [])          # the cell's own sweep only (a `_002` duplicate would add trials)
     tr = [t for t in tr if t.get("val_loss") is not None and t.get("prepd_std")]
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if tr else None
 

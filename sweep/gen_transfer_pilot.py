@@ -1,5 +1,6 @@
 """Transfer study, pilot (chapter 1): pretrain on ee->uu alone, then the data-scaling curve of
-two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-tuned.
+two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-tuned; the other probes
+(Z family, ladder) have scratch curves and, from the factor-off pretrain, fine-tunes too.
 
   pretrain   tp_pre_ee_uu              ee_uu, 100k train events, T_PRE steps
   scratch    tp2_scr_<probe>_d<k>      probe alone on the first D train events
@@ -30,7 +31,8 @@ one decade either side instead of CLAUDE.md's half decade:
   scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima, measured
                       at batch 16384) * sqrt(B/16384), Adam's square-root batch rule (the user's
                       choice, 2026-09-30); the template's lambda, warm-up, eta_min, EMA
-  fine-tune           training.lr = the pretrain's best * sqrt(B/16384), fine_tune.lr_scale [0.1, 10],
+  fine-tune           training.lr = the pretrain's best * sqrt(B/16384), fine_tune.lr_scale [0.1, 10]
+                      (--lr-scale; the tp3_ fine-tunes search [1, 100]),
                       fine_tune.layer_decay [0.75, 1], lambda, warm-up, eta_min, EMA;
                       amplitude stats fitted on the probe (fine_tune.target_stats=own)
 The fine-tune configs need the pretrain's best checkpoint:
@@ -43,10 +45,10 @@ import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 PRE, PROBES = "ee_uu", ["ee_ddbar", "uubar_gg"]
-# the multiplicity chapter's fine-tune targets (the user's choice): scratch curves only, for now
+# the multiplicity chapter's fine-tune targets (the user's choice)
 Z_FAMILY = ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
 # the ladder's probes, one or two per structure (EW t-channel, external photon, gluon exchange,
-# masses, one loop): scratch curves only, for now. The one-loop pools hold 5e4 train events, so
+# masses, one loop). The one-loop pools hold 5e4 train events, so
 # their grid stops at k = 9.
 LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo"]
 K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9}

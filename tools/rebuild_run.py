@@ -4,7 +4,10 @@ checkpoint loaded. Used by tools/steer_pool.py (the reference model scores candi
 analysis/transfer/cross_eval.py (a run scored on another recipe's test split).
 
 The rebuilt statistics are checked against the run's frozen data_stats.json, which is the evidence
-that the inputs go through exactly the run's preprocessing.
+that the inputs go through exactly the run's preprocessing. The off-shellness feature's column stats are
+fitted on every role together, so they are pinned to the run's own (data.offshell_stats; from
+data_stats.json, or for older runs a build on the run's own pools): a swapped split otherwise shifts
+every event's input (the steering cross-pool offset, docs/results.tex sec:ladder).
 """
 import gzip, io, json, os, sys, tempfile
 
@@ -27,26 +30,9 @@ def load_best_state(run_dir):
         return torch.load(io.BytesIO(f.read()), map_location="cpu", weights_only=False)["model"]
 
 
-def rebuild(run_dir, role, path, n_events):
-    """(exp, loader): the run rebuilt with `role` ('val' or 'test') read from `path` (n_events rows),
-    in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role]."""
-    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
-    rec = yaml.safe_load(open(os.path.expandvars(str(cfg.data.processes_file))))
-    (spec,) = rec["processes"]
-    name = spec["name"]
-    spec[f"n_{role}"] = int(n_events)
-    tmp = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)
-    yaml.safe_dump(rec, tmp); tmp.close()
-    with open_dict(cfg):
-        cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
-        cfg.use_mlflow = False; cfg.count_flops = False
-        cfg.warm_start_idx = None; cfg.fine_tune.pretrained_path = None
-        cfg.data.processes_file = tmp.name
-        cfg.data.eval_subsample = None            # the swapped split is read whole (the recipe count caps it)
-        cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
+def _build(cfg, swap, path, name):
+    """The experiment built through init_model, with the `swap` role's pool read from `path` (None: none)."""
     real = datagen.ensure_split_set
-
-    swap = role
 
     def split(specs, role, seed, dest_dir=None, require_cache=False):     # the loader's own signature
         return ({name: path} if role == swap else
@@ -60,7 +46,41 @@ def rebuild(run_dir, role, path, n_events):
         exp.init_data(); exp._init_dataloader(); exp.init_model()
     finally:
         datagen.ensure_split_set = real
+    return exp
+
+
+def rebuild(run_dir, role, path, n_events):
+    """(exp, loader): the run rebuilt with `role` ('val' or 'test') read from `path` (n_events rows),
+    in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role]."""
+    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    own_recipe = os.path.expandvars(str(cfg.data.processes_file))
+    rec = yaml.safe_load(open(own_recipe))
+    (spec,) = rec["processes"]
+    name = spec["name"]
+    spec[f"n_{role}"] = int(n_events)
+    tmp = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)
+    yaml.safe_dump(rec, tmp); tmp.close()
+    with open_dict(cfg):
+        cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
+        cfg.use_mlflow = False; cfg.count_flops = False
+        cfg.warm_start_idx = None; cfg.fine_tune.pretrained_path = None
+        cfg.data.processes_file = tmp.name
+        cfg.data.eval_subsample = None            # the swapped split is read whole (the recipe count caps it)
+        cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
+    if cfg.data.get("offshell_per_event", False) and cfg.data.get("offshell_stats", None) is None:
+        # the off-shellness column stats are fitted on every role together (experiment.py), so the swapped
+        # split would move them and shift every event's input; pin the run's own. Runs older than the
+        # record in data_stats.json get them from a build on the run's own pools
+        own = saved.get("offshell_stats")
+        if own is None:
+            cfg0 = cfg.copy()
+            with open_dict(cfg0):
+                cfg0.data.processes_file = own_recipe
+            own = _build(cfg0, None, None, name)._offshell_stats
+        with open_dict(cfg):
+            cfg.data.offshell_stats = own
+    exp = _build(cfg, role, path, name)
     got = dict(mom_div=float(exp.mom_div), prepd_mean=[float(x) for x in exp.prepd_mean],
                prepd_std=[float(x) for x in exp.prepd_std])
     for k, v in got.items():
