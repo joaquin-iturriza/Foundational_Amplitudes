@@ -3973,7 +3973,13 @@ limit (the dead cone, $ee\to b\bar bg$), narrow resonances, the $t\bar t$ thresh
 $1/\beta$ at one loop) and Sudakov logarithms in the one-loop finite parts. Each enters as a star
 arm (the first rung plus one axis, scored on its own probe and on the first rung's) next to the
 ladder, which shows what adding more and more structure does. The finale is the model with every
-structure against scratch on every held-out probe.
+structure against scratch on every held-out probe. The rungs as built (\code{recipes/transfer\_ladder\_r1..9.yaml},
+cumulative, $10^5$ training events per tree process): $ee\to u\bar u$, $\mu\mu$, $\nu_\mu\bar\nu_\mu$; $+$Bhabha;
+$+ee\to\gamma\gamma$ (the only clean $2\to2$ photon process: $u\bar u\to\gamma\gamma$ is the same dataset);
+$+u\bar u\to d\bar d$, $uu\to uu$, $u\bar u\to u\bar u$, $dd\to dd$; $+ee\to b\bar b$, $u\bar u\to t\bar t$, $ee\to ZZ$,
+$ee\to ZH$; $+u\bar d\to Wg$; $+Wgg$; $+Wggg$; $+ee\to u\bar u$, $u\bar u\to d\bar d$ and $u\bar u\to ZZ$ at one loop
+(trees in earlier rungs; $u\bar u\to ZZ$ is $ee\to ZZ$). No probe and nothing in a probe's equality class
+is in any rung.
 
 \paragraph{Protocol.} Every pretraining process has $10^5$ training events (to be revisited if
 $2\times$ or $3\times$ that changes a rung) and every pretraining is meant to run to convergence, capped at $64$k steps. The
@@ -4087,8 +4093,27 @@ $17.7\to27.6$, $ee\to d\bar d$ $9.1\to13.2$), and with three seeds at each cell'
 over seeds moves by $0.67$ and $0.44$ for $ee\to d\bar d$ at $10^3$ and $10^4$ (the arms overlap)
 and by $0.41$ and $0.08$ for $ee\to\nu_e\bar\nu_e$ (at $10^4$ they do not). The factors change the
 target, so each arm is re-based to MSE of $\log|\mathcal M|^2$ with its own $\sigma$. From here on
-the study's sweeps run with the $t$-channel factor off (\code{tp2\_}); whether the Breit--Wigner
-factor goes too is open (hand-off).
+the study's sweeps run with the $t$-channel factor off (\code{tp2\_}), and after this A/B the
+Breit--Wigner factor goes too (\code{tp3\_}, \code{data.target\_propagators} off; the user's call). Its
+run logs show it touches four probes only, the ones whose pool reaches the $Z$ pole ($ee\to d\bar d$,
+$ee\to\nu_e\bar\nu_e$, $ee\to d\bar d$ and $ee\to b\bar b$ at one loop); every other probe carries no
+massive factor and keeps its target. The same-HP shortcut of the A/B protocol, each of their $28$
+cells re-run once with the factor off at the search's best HPs (\code{bw\_off\_shortcut.py},
+Fig.~\ref{fig:ladder_bwoff}), comes out worse in $22$ cells ($0.1$--$0.8\times$), against the
+seeded A/B. The comparison is biased: the factor-on value is the minimum of eight noisy trials and
+carries the winner's seed luck, the factor-off value is one draw at those HPs (the next paragraph
+measures that bias at $1.5$--$11\times$). So the shortcut cannot settle it here, and the factor-off
+arm gets its own search, first on $ee\to d\bar d$ (\code{tp3\_scr\_ee\_ddbar}, running), extended to the
+other three on that result (the user's call).
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/bw_off_shortcut_a.pdf}\hfill\pnl{../analysis/transfer/figs/bw_off_shortcut_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/bw_off_shortcut_c.pdf}\hfill\pnl{../analysis/transfer/figs/bw_off_shortcut_d.pdf}}
+\caption{The Breit--Wigner factor off, one run per cell at the best HPs of the factor-on search, against
+that search's best of eight (MSE of $\log|\mathcal M|^2$ at the best checkpoint): (a) $ee\to d\bar d$,
+(b) $ee\to\nu_e\bar\nu_e$, (c) $ee\to d\bar d$ at one loop, (d) $ee\to b\bar b$ at one loop.}
+\label{fig:ladder_bwoff}
+\end{figure}
 
 \paragraph{One seed is not a measurement at a cell.} The same A/B gives the seed spread at fixed
 HPs: $ee\to d\bar d$ at $D=10^4$ lands between $2.0\times10^{-6}$ and $1.5\times10^{-4}$ over
@@ -4104,6 +4129,25 @@ above), $ee\to d\bar d$ at $10^4$ seed one in both arms (steps $1760$ off, $3040
 $2\times$ above) and $u\bar u\to gg$ seed three off (step $3600$, $1.3\times$). They enter at their
 best checkpoint, filled in Fig.~\ref{fig:ladder_ab}. So every point of the curves below is one
 seed, a $10\times$ wiggle between neighbouring cells can be noise, and the final curves need seeds.
+Two more seeds per cell at each cell's best HPs, for the seven probes no open question touches ($98$
+runs, \code{seeds\_scratch.py}, Fig.~\ref{fig:ladder_seeds}), measure both the noise and the selection:
+the search best, a minimum over eight trials, sits below fresh seeds at the same HPs by $1.5$--$3\times$
+at small $D$ and up to $11\times$ at $D=10^4$ ($u\bar u\to Zg$ $2.1\times10^{-7}$ against
+$2.3\times10^{-6}$, $ee\to Z\gamma$ $5\times$, $u\bar u\to gg$ $4.5\times$). The noise is the process's:
+the $2\to3$ and $2\to4$ probes and $ee\to t\bar t$ above $10^2$ stay within $1.5\times$, the $2\to2$
+$t$-channel probes swing $3$--$10\times$ at large $D$, and on fresh seeds $u\bar u\to Zg$, $ee\to Z\gamma$
+and $ud\to ud$ are flat from $10^3$ to $10^4$ ($1$--$3\times10^{-6}$), the fixed horizon. A fine-tune
+against scratch, both a best of eight, carries the same selection on both sides; a single fixed-HP run
+against a search best does not, which is what biased the shortcut above.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/seeds_scratch_a.pdf}\hfill\pnl{../analysis/transfer/figs/seeds_scratch_b.pdf}}
+\caption{Scratch curves with their seed noise: line, geometric mean of two fresh seeds at each cell's
+best HPs; band, their range with the search best; open circles, the search best (seed $42$, minimum
+of eight trials). (a) $u\bar u\to gg$, $u\bar u\to Zg$, $ee\to Z\gamma$, $ud\to ud$; (b) $u\bar u\to
+Zgg$, $u\bar u\to Zggg$, $ee\to t\bar t$.}
+\label{fig:ladder_seeds}
+\end{figure}
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/seeded_ab_a.pdf}\hfill\pnl{../analysis/transfer/figs/seeded_ab_b.pdf}}
@@ -4133,7 +4177,31 @@ squared error; the nine worst all sit below it. The training pool has $100$ such
 $9$ in the first $10^4$. The mixture sampling cannot fix this by selection: its flat-in-$\log|\mathcal
 M|^2$ part keeps what the candidates contain, the $2\to2$ candidates are uniform in $\cos\theta$ and
 the adaptive proposal acts on $\sqrt s$ only, and these events already sit at the top $0.04\%$ of the
-pool's $\log|\mathcal M|^2$.
+pool's $\log|\mathcal M|^2$ (Fig.~\ref{fig:ladder_wwcorner}).
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/ww_corner.pdf}
+\caption{$ee\to W^+W^-$: training events in the first $D$ of the pool whose $|t|$ lies below the
+$t$-channel factor's floor, and within $3\times$ and $10\times$ of it (\code{ww\_corner\_plot.py}).}
+\label{fig:ladder_wwcorner}
+\end{figure}
+
+\paragraph{Steering the $ee\to W^+W^-$ pool once: built, not yet scored.} The coordinate-free remedy of
+Sec.~\ref{sec:div-sampling}, generated once and frozen so scratch and fine-tune share the pool
+(\code{tools/steer\_pool.py}; sampling mode \code{steered}, pools tagged \code{\_ssteer}): $2.4$M flat
+candidates labelled on CPU, scored by a HETEROSC reference (detached $\sigma$, $\beta=1$, $D=10^5$, $16$k
+steps, the mixture pool), $1.2\times10^5$ kept $\propto\sigma^3$ and split into train, val and test; the
+$t$-channel normalisation is pinned to the mixture pool's (\code{data.target\_propagator\_tchannel\_norm})
+so the target is the baseline's. The reference's $\sigma$ varies little (its $99.9$th percentile is
+$3.2\times$ its median), so the selection is mild: the top $0.1\%$ of $\sigma$ make up $1.3\%$ of the
+kept events. At each cell's baseline-best HPs the steered runs fit their own pool well ($3.8\times10^{-6}$
+on its validation at $D=10^4$, against the baseline's $2.3\times10^{-5}$ on its own), but scored on the
+mixture test split (\code{cross\_eval.py}) they sit at $0.017$--$0.07$. That is a constant shift: $+0.12$
+in $\log|\mathcal M|^2$ on every mixture event, at every $|\mathcal M|^2$ and angle; the mixture-trained
+reference shows $-0.021$ on the steered test, equally constant, and none on its own test ($4\times10^{-5}$).
+The labels agree exactly (\code{tools/relabel\_check.py} reproduces the stored $|\mathcal M|^2$ of both
+pools and of the candidates), the stored momenta share one convention, and the rebuilt statistics equal
+each run's frozen ones. The cause is open (hand-off), and no steering number is used until it is found.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/residual_map_a.pdf}\hfill\pnl{../analysis/transfer/figs/residual_map_b.pdf}}
@@ -4191,6 +4259,26 @@ replaced them.}
 \label{fig:ladder_scratch}
 \end{figure}
 
+\paragraph{The large-$D$ end, at fixed compute.} One $64$k-step run per probe at $D=10^{4.5}$ and $10^5$
+(fixed HPs, lr $1.2\times10^{-3}$, the $t$-channel factor off; Fig.~\ref{fig:ladder_large},
+\code{large\_d.py}): the $t/u$-channel $2\to2$ probes reach $3$--$12\times10^{-9}$ ($u\bar u\to Zg$
+$3.2\times10^{-9}$ at $10^5$), with no sign of the old $10^{-5}$ floor, and most best checkpoints sit at the
+last step. Their curve through $D\le10^3$, extended, would put $10^5$ near $10^{-11}$, so at large $D$ they
+are limited by steps, at a compute that is not worth paying now. The probes with a $Z$ pole do not flatten
+at all: $ee\to\nu_e\bar\nu_e$ falls $30\times$ from $10^4$ to $10^{4.5}$ and another $8\times$ to $10^5$, and the
+one-loop probes as steeply, so they are the ones where transfer can show at large $D$. The eight runs on
+Jean Zay ($ud\to ud$, $ee\to t\bar t$, $u\bar u\to Zgg$, $u\bar u\to Zggg$) ran into the $3$\,h limit at
+$23$--$31$k steps, before the anneal, and are listed in \code{long\_runs.json}, not drawn.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/large_d_a.pdf}\hfill\pnl{../analysis/transfer/figs/large_d_b.pdf}}
+\caption{Scratch curves to $D=10^4$ (best of the $8$k-step search) with one $64$k-step run at $10^{4.5}$
+and $10^5$ (squares): (a) $u\bar u\to gg$, $u\bar u\to Zg$, $ee\to Z\gamma$; (b) $ee\to\nu_e\bar\nu_e$ (the
+Breit--Wigner factor on), $ee\to d\bar d$ and $ee\to b\bar b$ at one loop. The two sides are at different
+compute.}
+\label{fig:ladder_large}
+\end{figure}
+
 \paragraph{Chapter one: the near probe gains, the far probe loses at small $D$.} The $ee\to u\bar u$
 pretraining (one DyHPO, $8$ trials, $32$k steps, $10^5$ events; best trial lr
 $6.7\times10^{-4}$, $\vlnr=1.6\times10^{-8}$, $2.6\times10^{-7}$ in MSE of $\log|\mathcal M|^2$,
@@ -4203,8 +4291,13 @@ $5$--$8\times$ at every $D$ up to $10^{2.5}$ and $1.8\times$ at $10^3$, and gain
 $10^{3.5}$ ($3.5\times$) and $10^4$ ($1.3\times$, $7.6\times10^{-8}$). Four consecutive cells
 losing by a similar factor is not the seed noise above, but whether it is transfer or the
 fine-tune's search (its lr is fixed at the pretraining's times $\sqrt{B/16384}$, and only
-\code{lr\_scale}$\in[0.1,10]$ and the layer decay move it) is not yet separated. The expected
-ordering, gain falling with distance, holds; that it goes negative at small $D$ was not expected.
+\code{lr\_scale}$\in[0.1,10]$ and the layer decay move it) is not yet separated: every cell's best
+\code{lr\_scale}, both probes, sits in the top decade ($3$--$9$), the window's ceiling. The expected
+ordering, gain falling with distance, holds; that it goes negative at small $D$ was not expected. With
+the Breit--Wigner factor off the pretraining is re-run once at the best trial's HPs
+(\code{tp3\_pre\_ee\_uu}; it stopped at step $30080$ of $32000$ on a time limit, its best checkpoint there,
+$94\%$ through the anneal, at $1.18\times10^{-7}$, half the factor-on pretraining's), and both chapter-one
+probes are fine-tuned from it again with \code{lr\_scale} searched over $[1,100]$ (\code{tp3\_ft}, running).
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/transfer_ch1_a.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_ch1_b.pdf}}
@@ -4216,16 +4309,16 @@ Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor o
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{The Breit--Wigner factor.} Off wins in all four seeded cells. Switching
-    \code{data.target\_propagators} off for the study means a new $ee\to u\bar u$ pretraining (a
-    fine-tune asserts the parent's flag equals its own; $8\times32$k steps, $\sim26$ GPU-h) and
-    redoing the scratch and fine-tune sweeps of the probes where it applies ($ee\to d\bar d$,
-    $ee\to\nu_e\bar\nu_e$, and any other probe whose run log lists a massive factor). Waits on the
-    user's decision.
+  \item \textbf{The Breit--Wigner factor, off.} Running: the factor-off search on $ee\to d\bar d$
+    (\code{tp3\_scr}); best against best decides whether the other three probes get theirs.
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
+  \item \textbf{The steered pool's cross-pool offset.} Find why a model scored on the other pool is off by
+    a constant (above). Next check: the steered model on the raw flat candidates (the mixture pool's
+    uniform part, the steered pool's source), which needs \code{cross\_eval.py} to read a pool that is not
+    a recipe split. The user may park steering instead.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
     $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
@@ -4237,24 +4330,22 @@ Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor o
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{Seeds.} The final curves need several seeds per cell (spread up to $75\times$).
-  \item \textbf{Large $D$.} One $64$k-step run per probe at $10^{4.5}$ and $10^5$ ($t$-channel
-    factor off, lr $1.2\times10^{-3}$) is running on Jean Zay and lxplus; it decides per probe
-    whether those cells get a search or already plateau. The short cells come first: the story
-    holds to $10^4$.
+  \item \textbf{Seeds.} Done for the scratch curves of seven probes; the fine-tune arm and the four
+    probes the factor question touches still need theirs. Report the seed mean at each cell's chosen
+    HPs, with a band, not the search minimum.
+  \item \textbf{Large $D$, Jean Zay.} The four probes whose $64$k runs timed out need re-running with a
+    longer limit (about $50$ GPU-h); after everything else, as the longer horizons.
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
-  \item \textbf{$u\bar u\to gg$ at small $D$.} Separate transfer from the fine-tune search (the
-    best trials' \code{lr\_scale} and layer decay against their window edges; a wider or
-    re-centred window), and measure each probe's zero-shot loss as its distance from the
-    pretraining.
+  \item \textbf{$u\bar u\to gg$ at small $D$.} The \code{tp3\_ft} searches (\code{lr\_scale} up to $100$)
+    tell whether the loss was the capped lr. Then: fine-tune all twelve probes from $ee\to u\bar u$ and
+    measure each one's zero-shot loss as its distance from the pretraining.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
-  \item \textbf{The ladder rungs, the $W+ng$ pools and the star arms} are not started; the
-    pretrainings run at up to $64$k steps.
-  \item \textbf{CC} rejected three single-GPU submissions with ``Requested node configuration is
-    not available'' (they ran on Jean Zay); not investigated.
+  \item \textbf{The ladder.} The rung recipes are written; their pools (prebuild of
+    \code{transfer\_ladder\_r9.yaml}, Jean Zay CPU partition) wait in the queue. Then one pretraining
+    search per rung, up to $64$k steps; the star arms after.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
