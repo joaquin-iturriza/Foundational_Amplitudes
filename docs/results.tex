@@ -4429,9 +4429,8 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
   \item \textbf{Steering, next.} The steered results are with the $t$-channel factor on, the study's
     $ee\to W^+W^-$ arms with it off: the factor-off scratch search on the steered pool for $D=10^{2.5}$--$10^4$
-    (\code{tp3s\_scr}, lxplus, running) and its fine-tunes (\code{tp3s\_ftp}, configs written), which wait on the
-    pool and the pretraining being on one site: the pool exists only on lxplus, the checkpoint only on Jean Zay,
-    and nothing stages files between sites. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
+    (\code{tp3s\_scr}) and its fine-tunes (\code{tp3s\_ftp}, from the pretraining copied to lxplus with
+    \code{site copy}, checksum equal), both running on lxplus. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
     mixture pool at $D\sim10^2$.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
