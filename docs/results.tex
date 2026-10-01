@@ -4484,12 +4484,15 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
-  \item \textbf{The fine-tune's lr window.} In $46$ of the $84$ fine-tune cells the best \code{lr\_scale} sat in
-    the top $15\%$ of $[1,100]$ ($\ge10^{1.7}$), the trigger used for scratch; those cells are re-searched over
-    $[10,1000]$ (\code{tp3\_ftph}, with the parent's off-shellness scale; \code{tp3\_fth} for the five probes
-    without an internal $Z$), the user's call (2026-10-01) over replacing the $\sqrt{B/16384}$ scaling of the
-    fine-tune lr, which stays open. A cell's value over its searches (the best of all, or the re-search's alone)
-    is the user's to decide.
+  \item \textbf{Cells at the edge of their lr window, extended in place.} $31$ scratch cells had their best lr and
+    $46$ fine-tune cells their best \code{lr\_scale} in the top $15\%$ of the window. They were first re-run as separate
+    searches with the window moved up (\code{tp3\_scrh}, \code{tp3\_scrh10}; \code{tp3\_ftph}, \code{tp3\_fth}, the
+    \code{lr\_scale} window $[10,1000]$ the user's call), which discarded the original surrogate and left two values per
+    cell. Each cell is now one search: \code{sweep/extend\_sweep.py} widens the original sweep's range and folds the
+    shifted runs' trials into its DyHPO state as observations, and the $16$ cells still at the edge after that (eight
+    each) get four more trials over a further-widened range. A cell's value is that search's best. Running: those
+    $64$ trials; the two $u\bar u\to Zggg$ shifted scratch searches on lxplus ($10^{1.5}$, $10^4$), not yet started, to be
+    folded into their CC originals when done. The $\sqrt{B/16384}$ scaling of the fine-tune lr stays open.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
