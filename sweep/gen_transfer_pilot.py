@@ -145,6 +145,9 @@ def main():
     ap.add_argument("--probes", nargs="*", help="only these probes (default: all)")
     ap.add_argument("--pretrain", action="store_true", help="also (re)write the pretrain config")
     ap.add_argument("--steered", action="store_true", help="write the steered-pool scratch configs (tps_scr_)")
+    ap.add_argument("--lr-scale", default="0.1,10",
+                    help="fine_tune.lr_scale window low,high (the tp2_ft searches' best sat at the top of 0.1-10 "
+                         "in every cell, both probes: the tp3_ fine-tunes search 1-100)")
     ap.add_argument("--bw-off", action="store_true",
                     help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
                          "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
@@ -177,7 +180,8 @@ def main():
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
     else:
         assert a.lr, "--lr (the pretrain's best lr) is needed with --ft"
-        ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.1, "high": 10.0},
+        ls_lo, ls_hi = (float(x) for x in a.lr_scale.split(","))
+        ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": ls_lo, "high": ls_hi},
                     {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
         for p in only(PROBES):
             for k in KS:
