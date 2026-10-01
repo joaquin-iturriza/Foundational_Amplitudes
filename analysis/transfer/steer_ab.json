@@ -1,0 +1,3 @@
+{"_doc": "Steering A/B on ee->WW, MSE of log|M|^2 on the mixture test split (10k). baseline: each cell's tp_scr search best on its own test (scripts/job_cross_eval.sh, run FA-ccin2p3-daaf576d); steered: tps_calib, one run per cell at the baseline best's HPs on the sigma-steered pool, scored with the off-shellness stats pinned (FA-lxplus-140b066a). Keys: k of D = 10^(k/2).",
+ "baseline": {"2": 0.044530, "3": 0.0029678, "4": 0.00058656, "5": 0.00036776, "6": 0.00022115, "7": 6.7665e-05, "8": 6.1631e-05},
+ "steered":  {"2": 0.0556, "3": 0.0209, "4": 0.0264, "5": 0.000733, "6": 0.000333, "7": 4.42e-05, "8": 4.88e-06}}
