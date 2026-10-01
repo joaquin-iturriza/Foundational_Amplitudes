@@ -4232,16 +4232,16 @@ the candidates when the pool was built, so its $\sigma$ carried a shift of about
 deviations: the pool is steered by a slightly perturbed $\sigma$, not an unsteered one. Scored with the
 statistics pinned (Fig.~\ref{fig:ladder_steer}), the steered pool wins where the mixture pool
 plateaus, $12.6\times$ at $D=10^4$ ($4.9\times10^{-6}$ against $6.2\times10^{-5}$) and $1.5\times$ at
-$10^{3.5}$, and loses below, by $1.5$--$2\times$ at $10^{2.5}$--$10^3$ and $7$--$45\times$ at
-$10^{1.5}$--$10^2$, where selecting $\propto\sigma^3$ leaves the bulk few events. The comparison is
-biased against the steered arm (one run at the other arm's HPs, against a best of eight), so the two
-cells it wins are settled; the cells it loses get their own search (\code{tps\_scr}, $D\le10^3$,
-running).
+$10^{3.5}$, at the baseline's HPs, a comparison biased against it, so those two cells are settled. Below,
+at the baseline's HPs it lost; with its own $8$-trial search (\code{tps\_scr}) it wins at $10$
+($1.3\times$), $10^{2.5}$ ($1.9\times$) and $10^3$ ($1.7\times$) and still loses at $10^{1.5}$ and $10^2$
+($6.4$ and $8.7\times$), where selecting $\propto\sigma^3$ leaves a few hundred events too few in the
+bulk. So one steered pool helps from a few hundred events up, most where the mixture pool flattens.
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/steer_ab.pdf}
 \caption{$ee\to W^+W^-$ trained on the mixture pool (each cell's best of $8$ trials) and on the
-$\sigma$-steered pool (one run at those HPs), both scored on the mixture test split with the run's own
+$\sigma$-steered pool (its own search's best; open, one run at the mixture pool's best HPs), both scored on the mixture test split with the run's own
 input statistics (MSE of $\log|\mathcal M|^2$ at the best checkpoint).}
 \label{fig:ladder_steer}
 \end{figure}
@@ -4367,9 +4367,8 @@ factor reaches its pool, so its scratch arm is the $t$-channel-off search).}
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
-  \item \textbf{Steering at small $D$.} The steered searches at $D\le10^3$ (\code{tps\_scr}, running) decide
-    whether the steered pool loses there on its own HPs too. Then: re-score the pool with the corrected
-    rebuild if the $\sigma$ shift matters, and the fine-tune arm on the steered pool.
+  \item \textbf{Steering, next.} The fine-tune arm on the steered pool, and a milder selection
+    ($\gamma<3$, or a floor of mixture events) for $D\sim10^2$, where the steered pool still loses.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
     $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
