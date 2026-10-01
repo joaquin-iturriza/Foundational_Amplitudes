@@ -4426,8 +4426,10 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
   \item \textbf{Steering, next.} The steered results are with the $t$-channel factor on, the study's
-    $ee\to W^+W^-$ arms with it off: the factor-off scratch search and the fine-tunes on the steered pool for
-    $D=10^{2.5}$--$10^4$. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
+    $ee\to W^+W^-$ arms with it off: the factor-off scratch search on the steered pool for $D=10^{2.5}$--$10^4$
+    (\code{tp3s\_scr}, lxplus, running) and its fine-tunes (\code{tp3s\_ftp}, configs written), which wait on the
+    pool and the pretraining being on one site: the pool exists only on lxplus, the checkpoint only on Jean Zay,
+    and nothing stages files between sites. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
     mixture pool at $D\sim10^2$.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
@@ -4447,12 +4449,15 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     longer limit (about $50$ GPU-h); after everything else, as the longer horizons.
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
-  \item \textbf{Fine-tune input statistics.} A fine-tune takes the momentum scale from its pretraining
-    but refits the off-shellness input's statistics on the probe's own train, validation and test pools,
-    so the pretrained backbone sees that input shifted (the mechanism of the steering offset above). Every
-    \code{tp3\_ft} number so far uses the refit. The alternative, inheriting the pretraining's statistics
-    (now recorded in \code{data\_stats.json}; the $ee\to u\bar u$ pretraining predates the record and needs
-    them rebuilt), is an A/B for the user to decide on.
+  \item \textbf{Fine-tune input statistics: inherit.} The fine-tunes so far refitted the off-shellness input on the
+    probe, so the pretrained backbone read every propagator's off-shellness shifted ($ee\to W^+W^-$: $12.6\pm1.0$ on the
+    probe against $8.8\pm6.7$ in the pretraining, before standardization). Inputs must mean what they meant in the
+    pretraining, as the momentum scale already does, so a fine-tune now keeps the parent's scale on every column the
+    parent saw vary and fits only the columns it saw constant (\code{fine\_tune.offshell\_stats: parent}, the default;
+    \code{tools/offshell\_stats.py} rebuilt the $ee\to u\bar u$ pretraining's). Re-running (\code{tp3\_ftp}, Jean Zay) the
+    seven probes with an internal $Z$ ($ee\to d\bar d$, $\nu_e\bar\nu_e$, $t\bar t$, $W^+W^-$, $ud\to ud$, both one-loop);
+    the other five see constant columns only and stand. Their rows of Table~\ref{tab:ladder_transfer_all} and the
+    chapter-one $ee\to d\bar d$ panel are then replaced.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance. Away from
     $ee\to d\bar d$ the best \code{lr\_scale} is $30$--$93$ in most cells: replace the $\sqrt{B/16384}$ scaling
