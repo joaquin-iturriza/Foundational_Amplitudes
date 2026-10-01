@@ -172,7 +172,7 @@ def main():
                     help="the pretrain's off-shellness stats as JSON [mean, std] (tools/offshell_stats.py): fine-tunes "
                          "keep that input scale (*_ftp_) instead of refitting it on the probe")
     ap.add_argument("--cells", nargs="*",
-                    help="scratch configs only for these cells, probe:k (with --lr-shift: the cells whose best lr sat at "
+                    help="configs only for these cells, probe:k (with --lr-shift: the cells whose best lr sat at "
                          "the window's top)")
     ap.add_argument("--lr-shift", type=float, default=0.0,
                     help="move the scratch lr window up by this many decades (*_scrh_): 31 of 84 scratch cells had their "
@@ -228,12 +228,14 @@ def main():
         # share its target, so with --bw-off the probes whose target the factors change (the Z-window ones,
         # whose pools straddle the pole, and ee_WW, whose scratch arm kept the t-channel factor) need tp3_scr
         assert not a.steered or a.bw_off, "steered fine-tunes are on the study's factor-off target (--bw-off)"
-        tag = "ftp" if a.parent_offshell else "ft"
+        # *_ftph_: the cells whose best lr_scale sat at the top of [1, 100], re-searched over [10, 1000] (--lr-scale
+        # 10,1000 --cells), as the scratch cells pinned at their window's top were (scrh)
+        tag = ("ftp" if a.parent_offshell else "ft") + ("h" if cells is not None and ls_lo >= 10 else "")
         osh = ({"fine_tune.offshell_stats": "parent", "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))}
                if a.parent_offshell else {"fine_tune.offshell_stats": "own"})
         for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER)):
             for k in (steer_ks if a.steered else KS):
-                if k > K_MAX.get(p, 10):
+                if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
                 out.append(write(f"{pfx}{'s' if a.steered else ''}_{tag}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
