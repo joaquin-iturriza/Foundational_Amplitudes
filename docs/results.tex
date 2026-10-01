@@ -4384,6 +4384,12 @@ factor reaches its pool, so its scratch arm is the $t$-channel-off search).}
     longer limit (about $50$ GPU-h); after everything else, as the longer horizons.
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
+  \item \textbf{Fine-tune input statistics.} A fine-tune takes the momentum scale from its pretraining
+    but refits the off-shellness input's statistics on the probe's own train, validation and test pools,
+    so the pretrained backbone sees that input shifted (the mechanism of the steering offset above). Every
+    \code{tp3\_ft} number so far uses the refit. The alternative, inheriting the pretraining's statistics
+    (now recorded in \code{data\_stats.json}; the $ee\to u\bar u$ pretraining predates the record and needs
+    them rebuilt), is an A/B for the user to decide on.
   \item \textbf{All twelve probes fine-tuned.} Running on Jean Zay: \code{tp3\_ft} for every probe from the
     factor-off $ee\to u\bar u$ pretraining ($84$ sweeps). Then each probe's zero-shot loss as its distance
     from the pretraining. The far probe's best \code{lr\_scale} sits at $57$--$80$; if more probes push the
