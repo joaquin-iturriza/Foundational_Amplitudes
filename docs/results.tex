@@ -4099,7 +4099,7 @@ run logs show it touches four probes only, the ones whose pool reaches the $Z$ p
 $ee\to\nu_e\bar\nu_e$, $ee\to d\bar d$ and $ee\to b\bar b$ at one loop); every other probe carries no
 massive factor and keeps its target. The same-HP shortcut of the A/B protocol, each of their $28$
 cells re-run once with the factor off at the search's best HPs (\code{bw\_off\_shortcut.py},
-Fig.~\ref{fig:ladder_bwoff}), comes out worse in $22$ cells ($0.1$--$0.8\times$), against the
+Fig.~\ref{fig:ladder_bwoff}), comes out worse in $23$ cells ($0.07$--$0.9\times$), against the
 seeded A/B. The comparison is biased: the factor-on value is the minimum of eight noisy trials and
 carries the winner's seed luck, the factor-off value is one draw at those HPs (the next paragraph
 measures that bias at $1.5$--$11\times$). So the shortcut cannot settle it here, and the factor-off
@@ -4144,11 +4144,13 @@ best checkpoint, filled in Fig.~\ref{fig:ladder_ab}. So every point of the curve
 seed, a $10\times$ wiggle between neighbouring cells can be noise, and the final curves need seeds.
 Two more seeds per cell at each cell's best HPs, for the seven probes no open question touches ($98$
 runs, \code{seeds\_scratch.py}, Fig.~\ref{fig:ladder_seeds}), measure both the noise and the selection:
-the search best, a minimum over eight trials, sits below fresh seeds at the same HPs by $1.5$--$3\times$
-at small $D$ and up to $11\times$ at $D=10^4$ ($u\bar u\to Zg$ $2.1\times10^{-7}$ against
-$2.3\times10^{-6}$, $ee\to Z\gamma$ $5\times$, $u\bar u\to gg$ $4.5\times$). The noise is the process's:
-the $2\to3$ and $2\to4$ probes and $ee\to t\bar t$ above $10^2$ stay within $1.5\times$, the $2\to2$
-$t$-channel probes swing $3$--$10\times$ at large $D$, and on fresh seeds $u\bar u\to Zg$, $ee\to Z\gamma$
+the search best, a minimum over eight trials, sits below the fresh seeds' geometric mean at the same
+HPs by a median $1.5\times$ over the $49$ cells, by more than $3\times$ in $10$ of them (up to $23\times$,
+$ee\to Z\gamma$ at $10^2$; $11\times$ for $u\bar u\to Zg$ at $10^4$, $2.1\times10^{-7}$ against
+$2.3\times10^{-6}$; $u\bar u\to gg$ $4.4\times$ there), and above it in $11$ ($ud\to ud$ at
+$10^2$--$10^{3.5}$, $0.26$--$0.88\times$). The noise is the process's: $u\bar u\to Zgg$ and $Zggg$ stay
+within $0.9$--$1.9\times$ at every $D$, the $2\to2$ probes swing $3$--$23\times$ in several cells, and
+on fresh seeds $u\bar u\to Zg$, $ee\to Z\gamma$
 and $ud\to ud$ are flat from $10^3$ to $10^4$ ($1$--$3\times10^{-6}$), the fixed horizon. A fine-tune
 against scratch, both a best of eight, carries the same selection on both sides; a single fixed-HP run
 against a search best does not, which is what biased the shortcut above.
@@ -4300,7 +4302,7 @@ replaced them.}
 $3.2\times10^{-9}$ at $10^5$), with no sign of the old $10^{-5}$ floor, and most best checkpoints sit at the
 last step. Their curve through $D\le10^3$, extended, would put $10^5$ near $10^{-11}$, so at large $D$ they
 are limited by steps, at a compute that is not worth paying now. The probes with a $Z$ pole do not flatten
-at all: $ee\to\nu_e\bar\nu_e$ falls $30\times$ from $10^4$ to $10^{4.5}$ and another $8\times$ to $10^5$, and the
+at all: $ee\to\nu_e\bar\nu_e$ falls $36\times$ from $10^4$ to $10^{4.5}$ and another $8\times$ to $10^5$, and the
 one-loop probes as steeply, so they are the ones where transfer can show at large $D$. The eight runs on
 Jean Zay ($ud\to ud$, $ee\to t\bar t$, $u\bar u\to Zgg$, $u\bar u\to Zggg$) ran into the $3$\,h limit at
 $23$--$31$k steps, before the anneal, and are listed in \code{long\_runs.json}, not drawn.
@@ -4308,8 +4310,8 @@ $23$--$31$k steps, before the anneal, and are listed in \code{long\_runs.json}, 
 \centering
 \widerow{\pnl{../analysis/transfer/figs/large_d_a.pdf}\hfill\pnl{../analysis/transfer/figs/large_d_b.pdf}}
 \caption{Scratch curves to $D=10^4$ (best of the $8$k-step search) with one $64$k-step run at $10^{4.5}$
-and $10^5$ (squares): (a) $u\bar u\to gg$, $u\bar u\to Zg$, $ee\to Z\gamma$; (b) $ee\to\nu_e\bar\nu_e$ (the
-Breit--Wigner factor on), $ee\to d\bar d$ and $ee\to b\bar b$ at one loop. The two sides are at different
+and $10^5$ (squares): (a) $u\bar u\to gg$, $u\bar u\to Zg$, $ee\to Z\gamma$; (b) $ee\to\nu_e\bar\nu_e$, $ee\to d\bar d$ and
+$ee\to b\bar b$ at one loop, all three with the Breit--Wigner factor on. The two sides are at different
 compute.}
 \label{fig:ladder_large}
 \end{figure}
