@@ -9,7 +9,7 @@ cluster:
   chain_width: 2
   time: '12:15:00'
 paths: null
-sweep_name: tp3_pre_ladder_r7
+sweep_name: tp3_ladder_r7
 n_trials: 8
 dyhpo:
   n_candidates: 200
@@ -69,8 +69,8 @@ range_extension:
 search_space:
 - name: training.lr
   type: float_log
-  low: 4.58e-05
-  high: 0.00458
+  low: 0.00012
+  high: 0.012
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10

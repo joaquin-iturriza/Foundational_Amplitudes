@@ -60,6 +60,7 @@ def rebuild(run_dir, role, path, n_events):
     spec[f"n_{role}"] = int(n_events)
     tmp = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)
     yaml.safe_dump(rec, tmp); tmp.close()
+    own_eval_subsample = cfg.data.get("eval_subsample", None)
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
         cfg.use_mlflow = False; cfg.count_flops = False
@@ -77,6 +78,7 @@ def rebuild(run_dir, role, path, n_events):
             cfg0 = cfg.copy()
             with open_dict(cfg0):
                 cfg0.data.processes_file = own_recipe
+                cfg0.data.eval_subsample = own_eval_subsample      # the run's own val/test caps, as it trained
             own = _build(cfg0, None, None, name)._offshell_stats
         with open_dict(cfg):
             cfg.data.offshell_stats = own

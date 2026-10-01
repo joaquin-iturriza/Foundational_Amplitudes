@@ -1,4 +1,4 @@
-# Transfer ladder, pretraining on rung 4 (cumulative), 64000 steps, factors off.
+# Transfer ladder, pretraining on rung 8 (cumulative), 64000 steps, factors off.
 # Written by sweep/gen_transfer_pilot.py.
 cluster:
   scheduler: slurm
@@ -9,7 +9,7 @@ cluster:
   chain_width: 2
   time: '12:15:00'
 paths: null
-sweep_name: tp3_pre_ladder_r4
+sweep_name: tp3_ladder_r8
 n_trials: 8
 dyhpo:
   n_candidates: 200
@@ -63,14 +63,14 @@ fixed_params:
   training.dtype: float32
   plot: 'true'
   use_mlflow: 'false'
-  data.processes_file: ${PROJECT_DIR}/recipes/transfer_ladder_r4.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_ladder_r8.yaml
 range_extension:
   enabled: false
 search_space:
 - name: training.lr
   type: float_log
-  low: 4.58e-05
-  high: 0.00458
+  low: 0.00012
+  high: 0.012
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10

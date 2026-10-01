@@ -78,10 +78,8 @@ SETTLED = [2, 3, 4, 5, 6, 7, 8]
 N_TRIALS, N_STARTUP = 8, 3
 SEC_PER_STEP, OVERHEAD_MIN = 0.45, 15              # bs 16384 on a V100 (gen_solo16k_configs)
 # The ladder's pretrainings (docs/results.tex sec:ladder, Protocol): one search per rung, run to convergence
-# capped at 64k steps, factors off (tp3_). The lr window is centred on the ee->uu pretrain's best (6.7e-4 at
-# 32k, the lower edge of its lr*-centred window) moved to 64k by the t^-0.55 decay (CLAUDE.md, rule 2),
-# one decade either side.
-T_LADDER, LR_LADDER = 64000, 6.7e-4 * (64000 / 32000) ** -0.55
+# capped at 64k steps, factors off (tp3_), the lr window one decade either side of lr*(64k, high D).
+T_LADDER = 64000
 
 recs = json.load(open(os.path.join(ROOT, "analysis", "hpo_optima", "hpo_optima.json")))
 row = collections.defaultdict(list)
@@ -89,7 +87,11 @@ for r in recs:
     if r["family"] == "scaling_p" and r["converged"] and r["hp_best"].get("training.lr") and r["n_train"] == 70000:
         row[r["t_steps"]].append(np.log(r["hp_best"]["training.lr"]["val"]))
 ts = np.array(sorted(row)); lr_row = np.array([np.mean(row[t]) for t in ts])
-lr_star = lambda t: float(np.exp(np.interp(np.log(t), np.log(ts), lr_row)))
+# Past the high-D row's last horizon (~1.8e4) the centre follows CLAUDE.md rule 2's extrapolation of that
+# row's decay (2e-3 at 3e4, 1.4e-3 at 5e4, 9e-4 at 1e5); np.interp alone would hold the last value
+_EXTRAP = (np.log([3e4, 5e4, 1e5]), np.log([2e-3, 1.4e-3, 9e-4]))
+lr_star = lambda t: float(np.exp(np.interp(np.log(t), np.r_[np.log(ts), _EXTRAP[0]], np.r_[lr_row, _EXTRAP[1]])
+                                 if t > ts.max() else np.interp(np.log(t), np.log(ts), lr_row)))
 
 FIXED = {
     "data.source": "recipes", "data.require_cache": "false", "data.eval_subsample": 10000,
@@ -171,10 +173,9 @@ def main():
         FIXED["data.target_propagators"] = "false"
     if a.ladder:
         FIXED["data.target_propagators"] = "false"
-        lr = {"name": "training.lr", "type": "float_log",
-              "low": float(f"{LR_LADDER / 10:.3g}"), "high": float(f"{LR_LADDER * 10:.3g}")}
+        # tp3_ladder_r<n>: the tp3_pre_ladder_r<n> sweeps were centred on the ee_uu best instead and cancelled
         for r in a.ladder:
-            out.append(write(f"tp3_pre_ladder_r{r}", f"transfer_ladder_r{r}.yaml", T_LADDER, [lr] + COMMON_SPACE,
+            out.append(write(f"tp3_ladder_r{r}", f"transfer_ladder_r{r}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
                              head=f"Transfer ladder, pretraining on rung {r} (cumulative), {T_LADDER} steps, factors off."))
         print("\n".join(os.path.relpath(p, ROOT) for p in out))
         return
