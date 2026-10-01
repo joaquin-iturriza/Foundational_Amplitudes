@@ -77,6 +77,11 @@ T_CELL = {2: 176, 3: 704, 4: 2816, 5: 4576, 6: 8000, 7: 8000, 8: 8000, 9: 16000,
 SETTLED = [2, 3, 4, 5, 6, 7, 8]
 N_TRIALS, N_STARTUP = 8, 3
 SEC_PER_STEP, OVERHEAD_MIN = 0.45, 15              # bs 16384 on a V100 (gen_solo16k_configs)
+# The ladder's pretrainings (docs/results.tex sec:ladder, Protocol): one search per rung, run to convergence
+# capped at 64k steps, factors off (tp3_). The lr window is centred on the ee->uu pretrain's best (6.7e-4 at
+# 32k, the lower edge of its lr*-centred window) moved to 64k by the t^-0.55 decay (CLAUDE.md, rule 2),
+# one decade either side.
+T_LADDER, LR_LADDER = 64000, 6.7e-4 * (64000 / 32000) ** -0.55
 
 recs = json.load(open(os.path.join(ROOT, "analysis", "hpo_optima", "hpo_optima.json")))
 row = collections.defaultdict(list)
@@ -153,6 +158,8 @@ def main():
     ap.add_argument("--bw-off", action="store_true",
                     help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
                          "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
+    ap.add_argument("--ladder", nargs="*", type=int,
+                    help="write the ladder's pretraining configs (tp3_pre_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
@@ -162,6 +169,15 @@ def main():
     pfx = "tp3" if a.bw_off else "tp2"
     if a.bw_off:
         FIXED["data.target_propagators"] = "false"
+    if a.ladder:
+        FIXED["data.target_propagators"] = "false"
+        lr = {"name": "training.lr", "type": "float_log",
+              "low": float(f"{LR_LADDER / 10:.3g}"), "high": float(f"{LR_LADDER * 10:.3g}")}
+        for r in a.ladder:
+            out.append(write(f"tp3_pre_ladder_r{r}", f"transfer_ladder_r{r}.yaml", T_LADDER, [lr] + COMMON_SPACE,
+                             head=f"Transfer ladder, pretraining on rung {r} (cumulative), {T_LADDER} steps, factors off."))
+        print("\n".join(os.path.relpath(p, ROOT) for p in out))
+        return
     if a.steered:
         for p, (recipe, extra) in STEERED.items():
             for k in SETTLED:
