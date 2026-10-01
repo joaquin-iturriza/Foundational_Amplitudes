@@ -4483,9 +4483,13 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
-    pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance. Away from
-    $ee\to d\bar d$ the best \code{lr\_scale} is $30$--$93$ in most cells: replace the $\sqrt{B/16384}$ scaling
-    of the fine-tune lr rather than widening the window again.
+    pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
+  \item \textbf{The fine-tune's lr window.} In $46$ of the $84$ fine-tune cells the best \code{lr\_scale} sat in
+    the top $15\%$ of $[1,100]$ ($\ge10^{1.7}$), the trigger used for scratch; those cells are re-searched over
+    $[10,1000]$ (\code{tp3\_ftph}, with the parent's off-shellness scale; \code{tp3\_fth} for the five probes
+    without an internal $Z$), the user's call (2026-10-01) over replacing the $\sqrt{B/16384}$ scaling of the
+    fine-tune lr, which stays open. A cell's value over its searches (the best of all, or the re-search's alone)
+    is the user's to decide.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
