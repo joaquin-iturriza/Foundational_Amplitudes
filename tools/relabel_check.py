@@ -29,8 +29,10 @@ for path in a.pools:
     with mg.CppDriverPipe(driver, sa) as pipe:
         me2 = np.asarray(pipe.compute([(m, np.asarray(cfg["pdg_ids"])) for m in mom], perm=perm,
                                       alphas=mg.compute_alphas(s, alphas_mz=amz)), float)
-    lr = np.log(me2 / X[:, -1])
+    # ratio of magnitudes, so a signed (one-loop) pool compares too; a sign flip is counted apart
+    lr = np.log(np.abs(me2) / np.abs(X[:, -1]))
+    flips = int((np.sign(me2) != np.sign(X[:, -1])).sum())
     q = np.quantile(s, [0, .25, .5, .75, 1])
     by_s = [float(np.median(lr[(s >= q[i]) & (s <= q[i + 1])])) for i in range(4)]
     print(json.dumps(dict(pool=path, n=len(X), median_log_ratio=float(np.median(lr)),
-                          max_abs_log_ratio=float(np.abs(lr).max()), median_by_sqrts_quartile=by_s)))
+                          max_abs_log_ratio=float(np.abs(lr).max()), sign_flips=flips, median_by_sqrts_quartile=by_s)))
