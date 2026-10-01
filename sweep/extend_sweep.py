@@ -25,7 +25,10 @@ def state_of(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("sweep_dir")
-    ap.add_argument("--param", required=True)
+    ap.add_argument("--param")
+    ap.add_argument("--retract", nargs="*", type=int, default=[],
+                    help="hp indices whose trials failed for reasons unrelated to their HPs (a full disk): their "
+                         "observations and diverged marks are dropped")
     ap.add_argument("--low", type=float)
     ap.add_argument("--high", type=float)
     ap.add_argument("--fold", nargs="*", default=[])
@@ -48,13 +51,16 @@ def main():
     already = {d["source"] for d in done}
     srcs = [(src, os.path.abspath(state_of(src))) for src in a.fold]
     other = {st: DyHPOSampler.load(st, os.path.dirname(st)) for _, st in srcs}
-    bounds = [next(e for e in o.hp_space if e["name"] == a.param) for o in other.values()]
+    bounds = [next(e for e in o.hp_space if e["name"] == a.param) for o in other.values()] if a.param else []
     low = a.low if a.low is not None else min((b["low"] for b in bounds), default=None)
     high = a.high if a.high is not None else max((b["high"] for b in bounds), default=None)
     with DyHPOSampler.locked(state, a.sweep_dir) as s:
         (T,) = s.fidelity_grid["t_steps"]
-        ext = s.extend_range(a.param, low=low, high=high, n_new=a.n_new)
-        print(f"{a.sweep_dir}: {a.param} {ext or 'unchanged'}")
+        for hp in a.retract:
+            print(f"{a.sweep_dir}: retract hp_{hp:04d} {'done' if s.retract(hp) else '(nothing recorded)'}")
+        ext = s.extend_range(a.param, low=low, high=high, n_new=a.n_new) if a.param else {}
+        if a.param:
+            print(f"{a.sweep_dir}: {a.param} {ext or 'unchanged'}")
         for src, src_state in srcs:
             if src_state in already:
                 print(f"  {src}: folded before, skipped"); continue

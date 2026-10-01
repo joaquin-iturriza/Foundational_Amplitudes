@@ -465,6 +465,21 @@ class DyHPOSampler:
         self.observe(hp_idx, t_steps, val_loss, proc_val_losses, train=False)   # the next suggest() retrains
         return hp_idx
 
+    def retract(self, hp_idx: int) -> bool:
+        """Undo a trial that failed for a reason unrelated to its HPs (a full disk): drop its observations,
+        imputed penalty included, and its diverged mark, so the point can be suggested again. True if
+        anything was dropped. The surrogate retrains at the next suggest()."""
+        had = hp_idx in self._val_loss_history or hp_idx in self.algorithm.diverged_configs
+        self._val_loss_history.pop(hp_idx, None)
+        self._proc_val_loss_history.pop(hp_idx, None)
+        self._eval_order = [e for e in self._eval_order if e[0] != hp_idx]
+        self.algorithm.observations.pop(hp_idx, None)
+        self.algorithm.diverged_configs.discard(hp_idx)
+        self._in_flight.discard(hp_idx)
+        if had and self.algorithm.model is not None:
+            self.algorithm._surrogate_stale = True
+        return had
+
     def report_failure(self, hp_idx: int):
         """
         Called when a trial fails before observe().  Removes hp_idx from the
