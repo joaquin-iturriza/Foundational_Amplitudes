@@ -262,7 +262,7 @@ class DyHPOSampler:
         return hp_idx, self.candidates_raw[hp_idx], t_steps
 
     def observe(self, hp_idx: int, t_steps: int, val_loss: float,
-                proc_val_losses: Optional[dict] = None):
+                proc_val_losses: Optional[dict] = None, train: bool = True):
         """Record a completed evaluation."""
         self._in_flight.discard(hp_idx)
         combo = self._to_combo(t_steps)
@@ -270,7 +270,7 @@ class DyHPOSampler:
         if proc_val_losses:
             self._proc_val_loss_history.setdefault(hp_idx, {})[combo] = proc_val_losses
         self._eval_order.append((hp_idx, combo))
-        self.algorithm.observe(hp_idx, combo, -val_loss)
+        self.algorithm.observe(hp_idx, combo, -val_loss, train=train)
 
     def check_and_extend_ranges(
         self,
@@ -462,7 +462,7 @@ class DyHPOSampler:
         self.candidates_raw.append({e['name']: params[e['name']] for e in self.hp_space})
         self._reencode()
         hp_idx = len(self.candidates_raw) - 1
-        self.observe(hp_idx, t_steps, val_loss, proc_val_losses)
+        self.observe(hp_idx, t_steps, val_loss, proc_val_losses, train=False)   # the next suggest() retrains
         return hp_idx
 
     def report_failure(self, hp_idx: int):

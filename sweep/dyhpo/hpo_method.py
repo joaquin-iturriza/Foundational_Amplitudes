@@ -570,6 +570,9 @@ class DyHPOAlgorithmND:
                 break
 
         if idx is None:
+            if self.model is not None and getattr(self, "_surrogate_stale", False):
+                self._train_surrogate()          # observations were folded in without training
+                self._surrogate_stale = False
             if self.model is not None:
                 means, stds, hp_indices, combos = self._predict(exclude=exclude)
                 if hp_indices:
@@ -600,7 +603,7 @@ class DyHPOAlgorithmND:
 
         return int(idx), combo
 
-    def observe(self, hp_idx: int, combo: tuple, neg_val_loss: float):
+    def observe(self, hp_idx: int, combo: tuple, neg_val_loss: float, train: bool = True):
         """
         Record one completed evaluation.
 
@@ -609,6 +612,8 @@ class DyHPOAlgorithmND:
         hp_idx       : int    — same index returned by suggest()
         combo        : tuple  — same combo returned by suggest()
         neg_val_loss : float  — negated val_loss (DyHPO maximises internally)
+        train        : bool   — False records without retraining the surrogate (many observations folded in at
+                                once, sweep/extend_sweep.py); the next suggest() retrains first
         """
         if np.isnan(neg_val_loss):
             self.diverged_configs.add(hp_idx)
@@ -630,7 +635,10 @@ class DyHPOAlgorithmND:
                 )
             if self.no_improvement_patience == self.no_improvement_threshold:
                 self.model.restart = True
-            self._train_surrogate()
+            if train:
+                self._train_surrogate()
+            else:
+                self._surrogate_stale = True
 
 
 # Backward-compat alias
