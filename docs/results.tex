@@ -4103,8 +4103,21 @@ Fig.~\ref{fig:ladder_bwoff}), comes out worse in $22$ cells ($0.1$--$0.8\times$)
 seeded A/B. The comparison is biased: the factor-on value is the minimum of eight noisy trials and
 carries the winner's seed luck, the factor-off value is one draw at those HPs (the next paragraph
 measures that bias at $1.5$--$11\times$). So the shortcut cannot settle it here, and the factor-off
-arm gets its own search, first on $ee\to d\bar d$ (\code{tp3\_scr\_ee\_ddbar}, running), extended to the
-other three on that result (the user's call).
+arm gets its own search, first on $ee\to d\bar d$ (\code{tp3\_scr\_ee\_ddbar}), extended to the
+other three on that result (the user's call). Best against best (\code{bw\_off\_sweep.py},
+Fig.~\ref{fig:ladder_bwoff_sweep}) the factor off costs $1.5$--$2.1\times$ at $D\le10^2$ and at
+$10^{3.5}$--$10^4$ ($2.97\times10^{-6}$ against $1.42\times10^{-6}$ at $10^4$) and ties at
+$10^{2.5}$--$10^3$ ($0.9\times$): inside the spread of one search's best between seeds, so the factor
+buys nothing measurable and stays off. The other three probes get the same search
+(\code{tp3\_scr}, running), and so does $ee\to W^+W^-$, whose scratch arm kept the $t$-channel factor,
+so that every fine-tune from the factor-off pretraining has a scratch arm on its own target.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/bw_off_sweep_ee_ddbar.pdf}
+\caption{$ee\to d\bar d$, the Breit--Wigner factor on and off, the best of each cell's $8$-trial search
+(MSE of $\log|\mathcal M|^2$ at the best checkpoint).}
+\label{fig:ladder_bwoff_sweep}
+\end{figure}
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/bw_off_shortcut_a.pdf}\hfill\pnl{../analysis/transfer/figs/bw_off_shortcut_b.pdf}} \\[1ex]
@@ -4186,7 +4199,7 @@ $t$-channel factor's floor, and within $3\times$ and $10\times$ of it (\code{ww\
 \label{fig:ladder_wwcorner}
 \end{figure}
 
-\paragraph{Steering the $ee\to W^+W^-$ pool once: built, not yet scored.} The coordinate-free remedy of
+\paragraph{Steering the $ee\to W^+W^-$ pool once: it pays at large $D$.} The coordinate-free remedy of
 Sec.~\ref{sec:div-sampling}, generated once and frozen so scratch and fine-tune share the pool
 (\code{tools/steer\_pool.py}; sampling mode \code{steered}, pools tagged \code{\_ssteer}): $2.4$M flat
 candidates labelled on CPU, scored by a HETEROSC reference (detached $\sigma$, $\beta=1$, $D=10^5$, $16$k
@@ -4194,14 +4207,36 @@ steps, the mixture pool), $1.2\times10^5$ kept $\propto\sigma^3$ and split into 
 $t$-channel normalisation is pinned to the mixture pool's (\code{data.target\_propagator\_tchannel\_norm})
 so the target is the baseline's. The reference's $\sigma$ varies little (its $99.9$th percentile is
 $3.2\times$ its median), so the selection is mild: the top $0.1\%$ of $\sigma$ make up $1.3\%$ of the
-kept events. At each cell's baseline-best HPs the steered runs fit their own pool well ($3.8\times10^{-6}$
-on its validation at $D=10^4$, against the baseline's $2.3\times10^{-5}$ on its own), but scored on the
-mixture test split (\code{cross\_eval.py}) they sit at $0.017$--$0.07$. That is a constant shift: $+0.12$
-in $\log|\mathcal M|^2$ on every mixture event, at every $|\mathcal M|^2$ and angle; the mixture-trained
-reference shows $-0.021$ on the steered test, equally constant, and none on its own test ($4\times10^{-5}$).
-The labels agree exactly (\code{tools/relabel\_check.py} reproduces the stored $|\mathcal M|^2$ of both
-pools and of the candidates), the stored momenta share one convention, and the rebuilt statistics equal
-each run's frozen ones. The cause is open (hand-off), and no steering number is used until it is found.
+kept events. Each steered run is trained at its cell's baseline-best HPs (the A/B shortcut) and scored
+on the mixture test split, the baseline's own, by rebuilding it on that split (\code{cross\_eval.py}).
+A first scoring put every steered run $0.12$ too high in $\log|\mathcal M|^2$ on every mixture event,
+and the mixture-trained reference $0.021$ too low on the steered test. The cause was the rebuild: the
+per-event off-shellness input (signed-log $s-M^2$, \code{data.offshell\_per\_event}) is standardized
+with a mean and width taken over train, validation and test together, so swapping the test file
+moved them and shifted every event's input ($+0.22$ standard deviations for the steered $D=10^4$ run,
+$-0.034$ for the reference, the signs of their offsets, and the two models respond alike, $0.54$ and
+$0.61$ in $\log|\mathcal M|^2$ per unit). The pools themselves agree: the same $W$ masses and frame,
+and at matched points in $(\sqrt s,\cos\theta)$ the same $\log|\mathcal M|^2$ to $6\times10^{-4}$ on average
+(\code{tools/relabel\_check.py} also reproduces the stored values exactly). Within one run the input is
+consistent, so no single-pool number changes; the statistics are now recorded in
+\code{data\_stats.json} and pinned on a rebuild (\code{data.offshell\_stats}). The same rebuild scored
+the candidates when the pool was built, so its $\sigma$ carried a shift of about $-0.03$ standard
+deviations: the pool is steered by a slightly perturbed $\sigma$, not an unsteered one. Scored with the
+statistics pinned (Fig.~\ref{fig:ladder_steer}), the steered pool wins where the mixture pool
+plateaus, $12.6\times$ at $D=10^4$ ($4.9\times10^{-6}$ against $6.2\times10^{-5}$) and $1.5\times$ at
+$10^{3.5}$, and loses below, by $1.5$--$2\times$ at $10^{2.5}$--$10^3$ and $7$--$45\times$ at
+$10^{1.5}$--$10^2$, where selecting $\propto\sigma^3$ leaves the bulk few events. The comparison is
+biased against the steered arm (one run at the other arm's HPs, against a best of eight), so the two
+cells it wins are settled; the cells it loses get their own search (\code{tps\_scr}, $D\le10^3$,
+running).
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/steer_ab.pdf}
+\caption{$ee\to W^+W^-$ trained on the mixture pool (each cell's best of $8$ trials) and on the
+$\sigma$-steered pool (one run at those HPs), both scored on the mixture test split with the run's own
+input statistics (MSE of $\log|\mathcal M|^2$ at the best checkpoint).}
+\label{fig:ladder_steer}
+\end{figure}
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/residual_map_a.pdf}\hfill\pnl{../analysis/transfer/figs/residual_map_b.pdf}}
@@ -4279,7 +4314,7 @@ compute.}
 \label{fig:ladder_large}
 \end{figure}
 
-\paragraph{Chapter one: the near probe gains, the far probe loses at small $D$.} The $ee\to u\bar u$
+\paragraph{Chapter one: the near probe gains at every $D$, the far one once its lr is free.} The $ee\to u\bar u$
 pretraining (one DyHPO, $8$ trials, $32$k steps, $10^5$ events; best trial lr
 $6.7\times10^{-4}$, $\vlnr=1.6\times10^{-8}$, $2.6\times10^{-7}$ in MSE of $\log|\mathcal M|^2$,
 best checkpoint at the last step, so not converged) is fine-tuned on both chapter-one probes, the same cells and
@@ -4297,28 +4332,38 @@ ordering, gain falling with distance, holds; that it goes negative at small $D$ 
 the Breit--Wigner factor off the pretraining is re-run once at the best trial's HPs
 (\code{tp3\_pre\_ee\_uu}; it stopped at step $30080$ of $32000$ on a time limit, its best checkpoint there,
 $94\%$ through the anneal, at $1.18\times10^{-7}$, half the factor-on pretraining's), and both chapter-one
-probes are fine-tuned from it again with \code{lr\_scale} searched over $[1,100]$ (\code{tp3\_ft}, running).
+probes are fine-tuned from it again with \code{lr\_scale} searched over $[1,100]$ (\code{tp3\_ft};
+Fig.~\ref{fig:ladder_ch1}, against the factor-off scratch arms). $ee\to d\bar d$ gains $4$--$16\times$ at
+every $D$ up to $10^{3.5}$ and meets scratch at $10^4$ ($2.0\times10^{-6}$ against $3.0\times10^{-6}$);
+its best \code{lr\_scale} is $6$--$15$ in every cell but one. $u\bar u\to gg$ now loses only at $D=10$
+($2.2\times$) and at $10^{2.5}$ ($2.3\times$), gains $2$--$5\times$ at $10^{1.5}$, $10^2$, $10^3$ and
+$10^{3.5}$, and ties at $10^4$ ($1.4\times10^{-7}$ against $1.0\times10^{-7}$, the fine-tune cell at $6$ of
+$8$ trials); its best \code{lr\_scale} is $57$--$80$ in six of seven cells, near the top of the new window
+though not at it. So the old loss was mostly the capped lr: the far probe wants a fine-tuning lr close
+to scratch's, $\sqrt{B/16384}$ having shrunk the pretraining's by up to $57\times$ at small $D$. The two
+values $57$ and $80$ are two candidate points, recurring across cells because every sweep draws the
+same candidates (hand-off).
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/transfer_ch1_a.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_ch1_b.pdf}}
-\caption{Chapter one: best trial per cell from scratch and fine-tuned from the $ee\to u\bar u$
-pretraining, MSE of $\log|\mathcal M|^2$ at the best checkpoint. (a) $ee\to d\bar d$ (the
-Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor off in both).}
+\caption{Chapter one with both target factors off: best trial per cell from scratch and fine-tuned
+from the factor-off $ee\to u\bar u$ pretraining, MSE of $\log|\mathcal M|^2$ at the best checkpoint;
+open marker, a cell with fewer than $7$ of $8$ trials in. (a) $ee\to d\bar d$; (b) $u\bar u\to gg$ (no
+factor reaches its pool, so its scratch arm is the $t$-channel-off search).}
 \label{fig:ladder_ch1}
 \end{figure}
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{The Breit--Wigner factor, off.} Running: the factor-off search on $ee\to d\bar d$
-    (\code{tp3\_scr}); best against best decides whether the other three probes get theirs.
+  \item \textbf{Factor-off scratch arms.} Running on lxplus: \code{tp3\_scr} for $ee\to\nu_e\bar\nu_e$,
+    $ee\to d\bar d$ and $ee\to b\bar b$ at one loop, and $ee\to W^+W^-$; the scratch arms of their fine-tunes.
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
-  \item \textbf{The steered pool's cross-pool offset.} Find why a model scored on the other pool is off by
-    a constant (above). Next check: the steered model on the raw flat candidates (the mixture pool's
-    uniform part, the steered pool's source), which needs \code{cross\_eval.py} to read a pool that is not
-    a recipe split. The user may park steering instead.
+  \item \textbf{Steering at small $D$.} The steered searches at $D\le10^3$ (\code{tps\_scr}, running) decide
+    whether the steered pool loses there on its own HPs too. Then: re-score the pool with the corrected
+    rebuild if the $\sigma$ shift matters, and the fine-tune arm on the steered pool.
   \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
     ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
     $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
@@ -4337,15 +4382,17 @@ Breit--Wigner factor on in both arms); (b) $u\bar u\to gg$ ($t$-channel factor o
     longer limit (about $50$ GPU-h); after everything else, as the longer horizons.
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
-  \item \textbf{$u\bar u\to gg$ at small $D$.} The \code{tp3\_ft} searches (\code{lr\_scale} up to $100$)
-    tell whether the loss was the capped lr. Then: fine-tune all twelve probes from $ee\to u\bar u$ and
-    measure each one's zero-shot loss as its distance from the pretraining.
+  \item \textbf{All twelve probes fine-tuned.} Running on Jean Zay: \code{tp3\_ft} for every probe from the
+    factor-off $ee\to u\bar u$ pretraining ($84$ sweeps). Then each probe's zero-shot loss as its distance
+    from the pretraining. The far probe's best \code{lr\_scale} sits at $57$--$80$; if more probes push the
+    window's top, replace the $\sqrt{B/16384}$ scaling of the fine-tune lr rather than widening it again.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
-  \item \textbf{The ladder.} The rung recipes are written; their pools (prebuild of
-    \code{transfer\_ladder\_r9.yaml}, Jean Zay CPU partition) wait in the queue. Then one pretraining
-    search per rung, up to $64$k steps; the star arms after.
+  \item \textbf{The ladder.} Pools built (lxplus; rungs $1$--$4$ on every site). One pretraining search per
+    rung, $64$k steps, factors off (\code{tp3\_pre\_ladder\_r}$n$; lr one decade around the $ee\to u\bar u$
+    best moved to $64$k by $t^{-0.55}$): rungs $1$--$4$ on Jean Zay, $5$--$9$ on lxplus, queued. Then the
+    probes fine-tuned from each rung; the star arms after.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
