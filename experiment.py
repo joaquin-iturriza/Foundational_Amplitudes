@@ -1816,19 +1816,22 @@ class AmplitudeExperiment(BaseExperiment):
                 ft = self.cfg.get("fine_tune", None)
                 if ft is not None and ft.get("pretrained_path", None) is not None and not self.warm_start \
                         and str(ft.get("offshell_stats", "parent")) == "parent":
-                    # a fine-tune keeps the parent's scale on every column the parent saw vary, so the same
-                    # off-shellness reaches the backbone as the same input; a column the parent saw constant
-                    # (sd set to 1 above, standardized to 0) carries no learned scale and is fitted here,
-                    # centred on the 0 the parent saw. Refitting every column shifted the input under the
-                    # pretrained weights (docs/results.tex sec:ladder, the steering offset)
+                    # a fine-tune keeps the parent's scale on every column that varies in both, so the same
+                    # off-shellness reaches the backbone as the same input. A column the parent saw constant
+                    # (sd set to 1 above, standardized to 0) carries no learned scale, and a column the probe
+                    # never fills (no propagator of that pdg) would land on the parent's on-shell value under
+                    # the parent's scale: both are fitted here, centred on 0. Refitting every column shifted
+                    # the input under the pretrained weights (docs/results.tex sec:ladder, the steering offset)
                     parent = getattr(self, "_parent_offshell", None)
+                    if parent is None and ft.get("parent_offshell_stats", None) is not None:
+                        parent = OmegaConf.to_container(ft.parent_offshell_stats)   # parent without data_stats.json
                     assert parent is not None, (
                         "fine_tune.offshell_stats=parent but the parent's data_stats.json has no offshell_stats "
                         "(a run older than the record): pass fine_tune.parent_offshell_stats "
                         "(tools/offshell_stats.py <parent run>) or set fine_tune.offshell_stats=own")
                     pm, ps = np.asarray(parent[0], np.float64), np.asarray(parent[1], np.float64)
                     assert pm.shape == mu.shape, f"parent offshell_stats {parent} for {mu.shape[0]} columns"
-                    varied = ps != 1.0
+                    varied = (ps != 1.0) & (osh.std(0) >= 1e-8)
                     mu, sd = np.where(varied, pm, mu), np.where(varied, ps, sd)
                     LOGGER.info(f"Fine-tuning: off-shellness columns {np.flatnonzero(varied).tolist()} on the "
                                 f"parent's scale, the rest fitted here")
@@ -3386,8 +3389,8 @@ class AmplitudeExperiment(BaseExperiment):
                 self.proc_val_losses_no_reg[name].append(loss)
 
         LOGGER.info(
-            f"Val loss (combined): {val_loss:.4f} | " +
-            ", ".join(f"{n}={v:.4f}" for n, v in proc_losses.items())
+            f"Val loss (combined): {val_loss:.4g} | " +
+            ", ".join(f"{n}={v:.4g}" for n, v in proc_losses.items())
         )
 
         # σ-ranking SPEED probe on the MULTI-PROCESS path (this override does not

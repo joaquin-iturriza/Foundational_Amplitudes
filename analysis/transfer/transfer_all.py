@@ -35,17 +35,24 @@ def scratch(p, k):
     """The cell's scratch value: the best over its search and, where its best sat at the lr window's top, the searches
     re-run half a decade and a decade higher (tp3_scrh, tp3_scrh10; same target, checked by prepd_std). 16-24
     trials against the fine-tune's 8, so the selection favours scratch: conservative for the gain."""
-    vals = [best(n)[0] for n in (f"{ARM[p]}_{p}_d{k}", f"tp3_scrh_{p}_d{k}", f"tp3_scrh10_{p}_d{k}")]
-    vals = [v for v in vals if v is not None]
-    return (min(vals), None) if vals else (None, None)
+    return _pick([f"{ARM[p]}_{p}_d{k}", f"tp3_scrh_{p}_d{k}", f"tp3_scrh10_{p}_d{k}"])
 
 
 def finetune(p, k):
     """The cell's fine-tune value, chosen as scratch's: the best over its search (tp3_ftp where the probe has an internal
-    Z, else tp3_ft) and, where its best lr_scale sat at the top of [1, 100], the re-search over [10, 1000] (tp3_ftph)."""
+    Z, else tp3_ft) and, where its best lr_scale sat at the top of [1, 100] (>= 10^1.7, the top 15% as for scratch),
+    the re-search over [10, 1000] (tp3_ftph with the parent's off-shellness scale, tp3_fth for the probes without an
+    internal Z, whose columns are all fitted on the probe as in tp3_ft)."""
     ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-    got = [best(n) for n in (ft, f"tp3_ftph_{p}_d{k}")]
+    return _pick([ft, f"tp3_ftph_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_fth_{p}_d{k}"])
+
+
+def _pick(names):
+    """Best over the given searches of one cell; they must share the target (equal prepd_std)."""
+    got = [best(n) for n in names]
     got = [g for g in got if g[0] is not None]
+    stds = {round(g[1]["prepd_std"], 5) for g in got}
+    assert len(stds) <= 1, f"{names}: searches on different targets (prepd_std {stds})"
     return min(got, key=lambda g: g[0]) if got else (None, None)
 
 

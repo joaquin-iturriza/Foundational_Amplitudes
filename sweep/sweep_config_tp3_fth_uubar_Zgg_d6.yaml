@@ -1,4 +1,4 @@
-# Transfer pilot, fine-tune from ee_uu: uubar_Zggg on D = 10^3 events.
+# Transfer pilot, fine-tune from ee_uu: uubar_Zgg on D = 10^3 events.
 # Written by sweep/gen_transfer_pilot.py.
 cluster:
   scheduler: slurm
@@ -9,7 +9,7 @@ cluster:
   chain_width: 2
   time: 01:45:00
 paths: null
-sweep_name: tp3_ftph_uubar_Zggg_d6
+sweep_name: tp3_fth_uubar_Zgg_d6
 n_trials: 8
 dyhpo:
   n_candidates: 200
@@ -63,13 +63,12 @@ fixed_params:
   training.dtype: float32
   plot: 'true'
   use_mlflow: 'false'
-  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zggg.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zgg.yaml
   data.train_subsample: 1000
   training.lr: 0.000117
   fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre_ee_uu_calib_t32000_lr0.0006702359/models/model_run0_best.pt
   fine_tune.target_stats: own
-  fine_tune.offshell_stats: parent
-  fine_tune.parent_offshell_stats: '[[8.838823743095066,0.0,0.0],[6.652852064529154,1.0,1.0]]'
+  fine_tune.offshell_stats: own
 range_extension:
   enabled: false
 search_space:
