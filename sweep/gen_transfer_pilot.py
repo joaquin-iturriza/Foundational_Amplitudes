@@ -161,7 +161,7 @@ def main():
                     help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
                          "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
     ap.add_argument("--ladder", nargs="*", type=int,
-                    help="write the ladder's pretraining configs (tp3_pre_ladder_r<r>) for these rungs, factors off")
+                    help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
