@@ -4105,17 +4105,23 @@ carries the winner's seed luck, the factor-off value is one draw at those HPs (t
 measures that bias at $1.5$--$11\times$). So the shortcut cannot settle it here, and the factor-off
 arm gets its own search, first on $ee\to d\bar d$ (\code{tp3\_scr\_ee\_ddbar}), extended to the
 other three on that result (the user's call). Best against best (\code{bw\_off\_sweep.py},
-Fig.~\ref{fig:ladder_bwoff_sweep}) the factor off costs $1.5$--$2.1\times$ at $D\le10^2$ and at
-$10^{3.5}$--$10^4$ ($2.97\times10^{-6}$ against $1.42\times10^{-6}$ at $10^4$) and ties at
-$10^{2.5}$--$10^3$ ($0.9\times$): inside the spread of one search's best between seeds, so the factor
-buys nothing measurable and stays off. The other three probes get the same search
-(\code{tp3\_scr}, running), and so does $ee\to W^+W^-$, whose scratch arm kept the $t$-channel factor,
-so that every fine-tune from the factor-off pretraining has a scratch arm on its own target.
+Fig.~\ref{fig:ladder_bwoff_sweep}) the factor off costs $1.5$--$2.1\times$ on $ee\to d\bar d$ at $D\le10^2$
+and at $10^{3.5}$--$10^4$ ($2.97\times10^{-6}$ against $1.42\times10^{-6}$ at $10^4$) and ties at
+$10^{2.5}$--$10^3$; on the other three it swings both ways, from $0.13$ to $9.8\times$ per cell, with
+geometric means over the seven cells of $1.48$ ($ee\to d\bar d$), $0.58$ ($ee\to\nu_e\bar\nu_e$), $1.23$
+and $0.93$ ($d\bar d$ and $b\bar b$ at one loop). That is the spread of one search's best between seeds,
+not a direction, so the factor buys nothing measurable and stays off. The same search on
+$ee\to W^+W^-$ (\code{tp3\_scr}), where only the $t$-channel factor differs, loses in all seven cells
+($1.2$--$8.7\times$, geometric mean $2.8\times$): unlike the massless $2\to2$ probes, whose $t$-channel
+factor set a floor, the massive $W$ pair is helped by it. Its fine-tunes from the factor-off pretraining
+are compared with this factor-off arm, so both share a target.
 \begin{figure}[H]
 \centering
-\includegraphics{../analysis/transfer/figs/bw_off_sweep_ee_ddbar.pdf}
-\caption{$ee\to d\bar d$, the Breit--Wigner factor on and off, the best of each cell's $8$-trial search
-(MSE of $\log|\mathcal M|^2$ at the best checkpoint).}
+\widerow{\pnl{../analysis/transfer/figs/bw_off_sweep_a.pdf}\hfill\pnl{../analysis/transfer/figs/bw_off_sweep_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/bw_off_sweep_c.pdf}\hfill\pnl{../analysis/transfer/figs/bw_off_sweep_d.pdf}}
+\caption{The Breit--Wigner factor on and off, the best of each cell's $8$-trial search (MSE of
+$\log|\mathcal M|^2$ at the best checkpoint): (a) $ee\to d\bar d$, (b) $ee\to\nu_e\bar\nu_e$, (c) $ee\to d\bar d$
+at one loop, (d) $ee\to b\bar b$ at one loop.}
 \label{fig:ladder_bwoff_sweep}
 \end{figure}
 \begin{figure}[H]
@@ -4357,8 +4363,6 @@ factor reaches its pool, so its scratch arm is the $t$-channel-off search).}
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Factor-off scratch arms.} Running on lxplus: \code{tp3\_scr} for $ee\to\nu_e\bar\nu_e$,
-    $ee\to d\bar d$ and $ee\to b\bar b$ at one loop, and $ee\to W^+W^-$; the scratch arms of their fine-tunes.
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
