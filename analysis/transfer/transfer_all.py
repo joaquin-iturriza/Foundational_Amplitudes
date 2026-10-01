@@ -9,15 +9,24 @@ Prints the gain table, each probe's geometric mean over D, and the best trial's 
 <base>_loss_ee_a..f, <base>_loss_qcd_a..f: the same cells as losses, one panel per probe (groups a+b, c+d).
   <base>_a  ee->dd~, ee->nu_e nu_e~, ee->tt~, ee->WW      <base>_b  ee->dd~ and ee->bb~ at one loop
   <base>_c  ee->Za, ud->ud, uu~->gg                         <base>_d  uu~->Zg, Zgg, Zggg
+A cell with re-searches (the lr window moved up where the best sat at its top: scratch tp3_scrh/tp3_scrh10,
+fine-tune tp3_ftph/tp3_fth) has several values; which one is reported is open for the user (docs/results.tex
+sec:ladder-open), so the default is the original 8-trial search of each arm and the alternatives are flags:
+  --select original   each arm's first search (default)
+  --select latest     the last re-search where one exists (every cell one 8-trial search)
+  --select union      the best over all of a cell's searches (8-24 trials, uneven between cells and arms)
 Data: analysis/transfer/scratch_sweeps.json.
-    python analysis/transfer/transfer_all.py
+    python analysis/transfer/transfer_all.py [--select original|latest|union]
 """
-import json, os, sys
+import argparse, json, os, sys
 import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 import plot_style as ps
 
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--select", choices=["original", "latest", "union"], default="original")
+SELECT = _ap.parse_args().select
 S = json.load(open(os.path.join(ROOT, "analysis", "transfer", "scratch_sweeps.json")))
 ARM = {"ee_ddbar": "tp3_scr", "ee_nnbar": "tp3_scr", "ee_dd_nlo": "tp3_scr", "ee_bb_nlo": "tp3_scr", "ee_WW": "tp3_scr",
        "ee_Za": "tp2_scr", "ud_ud": "tp2_scr", "uubar_gg": "tp2_scr", "uubar_Zg": "tp2_scr",
@@ -48,12 +57,15 @@ def finetune(p, k):
 
 
 def _pick(names):
-    """Best over the given searches of one cell; they must share the target (equal prepd_std)."""
+    """One cell's value from its searches, original first, re-searches in order (--select); they must share the
+    target (equal prepd_std)."""
     got = [best(n) for n in names]
     got = [g for g in got if g[0] is not None]
     stds = {round(g[1]["prepd_std"], 5) for g in got}
     assert len(stds) <= 1, f"{names}: searches on different targets (prepd_std {stds})"
-    return min(got, key=lambda g: g[0]) if got else (None, None)
+    if not got:
+        return None, None
+    return {"original": got[0], "latest": got[-1], "union": min(got, key=lambda g: g[0])}[SELECT]
 
 
 def best(name):
@@ -80,7 +92,8 @@ for ax, group in zip(axes.flat, GROUPS):
     ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"$L_{\rm scratch}/L_{\rm fine\text{-}tune}$")
     ax.set_ylim(0.05, 3e3)                    # one scale on every panel, so the gains compare across panels
     ps.legend(ax, "upper left")
-ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "transfer_all"))
+SUF = "" if SELECT == "original" else f"_{SELECT}"
+ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "transfer_all" + SUF))
 
 
 for part, order in (("ee", GROUPS[0] + GROUPS[1]), ("qcd", GROUPS[2] + GROUPS[3])):
@@ -98,4 +111,4 @@ for part, order in (("ee", GROUPS[0] + GROUPS[1]), ("qcd", GROUPS[2] + GROUPS[3]
       ps.process_label(ax, LAB[p])
       ps.legend(ax, "lower left")
       ps.make_room(ax)
-  ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"transfer_all_loss_{part}"))
+  ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"transfer_all_loss_{part}" + SUF))
