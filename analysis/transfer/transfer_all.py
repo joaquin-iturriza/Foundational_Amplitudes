@@ -1,5 +1,7 @@
-"""Transfer study, every probe fine-tuned from the factor-off ee->uu pretraining (tp3_ft, lr_scale searched over
-[1,100]) against the same probe from scratch: the gain L_scratch / L_fine-tune per cell, each the best trial of an
+"""Transfer study, every probe fine-tuned from the factor-off ee->uu pretraining (lr_scale searched over [1,100])
+against the same probe from scratch. The fine-tune keeps the pretraining's off-shellness input scale (tp3_ftp) for the
+seven probes with an internal Z; the other five see only columns the pretraining saw constant, where tp3_ft is the
+same run: the gain L_scratch / L_fine-tune per cell, each the best trial of an
 8-trial single-fidelity DyHPO, MSE of log|M|^2 at the best checkpoint. The scratch arm is the one whose target is
 the fine-tune's (checked cell by cell: equal prepd_std): tp3_scr for the probes the factors touch (the Z-window
 probes and ee->WW), tp2_scr where only the t-channel factor reached the pool, tp_scr where neither did.
@@ -41,7 +43,8 @@ for ax, group in zip(axes.flat, GROUPS):
     for p, col in zip(group, ps.CYCLE):
         D, G, scale = [], [], []
         for k in range(2, 9):
-            (ls, _), (lf, bf) = best(f"{ARM[p]}_{p}_d{k}"), best(f"tp3_ft_{p}_d{k}")
+            ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
+            (ls, _), (lf, bf) = best(f"{ARM[p]}_{p}_d{k}"), best(ft)
             if ls is None or lf is None:
                 continue
             D.append(10 ** (k / 2)); G.append(ls / lf); scale.append((bf.get("fine_tune") or {}).get("lr_scale"))

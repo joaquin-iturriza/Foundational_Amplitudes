@@ -28,11 +28,13 @@ def cells(fam, p):
     return dict(sorted(out.items()))
 
 
+# ee->dd~ has an internal Z: its fine-tune keeps the pretraining's off-shellness scale (tp3_ftp); uu~->gg has none
+FT = {"ee_ddbar": "tp3_ftp", "uubar_gg": "tp3_ft"}
 figs = ps.panels(2)
 for (fig, ax), (p, scr, lab) in zip(figs, (("ee_ddbar", "tp3_scr", r"$e^+e^-\to d\bar d$"),
                                             ("uubar_gg", "tp2_scr", r"$u\bar u\to gg$"))):
-    both = set(cells(scr, p)) & set(cells("tp3_ft", p))
-    for fam, col, name in ((scr, ps.C.blue, "from scratch"), ("tp3_ft", ps.C.vermillion, "fine-tuned")):
+    both = set(cells(scr, p)) & set(cells(FT[p], p))
+    for fam, col, name in ((scr, ps.C.blue, "from scratch"), (FT[p], ps.C.vermillion, "fine-tuned")):
         C = {k: t for k, t in cells(fam, p).items() if k in both}
         D = np.array([10 ** (k / 2) for k in C])
         L = np.array([min(r["val_loss"] * r["prepd_std"] ** 2 for r in t) for t in C.values()])
