@@ -129,7 +129,8 @@ class BaseExperiment:
         # save config
         LOGGER.debug(OmegaConf.to_yaml(self.cfg))
         self._save_config("config.yaml")
-        self._save_config(f"config_{self.cfg.run_idx}.yaml")
+        if self.cfg.run_idx:        # a resumed segment; segment 0's config is config.yaml itself
+            self._save_config(f"config_{self.cfg.run_idx}.yaml")
 
         self.init_physics()
 
@@ -148,7 +149,8 @@ class BaseExperiment:
         # 8-entry data.dataset/data.amp_orders into the tracking DB where no
         # later save can correct it, leaving MLflow disagreeing with the run dir.
         self._save_config("config.yaml", to_mlflow=True)
-        self._save_config(f"config_{self.cfg.run_idx}.yaml")
+        if self.cfg.run_idx:        # see above: config_0.yaml duplicated config.yaml in every run (inode quota)
+            self._save_config(f"config_{self.cfg.run_idx}.yaml")
         self.init_geometric_algebra()
         self.init_data()
         self._init_dataloader()
@@ -454,11 +456,13 @@ class BaseExperiment:
         os.makedirs(os.path.join(run_dir, "models"), exist_ok=True)
 
         # save source
-        if self.cfg.save_source:
+        path_experiment = os.path.join(self.cfg.base_dir, "experiments")
+        # the zip is written only when there is source to put in it: the experiments/ dir does not exist in
+        # this tree, and an empty 22-byte zip per run filled Jean Zay's inode quota with ~13k files
+        if self.cfg.save_source and any(files for _, _, files in os.walk(path_experiment)):
             zip_name = os.path.join(self.cfg.run_dir, "source.zip")
             LOGGER.debug(f"Saving source to {zip_name}")
             zipf = zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED)
-            path_experiment = os.path.join(self.cfg.base_dir, "experiments")
             for path in [path_experiment]:
                 for root, dirs, files in os.walk(path):
                     for file in files:
