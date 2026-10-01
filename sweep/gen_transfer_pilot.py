@@ -6,7 +6,9 @@ two probes, a near one (ee->dd~) and a far one (uu~->gg), from scratch and fine-
   scratch    tp2_scr_<probe>_d<k>      probe alone on the first D train events
   fine-tune  tp2_ft_<probe>_d<k>       the same, from the pretrain's best checkpoint
   tp3_       the same with data.target_propagators off, no Breit-Wigner factor either (--bw-off)
-  tps_scr_   scratch on a sigma-steered pool (--steered)
+  tps_scr_   scratch on a sigma-steered pool (--steered); with --bw-off tp3s_scr_/tp3s_ft*_, D >= 10^2.5 only
+  *_ftp_     fine-tunes that keep the pretrain's off-shellness input scale (--parent-offshell, the pretrain's
+             [mean, std] from tools/offshell_stats.py): the default since 2026-10-01; the *_ft_ ones refit it
 The t-channel target factor is off (tp2_): on uu~->gg, uu~->Zg, ee->Za it set a floor near 1e-5
 that switching it off removes, 10-290x lower at the same HPs (analysis/transfer/tchannel_ab.py);
 the tp_ sweeps ran with it on and stay valid only for probes without a massless t/u-channel
@@ -75,6 +77,9 @@ T_PRE = 32000                                     # ee->dd~ at 1e5 events still 
 # other targets"), to be revisited where a probe's best trials all sit at the end of the horizon.
 T_CELL = {2: 176, 3: 704, 4: 2816, 5: 4576, 6: 8000, 7: 8000, 8: 8000, 9: 16000, 10: 16000}
 SETTLED = [2, 3, 4, 5, 6, 7, 8]
+# ee->WW takes the steered pool from D = 10^2.5 on and the mixture pool below, where the steered pool lost best
+# against best (the user's call, 2026-10-01; docs/results.tex sec:ladder)
+STEER_KS = [5, 6, 7, 8]
 N_TRIALS, N_STARTUP = 8, 3
 SEC_PER_STEP, OVERHEAD_MIN = 0.45, 15              # bs 16384 on a V100 (gen_solo16k_configs)
 # The ladder's pretrainings (docs/results.tex sec:ladder, Protocol): one search per rung, run to convergence
@@ -160,15 +165,18 @@ def main():
     ap.add_argument("--bw-off", action="store_true",
                     help="data.target_propagators off (tp3_): no Breit-Wigner factor either (the user's call, "
                          "2026-09-30, after the seeded A/B); the fixed-HP re-runs of the cells it touches")
+    ap.add_argument("--parent-offshell",
+                    help="the pretrain's off-shellness stats as JSON [mean, std] (tools/offshell_stats.py): fine-tunes "
+                         "keep that input scale (*_ftp_) instead of refitting it on the probe")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
-    # the steered arm keeps its probe's current target (ee_WW: the t-channel factor on), so --bw-off never
-    # rewrites it
-    assert not (a.bw_off and a.steered), "--bw-off and --steered write different families; run them apart"
+    # without --bw-off the steered arm keeps its probe's earlier target (ee_WW: the t-channel factor on, tps_);
+    # with it, the study's factor-off target on the steered pool (tp3s_), from D = 10^2.5 on
     pfx = "tp3" if a.bw_off else "tp2"
+    steer_ks = STEER_KS if a.bw_off else SETTLED
     if a.bw_off:
         FIXED["data.target_propagators"] = "false"
     if a.ladder:
@@ -179,11 +187,12 @@ def main():
                              head=f"Transfer ladder, pretraining on rung {r} (cumulative), {T_LADDER} steps, factors off."))
         print("\n".join(os.path.relpath(p, ROOT) for p in out))
         return
-    if a.steered:
+    if a.steered and a.ft is None:
         for p, (recipe, extra) in STEERED.items():
-            for k in SETTLED:
-                out.append(write(f"tps_scr_{p}_d{k}", recipe, T_CELL[k], [lr_space(T_CELL[k], k)] + COMMON_SPACE,
-                                 dict({"data.train_subsample": int(round(10 ** (k / 2)))}, **extra),
+            for k in steer_ks:
+                out.append(write(f"{'tp3s' if a.bw_off else 'tps'}_scr_{p}_d{k}", recipe, T_CELL[k],
+                                 [lr_space(T_CELL[k], k)] + COMMON_SPACE,
+                                 dict({"data.train_subsample": int(round(10 ** (k / 2)))}, **({} if a.bw_off else extra)),
                                  head=f"Transfer study, scratch on the sigma-steered pool: {p} on D = 10^{k / 2:g} events."))
     elif a.ft is None:
         if a.pretrain:
@@ -205,13 +214,18 @@ def main():
         # every probe is fine-tuned from the one pretrain (the plan, 2026-10-01); a probe's scratch arm must
         # share its target, so with --bw-off the probes whose target the factors change (the Z-window ones,
         # whose pools straddle the pole, and ee_WW, whose scratch arm kept the t-channel factor) need tp3_scr
-        for p in only(PROBES + Z_FAMILY + LADDER):
-            for k in KS:
+        assert not a.steered or a.bw_off, "steered fine-tunes are on the study's factor-off target (--bw-off)"
+        tag = "ftp" if a.parent_offshell else "ft"
+        osh = ({"fine_tune.offshell_stats": "parent", "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))}
+               if a.parent_offshell else {"fine_tune.offshell_stats": "own"})
+        for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER)):
+            for k in (steer_ks if a.steered else KS):
                 if k > K_MAX.get(p, 10):
                     continue
-                out.append(write(f"{pfx}_ft_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k], ft_space + COMMON_SPACE,
+                recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
+                out.append(write(f"{pfx}{'s' if a.steered else ''}_{tag}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
-                                  "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own"},
+                                  "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own", **osh},
                                  head=f"Transfer pilot, fine-tune from {PRE}: {p} on D = 10^{k / 2:g} events."))
     print("\n".join(os.path.relpath(p, ROOT) for p in out))
     print("lr* centres:", {T: f"{lr_star(T):.2g}" for T in sorted({T_PRE, *T_CELL.values()})})
