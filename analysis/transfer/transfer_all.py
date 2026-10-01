@@ -9,10 +9,8 @@ Prints the gain table, each probe's geometric mean over D, and the best trial's 
 <base>_loss_ee_a..f, <base>_loss_qcd_a..f: the same cells as losses, one panel per probe (groups a+b, c+d).
   <base>_a  ee->dd~, ee->nu_e nu_e~, ee->tt~, ee->WW      <base>_b  ee->dd~ and ee->bb~ at one loop
   <base>_c  ee->Za, ud->ud, uu~->gg                         <base>_d  uu~->Zg, Zgg, Zggg
-Where a cell's best sat at the top of its lr window (scratch lr, fine-tune lr_scale) the cell's search was extended
-in place (sweep/extend_sweep.py): its range widened, the trials of the window-shifted runs (scratch tp3_scrh,
-tp3_scrh10; fine-tune tp3_ftph, tp3_fth) folded into its DyHPO state as observations, and trials added where the best
-still sat at the edge. The cell is one search; its value is that search's best over every trial it holds.
+A cell is one search, extended in place where its best sat at the top of its lr window; the rule, the scratch arm
+per probe and ee->WW's steered pool from 10^2.5 are in cells.py.
 Data: analysis/transfer/scratch_sweeps.json.
     python analysis/transfer/transfer_all.py
 """
@@ -22,10 +20,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, ROOT)
 import plot_style as ps
 
-S = json.load(open(os.path.join(ROOT, "analysis", "transfer", "scratch_sweeps.json")))
-ARM = {"ee_ddbar": "tp3_scr", "ee_nnbar": "tp3_scr", "ee_dd_nlo": "tp3_scr", "ee_bb_nlo": "tp3_scr", "ee_WW": "tp3_scr",
-       "ee_Za": "tp2_scr", "ud_ud": "tp2_scr", "uubar_gg": "tp2_scr", "uubar_Zg": "tp2_scr",
-       "ee_ttbar": "tp_scr", "uubar_Zgg": "tp_scr", "uubar_Zggg": "tp_scr"}
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cells import ARM, scratch, finetune  # noqa: E402
+
 LAB = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_nnbar": r"$e^+e^-\to\nu_e\bar\nu_e$", "ee_ttbar": r"$e^+e^-\to t\bar t$",
        "ee_WW": r"$e^+e^-\to W^+W^-$", "ee_dd_nlo": r"$e^+e^-\to d\bar d$ (1-loop)",
        "ee_bb_nlo": r"$e^+e^-\to b\bar b$ (1-loop)", "ee_Za": r"$e^+e^-\to Z\gamma$", "ud_ud": r"$ud\to ud$",
@@ -33,42 +30,6 @@ LAB = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_nnbar": r"$e^+e^-\to\nu_e\bar\nu_
        "uubar_Zggg": r"$u\bar u\to Zggg$"}
 GROUPS = [["ee_ddbar", "ee_nnbar", "ee_ttbar", "ee_WW"], ["ee_dd_nlo", "ee_bb_nlo"],
           ["ee_Za", "ud_ud", "uubar_gg"], ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]]
-
-
-def scratch(p, k):
-    """The cell's scratch value: the best over its search and, where its best sat at the lr window's top, the searches
-    re-run half a decade and a decade higher (tp3_scrh, tp3_scrh10; same target, checked by prepd_std). 16-24
-    trials against the fine-tune's 8, so the selection favours scratch: conservative for the gain."""
-    return _pick([f"{ARM[p]}_{p}_d{k}", f"tp3_scrh_{p}_d{k}", f"tp3_scrh10_{p}_d{k}"])
-
-
-def finetune(p, k):
-    """The cell's fine-tune value, chosen as scratch's: the best over its search (tp3_ftp where the probe has an internal
-    Z, else tp3_ft) and, where its best lr_scale sat at the top of [1, 100] (>= 10^1.7, the top 15% as for scratch),
-    the re-search over [10, 1000] (tp3_ftph with the parent's off-shellness scale, tp3_fth for the probes without an
-    internal Z, whose columns are all fitted on the probe as in tp3_ft)."""
-    ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
-    return _pick([ft, f"tp3_ftph_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_fth_{p}_d{k}"])
-
-
-def _pick(names):
-    """One cell's value: the best over the trials of its search, the original and those folded into it (they must
-    share the target: equal prepd_std)."""
-    got = [best(n) for n in names]
-    got = [g for g in got if g[0] is not None]
-    stds = {round(g[1]["prepd_std"], 5) for g in got}
-    assert len(stds) <= 1, f"{names}: searches on different targets (prepd_std {stds})"
-    if not got:
-        return None, None
-    return min(got, key=lambda g: g[0])
-
-
-def best(name):
-    tr = [t for t in S.get(name, []) if t.get("val_loss") is not None and t.get("prepd_std")]
-    if not tr:
-        return None, None
-    b = min(tr, key=lambda t: t["val_loss"] * t["prepd_std"] ** 2)
-    return b["val_loss"] * b["prepd_std"] ** 2, b
 
 
 fig, axes = ps.figure(ncols=2, nrows=2)

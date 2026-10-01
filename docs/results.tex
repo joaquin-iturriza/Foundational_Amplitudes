@@ -4350,11 +4350,11 @@ the Breit--Wigner factor off the pretraining is re-run once at the best trial's 
 $94\%$ through the anneal, at $1.18\times10^{-7}$, half the factor-on pretraining's), and both chapter-one
 probes are fine-tuned from it again with \code{lr\_scale} searched over $[1,100]$ (\code{tp3\_ft};
 Fig.~\ref{fig:ladder_ch1}, against the factor-off scratch arms). $ee\to d\bar d$ (keeping the pretraining's
-off-shellness scale, next paragraph) gains $3.9$--$19\times$ at every $D$, $4.0\times$ at $10^4$ ($7.4\times10^{-7}$
-against $3.0\times10^{-6}$); its best \code{lr\_scale} is $1$--$10$ in every cell but one ($80$ at $10^{1.5}$). $u\bar u\to gg$ now loses only at $D=10$
-($2.2\times$) and at $10^{2.5}$ ($2.3\times$), gains $2$--$5\times$ at $10^{1.5}$, $10^2$, $10^3$ and
-$10^{3.5}$, and ties at $10^4$ ($1.4\times10^{-7}$ against $1.0\times10^{-7}$); its best \code{lr\_scale}
-is $57$--$80$ in six of seven cells, near the top of the new window though not at it. So the old loss was mostly the capped lr: the far probe wants a fine-tuning lr close
+off-shellness scale, next paragraph) gains at every $D$, $1.8\times$ at $10^3$ and $3.9$--$19\times$ elsewhere, $4.0\times$ at $10^4$
+($7.4\times10^{-7}$ against $3.0\times10^{-6}$); its best \code{lr\_scale} is $1$--$10$ in every cell but one ($80$ at
+$10^{1.5}$). $u\bar u\to gg$ now loses only at $10^{2.5}$ ($2.2\times$), gains $1.6$--$4.1\times$ at the other $D$ up
+to $10^{3.5}$ and ties at $10^4$ ($1.4\times10^{-7}$ against $1.0\times10^{-7}$); its best \code{lr\_scale} is $57$ or
+more in six of seven cells, up to $930$ once the window was extended (the next paragraph's cell rule). So the old loss was mostly the capped lr: the far probe wants a fine-tuning lr close
 to scratch's, $\sqrt{B/16384}$ having shrunk the pretraining's by up to $57\times$ at small $D$. The two
 values $57$ and $80$ are two candidate points, recurring across cells because every sweep draws the
 same candidates (hand-off).
@@ -4368,38 +4368,40 @@ factor reaches its pool, so its scratch arm is the $t$-channel-off search).}
 \label{fig:ladder_ch1}
 \end{figure}
 
-\paragraph{Every probe from $ee\to u\bar u$: the near probe gains most, the one-loop probes and $ud\to ud$ next.}
-All twelve probes fine-tuned from the same factor-off pretraining, the same cells, horizons and search ($8$
-trials, \code{lr\_scale} over $[1,100]$), each against the scratch search on the same target (the one with equal
-\code{prepd\_std} in every cell: \code{tp3\_scr} for the four $Z$-window probes and $ee\to W^+W^-$,
-\code{tp2\_scr} for $ee\to Z\gamma$, $ud\to ud$, $u\bar u\to gg$ and $Zg$, \code{tp\_scr} for $ee\to t\bar t$,
-$Zgg$ and $Zggg$, which no factor reaches). The fine-tune keeps the pretraining's scale on the off-shellness input
-(\code{tp3\_ftp}, the seven probes with an internal $Z$; the other five see only columns the pretraining saw
-constant, \code{tp3\_ft}). Refitting that input on the probe instead, as a first round did, costs those seven a
-geometric mean over $D$ of $1.3$--$2.1\times$ where the probe's off-shellness differs from $ee\to u\bar u$'s
-($ee\to d\bar d$ at one loop $2.1$, $\nu_e\bar\nu_e$ $1.7$, $b\bar b$ at one loop $1.6$, $W^+W^-$ $1.4$, $ud\to ud$ $1.3$)
-and nothing on $ee\to d\bar d$ ($0.98$), whose pool spans the same $\sqrt s$ window as the pretraining's, and
-$ee\to t\bar t$ ($0.96$). The gain $L_\text{scratch}/L_\text{fine-tune}$, best against best
-(Fig.~\ref{fig:ladder_transfer_all}, Table~\ref{tab:ladder_transfer_all}; the losses in
-Figs.~\ref{fig:ladder_transfer_loss_ee} and~\ref{fig:ladder_transfer_loss_qcd}; \code{transfer\_all.py}): $ee\to d\bar d$
-gains $3.9$--$19\times$ in every cell (mean $6.4$); $ud\to ud$ $3$--$16\times$ from $10^2$ on, growing with $D$, and
-loses $2$--$3\times$ below (mean $3.5$); $ee\to d\bar d$ and $b\bar b$ at one loop gain in every cell
-($1.4$--$9.3\times$, means $3.4$ and $2.7$), and $ee\to\nu_e\bar\nu_e$ in all but $10^4$ (mean $2.6$). The other
-seven have means of $0.85$--$1.8$, with cells from $0.22$ to $7.2\times$ in both directions; two searches' bests
-differ by up to $5\times$ between seeds, so a cell alone does not separate transfer from noise. The largest loss,
-$ee\to\nu_e\bar\nu_e$ at $10^4$ ($0.52\times$), is the scratch search's luck: its best trial is $5\times$ below its
-second. The massive $s$-channel probe, $ee\to t\bar t$ (the pretraining's topology with a mass), gains nothing
-measurable (mean $1.2$), and neither does the $Z+ng$ family. Where the gain is clear the search keeps the
-fine-tune lr low (best \code{lr\_scale} $1$--$15$ in most cells of $ee\to d\bar d$ and both one-loop probes);
-elsewhere it is $30$ or more in $53$ of the other $77$ cells, near scratch's lr, so for those probes the
-pretraining is little more than an initialisation the search trains away from. $ud\to ud$ gains at large $D$
-with \code{lr\_scale} $40$--$80$ all the same. These scratch arms are not final: $31$ of their cells sit at the
-top of the lr window (hand-off).
+\paragraph{Every probe from $ee\to u\bar u$: the near probe, $ud\to ud$ and the one-loop probes gain.}
+All twelve probes fine-tuned from the same factor-off pretraining, the same cells, horizons and search (\code{lr\_scale}
+over $[1,100]$), each against the scratch search on the same target (the one with equal \code{prepd\_std} in every cell:
+\code{tp3\_scr} for the four $Z$-window probes and $ee\to W^+W^-$, \code{tp2\_scr} for $ee\to Z\gamma$, $ud\to ud$,
+$u\bar u\to gg$ and $Zg$, \code{tp\_scr} for $ee\to t\bar t$, $Zgg$ and $Zggg$, which no factor reaches;
+$ee\to W^+W^-$ on the steered pool from $D=10^{2.5}$, scored on its own validation split). The fine-tune keeps the
+pretraining's scale on the off-shellness input (\code{tp3\_ftp}, the seven probes with an internal $Z$; the other five
+see only columns the pretraining saw constant, \code{tp3\_ft}). Refitting that input on the probe instead, as a first
+round did, costs those seven a geometric mean over $D$ of $1.3$--$2.1\times$ where the probe's off-shellness differs
+from $ee\to u\bar u$'s ($ee\to d\bar d$ at one loop $2.1$, $\nu_e\bar\nu_e$ $1.7$, $b\bar b$ at one loop $1.6$,
+$W^+W^-$ $1.4$, $ud\to ud$ $1.3$) and nothing on $ee\to d\bar d$ ($0.98$), whose pool spans the same $\sqrt s$ window
+as the pretraining's, and $ee\to t\bar t$ ($0.96$). Each cell is one search: where its best sat in the top $15\%$ of
+the lr window ($31$ scratch cells, $46$ fine-tune cells, both arms alike) the search was extended in place, its range
+widened and trials added until the best was inside (\code{sweep/extend\_sweep.py}), so a cell holds $8$ to $24$
+trials; its value is that search's best (\code{analysis/transfer/cells.py}). The gain
+$L_\text{scratch}/L_\text{fine-tune}$ (Fig.~\ref{fig:ladder_transfer_all}, Table~\ref{tab:ladder_transfer_all}; the
+losses in Figs.~\ref{fig:ladder_transfer_loss_ee} and~\ref{fig:ladder_transfer_loss_qcd}; \code{transfer\_all.py}):
+$ee\to d\bar d$ gains in every cell ($1.8$--$19\times$, geometric mean over $D$ $5.3$); $ud\to ud$ $5.5$--$16\times$
+from $10^{2.5}$ on, growing with $D$, and loses up to $3\times$ below (mean $3.7$); $ee\to d\bar d$ and $b\bar b$ at one
+loop gain in every cell ($1.4$--$9.3\times$, means $3.3$ and $2.7$). The other nine have means of $0.96$--$1.7$, with
+cells from $0.27$ to $8\times$ in both directions; two searches' bests differ by up to $5\times$ between seeds, so a
+cell alone does not separate transfer from noise. Extending the lr windows moved $ee\to\nu_e\bar\nu_e$ most: its
+scratch searches had been held low, and its mean fell from $2.6$ to $1.0$. The massive $s$-channel probe,
+$ee\to t\bar t$ (the pretraining's topology with a mass, mean $1.7$), the $Z+ng$ family and $ee\to Z\gamma$ gain nothing
+clear. Where the gain is clear the search keeps the fine-tune lr low (best \code{lr\_scale} $1$--$15$ in most cells of
+$ee\to d\bar d$ and both one-loop probes); elsewhere it is mostly $57$ or more, near scratch's lr, so for those probes
+the pretraining is little more than an initialisation the search trains away from. $ud\to ud$ gains at large $D$ with
+\code{lr\_scale} $40$--$80$ all the same.
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/transfer_all.pdf}
 \caption{Every probe fine-tuned from the factor-off $ee\to u\bar u$ pretraining: $L_\text{scratch}/L_\text{fine-tune}$,
-each the best of an $8$-trial search on the same target (MSE of $\log|\mathcal M|^2$ at the best checkpoint).
+each the best of the cell's search on the same target, extended where its best sat at the lr window's top (MSE of
+$\log|\mathcal M|^2$ at the best checkpoint).
 (a) the $s$-channel and massive trees, (b) the one-loop probes, (c) the $2\to2$ probes with a $t$- or
 $u$-channel exchange, (d) the $Z+ng$ family.}
 \label{fig:ladder_transfer_all}
@@ -4410,7 +4412,7 @@ $u$-channel exchange, (d) the $Z+ng$ family.}
 \widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_ee_c.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_ee_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_ee_e.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_ee_f.pdf}}
 \caption{The cells of Fig.~\ref{fig:ladder_transfer_all} as losses (MSE of $\log|\mathcal M|^2$ at the best
-checkpoint, best of $8$ trials), from scratch and fine-tuned from $ee\to u\bar u$: (a) $ee\to d\bar d$,
+checkpoint, the best of the cell's search), from scratch and fine-tuned from $ee\to u\bar u$: (a) $ee\to d\bar d$,
 (b) $ee\to\nu_e\bar\nu_e$, (c) $ee\to t\bar t$, (d) $ee\to W^+W^-$, (e) $ee\to d\bar d$ and (f) $ee\to b\bar b$ at one
 loop.}
 \label{fig:ladder_transfer_loss_ee}
@@ -4427,25 +4429,25 @@ loop.}
 \begin{table}[H]
 \centering
 \caption{The gain $L_\text{scratch}/L_\text{fine-tune}$ of Fig.~\ref{fig:ladder_transfer_all} per cell, and its
-geometric mean over $D$.}
+geometric mean over $D$. $^\ast$ the steered $ee\to W^+W^-$ pool, on its own validation split.}
 \label{tab:ladder_transfer_all}
 \small
 \begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
 probe & $10$ & $10^{1.5}$ & $10^2$ & $10^{2.5}$ & $10^3$ & $10^{3.5}$ & $10^4$ & mean \\
 \midrule
-$ee\to d\bar d$ & $6.9$ & $19$ & $6.8$ & $3.9$ & $7.1$ & $4.6$ & $4.0$ & $6.4$ \\
-$ud\to ud$ & $0.36$ & $0.56$ & $3.2$ & $4.6$ & $11$ & $14$ & $16$ & $3.5$ \\
-$ee\to d\bar d$ (1-loop) & $1.4$ & $1.9$ & $9.3$ & $3.3$ & $3.7$ & $4.0$ & $4.1$ & $3.4$ \\
-$ee\to b\bar b$ (1-loop) & $1.8$ & $3.1$ & $3.1$ & $4.6$ & $3.5$ & $1.7$ & $2.3$ & $2.7$ \\
-$ee\to\nu_e\bar\nu_e$ & $2.1$ & $1.6$ & $1.4$ & $6.3$ & $4.7$ & $12$ & $0.52$ & $2.6$ \\
-$ee\to W^+W^-$ & $2.3$ & $0.97$ & $0.69$ & $2.7$ & $1.6$ & $7.2$ & $1.3$ & $1.8$ \\
-$u\bar u\to gg$ & $0.44$ & $2.3$ & $4.9$ & $0.43$ & $4.1$ & $3.2$ & $0.73$ & $1.5$ \\
-$u\bar u\to Zggg$ & $2.4$ & $1.7$ & $1.0$ & $1.4$ & $1.6$ & $1.3$ & $1.1$ & $1.5$ \\
-$ee\to t\bar t$ & $1.2$ & $0.60$ & $0.94$ & $1.9$ & $1.1$ & $1.7$ & $1.5$ & $1.2$ \\
-$ee\to Z\gamma$ & $1.2$ & $0.66$ & $0.22$ & $1.0$ & $2.1$ & $2.6$ & $1.1$ & $1.0$ \\
-$u\bar u\to Zg$ & $1.6$ & $0.61$ & $1.5$ & $0.63$ & $0.72$ & $1.5$ & $1.0$ & $1.0$ \\
-$u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & $0.85$ \\
+$ee\to d\bar d$ & $6.9$ & $19$ & $6.8$ & $3.9$ & $1.8$ & $4.6$ & $4.0$ & $5.3$ \\
+$ud\to ud$ & $0.36$ & $1.9$ & $0.96$ & $5.5$ & $11$ & $14$ & $16$ & $3.7$ \\
+$ee\to d\bar d$ (1-loop) & $1.4$ & $1.9$ & $9.3$ & $3.3$ & $3.2$ & $4.0$ & $4.1$ & $3.3$ \\
+$ee\to b\bar b$ (1-loop) & $1.8$ & $3.1$ & $3.3$ & $4.6$ & $3.5$ & $1.7$ & $2.3$ & $2.7$ \\
+$u\bar u\to gg$ & $1.6$ & $2.9$ & $2.4$ & $0.46$ & $4.1$ & $3.2$ & $0.73$ & $1.7$ \\
+$ee\to t\bar t$ & $8.1$ & $0.58$ & $1.8$ & $1.6$ & $1.1$ & $1.7$ & $1.5$ & $1.7$ \\
+$u\bar u\to Zggg$ & $2.0$ & $1.5$ & $1.0$ & $1.4$ & $1.6$ & $1.3$ & $1.0$ & $1.4$ \\
+$u\bar u\to Zg$ & $1.6$ & $0.80$ & $2.2$ & $0.84$ & $1.2$ & $1.5$ & $1.0$ & $1.2$ \\
+$ee\to W^+W^-$ & $0.84$ & $1.2$ & $0.69$ & $1.7^\ast$ & $0.30^\ast$ & $3.7^\ast$ & $1.6^\ast$ & $1.1$ \\
+$ee\to\nu_e\bar\nu_e$ & $0.96$ & $1.8$ & $1.4$ & $1.4$ & $1.1$ & $0.66$ & $0.52$ & $1.0$ \\
+$ee\to Z\gamma$ & $0.86$ & $0.66$ & $0.27$ & $1.0$ & $2.1$ & $2.6$ & $1.1$ & $0.98$ \\
+$u\bar u\to Zgg$ & $0.83$ & $1.2$ & $0.97$ & $0.87$ & $0.92$ & $1.0$ & $0.94$ & $0.96$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -4484,15 +4486,9 @@ $u\bar u\to Zgg$ & $0.67$ & $1.2$ & $0.86$ & $0.69$ & $0.70$ & $1.0$ & $0.94$ & 
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
-  \item \textbf{Cells at the edge of their lr window, extended in place.} $31$ scratch cells had their best lr and
-    $46$ fine-tune cells their best \code{lr\_scale} in the top $15\%$ of the window. They were first re-run as separate
-    searches with the window moved up (\code{tp3\_scrh}, \code{tp3\_scrh10}; \code{tp3\_ftph}, \code{tp3\_fth}, the
-    \code{lr\_scale} window $[10,1000]$ the user's call), which discarded the original surrogate and left two values per
-    cell. Each cell is now one search: \code{sweep/extend\_sweep.py} widens the original sweep's range and folds the
-    shifted runs' trials into its DyHPO state as observations, and the $16$ cells still at the edge after that (eight
-    each) get four more trials over a further-widened range. A cell's value is that search's best. Running: those
-    $64$ trials; the two $u\bar u\to Zggg$ shifted scratch searches ($10^{1.5}$, $10^4$; moved from lxplus to Jean Zay),
-    to be folded into their CC originals when done. The $\sqrt{B/16384}$ scaling of the fine-tune lr stays open.
+  \item \textbf{The fine-tune lr.} The $\sqrt{B/16384}$ scaling of the fine-tune lr pushes the far probes' best
+    \code{lr\_scale} to $57$--$930$; replacing it stays open. Every sweep draws the same candidate points (the value
+    $805$ recurs as a best \code{lr\_scale}); a per-sweep candidate seed would diversify the search.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
