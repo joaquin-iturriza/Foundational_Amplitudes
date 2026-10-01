@@ -1349,6 +1349,12 @@ class AmplitudeExperiment(BaseExperiment):
                 f"frozen data stats were fitted with target_propagators={_tp_stats}, "
                 f"this run sets {_tp_cfg}")
             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
+            if ft_path is not None and not self.warm_start:
+                # the off-shellness input's column stats, kept so the backbone reads a propagator's
+                # off-shellness on the scale it was pretrained on (fine_tune.offshell_stats)
+                _po = ft.get("parent_offshell_stats", None)
+                self._parent_offshell = stats.get("offshell_stats") or (
+                    OmegaConf.to_container(_po) if _po is not None else None)
             if ft_path is not None and not self.warm_start \
                     and str(ft.get("target_stats", "parent")) == "own":
                 # fine-tune onto a process the parent never standardized: keep the parent's
@@ -1807,6 +1813,25 @@ class AmplitudeExperiment(BaseExperiment):
             else:
                 mu, sd = osh.mean(0), osh.std(0)
                 sd[sd < 1e-8] = 1.0
+                ft = self.cfg.get("fine_tune", None)
+                if ft is not None and ft.get("pretrained_path", None) is not None and not self.warm_start \
+                        and str(ft.get("offshell_stats", "parent")) == "parent":
+                    # a fine-tune keeps the parent's scale on every column the parent saw vary, so the same
+                    # off-shellness reaches the backbone as the same input; a column the parent saw constant
+                    # (sd set to 1 above, standardized to 0) carries no learned scale and is fitted here,
+                    # centred on the 0 the parent saw. Refitting every column shifted the input under the
+                    # pretrained weights (docs/results.tex sec:ladder, the steering offset)
+                    parent = getattr(self, "_parent_offshell", None)
+                    assert parent is not None, (
+                        "fine_tune.offshell_stats=parent but the parent's data_stats.json has no offshell_stats "
+                        "(a run older than the record): pass fine_tune.parent_offshell_stats "
+                        "(tools/offshell_stats.py <parent run>) or set fine_tune.offshell_stats=own")
+                    pm, ps = np.asarray(parent[0], np.float64), np.asarray(parent[1], np.float64)
+                    assert pm.shape == mu.shape, f"parent offshell_stats {parent} for {mu.shape[0]} columns"
+                    varied = ps != 1.0
+                    mu, sd = np.where(varied, pm, mu), np.where(varied, ps, sd)
+                    LOGGER.info(f"Fine-tuning: off-shellness columns {np.flatnonzero(varied).tolist()} on the "
+                                f"parent's scale, the rest fitted here")
             self._offshell_stats = [mu.tolist(), sd.tolist()]
             osh = ((osh - mu) / sd).astype(np.float32)
             n_pdg = len(self._internal_mass_pdgs)

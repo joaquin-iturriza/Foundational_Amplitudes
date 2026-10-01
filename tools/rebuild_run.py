@@ -49,6 +49,23 @@ def _build(cfg, swap, path, name):
     return exp
 
 
+def own_offshell_stats(run_dir):
+    """The off-shellness column stats [mean, std] the run trained with, from a build on its own pools (for runs
+    older than their record in data_stats.json); checked against the run's frozen amplitude stats."""
+    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    assert cfg.data.get("offshell_per_event", False), f"{run_dir} has no off-shellness input"
+    name = yaml.safe_load(open(os.path.expandvars(str(cfg.data.processes_file))))["processes"][0]["name"]
+    with open_dict(cfg):
+        cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
+        cfg.use_mlflow = False; cfg.count_flops = False
+        cfg.warm_start_idx = None; cfg.fine_tune.pretrained_path = None
+        cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
+    exp = _build(cfg, None, None, name)
+    saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
+    assert np.allclose([float(x) for x in exp.prepd_std], saved["prepd_std"], rtol=1e-6), "not the run's own build"
+    return exp._offshell_stats
+
+
 def rebuild(run_dir, role, path, n_events):
     """(exp, loader): the run rebuilt with `role` ('val' or 'test') read from `path` (n_events rows),
     in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role]."""
@@ -60,7 +77,6 @@ def rebuild(run_dir, role, path, n_events):
     spec[f"n_{role}"] = int(n_events)
     tmp = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)
     yaml.safe_dump(rec, tmp); tmp.close()
-    own_eval_subsample = cfg.data.get("eval_subsample", None)
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
         cfg.use_mlflow = False; cfg.count_flops = False
@@ -75,11 +91,7 @@ def rebuild(run_dir, role, path, n_events):
         # record in data_stats.json get them from a build on the run's own pools
         own = saved.get("offshell_stats")
         if own is None:
-            cfg0 = cfg.copy()
-            with open_dict(cfg0):
-                cfg0.data.processes_file = own_recipe
-                cfg0.data.eval_subsample = own_eval_subsample      # the run's own val/test caps, as it trained
-            own = _build(cfg0, None, None, name)._offshell_stats
+            own = own_offshell_stats(run_dir)
         with open_dict(cfg):
             cfg.data.offshell_stats = own
     exp = _build(cfg, role, path, name)

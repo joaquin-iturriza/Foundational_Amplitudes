@@ -209,6 +209,8 @@ mlflow:
 fine_tune:
  pretrained_path: null        # absolute path to pretrained .pt checkpoint
  target_stats: parent         # amplitude standardization: parent's frozen stats, or `own` (fit on this run's train split; for a target the parent never saw)
+ offshell_stats: parent       # off-shellness input: the parent's column scale where the parent saw it vary (else fitted here), or `own` (refit every column)
+ parent_offshell_stats: null  # [mean, std] per column, for a parent older than data_stats.json's record (tools/offshell_stats.py)
  lr_scale: 0.1                # global LR multiplier on top of base LR (sweep: 0.01–1.0)
  layer_decay: 1.0             # LLRD: lr = base_lr * lr_scale * layer_decay^depth (1.0 = no decay)
  freeze_blocks: []            # list of block indices to freeze, e.g. [0,1,2,3]
