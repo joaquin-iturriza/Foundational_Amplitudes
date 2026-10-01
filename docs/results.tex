@@ -4380,7 +4380,8 @@ geometric mean over $D$ of $1.3$--$2.1\times$ where the probe's off-shellness di
 ($ee\to d\bar d$ at one loop $2.1$, $\nu_e\bar\nu_e$ $1.7$, $b\bar b$ at one loop $1.6$, $W^+W^-$ $1.4$, $ud\to ud$ $1.3$)
 and nothing on $ee\to d\bar d$ ($0.98$), whose pool spans the same $\sqrt s$ window as the pretraining's, and
 $ee\to t\bar t$ ($0.96$). The gain $L_\text{scratch}/L_\text{fine-tune}$, best against best
-(Fig.~\ref{fig:ladder_transfer_all}, Table~\ref{tab:ladder_transfer_all}, \code{transfer\_all.py}): $ee\to d\bar d$
+(Fig.~\ref{fig:ladder_transfer_all}, Table~\ref{tab:ladder_transfer_all}; the losses in
+Figs.~\ref{fig:ladder_transfer_loss_ee} and~\ref{fig:ladder_transfer_loss_qcd}; \code{transfer\_all.py}): $ee\to d\bar d$
 gains $3.9$--$19\times$ in every cell (mean $6.4$); $ud\to ud$ $3$--$16\times$ from $10^2$ on, growing with $D$, and
 loses $2$--$3\times$ below (mean $3.5$); $ee\to d\bar d$ and $b\bar b$ at one loop gain in every cell
 ($1.4$--$9.3\times$, means $3.4$ and $2.7$), and $ee\to\nu_e\bar\nu_e$ in all but $10^4$ (mean $2.6$). The other
@@ -4402,6 +4403,26 @@ each the best of an $8$-trial search on the same target (MSE of $\log|\mathcal M
 (a) the $s$-channel and massive trees, (b) the one-loop probes, (c) the $2\to2$ probes with a $t$- or
 $u$-channel exchange, (d) the $Z+ng$ family.}
 \label{fig:ladder_transfer_all}
+\end{figure}
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_ee_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_ee_c.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_ee_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_ee_e.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_ee_f.pdf}}
+\caption{The cells of Fig.~\ref{fig:ladder_transfer_all} as losses (MSE of $\log|\mathcal M|^2$ at the best
+checkpoint, best of $8$ trials), from scratch and fine-tuned from $ee\to u\bar u$: (a) $ee\to d\bar d$,
+(b) $ee\to\nu_e\bar\nu_e$, (c) $ee\to t\bar t$, (d) $ee\to W^+W^-$, (e) $ee\to d\bar d$ and (f) $ee\to b\bar b$ at one
+loop.}
+\label{fig:ladder_transfer_loss_ee}
+\end{figure}
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/transfer_all_loss_qcd_f.pdf}}
+\caption{As Fig.~\ref{fig:ladder_transfer_loss_ee}: (a) $ee\to Z\gamma$, (b) $ud\to ud$, (c) $u\bar u\to gg$,
+(d) $u\bar u\to Zg$, (e) $u\bar u\to Zgg$, (f) $u\bar u\to Zggg$.}
+\label{fig:ladder_transfer_loss_qcd}
 \end{figure}
 \begin{table}[H]
 \centering

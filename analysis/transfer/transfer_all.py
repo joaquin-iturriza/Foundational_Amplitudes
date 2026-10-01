@@ -6,6 +6,7 @@ same run: the gain L_scratch / L_fine-tune per cell, each the best trial of an
 the fine-tune's (checked cell by cell: equal prepd_std): tp3_scr for the probes the factors touch (the Z-window
 probes and ee->WW), tp2_scr where only the t-channel factor reached the pool, tp_scr where neither did.
 Prints the gain table, each probe's geometric mean over D, and the best trial's lr_scale.
+<base>_loss_ee_a..f, <base>_loss_qcd_a..f: the same cells as losses, one panel per probe (groups a+b, c+d).
   <base>_a  ee->dd~, ee->nu_e nu_e~, ee->tt~, ee->WW      <base>_b  ee->dd~ and ee->bb~ at one loop
   <base>_c  ee->Za, ud->ud, uu~->gg                         <base>_d  uu~->Zg, Zgg, Zggg
 Data: analysis/transfer/scratch_sweeps.json.
@@ -56,3 +57,22 @@ for ax, group in zip(axes.flat, GROUPS):
     ax.set_ylim(0.05, 3e3)                    # one scale on every panel, so the gains compare across panels
     ps.legend(ax, "upper left")
 ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "transfer_all"))
+
+
+for part, order in (("ee", GROUPS[0] + GROUPS[1]), ("qcd", GROUPS[2] + GROUPS[3])):
+  figs = ps.panels(len(order))
+  for (fig, ax), p in zip(figs, order):
+      for arm, col, name in (("scratch", ps.C.blue, "from scratch"), ("fine-tune", ps.C.vermillion, "fine-tuned")):
+          D, L = [], []
+          for k in range(2, 9):
+              ft = f"tp3_ftp_{p}_d{k}" if f"tp3_ftp_{p}_d{k}" in S else f"tp3_ft_{p}_d{k}"
+              l, _ = best(f"{ARM[p]}_{p}_d{k}" if arm == "scratch" else ft)
+              if l is not None:
+                  D.append(10 ** (k / 2)); L.append(l)
+          ax.plot(D, L, "o-", color=col, label=name)
+      ax.set_xscale("log"); ax.set_yscale("log")
+      ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+      ps.process_label(ax, LAB[p])
+      ps.legend(ax, "lower left")
+      ps.make_room(ax)
+  ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"transfer_all_loss_{part}"))
