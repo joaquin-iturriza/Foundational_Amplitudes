@@ -51,3 +51,10 @@ case "$CCORCH_SITE" in
     [ -d "$PROJECT_DIR/.venv" ] && source "$PROJECT_DIR/.venv/bin/activate"
     ;;
 esac
+
+# MadLoop standalones (one-loop pools, tools/nlo_madloop.py) link libninja/libcollier from MG5's
+# HEPTools without an rpath; without this their matrix2py import fails ("libninja.so.0: cannot open")
+for _d in "$WORK/mg5amcnlo/HEPTools/lib" "$WORK/mg5amcnlo/HEPTools/ninja/lib" "$WORK/mg5amcnlo/HEPTools/collier/lib"; do
+  [ -d "$_d" ] && case ":${LD_LIBRARY_PATH:-}:" in *":$_d:"*) ;; *) export LD_LIBRARY_PATH="$_d${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ;; esac
+done
+unset _d
