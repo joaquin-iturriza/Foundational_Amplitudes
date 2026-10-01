@@ -132,8 +132,11 @@ def batch(k):
     return int(min(16384, round(10 ** (k / 2)) / 2))
 
 
+LR_SHIFT = 0.0                                     # decades the scratch window moves up (--lr-shift)
+
+
 def lr_space(T, k=None):
-    c = lr_star(T) * (np.sqrt(batch(k) / 16384) if k is not None else 1.0)
+    c = lr_star(T) * (np.sqrt(batch(k) / 16384) if k is not None else 1.0) * 10 ** LR_SHIFT
     return {"name": "training.lr", "type": "float_log",
             "low": float(f"{c / 10:.3g}"), "high": float(f"{c * 10:.3g}")}
 
@@ -168,9 +171,18 @@ def main():
     ap.add_argument("--parent-offshell",
                     help="the pretrain's off-shellness stats as JSON [mean, std] (tools/offshell_stats.py): fine-tunes "
                          "keep that input scale (*_ftp_) instead of refitting it on the probe")
+    ap.add_argument("--cells", nargs="*",
+                    help="scratch configs only for these cells, probe:k (with --lr-shift: the cells whose best lr sat at "
+                         "the window's top)")
+    ap.add_argument("--lr-shift", type=float, default=0.0,
+                    help="move the scratch lr window up by this many decades (*_scrh_): 31 of 84 scratch cells had their "
+                         "best trial in the window's top 15%%, none at the bottom (docs/results.tex sec:ladder)")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
+    global LR_SHIFT
+    LR_SHIFT = a.lr_shift
+    cells = {(c.split(":")[0], int(c.split(":")[1])) for c in a.cells} if a.cells else None
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
     # without --bw-off the steered arm keeps its probe's earlier target (ee_WW: the t-channel factor on, tps_);
@@ -200,9 +212,9 @@ def main():
                              head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
         for p in only(PROBES + Z_FAMILY + LADDER):
             for k in KS:
-                if k > K_MAX.get(p, 10):
+                if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
-                out.append(write(f"{pfx}_scr_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
+                out.append(write(f"{pfx}_scr{'h' if a.lr_shift else ''}_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
