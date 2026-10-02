@@ -4240,7 +4240,10 @@ at the baseline's HPs it lost; with its own $8$-trial search (\code{tps\_scr}) i
 ($6.4$ and $8.7\times$), where selecting $\propto\sigma^3$ leaves a few hundred events too few in the
 bulk. So one steered pool helps from a few hundred events up, most where the mixture pool flattens. The study's
 $ee\to W^+W^-$ cells therefore take the mixture pool up to $D=10^2$ and the steered pool from $10^{2.5}$ on (the
-user's call; the $1.3\times$ at $D=10$ is inside the search noise), scratch and fine-tune alike.
+user's call; the $1.3\times$ at $D=10$ is inside the search noise), scratch and fine-tune alike. With the study's
+target (both factors off) on the steered pool, fine-tuning from $ee\to u\bar u$ gains $1.7$, $0.30$, $3.7$ and $1.6\times$
+at $D=10^{2.5}$--$10^4$, about $1.1$ over the grid of Table~\ref{tab:ladder_transfer_all}, as on the mixture pool: the
+steered pool lowers both arms, not their ratio.
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/steer_ab.pdf}
@@ -4452,17 +4455,57 @@ $u\bar u\to Zgg$ & $0.83$ & $1.2$ & $0.97$ & $0.87$ & $0.92$ & $1.0$ & $0.94$ & 
 \end{tabular}
 \end{table}
 
+\paragraph{The ladder's pretraining: not converged at $64$k steps, and every process gets worse as rungs are added.}
+One single-fidelity search per rung ($8$ trials, $64$k steps, both target factors off, the lr window one decade either
+side of $\eta^\ast(64\text{k})=1.2\times10^{-3}$; \code{tp3\_ladder\_r}$n$, \code{ladder\_pretrain.py}). Rungs $1$--$4$
+(Jean Zay) are complete; rungs $5$--$9$ (lxplus) have $3$--$5$ trials in, the guided ones queued. A trial takes $6.3$\,h.
+Every finished curve still falls when the anneal ends: the best checkpoint sits at $58$--$64$k steps
+(Fig.~\ref{fig:ladder_pre_curves}). The optimum is the same region on every rung (Fig.~\ref{fig:ladder_pre_hpo}): lr
+$0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$; $\lambda$ near $10^{-7}$--$10^{-6}$ costs $10$--$1000\times$,
+and six trials diverged (NaN gradients, at $36$--$60$k steps), all with $\lambda\ge3\times10^{-7}$ (lr $0.8$--$4.7\times10^{-3}$). Every sweep starts from the same three random candidates, so the first wave tested only three points
+per rung; the guided trials improved the best by $2.0$, $2.1$ and $1.1\times$ on rungs $1$--$3$ and not on rung $4$. At
+the rung's best checkpoint each process's MSE of $\log|\mathcal M|^2$ rises with the rung
+(Fig.~\ref{fig:ladder_pre_dataset}): $ee\to u\bar u$ from $1.1\times10^{-7}$ at rung $1$ to $5.1\times10^{-6}$ at rung $9$,
+the four-quark processes $15$--$24\times$ between rungs $4$ and $9$, with the largest step at rung $9$, where the
+one-loop sets come in. At a fixed $64$k steps every added process takes its share of the same budget.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_a.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_c.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_e.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_f.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_g.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_h.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/ladder_pretrain_curves_i.pdf}
+\caption{The ladder's pretraining searches, rungs (a)--(i) $1$--$9$: each finished trial's validation loss
+($\vlnr$, geometric mean over the rung's processes), coloured by lr, its best checkpoint marked; dotted, a trial that
+diverged.}
+\label{fig:ladder_pre_curves}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/ladder_pretrain_hpo.pdf}
+\caption{Each finished ladder pretraining trial's best $\vlnr$ over its rung's best, against the searched HPs (open:
+EMA off); a cross, a trial that diverged.}
+\label{fig:ladder_pre_hpo}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/ladder_pretrain_per_dataset.pdf}
+\caption{Each pretraining process at its rung's best checkpoint (the best trial so far), MSE of $\log|\mathcal M|^2$,
+against the rung it is trained in.}
+\label{fig:ladder_pre_dataset}
+\end{figure}
+
 \paragraph{The ladder, preliminary: gluon exchange and multiplicity transfer from the rungs that carry them.} Each
 probe fine-tuned at $D=10$, $10^2$, $10^3$, $10^4$ from ladder rungs $4$ (up to gluon exchange) and $9$ (every rung,
-one loop included), from each rung's best pretraining trial after the search's first wave (lr $9.3\times10^{-4}$, EMA on;
+one loop included), from the best pretraining trial of each rung's first wave (lr $9.3\times10^{-4}$, EMA on; still rung $4$'s best
+after all eight trials, rung $9$'s with three in;
 \code{tp3\_r4ftp}, \code{tp3\_r9ftp}, single $8$-trial searches, not extended at the lr window's edge), against the same
 scratch cells (Fig.~\ref{fig:ladder_prelim}, \code{ladder\_prelim.py}; $ee\to W^+W^-$ on the mixture pool here). Where
 a rung adds the structure a probe needs, its gain rises: $u\bar u\to gg$ from $1.8$ ($ee\to u\bar u$) to $4.7$ and $4.3$,
 $u\bar u\to Zg$ to $4.0$ and $Zggg$ to $2.8$ once the $W+ng$ family is in (rung $9$; rung $4$ leaves them at $1.1$ and
 $1.3$), $ud\to ud$ to $5.9$ from rung $9$ ($52\times$ at $10^4$), and $ee\to b\bar b$ at one loop to $4.5$ and $6.9$.
 The near probe loses a little ($ee\to d\bar d$ $4.3\to2.9$, $2.7$): every pretraining process gets a smaller share of the
-same $64$k steps as the rungs grow, and each one's own loss rises with the rung ($ee\to u\bar u$ $1.5\times10^{-7}$ at
-rung $1$, $5\times10^{-6}$ at rung $9$). $ee\to Z\gamma$ and $ee\to W^+W^-$ stay near $1$ from every pretraining. Four
+same $64$k steps as the rungs grow, and each one's own loss rises with the rung (Fig.~\ref{fig:ladder_pre_dataset}). $ee\to Z\gamma$ and $ee\to W^+W^-$ stay near $1$ from every pretraining. Four
 cells per probe and one search each: a direction, not a measurement.
 \begin{figure}[H]
 \centering
@@ -4479,22 +4522,10 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
-  \item \textbf{Steering, next.} The steered results are with the $t$-channel factor on, the study's
-    $ee\to W^+W^-$ arms with it off: the factor-off scratch search on the steered pool for $D=10^{2.5}$--$10^4$
-    (\code{tp3s\_scr}, lxplus) and its fine-tunes (\code{tp3s\_ftp}, Jean Zay, where the steered pool was
-    copied with checksums equal), running. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
+  \item \textbf{Steering, next.} The factor-off steered scratch search (\code{tp3s\_scr}, lxplus) has $7$ of $8$
+    trials at $D=10^{2.5}$--$10^{3.5}$ and $5$ at $10^4$, the rest queued there; Table~\ref{tab:ladder_transfer_all} takes
+    those cells as they stand. A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
     mixture pool at $D\sim10^2$.
-  \item \textbf{The lr window.} The best trial sits at the top edge of its window in several cells
-    ($ee\to d\bar d$ at $10^{2.5}$, $10^3$ and $10^4$, $u\bar u\to Zggg$ at $D\le10^{1.5}$,
-    $ee\to Z\gamma$ at $10^{2.5}$, several cells at $D=10$). The measured surface
-    (\code{analysis/hpo\_optima}) predicts a smaller batch correction than $\sqrt{B/16384}$
-    ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$).
-    Counted on the study's arms, $31$ of the $84$ scratch cells have their best trial in the window's top $15\%$ and
-    none at the bottom, while the fine-tunes reach high lr through \code{lr\_scale}: a bias in favour of fine-tuning.
-    The $31$ cells are re-searched half a decade higher (\code{tp3\_scrh}, running); a cell's scratch value is then the
-    shifted search's best.
-  \item \textbf{Candidate seeds.} Every sweep draws its candidate set with one seed, so all probes
-    are searched on the same points; a per-sweep seed would diversify the search at no cost.
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
@@ -4507,17 +4538,24 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
-  \item \textbf{The fine-tune lr.} The $\sqrt{B/16384}$ scaling of the fine-tune lr pushes the far probes' best
-    \code{lr\_scale} to $57$--$930$; replacing it stays open. Every sweep draws the same candidate points (the value
+  \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
+    cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
+    \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
+    correction ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$); re-centring
+    on it stays open. Every sweep draws the same candidate points (the value
     $805$ recurs as a best \code{lr\_scale}); a per-sweep candidate seed would diversify the search.
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
-  \item \textbf{The ladder.} Pretraining searches: rungs $1$--$4$ on Jean Zay in their second wave, $5$--$9$ on
-    lxplus (second wave started on rungs $5$, $6$ only). Each process's loss rises with the rung at a fixed $64$k steps,
-    so the rung comparison mixes structure with training per process; a step budget that grows with the rung is the
-    user's call. Then the full fine-tune grid from every rung (after the preliminary rungs $4$ and $9$), the star arms
-    after.
+  \item \textbf{The ladder.} Rungs $5$--$9$'s guided pretraining trials are queued on lxplus, where scheduling is
+    slow (they can move to Jean Zay: the pools copy in seconds now). Each process's loss rises with the rung at a fixed
+    $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per process;
+    a step budget that grows with the rung is the user's call. Then the full fine-tune grid from every rung's final
+    best (rungs $1$--$3$'s bests moved in the second wave, so their fine-tunes start from those), the star arms after.
+  \item \textbf{Jean Zay's inode quota.} \code{\$WORK} filled its $500$k-file quota on 2026-10-01 and $25$ trials
+    failed or never started (retracted from their sweeps' states and replaced). Each run wrote an empty \code{source.zip}
+    and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
+    The project stays near $85\%$ (each trial still writes about $13$ files, mostly plots); about $36$k trials more fit.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
