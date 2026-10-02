@@ -1,0 +1,94 @@
+# Every pool the star arms and their new probes read (the union of recipes/transfer_star_*.yaml and the four
+# new probes' recipes), for one CPU prebuild: separate jobs would build the shared rung-1 pools at once.
+sampling: {mode: mixture}
+processes:
+- name: ee_uu
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_mumu
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_numu
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_bbbarg
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_bbbargg
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wg
+  sqrts: [85, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ZZ
+  sqrts: [192, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ZH
+  sqrts: [227, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_uug
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_uugg
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ddbar_nlo
+  sqrts: [500, 1000]
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ZZ_nlo
+  sqrts: [500, 1000]
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbar
+  sqrts: [363, 450]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ttbar_nlo
+  sqrts: [363, 450]
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ddbarg
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ttbarg
+  sqrts: [363, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ttbar_nlo
+  sqrts: [363, 450]
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_dd_nlo
+  sqrts: [500, 1000]
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
