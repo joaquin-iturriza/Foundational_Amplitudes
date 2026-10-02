@@ -4541,7 +4541,7 @@ the user's call, 2026-10-02).
 $ee\to u\bar u$ in that setup (\code{tp3\_r}$n$\code{fte}, \code{tp3\_uufte}; Fig.~\ref{fig:rung_grid},
 \code{rung\_grid.py}), collected from all three sites on 2026-10-02 at 18:00, when most cells held their three random
 start-up trials and the guided two were queued. On that equal footing (each cell's best of its first three trials;
-$36$--$48$ cells per pretraining at $D\ge10^3$, $14$ for rung $5$), the gain over scratch is a geometric mean of $1.5$
+$36$--$48$ cells per pretraining at $D\ge10^{2.5}$, $14$ for rung $5$), the gain over scratch is a geometric mean of $1.5$
 from $ee\to u\bar u$ and $2.1$, $2.3$, $2.3$, $2.3$, $2.3$ from rungs $1$--$5$. The $ee\to u\bar u$ parent trained $32$k
 steps on one process, rung $1$'s $64$k on three; the $64$k $ee\to u\bar u$ pretraining separates the two. The values
 move as trials land (a cell's value is its best so far), so nothing per cell is read yet.
@@ -4635,8 +4635,9 @@ cell is its search's best so far, mostly of three random trials.}
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
 
-All runs are on V100~32GB (Jean-Zay \code{gpu\_p2}, account \code{itg@v100}); A100 is
-unavailable to the account, which matters below. A per-step optimization campaign attacked two
+The runs below are on V100~32GB (Jean-Zay \code{gpu\_p2}, account \code{itg@v100}); A100 was then
+unavailable to the account (since 2026-10-02 the \code{itg@a100} allocation runs this project, with TF32 A/B'd: the
+hand-off of Sec.~\ref{sec:ladder-open}), which matters below. A per-step optimization campaign attacked two
 distinct regimes, each fast path proven numerically equal to the original by CPU equivalence
 guards (\code{tests/test\_amp.py}, Section~0).
 
@@ -4695,7 +4696,8 @@ wall time.
 \begin{remark}[Carried but inert, and deliberately declined]
 \code{allow\_tf32} is carried (default on) but is a \textbf{no-op on V100}; it would give
 $\sim2\times$ matmul on A100 at $\sim10^{-3}$ precision, so it must be loss-A/B'd on A100 before
-it is trusted, and A100 is unavailable. Two optimizations were declined on purpose:
+it is trusted (done for the transfer study on 2026-10-02: TF32 on and off agree within the run-to-run spread,
+Sec.~\ref{sec:ladder-open}). Two optimizations were declined on purpose:
 converting the $L_2$ penalty to decoupled \code{weight\_decay} (it is folded into $\vlnr$,
 checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP, so converting it
 would silently break continuity with all existing sweep results), and \code{torch.compile} (the
