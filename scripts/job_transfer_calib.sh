@@ -26,6 +26,7 @@ TAG="_lr$(printf '%s\n' "$@" | sed -n 's/^training.lr=//p' | head -1)"
 # data.* overrides (an A/B arm, e.g. data.target_propagator_tchannel=false) go into the name too
 TAG="$TAG$(printf '%s\n' "$@" | sed -n 's/^data\.\([^=]*\)=\(.*\)$/_\1-\2/p' | tr -d '\n')"
 TAG="$TAG$(printf '%s\n' "$@" | sed -n 's/^seed=\(.*\)$/_seed\1/p' | head -1)"   # seed repeats of one point
+TAG="$TAG$(printf '%s\n' "$@" | sed -n 's/^training.allow_tf32=\(.*\)$/_tf32-\1/p' | head -1)"   # the A100 TF32 A/B
 case " $* " in *" training.loss=HETEROSC "*) TAG="${TAG}_het";; esac          # a sigma-head (steering reference) run
 CFG=sweep/sweep_config_${FAM}_${P}_d${K}.yaml; NAME=${FAM%_scr}_calib_${P}_d${K}_t${T}${TAG}
 if [ -n "$CFGX" ]; then CFG="$CFGX"; STEM=$(basename "$CFG" .yaml); NAME=${STEM#sweep_config_}_calib_t${T}${TAG}; fi
