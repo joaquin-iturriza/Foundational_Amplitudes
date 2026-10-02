@@ -45,24 +45,25 @@ def draw(ax, f, *a, **kw):
         ax.plot(D, L, *a, **kw)
 
 
-for part, order in (("ee", P[:6]), ("qcd", P[6:]), ("new", NEW)):
-    figs = ps.panels(len(order))
-    for (fig, ax), p in zip(figs, order):
-        draw(ax, lambda k: scratch(p, k, steered=False)[0], "o-", color="k", label="from scratch")
-        draw(ax, lambda k: finetune(p, k, steered=False)[0], "o--", color=ps.C.blue, label=r"$ee\to u\bar u$, earlier setup")
-        draw(ax, lambda k: best(f"tp3_uufte_{p}_d{k}")[0], "s-", color=ps.C.blue, mfc="none", label=r"$ee\to u\bar u$")
-        if any(n.startswith("tp3_uu64fte_") for n in S):
-            draw(ax, lambda k: best(f"tp3_uu64fte_{p}_d{k}")[0], "s-", color=ps.C.vermillion, mfc="none",
-                    label=r"$ee\to u\bar u$, 64k steps")
-        for r in RUNGS:
-            if any(n.startswith(f"tp3_r{r}fte_") for n in S):
-                draw(ax, lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0], "o-", color=cols[r], label=f"rung {r}")
-            if any(n.startswith(f"tp3_r{r}ftp_") for n in S):
-                draw(ax, lambda k: best(f"tp3_r{r}ftp_{p}_d{k}")[0], "o--", color=cols[r],
-                        label=f"rung {r}, earlier setup")
-        ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-        ps.process_label(ax, LAB[p])
-        ps.make_room(ax)
-    ps.shared_legend(figs[0][0], figs[0][1], ncol=2)     # seven series: no panel has a clear corner for them
-    ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}"))
+if __name__ == "__main__":
+    for part, order in (("ee", P[:6]), ("qcd", P[6:]), ("new", NEW)):
+        figs = ps.panels(len(order))
+        for (fig, ax), p in zip(figs, order):
+            draw(ax, lambda k: scratch(p, k, steered=False)[0], "o-", color="k", label="from scratch")
+            draw(ax, lambda k: finetune(p, k, steered=False)[0], "o--", color=ps.C.blue, label=r"$ee\to u\bar u$, earlier setup")
+            draw(ax, lambda k: best(f"tp3_uufte_{p}_d{k}")[0], "s-", color=ps.C.blue, mfc="none", label=r"$ee\to u\bar u$")
+            if any(n.startswith("tp3_uu64fte_") for n in S):
+                draw(ax, lambda k: best(f"tp3_uu64fte_{p}_d{k}")[0], "s-", color=ps.C.vermillion, mfc="none",
+                        label=r"$ee\to u\bar u$, 64k steps")
+            for r in RUNGS:
+                if any(n.startswith(f"tp3_r{r}fte_") for n in S):
+                    draw(ax, lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0], "o-", color=cols[r], label=f"rung {r}")
+                if any(n.startswith(f"tp3_r{r}ftp_") for n in S):
+                    draw(ax, lambda k: best(f"tp3_r{r}ftp_{p}_d{k}")[0], "o--", color=cols[r],
+                            label=f"rung {r}, earlier setup")
+            ax.set_xscale("log"); ax.set_yscale("log")
+            ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+            ps.process_label(ax, LAB[p])
+            ps.make_room(ax)
+        ps.shared_legend(figs[0][0], figs[0][1], ncol=2)     # seven series: no panel has a clear corner for them
+        ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}"))
