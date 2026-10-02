@@ -8,6 +8,7 @@ and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as 
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
 """
 import os, sys
+import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, best, scratch, finetune  # noqa: E402
 from rung_grid import LAB, P, S, curve  # noqa: E402
@@ -18,6 +19,26 @@ import plot_style as ps  # noqa: E402
 FOCUS = {"ee_ddbar": 1, "ee_nnbar": 2, "ee_ttbar": 5, "ee_WW": 6, "ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_Za": 3,
          "ud_ud": 4, "uubar_gg": 6, "uubar_Zg": 6, "uubar_Zgg": 7, "uubar_Zggg": 8}
 GREY = dict(color="0.6", alpha=0.35)
+TIE = 1.2      # a lead under this factor is a tie: below what one seed's 5-trial search resolves (provisional)
+
+
+def overall(p, fams):
+    """The pretraining that does best over the D cells every candidate has: the mean over cells of
+    log10(scratch / fine-tune), equal weight per cell (each half-decade of D counts the same). Cells are those where
+    scratch and at least 9 families have a value; a family missing one of them is not ranked. Returns the leaders
+    within TIE of the best, best first."""
+    K = [k for k in range(2, 9) if scratch(p, k, steered=False)[0]
+         and sum(best(f"{f}_{p}_d{k}")[0] is not None for f in fams) >= 9]
+    score = {f: np.mean([np.log10(scratch(p, k, steered=False)[0] / best(f"{f}_{p}_d{k}")[0]) for k in K])
+             for f in fams if K and all(best(f"{f}_{p}_d{k}")[0] for k in K)}
+    if not score:
+        return []
+    top = max(score.values())
+    return sorted((f for f in score if top - score[f] < np.log10(TIE)), key=lambda f: -score[f])
+
+
+def short(f):
+    return {"tp3_uufte": r"$u\bar u$", "tp3_uu64fte": r"$u\bar u$ 64k"}.get(f, "r" + f[len("tp3_r"):-len("fte")])
 
 
 def fam(r):
@@ -36,9 +57,10 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     figs = ps.panels(len(order))
     for (fig, ax), p in zip(figs, order):
         hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
+        lead = overall(p, [f for f in series() if f.endswith("fte")])
         first = True
         for f in series():
-            if f in (hi, lo):
+            if f in (hi, lo) or (lead and f == lead[0]):
                 continue
             D, L = curve(lambda k: best(f"{f}_{p}_d{k}")[0])
             if D:
@@ -51,10 +73,16 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         ax.plot(*curve(lambda k: best(f"{lo}_{p}_d{k}")[0]), "o-", color=ps.C.blue, label="the rung below")
         ax.plot(*curve(lambda k: best(f"{hi}_{p}_d{k}")[0]), "o-", color=ps.C.vermillion,
                 label="first rung with the structure")
+        if lead and lead[0] not in (hi, lo):
+            ax.plot(*curve(lambda k: best(f"{lead[0]}_{p}_d{k}")[0]), "o-", color=ps.C.green, label="best overall")
         below = r"$ee\to u\bar u$" if FOCUS[p] == 1 else f"r{FOCUS[p] - 1}"
-        ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below)
+        ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
+                         + (", best " + r"$\approx$".join(short(f) for f in lead) if lead else ""))
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.make_room(ax)
-    ps.shared_legend(figs[0][0], figs[0][1], ncol=2)
+    a0 = figs[0][1]
+    if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
+        a0.plot([], [], "o-", color=ps.C.green, label="best overall")
+    ps.shared_legend(figs[0][0], a0, ncol=2)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))
