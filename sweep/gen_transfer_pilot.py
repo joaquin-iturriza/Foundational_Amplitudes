@@ -37,11 +37,18 @@ one decade either side instead of CLAUDE.md's half decade:
                       (--lr-scale; the tp3_ fine-tunes search [1, 100]),
                       fine_tune.layer_decay [0.75, 1], lambda, warm-up, eta_min, EMA;
                       amplitude stats fitted on the probe (fine_tune.target_stats=own)
+  fine-tune, --eff-lr  (*_fte_; the rung fine-tune grid, the user's call 2026-10-02) training.lr itself searched over
+                      the given window, no batch scaling, fine_tune.lr_scale = layer_decay = 1: over the 84 ee_uu
+                      fine-tune cells the best lr * lr_scale sat at a median 2.3e-3 (half of them in 0.8-7e-3) with no
+                      trend in D, a window of 1e-3..1e-2 would have cost the median cell nothing and 9 in 10 cells at
+                      most 2.5x, and layer_decay showed no effect (median correlation with the loss +0.08); 5 trials
+                      per cell, each sweep its own DyHPO candidate seed (a shared seed made every sweep draw the same
+                      points). To be extended in place where that proves short.
 The fine-tune configs need the pretrain's best checkpoint:
     python sweep/gen_transfer_pilot.py                      pretrain + scratch configs
     python sweep/gen_transfer_pilot.py --ft CKPT --lr LR    fine-tune configs
 """
-import argparse, collections, json, os
+import argparse, collections, json, os, zlib
 import numpy as np
 import yaml
 
@@ -141,13 +148,13 @@ def lr_space(T, k=None):
             "low": float(f"{c / 10:.3g}"), "high": float(f"{c * 10:.3g}")}
 
 
-def write(name, recipe, T, space, extra=None, head=""):
+def write(name, recipe, T, space, extra=None, head="", n_trials=None, seed=42):
     fixed = dict(FIXED, **{"data.processes_file": f"${{PROJECT_DIR}}/recipes/{recipe}"}, **(extra or {}))
     c = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "8G",
                      "cpus_per_task": 4, "chain_width": 2,   # HTCondor DAG chained; SLURM: submit --chain
                      "time": "%02d:%02d:00" % divmod(max(30, int(T * SEC_PER_STEP / 60 * 1.5 + OVERHEAD_MIN)), 60)},
-         "paths": None, "sweep_name": name, "n_trials": N_TRIALS,
-         "dyhpo": {"n_candidates": 200, "seed": 42, "n_startup": N_STARTUP, "total_budget": 10000},
+         "paths": None, "sweep_name": name, "n_trials": n_trials or N_TRIALS,
+         "dyhpo": {"n_candidates": 200, "seed": seed, "n_startup": N_STARTUP, "total_budget": 10000},
          "fidelity_schedule": {"t_steps": [T]}, "fixed_params": fixed,
          "range_extension": {"enabled": False}, "search_space": space}
     path = os.path.join(HERE, f"sweep_config_{name}.yaml")
@@ -179,6 +186,9 @@ def main():
                          "best trial in the window's top 15%%, none at the bottom (docs/results.tex sec:ladder)")
     ap.add_argument("--family", help="fine-tune sweep name prefix instead of the default (e.g. tp3_r4ftp for "
                                       "fine-tunes from ladder rung 4)")
+    ap.add_argument("--eff-lr", help="low,high: fine-tunes search training.lr itself over this window (*_fte_), "
+                                      "lr_scale and layer_decay fixed at 1, a per-sweep candidate seed")
+    ap.add_argument("--n-trials", type=int, help="trials per sweep (default N_TRIALS)")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
@@ -222,31 +232,40 @@ def main():
                                  {"data.train_subsample": int(round(10 ** (k / 2)))},
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
     else:
-        assert a.lr, "--lr (the pretrain's best lr) is needed with --ft"
+        assert a.lr or a.eff_lr, "--lr (the pretrain's best lr) is needed with --ft"
         ls_lo, ls_hi = (float(x) for x in a.lr_scale.split(","))
-        ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": ls_lo, "high": ls_hi},
-                    {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
+        if a.eff_lr:
+            lo, hi = (float(x) for x in a.eff_lr.split(","))
+            ft_space = [{"name": "training.lr", "type": "float_log", "low": lo, "high": hi}]
+        else:
+            ft_space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": ls_lo, "high": ls_hi},
+                        {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}]
         # every probe is fine-tuned from the one pretrain (the plan, 2026-10-01); a probe's scratch arm must
         # share its target, so with --bw-off the probes whose target the factors change (the Z-window ones,
         # whose pools straddle the pole, and ee_WW, whose scratch arm kept the t-channel factor) need tp3_scr
         assert not a.steered or a.bw_off, "steered fine-tunes are on the study's factor-off target (--bw-off)"
         # *_ftph_: the cells whose best lr_scale sat at the top of [1, 100], re-searched over [10, 1000] (--lr-scale
         # 10,1000 --cells), as the scratch cells pinned at their window's top were (scrh)
-        tag = ("ftp" if a.parent_offshell else "ft") + ("h" if cells is not None and ls_lo >= 10 else "")
+        tag = ("fte" if a.eff_lr else "ftp" if a.parent_offshell else "ft") + \
+            ("h" if not a.eff_lr and cells is not None and ls_lo >= 10 else "")
         # "auto": the parent records its own stats in data_stats.json (runs since 2026-10-01), nothing to pass
         osh = ({"fine_tune.offshell_stats": "own"} if not a.parent_offshell else
                {"fine_tune.offshell_stats": "parent"} if a.parent_offshell == "auto" else
                {"fine_tune.offshell_stats": "parent",
                 "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))})
         for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER)):
-            for k in (steer_ks if a.steered else KS):
+            for k in (steer_ks if a.steered else SETTLED if a.eff_lr else KS):
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
                 fam = a.family or f"{pfx}{'s' if a.steered else ''}_{tag}"
-                out.append(write(f"{fam}_{p}_d{k}", recipe, T_CELL[k], ft_space + COMMON_SPACE,
-                                 {"data.train_subsample": int(round(10 ** (k / 2))), "training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}"),
+                name = f"{fam}_{p}_d{k}"
+                lr = ({"fine_tune.lr_scale": 1.0, "fine_tune.layer_decay": 1.0} if a.eff_lr else
+                      {"training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}")})
+                out.append(write(name, recipe, T_CELL[k], ft_space + COMMON_SPACE,
+                                 {"data.train_subsample": int(round(10 ** (k / 2))), **lr,
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own", **osh},
+                                 n_trials=a.n_trials, seed=zlib.crc32(name.encode()) % 2 ** 31 if a.eff_lr else 42,
                                  head=f"Transfer pilot, fine-tune from {os.path.relpath(os.path.dirname(os.path.dirname(a.ft)), os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(a.ft)))))}: {p} on D = 10^{k / 2:g} events."))
     print("\n".join(os.path.relpath(p, ROOT) for p in out))
     print("lr* centres:", {T: f"{lr_star(T):.2g}" for T in sorted({T_PRE, *T_CELL.values()})})
