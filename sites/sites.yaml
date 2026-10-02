@@ -42,7 +42,10 @@ jeanzay:
     - source /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/sites/activate.sh
   cluster:
     scheduler: slurm
-    partition: gpu_p2
+    # gpu_p2 (31 nodes x 8 V100-32GB) and gpu_p13 (396 nodes x 4 V100, 16 or 32 GB): a job starts on whichever
+    # frees first. Every FA job fits 16 GB (a fine-tune peaks at ~2.3 GB, a 64k pretraining at ~7.4 GB); probed
+    # 2026-10-02 (job_probe on gpu_p13: V100-SXM2-32GB, torch 2.1.2+cu118)
+    partition: gpu_p2,gpu_p13
     account:   itg@v100
     gpu_flag:  "--gres=gpu:{n}"
     # no qos, no mem: Jean Zay rejects both. Host RAM scales with --cpus-per-task.
