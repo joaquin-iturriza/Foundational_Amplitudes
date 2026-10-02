@@ -104,11 +104,17 @@ def init_sampler(cfg, afs_dir, eos_dir):
     return state_path
 
 
-def write_sh(i, cfg, afs_dir, config_abs_path, t_steps_cap=None):
+def _fixed_flag(fixed):
+    """(hp_idx, t_steps): the trial runs that candidate instead of asking DyHPO (run_trial --fixed-hp-idx)."""
+    return "" if fixed is None else f" \\\n    --fixed-hp-idx {fixed[0]} --fixed-t-steps {fixed[1]}"
+
+
+def write_sh(i, cfg, afs_dir, config_abs_path, t_steps_cap=None, fixed=None):
     project_dir  = cfg["paths"]["project_dir"]
     python_env   = cfg["paths"]["python_env"]
     trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
+    cap_flag += _fixed_flag(fixed)
 
     eos_check = ""
     if "eos_sweep_dir" in cfg.get("paths", {}):
@@ -159,11 +165,12 @@ def _resolve_trial_script(cfg):
     return ts if os.path.isabs(ts) else os.path.join(project_dir, ts)
 
 
-def write_slurm_script(i, cfg, sweep_dir, config_abs_path, t_steps_cap=None):
+def write_slurm_script(i, cfg, sweep_dir, config_abs_path, t_steps_cap=None, fixed=None):
     cluster      = cfg["cluster"]
     project_dir  = cfg["paths"]["project_dir"]
     trial_script = _resolve_trial_script(cfg)
     cap_flag = f" \\\n    --t-steps-cap {t_steps_cap}" if t_steps_cap is not None else ""
+    cap_flag += _fixed_flag(fixed)
 
     # partition/account/qos/gpu flag/mem policy are the SITE's: siteconf renders them.
     header = siteconf.slurm_header(cluster, f"trial_{i:04d}",
@@ -324,12 +331,15 @@ def next_available_name(base_name, afs_sweep_dir):
             return candidate
 
 
-def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit=None):
+def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit=None, fixed_hp=None):
     """Generate (and optionally submit) one DyHPO sweep.
 
     submit : None  -> use cluster.auto_submit, else prompt interactively
              True  -> submit now via sweep_manager (interleaved across sweeps)
              False -> generate only (print the sweep_manager command to run later)
+
+    fixed_hp : candidate indices to run as they are (with --extend): one trial each at the sweep's single
+               fidelity, observed into the state like any other, no DyHPO suggestion.
 
     Returns the sweep directory (the one containing jobs/), or None on dry-run.
     """
@@ -339,6 +349,9 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
     # (a config may override by setting its own fixed_params.seed).
     cfg.setdefault("fixed_params", {}).setdefault("seed", 42)
     n_trials = n_trials if n_trials is not None else cfg.get("n_trials", 40)
+    if fixed_hp:
+        assert extend, "--fixed-hp adds trials to an existing sweep (--extend)"
+        n_trials = len(fixed_hp)
 
     base_name     = cfg["sweep_name"]
     afs_sweep_dir = cfg["paths"].get("afs_sweep_dir", cfg["paths"].get("sweep_dir"))
@@ -381,10 +394,11 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
     for i in range(existing_jobs, existing_jobs + n_trials):
         low_fidelity = lf_t_steps_cap is not None and (i - existing_jobs) < lf_n_trials
         cap          = lf_t_steps_cap if low_fidelity else None
+        fixed = (fixed_hp[i - existing_jobs], max(t_steps_sched)) if fixed_hp else None
         if scheduler == "slurm":
-            job_path = write_slurm_script(i, cfg, afs_dir, saved_config, t_steps_cap=cap)
+            job_path = write_slurm_script(i, cfg, afs_dir, saved_config, t_steps_cap=cap, fixed=fixed)
         else:
-            sh_path  = write_sh(i, cfg, afs_dir, saved_config, t_steps_cap=cap)
+            sh_path  = write_sh(i, cfg, afs_dir, saved_config, t_steps_cap=cap, fixed=fixed)
             job_path = write_sub(i, cfg, afs_dir, sh_path, low_fidelity=low_fidelity)
         job_paths.append(job_path)
         if low_fidelity:
@@ -449,10 +463,13 @@ def main():
                         help="Override n_trials from config")
     parser.add_argument("--extend",    action="store_true",
                         help="Add more trials to an existing sweep (reuse DyHPO state)")
+    parser.add_argument("--fixed-hp", type=int, nargs="+", default=None,
+                        help="with --extend: run these candidate indices as they are, one trial each")
+    parser.add_argument("--submit", action="store_true", help="submit without prompting")
     args = parser.parse_args()
 
     run_generate(args.config, n_trials=args.n_trials, extend=args.extend,
-                 dry_run=args.dry_run, submit=None)
+                 dry_run=args.dry_run, submit=True if args.submit else None, fixed_hp=args.fixed_hp)
 
 
 if __name__ == "__main__":
