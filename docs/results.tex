@@ -4455,19 +4455,29 @@ $ee\to W^+W^-$ & $0.84$ & $1.2$ & $0.69$ & $1.7^\ast$ & $0.30^\ast$ & $3.7^\ast$
 \end{tabular}
 \end{table}
 
-\paragraph{The ladder's pretraining: not converged at $64$k steps, and every process gets worse as rungs are added.}
-One single-fidelity search per rung ($8$ trials, $64$k steps, both target factors off, the lr window one decade either
+\paragraph{The ladder's pretraining: not converged at $64$k steps, one optimum on every rung, and the one-loop rung costs every process $\sim10\times$.}
+One single-fidelity search per rung ($64$k steps, both target factors off, the lr window one decade either
 side of $\eta^\ast(64\text{k})=1.2\times10^{-3}$; \code{tp3\_ladder\_r}$n$, \code{ladder\_pretrain.py}). Rungs $1$--$4$
-(Jean Zay) are complete; rungs $5$--$9$ (lxplus) have $3$--$5$ trials in, the guided ones queued. A trial takes $6.3$\,h.
+(Jean Zay) ran all $8$ trials. Rungs $5$--$9$ (lxplus) were cut short (2026-10-02, the user's call): with their first
+three to five trials in, every rung's optimum sat in the same region, and nine of the ten guided trials then running
+repeated points measured $7$--$1200\times$ worse or divergent on other rungs. Those were cancelled; rung $6$'s one new
+point (hp1, lr $2.7\times10^{-3}$, $\lambda=5\times10^{-10}$) ran on and came out $12\times$ above its rung's best, and
+each of rungs $5$--$9$ ran the two points that won the second wave on rungs $1$--$2$ (hp47, lr $1.1\times10^{-3}$, EMA
+on; hp73, lr $1.8\times10^{-3}$, EMA off; \code{generate\_sweep.py --extend --fixed-hp}). One of the two is the best on
+every one of rungs $5$--$9$, $1.2$, $1.5$, $6.3$, $2.0$ and $1.6\times$ below the first wave's. The bests, rungs
+$1$--$9$: $3.6$, $2.9$, $3.5$, $5.8$, $9.1$, $8.5$, $4.9$, $15\times10^{-8}$ and $1.3\times10^{-6}$ (hp47, hp73, hp185,
+hp15, hp47, hp73, hp73, hp47, hp73). Rung $7$ below rungs $5$ and $6$ is within what $5$--$7$ trials per rung resolve.
+A trial takes $6.3$\,h.
 Every finished curve still falls when the anneal ends: the best checkpoint sits at $58$--$64$k steps
 (Fig.~\ref{fig:ladder_pre_curves}). The optimum is the same region on every rung (Fig.~\ref{fig:ladder_pre_hpo}): lr
 $0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$; $\lambda$ near $10^{-7}$--$10^{-6}$ costs $10$--$1000\times$,
 and six trials diverged (NaN gradients, at $36$--$60$k steps), all with $\lambda\ge3\times10^{-7}$ (lr $0.8$--$4.7\times10^{-3}$); their best checkpoints before the blow-up, rescored on the validation split (\code{tools/eval\_best\_val.py}; their logs print the loss with the $L_2$ term, which swamps it), sit $8$--$2200\times$ above their rung's best, so none changes a rung's best. Every sweep starts from the same three random candidates, so the first wave tested only three points
 per rung; the guided trials improved the best by $2.0$, $2.1$ and $1.1\times$ on rungs $1$--$3$ and not on rung $4$. At
-the rung's best checkpoint each process's MSE of $\log|\mathcal M|^2$ rises with the rung
-(Fig.~\ref{fig:ladder_pre_dataset}): $ee\to u\bar u$ from $1.1\times10^{-7}$ at rung $1$ to $5.1\times10^{-6}$ at rung $9$,
-the four-quark processes $15$--$24\times$ between rungs $4$ and $9$, with the largest step at rung $9$, where the
-one-loop sets come in. At a fixed $64$k steps every added process takes its share of the same budget.
+the rung's best checkpoint (Fig.~\ref{fig:ladder_pre_dataset}) each process's MSE of $\log|\mathcal M|^2$ moves within
+$\sim3\times$ from rung to rung up to rung $8$ and jumps $\sim10\times$ at rung $9$, where the one-loop sets come in:
+$ee\to u\bar u$ $1.1\times10^{-7}$ at rung $1$, $1.7$--$3.6\times10^{-7}$ at rungs $4$--$8$, $2.6\times10^{-6}$ at rung
+$9$; the four-quark processes $9$--$12\times$ between rungs $4$ and $9$. At a fixed $64$k steps every added process takes
+its share of the same budget, and the one-loop targets take more of it.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_a.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_b.pdf}} \\[1ex]
@@ -4490,8 +4500,8 @@ EMA off); a cross, a trial that diverged, at its best checkpoint before the blow
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/ladder_pretrain_per_dataset.pdf}
-\caption{Each pretraining process at its rung's best checkpoint (the best trial so far), MSE of $\log|\mathcal M|^2$,
-against the rung it is trained in.}
+\caption{Each pretraining process at its rung's best checkpoint, MSE of $\log|\mathcal M|^2$, against the rung it is
+trained in.}
 \label{fig:ladder_pre_dataset}
 \end{figure}
 
@@ -4516,6 +4526,40 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
 \label{fig:ladder_prelim}
 \end{figure}
 
+\paragraph{The fine-tune wants a fixed lr, not a scaled one.} Over the $84$ cells fine-tuned from $ee\to u\bar u$
+(Table~\ref{tab:ladder_transfer_all}), the best trial's effective lr ($\code{training.lr}\times\code{lr\_scale}$) sits
+at a median $2.3\times10^{-3}$, half the cells within $0.8$--$7\times10^{-3}$, with no trend in $D$; the
+$\sqrt{B/16384}$ scaling of \code{training.lr} ($1.2\times10^{-5}$ at $D=10$) is what pushed the best \code{lr\_scale} to
+$10$--$900$. A window of $[10^{-3},10^{-2}]$ holds a trial in $80$ of the $84$ cells and costs the median cell nothing
+($2.5\times$ at the $90$th percentile). \code{layer\_decay} shows no effect (median correlation with the loss $+0.08$,
+the bests spread over the whole $[0.75,1]$). The scratch optimum is $\sim3\times$ lower (median $9\times10^{-4}$). The
+fine-tune grid from the rungs therefore searches \code{training.lr} over $[10^{-3},10^{-2}]$ with \code{lr\_scale} and
+\code{layer\_decay} fixed at $1$, $5$ trials per cell, a candidate seed per sweep (\code{gen\_transfer\_pilot.py --eff-lr};
+the user's call, 2026-10-02).
+
+\paragraph{The fine-tune grid, partial.} Each of the twelve probes fine-tuned from every rung's final best and from
+$ee\to u\bar u$ in that setup (\code{tp3\_r}$n$\code{fte}, \code{tp3\_uufte}; Fig.~\ref{fig:rung_grid},
+\code{rung\_grid.py}), collected from all three sites on 2026-10-02 at 18:00, when most cells held their three random
+start-up trials and the guided two were queued. On that equal footing (each cell's best of its first three trials;
+$36$--$48$ cells per pretraining at $D\ge10^3$, $14$ for rung $5$), the gain over scratch is a geometric mean of $1.5$
+from $ee\to u\bar u$ and $2.1$, $2.3$, $2.3$, $2.3$, $2.3$ from rungs $1$--$5$. The $ee\to u\bar u$ parent trained $32$k
+steps on one process, rung $1$'s $64$k on three; the $64$k $ee\to u\bar u$ pretraining separates the two. The values
+move as trials land (a cell's value is its best so far), so nothing per cell is read yet.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_f.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_f.pdf}}
+\caption{The fine-tune grid so far (2026-10-02, 18:00): each probe's MSE of $\log|\mathcal M|^2$ against $D$, from
+scratch, fine-tuned from $ee\to u\bar u$ and from every ladder rung in the grid's setup (solid), and the earlier setup
+(dashed: Table~\ref{tab:ladder_transfer_all}'s $ee\to u\bar u$ cells and the preliminary rung $4$ and $9$ fine-tunes). A
+cell is its search's best so far, mostly of three random trials.}
+\label{fig:rung_grid}
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
@@ -4530,8 +4574,6 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
   \item \textbf{Seeds (low priority, the user's call).} Done for the scratch curves of seven probes; the
     fine-tune arm and the five probes the factors touch still need theirs, for the final curves (the seed mean
     at each cell's chosen HPs, with a band, not the search minimum).
-  \item \textbf{Large $D$, Jean Zay.} The four probes whose $64$k runs timed out need re-running with a
-    longer limit (about $50$ GPU-h); after everything else, as the longer horizons.
   \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
     $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
@@ -4540,22 +4582,15 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
     \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
     correction ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$); re-centring
-    on it stays open. Every sweep draws the same candidate points (the value
-    $805$ recurs as a best \code{lr\_scale}); a per-sweep candidate seed would diversify the search.
+    the scratch window on it stays open (the fine-tune grid now searches the effective lr directly, with a candidate
+    seed per sweep).
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
-  \item \textbf{The ladder.} Rungs $5$--$9$'s searches were cut short on 2026-10-02 (the user's call): every rung's
-    optimum sat at lr $0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$, and nine of the ten guided trials then
-    running repeated points measured $7$--$1200\times$ worse or divergent on other rungs. Those were cancelled; rung $6$'s
-    one new point (hp1, lr $2.7\times10^{-3}$) runs on, and each of rungs $5$--$9$ adds the two points that won the
-    second wave on rungs $1$--$2$ (hp47, hp73; \code{generate\_sweep.py --extend --fixed-hp}), about $7$\,h each on lxplus.
-    A rung's best is then the best of its trials. Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the
-    $1.30\times10^{-7}$ its run recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises with the rung at a fixed $64$k steps
-    (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per process; the step
-    budget stays $64$k on every rung (the user's call). If time allows, the $ee\to u\bar u$ pretraining is redone at
-    $64$k steps too, so every pretraining has the same budget. Then the full fine-tune grid from every rung's final
-    best (rungs $1$--$3$'s bests moved in the second wave, so their fine-tunes start from those), the star arms after.
+  \item \textbf{The ladder.} Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the $1.30\times10^{-7}$ its run
+    recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises at rung $9$ at a
+    fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
+    process; the step budget stays $64$k on every rung (the user's call).
   \item \textbf{Star arms, running.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one structure,
     not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained as the rungs (\code{tp3\_star\_<arm>}, $64$k
     steps, $8$ trials): soft and collinear emission ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$); initial-state
@@ -4567,14 +4602,17 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     and is dropped. The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Each arm is
     then fine-tuned on its probe and on $ee\to d\bar d$. Pools built on CC-IN2P3 (\code{transfer\_star\_pools.yaml}),
     copied to lxplus and Jean Zay.
-  \item \textbf{Fine-tune grid, running.} Rungs $1$--$4$ and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte}):
-    \code{training.lr} searched over $[10^{-3},10^{-2}]$, \code{lr\_scale} and \code{layer\_decay} fixed at $1$, $5$
-    trials, a candidate seed per sweep (the user's call, 2026-10-02, from the $84$ $ee\to u\bar u$ cells' optima).
-    Rungs $5$--$9$ follow when their pretrainings end. \code{tp3\_uufte} starts from the $32$k $ee\to u\bar u$
+  \item \textbf{Fine-tune grid, running.} All nine rungs and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte};
+    Fig.~\ref{fig:rung_grid}): rungs $1$--$3$ and $5$--$8$ on Jean Zay, rung $4$ and $ee\to u\bar u$ on lxplus, rung $9$
+    on CC-IN2P3. About $100$ rung $1$--$3$ trials crashed when Jean Zay's quota filled; their $26$ recorded penalties
+    are retracted, and each sweep gets replacement trials to five once its queue drains. \code{tp3\_uufte} starts from the $32$k $ee\to u\bar u$
     pretraining, the parent of Table~\ref{tab:ladder_transfer_all}, so against that table it isolates the change of
     fine-tune protocol; against the rungs ($64$k parents) it mixes in the budget. The $ee\to u\bar u$ pretraining is
-    redone at $64$k steps (\code{tp3\_pre64\_ee\_uu}) and a second grid fine-tunes from its best, the comparison with
-    the rungs at one budget. The four probes whose $64$k large-$D$ runs timed out rerun on lxplus.
+    redone at $64$k steps (\code{tp3\_pre64\_ee\_uu}), cut as rungs $5$--$9$ were: hp15 $2.3\times10^{-8}$, hp95
+    $1.2\times10^{-8}$, hp30 diverged; its three guided trials (hp33, hp115, hp125, at points measured bad on the
+    ladder) were cancelled for hp47 and hp73, running on A100. A second grid fine-tunes from its best, the comparison
+    with the rungs at one budget. The four probes whose $64$k large-$D$ runs timed out rerun on lxplus (queued for
+    $12$\,h slots).
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
