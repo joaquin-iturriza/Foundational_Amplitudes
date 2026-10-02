@@ -16,7 +16,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 S = json.load(open(os.path.join(ROOT, "analysis", "transfer", "scratch_sweeps.json")))
 ARM = {"ee_ddbar": "tp3_scr", "ee_nnbar": "tp3_scr", "ee_dd_nlo": "tp3_scr", "ee_bb_nlo": "tp3_scr", "ee_WW": "tp3_scr",
        "ee_Za": "tp2_scr", "ud_ud": "tp2_scr", "uubar_gg": "tp2_scr", "uubar_Zg": "tp2_scr",
-       "ee_ttbar": "tp_scr", "uubar_Zgg": "tp_scr", "uubar_Zggg": "tp_scr"}
+       "ee_ttbar": "tp_scr", "uubar_Zgg": "tp_scr", "uubar_Zggg": "tp_scr",
+       # the star arms' probes, factors off from the start
+       "ee_ddbarg": "tp3_scr", "ee_ttbarg": "tp3_scr", "ee_ttbar_nlo_thr": "tp3_scr", "ee_dd_nlo_hi": "tp3_scr"}
 STEERED_FROM = {"ee_WW": 5}
 
 
