@@ -39,8 +39,10 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    dry-run of the sweep generators.
    - **The sites.** CC-IN2P3: SLURM, V100; it wants `--gpus=N`, a mandatory
      `--mem`, and at most 5 CPUs per GPU — all added at submit time, never written
-     into a job script. Jean Zay: SLURM, V100 through `itg@v100`/`gpu_p2` for FA;
-     compute nodes have **no internet** (stage data first). lxplus: HTCondor; code
+     into a job script. Jean Zay: SLURM, A100 through `itg@a100`/`gpu_p5` (`-C a100`,
+     QOS `qos_gpu_a100-t3`) for FA since 2026-10-02 (`itg@v100` is in over-consumption);
+     a pending job moved by `scontrol` needs Account, Partition, Features **and** QOS, else
+     it sits on `InvalidQOS`; compute nodes have **no internet** (stage data first). lxplus: HTCondor; code
      on EOS, submission from AFS; its ssh master needs a 2FA code, so I open it —
      you cannot.
    - **Jean Zay hours are limited.** `site pick` never chooses it on its own; use it
@@ -569,8 +571,9 @@ A foreground Bash call is capped at 10 min. `scripts/wait_for_slurm.sh` (`POLL=<
   sbatch). Numbers: `docs/results.tex` § throughput.
 - **Compute knobs** (default-on, A/B via config; attack the compute floor):
   `training.allow_tf32` (default true) sets `matmul/cudnn.allow_tf32` in
-  `_init_backend` — **no-op on V100**, ~2x matmul on A100 (`gpu_p13`) at ~1e-3
-  precision, so **A/B the loss on A100 before trusting it**. `training.fused_optimizer`
+  `_init_backend` — **no-op on V100**, faster matmul on A100 at ~1e-3 precision; A/B'd
+  on A100 (2026-10-02, `docs/results.tex` sec:ladder hand-off): TF32 on and off agree within
+  the run-to-run spread, so it stays on. `training.fused_optimizer`
   (default true, CUDA only) passes `fused=True` to Adam/AdamW; flows through
   `MuAdam/MuAdamW` to the real optimizer.
 - **NOT done (deliberately):**
