@@ -4575,6 +4575,14 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     fine-tune protocol; against the rungs ($64$k parents) it mixes in the budget. The $ee\to u\bar u$ pretraining is
     redone at $64$k steps (\code{tp3\_pre64\_ee\_uu}) and a second grid fine-tunes from its best, the comparison with
     the rungs at one budget. The four probes whose $64$k large-$D$ runs timed out rerun on lxplus.
+  \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
+    (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
+    80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
+    (\code{tp3\_calib}, $8$k steps) give $ee\to d\bar d$ $7.2\times10^{-5}$ (V100), $5.7\times10^{-5}$ (A100, TF32 off),
+    $5.1\times10^{-5}$ (A100, TF32 on), and $ee\to b\bar b$ at one loop $1.6\times10^{-3}$, $4.18\times10^{-3}$,
+    $4.18\times10^{-3}$ (its test losses $6.4$, $6.5$, $8.8\times10^{-3}$): TF32 changes nothing beyond the run-to-run
+    spread, which is larger between the two GPUs. A step is $\sim20\%$ faster than on V100 (these runs are data-bound).
+    Cells now mix V100 and A100 trials.
   \item \textbf{Jean Zay's inode quota.} \code{\$WORK} filled its $500$k-file quota on 2026-10-01 and $25$ trials
     failed or never started (retracted from their sweeps' states and replaced). Each run wrote an empty \code{source.zip}
     and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
