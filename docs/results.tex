@@ -4580,9 +4580,10 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
     Each trial still writes about $14$ files (five plots, two checkpoints, config, stats, tokenizer, log) plus two
     scheduler logs and a result. On 2026-10-02 the quota was full again ($497{,}952$ of $500{,}000$) with $252$
-    fine-tune sweeps queued there: their pending jobs are held. About $190$k of the files are \code{runs/}, mostly
-    finished studies (\code{scaling\_p1ext}, \code{scaling\_solo}, \code{finetune\_scaling}, \code{scaling\_p1},
-    \code{cscan\_*}: about $12$k trial directories); archiving those is the user's call.
+    fine-tune sweeps queued there; their pending jobs were held. The finished studies' runs (\code{cscan\_*},
+    \code{scaling\_p1}, \code{scaling\_p1ext}, \code{scaling\_solo}, \code{finetune\_scaling}; $111$k files) are packed
+    into one tar per study in \code{\$STORE/FA\_runs\_archive} (\code{scripts/archive\_runs.sh}, the user's call;
+    restore with \code{tar -xf}), leaving $395$k files; the held jobs were released.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
