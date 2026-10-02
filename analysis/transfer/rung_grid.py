@@ -1,7 +1,8 @@
 """Transfer study, the fine-tune grid: each probe's loss against D, from scratch and fine-tuned from each pretraining
 in the grid's setup (tp3_<parent>fte: training.lr searched over [1e-3, 1e-2], lr_scale = layer_decay = 1, 5 trials;
 docs/results.tex sec:ladder), with the ee->uu fine-tune of Table tab:ladder_transfer_all (cells.py, the earlier
-setup) for reference. A cell's value is its search's best so far (MSE of log|M|^2 at the best checkpoint); cells still
+setup) and the preliminary fine-tunes from rungs 4 and 9 (tp3_r4ftp, tp3_r9ftp: the earlier setup, from those rungs'
+best trial at the time, hp15, at D = 10, 1e2, 1e3, 1e4) dashed, for reference. A cell's value is its search's best so far (MSE of log|M|^2 at the best checkpoint); cells still
 running are drawn as they stand. ee->WW on the mixture pool throughout.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_grid.py      -> figs/rung_grid
@@ -20,8 +21,9 @@ LAB = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_nnbar": r"$e^+e^-\to\nu_e\bar\nu_
        "uubar_Zggg": r"$u\bar u\to Zggg$"}
 P = ["ee_ddbar", "ee_nnbar", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo", "ee_Za", "ud_ud", "uubar_gg",
      "uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
-RUNGS = [r for r in range(1, 10) if any(n.startswith(f"tp3_r{r}fte_") for n in __import__("cells").S)]
-cols = ps.sequence(len(RUNGS))
+S = __import__("cells").S
+RUNGS = sorted({r for r in range(1, 10) for n in S if n.startswith(f"tp3_r{r}fte_") or n.startswith(f"tp3_r{r}ftp_")})
+cols = dict(zip(RUNGS, ps.sequence(len(RUNGS))))
 
 
 def curve(f):
@@ -39,8 +41,12 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", label="from scratch")
         ax.plot(*curve(lambda k: finetune(p, k, steered=False)[0]), "o--", color=ps.C.blue, label=r"$ee\to u\bar u$, earlier setup")
         ax.plot(*curve(lambda k: best(f"tp3_uufte_{p}_d{k}")[0]), "s-", color=ps.C.blue, mfc="none", label=r"$ee\to u\bar u$")
-        for r, c in zip(RUNGS, cols):
-            ax.plot(*curve(lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0]), "o-", color=c, label=f"rung {r}")
+        for r in RUNGS:
+            if any(n.startswith(f"tp3_r{r}fte_") for n in S):
+                ax.plot(*curve(lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0]), "o-", color=cols[r], label=f"rung {r}")
+            if any(n.startswith(f"tp3_r{r}ftp_") for n in S):
+                ax.plot(*curve(lambda k: best(f"tp3_r{r}ftp_{p}_d{k}")[0]), "o--", color=cols[r],
+                        label=f"rung {r}, earlier setup")
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, LAB[p])
