@@ -4556,10 +4556,30 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
     budget stays $64$k on every rung (the user's call). If time allows, the $ee\to u\bar u$ pretraining is redone at
     $64$k steps too, so every pretraining has the same budget. Then the full fine-tune grid from every rung's final
     best (rungs $1$--$3$'s bests moved in the second wave, so their fine-tunes start from those), the star arms after.
+  \item \textbf{Star arms, running.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one structure,
+    not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained as the rungs (\code{tp3\_star\_<arm>}, $64$k
+    steps, $8$ trials): soft and collinear emission ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$); initial-state
+    collinear ($+u\bar d\to Wg$; probe $u\bar u\to Zg$); the massive quasi-collinear limit ($+ee\to b\bar bg$, $b\bar bgg$;
+    probe $ee\to t\bar tg$, since $c$ is massless in the generator); narrow resonances ($+ee\to ZZ$, $ZH$; probe
+    $ee\to\nu_e\bar\nu_e$); the $t\bar t$ threshold ($+u\bar u\to t\bar t$ tree and one loop at $\sqrt s=363$--$450$;
+    probe $ee\to t\bar t$ at one loop there, which carries the Coulomb $1/\beta$); Sudakov logarithms ($+u\bar u\to d\bar d$,
+    $ZZ$ at one loop, $\sqrt s\ge500$; probe $ee\to d\bar d$ at one loop there). The $t$-channel arm would be rung $2$
+    and is dropped. The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Each arm is
+    then fine-tuned on its probe and on $ee\to d\bar d$. Pools built on CC-IN2P3 (\code{transfer\_star\_pools.yaml}),
+    copied to lxplus and Jean Zay.
+  \item \textbf{Fine-tune grid, running.} Rungs $1$--$4$ and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte}):
+    \code{training.lr} searched over $[10^{-3},10^{-2}]$, \code{lr\_scale} and \code{layer\_decay} fixed at $1$, $5$
+    trials, a candidate seed per sweep (the user's call, 2026-10-02, from the $84$ $ee\to u\bar u$ cells' optima).
+    Rungs $5$--$9$ follow when their pretrainings end. The $ee\to u\bar u$ pretraining is redone at $64$k steps
+    (\code{tp3\_pre64\_ee\_uu}); the four probes whose $64$k large-$D$ runs timed out rerun on lxplus.
   \item \textbf{Jean Zay's inode quota.} \code{\$WORK} filled its $500$k-file quota on 2026-10-01 and $25$ trials
     failed or never started (retracted from their sweeps' states and replaced). Each run wrote an empty \code{source.zip}
     and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
-    The project stays near $85\%$ (each trial still writes about $13$ files, mostly plots); about $36$k trials more fit.
+    Each trial still writes about $14$ files (five plots, two checkpoints, config, stats, tokenizer, log) plus two
+    scheduler logs and a result. On 2026-10-02 the quota was full again ($497{,}952$ of $500{,}000$) with $252$
+    fine-tune sweeps queued there: their pending jobs are held. About $190$k of the files are \code{runs/}, mostly
+    finished studies (\code{scaling\_p1ext}, \code{scaling\_solo}, \code{finetune\_scaling}, \code{scaling\_p1},
+    \code{cscan\_*}: about $12$k trial directories); archiving those is the user's call.
 \end{itemize}
 
 \section{Training throughput}\label{sec:throughput}
