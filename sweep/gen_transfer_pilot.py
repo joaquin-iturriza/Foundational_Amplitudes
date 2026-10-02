@@ -189,6 +189,9 @@ def main():
     ap.add_argument("--eff-lr", help="low,high: fine-tunes search training.lr itself over this window (*_fte_), "
                                       "lr_scale and layer_decay fixed at 1, a per-sweep candidate seed")
     ap.add_argument("--n-trials", type=int, help="trials per sweep (default N_TRIALS)")
+    ap.add_argument("--pre64", action="store_true",
+                    help="the ee_uu pretraining at the ladder's 64k steps (tp3_pre64_ee_uu; the user's call, 2026-10-02: "
+                         "every pretraining on one budget), its search as the rungs'")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     a = ap.parse_args()
@@ -203,6 +206,12 @@ def main():
     steer_ks = STEER_KS if a.bw_off else SETTLED
     if a.bw_off:
         FIXED["data.target_propagators"] = "false"
+    if a.pre64:
+        FIXED["data.target_propagators"] = "false"
+        out.append(write(f"tp3_pre64_{PRE}", f"ref_solo_{PRE}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
+                         head=f"Transfer study: {PRE} alone, 100k events, {T_LADDER} steps (the ladder's budget), factors off."))
+        print("\n".join(os.path.relpath(p, ROOT) for p in out))
+        return
     if a.ladder:
         FIXED["data.target_propagators"] = "false"
         # tp3_ladder_r<n>: the tp3_pre_ladder_r<n> sweeps were centred on the ee_uu best instead and cancelled
