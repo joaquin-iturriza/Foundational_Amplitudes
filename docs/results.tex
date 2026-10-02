@@ -4570,8 +4570,11 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
   \item \textbf{Fine-tune grid, running.} Rungs $1$--$4$ and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte}):
     \code{training.lr} searched over $[10^{-3},10^{-2}]$, \code{lr\_scale} and \code{layer\_decay} fixed at $1$, $5$
     trials, a candidate seed per sweep (the user's call, 2026-10-02, from the $84$ $ee\to u\bar u$ cells' optima).
-    Rungs $5$--$9$ follow when their pretrainings end. The $ee\to u\bar u$ pretraining is redone at $64$k steps
-    (\code{tp3\_pre64\_ee\_uu}); the four probes whose $64$k large-$D$ runs timed out rerun on lxplus.
+    Rungs $5$--$9$ follow when their pretrainings end. \code{tp3\_uufte} starts from the $32$k $ee\to u\bar u$
+    pretraining, the parent of Table~\ref{tab:ladder_transfer_all}, so against that table it isolates the change of
+    fine-tune protocol; against the rungs ($64$k parents) it mixes in the budget. The $ee\to u\bar u$ pretraining is
+    redone at $64$k steps (\code{tp3\_pre64\_ee\_uu}) and a second grid fine-tunes from its best, the comparison with
+    the rungs at one budget. The four probes whose $64$k large-$D$ runs timed out rerun on lxplus.
   \item \textbf{Jean Zay's inode quota.} \code{\$WORK} filled its $500$k-file quota on 2026-10-01 and $25$ trials
     failed or never started (retracted from their sweeps' states and replaced). Each run wrote an empty \code{source.zip}
     and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
