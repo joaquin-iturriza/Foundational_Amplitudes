@@ -2763,7 +2763,7 @@ fine-tune data-efficiency protocol (Sec.~\ref{sec:transfer}).
 The organising question is \textbf{which kind of prior helps amplitude regression}: none,
 physics (our pretraining), language (a pretrained LLM), or a synthetic function class (a
 PFN-style prior). Every arm below is evaluated the same way, on one held-out process, as a
-curve of \vlnr\ against fine-tune events, with the seed bands of Sec.~\ref{sec:transfer}.
+curve of $\vlnr$ against fine-tune events, with the seed bands of Sec.~\ref{sec:transfer}.
 \begin{enumerate}
   \item \textbf{Pretrained LLM backbone, three arms.} (a) Qwen2.5-0.5B partially fine-tuned
     as in arXiv:2606.23791 (frozen copy of the weights for the text tokens, trainable copy for
@@ -4317,7 +4317,7 @@ $3.2\times10^{-9}$ at $10^5$), with no sign of the old $10^{-5}$ floor, and most
 last step. Their curve through $D\le10^3$, extended, would put $10^5$ near $10^{-11}$, so at large $D$ they
 are limited by steps, at a compute that is not worth paying now. The step from $10^4$ to $10^{4.5}$ also
 crosses from $8$k to $64$k steps, so it is no data slope: the $t/u$-channel probes gain $8$--$46\times$
-there, $ee\to\nu_e\bar\nu_e$ $36\times$, the one-loop probes $230$ and $470\times$. At equal compute, $10^{4.5}\to10^5$,
+there, $ee\to\nu_e\bar\nu_e$ $36\times$, the one-loop probes $230$ and $460\times$. At equal compute, $10^{4.5}\to10^5$,
 $ee\to\nu_e\bar\nu_e$ still falls $8\times$, against $\le2\times$ for the $t/u$-channel probes ($ee\to Z\gamma$
 rises), so of the probes measured there the $Z$-pole one is where transfer can still show at large $D$; the
 one-loop grid stops at $10^{4.5}$. The eight runs on
@@ -4390,7 +4390,7 @@ $L_\text{scratch}/L_\text{fine-tune}$ (Fig.~\ref{fig:ladder_transfer_all}, Table
 losses in Figs.~\ref{fig:ladder_transfer_loss_ee} and~\ref{fig:ladder_transfer_loss_qcd}; \code{transfer\_all.py}):
 $ee\to d\bar d$ gains in every cell ($1.8$--$19\times$, geometric mean over $D$ $5.3$); $ud\to ud$ $5.5$--$16\times$
 from $10^{2.5}$ on, growing with $D$, and loses up to $3\times$ below (mean $3.7$); $ee\to d\bar d$ and $b\bar b$ at one
-loop gain in every cell ($1.4$--$9.3\times$, means $3.3$ and $2.7$). The other nine have means of $0.96$--$1.7$, with
+loop gain in every cell ($1.4$--$9.3\times$, means $3.3$ and $2.7$). The other eight have means of $0.96$--$1.7$, with
 cells from $0.27$ to $8\times$ in both directions; two searches' bests differ by up to $5\times$ between seeds, so a
 cell alone does not separate transfer from noise. Extending the lr windows moved $ee\to\nu_e\bar\nu_e$ most: its
 scratch searches had been held low, and its mean fell from $2.6$ to $1.0$. The massive $s$-channel probe,
