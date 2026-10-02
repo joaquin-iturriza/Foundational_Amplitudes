@@ -1,0 +1,11 @@
+# Transfer study, star arm (docs/results.tex sec:ladder; the user approved the arms 2026-10-02): rung 1 (ee_uu, mumu,
+# numu) plus one structure, not cumulative. No probe is in any arm, nor any process of a probe's equality class
+# (analysis/process_equality/equal_processes.json). 1e5 train events per tree process, 5e4 per one-loop; mixture sampling.
+# + Sudakov logarithms: one-loop finite parts at sqrt(s) >> m_Z; probe ee_dd_nlo there
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ZZ_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

@@ -1,0 +1,5 @@
+# Transfer study probe (star arm threshold): ee_ttbar_nlo, the catalog pool (mixture sampling). The data-scaling grid
+# trains on prefixes of this train split (data.train_subsample = D); val and test stay fixed.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_ttbar_nlo, sqrts: [363, 450], n_train: 50000, n_val: 5000, n_test: 5000}

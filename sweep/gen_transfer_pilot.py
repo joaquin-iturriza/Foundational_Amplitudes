@@ -60,7 +60,13 @@ Z_FAMILY = ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
 # masses, one loop). The one-loop pools hold 5e4 train events, so
 # their grid stops at k = 9.
 LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo"]
-K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9}
+K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_ttbar_nlo_thr": 9, "ee_dd_nlo_hi": 9}
+# the star arms (the user approved them, 2026-10-02): rung 1 plus one structure each (recipes/transfer_star_<arm>.yaml),
+# pretrained as the rungs; the probes they add, never in any pretraining: ee_ddbarg (soft/collinear), ee_ttbarg (the
+# massive quasi-collinear limit), ee_ttbar_nlo_thr (ee_ttbar_nlo 5-30% above threshold), ee_dd_nlo_hi (ee_dd_nlo at
+# sqrt(s) >= 500, Sudakov). The isr and resonance arms reuse uubar_Zg and ee_nnbar.
+STARS = ["soft", "isr", "deadcone", "resonance", "threshold", "sudakov"]
+STAR_PROBES = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi"]
 # sigma-steered pools (tools/steer_pool.py; the user's call, 2026-09-30, after the ee->WW forward corner):
 # the same probe on a pool built once from a reference model's sigma, scratch only, D <= 1e4, on the
 # target of the probe's existing sweeps: ee->WW keeps the t-channel factor on, as its tp_scr sweeps, and
@@ -189,6 +195,7 @@ def main():
     ap.add_argument("--eff-lr", help="low,high: fine-tunes search training.lr itself over this window (*_fte_), "
                                       "lr_scale and layer_decay fixed at 1, a per-sweep candidate seed")
     ap.add_argument("--n-trials", type=int, help="trials per sweep (default N_TRIALS)")
+    ap.add_argument("--star", nargs="*", help="write the star arms' pretraining configs (tp3_star_<arm>), factors off")
     ap.add_argument("--pre64", action="store_true",
                     help="the ee_uu pretraining at the ladder's 64k steps (tp3_pre64_ee_uu; the user's call, 2026-10-02: "
                          "every pretraining on one budget), its search as the rungs'")
@@ -206,6 +213,13 @@ def main():
     steer_ks = STEER_KS if a.bw_off else SETTLED
     if a.bw_off:
         FIXED["data.target_propagators"] = "false"
+    if a.star is not None:
+        FIXED["data.target_propagators"] = "false"
+        for arm in (a.star or STARS):
+            out.append(write(f"tp3_star_{arm}", f"transfer_star_{arm}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
+                             head=f"Transfer star arm {arm}: rung 1 plus one structure, {T_LADDER} steps, factors off."))
+        print("\n".join(os.path.relpath(p, ROOT) for p in out))
+        return
     if a.pre64:
         FIXED["data.target_propagators"] = "false"
         out.append(write(f"tp3_pre64_{PRE}", f"ref_solo_{PRE}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
@@ -231,7 +245,7 @@ def main():
         if a.pretrain:
             out.append(write(f"{'tp' if pfx == 'tp2' else pfx}_pre_{PRE}", f"ref_solo_{PRE}.yaml", T_PRE, [lr_space(T_PRE)] + COMMON_SPACE,
                              head=f"Transfer pilot pretrain: {PRE} alone, 100k events, {T_PRE} steps."))
-        for p in only(PROBES + Z_FAMILY + LADDER):
+        for p in only(PROBES + Z_FAMILY + LADDER + STAR_PROBES):
             for k in KS:
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
@@ -262,7 +276,7 @@ def main():
                {"fine_tune.offshell_stats": "parent"} if a.parent_offshell == "auto" else
                {"fine_tune.offshell_stats": "parent",
                 "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))})
-        for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER)):
+        for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER + STAR_PROBES)):
             for k in (steer_ks if a.steered else SETTLED if a.eff_lr else KS):
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
