@@ -2,8 +2,9 @@
 both target factors off). Data: analysis/transfer/ladder_pretrain.json (collect_ladder.py on Jean Zay and lxplus).
   <base>_curves_a..i  per rung, each finished trial's validation curve (val_loss_no_reg, the rung's geometric mean
                       over its processes), its best checkpoint marked; a dotted line where a trial diverged
-  <base>_hpo          each finished trial's best loss over its rung's best, against the searched HPs (open: EMA off);
-                      a cross: diverged
+  <base>_hpo          each trial's best loss over its rung's best, against the searched HPs (open: EMA off);
+                      a cross: diverged, at its best checkpoint before the blow-up (tools/eval_best_val.py,
+                      ladder_eval_best.json); a diverged trial not rescored yet is not drawn
   <base>_per_dataset  each process at its rung's best checkpoint (best trial so far), MSE of log|M|^2, against the rung
     python analysis/transfer/ladder_pretrain.py
 """
@@ -17,7 +18,12 @@ import plot_style as ps  # noqa: E402
 L = json.load(open(os.path.join(ROOT, "analysis", "transfer", "ladder_pretrain.json")))
 RUNGS = sorted(L, key=lambda n: int(n.split("_r")[1]))
 FIG = os.path.join(ROOT, "analysis", "transfer", "figs", "ladder_pretrain")
-done = lambda n: [t for t in L[n] if t["state"] == "done"]
+EV = json.load(open(os.path.join(ROOT, "analysis", "transfer", "ladder_eval_best.json")))
+for n, ts_ in L.items():                   # a diverged trial's value: its best checkpoint, rescored
+    for t in ts_:
+        if t["state"] == "diverged" and str(t["hp"]) in EV.get(n, {}):
+            t["val_loss"] = EV[n][str(t["hp"])]["val_loss"]
+done = lambda n: [t for t in L[n] if t["state"] == "done" or (t["state"] == "diverged" and "val_loss" in t)]
 best = lambda n: min(done(n), key=lambda t: t["val_loss"])
 
 norm = mc.LogNorm(1e-4, 1e-2)
@@ -45,10 +51,8 @@ for ax, (k, lab, lg) in zip(axes.flat, knobs):
     for n, col in zip(RUNGS, ps.sequence(len(RUNGS))):
         b = best(n)["val_loss"]
         for t in done(n):
-            ax.plot(t[k], t["val_loss"] / b, "o", color=col, mfc=col if (k != "ema_decay" or t["ema"]) else "none")
-        for t in L[n]:
-            if t["state"] == "diverged":
-                ax.plot(t[k], 3e3, "x", color=col)
+            ax.plot(t[k], t["val_loss"] / b, "x" if t["state"] == "diverged" else "o", color=col,
+                    mfc=col if (k != "ema_decay" or t["ema"]) else "none")
         ax.plot([], [], "o", color=col, label=f"rung {n.split('_r')[1]}")
     if lg:
         ax.set_xscale("log")

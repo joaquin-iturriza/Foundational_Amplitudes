@@ -4462,7 +4462,7 @@ side of $\eta^\ast(64\text{k})=1.2\times10^{-3}$; \code{tp3\_ladder\_r}$n$, \cod
 Every finished curve still falls when the anneal ends: the best checkpoint sits at $58$--$64$k steps
 (Fig.~\ref{fig:ladder_pre_curves}). The optimum is the same region on every rung (Fig.~\ref{fig:ladder_pre_hpo}): lr
 $0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$; $\lambda$ near $10^{-7}$--$10^{-6}$ costs $10$--$1000\times$,
-and six trials diverged (NaN gradients, at $36$--$60$k steps), all with $\lambda\ge3\times10^{-7}$ (lr $0.8$--$4.7\times10^{-3}$). Every sweep starts from the same three random candidates, so the first wave tested only three points
+and six trials diverged (NaN gradients, at $36$--$60$k steps), all with $\lambda\ge3\times10^{-7}$ (lr $0.8$--$4.7\times10^{-3}$); their best checkpoints before the blow-up, rescored on the validation split (\code{tools/eval\_best\_val.py}; their logs print the loss with the $L_2$ term, which swamps it), sit $8$--$2200\times$ above their rung's best, so none changes a rung's best. Every sweep starts from the same three random candidates, so the first wave tested only three points
 per rung; the guided trials improved the best by $2.0$, $2.1$ and $1.1\times$ on rungs $1$--$3$ and not on rung $4$. At
 the rung's best checkpoint each process's MSE of $\log|\mathcal M|^2$ rises with the rung
 (Fig.~\ref{fig:ladder_pre_dataset}): $ee\to u\bar u$ from $1.1\times10^{-7}$ at rung $1$ to $5.1\times10^{-6}$ at rung $9$,
@@ -4483,8 +4483,8 @@ diverged.}
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/ladder_pretrain_hpo.pdf}
-\caption{Each finished ladder pretraining trial's best $\vlnr$ over its rung's best, against the searched HPs (open:
-EMA off); a cross, a trial that diverged.}
+\caption{Each ladder pretraining trial's best $\vlnr$ over its rung's best, against the searched HPs (open:
+EMA off); a cross, a trial that diverged, at its best checkpoint before the blow-up.}
 \label{fig:ladder_pre_hpo}
 \end{figure}
 \begin{figure}[H]
@@ -4545,8 +4545,13 @@ $ee$ probes, (b) the photon and QCD probes; $^{(1)}$ one loop.}
   \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
     order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
     events ambiguous). Saving the pool row would remove the matching.
-  \item \textbf{The ladder.} Rungs $5$--$9$'s guided pretraining trials run on lxplus, two per rung at a time (the
-    chain's width), about $7$\,h each. Each process's loss rises with the rung at a fixed $64$k steps
+  \item \textbf{The ladder.} Rungs $5$--$9$'s searches were cut short on 2026-10-02 (the user's call): every rung's
+    optimum sat at lr $0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$, and nine of the ten guided trials then
+    running repeated points measured $7$--$1200\times$ worse or divergent on other rungs. Those were cancelled; rung $6$'s
+    one new point (hp1, lr $2.7\times10^{-3}$) runs on, and each of rungs $5$--$9$ adds the two points that won the
+    second wave on rungs $1$--$2$ (hp47, hp73; \code{generate\_sweep.py --extend --fixed-hp}), about $7$\,h each on lxplus.
+    A rung's best is then the best of its trials. Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the
+    $1.30\times10^{-7}$ its run recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises with the rung at a fixed $64$k steps
     (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per process; the step
     budget stays $64$k on every rung (the user's call). If time allows, the $ee\to u\bar u$ pretraining is redone at
     $64$k steps too, so every pretraining has the same budget. Then the full fine-tune grid from every rung's final
