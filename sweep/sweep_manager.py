@@ -347,6 +347,12 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     order is then by trial length, longest first (duration_nice), not by round. `seq_batches`
     applies only without chaining.
     """
+    moved = [d for d in sweep_dirs if os.path.exists(os.path.join(d, "MOVED_TO"))]
+    for d in moved:      # sweep/rebalance.py placed it on another site: its trials run there, never here
+        print(f"  skip {sweep_name_from_dir(d)}: moved to {open(os.path.join(d, 'MOVED_TO')).read().strip()}")
+    sweep_dirs = [d for d in sweep_dirs if d not in moved]
+    if not sweep_dirs:
+        return
     reg = load_registry(registry)
     gap = reg["round_gap"]
 
