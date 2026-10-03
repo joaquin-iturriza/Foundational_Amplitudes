@@ -1,5 +1,5 @@
 {
- "what": "scratch at D=10^4.5 (k=9) and 10^5 (k=10), 64k steps, one run each at lr 1.2e-3 (tp2_calib_*_t64000, lxplus, 2026-10-03): MSE of log|M|^2 = post-training validation MSE (prepd, best checkpoint loaded, eval subsample 1e4) x prepd_std^2",
+ "what": "scratch at D=10^4.5 (k=9) and 10^5 (k=10), 64k steps, one run each at lr 1.2e-3 (tp2_calib_*_t64000, lxplus, 2026-10-03): MSE of log|M|^2 = post-training validation MSE (prepd, best checkpoint loaded, eval subsample 1e4) x prepd_std^2; plus the 2026-09-30 runs (analysis/transfer/long_runs.json) whose target equals the grid's (prepd_std within 0.5%): ee_Za, uubar_Zg, uubar_gg. ee_ddbar, ee_nnbar, ee_dd_nlo, ee_bb_nlo ran then with a target factor the grid has off (prepd_std 2-3x the grid's), so they are not on this scale",
  "mse_log_m2": {
   "ee_ttbar": {
    "9": 1.94e-09,
@@ -16,6 +16,18 @@
   "uubar_Zggg": {
    "9": 0.000624,
    "10": 0.000196
+  },
+  "ee_Za": {
+   "9": 5.01033897362558e-09,
+   "10": 1.0756355976565548e-08
+  },
+  "uubar_Zg": {
+   "9": 6.19465055331952e-09,
+   "10": 3.239544064217064e-09
+  },
+  "uubar_gg": {
+   "9": 1.1937385751892256e-08,
+   "10": 6.955096360439732e-09
   }
  }
 }
