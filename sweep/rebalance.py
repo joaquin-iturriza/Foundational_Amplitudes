@@ -90,8 +90,9 @@ def inventory(prefixes, scope, window_h):
         run, qd, ids = q.get(name, (0, 0, []))
         moved = os.path.exists(os.path.join(sd, "MOVED_TO"))
         # what will still run here: the queued trials, plus the never-submitted ones of a sweep that is being fed
-        # (SLURM: scripts the registry has not seen, of a sweep it knows or one created in the last 3 days; on
-        # HTCondor the live DAG submits its own nodes). A failed trial of a finished sweep is not backlog.
+        # (SLURM: scripts the registry has not seen, of a sweep it knows -- a sweep generated and never submitted
+        # is a leftover, not backlog; on HTCondor the live DAG submits its own nodes). A failed trial of a
+        # finished sweep is not backlog either.
         if moved:
             remaining = 0
         elif sched == "htcondor":
@@ -100,9 +101,7 @@ def inventory(prefixes, scope, window_h):
             names_ = {os.path.basename(x) for x in scripts}
             if name in reg:
                 unsub = len(names_ - {os.path.basename(x) for x in reg[name]["scripts"]})
-            elif scripts and now - os.path.getmtime(sd) < 3 * 86400:
-                unsub = max(0, len(scripts) - len(res) - run)
-            else:
+            else:                           # generated but never handed to sweep_manager: nothing will run it
                 unsub = 0
             remaining = qd + unsub
         sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
@@ -151,18 +150,34 @@ def plan(inv, margin_h):
                          reverse=True) for s, v in inv.items()}
     moves = []
     while True:
-        src = max(st, key=fin)
-        if not movable[src]:
-            break
-        name = movable[src][0]
-        k = inv[src]["sweeps"][name]["remaining"]
-        dst = min((s for s in st if s != src), key=lambda s: fin(s, k))
-        if max(fin(src, -k), fin(dst, k)) > fin(src) - margin_h:
+        # the latest-finishing site that still has a sweep to give: a site whose backlog is all started sweeps
+        # (CC with rung 9's half-run cells) stays as it is, and the next one is balanced instead
+        for src in sorted(st, key=fin, reverse=True):
+            if not movable[src]:
+                continue
+            name = movable[src][0]
+            k = inv[src]["sweeps"][name]["remaining"]
+            dsts = [s for s in st if s != src and name not in inv[s]["sweeps"]]   # never onto a namesake
+            if not dsts:
+                movable[src].pop(0)
+                continue
+            dst = min(dsts, key=lambda s: fin(s, k))
+            if max(fin(src, -k), fin(dst, k)) < fin(src):
+                break
+        else:
             break
         movable[src].pop(0)
         st[src]["backlog"] -= k
         st[dst]["backlog"] += k
         moves.append((name, src, dst))
+    # one sweep is a few trials: the margin is on what a site gains from all its moves together
+    for src in list(st):
+        gain = before[src][2] - fin(src)
+        if src in {m[1] for m in moves} and not gain >= margin_h:
+            for name, s_, dst in [m for m in moves if m[1] == src]:
+                k = inv[src]["sweeps"][name]["remaining"]
+                st[src]["backlog"] += k; st[dst]["backlog"] -= k
+            moves = [m for m in moves if m[1] != src]
     after = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
     return moves, before, after
 
