@@ -23,6 +23,10 @@ LAB = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_nnbar": r"$e^+e^-\to\nu_e\bar\nu_
        "ee_ttbar_nlo_thr": r"$e^+e^-\to t\bar t$ (1-loop, thr.)", "ee_dd_nlo_hi": r"$e^+e^-\to d\bar d$ (1-loop, high)"}
 P = ["ee_ddbar", "ee_nnbar", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo", "ee_Za", "ud_ud", "uubar_gg",
      "uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
+# what each ladder rung adds (recipes/transfer_ladder_r*.yaml headers); the rungs are cumulative
+RUNG_ADDS = {1: r"massless $s$-channel ($\gamma/Z$)", 2: r"+ EW $t$-channel", 3: "+ external photons",
+             4: "+ QCD exchange, colour", 5: "+ masses", 6: r"+ $W$+jet, $2\to2$", 7: r"+ $2\to3$",
+             8: r"+ $2\to4$", 9: "+ one loop"}
 NEW = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi"]   # the star arms' probes
 S = __import__("cells").S
 RUNGS = sorted({r for r in range(1, 10) for n in S if n.startswith(f"tp3_r{r}fte_") or n.startswith(f"tp3_r{r}ftp_")})
@@ -57,7 +61,7 @@ if __name__ == "__main__":
                         label=r"$ee\to u\bar u$, 64k steps")
             for r in RUNGS:
                 if any(n.startswith(f"tp3_r{r}fte_") for n in S):
-                    draw(ax, lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0], "o-", color=cols[r], label=f"rung {r}")
+                    draw(ax, lambda k: best(f"tp3_r{r}fte_{p}_d{k}")[0], "o-", color=cols[r], label=f"rung {r}: {RUNG_ADDS[r]}")
                 if any(n.startswith(f"tp3_r{r}ftp_") for n in S):
                     draw(ax, lambda k: best(f"tp3_r{r}ftp_{p}_d{k}")[0], "o--", color=cols[r],
                             label=f"rung {r}, earlier setup")

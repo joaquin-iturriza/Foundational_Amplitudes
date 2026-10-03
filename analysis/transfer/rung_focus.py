@@ -11,7 +11,7 @@ import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, best, scratch, finetune  # noqa: E402
-from rung_grid import LAB, P, S, curve  # noqa: E402
+from rung_grid import LAB, P, S, RUNG_ADDS, curve  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -84,5 +84,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     a0 = figs[0][1]
     if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
+    for r, what in RUNG_ADDS.items():                           # the key to the panels' "r6 vs r5" labels
+        a0.plot([], [], " ", label=f"r{r}: {what}")
     ps.shared_legend(figs[0][0], a0, ncol=2)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))
