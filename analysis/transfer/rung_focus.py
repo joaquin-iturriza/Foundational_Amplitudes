@@ -23,18 +23,19 @@ TIE = 1.2      # a lead under this factor is a tie: below what one seed's 5-tria
 
 
 def overall(p, fams):
-    """The pretraining that does best over the D cells every candidate has: the mean over cells of
-    log10(scratch / fine-tune), equal weight per cell (each half-decade of D counts the same). Cells are those where
-    scratch and at least 9 families have a value; a family missing one of them is not ranked. Returns the leaders
-    within TIE of the best, best first."""
-    K = [k for k in range(2, 9) if scratch(p, k, steered=False)[0]
-         and sum(best(f"{f}_{p}_d{k}")[0] is not None for f in fams) >= 9]
+    """The pretraining that does best over the D cells: the mean over cells of log10(scratch / fine-tune), equal
+    weight per cell (each half-decade of D counts the same), on every cell scratch has. Only grids with a value in
+    each of those cells are ranked; the others are returned as unranked (named on the panel), so a grid still
+    filling in is never silently left out. Returns (leaders within TIE of the best, best first; unranked)."""
+    K = [k for k in range(2, 9) if scratch(p, k, steered=False)[0]]
+    full = [f for f in fams if all(best(f"{f}_{p}_d{k}")[0] for k in K)]
     score = {f: np.mean([np.log10(scratch(p, k, steered=False)[0] / best(f"{f}_{p}_d{k}")[0]) for k in K])
-             for f in fams if K and all(best(f"{f}_{p}_d{k}")[0] for k in K)}
+             for f in full}
+    unranked = [f for f in fams if f not in full]
     if not score:
-        return []
+        return [], unranked
     top = max(score.values())
-    return sorted((f for f in score if top - score[f] < np.log10(TIE)), key=lambda f: -score[f])
+    return sorted((f for f in score if top - score[f] < np.log10(TIE)), key=lambda f: -score[f]), unranked
 
 
 def short(f):
@@ -57,7 +58,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     figs = ps.panels(len(order))
     for (fig, ax), p in zip(figs, order):
         hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
-        lead = overall(p, [f for f in series() if f.endswith("fte")])
+        lead, unranked = overall(p, [f for f in series() if f.endswith("fte")])
         first = True
         for f in series():
             if f in (hi, lo) or (lead and f == lead[0]):
@@ -77,7 +78,8 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
             ax.plot(*curve(lambda k: best(f"{lead[0]}_{p}_d{k}")[0]), "o-", color=ps.C.green, label="best overall")
         below = r"$ee\to u\bar u$" if FOCUS[p] == 1 else f"r{FOCUS[p] - 1}"
         ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
-                         + (", best " + r"$\approx$".join(short(f) for f in lead) if lead else ""))
+                         + (", best " + r"$\approx$".join(short(f) for f in lead) if lead else "")
+                         + ("\n" + "unranked " + ", ".join(short(f) for f in unranked) if unranked else ""))
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.make_room(ax)

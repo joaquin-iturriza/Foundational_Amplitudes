@@ -68,6 +68,14 @@ def _queue():
     return q
 
 
+def _ran(sd):
+    """Trial indices of the sweep that have started on this site: both schedulers write each trial's log to
+    <sweep>/output/trial_XXXX* when it starts. A result file is not enough: a trial whose result write failed (the
+    EOS quota, 2026-10-03) ran all the same, and moving its sweep would run it twice."""
+    return {m.group(1) for f in glob.glob(os.path.join(sd, "output", "trial_*"))
+            for m in [re.match(r"trial_(\d+)", os.path.basename(f))] if m}
+
+
 def inventory(prefixes, scope, window_h):
     """Backlog and rate over every sweep in `scope` (all the site's work of this kind competes for its slots);
     only sweeps matching `prefixes` may move."""
@@ -87,6 +95,7 @@ def inventory(prefixes, scope, window_h):
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))
         recent += sum(os.path.getmtime(r) > now - window_h * 3600 for r in res)
         scripts = glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))
+        ran = _ran(sd)
         run, qd, ids = q.get(name, (0, 0, []))
         moved = os.path.exists(os.path.join(sd, "MOVED_TO"))
         # what will still run here: the queued trials, plus the never-submitted ones of a sweep that is being fed
@@ -96,7 +105,7 @@ def inventory(prefixes, scope, window_h):
         if moved:
             remaining = 0
         elif sched == "htcondor":
-            remaining = max(qd, len(scripts) - len(res) - run) if ids else qd
+            remaining = max(qd, len(scripts) - len(ran)) if ids else qd
         else:
             names_ = {os.path.basename(x) for x in scripts}
             if name in reg:
@@ -106,7 +115,7 @@ def inventory(prefixes, scope, window_h):
             remaining = qd + unsub
         sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
                         "remaining": remaining,
-                        "started": bool(res) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
+                        "started": bool(res) or bool(ran) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "sweeps": sweeps}))
 
@@ -116,7 +125,8 @@ def release(dest, names):
     q = _queue()
     for name in names:
         sd = os.path.join(siteconf.SWEEP_DIR, name)
-        if glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json")) or q.get(name, (0,))[0]:
+        if (glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json")) or _ran(sd)
+                or q.get(name, (0,))[0]):
             print(f"KEEP {name}: it has started here")
             continue
         ids = q.get(name, (0, 0, []))[2]
@@ -140,6 +150,12 @@ def site_run(site, *cmd, timeout=900):
     p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", site,
                         "FA", "--"] + list(cmd), capture_output=True, text=True)
     return p.stdout + p.stderr
+
+
+def _earlier(new, old):
+    """new < old for finish times; a stalled site (no trial finished in the window) finishes at inf, and the
+    planner treats that case on its own (inf < inf is False, which kept a stalled site from ever handing off)."""
+    return new < old
 
 
 def plan(inv, margin_h):
@@ -169,8 +185,9 @@ def plan(inv, margin_h):
                 movable[src].pop(0)
                 continue
             dst = min(dsts, key=lambda s: fin(s, k))
-            if max(fin(src, -k), fin(dst, k)) < fin(src):
-                break
+            if (st[src]["rate"] == 0 and fin(dst, k) < float("inf")) \
+                    or _earlier(max(fin(src, -k), fin(dst, k)), fin(src)):
+                break         # a stalled source (rate 0) gains from any move to a site that will finish
         else:
             break
         movable[src].pop(0)
@@ -179,7 +196,9 @@ def plan(inv, margin_h):
         moves.append((name, src, dst))
     # one sweep is a few trials: the margin is on what a site gains from all its moves together
     for src in list(st):
-        gain = before[src][2] - fin(src)
+        was, now = before[src][2], fin(src)
+        # from a stalled source every trial moved is a gain, even if what is left (started sweeps) still never finishes
+        gain = float("inf") if st[src]["rate"] == 0 else was - now
         if src in {m[1] for m in moves} and not gain >= margin_h:
             for name, s_, dst in [m for m in moves if m[1] == src]:
                 k = inv[src]["sweeps"][name]["remaining"]
@@ -197,31 +216,48 @@ def _parent(name):
 
 
 def apply(moves, sites):
+    """Per (source, destination): make sure the destination has every parent checkpoint, generate and submit the
+    sweeps there and check each one is in its queue, and only then release them at the source. A sweep the source
+    has started in the meantime (KEEP) is released again at the destination instead, so it runs once. Nothing is
+    cancelled at the source before its replacement is queued, so a failure on the way leaves it where it was."""
     by = {}
     for name, src, dst in moves:
         by.setdefault((src, dst), []).append(name)
     for (src, dst), names in by.items():
-        out = site_run(src, "python", "sweep/rebalance.py", "--release", dst, *names, timeout=1200)
-        released = re.findall(r"^RELEASED (\S+)", out, re.M)         # a KEEP line leaves the sweep where it is
-        print(f"  {src}: released {len(released)} of {len(names)}")
-        if not released:
-            continue
-        parents = sorted({p for p in map(_parent, released) if p})
-        for p in parents:
+        ok = []
+        for p in sorted({p for p in map(_parent, names) if p}):
             if not _has(dst, f"{p}/models"):
                 holder = next((s for s in sites if s != dst and _has(s, f"{p}/models")), None)
-                if holder is None:
-                    sys.exit(f"parent {p} is on no site: not moving {released}")
-                subprocess.run(["site", "copy", "FA", holder, dst, p], check=True)
-        cfgs = [f"sweep/sweep_config_{n}.yaml" for n in released]
+                if holder is None or subprocess.run(["site", "copy", "FA", holder, dst, p]).returncode != 0 \
+                        or not _has(dst, f"{p}/models"):
+                    print(f"  parent {p} not on {dst}: its sweeps stay on {src}")
+                    names = [n for n in names if _parent(n) != p]
+        if not names:
+            continue
+        cfgs = [f"sweep/sweep_config_{n}.yaml" for n in names]
         if inv_sched[dst] == "htcondor":
             loop = " ".join(f"python sweep/generate_sweep.py --config {c} --submit;" for c in cfgs)
-            print(site_run(dst, "bash", "-c", loop, timeout=3600)[-2000:])
+            site_run(dst, "bash", "-c", loop, timeout=3600)
         else:
             gen = " ".join(f"yes n | python sweep/generate_sweep.py --config {c} >/dev/null;" for c in cfgs)
-            dirs = " ".join(f"$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}" for n in released)
-            print(site_run(dst, "bash", "-c", f"{gen} python sweep/sweep_manager.py submit --chain --capacity 30 {dirs}",
-                           timeout=3600)[-2000:])
+            dirs = " ".join(f"$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}" for n in names)
+            site_run(dst, "bash", "-c", f"{gen} python sweep/sweep_manager.py submit --chain --capacity 30 {dirs}",
+                     timeout=3600)
+        out = site_run(dst, "python", "sweep/rebalance.py", "--inventory", "--scope", *names, "--", *names)
+        line = next((l for l in out.splitlines() if l.startswith("INVENTORY ")), None)
+        got = json.loads(line[len("INVENTORY "):])["sweeps"] if line else {}
+        ok = [n for n in names if n in got and got[n]["queued"] + got[n]["running"] + got[n]["remaining"] > 0]
+        for n in sorted(set(names) - set(ok)):
+            print(f"  {n}: not queued on {dst} after generating it there: it stays on {src}")
+        if not ok:
+            continue
+        out = site_run(src, "python", "sweep/rebalance.py", "--release", dst, *ok, timeout=1200)
+        released = re.findall(r"^RELEASED (\S+)", out, re.M)
+        kept = sorted(set(ok) - set(released))
+        if kept:            # started at the source meanwhile: the copy just queued at the destination goes instead
+            site_run(dst, "python", "sweep/rebalance.py", "--release", f"{src} (started there first)", *kept, timeout=1200)
+        print(f"  {src} -> {dst}: moved {len(released)}, kept {len(kept)} (started at {src}), "
+              f"{len(names) - len(ok)} failed at {dst} and stayed")
 
 
 def main():
