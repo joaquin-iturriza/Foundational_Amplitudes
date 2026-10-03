@@ -401,6 +401,15 @@ rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pendin
 e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
 Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 
+**Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick`
+places a batch once; a site that then stops starting my jobs holds its share regardless (rung 9's grid sat on
+CC at ~0 starts/h for half a day, 2026-10-02). Per site it measures backlog (queued + unsubmitted trials of fed
+sweeps) and the rate actually achieved (trials finished per hour, last 6 h), and moves whole **not-started**
+sweeps from the latest-finishing site to the earliest (a sweep with results stays: its DyHPO state is local).
+A move deletes nothing: the source's queued jobs are cancelled and its dir marked `MOVED_TO` (sweep_manager
+skips it), the parent checkpoint is copied site to site if missing, the destination generates and submits.
+Runs hourly over the transfer study's grids while they drain; without `--apply` it prints the plan.
+
 ### HPO search-space rules (empirical — harvested from 422 converged sweeps)
 
 Full derivation, figures, and numbers are in `docs/results.tex` (§ optimization
