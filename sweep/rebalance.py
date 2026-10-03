@@ -129,6 +129,13 @@ def release(dest, names):
 
 
 # ------------------------------------------------------------------ on the laptop
+def _has(site, path):
+    """Whether `path` (relative to the checkout) exists on `site`. The answer is a line of its own: site run
+    echoes the command first, so a substring test would always find the word."""
+    out = site_run(site, "bash", "-c", f"test -e {path} && echo __HAVE__ || echo __MISSING__")
+    return any(l.strip() == "__HAVE__" for l in out.splitlines())
+
+
 def site_run(site, *cmd, timeout=900):
     p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", site,
                         "FA", "--"] + list(cmd), capture_output=True, text=True)
@@ -201,8 +208,8 @@ def apply(moves, sites):
             continue
         parents = sorted({p for p in map(_parent, released) if p})
         for p in parents:
-            if "HAVE" not in site_run(dst, "bash", "-c", f"test -e {p}/models && echo HAVE"):
-                holder = next((s for s in sites if s != dst and "HAVE" in site_run(s, "bash", "-c", f"test -e {p}/models && echo HAVE")), None)
+            if not _has(dst, f"{p}/models"):
+                holder = next((s for s in sites if s != dst and _has(s, f"{p}/models")), None)
                 if holder is None:
                     sys.exit(f"parent {p} is on no site: not moving {released}")
                 subprocess.run(["site", "copy", "FA", holder, dst, p], check=True)
