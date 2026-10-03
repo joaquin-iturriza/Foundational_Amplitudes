@@ -201,10 +201,19 @@ def main():
                          "every pretraining on one budget), its search as the rungs'")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
+    ap.add_argument("--horizon", type=int,
+                    help="train these cells for this many steps instead of T_CELL, names suffixed with it (e.g. "
+                         "tp3_scr32k_); default cells D = 10^3.5, 10^4 (docs/results.tex sec:ladder hand-off: "
+                         "longer horizons, last)")
     a = ap.parse_args()
     global LR_SHIFT
     LR_SHIFT = a.lr_shift
     cells = {(c.split(":")[0], int(c.split(":")[1])) for c in a.cells} if a.cells else None
+    hz = f"{a.horizon // 1000}k" if a.horizon else ""
+    if a.horizon:
+        T_CELL.update({k: a.horizon for k in T_CELL})
+        if cells is None:
+            cells = {(p, k) for p in PROBES + Z_FAMILY + LADDER for k in (7, 8)}   # the grid's twelve probes
     only = lambda ps: [p for p in ps if not a.probes or p in a.probes]
     out = []
     # without --bw-off the steered arm keeps its probe's earlier target (ee_WW: the t-channel factor on, tps_);
@@ -250,9 +259,9 @@ def main():
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 tag = "" if not a.lr_shift else "h" if a.lr_shift == 0.5 else f"h{round(a.lr_shift * 10)}"   # scrh: +0.5, scrh10: +1
-                out.append(write(f"{pfx}_scr{tag}_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
+                out.append(write(f"{pfx}_scr{tag}{hz}_{p}_d{k}", f"transfer_probe_{p}.yaml", T_CELL[k],
                                  [lr_space(T_CELL[k], k)] + COMMON_SPACE,
-                                 {"data.train_subsample": int(round(10 ** (k / 2)))},
+                                 {"data.train_subsample": int(round(10 ** (k / 2)))}, n_trials=a.n_trials,
                                  head=f"Transfer pilot, scratch: {p} on D = 10^{k / 2:g} events."))
     else:
         assert a.lr or a.eff_lr, "--lr (the pretrain's best lr) is needed with --ft"
@@ -281,7 +290,7 @@ def main():
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
-                fam = a.family or f"{pfx}{'s' if a.steered else ''}_{tag}"
+                fam = (a.family or f"{pfx}{'s' if a.steered else ''}_{tag}") + hz
                 name = f"{fam}_{p}_d{k}"
                 lr = ({"fine_tune.lr_scale": 1.0, "fine_tune.layer_decay": 1.0} if a.eff_lr else
                       {"training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}")})
