@@ -24,7 +24,8 @@ STEERED_FROM = {"ee_WW": 5}
 
 def best(name):
     """(loss, trial) of one sweep's best trial, (None, None) if it has none."""
-    tr = [t for t in S.get(name, []) if t.get("val_loss") is not None and t.get("prepd_std")]
+    # a sweep finished on another site continues as <name>_002 (sweep/sweep_config_*_002.yaml): one search
+    tr = [t for t in S.get(name, []) + S.get(name + "_002", []) if t.get("val_loss") is not None and t.get("prepd_std")]
     if not tr:
         return None, None
     b = min(tr, key=lambda t: t["val_loss"] * t["prepd_std"] ** 2)
