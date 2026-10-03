@@ -4,5 +4,17 @@
   "proc": null,
   "run_dir": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_star_resonance/trial_0073",
   "why": "trained to 64k; the result write hit the EOS quota (2026-10-03); rescored from the best checkpoint (tools/eval_best_val.py)"
+ },
+ "tp3_star_threshold_hp73": {
+  "val_loss": 5.6697117733143004e-08,
+  "proc": {
+   "ee_uu": 5.5611142439367186e-08,
+   "ee_mumu": 1.0414376258214886e-07,
+   "ee_numu": 6.3785277858003e-08,
+   "uubar_ttbar": 2.109871943968434e-08,
+   "uubar_ttbar_nlo": 7.516804893215375e-08
+  },
+  "run_dir": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_star_threshold/trial_0073",
+  "why": "trained to 64k; the result write hit the EOS quota (2026-10-03); rescored from the best checkpoint (tools/eval_best_val.py)"
  }
 }
