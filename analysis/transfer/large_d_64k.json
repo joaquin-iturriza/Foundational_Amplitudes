@@ -1,0 +1,21 @@
+{
+ "what": "scratch at D=10^4.5 (k=9) and 10^5 (k=10), 64k steps, one run each at lr 1.2e-3 (tp2_calib_*_t64000, lxplus, 2026-10-03): MSE of log|M|^2 = post-training validation MSE (prepd, best checkpoint loaded, eval subsample 1e4) x prepd_std^2",
+ "mse_log_m2": {
+  "ee_ttbar": {
+   "9": 1.94e-09,
+   "10": 3.23e-09
+  },
+  "ud_ud": {
+   "9": 1.59e-07,
+   "10": 2e-08
+  },
+  "uubar_Zgg": {
+   "9": 3.69e-05,
+   "10": 5.78e-06
+  },
+  "uubar_Zggg": {
+   "9": 0.000624,
+   "10": 0.000196
+  }
+ }
+}
