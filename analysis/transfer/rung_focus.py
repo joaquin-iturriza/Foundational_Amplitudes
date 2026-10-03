@@ -11,7 +11,7 @@ import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, best, scratch, finetune  # noqa: E402
-from rung_grid import LAB, P, S, RUNG_ADDS, curve  # noqa: E402
+from rung_grid import LAB, P, S, RUNG_ADDS, curve, large_d, legend_proxy  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -71,6 +71,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         if D:
             ax.plot(D, L, "o--", **GREY)
         ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", label="from scratch")
+        large_d(ax, p)
         ax.plot(*curve(lambda k: best(f"{lo}_{p}_d{k}")[0]), "o-", color=ps.C.blue, label="the rung below")
         ax.plot(*curve(lambda k: best(f"{hi}_{p}_d{k}")[0]), "o-", color=ps.C.vermillion,
                 label="first rung with the structure")
@@ -88,5 +89,6 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
     for r, what in RUNG_ADDS.items():                           # the key to the panels' "r6 vs r5" labels
         a0.plot([], [], " ", label=f"r{r}: {what}")
+    legend_proxy(a0)
     ps.shared_legend(figs[0][0], a0, ncol=2)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))
