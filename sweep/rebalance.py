@@ -73,17 +73,40 @@ def inventory(prefixes, scope, window_h):
     only sweeps matching `prefixes` may move."""
     import siteconf
     q = _queue()
+    sched = siteconf.CLUSTER.get("scheduler")
+    reg = {}
+    if sched != "htcondor":
+        sys.path.insert(0, os.path.join(REPO, "sweep"))
+        from sweep_manager import load_registry, DEFAULT_REGISTRY
+        reg = {n: {"scripts": [os.path.basename(i.get("script", "")) for i in e["jobs"].values()]}
+               for n, e in load_registry(DEFAULT_REGISTRY)["sweeps"].items()}
     now, sweeps, recent = time.time(), {}, 0
     names = sorted({os.path.basename(d) for p in scope for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))})
     for name in names:
         sd = os.path.join(siteconf.SWEEP_DIR, name)
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))
         recent += sum(os.path.getmtime(r) > now - window_h * 3600 for r in res)
-        n_scripts = len(glob.glob(os.path.join(sd, "jobs", "trial_*.sh")))
+        scripts = glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))
         run, qd, ids = q.get(name, (0, 0, []))
         moved = os.path.exists(os.path.join(sd, "MOVED_TO"))
+        # what will still run here: the queued trials, plus the never-submitted ones of a sweep that is being fed
+        # (SLURM: scripts the registry has not seen, of a sweep it knows or one created in the last 3 days; on
+        # HTCondor the live DAG submits its own nodes). A failed trial of a finished sweep is not backlog.
+        if moved:
+            remaining = 0
+        elif sched == "htcondor":
+            remaining = max(qd, len(scripts) - len(res) - run) if ids else qd
+        else:
+            names_ = {os.path.basename(x) for x in scripts}
+            if name in reg:
+                unsub = len(names_ - {os.path.basename(x) for x in reg[name]["scripts"]})
+            elif scripts and now - os.path.getmtime(sd) < 3 * 86400:
+                unsub = max(0, len(scripts) - len(res) - run)
+            else:
+                unsub = 0
+            remaining = qd + unsub
         sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
-                        "remaining": 0 if moved else max(0, (n_scripts or PER_SWEEP_FALLBACK) - len(res) - run),
+                        "remaining": remaining,
                         "started": bool(res) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "sweeps": sweeps}))
