@@ -12,3 +12,5 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 echo "site=$CCORCH_SITE host=$(hostname) project=$PROJECT_DIR data=$DATA_DIR"
 python -c "import sys,torch;print(f\"python={sys.version.split()[0]} torch={torch.__version__} cuda={torch.cuda.is_available()} gpu={torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}\")"
+# the attention kernel the model uses (xformers, CUDA only): a GPU it has no kernels for fails here, not in a trial
+python -c "import torch,xformers,xformers.ops as xo;q=torch.randn(1,64,8,16,device='cuda');print('xformers',xformers.__version__,'attention ok',tuple(xo.memory_efficient_attention(q,q,q).shape))" 2>&1 | tail -1
