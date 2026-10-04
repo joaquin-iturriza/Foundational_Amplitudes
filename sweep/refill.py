@@ -54,8 +54,9 @@ def main():
             continue
         # trial scripts generated but never run (a sweep not fed yet, a declined submit prompt) are still owed to
         # the sweep by its own queue: refilling on top of them would add trials past the planned count
-        scripts = {os.path.basename(x) for x in glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))}
-        if scripts - {os.path.basename(x) for x in _ran(sd)}:
+        scripts = {re.match(r"trial_(\d+)", os.path.basename(x)).group(1)
+                   for x in glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))}
+        if scripts - set(_ran(sd)):
             print(f"{name}: has never-run trial scripts, left alone")
             continue
         fails, n_done = failures(sd)
