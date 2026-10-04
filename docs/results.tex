@@ -4324,8 +4324,16 @@ there, $ee\to\nu_e\bar\nu_e$ $36\times$, the one-loop probes $230$ and $460\time
 $ee\to\nu_e\bar\nu_e$ still falls $8\times$, against $\le2\times$ for the $t/u$-channel probes ($ee\to Z\gamma$
 rises), so of the probes measured there the $Z$-pole one is where transfer can still show at large $D$; the
 one-loop grid stops at $10^{4.5}$. The eight runs on
-Jean Zay ($ud\to ud$, $ee\to t\bar t$, $u\bar u\to Zgg$, $u\bar u\to Zggg$) ran into the $3$\,h limit at
-$23$--$31$k steps, before the anneal, and are listed in \code{long\_runs.json}, not drawn.
+Jean Zay ($ud\to ud$, $ee\to t\bar t$, $u\bar u\to Zgg$, $u\bar u\to Zggg$) first ran into the $3$\,h limit at
+$23$--$31$k steps; rerun on lxplus to the end (2026-10-03), they give $1.6\times10^{-7}$ and $2.0\times10^{-8}$
+($ud\to ud$ at $10^{4.5}$, $10^5$), $1.9$ and $3.2\times10^{-9}$ ($ee\to t\bar t$), $3.7\times10^{-5}$ and $5.8\times10^{-6}$
+($u\bar u\to Zgg$), $6.2$ and $2.0\times10^{-4}$ ($u\bar u\to Zggg$), on the grid's target (\code{large\_d\_64k.json}). At
+equal compute $ud\to ud$ falls $8\times$ from $10^{4.5}$ to $10^5$, $u\bar u\to Zgg$ $6\times$, $u\bar u\to Zggg$ $3\times$, and
+$ee\to t\bar t$ rises $1.7\times$, one run each. The four probes the Breit--Wigner factor touched ran here with it on, so
+they were rerun on the grid's target (both factors off; Jean Zay, 2026-10-04): $ee\to d\bar d$ $1.9\times10^{-7}$ at both
+$10^{4.5}$ and $10^5$ (limited by steps), $ee\to\nu_e\bar\nu_e$ $1.2\times10^{-5}$ and $5.8\times10^{-7}$ ($21\times$),
+$ee\to d\bar d$ and $ee\to b\bar b$ at one loop $8.7\times10^{-7}$ and $1.5\times10^{-6}$ at $10^{4.5}$. The figure keeps the
+factor-on points of the first runs.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/large_d_a.pdf}\hfill\pnl{../analysis/transfer/figs/large_d_b.pdf}}
@@ -4540,14 +4548,17 @@ fine-tune grid from the rungs therefore searches \code{training.lr} over $[10^{-
 \code{layer\_decay} fixed at $1$, $5$ trials per cell, a candidate seed per sweep (\code{gen\_transfer\_pilot.py --eff-lr};
 the user's call, 2026-10-02).
 
-\paragraph{The fine-tune grid, partial.} Each of the twelve probes fine-tuned from every rung's final best and from
-$ee\to u\bar u$ in that setup (\code{tp3\_r}$n$\code{fte}, \code{tp3\_uufte}; Fig.~\ref{fig:rung_grid},
-\code{rung\_grid.py}), collected from all three sites on 2026-10-02 at 18:00, when most cells held their three random
-start-up trials and the guided two were queued. On that equal footing (each cell's best of its first three trials;
-$36$--$48$ cells per pretraining at $D\ge10^{2.5}$, $14$ for rung $5$), the gain over scratch is a geometric mean of $1.5$
-from $ee\to u\bar u$ and $2.1$, $2.3$, $2.3$, $2.3$, $2.3$ from rungs $1$--$5$. The $ee\to u\bar u$ parent trained $32$k
-steps on one process, rung $1$'s $64$k on three; the $64$k $ee\to u\bar u$ pretraining separates the two. The values
-move as trials land (a cell's value is its best so far), so nothing per cell is read yet.
+\paragraph{The fine-tune grid: the rungs that add multiplicity gain most, and the $ee\to u\bar u$ budget does not
+matter.} Each of the twelve probes fine-tuned from every rung's final best and from $ee\to u\bar u$ ($32$k and $64$k
+parents) in that setup (\code{tp3\_r}$n$\code{fte}, \code{tp3\_uufte}, \code{tp3\_uu64fte}; Fig.~\ref{fig:rung_grid},
+\code{rung\_grid.py}), collected from all three sites on 2026-10-04 at 12:00: every one of the $11\times84$ cells has a
+value, $412$--$421$ trials per pretraining (the last $16$, in rung $4$ and \code{tp3\_uufte}, were lost to the EOS quota and
+are being replaced). The gain over scratch, a geometric mean over the $84$ cells, is $2.1$, $2.2$, $2.1$, $2.3$, $2.2$,
+$2.4$ from rungs $1$--$6$, $3.3$, $3.2$, $3.4$ from rungs $7$--$9$ (the first rung with $2\to3$), and $1.7$ from $ee\to u\bar u$
+at either budget ($1.69$ from $32$k, $1.70$ from $64$k steps), so rung $1$'s lead over $ee\to u\bar u$ is the two other
+processes, not the steps. Summed over the probes the gain is larger at $D\ge10^{2.5}$ than at $D\le100$ for every
+pretraining (rungs $7$--$9$: $3.7$--$4.2\times$ against $2.5\times$); the probes that gain most at small $D$ are single
+cases, below. $u\bar u\to Zggg$ is $1.7$--$3.1\times$ lower from rung $8$ ($+2\to4$) than from rung $7$ at every $D$.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_b.pdf}} \\[1ex]
@@ -4556,11 +4567,62 @@ move as trials land (a cell's value is its best so far), so nothing per cell is 
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_b.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_f.pdf}}
-\caption{The fine-tune grid so far (2026-10-02, 18:00): each probe's MSE of $\log|\mathcal M|^2$ against $D$, from
-scratch, fine-tuned from $ee\to u\bar u$ and from every ladder rung in the grid's setup (solid), and the earlier setup
-(dashed: Table~\ref{tab:ladder_transfer_all}'s $ee\to u\bar u$ cells and the preliminary rung $4$ and $9$ fine-tunes). A
-cell is its search's best so far, mostly of three random trials.}
+\caption{The fine-tune grid (2026-10-04): each probe's MSE of $\log|\mathcal M|^2$ against $D$, from scratch,
+fine-tuned from $ee\to u\bar u$ ($32$k and $64$k parents) and from every ladder rung in the grid's setup (solid), and the
+earlier setup (dashed: Table~\ref{tab:ladder_transfer_all}'s $ee\to u\bar u$ cells and the preliminary rung $4$ and $9$
+fine-tunes). A cell is its search's best of five trials.}
 \label{fig:rung_grid}
+\end{figure}
+
+\paragraph{Each probe against the structure it needs.} Fig.~\ref{fig:rung_focus} (\code{rung\_focus.py}) draws, per
+probe, scratch, the first rung that adds the probe's structure, the rung below it (the same pretraining without it; $ee\to
+u\bar u$ below rung $1$), and the pretraining that does best overall, every other one grey. Best overall is the largest mean
+of $\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$ over the probe's cells, each half-decade of $D$ weighted the same (the
+user asked for a rule, 2026-10-02, weighing large $D$, where a factor in data matters most, against small $D$, noisier but
+what rare processes need; weighting large $D$ or small $D$ more moves the leader only where the top two are within
+$1.13\times$); leaders within $1.2\times$ of the best are reported as tied, $1.2$ being a provisional bound on what one seed's
+five-trial search resolves, to be replaced by the seed spread. The rung with the structure beats the one below it clearly
+on $u\bar u\to Zggg$ (rung $8$, above), $ee\to t\bar t$ at small $D$ (rung $5$, masses) and $ud\to ud$ at $D\le10^{2.5}$ (rung $4$);
+elsewhere the two are within the spread of the other pretrainings.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_ee_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_ee_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_ee_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_ee_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_ee_f.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_f.pdf}}
+\caption{The grid of Fig.~\ref{fig:rung_grid} per probe: scratch, the first rung with the probe's structure, the rung below,
+and the best pretraining overall (leader and first tie named, further ties counted), the others grey.}
+\label{fig:rung_focus}
+\end{figure}
+
+\paragraph{The star arms' four new probes, and the arms.} The new probes (Fig.~\ref{fig:rung_grid_new}) fine-tuned from rung
+$1$ and from the $64$k $ee\to u\bar u$: on $ee\to d\bar d$ at one loop above $500$\,GeV both are $30$--$250\times$ below scratch at
+$D\le10^{2.5}$ and $1.5$--$4\times$ above (the QCD-virtual target at $\mu=\sqrt s$ is close to the Born, which both pretrained
+on); on $ee\to t\bar t$ at one loop near threshold both are $2.5$--$20\times$ \emph{worse} than scratch at $D\le10^{2.5}$, and rung $1$
+is $1.6$--$3.6\times$ better from $10^3$ up. Each arm against rung $1$ on its own probe (Fig.~\ref{fig:star_arms},
+\code{star\_arms.py}; which arms test their structure: hand-off): soft and collinear emission ($ee\to d\bar dg$) $3$--$8\times$
+lower at every $D$; initial-state collinear ($u\bar u\to Zg$) $2$--$7\times$; the $t\bar t$ threshold $2$--$4\times$ from $10^3$ up,
+still above scratch at small $D$; the dead cone ($ee\to t\bar tg$) level, $2\times$ worse at $10^4$; the resonance and Sudakov
+controls level, the Sudakov one up to $20\times$ worse at $D=10$. On $ee\to d\bar d$ every arm stays with rung $1$, within
+$4\times$ at $10^4$: added structure costs the near probe little.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_new_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_new_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/rung_grid_new_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_new_d.pdf}}
+\caption{The star arms' four probes, from scratch and fine-tuned from rung $1$ and the $64$k $ee\to u\bar u$.}
+\label{fig:rung_grid_new}
+\end{figure}
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/star_arms_a.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/star_arms_c.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/star_arms_e.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_f.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/star_arms_g.pdf}
+\caption{The star arms: (a)--(f) each arm (rung $1$ plus one structure) on its own probe, against rung $1$ and scratch;
+(g) $ee\to d\bar d$ fine-tuned from every arm.}
+\label{fig:star_arms}
 \end{figure}
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
