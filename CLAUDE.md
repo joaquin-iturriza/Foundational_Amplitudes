@@ -40,7 +40,7 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    is no project python env on the laptop (no torch): anything that imports the
    project runs inside a job on a site, or on the local checkout only as a CPU
    dry-run of the sweep generators.
-   - **The sites.** CC-IN2P3: SLURM, V100; it wants `--gpus=N`, a mandatory
+   - **The sites.** CC-IN2P3: SLURM, V100 and H100; it wants `--gpus=N`, a mandatory
      `--mem`, and at most 5 CPUs per GPU — all added at submit time, never written
      into a job script. Jean Zay: SLURM, A100 through `itg@a100`/`gpu_p5` (`-C a100`,
      QOS `qos_gpu_a100-t3`) for FA since 2026-10-02 (`itg@v100` is in over-consumption);
@@ -148,12 +148,12 @@ account, qos, `--gpus` vs `--gres`, `--mem` and the CPU ceiling are the site's
 business and are added at submit time from `sites/sites.yaml` and
 `~/.config/ccorch/sites.toml`.
 
-SLURM (from the sweep template): `account: lpnhe`, `partition: gpu_v100`,
-`qos: gpu`, `gres: gpu:v100:1` (V100 32GB) — **the only validated setup**.
+SLURM (`sites/sites.yaml`): `account: lpnhe`, `partition: gpu_v100,gpu_h100` (either, whichever
+starts first), `qos: gpu`, one GPU through `--gpus=1`.
 **`--mem` is mandatory on CC-IN2P3**: the scheduler rejects any job without an
 explicit memory request (template `mem: 32G`; CPU jobs go to `htc` with
-`--mem-per-cpu`). `gpu_h100` exists but is untested; don't assume it works
-(relevant for the `allow_tf32` knob, which is a no-op on V100).
+`--mem-per-cpu`). `gpu_h100` (3 nodes of 4 H100 NVL) runs FA: `job_probe.sh` passed there
+(torch and an xformers attention call, 2026-10-04); `allow_tf32` is a no-op on V100, active on H100.
 
 ---
 
