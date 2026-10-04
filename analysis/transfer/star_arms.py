@@ -2,6 +2,9 @@
 the grid's protocol on the arm's own probe and on ee -> dd~ (tp3_s<arm>fte). Panels (a)-(f): each arm on its own probe,
 against scratch and against rung 1 (the arm without its structure). Panel (g): ee -> dd~, rung 1's own probe, from
 every arm, to show what adding a structure costs where rung 1 already does well. Same cells and values as rung_grid.py.
+The resonance and Sudakov arms tested neither structure (docs/results.tex): grey, and replaced by the W-pole and
+electroweak-Sudakov arms in their colours. Rung 1 and the new arms on the new probes run two chosen points per cell
+(sweep/pick_points.py); rung 1 there is the best of its five random trials and the two chosen points.
     python analysis/transfer/star_arms.py      -> figs/star_arms_a..g
 """
 import os, sys
@@ -14,8 +17,10 @@ import plot_style as ps  # noqa: E402
 # arm -> (its probe, what it adds to rung 1); docs/results.tex sec:ladder-open, the star arms item
 ARMS = {"soft": ("ee_ddbarg", "soft/collinear emission"), "isr": ("uubar_Zg", "initial-state collinear"),
         "deadcone": ("ee_ttbarg", "massive quasi-collinear"), "resonance": ("ee_nnbar", "narrow resonances"),
-        "threshold": ("ee_ttbar_nlo_thr", r"$t\bar t$ threshold"), "sudakov": ("ee_dd_nlo_hi", "Sudakov logarithms")}
-ARM_C = dict(zip(ARMS, (ps.C.vermillion, ps.C.orange, ps.C.green, ps.C.purple, ps.C.sky, ps.C.yellow)))
+        "threshold": ("ee_ttbar_nlo_thr", r"$t\bar t$ threshold"), "sudakov": ("ee_dd_nlo_hi", "Sudakov logarithms"),
+        # the redesign (2026-10-04) of the two arms that did not test their structure: they keep those arms' colours
+        "wpole": ("udbar_enu", r"$W$ pole"), "sudakovew": ("ee_dd_ew_nlo", "EW Sudakov logarithms")}
+ARM_C = dict(zip(ARMS, (ps.C.vermillion, ps.C.orange, ps.C.green, "0.6", ps.C.sky, "0.6", ps.C.purple, ps.C.yellow)))
 
 figs = ps.panels(len(ARMS) + 1)
 for (fig, ax), (arm, (p, what)) in zip(figs, ARMS.items()):

@@ -20,7 +20,8 @@ LAB = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_nnbar": r"$e^+e^-\to\nu_e\bar\nu_
        "uubar_gg": r"$u\bar u\to gg$", "uubar_Zg": r"$u\bar u\to Zg$", "uubar_Zgg": r"$u\bar u\to Zgg$",
        "uubar_Zggg": r"$u\bar u\to Zggg$",
        "ee_ddbarg": r"$e^+e^-\to d\bar dg$", "ee_ttbarg": r"$e^+e^-\to t\bar tg$",
-       "ee_ttbar_nlo_thr": r"$e^+e^-\to t\bar t$ (1-loop, thr.)", "ee_dd_nlo_hi": r"$e^+e^-\to d\bar d$ (1-loop, high)"}
+       "ee_ttbar_nlo_thr": r"$e^+e^-\to t\bar t$ (1-loop, thr.)", "ee_dd_nlo_hi": r"$e^+e^-\to d\bar d$ (1-loop, high)",
+       "udbar_enu": r"$u\bar d\to e^+\nu_e$", "ee_dd_ew_nlo": r"$e^+e^-\to d\bar d$ (EW 1-loop)"}
 P = ["ee_ddbar", "ee_nnbar", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo", "ee_Za", "ud_ud", "uubar_gg",
      "uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
 # what each ladder rung adds (recipes/transfer_ladder_r*.yaml headers); the rungs are cumulative

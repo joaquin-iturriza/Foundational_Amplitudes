@@ -3,7 +3,8 @@ the first ladder rung that adds the structure the probe carries, and the rung ju
 without that structure; ee_uu alone below rung 1), with every other pretraining's fine-tunes in grey. The pairing is
 the ladder's design (recipes/transfer_ladder_r*.yaml headers): s-channel r1, EW t-channel r2 (the W exchange in
 ee -> nu_e nu_e), external photons r3, QCD exchange r4, masses r5, the first external W and gluon r6 (ud -> Wg; uu -> gg
-and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py.
+and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py. The 32k-step searches
+at D = 10^3.5, 10^4 (tp3_scr32k, tp3_<parent>fte32k; preliminary) are open diamonds in their series' colour.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
 """
@@ -76,6 +77,17 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
                 label="first rung with the structure")
         if lead and lead[0] not in (hi, lo):
             ax.plot(*curve(lambda k: best(f"{lead[0]}_{p}_d{k}")[0]), "o-", color=ps.C.green, label="best overall")
+        # the 32k-step searches at D = 10^3.5, 10^4 (horizon32k.py; preliminary: 2-4 trials, two of them chosen points),
+        # open diamonds in their 8k series' colour: scratch, and each parent that has one
+        D32 = [10 ** 3.5, 10 ** 4]
+        def pts32(name):
+            v = [best(f"{name}_d{k}")[0] for k in (7, 8)]
+            return [d for d, x in zip(D32, v) if x], [x for x in v if x]
+        ax.plot(*pts32(f"tp3_scr32k_{p}"), "D", color="k", mfc="none")
+        for f in sorted({n.split("32k_")[0] for n in S if "fte32k_" in n and f"_{p}_d" in n}):
+            col = (ps.C.vermillion if f == hi else ps.C.blue if f == lo else
+                   ps.C.green if lead and f == lead[0] else "0.6")
+            ax.plot(*pts32(f"{f}32k_{p}"), "D", color=col, mfc="none")
         below = r"$ee\to u\bar u$" if FOCUS[p] == 1 else f"r{FOCUS[p] - 1}"
         ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
                          # the leader and its first tie by name, any further ties as a count (the full list ran
@@ -89,6 +101,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     a0 = figs[0][1]
     if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
+    a0.plot([], [], "D", color="k", mfc="none", label="open diamonds: 32k steps, same colours")
     for r, what in RUNG_ADDS.items():                           # the key to the panels' "r6 vs r5" labels
         a0.plot([], [], " ", label=f"r{r}: {what}")
     ps.shared_legend(figs[0][0], a0, ncol=2)

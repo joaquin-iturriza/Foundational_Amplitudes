@@ -18,7 +18,9 @@ ARM = {"ee_ddbar": "tp3_scr", "ee_nnbar": "tp3_scr", "ee_dd_nlo": "tp3_scr", "ee
        "ee_Za": "tp2_scr", "ud_ud": "tp2_scr", "uubar_gg": "tp2_scr", "uubar_Zg": "tp2_scr",
        "ee_ttbar": "tp_scr", "uubar_Zgg": "tp_scr", "uubar_Zggg": "tp_scr",
        # the star arms' probes, factors off from the start
-       "ee_ddbarg": "tp3_scr", "ee_ttbarg": "tp3_scr", "ee_ttbar_nlo_thr": "tp3_scr", "ee_dd_nlo_hi": "tp3_scr"}
+       "ee_ddbarg": "tp3_scr", "ee_ttbarg": "tp3_scr", "ee_ttbar_nlo_thr": "tp3_scr", "ee_dd_nlo_hi": "tp3_scr",
+       # the redesigned arms' probes (2026-10-04)
+       "udbar_enu": "tp3_scr", "ee_dd_ew_nlo": "tp3_scr"}
 STEERED_FROM = {"ee_WW": 5}
 
 
