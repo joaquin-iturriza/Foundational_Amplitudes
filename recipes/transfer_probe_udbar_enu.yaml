@@ -1,0 +1,5 @@
+# Transfer study probe: udbar_enu alone (the W-pole star arm's probe), the catalog pool (mixture sampling). The
+# data-scaling grid trains on prefixes of this train split (data.train_subsample = D); val and test stay fixed.
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_enu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

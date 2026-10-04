@@ -1,0 +1,6 @@
+# Every pool the W-pole star arm and its probe read that rung 1 has not built, for one CPU prebuild.
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_taunu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_enu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

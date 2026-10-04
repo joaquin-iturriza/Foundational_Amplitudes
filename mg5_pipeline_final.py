@@ -957,6 +957,14 @@ PROCESSES = {
         "pdg_ids": [2, -1, -11, 12],
         "m_final": 0.0,
     },
+    "udbar_taunu": {   # charged Drell-Yan to a massive lepton, s-channel W (star arm on the W pole; tau massive, so not
+        "mg5_generate": ["generate u d~ > ta+ vt"],     # udbar_enu's dataset)
+        "nfinal": 2,
+        "param_card_patches": {},
+        "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+        "pdg_ids": [2, -1, -15, 16],
+        "m_final": [1.777, 0.0],
+    },
     "udbar_tbbar": {   # s-channel single top
         "mg5_generate": ["generate u d~ > t b~"],
         "nfinal": 2,

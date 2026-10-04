@@ -1,0 +1,12 @@
+# Transfer study, star arm (docs/results.tex sec:ladder; redesign of the resonance arm, the user's go-ahead 2026-10-04):
+# rung 1 (ee_uu, mumu, numu) plus the W pole, which rung 1 lacks (it has only the Z). No probe is in any arm, nor any
+# process of a probe's equality class (analysis/process_equality/equal_processes.json). 1e5 train events a process;
+# mixture sampling.
+# + the s-channel W resonance: udbar_enug (W + jet), udbar_taunu (tau massive); probe udbar_enu
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_taunu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
