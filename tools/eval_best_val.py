@@ -11,6 +11,7 @@ import json, os, sys, tempfile
 
 import numpy as np
 import torch
+import siteconf
 from omegaconf import OmegaConf, open_dict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +29,9 @@ for run_dir in sys.argv[1:]:
         if cfg.get("fine_tune") is not None:
             cfg.fine_tune.pretrained_path = None
         cfg.run_dir = tempfile.mkdtemp(prefix="evalbest_", dir=os.environ["SCRATCH"])
+        # a run copied from another site keeps that site's absolute paths (its recipe): re-root them here
+        if cfg.data.get("processes_file"):
+            cfg.data.processes_file = siteconf._expand_str(str(cfg.data.processes_file))
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
     if cfg.data.get("offshell_per_event", False) and saved.get("offshell_stats") is not None:
         with open_dict(cfg):
