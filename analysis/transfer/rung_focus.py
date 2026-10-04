@@ -78,7 +78,10 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
             ax.plot(*curve(lambda k: best(f"{lead[0]}_{p}_d{k}")[0]), "o-", color=ps.C.green, label="best overall")
         below = r"$ee\to u\bar u$" if FOCUS[p] == 1 else f"r{FOCUS[p] - 1}"
         ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
-                         + (", best " + r"$\approx$".join(short(f) for f in lead) if lead else "")
+                         # the leader and its first tie by name, any further ties as a count (the full list ran
+                         # off the panel once every grid was ranked)
+                         + (", best " + r"$\approx$".join(short(f) for f in lead[:2])
+                            + (f" (+{len(lead) - 2})" if len(lead) > 2 else "") if lead else "")
                          + ("\n" + "unranked " + ", ".join(short(f) for f in unranked) if unranked else ""))
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
