@@ -1,5 +1,5 @@
 {
- "what": "scratch at D=10^4.5 (k=9) and 10^5 (k=10), 64k steps, one run each at lr 1.2e-3 (tp2_calib_*_t64000, lxplus, 2026-10-03): MSE of log|M|^2 = post-training validation MSE (prepd, best checkpoint loaded, eval subsample 1e4) x prepd_std^2; plus the 2026-09-30 runs (analysis/transfer/long_runs.json) whose target equals the grid's (prepd_std within 0.5%): ee_Za, uubar_Zg, uubar_gg. ee_ddbar, ee_nnbar, ee_dd_nlo, ee_bb_nlo ran then with a target factor the grid has off (prepd_std 2-3x the grid's), so they are not on this scale",
+ "what": "scratch at D=10^4.5 (k=9) and 10^5 (k=10), 64k steps, one run each at lr 1.2e-3 (tp2_calib_*_t64000, lxplus, 2026-10-03): MSE of log|M|^2 = post-training validation MSE (prepd, best checkpoint loaded, eval subsample 1e4) x prepd_std^2; plus the 2026-09-30 runs (analysis/transfer/long_runs.json) whose target equals the grid's (prepd_std within 0.5%): ee_Za, uubar_Zg, uubar_gg. ee_ddbar, ee_nnbar, ee_dd_nlo, ee_bb_nlo ran then with a target factor the grid has off (prepd_std 2-3x the grid's), so they are not on this scale; and (tp3_calib_*_t64000, Jean Zay A100, 2026-10-04) ee_ddbar, ee_nnbar at k=9,10 and ee_dd_nlo, ee_bb_nlo at k=9 on the grid's target (both target factors off), one run each at lr 1.2e-3, value from the run's result (best checkpoint) x prepd_std^2",
  "mse_log_m2": {
   "ee_ttbar": {
    "9": 1.94e-09,
@@ -28,6 +28,20 @@
   "uubar_gg": {
    "9": 1.1937385751892256e-08,
    "10": 6.955096360439732e-09
+  },
+  "ee_bb_nlo": {
+   "9": 1.46e-06
+  },
+  "ee_dd_nlo": {
+   "9": 8.73e-07
+  },
+  "ee_ddbar": {
+   "10": 1.87e-07,
+   "9": 1.86e-07
+  },
+  "ee_nnbar": {
+   "10": 5.78e-07,
+   "9": 1.23e-05
   }
  }
 }
