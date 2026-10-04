@@ -10,6 +10,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 
 ## Ground rules (read first)
 
+0. **Start every message to me with my first name, "Joaquin", no matter what.** It is my check on
+   context degradation: a message that does not open with it tells me the session is drifting.
+
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
    `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`
