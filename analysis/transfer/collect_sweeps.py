@@ -15,7 +15,7 @@ prefix = sys.argv[1]
 out = {}
 for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):   # = SWEEP_DIR except on lxplus (EOS)
     name = os.path.basename(sdir)
-    trials = []
+    trials, cand = [], None
     for rp in sorted(glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))):
         m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(rp))
         hp, T = int(m.group(1)), int(m.group(2))
@@ -32,6 +32,19 @@ for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):
                    "ema_decay": c["training"].get("ema_decay")}
             if (c.get("fine_tune") or {}).get("pretrained_path"):
                 ft = {k: c["fine_tune"].get(k) for k in ("lr_scale", "layer_decay")}
+        if hps is None or lr is None:          # run dir moved off this site (EOS cleanup): the sweep's own candidates
+            if cand is None:
+                try:
+                    import pickle
+                    cand = pickle.load(open(os.path.join(sdir, "dyhpo_state.pkl"), "rb"))["candidates_raw"]
+                except Exception:
+                    cand = {}
+            c_ = cand[hp] if hp < len(cand) else None
+            if c_:
+                lr = lr if lr is not None else c_.get("training.lr")
+                hps = {"lambda": c_.get("training.regularization_lambda"), "warmup": c_.get("training.cosanneal_warmup_frac"),
+                       "eta_min": c_.get("training.cosanneal_eta_min"), "ema": c_.get("ema"),
+                       "ema_decay": c_.get("training.ema_decay")}
         trials.append(dict(hp=hp, T=T, prepd_std=std, lr=lr, **({"fine_tune": ft} if ft else {}),
                           **({"hps": hps} if hps else {}), **r))
     out[name] = trials
