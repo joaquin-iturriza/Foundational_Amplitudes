@@ -4848,7 +4848,10 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     \code{gpu\_h100} (three nodes of four H100 NVL) runs FA (probe, 2026-10-04: torch and an xformers attention call), so
     its jobs now ask for \code{gpu\_v100,gpu\_h100}, whichever starts first. The arms' fine-tune waiter once submitted
     all $28$ arm sweeps while the pretrainings still ran (it matched its own marker in the echoed command); they were
-    removed before any trial started, and the waiter now matches the marker as a whole line.
+    removed before any trial started, and the waiter now matches the marker as a whole line. Four of the moved sweeps (from $ee\to u\bar u$ on $ud\to ud$ and $u\bar u\to Zg$, $D=10^{3.5}$, $10^4$) went back to
+    CC-IN2P3 to use the H100s before starting on lxplus. The hourly rebalancer no longer watches the chosen-point sweeps
+    (the $32$k families, rung $1$'s, the redesigned arms'): a move regenerates a sweep from its config, a random search;
+    they are placed by hand.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
