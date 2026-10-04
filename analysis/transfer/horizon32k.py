@@ -76,7 +76,7 @@ for k in (7, 8):
     c.plot([x[1] for x in r], [x[2] for x in r], "s", color=COL[k], mfc="none")
 lo, hi = min(min(x[1], x[2]) for x in gain), max(max(x[1], x[2]) for x in gain)
 c.plot([lo, hi], [lo, hi], "-", color=ps.C.grey, label="same gain")
-ps.legend(c, "upper left"); ps.make_room(c)
+ps.legend(c, "lower right")
 c.set_xscale("log"); c.set_yscale("log")
 c.set_xlabel("gain at 8k steps (scratch / fine-tune)"); c.set_ylabel("gain at 32k steps")
 ps.save_panels(figs, FIG)
