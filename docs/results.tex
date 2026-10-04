@@ -4516,6 +4516,29 @@ trained in.}
 \label{fig:ladder_pre_dataset}
 \end{figure}
 
+\paragraph{The pretraining protocol: hp73 alone, from 2026-10-04.}
+Every pretraining search draws from the same candidate pool, so an hp index is the same point on all sixteen $64$k-step
+pretrainings (rungs $1$--$9$, the $ee\to u\bar u$ pretraining, the six star arms; \code{pretrain\_hp.py}, collected on
+every site, \code{pretrain\_hp.json}). The good region is the same on all of them (Fig.~\ref{fig:pretrain_hp}): lr
+$0.8$--$2\times10^{-3}$ with $\lambda\le3\times10^{-9}$, $10$--$10^4\times$ worse outside it, and the four points that
+recur across the searches (hp15, hp47, hp73, hp95) all sit in it. hp73 (lr $1.8\times10^{-3}$, $\lambda=1.4\times10^{-10}$,
+warm-up $0.08$, EMA off) ran on $13$: the best trial on seven (rungs $2$, $6$, $7$, $9$; the soft, dead-cone and threshold
+arms, the last from the rescored best checkpoint of a run whose result write hit the EOS quota), within $1.02$--$1.37\times$ of
+the best on five more (rungs $5$, $8$; the ISR, resonance and Sudakov arms), and $2.3\times$ above it on the
+$ee\to u\bar u$ pretraining, where hp95 is the best. hp47 is
+$4.9\times$ above on rung $7$ and $4.1\times$ on the threshold arm, hp95 $9$--$13\times$ on rungs $7$ and $8$. Every
+best is the best of $4$--$8$ trials, so the ratios rank the points, not the optimum. From 2026-10-04 a new pretraining runs
+hp73 alone (the user's call; until then hp47 and hp73).
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/pretrain_hp_rank.pdf}\\[1ex]
+\includegraphics{../analysis/transfer/figs/pretrain_hp_landscape.pdf}
+\caption{Every $64$k-step pretraining trial's best $\vlnr$ over its pretraining's best. Top: per pretraining, the
+four recurring points marked (open: the best checkpoint rescored, the run diverged or could not write its result).
+Bottom: against the searched HPs (open: EMA off). A diverged trial not rescored is not drawn.}
+\label{fig:pretrain_hp}
+\end{figure}
+
 \paragraph{The ladder, preliminary: gluon exchange and multiplicity transfer from the rungs that carry them.} Each
 probe fine-tuned at $D=10$, $10^2$, $10^3$, $10^4$ from ladder rungs $4$ (up to gluon exchange) and $9$ (every rung,
 one loop included), from the best pretraining trial of each rung's first wave (lr $9.3\times10^{-4}$, EMA on; still rung $4$'s best
@@ -4699,10 +4722,9 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     process; the step budget stays $64$k on every rung (the user's call).
   \item \textbf{Star arms: two of six to redesign.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
     structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on hp47 and hp73, the
-    pretraining protocol since 2026-10-02 (the user's call, set on rungs $5$--$9$: the two points that won the ladder's
-    second wave, no search); each arm also holds the start-up trials that had run before the arms were cut to it (hp15,
-    hp30, hp95; hp95 is the best on the threshold arm, $2\times$ below hp47) and a few leftover guided ones
-    (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100, $\sim13$ GPU-h an arm at the protocol), then
+    pretraining protocol of 2026-10-02 to 10-04 (hp73 alone since, Fig.~\ref{fig:pretrain_hp}); each arm also holds the
+    start-up trials that had run before the arms were cut to it (hp15, hp30, hp95) and a few leftover guided ones
+    (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100), then
     fine-tuned with the grid's protocol on the arm's probe and on $ee\to d\bar d$ (\code{tp3\_s<arm>fte}; all cells in,
     \code{analysis/transfer/star\_arms.py}). Four arms test the structure they name: soft and collinear emission
     ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$, the same topology with $d$ for $u$); initial-state collinear
@@ -4723,7 +4745,7 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     and $+u\bar d\to\tau^+\nu_\tau$, the latter a new generator entry, $\tau$ massive); a Sudakov arm needs electroweak
     one-loop pools (\code{[virt=QED]} with MadGraph's \code{loop\_qcd\_qed\_sm}, not in the pipeline yet; probe $ee\to d\bar d$
     at $\sqrt s=500$--$1000$, arm $+ee\to\mu\mu$, $u\bar u$ there), verified to carry the logarithm before any pretraining.
-    Both pretrain at the protocol (hp47, hp73), $\sim26$ GPU-h for the two; waiting on the user's go-ahead, then the CPU
+    Both pretrain at the protocol (hp73 alone), $\sim13$ GPU-h for the two; waiting on the user's go-ahead, then the CPU
     steps first (the generator entry, the pools, an electroweak one-loop test on a few hundred $ee\to d\bar d$ points that the
     finite part grows as $\log^2(s/m_W^2)$). The Sudakov arm's two leftover guided trials on CC-IN2P3 (hp28, $24\times$ above
     hp47, and one cancelled mid-run) were deleted (2026-10-04, the user's call). The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
