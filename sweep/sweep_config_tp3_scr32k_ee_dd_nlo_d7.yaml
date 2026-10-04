@@ -10,7 +10,7 @@ cluster:
   time: 06:15:00
 paths: null
 sweep_name: tp3_scr32k_ee_dd_nlo_d7
-n_trials: 5
+n_trials: 8
 dyhpo:
   n_candidates: 200
   seed: 42

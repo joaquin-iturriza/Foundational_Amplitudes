@@ -12,7 +12,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, "sweep"))
 import siteconf  # noqa: E402
-from rebalance import _queue  # noqa: E402
+from rebalance import _queue, _ran  # noqa: E402
 
 INFRA = [("quota/disk", r"Disk quota exceeded|Errno 122|No space left on device|Errno 28"),
          ("checkpoint write", r"PytorchStreamWriter failed|unexpected pos \d+ vs \d+"),
@@ -51,6 +51,12 @@ def main():
     for sd in sorted({d for p in a.prefixes for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))}):
         name = os.path.basename(sd)
         if os.path.exists(os.path.join(sd, "MOVED_TO")) or sum(q.get(name, (0, 0, []))[:2]):
+            continue
+        # trial scripts generated but never run (a sweep not fed yet, a declined submit prompt) are still owed to
+        # the sweep by its own queue: refilling on top of them would add trials past the planned count
+        scripts = {os.path.basename(x) for x in glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))}
+        if scripts - {os.path.basename(x) for x in _ran(sd)}:
+            print(f"{name}: has never-run trial scripts, left alone")
             continue
         fails, n_done = failures(sd)
         owed = a.per_sweep - n_done

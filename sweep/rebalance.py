@@ -16,8 +16,8 @@ Per site, from the sweeps matching the prefixes:
   backlog  trials not finished and not running (queued, held by a dependency, or not yet submitted)
   rate     trials finished per hour over the last --window hours (result-file times): what the site is
            actually giving me, fair share and caps included
-  finish   backlog / rate (a site with no finished trial in the window takes its rate over 48 h, so an idle
-           site is not mistaken for a stalled one; with none in 48 h either, a backlog never finishes)
+  finish   backlog / rate (a site with no finished trial in the window is stalled, never finishing, if it has
+           queued work and runs nothing; an idle site or one still running takes its rate over 48 h)
 Sweeps go, one at a time, from the site that finishes last to the one that finishes first, while that
 brings the later of the two finish times at least --margin hours earlier.
 
@@ -121,6 +121,7 @@ def inventory(prefixes, scope, window_h):
                         "started": bool(res) or bool(ran) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
+                                     "running": sum(v[0] for v in q.values()),
                                      "long_window_h": LONG_WINDOW_H, "sweeps": sweeps}))
 
 
@@ -167,9 +168,12 @@ def plan(inv, margin_h):
     st = {}
     for s, v in inv.items():
         backlog = sum(x["remaining"] for x in v["sweeps"].values())
-        # a site that finished nothing in the window may be idle (its queue drained), not stalled: it then gets
-        # its rate over LONG_WINDOW_H, which a site that really stopped starting jobs keeps near zero
-        rate = v["recent"] / v["window_h"] if v["recent"] else v.get("recent_long", 0) / v.get("long_window_h", 1)
+        # a site that finished nothing in the window is stalled only if it holds queued work and runs nothing; an idle
+        # site (empty queue) or one whose running trials outlast the window (32k trials) gets its rate over
+        # LONG_WINDOW_H instead
+        rate = v["recent"] / v["window_h"]
+        if not rate and (backlog == 0 or v.get("running", 0) > 0):
+            rate = v.get("recent_long", 0) / v.get("long_window_h", 1)
         st[s] = {"backlog": backlog, "rate": rate}
     fin = lambda s, extra=0: (st[s]["backlog"] + extra) / st[s]["rate"] if st[s]["rate"] > 0 else (
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
