@@ -36,10 +36,10 @@ for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):
             if cand is None:
                 try:
                     import pickle
-                    cand = pickle.load(open(os.path.join(sdir, "dyhpo_state.pkl"), "rb"))["candidates_raw"]
+                    cand = pickle.load(open(os.path.join(siteconf.SWEEP_DIR, name, "dyhpo_state.pkl"), "rb"))["candidates_raw"]
                 except Exception:
                     cand = {}
-            c_ = cand[hp] if hp < len(cand) else None
+            c_ = cand.get(hp) if isinstance(cand, dict) else cand[hp] if hp < len(cand) else None
             if c_:
                 lr = lr if lr is not None else c_.get("training.lr")
                 hps = {"lambda": c_.get("training.regularization_lambda"), "warmup": c_.get("training.cosanneal_warmup_frac"),
