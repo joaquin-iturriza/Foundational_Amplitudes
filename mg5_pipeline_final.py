@@ -1522,6 +1522,18 @@ PROCESSES = {
     "ee_bb_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_bb", "nfinal": 2,
                   "n_loops": 1, "alphas_power": 1, "pdg_ids": [11, -11, 5, -5],
                   "m_finals": [4.7, 4.7], "param_card_patches": {}},
+    # 2->2 ELECTROWEAK one loop ([virt=QED], tools/nlo_virtual_pipeline.py `ew`): the alpha-stripped finite part,
+    # carrying the EW Sudakov log^2(s/M_W^2); the Sudakov star arm and its probe (2026-10-04). The stored target is
+    # the born's alpha^2 with one EW loop: [L_QCD, L_EW, alpha_s, alpha_ew] = [0, 1, 0, 2].
+    "ee_dd_ew_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_dd_ew", "nfinal": 2, "n_loops": 1,
+                     "alphas_power": 0, "order": [0, 1, 0, 2], "pdg_ids": [11, -11, 1, -1],
+                     "m_finals": [0.0, 0.0], "param_card_patches": {}},
+    "ee_uu_ew_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_uu_ew", "nfinal": 2, "n_loops": 1,
+                     "alphas_power": 0, "order": [0, 1, 0, 2], "pdg_ids": [11, -11, 2, -2],
+                     "m_finals": [0.0, 0.0], "param_card_patches": {}},
+    "ee_mumu_ew_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_mumu_ew", "nfinal": 2, "n_loops": 1,
+                       "alphas_power": 0, "order": [0, 1, 0, 2], "pdg_ids": [11, -11, -13, 13],
+                       "m_finals": [0.0, 0.0], "param_card_patches": {}},
     # 2->3 qqg QCD-virtual (born ∝ α_s; target ∝ α_s² → amp_orders [1,2]).
     "ee_uug_nlo": {"kind": "virt", "virt": True, "virt_base": "ee_uug", "nfinal": 3,
                    "n_loops": 1, "alphas_power": 2, "pdg_ids": [11, -11, 2, -2, 21],

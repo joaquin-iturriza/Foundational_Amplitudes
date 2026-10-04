@@ -1,0 +1,5 @@
+# Transfer study probe: ee_dd_ew_nlo alone (electroweak one loop at sqrt(s) = 500-1000, the Sudakov star arm's
+# probe). The data-scaling grid trains on prefixes of this train split (data.train_subsample = D); val and test fixed.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_dd_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

@@ -1,0 +1,12 @@
+# Transfer study, star arm (docs/results.tex sec:ladder; redesign of the Sudakov arm, the user's go-ahead 2026-10-04):
+# rung 1 (ee_uu, mumu, numu) plus electroweak one-loop targets at sqrt(s) = 500-1000, which carry the EW Sudakov
+# log^2(s/M_W^2) (tools/ew_sudakov_check.py); no pretraining process before had an electroweak loop. No probe is in
+# any arm. 1e5 train events per tree process, 5e4 per one-loop; mixture sampling.
+# + EW Sudakov logarithms: ee_mumu_ew_nlo, ee_uu_ew_nlo; probe ee_dd_ew_nlo
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

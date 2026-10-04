@@ -1,0 +1,6 @@
+# The electroweak one-loop pools of the Sudakov star arm and its probe, for one CPU prebuild.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_mumu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_dd_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

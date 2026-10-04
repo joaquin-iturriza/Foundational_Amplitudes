@@ -65,6 +65,17 @@ VIRT_PROCESSES = {
     "uubar_mumu":  {"mg5": "generate u u~ > mu+ mu- [virt=QCD]",         "pdg_ids": [2, -2, -13, 13], "m_finals": [0.0, 0.0]},
     "uubar_Zg":    {"mg5": "generate u u~ > z g [virt=QCD]",             "pdg_ids": [2, -2, 23, 21],  "m_finals": [91.1880, 0.0]},
     "udbar_tbbar": {"mg5": "generate u d~ > t b~ [virt=QCD]",            "pdg_ids": [2, -1, 6, -5],   "m_finals": [172.5, 4.7]},
+    # ELECTROWEAK one loop ([virt=QED], loop_qcd_qed_sm; `ew`): the stored target is the alpha-stripped
+    # finite part fin/(alpha/2pi), alpha = 1/aEWM1 of the locked card, at mu^2 = s; the per-event guard and the
+    # certification check the universal double pole -sum Q_i^2 over the massless charged legs (in alpha/2pi,
+    # normalised to the born). It carries the electroweak Sudakov log^2(s/M_W^2) (tools/ew_sudakov_check.py:
+    # finite/born -6% at 200 GeV to -29% at 3 TeV for ee -> dd~ at 90 degrees). The Sudakov star arm (2026-10-04).
+    "ee_dd_ew":   {"mg5": "generate e+ e- > d d~ [virt=QED]", "model": "loop_qcd_qed_sm", "ew": True,
+                   "pdg_ids": [11, -11, 1, -1], "m_finals": [0.0, 0.0]},
+    "ee_uu_ew":   {"mg5": "generate e+ e- > u u~ [virt=QED]", "model": "loop_qcd_qed_sm", "ew": True,
+                   "pdg_ids": [11, -11, 2, -2], "m_finals": [0.0, 0.0]},
+    "ee_mumu_ew": {"mg5": "generate e+ e- > mu+ mu- [virt=QED]", "model": "loop_qcd_qed_sm", "ew": True,
+                   "pdg_ids": [11, -11, -13, 13], "m_finals": [0.0, 0.0]},
     # LOOP-INDUCED (no tree): the target is |M_1|^2 itself, evaluated at the running
     # ([sqrvirt=...]: the [noborn=...] spelling trips an MG5 3.7.0 bug in `output standalone`)
     # alpha_s(sqrt s) like a tree; certification = the IR poles vanish. EW loops need
@@ -109,6 +120,15 @@ def _load_catalog_v2_virt():
     return n
 
 CATALOG_V2_VIRT = _load_catalog_v2_virt()
+
+ALPHA_EW = 1.0 / C.PARAM_CARD_PATCHES["aEWM1"]     # the locked card's alpha, MadLoop's QED normalisation
+
+
+def ew_double_pole(pdg_ids, masses):
+    """The universal QED 1/eps^2 coefficient in alpha/2pi, normalised to the born: -sum Q_i^2 over the massless
+    charged legs (checked: -0.002669 = -(alpha/2pi)(1+1+1/9+1/9) for ee -> dd~ at every point)."""
+    import particle_ids as P
+    return -sum(P.PARTICLE_PROPERTIES[p][0] ** 2 for p, m in zip(pdg_ids, masses) if not m or m <= 0)
 
 # Fortran subroutine appended to each standalone's f2py_wrapper.f so the f2py
 # module exposes the full Laurent array (born, finite, 1/eps, 1/eps^2).
@@ -288,6 +308,36 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and neg == 0) else "FA
     return "PASS" in out.stdout
 
 
+def certify_ew(process, n=50, seed=7, tol=1e-6):
+    """An electroweak one-loop standalone: at every point the double pole must be the universal QED one
+    (ew_double_pole) and the point stable. Runs in a subprocess (the f2py module chdir's and is a singleton)."""
+    cfg = VIRT_PROCESSES[process]
+    p0 = find_p0(virt_standalone_dir(process))
+    pred = ew_double_pole(cfg["pdg_ids"], [0.0, 0.0] + list(cfg["m_finals"]))
+    code = f"""
+import sys, numpy as np
+sys.path.insert(0, {HERE!r}); sys.path.insert(0, {ROOT!r})
+import nlo_madloop as ML, mg5_pipeline_final as mg
+cfg = {cfg!r}
+rng = np.random.default_rng({seed})
+ev, sq = mg.sample_nbody_phase_space({n}, 1.05*sum(cfg['m_finals']) + 30.0, 1000.0,
+                                     cfg['m_finals'], cfg['pdg_ids'], rng=rng, cuts=mg.FIDUCIAL_CUTS)
+g = ML.load({p0!r}); perm = mg.row_to_slot_perm(cfg['pdg_ids'], cfg['mg5'])
+worst, bad = 0.0, 0
+for (mom, _), s in zip(ev, sq):
+    r = ML.evaluate(g, mom[perm])
+    if r['rc'] // 100 == 4 or not r['born']: bad += 1; continue
+    worst = max(worst, abs(r['e2'] / r['born'] / ({ALPHA_EW!r} / (2 * np.pi)) - {pred!r}) / abs({pred!r}))
+print(f"[CERTIFY] {process}: QED double pole {pred:.4f}, worst relative deviation {{worst:.2e}}, unstable {{bad}}/{n}")
+print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and bad == 0) else "FAIL"))
+"""
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                         env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
+    lines = [l for l in out.stdout.splitlines() if "[CERTIFY]" in l]
+    print("  " + ("\n  ".join(lines) if lines else "(certifier crashed)\n  " + out.stderr.strip()[-800:]))
+    return "PASS" in out.stdout
+
+
 WIDTH_BACKUP = ".width_backup"
 
 
@@ -353,6 +403,8 @@ def pole_certify(process, n=100, seed=7):
     cfg = VIRT_PROCESSES[process]
     if cfg.get("loopind"):
         return certify_loop_induced(process, seed=seed)
+    if cfg.get("ew"):
+        return certify_ew(process, seed=seed)
     sa = virt_standalone_dir(process)
     p0 = find_p0(sa)
     # Rows in the stored convention plus the same row->slot permutation the generator
@@ -418,6 +470,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     mom_store = np.empty((n_events, npart * 4))
     amp = np.empty(n_events)
     loopind = bool(cfg.get("loopind"))
+    ew = bool(cfg.get("ew"))
+    a_ew = ALPHA_EW / (2.0 * np.pi)
 
     def evaluate_point(mom, sq):
         """(value, usable). MadLoop's return code hundreds digit 4 marks an
@@ -429,6 +483,14 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sq, alphas_mz=alphas_mz))
             # a non-positive |M_1|^2 is a MadLoop failure, not a value
             return r["fin"], (r["rc"] // 100 != 4) and (r["fin"] > 0.0)
+        if ew:
+            # alpha-stripped electroweak finite part at mu^2 = s; a point whose double pole is not the universal QED
+            # one, or that MadLoop flags unstable, is redrawn
+            r = ML.evaluate(get_me_full, mom[swap])
+            if r["rc"] // 100 == 4 or not r["born"] or \
+                    abs(r["e2"] / r["born"] / a_ew - c2_pred) > 1e-3 * max(abs(c2_pred), 1.0):
+                return 0.0, False
+            return r["fin"] / a_ew, True
         # Evaluate MadLoop at the per-event RUNNING α_s(√s) (scale μ=√s) when the
         # physical weighting is wanted, so a born that itself carries α_s (e.g. the
         # 2→3 ee→qqg LO) runs correctly with the energy; the normalized loop
@@ -452,7 +514,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return virt_e4 * (asrun / (2.0 * np.pi)), True
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
-    c2_pred = PC.double_pole(pdg, [0.0, 0.0] + list(m_finals))   # the set of legs only
+    c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [0.0, 0.0] + list(m_finals))   # the set of legs only
     bad = 0
     for i, (mom, _) in enumerate(events):
         value, usable = evaluate_point(mom, sqrts[i])
@@ -483,7 +545,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     np.save(out_file, arr)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
           f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional/wrong pole)={bad}  "
-          f"mass_shift={'on(m=%.1f)'%heavy_m if (mass_shift and heavy_m) else 'off'}")
+          f"mass_shift={'on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off'}")
     return out_file
 
 
