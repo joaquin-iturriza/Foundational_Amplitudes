@@ -26,6 +26,8 @@ for sdir in sorted(d for p in (sys.argv[1:] or ["tp3_ladder_r"]) for d in glob.g
            for f in glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))}
     trials = []
     for run in sorted(glob.glob(os.path.join(siteconf.PROJECT_DIR, "runs", name, "trial_*"))):
+        if not re.fullmatch(r"trial_\d+", os.path.basename(run)):
+            continue
         hp = int(run.rsplit("_", 1)[1])
         if not os.path.exists(os.path.join(run, "config.yaml")):
             continue
