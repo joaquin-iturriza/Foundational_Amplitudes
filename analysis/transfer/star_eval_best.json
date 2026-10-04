@@ -46,5 +46,11 @@
   "proc": null,
   "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_star_sudakov/trial_0018",
   "why": "diverged; its best checkpoint before the blow-up, rescored (tools/eval_best_val.py, 2026-10-04)"
+ },
+ "tp3_pre64_ee_uu_hp30": {
+  "val_loss": 1.0545997497501958e-06,
+  "proc": null,
+  "run_dir": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0030",
+  "why": "diverged; its best checkpoint before the blow-up, rescored (tools/eval_best_val.py, 2026-10-05; copied from Jean Zay)"
  }
 }

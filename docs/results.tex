@@ -4535,10 +4535,9 @@ hp73 alone (the user's call; until then hp47 and hp73).
 \includegraphics{../analysis/transfer/figs/pretrain_hp_landscape.pdf}
 \caption{Every $64$k-step pretraining trial's best $\vlnr$ over its pretraining's best. Top: per pretraining, the
 four recurring points marked (open: the best checkpoint rescored, the run diverged or could not write its result).
-Bottom: against the searched HPs (open: EMA off). Five diverged trials are drawn at their rescored best checkpoint, $30$--$230\times$ above their arm's best (hp30 on
-the soft, ISR and resonance arms, hp18 on the dead-cone and Sudakov arms; all with $\lambda\ge3\times10^{-7}$); not
-drawn, its rescoring resubmitted: hp30 on the $ee\to u\bar u$ pretraining (diverged at $35$k steps); nor the $22$
-stopped trials (cancelled or lost; \code{pretrain\_hp.py} lists them).}
+Bottom: against the searched HPs (open: EMA off). The six diverged trials are drawn at their rescored best checkpoint, $30$--$230\times$ above their pretraining's best
+(hp30 on the $ee\to u\bar u$ pretraining and the soft, ISR and resonance arms, hp18 on the dead-cone and Sudakov arms;
+all with $\lambda\ge3\times10^{-7}$). Not drawn: the $22$ stopped trials (cancelled or lost; \code{pretrain\_hp.py} lists them).}
 \label{fig:pretrain_hp}
 \end{figure}
 

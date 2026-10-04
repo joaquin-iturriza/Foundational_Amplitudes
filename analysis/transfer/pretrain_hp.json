@@ -745,7 +745,9 @@
 "ema": false,
 "state": "diverged",
 "step": 35003,
-"site": "jeanzay"
+"site": "jeanzay",
+"val_loss": 1.0545997497501958e-06,
+"rescored": true
 },
 {
 "hp": 33,
