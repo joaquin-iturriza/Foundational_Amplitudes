@@ -4834,8 +4834,17 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     queued work moved; on 2026-10-04 Jean Zay's A100 fair share had fallen to $0.002$ and $95$ unstarted $32$k trials moved to lxplus.
     The rest of the $32$k searches there ($278$ trials of sweeps that have started, so their DyHPO state is on Jean Zay and the
     rebalancer leaves them) ran nothing that evening ($124$ pending on priority, $154$ on dependencies), a projected
-    $\sim400$\,h. Moving a started sweep means moving its state by hand (cancel, copy the state and results, regenerate the
-    remaining trials at the destination); not done without the user's call.
+    $\sim400$\,h. On the user's call (2026-10-04, for preliminary results by the next day) these sweeps were cut and moved: each runs two
+    chosen points on lxplus (\code{sweep/pick_points.py}: the candidate of the sweep's own pool nearest the point, by
+    \code{generate\_sweep --extend --fixed-hp}; fine-tunes lr $1.2$, $1.8\times10^{-3}$ with $\lambda\approx3\times10^{-10}$,
+    where the $32$k fine-tunes already done had their bests; scratch lr $0.7$, $1.4\times10^{-3}$ with
+    $\lambda\approx2\times10^{-7}$, the $8$k scratch optimum moved to $32$k by $t^{-0.55}$), on top of the $1$--$2$ random
+    start-up trials each had run; the same for six CC-IN2P3 sweeps stuck behind its fair share ($0.14$) and six of its
+    sixteen V100 nodes out. $278$ queued trials cancelled on Jean Zay, $24$ on CC-IN2P3, the sweeps marked
+    \code{MOVED\_TO}. Rung $1$ runs the same two points on $u\bar d\to e^+\nu_e$, $ee\to d\bar d$ (EW one loop) and
+    $ee\to d\bar d$ (lr $1.3$, $2.2\times10^{-3}$), and so do the two redesigned arms once pretrained, so the arm against
+    rung $1$ compares the same points. Chosen from the data they are compared with: preliminary. Jean Zay's project has
+    only \code{itg@a100} and \code{itg@v100}, both over-consumed; the H100 partition needs an H100 allocation.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
