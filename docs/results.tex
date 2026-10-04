@@ -4595,8 +4595,11 @@ cell is its search's best so far, mostly of three random trials.}
     fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
     process; the step budget stays $64$k on every rung (the user's call).
   \item \textbf{Star arms: two of six to redesign.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
-    structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on the three start-up
-    trials plus hp47 and hp73 (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100, $\sim33$ GPU-h an arm), then
+    structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on hp47 and hp73, the
+    pretraining protocol since 2026-10-02 (the user's call, set on rungs $5$--$9$: the two points that won the ladder's
+    second wave, no search); each arm also holds the start-up trials that had run before the arms were cut to it (hp15,
+    hp30, hp95; hp95 is the best on the threshold arm, $2\times$ below hp47) and a few leftover guided ones
+    (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100, $\sim13$ GPU-h an arm at the protocol), then
     fine-tuned with the grid's protocol on the arm's probe and on $ee\to d\bar d$ (\code{tp3\_s<arm>fte}; all cells in,
     \code{analysis/transfer/star\_arms.py}). Four arms test the structure they name: soft and collinear emission
     ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$, the same topology with $d$ for $u$); initial-state collinear
@@ -4617,6 +4620,7 @@ cell is its search's best so far, mostly of three random trials.}
     and $+u\bar d\to\tau^+\nu_\tau$, the latter a new generator entry, $\tau$ massive); a Sudakov arm needs electroweak
     one-loop pools (\code{[virt=QED]} with MadGraph's \code{loop\_qcd\_qed\_sm}, not in the pipeline yet; probe $ee\to d\bar d$
     at $\sqrt s=500$--$1000$, arm $+ee\to\mu\mu$, $u\bar u$ there), verified to carry the logarithm before any pretraining.
+    Both pretrain at the protocol (hp47, hp73).
     The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
     (\code{transfer\_star\_pools.yaml}), copied to lxplus and Jean Zay.
   \item \textbf{Fine-tune grid, running.} All nine rungs and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte};
