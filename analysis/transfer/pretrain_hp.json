@@ -866,7 +866,9 @@
 "ema": true,
 "state": "diverged",
 "step": 37540,
-"site": "lxplus"
+"site": "lxplus",
+"val_loss": 0.00011473134969461008,
+"rescored": true
 },
 {
 "hp": 21,
@@ -1041,7 +1043,9 @@
 "ema": false,
 "state": "diverged",
 "step": 45118,
-"site": "lxplus"
+"site": "lxplus",
+"val_loss": 2.3996931195105523e-06,
+"rescored": true
 },
 {
 "hp": 47,
@@ -1213,7 +1217,9 @@
 "ema": false,
 "state": "diverged",
 "step": 38177,
-"site": "lxplus"
+"site": "lxplus",
+"val_loss": 3.023854428300458e-06,
+"rescored": true
 },
 {
 "hp": 33,
@@ -2490,7 +2496,9 @@
 "ema": false,
 "state": "diverged",
 "step": 41032,
-"site": "lxplus"
+"site": "lxplus",
+"val_loss": 1.4521445045283084e-05,
+"rescored": true
 },
 {
 "hp": 47,
@@ -2632,7 +2640,9 @@
 "ema": true,
 "state": "diverged",
 "step": 48646,
-"site": "ccin2p3"
+"site": "ccin2p3",
+"val_loss": 8.109065243274387e-05,
+"rescored": true
 },
 {
 "hp": 30,

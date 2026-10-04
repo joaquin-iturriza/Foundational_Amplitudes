@@ -4535,10 +4535,10 @@ hp73 alone (the user's call; until then hp47 and hp73).
 \includegraphics{../analysis/transfer/figs/pretrain_hp_landscape.pdf}
 \caption{Every $64$k-step pretraining trial's best $\vlnr$ over its pretraining's best. Top: per pretraining, the
 four recurring points marked (open: the best checkpoint rescored, the run diverged or could not write its result).
-Bottom: against the searched HPs (open: EMA off). Not drawn, no value yet: six diverged trials, rescoring
-submitted (hp30 on the $ee\to u\bar u$ pretraining, the soft, ISR and resonance arms, at $35$--$45$k steps; hp18 on the
-dead-cone and Sudakov arms, at $38$k and $49$k; all with $\lambda\ge3\times10^{-7}$), and $22$ stopped trials
-(cancelled or lost; \code{pretrain\_hp.py} lists them).}
+Bottom: against the searched HPs (open: EMA off). Five diverged trials are drawn at their rescored best checkpoint, $30$--$230\times$ above their arm's best (hp30 on
+the soft, ISR and resonance arms, hp18 on the dead-cone and Sudakov arms; all with $\lambda\ge3\times10^{-7}$); not
+drawn, its rescoring resubmitted: hp30 on the $ee\to u\bar u$ pretraining (diverged at $35$k steps); nor the $22$
+stopped trials (cancelled or lost; \code{pretrain\_hp.py} lists them).}
 \label{fig:pretrain_hp}
 \end{figure}
 
@@ -4844,7 +4844,11 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     \code{MOVED\_TO}. Rung $1$ runs the same two points on $u\bar d\to e^+\nu_e$, $ee\to d\bar d$ (EW one loop) and
     $ee\to d\bar d$ (lr $1.3$, $2.2\times10^{-3}$), and so do the two redesigned arms once pretrained, so the arm against
     rung $1$ compares the same points. Chosen from the data they are compared with: preliminary. Jean Zay's project has
-    only \code{itg@a100} and \code{itg@v100}, both over-consumed; the H100 partition needs an H100 allocation.
+    only \code{itg@a100} and \code{itg@v100}, both over-consumed; the H100 partition needs an H100 allocation. CC-IN2P3's
+    \code{gpu\_h100} (three nodes of four H100 NVL) runs FA (probe, 2026-10-04: torch and an xformers attention call), so
+    its jobs now ask for \code{gpu\_v100,gpu\_h100}, whichever starts first. The arms' fine-tune waiter once submitted
+    all $28$ arm sweeps while the pretrainings still ran (it matched its own marker in the echoed command); they were
+    removed before any trial started, and the waiter now matches the marker as a whole line.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
