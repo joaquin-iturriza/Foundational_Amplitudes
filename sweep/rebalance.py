@@ -16,7 +16,8 @@ Per site, from the sweeps matching the prefixes:
   backlog  trials not finished and not running (queued, held by a dependency, or not yet submitted)
   rate     trials finished per hour over the last --window hours (result-file times): what the site is
            actually giving me, fair share and caps included
-  finish   backlog / rate (a site with backlog and no finished trial in the window: never)
+  finish   backlog / rate (a site with no finished trial in the window takes its rate over 48 h, so an idle
+           site is not mistaken for a stalled one; with none in 48 h either, a backlog never finishes)
 Sweeps go, one at a time, from the site that finishes last to the one that finishes first, while that
 brings the later of the two finish times at least --margin hours earlier.
 
@@ -29,6 +30,7 @@ import argparse, glob, json, os, re, subprocess, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITES = ["ccin2p3", "jeanzay", "lxplus"]
+LONG_WINDOW_H = 48            # hours of finished trials that set the rate of a site with none in --window
 PER_SWEEP_FALLBACK = 5        # trials in a sweep whose job scripts were never written (not generated yet)
 
 
@@ -88,12 +90,13 @@ def inventory(prefixes, scope, window_h):
         from sweep_manager import load_registry, DEFAULT_REGISTRY
         reg = {n: {"scripts": [os.path.basename(i.get("script", "")) for i in e["jobs"].values()]}
                for n, e in load_registry(DEFAULT_REGISTRY)["sweeps"].items()}
-    now, sweeps, recent = time.time(), {}, 0
+    now, sweeps, recent, recent_long = time.time(), {}, 0, 0
     names = sorted({os.path.basename(d) for p in scope for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))})
     for name in names:
         sd = os.path.join(siteconf.SWEEP_DIR, name)
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))
         recent += sum(os.path.getmtime(r) > now - window_h * 3600 for r in res)
+        recent_long += sum(os.path.getmtime(r) > now - LONG_WINDOW_H * 3600 for r in res)
         scripts = glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))
         ran = _ran(sd)
         run, qd, ids = q.get(name, (0, 0, []))
@@ -117,7 +120,8 @@ def inventory(prefixes, scope, window_h):
                         "remaining": remaining,
                         "started": bool(res) or bool(ran) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
-                                     "recent": recent, "window_h": window_h, "sweeps": sweeps}))
+                                     "recent": recent, "window_h": window_h, "recent_long": recent_long,
+                                     "long_window_h": LONG_WINDOW_H, "sweeps": sweeps}))
 
 
 def release(dest, names):
@@ -163,7 +167,9 @@ def plan(inv, margin_h):
     st = {}
     for s, v in inv.items():
         backlog = sum(x["remaining"] for x in v["sweeps"].values())
-        rate = v["recent"] / v["window_h"]
+        # a site that finished nothing in the window may be idle (its queue drained), not stalled: it then gets
+        # its rate over LONG_WINDOW_H, which a site that really stopped starting jobs keeps near zero
+        rate = v["recent"] / v["window_h"] if v["recent"] else v.get("recent_long", 0) / v.get("long_window_h", 1)
         st[s] = {"backlog": backlog, "rate": rate}
     fin = lambda s, extra=0: (st[s]["backlog"] + extra) / st[s]["rate"] if st[s]["rate"] > 0 else (
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
