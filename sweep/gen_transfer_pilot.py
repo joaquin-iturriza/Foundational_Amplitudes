@@ -64,9 +64,10 @@ K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_ttbar_nlo_thr": 9, "ee_dd_nlo_hi": 
 # the star arms (the user approved them, 2026-10-02): rung 1 plus one structure each (recipes/transfer_star_<arm>.yaml),
 # pretrained as the rungs; the probes they add, never in any pretraining: ee_ddbarg (soft/collinear), ee_ttbarg (the
 # massive quasi-collinear limit), ee_ttbar_nlo_thr (ee_ttbar_nlo 5-30% above threshold), ee_dd_nlo_hi (ee_dd_nlo at
-# sqrt(s) >= 500, Sudakov). The isr and resonance arms reuse uubar_Zg and ee_nnbar.
-STARS = ["soft", "isr", "deadcone", "resonance", "threshold", "sudakov"]
-STAR_PROBES = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi"]
+# sqrt(s) >= 500, Sudakov). The isr and resonance arms reuse uubar_Zg and ee_nnbar. The redesign (the user's go-ahead,
+# 2026-10-04; resonance and Sudakov tested neither): wpole, rung 1 plus the W pole, probe udbar_enu.
+STARS = ["soft", "isr", "deadcone", "resonance", "threshold", "sudakov", "wpole"]
+STAR_PROBES = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi", "udbar_enu"]
 # sigma-steered pools (tools/steer_pool.py; the user's call, 2026-09-30, after the ee->WW forward corner):
 # the same probe on a pool built once from a reference model's sigma, scratch only, D <= 1e4, on the
 # target of the probe's existing sweeps: ee->WW keeps the t-channel factor on, as its tp_scr sweeps, and
