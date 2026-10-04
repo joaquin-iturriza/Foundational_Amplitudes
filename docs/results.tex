@@ -4526,7 +4526,8 @@ a rung adds the structure a probe needs, its gain rises: $u\bar u\to gg$ from $1
 $u\bar u\to Zg$ to $4.0$ and $Zggg$ to $2.8$ once the $W+ng$ family is in (rung $9$; rung $4$ leaves them at $1.1$ and
 $1.3$), $ud\to ud$ to $5.9$ from rung $9$ ($52\times$ at $10^4$), and $ee\to b\bar b$ at one loop to $4.5$ and $6.9$.
 The near probe loses a little ($ee\to d\bar d$ $4.3\to2.9$, $2.7$): every pretraining process gets a smaller share of the
-same $64$k steps as the rungs grow, and each one's own loss rises with the rung (Fig.~\ref{fig:ladder_pre_dataset}). $ee\to Z\gamma$ and $ee\to W^+W^-$ stay near $1$ from every pretraining. Four
+same $64$k steps as the rungs grow, though each one's own loss moves within $\sim3\times$ up to rung $8$ and jumps only
+at rung $9$ (Fig.~\ref{fig:ladder_pre_dataset}, the pretraining paragraph above). $ee\to Z\gamma$ and $ee\to W^+W^-$ stay near $1$ from every pretraining. Four
 cells per probe and one search each: a direction, not a measurement.
 \begin{figure}[H]
 \centering
@@ -4581,9 +4582,37 @@ of $\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$ over the probe's cells,
 user asked for a rule, 2026-10-02, weighing large $D$, where a factor in data matters most, against small $D$, noisier but
 what rare processes need; weighting large $D$ or small $D$ more moves the leader only where the top two are within
 $1.13\times$); leaders within $1.2\times$ of the best are reported as tied, $1.2$ being a provisional bound on what one seed's
-five-trial search resolves, to be replaced by the seed spread. The rung with the structure beats the one below it clearly
-on $u\bar u\to Zggg$ (rung $8$, above), $ee\to t\bar t$ at small $D$ (rung $5$, masses) and $ud\to ud$ at $D\le10^{2.5}$ (rung $4$);
-elsewhere the two are within the spread of the other pretrainings.
+five-trial search resolves, to be replaced by the seed spread. The rung with the structure is below the one without it
+at every $D$ only for multiplicity: $u\bar u\to Zggg$ (rung $8$, $1.7$--$3.1\times$) and $u\bar u\to Zgg$ (rung $7$,
+$1.1$--$1.8\times$); $ud\to ud$ gains from rung $4$ (gluon exchange) only at $D\le10^2$ ($2$--$7\times$). On the other
+probes the ratio swings both ways cell to cell ($ee\to t\bar t$ from rung $5$: $7\times$ lower at $D=10$, $4\times$
+higher at $10^3$), the scale of one seed's spread at a cell (Fig.~\ref{fig:ladder_seeds}); Table~\ref{tab:rung_focus_ratio}
+gives the ratio at every probe and $D$.
+\begin{table}[H]
+\centering
+\caption{The ratio $L_{\text{rung below}}/L_{\text{rung with structure}}$ behind Fig.~\ref{fig:rung_focus}, per probe
+and $D$: above $1$, the rung with the structure fine-tunes better.}
+\label{tab:rung_focus_ratio}
+\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+probe (first rung with the structure) & $10$ & $10^{1.5}$ & $10^2$ & $10^{2.5}$ & $10^3$ & $10^{3.5}$ & $10^4$ \\
+\midrule
+$ee\to d\bar d$ (rung $1$) & $0.96$ & $0.52$ & $1.63$ & $6.29$ & $0.75$ & $2.99$ & $8.10$ \\
+$ee\to\nu_e\bar\nu_e$ (rung $2$) & $1.04$ & $0.86$ & $0.92$ & $3.17$ & $0.86$ & $1.40$ & $1.26$ \\
+$ee\to Z\gamma$ (rung $3$) & $1.14$ & $0.58$ & $0.94$ & $0.77$ & $1.82$ & $1.36$ & $0.73$ \\
+$ud\to ud$ (rung $4$) & $7.10$ & $2.03$ & $2.28$ & $0.65$ & $1.08$ & $0.28$ & $0.83$ \\
+$ee\to t\bar t$ (rung $5$) & $6.86$ & $1.83$ & $3.78$ & $0.87$ & $0.24$ & $3.48$ & $2.50$ \\
+$ee\to W^+W^-$ (rung $6$) & $0.65$ & $1.33$ & $2.57$ & $2.17$ & $2.59$ & $2.40$ & $0.44$ \\
+$u\bar u\to gg$ (rung $6$) & $3.70$ & $0.59$ & $4.01$ & $1.02$ & $1.11$ & $1.79$ & $0.26$ \\
+$u\bar u\to Zg$ (rung $6$) & $1.23$ & $1.09$ & $0.45$ & $0.91$ & $0.40$ & $0.56$ & $1.64$ \\
+$u\bar u\to Zgg$ (rung $7$) & $1.72$ & $1.21$ & $1.40$ & $1.52$ & $1.53$ & $1.10$ & $1.82$ \\
+$u\bar u\to Zggg$ (rung $8$) & $3.10$ & $1.95$ & $2.60$ & $2.02$ & $1.67$ & $2.14$ & $2.68$ \\
+$ee\to d\bar d$ at one loop (rung $9$) & $1.41$ & $1.54$ & $0.50$ & $0.56$ & $1.00$ & $1.66$ & $2.12$ \\
+$ee\to b\bar b$ at one loop (rung $9$) & $1.41$ & $1.84$ & $0.72$ & $0.36$ & $0.71$ & $0.93$ & $0.74$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/rung_focus_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_ee_b.pdf}} \\[1ex]
@@ -4639,8 +4668,20 @@ $4\times$ at $10^4$: added structure costs the near probe little.
   \item \textbf{Seeds (low priority, the user's call).} Done for the scratch curves of seven probes; the
     fine-tune arm and the five probes the factors touch still need theirs, for the final curves (the seed mean
     at each cell's chosen HPs, with a band, not the search minimum).
-  \item \textbf{Longer horizons, last.} After everything else: the $D=10^{3.5}$ and $10^4$ cells at
-    $32$k steps with a search (the lr window re-centred for the horizon), and a $32$k check at $10^3$.
+  \item \textbf{Longer horizons, running.} The $D=10^{3.5}$ and $10^4$ cells at $32$k steps with a search, the lr window
+    re-centred for the horizon (\code{gen\_transfer\_pilot.py --horizon 32000}, 2026-10-04): scratch on the twelve probes at
+    the scratch protocol's $8$ trials (\code{tp3\_scr32k}), and fine-tunes at the grid's $5$ from each probe's best-overall
+    rung (Fig.~\ref{fig:rung_focus}: $ee\to d\bar d$ r1, $ee\to W^+W^-$ r3, $ee\to d\bar d$ 1-loop r5, $ee\to\nu_e\bar\nu_e$ r6, $ud\to ud$,
+    $ee\to b\bar b$ 1-loop and $u\bar u\to Zg$ r7, $ee\to Z\gamma$, $Zgg$, $Zggg$ r8, $ee\to t\bar t$ and $u\bar u\to gg$ r9; rung $4$
+    and the $32$k $ee\to u\bar u$ were unranked then) and from the $64$k $ee\to u\bar u$ (\code{tp3\_r}$n$\code{fte32k},
+    \code{tp3\_uu64fte32k}): $72$ sweeps, $\sim450$ GPU-h, Jean Zay (A100) and lxplus. $ee\to W^+W^-$ stays on the mixture
+    pool, as in the grid. At $ee\to d\bar d$ the best-overall rung at HEAD is r9, tied with r1 within $1.2\times$. The $32$k
+    check at $D=10^3$ is done (one run per probe at its cell's best HPs, \code{job\_transfer\_calib.sh}, Jean Zay): against the
+    $8$k cell, $ee\to t\bar t$ gains $4.0\times$, $ud\to ud$ $1.5\times$, $ee\to Z\gamma$ $1.2\times$; $ee\to d\bar d$ and the one-loop
+    probes, $u\bar u\to Zgg$, $Zggg$ and $ee\to\nu_e\bar\nu_e$ move by $\le1.2\times$ or rise ($0.3$--$1.0\times$); several best
+    checkpoints sit early ($4800$--$12480$ of $32$k: over-training at $10^3$), and $u\bar u\to gg$ diverged at step $28224$
+    (its best before that not yet read). One run against a best-of-$8$ search is biased toward the $8$k value, so $8$k
+    stands at $10^3$ where the $32$k run does not beat it clearly.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
@@ -4682,20 +4723,35 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     and $+u\bar d\to\tau^+\nu_\tau$, the latter a new generator entry, $\tau$ massive); a Sudakov arm needs electroweak
     one-loop pools (\code{[virt=QED]} with MadGraph's \code{loop\_qcd\_qed\_sm}, not in the pipeline yet; probe $ee\to d\bar d$
     at $\sqrt s=500$--$1000$, arm $+ee\to\mu\mu$, $u\bar u$ there), verified to carry the logarithm before any pretraining.
-    Both pretrain at the protocol (hp47, hp73).
-    The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
+    Both pretrain at the protocol (hp47, hp73), $\sim26$ GPU-h for the two; waiting on the user's go-ahead, then the CPU
+    steps first (the generator entry, the pools, an electroweak one-loop test on a few hundred $ee\to d\bar d$ points that the
+    finite part grows as $\log^2(s/m_W^2)$). The Sudakov arm's two leftover guided trials on CC-IN2P3 (hp28, $24\times$ above
+    hp47, and one cancelled mid-run) were deleted (2026-10-04, the user's call). The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
     (\code{transfer\_star\_pools.yaml}), copied to lxplus and Jean Zay.
-  \item \textbf{Fine-tune grid, running.} All nine rungs and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte};
-    Fig.~\ref{fig:rung_grid}): rungs $1$--$3$ and $5$--$8$ on Jean Zay, rung $4$ and $ee\to u\bar u$ on lxplus, rung $9$
-    on CC-IN2P3. About $100$ rung $1$--$3$ trials crashed when Jean Zay's quota filled; their $26$ recorded penalties
-    are retracted, and each sweep gets replacement trials to five once its queue drains. \code{tp3\_uufte} starts from the $32$k $ee\to u\bar u$
-    pretraining, the parent of Table~\ref{tab:ladder_transfer_all}, so against that table it isolates the change of
-    fine-tune protocol; against the rungs ($64$k parents) it mixes in the budget. The $ee\to u\bar u$ pretraining is
-    redone at $64$k steps (\code{tp3\_pre64\_ee\_uu}), cut as rungs $5$--$9$ were: hp15 $2.3\times10^{-8}$, hp95
-    $1.2\times10^{-8}$, hp30 diverged; its three guided trials (hp33, hp115, hp125, at points measured bad on the
-    ladder) were cancelled for hp47 and hp73, running on A100. A second grid fine-tunes from its best, the comparison
-    with the rungs at one budget. The four probes whose $64$k large-$D$ runs timed out rerun on lxplus (queued for
-    $12$\,h slots).
+  \item \textbf{Fine-tune grid: $16$ trials left.} The grid is in (results above); the last $16$ trials of rung $4$ and
+    \code{tp3\_uufte}, lost to the EOS quota, were refilled on lxplus on 2026-10-04. The rung comparison mixes structure with
+    training per process at a fixed $64$k steps (the ladder item above).
+  \item \textbf{Large $D$.} All fourteen probe/$D$ points at $10^{4.5}$, $10^5$ now exist on the grid's target
+    (\code{large\_d\_64k.json}), one run each. Whether they join the grid figures, drawn apart as a different horizon, is
+    open; the grid figures leave them out (the user stopped a first version, 2026-10-03).
+  \item \textbf{lxplus storage.} The EOS project quota ($1$\,TB logical) filled twice (2026-10-02/03 and the night of the
+    3rd), and $\sim370$ trials failed writing their logs or checkpoints. FA's finished runs were moved to CC-IN2P3
+    (\code{runs\_from\_lxplus/}, copied site to site, each directory's file count and bytes checked on both ends before the
+    EOS copy was removed): $76$ older-study runs ($47$\,GB), then $222$ directories (the complete rung $9$ grid and every
+    \code{tp\_}, \code{tp2\_}, \code{tps\_} scratch and calibration run, their numbers already collected). Most of the quota is
+    another project's: the model files of the non-best runs of every amplitude\_DSI sweep and scan were deleted (the user's
+    call, 2026-10-04; $3256$ runs, $171$\,GB; per HP sweep the lowest validation MSE keeps its models, per scan point the best
+    repeat; runs without a results file untouched), leaving EOS at $80\%$. The AFS home (sweep logs, submit files) was at
+    $94\%$ of $2$\,GB; an unused Claude Code binary went, $76\%$. \code{rung\_grid}'s rung $9$ normalizations are now read from
+    the moved directories on CC.
+  \item \textbf{Keeping the grids running across sites.} \code{sweep/refill.py} retracts trials an infrastructure failure
+    took (quota, checkpoint write, I/O, a leftover run directory) from a sweep's DyHPO state and refills the sweep to its
+    planned count; a failure of any other kind is listed and left alone. \code{sweep/rebalance.py} (CLAUDE.md) moves sweeps
+    that have not started from the latest-finishing site to the earliest, hourly; a site with nothing finished in its window
+    takes its $48$\,h rate if it is idle or still running (a drained lxplus was read as stalled), and stays stalled if it has
+    queued work and runs nothing. On 2026-10-03 five of CC-IN2P3's sixteen V100 nodes were out (one without GPUs since
+    Oct 2, three drained after job failures, one for a security update) and our fair share there was $0.14$, so its
+    queued work moved; on 2026-10-04 Jean Zay's A100 fair share had fallen to $0.002$ and $95$ unstarted $32$k trials moved to lxplus.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
