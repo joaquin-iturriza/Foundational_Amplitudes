@@ -1,11 +1,12 @@
-"""Transfer study, the HP landscape of the fine-tune grids (every *fte cell at the grid's horizons: rungs 1-9, ee_uu at 32k
+"""Transfer study, the HP landscape of the fine-tune grids (every *fte cell at the grid's horizons, lr_scale and layer_decay fixed at 1 (the fine-tune lr is searched): rungs 1-9, ee_uu at 32k
 and 64k, the star arms; the grid's protocol, docs/results.tex sec:ladder: 5 trials, 3 random start-up then 2 DyHPO-guided,
 lr searched over [1e-3, 1e-2] with the common space), to judge whether the protocol can run fewer trials or steps.
 Data: analysis/transfer/finetune_hp.json (collect_sweeps.py tp3_ on every site, merged; a cell's trials in evaluation
 order). Every ratio: val_loss_no_reg at the trial's best checkpoint over the best of its cell (same probe, D, parent).
 D = 10^(k/2).
-  <base>_landscape  per k, the median ratio in bins of lr, lambda, warm-up fraction, and against EMA (on/off)
-  <base>_protocol   (a) the best of the first n trials over the best of five, median and 90th percentile, per k;
+  <base>_landscape_a..f  per D, the median ratio in bins of lr, lambda, warm-up, eta_min, EMA decay (EMA-on trials), and
+                    for EMA off and on; bars: 16th-84th percentile over 200 resamples of the cells
+  <base>_protocol   (a) the best of the first n trials over the best of five, median and 90th percentile, per k (bars as above);
                     (b) where the best checkpoint sits in the horizon, and the first validation within 1.1x of it
     python analysis/transfer/finetune_hp.py
 """
@@ -33,41 +34,67 @@ def plain_log(ax, axis, ticks, fmt):
 rows = [(kof(n), t, t["val_loss"] / min(x["val_loss"] for x in v)) for n, v in F.items() for t in v]
 
 
-def binned(ax, key, edges, logx):
+NB = 200                                                    # bootstrap resamples, over cells
+RNG = np.random.default_rng(0)
+cells_k = {k: [v for n, v in F.items() if kof(n) == k] for k in K}
+
+
+def boot(k, stat):
+    """stat(list of cells) -> array; its value and its 16th/84th percentiles over cell resamples."""
+    cs = cells_k[k]
+    b = np.array([stat([cs[i] for i in RNG.integers(0, len(cs), len(cs))]) for _ in range(NB)])
+    return stat(cs), np.nanpercentile(b, 16, 0), np.nanpercentile(b, 84, 0)
+
+
+def ratios_of(cs, sel=lambda t: True):
+    return [(t, t["val_loss"] / min(x["val_loss"] for x in v)) for v in cs for t in v if sel(t)]
+
+
+def binned(ax, key, edges, logx, sel=lambda t: True):
     for k in K:
-        x = np.array([t[key] for kk, t, r in rows if kk == k]); y = np.array([r for kk, t, r in rows if kk == k])
-        xc, ym = [], []
-        for lo, hi in zip(edges[:-1], edges[1:]):
-            m = (x >= lo) & (x < hi)
-            if m.sum() >= 10:
-                xc.append(np.sqrt(lo * hi) if logx else (lo + hi) / 2); ym.append(np.median(y[m]))
-        ax.plot(xc, ym, "o-", color=COL[k], label=lab(k))
+        def stat(cs):
+            tr = ratios_of(cs, sel)
+            x = np.array([t[key] for t, _ in tr]); y = np.array([r for _, r in tr])
+            return np.array([np.median(y[(x >= lo) & (x < hi)]) if ((x >= lo) & (x < hi)).sum() >= 10 else np.nan
+                             for lo, hi in zip(edges[:-1], edges[1:])])
+        m, lo, hi = boot(k, stat)
+        xc = np.sqrt(edges[:-1] * edges[1:]) if logx else (edges[:-1] + edges[1:]) / 2
+        ok = ~np.isnan(m)
+        ax.errorbar(xc[ok], m[ok], yerr=[m[ok] - lo[ok], hi[ok] - m[ok]], fmt="o-", color=COL[k], capsize=2, label=lab(k))
     if logx:
         ax.set_xscale("log")
     ax.set_yscale("log"); ax.set_ylabel(YL)
-    plain_log(ax, "y", [1, 1.5, 2, 3, 4], lambda v: f"{v:g}")
+    plain_log(ax, "y", [1, 1.5, 2, 3, 4, 5], lambda v: f"{v:g}")
 
 
-fig, axes = ps.figure(ncols=2, nrows=2)
-binned(axes[0, 0], "lr", np.geomspace(1e-3, 1e-2, 9), True); axes[0, 0].set_xlabel("lr")
-plain_log(axes[0, 0], "x", [1e-3, 2e-3, 5e-3, 1e-2], lambda v: rf"${v * 1e3:g}\times10^{{-3}}$" if v < 1e-2 else r"$10^{-2}$")
-binned(axes[0, 1], "lambda", np.geomspace(1e-10, 1e-6, 9), True); axes[0, 1].set_xlabel(r"$\lambda$")
-binned(axes[1, 0], "warmup", np.linspace(0.05, 0.2, 7), False); axes[1, 0].set_xlabel("warm-up fraction")
-ax = axes[1, 1]
-for e, mk, name in ((True, "o-", "EMA on"), (False, "s--", "EMA off")):
-    ax.plot(K, [np.median([r for kk, t, r in rows if kk == k and t["ema"] == e]) for k in K], mk, color="k", label=name)
-ax.set_xlabel(r"$k$, $D=10^{k/2}$"); ax.set_yscale("log"); ax.set_ylabel(YL)
-plain_log(ax, "y", [1, 1.2, 1.5, 2, 2.5], lambda v: f"{v:g}")
-ps.legend(ax, "upper left"); ps.make_room(ax)
-ps.shared_legend(fig, axes[0, 0], ncol=4)
-ps.save(fig, FIG + "_landscape")
+figs = ps.panels(6)
+(_, a0), (_, a1), (_, a2), (_, a3), (_, a4), (_, a5) = figs
+binned(a0, "lr", np.geomspace(1e-3, 1e-2, 9), True); a0.set_xlabel("lr (fine-tune)")
+plain_log(a0, "x", [1e-3, 2e-3, 5e-3, 1e-2], lambda v: rf"${v * 1e3:g}\times10^{{-3}}$" if v < 1e-2 else r"$10^{-2}$")
+binned(a1, "lambda", np.geomspace(1e-10, 1e-6, 9), True); a1.set_xlabel(r"$\lambda$")
+binned(a2, "warmup", np.linspace(0.05, 0.2, 7), False); a2.set_xlabel("warm-up fraction")
+binned(a3, "eta_min", np.geomspace(1e-10, 1e-7, 7), True); a3.set_xlabel(r"$\eta_{\min}$")
+binned(a4, "ema_decay", np.linspace(0.9, 0.999, 7), False, sel=lambda t: t["ema"]); a4.set_xlabel("EMA decay (EMA on)")
+for k in K:                                                 # EMA off / on, as the other panels: the HP on x, a line per D
+    m, lo, hi = boot(k, lambda cs: np.array([np.median([r for _, r in ratios_of(cs, lambda t: t["ema"] == e)])
+                                             for e in (False, True)]))
+    a5.errorbar([0, 1], m, yerr=[m - lo, hi - m], fmt="o-", color=COL[k], capsize=2)
+a5.set_xticks([0, 1], ["off", "on"]); a5.set_xlim(-0.4, 1.4); a5.set_xlabel("EMA")
+a5.set_yscale("log"); a5.set_ylabel(YL); plain_log(a5, "y", [1, 1.5, 2, 3], lambda v: f"{v:g}")
+for _, ax in figs:
+    ps.make_room(ax)
+a0.plot([], [], " ", label=r"bars: $68\%$ bootstrap over cells")
+ps.shared_legend(figs[0][0], a0, ncol=3)
+ps.save_panels(figs, FIG + "_landscape")
 
 fig, (a, b) = ps.figure(ncols=2)
 for k in K:
-    reg = np.array([[min(t["val_loss"] for t in v[:m]) / min(t["val_loss"] for t in v) for m in range(1, 6)]
-                    for n, v in F.items() if kof(n) == k])
-    a.plot(range(1, 6), np.median(reg, 0), "o-", color=COL[k], label=lab(k))
-    a.plot(range(1, 6), np.quantile(reg, 0.9, 0), "o:", color=COL[k])
+    reg = lambda cs: np.array([[min(t["val_loss"] for t in v[:m]) / min(t["val_loss"] for t in v) for m in range(1, 6)]
+                               for v in cs])
+    for q, mk in ((0.5, "o-"), (0.9, "o:")):
+        m, lo, hi = boot(k, lambda cs: np.quantile(reg(cs), q, 0))
+        a.errorbar(np.arange(1, 6) + (0.08 if q == 0.9 else 0), m, yerr=[m - lo, hi - m], fmt=mk, color=COL[k], capsize=2,
+                   label=lab(k) if q == 0.5 else None)
 a.plot([], [], "-", color="k", label="median"); a.plot([], [], ":", color="k", label="90th percentile")
 a.set_xlabel("trials run, in evaluation order"); a.set_yscale("log")
 a.set_ylabel(r"$\mathcal{L}_{\rm val}^{{\rm best\ of\ first}\ n}/\mathcal{L}_{\rm val}^{\rm best\ of\ 5}$")

@@ -4560,13 +4560,17 @@ best checkpoint sits at the end of the horizon ($94$--$98\%$ for $D\ge10^3$): no
 $D=10^2$, where they could be cut, cost $41$ of the grid's $421$ GPU-h.
 \begin{figure}[H]
 \centering
-\includegraphics{../analysis/transfer/figs/finetune_hp_landscape.pdf}\\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/finetune_hp_landscape_a.pdf}\hfill\pnl{../analysis/transfer/figs/finetune_hp_landscape_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/finetune_hp_landscape_c.pdf}\hfill\pnl{../analysis/transfer/figs/finetune_hp_landscape_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/finetune_hp_landscape_e.pdf}\hfill\pnl{../analysis/transfer/figs/finetune_hp_landscape_f.pdf}} \\[1ex]
 \includegraphics{../analysis/transfer/figs/finetune_hp_protocol.pdf}
-\caption{The fine-tune grids' trials, each over its cell's best, per $D$. Top: the median against lr, $\lambda$ and
-warm-up (bins with ten trials or more), and with EMA on and off. Bottom left: the best of the first $n$ trials (evaluation
+\caption{The fine-tune grids' trials (the searched space: the fine-tune lr, $\lambda$, warm-up, $\eta_{\min}$, EMA and its
+decay; \code{lr\_scale} and \code{layer\_decay} fixed at $1$), each over its cell's best, per $D$. (a)--(e): the median
+against lr, $\lambda$, warm-up, $\eta_{\min}$ and the EMA decay (EMA-on trials), in bins with ten trials or more; (f) with EMA
+off and on. Bars: $16$th--$84$th percentile over $200$ resamples of the cells. Bottom left: the best of the first $n$ trials (evaluation
 order: three random start-up trials, then two guided) over the best of five, median (solid) and 90th percentile
 (dotted). Bottom right: where the cell's best trial has its best checkpoint, and its first validation within $1.1\times$
-of it, as a fraction of the horizon (median, 10th--90th percentile).}
+of it, as a fraction of the horizon (median; bars: the 10th--90th percentile over cells, a spread, not an uncertainty).}
 \label{fig:finetune_hp}
 \end{figure}
 
