@@ -60,14 +60,15 @@ Z_FAMILY = ["uubar_Zg", "uubar_Zgg", "uubar_Zggg"]
 # masses, one loop). The one-loop pools hold 5e4 train events, so
 # their grid stops at k = 9.
 LADDER = ["ee_nnbar", "ee_Za", "ud_ud", "ee_ttbar", "ee_WW", "ee_dd_nlo", "ee_bb_nlo"]
-K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_ttbar_nlo_thr": 9, "ee_dd_nlo_hi": 9}
+K_MAX = {"ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_ttbar_nlo_thr": 9, "ee_dd_nlo_hi": 9, "ee_dd_ew_nlo": 9}
 # the star arms (the user approved them, 2026-10-02): rung 1 plus one structure each (recipes/transfer_star_<arm>.yaml),
 # pretrained as the rungs; the probes they add, never in any pretraining: ee_ddbarg (soft/collinear), ee_ttbarg (the
 # massive quasi-collinear limit), ee_ttbar_nlo_thr (ee_ttbar_nlo 5-30% above threshold), ee_dd_nlo_hi (ee_dd_nlo at
 # sqrt(s) >= 500, Sudakov). The isr and resonance arms reuse uubar_Zg and ee_nnbar. The redesign (the user's go-ahead,
-# 2026-10-04; resonance and Sudakov tested neither): wpole, rung 1 plus the W pole, probe udbar_enu.
-STARS = ["soft", "isr", "deadcone", "resonance", "threshold", "sudakov", "wpole"]
-STAR_PROBES = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi", "udbar_enu"]
+# 2026-10-04; resonance and Sudakov tested neither): wpole, rung 1 plus the W pole, probe udbar_enu; sudakovew, rung 1
+# plus electroweak one-loop targets at 500-1000 GeV, probe ee_dd_ew_nlo.
+STARS = ["soft", "isr", "deadcone", "resonance", "threshold", "sudakov", "wpole", "sudakovew"]
+STAR_PROBES = ["ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr", "ee_dd_nlo_hi", "udbar_enu", "ee_dd_ew_nlo"]
 # sigma-steered pools (tools/steer_pool.py; the user's call, 2026-09-30, after the ee->WW forward corner):
 # the same probe on a pool built once from a reference model's sigma, scratch only, D <= 1e4, on the
 # target of the probe's existing sweeps: ee->WW keeps the t-channel factor on, as its tp_scr sweeps, and
