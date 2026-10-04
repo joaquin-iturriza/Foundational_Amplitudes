@@ -1,0 +1,41 @@
+"""Transfer study, the star arms: rung 1 plus one structure each (recipes/transfer_star_<arm>.yaml), fine-tuned with
+the grid's protocol on the arm's own probe and on ee -> dd~ (tp3_s<arm>fte). Panels (a)-(f): each arm on its own probe,
+against scratch and against rung 1 (the arm without its structure). Panel (g): ee -> dd~, rung 1's own probe, from
+every arm, to show what adding a structure costs where rung 1 already does well. Same cells and values as rung_grid.py.
+    python analysis/transfer/star_arms.py      -> figs/star_arms_a..g
+"""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cells import ROOT, best, scratch  # noqa: E402
+from rung_grid import LAB, curve  # noqa: E402
+sys.path.insert(0, ROOT)
+import plot_style as ps  # noqa: E402
+
+# arm -> (its probe, what it adds to rung 1); docs/results.tex sec:ladder-open, the star arms item
+ARMS = {"soft": ("ee_ddbarg", "soft/collinear emission"), "isr": ("uubar_Zg", "initial-state collinear"),
+        "deadcone": ("ee_ttbarg", "massive quasi-collinear"), "resonance": ("ee_nnbar", "narrow resonances"),
+        "threshold": ("ee_ttbar_nlo_thr", r"$t\bar t$ threshold"), "sudakov": ("ee_dd_nlo_hi", "Sudakov logarithms")}
+ARM_C = dict(zip(ARMS, (ps.C.vermillion, ps.C.orange, ps.C.green, ps.C.purple, ps.C.sky, ps.C.yellow)))
+
+figs = ps.panels(len(ARMS) + 1)
+for (fig, ax), (arm, (p, what)) in zip(figs, ARMS.items()):
+    ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", label="from scratch")
+    ax.plot(*curve(lambda k: best(f"tp3_r1fte_{p}_d{k}")[0]), "o-", color=ps.C.blue, label="rung 1")
+    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm])
+    ps.process_label(ax, LAB[p] + "\n+ " + what)
+fig, ax = figs[-1]
+p = "ee_ddbar"
+ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k")
+ax.plot(*curve(lambda k: best(f"tp3_r1fte_{p}_d{k}")[0]), "o-", color=ps.C.blue)
+for arm in ARMS:
+    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm])
+ps.process_label(ax, LAB[p] + "\nfrom every arm")
+for _, ax in figs:
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ps.make_room(ax)
+a0 = figs[0][1]
+for arm, (_, what) in ARMS.items():                   # one colour per arm, in its own panel and in (g)
+    a0.plot([], [], "o-", color=ARM_C[arm], label=f"rung 1 + {what}")
+ps.shared_legend(figs[0][0], a0, ncol=2)
+ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", "star_arms"))
