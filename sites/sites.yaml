@@ -17,7 +17,7 @@ ccin2p3:
     - source /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sites/activate.sh
   cluster:
     scheduler: slurm
-    partition: gpu_v100
+    partition: gpu_v100,gpu_h100   # either, whichever starts first; FA runs on the H100 NVL (probe 2026-10-04, torch + xformers)
     account:   lpnhe
     qos:       gpu
     gpu_flag:  "--gpus={n}"        # job_submit.lua dies on a typed --gres; --gpus is what it reads
