@@ -3959,7 +3959,8 @@ from-scratch $L(D)$ over the number of training events $D$.
 fine-tunes a near probe ($ee\to d\bar d$, same topology, other couplings) and a far one
 ($u\bar u\to gg$: gluons, $t/u$-channel exchange, the gluon self-coupling). The ladder then
 adds one kind of structure per rung, each probed by a target that needs it: massless
-$s$-channel; electroweak $t$-channel ($ee\to\nu_e\bar\nu_e$); external photons ($ee\to Z\gamma$);
+$s$-channel; electroweak $t$-channel ($ee\to\nu_e\bar\nu_e$, whose $t$-channel is a $W$, while the rung's
+Bhabha exchanges a $\gamma$ or $Z$; no rung before $6$ has a $W$); external photons ($ee\to Z\gamma$);
 gluon exchange and colour ($ud\to ud$ near, $u\bar u\to gg$ far); masses ($ee\to t\bar t$,
 $ee\to W^+W^-$); multiplicity; one loop (tree/loop pairs; $ee\to b\bar b$ at one loop, whose
 tree is pretrained on, and $ee\to d\bar d$ at one loop, whose tree is not); divergences.
@@ -3970,7 +3971,9 @@ $2\to3$ and fine-tuning $Zggg$ tests extrapolation in multiplicity. Divergences 
 types, not only the deep-IR pools: soft and collinear emission, initial-state collinear
 ($u\bar u\to Zg$ at small $p_{T,Z}$), the $t$-channel forward peak, the quasi-collinear massive
 limit (the dead cone, $ee\to b\bar bg$), narrow resonances, the $t\bar t$ threshold (Coulomb
-$1/\beta$ at one loop) and Sudakov logarithms in the one-loop finite parts. Each enters as a star
+$1/\beta$ at one loop) and Sudakov logarithms. Every one-loop pool in the study is MadLoop's QCD virtual
+(\code{[virt=QCD]}, its finite part at $\mu=\sqrt s$; \code{mg5\_pipeline\_final.py}, \code{tools/nlo\_virtual\_pipeline.py}):
+no electroweak loop, hence no electroweak Sudakov logarithm, is in any target. Each enters as a star
 arm (the first rung plus one axis, scored on its own probe and on the first rung's) next to the
 ladder, which shows what adding more and more structure does. The finale is the model with every
 structure against scratch on every held-out probe. The rungs as built (\code{recipes/transfer\_ladder\_r1..9.yaml},
@@ -4591,17 +4594,31 @@ cell is its search's best so far, mostly of three random trials.}
     recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises at rung $9$ at a
     fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
     process; the step budget stays $64$k on every rung (the user's call).
-  \item \textbf{Star arms, running.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one structure,
-    not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained as the rungs (\code{tp3\_star\_<arm>}, $64$k
-    steps, $8$ trials): soft and collinear emission ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$); initial-state
-    collinear ($+u\bar d\to Wg$; probe $u\bar u\to Zg$); the massive quasi-collinear limit ($+ee\to b\bar bg$, $b\bar bgg$;
-    probe $ee\to t\bar tg$, since $c$ is massless in the generator); narrow resonances ($+ee\to ZZ$, $ZH$; probe
-    $ee\to\nu_e\bar\nu_e$); the $t\bar t$ threshold ($+u\bar u\to t\bar t$ tree and one loop at $\sqrt s=363$--$450$;
-    probe $ee\to t\bar t$ at one loop there, which carries the Coulomb $1/\beta$); Sudakov logarithms ($+u\bar u\to d\bar d$,
-    $ZZ$ at one loop, $\sqrt s\ge500$; probe $ee\to d\bar d$ at one loop there). The $t$-channel arm would be rung $2$
-    and is dropped. The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Each arm is
-    then fine-tuned on its probe and on $ee\to d\bar d$. Pools built on CC-IN2P3 (\code{transfer\_star\_pools.yaml}),
-    copied to lxplus and Jean Zay.
+  \item \textbf{Star arms: two of six to redesign.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
+    structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on the three start-up
+    trials plus hp47 and hp73 (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100, $\sim33$ GPU-h an arm), then
+    fine-tuned with the grid's protocol on the arm's probe and on $ee\to d\bar d$ (\code{tp3\_s<arm>fte}; all cells in,
+    \code{analysis/transfer/star\_arms.py}). Four arms test the structure they name: soft and collinear emission
+    ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$, the same topology with $d$ for $u$); initial-state collinear
+    ($+u\bar d\to Wg$; probe $u\bar u\to Zg$); the $t\bar t$ threshold ($+u\bar u\to t\bar t$ tree and one loop at
+    $\sqrt s=363$--$450$; probe $ee\to t\bar t$ at one loop there: the Coulomb $1/\beta$ is a QCD one-loop term, so the
+    QCD-virtual target carries it); the massive quasi-collinear limit ($+ee\to b\bar bg$, $b\bar bgg$; probe $ee\to t\bar tg$,
+    $c$ being massless in the generator), weakly: $m_b/\sqrt s\le0.2$ against a strongly massive top. Two do not.
+    \emph{Narrow resonances} ($+ee\to ZZ$, $ZH$; probe $ee\to\nu_e\bar\nu_e$): the probe's resonance, the $s$-channel $Z$
+    pole, is already in rung $1$ ($ee\to\nu_\mu\bar\nu_\mu$, only the generation feature tells the two neutrinos apart), what
+    the probe adds is the $t$-channel $W$, and $ZZ$, $ZH$ (both also in rung $5$) put on-shell bosons in the final state,
+    which the probe has none of. \emph{Sudakov logarithms} ($+u\bar u\to d\bar d$, $ZZ$ at one loop, $\sqrt s\ge500$, both
+    rung-$9$ processes; probe $ee\to d\bar d$ at one loop there): every target is QCD-virtual at $\mu=\sqrt s$, so none
+    has the electroweak $\log^2(s/m_W^2)$; the probe is the QCD vertex correction to $\gamma^*/Z\to d\bar d$, which for
+    massless quarks at $\mu=\sqrt s$ is the Born times a constant (from the one-loop formula, not yet checked on the pool),
+    and the arm's processes carry boxes and initial-state vertices it lacks. Both arms' results stand as controls (unrelated
+    structure added to rung $1$), not as tests of their names. Redesign, proposed: a resonance arm on the $W$ pole, which no
+    rung before $6$ has (probe $u\bar d\to e^+\nu_e$, \code{udbar\_enu}, in no equality class; arm $+u\bar d\to e^+\nu_eg$
+    and $+u\bar d\to\tau^+\nu_\tau$, the latter a new generator entry, $\tau$ massive); a Sudakov arm needs electroweak
+    one-loop pools (\code{[virt=QED]} with MadGraph's \code{loop\_qcd\_qed\_sm}, not in the pipeline yet; probe $ee\to d\bar d$
+    at $\sqrt s=500$--$1000$, arm $+ee\to\mu\mu$, $u\bar u$ there), verified to carry the logarithm before any pretraining.
+    The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
+    (\code{transfer\_star\_pools.yaml}), copied to lxplus and Jean Zay.
   \item \textbf{Fine-tune grid, running.} All nine rungs and $ee\to u\bar u$ (\code{tp3\_r<n>fte}, \code{tp3\_uufte};
     Fig.~\ref{fig:rung_grid}): rungs $1$--$3$ and $5$--$8$ on Jean Zay, rung $4$ and $ee\to u\bar u$ on lxplus, rung $9$
     on CC-IN2P3. About $100$ rung $1$--$3$ trials crashed when Jean Zay's quota filled; their $26$ recorded penalties
