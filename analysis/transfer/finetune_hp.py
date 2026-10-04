@@ -19,7 +19,14 @@ import plot_style as ps  # noqa: E402
 
 F = json.load(open(os.path.join(ROOT, "analysis", "transfer", "finetune_hp.json")))
 FIG = os.path.join(ROOT, "analysis", "transfer", "figs", "finetune_hp")
-F = {n: v for n, v in F.items() if len(v) >= 5}
+# a cell is its first five trials in evaluation order (the protocol); a cell run twice (on two sites, before a move)
+# or extended past five keeps its first five; a cell with fewer than five results is listed, not used
+SHORT = {n: len(v) for n, v in F.items() if len(v) < 5}
+LONG = {n: len(v) for n, v in F.items() if len(v) > 5}
+F = {n: v[:5] for n, v in F.items() if len(v) >= 5}
+print(f"{len(F)} cells; cut to their first five trials: " + ", ".join(f"{n} ({k})" for n, k in sorted(LONG.items())))
+print("not used, fewer than five results (running, diverged or lost; no result file): "
+      + ", ".join(f"{n} ({k})" for n, k in sorted(SHORT.items())))
 kof = lambda n: int(re.search(r"_d(\d+)$", n).group(1))
 K = sorted({kof(n) for n in F})
 COL = dict(zip(K, ps.sequence(len(K))))

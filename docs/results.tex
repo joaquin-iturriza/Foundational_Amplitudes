@@ -4570,7 +4570,12 @@ against lr, $\lambda$, warm-up, $\eta_{\min}$ and the EMA decay (EMA-on trials),
 off and on. Bars: $16$th--$84$th percentile over $200$ resamples of the cells. Bottom left: the best of the first $n$ trials (evaluation
 order: three random start-up trials, then two guided) over the best of five, median (solid) and 90th percentile
 (dotted). Bottom right: where the cell's best trial has its best checkpoint, and its first validation within $1.1\times$
-of it, as a fraction of the horizon (median; bars: the 10th--90th percentile over cells, a spread, not an uncertainty).}
+of it, as a fraction of the horizon (median; bars: the 10th--90th percentile over cells, a spread, not an uncertainty).
+A cell is its first five trials in evaluation order: three cells had more (\code{tp3\_ssoftfte\_ee\_ddbarg} at
+$D=10^{3.5}$, $10^4$, run on two sites; \code{tp3\_r7fte\_ud\_ud} at $D=10^{1.5}$). Not used, fewer than five results
+(running, diverged or lost): rung $1$ on $u\bar d\to e^+\nu_e$ at $D\ge10^3$ (running), rung $4$ on the two one-loop
+probes at $D=10^2$ and on $ee\to t\bar t$ at $10^{2.5}$, $ee\to u\bar u$ on $Z\gamma$, $d\bar d$ at one loop and $gg$ at
+$10^{2.5}$ (\code{finetune\_hp.py} lists them).}
 \label{fig:finetune_hp}
 \end{figure}
 
