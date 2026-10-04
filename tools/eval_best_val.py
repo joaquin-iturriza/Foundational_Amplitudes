@@ -11,12 +11,12 @@ import json, os, sys, tempfile
 
 import numpy as np
 import torch
-import siteconf
 from omegaconf import OmegaConf, open_dict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
+import siteconf  # noqa: E402
 from rebuild_run import _build, load_best_state  # noqa: E402
 
 for run_dir in sys.argv[1:]:
