@@ -19,14 +19,38 @@ import plot_style as ps  # noqa: E402
 
 F = json.load(open(os.path.join(ROOT, "analysis", "transfer", "finetune_hp.json")))
 FIG = os.path.join(ROOT, "analysis", "transfer", "figs", "finetune_hp")
-# a cell is its first five trials in evaluation order (the protocol); a cell run twice (on two sites, before a move)
-# or extended past five keeps its first five; a cell with fewer than five results is listed, not used
-SHORT = {n: len(v) for n, v in F.items() if len(v) < 5}
-LONG = {n: len(v) for n, v in F.items() if len(v) > 5}
-F = {n: v[:5] for n, v in F.items() if len(v) >= 5}
-print(f"{len(F)} cells; cut to their first five trials: " + ", ".join(f"{n} ({k})" for n, k in sorted(LONG.items())))
-print("not used, fewer than five results (running, diverged or lost; no result file): "
-      + ", ".join(f"{n} ({k})" for n, k in sorted(SHORT.items())))
+# a cell is ONE sweep's first five trials in evaluation order (the protocol: three random start-up, two guided). A cell
+# run on two sites (started on one, generated again on the other by a move) holds two independent DyHPO runs: the site
+# with the most results is the cell, the other's trials are left out. A cell whose sweep has fewer than five results is
+# listed, not used.
+def one_sweep(v):
+    by = {}
+    for t in v:
+        by.setdefault(t["site"], []).append(t)
+    site = max(by, key=lambda s: len(by[s]))
+    return sorted(by[site], key=lambda t: t["order"] if t["order"] is not None else 99), len(by) > 1
+
+
+SPLIT, SHORT, LONG = [], {}, {}
+G = {}
+for n, v in F.items():
+    w, split = one_sweep(v)
+    if split:
+        SPLIT.append(n)
+    if len(w) < 5:
+        SHORT[n] = len(w)
+        continue
+    if len(w) > 5:
+        LONG[n] = len(w)
+    G[n] = w[:5]
+F = G
+# the protocol questions (best of the first n, start-up against guided) need cells that ran it: three start-up trials,
+# then two guided. A cell whose start-up trials failed and were replaced (refills after the EOS quota) is not one.
+CLEAN = {n: v for n, v in F.items() if [bool(t["startup"]) for t in v] == [True, True, True, False, False]}
+print(f"{len(CLEAN)} of {len(F)} cells ran three start-up then two guided trials (the protocol panel uses those)")
+print(f"{len(F)} cells; run on two sites, one site's sweep kept: " + ", ".join(sorted(SPLIT)))
+print("cut to their first five trials: " + ", ".join(f"{n} ({k})" for n, k in sorted(LONG.items())))
+print("not used, fewer than five results in one sweep: " + ", ".join(f"{n} ({k})" for n, k in sorted(SHORT.items())))
 kof = lambda n: int(re.search(r"_d(\d+)$", n).group(1))
 K = sorted({kof(n) for n in F})
 COL = dict(zip(K, ps.sequence(len(K))))
@@ -46,9 +70,9 @@ RNG = np.random.default_rng(0)
 cells_k = {k: [v for n, v in F.items() if kof(n) == k] for k in K}
 
 
-def boot(k, stat):
+def boot(k, stat, cs=None):
     """stat(list of cells) -> array; its value and its 16th/84th percentiles over cell resamples."""
-    cs = cells_k[k]
+    cs = cells_k[k] if cs is None else cs
     b = np.array([stat([cs[i] for i in RNG.integers(0, len(cs), len(cs))]) for _ in range(NB)])
     return stat(cs), np.nanpercentile(b, 16, 0), np.nanpercentile(b, 84, 0)
 
@@ -95,11 +119,12 @@ ps.shared_legend(figs[0][0], a0, ncol=3)
 ps.save_panels(figs, FIG + "_landscape")
 
 fig, (a, b) = ps.figure(ncols=2)
+cells_clean = {k: [v for n, v in CLEAN.items() if kof(n) == k] for k in K}
 for k in K:
     reg = lambda cs: np.array([[min(t["val_loss"] for t in v[:m]) / min(t["val_loss"] for t in v) for m in range(1, 6)]
                                for v in cs])
     for q, mk in ((0.5, "o-"), (0.9, "o:")):
-        m, lo, hi = boot(k, lambda cs: np.quantile(reg(cs), q, 0))
+        m, lo, hi = boot(k, lambda cs: np.quantile(reg(cs), q, 0), cells_clean[k])
         a.errorbar(np.arange(1, 6) + (0.08 if q == 0.9 else 0), m, yerr=[m - lo, hi - m], fmt=mk, color=COL[k], capsize=2,
                    label=lab(k) if q == 0.5 else None)
 a.plot([], [], "-", color="k", label="median"); a.plot([], [], ":", color="k", label="90th percentile")
@@ -109,7 +134,7 @@ a.set_xticks(range(1, 6)); plain_log(a, "y", [1, 2, 5, 10], lambda v: f"{v:g}")
 for key, mk, name in (("best_step", "o", "best checkpoint"), ("reach110", "s", r"first validation within $1.1\times$ of it")):
     med, lo, hi = [], [], []
     for k in K:
-        best = [min(v, key=lambda t: t["val_loss"]) for n, v in F.items() if kof(n) == k]
+        best = [min(v, key=lambda t: t["val_loss"]) for n, v in F.items() if kof(n) == k]   # any one-sweep cell
         f = np.array([(t["best_step"] / t["T"]) if key == "best_step" else t["reach110"] for t in best
                       if t.get(key) is not None])
         med.append(np.median(f)); lo.append(np.quantile(f, 0.1)); hi.append(np.quantile(f, 0.9))
