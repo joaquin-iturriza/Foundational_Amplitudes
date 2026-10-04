@@ -4542,6 +4542,34 @@ dead-cone and Sudakov arms, at $38$k and $49$k; all with $\lambda\ge3\times10^{-
 \label{fig:pretrain_hp}
 \end{figure}
 
+\paragraph{The fine-tune protocol's landscape: no HP matters much at small $D$, a low lr at large $D$, and the guided
+trials no better than random ones.} Every cell of the fine-tune grids ($1058$ cells with five trials: rungs $1$--$9$,
+$ee\to u\bar u$ at $32$k and $64$k, the star arms; \code{finetune\_hp.py}, \code{finetune\_hp.json}, collected on every
+site), each trial over its cell's best (Fig.~\ref{fig:finetune_hp}). Up to $D=10^2$ the cell is flat: the median trial is
+$1.2$--$1.3\times$ above the best, nothing in lr, $\lambda$, warm-up or EMA moves it, and the best checkpoint comes at
+$20$--$33\%$ of the horizon. From $D=10^{2.5}$ on the spread grows ($5$--$8\times$ for the worst of five at $D\ge10^3$)
+and one knob shows: lr above $\sim3\times10^{-3}$ costs $1.4$--$4.3\times$ at $D\ge10^3$, the best lr sits at
+$1$--$2.5\times10^{-3}$ (median $1.9\times10^{-3}$ at $D=10^{3.5}$, $10^4$; $23\%$ of the bests below $1.3\times10^{-3}$, near
+the window's floor); $\lambda$ near $10^{-6}$ costs $1.9$--$3.8\times$ there; warm-up and EMA do nothing at any $D$. The two DyHPO-guided
+trials hold the cell's best in $34$--$47\%$ of the cells, what two of five random draws would; the best of the three
+random start-up trials is the cell's best in the median cell at every $D$, $1.2$--$2.0\times$ above it at the 90th
+percentile. A trial in the good region (lr $\le2.5\times10^{-3}$, $\lambda\le10^{-7}$) is not safe alone: $1.1$--$1.3\times$
+above the cell's best in the median, $3.3$--$4.5\times$ at the 90th percentile for $D\ge10^2$, so the scatter between trials
+of a cell is wider than any HP trend, and a fixed point (the pretraining's answer) would not do here. At large $D$ the
+best checkpoint sits at the end of the horizon ($94$--$98\%$ for $D\ge10^3$): no steps to save there; the cells up to
+$D=10^2$, where they could be cut, cost $41$ of the grid's $421$ GPU-h.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/finetune_hp_landscape.pdf}\\[1ex]
+\includegraphics{../analysis/transfer/figs/finetune_hp_protocol.pdf}
+\caption{The fine-tune grids' trials, each over its cell's best, per $D$. Top: the median against lr, $\lambda$ and
+warm-up (bins with ten trials or more), and with EMA on and off. Bottom left: the best of the first $n$ trials (evaluation
+order: three random start-up trials, then two guided) over the best of five, median (solid) and 90th percentile
+(dotted). Bottom right: where the cell's best trial has its best checkpoint, and its first validation within $1.1\times$
+of it, as a fraction of the horizon (median, 10th--90th percentile).}
+\label{fig:finetune_hp}
+\end{figure}
+
 \paragraph{The ladder, preliminary: gluon exchange and multiplicity transfer from the rungs that carry them.} Each
 probe fine-tuned at $D=10$, $10^2$, $10^3$, $10^4$ from ladder rungs $4$ (up to gluon exchange) and $9$ (every rung,
 one loop included), from the best pretraining trial of each rung's first wave (lr $9.3\times10^{-4}$, EMA on; still rung $4$'s best
@@ -4741,18 +4769,32 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     which the probe has none of. \emph{Sudakov logarithms} ($+u\bar u\to d\bar d$, $ZZ$ at one loop, $\sqrt s\ge500$, both
     rung-$9$ processes; probe $ee\to d\bar d$ at one loop there): every target is QCD-virtual at $\mu=\sqrt s$, so none
     has the electroweak $\log^2(s/m_W^2)$; the probe is the QCD vertex correction to $\gamma^*/Z\to d\bar d$, which for
-    massless quarks at $\mu=\sqrt s$ is the Born times a constant (from the one-loop formula, not yet checked on the pool),
+    massless quarks at $\mu=\sqrt s$ is the Born times a constant (MadLoop, \code{tools/ew\_sudakov\_check.py}: finite over
+    Born $=0.0468$ at every point from $100$\,GeV to $3$\,TeV and three angles, constant to $10^{-16}$; so is the ladder's
+    one-loop probe $ee\to d\bar d$, the same target over $25$--$1000$\,GeV: its pool is the tree pool times a constant),
     and the arm's processes carry boxes and initial-state vertices it lacks. Both arms' results stand as controls (unrelated
-    structure added to rung $1$), not as tests of their names. Redesign, proposed: a resonance arm on the $W$ pole, which no
-    rung before $6$ has (probe $u\bar d\to e^+\nu_e$, \code{udbar\_enu}, in no equality class; arm $+u\bar d\to e^+\nu_eg$
-    and $+u\bar d\to\tau^+\nu_\tau$, the latter a new generator entry, $\tau$ massive); a Sudakov arm needs electroweak
-    one-loop pools (\code{[virt=QED]} with MadGraph's \code{loop\_qcd\_qed\_sm}, not in the pipeline yet; probe $ee\to d\bar d$
-    at $\sqrt s=500$--$1000$, arm $+ee\to\mu\mu$, $u\bar u$ there), verified to carry the logarithm before any pretraining.
-    Both pretrain at the protocol (hp73 alone), $\sim13$ GPU-h for the two; waiting on the user's go-ahead, then the CPU
-    steps first (the generator entry, the pools, an electroweak one-loop test on a few hundred $ee\to d\bar d$ points that the
-    finite part grows as $\log^2(s/m_W^2)$). The Sudakov arm's two leftover guided trials on CC-IN2P3 (hp28, $24\times$ above
+    structure added to rung $1$), not as tests of their names. Redesign, running (the user's go-ahead, 2026-10-04): a resonance arm on the $W$ pole, which no
+    rung before $6$ has (\code{transfer\_star\_wpole.yaml}: rung $1$ $+u\bar d\to e^+\nu_eg$, $+u\bar d\to\tau^+\nu_\tau$, a new
+    generator entry, $\tau$ massive; probe $u\bar d\to e^+\nu_e$, \code{udbar\_enu}, in no equality class), and a Sudakov arm
+    on electroweak one-loop targets (\code{transfer\_star\_sudakovew.yaml}: rung $1$ $+ee\to\mu\mu$, $u\bar u$ at one loop,
+    electroweak, $\sqrt s=500$--$1000$; probe $ee\to d\bar d$ there, \code{ee\_dd\_ew\_nlo}). The one-loop pipeline now
+    generates electroweak virtuals (\code{[virt=QED]}, \code{loop\_qcd\_qed\_sm}; the target is the finite part over
+    $\alpha/2\pi$ at $\mu^2=s$; the per-event guard and the certification check the universal QED double pole
+    $-\sum_iQ_i^2$ over the massless charged legs, met to $10^{-13}$ on all three). They carry the logarithm: for
+    $ee\to d\bar d$ at $90^\circ$ the finite part over the Born goes from $-6\%$ at $200$\,GeV to $-29\%$ at $3$\,TeV, a
+    fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3}$ at $\cos\theta=\pm0.5$;
+    \code{ew\_sudakov\_check.json}); the pools change sign (finite part negative on $65$--$92\%$ of the events). Submitted on
+    lxplus (2026-10-04): each arm's pretraining at hp73 (\code{tp3\_star\_wpole}, \code{tp3\_star\_sudakovew}), each new
+    probe's scratch search ($8$ trials, $D=10$--$10^4$; \code{tp3\_scr\_udbar\_enu\_d}$k$\code{\_002}, the first generation
+    left unsubmitted, \code{tp3\_scr\_ee\_dd\_ew\_nlo}) and rung $1$ fine-tuned on both (\code{tp3\_r1fte}); the arms'
+    fine-tunes on their probe and on $ee\to d\bar d$ follow their pretrainings. The Sudakov arm's two leftover guided trials on CC-IN2P3 (hp28, $24\times$ above
     hp47, and one cancelled mid-run) were deleted (2026-10-04, the user's call). The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
     (\code{transfer\_star\_pools.yaml}), copied to lxplus and Jean Zay.
+  \item \textbf{The fine-tune protocol, open (the user's call).} From Fig.~\ref{fig:finetune_hp}: three trials instead of
+    five (the start-up only) saves $40\%$ of the fine-tune GPU-h, at no cost in the median cell and $1.2$--$2\times$ in the
+    worst tenth; the lr window $[10^{-3},10^{-2}]$ spends its top half on points $2$--$4\times$ worse at $D\ge10^3$, and $23\%$
+    of the bests sit near its floor, so a window lower down (e.g. $[5\times10^{-4},4\times10^{-3}]$) would make each trial count
+    more; $\lambda$'s top decade could go. Steps: nothing to cut where the cost is.
   \item \textbf{Fine-tune grid: $16$ trials left.} The grid is in (results above); the last $16$ trials of rung $4$ and
     \code{tp3\_uufte}, lost to the EOS quota, were refilled on lxplus on 2026-10-04. The rung comparison mixes structure with
     training per process at a fixed $64$k steps (the ladder item above).
@@ -4777,6 +4819,10 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     queued work and runs nothing. On 2026-10-03 five of CC-IN2P3's sixteen V100 nodes were out (one without GPUs since
     Oct 2, three drained after job failures, one for a security update) and our fair share there was $0.14$, so its
     queued work moved; on 2026-10-04 Jean Zay's A100 fair share had fallen to $0.002$ and $95$ unstarted $32$k trials moved to lxplus.
+    The rest of the $32$k searches there ($278$ trials of sweeps that have started, so their DyHPO state is on Jean Zay and the
+    rebalancer leaves them) ran nothing that evening ($124$ pending on priority, $154$ on dependencies), a projected
+    $\sim400$\,h. Moving a started sweep means moving its state by hand (cancel, copy the state and results, regenerate the
+    remaining trials at the destination); not done without the user's call.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
