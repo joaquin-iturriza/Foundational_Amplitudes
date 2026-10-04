@@ -2,7 +2,7 @@
 Per trial: the result JSON (val/test loss at the best checkpoint, best_step, the validation curve),
 the horizon, the run's prepd_std (data_stats.json, to convert to MSE of log|M|^2) and its lr, lr
 from the run's config (a fine-tune also its lr_scale and layer_decay), and the other searched HPs (hps: lambda,
-warm-up, eta_min, EMA and its decay). Sweeps are matched by prefix, e.g. tp_scr_ (a `_002` suffix is kept).
+warm-up, eta_min, EMA and its decay), whether it was a random start-up trial and its place in the evaluation order. Sweeps are matched by prefix, e.g. tp_scr_ (a `_002` suffix is kept).
     python analysis/transfer/collect_sweeps.py tp_scr_ > out.json
 """
 import glob, json, os, re, sys
@@ -16,6 +16,13 @@ out = {}
 for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):   # = SWEEP_DIR except on lxplus (EOS)
     name = os.path.basename(sdir)
     trials, cand = [], None
+    try:                                       # the DyHPO state: start-up candidates and evaluation order
+        import pickle
+        st_ = pickle.load(open(os.path.join(siteconf.SWEEP_DIR, name, "dyhpo_state.pkl"), "rb"))
+        startup = {int(i) for i in st_.get("init_conf_indices", [])}
+        order = {int(h): i for i, (h, _) in enumerate(st_.get("eval_order", []))}
+    except Exception:
+        startup, order = None, {}
     for rp in sorted(glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))):
         m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(rp))
         hp, T = int(m.group(1)), int(m.group(2))
@@ -46,6 +53,7 @@ for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):
                        "eta_min": c_.get("training.cosanneal_eta_min"), "ema": c_.get("ema"),
                        "ema_decay": c_.get("training.ema_decay")}
         trials.append(dict(hp=hp, T=T, prepd_std=std, lr=lr, **({"fine_tune": ft} if ft else {}),
-                          **({"hps": hps} if hps else {}), **r))
+                          **({"hps": hps} if hps else {}),
+                          **({"startup": hp in startup, "order": order.get(hp)} if startup is not None else {}), **r))
     out[name] = trials
 json.dump(out, sys.stdout)
