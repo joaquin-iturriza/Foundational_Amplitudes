@@ -6,6 +6,7 @@ standardized loss times that process's prepd_std^2); a running one the number of
 the step (the log's "Training diverged" line). A diverged trial's value, its best checkpoint before the blow-up, is
 not in its log (the printed loss carries the L2 term, which swamps it at large lambda, to four decimals): it comes
 from tools/eval_best_val.py, kept in ladder_eval_best.json and read by ladder_pretrain.py.
+Other pretraining searches by prefix (default tp3_ladder_r): python analysis/transfer/collect_ladder.py tp3_star_ tp3_pre64_
 """
 import glob, json, os, re, sys, time
 import yaml
@@ -19,7 +20,7 @@ HP = {"lr": ("training", "lr"), "lambda": ("training", "regularization_lambda"),
 
 
 out = {}
-for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, "tp3_ladder_r*"))):
+for sdir in sorted(d for p in (sys.argv[1:] or ["tp3_ladder_r"]) for d in glob.glob(os.path.join(siteconf.RESULTS_DIR, p + "*"))):
     name = os.path.basename(sdir)
     res = {int(re.match(r"hp(\d+)_", os.path.basename(f)).group(1)): json.load(open(f))
            for f in glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))}
