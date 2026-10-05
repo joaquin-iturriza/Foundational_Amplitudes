@@ -28,7 +28,7 @@ for n in names:
     p, k = cell(n)
     v32 = best(n)[0]
     v8 = scratch(p, k, steered=False)[0] if "_scr32k_" in n else best(n.replace("32k", ""))[0]
-    if v32 is not None and v8 is not None:
+    if v32 is not None and v8 is not None and k in (7, 8):     # the figure's two D; ud_ud's d5/d6 are not drawn
         rows.append((n, p, k, "_scr32k_" in n, v32, v8))
 
 figs = ps.panels(3)
@@ -51,7 +51,7 @@ for n, ps_ in CH.items():
     tr = [t for t in S.get(n, []) + S.get(n + "_002", []) if t.get("val_loss") is not None]
     ch = [t["val_loss"] * t["prepd_std"] ** 2 for t in tr if t["hp"] in ps_]
     rd = [t["val_loss"] * t["prepd_std"] ** 2 for t in tr if t["hp"] not in ps_]
-    if ch and rd:
+    if ch and rd and cell(n)[1] in (7, 8):
         pts.append((cell(n)[1], "_scr32k_" in n, min(rd), min(ch)))
 for k in (7, 8):
     for scr, m in ((True, "o"), (False, "s")):

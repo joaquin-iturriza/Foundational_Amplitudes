@@ -68,6 +68,18 @@ HOLD_8K = {("scr", "ee_nnbar")}
 USE_32K = False     # scratch ee -> nu_e nu_e at 32k came out worse; its exploration is still running
 
 
+CHOSEN32 = json.load(open(os.path.join(ROOT, "analysis", "transfer", "horizon32k_chosen.json")))
+
+
+def best_chosen(name):
+    """A 32k cell on its two chosen points only (horizon32k_chosen.json; sweep/pick_points.py), so every 32k cell is the
+    best of the same two points: the first round's sweeps also hold 1-2 random start-up trials, the later ones none,
+    and counting those would favour the pretrainings of the first round."""
+    tr = [t for t in S.get(name, []) + S.get(name + "_002", [])
+          if t.get("val_loss") is not None and t.get("prepd_std") and t["hp"] in CHOSEN32.get(name, [])]
+    return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if tr else None
+
+
 def final(fam, p, k):
     """(value, at the final horizon?) of one cell. fam: "scr" for scratch, else a fine-tune family (tp3_r7fte, ...).
     Only the twelve ladder probes have long horizons; every other cell is at its grid horizon and counts as final."""
@@ -77,5 +89,5 @@ def final(fam, p, k):
     if p not in ARM or k not in LONG_K_PROBE.get(p, LONG_K) or p in ("ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr",
                                                                          "ee_dd_nlo_hi", "udbar_enu", "ee_dd_ew_nlo"):
         return short, True
-    v32 = None if (fam, p) in HOLD_8K else best(f"tp3_scr32k_{p}_d{k}" if fam == "scr" else f"{fam}32k_{p}_d{k}")[0]
+    v32 = None if (fam, p) in HOLD_8K else best_chosen(f"tp3_scr32k_{p}_d{k}" if fam == "scr" else f"{fam}32k_{p}_d{k}")
     return (v32, True) if v32 is not None else (short, False)

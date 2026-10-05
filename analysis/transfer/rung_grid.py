@@ -1,8 +1,8 @@
 """Transfer study, the fine-tune grid: each probe's loss against D, from scratch and fine-tuned from each pretraining
 (ee->uu, 64k steps, as rung 0, and ladder rungs 1-9; tp3_<parent>fte: training.lr searched over [1e-3, 1e-2],
 lr_scale = layer_decay = 1; docs/results.tex sec:ladder), the study's final setup only. A cell's value is its search's
-best (MSE of log|M|^2 at the best checkpoint) at the final horizon (cells.final: 32k steps at D = 10^3.5, 10^4); a cell
-whose long search is not in yet keeps its 8k value, drawn open (less compute, for now). ee->WW on the mixture pool.
+best (MSE of log|M|^2 at the best checkpoint). With cells.USE_32K off (now) every cell is the 8k grid, every
+pretraining at equal compute; on, the 32k cells at D = 10^3.5, 10^4 replace them (cells.final), a cell still at 8k drawn open. ee->WW on the mixture pool.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_grid.py      -> figs/rung_grid
 """

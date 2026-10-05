@@ -3,8 +3,8 @@ the first ladder rung that adds the structure the probe carries, and the rung ju
 without that structure; ee_uu alone, rung 0, below rung 1), with every other pretraining's fine-tunes in grey. The pairing is
 the ladder's design (recipes/transfer_ladder_r*.yaml headers): s-channel r1, EW t-channel r2 (the W exchange in
 ee -> nu_e nu_e), external photons r3, QCD exchange r4, masses r5, the first external W and gluon r6 (ud -> Wg; uu -> gg
-and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py: the final horizons
-(cells.final, 32k steps at D = 10^3.5, 10^4; a cell still at 8k there drawn open). The best pretraining overall is
+and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py: the 8k grid while
+cells.USE_32K is off (now), the 32k cells at D = 10^3.5, 10^4 once it is on (cells.final; a cell still at 8k drawn open). The best pretraining overall is
 ranked on the 8k grid, where every pretraining has every cell at the same compute.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
