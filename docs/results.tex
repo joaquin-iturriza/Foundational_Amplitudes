@@ -4915,9 +4915,14 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
     its jobs now ask for \code{gpu\_v100,gpu\_h100}, whichever starts first. The arms' fine-tune waiter once submitted
     all $28$ arm sweeps while the pretrainings still ran (it matched its own marker in the echoed command); they were
     removed before any trial started, and the waiter now matches the marker as a whole line. Four of the moved sweeps (from $ee\to u\bar u$ on $ud\to ud$ and $u\bar u\to Zg$, $D=10^{3.5}$, $10^4$) went back to
-    CC-IN2P3 to use the H100s before starting on lxplus. The hourly rebalancer no longer watches the chosen-point sweeps
-    (the $32$k families, rung $1$'s, the redesigned arms'): a move regenerates a sweep from its config, a random search;
-    they are placed by hand.
+    CC-IN2P3 to use the H100s before starting on lxplus. Since 2026-10-05 the rebalancer moves the pending trials of any sweep, not only whole unstarted ones (the
+    user's point: a rebalancer that leaves some jobs out is no rebalancer): a chosen point keeps its candidate index, a
+    pending DyHPO trial of a started sweep runs elsewhere as the next unrun start-up candidate or an unused random one
+    (guided trials win no more often than random, Fig.~\ref{fig:finetune_hp}); HTCondor DAGs are held, not removed, so
+    running trials finish. It runs hourly over every \code{tp3\_} sweep. The same day $52$ moved $32$k sweeps had failed at
+    start-up: rung $2$'s and rung $6$'s checkpoints had been copied to lxplus and CC without their run's
+    \code{data\_stats.json}, which a fine-tune with \code{fine\_tune.offshell\_stats=parent} reads; the whole run
+    directories were copied and the $94$ missing points resubmitted.
   \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
     (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
     80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
