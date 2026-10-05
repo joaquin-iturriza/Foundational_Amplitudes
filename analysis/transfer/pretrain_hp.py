@@ -17,7 +17,9 @@ import plot_style as ps  # noqa: E402
 P = json.load(open(os.path.join(ROOT, "analysis", "transfer", "pretrain_hp.json")))
 FIG = os.path.join(ROOT, "analysis", "transfer", "figs", "pretrain_hp")
 LADDER = [f"tp3_ladder_r{i}" for i in range(1, 10)]
-OTHER = ["tp3_pre64_ee_uu"] + [f"tp3_star_{a}" for a in ("soft", "isr", "deadcone", "resonance", "threshold", "sudakov")]
+# the study's final setup: the first resonance and Sudakov arms (replaced by the W-pole and EW-Sudakov arms, which ran hp73
+# alone and so rank nothing) are left out
+OTHER = ["tp3_pre64_ee_uu"] + [f"tp3_star_{a}" for a in ("soft", "isr", "deadcone", "threshold")]
 NAME = {**{f"tp3_ladder_r{i}": f"rung {i}" for i in range(1, 10)}, "tp3_pre64_ee_uu": r"$ee\to u\bar u$",
         "tp3_star_soft": "soft", "tp3_star_isr": "ISR", "tp3_star_deadcone": "dead cone",
         "tp3_star_resonance": "resonance", "tp3_star_threshold": "threshold", "tp3_star_sudakov": "Sudakov"}

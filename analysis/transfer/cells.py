@@ -54,3 +54,22 @@ def finetune(p, k, steered=True):
     if f"tp3_ftp_{p}_d{k}" in S:          # internal Z: the pretraining's off-shellness scale
         return _pick([f"tp3_ftp_{p}_d{k}", f"tp3_ftph_{p}_d{k}"])
     return _pick([f"tp3_ft_{p}_d{k}", f"tp3_fth_{p}_d{k}"])
+
+
+# The study's final horizons: 8k steps up to D = 10^3, 32k at D = 10^3.5, 10^4 (tp3_scr32k, tp3_<parent>fte32k), and
+# for ud -> ud also at 10^2.5, 10^3 (its 8k cells looked under-trained; the user's call, 2026-10-05). A cell whose 32k
+# search is not in yet, or still needs work, keeps its 8k value and is flagged as having less compute for now.
+LONG_K = {7, 8}
+LONG_K_PROBE = {"ud_ud": {5, 6, 7, 8}}
+HOLD_8K = {("scr", "ee_nnbar")}     # scratch ee -> nu_e nu_e at 32k came out worse; its exploration is still running
+
+
+def final(fam, p, k):
+    """(value, at the final horizon?) of one cell. fam: "scr" for scratch, else a fine-tune family (tp3_r7fte, ...).
+    Only the twelve ladder probes have long horizons; every other cell is at its grid horizon and counts as final."""
+    short = scratch(p, k, steered=False)[0] if fam == "scr" else best(f"{fam}_{p}_d{k}")[0]
+    if p not in ARM or k not in LONG_K_PROBE.get(p, LONG_K) or p in ("ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr",
+                                                                         "ee_dd_nlo_hi", "udbar_enu", "ee_dd_ew_nlo"):
+        return short, True
+    v32 = None if (fam, p) in HOLD_8K else best(f"tp3_scr32k_{p}_d{k}" if fam == "scr" else f"{fam}32k_{p}_d{k}")[0]
+    return (v32, True) if v32 is not None else (short, False)

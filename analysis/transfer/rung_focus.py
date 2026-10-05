@@ -1,18 +1,19 @@
 """Transfer study, the fine-tune grid read per probe against the structure it needs: for each probe, from scratch,
 the first ladder rung that adds the structure the probe carries, and the rung just below it (the same pretraining
-without that structure; ee_uu alone below rung 1), with every other pretraining's fine-tunes in grey. The pairing is
+without that structure; ee_uu alone, rung 0, below rung 1), with every other pretraining's fine-tunes in grey. The pairing is
 the ladder's design (recipes/transfer_ladder_r*.yaml headers): s-channel r1, EW t-channel r2 (the W exchange in
 ee -> nu_e nu_e), external photons r3, QCD exchange r4, masses r5, the first external W and gluon r6 (ud -> Wg; uu -> gg
-and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py. The 32k-step searches
-at D = 10^3.5, 10^4 (tp3_scr32k, tp3_<parent>fte32k; preliminary) are open diamonds in their series' colour.
+and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py: the final horizons
+(cells.final, 32k steps at D = 10^3.5, 10^4; a cell still at 8k there drawn open). The best pretraining overall is
+ranked on the 8k grid, where every pretraining has every cell at the same compute.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
 """
 import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cells import ROOT, best, scratch, finetune  # noqa: E402
-from rung_grid import LAB, P, S, RUNG_ADDS, curve  # noqa: E402
+from cells import ROOT, best, scratch  # noqa: E402
+from rung_grid import LAB, P, S, RUNG_ADDS, draw_final, fam  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -40,19 +41,12 @@ def overall(p, fams):
 
 
 def short(f):
-    return {"tp3_uufte": r"$u\bar u$", "tp3_uu64fte": r"$u\bar u$ 64k"}.get(f, "r" + f[len("tp3_r"):-len("fte")])
-
-
-def fam(r):
-    return "tp3_uufte" if r == 0 else f"tp3_r{r}fte"
+    return {"tp3_uu64fte": "r0"}.get(f, "r" + f[len("tp3_r"):-len("fte")])
 
 
 def series():
-    """Every pretraining's fine-tune family in the grid's setup, plus the earlier-setup references."""
-    out = {fam(r): None for r in range(0, 10)}
-    out["tp3_uu64fte"] = None
-    out.update({f"tp3_r{r}ftp": None for r in (4, 9)})
-    return [f for f in out if any(n.startswith(f + "_") for n in S)]
+    """Every pretraining's fine-tune family: ee->uu (rung 0) and rungs 1-9."""
+    return [f for f in (fam(r) for r in range(0, 10)) if any(n.startswith(f + "_") for n in S)]
 
 
 for part, order in (("ee", P[:6]), ("qcd", P[6:])):
@@ -64,31 +58,14 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         for f in series():
             if f in (hi, lo) or (lead and f == lead[0]):
                 continue
-            D, L = curve(lambda k: best(f"{f}_{p}_d{k}")[0])
-            if D:
-                ax.plot(D, L, "o-", label="other pretrainings" if first else None, **GREY)
+            if draw_final(ax, f, p, "o-", label="other pretrainings" if first else None, **GREY) is not None:
                 first = False
-        D, L = curve(lambda k: finetune(p, k, steered=False)[0])
-        if D:
-            ax.plot(D, L, "o--", **GREY)
-        ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", label="from scratch")
-        ax.plot(*curve(lambda k: best(f"{lo}_{p}_d{k}")[0]), "o-", color=ps.C.blue, label="the rung below")
-        ax.plot(*curve(lambda k: best(f"{hi}_{p}_d{k}")[0]), "o-", color=ps.C.vermillion,
-                label="first rung with the structure")
+        draw_final(ax, "scr", p, "o-", color="k", label="from scratch")
+        draw_final(ax, lo, p, "o-", color=ps.C.blue, label="the rung below")
+        draw_final(ax, hi, p, "o-", color=ps.C.vermillion, label="first rung with the structure")
         if lead and lead[0] not in (hi, lo):
-            ax.plot(*curve(lambda k: best(f"{lead[0]}_{p}_d{k}")[0]), "o-", color=ps.C.green, label="best overall")
-        # the 32k-step searches at D = 10^3.5, 10^4 (horizon32k.py; preliminary: 2-4 trials, two of them chosen points),
-        # open diamonds in their 8k series' colour: scratch, and each parent that has one
-        D32 = [10 ** 3.5, 10 ** 4]
-        def pts32(name):
-            v = [best(f"{name}_d{k}")[0] for k in (7, 8)]
-            return [d for d, x in zip(D32, v) if x], [x for x in v if x]
-        ax.plot(*pts32(f"tp3_scr32k_{p}"), "D", color="k", mfc="none")
-        for f in sorted({n.split("32k_")[0] for n in S if "fte32k_" in n and f"_{p}_d" in n}):
-            col = (ps.C.vermillion if f == hi else ps.C.blue if f == lo else
-                   ps.C.green if lead and f == lead[0] else "0.6")
-            ax.plot(*pts32(f"{f}32k_{p}"), "D", color=col, mfc="none")
-        below = r"$ee\to u\bar u$" if FOCUS[p] == 1 else f"r{FOCUS[p] - 1}"
+            draw_final(ax, lead[0], p, "o-", color=ps.C.green, label="best overall")
+        below = f"r{FOCUS[p] - 1}"
         ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
                          # the leader and its first tie by name, any further ties as a count (the full list ran
                          # off the panel once every grid was ranked)
@@ -101,8 +78,8 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     a0 = figs[0][1]
     if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
-    a0.plot([], [], "D", color="k", mfc="none", label="open diamonds: 32k steps, same colours")
-    for r, what in RUNG_ADDS.items():                           # the key to the panels' "r6 vs r5" labels
+    a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
+    for r, what in [(0, r"$ee\to u\bar u$")] + list(RUNG_ADDS.items()):                           # the key to the panels' "r6 vs r5" labels
         a0.plot([], [], " ", label=f"r{r}: {what}")
     ps.shared_legend(figs[0][0], a0, ncol=2)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))

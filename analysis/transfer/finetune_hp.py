@@ -1,5 +1,5 @@
-"""Transfer study, the HP landscape of the fine-tune grids (every *fte cell at the grid's horizons, lr_scale and layer_decay fixed at 1 (the fine-tune lr is searched): rungs 1-9, ee_uu at 32k
-and 64k, the star arms; the grid's protocol, docs/results.tex sec:ladder: 5 trials, 3 random start-up then 2 DyHPO-guided,
+"""Transfer study, the HP landscape of the fine-tune grids (every *fte cell at the grid's horizons, lr_scale and layer_decay fixed at 1 (the fine-tune lr is searched): rungs 1-9, ee_uu (64k), the
+star arms; the grid's protocol, docs/results.tex sec:ladder: 5 trials, 3 random start-up then 2 DyHPO-guided,
 lr searched over [1e-3, 1e-2] with the common space), to judge whether the protocol can run fewer trials or steps.
 Data: analysis/transfer/finetune_hp.json (collect_sweeps.py tp3_ on every site, merged; a cell's trials in evaluation
 order). Every ratio: val_loss_no_reg at the trial's best checkpoint over the best of its cell (same probe, D, parent).
@@ -18,6 +18,9 @@ sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
 F = json.load(open(os.path.join(ROOT, "analysis", "transfer", "finetune_hp.json")))
+# the study's final setup only: the 32k-step ee->uu parent (tp3_uufte, replaced by the 64k one) and the two first-design
+# star arms (resonance, Sudakov; replaced) are left out
+F = {n: v for n, v in F.items() if not n.startswith(("tp3_uufte_", "tp3_sresonancefte_", "tp3_ssudakovfte_"))}
 FIG = os.path.join(ROOT, "analysis", "transfer", "figs", "finetune_hp")
 # a cell is ONE sweep's first five trials in evaluation order (the protocol: three random start-up, two guided). A cell
 # run on two sites (started on one, generated again on the other by a move) holds two independent DyHPO runs: the site
