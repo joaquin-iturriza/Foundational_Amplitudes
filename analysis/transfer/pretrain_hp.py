@@ -23,8 +23,12 @@ OTHER = ["tp3_pre64_ee_uu"] + [f"tp3_star_{a}" for a in ("soft", "isr", "deadcon
 NAME = {**{f"tp3_ladder_r{i}": f"rung {i}" for i in range(1, 10)}, "tp3_pre64_ee_uu": r"$ee\to u\bar u$",
         "tp3_star_soft": "soft", "tp3_star_isr": "ISR", "tp3_star_deadcone": "dead cone",
         "tp3_star_resonance": "resonance", "tp3_star_threshold": "threshold", "tp3_star_sudakov": "Sudakov"}
-MARK = {47: ("hp47", ps.C.vermillion, "o"), 73: ("hp73", ps.C.blue, "s"), 95: ("hp95", ps.C.orange, "D"),
-        15: ("hp15", ps.C.green, "^")}
+# the four points tried on several pretrainings, labelled by what they are (lr, lambda; a DyHPO candidate index tells a
+# reader nothing): hp73 is the one later pretrainings run alone
+MARK = {47: (r"$\eta=1.1\times10^{-3}$, $\lambda=1.5\times10^{-10}$", ps.C.vermillion, "o"),
+        73: (r"$\eta=1.8\times10^{-3}$, $\lambda=1.4\times10^{-10}$", ps.C.blue, "s"),
+        95: (r"$\eta=7.7\times10^{-4}$, $\lambda=2.7\times10^{-9}$", ps.C.orange, "D"),
+        15: (r"$\eta=9.3\times10^{-4}$, $\lambda=1.2\times10^{-9}$", ps.C.green, "^")}
 OTHER_STYLE = ("other searched points", ps.C.grey, ".")
 
 
@@ -50,7 +54,7 @@ for ax, group in zip(axes, (LADDER, OTHER)):
 for hp, (lab, col, m) in list(MARK.items()) + [(None, OTHER_STYLE)]:
     axes[0].plot([], [], m, color=col, label=lab)
 axes[0].plot([], [], "o", color="k", mfc="none", label="rescored best checkpoint")
-ps.shared_legend(fig, axes[0], ncol=3)
+ps.shared_legend(fig, axes[0], ncol=2)
 ps.save(fig, FIG + "_rank")
 
 knobs = [("lr", "lr", True), ("lambda", r"$\lambda$", True), ("warmup", "warm-up fraction", False),
@@ -67,7 +71,7 @@ for ax, (k, lab, lg) in zip(axes.flat, knobs):
     ax.set_yscale("log"); ax.set_xlabel(lab); ax.set_ylabel(r"$\mathcal{L}_{\rm val}/\mathcal{L}_{\rm val}^{\rm best}$")
 for hp, (lab, col, m) in list(MARK.items()) + [(None, OTHER_STYLE)]:
     axes.flat[0].plot([], [], m, color=col, label=lab)
-ps.shared_legend(fig, axes.flat[0], ncol=5)
+ps.shared_legend(fig, axes.flat[0], ncol=2)
 ps.save(fig, FIG + "_landscape")
 
 for n in LADDER + OTHER:
