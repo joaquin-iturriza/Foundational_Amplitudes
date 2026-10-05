@@ -3,8 +3,12 @@ pretraining"): the pretrained weights, before any fine-tuning step, scored on th
 fine-tune's first validation would score them. Each argument is a fine-tune run dir (any trial of a tp3_<parent>fte cell):
 its config fixes the probe, its pool and the probe's own target statistics (fine_tune.target_stats: own), and its
 fine_tune.pretrained_path the parent. The value is val_loss_no_reg in the probe's standardized units (a constant
-prediction of the mean scores ~1) and, times prepd_std^2, MSE of log|M|^2. Prints one ZERO_SHOT JSON line per run dir.
-Needs a GPU.
+prediction of the mean scores ~1) and, times prepd_std^2, MSE of log|M|^2. The parent's outputs are in its own
+standardized units, not the probe's, so that value mixes a units mismatch with what the parent knows; val_loss_affine
+is the loss after the best affine map of the parent's output onto the probe's target, min_{a,b} E[(a + b h - z)^2]
+= 1 - corr(h, z)^2, the share of the probe's variance the parent cannot explain up to an offset and a scale (a and b
+fitted on the same validation split: two parameters on its 10^4-scale pool). Prints one ZERO_SHOT JSON line per run
+dir. Needs a GPU.
     python tools/zero_shot_ft.py <ft_run_dir> [<ft_run_dir> ...]
 """
 import json, os, sys, tempfile
@@ -50,7 +54,16 @@ for run_dir in sys.argv[1:]:
     exp._init_regularization()
     with torch.no_grad():
         exp._validate(0)
+        hs, zs = [], []
+        for data in exp.val_loader:
+            y_pred, y, _, _, _ = exp._forward_lloca(data)
+            hs.append(y_pred.reshape(-1).double().cpu()); zs.append(y.reshape(-1).double().cpu())
+    h, z = torch.cat(hs).numpy(), torch.cat(zs).numpy()
+    A = np.stack([np.ones_like(h), h], 1)
+    coef = np.linalg.lstsq(A, z, rcond=None)[0]
+    affine = float(np.mean((A @ coef - z) ** 2))
     print("ZERO_SHOT " + json.dumps({
         "run_dir": run_dir, "parent": str(cfg.fine_tune.pretrained_path), "val_loss": exp.val_loss_no_reg[-1],
-        "prepd_std": saved["prepd_std"],
+        "prepd_std": saved["prepd_std"], "val_loss_affine": affine, "affine_ab": [float(c) for c in coef],
+        "n_val": int(len(z)), "val_loss_check": float(np.mean((h - z) ** 2)),
         "mse_logm2": exp.val_loss_no_reg[-1] * float(np.asarray(saved["prepd_std"]).ravel()[0]) ** 2}), flush=True)

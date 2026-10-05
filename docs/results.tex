@@ -4880,6 +4880,15 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
   \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
     from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
+  \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
+    $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
+    prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
+    predict a process's normalization (a shift $y\to y+c$ of one process leaves its $z_p$ unchanged). True zero-shot tests
+    need a pretraining whose normalization the model predicts: one global $(\mu,\sigma)$, or, as in the multiplicity
+    extrapolation of the paper (Sec.~5, $\mu_n=a+bn$), a mean predicted from the process's features (mass dimension
+    $8-2N$ of $|\mathcal M|^2$ for $N$ legs, the coupling powers of \code{amp\_orders}). I will train one and test it
+    zero-shot on the probes. Until then a zero-shot loss here is read up to an affine map (next paragraph of the
+    distance result, \code{val\_loss\_affine}).
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
     cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
     \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
