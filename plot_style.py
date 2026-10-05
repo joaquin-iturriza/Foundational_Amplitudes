@@ -715,6 +715,20 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     return leg
 
 
+def legend_strip(ax, base: str, ncol: int = 3, **kwargs):
+    """The legend of a multi-panel set as a file of its own, `<base>.png/.pdf`, to be included centred above the
+    panels' rows in LaTeX. For `save_panels` sets, where a `shared_legend` on panel (a) widens that panel's canvas
+    and sits off-centre over the two columns. Takes the handles from `ax`; nothing is drawn on the panels."""
+    handles, labels = ax.get_legend_handles_labels()
+    fig = plt.figure(figsize=(1, 1))
+    kwargs.setdefault("frameon", False)
+    fig.legend(handles, labels, ncol=ncol, loc="center", **kwargs)
+    for ext in (".png", ".pdf"):
+        fig.savefig(base + ext, bbox_inches="tight", pad_inches=0.03)
+    plt.close(fig)
+    print(f"saved {base}.png / .pdf (legend strip)")
+
+
 #: Fraction of the plot box left clear above the topmost datum and below the lowest.
 #: Fixed so headroom does not depend on what the data happened to do -- "a lot of figures have
 #: very little space between the line and the top edge, while others don't".

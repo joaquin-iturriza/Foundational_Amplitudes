@@ -82,5 +82,5 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
     # the key to the panels' "r6 vs r5" labels is the ladder's table (rung -> structure) in the text, not the legend: nine
     # extra legend rows pushed the six-panel figure past a page
-    ps.shared_legend(figs[0][0], a0, ncol=1)
+    ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}_legend"), ncol=3)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))

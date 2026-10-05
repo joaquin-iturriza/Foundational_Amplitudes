@@ -58,5 +58,5 @@ for _, ax in figs:
 a0 = figs[0][1]
 for arm, (_, what) in ARMS.items():                   # one colour per arm, in its own panel and in (g)
     a0.plot([], [], "o-", color=ARM_C[arm], label=f"rung 1 + {what}")
-ps.shared_legend(figs[0][0], a0, ncol=1)
+ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", "star_arms_legend"), ncol=2)
 ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", "star_arms"))

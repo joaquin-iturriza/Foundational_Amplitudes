@@ -84,7 +84,7 @@ if __name__ == "__main__":
         a0 = figs[0][1]
         if USE_32K:
             a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
-        ps.shared_legend(figs[0][0], a0, ncol=3)     # eleven series: no panel has a clear corner for them
+        ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}_legend"), ncol=4)   # eleven series: no panel has a clear corner
         ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}"))
     # the star arms' probes, from scratch, ee->uu and rung 1 (all at their grid horizons)
     figs = ps.panels(len(NEW))

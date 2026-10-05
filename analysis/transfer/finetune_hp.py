@@ -118,7 +118,7 @@ a5.set_yscale("log"); a5.set_ylabel(YL); plain_log(a5, "y", [1, 1.5, 2, 3], lamb
 for _, ax in figs:
     ps.make_room(ax)
 a0.plot([], [], " ", label=r"bars: $68\%$ bootstrap over cells")
-ps.shared_legend(figs[0][0], a0, ncol=2)
+ps.legend_strip(a0, FIG + "_landscape_legend", ncol=4)
 ps.save_panels(figs, FIG + "_landscape")
 
 fig, (a, b) = ps.figure(ncols=2)
