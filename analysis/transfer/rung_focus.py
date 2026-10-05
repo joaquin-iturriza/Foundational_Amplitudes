@@ -80,7 +80,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
     if USE_32K:
         a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
-    for r, what in [(0, r"$ee\to u\bar u$")] + list(RUNG_ADDS.items()):                           # the key to the panels' "r6 vs r5" labels
-        a0.plot([], [], " ", label=f"r{r}: {what}")
-    ps.shared_legend(figs[0][0], a0, ncol=2)
+    # the key to the panels' "r6 vs r5" labels is the ladder's table (rung -> structure) in the text, not the legend: nine
+    # extra legend rows pushed the six-panel figure past a page
+    ps.shared_legend(figs[0][0], a0, ncol=1)
     ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))

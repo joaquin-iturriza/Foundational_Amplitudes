@@ -74,9 +74,9 @@ if __name__ == "__main__":
         figs = ps.panels(len(order))
         for (fig, ax), p in zip(figs, order):
             draw_final(ax, "scr", p, "o-", color="k", label="from scratch")
-            draw_final(ax, fam(0), p, "o-", color=ps.C.blue, label=r"rung 0: $ee\to u\bar u$")
+            draw_final(ax, fam(0), p, "o-", color=ps.C.blue, label=r"rung 0")
             for r in RUNGS:
-                draw_final(ax, fam(r), p, "o-", color=cols[r], label=f"rung {r}: {RUNG_ADDS[r]}")
+                draw_final(ax, fam(r), p, "o-", color=cols[r], label=f"rung {r}")     # the structures: the text's table
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
             ps.process_label(ax, LAB[p])
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         a0 = figs[0][1]
         if USE_32K:
             a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
-        ps.shared_legend(figs[0][0], a0, ncol=2)     # eleven series: no panel has a clear corner for them
+        ps.shared_legend(figs[0][0], a0, ncol=3)     # eleven series: no panel has a clear corner for them
         ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}"))
     # the star arms' probes, from scratch, ee->uu and rung 1 (all at their grid horizons)
     figs = ps.panels(len(NEW))
