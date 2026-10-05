@@ -327,6 +327,16 @@ def main():
         increment_steps = t_steps
         run_idx         = 0
         print(f"[run_trial] Cold start hp_{hp_idx:04d}")
+        # A cold start never reuses a run dir: an earlier attempt at this point (one that failed at start-up, or a
+        # trial moved here by rebalance.py) leaves its dir, and run.py refuses an existing one, so the rerun would die
+        # in seconds. The old dir is kept (nothing is deleted) and this attempt takes the first free _r<k> name.
+        k = 1
+        base_run_dir = run_dir
+        while os.path.exists(run_dir):
+            run_dir = f"{base_run_dir}_r{k}"
+            k += 1
+        if run_dir != base_run_dir:
+            print(f"[run_trial] {base_run_dir} exists: this attempt runs in {run_dir}")
 
     # Use t_steps for unique result filename (encodes fidelity level without listing all dataset sizes)
     result_path = os.path.join(results_dir, f"hp{hp_idx:04d}_t{t_steps}_{int(time.time())}.json")
