@@ -61,7 +61,11 @@ def finetune(p, k, steered=True):
 # search is not in yet, or still needs work, keeps its 8k value and is flagged as having less compute for now.
 LONG_K = {7, 8}
 LONG_K_PROBE = {"ud_ud": {5, 6, 7, 8}}
-HOLD_8K = {("scr", "ee_nnbar")}
+# scratch ee -> nu_e nu_e: at 32k worse than 8k at D = 10^3.5 even after four extra random points (2.4e-3 against 7.4e-4),
+# so that cell keeps 8k; at 10^4 the extra points beat 8k (2.1e-5 against 6.8e-5) and the cell is scored on all its
+# trials, since they were run to explore it (the user's call, 2026-10-05)
+HOLD_8K = {("scr", "ee_nnbar", 7)}
+ALL_TRIALS32 = {"tp3_scr32k_ee_nnbar_d8"}
 # Off until every pretraining has its 32k cells (2026-10-05, the user's call): the first 32k round covered scratch,
 # ee->uu and one rung per probe only, so mixing it in breaks the equal-compute comparison between rungs. With this off
 # every figure is the 8k grid, every pretraining at the same compute in every cell.
@@ -76,7 +80,7 @@ def best_chosen(name):
     best of the same two points: the first round's sweeps also hold 1-2 random start-up trials, the later ones none,
     and counting those would favour the pretrainings of the first round."""
     tr = [t for t in S.get(name, []) + S.get(name + "_002", [])
-          if t.get("val_loss") is not None and t.get("prepd_std") and t["hp"] in CHOSEN32.get(name, [])]
+          if t.get("val_loss") is not None and t.get("prepd_std") and (name in ALL_TRIALS32 or t["hp"] in CHOSEN32.get(name, []))]
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if tr else None
 
 
@@ -89,5 +93,5 @@ def final(fam, p, k):
     if p not in ARM or k not in LONG_K_PROBE.get(p, LONG_K) or p in ("ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr",
                                                                          "ee_dd_nlo_hi", "udbar_enu", "ee_dd_ew_nlo"):
         return short, True
-    v32 = None if (fam, p) in HOLD_8K else best_chosen(f"tp3_scr32k_{p}_d{k}" if fam == "scr" else f"{fam}32k_{p}_d{k}")
+    v32 = None if (fam, p, k) in HOLD_8K else best_chosen(f"tp3_scr32k_{p}_d{k}" if fam == "scr" else f"{fam}32k_{p}_d{k}")
     return (v32, True) if v32 is not None else (short, False)
