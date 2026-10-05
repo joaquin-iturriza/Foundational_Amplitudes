@@ -4713,6 +4713,25 @@ pretraining (rung $0$: $ee\to u\bar u$, $64$k steps), the $8$k grid; outlined, t
 \label{fig:gain_heatmap}
 \end{figure}
 
+\paragraph{Distance from the pretraining (2026-10-05).} Each pretraining's zero-shot loss on each probe
+(\code{tools/zero\_shot\_ft.py}: the parent's weights scored on the probe's validation split before any fine-tune step,
+in the probe's standardized units, where a constant prediction of the mean scores $\approx1$), all $10\times12$ pairs,
+against the gain of Fig.~\ref{fig:gain_heatmap} (Fig.~\ref{fig:zero_shot_gain}, \code{zero\_shot\_gain.py}). A pretraining
+that already predicts a probe gains more on it: the Spearman correlation of the log zero-shot loss with the gain is
+$-0.41$ over all pairs ($p=3\times10^{-6}$) and negative within ten of the twelve probes ($-0.26$ to $-0.81$; $ee\to\nu_e\bar\nu_e$
+$+0.12$, $ee\to t\bar t$ $-0.05$). Closeness is not needed for a gain, however: $ee\to u\bar u$ scores $0.99$--$1.13$ zero-shot
+on seven probes and $1.9$ and $2.4$ on $ee\to W^+W^-$ and $ee\to\nu_e\bar\nu_e$, no better than a constant, and still
+fine-tunes below scratch at a geometric mean of $1.7\times$. Only $ee\to d\bar d$ ($0.28$), $ee\to t\bar t$ ($0.66$) and
+$ud\to ud$ ($0.79$) start below the constant from it.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/zero_shot_gain_legend.pdf}\\
+\includegraphics{../analysis/transfer/figs/zero_shot_gain.pdf}
+\caption{Zero-shot loss of each pretraining on each probe (standardized $\log|\mathcal M|^2$, before any fine-tune step)
+against the fine-tune's gain over scratch of Fig.~\ref{fig:gain_heatmap}; one point per pretraining and probe, $8$k grid.}
+\label{fig:zero_shot_gain}
+\end{figure}
+
 \paragraph{A $32$k horizon at $D=10^3$: no clear gain from one run.} One run per probe at its cell's best $8$k HPs, $32$k
 steps (\code{job\_transfer\_calib.sh}, Jean Zay, 2026-10-04): against the $8$k cell, $ee\to t\bar t$ gains $4.0\times$,
 $ud\to ud$ $1.5\times$, $ee\to Z\gamma$ $1.2\times$; $ee\to d\bar d$, the one-loop probes, $u\bar u\to Zgg$, $Zggg$ and
@@ -4861,8 +4880,6 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
   \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
     from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
-  \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
-    pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
     cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
     \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
