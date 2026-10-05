@@ -5,10 +5,16 @@ dropped, a submit cap filled, others' jobs took the GPUs), its share of the batc
 the other sites drain theirs: on 2026-10-02 rung 9's fine-tune grid sat on CC-IN2P3 at zero starts for half a
 day while lxplus and Jean Zay ran everything else. This re-plans the not-yet-started part.
 
-The unit moved is a whole sweep none of whose trials has started: a sweep's DyHPO state lives in a file on one
-site's filesystem, so a sweep with results stays where it is. A move never deletes anything: the source's
-queued jobs of that sweep are cancelled and its directory gets a MOVED_TO marker (sweep_manager.py then skips
-it), the destination generates the sweep from the same config in git and submits it. A fine-tune's parent
+Two units move. A sweep none of whose trials has started and that runs DyHPO trials only moves whole: the source's
+queued jobs are cancelled, its directory gets a MOVED_TO marker (sweep_manager.py then skips it), the destination
+generates the sweep from the same config in git and submits it. Every other sweep with trials not yet started (one
+that has started, or one of chosen points, generate_sweep --fixed-hp) moves those trials, as candidate indices of the
+sweep's own pool (the same config and seed draw the same pool on every site): a chosen point keeps its index; a
+pending DyHPO trial becomes the next unrun start-up candidate, then an unused candidate drawn at random, since its
+surrogate's observations stay at the source (the fine-tune landscape, docs/results.tex fig:finetune_hp: guided trials
+win no more often than random ones). The destination runs them with generate_sweep --extend --fixed-hp; the source's
+queued trials are cancelled (on HTCondor its DAG is held, so running trials finish) and the sweep marked MOVED_TO.
+Results of one sweep on two sites are merged by name (analysis/transfer/collect_sweeps.py). A fine-tune's parent
 checkpoint is copied site to site (`site copy`) when the destination does not have it; recipe pools are
 prebuilt there by generate_sweep's CPU job as for any new sweep.
 
@@ -25,8 +31,9 @@ brings the later of the two finish times at least --margin hours earlier.
 On a site (through `site run`, by the planner):
     python sweep/rebalance.py --inventory PREFIX ...      one INVENTORY JSON line
     python sweep/rebalance.py --release DEST SWEEP ...    cancel the sweeps' queued jobs, mark them MOVED_TO DEST
+    python sweep/rebalance.py --release-trials DEST SWEEP ...   the same for sweeps whose pending trials move
 """
-import argparse, glob, json, os, re, subprocess, sys, time
+import argparse, glob, json, os, random, re, subprocess, sys, time, zlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITES = ["ccin2p3", "jeanzay", "lxplus"]
@@ -68,6 +75,63 @@ def _queue():
         run = sum(states[j] == "RUNNING" for j in jobs)
         q[name] = (run, len(jobs) - run, [j for j in jobs if states[j] != "RUNNING"])
     return q
+
+
+def _condor_nodes():
+    """{sweep: (idle node job ids, DAG manager ids)} on HTCondor."""
+    out = subprocess.run(["condor_q", "-af", "JobBatchName", "JobStatus", "ClusterId", "JobUniverse"],
+                         capture_output=True, text=True).stdout
+    d = {}
+    for line in out.splitlines():
+        p = line.split()
+        if len(p) < 4:
+            continue
+        name = re.sub(r"_\d{4}$", "", p[0])
+        idle, dag = d.get(name, ([], []))
+        if p[3] == "7":
+            dag = dag + [p[2]]
+        elif p[1] == "1":
+            idle = idle + [p[2]]
+        d[name] = (idle, dag)
+    return d
+
+
+def _pending(sd, ran):
+    """(fixed candidate indices, number of DyHPO trials) among the sweep's trial scripts that have not started."""
+    fixed, free = [], 0
+    for f in sorted(glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))):
+        m = re.match(r"trial_(\d+)", os.path.basename(f))
+        if not m or m.group(1) in ran:
+            continue
+        hp = re.search(r"--fixed-hp-idx (\d+)", open(f).read())
+        if hp:
+            fixed.append(int(hp.group(1)))
+        else:
+            free += 1
+    return fixed, free
+
+
+def _move_hps(sd, name, fixed, free):
+    """The candidate indices the pending trials run as elsewhere: the chosen points as they are, each DyHPO trial as
+    the next start-up candidate not run yet, then an unused candidate drawn at random (seeded by the sweep name)."""
+    import pickle
+    try:
+        st = pickle.load(open(os.path.join(sd, "dyhpo_state.pkl"), "rb"))
+    except Exception:
+        return None
+    n = len(st.get("candidates_raw", []))
+    taken = {int(h) for h, _ in st.get("eval_order", [])} | set(fixed)
+    taken |= {int(x[0]) if isinstance(x, tuple) else int(x) for x in st.get("in_flight", [])}
+    out = list(fixed)
+    for i in st.get("init_conf_indices", []):
+        if len(out) - len(fixed) >= free:
+            break
+        if int(i) not in taken:
+            out.append(int(i)); taken.add(int(i))
+    rest = [i for i in range(n) if i not in taken]
+    random.Random(zlib.crc32(name.encode())).shuffle(rest)
+    out += rest[:free - (len(out) - len(fixed))]
+    return out
 
 
 def _ran(sd):
@@ -116,9 +180,16 @@ def inventory(prefixes, scope, window_h):
             else:                           # generated but never handed to sweep_manager: nothing will run it
                 unsub = 0
             remaining = qd + unsub
+        started = bool(res) or bool(ran) or run > 0
+        fixed, free = _pending(sd, ran) if not moved else ([], 0)
+        # a whole sweep moves only if nothing has started and it is plain DyHPO; otherwise its pending trials move
+        unit = None if moved or not remaining else ("sweep" if not started and not fixed else "trials")
+        hps = _move_hps(sd, name, fixed, free) if unit == "trials" else None
+        if unit == "trials" and not hps:
+            unit = None                     # no state to draw from: stays
         sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
-                        "remaining": remaining,
-                        "started": bool(res) or bool(ran) or run > 0, "movable": any(name.startswith(p) for p in prefixes)}
+                        "remaining": remaining, "started": started, "unit": unit, "move_hps": hps,
+                        "movable": any(name.startswith(p) for p in prefixes)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
                                      "running": sum(v[0] for v in q.values()),
@@ -141,6 +212,32 @@ def release(dest, names):
         with open(os.path.join(sd, "MOVED_TO"), "w") as f:
             f.write(f"{dest} {time.strftime('%Y-%m-%d %H:%M')}\n")
         print(f"RELEASED {name} ({len(ids)} queued jobs cancelled)")
+
+
+def release_trials(dest, names):
+    """Cancel the sweeps' trials that have not started and mark the sweeps MOVED_TO: on SLURM the queued jobs, on
+    HTCondor the idle node jobs, with the DAG manager held first so it submits nothing more (running trials finish)."""
+    import siteconf
+    condor = siteconf.CLUSTER.get("scheduler") == "htcondor"
+    q = _queue()
+    nodes = _condor_nodes() if condor else {}
+    for name in names:
+        sd = os.path.join(siteconf.SWEEP_DIR, name)
+        if condor:
+            idle, dag = nodes.get(name, ([], []))
+            if dag:
+                subprocess.run(["condor_hold"] + dag, check=True)
+            if idle:
+                subprocess.run(["condor_rm"] + idle, check=True)
+            n = len(idle)
+        else:
+            ids = q.get(name, (0, 0, []))[2]
+            if ids:
+                subprocess.run(["scancel"] + ids, check=True)
+            n = len(ids)
+        with open(os.path.join(sd, "MOVED_TO"), "w") as f:
+            f.write(f"{dest} {time.strftime('%Y-%m-%d %H:%M')} (its trials not started here run there)\n")
+        print(f"RELEASED {name} ({n} queued trials cancelled)")
 
 
 # ------------------------------------------------------------------ on the laptop
@@ -179,7 +276,7 @@ def plan(inv, margin_h):
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
     before = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
     movable = {s: sorted((n for n, x in v["sweeps"].items()
-                          if x["movable"] and not x["started"] and not x["moved"] and x["remaining"]),
+                          if x["movable"] and x.get("unit")),
                          reverse=True) for s, v in inv.items()}
     moves = []
     while True:
@@ -189,8 +286,12 @@ def plan(inv, margin_h):
             if not movable[src]:
                 continue
             name = movable[src][0]
-            k = inv[src]["sweeps"][name]["remaining"]
-            dsts = [s for s in st if s != src and name not in inv[s]["sweeps"]]   # never onto a namesake
+            x = inv[src]["sweeps"][name]
+            k = len(x["move_hps"]) if x["unit"] == "trials" else x["remaining"]
+            # a whole sweep never onto a namesake; pending trials may go where the sweep also exists (a sweep
+            # moved before: its results there merge by name), but not back onto a site that marked it moved there
+            dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
+                                                   else not inv[s]["sweeps"].get(name, {}).get("running"))]
             if not dsts:
                 movable[src].pop(0)
                 continue
@@ -211,7 +312,8 @@ def plan(inv, margin_h):
         gain = float("inf") if st[src]["rate"] == 0 else was - now
         if src in {m[1] for m in moves} and not gain >= margin_h:
             for name, s_, dst in [m for m in moves if m[1] == src]:
-                k = inv[src]["sweeps"][name]["remaining"]
+                x = inv[src]["sweeps"][name]
+                k = len(x["move_hps"]) if x["unit"] == "trials" else x["remaining"]
                 st[src]["backlog"] += k; st[dst]["backlog"] -= k
             moves = [m for m in moves if m[1] != src]
     after = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
@@ -223,6 +325,39 @@ def _parent(name):
     m = re.search(r"fine_tune\.pretrained_path:\s*\S*?/(runs/\S+)/models/",
                   open(os.path.join(REPO, "sweep", f"sweep_config_{name}.yaml")).read())
     return m.group(1) if m else None
+
+
+def apply_trials(moves, inv):
+    """Pending trials to the destination as chosen points, then released at the source."""
+    by = {}
+    for name, src, dst in moves:
+        by.setdefault((src, dst), []).append(name)
+    for (src, dst), names in by.items():
+        for p in sorted({p for p in map(_parent, names) if p}):
+            if not _has(dst, f"{p}/models"):
+                holder = next((s for s in inv if s != dst and _has(s, f"{p}/models")), None)
+                if holder is None or subprocess.run(["site", "copy", "FA", holder, dst, p]).returncode != 0 \
+                        or not _has(dst, f"{p}/models"):
+                    print(f"  parent {p} not on {dst}: its trials stay on {src}")
+                    names = [n for n in names if _parent(n) != p]
+        lines = ['S=$(python -c "import siteconf;print(siteconf.SWEEP_DIR)")']
+        for n in names:
+            c = f"sweep/sweep_config_{n}.yaml"
+            hps = " ".join(map(str, inv[src]["sweeps"][n]["move_hps"]))
+            lines.append(f"[ -d $S/{n} ] || {{ yes n | python sweep/generate_sweep.py --config {c} --n-trials 0 >/dev/null 2>&1; }}; "
+                         f"rm -f $S/{n}/MOVED_TO; python sweep/generate_sweep.py --config {c} --extend --fixed-hp {hps} "
+                         f"--submit 2>&1 | grep -qiE 'submitted|submitting' && echo SUB {n} || echo FAIL {n}")
+        import base64
+        b = base64.b64encode("\n".join(lines).encode()).decode()
+        out = site_run(dst, "bash", "-c", f"echo {b} | base64 -d > /tmp/zz_rb_$USER.sh; bash /tmp/zz_rb_$USER.sh; "
+                                          f"rm -f /tmp/zz_rb_$USER.sh", timeout=3600)
+        ok = re.findall(r"^SUB (\S+)", out, re.M)
+        for n in sorted(set(names) - set(ok)):
+            print(f"  {n}: its trials did not go in on {dst}: they stay on {src}")
+        if ok:
+            out = site_run(src, "python", "sweep/rebalance.py", "--release-trials", dst, *ok, timeout=1200)
+            print(f"  {src} -> {dst}: {len(re.findall('^RELEASED', out, re.M))} sweeps' pending trials moved "
+                  f"({sum(len(inv[src]['sweeps'][n]['move_hps']) for n in ok)} trials)")
 
 
 def apply(moves, sites):
@@ -275,6 +410,7 @@ def main():
     ap.add_argument("prefixes", nargs="*")
     ap.add_argument("--inventory", action="store_true", help="(on a site) print this site's INVENTORY line")
     ap.add_argument("--release", metavar="DEST", help="(on a site) cancel and mark the named sweeps as moved")
+    ap.add_argument("--release-trials", metavar="DEST", help="(on a site) cancel the sweeps' pending trials, mark moved")
     ap.add_argument("--apply", action="store_true", help="carry the moves out (default: print the plan)")
     ap.add_argument("--allow-jeanzay", action="store_true")
     ap.add_argument("--scope", nargs="+", default=["tp3_"],
@@ -287,6 +423,8 @@ def main():
         return inventory(a.prefixes, a.scope, a.window)
     if a.release:
         return release(a.release, a.prefixes)
+    if a.release_trials:
+        return release_trials(a.release_trials, a.prefixes)
     sites = [s for s in SITES if a.allow_jeanzay or s != "jeanzay"]
     inv = {}
     for s in sites:
@@ -304,11 +442,14 @@ def main():
         b, r, f = before[s]; b2, _, f2 = after[s]
         print(f"  {s:9s} backlog {b:5d} -> {b2:5d} trials   rate {r:6.1f}/h   finish {f:6.1f} h -> {f2:6.1f} h")
     for name, src, dst in moves:
-        print(f"  move {name}: {src} -> {dst}")
+        x = inv[src]["sweeps"][name]
+        what = "whole sweep" if x["unit"] == "sweep" else f"{len(x['move_hps'])} pending trials"
+        print(f"  move {name}: {src} -> {dst} ({what})")
     if not moves:
         print("  nothing to move")
     elif a.apply:
-        apply(moves, list(inv))
+        apply([m for m in moves if inv[m[1]]["sweeps"][m[0]]["unit"] == "sweep"], list(inv))
+        apply_trials([m for m in moves if inv[m[1]]["sweeps"][m[0]]["unit"] == "trials"], inv)
 
 
 if __name__ == "__main__":
