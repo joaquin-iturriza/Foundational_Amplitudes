@@ -418,11 +418,18 @@ Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 **Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick`
 places a batch once; a site that then stops starting my jobs holds its share regardless (rung 9's grid sat on
 CC at ~0 starts/h for half a day, 2026-10-02). Per site it measures backlog (queued + unsubmitted trials of fed
-sweeps) and the rate actually achieved (trials finished per hour, last 6 h), and moves whole **not-started**
-sweeps from the latest-finishing site to the earliest (a sweep with results stays: its DyHPO state is local).
-A move deletes nothing: the source's queued jobs are cancelled and its dir marked `MOVED_TO` (sweep_manager
-skips it), the parent checkpoint is copied site to site if missing, the destination generates and submits.
-Runs hourly over the transfer study's grids while they drain; without `--apply` it prints the plan.
+sweeps) and the rate actually achieved (trials finished per hour, last 6 h), and moves work from the
+latest-finishing site to the earliest. **Every trial that has not started can move, whatever its sweep:** a plain
+DyHPO sweep with nothing started moves whole (regenerated from its config at the destination); any other sweep
+(started, or of chosen points, `generate_sweep --fixed-hp`) moves its pending trials as candidate indices of its own
+pool, a chosen point keeping its index and a pending DyHPO trial running as the next unrun start-up candidate or an
+unused random one (guided trials win no more often than random, `docs/results.tex` `fig:finetune_hp`), via
+`--extend --fixed-hp` at the destination. A move deletes nothing: the source's pending jobs are cancelled (on
+HTCondor the DAG is held, so running trials finish) and its dir marked `MOVED_TO` (sweep_manager skips it); the
+parent's **whole run directory** is copied site to site if missing (a fine-tune with
+`fine_tune.offshell_stats=parent` reads its `data_stats.json`: models alone fail at start-up). Runs hourly over every
+`tp3_` sweep; without `--apply` it prints the plan. Handling placement and rebalancing is the agent's job, never
+a question for me.
 
 ### HPO search-space rules (empirical — harvested from 422 converged sweeps)
 
