@@ -4688,7 +4688,9 @@ $ee\to b\bar b$ at one loop (rung $9$) & $1.41$ & $1.84$ & $0.72$ & $0.36$ & $0.
 \widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_f.pdf}}
 \caption{The grid of Fig.~\ref{fig:rung_grid} per probe: scratch, the first rung with the probe's structure, the rung below,
-and the best pretraining overall (leader and first tie named, further ties counted), the others grey.}
+and the best pretraining overall (leader and first tie named, further ties counted), the others grey. Open diamonds:
+the $32$k-step searches at $D=10^{3.5}$, $10^4$ in their series' colour, black for scratch (preliminary, the
+\emph{Longer horizons} item).}
 \label{fig:rung_focus}
 \end{figure}
 
@@ -4714,9 +4716,12 @@ $4\times$ at $10^4$: added structure costs the near probe little.
 \widerow{\pnl{../analysis/transfer/figs/star_arms_a.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_b.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/star_arms_c.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/star_arms_e.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_f.pdf}} \\[1ex]
-\pnl{../analysis/transfer/figs/star_arms_g.pdf}
-\caption{The star arms: (a)--(f) each arm (rung $1$ plus one structure) on its own probe, against rung $1$ and scratch;
-(g) $ee\to d\bar d$ fine-tuned from every arm.}
+\widerow{\pnl{../analysis/transfer/figs/star_arms_g.pdf}\hfill\pnl{../analysis/transfer/figs/star_arms_h.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/star_arms_i.pdf}
+\caption{The star arms: (a)--(h) each arm (rung $1$ plus one structure) on its own probe, against rung $1$ and scratch;
+the resonance (d) and Sudakov (f) arms, which tested neither structure, in grey; (g), (h) their replacements, the $W$ pole
+on $u\bar d\to e^+\nu_e$ and electroweak Sudakov logarithms on $ee\to d\bar d$ at one loop (EW), run at two chosen points
+per cell (rung $1$ there: its five random trials and the same two points); (i) $ee\to d\bar d$ fine-tuned from every arm.}
 \label{fig:star_arms}
 \end{figure}
 
@@ -4734,7 +4739,17 @@ $4\times$ at $10^4$: added structure costs the near probe little.
   \item \textbf{Seeds (low priority, the user's call).} Done for the scratch curves of seven probes; the
     fine-tune arm and the five probes the factors touch still need theirs, for the final curves (the seed mean
     at each cell's chosen HPs, with a band, not the search minimum).
-  \item \textbf{Longer horizons, running.} The $D=10^{3.5}$ and $10^4$ cells at $32$k steps with a search, the lr window
+  \item \textbf{Longer horizons, preliminary (2026-10-05).} Cut on 2026-10-04 to two chosen points per sweep on top of
+    the $1$--$2$ random start-up trials (the site item below), the $32$k searches have $171$ results, four trials left
+    (\code{horizon32k.py}, values in Fig.~\ref{fig:rung_focus} as diamonds). Against each cell's $8$k search: $32$k is lower
+    in $55$ of $72$ cells, by a median $2.6\times$ for scratch and $2.9\times$ for fine-tunes, most where the $8$k loss is below
+    $\sim10^{-6}$; the fine-tune's gain over scratch goes from a median $2.9$ to $3.8$ ($48$ cell--parent pairs, wide
+    scatter). The chosen points beat the best random start-up trial in $37$ of $52$ cells (median $1.7\times$; up to
+    $\sim10\times$ for fine-tunes at the low-loss end). A $32$k value is the best of $2$--$4$ trials against $5$ or $8$ at
+    $8$k, biased toward $8$k. Exceptions: scratch on $ee\to\nu_e\bar\nu_e$ is worse at $32$k ($9\times10^{-4}$ against
+    $7\times10^{-5}$ at $10^4$); four more random points per cell were submitted on CC-IN2P3 to explore (the user's call:
+    if they do not help, the $8$k curve stands for now). $ud\to ud$ at $D=10^{2.5}$, $10^3$ looked under-trained at $8$k:
+    scratch and rung $7$ at $32$k, two chosen points each, submitted on CC-IN2P3. Earlier plan, for the record: The $D=10^{3.5}$ and $10^4$ cells at $32$k steps with a search, the lr window
     re-centred for the horizon (\code{gen\_transfer\_pilot.py --horizon 32000}, 2026-10-04): scratch on the twelve probes at
     the scratch protocol's $8$ trials (\code{tp3\_scr32k}), and fine-tunes at the grid's $5$ from each probe's best-overall
     rung (Fig.~\ref{fig:rung_focus}: $ee\to d\bar d$ r1, $ee\to W^+W^-$ r3, $ee\to d\bar d$ 1-loop r5, $ee\to\nu_e\bar\nu_e$ r6, $ud\to ud$,
@@ -4763,6 +4778,13 @@ $4\times$ at $10^4$: added structure costs the near probe little.
     recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises at rung $9$ at a
     fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
     process; the step budget stays $64$k on every rung (the user's call).
+  \item \textbf{Star arms: the redesign running (2026-10-05).} Both new arms' pretrainings finished (hp73, $64$k steps:
+    $W$ pole $6.3$\,h, EW Sudakov $6.9$\,h on lxplus); their fine-tunes on their probe and on $ee\to d\bar d$ ($28$ sweeps,
+    two chosen points each) are queued on lxplus (submitted at 02:45, an hour late: the waiter looked for
+    \code{hp73\_*} result files, which are named \code{hp0073\_*}). So far (Fig.~\ref{fig:star_arms} (g), (h)): rung $1$ on
+    $u\bar d\to e^+\nu_e$ is $10$--$100\times$ below scratch at $D\ge10^3$, where scratch levels off near $10^{-4}$ (to check:
+    its search may not have reached a good region); on the EW $ee\to d\bar d$ rung $1$ is no better than scratch at any $D$,
+    as expected of a structure no pretraining had. Earlier text, for the record:
   \item \textbf{Star arms: two of six to redesign.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
     structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on hp47 and hp73, the
     pretraining protocol of 2026-10-02 to 10-04 (hp73 alone since, Fig.~\ref{fig:pretrain_hp}); each arm also holds the
