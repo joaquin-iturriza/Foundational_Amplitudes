@@ -4791,6 +4791,25 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
+  \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
+    compute item approved).} (1) The $32$k grid: scratch and every pretraining (rungs $0$--$9$) on the twelve probes at
+    $D=10^{3.5}$, $10^4$, and $ud\to ud$ also at $10^{2.5}$, $10^3$, two chosen points each (\code{horizon32k\_chosen.json});
+    $420$ trials, spread over lxplus, CC-IN2P3 and the $17$ done on Jean Zay (the rest moved off Jean Zay's priority queue on
+    2026-10-05); waiter: a background count over the $210$ sweeps on all sites. When in: \code{cells.USE\_32K} on, figures and
+    the paper draft redrawn. (2) $D=10^{4.5}$, $10^5$ at $32$k, scratch and every pretraining, two chosen points (the
+    one-loop probes stop at $10^{4.5}$), drawn in the grid figures. (3) Equal-total-data rungs: rungs $2$--$9$ at $3\times10^5$
+    training events in total, split evenly over the rung's processes, $64$k steps at the protocol point, and their full
+    fine-tune grid (same cells and horizons as the ladder, $32$k at the top two $D$), compared with the ladder. (4) The
+    finale: rung $9$ plus every star arm's processes, fine-tuned on all $18$ probes. (5) Two extra seeds at every fine-tune
+    cell's best point. (6) The synthetic-amplitude generator (Sec.~\ref{sec:prior-open}, item 6), validated on CPU, then its
+    pretraining fine-tuned on the twelve probes, after (3). Also: the zero-shot distances (\code{tools/zero\_shot\_ft.py},
+    one job per site submitted 2026-10-05), the probes that do not gain. Throughout: placement and rebalancing across
+    sites without asking; fresh collection from all sites before any figure; after every collection, and at least every
+    few hours while results land, the study's own figures (\code{rung\_focus}, \code{rung\_grid}, \code{star\_arms},
+    \code{gain\_heatmap}, and each new comparison) sent to the user unprompted, so a problem can be caught early;
+    \code{docs/results.tex} and the paper draft (scratchpad \code{draft/}, sent as PDF and zip) kept current; reviewers run
+    when due; never narrow the scope (CLAUDE.md 0b). Context guard (\code{.claude/hooks/context\_guard.py}): at $50\%$ of the
+    window the notes are flushed, at $60\%$ Claude Code compacts.
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
