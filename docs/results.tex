@@ -4694,6 +4694,14 @@ the $32$k-step searches at $D=10^{3.5}$, $10^4$ in their series' colour, black f
 \label{fig:rung_focus}
 \end{figure}
 
+\paragraph{A $32$k horizon at $D=10^3$: no clear gain from one run.} One run per probe at its cell's best $8$k HPs, $32$k
+steps (\code{job\_transfer\_calib.sh}, Jean Zay, 2026-10-04): against the $8$k cell, $ee\to t\bar t$ gains $4.0\times$,
+$ud\to ud$ $1.5\times$, $ee\to Z\gamma$ $1.2\times$; $ee\to d\bar d$, the one-loop probes, $u\bar u\to Zgg$, $Zggg$ and
+$ee\to\nu_e\bar\nu_e$ move by $\le1.2\times$ or rise ($0.3$--$1.0\times$); several best checkpoints sit early
+($4800$--$12480$ of $32$k steps: over-training at $D=10^3$), and $u\bar u\to gg$ diverged at step $28224$ (its best before
+that not read). One run against a best-of-eight search is biased toward the $8$k value, so the $8$k cells stand at
+$D=10^3$.
+
 \paragraph{The star arms' four new probes, and the arms.} The new probes (Fig.~\ref{fig:rung_grid_new}) fine-tuned from rung
 $1$ and from the $64$k $ee\to u\bar u$: on $ee\to d\bar d$ at one loop above $500$\,GeV both are $30$--$250\times$ below scratch at
 $D\le10^{2.5}$ and $1.5$--$4\times$ above (the QCD-virtual target at $\mu=\sqrt s$ is close to the Born, which both pretrained
@@ -4725,6 +4733,43 @@ per cell (rung $1$ there: its five random trials and the same two points); (i) $
 \label{fig:star_arms}
 \end{figure}
 
+\paragraph{The star arms' design, and the two that tested nothing.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
+structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on hp47 and hp73, the
+pretraining protocol of 2026-10-02 to 10-04 (hp73 alone since, Fig.~\ref{fig:pretrain_hp}); each arm also holds the
+start-up trials that had run before the arms were cut to it (hp15, hp30, hp95) and a few leftover guided ones
+(\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100), then
+fine-tuned with the grid's protocol on the arm's probe and on $ee\to d\bar d$ (\code{tp3\_s<arm>fte}; all cells in,
+\code{analysis/transfer/star\_arms.py}). Four arms test the structure they name: soft and collinear emission
+($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$, the same topology with $d$ for $u$); initial-state collinear
+($+u\bar d\to Wg$; probe $u\bar u\to Zg$); the $t\bar t$ threshold ($+u\bar u\to t\bar t$ tree and one loop at
+$\sqrt s=363$--$450$; probe $ee\to t\bar t$ at one loop there: the Coulomb $1/\beta$ is a QCD one-loop term, so the
+QCD-virtual target carries it); the massive quasi-collinear limit ($+ee\to b\bar bg$, $b\bar bgg$; probe $ee\to t\bar tg$,
+$c$ being massless in the generator), weakly: $m_b/\sqrt s\le0.2$ against a strongly massive top. Two do not.
+\emph{Narrow resonances} ($+ee\to ZZ$, $ZH$; probe $ee\to\nu_e\bar\nu_e$): the probe's resonance, the $s$-channel $Z$
+pole, is already in rung $1$ ($ee\to\nu_\mu\bar\nu_\mu$, only the generation feature tells the two neutrinos apart), what
+the probe adds is the $t$-channel $W$, and $ZZ$, $ZH$ (both also in rung $5$) put on-shell bosons in the final state,
+which the probe has none of. \emph{Sudakov logarithms} ($+u\bar u\to d\bar d$, $ZZ$ at one loop, $\sqrt s\ge500$, both
+rung-$9$ processes; probe $ee\to d\bar d$ at one loop there): every target is QCD-virtual at $\mu=\sqrt s$, so none
+has the electroweak $\log^2(s/m_W^2)$; the probe is the QCD vertex correction to $\gamma^*/Z\to d\bar d$, which for
+massless quarks at $\mu=\sqrt s$ is the Born times a constant (MadLoop, \code{tools/ew\_sudakov\_check.py}: finite over
+Born $=0.0468$ at every point from $100$\,GeV to $3$\,TeV and three angles, constant to $10^{-16}$; so is the ladder's
+one-loop probe $ee\to d\bar d$, the same target over $25$--$1000$\,GeV: its pool is the tree pool times a constant),
+and the arm's processes carry boxes and initial-state vertices it lacks. Both arms' results stand as controls (unrelated
+structure added to rung $1$), not as tests of their names. 
+
+\paragraph{The redesign: the $W$ pole, and electroweak one-loop targets that carry the Sudakov logarithm.} The user's
+go-ahead, 2026-10-04: a resonance arm on the $W$ pole, which no
+rung before $6$ has (\code{transfer\_star\_wpole.yaml}: rung $1$ $+u\bar d\to e^+\nu_eg$, $+u\bar d\to\tau^+\nu_\tau$, a new
+generator entry, $\tau$ massive; probe $u\bar d\to e^+\nu_e$, \code{udbar\_enu}, in no equality class), and a Sudakov arm
+on electroweak one-loop targets (\code{transfer\_star\_sudakovew.yaml}: rung $1$ $+ee\to\mu\mu$, $u\bar u$ at one loop,
+electroweak, $\sqrt s=500$--$1000$; probe $ee\to d\bar d$ there, \code{ee\_dd\_ew\_nlo}). The one-loop pipeline now
+generates electroweak virtuals (\code{[virt=QED]}, \code{loop\_qcd\_qed\_sm}; the target is the finite part over
+$\alpha/2\pi$ at $\mu^2=s$; the per-event guard and the certification check the universal QED double pole
+$-\sum_iQ_i^2$ over the massless charged legs, met to $10^{-13}$ on all three). They carry the logarithm: for
+$ee\to d\bar d$ at $90^\circ$ the finite part over the Born goes from $-6\%$ at $200$\,GeV to $-29\%$ at $3$\,TeV, a
+fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3}$ at $\cos\theta=\pm0.5$;
+\code{ew\_sudakov\_check.json}); the pools change sign (finite part negative on $65$--$92\%$ of the events).
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
@@ -4749,20 +4794,10 @@ per cell (rung $1$ there: its five random trials and the same two points); (i) $
     $8$k, biased toward $8$k. Exceptions: scratch on $ee\to\nu_e\bar\nu_e$ is worse at $32$k ($9\times10^{-4}$ against
     $7\times10^{-5}$ at $10^4$); four more random points per cell were submitted on CC-IN2P3 to explore (the user's call:
     if they do not help, the $8$k curve stands for now). $ud\to ud$ at $D=10^{2.5}$, $10^3$ looked under-trained at $8$k:
-    scratch and rung $7$ at $32$k, two chosen points each, submitted on CC-IN2P3. Earlier plan, for the record: The $D=10^{3.5}$ and $10^4$ cells at $32$k steps with a search, the lr window
-    re-centred for the horizon (\code{gen\_transfer\_pilot.py --horizon 32000}, 2026-10-04): scratch on the twelve probes at
-    the scratch protocol's $8$ trials (\code{tp3\_scr32k}), and fine-tunes at the grid's $5$ from each probe's best-overall
-    rung (Fig.~\ref{fig:rung_focus}: $ee\to d\bar d$ r1, $ee\to W^+W^-$ r3, $ee\to d\bar d$ 1-loop r5, $ee\to\nu_e\bar\nu_e$ r6, $ud\to ud$,
-    $ee\to b\bar b$ 1-loop and $u\bar u\to Zg$ r7, $ee\to Z\gamma$, $Zgg$, $Zggg$ r8, $ee\to t\bar t$ and $u\bar u\to gg$ r9; rung $4$
-    and the $32$k $ee\to u\bar u$ were unranked then) and from the $64$k $ee\to u\bar u$ (\code{tp3\_r}$n$\code{fte32k},
-    \code{tp3\_uu64fte32k}): $72$ sweeps, $\sim450$ GPU-h, Jean Zay (A100) and lxplus. $ee\to W^+W^-$ stays on the mixture
-    pool, as in the grid. At $ee\to d\bar d$ the best-overall rung at HEAD is r9, tied with r1 within $1.2\times$. The $32$k
-    check at $D=10^3$ is done (one run per probe at its cell's best HPs, \code{job\_transfer\_calib.sh}, Jean Zay): against the
-    $8$k cell, $ee\to t\bar t$ gains $4.0\times$, $ud\to ud$ $1.5\times$, $ee\to Z\gamma$ $1.2\times$; $ee\to d\bar d$ and the one-loop
-    probes, $u\bar u\to Zgg$, $Zggg$ and $ee\to\nu_e\bar\nu_e$ move by $\le1.2\times$ or rise ($0.3$--$1.0\times$); several best
-    checkpoints sit early ($4800$--$12480$ of $32$k: over-training at $10^3$), and $u\bar u\to gg$ diverged at step $28224$
-    (its best before that not yet read). One run against a best-of-$8$ search is biased toward the $8$k value, so $8$k
-    stands at $10^3$ where the $32$k run does not beat it clearly.
+    scratch and rung $7$ at $32$k, two chosen points each, submitted on CC-IN2P3. Set up with \code{gen\_transfer\_pilot.py --horizon 32000} (the lr
+    window re-centred for the horizon): scratch on the twelve probes (\code{tp3\_scr32k}), fine-tunes from each probe's
+    best-overall rung at the time and from the $64$k $ee\to u\bar u$ (\code{tp3\_r}$n$\code{fte32k},
+    \code{tp3\_uu64fte32k}); $ee\to W^+W^-$ on the mixture pool, as in the grid.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
@@ -4784,46 +4819,7 @@ per cell (rung $1$ there: its five random trials and the same two points); (i) $
     \code{hp73\_*} result files, which are named \code{hp0073\_*}). So far (Fig.~\ref{fig:star_arms} (g), (h)): rung $1$ on
     $u\bar d\to e^+\nu_e$ is $10$--$100\times$ below scratch at $D\ge10^3$, where scratch levels off near $10^{-4}$ (to check:
     its search may not have reached a good region); on the EW $ee\to d\bar d$ rung $1$ is no better than scratch at any $D$,
-    as expected of a structure no pretraining had. Earlier text, for the record:
-  \item \textbf{Star arms: two of six to redesign.} Six arms (the user approved them, 2026-10-02), each rung $1$ plus one
-    structure, not cumulative (\code{recipes/transfer\_star\_<arm>.yaml}), pretrained at $64$k steps on hp47 and hp73, the
-    pretraining protocol of 2026-10-02 to 10-04 (hp73 alone since, Fig.~\ref{fig:pretrain_hp}); each arm also holds the
-    start-up trials that had run before the arms were cut to it (hp15, hp30, hp95) and a few leftover guided ones
-    (\code{tp3\_star\_<arm>}, $6$--$7.7$\,h a trial on lxplus's V100), then
-    fine-tuned with the grid's protocol on the arm's probe and on $ee\to d\bar d$ (\code{tp3\_s<arm>fte}; all cells in,
-    \code{analysis/transfer/star\_arms.py}). Four arms test the structure they name: soft and collinear emission
-    ($+ee\to u\bar ug$, $u\bar ugg$; probe $ee\to d\bar dg$, the same topology with $d$ for $u$); initial-state collinear
-    ($+u\bar d\to Wg$; probe $u\bar u\to Zg$); the $t\bar t$ threshold ($+u\bar u\to t\bar t$ tree and one loop at
-    $\sqrt s=363$--$450$; probe $ee\to t\bar t$ at one loop there: the Coulomb $1/\beta$ is a QCD one-loop term, so the
-    QCD-virtual target carries it); the massive quasi-collinear limit ($+ee\to b\bar bg$, $b\bar bgg$; probe $ee\to t\bar tg$,
-    $c$ being massless in the generator), weakly: $m_b/\sqrt s\le0.2$ against a strongly massive top. Two do not.
-    \emph{Narrow resonances} ($+ee\to ZZ$, $ZH$; probe $ee\to\nu_e\bar\nu_e$): the probe's resonance, the $s$-channel $Z$
-    pole, is already in rung $1$ ($ee\to\nu_\mu\bar\nu_\mu$, only the generation feature tells the two neutrinos apart), what
-    the probe adds is the $t$-channel $W$, and $ZZ$, $ZH$ (both also in rung $5$) put on-shell bosons in the final state,
-    which the probe has none of. \emph{Sudakov logarithms} ($+u\bar u\to d\bar d$, $ZZ$ at one loop, $\sqrt s\ge500$, both
-    rung-$9$ processes; probe $ee\to d\bar d$ at one loop there): every target is QCD-virtual at $\mu=\sqrt s$, so none
-    has the electroweak $\log^2(s/m_W^2)$; the probe is the QCD vertex correction to $\gamma^*/Z\to d\bar d$, which for
-    massless quarks at $\mu=\sqrt s$ is the Born times a constant (MadLoop, \code{tools/ew\_sudakov\_check.py}: finite over
-    Born $=0.0468$ at every point from $100$\,GeV to $3$\,TeV and three angles, constant to $10^{-16}$; so is the ladder's
-    one-loop probe $ee\to d\bar d$, the same target over $25$--$1000$\,GeV: its pool is the tree pool times a constant),
-    and the arm's processes carry boxes and initial-state vertices it lacks. Both arms' results stand as controls (unrelated
-    structure added to rung $1$), not as tests of their names. Redesign, running (the user's go-ahead, 2026-10-04): a resonance arm on the $W$ pole, which no
-    rung before $6$ has (\code{transfer\_star\_wpole.yaml}: rung $1$ $+u\bar d\to e^+\nu_eg$, $+u\bar d\to\tau^+\nu_\tau$, a new
-    generator entry, $\tau$ massive; probe $u\bar d\to e^+\nu_e$, \code{udbar\_enu}, in no equality class), and a Sudakov arm
-    on electroweak one-loop targets (\code{transfer\_star\_sudakovew.yaml}: rung $1$ $+ee\to\mu\mu$, $u\bar u$ at one loop,
-    electroweak, $\sqrt s=500$--$1000$; probe $ee\to d\bar d$ there, \code{ee\_dd\_ew\_nlo}). The one-loop pipeline now
-    generates electroweak virtuals (\code{[virt=QED]}, \code{loop\_qcd\_qed\_sm}; the target is the finite part over
-    $\alpha/2\pi$ at $\mu^2=s$; the per-event guard and the certification check the universal QED double pole
-    $-\sum_iQ_i^2$ over the massless charged legs, met to $10^{-13}$ on all three). They carry the logarithm: for
-    $ee\to d\bar d$ at $90^\circ$ the finite part over the Born goes from $-6\%$ at $200$\,GeV to $-29\%$ at $3$\,TeV, a
-    fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3}$ at $\cos\theta=\pm0.5$;
-    \code{ew\_sudakov\_check.json}); the pools change sign (finite part negative on $65$--$92\%$ of the events). Submitted on
-    lxplus (2026-10-04): each arm's pretraining at hp73 (\code{tp3\_star\_wpole}, \code{tp3\_star\_sudakovew}), each new
-    probe's scratch search ($8$ trials, $D=10$--$10^4$; \code{tp3\_scr\_udbar\_enu\_d}$k$\code{\_002}, the first generation
-    left unsubmitted, \code{tp3\_scr\_ee\_dd\_ew\_nlo}) and rung $1$ fine-tuned on both (\code{tp3\_r1fte}); the arms'
-    fine-tunes on their probe and on $ee\to d\bar d$ follow their pretrainings. The Sudakov arm's two leftover guided trials on CC-IN2P3 (hp28, $24\times$ above
-    hp47, and one cancelled mid-run) were deleted (2026-10-04, the user's call). The four new probes have their own scratch searches (\code{tp3\_scr}, $D=10$--$10^4$). Pools built on CC-IN2P3
-    (\code{transfer\_star\_pools.yaml}), copied to lxplus and Jean Zay.
+    as expected of a structure no pretraining had. Pools on CC-IN2P3 and lxplus; the old arms' pools (\code{transfer\_star\_pools.yaml}) also on Jean Zay.
   \item \textbf{The fine-tune protocol, open (the user's call).} From Fig.~\ref{fig:finetune_hp}: three trials instead of
     five (the start-up only) saves $40\%$ of the fine-tune GPU-h, at no cost in the median cell and $1.2$--$2\times$ in the
     worst tenth; the lr window $[10^{-3},10^{-2}]$ spends its top half on points $2$--$4\times$ worse at $D\ge10^3$, and $23\%$
@@ -4856,7 +4852,7 @@ per cell (rung $1$ there: its five random trials and the same two points); (i) $
     The rest of the $32$k searches there ($278$ trials of sweeps that have started, so their DyHPO state is on Jean Zay and the
     rebalancer leaves them) ran nothing that evening ($124$ pending on priority, $154$ on dependencies), a projected
     $\sim400$\,h. On the user's call (2026-10-04, for preliminary results by the next day) these sweeps were cut and moved: each runs two
-    chosen points on lxplus (\code{sweep/pick_points.py}: the candidate of the sweep's own pool nearest the point, by
+    chosen points on lxplus (\code{sweep/pick\_points.py}: the candidate of the sweep's own pool nearest the point, by
     \code{generate\_sweep --extend --fixed-hp}; fine-tunes lr $1.2$, $1.8\times10^{-3}$ with $\lambda\approx3\times10^{-10}$,
     where the $32$k fine-tunes already done had their bests; scratch lr $0.7$, $1.4\times10^{-3}$ with
     $\lambda\approx2\times10^{-7}$, the $8$k scratch optimum moved to $32$k by $t^{-0.55}$), on top of the $1$--$2$ random
