@@ -133,3 +133,4 @@ scripts/build_nlo_verdicts.txt
 sweeps_local/
 .venv-driver/
 .claude/.notes_flushed
+.claude/.compact_wanted

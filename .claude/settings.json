@@ -107,9 +107,19 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context_guard.py"
+          }
+        ]
+      }
     ]
   },
   "env": {
-    "CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE": "60"
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "600000"
   }
 }
