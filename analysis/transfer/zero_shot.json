@@ -1,0 +1,1172 @@
+{
+ "tp3_r1fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_WW_d8/trial_0059",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.8630456328392029,
+  "prepd_std": [
+   1.8831031042500306
+  ],
+  "mse_logm2": 3.0604265285420436
+ },
+ "tp3_r1fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_Za_d8/trial_0013",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 1.0595716834068298,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 1.37940285242631
+ },
+ "tp3_r1fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_bb_nlo_d8/trial_0050",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5500073432922363,
+  "prepd_std": [
+   1.0859462527898185
+  ],
+  "mse_logm2": 0.6486122549638
+ },
+ "tp3_r1fte_ee_dd_ew_nlo_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_dd_ew_nlo_d8/trial_0017",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.8426299393177032,
+  "prepd_std": [
+   1.2589071919843957
+  ],
+  "mse_logm2": 1.3354397994194742
+ },
+ "tp3_r1fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_dd_nlo_d8/trial_0006",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5333572626113892,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.620264376559353
+ },
+ "tp3_r1fte_ee_dd_nlo_hi_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_dd_nlo_hi_d8/trial_0034",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5638279318809509,
+  "prepd_std": [
+   0.8199179499182251
+  ],
+  "mse_logm2": 0.3790420353027776
+ },
+ "tp3_r1fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_ddbar_d8/trial_0059",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.10476866737008095,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 0.4786279091231139
+ },
+ "tp3_r1fte_ee_ddbarg_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_ddbarg_d8/trial_0008",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5612113773822784,
+  "prepd_std": [
+   3.6879023829732906
+  ],
+  "mse_logm2": 7.632824920632368
+ },
+ "tp3_r1fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_nnbar_d8/trial_0119",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5515990555286407,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 5.8865718320412865
+ },
+ "tp3_r1fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_ttbar_d8/trial_0020",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.7100644111633301,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.262955492521634
+ },
+ "tp3_r1fte_ee_ttbar_nlo_thr_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_ttbar_nlo_thr_d8/trial_0076",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.9298853278160095,
+  "prepd_std": [
+   0.3831456390927256
+  ],
+  "mse_logm2": 0.13650770615966268
+ },
+ "tp3_r1fte_ee_ttbarg_d8": {
+  "run_dir": "runs/tp3_r1fte_ee_ttbarg_d8/trial_0025",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.9417657554149628,
+  "prepd_std": [
+   2.117826531635211
+  ],
+  "mse_logm2": 4.223997612161134
+ },
+ "tp3_r1fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r1fte_ud_ud_d8/trial_0049",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 2.429908871650696,
+  "prepd_std": [
+   1.496688930854847
+  ],
+  "mse_logm2": 5.443184811868329
+ },
+ "tp3_r1fte_udbar_enu_d8": {
+  "run_dir": "runs/tp3_r1fte_udbar_enu_d8/trial_0015",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.6960940957069397,
+  "prepd_std": [
+   2.76746072844312
+  ],
+  "mse_logm2": 5.331272526757624
+ },
+ "tp3_r1fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r1fte_uubar_Zg_d8/trial_0021",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.9160223603248596,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 1.3283285848964077
+ },
+ "tp3_r1fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r1fte_uubar_Zgg_d8/trial_0006",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 1.0484067797660828,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 7.032173770334853
+ },
+ "tp3_r1fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r1fte_uubar_Zggg_d8/trial_0051",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 1.0858201384544373,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 12.399069895234756
+ },
+ "tp3_r1fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r1fte_uubar_gg_d8/trial_0027",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r1/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.908782035112381,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.7673315492538612
+ },
+ "tp3_r2fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_WW_d8/trial_0026",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.8066327571868896,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 2.8603821106939216
+ },
+ "tp3_r2fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_Za_d8/trial_0021",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.2650953233242035,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.3451142106615532
+ },
+ "tp3_r2fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_bb_nlo_d8/trial_0043",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.568166583776474,
+  "prepd_std": [
+   1.0859462527898185
+  ],
+  "mse_logm2": 0.670027070715911
+ },
+ "tp3_r2fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_dd_nlo_d8/trial_0042",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.48629598319530487,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.5655347662524027
+ },
+ "tp3_r2fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_ddbar_d8/trial_0004",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.10231272131204605,
+  "prepd_std": [
+   2.137387669308136
+  ],
+  "mse_logm2": 0.46740810117686815
+ },
+ "tp3_r2fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_nnbar_d8/trial_0010",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.6441045105457306,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 6.873774403104226
+ },
+ "tp3_r2fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r2fte_ee_ttbar_d8/trial_0009",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.8516812324523926,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.31539991926089767
+ },
+ "tp3_r2fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r2fte_ud_ud_d8/trial_0005",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 1.2423787713050842,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 2.7830250498083675
+ },
+ "tp3_r2fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r2fte_uubar_Zg_d8/trial_0006",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.3172750771045685,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.4600821687843384
+ },
+ "tp3_r2fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r2fte_uubar_Zgg_d8/trial_0033",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.7913256585597992,
+  "prepd_std": [
+   2.5898814594507997
+  ],
+  "mse_logm2": 5.307805755661708
+ },
+ "tp3_r2fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r2fte_uubar_Zggg_d8/trial_0046",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.8172119855880737,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 9.331811199369541
+ },
+ "tp3_r2fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r2fte_uubar_gg_d8/trial_0017",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r2/trial_0073/models/model_run0_best.pt",
+  "val_loss": 1.0975633263587952,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.926729331214133
+ },
+ "tp3_r3fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_WW_d8/trial_0047",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.21463296562433243,
+  "prepd_std": [
+   1.8831031042500306
+  ],
+  "mse_logm2": 0.7611050874974337
+ },
+ "tp3_r3fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_Za_d8/trial_0003",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 1.1939151287078857,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 1.554297797766126
+ },
+ "tp3_r3fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_bb_nlo_d8/trial_0031",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.5769876539707184,
+  "prepd_std": [
+   1.0859462527898185
+  ],
+  "mse_logm2": 0.6804295758818154
+ },
+ "tp3_r3fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_dd_nlo_d8/trial_0003",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.5734144747257233,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.6668486521294531
+ },
+ "tp3_r3fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_ddbar_d8/trial_0004",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.22007358819246292,
+  "prepd_std": [
+   2.137387669308136
+  ],
+  "mse_logm2": 1.0053899129756423
+ },
+ "tp3_r3fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_nnbar_d8/trial_0022",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.8652947545051575,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 9.234279278091808
+ },
+ "tp3_r3fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r3fte_ee_ttbar_d8/trial_0006",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.6800011396408081,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.2518222738364942
+ },
+ "tp3_r3fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r3fte_ud_ud_d8/trial_0009",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 1.142121434211731,
+  "prepd_std": [
+   1.496688930854847
+  ],
+  "mse_logm2": 2.558440819135476
+ },
+ "tp3_r3fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r3fte_uubar_Zg_d8/trial_0008",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.7146244049072266,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 1.0362804071357037
+ },
+ "tp3_r3fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r3fte_uubar_Zgg_d8/trial_0011",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.9173493087291718,
+  "prepd_std": [
+   2.5898814594507997
+  ],
+  "mse_logm2": 6.15310762156594
+ },
+ "tp3_r3fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r3fte_uubar_Zggg_d8/trial_0065",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 0.9226294159889221,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 10.535581549012042
+ },
+ "tp3_r3fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r3fte_uubar_gg_d8/trial_0030",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r3/trial_0185/models/model_run0_best.pt",
+  "val_loss": 1.1844663619995117,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 1.0001060468583947
+ },
+ "tp3_r4fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_WW_d8/trial_0077",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 1.00847589969635,
+  "prepd_std": [
+   1.8831031042500306
+  ],
+  "mse_logm2": 3.5761334967568823
+ },
+ "tp3_r4fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_Za_d8/trial_0043",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 1.2362141609191895,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 1.6093647711487489
+ },
+ "tp3_r4fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_bb_nlo_d8/trial_0023",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.863893449306488,
+  "prepd_std": [
+   1.0859462527898185
+  ],
+  "mse_logm2": 1.0187716310278685
+ },
+ "tp3_r4fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_dd_nlo_d8/trial_0058",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.6622450351715088,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.7701535774707782
+ },
+ "tp3_r4fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_ddbar_d8/trial_0015",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.1523311883211136,
+  "prepd_std": [
+   2.137387669308136
+  ],
+  "mse_logm2": 0.695913768787661
+ },
+ "tp3_r4fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_nnbar_d8/trial_0032",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.9405994415283203,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 10.037918162183804
+ },
+ "tp3_r4fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r4fte_ee_ttbar_d8/trial_0007",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.9327625632286072,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.3454264646466018
+ },
+ "tp3_r4fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r4fte_ud_ud_d8/trial_0042",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.15093958377838135,
+  "prepd_std": [
+   1.496688930854847
+  ],
+  "mse_logm2": 0.33811640408312316
+ },
+ "tp3_r4fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r4fte_uubar_Zg_d8/trial_0027",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 1.0865603685379028,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 1.5756265995871697
+ },
+ "tp3_r4fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r4fte_uubar_Zgg_d8/trial_0013",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.9082212746143341,
+  "prepd_std": [
+   2.5898814594507997
+  ],
+  "mse_logm2": 6.091881460770409
+ },
+ "tp3_r4fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r4fte_uubar_Zggg_d8/trial_0027",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.8778540194034576,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 10.024287595079425
+ },
+ "tp3_r4fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r4fte_uubar_gg_d8/trial_0085",
+  "parent": "/eos/user/j/joiturri/Foundational_Amplitudes/runs/tp3_ladder_r4/trial_0015/models/model_run0_best.pt",
+  "val_loss": 0.20753297209739685,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.17523079335636432
+ },
+ "tp3_r5fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_WW_d8/trial_0020",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 1.735778272151947,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 6.155203930856841
+ },
+ "tp3_r5fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_Za_d8/trial_0014",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5768743455410004,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.7510035707751979
+ },
+ "tp3_r5fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_bb_nlo_d8/trial_0069",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.47999876737594604,
+  "prepd_std": [
+   1.0859462527898187
+  ],
+  "mse_logm2": 0.5660525930871724
+ },
+ "tp3_r5fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_dd_nlo_d8/trial_0019",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5021627396345139,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.5839869079605691
+ },
+ "tp3_r5fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_ddbar_d8/trial_0090",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.047742919996380806,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 0.21810999936251452
+ },
+ "tp3_r5fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_nnbar_d8/trial_0015",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.8370686173439026,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 8.933054716020111
+ },
+ "tp3_r5fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r5fte_ee_ttbar_d8/trial_0031",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.6862875819206238,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.25415030844843806
+ },
+ "tp3_r5fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r5fte_ud_ud_d8/trial_0053",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.36650538444519043,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 0.8210005590558636
+ },
+ "tp3_r5fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r5fte_uubar_Zg_d8/trial_0013",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.48780296742916107,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.7073655114746887
+ },
+ "tp3_r5fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r5fte_uubar_Zgg_d8/trial_0023",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.39550191164016724,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 2.65282352501938
+ },
+ "tp3_r5fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r5fte_uubar_Zggg_d8/trial_0006",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.6719391644001007,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 7.672928848604226
+ },
+ "tp3_r5fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r5fte_uubar_gg_d8/trial_0014",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r5/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5174591243267059,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.4369174303671798
+ },
+ "tp3_r6fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_WW_d8/trial_0080",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 1.3042781352996826,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 4.625071090084754
+ },
+ "tp3_r6fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_Za_d8/trial_0016",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.5977407395839691,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.778168475154462
+ },
+ "tp3_r6fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_bb_nlo_d8/trial_0053",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.46153202652931213,
+  "prepd_std": [
+   1.0859462527898187
+  ],
+  "mse_logm2": 0.5442751485340308
+ },
+ "tp3_r6fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_dd_nlo_d8/trial_0030",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.7572138011455536,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.8805968892035021
+ },
+ "tp3_r6fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_ddbar_d8/trial_0029",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.43662315607070923,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 1.9946805997509285
+ },
+ "tp3_r6fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_nnbar_d8/trial_0070",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.9720308780670166,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 10.373349137118959
+ },
+ "tp3_r6fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r6fte_ee_ttbar_d8/trial_0011",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.9415947496891022,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.3486972551611657
+ },
+ "tp3_r6fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r6fte_ud_ud_d8/trial_0051",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.06994364783167839,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 0.15667920966329463
+ },
+ "tp3_r6fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r6fte_uubar_Zg_d8/trial_0045",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.10555451363325119,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.15306512569645184
+ },
+ "tp3_r6fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r6fte_uubar_Zgg_d8/trial_0029",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.38143353164196014,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 2.5584600635044055
+ },
+ "tp3_r6fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r6fte_uubar_Zggg_d8/trial_0013",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.6358005702495575,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 7.260259255437614
+ },
+ "tp3_r6fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r6fte_uubar_gg_d8/trial_0024",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r6/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.14779621362686157,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.12479196682417922
+ },
+ "tp3_r7fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_WW_d8/trial_0001",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 3.130002737045288,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 11.099231658643168
+ },
+ "tp3_r7fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_Za_d8/trial_0047",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.7115051448345184,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.926272607762673
+ },
+ "tp3_r7fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_bb_nlo_d8/trial_0010",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.45755037665367126,
+  "prepd_std": [
+   1.0859462527898187
+  ],
+  "mse_logm2": 0.5395796713993855
+ },
+ "tp3_r7fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_dd_nlo_d8/trial_0046",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.6559320986270905,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.7628119887750311
+ },
+ "tp3_r7fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_ddbar_d8/trial_0020",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.24328579753637314,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 1.111433174795125
+ },
+ "tp3_r7fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_nnbar_d8/trial_0018",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.9254839420318604,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 9.876608107949174
+ },
+ "tp3_r7fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r7fte_ee_ttbar_d8/trial_0058",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.5411383211612701,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.20039772663745145
+ },
+ "tp3_r7fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r7fte_ud_ud_d8/trial_0061",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.11107006669044495,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 0.24880558572220451
+ },
+ "tp3_r7fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r7fte_uubar_Zg_d8/trial_0002",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.19162043929100037,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.27786975295054356
+ },
+ "tp3_r7fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r7fte_uubar_Zgg_d8/trial_0111",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.21104982495307922,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 1.415613740689413
+ },
+ "tp3_r7fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r7fte_uubar_Zggg_d8/trial_0066",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.46638287603855133,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 5.325664604244451
+ },
+ "tp3_r7fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r7fte_uubar_gg_d8/trial_0075",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r7/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.4609497934579849,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.38920368743713535
+ },
+ "tp3_r8fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_WW_d8/trial_0005",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 1.3393742442131042,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 4.749524605264349
+ },
+ "tp3_r8fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_Za_d8/trial_0064",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.5249606370925903,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.6834197360661407
+ },
+ "tp3_r8fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_bb_nlo_d8/trial_0014",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.45840461552143097,
+  "prepd_std": [
+   1.0859462527898187
+  ],
+  "mse_logm2": 0.5405870575825931
+ },
+ "tp3_r8fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_dd_nlo_d8/trial_0016",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.7474976778030396,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.8692975864470133
+ },
+ "tp3_r8fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_ddbar_d8/trial_0004",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.29968565702438354,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 1.369091762035042
+ },
+ "tp3_r8fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_nnbar_d8/trial_0063",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.8721226155757904,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 9.307145056683396
+ },
+ "tp3_r8fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_r8fte_ee_ttbar_d8/trial_0032",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.9593415260314941,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.35526935234054613
+ },
+ "tp3_r8fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_r8fte_ud_ud_d8/trial_0004",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.25191646814346313,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 0.564312476593619
+ },
+ "tp3_r8fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_r8fte_uubar_Zg_d8/trial_0028",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.3399547040462494,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.4929700087173478
+ },
+ "tp3_r8fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_r8fte_uubar_Zgg_d8/trial_0036",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.4588702619075775,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 3.077865845633998
+ },
+ "tp3_r8fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_r8fte_uubar_Zggg_d8/trial_0016",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.29370418190956116,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 3.353832325492646
+ },
+ "tp3_r8fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_r8fte_uubar_gg_d8/trial_0053",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_ladder_r8/trial_0047/models/model_run0_best.pt",
+  "val_loss": 0.9551554918289185,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.8064870508061748
+ },
+ "tp3_r9fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_r9fte_ee_WW_d8/trial_0030",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 1.47332102060318,
+  "prepd_std": [
+   1.8831031042500306
+  ],
+  "mse_logm2": 5.2245102285949425
+ },
+ "tp3_r9fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_r9fte_ee_Za_d8/trial_0028",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.3348224014043808,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 0.43588837148651643
+ },
+ "tp3_r9fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_r9fte_ee_bb_nlo_d8/trial_0075",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.42935551702976227,
+  "prepd_std": [
+   1.0859462527898185
+  ],
+  "mse_logm2": 0.5063300580949777
+ },
+ "tp3_r9fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_r9fte_ee_dd_nlo_d8/trial_0139",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.5685835480690002,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 0.6612305572407376
+ },
+ "tp3_r9fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_r9fte_ee_ddbar_d8/trial_0070",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.19795574247837067,
+  "prepd_std": [
+   2.137387669308136
+  ],
+  "mse_logm2": 0.9043461704696005
+ },
+ "tp3_r9fte_ee_nnbar_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_ee_nnbar_d8/trial_0005",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.7882494926452637,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 8.412065273714951
+ },
+ "tp3_r9fte_ee_ttbar_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_ee_ttbar_d8/trial_0036",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.846535325050354,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.31349425465625025
+ },
+ "tp3_r9fte_ud_ud_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_ud_ud_d8/trial_0011",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.28570495545864105,
+  "prepd_std": [
+   1.496688930854847
+  ],
+  "mse_logm2": 0.6400013154285679
+ },
+ "tp3_r9fte_uubar_Zg_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_uubar_Zg_d8/trial_0008",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.10165949165821075,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 0.14741693494004823
+ },
+ "tp3_r9fte_uubar_Zgg_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_uubar_Zgg_d8/trial_0032",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.3556640297174454,
+  "prepd_std": [
+   2.5898814594507997
+  ],
+  "mse_logm2": 2.385611490788575
+ },
+ "tp3_r9fte_uubar_Zggg_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_uubar_Zggg_d8/trial_0018",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.17443817853927612,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 1.9919239766399688
+ },
+ "tp3_r9fte_uubar_gg_d8": {
+  "run_dir": "runs_from_lxplus/tp3_r9fte_uubar_gg_d8/trial_0059",
+  "parent": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/tp3_ladder_r9/trial_0073/models/model_run0_best.pt",
+  "val_loss": 0.6899095773696899,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.5825262432511619
+ },
+ "tp3_uu64fte_ee_WW_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_WW_d8/trial_0126",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.8451185822486877,
+  "prepd_std": [
+   1.8831031042500308
+  ],
+  "mse_logm2": 6.54293312260101
+ },
+ "tp3_uu64fte_ee_Za_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_Za_d8/trial_0042",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.0149883031845093,
+  "prepd_std": [
+   1.1409861905152858
+  ],
+  "mse_logm2": 1.3213620017575374
+ },
+ "tp3_uu64fte_ee_bb_nlo_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_bb_nlo_d8/trial_0012",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.1264415979385376,
+  "prepd_std": [
+   1.0859462527898187
+  ],
+  "mse_logm2": 1.3283892184976478
+ },
+ "tp3_uu64fte_ee_dd_nlo_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_dd_nlo_d8/trial_0001",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.116301417350769,
+  "prepd_std": [
+   1.0783985941202756
+  ],
+  "mse_logm2": 1.2981955083826986
+ },
+ "tp3_uu64fte_ee_dd_nlo_hi_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_dd_nlo_hi_d8/trial_0005",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.4275889992713928,
+  "prepd_std": [
+   0.8199179499182251
+  ],
+  "mse_logm2": 0.9597187532985468
+ },
+ "tp3_uu64fte_ee_ddbar_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_ddbar_d8/trial_0032",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.27614453434944153,
+  "prepd_std": [
+   2.1373876693081364
+  ],
+  "mse_logm2": 1.26154588398624
+ },
+ "tp3_uu64fte_ee_ddbarg_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_ddbarg_d8/trial_0008",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.5702976286411285,
+  "prepd_std": [
+   3.6879023829732906
+  ],
+  "mse_logm2": 7.756403607449397
+ },
+ "tp3_uu64fte_ee_nnbar_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_nnbar_d8/trial_0114",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 2.413943350315094,
+  "prepd_std": [
+   3.2667768329259883
+  ],
+  "mse_logm2": 25.761195179150164
+ },
+ "tp3_uu64fte_ee_ttbar_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_ttbar_d8/trial_0007",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.6583510041236877,
+  "prepd_std": [
+   0.6085443719594377
+  ],
+  "mse_logm2": 0.24380466028121495
+ },
+ "tp3_uu64fte_ee_ttbar_nlo_thr_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_ttbar_nlo_thr_d8/trial_0145",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.8575629889965057,
+  "prepd_std": [
+   0.3831456390927256
+  ],
+  "mse_logm2": 0.12589074481934373
+ },
+ "tp3_uu64fte_ee_ttbarg_d8": {
+  "run_dir": "runs/tp3_uu64fte_ee_ttbarg_d8/trial_0027",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.1695101857185364,
+  "prepd_std": [
+   2.117826531635211
+  ],
+  "mse_logm2": 5.2454744754406
+ },
+ "tp3_uu64fte_ud_ud_d8": {
+  "run_dir": "runs/tp3_uu64fte_ud_ud_d8/trial_0012",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.7861514091491699,
+  "prepd_std": [
+   1.4966889308548472
+  ],
+  "mse_logm2": 1.761040284281404
+ },
+ "tp3_uu64fte_uubar_Zg_d8": {
+  "run_dir": "runs/tp3_uu64fte_uubar_Zg_d8/trial_0009",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 0.9892652332782745,
+  "prepd_std": [
+   1.2042030469364817
+  ],
+  "mse_logm2": 1.434538439587568
+ },
+ "tp3_uu64fte_uubar_Zgg_d8": {
+  "run_dir": "runs/tp3_uu64fte_uubar_Zgg_d8/trial_0007",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.0617152452468872,
+  "prepd_std": [
+   2.5898814594508
+  ],
+  "mse_logm2": 7.121440115882906
+ },
+ "tp3_uu64fte_uubar_Zggg_d8": {
+  "run_dir": "runs/tp3_uu64fte_uubar_Zggg_d8/trial_0012",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.0427629351615906,
+  "prepd_std": [
+   3.379213317014107
+  ],
+  "mse_logm2": 11.907396132505276
+ },
+ "tp3_uu64fte_uubar_gg_d8": {
+  "run_dir": "runs/tp3_uu64fte_uubar_gg_d8/trial_0010",
+  "parent": "/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_pre64_ee_uu/trial_0095/models/model_run0_best.pt",
+  "val_loss": 1.0785255432128906,
+  "prepd_std": [
+   0.9188860550878857
+  ],
+  "mse_logm2": 0.9106547488926421
+ }
+}
