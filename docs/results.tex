@@ -4688,10 +4688,29 @@ $ee\to b\bar b$ at one loop (rung $9$) & $1.41$ & $1.84$ & $0.72$ & $0.36$ & $0.
 \widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_focus_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_focus_qcd_f.pdf}}
 \caption{The grid of Fig.~\ref{fig:rung_grid} per probe: scratch, the first rung with the probe's structure, the rung below,
-and the best pretraining overall (leader and first tie named, further ties counted), the others grey. Open diamonds:
-the $32$k-step searches at $D=10^{3.5}$, $10^4$ in their series' colour, black for scratch (preliminary, the
-\emph{Longer horizons} item).}
+and the best pretraining overall (leader and first tie named, further ties counted), the others grey; rung $0$ is
+the $64$k $ee\to u\bar u$ pretraining. The $8$k grid: every pretraining at the same compute in every cell (the $32$k
+cells replace those at $D=10^{3.5}$, $10^4$ once every pretraining has them, the \emph{Longer horizons} item).}
 \label{fig:rung_focus}
+\end{figure}
+
+\paragraph{The grid in one picture (2026-10-05, the paper's summary).} Fig.~\ref{fig:gain_heatmap}
+(\code{gain\_heatmap.py}, the $8$k grid) gives each probe--pretraining pair the mean over $D$ of
+$\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$, the leader rule of Fig.~\ref{fig:rung_focus}. Of the $840$ cells
+$698$ ($83\%$) fine-tune below scratch, and $106$ of the $120$ pairs gain on average. The geometric mean of the gain over
+all cells is $1.70$ from rung $0$, $2.1$--$2.4$ from rungs $1$--$6$ and $3.2$--$3.4$ from rungs $7$--$9$; from rungs $7$--$9$ it is
+$2.5\times$ at $D\le10^2$ and $3.7$--$4.2\times$ at $D\ge10^{2.5}$. The rung adding a probe's structure beats the rung below on
+nine of twelve probes (not $u\bar u\to Zg$, $ee\to b\bar b$ at one loop, $ee\to Z\gamma$), and the best rung is that one
+or a later one on nine of twelve (not $ee\to W^+W^-$, best from rung $3$, and the two one-loop probes, best from rungs $5$
+and $7$). $ee\to Z\gamma$ is the one probe no pretraining helps ($0.5$--$1.2\times$). The scratch curve of the $W$-pole
+arm's probe $u\bar d\to e^+\nu_e$ levels off at $1$--$2\times10^{-4}$ from $D=10^{3.5}$: every top trial there has its best
+checkpoint at the last of the $8$k steps and its lr inside the window, so it is the horizon, not the search.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/gain_heatmap.pdf}
+\caption{The fine-tune's gain over scratch, $\langle\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})\rangle_D$, per probe and
+pretraining (rung $0$: $ee\to u\bar u$, $64$k steps), the $8$k grid; outlined, the first rung with the probe's structure.}
+\label{fig:gain_heatmap}
 \end{figure}
 
 \paragraph{A $32$k horizon at $D=10^3$: no clear gain from one run.} One run per probe at its cell's best $8$k HPs, $32$k
