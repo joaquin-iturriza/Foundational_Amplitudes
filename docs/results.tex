@@ -4808,8 +4808,22 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
     few hours while results land, the study's own figures (\code{rung\_focus}, \code{rung\_grid}, \code{star\_arms},
     \code{gain\_heatmap}, and each new comparison) sent to the user unprompted, so a problem can be caught early;
     \code{docs/results.tex} and the paper draft (scratchpad \code{draft/}, sent as PDF and zip) kept current; reviewers run
-    when due; never narrow the scope (CLAUDE.md 0b). Context guard (\code{.claude/hooks/context\_guard.py}): at $50\%$ of the
-    window the notes are flushed, at $60\%$ Claude Code compacts.
+    when due; never narrow the scope (CLAUDE.md 0b). Context guard (\code{.claude/hooks/context\_guard.py}): from $50\%$ of the
+    window the notes are flushed every $25$k tokens, at $60\%$ Claude Code compacts.
+    \emph{State at the last flush (2026-10-05, 22:30):} (1) $326$ of the $420$ $32$k trials done; the $94$ missing points
+    ($52$ sweeps: rung $2$ and $4$ on lxplus, rung $6$ and $7$ on CC-IN2P3) were resubmitted after the parent-copy failure
+    (site item below), the list in the scratchpad's \code{miss32.json}; background waiter counts results of the $210$ sweeps
+    on all sites (the sweep list \code{w\_all.txt}). Once all $420$ are in: collect \code{tp3\_} from every site
+    (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set \code{cells.USE\_32K = True}, redraw
+    \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap}, update the paper draft's numbers and send the figures.
+    Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all trials) at $10^4$
+    (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ goes to $32$k for every pretraining
+    ($32$k lower than $8$k: scratch $3.3$, $7.8\times$, rung $7$ $1.4$, $4.7\times$). Zero-shot distances: one job per site
+    (\code{FA-lxplus-42c4f7c6}, \code{FA-ccin2p3-6f199960}, \code{FA-jeanzay-4733f9ce}), lines \code{ZERO\_SHOT} in their
+    logs, not yet read. Rebalancer: the new version (pending trials of any sweep) hourly over \code{tp3\_}. Next: step (2),
+    the $D=10^{4.5}$, $10^5$ configs at $32$k (\code{gen\_transfer\_pilot.py} has $k=9,10$ at $16$k: write them at
+    $32$k, batch $16384$, the chosen points), then (3)--(6). The paper draft is the scratchpad's \code{draft/}
+    (\code{fm\_amplitudes\_updated.zip}, \code{fm\_amplitudes\_check.pdf} last sent).
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
