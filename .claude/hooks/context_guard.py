@@ -9,14 +9,14 @@ notes, and then the session compacts, so a long autonomous run does not drift.
 Compaction itself is Claude Code's auto-compact, set to COMPACT_AT in settings.json
 (env CLAUDE_CODE_AUTOCOMPACT_PCT_OVERRIDE): a hook cannot start one. Context use is the last main-chain assistant
 message's input + cache-read + cache-creation tokens. A flush is recorded by writing the context use at that moment
-into .claude/.notes_flushed (the command is in the instruction); from FLUSH_AT on a new flush is due every STEP tokens,
-so the last one before compaction trails it by at most STEP (the user's point, 2026-10-05: one flush at 50% left up to
-10% of the window unrecorded). The marker is cleared once use falls below RESET_AT (after a compaction).
+into .claude/.notes_flushed (the command is in the instruction). One flush, placed just below compaction (the user's
+point, 2026-10-05: a flush at 50% left up to 10% of the window unrecorded before compaction at 60%). The marker is
+cleared once use falls below RESET_AT (after a compaction).
 """
 import json, os, sys
 
 WINDOW = int(os.environ.get("FA_CONTEXT_WINDOW", "1000000"))
-FLUSH_AT, RESET_AT, COMPACT_AT, STEP = 0.50, 0.30, 0.60, 25000
+FLUSH_AT, RESET_AT, COMPACT_AT = 0.57, 0.30, 0.60
 REPO = os.environ.get("CLAUDE_PROJECT_DIR", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 MARK = os.path.join(REPO, ".claude", ".notes_flushed")
 
@@ -24,8 +24,7 @@ INSTR = (f"CONTEXT GUARD: the context window is at {{pct:.0f}}% (flush at {FLUSH
          f"{COMPACT_AT:.0%}). Before anything else: update docs/results.tex with everything needed to continue: the state "
          "of every running batch (sites, counts, waiters), decisions taken since the last flush, results not yet written "
          "up, and the plan's next steps in the transfer study's hand-off (the 'Plan to finish' item); commit; then run "
-         "`echo {n} > .claude/.notes_flushed`. Then carry on with the plan. Another flush is due every "
-         f"{STEP // 1000}k tokens until auto-compaction.")
+         "`echo {n} > .claude/.notes_flushed`. Then carry on with the plan; auto-compaction follows by itself.")
 AFTER = ("CONTEXT GUARD: this context was just compacted. Before continuing, read in docs/results.tex the transfer "
          "study's hand-off (sec:ladder-open), in particular the 'Plan to finish' item, and CLAUDE.md's ground rules "
          "(0: start every message with 'Joaquin'; 0b: never narrow the scope). Re-check the running batches with `site` "
@@ -76,7 +75,7 @@ def main():
         last = int(open(MARK).read().split()[0])
     except (OSError, ValueError, IndexError):
         last = None
-    if last is not None and n - last < STEP:
+    if last is not None:
         return 0
     msg = INSTR.format(pct=100 * frac, n=n)
     if ev == "Stop":
