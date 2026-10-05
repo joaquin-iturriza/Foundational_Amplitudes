@@ -4784,20 +4784,19 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
   \item \textbf{Seeds (low priority, the user's call).} Done for the scratch curves of seven probes; the
     fine-tune arm and the five probes the factors touch still need theirs, for the final curves (the seed mean
     at each cell's chosen HPs, with a band, not the search minimum).
-  \item \textbf{Longer horizons, preliminary (2026-10-05).} Cut on 2026-10-04 to two chosen points per sweep on top of
-    the $1$--$2$ random start-up trials (the site item below), the $32$k searches have $171$ results, four trials left
-    (\code{horizon32k.py}, values in Fig.~\ref{fig:rung_focus} as diamonds). Against each cell's $8$k search: $32$k is lower
-    in $55$ of $72$ cells, by a median $2.6\times$ for scratch and $2.9\times$ for fine-tunes, most where the $8$k loss is below
-    $\sim10^{-6}$; the fine-tune's gain over scratch goes from a median $2.9$ to $3.8$ ($48$ cell--parent pairs, wide
-    scatter). The chosen points beat the best random start-up trial in $37$ of $52$ cells (median $1.7\times$; up to
-    $\sim10\times$ for fine-tunes at the low-loss end). A $32$k value is the best of $2$--$4$ trials against $5$ or $8$ at
-    $8$k, biased toward $8$k. Exceptions: scratch on $ee\to\nu_e\bar\nu_e$ is worse at $32$k ($9\times10^{-4}$ against
-    $7\times10^{-5}$ at $10^4$); four more random points per cell were submitted on CC-IN2P3 to explore (the user's call:
-    if they do not help, the $8$k curve stands for now). $ud\to ud$ at $D=10^{2.5}$, $10^3$ looked under-trained at $8$k:
-    scratch and rung $7$ at $32$k, two chosen points each, submitted on CC-IN2P3. Set up with \code{gen\_transfer\_pilot.py --horizon 32000} (the lr
-    window re-centred for the horizon): scratch on the twelve probes (\code{tp3\_scr32k}), fine-tunes from each probe's
-    best-overall rung at the time and from the $64$k $ee\to u\bar u$ (\code{tp3\_r}$n$\code{fte32k},
-    \code{tp3\_uu64fte32k}); $ee\to W^+W^-$ on the mixture pool, as in the grid.
+  \item \textbf{Longer horizons: every pretraining at $32$k (2026-10-05, running).} The first $32$k round
+    (\code{gen\_transfer\_pilot.py --horizon 32000}, 2026-10-03) was set up for scratch, the $64$k $ee\to u\bar u$ and one rung
+    per probe only (its best-overall rung at the time). Nobody asked for that restriction, and it was not reported. With one
+    rung at $32$k and the other eight at $8$k, the equal-compute comparison between rungs breaks at $D=10^{3.5}$, $10^4$. The
+    same happened to the $ud\to ud$ follow-up at $D=10^{2.5}$, $10^3$ (scratch and rung $7$ only). So the figures are on the
+    $8$k grid (\code{cells.USE\_32K} off), and the missing cells were submitted on 2026-10-05: every pretraining (rungs
+    $0$--$9$) on the twelve probes at $D=10^{3.5}$, $10^4$ ($192$ sweeps; $153$ on Jean Zay, pending on priority at
+    submission; $39$ on lxplus), and the $18$ $ud\to ud$ sweeps at $10^{2.5}$, $10^3$ (lxplus). Each runs the two chosen points
+    (lr $1.2$, $1.8\times10^{-3}$, $\lambda\approx3\times10^{-10}$; \code{horizon32k\_chosen.json}), and every $32$k cell is
+    scored on those two points only (\code{cells.best\_chosen}): the first round's sweeps also hold $1$--$2$ random start-up
+    trials, which would favour its pretrainings. Once all are in, \code{USE\_32K} goes on. Scratch on $ee\to\nu_e\bar\nu_e$ stays
+    at $8$k (\code{HOLD\_8K}): it was worse at $32$k ($9\times10^{-4}$ against $7\times10^{-5}$ at $10^4$), and four more random
+    points per cell are exploring on CC-IN2P3. Rules 0b of CLAUDE.md and the reviewers' scope axis came out of this.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
