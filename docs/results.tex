@@ -4797,6 +4797,18 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
     trials, which would favour its pretrainings. Once all are in, \code{USE\_32K} goes on. Scratch on $ee\to\nu_e\bar\nu_e$ stays
     at $8$k (\code{HOLD\_8K}): it was worse at $32$k ($9\times10^{-4}$ against $7\times10^{-5}$ at $10^4$), and four more random
     points per cell are exploring on CC-IN2P3. Rule 0b of CLAUDE.md and the reviewers' scope axis came out of this.
+  \item \textbf{Structure or data (next).} Each rung adds $10^5$ events per new process at a fixed $64$k steps, so the
+    later rungs see more data in total as well as more structure. Rungs at equal total pretraining data as well as equal
+    steps separate the two (the user's plan, 2026-10-05; the paper draft names it as the main open objection).
+  \item \textbf{Synthetic pretraining data, after the structure-or-data item (the user's call, 2026-10-05).} Compare the
+    ladder with a pretraining on artificially generated amplitudes, in the style of the synthetic-prior tabular foundation
+    models: the synthetic-amplitude prior of Sec.~\ref{sec:prior-open} (item 6: random rational functions of the invariants
+    with random poles, Lorentz-invariant by construction), scored on the same probes and $D$ grid. It tells whether what
+    transfers is the physics or only ``smooth functions of invariants with poles''. Not before the structure-or-data
+    separation, which it builds on.
+  \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
+    from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
+    why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
   \item \textbf{Distance from the pretraining.} Each probe's zero-shot loss under the $ee\to u\bar u$
     pretraining, to order the twelve gains of Table~\ref{tab:ladder_transfer_all} by distance.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
