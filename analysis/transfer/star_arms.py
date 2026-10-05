@@ -6,7 +6,8 @@ The study's six arms as finally designed (the first resonance and Sudakov arms t
 replaced by the W-pole and electroweak-Sudakov arms, docs/results.tex; they are not drawn). The W-pole and EW-Sudakov
 arms run two chosen points per cell (sweep/pick_points.py), and on their own probes rung 1 is read on the same two
 points only (r1_chosen.json; the design approved 2026-10-04: arm and rung 1 at the same points), not on its search.
-Panel (g) keeps rung 1's full search, against which the four searched arms are read.
+Panel (g) draws rung 1's full search (the four searched arms' reference) and, dashed, rung 1 at the two chosen
+points (the reference of the two chosen-only arms).
     python analysis/transfer/star_arms.py      -> figs/star_arms_a..g (six arms, then ee -> dd~ from every arm)
 """
 import json, os, sys
@@ -25,7 +26,8 @@ def r1(p, k, arm):
     n = f"tp3_r1fte_{p}_d{k}"
     if arm not in CHOSEN_ONLY:
         return best(n)[0]
-    tr = [t for t in S.get(n, []) + S.get(n + "_002", []) if t.get("val_loss") and t["hp"] in R1_CHOSEN.get(n, [])]
+    tr = [t for t in S.get(n, []) + S.get(n + "_002", [])
+          if t.get("val_loss") and t.get("prepd_std") and t["hp"] in R1_CHOSEN.get(n, [])]
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if tr else None
 
 # arm -> (its probe, what it adds to rung 1); docs/results.tex sec:ladder-open, the star arms item
@@ -44,6 +46,8 @@ fig, ax = figs[-1]
 p = "ee_ddbar"
 ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k")
 ax.plot(*curve(lambda k: best(f"tp3_r1fte_{p}_d{k}")[0]), "o-", color=ps.C.blue)
+# the W-pole and EW-Sudakov arms ran two chosen points here too: rung 1 at the same two points, their reference
+ax.plot(*curve(lambda k: r1(p, k, "wpole")), "o--", color=ps.C.blue, label="rung 1, the two chosen points")
 for arm in ARMS:
     ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm])
 ps.process_label(ax, LAB[p] + "\nfrom every arm")
