@@ -12,7 +12,7 @@ ranked on the 8k grid, where every pretraining has every cell at the same comput
 import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cells import ROOT, best, scratch  # noqa: E402
+from cells import ROOT, USE_32K, best, scratch  # noqa: E402
 from rung_grid import LAB, P, S, RUNG_ADDS, draw_final, fam  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
@@ -78,7 +78,8 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     a0 = figs[0][1]
     if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
         a0.plot([], [], "o-", color=ps.C.green, label="best overall")
-    a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
+    if USE_32K:
+        a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
     for r, what in [(0, r"$ee\to u\bar u$")] + list(RUNG_ADDS.items()):                           # the key to the panels' "r6 vs r5" labels
         a0.plot([], [], " ", label=f"r{r}: {what}")
     ps.shared_legend(figs[0][0], a0, ncol=2)

@@ -61,13 +61,19 @@ def finetune(p, k, steered=True):
 # search is not in yet, or still needs work, keeps its 8k value and is flagged as having less compute for now.
 LONG_K = {7, 8}
 LONG_K_PROBE = {"ud_ud": {5, 6, 7, 8}}
-HOLD_8K = {("scr", "ee_nnbar")}     # scratch ee -> nu_e nu_e at 32k came out worse; its exploration is still running
+HOLD_8K = {("scr", "ee_nnbar")}
+# Off until every pretraining has its 32k cells (2026-10-05, the user's call): the first 32k round covered scratch,
+# ee->uu and one rung per probe only, so mixing it in breaks the equal-compute comparison between rungs. With this off
+# every figure is the 8k grid, every pretraining at the same compute in every cell.
+USE_32K = False     # scratch ee -> nu_e nu_e at 32k came out worse; its exploration is still running
 
 
 def final(fam, p, k):
     """(value, at the final horizon?) of one cell. fam: "scr" for scratch, else a fine-tune family (tp3_r7fte, ...).
     Only the twelve ladder probes have long horizons; every other cell is at its grid horizon and counts as final."""
     short = scratch(p, k, steered=False)[0] if fam == "scr" else best(f"{fam}_{p}_d{k}")[0]
+    if not USE_32K:
+        return short, True
     if p not in ARM or k not in LONG_K_PROBE.get(p, LONG_K) or p in ("ee_ddbarg", "ee_ttbarg", "ee_ttbar_nlo_thr",
                                                                          "ee_dd_nlo_hi", "udbar_enu", "ee_dd_ew_nlo"):
         return short, True

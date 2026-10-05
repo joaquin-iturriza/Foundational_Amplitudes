@@ -9,7 +9,7 @@ whose long search is not in yet keeps its 8k value, drawn open (less compute, fo
 import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cells import ROOT, ARM, best, scratch, final  # noqa: E402
+from cells import ROOT, ARM, USE_32K, best, scratch, final  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -82,7 +82,8 @@ if __name__ == "__main__":
             ps.process_label(ax, LAB[p])
             ps.make_room(ax)
         a0 = figs[0][1]
-        a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
+        if USE_32K:
+            a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
         ps.shared_legend(figs[0][0], a0, ncol=2)     # eleven series: no panel has a clear corner for them
         ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_grid_{part}"))
     # the star arms' probes, from scratch, ee->uu and rung 1 (all at their grid horizons)
