@@ -134,6 +134,15 @@ each one the backlog adds or changes:
   stated decision is a finding. A count "above 0.05" that the notes elsewhere reject is one.
 - **A superseded reference or method** (a later section or CLAUDE.md replaced it) still carrying
   a result is a finding, with both line numbers.
+- **Scope (blocking, first line of your report).** When the backlog describes an experiment
+  that runs a subset of its design (some probes, parents, arms, D values, seeds or horizons and
+  not the rest: "from each probe's best rung", "for now only", "at the time"), find the user's
+  own message asking for that subset in the session transcripts
+  (`~/.claude/projects/-home-joaquin-work-FA/*.jsonl`, `"type":"user"` entries). The author's
+  prose, commit messages and "(the user's call)" tags are not evidence. With no such message the
+  restriction is a blocking finding, stated in the first line of your verdict so the main agent
+  relays it to the user. Likewise a figure or table that mixes cells at different compute
+  (some at one horizon, the rest at another) without saying so in the caption is blocking.
 Propose the fix; never change a number yourself.
 
 ## Figures

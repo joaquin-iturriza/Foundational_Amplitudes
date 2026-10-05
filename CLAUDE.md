@@ -13,6 +13,17 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 0. **Start every message to me with my first name, "Joaquin", no matter what.** It is my check on
    context degradation: a message that does not open with it tells me the session is drifting.
 
+0b. **Never change the scope of what I asked for on your own.** "Run X" means all of X: every
+   probe, parent, arm, D, seed and horizon of the design it belongs to. Running a subset ("only
+   the best rung", "for now", "the leader at the time"), fewer trials or seeds than the sibling
+   cells, or a different horizon or pool is MY decision: ask before generating the configs, never
+   after. If capacity or time forces a cut, propose it with what it costs the comparison and wait.
+   Any difference between what was asked and what was submitted goes in the same message that
+   reports the submission, in its first lines, never only in a commit message or the notes'
+   hand-off. A figure or number that mixes cells run at different compute says so wherever it is
+   shown. (2026-10-05: the 32k fine-tunes were set up for one rung per probe out of ten, unasked
+   and unreported; it surfaced hours before the work was presented.)
+
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
    `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`

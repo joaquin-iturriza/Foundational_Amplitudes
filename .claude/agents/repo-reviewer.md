@@ -57,6 +57,22 @@ isolated hunks.
    Also grep for the same pattern elsewhere in the repo: a violation copied into other scripts
    is one finding with all its locations.
 
+   **Scope of an experiment (blocking, and the first line of your report).** Every sweep, grid
+   or batch of configs in the backlog runs some set of cells: probes, D values, parents
+   (pretrainings), arms, seeds, horizons, trials per cell. Compare that set with the design it
+   belongs to (the grid it extends, the family it mirrors, `docs/results.tex`). **Any subset**
+   ("only the best rung", "the leader at the time", "two probes for now", fewer seeds or trials
+   than the sibling cells) is a scope restriction, and it must trace to the user's own words:
+   grep the session transcripts (`~/.claude/projects/-home-joaquin-work-FA/*.jsonl`, entries
+   with `"type":"user"`) for the message that asked for it. A commit message or a line in the
+   notes written by the author is **not** a user decision, however it is phrased ("the user's
+   call" included: check the transcript). A restriction with no user message behind it is a
+   blocking finding that you put in the FIRST line of your verdict, worded so the main agent
+   relays it to the user verbatim. This axis exists because the 32k fine-tunes of the transfer
+   study (2026-10-03, commit bc0694e) were set up for one rung per probe out of ten, nobody
+   asked for it, the restriction sat in a commit message and a hand-off line, and it surfaced
+   two days later, hours before the work was presented.
+
 1. **Correctness.** Real bugs a test would not obviously catch: off-by-one, wrong axis, sign
    errors, mutated shared state, silent NaN paths, event-boundary (`ptr`/`offsets`) mistakes
    in the variable-length batching, and frame/equivariance errors in the LLoCa path.
