@@ -4841,24 +4841,32 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop; every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 02:10):} (1) $346$ of the $420$ $32$k points in. The $75$ missing (all of rung $2$, most of rung
-    $6$, three of rung $7$) had failed in seconds on every rerun: their first attempts' run dirs blocked \code{run.py}; fixed
-    (\code{run\_trial.py}: a cold start takes \code{trial\_<hp>\_r<k>}, nothing deleted) and the $71$ not running resubmitted on
-    lxplus at 01:39 (training checked); expected in by about 08:00. Once all $420$ are in: collect \code{tp3\_} from every site
-    (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set \code{cells.USE\_32K = True}, redraw
-    \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap}, update the paper draft's numbers and send the figures.
-    Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all trials) at $10^4$
-    (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ goes to $32$k for every pretraining.
-    Zero-shot: done (\code{fig:zero\_shot\_gain}); the version up to an affine map (\code{val\_loss\_affine}) is in for nine of ten
-    pretrainings, rung $9$ running on lxplus (\code{FA-lxplus-6f65373e}; the CC copy \code{FA-ccin2p3-fb225655} to be
-    cancelled when it lands); then redraw \code{zero\_shot\_gain} on it and explain to the user how to read it (they asked).
-    Before the equal-data and finale fine-tune grids go out, resolve the parent dir that wrote each hp73 result (a rerun
-    trains in \code{trial\_0073\_r<k>}) and point the configs at it. The equal-data rungs' parents are hp73 alone, the
-    ladder's fine-tunes use each rung's best-of-search parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every
-    comparison of the two says so, or uses the ladder rung's hp73 parent where it exists.
-    Next: step (2), the $D=10^{4.5}$, $10^5$ configs at $32$k (\code{gen\_transfer\_pilot.py} has $k=9,10$ at $16$k: write them at
-    $32$k, batch $16384$, the chosen points), then (3)--(6), and the globally preprocessed pretraining item below. The paper
-    draft is the scratchpad's \code{draft/} (\code{fm\_amplitudes\_updated.zip}, \code{fm\_amplitudes\_check.pdf} last sent).
+    \emph{State (2026-10-06, 04:00):} (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
+    $75$ that had failed in seconds, their first attempts' run dirs blocking \code{run.py}, were fixed by
+    \code{run\_trial.py} taking \code{trial\_<hp>\_r<k>} on a cold start, nothing deleted). Once all $420$ are in: collect
+    \code{tp3\_} from every site (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set
+    \code{cells.USE\_32K = True}, redraw \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap}, update the paper draft's
+    numbers and send the figures. Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all
+    trials) at $10^4$ (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ goes to $32$k for every
+    pretraining. (2) All $242$ sweeps of $D=10^{4.5}$, $10^5$ at $32$k submitted, two chosen points each ($218$ on Jean Zay,
+    $23$ on lxplus, $1$ on CC-IN2P3). (3) The eight equal-data pretrainings queued (rungs $2$--$6$ on Jean Zay, $7$--$9$
+    running on lxplus); their fine-tune grids (\code{tp3\_eqd\_r<n>fte[32k]\_*}) go out when each ends. (4) \code{tp3\_finale}
+    queued on lxplus, its grid (\code{tp3\_finfte[32k]\_*}) likewise. (5) $1468$ seed runs in $38$ chunks
+    (\code{analysis/transfer/seed\_chunks/}) queued on Jean Zay and lxplus; the $32$k cells' seeds follow once those cells are
+    final. (6) The generator is merged (\code{tools/synthetic\_amplitudes.py}, CPU checks in
+    \code{tests/test\_synthetic\_amplitudes.py}: Lorentz invariance to $5\times10^{-12}$, mass dimension $8-2N$, reproducible
+    from the name, $20/20$ off-shellness masks built); its pretraining \code{tp3\_synth} (recipe
+    \code{transfer\_synthetic.yaml}: $19$ synthetic processes at $10^5$ training events, rung $9$'s process count, $64$k steps,
+    hp73) is building its pools on CC-IN2P3, and its grid (\code{tp3\_synfte[32k]\_*}, the equal-data grid's $132$ cells) goes
+    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Zero-shot: the version up
+    to an affine map (\code{val\_loss\_affine}) is in for nine of ten pretrainings, rung $9$ queued on lxplus
+    (\code{FA-lxplus-6f65373e}) and CC (\code{FA-ccin2p3-fb225655}), the slower one cancelled when one lands; then redraw
+    \code{zero\_shot\_gain} on it and explain to the user how to read it (they asked). Before any fine-tune grid from an hp73
+    parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in \code{trial\_0073\_r<k>}) and point the
+    configs at it. The equal-data rungs' parents are hp73 alone, the ladder's fine-tunes use each rung's best-of-search
+    parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every comparison of the two says so, or uses the ladder
+    rung's hp73 parent where it exists. The paper draft is the scratchpad's \code{draft/} (\code{fm\_amplitudes\_updated.zip},
+    \code{fm\_amplitudes\_check.pdf} last sent).
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
