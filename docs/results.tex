@@ -4830,7 +4830,11 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
-    compute item approved).} (1) The $32$k grid: scratch and every pretraining (rungs $0$--$9$) on the twelve probes at
+    compute item approved).} \textbf{On hold since 2026-10-06, 22:45, on the user's call: every $32$k run} (the rest of
+    (1), all of (2), the $32$k cells of (3), (4) and (6), and the $32$k HP landscape pass), resumed only when the user says.
+    Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
+    carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
+    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. (1) The $32$k grid: scratch and every pretraining (rungs $0$--$9$) on the twelve probes at
     $D=10^{3.5}$, $10^4$, and $ud\to ud$ also at $10^{2.5}$, $10^3$, two chosen points each (\code{horizon32k\_chosen.json});
     $420$ trials, spread over lxplus, CC-IN2P3 and the $17$ done on Jean Zay (the rest moved off Jean Zay's priority queue on
     2026-10-05); waiter: a background count over the $210$ sweeps on all sites. When in: \code{cells.USE\_32K} on, figures and
