@@ -4715,23 +4715,35 @@ trials, fine-tune: five); outlined, the first rung with the probe's structure.}
 \label{fig:gain_heatmap}
 \end{figure}
 
-\paragraph{Distance from the pretraining: a raw score, superseded (2026-10-05).} Each pretraining's raw score on each
-probe (\code{tools/zero\_shot\_ft.py}: the parent's output on the probe's validation split before any fine-tune step,
-against the probe's own standardized target, where a constant prediction of the mean scores $\approx1$), for the twelve
-probes and ten pretrainings (\code{zero\_shot.json} also holds the six star-arm probes of rung $1$ and $ee\to u\bar u$),
-against the gain of Fig.~\ref{fig:gain_heatmap} (Fig.~\ref{fig:zero_shot_gain}, \code{zero\_shot\_gain.py}). No probe, nor any
-process in its equality class, is in any of these pretrainings (the recipes' headers, \code{recipes/transfer\_ladder\_r<n>.yaml}),
-so these are zero-shot predictions. The raw score does not measure them, though: the parent outputs in its own
-standardized units, and a parent with the right shape but the wrong offset $\alpha$ and scale $\beta$ scores
-$((\mu_q-\alpha)/\beta)^2+(\sigma_q/\beta-1)^2$, not $0$. The score up to an affine map, $1-\mathrm{corr}^2$ of the parent's
-output with the probe's target (\code{val\_loss\_affine}), will replace it once all ten pretrainings are scored; nothing is read from the
-raw score.
+\paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
+any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
+$z=(\log|\mathcal M|^2-\mu_q)/\sigma_q$ (\code{tools/zero\_shot\_ft.py}). The parent outputs in its own standardized units,
+so $h$ is compared with $z$ up to an affine map,
+\begin{equation}
+  L_0^*=\min_{a,b}\,\big\langle(a+b\,h-z)^2\big\rangle=1-\rho(h,z)^2 ,
+\end{equation}
+with $\rho$ the correlation over the validation events: $0$ when the frozen network predicts the probe's
+$\log|\mathcal M|^2$ exactly up to its offset and scale, $1$ when its output carries no linear information about it. The
+plain mean-squared error of $h$ against $z$ is not used: a parent with the right shape but an offset $\alpha$ and scale
+$\beta$ of its own scores $((\mu_q-\alpha)/\beta)^2+(\sigma_q/\beta-1)^2$, not $0$. No probe, nor any process in its
+equality class, is in any of these pretrainings (the recipes' headers, \code{recipes/transfer\_ladder\_r<n>.yaml}), so
+these are zero-shot predictions. Fig.~\ref{fig:zero_shot_gain} plots $L_0^*$ for the twelve probes and ten pretrainings
+against the fine-tune's gain of Fig.~\ref{fig:gain_heatmap} (\code{zero\_shot\_gain.py}, \code{zero\_shot.json}, which also
+holds the six star-arm probes of rung $1$ and of $ee\to u\bar u$). Over all $120$ points the two are anti-correlated
+(Spearman $-0.37$, $p=4\times10^{-5}$): a pretraining whose frozen output already tracks the probe's amplitude gains
+more from fine-tuning. Within a probe, across the ten pretrainings, the rank correlation is negative for ten of the
+twelve, strongest on $u\bar u\to gg$ ($-0.85$), $ud\to ud$ and the one-loop $ee\to b\bar b$ ($-0.73$ each). The two
+exceptions are $ee\to\nu_e\bar\nu_e$ ($+0.14$), where every pretraining sits at $L_0^*\geq0.43$, and $ee\to t\bar t$
+($+0.52$), where $L_0^*$ is already $0.027$ from $ee\to u\bar u$ alone and the gain ($-0.1$ to $0.6$ decades) does
+not follow it. $L_0^*$ ranks pretrainings for one probe; across probes it does not set the gain's scale, since scratch's own
+difficulty differs from probe to probe.
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/zero_shot_gain_legend.pdf}\\
 \includegraphics{../analysis/transfer/figs/zero_shot_gain.pdf}
-\caption{Raw score of each pretraining's output on each probe (the probe's standardized $\log|\mathcal M|^2$, before
-any fine-tune step; confounded by the parent's units, see the text) against the fine-tune's gain over scratch of Fig.~\ref{fig:gain_heatmap}; one point per pretraining and probe, $8$k grid.}
+\caption{Each pretraining's zero-shot distance to each probe up to an affine map, $L_0^*=1-\rho(h,z)^2$ ($h$ the frozen
+parent's output, $z$ the probe's standardized $\log|\mathcal M|^2$), against the fine-tune's gain over scratch of
+Fig.~\ref{fig:gain_heatmap}; one point per pretraining and probe, $8$k grid.}
 \label{fig:zero_shot_gain}
 \end{figure}
 
@@ -4858,10 +4870,7 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     from the name, $20/20$ off-shellness masks built); its pretraining \code{tp3\_synth} (recipe
     \code{transfer\_synthetic.yaml}: $19$ synthetic processes at $10^5$ training events, rung $9$'s process count, $64$k steps,
     hp73) is building its pools on CC-IN2P3, and its grid (\code{tp3\_synfte[32k]\_*}, the equal-data grid's $132$ cells) goes
-    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Zero-shot: the version up
-    to an affine map (\code{val\_loss\_affine}) is in for nine of ten pretrainings, rung $9$ queued on lxplus
-    (\code{FA-lxplus-6f65373e}) and CC (\code{FA-ccin2p3-fb225655}), the slower one cancelled when one lands; then redraw
-    \code{zero\_shot\_gain} on it and explain to the user how to read it (they asked). Before any fine-tune grid from an hp73
+    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Zero-shot: done, up to an affine map (\code{fig:zero\_shot\_gain}). Before any fine-tune grid from an hp73
     parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in \code{trial\_0073\_r<k>}) and point the
     configs at it. The equal-data rungs' parents are hp73 alone, the ladder's fine-tunes use each rung's best-of-search
     parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every comparison of the two says so, or uses the ladder
