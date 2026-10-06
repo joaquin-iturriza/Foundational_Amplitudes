@@ -203,6 +203,7 @@ def main():
                          "every pretraining on one budget), its search as the rungs'")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
+    ap.add_argument("--finale", action="store_true", help="the finale's pretraining config (tp3_finale)")
     ap.add_argument("--equal-data", type=int, metavar="N",
                     help="with --ladder: the rungs at N training events in total, split evenly (tp3_eqd_r<n>)")
     ap.add_argument("--horizon", type=int,
@@ -231,6 +232,12 @@ def main():
         for arm in (a.star or STARS):
             out.append(write(f"tp3_star_{arm}", f"transfer_star_{arm}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
                              head=f"Transfer star arm {arm}: rung 1 plus one structure, {T_LADDER} steps, factors off."))
+        print("\n".join(os.path.relpath(p, ROOT) for p in out))
+        return
+    if a.finale:
+        FIXED["data.target_propagators"] = "false"
+        out.append(write("tp3_finale", "transfer_finale.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
+                         head=f"Transfer finale: rung 9 plus every star arm's processes, {T_LADDER} steps, factors off."))
         print("\n".join(os.path.relpath(p, ROOT) for p in out))
         return
     if a.pre64:
