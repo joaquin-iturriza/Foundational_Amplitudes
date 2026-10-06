@@ -293,12 +293,13 @@ class AmplitudeExperiment(BaseExperiment):
             couplings_by_pid.append({str(k): float(v) for k, v in cpl.items()} if cpl else None)
             # Per-dataset INTERNAL (propagator/resonance) mass values for the
             # internal_mass_scalars feature: the scanned mass of a mediator that is
-            # NOT an external leg. Falls back to the table mass when unscanned.
+            # NOT an external leg. Falls back to the process's own internal mass (a
+            # synthetic process's random scalar mass), else the table mass, when unscanned.
             masses_blk = (physics or {}).get("masses", {}) if physics else {}
             imrow = []
             for pdg in getattr(self, "_internal_mass_pdgs", []):
                 v = masses_blk.get(pdg, masses_blk.get(str(pdg)))
-                imrow.append(float(v) if v is not None else float(mg._table_mass(pdg)))
+                imrow.append(float(v) if v is not None else mg.internal_mass(base, pdg))
             internal_mass_by_pid.append(imrow)
 
         # Register any physics-scan / decorated-base datasets into mg.PROCESSES so

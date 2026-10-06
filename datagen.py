@@ -152,7 +152,11 @@ def ensure_backend(process):
     """Compile the matrix-element backend for `process` if it isn't built yet.
 
     Run this serially (once per unique process) before parallel generation so
-    that concurrent workers never race to compile the same backend."""
+    that concurrent workers never race to compile the same backend. A synthetic
+    process has none: its structure (and diagram sidecar) is fixed by its name."""
+    if mg.is_synthetic(process):
+        mg.register_synthetic(process)
+        return None
     if is_virt(process):
         return ensure_virt_backend(process)
     # A coupling-only scan shares its base's compiled standalone (see
@@ -297,10 +301,15 @@ def gen_chunk(task):
     # cfg is the SCAN's (its alphas_mz / m_finals drive the per-event computation),
     # but the compiled backend dir may be the shared base (mg.standalone_name): a
     # coupling-only scan has base-identical masses/EW, so the base param_card is
-    # correct and α_s is applied per event.
-    cfg            = dict(mg.PROCESSES[process])
-    standalone_dir = f"{mg.WORK_DIR}/{mg.standalone_name(process)}_standalone"
-    backend, subproc_dirs, driver_bin, eff_dir = mg.detect_compiled_backend(standalone_dir)
+    # correct and α_s is applied per event. A synthetic process is labelled by
+    # tools/synthetic_amplitudes.py (registered here too: a spawned worker starts empty).
+    if mg.is_synthetic(process):
+        cfg = dict(mg.register_synthetic(process))
+        backend, subproc_dirs, driver_bin, eff_dir = "synthetic", ["synthetic"], None, None
+    else:
+        cfg            = dict(mg.PROCESSES[process])
+        standalone_dir = f"{mg.WORK_DIR}/{mg.standalone_name(process)}_standalone"
+        backend, subproc_dirs, driver_bin, eff_dir = mg.detect_compiled_backend(standalone_dir)
     if not subproc_dirs or (backend == "cpp" and driver_bin is None):
         raise RuntimeError(
             f"gen_chunk: backend for {process} not compiled — call ensure_backend first.")
