@@ -42,7 +42,11 @@ def site_report(prefixes, window_min):
         for b in out.split():
             n = re.sub(r"_\d{4}$", "", b)
             if n in names and n not in queued:
-                queued[n] = 1
+                dags = sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, n, "sweep_*.dag")), key=os.path.getmtime)
+                try:
+                    queued[n] = sum(l.startswith("JOB ") for l in open(dags[-1])) if dags else 1
+                except OSError:
+                    queued[n] = 1
     cut = time.time() - 60 * window_min
     failed = []
     for d in sweeps:
