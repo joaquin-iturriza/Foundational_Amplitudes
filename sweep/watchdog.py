@@ -46,8 +46,9 @@ def site_report(prefixes, window_min):
                 continue
             if "Trial FAILED" not in txt:
                 continue
-            err = next((l.strip() for l in txt.splitlines()
-                        if re.search(r"(Error|Exception|Aborting|Killed)", l) and "Exiting with error" not in l), "")
+            lines = txt.splitlines()
+            err = next((l.strip() for l in reversed(lines) if re.match(r"\s*[\w.]*(Error|Exception)\b.*:", l)), "") or \
+                next((l.strip() for l in reversed(lines) if re.search(r"(Killed|Aborting|CANCELLED|TIME LIMIT)", l)), "")
             failed.append({"sweep": os.path.basename(d), "log": os.path.basename(f), "error": err[:200], "moved": moved})
     results = {}
     rd = getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR)
