@@ -4864,15 +4864,13 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); a sweep it moves stays $12$\,h where it arrives (\code{ARRIVED}; without it the sweeps first in name order went back and forth up to $\sim90$ times, losing their place in every queue), a \code{PINNED} sweep never moves, and moved trials are released at the source only once they are queued at the destination; every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 19:58):} \textbf{In progress at the flush.} (i) The rebalancer moves sweeps into CC-IN2P3 beyond
-    its $100$-job per-user cap: a move whose trials only partly enter CC's queue is still released at the source
-    (\code{sweep/rebalance.py}: the release-after-queued check tests $>0$, not $\geq$ the trials moved). Fix next: read each
-    SLURM site's cap (CC $100$) and my total queued jobs (\code{squeue -u}) in the inventory, never plan a move into a site
-    without that room, and release at the source only when every moved trial is queued. Then resubmit the two sweeps it
-    lost, on lxplus with \code{--extend --fixed-hp} (mark them \code{ARRIVED}, write \code{MOVED\_TO} on the other copies with
-    literal paths, never \code{rm} of a shell-variable path): \code{tp3\_uu64fte32k\_ee\_Za\_d10} hp $52$, $188$ and
-    \code{tp3\_uu64fte32k\_uubar\_Zggg\_d9} hp $52$, $112$ (each has one trial queued on CC; check which before resubmitting).
-    (ii) The watchdog loop stopped on that alert: restart it (\code{watchdog.py tp3\_ --expect
+    \emph{State (2026-10-06, 20:25):} \textbf{Done since the flush.} (i) \code{sweep/rebalance.py} never plans a move into a
+    site past its job cap (\code{JOB\_CAP}: CC-IN2P3 $100$, read from \code{squeue}) and releases moved trials only when every
+    one is queued at the destination. CC's backlog ($\sim1500$ generated trials) was never fed past its cap:
+    \code{sweep/feed\_capped.py tp3\_} (on CC, every $20$ min, before each rebalancer pass, in one background loop) tops
+    the queue up to the cap through \code{submit\_sweeps}, submitting a fixed point at most once (stale duplicates from the
+    back-and-forth, up to $78$ per sweep, are marked submitted and never run); its first pass submitted until the cap
+    ($101$ jobs). The two sweeps that lost a trial get it back through the feeder. (ii) The watchdog loop restarted (\code{watchdog.py tp3\_ --expect
     analysis/transfer/expect\_tp3.json --window 30 --stall-site jeanzay=420}). (iii) Running loops (background shells, lost
     on a restart): the rebalancer every $20$ min; a loop raising the priority trials on lxplus (\code{tp3\_hpx32k\_*}
     JobPrio $2000$, the $34$ first-round $32$k points $1000$) and waiting for all $572$ chosen $32$k points; waiters for half
