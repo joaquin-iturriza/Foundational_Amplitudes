@@ -2140,5 +2140,857 @@
 ],
 "tp3_synth": [
 73
+],
+"tp3_finfte32k_ee_bb_nlo_d7": [
+68,
+116
+],
+"tp3_finfte32k_ee_bb_nlo_d8": [
+87,
+107
+],
+"tp3_finfte32k_ee_bb_nlo_d9": [
+33,
+89
+],
+"tp3_finfte32k_ee_ddbar_d10": [
+41,
+97
+],
+"tp3_finfte32k_ee_ddbar_d7": [
+14,
+50
+],
+"tp3_finfte32k_ee_ddbar_d8": [
+28,
+148
+],
+"tp3_finfte32k_ee_ddbar_d9": [
+5,
+125
+],
+"tp3_finfte32k_ee_ddbarg_d10": [
+20,
+172
+],
+"tp3_finfte32k_ee_ddbarg_d7": [
+19,
+91
+],
+"tp3_finfte32k_ee_ddbarg_d8": [
+42,
+118
+],
+"tp3_finfte32k_ee_ddbarg_d9": [
+13,
+121
+],
+"tp3_finfte32k_ee_dd_ew_nlo_d7": [
+76,
+128
+],
+"tp3_finfte32k_ee_dd_ew_nlo_d8": [
+84,
+152
+],
+"tp3_finfte32k_ee_dd_ew_nlo_d9": [
+97,
+181
+],
+"tp3_finfte32k_ee_dd_nlo_d7": [
+23,
+27
+],
+"tp3_finfte32k_ee_dd_nlo_d8": [
+58,
+66
+],
+"tp3_finfte32k_ee_dd_nlo_d9": [
+9,
+77
+],
+"tp3_finfte32k_ee_dd_nlo_hi_d7": [
+122,
+182
+],
+"tp3_finfte32k_ee_dd_nlo_hi_d8": [
+101,
+153
+],
+"tp3_finfte32k_ee_dd_nlo_hi_d9": [
+34,
+154
+],
+"tp3_finfte32k_ee_nnbar_d10": [
+19,
+155
+],
+"tp3_finfte32k_ee_nnbar_d7": [
+56,
+124
+],
+"tp3_finfte32k_ee_nnbar_d8": [
+106,
+190
+],
+"tp3_finfte32k_ee_nnbar_d9": [
+62,
+74
+],
+"tp3_finfte32k_ee_ttbar_d10": [
+36,
+80
+],
+"tp3_finfte32k_ee_ttbar_d7": [
+72,
+108
+],
+"tp3_finfte32k_ee_ttbar_d8": [
+100,
+168
+],
+"tp3_finfte32k_ee_ttbar_d9": [
+134,
+158
+],
+"tp3_finfte32k_ee_ttbarg_d10": [
+1,
+69
+],
+"tp3_finfte32k_ee_ttbarg_d7": [
+166,
+190
+],
+"tp3_finfte32k_ee_ttbarg_d8": [
+32,
+100
+],
+"tp3_finfte32k_ee_ttbarg_d9": [
+65,
+101
+],
+"tp3_finfte32k_ee_ttbar_nlo_thr_d7": [
+85,
+165
+],
+"tp3_finfte32k_ee_ttbar_nlo_thr_d8": [
+34,
+142
+],
+"tp3_finfte32k_ee_ttbar_nlo_thr_d9": [
+50,
+118
+],
+"tp3_finfte32k_ee_WW_d10": [
+74,
+134
+],
+"tp3_finfte32k_ee_WW_d7": [
+2,
+138
+],
+"tp3_finfte32k_ee_WW_d8": [
+44,
+104
+],
+"tp3_finfte32k_ee_WW_d9": [
+44,
+112
+],
+"tp3_finfte32k_ee_Za_d10": [
+59,
+127
+],
+"tp3_finfte32k_ee_Za_d7": [
+43,
+83
+],
+"tp3_finfte32k_ee_Za_d8": [
+89,
+149
+],
+"tp3_finfte32k_ee_Za_d9": [
+104,
+164
+],
+"tp3_finfte32k_udbar_enu_d10": [
+77,
+85
+],
+"tp3_finfte32k_udbar_enu_d7": [
+3,
+183
+],
+"tp3_finfte32k_udbar_enu_d8": [
+102,
+178
+],
+"tp3_finfte32k_udbar_enu_d9": [
+169,
+177
+],
+"tp3_finfte32k_ud_ud_d10": [
+53,
+113
+],
+"tp3_finfte32k_ud_ud_d5": [
+58,
+78
+],
+"tp3_finfte32k_ud_ud_d6": [
+52,
+140
+],
+"tp3_finfte32k_ud_ud_d7": [
+27,
+147
+],
+"tp3_finfte32k_ud_ud_d8": [
+45,
+165
+],
+"tp3_finfte32k_ud_ud_d9": [
+20,
+156
+],
+"tp3_finfte32k_uubar_gg_d10": [
+95,
+163
+],
+"tp3_finfte32k_uubar_gg_d7": [
+137,
+181
+],
+"tp3_finfte32k_uubar_gg_d8": [
+16,
+28
+],
+"tp3_finfte32k_uubar_gg_d9": [
+127,
+179
+],
+"tp3_finfte32k_uubar_Zg_d10": [
+5,
+29
+],
+"tp3_finfte32k_uubar_Zg_d7": [
+8,
+112
+],
+"tp3_finfte32k_uubar_Zg_d8": [
+2,
+14
+],
+"tp3_finfte32k_uubar_Zg_d9": [
+83,
+159
+],
+"tp3_finfte32k_uubar_Zgg_d10": [
+18,
+30
+],
+"tp3_finfte32k_uubar_Zgg_d7": [
+6,
+142
+],
+"tp3_finfte32k_uubar_Zgg_d8": [
+68,
+184
+],
+"tp3_finfte32k_uubar_Zgg_d9": [
+53,
+65
+],
+"tp3_finfte32k_uubar_Zggg_d10": [
+87,
+115
+],
+"tp3_finfte32k_uubar_Zggg_d7": [
+52,
+168
+],
+"tp3_finfte32k_uubar_Zggg_d8": [
+6,
+66
+],
+"tp3_finfte32k_uubar_Zggg_d9": [
+26,
+146
+],
+"tp3_eqd_r7fte32k_ee_bb_nlo_d7": [
+44,
+164
+],
+"tp3_eqd_r7fte32k_ee_bb_nlo_d8": [
+87,
+155
+],
+"tp3_eqd_r7fte32k_ee_bb_nlo_d9": [
+69,
+117
+],
+"tp3_eqd_r7fte32k_ee_ddbar_d10": [
+93,
+97
+],
+"tp3_eqd_r7fte32k_ee_ddbar_d7": [
+174,
+182
+],
+"tp3_eqd_r7fte32k_ee_ddbar_d8": [
+28,
+64
+],
+"tp3_eqd_r7fte32k_ee_ddbar_d9": [
+32,
+84
+],
+"tp3_eqd_r7fte32k_ee_dd_nlo_d7": [
+57,
+129
+],
+"tp3_eqd_r7fte32k_ee_dd_nlo_d8": [
+105,
+197
+],
+"tp3_eqd_r7fte32k_ee_dd_nlo_d9": [
+26,
+146
+],
+"tp3_eqd_r7fte32k_ee_nnbar_d10": [
+37,
+145
+],
+"tp3_eqd_r7fte32k_ee_nnbar_d7": [
+40,
+144
+],
+"tp3_eqd_r7fte32k_ee_nnbar_d8": [
+50,
+110
+],
+"tp3_eqd_r7fte32k_ee_nnbar_d9": [
+96,
+172
+],
+"tp3_eqd_r7fte32k_ee_ttbar_d10": [
+74,
+134
+],
+"tp3_eqd_r7fte32k_ee_ttbar_d7": [
+13,
+121
+],
+"tp3_eqd_r7fte32k_ee_ttbar_d8": [
+57,
+101
+],
+"tp3_eqd_r7fte32k_ee_ttbar_d9": [
+0,
+68
+],
+"tp3_eqd_r7fte32k_ee_WW_d10": [
+89,
+141
+],
+"tp3_eqd_r7fte32k_ee_WW_d7": [
+152,
+188
+],
+"tp3_eqd_r7fte32k_ee_WW_d8": [
+18,
+46
+],
+"tp3_eqd_r7fte32k_ee_WW_d9": [
+4,
+140
+],
+"tp3_eqd_r7fte32k_ee_Za_d10": [
+0,
+24
+],
+"tp3_eqd_r7fte32k_ee_Za_d7": [
+22,
+146
+],
+"tp3_eqd_r7fte32k_ee_Za_d8": [
+37,
+161
+],
+"tp3_eqd_r7fte32k_ee_Za_d9": [
+43,
+95
+],
+"tp3_eqd_r7fte32k_ud_ud_d10": [
+25,
+157
+],
+"tp3_eqd_r7fte32k_ud_ud_d5": [
+3,
+95
+],
+"tp3_eqd_r7fte32k_ud_ud_d6": [
+33,
+169
+],
+"tp3_eqd_r7fte32k_ud_ud_d7": [
+37,
+157
+],
+"tp3_eqd_r7fte32k_ud_ud_d8": [
+2,
+174
+],
+"tp3_eqd_r7fte32k_ud_ud_d9": [
+13,
+69
+],
+"tp3_eqd_r7fte32k_uubar_gg_d10": [
+2,
+70
+],
+"tp3_eqd_r7fte32k_uubar_gg_d7": [
+79,
+87
+],
+"tp3_eqd_r7fte32k_uubar_gg_d8": [
+34,
+58
+],
+"tp3_eqd_r7fte32k_uubar_gg_d9": [
+25,
+161
+],
+"tp3_eqd_r7fte32k_uubar_Zg_d10": [
+26,
+82
+],
+"tp3_eqd_r7fte32k_uubar_Zg_d7": [
+116,
+192
+],
+"tp3_eqd_r7fte32k_uubar_Zg_d8": [
+33,
+105
+],
+"tp3_eqd_r7fte32k_uubar_Zg_d9": [
+12,
+132
+],
+"tp3_eqd_r7fte32k_uubar_Zgg_d10": [
+11,
+179
+],
+"tp3_eqd_r7fte32k_uubar_Zgg_d7": [
+129,
+197
+],
+"tp3_eqd_r7fte32k_uubar_Zgg_d8": [
+40,
+116
+],
+"tp3_eqd_r7fte32k_uubar_Zgg_d9": [
+21,
+25
+],
+"tp3_eqd_r7fte32k_uubar_Zggg_d10": [
+17,
+89
+],
+"tp3_eqd_r7fte32k_uubar_Zggg_d7": [
+52,
+112
+],
+"tp3_eqd_r7fte32k_uubar_Zggg_d8": [
+49,
+121
+],
+"tp3_eqd_r7fte32k_uubar_Zggg_d9": [
+59,
+179
+],
+"tp3_eqd_r8fte32k_ee_bb_nlo_d7": [
+114,
+154
+],
+"tp3_eqd_r8fte32k_ee_bb_nlo_d8": [
+60,
+116
+],
+"tp3_eqd_r8fte32k_ee_bb_nlo_d9": [
+0,
+60
+],
+"tp3_eqd_r8fte32k_ee_ddbar_d10": [
+6,
+30
+],
+"tp3_eqd_r8fte32k_ee_ddbar_d7": [
+102,
+178
+],
+"tp3_eqd_r8fte32k_ee_ddbar_d8": [
+141,
+149
+],
+"tp3_eqd_r8fte32k_ee_ddbar_d9": [
+36,
+120
+],
+"tp3_eqd_r8fte32k_ee_dd_nlo_d7": [
+110,
+146
+],
+"tp3_eqd_r8fte32k_ee_dd_nlo_d8": [
+44,
+104
+],
+"tp3_eqd_r8fte32k_ee_dd_nlo_d9": [
+20,
+92
+],
+"tp3_eqd_r8fte32k_ee_nnbar_d10": [
+18,
+102
+],
+"tp3_eqd_r8fte32k_ee_nnbar_d7": [
+35,
+107
+],
+"tp3_eqd_r8fte32k_ee_nnbar_d8": [
+12,
+72
+],
+"tp3_eqd_r8fte32k_ee_nnbar_d9": [
+24,
+172
+],
+"tp3_eqd_r8fte32k_ee_ttbar_d10": [
+73,
+109
+],
+"tp3_eqd_r8fte32k_ee_ttbar_d7": [
+41,
+145
+],
+"tp3_eqd_r8fte32k_ee_ttbar_d8": [
+36,
+80
+],
+"tp3_eqd_r8fte32k_ee_ttbar_d9": [
+106,
+198
+],
+"tp3_eqd_r8fte32k_ee_WW_d10": [
+72,
+108
+],
+"tp3_eqd_r8fte32k_ee_WW_d7": [
+129,
+197
+],
+"tp3_eqd_r8fte32k_ee_WW_d8": [
+39,
+43
+],
+"tp3_eqd_r8fte32k_ee_WW_d9": [
+43,
+159
+],
+"tp3_eqd_r8fte32k_ee_Za_d10": [
+1,
+69
+],
+"tp3_eqd_r8fte32k_ee_Za_d7": [
+23,
+123
+],
+"tp3_eqd_r8fte32k_ee_Za_d8": [
+15,
+119
+],
+"tp3_eqd_r8fte32k_ee_Za_d9": [
+105,
+149
+],
+"tp3_eqd_r8fte32k_ud_ud_d10": [
+19,
+47
+],
+"tp3_eqd_r8fte32k_ud_ud_d5": [
+78,
+166
+],
+"tp3_eqd_r8fte32k_ud_ud_d6": [
+61,
+145
+],
+"tp3_eqd_r8fte32k_ud_ud_d7": [
+31,
+87
+],
+"tp3_eqd_r8fte32k_ud_ud_d8": [
+8,
+140
+],
+"tp3_eqd_r8fte32k_ud_ud_d9": [
+72,
+192
+],
+"tp3_eqd_r8fte32k_uubar_gg_d10": [
+62,
+122
+],
+"tp3_eqd_r8fte32k_uubar_gg_d7": [
+40,
+144
+],
+"tp3_eqd_r8fte32k_uubar_gg_d8": [
+8,
+16
+],
+"tp3_eqd_r8fte32k_uubar_gg_d9": [
+2,
+70
+],
+"tp3_eqd_r8fte32k_uubar_Zg_d10": [
+20,
+80
+],
+"tp3_eqd_r8fte32k_uubar_Zg_d7": [
+1,
+61
+],
+"tp3_eqd_r8fte32k_uubar_Zg_d8": [
+42,
+50
+],
+"tp3_eqd_r8fte32k_uubar_Zg_d9": [
+7,
+131
+],
+"tp3_eqd_r8fte32k_uubar_Zgg_d10": [
+95,
+163
+],
+"tp3_eqd_r8fte32k_uubar_Zgg_d7": [
+47,
+151
+],
+"tp3_eqd_r8fte32k_uubar_Zgg_d8": [
+65,
+125
+],
+"tp3_eqd_r8fte32k_uubar_Zgg_d9": [
+77,
+197
+],
+"tp3_eqd_r8fte32k_uubar_Zggg_d10": [
+34,
+154
+],
+"tp3_eqd_r8fte32k_uubar_Zggg_d7": [
+175,
+183
+],
+"tp3_eqd_r8fte32k_uubar_Zggg_d8": [
+26,
+162
+],
+"tp3_eqd_r8fte32k_uubar_Zggg_d9": [
+22,
+26
+],
+"tp3_eqd_r9fte32k_ee_bb_nlo_d7": [
+26,
+158
+],
+"tp3_eqd_r9fte32k_ee_bb_nlo_d8": [
+43,
+159
+],
+"tp3_eqd_r9fte32k_ee_bb_nlo_d9": [
+89,
+169
+],
+"tp3_eqd_r9fte32k_ee_ddbar_d10": [
+22,
+162
+],
+"tp3_eqd_r9fte32k_ee_ddbar_d7": [
+115,
+155
+],
+"tp3_eqd_r9fte32k_ee_ddbar_d8": [
+39,
+75
+],
+"tp3_eqd_r9fte32k_ee_ddbar_d9": [
+57,
+177
+],
+"tp3_eqd_r9fte32k_ee_dd_nlo_d7": [
+4,
+140
+],
+"tp3_eqd_r9fte32k_ee_dd_nlo_d8": [
+37,
+93
+],
+"tp3_eqd_r9fte32k_ee_dd_nlo_d9": [
+73,
+133
+],
+"tp3_eqd_r9fte32k_ee_nnbar_d10": [
+134,
+194
+],
+"tp3_eqd_r9fte32k_ee_nnbar_d7": [
+83,
+135
+],
+"tp3_eqd_r9fte32k_ee_nnbar_d8": [
+46,
+106
+],
+"tp3_eqd_r9fte32k_ee_nnbar_d9": [
+1,
+137
+],
+"tp3_eqd_r9fte32k_ee_ttbar_d10": [
+84,
+188
+],
+"tp3_eqd_r9fte32k_ee_ttbar_d7": [
+75,
+83
+],
+"tp3_eqd_r9fte32k_ee_ttbar_d8": [
+13,
+49
+],
+"tp3_eqd_r9fte32k_ee_ttbar_d9": [
+87,
+191
+],
+"tp3_eqd_r9fte32k_ee_WW_d10": [
+37,
+145
+],
+"tp3_eqd_r9fte32k_ee_WW_d7": [
+17,
+153
+],
+"tp3_eqd_r9fte32k_ee_WW_d8": [
+9,
+85
+],
+"tp3_eqd_r9fte32k_ee_WW_d9": [
+42,
+146
+],
+"tp3_eqd_r9fte32k_ee_Za_d10": [
+45,
+165
+],
+"tp3_eqd_r9fte32k_ee_Za_d7": [
+30,
+150
+],
+"tp3_eqd_r9fte32k_ee_Za_d8": [
+14,
+194
+],
+"tp3_eqd_r9fte32k_ee_Za_d9": [
+47,
+87
+],
+"tp3_eqd_r9fte32k_ud_ud_d10": [
+39,
+83
+],
+"tp3_eqd_r9fte32k_ud_ud_d5": [
+120,
+172
+],
+"tp3_eqd_r9fte32k_ud_ud_d6": [
+64,
+100
+],
+"tp3_eqd_r9fte32k_ud_ud_d7": [
+50,
+62
+],
+"tp3_eqd_r9fte32k_ud_ud_d8": [
+8,
+16
+],
+"tp3_eqd_r9fte32k_ud_ud_d9": [
+166,
+190
+],
+"tp3_eqd_r9fte32k_uubar_gg_d10": [
+150,
+178
+],
+"tp3_eqd_r9fte32k_uubar_gg_d7": [
+96,
+156
+],
+"tp3_eqd_r9fte32k_uubar_gg_d8": [
+25,
+93
+],
+"tp3_eqd_r9fte32k_uubar_gg_d9": [
+23,
+95
+],
+"tp3_eqd_r9fte32k_uubar_Zg_d10": [
+13,
+133
+],
+"tp3_eqd_r9fte32k_uubar_Zg_d7": [
+58,
+178
+],
+"tp3_eqd_r9fte32k_uubar_Zg_d8": [
+42,
+118
+],
+"tp3_eqd_r9fte32k_uubar_Zg_d9": [
+106,
+190
+],
+"tp3_eqd_r9fte32k_uubar_Zgg_d10": [
+107,
+131
+],
+"tp3_eqd_r9fte32k_uubar_Zgg_d7": [
+28,
+32
+],
+"tp3_eqd_r9fte32k_uubar_Zgg_d8": [
+185,
+193
+],
+"tp3_eqd_r9fte32k_uubar_Zgg_d9": [
+59,
+127
+],
+"tp3_eqd_r9fte32k_uubar_Zggg_d10": [
+100,
+176
+],
+"tp3_eqd_r9fte32k_uubar_Zggg_d7": [
+41,
+97
+],
+"tp3_eqd_r9fte32k_uubar_Zggg_d8": [
+116,
+172
+],
+"tp3_eqd_r9fte32k_uubar_Zggg_d9": [
+170,
+178
 ]
 }
