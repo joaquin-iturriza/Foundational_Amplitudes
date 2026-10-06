@@ -163,6 +163,49 @@ def collate_variable_length(batch):
     return particles, amplitudes, tokens, order_labels, ptr, process_ids
 
 
+class PerProcessMicroBatchSampler(Sampler):
+    """Batch sampler for training.per_process_accumulation: one micro-batch per process.
+
+    Every yielded index list holds, for each process in ascending id order, `m_p` events of
+    that process only (`m_p = min(microbatch, n_p)`), so the collated batch is grouped by
+    process and `experiment._split_by_process` cuts it into P single-process micro-batches.
+    Each process has its own stream: a permutation of its own training events, consumed
+    without replacement and reshuffled once fewer than `m_p` remain (the tail is dropped,
+    as drop_last does for the mixed loader), so the events of a micro-batch are distinct
+    and i.i.d. within the process. It runs in the main process (DataLoader batch_sampler),
+    so the workers only gather; their number does not change the streams.
+    """
+
+    def __init__(self, process_ids, microbatch, seed=0, min_batches=100):
+        pids = np.asarray(process_ids)
+        self.rng = np.random.default_rng(seed)
+        self.procs = sorted(set(pids.tolist()))
+        self.proc_indices = {p: np.flatnonzero(pids == p) for p in self.procs}
+        self.m = {p: int(min(int(microbatch), len(self.proc_indices[p]))) for p in self.procs}
+        self._pools = {p: self.rng.permutation(self.proc_indices[p]) for p in self.procs}
+        self._pos = {p: 0 for p in self.procs}
+        self.events_per_step = int(sum(self.m.values()))
+        # a floor so the loader is not re-iterated (and its workers re-armed) every few steps,
+        # as in ProcessBalancedSampler; the streams are infinite either way
+        self._n_batches = max(int(min_batches), len(pids) // max(self.events_per_step, 1))
+
+    def _draw(self, p):
+        m, pool = self.m[p], self._pools[p]
+        if self._pos[p] + m > len(pool):
+            self._pools[p] = pool = self.rng.permutation(self.proc_indices[p])
+            self._pos[p] = 0
+        out = pool[self._pos[p]:self._pos[p] + m]
+        self._pos[p] += m
+        return out
+
+    def __iter__(self):
+        for _ in range(self._n_batches):
+            yield np.concatenate([self._draw(p) for p in self.procs]).tolist()
+
+    def __len__(self):
+        return self._n_batches
+
+
 class ProcessBalancedSampler(Sampler):
     """
     Yields batches where each process contributes equally (or according to
