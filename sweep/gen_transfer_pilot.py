@@ -203,6 +203,8 @@ def main():
                          "every pretraining on one budget), its search as the rungs'")
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
+    ap.add_argument("--equal-data", type=int, metavar="N",
+                    help="with --ladder: the rungs at N training events in total, split evenly (tp3_eqd_r<n>)")
     ap.add_argument("--horizon", type=int,
                     help="train these cells for this many steps instead of T_CELL, names suffixed with it (e.g. "
                          "tp3_scr32k_); default cells D = 10^3.5, 10^4 (docs/results.tex sec:ladder hand-off: "
@@ -241,6 +243,19 @@ def main():
         FIXED["data.target_propagators"] = "false"
         # tp3_ladder_r<n>: the tp3_pre_ladder_r<n> sweeps were centred on the ee_uu best instead and cancelled
         for r in a.ladder:
+            if a.equal_data:
+                # tp3_eqd_r<n>: the rung at rung 1's total training data (3 processes x 1e5), split evenly over its
+                # processes through the per-process cap; same recipe, pool, seed and candidate pool as the ladder
+                # (docs/results.tex sec:ladder-open, structure or data)
+                n_proc = sum(1 for l in open(os.path.join(ROOT, "recipes", f"transfer_ladder_r{r}.yaml"))
+                             if l.strip().startswith("- {name:"))
+                out.append(write(f"tp3_eqd_r{r}", f"transfer_ladder_r{r}.yaml", T_LADDER,
+                                 [lr_space(T_LADDER)] + COMMON_SPACE,
+                                 {"data.train_subsample": a.equal_data // n_proc},
+                                 head=f"Transfer ladder at equal total data: rung {r} (cumulative, {n_proc} processes), "
+                                      f"{a.equal_data // n_proc} train events each ({a.equal_data} in total), "
+                                      f"{T_LADDER} steps, factors off."))
+                continue
             out.append(write(f"tp3_ladder_r{r}", f"transfer_ladder_r{r}.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
                              head=f"Transfer ladder, pretraining on rung {r} (cumulative), {T_LADDER} steps, factors off."))
         print("\n".join(os.path.relpath(p, ROOT) for p in out))
