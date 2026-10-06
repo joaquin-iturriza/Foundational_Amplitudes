@@ -4696,7 +4696,8 @@ cells replace those at $D=10^{3.5}$, $10^4$ once every pretraining has them, the
 
 \paragraph{The grid in one picture (2026-10-05, the paper's summary).} Fig.~\ref{fig:gain_heatmap}
 (\code{gain\_heatmap.py}, the $8$k grid) gives each probe--pretraining pair the mean over $D$ of
-$\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$, the leader rule of Fig.~\ref{fig:rung_focus}. Of the $840$ cells
+$\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$, each half-decade of $D$ weighted the same (the rule that ranks the
+leader in Fig.~\ref{fig:rung_focus}). Of the $840$ cells
 $698$ ($83\%$) fine-tune below scratch, and $106$ of the $120$ pairs gain on average. The geometric mean of the gain over
 all cells is $1.70$ from rung $0$, $2.1$--$2.4$ from rungs $1$--$6$ and $3.2$--$3.4$ from rungs $7$--$9$; from rungs $7$--$9$ it is
 $2.5\times$ at $D\le10^2$ and $3.7$--$4.2\times$ at $D\ge10^{2.5}$. The rung adding a probe's structure beats the rung below on
@@ -4709,26 +4710,28 @@ checkpoint at the last of the $8$k steps and its lr inside the window, so it is 
 \centering
 \includegraphics{../analysis/transfer/figs/gain_heatmap.pdf}
 \caption{The fine-tune's gain over scratch, $\langle\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})\rangle_D$, per probe and
-pretraining (rung $0$: $ee\to u\bar u$, $64$k steps), the $8$k grid; outlined, the first rung with the probe's structure.}
+pretraining (rung $0$: $ee\to u\bar u$, $64$k steps), the $8$k grid; each cell the best of its search (scratch: eight
+trials, fine-tune: five); outlined, the first rung with the probe's structure.}
 \label{fig:gain_heatmap}
 \end{figure}
 
-\paragraph{Distance from the pretraining (2026-10-05).} Each pretraining's zero-shot loss on each probe
-(\code{tools/zero\_shot\_ft.py}: the parent's weights scored on the probe's validation split before any fine-tune step,
-in the probe's standardized units, where a constant prediction of the mean scores $\approx1$), all $10\times12$ pairs,
-against the gain of Fig.~\ref{fig:gain_heatmap} (Fig.~\ref{fig:zero_shot_gain}, \code{zero\_shot\_gain.py}). A pretraining
-that already predicts a probe gains more on it: the Spearman correlation of the log zero-shot loss with the gain is
-$-0.41$ over all pairs ($p=3\times10^{-6}$) and negative within ten of the twelve probes ($-0.26$ to $-0.81$; $ee\to\nu_e\bar\nu_e$
-$+0.12$, $ee\to t\bar t$ $-0.05$). Closeness is not needed for a gain, however: $ee\to u\bar u$ scores $0.99$--$1.13$ zero-shot
-on seven probes and $1.9$ and $2.4$ on $ee\to W^+W^-$ and $ee\to\nu_e\bar\nu_e$, no better than a constant, and still
-fine-tunes below scratch at a geometric mean of $1.7\times$. Only $ee\to d\bar d$ ($0.28$), $ee\to t\bar t$ ($0.66$) and
-$ud\to ud$ ($0.79$) start below the constant from it.
+\paragraph{Distance from the pretraining: a raw score, superseded (2026-10-05).} Each pretraining's raw score on each
+probe (\code{tools/zero\_shot\_ft.py}: the parent's output on the probe's validation split before any fine-tune step,
+against the probe's own standardized target, where a constant prediction of the mean scores $\approx1$), for the twelve
+probes and ten pretrainings (\code{zero\_shot.json} also holds the six star-arm probes of rung $1$ and $ee\to u\bar u$),
+against the gain of Fig.~\ref{fig:gain_heatmap} (Fig.~\ref{fig:zero_shot_gain}, \code{zero\_shot\_gain.py}). No probe, nor any
+process in its equality class, is in any of these pretrainings (the recipes' headers, \code{recipes/transfer\_ladder\_r<n>.yaml}),
+so these are zero-shot predictions. The raw score does not measure them, though: the parent outputs in its own
+standardized units, and a parent with the right shape but the wrong offset $\alpha$ and scale $\beta$ scores
+$((\mu_q-\alpha)/\beta)^2+(\sigma_q/\beta-1)^2$, not $0$. The score up to an affine map, $1-\mathrm{corr}^2$ of the parent's
+output with the probe's target (\code{val\_loss\_affine}), replaces it in the next paragraph; nothing is read from the
+raw score.
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/zero_shot_gain_legend.pdf}\\
 \includegraphics{../analysis/transfer/figs/zero_shot_gain.pdf}
-\caption{Zero-shot loss of each pretraining on each probe (standardized $\log|\mathcal M|^2$, before any fine-tune step)
-against the fine-tune's gain over scratch of Fig.~\ref{fig:gain_heatmap}; one point per pretraining and probe, $8$k grid.}
+\caption{Raw score of each pretraining's output on each probe (the probe's standardized $\log|\mathcal M|^2$, before
+any fine-tune step; confounded by the parent's units, see the text) against the fine-tune's gain over scratch of Fig.~\ref{fig:gain_heatmap}; one point per pretraining and probe, $8$k grid.}
 \label{fig:zero_shot_gain}
 \end{figure}
 
@@ -4806,7 +4809,11 @@ $\alpha/2\pi$ at $\mu^2=s$; the per-event guard and the certification check the 
 $-\sum_iQ_i^2$ over the massless charged legs, met to $10^{-13}$ on all three). They carry the logarithm: for
 $ee\to d\bar d$ at $90^\circ$ the finite part over the Born goes from $-6\%$ at $200$\,GeV to $-29\%$ at $3$\,TeV, a
 fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3}$ at $\cos\theta=\pm0.5$;
-\code{ew\_sudakov\_check.json}); the pools change sign (finite part negative on $65$--$92\%$ of the events).
+\code{ew\_sudakov\_check.json}); the pools change sign (finite part negative on $65$--$92\%$ of the events). Both arms
+pretrained on hp73 ($64$k steps, lxplus) and fine-tuned on their probe and on $ee\to d\bar d$ at the two chosen points per
+cell (Fig.~\ref{fig:star_arms} (e)--(g), against rung $1$ at the same points): the $W$-pole arm is $17\times$ below rung $1$ on
+$u\bar d\to e^+\nu_e$, the electroweak Sudakov arm $1.1\times$ on the electroweak $ee\to d\bar d$, where rung $1$ is itself no
+better than scratch at any $D$, as expected of a structure no pretraining had.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
@@ -4892,8 +4899,7 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
     need a pretraining whose normalization the model predicts: one global $(\mu,\sigma)$, or, as in the multiplicity
     extrapolation of the paper (Sec.~5, $\mu_n=a+bn$), a mean predicted from the process's features (mass dimension
     $8-2N$ of $|\mathcal M|^2$ for $N$ legs, the coupling powers of \code{amp\_orders}). I will train one and test it
-    zero-shot on the probes. Until then a zero-shot loss here is read up to an affine map (next paragraph of the
-    distance result, \code{val\_loss\_affine}).
+    zero-shot on the probes. Until then a zero-shot score here is read up to an affine map (\code{val\_loss\_affine}).
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
     cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
     \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
@@ -4907,13 +4913,6 @@ fit in $L=\ln(s/m_W^2)$ giving $-3.7\times10^{-3}L^2$ ($-2.8$, $-4.7\times10^{-3
     recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Each process's loss rises at rung $9$ at a
     fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
     process; the step budget stays $64$k on every rung (the user's call).
-  \item \textbf{Star arms: the redesign running (2026-10-05).} Both new arms' pretrainings finished (hp73, $64$k steps:
-    $W$ pole $6.3$\,h, EW Sudakov $6.9$\,h on lxplus); their fine-tunes on their probe and on $ee\to d\bar d$ ($28$ sweeps,
-    two chosen points each) are queued on lxplus (submitted at 02:45, an hour late: the waiter looked for
-    \code{hp73\_*} result files, which are named \code{hp0073\_*}). So far (Fig.~\ref{fig:star_arms} (g), (h)): rung $1$ on
-    $u\bar d\to e^+\nu_e$ is $10$--$100\times$ below scratch at $D\ge10^3$, where scratch levels off near $10^{-4}$ (to check:
-    its search may not have reached a good region); on the EW $ee\to d\bar d$ rung $1$ is no better than scratch at any $D$,
-    as expected of a structure no pretraining had. Pools on CC-IN2P3 and lxplus; the old arms' pools (\code{transfer\_star\_pools.yaml}) also on Jean Zay.
   \item \textbf{The fine-tune protocol, open (the user's call).} From Fig.~\ref{fig:finetune_hp}: three trials instead of
     five (the start-up only) saves $40\%$ of the fine-tune GPU-h, at no cost in the median cell and $1.2$--$2\times$ in the
     worst tenth; the lr window $[10^{-3},10^{-2}]$ spends its top half on points $2$--$4\times$ worse at $D\ge10^3$, and $23\%$
