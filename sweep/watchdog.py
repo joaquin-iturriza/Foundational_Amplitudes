@@ -49,7 +49,9 @@ def site_report(prefixes, window_min):
             lines = txt.splitlines()
             err = next((l.strip() for l in reversed(lines) if re.match(r"\s*[\w.]*(Error|Exception)\b.*:", l)), "") or \
                 next((l.strip() for l in reversed(lines) if re.search(r"(Killed|Aborting|CANCELLED|TIME LIMIT)", l)), "")
-            failed.append({"sweep": os.path.basename(d), "log": os.path.basename(f), "error": err[:200], "moved": moved})
+            hp = re.search(r"hp_(\d{4})", txt)
+            failed.append({"sweep": os.path.basename(d), "log": os.path.basename(f), "error": err[:200], "moved": moved,
+                           "hp": int(hp.group(1)) if hp else None})
     results = {}
     rd = getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR)
     for n in names:
@@ -90,8 +92,13 @@ def main():
         if rep[s] is None:
             alerts.append(f"{s}: no report (site down, or the checkout is not synced)")
     rep = {s: r for s, r in rep.items() if r}
+    got = {}
+    for r in rep.values():
+        for n, hp in r["results"].items():
+            got.setdefault(n, set()).update(hp)
     for s, r in rep.items():
-        live = [f for f in r["failed"] if not f["moved"]]
+        # a failed attempt at a point that has a result somewhere (a duplicate run) loses nothing
+        live = [f for f in r["failed"] if not f["moved"] and f.get("hp") not in got.get(f["sweep"], set())]
         if live:
             by = {}
             for f in live:
@@ -100,10 +107,6 @@ def main():
                 alerts.append(f"{s}: {len(sw)} trial(s) FAILED in the last {a.window} min ({len(set(sw))} sweeps, e.g. "
                               f"{sw[0]}): {err or 'no error line'}")
     active = {n for r in rep.values() for n in list(r["running"]) + list(r["queued"])}
-    got = {}
-    for r in rep.values():
-        for n, hp in r["results"].items():
-            got.setdefault(n, set()).update(hp)
     n_missing = 0
     if a.expect:
         exp = json.load(open(os.path.join(REPO, a.expect) if not os.path.isabs(a.expect) else a.expect))
