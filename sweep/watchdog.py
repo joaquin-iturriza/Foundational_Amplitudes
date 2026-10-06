@@ -8,7 +8,7 @@ Per site (one `site run` each) it reads, for the sweeps matching PREFIX:
   results            result files of those sweeps
 On the laptop it adds:
   missing            the points of --expect (JSON {sweep: [hp indices]}) with a result on no site
-  stalled            a site with queued trials, none running, and no new result over the last --stall checks
+  stalled            a site with queued trials, none running and no new result for --stall minutes
 and exits 1 with an ALERT line per problem (a waiter then wakes the agent), else prints one status line and exits 0.
 A missing point is an alert only when nothing of its sweep is running or queued on any site.
 
@@ -80,7 +80,7 @@ def main():
     ap.add_argument("--site-report", action="store_true")
     ap.add_argument("--window", type=int, default=30, help="minutes of trial logs read for failures")
     ap.add_argument("--expect", help="JSON {sweep: [hp indices]} of the points the batch must produce")
-    ap.add_argument("--stall", type=int, default=3, help="checks without a new result that make a queued site stalled")
+    ap.add_argument("--stall", type=int, default=60, help="minutes queued, nothing running, no new result: stalled")
     ap.add_argument("--sites", nargs="+", default=SITES)
     a = ap.parse_args()
     if a.site_report:
@@ -127,12 +127,16 @@ def main():
         state = {}
     key = " ".join(a.prefixes)
     hist = state.get(key, {})
+    now = time.time()
     for s, r in rep.items():
-        n_res = sum(len(v) for v in r["results"].values())
-        h = (hist.get(s, []) + [[n_res, sum(r["queued"].values()), sum(r["running"].values())]])[-(a.stall + 1):]
+        n_res, n_q, n_run = sum(len(v) for v in r["results"].values()), sum(r["queued"].values()), sum(r["running"].values())
+        h = hist.get(s, {})
+        if n_q == 0 or n_run > 0 or n_res != h.get("n_res"):
+            h = {"since": now, "n_res": n_res}             # the stall clock restarts on any sign of life
         hist[s] = h
-        if len(h) > a.stall and h[-1][1] > 0 and all(x[2] == 0 for x in h[1:]) and h[-1][0] == h[0][0]:
-            alerts.append(f"{s}: {h[-1][1]} trial(s) queued, none running and no new result over {a.stall} checks")
+        if n_q > 0 and now - h["since"] >= 60 * a.stall:
+            alerts.append(f"{s}: {n_q} trial(s) queued, none running and no new result for "
+                          f"{(now - h['since']) / 60:.0f} min")
     state[key] = hist
     json.dump(state, open(STATE, "w"))
     status = " | ".join(f"{s} run {sum(r['running'].values())} q {sum(r['queued'].values())} "
