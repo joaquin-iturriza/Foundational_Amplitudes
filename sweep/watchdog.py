@@ -33,6 +33,16 @@ def site_report(prefixes, window_min):
     names = {os.path.basename(d) for d in sweeps}
     running = {n: q[n][0] for n in names if n in q and q[n][0]}
     queued = {n: q[n][1] for n in names if n in q and q[n][1]}
+    if siteconf.CLUSTER.get("scheduler") == "htcondor":
+        # a DAG whose manager waits for a slot (lxplus runs at most 200 per user) has not submitted its trials yet,
+        # so _queue sees none: the sweep is still queued (2026-10-06, 79 such sweeps raised a false alert)
+        import subprocess
+        out = subprocess.run(["condor_q", "-constraint", "JobUniverse == 7 && JobStatus == 1", "-af", "JobBatchName"],
+                             capture_output=True, text=True).stdout
+        for b in out.split():
+            n = re.sub(r"_\d{4}$", "", b)
+            if n in names and n not in queued:
+                queued[n] = 1
     cut = time.time() - 60 * window_min
     failed = []
     for d in sweeps:
