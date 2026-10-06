@@ -1075,6 +1075,74 @@
 77,
 197
 ],
+"tp3_scr32k_ud_ud_d5": [
+34,
+90
+],
+"tp3_scr32k_ud_ud_d6": [
+150,
+114
+],
+"tp3_r7fte32k_ud_ud_d5": [
+179,
+91
+],
+"tp3_r7fte32k_ud_ud_d6": [
+90,
+66
+],
+"tp3_uu64fte32k_ee_nnbar_d8": [
+119,
+75
+],
+"tp3_uu64fte32k_ee_nnbar_d7": [
+78,
+86
+],
+"tp3_uu64fte32k_ee_WW_d8": [
+41,
+37
+],
+"tp3_uu64fte32k_ee_WW_d7": [
+178,
+170
+],
+"tp3_uu64fte32k_ee_Za_d8": [
+20,
+156
+],
+"tp3_uu64fte32k_ee_Za_d7": [
+146,
+174
+],
+"tp3_uu64fte32k_uubar_gg_d8": [
+102,
+46
+],
+"tp3_uu64fte32k_uubar_gg_d7": [
+117,
+73
+],
+"tp3_uu64fte32k_ee_ttbar_d7": [
+76,
+128
+],
+"tp3_uu64fte32k_uubar_Zgg_d8": [
+12,
+132
+],
+"tp3_uu64fte32k_uubar_Zggg_d8": [
+50,
+186
+],
+"tp3_uu64fte32k_uubar_Zggg_d7": [
+173,
+97
+],
+"tp3_r8fte32k_ee_Za_d8": [
+49,
+13
+],
 "tp3_r1fte32k_ee_Za_d10": [
 38,
 174

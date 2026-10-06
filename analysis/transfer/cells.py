@@ -79,10 +79,10 @@ LONG_K_PROBE = {"ud_ud": {5, 6, 7, 8}}
 # trials, since they were run to explore it (the user's call, 2026-10-05)
 HOLD_8K = {("scr", "ee_nnbar", 7)}
 ALL_TRIALS32 = {"tp3_scr32k_ee_nnbar_d8"}
-# Off until every pretraining has its 32k cells (2026-10-05, the user's call): the first 32k round covered scratch,
-# ee->uu and one rung per probe only, so mixing it in breaks the equal-compute comparison between rungs. With this off
-# every figure is the 8k grid, every pretraining at the same compute in every cell.
-USE_32K = False     # scratch ee -> nu_e nu_e at 32k came out worse; its exploration is still running
+# On since 2026-10-06, when every pretraining and scratch had its 32k cells (all 420 chosen points: the twelve probes at
+# D = 10^3.5, 10^4, ud -> ud also at 10^2.5, 10^3): those cells are read at 32k for every family alike. Off, every figure
+# is the 8k grid (the first 32k round covered scratch, ee->uu and one rung per probe only; the user's call, 2026-10-05).
+USE_32K = True
 
 
 CHOSEN32 = json.load(open(os.path.join(ROOT, "analysis", "transfer", "horizon32k_chosen.json")))
