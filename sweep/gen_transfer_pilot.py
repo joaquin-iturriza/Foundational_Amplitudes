@@ -288,7 +288,8 @@ def main():
                {"fine_tune.offshell_stats": "parent",
                 "fine_tune.parent_offshell_stats": json.dumps(json.loads(a.parent_offshell), separators=(",", ":"))})
         for p in (list(STEERED) if a.steered else only(PROBES + Z_FAMILY + LADDER + STAR_PROBES)):
-            for k in (steer_ks if a.steered else SETTLED if a.eff_lr else KS):
+            # --horizon: the longer-horizon cells, k = 9, 10 included (the grid's D = 10^4.5, 10^5 at 32k)
+            for k in (steer_ks if a.steered else KS if a.eff_lr and a.horizon else SETTLED if a.eff_lr else KS):
                 if k > K_MAX.get(p, 10) or (cells is not None and (p, k) not in cells):
                     continue
                 recipe = STEERED[p][0] if a.steered else f"transfer_probe_{p}.yaml"
