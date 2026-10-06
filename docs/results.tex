@@ -4724,7 +4724,7 @@ process in its equality class, is in any of these pretrainings (the recipes' hea
 so these are zero-shot predictions. The raw score does not measure them, though: the parent outputs in its own
 standardized units, and a parent with the right shape but the wrong offset $\alpha$ and scale $\beta$ scores
 $((\mu_q-\alpha)/\beta)^2+(\sigma_q/\beta-1)^2$, not $0$. The score up to an affine map, $1-\mathrm{corr}^2$ of the parent's
-output with the probe's target (\code{val\_loss\_affine}), replaces it in the next paragraph; nothing is read from the
+output with the probe's target (\code{val\_loss\_affine}), will replace it once all ten pretrainings are scored; nothing is read from the
 raw score.
 \begin{figure}[H]
 \centering
