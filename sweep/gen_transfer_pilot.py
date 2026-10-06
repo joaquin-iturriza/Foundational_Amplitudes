@@ -204,6 +204,9 @@ def main():
     ap.add_argument("--ladder", nargs="*", type=int,
                     help="write the ladder's pretraining configs (tp3_ladder_r<r>) for these rungs, factors off")
     ap.add_argument("--finale", action="store_true", help="the finale's pretraining config (tp3_finale)")
+    ap.add_argument("--synthetic", action="store_true",
+                    help="the synthetic-amplitude pretraining (tp3_synth): rung 9's process count and events per "
+                         "process, on synthetic processes (tools/synthetic_amplitudes.py)")
     ap.add_argument("--equal-data", type=int, metavar="N",
                     help="with --ladder: the rungs at N training events in total, split evenly (tp3_eqd_r<n>)")
     ap.add_argument("--horizon", type=int,
@@ -238,6 +241,13 @@ def main():
         FIXED["data.target_propagators"] = "false"
         out.append(write("tp3_finale", "transfer_finale.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
                          head=f"Transfer finale: rung 9 plus every star arm's processes, {T_LADDER} steps, factors off."))
+        print("\n".join(os.path.relpath(p, ROOT) for p in out))
+        return
+    if a.synthetic:
+        FIXED["data.target_propagators"] = "false"
+        out.append(write("tp3_synth", "transfer_synthetic.yaml", T_LADDER, [lr_space(T_LADDER)] + COMMON_SPACE,
+                         head=f"Transfer, synthetic prior: 19 synthetic processes at 1e5 events, {T_LADDER} steps, "
+                              f"factors off."))
         print("\n".join(os.path.relpath(p, ROOT) for p in out))
         return
     if a.pre64:

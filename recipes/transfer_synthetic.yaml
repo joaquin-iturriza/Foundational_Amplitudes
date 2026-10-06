@@ -1,0 +1,99 @@
+# Synthetic-amplitude prior: 19 synthetic processes syn_00000.. (tools/synthetic_amplitudes.py, v1),
+# mixture sampling as the ladder recipes; sqrt(s) windows from each structure (max(25, 1.05 threshold), the catalog's rule).
+sampling: {mode: mixture}
+processes:
+- name: syn_00000
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00001
+  sqrts: [266, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00002
+  sqrts: [271, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00003
+  sqrts: [265, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00004
+  sqrts: [90, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00005
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00006
+  sqrts: [96, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00007
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00008
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00009
+  sqrts: [182, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00010
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00011
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00012
+  sqrts: [182, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00013
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00014
+  sqrts: [182, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00015
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00016
+  sqrts: [85, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00017
+  sqrts: [25, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: syn_00018
+  sqrts: [182, 1000]
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
