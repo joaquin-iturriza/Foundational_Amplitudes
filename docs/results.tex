@@ -4856,7 +4856,7 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     sites without asking; fresh collection from all sites before any figure; after every collection, and at least every
     few hours while results land, the study's own figures (\code{rung\_focus}, \code{rung\_grid}, \code{star\_arms},
     \code{gain\_heatmap}, and each new comparison) sent to the user unprompted, so a problem can be caught early;
-    \code{docs/results.tex} and the paper draft (scratchpad \code{draft/}, sent as PDF and zip) kept current; reviewers run
+    \code{docs/results.tex} and the paper draft (\code{\textasciitilde/drafts/fm\_amplitudes/}, sent as PDF and zip) kept current; reviewers run
     when due; never narrow the scope (CLAUDE.md 0b). Monitoring, every $20$ minutes, never hourly (the user's call,
     2026-10-06, after $75$ points failed for hours unnoticed): \code{sweep/watchdog.py tp3\_ --expect <the batch's
     \{sweep: [hp]\} JSON>} in a background loop that exits on an \code{ALERT} (fast trial failures, expected points with
@@ -4885,7 +4885,7 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in \code{trial\_0073\_r<k>}) and point the
     configs at it. The equal-data rungs' parents are hp73 alone, the ladder's fine-tunes use each rung's best-of-search
     parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every comparison of the two says so, or uses the ladder
-    rung's hp73 parent where it exists. The paper draft is the scratchpad's \code{draft/} (\code{fm\_amplitudes\_updated.zip},
+    rung's hp73 parent where it exists. The paper draft is \code{\textasciitilde/drafts/fm\_amplitudes/} (restored 2026-10-06 from the last version sent, \code{fm\_amplitudes\_updated.zip}, after a WSL restart wiped \code{/tmp}; never keep it in \code{/tmp} again;
     \code{fm\_amplitudes\_check.pdf} last sent).
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
