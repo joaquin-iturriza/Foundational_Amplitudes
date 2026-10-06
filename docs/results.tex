@@ -4864,7 +4864,22 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 04:00):} (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
+    \emph{State (2026-10-06, 18:30):} priority work runs first on lxplus, pinned (a \code{PINNED} file in the sweep dir; the
+    rebalancer never moves it) and at the top of the queue (\code{condor\_qedit JobPrio}; a background loop raises each new
+    trial as its DAG releases it): (A) \code{tp3\_hpx32k\_*}, $45$ of $120$ trials in; (B) \code{tp3\_lev\{diag,offsh,coup,gen\}},
+    four rung-$9$ pretrainings with one lever flipped, queued, their grids \code{tp3\_lev*fte[32k]\_*} (rung $9$'s $36$ cells,
+    the cells' DyHPO seeds kept so candidates pair) to submit when each ends; (C) \code{training.per\_process\_accumulation}
+    merged (CPU test: the accumulated gradient equals the mixed batch's to $10^{-16}$), \code{tp3\_accum\_r9} queued (default
+    micro-batch $16384/P$: only the batching differs), its grid \code{tp3\_accumfte[32k]\_*} ready; the equal-events arm
+    ($16384$ events per process, $3400$ steps, needs its own lr search) waits on the user. Step 1: $572$ chosen points in
+    \code{horizon32k\_chosen.json}, $538$ in; the $34$ of the $17$ first-round sweeps run on lxplus, pinned, first in line.
+    Figures redrawn with \code{USE\_32K} and sent (2026-10-06 11:00); $32$k is worse than the cell's $8$k in $49$ of $269$
+    cells ($6$ by more than $2\times$; median $32$k/$8$k $0.27$), the user asked to probe the HPs (A) before deciding.
+    Pretrainings done: equal-data rungs $2$, $3$, $7$--$9$, the finale, the synthetic one; rungs $4$--$6$ queued on CC.
+    Grids out: the finale ($195$ sweeps, all sites), equal-data $7$--$9$ (Jean Zay, CC, lxplus in chunks), equal-data $2$, $3$
+    and the synthetic grid (lxplus, after $7$--$9$). On 2026-10-06 a WSL restart wiped \code{/tmp} and stopped every loop for
+    $\sim4$\,h; the paper draft moved to \code{\textasciitilde/drafts/fm\_amplitudes/}. Backlog $\sim2300$ trials at
+    $\sim9$/h over the three sites. Earlier: (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
     $75$ that had failed in seconds, their first attempts' run dirs blocking \code{run.py}, were fixed by
     \code{run\_trial.py} taking \code{trial\_<hp>\_r<k>} on a cold start, nothing deleted). Once all $420$ are in: collect
     \code{tp3\_} from every site (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set
