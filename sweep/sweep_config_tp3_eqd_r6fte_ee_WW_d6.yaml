@@ -67,7 +67,7 @@ fixed_params:
   data.train_subsample: 1000
   fine_tune.lr_scale: 1.0
   fine_tune.layer_decay: 1.0
-  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_eqd_r6/trial_0073/models/model_run0_best.pt
+  fine_tune.pretrained_path: /lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes/runs/tp3_eqd_r6/trial_0073_r1/models/model_run0_best.pt
   fine_tune.target_stats: own
   fine_tune.offshell_stats: parent
 range_extension:
