@@ -25,7 +25,8 @@ random structure drawn from a seed derived from its name, so the name alone rege
         |M|^2 = g * < sum_h | sum_d c_hd P_hd(s_ij) s^(-k_hd/2) / prod_{S in d} D_S |^2 >_perm,
         D_S = s_S - M_S^2 + i M_S Gamma_S   (or its square root, |s_S| for a massless one),
 
-    g = (4 pi alpha_s)^k_s (4 pi alpha)^(n - k_s), averaged over the permutations of
+    g = (4 pi alpha_s(sqrt s))^k_s (4 pi alpha)^(n - k_s) (alpha_s run per event at one loop,
+    as the real pools), averaged over the permutations of
     identical legs (the target must be a function of the particle set). |M|^2 > 0 has mass
     dimension 8 - 2N and is Lorentz invariant by construction (only invariants enter).
 
@@ -60,10 +61,10 @@ from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS 
 # evaluates to: the version enters the structure hash, hence every pool's recipe_id.
 SYN_VERSION = 1
 _SALT = 0x5E17A                      # seed namespace of synthetic processes
-_NAME = re.compile(r"^syn([2-9])?_(\d+)$")
+_NAME = re.compile(r"^syn([2-4])?_(\d+)$")
 DEFAULT_DIAGRAMS_DIR = os.path.join(_HERE, "data", "diagrams")
 
-ALPHA_S, ALPHA_EW = 0.118, 1.0 / 132.507
+ALPHA_S, ALPHA_EW, MZ_REF = 0.118, 1.0 / 132.507, 91.1876      # alpha_s(M_Z), running reference
 SQRTS_MAX = 1000.0
 _COL = {k: PARTICLE_FEATURE_NAMES.index(k) for k in
         ("charge", "log10_mass_gev", "baryon_number", "lepton_number", "color_casimir")}
@@ -83,7 +84,7 @@ _PROP = {0: [(22, 0.3), (21, 0.3), (23, 0.2), (25, 0.2)],
          3: [(24, 0.5), (-11, 0.25), (-13, 0.25)], -3: [(-24, 0.5), (11, 0.25), (13, 0.25)],
          2: [(2, 0.6), (6, 0.4)], -2: [(-2, 0.6), (-6, 0.4)],
          -1: [(1, 0.6), (5, 0.4)], 1: [(-1, 0.6), (-5, 0.4)]}
-_PROP_MASSIVE = {0: [23, 25], 3: [24], -3: [-24], 2: [6], -2: [-6], -1: [5], 1: [-5]}
+_PROP_HEAVY = {0: [23, 25], 3: [24], -3: [-24], 2: [6], -2: [-6]}   # none for charge 1/3 (b is light)
 _WIDTH_RATIO = (1e-3, 0.1)            # Gamma/M, log-uniform per propagator particle
 _SCALAR_MASS = (20.0, 700.0)          # random scalar mass (log-uniform), half of the processes
 _KMAX = {4: 3, 5: 5, 6: 6}            # diagrams per process, at most
@@ -173,10 +174,12 @@ def structure(name):
     guard = [cut[i] or m_legs[i] > 0.0 for i in range(N)]       # keeps an invariant off zero
 
     def protected(S):
-        """A massless propagator only where the fiducial cuts (or a leg mass) keep s_S off 0:
-        s-type needs two cut legs or a massive one; t-type a guard on both sides of the beams."""
+        """A massless or light (M <= _LIGHT) propagator only where the fiducial cuts (or a leg
+        mass) keep s_S off 0 (and off a light pole): s-type needs two cut legs or legs
+        with masses above _LIGHT (s_S >= 100 GeV^2 either way); t-type (s_S <= 0) a guard on both
+        sides of the beams."""
         if 1 not in S:
-            return sum(cut[i] for i in S) >= 2 or any(m_legs[i] > 0 for i in S)
+            return sum(cut[i] for i in S) >= 2 or sum(m_legs[i] for i in S) > _LIGHT
         G = [i for i in S if i >= 2]
         F = [i for i in range(2, N) if i not in S]
         return any(guard[i] for i in G) and any(guard[i] for i in F)
@@ -184,7 +187,10 @@ def structure(name):
     colored = [_props(p)[_COL["color_casimir"]] > 0 for p in pdgs]
     n_glu = sum(p == 21 for p in fin)
     k_s = min(n, n_glu + int(rng.binomial(n - n_glu, 0.3))) if any(colored) else 0
-    m_scalar = 125.0 if rng.random() < 0.5 else float(np.exp(rng.uniform(*np.log(_SCALAR_MASS))))
+    # a random scalar mass only without an external H: one PDG must not carry two masses
+    m_scalar = float(np.exp(rng.uniform(*np.log(_SCALAR_MASS)))) if rng.random() >= 0.5 else 125.0
+    if 25 in fin:
+        m_scalar = 125.0
     ratio = {}
 
     def width(pdg):
@@ -206,8 +212,10 @@ def structure(name):
             if q not in _PROP:
                 ok = False; break
             pdg = int(_pick(rng, _PROP[q]))
-            if leg_mass(pdg) == 0.0 and not protected(S):
-                pdg = int(_PROP_MASSIVE[q][int(rng.integers(len(_PROP_MASSIVE[q])))])
+            if leg_mass(pdg) <= _LIGHT and not protected(S):
+                if q not in _PROP_HEAVY:            # charge 1/3: no heavy option, redraw the tree
+                    ok = False; break
+                pdg = int(_PROP_HEAVY[q][int(rng.integers(len(_PROP_HEAVY[q])))])
             M = m_scalar if abs(pdg) == 25 else leg_mass(pdg)
             s_type = 1 not in S
             props.append({"legs": list(S), "pdg": pdg, "mass": M,
@@ -242,11 +250,11 @@ def structure(name):
         numer.append(row)
 
     thr = sum(m_legs[2:])
-    lo = max(25.0, 15.0 * sum(cut), 1.05 * thr)
+    lo = max(25.0, 1.05 * thr)                                 # the catalog's window rule
     st = {
         "name": name, "version": SYN_VERSION, "pdg_ids": pdgs, "m_legs": m_legs, "nfinal": n,
         "sqrts": [float(np.ceil(lo)), SQRTS_MAX], "k_s": int(k_s),
-        "coupling": float((4 * np.pi * ALPHA_S) ** k_s * (4 * np.pi * ALPHA_EW) ** (n - k_s)),
+        "coupling": float((4 * np.pi) ** n * ALPHA_EW ** (n - k_s)),   # times alpha_s(sqrt s)^k_s
         "internal_masses": {25: m_scalar}, "diagrams": diagrams, "pairs": [list(p) for p in pairs],
         "numerators": numer, "perms": _identical_perms(pdgs),
     }
@@ -318,7 +326,12 @@ def evaluate(st, P, scale=1.0):
                     poly = poly + t
                 A = A + complex(*term["c"]) * poly * s_tot ** (-0.5 * term["k"]) / den
             total = total + np.abs(A) ** 2
-    return st["coupling"] * total / len(st["perms"])
+    # alpha_s runs per event at mu = sqrt(s) as in the real pools (mg5_pipeline_final.compute_alphas,
+    # one loop from M_Z, nf = 5); M_Z scales with the other constants
+    b0 = (11 * 3 - 2 * 5) / (12 * np.pi)
+    s_in = _mink2(P[:, 0] + P[:, 1])
+    a_s = ALPHA_S / (1 + ALPHA_S * b0 * np.log(s_in / (MZ_REF * scale) ** 2))
+    return st["coupling"] * a_s ** st["k_s"] * total / len(st["perms"])
 
 
 def label_events(name, events):
@@ -442,7 +455,7 @@ def main():
                "processes": recipe_entries(names, a.n_train, a.n_val, a.n_test)}
         head = (f"# Synthetic-amplitude prior: {a.count} synthetic processes syn_{a.first:05d}.. "
                 f"(tools/synthetic_amplitudes.py, v{SYN_VERSION}),\n# mixture sampling as the ladder "
-                f"recipes; sqrt(s) windows from each structure (max(25, 15 x cut legs, 1.05 threshold)).\n")
+                f"recipes; sqrt(s) windows from each structure (max(25, 1.05 threshold), the catalog's rule).\n")
         with open(a.recipe, "w") as f:
             f.write(head)
             yaml.safe_dump(doc, f, default_flow_style=None, sort_keys=False, width=200)
