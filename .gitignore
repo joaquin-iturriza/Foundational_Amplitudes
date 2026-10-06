@@ -134,3 +134,4 @@ sweeps_local/
 .venv-driver/
 .claude/.notes_flushed
 .claude/.compact_wanted
+.claude/.watchdog_state.json
