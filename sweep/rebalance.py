@@ -66,14 +66,32 @@ def _queue():
     sys.path.insert(0, os.path.join(REPO, "sweep"))
     from sweep_manager import load_registry, DEFAULT_REGISTRY
     states = {}
-    out = subprocess.run(["squeue", "-u", os.environ["USER"], "-h", "-o", "%i %T"], capture_output=True, text=True).stdout
+    by_path = {}
+    out = subprocess.run(["squeue", "-u", os.environ["USER"], "-h", "-o", "%i %T %o"], capture_output=True, text=True).stdout
     for line in out.splitlines():
-        jid, st = line.split()[:2]
-        states[jid] = st
+        p = line.split()
+        if len(p) < 2:
+            continue
+        states[p[0]] = p[1]
+        m = re.search(r"/sweeps/([^/]+)/jobs/", p[2]) if len(p) > 2 else None
+        if m:
+            by_path[p[0]] = m.group(1)
+    seen = set()
     for name, e in load_registry(DEFAULT_REGISTRY)["sweeps"].items():
         jobs = [j for j in e["jobs"] if j in states]
+        seen.update(jobs)
         run = sum(states[j] == "RUNNING" for j in jobs)
         q[name] = (run, len(jobs) - run, [j for j in jobs if states[j] != "RUNNING"])
+    # a job the registry lost (2026-10-06: tp3_eqd_r5's pretraining) is still a job of its sweep: its script's path says which
+    for j, name in by_path.items():
+        if j in seen:
+            continue
+        run, qd, ids = q.get(name, (0, 0, []))
+        if states[j] == "RUNNING":
+            run += 1
+        else:
+            qd, ids = qd + 1, ids + [j]
+        q[name] = (run, qd, ids)
     return q
 
 
