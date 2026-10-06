@@ -10,7 +10,7 @@ On the laptop it adds:
   missing            the points of --expect (JSON {sweep: [hp indices]}) with a result on no site
   stalled            a site with queued trials, none running and no new result for --stall minutes
 and exits 1 with an ALERT line per problem (a waiter then wakes the agent), else prints one status line and exits 0.
-A missing point is an alert only when nothing of its sweep is running or queued on any site.
+A missing point is an alert when its sweep has fewer trials running or queued on all sites than points missing.
 
     python3 sweep/watchdog.py tp3_ [--expect analysis/transfer/horizon32k_chosen.json] [--window 30]
 On a site (through `site run`):
@@ -119,7 +119,12 @@ def main():
             for err, sw in by.items():
                 alerts.append(f"{s}: {len(sw)} trial(s) FAILED in the last {a.window} min ({len(set(sw))} sweeps, e.g. "
                               f"{sw[0]}): {err or 'no error line'}")
-    active = {n for r in rep.values() for n in list(r["running"]) + list(r["queued"])}
+    # trials of a sweep running or queued anywhere: a sweep with more missing points than that has lost one (2026-10-06:
+    # a failed point sat unnoticed while other trials of its sweep were queued)
+    active = {}
+    for r in rep.values():
+        for n, k in list(r["running"].items()) + list(r["queued"].items()):
+            active[n] = active.get(n, 0) + k
     n_missing = 0
     if a.expect:
         exp = json.load(open(os.path.join(REPO, a.expect) if not os.path.isabs(a.expect) else a.expect))
@@ -129,11 +134,11 @@ def main():
                 continue
             miss = sorted(set(hps) - got.get(sw, set()))
             n_missing += len(miss)
-            if miss and sw not in active:
+            if len(miss) > active.get(sw, 0):
                 idle[sw] = miss
         if idle:
             alerts.append(f"{sum(map(len, idle.values()))} expected point(s) in {len(idle)} sweep(s) have no result and "
-                          f"nothing running or queued anywhere, e.g. {next(iter(idle))} {next(iter(idle.values()))}")
+                          f"fewer trials running or queued anywhere, e.g. {next(iter(idle))} {next(iter(idle.values()))}")
     try:
         state = json.load(open(STATE))
     except (OSError, ValueError):
