@@ -320,19 +320,23 @@ def plan(inv, margin_h):
         # the latest-finishing site that still has a sweep to give: a site whose backlog is all started sweeps
         # (CC with rung 9's half-run cells) stays as it is, and the next one is balanced instead
         for src in sorted(st, key=fin, reverse=True):
-            if not movable[src]:
-                continue
-            name = movable[src][0]
-            x = inv[src]["sweeps"][name]
-            k = len(x["move_hps"]) if x["unit"] == "trials" else x["remaining"]
-            # a whole sweep never onto a namesake; pending trials may go where the sweep also exists (a sweep
-            # moved before: its results there merge by name; apply_trials clears that site's MOVED_TO marker), but not
-            # onto a site where the sweep has trials running
-            dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
-                                                   else not inv[s]["sweeps"].get(name, {}).get("running"))]
-            dsts = [s for s in dsts if st[s]["room"] >= k]
+            # the first of the site's sweeps that has somewhere to go (a sweep with none is dropped and the next one
+            # tried; 2026-10-06: dropping it ended the site's turn, so one namesake at the head of lxplus's list kept
+            # all 335 of its movable sweeps in place while CC and Jean Zay sat idle)
+            dsts = []
+            while movable[src] and not dsts:
+                name = movable[src][0]
+                x = inv[src]["sweeps"][name]
+                k = len(x["move_hps"]) if x["unit"] == "trials" else x["remaining"]
+                # a whole sweep never onto a namesake; pending trials may go where the sweep also exists (a sweep
+                # moved before: its results there merge by name; apply_trials clears that site's MOVED_TO marker),
+                # but not onto a site where the sweep has trials running
+                dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
+                                                       else not inv[s]["sweeps"].get(name, {}).get("running"))]
+                dsts = [s for s in dsts if st[s]["room"] >= k]
+                if not dsts:
+                    movable[src].pop(0)
             if not dsts:
-                movable[src].pop(0)
                 continue
             dst = min(dsts, key=lambda s: fin(s, k))
             if (st[src]["rate"] == 0 and fin(dst, k) < float("inf")) \
