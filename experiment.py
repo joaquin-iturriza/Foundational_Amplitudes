@@ -1876,7 +1876,8 @@ class AmplitudeExperiment(BaseExperiment):
         return float(self.cfg.data.get("signedlog_quantile", SIGNEDLOG_QUANTILE))
 
     def _init_dataloader(self):
-        from dataset import AmplitudeDataset, collate_variable_length, ProcessBalancedSampler
+        from dataset import (AmplitudeDataset, collate_variable_length, ProcessBalancedSampler,
+                             PerProcessMicroBatchSampler)
 
         N_total = self.N_events
 
@@ -1961,7 +1962,35 @@ class AmplitudeExperiment(BaseExperiment):
         # dilutes with many datasets, perturbing the sampling dynamics hurts); it stays
         # available via training.use_balanced_sampler for few, very unbalanced datasets.
         use_balanced = bool(self.cfg.training.get("use_balanced_sampler", False))
-        if self.n_datasets > 1 and use_balanced:
+        self._per_process_accum = bool(self.cfg.training.get("per_process_accumulation", False))
+        if self._per_process_accum:
+            # one single-process micro-batch per process per step, gradients accumulated
+            # (_per_process_step_grads); the loader yields them collated and grouped by process
+            if use_balanced:
+                raise ValueError("training.per_process_accumulation and use_balanced_sampler "
+                                 "are exclusive (the former fixes every process's share)")
+            train_proc_ids = self.all_process_ids[train_idx]
+            n_proc_train = len(np.unique(train_proc_ids))
+            micro = self.cfg.training.get("accumulation_microbatch", None)
+            micro = int(micro) if micro not in (None, "null", "none") else max(1, batchsize // n_proc_train)
+            with open_dict(self.cfg):
+                self.cfg.training.accumulation_microbatch = micro
+            seed = self.cfg.get("seed", None)
+            self.train_sampler = None   # the balanced-sampler hooks (weights, snapshots) don't apply
+            self._accum_sampler = PerProcessMicroBatchSampler(
+                train_proc_ids, micro, seed=int(seed) if seed is not None else 0)
+            ds = make_dataset(train_idx)
+            self.train_loader = torch.utils.data.DataLoader(
+                ds, batch_sampler=self._accum_sampler, collate_fn=collate_variable_length,
+                pin_memory=False, num_workers=nw, persistent_workers=nw > 0,
+            )
+            capped = sum(1 for m in self._accum_sampler.m.values() if m < micro)
+            LOGGER.info(
+                f"Per-process gradient accumulation: {n_proc_train} micro-batches of {micro} "
+                f"events per step ({self._accum_sampler.events_per_step} events/update; "
+                f"{capped} processes capped at their pool size), one optimizer step per iteration"
+            )
+        elif self.n_datasets > 1 and use_balanced:
             train_proc_ids = self.all_process_ids[train_idx]
             self.train_sampler = ProcessBalancedSampler(
                 process_ids = train_proc_ids,
@@ -2795,6 +2824,125 @@ class AmplitudeExperiment(BaseExperiment):
         if sync_blocking:
             assert torch.isfinite(loss).all()   # original per-step guard (D2H sync)
         return loss, loss_no_reg, mse_val
+
+    @staticmethod
+    def _split_by_process(data):
+        """Cut a collated batch whose events are grouped by process (PerProcessMicroBatchSampler)
+        into one collated single-process micro-batch per process, in the batch's order.
+        Pure CPU slicing (ptr and process ids are born on the CPU), no device sync."""
+        particles, y, tokens, order_labels, ptr, process_ids = data
+        procs, counts = torch.unique_consecutive(process_ids, return_counts=True)
+        if len(torch.unique(procs)) != len(procs):
+            raise ValueError("per-process accumulation: the batch is not grouped by process")
+        ev = [0] + torch.cumsum(counts, 0).tolist()
+        pt = ptr.tolist()
+        out = []
+        for e0, e1 in zip(ev[:-1], ev[1:]):
+            a0, a1 = pt[e0], pt[e1]
+            out.append((particles[a0:a1], y[e0:e1], tokens[a0:a1], order_labels[e0:e1],
+                        ptr[e0:e1 + 1] - a0, process_ids[e0:e1]))
+        return out
+
+    def _per_process_step_grads(self, data):
+        """Gradient of one update under training.per_process_accumulation (Schiller et al.,
+        arXiv:2606.23791): one single-process micro-batch per process, accumulated into .grad.
+
+        Leaves in .grad EXACTLY the gradient the mixed-batch loss has on the union of the
+        micro-batches, so the only difference between the modes is how a batch is composed.
+        With l_p the mean per-event loss of process p on its micro-batch, P the processes
+        present, and the mixed-batch training loss L = A(l_1..l_P) + lambda*R(theta):
+
+          grad L = sum_p (dA/dl_p) grad l_p + lambda grad R,
+
+        and each micro-batch's backward contributes one term of the sum:
+          * mean:            A = (1/P) sum_p l_p,  dA/dl_p = 1/P. Backward l_p / P; done.
+          * geometric_mean:  A = exp(G), G = (1/P) sum_p log(l_p + tau), so
+                             dA/dl_p = A / (P (l_p + tau)): the weight depends on every l_q,
+                             known only after the last micro-batch. But grad A = A grad G and
+                             grad G = sum_p grad log(l_p + tau) / P has purely local terms:
+                             backward log(l_p + tau) / P per micro-batch, then multiply the
+                             accumulated gradient by the scalar A. Exact in one pass, no second
+                             forward and no graph kept alive across micro-batches.
+          * excess:          A = (1/P) sum_p c_p w_p l_p / wbar, c_p = (1/ref_p)/mean(1/ref),
+                             w_p = (l_p/ref_p)^beta detached, wbar its mean over the present
+                             processes (1 when beta = 0): backward c_p w_p l_p / P, divide by wbar.
+          (HETEROSC forces mean, as in _aggregate_per_process_loss.)
+        The update is therefore the per-process gradients combined with the aggregation's
+        weights, i.e. the MEAN over processes for loss_aggregation=mean (not the sum): a sum
+        would scale the step by P against the mixed batch and change the meaning of lr,
+        clip_grad_norm and lambda between the two modes.
+        Regularization (and the EWC penalty) is backpropagated once, after the micro-batches,
+        never P times. Returns (loss, loss_no_reg, mse_val) as detached tensors, the same
+        quantities _batch_loss returns, for the logging and the NaN guard in _step.
+        """
+        micro = self._split_by_process(data)
+        P = len(micro)
+        loss_agg = self.cfg.training.get("loss_aggregation", "mean")
+        if self.cfg.training.loss == "HETEROSC":
+            loss_agg = "mean"
+        tau = float(self.cfg.training.get("loss_aggregation_tau", 0.0) or 0.0)
+        beta = float(self.cfg.training.get("excess_beta", 0.0) or 0.0)
+        if loss_agg not in ("mean", "geometric_mean", "excess"):
+            raise ValueError(f"per-process accumulation: unknown loss_aggregation {loss_agg}")
+        if loss_agg == "excess":
+            ref = self._excess_reference()
+            inv = 1.0 / ref
+            c = inv / inv.mean()                       # over all datasets, as the mixed path
+
+        self.optimizer.zero_grad()
+        ells, ws, mse_sum, n_ev = [], [], None, 0
+        for mb in micro:
+            y_pred, y, pids, sigma, mse_val = self._forward_lloca(mb)
+            # one process present: the "mean" aggregation is exactly that process's mean loss
+            # (the same segment mean, sign-head term included, as in the mixed batch)
+            ell = self._aggregate_per_process_loss(y_pred, y, pids, "mean", sigma=sigma,
+                                                   sign=self._last_sign)
+            if loss_agg == "mean":
+                term = ell / P
+            elif loss_agg == "geometric_mean":
+                term = (ell + tau).clamp(min=1e-30).log() / P
+            else:
+                p = int(mb[5][0])
+                w = ((ell.detach() / ref[p].to(ell)).clamp(min=1e-12) ** beta) if beta > 0 else None
+                term = c[p].to(ell) * ell / P * (w if w is not None else 1.0)
+                if w is not None:
+                    ws.append(w)
+            term.backward()
+            ells.append(ell.detach())
+            if mse_val is not None:
+                k = len(y)
+                mse_sum = mse_val * k if mse_sum is None else mse_sum + mse_val * k
+                n_ev += k
+
+        ell_t = torch.stack(ells)
+        grads = [q.grad for q in self.model.parameters() if q.grad is not None]
+        if loss_agg == "geometric_mean":
+            agg = ((ell_t + tau).clamp(min=1e-30).log().sum() / P).exp()
+            for g in grads:
+                g.mul_(agg)
+        elif loss_agg == "excess":
+            pids_all = torch.as_tensor([int(mb[5][0]) for mb in micro])
+            e = ell_t * c[pids_all].to(ell_t)
+            if ws:
+                wbar = torch.stack(ws).mean()
+                for g in grads:
+                    g.div_(wbar)
+                e = e * torch.stack(ws) / wbar
+            agg = e.sum() / P
+        else:
+            agg = ell_t.sum() / P
+
+        reg = self.regularization_lambda * self.regularization(self.model)
+        if getattr(self, "ewc", None) is not None:
+            reg = reg + (self.cfg.fine_tune.ewc.get("lambda", 1000.0) / 2.0) * self.ewc.penalty(self.model)
+        if torch.is_tensor(reg) and reg.requires_grad:
+            reg.backward()
+        reg_val = reg.detach() if torch.is_tensor(reg) else reg
+        loss = agg + reg_val
+        mse_val = (mse_sum / n_ev) if mse_sum is not None else None
+        if os.environ.get("LLOCA_SYNC", "deferred") == "blocking":
+            assert torch.isfinite(loss).all()
+        return loss, agg, mse_val
 
     def _per_event_loss(self, y_pred, y, sigma=None):
         """Per-event loss vector (B,) with NO cross-event reduction.

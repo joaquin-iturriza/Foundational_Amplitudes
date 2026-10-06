@@ -47,6 +47,16 @@ training:
  # dilutes with many datasets and perturbing the sampling dynamics ends up hurting.
  # Keep it as an opt-in for mixtures of FEW, very unbalanced datasets.
  use_balanced_sampler: false    # true → ProcessBalancedSampler; false → equal/uniform (default)
+ # Per-process micro-batches with gradient accumulation (arXiv:2606.23791, Schiller et al.).
+ # true: every optimizer step draws one single-process micro-batch per training process
+ # (PerProcessMicroBatchSampler: each process its own shuffled stream), backpropagates each
+ # process's mean loss with the weight the mixed-batch loss_aggregation gives it, and takes
+ # ONE clipped optimizer/scheduler/EMA step on the sum (regularization added once). The
+ # update equals the mixed-batch one on the same events (experiment._per_process_step_grads).
+ # Not combinable with use_balanced_sampler.
+ per_process_accumulation: false
+ accumulation_microbatch: null  # events per process per step; null → batchsize // P (same events
+                                # per update as a mixed batch); batchsize → Schiller's P×larger update
  sampler_log_every_n_vals: 10   # log sampler weights every N validation steps (0 = never)
  sampler_alpha_ema: 0.7         # EMA decay applied to per-process val losses before fitting α (0 = no smoothing, 1 = never update)
  sampler_min_alpha_frac: 0.25   # minimum weight as fraction of max weight; extreme-starvation floor for confirmed-plateaued datasets (0.25 = 4:1 cap)

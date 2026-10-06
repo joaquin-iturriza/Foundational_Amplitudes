@@ -1211,12 +1211,19 @@ class BaseExperiment:
             
     def _step(self, data, step):
         # actual update step
-        loss, loss_no_reg, mse_val = self._batch_loss(data)
-        if self.ewc is not None:
-            ewc_lambda = self.cfg.fine_tune.ewc.get("lambda", 1000.0)
-            loss = loss + (ewc_lambda / 2.0) * self.ewc.penalty(self.model)
-        self.optimizer.zero_grad()
-        loss.backward()
+        if getattr(self, "_per_process_accum", False):
+            # training.per_process_accumulation: one single-process micro-batch per process,
+            # gradients accumulated into .grad (zero_grad, regularization and EWC included,
+            # once); clipping, the NaN guard, the optimizer/EMA/scheduler steps below are
+            # shared with the mixed-batch path and run once per iteration
+            loss, loss_no_reg, mse_val = self._per_process_step_grads(data)
+        else:
+            loss, loss_no_reg, mse_val = self._batch_loss(data)
+            if self.ewc is not None:
+                ewc_lambda = self.cfg.fine_tune.ewc.get("lambda", 1000.0)
+                loss = loss + (ewc_lambda / 2.0) * self.ewc.penalty(self.model)
+            self.optimizer.zero_grad()
+            loss.backward()
         if self.cfg.training.clip_grad_value is not None:
             # clip gradients at a certain value (this is dangerous!)
             torch.nn.utils.clip_grad_value_(
@@ -1513,6 +1520,9 @@ class BaseExperiment:
         raise NotImplementedError()
 
     def _batch_loss(self, data):
+        raise NotImplementedError()
+
+    def _per_process_step_grads(self, data):
         raise NotImplementedError()
 
     def _init_metrics(self):
