@@ -4864,7 +4864,7 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 18:30):} priority work runs first on lxplus, pinned (a \code{PINNED} file in the sweep dir; the
+    \emph{State (2026-10-06, 18:08):} priority work runs first on lxplus, pinned (a \code{PINNED} file in the sweep dir; the
     rebalancer never moves it) and at the top of the queue (\code{condor\_qedit JobPrio}; a background loop raises each new
     trial as its DAG releases it): (A) \code{tp3\_hpx32k\_*}, $45$ of $120$ trials in; (B) \code{tp3\_lev\{diag,offsh,coup,gen\}},
     four rung-$9$ pretrainings with one lever flipped, queued, their grids \code{tp3\_lev*fte[32k]\_*} (rung $9$'s $36$ cells,
