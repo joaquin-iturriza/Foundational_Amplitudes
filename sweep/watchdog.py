@@ -94,6 +94,9 @@ def main():
     ap.add_argument("--site-report", action="store_true")
     ap.add_argument("--window", type=int, default=30, help="minutes of trial logs read for failures")
     ap.add_argument("--expect", help="JSON {sweep: [hp indices]} of the points the batch must produce")
+    ap.add_argument("--collected", default="analysis/transfer/scratch_sweeps.json",
+                    help="trials already collected to the laptop ({sweep: [{hp, ...}]}): a point there is done even if its "
+                         "site lost the file (2026-10-06: two lxplus results dirs vanished from EOS after collection)")
     ap.add_argument("--stall", type=int, default=60, help="minutes queued, nothing running, no new result: stalled")
     ap.add_argument("--stall-site", nargs="*", default=[], metavar="SITE=MIN",
                     help="a longer stall limit on a site whose normal queue wait exceeds --stall (Jean Zay's A100 fair "
@@ -113,6 +116,12 @@ def main():
     for r in rep.values():
         for n, hp in r["results"].items():
             got.setdefault(n, set()).update(hp)
+    try:
+        col = json.load(open(a.collected if os.path.isabs(a.collected) else os.path.join(REPO, a.collected)))
+        for n, ts in col.items():
+            got.setdefault(n, set()).update(t["hp"] for t in ts if t.get("val_loss") is not None)
+    except (OSError, ValueError):
+        pass
     for s, r in rep.items():
         # a failed attempt at a point that has a result somewhere (a duplicate run) loses nothing
         live = [f for f in r["failed"] if not f["moved"] and f.get("hp") not in got.get(f["sweep"], set())]
