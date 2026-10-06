@@ -49,7 +49,7 @@ def site_report(prefixes, window_min):
             lines = txt.splitlines()
             err = next((l.strip() for l in reversed(lines) if re.match(r"\s*[\w.]*(Error|Exception)\b.*:", l)), "") or \
                 next((l.strip() for l in reversed(lines) if re.search(r"(Killed|Aborting|CANCELLED|TIME LIMIT)", l)), "")
-            hp = re.search(r"hp_(\d{4})", txt)
+            hp = re.search(r"hp_(\d{4})", txt) or re.search(r"/trial_(\d{4})", txt)   # stdout or the run dir
             failed.append({"sweep": os.path.basename(d), "log": os.path.basename(f), "error": err[:200], "moved": moved,
                            "hp": int(hp.group(1)) if hp else None})
     results = {}
