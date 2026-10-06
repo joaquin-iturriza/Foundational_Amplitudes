@@ -91,6 +91,9 @@ def main():
     ap.add_argument("--window", type=int, default=30, help="minutes of trial logs read for failures")
     ap.add_argument("--expect", help="JSON {sweep: [hp indices]} of the points the batch must produce")
     ap.add_argument("--stall", type=int, default=60, help="minutes queued, nothing running, no new result: stalled")
+    ap.add_argument("--stall-site", nargs="*", default=[], metavar="SITE=MIN",
+                    help="a longer stall limit on a site whose normal queue wait exceeds --stall (Jean Zay's A100 fair "
+                         "share: jobs routinely wait ~5.5 h)")
     ap.add_argument("--sites", nargs="+", default=SITES)
     a = ap.parse_args()
     if a.site_report:
@@ -144,7 +147,8 @@ def main():
         if n_q == 0 or n_run > 0 or n_res != h.get("n_res"):
             h = {"since": now, "n_res": n_res}             # the stall clock restarts on any sign of life
         hist[s] = h
-        if n_q > 0 and now - h["since"] >= 60 * a.stall:
+        lim = dict((kv.split("=")[0], int(kv.split("=")[1])) for kv in a.stall_site).get(s, a.stall)
+        if n_q > 0 and now - h["since"] >= 60 * lim:
             alerts.append(f"{s}: {n_q} trial(s) queued, none running and no new result for "
                           f"{(now - h['since']) / 60:.0f} min")
     state[key] = hist
