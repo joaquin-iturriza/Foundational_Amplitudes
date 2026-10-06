@@ -4864,22 +4864,32 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); a sweep it moves stays $12$\,h where it arrives (\code{ARRIVED}; without it the sweeps first in name order went back and forth up to $\sim90$ times, losing their place in every queue), a \code{PINNED} sweep never moves, and moved trials are released at the source only once they are queued at the destination; every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 18:08):} priority work runs first on lxplus, pinned (a \code{PINNED} file in the sweep dir; the
-    rebalancer never moves it) and at the top of the queue (\code{condor\_qedit JobPrio}; a background loop raises each new
-    trial as its DAG releases it): (A) \code{tp3\_hpx32k\_*}, $45$ of $120$ trials in; (B) \code{tp3\_lev\{diag,offsh,coup,gen\}},
-    four rung-$9$ pretrainings with one lever flipped, queued, their grids \code{tp3\_lev*fte[32k]\_*} (rung $9$'s $36$ cells,
-    the cells' DyHPO seeds kept so candidates pair) to submit when each ends; (C) \code{training.per\_process\_accumulation}
-    merged (CPU test: the accumulated gradient equals the mixed batch's to $10^{-16}$), \code{tp3\_accum\_r9} queued (default
-    micro-batch $16384/P$: only the batching differs), its grid \code{tp3\_accumfte[32k]\_*} ready; the equal-events arm
-    ($16384$ events per process, $3400$ steps, needs its own lr search) waits on the user. Step 1: $572$ chosen points in
-    \code{horizon32k\_chosen.json}, $538$ in; the $34$ of the $17$ first-round sweeps run on lxplus, pinned, first in line.
-    Figures redrawn with \code{USE\_32K} and sent (2026-10-06 11:00); $32$k is worse than the cell's $8$k in $49$ of $269$
-    cells ($6$ by more than $2\times$; median $32$k/$8$k $0.27$), the user asked to probe the HPs (A) before deciding.
-    Pretrainings done: equal-data rungs $2$, $3$, $7$--$9$, the finale, the synthetic one; rungs $4$--$6$ queued on CC.
-    Grids out: the finale ($195$ sweeps, all sites), equal-data $7$--$9$ (Jean Zay, CC, lxplus in chunks), equal-data $2$, $3$
-    and the synthetic grid (lxplus, after $7$--$9$). On 2026-10-06 a WSL restart wiped \code{/tmp} and stopped every loop for
-    $\sim4$\,h; the paper draft moved to \code{\textasciitilde/drafts/fm\_amplitudes/}. Backlog $\sim2300$ trials at
-    $\sim9$/h over the three sites. Earlier: (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
+    \emph{State (2026-10-06, 19:58):} \textbf{In progress at the flush.} (i) The rebalancer moves sweeps into CC-IN2P3 beyond
+    its $100$-job per-user cap: a move whose trials only partly enter CC's queue is still released at the source
+    (\code{sweep/rebalance.py}: the release-after-queued check tests $>0$, not $\geq$ the trials moved). Fix next: read each
+    SLURM site's cap (CC $100$) and my total queued jobs (\code{squeue -u}) in the inventory, never plan a move into a site
+    without that room, and release at the source only when every moved trial is queued. Then resubmit the two sweeps it
+    lost, on lxplus with \code{--extend --fixed-hp} (mark them \code{ARRIVED}, write \code{MOVED\_TO} on the other copies with
+    literal paths, never \code{rm} of a shell-variable path): \code{tp3\_uu64fte32k\_ee\_Za\_d10} hp $52$, $188$ and
+    \code{tp3\_uu64fte32k\_uubar\_Zggg\_d9} hp $52$, $112$ (each has one trial queued on CC; check which before resubmitting).
+    (ii) The watchdog loop stopped on that alert: restart it (\code{watchdog.py tp3\_ --expect
+    analysis/transfer/expect\_tp3.json --window 30 --stall-site jeanzay=420}). (iii) Running loops (background shells, lost
+    on a restart): the rebalancer every $20$ min; a loop raising the priority trials on lxplus (\code{tp3\_hpx32k\_*}
+    JobPrio $2000$, the $34$ first-round $32$k points $1000$) and waiting for all $572$ chosen $32$k points; waiters for half
+    of the $120$ HP-landscape trials, the next pretraining result (equal-data rungs $4$--$6$ on CC), the four lever
+    pretrainings, the start of \code{tp3\_accum\_r9} (read its log to confirm the accumulation mode runs on GPU), and the
+    $38$ seed jobs (none started: they rank below the sweeps); the submission of the equal-data rung $2$, $3$ and synthetic
+    grids on lxplus (chunks of $60$ lines; scripts over $\sim100$\,kB fail as one remote command). Once those are in, read
+    their $32$k chosen points from the trial scripts (\code{grep fixed-hp-idx jobs/trial\_*.sh}) into
+    \code{expect\_tp3.json}, as done for the finale and rungs $7$--$9$ ($213$ sweeps). \textbf{Open with the user:} the
+    equal-events accumulation arm ($16384$ events per process, $\sim3400$ steps, its own lr search, $\sim27$--$50$ GPU-h;
+    explained, no answer yet; my advice: wait for \code{tp3\_accum\_r9}); how to score the $49$ cells where $32$k is worse
+    than $8$k (decide after the HP landscape). \textbf{Results not yet written up:} the $32$k cells' effect (median
+    $32$k/$8$k $0.27$; $49$ of $269$ worse); the HP landscape (first trials in; one divergence: rung $0$ on one-loop $ee\to
+    d\bar d$, hp$180$, lr $1.5\times10^{-3}$, $\lambda=2\times10^{-6}$, EMA, non-finite at step $22491$ of $32$k, to be shown
+    separately). The paper draft (\code{\textasciitilde/drafts/fm\_amplitudes/}) still has the pre-$32$k numbers: update it
+    with the step-1 figures. Next in the plan after these: (B) and (C) grids as their pretrainings end (parents on lxplus,
+    \code{trial\_0073}, resolve before submitting), then steps (3)--(6) as their grids complete. Earlier (18:08): (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
     $75$ that had failed in seconds, their first attempts' run dirs blocking \code{run.py}, were fixed by
     \code{run\_trial.py} taking \code{trial\_<hp>\_r<k>} on a cold start, nothing deleted). Once all $420$ are in: collect
     \code{tp3\_} from every site (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set
