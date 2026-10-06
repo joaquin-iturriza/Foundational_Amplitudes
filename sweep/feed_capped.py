@@ -29,7 +29,8 @@ def main():
     todo = []
     for name, e in reg.items():
         d = e.get("dir")
-        if not d or not any(name.startswith(p) for p in a.prefixes) or os.path.exists(os.path.join(d, "MOVED_TO")):
+        if not d or not any(name.startswith(p) for p in a.prefixes) or os.path.exists(os.path.join(d, "MOVED_TO")) \
+                or os.path.exists(os.path.join(d, "HELD")):
             continue
         sub = set(e.get("submitted_scripts", []))
         new = sorted(f for f in glob.glob(os.path.join(d, "jobs", "trial_*.sh")) if f not in sub)

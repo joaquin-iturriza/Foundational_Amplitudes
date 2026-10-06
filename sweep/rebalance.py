@@ -175,7 +175,9 @@ def inventory(prefixes, scope, window_h):
         reg = {n: {"scripts": [os.path.basename(i.get("script", "")) for i in e["jobs"].values()]}
                for n, e in load_registry(DEFAULT_REGISTRY)["sweeps"].items()}
     now, sweeps, recent, recent_long = time.time(), {}, 0, 0
-    names = sorted({os.path.basename(d) for p in scope for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))})
+    # a HELD sweep is paused by hand (its jobs held in the scheduler): never moved, never counted as backlog
+    names = sorted({os.path.basename(d) for p in scope for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))
+                    if not os.path.exists(os.path.join(d, "HELD"))})
     for name in names:
         sd = os.path.join(siteconf.SWEEP_DIR, name)
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))

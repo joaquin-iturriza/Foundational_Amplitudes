@@ -73,7 +73,9 @@ def site_report(prefixes, window_min):
                      for m in [re.match(r"hp(\d+)", os.path.basename(f))] if m})
         if hp:
             results[n] = hp
-    print("WATCHDOG " + json.dumps({"running": running, "queued": queued, "failed": failed, "results": results}),
+    held = sorted(os.path.basename(d) for d in sweeps if os.path.exists(os.path.join(d, "HELD")))
+    print("WATCHDOG " + json.dumps({"running": running, "queued": queued, "failed": failed, "results": results,
+                                    "held": held}),
           flush=True)
 
 
@@ -142,8 +144,9 @@ def main():
     if a.expect:
         exp = json.load(open(os.path.join(REPO, a.expect) if not os.path.isabs(a.expect) else a.expect))
         idle = {}
+        held = {n for r in rep.values() for n in r.get("held", [])}
         for sw, hps in exp.items():
-            if not any(sw.startswith(p) for p in a.prefixes):
+            if not any(sw.startswith(p) for p in a.prefixes) or sw in held:
                 continue
             miss = sorted(set(hps) - got.get(sw, set()))
             n_missing += len(miss)
