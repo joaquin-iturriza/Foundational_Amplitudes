@@ -4838,7 +4838,7 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     2026-10-06, after $75$ points failed for hours unnoticed): \code{sweep/watchdog.py tp3\_ --expect <the batch's
     \{sweep: [hp]\} JSON>} in a background loop that exits on an \code{ALERT} (fast trial failures, expected points with
     nothing running or queued anywhere, a site with queued trials and nothing running over three checks), and
-    \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop; every alert is acted on at once and the
+    \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); every alert is acted on at once and the
     loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
     Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
     \emph{State (2026-10-06, 04:00):} (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
