@@ -38,6 +38,7 @@ import argparse, glob, json, os, random, re, subprocess, sys, time, zlib
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITES = ["ccin2p3", "jeanzay", "lxplus"]
 LONG_WINDOW_H = 48            # hours of finished trials that set the rate of a site with none in --window
+STAY_H = 12                   # hours a sweep that just moved stays where it arrived (no ping-pong)
 PER_SWEEP_FALLBACK = 5        # trials in a sweep whose job scripts were never written (not generated yet)
 
 
@@ -210,7 +211,11 @@ def inventory(prefixes, scope, window_h):
                         # a PINNED sweep stays where it is (priority work placed by hand, 2026-10-06: the rebalancer moved
                         # the 34 priority 32k points from lxplus, where they had been put first in line, to Jean Zay)
                         "movable": any(name.startswith(p) for p in prefixes)
-                                   and not os.path.exists(os.path.join(sd, "PINNED"))}
+                                   and not os.path.exists(os.path.join(sd, "PINNED"))
+                                   # a sweep moved here in the last STAY_H hours stays (2026-10-06: without this the same
+                                   # sweeps, first in name order, went back and forth ~90 times, losing their place each time)
+                                   and not (os.path.exists(os.path.join(sd, "ARRIVED"))
+                                            and now - os.path.getmtime(os.path.join(sd, "ARRIVED")) < STAY_H * 3600)}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
                                      "running": sum(v[0] for v in q.values()),
@@ -367,13 +372,22 @@ def apply_trials(moves, inv):
             c = f"sweep/sweep_config_{n}.yaml"
             hps = " ".join(map(str, inv[src]["sweeps"][n]["move_hps"]))
             lines.append(f"[ -d $S/{n} ] || {{ yes n | python sweep/generate_sweep.py --config {c} --n-trials 0 >/dev/null 2>&1; }}; "
-                         f"rm -f $S/{n}/MOVED_TO; python sweep/generate_sweep.py --config {c} --extend --fixed-hp {hps} "
+                         f"rm -f $S/{n}/MOVED_TO; touch $S/{n}/ARRIVED; python sweep/generate_sweep.py --config {c} --extend --fixed-hp {hps} "
                          f"--submit 2>&1 | grep -qiE 'submitted|submitting' && echo SUB {n} || echo FAIL {n}")
         import base64
         b = base64.b64encode("\n".join(lines).encode()).decode()
         out = site_run(dst, "bash", "-c", f"echo {b} | base64 -d > /tmp/zz_rb_$USER.sh; bash /tmp/zz_rb_$USER.sh; "
                                           f"rm -f /tmp/zz_rb_$USER.sh", timeout=3600)
         ok = re.findall(r"^SUB (\S+)", out, re.M)
+        if ok:
+            # "submitted" in the generator's output is not "queued": a site at its job cap refuses the jobs after it
+            # (2026-10-06: two sweeps released at Jean Zay never entered CC's full queue). Release only what is in.
+            out = site_run(dst, "python", "sweep/rebalance.py", "--inventory", "--scope", *ok, "--", *ok)
+            line = next((l for l in out.splitlines() if l.startswith("INVENTORY ")), None)
+            got = json.loads(line[len("INVENTORY "):])["sweeps"] if line else {}
+            # SLURM: in the queue; HTCondor: a live DAG (its nodes are submitted by DAGMan, possibly later)
+            key = "remaining" if inv[dst].get("scheduler") == "htcondor" else "queued"
+            ok = [n for n in ok if got.get(n, {}).get(key, 0) > 0 or got.get(n, {}).get("running", 0) > 0]
         for n in sorted(set(names) - set(ok)):
             print(f"  {n}: its trials did not go in on {dst}: they stay on {src}")
         if ok:
@@ -403,12 +417,14 @@ def apply(moves, sites):
             continue
         cfgs = [f"sweep/sweep_config_{n}.yaml" for n in names]
         if inv_sched[dst] == "htcondor":
-            loop = " ".join(f"python sweep/generate_sweep.py --config {c} --submit;" for c in cfgs)
+            loop = " ".join(f"python sweep/generate_sweep.py --config {c} --submit;" for c in cfgs) + \
+                " S=$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)'); " + " ".join(f"touch $S/{n}/ARRIVED;" for n in names)
             site_run(dst, "bash", "-c", loop, timeout=3600)
         else:
             gen = " ".join(f"yes n | python sweep/generate_sweep.py --config {c} >/dev/null;" for c in cfgs)
             dirs = " ".join(f"$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}" for n in names)
-            site_run(dst, "bash", "-c", f"{gen} python sweep/sweep_manager.py submit --chain --capacity 30 {dirs}",
+            arr = " ".join(f"touch $(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}/ARRIVED;" for n in names)
+            site_run(dst, "bash", "-c", f"{gen} python sweep/sweep_manager.py submit --chain --capacity 30 {dirs}; {arr}",
                      timeout=3600)
         out = site_run(dst, "python", "sweep/rebalance.py", "--inventory", "--scope", *names, "--", *names)
         line = next((l for l in out.splitlines() if l.startswith("INVENTORY ")), None)
