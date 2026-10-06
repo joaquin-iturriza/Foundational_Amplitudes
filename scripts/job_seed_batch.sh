@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=seed_batch
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=3
 #SBATCH --time=12:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --output=seed_batch_%j.out
