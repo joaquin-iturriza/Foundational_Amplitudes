@@ -4852,6 +4852,10 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     Zero-shot: done (\code{fig:zero\_shot\_gain}); the version up to an affine map (\code{val\_loss\_affine}) is in for nine of ten
     pretrainings, rung $9$ running on lxplus (\code{FA-lxplus-6f65373e}; the CC copy \code{FA-ccin2p3-fb225655} to be
     cancelled when it lands); then redraw \code{zero\_shot\_gain} on it and explain to the user how to read it (they asked).
+    Before the equal-data and finale fine-tune grids go out, resolve the parent dir that wrote each hp73 result (a rerun
+    trains in \code{trial\_0073\_r<k>}) and point the configs at it. The equal-data rungs' parents are hp73 alone, the
+    ladder's fine-tunes use each rung's best-of-search parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every
+    comparison of the two says so, or uses the ladder rung's hp73 parent where it exists.
     Next: step (2), the $D=10^{4.5}$, $10^5$ configs at $32$k (\code{gen\_transfer\_pilot.py} has $k=9,10$ at $16$k: write them at
     $32$k, batch $16384$, the chosen points), then (3)--(6), and the globally preprocessed pretraining item below. The paper
     draft is the scratchpad's \code{draft/} (\code{fm\_amplitudes\_updated.zip}, \code{fm\_amplitudes\_check.pdf} last sent).

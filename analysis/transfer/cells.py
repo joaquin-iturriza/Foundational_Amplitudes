@@ -10,7 +10,7 @@ search on the fine-tune's target (equal prepd_std, asserted): tp3_scr for the pr
 only the t-channel factor reached the pool, tp_scr where neither did. ee->WW takes the sigma-steered pool from
 D = 10^2.5 on (tp3s_scr, tp3s_ftp; the user's call, docs/results.tex sec:ladder), scored on its own validation split.
 """
-import json, os
+import atexit, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 S = json.load(open(os.path.join(ROOT, "analysis", "transfer", "scratch_sweeps.json")))
@@ -22,11 +22,24 @@ ARM = {"ee_ddbar": "tp3_scr", "ee_nnbar": "tp3_scr", "ee_dd_nlo": "tp3_scr", "ee
        # the redesigned arms' probes (2026-10-04)
        "udbar_enu": "tp3_scr", "ee_dd_ew_nlo": "tp3_scr"}
 STEERED_FROM = {"ee_WW": 5}
+# trials with a result but no prepd_std (their run dir's data_stats.json was not found): never dropped silently,
+# every one a figure skipped is listed when the script ends (CLAUDE.md, Reported values)
+UNCONVERTED = set()
+atexit.register(lambda: UNCONVERTED and print(f"cells.py: {len(UNCONVERTED)} trial(s) with a result but no prepd_std, "
+                                              f"not counted: " + ", ".join(f"{n} hp{h}" for n, h in sorted(UNCONVERTED)),
+                                              file=sys.stderr))
+
+
+def _note_unconverted(name, trials):
+    for t in trials:
+        if t.get("val_loss") is not None and not t.get("prepd_std"):
+            UNCONVERTED.add((name, t["hp"]))
 
 
 def best(name):
     """(loss, trial) of one sweep's best trial, (None, None) if it has none."""
     # a sweep finished on another site continues as <name>_002 (sweep/sweep_config_*_002.yaml): one search
+    _note_unconverted(name, S.get(name, []) + S.get(name + "_002", []))
     tr = [t for t in S.get(name, []) + S.get(name + "_002", []) if t.get("val_loss") is not None and t.get("prepd_std")]
     if not tr:
         return None, None
@@ -79,6 +92,8 @@ def best_chosen(name):
     """A 32k cell on its two chosen points only (horizon32k_chosen.json; sweep/pick_points.py), so every 32k cell is the
     best of the same two points: the first round's sweeps also hold 1-2 random start-up trials, the later ones none,
     and counting those would favour the pretrainings of the first round."""
+    _note_unconverted(name, [t for t in S.get(name, []) + S.get(name + "_002", [])
+                             if name in ALL_TRIALS32 or t["hp"] in CHOSEN32.get(name, [])])
     tr = [t for t in S.get(name, []) + S.get(name + "_002", [])
           if t.get("val_loss") is not None and t.get("prepd_std") and (name in ALL_TRIALS32 or t["hp"] in CHOSEN32.get(name, []))]
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if tr else None

@@ -289,7 +289,8 @@ def plan(inv, margin_h):
             x = inv[src]["sweeps"][name]
             k = len(x["move_hps"]) if x["unit"] == "trials" else x["remaining"]
             # a whole sweep never onto a namesake; pending trials may go where the sweep also exists (a sweep
-            # moved before: its results there merge by name), but not back onto a site that marked it moved there
+            # moved before: its results there merge by name; apply_trials clears that site's MOVED_TO marker), but not
+            # onto a site where the sweep has trials running
             dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
                                                    else not inv[s]["sweeps"].get(name, {}).get("running"))]
             if not dsts:

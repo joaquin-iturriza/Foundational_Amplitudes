@@ -27,7 +27,18 @@ for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):
         m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(rp))
         hp, T = int(m.group(1)), int(m.group(2))
         r = json.load(open(rp))
-        run = os.path.join(siteconf.PROJECT_DIR, "runs", name, f"trial_{hp:04d}")
+        # the run dir that wrote this result: a cold-start rerun runs in trial_<hp>_r<k> (sweep/run_trial.py) beside the
+        # failed attempt's trial_<hp>, so the dir is the one whose config names this result file
+        base = os.path.join(siteconf.PROJECT_DIR, "runs", name, f"trial_{hp:04d}")
+        run = base
+        for d in [base] + sorted(glob.glob(base + "_r*")):
+            try:
+                rp_cfg = (yaml.safe_load(open(os.path.join(d, "config.yaml")))["training"] or {}).get("result_path")
+            except (OSError, KeyError, TypeError, yaml.YAMLError):
+                continue
+            if rp_cfg and os.path.basename(str(rp_cfg)) == os.path.basename(rp):
+                run = d
+                break
         std = lr = ft = hps = None
         if os.path.exists(os.path.join(run, "data_stats.json")):
             std = json.load(open(os.path.join(run, "data_stats.json")))["prepd_std"][0]
