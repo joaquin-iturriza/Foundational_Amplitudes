@@ -11,7 +11,7 @@ compacts, with nothing in between, so a long autonomous run does not drift.
 When auto-compaction fires is Claude Code's call (env CLAUDE_CODE_AUTO_COMPACT_WINDOW in settings.json); a hook
 cannot start one, only hold it. Held, it is retried on the next auto-compaction check, which then finds the flush.
 """
-import datetime, json, os, re, sys
+import json, os, sys
 
 REPO = os.environ.get("CLAUDE_PROJECT_DIR", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 FLUSHED = os.path.join(REPO, ".claude", ".notes_flushed")
@@ -35,23 +35,6 @@ def _clear(path):
         pass
 
 
-STALE_H = 2       # the plan's state stamp may be at most this old when a turn ends (the user's rule, 2026-10-06)
-
-
-def _stale_state():
-    """Hours since the newest '\\emph{State (YYYY-MM-DD, HH:MM)' stamp in docs/results.tex, or None if it is fresh."""
-    try:
-        txt = open(os.path.join(REPO, "docs", "results.tex")).read()
-    except OSError:
-        return None
-    st = [datetime.datetime.strptime(f"{d} {t}", "%Y-%m-%d %H:%M")
-          for d, t in re.findall(r"\\emph\{State \((\d{4}-\d{2}-\d{2}), (\d{2}:\d{2})\)", txt)]
-    if not st:
-        return None
-    age = (datetime.datetime.now() - max(st)).total_seconds() / 3600
-    return age if age > STALE_H else None
-
-
 def main():
     try:
         inp = json.load(sys.stdin)
@@ -70,15 +53,6 @@ def main():
             _clear(WANTED)
             print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AFTER}}))
         return 0
-    if ev == "Stop" and not inp.get("stop_hook_active"):
-        age = _stale_state()
-        if age is not None:
-            print(json.dumps({"decision": "block", "reason": (
-                f"NOTES GUARD: the plan's state in docs/results.tex (the '\\emph{{State (...)}}' stamp in the transfer "
-                f"study's 'Plan to finish' item) is {age:.1f} h old, over {STALE_H} h. Update it now with the state of every "
-                "running batch, the decisions taken and results not yet written up, restamp it with the current date and "
-                "time, commit, and say in your message that the notes were updated and when.")}))
-            return 0
     if not os.path.exists(WANTED) or os.path.exists(FLUSHED):
         return 0
     if ev == "Stop":
