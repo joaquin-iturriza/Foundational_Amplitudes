@@ -229,15 +229,44 @@ def standalone_name(process):
     return base if me(cfg) == me(PROCESSES[base]) else process
 
 
+def is_synthetic(process):
+    """True for a synthetic-amplitude process name (``syn_<k>``, ``syn<n>_<k>``):
+    tools/synthetic_amplitudes.py, no MadGraph behind it."""
+    return re.match(r"^syn[2-4]?_\d+$", str(process)) is not None
+
+
+def register_synthetic(process, diagrams_dir=None):
+    """Register a synthetic process into PROCESSES (from its name alone; idempotent) and
+    write its diagram sidecar where data.offshell_per_event looks for it. Returns its cfg."""
+    if process not in PROCESSES:
+        from tools import synthetic_amplitudes as syn
+        PROCESSES[process] = syn.catalog_entry(process)
+        syn.write_sidecar(process, diagrams_dir)
+    return PROCESSES[process]
+
+
+def internal_mass(process, pdg):
+    """Mass (GeV) of an INTERNAL propagator `pdg` of `process`: the entry's own
+    ``internal_masses`` (a synthetic process's random scalar mass), else the table mass."""
+    if is_synthetic(process):
+        register_synthetic(process)
+    im = PROCESSES.get(process, {}).get("internal_masses") or {}
+    m = im.get(int(pdg), im.get(-int(pdg)))
+    return float(m) if m is not None else float(_table_mass(pdg))
+
+
 def register_recipe_processes(specs, default_sampling=None):
     """Register every recipe spec carrying a ``physics`` scan (or a decorated
     ``base``) into PROCESSES, so generation can address them by dataset name, and
     attach the sampling policy (per-entry ``sampling``, else the recipe-level
     ``default_sampling``, else the pipeline default) to the entry generation reads.
+    Synthetic processes (``syn_<k>``) are registered from their names.
     ``specs`` is the experiment's ``_recipe_specs`` list."""
     for s in specs:
         name = s["name"]
         base = s.get("base", name)
+        if is_synthetic(base):
+            register_synthetic(base)
         physics = s.get("physics")
         if physics or base != name:
             register_scan_process(name, base, physics or {})
@@ -2852,20 +2881,28 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     cuts       = FIDUCIAL_CUTS if FIDUCIAL_CUTS_ENABLED else None
     cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
     pol        = sampling_policy(config, role)
-    if pol["mode"] == "mixture" and backend != "cpp":
+    synthetic  = backend == "synthetic"     # tools/synthetic_amplitudes.py labels the events
+    if synthetic:
+        from tools.synthetic_amplitudes import label_events
+        syn_label = lambda ev, sq: label_events(config["syn_name"], ev)
+    if pol["mode"] == "mixture" and backend not in ("cpp", "synthetic"):
         raise RuntimeError(f"sampling policy 'mixture' needs the C++ backend (got {backend}); "
                            f"unset MG5_USE_MATRIX2PY or set the recipe's sampling mode to flat")
     if pol["mode"] == "mixture":
         # shaped sampling (DEFAULT_SAMPLING): the backend labels candidates as we go
         m_list = list(config["m_finals"]) if "m_finals" in config else \
                  (list(config["m_final"]) if isinstance(config["m_final"], (list, tuple)) else [float(config["m_final"])] * nfinal)
-        perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
         print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}"
               f"  policy=mixture f_flat={pol['f_flat']} oversample={pol['oversample']}")
-        with CppDriverPipe(driver_bin, standalone_dir) as pipe:
-            label = lambda ev, sq: pipe.compute(ev, perm=perm, alphas=compute_alphas(np.asarray(sq, float), alphas_mz=amz))
+        if synthetic:
             events, sqrts_arr, total_me2 = build_mixture_dataset(
-                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label)
+                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, syn_label)
+        else:
+            perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
+            with CppDriverPipe(driver_bin, standalone_dir) as pipe:
+                label = lambda ev, sq: pipe.compute(ev, perm=perm, alphas=compute_alphas(np.asarray(sq, float), alphas_mz=amz))
+                events, sqrts_arr, total_me2 = build_mixture_dataset(
+                    n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label)
         os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
         mmap_path = output_file + ".mmap"
         mmap = np.lib.format.open_memmap(mmap_path, mode="w+", dtype=np.float64, shape=(n_events, ncols))
@@ -2907,8 +2944,10 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     # Compute amplitudes
     # ----------------------------------------------------------------
     total_me2 = np.zeros(n_events)
-    perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
-    if backend == "matrix2py":
+    perm = None if synthetic else row_to_slot_perm(pdg_ids, config["mg5_generate"])
+    if synthetic:
+        total_me2 = np.asarray(syn_label(events, sqrts_arr), dtype=np.float64)
+    elif backend == "matrix2py":
         for subproc_dir in subproc_dirs:
             subproc_path = f"{standalone_dir}/SubProcesses/{subproc_dir}"
             if subproc_path in sys.path:
@@ -3040,7 +3079,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     NOT want a different chunk policy to mint a second, physically-identical frozen
     dataset. Hence `n_chunks` is left out of the val/test identity entirely — one
     test set serves regardless of how it was sliced for generation."""
-    cfg = PROCESSES[process]
+    cfg = register_synthetic(process) if is_synthetic(process) else PROCESSES[process]
     k   = cfg.get("alphas_power", 0)
     n   = int(n_events)
     recipe = {
@@ -3062,6 +3101,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         # them from being reused as cache hits.
         "label_convention":   "mg5_slot_v2",
     }
+    if cfg.get("kind") == "synthetic":
+        # the random structure (tools/synthetic_amplitudes.py) is what the data is
+        recipe["synthetic"] = dict(cfg["synthetic"])
     if cfg.get("kind") == "virt" or cfg.get("virt"):
         # One-loop pools: the generator redraws events whose MadLoop point is exceptional
         # or carries a wrong double pole (v2), so the bytes differ from an unguarded pool
@@ -3122,7 +3164,7 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
     out_dir = out_dir or OUTPUT_DIR
     os.makedirs(out_dir, exist_ok=True)
     process     = recipe["process"]
-    cfg         = dict(PROCESSES[process])
+    cfg         = dict(register_synthetic(process) if is_synthetic(process) else PROCESSES[process])
     output_file = recipe_output_path(recipe, out_dir)
     wanted_id   = recipe_id(recipe)
 
@@ -3149,7 +3191,10 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
 
     nparticles     = cfg["nfinal"] + 2
     standalone_dir = f"{WORK_DIR}/{process}_standalone"
-    backend, subproc_dirs, driver_bin, eff_dir = detect_compiled_backend(standalone_dir)
+    if cfg.get("kind") == "synthetic":
+        backend, subproc_dirs, driver_bin, eff_dir = "synthetic", ["synthetic"], None, None
+    else:
+        backend, subproc_dirs, driver_bin, eff_dir = detect_compiled_backend(standalone_dir)
     if not subproc_dirs or (backend == "cpp" and driver_bin is None):
         if not compile_if_needed:
             raise RuntimeError(
