@@ -207,7 +207,10 @@ def inventory(prefixes, scope, window_h):
             unit = None                     # no state to draw from: stays
         sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
                         "remaining": remaining, "started": started, "unit": unit, "move_hps": hps,
-                        "movable": any(name.startswith(p) for p in prefixes)}
+                        # a PINNED sweep stays where it is (priority work placed by hand, 2026-10-06: the rebalancer moved
+                        # the 34 priority 32k points from lxplus, where they had been put first in line, to Jean Zay)
+                        "movable": any(name.startswith(p) for p in prefixes)
+                                   and not os.path.exists(os.path.join(sd, "PINNED"))}
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
                                      "running": sum(v[0] for v in q.values()),
