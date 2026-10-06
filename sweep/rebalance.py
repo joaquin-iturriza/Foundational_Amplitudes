@@ -38,6 +38,7 @@ import argparse, glob, json, os, random, re, subprocess, sys, time, zlib
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITES = ["ccin2p3", "jeanzay", "lxplus"]
 LONG_WINDOW_H = 48            # hours of finished trials that set the rate of a site with none in --window
+JOB_CAP = {"ccin2p3": 100}     # per-user cap on queued+running jobs (CC-IN2P3 refuses jobs past it)
 STAY_H = 12                   # hours a sweep that just moved stays where it arrived (no ping-pong)
 PER_SWEEP_FALLBACK = 5        # trials in a sweep whose job scripts were never written (not generated yet)
 
@@ -216,9 +217,13 @@ def inventory(prefixes, scope, window_h):
                                    # sweeps, first in name order, went back and forth ~90 times, losing their place each time)
                                    and not (os.path.exists(os.path.join(sd, "ARRIVED"))
                                             and now - os.path.getmtime(os.path.join(sd, "ARRIVED")) < STAY_H * 3600)}
+    jobs_total = None
+    if siteconf.CLUSTER.get("scheduler") != "htcondor":
+        out = subprocess.run(["squeue", "-u", os.environ["USER"], "-h"], capture_output=True, text=True).stdout
+        jobs_total = len(out.splitlines())
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
-                                     "running": sum(v[0] for v in q.values()),
+                                     "running": sum(v[0] for v in q.values()), "jobs_total": jobs_total,
                                      "long_window_h": LONG_WINDOW_H, "sweeps": sweeps}))
 
 
@@ -297,7 +302,11 @@ def plan(inv, margin_h):
         rate = v["recent"] / v["window_h"]
         if not rate and (backlog == 0 or v.get("running", 0) > 0):
             rate = v.get("recent_long", 0) / v.get("long_window_h", 1)
-        st[s] = {"backlog": backlog, "rate": rate}
+        # room left under the site's job cap: a move never plans more trials into a site than it will accept
+        # (2026-10-06: moves into a full CC queue lost trials)
+        cap = JOB_CAP.get(s)
+        room = float("inf") if cap is None or v.get("jobs_total") is None else cap - v["jobs_total"] - 2
+        st[s] = {"backlog": backlog, "rate": rate, "room": room}
     fin = lambda s, extra=0: (st[s]["backlog"] + extra) / st[s]["rate"] if st[s]["rate"] > 0 else (
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
     before = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
@@ -319,6 +328,7 @@ def plan(inv, margin_h):
             # onto a site where the sweep has trials running
             dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
                                                    else not inv[s]["sweeps"].get(name, {}).get("running"))]
+            dsts = [s for s in dsts if st[s]["room"] >= k]
             if not dsts:
                 movable[src].pop(0)
                 continue
@@ -331,6 +341,7 @@ def plan(inv, margin_h):
         movable[src].pop(0)
         st[src]["backlog"] -= k
         st[dst]["backlog"] += k
+        st[dst]["room"] -= k
         moves.append((name, src, dst))
     # one sweep is a few trials: the margin is on what a site gains from all its moves together
     for src in list(st):
@@ -387,7 +398,9 @@ def apply_trials(moves, inv):
             got = json.loads(line[len("INVENTORY "):])["sweeps"] if line else {}
             # SLURM: in the queue; HTCondor: a live DAG (its nodes are submitted by DAGMan, possibly later)
             key = "remaining" if inv[dst].get("scheduler") == "htcondor" else "queued"
-            ok = [n for n in ok if got.get(n, {}).get(key, 0) > 0 or got.get(n, {}).get("running", 0) > 0]
+            # every moved trial must be in, not some (a partial entry is a lost trial once the source is released)
+            need = {n: len(inv[src]["sweeps"][n]["move_hps"]) for n in ok}
+            ok = [n for n in ok if got.get(n, {}).get(key, 0) + got.get(n, {}).get("running", 0) >= need[n]]
         for n in sorted(set(names) - set(ok)):
             print(f"  {n}: its trials did not go in on {dst}: they stay on {src}")
         if ok:
