@@ -213,6 +213,10 @@ def inventory(prefixes, scope, window_h):
                         "remaining": remaining, "started": started, "unit": unit, "move_hps": hps,
                         # a PINNED sweep stays where it is (priority work placed by hand, 2026-10-06: the rebalancer moved
                         # the 34 priority 32k points from lxplus, where they had been put first in line, to Jean Zay)
+                        "arrived": os.path.exists(os.path.join(sd, "ARRIVED"))
+                                   and now - os.path.getmtime(os.path.join(sd, "ARRIVED")) < STAY_H * 3600,
+                        "movable_any": any(name.startswith(p) for p in prefixes)
+                                   and not os.path.exists(os.path.join(sd, "PINNED")),
                         "movable": any(name.startswith(p) for p in prefixes)
                                    and not os.path.exists(os.path.join(sd, "PINNED"))
                                    # a sweep moved here in the last STAY_H hours stays (2026-10-06: without this the same
@@ -293,7 +297,7 @@ def _earlier(new, old):
     return new < old
 
 
-def plan(inv, margin_h):
+def plan(inv, margin_h, no_dest=()):
     """[(sweep, src, dst)] and the per-site (backlog, rate, finish) before and after."""
     st = {}
     for s, v in inv.items():
@@ -313,7 +317,8 @@ def plan(inv, margin_h):
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
     before = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
     movable = {s: sorted((n for n, x in v["sweeps"].items()
-                          if x["movable"] and x.get("unit")),
+                          # a site that takes no work (full filesystem) gives back what arrived there too
+                          if (x["movable"] or (s in no_dest and x.get("movable_any"))) and x.get("unit")),
                          reverse=True) for s, v in inv.items()}
     moves = []
     while True:
@@ -333,7 +338,8 @@ def plan(inv, margin_h):
                 # but not onto a site where the sweep has trials running
                 dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
                                                        else not inv[s]["sweeps"].get(name, {}).get("running"))]
-                dsts = [s for s in dsts if st[s]["room"] >= k]
+                # a site in no_dest gives work and takes none (2026-10-07: Jean Zay's WORK inode quota, 94% full)
+                dsts = [s for s in dsts if st[s]["room"] >= k and s not in no_dest]
                 if not dsts:
                     movable[src].pop(0)
             if not dsts:
@@ -470,6 +476,8 @@ def main():
     ap.add_argument("--release-trials", metavar="DEST", help="(on a site) cancel the sweeps' pending trials, mark moved")
     ap.add_argument("--apply", action="store_true", help="carry the moves out (default: print the plan)")
     ap.add_argument("--allow-jeanzay", action="store_true")
+    ap.add_argument("--no-dest", nargs="*", default=[], metavar="SITE",
+                    help="sites that give work but take none (a full filesystem); their ARRIVED stays do not apply")
     ap.add_argument("--scope", nargs="+", default=["tp3_"],
                     help="sweep prefixes whose backlog and finished trials set each site's load and rate")
     ap.add_argument("--window", type=float, default=6.0, help="hours of finished trials that set a site's rate")
@@ -494,7 +502,7 @@ def main():
         inv[s] = json.loads(line[len("INVENTORY "):])
     global inv_sched
     inv_sched = {s: v["scheduler"] for s, v in inv.items()}
-    moves, before, after = plan(inv, a.margin)
+    moves, before, after = plan(inv, a.margin, set(a.no_dest))
     for s in inv:
         b, r, f = before[s]; b2, _, f2 = after[s]
         print(f"  {s:9s} backlog {b:5d} -> {b2:5d} trials   rate {r:6.1f}/h   finish {f:6.1f} h -> {f2:6.1f} h")
