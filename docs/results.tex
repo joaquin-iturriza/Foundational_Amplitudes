@@ -4850,7 +4850,26 @@ $ee\to W^+W^-$ and $u\bar u\to Zgg$; above scratch on most cells (Sec.~\ref{sec:
     (1), all of (2), the $32$k cells of (3), (4) and (6), and the $32$k HP landscape pass), resumed only when the user says.
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
-    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
+    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
+    (3), the seeds (5). \textbf{Done:} finale and synthetic $8$k grids complete ($84+42$ and $84$ cells; result paragraph
+    above Sec.~\ref{sec:ladder-open}; figures \code{finale\_synth*} sent). The four lever pretrainings (B), hp73, $64$k,
+    lxplus, one \code{trial\_0073} each: \code{val\_loss} levdiag $2.48$, levoffsh $1.68$, levcoup $1.93$, levgen
+    $5.04\times10^{-6}$ against rung $9$'s $1.33\times10^{-6}$ (one seed each; rung $5$ twice at hp73 differed by $8\%$).
+    \textbf{Running:} the lever fine-tunes, $96$ sweeps of $5$ trials at $D=10^2,10^3$ ($82$ on lxplus, $14$ on
+    CC-IN2P3; their $32$k cells held). \code{tp3\_accum\_r9} (C) finished on lxplus (\code{hp0073\_t64000\_1791333835.json},
+    not yet read): next, resolve its run dir, read the log's loss against rung $9$, submit its $24$ $8$k fine-tune sweeps
+    (\code{sweep\_config\_tp3\_accumfte\_*}, not \code{32k}; parent on lxplus). \code{tp3\_gstd\_r9} (zero-shot
+    pretraining, shared standardization) running on lxplus since 15:13, $\sim7$\,h: then score it zero-shot on the twelve
+    probes on the real loss (\code{tools/zero\_shot\_ft.py} needs the probe's target under the parent's shared
+    $(\mu,\sigma)$ with the probe's own transform), and compare its fine-tunes' loss in MSE of $\log|\mathcal M|^2$ only.
+    \textbf{Sites:} Jean Zay down (maintenance) and its WORK inode quota $94\%$ ($470$k of $500$k): $2876$ trials held
+    there; the user's choice is pending: (a) archive old runs to STORE, (b) new runs to \code{\$SCRATCH}, (c) keep it out;
+    nothing new goes there. CC-IN2P3 unreachable since $\sim$18:50 (the jump host \code{lpnclaude03} closes the
+    connection); its jobs run on. \textbf{Loops} (background shells, lost on a restart): rebalancer + CC feeder every
+    $20$ min (\code{--allow-jeanzay --no-dest jeanzay --exclude tp3\_eqd\_r tp3\_finfte\_ tp3\_synfte\_}); watchdog on
+    lxplus only (\code{--sites lxplus --stall-site lxplus=240}), back to all sites when CC and Jean Zay answer; waiters on
+    CC and Jean Zay coming back. \textbf{To do, design first with the user:} larger synthetic catalogs ($10^2$, $10^{2.5}$,
+    $10^3$; hand-off item). \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
     $41$ synthetic) with fewer than $5$ results stop their search (held on lxplus, $255$ jobs, and CC-IN2P3, $46$; on Jean
     Zay excluded from the rebalancer) and run once at the reference cell's best point instead (rung $9$'s on the same
     probe and $D$, the star arm's on its own probe), \code{analysis/transfer/lad\_chunks/} ($9$ chunks on CC-IN2P3,
