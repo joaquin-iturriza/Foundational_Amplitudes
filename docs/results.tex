@@ -4827,6 +4827,22 @@ cell (Fig.~\ref{fig:star_arms} (e)--(g), against rung $1$ at the same points): t
 $u\bar d\to e^+\nu_e$, the electroweak Sudakov arm $1.1\times$ on the electroweak $ee\to d\bar d$, where rung $1$ is itself no
 better than scratch at any $D$, as expected of a structure no pretraining had.
 
+\paragraph{The finale and the synthetic pretraining on the $8$k grid.} Both fine-tuned on the twelve ladder probes,
+the finale also on the six star-arm probes, $7$ values of $D$ each (\code{analysis/transfer/finale\_synth.py},
+\code{finale\_synth\_scaling.py}; gain $=\log_{10}(L_\text{scratch}/L)$ per cell). A cell is the best of its $5$-trial
+search where that finished ($122$ cells), else one run at the reference cell's best point ($88$ cells, rung $9$'s or the
+star arm's; the user's call, 2026-10-07), so the two kinds of cell are measured differently; a search that ran twice
+counts its first $5$ trials. \emph{Finale against rung $9$:} no overall difference (median $+0.02$\,dex over $84$ cells,
+better in $51\%$, Wilcoxon $p=0.80$), but by probe: better on all $7$ cells of $u\bar u\to Zgg$ and $u\bar u\to Zggg$
+(median $+0.43$, $+0.56$\,dex) and $6/7$ of $u\bar u\to Zg$ and $ee\to Z\gamma$; worse on all $7$ of $ee\to d\bar d$
+($-0.90$) and $u\bar u\to gg$ ($-0.32$); sign tests $p=0.016$ each, not significant once the twelve probes are
+counted. A likely source of the $Z$+jets gain, untested: the finale adds $ee\to u\bar ug$, $u\bar ugg$, which by crossing
+are $q\bar q\to\gamma^*/Z$ plus gluons, absent from the ladder. \emph{Finale against each star arm on its own probe:}
+level (median $-0.02$\,dex over $42$ cells, $p=0.55$), so adding every other process costs the arm's probe nothing on
+average. \emph{Synthetic against rung $9$:} worse (median $-0.24$\,dex, better in $33\%$ of $84$ cells,
+$p=2\times10^{-6}$), most on $ee\to d\bar d$ ($0/7$) and the one-loop $ee\to d\bar d$ ($0/7$), level on $ee\to Z\gamma$,
+$ee\to W^+W^-$ and $u\bar u\to Zgg$; above scratch on most cells (Sec.~\ref{sec:synthetic}).
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
@@ -5214,8 +5230,8 @@ What it keeps: real particles and masses, real kinematics and cuts, Lorentz inva
 propagator masses with Breit--Wigner shapes, collinear-like $1/s_{ij}$ singularities, running $\alpha_s$, Bose and Fermi
 relabelling symmetry, and diagram sidecars that describe the function exactly.
 Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}): fine-tuned from it, the model
-beats scratch on most cells but is below rung $9$ (median $-0.14$\,dex over $48$ cells, better in $35\%$, Wilcoxon
-$p<10^{-3}$): it transfers something, less than real data.
+beats scratch on most cells but is below rung $9$ (median $-0.24$\,dex over all $84$ cells, better in $33\%$,
+Wilcoxon $p=2\times10^{-6}$): it transfers something, less than real data.
 
 \subsection{What it costs to generate}
 Per core, through \code{build\_mixture\_dataset} with the mixture policy (\code{tools/bench\_synthetic.py},
