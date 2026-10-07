@@ -4834,7 +4834,12 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     (1), all of (2), the $32$k cells of (3), (4) and (6), and the $32$k HP landscape pass), resumed only when the user says.
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
-    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \textbf{The seeds (5) are on hold} until the user says (2026-10-07): $13$ chunks done ($468$ runs), the $25$ that
+    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
+    $41$ synthetic) with fewer than $5$ results stop their search (held on lxplus, $255$ jobs, and CC-IN2P3, $46$; on Jean
+    Zay excluded from the rebalancer) and run once at the reference cell's best point instead (rung $9$'s on the same
+    probe and $D$, the star arm's on its own probe), \code{analysis/transfer/lad\_chunks/} ($9$ chunks on CC-IN2P3,
+    \code{scripts/job\_seed\_batch.sh}); their finished trials are kept. The $122$ finished cells keep their search's best.
+    \code{collect\_sweeps.py} now reads fixed-HP results (\code{results/fixed.json}, \code{hp}$=-1$). \textbf{The seeds (5) are on hold} until the user says (2026-10-07): $13$ chunks done ($468$ runs), the $25$ that
     failed on Jean Zay's inode quota ($1000$ runs, \code{analysis/transfer/seed\_chunks/A\_004}--\code{A\_028}) not
     resubmitted. \textbf{The equal-data fine-tunes (3) are on hold too} (the user's call, 2026-10-07): every
     cell had been set up as a new $5$-trial DyHPO search ($3360$ trials), not one run at the ladder cell's best point, the
