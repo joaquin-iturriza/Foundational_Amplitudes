@@ -31,7 +31,9 @@ def cell(fam, p, k):
         return lad[0]["val_loss"] * lad[0]["prepd_std"] ** 2
     tr = [t for t in S.get(f"{fam}_{p}_d{k}", []) + S.get(f"{fam}_{p}_d{k}_002", [])
           if t.get("val_loss") is not None and t.get("prepd_std") and t.get("hp", 0) >= 0]
-    return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if len(tr) >= 5 else None
+    # the two redesigned arms (W pole, Sudakov EW) ran two chosen points per cell, not a 5-trial search (results.tex)
+    need = 2 if fam in ("tp3_swpolefte", "tp3_ssudakovewfte") else 5
+    return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if len(tr) >= need else None
 
 
 def gains(p, fams):
