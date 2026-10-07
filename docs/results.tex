@@ -4843,6 +4843,19 @@ average. \emph{Synthetic against rung $9$:} worse (median $-0.24$\,dex, better i
 $p=2\times10^{-6}$), most on $ee\to d\bar d$ ($0/7$) and the one-loop $ee\to d\bar d$ ($0/7$), level on $ee\to Z\gamma$,
 $ee\to W^+W^-$ and $u\bar u\to Zgg$; above scratch on most cells (Sec.~\ref{sec:synthetic}).
 
+\paragraph{The conditionings and per-process accumulation, judged on fine-tuning.} Each arm is rung $9$'s pretraining
+with one change, at hp73 and $64$k steps (the user's calls (B) and (C), 2026-10-06), fine-tuned on the twelve probes at
+$D=10^2$ and $10^3$ by a $5$-trial search that shares its DyHPO seed, hence its candidate pool and start-up points,
+with rung $9$'s on the same cell (\code{analysis/transfer/levers\_accum.py}; per cell $\log_{10}(L_\text{rung 9}/L_\text{arm})$,
+MSE of $\log|\mathcal M|^2$ at the best checkpoint). Pretraining \code{val\_loss} against rung $9$'s $1.33\times10^{-6}$,
+then the fine-tune: Feynman diagrams on, $2.48\times10^{-6}$, fine-tunes level ($-0.08$\,dex median over $24$ cells,
+Wilcoxon $p=0.19$); off-shellness off, $1.68\times10^{-6}$, fine-tunes worse ($-0.23$\,dex, better in $4$ of $24$,
+$p=8\times10^{-4}$); coupling scalars off, $1.93\times10^{-6}$, level ($0.00$, $p=0.66$); generation feature off,
+$5.04\times10^{-6}$ (the worst pretraining) yet fine-tunes \emph{better} ($+0.18$\,dex, $17$ of $24$, $p=0.005$);
+per-process accumulation, $9.20\times10^{-7}$ (the best pretraining) yet fine-tunes worse ($-0.18$\,dex, $17$ of $24$
+cells in, $p=0.011$). Pretraining loss does not rank the arms for transfer: the two largest pretraining differences
+come out reversed on fine-tuning. One seed per arm.
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
