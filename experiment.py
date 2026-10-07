@@ -1627,6 +1627,19 @@ class AmplitudeExperiment(BaseExperiment):
                     _, m, s = preprocess_amplitude(
                         store[("train", name)]["raw_amp"], trafos=tr)
                     prepd_means.append(float(m)); prepd_stds.append(float(s))
+                if bool(self.cfg.data.get("shared_standardization", False)):
+                    # one (mu, sigma) pooled over every process's transformed train targets, each process
+                    # keeping its own transform (log, or signedlog for a signed pool): the network then
+                    # predicts each process's normalization, so a process without data can be scored
+                    # zero-shot. A single global transform is not an option: one signed pool forces
+                    # signedlog on every process and leaves |M|^2 << 1 in linear scale.
+                    n = np.array([len(store[("train", nm)]["raw_amp"]) for nm in names], dtype=np.float64)
+                    mu_p, sd_p = np.array(prepd_means), np.array(prepd_stds)
+                    mu = float((n * mu_p).sum() / n.sum())
+                    sd = float(np.sqrt((n * (sd_p ** 2 + (mu_p - mu) ** 2)).sum() / n.sum()))
+                    prepd_means, prepd_stds = [mu] * len(names), [sd] * len(names)
+                    LOGGER.info(f"shared_standardization: one (mu, sigma) = ({mu:.3f}, {sd:.3f}) pooled over "
+                                f"{len(names)} processes, per-process transforms kept")
             else:
                 _, m, s = preprocess_amplitude(train_raw, trafos=amp_trafos)
                 prepd_means, prepd_stds = [float(m)], [float(s)]
@@ -1861,6 +1874,7 @@ class AmplitudeExperiment(BaseExperiment):
                     "amp_trafos_pp": ([list(t) for t in self._amp_trafos_pp]
                                       if self._amp_trafos_pp else None),
                     "preprocess_per_dataset": per_dataset,
+                    "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
                     "target_propagators": bool(getattr(self, "_target_factor_on", False)),
                     "tchannel_norm": getattr(self, "_tch_norm", None),
                     "offshell_stats": getattr(self, "_offshell_stats", None),
