@@ -37,7 +37,12 @@ for (fig, ax), (fam, lab) in zip(figs, ARMS):
     ps.process_label(ax, lab)
     v = np.array(allv)
     if len(v):
+        # the two cells of a probe are not independent: the test is over probes (mean over its D), the per-cell one
+        # descriptive; five arms, so Bonferroni x5
+        per = [np.mean(m) for m in ([np.log10(cell("tp3_r9fte", p, k) / cell(fam, p, k)) for k, *_ in DS
+                                     if cell(fam, p, k) and cell("tp3_r9fte", p, k)] for p in P) if m]
         print(f"{lab:26s} {len(v):2d} cells  median {np.median(v):+.2f} dex  arm better in {np.mean(v > 0):.0%}"
-              f"  Wilcoxon p={wilcoxon(v).pvalue:.3g}")
+              f"  Wilcoxon p={wilcoxon(v).pvalue:.3g} | {len(per)} probes median {np.median(per):+.2f}"
+              f"  better on {sum(x > 0 for x in per)}  p={wilcoxon(per).pvalue:.3g}  x5 {min(1, 5 * wilcoxon(per).pvalue):.3g}")
 ps.legend_strip(figs[0][1], base + "_legend", ncol=3)
 ps.save_panels(figs, base)

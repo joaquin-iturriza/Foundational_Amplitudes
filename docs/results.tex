@@ -4829,32 +4829,74 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
 
 \paragraph{The finale and the synthetic pretraining on the $8$k grid.} Both fine-tuned on the twelve ladder probes,
 the finale also on the six star-arm probes, $7$ values of $D$ each (\code{analysis/transfer/finale\_synth.py},
-\code{finale\_synth\_scaling.py}; gain $=\log_{10}(L_\text{scratch}/L)$ per cell). A cell is the best of its $5$-trial
-search where that finished ($122$ cells), else one run at the reference cell's best point ($88$ cells, rung $9$'s or the
-star arm's; the user's call, 2026-10-07), so the two kinds of cell are measured differently; a search that ran twice
-counts its first $5$ trials. \emph{Finale against rung $9$:} no overall difference (median $+0.02$\,dex over $84$ cells,
-better in $51\%$, Wilcoxon $p=0.80$), but by probe: better on all $7$ cells of $u\bar u\to Zgg$ and $u\bar u\to Zggg$
+\code{finale\_synth\_scaling.py}; per cell MSE of $\log|\mathcal M|^2$ at the best checkpoint, the probe's
+\code{val\_loss\_no\_reg} times its $\sigma_p^2$; Figs.~\ref{fig:finale_synth} and \ref{fig:finale_synth_scaling}).
+A cell is the best of its $5$-trial search where that finished ($122$ cells), else one run at the reference cell's best
+point ($88$ cells, rung $9$'s or the star arm's; the user's call, 2026-10-07), so the two kinds of cell are measured
+differently; a search that ran twice counts its first $5$ trials. The tests are paired, cell against the reference cell
+of the same probe and $D$; since the $7$ cells of a probe are not independent, the test that counts is the one over
+probes (each probe's median difference, Wilcoxon), with the per-cell figure alongside as descriptive.
+\emph{Finale against rung $9$:} no overall difference (median over probes $-0.01$\,dex, better on $6$ of $12$,
+$p=0.91$; over cells $+0.02$, $p=0.80$), but by probe: better on all $7$ cells of $u\bar u\to Zgg$ and $u\bar u\to Zggg$
 (median $+0.43$, $+0.56$\,dex) and $6/7$ of $u\bar u\to Zg$ and $ee\to Z\gamma$; worse on all $7$ of $ee\to d\bar d$
 ($-0.90$) and $u\bar u\to gg$ ($-0.32$); sign tests $p=0.016$ each, not significant once the twelve probes are
-counted. A likely source of the $Z$+jets gain, untested: the finale adds $ee\to u\bar ug$, $u\bar ugg$, which by crossing
-are $q\bar q\to\gamma^*/Z$ plus gluons, absent from the ladder. \emph{Finale against each star arm on its own probe:}
-level (median $-0.02$\,dex over $42$ cells, $p=0.55$), so adding every other process costs the arm's probe nothing on
-average. \emph{Synthetic against rung $9$:} worse (median $-0.24$\,dex, better in $33\%$ of $84$ cells,
-$p=2\times10^{-6}$), most on $ee\to d\bar d$ ($0/7$) and the one-loop $ee\to d\bar d$ ($0/7$), level on $ee\to Z\gamma$,
-$ee\to W^+W^-$ and $u\bar u\to Zgg$; above scratch on most cells (Sec.~\ref{sec:synthetic}).
+counted. A possible source of the $Z$+jets gain, untested: the finale adds $ee\to u\bar ug$, $u\bar ugg$, which by
+crossing are $q\bar q\to\gamma^*/Z$ plus gluons, absent from the ladder. \emph{Finale against each star arm on its own
+probe:} level (median over the $6$ probes $-0.03$\,dex, better on $2$, $p=0.84$; over $42$ cells $-0.02$, $p=0.55$).
+\emph{Synthetic against rung $9$:} worse (median over probes $-0.23$\,dex, better on $3$ of $12$, $p=0.034$; over $84$
+cells $-0.24$, better in $33\%$), most on $ee\to d\bar d$ ($0/7$) and the one-loop $ee\to d\bar d$ ($0/7$), level on
+$ee\to Z\gamma$, $ee\to W^+W^-$ and $u\bar u\to Zgg$. Synthetic against scratch: better in $66$ of $84$ cells.
 
-\paragraph{The conditionings and per-process accumulation, judged on fine-tuning.} Each arm is rung $9$'s pretraining
-with one change, at hp73 and $64$k steps (the user's calls (B) and (C), 2026-10-06), fine-tuned on the twelve probes at
-$D=10^2$ and $10^3$ by a $5$-trial search that shares its DyHPO seed, hence its candidate pool and start-up points,
-with rung $9$'s on the same cell (\code{analysis/transfer/levers\_accum.py}; per cell $\log_{10}(L_\text{rung 9}/L_\text{arm})$,
-MSE of $\log|\mathcal M|^2$ at the best checkpoint). Pretraining \code{val\_loss} against rung $9$'s $1.33\times10^{-6}$,
-then the fine-tune: Feynman diagrams on, $2.48\times10^{-6}$, fine-tunes level ($-0.08$\,dex median over $24$ cells,
-Wilcoxon $p=0.19$); off-shellness off, $1.68\times10^{-6}$, fine-tunes worse ($-0.23$\,dex, better in $4$ of $24$,
-$p=8\times10^{-4}$); coupling scalars off, $1.93\times10^{-6}$, level ($0.00$, $p=0.66$); generation feature off,
-$5.04\times10^{-6}$ (the worst pretraining) yet fine-tunes \emph{better} ($+0.18$\,dex, $17$ of $24$, $p=0.005$);
-per-process accumulation, $9.20\times10^{-7}$ (the best pretraining) yet fine-tunes worse ($-0.18$\,dex, $17$ of $24$
-cells in, $p=0.011$). Pretraining loss does not rank the arms for transfer: the two largest pretraining differences
-come out reversed on fine-tuning. One seed per arm.
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/finale_synth_a.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_b.pdf}}
+\caption{Per cell, the gain over scratch $\log_{10}(L_\text{scratch}/L)$ of the finale (a) and the synthetic
+pretraining (b) against the reference's on the same probe and $D$: rung $9$, and in (a) also the star arm on its own
+probe; above the diagonal is better than the reference. $8$k grid.}
+\label{fig:finale_synth}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/finale_synth_scaling_qcd_legend.pdf}\\
+\widerow{\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_scaling_qcd_f.pdf}}
+\caption{Learning curves in $D$ of rung $9$, the finale, the synthetic pretraining and scratch on the hadronic probes,
+$8$k grid; a cell run once at the reference point is drawn apart from a search's best. The $e^+e^-$ and star-arm probes
+are \code{finale\_synth\_scaling\_ee\_*}, \code{\_arm\_*}.}
+\label{fig:finale_synth_scaling}
+\end{figure}
+
+\paragraph{The conditionings and per-process accumulation, judged on fine-tuning, at $D=10^2$ and $10^3$.} The design
+as approved (2026-10-06) was the twelve probes at $D=10^2$, $10^3$ ($8$k, $5$-trial search) and $10^4$ ($32$k, two chosen
+points); the $10^4$ cells are held with every $32$k run, so what follows is $2$ of the grid's $7$ values of $D$, and the
+other four ($10$, $10^{1.5}$, $10^{2.5}$, $10^{3.5}$) were never part of the arms' design. Each arm is rung $9$'s
+pretraining with one change, at hp73 and $64$k steps (the user's calls (B) and (C)), and each search shares its DyHPO
+seed, hence its candidate pool and start-up points, with rung $9$'s on the same cell
+(\code{analysis/transfer/levers\_accum.py}, Fig.~\ref{fig:levers_accum}; per cell $\log_{10}(L_\text{rung 9}/L_\text{arm})$,
+MSE of $\log|\mathcal M|^2$ at the best checkpoint). Tests over the twelve probes (each probe's mean over its two $D$),
+cells in brackets. Pretraining \code{val\_loss} against rung $9$'s $1.33\times10^{-6}$, then the fine-tune: Feynman
+diagrams on, $2.48\times10^{-6}$, level (median $-0.09$\,dex, better on $5$ probes, $p=0.27$; cells $-0.08$); coupling
+scalars off, $1.93\times10^{-6}$, level ($-0.09$, $4$ probes, $p=0.34$); off-shellness off, $1.68\times10^{-6}$, worse
+($-0.29$, $3$ probes, $p=0.016$; cells $-0.23$, $4$ of $24$); generation feature off, $5.04\times10^{-6}$, the worst
+pretraining, yet \emph{better} ($+0.21$, $10$ probes, $p=0.009$; cells $+0.18$, $17$ of $24$); per-process accumulation,
+$9.20\times10^{-7}$, the best pretraining, yet worse ($-0.16$, $1$ probe, $p=0.001$; cells $-0.19$, $6$ of $24$). Five
+arms tested: with a Bonferroni factor $5$, accumulation and the generation feature stay below $0.05$, off-shellness does
+not. In these two arms the pretraining ranking is reversed on fine-tuning. One seed per arm (rung $5$ twice at hp73
+differed by $8\%$ in pretraining loss).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/levers_accum_legend.pdf}\\
+\widerow{\pnl{../analysis/transfer/figs/levers_accum_a.pdf}\hfill\pnl{../analysis/transfer/figs/levers_accum_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/levers_accum_c.pdf}\hfill\pnl{../analysis/transfer/figs/levers_accum_d.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/levers_accum_e.pdf}
+\caption{Each arm against rung $9$, per probe and $D$: $\log_{10}(L_\text{rung 9}/L_\text{arm})$, $>0$ the arm
+fine-tunes better. (a) Feynman diagrams on, (b) off-shellness off, (c) coupling scalars off, (d) generation feature off,
+(e) per-process gradient accumulation.}
+\label{fig:levers_accum}
+\end{figure}
 
 \paragraph{Real zero-shot.} \code{tp3\_gstd\_r9} is rung $9$ at hp73 and $64$k steps with one shared standardization
 (\code{data.shared\_standardization}: $(\mu,\sigma)=(-2.89,4.40)$ pooled over the $19$ processes, each keeping its own

@@ -44,7 +44,9 @@ for run_dir in args:
         if parent:
             cfg.fine_tune.pretrained_path = os.path.join(parent, "models", "model_run0_best.pt")
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
-    if cfg.data.get("offshell_per_event", False) and saved.get("offshell_stats") is not None:
+    # the run's own off-shellness scale is pinned only for its own parent: with --parent the stats it recorded were merged
+    # with a different parent's, so the fine-tune's merge (fine_tune.offshell_stats=parent) is redone with the new one
+    if not parent and cfg.data.get("offshell_per_event", False) and saved.get("offshell_stats") is not None:
         with open_dict(cfg):
             cfg.data.offshell_stats = saved["offshell_stats"]
     try:

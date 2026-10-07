@@ -41,7 +41,7 @@ for name in sorted(S):
     r, p, k = int(m.group(1)), m.group(2), int(m.group(3))
     e, T = trials(name)
     l, _ = trials(f"tp3_r{r}fte_{p}_d{k}", T)
-    if len(e) < 3 or len(l) < 3:
+    if len(e) < 5 or len(l) < 5:   # a cell is a finished 5-trial search on both sides
         continue
     be, bl = min(e, key=lambda q: q[2]), min(l, key=lambda q: q[2])
     near = min(e, key=lambda q: math.hypot(math.log10(q[0] / bl[0]), math.log10(q[1] / bl[1]) / 2))
@@ -49,7 +49,7 @@ for name in sorted(S):
                      L_e=be[2], L_l=bl[2], L_near=near[2],
                      dist=math.hypot(math.log10(near[0] / bl[0]), math.log10(near[1] / bl[1]) / 2)))
 
-print(f"{len(rows)} cells with >= 3 trials on both sides")
+print(f"{len(rows)} cells with 5 trials on both sides")
 for lab, sel in (("clean (rungs 2,6,7,9)", lambda x: x["r"] in CLEAN), ("other parents (3,4,5,8)", lambda x: x["r"] not in CLEAN)):
     R = [x for x in rows if sel(x)]
     if not R:

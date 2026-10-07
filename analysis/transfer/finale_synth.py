@@ -8,6 +8,7 @@ finale. Right: the six star-arm probes, the arm itself and the finale.
 """
 import io, contextlib, os, sys
 import numpy as np
+from scipy.stats import wilcoxon
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, S, scratch  # noqa: E402
 with contextlib.redirect_stdout(io.StringIO()):
@@ -71,18 +72,26 @@ for (fig, ax), (fam, lab, col) in zip(figs, [("tp3_finfte", "finale", ps.C.vermi
     print(f"{lab} vs rung 9: {len(lad)} cells over {len({x[0] for x in lad})} probes; "
           f"log10(L_r9 / L_{lab}) median {np.median(d):+.2f}, IQR [{np.percentile(d, 25):+.2f}, {np.percentile(d, 75):+.2f}], "
           f"{lab} better in {np.mean(d > 0):.0%}")
+    per = []
     for p in P:
         dd = [x[3] - x[2] for x in lad if x[0] == p]
         if dd:
+            per.append(np.median(dd))
             print(f"    {p:12s} {len(dd)} cells, median {np.median(dd):+.2f}")
+    # the cells of a probe are not independent: the test is over probes, the per-cell one descriptive
+    print(f"  over probes: median {np.median(per):+.2f}, {lab} better on {sum(v > 0 for v in per)} of {len(per)}, "
+          f"Wilcoxon p={wilcoxon(per).pvalue:.2g}; over cells Wilcoxon p={wilcoxon(d).pvalue:.2g}; "
+          f"above scratch in {sum(x[3] > 0 for x in lad)} of {len(lad)} cells")
     if fam == "tp3_finfte":
         arm = pairs(fam, lambda p: ARMP[p][0], list(ARMP))
         ax.scatter([x[2] for x in arm], [x[3] for x in arm], color=ps.C.orange, marker="D",
                    label="vs its star arm")
         if arm:
             d = np.array([x[3] - x[2] for x in arm])
-            print(f"finale vs the star arm on its probe: {len(arm)} cells over {len({x[0] for x in arm})} probes; "
-                  f"median {np.median(d):+.2f}, finale better in {np.mean(d > 0):.0%}")
+            per = [np.median([x[3] - x[2] for x in arm if x[0] == p]) for p in sorted({x[0] for x in arm})]
+            print(f"finale vs the star arm on its probe: {len(arm)} cells over {len(per)} probes; "
+                  f"median {np.median(d):+.2f}, finale better in {np.mean(d > 0):.0%}, cells p={wilcoxon(d).pvalue:.2g}; "
+                  f"over probes median {np.median(per):+.2f}, better on {sum(v > 0 for v in per)}, p={wilcoxon(per).pvalue:.2g}")
     lim = [-1.0, 2.5]
     ax.plot(lim, lim, color="0.5", ls="--", label="equal")
     ax.set_xlim(lim); ax.set_ylim(lim)
