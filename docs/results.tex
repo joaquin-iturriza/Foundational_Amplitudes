@@ -5070,6 +5070,184 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     restore with \code{tar -xf}), leaving $395$k files; the held jobs were released.
 \end{itemize}
 
+\section{The synthetic-amplitude prior}\label{sec:synthetic}
+The transfer study's step $6$ pretrains on amplitudes that no process produced (\code{tools/synthetic\_amplitudes.py},
+\code{SYN\_VERSION}$=1$; \code{recipes/transfer\_synthetic.yaml}), the prior-fitted-network idea of the hand-off
+(Sec.~\ref{sec:prior-open}, item $6$) carried to matrix elements. The question it answers: is what transfers from the
+ladder physics, or only ``a smooth Lorentz-invariant function of the invariants with poles at the right places''? A
+second motive is cost: a prior that needs no MadGraph has no per-process generation, compile or certification step, and
+can supply as many distinct processes as one asks for, where the real catalog stops at the processes MadGraph was run on.
+This section states the generator exactly, the reason behind each choice (and, where no reason was ever written down,
+says so), how its output differs from real amplitudes, and what it costs to generate.
+
+\subsection{Definition}
+A synthetic process is a name, \code{syn\_<k>} (or \code{syn<n>\_<k>} with $n$ final particles forced). Everything below
+is drawn once from a generator seeded by $(\text{salt},\,\code{SYN\_VERSION},\,n_\text{forced},\,k)$, so the name alone
+regenerates the process, and a change of the generator bumps the version and with it every pool's recipe id.
+
+\paragraph{Legs.} An initial pair and $n$ final particles,
+\begin{equation}
+  (a,b)\sim\{e^-e^+\!:\,0.35,\ u\bar u\!:\,0.30,\ u\bar d\!:\,0.15,\ d\bar d\!:\,0.12,\ uu\!:\,0.08\},\qquad
+  n\sim\{2\!:\,0.30,\ 3\!:\,0.35,\ 4\!:\,0.35\},
+\end{equation}
+each final particle drawn independently from the SM list with weights $w_g=2.5$, $w_\gamma=1.2$, $w_Z=0.7$,
+$w_{W^\pm}=0.6$, $w_H=0.4$, $w_{\nu_e,\nu_\mu,\bar\nu}=0.4$, $w_{e^\pm,\mu^\pm,u,d,\bar u,\bar d}=1$,
+$w_{s,c,\bar s,\bar c}=0.6$, $w_{b,\bar b}=0.7$, $w_{t,\bar t}=0.5$, and the draw repeated until electric charge,
+baryon number and lepton number are conserved and $\sum_{f}m_f\le600$\,GeV. The beams are massless along $z$; every mass
+is the generator's (the property table \code{GLOBAL\_PROPERTY\_MATRIX}).
+\emph{Why.} The initial pairs are exactly the catalog's initial states, and real SM particles at their real masses make
+the model's particle-property inputs the ones it sees on real data: only the function $|\mathcal M|^2$ is fake. The mass
+cap keeps the $\sqrt s$ window $[\max(25,1.05\sum m_f),\,1000]$\,GeV (the catalog's rule) at least $370$\,GeV wide. The
+weights and the $n$ distribution are not recorded anywhere as tuned: they were set by hand to favour gluons and photons
+(the commonest real final states) and to keep heavy and exotic finals rarer. Only $Q$, $B$, $L$ are conserved, not
+flavour: $uu\to c\,t\,g$ is a legal draw.
+
+\paragraph{Diagrams.} $K\sim\mathcal U\{1,\dots,K_\text{max}(N)\}$ with $K_\text{max}=3,5,6$ for $N=n+2=4,5,6$ legs.
+Each diagram is a random cubic tree over the $N$ legs (merge two random clusters until three remain), so it has $N-3$
+internal lines. With all momenta outgoing ($q_{a,b}=-p_{a,b}$, $q_f=p_f$), an internal line is a channel $S$ (a set of
+legs) with invariant
+\begin{equation}
+  s_S=\Big(\sum_{i\in S}q_i\Big)^2,
+\end{equation}
+\emph{s-type} when $S$ holds only final legs ($s_S>0$), \emph{t-type} when it separates the two beams. The particle on the
+line is drawn from those with the channel's charge $Q_S=\sum_{i\in S}Q_i$:
+neutral $\{\gamma\!:0.3,\,g\!:0.3,\,Z\!:0.2,\,H\!:0.2\}$, $\pm1$ $\{W\!:0.5,\,e\!:0.25,\,\mu\!:0.25\}$,
+$\pm\tfrac23$ $\{u\!:0.6,\,t\!:0.4\}$, $\pm\tfrac13$ $\{d\!:0.6,\,b\!:0.4\}$; a channel of any other charge rejects the tree.
+\emph{Why.} A real propagator always carries the channel's quantum numbers; matching the charge is the cheapest rule that
+keeps that, and drawing from SM particles gives real masses and widths' positions. \emph{What it does not do:} the
+vertices are not SM vertices. Nothing checks that the two lines meeting the propagator can couple to it: syn\_00008 is
+$e^+e^-\to gg$ through a $t$-channel $W$, and the gluon exchange between leptons in syn\_00010 has no SM counterpart.
+$K_\text{max}$ is a hand-set bound that grows with multiplicity, as the real diagram count does (far more slowly).
+
+\paragraph{Propagators.} Each line contributes
+\begin{equation}
+  D_S^{\,e}\quad\text{with}\quad D_S=s_S-M_S^2+i\,M_S\Gamma_S,\qquad
+  \Gamma_S=\begin{cases} r_X M_S & \text{s-type, } M_S>0,\\ 0 & \text{otherwise,}\end{cases}\qquad
+  \log r_X\sim\mathcal U[\log10^{-3},\log10^{-1}]
+\end{equation}
+($r_X$ one per particle species $X$ in the process), and power $e=1$ for $M_S>10$\,GeV, $e\sim\mathcal U\{\tfrac12,1\}$
+for a massless or light ($b$) line; a massless line with $e=\tfrac12$ enters as $|s_S|^{1/2}$. A massless or light line is
+allowed only where $s_S$ stays away from zero: an s-type channel needs two cut final legs (photons, gluons, charged
+leptons and quarks under the fiducial cuts) or a total leg mass above $10$\,GeV; a t-type channel needs a cut or massive
+leg on both sides; otherwise the line is redrawn as $Z/H$, $W$ or $t$ (a charge-$\tfrac13$ channel has no heavy option
+and rejects the tree). The scalar (PDG $25$) gets $\log m_H\sim\mathcal U[\log20,\log700]$\,GeV in half of the processes,
+$125$\,GeV otherwise (always $125$ with an external $H$).
+\emph{Why.} The Breit--Wigner is the real resonance shape; $\Gamma/M\in[10^{-3},0.1]$ spans the SM's
+($\Gamma_Z/M_Z=0.027$, $\Gamma_W/M_W=0.026$, $\Gamma_t/m_t=0.008$, $\Gamma_H/m_H=3\times10^{-5}$ is below the range), and
+drawing it independently of $M$ keeps the model from learning a fixed width per mass. The power $\tfrac12$ mimics a
+collinear singularity: in a gauge theory $|\mathcal M|^2\propto1/s_{ij}$ as $i\parallel j$, i.e.\ $1/\sqrt{s_{ij}}$ at
+amplitude level. The protection rule exists because an unprotected massless pole is integrable nowhere in the sampled
+region and would make the target infinite on a set of events. The random scalar mass puts resonances at masses the SM
+does not have, so pole position is learned from the propagator inputs (the off-shellness channel) rather than memorised.
+
+\paragraph{Numerators and the amplitude.} $H\sim\mathcal U\{2,3,4\}$ ``helicity'' amplitudes. For each helicity $h$ and
+diagram $d$: a complex coefficient $c_{hd}=\alpha+i\beta$, $\alpha,\beta\sim\mathcal N(0,1)$; a degree
+$\delta_{hd}\sim\mathcal U\{0,1,2\}$; and a polynomial of $1$ to $3$ monomials in the $N(N-1)/2$ pair invariants
+$s_{ij}=(q_i+q_j)^2$,
+\begin{equation}
+  P_{hd}=\sum_{m=1}^{M_{hd}}a_m\prod_{j=1}^{\delta_{hd}}s_{\pi_{mj}},\qquad a_m\sim\mathcal N(0,1),\quad
+  M_{hd}\sim\mathcal U\{1,2,3\},\quad \pi_{mj}\ \text{uniform over the pairs, with repetition.}
+\end{equation}
+With $E_d=\sum_{S\in d}e_S$ the summed propagator powers of diagram $d$, the target is
+\begin{equation}
+  |\mathcal M|^2=g(\sqrt s)\;\frac1{|\Pi|}\sum_{\sigma\in\Pi}\ \sum_{h=1}^{H}\,
+  \Big|\sum_{d=1}^{K}c_{hd}\,\frac{P_{hd}(s_{ij}^\sigma)\;s^{-k_{hd}/2}}{\prod_{S\in d}\big(D_S^\sigma\big)^{e_S}}\Big|^2,
+  \qquad k_{hd}=2\delta_{hd}-2E_d-4+N,
+  \label{eq:syn}
+\end{equation}
+where $\Pi$ is the set of permutations of identical final legs and $\sigma$ relabels the momenta. Each term has mass
+dimension $2\delta_{hd}-k_{hd}-2E_d=4-N$, so $|\mathcal M|^2$ has the dimension $8-2N$ of a real $2\to n$ squared
+amplitude. The couplings are
+\begin{equation}
+  g(\sqrt s)=(4\pi)^n\,\alpha^{\,n-k_s}\,\alpha_s(\sqrt s)^{k_s},\qquad
+  \alpha_s(\mu)=\frac{\alpha_s(M_Z)}{1+\alpha_s(M_Z)\,b_0\ln(\mu^2/M_Z^2)},\quad b_0=\frac{33-2\cdot5}{12\pi},
+\end{equation}
+$\alpha_s(M_Z)=0.118$, $\alpha=1/132.507$, and $k_s=\min\!\big(n,\;n_g+\mathrm{Bin}(n-n_g,0.3)\big)$ if any leg is
+coloured ($n_g$ the external gluons), else $0$.
+\emph{Why.} Only invariants enter, so Eq.~\eqref{eq:syn} is Lorentz invariant by construction (the check below). The
+incoherent sum over $H\ge2$ amplitudes mirrors the helicity sum and avoids exact zeros of a single $|A|^2$ (a real
+spin-summed $|\mathcal M|^2$ rarely vanishes). Polynomial numerators of degree $\le2$ in $s_{ij}$ stand in for the
+spin-sum numerators of real amplitudes, which are polynomials in the same invariants; Gaussian coefficients give
+interference between diagrams with random relative phases. The power $s^{-k/2}$ is the only freedom left once the
+numerator degree and the propagators are drawn, and it fixes the dimension, so the overall energy scaling is that of a
+real process. The permutation average makes the target a function of the particle set, as a real amplitude is under
+exchange of identical particles. $\alpha_s$ runs per event at $\mu=\sqrt s$ exactly as in the real pools, so the
+coupling inputs (\code{amp\_orders}) mean the same thing on both. The $0.3$ in $k_s$, the degree range, the monomial
+count and $H\le4$ are hand-set, never tuned.
+
+\paragraph{Events.} The pools go through the real pools' own path: \code{mg5\_pipeline\_final} registers a \code{syn\_*}
+name as a process with \code{kind: synthetic}, samples events with the same mixture policy, fiducial cuts and $\sqrt s$
+window rule, and calls the synthetic labeller where MadGraph's matrix element would be. Each process also writes its
+diagram sidecar, so \code{offshell\_per\_event} sees the true propagators. The pretraining used $19$ processes
+(\code{syn\_00000}--\code{syn\_00018}: rung $9$'s process count) at $10^5$ training, $10^4$ validation and $10^4$ test
+events each: $6$ are $2\to2$, $7$ are $2\to3$, $6$ are $2\to4$; $K$ from $1$ to $6$; $8$ carry a non-SM scalar mass
+($21$--$381$\,GeV).
+
+\paragraph{Checks.} \code{tests/test\_synthetic\_amplitudes.py} (CPU): $|\mathcal M|^2$ unchanged under random Lorentz
+transformations (worst relative change $5\times10^{-12}$, asserted below $10^{-9}$);
+$|\mathcal M|^2(\lambda P;\lambda M,\lambda\Gamma)=\lambda^{8-2N}|\mathcal M|^2(P)$ (below $10^{-10}$); the same name
+gives the same structure and the same pool on every interpreter, and no two names draw the same structure; the pools
+conserve momentum, keep legs on shell and $\sqrt s$ in its window, and are finite and positive; every sidecar propagator
+is found among the events' invariant masses. The permutation average is not tested separately.
+
+\subsection{How it differs from real amplitudes}
+\begin{itemize}
+  \item \textbf{No Feynman rules.} Vertices only conserve charge; nothing ties a propagator's particle to the lines it
+    joins, the couplings to the vertices, or the widths to the couplings. Flavour is not conserved.
+  \item \textbf{No spinor or gauge structure.} Real numerators come from traces of $\gamma$ matrices and polarisation sums:
+    they produce helicity selection rules, angular shapes such as $1+\cos^2\theta$, and gauge cancellations between
+    diagrams that keep high-energy growth in check. Random polynomials have none of these; their cancellations are
+    accidental.
+  \item \textbf{Soft limits.} The $1/\sqrt{s_{ij}}$ line mimics the collinear pole only. There is no eikonal soft factor
+    $p_i\!\cdot\!p_j/(p_i\!\cdot\!k)(p_j\!\cdot\!k)$ for an emitted gluon or photon, which real $2\to3$ and $2\to4$
+    QCD amplitudes carry.
+  \item \textbf{Tree-like and positive only.} No loop-level features: no logarithms of $s$ (the Sudakov arms' structure),
+    no threshold enhancement, no sign changes (rung $9$ has a signed one-loop pool; all $19$ synthetic pools are
+    positive and resolve to \code{log}).
+  \item \textbf{Wider within a process.} The per-process standard deviation of $\log|\mathcal M|^2$ (the
+    standardisation of \code{data\_stats.json}) has median $2.75$ (range $0.99$--$4.24$) over the $19$ synthetic pools,
+    against $1.32$ ($0.21$--$3.38$) over rung $9$'s $19$; the per-process means span $-24.2$ to $5.0$ against $-14.4$ to
+    $2.7$. The random numerators and the narrow drawn widths make the synthetic functions vary roughly twice as much in
+    $\log|\mathcal M|^2$ over the same kind of phase space.
+\end{itemize}
+What it keeps: real particles and masses, real kinematics and cuts, Lorentz invariance, the mass dimension, poles at
+propagator masses with Breit--Wigner shapes, collinear-like $1/s_{ij}$ singularities, running $\alpha_s$, Bose and Fermi
+relabelling symmetry, and diagram sidecars that describe the function exactly.
+Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}): fine-tuned from it, the model
+beats scratch on most cells but is below rung $9$ (median $-0.14$\,dex over $48$ cells, better in $35\%$, Wilcoxon
+$p<10^{-3}$): it transfers something, less than real data.
+
+\subsection{What it costs to generate}
+Per core, through \code{build\_mixture\_dataset} with the mixture policy (\code{tools/bench\_synthetic.py},
+$2\times10^4$ stored events per process, a CC-IN2P3 login node, Intel Xeon E5-2640 v3):
+\begin{center}
+\begin{tabular}{lcc}
+\hline
+ & synthetic, stored events/s & real (Sec.~\ref{sec:catalog}, \code{htc} nodes), stored events/s \\
+\hline
+$2\to2$ & $77$--$99\times10^3$ (median $86\times10^3$) & LO trees $2$--$15\times10^3$ \\
+$2\to3$ & $44$--$59\times10^3$ (median $48\times10^3$) & one-loop $2\to2$, massive $2\to3$: $150$--$800$ \\
+$2\to4$ & $27$--$50\times10^3$ (median $39\times10^3$) & gluonic one-loop $2\to3$: $50$--$100$ \\
+\hline
+\end{tabular}
+\end{center}
+The two columns were measured on different machines and the real one spans multiplicities, so the ratio is indicative:
+$\sim5$--$40\times$ faster than real trees, $10^2$--$10^3\times$ faster than one-loop processes. The labeller is only
+$24$--$42\%$ of the synthetic time; the rest is the shared phase-space sampler, so the synthetic rate is near the
+sampler's own ceiling. On top of the rate, a real process needs a MadGraph output and a backend compile before its
+first event ($432$ compiles for the $478$-entry catalog; their time was never recorded separately), and a one-loop one
+its certification; a synthetic process needs neither.
+
+What this means for the planned larger catalogs (hand-off, ``Progressively larger synthetic catalogs''): $10^3$
+processes at $1.2\times10^5$ events each are $1.2\times10^8$ events, at $\sim5\times10^4$ per core-second about
+$0.7$ core-hours, minutes on one node. The real catalog took about six CPU-hours plus the compiles for $478$ entries,
+also small next to a $64$k-step pretraining (about $7$ GPU-hours). So at these sizes generation speed is not what
+decides: neither side's generation is the bottleneck. What the synthetic prior buys is the \emph{number of distinct
+processes}: the real catalog has the $478$ processes MadGraph was run on (and fewer once equal processes are merged),
+so $10^3$ real processes would mean defining, generating and certifying several hundred new ones, while $10^3$ (or
+$10^5$) synthetic ones are a range of names. Whether that is worth anything depends on transfer growing with the
+synthetic catalog, which is what the larger-catalog item measures.
+
 \section{Training throughput}\label{sec:throughput}
 % ==========================================================================
 
