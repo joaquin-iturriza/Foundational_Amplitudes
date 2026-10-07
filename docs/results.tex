@@ -4848,8 +4848,8 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     $0.14$ on all); single cells are noise-dominated (ratio $0.28$--$5.7$, 5--95\%). (1) The $32$k grid: scratch and every pretraining (rungs $0$--$9$) on the twelve probes at
     $D=10^{3.5}$, $10^4$, and $ud\to ud$ also at $10^{2.5}$, $10^3$, two chosen points each (\code{horizon32k\_chosen.json});
     $420$ trials, spread over lxplus, CC-IN2P3 and the $17$ done on Jean Zay (the rest moved off Jean Zay's priority queue on
-    2026-10-05); waiter: a background count over the $210$ sweeps on all sites. When in: \code{cells.USE\_32K} on, figures and
-    the paper draft redrawn. (2) $D=10^{4.5}$, $10^5$ at $32$k, scratch and every pretraining, two chosen points (the
+    2026-10-05); waiter: a background count over the $210$ sweeps on all sites. When in: \code{cells.USE\_32K} on, figures
+    redrawn. (2) $D=10^{4.5}$, $10^5$ at $32$k, scratch and every pretraining, two chosen points (the
     one-loop probes stop at $10^{4.5}$), drawn in the grid figures. (3) Equal-total-data rungs: rungs $2$--$9$ at $3\times10^5$
     training events in total, split evenly over the rung's processes, $64$k steps at the protocol point, and their full
     fine-tune grid (same cells and horizons as the ladder, $32$k at the top two $D$), compared with the ladder. (4) The
@@ -4871,7 +4871,8 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     sites without asking; fresh collection from all sites before any figure; after every collection, and at least every
     few hours while results land, the study's own figures (\code{rung\_focus}, \code{rung\_grid}, \code{star\_arms},
     \code{gain\_heatmap}, and each new comparison) sent to the user unprompted, so a problem can be caught early;
-    \code{docs/results.tex} and the paper draft (\code{\textasciitilde/drafts/fm\_amplitudes/}, sent as PDF and zip) kept current; reviewers run
+    \code{docs/results.tex} kept current (results go only there: the paper draft is not updated unless the user asks,
+    2026-10-07; the goal's ``update the paper draft'' was in the goal text the agent wrote, not asked for); reviewers run
     when due; never narrow the scope (CLAUDE.md 0b). Monitoring, every $20$ minutes, never hourly (the user's call,
     2026-10-06, after $75$ points failed for hours unnoticed): \code{sweep/watchdog.py tp3\_ --expect <the batch's
     \{sweep: [hp]\} JSON>} in a background loop that exits on an \code{ALERT} (fast trial failures, expected points with
@@ -4900,14 +4901,12 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
     than $8$k (decide after the HP landscape). \textbf{Results not yet written up:} the $32$k cells' effect (median
     $32$k/$8$k $0.27$; $49$ of $269$ worse); the HP landscape (first trials in; one divergence: rung $0$ on one-loop $ee\to
     d\bar d$, hp$180$, lr $1.5\times10^{-3}$, $\lambda=2\times10^{-6}$, EMA, non-finite at step $22491$ of $32$k, to be shown
-    separately). The paper draft (\code{\textasciitilde/drafts/fm\_amplitudes/}) still has the pre-$32$k numbers: update it
-    with the step-1 figures. Next in the plan after these: (B) and (C) grids as their pretrainings end (parents on lxplus,
+    separately). Next in the plan after these: (B) and (C) grids as their pretrainings end (parents on lxplus,
     \code{trial\_0073}, resolve before submitting), then steps (3)--(6) as their grids complete. Earlier (18:08): (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
     $75$ that had failed in seconds, their first attempts' run dirs blocking \code{run.py}, were fixed by
     \code{run\_trial.py} taking \code{trial\_<hp>\_r<k>} on a cold start, nothing deleted). Once all $420$ are in: collect
     \code{tp3\_} from every site (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set
-    \code{cells.USE\_32K = True}, redraw \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap}, update the paper draft's
-    numbers and send the figures. Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all
+    \code{cells.USE\_32K = True}, redraw \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap} and send the figures. Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all
     trials) at $10^4$ (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ goes to $32$k for every
     pretraining. (2) All $242$ sweeps of $D=10^{4.5}$, $10^5$ at $32$k submitted, two chosen points each ($218$ on Jean Zay,
     $23$ on lxplus, $1$ on CC-IN2P3). (3) The eight equal-data pretrainings queued (rungs $2$--$6$ on Jean Zay, $7$--$9$
