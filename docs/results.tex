@@ -4856,6 +4856,21 @@ per-process accumulation, $9.20\times10^{-7}$ (the best pretraining) yet fine-tu
 cells in, $p=0.011$). Pretraining loss does not rank the arms for transfer: the two largest pretraining differences
 come out reversed on fine-tuning. One seed per arm.
 
+\paragraph{Real zero-shot.} \code{tp3\_gstd\_r9} is rung $9$ at hp73 and $64$k steps with one shared standardization
+(\code{data.shared\_standardization}: $(\mu,\sigma)=(-2.89,4.40)$ pooled over the $19$ processes, each keeping its own
+log or signed-log), so its output is a prediction of $\log|\mathcal M|^2$ itself, $\mu+\sigma h$, for a process it has
+no data of (\code{tools/zero\_shot\_ft.py --parent}, \code{analysis/transfer/zero\_shot\_real.py},
+\code{zero\_shot\_gstd.json}; a ladder fine-tune's config per probe supplies the probe's validation split, rung $9$'s
+where its run dir is on lxplus, rung $4$'s otherwise). In units of the probe's variance (MSE of $\log|\mathcal M|^2$ over
+$\sigma_p^2$; $1$ is as good as the probe's exact mean, which the model is not given): $ee\to d\bar d$ $0.06$,
+$ee\to t\bar t$ $0.14$, the one-loop $ee\to d\bar d$ $0.46$ (the first and third better than scratch on $10$ events);
+$ee\to Z\gamma$, $ud\to ud$, $u\bar u\to Zggg$ $1.2$--$1.3$, $ee\to\nu_e\bar\nu_e$ and $ee\to W^+W^-$ $1.8$--$1.9$;
+far off on the one-loop $ee\to b\bar b$ ($16$), $u\bar u\to Zgg$ ($13$), $u\bar u\to Zg$ ($50$) and $u\bar u\to gg$
+($406$, an offset of $\sim18$ in $\log|\mathcal M|^2$). Up to an affine map the same outputs score $0.02$--$0.87$
+(shape mostly right): what fails is the normalization, worst where the probe's couplings and multiplicity are furthest
+from rung $9$'s processes (two external gluons and none of rung $9$'s $q\bar q\to gg$). Scratch on $10^2$ events beats
+the zero-shot prediction on every probe.
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
@@ -4874,10 +4889,7 @@ come out reversed on fine-tuning. One seed per arm.
     lower, one seed (rung $5$ twice at hp73: $8\%$); wall $14.6$\,h against $\sim6.7$\,h ($19$ micro-batches of $862$
     events per update). Its $24$ $8$k fine-tune sweeps are submitted ($15$ lxplus, $9$ CC-IN2P3, parent copied), paired with
     rung $9$'s cells by DyHPO seed; a waiter counts the lever and accumulation fine-tunes to $570$ of $600$ trials, then the
-    paired comparison against rung $9$ is drawn. \code{tp3\_gstd\_r9} (zero-shot
-    pretraining, shared standardization) running on lxplus since 15:13, $\sim7$\,h: then score it zero-shot on the twelve
-    probes on the real loss (\code{tools/zero\_shot\_ft.py} needs the probe's target under the parent's shared
-    $(\mu,\sigma)$ with the probe's own transform), and compare its fine-tunes' loss in MSE of $\log|\mathcal M|^2$ only.
+    paired comparison against rung $9$ is drawn. \code{tp3\_gstd\_r9} done and scored zero-shot (result paragraph above Sec.~\ref{sec:ladder-open}).
     \textbf{Sites:} Jean Zay down (maintenance) and its WORK inode quota $94\%$ ($470$k of $500$k): $2876$ trials held
     there; the user's choice is pending: (a) archive old runs to STORE, (b) new runs to \code{\$SCRATCH}, (c) keep it out;
     nothing new goes there. CC-IN2P3 unreachable since $\sim$18:50 (the jump host \code{lpnclaude03} closes the
