@@ -23,7 +23,13 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
 from rebuild_run import _build  # noqa: E402
 
-for run_dir in sys.argv[1:]:
+# --parent <pretraining run dir>: score that pretraining instead of the run dir's own parent, on the run dir's probe
+# (its config and pool); with a parent trained under data.shared_standardization the prediction is a real
+# log|M|^2, mu + sigma h, scored against the probe's true log|M|^2 with no fit (mse_logm2_real)
+args, parent = sys.argv[1:], None
+if "--parent" in args:
+    i = args.index("--parent"); parent = args[i + 1]; args = args[:i] + args[i + 2:]
+for run_dir in args:
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
@@ -35,6 +41,8 @@ for run_dir in sys.argv[1:]:
             cfg.data.processes_file = siteconf._expand_str(str(cfg.data.processes_file))
         # the parent checkpoint, re-rooted to this site (a config written on another site keeps its paths)
         cfg.fine_tune.pretrained_path = siteconf._expand_str(str(cfg.fine_tune.pretrained_path))
+        if parent:
+            cfg.fine_tune.pretrained_path = os.path.join(parent, "models", "model_run0_best.pt")
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
     if cfg.data.get("offshell_per_event", False) and saved.get("offshell_stats") is not None:
         with open_dict(cfg):
@@ -62,7 +70,17 @@ for run_dir in sys.argv[1:]:
     A = np.stack([np.ones_like(h), h], 1)
     coef = np.linalg.lstsq(A, z, rcond=None)[0]
     affine = float(np.mean((A @ coef - z) ** 2))
+    real = None
+    pstats = json.load(open(os.path.join(os.path.dirname(os.path.dirname(str(cfg.fine_tune.pretrained_path))),
+                                         "data_stats.json")))
+    if pstats.get("shared_standardization"):
+        tr = (exp._amp_trafos_pp or [exp.cfg.data.amp_trafos])[0]
+        assert str(tr[0]).startswith("log"), f"{run_dir}: probe transform {tr} (a signed probe has no log|M|^2 target)"
+        mu_c, sd_c = float(pstats["prepd_mean"][0]), float(pstats["prepd_std"][0])
+        mu_p, sd_p = float(saved["prepd_mean"][0]), float(saved["prepd_std"][0])
+        real = float(np.mean(((mu_c + sd_c * h) - (mu_p + sd_p * z)) ** 2))
     print("ZERO_SHOT " + json.dumps({
+        "mse_logm2_real": real, "shared_parent": bool(pstats.get("shared_standardization")),
         "run_dir": run_dir, "parent": str(cfg.fine_tune.pretrained_path), "val_loss": exp.val_loss_no_reg[-1],
         "prepd_std": saved["prepd_std"], "val_loss_affine": affine, "affine_ab": [float(c) for c in coef],
         "n_val": int(len(z)), "val_loss_check": float(np.mean((h - z) ** 2)),
