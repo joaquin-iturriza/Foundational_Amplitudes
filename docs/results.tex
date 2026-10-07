@@ -4903,10 +4903,11 @@ fine-tunes better. (a) Feynman diagrams on, (b) off-shellness off, (c) coupling 
 log or signed-log), so its output is a prediction of $\log|\mathcal M|^2$ itself, $\mu+\sigma h$, for a process it has
 no data of (\code{tools/zero\_shot\_ft.py --parent}, \code{analysis/transfer/zero\_shot\_real.py},
 \code{zero\_shot\_gstd.json}; a ladder fine-tune's config per probe supplies the probe's validation split, rung $9$'s
-where its run dir is on lxplus, rung $4$'s otherwise). In units of the probe's variance (MSE of $\log|\mathcal M|^2$ over
+where its run dir is on lxplus, rung $4$'s otherwise; the off-shellness inputs on the scored pretraining's own scale, merged as a fine-tune merges
+them: a first scoring pinned the borrowed cell's scale, which moved $ee\to\nu_e\bar\nu_e$ and $ud\to ud$ only). In units of the probe's variance (MSE of $\log|\mathcal M|^2$ over
 $\sigma_p^2$; $1$ is as good as the probe's exact mean, which the model is not given): $ee\to d\bar d$ $0.06$,
 $ee\to t\bar t$ $0.14$, the one-loop $ee\to d\bar d$ $0.46$ (the first and third better than scratch on $10$ events);
-$ee\to Z\gamma$, $ud\to ud$, $u\bar u\to Zggg$ $1.2$--$1.3$, $ee\to\nu_e\bar\nu_e$ and $ee\to W^+W^-$ $1.8$--$1.9$;
+$ee\to Z\gamma$, $u\bar u\to Zggg$, $ee\to\nu_e\bar\nu_e$, $ud\to ud$ $1.2$--$1.5$, $ee\to W^+W^-$ $1.8$;
 far off on the one-loop $ee\to b\bar b$ ($16$), $u\bar u\to Zgg$ ($13$), $u\bar u\to Zg$ ($50$) and $u\bar u\to gg$
 ($406$, an offset of $\sim18$ in $\log|\mathcal M|^2$). Up to an affine map the same outputs score $0.02$--$0.87$
 (shape mostly right): what fails is the normalization, worst where the probe's couplings and multiplicity are furthest
@@ -4922,8 +4923,7 @@ the zero-shot prediction on every probe.
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
     (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
     (3), the seeds (5). \textbf{Done and written up} (paragraphs above Sec.~\ref{sec:ladder-open}): (4) and (6) at $8$k, (B) and (C) at
-    $D=10^2,10^3$ (their $10^4$ cells held at $32$k), the real zero-shot test (being re-scored: the first scoring pinned the
-    borrowed rung $4$ cells' off-shellness scale, fixed in \code{tools/zero\_shot\_ft.py}). The accumulation pretraining's
+    $D=10^2,10^3$ (their $10^4$ cells held at $32$k), the real zero-shot test. The accumulation pretraining's
     wall time was $14.6$\,h against $\sim6.7$\,h for rung $9$ ($19$ micro-batches of $862$ events per update).
     \textbf{Sites:} Jean Zay down (maintenance) and its WORK inode quota $94\%$ ($470$k of $500$k): $2876$ trials held
     there; the user's choice is pending: (a) archive old runs to STORE, (b) new runs to \code{\$SCRATCH}, (c) keep it out;
