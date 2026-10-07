@@ -297,7 +297,7 @@ def _earlier(new, old):
     return new < old
 
 
-def plan(inv, margin_h, no_dest=()):
+def plan(inv, margin_h, no_dest=(), exclude=()):
     """[(sweep, src, dst)] and the per-site (backlog, rate, finish) before and after."""
     st = {}
     for s, v in inv.items():
@@ -318,7 +318,9 @@ def plan(inv, margin_h, no_dest=()):
     before = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
     movable = {s: sorted((n for n, x in v["sweeps"].items()
                           # a site that takes no work (full filesystem) gives back what arrived there too
-                          if (x["movable"] or (s in no_dest and x.get("movable_any"))) and x.get("unit")),
+                          if (x["movable"] or (s in no_dest and x.get("movable_any"))) and x.get("unit")
+                          # paused by hand where a HELD marker could not be written (a site that was down)
+                          and not any(n.startswith(e) for e in exclude)),
                          reverse=True) for s, v in inv.items()}
     moves = []
     while True:
@@ -476,6 +478,8 @@ def main():
     ap.add_argument("--release-trials", metavar="DEST", help="(on a site) cancel the sweeps' pending trials, mark moved")
     ap.add_argument("--apply", action="store_true", help="carry the moves out (default: print the plan)")
     ap.add_argument("--allow-jeanzay", action="store_true")
+    ap.add_argument("--exclude", nargs="*", default=[], metavar="PREFIX",
+                    help="sweeps never moved (paused by hand on a site where no HELD marker could be written)")
     ap.add_argument("--no-dest", nargs="*", default=[], metavar="SITE",
                     help="sites that give work but take none (a full filesystem); their ARRIVED stays do not apply")
     ap.add_argument("--scope", nargs="+", default=["tp3_"],
@@ -502,7 +506,7 @@ def main():
         inv[s] = json.loads(line[len("INVENTORY "):])
     global inv_sched
     inv_sched = {s: v["scheduler"] for s, v in inv.items()}
-    moves, before, after = plan(inv, a.margin, set(a.no_dest))
+    moves, before, after = plan(inv, a.margin, set(a.no_dest), tuple(a.exclude))
     for s in inv:
         b, r, f = before[s]; b2, _, f2 = after[s]
         print(f"  {s:9s} backlog {b:5d} -> {b2:5d} trials   rate {r:6.1f}/h   finish {f:6.1f} h -> {f2:6.1f} h")
