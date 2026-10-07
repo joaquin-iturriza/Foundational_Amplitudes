@@ -18,10 +18,12 @@ PAT="runs/tp3_uu64fte_*_d8 runs/tp3_r[1-9]fte_*_d8 runs_from_lxplus/tp3_r[1-9]ft
 if [ "${1:-}" = "--parent" ]; then
   # any D of a probe scores on the same validation split: the largest D whose run dir is on this site
   PAT=$(for p in ee_ddbar ee_nnbar ee_ttbar ee_WW ee_dd_nlo ee_bb_nlo ee_Za ud_ud uubar_gg uubar_Zg uubar_Zgg uubar_Zggg; do
-          for k in 8 7 6 5 4 3 2; do
-            t=$(ls -d runs/tp3_r9fte_${p}_d$k/trial_* 2>/dev/null | while read t; do [ -f $t/config.yaml ] && [ -f $t/data_stats.json ] && { echo $t; break; }; done)
-            [ -n "$t" ] && { echo runs/tp3_r9fte_${p}_d$k; break; }
-          done; done)
+          # a ladder fine-tune's config carries the probe, its pool and the data flags every rung shares; the parent
+          # is replaced, so any rung's cell serves (rung 9 first)
+          for f in r9 r8 r7 r6 r5 r4 r3 r2 r1 uu64; do for k in 8 7 6 5 4 3 2; do
+            t=$(ls -d runs/tp3_${f}fte_${p}_d$k/trial_* 2>/dev/null | while read t; do [ -f $t/config.yaml ] && [ -f $t/data_stats.json ] && { echo $t; break; }; done)
+            [ -n "$t" ] && { echo runs/tp3_${f}fte_${p}_d$k; break 2; }
+          done; done; done)
 fi
 dirs=$(for s in $PAT; do
          [ -d "$s" ] || continue
