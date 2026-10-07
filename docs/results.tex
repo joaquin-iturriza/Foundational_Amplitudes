@@ -4856,9 +4856,12 @@ $ee\to W^+W^-$ and $u\bar u\to Zgg$; above scratch on most cells (Sec.~\ref{sec:
     lxplus, one \code{trial\_0073} each: \code{val\_loss} levdiag $2.48$, levoffsh $1.68$, levcoup $1.93$, levgen
     $5.04\times10^{-6}$ against rung $9$'s $1.33\times10^{-6}$ (one seed each; rung $5$ twice at hp73 differed by $8\%$).
     \textbf{Running:} the lever fine-tunes, $96$ sweeps of $5$ trials at $D=10^2,10^3$ ($82$ on lxplus, $14$ on
-    CC-IN2P3; their $32$k cells held). \code{tp3\_accum\_r9} (C) finished on lxplus (\code{hp0073\_t64000\_1791333835.json},
-    not yet read): next, resolve its run dir, read the log's loss against rung $9$, submit its $24$ $8$k fine-tune sweeps
-    (\code{sweep\_config\_tp3\_accumfte\_*}, not \code{32k}; parent on lxplus). \code{tp3\_gstd\_r9} (zero-shot
+    CC-IN2P3; their $32$k cells held). \code{tp3\_accum\_r9} (C, per-process micro-batches with gradient accumulation; one \code{trial\_0073}) reached
+    \code{val\_loss} $9.20\times10^{-7}$ at step $64$k against rung $9$'s $1.33\times10^{-6}$ at the same point, $1.44\times$
+    lower, one seed (rung $5$ twice at hp73: $8\%$); wall $14.6$\,h against $\sim6.7$\,h ($19$ micro-batches of $862$
+    events per update). Its $24$ $8$k fine-tune sweeps are submitted ($15$ lxplus, $9$ CC-IN2P3, parent copied), paired with
+    rung $9$'s cells by DyHPO seed; a waiter counts the lever and accumulation fine-tunes to $570$ of $600$ trials, then the
+    paired comparison against rung $9$ is drawn. \code{tp3\_gstd\_r9} (zero-shot
     pretraining, shared standardization) running on lxplus since 15:13, $\sim7$\,h: then score it zero-shot on the twelve
     probes on the real loss (\code{tools/zero\_shot\_ft.py} needs the probe's target under the parent's shared
     $(\mu,\sigma)$ with the probe's own transform), and compare its fine-tunes' loss in MSE of $\log|\mathcal M|^2$ only.
