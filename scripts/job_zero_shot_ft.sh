@@ -12,9 +12,13 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-dirs=$(for s in runs/tp3_uu64fte_*_d8 runs/tp3_r[1-9]fte_*_d8 runs_from_lxplus/tp3_r[1-9]fte_*_d8; do
+# with `-- --parent <pretraining run dir>`: that pretraining on the twelve probes, through one rung 9 cell per probe
+# (its config fixes the probe and its pool)
+PAT="runs/tp3_uu64fte_*_d8 runs/tp3_r[1-9]fte_*_d8 runs_from_lxplus/tp3_r[1-9]fte_*_d8"
+[ "${1:-}" = "--parent" ] && PAT="runs/tp3_r9fte_*_d8"
+dirs=$(for s in $PAT; do
          [ -d "$s" ] || continue
          for t in "$s"/trial_*; do [ -f "$t/config.yaml" ] && [ -f "$t/data_stats.json" ] && { echo "$t"; break; }; done
        done)
 echo "ZERO_SHOT_DIRS $(echo $dirs | wc -w)"
-python tools/zero_shot_ft.py $dirs
+python tools/zero_shot_ft.py "$@" $dirs
