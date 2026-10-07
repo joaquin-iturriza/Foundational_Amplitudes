@@ -33,7 +33,12 @@ def cell(fam, p, k):
           if t.get("val_loss") is not None and t.get("prepd_std") and t.get("hp", 0) >= 0]
     # the two redesigned arms (W pole, Sudakov EW) ran two chosen points per cell, not a 5-trial search (results.tex)
     need = 2 if fam in ("tp3_swpolefte", "tp3_ssudakovewfte") else 5
-    return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if len(tr) >= need else None
+    if len(tr) < need:
+        return None
+    # a search that ran twice (a sweep resubmitted on another site by the rebalancer) holds up to 13 trials: only
+    # the first `need` evaluated count, so every family's cell is the best of the same number of trials
+    tr = sorted(tr, key=lambda t: (t.get("order") if t.get("order") is not None else 99, t["hp"]))[:need]
+    return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr)
 
 
 def gains(p, fams):
