@@ -4921,24 +4921,16 @@ the zero-shot prediction on every probe.
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
     (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
-    (3), the seeds (5). \textbf{Done:} finale and synthetic $8$k grids complete ($84+42$ and $84$ cells; result paragraph
-    above Sec.~\ref{sec:ladder-open}; figures \code{finale\_synth*} sent). The four lever pretrainings (B), hp73, $64$k,
-    lxplus, one \code{trial\_0073} each: \code{val\_loss} levdiag $2.48$, levoffsh $1.68$, levcoup $1.93$, levgen
-    $5.04\times10^{-6}$ against rung $9$'s $1.33\times10^{-6}$ (one seed each; rung $5$ twice at hp73 differed by $8\%$).
-    \textbf{Running:} the lever fine-tunes, $96$ sweeps of $5$ trials at $D=10^2,10^3$ ($82$ on lxplus, $14$ on
-    CC-IN2P3; their $32$k cells held). \code{tp3\_accum\_r9} (C, per-process micro-batches with gradient accumulation; one \code{trial\_0073}) reached
-    \code{val\_loss} $9.20\times10^{-7}$ at step $64$k against rung $9$'s $1.33\times10^{-6}$ at the same point, $1.44\times$
-    lower, one seed (rung $5$ twice at hp73: $8\%$); wall $14.6$\,h against $\sim6.7$\,h ($19$ micro-batches of $862$
-    events per update). Its $24$ $8$k fine-tune sweeps are submitted ($15$ lxplus, $9$ CC-IN2P3, parent copied), paired with
-    rung $9$'s cells by DyHPO seed; a waiter counts the lever and accumulation fine-tunes to $570$ of $600$ trials, then the
-    paired comparison against rung $9$ is drawn. \code{tp3\_gstd\_r9} done and scored zero-shot (result paragraph above Sec.~\ref{sec:ladder-open}).
+    (3), the seeds (5). \textbf{Done and written up} (paragraphs above Sec.~\ref{sec:ladder-open}): (4) and (6) at $8$k, (B) and (C) at
+    $D=10^2,10^3$ (their $10^4$ cells held at $32$k), the real zero-shot test (being re-scored: the first scoring pinned the
+    borrowed rung $4$ cells' off-shellness scale, fixed in \code{tools/zero\_shot\_ft.py}). The accumulation pretraining's
+    wall time was $14.6$\,h against $\sim6.7$\,h for rung $9$ ($19$ micro-batches of $862$ events per update).
     \textbf{Sites:} Jean Zay down (maintenance) and its WORK inode quota $94\%$ ($470$k of $500$k): $2876$ trials held
     there; the user's choice is pending: (a) archive old runs to STORE, (b) new runs to \code{\$SCRATCH}, (c) keep it out;
-    nothing new goes there. CC-IN2P3 unreachable since $\sim$18:50 (the jump host \code{lpnclaude03} closes the
-    connection); its jobs run on. \textbf{Loops} (background shells, lost on a restart): rebalancer + CC feeder every
+    nothing new goes there. CC-IN2P3 back since 2026-10-07 evening. \textbf{Loops} (background shells, lost on a restart): rebalancer + CC feeder every
     $20$ min (\code{--allow-jeanzay --no-dest jeanzay --exclude tp3\_eqd\_r tp3\_finfte\_ tp3\_synfte\_}); watchdog on
-    lxplus only (\code{--sites lxplus --stall-site lxplus=240}), back to all sites when CC and Jean Zay answer; waiters on
-    CC and Jean Zay coming back. \textbf{To do, design first with the user:} larger synthetic catalogs ($10^2$, $10^{2.5}$,
+    CC-IN2P3 and lxplus (\code{--sites ccin2p3 lxplus --stall-site lxplus=240}), Jean Zay added when it answers; a waiter on
+    Jean Zay coming back. \textbf{To do, design first with the user:} larger synthetic catalogs ($10^2$, $10^{2.5}$,
     $10^3$; hand-off item). \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
     $41$ synthetic) with fewer than $5$ results stop their search (held on lxplus, $255$ jobs, and CC-IN2P3, $46$; on Jean
     Zay excluded from the rebalancer) and run once at the reference cell's best point instead (rung $9$'s on the same
@@ -5030,7 +5022,7 @@ the zero-shot prediction on every probe.
     from the name, $20/20$ off-shellness masks built); its pretraining \code{tp3\_synth} (recipe
     \code{transfer\_synthetic.yaml}: $19$ synthetic processes at $10^5$ training events, rung $9$'s process count, $64$k steps,
     hp73) is building its pools on CC-IN2P3, and its grid (\code{tp3\_synfte[32k]\_*}, the equal-data grid's $132$ cells) goes
-    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Zero-shot: done, up to an affine map (\code{fig:zero\_shot\_gain}). Before any fine-tune grid from an hp73
+    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Before any fine-tune grid from an hp73
     parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in \code{trial\_0073\_r<k>}) and point the
     configs at it. The equal-data rungs' parents are hp73 alone, the ladder's fine-tunes use each rung's best-of-search
     parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every comparison of the two says so, or uses the ladder
