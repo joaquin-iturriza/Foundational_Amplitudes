@@ -13,8 +13,12 @@ import siteconf
 
 prefix = sys.argv[1]
 out = {}
-for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):   # = SWEEP_DIR except on lxplus (EOS)
-    name = os.path.basename(sdir)
+# a sweep's trials write to RESULTS_DIR (= SWEEP_DIR except on lxplus, EOS); a fixed-HP run (sweep/run_fixed_hp.py)
+# writes results/fixed.json under SWEEP_DIR (AFS on lxplus), so both are read
+names = sorted({os.path.basename(d) for root in {siteconf.RESULTS_DIR, siteconf.SWEEP_DIR}
+                for d in glob.glob(os.path.join(root, prefix + "*"))})
+for name in names:
+    sdir = os.path.join(siteconf.RESULTS_DIR, name)
     trials, cand = [], None
     try:                                       # the DyHPO state: start-up candidates and evaluation order
         import pickle
@@ -66,5 +70,26 @@ for sdir in sorted(glob.glob(os.path.join(siteconf.RESULTS_DIR, prefix + "*"))):
         trials.append(dict(hp=hp, T=T, prepd_std=std, lr=lr, **({"fine_tune": ft} if ft else {}),
                           **({"hps": hps} if hps else {}),
                           **({"startup": hp in startup, "order": order.get(hp)} if startup is not None else {}), **r))
-    out[name] = trials
+    for fx in {os.path.join(root, name, "results", "fixed.json") for root in (siteconf.RESULTS_DIR, siteconf.SWEEP_DIR)}:
+        if not os.path.exists(fx):
+            continue
+        # one fixed-HP run: its dir is runs/<name> itself (run_fixed_hp.py), hp = -1
+        r = json.load(open(fx))
+        run = os.path.join(siteconf.PROJECT_DIR, "runs", name)
+        std = lr = hps = ft = T = None
+        if os.path.exists(os.path.join(run, "data_stats.json")):
+            std = json.load(open(os.path.join(run, "data_stats.json")))["prepd_std"][0]
+        if os.path.exists(os.path.join(run, "config.yaml")):
+            c = yaml.safe_load(open(os.path.join(run, "config.yaml")))
+            lr, T = c["training"]["lr"], c["training"].get("iterations")
+            hps = {"lambda": c["training"].get("regularization_lambda"), "warmup": c["training"].get("cosanneal_warmup_frac"),
+                   "eta_min": c["training"].get("cosanneal_eta_min"), "ema": c.get("ema"),
+                   "ema_decay": c["training"].get("ema_decay")}
+            if (c.get("fine_tune") or {}).get("pretrained_path"):
+                ft = {k: c["fine_tune"].get(k) for k in ("lr_scale", "layer_decay")}
+        trials.append(dict(hp=-1, T=T, fixed=True, prepd_std=std, lr=lr, **({"fine_tune": ft} if ft else {}),
+                           **({"hps": hps} if hps else {}), **r))
+        break
+    if trials or os.path.isdir(sdir):
+        out[name] = trials
 json.dump(out, sys.stdout)
