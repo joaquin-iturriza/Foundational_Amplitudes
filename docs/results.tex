@@ -4968,6 +4968,12 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
   \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
     from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
+  \item \textbf{Progressively larger synthetic catalogs} (the user's call, 2026-10-07). Pretrain on $10^2$, $10^{2.5}$ and
+    $10^3$ synthetic processes (now $19$, \code{transfer\_synthetic.yaml}) and fine-tune on the probes, to see whether
+    transfer from synthetic amplitudes grows with the catalog. How these datasets are generated needs care: the design (which
+    structures the generator draws and from what distributions, events per process, total events, steps and therefore
+    run length) is agreed with the user \emph{before} anything is generated or run. The longer pretrainings' horizon is
+    still to be decided. Nothing started.
   \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
     $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
     prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
