@@ -64,9 +64,14 @@ What changed, and why
    physical identity, as their converter un-crosses initial legs); propagator labels
    from the edge PDG, with MadGraph's arbitrary sign on self-conjugate particles
    (``-22``, ``-23``, ...) folded. A flavour-summed process (several subprocesses) pools
-   over the diagrams of all of them; loop diagrams (one-loop datasets) are graphs like
-   the trees. They have neither case. ``per_diagram`` (one prefix token per diagram) has
-   no analogue without prefix tokens and is refused by the wrapper.
+   over the diagrams of all of them: a deliberate deviation, since their converter
+   (``generate_diagram_jsons.py``, ``amplitude_index=0``) keeps only the first
+   subprocess's amplitude. Loop diagrams (one-loop datasets) are graphs like the trees;
+   they have no loop case. The sign of a charged propagator's label comes here from the
+   drawing's line id, there from MadGraph's vertex output leg; the two conventions were
+   not checked to agree (the graph is undirected and the labels are learned embeddings,
+   so a consistent flip only relabels). ``per_diagram`` (one prefix token per diagram)
+   has no analogue without prefix tokens and is refused by the wrapper.
 """
 
 import json
