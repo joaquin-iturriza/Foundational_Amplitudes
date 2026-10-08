@@ -81,6 +81,16 @@ for run_dir in args:
         mu_c, sd_c = float(pstats["prepd_mean"][0]), float(pstats["prepd_std"][0])
         mu_p, sd_p = float(saved["prepd_mean"][0]), float(saved["prepd_std"][0])
         real = float(np.mean(((mu_c + sd_c * h) - (mu_p + sd_p * z)) ** 2))
+        # the distributions behind it, in log|M|^2: the probe's truth, the zero-shot prediction and the prediction after
+        # the best affine map, as 1-D histograms on one binning, and truth against prediction as a 2-D histogram
+        t, q, qa = mu_p + sd_p * z, mu_c + sd_c * h, mu_p + sd_p * (A @ coef)
+        lo, hi = float(min(t.min(), q.min())), float(max(t.max(), q.max()))
+        e = np.linspace(lo, hi, 61)
+        h2 = np.histogram2d(t, q, bins=40, range=[[lo, hi], [lo, hi]])[0]
+        print("ZERO_SHOT_HIST " + json.dumps({
+            "run_dir": run_dir, "edges": e.tolist(), "truth": np.histogram(t, e)[0].tolist(),
+            "pred": np.histogram(q, e)[0].tolist(), "pred_affine": np.histogram(qa, e)[0].tolist(),
+            "h2_range": [lo, hi], "h2": h2.astype(int).tolist()}), flush=True)
     print("ZERO_SHOT " + json.dumps({
         "mse_logm2_real": real, "shared_parent": bool(pstats.get("shared_standardization")),
         "run_dir": run_dir, "parent": str(cfg.fine_tune.pretrained_path), "val_loss": exp.val_loss_no_reg[-1],
