@@ -206,6 +206,67 @@ class PerProcessMicroBatchSampler(Sampler):
         return self._n_batches
 
 
+class RoundRobinMicroBatchSampler(PerProcessMicroBatchSampler):
+    """Batch sampler for training.per_process_accumulation=round_robin: the batching of
+    Bahl, Plehn, Schiller, Sivagnanalingam, arXiv:2606.23791 (their MultiDatasetBatchSampler
+    with one_process_per_batch=True, same_process_grad_accum=1, and the trainer pulling
+    gradient_accumulation_steps micro-batches per optimizer step).
+
+    Every yielded index list is ONE optimizer step: `accum_steps` (G) single-process
+    micro-batches of `m_p = min(microbatch, n_p)` events each, concatenated in schedule order.
+    The schedule is one continuous stream of process slots that the G-windows cut without
+    regard to cycle boundaries, as their trainer pulls G consecutive loader batches:
+      * order="interleaved" (their dataclass default): processes in ascending id order,
+        cycled, 0, 1, ..., P-1, 0, 1, ... A step holds G consecutive processes of the cycle
+        (G distinct ones when G <= P), and every process gets the same number of micro-batches.
+      * order="random" (what their shipped configs set, base_qwen2.yaml): each cycle is a
+        uniform permutation of K slots per process, K = max(1, min_p n_p // microbatch) (their
+        epoch: every process truncated to the smallest one's whole batches); same-process
+        micro-batches may follow each other, also inside a step.
+    The schedule position persists across re-iterations of the loader, so the cycle never
+    restarts at a loader epoch. Within a process, the events come from its own stream (see
+    PerProcessMicroBatchSampler): distinct within a micro-batch, a fresh permutation of the
+    process's training events once one is used up. Their sampler instead truncates every
+    process to the smallest one's size per epoch and, at their default per_epoch_resample=False,
+    replays the same events in the same order every epoch (their trainer.py documents it as a
+    known bug); the streams here are what their per_epoch_resample=True fix intends, without the
+    truncation (here every event of a large process is used).
+    Consecutive same-process micro-batches in a step are one contiguous run of the batch;
+    experiment._split_microbatches cuts it back at m_p.
+    """
+
+    def __init__(self, process_ids, microbatch, accum_steps, order="interleaved", seed=0,
+                 min_batches=100):
+        super().__init__(process_ids, microbatch, seed=seed, min_batches=min_batches)
+        if order not in ("interleaved", "random"):
+            raise ValueError(f"accumulation_order must be interleaved or random, got {order!r}")
+        self.G = int(accum_steps)
+        if self.G < 1:
+            raise ValueError(f"accumulation_steps must be >= 1, got {accum_steps}")
+        self.order = order
+        self.K = max(1, min(len(v) for v in self.proc_indices.values()) // int(microbatch))
+        self._cycle, self._cpos = [], 0
+        mean_m = float(np.mean(list(self.m.values())))
+        self.events_per_step = int(round(self.G * mean_m))   # exact when no process is capped
+        self._n_batches = max(int(min_batches), len(np.asarray(process_ids)) // max(self.events_per_step, 1))
+
+    def _next_proc(self):
+        if self._cpos >= len(self._cycle):
+            if self.order == "interleaved":
+                self._cycle = list(self.procs)
+            else:
+                slots = np.repeat(np.asarray(self.procs), self.K)
+                self._cycle = self.rng.permutation(slots).tolist()
+            self._cpos = 0
+        p = self._cycle[self._cpos]
+        self._cpos += 1
+        return p
+
+    def __iter__(self):
+        for _ in range(self._n_batches):
+            yield np.concatenate([self._draw(self._next_proc()) for _ in range(self.G)]).tolist()
+
+
 class ProcessBalancedSampler(Sampler):
     """
     Yields batches where each process contributes equally (or according to

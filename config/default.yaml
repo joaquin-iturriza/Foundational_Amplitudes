@@ -47,16 +47,28 @@ training:
  # dilutes with many datasets and perturbing the sampling dynamics ends up hurting.
  # Keep it as an opt-in for mixtures of FEW, very unbalanced datasets.
  use_balanced_sampler: false    # true → ProcessBalancedSampler; false → equal/uniform (default)
- # Per-process micro-batches with gradient accumulation (arXiv:2606.23791, Schiller et al.).
- # true: every optimizer step draws one single-process micro-batch per training process
- # (PerProcessMicroBatchSampler: each process its own shuffled stream), backpropagates each
- # process's mean loss with the weight the mixed-batch loss_aggregation gives it, and takes
- # ONE clipped optimizer/scheduler/EMA step on the sum (regularization added once). The
- # update equals the mixed-batch one on the same events (experiment._per_process_step_grads).
+ # Per-process micro-batches with gradient accumulation. per_process_accumulation:
+ #   false (default): the mixed batch.
+ #   all_processes (or true): every optimizer step draws one single-process micro-batch per
+ #     training process (PerProcessMicroBatchSampler: each process its own shuffled stream),
+ #     backpropagates each process's mean loss with the weight the mixed-batch loss_aggregation
+ #     gives it, and takes ONE clipped optimizer/scheduler/EMA step on the sum (regularization
+ #     added once). The update equals the mixed-batch one on the same events
+ #     (experiment._per_process_step_grads). accumulation_microbatch: events per process per
+ #     step; null -> batchsize // P.
+ #   round_robin: the batching of arXiv:2606.23791 (Bahl, Plehn, Schiller, Sivagnanalingam):
+ #     every optimizer step draws accumulation_steps (G) single-process micro-batches of
+ #     accumulation_microbatch (B; null -> batchsize // G) events, processes taken in
+ #     accumulation_order (interleaved: round-robin over all processes, cycling; random: per
+ #     cycle a permutation of K slots per process, what their shipped configs use). The
+ #     gradient is the per-event MEAN over the G*B events, as their trainer (each micro-batch
+ #     weighted 1/G); loss_aggregation does not enter it (RoundRobinMicroBatchSampler,
+ #     experiment._round_robin_step_grads).
  # Not combinable with use_balanced_sampler.
  per_process_accumulation: false
- accumulation_microbatch: null  # events per process per step; null → batchsize // P (same events
-                                # per update as a mixed batch); batchsize → Schiller's P×larger update
+ accumulation_microbatch: null
+ accumulation_steps: 4          # round_robin only: G micro-batches per optimizer step
+ accumulation_order: interleaved  # round_robin only: interleaved | random
  sampler_log_every_n_vals: 10   # log sampler weights every N validation steps (0 = never)
  sampler_alpha_ema: 0.7         # EMA decay applied to per-process val losses before fitting α (0 = no smoothing, 1 = never update)
  sampler_min_alpha_frac: 0.25   # minimum weight as fraction of max weight; extreme-starvation floor for confirmed-plateaued datasets (0.25 = 4:1 cap)

@@ -1891,7 +1891,7 @@ class AmplitudeExperiment(BaseExperiment):
 
     def _init_dataloader(self):
         from dataset import (AmplitudeDataset, collate_variable_length, ProcessBalancedSampler,
-                             PerProcessMicroBatchSampler)
+                             PerProcessMicroBatchSampler, RoundRobinMicroBatchSampler)
 
         N_total = self.N_events
 
@@ -1976,8 +1976,45 @@ class AmplitudeExperiment(BaseExperiment):
         # dilutes with many datasets, perturbing the sampling dynamics hurts); it stays
         # available via training.use_balanced_sampler for few, very unbalanced datasets.
         use_balanced = bool(self.cfg.training.get("use_balanced_sampler", False))
-        self._per_process_accum = bool(self.cfg.training.get("per_process_accumulation", False))
-        if self._per_process_accum:
+        self._accum_mode = self._accumulation_mode(self.cfg.training.get("per_process_accumulation", False))
+        self._per_process_accum = self._accum_mode is not None
+        if self._accum_mode == "round_robin":
+            # arXiv:2606.23791's batching: G single-process micro-batches of B events per
+            # optimizer step, processes in round-robin order; gradient = per-event mean over the
+            # G*B events (_round_robin_step_grads). The loader yields one step's G micro-batches
+            # collated together.
+            if use_balanced:
+                raise ValueError("training.per_process_accumulation and use_balanced_sampler "
+                                 "are exclusive (the former fixes every process's share)")
+            train_proc_ids = self.all_process_ids[train_idx]
+            G = self.cfg.training.get("accumulation_steps", None)
+            G = int(G) if G not in (None, "null", "none") else 4
+            micro = self.cfg.training.get("accumulation_microbatch", None)
+            micro = int(micro) if micro not in (None, "null", "none") else max(1, batchsize // G)
+            order = str(self.cfg.training.get("accumulation_order", "interleaved") or "interleaved")
+            with open_dict(self.cfg):
+                self.cfg.training.accumulation_steps = G
+                self.cfg.training.accumulation_microbatch = micro
+                self.cfg.training.accumulation_order = order
+            seed = self.cfg.get("seed", None)
+            self.train_sampler = None
+            self._accum_sampler = RoundRobinMicroBatchSampler(
+                train_proc_ids, micro, G, order=order, seed=int(seed) if seed is not None else 0)
+            ds = make_dataset(train_idx)
+            self.train_loader = torch.utils.data.DataLoader(
+                ds, batch_sampler=self._accum_sampler, collate_fn=collate_variable_length,
+                pin_memory=False, num_workers=nw, persistent_workers=nw > 0,
+            )
+            capped = {p: m for p, m in self._accum_sampler.m.items() if m < micro}
+            LOGGER.info(
+                f"Round-robin per-process accumulation (arXiv:2606.23791): {G} single-process "
+                f"micro-batches of {micro} events per optimizer step ({G * micro} events/update), "
+                f"order {order} over {len(self._accum_sampler.procs)} processes; gradient = "
+                f"per-event mean over the step's events (training.loss_aggregation is not used "
+                f"for the gradient in this mode); {len(capped)} processes capped at their pool size"
+                + (f" {capped}" if capped else "")
+            )
+        elif self._accum_mode == "all_processes":
             # one single-process micro-batch per process per step, gradients accumulated
             # (_per_process_step_grads); the loader yields them collated and grouped by process
             if use_balanced:
@@ -2840,6 +2877,93 @@ class AmplitudeExperiment(BaseExperiment):
         return loss, loss_no_reg, mse_val
 
     @staticmethod
+    def _accumulation_mode(value):
+        """training.per_process_accumulation -> None (off), "all_processes" or "round_robin".
+        false/null/off: the mixed batch. true/all_processes: one micro-batch from every process
+        per step, combined with the loss_aggregation weights (_per_process_step_grads).
+        round_robin: arXiv:2606.23791's batching (_round_robin_step_grads)."""
+        if value is None or value is False:
+            return None
+        if value is True:
+            return "all_processes"
+        v = str(value).strip().lower()
+        if v in ("false", "none", "null", "off", "0", ""):
+            return None
+        if v in ("true", "all_processes", "1"):
+            return "all_processes"
+        if v == "round_robin":
+            return "round_robin"
+        raise ValueError(f"training.per_process_accumulation: unknown mode {value!r} "
+                         "(false | all_processes | round_robin)")
+
+    def _split_microbatches(self, data):
+        """Cut one round-robin step (RoundRobinMicroBatchSampler) back into its single-process
+        micro-batches: contiguous runs of one process, each run cut at that process's
+        micro-batch size m_p (two consecutive slots of one process form one run of 2 m_p).
+        Pure CPU slicing, no device sync."""
+        particles, y, tokens, order_labels, ptr, process_ids = data
+        procs, counts = torch.unique_consecutive(process_ids, return_counts=True)
+        m = self._accum_sampler.m
+        bounds, e = [0], 0
+        for p, c in zip(procs.tolist(), counts.tolist()):
+            step = int(m[p])
+            for k in range(step, c + step, step):
+                bounds.append(e + min(k, c))
+            e += c
+        pt = ptr.tolist()
+        out = []
+        for e0, e1 in zip(bounds[:-1], bounds[1:]):
+            a0, a1 = pt[e0], pt[e1]
+            out.append((particles[a0:a1], y[e0:e1], tokens[a0:a1], order_labels[e0:e1],
+                        ptr[e0:e1 + 1] - a0, process_ids[e0:e1]))
+        return out
+
+    def _round_robin_step_grads(self, data):
+        """Gradient of one update under training.per_process_accumulation=round_robin, the
+        batching of arXiv:2606.23791 (Bahl, Plehn, Schiller, Sivagnanalingam), as their
+        trainer.py _step does it: G single-process micro-batches pulled per optimizer step,
+        each backpropagated as (its mean per-event loss) / G, one optimizer step on the sum.
+
+        Here each micro-batch's mean loss l_k is weighted by its event share n_k / N
+        (N = sum_k n_k): the accumulated gradient is that of the per-event MEAN over the
+        step's N = G*B events, which is their 1/G weighting whenever every micro-batch holds
+        B events (always, in their code: drop_last, and a process smaller than B is refused;
+        here such a process is capped at its pool size and its micro-batch counts by its events).
+        This is the faithful combination and the only one this mode uses: training.loss_aggregation
+        (geometric_mean, excess, tau) does not enter the gradient. With full micro-batches it
+        equals the arithmetic mean over the step's micro-batches of their process means, i.e.
+        loss_aggregation=mean restricted to the G processes the step holds.
+        Their loss is a per-token mean over a generative sequence; ours is the per-event loss
+        (_aggregate_per_process_loss on one process, sign-head term included), the same up to
+        what a 'unit' is. Regularization (and EWC) is backpropagated once, after the
+        micro-batches. Returns (loss, loss_no_reg, mse_val) detached, as _batch_loss.
+        """
+        micro = self._split_microbatches(data)
+        N = sum(len(mb[1]) for mb in micro)
+        self.optimizer.zero_grad()
+        agg, mse_sum = None, None
+        for mb in micro:
+            y_pred, y, pids, sigma, mse_val = self._forward_lloca(mb)
+            ell = self._aggregate_per_process_loss(y_pred, y, pids, "mean", sigma=sigma,
+                                                   sign=self._last_sign)
+            w = len(y) / N
+            (ell * w).backward()
+            agg = ell.detach() * w if agg is None else agg + ell.detach() * w
+            if mse_val is not None:
+                mse_sum = mse_val * w if mse_sum is None else mse_sum + mse_val * w
+
+        reg = self.regularization_lambda * self.regularization(self.model)
+        if getattr(self, "ewc", None) is not None:
+            reg = reg + (self.cfg.fine_tune.ewc.get("lambda", 1000.0) / 2.0) * self.ewc.penalty(self.model)
+        if torch.is_tensor(reg) and reg.requires_grad:
+            reg.backward()
+        reg_val = reg.detach() if torch.is_tensor(reg) else reg
+        loss = agg + reg_val
+        if os.environ.get("LLOCA_SYNC", "deferred") == "blocking":
+            assert torch.isfinite(loss).all()
+        return loss, agg, mse_sum
+
+    @staticmethod
     def _split_by_process(data):
         """Cut a collated batch whose events are grouped by process (PerProcessMicroBatchSampler)
         into one collated single-process micro-batch per process, in the batch's order.
@@ -2858,8 +2982,10 @@ class AmplitudeExperiment(BaseExperiment):
         return out
 
     def _per_process_step_grads(self, data):
-        """Gradient of one update under training.per_process_accumulation (Schiller et al.,
-        arXiv:2606.23791): one single-process micro-batch per process, accumulated into .grad.
+        """Gradient of one update under training.per_process_accumulation=all_processes (true):
+        one single-process micro-batch per process, accumulated into .grad. (Not
+        arXiv:2606.23791's scheme, which is the round_robin mode: _round_robin_step_grads,
+        dispatched from here.)
 
         Leaves in .grad EXACTLY the gradient the mixed-batch loss has on the union of the
         micro-batches, so the only difference between the modes is how a batch is composed.
@@ -2889,6 +3015,8 @@ class AmplitudeExperiment(BaseExperiment):
         never P times. Returns (loss, loss_no_reg, mse_val) as detached tensors, the same
         quantities _batch_loss returns, for the logging and the NaN guard in _step.
         """
+        if getattr(self, "_accum_mode", "all_processes") == "round_robin":
+            return self._round_robin_step_grads(data)
         micro = self._split_by_process(data)
         P = len(micro)
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
