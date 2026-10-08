@@ -96,6 +96,11 @@ write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits
 
 lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
 
+# A lock exempts its pillar from `gate` only while fresh. A reviewer whose `advance` never ran (it was refused by the
+# permission check on 2026-10-06) left both locks in place for two days, and the gate stood down the whole time.
+LOCK_TTL_MIN=180
+lock_fresh() { local f; f=$(lock_file "$1"); [ -f "$f" ] && [ -n "$(find "$f" -mmin -"$LOCK_TTL_MIN" 2>/dev/null)" ]; }
+
 # Which reviewer owns a repo-relative path (empty = ungated).
 pillar_for_path() {
   case "$1" in
@@ -167,7 +172,7 @@ except Exception: print("")' 2>/dev/null)
     case "$rel" in /*) exit 0 ;; esac          # outside the repo (scratchpad etc.)
     who=$(pillar_for_path "$rel")
     [ -z "$who" ] && exit 0
-    [ -f "$(lock_file "$who")" ] && exit 0     # reviewer (or human) holds the lock
+    lock_fresh "$who" && exit 0                # reviewer (or human) holds a fresh lock
 
     lt=$(pillar_field "$who" 2); ct=$(pillar_field "$who" 3)
     set -- $(backlog_for "$who")
@@ -202,6 +207,7 @@ except Exception: print("")' 2>/dev/null)
       set -- $(backlog_for "$who")
       l="${1:-0}"; c="${2:-0}"
       if [ "$l" -ge "$lt" ] || [ "$c" -ge "$ct" ]; then s="DUE (>= $lt lines or $ct commits)"; else s="ok"; fi
+      if [ -f "$(lock_file "$who")" ]; then lock_fresh "$who" && s="$s, locked" || s="$s, STALE lock (no longer exempts)"; fi
       printf '%-18s %8s %8s   %s\n' "$who" "$l/$lt" "$c/$ct" "$s"
     done
     exit 0
@@ -211,7 +217,14 @@ except Exception: print("")' 2>/dev/null)
     input="$(cat 2>/dev/null || true)"
     # Already nudged in this stop sequence -> let it through (no infinite loop; also the
     # deliberate-pause escape). The watermark is untouched, so it fires again next turn.
-    case "$input" in *'"stop_hook_active"'*true*) exit 0 ;; esac
+    # The harness sets stop_hook_active on every stop that follows a block, and a session driven by /goal stops that
+    # way all the time: exiting on it silenced this check from 2026-10-05 to 2026-10-08. So it is throttled instead:
+    # with stop_hook_active it nudges at most once per NUDGE_EVERY_MIN, which still cannot loop.
+    NUDGE_EVERY_MIN=30
+    nudged="$REPO/$STATE_REL/.last_nudge"
+    case "$input" in *'"stop_hook_active"'*true*)
+      [ -n "$(find "$nudged" -mmin -"$NUDGE_EVERY_MIN" 2>/dev/null)" ] && exit 0 ;;
+    esac
 
     br="$(git symbolic-ref --quiet --short HEAD 2>/dev/null)" || exit 0
     [ -z "$br" ] && exit 0
@@ -252,6 +265,7 @@ except Exception: print("")' 2>/dev/null)
     msg="$msg Ending the turn instead is not a pause: the PreToolUse gate will refuse your next edit"
     msg="$msg to these files until the reviewer has run. \`review_backlog.sh status\` lists all backlogs."
 
+    mkdir -p "$REPO/$STATE_REL"; : > "$nudged"
     esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
     printf '{"decision":"block","reason":"%s"}\n' "$esc"
     exit 0
