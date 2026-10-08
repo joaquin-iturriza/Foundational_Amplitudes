@@ -664,8 +664,11 @@ longer reads as one argument) are invisible to a per-hunk review.
 turn, without asking me** — a hook cannot spawn a subagent, so I am the part that
 executes it. If the nudge is skipped, `review_backlog.sh gate`
 (`PreToolUse(Edit|Write)`) refuses further edits to the overdue pillar until its
-reviewer runs, so ending the turn stalls rather than pauses. Commits and every pillar
-under threshold stay unblocked.
+reviewer runs, so ending the turn stalls rather than pauses. Shell writes count too:
+`bashpost` (`PostToolUse(Bash)`) blocks when a command changed an overdue pillar's files,
+and `bashpre` (`PreToolUse(Bash)`) refuses a `git commit` while an overdue, unlocked
+pillar has uncommitted changes. Pillars under threshold stay unblocked; a lock expires
+after 180 min.
 
 `status` lists backlogs and `/review-now` runs reviewers on demand; `begin <name>`
 takes a pillar's lock and `advance <name>` releases it on a pass (`begin` is also the
