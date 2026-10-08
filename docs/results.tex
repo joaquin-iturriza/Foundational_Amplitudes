@@ -5018,8 +5018,8 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     nothing new goes there. CC-IN2P3 back since 2026-10-07 evening. \textbf{Loops} (background shells, lost on a restart): rebalancer + CC feeder every
     $20$ min (\code{--allow-jeanzay --no-dest jeanzay --exclude tp3\_eqd\_r tp3\_finfte\_ tp3\_synfte\_}); watchdog on
     CC-IN2P3 and lxplus (\code{--sites ccin2p3 lxplus --stall-site lxplus=240}), Jean Zay added when it answers; a waiter on
-    Jean Zay coming back. \textbf{To do, design first with the user:} larger synthetic catalogs ($10^2$, $10^{2.5}$,
-    $10^3$; hand-off item). \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
+    Jean Zay coming back. \textbf{To do, design first with the user:} larger catalogs ($10^2$, $10^{2.5}$,
+    $10^3$; real processes first, 2026-10-08; hand-off item). \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
     $41$ synthetic) with fewer than $5$ results stop their search (held on lxplus, $255$ jobs, and CC-IN2P3, $46$; on Jean
     Zay excluded from the rebalancer) and run once at the reference cell's best point instead (rung $9$'s on the same
     probe and $D$, the star arm's on its own probe), \code{analysis/transfer/lad\_chunks/} ($9$ chunks on CC-IN2P3,
@@ -5153,12 +5153,12 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
   \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
     from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
-  \item \textbf{Progressively larger synthetic catalogs} (the user's call, 2026-10-07). Pretrain on $10^2$, $10^{2.5}$ and
-    $10^3$ synthetic processes (now $19$, \code{transfer\_synthetic.yaml}) and fine-tune on the probes, to see whether
-    transfer from synthetic amplitudes grows with the catalog. How these datasets are generated needs care: the design (which
-    structures the generator draws and from what distributions, events per process, total events, steps and therefore
-    run length) is agreed with the user \emph{before} anything is generated or run. The longer pretrainings' horizon is
-    still to be decided. Nothing started.
+  \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
+    not synthetic ones, ``at first at least'', 2026-10-08, \code{site} decision D15). Pretrain on $10^2$, $10^{2.5}$ and
+    $10^3$ processes (the ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the
+    catalog. The design (which processes, events per process, total events, steps and therefore run length) is agreed
+    with the user \emph{before} anything is generated or run. \code{catalog\_v2\_train.yaml} holds $400$ processes, so
+    $10^2$ and $10^{2.5}$ are subsets of it and $10^3$ needs about $600$ new ones. Nothing started.
   \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
     $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
     prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
@@ -5398,9 +5398,9 @@ is found among the events' invariant masses. The permutation average is not test
 What it keeps: real particles and masses, real kinematics and cuts, Lorentz invariance, the mass dimension, poles at
 propagator masses with Breit--Wigner shapes, collinear-like $1/s_{ij}$ singularities, running $\alpha_s$, Bose and Fermi
 relabelling symmetry, and diagram sidecars that describe the function exactly.
-Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}): fine-tuned from it, the model
-beats scratch on most cells but is below rung $9$ (median $-0.24$\,dex over all $84$ cells, better in $33\%$,
-Wilcoxon $p=2\times10^{-6}$): it transfers something, less than real data.
+Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}, $8$k grid): fine-tuned from
+it, the model beats scratch in $66$ of $84$ cells and stays within a factor $1.7$ of rung $9$ at the median (median over
+probes $-0.23$\,dex, better than rung $9$ on $3$ of $12$, $p=0.034$).
 
 \subsection{What it costs to generate}
 Per core, through \code{build\_mixture\_dataset} with the mixture policy (\code{tools/bench\_synthetic.py},
@@ -5423,8 +5423,8 @@ sampler's own ceiling. On top of the rate, a real process needs a MadGraph outpu
 first event ($432$ compiles for the $478$-entry catalog; their time was never recorded separately), and a one-loop one
 its certification; a synthetic process needs neither.
 
-What this means for the planned larger catalogs (hand-off, ``Progressively larger synthetic catalogs''): $10^3$
-processes at $1.2\times10^5$ events each are $1.2\times10^8$ events, at $\sim5\times10^4$ per core-second about
+What this would mean for larger synthetic catalogs (the hand-off's larger catalogs are real processes first, the user's
+call of 2026-10-08): $10^3$ processes at $1.2\times10^5$ events each are $1.2\times10^8$ events, at $\sim5\times10^4$ per core-second about
 $0.7$ core-hours, minutes on one node. The real catalog took about six CPU-hours plus the compiles for $478$ entries,
 also small next to a $64$k-step pretraining (about $7$ GPU-hours). So at these sizes generation speed is not what
 decides: neither side's generation is the bottleneck. What the synthetic prior buys is the \emph{number of distinct
