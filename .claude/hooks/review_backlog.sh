@@ -237,7 +237,10 @@ except Exception: print("")' 2>/dev/null)
     fi
     # bashpost
     for who in $overdue; do
-      before=$(cat "$REPO/$STATE_REL/.fp_$who" 2>/dev/null)
+      # no fingerprint from bashpre in this checkout (the command moved the shell into another worktree): nothing to
+      # compare, record one now; the commit gate still covers that checkout
+      [ -f "$REPO/$STATE_REL/.fp_$who" ] || { fingerprint "$who" > "$REPO/$STATE_REL/.fp_$who"; continue; }
+      before=$(cat "$REPO/$STATE_REL/.fp_$who")
       [ "$(fingerprint "$who")" = "$before" ] && continue
       msg="BLOCKED by review-backlog: that command changed files of the $who pillar, which is past its review"
       msg="$msg threshold (any write counts, editor or shell). The change is on disk but cannot be committed until"
