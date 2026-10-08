@@ -17,6 +17,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{float}          % the [H] specifier
+\usepackage{tikz}           % small diagrams (sec:syn-qft)
 \graphicspath{{figs/}{../analysis/hpo_optima/}{../analysis/scaling_compute/}{../sweeps/pretraining_scaling/}{../compare_models/figs/}{../compare_models/_levers_ab/}{../plots/}{../analysis/divergences/figs/}{../analysis/divergences/}}
 \usepackage{xcolor}
 \usepackage[colorlinks=true, linkcolor=blue!55!black, citecolor=blue!55!black]{hyperref}
@@ -4976,9 +4977,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{tp3\_accrrfte32k\_*\_d8}; parent on lxplus) and add their points to \code{expect\_tp3.json}. \textbf{Diagram
     arm (\code{tp3\_levdiagl})}: two smoke runs idle on lxplus (\code{FA-lxplus-e9ecb3df} 12\,GB, \code{FA-lxplus-3bed56fe}
     9\,GB): no GPU slot free (\code{condor\_q -better-analyze}: 0 willing); \code{site pick} wrongly counts unclaimed
-    partitionable leftovers (V100 slots with 4\,GB, 0 CPUs) as free GPUs; waiter \code{b51jh31e4}. \textbf{Results not yet
-    written up}: the lever arms' $D=10^4$ cells are now complete for all four arms (off-shellness and generation
-    $24/24$); the finale $32$k is at $118/138$ points. \textbf{Decisions since 10:40}: CLAUDE.md's commit-gate line
+    partitionable leftovers (V100 slots with 4\,GB, 0 CPUs) as free GPUs; waiter \code{b51jh31e4}. \textbf{Decisions since 10:40}: CLAUDE.md's commit-gate line
     updated (the user's call); the user approved building decision and work-item registers into the \code{site} tool
     (\code{~/work/CLAUDE.md} to document them). \textbf{That build}: \code{site} with \code{decide}, \code{item},
     \code{events}, \code{ack}, \code{supervise}, \code{selftest}, \code{guard} is written and tested on copies at
@@ -5160,7 +5159,20 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     $10^3$ processes (the ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the
     catalog. The design (which processes, events per process, total events, steps and therefore run length) is agreed
     with the user \emph{before} anything is generated or run. \code{catalog\_v2\_train.yaml} holds $400$ processes, so
-    $10^2$ and $10^{2.5}$ are subsets of it and $10^3$ needs about $600$ new ones. Nothing started.
+    $10^2$ and $10^{2.5}$ are subsets of it and $10^3$ needs about $600$ new ones. Settled so far (2026-10-08): our
+    sampler and $\sqrt s$ window as now (no PDF sampling; D17), gluon-initiated processes added ($gg$, $qg$; D16).
+    Candidate source for $10^3$: the $1501$-process list of arXiv:2606.23791 (\code{process\_catalog\_sm.json}, tree level,
+    up to $2\to3$, pp partons), $484$--$779$ distinct classes under our relabelling rules (liberal and conservative
+    rule-based bounds, not the numerical equality test), $75$--$78$ of them already in our catalog; their stored events
+    carry no $|\mathcal M|^2$, so each process would go through our pipeline. Still open: subsets, events per process,
+    steps, fine-tune grid, and whether $10^3$ waits for $10^2$ and $10^{2.5}$. Nothing started.
+  \item \textbf{Synthetic prior: possible extensions} (from Sec.~\ref{sec:syn-qft}; none started, each a design to agree
+    with the user): enforce quark-generation conservation in the drawn processes; a ladder of priors with increasing
+    structure (legal SM vertices only, then spinor-helicity numerators with the right helicity weights, then gauge
+    invariance) to measure how much structure transfer needs; an eikonal soft factor for emitted gluons and photons;
+    higher multiplicities; and one-loop features, built as random coefficients times the real scalar one-loop integrals
+    (tadpole, bubble, triangle, box), so logarithms, thresholds, imaginary parts and sign changes come out right by
+    construction.
   \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
     $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
     prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
@@ -5295,6 +5307,7 @@ internal lines. With all momenta outgoing ($q_{a,b}=-p_{a,b}$, $q_f=p_f$), an in
 legs) with invariant
 \begin{equation}
   s_S=\Big(\sum_{i\in S}q_i\Big)^2,
+  \label{eq:syn-sS}
 \end{equation}
 \emph{s-type} when $S$ holds only final legs ($s_S>0$), \emph{t-type} when it separates the two beams. The particle on the
 line is drawn from those with the channel's charge $Q_S=\sum_{i\in S}Q_i$:
@@ -5311,6 +5324,7 @@ $K_\text{max}$ is a hand-set bound that grows with multiplicity, as the real dia
   D_S^{\,e}\quad\text{with}\quad D_S=s_S-M_S^2+i\,M_S\Gamma_S,\qquad
   \Gamma_S=\begin{cases} r_X M_S & \text{s-type, } M_S>0,\\ 0 & \text{otherwise,}\end{cases}\qquad
   \log r_X\sim\mathcal U[\log10^{-3},\log10^{-1}]
+  \label{eq:syn-prop}
 \end{equation}
 ($r_X$ one per particle species $X$ in the process), and power $e=1$ for $M_S>10$\,GeV, $e\sim\mathcal U\{\tfrac12,1\}$
 for a massless or light ($b$) line; a massless line with $e=\tfrac12$ enters as $|s_S|^{1/2}$. A massless or light line is
@@ -5348,6 +5362,7 @@ amplitude. The couplings are
 \begin{equation}
   g(\sqrt s)=(4\pi)^n\,\alpha^{\,n-k_s}\,\alpha_s(\sqrt s)^{k_s},\qquad
   \alpha_s(\mu)=\frac{\alpha_s(M_Z)}{1+\alpha_s(M_Z)\,b_0\ln(\mu^2/M_Z^2)},\quad b_0=\frac{33-2\cdot5}{12\pi},
+  \label{eq:syn-coup}
 \end{equation}
 $\alpha_s(M_Z)=0.118$, $\alpha=1/132.507$, and $k_s=\min\!\big(n,\;n_g+\mathrm{Bin}(n-n_g,0.3)\big)$ if any leg is
 coloured ($n_g$ the external gluons), else $0$.
@@ -5377,6 +5392,120 @@ gives the same structure and the same pool on every interpreter, and no two name
 conserve momentum, keep legs on shell and $\sqrt s$ in its window, and are finite and positive; every sidecar propagator
 is found among the events' invariant masses. The permutation average is not tested separately.
 
+\subsection{The ingredients next to real QFT}\label{sec:syn-qft}
+Each piece of the generator is set here beside what it imitates in a real tree-level calculation, with the notation
+spelled out.
+
+\paragraph{Momenta: $p$ and $q$.} The $p$ are the physical momenta: $p_a,p_b$ of the beams, $p_f$ of the final
+particles, with $p_a+p_b=\sum_f p_f$. The amplitude literature treats every leg as outgoing: an incoming particle of
+momentum $p$ is an outgoing one of momentum $q=-p$ (crossing). Then $q_{a,b}=-p_{a,b}$, $q_f=p_f$, and momentum
+conservation reads $\sum_{i=1}^N q_i=0$ over all $N=n+2$ legs. Its use here: the momentum on any internal line is the sum
+of the $q$ on one side of it, whatever side the beams are on.
+
+\paragraph{Diagrams: cubic trees, $K$ and $K_\text{max}$.} A tree-level Feynman diagram with only three-line vertices
+(as gauge theories' $f\bar f V$ and $VVV$ vertices are) is a \emph{cubic tree}. The generator builds one at random:
+every leg starts as its own cluster; two clusters chosen at random are joined at a new vertex, and the line leaving that
+vertex is a propagator carrying the sum of their momenta; this repeats until three clusters remain, which meet at the
+last vertex. For legs $1$--$5$:
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,thick]
+  \coordinate (A) at (0,0); \coordinate (B) at (2,0); \coordinate (C) at (4,0);
+  \draw (-1,0.7) node[left]{$1$} -- (A); \draw (-1,-0.7) node[left]{$2$} -- (A);
+  \draw (A) -- node[above]{$q_3{+}q_4{+}q_5$} (B); \draw (B) -- (2,-1) node[below]{$5$};
+  \draw (B) -- node[above]{$q_3{+}q_4$} (C); \draw (C) -- (5,0.7) node[right]{$3$}; \draw (C) -- (5,-0.7) node[right]{$4$};
+  \foreach \p in {A,B,C} \fill (\p) circle (2pt);
+\end{tikzpicture}
+\end{center}
+merges $\{3,4\}$, then $\{5,\{3,4\}\}$; $\{1\}$, $\{2\}$ and $\{3,4,5\}$ meet at the left vertex. A cubic tree on $N$ legs
+always has $N-3$ internal lines. $K$ is how many such diagrams one synthetic amplitude sums over, and $K_\text{max}$
+($3$, $5$, $6$ at $4$, $5$, $6$ legs) its hand-set ceiling. Real counts for comparison: $e^+e^-\to\mu^+\mu^-$ has $2$
+diagrams ($\gamma$ and $Z$), $e^+e^-\to u\bar ug$ $4$, $e^+e^-\to u\bar ugg$ tens; they grow far faster than $K_\text{max}$.
+
+\paragraph{Channels: $s$-type and $t$-type.} Cutting one internal line splits the legs into a set $S$ and the rest; the
+line's momentum is $\sum_{i\in S}q_i$ and $s_S$ (Eq.~\eqref{eq:syn-sS}) is its square, the virtuality $p^2$ of that propagator.
+\emph{s-type}: $S$ holds only final particles, e.g.\ $S=\{\mu^+,\mu^-\}$ in $e^+e^-\to Z\to\mu^+\mu^-$, where
+$s_S=(p_{\mu^+}+p_{\mu^-})^2>0$ is the pair's invariant mass squared; only such a line can sit on a resonance.
+\emph{t-type}: $S$ holds one beam and some finals, e.g.\ the $t$-channel photon of Bhabha scattering,
+$S=\{e^-_\text{in},e^-_\text{out}\}$, $s_S=(p_\text{out}-p_\text{in})^2=t\le0$: spacelike, it never reaches a pole.
+
+\paragraph{Propagators, Eq.~\eqref{eq:syn-prop}.} A real unstable particle of mass $M$ and width $\Gamma$ propagates as
+$i/(p^2-M^2+iM\Gamma)$, times a spin numerator for fermions and vectors. A single $s$-channel resonance then gives in
+$|\mathcal M|^2$
+\begin{equation*}
+  \frac1{|D|^2}=\frac1{(s-M^2)^2+M^2\Gamma^2},
+\end{equation*}
+the Breit--Wigner peak of $e^+e^-\to\mu^+\mu^-$ at $\sqrt s=M_Z$. In nature $\Gamma$ is fixed by the couplings
+($\Gamma_Z/M_Z=0.027$, $\Gamma_t/m_t=0.008$); the generator draws $\Gamma/M$ in $[10^{-3},0.1]$ independently of $M$, so
+the ratios span the real ones without a width the model could memorise per mass. A $t$-type line gets $\Gamma=0$: its
+$p^2$ never reaches $M^2$, so a width would change nothing, in nature as here.
+
+\paragraph{The power $e=1$ or $\tfrac12$.} It stands in for what spin does to a massless line. The line has
+propagator $1/s_{ij}$, but in a gauge theory the numerator vanishes like $\sqrt{s_{ij}}$ when $i$ and $j$ become
+collinear (angular momentum: helicity is conserved along the line), so the amplitude goes as $1/\sqrt{s_{ij}}$ and
+$|\mathcal M|^2$ as $1/s_{ij}$, the collinear factorisation
+\begin{equation*}
+  |\mathcal M_{n+1}|^2\;\xrightarrow{\;i\parallel j\;}\;\frac{2g^2}{s_{ij}}\,P(z)\,|\mathcal M_n|^2 ,
+\end{equation*}
+with $P(z)$ the splitting function of the momentum fraction $z$. The synthetic numerators are random polynomials and do
+not vanish there, so a massless line (and the light $b$, $4.7$\,GeV) is given power $\tfrac12$ half the time to reproduce the $1/s_{ij}$ in
+$|\mathcal M|^2$; power $1$ gives the stronger $1/s_{ij}^2$. A massive line ($M>10$\,GeV) always has $e=1$: its pole is at
+$M^2\ne0$, there is no collinear limit, and the real numerator does not vanish at the pole. The protection rule (a
+massless line only where the cuts keep $s_S$ away from $0$) is the reason real event generation needs cuts too: without
+them $|\mathcal M|^2$ is infinite on a region of phase space.
+
+\paragraph{Helicity amplitudes.} Real particles carry spin states: helicity $\pm\tfrac12$ for fermions, $\pm1$ for
+photons and gluons. The amplitude is computed for each helicity configuration $\lambda$ of all legs; diagrams of one
+configuration add as complex numbers and interfere, different configurations add as squares, and an unpolarised
+measurement averages over the beams' spins,
+\begin{equation*}
+  |\mathcal M|^2_\text{unpol}=\frac14\sum_\lambda\Big|\sum_d\mathcal M_d(\lambda)\Big|^2 .
+\end{equation*}
+In $e^+e^-\to\mu^+\mu^-$ (massless) four helicity combinations are non-zero, two giving $(1+\cos\theta)^2$ and two
+$(1-\cos\theta)^2$, which sum to the familiar $1+\cos^2\theta$. The generator copies this \emph{shape}: $H$ ``helicities'', each a coherent sum over
+the $K$ diagrams with its own random coefficients, squared and summed (Eq.~\eqref{eq:syn}). They are not tied to actual
+spins: no selection rule makes one vanish.
+
+\paragraph{Numerators, and the notation $s_{\pi_{mj}}$.} The pair invariants are $s_{ij}=(q_i+q_j)^2$, one per pair of
+legs, $N(N-1)/2$ of them ($s_{12},s_{13},s_{14},s_{23},s_{24},s_{34}$ at $N=4$). A numerator $P_{hd}$ of degree $\delta$ is a
+sum of $1$--$3$ monomials, each a product of $\delta$ pair invariants; $\pi_{mj}$ is the pair drawn at random for the
+$j$-th factor of monomial $m$. A degree-$2$ example at $N=4$: $P=a_1\,s_{13}s_{24}+a_2\,s_{12}^2$. All monomials of one
+numerator share the degree, which keeps the mass dimension fixed. In real theories the numerators come out of the spin
+sums as polynomials in the same invariants: $e^+e^-\to\gamma^*\to\mu^+\mu^-$ (massless) has
+$|\mathcal M|^2=2e^4(t^2+u^2)/s^2$, Compton scattering $-2e^4(u/s+s/u)$, with $t=s_{13}$, $u=s_{14}$ in the all-outgoing
+labels.
+
+\paragraph{The amplitude, Eq.~\eqref{eq:syn}, against a real one.} A real tree-level result has the same skeleton,
+$\tfrac14\sum_\lambda|\sum_d(\text{couplings})\times N_d(\lambda)/\prod D|^2$: Feynman rules fix the numerators $N_d$, the
+propagator powers and the couplings, and they produce numerators of exactly the degree the mass dimension needs. The
+generator draws the degrees at random, so the factor $s^{-k/2}$, which has no real counterpart, restores the dimension.
+The average over permutations of identical final particles reproduces what Bose and Fermi symmetry build into a real
+amplitude.
+
+\paragraph{Dimension counting.} In natural units an amplitude with $N$ external legs has mass dimension $4-N$ (it is
+what makes the cross-section an area once the phase-space integral is done; a $2\to2$ amplitude such as $e^2\,t/s$ is a
+pure number), so $|\mathcal M|^2$ has dimension $8-2N$. One synthetic term has: numerator of degree $\delta$ in the
+$s_{ij}$, $+2\delta$; the factor $s^{-k/2}$, $-k$; propagators of dimension $2$ each raised to $e_S$, $-2E_d$ in all.
+Requiring $2\delta-k-2E_d=4-N$ gives $k=2\delta-2E_d-4+N$. Check: $N=4$, $\delta=1$, one propagator with $e=1$ gives $k=0$,
+and $c\,s_{13}/D$ is dimensionless, as a $2\to2$ amplitude must be.
+
+\paragraph{Couplings, Eq.~\eqref{eq:syn-coup}, and $k_s$.} A $2\to n$ tree with three-line vertices has $n$ vertices, each bringing a
+coupling $g$ ($e$ for an electroweak vertex, $g_s$ for a QCD one), so $|\mathcal M|^2\propto\prod_\text{vertices}g^2=
+\prod(4\pi\alpha_\text{v})$: $e^+e^-\to u\bar ug$ goes as $(4\pi\alpha)^2(4\pi\alpha_s)$. $k_s$ is the number of QCD
+vertices: $0$ with no coloured leg; otherwise one per external gluon ($n_g$), plus, for each of the other $n-n_g$ final
+particles, one more with probability $0.3$ (that sum of coin flips is the binomial $\mathrm{Bin}(n-n_g,0.3)$), capped at
+the $n$ vertices. Real orders for comparison: $e^+e^-\to u\bar ug$ $1$, $u\bar u\to gg$ $2$, $u\bar u\to Zg$ $1$; the
+real order is fixed by the process (MadGraph's minimal electroweak order), the synthetic one drawn. $\alpha_s$ runs per
+event at $\mu=\sqrt s$ with the five-flavour one-loop $\beta$ function, as in the real pools.
+
+\paragraph{Flavour, and Feynman rules in general.} The generator conserves only charge, baryon and lepton number, so it
+draws processes such as $uu\to c\,t\,g$. In the SM at tree level with a diagonal CKM matrix the quark generation is
+conserved (no flavour-changing neutral currents; a $W$ turns $u$ into $d$, not into $s$), so that particle list has no
+real counterpart. There was no reason for leaving it out: the generator's vertices are not SM vertices anywhere, and
+flavour on the external legs was not singled out. Not using Feynman rules at all is deliberate: with them the output
+would be real amplitudes, and the prior could no longer test whether transfer needs physics or only ``a smooth
+Lorentz-invariant function with poles at the right places''; it also keeps generation free of spinor algebra and of
+any limit on the number of processes. The price is the structure listed next.
+
 \subsection{How it differs from real amplitudes}
 \begin{itemize}
   \item \textbf{No Feynman rules.} Vertices only conserve charge; nothing ties a propagator's particle to the lines it
@@ -5385,9 +5514,18 @@ is found among the events' invariant masses. The permutation average is not test
     they produce helicity selection rules, angular shapes such as $1+\cos^2\theta$, and gauge cancellations between
     diagrams that keep high-energy growth in check. Random polynomials have none of these; their cancellations are
     accidental.
-  \item \textbf{Soft limits.} The $1/\sqrt{s_{ij}}$ line mimics the collinear pole only. There is no eikonal soft factor
-    $p_i\!\cdot\!p_j/(p_i\!\cdot\!k)(p_j\!\cdot\!k)$ for an emitted gluon or photon, which real $2\to3$ and $2\to4$
-    QCD amplitudes carry.
+  \item \textbf{Soft limits.} The $1/\sqrt{s_{ij}}$ line mimics the collinear pole only. When a real gluon or photon of
+    momentum $k$ becomes soft (its energy $\to0$), the amplitude factorises into the amplitude without it times a
+    universal \emph{eikonal} factor that depends only on the directions of the particles that emit it,
+    \begin{equation*}
+      |\mathcal M_{n+1}|^2\;\xrightarrow{\;k\to0\;}\;-g^2\sum_{i,j}\mathbf T_i\!\cdot\!\mathbf T_j\,
+      \frac{p_i\!\cdot\!p_j}{(p_i\!\cdot\!k)(p_j\!\cdot\!k)}\,|\mathcal M_n|^2
+    \end{equation*}
+    ($\mathbf T_i$ the colour charge of leg $i$, the electric charge for a photon), divergent as $1/E_k^2$. The generator
+    has no such factor: nothing in it knows that a final gluon was emitted from another leg, so it was not left out by
+    choice. It could be added for a synthetic process with an external $g$ or $\gamma$, as the eikonal factor times a
+    lower-multiplicity synthetic amplitude; the cuts keep the real pools away from the strict limit, but the approach
+    to it is in the data.
   \item \textbf{Tree-like and positive only.} No loop-level features: no logarithms of $s$ (the Sudakov arms' structure),
     no threshold enhancement, no sign changes (rung $9$ has a signed one-loop pool; all $19$ synthetic pools are
     positive and resolve to \code{log}).
