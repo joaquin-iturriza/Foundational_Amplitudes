@@ -194,6 +194,62 @@ except Exception: print("")' 2>/dev/null)
     exit 2
     ;;
 
+  # `gate` sees only the Edit/Write tools; a file rewritten by a shell command passed it unseen (2026-10-06/08,
+  # most of docs/results.tex). These two modes cover every Bash command, whatever it writes with:
+  #   bashpre  (PreToolUse(Bash)): refuses a `git commit` while an overdue, unlocked pillar has changes not yet
+  #            committed, and records a fingerprint of every pillar's uncommitted state;
+  #   bashpost (PostToolUse(Bash)): if the command changed the files of an overdue, unlocked pillar, blocks with the
+  #            reviewer instruction. The change stays on disk (nothing is reverted), but it cannot be committed.
+  bashpre|bashpost)
+    input="$(cat 2>/dev/null || true)"
+    cmd=$(printf '%s' "$input" | python3 -c 'import sys,json
+try: print(json.load(sys.stdin).get("tool_input",{}).get("command",""))
+except Exception: print("")' 2>/dev/null)
+    mkdir -p "$REPO/$STATE_REL"
+    overdue=""
+    for who in $(pillar_names); do
+      lock_fresh "$who" && continue
+      lt=$(pillar_field "$who" 2); ct=$(pillar_field "$who" 3)
+      set -- $(backlog_for "$who")
+      { [ "${1:-0}" -ge "$lt" ] || [ "${2:-0}" -ge "$ct" ]; } && overdue="$overdue $who"
+    done
+    fingerprint() {   # uncommitted state of a pillar: tracked diff against HEAD plus its untracked files' contents
+      local paths; paths=$(pillar_field "$1" 4)
+      { git diff HEAD -- $paths 2>/dev/null
+        git ls-files --others --exclude-standard -- $paths 2>/dev/null | while IFS= read -r f; do
+          echo "== $f"; cat "$f" 2>/dev/null; done; } | cksum | awk '{print $1"-"$2}'
+    }
+    deny() { echo "BLOCKED by review-backlog: $1" >&2
+             echo "Run the $2 subagent on its whole backlog now; it takes the lock ('review_backlog.sh begin $2')," >&2
+             echo "applies its fixes and, on a pass, runs 'review_backlog.sh advance $2' itself." >&2; }
+    if [ "$mode" = bashpre ]; then
+      for who in $(pillar_names); do fingerprint "$who" > "$REPO/$STATE_REL/.fp_$who"; done
+      if printf '%s' "$cmd" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
+        for who in $overdue; do
+          paths=$(pillar_field "$who" 4)
+          if [ -n "$(git status --porcelain -- $paths 2>/dev/null)" ]; then
+            deny "a commit while the $who pillar is overdue and has uncommitted changes ($(git status --porcelain -- $paths | wc -l) file(s))." "$who"
+            exit 2
+          fi
+        done
+      fi
+      exit 0
+    fi
+    # bashpost
+    for who in $overdue; do
+      before=$(cat "$REPO/$STATE_REL/.fp_$who" 2>/dev/null)
+      [ "$(fingerprint "$who")" = "$before" ] && continue
+      msg="BLOCKED by review-backlog: that command changed files of the $who pillar, which is past its review"
+      msg="$msg threshold (any write counts, editor or shell). The change is on disk but cannot be committed until"
+      msg="$msg the $who subagent has reviewed the whole backlog: run it now; it takes the lock with 'begin', applies"
+      msg="$msg its fixes and on a pass runs 'advance' itself."
+      esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
+      printf '{"decision":"block","reason":"%s"}\n' "$esc"
+      exit 0
+    done
+    exit 0
+    ;;
+
   init)
     for who in $(pillar_names); do reset_pillar "$who"; done
     echo "[review-backlog] all watermarks set to $(git rev-parse --short HEAD) — clean slate"
@@ -217,14 +273,9 @@ except Exception: print("")' 2>/dev/null)
     input="$(cat 2>/dev/null || true)"
     # Already nudged in this stop sequence -> let it through (no infinite loop; also the
     # deliberate-pause escape). The watermark is untouched, so it fires again next turn.
-    # The harness sets stop_hook_active on every stop that follows a block, and a session driven by /goal stops that
-    # way all the time: exiting on it silenced this check from 2026-10-05 to 2026-10-08. So it is throttled instead:
-    # with stop_hook_active it nudges at most once per NUDGE_EVERY_MIN, which still cannot loop.
-    NUDGE_EVERY_MIN=30
-    nudged="$REPO/$STATE_REL/.last_nudge"
-    case "$input" in *'"stop_hook_active"'*true*)
-      [ -n "$(find "$nudged" -mmin -"$NUDGE_EVERY_MIN" 2>/dev/null)" ] && exit 0 ;;
-    esac
+    # Under /goal nearly every stop carries stop_hook_active, so this nudge can stay silent for days (2026-10-05 to
+    # 2026-10-08). It is only a reminder: the enforcement is `gate`, `bashpre`/`bashpost` and the commit gate.
+    case "$input" in *'"stop_hook_active"'*true*) exit 0 ;; esac
 
     br="$(git symbolic-ref --quiet --short HEAD 2>/dev/null)" || exit 0
     [ -z "$br" ] && exit 0
@@ -265,11 +316,10 @@ except Exception: print("")' 2>/dev/null)
     msg="$msg Ending the turn instead is not a pause: the PreToolUse gate will refuse your next edit"
     msg="$msg to these files until the reviewer has run. \`review_backlog.sh status\` lists all backlogs."
 
-    mkdir -p "$REPO/$STATE_REL"; : > "$nudged"
     esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
     printf '{"decision":"block","reason":"%s"}\n' "$esc"
     exit 0
     ;;
 
-  *) echo "usage: review_backlog.sh {check|advance <reviewer>|status|init}" >&2; exit 2 ;;
+  *) echo "usage: review_backlog.sh {check|gate|bashpre|bashpost|begin <reviewer>|advance <reviewer>|status|init}" >&2; exit 2 ;;
 esac
