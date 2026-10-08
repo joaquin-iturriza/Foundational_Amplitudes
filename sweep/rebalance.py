@@ -318,11 +318,18 @@ def plan(inv, margin_h, no_dest=(), exclude=()):
     fin = lambda s, extra=0: (st[s]["backlog"] + extra) / st[s]["rate"] if st[s]["rate"] > 0 else (
         float("inf") if st[s]["backlog"] + extra > 0 else 0.0)
     before = {s: (st[s]["backlog"], st[s]["rate"], fin(s)) for s in st}
+    # under `site supervise` (CCORCH_WORK set): only sweeps of an active work item move, never a held one's; a move
+    # of held work was refused at the destination after its MOVED_TO marker had gone, leaving scripts that would run
+    # twice once the hold is lifted (2026-10-08 review)
+    import siteconf
+    gated = set(siteconf.work_gate(sorted({n for v in inv.values() for n in v["sweeps"]}))[0]) \
+        if os.environ.get("CCORCH_WORK") else None
     movable = {s: sorted((n for n, x in v["sweeps"].items()
                           # a site that takes no work (full filesystem) gives back what arrived there too
                           if (x["movable"] or (s in no_dest and x.get("movable_any"))) and x.get("unit")
                           # paused by hand where a HELD marker could not be written (a site that was down)
-                          and not any(n.startswith(e) for e in exclude)),
+                          and not any(n.startswith(e) for e in exclude)
+                          and (gated is None or n in gated)),
                          reverse=True) for s, v in inv.items()}
     moves = []
     while True:

@@ -211,7 +211,7 @@ def work_gate(names):
         if any(fnmatch.fnmatchcase(n, g) for g in w.get("held", [])):
             no.append((n, "its work item is held"))
         elif not any(fnmatch.fnmatchcase(n, g) for g in w.get("active", [])):
-            no.append((n, "not part of the named work items %s" % ",".join(w.get("items", [])) or "(none)"))
+            no.append((n, "not part of the named work items %s" % (",".join(w.get("items", [])) or "(none)")))
         else:
             ok.append(n)
     return ok, no

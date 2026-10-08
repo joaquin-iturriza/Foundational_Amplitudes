@@ -201,7 +201,9 @@ def main():
                         f"res {sum(len(v) for v in r['results'].values())}" for s, r in rep.items())
     print(time.strftime("%H:%M"), status + (f" | missing {n_missing}" if a.expect else ""))
     if a.units:
-        print(json.dumps({"units": units, "alerts": alerts}))
+        # partial: a site gave no report, so the counts miss its results and queue (no gap or milestone is judged)
+        missing = [s for s in a.sites if s not in rep]
+        print(json.dumps({"units": units, "alerts": alerts, "partial": ",".join(missing) if missing else ""}))
         return 0
     for al in alerts:
         print("ALERT", al)
