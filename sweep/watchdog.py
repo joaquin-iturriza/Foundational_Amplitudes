@@ -7,7 +7,7 @@ Per site (one `site run` each) it reads, for the sweeps matching PREFIX:
   failed             trial logs written in the last --window minutes that end in "Trial FAILED", with the first error line
   results            result files of those sweeps
 On the laptop it adds:
-  missing            the points of --expect (JSON {sweep: [hp indices]}) with a result on no site
+  missing            the points of --expect (JSON {sweep: [hp indices], or a result count for a DyHPO search}) with a result on no site
   stalled            a site with queued trials, none running and no new result for --stall minutes
 and exits 1 with an ALERT line per problem (a waiter then wakes the agent), else prints one status line and exits 0.
 A missing point is an alert when its sweep has fewer trials running or queued on all sites than points missing.
@@ -113,7 +113,7 @@ def main():
     ap.add_argument("prefixes", nargs="+")
     ap.add_argument("--site-report", action="store_true")
     ap.add_argument("--window", type=int, default=30, help="minutes of trial logs read for failures")
-    ap.add_argument("--expect", help="JSON {sweep: [hp indices]} of the points the batch must produce")
+    ap.add_argument("--expect", help="JSON {sweep: [hp indices] | n}: the points the batch must produce, or n results of a search")
     ap.add_argument("--collected", default="analysis/transfer/scratch_sweeps.json",
                     help="trials already collected to the laptop ({sweep: [{hp, ...}]}): a point there is done even if its "
                          "site lost the file (2026-10-06: two lxplus results dirs vanished from EOS after collection)")
@@ -170,9 +170,17 @@ def main():
         for sw, hps in exp.items():
             if not any(sw.startswith(p) for p in a.prefixes) or sw in held:
                 continue
-            miss = sorted(set(hps) - got.get(sw, set()))
+            if isinstance(hps, int):
+                # a DyHPO search: its points are not known in advance, only how many results it must produce
+                # (2026-10-08: the 8k searches of the arms were invisible to the check, which knew fixed points only)
+                have = len(got.get(sw, set()))
+                miss = list(range(max(0, hps - have)))
+                expected = hps
+            else:
+                miss = sorted(set(hps) - got.get(sw, set()))
+                expected = len(set(hps))
             n_missing += len(miss)
-            units[sw] = {"expected": len(set(hps)), "done": len(set(hps)) - len(miss), "active": active.get(sw, 0)}
+            units[sw] = {"expected": expected, "done": expected - len(miss), "active": active.get(sw, 0)}
             if len(miss) > active.get(sw, 0):
                 idle[sw] = miss
         if idle and not a.units:

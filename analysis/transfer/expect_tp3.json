@@ -3430,5 +3430,29 @@
  ],
  "tp3_accrr_r9": [
   73
- ]
+ ],
+ "tp3_accrrfte_ee_ddbar_d4": 5,
+ "tp3_accrrfte_ee_dd_nlo_d4": 5,
+ "tp3_accrrfte_ee_bb_nlo_d4": 5,
+ "tp3_accrrfte_uubar_gg_d4": 5,
+ "tp3_accrrfte_uubar_Zggg_d6": 5,
+ "tp3_accrrfte_ee_nnbar_d6": 5,
+ "tp3_accrrfte_uubar_Zg_d6": 5,
+ "tp3_accrrfte_ee_dd_nlo_d6": 5,
+ "tp3_accrrfte_ee_Za_d4": 5,
+ "tp3_accrrfte_ud_ud_d6": 5,
+ "tp3_accrrfte_ee_bb_nlo_d6": 5,
+ "tp3_accrrfte_ud_ud_d4": 5,
+ "tp3_accrrfte_uubar_Zg_d4": 5,
+ "tp3_accrrfte_ee_Za_d6": 5,
+ "tp3_accrrfte_ee_nnbar_d4": 5,
+ "tp3_accrrfte_ee_ttbar_d6": 5,
+ "tp3_accrrfte_ee_WW_d4": 5,
+ "tp3_accrrfte_uubar_Zgg_d6": 5,
+ "tp3_accrrfte_uubar_gg_d6": 5,
+ "tp3_accrrfte_ee_ddbar_d6": 5,
+ "tp3_accrrfte_ee_WW_d6": 5,
+ "tp3_accrrfte_ee_ttbar_d4": 5,
+ "tp3_accrrfte_uubar_Zgg_d4": 5,
+ "tp3_accrrfte_uubar_Zggg_d4": 5
 }
