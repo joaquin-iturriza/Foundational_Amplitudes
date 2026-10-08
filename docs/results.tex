@@ -4952,7 +4952,28 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     theirs runs single-process batches in round-robin, $G=2$--$4$ accumulated per update.
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
-    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
+    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-08, 10:40):} \textbf{(C) redone as in
+    arXiv:2606.23791} (user: the same as theirs, comparable to the paper; code \url{https://github.com/heidelberg-hepml/LLM4LHC}):
+    \code{training.per\_process\_accumulation: round\_robin}, single-process batches in random order (their shipped configs),
+    $G=4$ of $B=4096$ per update; \code{tp3\_accrr\_r9} (hp73, $64$k) queued on lxplus at JobPrio $2000$, its smoke run
+    passed (loss $0.33\to0.21$ in $300$ steps); waiter on its result file. \textbf{Diagram arm redone with their encoder}
+    (\code{model.diagram\_encoder\_impl: llm4lhc}, width $64$ on the user's call, every diagram, fixed labels added for the
+    one-loop ghosts and Goldstones their vocabulary lacks): \code{tp3\_levdiagl}; its smoke run \code{FA-lxplus-e9ecb3df} is
+    queued on lxplus (two earlier ones failed: PDG $82$, then a repeated run name, both fixed); submit its $64$k pretraining
+    (\code{generate\_sweep --n-trials 0}, then \code{--extend --fixed-hp 73 --submit}, PINNED, JobPrio $2000$) once it
+    passes. Both arms' fine-tune configs are committed (\code{tp3\_accrrfte[32k]\_*}, \code{tp3\_levdiaglfte[32k]\_*}, $72$:
+    $D=10^2,10^3$ at $8$k paired by DyHPO seed, $10^4$ at $32$k at rung $9$'s chosen points from
+    \code{horizon32k\_chosen.json}); submit each arm's when its parent ends (parent on lxplus; copy to CC-IN2P3 if
+    \code{site pick} places cells there) and add their points to \code{expect\_tp3.json}. \textbf{Released from the $32$k
+    hold} (it covers only the horizon item): finale $32$k ($49$ lxplus, $20$ CC-IN2P3) and the four lever arms' $D=10^4$
+    cells ($48$, CC-IN2P3, fed past the $100$-job cap by \code{feed\_capped.py}); the synthetic $32$k cells are on Jean Zay.
+    \textbf{Jean Zay}: IDRIS unreachable (ssh port silent from the jump host, idris.fr refuses); waiter \code{bqa4k4zhk};
+    when back, archive old runs to \code{\$STORE} (the user's call): every run and sweep dir in WORK not \code{tp3\_}, one tar
+    each, checked before the original is removed (criterion proposed to the user). \textbf{Review enforcement} rebuilt
+    (\code{review\_backlog.sh}): \code{bashpre}/\code{bashpost} on every shell command and a commit gate, locks expire after
+    $3$\,h, the Stop nudge a reminder only; reviewer \code{begin}/\code{advance} allowed in auto mode. Open with the user:
+    CLAUDE.md still says commits stay unblocked. \textbf{Loops}: rebalancer + CC feeder (\code{bs9qzry0o}), watchdog on
+    CC-IN2P3 and lxplus (\code{be954czj4}). \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
     (3), the seeds (5). \textbf{Done and written up} (paragraphs above Sec.~\ref{sec:ladder-open}): (4) and (6) at $8$k, (B) and (C) at
     $D=10^2,10^3$ (their $10^4$ cells held at $32$k), the real zero-shot test. The accumulation pretraining's
     wall time was $14.6$\,h against $\sim6.7$\,h for rung $9$ ($19$ micro-batches of $862$ events per update).
