@@ -3232,5 +3232,197 @@
  "tp3_accrrfte32k_uubar_gg_d8": [
   139,
   3
+ ],
+ "tp3_synfte32k_ee_WW_d10": [
+  134,
+  74
+ ],
+ "tp3_synfte32k_ee_WW_d7": [
+  138,
+  2
+ ],
+ "tp3_synfte32k_ee_WW_d8": [
+  104,
+  44
+ ],
+ "tp3_synfte32k_ee_WW_d9": [
+  44,
+  112
+ ],
+ "tp3_synfte32k_ee_Za_d10": [
+  127,
+  59
+ ],
+ "tp3_synfte32k_ee_Za_d7": [
+  83,
+  43
+ ],
+ "tp3_synfte32k_ee_Za_d8": [
+  149,
+  89
+ ],
+ "tp3_synfte32k_ee_Za_d9": [
+  164,
+  104
+ ],
+ "tp3_synfte32k_ee_bb_nlo_d7": [
+  68,
+  116
+ ],
+ "tp3_synfte32k_ee_bb_nlo_d8": [
+  87,
+  107
+ ],
+ "tp3_synfte32k_ee_bb_nlo_d9": [
+  33,
+  89
+ ],
+ "tp3_synfte32k_ee_dd_nlo_d7": [
+  27,
+  23
+ ],
+ "tp3_synfte32k_ee_dd_nlo_d8": [
+  58,
+  66
+ ],
+ "tp3_synfte32k_ee_dd_nlo_d9": [
+  9,
+  77
+ ],
+ "tp3_synfte32k_ee_ddbar_d10": [
+  97,
+  41
+ ],
+ "tp3_synfte32k_ee_ddbar_d7": [
+  14,
+  50
+ ],
+ "tp3_synfte32k_ee_ddbar_d8": [
+  148,
+  28
+ ],
+ "tp3_synfte32k_ee_ddbar_d9": [
+  5,
+  125
+ ],
+ "tp3_synfte32k_ee_nnbar_d10": [
+  19,
+  155
+ ],
+ "tp3_synfte32k_ee_nnbar_d7": [
+  124,
+  56
+ ],
+ "tp3_synfte32k_ee_nnbar_d8": [
+  106,
+  190
+ ],
+ "tp3_synfte32k_ee_nnbar_d9": [
+  74,
+  62
+ ],
+ "tp3_synfte32k_ee_ttbar_d10": [
+  80,
+  36
+ ],
+ "tp3_synfte32k_ee_ttbar_d7": [
+  108,
+  72
+ ],
+ "tp3_synfte32k_ee_ttbar_d8": [
+  100,
+  168
+ ],
+ "tp3_synfte32k_ee_ttbar_d9": [
+  134,
+  158
+ ],
+ "tp3_synfte32k_ud_ud_d10": [
+  53,
+  113
+ ],
+ "tp3_synfte32k_ud_ud_d5": [
+  78,
+  58
+ ],
+ "tp3_synfte32k_ud_ud_d6": [
+  52,
+  140
+ ],
+ "tp3_synfte32k_ud_ud_d7": [
+  27,
+  147
+ ],
+ "tp3_synfte32k_ud_ud_d8": [
+  45,
+  165
+ ],
+ "tp3_synfte32k_ud_ud_d9": [
+  156,
+  20
+ ],
+ "tp3_synfte32k_uubar_Zg_d10": [
+  29,
+  5
+ ],
+ "tp3_synfte32k_uubar_Zg_d7": [
+  112,
+  8
+ ],
+ "tp3_synfte32k_uubar_Zg_d8": [
+  14,
+  2
+ ],
+ "tp3_synfte32k_uubar_Zg_d9": [
+  159,
+  83
+ ],
+ "tp3_synfte32k_uubar_Zgg_d10": [
+  18,
+  30
+ ],
+ "tp3_synfte32k_uubar_Zgg_d7": [
+  6,
+  142
+ ],
+ "tp3_synfte32k_uubar_Zgg_d8": [
+  184,
+  68
+ ],
+ "tp3_synfte32k_uubar_Zgg_d9": [
+  65,
+  53
+ ],
+ "tp3_synfte32k_uubar_Zggg_d10": [
+  115,
+  87
+ ],
+ "tp3_synfte32k_uubar_Zggg_d7": [
+  168,
+  52
+ ],
+ "tp3_synfte32k_uubar_Zggg_d8": [
+  66,
+  6
+ ],
+ "tp3_synfte32k_uubar_Zggg_d9": [
+  146,
+  26
+ ],
+ "tp3_synfte32k_uubar_gg_d10": [
+  95,
+  163
+ ],
+ "tp3_synfte32k_uubar_gg_d7": [
+  181,
+  137
+ ],
+ "tp3_synfte32k_uubar_gg_d8": [
+  28,
+  16
+ ],
+ "tp3_synfte32k_uubar_gg_d9": [
+  127,
+  179
  ]
 }
