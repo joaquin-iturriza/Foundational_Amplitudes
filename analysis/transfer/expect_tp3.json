@@ -2154,24 +2154,24 @@
 89
 ],
 "tp3_finfte32k_ee_ddbar_d10": [
-41,
-97
+97,
+41
 ],
 "tp3_finfte32k_ee_ddbar_d7": [
 14,
 50
 ],
 "tp3_finfte32k_ee_ddbar_d8": [
-28,
-148
+148,
+28
 ],
 "tp3_finfte32k_ee_ddbar_d9": [
 5,
 125
 ],
 "tp3_finfte32k_ee_ddbarg_d10": [
-20,
-172
+172,
+20
 ],
 "tp3_finfte32k_ee_ddbarg_d7": [
 19,
@@ -2182,24 +2182,24 @@
 118
 ],
 "tp3_finfte32k_ee_ddbarg_d9": [
-13,
-121
+121,
+13
 ],
 "tp3_finfte32k_ee_dd_ew_nlo_d7": [
-76,
-128
+128,
+76
 ],
 "tp3_finfte32k_ee_dd_ew_nlo_d8": [
-84,
-152
+152,
+84
 ],
 "tp3_finfte32k_ee_dd_ew_nlo_d9": [
 97,
 181
 ],
 "tp3_finfte32k_ee_dd_nlo_d7": [
-23,
-27
+27,
+23
 ],
 "tp3_finfte32k_ee_dd_nlo_d8": [
 58,
@@ -2214,8 +2214,8 @@
 182
 ],
 "tp3_finfte32k_ee_dd_nlo_hi_d8": [
-101,
-153
+153,
+101
 ],
 "tp3_finfte32k_ee_dd_nlo_hi_d9": [
 34,
@@ -2226,24 +2226,24 @@
 155
 ],
 "tp3_finfte32k_ee_nnbar_d7": [
-56,
-124
+124,
+56
 ],
 "tp3_finfte32k_ee_nnbar_d8": [
 106,
 190
 ],
 "tp3_finfte32k_ee_nnbar_d9": [
-62,
-74
+74,
+62
 ],
 "tp3_finfte32k_ee_ttbar_d10": [
-36,
-80
+80,
+36
 ],
 "tp3_finfte32k_ee_ttbar_d7": [
-72,
-108
+108,
+72
 ],
 "tp3_finfte32k_ee_ttbar_d8": [
 100,
@@ -2254,8 +2254,8 @@
 158
 ],
 "tp3_finfte32k_ee_ttbarg_d10": [
-1,
-69
+69,
+1
 ],
 "tp3_finfte32k_ee_ttbarg_d7": [
 166,
@@ -2270,72 +2270,72 @@
 101
 ],
 "tp3_finfte32k_ee_ttbar_nlo_thr_d7": [
-85,
-165
+165,
+85
 ],
 "tp3_finfte32k_ee_ttbar_nlo_thr_d8": [
-34,
-142
+142,
+34
 ],
 "tp3_finfte32k_ee_ttbar_nlo_thr_d9": [
-50,
-118
+118,
+50
 ],
 "tp3_finfte32k_ee_WW_d10": [
-74,
-134
+134,
+74
 ],
 "tp3_finfte32k_ee_WW_d7": [
-2,
-138
+138,
+2
 ],
 "tp3_finfte32k_ee_WW_d8": [
-44,
-104
+104,
+44
 ],
 "tp3_finfte32k_ee_WW_d9": [
 44,
 112
 ],
 "tp3_finfte32k_ee_Za_d10": [
-59,
-127
+127,
+59
 ],
 "tp3_finfte32k_ee_Za_d7": [
-43,
-83
+83,
+43
 ],
 "tp3_finfte32k_ee_Za_d8": [
-89,
-149
+149,
+89
 ],
 "tp3_finfte32k_ee_Za_d9": [
-104,
-164
+164,
+104
 ],
 "tp3_finfte32k_udbar_enu_d10": [
-77,
-85
+85,
+77
 ],
 "tp3_finfte32k_udbar_enu_d7": [
-3,
-183
+183,
+3
 ],
 "tp3_finfte32k_udbar_enu_d8": [
 102,
 178
 ],
 "tp3_finfte32k_udbar_enu_d9": [
-169,
-177
+177,
+169
 ],
 "tp3_finfte32k_ud_ud_d10": [
 53,
 113
 ],
 "tp3_finfte32k_ud_ud_d5": [
-58,
-78
+78,
+58
 ],
 "tp3_finfte32k_ud_ud_d6": [
 52,
@@ -2350,40 +2350,40 @@
 165
 ],
 "tp3_finfte32k_ud_ud_d9": [
-20,
-156
+156,
+20
 ],
 "tp3_finfte32k_uubar_gg_d10": [
 95,
 163
 ],
 "tp3_finfte32k_uubar_gg_d7": [
-137,
-181
+181,
+137
 ],
 "tp3_finfte32k_uubar_gg_d8": [
-16,
-28
+28,
+16
 ],
 "tp3_finfte32k_uubar_gg_d9": [
 127,
 179
 ],
 "tp3_finfte32k_uubar_Zg_d10": [
-5,
-29
+29,
+5
 ],
 "tp3_finfte32k_uubar_Zg_d7": [
-8,
-112
+112,
+8
 ],
 "tp3_finfte32k_uubar_Zg_d8": [
-2,
-14
+14,
+2
 ],
 "tp3_finfte32k_uubar_Zg_d9": [
-83,
-159
+159,
+83
 ],
 "tp3_finfte32k_uubar_Zgg_d10": [
 18,
@@ -2394,28 +2394,28 @@
 142
 ],
 "tp3_finfte32k_uubar_Zgg_d8": [
-68,
-184
+184,
+68
 ],
 "tp3_finfte32k_uubar_Zgg_d9": [
-53,
-65
+65,
+53
 ],
 "tp3_finfte32k_uubar_Zggg_d10": [
-87,
-115
+115,
+87
 ],
 "tp3_finfte32k_uubar_Zggg_d7": [
-52,
-168
+168,
+52
 ],
 "tp3_finfte32k_uubar_Zggg_d8": [
-6,
-66
+66,
+6
 ],
 "tp3_finfte32k_uubar_Zggg_d9": [
-26,
-146
+146,
+26
 ],
 "tp3_eqd_r7fte32k_ee_bb_nlo_d7": [
 44,
@@ -2992,5 +2992,197 @@
 "tp3_eqd_r9fte32k_uubar_Zggg_d9": [
 170,
 178
+],
+"tp3_levcoupfte32k_ee_WW_d8": [
+197,
+17
+],
+"tp3_levcoupfte32k_ee_Za_d8": [
+119,
+51
+],
+"tp3_levcoupfte32k_ee_bb_nlo_d8": [
+32,
+100
+],
+"tp3_levcoupfte32k_ee_dd_nlo_d8": [
+78,
+198
+],
+"tp3_levcoupfte32k_ee_ddbar_d8": [
+142,
+102
+],
+"tp3_levcoupfte32k_ee_nnbar_d8": [
+36,
+24
+],
+"tp3_levcoupfte32k_ee_ttbar_d8": [
+172,
+96
+],
+"tp3_levcoupfte32k_ud_ud_d8": [
+49,
+117
+],
+"tp3_levcoupfte32k_uubar_Zg_d8": [
+171,
+179
+],
+"tp3_levcoupfte32k_uubar_Zgg_d8": [
+197,
+57
+],
+"tp3_levcoupfte32k_uubar_Zggg_d8": [
+20,
+96
+],
+"tp3_levcoupfte32k_uubar_gg_d8": [
+139,
+3
+],
+"tp3_levdiagfte32k_ee_WW_d8": [
+197,
+17
+],
+"tp3_levdiagfte32k_ee_Za_d8": [
+119,
+51
+],
+"tp3_levdiagfte32k_ee_bb_nlo_d8": [
+32,
+100
+],
+"tp3_levdiagfte32k_ee_dd_nlo_d8": [
+78,
+198
+],
+"tp3_levdiagfte32k_ee_ddbar_d8": [
+142,
+102
+],
+"tp3_levdiagfte32k_ee_nnbar_d8": [
+36,
+24
+],
+"tp3_levdiagfte32k_ee_ttbar_d8": [
+172,
+96
+],
+"tp3_levdiagfte32k_ud_ud_d8": [
+49,
+117
+],
+"tp3_levdiagfte32k_uubar_Zg_d8": [
+171,
+179
+],
+"tp3_levdiagfte32k_uubar_Zgg_d8": [
+197,
+57
+],
+"tp3_levdiagfte32k_uubar_Zggg_d8": [
+20,
+96
+],
+"tp3_levdiagfte32k_uubar_gg_d8": [
+139,
+3
+],
+"tp3_levgenfte32k_ee_WW_d8": [
+197,
+17
+],
+"tp3_levgenfte32k_ee_Za_d8": [
+119,
+51
+],
+"tp3_levgenfte32k_ee_bb_nlo_d8": [
+32,
+100
+],
+"tp3_levgenfte32k_ee_dd_nlo_d8": [
+78,
+198
+],
+"tp3_levgenfte32k_ee_ddbar_d8": [
+142,
+102
+],
+"tp3_levgenfte32k_ee_nnbar_d8": [
+36,
+24
+],
+"tp3_levgenfte32k_ee_ttbar_d8": [
+172,
+96
+],
+"tp3_levgenfte32k_ud_ud_d8": [
+49,
+117
+],
+"tp3_levgenfte32k_uubar_Zg_d8": [
+171,
+179
+],
+"tp3_levgenfte32k_uubar_Zgg_d8": [
+197,
+57
+],
+"tp3_levgenfte32k_uubar_Zggg_d8": [
+20,
+96
+],
+"tp3_levgenfte32k_uubar_gg_d8": [
+139,
+3
+],
+"tp3_levoffshfte32k_ee_WW_d8": [
+197,
+17
+],
+"tp3_levoffshfte32k_ee_Za_d8": [
+119,
+51
+],
+"tp3_levoffshfte32k_ee_bb_nlo_d8": [
+32,
+100
+],
+"tp3_levoffshfte32k_ee_dd_nlo_d8": [
+78,
+198
+],
+"tp3_levoffshfte32k_ee_ddbar_d8": [
+142,
+102
+],
+"tp3_levoffshfte32k_ee_nnbar_d8": [
+36,
+24
+],
+"tp3_levoffshfte32k_ee_ttbar_d8": [
+172,
+96
+],
+"tp3_levoffshfte32k_ud_ud_d8": [
+49,
+117
+],
+"tp3_levoffshfte32k_uubar_Zg_d8": [
+171,
+179
+],
+"tp3_levoffshfte32k_uubar_Zgg_d8": [
+197,
+57
+],
+"tp3_levoffshfte32k_uubar_Zggg_d8": [
+20,
+96
+],
+"tp3_levoffshfte32k_uubar_gg_d8": [
+139,
+3
 ]
 }
