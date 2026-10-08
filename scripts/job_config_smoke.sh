@@ -24,7 +24,8 @@ skip = ("run_name", "exp_name", "run_dir", "fine_tune.pretrained_path")
 print(" ".join(f"{k}={os.path.expandvars(str(v))}" for k, v in fp.items() if k not in skip and v is not None))
 EOF
 )
-RUN=zz_smoke_$(basename "$CFG" .yaml)_${SLURM_JOB_ID:-$$}
+# unique per submission: on HTCondor there is no SLURM_JOB_ID and the PID repeats (2026-10-08: two runs both "85")
+RUN=zz_smoke_$(basename "$CFG" .yaml)_${SLURM_JOB_ID:-$(date +%s)_$RANDOM}
 echo "SMOKE $CFG steps=$STEPS run=$RUN"
 # validate_frac=0: a config's validate_frac (a fraction of the run) would override validate_every_n_steps
 python run.py $OVR training.iterations=$STEPS training.validate_frac=0 training.validate_every_n_steps=100 \
