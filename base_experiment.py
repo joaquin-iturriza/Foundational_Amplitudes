@@ -1212,8 +1212,8 @@ class BaseExperiment:
     def _step(self, data, step):
         # actual update step
         if getattr(self, "_per_process_accum", False):
-            # training.per_process_accumulation: one single-process micro-batch per process,
-            # gradients accumulated into .grad (zero_grad, regularization and EWC included,
+            # training.per_process_accumulation (all_processes or round_robin): single-process
+            # micro-batches, gradients accumulated into .grad (zero_grad, regularization and EWC included,
             # once); clipping, the NaN guard, the optimizer/EMA/scheduler steps below are
             # shared with the mixed-batch path and run once per iteration
             loss, loss_no_reg, mse_val = self._per_process_step_grads(data)
