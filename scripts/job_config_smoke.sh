@@ -15,15 +15,18 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 CFG=$1; STEPS=${2:-300}; shift 2 2>/dev/null || shift $#
 OVR=$(python - "$CFG" <<'EOF'
-import sys, yaml
+import os, sys, yaml
 c = yaml.safe_load(open(sys.argv[1]))
 fp = c.get("fixed_params") or {}
 skip = ("run_name", "exp_name", "run_dir", "fine_tune.pretrained_path")
-print(" ".join(f"{k}={v}" for k, v in fp.items() if k not in skip and v is not None))
+# ${PROJECT_DIR}, ${DATA_DIR}, ... are expanded here, as siteconf.resolve does for a sweep: Hydra would read them as
+# config interpolations and fail
+print(" ".join(f"{k}={os.path.expandvars(str(v))}" for k, v in fp.items() if k not in skip and v is not None))
 EOF
 )
 RUN=zz_smoke_$(basename "$CFG" .yaml)_${SLURM_JOB_ID:-$$}
 echo "SMOKE $CFG steps=$STEPS run=$RUN"
-python run.py $OVR training.iterations=$STEPS training.validate_every_n_steps=100 \
+# validate_frac=0: a config's validate_frac (a fraction of the run) would override validate_every_n_steps
+python run.py $OVR training.iterations=$STEPS training.validate_frac=0 training.validate_every_n_steps=100 \
   evaluation.train_subsample=2000 use_mlflow=false run_name=$RUN exp_name=zz_smoke "$@"
 echo "SMOKE_EXIT $?"
