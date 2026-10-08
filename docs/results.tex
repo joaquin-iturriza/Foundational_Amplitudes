@@ -4889,15 +4889,20 @@ arms tested: with a Bonferroni factor $5$, accumulation and the generation featu
 not. In these two arms the pretraining ranking is reversed on fine-tuning. One seed per arm (rung $5$ twice at hp73
 differed by $8\%$ in pretraining loss).
 
-\paragraph{The conditionings at $D=10^4$, and the finale at $32$k (partial, 2026-10-08 13:30).} A $32$k cell is the best
+\paragraph{The conditionings at $D=10^4$, and the finale at $32$k (2026-10-08 19:00).} A $32$k cell is the best
 of rung $9$'s two chosen points (\code{horizon32k\_chosen.json}), the arm run at the same two, so it is measured at
-different compute from the $8$k cells above, and the two are not pooled. Per cell $\log_{10}(L_\text{rung 9}/L_\text{arm})$
-over the twelve probes: Feynman diagrams on, median $-0.24$\,dex, better on $3$ of $12$, $p=0.077$ (worst
-$ee\to b\bar b$ one-loop $-1.04$, best $ee\to\nu\bar\nu$ $+0.48$); coupling scalars off, $-0.14$, $3$ of $12$, $p=0.47$
-($ee\to W^+W^-$ alone $+2.29$); generation feature off, $9$ of $12$ cells in, $+0.10$, $6$ of $9$, $p=0.36$; off-shellness
-off, none in yet. The finale against rung $9$ at $D=10^{3.5}$ and $10^4$, on the $19$ cells of $10$ probes where both
-finished: median over probes $+0.07$\,dex, better on $8$ of $10$, $p=0.32$; its $D=10^{4.5}$, $10^5$ cells have no rung
-$9$ cell to meet (those are held), and its star-arm probes no $32$k star-arm cell.
+different compute from the $8$k cells above, and the two are not pooled. Per probe $\log_{10}(L_\text{rung 9}/L_\text{arm})$,
+all twelve probes in for the four lever arms (Wilcoxon over probes, Bonferroni $\times5$ as above): off-shellness off,
+median $-0.34$\,dex, better on $1$ of $12$, $p=0.021$ ($\times5$: $0.11$), the same sign as at $10^2$, $10^3$ ($-0.29$);
+Feynman diagrams on (the old encoder), $-0.24$, $3$ of $12$, $p=0.077$ (worst one-loop $ee\to b\bar b$ $-1.04$);
+coupling scalars off, $-0.14$, $3$ of $12$, $p=0.47$ ($ee\to W^+W^-$ alone $+2.29$); generation feature off, $+0.04$,
+$7$ of $12$, $p=0.73$: its advantage at $10^2$, $10^3$ ($+0.21$, $10$ of $12$) is gone at $10^4$. One seed per arm.
+The accumulation arm redone as in arXiv:2606.23791 (\code{tp3\_accrr\_r9}, pretraining \code{val\_loss}
+$5.58\times10^{-6}$) and the diagram arm with their encoder are still to come. The finale against rung $9$ at
+$D=10^{2.5}$ to $10^4$ ($u d\to u d$ from $10^{2.5}$, the others $10^{3.5}$ and $10^4$), $26$ cells of the twelve probes
+where both finished ($63$ of the finale's $69$ $32$k sweeps done): median over probes $+0.07$\,dex, better on $8$ of $12$,
+$p=0.27$; over cells $-0.01$. Its $D=10^{4.5}$, $10^5$ cells have no rung $9$ cell to meet (those are held), and its
+star-arm probes no $32$k star-arm cell.
 
 \begin{figure}[H]
 \centering
