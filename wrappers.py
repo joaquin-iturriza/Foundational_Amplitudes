@@ -163,7 +163,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  use_pair_bias: bool = False, pair_bias_hidden: int = 16,
                  pair_bias_clamp: float = 4.0,
                  pair_bias_max_props: int = 48,
-                 pair_bias_logit_cap: float = 8.0):    # ditto: consumed by the experiment (spec build + setup_pair_bias)
+                 pair_bias_logit_cap: float = 8.0,    # ditto: consumed by the experiment (spec build + setup_pair_bias)
+                 diagram_encoder_impl: str = "ours",  # "ours" | "llm4lhc" (models/diagram_encoder_llm4lhc.py)
+                 diagram_encoder_llm4lhc=None):       # its hyperparameters; consumed by the experiment
         super().__init__()
         self.net = net
         self.network_dtype = torch.float32
@@ -195,6 +197,11 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # experiment via setup_pair_bias() (needs the diagram sidecars).
         self.use_pair_bias = False
         self._cfg_use_diagrams = bool(use_diagrams)
+        # "llm4lhc": the arXiv:2606.23791 encoder, its vector ADDED to every particle's
+        # token embedding inside the backbone (setup_diagram_conditioning_llm4lhc), not
+        # appended to the scalar features. Set for real by that setup call.
+        self.diagram_encoder_impl = "ours"
+        self._cfg_diagram_encoder_impl = str(diagram_encoder_impl)
         self.d_diag = int(d_diag)
         self.diagrams_dir = diagrams_dir
         self._diag_enc_cfg = diagram_encoder
@@ -286,6 +293,27 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._diag_batch = build_diagram_batch(pd_by_pid)
         self._pd_device = None
         self.d_diag = int(d_diag)
+        self.use_diagrams = True
+
+    def setup_diagram_conditioning_llm4lhc(self, encoder):
+        """Attach the arXiv:2606.23791 diagram encoder (models/diagram_encoder_llm4lhc).
+
+        encoder : LLM4LHCDiagramEncoder holding every process's diagrams as buffers; its
+                  ``out_dim`` must equal the backbone's token width. A real submodule:
+                  trained, checkpointed, marked standard-parametrisation by mup_finalize.
+        Its per-process vector is added to the token embedding of every particle of the
+        event (``token_add``); the scalar features are left as they are.
+        """
+        if encoder.mode not in ("pooled", "pooled_external"):
+            raise ValueError(
+                f"diagram_encoder_llm4lhc.mode={encoder.mode!r}: only 'pooled' and "
+                "'pooled_external' have an injection site here (per_diagram needs one "
+                "prefix token per diagram; LLoCa tokens are particles with momenta)")
+        width = int(self.net.net.hidden_channels)
+        if encoder.out_dim != width:
+            raise ValueError(f"encoder out_dim {encoder.out_dim} != backbone width {width}")
+        self.diagram_encoder = encoder
+        self.diagram_encoder_impl = "llm4lhc"
         self.use_diagrams = True
 
     def setup_pair_bias(self, specs_by_pid, num_heads, hidden=16, clamp=4.0,
@@ -715,7 +743,13 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # is a Lorentz scalar, so this preserves equivariance. Appended AFTER the
         # order labels so the feature layout is [property | order | diagram], matching
         # the in_channels/num_scalars sizing in experiment._finalize_data_sizing.
-        if self.use_diagrams and process_ids is not None:
+        token_add = None
+        if self.use_diagrams and process_ids is not None and self.diagram_encoder_impl == "llm4lhc":
+            from models.diagram_encoder_llm4lhc import process_token_add
+            token_add = process_token_add(
+                self.diagram_encoder(), process_ids, ptr, fourmomenta.shape[0],
+                self.diagram_encoder.out_dim)                       # (N_total, width)
+        elif self.use_diagrams and process_ids is not None:
             if self.use_diagram_virtuality:
                 feat_fn = (self._diagram_features_virtuality_pool
                            if getattr(self, "_virt_mode", "edge") == "pool"
@@ -737,8 +771,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
             pair_ctx = build_pair_ctx(ptr, fourmomenta.shape[0], seq_lens=seq_lens)
             pair_ctx["bias"] = self._pair_bias(fourmomenta, process_ids, pair_ctx)
 
+        net_kwargs = {} if token_add is None else {"token_add": token_add}
         outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr,
-                           seq_lens=seq_lens, pair_ctx=pair_ctx)
+                           seq_lens=seq_lens, pair_ctx=pair_ctx, **net_kwargs)
 
         # Per-event mean pool (vectorised; see _pool_events / LLOCA_POOL env toggle)
         pooled = _pool_events(outputs, ptr)

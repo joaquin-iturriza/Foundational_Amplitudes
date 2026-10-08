@@ -703,7 +703,15 @@ class AmplitudeExperiment(BaseExperiment):
             self._use_diagrams = (
                 not use_pids and bool(self.cfg.model.get("use_diagrams", False))
             )
-            if self._use_diagrams:
+            self._diag_impl = str(self.cfg.model.get("diagram_encoder_impl", "ours"))
+            if self._diag_impl not in ("ours", "llm4lhc"):
+                raise ValueError(f"model.diagram_encoder_impl={self._diag_impl!r}; "
+                                 "valid: 'ours', 'llm4lhc'")
+            if self._use_diagrams and self._diag_impl == "llm4lhc":
+                # arXiv:2606.23791's encoder: its vector is added to the token
+                # embeddings inside the backbone, so n_scalars is NOT widened.
+                self._setup_diagram_set_llm4lhc(list(self.cfg.data.dataset))
+            elif self._use_diagrams:
                 self._d_diag = int(self.cfg.model.get("d_diag", 32))
                 self._use_diag_virt = bool(self.cfg.model.get("use_diagram_virtuality", False))
                 self._setup_diagram_registry(
@@ -963,6 +971,42 @@ class AmplitudeExperiment(BaseExperiment):
                     f"processes ({n_props_tot} propagators total, cap {max_props}/proc)")
         return by_proc
 
+    def _setup_diagram_set_llm4lhc(self, names):
+        """Build the arXiv:2606.23791 diagram set (models/diagram_encoder_llm4lhc) for
+        the processes ``names`` (index = process_id). Every process needs its sidecar:
+        a missing one would silently leave that process unconditioned, so it raises (as
+        their loader does)."""
+        from models.diagram_encoder_llm4lhc import load_llm4lhc_diagram_set
+        if self.modelname != "LLOCAMuPTransformer":
+            raise ValueError("model.diagram_encoder_impl=llm4lhc is wired for the LLoCa "
+                             f"μP transformer only (got {self.modelname})")
+        for flag in ("use_diagram_virtuality", "diagram_scanned_mass"):
+            if bool(self.cfg.model.get(flag, False)):
+                raise ValueError(f"model.{flag}=true has no effect with "
+                                 "diagram_encoder_impl=llm4lhc (no masses or momenta enter "
+                                 "their encoder); set it false")
+        cfg = self.cfg.model.get("diagram_encoder_llm4lhc", {}) or {}
+        diagrams_dir = self.cfg.model.get("diagrams_dir", "data/diagrams")
+        if not os.path.isabs(diagrams_dir):
+            diagrams_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), diagrams_dir)
+        paths = [self._resolve_diagram_path(diagrams_dir, n) for n in names]
+        missing = [n for n, p in zip(names, paths) if p is None]
+        if missing:
+            raise FileNotFoundError(
+                f"diagram_encoder_llm4lhc: no sidecar in {diagrams_dir} for {missing}; "
+                "generate them with `python tools/dump_diagrams.py --all`")
+        max_d = cfg.get("max_diagrams", None)
+        self._diag_set_llm4lhc = load_llm4lhc_diagram_set(
+            paths, laplacian_pe_dim=int(cfg.get("laplacian_pe_dim", 8)),
+            max_diagrams=int(max_d) if max_d is not None else None)
+        nd = self._diag_set_llm4lhc.n_diagrams
+        LOGGER.info(
+            f"Diagram conditioning (llm4lhc, mode={cfg.get('mode', 'pooled')}): "
+            f"{self._diag_set_llm4lhc.n_total} diagrams over {len(names)} processes "
+            f"(per process min {int(nd.min())}, max {int(nd.max())}), "
+            f"N_max={int(self._diag_set_llm4lhc.node_types.shape[1])} nodes; "
+            f"added to the token embeddings, n_scalars unchanged")
+
     def _setup_diagram_registry(self, names, spin_onehot, color_onehot,
                                 is_massless, standardize, generation_onehot=False, generation_feature=True, build_virtuality=False,
                                 couplings_by_pid=None,
@@ -1132,7 +1176,26 @@ class AmplitudeExperiment(BaseExperiment):
             # Build + attach the diagram graph encoder (a real submodule → trained,
             # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
             # so it exists before μP finalisation and warm-start loading.
-            if getattr(self, "_use_diagrams", False):
+            if getattr(self, "_use_diagrams", False) and \
+                    getattr(self, "_diag_impl", "ours") == "llm4lhc":
+                from models.diagram_encoder_llm4lhc import LLM4LHCDiagramEncoder
+                cfg = self.cfg.model.get("diagram_encoder_llm4lhc", {}) or {}
+                encoder = LLM4LHCDiagramEncoder(
+                    self._diag_set_llm4lhc,
+                    out_dim=int(model.net.net.hidden_channels),
+                    hidden_size=int(cfg.get("hidden_size", 256)),
+                    num_layers=int(cfg.get("num_layers", 3)),
+                    num_heads=int(cfg.get("num_heads", 4)),
+                    laplacian_pe_dim=int(cfg.get("laplacian_pe_dim", 8)),
+                    dropout=float(cfg.get("dropout", 0.0)),
+                    mode=str(cfg.get("mode", "pooled")),
+                    edge_feature_mode=str(cfg.get("edge_feature_mode", "bias_kv")),
+                )
+                model.setup_diagram_conditioning_llm4lhc(encoder)
+                LOGGER.info(f"Diagram encoder (llm4lhc): "
+                            f"{sum(p.numel() for p in encoder.parameters())} parameters, "
+                            f"out_dim={encoder.out_dim}")
+            elif getattr(self, "_use_diagrams", False):
                 from models.diagram_encoder import DiagramEncoder
                 f_node, f_edge = self._diag_feature_dims
                 enc_cfg = self.cfg.model.get("diagram_encoder", {}) or {}
@@ -1164,7 +1227,8 @@ class AmplitudeExperiment(BaseExperiment):
                 )
                 LOGGER.info("pair_bias: ON — per-pair off-shellness attention bias "
                             f"(H={int(self.cfg.model.net.num_heads)}, zero-init head)")
-            if getattr(self, "_use_diagrams", False):
+            if getattr(self, "_use_diagrams", False) and \
+                    getattr(self, "_diag_impl", "ours") == "ours":
                 if getattr(self, "_use_diag_virt", False):
                     model.setup_diagram_virtuality(
                         self._diag_virt_by_pid,

@@ -496,6 +496,10 @@ class MuPTransformer(nn.Module):
         # wrapper). When present it carries its own padded event-isolation mask, so
         # the xformers block-diagonal mask is skipped entirely.
         pair_ctx = attn_kwargs.pop("pair_ctx", None)
+        # Per-token additive term on the token embeddings (after linear_in, before the
+        # first block): the arXiv:2606.23791 diagram vector, placed on every particle of
+        # the event by the wrapper (models/diagram_encoder_llm4lhc.process_token_add).
+        token_add = attn_kwargs.pop("token_add", None)
         if pair_ctx is not None:
             attn_kwargs["pair_ctx"] = pair_ctx
         elif ptr is not None:
@@ -505,6 +509,8 @@ class MuPTransformer(nn.Module):
                 attn_kwargs["attn_bias"] = build_block_diagonal_bias(ptr, seq_lens=seq_lens)
 
         h = self.linear_in(inputs)
+        if token_add is not None:
+            h = h + token_add.to(h.dtype)
         for block in self.blocks:
             if self.checkpoint_blocks:
                 fn = partial(block, **attn_kwargs)

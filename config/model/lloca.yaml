@@ -59,6 +59,22 @@ diagram_encoder:             # graph-transformer hyperparameters (standard-param
   n_layers: 3
   k_pe: 8                     # Laplacian positional-encoding dimension
   max_diagrams: 512          # cap per process (high-multiplicity guard, e.g. qqbar_Zgggg)
+# Which encoder use_diagrams turns on. "ours": the one above (models/diagram_encoder.py; property
+# features, coupling orders, Tier B; E appended to the scalar features, d_diag wide). "llm4lhc":
+# arXiv:2606.23791's encoder (models/diagram_encoder_llm4lhc.py; node types + LapPE, learned
+# particle-label edge terms of their Eq. 19), its vector ADDED to every particle's token
+# embedding (after linear_in), n_scalars unchanged; d_diag, diagram_encoder, the virtuality and
+# scanned-mass options do not apply. Needs a sidecar for every process.
+diagram_encoder_impl: ours
+diagram_encoder_llm4lhc:     # their defaults (config/graph_pooled.yaml, App. B)
+  mode: pooled               # pooled | pooled_external (per_diagram has no injection site here)
+  hidden_size: 256           # encoder width (SP, fixed); out_proj maps it to the backbone width
+  num_layers: 3
+  num_heads: 4
+  laplacian_pe_dim: 8
+  dropout: 0.0
+  edge_feature_mode: bias_kv # bias | bias_kv
+  max_diagrams: null         # their default: every diagram (the old encoder caps at 512)
 net:
   _target_: models.lloca.LLOCAMuPTransformer
 
