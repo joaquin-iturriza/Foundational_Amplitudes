@@ -47,6 +47,24 @@ def site_report(prefixes, window_min):
                     queued[n] = sum(l.startswith("JOB ") for l in open(dags[-1])) if dags else 1
                 except OSError:
                     queued[n] = 1
+    else:
+        # a capped SLURM queue (CC-IN2P3: 100 jobs per user) leaves generated trials unsubmitted until
+        # sweep/feed_capped.py adds them as it drains: those are waiting, not lost (2026-10-08, 36 such points
+        # raised a false alert right after a 136-trial batch)
+        try:
+            from sweep_manager import DEFAULT_REGISTRY, load_registry
+            reg = load_registry(DEFAULT_REGISTRY)["sweeps"]
+        except Exception:
+            reg = {}
+        for n in names:
+            e = reg.get(n)
+            d = os.path.join(siteconf.SWEEP_DIR, n)
+            if not e or os.path.exists(os.path.join(d, "MOVED_TO")) or os.path.exists(os.path.join(d, "HELD")):
+                continue
+            sub = set(e.get("submitted_scripts", []))
+            waiting = sum(f not in sub for f in glob.glob(os.path.join(d, "jobs", "trial_*.sh")))
+            if waiting:
+                queued[n] = queued.get(n, 0) + waiting
     cut = time.time() - 60 * window_min
     failed = []
     for d in sweeps:
