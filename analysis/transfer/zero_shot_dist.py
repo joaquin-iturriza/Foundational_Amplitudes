@@ -1,7 +1,7 @@
 """Transfer study, real zero-shot, the distributions behind the scores of zero_shot_real.py: per probe, the validation
 split's log|M|^2 (truth), the shared-standardization pretraining's prediction mu + sigma h with no data of the probe
-(zero-shot), and that prediction after the best affine map onto the truth (the shape only), as histograms on one
-binning; and truth against zero-shot prediction as a 2-D histogram with the diagonal.
+(zero-shot), as histograms on one binning; and truth against zero-shot prediction as a 2-D histogram with the diagonal.
+No affine map: this parent is trained to place each process's log|M|^2 itself.
 Input: analysis/transfer/zero_shot_gstd_hist.txt (ZERO_SHOT_HIST lines of scripts/job_zero_shot_ft.sh --parent).
     python analysis/transfer/zero_shot_dist.py    -> figs/zero_shot_dist{1,2}_[a-f], figs/zero_shot_2d{1,2}_[a-f], legends
 (two sets of six probes each: a panel set holds at most nine)
@@ -27,13 +27,12 @@ for half, PP in ((1, P[:6]), (2, P[6:])):
   figs = ps.panels(len(PP))
   for (fig, ax), p in zip(figs, PP):
       r = H[p]; e = np.asarray(r["edges"])
-      for key, lab, col, ls in (("truth", "truth", "k", "-"), ("pred", "zero-shot", ps.C.vermillion, "-"),
-                                ("pred_affine", "zero-shot, affine map", ps.C.orange, "--")):
+      for key, lab, col, ls in (("truth", "truth", "k", "-"), ("pred", "zero-shot", ps.C.vermillion, "-")):
           c = np.asarray(r[key], float)
           ax.stairs(c / c.sum(), e, color=col, ls=ls, label=lab)
       ax.set_xlabel(r"$\log|\mathcal{M}|^2$"); ax.set_ylabel("fraction of events")
       ps.process_label(ax, LAB[p])
-  ps.legend_strip(figs[0][1], os.path.join(F, "zero_shot_dist_legend"), ncol=3)
+  ps.legend_strip(figs[0][1], os.path.join(F, "zero_shot_dist_legend"), ncol=2)
   ps.save_panels(figs, os.path.join(F, f"zero_shot_dist{half}"))
 
 for half, PP in ((1, P[:6]), (2, P[6:])):

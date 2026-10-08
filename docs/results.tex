@@ -4912,10 +4912,32 @@ $\sigma_p^2$; $1$ is as good as the probe's exact mean, which the model is not g
 $ee\to t\bar t$ $0.14$, the one-loop $ee\to d\bar d$ $0.46$ (the first and third better than scratch on $10$ events);
 $ee\to Z\gamma$, $u\bar u\to Zggg$, $ee\to\nu_e\bar\nu_e$, $ud\to ud$ $1.2$--$1.5$, $ee\to W^+W^-$ $1.8$;
 far off on the one-loop $ee\to b\bar b$ ($16$), $u\bar u\to Zgg$ ($13$), $u\bar u\to Zg$ ($50$) and $u\bar u\to gg$
-($406$, an offset of $\sim18$ in $\log|\mathcal M|^2$). Up to an affine map the same outputs score $0.02$--$0.87$
-(shape mostly right): what fails is the normalization, worst where the probe's couplings and multiplicity are furthest
-from rung $9$'s processes (two external gluons and none of rung $9$'s $q\bar q\to gg$). Scratch on $10^2$ events beats
-the zero-shot prediction on every probe.
+($406$). Event by event (Fig.~\ref{fig:zero_shot_2d}, \code{zero\_shot\_dist.py}) the failures are of three kinds:
+an offset with the right dependence on the kinematics ($u\bar u\to Zgg$, $\sim9$ units low, parallel to the diagonal;
+$u\bar u\to Zggg$ and the one-loop $ee\to b\bar b$, $2$--$4$ low); a prediction nearly constant over the event
+($ee\to W^+W^-$ at $\sim-4.5$ while the truth spans $-7$ to $5$, most of $ee\to\nu_e\bar\nu_e$); and a wrong dependence
+($ud\to ud$, $ee\to Z\gamma$ capped at $\sim-1.5$, $u\bar u\to gg$ spread over $-21$ to $-4$ against a true range of
+$0$--$3$, $u\bar u\to Zg$). Scratch on $10^2$ events beats the zero-shot prediction on every probe. No affine map is
+applied here: it would remove exactly the scale and offset this parent is trained to predict (the affine score is for
+the per-process standardized parents, Fig.~\ref{fig:zero_shot_gain}). In distribution, the shared standardization costs
+accuracy: MSE of $\log|\mathcal M|^2$ at the best checkpoint, geometric mean over the $19$ processes, $9.4\times10^{-5}$
+against rung $9$'s $7.6\times10^{-6}$ ($12\times$; $2.3$--$420\times$ by process, worst on $u\bar u\to t\bar t$), the
+shared run sitting near $5\times10^{-5}$ on almost every process (one seed; hp73 was tuned for per-process units).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/zero_shot_2d_legend.pdf}\\
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d1_a.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d1_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d1_c.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d1_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d1_e.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d1_f.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d2_a.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d2_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d2_c.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d2_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/zero_shot_2d2_e.pdf}\hfill\pnl{../analysis/transfer/figs/zero_shot_2d2_f.pdf}}
+\caption{Real zero-shot of the shared-standardization pretraining, per probe: true $\log|\mathcal M|^2$ against the
+prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the diagonal is a perfect prediction. The
+1-D distributions are \code{zero\_shot\_dist\{1,2\}\_*}.}
+\label{fig:zero_shot_2d}
+\end{figure}
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
