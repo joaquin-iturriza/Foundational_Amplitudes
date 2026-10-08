@@ -87,17 +87,28 @@ VALID_MODES = ("pooled", "per_diagram", "pooled_external")
 VALID_EDGE_FEATURE_MODES = ("bias", "bias_kv")
 
 # MadGraph SM particles that are their own antiparticle; their sign in a diagram's line
-# list is an orientation artefact.
-_SELF_CONJUGATE = {21, 22, 23, 25}
+# list is an orientation artefact (250: the neutral Goldstone G0).
+_SELF_CONJUGATE = {21, 22, 23, 25, 250}
+
+# Internal lines of MadGraph's one-loop diagrams (loop_sm, Feynman gauge) that their tree-level data never has, so their
+# 30-entry vocabulary lacks them: the ghosts (82 gluon, 9000001 photon, 9000002 Z, 9000003 W+, 9000004 W-) and the
+# Goldstones (250 G0, 251 G+). Each gets its own learned label after the 30, in a FIXED order (not built from the data),
+# so the embedding tables have the same size for every recipe and a parent loads into any fine-tune (2026-10-08: rung 9's
+# one-loop processes stopped the first GPU run on PDG 82).
+_LOOP_LINES = (82, -82, 9000001, -9000001, 9000002, -9000002, 9000003, -9000003, 9000004, -9000004, 250, 251, -251)
 
 
 def particle_label_vocab():
-    """Signed PDG -> edge label in [0, 30): the SM particles and antiparticles of
+    """Signed PDG -> edge label: [0, 30) the SM particles and antiparticles of
     ``particle_ids.PARTICLE_PROPERTIES`` in sorted-PDG order (the same 30 entries as
     their ``particles.json``; only the numbering differs, which a learned embedding
-    does not see)."""
+    does not see), then the one-loop ghosts and Goldstones of ``_LOOP_LINES``."""
     from particle_ids import GLOBAL_PDG_IDX
-    return {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    vocab = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    n = len(vocab)
+    for k, pdg in enumerate(_LOOP_LINES):
+        vocab[pdg] = n + k
+    return vocab
 
 
 def _label(pdg, vocab):
