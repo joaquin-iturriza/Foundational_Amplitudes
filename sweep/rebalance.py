@@ -286,7 +286,9 @@ def _has(site, path):
 
 
 def site_run(site, *cmd, timeout=900):
-    p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", site,
+    # moving work is upkeep of every active work item: `--item *` (site refuses work outside active items and the
+    # submitters on the site any sweep of a held one, ~/work/CLAUDE.md "Decisions and work items")
+    p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", "--item", "*", site,
                         "FA", "--"] + list(cmd), capture_output=True, text=True)
     return p.stdout + p.stderr
 
@@ -388,7 +390,7 @@ def apply_trials(moves, inv):
         for p in sorted({p for p in map(_parent, names) if p}):
             if not _has(dst, f"{p}/models"):
                 holder = next((s for s in inv if s != dst and _has(s, f"{p}/models")), None)
-                if holder is None or subprocess.run(["site", "copy", "FA", holder, dst, p]).returncode != 0 \
+                if holder is None or subprocess.run(["site", "copy", "--item", "*", "FA", holder, dst, p]).returncode != 0 \
                         or not _has(dst, f"{p}/models"):
                     print(f"  parent {p} not on {dst}: its trials stay on {src}")
                     names = [n for n in names if _parent(n) != p]
@@ -436,7 +438,7 @@ def apply(moves, sites):
         for p in sorted({p for p in map(_parent, names) if p}):
             if not _has(dst, f"{p}/models"):
                 holder = next((s for s in sites if s != dst and _has(s, f"{p}/models")), None)
-                if holder is None or subprocess.run(["site", "copy", "FA", holder, dst, p]).returncode != 0 \
+                if holder is None or subprocess.run(["site", "copy", "--item", "*", "FA", holder, dst, p]).returncode != 0 \
                         or not _has(dst, f"{p}/models"):
                     print(f"  parent {p} not on {dst}: its sweeps stay on {src}")
                     names = [n for n in names if _parent(n) != p]

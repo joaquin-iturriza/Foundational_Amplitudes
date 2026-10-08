@@ -192,3 +192,26 @@ def cpu_header(job_name, out, err, cpus=32, time="04:00:00", extra=()):
 def setup_lines(cfg=None):
     cmds = (cfg or {}).get("paths", {}).get("setup_commands") or SETUP_COMMANDS
     return "\n".join(cmds)
+
+
+def work_gate(names):
+    """(allowed, refused) of the sweep / run names a submitter is about to start, against the work items that
+    `site run --item ...` named (CCORCH_WORK, ~/work/CLAUDE.md "Decisions and work items"): a name must match an
+    active item's globs and no held item's. Refused when CCORCH_WORK is missing: work starts only through
+    `site run --item`, so a hold set on the laptop reaches every submitter here (2026-10-06: a hold the agent kept
+    in its head was applied to the wrong runs)."""
+    import fnmatch
+    import json
+    raw = os.environ.get("CCORCH_WORK")
+    if not raw:
+        return [], [(n, "no work item named: start it with `site run --item <id> ...`") for n in names]
+    w = json.loads(raw)
+    ok, no = [], []
+    for n in names:
+        if any(fnmatch.fnmatchcase(n, g) for g in w.get("held", [])):
+            no.append((n, "its work item is held"))
+        elif not any(fnmatch.fnmatchcase(n, g) for g in w.get("active", [])):
+            no.append((n, "not part of the named work items %s" % ",".join(w.get("items", [])) or "(none)"))
+        else:
+            ok.append(n)
+    return ok, no
