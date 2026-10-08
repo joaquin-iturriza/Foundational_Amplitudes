@@ -4873,7 +4873,7 @@ are \code{finale\_synth\_scaling\_ee\_*}, \code{\_arm\_*}.}
 
 \paragraph{The conditionings and per-process accumulation, judged on fine-tuning, at $D=10^2$ and $10^3$.} The design
 as approved (2026-10-06) was the twelve probes at $D=10^2$, $10^3$ ($8$k, $5$-trial search) and $10^4$ ($32$k, two chosen
-points); the $10^4$ cells are held with every $32$k run, so what follows is $2$ of the grid's $7$ values of $D$, and the
+points); the $10^4$ cells come in the next paragraph, so what follows is $2$ of the grid's $7$ values of $D$, and the
 other four ($10$, $10^{1.5}$, $10^{2.5}$, $10^{3.5}$) were never part of the arms' design. Each arm is rung $9$'s
 pretraining with one change, at hp73 and $64$k steps (the user's calls (B) and (C)), and each search shares its DyHPO
 seed, hence its candidate pool and start-up points, with rung $9$'s on the same cell
@@ -4888,6 +4888,16 @@ $9.20\times10^{-7}$, the best pretraining, yet worse ($-0.16$, $1$ probe, $p=0.0
 arms tested: with a Bonferroni factor $5$, accumulation and the generation feature stay below $0.05$, off-shellness does
 not. In these two arms the pretraining ranking is reversed on fine-tuning. One seed per arm (rung $5$ twice at hp73
 differed by $8\%$ in pretraining loss).
+
+\paragraph{The conditionings at $D=10^4$, and the finale at $32$k (partial, 2026-10-08 13:30).} A $32$k cell is the best
+of rung $9$'s two chosen points (\code{horizon32k\_chosen.json}), the arm run at the same two, so it is measured at
+different compute from the $8$k cells above, and the two are not pooled. Per cell $\log_{10}(L_\text{rung 9}/L_\text{arm})$
+over the twelve probes: Feynman diagrams on, median $-0.24$\,dex, better on $3$ of $12$, $p=0.077$ (worst
+$ee\to b\bar b$ one-loop $-1.04$, best $ee\to\nu\bar\nu$ $+0.48$); coupling scalars off, $-0.14$, $3$ of $12$, $p=0.47$
+($ee\to W^+W^-$ alone $+2.29$); generation feature off, $9$ of $12$ cells in, $+0.10$, $6$ of $9$, $p=0.36$; off-shellness
+off, none in yet. The finale against rung $9$ at $D=10^{3.5}$ and $10^4$, on the $19$ cells of $10$ probes where both
+finished: median over probes $+0.07$\,dex, better on $8$ of $10$, $p=0.32$; its $D=10^{4.5}$, $10^5$ cells have no rung
+$9$ cell to meet (those are held), and its star-arm probes no $32$k star-arm cell.
 
 \begin{figure}[H]
 \centering
