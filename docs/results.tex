@@ -4942,8 +4942,14 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
-    compute item approved).} \textbf{On hold since 2026-10-06, 22:45, on the user's call: every $32$k run} (the rest of
-    (1), all of (2), the $32$k cells of (3), (4) and (6), and the $32$k HP landscape pass), resumed only when the user says.
+    compute item approved).} \textbf{On hold since 2026-10-06, 22:45, on the user's call: the horizon item's $32$k runs} (the rest of
+    (1), all of (2), and the $32$k HP landscape pass that belongs to it), resumed only when the user says. The hold was
+    first applied to every run of $32$k steps; the user meant only the horizon item (2026-10-08), so the finale's $32$k
+    cells ($69$; their DAGs had been removed on lxplus and were resubmitted) and the four lever arms' $D=10^4$ cells ($48$,
+    rung $9$'s chosen points) were released on 2026-10-08; the synthetic grid's $32$k cells are on Jean Zay, released when
+    it answers. The accumulation arm (C) and the diagram arm of (B) are redone as in arXiv:2606.23791's code (user,
+    2026-10-08: the same scheme as theirs; the same diagram encoder): (C) ran one micro-batch of every process per update,
+    theirs runs single-process batches in round-robin, $G=2$--$4$ accumulated per update.
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
     (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues. \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
