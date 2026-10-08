@@ -532,6 +532,12 @@ being *fair* and *not wasteful*:
 
 ## Waiting on jobs (always a mechanism, never hand-poll)
 
+FA's work runs under `site` work items (`ledger = true`, `~/work/CLAUDE.md` "Decisions and work items"): one
+`site supervise --project FA` loop (CC feeder, rebalancer, `watchdog.py --units` as every item's check, overruns, run
+ends) and one `site events --wait --project FA` waiter replace the per-batch watchdog and waiter loops below; a run
+submitted with `--item` is watched by the supervisor without a waiter of its own. New sweep families go into
+`analysis/transfer/expect_tp3.json` so their item's check counts them.
+
 When I submit a job/test and need its result before continuing, **do not** poll
 `squeue` in a manual loop of tool calls, and **do not** promise "I'll check back"
 without a mechanism. The standard way on this laptop:
