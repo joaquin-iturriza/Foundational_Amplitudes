@@ -161,6 +161,7 @@ class LLOCAMuPTransformer(nn.Module):
         ptr: torch.Tensor,
         seq_lens=None,
         pair_ctx=None,
+        token_add=None,
     ):
         """Forward pass of the LLoCa network."""
         frames = self.framesnet(
@@ -196,24 +197,24 @@ class LLOCAMuPTransformer(nn.Module):
         if self.loss == "HETEROSC" and self.sigma_after_pool:
             if self.detach_sigma_backbone:
                 h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
-                             pair_ctx=pair_ctx, return_features=True)
+                             pair_ctx=pair_ctx, token_add=token_add, return_features=True)
                 mu = self.net.linear_out(h)[..., : self.out_shape]
                 sig_logit = self.net.linear_out(h.detach())[..., -self.out_shape:]
                 return torch.cat([mu, sig_logit], dim=-1)
             # raw logits; the wrapper pools then softpluses
-            return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
+            return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx, token_add=token_add)
 
         if self.loss == "HETEROSC" and self.detach_sigma_backbone:
             # Apply linear_out twice: mu from live features (grad -> backbone), sigma
             # from detached features (linear_out sigma-rows still train, backbone does
             # not see sigma's gradient). See __init__ note.
             h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
-                         pair_ctx=pair_ctx, return_features=True)
+                         pair_ctx=pair_ctx, token_add=token_add, return_features=True)
             mu = self.net.linear_out(h)[..., : self.out_shape]
             sigma_raw = self.net.linear_out(h.detach())[..., -self.out_shape:]
             sigma = torch.clamp(F.softplus(sigma_raw), min=1e-6)
             return torch.cat([mu, sigma], dim=-1)
-        out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx)
+        out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx, token_add=token_add)
         if self.loss == "HETEROSC":
             # softplus the sigma channels for positivity (floored), matching MuMLP.
             mu = out[..., : self.out_shape]
