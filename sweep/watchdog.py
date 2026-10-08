@@ -122,6 +122,9 @@ def main():
                     help="a longer stall limit on a site whose normal queue wait exceeds --stall (Jean Zay's A100 fair "
                          "share: jobs routinely wait ~5.5 h)")
     ap.add_argument("--sites", nargs="+", default=SITES)
+    ap.add_argument("--units", action="store_true",
+                    help="for `site supervise`: one JSON line {units: {sweep: {expected, done, active}}, alerts: [...]}, "
+                         "exit 0; the supervisor groups the sweeps into work items and finds the gaps itself")
     a = ap.parse_args()
     if a.site_report:
         return site_report(a.prefixes, a.window)
@@ -159,6 +162,7 @@ def main():
         for n, k in list(r["running"].items()) + list(r["queued"].items()):
             active[n] = active.get(n, 0) + k
     n_missing = 0
+    units = {}
     if a.expect:
         exp = json.load(open(os.path.join(REPO, a.expect) if not os.path.isabs(a.expect) else a.expect))
         idle = {}
@@ -168,9 +172,10 @@ def main():
                 continue
             miss = sorted(set(hps) - got.get(sw, set()))
             n_missing += len(miss)
+            units[sw] = {"expected": len(set(hps)), "done": len(set(hps)) - len(miss), "active": active.get(sw, 0)}
             if len(miss) > active.get(sw, 0):
                 idle[sw] = miss
-        if idle:
+        if idle and not a.units:
             alerts.append(f"{sum(map(len, idle.values()))} expected point(s) in {len(idle)} sweep(s) have no result and "
                           f"fewer trials running or queued anywhere, e.g. {next(iter(idle))} {next(iter(idle.values()))}")
     try:
@@ -195,6 +200,9 @@ def main():
     status = " | ".join(f"{s} run {sum(r['running'].values())} q {sum(r['queued'].values())} "
                         f"res {sum(len(v) for v in r['results'].values())}" for s, r in rep.items())
     print(time.strftime("%H:%M"), status + (f" | missing {n_missing}" if a.expect else ""))
+    if a.units:
+        print(json.dumps({"units": units, "alerts": alerts}))
+        return 0
     for al in alerts:
         print("ALERT", al)
     return 1 if alerts else 0

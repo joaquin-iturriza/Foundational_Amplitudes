@@ -436,6 +436,10 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
             from sweep.sweep_manager import submit_sweeps
             submit_sweeps([afs_dir])
         else:
+            # only a sweep of the work items `site run --item` named, never a held one (siteconf.work_gate)
+            _, refused = siteconf.work_gate([cfg["sweep_name"]])
+            if refused:
+                raise SystemExit(f"refused {cfg['sweep_name']}: {refused[0][1]}")
             dag = write_dag(cfg, afs_dir, job_paths, first_idx=existing_jobs)
             subprocess.run(["condor_submit_dag", "-batch-name", f"{cfg['sweep_name']}_{existing_jobs:04d}", dag],
                            check=True, cwd=afs_dir)
