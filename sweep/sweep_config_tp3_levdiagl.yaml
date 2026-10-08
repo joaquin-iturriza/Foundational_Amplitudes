@@ -10,7 +10,7 @@ cluster:
   mem: 8G
   cpus_per_task: 4
   chain_width: 2
-  time: '12:15:00'
+  time: '20:00:00'  # diagram encoder on every step; the accumulation arm took 14.6 h
 paths: null
 sweep_name: tp3_levdiagl
 n_trials: 8
