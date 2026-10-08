@@ -37,8 +37,20 @@ jobs=$(timeout 30 site runs --project FA --limit 100 2>/dev/null \
 # run id counts (another session's or project's poll proves nothing), or a run
 # listed in .claude/.slurm_monitor_jobs by a Monitor, or the on-site waiter.
 MON="$REPO/.claude/.slurm_monitor_jobs"
+# A run submitted under a `site` work item is watched by `site supervise` (overruns, run ends), and the global
+# ledger_guard.sh Stop hook already blocks while that supervisor or its events waiter is not alive.
+itemed=$(python3 - <<'PY' 2>/dev/null
+import os, sqlite3
+try:
+    c = sqlite3.connect(os.path.expanduser("~/.local/share/ccorch/runs.db"))
+    print(" ".join(r[0] for r in c.execute("SELECT id FROM runs WHERE item IS NOT NULL AND item != ''")))
+except Exception:
+    pass
+PY
+)
 unwatched=""
 for rid in $(awk '{print $1}' <<<"$jobs"); do
+  case " $itemed " in *" $rid "*) continue ;; esac
   if pgrep -f "site poll.*$rid" >/dev/null 2>&1 \
      || pgrep -f "wait_for_slurm.sh.*$(awk -v r="$rid" '$1==r {print $2}' <<<"$jobs")" >/dev/null 2>&1 \
      || { [ -f "$MON" ] && grep -qx "$rid" "$MON"; }; then
