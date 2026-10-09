@@ -3526,5 +3526,15 @@
  "tp3_levdiaglfte_uubar_Zggg_d4": 5,
  "tp3_levdiaglfte_uubar_Zggg_d6": 5,
  "tp3_levdiaglfte_uubar_gg_d4": 5,
- "tp3_levdiaglfte_uubar_gg_d6": 5
+ "tp3_levdiaglfte_uubar_gg_d6": 5,
+ "tp3_finale_wng": [
+  73
+ ],
+ "tp3_finale_synhm": [
+  73
+ ],
+ "tp3_scr32k_uubar_Zgggg_d8": 5,
+ "tp3_finfte32k_uubar_Zgggg_d8": 5,
+ "tp3_scr32k_uubar_Zggggg_d8": 5,
+ "tp3_finfte32k_uubar_Zggggg_d8": 5
 }
