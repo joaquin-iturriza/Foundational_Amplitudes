@@ -20,7 +20,8 @@ is kept wherever it ran.
   5. --caches: pip's cache under $SCRATCH emptied; amp_data_cache entries untouched for --cache-days removed (both
      rebuilt on demand)
 
-    python sweep/prune.py [PREFIX ...] [--apply] [--caches] [--cache-days 30]
+    python sweep/prune.py [PREFIX ...] [--apply] [--caches] [--submit-logs] [--cache-days 30] [--every HOURS]
+--every: skip this run if the last applied one on this site was less than HOURS ago (for the supervisor's upkeep).
 """
 import argparse, glob, json, os, re, shutil, sys, time
 
@@ -219,7 +220,13 @@ def main():
     ap.add_argument("--caches", action="store_true")
     ap.add_argument("--submit-logs", action="store_true")
     ap.add_argument("--cache-days", type=float, default=30)
+    ap.add_argument("--every", type=float, help="skip unless the last applied prune here is older than this (hours)")
     a = ap.parse_args()
+    stamp = os.path.join(siteconf.SWEEP_DIR, ".last_prune")
+    if a.every and a.apply and os.path.exists(stamp) and time.time() - os.path.getmtime(stamp) < 3600 * a.every:
+        print("SUMMARY %s: last prune %.1f h ago, next after %.0f h" % (
+            siteconf.SITE, (time.time() - os.path.getmtime(stamp)) / 3600, a.every))
+        return
     from rebalance import _queue
     q = _queue()
     protect = parents()
@@ -238,6 +245,8 @@ def main():
     print("SUMMARY %s %s: %d sweeps, %.1f GB %s; %d parent trials protected" % (
         siteconf.SITE, "applied" if a.apply else "dry run", nsw, total / 1e9, "freed" if a.apply else "to free",
         len(protect)))
+    if a.apply:
+        open(stamp, "w").close()
     if a.submit_logs:
         sl = sum(submit_logs(n, a.apply) for n in sorted(names) if finished(n, q))
         print("SUMMARY submit logs: %.2f GB %s" % (sl / 1e9, "freed" if a.apply else "to free (estimate)"))
