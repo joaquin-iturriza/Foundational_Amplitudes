@@ -9,7 +9,7 @@ apply a model to it, for the continual-pretraining test (the user's call of 2026
           away from this run forgot of its processes, read in the run's own preprocessed units (val_loss_no_reg).
 
     python tools/run_data_tools.py fisher --run-dir runs/tp3_finale/trial_0073 [--n-batches 64]
-    python tools/run_data_tools.py eval --run-dir runs/tp3_finale/trial_0073 --weights runs/X/trial_Y/models/model_run0_best.pt.gz --out f.json
+    python tools/run_data_tools.py eval --run-dir runs/tp3_finale/trial_0073 --weights runs/X/trial_Y/models/model_run0_best.pt.gz [...] --out f.json
 Runs on a GPU node (a job), never on a login node.
 """
 import argparse, json, os, sys
@@ -79,17 +79,20 @@ def cmd_fisher(a):
 
 
 def cmd_eval(a):
-    exp = build(a.run_dir, a.weights)
-    exp.evaluate()
-    res = {}
-    for name, r in exp.results_val.items():
-        pre = (r or {}).get("preprocessed") or {}
-        if "mse" in pre:
-            res[name] = float(pre["mse"])
-    out = {"run_dir": a.run_dir, "weights": a.weights, "val_mse_prepd": res}
+    """One or more checkpoints, each built afresh on the run's data; --out holds one record, or a list for several."""
+    outs = []
+    for w in a.weights:
+        exp = build(a.run_dir, w)
+        exp.evaluate()
+        res = {}
+        for name, r in exp.results_val.items():
+            pre = (r or {}).get("preprocessed") or {}
+            if "mse" in pre:
+                res[name] = float(pre["mse"])
+        outs.append({"run_dir": a.run_dir, "weights": w, "val_mse_prepd": res})
+        print("EVAL " + json.dumps(outs[-1]), flush=True)
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-    json.dump(out, open(a.out, "w"), indent=1)
-    print("EVAL " + json.dumps(out))
+    json.dump(outs[0] if len(outs) == 1 else outs, open(a.out, "w"), indent=1)
 
 
 def main():
@@ -97,7 +100,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("fisher"); s.add_argument("--run-dir", required=True); s.add_argument("--n-batches", type=int, default=64)
     s.set_defaults(fn=cmd_fisher)
-    s = sub.add_parser("eval"); s.add_argument("--run-dir", required=True); s.add_argument("--weights", required=True)
+    s = sub.add_parser("eval"); s.add_argument("--run-dir", required=True); s.add_argument("--weights", required=True, nargs="+")
     s.add_argument("--out", required=True); s.set_defaults(fn=cmd_eval)
     a = ap.parse_args()
     a.run_dir = os.path.abspath(a.run_dir)
