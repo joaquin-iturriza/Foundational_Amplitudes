@@ -4870,8 +4870,10 @@ to $2\to6$ the way they did from $2\to3$ to $2\to4$. Four of the eight fine-tune
 step $3\,000$, all at $\mathrm{lr}\ge4\times10^{-3}$: their validation loss jumps by one to three orders after it (one $Z+5g$
 trial to $18$ near step $9\,600$) and recovers only partly; the trials at $\mathrm{lr}\le4\times10^{-3}$ train smoothly
 to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top for these probes. The add-$W$ steps
-($16$k, $W$-only loss): naive $7.1\times10^{-4}$ ($2$ of $5$), EWC $7.7\times10^{-4}$ ($3$ of $5$); forgetting not yet
-measured.
+($16$k; validation \code{val\_loss\_no\_reg} on $W+4g$, $W+5g$, preprocessed units, 13:30): EWC complete, best
+$4.9\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
+$4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here. Forgetting and
+the mixed score (D23) are being evaluated on all $30$ processes in one job (\code{FA-ccin2p3-32a65175}).
 
 \begin{figure}[H]
 \centering
