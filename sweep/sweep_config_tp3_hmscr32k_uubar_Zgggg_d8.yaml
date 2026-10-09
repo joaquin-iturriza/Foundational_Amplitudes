@@ -1,4 +1,4 @@
-# Transfer pilot, scratch: uubar_Zggggg on D = 10^4 events.
+# Transfer pilot, scratch: uubar_Zgggg on D = 10^4 events.
 # Copied by hand from the corresponding uubar_Zggg / tp3_finale config written by sweep/gen_transfer_pilot.py (2026-10-09).
 cluster:
   scheduler: slurm
@@ -7,9 +7,9 @@ cluster:
   mem: 8G
   cpus_per_task: 4
   chain_width: 2
-  time: '10:00:00'
+  time: 08:00:00
 paths: null
-sweep_name: tp3_scr32k_uubar_Zggggg_d8
+sweep_name: tp3_hmscr32k_uubar_Zgggg_d8
 n_trials: 8
 dyhpo:
   n_candidates: 200
@@ -63,7 +63,7 @@ fixed_params:
   training.dtype: float32
   plot: 'true'
   use_mlflow: 'false'
-  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zggggg.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zgggg.yaml
   data.train_subsample: 10000
 range_extension:
   enabled: false
