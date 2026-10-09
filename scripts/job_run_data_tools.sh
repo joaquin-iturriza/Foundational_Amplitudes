@@ -10,5 +10,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-# site submit passes no arguments: they come in RDT_ARGS (site submit --env RDT_ARGS="...")
-python tools/run_data_tools.py ${RDT_ARGS:-"$@"}
+# site submit passes no arguments: they come in RDT_ARGS, words joined by '+' (the scheduler's environment export
+# splits on spaces), e.g. site submit ... --env RDT_ARGS=fisher+--run-dir+runs/tp3_finale/trial_0073
+if [ -n "${RDT_ARGS:-}" ]; then set -- ${RDT_ARGS//+/ }; fi
+python tools/run_data_tools.py "$@"
