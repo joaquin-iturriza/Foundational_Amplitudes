@@ -194,6 +194,25 @@ def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
     return cmd
 
 
+def _drop_last_model(cfg, run_dir, run_idx, t_steps):
+    """A trial that ended at its sweep's top fidelity keeps only its best checkpoint: the last model
+    (model_run<i>.pt[.gz]) is read only to warm-start a higher fidelity, and every reported value and every
+    fine-tune parent is the best checkpoint (CLAUDE.md "Reported values"; the user's call of 2026-10-09: the last
+    models were half of the 212 GB of runs/ on CC-IN2P3 with /sps/lpnhe at 98%)."""
+    sched = (cfg.get("fidelity_schedule") or {}).get("t_steps") or [t_steps]
+    if t_steps < max(sched):
+        return
+    models = os.path.join(run_dir, "models")
+    best = [os.path.join(models, f"model_run{run_idx}_best.pt{z}") for z in (".gz", "")]
+    if not any(os.path.exists(f) for f in best):
+        return                                     # no best checkpoint: keep the only model there is
+    for z in (".gz", ""):
+        f = os.path.join(models, f"model_run{run_idx}.pt{z}")
+        if os.path.exists(f):
+            os.remove(f)
+            print(f"[run_trial] removed the last model {f} (the best checkpoint is kept)")
+
+
 def _write_summary(cfg, sampler, eos_dir):
     results = sampler.all_results()
     best    = sampler.best_result()
@@ -361,6 +380,7 @@ def main():
             result = json.load(f)
         val_loss        = float(result["val_loss"])
         proc_val_losses = result.get("proc_val_losses")
+        _drop_last_model(cfg, run_dir, run_idx, t_steps)
 
         # Use transfer-ratio geometric mean as HPO objective when scaling law
         # params are available; fall back to raw combined val_loss otherwise.
