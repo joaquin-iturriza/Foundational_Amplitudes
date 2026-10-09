@@ -5180,6 +5180,18 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     soft emission as an eikonal factor times a lower-multiplicity amplitude; one-loop amplitudes from scalar integrals
     (Sec.~\ref{sec:syn-loops}); and multiplicities well past $2\to4$, to where MadGraph struggles and the generator does
     not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average.
+  \item \textbf{High-multiplicity test} (the user's call of 2026-10-09, \code{site} decisions D20, D21; targeted, no
+    evaluation beyond these probes). Probes $u\bar u\to Z+4g$ ($2\to5$) and $Z+5g$ ($2\to6$), new MadGraph processes
+    (\code{uubar\_Zgggg}, \code{uubar\_Zggggg}), at $D=10^4$ first ($32$k steps, $5$-trial searches); the other $D$ only once
+    the design is settled there. Arms: scratch; the finale (\code{tp3\_finale}, the reference: the largest
+    pretraining of the transfer study); the finale's pretraining with $W+4g$, $W+5g$ added (\code{tp3\_finale\_wng}, the
+    finale already holds $W+g$ to $W+3g$); the finale's pretraining with $8$ synthetic processes at $2\to5$ and $2\to6$
+    (\code{tp3\_finale\_synhm}; the generator's $K_\text{max}$ extended to $7$, $8$, version $1$ rules otherwise). Continual
+    pretraining (D21): the finale fine-tuned $16$k steps on $W+4g$, $W+5g$ alone (\code{tp3\_wadd\_naive}) and with
+    replay of its own $28$ processes (\code{tp3\_wadd\_replay}); forgetting read as the per-process validation loss on
+    the finale's processes against the finale's own; then the same $Z$ fine-tunes from each. The built-in EWC
+    (\code{fine\_tune.ewc}) estimates its Fisher matrix on the \emph{new} data, so it does not protect the old
+    processes as written; it enters only once fixed. Set up 2026-10-09 05:30, nothing run yet.
   \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
     $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
     prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
