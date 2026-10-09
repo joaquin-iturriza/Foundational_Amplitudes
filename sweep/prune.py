@@ -14,6 +14,9 @@ re-scored or rerun from its config. Before deleting anything in a sweep, runs/<s
 (hp, fidelity, val_loss, per-process losses, run dir, what was deleted and its size); one PRUNE JSON line per sweep
 goes to stdout for the laptop to keep. A sweep that also ran on another site keeps its best here, so the global best
 is kept wherever it ran.
+  4b. --submit-logs: in a finished sweep's directory under SWEEP_DIR (on lxplus the 2 GB AFS home) the scheduler's
+     bookkeeping (DAG manager output and logs, node logs, *.bak copies of the DyHPO state) is removed and trial
+     stdout/stderr (*.out, *.err) gzipped in place
   5. --caches: pip's cache under $SCRATCH emptied; amp_data_cache entries untouched for --cache-days removed (both
      rebuilt on demand)
 
@@ -168,6 +171,30 @@ def plan_sweep(sweep, q, protect, apply):
     return man
 
 
+def submit_logs(sweep, apply):
+    d = os.path.join(siteconf.SWEEP_DIR, sweep)
+    freed = 0
+    for dp, _, fs in os.walk(d):
+        for f in fs:
+            p = os.path.join(dp, f)
+            if re.search(r"\.dag\.(dagman\.(out|log)|nodes\.log|metrics|lock)$|\.dag\.rescue\d+$|\.bak$", f) or \
+                    (f.endswith(".log") and "/output" not in dp and f.startswith(("sweep_", "trial_"))):
+                freed += _size(p)
+                if apply:
+                    os.remove(p)
+            elif f.endswith((".out", ".err")) and _size(p) > 4096:
+                import gzip
+                n = _size(p)
+                if apply:
+                    with open(p, "rb") as fi, gzip.open(p + ".gz", "wb") as fo:
+                        shutil.copyfileobj(fi, fo)
+                    os.remove(p)
+                    freed += n - _size(p + ".gz")
+                else:
+                    freed += int(0.85 * n)
+    return freed
+
+
 def caches(days, apply):
     freed = 0
     pip = os.path.join(siteconf.SCRATCH, "pip-cache")
@@ -190,6 +217,7 @@ def main():
     ap.add_argument("prefixes", nargs="*", default=[""])
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--caches", action="store_true")
+    ap.add_argument("--submit-logs", action="store_true")
     ap.add_argument("--cache-days", type=float, default=30)
     a = ap.parse_args()
     from rebalance import _queue
@@ -210,6 +238,9 @@ def main():
     print("SUMMARY %s %s: %d sweeps, %.1f GB %s; %d parent trials protected" % (
         siteconf.SITE, "applied" if a.apply else "dry run", nsw, total / 1e9, "freed" if a.apply else "to free",
         len(protect)))
+    if a.submit_logs:
+        sl = sum(submit_logs(n, a.apply) for n in sorted(names) if finished(n, q))
+        print("SUMMARY submit logs: %.2f GB %s" % (sl / 1e9, "freed" if a.apply else "to free (estimate)"))
     if a.caches:
         c = caches(a.cache_days, a.apply)
         print("SUMMARY caches: %.1f GB %s" % (c / 1e9, "freed" if a.apply else "to free"))
