@@ -5322,14 +5322,14 @@ $w_{W^\pm}=0.6$, $w_H=0.4$, $w_{\nu_e,\nu_\mu,\bar\nu}=0.4$, $w_{e^\pm,\mu^\pm,u
 $w_{s,c,\bar s,\bar c}=0.6$, $w_{b,\bar b}=0.7$, $w_{t,\bar t}=0.5$, and the draw repeated until electric charge,
 baryon number and lepton number are conserved and $\sum_{f}m_f\le600$\,GeV. The beams are massless along $z$; every mass
 is the generator's (the property table \code{GLOBAL\_PROPERTY\_MATRIX}).
-\emph{Why.} Real SM particles at their real masses make the model's particle-property inputs the ones it sees on real
+\par\smallskip\noindent \emph{Why.} Real SM particles at their real masses make the model's particle-property inputs the ones it sees on real
 data: only the function $|\mathcal M|^2$ is fake. The initial pairs and $n\le4$ were copied from the real catalog, and the
 mass cap keeps the $\sqrt s$ window $[\max(25,1.05\sum m_f),\,1000]$\,GeV (the catalog's rule) at least $370$\,GeV wide.
 The weights were set by hand to favour gluons and photons and keep heavy finals rarer, never tuned. Flavour is not
 conserved: $uu\to c\,t\,g$ is a legal draw. In the SM at tree level with a diagonal CKM matrix the quark generation is
 conserved (no flavour-changing neutral currents; a $W$ turns $u$ into $d$, not into $s$), so such a particle list has no
 real counterpart; no reason for leaving the rule out was recorded.
-\emph{Proposed, not run.} Quark-generation conservation in the draw. Initial states not copied from the catalog: any
+\par\smallskip\noindent \emph{Proposed, not run.} Quark-generation conservation in the draw. Initial states not copied from the catalog: any
 pair, gluon-initiated ($gg$, $qg$) included. Multiplicities well beyond $2\to4$ (Sec.~\ref{sec:syn-cost}): the point of
 the prior is that it can make what MadGraph cannot, not that it matches the existing catalog.
 
@@ -5351,12 +5351,12 @@ merges $\{3,4\}$, then $\{5,\{3,4\}\}$; $\{1\}$, $\{2\}$ and $\{3,4,5\}$ meet at
 has $N-3$ internal lines. The particle on a line is drawn from those with the channel's charge $Q_S=\sum_{i\in S}Q_i$:
 neutral $\{\gamma\!:0.3,\,g\!:0.3,\,Z\!:0.2,\,H\!:0.2\}$, $\pm1$ $\{W\!:0.5,\,e\!:0.25,\,\mu\!:0.25\}$,
 $\pm\tfrac23$ $\{u\!:0.6,\,t\!:0.4\}$, $\pm\tfrac13$ $\{d\!:0.6,\,b\!:0.4\}$; a channel of any other charge rejects the tree.
-\emph{Why.} A real propagator always carries its channel's quantum numbers; matching the charge is the cheapest rule that
+\par\smallskip\noindent \emph{Why.} A real propagator always carries its channel's quantum numbers; matching the charge is the cheapest rule that
 keeps that, and SM particles put the poles at real masses. The vertices are not SM vertices: nothing checks that the two
 lines meeting a propagator can couple to it (syn\_00008 is $e^+e^-\to gg$ through a $t$-channel $W$; syn\_00010 exchanges
 a gluon between leptons). $K_\text{max}$ is hand-set. Real diagram counts grow much faster: $e^+e^-\to\mu^+\mu^-$ has $2$
 ($\gamma$, $Z$), $e^+e^-\to u\bar ug$ $4$, $e^+e^-\to u\bar ugg$ tens, $gg\to n\,g$ $4$, $25$, $220$, $2485$ for $n=2$ to $5$.
-\emph{Proposed, not run.}
+\par\smallskip\noindent \emph{Proposed, not run.}
 (a) \emph{$K$ growing with multiplicity:} the number of distinct cubic trees on $N$ labelled legs is $(2N-5)!!$
 ($3$, $15$, $105$, $945$ for $N=4$--$7$); $K$ could be drawn up to a fixed fraction of it, or log-uniform up to it. The
 labelling cost is linear in $K$; version $1$'s \code{\_KMAX} stops at $N=6$, so this and any $n>4$ need a new version.
@@ -5381,7 +5381,7 @@ charged leptons and quarks under the fiducial cuts) or a total leg mass above $1
 massive leg on both sides; otherwise the line is redrawn as $Z/H$, $W$ or $t$ (a charge-$\tfrac13$ channel has no heavy
 option and rejects the tree). The scalar (PDG $25$) gets $\log m_H\sim\mathcal U[\log20,\log700]$\,GeV in half of the
 processes, $125$\,GeV otherwise (always $125$ with an external $H$).
-\emph{Real counterpart.} An unstable particle propagates as $i/(p^2-M^2+iM\Gamma)$, times a spin numerator for fermions
+\par\smallskip\noindent \emph{Real counterpart.} An unstable particle propagates as $i/(p^2-M^2+iM\Gamma)$, times a spin numerator for fermions
 and vectors, so one s-channel resonance gives $|\mathcal M|^2$ the Breit--Wigner factor $1/[(s-M^2)^2+M^2\Gamma^2]$, the
 peak of $e^+e^-\to\mu^+\mu^-$ at $\sqrt s=M_Z$. In nature $\Gamma$ is fixed by the couplings ($\Gamma_Z/M_Z=0.027$,
 $\Gamma_W/M_W=0.026$, $\Gamma_t/m_t=0.008$, $\Gamma_H/m_H=3\times10^{-5}$); version $1$ draws $\Gamma/M$ in
@@ -5399,7 +5399,7 @@ of the two was set by hand. A massive line keeps $e=1$: its pole is at $M^2\ne0$
 protection rule exists because an unprotected massless pole makes the target infinite on a set of events, which is also
 why real event generation needs cuts. The random scalar mass puts resonances at masses the SM does not have, so pole
 positions are learned from the propagator inputs (the off-shellness channel) rather than memorised.
-\emph{Proposed, not run: the collinear limit by construction.} Every massless line joining two legs $i,j$ keeps $e=1$,
+\par\smallskip\noindent \emph{Proposed, not run: the collinear limit by construction.} Every massless line joining two legs $i,j$ keeps $e=1$,
 and each numerator term multiplying it carries a spinor bracket $\langle ij\rangle$ or $[ij]$, with
 $|\langle ij\rangle|=|[ij]|=|s_{ij}|^{1/2}$. The amplitude then goes as $1/\sqrt{s_{ij}}$ because the numerator vanishes,
 as in a gauge theory, instead of through a fractional propagator power, and the bracket's phase carries the azimuthal
@@ -5416,7 +5416,7 @@ $\delta_{hd}\sim\mathcal U\{0,1,2\}$; and a polynomial of $1$ to $3$ monomials i
 where $\pi_{mj}$ is the pair of legs drawn (uniformly, with repetition) for the $j$-th factor of monomial $m$; at $N=4$ a
 degree-$2$ example is $P=a_1\,s_{13}s_{24}+a_2\,s_{12}^2$. All monomials of one numerator share the degree, which fixes
 its mass dimension.
-\emph{Real counterpart.} Real particles carry spin states, helicity $\pm\tfrac12$ for fermions and $\pm1$ for photons
+\par\smallskip\noindent \emph{Real counterpart.} Real particles carry spin states, helicity $\pm\tfrac12$ for fermions and $\pm1$ for photons
 and gluons. The amplitude is computed per helicity configuration $\lambda$ of all legs; diagrams of one configuration add
 as complex numbers and interfere, configurations add as squares, and an unpolarised measurement averages the beams'
 spins,
@@ -5431,7 +5431,7 @@ own random coefficients, squared and added (Eq.~\eqref{eq:syn}). The incoherent 
 single $|A|^2$ (a real spin-summed $|\mathcal M|^2$ rarely vanishes) and Gaussian coefficients give interference with
 random relative phases. These ``helicities'' are not tied to spins: no selection rule makes one vanish, and no angular
 shape like $1+\cos^2\theta$ is built in. The degree range, monomial count and $H\le4$ are hand-set.
-\emph{Proposed, not run.}
+\par\smallskip\noindent \emph{Proposed, not run.}
 (a) \emph{Spinor-helicity numerators:} give each leg a helicity $h_i$ and build each numerator from random monomials in
 the brackets $\langle ij\rangle$, $[ij]$ of massless legs such that leg $i$ appears with little-group weight $-2h_i$
 (the number of its angle brackets minus its square brackets). Each amplitude then changes only by a phase under the little-group
@@ -5450,7 +5450,7 @@ helicities equal, or all but one, vanish. Both are cheap once (a) exists.
   \label{eq:syn}
 \end{equation}
 where $\Pi$ is the set of permutations of identical legs (initial and final legs kept apart; $uu$ beams are exchanged too) and $\sigma$ relabels the momenta.
-\emph{Real counterpart.} A real tree-level result has the same skeleton,
+\par\smallskip\noindent \emph{Real counterpart.} A real tree-level result has the same skeleton,
 $\tfrac14\sum_\lambda|\sum_d(\text{couplings})\times N_d(\lambda)/\prod D|^2$, with Feynman rules fixing the numerators
 $N_d$, the propagator powers and the couplings. Only invariants enter Eq.~\eqref{eq:syn}, so it is Lorentz invariant by
 construction. The permutation average does what Bose and Fermi symmetry do for a real amplitude: the target is a function
@@ -5461,7 +5461,7 @@ cross-section an area after the phase-space integral; a $2\to2$ amplitude such a
 $|\mathcal M|^2$ has dimension $8-2N$. One term has $+2\delta$ from the numerator, $-k$ from $s^{-k/2}$ and $-2E_d$ from
 the propagators; $2\delta-k-2E_d=4-N$ gives $k_{hd}$ above. Check: $N=4$, $\delta=1$, one propagator with $e=1$ gives
 $k=0$, and $c\,s_{13}/D$ is dimensionless. So the overall energy scaling is that of a real process.
-\emph{Proposed, not run.} At high multiplicity the permutation average costs $|\Pi|$ evaluations per event ($n!$ for
+\par\smallskip\noindent \emph{Proposed, not run.} At high multiplicity the permutation average costs $|\Pi|$ evaluations per event ($n!$ for
 $n$ identical gluons, $40320$ at $8$). Two cheaper symmetrisations: order identical legs by the invariant
 $q_i\!\cdot\!(p_a+p_b)$ (their energies in the centre-of-mass frame) before one evaluation, which is exact and invariant
 but leaves kinks where two energies cross; or draw the diagram set closed under the permutations, which keeps the
@@ -5476,12 +5476,12 @@ function smooth and costs the same as the average only when $K$ is already large
 $\alpha_s(M_Z)=0.118$, $\alpha=1/132.507$. $k_s$ is the number of QCD vertices: $0$ with no coloured leg; otherwise one
 per external gluon ($n_g$), plus, for each of the other $n-n_g$ final particles, one more with probability $0.3$ (that sum
 of coin flips is the binomial $\mathrm{Bin}(n-n_g,0.3)$), capped at $n$: $k_s=\min\!\big(n,\;n_g+\mathrm{Bin}(n-n_g,0.3)\big)$.
-\emph{Real counterpart.} A $2\to n$ tree with three-line vertices has $n$ vertices, each bringing a coupling $g$ ($e$ or
+\par\smallskip\noindent \emph{Real counterpart.} A $2\to n$ tree with three-line vertices has $n$ vertices, each bringing a coupling $g$ ($e$ or
 $g_s$), so $|\mathcal M|^2\propto\prod_\text{vertices}4\pi\alpha_\text{v}$: $e^+e^-\to u\bar ug$ goes as
 $(4\pi\alpha)^2(4\pi\alpha_s)$. The real order is fixed by the process ($e^+e^-\to u\bar ug$ $1$, $u\bar u\to gg$ $2$,
 $u\bar u\to Zg$ $1$ QCD vertices); version $1$ draws it, with the $0.3$ set by hand. $\alpha_s$ runs per event at
 $\mu=\sqrt s$ exactly as in the real pools, so the coupling inputs (\code{amp\_orders}) mean the same on both.
-\emph{Proposed, not run.} With vertex legality, $k_s$ would be counted from the diagrams' vertices instead of drawn.
+\par\smallskip\noindent \emph{Proposed, not run.} With vertex legality, $k_s$ would be counted from the diagrams' vertices instead of drawn.
 
 \paragraph{Events.} The pools go through the real pools' own path: \code{mg5\_pipeline\_final} registers a \code{syn\_*}
 name as a process with \code{kind: synthetic}, samples events with the same mixture policy, fiducial cuts and $\sqrt s$
@@ -5588,7 +5588,7 @@ so $10^3$ real processes would mean defining, generating and certifying several 
 $10^5$) synthetic ones are a range of names. Whether that is worth anything depends on transfer growing with the
 synthetic catalog, which is what the larger-catalog item measures.
 
-\emph{Proposed, not run: multiplicities MadGraph cannot reach.} The synthetic prior is not tied to the real catalog's
+\par\smallskip\noindent \emph{Proposed, not run: multiplicities MadGraph cannot reach.} The synthetic prior is not tied to the real catalog's
 processes or sizes. A real tree's cost grows with its diagram count, faster than exponentially in the number of gluons ($gg\to n\,g$
 has $4$, $25$, $220$, $2485$ diagrams for $n=2$ to $5$), and multi-gluon $2\to6$ and beyond is where we expect standalone MadGraph
 outputs, compiles and evaluations to become impractical (not measured here). The synthetic cost per event is about $K\times|\Pi|$ evaluations of
