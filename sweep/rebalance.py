@@ -49,8 +49,13 @@ def _queue():
     import siteconf
     q = {}
     if siteconf.CLUSTER.get("scheduler") == "htcondor":
-        out = subprocess.run(["condor_q", "-af", "JobBatchName", "JobStatus", "ClusterId", "JobUniverse"],
-                             capture_output=True, text=True).stdout
+        r = subprocess.run(["condor_q", "-af", "JobBatchName", "JobStatus", "ClusterId", "JobUniverse"],
+                           capture_output=True, text=True)
+        if r.returncode:
+            # a failed query is not an empty queue: callers would take every sweep for idle (prune.py deleting under
+            # running trials, the reviewer's finding of 2026-10-09)
+            raise RuntimeError("condor_q failed (%d): %s" % (r.returncode, r.stderr.strip()[-300:]))
+        out = r.stdout
         for line in out.splitlines():
             p = line.split()
             if len(p) < 4:
@@ -69,7 +74,10 @@ def _queue():
     from sweep_manager import load_registry, DEFAULT_REGISTRY
     states = {}
     by_path = {}
-    out = subprocess.run(["squeue", "-u", os.environ["USER"], "-h", "-o", "%i %T %o"], capture_output=True, text=True).stdout
+    r = subprocess.run(["squeue", "-u", os.environ["USER"], "-h", "-o", "%i %T %o"], capture_output=True, text=True)
+    if r.returncode:
+        raise RuntimeError("squeue failed (%d): %s" % (r.returncode, r.stderr.strip()[-300:]))
+    out = r.stdout
     for line in out.splitlines():
         p = line.split()
         if len(p) < 2:

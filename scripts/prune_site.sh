@@ -5,7 +5,7 @@ set -o pipefail
 site=$1
 out=~/.local/share/ccorch/artifacts/FA/prune; mkdir -p "$out"
 tmp=$(mktemp)
-timeout 3000 site --timeout 2990 run --item '*' "$site" FA -- python sweep/prune.py --apply --submit-logs --caches --every 6 > "$tmp" 2>&1
+timeout 3000 site --timeout 2990 run --item '*' "$site" FA -- python sweep/prune.py --apply --submit-logs --caches --every 6 --exclude tp3_wadd_ > "$tmp" 2>&1
 rc=$?
 grep '^PRUNE ' "$tmp" | sed 's/^PRUNE //' >> "$out/$site.jsonl"
 grep '^SUMMARY' "$tmp"

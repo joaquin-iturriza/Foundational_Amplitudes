@@ -61,7 +61,7 @@ from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS 
 # evaluates to: the version enters the structure hash, hence every pool's recipe_id.
 SYN_VERSION = 1
 _SALT = 0x5E17A                      # seed namespace of synthetic processes
-_NAME = re.compile(r"^syn([2-4])?_(\d+)$")
+_NAME = re.compile(r"^syn([2-6])?_(\d+)$")
 DEFAULT_DIAGRAMS_DIR = os.path.join(_HERE, "data", "diagrams")
 
 ALPHA_S, ALPHA_EW, MZ_REF = 0.118, 1.0 / 132.507, 91.1876      # alpha_s(M_Z), running reference
@@ -87,7 +87,10 @@ _PROP = {0: [(22, 0.3), (21, 0.3), (23, 0.2), (25, 0.2)],
 _PROP_HEAVY = {0: [23, 25], 3: [24], -3: [-24], 2: [6], -2: [-6]}   # none for charge 1/3 (b is light)
 _WIDTH_RATIO = (1e-3, 0.1)            # Gamma/M, log-uniform per propagator particle
 _SCALAR_MASS = (20.0, 700.0)          # random scalar mass (log-uniform), half of the processes
-_KMAX = {4: 3, 5: 5, 6: 6}            # diagrams per process, at most
+# diagrams per process, at most. N = 7, 8 (2->5, 2->6; reachable only as syn5_<k>, syn6_<k>) added 2026-10-09 for the
+# high-multiplicity test (D20), continuing the hand-set rule; every name drawable before draws exactly as before, so
+# SYN_VERSION stays 1 and no existing pool changes
+_KMAX = {4: 3, 5: 5, 6: 6, 7: 7, 8: 8}
 _H = (2, 4)                           # helicity amplitudes summed incoherently (no exact zeros)
 _LIGHT = 10.0                         # propagators below this mass (0, b) may enter as 1/sqrt
 

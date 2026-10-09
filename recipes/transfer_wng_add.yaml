@@ -1,0 +1,6 @@
+# High-multiplicity test (D21): the W+4g and W+5g pools alone, the data a pretrained model is fine-tuned on to "add"
+# them (continual pretraining, no replay).
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_Wgggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

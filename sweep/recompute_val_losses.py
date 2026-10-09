@@ -55,8 +55,10 @@ def _compute_proc_no_reg(exp):
 
 
 def _load_weights(exp, run_dir, run_idx):
-    for fname in [f"model_run{run_idx}.pt", f"model_run{run_idx}.pt.gz",
-                  f"model_run{run_idx}_best.pt", f"model_run{run_idx}_best.pt.gz"]:
+    # the best checkpoint first: every reported value is read there (CLAUDE.md "Reported values"), and pruned runs
+    # (sweep/prune.py) keep only it
+    for fname in [f"model_run{run_idx}_best.pt", f"model_run{run_idx}_best.pt.gz",
+                  f"model_run{run_idx}.pt", f"model_run{run_idx}.pt.gz"]:
         path = os.path.join(run_dir, "models", fname)
         if os.path.exists(path) or os.path.exists(path.replace(".pt.gz", ".pt")):
             exp._load_model_weights(path)

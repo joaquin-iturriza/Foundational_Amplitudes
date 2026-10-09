@@ -1,0 +1,5 @@
+# High-multiplicity test (the user's call of 2026-10-09, site decision D20): uubar_Zggggg alone, mixture sampling as the
+# other probes. Fine-tunes train on prefixes of this train split (data.train_subsample = D); val and test stay fixed.
+sampling: {mode: mixture}
+processes:
+  - {name: uubar_Zggggg, sqrts: [  96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

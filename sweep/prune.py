@@ -44,8 +44,8 @@ def _size(p):
 def parents():
     """Run dirs (relative tails, runs/<sweep>/<trial>) any sweep config names as a fine-tune parent."""
     tails = set()
-    cfgs = glob.glob(os.path.join(REPO, "sweep", "*.yaml")) + glob.glob(os.path.join(siteconf.SWEEP_DIR, "*",
-                                                                                     "sweep_config*.yaml"))
+    cfgs = glob.glob(os.path.join(REPO, "sweep", "**", "*.yaml"), recursive=True) + \
+        glob.glob(os.path.join(siteconf.SWEEP_DIR, "*", "sweep_config*.yaml"))
     for f in cfgs:
         try:
             txt = open(f, errors="replace").read()
@@ -88,9 +88,22 @@ def top_fidelity(sweep):
     return None
 
 
-def finished(sweep, q):
+def live_dags():
+    """Sweeps with a DAG manager in the HTCondor queue (idle, running or held): their unsubmitted nodes and DAGMan's
+    own files (nodes log, lock, rescue) are still in use, though no node may be queued."""
+    if siteconf.CLUSTER.get("scheduler") != "htcondor":
+        return set()
+    import subprocess
+    r = subprocess.run(["condor_q", "-constraint", "JobUniverse == 7", "-af", "JobBatchName"],
+                       capture_output=True, text=True)
+    if r.returncode:
+        raise RuntimeError("condor_q failed (%d): %s" % (r.returncode, r.stderr.strip()[-300:]))
+    return {re.sub(r"_\d{4}$", "", b) for b in r.stdout.split()}
+
+
+def finished(sweep, q, dags=frozenset()):
     d = os.path.join(siteconf.SWEEP_DIR, sweep)
-    if not os.path.isdir(d) or os.path.exists(os.path.join(d, "HELD")):
+    if not os.path.isdir(d) or os.path.exists(os.path.join(d, "HELD")) or sweep in dags:
         return False
     run, qd = q.get(sweep, (0, 0, []))[:2]
     if run or qd:
@@ -109,11 +122,17 @@ def finished(sweep, q):
     return True
 
 
-def plan_sweep(sweep, q, protect, apply):
+RECENT_H = 6       # a trial dir written to this recently may belong to a live run: never touched
+
+
+def plan_sweep(sweep, q, protect, apply, dags=frozenset(), exclude=()):
+    if any(sweep.startswith(x) for x in exclude):
+        return None
     tf = top_fidelity(sweep)
     res = results(sweep)
-    done = {hp for hp, (t, v, _) in res.items() if tf is None or t >= tf}
-    fin = finished(sweep, q)
+    # unknown top fidelity: no rule may assume a result is final (rule 1 would take a warm start's model)
+    done = {hp for hp, (t, v, _) in res.items() if tf is not None and t >= tf}
+    fin = finished(sweep, q, dags)
     best = min(done, key=lambda h: res[h][1]) if done else None
     trials, freed = [], 0
     for root in RUN_ROOTS:
@@ -124,12 +143,15 @@ def plan_sweep(sweep, q, protect, apply):
             if hp in res:
                 rec.update(t_steps=res[hp][0], val_loss=res[hp][1], proc_val_losses=res[hp][2])
             tail = "%s/%s" % (sweep, os.path.basename(td))
+            newest = max([os.path.getmtime(os.path.join(dp, f)) for dp, _, fs in os.walk(td) for f in fs] or [0])
             if tail in protect:
                 rec["kept"] = "fine-tune parent"
+            elif time.time() - newest < 3600 * RECENT_H:
+                rec["kept"] = "written to in the last %d h: everything" % RECENT_H
             else:
                 kill = []
                 models = glob.glob(os.path.join(td, "models", "*.pt")) + glob.glob(os.path.join(td, "models", "*.pt.gz"))
-                if fin and done and hp != best:
+                if fin and done and hp != best and (hp in res or time.time() - newest > 86400):
                     kill += models                                                        # rule 2
                     kill += [os.path.join(dp, f) for dp, _, fs in os.walk(td) for f in fs
                              if f.endswith((".png", ".pdf")) or re.match(r"preds_\w+\.npz$", f)]   # rule 4
@@ -220,6 +242,7 @@ def main():
     ap.add_argument("--caches", action="store_true")
     ap.add_argument("--submit-logs", action="store_true")
     ap.add_argument("--cache-days", type=float, default=30)
+    ap.add_argument("--exclude", nargs="*", default=[], help="sweep name prefixes never touched")
     ap.add_argument("--every", type=float, help="skip unless the last applied prune here is older than this (hours)")
     a = ap.parse_args()
     stamp = os.path.join(siteconf.SWEEP_DIR, ".last_prune")
@@ -228,7 +251,8 @@ def main():
             siteconf.SITE, (time.time() - os.path.getmtime(stamp)) / 3600, a.every))
         return
     from rebalance import _queue
-    q = _queue()
+    q = _queue()                     # raises on a failed scheduler query: nothing is pruned blind
+    dags = live_dags()
     protect = parents()
     names = set()
     for root in RUN_ROOTS:
@@ -238,7 +262,7 @@ def main():
                 names.add(n)
     total, nsw = 0, 0
     for n in sorted(names):
-        man = plan_sweep(n, q, protect, a.apply)
+        man = plan_sweep(n, q, protect, a.apply, dags, a.exclude)
         if man and man["freed_bytes"]:
             total += man["freed_bytes"]; nsw += 1
             print("PRUNE " + json.dumps(man), flush=True)
@@ -248,7 +272,8 @@ def main():
     if a.apply:
         open(stamp, "w").close()
     if a.submit_logs:
-        sl = sum(submit_logs(n, a.apply) for n in sorted(names) if finished(n, q))
+        sl = sum(submit_logs(n, a.apply) for n in sorted(names)
+                 if finished(n, q, dags) and not any(n.startswith(x) for x in a.exclude))
         print("SUMMARY submit logs: %.2f GB %s" % (sl / 1e9, "freed" if a.apply else "to free (estimate)"))
     if a.caches:
         c = caches(a.cache_days, a.apply)

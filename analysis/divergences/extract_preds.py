@@ -92,9 +92,11 @@ def main():
     args = ap.parse_args()
 
     cfg = OmegaConf.load(os.path.join(args.run_dir, "config.yaml"))
-    ckpt = os.path.join(args.run_dir, "models", "model_run0.pt.gz")
-    if not os.path.exists(ckpt):
-        ckpt = os.path.join(args.run_dir, "models", "model_run0.pt")
+    # the best checkpoint (CLAUDE.md "Reported values"; pruned runs keep only it), the last model only for old runs
+    # that never wrote one
+    ckpt = next((c for c in (os.path.join(args.run_dir, "models", f) for f in
+                 ("model_run0_best.pt.gz", "model_run0_best.pt", "model_run0.pt.gz", "model_run0.pt"))
+                 if os.path.exists(c)), os.path.join(args.run_dir, "models", "model_run0.pt"))
 
     # --- reproduce the TRAINING-TIME order_labels (avoid resolver drift) ---
     # These runs (2026-06-17) predate the name-based amp_orders resolver
