@@ -5020,6 +5020,15 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
     (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues.
+    \emph{HP protocol for new cells (D25--D28, 2026-10-09 16:00):} pretrainings at hp73; scratch cells $8$-trial searches;
+    fine-tune cells at the two fixed points (lr $1.3$, $2.2\times10^{-3}$, $\lambda\approx3\times10^{-10}$) through
+    \code{sweep/fixed\_points.py}, never a search, except where the user asked for one: the add-$W$ step (D26) and the
+    accumulation and diagram arms (D27). High multiplicity is $Z+4g$, $Z+5g$ only (D28). Done 16:10: the $16$ scratch
+    searches and $18$ finale fine-tune cells at the fixed points registered on CC (the $16$ new cells' unused search scripts
+    moved to \code{jobs\_search\_unused/}, two that had been submitted cancelled); still to do with \code{fixed\_points.py}:
+    \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} once their pretrainings end, and the add-$W$ children
+    (\code{tp3\_wadd\_*fte32k\_*}, two parents per method) once the forgetting evaluation is in; add their fixed points to
+    \code{expect\_tp3.json}.
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
