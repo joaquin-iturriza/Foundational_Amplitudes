@@ -70,10 +70,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      read its log (`site logs <run>`); a RUNNING job with an empty log is not
      working, and you don't report it as such.
    - **Never delete anything on a cluster you did not create in the same command.**
-     Except `sweep/prune.py` (the user's call of 2026-10-09), run by the supervisor at most every 6 h: a finished trial
-     drops its last model; a finished sweep keeps its best trial's models and every trial's config, logs, metrics and
-     `data_stats.json` (manifest `runs/<sweep>/PRUNED.json` first, copies in `~/.local/share/ccorch/artifacts/FA/prune/`);
-     fine-tune parents are never touched. Need a non-best trial's model? Rerun it from its config.
+     Except `sweep/prune.py` (D19), run by the supervisor: it keeps each finished sweep's best-trial models and every
+     trial's config, logs, metrics and `data_stats.json`, never touches fine-tune parents, and writes a manifest first.
+     Need another trial's model? Rerun it from its config.
    - **Submitting jobs is gated by GPU budget, not a blanket confirm.** You may
      submit quick tests on your own — **always be mindful of the GPU budget**.
      The rule: estimate the **total GPU-hours** of everything you're about to
