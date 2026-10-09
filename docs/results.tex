@@ -4861,6 +4861,18 @@ $ee\to W^+W^-$ at $10^4$), worst on $ee\to d\bar d$ ($-1.28$). The gap to rung $
 these five probes only; one trial (\code{tp3\_synfte32k\_ee\_WW\_d9}, hp$44$) blew up at step $25\,855$ and enters
 with its best checkpoint ($3.7\times10^{-6}$).
 
+\emph{High multiplicity, first cells (2026-10-09 12:40; hand-off item, D20--D24).} At $D=10^4$, $32$k: the finale
+fine-tuned on $u\bar u\to Z+5g$ ($5$ of $5$ trials) reaches $2.7\times10^{-3}$ (MSE of $\log|\mathcal M|^2$ at the best
+checkpoint), on $Z+4g$ $4.4\times10^{-3}$ ($3$ of $5$); scratch so far $4.9\times10^{-3}$ on $Z+5g$ ($2$ of $8$) and
+$7.0\times10^{-3}$ on $Z+4g$ ($1$ of $8$), no comparison before both searches are in. For scale, the same cell on $Z+3g$:
+finale $1.6\times10^{-3}$, scratch $2.9\times10^{-3}$; on $Z+2g$ $9.4\times10^{-5}$. So the losses do not grow from $2\to4$
+to $2\to6$ the way they did from $2\to3$ to $2\to4$. Four of the eight fine-tune trials have their best checkpoint before
+step $3\,000$, all at $\mathrm{lr}\ge4\times10^{-3}$: their validation loss jumps by one to three orders after it (one $Z+5g$
+trial to $18$ near step $9\,600$) and recovers only partly; the trials at $\mathrm{lr}\le4\times10^{-3}$ train smoothly
+to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top for these probes. The add-$W$ steps
+($16$k, $W$-only loss): naive $7.1\times10^{-4}$ ($2$ of $5$), EWC $7.7\times10^{-4}$ ($3$ of $5$); forgetting not yet
+measured.
+
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/finale_synth_a.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_b.pdf}}
@@ -5217,16 +5229,22 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average.
   \item \textbf{High-multiplicity test} (the user's call of 2026-10-09, \code{site} decisions D20, D21; targeted, no
     evaluation beyond these probes). Probes $u\bar u\to Z+4g$ ($2\to5$) and $Z+5g$ ($2\to6$), new MadGraph processes
-    (\code{uubar\_Zgggg}, \code{uubar\_Zggggg}), at $D=10^4$ first ($32$k steps, $5$-trial searches); the other $D$ only once
-    the design is settled there. Arms: scratch; the finale (\code{tp3\_finale}, the reference: the largest
-    pretraining of the transfer study); the finale's pretraining with $W+4g$, $W+5g$ added (\code{tp3\_finale\_wng}, the
-    finale already holds $W+g$ to $W+3g$); the finale's pretraining with $8$ synthetic processes at $2\to5$ and $2\to6$
-    (\code{tp3\_finale\_synhm}; the generator's $K_\text{max}$ extended to $7$, $8$, version $1$ rules otherwise). Continual
-    pretraining (D21): the finale fine-tuned $16$k steps on $W+4g$, $W+5g$ alone (\code{tp3\_wadd\_naive}) and with
-    replay of its own $28$ processes (\code{tp3\_wadd\_replay}); forgetting read as the per-process validation loss on
-    the finale's processes against the finale's own; then the same $Z$ fine-tunes from each. The built-in EWC
-    (\code{fine\_tune.ewc}) estimates its Fisher matrix on the \emph{new} data, so it does not protect the old
-    processes as written; it enters only once fixed. Set up 2026-10-09 05:30, nothing run yet.
+    (\code{uubar\_Zgggg}, \code{uubar\_Zggggg}). Every arm but the continual one runs the full grid (D22, 2026-10-09
+    10:33; first set up at $D=10^4$ only, which the user had not asked for): $D=10^1$--$10^3$ at $8$k (\code{tp3\_hmscr\_},
+    \code{tp3\_finfte\_}, \code{tp3\_fwngfte\_}, \code{tp3\_fsynfte\_}), $10^{3.5}$--$10^5$ at $32$k (the same with \code{32k}),
+    \code{sweep/gen\_highmult.py}; $8$-trial scratch and $5$-trial fine-tune searches, also at $32$k, since these probes
+    have no $8$k landscape to choose two points from. Arms: scratch; the finale (\code{tp3\_finale}, the reference,
+    confirmed as the largest pretraining, D24); the finale's pretraining with $W+4g$, $W+5g$ added
+    (\code{tp3\_finale\_wng}, the finale already holds $W+g$ to $W+3g$); the finale's pretraining with $8$ synthetic
+    processes at $2\to5$ and $2\to6$ (\code{tp3\_finale\_synhm}; the generator's $K_\text{max}$ extended to $7$, $8$,
+    version $1$ rules otherwise). Continual pretraining (D21), at $D=10^4$ until the user has seen it: the finale
+    fine-tuned $16$k steps on $W+4g$, $W+5g$ alone (\code{tp3\_wadd\_naive}), with replay of its own $28$ processes
+    (\code{tp3\_wadd\_replay}) and with EWC on the finale's own Fisher (\code{tp3\_wadd\_ewc}, \code{fine\_tune.ewc.fisher\_path}
+    from \code{tools/run\_data\_tools.py fisher}; $\lambda$ searched over $10^2$--$10^7$), $5$-trial searches;
+    forgetting read per process on the finale's data against the finale's own (\code{run\_data\_tools eval}). Each
+    method hands two parents to the $Z$ fine-tunes (D23): its best trial on $W$ alone, and its best on a mix of $W$ and
+    forgetting, the geometric mean of the validation MSE over all $30$ processes (the finale's $28$ and the two $W$),
+    the aggregate the pretraining itself is selected on.
   \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
     $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
     prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
