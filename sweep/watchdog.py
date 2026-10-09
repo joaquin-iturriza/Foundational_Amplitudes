@@ -37,16 +37,23 @@ def site_report(prefixes, window_min):
         # a DAG whose manager waits for a slot (lxplus runs at most 200 per user) has not submitted its trials yet,
         # so _queue sees none: the sweep is still queued (2026-10-06, 79 such sweeps raised a false alert)
         import subprocess
-        out = subprocess.run(["condor_q", "-constraint", "JobUniverse == 7 && JobStatus == 1", "-af", "JobBatchName"],
+        # A live DAG (idle or running manager) also holds the nodes it has not submitted yet: a chained sweep shows 3 of
+        # its 5 trials in the queue, the other 2 wait on the DAG (2026-10-09, 14 such sweeps raised a false GAP)
+        out = subprocess.run(["condor_q", "-constraint", "JobUniverse == 7 && JobStatus <= 2", "-af", "JobBatchName"],
                              capture_output=True, text=True).stdout
         for b in out.split():
             n = re.sub(r"_\d{4}$", "", b)
-            if n in names and n not in queued:
-                dags = sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, n, "sweep_*.dag")), key=os.path.getmtime)
-                try:
-                    queued[n] = sum(l.startswith("JOB ") for l in open(dags[-1])) if dags else 1
-                except OSError:
-                    queued[n] = 1
+            if n not in names:
+                continue
+            dags = sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, n, "sweep_*.dag")), key=os.path.getmtime)
+            try:
+                nodes = sum(l.startswith("JOB ") for l in open(dags[-1])) if dags else 1
+            except OSError:
+                nodes = 1
+            rd = getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR)
+            done = len(glob.glob(os.path.join(rd, n, "results", "hp*.json")))
+            pending = max(0, nodes - done) - running.get(n, 0)
+            queued[n] = max(queued.get(n, 0), pending, 1 if n not in queued else 0)
     else:
         # a capped SLURM queue (CC-IN2P3: 100 jobs per user) leaves generated trials unsubmitted until
         # sweep/feed_capped.py adds them as it drains: those are waiting, not lost (2026-10-08, 36 such points
