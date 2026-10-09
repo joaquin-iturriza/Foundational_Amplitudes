@@ -6,7 +6,8 @@ its full grid): the Z+4g and Z+5g probes on the study's grid, for scratch and th
   finale      tp3_finfte_<p>_d<k>, tp3_finfte32k_<p>_d<k>                 5-trial searches
   + W+4g/5g   tp3_fwngfte_<p>_d<k>, tp3_fwngfte32k_<p>_d<k>               from tp3_finale_wng hp73
   + syn 2->5/6 tp3_fsynfte_<p>_d<k>, tp3_fsynfte32k_<p>_d<k>               from tp3_finale_synhm hp73
-Each config is the uubar_Zggg cell of the same family and D with the probe swapped (recipe, name, its own DyHPO seed);
+Fine-tune cells run at the study's two fixed points, not as searches (D25): their configs go through
+sweep/fixed_points.py, which adds the two fixed-HP trials; scratch stays an 8-trial search. Each config is the uubar_Zggg cell of the same family and D with the probe swapped (recipe, name, its own DyHPO seed);
 the 32k cells are searches, not the ladder's two chosen points, since these probes have no 8k landscape to choose from;
 d8 at 32k was written first by hand (c5fb2ac) and is kept as is. Time limits are the Zggg cell's x3 at 8k (a Z+5g 32k
 trial ran 1.6 h against Zggg's 0.5 h), 10/14/16 h at 32k for k = 7, 9, 10.

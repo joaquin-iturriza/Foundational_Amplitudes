@@ -3533,8 +3533,14 @@
  "tp3_finale_synhm": [
   73
  ],
- "tp3_finfte32k_uubar_Zgggg_d8": 5,
- "tp3_finfte32k_uubar_Zggggg_d8": 5,
+ "tp3_finfte32k_uubar_Zgggg_d8": [
+  97,
+  37
+ ],
+ "tp3_finfte32k_uubar_Zggggg_d8": [
+  31,
+  107
+ ],
  "tp3_wadd_naive": 5,
  "tp3_wadd_replay": 5,
  "tp3_wadd_ewc": 5,
@@ -3542,13 +3548,25 @@
  "tp3_hmscr32k_uubar_Zggggg_d8": 8,
  "tp3_fwngfte32k_uubar_Zgggg_d9": 5,
  "tp3_fwngfte32k_uubar_Zgggg_d7": 5,
- "tp3_finfte32k_uubar_Zggggg_d10": 5,
+ "tp3_finfte32k_uubar_Zggggg_d10": [
+  4,
+  8
+ ],
  "tp3_hmscr32k_uubar_Zggggg_d9": 8,
- "tp3_finfte32k_uubar_Zgggg_d10": 5,
- "tp3_finfte_uubar_Zgggg_d5": 5,
+ "tp3_finfte32k_uubar_Zgggg_d10": [
+  160,
+  20
+ ],
+ "tp3_finfte_uubar_Zgggg_d5": [
+  179,
+  191
+ ],
  "tp3_fsynfte_uubar_Zggggg_d4": 5,
  "tp3_fwngfte_uubar_Zggggg_d3": 5,
- "tp3_finfte_uubar_Zggggg_d4": 5,
+ "tp3_finfte_uubar_Zggggg_d4": [
+  17,
+  45
+ ],
  "tp3_hmscr_uubar_Zggggg_d4": 8,
  "tp3_fsynfte_uubar_Zggggg_d3": 5,
  "tp3_hmscr_uubar_Zggggg_d3": 8,
@@ -3558,17 +3576,35 @@
  "tp3_fwngfte32k_uubar_Zggggg_d8": 5,
  "tp3_fsynfte32k_uubar_Zggggg_d7": 5,
  "tp3_hmscr32k_uubar_Zgggg_d7": 8,
- "tp3_finfte_uubar_Zgggg_d6": 5,
- "tp3_finfte32k_uubar_Zgggg_d9": 5,
- "tp3_finfte_uubar_Zggggg_d5": 5,
- "tp3_finfte32k_uubar_Zgggg_d7": 5,
+ "tp3_finfte_uubar_Zgggg_d6": [
+  116,
+  40
+ ],
+ "tp3_finfte32k_uubar_Zgggg_d9": [
+  162,
+  158
+ ],
+ "tp3_finfte_uubar_Zggggg_d5": [
+  104,
+  164
+ ],
+ "tp3_finfte32k_uubar_Zgggg_d7": [
+  170,
+  102
+ ],
  "tp3_hmscr_uubar_Zgggg_d2": 8,
- "tp3_finfte_uubar_Zggggg_d2": 5,
+ "tp3_finfte_uubar_Zggggg_d2": [
+  168,
+  140
+ ],
  "tp3_hmscr_uubar_Zggggg_d6": 8,
  "tp3_fsynfte32k_uubar_Zggggg_d9": 5,
  "tp3_fwngfte_uubar_Zgggg_d3": 5,
  "tp3_fwngfte32k_uubar_Zgggg_d10": 5,
- "tp3_finfte_uubar_Zggggg_d3": 5,
+ "tp3_finfte_uubar_Zggggg_d3": [
+  100,
+  152
+ ],
  "tp3_fsynfte32k_uubar_Zggggg_d8": 5,
  "tp3_fsynfte32k_uubar_Zgggg_d8": 5,
  "tp3_fsynfte32k_uubar_Zgggg_d10": 5,
@@ -3582,9 +3618,18 @@
  "tp3_fwngfte_uubar_Zgggg_d2": 5,
  "tp3_fwngfte32k_uubar_Zggggg_d9": 5,
  "tp3_hmscr_uubar_Zgggg_d4": 8,
- "tp3_finfte32k_uubar_Zggggg_d9": 5,
- "tp3_finfte_uubar_Zgggg_d2": 5,
- "tp3_finfte32k_uubar_Zggggg_d7": 5,
+ "tp3_finfte32k_uubar_Zggggg_d9": [
+  117,
+  185
+ ],
+ "tp3_finfte_uubar_Zgggg_d2": [
+  60,
+  120
+ ],
+ "tp3_finfte32k_uubar_Zggggg_d7": [
+  102,
+  90
+ ],
  "tp3_fwngfte_uubar_Zgggg_d5": 5,
  "tp3_hmscr32k_uubar_Zggggg_d7": 8,
  "tp3_fwngfte_uubar_Zggggg_d4": 5,
@@ -3593,7 +3638,10 @@
  "tp3_fwngfte_uubar_Zgggg_d4": 5,
  "tp3_fsynfte_uubar_Zggggg_d2": 5,
  "tp3_fsynfte_uubar_Zggggg_d6": 5,
- "tp3_finfte_uubar_Zgggg_d4": 5,
+ "tp3_finfte_uubar_Zgggg_d4": [
+  121,
+  61
+ ],
  "tp3_hmscr_uubar_Zgggg_d3": 8,
  "tp3_fwngfte32k_uubar_Zggggg_d10": 5,
  "tp3_fwngfte_uubar_Zgggg_d6": 5,
@@ -3604,8 +3652,14 @@
  "tp3_hmscr32k_uubar_Zgggg_d9": 8,
  "tp3_fwngfte32k_uubar_Zgggg_d8": 5,
  "tp3_fsynfte32k_uubar_Zgggg_d9": 5,
- "tp3_finfte_uubar_Zgggg_d3": 5,
+ "tp3_finfte_uubar_Zgggg_d3": [
+  71,
+  139
+ ],
  "tp3_fsynfte32k_uubar_Zgggg_d7": 5,
- "tp3_finfte_uubar_Zggggg_d6": 5,
+ "tp3_finfte_uubar_Zggggg_d6": [
+  57,
+  141
+ ],
  "tp3_fsynfte_uubar_Zgggg_d5": 5
 }
