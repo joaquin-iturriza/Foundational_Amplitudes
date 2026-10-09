@@ -232,7 +232,7 @@ def standalone_name(process):
 def is_synthetic(process):
     """True for a synthetic-amplitude process name (``syn_<k>``, ``syn<n>_<k>``):
     tools/synthetic_amplitudes.py, no MadGraph behind it."""
-    return re.match(r"^syn[2-4]?_\d+$", str(process)) is not None
+    return re.match(r"^syn[2-6]?_\d+$", str(process)) is not None
 
 
 def register_synthetic(process, diagrams_dir=None):
