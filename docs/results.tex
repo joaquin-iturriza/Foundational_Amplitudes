@@ -5020,6 +5020,23 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
     carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
     (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues.
+    \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
+    \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
+    \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
+    \textbf{Decisions since 08:30:} D22 (every high-multiplicity arm but the continual one gets the full grid; done:
+    \code{sweep/gen\_highmult.py}, $64$ configs, the $32$ scratch and finale cells generated on CC and registered with the
+    feeder, waiting on the $100$-job cap; \code{expect\_tp3.json} counts all of them), D23 (each add method hands two
+    parents: best on $W$ and best on the $30$-process geometric mean), D24 (largest pretraining $=$ the finale).
+    \textbf{Next:} (i) \code{FA-ccin2p3-32a65175}, pending on CC: \code{run\_data\_tools eval} of the finale and the $9$ finished
+    add trials (EWC 2, 13, 31, 108, 110; naive 102, 145; replay 21, 44) on \code{runs/tp3\_wadd\_replay/trial\_0044}'s data ($30$
+    processes), output \code{runs/forget\_wadd\_batch1.json}; forgetting $=$ per-process ratio to the finale's; evaluate the
+    remaining naive/replay trials the same way when done; pick two parents per method, write
+    \code{sweep\_config\_tp3\_wadd\_\{m\}fte32k\_*} (W-best) and a \code{\_\{m\}mixfte32k\_*} pair (mix-best) with the parent path in
+    place of \code{BEST}, add them to \code{expect\_tp3.json}, submit. (ii) When \code{tp3\_finale\_wng}, \code{tp3\_finale\_synhm}
+    finish: generate and register \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} (configs committed, $32$ sweeps
+    incl.\ the two hand-written d8 pairs). Until then the \code{highmult} GAP of $36$ units is expected (feeder cap and
+    unfinished parents). (iii) Jean Zay prune and archive (\code{jz\_archive}). Held: \code{horizon32k}, \code{eqd},
+    \code{seeds}. \textbf{Background:} \code{site supervise --project FA} and \code{site events --wait --project FA}.
     \emph{State (2026-10-09, 08:30):} the work lives in \code{site}'s registers (\code{site items -v}, \code{site digest
     --project FA}); this summarises it. \textbf{Active items:} \code{accrr} (accumulation as in arXiv:2606.23791; $12$ of
     $12$ $32$k cells and $10$ of $24$ $8$k cells written up; the other $7$ probes' $8$k searches queued on lxplus),
