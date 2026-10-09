@@ -84,7 +84,12 @@ def cmd_eval(a):
     for w in a.weights:
         exp = build(a.run_dir, w)
         exp.evaluate()
+        # per process (results_per_proc[name]["val"][name]), the pooled value as "combined": forgetting is per process
         res = {}
+        for name, splits in getattr(exp, "results_per_proc", {}).items():
+            pre = ((splits.get("val") or {}).get(name) or {}).get("preprocessed") or {}
+            if "mse" in pre:
+                res[name] = float(pre["mse"])
         for name, r in exp.results_val.items():
             pre = (r or {}).get("preprocessed") or {}
             if "mse" in pre:
