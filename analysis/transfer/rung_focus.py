@@ -8,6 +8,9 @@ cells.USE_32K is off (now), the 32k cells at D = 10^3.5, 10^4 once it is on (cel
 ranked on the 8k grid, where every pretraining has every cell at the same compute.
   <base>_ee_a..f, <base>_qcd_a..f
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
+    python analysis/transfer/rung_focus.py --paper   -> figs/rung_focus_paper: the paper's version (the user's call,
+        2026-10-09): scratch, the rung below, the first rung with the structure, the best rung overall, the synthetic
+        pretraining (tp3_synfte) and the finale (tp3_finfte); no grey curves
 """
 import os, sys
 import numpy as np
@@ -21,6 +24,8 @@ import plot_style as ps  # noqa: E402
 FOCUS = {"ee_ddbar": 1, "ee_nnbar": 2, "ee_ttbar": 5, "ee_WW": 6, "ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_Za": 3,
          "ud_ud": 4, "uubar_gg": 6, "uubar_Zg": 6, "uubar_Zgg": 7, "uubar_Zggg": 8}
 GREY = dict(color="0.6", alpha=0.35)
+PAPER = "--paper" in sys.argv
+BASE = "rung_focus_paper" if PAPER else "rung_focus"
 TIE = 1.2      # a lead under this factor is a tie: below what one seed's 5-trial search resolves (provisional)
 
 
@@ -40,6 +45,30 @@ def overall(p, fams):
     return sorted((f for f in score if top - score[f] < np.log10(TIE)), key=lambda f: -score[f]), unranked
 
 
+def draw_arm(ax, f, p, *a, **kw):
+    """The finale and the synthetic pretraining as draw_final draws a rung, except that their 8k cells are read the way
+    finale_synth.py reads them (a 5-trial search, or the cell's fixed run at the reference point, <cell>_lad)."""
+    from cells import LONG_K, LONG_K_PROBE, best_chosen
+    import io, contextlib
+    with contextlib.redirect_stdout(io.StringIO()):
+        from finale_synth import cell
+    pts = []
+    for k in range(2, 9):
+        v32 = best_chosen(f"{f}32k_{p}_d{k}") if USE_32K and k in LONG_K_PROBE.get(p, LONG_K) else None
+        long_k = USE_32K and k in LONG_K_PROBE.get(p, LONG_K)
+        v = v32 if v32 is not None else cell(f, p, k)
+        if v is not None:
+            pts.append((10 ** (k / 2), v, v32 is not None or not long_k))
+    if not pts:
+        return None
+    ax.plot([x[0] for x in pts], [x[1] for x in pts], *a, **kw)
+    op = [x for x in pts if not x[2]]
+    if op:
+        ax.plot([x[0] for x in op], [x[1] for x in op], a[0][0] if a else "o", color=kw.get("color"), mfc="white",
+                zorder=5)
+    return op
+
+
 def short(f):
     return {"tp3_uu64fte": "r0"}.get(f, "r" + f[len("tp3_r"):-len("fte")])
 
@@ -55,7 +84,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
         lead, unranked = overall(p, [f for f in series() if f.endswith("fte")])
         first = True
-        for f in series():
+        for f in ([] if PAPER else series()):
             if f in (hi, lo) or (lead and f == lead[0]):
                 continue
             if draw_final(ax, f, p, "o-", label="other pretrainings" if first else None, **GREY) is not None:
@@ -65,6 +94,9 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         draw_final(ax, hi, p, "o-", color=ps.C.vermillion, label="first rung with the structure")
         if lead and lead[0] not in (hi, lo):
             draw_final(ax, lead[0], p, "o-", color=ps.C.green, label="best overall")
+        if PAPER:
+            draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
+            draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="finale (rung 9 + every star arm)")
         below = f"r{FOCUS[p] - 1}"
         ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
                          # the leader and its first tie by name, any further ties as a count (the full list ran
@@ -82,5 +114,5 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
     # the key to the panels' "r6 vs r5" labels is the ladder's table (rung -> structure) in the text, not the legend: nine
     # extra legend rows pushed the six-panel figure past a page
-    ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}_legend"), ncol=3)
-    ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"rung_focus_{part}"))
+    ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}_legend"), ncol=3)
+    ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}"))

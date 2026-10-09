@@ -82,10 +82,16 @@ ALL_TRIALS32 = {"tp3_scr32k_ee_nnbar_d8"}
 # On since 2026-10-06, when every pretraining and scratch had its 32k cells (all 420 chosen points: the twelve probes at
 # D = 10^3.5, 10^4, ud -> ud also at 10^2.5, 10^3): those cells are read at 32k for every family alike. Off, every figure
 # is the 8k grid (the first 32k round covered scratch, ee->uu and one rung per probe only; the user's call, 2026-10-05).
-USE_32K = True
+# TP_USE_32K=0 draws the 8k grid alone (the paper draft's figures, whose text quotes the 8k grid)
+USE_32K = os.environ.get("TP_USE_32K", "1") == "1"
 
 
 CHOSEN32 = json.load(open(os.path.join(ROOT, "analysis", "transfer", "horizon32k_chosen.json")))
+# the 32k cells added after that file (the finale's and the synthetic pretraining's, ...) list their two chosen points in
+# expect_tp3.json; a cell named in both keeps horizon32k_chosen.json's
+for _n, _v in json.load(open(os.path.join(ROOT, "analysis", "transfer", "expect_tp3.json"))).items():
+    if isinstance(_v, list) and "32k_" in _n:
+        CHOSEN32.setdefault(_n, _v)
 
 
 def best_chosen(name):
