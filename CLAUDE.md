@@ -21,8 +21,7 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    Any difference between what was asked and what was submitted goes in the same message that
    reports the submission, in its first lines, never only in a commit message or the notes'
    hand-off. A figure or number that mixes cells run at different compute says so wherever it is
-   shown. (2026-10-05: the 32k fine-tunes were set up for one rung per probe out of ten, unasked
-   and unreported; it surfaced hours before the work was presented.)
+   shown.
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
@@ -166,8 +165,7 @@ SLURM (`sites/sites.yaml`): `account: lpnhe`, `partition: gpu_v100,gpu_h100` (ei
 starts first), `qos: gpu`, one GPU through `--gpus=1`.
 **`--mem` is mandatory on CC-IN2P3**: the scheduler rejects any job without an
 explicit memory request (template `mem: 32G`; CPU jobs go to `htc` with
-`--mem-per-cpu`). `gpu_h100` (3 nodes of 4 H100 NVL) runs FA: `job_probe.sh` passed there
-(torch and an xformers attention call, 2026-10-04); `allow_tf32` is a no-op on V100, active on H100.
+`--mem-per-cpu`). `gpu_h100` (3 nodes of 4 H100 NVL) runs FA; `allow_tf32` is a no-op on V100, active on H100.
 
 ---
 
@@ -314,13 +312,13 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 |---|---|---|
 | `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
 | `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
-| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`: not load-bearing at 448 processes) | fixed |
-| `use_diagrams` / `d_diag` | `false` (`tab:bigrun_arms`: off lowers the geometric mean by a third, raises the 90th percentile; retry once the catalog pretraining is understood, catalog hand-off) / `32` | fixed |
+| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`) | fixed |
+| `use_diagrams` / `d_diag` | `false` (`tab:bigrun_arms`; revisit after the catalog pretraining, catalog hand-off) / `32` | fixed |
 | `use_PIDs` | `false` | fixed |
 | `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
-| physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`. `mass_from_momenta` stays `false` (redundant, `tab:levers`). **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op (every catalog_v2 run before 2026-09-21 ran with 0/478) | per-run (need recipe+sidecars) |
+| physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`. `mass_from_momenta` stays `false` (redundant, `tab:levers`). **Off-shellness needs the diagram sidecars** `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op | per-run (need recipe+sidecars) |
 | `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
-| target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (`docs/results.tex` catalog census, three seeds each; off by default, **switch on for the full-horizon catalog sweep**). **Not for single-process runs:** in the transfer study (`docs/results.tex` `sec:ladder`) the t-channel factor sets a ~1e-5 floor (off: 11-290x lower) and the Breit-Wigner factor loses in all four seeded cells, so the study runs both off (`tp3_`; `tp2_` = t-channel off only); they change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
+| target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (`docs/results.tex` catalog census, three seeds each; off by default, **switch on for the full-horizon catalog sweep**). **Not for single-process runs:** in the transfer study (`docs/results.tex` `sec:ladder`) the t-channel factor sets a loss floor and the Breit-Wigner factor loses in all seeded cells, so the study runs both off (`tp3_`; `tp2_` = t-channel off only); they change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
 | `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` (default) / `L2` | `MSE`, `L2` fixed; the aggregation is **open at catalog scale**: the arithmetic mean wins there (`tab:agg_ab`, `tab:catv2_short_smix`, catalog hand-off) |
 | **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
@@ -333,10 +331,7 @@ those are historical artifacts and several carry stale values (e.g. `batchsize:
 | **EMA** (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; the big-run DyHPO and the catalog quick sweeps chose it on for their best trial (`docs/results.tex`, sec:bigrun, catalog quick sweeps), the catalog wave's best had it off; not settled | open |
 | fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
 
-Sweep search ranges (redesigned): `regularization_lambda [1e-10,1e-6]`,
-`cosanneal_warmup_frac [0.05,0.2]`, `cosanneal_eta_min` fix ~`1e-8`, `ema_decay
-[0.9,0.999]` (+ `ema` categorical), `sampler_alpha_ema [0.3,0.95]` only if the
-balanced sampler is on. Drop the exotic sampler variants.
+Sweep search ranges: HPO rule 3 below.
 
 ---
 
@@ -398,16 +393,9 @@ SLURM `afterany` dependencies, so wave *k+1* only starts after wave *k* has
 `observe()`d and the (single-fidelity) Bayesian optimiser actually has data to fit.
 Multi-sweep submissions default to `--seq-batches 1` (rely on interleaving); pass
 `--seq-batches N` to force, `1` to disable.
-**Chained submission (opt-in, `sweep_manager submit --chain [--capacity N]`).** `nice` only
-orders the queue: with free GPUs every round starts at once and the guided trials suggest
-blind. `--chain` starts each sweep's `n_startup` random trials together, holds the first
-guided trials until all of them end, then each later trial until the one `W` places back ends
-(`afterany`), `W = min(3, ceil(capacity/n_sweeps))`, so many sweeps side by side still fill the
-GPUs; the queue is ordered by trial length, longest first. `--weight`/`boost` do not apply to
-chained jobs. On HTCondor the same chain is the DAG when the config sets `cluster.chain_width`
-(default: the two waves). The transfer study (`sweep/gen_transfer_pilot.py`) uses both.
-On lxplus the trial's `+JobFlavour` is the shortest that fits its `time` (a short trial as
-`tomorrow` sits idle); HTCondor priority follows the trial length.
+**Chained submission (opt-in, `sweep_manager submit --chain [--capacity N]`).** Holds guided trials until the
+preceding trials have observed; use it when free GPUs would start a whole sweep blind. `--weight`/`boost` do not
+apply to chained jobs. On HTCondor the chain is the DAG (`cluster.chain_width`). Details: the script's docstring.
 
 **Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
 trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
@@ -418,21 +406,11 @@ rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pendin
 e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
 Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 
-**Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick`
-places a batch once; a site that then stops starting my jobs holds its share regardless (rung 9's grid sat on
-CC at ~0 starts/h for half a day, 2026-10-02). Per site it measures backlog (queued + unsubmitted trials of fed
-sweeps) and the rate actually achieved (trials finished per hour, last 6 h), and moves work from the
-latest-finishing site to the earliest. **Every trial that has not started can move, whatever its sweep:** a plain
-DyHPO sweep with nothing started moves whole (regenerated from its config at the destination); any other sweep
-(started, or of chosen points, `generate_sweep --fixed-hp`) moves its pending trials as candidate indices of its own
-pool, a chosen point keeping its index and a pending DyHPO trial running as the next unrun start-up candidate or an
-unused random one (guided trials win no more often than random, `docs/results.tex` `fig:finetune_hp`), via
-`--extend --fixed-hp` at the destination. A move deletes nothing: the source's pending jobs are cancelled (on
-HTCondor the DAG is held, so running trials finish) and its dir marked `MOVED_TO` (sweep_manager skips it); the
-parent's **whole run directory** is copied site to site if missing (a fine-tune with
-`fine_tune.offshell_stats=parent` reads its `data_stats.json`: models alone fail at start-up). Runs hourly over every
-`tp3_` sweep; without `--apply` it prints the plan. Handling placement and rebalancing is the agent's job, never
-a question for me.
+**Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick` places a
+batch once; this moves trials that have not started from the latest-finishing site to the earliest (by backlog and
+achieved rate), deletes nothing (the source is cancelled and marked `MOVED_TO`), and copies a fine-tune parent's
+whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan. Handling
+placement and rebalancing is the agent's job, never a question for me.
 
 ### HPO search-space rules (empirical — harvested from 422 converged sweeps)
 
@@ -453,7 +431,7 @@ laws); the settled rules that govern how sweeps are set up:
    Both axes are set by the run design, so both are known inputs, not uncertainty:
    - **`t`-axis (horizon):** every real run sits past the peak (`t ≫ t*=3000`), so
      `lr*` is on the `t^-0.55`-ish decay — a **longer run takes a lower center**.
-   - **`D`-axis (training events, summed over the 8 processes of each grid sweep, i.e. 88–8750 per process):** measured `lr* ∝ D^{~0.17}`, **saturating**
+   - **`D`-axis (training events summed over the sweep's 8 processes):** measured `lr* ∝ D^{~0.17}`, **saturating**
      (~2.2× from D=700→70k at t=3162, most of it by D~2k). A large-`D` run sits at
      the **high-D asymptote → center ABOVE the D-pooled value**; read it off the
      grid's high-D row at your `t`. Do NOT collapse `D` into "a nudge the window
@@ -554,7 +532,7 @@ without a mechanism. The standard way on this laptop:
    accepts the turn ending. It notifies only when it exits, so give each event you must
    act on (a sweep that unlocks the next step) its own waiter. Read the run
    (`site logs <run>`) before reporting anything, and clear the marker file.
-   Background waiters survive for hours on this laptop (2026-09-30, several of 3–7 h);
+   Background waiters survive for hours on this laptop;
    the Monitor tool is capped at 30 min per watch, so it suits only short waits.
 
 A foreground Bash call is capped at 10 min. `scripts/wait_for_slurm.sh` (`POLL=<s>`,

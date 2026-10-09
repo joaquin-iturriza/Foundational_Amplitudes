@@ -63,9 +63,8 @@ search_space:
   type: float_log
   low: 1.0e-10      # weakest knob, spans full range; narrow (or fix ~1e-8)
   high: 1.0e-07
-# EMA (weight averaging) is UNTESTED -- gated by top-level `ema` (default false), so
-# it has never been active. Test it properly here: ema=false is "no EMA at all",
-# ema=true uses ema_decay. Choices are strings so the Hydra override is lowercase
+# EMA (weight averaging), gated by top-level `ema`: not settled (CLAUDE.md EMA row; docs/results.tex),
+# so it stays in the search. ema=false is "no EMA at all", ema=true uses ema_decay. Choices are strings so the Hydra override is lowercase
 # (ema=true/false); once settled, fix `ema` and drop from the search.
 - name: ema
   type: categorical
