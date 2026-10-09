@@ -163,7 +163,12 @@ def slurm_header(cluster, job_name, out, err, extra=()):
     if gpus:
         lines.append(gpu_directive(gpus))
     lines.append("#SBATCH --cpus-per-task=%d" % cpus)
-    lines.append("#SBATCH --time=%s" % cl.get("time", "20:00:00"))
+    t = cl.get("time", "20:00:00")
+    if isinstance(t, int):
+        # YAML 1.1 reads an unquoted 10:00:00 as 36000 (base-60 seconds) and SLURM took that as minutes, past the
+        # 7-day limit (2026-10-09, QOSMaxWallDurationPerJobLimit): turn it back into H:MM:SS
+        t = "%d:%02d:%02d" % (t // 3600, t // 60 % 60, t % 60)
+    lines.append("#SBATCH --time=%s" % t)
     if CLUSTER.get("mem") is not None:          # site accepts/needs --mem
         lines.append("#SBATCH --mem=%s" % (cl.get("mem") or CLUSTER["mem"]))
     lines += ["#SBATCH --output=%s" % out, "#SBATCH --error=%s" % err]

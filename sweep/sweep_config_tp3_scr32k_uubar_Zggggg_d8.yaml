@@ -7,7 +7,7 @@ cluster:
   mem: 8G
   cpus_per_task: 4
   chain_width: 2
-  time: 10:00:00
+  time: '10:00:00'
 paths: null
 sweep_name: tp3_scr32k_uubar_Zggggg_d8
 n_trials: 8
