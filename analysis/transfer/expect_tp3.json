@@ -3536,5 +3536,8 @@
  "tp3_scr32k_uubar_Zgggg_d8": 5,
  "tp3_finfte32k_uubar_Zgggg_d8": 5,
  "tp3_scr32k_uubar_Zggggg_d8": 5,
- "tp3_finfte32k_uubar_Zggggg_d8": 5
+ "tp3_finfte32k_uubar_Zggggg_d8": 5,
+ "tp3_wadd_naive": 5,
+ "tp3_wadd_replay": 5,
+ "tp3_wadd_ewc": 5
 }
