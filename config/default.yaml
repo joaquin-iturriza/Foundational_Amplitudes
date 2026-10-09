@@ -246,6 +246,7 @@ fine_tune:
   enabled: false
   lambda: 1000.0              # EWC regularization strength (sweep: 1e2–1e5)
   n_fisher_batches: 64        # number of train batches to estimate Fisher diagonal
+  fisher_path: null           # Fisher diagonal of the PARENT's data (tools/run_data_tools.py fisher); null = estimate on this run's own train set (new-task importance)
 
 defaults:
  - hydra

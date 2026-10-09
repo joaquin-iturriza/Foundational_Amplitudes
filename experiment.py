@@ -1322,6 +1322,7 @@ class AmplitudeExperiment(BaseExperiment):
             n_fisher_batches=ft.ewc.get("n_fisher_batches", 64),
             device=self.device,
             loss_fn=loss_fn,
+            fisher_path=ft.ewc.get("fisher_path", None),
         )
         LOGGER.info(f"Fine-tuning: EWC initialized (lambda={ft.ewc.get('lambda', 1000.0)})")
 

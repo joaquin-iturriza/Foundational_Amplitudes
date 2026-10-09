@@ -123,9 +123,11 @@ class EWC:
 
     L_total = L_task + (lambda/2) * Σ_i F_i * (θ_i - θ*_i)²
 
-    Fisher is estimated from the fine-tune training set (not pretraining data,
-    which may not be available), so it measures parameter importance at the
-    pretrained optimum relative to the new task distribution.
+    With `fisher_path` the Fisher diagonal is read from a file computed on the PARENT's own training data
+    (tools/run_data_tools.py fisher, written next to the parent's models): it then measures what the old tasks need,
+    which is what EWC protects. Without it the Fisher is estimated on the fine-tune's training set, i.e. importance
+    for the NEW task, which does not protect the old processes (2026-10-09: the continual-pretraining test, D21,
+    needs the former).
     """
 
     def __init__(
@@ -135,14 +137,25 @@ class EWC:
         n_fisher_batches: int,
         device: torch.device,
         loss_fn,
+        fisher_path: str = None,
     ):
         self._theta_star = {
             name: param.data.clone()
             for name, param in model.named_parameters()
             if param.requires_grad
         }
-        self._fisher = self._compute_fisher(model, dataloader, n_fisher_batches, device, loss_fn)
-        LOGGER.info("EWC: Fisher diagonal computed.")
+        if fisher_path:
+            blob = torch.load(fisher_path, map_location="cpu", weights_only=False)
+            fisher = blob["fisher"]
+            missing = [n for n in self._theta_star if n not in fisher]
+            if missing:
+                raise KeyError(f"EWC: {fisher_path} has no Fisher for {len(missing)} parameters, e.g. {missing[0]}")
+            self._fisher = {n: fisher[n].to(device) for n in self._theta_star}
+            LOGGER.info(f"EWC: Fisher diagonal read from {fisher_path} ({blob.get('n_batches')} batches of the "
+                        f"parent's data)")
+        else:
+            self._fisher = self._compute_fisher(model, dataloader, n_fisher_batches, device, loss_fn)
+            LOGGER.info("EWC: Fisher diagonal computed on the fine-tune's own training data.")
 
     def _compute_fisher(self, model, dataloader, n_batches, device, loss_fn) -> dict:
         fisher = {
