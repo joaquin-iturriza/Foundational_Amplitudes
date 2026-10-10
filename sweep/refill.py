@@ -19,7 +19,9 @@ INFRA = [("quota/disk", r"Disk quota exceeded|Errno 122|No space left on device|
          ("I/O", r"Errno 5\b|Input/output error|Stale file handle"),
          ("leftover run dir", r"alredy exists|already exists\. Aborting"),
          # two trials building one process's MadGraph output at once on a site without its pools (2026-10-10, lxplus)
-         ("MadGraph build race", r"Errno 39\] Directory not empty: '[^']*_events'|no src/Parameters_\*\.h under")]
+         ("MadGraph build race", r"Errno 39\] Directory not empty: '[^']*_events'|no src/Parameters_\*\.h under"),
+         # two trials generating one pool: the first to finish removes the shared chunk dir under the other
+         ("pool build race", r"No such file or directory: '[^']*/\.chunks_[0-9a-f]+/")]
 
 
 def failures(sd):
