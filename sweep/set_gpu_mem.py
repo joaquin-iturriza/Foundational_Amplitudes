@@ -14,8 +14,9 @@ ap.add_argument("prefixes", nargs="+")
 ap.add_argument("--mb", type=int, required=True)
 ap.add_argument("--apply", action="store_true")
 a = ap.parse_args()
-dirs = sorted({d for p in a.prefixes for d in glob.glob(os.path.join(siteconf.SUBMIT_DIR or siteconf.SWEEP_DIR, "sweeps", p + "*"))
-               | set(glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*")))})
+roots = {os.path.join(siteconf.SUBMIT_DIR, "sweeps"), siteconf.SWEEP_DIR}
+dirs = sorted({d for p in a.prefixes for r in roots for d in glob.glob(os.path.join(r, p + "*"))
+               if os.path.isdir(os.path.join(d, "subs"))})
 line = f"gpus_minimum_memory     = {a.mb}\n"
 for d in dirs:
     subs = glob.glob(os.path.join(d, "subs", "*.sub"))
