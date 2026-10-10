@@ -4871,7 +4871,7 @@ step $3\,000$, all at $\mathrm{lr}\ge4\times10^{-3}$: their validation loss jump
 trial to $18$ near step $9\,600$) and recovers only partly; the trials at $\mathrm{lr}\le4\times10^{-3}$ train smoothly
 to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top for these probes. The add-$W$ steps
 ($16$k; validation \code{val\_loss\_no\_reg} on $W+4g$, $W+5g$, preprocessed units, 13:30): EWC complete, best
-$4.9\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
+$4.85\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
 $4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here.
 
 \emph{Forgetting in the add-$W$ step (2026-10-10, \code{FA-ccin2p3-4e4e6153}; EWC $5$ of $5$, naive and replay $2$ of $5$).}
