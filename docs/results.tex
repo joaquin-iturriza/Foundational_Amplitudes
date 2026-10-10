@@ -5078,6 +5078,27 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
+    \emph{State (2026-10-10, 06:15):} \textbf{Decisions since 15:45 yesterday:} D29 (Jean Zay usable for everything, the
+    user's words of 2026-09-30, recorded now), D30 (add-$W$ along the run: naive and EWC at $1$k/$2$k/$4$k with the finale's
+    $28$ processes as monitors), D31 (also LoRA, frozen lower blocks / layer-wise lr decay, $1\%$/$10\%$ replay buffers,
+    and weight interpolation). \textbf{Items:} \code{accrr} $102/145$, \code{levdiagl} $120/145$, \code{synth32k} $80/96$,
+    \code{contadd} $11/23$ (EWC's four children from the $16$k parents 108 and 13 at the fixed points), \code{highmult}
+    $36/254$ (all $36$ \code{fwngfte}/\code{fsynfte} sweeps at the fixed points registered 2026-10-09 18:00),
+    \code{addhoriz} $2/105$ (\code{tp3\_waddm\_*}, $21$ searches, CC feeder). \textbf{Next:} (i) read the first
+    \code{tp3\_waddm\_*} trial's log for the monitor line (the feature's first run) and its \code{per\_process\_metrics.json};
+    write up the forgetting curves per method as the searches finish; (ii) weight interpolation (D31 item 1): a
+    \code{run\_data\_tools} mode that evaluates $(1-a)\,\theta_\text{finale}+a\,\theta_W$ for a scan of $a$ on a
+    \code{tp3\_waddm\_naive*} trial's run dir (its off-shell scale is the finale's); (iii) choose the add-$W$ parents along
+    the curves (best on $W$, best on all $30$; \code{model\_run*\_best\_all.pt}), children at the fixed points
+    (\code{fixed\_points.py}; LoRA parents merge on load); (iv) naive/replay $16$k parents once their last $3$ trials each
+    are in. \textbf{Jean Zay:} its WORK file quota is full ($500$k of $500$k); \code{scripts/archive\_runs.sh --auto
+    @STORE@/FA\_runs\_archive tp3\_ tp2\_ tp\_ tps\_ many\_datasets\_006 pretrain25 pretrain\_full\_nh8} (item
+    \code{jz\_archive}, D9) waits on the ssh link (stale control socket, ``server not responding''): a background loop
+    retries the submission every $10$ min for $6$ h; the supervisor now also prunes Jean Zay every $6$ h (projects.toml);
+    once files are free, drop \code{--no-dest jeanzay} from the rebalancer. If the link stays down the user resets it
+    (\code{ssh -O exit jean-zay}). lxplus: $64$ trials idle on a full GPU pool (repeated ALERTs, nothing to fix).
+    \textbf{Reporting:} a goal check-in or a routine event gets no message beyond one line (D18; the user objected to four
+    near-identical updates on 2026-10-10).
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
