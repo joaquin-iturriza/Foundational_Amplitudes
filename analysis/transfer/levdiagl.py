@@ -4,7 +4,9 @@ the twelve probes. (a) the pretrainings' validation curves, val_loss_no_reg agai
 cell log10(L_rung9 / L_arm), loss = MSE of log|M|^2 at the best checkpoint, > 0 means the arm fine-tunes better:
 D = 10^2 and 10^3 on the 8k grid (5-trial searches sharing rung 9's DyHPO seed, finale_synth.cell), D = 10^4 at 32k
 (each cell the best of its chosen points in expect_tp3.json, all of them in). A cell is drawn once both sides are in.
-    python analysis/transfer/levdiagl.py    -> figs/levdiagl_a..d, _legend; per-panel medians on stdout
+With `accum` the same four panels for the per-process accumulation arms instead: the first one (tp3_accum_r9) and the
+one redone as in arXiv:2606.23791 (tp3_accrr_r9, D4).
+    python analysis/transfer/levdiagl.py [accum]   -> figs/levdiagl_a..d (figs/accrr_a..d), _legend; medians on stdout
 """
 import io, contextlib, json, os, sys
 import numpy as np
@@ -17,8 +19,14 @@ sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
 EXP = json.load(open(os.path.join(ROOT, "analysis", "transfer", "expect_tp3.json")))
-ARMS = [("tp3_levdiag", "diagrams, our encoder", ps.C.blue, "o"),
-        ("tp3_levdiagl", "diagrams, arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
+# (pretraining, fine-tune family, label, colour, marker)
+ARMS = [("tp3_levdiag", "tp3_levdiag", "diagrams, our encoder", ps.C.blue, "o"),
+        ("tp3_levdiagl", "tp3_levdiagl", "diagrams, arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
+NAME = "levdiagl"
+if sys.argv[1:] == ["accum"]:
+    ARMS = [("tp3_accum_r9", "tp3_accum", "accumulation, first", ps.C.blue, "o"),
+            ("tp3_accrr_r9", "tp3_accrr", "accumulation as in arXiv:2606.23791", ps.C.vermillion, "s")]
+    NAME = "accrr"
 
 
 def cell32(fam, p, k):
@@ -38,13 +46,13 @@ def curve(name):
     return t["validate_every"] * np.arange(1, len(v) + 1), v
 
 
-base = os.path.join(ROOT, "analysis", "transfer", "figs", "levdiagl")
+base = os.path.join(ROOT, "analysis", "transfer", "figs", NAME)
 figs = ps.panels(4)
 ax = figs[0][1]
 x, y = curve("tp3_ladder_r9")
 ax.plot(x, y, color="0.4", label="rung 9")
-for fam, lab, col, _ in ARMS:
-    x, y = curve(fam)
+for pre, _, lab, col, _ in ARMS:
+    x, y = curve(pre)
     ax.plot(x, y, color=col, label=lab)
 ax.set_yscale("log")
 ax.set_xlabel("step")
@@ -55,7 +63,7 @@ PANELS = [(4, r"$D=10^2$, $8$k", lambda f, p: cell(f + "fte", p, 4), lambda p: c
           (6, r"$D=10^3$, $8$k", lambda f, p: cell(f + "fte", p, 6), lambda p: cell("tp3_r9fte", p, 6)),
           (8, r"$D=10^4$, $32$k", lambda f, p: cell32(f + "fte", p, 8), lambda p: cell32("tp3_r9fte", p, 8))]
 for (fig, ax), (k, dlab, arm, ref) in zip(figs[1:], PANELS):
-    for fam, lab, col, m in ARMS:
+    for _, fam, lab, col, m in ARMS:
         xs, ys = [], []
         for i, p in enumerate(P):
             a, r = arm(fam, p), ref(p)
