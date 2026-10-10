@@ -3785,5 +3785,11 @@
  "tp3_wadd_ewcmixfte32k_uubar_Zggggg_d8": [
   141,
   65
- ]
+ ],
+ "tp3_waddm_naive1k": 5,
+ "tp3_waddm_naive2k": 5,
+ "tp3_waddm_naive4k": 5,
+ "tp3_waddm_ewc1k": 5,
+ "tp3_waddm_ewc2k": 5,
+ "tp3_waddm_ewc4k": 5
 }
