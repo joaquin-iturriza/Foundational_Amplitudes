@@ -269,6 +269,22 @@ def release(dest, names):
         print(f"RELEASED {name} ({len(ids)} queued jobs cancelled)")
 
 
+def take_back(names):
+    """(on the destination) A sweep coming back whole to the site it left (_returning): clear its MOVED_TO marker and
+    forget its scripts in sweep_manager's registry, so the next submit sends them again."""
+    import siteconf
+    sys.path.insert(0, os.path.join(REPO, "sweep"))
+    from sweep_manager import load_registry, save_registry, DEFAULT_REGISTRY
+    reg = load_registry(DEFAULT_REGISTRY)
+    for name in names:
+        mv = os.path.join(siteconf.SWEEP_DIR, name, "MOVED_TO")
+        if os.path.exists(mv):
+            os.remove(mv)
+        reg["sweeps"].pop(name, None)
+        print(f"TAKEN BACK {name}")
+    save_registry(DEFAULT_REGISTRY, reg)
+
+
 def release_trials(dest, names):
     """Cancel the sweeps' trials that have not started and mark the sweeps MOVED_TO: on SLURM the queued jobs, on
     HTCondor the idle node jobs, with the DAG manager held first so it submits nothing more (running trials finish)."""
@@ -317,6 +333,15 @@ def _earlier(new, old):
     return new < old
 
 
+def _returning(site_inv, name):
+    """The sweep left this SLURM site whole and ran nothing here (its MOVED_TO copy, no result, nothing queued): it
+    can come back as it is, its job scripts resubmitted (2026-10-11: 21 tp3_waddm_ sweeps moved CC -> lxplus, then
+    sat behind lxplus's 30 GB GPU floor, and the namesake rule kept them from going back)."""
+    x = site_inv["sweeps"].get(name)
+    return bool(x) and site_inv.get("scheduler") != "htcondor" and x["moved"] and not x["done"] \
+        and not x["running"] and not x["queued"]
+
+
 def plan(inv, margin_h, no_dest=(), exclude=()):
     """[(sweep, src, dst)] and the per-site (backlog, rate, finish) before and after."""
     st = {}
@@ -333,7 +358,16 @@ def plan(inv, margin_h, no_dest=(), exclude=()):
         # (2026-10-11: lxplus kept 13/h from before a 30 GB GPU floor left it running 1 trial of 90 queued for 3 h,
         # and nothing moved)
         if backlog and v.get("trial_h") and "running_scope" in v:
-            work = sum(x["remaining"] * (x.get("trial_h") or v["trial_h"]) for x in v["sweeps"].values())
+            # a sweep with no result yet takes its family's median (tp3_waddm_ewc1k from the other tp3_waddm_ sweeps):
+            # the site's median mixes in minute-long small-D trials
+            fam = lambda n: "_".join(n.split("_")[:2])
+            fam_h = {}
+            for n, x in v["sweeps"].items():
+                if x.get("trial_h"):
+                    fam_h.setdefault(fam(n), []).append(x["trial_h"])
+            th = lambda n, x: x.get("trial_h") or (sorted(fam_h[fam(n)])[len(fam_h[fam(n)]) // 2]
+                                                   if fam(n) in fam_h else v["trial_h"])
+            work = sum(x["remaining"] * th(n, x) for n, x in v["sweeps"].items())
             if work > 0:
                 rate = min(rate, v["running_scope"] * backlog / work)
         # room left under the site's job cap: a move never plans more trials into a site than it will accept
@@ -373,7 +407,8 @@ def plan(inv, margin_h, no_dest=(), exclude=()):
                 # a whole sweep never onto a namesake; pending trials may go where the sweep also exists (a sweep
                 # moved before: its results there merge by name; apply_trials clears that site's MOVED_TO marker),
                 # but not onto a site where the sweep has trials running
-                dsts = [s for s in st if s != src and (name not in inv[s]["sweeps"] if x["unit"] == "sweep"
+                dsts = [s for s in st if s != src and ((name not in inv[s]["sweeps"] or _returning(inv[s], name))
+                                                       if x["unit"] == "sweep"
                                                        else not inv[s]["sweeps"].get(name, {}).get("running"))]
                 # a site in no_dest gives work and takes none (2026-10-07: Jean Zay's WORK inode quota, 94% full)
                 dsts = [s for s in dsts if st[s]["room"] >= k and s not in no_dest]
@@ -483,7 +518,10 @@ def apply(moves, sites):
                 " S=$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)'); " + " ".join(f"touch $S/{n}/ARRIVED;" for n in names)
             site_run(dst, "bash", "-c", loop, timeout=3600)
         else:
-            gen = " ".join(f"yes n | python sweep/generate_sweep.py --config {c} >/dev/null;" for c in cfgs)
+            back = [n for n in names if _returning(inv_all[dst], n)]
+            gen = " ".join(f"yes n | python sweep/generate_sweep.py --config {c} >/dev/null;"
+                           for n, c in zip(names, cfgs) if n not in back) + \
+                (f" python sweep/rebalance.py --take-back {' '.join(back)};" if back else "")
             dirs = " ".join(f"$(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}" for n in names)
             arr = " ".join(f"touch $(python -c 'import siteconf;print(siteconf.SWEEP_DIR)')/{n}/ARRIVED;" for n in names)
             site_run(dst, "bash", "-c", f"{gen} python sweep/sweep_manager.py submit --chain --capacity 30 {dirs}; {arr}",
@@ -508,6 +546,7 @@ def apply(moves, sites):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("prefixes", nargs="*")
+    ap.add_argument("--take-back", action="store_true", help="(on a site) let the named sweeps that left it come back")
     ap.add_argument("--inventory", action="store_true", help="(on a site) print this site's INVENTORY line")
     ap.add_argument("--release", metavar="DEST", help="(on a site) cancel and mark the named sweeps as moved")
     ap.add_argument("--release-trials", metavar="DEST", help="(on a site) cancel the sweeps' pending trials, mark moved")
@@ -529,6 +568,8 @@ def main():
         return release(a.release, a.prefixes)
     if a.release_trials:
         return release_trials(a.release_trials, a.prefixes)
+    if a.take_back:
+        return take_back(a.prefixes)
     sites = [s for s in SITES if a.allow_jeanzay or s != "jeanzay"]
     inv = {}
     for s in sites:
@@ -539,8 +580,9 @@ def main():
             print(f"  {s}: no inventory (unreachable or not synced), left out")
             continue
         inv[s] = json.loads(line[len("INVENTORY "):])
-    global inv_sched
+    global inv_sched, inv_all
     inv_sched = {s: v["scheduler"] for s, v in inv.items()}
+    inv_all = inv
     moves, before, after = plan(inv, a.margin, set(a.no_dest), tuple(a.exclude))
     for s in inv:
         b, r, f = before[s]; b2, _, f2 = after[s]
