@@ -191,12 +191,13 @@ def inventory(prefixes, scope, window_h):
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))
         recent += sum(os.path.getmtime(r) > now - window_h * 3600 for r in res)
         recent_long += sum(os.path.getmtime(r) > now - LONG_WINDOW_H * 3600 for r in res)
+        th = []
         for r in res:
-            if os.path.getmtime(r) > now - LONG_WINDOW_H * 3600:
-                try:
-                    hours.append(float(json.load(open(r))["traintime_hours"]))
-                except (OSError, ValueError, KeyError, TypeError):
-                    pass
+            try:
+                th.append(float(json.load(open(r))["traintime_hours"]))
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+        hours += th
         scripts = glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))
         ran = _ran(sd)
         run, qd, ids = q.get(name, (0, 0, []))
@@ -223,7 +224,8 @@ def inventory(prefixes, scope, window_h):
         hps = _move_hps(sd, name, fixed, free) if unit == "trials" else None
         if unit == "trials" and not hps:
             unit = None                     # no state to draw from: stays
-        sweeps[name] = {"done": len(res), "running": run, "queued": qd, "cancel": ids, "moved": moved,
+        sweeps[name] = {"done": len(res), "running": run,
+                        "trial_h": sorted(th)[len(th) // 2] if th else None, "queued": qd, "cancel": ids, "moved": moved,
                         "remaining": remaining, "started": started, "unit": unit, "move_hps": hps,
                         # a PINNED sweep stays where it is (priority work placed by hand, 2026-10-06: the rebalancer moved
                         # the 34 priority 32k points from lxplus, where they had been put first in line, to Jean Zay)
@@ -245,7 +247,8 @@ def inventory(prefixes, scope, window_h):
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
                                      "running": sum(v[0] for v in q.values()), "jobs_total": jobs_total,
                                      "long_window_h": LONG_WINDOW_H,
-                                     "trial_h": sorted(hours)[len(hours) // 2] if hours else None, "sweeps": sweeps}))
+                                     "trial_h": sorted(hours)[len(hours) // 2] if hours else None,
+                                     "running_scope": sum(q.get(n, (0,))[0] for n in names), "sweeps": sweeps}))
 
 
 def release(dest, names):
@@ -325,11 +328,14 @@ def plan(inv, margin_h, no_dest=(), exclude=()):
         rate = v["recent"] / v["window_h"]
         if not rate and (backlog == 0 or v.get("running", 0) > 0):
             rate = v.get("recent_long", 0) / v.get("long_window_h", 1)
-        # nor can a site finish faster than what it runs now: running trials / the median trial's training time. The
-        # window's rate is history (2026-10-11: lxplus kept 13/h from before a 30 GB GPU floor left it running 1 trial
-        # of 90 queued for 3 h, and nothing moved)
-        if backlog and v.get("trial_h"):
-            rate = min(rate, v.get("running", 0) / v["trial_h"])
+        # nor can a site finish its backlog faster than the trials it runs now get through it: the backlog's training
+        # hours (each sweep's median trial, else the site's) over the running trials. The window's rate is history
+        # (2026-10-11: lxplus kept 13/h from before a 30 GB GPU floor left it running 1 trial of 90 queued for 3 h,
+        # and nothing moved)
+        if backlog and v.get("trial_h") and "running_scope" in v:
+            work = sum(x["remaining"] * (x.get("trial_h") or v["trial_h"]) for x in v["sweeps"].values())
+            if work > 0:
+                rate = min(rate, v["running_scope"] * backlog / work)
         # room left under the site's job cap: a move never plans more trials into a site than it will accept
         # (2026-10-06: moves into a full CC queue lost trials)
         cap = JOB_CAP.get(s)
