@@ -14,15 +14,38 @@
 # (analysis/divergences/extract.sh reads two finetune_scaling trials: restore them first.)
 # A finished sweep's checkpoint_index points into its runs: restore the family before any --extend of it.
 #     site submit <site> FA scripts/archive_runs.sh -- <dest_dir> <family> [<family> ...]
+#     site submit <site> FA scripts/archive_runs.sh -- --auto <dest_dir> <keep-prefix> [...]   (@STORE@ in dest = $STORE)
 set -uo pipefail
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
-DEST=$(realpath -m "$1"); shift
+# --auto <dest> <keep>...: every family in runs/ except those whose name starts with a <keep> prefix or equals a
+# <keep> name (a study still in use, a fine-tune parent); the family of runs/a_b_c is a_b (its last field dropped),
+# a directory without "_" is listed and left alone. Prints the families first, so the job log says what it took.
+AUTO=0
+if [ "${1:-}" = "--auto" ]; then AUTO=1; shift; fi
+DEST=$(realpath -m "${1//@STORE@/$STORE}"); shift
 mkdir -p "$DEST"
 cd "$PROJECT_DIR/runs" || exit 1
+if [ $AUTO = 1 ]; then
+    keep=("$@")
+    fams=()
+    for d in */; do
+        d=${d%/}
+        skip=0
+        for k in "${keep[@]}"; do [[ "$d" == "$k"* ]] && skip=1; done
+        [ $skip = 1 ] && continue
+        if [[ "$d" != *_* ]]; then echo "left alone (no family): $d"; continue; fi
+        fams+=("${d%_*}")
+    done
+    set -- $(printf '%s\n' "${fams[@]}" | sort -u)
+    echo "families to archive ($#): $*"
+fi
 for fam in "$@"; do
     dirs=$(ls -d "${fam}"_*/ 2>/dev/null | sed 's#/$##' | awk -F_ -v f="$fam" \
         '{n = split(f, a, "_"); k = $1; for (i = 2; i <= n; i++) k = k "_" $i; if (k == f) print}')
+    if [ $AUTO = 1 ]; then   # a kept directory never goes into another family's archive
+        dirs=$(for d in $dirs; do s=0; for k in "${keep[@]}"; do [[ "$d" == "$k"* ]] && s=1; done; [ $s = 0 ] && echo "$d"; done)
+    fi
     if [ -z "$dirs" ]; then echo "$fam: no directories"; continue; fi
     out="$DEST/$fam.tar"
     if [ -e "$out" ]; then echo "$fam: $out exists, skipped"; continue; fi
