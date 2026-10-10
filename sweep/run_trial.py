@@ -133,17 +133,18 @@ def _failure_penalty(sampler, cfg):
 
     Returns ``max(observed) * margin`` so the penalty stays on the same scale as
     real losses (a fixed huge value would distort the GP's noise/lengthscale fit).
-    Falls back to a configured constant when nothing has been observed yet.
+    With nothing observed yet there is no scale, so nothing is imputed: the trial stays in the diverged set, which
+    the surrogate fit counts as the worst value seen (sweep/dyhpo/hpo_method.py); a fixed constant (it was 10.0,
+    against losses of 1e-6..1e-3) would be an outlier of several decades in the standardised objective.
     Set ``dyhpo.failure_penalty: null`` to disable imputation entirely.
     """
     dy = cfg.get("dyhpo", {}) or {}
     if "failure_penalty" in dy and dy["failure_penalty"] is None:
         return None
     margin   = float(dy.get("failure_penalty_margin", 1.5))
-    fallback = float(dy.get("failure_penalty", 10.0))
     observed = [v for d in sampler._val_loss_history.values() for v in d.values()
                 if v is not None and math.isfinite(v)]
-    return max(observed) * margin if observed else fallback
+    return max(observed) * margin if observed else None
 
 
 def format_value(v):

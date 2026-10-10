@@ -456,15 +456,56 @@ class DyHPOAlgorithmND:
             if c != exclude_combo
         ]
 
+    @staticmethod
+    def _log_obj(neg_vl: float) -> float:
+        """-log10(loss) of a negated loss: our losses span decades (1e-7..1e-2, and a failure penalty above them),
+        so the surrogate sees the order of magnitude, not the raw value, which the worst trials would dominate."""
+        return -math.log10(max(-neg_vl, 1e-300))
+
+    OLD_FALLBACK = -10.0   # the constant failure penalty imputed before 2026-10-10 when nothing had been observed
+
+    def _real_obs(self):
+        """(hp_idx, combo, neg_vl) of every observation but a pre-2026-10-10 constant penalty on a diverged trial (several
+        decades above every real loss); such a trial counts through diverged_configs instead."""
+        return [(h, c, v) for h, obs in self.observations.items() for c, v in obs.items()
+                if not (v == self.OLD_FALLBACK and h in self.diverged_configs)]
+
+    def _label_stats(self) -> Tuple[float, float]:
+        """Mean and std of every observed objective, in -log10(loss)."""
+        vals = np.array([self._log_obj(v) for _, _, v in self._real_obs()], dtype=float)
+        mu = float(vals.mean()) if len(vals) else 0.0
+        sd = float(vals.std()) if len(vals) > 1 else 0.0
+        return mu, (sd if sd > 0 else 1.0)
+
+    def _scale(self, neg_vl: float) -> float:
+        """Standardise an objective value (larger = better). The raw objectives (val_loss 1e-7..1e-2) differ by far
+        less than the GP likelihood's noise floor (variance >= 1e-4), so on the raw scale the GP sees nothing but noise
+        and EI degenerates to picking the candidates furthest from every observation (likelihoods project, 2026-10-10)."""
+        mu, sd = self._label_stats()
+        return (self._log_obj(neg_vl) - mu) / sd
+
     def _history_configurations(self) -> Tuple[List, List, List, List]:
         """Training data for surrogate — one row per observed (hp_idx, combo)."""
         examples, labels, budgets, contexts = [], [], [], []
-        for hp_idx, obs_dict in self.observations.items():
-            for combo, neg_vl in obs_dict.items():
+        real = self._real_obs()
+        for hp_idx, combo, neg_vl in real:
+            examples.append(self.hp_candidates[hp_idx])
+            labels.append(self._scale(neg_vl))
+            budgets.append(list(self._combo_to_normalized(combo)))
+            contexts.append(self._build_context(hp_idx, exclude_combo=combo))
+        # A diverged trial with no observation (no failure penalty imputed, sweep/run_trial.py) enters as the worst
+        # value seen so far, at the cheapest fidelity: dropping it from the candidates alone teaches the surrogate
+        # nothing about its region, so it keeps proposing the neighbours.
+        if real:
+            worst = min(self._scale(v) for _, _, v in real)
+            observed = {h for h, _, _ in real}
+            for hp_idx in sorted(self.diverged_configs):
+                if hp_idx in observed:
+                    continue
                 examples.append(self.hp_candidates[hp_idx])
-                labels.append(neg_vl)
-                budgets.append(list(self._combo_to_normalized(combo)))
-                contexts.append(self._build_context(hp_idx, exclude_combo=combo))
+                labels.append(worst)
+                budgets.append(list(self._combo_to_normalized(self.all_combos[0])))
+                contexts.append([])
         return examples, labels, budgets, contexts
 
     def _generate_candidate_configurations(self, exclude=None) -> Tuple[List, List, List, List, List]:
@@ -533,7 +574,7 @@ class DyHPOAlgorithmND:
     def _find_best_ei(self, means, stds) -> int:
         """Return index of candidate with highest EI vs global best."""
         best_i, best_ei = -1, -np.inf
-        ymax = self.best_value_observed
+        ymax = max(self._scale(v) for _, _, v in self._real_obs())   # same units as the predictions
         for i, (m, s) in enumerate(zip(means, stds)):
             ei = self._acq(ymax, m, s)
             if ei > best_ei:
@@ -570,9 +611,18 @@ class DyHPOAlgorithmND:
                 break
 
         if idx is None:
-            if self.model is not None and getattr(self, "_surrogate_stale", False):
-                self._train_surrogate()          # observations were folded in without training
-                self._surrogate_stale = False
+            # Fit the surrogate on every observation so far, here, in the process that uses it. Each trial is its own
+            # process and the sampler state holds no surrogate weights, so a surrogate trained in observe() was lost
+            # and every post-startup suggestion came from an untrained network (no sweep ever saved one; found in the
+            # likelihoods project, 2026-10-10).
+            if len(self._real_obs()) >= 2:
+                torch.manual_seed(self.seed + self.budget_spent)
+                np.random.seed(self.seed + self.budget_spent)
+                self.model = DyHPO(
+                    self.surrogate_config, self.dev,
+                    self.dataset_name, self.output_path, self.seed,
+                )
+                self._train_surrogate()
             if self.model is not None:
                 means, stds, hp_indices, combos = self._predict(exclude=exclude)
                 if hp_indices:
@@ -612,8 +662,7 @@ class DyHPOAlgorithmND:
         hp_idx       : int    — same index returned by suggest()
         combo        : tuple  — same combo returned by suggest()
         neg_val_loss : float  — negated val_loss (DyHPO maximises internally)
-        train        : bool   — False records without retraining the surrogate (many observations folded in at
-                                once, sweep/extend_sweep.py); the next suggest() retrains first
+        train        : bool   — unused: the surrogate is fitted in suggest()
         """
         if np.isnan(neg_val_loss):
             self.diverged_configs.add(hp_idx)
@@ -627,18 +676,7 @@ class DyHPOAlgorithmND:
         else:
             self.no_improvement_patience += 1
 
-        if self.initial_random_index >= len(self.init_conf_indices):
-            if self.model is None:
-                self.model = DyHPO(
-                    self.surrogate_config, self.dev,
-                    self.dataset_name, self.output_path, self.seed,
-                )
-            if self.no_improvement_patience == self.no_improvement_threshold:
-                self.model.restart = True
-            if train:
-                self._train_surrogate()
-            else:
-                self._surrogate_stale = True
+        # The surrogate is fitted in suggest(), on all observations, when it is needed (`train` is kept for callers).
 
 
 # Backward-compat alias
