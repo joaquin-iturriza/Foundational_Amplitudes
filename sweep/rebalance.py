@@ -182,7 +182,7 @@ def inventory(prefixes, scope, window_h):
         from sweep_manager import load_registry, DEFAULT_REGISTRY
         reg = {n: {"scripts": [os.path.basename(i.get("script", "")) for i in e["jobs"].values()]}
                for n, e in load_registry(DEFAULT_REGISTRY)["sweeps"].items()}
-    now, sweeps, recent, recent_long = time.time(), {}, 0, 0
+    now, sweeps, recent, recent_long, hours = time.time(), {}, 0, 0, []
     # a HELD sweep is paused by hand (its jobs held in the scheduler): never moved, never counted as backlog
     names = sorted({os.path.basename(d) for p in scope for d in glob.glob(os.path.join(siteconf.SWEEP_DIR, p + "*"))
                     if not os.path.exists(os.path.join(d, "HELD"))})
@@ -191,6 +191,12 @@ def inventory(prefixes, scope, window_h):
         res = glob.glob(os.path.join(siteconf.RESULTS_DIR, name, "results", "hp*_t*.json"))
         recent += sum(os.path.getmtime(r) > now - window_h * 3600 for r in res)
         recent_long += sum(os.path.getmtime(r) > now - LONG_WINDOW_H * 3600 for r in res)
+        for r in res:
+            if os.path.getmtime(r) > now - LONG_WINDOW_H * 3600:
+                try:
+                    hours.append(float(json.load(open(r))["traintime_hours"]))
+                except (OSError, ValueError, KeyError, TypeError):
+                    pass
         scripts = glob.glob(os.path.join(sd, "jobs", "trial_*.sh"))
         ran = _ran(sd)
         run, qd, ids = q.get(name, (0, 0, []))
@@ -238,7 +244,8 @@ def inventory(prefixes, scope, window_h):
     print("INVENTORY " + json.dumps({"site": siteconf.SITE, "scheduler": siteconf.CLUSTER.get("scheduler"),
                                      "recent": recent, "window_h": window_h, "recent_long": recent_long,
                                      "running": sum(v[0] for v in q.values()), "jobs_total": jobs_total,
-                                     "long_window_h": LONG_WINDOW_H, "sweeps": sweeps}))
+                                     "long_window_h": LONG_WINDOW_H,
+                                     "trial_h": sorted(hours)[len(hours) // 2] if hours else None, "sweeps": sweeps}))
 
 
 def release(dest, names):
@@ -318,6 +325,11 @@ def plan(inv, margin_h, no_dest=(), exclude=()):
         rate = v["recent"] / v["window_h"]
         if not rate and (backlog == 0 or v.get("running", 0) > 0):
             rate = v.get("recent_long", 0) / v.get("long_window_h", 1)
+        # nor can a site finish faster than what it runs now: running trials / the median trial's training time. The
+        # window's rate is history (2026-10-11: lxplus kept 13/h from before a 30 GB GPU floor left it running 1 trial
+        # of 90 queued for 3 h, and nothing moved)
+        if backlog and v.get("trial_h"):
+            rate = min(rate, v.get("running", 0) / v["trial_h"])
         # room left under the site's job cap: a move never plans more trials into a site than it will accept
         # (2026-10-06: moves into a full CC queue lost trials)
         cap = JOB_CAP.get(s)
