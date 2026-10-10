@@ -4872,8 +4872,42 @@ trial to $18$ near step $9\,600$) and recovers only partly; the trials at $\math
 to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top for these probes. The add-$W$ steps
 ($16$k; validation \code{val\_loss\_no\_reg} on $W+4g$, $W+5g$, preprocessed units, 13:30): EWC complete, best
 $4.9\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
-$4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here. Forgetting and
-the mixed score (D23) are being evaluated on all $30$ processes in one job (\code{FA-ccin2p3-32a65175}).
+$4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here.
+
+\emph{Forgetting in the add-$W$ step (2026-10-10, \code{FA-ccin2p3-4e4e6153}; EWC $5$ of $5$, naive and replay $2$ of $5$).}
+Each trial's best checkpoint scored on the finale's $28$ processes (their validation MSE, preprocessed, on the finale's
+pools and normalization), against the finale's own ($4.9\times10^{-6}$, geometric mean over the $28$); the $W+4g$, $W+5g$
+column is each trial's own validation at its best checkpoint. The evaluation's own $W$ numbers are not used: a trial
+trained on $W$ alone fed its $W$ events the off-shellness input as zero (no $Z$, $t$ or $H$ propagator, so no column
+varies and \code{fine\_tune.offshell\_stats=parent} fits them there), while the evaluation run applies the finale's scale,
+which shifts that input; it reproduces the trials' own $W$ loss only for replay (same scale) and naive trial 145, and is up
+to $10^3\times$ off for the others.
+\begin{center}\small
+\begin{tabular}{lrrrrr}
+\toprule
+trial & $W$ & old $28$ & old$/$finale (gm) & range over the $28$ & all $30$ (gm) \\
+\midrule
+naive 102 & $4.5\times10^{-5}$ & $0.21$ & $4.3\times10^{4}$ & $144$--$1.6\times10^{6}$ & $0.12$ \\
+naive 145 & $5.3\times10^{-5}$ & $0.94$ & $1.9\times10^{5}$ & $64$--$6.1\times10^{6}$ & $0.49$ \\
+replay 44 & $1.5\times10^{-4}$ & $5.2\times10^{-6}$ & $1.06$ & $0.46$--$2.7$ & $6.5\times10^{-6}$ \\
+replay 21 & $2.0\times10^{-3}$ & $1.6\times10^{-4}$ & $32$ & $1.3$--$883$ & $1.9\times10^{-4}$ \\
+EWC 108 & $4.8\times10^{-5}$ & $0.75$ & $1.5\times10^{5}$ & $179$--$5.5\times10^{6}$ & $0.39$ \\
+EWC 31 & $5.3\times10^{-5}$ & $0.036$ & $7.4\times10^{3}$ & $177$--$2.2\times10^{5}$ & $0.023$ \\
+EWC 13 & $6.7\times10^{-5}$ & $0.0091$ & $1.8\times10^{3}$ & $50$--$2.8\times10^{4}$ & $0.0065$ \\
+EWC 2 & $2.7\times10^{-4}$ & $0.58$ & $1.2\times10^{5}$ & $865$--$2.6\times10^{6}$ & $0.35$ \\
+EWC 110 & $4.3\times10^{-4}$ & $0.66$ & $1.3\times10^{5}$ & $402$--$3.6\times10^{6}$ & $0.40$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Training on $W$ alone wipes out the finale's processes: naive loses $4$--$5$ orders on the geometric mean, every one of the
+$28$ worse by at least $64\times$. EWC with the finale's own Fisher holds back only at a large penalty with a moderate lr
+($\lambda=1.4\times10^{5}$, trial 13: $1.8\times10^{3}\times$ worse; $\lambda=339$, trial 108, is as bad as
+naive) and pays little on $W$ ($6.7$ against $4.8\times10^{-5}$); the two at $\lambda\ge5\times10^{5}$ ran at
+$\mathrm{lr}\ge7.9\times10^{-3}$ and lost both. Replay keeps the old processes (trial 44: $1.06\times$, $14$ of $28$ worse
+by more than $10\%$, the worst $u\bar u\to t\bar t$ at NLO, $2.7\times$) at $3\times$ the naive loss on $W$. The parents
+(D23): EWC's best on $W$ is trial 108, best on all $30$ trial 13; naive (102) and replay (44) are the best on both counts
+so far, each with $3$ trials still to run. The EWC children (\code{tp3\_wadd\_ewcwfte32k\_*} from 108,
+\code{tp3\_wadd\_ewcmixfte32k\_*} from 13, $Z+4g$ and $Z+5g$ at $D=10^4$, $32$k) run at the two fixed points (D25).
 
 \begin{figure}[H]
 \centering
@@ -5026,9 +5060,12 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     accumulation and diagram arms (D27). High multiplicity is $Z+4g$, $Z+5g$ only (D28). Done 16:10: the $16$ scratch
     searches and $18$ finale fine-tune cells at the fixed points registered on CC (the $16$ new cells' unused search scripts
     moved to \code{jobs\_search\_unused/}, two that had been submitted cancelled); still to do with \code{fixed\_points.py}:
-    \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} once their pretrainings end, and the add-$W$ children
-    (\code{tp3\_wadd\_*fte32k\_*}, two parents per method) once the forgetting evaluation is in; add their fixed points to
-    \code{expect\_tp3.json}.
+    the naive and replay add-$W$ children (\code{tp3\_wadd\_\{naive,replay\}\{w,mix\}fte32k\_*} from the BEST templates,
+    two parents per method) once their last $3$ add trials each are in and evaluated (\code{run\_data\_tools eval} on
+    \code{runs/tp3\_wadd\_replay/trial\_0044}'s data, the $28$ old processes only; $W$ from each trial's own
+    \code{proc\_val\_losses\_no\_reg}, see the forgetting table); add their fixed points to \code{expect\_tp3.json}. Done
+    2026-10-09/10: \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} ($36$ sweeps) and EWC's four children at the
+    fixed points, registered on CC.
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
