@@ -5065,7 +5065,19 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{runs/tp3\_wadd\_replay/trial\_0044}'s data, the $28$ old processes only; $W$ from each trial's own
     \code{proc\_val\_losses\_no\_reg}, see the forgetting table); add their fixed points to \code{expect\_tp3.json}. Done
     2026-10-09/10: \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} ($36$ sweeps) and EWC's four children at the
-    fixed points, registered on CC.
+    fixed points, registered on CC. \emph{Add-$W$ along the run (D30, D31, 2026-10-10):} the $16$k add step was too long
+    to keep the old processes (forgetting table above), so naive, EWC, LoRA (rank $8$, $\alpha=16$, attention qkv and
+    out; the precedent LoRA arm searched rank and $\alpha$), frozen lower blocks (depth searched over $2,4,6$ of $8$),
+    layer-wise lr decay ($[0.75,1]$) and replay of $1\%$ and $10\%$ of each old pool (\code{train\_events}) run at
+    $1$k, $2$k, $4$k steps (\code{tp3\_waddm\_*}, $21$ five-trial searches), the finale's $28$ processes as monitors
+    (recipe \code{monitor: true}: scored at every validation, never trained on unless given a buffer, outside the
+    selecting aggregate; \code{model\_run*\_best\_all.pt} is the best on all $30$, \code{per\_process\_metrics.json} the
+    curves). In both buffer arms the $28$ old processes carry $28/30$ of the per-process-mean loss whatever the buffer
+    size: $1\%$ against $10\%$ is how many distinct old events are rehearsed, not how much weight replay gets. Next:
+    check the first trial's log for \code{monitor processes [...]: ... left out of training} ($\approx2.65\times10^6$ events,
+    \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
+    evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
+    children keep running as the $16$k point.
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
