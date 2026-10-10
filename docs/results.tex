@@ -5129,7 +5129,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     value. lxplus had no $Z+4g$/$Z+5g$ pools (two trials raced building MadGraph): pools copied from CC;
     \code{sweep/refill.py} counts that race as infrastructure and runs from the supervisor on lxplus
     (\code{tp3\_hmscr\_}, \code{tp3\_hmscr32k\_}, $8$ per sweep); \code{tp3\_hmscr32k\_uubar\_Zgggg\_d8} hp 18 diverged
-    (listed separately), one trial added. \textbf{Items:} \code{synth32k} $95/96$ (write up when complete),
+    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 (done) and hp 15 (running then); check the other lxplus $Z+5g$ trials started 17:09--18:00 and flag them in the write-up. \textbf{Items:} \code{synth32k} $95/96$ (write up when complete),
     \code{highmult} $84/254$, \code{contadd} $14/23$ (EWC's $Z+5g$ children written up; $Z+4g$ children, naive/replay's last
     $3$ trials each and the finale's fixed-point $Z+5g$ cell pending), \code{addhoriz} $2/105$ (all $21$
     \code{tp3\_waddm\_*} DAGs moved to lxplus by the rebalancer, idle in its GPU pool; the first trial's monitor line not
