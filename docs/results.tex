@@ -4891,7 +4891,7 @@ naive 102 & $4.5\times10^{-5}$ & $0.21$ & $4.3\times10^{4}$ & $144$--$1.6\times1
 naive 145 & $5.3\times10^{-5}$ & $0.94$ & $1.9\times10^{5}$ & $64$--$6.1\times10^{6}$ & $0.49$ \\
 replay 44 & $1.5\times10^{-4}$ & $5.2\times10^{-6}$ & $1.06$ & $0.46$--$2.7$ & $6.5\times10^{-6}$ \\
 replay 21 & $2.0\times10^{-3}$ & $1.6\times10^{-4}$ & $32$ & $1.3$--$883$ & $1.9\times10^{-4}$ \\
-EWC 108 & $4.8\times10^{-5}$ & $0.75$ & $1.5\times10^{5}$ & $179$--$5.5\times10^{6}$ & $0.39$ \\
+EWC 108 & $4.85\times10^{-5}$ & $0.75$ & $1.5\times10^{5}$ & $179$--$5.5\times10^{6}$ & $0.39$ \\
 EWC 31 & $5.3\times10^{-5}$ & $0.036$ & $7.4\times10^{3}$ & $177$--$2.2\times10^{5}$ & $0.023$ \\
 EWC 13 & $6.7\times10^{-5}$ & $0.0091$ & $1.8\times10^{3}$ & $50$--$2.8\times10^{4}$ & $0.0065$ \\
 EWC 2 & $2.7\times10^{-4}$ & $0.58$ & $1.2\times10^{5}$ & $865$--$2.6\times10^{6}$ & $0.35$ \\
@@ -4903,7 +4903,7 @@ Training on $W$ alone wipes out the finale's processes: naive loses $4$--$5$ ord
 $28$ worse by at least $64\times$. EWC with the finale's own Fisher holds back only at a large penalty with a moderate lr
 ($\lambda=1.4\times10^{5}$, trial 13: $1.8\times10^{3}\times$ worse; $\lambda=339$, trial 108, is as bad as
 naive) and pays little on $W$ ($6.7$ against $4.8\times10^{-5}$); the two at $\lambda\ge5\times10^{5}$ ran at
-$\mathrm{lr}\ge7.9\times10^{-3}$ and lost both. Replay keeps the old processes (trial 44: $1.06\times$, $14$ of $28$ worse
+$\mathrm{lr}\ge7.9\times10^{-3}$ and are worse than trials 13 and 31 on both $W$ and the old processes. Replay keeps the old processes (trial 44: $1.06\times$, $14$ of $28$ worse
 by more than $10\%$, the worst $u\bar u\to t\bar t$ at NLO, $2.7\times$) at $3\times$ the naive loss on $W$. The parents
 (D23): EWC's best on $W$ is trial 108, best on all $30$ trial 13; naive (102) and replay (44) are the best on both counts
 so far, each with $3$ trials still to run. The EWC children (\code{tp3\_wadd\_ewcwfte32k\_*} from 108,
