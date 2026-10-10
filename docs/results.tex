@@ -696,6 +696,20 @@ range and the sweep has $\ge 6$ observations ($338$ $\eta$-sweeps, $84$
 \code{lr\_scale}-sweeps). Each sweep contributes its own best $\vlnr$ and the HP
 configuration attaining it.
 
+\paragraph{Every sweep before 2026-10-10 was a random search.} The DyHPO surrogate was never kept between trials: each
+trial is its own process, the sampler state saved the observations but not the surrogate's weights, and the reload
+caught the missing checkpoint silently (none of the $1584$ sweep directories on CC-IN2P3 holds one), so every pick after
+the random start-up came from an untrained network. The objective, the raw $\vlnr$ ($10^{-7}$--$10^{-2}$), also sat
+below the GP likelihood's noise floor (variance $\ge10^{-4}$). Found in the likelihoods project; fixed here the same
+day (the surrogate is fitted in \code{suggest()} on every observation, on standardised $-\log_{10}\vlnr$; commit
+4606315, \code{sweep/test\_sampler\_learns.py}). On a synthetic bowl at our loss scale over the transfer study's search
+space ($200$ candidates, $5$ start-up and $20$ guided picks, a save and a load between every step), the guided picks'
+median loss was $3.3\times10^{-4}$ and $8.2\times10^{-5}$ before the fix, worse than random picks' $3\times10^{-5}$, and is
+$7.4\times10^{-6}$ and $6.9\times10^{-6}$ after it, with the pool's best point found (two seeds). So the optima of this
+section are best-of-$N$ random draws from the narrowed ranges, not converged searches: the trained models and their
+losses stand, the claim that a sweep found its cell's optimum does not, and sweeps that share a seed shared their
+start-up picks only.
+
 % --------------------------------------------------------------------------
 \subsection{$\mu$P holds across width; it does not excuse a fixed $\eta$ across horizon}
 % --------------------------------------------------------------------------
