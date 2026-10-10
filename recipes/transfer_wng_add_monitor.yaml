@@ -1,0 +1,36 @@
+# Continual add-W with a forgetting curve (D30): W+4g and W+5g trained on, the finale's 28 processes as monitors
+# (experiment._monitor_names: scored at every validation on the finale's own pools, never trained on, outside the
+# aggregate that selects the checkpoint; model_run*_best_all.pt is the best over all 30). Pools as in
+# recipes/transfer_wng_add.yaml and recipes/transfer_finale.yaml.
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_Wgggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_bhabha, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_aa, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: uubar_ddbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: uu_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: uubar_uubar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: dd_dd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_bbbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: uubar_ttbar, sqrts: [363, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_ZZ, sqrts: [192, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_ZH, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: udbar_Wg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}
+  - {name: uubar_ddbar_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}
+  - {name: uubar_ZZ_nlo, sqrts: [192, 1000], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}
+  - {name: ee_uug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_uugg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_bbbarg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_bbbargg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: uubar_ttbar_nlo, sqrts: [363, 450], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: udbar_taunu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, monitor: true}
+  - {name: ee_mumu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}
+  - {name: ee_uu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000, monitor: true}

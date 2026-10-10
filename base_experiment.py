@@ -754,6 +754,8 @@ class BaseExperiment:
         self.train_lr, self.train_loss, self.val_loss = [], [], []
         self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
         self.val_loss_no_reg, self.val_mse = [], []
+        self.val_loss_no_reg_all = []              # monitor processes (experiment._monitor_names)
+        self._smallest_all = float("inf")
         self.proc_val_losses        = {}   # populated by AmplitudeExperiment._validate
         self.proc_val_losses_no_reg = {}
         self.train_metrics = self._init_metrics()
@@ -912,6 +914,14 @@ class BaseExperiment:
                     selection_loss = self.val_mse[-1]
 
                 improved = selection_loss < smallest_val_loss
+
+                # monitor processes (experiment._monitor_names): the best checkpoint on every process too
+                all_curve = getattr(self, "val_loss_no_reg_all", None)
+                if all_curve and len(all_curve) == len(self.val_loss_no_reg) and \
+                        all_curve[-1] < getattr(self, "_smallest_all", float("inf")):
+                    self._smallest_all, self._smallest_all_step = all_curve[-1], step
+                    if self.cfg.training.es_load_best_model:
+                        self._save_model(step, f"model_run{self.cfg.run_idx}_best_all.pt")
 
                 if improved:
                     smallest_val_loss        = selection_loss

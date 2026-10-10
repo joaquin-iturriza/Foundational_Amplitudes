@@ -278,6 +278,8 @@ class AmplitudeExperiment(BaseExperiment):
                 "n_test":    int(p["n_test"]),
                 "physics":   physics,
                 "sampling":  p.get("sampling", None),
+                # monitor process (scored at validation, never trained on; see _monitor_names below)
+                "monitor":   bool(p.get("monitor", False)),
             })
             names.append(name)
             # Coupling-order vector: resolved AFTER register_recipe_processes below, so a
@@ -311,6 +313,13 @@ class AmplitudeExperiment(BaseExperiment):
                              else mg.order_vector(ocfg))
 
         self._recipe_specs       = specs
+        # monitor processes (a recipe entry's `monitor: true`): loaded, standardized on their own train pool and scored
+        # at every validation like any other, but never trained on and outside the validation aggregate that selects
+        # the checkpoint; a second aggregate over every process (val_loss_no_reg_all) selects model_run*_best_all.pt.
+        # Built to watch forgetting while a model is fine-tuned on new processes (docs/results.tex, the add-W step)
+        self._monitor_names      = [s["name"] for s in specs if s.get("monitor", False)]
+        self._monitor_pids       = [i for i, s in enumerate(specs) if s.get("monitor", False)]
+        assert len(self._monitor_pids) < len(specs), "every process of the recipe is a monitor: nothing to train on"
         self._coupling_by_pid    = couplings_by_pid
         self._internal_mass_by_proc = internal_mass_by_pid
         # Standardize log-mass per PDG across the run's datasets so the fed scalar is
@@ -1992,6 +2001,19 @@ class AmplitudeExperiment(BaseExperiment):
             val_idx   = np.arange(n_train, n_train + n_val)
             test_idx  = np.arange(n_train + n_val, N_total)
 
+        mon = getattr(self, "_monitor_pids", [])
+        if mon:
+            keep = ~np.isin(self.all_process_ids[train_idx], mon)
+            LOGGER.info(f"monitor processes {self._monitor_names}: {int((~keep).sum())} train events left out of "
+                        f"training, scored at validation only")
+            train_idx = train_idx[keep]
+            n_train = len(train_idx)
+            with open_dict(self.cfg):
+                self.cfg.data.subsample = n_train     # the events actually trained on
+            if bool(self.cfg.training.get("use_balanced_sampler", False)):
+                raise ValueError("monitor processes and training.use_balanced_sampler are exclusive: the "
+                                 "balanced sampler's weights run over every dataset, monitors have no train events")
+
         nw = self.cfg.training.num_workers
 
         def make_dataset(indices):
@@ -2734,6 +2756,8 @@ class AmplitudeExperiment(BaseExperiment):
             "dataset_order": dataset_order,
             "val_loss": _f(self.val_loss),
             "val_loss_no_reg": _f(getattr(self, "val_loss_no_reg", [])),
+            "val_loss_no_reg_all": _f(getattr(self, "val_loss_no_reg_all", [])),
+            "monitor_processes": list(getattr(self, "_monitor_names", [])),
             "proc_val_losses": _fd(self.proc_val_losses),
             "proc_val_losses_no_reg": _fd(getattr(self, "proc_val_losses_no_reg", {})),
             "proc_ema_losses": _fd(getattr(self, "_proc_ema_losses", {})),
@@ -3714,7 +3738,9 @@ class AmplitudeExperiment(BaseExperiment):
         # GM_p(MSE_p + reg), a larger (reg-inflated) quantity not comparable to
         # train_loss.  (val_loss_no_reg = GM_p(MSE_p) is unchanged, so checkpoint
         # selection / HPO, which use the no-reg loss, are unaffected.)
-        lnr = [v for v in proc_losses_no_reg.values() if v is not None]
+        monitors = set(getattr(self, "_monitor_names", []))
+        lnr_all = [v for v in proc_losses_no_reg.values() if v is not None]
+        lnr = [v for k, v in proc_losses_no_reg.items() if v is not None and k not in monitors]
         if lnr:
             val_loss_no_reg = _combine(lnr)
             reg_val  = float(self.regularization_lambda * self.regularization(self.model))
@@ -3727,6 +3753,8 @@ class AmplitudeExperiment(BaseExperiment):
             self.val_loss.append(val_loss)
             if val_loss_no_reg is not None:
                 self.val_loss_no_reg.append(val_loss_no_reg)
+            if monitors and lnr_all:
+                self.val_loss_no_reg_all = getattr(self, "val_loss_no_reg_all", []) + [_combine(lnr_all)]
             mse = [v for v in proc_mse_vals.values() if v is not None]
             if mse:
                 self.val_mse.append(float(np.mean(mse)))
