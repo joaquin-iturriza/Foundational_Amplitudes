@@ -29,13 +29,18 @@ for d in dirs:
             txt = re.sub(r"^(request_gpus\s*=.*\n)", r"\1" + line, txt, count=1, flags=re.M)
             open(s, "w").write(txt)
     # idle queued jobs of this sweep (their Iwd or Cmd is under the sweep dir)
-    q = subprocess.run(["condor_q", "-idle", "-af:,", "ClusterId", "ProcId", "Cmd", "Requirements"],
-                       capture_output=True, text=True).stdout
+    q = subprocess.run(["condor_q", "-idle", "-af", "ClusterId", "ProcId", "Cmd"], capture_output=True, text=True).stdout
     for l in q.splitlines():
-        c, p, cmd, req = l.split(",", 3)
-        if not cmd.startswith(d + "/") or "GPUs_GlobalMemoryMb" in req:
+        c, p, cmd = (l.split(None, 2) + ["", "", ""])[:3]
+        if not cmd.startswith(d + "/"):
+            continue
+        # the raw expression (-af evaluates it, to false outside a match)
+        raw = next((x.split("=", 1)[1].strip() for x in subprocess.run(
+            ["condor_q", f"{c}.{p}", "-l"], capture_output=True, text=True).stdout.splitlines()
+            if x.startswith("Requirements = ")), "")
+        if not raw or "GPUs_GlobalMemoryMb" in raw:
             continue
         print(f"  idle {c}.{p} {os.path.basename(cmd)}")
         if a.apply:
             subprocess.run(["condor_qedit", f"{c}.{p}", "Requirements",
-                            f"({req}) && (TARGET.GPUs_GlobalMemoryMb >= {a.mb})"], check=False)
+                            f"({raw}) && (TARGET.GPUs_GlobalMemoryMb >= {a.mb})"], check=False)
