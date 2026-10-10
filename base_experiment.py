@@ -77,6 +77,29 @@ torch.autograd.set_detect_anomaly(False)
 MIN_STEP_SKIP = 1000
 
 
+def _merge_lora_state(state_dict, pretrained_path):
+    """A parent trained with LoRA (fine_tune.lora) saves each adapted linear as P.linear.{weight,bias} plus P.lora_A,
+    P.lora_B; a plain model expects P.{weight,bias}. Fold the adapters in, W = W0 + (alpha/rank) B A (LoRALinear.merge),
+    alpha read from the parent run's config.yaml (the checkpoint does not hold it). A state without adapters is
+    returned as is."""
+    prefixes = [k[:-len(".lora_A")] for k in state_dict if k.endswith(".lora_A")]
+    if not prefixes:
+        return state_dict
+    run_dir = os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path)))
+    pcfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    alpha = float(pcfg.fine_tune.lora.alpha)
+    out = dict(state_dict)
+    for P in prefixes:
+        A, B = out.pop(P + ".lora_A"), out.pop(P + ".lora_B")
+        W = out.pop(P + ".linear.weight")
+        out[P + ".weight"] = W + (alpha / A.shape[0]) * (B @ A)
+        if P + ".linear.bias" in out:
+            out[P + ".bias"] = out.pop(P + ".linear.bias")
+    LOGGER.info(f"Fine-tuning: the parent was trained with LoRA; {len(prefixes)} adapters merged "
+                f"(alpha {alpha}, rank {prefixes and state_dict[prefixes[0] + '.lora_A'].shape[0]})")
+    return out
+
+
 class BaseExperiment:
     def __init__(self, cfg):
         self.cfg = cfg
@@ -1164,6 +1187,7 @@ class BaseExperiment:
         try:
             state_dict = _torch_load(pretrained_path, map_location=self.device, weights_only=False)["model"]
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
+            state_dict = _merge_lora_state(state_dict, pretrained_path)
             if reset_output_head:
                 # Drop any parameter whose shape differs from the current model (e.g. the
                 # readout when switching MSE 1-ch -> HETEROSC 2-ch): load the body strictly

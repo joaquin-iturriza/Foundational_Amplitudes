@@ -280,6 +280,9 @@ class AmplitudeExperiment(BaseExperiment):
                 "sampling":  p.get("sampling", None),
                 # monitor process (scored at validation, never trained on; see _monitor_names below)
                 "monitor":   bool(p.get("monitor", False)),
+                # a monitor's train events used in training (default 0): a replay buffer of the old processes, drawn
+                # from the pool the statistics are still fitted on (the add-W partial replay, D31)
+                "train_events": int(p.get("train_events", 0) or 0),
             })
             names.append(name)
             # Coupling-order vector: resolved AFTER register_recipe_processes below, so a
@@ -320,6 +323,8 @@ class AmplitudeExperiment(BaseExperiment):
         self._monitor_names      = [s["name"] for s in specs if s.get("monitor", False)]
         self._monitor_pids       = [i for i, s in enumerate(specs) if s.get("monitor", False)]
         assert len(self._monitor_pids) < len(specs), "every process of the recipe is a monitor: nothing to train on"
+        _bad = [s["name"] for s in specs if s.get("train_events", 0) and not s.get("monitor", False)]
+        assert not _bad, f"train_events is a monitor's replay buffer; set on non-monitor processes {_bad}"
         self._coupling_by_pid    = couplings_by_pid
         self._internal_mass_by_proc = internal_mass_by_pid
         # Standardize log-mass per PDG across the run's datasets so the fed scalar is
@@ -2003,9 +2008,17 @@ class AmplitudeExperiment(BaseExperiment):
 
         mon = getattr(self, "_monitor_pids", [])
         if mon:
-            keep = ~np.isin(self.all_process_ids[train_idx], mon)
+            pid = self.all_process_ids[train_idx]
+            keep = ~np.isin(pid, mon)
+            n_buf = 0
+            for i in mon:
+                k = int(self._recipe_specs[i].get("train_events", 0))
+                if k > 0:   # the split is shuffled (seed 42): its first k events of the process are a random subset
+                    sel = np.flatnonzero(pid == i)[:k]
+                    keep[sel] = True
+                    n_buf += len(sel)
             LOGGER.info(f"monitor processes {self._monitor_names}: {int((~keep).sum())} train events left out of "
-                        f"training, scored at validation only")
+                        f"training, {n_buf} kept as a replay buffer; outside the checkpoint-selecting aggregate")
             train_idx = train_idx[keep]
             n_train = len(train_idx)
             with open_dict(self.cfg):

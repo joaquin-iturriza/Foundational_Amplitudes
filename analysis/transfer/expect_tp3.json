@@ -3791,5 +3791,20 @@
  "tp3_waddm_naive4k": 5,
  "tp3_waddm_ewc1k": 5,
  "tp3_waddm_ewc2k": 5,
- "tp3_waddm_ewc4k": 5
+ "tp3_waddm_ewc4k": 5,
+ "tp3_waddm_lora1k": 5,
+ "tp3_waddm_lora2k": 5,
+ "tp3_waddm_lora4k": 5,
+ "tp3_waddm_frz1k": 5,
+ "tp3_waddm_frz2k": 5,
+ "tp3_waddm_frz4k": 5,
+ "tp3_waddm_lld1k": 5,
+ "tp3_waddm_lld2k": 5,
+ "tp3_waddm_lld4k": 5,
+ "tp3_waddm_buf1pc1k": 5,
+ "tp3_waddm_buf1pc2k": 5,
+ "tp3_waddm_buf1pc4k": 5,
+ "tp3_waddm_buf10pc1k": 5,
+ "tp3_waddm_buf10pc2k": 5,
+ "tp3_waddm_buf10pc4k": 5
 }
