@@ -5136,16 +5136,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     read yet). \textbf{Next:} as before: (i) the monitor line and \code{per\_process\_metrics.json} of the first
     \code{tp3\_waddm\_*} trial, forgetting curves per method; (ii) weight interpolation (D31 item 1), a
     \code{run\_data\_tools} mode on a \code{tp3\_waddm\_naive*} run dir; (iii) add-$W$ parents along the curves, children at
-    the fixed points; (iv) naive/replay $16$k parents when their trials are in; (v) write up \code{synth32k}. \textbf{Jean
-    Zay:} up (both login nodes answer), but any command that runs git in the checkout hangs past $90$\,s, so neither
-    \code{site sync} nor \code{site submit} goes through. The archive is to run with the deployed (416ca49) interface:
-    explicit families, \code{--no-sync}, destination \code{/lustre/fsstor/projects/rech/itg/ulm49ia/FA\_runs\_archive},
-    the $77$ families of the non-kept runs (list in the session scratchpad, \code{jz\_runs.txt.fams.final}; without
-    \code{pretrain\_full}, which would match \code{pretrain\_full\_nh8}, and \code{tp3s\_ftp\_ee\_WW}); a background loop
-    reconnects and retries every $20$ min for $18$ h, success = a registered \code{FA-jeanzay} run. \code{site reconnect
-    <site>} (new) drops a dead ssh master, and \code{site} reconnects by itself on a dead-master error (allowed by the
-    user's permission rule). Once files are free: \code{site sync jeanzay}, then drop \code{--no-dest jeanzay} from the
-    rebalancer. \textbf{Background:} \code{site supervise --project FA}, the events waiter, the archive loop.
+    the fixed points; (iv) naive/replay $16$k parents when their trials are in; (v) write up \code{synth32k}. \textbf{Jean Zay} (19:45): the hangs were the shared ssh master (sessions stalled behind hung ones; \code{site}, the supervisor and \code{ccorch-web} all used it): \code{~/.ssh/config} now gives \code{jean-zay} no master, and fresh connections answer in $\sim$1\,s. Jean Zay's \code{sbatch} itself hangs on an argument list over $\sim$1\,KB, and no file can be created in WORK (the inode quota), so the archive runs as three jobs (878426, 878465, 878474: families 1--38, 39--58, 59--77 of \code{jz\_runs.txt.fams.final}) with logs in \code{\$STORE/FA\_runs\_archive/logs}, moved to the \code{archive} partition (estimated start 2026-10-11 17:30). Once they have run: \code{site sync jeanzay} (the push failed for lack of inodes), put \code{prune\_site.sh jeanzay} back in projects.toml, drop \code{--no-dest jeanzay} from the rebalancer. \textbf{Background:} \code{site supervise --project FA}, the events waiter, the archive loop.
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
