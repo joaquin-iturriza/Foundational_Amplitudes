@@ -1,5 +1,5 @@
 """Give sweeps back the trials an infrastructure failure took: a full disk or quota, a failed checkpoint write, an
-I/O error, a run directory left by an evicted attempt. Such a trial has no result and its failure says nothing
+I/O error, a run directory left by an evicted attempt, two trials building one MadGraph process at once. Such a trial has no result and its failure says nothing
 about its HPs, so its observation is retracted from the DyHPO state (extend_sweep.py --retract) and the sweep gets
 new trials (generate_sweep.py --extend) up to its planned count. A trial that failed any other way is listed and
 left alone: it may be its HPs. Only sweeps with nothing queued or running are touched, and none marked MOVED_TO.
@@ -17,7 +17,9 @@ from rebalance import _queue, _ran  # noqa: E402
 INFRA = [("quota/disk", r"Disk quota exceeded|Errno 122|No space left on device|Errno 28"),
          ("checkpoint write", r"PytorchStreamWriter failed|unexpected pos \d+ vs \d+"),
          ("I/O", r"Errno 5\b|Input/output error|Stale file handle"),
-         ("leftover run dir", r"alredy exists|already exists\. Aborting")]
+         ("leftover run dir", r"alredy exists|already exists\. Aborting"),
+         # two trials building one process's MadGraph output at once on a site without its pools (2026-10-10, lxplus)
+         ("MadGraph build race", r"Errno 39\] Directory not empty: '[^']*_events'|no src/Parameters_\*\.h under")]
 
 
 def failures(sd):
