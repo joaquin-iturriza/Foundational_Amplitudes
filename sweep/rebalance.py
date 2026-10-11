@@ -576,10 +576,13 @@ def main():
         out = site_run(s, "python", "sweep/rebalance.py", "--inventory", "--window", str(a.window),
                        "--scope", *a.scope, "--", *a.prefixes)
         line = next((l for l in out.splitlines() if l.startswith("INVENTORY ")), None)
-        if line is None:
-            print(f"  {s}: no inventory (unreachable or not synced), left out")
-            continue
-        inv[s] = json.loads(line[len("INVENTORY "):])
+        try:
+            inv[s] = json.loads(line[len("INVENTORY "):]) if line else None
+        except ValueError:      # cut short in transit (2026-10-11: Jean Zay's dropped packets)
+            inv[s] = None
+        if inv[s] is None:
+            del inv[s]
+            print(f"  {s}: no inventory (unreachable, not synced or cut short), left out")
     global inv_sched, inv_all
     inv_sched = {s: v["scheduler"] for s, v in inv.items()}
     inv_all = inv
