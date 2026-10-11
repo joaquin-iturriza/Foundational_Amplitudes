@@ -66,7 +66,10 @@ def main():
             print(f"{name}: has never-run trial scripts, left alone")
             continue
         fails, n_done = failures(sd)
-        owed = a.per_sweep - n_done
+        # owed only for trials that ran HERE and failed: a sweep split between sites (rebalance.py moved some of its
+        # trials away, or took it back) holds only part of its results on this site, and counting the planned total
+        # against them refilled trials that had finished elsewhere (tp3_hmscr32k_uubar_Zggggg_d10: 13 trials, 2026-10-11)
+        owed = min(a.per_sweep - n_done, len(fails))
         if owed <= 0:
             continue
         for r in fails.values():
