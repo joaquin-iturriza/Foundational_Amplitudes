@@ -5254,6 +5254,15 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
+    \emph{State (2026-10-11, 05:00):} \textbf{Items:} \code{synth32k} $96/96$, \code{addhoriz} $105/105$ (both written up);
+    \code{contadd} $33/35$ (the $12$ naive/replay child jobs on CC: \code{tp3\_wadd\_naivewfte32k\_*} from naive 57,
+    \code{tp3\_wadd\_naivemixfte32k\_*} from naive 130, \code{tp3\_wadd\_replaywfte32k\_*} from replay 44, $Z+4g$/$Z+5g$, fixed
+    points; add them to the children's table); \code{highmult} $246/254$ (last $Z+4g$/$Z+5g$ $32$k trials on lxplus; then the
+    full write-up and figure, flagging the $Z+5g$ lxplus trials on the regenerated pool). \textbf{Open questions for the user:}
+    run children from the no-buffer methods' best-on-mix parents ($10$--$80$ steps in, practically the finale) or only from
+    the best-on-$W$ ones (the $10\%$ buffer's mix parent, 2k t68@2000, is a trained model either way); Jean Zay's network
+    fix (Monday). Not started: the addhoriz children at the fixed points, weight interpolation (D31 item 1, not implemented).
+    \textbf{Background:} \code{site supervise --project FA}, the events waiter. Holds: horizon32k, eqd, seeds.
     \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: the naive and replay children (D23) launched 04:10 on CC, write them into the
     children's table when in. \code{addhoriz} complete. Parents proposed along the curves
     (best on $W$ / best on all $30$): naive 4k t179 / 2k t194@40; EWC 4k t37 / 1k t101@10; LoRA 4k t128 / 1k t1@10; frozen
