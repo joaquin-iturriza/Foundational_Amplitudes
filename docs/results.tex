@@ -4914,23 +4914,32 @@ $4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ proce
 
 \emph{High multiplicity at half the grid (2026-10-10 20:15, \code{highmult} $131/254$; collected from CC and lxplus).} A cell is drawn once complete: scratch the best of its $8$ trials, each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$. Only $D=10^5$ ($32$k) is complete for all four arms, on both probes; there the pretrainings give almost nothing: on $Z+4g$ scratch $4.0\times10^{-4}$, the finale $4.6\times10^{-4}$ ($-0.06$\,dex), finale$+W$ $5.6\times10^{-4}$ ($-0.15$), finale$+$synthetic $3.3\times10^{-4}$ ($+0.08$); on $Z+5g$ scratch $6.0\times10^{-4}$, the finale $5.3\times10^{-4}$ ($+0.05$), finale$+W$ $7.0\times10^{-4}$ ($-0.07$), finale$+$synthetic $3.9\times10^{-4}$ ($+0.19$). At $D=10^{4.5}$ the three pretrainings are in ($Z+4g$: $1.35$, $1.49$, $0.93\times10^{-3}$; $Z+5g$: $1.21$, $2.28$, $1.18\times10^{-3}$) but not scratch. Adding $W+4g$, $W+5g$ to the pretraining is worst of the three at both; the synthetic $2\to5$, $2\to6$ processes best. No verdict on the low-$D$ cells, where a pretraining should matter most: none has scratch in yet. The scratch cells ran before the DyHPO fix (sec:lrlaw), the fixed-point cells use no search. $Z+5g$ trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated pool (hand-off).
 
-\emph{Forgetting in the add-$W$ step (2026-10-10, \code{FA-ccin2p3-4e4e6153}; EWC $5$ of $5$, naive and replay $2$ of $5$).}
-Each trial's best checkpoint scored on the finale's $28$ processes (their validation MSE, preprocessed, on the finale's
-pools and normalization), against the finale's own ($4.9\times10^{-6}$, geometric mean over the $28$); the $W+4g$, $W+5g$
-column is each trial's own validation at its best checkpoint. The evaluation's own $W$ numbers are not used: a trial
-trained on $W$ alone fed its $W$ events the off-shellness input as zero (no $Z$, $t$ or $H$ propagator, so no column
-varies and \code{fine\_tune.offshell\_stats=parent} fits them there), while the evaluation run applies the finale's scale,
-which shifts that input; it reproduces the trials' own $W$ loss only for replay (same scale) and naive trial 145, and is up
-to $10^3\times$ off for the others.
+\emph{Forgetting in the add-$W$ step (all $15$ trials in, the old-process evaluation of $6$ pending; \code{contadd} $23/23$, collected from CC and lxplus 2026-10-11 03:40).}
+The finale ($28$ processes, hp73) trained on $u\bar d\to W+4g$, $W+5g$ for $16$k steps, three ways, each a $5$-trial
+search: alone (naive), with the finale's processes replayed (replay), and with EWC on the finale's own Fisher. Each
+trial's best checkpoint scored on the finale's $28$ processes (their validation MSE, preprocessed, on the finale's pools
+and normalization; \code{tools/run\_data\_tools.py eval}, runs \code{FA-ccin2p3-4e4e6153} and \code{FA-ccin2p3-3ab918ca}),
+against the finale's own ($4.9\times10^{-6}$, geometric mean over the $28$); the $W$ column is each trial's own
+validation on $W+4g$, $W+5g$ at its best checkpoint (geometric mean of the two). The evaluation's own $W$ numbers are not
+used: a trial trained on $W$ alone fed its $W$ events the off-shellness input as zero (no $Z$, $t$ or $H$ propagator, so
+no column varies and \code{fine\_tune.offshell\_stats=parent} fits them there), while the evaluation run applies the
+finale's scale, which shifts that input; it reproduces the trials' own $W$ loss only for replay (same scale) and naive
+trial 145, and is up to $10^3\times$ off for the others. Three replay trials blew up and are listed below the table, not
+in it; naive trial 130 and replay trial 159 ran twice (a requeue), and the first run is the one counted.
 \begin{center}\small
 \begin{tabular}{lrrrrr}
 \toprule
 trial & $W$ & old $28$ & old$/$finale (gm) & range over the $28$ & all $30$ (gm) \\
 \midrule
+naive 57 & $4.34\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
 naive 102 & $4.5\times10^{-5}$ & $0.21$ & $4.3\times10^{4}$ & $144$--$1.6\times10^{6}$ & $0.12$ \\
+naive 130 & $4.64\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+naive 162 & $4.66\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
 naive 145 & $5.3\times10^{-5}$ & $0.94$ & $1.9\times10^{5}$ & $64$--$6.1\times10^{6}$ & $0.49$ \\
 replay 44 & $1.5\times10^{-4}$ & $5.2\times10^{-6}$ & $1.06$ & $0.46$--$2.7$ & $6.5\times10^{-6}$ \\
-replay 21 & $2.0\times10^{-3}$ & $1.6\times10^{-4}$ & $32$ & $1.3$--$883$ & $1.9\times10^{-4}$ \\
+replay 159 & $1.65\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+replay 19 & $1.70\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+replay 187 & $2.2\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
 EWC 108 & $4.85\times10^{-5}$ & $0.75$ & $1.5\times10^{5}$ & $179$--$5.5\times10^{6}$ & $0.39$ \\
 EWC 31 & $5.3\times10^{-5}$ & $0.036$ & $7.4\times10^{3}$ & $177$--$2.2\times10^{5}$ & $0.023$ \\
 EWC 13 & $6.7\times10^{-5}$ & $0.0091$ & $1.8\times10^{3}$ & $50$--$2.8\times10^{4}$ & $0.0065$ \\
@@ -4939,21 +4948,117 @@ EWC 110 & $4.3\times10^{-4}$ & $0.66$ & $1.3\times10^{5}$ & $402$--$3.6\times10^
 \bottomrule
 \end{tabular}
 \end{center}
+\emph{Blown up} (best checkpoint at step $640$ or earlier, validation then up by $10^4$--$10^5\times$, ending $9$--$700\times$ above it), each at its best
+checkpoint: replay 21 (step $160$, $W$ $2.0\times10^{-3}$; old$/$finale $32$ in the first evaluation), replay 116
+(step $160$, $W$ $2.2\times10^{-3}$), replay 198 (step $640$, $W$ $8.0\times10^{-4}$), all at $\mathrm{lr}\ge2.9\times10^{-3}$;
+EWC 2 (in the table) peaked at step $5\,440$, rose $800\times$ and came back to $1.5\times$ its best by the end.
 Training on $W$ alone wipes out the finale's processes: naive loses $4$--$5$ orders on the geometric mean, every one of the
 $28$ worse by at least $64\times$. EWC with the finale's own Fisher holds back only at a large penalty with a moderate lr
-($\lambda=1.4\times10^{5}$, trial 13: $1.8\times10^{3}\times$ worse; $\lambda=339$, trial 108, is as bad as
-naive) and pays little on $W$ ($6.7$ against $4.8\times10^{-5}$); the two at $\lambda\ge5\times10^{5}$ ran at
-$\mathrm{lr}\ge7.9\times10^{-3}$ and are worse than trials 13 and 31 on both $W$ and the old processes. Replay keeps the old processes (trial 44: $1.06\times$, $14$ of $28$ worse
-by more than $10\%$, the worst $u\bar u\to t\bar t$ at NLO, $2.7\times$) at $3\times$ the naive loss on $W$. The parents
-(D23): EWC's best on $W$ is trial 108, best on all $30$ trial 13; naive (102) and replay (44) are the best on both counts
-so far, each with $3$ trials still to run. The EWC children (\code{tp3\_wadd\_ewcwfte32k\_*} from 108,
-\code{tp3\_wadd\_ewcmixfte32k\_*} from 13, $Z+4g$ and $Z+5g$ at $D=10^4$, $32$k) run at the two fixed points (D25).
-Their $Z+5g$ cells are in (collected 2026-10-10 13:50; MSE of $\log|\mathcal M|^2$, best of the two fixed points): from
-EWC 108 (best on $W$) $1.25\times10^{-3}$, from EWC 13 (best on the mix) $2.49\times10^{-3}$, against the $8$-trial
-scratch search's $4.75\times10^{-3}$, $3.8\times$ and $1.9\times$ better. The finale's own cell at its fixed points is not in
-yet; five trials of an earlier search on that cell, outside the fixed-point protocol (a queue left over from before D25,
-cancelled 2026-10-10), reach $2.72\times10^{-3}$ at best: the $W$-trained parent is $2.2\times$ below that and the mix parent
-level with it. One seed; the finale+$W$ and finale+synthetic cells and the $Z+4g$ children are not in.
+($\lambda=1.4\times10^{5}$, trial 13: $1.8\times10^{3}\times$ worse; $\lambda=339$, trial 108, is as bad as naive) and pays
+little on $W$ ($6.7$ against $4.8\times10^{-5}$); the two at $\lambda\ge5\times10^{5}$ ran at $\mathrm{lr}\ge7.9\times10^{-3}$
+and are worse than trials 13 and 31 on both counts. Replay keeps the old processes (trial 44: $1.06\times$, $14$ of $28$
+worse by more than $10\%$, the worst $u\bar u\to t\bar t$ at NLO, $2.7\times$) at $3\times$ the naive loss on $W$; its four
+finished trials sit within $1.5\times$ of each other on $W$. The searches' first three trials (random start-up) and EWC's
+five ran before the DyHPO fix (sec:lrlaw); naive's guided trials 162, 57 and replay's 116, 187, 19, 198 after it.
+\emph{Parents} (D23): EWC's best on $W$ is trial 108, best on all $30$ trial 13 (unchanged); naive's best on $W$ is now
+trial 57 ($4.34\times10^{-5}$, $4\%$ below trial 102, the partial write-up's), its best on the mix waits for the
+evaluation; replay's best on $W$ and on all $30$ is trial 44 (on its own validation, the evaluation pending for the rest).
+Only EWC's two parents have children; none was launched from naive or replay.
+
+\emph{The children} (\code{tp3\_wadd\_ewcwfte32k\_*} from EWC 108, \code{tp3\_wadd\_ewcmixfte32k\_*} from EWC 13; $D=10^4$,
+$32$k, the two fixed points of D25, run on CC and lxplus; MSE of $\log|\mathcal M|^2$ at the best checkpoint, best of the
+two points), against the $8$-trial scratch search and the other pretrainings' fixed-point cells of the same probe and $D$:
+\begin{center}\small
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{$u\bar u\to Z+4g$} & \multicolumn{2}{c}{$u\bar u\to Z+5g$} \\
+arm & MSE & gain (dex) & MSE & gain (dex) \\
+\midrule
+scratch ($8$-trial search) & $2.84\times10^{-3}$ & $0$ & $4.75\times10^{-3}$ & $0$ \\
+finale & $3.68\times10^{-3}$ & $-0.11$ & $3.13\times10^{-3}$ & $+0.18$ \\
+finale$+W$ (pretrained with $W+4g$, $W+5g$) & $2.22\times10^{-3}$ & $+0.11$ & $3.61\times10^{-3}$ & $+0.12$ \\
+finale$+$synthetic & $3.09\times10^{-3}$ & $-0.04$ & $3.66\times10^{-3}$ & $+0.11$ \\
+finale $\to W$, EWC 108 (best on $W$) & $0.95\times10^{-3}$ & $+0.48$ & $1.25\times10^{-3}$ & $+0.58$ \\
+finale $\to W$, EWC 13 (best on the mix) & $2.04\times10^{-3}$ & $+0.14$ & $2.49\times10^{-3}$ & $+0.28$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The parent that forgot more is the better parent on both probes: EWC 108 ($1.5\times10^{5}\times$ worse on the old
+processes) gives $3.9\times$ and $2.5\times$ below the finale's own cell, EWC 13 ($1.8\times10^{3}\times$) $1.8\times$ and
+$1.3\times$. Adding $W+4g$, $W+5g$ by continued training beats adding them to the pretraining from the start (finale$+W$)
+by $2.3\times$ and $2.9\times$, and is the only arm more than $0.3$\,dex above scratch at this $D$. What the $Z+ng$
+fine-tune draws on is the $W+ng$ fit, not the finale's other processes. The finale's cell is now its two fixed points
+(hp 97, 37 on $Z+4g$; 31, 107 on $Z+5g$); the $2.72\times10^{-3}$ quoted before was the best of a leftover search, outside
+the protocol. Every fixed-point fine-tune from a parent that saw $W+ng$ (the EWC children and finale$+W$) has its best
+checkpoint at step $1\,280$--$2\,880$ of $32\,000$; after it the validation rises $4$--$230\times$ (EWC 108's $Z+4g$
+children $140$ and $230\times$, the only ones past $100\times$) and ends $1$--$5\times$ above its best: these cells are the
+first $3$k steps, and a lower lr could do better. The finale's and the synthetic cells' best points mostly peak later (step $3\,840$--$17\,600$; the finale's hp 37 on
+$Z+4g$ at $2\,880$). One seed, two fixed points per cell, one value of $D$; the children of naive's and replay's parents
+were never run.
+
+\emph{Forgetting along the add-$W$ run (2026-10-11 03:40, \code{addhoriz} $94/105$; D30, D31; collected from CC and
+lxplus).} The finale fine-tuned on $W+4g$, $W+5g$ for $1$k, $2$k and $4$k steps by seven methods, each a $5$-trial search
+(\code{tp3\_waddm\_*}; \code{analysis/transfer/waddm\_tradeoff.py}, Fig.~\ref{fig:waddm_tradeoff}): naive, EWC with the
+finale's Fisher ($\lambda\in[10^2,10^7]$), LoRA, frozen lower blocks ($2$, $4$ or $6$ of $8$), layer-wise lr decay
+($[0.75,1]$), and replay buffers of $1\%$ and $10\%$ of each old process's train pool. The finale's $28$ processes are
+monitors: scored at every validation ($100$ per run) on the finale's pools, never trained on (except through a buffer),
+outside the aggregate that selects the checkpoint. $W$ is the run's \code{val\_loss\_no\_reg} (geometric mean over
+$W+4g$, $W+5g$, preprocessed); forgetting is the monitors' geometric-mean validation MSE over the finale's own on the same
+pools ($4.90\times10^{-6}$, \code{FA-ccin2p3-4e4e6153}). Missing: the $10\%$ buffer at $1$k and $2$k ($0$ of $5$ each)
+and one $4$k trial, queued on CC. Three searches ran more than $5$ trials (naive $1$k and $4$k, LoRA $1$k: $7$ distinct
+points each; four pending trials re-ran under the same HPs after a move between sites and gave the same curves, counted
+once); all are used. All trials but the first five of naive $1$k and LoRA $1$k ran after the DyHPO fix (4606315).
+\begin{center}\small
+\begin{tabular}{llrrrr}
+\toprule
+& & \multicolumn{2}{c}{best on $W$} & \multicolumn{2}{c}{best on all $30$} \\
+method & steps & $W$ & old$/$finale & $W$ & old$/$finale \\
+\midrule
+naive & $1$k & $2.9\times10^{-4}$ & $2.3\times10^{4}$ & $6.1\times10^{-2}$ & $226$ \\
+ & $2$k & $1.8\times10^{-4}$ & $3.0\times10^{4}$ & $1.4\times10^{-2}$ & $236$ \\
+ & $4$k & $1.2\times10^{-4}$ & $4.4\times10^{4}$ & $1.7\times10^{-2}$ & $255$ \\
+EWC & $1$k & $3.1\times10^{-4}$ & $1.3\times10^{3}$ & $7.1\times10^{-2}$ & $154$ \\
+ & $2$k & $1.8\times10^{-4}$ & $1.3\times10^{4}$ & $1.1\times10^{-2}$ & $257$ \\
+ & $4$k & $1.2\times10^{-4}$ & $1.6\times10^{4}$ & $1.2\times10^{-2}$ & $241$ \\
+LoRA & $1$k & $3.7\times10^{-4}$ & $828$ & $2.4\times10^{-1}$ & $5.4$ \\
+ & $2$k & $2.6\times10^{-4}$ & $979$ & $1.6\times10^{-1}$ & $30$ \\
+ & $4$k & $1.4\times10^{-4}$ & $2.1\times10^{3}$ & $1.1\times10^{-1}$ & $68$ \\
+frozen blocks & $1$k & $2.9\times10^{-4}$ & $1.6\times10^{4}$ & $2.4\times10^{-2}$ & $283$ \\
+ & $2$k & $2.4\times10^{-4}$ & $1.3\times10^{4}$ & $1.0\times10^{-2}$ & $788$ \\
+ & $4$k & $1.1\times10^{-4}$ & $3.3\times10^{4}$ & $4.4\times10^{-3}$ & $273$ \\
+lr decay & $1$k & $2.9\times10^{-4}$ & $2.6\times10^{4}$ & $3.0\times10^{-2}$ & $281$ \\
+ & $2$k & $2.1\times10^{-4}$ & $2.2\times10^{4}$ & $1.0\times10^{-2}$ & $219$ \\
+ & $4$k & $1.5\times10^{-4}$ & $1.5\times10^{3}$ & $7.0\times10^{-3}$ & $220$ \\
+replay $1\%$ & $1$k & $5.3\times10^{-4}$ & $13$ & $5.4\times10^{-4}$ & $10$ \\
+ & $2$k & $4.5\times10^{-4}$ & $33$ & $4.5\times10^{-4}$ & $25$ \\
+ & $4$k & $3.3\times10^{-4}$ & $21$ & $1.5\times10^{-3}$ & $8.0$ \\
+replay $10\%$ & $4$k & $2.9\times10^{-4}$ & $3.5$ & $2.9\times10^{-4}$ & $3.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The old processes go at once: at the first validation ($10$, $20$ or $40$ steps, inside the warm-up) every run is $50$ to
+$2\,200\times$ worse on them, the buffers included (they recover later), except LoRA at its lowest lr ($5$--$7\times$). Without a buffer, no point
+of any curve keeps the forgetting under $100\times$ once $W$ is below $10^{-2}$; the front of naive, EWC, frozen blocks
+and lr decay sits at $200$--$300\times$ over $W$ from $10^{-2}$ to $10^{-3}$ and climbs to $10^{3}$--$4\times10^{4}$ as
+$W$ reaches $1$--$3\times10^{-4}$, so their best-on-all-$30$ checkpoint is the first or second validation, a model barely
+trained on $W$. A shorter run does not buy retention: it only stops earlier on the same front, at a higher $W$ ($1$k
+$\approx2.9\times10^{-4}$, $4$k $\approx1.2\times10^{-4}$; the $16$k naive step reached $4.5\times10^{-5}$). Near the best
+$W$ the methods differ by about one order: lr decay at $4$k ($1.5\times10^{-4}$, $1.5\times10^{3}\times$), LoRA and EWC at
+$1$k ($\approx10^{3}\times$) against naive's $2$--$4\times10^{4}\times$. Only replay changes the picture: $1\%$ of the old
+pools holds the forgetting at $10$--$30\times$ at $W=3$--$5\times10^{-4}$, $10\%$ at $3.5\times$ with $W=2.9\times10^{-4}$,
+against the full replay's $1.06\times$ at $1.5\times10^{-4}$ in the $16$k step above (whose old-$28$ numbers come from a
+separate evaluation, not the in-run monitors). One seed per point.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/waddm_tradeoff_legend.pdf}\\
+\widerow{\pnl{../analysis/transfer/figs/waddm_tradeoff_a.pdf}\hfill\pnl{../analysis/transfer/figs/waddm_tradeoff_b.pdf}}
+\caption{The add-$W$ step's trade-off: the finale's $28$ processes' validation MSE (geometric mean) over the finale's own,
+against the $W+4g$, $W+5g$ validation MSE (geometric mean, preprocessed). (a) Per method, the Pareto front over every
+validation point of its runs at $1$k, $2$k and $4$k steps. (b) Each run's best checkpoint on $W$; the marker is the
+run's length.}
+\label{fig:waddm_tradeoff}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -5144,6 +5249,20 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
+    \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: its scope (D23) is not done: no child of naive's or replay's parents was ever launched (only EWC's).
+    The forgetting evaluation of naive 57/130/162 and replay 19/116/159/187/198 is \code{FA-ccin2p3-3ab918ca}
+    (\code{analysis/transfer/forget\_eval\_2.json}; \code{analysis/transfer/forget\_tab.py} fills the table's pending rows);
+    then the mix-best parents, and the naive and replay children ($Z+4g$, $Z+5g$, $D=10^4$, $32$k, fixed points).
+    \code{addhoriz}: the $10\%$ buffer's $11$ trials queued on CC. Parents proposed along the curves
+    (best on $W$ / best on all $30$): naive 4k t179 / 2k t194@40; EWC 4k t37 / 1k t101@10; LoRA 4k t128 / 1k t1@10; frozen
+    4k t49 / 4k t183@80; lr decay 4k t98 / 4k t2@80; replay $1\%$ 4k t17@4000 / t17@200; replay $10\%$ 4k t46 / t134@3920.
+    Without a buffer the best-on-all-$30$ point is $10$--$80$ steps in, practically the finale, so its child would repeat
+    the finale's own cell: a question for the user before those children run. Weight interpolation (D31 item 1) is not
+    implemented. \textbf{Infrastructure:} \code{prune\_site.sh} now excludes \code{tp3\_waddm\_} (parents along the curves
+    are not each sweep's best trial); \code{rebalance.py} caps a site's rate by its running trials over the backlog's own
+    trial times (lxplus kept $13$/h for $3$\,h while running $1$ of $90$ behind the $30$\,GB GPU floor), lets a sweep come
+    back whole to an empty \code{MOVED\_TO} copy on a SLURM site (\code{--take-back}), and leaves out a site whose inventory
+    arrives cut short (Jean Zay).
     \emph{State (2026-10-10, 16:00):} \textbf{Decisions since 06:15:} D32 (cancel my own jobs that are outside the
     decided scope or wasted without asking, report afterwards), D33 (the DyHPO sampler fix from the likelihoods project,
     deployed at once to every sweep, running ones included). \textbf{Done today:} \code{accrr} and \code{levdiagl} complete,
