@@ -135,3 +135,4 @@ sweeps_local/
 .claude/.notes_flushed
 .claude/.compact_wanted
 .claude/.watchdog_state.json
+analysis/transfer/waddm_curves.json
