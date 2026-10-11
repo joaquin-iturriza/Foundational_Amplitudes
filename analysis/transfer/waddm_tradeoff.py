@@ -4,7 +4,7 @@ the finale's 28 processes scored at every validation as monitors (never trained 
 aggregate; the buffers train on 1% or 10% of their pools). W = the run's val_loss_no_reg (geometric mean over W+4g,
 W+5g, preprocessed); forgetting = the geometric mean over the 28 monitors' validation MSE (preprocessed) divided by the
 finale's own on the same pools (FA-ccin2p3-4e4e6153). Data: analysis/transfer/waddm_curves.json, built from
-waddm_collect.py's output on each site (a trial re-run under the same HPs counts once).
+waddm_collect.py's output on each site by waddm_build.py (a trial re-run under the same HPs counts once).
 (a) per method, the Pareto front over every validation point of all its runs and horizons;
 (b) each run's best checkpoint on W (model_run0_best.pt), marker = horizon.
     python analysis/transfer/waddm_tradeoff.py   -> figs/waddm_tradeoff_a, _b, _legend; table on stdout
