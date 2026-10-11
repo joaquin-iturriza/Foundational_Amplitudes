@@ -4914,7 +4914,7 @@ $4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ proce
 
 \emph{High multiplicity at half the grid (2026-10-10 20:15, \code{highmult} $131/254$; collected from CC and lxplus).} A cell is drawn once complete: scratch the best of its $8$ trials, each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$. Only $D=10^5$ ($32$k) is complete for all four arms, on both probes; there the pretrainings give almost nothing: on $Z+4g$ scratch $4.0\times10^{-4}$, the finale $4.6\times10^{-4}$ ($-0.06$\,dex), finale$+W$ $5.6\times10^{-4}$ ($-0.15$), finale$+$synthetic $3.3\times10^{-4}$ ($+0.08$); on $Z+5g$ scratch $6.0\times10^{-4}$, the finale $5.3\times10^{-4}$ ($+0.05$), finale$+W$ $7.0\times10^{-4}$ ($-0.07$), finale$+$synthetic $3.9\times10^{-4}$ ($+0.19$). At $D=10^{4.5}$ the three pretrainings are in ($Z+4g$: $1.35$, $1.49$, $0.93\times10^{-3}$; $Z+5g$: $1.21$, $2.28$, $1.18\times10^{-3}$) but not scratch. Adding $W+4g$, $W+5g$ to the pretraining is worst of the three at both; the synthetic $2\to5$, $2\to6$ processes best. No verdict on the low-$D$ cells, where a pretraining should matter most: none has scratch in yet. The scratch cells ran before the DyHPO fix (sec:lrlaw), the fixed-point cells use no search. $Z+5g$ trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated pool (hand-off).
 
-\emph{Forgetting in the add-$W$ step (all $15$ trials in, the old-process evaluation of $6$ pending; \code{contadd} $23/23$, collected from CC and lxplus 2026-10-11 03:40).}
+\emph{Forgetting in the add-$W$ step (complete, \code{contadd} $23/23$, collected from CC and lxplus 2026-10-11 03:40).}
 The finale ($28$ processes, hp73) trained on $u\bar d\to W+4g$, $W+5g$ for $16$k steps, three ways, each a $5$-trial
 search: alone (naive), with the finale's processes replayed (replay), and with EWC on the finale's own Fisher. Each
 trial's best checkpoint scored on the finale's $28$ processes (their validation MSE, preprocessed, on the finale's pools
@@ -4931,15 +4931,15 @@ in it; naive trial 130 and replay trial 159 ran twice (a requeue), and the first
 \toprule
 trial & $W$ & old $28$ & old$/$finale (gm) & range over the $28$ & all $30$ (gm) \\
 \midrule
-naive 57 & $4.34\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+naive 57 & $4.34\times10^{-5}$ & $0.44$ & $8.9\times10^{4}$ & $60$--$4.9\times10^{6}$ & $0.24$ \\
 naive 102 & $4.5\times10^{-5}$ & $0.21$ & $4.3\times10^{4}$ & $144$--$1.6\times10^{6}$ & $0.12$ \\
-naive 130 & $4.64\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
-naive 162 & $4.66\times10^{-5}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+naive 130 & $4.64\times10^{-5}$ & $0.20$ & $4.1\times10^{4}$ & $102$--$1.6\times10^{6}$ & $0.11$ \\
+naive 162 & $4.66\times10^{-5}$ & $0.41$ & $8.3\times10^{4}$ & $28$--$5.0\times10^{6}$ & $0.22$ \\
 naive 145 & $5.3\times10^{-5}$ & $0.94$ & $1.9\times10^{5}$ & $64$--$6.1\times10^{6}$ & $0.49$ \\
 replay 44 & $1.5\times10^{-4}$ & $5.2\times10^{-6}$ & $1.06$ & $0.46$--$2.7$ & $6.5\times10^{-6}$ \\
-replay 159 & $1.65\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
-replay 19 & $1.70\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
-replay 187 & $2.2\times10^{-4}$ & \multicolumn{4}{c}{\textsc{eval pending}} \\
+replay 159 & $1.65\times10^{-4}$ & $7.2\times10^{-6}$ & $1.47$ & $0.62$--$4.1$ & $8.9\times10^{-6}$ \\
+replay 19 & $1.70\times10^{-4}$ & $8.9\times10^{-6}$ & $1.82$ & $0.81$--$10.4$ & $1.1\times10^{-5}$ \\
+replay 187 & $2.2\times10^{-4}$ & $2.1\times10^{-5}$ & $4.3$ & $1.25$--$61$ & $2.5\times10^{-5}$ \\
 EWC 108 & $4.85\times10^{-5}$ & $0.75$ & $1.5\times10^{5}$ & $179$--$5.5\times10^{6}$ & $0.39$ \\
 EWC 31 & $5.3\times10^{-5}$ & $0.036$ & $7.4\times10^{3}$ & $177$--$2.2\times10^{5}$ & $0.023$ \\
 EWC 13 & $6.7\times10^{-5}$ & $0.0091$ & $1.8\times10^{3}$ & $50$--$2.8\times10^{4}$ & $0.0065$ \\
@@ -4961,9 +4961,13 @@ worse by more than $10\%$, the worst $u\bar u\to t\bar t$ at NLO, $2.7\times$) a
 finished trials sit within $1.5\times$ of each other on $W$. The searches' first three trials (random start-up) and EWC's
 five ran before the DyHPO fix (sec:lrlaw); naive's guided trials 162, 57 and replay's 116, 187, 19, 198 after it.
 \emph{Parents} (D23): EWC's best on $W$ is trial 108, best on all $30$ trial 13 (unchanged); naive's best on $W$ is now
-trial 57 ($4.34\times10^{-5}$, $4\%$ below trial 102, the partial write-up's), its best on the mix waits for the
-evaluation; replay's best on $W$ and on all $30$ is trial 44 (on its own validation, the evaluation pending for the rest).
-Only EWC's two parents have children; none was launched from naive or replay.
+trial 57 ($4.34\times10^{-5}$, $4\%$ below trial 102, the partial write-up's), its best on the mix is trial 130 ($0.11$ on all $30$, level with 102); replay's best on $W$ and on all $30$ is trial 44
+($6.5\times10^{-6}$, then 159 and 19 within $1.7\times$). The second evaluation scored the finale again: $0.97\times$ the first on
+the geometric mean, single processes $0.5$--$1.0\times$, the run-to-run spread of the evaluation itself.
+Only EWC's two parents had children at first; naive's and replay's were never launched, a gap in D23's scope found at
+this write-up. They run since 2026-10-11 04:10 on CC (\code{tp3\_wadd\_naivewfte32k\_*} from naive 57,
+\code{tp3\_wadd\_replaywfte32k\_*} from replay 44, which is also replay's best on all $30$; \code{tp3\_wadd\_naivemixfte32k\_*}
+from naive 130), same probes, $D$ and fixed points.
 
 \emph{The children} (\code{tp3\_wadd\_ewcwfte32k\_*} from EWC 108, \code{tp3\_wadd\_ewcmixfte32k\_*} from EWC 13; $D=10^4$,
 $32$k, the two fixed points of D25, run on CC and lxplus; MSE of $\log|\mathcal M|^2$ at the best checkpoint, best of the
@@ -4994,7 +4998,7 @@ checkpoint at step $1\,280$--$2\,880$ of $32\,000$; after it the validation rise
 children $140$ and $230\times$, the only ones past $100\times$) and ends $1$--$5\times$ above its best: these cells are the
 first $3$k steps, and a lower lr could do better. The finale's and the synthetic cells' best points mostly peak later (step $3\,840$--$17\,600$; the finale's hp 37 on
 $Z+4g$ at $2\,880$). One seed, two fixed points per cell, one value of $D$; the children of naive's and replay's parents
-were never run.
+are running.
 
 \emph{Forgetting along the add-$W$ run (2026-10-11 03:40, \code{addhoriz} $94/105$; D30, D31; collected from CC and
 lxplus).} The finale fine-tuned on $W+4g$, $W+5g$ for $1$k, $2$k and $4$k steps by seven methods, each a $5$-trial search
@@ -5249,11 +5253,8 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
-    \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: its scope (D23) is not done: no child of naive's or replay's parents was ever launched (only EWC's).
-    The forgetting evaluation of naive 57/130/162 and replay 19/116/159/187/198 is \code{FA-ccin2p3-3ab918ca}
-    (\code{analysis/transfer/forget\_eval\_2.json}; \code{analysis/transfer/forget\_tab.py} fills the table's pending rows);
-    then the mix-best parents, and the naive and replay children ($Z+4g$, $Z+5g$, $D=10^4$, $32$k, fixed points).
-    \code{addhoriz}: the $10\%$ buffer's $11$ trials queued on CC. Parents proposed along the curves
+    \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: the naive and replay children (D23) launched 04:10 on CC, write them into the
+    children's table when in. \code{addhoriz}: the $10\%$ buffer's $11$ trials queued on CC. Parents proposed along the curves
     (best on $W$ / best on all $30$): naive 4k t179 / 2k t194@40; EWC 4k t37 / 1k t101@10; LoRA 4k t128 / 1k t1@10; frozen
     4k t49 / 4k t183@80; lr decay 4k t98 / 4k t2@80; replay $1\%$ 4k t17@4000 / t17@200; replay $10\%$ 4k t46 / t134@3920.
     Without a buffer the best-on-all-$30$ point is $10$--$80$ steps in, practically the finale, so its child would repeat

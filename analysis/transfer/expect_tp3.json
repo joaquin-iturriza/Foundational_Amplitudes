@@ -3822,5 +3822,13 @@
  "tp3_wadd_replaywfte32k_uubar_Zggggg_d8": [
   141,
   65
+ ],
+ "tp3_wadd_naivemixfte32k_uubar_Zgggg_d8": [
+  83,
+  175
+ ],
+ "tp3_wadd_naivemixfte32k_uubar_Zggggg_d8": [
+  141,
+  65
  ]
 }
