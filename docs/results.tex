@@ -4984,21 +4984,30 @@ finale$+W$ (pretrained with $W+4g$, $W+5g$) & $2.22\times10^{-3}$ & $+0.11$ & $3
 finale$+$synthetic & $3.09\times10^{-3}$ & $-0.04$ & $3.66\times10^{-3}$ & $+0.11$ \\
 finale $\to W$, EWC 108 (best on $W$) & $0.95\times10^{-3}$ & $+0.48$ & $1.25\times10^{-3}$ & $+0.58$ \\
 finale $\to W$, EWC 13 (best on the mix) & $2.04\times10^{-3}$ & $+0.14$ & $2.49\times10^{-3}$ & $+0.28$ \\
+finale $\to W$, naive 57 (best on $W$) & $3.18\times10^{-3}$ & $-0.05$ & $3.08\times10^{-3}$ & $+0.19$ \\
+finale $\to W$, naive 130 (best on the mix) & $1.42\times10^{-3}$ & $+0.30$ & $1.83\times10^{-3}$ & $+0.41$ \\
+finale $\to W$, replay 44 (best on both) & $2.92\times10^{-3}$ & $-0.01$ & $3.23\times10^{-3}$ & $+0.17$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-The parent that forgot more is the better parent on both probes: EWC 108 ($1.5\times10^{5}\times$ worse on the old
-processes) gives $3.9\times$ and $2.5\times$ below the finale's own cell, EWC 13 ($1.8\times10^{3}\times$) $1.8\times$ and
-$1.3\times$. Adding $W+4g$, $W+5g$ by continued training beats adding them to the pretraining from the start (finale$+W$)
-by $2.3\times$ and $2.9\times$, and is the only arm more than $0.3$\,dex above scratch at this $D$. What the $Z+ng$
-fine-tune draws on is the $W+ng$ fit, not the finale's other processes. The finale's cell is now its two fixed points
+Which parent gives the best child is not decided by how much it forgot. The two EWC parents first suggested so
+(EWC 108, $1.5\times10^{5}\times$ worse on the old processes, $3.9\times$ and $2.5\times$ below the finale's own cell; EWC 13,
+$1.8\times10^{3}\times$, $1.8\times$ and $1.3\times$), but naive's two parents, which forgot about equally ($8.9\times10^{4}$
+and $4.1\times10^{4}\times$) and fit $W$ equally ($4.3$, $4.6\times10^{-5}$), give children $2.2\times$ and $1.7\times$
+apart (57 level with the finale, 130 $2.6\times$ and $1.7\times$ below it). Replay's parent, which kept the old processes
+($1.06\times$), gives a child level with the finale ($1.26\times$, $0.97\times$). So among parents of equal $W$ loss and
+equal forgetting the children spread by $\sim\!2$--$3\times$ on one seed; the best two (EWC 108, naive 130) are the only
+arms more than $0.3$\,dex above scratch at this $D$, and continued training on $W$ beats adding $W+4g$, $W+5g$ to the
+pretraining from the start (finale$+W$) only for some parents ($2.3\times$ and $2.9\times$ for EWC 108, level for naive 57
+and replay 44). Keeping the old processes buys nothing for the $Z+ng$ child; which of the forgetting parents does best
+looks like parent-to-parent variance, which needs seeds of the parents, not more methods, to settle. The finale's cell is now its two fixed points
 (hp 97, 37 on $Z+4g$; 31, 107 on $Z+5g$); the $2.72\times10^{-3}$ quoted before was the best of a leftover search, outside
-the protocol. Every fixed-point fine-tune from a parent that saw $W+ng$ (the EWC children and finale$+W$) has its best
-checkpoint at step $1\,280$--$2\,880$ of $32\,000$; after it the validation rises $4$--$230\times$ (EWC 108's $Z+4g$
+the protocol. Every fixed-point fine-tune from EWC's parents and from finale$+W$ has its best
+checkpoint at step $1\,280$--$2\,880$ of $32\,000$ (naive 130's at $1\,920$--$3\,520$; naive 57's and replay 44's at $1\,920$--$13\,440$, half of them past
+$8\,000$); after it the validation rises $4$--$230\times$ (EWC 108's $Z+4g$
 children $140$ and $230\times$, the only ones past $100\times$) and ends $1$--$5\times$ above its best: these cells are the
 first $3$k steps, and a lower lr could do better. The finale's and the synthetic cells' best points mostly peak later (step $3\,840$--$17\,600$; the finale's hp 37 on
-$Z+4g$ at $2\,880$). One seed, two fixed points per cell, one value of $D$; the children of naive's and replay's parents
-are running.
+$Z+4g$ at $2\,880$). One seed, two fixed points per cell, one value of $D$.
 
 \emph{Forgetting along the add-$W$ run (complete, 2026-10-11 04:30, \code{addhoriz} $105/105$; D30, D31; collected from CC and
 lxplus).} The finale fine-tuned on $W+4g$, $W+5g$ for $1$k, $2$k and $4$k steps by seven methods, each a $5$-trial search
@@ -5255,9 +5264,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
     \emph{State (2026-10-11, 05:00):} \textbf{Items:} \code{synth32k} $96/96$, \code{addhoriz} $105/105$ (both written up);
-    \code{contadd} $33/35$ (the $12$ naive/replay child jobs on CC: \code{tp3\_wadd\_naivewfte32k\_*} from naive 57,
-    \code{tp3\_wadd\_naivemixfte32k\_*} from naive 130, \code{tp3\_wadd\_replaywfte32k\_*} from replay 44, $Z+4g$/$Z+5g$, fixed
-    points; add them to the children's table); \code{highmult} $246/254$ (last $Z+4g$/$Z+5g$ $32$k trials on lxplus; then the
+    \code{contadd} $35/35$ written up; \code{highmult} $246/254$ (last $Z+4g$/$Z+5g$ $32$k trials on lxplus; then the
     full write-up and figure, flagging the $Z+5g$ lxplus trials on the regenerated pool). \textbf{Open questions for the user:}
     run children from the no-buffer methods' best-on-mix parents ($10$--$80$ steps in, practically the finale) or only from
     the best-on-$W$ ones (the $10\%$ buffer's mix parent, 2k t68@2000, is a trained model either way); Jean Zay's network
