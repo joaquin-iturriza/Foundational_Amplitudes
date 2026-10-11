@@ -4912,7 +4912,45 @@ to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top f
 $4.85\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
 $4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here.
 
-\emph{High multiplicity at half the grid (2026-10-10 20:15, \code{highmult} $131/254$; collected from CC and lxplus).} A cell is drawn once complete: scratch the best of its $8$ trials, each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$. Only $D=10^5$ ($32$k) is complete for all four arms, on both probes; there the pretrainings give almost nothing: on $Z+4g$ scratch $4.0\times10^{-4}$, the finale $4.6\times10^{-4}$ ($-0.06$\,dex), finale$+W$ $5.6\times10^{-4}$ ($-0.15$), finale$+$synthetic $3.3\times10^{-4}$ ($+0.08$); on $Z+5g$ scratch $6.0\times10^{-4}$, the finale $5.3\times10^{-4}$ ($+0.05$), finale$+W$ $7.0\times10^{-4}$ ($-0.07$), finale$+$synthetic $3.9\times10^{-4}$ ($+0.19$). At $D=10^{4.5}$ the three pretrainings are in ($Z+4g$: $1.35$, $1.49$, $0.93\times10^{-3}$; $Z+5g$: $1.21$, $2.28$, $1.18\times10^{-3}$) but not scratch. Adding $W+4g$, $W+5g$ to the pretraining is worst of the three at both; the synthetic $2\to5$, $2\to6$ processes best. No verdict on the low-$D$ cells, where a pretraining should matter most: none has scratch in yet. The scratch cells ran before the DyHPO fix (sec:lrlaw), the fixed-point cells use no search. $Z+5g$ trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated pool (hand-off).
+\emph{High multiplicity, the full grid (complete, \code{highmult} $254/254$, collected from CC and lxplus 2026-10-11 09:40; \code{analysis/transfer/highmult.py}).} Each cell: scratch the best of its search ($8$ trials; the $D=10^5$ searches ran $15$ on $Z+4g$ and $13$ on $Z+5g$, and on $Z+5g$ the best of the first eight is $5.95\times10^{-4}$ against $5.54\times10^{-4}$ of all; the split $32$k searches at $10^{3.5}$ and $10^{4.5}$ ran $9$), each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$ at the best checkpoint; $8$k steps up to $D=10^3$, $32$k from $10^{3.5}$ (Fig.~\ref{fig:highmult}). Gains over scratch, in dex:
+\begin{center}\small
+\begin{tabular}{l rrr rrr}
+ & \multicolumn{3}{c}{$u\bar u\to Z+4g$} & \multicolumn{3}{c}{$u\bar u\to Z+5g$} \\
+$\log_{10}D$ & finale & $+W$ & $+$syn. & finale & $+W$ & $+$syn. \\ \hline
+$1$   & $+0.96$ & $+1.14$ & $+1.00$ & $+1.05$ & $+1.59$ & $+1.26$ \\
+$1.5$ & $+0.80$ & $+1.11$ & $+1.20$ & $+1.29$ & $+1.56$ & $+1.22$ \\
+$2$   & $+0.91$ & $+1.39$ & $+0.88$ & $+0.63$ & $+0.93$ & $+0.60$ \\
+$2.5$ & $+0.55$ & $+1.07$ & $+0.63$ & $+0.58$ & $+1.00$ & $+0.56$ \\
+$3$   & $+0.48$ & $+0.97$ & $+0.62$ & $+0.36$ & $+0.69$ & $+0.47$ \\
+$3.5$ & $+0.21$ & $+0.60$ & $+0.34$ & $+0.17$ & $+0.41$ & $+0.23$ \\
+$4$   & $-0.11$ & $+0.11$ & $-0.04$ & $+0.18$ & $+0.12$ & $+0.11$ \\
+$4.5$ & $-0.21$ & $-0.25$ & $-0.05$ & $-0.11$ & $-0.39$ & $-0.10$ \\
+$5$   & $-0.06$ & $-0.15$ & $+0.08$ & $+0.02$ & $-0.10$ & $+0.15$ \\
+\end{tabular}
+\end{center}
+Every pretraining gains about one decade over scratch at $D\le10^{1.5}$ on both probes, and the gain falls with $D$ to
+nothing at $D\approx10^4$; past it no pretraining is clearly better than scratch ($-0.39$ to $+0.15$\,dex, within the
+spread of one seed). Scratch at $D=10^1$ sits at $2.3$ and $2.9$ (no fit at all). Adding $W+4g$, $W+5g$ to the
+pretraining is the best arm wherever there is a gain: $0.2$--$0.5$\,dex over the finale at every $D\le10^{3.5}$ on both
+probes ($Z+4g$ at $10^{2.5}$: $6.8\times10^{-3}$ against the finale's $2.3\times10^{-2}$), so processes of the probe's own
+multiplicity in a neighbouring family help; at $D\ge10^{4.5}$ it is the worst. The synthetic $2\to5$, $2\to6$ processes
+are level with the finale at low $D$ (within $0.1$\,dex but for $Z+4g$ at $10^{1.5}$, $+0.4$) and the best arm at
+$D=10^5$ on both probes, by $0.1$--$0.15$\,dex. Neither the finale nor the synthetic arm saw a $2\to5$ or $2\to6$
+process of the probes' kind, and both still give a decade where data is scarce. The $D=10^4$ row is the children
+table's (below). $Z+5g$ scratch trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated train pool (2026-10-10
+17:09--18:00, hand-off); no other lxplus $Z+5g$ trial started in that window, and neither is the cell's value (hp 196,
+$9.18\times10^{-2}$, started 20:34). The
+fixed-point cells use no search; at $D\le10^{3}$ two points of the paper's window against an $8$-trial scratch search.
+
+\begin{figure}[t]
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/highmult.pdf}}\\[1ex]
+\widerow{\includegraphics{../analysis/transfer/figs/highmult_gain.pdf}}
+\caption{High-multiplicity probes $u\bar u\to Z+4g$ and $Z+5g$: MSE of $\log|\mathcal M|^2$ against $D$ for scratch
+and the three pretrainings fine-tuned (top), and the gain $\log_{10}(L_\text{scratch}/L)$ (bottom). Scratch is the best
+of its search, each pretraining the best of two fixed points; $8$k steps left of the dotted line, $32$k right of it.}
+\label{fig:highmult}
+\end{figure}
 
 \emph{Forgetting in the add-$W$ step (complete, \code{contadd} $23/23$, collected from CC and lxplus 2026-10-11 03:40).}
 The finale ($28$ processes, hp73) trained on $u\bar d\to W+4g$, $W+5g$ for $16$k steps, three ways, each a $5$-trial
@@ -5264,8 +5302,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
     \emph{State (2026-10-11, 05:00):} \textbf{Items:} \code{synth32k} $96/96$, \code{addhoriz} $105/105$ (both written up);
-    \code{contadd} $35/35$ written up; \code{highmult} $246/254$ (last $Z+4g$/$Z+5g$ $32$k trials on lxplus; then the
-    full write-up and figure, flagging the $Z+5g$ lxplus trials on the regenerated pool). \textbf{Open questions for the user:}
+    \code{contadd} $35/35$, \code{highmult} $254/254$, both written up. \textbf{Open questions for the user:}
     run children from the no-buffer methods' best-on-mix parents ($10$--$80$ steps in, practically the finale) or only from
     the best-on-$W$ ones (the $10\%$ buffer's mix parent, 2k t68@2000, is a trained model either way); Jean Zay's network
     fix (Monday). Not started: the addhoriz children at the fixed points, weight interpolation (D31 item 1, not implemented).
@@ -5292,7 +5329,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     value. lxplus had no $Z+4g$/$Z+5g$ pools (two trials raced building MadGraph): pools copied from CC;
     \code{sweep/refill.py} counts that race as infrastructure and runs from the supervisor on lxplus
     (\code{tp3\_hmscr\_}, \code{tp3\_hmscr32k\_}, $8$ per sweep); \code{tp3\_hmscr32k\_uubar\_Zgggg\_d8} hp 18 diverged
-    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 (done) and hp 15 (running then); check the other lxplus $Z+5g$ trials started 17:09--18:00 and flag them in the write-up. \textbf{Items:}
+    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 and hp 15 (flagged in the write-up). \textbf{Items:}
     \code{highmult} $84/254$, \code{contadd} $14/23$ (EWC's $Z+5g$ children written up; $Z+4g$ children, naive/replay's last
     $3$ trials each and the finale's fixed-point $Z+5g$ cell pending), \code{addhoriz} $2/105$ (all $21$
     \code{tp3\_waddm\_*} DAGs moved to lxplus by the rebalancer, idle in its GPU pool; the first trial's monitor line not
