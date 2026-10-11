@@ -4865,15 +4865,39 @@ the median (median over probes $-0.23$\,dex, better than rung $9$ on $3$ of $12$
 better in $33\%$). The gap is largest on $ee\to d\bar d$ and the one-loop $ee\to d\bar d$ ($0/7$ cells each), the probes
 closest to rung $9$'s own processes; it is level on $ee\to Z\gamma$, $ee\to W^+W^-$ and $u\bar u\to Zgg$.
 
-\emph{Synthetic at $32$k (partial, 2026-10-09 11:50):} $16$ of its $48$ cells in, each the best of its two chosen
-points, on five probes ($ee\to d\bar d$, the two one-loop $d\bar d$/$b\bar b$, $ee\to W^+W^-$, $ee\to Z\gamma$). Against
-scratch at $32$k: median $+0.30$\,dex, better in $11$ of $16$ ($p=0.07$), from $-0.83$ (one-loop $b\bar b$, $D=10^{4.5}$) to
-$+1.42$ ($ee\to Z\gamma$, $D=10^5$); the gain grows with $D$ (median $+0.02$ at $D=10^{3.5}$, $+0.18$ at $10^4$, $+0.30$ at
-$10^{4.5}$, $+1.09$ at $10^5$ on two cells). Against rung $9$ at $32$k, which exists only at $D=10^{3.5}$ and $10^4$ (the
-rest is the held horizon item): median $-0.77$\,dex on $10$ cells, better in $3$ (both one-loop $b\bar b$ cells and
-$ee\to W^+W^-$ at $10^4$), worst on $ee\to d\bar d$ ($-1.28$). The gap to rung $9$ is wider than at $8$k ($-0.24$), on
-these five probes only; one trial (\code{tp3\_synfte32k\_ee\_WW\_d9}, hp$44$) blew up at step $25\,855$ and enters
-with its best checkpoint ($3.7\times10^{-6}$).
+\emph{Synthetic at $32$k (complete, 2026-10-11 03:30; \code{synth32k} $96/96$, collected from CC and lxplus;
+\code{analysis/transfer/synth32k.py}, Fig.~\ref{fig:synth32k}).} All $48$ cells: the twelve probes at $D=10^{3.5}$ to
+$10^5$, $u d\to u d$ also at $10^{2.5}$, $10^3$; each the best of its two chosen points (MSE of $\log|\mathcal M|^2$ at the
+best checkpoint), as is every reference below. These are fixed points, no search, so the DyHPO fix (sec:lrlaw) does not
+touch them. \emph{Against scratch at $32$k} ($46$ cells): median $+0.26$\,dex, better in $30$ (Wilcoxon $p=0.007$); over
+probes median $+0.29$, better on $8$ of $12$ ($p=0.034$), from $-0.16$ ($ee\to d\bar d$) to $+0.92$ ($ud\to ud$). By $D$:
+$+0.22$ at $10^{3.5}$ (better in $10/12$), $+0.06$ at $10^4$ ($6/12$), $-0.13$ at $10^{4.5}$ ($5/12$), $+0.39$ at $10^5$
+($9/10$). The gain does not grow steadily with $D$ as the partial count suggested ($+1.09$ at $10^5$ on two cells); it
+dips at $10^{4.5}$ and recovers at $10^5$. The extremes are $-0.85$ ($ee\to\nu_e\bar\nu_e$, $10^4$, where both chosen
+points spiked, below) and $+1.44$ ($ud\to ud$, $10^5$). Scratch at $ud\to ud$, $10^{2.5}$ and $10^3$ ran two other points
+than its chosen ones and is left out of the tests; against the best of those the synthetic is $+0.32$ and $+0.88$\,dex.
+\emph{Against rung $9$ at $32$k} ($29$ cells: all twelve probes at $10^{3.5}$, $10^4$; $ud\to ud$ at $10^{2.5}$, $10^3$;
+$ee\to d\bar d$ at $10^{4.5}$, $10^5$ and the one-loop $d\bar d$ at $10^{4.5}$, the cells of the held horizon item that ran):
+median $-0.63$\,dex, better in $5$ ($p=1.4\times10^{-5}$); over probes $-0.55$, better on $2$ of $12$ (the one-loop $b\bar b$,
+$+0.21$; $ee\to W^+W^-$, $+0.08$; $p=0.005$); worst $u\bar u\to gg$ and $ee\to d\bar d$ ($-1.16$, $-1.14$). By $D$: $-0.41$
+at $10^{3.5}$ ($1/12$), $-0.72$ at $10^4$ ($3/12$). So at $32$k the synthetic pretraining keeps less of rung $9$'s
+transfer than at $8$k ($-0.24$ over probes, $p=0.034$): a factor $\sim\!4$ at the median, against $1.7$.
+\emph{Unstable trials}, each still entering with its best checkpoint: \code{tp3\_synfte32k\_ee\_WW\_d9} hp$44$ blew up at
+step $25\,855$ (best $1.3\times10^{-5}$, the cell's value); $13$ more of the $96$ trials have their validation loss jump
+more than $100\times$ above their best after it and recover only partly (on the one-loop $b\bar b$ at $10^4$, $10^{4.5}$,
+the one-loop $d\bar d$ at $10^{3.5}$, $10^4$, $ee\to\nu_e\bar\nu_e$ at $10^4$, $ee\to t\bar t$ at $10^{3.5}$, $ud\to ud$ at
+$10^{2.5}$, $u\bar u\to Zgg$ at $10^{3.5}$, $10^4$), with the jumps between steps $1\,920$ and $11\,840$; four cells take
+their value from such a trial ($ee\to\nu_e\bar\nu_e$ $10^4$, one-loop $d\bar d$ $10^{3.5}$, $ud\to ud$ $10^{2.5}$,
+$u\bar u\to Zgg$ $10^{3.5}$). One seed.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/synth32k_a.pdf}\hfill\pnl{../analysis/transfer/figs/synth32k_b.pdf}}
+\caption{The synthetic pretraining fine-tuned at $32$k, per cell $\log_{10}(L_\text{reference}/L_\text{synthetic})$
+against scratch at $32$k (a) and rung $9$ at $32$k where it ran (b), every cell the best of its two chosen points; the
+median is drawn where a value of $D$ has at least three cells. Above zero the synthetic pretraining is better.}
+\label{fig:synth32k}
+\end{figure}
 
 \emph{High multiplicity, first cells (2026-10-09 12:40; hand-off item, D20--D24).} At $D=10^4$, $32$k: the finale
 fine-tuned on $u\bar u\to Z+5g$ ($5$ of $5$ trials) reaches $2.7\times10^{-3}$ (MSE of $\log|\mathcal M|^2$ at the best
@@ -5131,14 +5155,14 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     value. lxplus had no $Z+4g$/$Z+5g$ pools (two trials raced building MadGraph): pools copied from CC;
     \code{sweep/refill.py} counts that race as infrastructure and runs from the supervisor on lxplus
     (\code{tp3\_hmscr\_}, \code{tp3\_hmscr32k\_}, $8$ per sweep); \code{tp3\_hmscr32k\_uubar\_Zgggg\_d8} hp 18 diverged
-    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 (done) and hp 15 (running then); check the other lxplus $Z+5g$ trials started 17:09--18:00 and flag them in the write-up. \textbf{Items:} \code{synth32k} $95/96$ (write up when complete),
+    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 (done) and hp 15 (running then); check the other lxplus $Z+5g$ trials started 17:09--18:00 and flag them in the write-up. \textbf{Items:}
     \code{highmult} $84/254$, \code{contadd} $14/23$ (EWC's $Z+5g$ children written up; $Z+4g$ children, naive/replay's last
     $3$ trials each and the finale's fixed-point $Z+5g$ cell pending), \code{addhoriz} $2/105$ (all $21$
     \code{tp3\_waddm\_*} DAGs moved to lxplus by the rebalancer, idle in its GPU pool; the first trial's monitor line not
     read yet). \textbf{Next:} as before: (i) the monitor line and \code{per\_process\_metrics.json} of the first
     \code{tp3\_waddm\_*} trial, forgetting curves per method; (ii) weight interpolation (D31 item 1), a
     \code{run\_data\_tools} mode on a \code{tp3\_waddm\_naive*} run dir; (iii) add-$W$ parents along the curves, children at
-    the fixed points; (iv) naive/replay $16$k parents when their trials are in; (v) write up \code{synth32k}. \textbf{Jean Zay} (19:45): the hangs were the shared ssh master (sessions stalled behind hung ones; \code{site}, the supervisor and \code{ccorch-web} all used it): \code{~/.ssh/config} now gives \code{jean-zay} no master, and fresh connections answer in $\sim$1\,s. Jean Zay's \code{sbatch} itself hangs on an argument list over $\sim$1\,KB, and no file can be created in WORK (the inode quota), so the archive runs as three jobs (878426, 878465, 878474: families 1--38, 39--58, 59--77 of \code{jz\_runs.txt.fams.final}) with logs in \code{\$STORE/FA\_runs\_archive/logs}, moved to the \code{archive} partition (estimated start 2026-10-11 17:30). Once they have run: \code{site sync jeanzay} (the push failed for lack of inodes), put \code{prune\_site.sh jeanzay} back in projects.toml, drop \code{--no-dest jeanzay} from the rebalancer. \textbf{Jean Zay network (21:30):} uploads over $\sim$1.4\,KB from lpnclaude03 to Jean Zay are silently dropped (a path-MTU black hole; downloads and short commands work), so no git push, bundle or GitHub fetch reaches it (it has no route to GitHub): its checkout stays at 416ca49 until the user fixes lpnclaude03 (\code{tcp\_mtu\_probing=1} or a route MTU of 1400). Leftover \code{git-receive-pack} processes there are mine (killed). The archive itself ran: 59 families, WORK at 467\,006 of 500\,000 files (\code{lfs quota -p}; \code{idr\_quota\_user} lags). \textbf{lxplus GPUs:} $Z+5g$ at batch 16384 OOMs on the 12\,GB MIG slices; \code{sweep/set\_gpu\_mem.py --mb 30000} set a floor on the $Z+5g$ scratch sweeps there (idle jobs' Requirements, submit files); \code{refill.py} counts such an OOM as infrastructure. \textbf{Background:} \code{site supervise --project FA}, the events waiter, the archive loop.
+    the fixed points; (iv) naive/replay $16$k parents when their trials are in. \textbf{Jean Zay} (19:45): the hangs were the shared ssh master (sessions stalled behind hung ones; \code{site}, the supervisor and \code{ccorch-web} all used it): \code{~/.ssh/config} now gives \code{jean-zay} no master, and fresh connections answer in $\sim$1\,s. Jean Zay's \code{sbatch} itself hangs on an argument list over $\sim$1\,KB, and no file can be created in WORK (the inode quota), so the archive runs as three jobs (878426, 878465, 878474: families 1--38, 39--58, 59--77 of \code{jz\_runs.txt.fams.final}) with logs in \code{\$STORE/FA\_runs\_archive/logs}, moved to the \code{archive} partition (estimated start 2026-10-11 17:30). Once they have run: \code{site sync jeanzay} (the push failed for lack of inodes), put \code{prune\_site.sh jeanzay} back in projects.toml, drop \code{--no-dest jeanzay} from the rebalancer. \textbf{Jean Zay network (21:30):} uploads over $\sim$1.4\,KB from lpnclaude03 to Jean Zay are silently dropped (a path-MTU black hole; downloads and short commands work), so no git push, bundle or GitHub fetch reaches it (it has no route to GitHub): its checkout stays at 416ca49 until the user fixes lpnclaude03 (\code{tcp\_mtu\_probing=1} or a route MTU of 1400). Leftover \code{git-receive-pack} processes there are mine (killed). The archive itself ran: 59 families, WORK at 467\,006 of 500\,000 files (\code{lfs quota -p}; \code{idr\_quota\_user} lags). \textbf{lxplus GPUs:} $Z+5g$ at batch 16384 OOMs on the 12\,GB MIG slices; \code{sweep/set\_gpu\_mem.py --mb 30000} set a floor on the $Z+5g$ scratch sweeps there (idle jobs' Requirements, submit files); \code{refill.py} counts such an OOM as infrastructure. \textbf{Background:} \code{site supervise --project FA}, the events waiter, the archive loop.
     \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
     \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
     \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
