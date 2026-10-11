@@ -5000,7 +5000,7 @@ first $3$k steps, and a lower lr could do better. The finale's and the synthetic
 $Z+4g$ at $2\,880$). One seed, two fixed points per cell, one value of $D$; the children of naive's and replay's parents
 are running.
 
-\emph{Forgetting along the add-$W$ run (2026-10-11 03:40, \code{addhoriz} $94/105$; D30, D31; collected from CC and
+\emph{Forgetting along the add-$W$ run (complete, 2026-10-11 04:30, \code{addhoriz} $105/105$; D30, D31; collected from CC and
 lxplus).} The finale fine-tuned on $W+4g$, $W+5g$ for $1$k, $2$k and $4$k steps by seven methods, each a $5$-trial search
 (\code{tp3\_waddm\_*}; \code{analysis/transfer/waddm\_tradeoff.py}, Fig.~\ref{fig:waddm_tradeoff}): naive, EWC with the
 finale's Fisher ($\lambda\in[10^2,10^7]$), LoRA, frozen lower blocks ($2$, $4$ or $6$ of $8$), layer-wise lr decay
@@ -5008,8 +5008,7 @@ finale's Fisher ($\lambda\in[10^2,10^7]$), LoRA, frozen lower blocks ($2$, $4$ o
 monitors: scored at every validation ($100$ per run) on the finale's pools, never trained on (except through a buffer),
 outside the aggregate that selects the checkpoint. $W$ is the run's \code{val\_loss\_no\_reg} (geometric mean over
 $W+4g$, $W+5g$, preprocessed); forgetting is the monitors' geometric-mean validation MSE over the finale's own on the same
-pools ($4.90\times10^{-6}$, \code{FA-ccin2p3-4e4e6153}). Missing: the $10\%$ buffer at $1$k and $2$k ($0$ of $5$ each)
-and one $4$k trial, queued on CC. Three searches ran more than $5$ trials (naive $1$k and $4$k, LoRA $1$k: $7$ distinct
+pools ($4.90\times10^{-6}$, \code{FA-ccin2p3-4e4e6153}). Three searches ran more than $5$ trials (naive $1$k and $4$k, LoRA $1$k: $7$ distinct
 points each; four pending trials re-ran under the same HPs after a move between sites and gave the same curves, counted
 once); all are used. All trials but the first five of naive $1$k and LoRA $1$k ran after the DyHPO fix (4606315).
 \begin{center}\small
@@ -5036,7 +5035,9 @@ lr decay & $1$k & $2.9\times10^{-4}$ & $2.6\times10^{4}$ & $3.0\times10^{-2}$ & 
 replay $1\%$ & $1$k & $5.3\times10^{-4}$ & $13$ & $5.4\times10^{-4}$ & $10$ \\
  & $2$k & $4.5\times10^{-4}$ & $33$ & $4.5\times10^{-4}$ & $25$ \\
  & $4$k & $3.3\times10^{-4}$ & $21$ & $1.5\times10^{-3}$ & $8.0$ \\
-replay $10\%$ & $4$k & $2.9\times10^{-4}$ & $3.5$ & $2.9\times10^{-4}$ & $3.0$ \\
+replay $10\%$ & $1$k & $4.7\times10^{-4}$ & $5.2$ & $5.0\times10^{-4}$ & $2.3$ \\
+ & $2$k & $3.9\times10^{-4}$ & $4.2$ & $4.2\times10^{-4}$ & $1.8$ \\
+ & $4$k & $2.9\times10^{-4}$ & $3.5$ & $3.0\times10^{-4}$ & $3.0$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -5049,7 +5050,7 @@ trained on $W$. A shorter run does not buy retention: it only stops earlier on t
 $\approx2.9\times10^{-4}$, $4$k $\approx1.2\times10^{-4}$; the $16$k naive step reached $4.5\times10^{-5}$). Near the best
 $W$ the methods differ by about one order: lr decay at $4$k ($1.5\times10^{-4}$, $1.5\times10^{3}\times$), LoRA and EWC at
 $1$k ($\approx10^{3}\times$) against naive's $2$--$4\times10^{4}\times$. Only replay changes the picture: $1\%$ of the old
-pools holds the forgetting at $10$--$30\times$ at $W=3$--$5\times10^{-4}$, $10\%$ at $3.5\times$ with $W=2.9\times10^{-4}$,
+pools holds the forgetting at $10$--$30\times$ at $W=3$--$5\times10^{-4}$, $10\%$ at $1.8$--$5\times$ with $W=2.9$--$5\times10^{-4}$ (best on both at $2$k: $1.8\times$, $W=4.2\times10^{-4}$),
 against the full replay's $1.06\times$ at $1.5\times10^{-4}$ in the $16$k step above (whose old-$28$ numbers come from a
 separate evaluation, not the in-run monitors). One seed per point.
 
@@ -5254,9 +5255,9 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
     \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: the naive and replay children (D23) launched 04:10 on CC, write them into the
-    children's table when in. \code{addhoriz}: the $10\%$ buffer's $11$ trials queued on CC. Parents proposed along the curves
+    children's table when in. \code{addhoriz} complete. Parents proposed along the curves
     (best on $W$ / best on all $30$): naive 4k t179 / 2k t194@40; EWC 4k t37 / 1k t101@10; LoRA 4k t128 / 1k t1@10; frozen
-    4k t49 / 4k t183@80; lr decay 4k t98 / 4k t2@80; replay $1\%$ 4k t17@4000 / t17@200; replay $10\%$ 4k t46 / t134@3920.
+    4k t49 / 4k t183@80; lr decay 4k t98 / 4k t2@80; replay $1\%$ 4k t17@4000 / t17@200; replay $10\%$ 4k t46 / 2k t68@2000.
     Without a buffer the best-on-all-$30$ point is $10$--$80$ steps in, practically the finale, so its child would repeat
     the finale's own cell: a question for the user before those children run. Weight interpolation (D31 item 1) is not
     implemented. \textbf{Infrastructure:} \code{prune\_site.sh} now excludes \code{tp3\_waddm\_} (parents along the curves
