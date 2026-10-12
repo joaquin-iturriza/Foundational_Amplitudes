@@ -1760,13 +1760,16 @@ def helicity_amplitudes(st, P, lg=None):
     P = np.asarray(P, np.float64)
     dinv = _dinv(pl["base"], P, 1.0)
     br, s_tot = _spinor_brackets(P, st["m_legs"], lg)
+    h = br.shape[1] // 2
     BT = _brtable(br)
+    BS = _brtable(np.concatenate([br[:, h:], br[:, :h]], 1))   # every <ij> swapped with [ij]
     res = {}
     for u in pl["units"]:
         U, V = _unit_UV(u, BT, s_tot, dinv)
         res[u["lam"]] = U + 1j * V
-        if u["w"] == 2.0:
-            res[_neg(u["lam"])] = U - 1j * V
+        if u["w"] == 2.0:                                   # the partner: the same terms with brackets swapped
+            U, V = _unit_UV(u, BS, s_tot, dinv)             # (= U - iV of the above for physical spinors)
+            res[_neg(u["lam"])] = U + 1j * V
     return res
 
 
