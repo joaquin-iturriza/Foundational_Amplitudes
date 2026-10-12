@@ -4931,10 +4931,10 @@ $5$   & $-0.06$ & $-0.15$ & $+0.08$ & $+0.05$ & $-0.07$ & $+0.19$ \\
 Every pretraining gains about one decade over scratch at $D\le10^{1.5}$ on both probes, and the gain falls with $D$ to
 nothing at $D\approx10^4$; past it no pretraining is clearly better than scratch ($-0.39$ to $+0.19$\,dex, within the
 spread of one seed). Scratch at $D=10^1$ sits at $2.3$ and $2.9$ (no fit at all). Adding $W+4g$, $W+5g$ to the
-pretraining is the best arm wherever there is a gain: $0.2$--$0.5$\,dex over the finale at every $D\le10^{3.5}$ on both
-probes ($Z+4g$ at $10^{2.5}$: $6.8\times10^{-3}$ against the finale's $2.3\times10^{-2}$), so processes of the probe's own
+pretraining is the best arm at every $D\le10^{3.5}$ but $Z+4g$ at $10^{1.5}$ (where the synthetic arm is $0.09$\,dex
+higher): $0.18$--$0.54$\,dex over the finale on both probes ($Z+4g$ at $10^{2.5}$: $6.8\times10^{-3}$ against the finale's $2.3\times10^{-2}$), so processes of the probe's own
 multiplicity in a neighbouring family help; at $D\ge10^{4.5}$ it is the worst. The synthetic $2\to5$, $2\to6$ processes
-are level with the finale at low $D$ (within $0.1$\,dex but for $Z+4g$ at $10^{1.5}$, $+0.4$) and the best arm at
+are close to the finale at low $D$ ($-0.07$ to $+0.21$\,dex over it at $D\le10^{3.5}$, $+0.40$ on $Z+4g$ at $10^{1.5}$) and the best arm at
 $D=10^5$ on both probes, by $0.1$--$0.2$\,dex. Neither the finale nor the (version-$1$) synthetic arm saw a $2\to5$ or $2\to6$
 process of the probes' kind, and both still give a decade where data is scarce. The $D=10^4$ row is the children
 table's (below). $Z+5g$ scratch trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated train pool (2026-10-10
@@ -5049,7 +5049,7 @@ and $4.1\times10^{4}\times$) and fit $W$ equally ($4.3$, $4.6\times10^{-5}$), gi
 apart (57 level with the finale, 130 $2.6\times$ and $1.7\times$ below it). Replay's parent, which kept the old processes
 ($1.06\times$), gives a child level with the finale ($1.26\times$, $0.97\times$). So among parents of equal $W$ loss and
 equal forgetting the children spread by $\sim\!2$--$3\times$ on one seed; the best two (EWC 108, naive 130) are the only
-arms more than $0.3$\,dex above scratch at this $D$, and continued training on $W$ beats adding $W+4g$, $W+5g$ to the
+arms at least $0.3$\,dex above scratch at this $D$, and continued training on $W$ beats adding $W+4g$, $W+5g$ to the
 pretraining from the start (finale$+W$) only for some parents ($2.3\times$ and $2.9\times$ for EWC 108, level for naive 57
 and replay 44). Keeping the old processes buys nothing for the $Z+ng$ child; which of the forgetting parents does best
 looks like parent-to-parent variance, which needs seeds of the parents, not more methods, to settle. The finale's cell is now its two fixed points
@@ -5159,8 +5159,8 @@ finale$+W$, pretrained        & $+0.18$ & $+0.31$ & $+0.48$ & $+0.52$ & $+0.49$ 
 Adding $W+4g$, $W+5g$ late, with a replay buffer, keeps a large part of what having them in the pretraining gives: the
 two best-on-$W$ parents gain $0.2$--$0.4$\,dex ($1.6$--$2.5\times$) over the finale at every $D$ from $10^{1.5}$ to
 $10^3$ on both probes, against $0.3$--$0.5$\,dex for finale$+W$ on $Z+4g$ and about the same as finale$+W$ on $Z+5g$; the
-gain fades to zero at $10^4$, as finale$+W$'s does. The buffer size does not matter ($1\%$ and $10\%$ within
-$0.07$\,dex of each other). The best-on-all-$30$ parents gain little or nothing: replay $1\%$'s is the step-$200$
+gain fades to zero at $10^4$ (finale$+W$'s to $+0.22$ on $Z+4g$ and $-0.06$ on $Z+5g$). The buffer size barely matters for
+the best-on-$W$ parents ($1\%$ and $10\%$ within $0.08$\,dex of each other). The best-on-all-$30$ parents gain little or nothing: replay $1\%$'s is the step-$200$
 checkpoint, the finale with $200$ steps of $W$ ($\le0.07$\,dex), replay $10\%$'s ($2$k, step $2\,000$) half of the
 best-on-$W$ gain. So the more a parent has learned $W$, the more its child gains on $Z+ng$. On $e^+e^-\to t\bar t$, outside
 both families, the children move both ways without a pattern: from $-0.54$ to $+0.60$\,dex over the cells
@@ -5386,7 +5386,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     versions, cheap: pretrainings and fine-tunes at fixed HPs), D37 (reference probe outside $Z+ng$/$W+ng$:
     $e^+e^-\to t\bar t$, Z+3g children cancelled), D38 (trend tests (b), (c); synthetic v2--v5 as designed). The open
     question on best-on-mix children is settled by D34. \textbf{Written up:} \code{highmult} grid (scratch = first $8$
-    trials), \code{replaykids} $24/24$, trend test (c) ($D=10^3$ at $32$k: horizon does not explain the gain's fall),
+    trials), \code{replaykids} $24/24$ and at low $D$ (\code{replaylowd} $130/130$, 10-13), trend test (c) ($D=10^3$ at $32$k: horizon does not explain the gain's fall),
     synthetic v2--v5 (sec:syn-versions, rates against MadGraph). \textbf{Running:} \code{finsrch} (finale on $Z+4g$,
     $D=10^{4.5}$, $8$-trial search over scratch's space): moved by the rebalancer to lxplus, hp167 died of CUDA OOM on a
     $12$\,GB card (nothing recorded in DyHPO), $24$\,GB floor set (\code{sweep/set\_gpu\_mem.py}), owed trial added as
@@ -5400,23 +5400,6 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
     maintain list (it cannot see other sites' results); rebalancer does not set lxplus GPU floors on what it moves (set
     by hand for today's sweeps). CC was unreachable 09:05--15:30 on 10-12. Jean Zay: network fix pending.
-    \emph{State (2026-10-11, 05:00):} \textbf{Items:} \code{synth32k} $96/96$, \code{addhoriz} $105/105$ (both written up);
-    \code{contadd} $35/35$, \code{highmult} $254/254$, both written up. \textbf{Open questions for the user:}
-    run children from the no-buffer methods' best-on-mix parents ($10$--$80$ steps in, practically the finale) or only from
-    the best-on-$W$ ones (the $10\%$ buffer's mix parent, 2k t68@2000, is a trained model either way); Jean Zay's network
-    fix (Monday). Not started: the addhoriz children at the fixed points, weight interpolation (D31 item 1, not implemented).
-    \textbf{Background:} \code{site supervise --project FA}, the events waiter. Holds: horizon32k, eqd, seeds.
-    \emph{State (2026-10-11, 04:00):} \textbf{Items:} \code{contadd}: the naive and replay children (D23) launched 04:10 on CC, write them into the
-    children's table when in. \code{addhoriz} complete. Parents proposed along the curves
-    (best on $W$ / best on all $30$): naive 4k t179 / 2k t194@40; EWC 4k t37 / 1k t101@10; LoRA 4k t128 / 1k t1@10; frozen
-    4k t49 / 4k t183@80; lr decay 4k t98 / 4k t2@80; replay $1\%$ 4k t17@4000 / t17@200; replay $10\%$ 4k t46 / 2k t68@2000.
-    Without a buffer the best-on-all-$30$ point is $10$--$80$ steps in, practically the finale, so its child would repeat
-    the finale's own cell: a question for the user before those children run. Weight interpolation (D31 item 1) is not
-    implemented. \textbf{Infrastructure:} \code{prune\_site.sh} now excludes \code{tp3\_waddm\_} (parents along the curves
-    are not each sweep's best trial); \code{rebalance.py} caps a site's rate by its running trials over the backlog's own
-    trial times (lxplus kept $13$/h for $3$\,h while running $1$ of $90$ behind the $30$\,GB GPU floor), lets a sweep come
-    back whole to an empty \code{MOVED\_TO} copy on a SLURM site (\code{--take-back}), and leaves out a site whose inventory
-    arrives cut short (Jean Zay).
     \emph{State (2026-10-10, 16:00):} \textbf{Decisions since 06:15:} D32 (cancel my own jobs that are outside the
     decided scope or wasted without asking, report afterwards), D33 (the DyHPO sampler fix from the likelihoods project,
     deployed at once to every sweep, running ones included). \textbf{Done today:} \code{accrr} and \code{levdiagl} complete,
