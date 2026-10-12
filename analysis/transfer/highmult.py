@@ -1,6 +1,6 @@
 """High-multiplicity test (D20, D22, D25, D28): u ubar -> Z+4g (2->5) and Z+5g (2->6), D = 10^1 .. 10^3 at 8k
 (tp3_*_d2..d6) and 10^3.5 .. 10^5 at 32k (tp3_*32k_*_d7..d10). Four arms per cell: scratch (an 8-trial search,
-tp3_hmscr[32k]; its value the best of every trial it ran), and the finale, finale+W+ng and finale+synthetic
+tp3_hmscr[32k]; its value the best of its first 8 trials), and the finale, finale+W+ng and finale+synthetic
 pretrainings fine-tuned at their cell's two fixed points (expect_tp3.json; tp3_finfte, tp3_fwngfte, tp3_fsynfte), each
 the best of the two. MSE of log|M|^2 at the best checkpoint (val_loss * prepd_std^2). Data: scratch_sweeps.json.
     python analysis/transfer/highmult.py     -> figs/highmult (MSE against D), figs/highmult_gain; table on stdout
@@ -30,8 +30,13 @@ def value(arm, p, k):
     if arm != "scr":
         tr = [t for t in tr if t["hp"] in E[n]]
         assert len(tr) == 2, (n, [t["hp"] for t in tr])
-    elif len(tr) < 8:
-        return None, len(tr)
+    else:
+        # the 8-trial search (D25): the first 8 by observation order. A search split between sites numbers each site's
+        # observations from 0, so ties go to CC; trials past the 8th (refilled by sweep/refill.py when it counted one
+        # site's results only, 2026-10-11) are left out
+        if len(tr) < 8:
+            return None, len(tr)
+        tr = sorted(tr, key=lambda t: (t["order"] if t.get("order") is not None else 99, t.get("site") != "ccin2p3"))[:8]
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr), len(tr)
 
 

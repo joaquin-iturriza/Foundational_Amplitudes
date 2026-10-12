@@ -4912,7 +4912,7 @@ to the end. The $1$--$10\times10^{-3}$ fine-tune window is too high at the top f
 $4.85\times10^{-5}$ of $5$ (the two trials at $\mathrm{lr}\ge7.9\times10^{-3}$ at $2.7$ and $4.3\times10^{-4}$), naive
 $4.5\times10^{-5}$ ($2$ of $5$); replay ($2$ of $5$) is scored on all $30$ processes, not comparable here.
 
-\emph{High multiplicity, the full grid (complete, \code{highmult} $254/254$, collected from CC and lxplus 2026-10-11 09:40; \code{analysis/transfer/highmult.py}).} Each cell: scratch the best of its search ($8$ trials; the $D=10^5$ searches ran $15$ on $Z+4g$ and $13$ on $Z+5g$, refilled for trials that had finished on the other site (\code{sweep/refill.py} counted one site's results; fixed 2026-10-11, two more cancelled), and on $Z+5g$ the best of the first eight is $5.95\times10^{-4}$ against $5.54\times10^{-4}$ of all; the split $32$k searches at $10^{3.5}$ and $10^{4.5}$ ran $9$), each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$ at the best checkpoint; $8$k steps up to $D=10^3$, $32$k from $10^{3.5}$ (Fig.~\ref{fig:highmult}). Gains over scratch, in dex:
+\emph{High multiplicity, the full grid (complete, \code{highmult} $254/254$, collected from CC and lxplus 2026-10-11 09:40; \code{analysis/transfer/highmult.py}).} Each cell: scratch the best of its $8$-trial search (the first $8$ by observation order: the $D=10^5$ searches ran $15$ on $Z+4g$ and $13$ on $Z+5g$, refilled for trials that had finished on the other site by \code{sweep/refill.py}, which counted one site's results, fixed 2026-10-11, and the split searches at $10^{3.5}$ and $10^{4.5}$ ran $9$; only $Z+5g$ at $10^5$ changes, $5.95\times10^{-4}$ against $5.54\times10^{-4}$ over all $13$), each pretraining the best of its two fixed points (D25); MSE of $\log|\mathcal M|^2$ at the best checkpoint; $8$k steps up to $D=10^3$, $32$k from $10^{3.5}$ (Fig.~\ref{fig:highmult}). Gains over scratch, in dex:
 \begin{center}\small
 \begin{tabular}{l rrr rrr}
  & \multicolumn{3}{c}{$u\bar u\to Z+4g$} & \multicolumn{3}{c}{$u\bar u\to Z+5g$} \\
@@ -4925,17 +4925,17 @@ $3$   & $+0.48$ & $+0.97$ & $+0.62$ & $+0.36$ & $+0.69$ & $+0.47$ \\
 $3.5$ & $+0.21$ & $+0.60$ & $+0.34$ & $+0.17$ & $+0.41$ & $+0.23$ \\
 $4$   & $-0.11$ & $+0.11$ & $-0.04$ & $+0.18$ & $+0.12$ & $+0.11$ \\
 $4.5$ & $-0.21$ & $-0.25$ & $-0.05$ & $-0.11$ & $-0.39$ & $-0.10$ \\
-$5$   & $-0.06$ & $-0.15$ & $+0.08$ & $+0.02$ & $-0.10$ & $+0.15$ \\
+$5$   & $-0.06$ & $-0.15$ & $+0.08$ & $+0.05$ & $-0.07$ & $+0.19$ \\
 \end{tabular}
 \end{center}
 Every pretraining gains about one decade over scratch at $D\le10^{1.5}$ on both probes, and the gain falls with $D$ to
-nothing at $D\approx10^4$; past it no pretraining is clearly better than scratch ($-0.39$ to $+0.15$\,dex, within the
+nothing at $D\approx10^4$; past it no pretraining is clearly better than scratch ($-0.39$ to $+0.19$\,dex, within the
 spread of one seed). Scratch at $D=10^1$ sits at $2.3$ and $2.9$ (no fit at all). Adding $W+4g$, $W+5g$ to the
 pretraining is the best arm wherever there is a gain: $0.2$--$0.5$\,dex over the finale at every $D\le10^{3.5}$ on both
 probes ($Z+4g$ at $10^{2.5}$: $6.8\times10^{-3}$ against the finale's $2.3\times10^{-2}$), so processes of the probe's own
 multiplicity in a neighbouring family help; at $D\ge10^{4.5}$ it is the worst. The synthetic $2\to5$, $2\to6$ processes
 are level with the finale at low $D$ (within $0.1$\,dex but for $Z+4g$ at $10^{1.5}$, $+0.4$) and the best arm at
-$D=10^5$ on both probes, by $0.1$--$0.15$\,dex. Neither the finale nor the synthetic arm saw a $2\to5$ or $2\to6$
+$D=10^5$ on both probes, by $0.1$--$0.2$\,dex. Neither the finale nor the synthetic arm saw a $2\to5$ or $2\to6$
 process of the probes' kind, and both still give a decade where data is scarce. The $D=10^4$ row is the children
 table's (below). $Z+5g$ scratch trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated train pool (2026-10-10
 17:09--18:00, hand-off); no other lxplus $Z+5g$ trial started in that window, and neither is the cell's value (hp 196,
