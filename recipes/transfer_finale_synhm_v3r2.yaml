@@ -1,6 +1,6 @@
 # High-multiplicity test, synthetic version 3, revision 2 (D36, D38; revision 2 2026-10-12): the finale plus 8 synthetic processes at high
 # multiplicity (syn5v3r2_00000..03, 2->5; syn6v3r2_00000..03, 2->6; tools/synthetic_amplitudes.py
-# v3r2: every SM-legal diagram of the process (at most 4000 labelled), one numerator per identical-leg
+# v3r2: every SM-legal diagram of the process, one numerator per identical-leg
 # permutation orbit summed coherently, instead of K log-uniform up to a cap (revision 1, superseded).
 # The finale's own lines follow unchanged (docs/results.tex, sec:syn-versions).
 #   syn5v3r2_00000: [2, -2] -> [12, -12, 6, -6, 23], 93 of 93 legal diagrams
@@ -8,7 +8,7 @@
 #   syn5v3r2_00002: [2, -2] -> [1, -1, 22, 23, 23], 588 of 588 legal diagrams
 #   syn5v3r2_00003: [2, 2] -> [2, 2, 21, 22, 25], 40 of 40 legal diagrams
 #   syn6v3r2_00000: [2, -2] -> [1, -1, 5, -5, 21, 25], 1276 of 1276 legal diagrams
-#   syn6v3r2_00001: [2, 2] -> [2, 2, 21, 21, 21, 21], 3996 of 14610 legal diagrams
+#   syn6v3r2_00001: [2, 2] -> [2, 2, 21, 21, 21, 21], 14610 of 14610 legal diagrams
 #   syn6v3r2_00002: [11, -11] -> [13, -14, -3, 4, 21, 23], 220 of 220 legal diagrams
 #   syn6v3r2_00003: [2, -2] -> [-13, 14, -1, 2, -24, -24], 1984 of 1984 legal diagrams
 sampling: {mode: mixture}

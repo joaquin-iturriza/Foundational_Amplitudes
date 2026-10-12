@@ -10,7 +10,7 @@
 #   syn6v6t_00000: [2, -2] -> [22, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
 #   syn6v6t_00001: [2, -2] -> [23, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
 #   syn6v6t_00002: [2, -1] -> [24, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
-#   syn6v6t_00003: [1, -1] -> [25, 21, 21, 21, 21, 21], 3990 of 6555 legal diagrams
+#   syn6v6t_00003: [1, -1] -> [25, 21, 21, 21, 21, 21], 6555 of 6555 legal diagrams
 sampling: {mode: mixture}
 processes:
   - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

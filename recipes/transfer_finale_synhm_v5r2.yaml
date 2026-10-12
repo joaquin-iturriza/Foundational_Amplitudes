@@ -1,7 +1,7 @@
 # High-multiplicity test, synthetic version 5, revision 2 (D36, D38; revision 2 2026-10-12): the finale plus 8 synthetic processes at high
 # multiplicity (syn5v5r2_00000..03, 2->5; syn6v5r2_00000..03, 2->6; tools/synthetic_amplitudes.py
 # v5r2: v4r2 on the target shape, q qbar' -> V + 4g (syn5v5r2_*) and V + 5g (syn6v5r2_*), V = gamma, Z,
-# W+, H by k % 4, every legal diagram (384, 3840; H + 5g 3990 of 6555); revision 1 superseded.
+# W+, H by k % 4, every legal diagram (384, 3840; H + 4g 561, H + 5g 6555); revision 1 superseded.
 # The finale's own lines follow unchanged (docs/results.tex, sec:syn-versions).
 #   syn5v5r2_00000: [2, -2] -> [22, 21, 21, 21, 21], 384 of 384 legal diagrams
 #   syn5v5r2_00001: [1, -1] -> [23, 21, 21, 21, 21], 384 of 384 legal diagrams
@@ -10,7 +10,7 @@
 #   syn6v5r2_00000: [1, -1] -> [22, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
 #   syn6v5r2_00001: [2, -2] -> [23, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
 #   syn6v5r2_00002: [2, -1] -> [24, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
-#   syn6v5r2_00003: [1, -1] -> [25, 21, 21, 21, 21, 21], 3990 of 6555 legal diagrams
+#   syn6v5r2_00003: [1, -1] -> [25, 21, 21, 21, 21, 21], 6555 of 6555 legal diagrams
 sampling: {mode: mixture}
 processes:
   - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

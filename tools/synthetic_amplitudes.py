@@ -55,10 +55,9 @@ Names and versions. The name selects the version, so a recipe can mix them:
           gives q qbar -> V + 4g 384, + 5g 3840), listed by subset recursion (_legal_tables) and grouped into orbits
           of the identical-leg permutations; one numerator per orbit, and |M|^2 sums every labelled diagram of every
           orbit coherently (each orbit's |Pi| images weighted 1/|stabiliser|) instead of averaging |.|^2 over |Pi|.
-          Lines a stabiliser maps onto each other share their drawn power. Above _KALL_MAX = 4000 labelled diagrams
-          whole orbits are kept in a uniformly random order while they fit (the cost is linear in that number, and
-          4000 keeps the target family's q qbar -> V + 5g, 3840, whole); above _ENUM_MAX legal trees the orbits
-          come from uniformly sampled trees instead of a full listing.
+          Lines a stabiliser maps onto each other share their drawn power. No cap on the diagram count (the user,
+          2026-10-13: optimise before compromising); only above _ENUM_MAX = 50000 legal trees, which no recipe name
+          reaches, do the orbits come from uniformly sampled trees (up to _ENUM_MAX labelled) instead of a listing.
   v6  (D40) Spinor-helicity numerators and the tree-level selection rules, on v5r2's diagrams (ggH vertex
       included; general legs as v4, or the target shape as v5 with the t tag). Every leg carries a helicity in the
       all-outgoing convention: fermions +-1/2, g and gamma +-1, Z and W -1, 0, +1, H 0. A massive leg's spinors are
@@ -86,8 +85,8 @@ Names and versions. The name selects the version, so a recipe can mix them:
       vanish. A diagram contributes only to the configurations its lines allow; a configuration no image allows is
       exactly zero. |M|^2 = (1/4) sum over configurations of (|A|^2 + |A^P|^2)/2, A^P the parity image (every
       angle bracket swapped with the square one, i.e. |A| at the spatially inverted momenta); a diagram allowed at
-      both a configuration and its parity partner gives the partner its numerator conjugated (one draw per pair). Above _V6_TERMS_MAX evaluated
-      terms (parity units x orbit representatives x |Pi|), whole orbits are dropped uniformly.
+      both a configuration and its parity partner gives the partner its numerator conjugated (one draw per pair).
+      Every legal diagram, as revision 2: no cap on the evaluated terms.
 
   v2  K grows with multiplicity. K = floor(exp U[0, ln(K_cap + 1))) (log-uniform on 1..K_cap),
           K_cap = max(K_max^v1(N), floor(_KFRAC (2N-5)!! / |Pi|)),   _KFRAC = 1/4,
@@ -983,9 +982,8 @@ def _eval_chunk(st, pl, P, scale):
 # =============================================================================
 # Revision 2 (versions 3-6; the r2 names and v6): every SM-legal diagram, one coherent sum
 # =============================================================================
-_KALL_MAX = 4000        # labelled diagrams per process, at most (module docstring, revision 2; docs sec:syn-versions)
-_ENUM_MAX = 50000       # above this many legal trees, orbits are found by uniform tree sampling instead of a listing
-_V6_TERMS_MAX = 1000000  # v6: evaluated terms (parity units x orbit representatives x |Pi|) per event, at most
+_ENUM_MAX = 50000       # above this many legal trees, orbits come from uniform tree sampling (up to this many labelled
+                        # diagrams) instead of a listing; no recipe name reaches it (module docstring, revision 2)
 _V6_MONOS = 1           # v6: bracket monomials per (diagram, configuration) (module docstring, version 6)
 
 
@@ -1104,7 +1102,8 @@ def _img_key(key, perm, N):
 def _legal_orbits(rng, out, N, protected, mass, hgg, perms, cap):
     """Every legal diagram of the process, grouped into orbits of the identical-leg permutations: returns
     (representatives [(diagram, stabiliser perms, orbit size)], legal count, labelled diagrams kept, subsampled).
-    Above `cap` labelled diagrams, whole orbits are taken in a uniformly random order while they fit."""
+    Called with cap = _ENUM_MAX: a listed set (count <= _ENUM_MAX) is kept whole; above it, sampled whole orbits up to
+    `cap` labelled diagrams."""
     count, gen, sample = _legal_tables(out, N, protected, mass, hgg)
     if count == 0:
         return [], 0, 0, False
@@ -1198,19 +1197,9 @@ def _draw_process_r2(rng, name, ver, ini, fin, target):
 
     perms = _identical_perms(pdgs)
     out = [_anti(p) for p in ini] + list(fin)
-    reps, n_legal, k_all, sub = _legal_orbits(rng, out, N, protected, mass, ver >= 5, perms, _KALL_MAX)
+    reps, n_legal, k_all, sub = _legal_orbits(rng, out, N, protected, mass, ver >= 5, perms, _ENUM_MAX)
     if not reps:
         return None
-    cap = _KALL_MAX
-    if ver >= 6:   # evaluated terms (parity units x representatives x |Pi|) <= _V6_TERMS_MAX: whole orbits dropped
-        _c, _a, lam = _v6_lambda([d for d, _s, _o in reps], out, m_legs, perms)
-        n_units = len({min(x, _neg(x)) for x in lam})
-        if lam and n_units * len(reps) * len(perms) > _V6_TERMS_MAX:
-            n_keep = max(1, _V6_TERMS_MAX // (n_units * len(perms)))
-            keep = sorted(int(i) for i in rng.permutation(len(reps))[:n_keep])
-            reps = [reps[i] for i in keep]
-            k_all, sub = sum(r[2] for r in reps), True
-            cap = k_all
     diagrams = []
     for d, stab, osize in reps:
         groups, gpow, spinors = _line_groups(d, stab, N), {}, []
@@ -1247,7 +1236,7 @@ def _draw_process_r2(rng, name, ver, ini, fin, target):
         "name": name, "version": ver, "revision": 2, "target_shape": bool(target), "pdg_ids": pdgs,
         "m_legs": m_legs, "nfinal": n, "sqrts": [float(np.ceil(max(25.0, 1.05 * sum(m_legs[2:])))), SQRTS_MAX],
         "k_s": k_s, "coupling": 1.0, "coupling_mode": "vertex", "coherent": True, "order": order,
-        "k_cap": int(cap), "n_legal": int(n_legal), "k_all": int(k_all), "subsampled": bool(sub),
+        "n_legal": int(n_legal), "k_all": int(k_all), "subsampled": bool(sub),
         "internal_masses": {25: m_scalar}, "diagrams": diagrams, "pairs": [list(p) for p in pairs], "perms": perms,
     }
     if ver < 6:
