@@ -1,7 +1,7 @@
-# Add-W child, replay parents only (D34): fine-tune from replay 1%, 4k, trial 17, its best checkpoint on W (step 4000) (runs/tp3_waddm_buf1pc4k/trial_0017): uubar_Zggg on D = 10^4
-# events, 32k steps, at the finale cell's own two points (its trial indices in expect_tp3.json, added with
-# generate_sweep --extend --fixed-hp; for Z+3g those are rung 9's 32k chosen points, not D25's). Copied from sweep_config_tp3_finfte32k_uubar_Zggg_d8.yaml (same
-# DyHPO seed, hence the same candidate pool), parent path changed.
+# Add-W child, replay parents only (D34), reference probe outside the Z+ng and W+ng families (D37): fine-tune from
+# replay 10%, 4k, trial 46, its best checkpoint on W (runs/tp3_waddm_buf10pc4k/trial_0046): ee_ttbar on D = 10^4 events, 32k steps, at the finale cell's own two points (its
+# trial indices in expect_tp3.json, added with generate_sweep --extend --fixed-hp). Copied from
+# sweep_config_tp3_finfte32k_ee_ttbar_d8.yaml (same DyHPO seed, hence the same candidate pool), parent path changed.
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -11,11 +11,11 @@ cluster:
   chain_width: 2
   time: 06:15:00
 paths: null
-sweep_name: tp3_waddr_b1wfte32k_uubar_Zggg_d8
+sweep_name: tp3_waddr_b10wfte32k_ee_ttbar_d8
 n_trials: 5
 dyhpo:
   n_candidates: 200
-  seed: 1838860086
+  seed: 2032083511
   n_startup: 3
   total_budget: 10000
 fidelity_schedule:
@@ -65,11 +65,11 @@ fixed_params:
   training.dtype: float32
   plot: 'true'
   use_mlflow: 'false'
-  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_uubar_Zggg.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_ttbar.yaml
   data.train_subsample: 10000
   fine_tune.lr_scale: 1.0
   fine_tune.layer_decay: 1.0
-  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/tp3_waddm_buf1pc4k/trial_0017/models/model_run0_best.pt
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/tp3_waddm_buf10pc4k/trial_0046/models/model_run0_best.pt
   fine_tune.target_stats: own
   fine_tune.offshell_stats: parent
 range_extension:

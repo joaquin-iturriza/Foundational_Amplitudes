@@ -3831,22 +3831,6 @@
   141,
   65
  ],
- "tp3_waddr_b1wfte32k_uubar_Zggg_d8": [
-  66,
-  6
- ],
- "tp3_waddr_b1mfte32k_uubar_Zggg_d8": [
-  66,
-  6
- ],
- "tp3_waddr_b10wfte32k_uubar_Zggg_d8": [
-  66,
-  6
- ],
- "tp3_waddr_b10mfte32k_uubar_Zggg_d8": [
-  66,
-  6
- ],
  "tp3_waddr_b1wfte32k_uubar_Zgggg_d8": [
   97,
   37
@@ -3879,5 +3863,28 @@
   31,
   107
  ],
- "tp3_finsrch32k_uubar_Zgggg_d9": 8
+ "tp3_finsrch32k_uubar_Zgggg_d9": 8,
+ "tp3_waddr_b1wfte32k_ee_ttbar_d8": [
+  100,
+  168
+ ],
+ "tp3_waddr_b1mfte32k_ee_ttbar_d8": [
+  100,
+  168
+ ],
+ "tp3_waddr_b10wfte32k_ee_ttbar_d8": [
+  100,
+  168
+ ],
+ "tp3_waddr_b10mfte32k_ee_ttbar_d8": [
+  100,
+  168
+ ],
+ "tp3_hmscr32k_uubar_Zgggg_d6": 8,
+ "tp3_hmscr128k_uubar_Zgggg_d9": [
+  15
+ ],
+ "tp3_finfte128k_uubar_Zgggg_d9": [
+  162
+ ]
 }
