@@ -30,13 +30,59 @@ random structure drawn from a seed derived from its name, so the name alone rege
     identical legs (the target must be a function of the particle set). |M|^2 > 0 has mass
     dimension 8 - 2N and is Lorentz invariant by construction (only invariants enter).
 
+That is version 1 (docs/results.tex, sec:synthetic). Versions 2-5 (site decisions D36, D38; the "Proposed, not
+run" paragraphs of that section) are cumulative, each keeping every change of the one before.
+
+Names and versions. The name selects the version, so a recipe can mix them:
+
+    syn_<k>, syn<n>_<k>          version 1 (SYN_VERSION, frozen: every v1 pool depends on its exact bytes)
+    syn[<n>]v<V>_<k>             version V = 2..5, n = 2..6 forced final particles or drawn when absent
+                                 (v5: n = 5 or 6 only); e.g. syn5v3_00000, synv2_00017, syn6v5_00002
+
+  The seed is (salt, V, n_forced, k) for every version (V = 1 for the unsuffixed names), so the name alone
+  regenerates the process and different versions of one index are unrelated draws. Version 1 keeps its own
+  structure and evaluator code untouched; versions >= 2 are evaluated by evaluate_vec.
+
+  v2  K grows with multiplicity. K = floor(exp U[0, ln(K_cap + 1))) (log-uniform on 1..K_cap),
+          K_cap = max(K_max^v1(N), floor(_KFRAC (2N-5)!! / |Pi|)),   _KFRAC = 1/4,
+      (2N-5)!! the number of cubic trees on N labelled legs, |Pi| the identical-leg permutations. The permutation
+      average turns each drawn diagram into |Pi| labelled images, so K|Pi| <= (2N-5)!!/4 bounds the labelled
+      diagrams evaluated, and the cost (linear in K|Pi|) with it; diagrams are drawn distinct up to the
+      permutations. The fraction keeps the cap under the SM's own cubic-tree count of the target family
+      (legal_diagram_count: q qbar -> V + 4g 384 = 0.41 (2N-5)!!, V + 5g 3840 = 0.37 (2N-5)!!) and puts at
+      most ~2600 labelled terms per helicity in a 2->6 event; never below version 1's K_max. Couplings, legs,
+      lines and numerators as version 1.
+  v3  SM vertices and flavour. Legs also conserve quark generation (diagonal CKM) and lepton family. Trees are
+      built bottom-up so that every vertex is an SM cubic vertex (sm_vertices: f fbar gamma for charged f,
+      f fbar Z, q qbar g, f fbar H for b and t, the doublets' W vertices, W W gamma, W W Z, g g g, W W H, Z Z H);
+      a line's particle is drawn among the legal ones (version 1's weights, _LINE_W), the light-line
+      protection as before; a final state with no legal tree is redrawn. Couplings come from the vertices, per
+      diagram: amplitude factor (4 pi alpha_s)^(n_QCD/2) (4 pi alpha)^(n_QED/2) with alpha_s run per event, so
+      diagrams of different orders interfere as in a mixed-order process; the order vector holds the maxima
+      over the diagrams (mg5_pipeline_final.order_vector's convention).
+  v4  The collinear (and soft) limit by construction. A massless line on two massless final legs i, k keeps
+      power 1 (version 1's 1/sqrt(s_ik) power is gone there), and every numerator term of its diagram carries
+          B_ik = |s_ik|^(1/2) W_ik tr(i k b a) / |tr(i k b a)|    or its conjugate ([ik] vs <ik>, drawn per term),
+          tr(i k b a) = <ik>[kb]<ba>[ai]   (beams a, b; weight 0 on every leg: Lorentz invariant),
+          W_ik = prod over the gluons/photons x among i, k of ((q_i + q_k).P / q_x.P)^(1/2),  P = p_a + p_b,
+      with s_ik left out of that term's monomials (brackets(), mass dimension counted in k). Then
+      |M|^2 ~ 1/s_ik as i || k (the numerator vanishes like sqrt(s_ik), with the azimuthal phase of <ik>), and
+      W makes a soft gluon or photon k give |M|^2 ~ 1/E_k^2 (the eikonal power; its coefficient is the random
+      hard function, not Sum T_i.T_j p_i.p_j / (p_i.k p_j.k) times a lower-point synthetic amplitude, and
+      initial-state (t-type) and multi-leg massless lines keep version 1's rule). |M|^2 is averaged with its
+      parity image (every bracket conjugated), so it is parity even like an unpolarised QCD sum.
+  v5  The target's shape: q qbar' -> V + (n-1) g, n = 5, 6 (2->5, 2->6); V = gamma, Z, W+, H by k % 4 (so any
+      four consecutive indices hold all four), u ubar or d dbar at 1/2 each (u dbar for the W, as the catalog's
+      udbar_W*); the effective g g H vertex (heavy-top limit, amplitude factor alpha_s e / (3 pi)), legal only on
+      the external H, since the generator's u, d are massless; v4 rules otherwise.
+
 The structure also gives the diagram sidecar (``<name>.diagrams.json``, tools/dump_diagrams.py
 format), so data.offshell_per_event sees the true propagators. Generation goes through the
 normal recipe path: mg5_pipeline_final registers ``syn*`` names into PROCESSES with
 ``kind: synthetic`` and labels events with ``label_events`` instead of a MadGraph backend.
 
 CLI:
-    python tools/synthetic_amplitudes.py --describe syn_00042
+    python tools/synthetic_amplitudes.py --describe syn_00042 syn6v5_00002
     python tools/synthetic_amplitudes.py --recipe recipes/synthetic_pilot.yaml --first 0 --count 20 \
         --n-train 20000 --n-val 2000 --n-test 2000
     python tools/synthetic_amplitudes.py --sidecars recipes/synthetic_pilot.yaml [--out-dir data/diagrams]
@@ -57,11 +103,13 @@ if _HERE not in sys.path:
 
 from particle_ids import PARTICLE_PROPERTIES, PARTICLE_FEATURE_NAMES, _MASSLESS  # noqa: E402
 
-# Bumped whenever a change alters the structure drawn for a name or the amplitude it
-# evaluates to: the version enters the structure hash, hence every pool's recipe_id.
+# The version of the UNSUFFIXED names (syn_<k>, syn<n>_<k>): frozen at 1, every v1 pool depends on it. Later
+# versions live under their own names (syn[<n>]v<V>_<k>, module docstring); the version enters the seed and the
+# structure hash, hence every pool's recipe_id.
 SYN_VERSION = 1
+SYN_VERSIONS = (1, 2, 3, 4, 5)
 _SALT = 0x5E17A                      # seed namespace of synthetic processes
-_NAME = re.compile(r"^syn([2-6])?_(\d+)$")
+_NAME = re.compile(r"^syn([2-6])?(?:v([2-5]))?_(\d+)$")
 DEFAULT_DIAGRAMS_DIR = os.path.join(_HERE, "data", "diagrams")
 
 ALPHA_S, ALPHA_EW, MZ_REF = 0.118, 1.0 / 132.507, 91.1876      # alpha_s(M_Z), running reference
@@ -95,8 +143,23 @@ _H = (2, 4)                           # helicity amplitudes summed incoherently 
 _LIGHT = 10.0                         # propagators below this mass (0, b) may enter as 1/sqrt
 
 
+def parse_name(name):
+    """(n_forced, version, index) of a synthetic name; n_forced = 0 when the multiplicity is drawn."""
+    m = _NAME.match(str(name))
+    if not m:
+        raise KeyError(f"{name!r} is not a synthetic process name (syn[<n>][v<V>]_<k>)")
+    n_forced, ver, idx = (int(m.group(1)) if m.group(1) else 0), (int(m.group(2)) if m.group(2) else 1), int(m.group(3))
+    if ver >= 5 and n_forced not in (0, 5, 6):
+        raise KeyError(f"{name!r}: version 5 is q qbar -> V + 4g or V + 5g (syn5v5_<k>, syn6v5_<k>, synv5_<k>)")
+    return n_forced, ver, idx
+
+
 def is_synthetic(name):
-    return bool(_NAME.match(str(name)))
+    try:
+        parse_name(name)
+        return True
+    except KeyError:
+        return False
 
 
 def _props(pdg):
@@ -161,11 +224,15 @@ def _canonical(S, N):
 @functools.lru_cache(maxsize=None)
 def structure(name):
     """The random structure of synthetic process `name` (a JSON-able dict), drawn from a
-    seed fixed by the name and SYN_VERSION."""
-    m = _NAME.match(str(name))
-    if not m:
-        raise KeyError(f"{name!r} is not a synthetic process name (syn_<k> or syn<n>_<k>)")
-    n_forced, idx = (int(m.group(1)) if m.group(1) else 0), int(m.group(2))
+    seed fixed by the name (its version included)."""
+    n_forced, ver, idx = parse_name(name)
+    if ver == 1:
+        return _structure_v1(name, n_forced, idx)
+    return _structure_vk(name, ver, n_forced, idx)
+
+
+def _structure_v1(name, n_forced, idx):
+    """Version 1, unchanged since it was run (every v1 pool depends on its exact draw)."""
     rng = np.random.default_rng(np.random.SeedSequence([_SALT, SYN_VERSION, n_forced, idx]))
     n = n_forced or int(_pick(rng, list(_N_FINAL_P.items())))
     ini, fin = _draw_legs(rng, n)
@@ -290,7 +357,22 @@ def _mink2(v):
 def evaluate(st, P, scale=1.0):
     """|M|^2 of structure `st` at momenta P (B, N, 4) (rows in pdg_ids order, beams incoming).
     `scale` multiplies every dimensionful constant (propagator masses and widths): the
-    mass-dimension check is |M|^2(lam P, scale=lam) = lam^(8-2N) |M|^2(P)."""
+    mass-dimension check is |M|^2(lam P, scale=lam) = lam^(8-2N) |M|^2(P).
+    Version 1 keeps its original evaluator (bit-identical labels); later versions use the
+    vectorised one, which gives v1 structures the same values to rounding (tests/test_synthetic_versions.py)."""
+    if st.get("version", 1) == 1:
+        return _evaluate_v1(st, P, scale)
+    return evaluate_vec(st, P, scale)
+
+
+def _alpha_s(P, scale):
+    """alpha_s(sqrt s) per event, one loop from M_Z (nf = 5) as mg5_pipeline_final.compute_alphas."""
+    b0 = (11 * 3 - 2 * 5) / (12 * np.pi)
+    s_in = _mink2(P[:, 0] + P[:, 1])
+    return ALPHA_S / (1 + ALPHA_S * b0 * np.log(s_in / (MZ_REF * scale) ** 2))
+
+
+def _evaluate_v1(st, P, scale=1.0):
     P = np.asarray(P, np.float64)
     N = P.shape[1]
     sign = np.array([-1.0, -1.0] + [1.0] * (N - 2))
@@ -337,6 +419,512 @@ def evaluate(st, P, scale=1.0):
     return st["coupling"] * a_s ** st["k_s"] * total / len(st["perms"])
 
 
+# =============================================================================
+# Versions 2-5 (site decisions D36, D38): cumulative changes on version 1, each under its own names
+# (syn[<n>]v<V>_<k>); the module docstring states what each adds.
+# =============================================================================
+_KFRAC = 0.25                         # v2+: K |Pi| <= _KFRAC (2N-5)!!, K log-uniform (module docstring)
+_N_FINAL_P5 = {5: 0.5, 6: 0.5}        # v5: V + 4g or V + 5g
+_V5_BOSONS = (22, 23, 24, 25)         # v5: V by the index, idx % 4 (any four consecutive names hold all four)
+_SELF_CONJ = frozenset((21, 22, 23, 25))
+_FERMIONS = (1, 2, 3, 4, 5, 6, 11, 12, 13, 14)
+_DOUBLETS = ((2, 1), (4, 3), (6, 5), (12, 11), (14, 13))       # (up, down) of each W vertex: diagonal CKM
+_YUKAWA = (5, 6)                      # fermions with a generator mass: the only f fbar H vertices
+_FAMILY = {1: "q1", 2: "q1", 3: "q2", 4: "q2", 5: "q3", 6: "q3", 11: "le", 12: "le", 13: "lm", 14: "lm"}
+_GAUGE = frozenset((21, 22))          # massless gauge bosons: the legs that can go soft
+# v3+: line particle weights among the legal options (version 1's charge-table weights where it had them)
+_LINE_W = {21: 0.3, 22: 0.3, 23: 0.2, 25: 0.2, 24: 0.5, -24: 0.5}
+_LINE_W.update({s * f: (0.25 if f > 10 else (0.4 if f in (5, 6) else 0.6)) for f in _FERMIONS for s in (1, -1)})
+_ORDER_OF = {"QED": {"QED": 1}, "QCD": {"QCD": 1}, "HGG": {"QCD": 2, "QED": 1}}
+
+
+def _anti(p):
+    return p if p in _SELF_CONJ else -p
+
+
+def _double_factorial(m):
+    return int(np.prod(np.arange(m, 0, -2))) if m > 0 else 1
+
+
+@functools.lru_cache(maxsize=None)
+def sm_vertices(hgg=False):
+    """The SM cubic vertices as sorted all-outgoing pdg triples -> coupling class: f fbar gamma (charged f),
+    f fbar Z, q qbar g, f fbar H (b, t: the massive fermions of the generator), the W vertices of the doublets
+    (diagonal CKM, lepton families), W W gamma, W W Z, g g g, W W H, Z Z H; with `hgg` (version 5) the effective
+    g g H vertex (heavy-top limit), class 'HGG'."""
+    V = {}
+
+    def add(t, cls):
+        V[tuple(sorted(t))] = cls
+    for f in _FERMIONS:
+        if _q3(f) != 0:
+            add((f, -f, 22), "QED")
+        add((f, -f, 23), "QED")
+        if f <= 6:
+            add((f, -f, 21), "QCD")
+        if f in _YUKAWA:
+            add((f, -f, 25), "QED")
+    for up, dn in _DOUBLETS:
+        add((-up, dn, 24), "QED")
+        add((up, -dn, -24), "QED")
+    for t, cls in (((24, -24, 22), "QED"), ((24, -24, 23), "QED"), ((21, 21, 21), "QCD"),
+                   ((24, -24, 25), "QED"), ((23, 23, 25), "QED")):
+        add(t, cls)
+    if hgg:
+        add((21, 21, 25), "HGG")
+    return V
+
+
+@functools.lru_cache(maxsize=None)
+def _line_table(hgg):
+    """(Xa, Xb) -> [(X, class)]: the lines X that a vertex joining the outgoing lines Xa, Xb can carry on, i.e.
+    (Xa, Xb, anti X) is an SM vertex. X is the line's particle seen as the merged cluster's outgoing state."""
+    V = sm_vertices(hgg)
+    univ = sorted({p for t in V for p in t})
+    tab = {}
+    for a in univ:
+        for b in univ:
+            tab[(a, b)] = [(X, V[tuple(sorted((a, b, _anti(X))))]) for X in univ
+                           if tuple(sorted((a, b, _anti(X)))) in V]
+    return tab
+
+
+def vertex_list(st, d):
+    """Every vertex of diagram d as (all-outgoing pdg triple, [is each line an external leg]), rebuilt from its
+    merges: the check of vertex legality reads this, not the builder's own bookkeeping."""
+    pdgs = st["pdg_ids"]
+    N = len(pdgs)
+    X = {i: (_anti(pdgs[i]) if i < 2 else pdgs[i]) for i in range(N)}
+    for c, pr in zip(range(N, N + len(d["merges"])), d["props"]):
+        X[c] = pr["x"]
+    out = []
+    for c, (a, b) in zip(range(N, N + len(d["merges"])), d["merges"]):
+        out.append(((X[a], X[b], _anti(X[c])), [a < N, b < N, False]))
+    out.append((tuple(X[c] for c in d["root"]), [c < N for c in d["root"]]))
+    return out
+
+
+def _families(pdgs):
+    out = {}
+    for p in pdgs:
+        f = _FAMILY.get(abs(p))
+        if f:
+            out[f] = out.get(f, 0) + (1 if p > 0 else -1)
+    return {k: v for k, v in out.items() if v}
+
+
+def _draw_legs_vk(rng, n, flavour):
+    """Version 1's leg draw; with `flavour` (v3+) also quark-generation and lepton-family numbers conserved
+    (diagonal CKM, massless neutrinos: the SM at tree level)."""
+    ini = _pick(rng, _INITIAL)
+    qn = lambda pdgs, c: round(sum(_props(p)[_COL[c]] for p in pdgs) * 3)
+    order = {p: i for i, (p, _) in enumerate(_FINAL)}
+    for _ in range(100000):
+        fin = [_pick(rng, _FINAL) for _ in range(n)]
+        if all(qn(fin, c) == qn(ini, c) for c in ("charge", "baryon_number", "lepton_number")) \
+                and sum(leg_mass(p) for p in fin) <= _MAX_FINAL_MASS \
+                and (not flavour or _families(fin) == _families(ini)):
+            return list(ini), sorted(fin, key=lambda p: order[p])
+    raise RuntimeError("no conserving final state drawn")
+
+
+def _draw_legs_v5(rng, n, idx):
+    """q qbar' -> V + (n-1) g: V = gamma, Z, W+, H by idx % 4; u ubar or d dbar (u dbar for the W, as the catalog's
+    udbar_W* processes)."""
+    V = _V5_BOSONS[idx % len(_V5_BOSONS)]
+    ini = (2, -1) if V == 24 else _pick(rng, [((2, -2), 0.5), ((1, -1), 0.5)])
+    return list(ini), [V] + [21] * (n - 1)
+
+
+def _orbit_key(props, perms, N):
+    """A diagram up to the identical-leg relabellings (the permutation average already sums its images)."""
+    return min(tuple(sorted((_canonical([perm[i] for i in p["legs"]], N), abs(p["pdg"])) for p in props))
+               for perm in perms)
+
+
+def _tree_charge(rng, N, pdgs, sign, protected):
+    """Version 1's tree: a random cubic tree, each line drawn from the channel-charge table (v2)."""
+    merges, legs_of, root = _random_tree(rng, N)
+    props = []
+    for c in range(N, N + len(merges)):
+        S = _canonical(legs_of[c], N)
+        q = sum(sign[i] * _q3(pdgs[i]) for i in S)
+        if q not in _PROP:
+            return None
+        pdg = int(_pick(rng, _PROP[q]))
+        if leg_mass(pdg) <= _LIGHT and not protected(S):
+            if q not in _PROP_HEAVY:
+                return None
+            pdg = int(_PROP_HEAVY[q][int(rng.integers(len(_PROP_HEAVY[q])))])
+        props.append({"legs": list(S), "pdg": pdg})
+    return {"merges": [list(mm) for mm in merges], "root": [int(r) for r in root], "props": props}
+
+
+def _tree_legal(rng, N, out, protected, mass, hgg):
+    """A cubic tree whose every vertex is an SM vertex (v3+). Built bottom-up: at each step a pair of clusters is
+    chosen uniformly among those some legal line can join (after the light-line protection), the line's particle
+    among those legal lines by _LINE_W; the three clusters left must meet at a legal vertex, else the tree is
+    rejected. The effective g g H vertex (v5) is legal only on the external H."""
+    tab, V = _line_table(hgg), sm_vertices(hgg)
+    cl = {i: (frozenset([i]), out[i], True) for i in range(N)}
+    alive, merges, props, vcls = list(range(N)), [], [], []
+    while len(alive) > 3:
+        cands = []
+        for x in range(len(alive)):
+            for y in range(x + 1, len(alive)):
+                ca, cb = alive[x], alive[y]
+                (La, Xa, la), (Lb, Xb, lb) = cl[ca], cl[cb]
+                opts = [(X, c) for X, c in tab.get((Xa, Xb), ())
+                        if c != "HGG" or (Xa == 25 and la) or (Xb == 25 and lb)]
+                if not opts:
+                    continue
+                S = _canonical(La | Lb, N)
+                if any(mass(X) <= _LIGHT for X, _ in opts) and not protected(S):
+                    opts = [(X, c) for X, c in opts if mass(X) > _LIGHT]
+                if opts:
+                    cands.append((ca, cb, S, opts))
+        if not cands:
+            return None
+        ca, cb, S, opts = cands[int(rng.integers(len(cands)))]
+        w = np.array([_LINE_W[X] for X, _ in opts], float)
+        X, cls = opts[int(rng.choice(len(opts), p=w / w.sum()))]
+        new = N + len(merges)
+        merges.append((ca, cb))
+        vcls.append(cls)
+        L = cl[ca][0] | cl[cb][0]
+        cl[new] = (L, X, False)
+        # pdg of the line as seen from the stored (canonical) side, as version 1 stores it
+        props.append({"legs": list(S), "pdg": int(X if tuple(sorted(L)) == S else _anti(X)), "x": int(X)})
+        alive = [c for c in alive if c not in (ca, cb)] + [new]
+    cls = V.get(tuple(sorted(cl[c][1] for c in alive)))
+    if cls is None or (cls == "HGG" and not any(cl[c][1] == 25 and cl[c][2] for c in alive)):
+        return None
+    vcls.append(cls)
+    return {"merges": [list(mm) for mm in merges], "root": [int(c) for c in alive], "props": props,
+            "vertex_class": vcls}
+
+
+def _structure_vk(name, ver, n_forced, idx):
+    rng = np.random.default_rng(np.random.SeedSequence([_SALT, ver, n_forced, idx]))
+    n = n_forced or int(_pick(rng, list((_N_FINAL_P5 if ver >= 5 else _N_FINAL_P).items())))
+    for _ in range(1000):
+        ini, fin = _draw_legs_v5(rng, n, idx) if ver >= 5 else _draw_legs_vk(rng, n, flavour=ver >= 3)
+        st = _draw_process_vk(rng, name, ver, ini, fin)
+        if st is not None:
+            return st
+    raise RuntimeError(f"{name}: no final state with a diagram drawn")
+
+
+def _draw_process_vk(rng, name, ver, ini, fin):
+    """Everything after the legs, versions 2-5; None when no diagram can be built on these legs (v3+: no SM tree)."""
+    pdgs = ini + fin
+    n, N = len(fin), len(pdgs)
+    m_legs = [leg_mass(p) for p in pdgs]
+    sign = [-1] * 2 + [1] * n
+    cut = [i >= 2 and m_legs[i] == 0.0 and abs(pdgs[i]) not in _NEUTRINOS for i in range(N)]
+    guard = [cut[i] or m_legs[i] > 0.0 for i in range(N)]
+
+    def protected(S):                                       # version 1's rule
+        if 1 not in S:
+            return sum(cut[i] for i in S) >= 2 or sum(m_legs[i] for i in S) > _LIGHT
+        G = [i for i in S if i >= 2]
+        F = [i for i in range(2, N) if i not in S]
+        return any(guard[i] for i in G) and any(guard[i] for i in F)
+
+    m_scalar = float(np.exp(rng.uniform(*np.log(_SCALAR_MASS)))) if rng.random() >= 0.5 else 125.0
+    if 25 in fin:
+        m_scalar = 125.0
+    mass = lambda X: m_scalar if abs(X) == 25 else leg_mass(X)
+    ratio = {}
+
+    def width(pdg):
+        a = abs(pdg)
+        if a not in ratio:
+            ratio[a] = float(np.exp(rng.uniform(*np.log(_WIDTH_RATIO))))
+        return ratio[a]
+
+    perms = _identical_perms(pdgs)
+    k_cap = max(_KMAX[N], int(_KFRAC * _double_factorial(2 * N - 5)) // len(perms))
+    n_diag = int(min(k_cap, max(1, np.floor(np.exp(rng.uniform(0.0, np.log(k_cap + 1)))))))
+    out = [_anti(p) for p in ini] + list(fin)              # all-outgoing particles
+    diagrams, seen = [], set()
+    for _ in range(50 * n_diag + 2000):
+        if len(diagrams) == n_diag:
+            break
+        d = _tree_charge(rng, N, pdgs, sign, protected) if ver == 2 else \
+            _tree_legal(rng, N, out, protected, mass, hgg=ver >= 5)
+        if d is None:
+            continue
+        key = _orbit_key(d["props"], perms, N)
+        if key in seen:
+            continue
+        seen.add(key)
+        spinors = []
+        for pr in d["props"]:
+            S, M = pr["legs"], mass(pr["pdg"])
+            s_type = 1 not in S
+            pr["mass"] = M
+            pr["width"] = width(pr["pdg"]) * M if (s_type and M > 0) else 0.0
+            if ver >= 4 and M == 0.0 and s_type and len(S) == 2 and all(m_legs[i] == 0.0 for i in S):
+                pr["power"] = 1.0                           # v4: the numerator vanishes instead
+                spinors.append({"legs": list(S), "soft": [i for i in S if pdgs[i] in _GAUGE]})
+            else:
+                pr["power"] = 1.0 if M > _LIGHT else float(rng.choice([0.5, 1.0]))
+        if ver >= 4:
+            d["spinors"] = spinors
+        diagrams.append(d)
+    if not diagrams:
+        return None
+
+    if ver == 2:                                            # version 1's drawn QCD order
+        colored = [_props(p)[_COL["color_casimir"]] > 0 for p in pdgs]
+        n_glu = sum(p == 21 for p in fin)
+        k_s = min(n, n_glu + int(rng.binomial(n - n_glu, 0.3))) if any(colored) else 0
+        for d in diagrams:
+            d["qcd_vertices"] = sorted(rng.choice(N - 2, size=k_s, replace=False).tolist())
+        coupling, order = float((4 * np.pi) ** n * ALPHA_EW ** (n - k_s)), [0, 0, int(k_s), int(n - k_s)]
+    else:                                                   # couplings from the vertices, per diagram
+        e = np.sqrt(4 * np.pi * ALPHA_EW)
+        for d in diagrams:
+            nq, ne, nh = (sum(c == k for c in d["vertex_class"]) for k in ("QCD", "QED", "HGG"))
+            d["as_pow"] = 0.5 * nq + nh                     # amplitude ~ g_s^nq e^ne (alpha_s e / 3 pi)^nh
+            d["cpl"] = float((4 * np.pi) ** (0.5 * nq) * e ** ne * (e / (3 * np.pi)) ** nh)
+            d["n_ew"] = ne + nh
+        # the order vector holds the maxima over the diagrams, as mg5_pipeline_final.order_vector (a mixed
+        # four-quark entry is [0, 0, 2, 2]); alphas_power is the alpha_s maximum
+        k_s = int(round(2 * max(d["as_pow"] for d in diagrams)))
+        coupling, order = 1.0, [0, 0, k_s, int(max(d["n_ew"] for d in diagrams))]
+
+    pairs = list(itertools.combinations(range(N), 2))
+    H = int(rng.integers(_H[0], _H[1] + 1))
+    numer = []
+    for _h in range(H):
+        row = []
+        for d in diagrams:
+            sp = d.get("spinors", [])
+            banned = {tuple(s["legs"]) for s in sp}
+            allowed = [i for i, p in enumerate(pairs) if p not in banned]
+            deg = int(rng.integers(0, 3))
+            monos = [{"a": float(rng.normal()),
+                      "pairs": sorted(int(allowed[x]) for x in rng.choice(len(allowed), size=deg))}
+                     for _ in range(int(rng.integers(1, 4)))]
+            e_sum = sum(p["power"] for p in d["props"])
+            term = {"c": [float(rng.normal()), float(rng.normal())], "deg": deg, "monos": monos,
+                    # mass dimension 4 - N: 2 deg + n_brackets - k - 2 e_sum = 4 - N
+                    "k": 2 * deg + len(sp) - 2 * e_sum - 4 + N}
+            if sp:
+                term["sig"] = [int(x) for x in rng.choice([-1, 1], size=len(sp))]   # <ij> (+1) or [ij] (-1)
+            row.append(term)
+        numer.append(row)
+
+    thr = sum(m_legs[2:])
+    lo = max(25.0, 1.05 * thr)
+    st = {
+        "name": name, "version": ver, "pdg_ids": pdgs, "m_legs": m_legs, "nfinal": n,
+        "sqrts": [float(np.ceil(lo)), SQRTS_MAX], "k_s": int(k_s), "coupling": coupling,
+        "coupling_mode": "global" if ver == 2 else "vertex", "order": order, "k_cap": int(k_cap),
+        "internal_masses": {25: m_scalar}, "diagrams": diagrams, "pairs": [list(p) for p in pairs],
+        "numerators": numer, "perms": perms,
+    }
+    st["sha"] = hashlib.sha256(json.dumps(st, sort_keys=True, default=str).encode()).hexdigest()[:16]
+    return st
+
+
+_PLANS = {}
+
+
+def _plan(st):
+    """Index arrays of the vectorised evaluator: every (permutation, diagram) image's propagators, monomials,
+    brackets and couplings as gathers into per-event tables (channels, pair invariants, brackets)."""
+    pl = _PLANS.get(st["sha"])
+    if pl is not None:
+        return pl
+    N, perms, D = len(st["pdg_ids"]), st["perms"], st["diagrams"]
+    K, H, nP = len(D), len(st["numerators"]), len(perms)
+    T = nP * K
+    pairs = [tuple(p) for p in st["pairs"]]
+    pid = {p: i for i, p in enumerate(pairs)}
+    ONE = len(pairs)
+    nsp = max((len(d.get("spinors", ())) for d in D), default=0)
+    chans, ptypes, brs = {}, {}, {}
+    den = np.zeros((T, N - 3), np.int64)
+    bidx = -np.ones((T, max(nsp, 1)), np.int64)
+    m1 = np.full((T, H, 3), ONE, np.int64)
+    m2 = np.full((T, H, 3), ONE, np.int64)
+    a = np.zeros((T, H, 3))
+    c = np.zeros((T, H), np.complex128)
+    kk = np.zeros((T, H))
+    sig = np.ones((T, H, max(nsp, 1)), np.int64)
+    const = np.ones(T)
+    as_pow = np.zeros(T)
+    for s, perm in enumerate(perms):
+        pmap = [pid[tuple(sorted((perm[i], perm[j])))] for i, j in pairs]
+        for di, d in enumerate(D):
+            t = s * K + di
+            const[t], as_pow[t] = d.get("cpl", 1.0), d.get("as_pow", 0.0)
+            for j, pr in enumerate(d["props"]):
+                S = _canonical([perm[i] for i in pr["legs"]], N)
+                ch = chans.setdefault(S, len(chans))
+                den[t, j] = ptypes.setdefault((ch, pr["mass"], pr["width"], pr["power"]), len(ptypes))
+            for j, spn in enumerate(d.get("spinors", ())):
+                i, k = spn["legs"]
+                key = (perm[i], perm[k], perm[0], perm[1], tuple(sorted(perm[x] for x in spn["soft"])))
+                bidx[t, j] = brs.setdefault(key, len(brs))
+            for h, row in enumerate(st["numerators"]):
+                term = row[di]
+                c[t, h], kk[t, h] = complex(*term["c"]), term["k"]
+                for m, mono in enumerate(term["monos"]):
+                    ps = [pmap[x] for x in mono["pairs"]] + [ONE, ONE]
+                    m1[t, h, m], m2[t, h, m], a[t, h, m] = ps[0], ps[1], mono["a"]
+                for j, sg in enumerate(term.get("sig", ())):
+                    sig[t, h, j] = sg
+    bidx[bidx < 0] = len(brs)                              # padding: the ones column
+    chmask = np.zeros((len(chans), N))
+    for S, ch in chans.items():
+        chmask[ch, list(S)] = 1.0
+    pt = sorted(ptypes.items(), key=lambda kv: kv[1])
+    ku, kinv = np.unique(kk, return_inverse=True)
+    mq, qidx = np.unique(m1 * (ONE + 1) + m2, return_inverse=True)
+    br = sorted(brs.items(), key=lambda kv: kv[1])
+    soft = np.zeros((len(br), N))
+    for (key, b) in br:
+        soft[b, list(key[4])] = 1.0
+    pl = {"T": T, "K": K, "H": H, "nP": nP, "nsp": nsp, "den": den, "chmask": chmask,
+          "ptC": np.array([k[0] for k, _ in pt], np.int64), "ptM": np.array([k[1] for k, _ in pt]),
+          "ptW": np.array([k[2] for k, _ in pt]), "ptE": np.array([k[3] for k, _ in pt]),
+          "pairs": np.array(pairs, np.int64), "qa": mq // (ONE + 1), "qb": mq % (ONE + 1),
+          "qidx": qidx.reshape(m1.shape), "a": a, "c": c,
+          "ku": ku, "kinv": kinv.reshape(T, H), "const": const, "as_pow": as_pow,
+          "bidx": bidx, "sig": sig, "nbr": len(br),
+          "bi": np.array([k[0] for k, _ in br], np.int64), "bk": np.array([k[1] for k, _ in br], np.int64),
+          "ba": np.array([k[2] for k, _ in br], np.int64), "bb": np.array([k[3] for k, _ in br], np.int64),
+          "soft": soft}
+    _PLANS[st["sha"]] = pl
+    return pl
+
+
+def _dot(x, y):
+    return x[..., 0] * y[..., 0] - (x[..., 1:] * y[..., 1:]).sum(-1)
+
+
+def brackets(q, i, k, a, b, soft):
+    """The v4 numerator factor of a massless line on the two massless legs i, k (all-outgoing momenta q (B, N, 4);
+    index arrays of equal length; `soft` (len, N) marks the gauge-boson legs among i, k):
+
+        B_ik = |s_ik|^(1/2) * W_ik * tr(i k b a) / |tr(i k b a)|,
+        tr(i k b a) = 2[(q_i.q_k)(q_b.q_a) - (q_i.q_b)(q_k.q_a) + (q_i.q_a)(q_k.q_b)] + 2i eps(q_i, q_k, q_b, q_a)
+                    = <ik>[kb]<ba>[ai]  (massless; |tr|^2 = s_ik s_kb s_ba s_ai),
+        W_ik = prod_{x in {i,k} soft-able} ((q_i + q_k).P / q_x.P)^(1/2),   P = p_a + p_b,
+
+    so |B| = |<ik>| = |s_ik|^(1/2) times the energy-fraction factor, and its phase is that of <ik> with the
+    little-group phases fixed by the two beams (weight 0 on every leg: Lorentz invariant, no helicity
+    bookkeeping). [ik] is its complex conjugate. Returns (B, len) complex."""
+    qi, qk, qa, qb = q[:, i], q[:, k], q[:, a], q[:, b]
+    re = 2 * (_dot(qi, qk) * _dot(qb, qa) - _dot(qi, qb) * _dot(qk, qa) + _dot(qi, qa) * _dot(qk, qb))
+    eps = np.linalg.det(np.stack([qi, qk, qb, qa], axis=-2))
+    tr = re + 2j * eps
+    mod = np.abs(tr)
+    phase = np.where(mod > 0, tr / np.where(mod > 0, mod, 1.0), 1.0)
+    P = -(q[:, 0] + q[:, 1])
+    E = _dot(q, P[:, None, :])                             # sqrt(s) times each leg's CM energy
+    Eik = E[:, i] + E[:, k]
+    logw = 0.5 * (soft.sum(1)[None, :] * np.log(Eik) - (np.log(np.abs(E))[:, None, :] * soft[None]).sum(-1))
+    return np.sqrt(np.abs(2 * _dot(qi, qk))) * np.exp(logw) * phase
+
+
+def evaluate_vec(st, P, scale=1.0):
+    """Vectorised evaluation of Eq. (syn) (any version; v1 structures to rounding): chunks of events, all
+    permutation images of all diagrams at once."""
+    pl = _plan(st)
+    P = np.asarray(P, np.float64)
+    out = np.empty(P.shape[0])
+    step = int(min(4096, max(8, 1_000_000 // max(pl["T"] * max(pl["nsp"], 1), 1))))
+    for lo in range(0, P.shape[0], step):
+        out[lo:lo + step] = _eval_chunk(st, pl, P[lo:lo + step], scale)
+    return out
+
+
+def _eval_chunk(st, pl, P, scale):
+    B, N = P.shape[:2]
+    nsp, nP, K = pl["nsp"], pl["nP"], pl["K"]
+    sign = np.array([-1.0, -1.0] + [1.0] * (N - 2))
+    q = P * sign[None, :, None]
+    s = _mink2(np.einsum("cn,bnk->bck", pl["chmask"], q))[:, pl["ptC"]]
+    M, G = pl["ptM"] * scale, pl["ptW"] * scale
+    val = s - M * M + 1j * M * G
+    half = pl["ptE"] != 1.0
+    if half.any():
+        val[:, half] = np.where(M[half] > 0, np.sqrt(val[:, half]), np.sqrt(np.abs(s[:, half])))
+    inv = 1.0 / val
+    dinv = inv[:, pl["den"][:, 0]]
+    for j in range(1, pl["den"].shape[1]):
+        dinv *= inv[:, pl["den"][:, j]]
+    a_s = _alpha_s(P, scale)
+    if st.get("coupling_mode", "global") == "vertex":
+        dinv *= pl["const"][None, :] * a_s[:, None] ** pl["as_pow"][None, :]
+    pairs = pl["pairs"]
+    SP = np.ones((B, len(pairs) + 1))
+    SP[:, :-1] = _mink2(q[:, pairs[:, 0]] + q[:, pairs[:, 1]])
+    Q = SP[:, pl["qa"]] * SP[:, pl["qb"]]                  # every monomial (degree <= 2) used, once
+    spow = _mink2(q[:, 0] + q[:, 1])[:, None] ** (-0.5 * pl["ku"][None, :])
+    if nsp:
+        Bv = np.ones((B, pl["nbr"] + 1), np.complex128)
+        Bv[:, :-1] = brackets(q, pl["bi"], pl["bk"], pl["ba"], pl["bb"], pl["soft"])
+        Bre = [Bv.real[:, pl["bidx"][:, j]] for j in range(nsp)]
+        Bim = [Bv.imag[:, pl["bidx"][:, j]] for j in range(nsp)]
+    total = np.zeros(B)
+    for h in range(pl["H"]):
+        qi, a = pl["qidx"][:, h], pl["a"][:, h]
+        poly = a[None, :, 0] * Q[:, qi[:, 0]]
+        poly += a[None, :, 1] * Q[:, qi[:, 1]]
+        poly += a[None, :, 2] * Q[:, qi[:, 2]]
+        poly *= spow[:, pl["kinv"][:, h]]
+        X = dinv * (pl["c"][None, :, h] * poly)
+        if nsp:
+            br = Bre[0] + 1j * (pl["sig"][None, :, h, 0] * Bim[0])
+            for j in range(1, nsp):
+                br *= Bre[j] + 1j * (pl["sig"][None, :, h, j] * Bim[j])
+            # the parity image (every bracket conjugated) with equal weight: |M|^2 parity even, as an unpolarised
+            # QCD/QED sum, the azimuthal correlations kept in the interference. With U = sum X Re(br),
+            # V = sum X Im(br): (|U + iV|^2 + |U - iV|^2) / 2 = |U|^2 + |V|^2
+            U = (X * br.real).reshape(B, nP, K).sum(-1)
+            V = (X * br.imag).reshape(B, nP, K).sum(-1)
+            total += (U.real ** 2 + U.imag ** 2 + V.real ** 2 + V.imag ** 2).sum(-1)
+        else:
+            A = X.reshape(B, nP, K).sum(-1)
+            total += (A.real ** 2 + A.imag ** 2).sum(-1)
+    total /= nP
+    if st.get("coupling_mode", "global") == "global":
+        total *= st["coupling"] * a_s ** st["k_s"]
+    return total
+
+
+def legal_diagram_count(pdgs, hgg=False):
+    """Number of SM cubic tree diagrams (sm_vertices; ggH only on an external H) of the process pdgs (beams
+    first, incoming), labelled legs: what version 3's trees are drawn from, the real count without the quartic
+    vertices. E.g. e+e- -> mu+mu- 2, gg -> gg 3, u ubar -> Z + 4g 384, + 5g 3840. Subset recursion."""
+    tab = _line_table(hgg)
+    N = len(pdgs)
+    out = [_anti(p) if i < 2 else p for i, p in enumerate(pdgs)]
+
+    @functools.lru_cache(maxsize=None)
+    def f(S):                        # legs S -> {line X leaving S: number of subtrees}
+        if len(S) == 1:
+            return {out[next(iter(S))]: 1}
+        res, legs = {}, sorted(S)
+        for r in range(len(legs) - 1):
+            for comb in itertools.combinations(legs[1:], r):
+                A = frozenset((legs[0],) + comb)
+                Bs = S - A
+                for Xa, ca in f(A).items():
+                    for Xb, cb in f(Bs).items():
+                        for X, cls in tab.get((Xa, Xb), ()):
+                            if cls != "HGG" or (Xa == 25 and len(A) == 1) or (Xb == 25 and len(Bs) == 1):
+                                res[X] = res.get(X, 0) + ca * cb
+        return res
+    return f(frozenset(range(N - 1))).get(_anti(out[N - 1]), 0)
+
+
 def label_events(name, events):
     """Labeller for the generation path: events = [(momenta (N,4), pdg)], returns |M|^2."""
     return evaluate(structure(name), np.stack([e[0] for e in events]))
@@ -348,9 +936,9 @@ def catalog_entry(name):
     cfg = {
         "kind": "synthetic", "nfinal": st["nfinal"], "pdg_ids": list(st["pdg_ids"]),
         "m_finals": list(st["m_legs"][2:]), "param_card_patches": {},
-        "alphas_power": st["k_s"], "order": [0, 0, st["k_s"], st["nfinal"] - st["k_s"]],
+        "alphas_power": st["k_s"], "order": list(st.get("order", [0, 0, st["k_s"], st["nfinal"] - st["k_s"]])),
         "internal_masses": dict(st["internal_masses"]), "gen_weight": 1.0,
-        "synthetic": {"version": SYN_VERSION, "sha": st["sha"]}, "syn_name": name, "sqrts": list(st["sqrts"]),
+        "synthetic": {"version": st["version"], "sha": st["sha"]}, "syn_name": name, "sqrts": list(st["sqrts"]),
         "mg5_generate": [],
     }
     if st["nfinal"] == 2:
@@ -376,7 +964,8 @@ def sidecar(name):
                       "pdg": int(pdgs[i]), "state": "in" if i < 2 else "out"} for i in range(N)]
             vert = {}                                     # cluster id -> vertex node creating it
             n_vertex = len(d["merges"]) + 1
-            orders = [{"QCD": 1} if v in d["qcd_vertices"] else {"QED": 1} for v in range(n_vertex)]
+            orders = ([dict(_ORDER_OF[c]) for c in d["vertex_class"]] if "vertex_class" in d else
+                      [{"QCD": 1} if v in d["qcd_vertices"] else {"QED": 1} for v in range(n_vertex)])
             for v in range(n_vertex):
                 nodes.append({"kind": "vertex", "interaction_id": -1, "orders": orders[v]})
             edges = []
@@ -395,7 +984,7 @@ def sidecar(name):
                               "leg_number": 0})
             graphs.append({"nodes": nodes, "edges": edges, "diagram_type": "tree"})
     tag = " ".join(str(p) for p in pdgs[:2]) + " > " + " ".join(str(p) for p in pdgs[2:])
-    return {"process": name, "model": f"synthetic_v{SYN_VERSION}", "mg5_generate": [],
+    return {"process": name, "model": f"synthetic_v{st['version']}", "mg5_generate": [],
             "synthetic_sha": st["sha"], "n_subprocesses": 1,
             "subprocesses": [{"process_str": f"synthetic {tag}", "external": external,
                               "n_diagrams": len(graphs), "diagrams": graphs}]}
@@ -428,12 +1017,15 @@ def recipe_entries(names, n_train, n_val, n_test):
 
 def _describe(name):
     st = structure(name)
-    print(f"{name}  sha={st['sha']}  {st['pdg_ids'][:2]} -> {st['pdg_ids'][2:]}  m={st['m_legs'][2:]}")
+    print(f"{name}  v{st['version']}  sha={st['sha']}  {st['pdg_ids'][:2]} -> {st['pdg_ids'][2:]}  m={st['m_legs'][2:]}"
+          f"  K={len(st['diagrams'])}" + (f" of cap {st['k_cap']}" if "k_cap" in st else "")
+          + f"  order={st.get('order', [0, 0, st['k_s'], st['nfinal'] - st['k_s']])}")
     print(f"  sqrt(s) {st['sqrts']}  k_s={st['k_s']}  g={st['coupling']:.3e}  H={len(st['numerators'])}"
           f"  perms={len(st['perms'])}  scalar mass={st['internal_masses'][25]:.1f}")
     for d in st["diagrams"]:
         print("  diagram: " + ", ".join(
-            f"{p['pdg']}{p['legs']}(M={p['mass']:.1f},G={p['width']:.3g},e={p['power']})" for p in d["props"]))
+            f"{p['pdg']}{p['legs']}(M={p['mass']:.1f},G={p['width']:.3g},e={p['power']})" for p in d["props"])
+              + "".join(f"  B{sp['legs']}" for sp in d.get("spinors", [])))
 
 
 def main():
