@@ -63,8 +63,8 @@ for h, mk in HOR.items():
 for ax in (axa, axb):
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel(r"$W$: MSE (preprocessed)")
-    ax.set_ylabel(r"old $28$ / finale")
+    ax.set_xlabel(r"error on $W+4g$, $W+5g$ (MSE)")
+    ax.set_ylabel(r"forgetting: $\mathrm{MSE}_{28}/\mathrm{MSE}_{28}^\mathrm{finale}$")
 base = os.path.join(ROOT, "analysis", "transfer", "figs", "waddm_tradeoff")
 ps.save_panels(figs, base)
 # one legend for both panels: the methods' colours from (a), the horizons' markers from (b)
