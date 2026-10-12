@@ -5169,6 +5169,15 @@ $+0.10$ and $-0.22$ (replay $10\%$, best on $W$, below the finale at four of six
 $\pm0.5$\,dex on these cells, at most a small cost on the unrelated probe, for the parent that learned $W$ longest
 with the larger buffer; seeds would settle it. One seed per point.
 
+\emph{Reading.} Adding processes late is not as good as having them in the pretraining from the start: on $Z+4g$ the
+best late parent trails finale$+W$ by $0.1$--$0.3$\,dex at every $D$, on $Z+5g$ it trails by $0.2$\,dex at $D=10^1$ and
+is level from $10^{1.5}$ on, and a forgetting of $3$--$30\times$ on the old processes remains (above). It still keeps
+most of the gain at a small fraction of the cost: the add-$W$ step is $4$k steps against the $64$k of a pretraining. The
+balance depends on the model's size. For a pretraining as cheap as ours, pretraining again with the new processes is
+affordable and better; for a very large pretrained model, retraining it from scratch only to add a few processes may
+cost far more than the extra gain is worth on the probes that would profit, and continued training with a small
+replay buffer is the better trade.
+
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/replay_children_legend.pdf}\\
