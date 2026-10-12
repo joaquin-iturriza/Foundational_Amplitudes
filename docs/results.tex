@@ -5109,6 +5109,32 @@ pools holds the forgetting at $10$--$30\times$ at $W=3$--$5\times10^{-4}$, $10\%
 against the full replay's $1.06\times$ at $1.5\times10^{-4}$ in the $16$k step above (whose old-$28$ numbers come from a
 separate evaluation, not the in-run monitors). One seed per point.
 
+\emph{Children of the replay parents (complete, \code{replaykids} $24/24$, collected from CC 2026-10-12 19:40; D34, D37).}
+Only the two buffer methods' parents, each its best checkpoint on $W$ and its best on all $30$ (replay $1\%$: $4$k trial
+$17$ at steps $4\,000$ and $200$; replay $10\%$: $4$k trial $46$, and $2$k trial $68$ at step $2\,000$), fine-tuned at
+$D=10^4$, $32$k, on $Z+4g$, $Z+5g$ and, as a probe outside both the $Z+ng$ and the $W+ng$ families, $e^+e^-\to t\bar t$;
+each child at the finale cell's own two points (the same candidates, so only the parent differs), the best of the two.
+Gain over the finale's child of the same cell, in dex:
+\begin{center}\small
+\begin{tabular}{lrrr}
+parent & $Z+4g$ & $Z+5g$ & $e^+e^-\to t\bar t$ \\ \hline
+replay $1\%$, best on $W$ & $+0.09$ & $-0.04$ & $+0.06$ \\
+replay $1\%$, best on all $30$ (step $200$) & $+0.04$ & $-0.09$ & $+0.15$ \\
+replay $10\%$, best on $W$ & $+0.06$ & $-0.02$ & $-0.12$ \\
+replay $10\%$, best on all $30$ & $+0.07$ & $-0.07$ & $-0.04$ \\ \hline
+the finale (reference) & $3.68\times10^{-3}$ & $3.13\times10^{-3}$ & $2.40\times10^{-9}$ \\
+scratch & $2.84\times10^{-3}$ & $4.75\times10^{-3}$ & $2.75\times10^{-8}$ \\
+\end{tabular}
+\end{center}
+All four children sit within $0.15$\,dex of the finale's on every probe, inside the spread of one seed (two equally
+forgetting naive parents gave children $2\times$ apart, above). Adding $W+4g$, $W+5g$ with a replay buffer therefore
+neither helps $Z+4g$, $Z+5g$ at $D=10^4$ nor costs anything on $t\bar t$: the buffer keeps the old transfer, and the new
+processes bring nothing measurable here. Pretraining on $W+4g$, $W+5g$ from the start (finale$+W$) gave $+0.11$ and
+$+0.12$\,dex over scratch on the same two cells (the high-multiplicity grid), against $-0.07$ to $-0.02$ and $+0.09$ to
+$+0.17$ for these children; at $D=10^4$ both are within the one-seed spread, so this cell cannot separate adding $W$ late
+from having it from the start; the high-multiplicity grid's low-$D$ cells, where finale$+W$ gained $2$--$3\times$ over
+the finale, can. One seed.
+
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/waddm_tradeoff_legend.pdf}\\
