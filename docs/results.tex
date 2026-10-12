@@ -4935,7 +4935,7 @@ pretraining is the best arm wherever there is a gain: $0.2$--$0.5$\,dex over the
 probes ($Z+4g$ at $10^{2.5}$: $6.8\times10^{-3}$ against the finale's $2.3\times10^{-2}$), so processes of the probe's own
 multiplicity in a neighbouring family help; at $D\ge10^{4.5}$ it is the worst. The synthetic $2\to5$, $2\to6$ processes
 are level with the finale at low $D$ (within $0.1$\,dex but for $Z+4g$ at $10^{1.5}$, $+0.4$) and the best arm at
-$D=10^5$ on both probes, by $0.1$--$0.2$\,dex. Neither the finale nor the synthetic arm saw a $2\to5$ or $2\to6$
+$D=10^5$ on both probes, by $0.1$--$0.2$\,dex. Neither the finale nor the (version-$1$) synthetic arm saw a $2\to5$ or $2\to6$
 process of the probes' kind, and both still give a decade where data is scarce. The $D=10^4$ row is the children
 table's (below). $Z+5g$ scratch trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated train pool (2026-10-10
 17:09--18:00, hand-off); no other lxplus $Z+5g$ trial started in that window, and neither is the cell's value (hp 196,
@@ -5943,6 +5943,67 @@ relabelling symmetry, and diagram sidecars that describe the function exactly.
 Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}, $8$k grid): fine-tuned from
 it, the model beats scratch in $66$ of $84$ cells and stays within a factor $1.7$ of rung $9$ at the median (median over
 probes $-0.23$\,dex, better than rung $9$ on $3$ of $12$, $p=0.034$).
+
+\subsection{Versions 2 to 5 (2026-10-12)}\label{sec:syn-versions}
+Built for the user's call of 2026-10-12 (\code{site} decisions D36, D38): add the proposals above one at a time, each
+version keeping the previous one's changes, and track the generation rate, so that the prior gets closer to real
+high-multiplicity amplitudes without becoming as slow as MadGraph. Each version is pretrained once at the finale's
+hyperparameters (no search) and fine-tuned at the two fixed points. Version $1$ is unchanged byte for byte (every name a
+recipe uses keeps its structure hash); the new versions are named \code{syn[<n>]v<V>\_<k>}, $V=2$--$5$, seeded by
+$(\text{salt},V,n_\text{forced},k)$, and evaluated by a vectorised labeller that reproduces version $1$ to $10^{-13}$.
+\paragraph{Version 2: diagram count growing with multiplicity} (proposal (a)). $K$ is drawn log-uniform on
+$1,\dots,K_\text{cap}$, $K_\text{cap}=\max\big(K_\text{max}^{(1)}(N),\lfloor(2N-5)!!/(4|\Pi|)\rfloor\big)$, with $|\Pi|$ the
+permutations of identical legs; the diagrams are distinct up to those permutations. The symmetrisation turns each drawn
+diagram into $|\Pi|$ labelled ones, so the cap bounds the labelled trees per event by $(2N-5)!!/4$, and the cost is
+linear in that number. Why a quarter: the SM cubic-tree count of $q\bar q\to V+n\,g$ is $384$ at $2\to5$ ($0.41$ of
+$(2N-5)!!$) and $3840$ at $2\to6$ ($0.37$); a quarter stays below the real count and bounds the work at about $2600$
+terms per helicity at $2\to6$.
+\paragraph{Version 3: SM vertices} (proposal (b)), and quark generation and lepton family conserved in the leg draw.
+Trees are built bottom-up so that every vertex is one of $f\bar f\gamma$, $f\bar fZ$, $q\bar qg$, $f\bar fH$ ($b$, $t$),
+$W$ within a doublet, $WW\gamma$, $WWZ$, $ggg$, $WWH$, $ZZH$. Each diagram carries its own coupling,
+$(4\pi\alpha_s)^{n_\text{QCD}/2}(4\pi\alpha)^{n_\text{QED}/2}$ in the amplitude with $\alpha_s$ running per event, so
+diagrams of different order interfere; the order vector holds the maxima over diagrams (the pipeline's convention).
+\paragraph{Version 4: collinear and soft limits by construction.} A massless line joining two massless final legs
+$i,k$ keeps power $1$, $s_{ik}$ is left out of that diagram's monomials, and each numerator term is multiplied by $B_{ik}$
+or its conjugate (drawn per term),
+\begin{equation*}
+  B_{ik}=|s_{ik}|^{1/2}\,W_{ik}\,\frac{\mathrm{tr}(ikba)}{|\mathrm{tr}(ikba)|},\qquad
+  \mathrm{tr}(ikba)=\langle ik\rangle[kb]\langle ba\rangle[ai],\qquad
+  W_{ik}=\prod_{x\in\{i,k\}\cap\{g,\gamma\}}\Big(\frac{(q_i+q_k)\cdot P}{q_x\cdot P}\Big)^{1/2},
+\end{equation*}
+$P$ the total incoming momentum. The phase is Lorentz invariant ($|\mathrm{tr}|^2=s_{ik}s_{kb}s_{ba}s_{ai}$ to $10^{-12}$).
+The result: $|\mathcal M|^2\propto1/s_{ik}$ in the collinear limit and $\propto1/E_k^2$ for a soft gluon or photon, the
+eikonal \emph{power} only: the coefficient is the random hard function, not the eikonal factor times a lower-point
+amplitude. The factor $W$ is what makes the soft power come out (the collinear construction alone gives $1/s_{ik}$ but
+not $1/E^2$). Initial-state lines and massless lines joining three or more legs keep version $1$'s rule. $|\mathcal M|^2$
+is averaged with its parity image, since the phase of $B$ is parity-odd and real unpolarised amplitudes are
+parity-even.
+\paragraph{Version 5: the target's shape} (D36's ``target the generation''). $q\bar q'\to V+4g$ (\code{syn5v5\_*}) and
+$V+5g$ (\code{syn6v5\_*}), version $4$'s rules otherwise; $V=\gamma,Z,W^+,H$ by $k\bmod4$ (so any four consecutive names
+hold all four bosons), beams $u\bar u$ or $d\bar d$ at $\tfrac12$ each ($u\bar d$ for the $W$). The Higgs couples to
+gluons only through an effective $ggH$ vertex (coupling $\alpha_s e/(3\pi)$, the top-loop's order), allowed on the
+external $H$ only. \code{syn5v5\_00001}, \code{syn6v5\_00001} ($Z+4g$, $Z+5g$) and \code{syn5v5\_00002},
+\code{syn6v5\_00002} ($W^++4g$, $W^++5g$) have exactly the probes' (and the $W$ arm's) particle content.
+\paragraph{Validation} (\code{tests/test\_synthetic\_versions.py}; $20$ processes and $6000$ events per version).
+$|\mathcal M|^2$ finite and positive on every event. Largest relative change under a Lorentz transformation
+$2.5\times10^{-11}$, $3.2\times10^{-12}$, $9.1\times10^{-12}$, $2.9\times10^{-12}$ (v2--v5); mass dimension to
+$2\times10^{-12}$; identical-leg swaps to $7\times10^{-14}$. Every vertex of $649$ diagrams ($3645$ vertices) is an SM vertex.
+Limits as slopes along momentum-conserving sequences: collinear $-1.000$ to $-0.997$ (v4, $16$ pairs) and $-1.000$
+(v5, $57$), soft $-2.000$ (v4, $11$ legs; v5, $114$); versions $1$--$3$ give $1/s_{ik}^2$ on most such pairs ($8$ of $22$,
+$39$ of $43$, $21$ of $24$). The soft power sets in below about $10^{-4}$ of the gluon's energy when a resonant massive
+line is adjacent.
+\paragraph{Rates} (stored events/s, one laptop core, $2000$ events per process, \code{tools/bench\_synthetic.py --hm}):
+\begin{center}\small
+\begin{tabular}{lccccc}
+ & v1 & v2 & v3 & v4 & v5 \\ \hline
+$2\to5$, median & $30.8$k & $10.1$k & $24.7$k & $27.2$k & $10.7$k \\
+$2\to6$, median & $14.9$k & $6.0$k & $9.8$k & $19.1$k & $2.1$k \\
+\end{tabular}
+\end{center}
+The slowest process is $W^++5g$ (\code{syn6v5\_00002}, $2040$ labelled terms) at $963$ events/s, the labeller $94\%$ of
+the time. MadGraph's rate for the four real $2\to5$, $2\to6$ processes on the same kind of core is to be measured
+(\code{tools/bench\_synthetic.py --real}, a CPU job on CC). Recipes: \code{recipes/transfer\_finale\_synhm\_v<V>.yaml},
+the finale's $28$ processes plus each version's eight.
 
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
 Any one-loop amplitude decomposes into a few universal scalar integrals with process-dependent coefficients,
