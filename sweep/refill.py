@@ -23,7 +23,7 @@ INFRA = [("quota/disk", r"Disk quota exceeded|Errno 122|No space left on device|
          # two trials generating one pool: the first to finish removes the shared chunk dir under the other
          ("pool build race", r"No such file or directory: '[^']*/\.chunks_[0-9a-f]+/"),
          # a card too small for the batch (12 GB on lxplus for Z+5g at 16384; sweep/set_gpu_mem.py sets a floor)
-         ("GPU too small", r"CUDA out of memory\. Tried to allocate .* GPU 0 has a total capac?ity of 1[0-2]\.\d+ GiB")]
+         ("GPU too small", r"CUDA out of memory\. Tried to allocate .* GPU 0 has a total capac?i?ty of 1[0-2]\.\d+ GiB")]
 
 
 def failures(sd):
