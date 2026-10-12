@@ -5,7 +5,7 @@ compare synthetic processes with the real pools' per-core rates (docs/results.te
     python tools/bench_synthetic.py [--n 5000] [--first 0 --count 19]      # v1 pilot names syn_<first>..
     python tools/bench_synthetic.py --hm [--versions 1 2 3 4 5] [--n 2000]  # 2->5 and 2->6 per version: the 8
         # high-multiplicity names of recipes/transfer_finale_synhm*.yaml, syn5[v<V>]_00000..03, syn6[v<V>]_00000..03
-    python tools/bench_synthetic.py --real uubar_Zgggg uubar_Zggggg udbar_Wgggg udbar_Wggggg [--n 2000]
+    python tools/bench_synthetic.py --real uubar_Zgggg uubar_Zggggg udbar_Wgggg udbar_Wggggg [--hm] [--n 2000]
         # the same measurement on MadGraph processes: compiles the C++ standalone if missing (datagen.ensure_backend,
         # timed apart), then labels through the pipe driver as prebuild does. Needs MadGraph: a site CPU node
         # (scripts/job_bench_generation.sh).
@@ -68,7 +68,7 @@ if a.real is not None:
         rows.append(("real", cfg["nfinal"], rate))
         print(f"BENCH {name} 2->{cfg['nfinal']} MadGraph C++ {rate:9.1f} stored ev/s  labeller {100 * share:4.1f}%  "
               f"(backend ready in {t_build:.0f} s)", flush=True)
-else:
+if a.real is None or a.hm:   # --real with --hm: both on the same node, so the rates compare
     if a.hm:
         names = [(v, f"syn{n}{'' if v == 1 else f'v{v}'}_{k:05d}") for v in a.versions for n in (5, 6) for k in range(4)]
     else:
