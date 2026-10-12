@@ -6035,8 +6035,17 @@ $2\to6$, median & $14.9$k & $6.0$k & $9.8$k & $19.1$k & $2.1$k \\
 \end{tabular}
 \end{center}
 The slowest process is $W^++5g$ (\code{syn6v5\_00002}, $2040$ labelled terms) at $963$ events/s, the labeller $94\%$ of
-the time. MadGraph's rate for the four real $2\to5$, $2\to6$ processes on the same kind of core is to be measured
-(\code{tools/bench\_synthetic.py --real}, a CPU job on CC). Recipes: \code{recipes/transfer\_finale\_synhm\_v<V>.yaml},
+the time. Against MadGraph on the same core (one lxplus CPU job, 2026-10-12, \code{FA-lxplus-86c9f2c4},
+\code{tools/bench\_synthetic.py --real ... --hm}, $2000$ stored events per process; medians, synthetic over four processes):
+\begin{center}\small
+\begin{tabular}{lcccccc}
+ & MadGraph & v1 & v2 & v3 & v4 & v5 \\ \hline
+$2\to5$ & $88$ ($u\bar u\to Z+4g$, $u\bar d\to W+4g$: $64$--$112$) & $16.0$k & $4.9$k & $15.1$k & $14.2$k & $5.0$k \\
+$2\to6$ & $4$ ($Z+5g$, $W+5g$: $3$--$5$) & $6.7$k & $3.2$k & $5.1$k & $10.8$k & $1.1$k \\
+\end{tabular}
+\end{center}
+The slowest synthetic version is still $\sim\!50\times$ faster than MadGraph at $2\to5$ and $\sim\!250\times$ at $2\to6$
+(v5's slowest process, $\gamma+5g$, $616$ events/s, against $3$--$5$), before MadGraph's compile. Recipes: \code{recipes/transfer\_finale\_synhm\_v<V>.yaml},
 the finale's $28$ processes plus each version's eight.
 
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
