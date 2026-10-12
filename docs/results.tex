@@ -5341,14 +5341,18 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     $e^+e^-\to t\bar t$, Z+3g children cancelled), D38 (trend tests (b), (c); synthetic v2--v5 as designed). The open
     question on best-on-mix children is settled by D34. \textbf{Written up:} \code{highmult} grid (scratch = first $8$
     trials), \code{replaykids} $24/24$, trend test (c) ($D=10^3$ at $32$k: horizon does not explain the gain's fall),
-    synthetic v2--v5 (sec:syn-versions, rates against MadGraph). \textbf{Running:} \code{finsrch} (finale on $Z+4g$,
+    synthetic v2--v5 (sec:syn-versions, rates against MadGraph), superseded the same evening by revision $2$ (every
+    legal diagram; names \code{syn[<n>]v<V>r2\_<k>}) and version $6$ (D40, spinor brackets and selection rules).
+    \textbf{Running:} \code{finsrch} (finale on $Z+4g$,
     $D=10^{4.5}$, $8$-trial search over scratch's space): moved by the rebalancer to lxplus, hp167 died of CUDA OOM on a
     $12$\,GB card (nothing recorded in DyHPO), $24$\,GB floor set (\code{sweep/set\_gpu\_mem.py}), owed trial added as
     DAG \code{sweep\_0005}; when complete compare its best with the fixed points ($1.35\times10^{-3}$) and scratch
     ($8.31\times10^{-4}$). \code{trendtests} (b): \code{tp3\_hmscr128k}/\code{tp3\_finfte128k\_uubar\_Zgggg\_d9} (hp15,
     hp162, $128$k steps, CC, $\sim18$\,h); compare with their $32$k values ($8.31$, $13.5\times10^{-4}$); the last scratch
-    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: \code{tp3\_finale\_synhm\_v2}..\code{v5}
-    pretrainings (hp73, $64$k, CC, $\sim12$\,h); \textbf{next:} their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
+    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: the \code{tp3\_finale\_synhm\_v2}..\code{v5}
+    pretrainings were cancelled (revision $1$ superseded); \textbf{next:} pretrain on
+    \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml}, \code{\_v6.yaml}, \code{\_v6t.yaml} (sweep configs not
+    yet written; v6t's $2\to6$ pools store $6$--$19$ events/s per core, MadGraph's speed: decide \code{\_V6\_TERMS\_MAX} with the user, then build them as CPU jobs first), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
     ($8$k) and $10^4$ ($32$k), two fixed points (sweep/fixed_points.py), names \code{tp3\_fsv<V>fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}
     (item \code{synthver} matches \code{tp3\_fsv*}); copy the \code{tp3\_fsynfte} configs with the parent path changed;
     then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
@@ -5610,10 +5614,10 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
   \item \textbf{Synthetic prior: alternatives to try} (the user's list of 2026-10-08 and 09; each described where its
     ingredient is, marked \emph{Proposed, not run}, in Sec.~\ref{sec:synthetic}; none started; how close to real
     amplitudes the prior should be is still to be settled with others, so these are variants to compare against version
-    $1$, each a design to agree with the user first): quark-generation conservation and initial states beyond the
-    catalog's; $K$ growing with multiplicity; vertex legality; quartic and effective vertices; the collinear limit by
-    construction through $\langle ij\rangle$, $[ij]$ factors; spinor-helicity numerators with helicity selection rules;
-    soft emission as an eikonal factor times a lower-multiplicity amplitude; one-loop amplitudes from scalar integrals
+    $1$, each a design to agree with the user first; built since as versions $2$--$6$, Sec.~\ref{sec:syn-versions}:
+    quark-generation conservation, $K$ growing with multiplicity, vertex legality, the effective $ggH$ vertex, the
+    collinear limit through $\langle ij\rangle$, $[ij]$ factors, spinor-helicity numerators with selection rules).
+    Still open: initial states beyond the catalog's; quartic vertices; soft emission as an eikonal factor times a lower-multiplicity amplitude; one-loop amplitudes from scalar integrals
     (Sec.~\ref{sec:syn-loops}); and multiplicities well past $2\to4$, to where MadGraph struggles and the generator does
     not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average.
   \item \textbf{High-multiplicity test} (the user's call of 2026-10-09, \code{site} decisions D20, D21; targeted, no
@@ -5889,13 +5893,13 @@ single $|A|^2$ (a real spin-summed $|\mathcal M|^2$ rarely vanishes) and Gaussia
 random relative phases. These ``helicities'' are not tied to spins: no selection rule makes one vanish, and no angular
 shape like $1+\cos^2\theta$ is built in. The degree range, monomial count and $H\le4$ are hand-set.
 \par\smallskip\noindent \emph{Proposed, not run.}
-(a) \emph{Spinor-helicity numerators:} give each leg a helicity $h_i$ and build each numerator from random monomials in
+(a) \emph{Spinor-helicity numerators} (built as version $6$, Sec.~\ref{sec:syn-versions}): give each leg a helicity $h_i$ and build each numerator from random monomials in
 the brackets $\langle ij\rangle$, $[ij]$ of massless legs such that leg $i$ appears with little-group weight $-2h_i$
 (the number of its angle brackets minus its square brackets). Each amplitude then changes only by a phase under the little-group
 rescaling of the spinors, $|A|^2$ stays invariant, and real angular shapes follow: $e^+e^-\to\mu^+\mu^-$ through a photon is
 $A(1^-,2^+,3^-,4^+)\propto\langle13\rangle[24]/s_{12}$, whose square is $s_{13}^2/s^2=t^2/s^2$, one of the $(1\pm\cos\theta)^2$ terms. Massive
 legs need massive spinors, a larger step; they could keep invariants while massless legs get brackets.
-(b) \emph{Helicity selection rules,} on top of (a): only the configurations allowed in a gauge theory are summed. A
+(b) \emph{Helicity selection rules,} on top of (a) (also version $6$): only the configurations allowed in a gauge theory are summed. A
 massless fermion line keeps its helicity through a gauge vertex (chirality), and tree amplitudes of gluons with all
 helicities equal, or all but one, vanish. Both are cheap once (a) exists.
 
@@ -5997,13 +6001,16 @@ Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_syn
 it, the model beats scratch in $66$ of $84$ cells and stays within a factor $1.7$ of rung $9$ at the median (median over
 probes $-0.23$\,dex, better than rung $9$ on $3$ of $12$, $p=0.034$).
 
-\subsection{Versions 2 to 5 (2026-10-12)}\label{sec:syn-versions}
-Built for the user's call of 2026-10-12 (\code{site} decisions D36, D38): add the proposals above one at a time, each
+\subsection{Versions 2 to 6 (2026-10-12)}\label{sec:syn-versions}
+Built for the user's call of 2026-10-12 (\code{site} decisions D36, D38; version $6$ D40): add the proposals above one at a time, each
 version keeping the previous one's changes, and track the generation rate, so that the prior gets closer to real
 high-multiplicity amplitudes without becoming as slow as MadGraph. Each version is pretrained once at the finale's
 hyperparameters (no search) and fine-tuned at the two fixed points. Version $1$ is unchanged byte for byte (every name a
 recipe uses keeps its structure hash); the new versions are named \code{syn[<n>]v<V>\_<k>}, $V=2$--$5$, seeded by
 $(\text{salt},V,n_\text{forced},k)$, and evaluated by a vectorised labeller that reproduces version $1$ to $10^{-13}$.
+\emph{Versions $2$--$5$ as first defined (revision $1$, the next six paragraphs) drew far fewer diagrams than intended
+and are superseded by revision $2$ and version $6$ at the end of this subsection; they stay reproducible under their
+names.}
 \paragraph{Version 2: diagram count growing with multiplicity} (proposal (a)). $K$ is drawn log-uniform on
 $1,\dots,K_\text{cap}$, $K_\text{cap}=\max\big(K_\text{max}^{(1)}(N),\lfloor(2N-5)!!/(4|\Pi|)\rfloor\big)$, with $|\Pi|$ the
 permutations of identical legs; the diagrams are distinct up to those permutations. The symmetrisation turns each drawn
@@ -6066,6 +6073,130 @@ $2\to6$ & $4$ ($Z+5g$, $W+5g$: $3$--$5$) & $6.7$k & $3.2$k & $5.1$k & $10.8$k & 
 The slowest synthetic version is still $\sim\!50\times$ faster than MadGraph at $2\to5$ and $\sim\!250\times$ at $2\to6$
 (v5's slowest process, $\gamma+5g$, $616$ events/s, against $3$--$5$), before MadGraph's compile. Recipes: \code{recipes/transfer\_finale\_synhm\_v<V>.yaml},
 the finale's $28$ processes plus each version's eight.
+
+\paragraph{Revision 2: every legal diagram, up to $4000$ labelled ones} (the user's correction of 2026-10-12: ``if in
+the end we end up with only $\sim200$ legal diagrams, we aren't doing what we said''; the cap of $4000$ labelled diagrams is
+our cost limit, not yet agreed with the user). Revision $1$ above drew $K$ log-uniform \emph{up to} the cap,
+so a typical process had a handful of diagrams (\code{syn5v2\_00001}: $5$ of a possible $236$; \code{syn6v5\_00001},
+$Z+5g$: $1$ orbit of the $3840$ legal diagrams). Revision $2$ replaces it under new names, \code{syn[<n>]v<V>r2\_<k>},
+seeded by $(\text{salt},V,n_\text{forced},k,2,\text{target-shaped})$, so no revised process can meet a pool cached
+under a revision-$1$ name; revision $1$ stays reproducible (its structure hashes are frozen in the test) and is
+superseded, and its pretrainings were cancelled (2026-10-12, with the scope change). Version $2$ (no legality) now takes
+$K=K_\text{cap}$. Versions $3$--$5$ use \emph{every} SM-legal tree of the process, listed by the subset recursion of
+\code{legal\_diagram\_count} with version $3$'s vertices and light-line protection: $384$ for $q\bar q\to V+4g$ ($V=\gamma,
+Z,W$), $561$ for $H+4g$, $3840$ for $V+5g$. That set is closed under the permutations of identical legs, so the
+numerators are drawn once per permutation orbit and carried to the orbit's images, and $|\mathcal M|^2$ is one
+coherent sum over every labelled diagram (each orbit's $|\Pi|$ images weighted by $1/|\text{stabiliser}|$) instead of
+version $1$'s incoherent average over $|\Pi|$; lines a stabiliser maps onto each other share their drawn power. The
+cost is linear in the labelled diagrams, so a process keeps at most $4000$ of them (whole orbits in a uniformly random
+order while they fit): $4000$ is the smallest round number that keeps the target family's $V+5g$ whole. Of the $88$
+revised and v6 processes tested it bites on $7$: $H+5g$ ($3990$ of $6555$, the effective $ggH$ vertex adds diagrams;
+\code{syn6v5r2\_00003}, \code{\_00007}, \code{syn6v6t\_00003}) and four general $2\to6$ draws (\code{syn6v3r2\_00001},
+$uu\to uu\,4g$: $3996$ of $14610$; \code{syn6v4r2\_00003}: $4000$ of $5200$; \code{syn6v6\_00000}: $4000$ of $4512$;
+\code{syn6v6\_00001}: $3999$ of $7305$).
+Diagram counts of the recipes' processes (labelled diagrams kept / legal):
+\begin{center}\small
+\begin{tabular}{lll}
+ & $2\to5$ (\code{syn5...\_00000}--$03$) & $2\to6$ (\code{syn6...\_00000}--$03$) \\ \hline
+v2r2 ($K$, charge-table trees) & $236$, $236$, $236$, $236$ & $1299$, $108$, $2598$, $1299$ \\
+v3r2 & $93$, $130$, $588$, $40$ & $1276$, $3996/14610$, $220$, $1984$ \\
+v4r2 & $126$, $64$, $112$, $312$ & $441$, $1439$, $3438$, $4000/5200$ \\
+v5r2, v6t ($\gamma,Z,W^+,H$) & $384$, $384$, $384$, $561$ & $3840$, $3840$, $3840$, $3990/6555$ \\
+v6 & $317$, $252$, $126$, $315$ & $4000/4512$, $3999/7305$, $624$, $1008$ \\
+\end{tabular}
+\end{center}
+(v2r2's $K$ counts drawn diagrams up to the permutations, each evaluated in all $|\Pi|$ images as before.)
+
+\paragraph{Version 6: spinor brackets and helicity selection rules} (D40: ``a v6 with the terms generated by $\langle
+ij\rangle$, $[ij]$ terms, and the helicity selection rules''; proposals (a) and (b) of the helicity paragraph). Built on
+revision $2$ of version $5$ (every legal diagram, the $ggH$ vertex), in two forms: \code{syn[<n>]v6\_<k>} on version
+$4$'s general legs and \code{syn[<n>]v6t\_<k>} on version $5$'s target shape. Every leg carries a helicity in the
+all-outgoing convention: $\pm\tfrac12$ for fermions, $\pm1$ for $g,\gamma$, $-1,0,+1$ for $Z,W$, $0$ for $H$. Spinors
+are those of the physical momenta, with $[ij]=\langle ij\rangle^*$ and $|\langle ij\rangle|^2=2p_i\!\cdot\!p_j$; a
+massive leg enters through the light-cone component of its momentum along its direction in the centre-of-mass frame,
+$p^\flat=\tfrac12(E+|\vec k|)(1,\hat k)$ there, i.e.\ $p=p^\flat+\frac{m^2}{2p^\flat\cdot q}\,q$ with $q$ null against it:
+its helicity is the usual one, quantised along the momentum in the CM frame, $p^\flat\to p$ as $m\to0$, and the
+choice is covariant, symmetric in the beams and the same in every term (a reference that changed between terms, a beam
+chosen by its label, mixes helicity bases and broke Lorentz invariance at $\mathcal O(1)$ with identical beams; the
+other light-cone component, against the momentum, lands exactly on the partner of a $2\to2$ process). Each diagram
+(orbit) and configuration $\lambda$ has its own numerator $c\,a\,\Phi\,s^{-k/2}$, $c$ and $a$ Gaussian as before and
+$\Phi$ one monomial in the brackets (the configuration sum already gives each diagram many independent random
+structures, and one monomial halves the cost against version $1$'s one to three), built to satisfy:
+\begin{itemize}
+  \item \emph{little-group weight}: leg $i$ appears with (angle minus square) count $-2h_i$, so
+    $A_\lambda\to t_i^{-2h_i}A_\lambda$ when $\lambda_i\to t_i\lambda_i$, $\tilde\lambda_i\to\tilde\lambda_i/t_i$;
+  \item \emph{soft}: a gluon or photon has as many brackets in the denominator as in the numerator, so $\Phi$ stays
+    finite as it goes soft; its denominators pair with a beam ($\langle ka\rangle$, never zero inside the fiducial
+    cuts, as in the eikonal $\langle ai\rangle[ik]/\langle ak\rangle$);
+  \item \emph{collinear}: a massless line on two massless final legs $i,k$ keeps power $1$ and $\Phi$ has exactly one
+    $\langle ik\rangle$ or $[ik]$ (a gauge leg's helicity fixes which). With the soft rule this gives $1/s_{ik}$ and
+    $1/E_k^2$ without version $4$'s factor $W$;
+  \item \emph{dimension}: the remaining brackets pair legs at random (no $\langle ii\rangle$, no second bracket of a
+    collinear pair), padded with weight-$0$ dipoles on non-gauge legs to $n_b+2\delta$ brackets, $\delta\sim\mathcal
+    U\{0,1,2\}$ as version $1$'s degree; $s^{-k/2}$ with $k=n_b-2E_d+N-4$ restores the mass dimension.
+\end{itemize}
+The selection rules: helicity is conserved along every massless fermion line (its ends opposite in the all-outgoing
+convention), left-handed along a line through a $W$ vertex or ending on a neutrino (the SM's charged current and
+neutrinos are left-handed); with every external leg massless and no scalar in the process, configurations with fewer
+than two negative or two positive helicities vanish (the all-plus and one-minus tree amplitudes). Massive fermions
+($b$, $t$) and massive external vectors are exempt ($q\bar q\to Zg$ has every configuration). A diagram contributes
+only to the configurations its fermion lines allow, and a configuration that no diagram allows is exactly zero. Then
+\begin{equation*}
+  |\mathcal M|^2=\frac14\sum_{\lambda}\tfrac12\big(|A_\lambda(p)|^2+|A_\lambda(\tilde p)|^2\big),
+\end{equation*}
+$\tilde p$ the spatially inverted momenta (the parity image swaps every $\langle ij\rangle$ with $[ij]$), $\tfrac14$
+the beams' average. For a configuration whose parity partner is allowed term by term, the partner's numerators are the
+conjugates, so the pair costs one evaluation; a chiral configuration is averaged with its own image, which keeps
+$|\mathcal M|^2$ parity even, as an unpolarised tree is. Configurations per process: $60$ ($\gamma+4g$), $96$ ($Z+4g$),
+$48$ ($W^++4g$, chiral), $32$ ($H+4g$); at $2\to6$ $124$, $192$, $96$, $64$. The evaluation multiplies brackets
+gathered from a per-event table; the work is configurations (pairs counted once) times orbit representatives times
+$|\Pi|$, $0.85$ million terms per event for $Z+5g$ and $W^++5g$ (stabilisers count each image once per element),
+capped at $10^6$, a cap no recipe name reaches.
+
+\paragraph{Validation of revision 2 and version 6} \code{tests/test\_synthetic\_versions.py}, $20$ processes per revised version and per v6 form ($8$ for v6t), $6000$ events
+each ($5040$ for v6 and $1440$ for v6t, whose $2\to6$ processes label slowly). Revision $1$'s structure hashes of the $44$ names
+in use and drawn first are frozen, and every revision-$1$ label is bit-identical to the trunk's code. $|\mathcal M|^2$
+finite and positive on every event; largest relative change under a Lorentz transformation $3.3\times10^{-11}$,
+$1.1\times10^{-11}$, $4.0\times10^{-12}$, $1.0\times10^{-12}$ (v2r2--v5r2), $4.9\times10^{-11}$ (v6), $2.5\times10^{-12}$
+(v6t); mass dimension to $3\times10^{-12}$; identical-leg swaps to $2\times10^{-13}$. Every vertex of $18321$ diagrams
+($106351$ vertices, all versions) is an SM vertex; of the $88$ revision-$2$ and v6 processes, $81$ keep every legal
+diagram and the labelled diagrams kept equal the orbit sizes summed. Version $6$: under the little-group scaling with
+complex $t_i$ each of $26140$ helicity amplitudes (times events) changes by $\prod_i t_i^{-2h_i}$ to $6\times10^{-13}$; the
+surviving configurations ($1307$; $3033$ vanish) equal the set recomputed in the test from the trees and the rules,
+each is non-zero, $|\mathcal M|^2$ equals the configuration sum of the equation above to $3\times10^{-15}$, so the
+vanishing ones contribute nothing, and it is parity even exactly. Limits along momentum-conserving sequences (the
+collinear one now down to $\theta=10^{-6.5}$: with thousands of regular diagrams some events reach the asymptote only
+below $10^{-5.5}$): collinear slope $-1.005$ to $-0.996$ (v4r2, $28$ pairs), $-1.007$ to $-0.994$ (v5r2, $70$), $-1.004$
+to $-0.996$ (v6, $33$), $-1.007$ to $-0.997$ (v6t, $28$); soft $-2.000$ ($20$, $140$, $30$, $56$ gauge legs). v6 gets both
+from the brackets alone. v2r2 and v3r2 give $1/s_{ik}^2$ on $59$ of $62$ and $36$ of $36$ pairs, as their revision $1$.
+
+\paragraph{Rates of revision 2 and version 6} (stored events/s, one laptop core, $2000$ events per process through the pools' mixture
+sampler, \code{tools/bench\_synthetic.py --hm}, every version in one run; medians over the four names, range in
+brackets):
+\begin{center}\small
+\begin{tabular}{lcc}
+ & $2\to5$ & $2\to6$ \\ \hline
+v1 & $33.1$k ($16.3$--$41.3$k) & $12.4$k ($10.6$--$14.5$k) \\
+v2, v3, v4, v5 (revision $1$) & $10.2$k, $22.7$k, $28.7$k, $9.6$k & $5.8$k, $10.1$k, $17.4$k, $2.1$k \\
+v2r2 & $9.1$k ($8.0$--$10.1$k) & $1.6$k ($1.3$--$2.1$k) \\
+v3r2 & $16.9$k ($5.6$--$21.9$k) & $2.0$k ($480$--$8.3$k) \\
+v4r2 & $10.0$k ($5.2$--$24.4$k) & $790$ ($540$--$4.6$k) \\
+v5r2 & $2.3$k ($1.6$--$2.8$k) & $199$ ($178$--$262$) \\
+v6 & $1.5$k ($930$--$2.0$k) & $105$ ($30$--$209$) \\
+v6t & $265$ ($209$--$485$) & $8$ ($6$--$19$) \\
+\end{tabular}
+\end{center}
+The labeller is $87$--$100\%$ of the time from v5r2 on; the one-off structure and plan take up to $6$\,s ($42$\,s for
+the general $2\to6$ draw \code{syn6v6\_00000}). Every legal diagram costs: v5r2's $V+5g$ evaluates $8880$ diagram
+images per helicity ($3840$ labelled diagrams, $74$ orbits, stabilisers counted) where revision $1$ evaluated $120$ to
+$2040$, so it is $\sim\!10\times$ slower, still $\sim\!50\times$ MadGraph's $3$--$5$. Version $6$ multiplies that by the
+helicity configurations: $2\to6$ v6t sums $0.28$--$0.85$ million bracket monomials per event and stores $6$--$19$
+events/s, \emph{as slow as MadGraph} per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is
+indicative), though with no compile. That breaks D36's ``cheap'' at $2\to6$; the knob is \code{\_V6\_TERMS\_MAX}, whose cut drops
+whole orbits uniformly (at $2\times10^5$ terms $Z+5g$ would keep $\sim\!900$ of its $3840$ diagrams, $\sim\!4\times$ faster by the term
+count; not measured), a choice for the user, not made here. Recipes: \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml},
+\code{\_v6.yaml} (general legs) and \code{\_v6t.yaml} (target shape), the finale's $28$ processes plus each version's
+eight; the revision-$1$ recipes stay for the record.
 
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
 Any one-loop amplitude decomposes into a few universal scalar integrals with process-dependent coefficients,
