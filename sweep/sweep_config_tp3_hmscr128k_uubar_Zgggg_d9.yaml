@@ -11,7 +11,7 @@ cluster:
   time: '36:00:00'
 paths: null
 sweep_name: tp3_hmscr128k_uubar_Zgggg_d9
-n_trials: 8
+n_trials: 1
 dyhpo:
   n_candidates: 200
   seed: 42

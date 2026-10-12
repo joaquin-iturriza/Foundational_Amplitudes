@@ -1,6 +1,6 @@
 # Add-W child, replay parents only (D34): fine-tune from replay 1%, 4k, trial 17, its best checkpoint on all 30 (step 200) (runs/tp3_waddm_buf1pc4k/trial_0017): uubar_Zggggg on D = 10^4
 # events, 32k steps, at the finale cell's own two points (its trial indices in expect_tp3.json, added with
-# generate_sweep --extend --fixed-hp; for Z+3g those are rung 9's 32k chosen points, not D25's). Copied from sweep_config_tp3_finfte32k_uubar_Zggggg_d8.yaml (same
+# generate_sweep --extend --fixed-hp). Copied from sweep_config_tp3_finfte32k_uubar_Zggggg_d8.yaml (same
 # DyHPO seed, hence the same candidate pool), parent path changed.
 cluster:
   scheduler: slurm
