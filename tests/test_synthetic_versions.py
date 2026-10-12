@@ -338,7 +338,8 @@ def limit_slopes(nm, rng, i, k, kind):
         axis = np.cross(fin[a, 1:], rng.normal(size=3))
         Ek = fin[b, 0]
         xs, ys = [], []
-        for th in np.geomspace(1e-2, 10 ** -5.5, 8):
+        for th in np.geomspace(1e-2, 10 ** -6.5, 9):     # down to s_ik ~ 1e-13 E^2: thousands of regular diagrams
+            # (revision 2) push the asymptote below 10^-5.5 on some events
             f = fin.copy()
             f[b, 1:] = _rot(fin[a, 1:] / np.linalg.norm(fin[a, 1:]) * Ek, axis, th)
             Pe = _rebalance(f, others)

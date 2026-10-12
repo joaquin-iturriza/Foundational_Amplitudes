@@ -1779,10 +1779,13 @@ def helicity_amplitudes(st, P, lg=None):
 def legal_diagram_count(pdgs, hgg=False):
     """Number of SM cubic tree diagrams (sm_vertices; ggH only on an external H) of the process pdgs (beams
     first, incoming), labelled legs: what version 3's trees are drawn from, the real count without the quartic
-    vertices. E.g. e+e- -> mu+mu- 2, gg -> gg 3, u ubar -> Z + 4g 384, + 5g 3840. Subset recursion."""
+    vertices. E.g. e+e- -> mu+mu- 2, gg -> gg 3, u ubar -> Z + 4g 384, + 5g 3840. Subset recursion; the last leg is
+    the root, so the ggH vertex is also legal at the top when that leg is the H (missing before 2026-10-12: it
+    undercounted processes ending on an H, e.g. u ubar -> g Z H, which no number reported here was)."""
     tab = _line_table(hgg)
     N = len(pdgs)
     out = [_anti(p) if i < 2 else p for i, p in enumerate(pdgs)]
+    top = frozenset(range(N - 1))
 
     @functools.lru_cache(maxsize=None)
     def f(S):                        # legs S -> {line X leaving S: number of subtrees}
@@ -1796,10 +1799,11 @@ def legal_diagram_count(pdgs, hgg=False):
                 for Xa, ca in f(A).items():
                     for Xb, cb in f(Bs).items():
                         for X, cls in tab.get((Xa, Xb), ()):
-                            if cls != "HGG" or (Xa == 25 and len(A) == 1) or (Xb == 25 and len(Bs) == 1):
+                            if cls != "HGG" or (Xa == 25 and len(A) == 1) or (Xb == 25 and len(Bs) == 1) \
+                                    or (S == top and out[N - 1] == 25):
                                 res[X] = res.get(X, 0) + ca * cb
         return res
-    return f(frozenset(range(N - 1))).get(_anti(out[N - 1]), 0)
+    return f(top).get(_anti(out[N - 1]), 0)
 
 
 def label_events(name, events):
