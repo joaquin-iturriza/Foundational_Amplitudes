@@ -230,9 +230,12 @@ def standalone_name(process):
 
 
 def is_synthetic(process):
-    """True for a synthetic-amplitude process name (``syn_<k>``, ``syn<n>_<k>``):
-    tools/synthetic_amplitudes.py, no MadGraph behind it."""
-    return re.match(r"^syn[2-6]?_\d+$", str(process)) is not None
+    """True for a synthetic-amplitude process name (``syn_<k>``, ``syn<n>_<k>``,
+    ``syn[<n>]v<V>_<k>``): tools/synthetic_amplitudes.py, no MadGraph behind it. The name grammar is that module's."""
+    if not str(process).startswith("syn"):
+        return False
+    from tools import synthetic_amplitudes as syn
+    return syn.is_synthetic(process)
 
 
 def register_synthetic(process, diagrams_dir=None):
