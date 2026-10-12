@@ -5335,6 +5335,25 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
+    \emph{State (2026-10-12, 21:40):} \textbf{Decisions since 10-11:} D34 (add-W children from the replay parents
+    only, one point $D=10^4$), D35 (one full fine-tune search on one high-multiplicity cell), D36 (synthetic generator
+    versions, cheap: pretrainings and fine-tunes at fixed HPs), D37 (reference probe outside $Z+ng$/$W+ng$:
+    $e^+e^-\to t\bar t$, Z+3g children cancelled), D38 (trend tests (b), (c); synthetic v2--v5 as designed). The open
+    question on best-on-mix children is settled by D34. \textbf{Written up:} \code{highmult} grid (scratch = first $8$
+    trials), \code{replaykids} $24/24$, trend test (c) ($D=10^3$ at $32$k: horizon does not explain the gain's fall),
+    synthetic v2--v5 (sec:syn-versions, rates against MadGraph). \textbf{Running:} \code{finsrch} (finale on $Z+4g$,
+    $D=10^{4.5}$, $8$-trial search over scratch's space): moved by the rebalancer to lxplus, hp167 died of CUDA OOM on a
+    $12$\,GB card (nothing recorded in DyHPO), $24$\,GB floor set (\code{sweep/set\_gpu\_mem.py}), owed trial added as
+    DAG \code{sweep\_0005}; when complete compare its best with the fixed points ($1.35\times10^{-3}$) and scratch
+    ($8.31\times10^{-4}$). \code{trendtests} (b): \code{tp3\_hmscr128k}/\code{tp3\_finfte128k\_uubar\_Zgggg\_d9} (hp15,
+    hp162, $128$k steps, CC, $\sim18$\,h); compare with their $32$k values ($8.31$, $13.5\times10^{-4}$); the last scratch
+    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: \code{tp3\_finale\_synhm\_v2}..\code{v5}
+    pretrainings (hp73, $64$k, CC, $\sim12$\,h); \textbf{next:} their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
+    ($8$k) and $10^4$ ($32$k), two fixed points (sweep/fixed_points.py), names \code{tp3\_fsv<V>fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}
+    (item \code{synthver} matches \code{tp3\_fsv*}); copy the \code{tp3\_fsynfte} configs with the parent path changed;
+    then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
+    maintain list (it cannot see other sites' results); rebalancer does not set lxplus GPU floors on what it moves (set
+    by hand for today's sweeps). CC was unreachable 09:05--15:30 on 10-12. Jean Zay: network fix pending.
     \emph{State (2026-10-11, 05:00):} \textbf{Items:} \code{synth32k} $96/96$, \code{addhoriz} $105/105$ (both written up);
     \code{contadd} $35/35$, \code{highmult} $254/254$, both written up. \textbf{Open questions for the user:}
     run children from the no-buffer methods' best-on-mix parents ($10$--$80$ steps in, practically the finale) or only from
