@@ -6,7 +6,7 @@ cell's own points, on ee->ttbar the D25 fixed points, where the finale ran the s
 at 10^4 the finale cell's own). Reference per cell: the finale at the same points, scratch (Z: the first 8 trials of
 tp3_hmscr[32k]; ee->ttbar: cells.scratch, the ladder's search, best_chosen at 32k), and on Z the finale+W pretraining
 (tp3_fwngfte[32k]). MSE of log|M|^2 at the best checkpoint. Data: scratch_sweeps.json.
-    python analysis/transfer/replay_children.py      -> figs/replay_children (gain over the finale against D); table
+    python analysis/transfer/replay_children.py      -> figs/replay_children_a.._c, _legend (gain over the finale against D); table
 """
 import json, math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -74,5 +74,6 @@ for (fg, ax), (p, lab) in zip(fig, PROBES):
     ax.set_xlabel(r"$\log_{10} D$")
     ax.set_ylabel(r"$\log_{10}(L_\mathrm{finale}/L)$")
     ps.process_label(ax, lab)
-ps.legend(fig[0][1], "upper left")
-ps.save_panels(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "replay_children"))
+base = os.path.join(ROOT, "analysis", "transfer", "figs", "replay_children")
+ps.legend_strip(fig[0][1], base + "_legend", ncol=3)
+ps.save_panels(fig, base)

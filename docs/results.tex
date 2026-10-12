@@ -5141,14 +5141,44 @@ $+0.17$ for these children; at $D=10^4$ both are within the one-seed spread, so 
 from having it from the start; the high-multiplicity grid's low-$D$ cells, where finale$+W$ gained $2$--$3\times$ over
 the finale, can. One seed.
 
-\emph{The same children at low $D$ (D39; partial, 2026-10-12 23:00, \code{replaylowd} $89/130$, collected from CC and
-lxplus; \code{analysis/transfer/replay\_children.py}).} $D=10^1$--$10^3$ on the $8$k grid, the same four parents and
-probes; on $e^+e^-\to t\bar t$ the finale was rerun at the children's two points (its $8$k cells were searches). So
-far, gain over the finale's child in dex: on $Z+4g$ the $10\%$ parents $-0.02$ to $+0.21$ ($D\le10^{2.5}$), on $Z+5g$
-$+0.01$ to $+0.34$ ($D\le10^{2.5}$); finale$+W$ pretrained from the start sits $0.2$--$0.5$\,dex above the finale on the
-same cells. On $t\bar t$ the children lose at $D=10^2$: $-0.16$ to $-0.45$\,dex for all four parents (and $-0.54$ for
-replay $10\%$ best on $W$ at $10^{1.5}$), within $\pm0.15$ elsewhere. The $1\%$ parents' $Z$ cells and every
-$D=10^3$ cell are still running; no verdict before they are in.
+\emph{The same children at low $D$ (complete, \code{replaylowd} $130/130$, collected from CC and lxplus 2026-10-13
+00:50; D39; \code{analysis/transfer/replay\_children.py}, Fig.~\ref{fig:replay_children}).} $D=10^1$--$10^3$ on the $8$k
+grid, the same four parents and probes; on $e^+e^-\to t\bar t$ the finale was rerun at the children's two points (its $8$k
+cells were searches). Gain over the finale's child, in dex ($D=10^4$ from above):
+\begin{center}\small
+\begin{tabular}{l rrrrrr rrrrrr}
+ & \multicolumn{6}{c}{$Z+4g$, $\log_{10}D=$} & \multicolumn{6}{c}{$Z+5g$, $\log_{10}D=$} \\
+ & $1$ & $1.5$ & $2$ & $2.5$ & $3$ & $4$ & $1$ & $1.5$ & $2$ & $2.5$ & $3$ & $4$ \\ \hline
+replay $1\%$, best on $W$     & $+0.05$ & $+0.21$ & $+0.27$ & $+0.27$ & $+0.20$ & $+0.09$ & $+0.33$ & $+0.39$ & $+0.31$ & $+0.23$ & $+0.20$ & $-0.04$ \\
+replay $1\%$, best on all $30$ & $-0.01$ & $+0.06$ & $+0.01$ & $+0.03$ & $+0.02$ & $+0.04$ & $+0.05$ & $+0.05$ & $+0.07$ & $-0.05$ & $-0.02$ & $-0.09$ \\
+replay $10\%$, best on $W$    & $+0.02$ & $+0.19$ & $+0.21$ & $+0.26$ & $+0.20$ & $+0.06$ & $+0.25$ & $+0.34$ & $+0.32$ & $+0.25$ & $+0.22$ & $-0.02$ \\
+replay $10\%$, best on all $30$ & $-0.02$ & $+0.05$ & $+0.17$ & $+0.14$ & $+0.11$ & $+0.07$ & $+0.01$ & $+0.28$ & $+0.20$ & $+0.09$ & $+0.11$ & $-0.07$ \\ \hline
+finale$+W$, pretrained        & $+0.18$ & $+0.31$ & $+0.48$ & $+0.52$ & $+0.49$ & $+0.22$ & $+0.54$ & $+0.27$ & $+0.30$ & $+0.42$ & $+0.33$ & $-0.06$ \\
+\end{tabular}
+\end{center}
+Adding $W+4g$, $W+5g$ late, with a replay buffer, keeps a large part of what having them in the pretraining gives: the
+two best-on-$W$ parents gain $0.2$--$0.4$\,dex ($1.6$--$2.5\times$) over the finale at every $D$ from $10^{1.5}$ to
+$10^3$ on both probes, against $0.3$--$0.5$\,dex for finale$+W$ on $Z+4g$ and about the same as finale$+W$ on $Z+5g$; the
+gain fades to zero at $10^4$, as finale$+W$'s does. The buffer size does not matter ($1\%$ and $10\%$ within
+$0.07$\,dex of each other). The best-on-all-$30$ parents gain little or nothing: replay $1\%$'s is the step-$200$
+checkpoint, the finale with $200$ steps of $W$ ($\le0.07$\,dex), replay $10\%$'s ($2$k, step $2\,000$) half of the
+best-on-$W$ gain. So the more a parent has learned $W$, the more its child gains on $Z+ng$. On $e^+e^-\to t\bar t$, outside
+both families, the children move both ways without a pattern: from $-0.54$ to $+0.60$\,dex over the cells
+($D=10^2$: $-0.16$ to $-0.45$; $10^3$: $+0.14$ to $+0.60$), the four parents' median over the six values of $D$ between
+$-0.10$ and $+0.13$. No sign that the late addition costs the unrelated probe, at a one-seed spread of about
+$\pm0.5$\,dex on these cells. One seed per point.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/replay_children_legend.pdf}\\
+\widerow{\pnl{../analysis/transfer/figs/replay_children_a.pdf}\hfill\pnl{../analysis/transfer/figs/replay_children_b.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/replay_children_c.pdf}
+\caption{Children of the add-$W$ replay parents: gain over the finale's child of the same cell,
+$\log_{10}(L_\text{finale}/L)$, against $D$, on $Z+4g$ (a), $Z+5g$ (b) and $e^+e^-\to t\bar t$ (c), and on $Z$ the
+finale$+W$ pretraining's. $8$k steps to $D=10^3$, $32$k at $10^4$; each cell the best of two points, the same for
+every arm of the cell.}
+\label{fig:replay_children}
+\end{figure}
 
 \begin{figure}[H]
 \centering
