@@ -62,9 +62,11 @@ Names and versions. The name selects the version, so a recipe can mix them:
   v6  (D40) Spinor-helicity numerators and the tree-level selection rules, on v5r2's diagrams (ggH vertex
       included; general legs as v4, or the target shape as v5 with the t tag). Every leg carries a helicity in the
       all-outgoing convention: fermions +-1/2, g and gamma +-1, Z and W -1, 0, +1, H 0. A massive leg's spinors are
-      those of its massless projection p - m^2/(2 p.r) r, r = alpha (p_a + p_b) + p null: in the centre-of-mass frame
-      the helicity quantised along the momentum, symmetric in the beams and the same in every term (a reference
-      that changed between terms would mix helicity bases and break Lorentz invariance). Per configuration and
+      those of the light-cone component of its momentum along its direction in the centre-of-mass frame,
+      p_flat = (E + |k|)/2 (1, k/|k|) there (p = p_flat + m^2/(2 p_flat.q) q, q null against it; p_flat -> p as
+      m -> 0): the helicity quantised along the momentum in the CM frame, symmetric in the beams and the same in
+      every term (a reference that changed between terms would mix helicity bases and break Lorentz invariance).
+      The opposite component (1, -k/|k|) would put p_flat exactly on the other final particle of a 2->2 process. Per configuration and
       orbit representative a numerator c * a * monomial(<ij>, [ij]) * s^(-k/2) (_V6_MONOS = 1 monomial: the
       configuration sum already gives each diagram many independent random structures) with
         weights: angle minus square count of leg i = -2 h_i, so A goes to t^(-2 h_i) A when lambda_i goes to
@@ -1561,21 +1563,22 @@ def _numerators_v6(rng, st, out):
 def _spinor_brackets(P, m_legs, lg=None):
     """Bracket table (B, 2 N^2): column (typ*N + i)*N + j holds <ij> (typ 0) or [ij] (typ 1) (1 on the unused
     diagonal), and s = (p_a + p_b)^2 (B,). Spinors of the physical (positive-energy) momenta, [ij] = conj(<ij>), |<ij>|^2 = 2 p_i.p_j.
-    A massive leg enters through its massless projection p_flat = p - m^2/(2 p.r) r with r = alpha P + p null,
-    P = p_a + p_b: in the centre-of-mass frame r points along the particle and p_flat against it, so its helicity
-    is the usual one (quantised along the momentum in the CM frame), the same for every term and symmetric in the
-    beams. lg (N,) scales lambda_i -> t lambda_i, lambda~_i -> lambda~_i / t (the little-group test)."""
+    A massive leg enters through p_flat, its light-cone component along its CM-frame direction ((E + |k|)/2 (1, k/|k|)
+    in the CM frame, P = p_a + p_b), so its helicity is the usual one (quantised along the momentum in the CM
+    frame), the same for every term and symmetric in the beams. lg (N,) scales lambda_i -> t lambda_i, lambda~_i -> lambda~_i / t (the little-group test)."""
     P = np.asarray(P, np.float64)
     B, N = P.shape[:2]
     m2 = np.array([m * m for m in m_legs], float)
     Pt = P[:, 0] + P[:, 1]
     s_tot = _mink2(Pt)
     pf = P.copy()
+    u = Pt / np.sqrt(s_tot)[:, None]
     for l in np.flatnonzero(m2 > 0):
-        Pp = _dot(Pt, P[:, l])
-        alpha = (-Pp + np.sqrt(np.maximum(Pp * Pp - s_tot * m2[l], 0.0))) / s_tot
-        r = alpha[:, None] * Pt + P[:, l]
-        pf[:, l] = P[:, l] - (m2[l] / (2 * _dot(P[:, l], r)))[:, None] * r
+        # in the CM frame p_flat = (E + |k|)/2 (1, k/|k|), the light-cone component along the momentum (p_flat -> p as
+        # m -> 0): p_flat = (E + |k|)/(2|k|) p - m^2/(2|k|) u, u = P/sqrt(s), E = p.u, |k| = sqrt(E^2 - m^2)
+        E = _dot(P[:, l], u)
+        k = np.sqrt(np.maximum(E * E - m2[l], 1e-300))
+        pf[:, l] = ((E + k) / (2 * k))[:, None] * P[:, l] - (m2[l] / (2 * k))[:, None] * u
     E, x, y, z = pf[..., 0], pf[..., 1], pf[..., 2], pf[..., 3]
     up = z >= 0
     sp = np.sqrt(np.maximum(E + z, 0.0))
