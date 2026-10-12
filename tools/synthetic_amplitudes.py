@@ -85,8 +85,8 @@ Names and versions. The name selects the version, so a recipe can mix them:
       external leg massless and no scalar, configurations with fewer than two negative or two positive helicities
       vanish. A diagram contributes only to the configurations its lines allow; a configuration no image allows is
       exactly zero. |M|^2 = (1/4) sum over configurations of (|A|^2 + |A^P|^2)/2, A^P the parity image (every
-      angle bracket swapped with the square one, i.e. |A| at the spatially inverted momenta); a configuration whose
-      parity partner has every term paired shares its numerators, conjugated, with it. Above _V6_TERMS_MAX evaluated
+      angle bracket swapped with the square one, i.e. |A| at the spatially inverted momenta); a diagram allowed at
+      both a configuration and its parity partner gives the partner its numerator conjugated (one draw per pair). Above _V6_TERMS_MAX evaluated
       terms (parity units x orbit representatives x |Pi|), whole orbits are dropped uniformly.
 
   v2  K grows with multiplicity. K = floor(exp U[0, ln(K_cap + 1))) (log-uniform on 1..K_cap),
@@ -1136,14 +1136,17 @@ def _legal_orbits(rng, out, N, protected, mass, hgg, perms, cap):
                 keep.append(int(i))
                 k += reps[i][2]
         return [reps[i] for i in sorted(keep)], count, k, True
-    k = 0
-    for _ in range(50 * cap):                              # too many to list: uniform trees, whole orbits
-        r = add(sample(rng))
-        if r is None:
+    k, misses = 0, 0
+    for _ in range(50 * cap):          # too many to list: uniform trees (orbits in proportion to their size), whole
+        r = add(sample(rng))           # orbits while they fit; stops after 500 draws in a row add nothing
+        if r is None or k + r[2] > cap:
+            misses += 1
+            if misses >= 500:
+                break
             continue
-        if k + r[2] <= cap:
-            reps.append(r)
-            k += r[2]
+        misses = 0
+        reps.append(r)
+        k += r[2]
         if k >= 0.95 * cap:
             break
     return reps, count, k, True
