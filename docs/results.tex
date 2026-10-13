@@ -4943,12 +4943,19 @@ $9.18\times10^{-2}$, started 20:34). The
 fixed-point cells use no search; at $D\le10^{3}$ two points of the paper's window against an $8$-trial scratch search.
 
 \emph{Why the gain shrinks with $D$: the horizon test at $D=10^3$ (D38, \code{trendtests}; 2026-10-12 19:10, $9$ of the
-item's $12$ runs: scratch $7$ of $8$, the finale $2$ of $2$; the $128$k pair at $D=10^{4.5}$ still running).} The grid
+item's $12$ runs: scratch $7$ of $8$, the finale $2$ of $2$; the $128$k pair at $D=10^{4.5}$ complete 2026-10-13).} The grid
 trains $8$k steps up to $D=10^3$ and $32$k from $10^{3.5}$, and the gain falls fastest across that boundary
 ($Z+4g$: $+0.48$ to $+0.21$\,dex). The $Z+4g$ cell at $D=10^3$ rerun at $32$k: scratch $3.73\times10^{-2}$ (best of
 $7$; $3.94\times10^{-2}$ at $8$k), the finale $1.32\times10^{-2}$ ($1.32\times10^{-2}$ at $8$k), a gain of $+0.45$\,dex
 against $+0.48$. The horizon change does not explain the fall: at $D=10^3$ neither arm uses the extra steps (the
 finale's best checkpoints at steps $1\,920$ and $2\,560$, scratch's at $3\,520$--$8\,640$, all far before $32$k).
+The second test, $Z+4g$ at $D=10^{4.5}$ at $128$k steps instead of $32$k, each arm at its $32$k cell's best point
+(scratch hp15, the finale hp162; complete 2026-10-13 11:48, CC): scratch $8.70\times10^{-4}$ ($8.31\times10^{-4}$ at
+$32$k, best step $51\,200$), the finale $1.23\times10^{-3}$ ($1.35\times10^{-3}$, best step $34\,560$), a gain of
+$-0.15$\,dex against $-0.21$. Four times the steps moves neither arm by more than $10\%$, and both stop improving
+near $35$--$50$k steps, so at $10^{4.5}$ events the cell is limited by its data, not its horizon. Neither test finds
+a horizon effect; what moved this cell was the finale's fixed points (next paragraph: a search reaches
+$9.32\times10^{-4}$). One seed each.
 
 \emph{The fixed points against a search on one cell (D35; complete, $8/8$, CC and lxplus, 2026-10-13 05:30).} The finale
 on $Z+4g$ at $D=10^{4.5}$, $32$k, an $8$-trial search over scratch's own space (the search ran split between CC and
