@@ -887,9 +887,16 @@ def _plan(st):
         pl["pid"] = (rel * (1 << np.arange(nsp - 1))[None, None, :]).sum(-1) if nsp > 1 else np.zeros((T, H), int)
         pl["s0"] = sig[:, :, 0].astype(float)
         pl["patterns"] = sorted(set(pl["pid"].reshape(-1).tolist()))
-    pl["sparse"] = _sparse_rows(pl, T, H, nsp, nP, K, bool(st.get("coherent")))
+    sp = _sparse_rows(pl, T, H, nsp, nP, K, bool(st.get("coherent")))
+    # the sparse sums pay off when the (group, s-power, monomial) rows compress the images; else elementwise
+    rows = sum(x["S_re"].shape[0] for x in sp)
+    pl["sparse"] = sp if (os.environ.get("SYN_SPARSE", "auto") == "on" or
+                          (os.environ.get("SYN_SPARSE", "auto") == "auto" and rows < _SPARSE_RATIO * H * T)) else None
     _PLANS[st["sha"]] = pl
     return pl
+
+
+_SPARSE_RATIO = float(os.environ.get("SYN_SPARSE_RATIO", "1.0"))
 
 
 def _sparse_rows(pl, T, H, nsp, nP, K, coherent):
@@ -1008,15 +1015,38 @@ def _eval_chunk(st, pl, P, scale):
         Bv = np.ones((B, pl["nbr"] + 1), np.complex128)
         Bv[:, :-1] = brackets(q, pl["bi"], pl["bk"], pl["ba"], pl["bb"], pl["soft"])
         bj = [Bv[:, pl["bidx"][:, j]] for j in range(nsp)]
-        # the bracket product of every sign pattern, once per chunk (not once per helicity row): pattern bit j - 1
-        # conjugates bracket j relative to bracket 0; a row with a negative first sign takes the conjugate
-        prod = {}
-        for pat in pl["patterns"]:
-            b = bj[0].copy()
-            for j in range(1, nsp):
-                b *= np.conj(bj[j]) if (pat >> (j - 1)) & 1 else bj[j]
-            prod[pat] = b
+        if pl["sparse"] is not None:
+            # the bracket product of every sign pattern, once per chunk (not once per helicity row): pattern bit
+            # j - 1 conjugates bracket j relative to bracket 0; a row with a negative first sign takes the conjugate
+            prod = {}
+            for pat in pl["patterns"]:
+                b = bj[0].copy()
+                for j in range(1, nsp):
+                    b *= np.conj(bj[j]) if (pat >> (j - 1)) & 1 else bj[j]
+                prod[pat] = b
     total = np.zeros(B)
+    if pl["sparse"] is None:
+        for h in range(pl["H"]):
+            qi, a = pl["qidx"][:, h], pl["a"][:, h]
+            poly = a[None, :, 0] * Q[:, qi[:, 0]]
+            poly += a[None, :, 1] * Q[:, qi[:, 1]]
+            poly += a[None, :, 2] * Q[:, qi[:, 2]]
+            poly *= spow[:, pl["kinv"][:, h]]
+            X = (dinv[:, grp] if (grp is not None and not nsp) else dinv) * (pl["c"][None, :, h] * poly)
+            if nsp:
+                b = bj[0].real + 1j * (pl["sig"][None, :, h, 0] * bj[0].imag)
+                for j in range(1, nsp):
+                    b *= bj[j].real + 1j * (pl["sig"][None, :, h, j] * bj[j].imag)
+                # the parity image (every bracket conjugated) with equal weight: |M|^2 parity even, as an unpolarised
+                # QCD/QED sum, the azimuthal correlations kept in the interference. With U = sum X Re(br),
+                # V = sum X Im(br): (|U + iV|^2 + |U - iV|^2) / 2 = |U|^2 + |V|^2
+                U = (X * b.real).reshape(B, cs, -1).sum(-1)
+                V = (X * b.imag).reshape(B, cs, -1).sum(-1)
+                total += (U.real ** 2 + U.imag ** 2 + V.real ** 2 + V.imag ** 2).sum(-1)
+            else:   # revision 2: one coherent sum over every labelled diagram (all images of every orbit)
+                A = X.reshape(B, cs, -1).sum(-1)
+                total += (A.real ** 2 + A.imag ** 2).sum(-1)
+        return _finish(st, total, coherent, nP, a_s)
     dT = np.ascontiguousarray(dinv.T)                       # (T, B)
     if nsp:
         Yre = np.concatenate([dT * prod[k].real.T for k in pl["patterns"]], 0)
@@ -1032,6 +1062,10 @@ def _eval_chunk(st, pl, P, scale):
         else:
             A = np.add.reduceat((sp["S_re"] @ dT) * F, sp["gstart"], axis=0)
             total += (A.real ** 2 + A.imag ** 2).sum(0)
+    return _finish(st, total, coherent, nP, a_s)
+
+
+def _finish(st, total, coherent, nP, a_s):
     if not coherent:
         total /= nP
     if st.get("coupling_mode", "global") == "global":
