@@ -4950,11 +4950,16 @@ $7$; $3.94\times10^{-2}$ at $8$k), the finale $1.32\times10^{-2}$ ($1.32\times10
 against $+0.48$. The horizon change does not explain the fall: at $D=10^3$ neither arm uses the extra steps (the
 finale's best checkpoints at steps $1\,920$ and $2\,560$, scratch's at $3\,520$--$8\,640$, all far before $32$k).
 
-\emph{The fixed points against a search on one cell (D35; partial, 2026-10-12 23:55, $4$ of $8$ trials, CC and lxplus).}
-The finale on $Z+4g$ at $D=10^{4.5}$, $32$k, an $8$-trial search over scratch's own space: best so far
-$1.28\times10^{-3}$ (lr $3.2\times10^{-4}$, still improving at step $32$k), then $1.54$, $1.86$, $3.94\times10^{-3}$;
-the cell's two fixed points gave $1.35\times10^{-3}$, scratch's search $8.31\times10^{-4}$. Half-way, the search
-recovers $0.02$\,dex of the $0.21$ the finale trails scratch by; verdict when all $8$ are in.
+\emph{The fixed points against a search on one cell (D35; complete, $8/8$, CC and lxplus, 2026-10-13 05:30).} The finale
+on $Z+4g$ at $D=10^{4.5}$, $32$k, an $8$-trial search over scratch's own space (the search ran split between CC and
+lxplus after a rebalance, so the two halves suggested from separate DyHPO states). Best $9.32\times10^{-4}$ (lr
+$3.8\times10^{-3}$, $\lambda=7.6\times10^{-7}$, EMA on, still improving at step $32$k), then $1.28$, $1.54$, $1.86\times10^{-3}$;
+the cell's two fixed points gave $1.35\times10^{-3}$, scratch's search $8.31\times10^{-4}$. The search recovers
+$0.16$ of the $0.21$\,dex the finale trailed scratch by: the finale is $-0.05$\,dex from scratch, inside one seed. So at
+this cell the negative gain was mostly the fixed points: the best fine-tune sits at a regularisation three decades
+above them ($\lambda\approx3\times10^{-10}$) and a higher lr, outside what the paper's landscape (fit on lower
+multiplicities and smaller $D$) chose. The fall of the gain to zero with $D$ stands; that it goes below zero at
+$D\ge10^{4.5}$ does not, at least on this cell. One seed.
 
 \begin{figure}[t]
 \centering
