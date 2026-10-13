@@ -1,0 +1,126 @@
+%=========================================================================
+%  Foundational Amplitudes, informal weekly update (October 2026)
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}{../../analysis/transfer/figs/}}
+
+\definecolor{navy}{RGB}{38,38,110}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+\begin{document}
+
+\begin{frame}{Lever arms}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{levers_accum_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levers_accum_a.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levers_accum_b.pdf}
+\end{frame}
+
+\begin{frame}{Lever arms}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{levers_accum_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levers_accum_c.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levers_accum_d.pdf}
+\end{frame}
+
+\begin{frame}{Feynman diagram encoders}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{levdiagl_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_b.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_c.pdf}
+\end{frame}
+
+\begin{frame}{Per process gradient accumulation}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{accrr_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{accrr_b.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{accrr_c.pdf}
+\end{frame}
+
+\begin{frame}{Finale and synthetic pretraining}
+  \centering
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{finale_synth_a.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{finale_synth_b.pdf}
+\end{frame}
+
+\begin{frame}{Synthetic pretraining at 32k}
+  \centering
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{synth32k_a.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{synth32k_b.pdf}
+\end{frame}
+
+\begin{frame}{High multiplicity}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{highmult.pdf}
+\end{frame}
+
+\begin{frame}{High multiplicity}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{highmult_gain.pdf}
+\end{frame}
+
+\begin{frame}{Adding W to a pretrained model}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{waddm_tradeoff_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{waddm_tradeoff_a.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{waddm_tradeoff_b.pdf}
+\end{frame}
+
+\begin{frame}{Adding W to a pretrained model}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{replay_children_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{replay_children_a.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{replay_children_b.pdf}
+\end{frame}
+
+\begin{frame}{Unrelated process after adding W}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{replay_children_c.pdf}
+\end{frame}
+
+\begin{frame}{Synthetic generator speed}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{synth_rates.pdf}
+\end{frame}
+
+\begin{frame}{Open ends}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.8\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.9em}
+        \item Fixed fine tune points too weak at high multiplicity and large D
+        \item Target shaped synthetic data hurts at small D
+        \item Synthetic v2 and v3 and v6 still to fine tune
+        \item Seeds for the add W children
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\end{document}
