@@ -24,6 +24,7 @@ KS = [2, 3, 4, 5, 6, 8]
 def pts(n):
     """Best of the cell's expected points, None until both are in."""
     tr = [t for t in S.get(n, []) if t.get("val_loss") is not None and t.get("prepd_std") and t["hp"] in E.get(n, [])]
+    assert len(tr) <= 2, (n, [t["hp"] for t in tr])
     return min(t["val_loss"] * t["prepd_std"] ** 2 for t in tr) if len(tr) == 2 else None
 
 
