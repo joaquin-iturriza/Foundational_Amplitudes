@@ -887,16 +887,15 @@ def _plan(st):
         pl["pid"] = (rel * (1 << np.arange(nsp - 1))[None, None, :]).sum(-1) if nsp > 1 else np.zeros((T, H), int)
         pl["s0"] = sig[:, :, 0].astype(float)
         pl["patterns"] = sorted(set(pl["pid"].reshape(-1).tolist()))
-    sp = _sparse_rows(pl, T, H, nsp, nP, K, bool(st.get("coherent")))
-    # the sparse sums pay off when the (group, s-power, monomial) rows compress the images; else elementwise
-    rows = sum(x["S_re"].shape[0] for x in sp)
-    pl["sparse"] = sp if (os.environ.get("SYN_SPARSE", "auto") == "on" or
-                          (os.environ.get("SYN_SPARSE", "auto") == "auto" and rows < _SPARSE_RATIO * H * T)) else None
+    # the sparse sums pay off when the (group, s-power, monomial) rows compress the images; else elementwise.
+    # SYN_SPARSE=on/off forces either, SYN_SPARSE_RATIO moves the rule (speed only, the values are the same)
+    mode = os.environ.get("SYN_SPARSE", "auto")
+    sp = _sparse_rows(pl, T, H, nsp, nP, K, bool(st.get("coherent"))) if mode != "off" else None
+    ratio = float(os.environ.get("SYN_SPARSE_RATIO", "1.0"))
+    pl["sparse"] = sp if (sp is not None and (mode == "on" or
+                                              sum(x["S_re"].shape[0] for x in sp) < ratio * H * T)) else None
     _PLANS[st["sha"]] = pl
     return pl
-
-
-_SPARSE_RATIO = float(os.environ.get("SYN_SPARSE_RATIO", "1.0"))
 
 
 def _sparse_rows(pl, T, H, nsp, nP, K, coherent):
@@ -915,7 +914,7 @@ def _sparse_rows(pl, T, H, nsp, nP, K, coherent):
     res = []
     for h in range(H):
         pidx = (np.array([pcol[x] for x in pl["pid"][:, h]]) if nsp else np.zeros(T, np.int64))
-        rows_t, cols, vals_re, vals_im, keys = [], [], [], [], []
+        cols, vals_re, vals_im, keys = [], [], [], []
         for m in range(3):
             a = pl["a"][:, h, m]
             ok = a != 0
@@ -935,6 +934,8 @@ def _sparse_rows(pl, T, H, nsp, nP, K, coherent):
         rq = uk % len(pl["qa"])
         rk = (uk // len(pl["qa"])) % len(pl["ku"])
         rg = uk // (len(pl["qa"]) * len(pl["ku"]))
+        if len(np.unique(rg)) != (1 if coherent else nP):   # reduceat needs every group non-empty: elementwise
+            return None
         res.append({"S_re": S_re, "S_im": S_im, "rq": rq, "rk": rk, "rg": rg,
                     "gstart": np.searchsorted(rg, np.arange(1 if coherent else nP))})
     return res
