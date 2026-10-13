@@ -875,8 +875,62 @@ def _plan(st):
           "bi": np.array([k[0] for k, _ in br], np.int64), "bk": np.array([k[1] for k, _ in br], np.int64),
           "ba": np.array([k[2] for k, _ in br], np.int64), "bb": np.array([k[3] for k, _ in br], np.int64),
           "soft": soft}
+    # images with the same propagators and couplings (a stabiliser's images of one labelled diagram, revision 2)
+    # share one propagator product, computed once and gathered (bitwise the same values)
+    key = np.concatenate([den.astype(float), const[:, None], as_pow[:, None]], 1)
+    uk, grp = np.unique(key, axis=0, return_inverse=True)
+    if len(uk) < 0.8 * T:
+        pl["dgrp"] = grp.reshape(-1)
+        pl["den_u"], pl["const_u"], pl["aspow_u"] = uk[:, :-2].astype(np.int64), uk[:, -2], uk[:, -1]
+    if nsp:                          # bracket products by sign pattern relative to the first bracket (_eval_chunk)
+        rel = (sig[:, :, 1:] * sig[:, :, :1]) < 0           # (T, H, nsp-1): conjugate bracket j relative to 0
+        pl["pid"] = (rel * (1 << np.arange(nsp - 1))[None, None, :]).sum(-1) if nsp > 1 else np.zeros((T, H), int)
+        pl["s0"] = sig[:, :, 0].astype(float)
+        pl["patterns"] = sorted(set(pl["pid"].reshape(-1).tolist()))
+    pl["sparse"] = _sparse_rows(pl, T, H, nsp, nP, K, bool(st.get("coherent")))
     _PLANS[st["sha"]] = pl
     return pl
+
+
+def _sparse_rows(pl, T, H, nsp, nP, K, coherent):
+    """The numerator sums of Eq. (syn) as sparse matrices, one per helicity row h (and per real/imaginary bracket
+    part): sum_t X_t br_t = sum_rows spow_k Q_q (S_h Y)_row, rows = (permutation group, s-power k, monomial q),
+    columns = (sign pattern, image t), entries c a (times the first bracket's sign for the imaginary part), Y the
+    per-event propagators times the pattern's bracket product. Same terms as the elementwise sums, summed in another
+    order (labels equal to rounding, tests/test_synthetic_versions.py and the before/after check)."""
+    from scipy import sparse
+    npat = len(pl["patterns"]) if nsp else 1
+    pcol = {p: i for i, p in enumerate(pl["patterns"])} if nsp else {0: 0}
+    t = np.arange(T)
+    g = np.zeros(T, np.int64) if coherent else t // K
+    # without brackets a column is a propagator product: images sharing one (the stabiliser's) share the column
+    tcol, ncol = (pl["dgrp"], len(pl["const_u"])) if (not nsp and "dgrp" in pl) else (t, T)
+    res = []
+    for h in range(H):
+        pidx = (np.array([pcol[x] for x in pl["pid"][:, h]]) if nsp else np.zeros(T, np.int64))
+        rows_t, cols, vals_re, vals_im, keys = [], [], [], [], []
+        for m in range(3):
+            a = pl["a"][:, h, m]
+            ok = a != 0
+            q = pl["qidx"][:, h, m]
+            key = (g * len(pl["ku"]) + pl["kinv"][:, h]) * len(pl["qa"]) + q
+            keys.append(key[ok])
+            cols.append((pidx * ncol + tcol)[ok])
+            w = (pl["c"][:, h] * a)[ok]
+            vals_re.append(w)
+            vals_im.append(w * (pl["s0"][ok, h] if nsp else 1.0))
+        key = np.concatenate(keys)
+        uk, row = np.unique(key, return_inverse=True)
+        col = np.concatenate(cols)
+        shape = (len(uk), npat * ncol)
+        S_re = sparse.csr_matrix((np.concatenate(vals_re), (row, col)), shape=shape)
+        S_im = sparse.csr_matrix((np.concatenate(vals_im), (row, col)), shape=shape) if nsp else None
+        rq = uk % len(pl["qa"])
+        rk = (uk // len(pl["qa"])) % len(pl["ku"])
+        rg = uk // (len(pl["qa"]) * len(pl["ku"]))
+        res.append({"S_re": S_re, "S_im": S_im, "rq": rq, "rk": rk, "rg": rg,
+                    "gstart": np.searchsorted(rg, np.arange(1 if coherent else nP))})
+    return res
 
 
 def _dot(x, y):
@@ -934,12 +988,17 @@ def _eval_chunk(st, pl, P, scale):
     if half.any():
         val[:, half] = np.where(M[half] > 0, np.sqrt(val[:, half]), np.sqrt(np.abs(s[:, half])))
     inv = 1.0 / val
-    dinv = inv[:, pl["den"][:, 0]]
-    for j in range(1, pl["den"].shape[1]):
-        dinv *= inv[:, pl["den"][:, j]]
     a_s = _alpha_s(P, scale)
+    grp = pl.get("dgrp")
+    den, const, aspow = ((pl["den_u"], pl["const_u"], pl["aspow_u"]) if grp is not None else
+                         (pl["den"], pl["const"], pl["as_pow"]))
+    dinv = inv[:, den[:, 0]]
+    for j in range(1, den.shape[1]):
+        dinv *= inv[:, den[:, j]]
     if st.get("coupling_mode", "global") == "vertex":
-        dinv *= pl["const"][None, :] * a_s[:, None] ** pl["as_pow"][None, :]
+        dinv *= const[None, :] * a_s[:, None] ** aspow[None, :]
+    if grp is not None and nsp:
+        dinv = dinv[:, grp]
     pairs = pl["pairs"]
     SP = np.ones((B, len(pairs) + 1))
     SP[:, :-1] = _mink2(q[:, pairs[:, 0]] + q[:, pairs[:, 1]])
@@ -948,30 +1007,31 @@ def _eval_chunk(st, pl, P, scale):
     if nsp:
         Bv = np.ones((B, pl["nbr"] + 1), np.complex128)
         Bv[:, :-1] = brackets(q, pl["bi"], pl["bk"], pl["ba"], pl["bb"], pl["soft"])
-        Bre = [Bv.real[:, pl["bidx"][:, j]] for j in range(nsp)]
-        Bim = [Bv.imag[:, pl["bidx"][:, j]] for j in range(nsp)]
-    total = np.zeros(B)
-    for h in range(pl["H"]):
-        qi, a = pl["qidx"][:, h], pl["a"][:, h]
-        poly = a[None, :, 0] * Q[:, qi[:, 0]]
-        poly += a[None, :, 1] * Q[:, qi[:, 1]]
-        poly += a[None, :, 2] * Q[:, qi[:, 2]]
-        poly *= spow[:, pl["kinv"][:, h]]
-        X = dinv * (pl["c"][None, :, h] * poly)
-        if nsp:
-            br = Bre[0] + 1j * (pl["sig"][None, :, h, 0] * Bim[0])
+        bj = [Bv[:, pl["bidx"][:, j]] for j in range(nsp)]
+        # the bracket product of every sign pattern, once per chunk (not once per helicity row): pattern bit j - 1
+        # conjugates bracket j relative to bracket 0; a row with a negative first sign takes the conjugate
+        prod = {}
+        for pat in pl["patterns"]:
+            b = bj[0].copy()
             for j in range(1, nsp):
-                br *= Bre[j] + 1j * (pl["sig"][None, :, h, j] * Bim[j])
-            # the parity image (every bracket conjugated) with equal weight: |M|^2 parity even, as an unpolarised
-            # QCD/QED sum, the azimuthal correlations kept in the interference. With U = sum X Re(br),
-            # V = sum X Im(br): (|U + iV|^2 + |U - iV|^2) / 2 = |U|^2 + |V|^2
-            # revision 2: one coherent sum over every labelled diagram (all permutation images of every orbit)
-            U = (X * br.real).reshape(B, cs, -1).sum(-1)
-            V = (X * br.imag).reshape(B, cs, -1).sum(-1)
-            total += (U.real ** 2 + U.imag ** 2 + V.real ** 2 + V.imag ** 2).sum(-1)
+                b *= np.conj(bj[j]) if (pat >> (j - 1)) & 1 else bj[j]
+            prod[pat] = b
+    total = np.zeros(B)
+    dT = np.ascontiguousarray(dinv.T)                       # (T, B)
+    if nsp:
+        Yre = np.concatenate([dT * prod[k].real.T for k in pl["patterns"]], 0)
+        Yim = np.concatenate([dT * prod[k].imag.T for k in pl["patterns"]], 0)
+    for h in range(pl["H"]):
+        sp = pl["sparse"][h]
+        F = (spow[:, sp["rk"]] * Q[:, sp["rq"]]).T            # (rows, B): s^(-k/2) times the monomial
+        if nsp:
+            # U = sum X Re(br), V = sum X Im(br); |M|^2 parity even through (|U + iV|^2 + |U - iV|^2) / 2
+            U = np.add.reduceat((sp["S_re"] @ Yre) * F, sp["gstart"], axis=0)
+            V = np.add.reduceat((sp["S_im"] @ Yim) * F, sp["gstart"], axis=0)
+            total += (U.real ** 2 + U.imag ** 2 + V.real ** 2 + V.imag ** 2).sum(0)
         else:
-            A = X.reshape(B, cs, -1).sum(-1)
-            total += (A.real ** 2 + A.imag ** 2).sum(-1)
+            A = np.add.reduceat((sp["S_re"] @ dT) * F, sp["gstart"], axis=0)
+            total += (A.real ** 2 + A.imag ** 2).sum(0)
     if not coherent:
         total /= nP
     if st.get("coupling_mode", "global") == "global":
