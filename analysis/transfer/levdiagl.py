@@ -21,11 +21,11 @@ import plot_style as ps  # noqa: E402
 EXP = json.load(open(os.path.join(ROOT, "analysis", "transfer", "expect_tp3.json")))
 # (pretraining, fine-tune family, label, colour, marker)
 ARMS = [("tp3_levdiag", "tp3_levdiag", "diagrams, our encoder", ps.C.blue, "o"),
-        ("tp3_levdiagl", "tp3_levdiagl", "diagrams, arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
+        ("tp3_levdiagl", "tp3_levdiagl", "diagrams, Daniel's arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
 NAME = "levdiagl"
 if sys.argv[1:] == ["accum"]:
-    ARMS = [("tp3_accum_r9", "tp3_accum", "accumulation, first", ps.C.blue, "o"),
-            ("tp3_accrr_r9", "tp3_accrr", "accumulation as in arXiv:2606.23791", ps.C.vermillion, "s")]
+    ARMS = [("tp3_accum_r9", "tp3_accum", "gradient accumulation, ours", ps.C.blue, "o"),
+            ("tp3_accrr_r9", "tp3_accrr", "gradient accumulation, Daniel's arXiv:2606.23791", ps.C.vermillion, "s")]
     NAME = "accrr"
 
 

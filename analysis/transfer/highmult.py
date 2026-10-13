@@ -65,7 +65,7 @@ for ax, (p, lab) in zip(axs, PROBES):
     ax.set_xlabel(r"$\log_{10} D$")
     ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(ax, lab)
-ps.legend(axs[0], "lower left")
+ps.shared_legend(fig, axs[0], ncol=5)
 ps.save(fig, base)
 
 fig, axs = ps.figure(ncols=2)
