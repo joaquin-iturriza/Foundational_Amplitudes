@@ -6278,6 +6278,27 @@ processes, bars the range) and of MadGraph on the same lxplus node (dashed: $Z$,
 \label{fig:synth_rates}
 \end{figure}
 
+\paragraph{Fine-tuned, first versions in (partial, 2026-10-13 10:30; v4r2 and v5r2 of four, collected from CC).} Each
+revision-$2$ pretraining (the finale plus that version's eight $2\to5$, $2\to6$ processes, hp73, $64$k) fine-tuned on
+$Z+4g$, $Z+5g$ at the v1 synthetic cells' own two points, so only the pretraining differs. Gain over the finale's child,
+in dex (finale$+W$ for reference):
+\begin{center}\small
+\begin{tabular}{l rrr rrr}
+ & \multicolumn{3}{c}{$Z+4g$, $D=$} & \multicolumn{3}{c}{$Z+5g$, $D=$} \\
+ & $10^2$ & $10^3$ & $10^4$ & $10^2$ & $10^3$ & $10^4$ \\ \hline
+v1 (version $1$)  & $-0.02$ & $+0.15$ & $+0.08$ & $-0.03$ & $+0.11$ & $-0.07$ \\
+v4r2              & $-0.03$ & $+0.07$ & $+0.07$ & $+0.03$ & $+0.06$ & $-0.01$ \\
+v5r2 (target shape) & $-0.61$ & $-0.05$ & $+0.11$ & $-0.71$ & $+0.02$ & $+0.04$ \\ \hline
+finale$+W$        & $+0.49$ & $+0.50$ & $+0.22$ & $+0.30$ & $+0.33$ & $-0.06$ \\
+\end{tabular}
+\end{center}
+The collinear and soft structure (v4r2) changes nothing measurable against v1. The target-shaped version is \emph{worse}
+at $D=10^2$, by $4$--$5\times$ against the finale ($Z+5g$ even $0.08$\,dex below scratch), and level from $10^3$ on. Its
+eight processes include $q\bar q\to Z+4g$ and $Z+5g$ with exactly the probes' particles and order vector but a
+synthetic $|\mathcal M|^2$: the pretrained model has learned a wrong function for the very input the probe presents,
+and with $10^2$ events and $2\,816$ steps the fine-tune cannot unlearn it. A synthetic process that coincides with a
+real one in every input the model sees is a wrong label, not a prior. v2r2 and v3r2 still pretraining; one seed.
+
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
 Any one-loop amplitude decomposes into a few universal scalar integrals with process-dependent coefficients,
 \begin{equation*}
