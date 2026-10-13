@@ -5420,13 +5420,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     DAG \code{sweep\_0005}; when complete compare its best with the fixed points ($1.35\times10^{-3}$) and scratch
     ($8.31\times10^{-4}$). \code{trendtests} (b): \code{tp3\_hmscr128k}/\code{tp3\_finfte128k\_uubar\_Zgggg\_d9} (hp15,
     hp162, $128$k steps, CC, $\sim18$\,h); compare with their $32$k values ($8.31$, $13.5\times10^{-4}$); the last scratch
-    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: the \code{tp3\_finale\_synhm\_v2}..\code{v5}
-    pretrainings were cancelled (revision $1$ superseded); \textbf{next:} pretrain on
-    \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml}, \code{\_v6.yaml}, \code{\_v6t.yaml} (sweep configs not
-    yet written; v6t's $2\to6$ pools stored $5$--$10$ events/s per core, MadGraph's speed; the labeller is now optimised without changing a value, v6t $14$--$25$ (Sec.~\ref{sec:syn-versions}, rates of revision $2$ and version $6$); next a bench of v6t and MadGraph on one lxplus node (\code{scripts/job\_bench\_generation.sh}), then build them as CPU jobs), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
-    ($8$k) and $10^4$ ($32$k), two fixed points (sweep/fixed_points.py), names \code{tp3\_fsv<V>fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}
-    (item \code{synthver} matches \code{tp3\_fsv*}); copy the \code{tp3\_fsynfte} configs with the parent path changed;
-    then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
+    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: superseded by the 04:00 state above. \textbf{Infra:} \code{refill.py} out of the supervisor's
     maintain list (it cannot see other sites' results); rebalancer does not set lxplus GPU floors on what it moves (set
     by hand for today's sweeps). CC was unreachable 09:05--15:30 on 10-12. Jean Zay: network fix pending.
     \emph{State (2026-10-10, 16:00):} \textbf{Decisions since 06:15:} D32 (cancel my own jobs that are outside the
@@ -6241,10 +6235,10 @@ v6t & $224$ $\to$ $543$ ($397$--$881$) & $6$ $\to$ $18$ ($14$--$25$) \\
 The labeller is $84$--$100\%$ of the time from v5r2 on (after the optimisation); the one-off structure and plan take up to $8$\,s ($48$\,s for
 the general $2\to6$ draw \code{syn6v6\_00000}). Every legal diagram costs: v5r2's $V+5g$ evaluates $8880$ diagram
 images per helicity ($3840$ labelled diagrams, $74$ orbits, stabilisers counted) where revision $1$ evaluated $120$ to
-$2040$, so its $2\to6$ median ($305$) is $\sim\!7\times$ below revision $1$'s ($2.1$k; $\sim\!10\times$ before the
+$2040$, so its $2\to6$ median ($305$) is $\sim\!7\times$ below revision $1$'s ($2.1$k; $\sim\!12\times$ before the
 optimisation), still $\sim\!60$--$100\times$ MadGraph's $3$--$5$; the slowest revision-$2$ process is
 \code{syn6v3r2\_00001} ($uu\to uu\,4g$, all $14610$ diagrams) at $352$ ($116$ before the optimisation). Version $6$ multiplies the work by the helicity
-configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stores $14$--$25$ events/s,
+configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stores $18$ events/s (median; range $14$--$25$),
 $3$--$8\times$ MadGraph per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is indicative; v6t
 and MadGraph on one lxplus node settle it), with no compile. Before the optimisation it stored $5$--$10$, MadGraph's
 speed, which broke D36's ``cheap'' at $2\to6$; the user's call (2026-10-13) was to make the labeller faster before
