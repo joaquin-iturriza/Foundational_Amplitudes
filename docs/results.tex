@@ -5243,7 +5243,12 @@ pretraining, yet \emph{better} ($+0.21$, $10$ probes, $p=0.009$; cells $+0.18$, 
 $9.20\times10^{-7}$, the best pretraining, yet worse ($-0.16$, $1$ probe, $p=0.001$; cells $-0.19$, $6$ of $24$). Five
 arms tested: with a Bonferroni factor $5$, accumulation and the generation feature stay below $0.05$, off-shellness does
 not. In these two arms the pretraining ranking is reversed on fine-tuning. One seed per arm (rung $5$ twice at hp73
-differed by $8\%$ in pretraining loss).
+differed by $8\%$ in pretraining loss). Taken per $D$ (Wilcoxon over the twelve probes, Fig.~\ref{fig:levers_accum} now with the $D=10^4$ cells of the
+next paragraph), the generation feature's advantage is one value of $D$, not ``small $D$'': $+0.09$\,dex at $10^2$ ($7$ of
+$12$, $p=0.23$), $+0.26$ at $10^3$ ($10$ of $12$, $p=0.02$), $+0.04$ at $10^4$ ($7$ of $12$, $p=0.73$); the pooled
+$+0.21$ above is the $10^3$ cells. Off-shellness off is worse at each $D$ ($-0.24$, $-0.23$, $-0.34$; $p=0.03$, $0.02$,
+$0.02$); Feynman diagrams on ($-0.07$, $-0.10$, $-0.24$) and coupling scalars off ($-0.11$, $+0.06$, $-0.14$) reach no
+$p<0.05$ at any $D$.
 
 \paragraph{The conditionings at $D=10^4$, and the finale at $32$k (2026-10-08 19:00).} A $32$k cell is the best
 of rung $9$'s two chosen points (\code{horizon32k\_chosen.json}), the arm run at the same two, so it is measured at
@@ -5315,7 +5320,8 @@ star-arm probes no $32$k star-arm cell.
 \pnl{../analysis/transfer/figs/levers_accum_e.pdf}
 \caption{Each arm against rung $9$, per probe and $D$: $\log_{10}(L_\text{rung 9}/L_\text{arm})$, $>0$ the arm
 fine-tunes better. (a) Feynman diagrams on, (b) off-shellness off, (c) coupling scalars off, (d) generation feature off,
-(e) per-process gradient accumulation.}
+(e) per-process gradient accumulation. $D=10^2$, $10^3$ at $8$k (5-trial searches); $D=10^4$ at $32$k, the best of
+rung $9$'s two chosen points with the arm at the same two (none for (e)).}
 \label{fig:levers_accum}
 \end{figure}
 
