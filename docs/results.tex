@@ -5390,6 +5390,22 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
     evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
     children keep running as the $16$k point.
+    \emph{State (2026-10-13, 04:00):} \textbf{Decisions since 10-12 21:40:} D39 (replay children at low $D$, done and
+    written up), D40 (synthetic v6: spinor brackets and helicity selection rules), D41 (no diagram cap, optimise the
+    labeller before compromising; send v2--v5 now). \textbf{Synthetic:} revision $2$ of v2--v5 (every legal diagram,
+    names \code{syn[<n>]v<V>r2\_<k>}) merged (2740954); pretrainings \code{tp3\_finale\_synhm\_v\{3,4,5\}r2} on CC
+    (prebuild CPU jobs then hp73, $64$k, $\sim12$\,h) and \code{tp3\_finale\_synhm\_v2r2} on lxplus ($24$\,GB floor,
+    DAG \code{sweep\_0000}); item \code{synthver} (D41). \textbf{Next:} when each finishes, its fine-tunes on $Z+4g$,
+    $Z+5g$ at $D=10^2$, $10^3$ ($8$k) and $10^4$ ($32$k), two fixed points (copy the \code{tp3\_fsynfte} cells with the
+    parent changed, names \code{tp3\_fsv<V>r2fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}), then compare with v1 and
+    finale$+W$. The old v2--v5 pretrainings were cancelled (diagram count below the design). \textbf{v6:} implemented on
+    branch \code{worktree-agent-a1af77142289f05b1} (merged up to step 1, no cap); step 2 running there: exact speed-up of
+    the labeller (prefix-sharing of bracket products, values held to $10^{-12}$), then a same-node rate test against
+    MadGraph on lxplus (\code{scripts/job\_bench\_generation.sh}). Open question to the user: pretrain v6 only, or also
+    v6t (target shape)? v6/v6t pretrainings wait for the speed-up and that answer. \textbf{Running:} \code{finsrch}
+    $4/8$ (partial written up), \code{trendtests} (b) the $128$k pair on CC. \textbf{Written up since:}
+    \code{replaylowd} $130/130$ with the reading (late addition below pretraining from the start, most of the gain at a
+    fraction of the cost; the trade depends on model size).
     \emph{State (2026-10-12, 21:40):} \textbf{Decisions since 10-11:} D34 (add-W children from the replay parents
     only, one point $D=10^4$), D35 (one full fine-tune search on one high-multiplicity cell), D36 (synthetic generator
     versions, cheap: pretrainings and fine-tunes at fixed HPs), D37 (reference probe outside $Z+ng$/$W+ng$:
