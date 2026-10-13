@@ -5407,7 +5407,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: the \code{tp3\_finale\_synhm\_v2}..\code{v5}
     pretrainings were cancelled (revision $1$ superseded); \textbf{next:} pretrain on
     \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml}, \code{\_v6.yaml}, \code{\_v6t.yaml} (sweep configs not
-    yet written; v6t's $2\to6$ pools store $5$--$10$ events/s per core, MadGraph's speed: the labeller is being optimised first (the user, 2026-10-13), then build them as CPU jobs), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
+    yet written; v6t's $2\to6$ pools stored $5$--$10$ events/s per core, MadGraph's speed; the labeller is optimised without changing a value (the user, 2026-10-13; all $108$ synthetic recipe names within $1.7\times10^{-14}$ of the old labels, about $3\times$ for v6t, $1.1$--$2.9\times$ for revision $2$, revision $1$ bitwise equal), the rates are being re-measured for the \code{Rates of revision 2 and version 6} table, then build them as CPU jobs), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
     ($8$k) and $10^4$ ($32$k), two fixed points (sweep/fixed_points.py), names \code{tp3\_fsv<V>fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}
     (item \code{synthver} matches \code{tp3\_fsv*}); copy the \code{tp3\_fsynfte} configs with the parent path changed;
     then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
