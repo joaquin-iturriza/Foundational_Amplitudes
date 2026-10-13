@@ -6206,7 +6206,8 @@ from the brackets alone. v2r2 and v3r2 give $1/s_{ik}^2$ on $59$ of $62$ and $37
 
 \paragraph{Rates of revision 2 and version 6} (stored events/s, one laptop core, $2000$ events per process through the pools' mixture
 sampler, \code{tools/bench\_synthetic.py --hm}; medians over the four names, range in brackets; v1 and revision $1$ from
-one run, revision $2$ and v6 without the cap, with the optimised labeller, from a third run on the same laptop; the
+one run (the third run re-measured them within the run-to-run spread, e.g.\ v1 $2\to6$ $14.9$k; the table
+keeps the first), revision $2$ and v6 without the cap, with the optimised labeller, from a third run on the same laptop; the
 median before the optimisation $\to$ after it):
 \begin{center}\small
 \begin{tabular}{lcc}
@@ -6221,10 +6222,11 @@ v6 & $1.4$k $\to$ $1.9$k ($1.2$--$2.9$k) & $87$ $\to$ $167$ ($26$--$356$) \\
 v6t & $224$ $\to$ $543$ ($397$--$881$) & $6$ $\to$ $18$ ($14$--$25$) \\
 \end{tabular}
 \end{center}
-The labeller is $87$--$100\%$ of the time from v5r2 on; the one-off structure and plan take up to $8$\,s ($48$\,s for
+The labeller is $84$--$100\%$ of the time from v5r2 on (after the optimisation); the one-off structure and plan take up to $8$\,s ($48$\,s for
 the general $2\to6$ draw \code{syn6v6\_00000}). Every legal diagram costs: v5r2's $V+5g$ evaluates $8880$ diagram
 images per helicity ($3840$ labelled diagrams, $74$ orbits, stabilisers counted) where revision $1$ evaluated $120$ to
-$2040$, so it is $\sim\!10\times$ slower, still $\sim\!50\times$ MadGraph's $3$--$5$; the slowest revision-$2$ process is
+$2040$, so its $2\to6$ median ($305$) is $\sim\!7\times$ below revision $1$'s ($2.1$k; $\sim\!10\times$ before the
+optimisation), still $\sim\!60$--$100\times$ MadGraph's $3$--$5$; the slowest revision-$2$ process is
 \code{syn6v3r2\_00001} ($uu\to uu\,4g$, all $14610$ diagrams) at $352$ ($116$ before the optimisation). Version $6$ multiplies the work by the helicity
 configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stores $14$--$25$ events/s,
 $3$--$8\times$ MadGraph per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is indicative; v6t
