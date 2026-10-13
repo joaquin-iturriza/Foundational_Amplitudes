@@ -100,8 +100,25 @@
 \end{frame}
 
 \begin{frame}{Synthetic generator speed}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{synth_rates.pdf}
+  \begin{columns}[c]
+    \begin{column}{0.56\textwidth}
+      \centering
+      \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{synth_rates.pdf}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \footnotesize
+      \begin{tabular}{@{}ll@{}}
+        v1 & random processes, 2 to 6 diagrams \\[0.3em]
+        v2 & diagram count up to the real one \\[0.3em]
+        v3 & only Standard Model vertices \\[0.3em]
+        v4 & collinear and soft limits built in \\[0.3em]
+        v5 & processes shaped like $q\bar q\to V+ng$ \\[0.3em]
+        v6 & spinor brackets, helicity rules \\[0.3em]
+        v6t & v6 with the v5 process shape \\
+      \end{tabular}\\[0.8em]
+      {\footnotesize each version keeps the ones above}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \end{document}
