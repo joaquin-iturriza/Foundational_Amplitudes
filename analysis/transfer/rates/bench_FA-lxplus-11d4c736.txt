@@ -1,0 +1,28 @@
+BENCH syn6v6_00000 v6 2->6 [2, -2]->[1, -1, 6, -6, 22, 23] K=4512 K|Pi|=4512 labelled=4512 of 4512 legal configurations=96 terms=266400        30 stored ev/s  labeller 99.9%  setup 80.2 s
+BENCH syn6v6_00001 v6 2->6 [2, -2]->[3, -3, 21, 21, 21, 21] K=496 K|Pi|=11904 labelled=7305 of 7305 legal configurations=64 terms=380928        12 stored ev/s  labeller 99.8%  setup 14.4 s
+BENCH syn6v6_00002 v6 2->6 [2, -2]->[11, -11, 21, 21, 22, 23] K=372 K|Pi|=744 labelled=624 of 624 legal configurations=96 terms=35712       189 stored ev/s  labeller 98.2%  setup 7.6 s
+BENCH syn6v6_00003 v6 2->6 [11, -11]->[-3, 4, 21, 22, 22, -24] K=504 K|Pi|=1008 labelled=1008 of 1008 legal configurations=48 terms=45696       157 stored ev/s  labeller 98.3%  setup 12.1 s
+BENCH syn5v6t_00000 v6t 2->5 [1, -1]->[22, 21, 21, 21, 21] K=30 K|Pi|=720 labelled=384 of 384 legal configurations=60 terms=21600       373 stored ev/s  labeller 97.2%  setup 0.8 s
+BENCH syn5v6t_00001 v6t 2->5 [1, -1]->[23, 21, 21, 21, 21] K=30 K|Pi|=720 labelled=384 of 384 legal configurations=96 terms=34560       211 stored ev/s  labeller 98.7%  setup 1.0 s
+BENCH syn5v6t_00002 v6t 2->5 [2, -1]->[24, 21, 21, 21, 21] K=30 K|Pi|=720 labelled=384 of 384 legal configurations=48 terms=34560       221 stored ev/s  labeller 98.7%  setup 1.4 s
+BENCH syn5v6t_00003 v6t 2->5 [1, -1]->[25, 21, 21, 21, 21] K=39 K|Pi|=936 labelled=561 of 561 legal configurations=32 terms=14976       445 stored ev/s  labeller 96.8%  setup 0.8 s
+BENCH syn6v6t_00000 v6t 2->6 [2, -2]->[22, 21, 21, 21, 21, 21] K=74 K|Pi|=8880 labelled=3840 of 3840 legal configurations=124 terms=550560        11 stored ev/s  labeller 99.8%  setup 9.5 s
+BENCH syn6v6t_00001 v6t 2->6 [2, -2]->[23, 21, 21, 21, 21, 21] K=74 K|Pi|=8880 labelled=3840 of 3840 legal configurations=192 terms=852480         8 stored ev/s  labeller 99.9%  setup 11.7 s
+BENCH syn6v6t_00002 v6t 2->6 [2, -1]->[24, 21, 21, 21, 21, 21] K=74 K|Pi|=8880 labelled=3840 of 3840 legal configurations=96 terms=852480         7 stored ev/s  labeller 99.9%  setup 13.8 s
+BENCH syn6v6t_00003 v6t 2->6 [1, -1]->[25, 21, 21, 21, 21, 21] K=112 K|Pi|=13440 labelled=6555 of 6555 legal configurations=64 terms=430080        12 stored ev/s  labeller 99.9%  setup 9.5 s
+SUMMARY MadGraph 2->5: 2 processes, stored ev/s median 118, range 83-154
+SUMMARY MadGraph 2->6: 2 processes, stored ev/s median 5, range 3-7
+SUMMARY v1 2->5: 4 processes, stored ev/s median 17497, range 9773-23710
+SUMMARY v1 2->6: 4 processes, stored ev/s median 8444, range 5989-9525
+SUMMARY v2r2 2->5: 4 processes, stored ev/s median 4940, range 4798-5766
+SUMMARY v2r2 2->6: 4 processes, stored ev/s median 1163, range 552-1421
+SUMMARY v3r2 2->5: 4 processes, stored ev/s median 8635, range 3788-11277
+SUMMARY v3r2 2->6: 4 processes, stored ev/s median 1577, range 237-5113
+SUMMARY v4r2 2->5: 4 processes, stored ev/s median 4848, range 2905-14645
+SUMMARY v4r2 2->6: 4 processes, stored ev/s median 512, range 263-2467
+SUMMARY v5r2 2->5: 4 processes, stored ev/s median 1591, range 1147-1642
+SUMMARY v5r2 2->6: 4 processes, stored ev/s median 120, range 48-140
+SUMMARY v6 2->5: 4 processes, stored ev/s median 884, range 673-1539
+SUMMARY v6 2->6: 4 processes, stored ev/s median 93, range 12-189
+SUMMARY v6t 2->5: 4 processes, stored ev/s median 297, range 211-445
+SUMMARY v6t 2->6: 4 processes, stored ev/s median 9, range 7-12

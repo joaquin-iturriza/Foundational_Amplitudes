@@ -6251,6 +6251,28 @@ as sparse matrices; elsewhere they keep the original elementwise sums. Recipes: 
 \code{\_v6.yaml} (general legs) and \code{\_v6t.yaml} (target shape), the finale's $28$ processes plus each version's
 eight; the revision-$1$ recipes stay for the record.
 
+\paragraph{Rates on one node} (2026-10-13, one lxplus CPU job \code{FA-lxplus-11d4c736}, MadGraph and every
+version in the same job, $2000$ stored events per process; \code{analysis/transfer/synth\_rates.py},
+Fig.~\ref{fig:synth_rates}; medians over four processes, MadGraph over $Z$, $W$ $+4g$ and $+5g$):
+\begin{center}\small
+\begin{tabular}{lcccccccc}
+ & MadGraph & v1 & v2r2 & v3r2 & v4r2 & v5r2 & v6 & v6t \\ \hline
+$2\to5$ & $118$ & $17.5$k & $4.9$k & $8.6$k & $4.8$k & $1.6$k & $884$ & $297$ \\
+$2\to6$ & $5$ & $8.4$k & $1.2$k & $1.6$k & $512$ & $120$ & $93$ & $9$ \\
+\end{tabular}
+\end{center}
+On the same core, every version but v6t keeps a factor $\ge7$ over MadGraph at $2\to5$ and $\ge18$ at $2\to6$ (v6's
+slowest $2\to6$ process at $12$, against MadGraph's $3$--$7$); v6t is $2.5\times$ faster at $2\to5$ and $\sim\!2\times$ at
+$2\to6$ ($9$ against $5$), before MadGraph's compile. The real-diagram count and the bracket numerators together bring
+the synthetic labeller to MadGraph's order exactly where the target is: $q\bar q\to V+5g$ with all $3\,840$ diagrams.
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/synth_rates.pdf}
+\caption{Stored events per second per core of each synthetic version at $2\to5$ and $2\to6$ (median over four
+processes, bars the range) and of MadGraph on the same lxplus node (dashed: $Z$, $W$ $+4g$, $+5g$).}
+\label{fig:synth_rates}
+\end{figure}
+
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
 Any one-loop amplitude decomposes into a few universal scalar integrals with process-dependent coefficients,
 \begin{equation*}
