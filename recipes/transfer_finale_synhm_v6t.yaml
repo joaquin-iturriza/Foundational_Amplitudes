@@ -1,0 +1,51 @@
+# High-multiplicity test, synthetic version 6, target-shaped (D40): the finale plus 8 synthetic processes at high
+# multiplicity (syn5v6t_00000..03, 2->5; syn6v6t_00000..03, 2->6; tools/synthetic_amplitudes.py
+# v6t: version 6 on version 5's target shape, q qbar' -> V + 4g (syn5v6t_*) and V + 5g (syn6v6t_*),
+# V = gamma, Z, W+, H by k % 4.
+# The finale's own lines follow unchanged (docs/results.tex, sec:syn-versions).
+#   syn5v6t_00000: [1, -1] -> [22, 21, 21, 21, 21], 384 of 384 legal diagrams
+#   syn5v6t_00001: [1, -1] -> [23, 21, 21, 21, 21], 384 of 384 legal diagrams
+#   syn5v6t_00002: [2, -1] -> [24, 21, 21, 21, 21], 384 of 384 legal diagrams
+#   syn5v6t_00003: [1, -1] -> [25, 21, 21, 21, 21], 561 of 561 legal diagrams
+#   syn6v6t_00000: [2, -2] -> [22, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
+#   syn6v6t_00001: [2, -2] -> [23, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
+#   syn6v6t_00002: [2, -1] -> [24, 21, 21, 21, 21, 21], 3840 of 3840 legal diagrams
+#   syn6v6t_00003: [1, -1] -> [25, 21, 21, 21, 21, 21], 6555 of 6555 legal diagrams
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bhabha, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_aa, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uu_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: dd_dd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbar, sqrts: [363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZ, sqrts: [192, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZH, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ddbar_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ZZ_nlo, sqrts: [192, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uugg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbarg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbargg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbar_nlo, sqrts: [363, 450], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_taunu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: syn5v6t_00000, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn5v6t_00001, sqrts: [96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn5v6t_00002, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn5v6t_00003, sqrts: [132, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn6v6t_00000, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn6v6t_00001, sqrts: [96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn6v6t_00002, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: syn6v6t_00003, sqrts: [132, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

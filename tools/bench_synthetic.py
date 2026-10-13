@@ -3,15 +3,18 @@ build_mixture_dataset, with the default mixture parameters), split into phase-sp
 compare synthetic processes with the real pools' per-core rates (docs/results.tex, Generation cost). CPU only:
 
     python tools/bench_synthetic.py [--n 5000] [--first 0 --count 19]      # v1 pilot names syn_<first>..
-    python tools/bench_synthetic.py --hm [--versions 1 2 3 4 5] [--n 2000]  # 2->5 and 2->6 per version: the 8
-        # high-multiplicity names of recipes/transfer_finale_synhm*.yaml, syn5[v<V>]_00000..03, syn6[v<V>]_00000..03
+    python tools/bench_synthetic.py --hm [--versions 1 2 3 4 5 2r2 3r2 4r2 5r2 6 6t] [--n 2000]  # 2->5 and 2->6
+        # per version: the 8 high-multiplicity names of recipes/transfer_finale_synhm*.yaml, syn5[v<tag>]_00000..03,
+        # syn6[v<tag>]_00000..03 (tag 2..5 revision 1, 2r2..5r2 revision 2, 6 and 6t version 6)
     python tools/bench_synthetic.py --real uubar_Zgggg uubar_Zggggg udbar_Wgggg udbar_Wggggg [--hm] [--n 2000]
         # the same measurement on MadGraph processes: compiles the C++ standalone if missing (datagen.ensure_backend,
         # timed apart), then labels through the pipe driver as prebuild does. Needs MadGraph: a site CPU node
         # (scripts/job_bench_generation.sh).
 
-One line per process: final-state size, diagrams (K, the drawn ones; K|Pi|, with their identical-leg images),
-helicities, stored events per second, the labeller's share; a summary per (version, multiplicity).
+One line per process: final-state size, diagrams (K, the drawn ones or permutation orbits; K|Pi|, with their
+identical-leg images; revision 2 and v6 also the labelled diagrams kept of the legal ones), helicities (v6: the
+surviving configurations and the evaluated terms), stored events per second, the labeller's share, and the
+one-off structure and evaluation-plan time (before the timed run); a summary per (version, multiplicity).
 """
 import argparse, os, sys, time
 import numpy as np
@@ -25,7 +28,7 @@ ap.add_argument("--n", type=int, default=5000, help="stored events per process")
 ap.add_argument("--first", type=int, default=0)
 ap.add_argument("--count", type=int, default=19)
 ap.add_argument("--hm", action="store_true", help="the 8 high-multiplicity names per version")
-ap.add_argument("--versions", type=int, nargs="*", default=list(syn.SYN_VERSIONS))
+ap.add_argument("--versions", nargs="*", default=["1", "2", "3", "4", "5", "2r2", "3r2", "4r2", "5r2", "6", "6t"])
 ap.add_argument("--real", nargs="*", default=None, help="MadGraph processes (catalog names) instead")
 a = ap.parse_args()
 os.environ.setdefault("OMP_NUM_THREADS", "1")
@@ -70,18 +73,28 @@ if a.real is not None:
               f"(backend ready in {t_build:.0f} s)", flush=True)
 if a.real is None or a.hm:   # --real with --hm: both on the same node, so the rates compare
     if a.hm:
-        names = [(v, f"syn{n}{'' if v == 1 else f'v{v}'}_{k:05d}") for v in a.versions for n in (5, 6) for k in range(4)]
+        names = [(v, f"syn{n}{'' if v == '1' else f'v{v}'}_{k:05d}") for v in a.versions for n in (5, 6) for k in range(4)]
     else:
-        names = [(1, f"syn_{i:05d}") for i in range(a.first, a.first + a.count)]
+        names = [("1", f"syn_{i:05d}") for i in range(a.first, a.first + a.count)]
     for v, name in names:
+        t0 = time.perf_counter()
         cfg = mg.register_synthetic(name)
         st = syn.structure(name)
+        hel = f"H={len(st['numerators'])}"
+        if st["version"] >= 6:
+            pl = syn._plan6(st)
+            hel = f"configurations={len(st['configs'])} terms={pl['nterms']}"
+        elif st["version"] >= 2:
+            syn._plan(st)
+        t_setup = time.perf_counter() - t0
         rate, share = timed(name, cfg, lambda ev, sq, name=name: syn.label_events(name, ev), st["sqrts"],
                             st["pdg_ids"], st["m_legs"][2:])
         K, nP = len(st["diagrams"]), len(st["perms"])
+        kept = (f" labelled={st['k_all']} of {st['n_legal']} legal" + (" (subsampled)" if st["subsampled"] else "")
+                if "n_legal" in st else "")
         rows.append((v, st["nfinal"], rate))
-        print(f"BENCH {name} v{v} 2->{st['nfinal']} {st['pdg_ids'][:2]}->{st['pdg_ids'][2:]} K={K} K|Pi|={K * nP} "
-              f"H={len(st['numerators'])} {rate:9.0f} stored ev/s  labeller {100 * share:4.1f}%", flush=True)
+        print(f"BENCH {name} v{v} 2->{st['nfinal']} {st['pdg_ids'][:2]}->{st['pdg_ids'][2:]} K={K} K|Pi|={K * nP}"
+              f"{kept} {hel} {rate:9.0f} stored ev/s  labeller {100 * share:4.1f}%  setup {t_setup:.1f} s", flush=True)
 for v in dict.fromkeys(r[0] for r in rows):
     for n in sorted({r[1] for r in rows if r[0] == v}):
         r = [x[2] for x in rows if x[0] == v and x[1] == n]
