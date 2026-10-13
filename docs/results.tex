@@ -5352,7 +5352,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: the \code{tp3\_finale\_synhm\_v2}..\code{v5}
     pretrainings were cancelled (revision $1$ superseded); \textbf{next:} pretrain on
     \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml}, \code{\_v6.yaml}, \code{\_v6t.yaml} (sweep configs not
-    yet written; v6t's $2\to6$ pools store $6$--$19$ events/s per core, MadGraph's speed: decide \code{\_V6\_TERMS\_MAX} with the user, then build them as CPU jobs first), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
+    yet written; v6t's $2\to6$ pools store $5$--$10$ events/s per core, MadGraph's speed: the labeller is being optimised first (the user, 2026-10-13), then build them as CPU jobs), then their fine-tunes on $Z+4g$, $Z+5g$ at $D=10^2$, $10^3$
     ($8$k) and $10^4$ ($32$k), two fixed points (sweep/fixed_points.py), names \code{tp3\_fsv<V>fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}
     (item \code{synthver} matches \code{tp3\_fsv*}); copy the \code{tp3\_fsynfte} configs with the parent path changed;
     then compare with v1 (finale$+$synthetic) and finale$+W$. \textbf{Infra:} \code{refill.py} out of the supervisor's
@@ -6074,9 +6074,9 @@ The slowest synthetic version is still $\sim\!50\times$ faster than MadGraph at 
 (v5's slowest process, $\gamma+5g$, $616$ events/s, against $3$--$5$), before MadGraph's compile. Recipes: \code{recipes/transfer\_finale\_synhm\_v<V>.yaml},
 the finale's $28$ processes plus each version's eight.
 
-\paragraph{Revision 2: every legal diagram, up to $4000$ labelled ones} (the user's correction of 2026-10-12: ``if in
-the end we end up with only $\sim200$ legal diagrams, we aren't doing what we said''; the cap of $4000$ labelled diagrams is
-our cost limit, not yet agreed with the user). Revision $1$ above drew $K$ log-uniform \emph{up to} the cap,
+\paragraph{Revision 2: every legal diagram} (the user's correction of 2026-10-12: ``if in the end we end up with only
+$\sim200$ legal diagrams, we aren't doing what we said''; and on a proposed cap of $4000$ labelled diagrams, 2026-10-13:
+``I would first try to optimize as much as we can what we are doing, before deciding to compromise on other things''). Revision $1$ above drew $K$ log-uniform \emph{up to} the cap,
 so a typical process had a handful of diagrams (\code{syn5v2\_00001}: $5$ of a possible $236$; \code{syn6v5\_00001},
 $Z+5g$: $1$ orbit of the $3840$ legal diagrams). Revision $2$ replaces it under new names, \code{syn[<n>]v<V>r2\_<k>},
 seeded by $(\text{salt},V,n_\text{forced},k,2,\text{target-shaped})$, so no revised process can meet a pool cached
@@ -6087,22 +6087,19 @@ $K=K_\text{cap}$. Versions $3$--$5$ use \emph{every} SM-legal tree of the proces
 Z,W$), $561$ for $H+4g$, $3840$ for $V+5g$. That set is closed under the permutations of identical legs, so the
 numerators are drawn once per permutation orbit and carried to the orbit's images, and $|\mathcal M|^2$ is one
 coherent sum over every labelled diagram (each orbit's $|\Pi|$ images weighted by $1/|\text{stabiliser}|$) instead of
-version $1$'s incoherent average over $|\Pi|$; lines a stabiliser maps onto each other share their drawn power. The
-cost is linear in the labelled diagrams, so a process keeps at most $4000$ of them (whole orbits in a uniformly random
-order while they fit): $4000$ is the smallest round number that keeps the target family's $V+5g$ whole. Of the $88$
-revised and v6 processes tested it bites on $7$: $H+5g$ ($3990$ of $6555$, the effective $ggH$ vertex adds diagrams;
-\code{syn6v5r2\_00003}, \code{\_00007}, \code{syn6v6t\_00003}) and four general $2\to6$ draws (\code{syn6v3r2\_00001},
-$uu\to uu\,4g$: $3996$ of $14610$; \code{syn6v4r2\_00003}: $4000$ of $5200$; \code{syn6v6\_00000}: $4000$ of $4512$;
-\code{syn6v6\_00001}: $3999$ of $7305$).
-Diagram counts of the recipes' processes (labelled diagrams kept / legal):
+version $1$'s incoherent average over $|\Pi|$; lines a stabiliser maps onto each other share their drawn power. There
+is no cap on the count: the largest recipe process, \code{syn6v3r2\_00001} ($uu\to uu\,4g$), keeps all $14610$, and
+$H+5g$ (the effective $ggH$ vertex adds diagrams) all $6555$. Only above $5\times10^4$ legal trees, which no recipe
+name reaches, would the orbits come from uniformly sampled trees instead of a full listing.
+Diagram counts of the recipes' processes (labelled diagrams, every legal one):
 \begin{center}\small
 \begin{tabular}{lll}
  & $2\to5$ (\code{syn5...\_00000}--$03$) & $2\to6$ (\code{syn6...\_00000}--$03$) \\ \hline
 v2r2 ($K$, charge-table trees) & $236$, $236$, $236$, $236$ & $1299$, $108$, $2598$, $1299$ \\
-v3r2 & $93$, $130$, $588$, $40$ & $1276$, $3996/14610$, $220$, $1984$ \\
-v4r2 & $126$, $64$, $112$, $312$ & $441$, $1439$, $3438$, $4000/5200$ \\
-v5r2, v6t ($\gamma,Z,W^+,H$) & $384$, $384$, $384$, $561$ & $3840$, $3840$, $3840$, $3990/6555$ \\
-v6 & $317$, $252$, $126$, $315$ & $4000/4512$, $3999/7305$, $624$, $1008$ \\
+v3r2 & $93$, $130$, $588$, $40$ & $1276$, $14610$, $220$, $1984$ \\
+v4r2 & $126$, $64$, $112$, $312$ & $441$, $1439$, $3438$, $5200$ \\
+v5r2, v6t ($\gamma,Z,W^+,H$) & $384$, $384$, $384$, $561$ & $3840$, $3840$, $3840$, $6555$ \\
+v6 & $317$, $252$, $126$, $315$ & $4512$, $7305$, $624$, $1008$ \\
 \end{tabular}
 \end{center}
 (v2r2's $K$ counts drawn diagrams up to the permutations, each evaluated in all $|\Pi|$ images as before.)
@@ -6150,51 +6147,50 @@ conjugates, so the pair costs one evaluation; a chiral configuration is averaged
 $|\mathcal M|^2$ parity even, as an unpolarised tree is. Configurations per process: $60$ ($\gamma+4g$), $96$ ($Z+4g$),
 $48$ ($W^++4g$, chiral), $32$ ($H+4g$); at $2\to6$ $124$, $192$, $96$, $64$. The evaluation multiplies brackets
 gathered from a per-event table; the work is configurations (pairs counted once) times orbit representatives times
-$|\Pi|$, $0.85$ million terms per event for $Z+5g$ and $W^++5g$ (stabilisers count each image once per element),
-capped at $10^6$, a cap no recipe name reaches.
+$|\Pi|$, $0.85$ million terms per event for $Z+5g$ and $W^++5g$ (stabilisers count each image once per element), with no cap.
 
 \paragraph{Validation of revision 2 and version 6} \code{tests/test\_synthetic\_versions.py}, $20$ processes per revised version and per v6 form ($8$ for v6t), $6000$ events
 each ($5040$ for v6 and $1440$ for v6t, whose $2\to6$ processes label slowly). Revision $1$'s structure hashes of the $44$ names
 in use and drawn first are frozen, and every revision-$1$ label is bit-identical to the trunk's code. $|\mathcal M|^2$
 finite and positive on every event; largest relative change under a Lorentz transformation $3.3\times10^{-11}$,
 $1.1\times10^{-11}$, $4.0\times10^{-12}$, $1.0\times10^{-12}$ (v2r2--v5r2), $4.9\times10^{-11}$ (v6), $2.5\times10^{-12}$
-(v6t); mass dimension to $3\times10^{-12}$; identical-leg swaps to $2\times10^{-13}$. Every vertex of $18321$ diagrams
-($106351$ vertices, all versions) is an SM vertex; of the $88$ revision-$2$ and v6 processes, $81$ keep every legal
-diagram and the labelled diagrams kept equal the orbit sizes summed. Version $6$: under the little-group scaling with
+(v6t); mass dimension to $3\times10^{-12}$; identical-leg swaps to $2\times10^{-13}$. Every vertex of $20577$ diagrams
+($119887$ vertices, all versions) is an SM vertex; all $88$ revision-$2$ and v6 processes keep every legal diagram,
+and the labelled diagrams equal the orbit sizes summed. Version $6$: under the little-group scaling with
 complex $t_i$ each of $26140$ helicity amplitudes (times events) changes by $\prod_i t_i^{-2h_i}$ to $6\times10^{-13}$; the
 surviving configurations ($1307$; $3033$ vanish) equal the set recomputed in the test from the trees and the rules,
 each is non-zero, $|\mathcal M|^2$ equals the configuration sum of the equation above to $3\times10^{-15}$, so the
 vanishing ones contribute nothing, and it is parity even exactly. Limits along momentum-conserving sequences (the
 collinear one now down to $\theta=10^{-6.5}$: with thousands of regular diagrams some events reach the asymptote only
-below $10^{-5.5}$): collinear slope $-1.005$ to $-0.996$ (v4r2, $28$ pairs), $-1.007$ to $-0.994$ (v5r2, $70$), $-1.004$
-to $-0.996$ (v6, $33$), $-1.007$ to $-0.997$ (v6t, $28$); soft $-2.000$ ($20$, $140$, $30$, $56$ gauge legs). v6 gets both
-from the brackets alone. v2r2 and v3r2 give $1/s_{ik}^2$ on $59$ of $62$ and $36$ of $36$ pairs, as their revision $1$.
+below $10^{-5.5}$): collinear slope $-1.003$ to $-0.997$ (v4r2, $28$ pairs), $-1.008$ to $-0.982$ (v5r2, $70$), $-1.006$
+to $-0.993$ (v6, $33$), $-1.008$ to $-0.992$ (v6t, $28$); soft $-2.000$ ($20$, $140$, $30$, $56$ gauge legs). v6 gets both
+from the brackets alone. v2r2 and v3r2 give $1/s_{ik}^2$ on $59$ of $62$ and $37$ of $37$ pairs, as their revision $1$.
 
 \paragraph{Rates of revision 2 and version 6} (stored events/s, one laptop core, $2000$ events per process through the pools' mixture
-sampler, \code{tools/bench\_synthetic.py --hm}, every version in one run; medians over the four names, range in
-brackets):
+sampler, \code{tools/bench\_synthetic.py --hm}; medians over the four names, range in brackets; v1 and revision $1$ from
+one run, revision $2$ and v6 without the cap from a second run on the same laptop):
 \begin{center}\small
 \begin{tabular}{lcc}
  & $2\to5$ & $2\to6$ \\ \hline
 v1 & $33.1$k ($16.3$--$41.3$k) & $12.4$k ($10.6$--$14.5$k) \\
 v2, v3, v4, v5 (revision $1$) & $10.2$k, $22.7$k, $28.7$k, $9.6$k & $5.8$k, $10.1$k, $17.4$k, $2.1$k \\
-v2r2 & $9.1$k ($8.0$--$10.1$k) & $1.6$k ($1.3$--$2.1$k) \\
-v3r2 & $16.9$k ($5.6$--$21.9$k) & $2.0$k ($480$--$8.3$k) \\
-v4r2 & $10.0$k ($5.2$--$24.4$k) & $790$ ($540$--$4.6$k) \\
-v5r2 & $2.3$k ($1.6$--$2.8$k) & $199$ ($178$--$262$) \\
-v6 & $1.5$k ($930$--$2.0$k) & $105$ ($30$--$209$) \\
-v6t & $265$ ($209$--$485$) & $8$ ($6$--$19$) \\
+v2r2 & $8.9$k ($8.2$--$10.6$k) & $1.5$k ($1.2$--$2.0$k) \\
+v3r2 & $16.9$k ($5.6$--$18.4$k) & $1.9$k ($116$--$8.2$k) \\
+v4r2 & $9.7$k ($5.5$--$21.8$k) & $758$ ($449$--$4.8$k) \\
+v5r2 & $2.4$k ($1.6$--$2.9$k) & $174$ ($136$--$273$) \\
+v6 & $1.4$k ($891$--$2.1$k) & $87$ ($13$--$187$) \\
+v6t & $224$ ($172$--$414$) & $6$ ($5$--$10$) \\
 \end{tabular}
 \end{center}
-The labeller is $87$--$100\%$ of the time from v5r2 on; the one-off structure and plan take up to $6$\,s ($42$\,s for
+The labeller is $87$--$100\%$ of the time from v5r2 on; the one-off structure and plan take up to $8$\,s ($48$\,s for
 the general $2\to6$ draw \code{syn6v6\_00000}). Every legal diagram costs: v5r2's $V+5g$ evaluates $8880$ diagram
 images per helicity ($3840$ labelled diagrams, $74$ orbits, stabilisers counted) where revision $1$ evaluated $120$ to
-$2040$, so it is $\sim\!10\times$ slower, still $\sim\!50\times$ MadGraph's $3$--$5$. Version $6$ multiplies that by the
-helicity configurations: $2\to6$ v6t sums $0.28$--$0.85$ million bracket monomials per event and stores $6$--$19$
-events/s, \emph{as slow as MadGraph} per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is
-indicative), though with no compile. That breaks D36's ``cheap'' at $2\to6$; the knob is \code{\_V6\_TERMS\_MAX}, whose cut drops
-whole orbits uniformly (at $2\times10^5$ terms $Z+5g$ would keep $\sim\!900$ of its $3840$ diagrams, $\sim\!4\times$ faster by the term
-count; not measured), a choice for the user, not made here. Recipes: \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml},
+$2040$, so it is $\sim\!10\times$ slower, still $\sim\!50\times$ MadGraph's $3$--$5$; the slowest revision-$2$ process is
+\code{syn6v3r2\_00001} ($uu\to uu\,4g$, all $14610$ diagrams) at $116$. Version $6$ multiplies the work by the helicity
+configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stores $5$--$10$ events/s,
+\emph{as slow as MadGraph} per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is indicative),
+though with no compile. That breaks D36's ``cheap'' at $2\to6$; the user's call (2026-10-13) is to make the labeller
+faster before cutting anything. Recipes: \code{recipes/transfer\_finale\_synhm\_v\{2,3,4,5\}r2.yaml},
 \code{\_v6.yaml} (general legs) and \code{\_v6t.yaml} (target shape), the finale's $28$ processes plus each version's
 eight; the revision-$1$ recipes stay for the record.
 
