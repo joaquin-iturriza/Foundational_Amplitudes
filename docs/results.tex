@@ -5424,6 +5424,19 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     $4/8$ (partial written up), \code{trendtests} (b) the $128$k pair on CC. \textbf{Written up since:}
     \code{replaylowd} $130/130$ with the reading (late addition below pretraining from the start, most of the gain at a
     fraction of the cost; the trade depends on model size).
+    \emph{State (2026-10-13, 19:10):} \textbf{Done today:} CC reached directly (lpnclaude03 refuses ssh; the hop
+    removed from \code{~/.ssh/config}, backup \code{config.bak-2026-10-13}); the October weekly deck
+    (\code{talks/progress\_oct2026}, 11 slides; fig:levers\_accum now carries the $D=10^4$ cells, and the generation
+    feature's gain is $D=10^3$ only); trend test (b) written up (no horizon effect at $10^{4.5}$); v4r2/v5r2 fine-tunes
+    written up. \textbf{To do next:} E130 READY, \code{synthver} $52/52$: collect \code{tp3\_fsv2r2*}, \code{tp3\_fsv3r2*}
+    from CC \emph{and} lxplus (v2r2's $D=10^2$, $10^3$ cells ran twice on CC: take the first result per hp; Z+5g
+    $D=10^4$ on lxplus), add them to scratch\_sweeps.json, extend the v4r2/v5r2 table (sec:syn-versions) with v2r2 and
+    v3r2, draw the comparison figure, send it, ack E130. Early v2r2: $2.7\times10^{-2}$--$1.0\times10^{-1}$ at $D=10^2$,
+    $10^3$, about $2\times$ worse than the finale's child. \textbf{Open with the user:} v6 only, or v6t too (v6t carries
+    the probes' exact processes, as v5 does, which hurt $4$--$5\times$ at $D=10^2$). \textbf{Infra:} supervisor and
+    events waiter in the background; gen helper for fixed-point fine-tunes: run\_generate(extend=True, fixed\_hp=E[n],
+    submit=True on HTCondor; submit=False then \code{sweep\_manager submit} on SLURM); check for existing sweep dirs on
+    every site before generating (the v2r2 duplicates came from dirs generated on CC before the WSL crash).
     \emph{State (2026-10-12, 21:40):} \textbf{Decisions since 10-11:} D34 (add-W children from the replay parents
     only, one point $D=10^4$), D35 (one full fine-tune search on one high-multiplicity cell), D36 (synthetic generator
     versions, cheap: pretrainings and fine-tunes at fixed HPs), D37 (reference probe outside $Z+ng$/$W+ng$:
