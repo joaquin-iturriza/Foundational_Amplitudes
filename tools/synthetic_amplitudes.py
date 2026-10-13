@@ -1168,7 +1168,8 @@ def _line_groups(d, stab, N):
 
 
 def _draw_process_r2(rng, name, ver, ini, fin, target):
-    """Revision 2, versions 3-6: every legal diagram (up to the cap of labelled ones), one numerator per permutation
+    """Revision 2, versions 3-6: every legal diagram (no cap; orbits sampled only above _ENUM_MAX legal trees), one
+    numerator per permutation
     orbit, summed coherently over the orbit's images instead of an incoherent average over the permutations."""
     pdgs = ini + fin
     n, N = len(fin), len(pdgs)
@@ -1677,10 +1678,65 @@ def _plan6(st):
         ku, kidx = np.unique(ke[e][tt], return_inverse=True)
         U.append({"lam": lm, "w": w, "t": t, "c": ce[e], "a": am[e][tt, mm], "ku": ku, "kidx": kidx,
                   "buckets": buckets, "nrow": len(tt), "starts": starts})
-    pl = {"base": base, "units": U, "C": C, "nrows": int(sum(u["nrow"] for u in U)),
+    off = 0
+    kall = np.unique(np.concatenate([u["ku"] for u in U]))  # the s-powers, factors 2C.. of the product table
+    for u in U:
+        u["off"] = off
+        off += u["nrow"]
+        u["kfac"] = 2 * C + np.searchsorted(kall, u["ku"])[u["kidx"]]
+        # one coefficient per monomial: c of its term times its a (one monomial per term unless _V6_MONOS > 1)
+        u["ca"] = (u["c"][np.repeat(np.arange(len(u["t"])), np.diff(np.append(u["starts"], u["nrow"])))]
+                   * u["a"])
+    pl = {"base": base, "units": U, "C": C, "kall": kall, "nrows": int(off),
           "nterms": int(sum(len(u["t"]) for u in U))}
+    for u in U:                     # one prefix tree per unit: its products stay in cache for the unit's sums
+        u["trie"] = _bracket_trie([dict(u, off=0)], 2 * C + len(kall), u["nrow"])
     _PLANS6[st["sha"]] = pl
     return pl
+
+
+def _bracket_trie(U, n_fac, R):
+    """The monomials of every unit as one prefix tree: each monomial is a product of factors (rows of the stacked
+    bracket table), ordered by how many monomials use the factor (most first, then by index), so that a product
+    shared by many monomials (the same brackets on the beams and the boson in every permutation image, the same
+    leading factors across configurations) is computed once. Built level by level with np.unique; a level's node is
+    its parent's product times one factor. Returns per level (parent node, factor) and the monomials ending there."""
+    L = np.zeros(R, np.int64)
+    F = max((idx.shape[1] for u in U for _r, idx in u["buckets"]), default=1)
+    F += 1                                                  # the s-power s^(-k/2) is one more factor
+    fac = np.full((R, F), n_fac, np.int64)
+    for u in U:
+        for rws, idx in u["buckets"]:
+            fac[u["off"] + rws, :idx.shape[1]] = idx
+            fac[u["off"] + rws, idx.shape[1]] = u["kfac"][rws]
+            L[u["off"] + rws] = idx.shape[1] + 1
+    freq = np.bincount(fac[fac < n_fac], minlength=n_fac + 1)
+    freq[n_fac] = -1
+    key = (freq.max() - freq[fac]) * (n_fac + 1) + fac     # most used first, then by index; padding last
+    fac = np.take_along_axis(fac, np.argsort(key, axis=1, kind="stable"), 1)
+    node = np.zeros(R, np.int64)
+    levels = []
+    for lev in range(F):
+        act = np.flatnonzero(L > lev)
+        k = node[act] * (n_fac + 1) + fac[act, lev]
+        uq, inv = np.unique(k, return_inverse=True)
+        node[act] = inv
+        end = L[act] == lev + 1
+        levels.append({"parent": uq // (n_fac + 1), "fac": uq % (n_fac + 1), "end_rows": act[end],
+                       "end_nodes": inv[end]})
+    return levels
+
+
+def _trie_products(trie, BT, R):
+    """Every monomial's bracket product (R, B), one multiplication per prefix-tree node."""
+    G = np.empty((R, BT.shape[1]), np.complex128)
+    vals = None
+    for lev in trie:
+        f = np.take(BT, lev["fac"], axis=0)
+        vals = f if vals is None else np.multiply(np.take(vals, lev["parent"], axis=0), f, out=f)
+        if len(lev["end_rows"]):
+            G[lev["end_rows"]] = vals[lev["end_nodes"]]
+    return G
 
 
 def _dinv(pl, P, scale):
@@ -1702,27 +1758,31 @@ def _dinv(pl, P, scale):
     return dinv * (pl["const"][None, :] * a_s[:, None] ** pl["as_pow"][None, :])
 
 
-def _unit_UV(u, BT, s_tot, dinv):
-    """U = sum X Re(poly), V = sum X Im(poly) of one helicity unit (A = U + iV; its parity image U - iV).
-    BT (2C, B): the brackets and their inverses, one row per bracket (_brtable)."""
-    B = BT.shape[1]
-    G = np.empty((u["nrow"], B), np.complex128)
-    for rws, idx in u["buckets"]:
-        g = BT[idx[:, 0]]
-        tmp = np.empty_like(g)
-        for j in range(1, idx.shape[1]):
-            np.take(BT, idx[:, j], axis=0, out=tmp)
-            g *= tmp
-        G[rws] = g
-    G *= (s_tot[None, :] ** (-0.5 * u["ku"][:, None]))[u["kidx"]] * u["a"][:, None]   # s^(-k/2), the a
-    poly = G if u["nrow"] == len(u["t"]) else np.add.reduceat(G, u["starts"], axis=0)   # (terms, B)
-    X = dinv[:, u["t"]].T * u["c"][:, None]
-    return (X * poly.real).sum(0), (X * poly.imag).sum(0)
+def _unit_UV(u, BT, dinvT):
+    """U = sum X Re(poly), V = sum X Im(poly) of one helicity unit (A = U + iV; its parity image U - iV), from its
+    monomial products (its prefix tree over the factor table BT, _trie_products; s-power included) and the
+    images' propagator table dinvT (T, B); X = propagators x c, poly = sum of a x monomial. Four real reductions,
+    no temporaries beyond X."""
+    g = _trie_products(u["trie"], BT, u["nrow"])
+    X = np.take(dinvT, u["t"], axis=0)
+    if u["nrow"] == len(u["t"]):
+        X *= u["ca"][:, None]
+    else:                                                   # several monomials per term: sum them first
+        X *= u["c"][:, None]
+        g = np.add.reduceat(g * u["a"][:, None], u["starts"], axis=0)
+    gr, gi, xr, xi = g.real, g.imag, X.real, X.imag
+    U = np.einsum("rb,rb->b", xr, gr) + 1j * np.einsum("rb,rb->b", xi, gr)
+    V = np.einsum("rb,rb->b", xr, gi) + 1j * np.einsum("rb,rb->b", xi, gi)
+    return U, V
 
 
-def _brtable(br):
-    """[brackets; 1/brackets] transposed (2C, B), contiguous rows for the gathers."""
-    return np.ascontiguousarray(np.concatenate([br, 1.0 / br], 1).T)
+def _brtable(br, s_tot=None, kall=()):
+    """[brackets; 1/brackets; s^(-k/2) for each k of kall] transposed (2C + len(kall), B): contiguous rows for the
+    gathers of _trie_products."""
+    rows = [br, 1.0 / br]
+    if len(kall):
+        rows.append((s_tot[:, None] ** (-0.5 * np.asarray(kall)[None, :])).astype(np.complex128))
+    return np.ascontiguousarray(np.concatenate(rows, 1).T)
 
 
 def evaluate_v6(st, P, scale=1.0):
@@ -1732,16 +1792,18 @@ def evaluate_v6(st, P, scale=1.0):
     P = np.asarray(P, np.float64)
     res = np.zeros(P.shape[0])
     m_legs = [m * scale for m in st["m_legs"]]
-    per = max(pl["nrows"] // max(len(pl["units"]), 1), 1)
-    step = int(min(64, max(8, 600_000 // per)))           # cache-sized chunks (measured optimum ~32 at 2->6)
+    # events per chunk: a unit's products (rows x events) should stay in cache; measured optimum 8 at 2->6 (~9000 rows
+    # per unit), >= 32 at 2->5 (~700)
+    step = int(np.clip(70_000 // max(pl["nrows"] // max(len(pl["units"]), 1), 1), 4, 64))
     for lo in range(0, P.shape[0], step):
         Pc = P[lo:lo + step]
         dinv = _dinv(pl["base"], Pc, scale)
         br, s_tot = _spinor_brackets(Pc, m_legs)
-        BT = _brtable(br)
+        BT = _brtable(br, s_tot, pl["kall"])
+        dinvT = np.ascontiguousarray(dinv.T)
         tot = np.zeros(len(Pc))
         for u in pl["units"]:
-            U, V = _unit_UV(u, BT, s_tot, dinv)
+            U, V = _unit_UV(u, BT, dinvT)
             tot += u["w"] * (U.real ** 2 + U.imag ** 2 + V.real ** 2 + V.imag ** 2)
         res[lo:lo + step] = tot / 4.0
     return res
@@ -1756,14 +1818,15 @@ def helicity_amplitudes(st, P, lg=None):
     dinv = _dinv(pl["base"], P, 1.0)
     br, s_tot = _spinor_brackets(P, st["m_legs"], lg)
     h = br.shape[1] // 2
-    BT = _brtable(br)
-    BS = _brtable(np.concatenate([br[:, h:], br[:, :h]], 1))   # every <ij> swapped with [ij]
+    BT = _brtable(br, s_tot, pl["kall"])
+    BS = _brtable(np.concatenate([br[:, h:], br[:, :h]], 1), s_tot, pl["kall"])   # every <ij> swapped with [ij]
+    dinvT = np.ascontiguousarray(dinv.T)
     res = {}
     for u in pl["units"]:
-        U, V = _unit_UV(u, BT, s_tot, dinv)
+        U, V = _unit_UV(u, BT, dinvT)
         res[u["lam"]] = U + 1j * V
         if u["w"] == 2.0:                                   # the partner: the same terms with brackets swapped
-            U, V = _unit_UV(u, BS, s_tot, dinv)             # (= U - iV of the above for physical spinors)
+            U, V = _unit_UV(u, BS, dinvT)                   # (= U - iV of the above for physical spinors)
             res[_neg(u["lam"])] = U + 1j * V
     return res
 
