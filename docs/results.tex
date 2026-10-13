@@ -5431,7 +5431,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     written up. \textbf{To do next:} E130 READY, \code{synthver} $52/52$: collect \code{tp3\_fsv2r2*}, \code{tp3\_fsv3r2*}
     from CC \emph{and} lxplus (v2r2's $D=10^2$, $10^3$ cells ran twice on CC: take the first result per hp; Z+5g
     $D=10^4$ on lxplus), add them to scratch\_sweeps.json, extend the v4r2/v5r2 table (sec:syn-versions) with v2r2 and
-    v3r2, draw the comparison figure, send it, ack E130. Early v2r2: $2.7\times10^{-2}$--$1.0\times10^{-1}$ at $D=10^2$,
+    v3r2, draw the comparison figure, send it, ack E130 (done 19:40, fig:synth\_versions). Early v2r2: $2.7\times10^{-2}$--$1.0\times10^{-1}$ at $D=10^2$,
     $10^3$, about $2\times$ worse than the finale's child. \textbf{Open with the user:} v6 only, or v6t too (v6t carries
     the probes' exact processes, as v5 does, which hurt $4$--$5\times$ at $D=10^2$). \textbf{Infra:} supervisor and
     events waiter in the background; gen helper for fixed-point fine-tunes: run\_generate(extend=True, fixed\_hp=E[n],
@@ -6304,26 +6304,42 @@ processes, bars the range) and of MadGraph on the same lxplus node (dashed: $Z$,
 \label{fig:synth_rates}
 \end{figure}
 
-\paragraph{Fine-tuned, first versions in (partial, 2026-10-13 10:30; v4r2 and v5r2 of four, collected from CC).} Each
+\paragraph{Fine-tuned (complete, $52/52$, collected from CC and lxplus 2026-10-13 19:30).} Each
 revision-$2$ pretraining (the finale plus that version's eight $2\to5$, $2\to6$ processes, hp73, $64$k) fine-tuned on
-$Z+4g$, $Z+5g$ at the v1 synthetic cells' own two points, so only the pretraining differs. Gain over the finale's child,
-in dex (finale$+W$ for reference):
+$Z+4g$, $Z+5g$ at the v1 synthetic cells' own two points, so only the pretraining differs
+(\code{analysis/transfer/synth\_versions.py}, Fig.~\ref{fig:synth_versions}). Gain over the finale's child, in dex
+(finale$+W$ for reference; v2r2's $D=10^2$, $10^3$ cells ran twice on CC, the first result per point is used, the
+repeats agree within $2\%$):
 \begin{center}\small
 \begin{tabular}{l rrr rrr}
  & \multicolumn{3}{c}{$Z+4g$, $D=$} & \multicolumn{3}{c}{$Z+5g$, $D=$} \\
  & $10^2$ & $10^3$ & $10^4$ & $10^2$ & $10^3$ & $10^4$ \\ \hline
 v1 (version $1$)  & $-0.02$ & $+0.15$ & $+0.08$ & $-0.03$ & $+0.11$ & $-0.07$ \\
-v4r2              & $-0.03$ & $+0.07$ & $+0.07$ & $+0.03$ & $+0.06$ & $-0.01$ \\
+v2r2 (real diagram counts) & $-0.32$ & $-0.31$ & $-0.03$ & $-0.33$ & $-0.25$ & $-0.16$ \\
+v3r2 (SM vertices) & $+0.05$ & $+0.07$ & $-0.00$ & $-0.09$ & $+0.04$ & $-0.06$ \\
+v4r2 (collinear, soft) & $-0.03$ & $+0.07$ & $+0.07$ & $+0.03$ & $+0.06$ & $-0.01$ \\
 v5r2 (target shape) & $-0.61$ & $-0.05$ & $+0.11$ & $-0.71$ & $+0.02$ & $+0.04$ \\ \hline
 finale$+W$        & $+0.49$ & $+0.50$ & $+0.22$ & $+0.30$ & $+0.33$ & $-0.06$ \\
 \end{tabular}
 \end{center}
-The collinear and soft structure (v4r2) changes nothing measurable against v1. The target-shaped version is \emph{worse}
-at $D=10^2$, by $4$--$5\times$ against the finale ($Z+5g$ even $0.08$\,dex below scratch), and level from $10^3$ on. Its
-eight processes include $q\bar q\to Z+4g$ and $Z+5g$ with exactly the probes' particles and order vector but a
-synthetic $|\mathcal M|^2$: the pretrained model has learned a wrong function for the very input the probe presents,
-and with $10^2$ events and $2\,816$ steps the fine-tune cannot unlearn it. A synthetic process that coincides with a
-real one in every input the model sees is a wrong label, not a prior. v2r2 and v3r2 still pretraining; one seed.
+No version improves on v1, and none comes near the finale$+W$ pretraining. Giving the random processes their real
+diagram counts (v2r2) makes the child $2\times$ worse at $D=10^2$, $10^3$ on both probes; restricting to Standard Model
+vertices (v3r2) recovers v1's level, and the collinear and soft structure (v4r2) changes nothing measurable on top. The
+target-shaped version is \emph{worse} at $D=10^2$, by $4$--$5\times$ against the finale ($Z+5g$ even $0.08$\,dex below
+scratch), and level from $10^3$ on. Its eight processes include $q\bar q\to Z+4g$ and $Z+5g$ with exactly the probes'
+particles and order vector but a synthetic $|\mathcal M|^2$: the pretrained model has learned a wrong function for the
+very input the probe presents, and with $10^2$ events and $2\,816$ steps the fine-tune cannot unlearn it. A synthetic
+process that coincides with a real one in every input the model sees is a wrong label, not a prior. One seed.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/synth_versions.pdf}
+\caption{The synthetic generator's versions, each pretrained with the finale's processes and fine-tuned on $Z+4g$ (left)
+and $Z+5g$ (right) at the v1 cells' two points: $\log_{10}(L_\text{finale}/L)$ at the best checkpoint, above zero the
+version's child beats the finale's. $D=10^2$, $10^3$ at $8$k steps, $10^4$ at $32$k. finale$+W$ (real $W+4g$, $W+5g$
+in the pretraining) for reference. One seed.}
+\label{fig:synth_versions}
+\end{figure}
 
 \subsection{Proposed, not run: one-loop synthetic amplitudes}\label{sec:syn-loops}
 Any one-loop amplitude decomposes into a few universal scalar integrals with process-dependent coefficients,
