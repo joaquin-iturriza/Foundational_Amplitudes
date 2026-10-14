@@ -136,3 +136,4 @@ sweeps_local/
 .claude/.compact_wanted
 .claude/.watchdog_state.json
 analysis/transfer/waddm_curves.json
+analysis/transfer/delta_data/
