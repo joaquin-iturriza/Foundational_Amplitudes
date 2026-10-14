@@ -5424,6 +5424,24 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     $4/8$ (partial written up), \code{trendtests} (b) the $128$k pair on CC. \textbf{Written up since:}
     \code{replaylowd} $130/130$ with the reading (late addition below pretraining from the start, most of the gain at a
     fraction of the cost; the trade depends on model size).
+    \emph{State (2026-10-14, 19:45):} \textbf{Investigated and told to the user (19:40):} (i) arXiv:2606.23791's catalog
+    (\code{analysis/catalog\_daniel/}): $1501$ processes are $409$ exact relabelling classes at MadGraph's default coupling
+    orders (what its events contain) and $467$ at all orders (what its diagram files show; $616$/$708$ without merging
+    CP conjugates); $96$ of the $149$ held-out processes are exact relabels of training ones; ours cover $81$ of $467$;
+    no $|\mathcal M|^2$ is public (Zenodo: momenta only); our own generation $\approx19$ core-h for all $1491$, after a
+    reader of its catalog and massive $b$ beams ($347$ processes) are built. (ii) Zero-shot: theirs is not better on
+    $R^2$; autoregression is not the reason (every arm of theirs is autoregressive, one-hot fails held out).
+    (iii) The heteroscedastic history (the argument withdrawn, causes listed in the plan below). (iv) Delta-plot audit
+    (\code{analysis/transfer/delta\_audit.json}): paper's figures use the $8$k grid at $d8$; $179$ runs, $176$ keep their
+    best model (pruned: \code{tp3\_finfte\_uubar\_Zggg\_d8} trial 96, \code{tp3\_r1fte\_udbar\_enu\_d8} 197,
+    \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} 98, $\approx0.85$ GPU-h to rerun); runs on Jean Zay $107$, CC $37$, lxplus $32$;
+    \code{run\_data\_tools eval} has an EMA bug (fresh EMA of random weights scored when \code{cfg.ema}; fix: set
+    \code{cfg.ema=False}, \code{reset\_output\_head=False}, an \code{--pred-dir} with \code{save\_predictions}, assert stats
+    and val MSE). \textbf{Waiting on the user:} coupling orders (recommended: all), massive $b$ beams or
+    \code{sm-no\_b\_mass}, the catalog's loss (MSE now or after the clean joint heteroscedastic test), whether the
+    $|\mathcal M|^2$ labels exist in Heidelberg. \textbf{Next, approved (D42):} the eval fix, then the Delta-plot
+    re-evaluation on the three sites and the three reruns. \textbf{Infra:} supervisor and events waiter running; nothing
+    of ours queued.
     \emph{Plan (2026-10-14, user's list of 16:48; D42--D49), in priority order.} (1) \textbf{Full real catalog} (D45, most
     urgent, trainings sent today): the catalog of arXiv:2606.23791 ($1501$ tree processes, $2\to2$ $254$, $2\to3$ $1237$,
     $2\to1$ $10$, pp partons only; $519$--$711$ classes under a liberal flavour/charge-conjugation relabelling, $484$--$779$
