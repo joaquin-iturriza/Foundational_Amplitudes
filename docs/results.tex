@@ -5424,6 +5424,27 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     $4/8$ (partial written up), \code{trendtests} (b) the $128$k pair on CC. \textbf{Written up since:}
     \code{replaylowd} $130/130$ with the reading (late addition below pretraining from the start, most of the gain at a
     fraction of the cost; the trade depends on model size).
+    \emph{Plan (2026-10-14, user's list of 16:48; D42--D49), in priority order.} (1) \textbf{Full real catalog} (D45, most
+    urgent, trainings sent today): the catalog of arXiv:2606.23791 ($1501$ tree processes, $2\to2$ $254$, $2\to3$ $1237$,
+    $2\to1$ $10$, pp partons only; $519$--$711$ classes under a liberal flavour/charge-conjugation relabelling, $484$--$779$
+    by the earlier bounds), with Daniel's diagram embedding on top of the usual inputs; the user wants the diversity
+    (how many are relabels of one another) to ask the others about. Blocker: the catalog list carries no
+    $|\mathcal M|^2$; where the amplitude-labelled events of Sec.~cond (1352 training processes) live is asked. (2)
+    \textbf{Heteroscedastic loss} (agreement with the user first): the ``deterministic targets'' argument
+    (results above, Sec.~heterosc) is withdrawn: the failures trace to the geometric-mean bug (49cfe64), selection and
+    DyHPO on the $\beta$-NLL (cbae458), $\beta=1$ pinned (da17ce9), global grad clip shared by $\mu$ and $\sigma$, short
+    horizons; no clean $\beta=0$ joint run with every fix was ever made. (3) \textbf{$\Delta$ plots} (D42; Butter, Plehn):
+    arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at the largest $D$
+    ($10^4$): all ladder rungs; the scaling figures' arms; the star arms. No per-event predictions were saved
+    (\code{evaluation.save\_predictions} off): re-evaluate the best trials with \code{run\_data\_tools eval} plus a
+    predictions flag ($\sim180$ runs, $\sim3$--$6$ GPU-h); check that the chosen-point trials kept their models (13 cells
+    where prune's best differs). Pulls after (2), by retraining those cells with the agreed loss (D47). (4)
+    \textbf{Decomposed targets} (D48): per-diagram or per-pairing parts of the amplitude, as in real calculations; design
+    for loops. (5) \textbf{Synthetic one-loop amplitudes} (D44), small. (6) \textbf{Non-SM Lagrangians} (D49). (7)
+    \textbf{Three-phase training} (D46, lowest): synthetic until the fine-tune benefit stops, then real data. Recorded
+    as a result (D43): synthetic data does not help at high multiplicity and closer-to-physical versions hurt; the
+    direction is paused. Zero-shot comparison with the draft's Sec.~cond and the autoregressive question: answered
+    to the user 2026-10-14.
     \emph{State (2026-10-14, 18:30):} \textbf{On hold (user, 10-14: ``for now you'll put it on hold''):} synthetic v6
     and the labeller optimisation before it (D40, D41); v6t is not part of D40 and is not run. Prepared, not submitted:
     \code{sweep/sweep\_config\_tp3\_finale\_synhm\_v6.yaml} (v5r2's protocol, hp73). \textbf{Approved and not started:}
