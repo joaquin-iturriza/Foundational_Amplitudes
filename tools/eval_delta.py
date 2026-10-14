@@ -72,8 +72,11 @@ def one(run_dir, out_dir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out-dir", required=True)
-    ap.add_argument("run_dirs", nargs="+")
+    ap.add_argument("--list", help="a file of run directories, one per line (long lists hang the login shell)")
+    ap.add_argument("run_dirs", nargs="*")
     a = ap.parse_args()
+    if a.list:
+        a.run_dirs += [l.strip() for l in open(a.list) if l.strip() and not l.startswith("#")]
     bad = []
     for rd in a.run_dirs:
         rd = rd if os.path.isabs(rd) else os.path.join(siteconf.PROJECT_DIR, rd)
