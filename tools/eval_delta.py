@@ -20,7 +20,7 @@ import siteconf  # noqa: E402
 from rebuild_run import load_best_state  # noqa: E402
 
 
-def one(run_dir, out_dir):
+def one(run_dir, out_dir, seed=None):
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
@@ -31,6 +31,8 @@ def one(run_dir, out_dir):
             cfg.fine_tune.pretrained_path = None
             cfg.fine_tune.reset_output_head = False
         cfg.evaluation.save_predictions = True
+        if seed is not None:
+            cfg.seed = seed               # the random Lorentz frames of every role (invariance check)
         cfg.run_dir = out_dir
         if cfg.data.get("processes_file"):
             cfg.data.processes_file = siteconf._expand_str(str(cfg.data.processes_file))
@@ -72,6 +74,7 @@ def one(run_dir, out_dir):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out-dir", required=True)
+    ap.add_argument("--seed", type=int, default=None, help="override the run's seed (its random Lorentz frames)")
     ap.add_argument("--list", help="a file of run directories, one per line (long lists hang the login shell)")
     ap.add_argument("run_dirs", nargs="*")
     a = ap.parse_args()
@@ -83,7 +86,7 @@ def main():
         rd = os.path.normpath(rd)
         tag = "__".join(rd.split(os.sep)[-2:])
         try:
-            one(rd, os.path.join(a.out_dir, tag))
+            one(rd, os.path.join(a.out_dir, tag + (f"_seed{a.seed}" if a.seed is not None else "")), a.seed)
         except Exception:
             traceback.print_exc()
             print("EVAL_DELTA_FAIL " + json.dumps({"run_dir": rd}), flush=True)

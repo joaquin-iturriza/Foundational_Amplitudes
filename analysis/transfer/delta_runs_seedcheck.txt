@@ -1,0 +1,5 @@
+runs/tp3_synfte_ee_bb_nlo_d8_lad
+runs/tp3_finfte_ud_ud_d8/trial_0175
+runs/tp3_finfte_uubar_Zg_d8/trial_0031
+runs_from_lxplus/tp3_r9fte_ee_ddbar_d8_002/trial_0060
+runs_from_lxplus/tp3_ssudakovewfte_ee_dd_ew_nlo_d8/trial_0131
