@@ -20,7 +20,7 @@ import siteconf  # noqa: E402
 from rebuild_run import load_best_state  # noqa: E402
 
 
-def one(run_dir, out_dir, seed=None):
+def one(run_dir, out_dir, seed=None, tf32=None):
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
@@ -31,6 +31,8 @@ def one(run_dir, out_dir, seed=None):
             cfg.fine_tune.pretrained_path = None
             cfg.fine_tune.reset_output_head = False
         cfg.evaluation.save_predictions = True
+        if tf32 is not None:
+            cfg.training.allow_tf32 = tf32   # TF32 matmuls (H100/A100; a no-op on V100)
         if seed is not None:
             cfg.seed = seed               # the random Lorentz frames of every role (invariance check)
         cfg.run_dir = out_dir
@@ -71,6 +73,8 @@ def one(run_dir, out_dir, seed=None):
         exp._validate(0)
         exp.evaluate()
     rec = {"run_dir": run_dir, "out_dir": out_dir, "val_loss_rebuilt": exp.val_loss_no_reg[-1],
+           "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
+           "tf32": bool(torch.backends.cuda.matmul.allow_tf32),
            "files": sorted(f for f in os.listdir(out_dir) if f.startswith("preds_"))}
     json.dump(rec, open(os.path.join(out_dir, "eval_delta.json"), "w"), indent=1)
     print("EVAL_DELTA " + json.dumps(rec), flush=True)
@@ -80,6 +84,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--seed", type=int, default=None, help="override the run's seed (its random Lorentz frames)")
+    ap.add_argument("--tf32", choices=("on", "off"), default=None, help="override training.allow_tf32")
     ap.add_argument("--list", help="a file of run directories, one per line (long lists hang the login shell)")
     ap.add_argument("run_dirs", nargs="*")
     a = ap.parse_args()
@@ -91,7 +96,8 @@ def main():
         rd = os.path.normpath(rd)
         tag = "__".join(rd.split(os.sep)[-2:])
         try:
-            one(rd, os.path.join(a.out_dir, tag + (f"_seed{a.seed}" if a.seed is not None else "")), a.seed)
+            sfx = (f"_seed{a.seed}" if a.seed is not None else "") + (f"_tf32{a.tf32}" if a.tf32 else "")
+            one(rd, os.path.join(a.out_dir, tag + sfx), a.seed, None if a.tf32 is None else a.tf32 == "on")
         except Exception:
             traceback.print_exc()
             print("EVAL_DELTA_FAIL " + json.dumps({"run_dir": rd}), flush=True)
