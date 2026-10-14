@@ -17,7 +17,10 @@ T="$PROJECT_DIR/$1"
 test -f "$T/config.yaml" || { echo "no $T/config.yaml"; exit 1; }
 test -e "${T}_rerun" && { echo "${T}_rerun exists"; exit 1; }
 PARENT=()
-[ -n "$2" ] && PARENT=(fine_tune.pretrained_path="$PROJECT_DIR/$2")
+# a copied trial names the other site's recipe path: re-root it on this checkout
+PF=$(grep -m1 "processes_file:" "$T/config.yaml" | sed "s/.*processes_file: *//")
+[ -n "$PF" ] && [ ! -e "$PF" ] && PARENT+=(data.processes_file="$PROJECT_DIR/recipes/${PF##*/recipes/}")
+[ -n "$2" ] && PARENT+=(fine_tune.pretrained_path="$PROJECT_DIR/$2")
 python run.py --config-path "$T" --config-name config run_dir="${T}_rerun" warm_start_idx=null \
     training.is_dyhpo_run=false plot=true "${PARENT[@]}"
 python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta" "${T}_rerun"
