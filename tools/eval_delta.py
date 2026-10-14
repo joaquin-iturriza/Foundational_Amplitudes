@@ -41,14 +41,19 @@ def one(run_dir, out_dir, seed=None):
         with open_dict(cfg):
             cfg.data.offshell_stats = saved["offshell_stats"]
     os.makedirs(out_dir, exist_ok=True)
-    # the run's frozen stats are read as a resume reads its own (warm_start during init_data only): a fine-tune's
-    # momentum scale is its parent's, which a fresh build without the parent would refit (rebuilt val 3e5x worse)
-    shutil.copy(os.path.join(run_dir, "data_stats.json"), os.path.join(out_dir, "data_stats.json"))
+    # the run's frozen stats are read as a resume reads its own (warm_start during init_physics/init_data only): a
+    # fine-tune's momentum scale is its parent's, which a fresh build without the parent would refit (rebuilt val 3e5x
+    # worse);
+    # and its particle tokenizer the same way: a fine-tune's is its parent's (token index -> particle), and a fresh one
+    # built from the probe alone re-indexes the particles under the trained weights (rebuilt val up to 13x off)
+    for f in ("data_stats.json", "particle_tokenizer.json"):
+        shutil.copy(os.path.join(run_dir, f), os.path.join(out_dir, f))
     torch.set_default_dtype(torch.float32)
     from experiment import AmplitudeExperiment
     exp = AmplitudeExperiment(cfg)
-    exp._init(); exp.init_physics(); exp.init_geometric_algebra()
+    exp._init()
     exp.warm_start = True
+    exp.init_physics(); exp.init_geometric_algebra()
     exp.init_data()
     exp.warm_start = False
     exp._init_dataloader(); exp.init_model()
