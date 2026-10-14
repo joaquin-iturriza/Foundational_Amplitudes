@@ -1,0 +1,3253 @@
+{
+ "rows": {
+  "cs_cs": {
+   "proc": "c s > c s",
+   "exact": "c s > c s",
+   "weak": "c s > c s",
+   "dan_exact": [
+    "s c > s c",
+    "s~ c~ > s~ c~",
+    "u d > u d",
+    "u~ d~ > u~ d~"
+   ],
+   "dan_weak": [
+    "s c > s c",
+    "s~ c~ > s~ c~",
+    "u b > u b",
+    "u d > u d"
+   ]
+  },
+  "dd_dd": {
+   "proc": "d d > d d",
+   "exact": "d d > d d",
+   "weak": "d d > d d",
+   "dan_exact": [
+    "d d > d d",
+    "d~ d~ > d~ d~",
+    "s s > s s",
+    "s~ s~ > s~ s~"
+   ],
+   "dan_weak": [
+    "b b > b b",
+    "b~ b~ > b~ b~",
+    "d b > d b",
+    "d d > d d"
+   ]
+  },
+  "ds_ds": {
+   "proc": "d s > d s",
+   "exact": "d s > d s",
+   "weak": "d s > d s",
+   "dan_exact": [
+    "d s > d s",
+    "d~ s~ > d~ s~"
+   ],
+   "dan_weak": [
+    "d s > d s",
+    "d~ s~ > d~ s~",
+    "s b > s b",
+    "s~ b~ > s~ b~"
+   ]
+  },
+  "ee_WW": {
+   "proc": "e- e+ > w+ w-",
+   "exact": "e+ e- > w+ w-",
+   "weak": "e+ e- > w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WWH": {
+   "proc": "e- e+ > w+ w- h",
+   "exact": "e+ e- > h w+ w-",
+   "weak": "e+ e- > h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WWWW": {
+   "proc": "e- e+ > w+ w- w+ w-",
+   "exact": "e+ e- > w+ w+ w- w-",
+   "weak": "e+ e- > w+ w+ w- w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WWZZ": {
+   "proc": "e- e+ > w+ w- z z",
+   "exact": "e+ e- > w+ w- z z",
+   "weak": "e+ e- > w+ w- z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WWa": {
+   "proc": "e- e+ > w+ w- a",
+   "exact": "e+ e- > a w+ w-",
+   "weak": "e+ e- > a w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WWaa": {
+   "proc": "e- e+ > w+ w- a a",
+   "exact": "e+ e- > a a w+ w-",
+   "weak": "e+ e- > a a w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WpWmHH": {
+   "proc": "e- e+ > w+ w- h h",
+   "exact": "e+ e- > h h w+ w-",
+   "weak": "e+ e- > h h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WpWmHa": {
+   "proc": "e- e+ > w+ w- h a",
+   "exact": "e+ e- > a h w+ w-",
+   "weak": "e+ e- > a h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WpWmZH": {
+   "proc": "e- e+ > w+ w- z h",
+   "exact": "e+ e- > h w+ w- z",
+   "weak": "e+ e- > h w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_WpWmZa": {
+   "proc": "e- e+ > w+ w- z a",
+   "exact": "e+ e- > a w+ w- z",
+   "weak": "e+ e- > a w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZH": {
+   "proc": "e- e+ > z h",
+   "exact": "h z > q q~",
+   "weak": "h z > q q~",
+   "dan_exact": [
+    "c c~ > z h",
+    "d d~ > z h",
+    "s s~ > z h",
+    "u u~ > z h"
+   ],
+   "dan_weak": [
+    "c c~ > z h",
+    "d d~ > z h",
+    "s s~ > z h",
+    "u u~ > z h"
+   ]
+  },
+  "ee_ZHH": {
+   "proc": "e- e+ > z h h",
+   "exact": "c c~ > h h z",
+   "weak": "c c~ > h h z",
+   "dan_exact": [
+    "c c~ > z h h",
+    "u u~ > z h h"
+   ],
+   "dan_weak": []
+  },
+  "ee_ZHHa": {
+   "proc": "e- e+ > z h h a",
+   "exact": "c c~ > a h h z",
+   "weak": "c c~ > a h h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZZ": {
+   "proc": "e- e+ > z z",
+   "exact": "q q~ > z z",
+   "weak": "q q~ > z z",
+   "dan_exact": [
+    "c c~ > z z",
+    "d d~ > z z",
+    "s s~ > z z",
+    "u u~ > z z"
+   ],
+   "dan_weak": [
+    "b b~ > z z",
+    "c c~ > z z",
+    "d d~ > z z",
+    "s s~ > z z"
+   ]
+  },
+  "ee_ZZH": {
+   "proc": "e- e+ > z z h",
+   "exact": "c c~ > h z z",
+   "weak": "c c~ > h z z",
+   "dan_exact": [
+    "c c~ > z z h",
+    "u u~ > z z h"
+   ],
+   "dan_weak": []
+  },
+  "ee_ZZHH": {
+   "proc": "e- e+ > z z h h",
+   "exact": "c c~ > h h z z",
+   "weak": "c c~ > h h z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZZHa": {
+   "proc": "e- e+ > z z h a",
+   "exact": "c c~ > a h z z",
+   "weak": "c c~ > a h z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZZZ": {
+   "proc": "e- e+ > z z z",
+   "exact": "c c~ > z z z",
+   "weak": "c c~ > z z z",
+   "dan_exact": [
+    "c c~ > z z z",
+    "u u~ > z z z"
+   ],
+   "dan_weak": [
+    "c c~ > z z z",
+    "u u~ > z z z"
+   ]
+  },
+  "ee_ZZZZ": {
+   "proc": "e- e+ > z z z z",
+   "exact": "c c~ > z z z z",
+   "weak": "c c~ > z z z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZZZa": {
+   "proc": "e- e+ > z z z a",
+   "exact": "c c~ > a z z z",
+   "weak": "c c~ > a z z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZZa": {
+   "proc": "e- e+ > z z a",
+   "exact": "q q~ > a z z",
+   "weak": "q q~ > a z z",
+   "dan_exact": [
+    "c c~ > a z z",
+    "d d~ > a z z",
+    "s s~ > a z z",
+    "u u~ > a z z"
+   ],
+   "dan_weak": [
+    "b b~ > a z z",
+    "b b~ > g z z",
+    "c c~ > a z z",
+    "c c~ > g z z"
+   ]
+  },
+  "ee_Za": {
+   "proc": "e- e+ > z a",
+   "exact": "a z > q q~",
+   "weak": "a z > q q~",
+   "dan_exact": [
+    "c c~ > a z",
+    "d d~ > a z",
+    "s s~ > a z",
+    "u u~ > a z"
+   ],
+   "dan_weak": [
+    "b b~ > a z",
+    "b b~ > g z",
+    "c c~ > a z",
+    "c c~ > g z"
+   ]
+  },
+  "ee_ZaH": {
+   "proc": "e- e+ > z a h",
+   "exact": "q q~ > a h z",
+   "weak": "q q~ > a h z",
+   "dan_exact": [
+    "c c~ > a z h",
+    "d d~ > a z h",
+    "s s~ > a z h",
+    "u u~ > a z h"
+   ],
+   "dan_weak": [
+    "c c~ > a z h",
+    "c c~ > g z h",
+    "d d~ > a z h",
+    "d d~ > g z h"
+   ]
+  },
+  "ee_ZaHa": {
+   "proc": "e- e+ > z a h a",
+   "exact": "q q~ > a a h z",
+   "weak": "q q~ > a a h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ZaZa": {
+   "proc": "e- e+ > z a z a",
+   "exact": "q q~ > a a z z",
+   "weak": "q q~ > a a z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_Zaa": {
+   "proc": "e- e+ > z a a",
+   "exact": "q q~ > a a z",
+   "weak": "q q~ > a a z",
+   "dan_exact": [
+    "c c~ > a a z",
+    "d d~ > a a z",
+    "s s~ > a a z",
+    "u u~ > a a z"
+   ],
+   "dan_weak": [
+    "b b~ > a a z",
+    "b b~ > g a z",
+    "c c~ > a a z",
+    "c c~ > g a z"
+   ]
+  },
+  "ee_aa": {
+   "proc": "e- e+ > a a",
+   "exact": "a a > q q~",
+   "weak": "a a > q q~",
+   "dan_exact": [
+    "c c~ > a a",
+    "d d~ > a a",
+    "s s~ > a a",
+    "u u~ > a a"
+   ],
+   "dan_weak": [
+    "b b~ > a a",
+    "b b~ > g a",
+    "c c~ > a a",
+    "c c~ > g a"
+   ]
+  },
+  "ee_aaZa": {
+   "proc": "e- e+ > a a z a",
+   "exact": "q q~ > a a a z",
+   "weak": "q q~ > a a a z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_aaa": {
+   "proc": "e- e+ > a a a",
+   "exact": "q q~ > a a a",
+   "weak": "q q~ > a a a",
+   "dan_exact": [
+    "c c~ > a a a",
+    "d d~ > a a a",
+    "s s~ > a a a",
+    "u u~ > a a a"
+   ],
+   "dan_weak": [
+    "b b~ > a a a",
+    "b b~ > g a a",
+    "c c~ > a a a",
+    "c c~ > g a a"
+   ]
+  },
+  "ee_aaaa": {
+   "proc": "e- e+ > a a a a",
+   "exact": "q q~ > a a a a",
+   "weak": "q q~ > a a a a",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbar": {
+   "proc": "e- e+ > b b~",
+   "exact": "b b~ > e+ e-",
+   "weak": "d d~ > e+ e-",
+   "dan_exact": [
+    "b b~ > e- e+",
+    "b b~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "b b~ > e- e+",
+    "b b~ > mu- mu+",
+    "b b~ > ta- ta+",
+    "d d~ > e- e+"
+   ]
+  },
+  "ee_bbbarH": {
+   "proc": "e- e+ > b b~ h",
+   "exact": "e+ e- > b b~ h",
+   "weak": "e+ e- > b b~ h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarHa": {
+   "proc": "e- e+ > b b~ h a",
+   "exact": "e+ e- > a b b~ h",
+   "weak": "e+ e- > a b b~ h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarHg": {
+   "proc": "e- e+ > b b~ h g",
+   "exact": "e+ e- > b b~ g h",
+   "weak": "e+ e- > b b~ g h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarZ": {
+   "proc": "e- e+ > b b~ z",
+   "exact": "e+ e- > b b~ z",
+   "weak": "e+ e- > d d~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarZa": {
+   "proc": "e- e+ > b b~ z a",
+   "exact": "e+ e- > a b b~ z",
+   "weak": "e+ e- > a d d~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarZg": {
+   "proc": "e- e+ > b b~ z g",
+   "exact": "e+ e- > b b~ g z",
+   "weak": "e+ e- > d d~ g z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbara": {
+   "proc": "e- e+ > b b~ a",
+   "exact": "e+ e- > a b b~",
+   "weak": "e+ e- > a d d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbaraa": {
+   "proc": "e- e+ > b b~ a a",
+   "exact": "e+ e- > a a b b~",
+   "weak": "e+ e- > a a d d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarbbbar": {
+   "proc": "e- e+ > b b~ b b~",
+   "exact": "e+ e- > b b b~ b~",
+   "weak": "e+ e- > d d d~ d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarg": {
+   "proc": "e- e+ > b b~ g",
+   "exact": "e+ e- > b b~ g",
+   "weak": "e+ e- > d d~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarga": {
+   "proc": "e- e+ > b b~ g a",
+   "exact": "e+ e- > a b b~ g",
+   "weak": "e+ e- > a d d~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbargg": {
+   "proc": "e- e+ > b b~ g g",
+   "exact": "e+ e- > b b~ g g",
+   "weak": "e+ e- > d d~ g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarmupmum": {
+   "proc": "e- e+ > b b~ mu+ mu-",
+   "exact": "e+ e- > b b~ mu+ mu-",
+   "weak": "e+ e- > d d~ mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbartaptam": {
+   "proc": "e- e+ > b b~ ta+ ta-",
+   "exact": "e+ e- > b b~ ta+ ta-",
+   "weak": "e+ e- > d d~ e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bbbarvevebar": {
+   "proc": "e- e+ > b b~ ve ve~",
+   "exact": "e+ e- > b b~ ve ve~",
+   "weak": "e+ e- > d d~ ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_bhabha": {
+   "proc": "e- e+ > e+ e-",
+   "exact": "e+ e- > e+ e-",
+   "weak": "e+ e- > e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_cc": {
+   "proc": "e- e+ > c c~",
+   "exact": "c c~ > e+ e-",
+   "weak": "c c~ > e+ e-",
+   "dan_exact": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "u u~ > e- e+",
+    "u u~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "c c~ > ta- ta+",
+    "u u~ > e- e+"
+   ]
+  },
+  "ee_ddbar": {
+   "proc": "e- e+ > d d~",
+   "exact": "d d~ > e+ e-",
+   "weak": "d d~ > e+ e-",
+   "dan_exact": [
+    "d d~ > e- e+",
+    "d d~ > mu- mu+",
+    "s s~ > e- e+",
+    "s s~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "b b~ > e- e+",
+    "b b~ > mu- mu+",
+    "b b~ > ta- ta+",
+    "d d~ > e- e+"
+   ]
+  },
+  "ee_ddbara": {
+   "proc": "e- e+ > d d~ a",
+   "exact": "e+ e- > a d d~",
+   "weak": "e+ e- > a d d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbaraa": {
+   "proc": "e- e+ > d d~ a a",
+   "exact": "e+ e- > a a d d~",
+   "weak": "e+ e- > a a d d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarbbbar": {
+   "proc": "e- e+ > d d~ b b~",
+   "exact": "e+ e- > b b~ d d~",
+   "weak": "e+ e- > d d d~ d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarddbar": {
+   "proc": "e- e+ > d d~ d d~",
+   "exact": "e+ e- > d d d~ d~",
+   "weak": "e+ e- > d d d~ d~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarg": {
+   "proc": "e- e+ > d d~ g",
+   "exact": "e+ e- > d d~ g",
+   "weak": "e+ e- > d d~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarga": {
+   "proc": "e- e+ > d d~ g a",
+   "exact": "e+ e- > a d d~ g",
+   "weak": "e+ e- > a d d~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbargg": {
+   "proc": "e- e+ > d d~ g g",
+   "exact": "e+ e- > d d~ g g",
+   "weak": "e+ e- > d d~ g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarmupmum": {
+   "proc": "e- e+ > d d~ mu+ mu-",
+   "exact": "e+ e- > d d~ mu+ mu-",
+   "weak": "e+ e- > d d~ mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbartaptam": {
+   "proc": "e- e+ > d d~ ta+ ta-",
+   "exact": "e+ e- > d d~ ta+ ta-",
+   "weak": "e+ e- > d d~ e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarttbar": {
+   "proc": "e- e+ > d d~ t t~",
+   "exact": "e+ e- > d d~ t t~",
+   "weak": "e+ e- > d d~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ddbarvevebar": {
+   "proc": "e- e+ > d d~ ve ve~",
+   "exact": "e+ e- > d d~ ve ve~",
+   "weak": "e+ e- > d d~ ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_eeH": {
+   "proc": "e- e+ > e+ e- h",
+   "exact": "e+ e- > e+ e- h",
+   "weak": "e+ e- > e+ e- h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_enuW": {
+   "proc": "e- e+ > e- ve~ w+",
+   "exact": "e+ e- > e+ ve w-",
+   "weak": "e+ e- > e+ ve w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_epemHa": {
+   "proc": "e- e+ > e+ e- h a",
+   "exact": "e+ e- > a e+ e- h",
+   "weak": "e+ e- > a e+ e- h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_epema": {
+   "proc": "e- e+ > e+ e- a",
+   "exact": "e+ e- > a e+ e-",
+   "weak": "e+ e- > a e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_epemaa": {
+   "proc": "e- e+ > e+ e- a a",
+   "exact": "e+ e- > a a e+ e-",
+   "weak": "e+ e- > a a e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mumu": {
+   "proc": "e- e+ > mu+ mu-",
+   "exact": "e+ e- > mu+ mu-",
+   "weak": "e+ e- > mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mumua": {
+   "proc": "e- e+ > mu+ mu- a",
+   "exact": "e+ e- > a mu+ mu-",
+   "weak": "e+ e- > a mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mumumumu": {
+   "proc": "e- e+ > mu+ mu- mu+ mu-",
+   "exact": "e+ e- > mu+ mu+ mu- mu-",
+   "weak": "e+ e- > mu+ mu+ mu- mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mumutautau": {
+   "proc": "e- e+ > mu+ mu- ta+ ta-",
+   "exact": "e+ e- > mu+ mu- ta+ ta-",
+   "weak": "e+ e- > e+ e- mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mupmumaa": {
+   "proc": "e- e+ > mu+ mu- a a",
+   "exact": "e+ e- > a a mu+ mu-",
+   "weak": "e+ e- > a a mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_mupmumvevebar": {
+   "proc": "e- e+ > mu+ mu- ve ve~",
+   "exact": "e+ e- > mu+ mu- ve ve~",
+   "weak": "e+ e- > mu+ mu- ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nnbar": {
+   "proc": "e- e+ > ve ve~",
+   "exact": "e+ e- > ve ve~",
+   "weak": "e+ e- > ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nnbarH": {
+   "proc": "e- e+ > ve ve~ h",
+   "exact": "e+ e- > h ve ve~",
+   "weak": "e+ e- > h ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nnbarHH": {
+   "proc": "e- e+ > ve ve~ h h",
+   "exact": "e+ e- > h h ve ve~",
+   "weak": "e+ e- > h h ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nnbarWW": {
+   "proc": "e- e+ > ve ve~ w+ w-",
+   "exact": "e+ e- > ve ve~ w+ w-",
+   "weak": "e+ e- > ve ve~ w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nnbara": {
+   "proc": "e- e+ > ve ve~ a",
+   "exact": "e+ e- > a ve ve~",
+   "weak": "e+ e- > a ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_numu": {
+   "proc": "e- e+ > vm vm~",
+   "exact": "e+ e- > vm vm~",
+   "weak": "e+ e- > vm vm~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_nutau": {
+   "proc": "e- e+ > vt vt~",
+   "exact": "e+ e- > vt vt~",
+   "weak": "e+ e- > ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ss": {
+   "proc": "e- e+ > s s~",
+   "exact": "d d~ > e+ e-",
+   "weak": "d d~ > e+ e-",
+   "dan_exact": [
+    "d d~ > e- e+",
+    "d d~ > mu- mu+",
+    "s s~ > e- e+",
+    "s s~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "b b~ > e- e+",
+    "b b~ > mu- mu+",
+    "b b~ > ta- ta+",
+    "d d~ > e- e+"
+   ]
+  },
+  "ee_ssbarg": {
+   "proc": "e- e+ > s s~ g",
+   "exact": "e+ e- > d d~ g",
+   "weak": "e+ e- > d d~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_taptamaa": {
+   "proc": "e- e+ > ta+ ta- a a",
+   "exact": "e+ e- > a a ta+ ta-",
+   "weak": "e+ e- > a a e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_taptamtaptam": {
+   "proc": "e- e+ > ta+ ta- ta+ ta-",
+   "exact": "e+ e- > ta+ ta+ ta- ta-",
+   "weak": "e+ e- > e+ e+ e- e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_taptamvevebar": {
+   "proc": "e- e+ > ta+ ta- ve ve~",
+   "exact": "e+ e- > ta+ ta- ve ve~",
+   "weak": "e+ e- > e+ e- ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_tautau": {
+   "proc": "e- e+ > ta+ ta-",
+   "exact": "e+ e- > ta+ ta-",
+   "weak": "e+ e- > e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_tautaua": {
+   "proc": "e- e+ > ta+ ta- a",
+   "exact": "e+ e- > a ta+ ta-",
+   "weak": "e+ e- > a e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbar": {
+   "proc": "e- e+ > t t~",
+   "exact": "e+ e- > t t~",
+   "weak": "e+ e- > t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarH": {
+   "proc": "e- e+ > t t~ h",
+   "exact": "e+ e- > h t t~",
+   "weak": "e+ e- > h t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarHa": {
+   "proc": "e- e+ > t t~ h a",
+   "exact": "e+ e- > a h t t~",
+   "weak": "e+ e- > a h t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarHg": {
+   "proc": "e- e+ > t t~ h g",
+   "exact": "e+ e- > g h t t~",
+   "weak": "e+ e- > g h t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarZ": {
+   "proc": "e- e+ > t t~ z",
+   "exact": "e+ e- > t t~ z",
+   "weak": "e+ e- > t t~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarZa": {
+   "proc": "e- e+ > t t~ z a",
+   "exact": "e+ e- > a t t~ z",
+   "weak": "e+ e- > a t t~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarZg": {
+   "proc": "e- e+ > t t~ z g",
+   "exact": "e+ e- > g t t~ z",
+   "weak": "e+ e- > g t t~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbara": {
+   "proc": "e- e+ > t t~ a",
+   "exact": "e+ e- > a t t~",
+   "weak": "e+ e- > a t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbaraa": {
+   "proc": "e- e+ > t t~ a a",
+   "exact": "e+ e- > a a t t~",
+   "weak": "e+ e- > a a t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarbb": {
+   "proc": "e- e+ > t t~ b b~",
+   "exact": "e+ e- > b b~ t t~",
+   "weak": "e+ e- > b b~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarg": {
+   "proc": "e- e+ > t t~ g",
+   "exact": "e+ e- > g t t~",
+   "weak": "e+ e- > g t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarga": {
+   "proc": "e- e+ > t t~ g a",
+   "exact": "e+ e- > a g t t~",
+   "weak": "e+ e- > a g t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbargg": {
+   "proc": "e- e+ > t t~ g g",
+   "exact": "e+ e- > g g t t~",
+   "weak": "e+ e- > g g t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarmupmum": {
+   "proc": "e- e+ > t t~ mu+ mu-",
+   "exact": "e+ e- > mu+ mu- t t~",
+   "weak": "e+ e- > mu+ mu- t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbartaptam": {
+   "proc": "e- e+ > t t~ ta+ ta-",
+   "exact": "e+ e- > t ta+ ta- t~",
+   "weak": "e+ e- > e+ e- t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarttbar": {
+   "proc": "e- e+ > t t~ t t~",
+   "exact": "e+ e- > t t t~ t~",
+   "weak": "e+ e- > t t t~ t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_ttbarvevebar": {
+   "proc": "e- e+ > t t~ ve ve~",
+   "exact": "e+ e- > t t~ ve ve~",
+   "weak": "e+ e- > t t~ ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uu": {
+   "proc": "e- e+ > u u~",
+   "exact": "c c~ > e+ e-",
+   "weak": "c c~ > e+ e-",
+   "dan_exact": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "u u~ > e- e+",
+    "u u~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "c c~ > ta- ta+",
+    "u u~ > e- e+"
+   ]
+  },
+  "ee_uua": {
+   "proc": "e- e+ > u u~ a",
+   "exact": "e+ e- > a c c~",
+   "weak": "e+ e- > a c c~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubaraa": {
+   "proc": "e- e+ > u u~ a a",
+   "exact": "e+ e- > a a c c~",
+   "weak": "e+ e- > a a c c~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubarbbbar": {
+   "proc": "e- e+ > u u~ b b~",
+   "exact": "e+ e- > b b~ c c~",
+   "weak": "e+ e- > c c~ s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubarga": {
+   "proc": "e- e+ > u u~ g a",
+   "exact": "e+ e- > a c c~ g",
+   "weak": "e+ e- > a c c~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubarmupmum": {
+   "proc": "e- e+ > u u~ mu+ mu-",
+   "exact": "e+ e- > c c~ mu+ mu-",
+   "weak": "e+ e- > c c~ mu+ mu-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubartaptam": {
+   "proc": "e- e+ > u u~ ta+ ta-",
+   "exact": "e+ e- > c c~ ta+ ta-",
+   "weak": "e+ e- > c c~ e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubarttbar": {
+   "proc": "e- e+ > u u~ t t~",
+   "exact": "e+ e- > c c~ t t~",
+   "weak": "e+ e- > c c~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uubarvevebar": {
+   "proc": "e- e+ > u u~ ve ve~",
+   "exact": "e+ e- > c c~ ve ve~",
+   "weak": "e+ e- > c c~ ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uudd": {
+   "proc": "e- e+ > u u~ d d~",
+   "exact": "e+ e- > c c~ s s~",
+   "weak": "e+ e- > c c~ s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uug": {
+   "proc": "e- e+ > u u~ g",
+   "exact": "e+ e- > c c~ g",
+   "weak": "e+ e- > c c~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uugg": {
+   "proc": "e- e+ > u u~ g g",
+   "exact": "e+ e- > c c~ g g",
+   "weak": "e+ e- > c c~ g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uuggg": {
+   "proc": "e- e+ > u u~ g g g",
+   "exact": "e+ e- > c c~ g g g",
+   "weak": "e+ e- > c c~ g g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_uuuu": {
+   "proc": "e- e+ > u u~ u u~",
+   "exact": "e+ e- > c c c~ c~",
+   "weak": "e+ e- > c c c~ c~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vevebarHa": {
+   "proc": "e- e+ > ve ve~ h a",
+   "exact": "e+ e- > a h ve ve~",
+   "weak": "e+ e- > a h ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vevebarZH": {
+   "proc": "e- e+ > ve ve~ z h",
+   "exact": "e+ e- > h ve ve~ z",
+   "weak": "e+ e- > h ve ve~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vevebarZZ": {
+   "proc": "e- e+ > ve ve~ z z",
+   "exact": "e+ e- > ve ve~ z z",
+   "weak": "e+ e- > ve ve~ z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vevebaraa": {
+   "proc": "e- e+ > ve ve~ a a",
+   "exact": "e+ e- > a a ve ve~",
+   "weak": "e+ e- > a a ve ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vevebarvevebar": {
+   "proc": "e- e+ > ve ve~ ve ve~",
+   "exact": "e+ e- > ve ve ve~ ve~",
+   "weak": "e+ e- > ve ve ve~ ve~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vmvmbara": {
+   "proc": "e- e+ > vm vm~ a",
+   "exact": "e+ e- > a vm vm~",
+   "weak": "e+ e- > a vm vm~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_vmvmbaraa": {
+   "proc": "e- e+ > vm vm~ a a",
+   "exact": "e+ e- > a a vm vm~",
+   "weak": "e+ e- > a a vm vm~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_wwbb": {
+   "proc": "e- e+ > w+ w- b b~",
+   "exact": "e+ e- > b b~ w+ w-",
+   "weak": "e+ e- > b b~ w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ee_wwz": {
+   "proc": "e- e+ > w+ w- z",
+   "exact": "e+ e- > w+ w- z",
+   "weak": "e+ e- > w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ud_ud": {
+   "proc": "u d > u d",
+   "exact": "c s > c s",
+   "weak": "c s > c s",
+   "dan_exact": [
+    "s c > s c",
+    "s~ c~ > s~ c~",
+    "u d > u d",
+    "u~ d~ > u~ d~"
+   ],
+   "dan_weak": [
+    "s c > s c",
+    "s~ c~ > s~ c~",
+    "u b > u b",
+    "u d > u d"
+   ]
+  },
+  "ud_uda": {
+   "proc": "u d > u d a",
+   "exact": "c s > a c s",
+   "weak": "c s > a c s",
+   "dan_exact": [
+    "s c > s c a",
+    "s~ c~ > s~ c~ a",
+    "u d > u d a",
+    "u~ d~ > u~ d~ a"
+   ],
+   "dan_weak": [
+    "s c > s c a",
+    "s~ c~ > s~ c~ a",
+    "u b > u b a",
+    "u d > u d a"
+   ]
+  },
+  "ud_udaa": {
+   "proc": "u d > u d a a",
+   "exact": "c s > a a c s",
+   "weak": "c s > a a c s",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ud_udg": {
+   "proc": "u d > u d g",
+   "exact": "c s > c g s",
+   "weak": "c s > c g s",
+   "dan_exact": [
+    "s c > g s c",
+    "s~ c~ > g s~ c~",
+    "u d > g u d",
+    "u~ d~ > g u~ d~"
+   ],
+   "dan_weak": [
+    "s c > g s c",
+    "s~ c~ > g s~ c~",
+    "u b > g u b",
+    "u d > g u d"
+   ]
+  },
+  "ud_udga": {
+   "proc": "u d > u d g a",
+   "exact": "c s > a c g s",
+   "weak": "c s > a c g s",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "ud_udgg": {
+   "proc": "u d > u d g g",
+   "exact": "c s > c g g s",
+   "weak": "c s > c g g s",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WH": {
+   "proc": "u d~ > w+ h",
+   "exact": "c s~ > h w+",
+   "weak": "c s~ > h w+",
+   "dan_exact": [
+    "c s~ > w+ h",
+    "d u~ > w- h",
+    "s c~ > w- h",
+    "u d~ > w+ h"
+   ],
+   "dan_weak": [
+    "c s~ > w+ h",
+    "d u~ > w- h",
+    "s c~ > w- h",
+    "u d~ > w+ h"
+   ]
+  },
+  "udbar_WZ": {
+   "proc": "u d~ > w+ z",
+   "exact": "c s~ > w+ z",
+   "weak": "c s~ > w+ z",
+   "dan_exact": [
+    "c s~ > w+ z",
+    "d u~ > w- z",
+    "s c~ > w- z",
+    "u d~ > w+ z"
+   ],
+   "dan_weak": [
+    "c s~ > w+ z",
+    "d u~ > w- z",
+    "s c~ > w- z",
+    "u d~ > w+ z"
+   ]
+  },
+  "udbar_Wa": {
+   "proc": "u d~ > w+ a",
+   "exact": "a w+ > c s~",
+   "weak": "a w+ > c s~",
+   "dan_exact": [
+    "c s~ > w+ a",
+    "d u~ > w- a",
+    "s c~ > w- a",
+    "u d~ > w+ a"
+   ],
+   "dan_weak": [
+    "c s~ > w+ a",
+    "d u~ > w- a",
+    "s c~ > w- a",
+    "u d~ > w+ a"
+   ]
+  },
+  "udbar_Wg": {
+   "proc": "u d~ > w+ g",
+   "exact": "c s~ > g w+",
+   "weak": "c s~ > g w+",
+   "dan_exact": [
+    "c s~ > g w+",
+    "d u~ > g w-",
+    "s c~ > g w-",
+    "u d~ > g w+"
+   ],
+   "dan_weak": [
+    "c s~ > g w+",
+    "d u~ > g w-",
+    "s c~ > g w-",
+    "u d~ > g w+"
+   ]
+  },
+  "udbar_Wgg": {
+   "proc": "u d~ > w+ g g",
+   "exact": "c s~ > g g w+",
+   "weak": "c s~ > g g w+",
+   "dan_exact": [
+    "c s~ > g g w+",
+    "d u~ > g g w-",
+    "s c~ > g g w-",
+    "u d~ > g g w+"
+   ],
+   "dan_weak": [
+    "c s~ > g g w+",
+    "d u~ > g g w-",
+    "s c~ > g g w-",
+    "u d~ > g g w+"
+   ]
+  },
+  "udbar_Wggg": {
+   "proc": "u d~ > w+ g g g",
+   "exact": "c s~ > g g g w+",
+   "weak": "c s~ > g g g w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_Wgggg": {
+   "proc": "u d~ > w+ g g g g",
+   "exact": "c s~ > g g g g w+",
+   "weak": "c s~ > g g g g w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_Wggggg": {
+   "proc": "u d~ > w+ g g g g g",
+   "exact": "c s~ > g g g g g w+",
+   "weak": "c s~ > g g g g g w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpHH": {
+   "proc": "u d~ > w+ h h",
+   "exact": "c s~ > h h w+",
+   "weak": "c s~ > h h w+",
+   "dan_exact": [
+    "c s~ > w+ h h",
+    "d u~ > w- h h",
+    "s c~ > w- h h",
+    "u d~ > w+ h h"
+   ],
+   "dan_weak": [
+    "c s~ > w+ h h",
+    "d u~ > w- h h",
+    "s c~ > w- h h",
+    "u d~ > w+ h h"
+   ]
+  },
+  "udbar_WpHHa": {
+   "proc": "u d~ > w+ h h a",
+   "exact": "c s~ > a h h w+",
+   "weak": "c s~ > a h h w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpHHg": {
+   "proc": "u d~ > w+ h h g",
+   "exact": "c s~ > g h h w+",
+   "weak": "c s~ > g h h w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpHg": {
+   "proc": "u d~ > w+ h g",
+   "exact": "c s~ > g h w+",
+   "weak": "c s~ > g h w+",
+   "dan_exact": [
+    "c s~ > g w+ h",
+    "d u~ > g w- h",
+    "s c~ > g w- h",
+    "u d~ > g w+ h"
+   ],
+   "dan_weak": [
+    "c s~ > g w+ h",
+    "d u~ > g w- h",
+    "s c~ > g w- h",
+    "u d~ > g w+ h"
+   ]
+  },
+  "udbar_WpHgg": {
+   "proc": "u d~ > w+ h g g",
+   "exact": "c s~ > g g h w+",
+   "weak": "c s~ > g g h w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZH": {
+   "proc": "u d~ > w+ z h",
+   "exact": "c s~ > h w+ z",
+   "weak": "c s~ > h w+ z",
+   "dan_exact": [
+    "c s~ > w+ z h",
+    "d u~ > w- z h",
+    "s c~ > w- z h",
+    "u d~ > w+ z h"
+   ],
+   "dan_weak": [
+    "c s~ > w+ z h",
+    "d u~ > w- z h",
+    "s c~ > w- z h",
+    "u d~ > w+ z h"
+   ]
+  },
+  "udbar_WpZHa": {
+   "proc": "u d~ > w+ z h a",
+   "exact": "c s~ > a h w+ z",
+   "weak": "c s~ > a h w+ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZHg": {
+   "proc": "u d~ > w+ z h g",
+   "exact": "c s~ > g h w+ z",
+   "weak": "c s~ > g h w+ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZZ": {
+   "proc": "u d~ > w+ z z",
+   "exact": "c s~ > w+ z z",
+   "weak": "c s~ > w+ z z",
+   "dan_exact": [
+    "c s~ > w+ z z",
+    "d u~ > w- z z",
+    "s c~ > w- z z",
+    "u d~ > w+ z z"
+   ],
+   "dan_weak": [
+    "c s~ > w+ z z",
+    "d u~ > w- z z",
+    "s c~ > w- z z",
+    "u d~ > w+ z z"
+   ]
+  },
+  "udbar_WpZZa": {
+   "proc": "u d~ > w+ z z a",
+   "exact": "c s~ > a w+ z z",
+   "weak": "c s~ > a w+ z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZZg": {
+   "proc": "u d~ > w+ z z g",
+   "exact": "c s~ > g w+ z z",
+   "weak": "c s~ > g w+ z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZa": {
+   "proc": "u d~ > w+ z a",
+   "exact": "c s~ > a w+ z",
+   "weak": "c s~ > a w+ z",
+   "dan_exact": [
+    "c s~ > w+ a z",
+    "d u~ > w- a z",
+    "s c~ > w- a z",
+    "u d~ > w+ a z"
+   ],
+   "dan_weak": [
+    "c s~ > w+ a z",
+    "d u~ > w- a z",
+    "s c~ > w- a z",
+    "u d~ > w+ a z"
+   ]
+  },
+  "udbar_WpZaa": {
+   "proc": "u d~ > w+ z a a",
+   "exact": "c s~ > a a w+ z",
+   "weak": "c s~ > a a w+ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZg": {
+   "proc": "u d~ > w+ z g",
+   "exact": "c s~ > g w+ z",
+   "weak": "c s~ > g w+ z",
+   "dan_exact": [
+    "c s~ > g w+ z",
+    "d u~ > g w- z",
+    "s c~ > g w- z",
+    "u d~ > g w+ z"
+   ],
+   "dan_weak": [
+    "c s~ > g w+ z",
+    "d u~ > g w- z",
+    "s c~ > g w- z",
+    "u d~ > g w+ z"
+   ]
+  },
+  "udbar_WpZga": {
+   "proc": "u d~ > w+ z g a",
+   "exact": "c s~ > a g w+ z",
+   "weak": "c s~ > a g w+ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpZgg": {
+   "proc": "u d~ > w+ z g g",
+   "exact": "c s~ > g g w+ z",
+   "weak": "c s~ > g g w+ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpaH": {
+   "proc": "u d~ > w+ a h",
+   "exact": "c s~ > a h w+",
+   "weak": "c s~ > a h w+",
+   "dan_exact": [
+    "c s~ > w+ a h",
+    "d u~ > w- a h",
+    "s c~ > w- a h",
+    "u d~ > w+ a h"
+   ],
+   "dan_weak": [
+    "c s~ > w+ a h",
+    "d u~ > w- a h",
+    "s c~ > w- a h",
+    "u d~ > w+ a h"
+   ]
+  },
+  "udbar_WpaHa": {
+   "proc": "u d~ > w+ a h a",
+   "exact": "c s~ > a a h w+",
+   "weak": "c s~ > a a h w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_WpaHg": {
+   "proc": "u d~ > w+ a h g",
+   "exact": "c s~ > a g h w+",
+   "weak": "c s~ > a g h w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_Wpaa": {
+   "proc": "u d~ > w+ a a",
+   "exact": "c s~ > a a w+",
+   "weak": "c s~ > a a w+",
+   "dan_exact": [
+    "c s~ > w+ a a",
+    "d u~ > w- a a",
+    "s c~ > w- a a",
+    "u d~ > w+ a a"
+   ],
+   "dan_weak": [
+    "c s~ > w+ a a",
+    "d u~ > w- a a",
+    "s c~ > w- a a",
+    "u d~ > w+ a a"
+   ]
+  },
+  "udbar_Wpaaa": {
+   "proc": "u d~ > w+ a a a",
+   "exact": "c s~ > a a a w+",
+   "weak": "c s~ > a a a w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_Wpag": {
+   "proc": "u d~ > w+ a g",
+   "exact": "c s~ > a g w+",
+   "weak": "c s~ > a g w+",
+   "dan_exact": [
+    "c s~ > g w+ a",
+    "d u~ > g w- a",
+    "s c~ > g w- a",
+    "u d~ > g w+ a"
+   ],
+   "dan_weak": [
+    "c s~ > g w+ a",
+    "d u~ > g w- a",
+    "s c~ > g w- a",
+    "u d~ > g w+ a"
+   ]
+  },
+  "udbar_Wpaga": {
+   "proc": "u d~ > w+ a g a",
+   "exact": "c s~ > a a g w+",
+   "weak": "c s~ > a a g w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_Wpagg": {
+   "proc": "u d~ > w+ a g g",
+   "exact": "c s~ > a g g w+",
+   "weak": "c s~ > a g g w+",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_enu": {
+   "proc": "u d~ > e+ ve",
+   "exact": "c s~ > e+ ve",
+   "weak": "c s~ > e+ ve",
+   "dan_exact": [
+    "c s~ > e+ ve",
+    "c s~ > mu+ vm",
+    "d u~ > e- ve~",
+    "d u~ > mu- vm~"
+   ],
+   "dan_weak": [
+    "c s~ > e+ ve",
+    "c s~ > mu+ vm",
+    "c s~ > ta+ vt",
+    "d u~ > e- ve~"
+   ]
+  },
+  "udbar_enug": {
+   "proc": "u d~ > e+ ve g",
+   "exact": "c s~ > e+ g ve",
+   "weak": "c s~ > e+ g ve",
+   "dan_exact": [
+    "c s~ > g e+ ve",
+    "c s~ > g mu+ vm",
+    "d u~ > g e- ve~",
+    "d u~ > g mu- vm~"
+   ],
+   "dan_weak": [
+    "c s~ > g e+ ve",
+    "c s~ > g mu+ vm",
+    "c s~ > g ta+ vt",
+    "d u~ > g e- ve~"
+   ]
+  },
+  "udbar_taunu": {
+   "proc": "u d~ > ta+ vt",
+   "exact": "c s~ > ta+ vt",
+   "weak": "c s~ > e+ ve",
+   "dan_exact": [
+    "c s~ > ta+ vt",
+    "d u~ > ta- vt~",
+    "s c~ > ta- vt~",
+    "u d~ > ta+ vt"
+   ],
+   "dan_weak": [
+    "c s~ > e+ ve",
+    "c s~ > mu+ vm",
+    "c s~ > ta+ vt",
+    "d u~ > e- ve~"
+   ]
+  },
+  "udbar_tbbar": {
+   "proc": "u d~ > t b~",
+   "exact": "b t~ > c~ s",
+   "weak": "b t~ > c~ s",
+   "dan_exact": [
+    "c s~ > t b~",
+    "d u~ > t~ b",
+    "s c~ > t~ b",
+    "u d~ > t b~"
+   ],
+   "dan_weak": [
+    "c s~ > t b~",
+    "d u~ > t~ b",
+    "s c~ > t~ b",
+    "u d~ > t b~"
+   ]
+  },
+  "udbar_tbbarH": {
+   "proc": "u d~ > t b~ h",
+   "exact": "c s~ > b~ h t",
+   "weak": "c s~ > b~ h t",
+   "dan_exact": [
+    "c s~ > t b~ h",
+    "d u~ > b t~ h",
+    "s c~ > b t~ h",
+    "u d~ > t b~ h"
+   ],
+   "dan_weak": [
+    "c s~ > t b~ h",
+    "d u~ > b t~ h",
+    "s c~ > b t~ h",
+    "u d~ > t b~ h"
+   ]
+  },
+  "udbar_tbbarHa": {
+   "proc": "u d~ > t b~ h a",
+   "exact": "c s~ > a b~ h t",
+   "weak": "c s~ > a b~ h t",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbarHg": {
+   "proc": "u d~ > t b~ h g",
+   "exact": "c s~ > b~ g h t",
+   "weak": "c s~ > b~ g h t",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbarZ": {
+   "proc": "u d~ > t b~ z",
+   "exact": "c s~ > b~ t z",
+   "weak": "c s~ > b~ t z",
+   "dan_exact": [
+    "c s~ > t b~ z",
+    "d u~ > b t~ z",
+    "s c~ > b t~ z",
+    "u d~ > t b~ z"
+   ],
+   "dan_weak": [
+    "c s~ > t b~ z",
+    "d u~ > b t~ z",
+    "s c~ > b t~ z",
+    "u d~ > t b~ z"
+   ]
+  },
+  "udbar_tbbarZa": {
+   "proc": "u d~ > t b~ z a",
+   "exact": "c s~ > a b~ t z",
+   "weak": "c s~ > a b~ t z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbarZg": {
+   "proc": "u d~ > t b~ z g",
+   "exact": "c s~ > b~ g t z",
+   "weak": "c s~ > b~ g t z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbara": {
+   "proc": "u d~ > t b~ a",
+   "exact": "c s~ > a b~ t",
+   "weak": "c s~ > a b~ t",
+   "dan_exact": [
+    "c s~ > t b~ a",
+    "d u~ > b t~ a",
+    "s c~ > b t~ a",
+    "u d~ > t b~ a"
+   ],
+   "dan_weak": [
+    "c s~ > t b~ a",
+    "d u~ > b t~ a",
+    "s c~ > b t~ a",
+    "u d~ > t b~ a"
+   ]
+  },
+  "udbar_tbbaraa": {
+   "proc": "u d~ > t b~ a a",
+   "exact": "c s~ > a a b~ t",
+   "weak": "c s~ > a a b~ t",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbarg": {
+   "proc": "u d~ > t b~ g",
+   "exact": "c s~ > b~ g t",
+   "weak": "c s~ > b~ g t",
+   "dan_exact": [
+    "c s~ > g t b~",
+    "d u~ > g b t~",
+    "s c~ > g b t~",
+    "u d~ > g t b~"
+   ],
+   "dan_weak": [
+    "c s~ > g t b~",
+    "d u~ > g b t~",
+    "s c~ > g b t~",
+    "u d~ > g t b~"
+   ]
+  },
+  "udbar_tbbarga": {
+   "proc": "u d~ > t b~ g a",
+   "exact": "c s~ > a b~ g t",
+   "weak": "c s~ > a b~ g t",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_tbbargg": {
+   "proc": "u d~ > t b~ g g",
+   "exact": "c s~ > b~ g g t",
+   "weak": "c s~ > b~ g g t",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_udbar": {
+   "proc": "u d~ > u d~",
+   "exact": "c s~ > c s~",
+   "weak": "c s~ > c s~",
+   "dan_exact": [
+    "c s~ > c s~",
+    "d u~ > d u~",
+    "s c~ > s c~",
+    "u d~ > u d~"
+   ],
+   "dan_weak": [
+    "b u~ > b u~",
+    "c s~ > c s~",
+    "d u~ > d u~",
+    "s c~ > s c~"
+   ]
+  },
+  "udbar_udbara": {
+   "proc": "u d~ > u d~ a",
+   "exact": "c s~ > a c s~",
+   "weak": "c s~ > a c s~",
+   "dan_exact": [
+    "c s~ > c s~ a",
+    "d u~ > d u~ a",
+    "s c~ > s c~ a",
+    "u d~ > u d~ a"
+   ],
+   "dan_weak": [
+    "b u~ > b u~ a",
+    "c s~ > c s~ a",
+    "d u~ > d u~ a",
+    "s c~ > s c~ a"
+   ]
+  },
+  "udbar_udbaraa": {
+   "proc": "u d~ > u d~ a a",
+   "exact": "c s~ > a a c s~",
+   "weak": "c s~ > a a c s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_udbarg": {
+   "proc": "u d~ > u d~ g",
+   "exact": "c s~ > c g s~",
+   "weak": "c s~ > c g s~",
+   "dan_exact": [
+    "c s~ > g c s~",
+    "d u~ > g d u~",
+    "s c~ > g s c~",
+    "u d~ > g u d~"
+   ],
+   "dan_weak": [
+    "b u~ > g b u~",
+    "c s~ > g c s~",
+    "d u~ > g d u~",
+    "s c~ > g s c~"
+   ]
+  },
+  "udbar_udbarga": {
+   "proc": "u d~ > u d~ g a",
+   "exact": "c s~ > a c g s~",
+   "weak": "c s~ > a c g s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "udbar_udbargg": {
+   "proc": "u d~ > u d~ g g",
+   "exact": "c s~ > c g g s~",
+   "weak": "c s~ > c g g s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "us_us": {
+   "proc": "u s > u s",
+   "exact": "c d > c d",
+   "weak": "c d > c d",
+   "dan_exact": [
+    "d c > d c",
+    "d~ c~ > d~ c~",
+    "u s > u s",
+    "u~ s~ > u~ s~"
+   ],
+   "dan_weak": [
+    "c b > c b",
+    "c~ b~ > c~ b~",
+    "d c > d c",
+    "d~ c~ > d~ c~"
+   ]
+  },
+  "us_usa": {
+   "proc": "u s > u s a",
+   "exact": "c d > a c d",
+   "weak": "c d > a c d",
+   "dan_exact": [
+    "d c > d c a",
+    "d~ c~ > d~ c~ a",
+    "u s > u s a",
+    "u~ s~ > u~ s~ a"
+   ],
+   "dan_weak": [
+    "c b > c b a",
+    "c~ b~ > c~ b~ a",
+    "d c > d c a",
+    "d~ c~ > d~ c~ a"
+   ]
+  },
+  "us_usaa": {
+   "proc": "u s > u s a a",
+   "exact": "c d > a a c d",
+   "weak": "c d > a a c d",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "us_usg": {
+   "proc": "u s > u s g",
+   "exact": "c d > c d g",
+   "weak": "c d > c d g",
+   "dan_exact": [
+    "d c > g d c",
+    "d~ c~ > g d~ c~",
+    "u s > g u s",
+    "u~ s~ > g u~ s~"
+   ],
+   "dan_weak": [
+    "c b > g c b",
+    "c~ b~ > g c~ b~",
+    "d c > g d c",
+    "d~ c~ > g d~ c~"
+   ]
+  },
+  "us_usga": {
+   "proc": "u s > u s g a",
+   "exact": "c d > a c d g",
+   "weak": "c d > a c d g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "us_usgg": {
+   "proc": "u s > u s g g",
+   "exact": "c d > c d g g",
+   "weak": "c d > c d g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uu_uu": {
+   "proc": "u u > u u",
+   "exact": "c c > c c",
+   "weak": "c c > c c",
+   "dan_exact": [
+    "c c > c c",
+    "c~ c~ > c~ c~",
+    "u u > u u",
+    "u~ u~ > u~ u~"
+   ],
+   "dan_weak": [
+    "c c > c c",
+    "c~ c~ > c~ c~",
+    "u u > u u",
+    "u~ u~ > u~ u~"
+   ]
+  },
+  "uu_uua": {
+   "proc": "u u > u u a",
+   "exact": "c c > a c c",
+   "weak": "c c > a c c",
+   "dan_exact": [
+    "c c > c c a",
+    "c~ c~ > c~ c~ a",
+    "u u > u u a",
+    "u~ u~ > u~ u~ a"
+   ],
+   "dan_weak": [
+    "c c > c c a",
+    "c~ c~ > c~ c~ a",
+    "u u > u u a",
+    "u~ u~ > u~ u~ a"
+   ]
+  },
+  "uu_uuaa": {
+   "proc": "u u > u u a a",
+   "exact": "c c > a a c c",
+   "weak": "c c > a a c c",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uu_uug": {
+   "proc": "u u > u u g",
+   "exact": "c c > c c g",
+   "weak": "c c > c c g",
+   "dan_exact": [
+    "c c > g c c",
+    "c~ c~ > g c~ c~",
+    "u u > g u u",
+    "u~ u~ > g u~ u~"
+   ],
+   "dan_weak": [
+    "c c > g c c",
+    "c~ c~ > g c~ c~",
+    "u u > g u u",
+    "u~ u~ > g u~ u~"
+   ]
+  },
+  "uu_uuga": {
+   "proc": "u u > u u g a",
+   "exact": "c c > a c c g",
+   "weak": "c c > a c c g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uu_uugg": {
+   "proc": "u u > u u g g",
+   "exact": "c c > c c g g",
+   "weak": "c c > c c g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WW": {
+   "proc": "u u~ > w+ w-",
+   "exact": "c c~ > w+ w-",
+   "weak": "c c~ > w+ w-",
+   "dan_exact": [
+    "c c~ > w+ w-",
+    "u u~ > w+ w-"
+   ],
+   "dan_weak": [
+    "c c~ > w+ w-",
+    "u u~ > w+ w-"
+   ]
+  },
+  "uubar_WWgg": {
+   "proc": "u u~ > w+ w- g g",
+   "exact": "c c~ > g g w+ w-",
+   "weak": "c c~ > g g w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmH": {
+   "proc": "u u~ > w+ w- h",
+   "exact": "c c~ > h w+ w-",
+   "weak": "c c~ > h w+ w-",
+   "dan_exact": [
+    "c c~ > w+ w- h",
+    "u u~ > w+ w- h"
+   ],
+   "dan_weak": [
+    "c c~ > w+ w- h",
+    "u u~ > w+ w- h"
+   ]
+  },
+  "uubar_WpWmHH": {
+   "proc": "u u~ > w+ w- h h",
+   "exact": "c c~ > h h w+ w-",
+   "weak": "c c~ > h h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmHa": {
+   "proc": "u u~ > w+ w- h a",
+   "exact": "c c~ > a h w+ w-",
+   "weak": "c c~ > a h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmHg": {
+   "proc": "u u~ > w+ w- h g",
+   "exact": "c c~ > g h w+ w-",
+   "weak": "c c~ > g h w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmWpWm": {
+   "proc": "u u~ > w+ w- w+ w-",
+   "exact": "c c~ > w+ w+ w- w-",
+   "weak": "c c~ > w+ w+ w- w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmZ": {
+   "proc": "u u~ > w+ w- z",
+   "exact": "c c~ > w+ w- z",
+   "weak": "c c~ > w+ w- z",
+   "dan_exact": [
+    "c c~ > w+ w- z",
+    "u u~ > w+ w- z"
+   ],
+   "dan_weak": [
+    "c c~ > w+ w- z",
+    "u u~ > w+ w- z"
+   ]
+  },
+  "uubar_WpWmZH": {
+   "proc": "u u~ > w+ w- z h",
+   "exact": "c c~ > h w+ w- z",
+   "weak": "c c~ > h w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmZZ": {
+   "proc": "u u~ > w+ w- z z",
+   "exact": "c c~ > w+ w- z z",
+   "weak": "c c~ > w+ w- z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmZa": {
+   "proc": "u u~ > w+ w- z a",
+   "exact": "c c~ > a w+ w- z",
+   "weak": "c c~ > a w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmZg": {
+   "proc": "u u~ > w+ w- z g",
+   "exact": "c c~ > g w+ w- z",
+   "weak": "c c~ > g w+ w- z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWma": {
+   "proc": "u u~ > w+ w- a",
+   "exact": "c c~ > a w+ w-",
+   "weak": "c c~ > a w+ w-",
+   "dan_exact": [
+    "c c~ > w+ w- a",
+    "u u~ > w+ w- a"
+   ],
+   "dan_weak": [
+    "c c~ > w+ w- a",
+    "u u~ > w+ w- a"
+   ]
+  },
+  "uubar_WpWmaa": {
+   "proc": "u u~ > w+ w- a a",
+   "exact": "c c~ > a a w+ w-",
+   "weak": "c c~ > a a w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_WpWmg": {
+   "proc": "u u~ > w+ w- g",
+   "exact": "c c~ > g w+ w-",
+   "weak": "c c~ > g w+ w-",
+   "dan_exact": [
+    "c c~ > g w+ w-",
+    "u u~ > g w+ w-"
+   ],
+   "dan_weak": [
+    "c c~ > g w+ w-",
+    "u u~ > g w+ w-"
+   ]
+  },
+  "uubar_WpWmga": {
+   "proc": "u u~ > w+ w- g a",
+   "exact": "c c~ > a g w+ w-",
+   "weak": "c c~ > a g w+ w-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZH": {
+   "proc": "u u~ > z h",
+   "exact": "h z > q q~",
+   "weak": "h z > q q~",
+   "dan_exact": [
+    "c c~ > z h",
+    "d d~ > z h",
+    "s s~ > z h",
+    "u u~ > z h"
+   ],
+   "dan_weak": [
+    "c c~ > z h",
+    "d d~ > z h",
+    "s s~ > z h",
+    "u u~ > z h"
+   ]
+  },
+  "uubar_ZHH": {
+   "proc": "u u~ > z h h",
+   "exact": "c c~ > h h z",
+   "weak": "q q~ > h h z",
+   "dan_exact": [
+    "c c~ > z h h",
+    "u u~ > z h h"
+   ],
+   "dan_weak": [
+    "c c~ > z h h",
+    "d d~ > z h h",
+    "s s~ > z h h",
+    "u u~ > z h h"
+   ]
+  },
+  "uubar_ZHHa": {
+   "proc": "u u~ > z h h a",
+   "exact": "c c~ > a h h z",
+   "weak": "q q~ > a h h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZHHg": {
+   "proc": "u u~ > z h h g",
+   "exact": "c c~ > g h h z",
+   "weak": "q q~ > a h h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZHg": {
+   "proc": "u u~ > z h g",
+   "exact": "q q~ > g h z",
+   "weak": "q q~ > a h z",
+   "dan_exact": [
+    "c c~ > g z h",
+    "d d~ > g z h",
+    "s s~ > g z h",
+    "u u~ > g z h"
+   ],
+   "dan_weak": [
+    "c c~ > a z h",
+    "c c~ > g z h",
+    "d d~ > a z h",
+    "d d~ > g z h"
+   ]
+  },
+  "uubar_ZHgg": {
+   "proc": "u u~ > z h g g",
+   "exact": "q q~ > g g h z",
+   "weak": "q q~ > g g h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZ": {
+   "proc": "u u~ > z z",
+   "exact": "q q~ > z z",
+   "weak": "q q~ > z z",
+   "dan_exact": [
+    "c c~ > z z",
+    "d d~ > z z",
+    "s s~ > z z",
+    "u u~ > z z"
+   ],
+   "dan_weak": [
+    "b b~ > z z",
+    "c c~ > z z",
+    "d d~ > z z",
+    "s s~ > z z"
+   ]
+  },
+  "uubar_ZZH": {
+   "proc": "u u~ > z z h",
+   "exact": "c c~ > h z z",
+   "weak": "q q~ > h z z",
+   "dan_exact": [
+    "c c~ > z z h",
+    "u u~ > z z h"
+   ],
+   "dan_weak": [
+    "c c~ > z z h",
+    "d d~ > z z h",
+    "s s~ > z z h",
+    "u u~ > z z h"
+   ]
+  },
+  "uubar_ZZHH": {
+   "proc": "u u~ > z z h h",
+   "exact": "c c~ > h h z z",
+   "weak": "q q~ > h h z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZHa": {
+   "proc": "u u~ > z z h a",
+   "exact": "c c~ > a h z z",
+   "weak": "q q~ > a h z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZHg": {
+   "proc": "u u~ > z z h g",
+   "exact": "c c~ > g h z z",
+   "weak": "q q~ > a h z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZZ": {
+   "proc": "u u~ > z z z",
+   "exact": "c c~ > z z z",
+   "weak": "c c~ > z z z",
+   "dan_exact": [
+    "c c~ > z z z",
+    "u u~ > z z z"
+   ],
+   "dan_weak": [
+    "c c~ > z z z",
+    "u u~ > z z z"
+   ]
+  },
+  "uubar_ZZZZ": {
+   "proc": "u u~ > z z z z",
+   "exact": "c c~ > z z z z",
+   "weak": "c c~ > z z z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZZa": {
+   "proc": "u u~ > z z z a",
+   "exact": "c c~ > a z z z",
+   "weak": "c c~ > a z z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZZg": {
+   "proc": "u u~ > z z z g",
+   "exact": "c c~ > g z z z",
+   "weak": "c c~ > a z z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZZg": {
+   "proc": "u u~ > z z g",
+   "exact": "q q~ > g z z",
+   "weak": "q q~ > a z z",
+   "dan_exact": [
+    "c c~ > g z z",
+    "d d~ > g z z",
+    "s s~ > g z z",
+    "u u~ > g z z"
+   ],
+   "dan_weak": [
+    "b b~ > a z z",
+    "b b~ > g z z",
+    "c c~ > a z z",
+    "c c~ > g z z"
+   ]
+  },
+  "uubar_ZZgg": {
+   "proc": "u u~ > z z g g",
+   "exact": "q q~ > g g z z",
+   "weak": "q q~ > g g z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Za": {
+   "proc": "u u~ > z a",
+   "exact": "a z > q q~",
+   "weak": "a z > q q~",
+   "dan_exact": [
+    "c c~ > a z",
+    "d d~ > a z",
+    "s s~ > a z",
+    "u u~ > a z"
+   ],
+   "dan_weak": [
+    "b b~ > a z",
+    "b b~ > g z",
+    "c c~ > a z",
+    "c c~ > g z"
+   ]
+  },
+  "uubar_ZaH": {
+   "proc": "u u~ > z a h",
+   "exact": "q q~ > a h z",
+   "weak": "q q~ > a h z",
+   "dan_exact": [
+    "c c~ > a z h",
+    "d d~ > a z h",
+    "s s~ > a z h",
+    "u u~ > a z h"
+   ],
+   "dan_weak": [
+    "c c~ > a z h",
+    "c c~ > g z h",
+    "d d~ > a z h",
+    "d d~ > g z h"
+   ]
+  },
+  "uubar_ZaHa": {
+   "proc": "u u~ > z a h a",
+   "exact": "q q~ > a a h z",
+   "weak": "q q~ > a a h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZaHg": {
+   "proc": "u u~ > z a h g",
+   "exact": "q q~ > a g h z",
+   "weak": "q q~ > a a h z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZaZ": {
+   "proc": "u u~ > z a z",
+   "exact": "q q~ > a z z",
+   "weak": "q q~ > a z z",
+   "dan_exact": [
+    "c c~ > a z z",
+    "d d~ > a z z",
+    "s s~ > a z z",
+    "u u~ > a z z"
+   ],
+   "dan_weak": [
+    "b b~ > a z z",
+    "b b~ > g z z",
+    "c c~ > a z z",
+    "c c~ > g z z"
+   ]
+  },
+  "uubar_ZaZa": {
+   "proc": "u u~ > z a z a",
+   "exact": "q q~ > a a z z",
+   "weak": "q q~ > a a z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ZaZg": {
+   "proc": "u u~ > z a z g",
+   "exact": "q q~ > a g z z",
+   "weak": "q q~ > a a z z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zaa": {
+   "proc": "u u~ > z a a",
+   "exact": "q q~ > a a z",
+   "weak": "q q~ > a a z",
+   "dan_exact": [
+    "c c~ > a a z",
+    "d d~ > a a z",
+    "s s~ > a a z",
+    "u u~ > a a z"
+   ],
+   "dan_weak": [
+    "b b~ > a a z",
+    "b b~ > g a z",
+    "c c~ > a a z",
+    "c c~ > g a z"
+   ]
+  },
+  "uubar_Zaaa": {
+   "proc": "u u~ > z a a a",
+   "exact": "q q~ > a a a z",
+   "weak": "q q~ > a a a z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zg": {
+   "proc": "u u~ > z g",
+   "exact": "g z > q q~",
+   "weak": "a z > q q~",
+   "dan_exact": [
+    "c c~ > g z",
+    "d d~ > g z",
+    "s s~ > g z",
+    "u u~ > g z"
+   ],
+   "dan_weak": [
+    "b b~ > a z",
+    "b b~ > g z",
+    "c c~ > a z",
+    "c c~ > g z"
+   ]
+  },
+  "uubar_Zga": {
+   "proc": "u u~ > z g a",
+   "exact": "q q~ > a g z",
+   "weak": "q q~ > a a z",
+   "dan_exact": [
+    "c c~ > g a z",
+    "d d~ > g a z",
+    "s s~ > g a z",
+    "u u~ > g a z"
+   ],
+   "dan_weak": [
+    "b b~ > a a z",
+    "b b~ > g a z",
+    "c c~ > a a z",
+    "c c~ > g a z"
+   ]
+  },
+  "uubar_Zgaa": {
+   "proc": "u u~ > z g a a",
+   "exact": "q q~ > a a g z",
+   "weak": "q q~ > a a a z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zgg": {
+   "proc": "u u~ > z g g",
+   "exact": "q q~ > g g z",
+   "weak": "q q~ > g g z",
+   "dan_exact": [
+    "c c~ > g g z",
+    "d d~ > g g z",
+    "s s~ > g g z",
+    "u u~ > g g z"
+   ],
+   "dan_weak": [
+    "b b~ > g g z",
+    "c c~ > g g z",
+    "d d~ > g g z",
+    "s s~ > g g z"
+   ]
+  },
+  "uubar_Zgga": {
+   "proc": "u u~ > z g g a",
+   "exact": "q q~ > a g g z",
+   "weak": "q q~ > a g g z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zggg": {
+   "proc": "u u~ > z g g g",
+   "exact": "q q~ > g g g z",
+   "weak": "q q~ > g g g z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zgggg": {
+   "proc": "u u~ > z g g g g",
+   "exact": "q q~ > g g g g z",
+   "weak": "q q~ > g g g g z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_Zggggg": {
+   "proc": "u u~ > z g g g g g",
+   "exact": "q q~ > g g g g g z",
+   "weak": "q q~ > g g g g g z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_aa": {
+   "proc": "u u~ > a a",
+   "exact": "a a > q q~",
+   "weak": "a a > q q~",
+   "dan_exact": [
+    "c c~ > a a",
+    "d d~ > a a",
+    "s s~ > a a",
+    "u u~ > a a"
+   ],
+   "dan_weak": [
+    "b b~ > a a",
+    "b b~ > g a",
+    "c c~ > a a",
+    "c c~ > g a"
+   ]
+  },
+  "uubar_agg": {
+   "proc": "u u~ > a g g",
+   "exact": "q q~ > a g g",
+   "weak": "q q~ > a g g",
+   "dan_exact": [
+    "c c~ > g g a",
+    "d d~ > g g a",
+    "s s~ > g g a",
+    "u u~ > g g a"
+   ],
+   "dan_weak": [
+    "b b~ > g g a",
+    "c c~ > g g a",
+    "d d~ > g g a",
+    "s s~ > g g a"
+   ]
+  },
+  "uubar_bbbar": {
+   "proc": "u u~ > b b~",
+   "exact": "b b~ > c c~",
+   "weak": "c c~ > s s~",
+   "dan_exact": [
+    "b b~ > c c~",
+    "b b~ > u u~",
+    "c c~ > b b~",
+    "u u~ > b b~"
+   ],
+   "dan_weak": [
+    "b b~ > u u~",
+    "c c~ > s s~",
+    "d d~ > u u~",
+    "s s~ > c c~"
+   ]
+  },
+  "uubar_bbbarH": {
+   "proc": "u u~ > b b~ h",
+   "exact": "c c~ > b b~ h",
+   "weak": "c c~ > b b~ h",
+   "dan_exact": [
+    "c c~ > b b~ h",
+    "u u~ > b b~ h"
+   ],
+   "dan_weak": [
+    "c c~ > b b~ h",
+    "u u~ > b b~ h"
+   ]
+  },
+  "uubar_bbbarHa": {
+   "proc": "u u~ > b b~ h a",
+   "exact": "c c~ > a b b~ h",
+   "weak": "c c~ > a b b~ h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarHg": {
+   "proc": "u u~ > b b~ h g",
+   "exact": "c c~ > b b~ g h",
+   "weak": "c c~ > b b~ g h",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarZ": {
+   "proc": "u u~ > b b~ z",
+   "exact": "c c~ > b b~ z",
+   "weak": "c c~ > s s~ z",
+   "dan_exact": [
+    "c c~ > b b~ z",
+    "u u~ > b b~ z"
+   ],
+   "dan_weak": [
+    "c c~ > s s~ z",
+    "u u~ > b b~ z",
+    "u u~ > d d~ z"
+   ]
+  },
+  "uubar_bbbarZa": {
+   "proc": "u u~ > b b~ z a",
+   "exact": "c c~ > a b b~ z",
+   "weak": "c c~ > a s s~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarZg": {
+   "proc": "u u~ > b b~ z g",
+   "exact": "c c~ > b b~ g z",
+   "weak": "c c~ > g s s~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbara": {
+   "proc": "u u~ > b b~ a",
+   "exact": "c c~ > a b b~",
+   "weak": "c c~ > a s s~",
+   "dan_exact": [
+    "c c~ > b b~ a",
+    "u u~ > b b~ a"
+   ],
+   "dan_weak": [
+    "c c~ > s s~ a",
+    "u u~ > b b~ a",
+    "u u~ > d d~ a"
+   ]
+  },
+  "uubar_bbbaraa": {
+   "proc": "u u~ > b b~ a a",
+   "exact": "c c~ > a a b b~",
+   "weak": "c c~ > a a s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarbbbar": {
+   "proc": "u u~ > b b~ b b~",
+   "exact": "c c~ > b b b~ b~",
+   "weak": "c c~ > s s s~ s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarg": {
+   "proc": "u u~ > b b~ g",
+   "exact": "c c~ > b b~ g",
+   "weak": "c c~ > g s s~",
+   "dan_exact": [
+    "c c~ > g b b~",
+    "u u~ > g b b~"
+   ],
+   "dan_weak": [
+    "c c~ > g s s~",
+    "u u~ > g b b~",
+    "u u~ > g d d~"
+   ]
+  },
+  "uubar_bbbarga": {
+   "proc": "u u~ > b b~ g a",
+   "exact": "c c~ > a b b~ g",
+   "weak": "c c~ > a g s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbargg": {
+   "proc": "u u~ > b b~ g g",
+   "exact": "c c~ > b b~ g g",
+   "weak": "c c~ > g g s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarmupmum": {
+   "proc": "u u~ > b b~ mu+ mu-",
+   "exact": "c c~ > b b~ e+ e-",
+   "weak": "c c~ > e+ e- s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbartaptam": {
+   "proc": "u u~ > b b~ ta+ ta-",
+   "exact": "c c~ > b b~ ta+ ta-",
+   "weak": "c c~ > e+ e- s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarttbar": {
+   "proc": "u u~ > b b~ t t~",
+   "exact": "c c~ > b b~ t t~",
+   "weak": "c c~ > b b~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_bbbarvevebar": {
+   "proc": "u u~ > b b~ ve ve~",
+   "exact": "c c~ > b b~ v v~",
+   "weak": "c c~ > s s~ v v~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbar": {
+   "proc": "u u~ > d d~",
+   "exact": "c c~ > s s~",
+   "weak": "c c~ > s s~",
+   "dan_exact": [
+    "c c~ > s s~",
+    "d d~ > u u~",
+    "s s~ > c c~",
+    "u u~ > d d~"
+   ],
+   "dan_weak": [
+    "b b~ > u u~",
+    "c c~ > s s~",
+    "d d~ > u u~",
+    "s s~ > c c~"
+   ]
+  },
+  "uubar_ddbara": {
+   "proc": "u u~ > d d~ a",
+   "exact": "c c~ > a s s~",
+   "weak": "c c~ > a s s~",
+   "dan_exact": [
+    "c c~ > s s~ a",
+    "u u~ > d d~ a"
+   ],
+   "dan_weak": [
+    "c c~ > s s~ a",
+    "u u~ > b b~ a",
+    "u u~ > d d~ a"
+   ]
+  },
+  "uubar_ddbaraa": {
+   "proc": "u u~ > d d~ a a",
+   "exact": "c c~ > a a s s~",
+   "weak": "c c~ > a a s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarbbbar": {
+   "proc": "u u~ > d d~ b b~",
+   "exact": "c c~ > b b~ s s~",
+   "weak": "c c~ > s s s~ s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarddbar": {
+   "proc": "u u~ > d d~ d d~",
+   "exact": "c c~ > s s s~ s~",
+   "weak": "c c~ > s s s~ s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarg": {
+   "proc": "u u~ > d d~ g",
+   "exact": "c c~ > g s s~",
+   "weak": "c c~ > g s s~",
+   "dan_exact": [
+    "c c~ > g s s~",
+    "u u~ > g d d~"
+   ],
+   "dan_weak": [
+    "c c~ > g s s~",
+    "u u~ > g b b~",
+    "u u~ > g d d~"
+   ]
+  },
+  "uubar_ddbarga": {
+   "proc": "u u~ > d d~ g a",
+   "exact": "c c~ > a g s s~",
+   "weak": "c c~ > a g s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbargg": {
+   "proc": "u u~ > d d~ g g",
+   "exact": "c c~ > g g s s~",
+   "weak": "c c~ > g g s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarmupmum": {
+   "proc": "u u~ > d d~ mu+ mu-",
+   "exact": "c c~ > e+ e- s s~",
+   "weak": "c c~ > e+ e- s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbartaptam": {
+   "proc": "u u~ > d d~ ta+ ta-",
+   "exact": "c c~ > s s~ ta+ ta-",
+   "weak": "c c~ > e+ e- s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarttbar": {
+   "proc": "u u~ > d d~ t t~",
+   "exact": "c c~ > s s~ t t~",
+   "weak": "c c~ > s s~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ddbarvevebar": {
+   "proc": "u u~ > d d~ ve ve~",
+   "exact": "c c~ > s s~ v v~",
+   "weak": "c c~ > s s~ v v~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ga": {
+   "proc": "u u~ > g a",
+   "exact": "a g > q q~",
+   "weak": "a a > q q~",
+   "dan_exact": [
+    "c c~ > g a",
+    "d d~ > g a",
+    "s s~ > g a",
+    "u u~ > g a"
+   ],
+   "dan_weak": [
+    "b b~ > a a",
+    "b b~ > g a",
+    "c c~ > a a",
+    "c c~ > g a"
+   ]
+  },
+  "uubar_gaa": {
+   "proc": "u u~ > g a a",
+   "exact": "q q~ > a a g",
+   "weak": "q q~ > a a a",
+   "dan_exact": [
+    "c c~ > g a a",
+    "d d~ > g a a",
+    "s s~ > g a a",
+    "u u~ > g a a"
+   ],
+   "dan_weak": [
+    "b b~ > a a a",
+    "b b~ > g a a",
+    "c c~ > a a a",
+    "c c~ > g a a"
+   ]
+  },
+  "uubar_gaaa": {
+   "proc": "u u~ > g a a a",
+   "exact": "q q~ > a a a g",
+   "weak": "q q~ > a a a a",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_gg": {
+   "proc": "u u~ > g g",
+   "exact": "g g > q q~",
+   "weak": "g g > q q~",
+   "dan_exact": [
+    "c c~ > g g",
+    "d d~ > g g",
+    "g g > c c~",
+    "g g > d d~"
+   ],
+   "dan_weak": [
+    "b b~ > g g",
+    "c c~ > g g",
+    "d d~ > g g",
+    "g g > b b~"
+   ]
+  },
+  "uubar_ggaa": {
+   "proc": "u u~ > g g a a",
+   "exact": "q q~ > a a g g",
+   "weak": "q q~ > a a g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ggg": {
+   "proc": "u u~ > g g g",
+   "exact": "q q~ > g g g",
+   "weak": "q q~ > g g g",
+   "dan_exact": [
+    "c c~ > g g g",
+    "d d~ > g g g",
+    "s s~ > g g g",
+    "u u~ > g g g"
+   ],
+   "dan_weak": [
+    "b b~ > g g g",
+    "c c~ > g g g",
+    "d d~ > g g g",
+    "s s~ > g g g"
+   ]
+  },
+  "uubar_ggga": {
+   "proc": "u u~ > g g g a",
+   "exact": "q q~ > a g g g",
+   "weak": "q q~ > a g g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_gggg": {
+   "proc": "u u~ > g g g g",
+   "exact": "q q~ > g g g g",
+   "weak": "q q~ > g g g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_mumu": {
+   "proc": "u u~ > mu+ mu-",
+   "exact": "c c~ > e+ e-",
+   "weak": "c c~ > e+ e-",
+   "dan_exact": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "u u~ > e- e+",
+    "u u~ > mu- mu+"
+   ],
+   "dan_weak": [
+    "c c~ > e- e+",
+    "c c~ > mu- mu+",
+    "c c~ > ta- ta+",
+    "u u~ > e- e+"
+   ]
+  },
+  "uubar_mumug": {
+   "proc": "u u~ > mu+ mu- g",
+   "exact": "c c~ > e+ e- g",
+   "weak": "c c~ > e+ e- g",
+   "dan_exact": [
+    "c c~ > g e- e+",
+    "c c~ > g mu- mu+",
+    "u u~ > g e- e+",
+    "u u~ > g mu- mu+"
+   ],
+   "dan_weak": [
+    "c c~ > g e- e+",
+    "c c~ > g mu- mu+",
+    "c c~ > g ta- ta+",
+    "u u~ > g e- e+"
+   ]
+  },
+  "uubar_ttbar": {
+   "proc": "u u~ > t t~",
+   "exact": "c c~ > t t~",
+   "weak": "c c~ > t t~",
+   "dan_exact": [
+    "c c~ > t t~",
+    "u u~ > t t~"
+   ],
+   "dan_weak": [
+    "c c~ > t t~",
+    "u u~ > t t~"
+   ]
+  },
+  "uubar_ttbarH": {
+   "proc": "u u~ > t t~ h",
+   "exact": "c c~ > h t t~",
+   "weak": "c c~ > h t t~",
+   "dan_exact": [
+    "c c~ > t t~ h",
+    "u u~ > t t~ h"
+   ],
+   "dan_weak": [
+    "c c~ > t t~ h",
+    "u u~ > t t~ h"
+   ]
+  },
+  "uubar_ttbarHa": {
+   "proc": "u u~ > t t~ h a",
+   "exact": "c c~ > a h t t~",
+   "weak": "c c~ > a h t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarHg": {
+   "proc": "u u~ > t t~ h g",
+   "exact": "c c~ > g h t t~",
+   "weak": "c c~ > g h t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarZ": {
+   "proc": "u u~ > t t~ z",
+   "exact": "c c~ > t t~ z",
+   "weak": "c c~ > t t~ z",
+   "dan_exact": [
+    "c c~ > t t~ z",
+    "u u~ > t t~ z"
+   ],
+   "dan_weak": [
+    "c c~ > t t~ z",
+    "u u~ > t t~ z"
+   ]
+  },
+  "uubar_ttbarZa": {
+   "proc": "u u~ > t t~ z a",
+   "exact": "c c~ > a t t~ z",
+   "weak": "c c~ > a t t~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarZg": {
+   "proc": "u u~ > t t~ z g",
+   "exact": "c c~ > g t t~ z",
+   "weak": "c c~ > g t t~ z",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbara": {
+   "proc": "u u~ > t t~ a",
+   "exact": "c c~ > a t t~",
+   "weak": "c c~ > a t t~",
+   "dan_exact": [
+    "c c~ > t t~ a",
+    "u u~ > t t~ a"
+   ],
+   "dan_weak": [
+    "c c~ > t t~ a",
+    "u u~ > t t~ a"
+   ]
+  },
+  "uubar_ttbaraa": {
+   "proc": "u u~ > t t~ a a",
+   "exact": "c c~ > a a t t~",
+   "weak": "c c~ > a a t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarg": {
+   "proc": "u u~ > t t~ g",
+   "exact": "c c~ > g t t~",
+   "weak": "c c~ > g t t~",
+   "dan_exact": [
+    "c c~ > g t t~",
+    "u u~ > g t t~"
+   ],
+   "dan_weak": [
+    "c c~ > g t t~",
+    "u u~ > g t t~"
+   ]
+  },
+  "uubar_ttbarga": {
+   "proc": "u u~ > t t~ g a",
+   "exact": "c c~ > a g t t~",
+   "weak": "c c~ > a g t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbargg": {
+   "proc": "u u~ > t t~ g g",
+   "exact": "c c~ > g g t t~",
+   "weak": "c c~ > g g t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarmupmum": {
+   "proc": "u u~ > t t~ mu+ mu-",
+   "exact": "c c~ > e+ e- t t~",
+   "weak": "c c~ > e+ e- t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbartaptam": {
+   "proc": "u u~ > t t~ ta+ ta-",
+   "exact": "c c~ > t ta+ ta- t~",
+   "weak": "c c~ > e+ e- t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarttbar": {
+   "proc": "u u~ > t t~ t t~",
+   "exact": "c c~ > t t t~ t~",
+   "weak": "c c~ > t t t~ t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_ttbarvevebar": {
+   "proc": "u u~ > t t~ ve ve~",
+   "exact": "c c~ > t t~ v v~",
+   "weak": "c c~ > t t~ v v~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubar": {
+   "proc": "u u~ > u u~",
+   "exact": "c c~ > c c~",
+   "weak": "c c~ > c c~",
+   "dan_exact": [
+    "c c~ > c c~",
+    "u u~ > u u~"
+   ],
+   "dan_weak": [
+    "c c~ > c c~",
+    "u u~ > u u~"
+   ]
+  },
+  "uubar_uubara": {
+   "proc": "u u~ > u u~ a",
+   "exact": "c c~ > a c c~",
+   "weak": "c c~ > a c c~",
+   "dan_exact": [
+    "c c~ > c c~ a",
+    "u u~ > u u~ a"
+   ],
+   "dan_weak": [
+    "c c~ > c c~ a",
+    "u u~ > u u~ a"
+   ]
+  },
+  "uubar_uubaraa": {
+   "proc": "u u~ > u u~ a a",
+   "exact": "c c~ > a a c c~",
+   "weak": "c c~ > a a c c~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarbbbar": {
+   "proc": "u u~ > u u~ b b~",
+   "exact": "c c~ > b b~ c c~",
+   "weak": "c c~ > c c~ s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarddbar": {
+   "proc": "u u~ > u u~ d d~",
+   "exact": "c c~ > c c~ s s~",
+   "weak": "c c~ > c c~ s s~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarg": {
+   "proc": "u u~ > u u~ g",
+   "exact": "c c~ > c c~ g",
+   "weak": "c c~ > c c~ g",
+   "dan_exact": [
+    "c c~ > g c c~",
+    "u u~ > g u u~"
+   ],
+   "dan_weak": [
+    "c c~ > g c c~",
+    "u u~ > g u u~"
+   ]
+  },
+  "uubar_uubarga": {
+   "proc": "u u~ > u u~ g a",
+   "exact": "c c~ > a c c~ g",
+   "weak": "c c~ > a c c~ g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubargg": {
+   "proc": "u u~ > u u~ g g",
+   "exact": "c c~ > c c~ g g",
+   "weak": "c c~ > c c~ g g",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarmupmum": {
+   "proc": "u u~ > u u~ mu+ mu-",
+   "exact": "c c~ > c c~ e+ e-",
+   "weak": "c c~ > c c~ e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubartaptam": {
+   "proc": "u u~ > u u~ ta+ ta-",
+   "exact": "c c~ > c c~ ta+ ta-",
+   "weak": "c c~ > c c~ e+ e-",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarttbar": {
+   "proc": "u u~ > u u~ t t~",
+   "exact": "c c~ > c c~ t t~",
+   "weak": "c c~ > c c~ t t~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubaruubar": {
+   "proc": "u u~ > u u~ u u~",
+   "exact": "c c~ > c c c~ c~",
+   "weak": "c c~ > c c c~ c~",
+   "dan_exact": [],
+   "dan_weak": []
+  },
+  "uubar_uubarvevebar": {
+   "proc": "u u~ > u u~ ve ve~",
+   "exact": "c c~ > c c~ v v~",
+   "weak": "c c~ > c c~ v v~",
+   "dan_exact": [],
+   "dan_weak": []
+  }
+ },
+ "covered_exact_classes": [
+  "a a > q q~",
+  "a g > q q~",
+  "a w+ > c s~",
+  "a z > q q~",
+  "b b~ > c c~",
+  "b b~ > e+ e-",
+  "b t~ > c~ s",
+  "c c > a c c",
+  "c c > c c",
+  "c c > c c g",
+  "c c~ > a b b~",
+  "c c~ > a c c~",
+  "c c~ > a s s~",
+  "c c~ > a t t~",
+  "c c~ > a w+ w-",
+  "c c~ > b b~ g",
+  "c c~ > b b~ h",
+  "c c~ > b b~ z",
+  "c c~ > c c~",
+  "c c~ > c c~ g",
+  "c c~ > e+ e-",
+  "c c~ > e+ e- g",
+  "c c~ > g s s~",
+  "c c~ > g t t~",
+  "c c~ > g w+ w-",
+  "c c~ > h h z",
+  "c c~ > h t t~",
+  "c c~ > h w+ w-",
+  "c c~ > h z z",
+  "c c~ > s s~",
+  "c c~ > t t~",
+  "c c~ > t t~ z",
+  "c c~ > w+ w-",
+  "c c~ > w+ w- z",
+  "c c~ > z z z",
+  "c d > a c d",
+  "c d > c d",
+  "c d > c d g",
+  "c s > a c s",
+  "c s > c g s",
+  "c s > c s",
+  "c s~ > a a w+",
+  "c s~ > a b~ t",
+  "c s~ > a c s~",
+  "c s~ > a g w+",
+  "c s~ > a h w+",
+  "c s~ > a w+ z",
+  "c s~ > b~ g t",
+  "c s~ > b~ h t",
+  "c s~ > b~ t z",
+  "c s~ > c g s~",
+  "c s~ > c s~",
+  "c s~ > e+ g ve",
+  "c s~ > e+ ve",
+  "c s~ > g g w+",
+  "c s~ > g h w+",
+  "c s~ > g w+",
+  "c s~ > g w+ z",
+  "c s~ > h h w+",
+  "c s~ > h w+",
+  "c s~ > h w+ z",
+  "c s~ > ta+ vt",
+  "c s~ > w+ z",
+  "c s~ > w+ z z",
+  "d d > d d",
+  "d d~ > e+ e-",
+  "d s > d s",
+  "g g > q q~",
+  "g z > q q~",
+  "h z > q q~",
+  "q q~ > a a a",
+  "q q~ > a a g",
+  "q q~ > a a z",
+  "q q~ > a g g",
+  "q q~ > a g z",
+  "q q~ > a h z",
+  "q q~ > a z z",
+  "q q~ > g g g",
+  "q q~ > g g z",
+  "q q~ > g h z",
+  "q q~ > g z z",
+  "q q~ > z z"
+ ],
+ "covered_weak_classes": [
+  "a a > q q~",
+  "a w+ > c s~",
+  "a z > q q~",
+  "b t~ > c~ s",
+  "c c > a c c",
+  "c c > c c",
+  "c c > c c g",
+  "c c~ > a c c~",
+  "c c~ > a s s~",
+  "c c~ > a t t~",
+  "c c~ > a w+ w-",
+  "c c~ > b b~ h",
+  "c c~ > c c~",
+  "c c~ > c c~ g",
+  "c c~ > e+ e-",
+  "c c~ > e+ e- g",
+  "c c~ > g s s~",
+  "c c~ > g t t~",
+  "c c~ > g w+ w-",
+  "c c~ > h t t~",
+  "c c~ > h w+ w-",
+  "c c~ > s s~",
+  "c c~ > s s~ z",
+  "c c~ > t t~",
+  "c c~ > t t~ z",
+  "c c~ > w+ w-",
+  "c c~ > w+ w- z",
+  "c c~ > z z z",
+  "c d > a c d",
+  "c d > c d",
+  "c d > c d g",
+  "c s > a c s",
+  "c s > c g s",
+  "c s > c s",
+  "c s~ > a a w+",
+  "c s~ > a b~ t",
+  "c s~ > a c s~",
+  "c s~ > a g w+",
+  "c s~ > a h w+",
+  "c s~ > a w+ z",
+  "c s~ > b~ g t",
+  "c s~ > b~ h t",
+  "c s~ > b~ t z",
+  "c s~ > c g s~",
+  "c s~ > c s~",
+  "c s~ > e+ g ve",
+  "c s~ > e+ ve",
+  "c s~ > g g w+",
+  "c s~ > g h w+",
+  "c s~ > g w+",
+  "c s~ > g w+ z",
+  "c s~ > h h w+",
+  "c s~ > h w+",
+  "c s~ > h w+ z",
+  "c s~ > w+ z",
+  "c s~ > w+ z z",
+  "d d > d d",
+  "d d~ > e+ e-",
+  "d s > d s",
+  "g g > q q~",
+  "h z > q q~",
+  "q q~ > a a a",
+  "q q~ > a a z",
+  "q q~ > a g g",
+  "q q~ > a h z",
+  "q q~ > a z z",
+  "q q~ > g g g",
+  "q q~ > g g z",
+  "q q~ > h h z",
+  "q q~ > h z z",
+  "q q~ > z z"
+ ]
+}
