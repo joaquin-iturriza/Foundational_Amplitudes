@@ -7,7 +7,7 @@ aggregate recomputed and printed next to the run's recorded one. Needs a GPU.
     python tools/eval_delta.py --out-dir $SCRATCH/zz_delta runs/tp3_scr_ee_ddbar_d8/trial_0010 [...]
 Relative run directories (runs/<sweep>/trial_N) are read under the site checkout.
 """
-import argparse, json, os, sys, traceback
+import argparse, json, os, shutil, sys, traceback
 
 import numpy as np
 import torch
@@ -17,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
-from rebuild_run import _build, load_best_state  # noqa: E402
+from rebuild_run import load_best_state  # noqa: E402
 
 
 def one(run_dir, out_dir):
@@ -39,7 +39,18 @@ def one(run_dir, out_dir):
         with open_dict(cfg):
             cfg.data.offshell_stats = saved["offshell_stats"]
     os.makedirs(out_dir, exist_ok=True)
-    exp = _build(cfg, None, None, None)
+    # the run's frozen stats are read as a resume reads its own (warm_start during init_data only): a fine-tune's
+    # momentum scale is its parent's, which a fresh build without the parent would refit (rebuilt val 3e5x worse)
+    shutil.copy(os.path.join(run_dir, "data_stats.json"), os.path.join(out_dir, "data_stats.json"))
+    torch.set_default_dtype(torch.float32)
+    from experiment import AmplitudeExperiment
+    exp = AmplitudeExperiment(cfg)
+    exp._init(); exp.init_physics(); exp.init_geometric_algebra()
+    exp.warm_start = True
+    exp.init_data()
+    exp.warm_start = False
+    exp._init_dataloader(); exp.init_model()
+    assert np.isclose(float(exp.mom_div), saved["mom_div"], rtol=1e-6), (float(exp.mom_div), saved["mom_div"])
     for k in ("prepd_mean", "prepd_std"):
         got = [float(x) for x in getattr(exp, k)]
         assert np.allclose(got, saved[k], rtol=1e-6), f"{run_dir}: rebuilt {k} {got} != {saved[k]}"
