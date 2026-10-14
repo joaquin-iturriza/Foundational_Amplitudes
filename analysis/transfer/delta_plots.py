@@ -41,7 +41,9 @@ def load():
     d = {}
     for f in sorted(glob.glob(os.path.join(HERE, "delta_data", "*.npz"))):
         with np.load(f) as z:
-            d.update({k: z[k] for k in z.files})
+            d.update({k: z[k] for k in z.files if k != "_meta"})
+            if "_meta" in z.files:
+                d.setdefault("_meta", {}).update(json.loads(z["_meta"].tobytes().decode()))
     return d
 
 
@@ -63,7 +65,7 @@ def axes_lab(ax):
 def main():
     audit = json.load(open(os.path.join(HERE, "delta_audit.json")))
     D = load()
-    missing = []
+    missing, off = [], []
 
     def get(row):
         p = row.get("paper_8k") or {}
@@ -73,6 +75,9 @@ def main():
         if t not in D:
             missing.append(f"{row['probe']} {row['arm']} {p.get('site')}:{p.get('run_dir')}")
             return None
+        rec, got = p.get("mse_logM2"), D.get("_meta", {}).get(t)
+        if rec and got and not t.endswith("_rerun") and abs(np.log10(got / rec)) > 0.02:
+            off.append(f"{t}: rebuilt {got:.3g} vs recorded {rec:.3g}")
         return D[t]
 
     by = {}
@@ -154,6 +159,9 @@ def main():
     print(f"{len(medians)} lines drawn; {len(missing)} missing")
     for m in missing:
         print("  missing", m)
+    print(f"{len(off)} rebuilt validation losses off the recorded one by > 5%")
+    for m in off:
+        print("  !!", m)
 
 
 if __name__ == "__main__":
