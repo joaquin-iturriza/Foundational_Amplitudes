@@ -5,7 +5,7 @@ the checkpoint's "model" weights (the EMA average where EMA was on; a fresh EMA 
 fine-tune head kept, the rebuilt amplitude statistics asserted against the run's data_stats.json, and the validation
 aggregate recomputed and printed next to the run's recorded one. Needs a GPU.
     python tools/eval_delta.py --out-dir $SCRATCH/zz_delta runs/tp3_scr_ee_ddbar_d8/trial_0010 [...]
-Relative run directories are read under the site's sweep_dir.
+Relative run directories (runs/<sweep>/trial_N) are read under the site checkout.
 """
 import argparse, json, os, sys, traceback
 
@@ -65,7 +65,7 @@ def main():
     a = ap.parse_args()
     bad = []
     for rd in a.run_dirs:
-        rd = rd if os.path.isabs(rd) else os.path.join(siteconf.SWEEP_DIR, rd)
+        rd = rd if os.path.isabs(rd) else os.path.join(siteconf.PROJECT_DIR, rd)
         rd = os.path.normpath(rd)
         tag = "__".join(rd.split(os.sep)[-2:])
         try:
