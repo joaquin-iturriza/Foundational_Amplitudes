@@ -68,6 +68,8 @@ def main():
     def get(row):
         p = row.get("paper_8k") or {}
         t = tag(p.get("run_dir", "?"))
+        if t not in D and t + "_rerun" in D:
+            t += "_rerun"          # a pruned trial rerun from its config (scripts/job_rerun_trial.sh)
         if t not in D:
             missing.append(f"{row['probe']} {row['arm']} {p.get('site')}:{p.get('run_dir')}")
             return None
