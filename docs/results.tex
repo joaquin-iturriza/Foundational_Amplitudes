@@ -2162,7 +2162,9 @@ does not rank the clip values). Training only the $\sigma$ readout on the frozen
 (\code{heterosc\_sigma\_only}, $4$k steps, no L2, clipping never binds) calibrates it: test pull std $1.03$,
 $|{\rm pull}|<1$ for $0.69$ of the events, deciles $0.65$ to $1.24$ except the worst at $2.4$; validation NLL $-9.68$
 against $-9.18$, $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
-$\mu$ has since outgrown; that it is the lag rather than the L2 term is not separated.
+$\mu$ has since outgrown. The same refit with the trial's L2 ($\lambda=1.6\times10^{-8}$) ends at the same validation NLL
+($-9.68005$ against $-9.68008$), so L2 on the readout plays no part; L2 on the trunk during joint training is not excluded
+but is of the same size.
 
 \begin{figure}[H]
 \centering
