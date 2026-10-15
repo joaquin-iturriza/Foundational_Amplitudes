@@ -2164,7 +2164,15 @@ $|{\rm pull}|<1$ for $0.69$ of the events, deciles $0.65$ to $1.24$ except the w
 against $-9.18$, $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
 $\mu$ has since outgrown. The same refit with the trial's L2 ($\lambda=1.6\times10^{-8}$) ends at the same validation NLL
 ($-9.68005$ against $-9.68008$), so L2 on the readout plays no part; L2 on the trunk during joint training is not excluded
-but is of the same size.
+but is of the same size. A DyHPO sweep with \code{clip\_grad\_norm} searched (D68, the user: ``maybe sweeping the value is
+better?''; \code{sweep\_config\_tp\_het\_clip\_ee\_ttbar\_d8.yaml}, the het sweep with the clip log-uniform in $[1,1000]$,
+8 trials) ranks the clip with lr: the four best trials all clip on $100\%$ of steps (clip $1.0$ to $4.3$, validation NLL
+$-7.52$ to $-7.25$), the four with clip $152$ to $769$ reach $-7.09$ to $-5.93$. Its best ($-7.52$, clip $1.04$, lr
+$4.4\times10^{-3}$, EMA on) does not beat the fixed-clip sweep's $-7.63$, so the fixed $5$ stands. The short $\sigma$-only stage
+(D69, \code{sweep\_config\_tp\_het\_sigonly\_ee\_ttbar\_d8.yaml}: $250$ steps, its lr and warmup searched, 8 trials) reaches
+validation NLL $-9.764$ at lr $0.097$, against $-9.680$ for the $4$k-step refit at the trial's lr $2.3\times10^{-3}$; the six
+trials with lr $\approx0.1$ are within $0.01$ of their final NLL by step $150$ to $170$ and past the $4$k refit by step
+$100$. The best lr sits at the top of the searched range.
 
 \begin{figure}[H]
 \centering
