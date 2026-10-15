@@ -815,7 +815,7 @@ class BaseExperiment:
         """One `RUN_SUMMARY {json}` line at the start of training: the resolved setup, which `site supervise`
         compares against what the submission expected (a rerun from a DyHPO trial config once kept
         increment_steps=8000, so a 16k/32k run annealed over 8k steps)."""
-        t, d = self.cfg.training, self.cfg.data
+        t, d = self.cfg.training, (self.cfg.get("data", None) or {})
         sched = dict(getattr(self, "_sched_summary", None) or {})
         if t.scheduler == "OneCycleLR":
             sched = {"T_max": int(t.iterations * t.scheduler_scale)}
