@@ -134,6 +134,7 @@ training:
  fused_optimizer: true   # fused=True for Adam/AdamW (CUDA only); flows through MuAdam/MuAdamW.
 
  loss: MSE
+ track_train_eval: false   # also score the training split with the validation weights (EMA when on) at every validation step
  heterosc_select: mu_mse   # checkpoint selection and DyHPO objective for HETEROSC: mu_mse, or nll (the original: the
                            # plain Gaussian NLL, proper at heterosc_beta=0)
  heterosc_beta: 0.0   # β-NLL (Seitzer et al. 2022): weight the HETEROSC NLL by detach(σ^{2β}).

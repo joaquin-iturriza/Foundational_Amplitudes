@@ -1054,6 +1054,10 @@ class BaseExperiment:
                       "best_step": int(smallest_val_loss_step) + 1,
                       "validate_every": int(self.cfg.training.validate_every_n_steps),
                       "val_curve": [float(x) for x in self.val_loss_no_reg]}
+            # the curves on equal footing (training.track_train_eval), and the val mu-MSE for HETEROSC
+            for k in ("train_eval_loss_no_reg", "train_eval_mse", "val_mse"):
+                if getattr(self, k, None):
+                    result[k + "_curve"] = [float(x) for x in getattr(self, k)]
             result.update(self._result_extra())
             with open(result_path, "w") as _f:
                 json.dump(result, _f)
@@ -1396,6 +1400,8 @@ class BaseExperiment:
             LOGGER.info(f"Val loss: {(np.mean(losses_no_reg) if losses_no_reg else val_loss):.6e} "
                         f"| step {step + 1}")
 
+        self._track_train_eval(step)
+
         # σ-ranking SPEED probe. Called here for the single-dataset path; the
         # multi-process AmplitudeExperiment._validate override calls it too (it does
         # NOT delegate to super), so both paths record the curve.
@@ -1403,6 +1409,36 @@ class BaseExperiment:
 
         end_time_validate = time.time()
         return val_loss
+
+    def _track_train_eval(self, step):
+        """training.track_train_eval: the training split scored with the same weights as validation (the EMA average
+        when on) at every validation step, so the train and val curves compare like with like; the logged train loss is
+        the live weights' per-batch loss. Single-dataset path only (the multi-process _validate override does not call
+        it). Stored in self.train_eval_loss_no_reg / train_eval_mse and the result JSON."""
+        if not self.cfg.training.get("track_train_eval", False) \
+                or (step + 1) % self.cfg.training.validate_every_n_steps != 0:
+            return
+        loader = getattr(self, "train_eval_loader", None)
+        if loader is None:
+            return
+        nr, ms = [], []
+        self.model.eval()
+        with torch.no_grad():
+            for data in loader:
+                if self.ema is not None:
+                    with self.ema.average_parameters():
+                        _, loss_no_reg, mse_val = self._batch_loss(data)
+                else:
+                    _, loss_no_reg, mse_val = self._batch_loss(data)
+                if loss_no_reg is not None:
+                    nr.append(float(loss_no_reg))
+                if mse_val is not None:
+                    ms.append(float(mse_val))
+        self.model.train()
+        if nr:
+            self.__dict__.setdefault("train_eval_loss_no_reg", []).append(float(np.mean(nr)))
+        if ms:
+            self.__dict__.setdefault("train_eval_mse", []).append(float(np.mean(ms)))
 
     def _sigma_rank_probe(self, step):
         """Record the σ-RANKING convergence (SPEED study), guarded + worktree-local.
