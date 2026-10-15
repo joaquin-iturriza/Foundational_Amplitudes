@@ -6393,8 +6393,9 @@ are data-bound). Transfer cells from then on mix V100 and A100 trials. One run p
 \paragraph{TF32 at evaluation (2026-10-15).}\label{sec:tf32-eval} The training-side A/B above does not cover evaluating a
 model at a precision other than the one it was trained at, and that is not harmless. Each of the $107$ Jean Zay runs in
 the $\Delta$ plots was rebuilt on A100 twice (\code{tools/eval\_delta.py --tf32 on|off}) and its rebuilt validation loss
-compared with the recorded one (\code{analysis/transfer/tf32\_eval.py}, Fig.~\ref{fig:tf32_eval}): $57$ match within
-$0.02$\,dex either way, $26$ only with TF32 on, $19$ only with it off, $5$ with neither. At the wrong precision the error
+compared with the recorded one (\code{analysis/transfer/tf32\_eval.py}, Fig.~\ref{fig:tf32_eval}; the best
+checkpoint's EMA weights, sec:ema-ckpt): $59$ match within $0.02$\,dex either way, $28$ only with TF32 on, $20$ only with
+it off, none with neither. At the wrong precision the error
 is up to $133\times$ larger (\code{tp3\_r3fte\_uubar\_gg\_d8/trial\_0031}, trained on V100, rebuilt with TF32 on), and a
 TF32-trained model rebuilt in fp32 is up to $4\times$ better (\code{tp3\_r6fte\_ud\_ud\_d8/trial\_0194}). TF32's $10$-bit
 mantissa is a relative error of $\sim10^{-3}$ per matmul, against $|\Delta|\sim10^{-5}$ to $10^{-4}$ in these models,
@@ -6402,16 +6403,16 @@ so a model's precision is part of what it learned. The $\Delta$ plots draw each 
 its recorded loss. On H100 the same holds (\code{FA-ccin2p3-c0a4a22d}, TF32 on, the five CC runs that V100 did not reproduce):
 \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} rebuilds at $1.00\times$ its recorded loss (V100: $0.29\times$),
 \code{tp3\_finfte\_uubar\_Zg\_d8/trial\_0031} at $1.00\times$ (V100: $1.52\times$), and the lxplus-trained
-\code{tp3\_r9fte\_ee\_ddbar\_d8\_002/trial\_0060} matches only in fp32 ($7.3\times$ with TF32). With each model at its own
-precision, $24$ of the $251$ $\Delta$-plot models still rebuild off their recorded loss by more than $0.02$\,dex: $20$
-by $5$ to $40\%$, and four far off at every precision, all from the one-loop $b\bar b$ probe or the Sudakov-EW star arm:
-\code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} ($13\times$), \code{tp3\_r8fte\_ee\_bb\_nlo\_d8/trial\_0162} ($7.4\times$),
-\code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8/trial\_0131} ($7.2\times$) and \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132}
-($0.34\times$). Three of those four are the EMA checkpoint defect below (sec:ema-ckpt). Not settled: whether the study's V100/A100/H100 mix moves its cell values beyond the
+\code{tp3\_r9fte\_ee\_ddbar\_d8\_002/trial\_0060} matches only in fp32 ($7.3\times$ with TF32). With each model at its
+own precision and its EMA weights, $10$ of the $251$ $\Delta$-plot models at $D=10^4$ still rebuild off their recorded
+loss by more than $0.02$\,dex: CC runs trained on H100 and rebuilt on V100 ($0.70$ to $1.5\times$; the H100 queue held
+the TF32 rebuild for $11$\,h) and \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132} ($0.34\times$, EMA off, its own
+post-training evaluation reproducing the recorded loss). Not settled: that one, and whether the study's V100/A100/H100 mix moves its cell values beyond the
 run-to-run spread (the training-side A/B says not, at two cells). 
 
 \paragraph{The best checkpoint's \code{"model"} weights are not the EMA weights (2026-10-15).}\label{sec:ema-ckpt}
-\textbf{The counts above mix two effects; they are being redone.} \code{base\_experiment.\_save\_model} takes
+The counts above are with the EMA weights (redone after this finding; the first count, with the live weights, had $5$
+matching at neither precision). \code{base\_experiment.\_save\_model} takes
 \code{state\_dict()} inside \code{ema.average\_parameters()} but saves it after the block ends; the state dict shares
 storage with the parameters, which the EMA restores to the live weights, so for every run with \code{ema: true} the
 checkpoint's \code{"model"} entry is the live weights at the best step, not the EMA average that validation scored (the

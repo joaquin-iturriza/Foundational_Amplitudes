@@ -1,430 +1,537 @@
 {
 "tp3_uu64fte_ee_ddbar_d8/trial_0130": {
-"on_over_rec": 1.0002697446477378,
-"off_over_rec": 1.104147627928313
+"on_over_rec": 1.0046563975564766,
+"off_over_rec": 1.0947479576262231,
+"ema": true
 },
 "tp3_r1fte_ee_ddbar_d8/trial_0078": {
-"on_over_rec": 1.6764645040181674,
-"off_over_rec": 0.9999608646692612
+"on_over_rec": 1.682451407966401,
+"off_over_rec": 0.9999708124767953,
+"ema": false
 },
 "tp3_r2fte_ee_ddbar_d8/trial_0198": {
-"on_over_rec": 1.4042503460671145,
-"off_over_rec": 1.000012527172865
+"on_over_rec": 1.4066253077561657,
+"off_over_rec": 0.9999622281952345,
+"ema": false
 },
 "tp3_r3fte_ee_ddbar_d8/trial_0112": {
-"on_over_rec": 1.3180772737532418,
-"off_over_rec": 1.0145135836515513
+"on_over_rec": 1.2624317845526811,
+"off_over_rec": 1.0064208609725185,
+"ema": true
 },
 "tp3_r5fte_ee_ddbar_d8/trial_0191": {
-"on_over_rec": 0.9885289473516253,
-"off_over_rec": 1.0873512933923069
+"on_over_rec": 0.9993367415321579,
+"off_over_rec": 1.0616803824330967,
+"ema": true
 },
 "tp3_r6fte_ee_ddbar_d8/trial_0114": {
-"on_over_rec": 1.0152689389942096,
-"off_over_rec": 0.9021902673212338
+"on_over_rec": 1.0024504716313873,
+"off_over_rec": 0.8755958139754578,
+"ema": true
 },
 "tp3_r7fte_ee_ddbar_d8/trial_0175": {
-"on_over_rec": 1.0018830827345386,
-"off_over_rec": 0.8805179720927181
+"on_over_rec": 1.0025511093473538,
+"off_over_rec": 0.8805157778447198,
+"ema": false
 },
 "tp3_r8fte_ee_ddbar_d8/trial_0093": {
-"on_over_rec": 0.9999807057912707,
-"off_over_rec": 1.039168357821786
+"on_over_rec": 1.0019969759239673,
+"off_over_rec": 1.0391744853788891,
+"ema": false
 },
 "tp3_uu64fte_ee_nnbar_d8/trial_0114": {
-"on_over_rec": 0.9997725742788571,
-"off_over_rec": 0.9956962313590625
+"on_over_rec": 1.0001544372086066,
+"off_over_rec": 0.9956247972109551,
+"ema": true
 },
 "tp3_r1fte_ee_nnbar_d8/trial_0142": {
-"on_over_rec": 1.006635390240178,
-"off_over_rec": 0.9999827469510201
+"on_over_rec": 1.0067792070225619,
+"off_over_rec": 0.999996483191455,
+"ema": false
 },
 "tp3_r2fte_ee_nnbar_d8/trial_0084": {
-"on_over_rec": 1.00040677077287,
-"off_over_rec": 0.9971489759711561
+"on_over_rec": 1.0012714784535621,
+"off_over_rec": 0.9971524218537141,
+"ema": false
 },
 "tp3_r3fte_ee_nnbar_d8/trial_0022": {
-"on_over_rec": 1.0450287906502498,
-"off_over_rec": 1.0006815856191866
+"on_over_rec": 1.0458579229518126,
+"off_over_rec": 0.9998307836926162,
+"ema": true
 },
 "tp3_r5fte_ee_nnbar_d8/trial_0170": {
-"on_over_rec": 1.0151857801773752,
-"off_over_rec": 1.0055917059315507
+"on_over_rec": 0.998512516458128,
+"off_over_rec": 0.9940029065675177,
+"ema": true
 },
 "tp3_r6fte_ee_nnbar_d8/trial_0079": {
-"on_over_rec": 1.0002782591003394,
-"off_over_rec": 0.9173786680499845
+"on_over_rec": 1.001800560711146,
+"off_over_rec": 0.9171555858608509,
+"ema": false
 },
 "tp3_r7fte_ee_nnbar_d8/trial_0018": {
-"on_over_rec": 0.9992251458406157,
-"off_over_rec": 1.0396983541833789
+"on_over_rec": 0.9924367448905224,
+"off_over_rec": 1.0409720175363943,
+"ema": false
 },
 "tp3_r8fte_ee_nnbar_d8/trial_0188": {
-"on_over_rec": 1.0016459032873994,
-"off_over_rec": 1.0057745679474093
+"on_over_rec": 1.000794453860988,
+"off_over_rec": 1.005165364563171,
+"ema": false
 },
 "tp3_uu64fte_ee_ttbar_d8/trial_0007": {
-"on_over_rec": 1.0046358040936705,
-"off_over_rec": 0.9828067947163216
+"on_over_rec": 1.0022435866923924,
+"off_over_rec": 0.9827914914856202,
+"ema": false
 },
 "tp3_r1fte_ee_ttbar_d8/trial_0020": {
-"on_over_rec": 1.007680784521445,
-"off_over_rec": 0.9735760865926604
+"on_over_rec": 1.0055023060768244,
+"off_over_rec": 0.9735751439364748,
+"ema": false
 },
 "tp3_r2fte_ee_ttbar_d8/trial_0194": {
-"on_over_rec": 1.0312626768182778,
-"off_over_rec": 0.9824718249779099
+"on_over_rec": 0.9999941750113364,
+"off_over_rec": 0.9785328257527827,
+"ema": true
 },
 "tp3_r3fte_ee_ttbar_d8/trial_0197": {
-"on_over_rec": 1.0616203849113122,
-"off_over_rec": 0.9996210327946727
+"on_over_rec": 1.066112358206311,
+"off_over_rec": 1.0000398681871985,
+"ema": true
 },
 "tp3_r5fte_ee_ttbar_d8/trial_0196": {
-"on_over_rec": 1.0109571366361327,
-"off_over_rec": 0.9030105838843238
+"on_over_rec": 1.0093603430556548,
+"off_over_rec": 0.9029930641146123,
+"ema": false
 },
 "tp3_r6fte_ee_ttbar_d8/trial_0168": {
-"on_over_rec": 0.998761657332244,
-"off_over_rec": 0.962677431009193
+"on_over_rec": 1.0069826265481125,
+"off_over_rec": 0.9624844791594118,
+"ema": true
 },
 "tp3_r7fte_ee_ttbar_d8/trial_0058": {
-"on_over_rec": 1.0051303319633604,
-"off_over_rec": 0.9424097059150007
+"on_over_rec": 1.0064218531622888,
+"off_over_rec": 0.9330513023068924,
+"ema": true
 },
 "tp3_r8fte_ee_ttbar_d8/trial_0032": {
-"on_over_rec": 1.0292164950450569,
-"off_over_rec": 0.9718100389953452
+"on_over_rec": 1.0051903156302135,
+"off_over_rec": 0.974653103227424,
+"ema": true
 },
 "tp3_uu64fte_ee_WW_d8/trial_0151": {
-"on_over_rec": 1.003375431306382,
-"off_over_rec": 1.0056620470053625
+"on_over_rec": 1.0019156338871529,
+"off_over_rec": 1.0058134588175882,
+"ema": false
 },
 "tp3_r1fte_ee_WW_d8/trial_0174": {
-"on_over_rec": 1.0159477905850376,
-"off_over_rec": 1.0000657747410613
+"on_over_rec": 1.013734369430494,
+"off_over_rec": 0.9999951848652225,
+"ema": false
 },
 "tp3_r2fte_ee_WW_d8/trial_0046": {
-"on_over_rec": 1.022605915115123,
-"off_over_rec": 1.0007732762014239
+"on_over_rec": 1.0242848372305293,
+"off_over_rec": 0.9999531108281883,
+"ema": true
 },
 "tp3_r3fte_ee_WW_d8/trial_0059": {
-"on_over_rec": 1.1378393653458283,
-"off_over_rec": 1.158145383796252
+"on_over_rec": 1.0818581302438546,
+"off_over_rec": 1.0000877875494347,
+"ema": true
 },
 "tp3_r5fte_ee_WW_d8/trial_0144": {
-"on_over_rec": 1.039411826670342,
-"off_over_rec": 1.029739429614552
+"on_over_rec": 1.0388213152645465,
+"off_over_rec": 1.0299380451875264,
+"ema": false
 },
 "tp3_r6fte_ee_WW_d8/trial_0107": {
-"on_over_rec": 1.0006560706261431,
-"off_over_rec": 1.040299676783129
+"on_over_rec": 0.9998753819499597,
+"off_over_rec": 1.0403034433441696,
+"ema": false
 },
 "tp3_r7fte_ee_WW_d8/trial_0182": {
-"on_over_rec": 1.030588170195008,
-"off_over_rec": 1.0659039344874965
+"on_over_rec": 1.0025043808638954,
+"off_over_rec": 1.0599654278453012,
+"ema": true
 },
 "tp3_r8fte_ee_WW_d8/trial_0117": {
-"on_over_rec": 1.0010807645368909,
-"off_over_rec": 1.001265415314544
+"on_over_rec": 1.0019015222865737,
+"off_over_rec": 1.0014200977332905,
+"ema": true
 },
 "tp3_finfte_ee_WW_d8/trial_0193": {
-"on_over_rec": 0.9831975403125368,
-"off_over_rec": 1.0428738743439825
+"on_over_rec": 0.9993754044346858,
+"off_over_rec": 0.9773155877938761,
+"ema": true
 },
 "tp3_uu64fte_ee_dd_nlo_d8/trial_0052": {
-"on_over_rec": 0.9991377446829381,
-"off_over_rec": 0.9999057006581181
+"on_over_rec": 1.0002782084351238,
+"off_over_rec": 0.9999048480052959,
+"ema": false
 },
 "tp3_r1fte_ee_dd_nlo_d8/trial_0112": {
-"on_over_rec": 1.0039990992259396,
-"off_over_rec": 1.0109050563788657
+"on_over_rec": 1.0000635047754673,
+"off_over_rec": 1.0107596352076058,
+"ema": true
 },
 "tp3_r2fte_ee_dd_nlo_d8/trial_0084": {
-"on_over_rec": 1.0005010102291667,
-"off_over_rec": 1.0141523421765648
+"on_over_rec": 0.9998036958572161,
+"off_over_rec": 1.0211965888777728,
+"ema": true
 },
 "tp3_r3fte_ee_dd_nlo_d8/trial_0003": {
-"on_over_rec": 1.0221278774918332,
-"off_over_rec": 0.9998289161146887
+"on_over_rec": 1.0202311468746195,
+"off_over_rec": 1.002703260539192,
+"ema": false
 },
 "tp3_r5fte_ee_dd_nlo_d8/trial_0077": {
-"on_over_rec": 1.0043033251910634,
-"off_over_rec": 0.9989810009567283
+"on_over_rec": 0.9995303005996835,
+"off_over_rec": 0.9979002194330644,
+"ema": true
 },
 "tp3_r6fte_ee_dd_nlo_d8/trial_0030": {
-"on_over_rec": 1.0002971845890534,
-"off_over_rec": 0.980692651119609
+"on_over_rec": 1.0001514699369969,
+"off_over_rec": 0.9806884420306224,
+"ema": false
 },
 "tp3_r7fte_ee_dd_nlo_d8/trial_0071": {
-"on_over_rec": 1.0043328855503573,
-"off_over_rec": 0.9974053609083031
+"on_over_rec": 0.9999714037698915,
+"off_over_rec": 0.9979879211985173,
+"ema": true
 },
 "tp3_r8fte_ee_dd_nlo_d8/trial_0016": {
-"on_over_rec": 1.0127917755225155,
-"off_over_rec": 0.9998383958622638
+"on_over_rec": 0.9998007780102017,
+"off_over_rec": 0.9998496482985209,
+"ema": true
 },
 "tp3_uu64fte_ee_bb_nlo_d8/trial_0177": {
-"on_over_rec": 0.9983678888635468,
-"off_over_rec": 1.0010652967940692
+"on_over_rec": 1.0002943158382893,
+"off_over_rec": 1.0042880661320053,
+"ema": true
 },
 "tp3_r1fte_ee_bb_nlo_d8/trial_0089": {
-"on_over_rec": 1.0045535913218127,
-"off_over_rec": 0.9963153909037321
+"on_over_rec": 1.0001800823722151,
+"off_over_rec": 1.0003110450137058,
+"ema": true
 },
 "tp3_r2fte_ee_bb_nlo_d8/trial_0043": {
-"on_over_rec": 0.9996716958633522,
-"off_over_rec": 0.9996934017040061
+"on_over_rec": 1.002439467474233,
+"off_over_rec": 1.0002049527189825,
+"ema": true
 },
 "tp3_r3fte_ee_bb_nlo_d8/trial_0052": {
-"on_over_rec": 1.0192278687810175,
-"off_over_rec": 0.999971553046003
+"on_over_rec": 1.018052182528926,
+"off_over_rec": 1.0000583026229681,
+"ema": false
 },
 "tp3_r5fte_ee_bb_nlo_d8/trial_0079": {
-"on_over_rec": 0.9976559037336031,
-"off_over_rec": 0.9916114827281156
+"on_over_rec": 1.0000979367369902,
+"off_over_rec": 0.9918811926884016,
+"ema": true
 },
 "tp3_r6fte_ee_bb_nlo_d8/trial_0058": {
-"on_over_rec": 1.0002794260687657,
-"off_over_rec": 0.9915510114361806
+"on_over_rec": 1.000333177221868,
+"off_over_rec": 0.992531626958685,
+"ema": false
 },
 "tp3_r7fte_ee_bb_nlo_d8/trial_0165": {
-"on_over_rec": 1.000872249977788,
-"off_over_rec": 1.005726983194024
+"on_over_rec": 0.999909887436183,
+"off_over_rec": 1.0067086531298484,
+"ema": true
 },
 "tp3_r8fte_ee_bb_nlo_d8/trial_0162": {
-"on_over_rec": 7.43719964309498,
-"off_over_rec": 7.402564817458418
+"on_over_rec": 0.9997745706288906,
+"off_over_rec": 0.9801909151516754,
+"ema": true
 },
 "tp3_finfte_ee_bb_nlo_d8/trial_0114": {
-"on_over_rec": 1.0346950401345412,
-"off_over_rec": 1.082026669399445
+"on_over_rec": 1.0023073563341216,
+"off_over_rec": 1.0627592779857942,
+"ema": true
 },
 "tp3_uu64fte_ee_Za_d8/trial_0116": {
-"on_over_rec": 1.0037642774719553,
-"off_over_rec": 1.0219936282475417
+"on_over_rec": 0.9975378266210227,
+"off_over_rec": 0.9915372466218886,
+"ema": true
 },
 "tp3_r1fte_ee_Za_d8/trial_0131": {
-"on_over_rec": 1.2584002359668336,
-"off_over_rec": 0.9962127545406119
+"on_over_rec": 1.2926871204584391,
+"off_over_rec": 1.0000281441923256,
+"ema": true
 },
 "tp3_r2fte_ee_Za_d8/trial_0021": {
-"on_over_rec": 1.1893204277100846,
-"off_over_rec": 1.0000107421764548
+"on_over_rec": 1.1872987810883364,
+"off_over_rec": 0.9999993802590507,
+"ema": false
 },
 "tp3_r3fte_ee_Za_d8/trial_0046": {
-"on_over_rec": 1.1842610714047848,
-"off_over_rec": 0.9864156715891128
+"on_over_rec": 1.186065014378555,
+"off_over_rec": 0.9897853534256658,
+"ema": false
 },
 "tp3_r5fte_ee_Za_d8/trial_0014": {
-"on_over_rec": 1.2756985939035244,
-"off_over_rec": 0.9999809739846686
+"on_over_rec": 1.2770439521714982,
+"off_over_rec": 0.9999775328070076,
+"ema": false
 },
 "tp3_r6fte_ee_Za_d8/trial_0052": {
-"on_over_rec": 1.0000109316489607,
-"off_over_rec": 1.0352325402148037
+"on_over_rec": 1.0013163184820033,
+"off_over_rec": 1.035269116032755,
+"ema": false
 },
 "tp3_r7fte_ee_Za_d8/trial_0080": {
-"on_over_rec": 0.9922031405690649,
-"off_over_rec": 1.054053102646362
+"on_over_rec": 1.002174985941796,
+"off_over_rec": 1.0547710743062702,
+"ema": false
 },
 "tp3_r8fte_ee_Za_d8/trial_0168": {
-"on_over_rec": 1.006465556966454,
-"off_over_rec": 0.9459809175260155
+"on_over_rec": 1.0000196584452934,
+"off_over_rec": 0.9414858977500423,
+"ema": true
 },
 "tp3_finfte_ee_Za_d8/trial_0123": {
-"on_over_rec": 0.9928128030287549,
-"off_over_rec": 1.6421514924701954
+"on_over_rec": 1.0028803281828473,
+"off_over_rec": 1.6419232990818116,
+"ema": false
 },
 "tp2_scr_ud_ud_d8/trial_0018": {
-"on_over_rec": 1.0718499184029167,
-"off_over_rec": 0.9998943232456955
+"on_over_rec": 1.075558310102046,
+"off_over_rec": 1.0000271236054006,
+"ema": true
 },
 "tp3_uu64fte_ud_ud_d8/trial_0022": {
-"on_over_rec": 1.0011273746398062,
-"off_over_rec": 0.8249777359809012
+"on_over_rec": 1.0023309025909497,
+"off_over_rec": 0.8249744504366998,
+"ema": false
 },
 "tp3_r1fte_ud_ud_d8/trial_0106": {
-"on_over_rec": 2.8553920387446787,
-"off_over_rec": 0.9994409342839317
+"on_over_rec": 2.8586277031188123,
+"off_over_rec": 0.9999627675141171,
+"ema": true
 },
 "tp3_r2fte_ud_ud_d8/trial_0047": {
-"on_over_rec": 1.930775776992846,
-"off_over_rec": 0.9981283751571814
+"on_over_rec": 1.830038999819522,
+"off_over_rec": 1.0005085549597306,
+"ema": true
 },
 "tp3_r3fte_ud_ud_d8/trial_0050": {
-"on_over_rec": 3.266424082602407,
-"off_over_rec": 1.0263424454355172
+"on_over_rec": 3.237157018181002,
+"off_over_rec": 1.0239803727157777,
+"ema": false
 },
 "tp3_r5fte_ud_ud_d8/trial_0096": {
-"on_over_rec": 1.0134462036900331,
-"off_over_rec": 0.8425365035676452
+"on_over_rec": 1.0093356794331714,
+"off_over_rec": 0.8444725478299385,
+"ema": true
 },
 "tp3_r6fte_ud_ud_d8/trial_0194": {
-"on_over_rec": 0.9886093478766994,
-"off_over_rec": 0.2500148455482224
+"on_over_rec": 0.9966455824896328,
+"off_over_rec": 0.272072379756074,
+"ema": true
 },
 "tp3_r7fte_ud_ud_d8/trial_0097": {
-"on_over_rec": 1.0507235752048947,
-"off_over_rec": 0.44282687231379075
+"on_over_rec": 1.008475478896445,
+"off_over_rec": 0.4437167672680416,
+"ema": true
 },
 "tp3_r8fte_ud_ud_d8/trial_0186": {
-"on_over_rec": 1.0224165448195643,
-"off_over_rec": 0.7141954998594469
+"on_over_rec": 1.0182223574233347,
+"off_over_rec": 0.7129722303559086,
+"ema": true
 },
 "tp3_uu64fte_uubar_gg_d8/trial_0084": {
-"on_over_rec": 0.9986313749858899,
-"off_over_rec": 0.992134897632693
+"on_over_rec": 0.9995548861544075,
+"off_over_rec": 0.992107271744636,
+"ema": false
 },
 "tp3_r1fte_uubar_gg_d8/trial_0100": {
-"on_over_rec": 62.067550383285806,
-"off_over_rec": 1.0000666448744708
+"on_over_rec": 62.04276088297639,
+"off_over_rec": 1.0000215668556973,
+"ema": false
 },
 "tp3_r2fte_uubar_gg_d8/trial_0028": {
-"on_over_rec": 21.026526236182647,
-"off_over_rec": 0.9974776357324927
+"on_over_rec": 21.01766686889897,
+"off_over_rec": 0.9968927363097632,
+"ema": false
 },
 "tp3_r3fte_uubar_gg_d8/trial_0031": {
-"on_over_rec": 133.02095047759374,
-"off_over_rec": 0.9998374446864812
+"on_over_rec": 133.01771617422187,
+"off_over_rec": 0.9999871114130825,
+"ema": false
 },
 "tp3_r5fte_uubar_gg_d8/trial_0094": {
-"on_over_rec": 2.976968610019013,
-"off_over_rec": 1.000008330694643
+"on_over_rec": 3.0024033671903463,
+"off_over_rec": 1.000045551321168,
+"ema": false
 },
 "tp3_r6fte_uubar_gg_d8/trial_0024": {
-"on_over_rec": 1.4128509382469516,
-"off_over_rec": 0.374085144504532
+"on_over_rec": 1.0008187108816,
+"off_over_rec": 0.37233614702100154,
+"ema": true
 },
 "tp3_r7fte_uubar_gg_d8/trial_0075": {
-"on_over_rec": 1.002455039975507,
-"off_over_rec": 0.43801204657393866
+"on_over_rec": 1.010309806608012,
+"off_over_rec": 0.43799495019527923,
+"ema": false
 },
 "tp3_r8fte_uubar_gg_d8/trial_0088": {
-"on_over_rec": 0.9972978620644798,
-"off_over_rec": 0.3890253496684948
+"on_over_rec": 0.9988984421813614,
+"off_over_rec": 0.38902007944316896,
+"ema": false
 },
 "tp3_uu64fte_uubar_Zg_d8/trial_0188": {
-"on_over_rec": 1.0090480275271418,
-"off_over_rec": 1.089123978785686
+"on_over_rec": 1.0156325177345527,
+"off_over_rec": 1.0891134316339086,
+"ema": false
 },
 "tp3_r1fte_uubar_Zg_d8/trial_0075": {
-"on_over_rec": 1.1626707185186356,
-"off_over_rec": 0.9989689958596039
+"on_over_rec": 1.1703716775623332,
+"off_over_rec": 0.9999992878494148,
+"ema": true
 },
 "tp3_r2fte_uubar_Zg_d8/trial_0006": {
-"on_over_rec": 1.8050565495848108,
-"off_over_rec": 0.9997271602928848
+"on_over_rec": 1.8348217852581532,
+"off_over_rec": 1.0000010406373911,
+"ema": true
 },
 "tp3_r3fte_uubar_Zg_d8/trial_0095": {
-"on_over_rec": 1.4866871256681797,
-"off_over_rec": 0.9994839379252214
+"on_over_rec": 1.4836658063998722,
+"off_over_rec": 1.0000244596599772,
+"ema": true
 },
 "tp3_r5fte_uubar_Zg_d8/trial_0103": {
-"on_over_rec": 1.011862120117763,
-"off_over_rec": 0.8949871606144325
+"on_over_rec": 1.0006457435499143,
+"off_over_rec": 0.9056378298595948,
+"ema": true
 },
 "tp3_r6fte_uubar_Zg_d8/trial_0094": {
-"on_over_rec": 1.0024120139373327,
-"off_over_rec": 1.0792444175210538
+"on_over_rec": 0.9985736217773892,
+"off_over_rec": 1.0792450106343736,
+"ema": false
 },
 "tp3_r7fte_uubar_Zg_d8/trial_0068": {
-"on_over_rec": 0.9969243420937094,
-"off_over_rec": 0.8919870096479888
+"on_over_rec": 1.000501565225373,
+"off_over_rec": 0.8919716723360085,
+"ema": false
 },
 "tp3_r8fte_uubar_Zg_d8/trial_0195": {
-"on_over_rec": 1.0125720849746935,
-"off_over_rec": 1.300414519229229
+"on_over_rec": 1.005088747316301,
+"off_over_rec": 1.2780128150970185,
+"ema": true
 },
 "tp3_uu64fte_uubar_Zgg_d8/trial_0198": {
-"on_over_rec": 1.0003731399196316,
-"off_over_rec": 0.9993125981636242
+"on_over_rec": 1.0007482624188437,
+"off_over_rec": 0.9993190991803876,
+"ema": false
 },
 "tp3_r1fte_uubar_Zgg_d8/trial_0108": {
-"on_over_rec": 1.001561050114638,
-"off_over_rec": 1.0000001649940669
+"on_over_rec": 1.0016566641763562,
+"off_over_rec": 0.9999952564205791,
+"ema": false
 },
 "tp3_r2fte_uubar_Zgg_d8/trial_0119": {
-"on_over_rec": 1.0001564089822894,
-"off_over_rec": 0.9985431574703938
+"on_over_rec": 0.9999509451842358,
+"off_over_rec": 0.9985413940619841,
+"ema": true
 },
 "tp3_r3fte_uubar_Zgg_d8/trial_0085": {
-"on_over_rec": 0.9998781338845919,
-"off_over_rec": 1.0000036721408823
+"on_over_rec": 0.9999212203376089,
+"off_over_rec": 1.000000244809392,
+"ema": true
 },
 "tp3_r5fte_uubar_Zgg_d8/trial_0114": {
-"on_over_rec": 1.000291338236061,
-"off_over_rec": 0.9999996992637563
+"on_over_rec": 1.0001467968789444,
+"off_over_rec": 1.0000018420094927,
+"ema": false
 },
 "tp3_r6fte_uubar_Zgg_d8/trial_0029": {
-"on_over_rec": 1.0001589999482845,
-"off_over_rec": 0.9989077044138978
+"on_over_rec": 1.0001746549601036,
+"off_over_rec": 0.9989065392508042,
+"ema": false
 },
 "tp3_r7fte_uubar_Zgg_d8/trial_0194": {
-"on_over_rec": 1.0002310847315028,
-"off_over_rec": 1.002538346810922
+"on_over_rec": 0.9999889183626642,
+"off_over_rec": 1.0025662681912682,
+"ema": true
 },
 "tp3_r8fte_uubar_Zgg_d8/trial_0154": {
-"on_over_rec": 1.000703862173979,
-"off_over_rec": 1.0025874667570347
+"on_over_rec": 1.0008157030821168,
+"off_over_rec": 1.0025894282164691,
+"ema": false
 },
 "tp3_scrh_uubar_Zggg_d8/trial_0144": {
-"on_over_rec": 0.9997542040039534,
-"off_over_rec": 0.9999061156941182
+"on_over_rec": 0.9999947575259716,
+"off_over_rec": 1.000001240585457,
+"ema": true
 },
 "tp3_uu64fte_uubar_Zggg_d8/trial_0195": {
-"on_over_rec": 0.9999810109984202,
-"off_over_rec": 1.0000721198443843
+"on_over_rec": 1.0000269010855716,
+"off_over_rec": 1.0000711608039003,
+"ema": false
 },
 "tp3_r1fte_uubar_Zggg_d8/trial_0151": {
-"on_over_rec": 1.0001247770849746,
-"off_over_rec": 0.9998185962501623
+"on_over_rec": 1.0000531924331666,
+"off_over_rec": 0.9998293950009416,
+"ema": true
 },
 "tp3_r2fte_uubar_Zggg_d8/trial_0182": {
-"on_over_rec": 1.0001804153459415,
-"off_over_rec": 1.0010526770498396
+"on_over_rec": 1.0000917574639163,
+"off_over_rec": 1.0011447297120313,
+"ema": true
 },
 "tp3_r3fte_uubar_Zggg_d8/trial_0122": {
-"on_over_rec": 0.9998604902239012,
-"off_over_rec": 0.9997971792555255
+"on_over_rec": 1.0000448687740238,
+"off_over_rec": 0.9999045779167524,
+"ema": true
 },
 "tp3_r5fte_uubar_Zggg_d8/trial_0006": {
-"on_over_rec": 0.9994688962061982,
-"off_over_rec": 1.0000060790623306
+"on_over_rec": 0.9994281881995195,
+"off_over_rec": 1.0000033651952187,
+"ema": false
 },
 "tp3_r6fte_uubar_Zggg_d8/trial_0013": {
-"on_over_rec": 1.0000231236983246,
-"off_over_rec": 1.0012372820245516
+"on_over_rec": 0.9999366795279144,
+"off_over_rec": 1.0012365315596972,
+"ema": false
 },
 "tp3_r7fte_uubar_Zggg_d8/trial_0193": {
-"on_over_rec": 0.9941010057481092,
-"off_over_rec": 0.9942972645749113
+"on_over_rec": 1.0000003990159128,
+"off_over_rec": 1.0007419415886305,
+"ema": true
 },
 "tp3_r8fte_uubar_Zggg_d8/trial_0186": {
-"on_over_rec": 1.0001073490872063,
-"off_over_rec": 0.9997444923752944
+"on_over_rec": 1.0003124270731496,
+"off_over_rec": 0.9997446832520497,
+"ema": false
 },
 "tp3_ssoftfte_ee_ddbarg_d8/trial_0193": {
-"on_over_rec": 1.0002980331153921,
-"off_over_rec": 1.0002170337739038
+"on_over_rec": 1.0000176420099864,
+"off_over_rec": 1.000211618617365,
+"ema": true
 },
 "tp3_r1fte_ee_ddbarg_d8/trial_0162": {
-"on_over_rec": 1.000455224228085,
-"off_over_rec": 1.0004244670298021
+"on_over_rec": 1.0000907676474733,
+"off_over_rec": 1.0004270030979252,
+"ema": true
 },
 "tp3_r1fte_ee_ttbarg_d8/trial_0157": {
-"on_over_rec": 1.0699203063273146,
-"off_over_rec": 1.0687970249320362
+"on_over_rec": 1.0001438266744949,
+"off_over_rec": 1.0006507453410474,
+"ema": true
 },
 "tp3_sthresholdfte_ee_ttbar_nlo_thr_d8/trial_0112": {
-"on_over_rec": 1.0047678098242467,
-"off_over_rec": 0.9074137431700808
+"on_over_rec": 0.9965051434476713,
+"off_over_rec": 0.9049288850658821,
+"ema": false
 },
 "tp3_sthresholdfte_ee_ddbar_d8/trial_0183": {
-"on_over_rec": 0.9989290821263307,
-"off_over_rec": 1.308501188607357
+"on_over_rec": 1.0001592219191404,
+"off_over_rec": 1.3110927852396903,
+"ema": true
 },
 "tp3_r1fte_ee_ttbar_nlo_thr_d8/trial_0125": {
-"on_over_rec": 1.0009528181898852,
-"off_over_rec": 0.9155746059680046
+"on_over_rec": 1.0005992100956271,
+"off_over_rec": 0.9153994675727465,
+"ema": true
 }
 }
