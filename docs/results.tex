@@ -335,6 +335,20 @@ family's interference (the LO$\to$NLO map), drop one loop-induced entry, and the
 vertex/particle/topology removals of the $2\to2$ layer ($ggg$, the Higgs family, the top
 family, the pure $t$-channel family, the $WWV$ family).
 
+\paragraph{The catalog of arXiv:2606.23791: $409$ to $467$ distinct processes (2026-10-14).} Its $1501$ tree
+processes ($2\to1$ $10$, $2\to2$ $254$, $2\to3$ $1237$; pp partons only) fall into $409$ exact relabelling classes at
+MadGraph's default coupling orders, which is what its events contain, and $467$ at all orders, which is what its
+diagram files show ($616$ and $708$ without merging CP conjugates). The classes follow the vertices of each process's
+diagrams: massless quark flavours are interchangeable on pure-QCD quark lines, only up or down type matters once an
+electroweak vertex touches a light quark, and a $W$ on a light quark allows only the generation swap
+(\code{analysis/catalog\_daniel/classify2.py}, \code{classes\_default.json}, \code{classes\_allorders.json}). $96$ of
+its $149$ held-out processes are exact relabels of training processes, so ``held out'' in its split is not
+``unseen'' in ours, where a probe's whole class is held out (Sec.~\ref{sec:ladder}). Our catalog covers $81$ of the
+$467$ classes (\code{overlap.py}, \code{overlap\_ours\_vs\_daniel.json}). No $|\mathcal M|^2$ is public (the Zenodo record
+holds momenta only); generating all of it ourselves is $\approx19$ core-h, once a reader of its catalog and massive
+$b$ beams ($347$ processes) are built. The earlier rule-based bounds without the diagrams' vertices ($484$ to $779$
+classes, $519$ to $711$ under a liberal flavour and charge-conjugation rule, $75$ to $78$ of them ours) are superseded.
+
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
 $2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
@@ -2047,7 +2061,8 @@ The ``deterministic, hence degenerate'' mechanism was a hypothesis (commit \code
 withdrawn. The failures trace to choices made on top of the user's loss (\code{losses.py:32-35},
 commit \code{4ef5b76}: the plain Gaussian NLL, $\sigma$ through a softplus, selection on the NLL):
 the $\beta$-NLL pinned at $\beta{=}1$, selection on that $\beta$-NLL (minimised at $r^*=1/e$), the
-geometric mean of a signed NLL across processes, and short horizons. The first clean joint run of the
+geometric mean of a signed NLL across processes, and short horizons (commits \code{49cfe64}, \code{cbae458},
+\code{da17ce9}); the global gradient clip, shared by $\mu$ and $\sigma$, is a further suspect. The first clean joint run of the
 user's loss (\code{training.loss=HETEROSC}, \code{heterosc\_beta=0}, the new
 \code{training.heterosc\_select=nll}; \code{scripts/job\_het\_ab.sh}) on $e^+e^-\to t\bar t$ at
 $D=10^4$, $8$k steps, seed 2, at the MSE baseline's own HPs (\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144},
@@ -2055,13 +2070,23 @@ the best of its 8-trial DyHPO sweep), V100, \code{sign\_head} off (a positive pr
 $\log|\mathcal M|^2$) $1.37\times10^{-7}$ against the MSE baseline's $3.57\times10^{-7}$, i.e.\
 $2.6\times$ lower error; test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
 to the last step, which is also the best checkpoint. On the test split (\code{analysis/transfer/het\_ab.py}, figures
-\code{het\_ab\_delta}, \code{het\_ab\_pull}, \code{het\_ab\_calib}) the median $|\Delta|$ is
+\code{het\_ab\_delta}, \code{het\_ab\_pull}, \code{het\_ab\_calib}; Fig.~\ref{fig:het_ab}) the median $|\Delta|$ is
 $5.0\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$. Calibration is not there yet: pull mean
 $0.00$, std $0.46$, so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
 $6\times10^{-4}$ over its deciles) while the actual error spans $10^{-4}$ to $6\times10^{-4}$, so it
 ranks events only weakly; the NLL was still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
 \code{sign\_head} with \code{HETEROSC} (asserted incompatible) and left an empty
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_pull.pdf}\hfill
+\includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_calib.pdf}
+\caption{The user's heteroscedastic loss against the MSE baseline on $e^+e^-\to t\bar t$, $D=10^4$, test split, one
+seed. Left: pulls $\Delta/\sigma$ (standard deviation $0.46$, a calibrated model has $1$). Right: predicted $\sigma$
+against the realised error per decile of $\sigma$.}
+\label{fig:het_ab}
+\end{figure}
 
 \paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
@@ -4791,12 +4816,37 @@ $ee\to\nu_e\bar\nu_e$ move by $\le1.2\times$ or rise ($0.3$--$1.0\times$); sever
 that not read). One run against a best-of-eight search is biased toward the $8$k value, so the $8$k cells stand at
 $D=10^3$.
 
+\paragraph{The $32$k chosen points, and what the held items gave before the hold.} Every $32$k fine-tune cell runs two
+fixed points (\code{horizon32k\_chosen.json}; \code{sweep/pick\_points.py} takes the candidate of the sweep's own pool
+nearest each, through \code{generate\_sweep --extend --fixed-hp}): lr $1.2$ and $1.8\times10^{-3}$ with
+$\lambda\approx3\times10^{-10}$, where the $32$k fine-tunes already done had their bests; scratch lr $0.7$ and
+$1.4\times10^{-3}$ with $\lambda\approx2\times10^{-7}$, the $8$k scratch optimum moved to $32$k by $t^{-0.55}$. Rung $1$
+and the redesigned arms run lr $1.3$ and $2.2\times10^{-3}$ on $u\bar d\to e^+\nu_e$, $ee\to d\bar d$ and its EW one loop.
+A cell is scored on its two points only (\code{cells.best\_chosen}): the first $32$k round's sweeps also hold one or two
+random start-up trials, which would favour its pretrainings. The points were chosen from the data they are compared
+with, so the $32$k comparisons are preliminary. Scratch on $ee\to\nu_e\bar\nu_e$ was worse at $32$k at both points
+($9\times10^{-4}$ against $7\times10^{-5}$ at $8$k, $D=10^4$): it keeps $8$k at $10^{3.5}$ and takes its whole $32$k search
+at $10^4$ (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ is at $32$k for every pretraining.
+Before the horizon item was held (2026-10-06), the first round gave a median $32$k$/8$k ratio of $0.27$ over $269$ cells,
+$49$ of them worse at $32$k; how to score those is open with the held item. The $32$k HP landscape at $D=10^{3.5}$
+(\code{tp3\_hpx32k\_*}, held with it) had one divergence: rung $0$ on the one-loop $ee\to d\bar d$, hp$180$ (lr
+$1.5\times10^{-3}$, $\lambda=2\times10^{-6}$, EMA), non-finite at step $22\,491$ of $32$k; it is shown separately when the
+landscape is written up. The equal-total-data rungs (held 2026-10-07; \code{analysis/transfer/eqd\_vs\_ladder.py}, the
+$147$ cells of rungs $2$, $7$, $8$ that finished): the searches' best lr does not move (median
+$\log_{10}(\mathrm{lr}_{eq}/\mathrm{lr}_{lad})=+0.02$ on rungs $2$, $7$), the landscape is flat across the window (second-best
+trial $1.16\times$ the best, median), and the equal-data trial nearest the ladder's best point is $1.22\times$ the
+equal-data best, so one run at the ladder's point would have done. Rung $7$'s equal-data cells are $1.31\times$ worse at
+the median (Wilcoxon $p=0.008$, $83$ cells); over all $147$, $1.11\times$, $p=0.11$; no dependence on $D$
+(Kruskal--Wallis $p=0.08$ on rung $7$, $0.14$ on all); single cells are noise-dominated (ratio $0.28$ to $5.7$, 5 to
+95\%). The equal-data parents are hp73 alone, the ladder's the best of each rung's search (hp47 on rungs $1$, $5$, $8$,
+hp185 on $3$, hp15 on $4$). One seed.
+
 \paragraph{The star arms' four new probes, and the arms.} The new probes (Fig.~\ref{fig:rung_grid_new}) fine-tuned from rung
 $1$ and from the $64$k $ee\to u\bar u$: on $ee\to d\bar d$ at one loop above $500$\,GeV both are $30$--$250\times$ below scratch at
 $D\le10^{2.5}$ and $1.5$--$4\times$ above (the QCD-virtual target at $\mu=\sqrt s$ is close to the Born, which both pretrained
 on); on $ee\to t\bar t$ at one loop near threshold both are $2.5$--$20\times$ \emph{worse} than scratch at $D\le10^{2.5}$, and rung $1$
 is $1.6$--$3.6\times$ better from $10^3$ up. Each arm against rung $1$ on its own probe (Fig.~\ref{fig:star_arms},
-\code{star\_arms.py}; which arms test their structure: hand-off): soft and collinear emission ($ee\to d\bar dg$) $3$--$8\times$
+\code{star\_arms.py}; which arms test their structure: the design paragraph below): soft and collinear emission ($ee\to d\bar dg$) $3$--$8\times$
 lower at every $D$; initial-state collinear ($u\bar u\to Zg$) $2$--$7\times$; the $t\bar t$ threshold $2$--$4\times$ from $10^3$ up,
 still above scratch at small $D$; the dead cone ($ee\to t\bar tg$) level, $2\times$ worse at $10^4$; the resonance and Sudakov
 controls level, the Sudakov one up to $20\times$ worse at $D=10$. On $ee\to d\bar d$ every arm stays with rung $1$, within
@@ -4920,7 +4970,7 @@ median is drawn where a value of $D$ has at least three cells. Above zero the sy
 \label{fig:synth32k}
 \end{figure}
 
-\emph{High multiplicity, first cells (2026-10-09 12:40; hand-off item, D20--D24).} At $D=10^4$, $32$k: the finale
+\emph{High multiplicity, first cells (2026-10-09 12:40; D20 to D24).} At $D=10^4$, $32$k: the finale
 fine-tuned on $u\bar u\to Z+5g$ ($5$ of $5$ trials) reaches $2.7\times10^{-3}$ (MSE of $\log|\mathcal M|^2$ at the best
 checkpoint), on $Z+4g$ $4.4\times10^{-3}$ ($3$ of $5$); scratch so far $4.9\times10^{-3}$ on $Z+5g$ ($2$ of $8$) and
 $7.0\times10^{-3}$ on $Z+4g$ ($1$ of $8$), no comparison before both searches are in. For scale, the same cell on $Z+3g$:
@@ -4959,8 +5009,12 @@ are close to the finale at low $D$ ($-0.07$ to $+0.21$\,dex over it at $D\le10^{
 $D=10^5$ on both probes, by $0.1$--$0.2$\,dex. Neither the finale nor the (version-$1$) synthetic arm saw a $2\to5$ or $2\to6$
 process of the probes' kind, and both still give a decade where data is scarce. The $D=10^4$ row is the children
 table's (below). $Z+5g$ scratch trials hp 30 and 15 of $D=10^{2.5}$ trained on lxplus's regenerated train pool (2026-10-10
-17:09--18:00, hand-off); no other lxplus $Z+5g$ trial started in that window, and neither is the cell's value (hp 196,
-$9.18\times10^{-2}$, started 20:34). The
+17:09--18:00: a trial that started before the pools were copied from CC rebuilt it, same \code{recipe\_id},
+different bytes, the generator not being byte-reproducible across sites; CC's copy restored at 18:00, md5
+\code{dc03352472ea} on both, the $Z+4g$ and val/test pools matching); no other lxplus $Z+5g$ trial started in that window, and neither is the cell's value (hp 196,
+$9.18\times10^{-2}$, started 20:34). Scratch trial hp 18 of $Z+4g$ at $D=10^4$
+(\code{tp3\_hmscr32k\_uubar\_Zgggg\_d8}) diverged; like every trial it enters its search with its best checkpoint, and one
+trial was added to keep the search at $8$. The
 fixed-point cells use no search; at $D\le10^{3}$ two points of the paper's window against an $8$-trial scratch search.
 
 \emph{Why the gain shrinks with $D$: the horizon test at $D=10^3$ (D38, \code{trendtests}; 2026-10-12 19:10, $9$ of the
@@ -5271,7 +5325,8 @@ pretraining, yet \emph{better} ($+0.21$, $10$ probes, $p=0.009$; cells $+0.18$, 
 $9.20\times10^{-7}$, the best pretraining, yet worse ($-0.16$, $1$ probe, $p=0.001$; cells $-0.19$, $6$ of $24$). Five
 arms tested: with a Bonferroni factor $5$, accumulation and the generation feature stay below $0.05$, off-shellness does
 not. In these two arms the pretraining ranking is reversed on fine-tuning. One seed per arm (rung $5$ twice at hp73
-differed by $8\%$ in pretraining loss). Taken per $D$ (Wilcoxon over the twelve probes, Fig.~\ref{fig:levers_accum} now with the $D=10^4$ cells of the
+differed by $8\%$ in pretraining loss). The accumulation pretraining took $14.6$\,h of wall time against $\sim6.7$\,h for
+rung $9$ ($19$ micro-batches of $862$ events per update). Taken per $D$ (Wilcoxon over the twelve probes, Fig.~\ref{fig:levers_accum} now with the $D=10^4$ cells of the
 next paragraph), the generation feature's advantage is one value of $D$, not ``small $D$'': $+0.09$\,dex at $10^2$ ($7$ of
 $12$, $p=0.23$), $+0.26$ at $10^3$ ($10$ of $12$, $p=0.02$), $+0.04$ at $10^4$ ($7$ of $12$, $p=0.73$); the pooled
 $+0.21$ above (better on $10$ of $12$ probes) pools $10^2$ and $10^3$ per probe before the median over probes, so it is
@@ -5355,7 +5410,9 @@ rung $9$'s two chosen points with the arm at the same two (none for (e)).}
 \label{fig:levers_accum}
 \end{figure}
 
-\paragraph{Real zero-shot.} \code{tp3\_gstd\_r9} is rung $9$ at hp73 and $64$k steps with one shared standardization
+\paragraph{Real zero-shot.} Every other run standardizes $y=\log|\mathcal M|^2$ per dataset with $(\mu_p,\sigma_p)$
+fitted on $p$'s own data, so it is never trained to predict a process's normalization and its prediction on a process
+without data is defined only up to an affine map (\code{val\_loss\_affine}). \code{tp3\_gstd\_r9} is rung $9$ at hp73 and $64$k steps with one shared standardization
 (\code{data.shared\_standardization}: $(\mu,\sigma)=(-2.89,4.40)$ pooled over the $19$ processes, each keeping its own
 log or signed-log), so its output is a prediction of $\log|\mathcal M|^2$ itself, $\mu+\sigma h$, for a process it has
 no data of (\code{tools/zero\_shot\_ft.py --parent}, \code{analysis/transfer/zero\_shot\_real.py},
@@ -5393,343 +5450,132 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
 \label{fig:zero_shot_2d}
 \end{figure}
 
+\paragraph{Against the zero-shot results of the collaboration draft (2026-10-15).} Two sections of the draft
+(\code{\textasciitilde/drafts/fm\_amplitudes/paper.tex}) report zero-shot numbers, each on a different scope from ours.
+``Extrapolating to more legs'' (Jonas) trains on $q\bar q\to Z+ng$, $n\le4$ ($10$M events per $n$ from a published
+dataset) and predicts $n=5$ at an MSE of $\sim7\times10^{-4}$ on the standardized $\log|\mathcal M|^2$: one family,
+one more gluon, a standardization mean fitted linear in $n$, and an autoregressive (causal) attention mask over the
+particles in virtuality order. The draft has no run without the mask, so whether the mask carries the extrapolation is
+not shown. ``Conditioning on Feynman diagrams'' (Suprio, the draft's sec:cond) keeps the setup and the held-out split
+of arXiv:2606.23791: on its held-out $gg\to u\bar dW^-$ the encodings reach $R^2=0.35$ to $0.91$ ($0.80$ to $0.91$ with
+diagram information, in-out $0.35$), on $gg\to t\bar tH$ at most $0.53$. Held out there means absent from that
+split's training processes, of which $96$ of the $149$ held-out ones are exact relabels (Sec.~\ref{sec:catalog}).
+Ours is never in training, with the probe's whole relabelling class held out; $1-R^2$ is about the variance-normalized
+MSE above, so $R^2\approx0.94$ on $ee\to d\bar d$, $0.86$ on $ee\to t\bar t$, $0.54$ on the one-loop $ee\to d\bar d$,
+and negative on the other nine probes. On our good probes our zero-shot is at the top of Suprio's held-out range; the
+others have no counterpart there, and Jonas's extrapolation is one more gluon within a family seen at every lower $n$. No two
+of the three share a test set.
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Plan to finish (the user's goal, 2026-10-05; work through it in order without stopping to ask, every
-    compute item approved).} \textbf{On hold since 2026-10-06, 22:45, on the user's call: the horizon item's $32$k runs} (the rest of
-    (1), all of (2), and the $32$k HP landscape pass that belongs to it), resumed only when the user says. The hold was
-    first applied to every run of $32$k steps; the user meant only the horizon item (2026-10-08), so the finale's $32$k
-    cells ($69$; their DAGs had been removed on lxplus and were resubmitted) and the four lever arms' $D=10^4$ cells ($48$,
-    rung $9$'s chosen points) were released on 2026-10-08; the synthetic grid's $32$k cells are on Jean Zay, released when
-    it answers. The accumulation arm (C) and the diagram arm of (B) are redone as in arXiv:2606.23791's code (user,
-    2026-10-08: the same scheme as theirs; the same diagram encoder): (C) ran one micro-batch of every process per update,
-    theirs runs single-process batches in round-robin, $G=2$--$4$ accumulated per update.
-    Queued jobs are held in the schedulers (lxplus $1104$, CC-IN2P3 $98$, Jean Zay $579$) and every $32$k sweep directory
-    carries a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
-    (\code{condor\_release}, \code{scontrol release}) and delete the markers. The $8$k work continues.
-    \emph{HP protocol for new cells (D25--D28, 2026-10-09 16:00):} pretrainings at hp73; scratch cells $8$-trial searches;
-    fine-tune cells at the two fixed points (lr $1.3$, $2.2\times10^{-3}$, $\lambda\approx3\times10^{-10}$) through
-    \code{sweep/fixed\_points.py}, never a search, except where the user asked for one: the add-$W$ step (D26) and the
-    accumulation and diagram arms (D27). High multiplicity is $Z+4g$, $Z+5g$ only (D28). Done 16:10: the $16$ scratch
-    searches and $18$ finale fine-tune cells at the fixed points registered on CC (the $16$ new cells' unused search scripts
-    moved to \code{jobs\_search\_unused/}, two that had been submitted cancelled); still to do with \code{fixed\_points.py}:
-    the naive and replay add-$W$ children (\code{tp3\_wadd\_\{naive,replay\}\{w,mix\}fte32k\_*} from the BEST templates,
-    two parents per method) once their last $3$ add trials each are in and evaluated (\code{run\_data\_tools eval} on
-    \code{runs/tp3\_wadd\_replay/trial\_0044}'s data, the $28$ old processes only; $W$ from each trial's own
-    \code{proc\_val\_losses\_no\_reg}, see the forgetting table); add their fixed points to \code{expect\_tp3.json}. Done
-    2026-10-09/10: \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} ($36$ sweeps) and EWC's four children at the
-    fixed points, registered on CC. \emph{Add-$W$ along the run (D30, D31, 2026-10-10):} the $16$k add step was too long
-    to keep the old processes (forgetting table above), so naive, EWC, LoRA (rank $8$, $\alpha=16$, attention qkv and
-    out; the precedent LoRA arm searched rank and $\alpha$), frozen lower blocks (depth searched over $2,4,6$ of $8$),
-    layer-wise lr decay ($[0.75,1]$) and replay of $1\%$ and $10\%$ of each old pool (\code{train\_events}) run at
-    $1$k, $2$k, $4$k steps (\code{tp3\_waddm\_*}, $21$ five-trial searches), the finale's $28$ processes as monitors
-    (recipe \code{monitor: true}: scored at every validation, never trained on unless given a buffer, outside the
-    selecting aggregate; \code{model\_run*\_best\_all.pt} is the best on all $30$, \code{per\_process\_metrics.json} the
-    curves). In both buffer arms the $28$ old processes carry $28/30$ of the per-process-mean loss whatever the buffer
-    size: $1\%$ against $10\%$ is how many distinct old events are rehearsed, not how much weight replay gets. Next:
-    check the first trial's log for \code{monitor processes [...]: ... left out of training} ($\approx2.65\times10^6$ events,
-    \code{train=200000}); weight interpolation (D31 item 1) between the finale and the \code{tp3\_waddm\_naive*} models,
-    evaluated on their own run dirs (their off-shell scale is the finale's, unlike \code{tp3\_wadd\_naive}); the $16$k EWC
-    children keep running as the $16$k point.
-    \emph{State (2026-10-13, 04:00):} \textbf{Decisions since 10-12 21:40:} D39 (replay children at low $D$, done and
-    written up), D40 (synthetic v6: spinor brackets and helicity selection rules), D41 (no diagram cap, optimise the
-    labeller before compromising; send v2--v5 now). \textbf{Synthetic:} revision $2$ of v2--v5 (every legal diagram,
-    names \code{syn[<n>]v<V>r2\_<k>}) merged (2740954); pretrainings \code{tp3\_finale\_synhm\_v\{3,4,5\}r2} on CC
-    (prebuild CPU jobs then hp73, $64$k, $\sim12$\,h) and \code{tp3\_finale\_synhm\_v2r2} on lxplus ($24$\,GB floor,
-    DAG \code{sweep\_0000}); item \code{synthver} (D41). \textbf{Next:} when each finishes, its fine-tunes on $Z+4g$,
-    $Z+5g$ at $D=10^2$, $10^3$ ($8$k) and $10^4$ ($32$k), two fixed points (copy the \code{tp3\_fsynfte} cells with the
-    parent changed, names \code{tp3\_fsv<V>r2fte[32k]\_uubar\_Zggg\{g,gg\}\_d\{4,6,8\}}), then compare with v1 and
-    finale$+W$. The old v2--v5 pretrainings were cancelled (diagram count below the design). \textbf{v6:} implemented on
-    branch \code{worktree-agent-a1af77142289f05b1} (merged up to step 1, no cap); step 2 running there: exact speed-up of
-    the labeller (prefix-sharing of bracket products, values held to $10^{-12}$), then a same-node rate test against
-    MadGraph on lxplus (\code{scripts/job\_bench\_generation.sh}). Open question to the user: pretrain v6 only, or also
-    v6t (target shape)? v6/v6t pretrainings wait for the speed-up and that answer. \textbf{Running:} \code{finsrch}
-    $4/8$ (partial written up), \code{trendtests} (b) the $128$k pair on CC. \textbf{Written up since:}
-    \code{replaylowd} $130/130$ with the reading (late addition below pretraining from the start, most of the gain at a
-    fraction of the cost; the trade depends on model size).
-    \emph{State (2026-10-14, 19:45):} \textbf{Investigated and told to the user (19:40):} (i) arXiv:2606.23791's catalog
-    (\code{analysis/catalog\_daniel/}): $1501$ processes are $409$ exact relabelling classes at MadGraph's default coupling
-    orders (what its events contain) and $467$ at all orders (what its diagram files show; $616$/$708$ without merging
-    CP conjugates); $96$ of the $149$ held-out processes are exact relabels of training ones; ours cover $81$ of $467$;
-    no $|\mathcal M|^2$ is public (Zenodo: momenta only); our own generation $\approx19$ core-h for all $1491$, after a
-    reader of its catalog and massive $b$ beams ($347$ processes) are built. (ii) Zero-shot: theirs is not better on
-    $R^2$; autoregression is not the reason (every arm of theirs is autoregressive, one-hot fails held out).
-    (iii) The heteroscedastic history (the argument withdrawn, causes listed in the plan below). (iv) Delta-plot audit
-    (\code{analysis/transfer/delta\_audit.json}): paper's figures use the $8$k grid at $d8$; $179$ runs, $176$ keep their
-    best model (pruned: \code{tp3\_finfte\_uubar\_Zggg\_d8} trial 96, \code{tp3\_r1fte\_udbar\_enu\_d8} 197,
-    \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} 98, $\approx0.85$ GPU-h to rerun); runs on Jean Zay $107$, CC $37$, lxplus $32$;
-    \code{run\_data\_tools eval} has an EMA bug (fresh EMA of random weights scored when \code{cfg.ema}; fix: set
-    \code{cfg.ema=False}, \code{reset\_output\_head=False}, an \code{--pred-dir} with \code{save\_predictions}, assert stats
-    and val MSE). \textbf{Waiting on the user:} coupling orders (recommended: all), massive $b$ beams or
-    \code{sm-no\_b\_mass}, the catalog's loss (MSE now or after the clean joint heteroscedastic test), whether the
-    $|\mathcal M|^2$ labels exist in Heidelberg.
-    \emph{Delta plots, state 2026-10-15 03:00 (D42, item \code{delta}).} Tools: \code{tools/eval\_delta.py} (rebuilds a
-    run with its own frozen \code{data\_stats.json} and tokenizer read as a resume reads them, EMA off with the
-    checkpoint's weights, fine-tune head kept; writes \code{preds\_*.npz} to \code{\$SCRATCH/zz\_delta/<sweep>\_\_<trial>};
-    \code{--list}, \code{--seed}, \code{--tf32 on|off}), \code{scripts/job\_eval\_delta.sh},
-    \code{scripts/job\_rerun\_trial.sh} (pruned trial rerun from its config into \code{<trial>\_rerun}, optional parent
-    override, recipe re-rooted), \code{analysis/transfer/collect\_delta.py} (site run, base64 npz of test $\Delta$ plus the
-    rebuilt val in MSE$(\log|\mathcal M|^2)$), \code{analysis/transfer/delta\_plots.py} (sets delta\_ladder, delta\_focus,
-    delta\_finale, delta\_star; flags rebuilt-vs-recorded $>5\%$). Done: the $37$ CC runs and the $32$ lxplus runs (copied
-    to CC \code{runs\_from\_lxplus/<sweep>/}) evaluated on V100 ($69/69$); the three pruned trials rerun on CC (parent
-    \code{runs/tp3\_ladder\_r1/trial\_0047}, md5-identical to lxplus's) and evaluated; CC data collected to
-    \code{analysis/transfer/delta\_data/ccin2p3.npz} (before the reruns). First bug fixed: a fresh build refits a fine-tune's
-    momentum scale (parent's), val $3\times10^5$ off. Open: $17/69$ rebuilt val losses differ from the recorded by
-    $5\%$ to $13\times$ (worst \code{runs/tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} $13\times$ worse, \code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8}
-    $7\times$ worse, \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} $3.4\times$ better). Ruled out: Lorentz-frame seed (agree to
-    4 digits over seeds 1,2,3,42), tokenizer, pools/sidecars/recipes (older than the runs), checkpoint step (is the best).
-    Lead: TF32: finfte ud\_ud trained on \code{gpu\_h100} (TF32 on, val $1.14\times10^{-7}$, its own post-training eval
-    reproduced it), rebuilt on V100 $3.3\times10^{-8}$. Test queued: \code{FA-ccin2p3-c0a4a22d} (TF32 on) and
-    \code{-9916a268} (off), \code{--partition=gpu\_h100}, list \code{analysis/transfer/delta\_runs\_seedcheck.txt}; pending
-    on Resources since 23:30 (OVERRUNs E144--E147 acked). Then: fix one evaluation precision for every run (likely fp32,
-    stated in the caption), re-collect, draw. Stuck: the $107$ Jean Zay runs (\code{analysis/transfer/delta\_runs\_jeanzay.txt}):
-    \code{site copy} from Jean Zay fails (relay \code{lpnclaude03} times out on port 22) and \code{site pick} reports Jean Zay
-    DOWN (probe $>120$ s) so \code{placement\_guard} refuses a submission there; \code{site run jeanzay} works. Asked the
-    user to fix the network or allow a hand submission. $19$ jobs of ours held on Jean Zay since 10-07
-    (\code{JobHeldUser}, held items): left alone. \textbf{Infra:} supervisor (b36yc48nx) and events waiter running; waiter
-    b0wm737fa on the two TF32 jobs.
-    \emph{Plan (2026-10-14, user's list of 16:48; D42--D49), in priority order.} (1) \textbf{Full real catalog} (D45, most
-    urgent, trainings sent today): the catalog of arXiv:2606.23791 ($1501$ tree processes, $2\to2$ $254$, $2\to3$ $1237$,
-    $2\to1$ $10$, pp partons only; $519$--$711$ classes under a liberal flavour/charge-conjugation relabelling, $484$--$779$
-    by the earlier bounds), with Daniel's diagram embedding on top of the usual inputs; the user wants the diversity
-    (how many are relabels of one another) to ask the others about. Blocker: the catalog list carries no
-    $|\mathcal M|^2$; where the amplitude-labelled events of Sec.~cond (1352 training processes) live is asked. (2)
-    \textbf{Heteroscedastic loss} (agreement with the user first): the ``deterministic targets'' argument
-    (results above, Sec.~heterosc) is withdrawn: the failures trace to the geometric-mean bug (49cfe64), selection and
-    DyHPO on the $\beta$-NLL (cbae458), $\beta=1$ pinned (da17ce9), global grad clip shared by $\mu$ and $\sigma$, short
-    horizons; no clean $\beta=0$ joint run with every fix was ever made (until the 2026-10-15 run of the user's loss: see the correction after \code{The coupled fit fails}). (3) \textbf{$\Delta$ plots} (D42; Butter, Plehn):
-    arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at the largest $D$
-    ($10^4$): all ladder rungs; the scaling figures' arms; the star arms. No per-event predictions were saved
-    (\code{evaluation.save\_predictions} off): re-evaluate the best trials with \code{run\_data\_tools eval} plus a
-    predictions flag ($\sim180$ runs, $\sim3$--$6$ GPU-h); check that the chosen-point trials kept their models (13 cells
-    where prune's best differs). Pulls after (2), by retraining those cells with the agreed loss (D47). (4)
-    \textbf{Decomposed targets} (D48): per-diagram or per-pairing parts of the amplitude, as in real calculations; design
-    for loops. (5) \textbf{Synthetic one-loop amplitudes} (D44), small. (6) \textbf{Non-SM Lagrangians} (D49). (7)
-    \textbf{Three-phase training} (D46, lowest): synthetic until the fine-tune benefit stops, then real data. Recorded
-    as a result (D43): synthetic data does not help at high multiplicity and closer-to-physical versions hurt; the
-    direction is paused. Zero-shot comparison with the draft's Sec.~cond and the autoregressive question: answered
-    to the user 2026-10-14.
-    \emph{State (2026-10-14, 18:30):} \textbf{On hold (user, 10-14: ``for now you'll put it on hold''):} synthetic v6
-    and the labeller optimisation before it (D40, D41); v6t is not part of D40 and is not run. Prepared, not submitted:
-    \code{sweep/sweep\_config\_tp3\_finale\_synhm\_v6.yaml} (v5r2's protocol, hp73). \textbf{Approved and not started:}
-    weight interpolation finale $\leftrightarrow$ $W$-trained (D31 item 1).
-    \emph{State (2026-10-13, 19:10):} \textbf{Done today:} CC reached directly (lpnclaude03 refuses ssh; the hop
-    removed from \code{~/.ssh/config}, backup \code{config.bak-2026-10-13}); the October weekly deck
-    (\code{talks/progress\_oct2026}, 11 slides; fig:levers\_accum now carries the $D=10^4$ cells, and the generation
-    feature's gain is $D=10^3$ only); trend test (b) written up (no horizon effect at $10^{4.5}$); v4r2/v5r2 fine-tunes
-    written up. \textbf{To do next:} E130 READY, \code{synthver} $52/52$: collect \code{tp3\_fsv2r2*}, \code{tp3\_fsv3r2*}
-    from CC \emph{and} lxplus (v2r2's $D=10^2$, $10^3$ cells ran twice on CC: take the first result per hp; Z+5g
-    $D=10^4$ on lxplus), add them to scratch\_sweeps.json, extend the v4r2/v5r2 table (sec:syn-versions) with v2r2 and
-    v3r2, draw the comparison figure, send it, ack E130 (done 19:40, fig:synth\_versions). Early v2r2: $2.7\times10^{-2}$--$1.0\times10^{-1}$ at $D=10^2$,
-    $10^3$, about $2\times$ worse than the finale's child. \textbf{Open with the user:} v6 only, or v6t too (v6t carries
-    the probes' exact processes, as v5 does, which hurt $4$--$5\times$ at $D=10^2$). \textbf{Infra:} supervisor and
-    events waiter in the background; gen helper for fixed-point fine-tunes: run\_generate(extend=True, fixed\_hp=E[n],
-    submit=True on HTCondor; submit=False then \code{sweep\_manager submit} on SLURM); check for existing sweep dirs on
-    every site before generating (the v2r2 duplicates came from dirs generated on CC before the WSL crash).
-    \emph{State (2026-10-12, 21:40):} \textbf{Decisions since 10-11:} D34 (add-W children from the replay parents
-    only, one point $D=10^4$), D35 (one full fine-tune search on one high-multiplicity cell), D36 (synthetic generator
-    versions, cheap: pretrainings and fine-tunes at fixed HPs), D37 (reference probe outside $Z+ng$/$W+ng$:
-    $e^+e^-\to t\bar t$, Z+3g children cancelled), D38 (trend tests (b), (c); synthetic v2--v5 as designed). The open
-    question on best-on-mix children is settled by D34. \textbf{Written up:} \code{highmult} grid (scratch = first $8$
-    trials), \code{replaykids} $24/24$ and at low $D$ (\code{replaylowd} $130/130$, 10-13), trend test (c) ($D=10^3$ at $32$k: horizon does not explain the gain's fall),
-    synthetic v2--v5 (sec:syn-versions, rates against MadGraph), superseded the same evening by revision $2$ (every
-    legal diagram; names \code{syn[<n>]v<V>r2\_<k>}) and version $6$ (D40, spinor brackets and selection rules).
-    \textbf{Running:} \code{finsrch} (finale on $Z+4g$,
-    $D=10^{4.5}$, $8$-trial search over scratch's space): moved by the rebalancer to lxplus, hp167 died of CUDA OOM on a
-    $12$\,GB card (nothing recorded in DyHPO), $24$\,GB floor set (\code{sweep/set\_gpu\_mem.py}), owed trial added as
-    DAG \code{sweep\_0005}; when complete compare its best with the fixed points ($1.35\times10^{-3}$) and scratch
-    ($8.31\times10^{-4}$). \code{trendtests} (b): \code{tp3\_hmscr128k}/\code{tp3\_finfte128k\_uubar\_Zgggg\_d9} (hp15,
-    hp162, $128$k steps, CC, $\sim18$\,h); compare with their $32$k values ($8.31$, $13.5\times10^{-4}$); the last scratch
-    trial of \code{tp3\_hmscr32k\_uubar\_Zgggg\_d6} (7 of 8 in). \code{synthver}: superseded by the 04:00 state above. \textbf{Infra:} \code{refill.py} out of the supervisor's
-    maintain list (it cannot see other sites' results); rebalancer does not set lxplus GPU floors on what it moves (set
-    by hand for today's sweeps). CC was unreachable 09:05--15:30 on 10-12. Jean Zay: network fix pending.
-    \emph{State (2026-10-10, 16:00):} \textbf{Decisions since 06:15:} D32 (cancel my own jobs that are outside the
-    decided scope or wasted without asking, report afterwards), D33 (the DyHPO sampler fix from the likelihoods project,
-    deployed at once to every sweep, running ones included). \textbf{Done today:} \code{accrr} and \code{levdiagl} complete,
-    written up (fig:accrr, fig:levdiagl), items closed; the DyHPO fix (commit 4606315, on CC and lxplus; Jean Zay is still at
-    416ca49, its git push hangs) and its paragraph in sec:lrlaw: every sweep before 2026-10-10 was a random search, so
-    write-ups that compare cells must say which ran before and which after the fix. 14 leftover search jobs of the
-    fixed-point cells \code{tp3\_finfte[32k]\_uubar\_Zgggg[g]\_d*} (queued before D25) cancelled; the ones that had finished
-    (e.g. \code{tp3\_finfte32k\_uubar\_Zggggg\_d8} hp 17, 98, 110, 116, 192) sit beside the fixed points and are not the cell's
-    value. lxplus had no $Z+4g$/$Z+5g$ pools (two trials raced building MadGraph): pools copied from CC;
-    \code{sweep/refill.py} counts that race as infrastructure and runs from the supervisor on lxplus
-    (\code{tp3\_hmscr\_}, \code{tp3\_hmscr32k\_}, $8$ per sweep); \code{tp3\_hmscr32k\_uubar\_Zgggg\_d8} hp 18 diverged
-    (listed separately), one trial added. A $Z+5g$ trial that started on lxplus before the copy regenerated the train pool there (17:09): same recipe\_id, different bytes from CC's (the generator is not byte-reproducible across sites); CC's copy restored on lxplus at 18:00 (md5 dc03352472ea on both; the $Z+4g$ and val/test pools match). Trials that trained on the regenerated pool: \code{tp3\_hmscr\_uubar\_Zggggg\_d5} hp 30 and hp 15 (flagged in the write-up). \textbf{Items:}
-    \code{highmult} $84/254$, \code{contadd} $14/23$ (EWC's $Z+5g$ children written up; $Z+4g$ children, naive/replay's last
-    $3$ trials each and the finale's fixed-point $Z+5g$ cell pending), \code{addhoriz} $2/105$ (all $21$
-    \code{tp3\_waddm\_*} DAGs moved to lxplus by the rebalancer, idle in its GPU pool; the first trial's monitor line not
-    read yet). \textbf{Next:} as before: (i) the monitor line and \code{per\_process\_metrics.json} of the first
-    \code{tp3\_waddm\_*} trial, forgetting curves per method; (ii) weight interpolation (D31 item 1), a
-    \code{run\_data\_tools} mode on a \code{tp3\_waddm\_naive*} run dir; (iii) add-$W$ parents along the curves, children at
-    the fixed points; (iv) naive/replay $16$k parents when their trials are in. \textbf{Jean Zay} (19:45): the hangs were the shared ssh master (sessions stalled behind hung ones; \code{site}, the supervisor and \code{ccorch-web} all used it): \code{~/.ssh/config} now gives \code{jean-zay} no master, and fresh connections answer in $\sim$1\,s. Jean Zay's \code{sbatch} itself hangs on an argument list over $\sim$1\,KB, and no file can be created in WORK (the inode quota), so the archive runs as three jobs (878426, 878465, 878474: families 1--38, 39--58, 59--77 of \code{jz\_runs.txt.fams.final}) with logs in \code{\$STORE/FA\_runs\_archive/logs}, moved to the \code{archive} partition (estimated start 2026-10-11 17:30). Once they have run: \code{site sync jeanzay} (the push failed for lack of inodes), put \code{prune\_site.sh jeanzay} back in projects.toml, drop \code{--no-dest jeanzay} from the rebalancer. \textbf{Jean Zay network (21:30):} uploads over $\sim$1.4\,KB from lpnclaude03 to Jean Zay are silently dropped (a path-MTU black hole; downloads and short commands work), so no git push, bundle or GitHub fetch reaches it (it has no route to GitHub): its checkout stays at 416ca49 until the user fixes lpnclaude03 (\code{tcp\_mtu\_probing=1} or a route MTU of 1400). Leftover \code{git-receive-pack} processes there are mine (killed). The archive itself ran: 59 families, WORK at 467\,006 of 500\,000 files (\code{lfs quota -p}; \code{idr\_quota\_user} lags). \textbf{lxplus GPUs:} $Z+5g$ at batch 16384 OOMs on the 12\,GB MIG slices; \code{sweep/set\_gpu\_mem.py --mb 30000} set a floor on the $Z+5g$ scratch sweeps there (idle jobs' Requirements, submit files); \code{refill.py} counts such an OOM as infrastructure. \textbf{Background:} \code{site supervise --project FA}, the events waiter, the archive loop.
-    \emph{State (2026-10-09, 15:45):} \textbf{Active items} (\code{site items -v}): \code{accrr} $96/145$,
-    \code{levdiagl} $120/145$ (fig:levdiagl drawn 12:25, \code{analysis/transfer/levdiagl.py}; its $D=10^2$ cells not in yet),
-    \code{synth32k} $64/96$ (written up at $16$ of $48$ cells), \code{contadd} $9/15$, \code{highmult} $14/416$.
-    \textbf{Decisions since 08:30:} D22 (every high-multiplicity arm but the continual one gets the full grid; done:
-    \code{sweep/gen\_highmult.py}, $64$ configs, the $32$ scratch and finale cells generated on CC and registered with the
-    feeder, waiting on the $100$-job cap; \code{expect\_tp3.json} counts all of them), D23 (each add method hands two
-    parents: best on $W$ and best on the $30$-process geometric mean), D24 (largest pretraining $=$ the finale).
-    \textbf{Next:} (i) \code{FA-ccin2p3-32a65175}, pending on CC: \code{run\_data\_tools eval} of the finale and the $9$ finished
-    add trials (EWC 2, 13, 31, 108, 110; naive 102, 145; replay 21, 44) on \code{runs/tp3\_wadd\_replay/trial\_0044}'s data ($30$
-    processes), output \code{runs/forget\_wadd\_batch1.json}; forgetting $=$ per-process ratio to the finale's; evaluate the
-    remaining naive/replay trials the same way when done; pick two parents per method, write
-    \code{sweep\_config\_tp3\_wadd\_\{m\}fte32k\_*} (W-best) and a \code{\_\{m\}mixfte32k\_*} pair (mix-best) with the parent path in
-    place of \code{BEST}, add them to \code{expect\_tp3.json}, submit. (ii) When \code{tp3\_finale\_wng}, \code{tp3\_finale\_synhm}
-    finish: generate and register \code{tp3\_fwngfte[32k]\_*}, \code{tp3\_fsynfte[32k]\_*} (configs committed, $32$ sweeps
-    incl.\ the two hand-written d8 pairs). Until then the \code{highmult} GAP of $36$ units is expected (feeder cap and
-    unfinished parents). (iii) Jean Zay prune and archive (\code{jz\_archive}). Held: \code{horizon32k}, \code{eqd},
-    \code{seeds}. \textbf{Background:} \code{site supervise --project FA} and \code{site events --wait --project FA}.
-    \emph{State (2026-10-09, 08:30):} the work lives in \code{site}'s registers (\code{site items -v}, \code{site digest
-    --project FA}); this summarises it. \textbf{Active items:} \code{accrr} (accumulation as in arXiv:2606.23791; $12$ of
-    $12$ $32$k cells and $10$ of $24$ $8$k cells written up; the other $7$ probes' $8$k searches queued on lxplus),
-    \code{levdiagl} (diagram arm, pretraining done, \code{val\_loss} $2.04\times10^{-6}$; $36$ fine-tune sweeps on CC, the
-    $32$k cells running), \code{synth32k} ($48$ synthetic $32$k sweeps generated and submitted on CC 2026-10-09; one trial,
-    \code{tp3\_synfte32k\_ee\_WW\_d9}, diverged at step $25\,855$: report it as blown up), \code{highmult} and
-    \code{contadd} (the high-multiplicity test, the item above: pools and sidecars of $W+4g$, $W+5g$, $Z+4g$, $Z+5g$ built
-    on CC, the $W$ pools in $11.7$ min of one CPU job, $428$ and $4\,670$ diagrams at $2\to5$, $2\to6$; the finale's
-    Fisher for EWC written to \code{runs/tp3\_finale/trial\_0073/models/ewc\_fisher.pt}; \code{tp3\_wadd\_naive}, \_replay,
-    \_ewc and \code{tp3\_finfte32k\_uubar\_Zggg\{g,gg\}\_d8} submitted on CC; \code{tp3\_finale\_wng}, \code{tp3\_finale\_synhm},
-    \code{tp3\_hmscr32k\_uubar\_Zggg\{g,gg\}\_d8} registered for CC's feeder (100-job cap). Next: when the add steps end,
-    \code{tools/run\_data\_tools.py eval} of each trial on the finale's data (forgetting), choose the parents, replace
-    \code{BEST} in \code{sweep\_config\_tp3\_wadd\_*fte32k\_*.yaml}, submit; when the two pretrainings end, submit
-    \code{tp3\_fwngfte32k\_*}, \code{tp3\_fsynfte32k\_*}; other $D$ only after the user sees $D=10^4$), \code{jz\_archive}
-    (Jean Zay reachable again since 2026-10-09: the curve25519 key exchange stalls there, \code{\textasciitilde/.ssh/config}
-    pins two others; next: \code{scripts/prune\_site.sh jeanzay}, then the archive). Held: \code{horizon32k},
-    \code{eqd}, \code{seeds}. \textbf{Decisions since the last state:} D16--D21 (gluon beams; sampler as now; quiet
-    reporting with \code{site digest}; storage pruning, \code{sweep/prune.py} in the supervisor every $6$ h; the
-    high-multiplicity test and the continual-pretraining quest). \textbf{Open questions to the user:} whether $D=10^4$-only
-    applies to every arm of the high-multiplicity test; ``largest pretraining'' $=$ the finale; the add-step design
-    ($16$k steps, $5$-trial searches, the naive parent chosen on its own data). \textbf{Infrastructure:} the supervisor
-    and the events waiter run in the background (restart: \code{site supervise --project FA}, \code{site events --wait
-    --project FA}); \code{~/.claude/settings.json} allows \code{ssh lpnclaude03} (the user's call).
-\emph{State (2026-10-08, 10:40):} \textbf{(C) redone as in
-    arXiv:2606.23791} (user: the same as theirs, comparable to the paper; code \url{https://github.com/heidelberg-hepml/LLM4LHC}):
-    \code{training.per\_process\_accumulation: round\_robin}, single-process batches in random order (their shipped configs),
-    $G=4$ of $B=4096$ per update; \code{tp3\_accrr\_r9} (hp73, $64$k) queued on lxplus at JobPrio $2000$, its smoke run
-    passed (loss $0.33\to0.21$ in $300$ steps); waiter on its result file. \textbf{Diagram arm redone with their encoder}
-    (\code{model.diagram\_encoder\_impl: llm4lhc}, width $64$ on the user's call, every diagram, fixed labels added for the
-    one-loop ghosts and Goldstones their vocabulary lacks): \code{tp3\_levdiagl}; its smoke run \code{FA-lxplus-e9ecb3df} is
-    queued on lxplus (two earlier ones failed: PDG $82$, then a repeated run name, both fixed); submit its $64$k pretraining
-    (\code{generate\_sweep --n-trials 0}, then \code{--extend --fixed-hp 73 --submit}, PINNED, JobPrio $2000$) once it
-    passes. Both arms' fine-tune configs are committed (\code{tp3\_accrrfte[32k]\_*}, \code{tp3\_levdiaglfte[32k]\_*}, $72$:
-    $D=10^2,10^3$ at $8$k paired by DyHPO seed, $10^4$ at $32$k at rung $9$'s chosen points from
-    \code{horizon32k\_chosen.json}); submit each arm's when its parent ends (parent on lxplus; copy to CC-IN2P3 if
-    \code{site pick} places cells there) and add their points to \code{expect\_tp3.json}. \textbf{Released from the $32$k
-    hold} (it covers only the horizon item): finale $32$k ($49$ lxplus, $20$ CC-IN2P3) and the four lever arms' $D=10^4$
-    cells ($48$, CC-IN2P3, fed past the $100$-job cap by \code{feed\_capped.py}); the synthetic $32$k cells are on Jean Zay.
-    \textbf{Jean Zay}: IDRIS unreachable (ssh port silent from the jump host, idris.fr refuses); waiter \code{bqa4k4zhk};
-    when back, archive old runs to \code{\$STORE} (the user's call): every run and sweep dir in WORK not \code{tp3\_}, one tar
-    each, checked before the original is removed (criterion proposed to the user). \textbf{Review enforcement} rebuilt
-    (\code{review\_backlog.sh}): \code{bashpre}/\code{bashpost} on every shell command and a commit gate, locks expire after
-    $3$\,h, the Stop nudge a reminder only; reviewer \code{begin}/\code{advance} allowed in auto mode. Open with the user:
-    CLAUDE.md still says commits stay unblocked. \textbf{Loops}: rebalancer + CC feeder (\code{bs9qzry0o}), watchdog on
-    CC-IN2P3 and lxplus (\code{be954czj4}). \emph{State (2026-10-07, 19:15):} \textbf{On hold until the user says:} every $32$k run, the equal-data fine-tunes
-    (3), the seeds (5). \textbf{Done and written up} (paragraphs above Sec.~\ref{sec:ladder-open}): (4) and (6) at $8$k, (B) and (C) at
-    $D=10^2,10^3$ (their $10^4$ cells held at $32$k), the real zero-shot test. The accumulation pretraining's
-    wall time was $14.6$\,h against $\sim6.7$\,h for rung $9$ ($19$ micro-batches of $862$ events per update).
-    \textbf{Sites:} Jean Zay down (maintenance) and its WORK inode quota $94\%$ ($470$k of $500$k): $2876$ trials held
-    there; the user's choice is pending: (a) archive old runs to STORE, (b) new runs to \code{\$SCRATCH}, (c) keep it out;
-    nothing new goes there. CC-IN2P3 back since 2026-10-07 evening. \textbf{Loops} (background shells, lost on a restart): rebalancer + CC feeder every
-    $20$ min (\code{--allow-jeanzay --no-dest jeanzay --exclude tp3\_eqd\_r tp3\_finfte\_ tp3\_synfte\_}); watchdog on
-    CC-IN2P3 and lxplus (\code{--sites ccin2p3 lxplus --stall-site lxplus=240}), Jean Zay added when it answers; a waiter on
-    Jean Zay coming back. \textbf{To do, design first with the user:} larger catalogs ($10^2$, $10^{2.5}$,
-    $10^3$; real processes first, 2026-10-08; hand-off item). \textbf{Finale (4) and synthetic (6) grids, unfinished cells} (the user's call, 2026-10-07): $88$ cells ($47$ finale,
-    $41$ synthetic) with fewer than $5$ results stop their search (held on lxplus, $255$ jobs, and CC-IN2P3, $46$; on Jean
-    Zay excluded from the rebalancer) and run once at the reference cell's best point instead (rung $9$'s on the same
-    probe and $D$, the star arm's on its own probe), \code{analysis/transfer/lad\_chunks/} ($9$ chunks on CC-IN2P3,
-    \code{scripts/job\_seed\_batch.sh}); their finished trials are kept. The $122$ finished cells keep their search's best.
-    \code{collect\_sweeps.py} now reads fixed-HP results (\code{results/fixed.json}, \code{hp}$=-1$). \textbf{The seeds (5) are on hold} until the user says (2026-10-07): $13$ chunks done ($468$ runs), the $25$ that
-    failed on Jean Zay's inode quota ($1000$ runs, \code{analysis/transfer/seed\_chunks/A\_004}--\code{A\_028}) not
-    resubmitted. \textbf{The equal-data fine-tunes (3) are on hold too} (the user's call, 2026-10-07): every
-    cell had been set up as a new $5$-trial DyHPO search ($3360$ trials), not one run at the ladder cell's best point, the
-    design the user expected, and all eight rungs went out at once without a pilot. Held on lxplus ($442$ DAGs, $516$
-    trials; a first \code{condor\_hold} with $\sim10^3$ ids left most running, held again by cluster in batches of $40$),
-    on Jean Zay (held, no \code{HELD} marker: it was down; \code{rebalance.py --exclude tp3\_eqd\_r} keeps them in place)
-    and on CC-IN2P3 (none queued). What the $147$ cells in so far show (\code{analysis/transfer/eqd\_vs\_ladder.py}; rungs
-    $2$, $7$, $8$): the searches' best lr does not move (median $\log_{10}(\mathrm{lr}_{eq}/\mathrm{lr}_{lad})=+0.02$ on
-    rungs $2$, $7$), the landscape being flat across the window (second-best trial $1.16\times$ the best, median), and
-    the equal-data trial nearest the ladder's best point is $1.22\times$ the equal-data best: one run at the ladder's point
-    would have done. Rung $7$'s equal-data cells are $1.31\times$ worse at the median (Wilcoxon $p=0.008$, $83$ cells);
-    over all $147$, $1.11\times$, not significant ($p=0.11$); no dependence on $D$ (Kruskal--Wallis $p=0.08$ on rung $7$,
-    $0.14$ on all); single cells are noise-dominated (ratio $0.28$--$5.7$, 5--95\%). (1) The $32$k grid: scratch and every pretraining (rungs $0$--$9$) on the twelve probes at
-    $D=10^{3.5}$, $10^4$, and $ud\to ud$ also at $10^{2.5}$, $10^3$, two chosen points each (\code{horizon32k\_chosen.json});
-    $420$ trials, spread over lxplus, CC-IN2P3 and the $17$ done on Jean Zay (the rest moved off Jean Zay's priority queue on
-    2026-10-05); waiter: a background count over the $210$ sweeps on all sites. When in: \code{cells.USE\_32K} on, figures
-    redrawn. (2) $D=10^{4.5}$, $10^5$ at $32$k, scratch and every pretraining, two chosen points (the
-    one-loop probes stop at $10^{4.5}$), drawn in the grid figures. (3) Equal-total-data rungs: rungs $2$--$9$ at $3\times10^5$
-    training events in total, split evenly over the rung's processes, $64$k steps at the protocol point, and their full
-    fine-tune grid (same cells and horizons as the ladder, $32$k at the top two $D$), compared with the ladder. (4) The
-    finale: rung $9$ plus every star arm's processes, fine-tuned on all $18$ probes. (5) Two extra seeds at every fine-tune
-    cell's best point. (6) The synthetic-amplitude generator (Sec.~\ref{sec:prior-open}, item 6), validated on CPU, then its
-    pretraining fine-tuned on the twelve probes, after (3). \emph{Ahead of what remains of (3)--(6) (the user's call, 2026-10-06, high priority):} (A) the $32$k HP landscape at
-    $D=10^{3.5}$ (\code{tp3\_hpx32k\_*}, running first); (B) the input conditionings re-judged on fine-tuning: every lever of
-    Table~\ref{tab:levers} and the diagram channel was adopted or dropped on in-distribution losses only (the diagram item of
-    Sec.~\ref{sec:prior-open}), so each is A/B'd on what the study measures, the fine-tune gain over scratch: a pretraining
-    with the lever flipped (diagrams on; off-shellness off; coupling scalars off; generation features off), fine-tuned on
-    the probes at the chosen points, against the same pretraining with the study's setting; (C) per-process micro-batches
-    with gradient accumulation (the scheme of arXiv:2606.23791, D.~Schiller, 2026-10-06): each step draws one micro-batch
-    per process and the update sums their gradients, against our mixed batch of $16384$ events over all processes. With
-    $P$ processes, micro-batch $b$ and a mean loss per process, their update follows
-    $\sum_p\nabla\bar\ell_p$ over $Pb$ events, ours $\sum_p\nabla\bar\ell_p$ over $\approx16384/P$ events per process: the
-    same weighting of processes, at $Pb$ against $16384$ events per update; the A/B separates the two at equal updates and
-    at equal events. Also: the zero-shot distances (\code{tools/zero\_shot\_ft.py},
-    one job per site submitted 2026-10-05), the probes that do not gain. Throughout: placement and rebalancing across
-    sites without asking; fresh collection from all sites before any figure; after every collection, and at least every
-    few hours while results land, the study's own figures (\code{rung\_focus}, \code{rung\_grid}, \code{star\_arms},
-    \code{gain\_heatmap}, and each new comparison) sent to the user unprompted, so a problem can be caught early;
-    \code{docs/results.tex} kept current (results go only there: the paper draft is not updated unless the user asks,
-    2026-10-07; the goal's ``update the paper draft'' was in the goal text the agent wrote, not asked for); reviewers run
-    when due; never narrow the scope (CLAUDE.md 0b). Monitoring, every $20$ minutes, never hourly (the user's call,
-    2026-10-06, after $75$ points failed for hours unnoticed): \code{sweep/watchdog.py tp3\_ --expect <the batch's
-    \{sweep: [hp]\} JSON>} in a background loop that exits on an \code{ALERT} (fast trial failures, expected points with
-    nothing running or queued anywhere, a site with queued trials and nothing running over three checks), and
-    \code{sweep/rebalance.py tp3\_ --allow-jeanzay --apply} in a $20$-minute loop, never cut off by an outer timeout (a pass killed between submitting at the destination and releasing at the source leaves both queues holding the sweep: $70$ on 2026-10-06, released by hand; every site call inside it has its own timeout); a sweep it moves stays $12$\,h where it arrives (\code{ARRIVED}; without it the sweeps first in name order went back and forth up to $\sim90$ times, losing their place in every queue), a \code{PINNED} sweep never moves, and moved trials are released at the source only once they are queued at the destination; every alert is acted on at once and the
-    loop restarted; each new batch gets its own \code{--expect} file. Context guard (\code{.claude/hooks/context\_guard.py}):
-    Claude Code's auto-compaction is held until the notes are flushed (\code{touch .claude/.notes\_flushed}), then goes through.
-    \emph{State (2026-10-06, 20:25):} \textbf{Done since the flush.} (i) \code{sweep/rebalance.py} never plans a move into a
-    site past its job cap (\code{JOB\_CAP}: CC-IN2P3 $100$, read from \code{squeue}) and releases moved trials only when every
-    one is queued at the destination. CC's backlog ($\sim1500$ generated trials) was never fed past its cap:
-    \code{sweep/feed\_capped.py tp3\_} (on CC, every $20$ min, before each rebalancer pass, in one background loop) tops
-    the queue up to the cap through \code{submit\_sweeps}, submitting a fixed point at most once (stale duplicates from the
-    back-and-forth, up to $78$ per sweep, are marked submitted and never run); its first pass submitted until the cap
-    ($101$ jobs). The two sweeps that lost a trial get it back through the feeder. (ii) The watchdog loop restarted (\code{watchdog.py tp3\_ --expect
-    analysis/transfer/expect\_tp3.json --window 30 --stall-site jeanzay=420}). (iii) Running loops (background shells, lost
-    on a restart): the rebalancer every $20$ min; a loop raising the priority trials on lxplus (\code{tp3\_hpx32k\_*}
-    JobPrio $2000$, the $34$ first-round $32$k points $1000$) and waiting for all $572$ chosen $32$k points; waiters for half
-    of the $120$ HP-landscape trials, the next pretraining result (equal-data rungs $4$--$6$ on CC), the four lever
-    pretrainings, the start of \code{tp3\_accum\_r9} (read its log to confirm the accumulation mode runs on GPU), and the
-    $38$ seed jobs (none started: they rank below the sweeps); the submission of the equal-data rung $2$, $3$ and synthetic
-    grids on lxplus (chunks of $60$ lines; scripts over $\sim100$\,kB fail as one remote command). Once those are in, read
-    their $32$k chosen points from the trial scripts (\code{grep fixed-hp-idx jobs/trial\_*.sh}) into
-    \code{expect\_tp3.json}, as done for the finale and rungs $7$--$9$ ($213$ sweeps). \textbf{Open with the user:} the
-    equal-events accumulation arm ($16384$ events per process, $\sim3400$ steps, its own lr search, $\sim27$--$50$ GPU-h;
-    explained, no answer yet; my advice: wait for \code{tp3\_accum\_r9}); how to score the $49$ cells where $32$k is worse
-    than $8$k (decide after the HP landscape). \textbf{Results not yet written up:} the $32$k cells' effect (median
-    $32$k/$8$k $0.27$; $49$ of $269$ worse); the HP landscape (first trials in; one divergence: rung $0$ on one-loop $ee\to
-    d\bar d$, hp$180$, lr $1.5\times10^{-3}$, $\lambda=2\times10^{-6}$, EMA, non-finite at step $22491$ of $32$k, to be shown
-    separately). Next in the plan after these: (B) and (C) grids as their pretrainings end (parents on lxplus,
-    \code{trial\_0073}, resolve before submitting), then steps (3)--(6) as their grids complete. Earlier (18:08): (1) $377$ of the $420$ $32$k points in, the rest training or queued on lxplus (the
-    $75$ that had failed in seconds, their first attempts' run dirs blocking \code{run.py}, were fixed by
-    \code{run\_trial.py} taking \code{trial\_<hp>\_r<k>} on a cold start, nothing deleted). Once all $420$ are in: collect
-    \code{tp3\_} from every site (\code{collect\_sweeps.py tp3\_}, merge into \code{scratch\_sweeps.json}), set
-    \code{cells.USE\_32K = True}, redraw \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap} and send the figures. Decided: scratch $ee\to\nu_e\bar\nu_e$ keeps $8$k at $10^{3.5}$, takes its $32$k search (all
-    trials) at $10^4$ (\code{cells.HOLD\_8K}, \code{ALL\_TRIALS32}); $ud\to ud$ at $10^{2.5}$, $10^3$ goes to $32$k for every
-    pretraining. (2) All $242$ sweeps of $D=10^{4.5}$, $10^5$ at $32$k submitted, two chosen points each ($218$ on Jean Zay,
-    $23$ on lxplus, $1$ on CC-IN2P3). (3) The eight equal-data pretrainings queued (rungs $2$--$6$ on Jean Zay, $7$--$9$
-    running on lxplus); their fine-tune grids (\code{tp3\_eqd\_r<n>fte[32k]\_*}) go out when each ends. (4) \code{tp3\_finale}
-    queued on lxplus, its grid (\code{tp3\_finfte[32k]\_*}) likewise. (5) $1468$ seed runs in $38$ chunks
-    (\code{analysis/transfer/seed\_chunks/}) queued on Jean Zay and lxplus; the $32$k cells' seeds follow once those cells are
-    final. (6) The generator is merged (\code{tools/synthetic\_amplitudes.py}, CPU checks in
-    \code{tests/test\_synthetic\_amplitudes.py}: Lorentz invariance to $5\times10^{-12}$, mass dimension $8-2N$, reproducible
-    from the name, $20/20$ off-shellness masks built); its pretraining \code{tp3\_synth} (recipe
-    \code{transfer\_synthetic.yaml}: $19$ synthetic processes at $10^5$ training events, rung $9$'s process count, $64$k steps,
-    hp73) is building its pools on CC-IN2P3, and its grid (\code{tp3\_synfte[32k]\_*}, the equal-data grid's $132$ cells) goes
-    out when it ends. Every batch is in \code{analysis/transfer/expect\_tp3.json} for the watchdog. Before any fine-tune grid from an hp73
-    parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in \code{trial\_0073\_r<k>}) and point the
-    configs at it. The equal-data rungs' parents are hp73 alone, the ladder's fine-tunes use each rung's best-of-search
-    parent (hp47 on rungs $1$, $5$, $8$, hp185 on $3$, hp15 on $4$): every comparison of the two says so, or uses the ladder
-    rung's hp73 parent where it exists. The paper draft is \code{\textasciitilde/drafts/fm\_amplitudes/} (restored 2026-10-06 from the last version sent, \code{fm\_amplitudes\_updated.zip}, after a WSL restart wiped \code{/tmp}; never keep it in \code{/tmp} again;
-    \code{fm\_amplitudes\_check.pdf} last sent).
+  \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
+    \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{The plan (the user's list of
+    2026-10-14 16:48; D42 to D49), in priority order.} (1) \textbf{The catalog of arXiv:2606.23791} (D45, most urgent):
+    its $1501$ tree processes, with Daniel's diagram embedding on top of the usual inputs; the user wants its diversity
+    (how many are relabels of one another, Sec.~\ref{sec:catalog}) to ask the others about. No $|\mathcal M|^2$ is
+    public, so we generate it: about $10^5$ events per process (user, 2026-10-15: ``For now let's do only 100k.''), with
+    their MadEvent setup and their split as published; the pipeline (a reader of their catalog, massive $b$ beams for
+    $347$ processes) is being built. Asked on 10-14 and open unless their setup answers them: coupling orders
+    (recommended: all), massive $b$ beams or \code{sm-no\_b\_mass}, the catalog's loss (MSE now or after the
+    heteroscedastic test), whether the $|\mathcal M|^2$ labels exist in Heidelberg. (2) \textbf{Heteroscedastic loss}
+    (agreement with the user first). The first clean joint run of the user's loss is written up (the correction after
+    ``The coupled fit fails'', Sec.~\ref{sec:divergences}): $\mu$ $2.6\times$ below the MSE baseline on $ee\to t\bar t$,
+    calibration open (pull std $0.46$, the NLL still falling at $8$k). The test is that one run (user, 2026-10-15: ``No
+    need to send 8 runs, let's just see that the het loss works''). Pulls in the $\Delta$ plots come after (2), by
+    retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
+    Plehn): arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at $D=10^4$: all
+    ladder rungs, the scaling figures' arms, the star arms. The paper's figures use the $8$k grid at \code{d8}
+    (\code{analysis/transfer/delta\_audit.json}): $179$ runs, on Jean Zay $107$, CC $37$, lxplus $32$, and three pruned
+    trials (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial 96, \code{tp3\_r1fte\_udbar\_enu\_d8} 197,
+    \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} 98) rerun on CC from their configs (parent \code{runs/tp3\_ladder\_r1/trial\_0047},
+    md5-identical to lxplus's). Tools: \code{tools/eval\_delta.py} (rebuilds a run with its own frozen
+    \code{data\_stats.json} and tokenizer as a resume reads them, EMA off with the checkpoint's weights, fine-tune head
+    kept; writes \code{preds\_*.npz} to \code{\$SCRATCH/zz\_delta/<sweep>\_\_<trial>}; \code{--list}, \code{--seed},
+    \code{--tf32 on|off}), \code{scripts/job\_eval\_delta.sh}, \code{scripts/job\_rerun\_trial.sh} (a pruned trial rerun from
+    its config into \code{<trial>\_rerun}), \code{analysis/transfer/collect\_delta.py} (test $\Delta$ and the rebuilt val in
+    MSE$(\log|\mathcal M|^2)$), \code{analysis/transfer/delta\_plots.py} (delta\_ladder, delta\_focus, delta\_finale,
+    delta\_star; flags rebuilt against recorded above $5\%$). Evaluated on V100: the $37$ CC and $32$ lxplus runs (the
+    latter copied to CC \code{runs\_from\_lxplus/<sweep>/}) and the three reruns; \code{analysis/transfer/delta\_data/ccin2p3.npz}
+    was collected before the reruns. Open: $17/69$ rebuilt val losses differ from the recorded by $5\%$ to $13\times$
+    (worst \code{runs/tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} $13\times$ worse, \code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8}
+    $7\times$ worse, \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} $3.4\times$ better). Ruled out: the Lorentz-frame seed
+    (4 digits over seeds 1, 2, 3, 42), the tokenizer, pools, sidecars and recipes (older than the runs), the checkpoint
+    step. Lead, TF32: finfte ud\_ud trained on \code{gpu\_h100} (TF32 on, val $1.14\times10^{-7}$, reproduced by its own
+    post-training eval) rebuilds on V100 at $3.3\times10^{-8}$; on A100 TF32 had changed nothing beyond the run-to-run
+    spread (Sec.~\ref{sec:tf32-a100}). Test: \code{FA-ccin2p3-c0a4a22d} (TF32 on) and \code{FA-ccin2p3-9916a268} (off),
+    \code{--partition=gpu\_h100}, list \code{analysis/transfer/delta\_runs\_seedcheck.txt}, pending on Resources since
+    10-14 23:30. Jean Zay's $107$ runs (\code{analysis/transfer/delta\_runs\_jeanzay.txt}): \code{FA-jeanzay-e99a690d}
+    (TF32 on) and \code{FA-jeanzay-5c91508e} (TF32 off) submitted by hand (D50, \code{scripts/hand\_place.sh}), since
+    \code{site copy} from Jean Zay fails (relay \code{lpnclaude03} times out on port 22) and \code{site pick} reports it
+    DOWN, so \code{placement\_guard} refuses it. Then: one evaluation precision for every run (likely fp32, stated in
+    the caption), re-collect from all sites, draw. Caveat: \code{tools/run\_data\_tools.py eval} scores a fresh EMA of
+    random weights when \code{cfg.ema} (fix: \code{cfg.ema=False}, \code{reset\_output\_head=False}, a \code{--pred-dir}
+    with \code{save\_predictions}, assert stats and val MSE); \code{eval\_delta.py} avoids it, and the forgetting
+    evaluations (\code{FA-ccin2p3-4e4e6153}, \code{-3ab918ca}) used that tool. (4) \textbf{Decomposed targets} (D48):
+    per-diagram or per-pairing parts of the amplitude, as in real calculations; design for loops. (5) \textbf{Synthetic
+    one-loop amplitudes} (D44), small. (6) \textbf{Non-SM Lagrangians} (D49). (7) \textbf{Three-phase training} (D46,
+    lowest): synthetic until the fine-tune benefit stops, then real data. Recorded as a result (D43,
+    Sec.~\ref{sec:syn-versions}): synthetic data does not help at high multiplicity and the closer-to-physical versions
+    hurt; the direction is paused.
+    \emph{Also approved (2026-10-15).} Jonas's causal mask, reimplemented as in his section of the draft (the zero-shot
+    comparison in Sec.~\ref{sec:ladder}), then one pretraining like \code{tp3\_gstd\_r9} with it, scored zero-shot on $W$
+    with one more emission (user: ``do whatever jonas did for his results with the causal mask and run a pretraining'');
+    the mask is being reimplemented. Weight interpolation between the finale and the \code{tp3\_waddm\_naive*} models
+    (D31 item 1), evaluated on their own run dirs (their off-shell scale is the finale's), approved and not started.
+    \emph{Not to be proposed again:} a ratio target (user, 2026-10-15: ``We already tried learning the ratio and it
+    didn't go well'').
+    \emph{On hold until the user says.} (a) The horizon item (\code{horizon32k}, since 2026-10-06 22:45): the $32$k grid of
+    scratch and every pretraining (rungs $0$ to $9$) on the twelve probes at $D=10^{3.5}$, $10^4$, $ud\to ud$ also at
+    $10^{2.5}$, $10^3$ ($420$ trials at the chosen points, Sec.~\ref{sec:ladder}); the same at $D=10^{4.5}$, $10^5$ ($242$
+    sweeps, the one-loop probes stopping at $10^{4.5}$); the $32$k HP landscape at $D=10^{3.5}$ (\code{tp3\_hpx32k\_*}).
+    The finale's $32$k cells, the lever arms' $D=10^4$ cells and the synthetic $32$k grid were released on 2026-10-08 and
+    are written up. When resumed: collect \code{tp3\_} from every site, set \code{cells.USE\_32K}, redraw
+    \code{rung\_focus}, \code{rung\_grid}, \code{gain\_heatmap} (on the $8$k grid until then); open with the user: how to
+    score the cells where $32$k is worse than $8$k. (b) The equal-total-data rungs (\code{eqd}, 2026-10-07): rungs
+    $2$ to $9$ at $3\times10^5$ training events in total, split evenly over the rung's processes, $64$k steps at hp73, and
+    their fine-tune grid against the ladder (each rung adds $10^5$ events per new process, so the later rungs see more
+    data as well as more structure; the paper draft names it the main open objection). Every cell had been set up as a
+    $5$-trial search ($3360$ trials), not one run at the ladder cell's best point as the user expected, and all eight
+    rungs went out without a pilot; the $147$ cells in say one run would do (Sec.~\ref{sec:ladder}). Held on lxplus
+    ($442$ DAGs) and Jean Zay (no \code{HELD} marker; \code{rebalance.py --exclude tp3\_eqd\_r} keeps them in place).
+    (c) Seeds (\code{seeds}, low priority): two extra seeds at every fine-tune cell's best point ($1468$ runs in $38$
+    chunks, \code{analysis/transfer/seed\_chunks/}; $13$ done, $468$ runs; \code{A\_004} to \code{A\_028}, $1000$ runs, failed
+    on Jean Zay's inode quota and were not resubmitted); for the final curves also the fine-tune arm and the five probes
+    the target factors touch (scratch done for seven probes): the seed mean at each cell's chosen HPs with a band, not the
+    search minimum. (d) Synthetic v6 and the labeller optimisation before it (D40, D41; user, 10-14: ``for now you'll
+    put it on hold''); v6t is not part of D40 and is not run; prepared, not submitted:
+    \code{sweep/sweep\_config\_tp3\_finale\_synhm\_v6.yaml} (v5r2's protocol, hp73). Mechanics of (a) to (c): the queued
+    jobs are held in the schedulers (at the hold lxplus $1104$, CC $98$, Jean Zay $579$) and every held sweep dir carries
+    a \code{HELD} marker, which the rebalancer, the CC feeder and the watchdog skip; to resume, release the jobs
+    (\code{condor\_release}, \code{scontrol release}) and delete the markers. $19$ jobs of ours on Jean Zay are
+    \code{JobHeldUser} since 10-07 (held items): left alone.
+    \emph{Decisions in force.} HP protocol (D25 to D28): pretrainings at hp73; scratch cells $8$-trial searches; fine-tune
+    cells at the two fixed points (lr $1.3$, $2.2\times10^{-3}$, $\lambda\approx3\times10^{-10}$) through
+    \code{sweep/fixed\_points.py}, never a search, except where the user asked for one (the add-$W$ step, D26; the
+    accumulation and diagram arms, D27); high multiplicity is $Z+4g$, $Z+5g$ only (D28). D32: cancel my own jobs that are
+    outside the decided scope or wasted, without asking, and report afterwards. Results go only in this file; the paper
+    draft (\code{\textasciitilde/drafts/fm\_amplitudes/}, never in \code{/tmp}; \code{fm\_amplitudes\_check.pdf} last sent) is
+    not updated unless the user asks (2026-10-07). Throughout: placement and rebalancing across sites without asking;
+    fresh collection from all sites before any figure; the study's figures sent to the user unprompted after every
+    collection; never narrow the scope (CLAUDE.md 0b).
+    \emph{Sites and infrastructure.} Background: \code{site supervise --project FA} and \code{site events --wait
+    --project FA}. Jean Zay: its checkout was at \code{416ca49}, before the DyHPO fix, as of 10-10 (uploads over
+    $\sim1.4$\,KB from \code{lpnclaude03} are silently dropped, a path-MTU black hole; the user's fix:
+    \code{tcp\_mtu\_probing=1} or a route MTU of $1400$), so check the commit of anything run there;
+    \code{\textasciitilde/.ssh/config} gives \code{jean-zay} no shared master; WORK at $467\,006$ of $500\,000$ files after the
+    archive (\code{lfs quota -p}); old runs are in \code{\$STORE/FA\_runs\_archive}, one tar per study or family
+    (\code{scripts/archive\_runs.sh}, restore with \code{tar -xf}). Still to do there: \code{site sync jeanzay},
+    \code{prune\_site.sh jeanzay} back in \code{projects.toml}, \code{--no-dest jeanzay} dropped from the rebalancer. CC is
+    reached directly (\code{lpnclaude03} refuses ssh; the hop removed from \code{\textasciitilde/.ssh/config}, backup
+    \code{config.bak-2026-10-13}). lxplus: $Z+5g$ at batch $16384$ runs out of memory on the $12$\,GB MIG slices, so its
+    sweeps carry a GPU-memory floor (\code{sweep/set\_gpu\_mem.py}); the rebalancer does not set that floor on what it
+    moves; \code{sweep/refill.py} counts such an OOM and a pool-building race as infrastructure, and is out of the
+    supervisor's maintain list (it cannot see other sites' results). Fixed-point fine-tunes:
+    \code{run\_generate(extend=True, fixed\_hp=E[n])}, \code{submit=True} on HTCondor, \code{submit=False} then
+    \code{sweep\_manager submit} on SLURM; check for existing sweep dirs on every site before generating. Before a fine-tune
+    grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
+    \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
+    are flushed (\code{touch .claude/.notes\_flushed}).
   \item \textbf{$ee\to W^+W^-$.} The corner is the $|t|$ floor plus a pool that barely reaches it.
     Candidate fixes: the floor at the pool's minimum $|t|$ (regulated by $m_W$ here), and candidates
     drawn log-uniform in the initial--final invariants $|t_{ij}|$, the forward-peak analogue of the
@@ -5739,83 +5585,26 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{Seeds (low priority, the user's call).} Done for the scratch curves of seven probes; the
-    fine-tune arm and the five probes the factors touch still need theirs, for the final curves (the seed mean
-    at each cell's chosen HPs, with a band, not the search minimum).
-  \item \textbf{Longer horizons: every pretraining at $32$k (2026-10-05, running).} The first $32$k round
-    (\code{gen\_transfer\_pilot.py --horizon 32000}, 2026-10-03) was set up for scratch, the $64$k $ee\to u\bar u$ and one rung
-    per probe only (its best-overall rung at the time). Nobody asked for that restriction, and it was not reported. With one
-    rung at $32$k and the other eight at $8$k, the equal-compute comparison between rungs breaks at $D=10^{3.5}$, $10^4$. The
-    same happened to the $ud\to ud$ follow-up at $D=10^{2.5}$, $10^3$ (scratch and rung $7$ only). So the figures are on the
-    $8$k grid (\code{cells.USE\_32K} off), and the missing cells were submitted on 2026-10-05: every pretraining (rungs
-    $0$--$9$) on the twelve probes at $D=10^{3.5}$, $10^4$ ($192$ sweeps; $153$ on Jean Zay, pending on priority at
-    submission; $39$ on lxplus), and the $18$ $ud\to ud$ sweeps at $10^{2.5}$, $10^3$ (lxplus). Each runs the two chosen points
-    (lr $1.2$, $1.8\times10^{-3}$, $\lambda\approx3\times10^{-10}$; \code{horizon32k\_chosen.json}), and every $32$k cell is
-    scored on those two points only (\code{cells.best\_chosen}): the first round's sweeps also hold $1$--$2$ random start-up
-    trials, which would favour its pretrainings. Once all are in, \code{USE\_32K} goes on. Scratch on $ee\to\nu_e\bar\nu_e$ stays
-    at $8$k (\code{HOLD\_8K}): it was worse at $32$k ($9\times10^{-4}$ against $7\times10^{-5}$ at $10^4$), and four more random
-    points per cell are exploring on CC-IN2P3. Rule 0b of CLAUDE.md and the reviewers' scope axis came out of this.
-  \item \textbf{Structure or data (next).} Each rung adds $10^5$ events per new process at a fixed $64$k steps, so the
-    later rungs see more data in total as well as more structure. Rungs at equal total pretraining data as well as equal
-    steps separate the two (the user's plan, 2026-10-05; the paper draft names it as the main open objection).
-  \item \textbf{Synthetic pretraining data, after the structure-or-data item (the user's call, 2026-10-05).} Compare the
-    ladder with a pretraining on artificially generated amplitudes, in the style of the synthetic-prior tabular foundation
-    models: the synthetic-amplitude prior of Sec.~\ref{sec:prior-open} (item 6: random rational functions of the invariants
-    with random poles, Lorentz-invariant by construction), scored on the same probes and $D$ grid. It tells whether what
-    transfers is the physics or only ``smooth functions of invariants with poles''. Not before the structure-or-data
-    separation, which it builds on.
   \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
     from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
   \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
-    not synthetic ones, ``at first at least'', 2026-10-08, \code{site} decision D15). Pretrain on $10^2$, $10^{2.5}$ and
-    $10^3$ processes (the ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the
-    catalog. The design (which processes, events per process, total events, steps and therefore run length) is agreed
-    with the user \emph{before} anything is generated or run. \code{catalog\_v2\_train.yaml} holds $400$ processes, so
-    $10^2$ and $10^{2.5}$ are subsets of it and $10^3$ needs about $600$ new ones. Settled so far (2026-10-08): our
-    sampler and $\sqrt s$ window as now (no PDF sampling; D17), gluon-initiated processes added ($gg$, $qg$; D16).
-    Candidate source for $10^3$: the $1501$-process list of arXiv:2606.23791 (\code{process\_catalog\_sm.json}, tree level,
-    up to $2\to3$, pp partons), $484$--$779$ distinct classes under our relabelling rules (liberal and conservative
-    rule-based bounds, not the numerical equality test), $75$--$78$ of them already in our catalog; their stored events
-    carry no $|\mathcal M|^2$, so each process would go through our pipeline. Still open: subsets, events per process,
-    steps, fine-tune grid, and whether $10^3$ waits for $10^2$ and $10^{2.5}$. Nothing started.
-  \item \textbf{Synthetic prior: alternatives to try} (the user's list of 2026-10-08 and 09; each described where its
-    ingredient is, marked \emph{Proposed, not run}, in Sec.~\ref{sec:synthetic}; none started; how close to real
-    amplitudes the prior should be is still to be settled with others, so these are variants to compare against version
-    $1$, each a design to agree with the user first; built since as versions $2$--$6$, Sec.~\ref{sec:syn-versions}:
-    quark-generation conservation, $K$ growing with multiplicity, vertex legality, the effective $ggH$ vertex, the
-    collinear limit through $\langle ij\rangle$, $[ij]$ factors, spinor-helicity numerators with selection rules).
-    Still open: initial states beyond the catalog's; quartic vertices; soft emission as an eikonal factor times a lower-multiplicity amplitude; one-loop amplitudes from scalar integrals
-    (Sec.~\ref{sec:syn-loops}); and multiplicities well past $2\to4$, to where MadGraph struggles and the generator does
-    not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average.
-  \item \textbf{High-multiplicity test} (the user's call of 2026-10-09, \code{site} decisions D20, D21; targeted, no
-    evaluation beyond these probes). Probes $u\bar u\to Z+4g$ ($2\to5$) and $Z+5g$ ($2\to6$), new MadGraph processes
-    (\code{uubar\_Zgggg}, \code{uubar\_Zggggg}). Every arm but the continual one runs the full grid (D22, 2026-10-09
-    10:33; first set up at $D=10^4$ only, which the user had not asked for): $D=10^1$--$10^3$ at $8$k (\code{tp3\_hmscr\_},
-    \code{tp3\_finfte\_}, \code{tp3\_fwngfte\_}, \code{tp3\_fsynfte\_}), $10^{3.5}$--$10^5$ at $32$k (the same with \code{32k}),
-    \code{sweep/gen\_highmult.py}; $8$-trial scratch and $5$-trial fine-tune searches, also at $32$k, since these probes
-    have no $8$k landscape to choose two points from. Arms: scratch; the finale (\code{tp3\_finale}, the reference,
-    confirmed as the largest pretraining, D24); the finale's pretraining with $W+4g$, $W+5g$ added
-    (\code{tp3\_finale\_wng}, the finale already holds $W+g$ to $W+3g$); the finale's pretraining with $8$ synthetic
-    processes at $2\to5$ and $2\to6$ (\code{tp3\_finale\_synhm}; the generator's $K_\text{max}$ extended to $7$, $8$,
-    version $1$ rules otherwise). Continual pretraining (D21), at $D=10^4$ until the user has seen it: the finale
-    fine-tuned $16$k steps on $W+4g$, $W+5g$ alone (\code{tp3\_wadd\_naive}), with replay of its own $28$ processes
-    (\code{tp3\_wadd\_replay}) and with EWC on the finale's own Fisher (\code{tp3\_wadd\_ewc}, \code{fine\_tune.ewc.fisher\_path}
-    from \code{tools/run\_data\_tools.py fisher}; $\lambda$ searched over $10^2$--$10^7$), $5$-trial searches;
-    forgetting read per process on the finale's data against the finale's own (\code{run\_data\_tools eval}). Each
-    method hands two parents to the $Z$ fine-tunes (D23): its best trial on $W$ alone, and its best on a mix of $W$ and
-    forgetting, the geometric mean of the validation MSE over all $30$ processes (the finale's $28$ and the two $W$),
-    the aggregate the pretraining itself is selected on.
-  \item \textbf{A pretraining with global target preprocessing, for zero-shot tests.} Every run standardizes
-    $y=\log|\mathcal M|^2$ per dataset, $z_p=(y-\mu_p)/\sigma_p$ with $\mu_p,\sigma_p$ fitted on $p$'s own data, so a
-    prediction $\hat y=\mu_p+\sigma_p f_\theta$ on a process without data is undefined and the network is never trained to
-    predict a process's normalization (a shift $y\to y+c$ of one process leaves its $z_p$ unchanged). True zero-shot tests
-    need a pretraining whose normalization the model predicts: one global $(\mu,\sigma)$, or, as in the multiplicity
-    extrapolation of the paper (Sec.~5, $\mu_n=a+bn$), a mean predicted from the process's features (mass dimension
-    $8-2N$ of $|\mathcal M|^2$ for $N$ legs, the coupling powers of \code{amp\_orders}). Running (2026-10-07): \code{tp3\_gstd\_r9}, rung $9$ at hp73, $64$k, with
-    \code{data.shared\_standardization} (one $(\mu,\sigma)$ pooled over every process's transformed targets, each process
-    keeping its own log or signed-log: a single global transform turns signed-log on for all as soon as one pool is
-    signed, and rung $9$ has one); then it is tested zero-shot on the probes. Until then a zero-shot score here is read up to an affine map (\code{val\_loss\_affine}).
+    not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
+    ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the catalog. The design (which
+    processes, events per process, total events, steps and therefore run length) is agreed with the user \emph{before}
+    anything is generated or run. \code{catalog\_v2\_train.yaml} holds $400$ processes, so $10^2$ and $10^{2.5}$ are
+    subsets of it. Settled: our sampler and $\sqrt s$ window as now (no PDF sampling; D17), gluon-initiated processes
+    added ($gg$, $qg$; D16). The candidate source for $10^3$ is the catalog of arXiv:2606.23791 now being generated
+    (state above), $409$ to $467$ classes (Sec.~\ref{sec:catalog}), so fewer than $10^3$ distinct processes. Still open:
+    subsets, events per process, steps, fine-tune grid, and whether $10^3$ waits for $10^2$ and $10^{2.5}$.
+  \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
+    D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
+    multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
+    factors, spinor-helicity numerators with selection rules. Not built: initial states beyond the catalog's; quartic
+    vertices; soft emission as an eikonal factor times a lower-multiplicity amplitude; one-loop amplitudes from scalar
+    integrals (Sec.~\ref{sec:syn-loops}, plan item (5)); multiplicities well past $2\to4$, where MadGraph struggles and the
+    generator does not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average. How close to
+    real amplitudes the prior should be is still to be settled with others.
   \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
     cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
     \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
@@ -5834,72 +5623,9 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     worst tenth; the lr window $[10^{-3},10^{-2}]$ spends its top half on points $2$--$4\times$ worse at $D\ge10^3$, and $23\%$
     of the bests sit near its floor, so a window lower down (e.g. $[5\times10^{-4},4\times10^{-3}]$) would make each trial count
     more; $\lambda$'s top decade could go. Steps: nothing to cut where the cost is.
-  \item \textbf{Fine-tune grid: $16$ trials left.} The grid is in (results above); the last $16$ trials of rung $4$ and
-    \code{tp3\_uufte}, lost to the EOS quota, were refilled on lxplus on 2026-10-04. The rung comparison mixes structure with
-    training per process at a fixed $64$k steps (the ladder item above).
   \item \textbf{Large $D$.} All fourteen probe/$D$ points at $10^{4.5}$, $10^5$ now exist on the grid's target
     (\code{large\_d\_64k.json}), one run each. Whether they join the grid figures, drawn apart as a different horizon, is
     open; the grid figures leave them out (the user stopped a first version, 2026-10-03).
-  \item \textbf{lxplus storage.} The EOS project quota ($1$\,TB logical) filled twice (2026-10-02/03 and the night of the
-    3rd), and $\sim370$ trials failed writing their logs or checkpoints. FA's finished runs were moved to CC-IN2P3
-    (\code{runs\_from\_lxplus/}, copied site to site, each directory's file count and bytes checked on both ends before the
-    EOS copy was removed): $76$ older-study runs ($47$\,GB), then $222$ directories (the complete rung $9$ grid and every
-    \code{tp\_}, \code{tp2\_}, \code{tps\_} scratch and calibration run, their numbers already collected). Most of the quota is
-    another project's: the model files of the non-best runs of every amplitude\_DSI sweep and scan were deleted (the user's
-    call, 2026-10-04; $3256$ runs, $171$\,GB; per HP sweep the lowest validation MSE keeps its models, per scan point the best
-    repeat; runs without a results file untouched), leaving EOS at $80\%$. The AFS home (sweep logs, submit files) was at
-    $94\%$ of $2$\,GB; an unused Claude Code binary went, $76\%$. \code{rung\_grid}'s rung $9$ normalizations are now read from
-    the moved directories on CC.
-  \item \textbf{Keeping the grids running across sites.} \code{sweep/refill.py} retracts trials an infrastructure failure
-    took (quota, checkpoint write, I/O, a leftover run directory) from a sweep's DyHPO state and refills the sweep to its
-    planned count; a failure of any other kind is listed and left alone. \code{sweep/rebalance.py} (CLAUDE.md) moves sweeps
-    that have not started from the latest-finishing site to the earliest, hourly; a site with nothing finished in its window
-    takes its $48$\,h rate if it is idle or still running (a drained lxplus was read as stalled), and stays stalled if it has
-    queued work and runs nothing. On 2026-10-03 five of CC-IN2P3's sixteen V100 nodes were out (one without GPUs since
-    Oct 2, three drained after job failures, one for a security update) and our fair share there was $0.14$, so its
-    queued work moved; on 2026-10-04 Jean Zay's A100 fair share had fallen to $0.002$ and $95$ unstarted $32$k trials moved to lxplus.
-    The rest of the $32$k searches there ($278$ trials of sweeps that have started, so their DyHPO state is on Jean Zay and the
-    rebalancer leaves them) ran nothing that evening ($124$ pending on priority, $154$ on dependencies), a projected
-    $\sim400$\,h. On the user's call (2026-10-04, for preliminary results by the next day) these sweeps were cut and moved: each runs two
-    chosen points on lxplus (\code{sweep/pick\_points.py}: the candidate of the sweep's own pool nearest the point, by
-    \code{generate\_sweep --extend --fixed-hp}; fine-tunes lr $1.2$, $1.8\times10^{-3}$ with $\lambda\approx3\times10^{-10}$,
-    where the $32$k fine-tunes already done had their bests; scratch lr $0.7$, $1.4\times10^{-3}$ with
-    $\lambda\approx2\times10^{-7}$, the $8$k scratch optimum moved to $32$k by $t^{-0.55}$), on top of the $1$--$2$ random
-    start-up trials each had run; the same for six CC-IN2P3 sweeps stuck behind its fair share ($0.14$) and six of its
-    sixteen V100 nodes out. $278$ queued trials cancelled on Jean Zay, $24$ on CC-IN2P3, the sweeps marked
-    \code{MOVED\_TO}. Rung $1$ runs the same two points on $u\bar d\to e^+\nu_e$, $ee\to d\bar d$ (EW one loop) and
-    $ee\to d\bar d$ (lr $1.3$, $2.2\times10^{-3}$), and so do the two redesigned arms once pretrained, so the arm against
-    rung $1$ compares the same points. Chosen from the data they are compared with: preliminary. Jean Zay's project has
-    only \code{itg@a100} and \code{itg@v100}, both over-consumed; the H100 partition needs an H100 allocation. CC-IN2P3's
-    \code{gpu\_h100} (three nodes of four H100 NVL) runs FA (probe, 2026-10-04: torch and an xformers attention call), so
-    its jobs now ask for \code{gpu\_v100,gpu\_h100}, whichever starts first. The arms' fine-tune waiter once submitted
-    all $28$ arm sweeps while the pretrainings still ran (it matched its own marker in the echoed command); they were
-    removed before any trial started, and the waiter now matches the marker as a whole line. Four of the moved sweeps (from $ee\to u\bar u$ on $ud\to ud$ and $u\bar u\to Zg$, $D=10^{3.5}$, $10^4$) went back to
-    CC-IN2P3 to use the H100s before starting on lxplus. Since 2026-10-05 the rebalancer moves the pending trials of any sweep, not only whole unstarted ones (the
-    user's point: a rebalancer that leaves some jobs out is no rebalancer): a chosen point keeps its candidate index, a
-    pending DyHPO trial of a started sweep runs elsewhere as the next unrun start-up candidate or an unused random one
-    (guided trials win no more often than random, Fig.~\ref{fig:finetune_hp}); HTCondor DAGs are held, not removed, so
-    running trials finish. It runs hourly over every \code{tp3\_} sweep. The same day $52$ moved $32$k sweeps had failed at
-    start-up: rung $2$'s and rung $6$'s checkpoints had been copied to lxplus and CC without their run's
-    \code{data\_stats.json}, which a fine-tune with \code{fine\_tune.offshell\_stats=parent} reads; the whole run
-    directories were copied and the $94$ missing points resubmitted.
-  \item \textbf{Jean Zay on the A100 allocation (2026-10-02, the user's call).} \code{itg@v100} is in over-consumption
-    (fair share $0.08$): its jobs waited $\sim6.5$\,h with hundreds of V100s free. \code{itg@a100} (\code{gpu\_p5}, A100
-    80GB) is barely used, so Jean Zay jobs now go there. TF32 stays on: two fixed-HP cells at $D=10^3$
-    (\code{tp3\_calib}, $8$k steps) give $ee\to d\bar d$ $7.2\times10^{-5}$ (V100), $5.7\times10^{-5}$ (A100, TF32 off),
-    $5.1\times10^{-5}$ (A100, TF32 on), and $ee\to b\bar b$ at one loop $1.6\times10^{-3}$, $4.18\times10^{-3}$,
-    $4.18\times10^{-3}$ (its test losses $6.4$, $6.5$, $8.8\times10^{-3}$): TF32 changes nothing beyond the run-to-run
-    spread, which is larger between the two GPUs. A step is $\sim20\%$ faster than on V100 (these runs are data-bound).
-    Cells now mix V100 and A100 trials.
-  \item \textbf{Jean Zay's inode quota.} \code{\$WORK} filled its $500$k-file quota on 2026-10-01 and $25$ trials
-    failed or never started (retracted from their sweeps' states and replaced). Each run wrote an empty \code{source.zip}
-    and a \code{config\_0.yaml} identical to \code{config.yaml}; those $27$k files are deleted and no longer written.
-    Each trial still writes about $14$ files (five plots, two checkpoints, config, stats, tokenizer, log) plus two
-    scheduler logs and a result. On 2026-10-02 the quota was full again ($497{,}952$ of $500{,}000$) with $252$
-    fine-tune sweeps queued there; their pending jobs were held. The finished studies' runs (\code{cscan\_*},
-    \code{scaling\_p1}, \code{scaling\_p1ext}, \code{scaling\_solo}, \code{finetune\_scaling}; $111$k files) are packed
-    into one tar per study in \code{\$STORE/FA\_runs\_archive} (\code{scripts/archive\_runs.sh}, the user's call;
-    restore with \code{tar -xf}), leaving $395$k files; the held jobs were released.
 \end{itemize}
 
 \section{The synthetic-amplitude prior}\label{sec:synthetic}
@@ -6165,7 +5891,7 @@ is found among the events' invariant masses. The permutation average is not test
 What it keeps: real particles and masses, real kinematics and cuts, Lorentz invariance, the mass dimension, poles at
 propagator masses with Breit--Wigner shapes, collinear-like $1/s_{ij}$ singularities, running $\alpha_s$, Bose and Fermi
 relabelling symmetry, and diagram sidecars that describe the function exactly.
-Measured so far (Sec.~\ref{sec:ladder-open}, \code{analysis/transfer/finale\_synth*.py}, $8$k grid): fine-tuned from
+Measured so far (Sec.~\ref{sec:ladder}, \code{analysis/transfer/finale\_synth*.py}, $8$k grid): fine-tuned from
 it, the model beats scratch in $66$ of $84$ cells and stays within a factor $1.7$ of rung $9$ at the median (median over
 probes $-0.23$\,dex, better than rung $9$ on $3$ of $12$, $p=0.034$).
 
@@ -6491,8 +6217,8 @@ transfer reaches where real data is scarcest.
 % ==========================================================================
 
 The runs below are on V100~32GB (Jean-Zay \code{gpu\_p2}, account \code{itg@v100}); A100 was then
-unavailable to the account (since 2026-10-02 the \code{itg@a100} allocation runs this project, with TF32 A/B'd: the
-hand-off of Sec.~\ref{sec:ladder-open}), which matters below. A per-step optimization campaign attacked two
+unavailable to the account (since 2026-10-02 the \code{itg@a100} allocation runs this project, with TF32 A/B'd:
+Sec.~\ref{sec:tf32-a100}), which matters below. A per-step optimization campaign attacked two
 distinct regimes, each fast path proven numerically equal to the original by CPU equivalence
 guards (\code{tests/test\_amp.py}, Section~0).
 
@@ -6552,7 +6278,7 @@ wall time.
 \code{allow\_tf32} is carried (default on) but is a \textbf{no-op on V100}; it would give
 $\sim2\times$ matmul on A100 at $\sim10^{-3}$ precision, so it must be loss-A/B'd on A100 before
 it is trusted (done for the transfer study on 2026-10-02: TF32 on and off agree within the run-to-run spread,
-Sec.~\ref{sec:ladder-open}). Two optimizations were declined on purpose:
+Sec.~\ref{sec:tf32-a100}). Two optimizations were declined on purpose:
 converting the $L_2$ penalty to decoupled \code{weight\_decay} (it is folded into $\vlnr$,
 checkpoint selection, and the HPO objective, and $\lambda$ is a tuned sweep HP, so converting it
 would silently break continuity with all existing sweep results), and \code{torch.compile} (the
@@ -6562,6 +6288,14 @@ breaking warm-start/fine-tune reloads). A gradient-checkpointing knob
 (\code{checkpoint\_blocks}) trades $\sim$one extra forward for a large activation-memory saving
 when memory-bound.
 \end{remark}
+
+\paragraph{TF32 on A100 (2026-10-02).}\label{sec:tf32-a100} Jean Zay's \code{itg@v100} was over-consumed (fair share
+$0.08$, jobs waiting $\sim6.5$\,h with hundreds of V100s free), so its jobs moved to \code{itg@a100} (\code{gpu\_p5}, A100
+80GB) with TF32 on. Two fixed-HP cells at $D=10^3$ (\code{tp3\_calib}, $8$k steps): $ee\to d\bar d$ $7.2\times10^{-5}$ on
+V100, $5.7\times10^{-5}$ on A100 with TF32 off, $5.1\times10^{-5}$ with it on; the one-loop $ee\to b\bar b$
+$1.6\times10^{-3}$, $4.18\times10^{-3}$, $4.18\times10^{-3}$ (test $6.4$, $6.5$, $8.8\times10^{-3}$). TF32 changes nothing
+beyond the run-to-run spread, which is larger between the two GPUs. A step is $\sim20\%$ faster than on V100 (these runs
+are data-bound). Transfer cells from then on mix V100 and A100 trials. One run per setting.
 
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
