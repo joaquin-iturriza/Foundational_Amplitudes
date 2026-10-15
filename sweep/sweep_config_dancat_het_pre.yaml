@@ -9,7 +9,7 @@
 #   incompatible with HETEROSC), track_train_eval=true (D58; NOTE: today a no-op on the multi-process validation path);
 #   data: the full pools (no train_subsample), require_cache (built by the catalog generation), 2000 val events per
 #   process in memory (as catalog_v2_pretrain).
-# PROPOSED, for the user to confirm (not specified by him):
+# Chosen here (the user: "send the run as soon as possible"):
 #   horizon 32000 steps: 16384/1352 = 12 events per process per step, so 3.9e5 events per process (3.9 passes over
 #     1e5), the per-process compute of catalog_v2's 8601-step pretraining (38/step x 8601 = 3.3e5), whose tuned steps
 #     curves were still falling at 8000 steps (docs/results.tex, joint-training gap); 16000 halves the cost;
