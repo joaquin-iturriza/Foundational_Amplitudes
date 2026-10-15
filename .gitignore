@@ -138,3 +138,4 @@ sweeps_local/
 analysis/transfer/waddm_curves.json
 analysis/transfer/delta_data/
 analysis/transfer/delta_medians.json
+analysis/transfer/het_ab_data/
