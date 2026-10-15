@@ -1,0 +1,1771 @@
+# ============================================================================
+# Standard Model (sm) Tree-Level Partonic Subprocesses (2→1, 2→2, and 2→3)
+# ============================================================================
+#
+# Format:
+#   2→1:  initial1 initial2 > [mediators] > final                  # description
+#   2→2:  initial1 initial2 > [mediators] > final1 final2           # description
+#
+# Particle naming follows MadGraph conventions:
+#   quarks:    u, d, s, c, b, t  (antiquarks: u~, d~, s~, c~, b~, t~)
+#   leptons:   e-, mu-, ta-      (antileptons: e+, mu+, ta+)
+#   neutrinos: ve, vm, vt        (anti: ve~, vm~, vt~)
+#   bosons:    g, a, z, w+, w-, h
+#
+# [mediators] lists ALL virtual particles that can appear internally
+# in any tree-level Feynman diagram for that process (union of QCD and EW).
+# A "-" denotes a contact interaction (no intermediate particle).
+# Mediator names always use the particle (not antiparticle): e.g., [u] not [u~].
+#
+# Comments are short process identifiers using Unicode:
+#   antiparticles: ū, d̄, s̄, c̄, b̄, t̄
+#   charges/symbols: W⁺, W⁻, e⁻, e⁺, μ⁻, μ⁺, τ⁻, τ⁺, H, γ
+#
+# Initial states: only proton constituents (g, u, u~, d, d~, s, s~, c, c~, b, b~).
+#
+# Model: sm (restrict_default.dat)
+#   - Diagonal CKM matrix (no cross-generation W couplings)
+#   - Zero Yukawa couplings for u, d, s, c, e, mu (no Higgs coupling)
+#   - Massless u, d, s, c, e, mu
+# ============================================================================
+
+# ############################################################################
+# 2 → 1 PROCESSES
+# ############################################################################
+
+# --- Z production ---
+
+u u~ > [-] > z                                          # uū to Z
+d d~ > [-] > z                                          # dd̄ to Z
+s s~ > [-] > z                                          # ss̄ to Z
+c c~ > [-] > z                                          # cc̄ to Z
+b b~ > [-] > z                                          # bb̄ to Z
+
+# --- W⁺ production ---
+
+u d~ > [-] > w+                                         # ud̄ to W⁺
+c s~ > [-] > w+                                         # cs̄ to W⁺
+
+# --- W⁻ production ---
+
+d u~ > [-] > w-                                         # dū to W⁻
+s c~ > [-] > w-                                         # sc̄ to W⁻
+
+# --- H production ---
+
+b b~ > [-] > h                                          # bb̄ to H
+
+# ############################################################################
+# 2 → 2 PROCESSES
+# ############################################################################
+
+# --- gg → gg ---
+
+g g > [g, -] > g g                                      # gg scattering
+
+# --- gg → qq̄ ---
+
+g g > [g, u] > u u~                                     # gg to uū
+g g > [g, d] > d d~                                     # gg to dd̄
+g g > [g, s] > s s~                                     # gg to ss̄
+g g > [g, c] > c c~                                     # gg to cc̄
+g g > [g, b] > b b~                                     # gg to bb̄
+g g > [g, t] > t t~                                     # gg to tt̄
+
+# --- gq / gq̄ Compton ---
+
+g u > [g, u] > g u                                      # gu Compton
+g d > [g, d] > g d                                      # gd Compton
+g s > [g, s] > g s                                      # gs Compton
+g c > [g, c] > g c                                      # gc Compton
+g b > [g, b] > g b                                      # gb Compton
+g u~ > [g, u] > g u~                                    # gū Compton
+g d~ > [g, d] > g d~                                    # gd̄ Compton
+g s~ > [g, s] > g s~                                    # gs̄ Compton
+g c~ > [g, c] > g c~                                    # gc̄ Compton
+g b~ > [g, b] > g b~                                    # gb̄ Compton
+
+# --- tW associated production ---
+
+g b > [t, b] > t w-                                     # gb to tW⁻
+g b~ > [t, b] > t~ w+                                   # gb̄ to t̄W⁺
+
+# --- qq same-flavor scattering ---
+
+u u > [g, a, z] > u u                                   # uu scattering
+d d > [g, a, z] > d d                                   # dd scattering
+s s > [g, a, z] > s s                                   # ss scattering
+c c > [g, a, z] > c c                                   # cc scattering
+b b > [g, a, z, h] > b b                                # bb scattering
+
+# --- q̄q̄ same-flavor scattering ---
+
+u~ u~ > [g, a, z] > u~ u~                               # ūū scattering
+d~ d~ > [g, a, z] > d~ d~                               # d̄d̄ scattering
+s~ s~ > [g, a, z] > s~ s~                               # s̄s̄ scattering
+c~ c~ > [g, a, z] > c~ c~                               # c̄c̄ scattering
+b~ b~ > [g, a, z, h] > b~ b~                            # b̄b̄ scattering
+
+# --- qq′ different-flavor elastic ---
+
+u d > [g, a, z, w+] > u d                               # ud scattering
+u s > [g, a, z] > u s                                   # us scattering
+u c > [g, a, z] > u c                                   # uc scattering
+u b > [g, a, z] > u b                                   # ub scattering
+d s > [g, a, z] > d s                                   # ds scattering
+d c > [g, a, z] > d c                                   # dc scattering
+d b > [g, a, z] > d b                                   # db scattering
+s c > [g, a, z, w+] > s c                               # sc scattering
+s b > [g, a, z] > s b                                   # sb scattering
+c b > [g, a, z] > c b                                   # cb scattering
+
+# --- q̄q̄′ different-flavor elastic ---
+
+u~ d~ > [g, a, z, w-] > u~ d~                           # ūd̄ scattering
+u~ s~ > [g, a, z] > u~ s~                               # ūs̄ scattering
+u~ c~ > [g, a, z] > u~ c~                               # ūc̄ scattering
+u~ b~ > [g, a, z] > u~ b~                               # ūb̄ scattering
+d~ s~ > [g, a, z] > d~ s~                               # d̄s̄ scattering
+d~ c~ > [g, a, z] > d~ c~                               # d̄c̄ scattering
+d~ b~ > [g, a, z] > d~ b~                               # d̄b̄ scattering
+s~ c~ > [g, a, z, w-] > s~ c~                           # s̄c̄ scattering
+s~ b~ > [g, a, z] > s~ b~                               # s̄b̄ scattering
+c~ b~ > [g, a, z] > c~ b~                               # c̄b̄ scattering
+
+# --- qq̄ same-flavor scattering ---
+
+u u~ > [g, a, z] > u u~                                 # uū scattering
+d d~ > [g, a, z] > d d~                                 # dd̄ scattering
+s s~ > [g, a, z] > s s~                                 # ss̄ scattering
+c c~ > [g, a, z] > c c~                                 # cc̄ scattering
+b b~ > [g, a, z, h] > b b~                              # bb̄ scattering
+
+# --- qq̄′ different-flavor elastic ---
+
+u d~ > [g, a, z, w+] > u d~                             # ud̄ elastic
+u s~ > [g, a, z] > u s~                                 # us̄ elastic
+u c~ > [g, a, z] > u c~                                 # uc̄ elastic
+u b~ > [g, a, z] > u b~                                 # ub̄ elastic
+d u~ > [g, a, z, w-] > d u~                             # dū elastic
+d s~ > [g, a, z] > d s~                                 # ds̄ elastic
+d c~ > [g, a, z] > d c~                                 # dc̄ elastic
+d b~ > [g, a, z] > d b~                                 # db̄ elastic
+s u~ > [g, a, z] > s u~                                 # sū elastic
+s d~ > [g, a, z] > s d~                                 # sd̄ elastic
+s c~ > [g, a, z, w-] > s c~                             # sc̄ elastic
+s b~ > [g, a, z] > s b~                                 # sb̄ elastic
+c u~ > [g, a, z] > c u~                                 # cū elastic
+c d~ > [g, a, z] > c d~                                 # cd̄ elastic
+c s~ > [g, a, z, w+] > c s~                             # cs̄ elastic
+c b~ > [g, a, z] > c b~                                 # cb̄ elastic
+b u~ > [g, a, z] > b u~                                 # bū elastic
+b d~ > [g, a, z] > b d~                                 # bd̄ elastic
+b s~ > [g, a, z] > b s~                                 # bs̄ elastic
+b c~ > [g, a, z] > b c~                                 # bc̄ elastic
+
+# --- qq̄ annihilation → q′q̄′ ---
+
+u u~ > [g, a, z, w+] > d d~                             # uū to dd̄
+u u~ > [g, a, z] > s s~                                 # uū to ss̄
+u u~ > [g, a, z] > c c~                                 # uū to cc̄
+u u~ > [g, a, z] > b b~                                 # uū to bb̄
+u u~ > [g, a, z] > t t~                                 # uū to tt̄
+d d~ > [g, a, z, w-] > u u~                             # dd̄ to uū
+d d~ > [g, a, z] > s s~                                 # dd̄ to ss̄
+d d~ > [g, a, z] > c c~                                 # dd̄ to cc̄
+d d~ > [g, a, z] > b b~                                 # dd̄ to bb̄
+d d~ > [g, a, z] > t t~                                 # dd̄ to tt̄
+s s~ > [g, a, z] > u u~                                 # ss̄ to uū
+s s~ > [g, a, z] > d d~                                 # ss̄ to dd̄
+s s~ > [g, a, z, w-] > c c~                             # ss̄ to cc̄
+s s~ > [g, a, z] > b b~                                 # ss̄ to bb̄
+s s~ > [g, a, z] > t t~                                 # ss̄ to tt̄
+c c~ > [g, a, z] > u u~                                 # cc̄ to uū
+c c~ > [g, a, z] > d d~                                 # cc̄ to dd̄
+c c~ > [g, a, z, w+] > s s~                             # cc̄ to ss̄
+c c~ > [g, a, z] > b b~                                 # cc̄ to bb̄
+c c~ > [g, a, z] > t t~                                 # cc̄ to tt̄
+b b~ > [g, a, z] > u u~                                 # bb̄ to uū
+b b~ > [g, a, z] > d d~                                 # bb̄ to dd̄
+b b~ > [g, a, z] > s s~                                 # bb̄ to ss̄
+b b~ > [g, a, z] > c c~                                 # bb̄ to cc̄
+b b~ > [g, a, z, w-, h] > t t~                          # bb̄ to tt̄
+
+# --- qq̄ → gg ---
+
+u u~ > [g, u] > g g                                     # uū to gg
+d d~ > [g, d] > g g                                     # dd̄ to gg
+s s~ > [g, s] > g g                                     # ss̄ to gg
+c c~ > [g, c] > g g                                     # cc̄ to gg
+b b~ > [g, b] > g g                                     # bb̄ to gg
+
+# --- Drell-Yan (NC): qq̄ → ll̄ ---
+
+u u~ > [a, z] > e- e+                                   # uū to e⁻e⁺
+u u~ > [a, z] > mu- mu+                                 # uū to μ⁻μ⁺
+u u~ > [a, z] > ta- ta+                                 # uū to τ⁻τ⁺
+d d~ > [a, z] > e- e+                                   # dd̄ to e⁻e⁺
+d d~ > [a, z] > mu- mu+                                 # dd̄ to μ⁻μ⁺
+d d~ > [a, z] > ta- ta+                                 # dd̄ to τ⁻τ⁺
+s s~ > [a, z] > e- e+                                   # ss̄ to e⁻e⁺
+s s~ > [a, z] > mu- mu+                                 # ss̄ to μ⁻μ⁺
+s s~ > [a, z] > ta- ta+                                 # ss̄ to τ⁻τ⁺
+c c~ > [a, z] > e- e+                                   # cc̄ to e⁻e⁺
+c c~ > [a, z] > mu- mu+                                 # cc̄ to μ⁻μ⁺
+c c~ > [a, z] > ta- ta+                                 # cc̄ to τ⁻τ⁺
+b b~ > [a, z] > e- e+                                   # bb̄ to e⁻e⁺
+b b~ > [a, z] > mu- mu+                                 # bb̄ to μ⁻μ⁺
+b b~ > [a, z, h] > ta- ta+                              # bb̄ to τ⁻τ⁺
+
+# --- Drell-Yan (NC): qq̄ → νν̄ ---
+
+u u~ > [z] > ve ve~                                     # uū to νeν̄e
+u u~ > [z] > vm vm~                                     # uū to νμν̄μ
+u u~ > [z] > vt vt~                                     # uū to ντν̄τ
+d d~ > [z] > ve ve~                                     # dd̄ to νeν̄e
+d d~ > [z] > vm vm~                                     # dd̄ to νμν̄μ
+d d~ > [z] > vt vt~                                     # dd̄ to ντν̄τ
+s s~ > [z] > ve ve~                                     # ss̄ to νeν̄e
+s s~ > [z] > vm vm~                                     # ss̄ to νμν̄μ
+s s~ > [z] > vt vt~                                     # ss̄ to ντν̄τ
+c c~ > [z] > ve ve~                                     # cc̄ to νeν̄e
+c c~ > [z] > vm vm~                                     # cc̄ to νμν̄μ
+c c~ > [z] > vt vt~                                     # cc̄ to ντν̄τ
+b b~ > [z] > ve ve~                                     # bb̄ to νeν̄e
+b b~ > [z] > vm vm~                                     # bb̄ to νμν̄μ
+b b~ > [z] > vt vt~                                     # bb̄ to ντν̄τ
+
+# --- Drell-Yan (CC): qq̄′ → lν ---
+
+u d~ > [w+] > e+ ve                                     # ud̄ to e⁺νe
+u d~ > [w+] > mu+ vm                                    # ud̄ to μ⁺νμ
+u d~ > [w+] > ta+ vt                                    # ud̄ to τ⁺ντ
+c s~ > [w+] > e+ ve                                     # cs̄ to e⁺νe
+c s~ > [w+] > mu+ vm                                    # cs̄ to μ⁺νμ
+c s~ > [w+] > ta+ vt                                    # cs̄ to τ⁺ντ
+d u~ > [w-] > e- ve~                                    # dū to e⁻ν̄e
+d u~ > [w-] > mu- vm~                                   # dū to μ⁻ν̄μ
+d u~ > [w-] > ta- vt~                                   # dū to τ⁻ν̄τ
+s c~ > [w-] > e- ve~                                    # sc̄ to e⁻ν̄e
+s c~ > [w-] > mu- vm~                                   # sc̄ to μ⁻ν̄μ
+s c~ > [w-] > ta- vt~                                   # sc̄ to τ⁻ν̄τ
+
+# --- Diphoton: qq̄ → γγ ---
+
+u u~ > [u] > a a                                        # uū to γγ
+d d~ > [d] > a a                                        # dd̄ to γγ
+s s~ > [s] > a a                                        # ss̄ to γγ
+c c~ > [c] > a a                                        # cc̄ to γγ
+b b~ > [b] > a a                                        # bb̄ to γγ
+
+# --- γZ production: qq̄ → γZ ---
+
+u u~ > [u] > a z                                        # uū to γZ
+d d~ > [d] > a z                                        # dd̄ to γZ
+s s~ > [s] > a z                                        # ss̄ to γZ
+c c~ > [c] > a z                                        # cc̄ to γZ
+b b~ > [b] > a z                                        # bb̄ to γZ
+
+# --- ZZ production: qq̄ → ZZ ---
+
+u u~ > [u] > z z                                        # uū to ZZ
+d d~ > [d] > z z                                        # dd̄ to ZZ
+s s~ > [s] > z z                                        # ss̄ to ZZ
+c c~ > [c] > z z                                        # cc̄ to ZZ
+b b~ > [b, h] > z z                                     # bb̄ to ZZ
+
+# --- WW production: qq̄ → W⁺W⁻ ---
+
+u u~ > [a, z, d] > w+ w-                                # uū to W⁺W⁻
+d d~ > [a, z, u] > w+ w-                                # dd̄ to W⁺W⁻
+s s~ > [a, z, c] > w+ w-                                # ss̄ to W⁺W⁻
+c c~ > [a, z, s] > w+ w-                                # cc̄ to W⁺W⁻
+b b~ > [a, z, t, h] > w+ w-                             # bb̄ to W⁺W⁻
+
+# --- Wγ production: qq̄′ → Wγ ---
+
+u d~ > [w+, u, d] > w+ a                                # ud̄ to W⁺γ
+c s~ > [w+, c, s] > w+ a                                # cs̄ to W⁺γ
+d u~ > [w-, u, d] > w- a                                # dū to W⁻γ
+s c~ > [w-, c, s] > w- a                                # sc̄ to W⁻γ
+
+# --- WZ production: qq̄′ → WZ ---
+
+u d~ > [w+, u, d] > w+ z                                # ud̄ to W⁺Z
+c s~ > [w+, c, s] > w+ z                                # cs̄ to W⁺Z
+d u~ > [w-, u, d] > w- z                                # dū to W⁻Z
+s c~ > [w-, c, s] > w- z                                # sc̄ to W⁻Z
+
+# --- Higgsstrahlung: qq̄ → ZH ---
+
+u u~ > [z] > z h                                        # uū to ZH
+d d~ > [z] > z h                                        # dd̄ to ZH
+s s~ > [z] > z h                                        # ss̄ to ZH
+c c~ > [z] > z h                                        # cc̄ to ZH
+b b~ > [z, b] > z h                                     # bb̄ to ZH
+
+# --- Higgsstrahlung: qq̄′ → WH ---
+
+u d~ > [w+] > w+ h                                      # ud̄ to W⁺H
+c s~ > [w+] > w+ h                                      # cs̄ to W⁺H
+d u~ > [w-] > w- h                                      # dū to W⁻H
+s c~ > [w-] > w- h                                      # sc̄ to W⁻H
+
+# --- Single top (s-channel) ---
+
+u d~ > [w+] > t b~                                      # ud̄ to tb̄
+c s~ > [w+] > t b~                                      # cs̄ to tb̄
+d u~ > [w-] > t~ b                                      # dū to t̄b
+s c~ > [w-] > t~ b                                      # sc̄ to t̄b
+d b~ > [w-] > u t~                                      # db̄ to ut̄
+s b~ > [w-] > c t~                                      # sb̄ to ct̄
+d~ b > [w+] > u~ t                                      # d̄b to ūt
+s~ b > [w+] > c~ t                                      # s̄b to c̄t
+
+# --- Single top (t-channel, same-sign) ---
+
+u b > [w+] > d t                                        # ub to dt
+c b > [w+] > s t                                        # cb to st
+
+# --- Single antitop (t-channel, same-sign) ---
+
+u~ b~ > [w-] > d~ t~                                    # ūb̄ to d̄t̄
+c~ b~ > [w-] > s~ t~                                    # c̄b̄ to s̄t̄
+
+# --- Mixed QCD+EW: gq → q′W ---
+
+g u > [u, d] > d w+                                     # gu to dW⁺
+g c > [c, s] > s w+                                     # gc to sW⁺
+g d > [u, d] > u w-                                     # gd to uW⁻
+g s > [c, s] > c w-                                     # gs to cW⁻
+g u~ > [u, d] > d~ w-                                   # gū to d̄W⁻
+g c~ > [c, s] > s~ w-                                   # gc̄ to s̄W⁻
+g d~ > [u, d] > u~ w+                                   # gd̄ to ūW⁺
+g s~ > [c, s] > c~ w+                                   # gs̄ to c̄W⁺
+
+# --- Mixed QCD+EW: gq → qZ ---
+
+g u > [u] > u z                                         # gu to uZ
+g d > [d] > d z                                         # gd to dZ
+g s > [s] > s z                                         # gs to sZ
+g c > [c] > c z                                         # gc to cZ
+g b > [b] > b z                                         # gb to bZ
+g u~ > [u] > u~ z                                       # gū to ūZ
+g d~ > [d] > d~ z                                       # gd̄ to d̄Z
+g s~ > [s] > s~ z                                       # gs̄ to s̄Z
+g c~ > [c] > c~ z                                       # gc̄ to c̄Z
+g b~ > [b] > b~ z                                       # gb̄ to b̄Z
+
+# --- Mixed QCD+EW: gq → qγ ---
+
+g u > [u] > u a                                         # gu to uγ
+g d > [d] > d a                                         # gd to dγ
+g s > [s] > s a                                         # gs to sγ
+g c > [c] > c a                                         # gc to cγ
+g b > [b] > b a                                         # gb to bγ
+g u~ > [u] > u~ a                                       # gū to ūγ
+g d~ > [d] > d~ a                                       # gd̄ to d̄γ
+g s~ > [s] > s~ a                                       # gs̄ to s̄γ
+g c~ > [c] > c~ a                                       # gc̄ to c̄γ
+g b~ > [b] > b~ a                                       # gb̄ to b̄γ
+
+# --- Mixed QCD+EW: qq̄ → gγ ---
+
+u u~ > [u] > g a                                        # uū to gγ
+d d~ > [d] > g a                                        # dd̄ to gγ
+s s~ > [s] > g a                                        # ss̄ to gγ
+c c~ > [c] > g a                                        # cc̄ to gγ
+b b~ > [b] > g a                                        # bb̄ to gγ
+
+# --- Mixed QCD+EW: qq̄ → gZ ---
+
+u u~ > [u] > g z                                        # uū to gZ
+d d~ > [d] > g z                                        # dd̄ to gZ
+s s~ > [s] > g z                                        # ss̄ to gZ
+c c~ > [c] > g z                                        # cc̄ to gZ
+b b~ > [b] > g z                                        # bb̄ to gZ
+
+# --- Mixed QCD+EW: qq̄′ → gW ---
+
+u d~ > [u, d] > g w+                                    # ud̄ to gW⁺
+c s~ > [c, s] > g w+                                    # cs̄ to gW⁺
+d u~ > [u, d] > g w-                                    # dū to gW⁻
+s c~ > [c, s] > g w-                                    # sc̄ to gW⁻
+
+# --- Yukawa: gq → qH ---
+
+g b > [b] > b h                                         # gb to bH
+g b~ > [b] > b~ h                                       # gb̄ to b̄H
+
+# --- Yukawa: qq̄ → gH ---
+
+b b~ > [b] > g h                                        # bb̄ to gH
+
+# --- Yukawa: qq̄ → γH ---
+
+b b~ > [b] > a h                                        # bb̄ to γH
+
+# --- Yukawa: qq̄ → HH ---
+
+b b~ > [b, h] > h h                                     # bb̄ to HH
+
+# --- EW flavor-changing: qq̄ → q′q̄′ (different-flavor initial) ---
+
+u c~ > [w+] > d s~                                     # uc̄ to ds̄
+c u~ > [w+] > s d~                                     # cū to sd̄
+d s~ > [w-] > u c~                                     # ds̄ to uc̄
+s d~ > [w-] > c u~                                     # sd̄ to cū
+
+# --- EW flavor-changing: qq → q′q′ (t-channel W) ---
+
+u s > [w+] > d c                                       # us to dc
+c d > [w+] > s u                                       # cd to su
+
+# --- EW flavor-changing: q̄q̄ → q̄′q̄′ (t-channel W) ---
+
+u~ s~ > [w-] > d~ c~                                   # ūs̄ to d̄c̄
+c~ d~ > [w-] > s~ u~                                   # c̄d̄ to s̄ū
+
+# --- EW flavor-changing: qq̄′ → q″q̄‴ ---
+
+u d~ > [w+] > c s~                                      # ud̄ to cs̄
+c s~ > [w+] > u d~                                      # cs̄ to ud̄
+d u~ > [w-] > s c~                                      # dū to sc̄
+s c~ > [w-] > d u~                                      # sc̄ to dū
+
+# ############################################################################
+# 2 → 3 PROCESSES
+# ############################################################################
+
+# --- tt̄ + jet ---
+
+b b~ > [g, a, z, w+, w-, b, t, h] > g t t~              # bb̄ to gtt̄
+c c~ > [g, a, z, c, t] > g t t~                         # cc̄ to gtt̄
+d d~ > [g, a, z, d, t] > g t t~                         # dd̄ to gtt̄
+g b > [g, a, z, w+, w-, b, t, h] > b t t~               # gb to btt̄
+g b~ > [g, a, z, w+, w-, b, t, h] > t b~ t~             # gb̄ to tb̄t̄
+g c > [g, a, z, c, t] > c t t~                          # gc to ctt̄
+g c~ > [g, a, z, c, t] > t c~ t~                        # gc̄ to tc̄t̄
+g d > [g, a, z, d, t] > d t t~                          # gd to dtt̄
+g d~ > [g, a, z, d, t] > t d~ t~                        # gd̄ to td̄t̄
+g g > [g, t] > g t t~                                   # gg to gtt̄
+g s > [g, a, z, s, t] > s t t~                          # gs to stt̄
+g s~ > [g, a, z, s, t] > t s~ t~                        # gs̄ to ts̄t̄
+g u > [g, a, z, u, t] > u t t~                          # gu to utt̄
+g u~ > [g, a, z, u, t] > t u~ t~                        # gū to tūt̄
+s s~ > [g, a, z, s, t] > g t t~                         # ss̄ to gtt̄
+u u~ > [g, a, z, u, t] > g t t~                         # uū to gtt̄
+
+# --- Single top + 2 partons ---
+
+b d~ > [w+, w-, u, d, b, t] > g t u~                    # bd̄ to gtū
+b s~ > [w+, w-, s, c, b, t] > g t c~                    # bs̄ to gtc̄
+c b > [w+, w-, s, c, b, t] > g s t                      # cb to gst
+c s~ > [w+, w-, s, c, b, t] > g t b~                    # cs̄ to gtb̄
+c~ b~ > [w+, w-, s, c, b, t] > g s~ t~                  # c̄b̄ to gs̄t̄
+d b~ > [w+, w-, u, d, b, t] > g u t~                    # db̄ to gut̄
+d u~ > [w+, w-, u, d, b, t] > g b t~                    # dū to gbt̄
+g b > [w+, w-, u, d, b, t] > d t u~                     # gb to dtū
+g b > [w+, w-, s, c, b, t] > s t c~                     # gb to stc̄
+g b~ > [w+, w-, s, c, b, t] > c s~ t~                   # gb̄ to cs̄t̄
+g b~ > [w+, w-, u, d, b, t] > u d~ t~                   # gb̄ to ud̄t̄
+g c > [w+, w-, s, c, b, t] > s t b~                     # gc to stb̄
+g c~ > [w+, w-, s, c, b, t] > b s~ t~                   # gc̄ to bs̄t̄
+g d > [w+, w-, u, d, b, t] > u b t~                     # gd to ubt̄
+g d~ > [w+, w-, u, d, b, t] > t u~ b~                   # gd̄ to tūb̄
+g s > [w+, w-, s, c, b, t] > c b t~                     # gs to cbt̄
+g s~ > [w+, w-, s, c, b, t] > t c~ b~                   # gs̄ to tc̄b̄
+g u > [w+, w-, u, d, b, t] > d t b~                     # gu to dtb̄
+g u~ > [w+, w-, u, d, b, t] > b d~ t~                   # gū to bd̄t̄
+s b~ > [w+, w-, s, c, b, t] > g c t~                    # sb̄ to gct̄
+s c~ > [w+, w-, s, c, b, t] > g b t~                    # sc̄ to gbt̄
+u b > [w+, w-, u, d, b, t] > g d t                      # ub to gdt
+u d~ > [w+, w-, u, d, b, t] > g t b~                    # ud̄ to gtb̄
+u~ b~ > [w+, w-, u, d, b, t] > g d~ t~                  # ūb̄ to gd̄t̄
+
+# --- Single top + boson + parton ---
+
+b b > [g, a, z, w+, b, t, h] > b t w-                   # bb to btW⁻
+b b~ > [g, a, z, w-, b, t, h] > b t~ w+                 # bb̄ to bt̄W⁺
+b b~ > [g, a, z, w+, b, t, h] > t b~ w-                 # bb̄ to tb̄W⁻
+b c~ > [g, a, z, w+, s, b, t] > t c~ w-                 # bc̄ to tc̄W⁻
+b d~ > [g, a, z, w+, u, b, t] > t d~ w-                 # bd̄ to td̄W⁻
+b d~ > [w+, w-, u, d, b, t] > t u~ a                    # bd̄ to tūγ
+b d~ > [w+, w-, b, t] > t u~ h                          # bd̄ to tūH
+b d~ > [w+, w-, u, d, b, t] > t u~ z                    # bd̄ to tūZ
+b s~ > [w+, w-, s, c, b, t] > t c~ a                    # bs̄ to tc̄γ
+b s~ > [w+, w-, b, t] > t c~ h                          # bs̄ to tc̄H
+b s~ > [w+, w-, s, c, b, t] > t c~ z                    # bs̄ to tc̄Z
+b s~ > [g, a, z, w+, c, b, t] > t s~ w-                 # bs̄ to ts̄W⁻
+b u~ > [g, a, z, w+, d, b, t] > t u~ w-                 # bū to tūW⁻
+b~ b~ > [g, a, z, w-, b, t, h] > b~ t~ w+               # b̄b̄ to b̄t̄W⁺
+c b > [g, a, z, w+, s, b, t] > c t w-                   # cb to ctW⁻
+c b > [w+, w-, s, c, b, t] > s t a                      # cb to stγ
+c b > [w+, w-, b, t] > s t h                            # cb to stH
+c b > [w+, w-, s, c, b, t] > s t z                      # cb to stZ
+c b~ > [g, a, z, w-, s, b, t] > c t~ w+                 # cb̄ to ct̄W⁺
+c c~ > [g, a, z, w-, s, b, t] > b t~ w+                 # cc̄ to bt̄W⁺
+c c~ > [g, a, z, w+, s, b, t] > t b~ w-                 # cc̄ to tb̄W⁻
+c s~ > [w+, w-, s, c, b, t] > t b~ a                    # cs̄ to tb̄γ
+c s~ > [w+, w-, b, t] > t b~ h                          # cs̄ to tb̄H
+c s~ > [w+, w-, s, c, b, t] > t b~ z                    # cs̄ to tb̄Z
+c~ b~ > [g, a, z, w-, s, b, t] > c~ t~ w+               # c̄b̄ to c̄t̄W⁺
+c~ b~ > [w+, w-, s, c, b, t] > s~ t~ a                  # c̄b̄ to s̄t̄γ
+c~ b~ > [w+, w-, b, t] > s~ t~ h                        # c̄b̄ to s̄t̄H
+c~ b~ > [w+, w-, s, c, b, t] > s~ t~ z                  # c̄b̄ to s̄t̄Z
+d b > [g, a, z, w+, u, b, t] > d t w-                   # db to dtW⁻
+d b~ > [g, a, z, w-, u, b, t] > d t~ w+                 # db̄ to dt̄W⁺
+d b~ > [w+, w-, u, d, b, t] > u t~ a                    # db̄ to ut̄γ
+d b~ > [w+, w-, b, t] > u t~ h                          # db̄ to ut̄H
+d b~ > [w+, w-, u, d, b, t] > u t~ z                    # db̄ to ut̄Z
+d d~ > [g, a, z, w-, u, b, t] > b t~ w+                 # dd̄ to bt̄W⁺
+d d~ > [g, a, z, w+, u, b, t] > t b~ w-                 # dd̄ to tb̄W⁻
+d u~ > [w+, w-, u, d, b, t] > b t~ a                    # dū to bt̄γ
+d u~ > [w+, w-, b, t] > b t~ h                          # dū to bt̄H
+d u~ > [w+, w-, u, d, b, t] > b t~ z                    # dū to bt̄Z
+d~ b~ > [g, a, z, w-, u, b, t] > d~ t~ w+               # d̄b̄ to d̄t̄W⁺
+g b > [g, b, t] > g t w-                                # gb to gtW⁻
+g b~ > [g, b, t] > g t~ w+                              # gb̄ to gt̄W⁺
+g g > [g, b, t] > b t~ w+                               # gg to bt̄W⁺
+g g > [g, b, t] > t b~ w-                               # gg to tb̄W⁻
+s b > [g, a, z, w+, c, b, t] > s t w-                   # sb to stW⁻
+s b~ > [w+, w-, s, c, b, t] > c t~ a                    # sb̄ to ct̄γ
+s b~ > [w+, w-, b, t] > c t~ h                          # sb̄ to ct̄H
+s b~ > [w+, w-, s, c, b, t] > c t~ z                    # sb̄ to ct̄Z
+s b~ > [g, a, z, w-, c, b, t] > s t~ w+                 # sb̄ to st̄W⁺
+s c~ > [w+, w-, s, c, b, t] > b t~ a                    # sc̄ to bt̄γ
+s c~ > [w+, w-, b, t] > b t~ h                          # sc̄ to bt̄H
+s c~ > [w+, w-, s, c, b, t] > b t~ z                    # sc̄ to bt̄Z
+s s~ > [g, a, z, w-, c, b, t] > b t~ w+                 # ss̄ to bt̄W⁺
+s s~ > [g, a, z, w+, c, b, t] > t b~ w-                 # ss̄ to tb̄W⁻
+s~ b~ > [g, a, z, w-, c, b, t] > s~ t~ w+               # s̄b̄ to s̄t̄W⁺
+u b > [w+, w-, u, d, b, t] > d t a                      # ub to dtγ
+u b > [w+, w-, b, t] > d t h                            # ub to dtH
+u b > [w+, w-, u, d, b, t] > d t z                      # ub to dtZ
+u b > [g, a, z, w+, d, b, t] > u t w-                   # ub to utW⁻
+u b~ > [g, a, z, w-, d, b, t] > u t~ w+                 # ub̄ to ut̄W⁺
+u d~ > [w+, w-, u, d, b, t] > t b~ a                    # ud̄ to tb̄γ
+u d~ > [w+, w-, b, t] > t b~ h                          # ud̄ to tb̄H
+u d~ > [w+, w-, u, d, b, t] > t b~ z                    # ud̄ to tb̄Z
+u u~ > [g, a, z, w-, d, b, t] > b t~ w+                 # uū to bt̄W⁺
+u u~ > [g, a, z, w+, d, b, t] > t b~ w-                 # uū to tb̄W⁻
+u~ b~ > [w+, w-, u, d, b, t] > d~ t~ a                  # ūb̄ to d̄t̄γ
+u~ b~ > [w+, w-, b, t] > d~ t~ h                        # ūb̄ to d̄t̄H
+u~ b~ > [w+, w-, u, d, b, t] > d~ t~ z                  # ūb̄ to d̄t̄Z
+u~ b~ > [g, a, z, w-, d, b, t] > u~ t~ w+               # ūb̄ to ūt̄W⁺
+
+# --- Single top + leptons ---
+
+g b > [w-, b, t] > t e- ve~                             # gb to te⁻ν̄e
+g b > [w-, b, t] > t mu- vm~                            # gb to tμ⁻ν̄μ
+g b > [w-, b, t] > t ta- vt~                            # gb to tτ⁻ν̄τ
+g b~ > [w+, b, t] > t~ e+ ve                            # gb̄ to t̄e⁺νe
+g b~ > [w+, b, t] > t~ mu+ vm                           # gb̄ to t̄μ⁺νμ
+g b~ > [w+, b, t] > t~ ta+ vt                           # gb̄ to t̄τ⁺ντ
+
+# --- Pure QCD 3-parton: gg initial ---
+
+g g > [g, b] > g b b~                                   # gg to gbb̄
+g g > [g, c] > g c c~                                   # gg to gcc̄
+g g > [g, d] > g d d~                                   # gg to gdd̄
+g g > [g] > g g g                                       # gg to ggg
+g g > [g, s] > g s s~                                   # gg to gss̄
+g g > [g, u] > g u u~                                   # gg to guū
+
+# --- Pure QCD 3-parton: gq / gq̄ initial ---
+
+g b > [g, a, z, b, h] > b b b~                          # gb to bbb̄
+g b > [g, a, z, c, b] > c b c~                          # gb to cbc̄
+g b > [g, a, z, d, b] > d b d~                          # gb to dbd̄
+g b > [g, b] > g g b                                    # gb to ggb
+g b > [g, a, z, s, b] > s b s~                          # gb to sbs̄
+g b > [g, a, z, u, b] > u b u~                          # gb to ubū
+g b~ > [g, a, z, b, h] > b b~ b~                        # gb̄ to bb̄b̄
+g b~ > [g, a, z, c, b] > c c~ b~                        # gb̄ to cc̄b̄
+g b~ > [g, a, z, d, b] > d d~ b~                        # gb̄ to dd̄b̄
+g b~ > [g, b] > g g b~                                  # gb̄ to ggb̄
+g b~ > [g, a, z, s, b] > s s~ b~                        # gb̄ to ss̄b̄
+g b~ > [g, a, z, u, b] > u u~ b~                        # gb̄ to uūb̄
+g c > [g, a, z, c, b] > c b b~                          # gc to cbb̄
+g c > [g, a, z, c] > c c c~                             # gc to ccc̄
+g c > [g, a, z, d, c] > d c d~                          # gc to dcd̄
+g c > [g, c] > g g c                                    # gc to ggc
+g c > [g, a, z, w+, w-, s, c] > s c s~                  # gc to scs̄
+g c > [g, a, z, u, c] > u c u~                          # gc to ucū
+g c > [w+, w-, u, d, s, c] > u s d~                     # gc to usd̄
+g c~ > [g, a, z, c, b] > b c~ b~                        # gc̄ to bc̄b̄
+g c~ > [g, a, z, c] > c c~ c~                           # gc̄ to cc̄c̄
+g c~ > [g, a, z, d, c] > d d~ c~                        # gc̄ to dd̄c̄
+g c~ > [w+, w-, u, d, s, c] > d u~ s~                   # gc̄ to dūs̄
+g c~ > [g, c] > g g c~                                  # gc̄ to ggc̄
+g c~ > [g, a, z, w+, w-, s, c] > s s~ c~                # gc̄ to ss̄c̄
+g c~ > [g, a, z, u, c] > u u~ c~                        # gc̄ to uūc̄
+g d > [g, a, z, d, b] > d b b~                          # gd to dbb̄
+g d > [g, a, z, d, c] > d c c~                          # gd to dcc̄
+g d > [g, a, z, d] > d d d~                             # gd to ddd̄
+g d > [g, a, z, d, s] > d s s~                          # gd to dss̄
+g d > [g, d] > g g d                                    # gd to ggd
+g d > [g, a, z, w+, w-, u, d] > u d u~                  # gd to udū
+g d > [w+, w-, u, d, s, c] > u s c~                     # gd to usc̄
+g d~ > [g, a, z, d, b] > b d~ b~                        # gd̄ to bd̄b̄
+g d~ > [g, a, z, d, c] > c d~ c~                        # gd̄ to cd̄c̄
+g d~ > [w+, w-, u, d, s, c] > c u~ s~                   # gd̄ to cūs̄
+g d~ > [g, a, z, d] > d d~ d~                           # gd̄ to dd̄d̄
+g d~ > [g, d] > g g d~                                  # gd̄ to ggd̄
+g d~ > [g, a, z, d, s] > s d~ s~                        # gd̄ to sd̄s̄
+g d~ > [g, a, z, w+, w-, u, d] > u u~ d~                # gd̄ to uūd̄
+g s > [w+, w-, u, d, s, c] > d c u~                     # gs to dcū
+g s > [g, a, z, d, s] > d s d~                          # gs to dsd̄
+g s > [g, s] > g g s                                    # gs to ggs
+g s > [g, a, z, s, b] > s b b~                          # gs to sbb̄
+g s > [g, a, z, w+, w-, s, c] > s c c~                  # gs to scc̄
+g s > [g, a, z, s] > s s s~                             # gs to sss̄
+g s > [g, a, z, u, s] > u s u~                          # gs to usū
+g s~ > [g, a, z, s, b] > b s~ b~                        # gs̄ to bs̄b̄
+g s~ > [g, a, z, w+, w-, s, c] > c s~ c~                # gs̄ to cs̄c̄
+g s~ > [g, a, z, d, s] > d d~ s~                        # gs̄ to dd̄s̄
+g s~ > [g, s] > g g s~                                  # gs̄ to ggs̄
+g s~ > [g, a, z, s] > s s~ s~                           # gs̄ to ss̄s̄
+g s~ > [w+, w-, u, d, s, c] > u d~ c~                   # gs̄ to ud̄c̄
+g s~ > [g, a, z, u, s] > u u~ s~                        # gs̄ to uūs̄
+g u > [w+, w-, u, d, s, c] > d c s~                     # gu to dcs̄
+g u > [g, u] > g g u                                    # gu to ggu
+g u > [g, a, z, u, b] > u b b~                          # gu to ubb̄
+g u > [g, a, z, u, c] > u c c~                          # gu to ucc̄
+g u > [g, a, z, w+, w-, u, d] > u d d~                  # gu to udd̄
+g u > [g, a, z, u, s] > u s s~                          # gu to uss̄
+g u > [g, a, z, u] > u u u~                             # gu to uuū
+g u~ > [g, a, z, u, b] > b u~ b~                        # gū to būb̄
+g u~ > [g, a, z, u, c] > c u~ c~                        # gū to cūc̄
+g u~ > [g, a, z, w+, w-, u, d] > d u~ d~                # gū to dūd̄
+g u~ > [g, u] > g g u~                                  # gū to ggū
+g u~ > [w+, w-, u, d, s, c] > s d~ c~                   # gū to sd̄c̄
+g u~ > [g, a, z, u, s] > s u~ s~                        # gū to sūs̄
+g u~ > [g, a, z, u] > u u~ u~                           # gū to uūū
+
+# --- Pure QCD 3-parton: qq / q̄q̄ initial ---
+
+b b > [g, a, z, b, h] > g b b                           # bb to gbb
+b~ b~ > [g, a, z, b, h] > g b~ b~                       # b̄b̄ to gb̄b̄
+c b > [g, a, z, c, b] > g c b                           # cb to gcb
+c c > [g, a, z, c] > g c c                              # cc to gcc
+c~ b~ > [g, a, z, c, b] > g c~ b~                       # c̄b̄ to gc̄b̄
+c~ c~ > [g, a, z, c] > g c~ c~                          # c̄c̄ to gc̄c̄
+d b > [g, a, z, d, b] > g d b                           # db to gdb
+d c > [g, a, z, d, c] > g d c                           # dc to gdc
+d c > [w+, w-, u, d, s, c] > g u s                      # dc to gus
+d d > [g, a, z, d] > g d d                              # dd to gdd
+d s > [g, a, z, d, s] > g d s                           # ds to gds
+d~ b~ > [g, a, z, d, b] > g d~ b~                       # d̄b̄ to gd̄b̄
+d~ c~ > [g, a, z, d, c] > g d~ c~                       # d̄c̄ to gd̄c̄
+d~ c~ > [w+, w-, u, d, s, c] > g u~ s~                  # d̄c̄ to gūs̄
+d~ d~ > [g, a, z, d] > g d~ d~                          # d̄d̄ to gd̄d̄
+d~ s~ > [g, a, z, d, s] > g d~ s~                       # d̄s̄ to gd̄s̄
+s b > [g, a, z, s, b] > g s b                           # sb to gsb
+s c > [g, a, z, w+, w-, s, c] > g s c                   # sc to gsc
+s s > [g, a, z, s] > g s s                              # ss to gss
+s~ b~ > [g, a, z, s, b] > g s~ b~                       # s̄b̄ to gs̄b̄
+s~ c~ > [g, a, z, w+, w-, s, c] > g s~ c~               # s̄c̄ to gs̄c̄
+s~ s~ > [g, a, z, s] > g s~ s~                          # s̄s̄ to gs̄s̄
+u b > [g, a, z, u, b] > g u b                           # ub to gub
+u c > [g, a, z, u, c] > g u c                           # uc to guc
+u d > [g, a, z, w+, w-, u, d] > g u d                   # ud to gud
+u s > [w+, w-, u, d, s, c] > g d c                      # us to gdc
+u s > [g, a, z, u, s] > g u s                           # us to gus
+u u > [g, a, z, u] > g u u                              # uu to guu
+u~ b~ > [g, a, z, u, b] > g u~ b~                       # ūb̄ to gūb̄
+u~ c~ > [g, a, z, u, c] > g u~ c~                       # ūc̄ to gūc̄
+u~ d~ > [g, a, z, w+, w-, u, d] > g u~ d~               # ūd̄ to gūd̄
+u~ s~ > [w+, w-, u, d, s, c] > g d~ c~                  # ūs̄ to gd̄c̄
+u~ s~ > [g, a, z, u, s] > g u~ s~                       # ūs̄ to gūs̄
+u~ u~ > [g, a, z, u] > g u~ u~                          # ūū to gūū
+
+# --- Pure QCD 3-parton: qq̄ initial ---
+
+b b~ > [g, a, z, b, h] > g b b~                         # bb̄ to gbb̄
+b b~ > [g, a, z, c, b] > g c c~                         # bb̄ to gcc̄
+b b~ > [g, a, z, d, b] > g d d~                         # bb̄ to gdd̄
+b b~ > [g, b] > g g g                                   # bb̄ to ggg
+b b~ > [g, a, z, s, b] > g s s~                         # bb̄ to gss̄
+b b~ > [g, a, z, u, b] > g u u~                         # bb̄ to guū
+b c~ > [g, a, z, c, b] > g b c~                         # bc̄ to gbc̄
+b d~ > [g, a, z, d, b] > g b d~                         # bd̄ to gbd̄
+b s~ > [g, a, z, s, b] > g b s~                         # bs̄ to gbs̄
+b u~ > [g, a, z, u, b] > g b u~                         # bū to gbū
+c b~ > [g, a, z, c, b] > g c b~                         # cb̄ to gcb̄
+c c~ > [g, a, z, c, b] > g b b~                         # cc̄ to gbb̄
+c c~ > [g, a, z, c] > g c c~                            # cc̄ to gcc̄
+c c~ > [g, a, z, d, c] > g d d~                         # cc̄ to gdd̄
+c c~ > [g, c] > g g g                                   # cc̄ to ggg
+c c~ > [g, a, z, w+, w-, s, c] > g s s~                 # cc̄ to gss̄
+c c~ > [g, a, z, u, c] > g u u~                         # cc̄ to guū
+c d~ > [g, a, z, d, c] > g c d~                         # cd̄ to gcd̄
+c s~ > [g, a, z, w+, w-, s, c] > g c s~                 # cs̄ to gcs̄
+c s~ > [w+, w-, u, d, s, c] > g u d~                    # cs̄ to gud̄
+c u~ > [g, a, z, u, c] > g c u~                         # cū to gcū
+c u~ > [w+, w-, u, d, s, c] > g s d~                    # cū to gsd̄
+d b~ > [g, a, z, d, b] > g d b~                         # db̄ to gdb̄
+d c~ > [g, a, z, d, c] > g d c~                         # dc̄ to gdc̄
+d d~ > [g, a, z, d, b] > g b b~                         # dd̄ to gbb̄
+d d~ > [g, a, z, d, c] > g c c~                         # dd̄ to gcc̄
+d d~ > [g, a, z, d] > g d d~                            # dd̄ to gdd̄
+d d~ > [g, d] > g g g                                   # dd̄ to ggg
+d d~ > [g, a, z, d, s] > g s s~                         # dd̄ to gss̄
+d d~ > [g, a, z, w+, w-, u, d] > g u u~                 # dd̄ to guū
+d s~ > [g, a, z, d, s] > g d s~                         # ds̄ to gds̄
+d s~ > [w+, w-, u, d, s, c] > g u c~                    # ds̄ to guc̄
+d u~ > [g, a, z, w+, w-, u, d] > g d u~                 # dū to gdū
+d u~ > [w+, w-, u, d, s, c] > g s c~                    # dū to gsc̄
+s b~ > [g, a, z, s, b] > g s b~                         # sb̄ to gsb̄
+s c~ > [w+, w-, u, d, s, c] > g d u~                    # sc̄ to gdū
+s c~ > [g, a, z, w+, w-, s, c] > g s c~                 # sc̄ to gsc̄
+s d~ > [w+, w-, u, d, s, c] > g c u~                    # sd̄ to gcū
+s d~ > [g, a, z, d, s] > g s d~                         # sd̄ to gsd̄
+s s~ > [g, a, z, s, b] > g b b~                         # ss̄ to gbb̄
+s s~ > [g, a, z, w+, w-, s, c] > g c c~                 # ss̄ to gcc̄
+s s~ > [g, a, z, d, s] > g d d~                         # ss̄ to gdd̄
+s s~ > [g, s] > g g g                                   # ss̄ to ggg
+s s~ > [g, a, z, s] > g s s~                            # ss̄ to gss̄
+s s~ > [g, a, z, u, s] > g u u~                         # ss̄ to guū
+s u~ > [g, a, z, u, s] > g s u~                         # sū to gsū
+u b~ > [g, a, z, u, b] > g u b~                         # ub̄ to gub̄
+u c~ > [w+, w-, u, d, s, c] > g d s~                    # uc̄ to gds̄
+u c~ > [g, a, z, u, c] > g u c~                         # uc̄ to guc̄
+u d~ > [w+, w-, u, d, s, c] > g c s~                    # ud̄ to gcs̄
+u d~ > [g, a, z, w+, w-, u, d] > g u d~                 # ud̄ to gud̄
+u s~ > [g, a, z, u, s] > g u s~                         # us̄ to gus̄
+u u~ > [g, a, z, u, b] > g b b~                         # uū to gbb̄
+u u~ > [g, a, z, u, c] > g c c~                         # uū to gcc̄
+u u~ > [g, a, z, w+, w-, u, d] > g d d~                 # uū to gdd̄
+u u~ > [g, u] > g g g                                   # uū to ggg
+u u~ > [g, a, z, u, s] > g s s~                         # uū to gss̄
+u u~ > [g, a, z, u] > g u u~                            # uū to guū
+
+# --- γ + 2 jets ---
+
+b b > [g, a, z, b, h] > b b a                           # bb to bbγ
+b b~ > [g, a, z, b, h] > b b~ a                         # bb̄ to bb̄γ
+b b~ > [g, a, z, c, b] > c c~ a                         # bb̄ to cc̄γ
+b b~ > [g, a, z, d, b] > d d~ a                         # bb̄ to dd̄γ
+b b~ > [g, b] > g g a                                   # bb̄ to ggγ
+b b~ > [g, a, z, s, b] > s s~ a                         # bb̄ to ss̄γ
+b b~ > [g, a, z, u, b] > u u~ a                         # bb̄ to uūγ
+b c~ > [g, a, z, c, b] > b c~ a                         # bc̄ to bc̄γ
+b d~ > [g, a, z, d, b] > b d~ a                         # bd̄ to bd̄γ
+b s~ > [g, a, z, s, b] > b s~ a                         # bs̄ to bs̄γ
+b u~ > [g, a, z, u, b] > b u~ a                         # bū to būγ
+b~ b~ > [g, a, z, b, h] > b~ b~ a                       # b̄b̄ to b̄b̄γ
+c b > [g, a, z, c, b] > c b a                           # cb to cbγ
+c b~ > [g, a, z, c, b] > c b~ a                         # cb̄ to cb̄γ
+c c > [g, a, z, c] > c c a                              # cc to ccγ
+c c~ > [g, a, z, c, b] > b b~ a                         # cc̄ to bb̄γ
+c c~ > [g, a, z, c] > c c~ a                            # cc̄ to cc̄γ
+c c~ > [g, a, z, d, c] > d d~ a                         # cc̄ to dd̄γ
+c c~ > [g, c] > g g a                                   # cc̄ to ggγ
+c c~ > [g, a, z, w+, w-, s, c] > s s~ a                 # cc̄ to ss̄γ
+c c~ > [g, a, z, u, c] > u u~ a                         # cc̄ to uūγ
+c d~ > [g, a, z, d, c] > c d~ a                         # cd̄ to cd̄γ
+c s~ > [g, a, z, w+, w-, s, c] > c s~ a                 # cs̄ to cs̄γ
+c s~ > [w+, w-, u, d, s, c] > u d~ a                    # cs̄ to ud̄γ
+c u~ > [g, a, z, u, c] > c u~ a                         # cū to cūγ
+c u~ > [w+, w-, u, d, s, c] > s d~ a                    # cū to sd̄γ
+c~ b~ > [g, a, z, c, b] > c~ b~ a                       # c̄b̄ to c̄b̄γ
+c~ c~ > [g, a, z, c] > c~ c~ a                          # c̄c̄ to c̄c̄γ
+d b > [g, a, z, d, b] > d b a                           # db to dbγ
+d b~ > [g, a, z, d, b] > d b~ a                         # db̄ to db̄γ
+d c > [g, a, z, d, c] > d c a                           # dc to dcγ
+d c > [w+, w-, u, d, s, c] > u s a                      # dc to usγ
+d c~ > [g, a, z, d, c] > d c~ a                         # dc̄ to dc̄γ
+d d > [g, a, z, d] > d d a                              # dd to ddγ
+d d~ > [g, a, z, d, b] > b b~ a                         # dd̄ to bb̄γ
+d d~ > [g, a, z, d, c] > c c~ a                         # dd̄ to cc̄γ
+d d~ > [g, a, z, d] > d d~ a                            # dd̄ to dd̄γ
+d d~ > [g, d] > g g a                                   # dd̄ to ggγ
+d d~ > [g, a, z, d, s] > s s~ a                         # dd̄ to ss̄γ
+d d~ > [g, a, z, w+, w-, u, d] > u u~ a                 # dd̄ to uūγ
+d s > [g, a, z, d, s] > d s a                           # ds to dsγ
+d s~ > [g, a, z, d, s] > d s~ a                         # ds̄ to ds̄γ
+d s~ > [w+, w-, u, d, s, c] > u c~ a                    # ds̄ to uc̄γ
+d u~ > [g, a, z, w+, w-, u, d] > d u~ a                 # dū to dūγ
+d u~ > [w+, w-, u, d, s, c] > s c~ a                    # dū to sc̄γ
+d~ b~ > [g, a, z, d, b] > d~ b~ a                       # d̄b̄ to d̄b̄γ
+d~ c~ > [g, a, z, d, c] > d~ c~ a                       # d̄c̄ to d̄c̄γ
+d~ c~ > [w+, w-, u, d, s, c] > u~ s~ a                  # d̄c̄ to ūs̄γ
+d~ d~ > [g, a, z, d] > d~ d~ a                          # d̄d̄ to d̄d̄γ
+d~ s~ > [g, a, z, d, s] > d~ s~ a                       # d̄s̄ to d̄s̄γ
+g b > [g, b] > g b a                                    # gb to gbγ
+g b~ > [g, b] > g b~ a                                  # gb̄ to gb̄γ
+g c > [g, c] > g c a                                    # gc to gcγ
+g c~ > [g, c] > g c~ a                                  # gc̄ to gc̄γ
+g d > [g, d] > g d a                                    # gd to gdγ
+g d~ > [g, d] > g d~ a                                  # gd̄ to gd̄γ
+g g > [g, b] > b b~ a                                   # gg to bb̄γ
+g g > [g, c] > c c~ a                                   # gg to cc̄γ
+g g > [g, d] > d d~ a                                   # gg to dd̄γ
+g g > [g, s] > s s~ a                                   # gg to ss̄γ
+g g > [g, u] > u u~ a                                   # gg to uūγ
+g s > [g, s] > g s a                                    # gs to gsγ
+g s~ > [g, s] > g s~ a                                  # gs̄ to gs̄γ
+g u > [g, u] > g u a                                    # gu to guγ
+g u~ > [g, u] > g u~ a                                  # gū to gūγ
+s b > [g, a, z, s, b] > s b a                           # sb to sbγ
+s b~ > [g, a, z, s, b] > s b~ a                         # sb̄ to sb̄γ
+s c > [g, a, z, w+, w-, s, c] > s c a                   # sc to scγ
+s c~ > [w+, w-, u, d, s, c] > d u~ a                    # sc̄ to dūγ
+s c~ > [g, a, z, w+, w-, s, c] > s c~ a                 # sc̄ to sc̄γ
+s d~ > [w+, w-, u, d, s, c] > c u~ a                    # sd̄ to cūγ
+s d~ > [g, a, z, d, s] > s d~ a                         # sd̄ to sd̄γ
+s s > [g, a, z, s] > s s a                              # ss to ssγ
+s s~ > [g, a, z, s, b] > b b~ a                         # ss̄ to bb̄γ
+s s~ > [g, a, z, w+, w-, s, c] > c c~ a                 # ss̄ to cc̄γ
+s s~ > [g, a, z, d, s] > d d~ a                         # ss̄ to dd̄γ
+s s~ > [g, s] > g g a                                   # ss̄ to ggγ
+s s~ > [g, a, z, s] > s s~ a                            # ss̄ to ss̄γ
+s s~ > [g, a, z, u, s] > u u~ a                         # ss̄ to uūγ
+s u~ > [g, a, z, u, s] > s u~ a                         # sū to sūγ
+s~ b~ > [g, a, z, s, b] > s~ b~ a                       # s̄b̄ to s̄b̄γ
+s~ c~ > [g, a, z, w+, w-, s, c] > s~ c~ a               # s̄c̄ to s̄c̄γ
+s~ s~ > [g, a, z, s] > s~ s~ a                          # s̄s̄ to s̄s̄γ
+u b > [g, a, z, u, b] > u b a                           # ub to ubγ
+u b~ > [g, a, z, u, b] > u b~ a                         # ub̄ to ub̄γ
+u c > [g, a, z, u, c] > u c a                           # uc to ucγ
+u c~ > [w+, w-, u, d, s, c] > d s~ a                    # uc̄ to ds̄γ
+u c~ > [g, a, z, u, c] > u c~ a                         # uc̄ to uc̄γ
+u d > [g, a, z, w+, w-, u, d] > u d a                   # ud to udγ
+u d~ > [w+, w-, u, d, s, c] > c s~ a                    # ud̄ to cs̄γ
+u d~ > [g, a, z, w+, w-, u, d] > u d~ a                 # ud̄ to ud̄γ
+u s > [w+, w-, u, d, s, c] > d c a                      # us to dcγ
+u s > [g, a, z, u, s] > u s a                           # us to usγ
+u s~ > [g, a, z, u, s] > u s~ a                         # us̄ to us̄γ
+u u > [g, a, z, u] > u u a                              # uu to uuγ
+u u~ > [g, a, z, u, b] > b b~ a                         # uū to bb̄γ
+u u~ > [g, a, z, u, c] > c c~ a                         # uū to cc̄γ
+u u~ > [g, a, z, w+, w-, u, d] > d d~ a                 # uū to dd̄γ
+u u~ > [g, u] > g g a                                   # uū to ggγ
+u u~ > [g, a, z, u, s] > s s~ a                         # uū to ss̄γ
+u u~ > [g, a, z, u] > u u~ a                            # uū to uūγ
+u~ b~ > [g, a, z, u, b] > u~ b~ a                       # ūb̄ to ūb̄γ
+u~ c~ > [g, a, z, u, c] > u~ c~ a                       # ūc̄ to ūc̄γ
+u~ d~ > [g, a, z, w+, w-, u, d] > u~ d~ a               # ūd̄ to ūd̄γ
+u~ s~ > [w+, w-, u, d, s, c] > d~ c~ a                  # ūs̄ to d̄c̄γ
+u~ s~ > [g, a, z, u, s] > u~ s~ a                       # ūs̄ to ūs̄γ
+u~ u~ > [g, a, z, u] > u~ u~ a                          # ūū to ūūγ
+
+# --- Z + 2 jets ---
+
+b b > [g, a, z, b, h] > b b z                           # bb to bbZ
+b b~ > [g, a, z, b, h] > b b~ z                         # bb̄ to bb̄Z
+b b~ > [g, a, z, c, b, h] > c c~ z                      # bb̄ to cc̄Z
+b b~ > [g, a, z, d, b, h] > d d~ z                      # bb̄ to dd̄Z
+b b~ > [g, b] > g g z                                   # bb̄ to ggZ
+b b~ > [g, a, z, s, b, h] > s s~ z                      # bb̄ to ss̄Z
+b b~ > [g, a, z, u, b, h] > u u~ z                      # bb̄ to uūZ
+b c~ > [g, a, z, c, b, h] > b c~ z                      # bc̄ to bc̄Z
+b d~ > [g, a, z, d, b, h] > b d~ z                      # bd̄ to bd̄Z
+b s~ > [g, a, z, s, b, h] > b s~ z                      # bs̄ to bs̄Z
+b u~ > [g, a, z, u, b, h] > b u~ z                      # bū to būZ
+b~ b~ > [g, a, z, b, h] > b~ b~ z                       # b̄b̄ to b̄b̄Z
+c b > [g, a, z, c, b, h] > c b z                        # cb to cbZ
+c b~ > [g, a, z, c, b, h] > c b~ z                      # cb̄ to cb̄Z
+c c > [g, a, z, c] > c c z                              # cc to ccZ
+c c~ > [g, a, z, c, b, h] > b b~ z                      # cc̄ to bb̄Z
+c c~ > [g, a, z, c] > c c~ z                            # cc̄ to cc̄Z
+c c~ > [g, a, z, d, c] > d d~ z                         # cc̄ to dd̄Z
+c c~ > [g, c] > g g z                                   # cc̄ to ggZ
+c c~ > [g, a, z, w+, w-, s, c] > s s~ z                 # cc̄ to ss̄Z
+c c~ > [g, a, z, u, c] > u u~ z                         # cc̄ to uūZ
+c d~ > [g, a, z, d, c] > c d~ z                         # cd̄ to cd̄Z
+c s~ > [g, a, z, w+, w-, s, c] > c s~ z                 # cs̄ to cs̄Z
+c s~ > [w+, w-, u, d, s, c] > u d~ z                    # cs̄ to ud̄Z
+c u~ > [g, a, z, u, c] > c u~ z                         # cū to cūZ
+c u~ > [w+, w-, u, d, s, c] > s d~ z                    # cū to sd̄Z
+c~ b~ > [g, a, z, c, b, h] > c~ b~ z                    # c̄b̄ to c̄b̄Z
+c~ c~ > [g, a, z, c] > c~ c~ z                          # c̄c̄ to c̄c̄Z
+d b > [g, a, z, d, b, h] > d b z                        # db to dbZ
+d b~ > [g, a, z, d, b, h] > d b~ z                      # db̄ to db̄Z
+d c > [g, a, z, d, c] > d c z                           # dc to dcZ
+d c > [w+, w-, u, d, s, c] > u s z                      # dc to usZ
+d c~ > [g, a, z, d, c] > d c~ z                         # dc̄ to dc̄Z
+d d > [g, a, z, d] > d d z                              # dd to ddZ
+d d~ > [g, a, z, d, b, h] > b b~ z                      # dd̄ to bb̄Z
+d d~ > [g, a, z, d, c] > c c~ z                         # dd̄ to cc̄Z
+d d~ > [g, a, z, d] > d d~ z                            # dd̄ to dd̄Z
+d d~ > [g, d] > g g z                                   # dd̄ to ggZ
+d d~ > [g, a, z, d, s] > s s~ z                         # dd̄ to ss̄Z
+d d~ > [g, a, z, w+, w-, u, d] > u u~ z                 # dd̄ to uūZ
+d s > [g, a, z, d, s] > d s z                           # ds to dsZ
+d s~ > [g, a, z, d, s] > d s~ z                         # ds̄ to ds̄Z
+d s~ > [w+, w-, u, d, s, c] > u c~ z                    # ds̄ to uc̄Z
+d u~ > [g, a, z, w+, w-, u, d] > d u~ z                 # dū to dūZ
+d u~ > [w+, w-, u, d, s, c] > s c~ z                    # dū to sc̄Z
+d~ b~ > [g, a, z, d, b, h] > d~ b~ z                    # d̄b̄ to d̄b̄Z
+d~ c~ > [g, a, z, d, c] > d~ c~ z                       # d̄c̄ to d̄c̄Z
+d~ c~ > [w+, w-, u, d, s, c] > u~ s~ z                  # d̄c̄ to ūs̄Z
+d~ d~ > [g, a, z, d] > d~ d~ z                          # d̄d̄ to d̄d̄Z
+d~ s~ > [g, a, z, d, s] > d~ s~ z                       # d̄s̄ to d̄s̄Z
+g b > [g, b] > g b z                                    # gb to gbZ
+g b~ > [g, b] > g b~ z                                  # gb̄ to gb̄Z
+g c > [g, c] > g c z                                    # gc to gcZ
+g c~ > [g, c] > g c~ z                                  # gc̄ to gc̄Z
+g d > [g, d] > g d z                                    # gd to gdZ
+g d~ > [g, d] > g d~ z                                  # gd̄ to gd̄Z
+g g > [g, b] > b b~ z                                   # gg to bb̄Z
+g g > [g, c] > c c~ z                                   # gg to cc̄Z
+g g > [g, d] > d d~ z                                   # gg to dd̄Z
+g g > [g, s] > s s~ z                                   # gg to ss̄Z
+g g > [g, u] > u u~ z                                   # gg to uūZ
+g s > [g, s] > g s z                                    # gs to gsZ
+g s~ > [g, s] > g s~ z                                  # gs̄ to gs̄Z
+g u > [g, u] > g u z                                    # gu to guZ
+g u~ > [g, u] > g u~ z                                  # gū to gūZ
+s b > [g, a, z, s, b, h] > s b z                        # sb to sbZ
+s b~ > [g, a, z, s, b, h] > s b~ z                      # sb̄ to sb̄Z
+s c > [g, a, z, w+, w-, s, c] > s c z                   # sc to scZ
+s c~ > [w+, w-, u, d, s, c] > d u~ z                    # sc̄ to dūZ
+s c~ > [g, a, z, w+, w-, s, c] > s c~ z                 # sc̄ to sc̄Z
+s d~ > [w+, w-, u, d, s, c] > c u~ z                    # sd̄ to cūZ
+s d~ > [g, a, z, d, s] > s d~ z                         # sd̄ to sd̄Z
+s s > [g, a, z, s] > s s z                              # ss to ssZ
+s s~ > [g, a, z, s, b, h] > b b~ z                      # ss̄ to bb̄Z
+s s~ > [g, a, z, w+, w-, s, c] > c c~ z                 # ss̄ to cc̄Z
+s s~ > [g, a, z, d, s] > d d~ z                         # ss̄ to dd̄Z
+s s~ > [g, s] > g g z                                   # ss̄ to ggZ
+s s~ > [g, a, z, s] > s s~ z                            # ss̄ to ss̄Z
+s s~ > [g, a, z, u, s] > u u~ z                         # ss̄ to uūZ
+s u~ > [g, a, z, u, s] > s u~ z                         # sū to sūZ
+s~ b~ > [g, a, z, s, b, h] > s~ b~ z                    # s̄b̄ to s̄b̄Z
+s~ c~ > [g, a, z, w+, w-, s, c] > s~ c~ z               # s̄c̄ to s̄c̄Z
+s~ s~ > [g, a, z, s] > s~ s~ z                          # s̄s̄ to s̄s̄Z
+u b > [g, a, z, u, b, h] > u b z                        # ub to ubZ
+u b~ > [g, a, z, u, b, h] > u b~ z                      # ub̄ to ub̄Z
+u c > [g, a, z, u, c] > u c z                           # uc to ucZ
+u c~ > [w+, w-, u, d, s, c] > d s~ z                    # uc̄ to ds̄Z
+u c~ > [g, a, z, u, c] > u c~ z                         # uc̄ to uc̄Z
+u d > [g, a, z, w+, w-, u, d] > u d z                   # ud to udZ
+u d~ > [w+, w-, u, d, s, c] > c s~ z                    # ud̄ to cs̄Z
+u d~ > [g, a, z, w+, w-, u, d] > u d~ z                 # ud̄ to ud̄Z
+u s > [w+, w-, u, d, s, c] > d c z                      # us to dcZ
+u s > [g, a, z, u, s] > u s z                           # us to usZ
+u s~ > [g, a, z, u, s] > u s~ z                         # us̄ to us̄Z
+u u > [g, a, z, u] > u u z                              # uu to uuZ
+u u~ > [g, a, z, u, b, h] > b b~ z                      # uū to bb̄Z
+u u~ > [g, a, z, u, c] > c c~ z                         # uū to cc̄Z
+u u~ > [g, a, z, w+, w-, u, d] > d d~ z                 # uū to dd̄Z
+u u~ > [g, u] > g g z                                   # uū to ggZ
+u u~ > [g, a, z, u, s] > s s~ z                         # uū to ss̄Z
+u u~ > [g, a, z, u] > u u~ z                            # uū to uūZ
+u~ b~ > [g, a, z, u, b, h] > u~ b~ z                    # ūb̄ to ūb̄Z
+u~ c~ > [g, a, z, u, c] > u~ c~ z                       # ūc̄ to ūc̄Z
+u~ d~ > [g, a, z, w+, w-, u, d] > u~ d~ z               # ūd̄ to ūd̄Z
+u~ s~ > [w+, w-, u, d, s, c] > d~ c~ z                  # ūs̄ to d̄c̄Z
+u~ s~ > [g, a, z, u, s] > u~ s~ z                       # ūs̄ to ūs̄Z
+u~ u~ > [g, a, z, u] > u~ u~ z                          # ūū to ūūZ
+
+# --- W⁺ + 2 jets ---
+
+b b~ > [g, a, z, w-, u, d, t, h] > d u~ w+              # bb̄ to dūW⁺
+b b~ > [g, a, z, w-, s, c, t, h] > s c~ w+              # bb̄ to sc̄W⁺
+b d~ > [g, a, z, w-, u, d, t, h] > b u~ w+              # bd̄ to būW⁺
+b s~ > [g, a, z, w-, s, c, t, h] > b c~ w+              # bs̄ to bc̄W⁺
+c b > [g, a, z, w-, s, c, t, h] > s b w+                # cb to sbW⁺
+c b~ > [g, a, z, w-, s, c, t, h] > s b~ w+              # cb̄ to sb̄W⁺
+c c > [g, a, z, w-, s, c] > s c w+                      # cc to scW⁺
+c c~ > [g, a, z, w-, u, d, s] > d u~ w+                 # cc̄ to dūW⁺
+c c~ > [g, a, z, w-, s, c] > s c~ w+                    # cc̄ to sc̄W⁺
+c d~ > [g, a, z, w-, u, d, s] > c u~ w+                 # cd̄ to cūW⁺
+c d~ > [g, a, z, w-, u, s, c] > s d~ w+                 # cd̄ to sd̄W⁺
+c s~ > [g, a, z, w-, s, c, t, h] > b b~ w+              # cs̄ to bb̄W⁺
+c s~ > [g, a, z, w-, s, c] > c c~ w+                    # cs̄ to cc̄W⁺
+c s~ > [g, a, z, w-, u, s, c] > d d~ w+                 # cs̄ to dd̄W⁺
+c s~ > [g, s, c] > g g w+                               # cs̄ to ggW⁺
+c s~ > [g, a, z, w-, s, c] > s s~ w+                    # cs̄ to ss̄W⁺
+c s~ > [g, a, z, w-, d, s, c] > u u~ w+                 # cs̄ to uūW⁺
+c u~ > [g, a, z, w-, d, s, c] > s u~ w+                 # cū to sūW⁺
+d c > [g, a, z, w-, u, s, c] > d s w+                   # dc to dsW⁺
+d d~ > [g, a, z, w-, u, d] > d u~ w+                    # dd̄ to dūW⁺
+d d~ > [g, a, z, w-, u, s, c] > s c~ w+                 # dd̄ to sc̄W⁺
+d s~ > [g, a, z, w-, u, s, c] > d c~ w+                 # ds̄ to dc̄W⁺
+d~ b~ > [g, a, z, w-, u, d, t, h] > u~ b~ w+            # d̄b̄ to ūb̄W⁺
+d~ c~ > [g, a, z, w-, u, d, s] > u~ c~ w+               # d̄c̄ to ūc̄W⁺
+d~ d~ > [g, a, z, w-, u, d] > u~ d~ w+                  # d̄d̄ to ūd̄W⁺
+d~ s~ > [g, a, z, w-, u, s, c] > d~ c~ w+               # d̄s̄ to d̄c̄W⁺
+d~ s~ > [g, a, z, w-, u, d, c] > u~ s~ w+               # d̄s̄ to ūs̄W⁺
+g c > [g, s, c] > g s w+                                # gc to gsW⁺
+g d~ > [g, u, d] > g u~ w+                              # gd̄ to gūW⁺
+g g > [g, u, d] > d u~ w+                               # gg to dūW⁺
+g g > [g, s, c] > s c~ w+                               # gg to sc̄W⁺
+g s~ > [g, s, c] > g c~ w+                              # gs̄ to gc̄W⁺
+g u > [g, u, d] > g d w+                                # gu to gdW⁺
+s c > [g, a, z, w-, s, c] > s s w+                      # sc to ssW⁺
+s d~ > [g, a, z, w-, u, d, c] > s u~ w+                 # sd̄ to sūW⁺
+s s~ > [g, a, z, w-, u, d, c] > d u~ w+                 # ss̄ to dūW⁺
+s s~ > [g, a, z, w-, s, c] > s c~ w+                    # ss̄ to sc̄W⁺
+s~ b~ > [g, a, z, w-, s, c, t, h] > c~ b~ w+            # s̄b̄ to c̄b̄W⁺
+s~ c~ > [g, a, z, w-, s, c] > c~ c~ w+                  # s̄c̄ to c̄c̄W⁺
+s~ s~ > [g, a, z, w-, s, c] > s~ c~ w+                  # s̄s̄ to s̄c̄W⁺
+u b > [g, a, z, w-, u, d, t, h] > d b w+                # ub to dbW⁺
+u b~ > [g, a, z, w-, u, d, t, h] > d b~ w+              # ub̄ to db̄W⁺
+u c > [g, a, z, w-, u, d, s] > d c w+                   # uc to dcW⁺
+u c > [g, a, z, w-, d, s, c] > u s w+                   # uc to usW⁺
+u c~ > [g, a, z, w-, u, d, s] > d c~ w+                 # uc̄ to dc̄W⁺
+u d > [g, a, z, w-, u, d] > d d w+                      # ud to ddW⁺
+u d~ > [g, a, z, w-, u, d, t, h] > b b~ w+              # ud̄ to bb̄W⁺
+u d~ > [g, a, z, w-, u, d, s] > c c~ w+                 # ud̄ to cc̄W⁺
+u d~ > [g, a, z, w-, u, d] > d d~ w+                    # ud̄ to dd̄W⁺
+u d~ > [g, u, d] > g g w+                               # ud̄ to ggW⁺
+u d~ > [g, a, z, w-, u, d, c] > s s~ w+                 # ud̄ to ss̄W⁺
+u d~ > [g, a, z, w-, u, d] > u u~ w+                    # ud̄ to uūW⁺
+u s > [g, a, z, w-, u, d, c] > d s w+                   # us to dsW⁺
+u s~ > [g, a, z, w-, u, d, c] > d s~ w+                 # us̄ to ds̄W⁺
+u s~ > [g, a, z, w-, d, s, c] > u c~ w+                 # us̄ to uc̄W⁺
+u u > [g, a, z, w-, u, d] > u d w+                      # uu to udW⁺
+u u~ > [g, a, z, w-, u, d] > d u~ w+                    # uū to dūW⁺
+u u~ > [g, a, z, w-, d, s, c] > s c~ w+                 # uū to sc̄W⁺
+u~ d~ > [g, a, z, w-, u, d] > u~ u~ w+                  # ūd̄ to ūūW⁺
+u~ s~ > [g, a, z, w-, d, s, c] > u~ c~ w+               # ūs̄ to ūc̄W⁺
+
+# --- W⁻ + 2 jets ---
+
+b b~ > [g, a, z, w+, s, c, t, h] > c s~ w-              # bb̄ to cs̄W⁻
+b b~ > [g, a, z, w+, u, d, t, h] > u d~ w-              # bb̄ to ud̄W⁻
+b c~ > [g, a, z, w+, s, c, t, h] > b s~ w-              # bc̄ to bs̄W⁻
+b u~ > [g, a, z, w+, u, d, t, h] > b d~ w-              # bū to bd̄W⁻
+c c~ > [g, a, z, w+, s, c] > c s~ w-                    # cc̄ to cs̄W⁻
+c c~ > [g, a, z, w+, u, d, s] > u d~ w-                 # cc̄ to ud̄W⁻
+c u~ > [g, a, z, w+, u, d, s] > c d~ w-                 # cū to cd̄W⁻
+c~ b~ > [g, a, z, w+, s, c, t, h] > s~ b~ w-            # c̄b̄ to s̄b̄W⁻
+c~ c~ > [g, a, z, w+, s, c] > s~ c~ w-                  # c̄c̄ to s̄c̄W⁻
+d b > [g, a, z, w+, u, d, t, h] > u b w-                # db to ubW⁻
+d b~ > [g, a, z, w+, u, d, t, h] > u b~ w-              # db̄ to ub̄W⁻
+d c > [g, a, z, w+, u, d, s] > u c w-                   # dc to ucW⁻
+d c~ > [g, a, z, w+, u, s, c] > d s~ w-                 # dc̄ to ds̄W⁻
+d c~ > [g, a, z, w+, u, d, s] > u c~ w-                 # dc̄ to uc̄W⁻
+d d > [g, a, z, w+, u, d] > u d w-                      # dd to udW⁻
+d d~ > [g, a, z, w+, u, s, c] > c s~ w-                 # dd̄ to cs̄W⁻
+d d~ > [g, a, z, w+, u, d] > u d~ w-                    # dd̄ to ud̄W⁻
+d s > [g, a, z, w+, u, s, c] > d c w-                   # ds to dcW⁻
+d s > [g, a, z, w+, u, d, c] > u s w-                   # ds to usW⁻
+d s~ > [g, a, z, w+, u, d, c] > u s~ w-                 # ds̄ to us̄W⁻
+d u~ > [g, a, z, w+, u, d, t, h] > b b~ w-              # dū to bb̄W⁻
+d u~ > [g, a, z, w+, u, d, s] > c c~ w-                 # dū to cc̄W⁻
+d u~ > [g, a, z, w+, u, d] > d d~ w-                    # dū to dd̄W⁻
+d u~ > [g, u, d] > g g w-                               # dū to ggW⁻
+d u~ > [g, a, z, w+, u, d, c] > s s~ w-                 # dū to ss̄W⁻
+d u~ > [g, a, z, w+, u, d] > u u~ w-                    # dū to uūW⁻
+d~ c~ > [g, a, z, w+, u, s, c] > d~ s~ w-               # d̄c̄ to d̄s̄W⁻
+g c~ > [g, s, c] > g s~ w-                              # gc̄ to gs̄W⁻
+g d > [g, u, d] > g u w-                                # gd to guW⁻
+g g > [g, s, c] > c s~ w-                               # gg to cs̄W⁻
+g g > [g, u, d] > u d~ w-                               # gg to ud̄W⁻
+g s > [g, s, c] > g c w-                                # gs to gcW⁻
+g u~ > [g, u, d] > g d~ w-                              # gū to gd̄W⁻
+s b > [g, a, z, w+, s, c, t, h] > c b w-                # sb to cbW⁻
+s b~ > [g, a, z, w+, s, c, t, h] > c b~ w-              # sb̄ to cb̄W⁻
+s c > [g, a, z, w+, s, c] > c c w-                      # sc to ccW⁻
+s c~ > [g, a, z, w+, s, c, t, h] > b b~ w-              # sc̄ to bb̄W⁻
+s c~ > [g, a, z, w+, s, c] > c c~ w-                    # sc̄ to cc̄W⁻
+s c~ > [g, a, z, w+, u, s, c] > d d~ w-                 # sc̄ to dd̄W⁻
+s c~ > [g, s, c] > g g w-                               # sc̄ to ggW⁻
+s c~ > [g, a, z, w+, s, c] > s s~ w-                    # sc̄ to ss̄W⁻
+s c~ > [g, a, z, w+, d, s, c] > u u~ w-                 # sc̄ to uūW⁻
+s d~ > [g, a, z, w+, u, s, c] > c d~ w-                 # sd̄ to cd̄W⁻
+s s > [g, a, z, w+, s, c] > s c w-                      # ss to scW⁻
+s s~ > [g, a, z, w+, s, c] > c s~ w-                    # ss̄ to cs̄W⁻
+s s~ > [g, a, z, w+, u, d, c] > u d~ w-                 # ss̄ to ud̄W⁻
+s u~ > [g, a, z, w+, d, s, c] > c u~ w-                 # sū to cūW⁻
+s u~ > [g, a, z, w+, u, d, c] > s d~ w-                 # sū to sd̄W⁻
+s~ c~ > [g, a, z, w+, s, c] > s~ s~ w-                  # s̄c̄ to s̄s̄W⁻
+u c~ > [g, a, z, w+, d, s, c] > u s~ w-                 # uc̄ to us̄W⁻
+u d > [g, a, z, w+, u, d] > u u w-                      # ud to uuW⁻
+u s > [g, a, z, w+, d, s, c] > u c w-                   # us to ucW⁻
+u u~ > [g, a, z, w+, d, s, c] > c s~ w-                 # uū to cs̄W⁻
+u u~ > [g, a, z, w+, u, d] > u d~ w-                    # uū to ud̄W⁻
+u~ b~ > [g, a, z, w+, u, d, t, h] > d~ b~ w-            # ūb̄ to d̄b̄W⁻
+u~ c~ > [g, a, z, w+, u, d, s] > d~ c~ w-               # ūc̄ to d̄c̄W⁻
+u~ c~ > [g, a, z, w+, d, s, c] > u~ s~ w-               # ūc̄ to ūs̄W⁻
+u~ d~ > [g, a, z, w+, u, d] > d~ d~ w-                  # ūd̄ to d̄d̄W⁻
+u~ s~ > [g, a, z, w+, u, d, c] > d~ s~ w-               # ūs̄ to d̄s̄W⁻
+u~ u~ > [g, a, z, w+, u, d] > u~ d~ w-                  # ūū to ūd̄W⁻
+
+# --- H + 2 jets ---
+
+b b > [g, a, z, b, h] > b b h                           # bb to bbH
+b b~ > [g, a, z, b, h] > b b~ h                         # bb̄ to bb̄H
+b b~ > [g, a, z, b] > c c~ h                            # bb̄ to cc̄H
+b b~ > [g, a, z, b] > d d~ h                            # bb̄ to dd̄H
+b b~ > [g, b] > g g h                                   # bb̄ to ggH
+b b~ > [g, a, z, b] > s s~ h                            # bb̄ to ss̄H
+b b~ > [g, a, z, b] > u u~ h                            # bb̄ to uūH
+b c~ > [g, a, z, b] > b c~ h                            # bc̄ to bc̄H
+b d~ > [g, a, z, b] > b d~ h                            # bd̄ to bd̄H
+b s~ > [g, a, z, b] > b s~ h                            # bs̄ to bs̄H
+b u~ > [g, a, z, b] > b u~ h                            # bū to būH
+b~ b~ > [g, a, z, b, h] > b~ b~ h                       # b̄b̄ to b̄b̄H
+c b > [g, a, z, b] > c b h                              # cb to cbH
+c b~ > [g, a, z, b] > c b~ h                            # cb̄ to cb̄H
+c c > [z] > c c h                                       # cc to ccH
+c c~ > [g, a, z, b] > b b~ h                            # cc̄ to bb̄H
+c c~ > [z] > c c~ h                                     # cc̄ to cc̄H
+c c~ > [z] > d d~ h                                     # cc̄ to dd̄H
+c c~ > [z, w+, w-] > s s~ h                             # cc̄ to ss̄H
+c c~ > [z] > u u~ h                                     # cc̄ to uūH
+c d~ > [z] > c d~ h                                     # cd̄ to cd̄H
+c s~ > [z, w+, w-] > c s~ h                             # cs̄ to cs̄H
+c s~ > [w+, w-] > u d~ h                                # cs̄ to ud̄H
+c u~ > [z] > c u~ h                                     # cū to cūH
+c u~ > [w+, w-] > s d~ h                                # cū to sd̄H
+c~ b~ > [g, a, z, b] > c~ b~ h                          # c̄b̄ to c̄b̄H
+c~ c~ > [z] > c~ c~ h                                   # c̄c̄ to c̄c̄H
+d b > [g, a, z, b] > d b h                              # db to dbH
+d b~ > [g, a, z, b] > d b~ h                            # db̄ to db̄H
+d c > [z] > d c h                                       # dc to dcH
+d c > [w+, w-] > u s h                                  # dc to usH
+d c~ > [z] > d c~ h                                     # dc̄ to dc̄H
+d d > [z] > d d h                                       # dd to ddH
+d d~ > [g, a, z, b] > b b~ h                            # dd̄ to bb̄H
+d d~ > [z] > c c~ h                                     # dd̄ to cc̄H
+d d~ > [z] > d d~ h                                     # dd̄ to dd̄H
+d d~ > [z] > s s~ h                                     # dd̄ to ss̄H
+d d~ > [z, w+, w-] > u u~ h                             # dd̄ to uūH
+d s > [z] > d s h                                       # ds to dsH
+d s~ > [z] > d s~ h                                     # ds̄ to ds̄H
+d s~ > [w+, w-] > u c~ h                                # ds̄ to uc̄H
+d u~ > [z, w+, w-] > d u~ h                             # dū to dūH
+d u~ > [w+, w-] > s c~ h                                # dū to sc̄H
+d~ b~ > [g, a, z, b] > d~ b~ h                          # d̄b̄ to d̄b̄H
+d~ c~ > [z] > d~ c~ h                                   # d̄c̄ to d̄c̄H
+d~ c~ > [w+, w-] > u~ s~ h                              # d̄c̄ to ūs̄H
+d~ d~ > [z] > d~ d~ h                                   # d̄d̄ to d̄d̄H
+d~ s~ > [z] > d~ s~ h                                   # d̄s̄ to d̄s̄H
+g b > [g, b] > g b h                                    # gb to gbH
+g b~ > [g, b] > g b~ h                                  # gb̄ to gb̄H
+g g > [g, b] > b b~ h                                   # gg to bb̄H
+s b > [g, a, z, b] > s b h                              # sb to sbH
+s b~ > [g, a, z, b] > s b~ h                            # sb̄ to sb̄H
+s c > [z, w+, w-] > s c h                               # sc to scH
+s c~ > [w+, w-] > d u~ h                                # sc̄ to dūH
+s c~ > [z, w+, w-] > s c~ h                             # sc̄ to sc̄H
+s d~ > [w+, w-] > c u~ h                                # sd̄ to cūH
+s d~ > [z] > s d~ h                                     # sd̄ to sd̄H
+s s > [z] > s s h                                       # ss to ssH
+s s~ > [g, a, z, b] > b b~ h                            # ss̄ to bb̄H
+s s~ > [z, w+, w-] > c c~ h                             # ss̄ to cc̄H
+s s~ > [z] > d d~ h                                     # ss̄ to dd̄H
+s s~ > [z] > s s~ h                                     # ss̄ to ss̄H
+s s~ > [z] > u u~ h                                     # ss̄ to uūH
+s u~ > [z] > s u~ h                                     # sū to sūH
+s~ b~ > [g, a, z, b] > s~ b~ h                          # s̄b̄ to s̄b̄H
+s~ c~ > [z, w+, w-] > s~ c~ h                           # s̄c̄ to s̄c̄H
+s~ s~ > [z] > s~ s~ h                                   # s̄s̄ to s̄s̄H
+u b > [g, a, z, b] > u b h                              # ub to ubH
+u b~ > [g, a, z, b] > u b~ h                            # ub̄ to ub̄H
+u c > [z] > u c h                                       # uc to ucH
+u c~ > [w+, w-] > d s~ h                                # uc̄ to ds̄H
+u c~ > [z] > u c~ h                                     # uc̄ to uc̄H
+u d > [z, w+, w-] > u d h                               # ud to udH
+u d~ > [w+, w-] > c s~ h                                # ud̄ to cs̄H
+u d~ > [z, w+, w-] > u d~ h                             # ud̄ to ud̄H
+u s > [w+, w-] > d c h                                  # us to dcH
+u s > [z] > u s h                                       # us to usH
+u s~ > [z] > u s~ h                                     # us̄ to us̄H
+u u > [z] > u u h                                       # uu to uuH
+u u~ > [g, a, z, b] > b b~ h                            # uū to bb̄H
+u u~ > [z] > c c~ h                                     # uū to cc̄H
+u u~ > [z, w+, w-] > d d~ h                             # uū to dd̄H
+u u~ > [z] > s s~ h                                     # uū to ss̄H
+u u~ > [z] > u u~ h                                     # uū to uūH
+u~ b~ > [g, a, z, b] > u~ b~ h                          # ūb̄ to ūb̄H
+u~ c~ > [z] > u~ c~ h                                   # ūc̄ to ūc̄H
+u~ d~ > [z, w+, w-] > u~ d~ h                           # ūd̄ to ūd̄H
+u~ s~ > [w+, w-] > d~ c~ h                              # ūs̄ to d̄c̄H
+u~ s~ > [z] > u~ s~ h                                   # ūs̄ to ūs̄H
+u~ u~ > [z] > u~ u~ h                                   # ūū to ūūH
+
+# --- γγ + jet ---
+
+b b~ > [b] > g a a                                      # bb̄ to gγγ
+c c~ > [c] > g a a                                      # cc̄ to gγγ
+d d~ > [d] > g a a                                      # dd̄ to gγγ
+g b > [b] > b a a                                       # gb to bγγ
+g b~ > [b] > b~ a a                                     # gb̄ to b̄γγ
+g c > [c] > c a a                                       # gc to cγγ
+g c~ > [c] > c~ a a                                     # gc̄ to c̄γγ
+g d > [d] > d a a                                       # gd to dγγ
+g d~ > [d] > d~ a a                                     # gd̄ to d̄γγ
+g s > [s] > s a a                                       # gs to sγγ
+g s~ > [s] > s~ a a                                     # gs̄ to s̄γγ
+g u > [u] > u a a                                       # gu to uγγ
+g u~ > [u] > u~ a a                                     # gū to ūγγ
+s s~ > [s] > g a a                                      # ss̄ to gγγ
+u u~ > [u] > g a a                                      # uū to gγγ
+
+# --- γH + jet ---
+
+b b~ > [b] > g a h                                      # bb̄ to gγH
+g b > [b] > b a h                                       # gb to bγH
+g b~ > [b] > b~ a h                                     # gb̄ to b̄γH
+
+# --- γW⁺ + jet ---
+
+c s~ > [w+, s, c] > g w+ a                              # cs̄ to gW⁺γ
+g b~ > [w+, b, t] > t~ w+ a                             # gb̄ to t̄W⁺γ
+g c > [w+, s, c] > s w+ a                               # gc to sW⁺γ
+g d~ > [w+, u, d] > u~ w+ a                             # gd̄ to ūW⁺γ
+g s~ > [w+, s, c] > c~ w+ a                             # gs̄ to c̄W⁺γ
+g u > [w+, u, d] > d w+ a                               # gu to dW⁺γ
+u d~ > [w+, u, d] > g w+ a                              # ud̄ to gW⁺γ
+
+# --- γW⁻ + jet ---
+
+d u~ > [w-, u, d] > g w- a                              # dū to gW⁻γ
+g b > [w-, b, t] > t w- a                               # gb to tW⁻γ
+g c~ > [w-, s, c] > s~ w- a                             # gc̄ to s̄W⁻γ
+g d > [w-, u, d] > u w- a                               # gd to uW⁻γ
+g s > [w-, s, c] > c w- a                               # gs to cW⁻γ
+g u~ > [w-, u, d] > d~ w- a                             # gū to d̄W⁻γ
+s c~ > [w-, s, c] > g w- a                              # sc̄ to gW⁻γ
+
+# --- γZ + jet ---
+
+b b~ > [b] > g a z                                      # bb̄ to gγZ
+c c~ > [c] > g a z                                      # cc̄ to gγZ
+d d~ > [d] > g a z                                      # dd̄ to gγZ
+g b > [b] > b a z                                       # gb to bγZ
+g b~ > [b] > b~ a z                                     # gb̄ to b̄γZ
+g c > [c] > c a z                                       # gc to cγZ
+g c~ > [c] > c~ a z                                     # gc̄ to c̄γZ
+g d > [d] > d a z                                       # gd to dγZ
+g d~ > [d] > d~ a z                                     # gd̄ to d̄γZ
+g s > [s] > s a z                                       # gs to sγZ
+g s~ > [s] > s~ a z                                     # gs̄ to s̄γZ
+g u > [u] > u a z                                       # gu to uγZ
+g u~ > [u] > u~ a z                                     # gū to ūγZ
+s s~ > [s] > g a z                                      # ss̄ to gγZ
+u u~ > [u] > g a z                                      # uū to gγZ
+
+# --- HH + jet ---
+
+b b~ > [b, h] > g h h                                   # bb̄ to gHH
+g b > [b, h] > b h h                                    # gb to bHH
+g b~ > [b, h] > b~ h h                                  # gb̄ to b̄HH
+
+# --- W⁺H + jet ---
+
+c s~ > [w+, s, c] > g w+ h                              # cs̄ to gW⁺H
+g b~ > [w+, b, t] > t~ w+ h                             # gb̄ to t̄W⁺H
+g c > [w+, s, c] > s w+ h                               # gc to sW⁺H
+g d~ > [w+, u, d] > u~ w+ h                             # gd̄ to ūW⁺H
+g s~ > [w+, s, c] > c~ w+ h                             # gs̄ to c̄W⁺H
+g u > [w+, u, d] > d w+ h                               # gu to dW⁺H
+u d~ > [w+, u, d] > g w+ h                              # ud̄ to gW⁺H
+
+# --- W⁻H + jet ---
+
+d u~ > [w-, u, d] > g w- h                              # dū to gW⁻H
+g b > [w-, b, t] > t w- h                               # gb to tW⁻H
+g c~ > [w-, s, c] > s~ w- h                             # gc̄ to s̄W⁻H
+g d > [w-, u, d] > u w- h                               # gd to uW⁻H
+g s > [w-, s, c] > c w- h                               # gs to cW⁻H
+g u~ > [w-, u, d] > d~ w- h                             # gū to d̄W⁻H
+s c~ > [w-, s, c] > g w- h                              # sc̄ to gW⁻H
+
+# --- ZH + jet ---
+
+b b~ > [z, b] > g z h                                   # bb̄ to gZH
+c c~ > [z, c] > g z h                                   # cc̄ to gZH
+d d~ > [z, d] > g z h                                   # dd̄ to gZH
+g b > [z, b] > b z h                                    # gb to bZH
+g b~ > [z, b] > b~ z h                                  # gb̄ to b̄ZH
+g c > [z, c] > c z h                                    # gc to cZH
+g c~ > [z, c] > c~ z h                                  # gc̄ to c̄ZH
+g d > [z, d] > d z h                                    # gd to dZH
+g d~ > [z, d] > d~ z h                                  # gd̄ to d̄ZH
+g s > [z, s] > s z h                                    # gs to sZH
+g s~ > [z, s] > s~ z h                                  # gs̄ to s̄ZH
+g u > [z, u] > u z h                                    # gu to uZH
+g u~ > [z, u] > u~ z h                                  # gū to ūZH
+s s~ > [z, s] > g z h                                   # ss̄ to gZH
+u u~ > [z, u] > g z h                                   # uū to gZH
+
+# --- W⁺W⁻ + jet ---
+
+b b~ > [a, z, b, t, h] > g w+ w-                        # bb̄ to gW⁺W⁻
+c c~ > [a, z, s, c] > g w+ w-                           # cc̄ to gW⁺W⁻
+d d~ > [a, z, u, d] > g w+ w-                           # dd̄ to gW⁺W⁻
+g b > [a, z, b, t, h] > b w+ w-                         # gb to bW⁺W⁻
+g b~ > [a, z, b, t, h] > b~ w+ w-                       # gb̄ to b̄W⁺W⁻
+g c > [a, z, s, c] > c w+ w-                            # gc to cW⁺W⁻
+g c~ > [a, z, s, c] > c~ w+ w-                          # gc̄ to c̄W⁺W⁻
+g d > [a, z, u, d] > d w+ w-                            # gd to dW⁺W⁻
+g d~ > [a, z, u, d] > d~ w+ w-                          # gd̄ to d̄W⁺W⁻
+g s > [a, z, s, c] > s w+ w-                            # gs to sW⁺W⁻
+g s~ > [a, z, s, c] > s~ w+ w-                          # gs̄ to s̄W⁺W⁻
+g u > [a, z, u, d] > u w+ w-                            # gu to uW⁺W⁻
+g u~ > [a, z, u, d] > u~ w+ w-                          # gū to ūW⁺W⁻
+s s~ > [a, z, s, c] > g w+ w-                           # ss̄ to gW⁺W⁻
+u u~ > [a, z, u, d] > g w+ w-                           # uū to gW⁺W⁻
+
+# --- W⁺Z + jet ---
+
+c s~ > [w+, s, c] > g w+ z                              # cs̄ to gW⁺Z
+g b~ > [w+, b, t] > t~ w+ z                             # gb̄ to t̄W⁺Z
+g c > [w+, s, c] > s w+ z                               # gc to sW⁺Z
+g d~ > [w+, u, d] > u~ w+ z                             # gd̄ to ūW⁺Z
+g s~ > [w+, s, c] > c~ w+ z                             # gs̄ to c̄W⁺Z
+g u > [w+, u, d] > d w+ z                               # gu to dW⁺Z
+u d~ > [w+, u, d] > g w+ z                              # ud̄ to gW⁺Z
+
+# --- W⁻Z + jet ---
+
+d u~ > [w-, u, d] > g w- z                              # dū to gW⁻Z
+g b > [w-, b, t] > t w- z                               # gb to tW⁻Z
+g c~ > [w-, s, c] > s~ w- z                             # gc̄ to s̄W⁻Z
+g d > [w-, u, d] > u w- z                               # gd to uW⁻Z
+g s > [w-, s, c] > c w- z                               # gs to cW⁻Z
+g u~ > [w-, u, d] > d~ w- z                             # gū to d̄W⁻Z
+s c~ > [w-, s, c] > g w- z                              # sc̄ to gW⁻Z
+
+# --- ZZ + jet ---
+
+b b~ > [b, h] > g z z                                   # bb̄ to gZZ
+c c~ > [c] > g z z                                      # cc̄ to gZZ
+d d~ > [d] > g z z                                      # dd̄ to gZZ
+g b > [b, h] > b z z                                    # gb to bZZ
+g b~ > [b, h] > b~ z z                                  # gb̄ to b̄ZZ
+g c > [c] > c z z                                       # gc to cZZ
+g c~ > [c] > c~ z z                                     # gc̄ to c̄ZZ
+g d > [d] > d z z                                       # gd to dZZ
+g d~ > [d] > d~ z z                                     # gd̄ to d̄ZZ
+g s > [s] > s z z                                       # gs to sZZ
+g s~ > [s] > s~ z z                                     # gs̄ to s̄ZZ
+g u > [u] > u z z                                       # gu to uZZ
+g u~ > [u] > u~ z z                                     # gū to ūZZ
+s s~ > [s] > g z z                                      # ss̄ to gZZ
+u u~ > [u] > g z z                                      # uū to gZZ
+
+# --- Triboson ---
+
+b b~ > [b] > a a a                                      # bb̄ to γγγ
+b b~ > [b] > a a h                                      # bb̄ to γγH
+b b~ > [b] > a a z                                      # bb̄ to γγZ
+b b~ > [b, h] > a h h                                   # bb̄ to γHH
+b b~ > [z, b] > a z h                                   # bb̄ to γZH
+b b~ > [b, h] > a z z                                   # bb̄ to γZZ
+b b~ > [b, h] > h h h                                   # bb̄ to HHH
+b b~ > [a, z, w+, w-, b, t, h] > w+ w- a                # bb̄ to W⁺W⁻γ
+b b~ > [a, z, w+, w-, b, t, h] > w+ w- h                # bb̄ to W⁺W⁻H
+b b~ > [a, z, w+, w-, b, t, h] > w+ w- z                # bb̄ to W⁺W⁻Z
+b b~ > [z, b, h] > z h h                                # bb̄ to ZHH
+b b~ > [z, b, h] > z z h                                # bb̄ to ZZH
+b b~ > [z, b, h] > z z z                                # bb̄ to ZZZ
+c c~ > [c] > a a a                                      # cc̄ to γγγ
+c c~ > [c] > a a z                                      # cc̄ to γγZ
+c c~ > [z, c] > a z h                                   # cc̄ to γZH
+c c~ > [c] > a z z                                      # cc̄ to γZZ
+c c~ > [a, z, w+, w-, s, c] > w+ w- a                   # cc̄ to W⁺W⁻γ
+c c~ > [a, z, w+, w-, s] > w+ w- h                      # cc̄ to W⁺W⁻H
+c c~ > [a, z, w+, w-, s, c, h] > w+ w- z                # cc̄ to W⁺W⁻Z
+c c~ > [z, h] > z h h                                   # cc̄ to ZHH
+c c~ > [z, c] > z z h                                   # cc̄ to ZZH
+c c~ > [z, c, h] > z z z                                # cc̄ to ZZZ
+c s~ > [w+, w-, s, c] > w+ a a                          # cs̄ to W⁺γγ
+c s~ > [w+, w-, s, c] > w+ a h                          # cs̄ to W⁺γH
+c s~ > [w+, w-, s, c] > w+ a z                          # cs̄ to W⁺γZ
+c s~ > [w+, w-, h] > w+ h h                             # cs̄ to W⁺HH
+c s~ > [a, z, w-, s, c, h] > w+ w+ w-                   # cs̄ to W⁺W⁺W⁻
+c s~ > [z, w+, w-, s, c] > w+ z h                       # cs̄ to W⁺ZH
+c s~ > [w+, w-, s, c, h] > w+ z z                       # cs̄ to W⁺ZZ
+d d~ > [d] > a a a                                      # dd̄ to γγγ
+d d~ > [d] > a a z                                      # dd̄ to γγZ
+d d~ > [z, d] > a z h                                   # dd̄ to γZH
+d d~ > [d] > a z z                                      # dd̄ to γZZ
+d d~ > [a, z, w+, w-, u, d] > w+ w- a                   # dd̄ to W⁺W⁻γ
+d d~ > [a, z, w+, w-, u] > w+ w- h                      # dd̄ to W⁺W⁻H
+d d~ > [a, z, w+, w-, u, d, h] > w+ w- z                # dd̄ to W⁺W⁻Z
+d d~ > [z, h] > z h h                                   # dd̄ to ZHH
+d d~ > [z, d] > z z h                                   # dd̄ to ZZH
+d d~ > [z, d, h] > z z z                                # dd̄ to ZZZ
+d u~ > [w+, w-, u, d] > w- a a                          # dū to W⁻γγ
+d u~ > [w+, w-, u, d] > w- a h                          # dū to W⁻γH
+d u~ > [w+, w-, u, d] > w- a z                          # dū to W⁻γZ
+d u~ > [w+, w-, h] > w- h h                             # dū to W⁻HH
+d u~ > [z, w+, w-, u, d] > w- z h                       # dū to W⁻ZH
+d u~ > [w+, w-, u, d, h] > w- z z                       # dū to W⁻ZZ
+d u~ > [a, z, w+, u, d, h] > w+ w- w-                   # dū to W⁺W⁻W⁻
+s c~ > [w+, w-, s, c] > w- a a                          # sc̄ to W⁻γγ
+s c~ > [w+, w-, s, c] > w- a h                          # sc̄ to W⁻γH
+s c~ > [w+, w-, s, c] > w- a z                          # sc̄ to W⁻γZ
+s c~ > [w+, w-, h] > w- h h                             # sc̄ to W⁻HH
+s c~ > [z, w+, w-, s, c] > w- z h                       # sc̄ to W⁻ZH
+s c~ > [w+, w-, s, c, h] > w- z z                       # sc̄ to W⁻ZZ
+s c~ > [a, z, w+, s, c, h] > w+ w- w-                   # sc̄ to W⁺W⁻W⁻
+s s~ > [s] > a a a                                      # ss̄ to γγγ
+s s~ > [s] > a a z                                      # ss̄ to γγZ
+s s~ > [z, s] > a z h                                   # ss̄ to γZH
+s s~ > [s] > a z z                                      # ss̄ to γZZ
+s s~ > [a, z, w+, w-, s, c] > w+ w- a                   # ss̄ to W⁺W⁻γ
+s s~ > [a, z, w+, w-, c] > w+ w- h                      # ss̄ to W⁺W⁻H
+s s~ > [a, z, w+, w-, s, c, h] > w+ w- z                # ss̄ to W⁺W⁻Z
+s s~ > [z, h] > z h h                                   # ss̄ to ZHH
+s s~ > [z, s] > z z h                                   # ss̄ to ZZH
+s s~ > [z, s, h] > z z z                                # ss̄ to ZZZ
+u d~ > [w+, w-, u, d] > w+ a a                          # ud̄ to W⁺γγ
+u d~ > [w+, w-, u, d] > w+ a h                          # ud̄ to W⁺γH
+u d~ > [w+, w-, u, d] > w+ a z                          # ud̄ to W⁺γZ
+u d~ > [w+, w-, h] > w+ h h                             # ud̄ to W⁺HH
+u d~ > [a, z, w-, u, d, h] > w+ w+ w-                   # ud̄ to W⁺W⁺W⁻
+u d~ > [z, w+, w-, u, d] > w+ z h                       # ud̄ to W⁺ZH
+u d~ > [w+, w-, u, d, h] > w+ z z                       # ud̄ to W⁺ZZ
+u u~ > [u] > a a a                                      # uū to γγγ
+u u~ > [u] > a a z                                      # uū to γγZ
+u u~ > [z, u] > a z h                                   # uū to γZH
+u u~ > [u] > a z z                                      # uū to γZZ
+u u~ > [a, z, w+, w-, u, d] > w+ w- a                   # uū to W⁺W⁻γ
+u u~ > [a, z, w+, w-, d] > w+ w- h                      # uū to W⁺W⁻H
+u u~ > [a, z, w+, w-, u, d, h] > w+ w- z                # uū to W⁺W⁻Z
+u u~ > [z, h] > z h h                                   # uū to ZHH
+u u~ > [z, u] > z z h                                   # uū to ZZH
+u u~ > [z, u, h] > z z z                                # uū to ZZZ
+
+# --- Drell-Yan + jet (NC charged): l⁺l⁻ + parton ---
+
+b b~ > [a, z, b] > g e- e+                              # bb̄ to ge⁻e⁺
+b b~ > [a, z, b] > g mu- mu+                            # bb̄ to gμ⁻μ⁺
+b b~ > [a, z, b, h] > g ta- ta+                         # bb̄ to gτ⁻τ⁺
+c c~ > [a, z, c] > g e- e+                              # cc̄ to ge⁻e⁺
+c c~ > [a, z, c] > g mu- mu+                            # cc̄ to gμ⁻μ⁺
+c c~ > [a, z, c] > g ta- ta+                            # cc̄ to gτ⁻τ⁺
+d d~ > [a, z, d] > g e- e+                              # dd̄ to ge⁻e⁺
+d d~ > [a, z, d] > g mu- mu+                            # dd̄ to gμ⁻μ⁺
+d d~ > [a, z, d] > g ta- ta+                            # dd̄ to gτ⁻τ⁺
+g b > [a, z, b] > b e- e+                               # gb to be⁻e⁺
+g b > [a, z, b] > b mu- mu+                             # gb to bμ⁻μ⁺
+g b > [a, z, b, h] > b ta- ta+                          # gb to bτ⁻τ⁺
+g b~ > [a, z, b] > b~ e- e+                             # gb̄ to b̄e⁻e⁺
+g b~ > [a, z, b] > b~ mu- mu+                           # gb̄ to b̄μ⁻μ⁺
+g b~ > [a, z, b, h] > b~ ta- ta+                        # gb̄ to b̄τ⁻τ⁺
+g c > [a, z, c] > c e- e+                               # gc to ce⁻e⁺
+g c > [a, z, c] > c mu- mu+                             # gc to cμ⁻μ⁺
+g c > [a, z, c] > c ta- ta+                             # gc to cτ⁻τ⁺
+g c~ > [a, z, c] > c~ e- e+                             # gc̄ to c̄e⁻e⁺
+g c~ > [a, z, c] > c~ mu- mu+                           # gc̄ to c̄μ⁻μ⁺
+g c~ > [a, z, c] > c~ ta- ta+                           # gc̄ to c̄τ⁻τ⁺
+g d > [a, z, d] > d e- e+                               # gd to de⁻e⁺
+g d > [a, z, d] > d mu- mu+                             # gd to dμ⁻μ⁺
+g d > [a, z, d] > d ta- ta+                             # gd to dτ⁻τ⁺
+g d~ > [a, z, d] > d~ e- e+                             # gd̄ to d̄e⁻e⁺
+g d~ > [a, z, d] > d~ mu- mu+                           # gd̄ to d̄μ⁻μ⁺
+g d~ > [a, z, d] > d~ ta- ta+                           # gd̄ to d̄τ⁻τ⁺
+g s > [a, z, s] > s e- e+                               # gs to se⁻e⁺
+g s > [a, z, s] > s mu- mu+                             # gs to sμ⁻μ⁺
+g s > [a, z, s] > s ta- ta+                             # gs to sτ⁻τ⁺
+g s~ > [a, z, s] > s~ e- e+                             # gs̄ to s̄e⁻e⁺
+g s~ > [a, z, s] > s~ mu- mu+                           # gs̄ to s̄μ⁻μ⁺
+g s~ > [a, z, s] > s~ ta- ta+                           # gs̄ to s̄τ⁻τ⁺
+g u > [a, z, u] > u e- e+                               # gu to ue⁻e⁺
+g u > [a, z, u] > u mu- mu+                             # gu to uμ⁻μ⁺
+g u > [a, z, u] > u ta- ta+                             # gu to uτ⁻τ⁺
+g u~ > [a, z, u] > u~ e- e+                             # gū to ūe⁻e⁺
+g u~ > [a, z, u] > u~ mu- mu+                           # gū to ūμ⁻μ⁺
+g u~ > [a, z, u] > u~ ta- ta+                           # gū to ūτ⁻τ⁺
+s s~ > [a, z, s] > g e- e+                              # ss̄ to ge⁻e⁺
+s s~ > [a, z, s] > g mu- mu+                            # ss̄ to gμ⁻μ⁺
+s s~ > [a, z, s] > g ta- ta+                            # ss̄ to gτ⁻τ⁺
+u u~ > [a, z, u] > g e- e+                              # uū to ge⁻e⁺
+u u~ > [a, z, u] > g mu- mu+                            # uū to gμ⁻μ⁺
+u u~ > [a, z, u] > g ta- ta+                            # uū to gτ⁻τ⁺
+
+# --- Drell-Yan + jet (CC): lν + parton ---
+
+c s~ > [w+, s, c] > g e+ ve                             # cs̄ to ge⁺νe
+c s~ > [w+, s, c] > g mu+ vm                            # cs̄ to gμ⁺νμ
+c s~ > [w+, s, c] > g ta+ vt                            # cs̄ to gτ⁺ντ
+d u~ > [w-, u, d] > g e- ve~                            # dū to ge⁻ν̄e
+d u~ > [w-, u, d] > g mu- vm~                           # dū to gμ⁻ν̄μ
+d u~ > [w-, u, d] > g ta- vt~                           # dū to gτ⁻ν̄τ
+g c > [w+, s, c] > s e+ ve                              # gc to se⁺νe
+g c > [w+, s, c] > s mu+ vm                             # gc to sμ⁺νμ
+g c > [w+, s, c] > s ta+ vt                             # gc to sτ⁺ντ
+g c~ > [w-, s, c] > s~ e- ve~                           # gc̄ to s̄e⁻ν̄e
+g c~ > [w-, s, c] > s~ mu- vm~                          # gc̄ to s̄μ⁻ν̄μ
+g c~ > [w-, s, c] > s~ ta- vt~                          # gc̄ to s̄τ⁻ν̄τ
+g d > [w-, u, d] > u e- ve~                             # gd to ue⁻ν̄e
+g d > [w-, u, d] > u mu- vm~                            # gd to uμ⁻ν̄μ
+g d > [w-, u, d] > u ta- vt~                            # gd to uτ⁻ν̄τ
+g d~ > [w+, u, d] > u~ e+ ve                            # gd̄ to ūe⁺νe
+g d~ > [w+, u, d] > u~ mu+ vm                           # gd̄ to ūμ⁺νμ
+g d~ > [w+, u, d] > u~ ta+ vt                           # gd̄ to ūτ⁺ντ
+g s > [w-, s, c] > c e- ve~                             # gs to ce⁻ν̄e
+g s > [w-, s, c] > c mu- vm~                            # gs to cμ⁻ν̄μ
+g s > [w-, s, c] > c ta- vt~                            # gs to cτ⁻ν̄τ
+g s~ > [w+, s, c] > c~ e+ ve                            # gs̄ to c̄e⁺νe
+g s~ > [w+, s, c] > c~ mu+ vm                           # gs̄ to c̄μ⁺νμ
+g s~ > [w+, s, c] > c~ ta+ vt                           # gs̄ to c̄τ⁺ντ
+g u > [w+, u, d] > d e+ ve                              # gu to de⁺νe
+g u > [w+, u, d] > d mu+ vm                             # gu to dμ⁺νμ
+g u > [w+, u, d] > d ta+ vt                             # gu to dτ⁺ντ
+g u~ > [w-, u, d] > d~ e- ve~                           # gū to d̄e⁻ν̄e
+g u~ > [w-, u, d] > d~ mu- vm~                          # gū to d̄μ⁻ν̄μ
+g u~ > [w-, u, d] > d~ ta- vt~                          # gū to d̄τ⁻ν̄τ
+s c~ > [w-, s, c] > g e- ve~                            # sc̄ to ge⁻ν̄e
+s c~ > [w-, s, c] > g mu- vm~                           # sc̄ to gμ⁻ν̄μ
+s c~ > [w-, s, c] > g ta- vt~                           # sc̄ to gτ⁻ν̄τ
+u d~ > [w+, u, d] > g e+ ve                             # ud̄ to ge⁺νe
+u d~ > [w+, u, d] > g mu+ vm                            # ud̄ to gμ⁺νμ
+u d~ > [w+, u, d] > g ta+ vt                            # ud̄ to gτ⁺ντ
+
+# --- Drell-Yan + jet (NC neutrino): νν̄ + parton ---
+
+b b~ > [z, b] > g ve ve~                                # bb̄ to gνeν̄e
+b b~ > [z, b] > g vm vm~                                # bb̄ to gνμν̄μ
+b b~ > [z, b] > g vt vt~                                # bb̄ to gντν̄τ
+c c~ > [z, c] > g ve ve~                                # cc̄ to gνeν̄e
+c c~ > [z, c] > g vm vm~                                # cc̄ to gνμν̄μ
+c c~ > [z, c] > g vt vt~                                # cc̄ to gντν̄τ
+d d~ > [z, d] > g ve ve~                                # dd̄ to gνeν̄e
+d d~ > [z, d] > g vm vm~                                # dd̄ to gνμν̄μ
+d d~ > [z, d] > g vt vt~                                # dd̄ to gντν̄τ
+g b > [z, b] > b ve ve~                                 # gb to bνeν̄e
+g b > [z, b] > b vm vm~                                 # gb to bνμν̄μ
+g b > [z, b] > b vt vt~                                 # gb to bντν̄τ
+g b~ > [z, b] > b~ ve ve~                               # gb̄ to b̄νeν̄e
+g b~ > [z, b] > b~ vm vm~                               # gb̄ to b̄νμν̄μ
+g b~ > [z, b] > b~ vt vt~                               # gb̄ to b̄ντν̄τ
+g c > [z, c] > c ve ve~                                 # gc to cνeν̄e
+g c > [z, c] > c vm vm~                                 # gc to cνμν̄μ
+g c > [z, c] > c vt vt~                                 # gc to cντν̄τ
+g c~ > [z, c] > c~ ve ve~                               # gc̄ to c̄νeν̄e
+g c~ > [z, c] > c~ vm vm~                               # gc̄ to c̄νμν̄μ
+g c~ > [z, c] > c~ vt vt~                               # gc̄ to c̄ντν̄τ
+g d > [z, d] > d ve ve~                                 # gd to dνeν̄e
+g d > [z, d] > d vm vm~                                 # gd to dνμν̄μ
+g d > [z, d] > d vt vt~                                 # gd to dντν̄τ
+g d~ > [z, d] > d~ ve ve~                               # gd̄ to d̄νeν̄e
+g d~ > [z, d] > d~ vm vm~                               # gd̄ to d̄νμν̄μ
+g d~ > [z, d] > d~ vt vt~                               # gd̄ to d̄ντν̄τ
+g s > [z, s] > s ve ve~                                 # gs to sνeν̄e
+g s > [z, s] > s vm vm~                                 # gs to sνμν̄μ
+g s > [z, s] > s vt vt~                                 # gs to sντν̄τ
+g s~ > [z, s] > s~ ve ve~                               # gs̄ to s̄νeν̄e
+g s~ > [z, s] > s~ vm vm~                               # gs̄ to s̄νμν̄μ
+g s~ > [z, s] > s~ vt vt~                               # gs̄ to s̄ντν̄τ
+g u > [z, u] > u ve ve~                                 # gu to uνeν̄e
+g u > [z, u] > u vm vm~                                 # gu to uνμν̄μ
+g u > [z, u] > u vt vt~                                 # gu to uντν̄τ
+g u~ > [z, u] > u~ ve ve~                               # gū to ūνeν̄e
+g u~ > [z, u] > u~ vm vm~                               # gū to ūνμν̄μ
+g u~ > [z, u] > u~ vt vt~                               # gū to ūντν̄τ
+s s~ > [z, s] > g ve ve~                                # ss̄ to gνeν̄e
+s s~ > [z, s] > g vm vm~                                # ss̄ to gνμν̄μ
+s s~ > [z, s] > g vt vt~                                # ss̄ to gντν̄τ
+u u~ > [z, u] > g ve ve~                                # uū to gνeν̄e
+u u~ > [z, u] > g vm vm~                                # uū to gνμν̄μ
+u u~ > [z, u] > g vt vt~                                # uū to gντν̄τ
+
+# --- Boson + lepton pair ---
+
+b b~ > [a, z, b, e-] > a e- e+                          # bb̄ to γe⁻e⁺
+b b~ > [a, z, b, mu-] > a mu- mu+                       # bb̄ to γμ⁻μ⁺
+b b~ > [a, z, b, ta-, h] > a ta- ta+                    # bb̄ to γτ⁻τ⁺
+b b~ > [z, b] > a ve ve~                                # bb̄ to γνeν̄e
+b b~ > [z, b] > a vm vm~                                # bb̄ to γνμν̄μ
+b b~ > [z, b] > a vt vt~                                # bb̄ to γντν̄τ
+b b~ > [a, z, b] > h e- e+                              # bb̄ to He⁻e⁺
+b b~ > [a, z, b] > h mu- mu+                            # bb̄ to Hμ⁻μ⁺
+b b~ > [a, z, b, ta-, h] > h ta- ta+                    # bb̄ to Hτ⁻τ⁺
+b b~ > [z, b] > h ve ve~                                # bb̄ to Hνeν̄e
+b b~ > [z, b] > h vm vm~                                # bb̄ to Hνμν̄μ
+b b~ > [z, b] > h vt vt~                                # bb̄ to Hντν̄τ
+b b~ > [a, z, w+, t, e-, ve, h] > w- e+ ve              # bb̄ to W⁻e⁺νe
+b b~ > [a, z, w+, t, mu-, vm, h] > w- mu+ vm            # bb̄ to W⁻μ⁺νμ
+b b~ > [a, z, w+, t, ta-, vt, h] > w- ta+ vt            # bb̄ to W⁻τ⁺ντ
+b b~ > [a, z, w-, t, e-, ve, h] > w+ e- ve~             # bb̄ to W⁺e⁻ν̄e
+b b~ > [a, z, w-, t, mu-, vm, h] > w+ mu- vm~           # bb̄ to W⁺μ⁻ν̄μ
+b b~ > [a, z, w-, t, ta-, vt, h] > w+ ta- vt~           # bb̄ to W⁺τ⁻ν̄τ
+b b~ > [a, z, b, e-, h] > z e- e+                       # bb̄ to Ze⁻e⁺
+b b~ > [a, z, b, mu-, h] > z mu- mu+                    # bb̄ to Zμ⁻μ⁺
+b b~ > [a, z, b, ta-, h] > z ta- ta+                    # bb̄ to Zτ⁻τ⁺
+b b~ > [z, b, ve, h] > z ve ve~                         # bb̄ to Zνeν̄e
+b b~ > [z, b, vm, h] > z vm vm~                         # bb̄ to Zνμν̄μ
+b b~ > [z, b, vt, h] > z vt vt~                         # bb̄ to Zντν̄τ
+c c~ > [a, z, c, e-] > a e- e+                          # cc̄ to γe⁻e⁺
+c c~ > [a, z, c, mu-] > a mu- mu+                       # cc̄ to γμ⁻μ⁺
+c c~ > [a, z, c, ta-] > a ta- ta+                       # cc̄ to γτ⁻τ⁺
+c c~ > [z, c] > a ve ve~                                # cc̄ to γνeν̄e
+c c~ > [z, c] > a vm vm~                                # cc̄ to γνμν̄μ
+c c~ > [z, c] > a vt vt~                                # cc̄ to γντν̄τ
+c c~ > [z] > h e- e+                                    # cc̄ to He⁻e⁺
+c c~ > [z] > h mu- mu+                                  # cc̄ to Hμ⁻μ⁺
+c c~ > [a, z, ta-] > h ta- ta+                          # cc̄ to Hτ⁻τ⁺
+c c~ > [z] > h ve ve~                                   # cc̄ to Hνeν̄e
+c c~ > [z] > h vm vm~                                   # cc̄ to Hνμν̄μ
+c c~ > [z] > h vt vt~                                   # cc̄ to Hντν̄τ
+c c~ > [a, z, w+, s, e-, ve] > w- e+ ve                 # cc̄ to W⁻e⁺νe
+c c~ > [a, z, w+, s, mu-, vm] > w- mu+ vm               # cc̄ to W⁻μ⁺νμ
+c c~ > [a, z, w+, s, ta-, vt] > w- ta+ vt               # cc̄ to W⁻τ⁺ντ
+c c~ > [a, z, w-, s, e-, ve] > w+ e- ve~                # cc̄ to W⁺e⁻ν̄e
+c c~ > [a, z, w-, s, mu-, vm] > w+ mu- vm~              # cc̄ to W⁺μ⁻ν̄μ
+c c~ > [a, z, w-, s, ta-, vt] > w+ ta- vt~              # cc̄ to W⁺τ⁻ν̄τ
+c c~ > [a, z, c, e-] > z e- e+                          # cc̄ to Ze⁻e⁺
+c c~ > [a, z, c, mu-] > z mu- mu+                       # cc̄ to Zμ⁻μ⁺
+c c~ > [a, z, c, ta-, h] > z ta- ta+                    # cc̄ to Zτ⁻τ⁺
+c c~ > [z, c, ve] > z ve ve~                            # cc̄ to Zνeν̄e
+c c~ > [z, c, vm] > z vm vm~                            # cc̄ to Zνμν̄μ
+c c~ > [z, c, vt] > z vt vt~                            # cc̄ to Zντν̄τ
+c s~ > [w+, w-, s, c, e-] > a e+ ve                     # cs̄ to γe⁺νe
+c s~ > [w+, w-, s, c, mu-] > a mu+ vm                   # cs̄ to γμ⁺νμ
+c s~ > [w+, w-, s, c, ta-] > a ta+ vt                   # cs̄ to γτ⁺ντ
+c s~ > [w+, w-] > h e+ ve                               # cs̄ to He⁺νe
+c s~ > [w+, w-] > h mu+ vm                              # cs̄ to Hμ⁺νμ
+c s~ > [w+, w-, ta-] > h ta+ vt                         # cs̄ to Hτ⁺ντ
+c s~ > [a, z, w-, s, c, ve] > w+ e- e+                  # cs̄ to W⁺e⁻e⁺
+c s~ > [a, z, w-, s, c, vm] > w+ mu- mu+                # cs̄ to W⁺μ⁻μ⁺
+c s~ > [a, z, w-, s, c, vt, h] > w+ ta- ta+             # cs̄ to W⁺τ⁻τ⁺
+c s~ > [z, w-, s, c, e-] > w+ ve ve~                    # cs̄ to W⁺νeν̄e
+c s~ > [z, w-, s, c, mu-] > w+ vm vm~                   # cs̄ to W⁺νμν̄μ
+c s~ > [z, w-, s, c, ta-] > w+ vt vt~                   # cs̄ to W⁺ντν̄τ
+c s~ > [w+, w-, s, c, e-, ve] > z e+ ve                 # cs̄ to Ze⁺νe
+c s~ > [w+, w-, s, c, mu-, vm] > z mu+ vm               # cs̄ to Zμ⁺νμ
+c s~ > [w+, w-, s, c, ta-, vt] > z ta+ vt               # cs̄ to Zτ⁺ντ
+d d~ > [a, z, d, e-] > a e- e+                          # dd̄ to γe⁻e⁺
+d d~ > [a, z, d, mu-] > a mu- mu+                       # dd̄ to γμ⁻μ⁺
+d d~ > [a, z, d, ta-] > a ta- ta+                       # dd̄ to γτ⁻τ⁺
+d d~ > [z, d] > a ve ve~                                # dd̄ to γνeν̄e
+d d~ > [z, d] > a vm vm~                                # dd̄ to γνμν̄μ
+d d~ > [z, d] > a vt vt~                                # dd̄ to γντν̄τ
+d d~ > [z] > h e- e+                                    # dd̄ to He⁻e⁺
+d d~ > [z] > h mu- mu+                                  # dd̄ to Hμ⁻μ⁺
+d d~ > [a, z, ta-] > h ta- ta+                          # dd̄ to Hτ⁻τ⁺
+d d~ > [z] > h ve ve~                                   # dd̄ to Hνeν̄e
+d d~ > [z] > h vm vm~                                   # dd̄ to Hνμν̄μ
+d d~ > [z] > h vt vt~                                   # dd̄ to Hντν̄τ
+d d~ > [a, z, w+, u, e-, ve] > w- e+ ve                 # dd̄ to W⁻e⁺νe
+d d~ > [a, z, w+, u, mu-, vm] > w- mu+ vm               # dd̄ to W⁻μ⁺νμ
+d d~ > [a, z, w+, u, ta-, vt] > w- ta+ vt               # dd̄ to W⁻τ⁺ντ
+d d~ > [a, z, w-, u, e-, ve] > w+ e- ve~                # dd̄ to W⁺e⁻ν̄e
+d d~ > [a, z, w-, u, mu-, vm] > w+ mu- vm~              # dd̄ to W⁺μ⁻ν̄μ
+d d~ > [a, z, w-, u, ta-, vt] > w+ ta- vt~              # dd̄ to W⁺τ⁻ν̄τ
+d d~ > [a, z, d, e-] > z e- e+                          # dd̄ to Ze⁻e⁺
+d d~ > [a, z, d, mu-] > z mu- mu+                       # dd̄ to Zμ⁻μ⁺
+d d~ > [a, z, d, ta-, h] > z ta- ta+                    # dd̄ to Zτ⁻τ⁺
+d d~ > [z, d, ve] > z ve ve~                            # dd̄ to Zνeν̄e
+d d~ > [z, d, vm] > z vm vm~                            # dd̄ to Zνμν̄μ
+d d~ > [z, d, vt] > z vt vt~                            # dd̄ to Zντν̄τ
+d u~ > [w+, w-, u, d, e-] > a e- ve~                    # dū to γe⁻ν̄e
+d u~ > [w+, w-, u, d, mu-] > a mu- vm~                  # dū to γμ⁻ν̄μ
+d u~ > [w+, w-, u, d, ta-] > a ta- vt~                  # dū to γτ⁻ν̄τ
+d u~ > [w+, w-] > h e- ve~                              # dū to He⁻ν̄e
+d u~ > [w+, w-] > h mu- vm~                             # dū to Hμ⁻ν̄μ
+d u~ > [w+, w-, ta-] > h ta- vt~                        # dū to Hτ⁻ν̄τ
+d u~ > [a, z, w+, u, d, ve] > w- e- e+                  # dū to W⁻e⁻e⁺
+d u~ > [a, z, w+, u, d, vm] > w- mu- mu+                # dū to W⁻μ⁻μ⁺
+d u~ > [a, z, w+, u, d, vt, h] > w- ta- ta+             # dū to W⁻τ⁻τ⁺
+d u~ > [z, w+, u, d, e-] > w- ve ve~                    # dū to W⁻νeν̄e
+d u~ > [z, w+, u, d, mu-] > w- vm vm~                   # dū to W⁻νμν̄μ
+d u~ > [z, w+, u, d, ta-] > w- vt vt~                   # dū to W⁻ντν̄τ
+d u~ > [w+, w-, u, d, e-, ve] > z e- ve~                # dū to Ze⁻ν̄e
+d u~ > [w+, w-, u, d, mu-, vm] > z mu- vm~              # dū to Zμ⁻ν̄μ
+d u~ > [w+, w-, u, d, ta-, vt] > z ta- vt~              # dū to Zτ⁻ν̄τ
+s c~ > [w+, w-, s, c, e-] > a e- ve~                    # sc̄ to γe⁻ν̄e
+s c~ > [w+, w-, s, c, mu-] > a mu- vm~                  # sc̄ to γμ⁻ν̄μ
+s c~ > [w+, w-, s, c, ta-] > a ta- vt~                  # sc̄ to γτ⁻ν̄τ
+s c~ > [w+, w-] > h e- ve~                              # sc̄ to He⁻ν̄e
+s c~ > [w+, w-] > h mu- vm~                             # sc̄ to Hμ⁻ν̄μ
+s c~ > [w+, w-, ta-] > h ta- vt~                        # sc̄ to Hτ⁻ν̄τ
+s c~ > [a, z, w+, s, c, ve] > w- e- e+                  # sc̄ to W⁻e⁻e⁺
+s c~ > [a, z, w+, s, c, vm] > w- mu- mu+                # sc̄ to W⁻μ⁻μ⁺
+s c~ > [a, z, w+, s, c, vt, h] > w- ta- ta+             # sc̄ to W⁻τ⁻τ⁺
+s c~ > [z, w+, s, c, e-] > w- ve ve~                    # sc̄ to W⁻νeν̄e
+s c~ > [z, w+, s, c, mu-] > w- vm vm~                   # sc̄ to W⁻νμν̄μ
+s c~ > [z, w+, s, c, ta-] > w- vt vt~                   # sc̄ to W⁻ντν̄τ
+s c~ > [w+, w-, s, c, e-, ve] > z e- ve~                # sc̄ to Ze⁻ν̄e
+s c~ > [w+, w-, s, c, mu-, vm] > z mu- vm~              # sc̄ to Zμ⁻ν̄μ
+s c~ > [w+, w-, s, c, ta-, vt] > z ta- vt~              # sc̄ to Zτ⁻ν̄τ
+s s~ > [a, z, s, e-] > a e- e+                          # ss̄ to γe⁻e⁺
+s s~ > [a, z, s, mu-] > a mu- mu+                       # ss̄ to γμ⁻μ⁺
+s s~ > [a, z, s, ta-] > a ta- ta+                       # ss̄ to γτ⁻τ⁺
+s s~ > [z, s] > a ve ve~                                # ss̄ to γνeν̄e
+s s~ > [z, s] > a vm vm~                                # ss̄ to γνμν̄μ
+s s~ > [z, s] > a vt vt~                                # ss̄ to γντν̄τ
+s s~ > [z] > h e- e+                                    # ss̄ to He⁻e⁺
+s s~ > [z] > h mu- mu+                                  # ss̄ to Hμ⁻μ⁺
+s s~ > [a, z, ta-] > h ta- ta+                          # ss̄ to Hτ⁻τ⁺
+s s~ > [z] > h ve ve~                                   # ss̄ to Hνeν̄e
+s s~ > [z] > h vm vm~                                   # ss̄ to Hνμν̄μ
+s s~ > [z] > h vt vt~                                   # ss̄ to Hντν̄τ
+s s~ > [a, z, w+, c, e-, ve] > w- e+ ve                 # ss̄ to W⁻e⁺νe
+s s~ > [a, z, w+, c, mu-, vm] > w- mu+ vm               # ss̄ to W⁻μ⁺νμ
+s s~ > [a, z, w+, c, ta-, vt] > w- ta+ vt               # ss̄ to W⁻τ⁺ντ
+s s~ > [a, z, w-, c, e-, ve] > w+ e- ve~                # ss̄ to W⁺e⁻ν̄e
+s s~ > [a, z, w-, c, mu-, vm] > w+ mu- vm~              # ss̄ to W⁺μ⁻ν̄μ
+s s~ > [a, z, w-, c, ta-, vt] > w+ ta- vt~              # ss̄ to W⁺τ⁻ν̄τ
+s s~ > [a, z, s, e-] > z e- e+                          # ss̄ to Ze⁻e⁺
+s s~ > [a, z, s, mu-] > z mu- mu+                       # ss̄ to Zμ⁻μ⁺
+s s~ > [a, z, s, ta-, h] > z ta- ta+                    # ss̄ to Zτ⁻τ⁺
+s s~ > [z, s, ve] > z ve ve~                            # ss̄ to Zνeν̄e
+s s~ > [z, s, vm] > z vm vm~                            # ss̄ to Zνμν̄μ
+s s~ > [z, s, vt] > z vt vt~                            # ss̄ to Zντν̄τ
+u d~ > [w+, w-, u, d, e-] > a e+ ve                     # ud̄ to γe⁺νe
+u d~ > [w+, w-, u, d, mu-] > a mu+ vm                   # ud̄ to γμ⁺νμ
+u d~ > [w+, w-, u, d, ta-] > a ta+ vt                   # ud̄ to γτ⁺ντ
+u d~ > [w+, w-] > h e+ ve                               # ud̄ to He⁺νe
+u d~ > [w+, w-] > h mu+ vm                              # ud̄ to Hμ⁺νμ
+u d~ > [w+, w-, ta-] > h ta+ vt                         # ud̄ to Hτ⁺ντ
+u d~ > [a, z, w-, u, d, ve] > w+ e- e+                  # ud̄ to W⁺e⁻e⁺
+u d~ > [a, z, w-, u, d, vm] > w+ mu- mu+                # ud̄ to W⁺μ⁻μ⁺
+u d~ > [a, z, w-, u, d, vt, h] > w+ ta- ta+             # ud̄ to W⁺τ⁻τ⁺
+u d~ > [z, w-, u, d, e-] > w+ ve ve~                    # ud̄ to W⁺νeν̄e
+u d~ > [z, w-, u, d, mu-] > w+ vm vm~                   # ud̄ to W⁺νμν̄μ
+u d~ > [z, w-, u, d, ta-] > w+ vt vt~                   # ud̄ to W⁺ντν̄τ
+u d~ > [w+, w-, u, d, e-, ve] > z e+ ve                 # ud̄ to Ze⁺νe
+u d~ > [w+, w-, u, d, mu-, vm] > z mu+ vm               # ud̄ to Zμ⁺νμ
+u d~ > [w+, w-, u, d, ta-, vt] > z ta+ vt               # ud̄ to Zτ⁺ντ
+u u~ > [a, z, u, e-] > a e- e+                          # uū to γe⁻e⁺
+u u~ > [a, z, u, mu-] > a mu- mu+                       # uū to γμ⁻μ⁺
+u u~ > [a, z, u, ta-] > a ta- ta+                       # uū to γτ⁻τ⁺
+u u~ > [z, u] > a ve ve~                                # uū to γνeν̄e
+u u~ > [z, u] > a vm vm~                                # uū to γνμν̄μ
+u u~ > [z, u] > a vt vt~                                # uū to γντν̄τ
+u u~ > [z] > h e- e+                                    # uū to He⁻e⁺
+u u~ > [z] > h mu- mu+                                  # uū to Hμ⁻μ⁺
+u u~ > [a, z, ta-] > h ta- ta+                          # uū to Hτ⁻τ⁺
+u u~ > [z] > h ve ve~                                   # uū to Hνeν̄e
+u u~ > [z] > h vm vm~                                   # uū to Hνμν̄μ
+u u~ > [z] > h vt vt~                                   # uū to Hντν̄τ
+u u~ > [a, z, w+, d, e-, ve] > w- e+ ve                 # uū to W⁻e⁺νe
+u u~ > [a, z, w+, d, mu-, vm] > w- mu+ vm               # uū to W⁻μ⁺νμ
+u u~ > [a, z, w+, d, ta-, vt] > w- ta+ vt               # uū to W⁻τ⁺ντ
+u u~ > [a, z, w-, d, e-, ve] > w+ e- ve~                # uū to W⁺e⁻ν̄e
+u u~ > [a, z, w-, d, mu-, vm] > w+ mu- vm~              # uū to W⁺μ⁻ν̄μ
+u u~ > [a, z, w-, d, ta-, vt] > w+ ta- vt~              # uū to W⁺τ⁻ν̄τ
+u u~ > [a, z, u, e-] > z e- e+                          # uū to Ze⁻e⁺
+u u~ > [a, z, u, mu-] > z mu- mu+                       # uū to Zμ⁻μ⁺
+u u~ > [a, z, u, ta-, h] > z ta- ta+                    # uū to Zτ⁻τ⁺
+u u~ > [z, u, ve] > z ve ve~                            # uū to Zνeν̄e
+u u~ > [z, u, vm] > z vm vm~                            # uū to Zνμν̄μ
+u u~ > [z, u, vt] > z vt vt~                            # uū to Zντν̄τ
+
+# --- tt̄ + boson / remaining ---
+
+b b~ > [g, a, z, w+, w-, b, t, h] > t t~ a              # bb̄ to tt̄γ
+b b~ > [g, a, z, w+, w-, b, t, h] > t t~ h              # bb̄ to tt̄H
+b b~ > [g, a, z, w+, w-, b, t, h] > t t~ z              # bb̄ to tt̄Z
+c c~ > [g, a, z, c, t] > t t~ a                         # cc̄ to tt̄γ
+c c~ > [g, a, z, t] > t t~ h                            # cc̄ to tt̄H
+c c~ > [g, a, z, c, t, h] > t t~ z                      # cc̄ to tt̄Z
+c s~ > [g, a, z, w-, s, c, b, h] > t t~ w+              # cs̄ to tt̄W⁺
+d d~ > [g, a, z, d, t] > t t~ a                         # dd̄ to tt̄γ
+d d~ > [g, a, z, t] > t t~ h                            # dd̄ to tt̄H
+d d~ > [g, a, z, d, t, h] > t t~ z                      # dd̄ to tt̄Z
+d u~ > [g, a, z, w+, u, d, b, h] > t t~ w-              # dū to tt̄W⁻
+g g > [g, t] > t t~ a                                   # gg to tt̄γ
+g g > [g, t] > t t~ h                                   # gg to tt̄H
+g g > [g, t] > t t~ z                                   # gg to tt̄Z
+s c~ > [g, a, z, w+, s, c, b, h] > t t~ w-              # sc̄ to tt̄W⁻
+s s~ > [g, a, z, s, t] > t t~ a                         # ss̄ to tt̄γ
+s s~ > [g, a, z, t] > t t~ h                            # ss̄ to tt̄H
+s s~ > [g, a, z, s, t, h] > t t~ z                      # ss̄ to tt̄Z
+u d~ > [g, a, z, w-, u, d, b, h] > t t~ w+              # ud̄ to tt̄W⁺
+u u~ > [g, a, z, u, t] > t t~ a                         # uū to tt̄γ
+u u~ > [g, a, z, t] > t t~ h                            # uū to tt̄H
+u u~ > [g, a, z, u, t, h] > t t~ z                      # uū to tt̄Z

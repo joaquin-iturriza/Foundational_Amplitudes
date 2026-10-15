@@ -1,0 +1,617 @@
+{
+ "bbx_amummup": [
+  "bbx_aemep"
+ ],
+ "bbx_avmvmx": [
+  "bbx_avevex",
+  "bbx_avtvtx"
+ ],
+ "bbx_gmummup": [
+  "bbx_gemep"
+ ],
+ "bbx_gvmvmx": [
+  "bbx_gvevex",
+  "bbx_gvtvtx"
+ ],
+ "bbx_hmummup": [
+  "bbx_hemep"
+ ],
+ "bbx_hvmvmx": [
+  "bbx_hvevex",
+  "bbx_hvtvtx"
+ ],
+ "bbx_mummup": [
+  "bbx_emep"
+ ],
+ "bbx_vmvmx": [
+  "bbx_vevex",
+  "bbx_vtvtx"
+ ],
+ "bbx_wmmupvm": [
+  "bbx_wmepve",
+  "bbx_wpemvex"
+ ],
+ "bbx_wpmumvmx": [
+  "bbx_wmepve",
+  "bbx_wpemvex"
+ ],
+ "bbx_zmummup": [
+  "bbx_zemep"
+ ],
+ "bbx_zvmvmx": [
+  "bbx_zvevex",
+  "bbx_zvtvtx"
+ ],
+ "bsx_bsx": [
+  "bcx_bcx",
+  "bdx_bdx",
+  "bux_bux",
+  "cbx_cbx",
+  "dbx_dbx",
+  "sbx_sbx",
+  "ubx_ubx"
+ ],
+ "bsx_bsxa": [
+  "bdx_bdxa",
+  "dbx_dbxa",
+  "sbx_sbxa"
+ ],
+ "bsx_bsxh": [
+  "bcx_bcxh",
+  "bdx_bdxh",
+  "bux_buxh",
+  "cbx_cbxh",
+  "dbx_dbxh",
+  "sbx_sbxh",
+  "ubx_ubxh"
+ ],
+ "bsx_bsxz": [
+  "bdx_bdxz",
+  "dbx_dbxz",
+  "sbx_sbxz"
+ ],
+ "bsx_gbsx": [
+  "bcx_gbcx",
+  "bdx_gbdx",
+  "bux_gbux",
+  "cbx_gcbx",
+  "dbx_gdbx",
+  "sbx_gsbx",
+  "ubx_gubx"
+ ],
+ "bsx_tsxwm": [
+  "bcx_tcxwm",
+  "bdx_tdxwm",
+  "bux_tuxwm",
+  "cbx_ctxwp",
+  "dbx_dtxwp",
+  "sbx_stxwp",
+  "ubx_utxwp"
+ ],
+ "cb_cb": [
+  "db_db",
+  "dxbx_dxbx",
+  "sxbx_sxbx",
+  "ub_ub",
+  "uxbx_uxbx"
+ ],
+ "cb_cba": [
+  "ub_uba",
+  "uxbx_uxbxa"
+ ],
+ "cb_cbh": [
+  "db_dbh",
+  "dxbx_dxbxh",
+  "sxbx_sxbxh",
+  "ub_ubh",
+  "uxbx_uxbxh"
+ ],
+ "cb_cbz": [
+  "ub_ubz",
+  "uxbx_uxbxz"
+ ],
+ "cb_ctwm": [
+  "db_dtwm",
+  "dxbx_dxtxwp",
+  "sb_stwm",
+  "sxbx_sxtxwp",
+  "ub_utwm",
+  "uxbx_uxtxwp"
+ ],
+ "cb_gcb": [
+  "db_gdb",
+  "dxbx_gdxbx",
+  "sxbx_gsxbx",
+  "ub_gub",
+  "uxbx_guxbx"
+ ],
+ "cb_gst": [
+  "ub_gdt",
+  "uxbx_gdxtx"
+ ],
+ "cb_sbwp": [
+  "ub_dbwp",
+  "uxbx_dxbxwm"
+ ],
+ "cb_st": [
+  "ub_dt",
+  "uxbx_dxtx"
+ ],
+ "cb_sta": [
+  "ub_dta",
+  "uxbx_dxtxa"
+ ],
+ "cb_sth": [
+  "ub_dth",
+  "uxbx_dxtxh"
+ ],
+ "cb_stz": [
+  "ub_dtz",
+  "uxbx_dxtxz"
+ ],
+ "cux_cux": [
+  "cdx_cdx",
+  "csx_csx",
+  "dcx_dcx",
+  "dsx_dsx",
+  "dux_dux",
+  "scx_scx",
+  "sdx_sdx",
+  "sux_sux",
+  "ucx_ucx",
+  "udx_udx",
+  "usx_usx"
+ ],
+ "cux_cuxa": [
+  "ucx_ucxa"
+ ],
+ "cux_cuxh": [
+  "ucx_ucxh"
+ ],
+ "cux_cuxz": [
+  "ucx_ucxz"
+ ],
+ "cux_gcux": [
+  "cdx_gcdx",
+  "csx_gcsx",
+  "dcx_gdcx",
+  "dsx_gdsx",
+  "dux_gdux",
+  "scx_gscx",
+  "sdx_gsdx",
+  "sux_gsux",
+  "ucx_gucx",
+  "udx_gudx",
+  "usx_gusx"
+ ],
+ "cxbx_cxbx": [
+  "db_db",
+  "dxbx_dxbx",
+  "sxbx_sxbx",
+  "ub_ub",
+  "uxbx_uxbx"
+ ],
+ "cxbx_cxbxa": [
+  "ub_uba",
+  "uxbx_uxbxa"
+ ],
+ "cxbx_cxbxh": [
+  "db_dbh",
+  "dxbx_dxbxh",
+  "sxbx_sxbxh",
+  "ub_ubh",
+  "uxbx_uxbxh"
+ ],
+ "cxbx_cxbxz": [
+  "ub_ubz",
+  "uxbx_uxbxz"
+ ],
+ "cxbx_cxtxwp": [
+  "db_dtwm",
+  "dxbx_dxtxwp",
+  "sb_stwm",
+  "sxbx_sxtxwp",
+  "ub_utwm",
+  "uxbx_uxtxwp"
+ ],
+ "cxbx_gcxbx": [
+  "db_gdb",
+  "dxbx_gdxbx",
+  "sxbx_gsxbx",
+  "ub_gub",
+  "uxbx_guxbx"
+ ],
+ "cxbx_gsxtx": [
+  "ub_gdt",
+  "uxbx_gdxtx"
+ ],
+ "cxbx_sxbxwm": [
+  "ub_dbwp",
+  "uxbx_dxbxwm"
+ ],
+ "cxbx_sxtx": [
+  "ub_dt",
+  "uxbx_dxtx"
+ ],
+ "cxbx_sxtxa": [
+  "ub_dta",
+  "uxbx_dxtxa"
+ ],
+ "cxbx_sxtxh": [
+  "ub_dth",
+  "uxbx_dxtxh"
+ ],
+ "cxbx_sxtxz": [
+  "ub_dtz",
+  "uxbx_dxtxz"
+ ],
+ "ds_ds": [
+  "dc_dc",
+  "dxcx_dxcx",
+  "dxsx_dxsx",
+  "sc_sc",
+  "sxcx_sxcx",
+  "uc_uc",
+  "ud_ud",
+  "us_us",
+  "uxcx_uxcx",
+  "uxdx_uxdx",
+  "uxsx_uxsx"
+ ],
+ "ds_dsa": [
+  "dxsx_dxsxa"
+ ],
+ "ds_dsh": [
+  "dxsx_dxsxh"
+ ],
+ "ds_dsz": [
+  "dxsx_dxsxz"
+ ],
+ "ds_gds": [
+  "dc_gdc",
+  "dxcx_gdxcx",
+  "dxsx_gdxsx",
+  "sc_gsc",
+  "sxcx_gsxcx",
+  "uc_guc",
+  "ud_gud",
+  "us_gus",
+  "uxcx_guxcx",
+  "uxdx_guxdx",
+  "uxsx_guxsx"
+ ],
+ "gs_ggs": [
+  "gc_ggc",
+  "gcx_ggcx",
+  "gd_ggd",
+  "gdx_ggdx",
+  "gsx_ggsx",
+  "gu_ggu",
+  "gux_ggux"
+ ],
+ "gs_gs": [
+  "gc_gc",
+  "gcx_gcx",
+  "gd_gd",
+  "gdx_gdx",
+  "gsx_gsx",
+  "gu_gu",
+  "gux_gux"
+ ],
+ "gs_gsa": [
+  "gc_gca",
+  "gcx_gcxa",
+  "gd_gda",
+  "gdx_gdxa",
+  "gsx_gsxa",
+  "gu_gua",
+  "gux_guxa"
+ ],
+ "gs_gsz": [
+  "gc_gcz",
+  "gcx_gcxz",
+  "gd_gdz",
+  "gdx_gdxz",
+  "gsx_gsxz",
+  "gu_guz",
+  "gux_guxz"
+ ],
+ "gs_sa": [
+  "gc_ca",
+  "gcx_cxa",
+  "gd_da",
+  "gdx_dxa",
+  "gsx_sxa",
+  "gu_ua",
+  "gux_uxa"
+ ],
+ "gs_saa": [
+  "gc_caa",
+  "gcx_cxaa",
+  "gd_daa",
+  "gdx_dxaa",
+  "gsx_sxaa",
+  "gu_uaa",
+  "gux_uxaa"
+ ],
+ "gs_saz": [
+  "gc_caz",
+  "gcx_cxaz",
+  "gd_daz",
+  "gdx_dxaz",
+  "gsx_sxaz",
+  "gu_uaz",
+  "gux_uxaz"
+ ],
+ "gs_sbbx": [
+  "gc_cbbx",
+  "gcx_bcxbx",
+  "gd_dbbx",
+  "gdx_bdxbx",
+  "gsx_bsxbx",
+  "gu_ubbx",
+  "gux_buxbx"
+ ],
+ "gs_sccx": [
+  "gc_dcdx",
+  "gc_scsx",
+  "gc_ucux",
+  "gcx_ddxcx",
+  "gcx_ssxcx",
+  "gcx_uuxcx",
+  "gd_dccx",
+  "gd_dssx",
+  "gd_udux",
+  "gdx_cdxcx",
+  "gdx_sdxsx",
+  "gdx_uuxdx",
+  "gs_dsdx",
+  "gs_usux",
+  "gsx_csxcx",
+  "gsx_ddxsx",
+  "gsx_uuxsx",
+  "gu_uccx",
+  "gu_uddx",
+  "gu_ussx",
+  "gux_cuxcx",
+  "gux_duxdx",
+  "gux_suxsx"
+ ],
+ "gs_stamtap": [
+  "gd_dtamtap",
+  "gdx_dxtamtap",
+  "gsx_sxtamtap"
+ ],
+ "gs_sttx": [
+  "gc_cttx",
+  "gcx_tcxtx",
+  "gd_dttx",
+  "gdx_tdxtx",
+  "gsx_tsxtx",
+  "gu_uttx",
+  "gux_tuxtx"
+ ],
+ "gs_svtvtx": [
+  "gd_dvevex",
+  "gd_dvmvmx",
+  "gd_dvtvtx",
+  "gdx_dxvevex",
+  "gdx_dxvmvmx",
+  "gdx_dxvtvtx",
+  "gs_svevex",
+  "gs_svmvmx",
+  "gsx_sxvevex",
+  "gsx_sxvmvmx",
+  "gsx_sxvtvtx"
+ ],
+ "gs_swpwm": [
+  "gd_dwpwm",
+  "gdx_dxwpwm",
+  "gsx_sxwpwm"
+ ],
+ "gs_sz": [
+  "gc_cz",
+  "gcx_cxz",
+  "gd_dz",
+  "gdx_dxz",
+  "gsx_sxz",
+  "gu_uz",
+  "gux_uxz"
+ ],
+ "gs_szh": [
+  "gc_czh",
+  "gcx_cxzh",
+  "gd_dzh",
+  "gdx_dxzh",
+  "gsx_sxzh",
+  "gu_uzh",
+  "gux_uxzh"
+ ],
+ "gs_szz": [
+  "gc_czz",
+  "gcx_cxzz",
+  "gd_dzz",
+  "gdx_dxzz",
+  "gsx_sxzz",
+  "gu_uzz",
+  "gux_uxzz"
+ ],
+ "sb_gsb": [
+  "db_gdb",
+  "dxbx_gdxbx",
+  "sxbx_gsxbx",
+  "ub_gub",
+  "uxbx_guxbx"
+ ],
+ "sb_sb": [
+  "db_db",
+  "dxbx_dxbx",
+  "sxbx_sxbx",
+  "ub_ub",
+  "uxbx_uxbx"
+ ],
+ "sb_sba": [
+  "db_dba",
+  "dxbx_dxbxa",
+  "sxbx_sxbxa"
+ ],
+ "sb_sbh": [
+  "db_dbh",
+  "dxbx_dxbxh",
+  "sxbx_sxbxh",
+  "ub_ubh",
+  "uxbx_uxbxh"
+ ],
+ "ssx_aemep": [
+  "ddx_aemep",
+  "ddx_amummup",
+  "ssx_amummup"
+ ],
+ "ssx_avevex": [
+  "ddx_avevex",
+  "ddx_avmvmx",
+  "ddx_avtvtx",
+  "ssx_avmvmx",
+  "ssx_avtvtx"
+ ],
+ "ssx_ddx": [
+  "ccx_ddx",
+  "ccx_ssx",
+  "ccx_uux",
+  "ddx_ccx",
+  "ddx_ssx",
+  "ddx_uux",
+  "ssx_ccx",
+  "ssx_uux",
+  "uux_ccx",
+  "uux_ddx",
+  "uux_ssx"
+ ],
+ "ssx_ddxa": [
+  "ddx_ssxa"
+ ],
+ "ssx_ddxh": [
+  "ddx_ssxh"
+ ],
+ "ssx_ddxz": [
+  "ddx_ssxz"
+ ],
+ "ssx_duxwp": [
+  "ddx_csxwm",
+  "ddx_scxwp"
+ ],
+ "ssx_emep": [
+  "ddx_emep",
+  "ddx_mummup",
+  "ssx_mummup"
+ ],
+ "ssx_gddx": [
+  "ccx_gddx",
+  "ccx_gssx",
+  "ccx_guux",
+  "ddx_gccx",
+  "ddx_gssx",
+  "ddx_guux",
+  "ssx_gccx",
+  "ssx_guux",
+  "uux_gccx",
+  "uux_gddx",
+  "uux_gssx"
+ ],
+ "ssx_gemep": [
+  "ddx_gemep",
+  "ddx_gmummup",
+  "ssx_gmummup"
+ ],
+ "ssx_gvevex": [
+  "ddx_gvevex",
+  "ddx_gvmvmx",
+  "ddx_gvtvtx",
+  "ssx_gvmvmx",
+  "ssx_gvtvtx"
+ ],
+ "ssx_hemep": [
+  "ddx_hemep",
+  "ddx_hmummup",
+  "ssx_hmummup"
+ ],
+ "ssx_hvevex": [
+  "ddx_hvevex",
+  "ddx_hvmvmx",
+  "ddx_hvtvtx",
+  "ssx_hvmvmx",
+  "ssx_hvtvtx"
+ ],
+ "ssx_udxwm": [
+  "ddx_csxwm",
+  "ddx_scxwp"
+ ],
+ "ssx_vevex": [
+  "ddx_vevex",
+  "ddx_vmvmx",
+  "ddx_vtvtx",
+  "ssx_vmvmx",
+  "ssx_vtvtx"
+ ],
+ "ssx_wmepve": [
+  "ddx_wmepve",
+  "ddx_wmmupvm",
+  "ddx_wpemvex",
+  "ddx_wpmumvmx",
+  "ssx_wmmupvm",
+  "ssx_wpmumvmx"
+ ],
+ "ssx_wpemvex": [
+  "ddx_wmepve",
+  "ddx_wmmupvm",
+  "ddx_wpemvex",
+  "ddx_wpmumvmx",
+  "ssx_wmmupvm",
+  "ssx_wpmumvmx"
+ ],
+ "ssx_zemep": [
+  "ddx_zemep",
+  "ddx_zmummup",
+  "ssx_zmummup"
+ ],
+ "ssx_zvevex": [
+  "ddx_zvevex",
+  "ddx_zvmvmx",
+  "ddx_zvtvtx",
+  "ssx_zvmvmx",
+  "ssx_zvtvtx"
+ ],
+ "sxsx_gsxsx": [
+  "cc_gcc",
+  "cxcx_gcxcx",
+  "dd_gdd",
+  "dxdx_gdxdx",
+  "ss_gss",
+  "uu_guu",
+  "uxux_guxux"
+ ],
+ "sxsx_sxsx": [
+  "cc_cc",
+  "cxcx_cxcx",
+  "dd_dd",
+  "dxdx_dxdx",
+  "ss_ss",
+  "uu_uu",
+  "uxux_uxux"
+ ],
+ "sxsx_sxsxa": [
+  "dd_dda",
+  "dxdx_dxdxa",
+  "ss_ssa"
+ ],
+ "sxsx_sxsxh": [
+  "dd_ddh",
+  "dxdx_dxdxh",
+  "ss_ssh"
+ ],
+ "sxsx_sxsxz": [
+  "dd_ddz",
+  "dxdx_dxdxz",
+  "ss_ssz"
+ ]
+}

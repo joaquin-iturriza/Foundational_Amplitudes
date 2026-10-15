@@ -1,0 +1,239 @@
+{
+  "interpolation": [
+    {
+      "group": "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)",
+      "motivation": "s s~ has identical dynamics to d d~ (both massless, weak isospin T3 = -1/2). With d d~ and u u~ variants in training for every topology, the network must learn that matrix elements depend on quark charges and isospin, not flavor identity. The most fundamental test of flavor symmetry generalization.",
+      "folders": [
+        "ssx_aemep",
+        "ssx_avevex",
+        "ssx_ddx",
+        "ssx_ddxa",
+        "ssx_ddxh",
+        "ssx_ddxz",
+        "ssx_duxwp",
+        "ssx_emep",
+        "ssx_gddx",
+        "ssx_gemep",
+        "ssx_gvevex",
+        "ssx_hemep",
+        "ssx_hvevex",
+        "ssx_udxwm",
+        "ssx_vevex",
+        "ssx_wmepve",
+        "ssx_wpemvex",
+        "ssx_zemep",
+        "ssx_zvevex"
+      ]
+    },
+    {
+      "group": "Muon final states from bb~ annihilation",
+      "motivation": "mu and e are both effectively massless with identical EW couplings (lepton universality). With the electron variant from bb~ in training, the network tests lepton universality. Focusing on bb~ provides a richer test than light-quark initial states due to the b quark mass and Yukawa coupling.",
+      "folders": [
+        "bbx_amummup",
+        "bbx_avmvmx",
+        "bbx_gmummup",
+        "bbx_gvmvmx",
+        "bbx_hmummup",
+        "bbx_hvmvmx",
+        "bbx_mummup",
+        "bbx_vmvmx",
+        "bbx_wmmupvm",
+        "bbx_wpmumvmx",
+        "bbx_zmummup",
+        "bbx_zvmvmx"
+      ]
+    },
+    {
+      "group": "g+s processes from gluon + light-quark families",
+      "motivation": "With g+d and g+u in training, g+s is redundant since s is degenerate with d (same mass, same isospin). Tests gluon-quark sector flavor generalization. Only the quark (not antiquark) sector is held out; the antiquark sector tests the same physics.",
+      "folders": [
+        "gs_ggs",
+        "gs_gs",
+        "gs_gsa",
+        "gs_gsz",
+        "gs_sa",
+        "gs_saa",
+        "gs_saz",
+        "gs_sbbx",
+        "gs_sccx",
+        "gs_stamtap",
+        "gs_sttx",
+        "gs_svtvtx",
+        "gs_swpwm",
+        "gs_sz",
+        "gs_szh",
+        "gs_szz"
+      ]
+    },
+    {
+      "group": "b+s(~) scattering from b+light-quark families",
+      "motivation": "b+d(~) and b+u(~) remain in training. Since s(~) is degenerate with d(~), b+s scattering should be directly interpolatable. Tests flavor generalization when one initial-state quark is massive.",
+      "folders": [
+        "bsx_bsx",
+        "bsx_bsxa",
+        "bsx_bsxh",
+        "bsx_bsxz",
+        "bsx_gbsx",
+        "bsx_tsxwm",
+        "sb_gsb",
+        "sb_sb",
+        "sb_sba",
+        "sb_sbh"
+      ]
+    },
+    {
+      "group": "c+u~ scattering from c+light-quark families",
+      "motivation": "c+d~ and c+s~ (same isospin) are in training; c+u~ differs only in the light quark's isospin (T3 = +1/2 vs -1/2). Tests whether the network interpolates the correct Z/gamma coupling across isospin.",
+      "folders": [
+        "cux_cux",
+        "cux_cuxa",
+        "cux_cuxh",
+        "cux_cuxz",
+        "cux_gcux"
+      ]
+    },
+    {
+      "group": "ds and s~s~ from same-sign light quark families",
+      "motivation": "d s scattering is intermediate between dd and us in flavor space; s~s~ is the CP conjugate of ss. With the other family members in training, these are straightforward interpolations. Tests same-sign quark scattering and CP symmetry generalization.",
+      "folders": [
+        "ds_ds",
+        "ds_dsa",
+        "ds_dsh",
+        "ds_dsz",
+        "ds_gds",
+        "sxsx_gsxsx",
+        "sxsx_sxsx",
+        "sxsx_sxsxa",
+        "sxsx_sxsxh",
+        "sxsx_sxsxz"
+      ]
+    }
+  ],
+  "extrapolation": [
+    {
+      "group": "Multi-Higgs production (hh, hhh, Xhh)",
+      "motivation": "Multi-Higgs final states uniquely probe the triple-Higgs self-coupling vertex (lambda_hhh). Removing ALL such processes means the network has never seen this vertex topology. Includes the unique bb~ > hhh (only triple-Higgs process). Pure extrapolation of the Higgs potential structure.",
+      "folders": [
+        "bbx_ahh",
+        "bbx_ghh",
+        "bbx_hh",
+        "bbx_hhh",
+        "bbx_zhh",
+        "ccx_zhh",
+        "csx_wphh",
+        "ddx_zhh",
+        "dux_wmhh",
+        "gb_bhh",
+        "gbx_bxhh",
+        "scx_wmhh",
+        "ssx_zhh",
+        "udx_wphh",
+        "uux_zhh"
+      ]
+    },
+    {
+      "group": "Triple-W production (W+W+W-, W+W-W-)",
+      "motivation": "The only processes with same-sign W pairs. Triple-W involves WWWW quartic gauge couplings not testable with W+W- pair production. Unique charge topology makes this pure extrapolation.",
+      "folders": [
+        "csx_wpwpwm",
+        "dux_wpwmwm",
+        "scx_wpwmwm",
+        "udx_wpwpwm"
+      ]
+    },
+    {
+      "group": "Triple-Z production (ZZZ)",
+      "motivation": "No ZZZ or ZZZZ vertex exists in the SM. ZZZ proceeds only through Higgs-mediated diagrams and longitudinal Z scattering. Qualitatively distinct from ZZ production. Tests extrapolation of neutral boson sector.",
+      "folders": [
+        "bbx_zzz",
+        "ccx_zzz",
+        "ddx_zzz",
+        "ssx_zzz",
+        "uux_zzz"
+      ]
+    },
+    {
+      "group": "Higgs + tau lepton processes",
+      "motivation": "These uniquely probe the Higgs-tau-tau Yukawa coupling. Tau is the only lepton with non-zero Yukawa (m_tau = 1.777 GeV). Without these, the network must extrapolate the Yukawa vertex from Higgs with other particles and tau pairs without Higgs.",
+      "folders": [
+        "bbx_htamtap",
+        "ccx_htamtap",
+        "csx_htapvt",
+        "ddx_htamtap",
+        "dux_htamvtx",
+        "scx_htamvtx",
+        "ssx_htamtap",
+        "udx_htapvt",
+        "uux_htamtap"
+      ]
+    },
+    {
+      "group": "gg -> tt~ + boson (ttX via gluon fusion)",
+      "motivation": "Combines heaviest quark pair with boson radiation from pure-QCD initial state. gg -> tt~h is the primary channel for top Yukawa measurement. With gg -> tt~ in training, the network must extrapolate the boson radiation pattern from gluon fusion.",
+      "folders": [
+        "gg_gttx",
+        "gg_ttxa",
+        "gg_ttxh",
+        "gg_ttxz"
+      ]
+    },
+    {
+      "group": "gg -> W + qq' (W production from gluon fusion)",
+      "motivation": "Gluons cannot couple to W directly. These proceed through quark-mediated topologies combining QCD pair production with charged-current weak decay. Unique interference between top-mediated and light-quark-mediated diagrams.",
+      "folders": [
+        "gg_btxwp",
+        "gg_csxwm",
+        "gg_duxwp",
+        "gg_scxwp",
+        "gg_tbxwm",
+        "gg_udxwm"
+      ]
+    },
+    {
+      "group": "Single-particle production (2 -> 1 resonances)",
+      "motivation": "The ONLY 2->1 processes in the catalog: 1-body final state with zero transverse momentum and fixed invariant mass. Fundamentally different phase space dimensionality from all 2->2 and 2->3 training processes. Includes bb~ -> h (Yukawa-initiated scalar production).",
+      "folders": [
+        "bbx_h",
+        "bbx_z",
+        "ccx_z",
+        "csx_wp",
+        "ddx_z",
+        "dux_wm",
+        "scx_wm",
+        "ssx_z",
+        "udx_wp",
+        "uux_z"
+      ]
+    },
+    {
+      "group": "Same-sign charm-bottom scattering (cb, c~b~)",
+      "motivation": "The only same-sign processes combining two DIFFERENT massive quarks (m_c = 1.55 GeV, m_b = 4.7 GeV). Unique initial-state mass asymmetry. Includes novel topologies like cb -> st via W exchange. No other training process has this combination of initial-state masses.",
+      "folders": [
+        "cb_cb",
+        "cb_cba",
+        "cb_cbh",
+        "cb_cbz",
+        "cb_ctwm",
+        "cb_gcb",
+        "cb_gst",
+        "cb_sbwp",
+        "cb_st",
+        "cb_sta",
+        "cb_sth",
+        "cb_stz",
+        "cxbx_cxbx",
+        "cxbx_cxbxa",
+        "cxbx_cxbxh",
+        "cxbx_cxbxz",
+        "cxbx_cxtxwp",
+        "cxbx_gcxbx",
+        "cxbx_gsxtx",
+        "cxbx_sxbxwm",
+        "cxbx_sxtx",
+        "cxbx_sxtxa",
+        "cxbx_sxtxh",
+        "cxbx_sxtxz"
+      ]
+    }
+  ]
+}

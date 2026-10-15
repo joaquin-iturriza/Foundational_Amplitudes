@@ -1,0 +1,7507 @@
+[
+  {
+    "process": "b b > b b",
+    "n_outgoing": 2,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b > b b a",
+    "n_outgoing": 3,
+    "n_diagrams": 32
+  },
+  {
+    "process": "b b > b b h",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b b > b b z",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b b > b t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "b b > g b b",
+    "n_outgoing": 3,
+    "n_diagrams": 34
+  },
+  {
+    "process": "b b~ > a a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > a a h",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > a a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > a e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > a h",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a h h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > a mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > a ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b b~ > a ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > a z h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > a z z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 32
+  },
+  {
+    "process": "b b~ > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b b~ > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b b~ > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "b b~ > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b b~ > c c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b b~ > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b b~ > d d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b b~ > e- e+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > g a h",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > g a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 34
+  },
+  {
+    "process": "b b~ > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > g e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "b b~ > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > g g a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "b b~ > g g h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > g g z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > g h",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g h h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > g mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "b b~ > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > g ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "b b~ > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 21
+  },
+  {
+    "process": "b b~ > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > g ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b b~ > g z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > g z h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > g z z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > h",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "b b~ > h e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > h h",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > h h h",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "b b~ > h mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > h ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "b b~ > h ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > h vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > h vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > mu- mu+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "b b~ > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b b~ > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b b~ > s s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > ta- ta+",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "b b~ > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 21
+  },
+  {
+    "process": "b b~ > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 23
+  },
+  {
+    "process": "b b~ > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 23
+  },
+  {
+    "process": "b b~ > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b b~ > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b b~ > u u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b b~ > ve ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "b b~ > vm vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "b b~ > vt vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "b b~ > w- e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > w- mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > w- ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > w+ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > w+ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b b~ > w+ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b b~ > w+ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "b b~ > w+ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 19
+  },
+  {
+    "process": "b b~ > w+ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 20
+  },
+  {
+    "process": "b b~ > w+ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 21
+  },
+  {
+    "process": "b b~ > z",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "b b~ > z e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b b~ > z h",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > z h h",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "b b~ > z mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b b~ > z ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "b b~ > z ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > z vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > z vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b b~ > z z",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b b~ > z z h",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "b b~ > z z z",
+    "n_outgoing": 3,
+    "n_diagrams": 15
+  },
+  {
+    "process": "b c~ > b c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b c~ > b c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b c~ > b c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b c~ > b c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b c~ > b s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b c~ > g b c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b c~ > t c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b d~ > b d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b d~ > b d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b d~ > b d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b d~ > b d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b d~ > b u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b d~ > g b d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b d~ > g t u~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "b d~ > t d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b d~ > t u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b d~ > t u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b d~ > t u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b s~ > b c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b s~ > b s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b s~ > b s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b s~ > b s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b s~ > b s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b s~ > g b s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b s~ > g t c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "b s~ > t c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b s~ > t c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b s~ > t c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "b s~ > t s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b u~ > b d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "b u~ > b u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "b u~ > b u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "b u~ > b u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "b u~ > b u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b u~ > g b u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "b u~ > t u~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "b~ b~ > b~ b~",
+    "n_outgoing": 2,
+    "n_diagrams": 8
+  },
+  {
+    "process": "b~ b~ > b~ b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 32
+  },
+  {
+    "process": "b~ b~ > b~ b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b~ b~ > b~ b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 36
+  },
+  {
+    "process": "b~ b~ > b~ t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "b~ b~ > g b~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 34
+  },
+  {
+    "process": "c b > c b",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c b > c b a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c b > c b h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c b > c b z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c b > c t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c b > g c b",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c b > g s t",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c b > s b w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "c b > s t",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c b > s t a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c b > s t h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c b > s t z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c b~ > c b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c b~ > c b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c b~ > c b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c b~ > c b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c b~ > c t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c b~ > g c b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c b~ > s b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "c c > c c",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c > c c a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c c > c c h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c > c c z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c c > g c c",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "c c > s c w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c c~ > a a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > a a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > a e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > a mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > a ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > a ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > a z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c c~ > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c c~ > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c c~ > c c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c c~ > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c c~ > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > d d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c c~ > e- e+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > g a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "c c~ > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > g e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > g g a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "c c~ > g g z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > g mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c c~ > g ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > g ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c c~ > g z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > g z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > h e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > h mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > h ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c c~ > h ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > h vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > h vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > mu- mu+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c c~ > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c c~ > s s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c c~ > ta- ta+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c c~ > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c c~ > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c c~ > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c c~ > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > u u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c c~ > ve ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > vm vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > vt vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > w- e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w- mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w- ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w+ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w+ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w+ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c c~ > w+ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c c~ > w+ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 15
+  },
+  {
+    "process": "c c~ > w+ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c c~ > w+ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "c c~ > z",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > z e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > z h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c c~ > z h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > z mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c c~ > z ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c c~ > z ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > z vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > z vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > z z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c c~ > z z h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c c~ > z z z",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c d > s u",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c d~ > c d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c d~ > c d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c d~ > c d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c d~ > c d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c d~ > c u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c d~ > g c d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c d~ > s d~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c s~ > a e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > a mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > a ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > b b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "c s~ > c c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c s~ > c s~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > c s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c s~ > c s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > c s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c s~ > d d~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c s~ > e+ ve",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > g c s~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c s~ > g e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > g g w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c s~ > g mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > g ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > g t b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > g u d~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > g w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > g w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c s~ > g w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > g w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c s~ > h e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > h mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > h ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c s~ > mu+ vm",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > s s~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c s~ > ta+ vt",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > t b~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > t b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > t b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c s~ > t b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > t t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "c s~ > u d~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > u d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > u d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > u d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > u u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c s~ > w+",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > w+ a",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c s~ > w+ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c s~ > w+ a h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > w+ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c s~ > w+ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c s~ > w+ h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c s~ > w+ h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > w+ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c s~ > w+ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "c s~ > w+ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > w+ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > w+ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c s~ > w+ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "c s~ > w+ z",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c s~ > w+ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c s~ > w+ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "c s~ > z e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > z mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c s~ > z ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c u~ > c d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c u~ > c u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c u~ > c u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c u~ > c u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c u~ > c u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c u~ > g c u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c u~ > g s d~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c u~ > s d~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c u~ > s d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c u~ > s d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c u~ > s d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c u~ > s u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c~ b~ > c~ b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c~ b~ > c~ b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "c~ b~ > c~ b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "c~ b~ > c~ b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c~ b~ > c~ t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "c~ b~ > g c~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "c~ b~ > g s~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "c~ b~ > s~ b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "c~ b~ > s~ t~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "c~ b~ > s~ t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c~ b~ > s~ t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "c~ b~ > s~ t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "c~ c~ > c~ c~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "c~ c~ > c~ c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c~ c~ > c~ c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "c~ c~ > c~ c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "c~ c~ > g c~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "c~ c~ > s~ c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "c~ d~ > s~ u~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d b > d b",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d b > d b a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d b > d b h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d b > d b z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d b > d t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d b > g d b",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d b > u b w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "d b~ > d b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d b~ > d b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d b~ > d b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d b~ > d b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d b~ > d t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d b~ > g d b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d b~ > g u t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d b~ > u b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "d b~ > u t~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d b~ > u t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d b~ > u t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d b~ > u t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d c > d c",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d c > d c a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d c > d c h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d c > d c z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d c > d s w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d c > g d c",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d c > g u s",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d c > u c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d c > u s a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d c > u s h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d c > u s z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d c~ > d c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d c~ > d c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d c~ > d c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d c~ > d c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d c~ > d s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d c~ > g d c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d c~ > u c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d > d d",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d > d d a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d d > d d h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d > d d z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d d > g d d",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "d d > u d w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d d~ > a a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > a a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > a e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > a mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > a ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > a ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > a z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d d~ > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d~ > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > c c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d~ > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d d~ > d d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d d~ > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d d~ > e- e+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > g a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "d d~ > g e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > g g a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "d d~ > g g z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > g mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > g ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d d~ > g ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d d~ > g z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > g z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > h e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > h mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > h ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d d~ > h ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > h vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > h vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > mu- mu+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d~ > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > s s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > ta- ta+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d~ > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d d~ > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d d~ > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d d~ > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d d~ > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d d~ > u u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d d~ > ve ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > vm vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > vt vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > w- e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w- mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w- ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w+ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w+ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w+ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d d~ > w+ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d d~ > w+ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 15
+  },
+  {
+    "process": "d d~ > w+ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d d~ > w+ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "d d~ > z",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > z e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > z h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d d~ > z h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > z mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d d~ > z ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d d~ > z ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > z vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > z vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > z z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d d~ > z z h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d d~ > z z z",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d s > d c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d s > d s",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d s > d s a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d s > d s h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d s > d s z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d s > g d s",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d s > u s w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d s~ > d c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d s~ > d s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d s~ > d s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d s~ > d s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d s~ > d s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d s~ > g d s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d s~ > g u c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d s~ > u c~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d s~ > u c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d s~ > u c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d s~ > u c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d s~ > u s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d u~ > a e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > a mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > a ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > b b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "d u~ > b t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > b t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d u~ > b t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > c c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d u~ > d d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d u~ > d u~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > d u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d u~ > d u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > d u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d u~ > e- ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > g b t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > g d u~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d u~ > g e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > g g w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d u~ > g mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > g s c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > g ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > g w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > g w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d u~ > g w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > g w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d u~ > h e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > h mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > h ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d u~ > mu- vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > s c~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > s c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > s c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > s c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > s s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d u~ > ta- vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > t t~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "d u~ > t~ b",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > u u~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d u~ > w-",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > w- a",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d u~ > w- a a",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d u~ > w- a h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > w- a z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d u~ > w- e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d u~ > w- h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d u~ > w- h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > w- mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d u~ > w- ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "d u~ > w- ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > w- vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > w- vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d u~ > w- z",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d u~ > w- z h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d u~ > w- z z",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "d u~ > w+ w- w-",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "d u~ > z e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > z mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d u~ > z ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d~ b > u~ t",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d~ b~ > d~ b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d~ b~ > d~ b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d~ b~ > d~ b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "d~ b~ > d~ b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d~ b~ > d~ t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d~ b~ > g d~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d~ b~ > u~ b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "d~ c~ > d~ c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d~ c~ > d~ c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d~ c~ > d~ c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d~ c~ > d~ c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d~ c~ > d~ s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d~ c~ > g d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d~ c~ > g u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "d~ c~ > u~ c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d~ c~ > u~ s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d~ c~ > u~ s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d~ c~ > u~ s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "d~ d~ > d~ d~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "d~ d~ > d~ d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d~ d~ > d~ d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "d~ d~ > d~ d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "d~ d~ > g d~ d~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "d~ d~ > u~ d~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "d~ s~ > d~ c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "d~ s~ > d~ s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "d~ s~ > d~ s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d~ s~ > d~ s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "d~ s~ > d~ s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "d~ s~ > g d~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "d~ s~ > u~ s~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "g b > b a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b > b a h",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b > b a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b > b b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 34
+  },
+  {
+    "process": "g b > b e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b > b h",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b h h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > b mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b > b ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b > b t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 21
+  },
+  {
+    "process": "g b > b ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "g b > b z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > b z h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > b z z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > c b c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b > d b d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b > d t u~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b > g b",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g b > g b a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > g b h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > g b z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > g g b",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g b > g t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > s b s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b > s t c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b > t e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > t mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > t ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > t w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b > t w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > t w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > t w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b > u b u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b~ > b b~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 34
+  },
+  {
+    "process": "g b~ > b~ a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b~ > b~ a h",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b~ > b~ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b~ > b~ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b~ > b~ h",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ h h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > b~ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b~ > b~ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g b~ > b~ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "g b~ > b~ z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > b~ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > b~ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > c c~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b~ > c s~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b~ > d d~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b~ > g b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g b~ > g b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > g b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > g b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > g g b~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g b~ > g t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > s s~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g b~ > t b~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 21
+  },
+  {
+    "process": "g b~ > t~ e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > t~ mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > t~ ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > t~ w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g b~ > t~ w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > t~ w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > t~ w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g b~ > u d~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g b~ > u u~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c > c a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c > c a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c > c b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c > c c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g c > c e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c > c mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c > c ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c > c t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c > c ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g c > c z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > c z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c > d c d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c > g c",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g c > g c a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c > g c z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c > g g c",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g c > g s w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c > s c s~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g c > s e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > s mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > s ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > s t b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c > s w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > s w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c > s w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c > s w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c > u c u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c > u s d~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > b c~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c~ > b s~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > c c~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g c~ > c~ a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c~ > c~ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c~ > c~ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > c~ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > c~ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > c~ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g c~ > c~ z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > c~ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g c~ > d d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c~ > d u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g c~ > g c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g c~ > g c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c~ > g c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c~ > g g c~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g c~ > g s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c~ > s s~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g c~ > s~ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > s~ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > s~ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > s~ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > s~ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c~ > s~ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g c~ > s~ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g c~ > t c~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g c~ > u u~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d > d a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d > d a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d > d b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d > d c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d > d d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g d > d e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d > d mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d > d s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d > d ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d > d t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d > d ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g d > d z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > d z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d > g d",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g d > g d a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d > g d z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d > g g d",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g d > g u w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d > u b t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d > u d u~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g d > u e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > u mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > u s c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d > u ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > u w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > u w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d > u w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d > u w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d~ > b d~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d~ > c d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d~ > c u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d~ > d d~ d~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g d~ > d~ a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d~ > d~ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d~ > d~ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d~ > d~ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d~ > d~ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d~ > d~ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g d~ > d~ z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > d~ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g d~ > g d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g d~ > g d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d~ > g d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d~ > g g d~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g d~ > g u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d~ > s d~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d~ > t d~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g d~ > t u~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g d~ > u u~ d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g d~ > u~ e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > u~ mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > u~ ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > u~ w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > u~ w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g d~ > u~ w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g d~ > u~ w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g g > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 25
+  },
+  {
+    "process": "g g > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g g > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g g > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g g > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > c b t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s > c e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > c mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > c ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > c w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > c w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > c w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > c w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > d c u~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s > d s d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s > g c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > g g s",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g s > g s",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g s > g s a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > g s z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s > s a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s > s a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s > s b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s > s c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g s > s e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s > s mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s > s s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g s > s ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s > s t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s > s ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g s > s z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s > s z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s > u s u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s~ > b s~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s~ > c s~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g s~ > c~ e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > c~ mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > c~ ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > c~ w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > c~ w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s~ > c~ w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > c~ w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s~ > d d~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s~ > g c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s~ > g g s~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g s~ > g s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g s~ > g s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s~ > g s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g s~ > s s~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g s~ > s~ a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s~ > s~ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s~ > s~ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s~ > s~ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s~ > s~ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s~ > s~ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g s~ > s~ z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g s~ > s~ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g s~ > t c~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s~ > t s~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g s~ > u d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g s~ > u u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u > d c s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u > d e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > d mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > d ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > d t b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u > d w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > d w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u > d w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > d w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u > g d w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u > g g u",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g u > g u",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g u > g u a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u > g u z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u > u a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g u > u a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g u > u b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u > u c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u > u d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g u > u e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u > u mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u > u s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u > u ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u > u t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u > u u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g u > u ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g u > u z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u > u z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g u~ > b d~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u~ > b u~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u~ > c u~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u~ > d u~ d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "g u~ > d~ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > d~ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > d~ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > d~ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > d~ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u~ > d~ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > d~ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u~ > g d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u~ > g g u~",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "g u~ > g u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "g u~ > g u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u~ > g u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "g u~ > s d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u~ > s u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u~ > t u~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "g u~ > u u~ u~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "g u~ > u~ a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g u~ > u~ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "g u~ > u~ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u~ > u~ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u~ > u~ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "g u~ > u~ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "g u~ > u~ z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "g u~ > u~ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s b > c b w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "s b > g s b",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s b > s b",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s b > s b a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s b > s b h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s b > s b z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s b > s t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s b~ > c b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "s b~ > c t~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s b~ > c t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s b~ > c t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s b~ > c t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s b~ > g c t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s b~ > g s b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s b~ > s b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s b~ > s b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s b~ > s b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s b~ > s b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s b~ > s t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s c > c c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s c > g s c",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c > s c",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c > s c a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c > s c h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c > s c z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c > s s w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s c~ > a e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > a mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > a ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > b b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "s c~ > b t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > b t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s c~ > b t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > c c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s c~ > d d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s c~ > d u~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > d u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > d u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > d u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > e- ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > g b t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > g d u~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > g e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > g g w-",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s c~ > g mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > g s c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c~ > g ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > g w-",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > g w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s c~ > g w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > g w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s c~ > h e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > h mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > h ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > mu- vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > s c~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > s c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c~ > s c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s c~ > s c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c~ > s s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s c~ > ta- vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > t t~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "s c~ > t~ b",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > u u~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s c~ > w-",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > w- a",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s c~ > w- a a",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s c~ > w- a h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > w- a z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s c~ > w- e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s c~ > w- h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s c~ > w- h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > w- mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s c~ > w- ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s c~ > w- ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > w- vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > w- vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s c~ > w- z",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s c~ > w- z h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s c~ > w- z z",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "s c~ > w+ w- w-",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s c~ > z e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > z mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s c~ > z ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s d~ > c d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s d~ > c u~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s d~ > c u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s d~ > c u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s d~ > c u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s d~ > g c u~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s d~ > g s d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s d~ > s d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s d~ > s d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s d~ > s d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s d~ > s d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s d~ > s u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s > g s s",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "s s > s c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s s > s s",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s > s s a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "s s > s s h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s > s s z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "s s~ > a a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > a a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > a e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > a mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > a ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > a ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > a z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s s~ > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s~ > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s s~ > c c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s s~ > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s s~ > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > d d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s~ > e- e+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > g a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s s~ > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > g e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > g g a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "s s~ > g g z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > g mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "s s~ > g ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > g ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s s~ > g z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > g z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > h e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > h mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > h ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "s s~ > h ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > h vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > h vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > mu- mu+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s s~ > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "s s~ > s s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "s s~ > ta- ta+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s~ > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s s~ > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s s~ > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s~ > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > u u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s s~ > ve ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > vm vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > vt vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > w- e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w- mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w- ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w+ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w+ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w+ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s s~ > w+ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s s~ > w+ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 15
+  },
+  {
+    "process": "s s~ > w+ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s s~ > w+ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "s s~ > z",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > z e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > z h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s s~ > z h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > z mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "s s~ > z ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s s~ > z ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > z vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > z vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > z z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s s~ > z z h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s s~ > z z z",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s u~ > c u~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s u~ > g s u~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s u~ > s d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s u~ > s u~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s u~ > s u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s u~ > s u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s u~ > s u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s~ b > c~ t",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "s~ b~ > c~ b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "s~ b~ > g s~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s~ b~ > s~ b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "s~ b~ > s~ b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "s~ b~ > s~ b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "s~ b~ > s~ b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "s~ b~ > s~ t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "s~ c~ > c~ c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s~ c~ > g s~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s~ c~ > s~ c~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "s~ c~ > s~ c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s~ c~ > s~ c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s~ c~ > s~ c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "s~ c~ > s~ s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s~ s~ > g s~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "s~ s~ > s~ c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "s~ s~ > s~ s~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "s~ s~ > s~ s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "s~ s~ > s~ s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "s~ s~ > s~ s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u b > d b w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "u b > d t",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u b > d t a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u b > d t h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u b > d t z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u b > g d t",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u b > g u b",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u b > u b",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u b > u b a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u b > u b h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u b > u b z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u b > u t w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u b~ > d b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "u b~ > g u b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u b~ > u b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u b~ > u b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u b~ > u b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u b~ > u b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u b~ > u t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u c > d c w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u c > g u c",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u c > u c",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u c > u c a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u c > u c h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u c > u c z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u c > u s w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u c~ > d c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u c~ > d s~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u c~ > d s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u c~ > d s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u c~ > d s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u c~ > g d s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u c~ > g u c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u c~ > u c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u c~ > u c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u c~ > u c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u c~ > u c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u c~ > u s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u d > d d w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u d > g u d",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d > u d",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d > u d a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d > u d h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d > u d z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d > u u w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u d~ > a e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > a mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > a ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > b b~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "u d~ > c c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u d~ > c s~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > c s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > c s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > c s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > d d~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u d~ > e+ ve",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > g c s~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > g e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > g g w+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u d~ > g mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > g ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > g t b~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > g u d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d~ > g w+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > g w+ a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u d~ > g w+ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > g w+ z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u d~ > h e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > h mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > h ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > mu+ vm",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > s s~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u d~ > ta+ vt",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > t b~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > t b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > t b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u d~ > t b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > t t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "u d~ > u d~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > u d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d~ > u d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u d~ > u d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d~ > u u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u d~ > w+",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > w+ a",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u d~ > w+ a a",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u d~ > w+ a h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > w+ a z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u d~ > w+ e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u d~ > w+ h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u d~ > w+ h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > w+ mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u d~ > w+ ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u d~ > w+ ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > w+ vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > w+ vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u d~ > w+ w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u d~ > w+ z",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u d~ > w+ z h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u d~ > w+ z z",
+    "n_outgoing": 3,
+    "n_diagrams": 14
+  },
+  {
+    "process": "u d~ > z e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > z mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u d~ > z ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u s > d c",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u s > d c a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u s > d c h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u s > d c z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u s > d s w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u s > g d c",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u s > g u s",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u s > u c w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u s > u s",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u s > u s a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u s > u s h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u s > u s z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u s~ > d s~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u s~ > g u s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u s~ > u c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u s~ > u s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u s~ > u s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u s~ > u s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u s~ > u s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u > g u u",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "u u > u d w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u u > u u",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u > u u a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u u > u u h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u > u u z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u u~ > a a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > a a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > a e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > a mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > a ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > a ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > a z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > b b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > b b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > b b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u u~ > b b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > b t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u u~ > c c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > c c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > c c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > c c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > c s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u u~ > d d~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > d d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u u~ > d d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > d d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u u~ > d u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u u~ > e- e+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g a",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g a a",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > g a z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > g b b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > g c c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > g d d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u u~ > g e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > g g",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > g g a",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > g g g",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "u u~ > g g z",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > g mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > g s s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > g ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > g t t~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > g u u~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "u u~ > g ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g w+ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u u~ > g z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g z h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > g z z",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > h e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > h mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > h ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u u~ > h ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > h vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > h vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > mu- mu+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > s c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u u~ > s s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > s s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > s s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > s s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > ta- ta+",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > t b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u u~ > t t~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > t t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u u~ > t t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u u~ > t t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u u~ > u d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u u~ > u u~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > u u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u u~ > u u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > u u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u u~ > ve ve~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > vm vm~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > vt vt~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > w- e+ ve",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w- mu+ vm",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w- ta+ vt",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w+ e- ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w+ mu- vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w+ ta- vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u u~ > w+ w-",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u u~ > w+ w- a",
+    "n_outgoing": 3,
+    "n_diagrams": 15
+  },
+  {
+    "process": "u u~ > w+ w- h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u u~ > w+ w- z",
+    "n_outgoing": 3,
+    "n_diagrams": 16
+  },
+  {
+    "process": "u u~ > z",
+    "n_outgoing": 1,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > z e- e+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > z h",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u u~ > z h h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > z mu- mu+",
+    "n_outgoing": 3,
+    "n_diagrams": 8
+  },
+  {
+    "process": "u u~ > z ta- ta+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u u~ > z ve ve~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > z vm vm~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > z vt vt~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > z z",
+    "n_outgoing": 2,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u u~ > z z h",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u u~ > z z z",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ b~ > d~ b~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 10
+  },
+  {
+    "process": "u~ b~ > d~ t~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u~ b~ > d~ t~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u~ b~ > d~ t~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u~ b~ > d~ t~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u~ b~ > g d~ t~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u~ b~ > g u~ b~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u~ b~ > u~ b~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u~ b~ > u~ b~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u~ b~ > u~ b~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 7
+  },
+  {
+    "process": "u~ b~ > u~ b~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u~ b~ > u~ t~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ c~ > d~ c~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ c~ > g u~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u~ c~ > u~ c~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u~ c~ > u~ c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u~ c~ > u~ c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u~ c~ > u~ c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u~ c~ > u~ s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ d~ > d~ d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u~ d~ > g u~ d~",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u~ d~ > u~ d~",
+    "n_outgoing": 2,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u~ d~ > u~ d~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u~ d~ > u~ d~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u~ d~ > u~ d~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 17
+  },
+  {
+    "process": "u~ d~ > u~ u~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u~ s~ > d~ c~",
+    "n_outgoing": 2,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u~ s~ > d~ c~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u~ s~ > d~ c~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u~ s~ > d~ c~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 5
+  },
+  {
+    "process": "u~ s~ > d~ s~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ s~ > g d~ c~",
+    "n_outgoing": 3,
+    "n_diagrams": 4
+  },
+  {
+    "process": "u~ s~ > g u~ s~",
+    "n_outgoing": 3,
+    "n_diagrams": 13
+  },
+  {
+    "process": "u~ s~ > u~ c~ w+",
+    "n_outgoing": 3,
+    "n_diagrams": 9
+  },
+  {
+    "process": "u~ s~ > u~ s~",
+    "n_outgoing": 2,
+    "n_diagrams": 3
+  },
+  {
+    "process": "u~ s~ > u~ s~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u~ s~ > u~ s~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 1
+  },
+  {
+    "process": "u~ s~ > u~ s~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 12
+  },
+  {
+    "process": "u~ u~ > g u~ u~",
+    "n_outgoing": 3,
+    "n_diagrams": 26
+  },
+  {
+    "process": "u~ u~ > u~ d~ w-",
+    "n_outgoing": 3,
+    "n_diagrams": 18
+  },
+  {
+    "process": "u~ u~ > u~ u~",
+    "n_outgoing": 2,
+    "n_diagrams": 6
+  },
+  {
+    "process": "u~ u~ > u~ u~ a",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  },
+  {
+    "process": "u~ u~ > u~ u~ h",
+    "n_outgoing": 3,
+    "n_diagrams": 2
+  },
+  {
+    "process": "u~ u~ > u~ u~ z",
+    "n_outgoing": 3,
+    "n_diagrams": 24
+  }
+]
