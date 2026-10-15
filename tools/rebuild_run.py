@@ -30,19 +30,23 @@ def _load_best_ckpt(run_dir):
 
 
 def load_best_state(run_dir):
-    """The best checkpoint's "model" entry, plain or gzipped. With EMA on this is the LIVE weights at the
-    best step, not the EMA average that scored it: base_experiment._save_model takes state_dict() inside
-    ema.average_parameters() but saves after the context restored the live weights into the same storage.
-    To score a run as it was validated, use load_best_weights."""
+    """The best checkpoint's "model" entry, plain or gzipped. With EMA on it is the EMA average that validation
+    scored only in a checkpoint written since D63 (marker "model_is_ema"); in an older one it is the LIVE weights at
+    the best step (base_experiment._save_model took state_dict() inside ema.average_parameters() but saved after the
+    context restored the live weights into the same storage; docs/results.tex sec:ema-ckpt). To score a run as it
+    was validated, use load_best_weights."""
     return _load_best_ckpt(run_dir)["model"]
 
 
 def load_best_weights(model, run_dir):
     """Load the best checkpoint (es_load_best_model: the validation minimum) into `model` as the run
-    validated it: the "model" entry, then, where the run had EMA on, the EMA shadow over model.parameters()
-    (the order ExponentialMovingAverage was built with). Returns True if the EMA shadow was applied."""
+    validated it. A checkpoint written since D63 with EMA on ("model_is_ema") holds the EMA weights in "model"; an
+    older one holds the live weights there, and the EMA shadow is applied over model.parameters() (the order
+    ExponentialMovingAverage was built with). Returns True if the weights loaded are the EMA weights."""
     ck = _load_best_ckpt(run_dir)
     model.load_state_dict(ck["model"])
+    if ck.get("model_is_ema"):
+        return True
     ema = ck.get("ema")
     if not ema:
         return False

@@ -59,8 +59,8 @@ for recipe in a.recipes:
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
         continue
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
-    # the fine-tune path loads the checkpoint's "model" entry, the live weights at the best step; the parent's recorded
-    # loss is its EMA shadow's (docs/results.tex sec:ema-ckpt), so that is what is scored here
+    # the parent's recorded loss is its EMA weights' (docs/results.tex sec:ema-ckpt), so that is what is scored here,
+    # as fine-tunes start from it since D63 (base_experiment._ckpt_scored_state)
     ema_applied = load_best_weights(exp.model, parent)
     probe = str(exp.cfg.data.dataset[0])
     N = int(exp._proc_npart[0])

@@ -60,7 +60,7 @@ def measure(run_dir, n_events, n_rep, seed=0):
     exp._init()
     exp.init_physics(); exp.init_geometric_algebra(); exp.init_data(); exp._init_dataloader(); exp.init_model()   # full_run's order
     ck = _torch_load(os.path.join(run_dir, "models", f"model_run{idx}_best.pt.gz"), map_location=exp.device, weights_only=False)
-    exp.model.load_state_dict(ck["model"])
+    exp.model.load_state_dict(ck.get("model_live", ck["model"]))   # live weights; the EMA ones come from ck["ema"]
     if exp.ema is not None and ck.get("ema") is not None:
         exp.ema.load_state_dict(ck["ema"])
 

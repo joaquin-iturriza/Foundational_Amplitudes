@@ -2,8 +2,8 @@
 aggregate without the regularizer) and each process's standardized loss. For runs that diverged before writing a
 result: their best checkpoint is still their value (CLAUDE.md, reported values), and their logs print the
 regularized loss to four decimals, which the L2 term swamps at large lambda. The run is rebuilt with EMA off and the
-weights validation used (rebuild_run.load_best_weights: the checkpoint's EMA shadow where EMA was on; its "model"
-entry alone is the live weights at the best step).
+weights validation used (rebuild_run.load_best_weights: the EMA weights where EMA was on; in a checkpoint older than
+D63 the "model" entry alone is the live weights at the best step).
 The rebuilt statistics are asserted against the run's data_stats.json. Prints one EVAL_BEST JSON line per run.
 Needs a GPU.
     python tools/eval_best_val.py <run_dir> [<run_dir> ...]

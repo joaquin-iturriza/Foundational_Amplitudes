@@ -15,6 +15,7 @@ Usage:
 """
 
 import argparse
+import contextlib
 import json
 import os
 import re
@@ -44,7 +45,10 @@ SWEEP_BASE  = os.path.join(LUSTRE_BASE, "sweeps", "pretraining_scaling")
 def _compute_proc_no_reg(exp):
     exp.model.eval()
     proc_losses_no_reg = {}
-    with torch.no_grad():
+    # the weights validation scored: the checkpoint's EMA average where EMA was on (_load_model_weights restores
+    # the checkpoint's EMA state; D63, docs/results.tex sec:ema-ckpt)
+    ema_ctx = exp.ema.average_parameters() if exp.ema is not None else contextlib.nullcontext()
+    with torch.no_grad(), ema_ctx:
         for name, loader in exp.proc_val_loaders.items():
             batch_losses = []
             for data in loader:
