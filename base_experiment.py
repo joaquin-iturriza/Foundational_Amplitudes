@@ -77,6 +77,40 @@ torch.autograd.set_detect_anomaly(False)
 MIN_STEP_SKIP = 1000
 
 
+def _ckpt_live_state(ck):
+    """A checkpoint's live (training) weights, the ones a resume continues from: "model_live" where the checkpoint
+    was written with EMA on (format marker "model_is_ema"; D63), else "model" (EMA off, or a checkpoint older than
+    D63, whose "model" holds the live weights; docs/results.tex sec:ema-ckpt)."""
+    return ck["model_live"] if "model_live" in ck else ck["model"]
+
+
+def _ckpt_scored_state(ck, buffer_names):
+    """A checkpoint's weights as validation scored them: with EMA on, the EMA average; else the weights themselves.
+    Returns (state_dict, source) with source "ema" (the checkpoint's "model", D63 format), "shadow" (an older
+    checkpoint: its EMA shadow over the parameter entries of "model"), "model" (EMA off), or "live" (an older
+    checkpoint whose shadow cannot be mapped to its parameter entries; the live weights are returned, and the
+    fine-tune refuses them).
+
+    The shadow is a list in model.parameters() order of the model the EMA was built on. The parameters of a state
+    dict are, in order, its entries minus the buffers (state_dict and named_parameters walk the modules in the same
+    order), so the shadow is mapped onto the entries of "model" that are not in `buffer_names`, after checking that
+    count and every shape agree with the checkpoint's own tensors."""
+    sd = ck["model"]
+    if ck.get("model_is_ema"):
+        return sd, "ema"
+    ema = ck.get("ema")
+    if not ema:
+        return sd, "model"
+    shadow = ema["shadow_params"]
+    keys = [k for k in sd if k not in buffer_names]
+    if len(keys) != len(shadow) or any(tuple(sd[k].shape) != tuple(s.shape) for k, s in zip(keys, shadow)):
+        return sd, "live"
+    out = dict(sd)
+    for k, s in zip(keys, shadow):
+        out[k] = s.to(device=sd[k].device, dtype=sd[k].dtype)
+    return out, "shadow"
+
+
 def _merge_lora_state(state_dict, pretrained_path):
     """A parent trained with LoRA (fine_tune.lora) saves each adapted linear as P.linear.{weight,bias} plus P.lora_A,
     P.lora_B; a plain model expects P.{weight,bias}. Fold the adapters in, W = W0 + (alpha/rank) B A (LoRALinear.merge),
@@ -335,7 +369,7 @@ class BaseExperiment:
             try:
                 state_dict = _torch_load(model_path, map_location=self.device, weights_only=False)
                 LOGGER.info(f"Loading model from {model_path}")
-                self.model.load_state_dict(state_dict["model"])
+                self.model.load_state_dict(_ckpt_live_state(state_dict))
 
                 if self.ema is not None and "ema" in state_dict:
                     self.ema.load_state_dict(state_dict["ema"])
@@ -1200,8 +1234,19 @@ class BaseExperiment:
         weights — optimizer and scheduler state are always started fresh.
         """
         try:
-            state_dict = _torch_load(pretrained_path, map_location=self.device, weights_only=False)["model"]
+            ck = _torch_load(pretrained_path, map_location=self.device, weights_only=False)
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
+            # the parent's weights as its validation scored them (its reported loss): with EMA on, the EMA average
+            # (D63; docs/results.tex sec:ema-ckpt)
+            state_dict, source = _ckpt_scored_state(ck, {n for n, _ in self.model.named_buffers()})
+            if source == "shadow":
+                LOGGER.info("Fine-tuning: the parent's EMA weights (its EMA shadow over its live weights)")
+            elif source == "ema":
+                LOGGER.info("Fine-tuning: the parent's EMA weights")
+            elif source == "live":
+                raise RuntimeError(f"Fine-tuning: the EMA shadow of {pretrained_path} does not map onto its parameter "
+                                   "entries (count or shapes differ), so its EMA weights cannot be rebuilt; refusing "
+                                   "to start from its live weights (D63)")
             state_dict = _merge_lora_state(state_dict, pretrained_path)
             if reset_output_head:
                 # Drop any parameter whose shape differs from the current model (e.g. the
@@ -1235,9 +1280,14 @@ class BaseExperiment:
 
     def _load_model_weights(self, model_path):
         try:
-            state_dict = _torch_load(model_path, map_location=self.device, weights_only=False)["model"]
+            ck = _torch_load(model_path, map_location=self.device, weights_only=False)
             LOGGER.info(f"Loading model from {model_path}")
-            self.model.load_state_dict(state_dict)
+            # the live weights and, with EMA on, the checkpoint's own EMA state: a later
+            # ema.average_parameters() (validation, evaluate) then scores this checkpoint's EMA weights, and
+            # reloading the current checkpoint restores training exactly (D63; docs/results.tex sec:ema-ckpt)
+            self.model.load_state_dict(_ckpt_live_state(ck))
+            if self.ema is not None and ck.get("ema") is not None:
+                self.ema.load_state_dict(ck["ema"])
         except FileNotFoundError:
             LOGGER.warning(f"Cannot load model from {model_path}")
         # base shapes are intrinsic to the constructed backbone; load_state_dict
@@ -1509,23 +1559,27 @@ class BaseExperiment:
             filename = f"model_run{self.cfg.run_idx}.pt"
         model_path = os.path.join(self.cfg.run_dir, "models", filename)
         LOGGER.debug(f"Saving model at {model_path}")
+        ckpt = {
+            "model": self.model.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+            "scheduler": self.scheduler.state_dict()
+            if self.scheduler is not None
+            else None,
+            "ema": self.ema.state_dict() if self.ema is not None else None,
+            "step": step
+        }
         if self.ema is not None:
+            # "model" is the EMA average validation scored, cloned inside the context (a state dict shares storage
+            # with the parameters, which the context restores to the live weights on exit); the live weights, which
+            # a resume continues from, go in "model_live" (D63; docs/results.tex sec:ema-ckpt)
             with self.ema.average_parameters():
-                model_state = self.model.state_dict()
-        else:
-            model_state = self.model.state_dict()
-        torch.save(
-            {
-                "model": model_state,
-                "optimizer": self.optimizer.state_dict(),
-                "scheduler": self.scheduler.state_dict()
-                if self.scheduler is not None
-                else None,
-                "ema": self.ema.state_dict() if self.ema is not None else None,
-                "step": step
-            },
-            model_path,
-        )
+                ema_state = self.model.state_dict()        # a fresh OrderedDict (keeps _metadata); clone its values
+                for k in ema_state:
+                    ema_state[k] = ema_state[k].detach().clone()
+            ckpt["model"] = ema_state
+            ckpt["model_live"] = self.model.state_dict()
+            ckpt["model_is_ema"] = True
+        torch.save(ckpt, model_path)
 
     def compress_models(self):
         pt_files = glob.glob(os.path.join(self.cfg.run_dir , "models", "*.pt"))
