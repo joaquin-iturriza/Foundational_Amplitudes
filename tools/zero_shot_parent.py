@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
-from rebuild_run import _build  # noqa: E402
+from rebuild_run import _build, load_best_weights  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--parent", required=True, help="pretraining run dir (config.yaml, data_stats.json, models/)")
@@ -59,6 +59,9 @@ for recipe in a.recipes:
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
         continue
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
+    # the fine-tune path loads the checkpoint's "model" entry, the live weights at the best step; the parent's recorded
+    # loss is its EMA shadow's (docs/results.tex sec:ema-ckpt), so that is what is scored here
+    ema_applied = load_best_weights(exp.model, parent)
     probe = str(exp.cfg.data.dataset[0])
     N = int(exp._proc_npart[0])
     exp.model.to(exp.device, dtype=exp.dtype).eval()
@@ -86,7 +89,7 @@ for recipe in a.recipes:
         mu_c, sd_c, kind = float(pstats["prepd_mean"][0]), float(pstats["prepd_std"][0]), "shared"
     else:
         mu_c = sd_c = None; kind = "per_process"
-    rec = {"probe": probe, "n_particles": N, "recipe": recipe, "parent": parent, "parent_stats": kind,
+    rec = {"probe": probe, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
            "n_val": int(len(z)), "var_logm2": float(np.var(t)), "val_loss_affine": affine,
            "affine_ab": [float(c) for c in coef]}
     if mu_c is not None:
