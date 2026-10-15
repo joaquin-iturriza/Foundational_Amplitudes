@@ -129,6 +129,13 @@ data:
  # (Breit–Wigner denominators; the scanned mass where a scan sets it), so the log target is the
  # smooth remainder; undone exactly at evaluation (raw metrics on the true |M|²). Needs the
  # diagram sidecars like offshell_per_event. Widths: the MadGraph sm model defaults.
+ # Decomposed targets (D48, tools/decomp_targets.py): the net predicts the parts of |M|^2 a real calculation
+ # sums -- colour-ordered partial amplitudes (colour) or Feynman-diagram amplitudes (diagram) -- as their
+ # helicity-summed Gram matrix, and |M|^2 is their coherent sum Re sum_ab K_ab X_ab. null = off. The parts are
+ # read from sidecars <decomp_dir>/<pool>.decomp.npz (default ${DATA_DIR}/decomp), aligned row by row with the
+ # pools and checked against the stored |M|^2. Recipe path (not memmap), single colour/diagram count.
+ decomp_basis: null
+ decomp_dir: null
  target_propagators: false
  target_propagator_pdgs: [23, 24, 6, 25]
  target_propagator_widths: {23: 2.4414, 24: 2.0476, 6: 1.5083, 25: 0.006382}

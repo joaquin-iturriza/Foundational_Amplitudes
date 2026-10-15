@@ -317,6 +317,7 @@ def main():
     ap.add_argument("--workdir", default=os.path.join(os.environ.get("SCRATCH", "/tmp"), "decomp_sa"))
     ap.add_argument("--n-max", type=int, default=None)
     ap.add_argument("--rtol", type=float, default=1e-10)
+    ap.add_argument("--seed", type=int, default=42, help="data.seed of the runs that read the pools")
     a = ap.parse_args()
     if a.pool:
         run_pool(a.process, a.pool, a.out, a.workdir, a.n_max, a.rtol)
@@ -326,13 +327,19 @@ def main():
     import yaml
     import datagen
     rec = yaml.safe_load(open(a.recipe))
+    procs = rec["processes"] if isinstance(rec, dict) else rec
     out_dir = a.out_dir or os.path.join(os.environ.get("DATA_DIR", mg.OUTPUT_DIR), "decomp")
-    seed = 42
+    # the pools as training resolves them (experiment._resolve_recipe_config): the recipe's sampling policy is
+    # attached to the process before the pool path is derived; the sidecar's stored |M|^2 is checked against the
+    # pool row by row when a run loads it, so a wrong pool cannot pass silently
+    specs = [{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
+              "sampling": p.get("sampling")} for p in procs]
+    mg.register_recipe_processes(specs, default_sampling=rec.get("sampling") if isinstance(rec, dict) else None)
     for role, key in (("train", "n_train"), ("val", "n_val"), ("test", "n_test")):
-        specs = [{"process": p["name"], "sqrts_min": p["sqrts"][0], "sqrts_max": p["sqrts"][1],
-                  "n_events": p[key]} for p in rec["processes"] if p["name"] == a.process]
-        paths = datagen.ensure_split_set(specs, role=role, seed=seed, require_cache=True)
-        pool = paths[a.process]
+        rs = [{"process": p["name"], "sqrts_min": float(p["sqrts"][0]), "sqrts_max": float(p["sqrts"][1]),
+               "n_events": int(p[key])} for p in procs if p["name"] == a.process]
+        assert rs, f"{a.process} not in {a.recipe}"
+        pool = datagen.ensure_split_set(rs, role=role, seed=a.seed, require_cache=True)[a.process]
         run_pool(a.process, pool, decomp_path(out_dir, pool), a.workdir, a.n_max, a.rtol)
 
 

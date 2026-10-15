@@ -1493,6 +1493,23 @@ class AmplitudeExperiment(BaseExperiment):
             train_cap = None
         cap_for   = {"train": train_cap, "val": eval_cap, "test": eval_cap}
 
+        self._decomp_basis = self.cfg.data.get("decomp_basis", None) or None
+        if self._decomp_basis:
+            assert self._decomp_basis in ("colour", "diagram"), f"data.decomp_basis={self._decomp_basis}"
+            assert not bool(self.cfg.data.get("memmap", False)), "data.decomp_basis is not wired into data.memmap"
+            assert not bool(self.cfg.data.get("target_propagators", False)), \
+                "data.decomp_basis decomposes the true |M|^2; data.target_propagators would rescale it"
+            assert not bool(self.cfg.training.get("sign_head", False)), "data.decomp_basis: |M|^2 > 0, no sign head"
+            assert self.cfg.training.loss == "MSE", "data.decomp_basis is wired for the MSE loss"
+            assert per_dataset, "data.decomp_basis needs data.preprocess_per_dataset"
+            # the parts loss is added in _batch_loss_lloca only: the micro-batch and loop paths would drop it
+            assert not self._accumulation_mode(self.cfg.training.get("per_process_accumulation", False)), \
+                "data.decomp_basis is not wired into training.per_process_accumulation"
+            assert os.environ.get("LLOCA_PROC_LOSS", "vectorized") != "loop", "data.decomp_basis: LLOCA_PROC_LOSS=loop"
+            _ft = self.cfg.get("fine_tune", None)
+            assert _ft is None or _ft.get("pretrained_path", None) is None or bool(_ft.get("reset_output_head", False)), \
+                "data.decomp_basis changes the readout width: a fine-tune needs fine_tune.reset_output_head"
+
         if bool(self.cfg.data.get("memmap", False)):
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
@@ -1554,6 +1571,8 @@ class AmplitudeExperiment(BaseExperiment):
                     "tokens":  toks,
                     "raw_amp": amplitudes,
                 }
+                if self._decomp_basis:
+                    store[(role, name)]["decomp_X"] = self._load_decomp(paths[role][name], amplitudes, cap)
 
         # --- single GLOBAL momentum scale, fit on TRAIN only (matches upstream
         #     load_file: momentum /= momentum.std()), then applied to every block.
@@ -1720,6 +1739,7 @@ class AmplitudeExperiment(BaseExperiment):
         role_offshell = []   # per-event propagator off-shellness (s_prop − M²)
         role_factor = []     # per-event target factor (data.target_propagators; 1 when off)
         role_sign = []       # per-event sign target (1 for x >= 0), used by training.sign_head
+        role_decomp = []     # per-event decomposed-target columns (data.decomp_basis)
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
@@ -1730,6 +1750,7 @@ class AmplitudeExperiment(BaseExperiment):
             ev_offshell = []
             ev_factor = []
             ev_sign = []
+            ev_decomp = []
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
@@ -1754,6 +1775,8 @@ class AmplitudeExperiment(BaseExperiment):
                 ev_factor.append(np.asarray(rec.get("amp_factor", np.ones_like(rec["raw_amp"])),
                                             dtype=np.float64).reshape(-1))
                 ev_sign.append((np.asarray(rec["raw_amp"]).reshape(-1) >= 0).astype(np.float32))
+                if self._decomp_basis:
+                    ev_decomp.append(self._decomp_features(rec["decomp_X"], rec["raw_amp"]))
                 if _want_resarg:
                     # per-event √s (physical) from the initial pair (parts are /mom_div)
                     q  = parts[:, 0, :] + parts[:, 1, :]                    # (N,4)
@@ -1805,6 +1828,8 @@ class AmplitudeExperiment(BaseExperiment):
             role_order.append(order[perm])
             role_factor.append(np.concatenate(ev_factor, axis=0)[perm])
             role_sign.append(np.concatenate(ev_sign, axis=0)[perm])
+            if self._decomp_basis:
+                role_decomp.append(np.concatenate(ev_decomp, axis=0)[perm])
             if _want_resarg:
                 role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
             if _want_offshell:
@@ -1838,6 +1863,11 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"sign_head ON: {int(self._proc_signed.sum())}/{self.n_datasets} sign-changing pools "
                         f"carry the sign loss (weight {float(self.cfg.training.get('sign_loss_weight', 1.0))}); "
                         f"their target is log|x|")
+        if self._decomp_basis:
+            # target columns [log|M|^2 standardized, parts...]: the parts are read by the decomposed loss only
+            dec = np.concatenate(role_decomp, axis=0).astype(np.float32)
+            self.all_amplitudes = np.concatenate([self.all_amplitudes.reshape(-1, 1), dec], axis=1)
+            self._setup_decomp_head(names, prepd_stds)
         if _want_resarg:
             # Replace the internal-mass slot (last n_pdg cols) with the PER-EVENT
             # resonance argument (√s − m), standardized to O(1). This hands the model
@@ -1881,6 +1911,78 @@ class AmplitudeExperiment(BaseExperiment):
             self._save_data_stats(stats_path, mom_div, amp_trafos, per_dataset)
 
         self._finalize_data_sizing()
+
+    # ------------------------------------------------------------------ decomposed targets (D48)
+    # The parts of |M|^2 (tools/decomp_targets.py): X_ab = sum_h A_a(h) A_b(h)^*, the helicity-summed Gram matrix of
+    # the colour-ordered partial amplitudes (basis "colour") or of the diagram amplitudes ("diagram"), with
+    # |M|^2 = Re sum_ab K_ab X_ab exactly (K: colour matrix and averaging; diagram basis K = C^T G C^*).
+    # Net: per slot a a log-magnitude rho_a and a direction u_a in C^n (|u_a| = 1), X^pred_ab = e^{rho_a+rho_b}
+    # u_a.u_b^*; |M|^2 is their coherent sum, so the loss on log|M|^2 is the usual one. The parts loss compares
+    # each part's share log(X_aa/|M|^2) (in units of the target's std) and the normalised interference
+    # X_ab/sqrt(X_aa X_bb) of each pair, against the truth.
+    def _load_decomp(self, pool, amplitudes, cap):
+        import datagen
+        d = self.cfg.data.get("decomp_dir", None) or os.path.join(
+            os.environ.get("DATA_DIR") or datagen.frozen_dir(), "decomp")
+        f = os.path.join(d, os.path.basename(pool).replace(".npy", "") + ".decomp.npz")
+        assert os.path.exists(f), f"data.decomp_basis: no sidecar {f} (tools/decomp_targets.py --recipe ...)"
+        z = np.load(f)
+        X = z["Xc" if self._decomp_basis == "colour" else "Xd"]
+        K = z["G"].astype(np.complex128) if self._decomp_basis == "colour" else z["K"]
+        n = amplitudes.shape[0]
+        assert X.shape[0] >= n, f"{f}: {X.shape[0]} rows for {n} events"
+        X, stored = X[:n], z["stored"][:n]
+        amp = np.asarray(amplitudes, dtype=np.float64).reshape(-1)
+        # row alignment: the sidecar carries the pool's own |M|^2, and the parts must sum back to it
+        assert np.array_equal(stored, amp), f"{f}: stored |M|^2 differs from the pool's (rows misaligned?)"
+        rel = np.abs(np.einsum("ab,nab->n", K, X).real - amp) / np.abs(amp)
+        assert rel.max() < 1e-10, f"{f}: coherent sum misses |M|^2 by {rel.max():.2e}"
+        name = str(z["process"])
+        self._decomp_K = getattr(self, "_decomp_K", {})
+        self._decomp_K[name] = K
+        LOGGER.info(f"decomp {self._decomp_basis}: {os.path.basename(f)} {X.shape[1]} parts, {n} rows, "
+                    f"coherent sum = |M|^2 to {rel.max():.1e}")
+        return X
+
+    def _decomp_features(self, X, raw_amp):
+        import decomp_head
+        return decomp_head.features(X, raw_amp)
+
+    def _setup_decomp_head(self, names, prepd_stds):
+        import decomp_head
+        Ks = [self._decomp_K[n] for n in names]
+        nb = Ks[0].shape[0]
+        assert all(K.shape == (nb, nb) for K in Ks), "data.decomp_basis: one part count for every process"
+        # the readout returns ln(S)/s: the target must be (ln|M|^2 - m)/s for every pool
+        assert self._amp_trafos_pp and all(list(t) == ["log", "standardization"] for t in self._amp_trafos_pp), \
+            f"data.decomp_basis needs every pool on [log, standardization], got {self._amp_trafos_pp}"
+        c = np.array([np.trace(K).real for K in Ks])
+        self._decomp_n = nb
+        self._decomp_Kt_np = np.stack([K / ci for K, ci in zip(Ks, c)])
+        self._decomp_logc_np = np.log(c)
+        self._decomp_s_np = np.asarray(prepd_stds, dtype=np.float64).reshape(-1)
+        assert len(self._decomp_s_np) == len(names)
+        with open_dict(self.cfg):
+            self.cfg.model.net.out_channels = decomp_head.n_out(nb)
+        LOGGER.info(f"decomp {self._decomp_basis} ON: {nb} parts per event, net out_channels {decomp_head.n_out(nb)} "
+                    f"(log-magnitude + a direction in C^{nb} per part), parts-loss weight "
+                    f"{float(self.cfg.training.get('decomp_weight', 1.0))}")
+
+    def _decomp_tensors(self, device):
+        if getattr(self, "_decomp_t", None) is None or self._decomp_t[0].device != device:
+            self._decomp_t = (torch.as_tensor(self._decomp_Kt_np, dtype=torch.complex128, device=device),
+                              torch.as_tensor(self._decomp_logc_np, dtype=torch.float64, device=device),
+                              torch.as_tensor(self._decomp_s_np, dtype=torch.float64, device=device))
+        return self._decomp_t
+
+    def _decomp_readout(self, raw, process_ids):
+        import decomp_head
+        Kt, logc, s = self._decomp_tensors(raw.device)
+        return decomp_head.readout(raw, Kt, logc, s, process_ids, self._decomp_n)
+
+    def _decomp_parts_loss(self, lhat, gram, y, process_ids):
+        import decomp_head
+        return decomp_head.parts_loss(lhat, gram, y, self._decomp_tensors(lhat.device)[2], process_ids, self._decomp_n)
 
     def _resolve_amp_preprocessing(self, names, roles, get_amp, train_raw, npart_of, per_dataset,
                                    amp_trafos, amp_trafos_pp, prepd_means, prepd_stds, global_min=None):
@@ -2637,6 +2739,7 @@ class AmplitudeExperiment(BaseExperiment):
         all_sigma = [] if self.cfg.training.loss == "HETEROSC" else None
         all_pids  = [] if return_process_ids else None
         all_signs = []          # (N,2) bool [predicted sign > 0, true sign > 0] with the sign head
+        dec_err = []            # data.decomp_basis: per-event errors of the parts (log-share, interference)
 
         t0 = time.time()
         for data in loader:
@@ -2694,6 +2797,12 @@ class AmplitudeExperiment(BaseExperiment):
                 all_signs.append(np.stack([(y_pred[..., -1] > 0).cpu().numpy(),
                                            (y[..., 1] > 0.5).cpu().numpy()], axis=1))
                 y_pred, y = y_pred[..., :-1], y[..., :1]
+            if is_lloca and getattr(self, "_decomp_basis", None):
+                import decomp_head
+                y_pred, lhat, gram = self._decomp_readout(y_pred, process_ids)
+                dec_err.append(decomp_head.parts_errors(lhat, gram, y.to(self.device), self._decomp_tensors(self.device)[2],
+                                                        process_ids, self._decomp_n).cpu().numpy())
+                y = y[..., :1]
 
             all_pred.append(y_pred[:, :1].cpu().float().numpy() if not is_lloca
                             else y_pred.cpu().float().numpy())
@@ -2704,6 +2813,13 @@ class AmplitudeExperiment(BaseExperiment):
         LOGGER.info(
             f"Collected {sum(len(p) for p in all_pred)} predictions in {time.time()-t0:.2f}s"
         )
+        if dec_err:
+            e = np.concatenate(dec_err, axis=0)
+            nb = self._decomp_n
+            LOGGER.info(f"decomp {self._decomp_basis}: RMS error of the parts' log-share log(X_aa/|M|^2) per part "
+                        + " ".join(f"{x:.4g}" for x in np.sqrt((e[:, :nb] ** 2).mean(0)))
+                        + (f"; RMS error of the normalised interference (Re, Im per pair) "
+                           + " ".join(f"{x:.4g}" for x in np.sqrt((e[:, nb:] ** 2).mean(0))) if e.shape[1] > nb else ""))
         amp_pred_prepd  = np.concatenate(all_pred,  axis=0)
         amp_truth_prepd = np.concatenate(all_truth, axis=0)
         sigmas = np.concatenate(all_sigma, axis=0) if all_sigma else None
@@ -3087,6 +3203,12 @@ class AmplitudeExperiment(BaseExperiment):
         if getattr(self, "_sign_head", False):
             self._last_sign = (y_pred[..., -1:], y[..., 1:])
             y_pred, y = y_pred[..., :-1], y[..., :1]
+        # decomposed targets: the parts' coherent sum is the prediction, the parts go to the parts loss
+        self._last_decomp = None
+        if getattr(self, "_decomp_basis", None):
+            y_pred, lhat, gram = self._decomp_readout(y_pred, process_ids)
+            self._last_decomp = (lhat, gram, y)
+            y = y[..., :1]
         return y_pred, y, process_ids, sigma, mse_val
 
     def _batch_loss_lloca(self, data):
@@ -3096,6 +3218,11 @@ class AmplitudeExperiment(BaseExperiment):
         loss_agg = self.cfg.training.get("loss_aggregation", "mean")
         loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma,
                                                 sign=self._last_sign)
+        # data.decomp_basis: the parts loss, added after the aggregation (training only), so the per-process
+        # weighting of the |M|^2 loss (geometric mean: 1/MSE_p) is the baseline's own
+        w_dec = float(self.cfg.training.get("decomp_weight", 1.0) or 0.0)
+        if getattr(self, "_last_decomp", None) is not None and self.model.training and w_dec > 0:
+            loss = loss + w_dec * self._decomp_parts_loss(*self._last_decomp, process_ids).mean().to(loss.dtype)
 
         reg         = self._reg_term(self.model)
         # Keep the no-reg loss as a detached tensor instead of syncing here with

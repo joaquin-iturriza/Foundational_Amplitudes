@@ -178,6 +178,11 @@ training:
  # with the sign accuracy on the signed pools logged. LLoCa path only.
  sign_head: false
  sign_loss_weight: 1.0
+ # Decomposed targets (data.decomp_basis, D48): weight of the parts loss, added after the per-process aggregation (log-fraction of each
+ # part's |part|^2 in |M|^2 and the normalised interference of each pair); 0 keeps the coherent readout only.
+ # Training loss only: validation and checkpoint selection stay the MSE of log|M|^2.
+ decomp_weight: 1.0     # a design choice (parts loss O(1) like the standardized MSE at init), not tuned: searched with
+                        # the other HPs if the same-HP run does not beat the baseline (CLAUDE.md A/B step 4)
  loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
                         # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact
