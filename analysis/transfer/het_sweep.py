@@ -69,8 +69,9 @@ def main():
     ps.colorbar(ax, mpl.cm.ScalarMappable(norm=norm, cmap=cmap), r"$\log_{10}$ lr")
     ps.save(fig, os.path.join(OUT, "het_sweep_trials"))
     for d in rs:
-        print(f"{d['hp']}: val NLL {d['val_loss']:.3f} at step {d['best_step']}, val MSE(mu) {d['val_mse_curve'][-1]:.3g}, "
-              f"train-split MSE(mu) {d['train_eval_mse_curve'][-1]:.3g}")
+        i = int(np.argmin(d["val_curve"]))   # the best checkpoint's validation (CLAUDE.md "Reported values")
+        print(f"{d['hp']}: val NLL {d['val_loss']:.3f} at step {d['best_step']}, val MSE(mu) {d['val_mse_curve'][i]:.3g}, "
+              f"train-split MSE(mu) {d['train_eval_mse_curve'][i]:.3g}")
 
 
 if __name__ == "__main__":
