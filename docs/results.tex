@@ -2119,12 +2119,12 @@ same weights. Right: every trial's validation NLL, coloured by $\log_{10}$ lr; e
 \paragraph{Longer horizons (D61).} \code{hp1550} retrained at $8$k, $16$k and $32$k steps, all seed $1$, no sweep, with the
 cosine spanning the whole run (\code{scripts/job\_het\_ab.sh}; a first $16$k/$32$k attempt kept the trial's
 \code{increment\_steps}, restarted the cosine at $8$k and is discarded). Each run is best at its last step again
-(Fig.~\ref{fig:het_long}, left). Test MSE$(\log|\mathcal M|^2)$: $2.9\times10^{-8}$, $1.2\times10^{-8}$,
+(Fig.~\ref{fig:het_long}, top). Test MSE$(\log|\mathcal M|^2)$: $2.9\times10^{-8}$, $1.2\times10^{-8}$,
 $5.1\times10^{-9}$; median $|\Delta|$ $6.2$, $1.9$, $1.2\times10^{-5}$. The MSE baseline at the same length:
 $9.6\times10^{-8}$ at $8$k (\code{tp\_scr\_ee\_ttbar\_d8} trial $144$), $1.7\times10^{-8}$ at $32$k
 (\code{tp3\_scr32k\_ee\_ttbar\_d8}, the better of its two chosen points on validation); the het loss stays
 $3.3\times$ and $3.2\times$ lower. The $8$k run at seed $1$ ($2.9\times10^{-8}$) against the sweep trial at seed $42$
-($2.0\times10^{-8}$) is the seed spread. Calibration does improve with length (Fig.~\ref{fig:het_long}, right): at $8$k
+($2.0\times10^{-8}$) is the seed spread. Calibration does improve with length (Fig.~\ref{fig:het_long}, bottom): at $8$k
 $\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.5\times$, the
 error $30\times$, and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
 $8$k, $16$k, $32$k; pull std $0.42$, $0.44$, $0.60$). $\sigma$ still varies less than the error: about $5\times$ too large
@@ -2134,9 +2134,10 @@ the per-event error only in the cosine's tail (\code{analysis/transfer/het\_long
 
 \begin{figure}[H]
 \centering
-\widerow{\pnl{../analysis/transfer/figs/het_long.pdf}\hfill\pnl{../analysis/transfer/figs/het_long_calib.pdf}}
+\includegraphics{../analysis/transfer/figs/het_long.pdf} \\[1ex]
+\includegraphics{../analysis/transfer/figs/het_long_calib.pdf}
 \caption{The heteroscedastic loss at \code{hp1550} trained $8$k, $16$k and $32$k steps (seed $1$), $e^+e^-\to t\bar t$ at
-$D=10^4$. Left pair: validation NLL and validation MSE of $\mu$ against step. Right: the RMS of the actual error
+$D=10^4$. Top: validation NLL and validation MSE of $\mu$ against step. Bottom: the RMS of the actual error
 $|\mu-\log|\mathcal M|^2|$ against the median predicted $\sigma$ in each $\sigma$ decile of the test split (standardized
 units), with the calibrated diagonal.}
 \label{fig:het_long}
