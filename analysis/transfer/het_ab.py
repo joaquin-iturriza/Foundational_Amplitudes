@@ -54,6 +54,8 @@ def main():
         ax.set_xlabel(r"$(\mu-\log|\mathcal{M}|^2)/\sigma$"); ax.set_ylabel("density")
         if log:
             ax.set_yscale("log")
+        else:
+            ax.plot([0, 0], [0, 1.25 * hh.max()], alpha=0)   # an invisible extent so the axis holds the peak
     ps.process_label(a2, LAB); ps.legend(a1, "upper left")
     ps.save(fig, os.path.join(OUT, "het_ab_pull"))
 
