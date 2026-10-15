@@ -56,6 +56,14 @@ def hist(ax, delta, **kw):
     return float(np.median(a))
 
 
+def save(fig, ax, path):
+    """Save a panel only when something was drawn on it (a probe or arm with no run at this D has no figure)."""
+    import matplotlib.pyplot as plt
+    if ax.get_legend_handles_labels()[0]:
+        ps.save(fig, path)
+    plt.close(fig)
+
+
 def axes_lab(ax):
     ax.set_xscale("log")
     ax.set_xlabel(r"$|\Delta| = |A_\theta - A|/A$")
@@ -108,11 +116,15 @@ def main():
                 continue
             lab = "from scratch" if arm == "scratch" else f"rung {arm[1:]}"
             medians[f"ladder {probe} {arm}"] = hist(ax, dl, color="k" if arm == "scratch" else seq[arm], label=lab + sfx, linestyle=":" if sfx else "-")
-        axes_lab(ax); ps.process_label(ax, LAB[probe])
-        if leg_ax is None and len(ax.get_legend_handles_labels()[0]) == 11:
-            leg_ax = ax
-            ps.legend_strip(ax, os.path.join(OUT, pre + "ladder_legend"), ncol=6)
-        ps.save(fig, os.path.join(OUT, f"{pre}ladder_{probe}"))
+        axes_lab(ax); ps.process_label(ax, LAB[probe], loc="lower right")
+        nl = len(ax.get_legend_handles_labels()[0])
+        if nl == 11 and not any("(" in l for l in ax.get_legend_handles_labels()[1]):
+            if leg_ax is None:          # every rung drawn plainly: one legend strip for the set
+                leg_ax = ax
+                ps.legend_strip(ax, os.path.join(OUT, pre + "ladder_legend"), ncol=6)
+        elif nl:
+            ps.legend(ax, "upper left", ncol=2 if nl > 4 else 1)   # a partial or marked set names its own lines
+        save(fig, ax, os.path.join(OUT, f"{pre}ladder_{probe}"))
 
     def small(fam, colors, labels, base):
         for probe, rows in by.get(fam, {}).items():
@@ -123,8 +135,8 @@ def main():
                     continue
                 rung = r["arm"][1:] if r["arm"].startswith("r") else ""
                 medians[f"{fam} {probe} {arm}"] = hist(ax, dl, color=colors[arm], label=labels(arm, rung) + sfx, linestyle=":" if sfx else "-")
-            axes_lab(ax); ps.process_label(ax, LAB[probe]); ps.legend(ax, "upper left")
-            ps.save(fig, os.path.join(OUT, f"{pre}{base[len('delta_'):]}_{probe}"))
+            axes_lab(ax); ps.process_label(ax, LAB[probe], loc="lower right"); ps.legend(ax, "upper left")
+            save(fig, ax, os.path.join(OUT, f"{pre}{base[len('delta_'):]}_{probe}"))
 
     small("rung_focus", {"scratch": "k", "rung below": ps.C.sky, "first rung": ps.C.blue, "best overall": ps.C.vermillion},
           lambda a, n: {"scratch": "from scratch", "rung below": f"rung {n}", "first rung": f"rung {n}",
@@ -149,8 +161,8 @@ def main():
                 c, lab = {"scratch": ("k", "from scratch"), "rung 1": (ps.C.blue, "rung 1")}.get(
                     lab_arm, (ARM_C[arm], f"rung 1 + {arm}"))
                 medians[f"star {p} {lab_arm}"] = hist(ax, dl, color=c, label=lab + sfx, linestyle=":" if sfx else "-")
-        axes_lab(ax); ps.process_label(ax, LAB[p]); ps.legend(ax, "upper left")
-        ps.save(fig, os.path.join(OUT, f"{pre}star_{arm}"))
+        axes_lab(ax); ps.process_label(ax, LAB[p], loc="lower right"); ps.legend(ax, "upper left")
+        save(fig, ax, os.path.join(OUT, f"{pre}star_{arm}"))
     fig, ax = ps.figure()
     for lab_arm, r in star.get("ee_ddbar", []):
         dl, sfx = get(r)
@@ -161,8 +173,8 @@ def main():
         else:
             arm = lab_arm.split()[0]
             medians[f"star ee_ddbar {arm}"] = hist(ax, dl, color=ARM_C[arm], label=f"+ {arm}" + sfx, linestyle=":" if sfx else "-")
-    axes_lab(ax); ps.process_label(ax, LAB["ee_ddbar"]); ps.legend(ax, "upper left", ncol=2)
-    ps.save(fig, os.path.join(OUT, pre + "star_ee_ddbar"))
+    axes_lab(ax); ps.process_label(ax, LAB["ee_ddbar"], loc="lower right"); ps.legend(ax, "upper left", ncol=2)
+    save(fig, ax, os.path.join(OUT, pre + "star_ee_ddbar"))
 
     json.dump(medians, open(os.path.join(HERE, pre + "medians.json"), "w"), indent=1, sort_keys=True)
     print(f"{len(medians)} lines drawn; {len(missing)} missing")
