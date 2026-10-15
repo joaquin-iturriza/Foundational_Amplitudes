@@ -21,7 +21,9 @@ import siteconf  # noqa: E402
 from rebuild_run import load_best_weights  # noqa: E402
 
 
-def one(run_dir, out_dir, seed=None, tf32=None):
+def build(run_dir, out_dir, seed=None, tf32=None):
+    """The run rebuilt through init_model (EMA off, no weights loaded), its statistics asserted against its
+    data_stats.json."""
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
@@ -64,6 +66,11 @@ def one(run_dir, out_dir, seed=None, tf32=None):
     for k in ("prepd_mean", "prepd_std"):
         got = [float(x) for x in getattr(exp, k)]
         assert np.allclose(got, saved[k], rtol=1e-6), f"{run_dir}: rebuilt {k} {got} != {saved[k]}"
+    return exp, cfg
+
+
+def one(run_dir, out_dir, seed=None, tf32=None):
+    exp, cfg = build(run_dir, out_dir, seed, tf32)
     ema_applied = load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     exp.ema, exp.train_sampler = None, None
