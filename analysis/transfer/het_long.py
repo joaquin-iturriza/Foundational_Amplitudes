@@ -17,9 +17,9 @@ D = os.path.join(HERE, "het_ab_data")
 
 
 def main():
-    runs = [("8k", glob.glob(os.path.join(D, "sweep", "sweeps", "tp_het_ee_ttbar_d8", "results", "hp1550_*.json"))[0], ps.C.sky),
-            ("16k", os.path.join(D, "long", "t16k.json"), ps.C.blue),
-            ("32k", os.path.join(D, "long", "t32k.json"), ps.C.vermillion)]
+    runs = [("8k (seed 42)", glob.glob(os.path.join(D, "sweep", "sweeps", "tp_het_ee_ttbar_d8", "results", "hp1550_*.json"))[0], ps.C.sky),
+            ("16k (seed 1)", os.path.join(D, "long", "t16k.json"), ps.C.blue),
+            ("32k (seed 1)", os.path.join(D, "long", "t32k.json"), ps.C.vermillion)]
     fig, (a1, a2) = ps.figure(ncols=2)
     for lab, f, c in runs:
         if not os.path.exists(f):
