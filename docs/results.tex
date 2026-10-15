@@ -2151,7 +2151,18 @@ $8$k, $16$k, $32$k; test pull std $1.00$, $1.01$, $0.97$ (raw $0.42$, $0.44$, $0
 per decile within $0.79$ to $1.15$ at $32$k ($0.76$ to $1.47$ at $16$k, $0.89$ to $1.34$ at $8$k); test NLL lower by
 $0.65$, $0.67$, $0.42$. The tails are heavier than Gaussian: $|{\rm pull}|<1$ holds for $0.72$ to $0.74$ of the events
 against $0.68$, with a few events beyond $4$. $\mu$ is unchanged, so the accuracy numbers above stand
-(\code{analysis/transfer/het\_long.py}, figure \code{het\_long\_recal}).
+(\code{analysis/transfer/het\_long.py}, figure \code{het\_long\_recal}). The map is a measurement of the miscalibration, not a fix: a Gaussian NLL trained
+to convergence should be calibrated without one. Diagnosis on the $32$k run: $\sigma$ is as compressed on the training
+split it was fitted on (pull std $0.59$, deciles $0.22$ to $1.42$), so this is not overfitting. Gradient clipping binds on
+every step of every het run (pre-clip median norm $417$ at $8$k, $731$ at $32$k, against \code{clip\_grad\_norm}$=5$; the
+MSE baseline binds on $4\%$), but it is not the cause: at $8$k and the same HPs, clip $1000$ ($14\%$ of steps) and no
+clipping leave $\sigma$ as compressed (test pull std $0.72$, $0.83$; worst decile $2.0$, $2.6$) and $\mu$ far worse
+(val MSE $8.2\times10^{-6}$, $4.7\times10^{-5}$ against $1.7\times10^{-7}$; the lr was found under full clipping, so this
+does not rank the clip values). Training only the $\sigma$ readout on the frozen $32$k trunk and $\mu$
+(\code{heterosc\_sigma\_only}, $4$k steps, no L2, clipping never binds) calibrates it: test pull std $1.03$,
+$|{\rm pull}|<1$ for $0.69$ of the events, deciles $0.65$ to $1.24$ except the worst at $2.4$; validation NLL $-9.68$
+against $-9.18$, $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
+$\mu$ has since outgrown; that it is the lag rather than the L2 term is not separated.
 
 \begin{figure}[H]
 \centering
