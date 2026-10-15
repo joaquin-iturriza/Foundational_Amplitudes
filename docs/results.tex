@@ -2143,6 +2143,25 @@ units), with the calibrated diagonal.}
 \label{fig:het_long}
 \end{figure}
 
+\paragraph{Recalibrating $\sigma$ (2026-10-15).} The user: ``I believe the calibration is something we need to figure
+out before we continue, try to force it to be well calibrated''. The raw $\sigma$ ranks the events correctly (the
+deciles are monotone) but its range is compressed. A two-parameter map $\sigma'=a\,\sigma^b$, fitted by the Gaussian NLL
+on the validation split and scored on test, calibrates every horizon (Fig.~\ref{fig:het_recal}): $b=3.9$, $2.1$, $2.1$ at
+$8$k, $16$k, $32$k; test pull std $1.00$, $1.01$, $0.97$ (raw $0.42$, $0.44$, $0.60$); the RMS error over $\sigma'$
+per decile within $0.79$ to $1.15$ at $32$k ($0.76$ to $1.47$ at $16$k, $0.89$ to $1.34$ at $8$k); test NLL lower by
+$0.65$, $0.67$, $0.42$. The tails are heavier than Gaussian: $|{\rm pull}|<1$ holds for $0.72$ to $0.74$ of the events
+against $0.68$, with a few events beyond $4$. $\mu$ is unchanged, so the accuracy numbers above stand
+(\code{analysis/transfer/het\_long.py}, figure \code{het\_long\_recal}).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_long_recal.pdf}
+\caption{$\sigma'=a\,\sigma^b$ fitted on validation, scored on the test split, at the three horizons of
+Fig.~\ref{fig:het_long}. Left: the RMS actual error against the median $\sigma'$ per $\sigma'$ decile, with the calibrated
+diagonal. Right: the test pulls $(\mu-\log|\mathcal M|^2)/\sigma'$, with $\mathcal N(0,1)$ dashed.}
+\label{fig:het_recal}
+\end{figure}
+
 \paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
