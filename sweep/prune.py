@@ -57,6 +57,18 @@ def parents():
     return tails
 
 
+def delta_runs():
+    """Run dirs (relative tails, <sweep>/<trial>) the Delta plots evaluate (analysis/transfer/delta_runs_*.txt): a copy
+    under runs_from_lxplus/ has no result files on this site, so rule 2 saw no best and took its models."""
+    tails = set()
+    for f in glob.glob(os.path.join(REPO, "analysis", "transfer", "delta_runs_*.txt")):
+        for line in open(f):
+            parts = line.strip().rstrip("/").split("/")
+            if len(parts) >= 2:
+                tails.add("/".join(parts[-2:]))
+    return tails
+
+
 def results(sweep):
     """{hp: (t_steps, val_loss, proc_val_losses)} at each hp's highest fidelity, from this site's result files."""
     out = {}
@@ -253,7 +265,7 @@ def main():
     from rebalance import _queue
     q = _queue()                     # raises on a failed scheduler query: nothing is pruned blind
     dags = live_dags()
-    protect = parents()
+    protect = parents() | delta_runs()
     names = set()
     for root in RUN_ROOTS:
         for d in glob.glob(os.path.join(siteconf.PROJECT_DIR, root, "*")):
