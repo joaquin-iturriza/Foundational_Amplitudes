@@ -19,10 +19,23 @@ Before the first trial on a site, the recipe's pools are checked there and, if m
 built by a CPU job (`scripts/prebuild_recipes.sh` via `site submit`) — SLURM or HTCondor.
 
 Usage (from the checkout, code committed and pushed; the driver syncs each site once):
-    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...]
-        [--n-trials N] [--parallel P] [--mem 8G] [--cpus 4] [--hours 0.5]
+    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] --item <work item>
+        [--n-trials N] [--parallel P | --wave-sizes 3,3,2] [--mem 8G] [--cpus 4] [--hours 0.5]
         [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60] [--once] [--dry-run]
 Resumable: run it again and it continues from driver_state.json.
+
+Issuing trials, two modes:
+  rolling (default, --parallel P): the n_startup random trials first; once all of them are observed,
+      up to P guided trials in flight, a new one suggested as soon as any one finishes.
+  waves (--wave-sizes 3,3,2, or `dyhpo.waves: [3, 3, 2]` in the sweep config; the flag wins): trials go
+      out in whole waves, and wave k+1 is suggested and submitted only once EVERY trial of waves 1..k
+      has finished (observed, or failed/lost and reported to the sampler), counted from this driver's
+      own driver_state.json, never from a scheduler's view. The first wave should be the n_startup
+      random trials; each later wave is the surrogate's picks given every earlier result. The sizes
+      must add up to n_trials. This is the likelihoods project's rule: trials that run together are
+      suggested blind of each other, so all-at-once is a random search.
+--dry-run: no state written (a temporary directory), no sync, no pool check, no submission; prints the
+      `site submit` commands of the first wave that would go out now and exits.
 Limits: detached trials always cold-start (no cross-fidelity warm start), which is how
 nearly every sweep runs anyway (single fidelity).
 """
@@ -32,6 +45,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
 import yaml
@@ -98,7 +112,8 @@ class Sweep:
             self.cfg = siteconf.resolve(yaml.safe_load(f))
         self.cfg.setdefault("fixed_params", {}).setdefault("seed", 42)
         self.name = self.cfg["sweep_name"]
-        self.dir = os.path.join(ROOT, "sweeps_local", self.name)
+        self.dir = (tempfile.mkdtemp(prefix="zz_drive_dry_%s_" % self.name) if a.dry_run
+                    else os.path.join(ROOT, "sweeps_local", self.name))
         os.makedirs(os.path.join(self.dir, "results"), exist_ok=True)
         os.makedirs(os.path.join(self.dir, "dyhpo_surrogate"), exist_ok=True)
         self.state_path = os.path.join(self.dir, "dyhpo_state.pkl")
@@ -109,6 +124,17 @@ class Sweep:
         self.n_trials = int(a.n_trials or self.cfg.get("n_trials", 40))
         dy = self.cfg.get("dyhpo", {}) or {}
         self.n_startup = int(dy.get("n_startup", 3))
+        waves = a.wave_sizes or dy.get("waves")
+        if isinstance(waves, str):
+            waves = [int(x) for x in waves.split(",") if x.strip()]
+        self.waves = [int(x) for x in waves] if waves else None
+        if self.waves:
+            if any(w <= 0 for w in self.waves) or sum(self.waves) != self.n_trials:
+                raise SystemExit("%s: wave sizes %s must be positive and add up to n_trials=%d"
+                                 % (self.name, self.waves, self.n_trials))
+            if self.waves[0] != self.n_startup:
+                log("%s: WARNING first wave %d != n_startup %d: the random start-up trials and the first wave differ"
+                    % (self.name, self.waves[0], self.n_startup))
         cl = self.cfg.get("cluster", {}) or {}
         self.mem = a.mem or cl.get("mem") or cl.get("request_memory") or "8G"
         self.cpus = int(a.cpus or cl.get("cpus_per_task") or 4)
@@ -150,6 +176,15 @@ class Sweep:
     def may_issue(self, parallel):
         if self.issued() >= self.n_trials:
             return 0
+        if self.waves:
+            # whole waves: the wave holding the next trial goes out only when every trial of the
+            # waves before it has finished (tracked trials in driver_state.json), and all at once
+            end = 0
+            for w in self.waves:
+                start, end = end, end + w
+                if self.issued() < end:
+                    return end - self.issued() if self.finished() >= start else 0
+            return 0
         room = parallel - len(self.in_flight())
         if room <= 0:
             return 0
@@ -166,6 +201,8 @@ class Sweep:
         """True when the recipe's pools exist on site s; submits the CPU prebuild once."""
         if not self.spec:
             return True
+        if a.dry_run:
+            log("[dry-run] pools of %s on %s not checked" % (self.spec, s)); return True
         pb = self.st["prebuild"].get(s)
         if pb == "ok":
             return True
@@ -306,7 +343,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", action="append", required=True)
     ap.add_argument("--n-trials", type=int)
-    ap.add_argument("--parallel", type=int, help="trials in flight per sweep (default: n_startup)")
+    ap.add_argument("--parallel", type=int, help="rolling mode: trials in flight per sweep (default: n_startup)")
+    ap.add_argument("--wave-sizes", type=lambda v: [int(x) for x in v.split(",")],
+                    help="whole waves, e.g. 3,3,2 (sum = n_trials): wave k+1 starts when waves 1..k are all observed; "
+                         "overrides the config's dyhpo.waves")
     ap.add_argument("--mem"); ap.add_argument("--cpus", type=int); ap.add_argument("--hours", type=float)
     ap.add_argument("--sites", nargs="*")
     ap.add_argument("--item", required=True, help="the work item these trials belong to (`site items FA`)")
@@ -314,11 +354,17 @@ def main():
     ap.add_argument("--poll", type=int, default=60)
     ap.add_argument("--no-fetch", dest="fetch", action="store_false", help="do not mirror each trial's tier-0 outputs locally")
     ap.add_argument("--once", action="store_true", help="one pass (collect, then submit what fits) and exit")
-    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--dry-run", action="store_true", help="print the first wave's submit commands; nothing written or sent")
     a = ap.parse_args()
+    if a.dry_run:
+        a.once = True
 
     sweeps = [Sweep(c, a) for c in a.config]
     parallel = a.parallel or max(s.n_startup for s in sweeps)
+    for sw in sweeps:
+        log("%s: %d trials, n_startup %d, surrogate %s, objective scale %s, %s" % (
+            sw.name, sw.n_trials, sw.n_startup, sw.sampler.surrogate, sw.sampler.objective_scale,
+            "waves %s" % sw.waves if sw.waves else "rolling, %d in flight" % parallel))
     if not a.dry_run:
         for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
             log("sync %s" % s)
@@ -330,6 +376,8 @@ def main():
         k = sum(want.values())
         if k:
             order, rows = plan(k, sweeps, a)
+            if a.dry_run and not order:
+                order = [(a.sites or ["<site pick>"])[0]] * k
             for r in rows:
                 if r.get("state") in ("UP", "HELD"):
                     log("  %-9s %-5s %s" % (r["site"], r["state"], r.get("reason", "")[:150]))
