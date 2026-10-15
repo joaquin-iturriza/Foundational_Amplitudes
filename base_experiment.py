@@ -931,7 +931,10 @@ class BaseExperiment:
                 # Exception: heterosc_sigma_only freezes μ, and at β=0 the plain Gaussian NLL
                 # IS a proper scoring rule for σ — there the NLL is exactly the right metric
                 # (and μ-MSE is constant, so it could not select anything).
+                # training.heterosc_select: "nll" (the plain Gaussian NLL of losses.heteroscedastic_loss, a proper
+                # scoring rule at heterosc_beta=0: the original selection) or "mu_mse" (the override above)
                 if (self.cfg.training.loss == "HETEROSC"
+                        and str(self.cfg.training.get("heterosc_select", "mu_mse")) == "mu_mse"
                         and not self.cfg.training.get("heterosc_sigma_only", False)
                         and self.val_mse):
                     selection_loss = self.val_mse[-1]
