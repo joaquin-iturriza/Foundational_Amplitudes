@@ -253,6 +253,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--set", action="append", default=[], help="extra override k=v (repeatable)")
     a = ap.parse_args()
+    a.out = os.path.expandvars(a.out)           # a literal $SCRATCH survives the submission's quoting
 
     os.makedirs(a.out, exist_ok=True)
     rec = Recorder(a.dt)
@@ -267,7 +268,8 @@ def main():
     exp = AmplitudeExperiment(cfg)
     exp._init()
     # after _init: the run's logger is set up; mark every INFO line from here on
-    logging.getLogger().addHandler(MarkHandler(rec))
+    from logger import LOGGER                     # the run's logger does not propagate to the root logger
+    LOGGER.addHandler(MarkHandler(rec))
     t = time.time()
     exp.init_physics(); exp.init_geometric_algebra()
     rec.mark("== init_physics done")
@@ -292,7 +294,9 @@ def main():
 
     rows = summarize(rec)
     peak = max(s["rss"] + s.get("workers_private_dirty", 0) for s in rec.samples)
-    out = {"n_procs": len(exp.cfg.data.dataset), "n_events": int(exp.N_events),
+    mdir = getattr(exp, "_mmap_dir", None)
+    out = {"n_procs": len(exp.cfg.data.dataset), "mmap_dir": mdir,
+           "mmap_gb": (sum(os.path.getsize(os.path.join(mdir, f)) for f in os.listdir(mdir)) / GB if mdir else None), "n_events": int(exp.N_events),
            "n_particles": int(exp.particles_flat.shape[0]), "role_counts": list(exp._role_counts),
            "overrides": ov, "peak_rss_gb": max(s["rss"] for s in rec.samples) / GB,
            "peak_anon_gb": max(s["anon"] for s in rec.samples) / GB,
