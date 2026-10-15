@@ -1,0 +1,8 @@
+runs/tp_het_ee_ttbar_d8/trial_1550
+runs/tp_het_ee_ttbar_d8/trial_1973
+runs/tp_het_ee_ttbar_d8/trial_1469
+runs/tp_het_ee_ttbar_d8/trial_0353
+runs/tp_het_ee_ttbar_d8/trial_1333
+runs/tp_het_ee_ttbar_d8/trial_1860
+runs/tp_het_ee_ttbar_d8/trial_1255
+runs/tp_het_ee_ttbar_d8/trial_0308
