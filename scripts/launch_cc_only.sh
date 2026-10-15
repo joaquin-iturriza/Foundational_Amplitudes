@@ -5,7 +5,7 @@
 #     bash scripts/launch_cc_only.sh <item> <est_gpu_h> "<note>" <job.sh> [job args...]
 cd "$(dirname "$0")/.." || exit 1
 ITEM="$1"; EST="$2"; NOTE="$3"; JOB="$4"; shift 4
-p=$(timeout 250 site pick FA --jobs 1 --mem 16G --cpus 4 --hours "$EST" 2>&1 | tail -1)
+p=$(timeout 250 site pick FA --jobs 1 --mem 16G --cpus 4 --hours "$EST" 2>&1 | tail -1 | sed "s/^ *//")
 echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
 exec site submit ccin2p3 FA "$JOB" --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@"
