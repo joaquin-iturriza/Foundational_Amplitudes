@@ -15,8 +15,12 @@
 #     curves were still falling at 8000 steps (docs/results.tex, joint-training gap); 16000 halves the cost;
 #   lr window [1e-3, 9e-3], half a decade around 3e-3: between lr*(32k, high D) = 1.9e-3 (CLAUDE.md rule 2, the
 #     high-D row's extrapolation) and 4.7e-3 (catalog_v2's best 9.7e-3 at 8601 steps carried to 32k as t^-0.55);
-#   waves 3 (random start-up) + 3 + 2, run by sweep/drive.py; mem 200G (catalog_v2 took 64G for 42.7M events;
-#     this is 135M), 5 CPUs (CC allows 5 per V100), 18 h wall.
+#   waves 3 (random start-up) + 3 + 2, run by sweep/drive.py; 5 CPUs (CC allows 5 per V100), 18 h wall;
+#   data.memmap (2026-10-15, the user: "if we need 200Gb to just run the training, we really can't do that"): the
+#     in-memory data path peaks at ~110 GB for these 140.6M events (tools/mem_profile_data.py at 100/300/600
+#     processes, 772 B/event, linear), the memmap path at 1.8 GB anonymous + 21.8 GB of mapped cache files
+#     ($SCRATCH/amp_mmap_cache, built once, shared by the trials), 26.3 GB peak RSS on the full catalog; mem 40G =
+#     that peak + a GPU process's host overhead (1.7 GB measured) + 30%.
 # Prerequisites on the site: the pools (scripts/job_gen_daniel_catalog.sh) and the diagram sidecars
 # data/diagrams/dc_*.diagrams.json (tools/dump_diagrams.py --prefix dc_): use_diagrams and offshell_per_event read them;
 # the first log must show "offshell_per_event: built propagator masks for N/P processes" with N = P = 1352.
@@ -24,7 +28,7 @@ cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  mem: 200G
+  mem: 40G
   cpus_per_task: 5
   time: '18:00:00'
 paths: null
@@ -47,6 +51,7 @@ fidelity_schedule:
 fixed_params:
   data.source: recipes
   data.require_cache: 'true'
+  data.memmap: 'true'
   data.eval_subsample: 2000
   data.preprocess_per_dataset: 'true'
   data.seed: 42
