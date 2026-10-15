@@ -144,7 +144,12 @@ def _failure_penalty(sampler, cfg):
     margin   = float(dy.get("failure_penalty_margin", 1.5))
     observed = [v for d in sampler._val_loss_history.values() for v in d.values()
                 if v is not None and math.isfinite(v)]
-    return max(observed) * margin if observed else None
+    if not observed:
+        return None
+    worst = max(observed)
+    # A signed objective (a heteroscedastic NLL can be <= 0): max*margin would be BETTER than the worst value
+    # when it is negative, so step past it by the margin times its magnitude (or the spread when it is 0).
+    return worst * margin if worst > 0 else worst + (margin - 1) * (abs(worst) or (worst - min(observed)) or 1.0)
 
 
 def format_value(v):

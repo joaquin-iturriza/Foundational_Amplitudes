@@ -367,6 +367,7 @@ class DyHPOAlgorithmND:
         output_path: str = '.',
         surrogate_config: dict = None,
         n_startup: int = 10,
+        objective_scale: str = 'auto',
     ):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
@@ -379,6 +380,7 @@ class DyHPOAlgorithmND:
             self.dev = torch.device(device)
 
         self.seed          = seed
+        self.objective_scale = objective_scale   # 'auto' | 'log' | 'linear', see _obj
         self.total_budget  = total_budget
         self.output_path   = output_path
         self.dataset_name  = dataset_name
@@ -462,6 +464,25 @@ class DyHPOAlgorithmND:
         so the surrogate sees the order of magnitude, not the raw value, which the worst trials would dominate."""
         return -math.log10(max(-neg_vl, 1e-300))
 
+    def _linear(self) -> bool:
+        """True when labels are the raw objective. 'auto' switches to it as soon as any observed objective is <= 0:
+        -log10 maps every such value to the same number (the clamp above), so a signed objective (a heteroscedastic
+        NLL) would give every trial the same label and the search would silently be random."""
+        scale = getattr(self, 'objective_scale', 'auto')
+        if scale == 'linear':
+            return True
+        if scale == 'log':
+            return False
+        return any(v >= 0 for obs in self.observations.values() for v in obs.values())
+
+    def _obj(self, neg_vl: float) -> float:
+        """The surrogate's label for a negated objective (larger = better), before standardisation."""
+        if self._linear():
+            return float(neg_vl)
+        if neg_vl >= 0:
+            raise ValueError("dyhpo.objective_scale 'log' with an objective <= 0 (%g): use 'linear' or 'auto'" % -neg_vl)
+        return self._log_obj(neg_vl)
+
     OLD_FALLBACK = -10.0   # the constant failure penalty imputed before 2026-10-10 when nothing had been observed
 
     def _real_obs(self):
@@ -471,8 +492,8 @@ class DyHPOAlgorithmND:
                 if not (v == self.OLD_FALLBACK and h in self.diverged_configs)]
 
     def _label_stats(self) -> Tuple[float, float]:
-        """Mean and std of every observed objective, in -log10(loss)."""
-        vals = np.array([self._log_obj(v) for _, _, v in self._real_obs()], dtype=float)
+        """Mean and std of every observed objective, in the label units of _obj."""
+        vals = np.array([self._obj(v) for _, _, v in self._real_obs()], dtype=float)
         mu = float(vals.mean()) if len(vals) else 0.0
         sd = float(vals.std()) if len(vals) > 1 else 0.0
         return mu, (sd if sd > 0 else 1.0)
@@ -482,7 +503,7 @@ class DyHPOAlgorithmND:
         less than the GP likelihood's noise floor (variance >= 1e-4), so on the raw scale the GP sees nothing but noise
         and EI degenerates to picking the candidates furthest from every observation (likelihoods project, 2026-10-10)."""
         mu, sd = self._label_stats()
-        return (self._log_obj(neg_vl) - mu) / sd
+        return (self._obj(neg_vl) - mu) / sd
 
     def _history_configurations(self) -> Tuple[List, List, List, List]:
         """Training data for surrogate — one row per observed (hp_idx, combo)."""

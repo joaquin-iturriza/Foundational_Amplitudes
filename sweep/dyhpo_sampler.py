@@ -145,6 +145,15 @@ class DyHPOSampler:
         Number of random evaluations before the surrogate kicks in
     total_budget : int
         Max total evaluations before DyHPO raises
+    surrogate : str
+        'dyhpo' (deep-kernel GP over the fidelity ladder, the default) or 'gp': after the same start-up trials,
+        a plain GP (Matern-5/2 ARD + white noise, sklearn) with expected improvement over the same candidate
+        pool, as in the likelihoods project's sweep/dyhpo_sampler.py. Single fidelity only.
+    objective_scale : str
+        How an observed objective becomes the surrogate's label, for both surrogates: 'log' (-log10, for a loss
+        spanning decades; needs every value > 0), 'linear' (the raw value, standardised: an objective that can be
+        <= 0, e.g. a heteroscedastic NLL), or 'auto' (the default: 'linear' as soon as any observed value is
+        <= 0, else 'log', which is what every positive-loss sweep always used).
     """
 
     def __init__(
@@ -156,7 +165,17 @@ class DyHPOSampler:
         output_path: str = '.',
         n_startup: int = 10,
         total_budget: int = 10_000,
+        surrogate: str = 'dyhpo',
+        objective_scale: str = 'auto',
     ):
+        if surrogate not in ('dyhpo', 'gp'):
+            raise ValueError(f"surrogate must be 'dyhpo' or 'gp', not {surrogate!r}")
+        if surrogate == 'gp' and len(fidelity_grid['t_steps']) != 1:
+            raise ValueError("surrogate 'gp' supports a single fidelity level only")
+        if objective_scale not in ('auto', 'log', 'linear'):
+            raise ValueError(f"objective_scale must be 'auto', 'log' or 'linear', not {objective_scale!r}")
+        self.surrogate     = surrogate
+        self.objective_scale = objective_scale
         self.hp_space      = hp_space
         self.fidelity_grid = fidelity_grid
         self.n_candidates  = n_candidates
@@ -192,6 +211,7 @@ class DyHPOSampler:
             dataset_name='amplitude_sweep',
             surrogate_config=surrogate_config,
             n_startup=n_startup,
+            objective_scale=objective_scale,
         )
 
         # Raw (not negated) val_loss history: {hp_idx: {combo: val_loss}}
@@ -253,13 +273,51 @@ class DyHPOSampler:
         max_t_steps : if set, clamp the suggested t_steps to the highest
             fidelity level that does not exceed this value.
         """
-        hp_idx, combo = self.algorithm.suggest(exclude=self._in_flight)
+        if self.surrogate == 'gp':
+            hp_idx, combo = self._suggest_gp(), self.algorithm.all_combos[0]
+        else:
+            hp_idx, combo = self.algorithm.suggest(exclude=self._in_flight)
         self._in_flight.add(hp_idx)
         t_steps = self._from_combo(combo)
         if max_t_steps is not None and t_steps > max_t_steps:
             allowed = [t for t in self.fidelity_grid['t_steps'] if t <= max_t_steps]
             t_steps = max(allowed) if allowed else self.fidelity_grid['t_steps'][0]
         return hp_idx, self.candidates_raw[hp_idx], t_steps
+
+    def _suggest_gp(self) -> int:
+        """Start-up trials in DyHPO's order, then a plain GP + expected improvement over the candidate pool
+        (the likelihoods project's `_suggest_gp`). Labels go through the same objective transform as the DyHPO path
+        (`DyHPOAlgorithmND._obj`: -log10 for a positive loss, the raw value for a signed one), then are
+        standardised; a diverged trial without an observation counts as the worst value seen."""
+        alg = self.algorithm
+        while alg.initial_random_index < len(alg.init_conf_indices):
+            h = int(alg.init_conf_indices[alg.initial_random_index])
+            alg.initial_random_index += 1
+            if h not in self._in_flight and h not in alg.diverged_configs:
+                return h
+        X = alg.hp_candidates
+        hs = [h for h in self._val_loss_history if self._val_loss_history[h]]
+        cand = [i for i in range(len(X)) if i not in self._val_loss_history
+                and i not in alg.diverged_configs and i not in self._in_flight]
+        if not cand:                                   # everything observed or in flight: lift the exclusions
+            cand = [i for i in range(len(X)) if i not in alg.diverged_configs] or list(range(len(X)))
+        if not hs:                                     # nothing observed yet (every start-up trial failed)
+            return int(np.random.default_rng(self.seed + len(alg.diverged_configs)).choice(cand))
+        from sklearn.gaussian_process import GaussianProcessRegressor
+        from sklearn.gaussian_process.kernels import Matern, WhiteKernel, ConstantKernel
+        from scipy.stats import norm
+        y = np.array([alg._obj(-min(self._val_loss_history[h].values())) for h in hs], dtype=float)
+        mu, sd = y.mean(), y.std() or 1.0
+        ys = list((y - mu) / sd); Xs = [X[h] for h in hs]
+        for h in sorted(alg.diverged_configs):         # a diverged trial counts as the worst result
+            if h not in self._val_loss_history:
+                Xs.append(X[h]); ys.append(min(ys[:len(hs)]))
+        gp = GaussianProcessRegressor(
+            ConstantKernel(1.0) * Matern(length_scale=np.ones(X.shape[1]), nu=2.5, length_scale_bounds=(1e-2, 1e2))
+            + WhiteKernel(0.1, (1e-4, 1)), n_restarts_optimizer=5, random_state=0).fit(np.array(Xs), np.array(ys))
+        m, s = gp.predict(X[cand], return_std=True)
+        best = max(ys[:len(hs)]); z = (m - best) / np.maximum(s, 1e-12)
+        return cand[int(np.argmax((m - best) * norm.cdf(z) + s * norm.pdf(z)))]
 
     def observe(self, hp_idx: int, t_steps: int, val_loss: float,
                 proc_val_losses: Optional[dict] = None, train: bool = True):
@@ -556,6 +614,8 @@ class DyHPOSampler:
             'fidelity_grid':     self.fidelity_grid,
             'n_candidates':      self.n_candidates,
             'seed':              self.seed,
+            'surrogate':         self.surrogate,
+            'objective_scale':   self.objective_scale,
             'candidates_raw':    self.candidates_raw,
             'candidates_array':  self.candidates_array,
             'log_indicator':     self.log_indicator,
@@ -602,6 +662,8 @@ class DyHPOSampler:
         obj.fidelity_grid    = state['fidelity_grid']
         obj.n_candidates     = state['n_candidates']
         obj.seed             = state['seed']
+        obj.surrogate        = state.get('surrogate', 'dyhpo')
+        obj.objective_scale  = state.get('objective_scale', 'auto')
         obj.candidates_raw   = state['candidates_raw']
         obj.candidates_array = state['candidates_array']
         obj.log_indicator    = state['log_indicator']
@@ -651,6 +713,7 @@ class DyHPOSampler:
         alg.suggest_time_duration   = 0
         alg.info_dict               = {}
         alg.surrogate_config        = surrogate_config
+        alg.objective_scale         = obj.objective_scale
 
         # Rebuild axis_schedules, axis_fulls, all_combos, budget_dim
         t_steps_sched      = obj.fidelity_grid['t_steps']

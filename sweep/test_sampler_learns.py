@@ -3,8 +3,14 @@ trial)? On a synthetic objective at our scale (loss 1e-6..1e-3, a log-quadratic 
 transfer study's search space), the median loss of the guided picks is compared with random picks from the same pool,
 and a replay of a real sweep's observations shows where its next picks go. Before the 2026-10-10 fix the surrogate
 was never kept between processes and the objective sat below the GP noise floor, so guided picks were no better than
-random. CPU, a few minutes, on a login node:
-    python sweep/test_sampler_learns.py [--trials 30] [--startup 5] [--replay <sweep_dir>]
+random. Objectives: 'loss' (the bowl, > 0), 'nll' (its natural log, all < 0, the scale of a heteroscedastic NLL) and
+'signed' (log10 of it shifted to cross zero). Before 2026-10-15 every objective <= 0 got the same label (-log10 of the
+clamped value), so the 'nll' and 'signed' searches were random; `dyhpo.objective_scale: auto` now standardises the raw
+value. --check runs every surrogate x objective cell and fails unless the guided picks beat random ones and the
+labels of a signed objective are distinct. CPU, a few minutes, on a login node or in .venv-driver:
+    python sweep/test_sampler_learns.py [--trials 30] [--startup 5] [--surrogate dyhpo|gp] [--objective loss|nll|signed]
+    python sweep/test_sampler_learns.py --check
+    python sweep/test_sampler_learns.py --replay <sweep_dir>
 """
 import argparse, math, os, pickle, sys, tempfile
 import numpy as np
@@ -27,10 +33,17 @@ def loss(hp):
     return 2e-6 * 10 ** (1.5 * (x * x + y * y))
 
 
-def run(trials, startup, seed):
+OBJECTIVES = {"loss": loss,                                          # 2e-6 .. 1e-2, > 0
+              "nll": lambda hp: math.log(loss(hp)),                  # -13 .. -5, every value < 0
+              "signed": lambda hp: math.log10(loss(hp)) + 4.5}       # -1.2 .. +2.5, crosses zero
+
+
+def run(trials, startup, seed, surrogate="dyhpo", objective="loss"):
+    f = OBJECTIVES[objective]
     d = tempfile.mkdtemp(prefix="zz_sampler_test_")
     path = os.path.join(d, "state.pkl")
-    s = DyHPOSampler(SPACE, {"t_steps": [8000]}, n_candidates=200, seed=seed, output_path=d, n_startup=startup)
+    s = DyHPOSampler(SPACE, {"t_steps": [8000]}, n_candidates=200, seed=seed, output_path=d, n_startup=startup,
+                     surrogate=surrogate)
     s.save(path)
     got = []
     for _ in range(trials):
@@ -38,12 +51,31 @@ def run(trials, startup, seed):
         hp_idx, hp, t = s.suggest()
         s.save(path)
         s = DyHPOSampler.load(path, d, force_cpu=True)
-        v = loss(hp)
+        v = f(hp)
         s.observe(hp_idx, t, v)
         s.save(path)
         got.append(v)
-    pool = [loss(c) for c in s.candidates_raw]
-    return got, pool
+    pool = [f(c) for c in s.candidates_raw]
+    labels = [s.algorithm._scale(v) for _, _, v in s.algorithm._real_obs()]
+    return got, pool, labels
+
+
+def cell(a, surrogate, objective):
+    """One surrogate x objective cell over a.seeds seeds: (passed, lines)."""
+    ok, lines = True, []
+    for seed in range(a.seeds):
+        got, pool, labels = run(a.trials, a.startup, 1000 + seed, surrogate, objective)
+        guided = got[a.startup:]
+        rng = np.random.default_rng(seed)
+        rand = [np.median(rng.choice(pool, len(guided), replace=False)) for _ in range(200)]
+        # guided picks must beat the typical random draw, and a signed objective must keep distinct labels
+        good = np.median(guided) < np.median(rand) and np.ptp(labels) > 0
+        ok &= bool(good)
+        lines.append(f"{surrogate:5s} {objective:6s} seed {seed}: guided picks median {np.median(guided):.3g}, best "
+                     f"{min(got):.3g} | random picks median {np.median(rand):.3g} (5-95%: {np.percentile(rand, 5):.3g}-"
+                     f"{np.percentile(rand, 95):.3g}) | pool best {min(pool):.3g} | label spread {np.ptp(labels):.3g}"
+                     f" {'ok' if good else 'FAIL'}")
+    return ok, lines
 
 
 def main():
@@ -51,16 +83,22 @@ def main():
     ap.add_argument("--trials", type=int, default=30)
     ap.add_argument("--startup", type=int, default=5)
     ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--surrogate", choices=["dyhpo", "gp"], help="default dyhpo; with --check, only this surrogate")
+    ap.add_argument("--objective", choices=sorted(OBJECTIVES), help="default loss; with --check, only this objective")
+    ap.add_argument("--check", action="store_true", help="every surrogate x objective cell; exit 1 unless all pass")
     ap.add_argument("--replay", help="a sweep dir: load its state and print the next 3 guided picks (state not saved)")
     a = ap.parse_args()
-    for seed in range(a.seeds):
-        got, pool = run(a.trials, a.startup, 1000 + seed)
-        guided = got[a.startup:]
-        rng = np.random.default_rng(seed)
-        rand = [np.median(rng.choice(pool, len(guided), replace=False)) for _ in range(200)]
-        print(f"seed {seed}: guided picks median {np.median(guided):.3g}, best {min(got):.3g} | random picks median "
-              f"{np.median(rand):.3g} (5-95%: {np.percentile(rand, 5):.3g}-{np.percentile(rand, 95):.3g}) | "
-              f"pool best {min(pool):.3g}")
+    if a.check:
+        ok = True
+        for surrogate in [a.surrogate] if a.surrogate else ("dyhpo", "gp"):
+            for objective in [a.objective] if a.objective else ("loss", "nll", "signed"):
+                good, lines = cell(a, surrogate, objective)
+                ok &= good
+                print("\n".join(lines), flush=True)
+        print("PASS" if ok else "FAIL")
+        sys.exit(0 if ok else 1)
+    if not a.replay:
+        print("\n".join(cell(a, a.surrogate or "dyhpo", a.objective or "loss")[1]))
     if a.replay:
         st = os.path.join(a.replay, "dyhpo_state.pkl")
         s = DyHPOSampler.load(st, tempfile.mkdtemp(prefix="zz_sampler_replay_"), force_cpu=True)
