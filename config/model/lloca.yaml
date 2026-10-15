@@ -94,6 +94,11 @@ net:
                              # (no leak of later particles through the frames net), "full" = from the whole event
   causal_frames_min: 4       # K: the first K particles see each other in the frames net (a frame needs three
                              # independent directions; 4 = the smallest events, 2 -> 2, which stay complete)
+  bayesian_last_layer: false # BNN last layer (draft Sec. 5, fig:bnn): net.linear_out -> variational μP readout
+                             # (models/bayesian_readout.py, the Heidelberg VBLinear); KL/N_train joins the training
+                             # loss (never the *_no_reg losses), evaluation uses the posterior-mean weights
+  bnn_prior_prec: 1.0        # 1/sigma_prior^2 of the Gaussian weight prior (VBLinear default)
+  bnn_logsig2_init: -9.0     # init of the posterior log-variance, N(-9, 0.001) (VBLinear default)
   checkpoint_blocks: false   # gradient-checkpoint transformer blocks: recompute block
                              # activations in backward instead of storing them — large
                              # activation-memory saving for ~one extra forward of compute.

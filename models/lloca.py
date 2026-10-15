@@ -105,6 +105,9 @@ class LLOCAMuPTransformer(nn.Module):
         causal_mask: bool = False,
         causal_frames: str = "prefix",
         causal_frames_min: int = 4,
+        bayesian_last_layer: bool = False,
+        bnn_prior_prec: float = 1.0,
+        bnn_logsig2_init: float = -9.0,
         # token_size: int = 0,
     ):
         super().__init__()
@@ -163,6 +166,10 @@ class LLOCAMuPTransformer(nn.Module):
             dropout_prob=dropout_prob,
             checkpoint_blocks=checkpoint_blocks,
             parametrization=parametrization,
+            # BNN last layer (draft Sec. 5, fig:bnn): net.linear_out becomes a variational μP readout; the KL term
+            # enters the training loss in experiment._reg_term, evaluation uses the posterior-mean weights
+            **({"bayesian_readout": True, "bnn_prior_prec": bnn_prior_prec, "bnn_logsig2_init": bnn_logsig2_init}
+               if bayesian_last_layer else {}),
         )
 
     def forward(

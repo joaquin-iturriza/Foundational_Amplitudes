@@ -64,6 +64,13 @@ _AMP_ORDER_BY_NAME = [
     ("nlo_virt", [1, 0, 0, 0]),   # absolute-virt (e4) and the virt/born ratio
 ]
 
+def _reg_params(model):
+    """The parameters under the L2/L1 penalty: all of them except a Bayesian readout's log-variances
+    (models/bayesian_readout.py), whose prior is the KL term (_reg_term). Same tensors, same order as
+    model.parameters() when there is none."""
+    return [p for n, p in model.named_parameters() if not n.endswith("logsig2_w")]
+
+
 def catalog_cfg_for_dataset(name):
     """The catalog entry whose key prefixes a (files-path) dataset name, else None."""
     import mg5_pipeline_final as mg   # lazy: keeps the MG5 catalog off the import path
@@ -2279,6 +2286,7 @@ class AmplitudeExperiment(BaseExperiment):
                     batchsize=min(self.cfg.evaluation.batchsize, max(len(train_eval_idx) // 2, 1)),
                     workers=0, drop_last=False)
     
+        self._n_train_events = int(n_train)   # the BNN readout's KL normalization (_reg_term)
         LOGGER.info(
             f"Constructed dataloaders: train={n_train}, val={n_val}, "
             f"test={len(test_idx)} | "
@@ -2852,21 +2860,21 @@ class AmplitudeExperiment(BaseExperiment):
         match self.cfg.training.regularization:
             case "L2":
                 if use_loop:
-                    self.regularization = lambda model: sum(param.pow(2.0).sum() for param in model.parameters())
+                    self.regularization = lambda model: sum(param.pow(2.0).sum() for param in _reg_params(model))
                 else:
                     # sum of squared L2 norms == sum of squares of all params.
                     # norm-then-square introduces a tiny float rounding difference
                     # vs. pow(2).sum() — negligible for a regularization term.
                     self.regularization = lambda model: torch.stack(
-                        torch._foreach_norm(list(model.parameters()))
+                        torch._foreach_norm(_reg_params(model))
                     ).square().sum()
             case "L1":
                 if use_loop:
-                    self.regularization = lambda model: sum(param.abs().sum() for param in model.parameters())
+                    self.regularization = lambda model: sum(param.abs().sum() for param in _reg_params(model))
                 else:
                     # L1 norm per tensor (ord=1), summed → sum of |p| over all params (exact).
                     self.regularization = lambda model: torch.stack(
-                        torch._foreach_norm(list(model.parameters()), ord=1)
+                        torch._foreach_norm(_reg_params(model), ord=1)
                     ).sum()
             case None:
                 self.regularization = lambda model: 0.0
@@ -2874,6 +2882,25 @@ class AmplitudeExperiment(BaseExperiment):
                 raise ValueError(
                     f"Unknown regularization function {self.cfg.training.regularization}"
                 )
+
+    def _reg_term(self, model):
+        """The penalty added to the training loss and to the tracked (regularized) val_loss, never to the
+        *_no_reg losses: lambda * L2/L1, plus, with model.net.bayesian_last_layer, the BNN readout's
+        KL(q || prior) / (number of training events) (models/bayesian_readout.py; jetgpt-splittings
+        JetGPT.batch_loss, arlo Bayesian.batch_loss). Without a Bayesian readout this is the plain lambda * reg."""
+        reg = self.regularization_lambda * self.regularization(model)
+        cache = getattr(self, "_bnn_cache", None)
+        if cache is None or cache[0] is not model:
+            from models.bayesian_readout import bayesian_readouts
+            cache = self._bnn_cache = (model, bayesian_readouts(model))
+        if not cache[1]:
+            return reg
+        n_train = int(getattr(self, "_n_train_events", 0))
+        if n_train <= 0:
+            # an evaluation-only tool that never built the train loader: the KL only enters the tracked val_loss
+            assert not model.training, "bayesian_last_layer: the KL term needs the training-event count (_init_dataloader)"
+            return reg
+        return reg + sum(layer.kl() for layer in cache[1]) / n_train
 
     def _batch_loss(self, data):
         
@@ -2925,7 +2952,7 @@ class AmplitudeExperiment(BaseExperiment):
             loss    = self.loss(y_pred, y)
             mse_val = None
     
-        reg_term    = self.regularization_lambda * self.regularization(self.model)
+        reg_term    = self._reg_term(self.model)
         # Detached tensor (not .item()) — deferred sync; see _batch_loss_lloca / _step.
         loss_no_reg = loss.detach()
         loss        = loss + reg_term
@@ -2998,7 +3025,7 @@ class AmplitudeExperiment(BaseExperiment):
         loss = self._aggregate_per_process_loss(y_pred, y, process_ids, loss_agg, sigma=sigma,
                                                 sign=self._last_sign)
 
-        reg         = self.regularization_lambda * self.regularization(self.model)
+        reg         = self._reg_term(self.model)
         # Keep the no-reg loss as a detached tensor instead of syncing here with
         # .item() *before backward* — that sync forces the whole forward to finish
         # and the CPU to wait before backward is even queued. Callers materialise it
@@ -3091,7 +3118,7 @@ class AmplitudeExperiment(BaseExperiment):
             if mse_val is not None:
                 mse_sum = mse_val * w if mse_sum is None else mse_sum + mse_val * w
 
-        reg = self.regularization_lambda * self.regularization(self.model)
+        reg = self._reg_term(self.model)
         if getattr(self, "ewc", None) is not None:
             reg = reg + (self.cfg.fine_tune.ewc.get("lambda", 1000.0) / 2.0) * self.ewc.penalty(self.model)
         if torch.is_tensor(reg) and reg.requires_grad:
@@ -3213,7 +3240,7 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             agg = ell_t.sum() / P
 
-        reg = self.regularization_lambda * self.regularization(self.model)
+        reg = self._reg_term(self.model)
         if getattr(self, "ewc", None) is not None:
             reg = reg + (self.cfg.fine_tune.ewc.get("lambda", 1000.0) / 2.0) * self.ewc.penalty(self.model)
         if torch.is_tensor(reg) and reg.requires_grad:
@@ -3698,7 +3725,7 @@ class AmplitudeExperiment(BaseExperiment):
                     if sigma is not None:
                         mse_e = ((y_pred - y) ** 2).flatten(1).mean(dim=1).to(torch.float64)
                         mse_sums.index_add_(0, pids, mse_e)
-                reg_val = float(self.regularization_lambda * self.regularization(self.model))
+                reg_val = float(self._reg_term(self.model))
             sums, counts, mse_sums = sums.cpu().numpy(), counts.cpu().numpy(), mse_sums.cpu().numpy()
             if getattr(self, "_sign_head", False):
                 acc = sign_ok.cpu().numpy() / np.maximum(counts, 1)
@@ -3731,7 +3758,7 @@ class AmplitudeExperiment(BaseExperiment):
               if is_lloca:
                   y_pred, y, _, sigma, mse_val = self._forward_lloca(data)
                   loss_no_reg = self._per_event_loss(y_pred, y, sigma=sigma).mean().detach()
-                  reg = self.regularization_lambda * self.regularization(self.model)
+                  reg = self._reg_term(self.model)
                   return loss_no_reg + reg, loss_no_reg, mse_val
               return self._batch_loss(data)      # legacy models: single-process batch, mean loss
           with torch.no_grad():
@@ -3793,7 +3820,7 @@ class AmplitudeExperiment(BaseExperiment):
         lnr = [v for k, v in proc_losses_no_reg.items() if v is not None and k not in monitors]
         if lnr:
             val_loss_no_reg = _combine(lnr)
-            reg_val  = float(self.regularization_lambda * self.regularization(self.model))
+            reg_val  = float(self._reg_term(self.model))
             val_loss = val_loss_no_reg + reg_val
         else:
             val_loss_no_reg = None

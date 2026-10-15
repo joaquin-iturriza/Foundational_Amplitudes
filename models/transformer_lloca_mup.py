@@ -8,6 +8,7 @@ import mup  # Microsoft μP library
 from mup import MuReadout, set_base_shapes, make_base_shapes
 
 from .attention_lloca_mup import LLoCaAttention, build_block_diagonal_bias
+from .bayesian_readout import MuBayesianReadout
 from lloca.reps.tensorreps import TensorReps
 from lloca.mup import mup_parametrized  # self-contained μP base-shape machinery
 
@@ -427,6 +428,9 @@ class MuPTransformer(nn.Module):
         parametrization: str = "mup",
         mup_base_shapes: dict | None = None,
         mup_delta_shapes: dict | None = None,
+        bayesian_readout: bool = False,
+        bnn_prior_prec: float = 1.0,
+        bnn_logsig2_init: float = -9.0,
     ) -> None:
         super().__init__()
         self.parametrization = parametrization
@@ -450,7 +454,13 @@ class MuPTransformer(nn.Module):
                 for _ in range(num_blocks)
             ]
         )
-        self.linear_out = MuReadout(self.hidden_channels, out_channels, bias=True)
+        # bayesian_readout: the variational "BNN last layer" (models/bayesian_readout.py); a MuReadout subclass, so
+        # the μP base shapes, rescaling and 1/width output scaling are those of the plain readout.
+        if bayesian_readout:
+            self.linear_out = MuBayesianReadout(self.hidden_channels, out_channels, bias=True,
+                                                prior_prec=bnn_prior_prec, logsig2_init=bnn_logsig2_init)
+        else:
+            self.linear_out = MuReadout(self.hidden_channels, out_channels, bias=True)
         self.init_method = init_method_normal((encoder_var / in_channels)**0.5)
 
         self._reset_parameters()
