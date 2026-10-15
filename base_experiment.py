@@ -835,6 +835,7 @@ class BaseExperiment:
             "iterations": int(t.iterations),
             "increment_steps": t.get("increment_steps", None),
             "is_dyhpo_run": bool(t.get("is_dyhpo_run", False)),
+            "warm_start": bool(getattr(self, "warm_start", False)),
             "scheduler": t.scheduler,
             "scheduler_scale": t.get("scheduler_scale", 1),
             "T_max": sched.get("T_max"),
