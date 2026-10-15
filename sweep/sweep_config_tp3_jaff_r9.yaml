@@ -2,6 +2,15 @@
 # (data.affine_multiplicity_std), p.P ordering and dropped coupling powers, same search space and seed (hp73 is the same
 # candidate), rung 9, 64k steps; it separates the mask's share of jcaus's zero-shot gain over tp3_gstd_r9 from the
 # statistics'. Ordering is kept although it matters only with the mask, so that one switch differs.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 8G
+  cpus_per_task: 4
+  chain_width: 2
+  time: '12:15:00'
+paths: null
 sweep_name: tp3_jaff_r9
 n_trials: 8
 dyhpo:
