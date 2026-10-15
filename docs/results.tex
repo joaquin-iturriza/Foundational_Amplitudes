@@ -6365,10 +6365,16 @@ is up to $133\times$ larger (\code{tp3\_r3fte\_uubar\_gg\_d8/trial\_0031}, train
 TF32-trained model rebuilt in fp32 is up to $4\times$ better (\code{tp3\_r6fte\_ud\_ud\_d8/trial\_0194}). TF32's $10$-bit
 mantissa is a relative error of $\sim10^{-3}$ per matmul, against $|\Delta|\sim10^{-5}$ to $10^{-4}$ in these models,
 so a model's precision is part of what it learned. The $\Delta$ plots draw each model at the precision that reproduces
-its recorded loss. Not settled: whether the transfer study's V100/A100 mix moves its cell values beyond the run-to-run
-spread (the training-side A/B says not, at two cells), and the H100 test of the CC runs (still queued). The five that
-match neither include \code{tp3\_r8fte\_ee\_bb\_nlo\_d8/trial\_0162} ($7.4\times$ either way), like the CC
-\code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} ($13\times$ on V100): the one-loop $b\bar b$ probe has its own open mismatch.
+its recorded loss. On H100 the same holds (\code{FA-ccin2p3-c0a4a22d}, TF32 on, the five CC runs that V100 did not reproduce):
+\code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} rebuilds at $1.00\times$ its recorded loss (V100: $0.29\times$),
+\code{tp3\_finfte\_uubar\_Zg\_d8/trial\_0031} at $1.00\times$ (V100: $1.52\times$), and the lxplus-trained
+\code{tp3\_r9fte\_ee\_ddbar\_d8\_002/trial\_0060} matches only in fp32 ($7.3\times$ with TF32). With each model at its own
+precision, $24$ of the $251$ $\Delta$-plot models still rebuild off their recorded loss by more than $0.02$\,dex: $20$
+by $5$ to $40\%$, and four far off at every precision, all from the one-loop $b\bar b$ probe or the Sudakov-EW star arm:
+\code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} ($13\times$), \code{tp3\_r8fte\_ee\_bb\_nlo\_d8/trial\_0162} ($7.4\times$),
+\code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8/trial\_0131} ($7.2\times$) and \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132}
+($0.34\times$). Not settled: those four, and whether the study's V100/A100/H100 mix moves its cell values beyond the
+run-to-run spread (the training-side A/B says not, at two cells). 
 
 \begin{figure}[H]
 \centering
