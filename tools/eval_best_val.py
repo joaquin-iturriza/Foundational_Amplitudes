@@ -1,8 +1,9 @@
 """Score a run's best checkpoint on its own validation split, as training did: val_loss_no_reg (the validation
 aggregate without the regularizer) and each process's standardized loss. For runs that diverged before writing a
 result: their best checkpoint is still their value (CLAUDE.md, reported values), and their logs print the
-regularized loss to four decimals, which the L2 term swamps at large lambda. The checkpoint's "model" holds the
-weights validation used (the EMA average where EMA was on), so the run is rebuilt with EMA off and those weights.
+regularized loss to four decimals, which the L2 term swamps at large lambda. The run is rebuilt with EMA off and the
+weights validation used (rebuild_run.load_best_weights: the checkpoint's EMA shadow where EMA was on; its "model"
+entry alone is the live weights at the best step).
 The rebuilt statistics are asserted against the run's data_stats.json. Prints one EVAL_BEST JSON line per run.
 Needs a GPU.
     python tools/eval_best_val.py <run_dir> [<run_dir> ...]
@@ -17,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
-from rebuild_run import _build, load_best_state  # noqa: E402
+from rebuild_run import _build, load_best_weights  # noqa: E402
 
 for run_dir in sys.argv[1:]:
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
@@ -40,7 +41,7 @@ for run_dir in sys.argv[1:]:
     for k in ("prepd_mean", "prepd_std"):
         got = [float(x) for x in getattr(exp, k)]
         assert np.allclose(got, saved[k], rtol=1e-6), f"{run_dir}: rebuilt {k} {got} != {saved[k]}"
-    exp.model.load_state_dict(load_best_state(run_dir))
+    ema_applied = load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     exp.ema, exp.train_sampler = None, None
     exp.val_loss, exp.val_loss_no_reg, exp.val_mse = [], [], []
@@ -49,6 +50,6 @@ for run_dir in sys.argv[1:]:
     with torch.no_grad():
         exp._validate(0)
     print("EVAL_BEST " + json.dumps({
-        "run_dir": run_dir, "val_loss": exp.val_loss_no_reg[-1],
+        "run_dir": run_dir, "val_loss": exp.val_loss_no_reg[-1], "ema_applied": ema_applied,
         "proc_val_losses_no_reg": {n: v[-1] for n, v in exp.proc_val_losses_no_reg.items()},
         "prepd_std": saved["prepd_std"]}), flush=True)

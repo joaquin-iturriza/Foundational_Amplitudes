@@ -21,13 +21,39 @@ sys.path.insert(0, ROOT)
 import datagen  # noqa: E402
 
 
-def load_best_state(run_dir):
-    """The best checkpoint (es_load_best_model: the validation minimum), plain or gzipped."""
+def _load_best_ckpt(run_dir):
     p = os.path.join(run_dir, "models", "model_run0_best.pt")
     if os.path.exists(p):
-        return torch.load(p, map_location="cpu", weights_only=False)["model"]
+        return torch.load(p, map_location="cpu", weights_only=False)
     with gzip.open(p + ".gz", "rb") as f:
-        return torch.load(io.BytesIO(f.read()), map_location="cpu", weights_only=False)["model"]
+        return torch.load(io.BytesIO(f.read()), map_location="cpu", weights_only=False)
+
+
+def load_best_state(run_dir):
+    """The best checkpoint's "model" entry, plain or gzipped. With EMA on this is the LIVE weights at the
+    best step, not the EMA average that scored it: base_experiment._save_model takes state_dict() inside
+    ema.average_parameters() but saves after the context restored the live weights into the same storage.
+    To score a run as it was validated, use load_best_weights."""
+    return _load_best_ckpt(run_dir)["model"]
+
+
+def load_best_weights(model, run_dir):
+    """Load the best checkpoint (es_load_best_model: the validation minimum) into `model` as the run
+    validated it: the "model" entry, then, where the run had EMA on, the EMA shadow over model.parameters()
+    (the order ExponentialMovingAverage was built with). Returns True if the EMA shadow was applied."""
+    ck = _load_best_ckpt(run_dir)
+    model.load_state_dict(ck["model"])
+    ema = ck.get("ema")
+    if not ema:
+        return False
+    params = list(model.parameters())
+    shadow = ema["shadow_params"]
+    assert len(shadow) == len(params), f"{run_dir}: EMA shadow has {len(shadow)} tensors, model {len(params)}"
+    with torch.no_grad():
+        for p, s in zip(params, shadow):
+            assert p.shape == s.shape, f"{run_dir}: EMA shadow shape {tuple(s.shape)} != {tuple(p.shape)}"
+            p.copy_(s.to(p.device, p.dtype))
+    return True
 
 
 def _build(cfg, swap, path, name):
@@ -101,7 +127,7 @@ def rebuild(run_dir, role, path, n_events):
         assert np.allclose(v, saved[k], rtol=1e-6), f"rebuilt {k} {v} != the run's {saved[k]}"
     if saved.get("tchannel_norm") is not None:
         assert np.allclose(exp._tch_norm, saved["tchannel_norm"], rtol=1e-6), (exp._tch_norm, saved["tchannel_norm"])
-    exp.model.load_state_dict(load_best_state(run_dir))
+    load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     loader = exp.val_loader if role == "val" else exp.test_loader
     n = len(loader.dataset) if hasattr(loader.dataset, "__len__") else None

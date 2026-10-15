@@ -1,7 +1,8 @@
 """Per-event predictions of a run's best checkpoint on its own splits, for the Delta and pull plots (decision D42):
 preds_<split>.npz (evaluation.save_predictions: standardized pred/truth, raw |M|^2 pred/truth, pool_row) written to
 <out-dir>/<sweep>__<trial>/, never into the run directory. Built as tools/eval_best_val.py builds a run: EMA off and
-the checkpoint's "model" weights (the EMA average where EMA was on; a fresh EMA would score random weights), the
+the checkpoint's weights as the run validated them (rebuild_run.load_best_weights: the EMA shadow where EMA was on;
+the "model" entry alone is the live weights at the best step, and a fresh EMA would score random weights), the
 fine-tune head kept, the rebuilt amplitude statistics asserted against the run's data_stats.json, and the validation
 aggregate recomputed and printed next to the run's recorded one. Needs a GPU.
     python tools/eval_delta.py --out-dir $SCRATCH/zz_delta runs/tp3_scr_ee_ddbar_d8/trial_0010 [...]
@@ -17,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
-from rebuild_run import load_best_state  # noqa: E402
+from rebuild_run import load_best_weights  # noqa: E402
 
 
 def one(run_dir, out_dir, seed=None, tf32=None):
@@ -63,7 +64,7 @@ def one(run_dir, out_dir, seed=None, tf32=None):
     for k in ("prepd_mean", "prepd_std"):
         got = [float(x) for x in getattr(exp, k)]
         assert np.allclose(got, saved[k], rtol=1e-6), f"{run_dir}: rebuilt {k} {got} != {saved[k]}"
-    exp.model.load_state_dict(load_best_state(run_dir))
+    ema_applied = load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     exp.ema, exp.train_sampler = None, None
     exp.val_loss, exp.val_loss_no_reg, exp.val_mse = [], [], []
@@ -77,7 +78,7 @@ def one(run_dir, out_dir, seed=None, tf32=None):
             for role, loader in (("val", exp.val_loader), ("test", exp.test_loader)):
                 pr, tr, sg = exp._collect_predictions(loader)[:3]
                 np.savez_compressed(os.path.join(out_dir, f"sigma_{role}.npz"), pred=pr, truth=tr, sigma=sg)
-    rec = {"run_dir": run_dir, "out_dir": out_dir, "val_loss_rebuilt": exp.val_loss_no_reg[-1],
+    rec = {"run_dir": run_dir, "out_dir": out_dir, "val_loss_rebuilt": exp.val_loss_no_reg[-1], "ema_applied": ema_applied,
            "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
            "tf32": bool(torch.backends.cuda.matmul.allow_tf32),
            "files": sorted(f for f in os.listdir(out_dir) if f.startswith("preds_"))}
