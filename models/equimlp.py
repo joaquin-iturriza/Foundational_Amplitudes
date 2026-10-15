@@ -60,6 +60,22 @@ def get_edge_index_from_ptr(ptr, shape=None, remove_self_loops=True):
     return edge_index
 
 
+def restrict_edges_causal(edge_index, ptr, n_nodes, min_prefix):
+    """Keep the edges (i <- j) of the fully connected graph with local_j <= max(local_i, min_prefix - 1): particle i
+    of an event reads particles 1..max(i, min_prefix) (1-indexed) only, the frames-net side of the causal attention
+    mask (models/lloca.py causal_frames="prefix"). Filtering keeps the edges grouped by i in ascending order, which
+    the softmax's edge pointer relies on. Returns (edge_index, edge_ptr), edge_ptr (n_nodes+1,) delimiting each
+    node's edges."""
+    batch = torch.repeat_interleave(torch.arange(len(ptr) - 1, device=ptr.device), (ptr[1:] - ptr[:-1]).long())
+    local = torch.arange(n_nodes, device=ptr.device) - ptr[:-1][batch]
+    li, lj = local[edge_index[0]], local[edge_index[1]]
+    edge_index = edge_index[:, lj <= torch.clamp(li, min=min_prefix - 1)]
+    counts = torch.bincount(edge_index[0], minlength=n_nodes)
+    edge_ptr = torch.zeros(n_nodes + 1, dtype=torch.long, device=ptr.device)
+    torch.cumsum(counts, dim=0, out=edge_ptr[1:])
+    return edge_index, edge_ptr
+
+
 class EquiEdgeConv(MessagePassing):
     def __init__(
         self,
@@ -145,7 +161,7 @@ class EquiEdgeConv(MessagePassing):
             self.edge_std = edge_attr.std().clamp(min=1e-5).detach()
             self.edge_inited.fill_(True)
             
-    def forward(self, fourmomenta, scalars, edge_index, ptr, batch=None):
+    def forward(self, fourmomenta, scalars, edge_index, ptr, batch=None, edge_ptr=None):
         """
         Parameters
         ----------
@@ -188,6 +204,8 @@ class EquiEdgeConv(MessagePassing):
         fourmomenta = fourmomenta.reshape(-1, 4)
         self._node_ptr = ptr
         self._node_batch = batch
+        # per-node edge pointer of a non-fully-connected graph (restrict_edges_causal); None = fully connected
+        self._edge_ptr = edge_ptr
         vecs = self.propagate(
             edge_index,
             s=scalars,
@@ -239,9 +257,15 @@ class EquiEdgeConv(MessagePassing):
         if edge_attr is not None:
             prefactor = torch.cat([prefactor, edge_attr], dim=-1)
         prefactor = self.mlp(prefactor)
-        prefactor = self.nonlinearity(
-            prefactor, index=edge_index[0], node_ptr=self._node_ptr, node_batch=self._node_batch
-        )
+        if getattr(self, "_edge_ptr", None) is None:
+            prefactor = self.nonlinearity(
+                prefactor, index=edge_index[0], node_ptr=self._node_ptr, node_batch=self._node_batch
+            )
+        else:
+            prefactor = self.nonlinearity(
+                prefactor, index=edge_index[0], node_ptr=self._node_ptr, node_batch=self._node_batch,
+                edge_ptr=self._edge_ptr,
+            )
         fm_rel = (fm_rel / fm_rel_norm)[:, None, :4]
         prefactor = prefactor.unsqueeze(-1)
         out = prefactor * fm_rel
@@ -285,7 +309,7 @@ class EquiMLP(EquiVectors):
         edge_index, _, _ = get_edge_index_and_batch(fourmomenta, ptr)
         self.block.init_standardization(fourmomenta, edge_index)
 
-    def forward(self, fourmomenta, scalars=None, ptr=None):
+    def forward(self, fourmomenta, scalars=None, ptr=None, causal_min_prefix=None):
         """
         Parameters
         ----------
@@ -308,6 +332,12 @@ class EquiMLP(EquiVectors):
         edge_index, batch, ptr = get_edge_index_and_batch(fourmomenta, ptr)
         if len(in_shape) > 1:
             scalars = scalars.reshape(math.prod(in_shape), scalars.shape[-1])
+        block_kwargs = {}
+        if causal_min_prefix is not None:
+            # causal frames (models/lloca.py causal_frames="prefix"): particle i reads 1..max(i, causal_min_prefix)
+            assert len(in_shape) == 1, "causal frames are implemented for the sparse (ptr) layout"
+            edge_index, block_kwargs["edge_ptr"] = restrict_edges_causal(
+                edge_index, ptr, fourmomenta.shape[0], int(causal_min_prefix))
 
         # pass through block
         fourmomenta = self.block(
@@ -316,6 +346,7 @@ class EquiMLP(EquiVectors):
             edge_index=edge_index,
             batch=batch,
             ptr=ptr,
+            **block_kwargs,
         )
         fourmomenta = fourmomenta.reshape(*in_shape, -1, 4)
         return fourmomenta
@@ -396,10 +427,11 @@ def get_nonlinearity(nonlinearity):
         return lambda x, *args, **kwargs: torch.nn.functional.softplus(x)
     elif nonlinearity == "softmax":
 
-        def func(x, index, node_ptr, node_batch, remove_self_loops=True):
-            edge_ptr = get_node_to_edge_ptr_fully_connected(
-                node_ptr, node_batch, remove_self_loops=remove_self_loops
-            )
+        def func(x, index, node_ptr, node_batch, remove_self_loops=True, edge_ptr=None):
+            if edge_ptr is None:
+                edge_ptr = get_node_to_edge_ptr_fully_connected(
+                    node_ptr, node_batch, remove_self_loops=remove_self_loops
+                )
             return softmax(
                 x,
                 ptr=edge_ptr,

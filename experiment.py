@@ -23,6 +23,7 @@ from logger import LOGGER
 #from mlflow_util import log_mlflow
 from losses import LogCoshLoss, RelL1Loss, HeteroscedasticLoss
 from dataset import AmplitudeDataset, collate_variable_length
+from multiplicity_extrap import order_identical_particles, fit_affine_multiplicity
 
 from lloca.utils.rand_transforms import rand_lorentz
 from lloca.utils.polar_decomposition import restframe_boost
@@ -441,6 +442,13 @@ class AmplitudeExperiment(BaseExperiment):
         (data.internal_mass_scalars). Shared by both data paths so
         n_order_features is identical."""
         base = np.array(amp_orders[proc_idx], dtype=np.float32)
+        if bool(self.cfg.data.get("drop_coupling_powers", False)):
+            # the coupling powers [.., alpha_s_max, alpha_ew_max] grow with the legs (alpha_s_max = n for W/Z + n g):
+            # broadcast to every particle they hand the multiplicity to particle 1, against the causal mask's
+            # log A_i(p_1..p_i) (D55). Zeroed, not removed, so the feature width and checkpoints stay; the loop
+            # counts (tree against one-loop of the same particles) are kept.
+            assert base.shape[0] == 4, f"amp_orders {base} is not [L_QCD, L_EW, alpha_s_max, alpha_ew_max]"
+            base[2:] = 0.0
         return np.concatenate([base, self._coupling_scalar_row(proc_idx),
                                self._internal_mass_row(proc_idx)])
 
@@ -452,6 +460,9 @@ class AmplitudeExperiment(BaseExperiment):
         self._offshell_per_event = bool(self.cfg.data.get("offshell_per_event", False))
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
+        assert str(self.cfg.data.get("particle_order", "none")) == "none" and \
+            not self.cfg.data.get("affine_multiplicity_std", False), \
+            "data.particle_order / data.affine_multiplicity_std are implemented on the recipe path only"
 
         LOGGER.info(f"Loading datasets: {self.cfg.data.dataset}")
 
@@ -1477,6 +1488,11 @@ class AmplitudeExperiment(BaseExperiment):
 
         # --- load every (role, process); boost+augment momenta (no scale yet) ---
         store = {}
+        _porder = str(self.cfg.data.get("particle_order", "none"))
+        _porder_rng = np.random.default_rng(int(self.cfg.data.get("seed", 42))) if _porder == "shuffle" else None
+        if _porder != "none":
+            LOGGER.info(f"particle_order={_porder}: identical outgoing particles ordered "
+                        f"{'by p.P descending' if _porder == 'pdotP' else 'at random'} (multiplicity_extrap)")
         for role in roles:
             cap = cap_for[role]
             cap = int(cap) if cap not in (None, "null", "none") else None
@@ -1507,6 +1523,10 @@ class AmplitudeExperiment(BaseExperiment):
                     self._slot_pdgs_by_name = {}
                 self._slot_pdgs_by_name.setdefault(name, [int(x) for x in pdg_ids[0]])
 
+                if _porder != "none":
+                    # the causal mask's sequence order (multiplicity_extrap): identical outgoing particles
+                    # trade slots, by p.P descending or at random; set before anything reads the momenta
+                    particles = order_identical_particles(particles, pdg_ids, _porder, rng=_porder_rng)
                 store[(role, name)] = {
                     "momenta": self._boost_augment_momenta(particles, n_particles),
                     "tokens":  toks,
@@ -1698,6 +1718,9 @@ class AmplitudeExperiment(BaseExperiment):
                 "Frozen data stats carry no per-process amplitude transforms (written before "
                 "the signed-log scale); re-resolved per pool in legacy mode (unscaled signedlog).")
         self.cfg.data.amp_trafos = amp_trafos
+        assert not self.cfg.data.get("affine_multiplicity_std", False) or (
+            per_dataset and self.cfg.data.get("shared_standardization", False)), \
+            "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
         if prepd_means is None:
             if per_dataset:
                 prepd_means, prepd_stds = [], []
@@ -1719,6 +1742,18 @@ class AmplitudeExperiment(BaseExperiment):
                     prepd_means, prepd_stds = [mu] * len(names), [sd] * len(names)
                     LOGGER.info(f"shared_standardization: one (mu, sigma) = ({mu:.3f}, {sd:.3f}) pooled over "
                                 f"{len(names)} processes, per-process transforms kept")
+                    if bool(self.cfg.data.get("affine_multiplicity_std", False)):
+                        # the draft's multiplicity preprocessing (Sec. "Extrapolating to more legs"):
+                        # mu_N = a + b N over the particle count N, one shared sigma (multiplicity_extrap)
+                        N_p = [int(store[("train", nm)]["momenta"].shape[1]) for nm in names]
+                        a, b, sd = fit_affine_multiplicity(n, N_p, mu_p, sd_p)
+                        prepd_means = [a + b * k for k in N_p]
+                        prepd_stds = [sd] * len(names)
+                        self._affine_multiplicity = {"a": a, "b": b, "sigma": sd}
+                        LOGGER.info(f"affine_multiplicity_std: mu_N = {a:.4f} + {b:.4f} N, sigma = {sd:.4f}; per "
+                                    f"process (N, own mean, mu_N): "
+                                    + ", ".join(f"{nm} ({k}, {m:.2f}, {a + b * k:.2f})"
+                                                for nm, k, m in zip(names, N_p, mu_p)))
             else:
                 _, m, s = preprocess_amplitude(train_raw, trafos=amp_trafos)
                 prepd_means, prepd_stds = [float(m)], [float(s)]
@@ -1954,6 +1989,8 @@ class AmplitudeExperiment(BaseExperiment):
                                       if self._amp_trafos_pp else None),
                     "preprocess_per_dataset": per_dataset,
                     "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
+                    **({"affine_multiplicity": self._affine_multiplicity}
+                       if getattr(self, "_affine_multiplicity", None) else {}),
                     "target_propagators": bool(getattr(self, "_target_factor_on", False)),
                     "tchannel_norm": getattr(self, "_tch_norm", None),
                     "offshell_stats": getattr(self, "_offshell_stats", None),

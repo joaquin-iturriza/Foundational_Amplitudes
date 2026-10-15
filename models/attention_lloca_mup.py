@@ -14,7 +14,7 @@ from lloca.utils.misc import minimum_autocast_precision
 
 try:
     from xformers.ops import memory_efficient_attention
-    from xformers.ops.fmha.attn_bias import BlockDiagonalMask
+    from xformers.ops.fmha.attn_bias import BlockDiagonalMask, BlockDiagonalCausalMask
     _XFORMERS_AVAILABLE = True
 except ImportError:
     _XFORMERS_AVAILABLE = False
@@ -31,7 +31,23 @@ def _cached_block_diagonal_mask(seq_lens):
     return BlockDiagonalMask.from_seqlens(list(seq_lens))
 
 
-def build_block_diagonal_bias(ptr, seq_lens=None):
+@functools.lru_cache(maxsize=128)
+def _cached_block_diagonal_causal_mask(seq_lens):
+    return BlockDiagonalCausalMask.from_seqlens(list(seq_lens))
+
+
+def dense_block_causal_mask(ptr, device=None):
+    """Boolean (N_total, N_total) mask, True where key j is visible to query i: same event and j <= i. The
+    xformers-free equivalent of BlockDiagonalCausalMask (CPU, tests)."""
+    ptr = torch.as_tensor(ptr)
+    counts = (ptr[1:] - ptr[:-1]).long()
+    ev = torch.repeat_interleave(torch.arange(len(counts)), counts.cpu())
+    idx = torch.arange(int(counts.sum()))
+    m = (ev[:, None] == ev[None, :]) & (idx[None, :] <= idx[:, None])
+    return m if device is None else m.to(device)
+
+
+def build_block_diagonal_bias(ptr, seq_lens=None, causal=False):
     """Build (or fetch from cache) the xformers BlockDiagonalMask for `ptr`.
 
     Returns None if xformers is unavailable (caller falls back to dense attention).
@@ -49,11 +65,15 @@ def build_block_diagonal_bias(ptr, seq_lens=None):
     `num_blocks` serializing syncs per step for the identical mask.
     """
     if not _XFORMERS_AVAILABLE:
-        return None
+        # causal: the dense boolean mask (the fallback below would otherwise attend across events and to later
+        # particles); non-causal keeps the old behaviour
+        return dense_block_causal_mask(ptr, device=ptr.device) if causal else None
     if seq_lens is None:
         seq_lens = tuple((ptr[1:] - ptr[:-1]).tolist())   # GPU→CPU sync
     else:
         seq_lens = tuple(seq_lens)
+    if causal:
+        return _cached_block_diagonal_causal_mask(seq_lens)
     return _cached_block_diagonal_mask(seq_lens)
 
 
@@ -388,6 +408,12 @@ def scaled_dot_product_attention(
     # Legacy path: derive the mask from ptr here (one sync per call, i.e. per block).
     if attn_bias is None and ptr is not None:
         attn_bias = build_block_diagonal_bias(ptr)
+
+    if isinstance(attn_bias, torch.Tensor):
+        # dense boolean mask (dense_block_causal_mask: the causal path without xformers)
+        attn_scores = torch.matmul(query, key.transpose(-2, -1)) * scale
+        attn_scores = attn_scores.masked_fill(~attn_bias, float("-inf"))
+        return torch.matmul(F.softmax(attn_scores, dim=-1), value)
 
     if attn_bias is not None:
         # xformers expects (1, N_total, H, C) — reshape from (..., H, N_total, C)

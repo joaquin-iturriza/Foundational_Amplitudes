@@ -88,6 +88,12 @@ net:
   num_blocks: 8
   num_heads: 8
   freeze_framesnet: false
+  causal_mask: false         # autoregressive attention within each event: particle i attends to 1..i (draft Sec. 5,
+                             # "Extrapolating to more legs"); pair with data.particle_order
+  causal_frames: prefix      # with causal_mask: "prefix" = particle i's local frame from particles 1..max(i, K) only
+                             # (no leak of later particles through the frames net), "full" = from the whole event
+  causal_frames_min: 4       # K: the first K particles see each other in the frames net (a frame needs three
+                             # independent directions; 4 = the smallest events, 2 -> 2, which stay complete)
   checkpoint_blocks: false   # gradient-checkpoint transformer blocks: recompute block
                              # activations in backward instead of storing them — large
                              # activation-memory saving for ~one extra forward of compute.

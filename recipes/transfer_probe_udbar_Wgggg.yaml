@@ -1,0 +1,6 @@
+# Zero-shot probe of the causal-mask pretraining (D55): u dbar -> W+ 4g, one emission past rung 9's highest (W+3g).
+# The pool of the high-multiplicity test (recipes/transfer_finale_wng.yaml, same entry and sampling, so the same
+# cached files); zero-shot scoring reads its validation split (tools/zero_shot_parent.py).
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_Wgggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

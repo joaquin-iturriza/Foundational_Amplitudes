@@ -500,7 +500,13 @@ class MuPTransformer(nn.Module):
         # first block): the arXiv:2606.23791 diagram vector, placed on every particle of
         # the event by the wrapper (models/diagram_encoder_llm4lhc.process_token_add).
         token_add = attn_kwargs.pop("token_add", None)
-        if pair_ctx is not None:
+        # Autoregressive mask within each event (LLOCAMuPTransformer.causal_mask): block-diagonal across events,
+        # lower-triangular inside each (xformers BlockDiagonalCausalMask). Always built once per forward.
+        causal = bool(attn_kwargs.pop("causal", False))
+        if causal:
+            assert pair_ctx is None and ptr is not None, "causal_mask needs ptr and no pairwise attention bias"
+            attn_kwargs["attn_bias"] = build_block_diagonal_bias(ptr, seq_lens=seq_lens, causal=True)
+        elif pair_ctx is not None:
             attn_kwargs["pair_ctx"] = pair_ctx
         elif ptr is not None:
             if os.environ.get("LLOCA_ATTN_MASK", "per_forward") == "per_block":

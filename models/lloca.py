@@ -102,10 +102,23 @@ class LLOCAMuPTransformer(nn.Module):
         parametrization: str = "mup",
         detach_sigma_backbone: bool = False,
         sigma_after_pool: bool = True,
+        causal_mask: bool = False,
+        causal_frames: str = "prefix",
+        causal_frames_min: int = 4,
         # token_size: int = 0,
     ):
         super().__init__()
         self.parametrization = parametrization
+        # Autoregressive attention (paper draft, Sec. "Extrapolating to more legs"): within an event, particle i
+        # attends to particles 1..i only. Under LLoCa the local frames are a second path between particles: with
+        # causal_frames="prefix" the frames net of particle i reads particles 1..max(i, causal_frames_min) only, so the
+        # outputs of a prefix of length >= causal_frames_min do not depend on the particles after it (tests/
+        # test_causal_mask.py); "full" leaves the frames net on the whole event.
+        self.causal_mask = bool(causal_mask)
+        assert causal_frames in ("prefix", "full"), causal_frames
+        self.causal_frames = causal_frames
+        self.causal_frames_min = int(causal_frames_min)
+        assert self.causal_frames_min >= 2, "a prefix frame needs other particles to point at"
         # See forward(): softplus must be applied ONCE to the POOLED per-event sigma logit, not
         # per-particle before pooling. False restores the old (range-compressing) behaviour for A/B.
         self.sigma_after_pool = sigma_after_pool
@@ -164,8 +177,13 @@ class LLOCAMuPTransformer(nn.Module):
         token_add=None,
     ):
         """Forward pass of the LLoCa network."""
+        frames_kwargs = {}
+        if self.causal_mask:
+            assert pair_ctx is None, "causal_mask and the pairwise attention bias are not combined"
+            if self.causal_frames == "prefix":
+                frames_kwargs["causal_min_prefix"] = self.causal_frames_min
         frames = self.framesnet(
-            fourmomenta, scalars=particle_type, ptr=ptr, return_tracker=False
+            fourmomenta, scalars=particle_type, ptr=ptr, return_tracker=False, **frames_kwargs
         )
         fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
         features_local = (fourmomenta_local - mean) / std
@@ -196,25 +214,25 @@ class LLOCAMuPTransformer(nn.Module):
         # pooling is linear and commutes with its readout.
         if self.loss == "HETEROSC" and self.sigma_after_pool:
             if self.detach_sigma_backbone:
-                h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
+                h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask,
                              pair_ctx=pair_ctx, token_add=token_add, return_features=True)
                 mu = self.net.linear_out(h)[..., : self.out_shape]
                 sig_logit = self.net.linear_out(h.detach())[..., -self.out_shape:]
                 return torch.cat([mu, sig_logit], dim=-1)
             # raw logits; the wrapper pools then softpluses
-            return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx, token_add=token_add)
+            return self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask, pair_ctx=pair_ctx, token_add=token_add)
 
         if self.loss == "HETEROSC" and self.detach_sigma_backbone:
             # Apply linear_out twice: mu from live features (grad -> backbone), sigma
             # from detached features (linear_out sigma-rows still train, backbone does
             # not see sigma's gradient). See __init__ note.
-            h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens,
+            h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask,
                          pair_ctx=pair_ctx, token_add=token_add, return_features=True)
             mu = self.net.linear_out(h)[..., : self.out_shape]
             sigma_raw = self.net.linear_out(h.detach())[..., -self.out_shape:]
             sigma = torch.clamp(F.softplus(sigma_raw), min=1e-6)
             return torch.cat([mu, sigma], dim=-1)
-        out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, pair_ctx=pair_ctx, token_add=token_add)
+        out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask, pair_ctx=pair_ctx, token_add=token_add)
         if self.loss == "HETEROSC":
             # softplus the sigma channels for positivity (floored), matching MuMLP.
             mu = out[..., : self.out_shape]
