@@ -5529,9 +5529,11 @@ of the three share a test set.
     need to send 8 runs, let's just see that the het loss works''). Next (D57, before any longer horizon): a GP sweep of
     the user's loss on $ee\to t\bar t$ at $D=10^4$, $8$k (\code{sweep/sweep\_config\_tp\_het\_ee\_ttbar\_d8.yaml}; the
     user's answers: rank on the NLL, ``GP, 8 trials, 2000 candidates''; waves $3+3+2$ through \code{sweep/drive.py};
-    FA's other sweeps unchanged, user: ``Let's see what we get from this sweep first''), launched once the GP port and
-    the signed-objective fix (a negative NLL made every DyHPO label identical) are committed and pass
-    \code{sweep/test\_sampler\_learns.py}. \code{training.track\_train\_eval} (D58) scores the training split with the
+    FA's other sweeps unchanged, user: ``Let's see what we get from this sweep first''), done 2026-10-15 06:12
+    (Fig.~\ref{fig:het_sweep}: test error $4.8\times$ below the MSE baseline's, $\sigma$ still $\approx2\times$ too large and
+    flat, every trial best at its last step). For the user: the longer horizon this sweep was the prerequisite for
+    (user: ``before extending the horizon, perhaps a HP sweep is needed''), at which length and whether to re-sweep
+    there; and whether \code{heterosc\_select} defaults to \code{nll}. \code{training.track\_train\_eval} (D58) scores the training split with the
     validation weights. Pulls in the $\Delta$ plots come after, by retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
     Plehn): arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at $D=10^4$: all
     ladder rungs, the scaling figures' arms, the star arms. The paper's figures use the $8$k grid at \code{d8}
