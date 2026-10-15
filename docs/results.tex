@@ -5478,6 +5478,37 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
 \label{fig:zero_shot_2d}
 \end{figure}
 
+\paragraph{Jonas's causal mask on our rung 9 (2026-10-15, D55).}\label{sec:jcaus} Two pretrainings at rung 9's point
+(hp73, $64$k steps, CC V100, $6.5$\,h each): \code{tp3\_jcaus\_r9}, the draft's causal construction
+(\code{model.net.causal\_mask}: a causal attention mask over particles ordered by descending $p\cdot P$ within identical
+outgoing particles, the output the mean over particles of $\log A_i(p_1..p_i)$, the target standardized with a mean
+affine in the multiplicity fitted over the $19$ processes, coupling powers dropped from the inputs), and
+\code{tp3\_jcausbnn\_r9}, the same with the draft's Bayesian last layer (Heidelberg's \code{VBLinear} as a $\mu$P readout,
+evaluated at its posterior-mean weights); against \code{tp3\_gstd\_r9} (one shared standardization, no mask). Real
+zero-shot, no data of the probe (\code{tools/zero\_shot\_parent.py}, \code{analysis/transfer/zero\_shot\_jcaus.py},
+Fig.~\ref{fig:zero_shot_jcaus}): on $u\bar d\to W^+4g$, one gluon past rung 9, the validation MSE of $\log|\mathcal M|^2$
+over the probe's variance is $0.084$ (causal), $0.10$ (with BNN) and $1.95$ (shared std.); on $u\bar u\to Z+ng$, a family
+rung 9 never saw, $0.18$ to $0.86$ (causal), $0.31$ to $0.47$ (BNN), $0.52$ to $50$ (shared std.). Most of the gain is the
+placement of the scale: after the best affine map fitted on the probe the three are close ($W{+}4g$: $0.0062$, $0.0070$,
+$0.013$; $Z{+}ng$ for $n\ge3$ the shared-standardization parent is slightly better, $0.067$ to $0.095$ against $0.080$ to
+$0.089$). The BNN layer helps only at $Z{+}g$ ($0.36$ against $0.86$) and is worse at every larger $n$, unlike the draft,
+where it helps the extrapolation. Four things change at once between the causal and shared-standardization parents (the
+mask, the ordering, the affine-in-$N$ statistics, the dropped coupling powers), so the gain is not the mask's alone; an
+unmasked parent with the affine statistics would separate them. Not Jonas's implementation (his code is not public, the
+draft is the spec): the local frames are built from the prefix with the first $4$ particles seeing each other, our extra
+scalar inputs stay, and the training set is rung 9 ($10^5$ events per process), not $Z+ng$ with $10^7$ per $n$. One
+seed per arm; the hp73 trial has EMA off.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/zero_shot_jcaus.pdf}
+\caption{Real zero-shot of three rung-9 pretrainings at the same HPs: the causal mask, the causal mask with the Bayesian
+last layer, and the shared standardization without mask. Circles: $u\bar u\to Z+ng$ (no $Z+ng$ in training); open
+diamonds: $u\bar d\to W^+4g$ (training stops at $W^+3g$). Left: validation MSE of $\log|\mathcal M|^2$ over the probe's
+variance. Right: the same after the best affine map fitted on the probe.}
+\label{fig:zero_shot_jcaus}
+\end{figure}
+
 \paragraph{Against the zero-shot results of the collaboration draft (2026-10-15).} Two sections of the draft
 (\code{\textasciitilde/drafts/fm\_amplitudes/paper.tex}) report zero-shot numbers, each on a different scope from ours.
 ``Extrapolating to more legs'' (Jonas) trains on $q\bar q\to Z+ng$, $n\le4$ ($10$M events per $n$ from a published
@@ -5501,9 +5532,9 @@ of the three share a test set.
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
     $6.5$\,h; GPU unit tests passed, prefix leak $3.6\times10^{-6}$ against $0.5$ to $0.6$ for the controls);
     \code{tp3\_jcausbnn\_r9} (CC job 61507824, the same plus the Bayesian last layer of the draft's fig:bnn, copied from
-    jetgpt-splittings' \code{VBLinear}; tests passed); the Jean Zay and H100 $\Delta$ evaluations. After the two
-    pretrainings: \code{scripts/job\_zero\_shot\_parent.sh} with \code{PARENTS} = both and \code{runs/tp3\_gstd\_r9/trial\_0073}
-    on $W{+}4g$ and the $Z{+}ng$ probes. To tell the user with the result: Jonas's code is not public, so ``the same
+    jetgpt-splittings' \code{VBLinear}; tests passed); the Jean Zay and H100 $\Delta$ evaluations. Both pretrainings and their zero-shot are done
+    (Sec.~\ref{sec:jcaus}). For the user: an unmasked parent with the affine-in-$N$ statistics, to tell the mask's share of
+    the gain from the statistics'. To tell the user with the result: Jonas's code is not public, so ``the same
     implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
     each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). For the user (sec:ema-ckpt): fix \code{\_save\_model} to store the EMA weights as the best model (a cloned
 \code{"model\_ema"} entry, keeping \code{"model"} for resume), make the post-training evaluation restore the best
