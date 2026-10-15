@@ -213,11 +213,18 @@ def parse_name(name):
 
 
 def is_synthetic(name):
+    if re.match(r"^synl([2-6])?_(\d+)$", str(name)):          # one-loop partners (tools/synthetic_loops.py)
+        return True
     try:
         parse_name(name)
         return True
     except KeyError:
         return False
+
+
+def _loops():
+    import importlib
+    return importlib.import_module("tools.synthetic_loops")
 
 
 def _props(pdg):
@@ -282,7 +289,10 @@ def _canonical(S, N):
 @functools.lru_cache(maxsize=None)
 def structure(name):
     """The random structure of synthetic process `name` (a JSON-able dict), drawn from a
-    seed fixed by the name (its version included)."""
+    seed fixed by the name (its version included). A one-loop name synl[<n>]_<k> is the loop partner of the
+    version-1 syn[<n>]_<k> (tools/synthetic_loops.py)."""
+    if str(name).startswith("synl"):
+        return _loops().structure_loop(name)
     n_forced, ver, rev, target, idx = parse_name_full(name)
     if ver == 1:
         return _structure_v1(name, n_forced, idx)
@@ -417,7 +427,10 @@ def evaluate(st, P, scale=1.0):
     `scale` multiplies every dimensionful constant (propagator masses and widths): the
     mass-dimension check is |M|^2(lam P, scale=lam) = lam^(8-2N) |M|^2(P).
     Version 1 keeps its original evaluator (bit-identical labels); later versions use the
-    vectorised one, which gives v1 structures the same values to rounding (tests/test_synthetic_versions.py)."""
+    vectorised one, which gives v1 structures the same values to rounding (tests/test_synthetic_versions.py).
+    A one-loop structure (tools/synthetic_loops.py) gives its tree-loop interference."""
+    if "loop" in st:
+        return _loops().evaluate_loop(st, P, scale)
     if st.get("version", 1) == 1:
         return _evaluate_v1(st, P, scale)
     if st["version"] >= 6:

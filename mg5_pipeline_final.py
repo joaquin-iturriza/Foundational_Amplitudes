@@ -2899,7 +2899,12 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
                 lg1 = np.log(np.where(me1 > 0, me1, np.nan))
             ok = np.isfinite(lg1)
             nb_s = _adaptive_bins(int(ok.sum()), int(pol["n_sqrts_bins"]))
-            edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, nb_s, n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
+            if ok.any():
+                edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, nb_s, n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
+            else:
+                # no positive candidate (a signed target negative throughout, e.g. a synthetic one-loop pool): the
+                # proposal stays uniform in sqrt(s); every pool that has one is unchanged
+                edges, probs = np.linspace(lo, hi, nb_s + 1), np.full(nb_s, 1.0 / nb_s)
             ev2, sq2 = _candidates(n_cand - n1, lambda n: _draw_sqrts_from_bins(n, edges, probs, rng),
                                    m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
             me2 = np.asarray(label(ev2, sq2), float)
