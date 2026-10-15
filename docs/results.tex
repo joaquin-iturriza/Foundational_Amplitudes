@@ -2116,7 +2116,7 @@ same weights. Right: every trial's validation NLL, coloured by $\log_{10}$ lr; e
 \label{fig:het_sweep}
 \end{figure}
 
-\paragraph{Longer horizons (D61).} \code{hp1550} retrained at $8$k, $16$k and $32$k steps, all seed $1$, no sweep, with the
+\paragraph{The het loss trained longer (D61).} \code{hp1550} retrained at $8$k, $16$k and $32$k steps, all seed $1$, no sweep, with the
 cosine spanning the whole run (\code{scripts/job\_het\_ab.sh}; a first $16$k/$32$k attempt kept the trial's
 \code{increment\_steps}, restarted the cosine at $8$k and is discarded). Each run is best at its last step again
 (Fig.~\ref{fig:het_long}, top). Test MSE$(\log|\mathcal M|^2)$: $2.9\times10^{-8}$, $1.2\times10^{-8}$,
@@ -2124,13 +2124,13 @@ $5.1\times10^{-9}$; median $|\Delta|$ $6.2$, $1.9$, $1.2\times10^{-5}$. The MSE 
 $9.6\times10^{-8}$ at $8$k (\code{tp\_scr\_ee\_ttbar\_d8} trial $144$), $1.7\times10^{-8}$ at $32$k
 (\code{tp3\_scr32k\_ee\_ttbar\_d8}, the better of its two chosen points on validation); the het loss stays
 $3.3\times$ and $3.2\times$ lower. The $8$k run at seed $1$ ($2.9\times10^{-8}$) against the sweep trial at seed $42$
-($2.0\times10^{-8}$) is the seed spread. Calibration does improve with length (Fig.~\ref{fig:het_long}, bottom): at $8$k
+($2.0\times10^{-8}$) is compatible with the seed spread (two seeds). Calibration does improve with length (Fig.~\ref{fig:het_long}, bottom): at $8$k
 $\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.5\times$, the
 error $30\times$, and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
 $8$k, $16$k, $32$k; pull std $0.42$, $0.44$, $0.60$). $\sigma$ still varies less than the error: about $5\times$ too large
-on the best-predicted decile and $1.5\times$ too small on the worst. Since every horizon is still best at its last step,
-$\sigma$ being calibrated only late follows the schedule: the NLL keeps spiking while the lr is high and $\sigma$ resolves
-the per-event error only in the cosine's tail (\code{analysis/transfer/het\_long.py}).
+on the best-predicted decile and $1.5\times$ too small on the worst. Since every horizon is still best at its last step, we
+speculate that $\sigma$ is calibrated only late because of the schedule: the NLL keeps spiking while the lr is high and
+$\sigma$ appears to resolve the per-event error only in the cosine's tail; no run tests this (\code{analysis/transfer/het\_long.py}).
 
 \begin{figure}[H]
 \centering
@@ -5569,8 +5569,7 @@ format; the post-training evaluation scores the best checkpoint's EMA; fine-tune
 old checkpoints through the EMA shadow mapped by parameter name; \code{tests/test\_ema\_checkpoint.py}, real-model check
 $3/3$; from now on, fine-tunes of EMA parents start from different weights than the transfer study's so far); the catalog sweep launched (\code{dancat\_het\_pre}, $32$k,
 waves $3+3+2$; its $200$\,GB fits only CC's large V100 node and the H100 nodes; the user: ``there has to be a way around this'':
-a memory-mapped data path whose memory scales with the batch, being built and measured, then the sweep restarts); the het loss at
-\code{hp1550} for $16$k and $32$k, no sweep (D61), done (Fig.~\ref{fig:het_long}); selection
+a memory-mapped data path whose memory scales with the batch, being built and measured, then the sweep restarts); selection
 on the NLL by default (D62); the unmasked control \code{tp3\_jaff\_r9} (D65, CC job 61554675); the $\Delta$ plots are the
 $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
     (\code{4ef5b76}); the het sweep sets \code{nll} explicitly, the default waits for the user. The catalog class counts
