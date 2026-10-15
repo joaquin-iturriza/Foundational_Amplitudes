@@ -5469,20 +5469,39 @@ of the three share a test set.
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
-    \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{The plan (the user's list of
+    \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
+    catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
+    $6.5$\,h; GPU unit tests passed, prefix leak $3.6\times10^{-6}$ against $0.5$ to $0.6$ for the controls);
+    \code{tp3\_jcausbnn\_r9} (CC job 61507824, the same plus the Bayesian last layer of the draft's fig:bnn, copied from
+    jetgpt-splittings' \code{VBLinear}; tests passed); the Jean Zay and H100 $\Delta$ evaluations. After the two
+    pretrainings: \code{scripts/job\_zero\_shot\_parent.sh} with \code{PARENTS} = both and \code{runs/tp3\_gstd\_r9/trial\_0073}
+    on $W{+}4g$ and the $Z{+}ng$ probes. To tell the user with the result: Jonas's code is not public, so ``the same
+    implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
+    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). \emph{The plan (the user's list of
     2026-10-14 16:48; D42 to D49), in priority order.} (1) \textbf{The catalog of arXiv:2606.23791} (D45, most urgent):
     its $1501$ tree processes, with Daniel's diagram embedding on top of the usual inputs; the user wants its diversity
     (how many are relabels of one another, Sec.~\ref{sec:catalog}) to ask the others about. No $|\mathcal M|^2$ is
     public, so we generate it: about $10^5$ events per process (user, 2026-10-15: ``For now let's do only 100k.''), with
     their MadEvent setup and their split as published; the pipeline (a reader of their catalog, massive $b$ beams for
-    $347$ processes) is being built. Asked on 10-14 and open unless their setup answers them: coupling orders
-    (recommended: all), massive $b$ beams or \code{sm-no\_b\_mass}, the catalog's loss (MSE now or after the
-    heteroscedastic test), whether the $|\mathcal M|^2$ labels exist in Heidelberg. (2) \textbf{Heteroscedastic loss}
+    $347$ processes) is built (commits \code{9bbc825}, \code{77cae08}; tested end to end locally, $gg\to gg$ labels
+    against the analytic $|\mathcal M|^2$ to $1.7\times10^{-7}$). Settled by their setup and the user's answers of
+    2026-10-15: their default coupling orders, massive $b$ beams, the $2\to1$ group ``Drop them'' ($1491$ processes,
+    $139$ held out), the hold-out ``Their split, report both'' (all $139$ and the $43$ without a relabel in training),
+    the top mass ``173.0, theirs''; the loss is the user's heteroscedastic one (D52). Running: the full generation
+    \code{FA-ccin2p3-17f91455} (one $48$-core CC node, user: ``No, just send it''; the timing job
+    \code{FA-ccin2p3-85c90b04} alongside). Next: the pretraining sweep on it (D59: GP, $8$ trials, $2000$ candidates,
+    NLL-ranked, Daniel's diagram embedding; \code{sweep/sweep\_config\_dancat\_het\_pre.yaml}, whose horizon, lr window
+    $[10^{-3}, 9\times10^{-3}]$ and memory are PROPOSED and wait for the user). (2) \textbf{Heteroscedastic loss}
     (agreement with the user first). The first clean joint run of the user's loss is written up (the correction after
     ``The coupled fit fails'', Sec.~\ref{sec:divergences}): $\mu$ $2.6\times$ below the MSE baseline on $ee\to t\bar t$,
     calibration open (pull std $0.46$, the NLL still falling at $8$k). The test is that one run (user, 2026-10-15: ``No
-    need to send 8 runs, let's just see that the het loss works''). Pulls in the $\Delta$ plots come after (2), by
-    retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
+    need to send 8 runs, let's just see that the het loss works''). Next (D57, before any longer horizon): a GP sweep of
+    the user's loss on $ee\to t\bar t$ at $D=10^4$, $8$k (\code{sweep/sweep\_config\_tp\_het\_ee\_ttbar\_d8.yaml}; the
+    user's answers: rank on the NLL, ``GP, 8 trials, 2000 candidates''; waves $3+3+2$ through \code{sweep/drive.py};
+    FA's other sweeps unchanged, user: ``Let's see what we get from this sweep first''), launched once the GP port and
+    the signed-objective fix (a negative NLL made every DyHPO label identical) are committed and pass
+    \code{sweep/test\_sampler\_learns.py}. \code{training.track\_train\_eval} (D58) scores the training split with the
+    validation weights. Pulls in the $\Delta$ plots come after, by retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
     Plehn): arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at $D=10^4$: all
     ladder rungs, the scaling figures' arms, the star arms. The paper's figures use the $8$k grid at \code{d8}
     (\code{analysis/transfer/delta\_audit.json}): $179$ runs, on Jean Zay $107$, CC $37$, lxplus $32$, and three pruned
