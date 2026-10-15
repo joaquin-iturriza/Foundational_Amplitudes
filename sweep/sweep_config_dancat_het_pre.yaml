@@ -16,7 +16,7 @@
 #   lr window [1e-3, 9e-3], half a decade around 3e-3: between lr*(32k, high D) = 1.9e-3 (CLAUDE.md rule 2, the
 #     high-D row's extrapolation) and 4.7e-3 (catalog_v2's best 9.7e-3 at 8601 steps carried to 32k as t^-0.55);
 #   waves 3 (random start-up) + 3 + 2, run by sweep/drive.py; mem 200G (catalog_v2 took 64G for 42.7M events;
-#     this is 135M), 8 CPUs, 18 h wall.
+#     this is 135M), 5 CPUs (CC allows 5 per V100), 18 h wall.
 # Prerequisites on the site: the pools (scripts/job_gen_daniel_catalog.sh) and the diagram sidecars
 # data/diagrams/dc_*.diagrams.json (tools/dump_diagrams.py --prefix dc_): use_diagrams and offshell_per_event read them;
 # the first log must show "offshell_per_event: built propagator masks for N/P processes" with N = P = 1352.
@@ -25,7 +25,7 @@ cluster:
   auto_submit: false
   request_gpus: 1
   mem: 200G
-  cpus_per_task: 8
+  cpus_per_task: 5
   time: '18:00:00'
 paths: null
 sweep_name: dancat_het_pre
