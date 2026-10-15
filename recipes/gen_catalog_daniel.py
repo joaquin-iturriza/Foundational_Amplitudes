@@ -29,7 +29,7 @@ relabellings of a training process, so held-out results are reported on all 139 
 _heldout_norelabel); the top mass "173.0, theirs" (their card, against our table's 172.5). The relabel classes come from the symbolic
 analysis/catalog_daniel/classify2.py, not from the numeric tools/equal_processes.py check.
   - the ten 2->1 processes are dropped everywhere, as they drop them;
-  - the hold-out is their split as published, no class-based removal on top (pending, above); the relabel side
+  - the hold-out is their split as published, no class-based removal on top (the user: "Their split, report both"); the relabel side
     list uses analysis/catalog_daniel/classes_default.json (exact_key, default coupling orders);
   - 100k train events per process (they used 1M), 10k val, 10k test, all from ONE MadEvent run per
     process (datagen.ensure_lhe_pp), so the three roles are disjoint unweighted events;
