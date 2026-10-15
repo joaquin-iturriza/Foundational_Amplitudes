@@ -89,10 +89,24 @@ def test_generation_feature_off_is_the_old_encoding():
 
 def test_frozen_standardization_matches_the_table():
     m2, n2 = P.add_is_massless_flag(P.GLOBAL_PROPERTY_MATRIX)
-    real = np.any(P.GLOBAL_PROPERTY_MATRIX != 0, axis=1)
+    real = np.zeros(len(m2), dtype=bool)
+    real[1:len(P.SM_PDGS) + 1] = True        # the SM rows the constants were frozen over (non-SM rows appended, D49)
     for f, (mu, sd) in P._FROZEN_STD_STATS.items():
         col = m2[real, n2.index(f)]
         assert abs(col.mean() - mu) < 1e-5 and abs(col.std() - sd) < 1e-5, f
+
+
+def test_non_sm_rows_are_appended_after_the_sm_ones():
+    """D49: the non-SM rows come after every SM row, so an SM particle keeps its index and its encoded row (a
+    checkpoint's property_matrix is a prefix of the current one) and the massless neutralisation ignores them."""
+    n_sm = len(P.SM_PDGS)
+    assert [P.GLOBAL_PDG_IDX[p] for p in P.SM_PDGS] == list(range(1, n_sm + 1))
+    assert sorted(P.GLOBAL_PDG_IDX[p] for p in P.BSM_PARTICLE_PROPERTIES) == list(range(n_sm + 1, P.GLOBAL_N_ENTRIES))
+    m = P.PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+    sm = np.array([P.PARTICLE_PROPERTIES[p][m] for p in P.SM_PDGS], dtype=np.float32)
+    assert P.MASSLESS_NEUTRAL_LOG10 == sm[np.abs(sm - P._MASSLESS) >= 1e-6].mean()
+    mat, names = P.build_property_matrix(is_massless=True)
+    assert mat[P.GLOBAL_PDG_IDX[22], names.index("log10_mass_gev")] == P.MASSLESS_NEUTRAL_LOG10
 
 
 if __name__ == "__main__":       # plain runner: python tests/test_particle_encoding.py

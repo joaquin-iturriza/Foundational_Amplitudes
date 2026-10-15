@@ -7,6 +7,23 @@ from lgatr.interface import embed_vector, extract_scalar
 from models.attention_lloca_mup import build_block_diagonal_bias
 
 
+def _property_matrix_prefix_hook(module):
+    """load_state_dict pre-hook for the ``property_matrix`` buffer: a checkpoint written before non-SM
+    rows were appended to particle_ids' table (D49) holds the first rows of the current matrix. If its
+    rows equal the current first rows bit for bit, the current (longer) matrix is loaded in its place;
+    anything else is left alone, so a genuinely different encoding still fails the strict load."""
+    def hook(state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs):
+        k = prefix + "property_matrix"
+        own = getattr(module, "property_matrix", None)
+        if k not in state_dict or own is None:
+            return
+        old = state_dict[k]
+        if (old.dim() == 2 and old.shape[1] == own.shape[1] and old.shape[0] < own.shape[0]
+                and torch.equal(old.to(device=own.device, dtype=own.dtype), own[: old.shape[0]])):
+            state_dict[k] = own.detach().clone()
+    return hook
+
+
 def _build_particle_encoder(n_features: int, d_hidden: int, encoder_hidden: int = 0):
     """Project the physical property vector (n_features) → d_hidden.
 
@@ -231,6 +248,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
             assert property_matrix is not None
             t = torch.tensor(property_matrix, dtype=torch.float32)
             self.register_buffer("property_matrix", t)
+            self._register_load_state_dict_pre_hook(_property_matrix_prefix_hook(self))
             n_features = property_matrix.shape[1]
             self.particle_encoder = _build_particle_encoder(
                 n_features, self.d_particle_hidden, encoder_hidden
@@ -825,6 +843,7 @@ class _AmplitudeGATrMuPBase(nn.Module):
             assert property_matrix is not None
             t = torch.tensor(property_matrix, dtype=torch.float32)
             self.register_buffer("property_matrix", t)
+            self._register_load_state_dict_pre_hook(_property_matrix_prefix_hook(self))
             n_features = property_matrix.shape[1]
             self.particle_encoder = _build_particle_encoder(
                 n_features, self.d_particle_hidden, encoder_hidden

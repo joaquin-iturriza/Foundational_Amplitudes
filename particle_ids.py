@@ -170,11 +170,32 @@ PARTICLE_PROPERTIES = {
    -16: [  0.0,  0.5,  _MASSLESS,  -0.5,  0.0, -1.0,  0.0,  0.0,  3.0 ],  # ν̄τ
     # fmt: on
 }
-# To add a BSM particle: append one entry here with its quantum numbers.
-# The trained model's projection layer can then process it immediately at
-# inference (the transformer weights are unchanged).  If you also want the
-# model to *learn* the new particle's dynamics, fine-tune on a small BSM
-# dataset — only the tiny particle_encoder layer needs updating.
+
+# ── non-SM particles (D49; docs/results.tex sec:nonsm) ─────────────────────────
+# APPEND ONLY, in a dict of their own: GLOBAL_PDG_IDX numbers the SM entries above first
+# (sorted, exactly as before these rows existed) and these after them in insertion order,
+# so every SM particle keeps its index and its encoded row. A checkpoint's property_matrix
+# buffer is then the first rows of the current one (wrappers.AmplitudeLLoCaWrapper loads
+# it as such), and a pretrained SM model reads a new particle with no retraining.
+# Masses: the generator's, i.e. the parameter point the recipes generate
+# (mg5_pipeline_final.NONSM_POINT), one mass per PDG id as for the SM rows.
+# Quantum numbers: T3 of the field's upper/lower doublet component for the charged scalar
+# (H+ = +1/2, H- = -1/2, as the SM table gives the W its T3 = +-1), 0 for the neutral
+# scalars like the SM H, 0 for the Z'-like vector (an SU(2) singlet).
+NONSM_MASSES_GEV = {"Y1": 500.0, "H+": 200.0, "h2": 250.0, "h3": 300.0}
+BSM_PARTICLE_PROPERTIES = {
+    # fmt: off
+    #               Q     s   log10m                               T3    B    L   col  C2   gen
+    5000001: [  0.0,  1.0,  float(np.log10(NONSM_MASSES_GEV["Y1"])),  0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # Y1 (DMsimp_s_spin1 vector mediator)
+         37: [  1.0,  0.0,  float(np.log10(NONSM_MASSES_GEV["H+"])),  0.5, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # H+ (2HDM)
+        -37: [ -1.0,  0.0,  float(np.log10(NONSM_MASSES_GEV["H+"])), -0.5, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # H- (2HDM)
+         35: [  0.0,  0.0,  float(np.log10(NONSM_MASSES_GEV["h2"])),  0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # h2 (2HDM, CP-even)
+         36: [  0.0,  0.0,  float(np.log10(NONSM_MASSES_GEV["h3"])),  0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # h3 (2HDM, CP-odd)
+    # fmt: on
+}
+SM_PDGS = tuple(sorted(PARTICLE_PROPERTIES))      # frozen before the merge below
+assert not set(BSM_PARTICLE_PROPERTIES) & set(SM_PDGS)
+PARTICLE_PROPERTIES = {**PARTICLE_PROPERTIES, **BSM_PARTICLE_PROPERTIES}
 
 
 class ParticleFeaturizer:
@@ -201,7 +222,7 @@ class ParticleFeaturizer:
 # PARTICLE_PROPERTIES above gets an index here at import time — no retraining
 # of the transformer needed, only (optionally) fine-tuning the projection layer.
 
-_sorted_pdgs     = sorted(PARTICLE_PROPERTIES.keys())
+_sorted_pdgs     = list(SM_PDGS) + list(BSM_PARTICLE_PROPERTIES)   # SM sorted, then non-SM appended (see above)
 GLOBAL_PDG_IDX   = {pdg: i + 1 for i, pdg in enumerate(_sorted_pdgs)}  # 1-based; 0 = padding
 GLOBAL_N_ENTRIES = len(_sorted_pdgs) + 1
 
@@ -209,6 +230,12 @@ _mat = np.zeros((GLOBAL_N_ENTRIES, N_PARTICLE_FEATURES), dtype=np.float32)
 for _pdg, _idx in GLOBAL_PDG_IDX.items():
     _mat[_idx] = PARTICLE_PROPERTIES[_pdg]
 GLOBAL_PROPERTY_MATRIX = _mat   # (GLOBAL_N_ENTRIES, N_FEATURES), row 0 = padding zeros
+
+# The value add_is_massless_flag gives massless rows: the mean log10 mass over the massive
+# SM species, from the SM rows only (float32 like the table), so non-SM rows never shift it.
+_mcol = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+_sm_m = np.array([PARTICLE_PROPERTIES[p][_mcol] for p in SM_PDGS], dtype=np.float32)
+MASSLESS_NEUTRAL_LOG10 = np.float32(_sm_m[np.abs(_sm_m - _MASSLESS) >= 1e-6].mean())
 
 
 # ---------------------------------------------------------------------------
@@ -387,9 +414,10 @@ def add_is_massless_flag(matrix, names=None):
     massive  = ~massless & ~padding
 
     flag = massless.astype(np.float32).reshape(-1, 1)
-    # neutralise sentinel → mean log10 mass of the massive species
-    if massive.any():
-        matrix[massless, m] = matrix[massive, m].mean()
+    # neutralise sentinel → mean log10 mass of the massive SM species, frozen (a non-SM row
+    # must not move the value every massless particle is encoded with)
+    if massless.any():
+        matrix[massless, m] = MASSLESS_NEUTRAL_LOG10
 
     expanded = np.concatenate([matrix, flag], axis=1)
     return expanded, names + ["is_massless"]
@@ -544,12 +572,7 @@ def mass_feature_spec(spin_onehot=False, color_onehot=False,
     if is_massless:
         # Reproduce add_is_massless_flag's neutralisation: massless rows take the
         # mean log10 over the massive species (computed on the raw table).
-        m = PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
-        col = GLOBAL_PROPERTY_MATRIX[:, m]
-        padding  = ~np.any(GLOBAL_PROPERTY_MATRIX != 0.0, axis=1)
-        massless = (np.abs(col - _MASSLESS) < 1e-6) & ~padding
-        massive  = ~massless & ~padding
-        neutralize_log10 = float(col[massive].mean()) if massive.any() else _MASSLESS
+        neutralize_log10 = float(MASSLESS_NEUTRAL_LOG10)
 
     std_mu = std_sd = None
     if standardize:

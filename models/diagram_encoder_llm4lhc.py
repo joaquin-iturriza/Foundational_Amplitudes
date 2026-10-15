@@ -103,8 +103,10 @@ def particle_label_vocab():
     ``particle_ids.PARTICLE_PROPERTIES`` in sorted-PDG order (the same 30 entries as
     their ``particles.json``; only the numbering differs, which a learned embedding
     does not see), then the one-loop ghosts and Goldstones of ``_LOOP_LINES``."""
-    from particle_ids import GLOBAL_PDG_IDX
-    vocab = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    from particle_ids import GLOBAL_PDG_IDX, SM_PDGS
+    # the SM entries only: the non-SM rows appended to the table (particle_ids, D49) would grow the embedding
+    # tables and break every checkpoint built with this encoder; a non-SM leg raises in _label below
+    vocab = {int(pdg): int(GLOBAL_PDG_IDX[pdg]) - 1 for pdg in SM_PDGS}
     n = len(vocab)
     for k, pdg in enumerate(_LOOP_LINES):
         vocab[pdg] = n + k
