@@ -9,7 +9,26 @@ import numpy as np
 
 root = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.environ["SCRATCH"], "zz_delta")
 out, meta = {}, {}
+def stale(d):
+    """An output written before the EMA fix (no "ema_applied" in eval_delta.json) of a run trained with EMA: it scored
+    the checkpoint's live weights, not the ones the run validated (docs/results.tex sec:ema-ckpt), so it is skipped."""
+    try:
+        ev = json.load(open(os.path.join(d, "eval_delta.json")))
+    except (OSError, ValueError):
+        return False
+    if "ema_applied" in ev:
+        return False
+    try:
+        cfg = open(os.path.join(ev["run_dir"], "config.yaml")).read()
+    except (OSError, KeyError):
+        return True
+    return any(line.strip() == "ema: true" for line in cfg.splitlines() if not line.startswith(" "))
+
+
 for f in sorted(glob.glob(os.path.join(root, "*", "preds_test.npz"))):
+    if stale(os.path.dirname(f)):
+        print(f"{os.path.basename(os.path.dirname(f))} skipped: live weights of an EMA run (before the fix)", file=sys.stderr)
+        continue
     with np.load(f) as z:
         t, p = z["raw_truth"].reshape(-1).astype(np.float64), z["raw_pred"].reshape(-1).astype(np.float64)
     out[os.path.basename(os.path.dirname(f))] = ((p - t) / t).astype(np.float32)
