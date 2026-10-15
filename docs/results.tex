@@ -5477,7 +5477,10 @@ of the three share a test set.
     pretrainings: \code{scripts/job\_zero\_shot\_parent.sh} with \code{PARENTS} = both and \code{runs/tp3\_gstd\_r9/trial\_0073}
     on $W{+}4g$ and the $Z{+}ng$ probes. To tell the user with the result: Jonas's code is not public, so ``the same
     implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
-    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). \emph{The plan (the user's list of
+    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). Open from review: \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
+    (\code{4ef5b76}); the het sweep sets \code{nll} explicitly, the default waits for the user. The catalog class counts
+    ($467$/$409$) come from \code{analysis/catalog\_daniel/classify2.py}, which imports a \code{classify} module not in
+    the repo, so they cannot yet be regenerated from trunk. \emph{The plan (the user's list of
     2026-10-14 16:48; D42 to D49), in priority order.} (1) \textbf{The catalog of arXiv:2606.23791} (D45, most urgent):
     its $1501$ tree processes, with Daniel's diagram embedding on top of the usual inputs; the user wants its diversity
     (how many are relabels of one another, Sec.~\ref{sec:catalog}) to ask the others about. No $|\mathcal M|^2$ is
