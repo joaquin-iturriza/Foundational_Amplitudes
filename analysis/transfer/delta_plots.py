@@ -82,7 +82,7 @@ def main():
         rec, got = p.get("mse_logM2"), D.get("_meta", {}).get(t)
         if rec and got and abs(np.log10(got / rec)) > 0.02:
             off.append(f"{t}: rebuilt {got:.3g} vs recorded {rec:.3g}")
-            return D[t], rf" (rebuilt ${got / rec:.1f}\times$)"
+            return D[t], rf" (rebuilt ${got / rec:.2f}\times$)"
         return D[t], ""
 
     by = {}
