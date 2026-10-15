@@ -204,14 +204,45 @@ def section2_end_to_end(sweep_config, n_procs, out):
     print("section 2: data.memmap on and off give bitwise the same data, batches and RNG state")
 
 
+def section3_gpu_training(sweep_config, n_procs, out, steps):
+    """A few training steps with the flag off, on and off again (the last is the run-to-run control on the GPU):
+    the train and validation losses of every step / validation, compared exactly."""
+    from mem_profile_data import sweep_cfg
+    from experiment import AmplitudeExperiment
+    assert torch.cuda.is_available(), "section 3 needs a GPU"
+    shutil.rmtree(out, ignore_errors=True)
+    runs = {}
+    for tag, extra in (("off", []), ("on", ["data.memmap=true", f"data.memmap_dir={os.path.join(out, 'cache')}"]),
+                       ("off2", [])):
+        cfg, _ = sweep_cfg(sweep_config, n_procs, os.path.join(out, tag), extra + [
+            f"training.iterations={steps}", "training.validate_frac=0.1", "evaluate=false", "plot=false",
+            "training.num_workers=2", "ema=false", "training.regularization_lambda=1e-8"])
+        torch.set_default_dtype(torch.float32)
+        exp = AmplitudeExperiment(cfg)
+        exp()
+        runs[tag] = (np.asarray(exp.train_loss, np.float64), np.asarray(exp.val_loss_no_reg, np.float64))
+        print(f"  {tag}: train loss steps 1..{len(exp.train_loss)}: first {runs[tag][0][:3]}, last "
+              f"{runs[tag][0][-3:]}; val_loss_no_reg {runs[tag][1]}")
+    for a, b in (("off", "on"), ("off", "off2")):
+        tr = np.array_equal(runs[a][0], runs[b][0])
+        va = np.array_equal(runs[a][1], runs[b][1])
+        rel = float(np.max(np.abs(runs[a][1] - runs[b][1]) / np.abs(runs[a][1])))
+        print(f"  {a} vs {b}: train losses identical {tr}, val losses identical {va} (max rel. diff {rel:.3g})")
+    print("section 3 done")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--sweep-config")
     ap.add_argument("--n-procs", type=int, default=4)
     ap.add_argument("--out")
+    ap.add_argument("--gpu-steps", type=int, default=0, help="section 3 only: train this many steps off/on/off")
     a = ap.parse_args()
+    if a.gpu_steps:
+        section3_gpu_training(a.sweep_config, a.n_procs, os.path.expandvars(a.out), a.gpu_steps)
+        sys.exit(0)
     section0_reductions()
     section1_dataset_sampler()
     if a.sweep_config:
-        section2_end_to_end(a.sweep_config, a.n_procs, a.out)
+        section2_end_to_end(a.sweep_config, a.n_procs, os.path.expandvars(a.out))
     print("OK")
