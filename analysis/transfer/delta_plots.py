@@ -74,11 +74,16 @@ def main():
             t += "_rerun"          # a pruned trial rerun from its config (scripts/job_rerun_trial.sh)
         if t not in D:
             missing.append(f"{row['probe']} {row['arm']} {p.get('site')}:{p.get('run_dir')}")
-            return None
+            return None, ""
+        # a model that is not the recorded cell's is drawn dotted and named in the legend, never dropped: a rerun of a
+        # pruned trial (a new model), or a rebuilt validation loss off the recorded one by > 0.02 dex (4.7%)
+        if t.endswith("_rerun"):
+            return D[t], " (rerun)"
         rec, got = p.get("mse_logM2"), D.get("_meta", {}).get(t)
-        if rec and got and not t.endswith("_rerun") and abs(np.log10(got / rec)) > 0.02:
+        if rec and got and abs(np.log10(got / rec)) > 0.02:
             off.append(f"{t}: rebuilt {got:.3g} vs recorded {rec:.3g}")
-        return D[t]
+            return D[t], rf" (rebuilt ${got / rec:.1f}\times$)"
+        return D[t], ""
 
     by = {}
     for r in audit["rows"]:
@@ -94,11 +99,11 @@ def main():
     for probe, rows in by.get("ladder", {}).items():
         fig, ax = ps.figure()
         for arm, r in sorted(rows, key=lambda x: (x[0] != "scratch", x[0])):
-            dl = get(r)
+            dl, sfx = get(r)
             if dl is None:
                 continue
             lab = "from scratch" if arm == "scratch" else f"rung {arm[1:]}"
-            medians[f"ladder {probe} {arm}"] = hist(ax, dl, color="k" if arm == "scratch" else seq[arm], label=lab)
+            medians[f"ladder {probe} {arm}"] = hist(ax, dl, color="k" if arm == "scratch" else seq[arm], label=lab + sfx, linestyle=":" if sfx else "-")
         axes_lab(ax); ps.process_label(ax, LAB[probe])
         if leg_ax is None and len(ax.get_legend_handles_labels()[0]) == 11:
             leg_ax = ax
@@ -109,11 +114,11 @@ def main():
         for probe, rows in by.get(fam, {}).items():
             fig, ax = ps.figure()
             for arm, r in sorted(rows, key=lambda x: list(colors).index(x[0])):
-                dl = get(r)
+                dl, sfx = get(r)
                 if dl is None:
                     continue
                 rung = r["arm"][1:] if r["arm"].startswith("r") else ""
-                medians[f"{fam} {probe} {arm}"] = hist(ax, dl, color=colors[arm], label=labels(arm, rung))
+                medians[f"{fam} {probe} {arm}"] = hist(ax, dl, color=colors[arm], label=labels(arm, rung) + sfx, linestyle=":" if sfx else "-")
             axes_lab(ax); ps.process_label(ax, LAB[probe]); ps.legend(ax, "upper left")
             ps.save(fig, os.path.join(OUT, f"{base}_{probe}"))
 
@@ -134,24 +139,24 @@ def main():
         fig, ax = ps.figure()
         for lab_arm, r in star[p]:
             if lab_arm in ("scratch", "rung 1") or lab_arm == a:
-                dl = get(r)
+                dl, sfx = get(r)
                 if dl is None:
                     continue
                 c, lab = {"scratch": ("k", "from scratch"), "rung 1": (ps.C.blue, "rung 1")}.get(
                     lab_arm, (ARM_C[arm], f"rung 1 + {arm}"))
-                medians[f"star {p} {lab_arm}"] = hist(ax, dl, color=c, label=lab)
+                medians[f"star {p} {lab_arm}"] = hist(ax, dl, color=c, label=lab + sfx, linestyle=":" if sfx else "-")
         axes_lab(ax); ps.process_label(ax, LAB[p]); ps.legend(ax, "upper left")
         ps.save(fig, os.path.join(OUT, f"delta_star_{arm}"))
     fig, ax = ps.figure()
     for lab_arm, r in star.get("ee_ddbar", []):
-        dl = get(r)
+        dl, sfx = get(r)
         if dl is None:
             continue
         if lab_arm.startswith("panel g"):
-            medians["star ee_ddbar rung 1"] = hist(ax, dl, color=ps.C.blue, linestyle="--", label="rung 1")
+            medians["star ee_ddbar rung 1"] = hist(ax, dl, color=ps.C.blue, linestyle=":" if sfx else "--", label="rung 1" + sfx)
         else:
             arm = lab_arm.split()[0]
-            medians[f"star ee_ddbar {arm}"] = hist(ax, dl, color=ARM_C[arm], label=f"+ {arm}")
+            medians[f"star ee_ddbar {arm}"] = hist(ax, dl, color=ARM_C[arm], label=f"+ {arm}" + sfx, linestyle=":" if sfx else "-")
     axes_lab(ax); ps.process_label(ax, LAB["ee_ddbar"]); ps.legend(ax, "upper left", ncol=2)
     ps.save(fig, os.path.join(OUT, "delta_star_ee_ddbar"))
 
@@ -159,7 +164,7 @@ def main():
     print(f"{len(medians)} lines drawn; {len(missing)} missing")
     for m in missing:
         print("  missing", m)
-    print(f"{len(off)} rebuilt validation losses off the recorded one by > 5%")
+    print(f"{len(off)} rebuilt validation losses off the recorded one by > 0.02 dex (4.7%), drawn dotted")
     for m in off:
         print("  !!", m)
 
