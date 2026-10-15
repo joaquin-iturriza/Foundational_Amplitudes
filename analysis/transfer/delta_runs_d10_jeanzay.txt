@@ -1,0 +1,2 @@
+runs/tp3_r9fte32k_ee_ddbar_d10/trial_0090
+runs/tp3_r9fte32k_ee_dd_nlo_d9/trial_0191
