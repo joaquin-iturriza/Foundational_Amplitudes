@@ -12,4 +12,13 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-python tools/mem_profile_data.py "$@"
+# MEMPROF_NPROCS="100 300" (with --out DIR among the args): one profile per recipe cut, into DIR_n<N>
+if [ -n "${MEMPROF_NPROCS:-}" ]; then
+  args=("$@"); out=""
+  for ((i=0; i<${#args[@]}; i++)); do [ "${args[i]}" = "--out" ] && out="${args[i+1]}" && unset 'args[i]' 'args[i+1]'; done
+  for n in $MEMPROF_NPROCS; do
+    python tools/mem_profile_data.py "${args[@]}" --n-procs "$n" --out "${out}_n$n"
+  done
+else
+  python tools/mem_profile_data.py "$@"
+fi
