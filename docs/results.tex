@@ -5439,9 +5439,32 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \code{cfg.ema=False}, \code{reset\_output\_head=False}, an \code{--pred-dir} with \code{save\_predictions}, assert stats
     and val MSE). \textbf{Waiting on the user:} coupling orders (recommended: all), massive $b$ beams or
     \code{sm-no\_b\_mass}, the catalog's loss (MSE now or after the clean joint heteroscedastic test), whether the
-    $|\mathcal M|^2$ labels exist in Heidelberg. \textbf{Next, approved (D42):} the eval fix, then the Delta-plot
-    re-evaluation on the three sites and the three reruns. \textbf{Infra:} supervisor and events waiter running; nothing
-    of ours queued.
+    $|\mathcal M|^2$ labels exist in Heidelberg.
+    \emph{Delta plots, state 2026-10-15 03:00 (D42, item \code{delta}).} Tools: \code{tools/eval\_delta.py} (rebuilds a
+    run with its own frozen \code{data\_stats.json} and tokenizer read as a resume reads them, EMA off with the
+    checkpoint's weights, fine-tune head kept; writes \code{preds\_*.npz} to \code{\$SCRATCH/zz\_delta/<sweep>\_\_<trial>};
+    \code{--list}, \code{--seed}, \code{--tf32 on|off}), \code{scripts/job\_eval\_delta.sh},
+    \code{scripts/job\_rerun\_trial.sh} (pruned trial rerun from its config into \code{<trial>\_rerun}, optional parent
+    override, recipe re-rooted), \code{analysis/transfer/collect\_delta.py} (site run, base64 npz of test $\Delta$ plus the
+    rebuilt val in MSE$(\log|\mathcal M|^2)$), \code{analysis/transfer/delta\_plots.py} (sets delta\_ladder, delta\_focus,
+    delta\_finale, delta\_star; flags rebuilt-vs-recorded $>5\%$). Done: the $37$ CC runs and the $32$ lxplus runs (copied
+    to CC \code{runs\_from\_lxplus/<sweep>/}) evaluated on V100 ($69/69$); the three pruned trials rerun on CC (parent
+    \code{runs/tp3\_ladder\_r1/trial\_0047}, md5-identical to lxplus's) and evaluated; CC data collected to
+    \code{analysis/transfer/delta\_data/ccin2p3.npz} (before the reruns). First bug fixed: a fresh build refits a fine-tune's
+    momentum scale (parent's), val $3\times10^5$ off. Open: $17/69$ rebuilt val losses differ from the recorded by
+    $5\%$ to $13\times$ (worst \code{runs/tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} $13\times$ worse, \code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8}
+    $7\times$ worse, \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} $3.4\times$ better). Ruled out: Lorentz-frame seed (agree to
+    4 digits over seeds 1,2,3,42), tokenizer, pools/sidecars/recipes (older than the runs), checkpoint step (is the best).
+    Lead: TF32: finfte ud\_ud trained on \code{gpu\_h100} (TF32 on, val $1.14\times10^{-7}$, its own post-training eval
+    reproduced it), rebuilt on V100 $3.3\times10^{-8}$. Test queued: \code{FA-ccin2p3-c0a4a22d} (TF32 on) and
+    \code{-9916a268} (off), \code{--partition=gpu\_h100}, list \code{analysis/transfer/delta\_runs\_seedcheck.txt}; pending
+    on Resources since 23:30 (OVERRUNs E144--E147 acked). Then: fix one evaluation precision for every run (likely fp32,
+    stated in the caption), re-collect, draw. Stuck: the $107$ Jean Zay runs (\code{analysis/transfer/delta\_runs\_jeanzay.txt}):
+    \code{site copy} from Jean Zay fails (relay \code{lpnclaude03} times out on port 22) and \code{site pick} reports Jean Zay
+    DOWN (probe $>120$ s) so \code{placement\_guard} refuses a submission there; \code{site run jeanzay} works. Asked the
+    user to fix the network or allow a hand submission. $19$ jobs of ours held on Jean Zay since 10-07
+    (\code{JobHeldUser}, held items): left alone. \textbf{Infra:} supervisor (b36yc48nx) and events waiter running; waiter
+    b0wm737fa on the two TF32 jobs.
     \emph{Plan (2026-10-14, user's list of 16:48; D42--D49), in priority order.} (1) \textbf{Full real catalog} (D45, most
     urgent, trainings sent today): the catalog of arXiv:2606.23791 ($1501$ tree processes, $2\to2$ $254$, $2\to3$ $1237$,
     $2\to1$ $10$, pp partons only; $519$--$711$ classes under a liberal flavour/charge-conjugation relabelling, $484$--$779$
