@@ -84,6 +84,15 @@ def main():
         t = tag(p.get("run_dir", "?"))
         if t not in D and t + "_rerun" in D:
             t += "_rerun"          # a pruned trial rerun from its config (scripts/job_rerun_trial.sh)
+        rec = p.get("mse_logM2")
+        alt = [t + "_tf32off", t + "_tf32on"]
+        if rec and any(a in D for a in alt):
+            # evaluated at both matmul precisions (TF32 on A100/H100): a model is drawn at the one that reproduces its
+            # recorded validation loss, i.e. the precision it was trained at (sec:tf32-eval); off by up to 133x otherwise
+            got = D.get("_meta", {})
+            cands = [c for c in [t] + alt if c in D and got.get(c)]
+            if cands:
+                t = min(cands, key=lambda c: abs(np.log10(got[c] / rec)))
         if t not in D:
             missing.append(f"{row['probe']} {row['arm']} {p.get('site')}:{p.get('run_dir')}")
             return None, ""
@@ -91,10 +100,10 @@ def main():
         # pruned trial (a new model), or a rebuilt validation loss off the recorded one by > 0.02 dex (4.7%)
         if t.endswith("_rerun"):
             return D[t], " (rerun)"
-        rec, got = p.get("mse_logM2"), D.get("_meta", {}).get(t)
+        got = D.get("_meta", {}).get(t)
         if rec and got and abs(np.log10(got / rec)) > 0.02:
             off.append(f"{t}: rebuilt {got:.3g} vs recorded {rec:.3g}")
-            return D[t], rf" (rebuilt ${got / rec:.2f}\times$)"
+            return D[t], rf" (${got / rec:.1f}\times$)"
         return D[t], ""
 
     by = {}
@@ -118,8 +127,10 @@ def main():
             medians[f"ladder {probe} {arm}"] = hist(ax, dl, color="k" if arm == "scratch" else seq[arm], label=lab + sfx, linestyle=":" if sfx else "-")
         axes_lab(ax); ps.process_label(ax, LAB[probe], loc="lower right")
         nl = len(ax.get_legend_handles_labels()[0])
-        if nl == 11 and not any("(" in l for l in ax.get_legend_handles_labels()[1]):
-            if leg_ax is None:          # every rung drawn plainly: one legend strip for the set
+        if nl >= 8:
+            # most rungs drawn: the colours are named once, in a strip for the set; a line drawn dotted is a model whose
+            # rebuilt validation loss is off its recorded one (the run's factor is printed below and in the caption)
+            if leg_ax is None and nl == 11:
                 leg_ax = ax
                 ps.legend_strip(ax, os.path.join(OUT, pre + "ladder_legend"), ncol=6)
         elif nl:
