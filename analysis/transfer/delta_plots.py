@@ -11,7 +11,7 @@ Sets (each panel one probe):
   delta_star_<arm>        each star arm on its own probe with scratch and rung 1; delta_star_ee_ddbar: every arm
 Data: analysis/transfer/delta_data/<site>.npz, one array of test-split Delta per run, keyed <sweep>__<trial>
 (collect_delta.py packs them on each site).
-    python analysis/transfer/delta_plots.py
+    python analysis/transfer/delta_plots.py [--d10]
 """
 import glob, json, os, sys
 
@@ -63,12 +63,16 @@ def axes_lab(ax):
 
 
 def main():
-    audit = json.load(open(os.path.join(HERE, "delta_audit.json")))
+    # --d10: the 32k grid's largest D (D=10^5; 10^4.5 for the one-loop probes), delta_audit_d10.json; the user has
+    # not chosen between it and the paper's 8k grid at D=10^4, so both sets are drawn (files delta_d10_*)
+    d10 = "--d10" in sys.argv
+    audit = json.load(open(os.path.join(HERE, "delta_audit_d10.json" if d10 else "delta_audit.json")))
+    key, pre = ("d10", "delta_d10_") if d10 else ("paper_8k", "delta_")
     D = load()
     missing, off = [], []
 
     def get(row):
-        p = row.get("paper_8k") or {}
+        p = row.get(key) or {}
         t = tag(p.get("run_dir", "?"))
         if t not in D and t + "_rerun" in D:
             t += "_rerun"          # a pruned trial rerun from its config (scripts/job_rerun_trial.sh)
@@ -107,8 +111,8 @@ def main():
         axes_lab(ax); ps.process_label(ax, LAB[probe])
         if leg_ax is None and len(ax.get_legend_handles_labels()[0]) == 11:
             leg_ax = ax
-            ps.legend_strip(ax, os.path.join(OUT, "delta_ladder_legend"), ncol=6)
-        ps.save(fig, os.path.join(OUT, f"delta_ladder_{probe}"))
+            ps.legend_strip(ax, os.path.join(OUT, pre + "ladder_legend"), ncol=6)
+        ps.save(fig, os.path.join(OUT, f"{pre}ladder_{probe}"))
 
     def small(fam, colors, labels, base):
         for probe, rows in by.get(fam, {}).items():
@@ -120,7 +124,7 @@ def main():
                 rung = r["arm"][1:] if r["arm"].startswith("r") else ""
                 medians[f"{fam} {probe} {arm}"] = hist(ax, dl, color=colors[arm], label=labels(arm, rung) + sfx, linestyle=":" if sfx else "-")
             axes_lab(ax); ps.process_label(ax, LAB[probe]); ps.legend(ax, "upper left")
-            ps.save(fig, os.path.join(OUT, f"{base}_{probe}"))
+            ps.save(fig, os.path.join(OUT, f"{pre}{base[len('delta_'):]}_{probe}"))
 
     small("rung_focus", {"scratch": "k", "rung below": ps.C.sky, "first rung": ps.C.blue, "best overall": ps.C.vermillion},
           lambda a, n: {"scratch": "from scratch", "rung below": f"rung {n}", "first rung": f"rung {n}",
@@ -146,7 +150,7 @@ def main():
                     lab_arm, (ARM_C[arm], f"rung 1 + {arm}"))
                 medians[f"star {p} {lab_arm}"] = hist(ax, dl, color=c, label=lab + sfx, linestyle=":" if sfx else "-")
         axes_lab(ax); ps.process_label(ax, LAB[p]); ps.legend(ax, "upper left")
-        ps.save(fig, os.path.join(OUT, f"delta_star_{arm}"))
+        ps.save(fig, os.path.join(OUT, f"{pre}star_{arm}"))
     fig, ax = ps.figure()
     for lab_arm, r in star.get("ee_ddbar", []):
         dl, sfx = get(r)
@@ -158,9 +162,9 @@ def main():
             arm = lab_arm.split()[0]
             medians[f"star ee_ddbar {arm}"] = hist(ax, dl, color=ARM_C[arm], label=f"+ {arm}" + sfx, linestyle=":" if sfx else "-")
     axes_lab(ax); ps.process_label(ax, LAB["ee_ddbar"]); ps.legend(ax, "upper left", ncol=2)
-    ps.save(fig, os.path.join(OUT, "delta_star_ee_ddbar"))
+    ps.save(fig, os.path.join(OUT, pre + "star_ee_ddbar"))
 
-    json.dump(medians, open(os.path.join(HERE, "delta_medians.json"), "w"), indent=1, sort_keys=True)
+    json.dump(medians, open(os.path.join(HERE, pre + "medians.json"), "w"), indent=1, sort_keys=True)
     print(f"{len(medians)} lines drawn; {len(missing)} missing")
     for m in missing:
         print("  missing", m)
