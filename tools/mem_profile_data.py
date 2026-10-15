@@ -215,6 +215,33 @@ def summarize(rec):
     return rows
 
 
+def sweep_cfg(sweep_config, n_procs, out, extra=()):
+    """The Hydra config a trial of `sweep_config` runs with (its fixed_params, an in-range lr, no MLflow), its recipe
+    cut to the first n_procs processes (0: all), the run dir under `out`; `extra` overrides last."""
+    sc = yaml.safe_load(open(sweep_config))
+    fixed = dict(sc.get("fixed_params", {}))
+    pdir = os.environ.get("PROJECT_DIR", ROOT)
+    fixed = {k: (v.replace("${PROJECT_DIR}", pdir) if isinstance(v, str) else v) for k, v in fixed.items()}
+    recipe = fixed.get("data.processes_file")
+    os.makedirs(out, exist_ok=True)
+    if recipe and n_procs:
+        spec = yaml.safe_load(open(recipe))
+        procs = spec["processes"] if isinstance(spec, dict) else spec
+        cut = os.path.join(out, f"recipe_first{n_procs}.yaml")
+        with open(cut, "w") as f:
+            yaml.safe_dump({"processes": procs[:n_procs]}, f, sort_keys=False)
+        fixed["data.processes_file"] = cut
+    # the sweep's HPs do not touch the data; any in-range value builds the same pipeline
+    ov = ["local=none"] + [f"{k}={v}" for k, v in fixed.items()]
+    ov += ["training.lr=3e-3", "training.iterations=1", "use_mlflow=false", "warm_start_idx=null",
+           f"base_dir={pdir}", "exp_name=zz_memprof", f"run_dir={os.path.join(out, 'run')}"]
+    ov += list(extra)
+    from hydra import compose, initialize_config_dir
+    with initialize_config_dir(config_dir=os.path.join(ROOT, "config"), version_base=None):
+        cfg = compose(config_name="amplitudes", overrides=ov)
+    return cfg, ov
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sweep-config", required=True)
@@ -233,29 +260,8 @@ def main():
     rec.mark("start")
     hook_concatenate(rec)
 
-    sc = yaml.safe_load(open(a.sweep_config))
-    fixed = dict(sc.get("fixed_params", {}))
-    pdir = os.environ.get("PROJECT_DIR", ROOT)
-    fixed = {k: (v.replace("${PROJECT_DIR}", pdir) if isinstance(v, str) else v) for k, v in fixed.items()}
-    recipe = fixed.get("data.processes_file")
-    if recipe and a.n_procs:
-        spec = yaml.safe_load(open(recipe))
-        procs = spec["processes"] if isinstance(spec, dict) else spec
-        cut = os.path.join(a.out, f"recipe_first{a.n_procs}.yaml")
-        with open(cut, "w") as f:
-            yaml.safe_dump({"processes": procs[:a.n_procs]}, f, sort_keys=False)
-        fixed["data.processes_file"] = cut
-    # the sweep's HPs do not touch the data; any in-range value builds the same pipeline
-    ov = ["local=none"] + [f"{k}={v}" for k, v in fixed.items()]
-    ov += ["training.lr=3e-3", "training.iterations=1", "use_mlflow=false", "warm_start_idx=null",
-           f"training.num_workers={a.workers}", f"base_dir={pdir}", "exp_name=zz_memprof",
-           f"run_dir={os.path.join(a.out, 'run')}"]
-    ov += a.set
-
-    from hydra import compose, initialize_config_dir
+    cfg, ov = sweep_cfg(a.sweep_config, a.n_procs, a.out, a.set + [f"training.num_workers={a.workers}"])
     import torch
-    with initialize_config_dir(config_dir=os.path.join(ROOT, "config"), version_base=None):
-        cfg = compose(config_name="amplitudes", overrides=ov)
     torch.set_default_dtype(torch.float32)
     from experiment import AmplitudeExperiment
     exp = AmplitudeExperiment(cfg)

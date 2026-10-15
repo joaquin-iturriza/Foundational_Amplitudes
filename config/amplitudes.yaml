@@ -51,6 +51,9 @@ data:
  train_subsample: null
  eval_subsample: null
  phase_space_on_pool: false   # momentum scale + target propagators from the whole train pool's momenta, amplitude stats from the train_subsample events (data-scaling grids)
+ memmap: false               # recipe path: the arrays built once into memory-mapped files under $SCRATCH and gathered per batch (data_mmap.py); host RAM scales with the batch
+ memmap_dir: null            # the cache root (default $SCRATCH/amp_mmap_cache)
+ memmap_prefetch: true       # read the cache once sequentially at start (page cache), so shuffled batches do not fault pages one at a time
  # Example inline form:
  #   - {name: ee_uu,    sqrts: [91, 1000],  n_train: 1_000_000, n_val: 100_000, n_test: 100_000}
  #   - {name: ee_uug,   sqrts: [91, 1000],  n_train: 2_000_000, n_val: 100_000, n_test: 100_000}

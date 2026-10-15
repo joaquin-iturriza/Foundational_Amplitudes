@@ -1493,6 +1493,21 @@ class AmplitudeExperiment(BaseExperiment):
             train_cap = None
         cap_for   = {"train": train_cap, "val": eval_cap, "test": eval_cap}
 
+        if bool(self.cfg.data.get("memmap", False)):
+            # host memory that scales with the batch: the same arrays, built once per input set into
+            # memory-mapped files and gathered by index (data_mmap.py)
+            from data_mmap import init_data_recipes_mmap
+            init_data_recipes_mmap(self, dict(
+                specs=specs, names=names, roles=roles, paths=paths, use_pids=use_pids, per_dataset=per_dataset,
+                mom_div=mom_div, mom_mean=mom_mean, mom_std=mom_std, amp_trafos=amp_trafos,
+                amp_trafos_pp=amp_trafos_pp, prepd_means=prepd_means, prepd_stds=prepd_stds,
+                amp_orders=amp_orders, n_order_features=n_order_features, cap_for=cap_for,
+                stats_on_pool=stats_on_pool))
+            if self.cfg.save and not os.path.exists(stats_path):
+                self._save_data_stats(stats_path, self.mom_div, self.cfg.data.amp_trafos, per_dataset)
+            self._finalize_data_sizing()
+            return
+
         # --- load every (role, process); boost+augment momenta (no scale yet) ---
         store = {}
         _porder = str(self.cfg.data.get("particle_order", "none"))
@@ -1674,104 +1689,10 @@ class AmplitudeExperiment(BaseExperiment):
         train_raw = np.concatenate(
             [store[("train", n)]["raw_amp"] for n in names], axis=0
         )
-        # Resolve the amplitude transform. Per-dataset (preprocess_per_dataset) resolves
-        # it INDEPENDENTLY per process: a positive-definite |M|² dataset uses `log`
-        # (compresses its multiplicative range to ~unit std), a genuinely-signed one
-        # (e.g. an NLO virtual with negative events) uses `signedlog`. A GLOBAL
-        # resolution forces signedlog on EVERY process as soon as ONE dataset has a
-        # negative event — and signedlog leaves sub-1 amplitudes in linear scale
-        # (log1p(x)≈x for |x|≪1, and every |M|² is ≪1), so those targets never
-        # standardize to unit variance and the datasets don't train. self.cfg.data.
-        # amp_trafos keeps a representative resolution; per-process trafos in _amp_trafos_pp.
-        base_trafos = list(self.cfg.data.amp_trafos)
-        self._amp_trafos_pp = None
-        self._sign_head = bool(self.cfg.training.get("sign_head", False))
-        if self._sign_head:
-            assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
-            assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \
-                "sign_head is implemented on the LLoCa path"
-            with open_dict(self.cfg):
-                self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
-        q = self._signedlog_quantile()
-        if amp_trafos is None:                       # fresh run: resolve from raw amps
-            # the sign decision (positive -> log, signed -> signedlog) looks at every role
-            # of a process; the scale and the statistics stay train-only
-            all_roles = lambda n: np.concatenate(
-                [store[(r, n)]["raw_amp"] for r in roles if (r, n) in store], axis=0)
-            amp_trafos = resolve_amp_trafos(
-                base_trafos, train_raw, scale_quantile=q,
-                sign_data=np.concatenate([all_roles(n) for n in names], axis=0))
-            if per_dataset:
-                self._amp_trafos_pp = [
-                    resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
-                                       scale_quantile=q, sign_data=all_roles(n),
-                                       sign_head=self._sign_head)
-                    for n in names]
-        elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
-            assert len(amp_trafos_pp) == len(names), (
-                f"frozen amp_trafos_pp has {len(amp_trafos_pp)} entries for {len(names)} datasets")
-            self._amp_trafos_pp = [list(t) for t in amp_trafos_pp]
-        elif per_dataset:
-            # Frozen stats that predate the stored per-process transforms: the parent
-            # resolved each pool in legacy mode (plain `log` for a positive pool, bare
-            # `signedlog` with s = 1 for a signed one) and fitted its mean/std on that,
-            # so reproduce exactly that; re-resolving with the scale would change the
-            # target under the parent's statistics.
-            self._amp_trafos_pp = [
-                resolve_amp_trafos(base_trafos, store[("train", n)]["raw_amp"],
-                                   scale_quantile=None)
-                for n in names]      # legacy: train-only sign decision, as the parent did
-            LOGGER.warning(
-                "Frozen data stats carry no per-process amplitude transforms (written before "
-                "the signed-log scale); re-resolved per pool in legacy mode (unscaled signedlog).")
-        self.cfg.data.amp_trafos = amp_trafos
-        assert not self.cfg.data.get("affine_multiplicity_std", False) or (
-            per_dataset and self.cfg.data.get("shared_standardization", False)), \
-            "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
-        if prepd_means is None:
-            if per_dataset:
-                prepd_means, prepd_stds = [], []
-                for i, name in enumerate(names):
-                    tr = self._amp_trafos_pp[i] if self._amp_trafos_pp else amp_trafos
-                    _, m, s = preprocess_amplitude(
-                        store[("train", name)]["raw_amp"], trafos=tr)
-                    prepd_means.append(float(m)); prepd_stds.append(float(s))
-                if bool(self.cfg.data.get("shared_standardization", False)):
-                    # one (mu, sigma) pooled over every process's transformed train targets, each process
-                    # keeping its own transform (log, or signedlog for a signed pool): the network then
-                    # predicts each process's normalization, so a process without data can be scored
-                    # zero-shot. A single global transform is not an option: one signed pool forces
-                    # signedlog on every process and leaves |M|^2 << 1 in linear scale.
-                    n = np.array([len(store[("train", nm)]["raw_amp"]) for nm in names], dtype=np.float64)
-                    mu_p, sd_p = np.array(prepd_means), np.array(prepd_stds)
-                    mu = float((n * mu_p).sum() / n.sum())
-                    sd = float(np.sqrt((n * (sd_p ** 2 + (mu_p - mu) ** 2)).sum() / n.sum()))
-                    prepd_means, prepd_stds = [mu] * len(names), [sd] * len(names)
-                    LOGGER.info(f"shared_standardization: one (mu, sigma) = ({mu:.3f}, {sd:.3f}) pooled over "
-                                f"{len(names)} processes, per-process transforms kept")
-                    if bool(self.cfg.data.get("affine_multiplicity_std", False)):
-                        # the draft's multiplicity preprocessing (Sec. "Extrapolating to more legs"):
-                        # mu_N = a + b N over the particle count N, one shared sigma (multiplicity_extrap)
-                        N_p = [int(store[("train", nm)]["momenta"].shape[1]) for nm in names]
-                        a, b, sd = fit_affine_multiplicity(n, N_p, mu_p, sd_p)
-                        prepd_means = [a + b * k for k in N_p]
-                        prepd_stds = [sd] * len(names)
-                        self._affine_multiplicity = {"a": a, "b": b, "sigma": sd}
-                        LOGGER.info(f"affine_multiplicity_std: mu_N = {a:.4f} + {b:.4f} N, sigma = {sd:.4f}; per "
-                                    f"process (N, own mean, mu_N): "
-                                    + ", ".join(f"{nm} ({k}, {m:.2f}, {a + b * k:.2f})"
-                                                for nm, k, m in zip(names, N_p, mu_p)))
-            else:
-                _, m, s = preprocess_amplitude(train_raw, trafos=amp_trafos)
-                prepd_means, prepd_stds = [float(m)], [float(s)]
-        self.prepd_mean = prepd_means
-        self.prepd_std  = prepd_stds
-        LOGGER.info(
-            f"Preprocessing amplitudes "
-            f"{'per-dataset (independent unit scale)' if per_dataset else 'globally (shared scale)'} "
-            f"using trafos={amp_trafos} (train-only stats); "
-            f"means={[f'{m:.3f}' for m in prepd_means]}"
-        )
+        amp_trafos, prepd_means, prepd_stds = self._resolve_amp_preprocessing(
+            names, roles, lambda r, n: store[(r, n)]["raw_amp"] if (r, n) in store else None, train_raw,
+            lambda n: store[("train", n)]["momenta"].shape[1], per_dataset,
+            amp_trafos, amp_trafos_pp, prepd_means, prepd_stds)
 
         # --- assemble combined flat arrays, role-contiguous (train|val|test) ---
         # Vectorized per dataset (no per-event Python list), so this scales to
@@ -1941,36 +1862,7 @@ class AmplitudeExperiment(BaseExperiment):
             # the column stats are fitted on every role together, so they move with the val/test pools;
             # a run rebuilt on another pool (tools/rebuild_run.py) pins the run's own through
             # data.offshell_stats, else the swapped split shifts the input of every event
-            pinned = self.cfg.data.get("offshell_stats", None)
-            if pinned is not None:
-                mu, sd = np.asarray(pinned[0], np.float64), np.asarray(pinned[1], np.float64)
-                assert mu.shape == (osh.shape[1],) == sd.shape, f"data.offshell_stats {pinned} for {osh.shape[1]} columns"
-            else:
-                mu, sd = osh.mean(0), osh.std(0)
-                sd[sd < 1e-8] = 1.0
-                ft = self.cfg.get("fine_tune", None)
-                if ft is not None and ft.get("pretrained_path", None) is not None and not self.warm_start \
-                        and str(ft.get("offshell_stats", "parent")) == "parent":
-                    # a fine-tune keeps the parent's scale on every column that varies in both, so the same
-                    # off-shellness reaches the backbone as the same input. A column the parent saw constant
-                    # (sd set to 1 above, standardized to 0) carries no learned scale, and a column the probe
-                    # never fills (no propagator of that pdg) would land on the parent's on-shell value under
-                    # the parent's scale: both are fitted here, centred on 0. Refitting every column shifted
-                    # the input under the pretrained weights (docs/results.tex sec:ladder, the steering offset)
-                    parent = getattr(self, "_parent_offshell", None)
-                    if parent is None and ft.get("parent_offshell_stats", None) is not None:
-                        parent = OmegaConf.to_container(ft.parent_offshell_stats)   # parent without data_stats.json
-                    assert parent is not None, (
-                        "fine_tune.offshell_stats=parent but the parent's data_stats.json has no offshell_stats "
-                        "(a run older than the record): pass fine_tune.parent_offshell_stats "
-                        "(tools/offshell_stats.py <parent run>) or set fine_tune.offshell_stats=own")
-                    pm, ps = np.asarray(parent[0], np.float64), np.asarray(parent[1], np.float64)
-                    assert pm.shape == mu.shape, f"parent offshell_stats {parent} for {mu.shape[0]} columns"
-                    varied = (ps != 1.0) & (osh.std(0) >= 1e-8)
-                    mu, sd = np.where(varied, pm, mu), np.where(varied, ps, sd)
-                    LOGGER.info(f"Fine-tuning: off-shellness columns {np.flatnonzero(varied).tolist()} on the "
-                                f"parent's scale, the rest fitted here")
-            self._offshell_stats = [mu.tolist(), sd.tolist()]
+            mu, sd = self._resolve_offshell_stats(lambda: (osh.mean(0), osh.std(0)), osh.shape[1])
             osh = ((osh - mu) / sd).astype(np.float32)
             n_pdg = len(self._internal_mass_pdgs)
             self.all_order_labels[:, -n_pdg:] = osh
@@ -1986,27 +1878,181 @@ class AmplitudeExperiment(BaseExperiment):
         #     warm-start resume; a fine-tune persists the inherited stats here so
         #     the fine-tune run can itself be resumed reproducibly). ---
         if self.cfg.save and not os.path.exists(stats_path):
-            with open(stats_path, "w") as f:
-                json.dump({
-                    "mom_div":    float(mom_div),
-                    "mom_mean":   float(self.mom_mean[0]),
-                    "mom_std":    float(self.mom_std[0]),
-                    "amp_trafos": list(amp_trafos) if amp_trafos else amp_trafos,
-                    "amp_trafos_pp": ([list(t) for t in self._amp_trafos_pp]
-                                      if self._amp_trafos_pp else None),
-                    "preprocess_per_dataset": per_dataset,
-                    "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
-                    **({"affine_multiplicity": self._affine_multiplicity}
-                       if getattr(self, "_affine_multiplicity", None) else {}),
-                    "target_propagators": bool(getattr(self, "_target_factor_on", False)),
-                    "tchannel_norm": getattr(self, "_tch_norm", None),
-                    "offshell_stats": getattr(self, "_offshell_stats", None),
-                    "prepd_mean": [float(x) for x in self.prepd_mean],
-                    "prepd_std":  [float(x) for x in self.prepd_std],
-                }, f, indent=2)
-            LOGGER.info(f"Saved frozen data stats to {stats_path}")
+            self._save_data_stats(stats_path, mom_div, amp_trafos, per_dataset)
 
         self._finalize_data_sizing()
+
+    def _resolve_amp_preprocessing(self, names, roles, get_amp, train_raw, npart_of, per_dataset,
+                                   amp_trafos, amp_trafos_pp, prepd_means, prepd_stds, global_min=None):
+        """The recipe path's amplitude transform and standardization (shared by the in-memory and the memmap paths).
+        get_amp(role, name): that pool's raw amplitudes (None if absent); train_raw: the train amplitudes concatenated
+        over `names`, or a callable returning them (read only when needed); npart_of(name): its particle count;
+        amp_trafos ... prepd_stds: the frozen statistics, None when fitted here; global_min: the minimum over every
+        role's amplitudes when the caller has it. Sets self._amp_trafos_pp, self._sign_head, cfg.data.amp_trafos,
+        self.prepd_mean / prepd_std (and self._affine_multiplicity); returns (amp_trafos, prepd_means, prepd_stds)."""
+        _train_raw = train_raw if callable(train_raw) else (lambda: train_raw)
+        # Resolve the amplitude transform. Per-dataset (preprocess_per_dataset) resolves
+        # it INDEPENDENTLY per process: a positive-definite |M|² dataset uses `log`
+        # (compresses its multiplicative range to ~unit std), a genuinely-signed one
+        # (e.g. an NLO virtual with negative events) uses `signedlog`. A GLOBAL
+        # resolution forces signedlog on EVERY process as soon as ONE dataset has a
+        # negative event — and signedlog leaves sub-1 amplitudes in linear scale
+        # (log1p(x)≈x for |x|≪1, and every |M|² is ≪1), so those targets never
+        # standardize to unit variance and the datasets don't train. self.cfg.data.
+        # amp_trafos keeps a representative resolution; per-process trafos in _amp_trafos_pp.
+        base_trafos = list(self.cfg.data.amp_trafos)
+        self._amp_trafos_pp = None
+        self._sign_head = bool(self.cfg.training.get("sign_head", False))
+        if self._sign_head:
+            assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
+            assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \
+                "sign_head is implemented on the LLoCa path"
+            with open_dict(self.cfg):
+                self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
+        q = self._signedlog_quantile()
+        if amp_trafos is None:                       # fresh run: resolve from raw amps
+            # the sign decision (positive -> log, signed -> signedlog) looks at every role
+            # of a process; the scale and the statistics stay train-only
+            all_roles = lambda n: np.concatenate(
+                [get_amp(r, n) for r in roles if get_amp(r, n) is not None], axis=0)
+            # global_min (the memmap path) stands in for every role's amplitudes in the sign test; the train
+            # amplitudes are then read only for a signed pool's scale
+            sign_data = (np.array([global_min]) if global_min is not None
+                         else np.concatenate([all_roles(n) for n in names], axis=0))
+            amp_trafos = resolve_amp_trafos(
+                base_trafos, sign_data if global_min is not None and global_min > 0 else _train_raw(),
+                scale_quantile=q, sign_data=sign_data)
+            if per_dataset:
+                self._amp_trafos_pp = [
+                    resolve_amp_trafos(base_trafos, get_amp("train", n),
+                                       scale_quantile=q, sign_data=all_roles(n),
+                                       sign_head=self._sign_head)
+                    for n in names]
+        elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
+            assert len(amp_trafos_pp) == len(names), (
+                f"frozen amp_trafos_pp has {len(amp_trafos_pp)} entries for {len(names)} datasets")
+            self._amp_trafos_pp = [list(t) for t in amp_trafos_pp]
+        elif per_dataset:
+            # Frozen stats that predate the stored per-process transforms: the parent
+            # resolved each pool in legacy mode (plain `log` for a positive pool, bare
+            # `signedlog` with s = 1 for a signed one) and fitted its mean/std on that,
+            # so reproduce exactly that; re-resolving with the scale would change the
+            # target under the parent's statistics.
+            self._amp_trafos_pp = [
+                resolve_amp_trafos(base_trafos, get_amp("train", n),
+                                   scale_quantile=None)
+                for n in names]      # legacy: train-only sign decision, as the parent did
+            LOGGER.warning(
+                "Frozen data stats carry no per-process amplitude transforms (written before "
+                "the signed-log scale); re-resolved per pool in legacy mode (unscaled signedlog).")
+        self.cfg.data.amp_trafos = amp_trafos
+        assert not self.cfg.data.get("affine_multiplicity_std", False) or (
+            per_dataset and self.cfg.data.get("shared_standardization", False)), \
+            "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
+        if prepd_means is None:
+            if per_dataset:
+                prepd_means, prepd_stds = [], []
+                for i, name in enumerate(names):
+                    tr = self._amp_trafos_pp[i] if self._amp_trafos_pp else amp_trafos
+                    _, m, s = preprocess_amplitude(
+                        get_amp("train", name), trafos=tr)
+                    prepd_means.append(float(m)); prepd_stds.append(float(s))
+                if bool(self.cfg.data.get("shared_standardization", False)):
+                    # one (mu, sigma) pooled over every process's transformed train targets, each process
+                    # keeping its own transform (log, or signedlog for a signed pool): the network then
+                    # predicts each process's normalization, so a process without data can be scored
+                    # zero-shot. A single global transform is not an option: one signed pool forces
+                    # signedlog on every process and leaves |M|^2 << 1 in linear scale.
+                    n = np.array([len(get_amp("train", nm)) for nm in names], dtype=np.float64)
+                    mu_p, sd_p = np.array(prepd_means), np.array(prepd_stds)
+                    mu = float((n * mu_p).sum() / n.sum())
+                    sd = float(np.sqrt((n * (sd_p ** 2 + (mu_p - mu) ** 2)).sum() / n.sum()))
+                    prepd_means, prepd_stds = [mu] * len(names), [sd] * len(names)
+                    LOGGER.info(f"shared_standardization: one (mu, sigma) = ({mu:.3f}, {sd:.3f}) pooled over "
+                                f"{len(names)} processes, per-process transforms kept")
+                    if bool(self.cfg.data.get("affine_multiplicity_std", False)):
+                        # the draft's multiplicity preprocessing (Sec. "Extrapolating to more legs"):
+                        # mu_N = a + b N over the particle count N, one shared sigma (multiplicity_extrap)
+                        N_p = [int(npart_of(nm)) for nm in names]
+                        a, b, sd = fit_affine_multiplicity(n, N_p, mu_p, sd_p)
+                        prepd_means = [a + b * k for k in N_p]
+                        prepd_stds = [sd] * len(names)
+                        self._affine_multiplicity = {"a": a, "b": b, "sigma": sd}
+                        LOGGER.info(f"affine_multiplicity_std: mu_N = {a:.4f} + {b:.4f} N, sigma = {sd:.4f}; per "
+                                    f"process (N, own mean, mu_N): "
+                                    + ", ".join(f"{nm} ({k}, {m:.2f}, {a + b * k:.2f})"
+                                                for nm, k, m in zip(names, N_p, mu_p)))
+            else:
+                _, m, s = preprocess_amplitude(_train_raw(), trafos=amp_trafos)
+                prepd_means, prepd_stds = [float(m)], [float(s)]
+        self.prepd_mean = prepd_means
+        self.prepd_std  = prepd_stds
+        LOGGER.info(
+            f"Preprocessing amplitudes "
+            f"{'per-dataset (independent unit scale)' if per_dataset else 'globally (shared scale)'} "
+            f"using trafos={amp_trafos} (train-only stats); "
+            f"means={[f'{m:.3f}' for m in prepd_means]}"
+        )
+        return amp_trafos, prepd_means, prepd_stds
+
+    def _resolve_offshell_stats(self, stats_fn, n_cols):
+        """(mu, sd) of the off-shellness columns (data.offshell_per_event): pinned (data.offshell_stats), else
+        stats_fn() = (mean(0), std(0)) of the signed-log columns over every role, with a fine-tune's parent scale on
+        the columns that vary in both. Sets self._offshell_stats."""
+        pinned = self.cfg.data.get("offshell_stats", None)
+        if pinned is not None:
+            mu, sd = np.asarray(pinned[0], np.float64), np.asarray(pinned[1], np.float64)
+            assert mu.shape == (n_cols,) == sd.shape, f"data.offshell_stats {pinned} for {n_cols} columns"
+        else:
+            mu, s0 = stats_fn()
+            sd = s0.copy()
+            sd[sd < 1e-8] = 1.0
+            ft = self.cfg.get("fine_tune", None)
+            if ft is not None and ft.get("pretrained_path", None) is not None and not self.warm_start \
+                    and str(ft.get("offshell_stats", "parent")) == "parent":
+                # a fine-tune keeps the parent's scale on every column that varies in both, so the same
+                # off-shellness reaches the backbone as the same input. A column the parent saw constant
+                # (sd set to 1 above, standardized to 0) carries no learned scale, and a column the probe
+                # never fills (no propagator of that pdg) would land on the parent's on-shell value under
+                # the parent's scale: both are fitted here, centred on 0. Refitting every column shifted
+                # the input under the pretrained weights (docs/results.tex sec:ladder, the steering offset)
+                parent = getattr(self, "_parent_offshell", None)
+                if parent is None and ft.get("parent_offshell_stats", None) is not None:
+                    parent = OmegaConf.to_container(ft.parent_offshell_stats)   # parent without data_stats.json
+                assert parent is not None, (
+                    "fine_tune.offshell_stats=parent but the parent's data_stats.json has no offshell_stats "
+                    "(a run older than the record): pass fine_tune.parent_offshell_stats "
+                    "(tools/offshell_stats.py <parent run>) or set fine_tune.offshell_stats=own")
+                pm, ps = np.asarray(parent[0], np.float64), np.asarray(parent[1], np.float64)
+                assert pm.shape == mu.shape, f"parent offshell_stats {parent} for {mu.shape[0]} columns"
+                varied = (ps != 1.0) & (s0 >= 1e-8)
+                mu, sd = np.where(varied, pm, mu), np.where(varied, ps, sd)
+                LOGGER.info(f"Fine-tuning: off-shellness columns {np.flatnonzero(varied).tolist()} on the "
+                            f"parent's scale, the rest fitted here")
+        self._offshell_stats = [mu.tolist(), sd.tolist()]
+        return mu, sd
+
+    def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
+        """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
+        with open(stats_path, "w") as f:
+            json.dump({
+                "mom_div":    float(mom_div),
+                "mom_mean":   float(self.mom_mean[0]),
+                "mom_std":    float(self.mom_std[0]),
+                "amp_trafos": list(amp_trafos) if amp_trafos else amp_trafos,
+                "amp_trafos_pp": ([list(t) for t in self._amp_trafos_pp]
+                                  if self._amp_trafos_pp else None),
+                "preprocess_per_dataset": per_dataset,
+                "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
+                **({"affine_multiplicity": self._affine_multiplicity}
+                   if getattr(self, "_affine_multiplicity", None) else {}),
+                "target_propagators": bool(getattr(self, "_target_factor_on", False)),
+                "tchannel_norm": getattr(self, "_tch_norm", None),
+                "offshell_stats": getattr(self, "_offshell_stats", None),
+                "prepd_mean": [float(x) for x in self.prepd_mean],
+                "prepd_std":  [float(x) for x in self.prepd_std],
+            }, f, indent=2)
+        LOGGER.info(f"Saved frozen data stats to {stats_path}")
 
     def _signedlog_quantile(self):
         """Quantile of |x| that sets the signed-log scale (data.signedlog_quantile)."""
@@ -2017,13 +2063,19 @@ class AmplitudeExperiment(BaseExperiment):
                              PerProcessMicroBatchSampler, RoundRobinMicroBatchSampler)
 
         N_total = self.N_events
+        mm = getattr(self, "_mmap_dir", None) is not None    # data.memmap (data_mmap.py)
 
         role_counts = getattr(self, "_role_counts", None)
         if role_counts is not None:
             # Recipe data path: explicit, role-contiguous train|val|test pools
             # (no positional ratio split).
             n_train, n_val, n_test = role_counts
-            train_idx = np.arange(0,                 n_train)
+            if mm and not (getattr(self, "_monitor_pids", []) or self.cfg.training.get("use_balanced_sampler", False)
+                           or self._accumulation_mode(self.cfg.training.get("per_process_accumulation", False))):
+                # data.memmap: the train split is rows [0, n_train) of the maps, never materialised (8 B per event)
+                train_idx = range(0, n_train)
+            else:
+                train_idx = np.arange(0,                 n_train)
             val_idx   = np.arange(n_train,           n_train + n_val)
             test_idx  = np.arange(n_train + n_val,   n_train + n_val + n_test)
             with open_dict(self.cfg):
@@ -2074,6 +2126,10 @@ class AmplitudeExperiment(BaseExperiment):
         nw = self.cfg.training.num_workers
 
         def make_dataset(indices):
+            if mm:
+                from data_mmap import MmapAmplitudeDataset
+                return MmapAmplitudeDataset(self.particles_flat, self.offsets, self.all_amplitudes, self.tokens_flat,
+                                            self.all_order_labels, self.dtype, self.all_process_ids, indices)
             return AmplitudeDataset(
                 particles_flat = self.particles_flat,
                 offsets        = self.offsets[indices],
@@ -2100,6 +2156,13 @@ class AmplitudeExperiment(BaseExperiment):
             # progressively slows the run).
             ds = make_dataset(indices)
             w = nw if workers is None else workers
+            if mm and shuffle and sampler is None:
+                # RandomSampler's batches without its per-epoch Python list of every index (data_mmap.py)
+                from data_mmap import RandomBatchSampler
+                return torch.utils.data.DataLoader(
+                    ds, batch_sampler=RandomBatchSampler(len(ds), batchsize, drop_last),
+                    collate_fn=collate_variable_length, pin_memory=False, num_workers=w,
+                    persistent_workers=w > 0)
             return torch.utils.data.DataLoader(
                 ds,
                 batch_size  = batchsize,
@@ -2242,7 +2305,13 @@ class AmplitudeExperiment(BaseExperiment):
         if self.n_datasets > 1:
             val_proc_ids   = self.all_process_ids[val_idx]
             test_proc_ids  = self.all_process_ids[test_idx]
-            train_proc_ids = self.all_process_ids[train_idx]
+            if isinstance(train_idx, range):
+                # data.memmap: each process's first `_tcap` train rows, read in chunks (train_idx[pid == p][:_tcap])
+                from data_mmap import first_k_per_process
+                train_first = first_k_per_process(self.all_process_ids, train_idx.start, train_idx.stop,
+                                                  self.n_datasets, _tcap)
+            else:
+                train_proc_ids = self.all_process_ids[train_idx]
             test_bs        = min(self.cfg.evaluation.batchsize, max(len(test_idx) // 2, 1))
             _capped        = []
             for p, name in enumerate(self.cfg.data.dataset):
@@ -2266,8 +2335,11 @@ class AmplitudeExperiment(BaseExperiment):
                         workers=0,
                     )
                 # train (plain, for evaluation only; capped per process, see above)
-                mask  = train_proc_ids == p
-                p_idx = train_idx[mask]
+                if isinstance(train_idx, range):
+                    p_idx = train_first[p]
+                else:
+                    mask  = train_proc_ids == p
+                    p_idx = train_idx[mask]
                 if _tcap is not None:
                     p_idx = p_idx[:_tcap]
                 if len(p_idx) >= 2:
