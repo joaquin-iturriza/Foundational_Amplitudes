@@ -785,6 +785,10 @@ class BaseExperiment:
         self.val_metrics   = self._init_metrics()
 
         smallest_val_loss, smallest_val_loss_step = 1e10, 0
+        # index into the validation curves (val_loss_no_reg, val_mse, proc_val_losses...) of the validation the
+        # selected checkpoint was chosen at, whatever the selection metric (no-reg loss, or HETEROSC's mu-MSE):
+        # _result_extra reports the per-process values at this index, not at argmin(val_loss_no_reg)
+        self._best_val_idx = None
         smallest_val_loss_no_reg = 1e10   # checkpoint selection uses this when available
         patience  = 0
         # Divergence abort: a sustained run of non-finite-grad skips means the run
@@ -952,6 +956,9 @@ class BaseExperiment:
                 if improved:
                     smallest_val_loss        = selection_loss
                     smallest_val_loss_step   = step
+                    # every curve gets one entry per validate_every step, so they share this index (the
+                    # selection above read their [-1])
+                    self._best_val_idx = len(self.val_loss) - 1 if self.val_loss else None
                     smallest_val_loss_no_reg = selection_loss
                     patience = 0
                     if self.cfg.training.es_load_best_model:
@@ -1046,9 +1053,10 @@ class BaseExperiment:
             import json
             os.makedirs(os.path.dirname(result_path), exist_ok=True)
             # This is what DyHPO observes (sweep/run_trial.py: observe_loss = val_loss).
-            # It is now the same quantity used for checkpoint selection above — i.e. the
-            # β-invariant μ-MSE for HETEROSC, never the β-scaled NLL (which is monotone in
-            # β and would make any sweep over heterosc_beta a pure argmin-β).
+            # It is the quantity used for checkpoint selection above: for HETEROSC the
+            # β-invariant μ-MSE under heterosc_select=mu_mse, the validation NLL (signed,
+            # arithmetic mean over processes) under heterosc_select=nll. Never sweep
+            # heterosc_beta on the NLL: it is monotone in β, a pure argmin-β.
             best_loss = smallest_val_loss_no_reg if smallest_val_loss_no_reg < 1e10 else smallest_val_loss
             result = {"val_loss": float(best_loss), "traintime_hours": dt / 3600.0,
                       "best_step": int(smallest_val_loss_step) + 1,
@@ -1414,7 +1422,8 @@ class BaseExperiment:
         """training.track_train_eval: the training split scored with the same weights as validation (the EMA average
         when on) at every validation step, so the train and val curves compare like with like; the logged train loss is
         the live weights' per-batch loss. Single-dataset path only (the multi-process _validate override does not call
-        it). Stored in self.train_eval_loss_no_reg / train_eval_mse and the result JSON."""
+        it). Scores train_eval_loader, i.e. the train subsample (evaluation.train_subsample), not the whole training split.
+        Stored in self.train_eval_loss_no_reg / train_eval_mse and the result JSON."""
         if not self.cfg.training.get("track_train_eval", False) \
                 or (step + 1) % self.cfg.training.validate_every_n_steps != 0:
             return

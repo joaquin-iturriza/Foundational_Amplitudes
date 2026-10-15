@@ -3891,15 +3891,19 @@ class AmplitudeExperiment(BaseExperiment):
     def _result_extra(self) -> dict:
         """Return per-dataset val_losses and compute counts at the best checkpoint.
 
-        proc_val_losses        : {ds_name: val_loss}        at the best combined checkpoint step
-        proc_val_losses_no_reg : {ds_name: val_loss_no_reg} at the best combined checkpoint step
+        proc_val_losses        : {ds_name: val_loss}        at the selected checkpoint's validation
+        proc_val_losses_no_reg : {ds_name: val_loss_no_reg} at the same validation
         compute_ds             : {ds_name: n_samples}       total samples seen from each dataset
         """
         if not self.proc_val_losses or not self.val_loss:
             return {}
-        # Use no-reg val_loss for index selection when available (matches checkpoint selection)
-        ref_series = self.val_loss_no_reg if self.val_loss_no_reg else self.val_loss
-        best_idx = int(np.argmin(ref_series))
+        # The validation the checkpoint was selected at (base_experiment.train records it, whatever the selection
+        # metric: HETEROSC with heterosc_select=mu_mse selects on val_mse, not val_loss_no_reg); argmin of the no-reg
+        # loss only when it was not recorded.
+        best_idx = getattr(self, "_best_val_idx", None)
+        if best_idx is None:
+            ref_series = self.val_loss_no_reg if self.val_loss_no_reg else self.val_loss
+            best_idx = int(np.argmin(ref_series))
 
         proc = {}
         for name, losses in self.proc_val_losses.items():
