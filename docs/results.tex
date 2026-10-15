@@ -2097,8 +2097,9 @@ NLL $\le0$ to one label (fixed by \code{dyhpo.objective\_scale}, commit \code{8d
 $2.3\times10^{-3}$, EMA off, validation NLL $-7.63$. On the test split, in MSE$(\log|\mathcal M|^2)$ from the raw
 predictions (\code{tools/eval\_delta.py}, V100): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
 ($4.8\times$ lower; the one run at the baseline's HPs: $2.3\times10^{-8}$); median $|\Delta|$ $4.4\times10^{-5}$ against
-$1.4\times10^{-4}$ (\code{analysis/transfer/het\_ab.py --sweep}, figures \code{het\_ab\_sweep\_*}). Three of the eight
-trials beat the baseline's test error by more than $2\times$ and none is worse than it. Calibration is unchanged: pull
+$1.4\times10^{-4}$ (\code{analysis/transfer/het\_ab.py --sweep}, figures \code{het\_ab\_sweep\_*}). Five of the eight
+trials beat the baseline's test error ($2.0$ to $4.8\times$ lower); the three with lr $\le3.1\times10^{-4}$ are $4$ to
+$6\times$ worse than it. Calibration is unchanged: pull
 std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.7$ to $5.7\times10^{-4}$ over its deciles,
 against errors from $7\times10^{-5}$ to $6\times10^{-4}$), monotone in it. Every trial selected its last step: the NLL
 falls to $8$k (\code{analysis/transfer/het\_sweep.py}, Fig.~\ref{fig:het_sweep}), so the horizon is short for this loss.
