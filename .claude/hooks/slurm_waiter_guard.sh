@@ -23,11 +23,11 @@ if [ -f "$BYPASS" ]; then
 fi
 
 # Jobs live on three sites now; the `site` registry is the one place that knows
-# them all. Refresh it (bounded), then list this project's non-terminal runs as
-# "<run-id> <job> <STATE>". If the tool is missing or the sites are unreachable,
-# fail open rather than hang the Stop.
+# them all. List this project's non-terminal runs as "<run-id> <job> <STATE>" from
+# the registry as it stands: `site supervise` refreshes it every 20 min. No live
+# `site poll` here: it held every Stop for up to 90 s, and a web-view message sent in
+# that window is answered as a tool-less side question outside the session.
 command -v site >/dev/null 2>&1 || exit 0
-timeout 90 site poll >/dev/null 2>&1 || true
 jobs=$(timeout 30 site runs --project FA --limit 100 2>/dev/null \
        | awk '$4 ~ /^(SUBMITTED|PENDING|RUNNING|IDLE|CONFIGURING|UNKNOWN)$/ {print $1, $6, $4}' \
        | grep -viE 'prebuild' || true)
