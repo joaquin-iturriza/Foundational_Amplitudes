@@ -2051,12 +2051,15 @@ geometric mean of a signed NLL across processes, and short horizons. The first c
 user's loss (\code{training.loss=HETEROSC}, \code{heterosc\_beta=0}, the new
 \code{training.heterosc\_select=nll}; \code{scripts/job\_het\_ab.sh}) on $e^+e^-\to t\bar t$ at
 $D=10^4$, $8$k steps, seed 2, at the MSE baseline's own HPs (\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144},
-the best of its sweep), V100, \code{sign\_head} off (a positive probe): $\mu$-MSE (val, standardized
+the best of its 8-trial DyHPO sweep), V100, \code{sign\_head} off (a positive probe): $\mu$-MSE (val, standardized
 $\log|\mathcal M|^2$) $1.37\times10^{-7}$ against the MSE baseline's $3.57\times10^{-7}$, i.e.\
 $2.6\times$ lower error; test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
-to the last step, which is also the best checkpoint. Calibration is not there yet: the pulls peak at 0
-with a width of about $0.3$, so $\sigma$ overestimates the error by about $3\times$, and the NLL was
-still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
+to the last step, which is also the best checkpoint. On the test split (\code{analysis/transfer/het\_ab.py}, figures
+\code{het\_ab\_delta}, \code{het\_ab\_pull}, \code{het\_ab\_calib}) the median $|\Delta|$ is
+$5.0\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$. Calibration is not there yet: pull mean
+$0.00$, std $0.46$, so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
+$6\times10^{-4}$ over its deciles) while the actual error spans $10^{-4}$ to $6\times10^{-4}$, so it
+ranks events only weakly; the NLL was still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
 \code{sign\_head} with \code{HETEROSC} (asserted incompatible) and left an empty
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1}.
 
