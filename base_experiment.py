@@ -5,7 +5,7 @@ import torch.nn as nn
 import math
 import datetime
 import pickle
-import os, time
+import os, time, json
 import io
 import zipfile
 import logging
@@ -772,6 +772,8 @@ class BaseExperiment:
                 T_max=int(increment_steps * self.cfg.training.scheduler_scale),
                 eta_min=self.cfg.training.cosanneal_eta_min,
             )
+            self._sched_summary = {"T_max": int(increment_steps * self.cfg.training.scheduler_scale),
+                                   "warmup": int(warmup), "increment_steps": increment_steps}
             if is_dyhpo_run:
                 run_kind = "resume" if self.warm_start else "cold start"
                 LOGGER.info(
@@ -808,6 +810,56 @@ class BaseExperiment:
                 LOGGER.warning(
                     f"Cannot load scheduler from {model_path}, starting from scratch"
                 )
+
+    def _print_run_summary(self):
+        """One `RUN_SUMMARY {json}` line at the start of training: the resolved setup, which `site supervise`
+        compares against what the submission expected (a rerun from a DyHPO trial config once kept
+        increment_steps=8000, so a 16k/32k run annealed over 8k steps)."""
+        t, d = self.cfg.training, self.cfg.data
+        sched = dict(getattr(self, "_sched_summary", None) or {})
+        if t.scheduler == "OneCycleLR":
+            sched = {"T_max": int(t.iterations * t.scheduler_scale)}
+        specs = getattr(self, "_recipe_specs", None) or []
+        per = {s["name"]: (s["train_events"] if s.get("monitor") else s["n_train"]) for s in specs}
+        if len(per) > 40:
+            v = sorted(per.values())
+            per = {"n": len(v), "min": v[0], "median": v[len(v) // 2], "max": v[-1]}
+        gpu = None
+        try:
+            if torch.cuda.is_available():
+                gpu = torch.cuda.get_device_name(0)
+        except Exception:
+            pass
+        net = self.cfg.model.get("net", {}) if hasattr(self.cfg, "model") else {}
+        summary = {
+            "iterations": int(t.iterations),
+            "increment_steps": t.get("increment_steps", None),
+            "is_dyhpo_run": bool(t.get("is_dyhpo_run", False)),
+            "scheduler": t.scheduler,
+            "scheduler_scale": t.get("scheduler_scale", 1),
+            "T_max": sched.get("T_max"),
+            "warmup": sched.get("warmup"),
+            "lr": float(t.lr),
+            "batchsize": int(t.batchsize),
+            "ema": bool(self.cfg.get("ema", False)),
+            "ema_decay": t.get("ema_decay", None),
+            "loss": t.get("loss", None),
+            "heterosc_select": t.get("heterosc_select", None),
+            "n_datasets": len(specs) if specs else len(d.get("dataset", []) or []),
+            "train_events": int(getattr(self, "_n_train_events", 0) or 0),
+            "train_events_per_process": per,
+            "processes_file": d.get("processes_file", None),
+            "memmap": d.get("memmap", None),
+            "run_dir": self.cfg.run_dir,
+            "seed": self.cfg.seed,
+            "dtype": t.get("dtype", None),
+            "allow_tf32": t.get("allow_tf32", None),
+            "num_heads": net.get("num_heads", None) if net else None,
+            "slurm_mem_per_node": os.environ.get("SLURM_MEM_PER_NODE"),
+            "gpu": gpu,
+            "run_id": os.environ.get("CCORCH_RUN_ID"),
+        }
+        print("RUN_SUMMARY " + json.dumps(summary, default=str, sort_keys=True), flush=True)
 
     def train(self):
         self.train_lr, self.train_loss, self.val_loss = [], [], []
@@ -864,6 +916,10 @@ class BaseExperiment:
             f"validating every {self.cfg.training.validate_every_n_steps} steps"
             + (f" (validate_frac={validate_frac})" if validate_frac > 0 else "")
         )
+        try:
+            self._print_run_summary()
+        except Exception as e:                       # a summary never stops a run
+            LOGGER.warning(f"RUN_SUMMARY not printed: {e!r}")
         self.training_start_time = time.time()
 
         # --- optional per-iter profiling: split dataloading vs compute ---
