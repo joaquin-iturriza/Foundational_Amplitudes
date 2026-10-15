@@ -1,0 +1,2 @@
+runs_from_lxplus/tp3_finfte_uubar_Zgg_d8/trial_0036
+runs_from_lxplus/tp3_finfte_uubar_gg_d8/trial_0030
