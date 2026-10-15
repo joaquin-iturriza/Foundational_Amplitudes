@@ -2088,6 +2088,33 @@ against the realised error per decile of $\sigma$.}
 \label{fig:het_ab}
 \end{figure}
 
+\paragraph{The GP sweep of the user's loss (2026-10-15, D57).} The same setup swept for its own HPs: the MSE baseline's
+config verbatim (\code{sweep/sweep\_config\_tp\_het\_ee\_ttbar\_d8.yaml}) with \code{HETEROSC}, $\beta=0$, selection and
+ranking on the validation NLL, a plain GP over $2000$ candidates (the likelihoods project's surrogate, now
+\code{dyhpo.surrogate: gp}), $8$ trials in waves $3+3+2$ through \code{sweep/drive.py} (the user's answers: ``NLL'',
+``GP, 8 trials, 2000 candidates''). Before it, a signed objective was a silent random search: \code{-log10} mapped every
+NLL $\le0$ to one label (fixed by \code{dyhpo.objective\_scale}, commit \code{8d31b58}). Best trial \code{hp1550}: lr
+$2.3\times10^{-3}$, EMA off, validation NLL $-7.63$. On the test split, in MSE$(\log|\mathcal M|^2)$ from the raw
+predictions (\code{tools/eval\_delta.py}, V100): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
+($4.8\times$ lower; the one run at the baseline's HPs: $2.3\times10^{-8}$); median $|\Delta|$ $4.4\times10^{-5}$ against
+$1.4\times10^{-4}$ (\code{analysis/transfer/het\_ab.py --sweep}, figures \code{het\_ab\_sweep\_*}). Three of the eight
+trials beat the baseline's test error by more than $2\times$ and none is worse than it. Calibration is unchanged: pull
+std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.7$ to $5.7\times10^{-4}$ over its deciles,
+against errors from $7\times10^{-5}$ to $6\times10^{-4}$), monotone in it. Every trial selected its last step: the NLL
+falls to $8$k (\code{analysis/transfer/het\_sweep.py}, Fig.~\ref{fig:het_sweep}), so the horizon is short for this loss.
+Scored with the validation weights (\code{training.track\_train\_eval}, D58), the training split sits at or just below
+validation; the earlier validation-below-training curve was the EMA weights against the live ones.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.62\textwidth]{../analysis/transfer/figs/het_sweep_curves.pdf}\hfill
+\includegraphics[width=0.36\textwidth]{../analysis/transfer/figs/het_sweep_trials.pdf}
+\caption{The user's heteroscedastic loss, GP sweep on $e^+e^-\to t\bar t$ at $D=10^4$, $8$k steps. Left: the best trial's
+NLL and MSE of $\mu$ (standardized $\log|\mathcal M|^2$) on validation and on a training subsample scored with the
+same weights. Right: every trial's validation NLL, coloured by $\log_{10}$ lr; early spikes up to $+20$ are cut at $0$.}
+\label{fig:het_sweep}
+\end{figure}
+
 \paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
@@ -6318,6 +6345,28 @@ V100, $5.7\times10^{-5}$ on A100 with TF32 off, $5.1\times10^{-5}$ with it on; t
 $1.6\times10^{-3}$, $4.18\times10^{-3}$, $4.18\times10^{-3}$ (test $6.4$, $6.5$, $8.8\times10^{-3}$). TF32 changes nothing
 beyond the run-to-run spread, which is larger between the two GPUs. A step is $\sim20\%$ faster than on V100 (these runs
 are data-bound). Transfer cells from then on mix V100 and A100 trials. One run per setting.
+
+\paragraph{TF32 at evaluation (2026-10-15).}\label{sec:tf32-eval} The training-side A/B above does not cover evaluating a
+model at a precision other than the one it was trained at, and that is not harmless. Each of the $107$ Jean Zay runs in
+the $\Delta$ plots was rebuilt on A100 twice (\code{tools/eval\_delta.py --tf32 on|off}) and its rebuilt validation loss
+compared with the recorded one (\code{analysis/transfer/tf32\_eval.py}, Fig.~\ref{fig:tf32_eval}): $57$ match within
+$0.02$\,dex either way, $26$ only with TF32 on, $19$ only with it off, $5$ with neither. At the wrong precision the error
+is up to $133\times$ larger (\code{tp3\_r3fte\_uubar\_gg\_d8/trial\_0031}, trained on V100, rebuilt with TF32 on), and a
+TF32-trained model rebuilt in fp32 is up to $4\times$ better (\code{tp3\_r6fte\_ud\_ud\_d8/trial\_0194}). TF32's $10$-bit
+mantissa is a relative error of $\sim10^{-3}$ per matmul, against $|\Delta|\sim10^{-5}$ to $10^{-4}$ in these models,
+so a model's precision is part of what it learned. The $\Delta$ plots draw each model at the precision that reproduces
+its recorded loss. Not settled: whether the transfer study's V100/A100 mix moves its cell values beyond the run-to-run
+spread (the training-side A/B says not, at two cells), and the H100 test of the CC runs (still queued). The five that
+match neither include \code{tp3\_r8fte\_ee\_bb\_nlo\_d8/trial\_0162} ($7.4\times$ either way), like the CC
+\code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} ($13\times$ on V100): the one-loop $b\bar b$ probe has its own open mismatch.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/tf32_eval.pdf}
+\caption{Jean Zay's $107$ $\Delta$-plot runs rebuilt on A100 with TF32 matmuls on and off, each divided by the run's
+recorded validation MSE$(\log|\mathcal M|^2)$.}
+\label{fig:tf32_eval}
+\end{figure}
 
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
