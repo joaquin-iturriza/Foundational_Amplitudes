@@ -5518,11 +5518,18 @@ of the three share a test set.
     against the analytic $|\mathcal M|^2$ to $1.7\times10^{-7}$). Settled by their setup and the user's answers of
     2026-10-15: their default coupling orders, massive $b$ beams, the $2\to1$ group ``Drop them'' ($1491$ processes,
     $139$ held out), the hold-out ``Their split, report both'' (all $139$ and the $43$ without a relabel in training),
-    the top mass ``173.0, theirs''; the loss is the user's heteroscedastic one (D52). Running: the full generation
-    \code{FA-ccin2p3-17f91455} (one $48$-core CC node, user: ``No, just send it''; the timing job
-    \code{FA-ccin2p3-85c90b04} alongside). Next: the pretraining sweep on it (D59: GP, $8$ trials, $2000$ candidates,
+    the top mass ``173.0, theirs''; the loss is the user's heteroscedastic one (D52). Generated 2026-10-15 08:10
+    (\code{FA-ccin2p3-17f91455}, one $48$-core CC node, user: ``No, just send it''): $1491$ processes, $0$ failed, MadEvent
+    phase $3.6$\,h; val and test ($10^4$ each) in \code{\$WORK/datasets}, train ($10^5$) in the \code{\$SCRATCH} cache
+    (\code{amp\_data\_cache}), diagram sidecars \code{data/diagrams/dc\_*.diagrams.json} for all $1491$; $33$\,GB in
+    \code{datasets}. The timing job (\code{FA-ccin2p3-85c90b04}): $10^5$ events take $7.6$ to $30$\,min of MadEvent per
+    process ($b g\to b\bar b b$ $435$\,s, $gg\to ggg$ $1787$\,s). Next: the pretraining sweep on it (D59: GP, $8$ trials, $2000$ candidates,
     NLL-ranked, Daniel's diagram embedding; \code{sweep/sweep\_config\_dancat\_het\_pre.yaml}, whose horizon, lr window
-    $[10^{-3}, 9\times10^{-3}]$ and memory are PROPOSED and wait for the user). (2) \textbf{Heteroscedastic loss}
+    $[10^{-3}, 9\times10^{-3}]$ and memory are PROPOSED and wait for the user). The proposal, for the user: $32$k steps
+    ($3.9\times10^5$ events per process, the per-process compute of catalog\_v2's pretraining), lr window centred at
+    $3\times10^{-3}$ (between CLAUDE.md's high-$D$ $1.9\times10^{-3}$ at $32$k and catalog\_v2's best carried to $32$k,
+    $4.7\times10^{-3}$), $200$\,GB host memory, $8$ trials in waves $3+3+2$ on CC; about $11$\,h per trial, $\approx90$
+    GPU-h ($60$ to $120$). $16$k steps would halve it. (2) \textbf{Heteroscedastic loss}
     (agreement with the user first). The first clean joint run of the user's loss is written up (the correction after
     ``The coupled fit fails'', Sec.~\ref{sec:divergences}): $\mu$ $2.6\times$ below the MSE baseline on $ee\to t\bar t$,
     calibration open (pull std $0.46$, the NLL still falling at $8$k). The test is that one run (user, 2026-10-15: ``No
