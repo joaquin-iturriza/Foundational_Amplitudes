@@ -139,6 +139,18 @@ def _build(sweep_config, n_procs, out, extra):
     return snap
 
 
+def _plain(x):
+    if isinstance(x, dict):
+        return {str(k): _plain(v) for k, v in sorted(x.items(), key=lambda kv: str(kv[0]))}
+    if isinstance(x, (list, tuple, np.ndarray)):
+        return [_plain(v) for v in (x.tolist() if isinstance(x, np.ndarray) else x)]
+    if isinstance(x, (np.floating, float)):
+        return float(x).hex()
+    if isinstance(x, np.integer):
+        return int(x)
+    return x
+
+
 def _compare(A, B, label):
     for k in A:
         if k in ("mmap_dir", "run_dir", "train", "val", "proc_val", "proc_train_eval", "train_eval"):
@@ -153,7 +165,7 @@ def _compare(A, B, label):
         elif k == "perm":
             assert a.keys() == b.keys() and all(np.array_equal(a[r], b[r]) for r in a), f"{label}: perm differs"
         else:
-            assert a == b, f"{label}: {k} differs: {a} vs {b}"
+            assert repr(_plain(a)) == repr(_plain(b)), f"{label}: {k} differs: {a} vs {b}"
     for i, (x, y) in enumerate(zip(A["train"], B["train"])):
         _eq_batch(x, y, f"{label}: train batch {i}")
     assert len(A["val"]) == len(B["val"])

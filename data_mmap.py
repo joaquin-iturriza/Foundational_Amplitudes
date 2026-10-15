@@ -314,7 +314,12 @@ def init_data_recipes_mmap(exp, c):
 
     _porder = str(cfg.data.get("particle_order", "none"))
     want_offshell = (exp._offshell_per_event and exp._use_internal_mass_scalars and bool(exp._internal_mass_pdgs))
-    offshell_masks = exp._setup_offshell_masks(names) if want_offshell else None
+    # the propagator masks need the pools' slot PDGs (set while loading), so _build makes them; the key holds
+    # what they are made from: the diagram sidecars, the property-table flags and the scanned masses
+    ddir = cfg.model.get("diagrams_dir", "data/diagrams")
+    if not os.path.isabs(ddir):
+        ddir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
+    sidecars = [exp._resolve_diagram_path(ddir, n) for n in names] if want_offshell else []
     order_rows = np.stack([exp._order_row(i, c["amp_orders"]) for i in range(len(names))]).astype(np.float32)
     ft = cfg.get("fine_tune", None)
     ft_on = ft is not None and ft.get("pretrained_path", None) is not None and not exp.warm_start
@@ -338,8 +343,12 @@ def init_data_recipes_mmap(exp, c):
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
-            "masks": [None if m is None else {str(p): [[np.asarray(r).tolist(), float(mm)] for r, mm in lst]
-                                              for p, lst in m.items()} for m in (offshell_masks or [])],
+            "sidecars": [None if p is None else _pool_doc(p)[:3] for p in sidecars],
+            "table": {k: bool(cfg.data.get(k, dflt)) for k, dflt in (
+                ("spin_onehot", False), ("color_onehot", False), ("prop_is_massless", True),
+                ("standardize_props", True), ("generation_onehot", False), ("generation_feature", True))},
+            "k_pe": int((cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8)),
+            "internal_masses": getattr(exp, "_internal_mass_by_proc", None),
             "pinned": (None if cfg.data.get("offshell_stats", None) is None
                        else np.asarray(cfg.data.offshell_stats, dtype=np.float64).tolist()),
             "ft_mode": str(ft.get("offshell_stats", "parent")) if ft_on else None,
@@ -368,7 +377,7 @@ def init_data_recipes_mmap(exp, c):
                 if old.startswith(key + ".tmp"):
                     shutil.rmtree(os.path.join(root, old), ignore_errors=True)
             os.makedirs(tmp)
-            meta = _build(exp, c, tmp, key_doc, order_rows, offshell_masks, want_offshell,
+            meta = _build(exp, c, tmp, key_doc, order_rows, want_offshell,
                           global_encode, resolve_amp_trafos, preprocess_amplitude)
             with open(os.path.join(tmp, "meta.json"), "w") as f:
                 json.dump(meta, f)
@@ -377,7 +386,7 @@ def init_data_recipes_mmap(exp, c):
     _apply(exp, c, d, meta, built)
 
 
-def _build(exp, c, d, key_doc, order_rows, offshell_masks, want_offshell, global_encode, resolve_amp_trafos,
+def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve_amp_trafos,
            preprocess_amplitude):
     from experiment import order_identical_particles
     cfg = exp.cfg
@@ -445,6 +454,8 @@ def _build(exp, c, d, key_doc, order_rows, offshell_masks, want_offshell, global
             LOGGER.info(f"  [{role}] {name}: {Nn} events{f' (cap {cap})' if cap else ''} from {paths[role][name]}"
                         f" -> memmap")
             del data_raw, parts, mom, toks
+    exp._slot_pdgs_by_name = {**slot_pdgs, **getattr(exp, "_slot_pdgs_by_name", {})}
+    offshell_masks = exp._setup_offshell_masks(names) if want_offshell else None
     rng_out = torch.get_rng_state().numpy().copy()
     np.save(os.path.join(d, "rng_out.npy"), rng_out)
     tokens.flush(); del tokens
