@@ -82,7 +82,11 @@ def one(run_dir, out_dir, seed=None, tf32=None):
         exp.evaluate()
         if cfg.training.loss == "HETEROSC":
             # the predicted sigma per event (standardized log|M|^2 units), for the pulls
-            for role, loader in (("val", exp.val_loader), ("test", exp.test_loader)):
+            # train too: sigma fitted where it was trained tells an optimization limit from a generalization gap
+            loaders = [("val", exp.val_loader), ("test", exp.test_loader)]
+            if getattr(exp, "train_loader", None) is not None:
+                loaders.append(("train", exp.train_loader))
+            for role, loader in loaders:
                 pr, tr, sg = exp._collect_predictions(loader)[:3]
                 np.savez_compressed(os.path.join(out_dir, f"sigma_{role}.npz"), pred=pr, truth=tr, sigma=sg)
     rec = {"run_dir": run_dir, "out_dir": out_dir, "val_loss_rebuilt": exp.val_loss_no_reg[-1], "ema_applied": ema_applied,
