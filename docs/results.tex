@@ -2022,7 +2022,7 @@ iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives i
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
 gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
 
-\paragraph{The coupled fit fails for a structural reason; two-stage $\sigma$ works.}
+\paragraph{The coupled fit fails for a structural reason; two-stage $\sigma$ works. (Withdrawn 2026-10-15: the mechanism below is wrong, see the correction that follows.)}
 The coupled $(\mu,\sigma)$ NLL underfit $\mu$ ($\mu$-MSE $\sim$1 or $\gg$ the MSE baseline) across
 $\sim$40 GPU-h of runs and three sweeps. Mechanism (\code{grad\_decomp.py}, \code{clip\_test.sh}):
 amplitudes are \emph{deterministic} (no aleatoric noise), so the Gaussian likelihood is degenerate
@@ -2042,7 +2042,7 @@ broken; they must not be trained \emph{jointly} with $\mu$. A naming trap worth 
 $\beta$-NLL is $\mathrm{detach}(\sigma^{2\beta})\!\cdot\!\text{NLL}$, so $\beta{=}0$ is the standard
 Gaussian NLL (works); the catastrophic runs were all $\beta{=}1$.
 
-\paragraph{Correction (2026-10-15): the joint fit works; the paragraph above is wrong.}
+\paragraph{Correction (2026-10-15): fitting $\mu$ and $\sigma$ together works for $\mu$ on one process; calibration is open.}
 The ``deterministic, hence degenerate'' mechanism was a hypothesis (commit \code{ba2c0ae}) and is
 withdrawn. The failures trace to choices made on top of the user's loss (\code{losses.py:32-35},
 commit \code{4ef5b76}: the plain Gaussian NLL, $\sigma$ through a softplus, selection on the NLL):
@@ -5274,9 +5274,11 @@ not. In these two arms the pretraining ranking is reversed on fine-tuning. One s
 differed by $8\%$ in pretraining loss). Taken per $D$ (Wilcoxon over the twelve probes, Fig.~\ref{fig:levers_accum} now with the $D=10^4$ cells of the
 next paragraph), the generation feature's advantage is one value of $D$, not ``small $D$'': $+0.09$\,dex at $10^2$ ($7$ of
 $12$, $p=0.23$), $+0.26$ at $10^3$ ($10$ of $12$, $p=0.02$), $+0.04$ at $10^4$ ($7$ of $12$, $p=0.73$); the pooled
-$+0.21$ above is the $10^3$ cells. Off-shellness off is worse at each $D$ ($-0.24$, $-0.23$, $-0.34$; $p=0.03$, $0.02$,
-$0.02$); Feynman diagrams on ($-0.07$, $-0.10$, $-0.24$) and coupling scalars off ($-0.11$, $+0.06$, $-0.14$) reach no
-$p<0.05$ at any $D$.
+$+0.21$ above (better on $10$ of $12$ probes) pools $10^2$ and $10^3$ per probe before the median over probes, so it is
+neither of the per-$D$ medians. Off-shellness off is worse at each $D$ ($-0.24$, $-0.23$, $-0.34$; nominal $p=0.03$, $0.02$, $0.02$,
+none below $0.05$ after the factor $5$ for the arms, before any factor for the three $D$); Feynman diagrams on ($-0.07$,
+$-0.10$, $-0.24$) and coupling scalars off ($-0.11$, $+0.06$, $-0.14$) reach no nominal $p<0.05$ at any $D$. The
+$10^2$, $10^3$ cells are $8$k fine-tunes and the $10^4$ cells $32$k.
 
 \paragraph{The conditionings at $D=10^4$, and the finale at $32$k (2026-10-08 19:00).} A $32$k cell is the best
 of rung $9$'s two chosen points (\code{horizon32k\_chosen.json}), the arm run at the same two, so it is measured at
@@ -5495,7 +5497,7 @@ prediction $\mu+\sigma h$ on the probe's validation events, events per bin; the 
     \textbf{Heteroscedastic loss} (agreement with the user first): the ``deterministic targets'' argument
     (results above, Sec.~heterosc) is withdrawn: the failures trace to the geometric-mean bug (49cfe64), selection and
     DyHPO on the $\beta$-NLL (cbae458), $\beta=1$ pinned (da17ce9), global grad clip shared by $\mu$ and $\sigma$, short
-    horizons; no clean $\beta=0$ joint run with every fix was ever made. (3) \textbf{$\Delta$ plots} (D42; Butter, Plehn):
+    horizons; no clean $\beta=0$ joint run with every fix was ever made (until the 2026-10-15 run of the user's loss: see the correction after \code{The coupled fit fails}). (3) \textbf{$\Delta$ plots} (D42; Butter, Plehn):
     arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at the largest $D$
     ($10^4$): all ladder rungs; the scaling figures' arms; the star arms. No per-event predictions were saved
     (\code{evaluation.save\_predictions} off): re-evaluate the best trials with \code{run\_data\_tools eval} plus a
@@ -6356,9 +6358,9 @@ images per helicity ($3840$ labelled diagrams, $74$ orbits, stabilisers counted)
 $2040$, so its $2\to6$ median ($305$) is $\sim\!7\times$ below revision $1$'s ($2.1$k; $\sim\!12\times$ before the
 optimisation), still $\sim\!60$--$100\times$ MadGraph's $3$--$5$; the slowest revision-$2$ process is
 \code{syn6v3r2\_00001} ($uu\to uu\,4g$, all $14610$ diagrams) at $352$ ($116$ before the optimisation). Version $6$ multiplies the work by the helicity
-configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stores $18$ events/s (median; range $14$--$25$),
-$3$--$8\times$ MadGraph per core (MadGraph's $3$--$5$ came from an lxplus core, so the comparison is indicative; v6t
-and MadGraph on one lxplus node settle it), with no compile. Before the optimisation it stored $5$--$10$, MadGraph's
+configurations: $2\to6$ v6t sums $0.43$--$0.85$ million bracket monomials per event and stored $18$ events/s (median; range $14$--$25$) on the laptop, with no compile (the laptop rates in this
+paragraph and its table are superseded by the one-node lxplus rates below: v6t $9$ against MadGraph's $5$ at $2\to6$,
+about $2\times$). Before the optimisation it stored $5$--$10$, MadGraph's
 speed, which broke D36's ``cheap'' at $2\to6$; the user's call (2026-10-13) was to make the labeller faster before
 cutting anything. The optimisation changes no value (every synthetic recipe name's labels within $1.7\times10^{-14}$
 of the old ones on fixed events, revision $1$ and v1 bitwise): v6 sums each helicity unit's bracket monomials over a
@@ -6380,7 +6382,7 @@ $2\to6$ & $5$ & $8.4$k & $1.2$k & $1.6$k & $512$ & $120$ & $93$ & $9$ \\
 \end{tabular}
 \end{center}
 On the same core, every version but v6t keeps a factor $\ge7$ over MadGraph at $2\to5$ and $\ge18$ at $2\to6$ (v6's
-slowest $2\to6$ process at $12$, against MadGraph's $3$--$7$); v6t is $2.5\times$ faster at $2\to5$ and $\sim\!2\times$ at
+slowest $2\to6$ process at $12$, against MadGraph's $3$--$7$); v6t is $2.5\times$ faster than MadGraph at $2\to5$ and $\sim\!2\times$ at
 $2\to6$ ($9$ against $5$), before MadGraph's compile. The real-diagram count and the bracket numerators together bring
 the synthetic labeller to MadGraph's order exactly where the target is: $q\bar q\to V+5g$ with all $3\,840$ diagrams.
 \begin{figure}[H]
@@ -6409,7 +6411,7 @@ v5r2 (target shape) & $-0.61$ & $-0.05$ & $+0.11$ & $-0.71$ & $+0.02$ & $+0.04$ 
 finale$+W$        & $+0.49$ & $+0.50$ & $+0.22$ & $+0.30$ & $+0.33$ & $-0.06$ \\
 \end{tabular}
 \end{center}
-No version improves on v1, and none comes near the finale$+W$ pretraining. Giving the random processes their real
+No version improves on v1 consistently (v3r2 at $Z{+}4g$, $D=10^2$ and v5r2 at $Z{+}4g$, $D=10^4$ are ahead by $0.03$ to $0.07$ dex, inside one seed's scatter), and none comes near the finale$+W$ pretraining. Giving the random processes their real
 diagram counts (v2r2) makes the child $2\times$ worse at $D=10^2$, $10^3$ on both probes; restricting to Standard Model
 vertices (v3r2) recovers v1's level, and the collinear and soft structure (v4r2) changes nothing measurable on top. The
 target-shaped version is \emph{worse} at $D=10^2$, by $4$--$5\times$ against the finale ($Z+5g$ even $0.08$\,dex below
