@@ -23,11 +23,10 @@ What this script writes (the pipeline reads recipes/catalog_daniel_processes.yam
   recipes/catalog_daniel_all.yaml         all 1491
 
 Decisions: D51 ("just generate the data": the catalog, momenta and |M|^2, made by us) and D54
-("For now let's do only 100k."). Two choices below are the main session's reading, NOT user words,
-and await the user's call (repo-reviewer 2026-10-15): the hold-out as published although 96 of its 139
-processes are exact relabellings of a training process (CLAUDE.md: a held-out process is held out
-with its whole class; only _heldout_norelabel carries a clean held-out claim until then), and the top
-mass 173.0 (their card) against our table's 172.5. The relabel classes come from the symbolic
+("For now let's do only 100k."). The user's answers of 2026-10-15 to the three open choices: the 2->1 group
+"Drop them"; the hold-out "Their split, report both" (as published, although 96 of its 139 processes are exact
+relabellings of a training process, so held-out results are reported on all 139 and on the 43 of
+_heldout_norelabel); the top mass "173.0, theirs" (their card, against our table's 172.5). The relabel classes come from the symbolic
 analysis/catalog_daniel/classify2.py, not from the numeric tools/equal_processes.py check.
   - the ten 2->1 processes are dropped everywhere, as they drop them;
   - the hold-out is their split as published, no class-based removal on top (pending, above); the relabel side
