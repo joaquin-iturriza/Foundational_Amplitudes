@@ -5505,7 +5505,10 @@ of the three share a test set.
     pretrainings: \code{scripts/job\_zero\_shot\_parent.sh} with \code{PARENTS} = both and \code{runs/tp3\_gstd\_r9/trial\_0073}
     on $W{+}4g$ and the $Z{+}ng$ probes. To tell the user with the result: Jonas's code is not public, so ``the same
     implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
-    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). Open from review: \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
+    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). For the user (sec:ema-ckpt): fix \code{\_save\_model} to store the EMA weights as the best model (a cloned
+\code{"model\_ema"} entry, keeping \code{"model"} for resume), make the post-training evaluation restore the best
+checkpoint's EMA, and whether fine-tunes start from the parent's EMA weights (one line, \code{base\_experiment.py:1203};
+it changes the transfer study's parents from here on). Open from review: \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
     (\code{4ef5b76}); the het sweep sets \code{nll} explicitly, the default waits for the user. The catalog class counts
     ($467$/$409$) come from \code{analysis/catalog\_daniel/classify2.py}, which imports a \code{classify} module not in
     the repo, so they cannot yet be regenerated from trunk. \emph{The plan (the user's list of
@@ -6373,8 +6376,30 @@ precision, $24$ of the $251$ $\Delta$-plot models still rebuild off their record
 by $5$ to $40\%$, and four far off at every precision, all from the one-loop $b\bar b$ probe or the Sudakov-EW star arm:
 \code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} ($13\times$), \code{tp3\_r8fte\_ee\_bb\_nlo\_d8/trial\_0162} ($7.4\times$),
 \code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8/trial\_0131} ($7.2\times$) and \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132}
-($0.34\times$). Not settled: those four, and whether the study's V100/A100/H100 mix moves its cell values beyond the
+($0.34\times$). Three of those four are the EMA checkpoint defect below (sec:ema-ckpt). Not settled: whether the study's V100/A100/H100 mix moves its cell values beyond the
 run-to-run spread (the training-side A/B says not, at two cells). 
+
+\paragraph{The best checkpoint's \code{"model"} weights are not the EMA weights (2026-10-15).}\label{sec:ema-ckpt}
+\textbf{The counts above mix two effects; they are being redone.} \code{base\_experiment.\_save\_model} takes
+\code{state\_dict()} inside \code{ema.average\_parameters()} but saves it after the block ends; the state dict shares
+storage with the parameters, which the EMA restores to the live weights, so for every run with \code{ema: true} the
+checkpoint's \code{"model"} entry is the live weights at the best step, not the EMA average that validation scored (the
+\code{"ema"} entry still holds that average). Checked on \code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad}: \code{"model"} equals
+the live weights to $0$, and differs from the EMA shadow by up to $5.8\times10^{-3}$. Rebuilt with the shadow
+(\code{tools/rebuild\_run.load\_best\_weights}, commit \code{570c5cc}; \code{FA-ccin2p3-500d70ed}, V100):
+\code{tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} $1.000\times$ its recorded loss (was $13\times$) and
+\code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8/trial\_0131} $1.000\times$ (was $7.2\times$). The \emph{recorded} values (the
+scaling figures, every sweep's ranking) are the EMA weights' and are right. Wrong were: every rebuild of an EMA run (the
+$\Delta$ plots, the counts of Fig.~\ref{fig:tf32_eval}, the MSE baseline of the het A/B: \code{trial\_0144} has EMA on),
+being redone with the fixed tool (\code{FA-ccin2p3-3eacf1a4}, $122$ CC runs on V100; Jean Zay's $107$ next); the
+post-training evaluation of every EMA run, which loads the best live weights and then swaps in the \emph{final} EMA
+shadow (\code{experiment.py} \code{evaluate}), so its ``MSE (prepd)'' lines, test metrics and \code{plots\_0} are the
+final EMA model's (in the synfte run exactly the step-$8000$ value); and every fine-tune of an EMA parent starts from the
+parent's live weights at its best step (\code{base\_experiment.py:1203}), not from the model whose loss the parent
+reports. The best checkpoint of a run whose best step sits late in the cosine schedule has live $\approx$ EMA weights,
+which is why most rebuilds matched; the four far off had their best step on an unstable stretch.
+\code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132} ($0.34\times$) has EMA off and stays open (its own post-training
+evaluation reproduces the recorded loss; an H100 TF32 rebuild is queued).
 
 \begin{figure}[H]
 \centering
