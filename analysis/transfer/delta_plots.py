@@ -71,8 +71,8 @@ def axes_lab(ax):
 
 
 def main():
-    # --d10: the 32k grid's largest D (D=10^5; 10^4.5 for the one-loop probes), delta_audit_d10.json; the user has
-    # not chosen between it and the paper's 8k grid at D=10^4, so both sets are drawn (files delta_d10_*)
+    # --d10: a supplementary set at the 32k grid's largest D (D=10^5; 10^4.5 for the one-loop probes), delta_audit_d10.json,
+    # files delta_d10_*; the Delta plots are the 8k grid at D=10^4 (the user's D64)
     d10 = "--d10" in sys.argv
     audit = json.load(open(os.path.join(HERE, "delta_audit_d10.json" if d10 else "delta_audit.json")))
     key, pre = ("d10", "delta_d10_") if d10 else ("paper_8k", "delta_")

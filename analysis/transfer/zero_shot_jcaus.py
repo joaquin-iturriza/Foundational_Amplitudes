@@ -27,7 +27,9 @@ def main():
     for line in open(os.path.join(HERE, "zero_shot_jcaus.txt")):
         if line.startswith("ZERO_SHOT {"):
             d = json.loads(line.split(" ", 1)[1])
-            if "error" not in d:
+            if "error" in d:          # listed, not dropped (zero_shot_parent.py writes them for exactly this)
+                print(f"ERROR {d['parent']} {d['recipe']}: {d['error']}")
+            else:
                 rows.append(d)
     fig, (a1, a2) = ps.figure(ncols=2)
     for key, lab, c in ARMS:

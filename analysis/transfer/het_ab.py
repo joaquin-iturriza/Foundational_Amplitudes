@@ -1,6 +1,7 @@
 """The user's heteroscedastic loss against the MSE baseline at the baseline's HPs (scripts/job_het_ab.sh; docs/results.tex,
 the het correction paragraph): e+e- -> t tbar at D=10^4, 8k steps. Inputs, brought home by `site run` into
-analysis/transfer/het_ab_data/ (tools/eval_delta.py outputs, test split, V100, TF32 a no-op):
+analysis/transfer/het_ab_data/ (tools/eval_delta.py outputs at the EMA-fixed tool, 570c5cc: the weights each run
+validated; test split, V100, TF32 a no-op):
   mse_preds_test.npz   the MSE baseline tp_scr_ee_ttbar_d8/trial_0144 (best of its 8-trial sweep)
   het_preds_test.npz   the het run, seed 2;  het_sigma_test.npz  its mu, truth and sigma (standardized log|M|^2)
 Figures (analysis/transfer/figs/):
