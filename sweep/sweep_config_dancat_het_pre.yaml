@@ -1,0 +1,125 @@
+# Pretraining on the arXiv:2606.23791 catalog (recipes/catalog_daniel_train.yaml: their 1352 training processes, pp
+# 2->2 / 2->3 at 13 TeV, tree level, 1e5 train events each; D51/D54), with the user's heteroscedastic loss ranked on the
+# NLL and a GP DyHPO of 8 trials over 2000 candidates (D59), Daniel's diagram embedding (model.diagram_encoder_impl
+# llm4lhc at hidden_size 64, their other defaults, every diagram: <= 25 per process here; D5/D6, as tp3_levdiagl).
+# Written from sweep_config_tp3_levdiagl.yaml (the canonical tp3 setup: target factors off, off-shellness input on,
+# bs 16384, arithmetic training mean) with
+#   training.loss=HETEROSC, heterosc_beta=0, heterosc_select=nll, model.net.sigma_after_pool=true,
+#   detach_sigma_backbone=false, sign_head=false (every pool is a tree-level |M|^2 > 0; sign_head is asserted
+#   incompatible with HETEROSC), track_train_eval=true (D58; NOTE: today a no-op on the multi-process validation path);
+#   data: the full pools (no train_subsample), require_cache (built by the catalog generation), 2000 val events per
+#   process in memory (as catalog_v2_pretrain).
+# PROPOSED, for the user to confirm (not specified by him):
+#   horizon 32000 steps: 16384/1352 = 12 events per process per step, so 3.9e5 events per process (3.9 passes over
+#     1e5), the per-process compute of catalog_v2's 8601-step pretraining (38/step x 8601 = 3.3e5), whose tuned steps
+#     curves were still falling at 8000 steps (docs/results.tex, joint-training gap); 16000 halves the cost;
+#   lr window [1e-3, 9e-3], half a decade around 3e-3: between lr*(32k, high D) = 1.9e-3 (CLAUDE.md rule 2, the
+#     high-D row's extrapolation) and 4.7e-3 (catalog_v2's best 9.7e-3 at 8601 steps carried to 32k as t^-0.55);
+#   waves 3 (random start-up) + 3 + 2, run by sweep/drive.py; mem 200G (catalog_v2 took 64G for 42.7M events;
+#     this is 135M), 8 CPUs, 18 h wall.
+# Prerequisites on the site: the pools (scripts/job_gen_daniel_catalog.sh) and the diagram sidecars
+# data/diagrams/dc_*.diagrams.json (tools/dump_diagrams.py --prefix dc_): use_diagrams and offshell_per_event read them;
+# the first log must show "offshell_per_event: built propagator masks for N/P processes" with N = P = 1352.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 200G
+  cpus_per_task: 8
+  time: '18:00:00'
+paths: null
+sweep_name: dancat_het_pre
+n_trials: 8
+dyhpo:
+  n_candidates: 2000
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  surrogate: gp
+  objective_scale: linear
+  waves:
+  - 3
+  - 3
+  - 2
+fidelity_schedule:
+  t_steps:
+  - 32000
+fixed_params:
+  data.source: recipes
+  data.require_cache: 'true'
+  data.eval_subsample: 2000
+  data.preprocess_per_dataset: 'true'
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'false'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'false'
+  data.target_propagator_tchannel: 'false'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'true'
+  model.diagram_encoder_impl: llm4lhc
+  model.diagram_encoder_llm4lhc.hidden_size: 64
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'false'
+  training.loss: HETEROSC
+  training.heterosc_beta: 0.0
+  training.heterosc_select: nll
+  model.net.sigma_after_pool: 'true'
+  model.net.detach_sigma_backbone: 'false'
+  training.track_train_eval: 'true'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.01'
+  training.es_load_best_model: 'true'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_daniel_train.yaml
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.001
+  high: 0.009
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999
