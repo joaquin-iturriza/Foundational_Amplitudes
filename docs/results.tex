@@ -2042,6 +2042,24 @@ broken; they must not be trained \emph{jointly} with $\mu$. A naming trap worth 
 $\beta$-NLL is $\mathrm{detach}(\sigma^{2\beta})\!\cdot\!\text{NLL}$, so $\beta{=}0$ is the standard
 Gaussian NLL (works); the catastrophic runs were all $\beta{=}1$.
 
+\paragraph{Correction (2026-10-15): the joint fit works; the paragraph above is wrong.}
+The ``deterministic, hence degenerate'' mechanism was a hypothesis (commit \code{ba2c0ae}) and is
+withdrawn. The failures trace to choices made on top of the user's loss (\code{losses.py:32-35},
+commit \code{4ef5b76}: the plain Gaussian NLL, $\sigma$ through a softplus, selection on the NLL):
+the $\beta$-NLL pinned at $\beta{=}1$, selection on that $\beta$-NLL (minimised at $r^*=1/e$), the
+geometric mean of a signed NLL across processes, and short horizons. The first clean joint run of the
+user's loss (\code{training.loss=HETEROSC}, \code{heterosc\_beta=0}, the new
+\code{training.heterosc\_select=nll}; \code{scripts/job\_het\_ab.sh}) on $e^+e^-\to t\bar t$ at
+$D=10^4$, $8$k steps, seed 2, at the MSE baseline's own HPs (\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144},
+the best of its sweep), V100, \code{sign\_head} off (a positive probe): $\mu$-MSE (val, standardized
+$\log|\mathcal M|^2$) $1.37\times10^{-7}$ against the MSE baseline's $3.57\times10^{-7}$, i.e.\
+$2.6\times$ lower error; test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
+to the last step, which is also the best checkpoint. Calibration is not there yet: the pulls peak at 0
+with a width of about $0.3$, so $\sigma$ overestimates the error by about $3\times$, and the NLL was
+still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
+\code{sign\_head} with \code{HETEROSC} (asserted incompatible) and left an empty
+\code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1}.
+
 \paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
