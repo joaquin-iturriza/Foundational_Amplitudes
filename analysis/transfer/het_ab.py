@@ -37,7 +37,7 @@ def main():
     for d, c, lab in ((dm, "k", "MSE"), (dh, ps.C.vermillion, "heteroscedastic")):
         a = np.abs(d)
         h, e = np.histogram(a, bins=bins)
-        ax.stairs(h / len(a) / np.diff(np.log10(e)), e, color=c, label=f"{lab}, median {np.median(a):.1e}")
+        ax.stairs(h / len(a) / np.diff(np.log10(e)), e, color=c, label=lab)
     ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta| = |A_\theta - A|/A$"); ax.set_ylabel(r"events per unit $\log_{10}|\Delta|$")
     ps.process_label(ax, LAB); ps.legend(ax, "upper left")
     ps.save(fig, os.path.join(OUT, "het_ab_delta"))
@@ -48,8 +48,8 @@ def main():
     x = np.linspace(-5, 5, 201); g = np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi)
     fig, (a1, a2) = ps.figure(ncols=2)
     for ax, log in ((a1, False), (a2, True)):
-        ax.hist(pull, bins=np.linspace(-5, 5, 61), density=True, histtype="step", color=ps.C.vermillion,
-                label=f"pulls, mean {pull.mean():.2f}, std {pull.std():.2f}")
+        hh, ee = np.histogram(pull, bins=np.linspace(-5, 5, 61), density=True)
+        ax.stairs(hh, ee, color=ps.C.vermillion, label=f"pulls, std {pull.std():.2f}")
         ax.plot(x, g, "--", color="k", label=r"$\mathcal{N}(0,1)$")
         ax.set_xlabel(r"$(\mu-\log|\mathcal{M}|^2)/\sigma$"); ax.set_ylabel("density")
         if log:
@@ -63,7 +63,7 @@ def main():
     cs = np.array([np.median(sg[idx == k]) for k in range(10)])
     rms = np.array([np.sqrt(np.mean(r[idx == k] ** 2)) for k in range(10)])
     fig, ax = ps.figure()
-    ax.plot(cs, rms, "o-", color=ps.C.vermillion, label=r"RMS $|\mu-\log|\mathcal{M}|^2|$ per $\sigma$ decile")
+    ax.plot(cs, rms, "o-", color=ps.C.vermillion, label=r"RMS error per $\sigma$ decile")
     lim = [min(cs.min(), rms.min()) / 2, max(cs.max(), rms.max()) * 2]
     ax.plot(lim, lim, "--", color="k", label="calibrated")
     ax.set_xscale("log"); ax.set_yscale("log")
