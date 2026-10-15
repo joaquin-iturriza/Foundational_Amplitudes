@@ -2172,7 +2172,21 @@ $4.4\times10^{-3}$, EMA on) does not beat the fixed-clip sweep's $-7.63$, so the
 (D69, \code{sweep\_config\_tp\_het\_sigonly\_ee\_ttbar\_d8.yaml}: $250$ steps, its lr and warmup searched, 8 trials) reaches
 validation NLL $-9.764$ at lr $0.097$, against $-9.680$ for the $4$k-step refit at the trial's lr $2.3\times10^{-3}$; the six
 trials with lr $\approx0.1$ are within $0.01$ of their final NLL by step $150$ to $170$ and past the $4$k refit by step
-$100$. The best lr sits at the top of the searched range.
+$100$. The best lr sits at the top of the searched range. Its calibration on test (Fig.~\ref{fig:het_sigonly}, \code{analysis/transfer/het\_sigonly.py}): pull std
+$1.02$, $|{\rm pull}|<1$ for $0.67$ of the events ($0.68$ for a Gaussian), the RMS error over $\sigma$ per decile $0.73$
+to $1.22$ except the worst-predicted decile at $2.15$; the $4$k refit gives $1.03$, $0.69$ and $0.65$ to $1.24$ (worst
+$2.42$), the joint model $0.60$, $0.93$ and $0.22$ to $1.56$.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_sigonly.pdf}
+\caption{The $\sigma$-only stage on the $32$k het model ($e^+e^-\to t\bar t$, $D=10^4$), test split: the joint model, the
+$4000$-step refit at the trial's lr, and the best $250$-step refit (lr $0.097$). Left: the RMS actual error against the
+median predicted $\sigma$ per $\sigma$ decile, with the calibrated diagonal. Right: the pulls, with $\mathcal N(0,1)$
+dashed.}
+\label{fig:het_sigonly}
+\end{figure}
+
 
 \begin{figure}[H]
 \centering
