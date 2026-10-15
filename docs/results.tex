@@ -5536,9 +5536,13 @@ of the three share a test set.
     (Sec.~\ref{sec:jcaus}). For the user: an unmasked parent with the affine-in-$N$ statistics, to tell the mask's share of
     the gain from the statistics'. To tell the user with the result: Jonas's code is not public, so ``the same
     implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
-    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). User's calls of 2026-10-15 13:30: the EMA checkpoint fix (D63: the best model is the EMA weights; the post-training
-evaluation and fine-tunes use them), being implemented; the catalog sweep launched (\code{dancat\_het\_pre}, $32$k,
-waves $3+3+2$; its $200$\,GB fits only CC's large V100 node and the H100 nodes, so it queues there); the het loss at
+    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). User's calls of 2026-10-15 13:30: the EMA checkpoint fix (D63), done (commits \code{cd26a58} to \code{cff8039}: with EMA on, the
+checkpoint's \code{"model"} is the EMA weights and \code{"model\_live"} the live ones, \code{"model\_is\_ema"} marks the
+format; the post-training evaluation scores the best checkpoint's EMA; fine-tunes start from the parent's EMA weights,
+old checkpoints through the EMA shadow mapped by parameter name; \code{tests/test\_ema\_checkpoint.py}, real-model check
+$3/3$; from now on, fine-tunes of EMA parents start from different weights than the transfer study's so far); the catalog sweep launched (\code{dancat\_het\_pre}, $32$k,
+waves $3+3+2$; its $200$\,GB fits only CC's large V100 node and the H100 nodes; the user: ``there has to be a way around this'':
+a memory-mapped data path whose memory scales with the batch, being built and measured, then the sweep restarts); the het loss at
 \code{hp1550} for $16$k and $32$k, no sweep (D61; \code{FA-ccin2p3-fbf72862}, \code{FA-ccin2p3-d9c9c5cb}); selection
 on the NLL by default (D62); the unmasked control \code{tp3\_jaff\_r9} (D65, CC job 61554675); the $\Delta$ plots are the
 $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
