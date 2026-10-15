@@ -35,7 +35,7 @@ def texts(content):
 
 
 def scan(path):
-    """The user's typed messages (oldest first) and the last assistant text."""
+    """The messages typed since the current turn began (its prompt, then any sent mid-turn), and the last assistant text."""
     msgs, reply = [], ""
     for line in open(path):
         if not line.strip():
@@ -51,7 +51,7 @@ def scan(path):
                         if part:
                             msgs.append(part)
                 elif t and not t.startswith(SKIP) and r.get("toolUseResult") is None and not r.get("isMeta"):
-                    msgs.append(t)
+                    msgs = [t]        # a new prompt opens the window: earlier messages were answered in earlier turns
         elif r.get("type") == "assistant":
             tx = "".join(texts(m.get("content"))).strip()
             if tx:
@@ -71,7 +71,7 @@ def main():
     reply = inp.get("last_assistant_message") or reply
     if not msgs or not reply:
         return 0
-    recent = msgs[-2:]
+    recent = msgs[-3:]
     h = hashlib.sha1(recent[-1].encode()).hexdigest()
     try:
         st = json.load(open(STATE))
