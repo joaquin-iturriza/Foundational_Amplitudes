@@ -29,6 +29,7 @@ To add a new process, add an entry to the PROCESSES dictionary below.
 
 import os
 import glob
+import math
 import re
 import sys
 import gzip
@@ -338,7 +339,10 @@ def recipe_id(recipe):
                 #       it IS identity. variable_energy_recipe only adds it for
                 #       TRAIN (byte-strict $SCRATCH cache); val/test omit it so the
                 #       frozen benchmark is chunk-policy-independent.
-                "chunked", "chunk_size", "gen_weight"}
+                "chunked", "chunk_size", "gen_weight",
+                # `lhe_run`: what an lhe_pp MadEvent run reported (event count, cross section,
+                # MG5 version, timings): a record of the run, not "what the data is".
+                "lhe_run"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -1633,6 +1637,32 @@ def _load_catalog_v2():
     return n
 
 CATALOG_V2_ENTRIES = _load_catalog_v2()
+
+
+def _load_catalog_daniel():
+    """Append the arXiv:2606.23791 (LLM4LHC) catalog (recipes/gen_catalog_daniel.py): pp processes
+    whose events come from MadEvent with their cards (kind ``lhe_pp``; generation in the LHE_PP
+    section below). Every entry is named dc_<their folder>, so none may collide with another."""
+    import yaml as _yaml
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes", "catalog_daniel_processes.yaml")
+    if not os.path.exists(path):
+        return 0
+    with open(path) as f:
+        d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+    lhe = dict(d.get("lhe") or {})
+    n = 0
+    for name, entry in (d.get("processes") or {}).items():
+        if name in PROCESSES:
+            raise KeyError(f"catalog_daniel entry {name} collides with an existing process")
+        PROCESSES[name] = dict(entry, lhe=lhe); n += 1
+    return n
+
+CATALOG_DANIEL_ENTRIES = _load_catalog_daniel()
+
+
+def is_lhe_pp(process):
+    """True for a process whose events are MadEvent pp events (catalog_daniel), not our samplers."""
+    return PROCESSES.get(process, {}).get("kind") == "lhe_pp"
 
 # =============================================================================
 # STANDARD RUN CARD SETTINGS applied to every process
@@ -3120,6 +3150,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     dataset. Hence `n_chunks` is left out of the val/test identity entirely — one
     test set serves regardless of how it was sliced for generation."""
     cfg = register_synthetic(process) if is_synthetic(process) else PROCESSES[process]
+    if cfg.get("kind") == "lhe_pp":
+        # MadEvent pp events (catalog_daniel): a different generator, so a different identity
+        return lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=role, seed=seed)
     k   = cfg.get("alphas_power", 0)
     n   = int(n_events)
     recipe = {
@@ -3187,6 +3220,8 @@ def recipe_output_path(recipe, out_dir):
     # a steered pool (tools/steer_pool.py) has its own tag: it is built from a reference model's
     # sigma, never by this generator, and must not shadow the mixture pool of the same spec
     samp_tag = {"flat": "", "steered": "_ssteer"}.get(mode, "_smix")
+    if recipe.get("mode") == "lhe_pp":
+        samp_tag = "_lhe"          # MadEvent pp events (catalog_daniel), never a sampler's pool
     return (f"{out_dir}/{recipe['process']}"
             f"_{recipe['sqrts_min']:.0f}-{recipe['sqrts_max']:.0f}GeV"
             f"{role_tag}{samp_tag}_amplitudes.npy")
@@ -3217,6 +3252,8 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
+    if recipe.get("mode") == "lhe_pp":
+        return build_lhe_pp(process, [(recipe, output_file)])[0][0]
     if (recipe.get("sampling") or {}).get("mode") == "steered":
         raise RuntimeError(
             f"{output_file}: a steered pool is not generated here; build it with tools/steer_pool.py "
@@ -3253,6 +3290,323 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
     full["backend"]        = backend
     write_recipe(output_file, full)
     return output_file
+
+
+# =============================================================================
+# LHE_PP: pp events from MadEvent (catalog_daniel, arXiv:2606.23791)
+# =============================================================================
+# Our samplers have no PDFs and do not unweight, so a catalog defined by a hadron-collider
+# generation (theirs: MadEvent, pp at 2 x 6500 GeV, nn23lo1, dynamical scale, unweighted, pT/eta
+# generation cuts) takes its momenta from MadEvent itself, run with THEIR run_card and param_card
+# verbatim except nevents and iseed. Each LHE event is labelled with our standalone_cpp |M|^2
+# (CppDriverPipe, rows -> MadGraph slots by row_to_slot_perm) at the event's own alpha_s (AQCDUP:
+# the PDF set's running alpha_s at the event's dynamical scale, the value MadEvent used), on the
+# event's own momenta: a massive incoming b keeps its LHE kinematics, no special treatment.
+# One MadEvent run per process feeds all three roles: the events are shuffled (seeded) and cut into
+# [val | test | train] blocks of the catalog's sizes (lhe_layout), so the roles are disjoint; a role
+# asking fewer events than its block takes the block's first n. Bytes are reproducible given the
+# MadEvent output; MadEvent itself is deterministic at fixed iseed on one core (run_mode 0), but the
+# MG5 version is not part of the identity (3.7.0 at CC-IN2P3; they used 3.5.12), as for every pool.
+
+LHE_MARGIN = float(os.environ.get("AMP_LHE_MARGIN", "0.02"))   # extra events asked of MadEvent
+
+
+def lhe_layout(cfg):
+    """role -> [start, stop) of its block in the shuffled events of the process's MadEvent run."""
+    l = cfg["lhe"]
+    nv, nt, ntr = int(l["n_val"]), int(l["n_test"]), int(l["n_train"])
+    return {"val": (0, nv), "test": (nv, nv + nt), "train": (nv + nt, nv + nt + ntr)}
+
+
+def lhe_n_requested(cfg):
+    """Events asked of MadEvent: the layout plus a margin (an unweighted run can come back short)."""
+    total = lhe_layout(cfg)["train"][1]
+    return int(math.ceil(total * (1.0 + LHE_MARGIN)))
+
+
+def lhe_cards(cfg):
+    """(run_card, param_card) paths of an lhe_pp entry (their cards, copied verbatim)."""
+    d = os.path.join(os.path.dirname(os.path.abspath(__file__)), cfg["lhe"]["cards_dir"])
+    return os.path.join(d, cfg["lhe"]["run_card"]), os.path.join(d, cfg["lhe"]["param_card"])
+
+
+def lhe_iseed(process, seed):
+    """MadEvent iseed of a process, deterministic in (process, seed) and kept small: MadEvent derives
+    its per-channel ranmar seeds from it."""
+    return int(hashlib.sha256(f"{process}|{seed}".encode()).hexdigest(), 16) % 20000 + 1
+
+
+def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None):
+    """Identity of an lhe_pp pool. sqrts_min/max only label the path (the hadronic 13 TeV); the
+    events are fixed by the cards, the generate line, iseed, the events asked of MadEvent and the
+    block of the shuffled run this role reads."""
+    cfg = PROCESSES[process]
+    seed = 0 if seed is None else int(seed)
+    lo, hi = lhe_layout(cfg)[role or "train"]
+    n = int(n_events)
+    if n > hi - lo:
+        raise ValueError(f"{process}: {n} {role} events asked, the catalog's block holds {hi - lo} "
+                         f"(lhe n_val/n_test/n_train in recipes/catalog_daniel_processes.yaml)")
+    run_card, param_card = lhe_cards(cfg)
+    return {
+        "process":          process,
+        "mode":             "lhe_pp",
+        "sqrts_min":        float(sqrts_min),
+        "sqrts_max":        float(sqrts_max),
+        "n_events":         n,
+        "role":             role,
+        "seed":             seed,
+        "pdg_ids":          [int(p) for p in cfg["pdg_ids"]],
+        "m_finals":         [float(m) for m in cfg["m_finals"]],
+        "alphas_power":     int(cfg.get("alphas_power", 0)),
+        "amp_orders":       order_vector(cfg),
+        "mg5_generate":     list(cfg["mg5_generate"]),
+        "per_event_alphas": "lhe_aqcdup",
+        "label_convention": "mg5_slot_v2",
+        "lhe": {
+            "model":             cfg["lhe"].get("model", "sm"),
+            "iseed":             lhe_iseed(process, seed),
+            "n_requested":       lhe_n_requested(cfg),
+            "block":             [lo, lo + n],
+            "run_card_sha256":   _file_sha256(run_card),
+            "param_card_sha256": _file_sha256(param_card),
+        },
+    }
+
+
+def lhe_work_dir():
+    """Where the per-process MadEvent directories live while they run (deleted afterwards)."""
+    d = os.environ.get("AMP_LHE_WORK_DIR")
+    if d:
+        return d
+    s = os.environ.get("SCRATCH")
+    return os.path.join(s, "lhe_work") if s else os.path.join(OUTPUT_DIR, ".lhe_work")
+
+
+def lhe_standalone_dir(process):
+    return f"{WORK_DIR}/{process}_standalone"
+
+
+def _mg5_script(script, log_path):
+    with open(log_path, "a") as log:
+        r = subprocess.run([MG5_BIN], input=script, text=True, stdout=log, stderr=subprocess.STDOUT)
+    if r.returncode != 0:
+        raise RuntimeError(f"mg5_aMC exited {r.returncode}; log {log_path}")
+
+
+def _set_me5_config(path, values):
+    """Set `key = value` lines of a me5_configuration.txt (commented defaults included)."""
+    lines, done = open(path).read().splitlines(True), set()
+    for i, line in enumerate(lines):
+        m = re.match(r"^\s*#?\s*(\w+)\s*=", line)
+        if m and m.group(1) in values and m.group(1) not in done:
+            lines[i] = f"{m.group(1)} = {values[m.group(1)]}\n"
+            done.add(m.group(1))
+    lines += [f"{k} = {v}\n" for k, v in values.items() if k not in done]
+    with open(path, "w") as f:
+        f.writelines(lines)
+
+
+def lhe_prepare(process, work_root, log_path):
+    """MG5 `output` of a fresh MadEvent directory and, unless already compiled, of the
+    standalone_cpp backend (their param card in its Cards/, C++ pipe driver). Returns (ev_dir, sa_dir)."""
+    cfg = PROCESSES[process]
+    sa = lhe_standalone_dir(process)
+    _, sub, drv, _ = detect_compiled_backend(sa)
+    need_sa = not (sub and drv and os.path.exists(f"{sa}/Cards/param_card.dat"))
+    ev = os.path.join(work_root, f"{process}_madevent")
+    for d in [ev] + ([sa] if need_sa else []):
+        if os.path.isdir(d):
+            shutil.rmtree(d)          # a half-written output from an interrupted run
+    os.makedirs(work_root, exist_ok=True)
+    script = (f"import model {cfg['lhe'].get('model', 'sm')}\n" + "\n".join(cfg["mg5_generate"]) +
+              f"\noutput {ev}\n" + (f"output standalone_cpp {sa}\n" if need_sa else "") + "quit\n")
+    _mg5_script(script, log_path)
+    if need_sa:
+        shutil.copy2(lhe_cards(cfg)[1], f"{sa}/Cards/param_card.dat")
+        compile_backends(sa, int(cfg["nfinal"]) + 2)
+    return ev, sa
+
+
+def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1):
+    """generate_events in `ev` with the catalog's cards (nevents and iseed set). run_mode 0 (one core)
+    unless mg_cores > 1. Returns (lhe_path, banner_path)."""
+    cfg = PROCESSES[process]
+    run_card, param_card = lhe_cards(cfg)
+    shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
+    shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
+    patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(nevents), "iseed": int(iseed)})
+    mg_cores = max(1, int(mg_cores))
+    _set_me5_config(f"{ev}/Cards/me5_configuration.txt",
+                    {"run_mode": 0 if mg_cores == 1 else 2, "nb_core": mg_cores,
+                     "automatic_html_opening": "False"})
+    with open(log_path, "a") as log:
+        r = subprocess.run([f"{ev}/bin/generate_events", "run_01", "-f"], cwd=ev, stdout=log,
+                           stderr=subprocess.STDOUT, env=dict(os.environ, OMP_NUM_THREADS="1"))
+    lhe = f"{ev}/Events/run_01/unweighted_events.lhe.gz"
+    if r.returncode != 0 or not os.path.exists(lhe):
+        raise RuntimeError(f"{process}: generate_events exited {r.returncode}, no {lhe}; log {log_path}")
+    banners = sorted(glob.glob(f"{ev}/Events/run_01/*_banner.txt"))
+    return lhe, (banners[0] if banners else None)
+
+
+def _lhe_rows(parts, pdg_ids, n_in=2):
+    """One event's (status, pdg, p4) list -> momenta in `pdg_ids` row order (identical particles in
+    LHE order). Incoming are status -1, outgoing status +1; intermediate resonances are dropped."""
+    rows = []
+    for want, st in ((pdg_ids[:n_in], -1), (pdg_ids[n_in:], 1)):
+        pool = [(p, m) for s, p, m in parts if s == st]
+        if len(pool) != len(want):
+            raise ValueError(f"LHE event has {[p for p, _ in pool]} with status {st}, expected {list(want)}")
+        for w in want:
+            j = next((i for i, (p, _) in enumerate(pool) if p == w), None)
+            if j is None:
+                raise ValueError(f"LHE event has no pdg {w} among {[p for p, _ in pool]} (status {st})")
+            rows.append(pool.pop(j)[1])
+    return rows
+
+
+def read_lhe_pp(lhe_path, pdg_ids):
+    """Stream an LHE file -> (momenta (N, n, 4) as (E, px, py, pz) in `pdg_ids` row order,
+    alpha_s per event (AQCDUP), scale per event (SCALUP))."""
+    pdg_ids = [int(p) for p in pdg_ids]
+    moms, aqcd, scal = [], [], []
+    opener = gzip.open if str(lhe_path).endswith(".gz") else open
+    with opener(lhe_path, "rt") as f:
+        parts = head = None
+        for line in f:
+            s = line.strip()
+            if not s:
+                continue
+            if s.startswith("<event"):
+                parts, head = [], None
+                continue
+            if parts is None:
+                continue
+            if s.startswith("</event"):
+                moms.append(_lhe_rows(parts, pdg_ids))
+                aqcd.append(float(head[5]))
+                scal.append(float(head[3]))
+                parts = None
+                continue
+            if s[0] in "<#":
+                continue                # <mgrwt>, <scales>, ... inside the event block
+            c = s.split()
+            if head is None:
+                head = c                # NUP IDPRUP XWGTUP SCALUP AQEDUP AQCDUP
+                continue
+            st = int(c[1])
+            if st in (-1, 1):
+                parts.append((st, int(c[0]), (float(c[9]), float(c[6]), float(c[7]), float(c[8]))))
+    return (np.asarray(moms, dtype=np.float64).reshape(len(moms), len(pdg_ids), 4),
+            np.asarray(aqcd, dtype=np.float64), np.asarray(scal, dtype=np.float64))
+
+
+def label_lhe_pp(process, momenta, alphas, sa=None):
+    """|M|^2 of `process` at each event's momenta (rows in pdg_ids order) and alpha_s, through the
+    standalone_cpp pipe driver."""
+    cfg = PROCESSES[process]
+    sa = sa or lhe_standalone_dir(process)
+    backend, sub, drv, _ = detect_compiled_backend(sa)
+    if backend != "cpp" or drv is None:
+        raise RuntimeError(f"{process}: no compiled C++ driver under {sa} (lhe_prepare builds it)")
+    perm = row_to_slot_perm(cfg["pdg_ids"], cfg["mg5_generate"])
+    with CppDriverPipe(drv, sa) as pipe:
+        amps = pipe.compute([(m, None) for m in momenta], perm=perm, alphas=alphas)
+    return np.asarray(amps, dtype=np.float64)
+
+
+def _mg5_version():
+    try:
+        with open(os.path.join(os.path.dirname(os.path.dirname(MG5_BIN)), "VERSION")) as f:
+            return next((l.split("=", 1)[1].strip() for l in f if l.startswith("version")), None)
+    except OSError:
+        return None
+
+
+def _banner_xsec(banner):
+    try:
+        m = re.search(r"Integrated weight \(pb\)\s*:\s*([-+0-9.eE]+)", open(banner).read())
+        return float(m.group(1)) if m else None
+    except (OSError, TypeError):
+        return None
+
+
+def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True, keep_dir=None):
+    """Generate the pools `items` = [(recipe, out_path), ...] of ONE lhe_pp process from one
+    MadEvent run: MG5 output (+ standalone backend if missing), generate_events, stream-parse the
+    LHE, seeded shuffle, slice each recipe's block, label it, write the .npy (and, if
+    `write_sidecars`, its .recipe.json + manifest entry; a parallel caller writes them itself,
+    serially, from the returned recipes). The banner is kept next to each pool directory, the
+    MadEvent directory is deleted (AMP_LHE_KEEP=1 keeps it). Returns [(out_path, full_recipe)]."""
+    cfg = PROCESSES[process]
+    recs = [r for r, _ in items]
+    if not recs or any(r["process"] != process or r.get("mode") != "lhe_pp" for r in recs):
+        raise ValueError(f"build_lhe_pp({process}): items must be lhe_pp recipes of this process")
+    runs = {(r["seed"], r["lhe"]["iseed"], r["lhe"]["n_requested"]) for r in recs}
+    if len(runs) != 1:
+        raise ValueError(f"build_lhe_pp({process}): recipes from different MadEvent runs {runs}")
+    seed, iseed, n_req = runs.pop()
+    keep_dir = os.environ.get("AMP_LHE_KEEP") == "1" if keep_dir is None else keep_dir
+    work_root = work_root or lhe_work_dir()
+    os.makedirs(work_root, exist_ok=True)
+    log_path = os.path.join(work_root, f"{process}.mg5.log")
+    open(log_path, "w").close()
+    secs, t0 = {}, time.time()
+    ev, sa = lhe_prepare(process, work_root, log_path)
+    secs["output"] = time.time() - t0; t0 = time.time()
+    lhe, banner = lhe_run_madevent(process, ev, n_req, iseed, log_path, mg_cores)
+    secs["madevent"] = time.time() - t0; t0 = time.time()
+    mom, aqcd, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+    secs["parse"] = time.time() - t0; t0 = time.time()
+    n_lhe = len(mom)
+    need = max(r["lhe"]["block"][1] for r in recs)
+    if n_lhe < need:
+        raise RuntimeError(f"{process}: MadEvent returned {n_lhe} events, the blocks need {need} "
+                           f"(asked {n_req}); raise AMP_LHE_MARGIN")
+    order = np.random.default_rng(np.random.SeedSequence([seed, iseed])).permutation(n_lhe)
+    mom, aqcd = mom[order], aqcd[order]
+    xsec, version = _banner_xsec(banner), _mg5_version()
+    npart = int(cfg["nfinal"]) + 2
+    pdg_row = np.asarray(cfg["pdg_ids"], dtype=np.float64)
+    out = []
+    for rec, path in items:
+        lo, hi = rec["lhe"]["block"]
+        m, a = mom[lo:hi], aqcd[lo:hi]
+        amps = label_lhe_pp(process, m, a, sa)
+        bad = ~np.isfinite(amps) | (amps <= 0)
+        if bad.any():
+            raise RuntimeError(f"{process} {rec['role']}: {int(bad.sum())} labels non-finite or <= 0")
+        n = hi - lo
+        data = np.concatenate([m.reshape(n, npart * 4), np.tile(pdg_row, (n, 1)), amps[:, None]], axis=1)
+        d = os.path.dirname(path) or "."
+        os.makedirs(d, exist_ok=True)
+        tmp = path + ".tmp.npy"
+        np.save(tmp, data)
+        os.replace(tmp, path)
+        bcopy = None
+        if banner:
+            bcopy = os.path.join(d, f"{process}_lhe_iseed{iseed}.banner.txt")
+            shutil.copy2(banner, bcopy)
+        full = dict(rec)
+        full["effective_seed"] = seed
+        full["backend"] = "cpp"
+        full["lhe_run"] = {"n_lhe_events": n_lhe, "xsec_pb": xsec, "mg5_version": version,
+                           "banner": bcopy, "mg_cores": int(mg_cores),
+                           "alphas_range": [float(a.min()), float(a.max())],
+                           "amp_range": [float(amps.min()), float(amps.max())],
+                           "seconds": {k: round(v, 1) for k, v in secs.items()}}
+        if write_sidecars:
+            write_recipe(path, full)
+        out.append((path, full))
+        print(f"[LHE] {process} {rec['role']}: {n} events [{lo}:{hi}] of {n_lhe} -> {path}  "
+              f"|M|^2 in [{amps.min():.3e}, {amps.max():.3e}]", flush=True)
+    secs["label+write"] = time.time() - t0
+    if not keep_dir:
+        shutil.rmtree(ev, ignore_errors=True)
+    print(f"[LHE] {process}: done (iseed {iseed}, xsec {xsec} pb, MG5 {version}); seconds "
+          + ", ".join(f"{k} {v:.1f}" for k, v in secs.items()), flush=True)
+    return out
 
 
 # =============================================================================

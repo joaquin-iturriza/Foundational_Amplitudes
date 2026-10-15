@@ -446,6 +446,11 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
         raise RuntimeError(f"{out}: a steered pool is not generated here; build it with "
                            f"tools/steer_pool.py (recipe_id {wanted})")
 
+    # MadEvent pp events (catalog_daniel): one MadEvent run feeds every role, so build the other
+    # roles' default pools from the same run while at it (prebuild_recipes does this in parallel).
+    if mg.is_lhe_pp(process):
+        return ensure_lhe_pp(process, {role: (n_events, dest_dir)}, seed, sqrts_min, sqrts_max)[role]
+
     # NLO α_s scan: derive from the stripped base by reweighting (ONE MadLoop run
     # per base feeds all its α_s points) instead of re-running MadLoop per point.
     if is_reweightable_virt_scan(process):
@@ -465,6 +470,48 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     ordered = [results[i] for i in sorted(results)]
     return finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
                             ordered, dest_dir, work)
+
+
+def lhe_pp_items(process, wants, seed, sqrts_min, sqrts_max, fill_defaults=True):
+    """[(recipe, out_path)] still to build for an lhe_pp process. `wants` = {role: (n_events,
+    dest_dir or None)}; with `fill_defaults`, the roles not asked are added at the catalog's block
+    sizes (lhe n_val/n_test/n_train) in their default directories, since they come from the same
+    MadEvent run. Cached pools are left out."""
+    cfg = mg.PROCESSES[process]
+    full = dict(wants)
+    if fill_defaults:
+        for r, (lo, hi) in mg.lhe_layout(cfg).items():
+            full.setdefault(r, (hi - lo, None))
+    items = {}
+    for r, (n, dest) in full.items():
+        rec = mg.variable_energy_recipe(process, sqrts_min, sqrts_max, n, role=r, seed=seed)
+        out = mg.recipe_output_path(rec, dest or dest_for_role(r))
+        items[r] = (rec, out, _is_cached(out, mg.recipe_id(rec)))
+    return items
+
+
+def ensure_lhe_pp(process, wants, seed, sqrts_min, sqrts_max, mg_cores=1):
+    """Paths {role: npy} of an lhe_pp process's pools for `wants` = {role: (n_events, dest_dir)},
+    built (with the other roles' default pools) from one MadEvent run when any is missing."""
+    items = lhe_pp_items(process, wants, seed, sqrts_min, sqrts_max)
+    todo = [(rec, out) for rec, out, cached in items.values() if not cached]
+    if todo:
+        mg.build_lhe_pp(process, todo, mg_cores=mg_cores)
+    return {r: items[r][1] for r in wants}
+
+
+def build_lhe_pp_job(job):
+    """Pool worker of prebuild_recipes: one lhe_pp process, sidecars left to the parent (the
+    manifest upsert is not safe across processes). Never raises: returns
+    (process, [(out, full_recipe)], error or None, seconds)."""
+    import time, traceback
+    process, todo, mg_cores = job["process"], job["items"], job.get("mg_cores", 1)
+    t0 = time.time()
+    try:
+        res = mg.build_lhe_pp(process, todo, mg_cores=mg_cores, write_sidecars=False)
+        return process, res, None, time.time() - t0
+    except BaseException as e:          # compile_backends sys.exit()s on a failed g++
+        return process, [], f"{type(e).__name__}: {e}\n{traceback.format_exc()[-1500:]}", time.time() - t0
 
 
 def ensure_split_set(specs, role, seed, dest_dir=None, require_cache=False):

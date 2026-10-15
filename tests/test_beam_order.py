@@ -79,7 +79,11 @@ def test_masses_match_card():
         for pdg, mf in zip(cfg["pdg_ids"][2:], m):
             want = card.get(abs(int(pdg)), 0.0)
             assert abs(mf - want) < 1e-6, f"{name}: pdg {pdg} sampled at {mf}, card has {want}"
-        if any(abs(int(q)) == 6 for q in cfg["pdg_ids"][2:]):
+        if cfg.get("kind") == "lhe_pp":
+            # catalog_daniel generates and labels with ITS param card (top 173.0, the sm default
+            # above), not LOCKED_MT: the card must be the default card's masses
+            assert mg.lhe_cards(cfg)[1].endswith("param_card_sm.dat"), name
+        elif any(abs(int(q)) == 6 for q in cfg["pdg_ids"][2:]):
             # the top mass on the card, its Yukawa and the sampling mass agree: LOCKED_MT on the
             # base entries, the scanned value on a registered m_t variant
             mt = float(patches.get("MT", -1)); mt_sampled = [mf for q, mf in zip(cfg["pdg_ids"][2:], m) if abs(int(q)) == 6][0]

@@ -93,6 +93,8 @@ def existing_by_canon():
     for n, c in mg.PROCESSES.items():
         if c.get("_v2"):
             continue      # generated last time: not "existing" for the purpose of re-generation
+        if c.get("kind") == "lhe_pp":
+            continue      # catalog_daniel (pp, MadEvent events): another catalog, not this one's base
         if "mg5_generate" in c and c.get("kind") != "virt" and "pdg_ids" in c and len(c["mg5_generate"]) == 1:
             out.setdefault(canon(c["mg5_generate"][0]), n)
     return out
@@ -288,7 +290,7 @@ def main():
         # one-loop entry yet (existing *_nlo entries and their VIRT bases are kept as is)
         from tools.nlo_virtual_pipeline import VIRT_PROCESSES
         have_virt = {canon(re.sub(r"\s*\[.*?\]\s*$", "", v["mg5"])) for v in VIRT_PROCESSES.values() if not v.get("_v2")}
-        trees = {n: mg.PROCESSES[n] for n in mg.PROCESSES if mg.PROCESSES[n].get("kind") != "virt" and "mg5_generate" in mg.PROCESSES[n]
+        trees = {n: mg.PROCESSES[n] for n in mg.PROCESSES if mg.PROCESSES[n].get("kind") not in ("virt", "lhe_pp") and "mg5_generate" in mg.PROCESSES[n]
                  and "pdg_ids" in mg.PROCESSES[n] and not mg.PROCESSES[n].get("_v2")}
         trees.update({n: e for n, e in procs.items()})
         n_nlo = 0

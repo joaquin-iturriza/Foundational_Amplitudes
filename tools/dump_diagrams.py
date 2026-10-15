@@ -22,6 +22,7 @@ Usage:
     python tools/dump_diagrams.py --process ee_ttbar --process ee_uug
     python tools/dump_diagrams.py --all
     python tools/dump_diagrams.py --all --out-dir data/diagrams
+    python tools/dump_diagrams.py --prefix dc_ --skip-existing --workers 48   # catalog_daniel
 """
 
 import argparse
@@ -342,6 +343,17 @@ def dump_process(name, spec, out_dir, model_name="sm"):
     return path, f"{len(subprocesses)} subprocess(es), {n_diag} diagram(s)"
 
 
+def _dump_one(job):
+    """(name, out_dir, model) -> (name, path or None, info); exceptions come back as info 'EXC ...'."""
+    name, out_dir, model = job
+    from mg5_pipeline_final import PROCESSES
+    try:
+        path, info = dump_process(name, PROCESSES[name], out_dir, model)
+    except Exception as e:
+        return name, None, f"EXC {type(e).__name__}: {e}"
+    return name, path, info
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -355,6 +367,11 @@ def main():
                         help="Default MadGraph model (overridden per-process by spec['model']).")
     parser.add_argument("--skip-existing", action="store_true",
                         help="Skip processes whose sidecar already exists.")
+    parser.add_argument("--prefix", action="append", default=[],
+                        help="Every registry process whose name starts with PREFIX (repeatable), "
+                             "e.g. dc_ for catalog_daniel.")
+    parser.add_argument("--workers", type=int, default=1,
+                        help="Processes dumped in parallel, each in its own MG5 instance (default 1).")
     args = parser.parse_args()
 
     _silence_mg5()
@@ -363,11 +380,12 @@ def main():
     if args.all:
         names = list(PROCESSES.keys())
     else:
-        names = args.process
+        names = list(args.process) + [n for n in PROCESSES
+                                      if any(n.startswith(p) for p in args.prefix) and n not in args.process]
     if not names:
-        parser.error("specify --process NAME (repeatable) or --all")
+        parser.error("specify --process NAME (repeatable), --prefix PREFIX or --all")
 
-    ok, failed = [], []
+    ok, failed, todo = [], [], []
     for name in names:
         if name not in PROCESSES:
             print(f"[skip] {name}: not in registry")
@@ -378,10 +396,17 @@ def main():
             print(f"[skip] {name}: sidecar exists")
             ok.append(name)
             continue
-        try:
-            path, info = dump_process(name, PROCESSES[name], args.out_dir, args.model)
-        except Exception as e:  # one bad process shouldn't abort the batch
-            print(f"[FAIL] {name}: {type(e).__name__}: {e}")
+        todo.append(name)
+    if args.workers > 1 and len(todo) > 1:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(max_workers=args.workers, initializer=_silence_mg5) as ex:
+            results = ex.map(_dump_one, [(n, args.out_dir, args.model) for n in todo])
+            results = list(results)
+    else:
+        results = map(_dump_one, [(n, args.out_dir, args.model) for n in todo])
+    for name, path, info in results:
+        if path is None and info.startswith("EXC "):  # one bad process shouldn't abort the batch
+            print(f"[FAIL] {name}: {info[4:]}")
             failed.append(name)
             continue
         if path is None:

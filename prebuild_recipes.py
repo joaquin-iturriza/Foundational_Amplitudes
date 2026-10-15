@@ -63,12 +63,45 @@ def _gen_chunk(task):
             time.sleep(5.0 * (attempt + 1))
 
 
+def _run_lhe_jobs(lhe_jobs, args):
+    """lhe_pp processes (catalog_daniel): one MadEvent run per process, workers // lhe_cores of them
+    at once, costliest first (2->3 before 2->2, more diagrams first). A failed process is reported
+    and skipped, never aborts the rest; the run is resumable (built pools are cache hits next time).
+    Sidecars + manifest are written here, serially. Returns the failed process names."""
+    lhe_cores = max(1, args.lhe_cores)
+    nw = max(1, args.workers // lhe_cores)
+    order = sorted(lhe_jobs, key=lambda n: (-int(mg.PROCESSES[n]["nfinal"]),
+                                            -int(mg.PROCESSES[n].get("n_diagrams", 0)), n))
+    print(f"\nMadEvent: {len(order)} lhe_pp processes, {nw} at once x {lhe_cores} core(s); "
+          f"work dir {mg.lhe_work_dir()}", flush=True)
+    failed, t0 = [], time.time()
+    jobs = [{"process": n, "items": lhe_jobs[n], "mg_cores": lhe_cores} for n in order]
+    with ProcessPoolExecutor(max_workers=nw) as ex:
+        futs = [ex.submit(datagen.build_lhe_pp_job, j) for j in jobs]
+        for i, fut in enumerate(as_completed(futs), 1):
+            name, res, err, dt = fut.result()
+            if err:
+                failed.append(name)
+                print(f"  [LHE FAIL] {name} ({dt:.0f}s): {err}", flush=True)
+                continue
+            for out, full in res:
+                mg.write_recipe(out, full)
+            print(f"  [LHE {i}/{len(jobs)}] {name}: {len(res)} pools in {dt:.0f}s "
+                  f"({(time.time()-t0)/60:.1f} min elapsed)", flush=True)
+    print(f"MadEvent phase: {len(jobs)-len(failed)} ok, {len(failed)} failed"
+          + (f" ({' '.join(failed)})" if failed else "") + f", {(time.time()-t0)/60:.1f} min", flush=True)
+    return failed
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--workers", type=int, default=min(24, _cores_available()),
                     help="parallel chunk-generation workers (default: min(24, ncpu))")
+    ap.add_argument("--lhe-cores", type=int, default=int(os.environ.get("AMP_LHE_CORES", "1")),
+                    help="MadEvent cores per lhe_pp process (catalog_daniel); the pool then runs "
+                         "workers // lhe-cores processes at once (default 1: run_mode 0)")
     ap.add_argument("--auto-workers", action="store_true",
                     help="raise --workers up to ncpu when the cost estimate shows "
                          "more cores would shorten the prebuild (free on prepost)")
@@ -97,6 +130,7 @@ def main():
     # and reweight the children in a cheap post-pass (4).
     all_tasks, datasets = [], {}   # datasets[key] = metadata for finalize
     reweight_jobs = []             # (child_name, child_out, parent_out, role, child_recipe)
+    lhe_jobs = {}                  # lhe_pp process -> [(recipe, out)]: one MadEvent run each
     n_cached = 0
     for role in ("val", "test", "train"):
         dest = datagen.dest_for_role(role)
@@ -110,6 +144,9 @@ def main():
             if datagen._is_cached(out, rid):
                 n_cached += 1
                 print(f"  [cached] [{role:5s}] {name}")
+                continue
+            if mg.is_lhe_pp(name):
+                lhe_jobs.setdefault(name, []).append((recipe, out))
                 continue
             if datagen.is_reweightable_virt_scan(name):
                 # plan the stripped parent (dedup across this base's α_s points)
@@ -140,9 +177,14 @@ def main():
     print(f"\n{n_cached} datasets already cached; "
           f"{len(datasets)} to build ({len(all_tasks)} chunks total); "
           f"{len(reweight_jobs)} NLO α_s datasets reweighted from "
-          f"{len({j[2] for j in reweight_jobs})} stripped parents.")
+          f"{len({j[2] for j in reweight_jobs})} stripped parents; "
+          f"{len(lhe_jobs)} lhe_pp processes ({sum(map(len, lhe_jobs.values()))} pools) from MadEvent.")
+    lhe_failed = _run_lhe_jobs(lhe_jobs, args) if lhe_jobs else []
     if not datasets and not reweight_jobs:
-        print(f"\nNothing to do — all cached. ({time.time()-t_all:.1f}s)")
+        if lhe_failed:
+            sys.exit(1)
+        print(f"\nNothing else to do{' (lhe_pp built above)' if lhe_jobs else ' — all cached'}. "
+              f"({time.time()-t_all:.1f}s)")
         return
 
     if not datasets:
@@ -225,6 +267,8 @@ def main():
 
     print(f"\nBuilt {len(datasets)} datasets + reweighted {len(reweight_jobs)} "
           f"in {time.time()-t_all:.1f}s ({n_cached} were cached).")
+    if lhe_failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
