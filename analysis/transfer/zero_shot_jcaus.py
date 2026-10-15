@@ -4,6 +4,7 @@ rung 9). tools/zero_shot_parent.py scores each parent's own prediction with no d
 validated, the EMA shadow where it had EMA on).
   tp3_jcaus_r9     causal mask, prefix frames, p.P order, affine-in-N target statistics, coupling powers dropped
   tp3_jcausbnn_r9  the same with the Bayesian last layer (posterior-mean weights)
+  tp3_jaff_r9      tp3_jcaus_r9 without the three causal_* keys (no mask, the rest as jcaus; D65's control)
   tp3_gstd_r9      one shared standardization, no mask (the earlier real zero-shot parent)
 Left: validation MSE of log|M|^2 divided by the probe's variance (1 = the probe's exact mean, which no parent is given).
 Right: the same after the best affine map a + b h fitted on the probe (what is left once the scale and offset are free).
@@ -19,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import plot_style as ps  # noqa: E402
 
 ARMS = (("tp3_jcaus_r9", "causal", ps.C.vermillion), ("tp3_jcausbnn_r9", "causal + BNN", ps.C.blue),
-        ("tp3_gstd_r9", "shared std., no mask", "k"))
+        ("tp3_jaff_r9", "no mask, rest as causal", ps.C.green), ("tp3_gstd_r9", "shared std., no mask", "k"))
 
 
 def main():
