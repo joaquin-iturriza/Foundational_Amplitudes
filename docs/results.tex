@@ -5727,6 +5727,57 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     open; the grid figures leave them out (the user stopped a first version, 2026-10-03).
 \end{itemize}
 
+\section{Non-SM Lagrangians as training data}\label{sec:nonsm}
+The user's call of 2026-10-14 (D49, ``Use non SM lagrangians (less important)''): amplitudes from Lagrangians other than
+the SM's, as data. This section records the design, the pools and a first transfer test.
+
+\paragraph{Models and parameter points.} Three UFO models from MadGraph's model database (\code{import model} downloads
+them; MG5 3.7.0 on CC-IN2P3), each at one fixed point (\code{mg5\_pipeline\_final.NONSM}), each bringing a structure
+no SM pretraining has:
+\begin{itemize}
+  \item \code{DMsimp\_s\_spin1}: a vector mediator $Y_1$ (PDG $5000001$, a $Z'$), $M=500$\,GeV, vector and axial couplings to every lepton
+    ($g_V^\ell=0.3$, $g_A^\ell=0.1$), quarks at the model default $g_V^q=0.25$, the dark matter switched off ($g_V^{X_d}=0$);
+    its width $18.64$\,GeV is MG5's \code{compute\_widths} at this point. A new heavy resonance inside the probes' $\sqrt s$
+    window, interfering with $\gamma$ and $Z$.
+  \item \code{2HDM} (general, Higgs basis): $H^\pm$ $200$\,GeV, $h_2$ $250$, $h_3$ $300$, $h_1$ the SM-like $125$\,GeV;
+    the second doublet's lepton Yukawas set to zero, so $e^+e^-\to$ scalars is gauge exchange only. Spin $0$ with charge
+    is a combination no SM particle has, so it tests the particle encoding on a new point.
+  \item \code{SMEFTatNLO} (restriction \code{LO}): dimension $6$ at $\Lambda=1$\,TeV, every Wilson coefficient zero except
+    the process's own: the four-lepton contact $c_{ll}^{1122}=0.5$ in $ee\to\mu\mu$, the top's $Z$ dipole $c_{tZ}=0.5$
+    and the $(ee)(tt)$ contact $c_{te}^{1}=0.5$ in $ee\to t\bar t$; generated with \code{NP<=1}, so the target holds
+    the interference and the squared dimension-6 term. New vertex structures (a four-fermion contact, a
+    $\sigma^{\mu\nu}q_\nu$ vertex) whose effect grows with $s$.
+\end{itemize}
+Every model's SM inputs are set to the \code{sm} card's ($\alpha^{-1}=132.507$, $G_F$, $M_Z=91.188$, $M_H=125$, the
+widths) and the locked $m_t=172.5$; the SMEFT model is an $\{M_W, M_Z, G_F\}$ scheme, run at the \code{sm} card's derived
+$M_W=80.419$. So each model's SM part is the SM pools' amplitude, which \code{tools/nonsm\_validate.py} checks with the
+non-SM couplings at zero. The values are illustrative, chosen so the new structure is visible inside $\sqrt s\le1$\,TeV
+(the $Z'$, $H^\pm$ pair and $h_2h_3$ thresholds inside it, the contact terms of order the SM amplitude at $1$\,TeV), not
+fits to data.
+
+\paragraph{Encoding.} The particle table gains five rows ($Y_1$; $H^+$, $H^-$ with $T_3=\pm\tfrac12$; $h_2$, $h_3$),
+with the generator's masses. They are appended after the SM rows (\code{particle\_ids.BSM\_PARTICLE\_PROPERTIES}), so
+every SM particle keeps its index and its encoded row bit for bit (checked in all $32$ combinations of the encoding
+flags), the massless rows' neutral mass is frozen at its SM value, and a pretraining's checkpoint loads with the longer
+table (its property buffer is a prefix of the new one; \code{wrappers.py}). The $Y_1$ sits at a standardized
+$\log_{10}m$ of $2.8$, above the top's $1.8$: an extrapolation in the mass input. Unchanged: the coupling-order vector
+(the new couplings are not QED or QCD powers, so $ee\to\mu\mu$ through the $Z'$ carries SM $ee\to\mu\mu$'s $[0,0,0,2]$),
+the coupling scalars (no \code{physics} block) and the off-shellness columns ($Z$, $t$, $H$; the $Y_1$ propagator has
+none, so the model has to find the new pole from the momenta).
+
+\paragraph{Pools.} Seven $2\to2$ processes (\code{recipes/nonsm\_all.yaml}, the ladder's conventions: $10^5$ train,
+$10^4$ val and test events, mixture sampling, $\sqrt s$ from $5\%$ above threshold, else $25$\,GeV, to $1$\,TeV):
+$ee\to\mu\mu$ and $ee\to u\bar u$ through the $Z'$, $ee\to Y_1\gamma$; $ee\to H^+H^-$, $ee\to h_2h_3$; $ee\to\mu\mu$ and
+$ee\to t\bar t$ in the SMEFT. Built by \code{scripts/job\_nonsm\_gen.sh} (CPU, CC-IN2P3), which also writes their
+diagram sidecars and runs the validation.
+
+\paragraph{First test (design).} The rung-$9$ pretraining (\code{tp3\_ladder\_r9}, hp73) scored zero-shot
+(Sec.~\ref{sec:ladder}'s $L_0^\ast$) on all seven, and fine-tuned at the ladder's two fixed points against scratch's
+$8$-trial search on two probes, $ee\to\mu\mu$ through the $Z'$ (a known process, every rung pretrains on SM $ee\to\mu\mu$,
+deformed by a new pole) and $ee\to H^+H^-$ (new external particles), at $D=10^3$ and $10^4$, $8$k steps
+Proposed, not run: this cell set (two of seven probes, two $D$, one parent, one seed) is a subset of the ladder's grid
+and waits for the user's choice of cells (CLAUDE.md rule 0b).
+
 \section{The synthetic-amplitude prior}\label{sec:synthetic}
 The transfer study's step $6$ pretrains on amplitudes that no process produced (\code{tools/synthetic\_amplitudes.py},
 \code{SYN\_VERSION}$=1$; \code{recipes/transfer\_synthetic.yaml}), the prior-fitted-network idea of the hand-off

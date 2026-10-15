@@ -1,0 +1,13 @@
+# Non-SM Lagrangians (D49; docs/results.tex sec:nonsm): the seven processes of mg5_pipeline_final.NONSM, three UFO
+# models at one parameter point each (DMsimp_s_spin1's Z'-like Y1, the 2HDM's scalars, dim-6 SMEFT). The ladder's pool
+# conventions: 1e5 train, 1e4 val and test events per process, mixture sampling, sqrt(s) from 5% above threshold
+# (else 25 GeV) to 1 TeV. Built by scripts/job_nonsm_gen.sh (CPU, CC-IN2P3); none is in any SM pretraining.
+sampling: {mode: mixture}
+processes:
+  - {name: zp_ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: zp_ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: zp_ee_Y1a, sqrts: [525, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: thdm_ee_HpHm, sqrts: [420, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: thdm_ee_h2h3, sqrts: [578, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: smeft_ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: smeft_ee_ttbar, sqrts: [363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

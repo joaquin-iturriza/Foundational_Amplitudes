@@ -1,0 +1,5 @@
+# Non-SM probe (D49; docs/results.tex sec:nonsm): thdm_ee_HpHm alone, the transfer probes' conventions (mixture sampling;
+# the data-scaling grid trains on prefixes of this train split, data.train_subsample = D; val and test fixed).
+sampling: {mode: mixture}
+processes:
+  - {name: thdm_ee_HpHm, sqrts: [420, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

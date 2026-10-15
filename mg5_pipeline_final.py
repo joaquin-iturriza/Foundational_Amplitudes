@@ -396,7 +396,9 @@ MG5_PDG = {"e-": 11, "e+": -11, "mu-": 13, "mu+": -13, "ta-": 15, "ta+": -15,
            "ve": 12, "ve~": -12, "vm": 14, "vm~": -14, "vt": 16, "vt~": -16,
            "u": 2, "u~": -2, "d": 1, "d~": -1, "s": 3, "s~": -3, "c": 4, "c~": -4,
            "b": 5, "b~": -5, "t": 6, "t~": -6, "g": 21, "a": 22, "z": 23,
-           "w+": 24, "w-": -24, "h": 25}
+           "w+": 24, "w-": -24, "h": 25,
+           # non-SM models (NONSM below): DMsimp_s_spin1's vector mediator, the 2HDM's scalars (its h1 is PDG 25)
+           "y1": 5000001, "h+": 37, "h-": -37, "h1": 25, "h2": 35, "h3": 36}
 
 
 def generate_slot_pdgs(gen):
@@ -1617,6 +1619,75 @@ PROCESSES = {
 }
 
 
+# =============================================================================
+# NON-SM LAGRANGIANS (D49; docs/results.tex sec:nonsm). Three UFO models from the MG5 model database
+# (`import model` downloads them on first use; CC-IN2P3, MG5 3.7.0), each at ONE fixed parameter point:
+#   DMsimp_s_spin1   a vector mediator Y1 (PDG 5000001, a Z'), M = 500 GeV, vector and axial couplings to
+#                    every lepton (gVl = 0.3, gAl = 0.1), quarks at the model default gVq = 0.25, the dark
+#                    matter decoupled (gVXd = 0); width 18.64129 GeV from MG5's compute_widths at this point
+#   2HDM             the general 2HDM (Higgs basis), H+ 200, h2 250, h3 300 GeV, h1 = the SM-like 125 GeV;
+#                    the second doublet's lepton Yukawas set to zero, so ee -> scalars is gauge exchange only
+#   SMEFTatNLO-LO    dim-6 SMEFT at Lambda = 1 TeV, every Wilson coefficient zero except the process's own
+# Every model's SM inputs are set to the sm card's (aEWM1, Gf, MZ, MH, the widths) and the locked top mass, so each
+# model's SM part is the SM pool's amplitude (tools/nonsm_validate.py checks it with the BSM couplings at zero)
+# and the particle table's masses are the generator's (particle_ids.NONSM_MASSES_GEV mirrors NONSM_POINT).
+NONSM_POINT = {"MY1": 500.0, "WY1": 18.64129, "mhc": 200.0, "mh2": 250.0, "mh3": 300.0}
+_SM_ALIGN = {"aEWM1": 132.507, "Gf": 1.16639e-05, "MZ": 91.188, "MH": 125.0, "MT": LOCKED_MT, "ymt": LOCKED_MT,
+             "WZ": 2.441404, "WW": 2.0476, "WT": 1.4915, "WH": 6.38233934e-03}
+_ZP = {**_SM_ALIGN, "MTA": 1.777, "ymtau": 1.777, "gVXd": 0.0, "MXd": 1000.0,
+       "MY1": NONSM_POINT["MY1"], "WY1": NONSM_POINT["WY1"],
+       **{f"gVl{i}{i}": 0.3 for i in (1, 2, 3)}, **{f"gAl{i}{i}": 0.1 for i in (1, 2, 3)}}
+_ZP_OFF = {**_ZP, **{f"gVl{i}{i}": 0.0 for i in (1, 2, 3)}, **{f"gAl{i}{i}": 0.0 for i in (1, 2, 3)}}
+_THDM = {**{k: v for k, v in _SM_ALIGN.items() if k not in ("MH", "WH")}, "mh1": 125.0, "Wh1": 6.38233934e-03,
+         "mhc": NONSM_POINT["mhc"], "mh2": NONSM_POINT["mh2"], "mh3": NONSM_POINT["mh3"],
+         **{f"GL{ri}{i}x{j}": 0.0 for ri in ("R", "I") for i in (1, 2, 3) for j in (1, 2, 3)}}
+# SMEFTatNLO (restrict_LO) is an {MW, MZ, Gf} scheme: MW = the sm card's derived 80.419 gives the same alpha
+SMEFT_WILSON = ("cpDC cpWB cdp cp cWWW cG cpG cpW cpBB cpl1 cpl2 cpl3 c3pl1 c3pl2 c3pl3 cpe cpmu cpta cpqMi cpq3i "
+                "cpQ3 cpQM cpu cpt cpd ctp ctZ ctW ctG cQq83 cQq81 cQu8 ctq8 cQd8 ctu8 ctd8 cQq13 cQq11 cQu1 ctq1 "
+                "cQd1 ctu1 ctd1 cQQ8 cQQ1 cQt1 ctt1 cQt8 cQlM1 cQlM2 cQl31 cQl32 cQe1 cQe2 ctl1 ctl2 cte1 cte2 "
+                "cQlM3 cQl33 cQe3 ctl3 cte3 ctlS3 ctlT3 cblS3 cll1111 cll2222 cll3333 cll1122 cll1133 cll2233 "
+                "cll1221 cll1331 cll2332").split()
+_SMEFT0 = {**{k: v for k, v in _SM_ALIGN.items() if k != "aEWM1"}, "MW": 80.419, "Lambda": 1000.0,
+           **{c: 0.0 for c in SMEFT_WILSON}}
+_LEP = {"lpp1": "0", "lpp2": "0"}
+NONSM = {
+    # Y1 in the s-channel next to gamma and Z: a new resonance in a process every rung pretrains on (ee_mumu)
+    "zp_ee_mumu": {"model": "DMsimp_s_spin1", "mg5_generate": ["generate e+ e- > mu+ mu- QED<=2 DMV<=2"],
+                   "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [11, -11, -13, 13], "m_final": 0.0},
+    "zp_ee_uu":   {"model": "DMsimp_s_spin1", "mg5_generate": ["generate e+ e- > u u~ QED<=2 DMV<=2"],
+                   "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [11, -11, 2, -2], "m_final": 0.0},
+    # Y1 as an external leg (a new particle in the encoding), radiated with a photon
+    "zp_ee_Y1a":  {"model": "DMsimp_s_spin1", "mg5_generate": ["generate e+ e- > y1 a QED<=1 DMV<=1"],
+                   "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [11, -11, 5000001, 22],
+                   "m_finals": [NONSM_POINT["MY1"], 0.0]},
+    # charged-scalar pairs: spin 0 with charge, a combination no SM particle has
+    "thdm_ee_HpHm": {"model": "2HDM", "mg5_generate": ["generate e+ e- > h+ h-"], "nfinal": 2,
+                     "param_card_patches": _THDM, "pdg_ids": [11, -11, 37, -37],
+                     "m_finals": [NONSM_POINT["mhc"], NONSM_POINT["mhc"]]},
+    "thdm_ee_h2h3": {"model": "2HDM", "mg5_generate": ["generate e+ e- > h2 h3"], "nfinal": 2,
+                     "param_card_patches": _THDM, "pdg_ids": [11, -11, 35, 36],
+                     "m_finals": [NONSM_POINT["mh2"], NONSM_POINT["mh3"]]},
+    # dim-6 contact (ee)(mumu) and the top's Z dipole plus an (ee)(tt) contact: new vertex structures
+    "smeft_ee_mumu":  {"model": "SMEFTatNLO-LO", "mg5_generate": ["generate e+ e- > mu+ mu- QED<=2 NP<=1"],
+                       "nfinal": 2, "param_card_patches": {**_SMEFT0, "cll1122": 0.5},
+                       "pdg_ids": [11, -11, -13, 13], "m_final": 0.0},
+    "smeft_ee_ttbar": {"model": "SMEFTatNLO-LO", "mg5_generate": ["generate e+ e- > t t~ QED<=2 NP<=1"],
+                       "nfinal": 2, "param_card_patches": {**_SMEFT0, "ctZ": 0.5, "cte1": 0.5},
+                       "pdg_ids": [11, -11, 6, -6], "m_final": LOCKED_MT},
+    # validation only (tools/nonsm_validate.py): the same models with every non-SM coupling at zero
+    "zp0_ee_mumu":    {"model": "DMsimp_s_spin1", "mg5_generate": ["generate e+ e- > mu+ mu- QED<=2 DMV<=2"],
+                       "nfinal": 2, "param_card_patches": _ZP_OFF, "pdg_ids": [11, -11, -13, 13], "m_final": 0.0},
+    "smeft0_ee_mumu": {"model": "SMEFTatNLO-LO", "mg5_generate": ["generate e+ e- > mu+ mu- QED<=2 NP<=1"],
+                       "nfinal": 2, "param_card_patches": dict(_SMEFT0), "pdg_ids": [11, -11, -13, 13], "m_final": 0.0},
+    "smeft0_ee_ttbar": {"model": "SMEFTatNLO-LO", "mg5_generate": ["generate e+ e- > t t~ QED<=2 NP<=1"],
+                        "nfinal": 2, "param_card_patches": dict(_SMEFT0), "pdg_ids": [11, -11, 6, -6],
+                        "m_final": LOCKED_MT},
+}
+for _n, _e in NONSM.items():
+    assert _n not in PROCESSES, _n
+    PROCESSES[_n] = dict(_e, run_card_patches=dict(_LEP))
+
+
 def _load_catalog_v2():
     """Append the generated catalog_v2 tree and one-loop entries (recipes/gen_catalog_v2.py
     --write). Generated entries never override a hand-written one."""
@@ -1718,6 +1789,8 @@ def generate_mg5_process(process_name, config):
     standalone_dir = f"{WORK_DIR}/{process_name}_standalone"
     fortran_dir    = fortran_dir_for(standalone_dir)
     generate_cmds = "\n".join(config["mg5_generate"])
+    if config.get("model"):     # a non-SM UFO model (NONSM); the sm default otherwise
+        generate_cmds = f"import model {config['model']}\n" + generate_cmds
 
     # Generation is complete only when the standalone tree is: a run killed mid-output
     # (the 432-way parallel prebuild that died on fork) leaves the events dir and a
@@ -2092,6 +2165,7 @@ done:
 def compile_cpp_driver(standalone_dir, subproc_dirs, nparticles):
     """Compile all C++ wrappers and link the N-particle pipe-mode driver."""
     param_card_path = f"{standalone_dir}/Cards/param_card.dat"
+    params_cls = parameters_class_name(standalone_dir)   # Parameters_sm, or the UFO model's
     suffixes = []
 
     print(f"  [CXX] Writing wrappers and driver ({nparticles} particles)...")
@@ -2110,7 +2184,7 @@ def compile_cpp_driver(standalone_dir, subproc_dirs, nparticles):
             "-I.", "-Isrc", f"-ISubProcesses/{subproc_dir}",
             f"wrapper_{suffix}.cc",
             f"SubProcesses/{subproc_dir}/CPPProcess.cc",
-            "src/Parameters_sm.cc", "src/HelAmps_sm.cc", "src/read_slha.cc",
+            f"src/{params_cls}.cc", f"src/{params_cls.replace('Parameters_', 'HelAmps_', 1)}.cc", "src/read_slha.cc",
             "-o", f"libME_{suffix}.so"
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=standalone_dir)
@@ -3179,6 +3253,8 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
         # them from being reused as cache hits.
         "label_convention":   "mg5_slot_v2",
     }
+    if cfg.get("model"):
+        recipe["model"] = cfg["model"]      # a non-SM UFO model; absent (sm) keeps every SM recipe_id
     if cfg.get("kind") == "synthetic":
         # the random structure (tools/synthetic_amplitudes.py) is what the data is
         recipe["synthetic"] = dict(cfg["synthetic"])

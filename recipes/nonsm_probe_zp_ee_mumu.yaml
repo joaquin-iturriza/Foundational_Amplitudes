@@ -1,0 +1,5 @@
+# Non-SM probe (D49; docs/results.tex sec:nonsm): zp_ee_mumu alone, the transfer probes' conventions (mixture sampling;
+# the data-scaling grid trains on prefixes of this train split, data.train_subsample = D; val and test fixed).
+sampling: {mode: mixture}
+processes:
+  - {name: zp_ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
