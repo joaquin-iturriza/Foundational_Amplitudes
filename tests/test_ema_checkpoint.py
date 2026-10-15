@@ -18,7 +18,7 @@ torch_ema must be importable (requirements.txt); other heavy imports missing on 
 Run: python tests/test_ema_checkpoint.py
 On a site, the same checks on real runs' μP models (scripts/job_ema_ckpt_check.sh; the full stack, data included):
     python tests/test_ema_checkpoint.py --real --out-dir $SCRATCH/zz_ema_ckpt <run_dir> [...]
-for each run: the old checkpoint's EMA weights as _ckpt_scored_state maps them (by name, past the buffers) equal
+for each run: the old checkpoint's EMA weights as _ckpt_scored_state maps them (onto named_parameters) equal
 rebuild_run.load_best_weights' (by model.parameters() order), and _load_pretrained_weights loads them; then a
 new-format save of that model round-trips (save, best reload + average, fine-tune load, load_best_weights).
 """
@@ -214,6 +214,17 @@ def test_finetune_and_rebuild():
             m = Tiny()
             assert rebuild_run.load_best_weights(m, d) is True
             assert same(live_m(m), want), f"{fmt}: rebuild_run.load_best_weights is not the EMA weights"
+    with tempfile.TemporaryDirectory() as d:          # an old shadow that does not map: refused, never the live weights
+        parent = make_exp(d); step(parent, 6)
+        save_old_format(parent, "model_run0_best.pt")
+        path = os.path.join(d, "models", "model_run0_best.pt")
+        ck = load(path); ck["ema"]["shadow_params"] = ck["ema"]["shadow_params"][:-1]; torch.save(ck, path)
+        child = make_exp(os.path.join(d, "child"), seed=7)
+        try:
+            child._load_pretrained_weights(path)
+            raise AssertionError("an unmappable shadow was not refused")
+        except RuntimeError:
+            pass
     with tempfile.TemporaryDirectory() as d:
         parent = make_exp(d, ema=False); step(parent, 6)
         parent._save_model(5, "model_run0_best.pt")
@@ -239,11 +250,13 @@ def real(run_dir, out_dir):
     names = [n for n, _ in model.named_parameters()]
     buffers = {n for n, _ in model.named_buffers()}
     ck = rebuild_run._load_best_ckpt(run_dir)
-    sd, source = _ckpt_scored_state(ck, buffers)
+    sd, source = _ckpt_scored_state(ck, names)
     ema_applied = rebuild_run.load_best_weights(model, run_dir)
     ref = live_m(model)
     rec = {"run_dir": run_dir, "ema_applied": ema_applied, "source": source, "n_params": len(names),
-           "n_buffers": len(buffers), "old_format": "model_live" not in ck}
+           "n_buffers": len(buffers), "old_format": "model_live" not in ck,
+           "n_shadow": len(ck["ema"]["shadow_params"]) if ck.get("ema") else None,
+           "other_entries": [k for k in ck["model"] if k not in set(names) | buffers][:8]}
     assert source == ("shadow" if ema_applied else "model"), rec
     assert same([sd[n].to(p.device, p.dtype) for n, p in zip(names, ref)], ref), f"{run_dir}: name map != order map"
 

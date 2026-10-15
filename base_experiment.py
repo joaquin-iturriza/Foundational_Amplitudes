@@ -84,17 +84,18 @@ def _ckpt_live_state(ck):
     return ck["model_live"] if "model_live" in ck else ck["model"]
 
 
-def _ckpt_scored_state(ck, buffer_names):
+def _ckpt_scored_state(ck, param_names):
     """A checkpoint's weights as validation scored them: with EMA on, the EMA average; else the weights themselves.
     Returns (state_dict, source) with source "ema" (the checkpoint's "model", D63 format), "shadow" (an older
     checkpoint: its EMA shadow over the parameter entries of "model"), "model" (EMA off), or "live" (an older
     checkpoint whose shadow cannot be mapped to its parameter entries; the live weights are returned, and the
     fine-tune refuses them).
 
-    The shadow is a list in model.parameters() order of the model the EMA was built on. The parameters of a state
-    dict are, in order, its entries minus the buffers (state_dict and named_parameters walk the modules in the same
-    order), so the shadow is mapped onto the entries of "model" that are not in `buffer_names`, after checking that
-    count and every shape agree with the checkpoint's own tensors."""
+    The shadow is a list in model.parameters() order of the model the EMA was built on. `param_names` are the
+    named_parameters() names, in order, of a model of the checkpoint's architecture (a fine-tune's own model before
+    any LoRA injection: its names are the parent's even when its head has another shape), and the shadow is mapped
+    onto them after checking that every name is in "model" and that count and every shape agree with the
+    checkpoint's own tensors."""
     sd = ck["model"]
     if ck.get("model_is_ema"):
         return sd, "ema"
@@ -102,8 +103,9 @@ def _ckpt_scored_state(ck, buffer_names):
     if not ema:
         return sd, "model"
     shadow = ema["shadow_params"]
-    keys = [k for k in sd if k not in buffer_names]
-    if len(keys) != len(shadow) or any(tuple(sd[k].shape) != tuple(s.shape) for k, s in zip(keys, shadow)):
+    keys = list(param_names)
+    if (len(keys) != len(shadow) or any(k not in sd for k in keys)
+            or any(tuple(sd[k].shape) != tuple(s.shape) for k, s in zip(keys, shadow))):
         return sd, "live"
     out = dict(sd)
     for k, s in zip(keys, shadow):
@@ -1238,7 +1240,7 @@ class BaseExperiment:
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
             # the parent's weights as its validation scored them (its reported loss): with EMA on, the EMA average
             # (D63; docs/results.tex sec:ema-ckpt)
-            state_dict, source = _ckpt_scored_state(ck, {n for n, _ in self.model.named_buffers()})
+            state_dict, source = _ckpt_scored_state(ck, [n for n, _ in self.model.named_parameters()])
             if source == "shadow":
                 LOGGER.info("Fine-tuning: the parent's EMA weights (its EMA shadow over its live weights)")
             elif source == "ema":
