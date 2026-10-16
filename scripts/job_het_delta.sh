@@ -23,7 +23,22 @@ for T in "$@"; do
         test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"    # an earlier attempt that did not finish: kept aside
         # increment_steps cleared (a DyHPO trial's config carries its fidelity there and it sets the cosine horizon);
         # sign_head off (asserted incompatible with HETEROSC; a signed probe keeps its signed-log target)
-        python run.py --config-path "$PROJECT_DIR/$T" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
+        # a cell copied from another site carries that site's checkout in its paths: re-rooted onto this one
+        RR=$(python - "$PROJECT_DIR/$T/config.yaml" "$PROJECT_DIR" <<'PY'
+import re, sys
+from omegaconf import OmegaConf
+c = OmegaConf.load(sys.argv[1]); here = sys.argv[2]
+def rr(p):
+    return re.sub(r"^.*?/Foundational_Amplitudes/", here + "/", str(p))
+out = [f"base_dir={here}"]
+if c.data.get("processes_file"):
+    out.append(f"data.processes_file={rr(c.data.processes_file)}")
+if c.get("fine_tune") is not None and c.fine_tune.get("pretrained_path"):
+    out.append(f"fine_tune.pretrained_path={rr(c.fine_tune.pretrained_path)}")
+print(" ".join(out))
+PY
+)
+        python run.py --config-path "$PROJECT_DIR/$T" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null $RR \
             training.is_dyhpo_run=false training.increment_steps=null training.result_path="$OUT/result.json" plot=true \
             training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_select=nll \
             ++model.net.sigma_after_pool=true ++model.net.detach_sigma_backbone=false \
