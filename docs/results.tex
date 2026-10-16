@@ -5673,6 +5673,31 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
+  \item \textbf{State (2026-10-16, 10:50).} Decisions since 2026-10-15 evening: D70 (the $\sigma$-only stage is the
+    default end of every HETEROSC run, \code{run.py}, $250$ steps, effective lr $0.01$), D71 (releases \code{het\_delta}),
+    D72 (het keeps clip $5$), D73 (the stage's code and GPU check, item \code{sigma\_stage}, done). Items \code{het\_clip}
+    (D68) and \code{het\_sigonly} (D69) done. \emph{het\_delta (D47):} job \code{scripts/job\_het\_delta.sh} (a cell's
+    config, HETEROSC, a non-het parent's readout kept for $\mu$ with $\sigma$ zeroed, paths re-rooted, the stage, then
+    \code{tools/eval\_delta.py} into \code{\$SCRATCH/zz\_delta\_het}); \code{analysis/transfer/het\_delta\_jobs\_\{cclx,jz\}.txt},
+    launcher \code{scripts/launch\_het\_delta.sh <set>} (submitted jobs recorded in
+    \code{\textasciitilde/.local/share/ccorch/launch/FA/het\_delta.submitted}). The $72$ CC/lxplus cells: all done on CC
+    ($18$ jobs; $72$ outputs in \code{\$SCRATCH/zz\_delta\_het}). The $107$ Jean Zay cells: launch
+    \code{het\_delta\_jzcopy} (\code{scripts/launch\_het\_delta\_jzcopy.sh}) retries the site-to-site copy to CC and
+    lxplus each supervisor pass and fails (the relay times out reaching Jean Zay); \code{het\_delta\_jz} fires once the
+    marker \code{het\_delta\_jz.copied} exists. Asked the user (2026-10-16 08:15): train them on Jean Zay instead
+    ($\sim22$ GPU-h)? Unanswered. Analysis ready, not written up: \code{collect\_het\_delta.py} (run on CC, output into
+    \code{analysis/transfer/het\_delta\_data/ccin2p3.npz}), \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}; on
+    the $68$ cells collected so far the pulls are calibrated on $u\bar u\to gg$ (std $1.01$) and too narrow on
+    $Z{+}2g$, $Z{+}3g$ (std $1.3$ to $2.1$). \emph{Catalog (D59):} sweep done and written up (fig:dancat\_het\_pre); launch
+    \code{catalog\_heldout} (\code{MEM=40G scripts/launch\_cc\_only.sh} with \code{scripts/job\_catalog\_heldout.sh
+    runs/dancat\_het\_pre/trial\_0058}: \code{tools/sigma\_stage.py}, then the zero-shot on the $139$ held-out processes,
+    affine score only) failed twice on the launcher (\code{--hdr} syntax, then an uncommitted file), requeue it.
+    \emph{Zero-shot (user's question 2026-10-16):} the error past $n=2$ is a compressed spread
+    (fig:zero\_shot\_parts); fixes proposed to the user, none run: (a) divide by eikonal/dipole factors, (b) coupling powers
+    and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test. Waiting on the user also: deleting
+    my test leftovers on CC (the \code{zz\_memprof}/\code{zz\_memmap\_*}/\code{zz\_ema\_ckpt\_*} dirs, mmap caches
+    \code{2b98\ldots}, \code{98f8\ldots}; the live one is \code{b020\ldots}); D66 designs; D47 signed probes use het on the
+    signed-log target (told to the user). Background: supervisor (task be01e4jc6), events waiter.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
