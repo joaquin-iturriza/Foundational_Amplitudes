@@ -47,6 +47,7 @@ for recipe in a.recipes:
         cfg.data.source = "recipes"
         cfg.data.processes_file = recipe
         cfg.data.train_subsample = a.train_subsample
+        cfg.data.memmap = False                      # one probe fits in memory; a memmap would build a cache per probe
         # the probe's own target statistics (one process: no pooled or affine fit)
         cfg.data.shared_standardization = False
         cfg.data.affine_multiplicity_std = False
