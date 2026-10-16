@@ -367,13 +367,14 @@ and MSE $1.4\times10^{-2}$. Since the best lr sits at the top of the window and 
 a window reaching higher lr would likely move the optimum; neither is run. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
 validation NLL from $-4.098$ to $-4.102$; its test calibration is not measured yet.
 
-\paragraph{Zero-shot on its held-out split (2026-10-16, D45).} hp58 scored on each of the $139$ held-out processes with
+\paragraph{Its held-out split: zero-shot on $43$, in-class on $96$ (2026-10-16, D45).} hp58 scored on each of the $139$ held-out processes with
 no data of them (\code{scripts/job\_catalog\_heldout.sh}, \code{tools/zero\_shot\_parent.py}, $0$ errors;
 Fig.~\ref{fig:heldout_zero_shot}, \code{analysis/catalog\_daniel/heldout\_zero\_shot.py}). The parent standardizes each
 process with its own statistics, so a process it has no data of is scored up to an affine map: $1-\rho^2$, the MSE after
 the best $a+bh$ over the variance. Both groups, as agreed (``Their split, report both''): the $96$ held-out processes
-that are exact relabels of a training process, median $1-\rho^2=1.2\times10^{-3}$ ($10$ to $90\%$: $1.8\times10^{-4}$ to
-$5.1\times10^{-3}$, worst $0.056$), and the $43$ without one, median $0.098$ ($5.9\times10^{-3}$ to $0.27$). The worst are
+that are exact relabels of a training process (in-class transfer, not zero-shot: our convention holds a process out with
+its whole relabelling class), median $1-\rho^2=1.2\times10^{-3}$ ($10$ to $90\%$: $1.8\times10^{-4}$ to
+$5.1\times10^{-3}$, worst $0.056$), and the $43$ without one, the only zero-shot ones in our sense, median $0.098$ ($5.9\times10^{-3}$ to $0.27$). The worst are
 all $gg$-initiated with a top: $gg\to b\bar tW^+$ $0.94$, $gg\to t\bar tZ$ $0.88$, $gg\to t\bar bW^-$ $0.74$,
 $gg\to t\bar tH$ $0.50$, $gg\to t\bar t\gamma$ $0.22$; then $u\bar d\to W^+HH$ $0.28$, $b\bar b\to HH$ $0.23$. Against the
 draft's sec:cond on the same split (raw $R^2$, no map): $gg\to t\bar tH$ is at most $0.53$ there and $1-0.50=0.50$ here;
@@ -392,9 +393,9 @@ standardized $\log|\mathcal M|^2$. hp1466 is drawn to its best checkpoint (cross
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/catalog_daniel/figs/heldout_zero_shot.pdf}
-\caption{Zero-shot of the catalog pretraining (hp58) on the $139$ held-out processes of arXiv:2606.23791's split:
+\caption{The catalog pretraining (hp58) on the $139$ held-out processes of arXiv:2606.23791's split, with no data of them:
 the fraction of processes below a given $1-\rho^2$, for the $96$ that are exact relabels of a training process and the
-$43$ that are not.}
+$43$ that are not (zero-shot proper).}
 \label{fig:heldout_zero_shot}
 \end{figure}
 
@@ -2256,7 +2257,7 @@ $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9), and
 $1.17$, $|{\rm pull}|<1$ for $0.62$ to $0.70$ of the events. On the $12$ $2\to3$ cells ($ee\to d\bar dg$,
 $ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.61\times$ the MSE median $|\Delta|$,
 $0.90$ to $3.78$, lower in $1$ of $12$), and $\sigma$ is too small on test (pull std $0.99$ to $2.99$, $|{\rm pull}|<1$
-$0.48$ to $0.64$; on $u\bar u\to Zgg$ $1.8$ to $3.0$). The cause is overfitting, not the stage: on the same cells the
+$0.48$ to $0.64$; on $u\bar u\to Zgg$ $1.8$ to $3.0$). The cause appears to be overfitting rather than the stage: on the same cells the
 training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$ to $2.99$,
 while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three splits. The stage fits $\sigma$ to the training residuals,
 which at $D=10^4$ on a $2\to3$ process are smaller than the residuals on unseen events. Under the A/B protocol the het
@@ -5663,7 +5664,7 @@ mask, the ordering, the affine-in-$N$ statistics, the dropped coupling powers). 
 the causal parent's config without the three \code{causal\_*} keys, so no mask and no prefix frames, the rest identical,
 same HPs and seed) separates the mask: its raw zero-shot is $0.165$ on $W{+}4g$ and $1.02$, $0.36$, $0.19$, $0.43$, $0.63$
 on $Z{+}ng$, $n=1..5$, against the causal $0.084$ and $0.86$, $0.25$, $0.18$, $0.18$, $0.21$. Most of the gain over the
-shared standardization is therefore the other changes (the affine-in-$N$ statistics above all); the mask adds a factor
+shared standardization is therefore the other changes (the affine-in-$N$ statistics above all); in one seed per arm the mask adds a factor
 $\approx2$ on $W{+}4g$ and $2$ to $3$ at $n=4,5$, the multiplicities furthest past training, and little at $n\le3$. After
 the affine map the control has the best shape on $Z{+}ng$ ($0.040$ to $0.10$, against $0.080$ to $0.41$ causal) and is
 between the two on $W{+}4g$ ($0.011$): the mask helps place the level, not the shape. One seed per arm. Not Jonas's implementation (his code is not public, the
@@ -5723,31 +5724,18 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-16, 10:50).} Decisions since 2026-10-15 evening: D70 (the $\sigma$-only stage is the
-    default end of every HETEROSC run, \code{run.py}, $250$ steps, effective lr $0.01$), D71 (releases \code{het\_delta}),
-    D72 (het keeps clip $5$), D73 (the stage's code and GPU check, item \code{sigma\_stage}, done). Items \code{het\_clip}
-    (D68) and \code{het\_sigonly} (D69) done. \emph{het\_delta (D47):} job \code{scripts/job\_het\_delta.sh} (a cell's
-    config, HETEROSC, a non-het parent's readout kept for $\mu$ with $\sigma$ zeroed, paths re-rooted, the stage, then
-    \code{tools/eval\_delta.py} into \code{\$SCRATCH/zz\_delta\_het}); \code{analysis/transfer/het\_delta\_jobs\_\{cclx,jz\}.txt},
-    launcher \code{scripts/launch\_het\_delta.sh <set>} (submitted jobs recorded in
-    \code{\textasciitilde/.local/share/ccorch/launch/FA/het\_delta.submitted}). The $72$ CC/lxplus cells: all done on CC
-    ($18$ jobs; $72$ outputs in \code{\$SCRATCH/zz\_delta\_het}). The $107$ Jean Zay cells: launch
-    \code{het\_delta\_jzcopy} (\code{scripts/launch\_het\_delta\_jzcopy.sh}) retries the site-to-site copy to CC and
-    lxplus each supervisor pass and fails (the relay times out reaching Jean Zay); \code{het\_delta\_jz} fires once the
-    marker \code{het\_delta\_jz.copied} exists. Asked the user (2026-10-16 08:15): train them on Jean Zay instead
-    ($\sim22$ GPU-h)? Unanswered. Analysis ready, not written up: \code{collect\_het\_delta.py} (run on CC, output into
-    \code{analysis/transfer/het\_delta\_data/ccin2p3.npz}), \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}; on
-    the $68$ cells collected so far the pulls are calibrated on $u\bar u\to gg$ (std $1.01$) and too narrow on
-    $Z{+}2g$, $Z{+}3g$ (std $1.3$ to $2.1$). \emph{Catalog (D59):} sweep done and written up (fig:dancat\_het\_pre); launch
-    \code{catalog\_heldout} (\code{MEM=40G scripts/launch\_cc\_only.sh} with \code{scripts/job\_catalog\_heldout.sh
-    runs/dancat\_het\_pre/trial\_0058}: \code{tools/sigma\_stage.py}, then the zero-shot on the $139$ held-out processes,
-    affine score only) failed twice on the launcher (\code{--hdr} syntax, then an uncommitted file), requeue it.
-    \emph{Zero-shot (user's question 2026-10-16):} the error past $n=2$ is a compressed spread
-    (fig:zero\_shot\_parts); fixes proposed to the user, none run: (a) divide by eikonal/dipole factors, (b) coupling powers
-    and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test. Waiting on the user also: deleting
-    my test leftovers on CC (the \code{zz\_memprof}/\code{zz\_memmap\_*}/\code{zz\_ema\_ckpt\_*} dirs, mmap caches
-    \code{2b98\ldots}, \code{98f8\ldots}; the live one is \code{b020\ldots}); D66 designs; D47 signed probes use het on the
-    signed-log target (told to the user). Background: supervisor (task be01e4jc6), events waiter.
+  \item \textbf{Open (2026-10-16, 16:30).} \emph{het\_delta (D47):} $72$ of $179$ cells done and written up
+    (fig:het\_delta\_summary); the $107$ cells first trained on Jean Zay wait: launch \code{het\_delta\_jzcopy}
+    (\code{scripts/launch\_het\_delta\_jzcopy.sh}) retries the copy to CC and lxplus each supervisor pass and keeps failing
+    (the relay times out reaching Jean Zay); \code{het\_delta\_jz} (\code{scripts/launch\_het\_delta.sh jz}) fires once the
+    marker \code{\textasciitilde/.local/share/ccorch/launch/FA/het\_delta\_jz.copied} exists. For the user (asked 08:15,
+    unanswered): train them on Jean Zay instead ($\sim22$ GPU-h)? Then rerun \code{collect\_het\_delta.py} on each site,
+    \code{het\_delta\_summary.py}, \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}. Also for the user: a het sweep
+    on the $2\to3$ cells (A/B step 4) and/or the $\sigma$ stage fitted on held-out residuals; which zero-shot fix to
+    design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's
+    matched $Z{+}ng$ test); deleting my test leftovers on CC (\code{zz\_memprof}, \code{zz\_memmap\_*},
+    \code{zz\_ema\_ckpt\_*}, mmap caches \code{2b98\ldots}, \code{98f8\ldots}); the D66 designs. Not measured: the
+    catalog stage's test calibration.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
