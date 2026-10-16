@@ -2237,8 +2237,8 @@ $1.17$, $|{\rm pull}|<1$ for $0.62$ to $0.70$ of the events. On the $12$ $2\to3$
 $ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.61\times$ the MSE median $|\Delta|$,
 $0.90$ to $3.78$, lower in $1$ of $12$), and $\sigma$ is too small on test (pull std $0.99$ to $2.99$, $|{\rm pull}|<1$
 $0.48$ to $0.64$; on $u\bar u\to Zgg$ $1.8$ to $3.0$). The cause is overfitting, not the stage: on the same cells the
-training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $1.0$ to $3.0$,
-while every $2\to2$ cell checked has std $1.00$ on all three splits. The stage fits $\sigma$ to the training residuals,
+training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$ to $2.99$,
+while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three splits. The stage fits $\sigma$ to the training residuals,
 which at $D=10^4$ on a $2\to3$ process are smaller than the residuals on unseen events. Under the A/B protocol the het
 loss losing at the MSE cell's HPs calls for its own sweep before a verdict on $\mu$; neither that nor a $\sigma$ fitted
 on held-out residuals is run.
