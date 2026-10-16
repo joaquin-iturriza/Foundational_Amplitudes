@@ -2170,8 +2170,9 @@ better?''; \code{sweep\_config\_tp\_het\_clip\_ee\_ttbar\_d8.yaml}, the het swee
 $-7.52$ to $-7.25$), the four with clip $152$ to $769$ reach $-7.09$ to $-5.93$. Its best ($-7.52$, clip $1.04$, lr
 $4.4\times10^{-3}$, EMA on) does not beat the fixed-clip sweep's $-7.63$, so the fixed $5$ stands. The short $\sigma$-only stage
 (D69, \code{sweep\_config\_tp\_het\_sigonly\_ee\_ttbar\_d8.yaml}: $250$ steps, its lr and warmup searched, 8 trials) reaches
-validation NLL $-9.764$ at lr $0.097$, against $-9.680$ for the $4$k-step refit at the trial's lr $2.3\times10^{-3}$; the six
-trials with lr $\approx0.1$ are within $0.01$ of their final NLL by step $150$ to $170$ and past the $4$k refit by step
+validation NLL $-9.764$ at \code{training.lr} $0.097$, against $-9.680$ for the $4$k-step refit at the trial's lr $2.3\times10^{-3}$
+(both are fine-tunes of the joint model, so \code{fine\_tune.lr\_scale} $0.1$ multiplies them: the effective rates are
+$9.7\times10^{-3}$ and $2.3\times10^{-4}$); the six trials with lr $\approx0.1$ are within $0.01$ of their final NLL by step $150$ to $170$ and past the $4$k refit by step
 $100$. The best lr sits at the top of the searched range. Its calibration on test (Fig.~\ref{fig:het_sigonly}, \code{analysis/transfer/het\_sigonly.py}): pull std
 $1.02$, $|{\rm pull}|<1$ for $0.67$ of the events ($0.68$ for a Gaussian), the RMS error over $\sigma$ per decile $0.73$
 to $1.22$ except the worst-predicted decile at $2.15$; the $4$k refit gives $1.03$, $0.69$ and $0.65$ to $1.24$ (worst
@@ -2181,7 +2182,7 @@ $2.42$), the joint model $0.60$, $0.93$ and $0.22$ to $1.56$.
 \centering
 \includegraphics{../analysis/transfer/figs/het_sigonly.pdf}
 \caption{The $\sigma$-only stage on the $32$k het model ($e^+e^-\to t\bar t$, $D=10^4$), test split: the joint model, the
-$4000$-step refit at the trial's lr, and the best $250$-step refit (lr $0.097$). Left: the RMS actual error against the
+$4000$-step refit at the trial's lr, and the best $250$-step refit (\code{training.lr} $0.097$, effective $9.7\times10^{-3}$). Left: the RMS actual error against the
 median predicted $\sigma$ per $\sigma$ decile, with the calibrated diagonal. Right: the pulls, with $\mathcal N(0,1)$
 dashed.}
 \label{fig:het_sigonly}
@@ -5594,6 +5595,30 @@ last layer, the causal parent without the mask (control), and the shared standar
 diamonds: $u\bar d\to W^+4g$ (training stops at $W^+3g$). Left: validation MSE of $\log|\mathcal M|^2$ over the probe's
 variance. Right: the same after the best affine map fitted on the probe.}
 \label{fig:zero_shot_jcaus}
+\end{figure}
+
+\paragraph{Level and spread of the zero-shot prediction (2026-10-16).} The raw zero-shot MSE splits into the squared mean
+offset and the rest, $\mathrm{MSE}=\mathrm{bias}^2+\mathrm{MSE}_{\rm after\ offset}$, and the rest is mostly the spread:
+the prediction's standard deviation over the truth's (Fig.~\ref{fig:zero_shot_parts}, \code{zero\_shot\_parts.py}, the
+same \code{ZERO\_SHOT} rows as Fig.~\ref{fig:zero_shot_jcaus}). For the three parents with the affine-in-$N$ statistics
+the level is placed well past $n=2$: $\mathrm{bias}^2/\mathrm{Var}\le0.10$ on $Z{+}ng$, $n\ge3$, and $\le0.05$ on
+$W{+}4g$; the exception is $Z{+}g$, at $0.45$ (causal) and $0.73$ (control). What remains is a compressed
+prediction: its spread is $0.26$ to $0.66$ of the truth's at $n\ge3$ and $0.61$ to $0.80$ on $W{+}4g$, falling with $n$
+(control $0.60$, $0.38$, $0.26$ at $n=3,4,5$), while the correlation stays $0.94$ to $0.997$. So past $n=2$ the affine map
+mostly restores the dynamic range, the growth of $\log|\mathcal M|^2$'s spread with each extra gluon ($\mathrm{Var}=1.5$,
+$6.8$, $11.6$, $16.3$, $19.5$ for $n=1..5$), not the overall level. The shared-standardization parent misses the level
+by $\mathrm{bias}^2/\mathrm{Var}=0.27$ to $47$. The comparisons are raw: the draft's extrapolation is scored on the
+standardized $\log|\mathcal M|^2$ with the mean linear in $n$ fitted on the same family, and its $R^2$ with no map
+(an offset alone makes it negative), so the left panel of Fig.~\ref{fig:zero_shot_jcaus}, not the affine one, is what
+compares with them.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/zero_shot_parts.pdf}
+\caption{The real zero-shot error of Fig.~\ref{fig:zero_shot_jcaus}'s four parents split into level and spread. Left: the
+squared mean offset over the probe's variance. Right: the standard deviation of the prediction over that of the truth
+(dashed: equal). Circles: $u\bar u\to Z+ng$; open diamonds: $u\bar d\to W^+4g$.}
+\label{fig:zero_shot_parts}
 \end{figure}
 
 \paragraph{Against the zero-shot results of the collaboration draft (2026-10-15).} Two sections of the draft
