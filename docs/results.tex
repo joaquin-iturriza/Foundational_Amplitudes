@@ -364,10 +364,22 @@ $-3.96$; $4.0$ and $4.4\times10^{-3}$ $-3.77$ and $-3.84$; $1.7\times10^{-3}$ $-
 last step, still falling. hp1466 (lr $8.8\times10^{-3}$, L2 $4.8\times10^{-8}$, EMA decay $0.98$) blew up after step
 $15.4$k (validation NLL $1.9\times10^{6}$, the MSE of $\mu$ $6.5$); its best checkpoint, step $15360$, is at NLL $-2.83$
 and MSE $1.4\times10^{-2}$. Since the best lr sits at the top of the window and nothing has converged, a longer horizon or
-a window reaching higher lr would likely move the optimum; neither is run. Next, queued: the $\sigma$-only stage on hp58
-(D70) and its zero-shot on the $139$ held-out processes (\code{scripts/job\_catalog\_heldout.sh}). The parent
-standardizes each process with its own statistics, so a process it has no data of is scored up to an affine map
-($1-\rho^2$), not in $\log|\mathcal M|^2$ itself, unlike the draft's $R^2$ on the same split.
+a window reaching higher lr would likely move the optimum; neither is run. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
+validation NLL from $-4.098$ to $-4.102$; its test calibration is not measured yet.
+
+\paragraph{Zero-shot on its held-out split (2026-10-16, D45).} hp58 scored on each of the $139$ held-out processes with
+no data of them (\code{scripts/job\_catalog\_heldout.sh}, \code{tools/zero\_shot\_parent.py}, $0$ errors;
+Fig.~\ref{fig:heldout_zero_shot}, \code{analysis/catalog\_daniel/heldout\_zero\_shot.py}). The parent standardizes each
+process with its own statistics, so a process it has no data of is scored up to an affine map: $1-\rho^2$, the MSE after
+the best $a+bh$ over the variance. Both groups, as agreed (``Their split, report both''): the $96$ held-out processes
+that are exact relabels of a training process, median $1-\rho^2=1.2\times10^{-3}$ ($10$ to $90\%$: $1.8\times10^{-4}$ to
+$5.1\times10^{-3}$, worst $0.056$), and the $43$ without one, median $0.098$ ($5.9\times10^{-3}$ to $0.27$). The worst are
+all $gg$-initiated with a top: $gg\to b\bar tW^+$ $0.94$, $gg\to t\bar tZ$ $0.88$, $gg\to t\bar bW^-$ $0.74$,
+$gg\to t\bar tH$ $0.50$, $gg\to t\bar t\gamma$ $0.22$; then $u\bar d\to W^+HH$ $0.28$, $b\bar b\to HH$ $0.23$. Against the
+draft's sec:cond on the same split (raw $R^2$, no map): $gg\to t\bar tH$ is at most $0.53$ there and $1-0.50=0.50$ here;
+$gg\to u\bar dW^-$ is $0.35$ to $0.91$ there and $0.995$ here ($1-\rho^2=5.5\times10^{-3}$). Ours has the affine map for
+free, theirs does not, so the comparison favours us by exactly the scale and offset; on these two processes the
+draft's own scatter (its Fig.~cond\_scatter) is the check of how much of its gap that is.
 
 \begin{figure}[H]
 \centering
@@ -376,6 +388,15 @@ standardizes each process with its own statistics, so a process it has no data o
 $32$k steps, $8$ trials). Left: the validation NLL against the step. Right: the validation MSE of $\mu$ on the
 standardized $\log|\mathcal M|^2$. hp1466 is drawn to its best checkpoint (cross); it blew up after it.}
 \label{fig:dancat_het_pre}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_daniel/figs/heldout_zero_shot.pdf}
+\caption{Zero-shot of the catalog pretraining (hp58) on the $139$ held-out processes of arXiv:2606.23791's split:
+the fraction of processes below a given $1-\rho^2$, for the $96$ that are exact relabels of a training process and the
+$43$ that are not.}
+\label{fig:heldout_zero_shot}
 \end{figure}
 
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
