@@ -355,7 +355,7 @@ classes, $519$ to $711$ under a liberal flavour and charge-conjugation rule, $75
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
 embedding at width $64$ on top of the usual inputs, $32$k steps at batch $16384$ ($12$ events per process per step,
 $3.9$ passes), memory-mapped data at $40$\,GB, GP DyHPO over $2000$ candidates, $8$ trials in waves $3+3+2$ on CC
-($1.8$ to $5.1$\,h each, $36$ GPU-h in all; Fig.~\ref{fig:dancat_het_pre}, \code{analysis/catalog\_daniel/dancat\_het\_pre.py}).
+($1.8$ to $5.1$\,h each, $37$ GPU-h in all; Fig.~\ref{fig:dancat_het_pre}, \code{analysis/catalog\_daniel/dancat\_het\_pre.py}).
 Best: hp58, validation NLL $-4.10$ (lr $8.9\times10^{-3}$, EMA on with decay $0.94$, warmup $0.16$, L2
 $5\times10^{-7}$), the MSE of $\mu$ on the standardized $\log|\mathcal M|^2$ $3.96\times10^{-3}$ on validation and
 $3.97\times10^{-3}$ on test; the next, hp1733 at the same lr, $-4.07$ and $4.0\times10^{-3}$. The ranking follows the lr:
