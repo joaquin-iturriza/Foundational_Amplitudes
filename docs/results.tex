@@ -2176,7 +2176,12 @@ $9.7\times10^{-3}$ and $2.3\times10^{-4}$); the six trials with lr $\approx0.1$ 
 $100$. The best lr sits at the top of the searched range. Its calibration on test (Fig.~\ref{fig:het_sigonly}, \code{analysis/transfer/het\_sigonly.py}): pull std
 $1.02$, $|{\rm pull}|<1$ for $0.67$ of the events ($0.68$ for a Gaussian), the RMS error over $\sigma$ per decile $0.73$
 to $1.22$ except the worst-predicted decile at $2.15$; the $4$k refit gives $1.03$, $0.69$ and $0.65$ to $1.24$ (worst
-$2.42$), the joint model $0.60$, $0.93$ and $0.22$ to $1.56$.
+$2.42$), the joint model $0.60$, $0.93$ and $0.22$ to $1.56$. Since D70 (the user: ``the short end of training with the trunk frozen is the default'') every HETEROSC run ends
+with this stage: \code{run.py} warm-starts a $\sigma$-only fit from the run's best checkpoint
+(\code{training.heterosc\_sigma\_stage\_steps} $250$, effective lr $0.01$, warmup $0$, no L2, EMA off) into
+\code{<run\_dir>/sigma\_stage}; $\mu$ is the run's own. Checked on a $500$-step het run of $ee\to t\bar t$ ($D=10^4$,
+\code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1\_stagetest}): $258$ trainable parameters, validation
+NLL $-3.82\to-4.65$ in $16$\,s.
 
 \begin{figure}[H]
 \centering

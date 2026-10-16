@@ -1320,6 +1320,15 @@ class BaseExperiment:
                     LOGGER.info(f"Fine-tuning: skipped {len(dropped)} shape-mismatched "
                                 f"pretrained tensors (e.g. {dropped[:2]}).")
             else:
+                # an MSE parent (1-channel readout) under a HETEROSC child (2 channels: mu, sigma): keep the parent's
+                # mu row and start the sigma row as a fresh model's does (zero weights, sigma = softplus(0)), as
+                # analysis/divergences/grow_sigma_head.py does offline (the D47 het retrains of fine-tune cells)
+                own = self.model.state_dict()
+                for k in [k for k in state_dict if k.endswith("linear_out.weight") or k.endswith("linear_out.bias")]:
+                    v = state_dict[k]
+                    if k in own and v.shape[0] == 1 and own[k].shape[0] == 2 and v.shape[1:] == own[k].shape[1:]:
+                        state_dict[k] = torch.cat([v, torch.zeros_like(v)], 0)
+                        LOGGER.info(f"Fine-tuning: {k} grown from the parent's 1 channel to (mu, sigma), mu kept")
                 self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
