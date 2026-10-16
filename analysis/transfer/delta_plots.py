@@ -11,7 +11,9 @@ Sets (each panel one probe):
   delta_star_<arm>        each star arm on its own probe with scratch and rung 1; delta_star_ee_ddbar: every arm
 Data: analysis/transfer/delta_data/<site>.npz, one array of test-split Delta per run, keyed <sweep>__<trial>
 (collect_delta.py packs them on each site).
-    python analysis/transfer/delta_plots.py [--d10]
+    python analysis/transfer/delta_plots.py [--d10 | --het]
+--het: the same figures from the het retrains of the 8k cells (D47; analysis/transfer/het_delta_data/<site>.npz,
+collect_het_delta.py: the sigma stage's mu), files delta_het_*; the pulls are het_delta_pulls.py's.
 """
 import glob, json, os, sys
 
@@ -37,9 +39,15 @@ def tag(run_dir):
     return "__".join(os.path.normpath(run_dir).split(os.sep)[-2:])
 
 
-def load():
+def load(sub="delta_data"):
     d = {}
-    for f in sorted(glob.glob(os.path.join(HERE, "delta_data", "*.npz"))):
+    if sub == "het_delta_data":
+        # het retrains: <tag>__delta arrays only, no recorded MSE to check a rebuilt loss against (the NLL is not one)
+        for f in sorted(glob.glob(os.path.join(HERE, sub, "*.npz"))):
+            with np.load(f) as z:
+                d.update({k[: -len("__delta")]: z[k] for k in z.files if k.endswith("__delta")})
+        return d
+    for f in sorted(glob.glob(os.path.join(HERE, sub, "*.npz"))):
         with np.load(f) as z:
             d.update({k: z[k] for k in z.files if k != "_meta"})
             if "_meta" in z.files:
@@ -73,10 +81,10 @@ def axes_lab(ax):
 def main():
     # --d10: a supplementary set at the 32k grid's largest D (D=10^5; 10^4.5 for the one-loop probes), delta_audit_d10.json,
     # files delta_d10_*; the Delta plots are the 8k grid at D=10^4 (the user's D64)
-    d10 = "--d10" in sys.argv
+    d10, het = "--d10" in sys.argv, "--het" in sys.argv
     audit = json.load(open(os.path.join(HERE, "delta_audit_d10.json" if d10 else "delta_audit.json")))
-    key, pre = ("d10", "delta_d10_") if d10 else ("paper_8k", "delta_")
-    D = load()
+    key, pre = ("d10", "delta_d10_") if d10 else ("paper_8k", "delta_het_" if het else "delta_")
+    D = load("het_delta_data" if het else "delta_data")
     missing, off = [], []
 
     def get(row):
