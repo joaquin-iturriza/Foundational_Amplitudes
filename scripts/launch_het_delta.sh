@@ -1,10 +1,10 @@
 #!/bin/bash
 # Launch-queue run command (site launch FA het_delta, D47 released by D71): the het retrains of the Delta-plot cells,
-# one job per line of analysis/transfer/het_delta_jobs.txt (est. GPU-h, then its cells). Plans the remaining jobs with
+# one job per line of analysis/transfer/het_delta_jobs_<set>.txt (est. GPU-h, then its cells). Plans the remaining jobs with
 # `site pick`, submits each site's allotment, records what it submitted; exit 75 (stays queued, retried on the
 # supervisor's next pass) while any job is left. Every cell and its parent is on CC-IN2P3 and lxplus (site copy).
 cd "$(dirname "$0")/.." || exit 1
-JOBS=analysis/transfer/het_delta_jobs.txt
+JOBS="analysis/transfer/het_delta_jobs_${1:?cclx or jz}.txt"   # cclx: cells first trained on CC/lxplus; jz: on Jean Zay
 DONE="$HOME/.local/share/ccorch/launch/FA/het_delta.submitted"
 touch "$DONE"
 mapfile -t LEFT < <(grep -v '^#' "$JOBS" | while read -r t cells; do grep -qxF "$cells" "$DONE" || echo "$t $cells"; done)
