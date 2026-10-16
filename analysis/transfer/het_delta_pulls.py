@@ -40,7 +40,7 @@ def main():
         for a in sorted(ladder, key=lambda a: (a != "scratch", a)):
             h, e = np.histogram(ladder[a], bins=BINS, density=True)
             ax.stairs(h, e, color="k" if a == "scratch" else seq[a], label="from scratch" if a == "scratch" else f"rung {a[1:]}")
-        ax.plot(g, np.exp(-g ** 2 / 2) / np.sqrt(2 * np.pi), "--", color="grey", label=r"$\mathcal N(0,1)$")
+        ax.plot(g, np.exp(-g ** 2 / 2) / np.sqrt(2 * np.pi), "--", color="grey", label="unit Gaussian")
         ax.set_xlabel(r"pull $(\mu-y)/\sigma$"); ax.set_ylabel("density")
         ps.process_label(ax, LAB.get(probe, probe))
         ps.legend(ax, "upper left", ncol=2)
