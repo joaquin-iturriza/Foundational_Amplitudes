@@ -5664,7 +5664,7 @@ the causal parent's config without the three \code{causal\_*} keys, so no mask a
 same HPs and seed) separates the mask: its raw zero-shot is $0.165$ on $W{+}4g$ and $1.02$, $0.36$, $0.19$, $0.43$, $0.63$
 on $Z{+}ng$, $n=1..5$, against the causal $0.084$ and $0.86$, $0.25$, $0.18$, $0.18$, $0.21$. Most of the gain over the
 shared standardization is therefore the other changes (the affine-in-$N$ statistics above all); the mask adds a factor
-$pprox2$ on $W{+}4g$ and $2$ to $3$ at $n=4,5$, the multiplicities furthest past training, and little at $n\le3$. After
+$\approx2$ on $W{+}4g$ and $2$ to $3$ at $n=4,5$, the multiplicities furthest past training, and little at $n\le3$. After
 the affine map the control has the best shape on $Z{+}ng$ ($0.040$ to $0.10$, against $0.080$ to $0.41$ causal) and is
 between the two on $W{+}4g$ ($0.011$): the mask helps place the level, not the shape. One seed per arm. Not Jonas's implementation (his code is not public, the
 draft is the spec): the local frames are built from the prefix with the first $4$ particles seeing each other, our extra
