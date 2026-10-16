@@ -2222,6 +2222,36 @@ dashed.}
 \label{fig:het_sigonly}
 \end{figure}
 
+\paragraph{The $\Delta$ cells retrained with the het loss (D47; 2026-10-16, $72$ of $179$ cells).} Each cell of the
+$\Delta$ plots' $8$k grid at $D=10^4$ (\code{delta\_audit.json}) retrained with the user's loss at its own config and
+HPs (CLAUDE.md A/B step 3), the same seed and, for a fine-tune, the same parent with its readout's $\mu$ row kept and the
+$\sigma$ row zeroed (a \code{sign\_head} parent's second row is its sign logit), then the $\sigma$-only stage (D70) and
+\code{tools/eval\_delta.py} on its test split (\code{scripts/job\_het\_delta.sh}; the four signed one-loop probes on
+their signed-log target). Done: the $72$ cells first trained on CC and lxplus, all run on CC ($18$ jobs). The $107$ first
+trained on Jean Zay wait: copying them off Jean Zay times out. Fig.~\ref{fig:het_delta_summary}
+(\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het} and
+\code{pull\_het\_ladder\_*} from \code{het\_delta\_pulls.py}). On the $60$ $2\to2$ cells the het $\mu$ has a median
+$|\Delta|$ $0.69$ times the MSE cell's (median over cells; lower in $48$ of $60$, from $0.03\times$ on the one-loop
+$ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9), and the pulls are calibrated: std $0.99$ to
+$1.17$, $|{\rm pull}|<1$ for $0.62$ to $0.70$ of the events. On the $12$ $2\to3$ cells ($ee\to d\bar dg$,
+$ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.61\times$ the MSE median $|\Delta|$,
+$0.90$ to $3.78$, lower in $1$ of $12$), and $\sigma$ is too small on test (pull std $0.99$ to $2.99$, $|{\rm pull}|<1$
+$0.48$ to $0.64$; on $u\bar u\to Zgg$ $1.8$ to $3.0$). The cause is overfitting, not the stage: on the same cells the
+training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $1.0$ to $3.0$,
+while every $2\to2$ cell checked has std $1.00$ on all three splits. The stage fits $\sigma$ to the training residuals,
+which at $D=10^4$ on a $2\to3$ process are smaller than the residuals on unseen events. Under the A/B protocol the het
+loss losing at the MSE cell's HPs calls for its own sweep before a verdict on $\mu$; neither that nor a $\sigma$ fitted
+on held-out residuals is run.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_delta_summary.pdf}
+\caption{The $\Delta$ cells retrained with the het loss against the MSE cells ($72$ of $179$ cells, the rest wait on
+Jean Zay), test split. Left: the median $|\Delta|$ of the het $\mu$ against the MSE model's, one point per cell. Right:
+the pull std against the fraction of events with $|{\rm pull}|<1$; the star is a unit Gaussian.}
+\label{fig:het_delta_summary}
+\end{figure}
+
 
 \begin{figure}[H]
 \centering

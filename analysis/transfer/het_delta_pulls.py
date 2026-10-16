@@ -43,7 +43,7 @@ def main():
         ax.plot(g, np.exp(-g ** 2 / 2) / np.sqrt(2 * np.pi), "--", color="grey", label="unit Gaussian")
         ax.set_xlabel(r"pull $(\mu-y)/\sigma$"); ax.set_ylabel("density")
         ps.process_label(ax, LAB.get(probe, probe))
-        ps.legend(ax, "upper left", ncol=2)
+        ps.legend(ax, "upper left")
         ps.save(fig, os.path.join(OUT, f"pull_het_ladder_{probe}"))
     fig, (a1, a2) = ps.figure(ncols=2)
     probes = sorted(cells)
