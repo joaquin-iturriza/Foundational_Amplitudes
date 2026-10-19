@@ -5724,18 +5724,24 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-16, 16:30).} \emph{het\_delta (D47):} $72$ of $179$ cells done and written up
-    (fig:het\_delta\_summary); the $107$ cells first trained on Jean Zay wait: launch \code{het\_delta\_jzcopy}
-    (\code{scripts/launch\_het\_delta\_jzcopy.sh}) retries the copy to CC and lxplus each supervisor pass and keeps failing
-    (the relay times out reaching Jean Zay); \code{het\_delta\_jz} (\code{scripts/launch\_het\_delta.sh jz}) fires once the
-    marker \code{\textasciitilde/.local/share/ccorch/launch/FA/het\_delta\_jz.copied} exists. For the user (asked 08:15,
-    unanswered): train them on Jean Zay instead ($\sim22$ GPU-h)? Then rerun \code{collect\_het\_delta.py} on each site,
-    \code{het\_delta\_summary.py}, \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}. Also for the user: a het sweep
-    on the $2\to3$ cells (A/B step 4) and/or the $\sigma$ stage fitted on held-out residuals; which zero-shot fix to
-    design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's
-    matched $Z{+}ng$ test); deleting my test leftovers on CC (\code{zz\_memprof}, \code{zz\_memmap\_*},
-    \code{zz\_ema\_ckpt\_*}, mmap caches \code{2b98\ldots}, \code{98f8\ldots}); the D66 designs. Not measured: the
-    catalog stage's test calibration.
+  \item \textbf{Open (2026-10-19, 17:00).} \emph{het\_delta (D47, D71):} $72$ of $179$ cells done and written up
+    (fig:het\_delta\_summary). The $107$ cells first trained on Jean Zay retrain on CC (Jean Zay only when nothing else
+    fits), after their run folders and parents are copied there. The copy failed $93$ times (2026-10-16 to 10-19): the
+    relay's hop to Jean Zay used the default key exchange, which stalls on IDRIS login nodes; fixed 10-19 (\code{site}
+    \code{hop\_cmd} passes \code{sites.toml} \code{hop\_kex}; one cell copied, 11 files). Launch \code{het\_delta\_jzcopy}
+    (\code{scripts/launch\_het\_delta\_jzcopy.sh}, commit \code{e6ba22c}) copies to each of CC and lxplus on its own,
+    leaving \code{het\_delta\_jz.copied.<site>}; \code{het\_delta\_jz} (\code{scripts/launch\_het\_delta.sh jz}) fires on
+    the first marker and submits only to sites that have one. Open bug at 17:00: the parents lookup now runs \code{site run
+    jeanzay}, which timed out at 120\,s, so the parents list is garbage; fix it (longer timeout, or the list computed once
+    into a file) before the copy can succeed. Then rerun \code{collect\_het\_delta.py} on each site,
+    \code{het\_delta\_summary.py}, \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}. Also 10-19: \code{site} no
+    longer raises an event on every retry of a launch (first attempt, then every 28th), and an event acked as needing the
+    user stays quiet 24\,h (the user: ``you filled my screen with nonsense''). For the user: a het sweep or a held-out
+    $\sigma$ fit on the $12$ overfit $2\to3$ cells (not covered by D57/D70/D73); which zero-shot fix to design ((a)
+    eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$
+    test); deleting my test leftovers on CC (\code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*}, mmap caches
+    \code{2b98\ldots}, \code{98f8\ldots}); feedback on the D66 designs (written; the nonsm commits are code only and
+    stay). Not measured: the catalog stage's test calibration.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
