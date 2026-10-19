@@ -13,6 +13,8 @@ plan=$(timeout 300 site pick FA --jobs ${#LEFT[@]} --mem 16G --cpus 4 --hours 1.
 echo "$plan" | tail -4
 i=0
 for site in ccin2p3 lxplus; do
+    # the Jean Zay cells go only where their copy has landed (launch_het_delta_jzcopy.sh leaves one marker per site)
+    [ "$1" = jz ] && [ ! -e "$HOME/.local/share/ccorch/launch/FA/het_delta_jz.copied.$site" ] && continue
     n=$(echo "$plan" | awk -v s="$site" '$1==s && $3 ~ /^jobs?$/ {print $2}' | tail -1)
     for ((k = 0; k < ${n:-0} && i < ${#LEFT[@]}; k++, i++)); do
         read -r t cells <<< "${LEFT[$i]}"
