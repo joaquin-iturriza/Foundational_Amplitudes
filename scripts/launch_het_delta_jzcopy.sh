@@ -15,11 +15,19 @@ PAR=$(for c in $CELLS; do s=${c#runs/}; s=${s%%/*}; grep -m1 'fine_tune.pretrain
       | sed -E 's#.*(runs/[^ "]+)/models/.*#\1#' | sort -u | tr '\n' ' ')
 echo "parents: $PAR"
 pending=0
+# one path per `site copy`: it stops at the first path that fails and re-sends the earlier ones on the next try, and
+# Jean Zay drops a connection every few paths, so the batch never finished. Paths done go in <MARK>.<site>.done.
 for dst in ccin2p3 lxplus; do
     [ -e "$MARK.$dst" ] && continue
-    # shellcheck disable=SC2086
-    out=$(timeout 3600 site copy FA jeanzay "$dst" $CELLS $PAR --item het_delta 2>&1); rc=$?; echo "$out" | tail -3
-    if [ "$rc" -ne 0 ] || echo "$out" | grep -q "copy failed"; then pending=1; continue; fi
+    touch "$MARK.$dst.done"; left=0
+    for p in $CELLS $PAR; do
+        grep -qxF "$p" "$MARK.$dst.done" && continue
+        out=$(timeout 1800 site copy FA jeanzay "$dst" "$p" --item het_delta 2>&1); rc=$?
+        if [ "$rc" -ne 0 ] || echo "$out" | grep -q "copy failed"; then left=$((left+1)); continue; fi
+        echo "$p" >> "$MARK.$dst.done"
+    done
+    echo "$dst: $(wc -l < "$MARK.$dst.done") paths copied, $left failed this pass"
+    if [ "$left" -gt 0 ]; then pending=1; continue; fi
     touch "$MARK.$dst"; [ -e "$MARK" ] || touch "$MARK"
 done
 [ "$pending" -eq 0 ] || exit 75
