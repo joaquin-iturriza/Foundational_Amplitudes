@@ -33,7 +33,7 @@ cluster:
   time: '18:00:00'
 paths: null
 sweep_name: dancat_het_pre
-n_trials: 8
+n_trials: 12  # 8, then 4 after the lr window was widened to 2.7e-2 (D76)
 dyhpo:
   n_candidates: 2000
   seed: 42
@@ -44,6 +44,8 @@ dyhpo:
   waves:
   - 3
   - 3
+  - 2
+  - 2
   - 2
 fidelity_schedule:
   t_steps:
@@ -106,7 +108,7 @@ search_space:
 - name: training.lr
   type: float_log
   low: 0.001
-  high: 0.009
+  high: 0.027
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10
