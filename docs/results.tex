@@ -2243,33 +2243,42 @@ dashed.}
 \label{fig:het_sigonly}
 \end{figure}
 
-\paragraph{The $\Delta$ cells retrained with the het loss (D47; 2026-10-16, $72$ of $179$ cells).} Each cell of the
+\paragraph{The $\Delta$ cells retrained with the het loss (D47; 2026-10-16 and 10-21, all $179$ cells).} Each cell of the
 $\Delta$ plots' $8$k grid at $D=10^4$ (\code{delta\_audit.json}) retrained with the user's loss at its own config and
 HPs (CLAUDE.md A/B step 3), the same seed and, for a fine-tune, the same parent with its readout's $\mu$ row kept and the
 $\sigma$ row zeroed (a \code{sign\_head} parent's second row is its sign logit), then the $\sigma$-only stage (D70) and
 \code{tools/eval\_delta.py} on its test split (\code{scripts/job\_het\_delta.sh}; the four signed one-loop probes on
-their signed-log target). Done: the $72$ cells first trained on CC and lxplus, all run on CC ($18$ jobs). The $107$ first
-trained on Jean Zay wait: copying them off Jean Zay times out. Fig.~\ref{fig:het_delta_summary}
-(\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het} and
-\code{pull\_het\_ladder\_*} from \code{het\_delta\_pulls.py}). On the $60$ $2\to2$ cells the het $\mu$ has a median
-$|\Delta|$ $0.69$ times the MSE cell's (median over cells; lower in $48$ of $60$, from $0.03\times$ on the one-loop
-$ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9), and the pulls are calibrated: std $0.99$ to
-$1.17$, $|{\rm pull}|<1$ for $0.62$ to $0.70$ of the events. On the $12$ $2\to3$ cells ($ee\to d\bar dg$,
-$ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.61\times$ the MSE median $|\Delta|$,
-$0.90$ to $3.78$, lower in $1$ of $12$), and $\sigma$ is too small on test (pull std $0.99$ to $2.99$, $|{\rm pull}|<1$
-$0.48$ to $0.64$; on $u\bar u\to Zgg$ $1.8$ to $3.0$). The cause appears to be overfitting rather than the stage: on the same cells the
-training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$ to $2.99$,
-while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three splits. The stage fits $\sigma$ to the training residuals,
-which at $D=10^4$ on a $2\to3$ process are smaller than the residuals on unseen events. Under the A/B protocol the het
-loss losing at the MSE cell's HPs calls for its own sweep before a verdict on $\mu$; neither that nor a $\sigma$ fitted
-on held-out residuals is run.
+their signed-log target). All run on CC: the $72$ cells first trained on CC and lxplus in $18$ jobs (2026-10-16), the
+$107$ first trained on Jean Zay in $20$ (2026-10-21, after copying them and their $11$ parents to CC). One blew up:
+\code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$, at step $1360$ (validation NLL $10^{12}$, then $50$ non-finite gradient
+steps and the run aborts); its best checkpoint, step $400$ at NLL $-2.65$ against $-7$ to $-9$ for the other cells, went
+through the $\sigma$ stage on its own (\code{scripts/job\_het\_delta\_stage.sh}): $29\times$ the MSE cell's median
+$|\Delta|$, pull std $1.06$. It is drawn apart and left out of the numbers below. Fig.~\ref{fig:het_delta_summary}
+(\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het},
+\code{pull\_het\_ladder\_*} and \code{pull\_het\_summary} from \code{het\_delta\_pulls.py}). On the $146$ $2\to2$ cells the
+het $\mu$ has a median $|\Delta|$ $0.60$ times the MSE cell's (median over cells; lower in $125$ of $146$, from
+$0.03\times$ on the one-loop $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9; per probe from
+$0.15$ on the electroweak one-loop $ee\to d\bar d$ to $0.97$ on $ee\to d\bar d$), and the pulls are calibrated: std
+$1.01$, $1.02$, $1.03$ at the quartiles, $138$ of $146$ within $0.9$ to $1.2$, $|{\rm pull}|<1$ for $0.61$ to $0.80$ of
+the events. The eight outside: five between $0.81$ and $0.89$, and three above $1.2$ ($ee\to b\bar b$ one-loop from rungs 1
+and 8, $3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events
+(largest $|{\rm pull}|$ $236$ and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. On the $32$ $2\to3$ cells
+($ee\to d\bar dg$, $ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.57\times$ the MSE
+median $|\Delta|$, $0.90$ to $3.78$, lower in $2$ of $32$), and $\sigma$ is too small on test (pull std $1.83$ at the
+median, $0.99$ to $3.45$, $5$ of $32$ within $0.9$ to $1.2$; $|{\rm pull}|<1$ $0.34$ to $0.69$; $u\bar u\to Zgg$ worst,
+median std $2.14$). The cause appears to be overfitting rather than the stage, as measured on the first $12$ of these
+cells: the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
+to $2.99$, while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three
+splits. The stage fits $\sigma$ to the training residuals, which at $D=10^4$ on a $2\to3$ process are smaller than the
+residuals on unseen events. Under the A/B protocol the het loss losing at the MSE cell's HPs calls for its own sweep
+before a verdict on $\mu$; neither that nor a $\sigma$ fitted on held-out residuals is run.
 
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/het_delta_summary.pdf}
-\caption{The $\Delta$ cells retrained with the het loss against the MSE cells ($72$ of $179$ cells, the rest wait on
-Jean Zay), test split. Left: the median $|\Delta|$ of the het $\mu$ against the MSE model's, one point per cell. Right:
-the pull std against the fraction of events with $|{\rm pull}|<1$; the star is a unit Gaussian.}
+\caption{The $179$ $\Delta$ cells retrained with the het loss against the MSE cells, test split. Left: the median
+$|\Delta|$ of the het $\mu$ against the MSE model's, one point per cell. Right: the pull std against the fraction of
+events with $|{\rm pull}|<1$; the star is a unit Gaussian. Cross: the cell that blew up, at its best checkpoint.}
 \label{fig:het_delta_summary}
 \end{figure}
 
@@ -5724,24 +5733,16 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-19, 17:00).} \emph{het\_delta (D47, D71):} $72$ of $179$ cells done and written up
-    (fig:het\_delta\_summary). The $107$ cells first trained on Jean Zay retrain on CC (Jean Zay only when nothing else
-    fits), after their run folders and parents are copied there. The copy failed $93$ times (2026-10-16 to 10-19): the
-    relay's hop to Jean Zay used the default key exchange, which stalls on IDRIS login nodes; fixed 10-19 (\code{site}
-    \code{hop\_cmd} passes \code{sites.toml} \code{hop\_kex}; one cell copied, 11 files). Launch \code{het\_delta\_jzcopy}
-    (\code{scripts/launch\_het\_delta\_jzcopy.sh}, commit \code{e6ba22c}) copies to each of CC and lxplus on its own,
-    leaving \code{het\_delta\_jz.copied.<site>}; \code{het\_delta\_jz} (\code{scripts/launch\_het\_delta.sh jz}) fires on
-    the first marker and submits only to sites that have one. Open bug at 17:00: the parents lookup now runs \code{site run
-    jeanzay}, which timed out at 120\,s, so the parents list is garbage; fix it (longer timeout, or the list computed once
-    into a file) before the copy can succeed. Then rerun \code{collect\_het\_delta.py} on each site,
-    \code{het\_delta\_summary.py}, \code{delta\_plots.py --het}, \code{het\_delta\_pulls.py}. Also 10-19: \code{site} no
-    longer raises an event on every retry of a launch (first attempt, then every 28th), and an event acked as needing the
-    user stays quiet 24\,h (the user: ``you filled my screen with nonsense''). For the user: a het sweep or a held-out
-    $\sigma$ fit on the $12$ overfit $2\to3$ cells (not covered by D57/D70/D73); which zero-shot fix to design ((a)
-    eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$
-    test); deleting my test leftovers on CC (\code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*}, mmap caches
-    \code{2b98\ldots}, \code{98f8\ldots}); feedback on the D66 designs (written; the nonsm commits are code only and
-    stay). Not measured: the catalog stage's test calibration.
+  \item \textbf{Open (2026-10-21).} het\_delta (D47, D71) is done, all $179$ cells (fig:het\_delta\_summary). For the
+    user: a het sweep or a held-out $\sigma$ fit on the $32$ overfit $2\to3$ cells (not covered by D57/D70/D73); which
+    zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target
+    statistics, (c) Jonas's matched $Z{+}ng$ test); feedback on the D66 designs (written; the nonsm commits are code only
+    and stay). Not measured: the catalog stage's test calibration. Left on CC from my tests, not deleted (CLAUDE.md:
+    nothing outside the command that made it): \code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*}, mmap
+    caches \code{2b98\ldots}, \code{98f8\ldots}. Infrastructure since 10-19: \code{site} raises a launch's retry event only
+    on its first attempt and every 28th, and an event acked as needing the user stays quiet $24$\,h; the Jean Zay copy
+    goes one path per \code{site copy} with the paths done remembered
+    (\code{scripts/launch\_het\_delta\_jzcopy.sh}), since Jean Zay drops a connection every few paths.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
