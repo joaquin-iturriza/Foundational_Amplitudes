@@ -15,6 +15,7 @@ import plot_style as ps  # noqa: E402
 
 LR = {"hp0058": 8.94e-3, "hp1733": 8.91e-3, "hp1333": 6.92e-3, "hp1269": 7.22e-3, "hp1537": 4.42e-3, "hp0353": 4.04e-3,
       "hp1860": 1.73e-3, "hp1466": 8.83e-3}   # the trials' training.lr (sweeps_local/dancat_het_pre/summary.txt)
+BLOWUP = {"hp1466"}   # the trial that blew up (non-finite after step 15.4k); a best step before the last is not one
 
 
 def main():
@@ -27,7 +28,7 @@ def main():
         s = np.arange(1, len(r["val_curve"]) + 1) * r["validate_every"]
         nll, mse = np.array(r["val_curve"], float), np.array(r["val_mse_curve"], float)
         lab = f"hp{k[2:].lstrip('0')}, lr {LR[k] * 1e3:.1f}e-3"
-        if r["best_step"] < s[-1]:
+        if k in BLOWUP:
             # a run that blew up: drawn to its best step (x), the blow-up after it named in the legend, never dropped (CLAUDE.md, reported values)
             keep = s <= r["best_step"]
             s, nll, mse = s[keep], nll[keep], mse[keep]

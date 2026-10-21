@@ -55,6 +55,24 @@ def load(sub="delta_data"):
     return d
 
 
+
+def pick(D, p):
+    """The evaluation of a cell (p: its delta_audit.json entry) that stands for it: the cell's own, else its rerun (a
+    pruned trial rerun from its config, scripts/job_rerun_trial.sh); evaluated at both matmul precisions (TF32 on
+    A100/H100), the one that reproduces its recorded validation loss, i.e. the precision it was trained at
+    (sec:tf32-eval; off by up to 133x otherwise). Shared by every figure that compares against the MSE cells."""
+    t = tag(p.get("run_dir", "?"))
+    if t not in D and t + "_rerun" in D:
+        t += "_rerun"
+    rec = p.get("mse_logM2")
+    alt = [t + "_tf32off", t + "_tf32on"]
+    if rec and any(a in D for a in alt):
+        got = D.get("_meta", {})
+        cands = [c for c in [t] + alt if c in D and got.get(c)]
+        if cands:
+            t = min(cands, key=lambda c: abs(np.log10(got[c] / rec)))
+    return t
+
 def hist(ax, delta, **kw):
     """The |Delta| density per unit log10|Delta| (each line integrates to the fraction of events inside the bins)."""
     a = np.abs(delta[np.isfinite(delta)])
@@ -89,18 +107,7 @@ def main():
 
     def get(row):
         p = row.get(key) or {}
-        t = tag(p.get("run_dir", "?"))
-        if t not in D and t + "_rerun" in D:
-            t += "_rerun"          # a pruned trial rerun from its config (scripts/job_rerun_trial.sh)
-        rec = p.get("mse_logM2")
-        alt = [t + "_tf32off", t + "_tf32on"]
-        if rec and any(a in D for a in alt):
-            # evaluated at both matmul precisions (TF32 on A100/H100): a model is drawn at the one that reproduces its
-            # recorded validation loss, i.e. the precision it was trained at (sec:tf32-eval); off by up to 133x otherwise
-            got = D.get("_meta", {})
-            cands = [c for c in [t] + alt if c in D and got.get(c)]
-            if cands:
-                t = min(cands, key=lambda c: abs(np.log10(got[c] / rec)))
+        t, rec = pick(D, p), p.get("mse_logM2")
         if t not in D:
             missing.append(f"{row['probe']} {row['arm']} {p.get('site')}:{p.get('run_dir')}")
             return None, ""

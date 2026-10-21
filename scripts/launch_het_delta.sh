@@ -11,7 +11,7 @@ mapfile -t LEFT < <(grep -v '^#' "$JOBS" | while read -r t cells; do grep -qxF "
 [ ${#LEFT[@]} -eq 0 ] && { echo "all $(grep -vc '^#' "$JOBS") jobs submitted"; exit 0; }
 plan=$(timeout 300 site pick FA --jobs ${#LEFT[@]} --mem 16G --cpus 4 --hours 1.5 2>&1)
 echo "$plan" | tail -4
-i=0
+i=0; ok=0     # i: jobs tried, ok: jobs submitted (a failed one stays left and is retried on the next pass)
 for site in ccin2p3 lxplus; do
     # the Jean Zay cells go only where their copy has landed (launch_het_delta_jzcopy.sh leaves one marker per site)
     [ "$1" = jz ] && [ ! -e "$HOME/.local/share/ccorch/launch/FA/het_delta_jz.copied.$site" ] && continue
@@ -20,9 +20,9 @@ for site in ccin2p3 lxplus; do
         read -r t cells <<< "${LEFT[$i]}"
         # shellcheck disable=SC2086
         site submit "$site" FA scripts/job_het_delta.sh --item het_delta --est-gpu-hours "$t" \
-            --note "het retrain of Delta cells (D47)" -- $cells && echo "$cells" >> "$DONE"
+            --note "het retrain of Delta cells (D47)" -- $cells && { echo "$cells" >> "$DONE"; ok=$((ok + 1)); }
     done
 done
-left=$(( ${#LEFT[@]} - i ))
-echo "submitted $i, left $left"
+left=$(( ${#LEFT[@]} - ok ))
+echo "submitted $ok, left $left"
 [ "$left" -eq 0 ] || exit 75

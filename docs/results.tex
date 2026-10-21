@@ -364,7 +364,9 @@ $-3.96$; $4.0$ and $4.4\times10^{-3}$ $-3.77$ and $-3.84$; $1.7\times10^{-3}$ $-
 last step, still falling. hp1466 (lr $8.8\times10^{-3}$, L2 $4.8\times10^{-8}$, EMA decay $0.98$) blew up after step
 $15.4$k (validation NLL $1.9\times10^{6}$, the MSE of $\mu$ $6.5$); its best checkpoint, step $15360$, is at NLL $-2.83$
 and MSE $1.4\times10^{-2}$. Since the best lr sits at the top of the window and nothing has converged, a longer horizon or
-a window reaching higher lr would likely move the optimum; neither is run. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
+a window reaching higher lr would likely move the optimum; neither is run. Every trial against each searched HP:
+Fig.~\ref{fig:dancat_het_pre_hpo} (\code{dancat\_het\_pre\_hpo.py}); hp58 trained $281$\,min ($4.7$\,h) of the $5.1$\,h
+between its submission and its end. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
 validation NLL from $-4.098$ to $-4.102$; its test calibration is not measured yet.
 
 \paragraph{Its held-out split: zero-shot on $43$, in-class on $96$ (2026-10-16, D45).} hp58 scored on each of the $139$ held-out processes with
@@ -388,6 +390,18 @@ free, theirs does not, so the comparison favours us by exactly the scale and off
 $32$k steps, $8$ trials). Left: the validation NLL against the step. Right: the validation MSE of $\mu$ on the
 standardized $\log|\mathcal M|^2$. hp1466 is drawn to its best checkpoint (cross); it blew up after it.}
 \label{fig:dancat_het_pre}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\pnl{../analysis/catalog_daniel/figs/dancat_het_pre_hpo_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/dancat_het_pre_hpo_b.pdf} \\[1ex]
+\pnl{../analysis/catalog_daniel/figs/dancat_het_pre_hpo_c.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/dancat_het_pre_hpo_d.pdf} \\[1ex]
+\pnl{../analysis/catalog_daniel/figs/dancat_het_pre_hpo_e.pdf}
+\caption{The catalog pretraining sweep's $8$ trials: the validation NLL at the best checkpoint against (a) the learning
+rate, (b) the L2 $\lambda$, (c) the warmup fraction, (d) the cosine's final learning rate and (e) the EMA decay, each x
+axis exactly the searched range. Colour: the wave the trial was suggested in; open: EMA off; cross: hp1466, which blew
+up after step $15.4$k.}
+\label{fig:dancat_het_pre_hpo}
 \end{figure}
 
 \begin{figure}[H]
@@ -2229,7 +2243,9 @@ to $1.22$ except the worst-predicted decile at $2.15$; the $4$k refit gives $1.0
 $2.42$), the joint model $0.60$, $0.93$ and $0.22$ to $1.56$. Since D70 (the user: ``the short end of training with the trunk frozen is the default'') every HETEROSC run ends
 with this stage: \code{run.py} warm-starts a $\sigma$-only fit from the run's best checkpoint
 (\code{training.heterosc\_sigma\_stage\_steps} $250$, effective lr $0.01$, warmup $0$, no L2, EMA off) into
-\code{<run\_dir>/sigma\_stage}; $\mu$ is the run's own. Checked on a $500$-step het run of $ee\to t\bar t$ ($D=10^4$,
+\code{<run\_dir>/sigma\_stage}; $\mu$ is the run's own. It costs $17$ to $19$\,s of training on the single-process $8$k cells ($17$ to $20$\,min for the joint run, so
+$1.5$ to $1.8\%$) and $12.6$\,min on the catalog's hp58 against its $281$\,min ($4.5\%$; $44$\,min of wall, most of it
+loading the $1352$ pools). Checked on a $500$-step het run of $ee\to t\bar t$ ($D=10^4$,
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1\_stagetest}): $258$ trainable parameters, validation
 NLL $-3.82\to-4.65$ in $16$\,s.
 
@@ -2255,21 +2271,24 @@ steps and the run aborts); its best checkpoint, step $400$ at NLL $-2.65$ agains
 through the $\sigma$ stage on its own (\code{scripts/job\_het\_delta\_stage.sh}): $29\times$ the MSE cell's median
 $|\Delta|$, pull std $1.06$. It is drawn apart and left out of the numbers below. Fig.~\ref{fig:het_delta_summary}
 (\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het},
-\code{pull\_het\_ladder\_*} and \code{pull\_het\_summary} from \code{het\_delta\_pulls.py}). On the $146$ $2\to2$ cells the
-het $\mu$ has a median $|\Delta|$ $0.60$ times the MSE cell's (median over cells; lower in $125$ of $146$, from
-$0.03\times$ on the one-loop $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9; per probe from
-$0.15$ on the electroweak one-loop $ee\to d\bar d$ to $0.97$ on $ee\to d\bar d$), and the pulls are calibrated: std
-$1.01$, $1.02$, $1.03$ at the quartiles, $138$ of $146$ within $0.9$ to $1.2$, $|{\rm pull}|<1$ for $0.61$ to $0.80$ of
-the events. The eight outside: five between $0.81$ and $0.89$, and three above $1.2$ ($ee\to b\bar b$ one-loop from rungs 1
-and 8, $3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events
-(largest $|{\rm pull}|$ $236$ and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. On the $32$ $2\to3$ cells
-($ee\to d\bar dg$, $ee\to t\bar tg$, $u\bar u\to Zgg$, $Zggg$) both fail: the het $\mu$ is worse ($1.57\times$ the MSE
-median $|\Delta|$, $0.90$ to $3.78$, lower in $2$ of $32$), and $\sigma$ is too small on test (pull std $1.83$ at the
-median, $0.99$ to $3.45$, $5$ of $32$ within $0.9$ to $1.2$; $|{\rm pull}|<1$ $0.34$ to $0.69$; $u\bar u\to Zgg$ worst,
-median std $2.14$). The cause appears to be overfitting rather than the stage, as measured on the first $12$ of these
-cells: the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
+\code{pull\_het\_ladder\_*} and \code{pull\_het\_summary} from \code{het\_delta\_pulls.py}). Each het cell is compared with the MSE evaluation the $\Delta$ plots draw for it (\code{delta\_plots.pick}: the
+precision it was trained at; $3$ of them reruns of a pruned trial). On the $146$ $2\to2$ cells the het $\mu$ has a
+median $|\Delta|$ $0.64$ times the MSE cell's (median over cells; lower in $119$ of $146$, from $0.03\times$ on the
+one-loop $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9; per probe from $0.15$ on the
+electroweak one-loop $ee\to d\bar d$ to $0.98$ on $ee\to d\bar d$), and the pulls are calibrated: std $1.01$, $1.02$,
+$1.03$ at the quartiles, $138$ of $146$ within $0.9$ to $1.2$, $|{\rm pull}|<1$ for $0.61$ to $0.80$ of the events. The
+eight outside: five between $0.81$ and $0.89$, and three above $1.2$ ($ee\to b\bar b$ one-loop from rungs 1 and 8,
+$3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events (largest $|{\rm pull}|$ $236$
+and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. With more final-state particles both fail. On the $19$
+$2\to3$ cells ($3$ each of $ee\to d\bar dg$ and $ee\to t\bar tg$, $13$ of $u\bar u\to Zgg$) the het $\mu$ is worse
+($1.55\times$ the MSE median $|\Delta|$, $0.90$ to $3.78$, lower in $2$ of $19$) and $\sigma$ too small on test (pull
+std $2.14$ at the median, $0.99$ to $3.28$, $3$ of $19$ within $0.9$ to $1.2$; $|{\rm pull}|<1$ $0.46$ to $0.69$;
+$u\bar u\to Zgg$ worst). On the $13$ $2\to4$ cells ($u\bar u\to Zggg$) the same: $1.63\times$ ($1.16$ to $2.48$, lower in
+none), pull std $1.48$ at the median ($1.05$ to $3.45$, $2$ of $13$ within $0.9$ to $1.2$), $|{\rm pull}|<1$ $0.34$ to
+$0.62$. The cause appears to be overfitting rather than the stage, as measured on the first $12$ of these
+$32$ cells: the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
 to $2.99$, while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three
-splits. The stage fits $\sigma$ to the training residuals, which at $D=10^4$ on a $2\to3$ process are smaller than the
+splits. The stage fits $\sigma$ to the training residuals, which at $D=10^4$ on these processes are smaller than the
 residuals on unseen events. Under the A/B protocol the het loss losing at the MSE cell's HPs calls for its own sweep
 before a verdict on $\mu$; neither that nor a $\sigma$ fitted on held-out residuals is run.
 
@@ -2277,8 +2296,10 @@ before a verdict on $\mu$; neither that nor a $\sigma$ fitted on held-out residu
 \centering
 \includegraphics{../analysis/transfer/figs/het_delta_summary.pdf}
 \caption{The $179$ $\Delta$ cells retrained with the het loss against the MSE cells, test split. Left: the median
-$|\Delta|$ of the het $\mu$ against the MSE model's, one point per cell. Right: the pull std against the fraction of
-events with $|{\rm pull}|<1$; the star is a unit Gaussian. Cross: the cell that blew up, at its best checkpoint.}
+$|\Delta|$ of the het $\mu$ against the MSE model's, one point per cell. Right: the fraction of
+events with $|{\rm pull}|$ beyond $k$, the median cell of each group with the band holding $10$ to $90\%$ of its
+cells, against $\mathcal N(0,1)$ (dashed); a pull std and one fraction are two numbers of this curve and do not define a
+Gaussian. Cross and dotted: the cell that blew up, at its best checkpoint.}
 \label{fig:het_delta_summary}
 \end{figure}
 
@@ -5752,7 +5773,7 @@ of the three share a test set.
     over the truth's, x the gluon count of $u\bar u\to Z{+}ng$, diamonds the separate $u\bar d\to W^+4g$ probe drawn at
     $n=4$, four colours four rung-9 parents. Watch: supervisor \code{b73xtn2a9}, waiter re-armed each event.
   \item \textbf{Open (2026-10-21).} het\_delta (D47, D71) is done, all $179$ cells (fig:het\_delta\_summary). For the
-    user: a het sweep or a held-out $\sigma$ fit on the $32$ overfit $2\to3$ cells (not covered by D57/D70/D73); which
+    user: D75: het DyHPO sweeps on a few of the $32$ overfit cells ($19$ at $2\to3$, $13$ at $2\to4$), then the rest at shared HPs or swept; which
     zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target
     statistics, (c) Jonas's matched $Z{+}ng$ test); feedback on the D66 designs (written; the nonsm commits are code only
     and stay). Not measured: the catalog stage's test calibration. Left on CC from my tests, not deleted (CLAUDE.md:
