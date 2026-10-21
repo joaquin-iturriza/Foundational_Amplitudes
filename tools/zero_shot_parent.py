@@ -13,8 +13,8 @@ representation only, inverted exactly). Scored on the probe's validation split. 
 and one ZERO_SHOT_HIST line per probe. Needs a GPU.
 --twins: a JSON {probe: training process} for a per-process parent: a probe that relabels a training process is scored
 in log|M|^2 with that process's statistics (prepd_mean/std at its index in the parent's recipe), parent_stats "twin".
---save-dir: per probe <probe>.npz with the truth t, the affine-mapped prediction q_aff and, when there is one, the
-prediction q, all in log|M|^2 on the validation split (the Delta plots and per-process MSEs are built from these).
+--save-dir: per probe <probe>.npz with the truth t, the affine-mapped prediction q_aff, q_own (the output in the probe's
+own standardized units) and, when there is one, the prediction q, all in log|M|^2 on the validation split (the Delta plots and per-process MSEs are built from these).
     python tools/zero_shot_parent.py --parent <pretraining run dir> [--twins J] [--save-dir D] <probe recipe.yaml> [...]
 """
 import argparse, json, os, sys, tempfile
@@ -125,7 +125,11 @@ for recipe in a.recipes:
             "pred": np.histogram(q, e)[0].tolist(), "h2_range": [lo, hi],
             "h2": np.histogram2d(t, q, bins=40, range=[[lo, hi], [lo, hi]])[0].astype(int).tolist()}), flush=True)
     if a.save_dir:
+        # q_own: the raw output read in the probe's own standardized units (its train split's mean and std of
+        # log|M|^2, two numbers from its data, no fit to the predictions)
         np.savez_compressed(os.path.join(a.save_dir, probe + ".npz"), t=t.astype(np.float32),
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
+                            q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
+                            mu_sd=np.array([mu_p, sd_p]),
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
