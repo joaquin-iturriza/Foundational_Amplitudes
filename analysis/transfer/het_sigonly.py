@@ -50,7 +50,7 @@ def main():
     a2.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi), "--", color="k")
     a2.set_yscale("log"); a2.set_ylim(1e-4, 5)
     a2.set_xlabel(r"pull $(\mu-\log|\mathcal{M}|^2)/\sigma$"); a2.set_ylabel("density")
-    ps.legend(a2, "upper left"); ps.process_label(a1, r"$e^+e^-\to t\bar t$", loc="lower right")
+    ps.shared_legend(fig, a2, ncol=4); ps.process_label(a1, r"$e^+e^-\to t\bar t$", loc="lower right")
     ps.save(fig, os.path.join(HERE, "figs", "het_sigonly"))
 
 

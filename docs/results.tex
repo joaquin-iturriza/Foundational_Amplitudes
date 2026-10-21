@@ -5762,7 +5762,10 @@ of the three share a test set.
     \code{analysis/catalog\_daniel/data/heldout\_preds.npz}, \code{heldout\_delta.py}, write up, send) and launch
     \code{het23\_sweeps} (D75, item het23, the user chose the 8 sweeps, 52 trials, ~21 GPU-h; then compare each sweep's best
     HPs across process and arm, best-vs-best with the MSE cell, and propose shared HPs or per-cell sweeps for the other 24).
-    Open for the user: whether to widen the catalog sweep's lr window (design to show first).
+    Also queued: \code{dancat\_ext} (D76: lr window to $2.7\times10^{-2}$, 4 more trials, waves 2+2) and
+    \code{catalog\_global} (D77: hp58's config with global preprocessing, shared + affine in $N$, then the held-out
+    zero-shot on its own; the catalog sweep had per-process preprocessing, so its held-out ``on its own'' reads the
+    output with each probe's own train statistics instead). Write-ups pending for all of them.
   \item \textbf{Open (2026-10-21).} het\_delta (D47, D71) is done, all $179$ cells (fig:het\_delta\_summary). For the
     user: D75: het DyHPO sweeps on a few of the $32$ overfit cells ($19$ at $2\to3$, $13$ at $2\to4$), then the rest at shared HPs or swept; which
     zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target
