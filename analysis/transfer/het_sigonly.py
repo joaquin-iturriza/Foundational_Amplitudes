@@ -30,21 +30,28 @@ def main():
         idx = np.clip(np.digitize(sg, q[1:-1]), 0, 9)
         cs = np.array([np.median(sg[idx == k]) for k in range(10)])
         rms = np.array([np.sqrt(np.mean(r[idx == k] ** 2)) for k in range(10)])
-        a1.plot(cs, rms, "o-", color=c, label=lab)
+        a1.plot(cs, rms, "o-", color=c)
+        a2.plot([], [], "-", color=c, label=lab)
         lo, hi = min(lo, cs.min(), rms.min()), max(hi, cs.max(), rms.max())
         pull = (mu - tr) / sg
         hh, ee = np.histogram(pull, bins=np.linspace(-5, 5, 41), density=True)
         a2.stairs(hh, ee, color=c)
         print(f"{lab}: test pull std {pull.std():.2f}, |pull|<1 {np.mean(np.abs(pull) < 1):.2f}, RMS/sigma per decile "
               f"{np.round(rms / cs, 2)}, NLL {np.mean(np.log(sg) + r ** 2 / (2 * sg ** 2)):.3f}")
-    a1.plot([lo / 2, hi * 2], [lo / 2, hi * 2], "--", color="k", label="calibrated")
+    # a decade the same length on both axes, so the calibrated line is the box's true diagonal; the legend sits on the
+    # right panel, so it does not stretch this one
     a1.set_xscale("log"); a1.set_yscale("log")
+    c0, ydec = np.sqrt(lo * hi), np.log10(hi / lo) + 0.5
+    xdec = ydec * ps.PLOT_W_IN / ps.PLOT_H_IN
+    a1.set_xlim(c0 / 10 ** (xdec / 2), c0 * 10 ** (xdec / 2)); a1.set_ylim(c0 / 10 ** (ydec / 2), c0 * 10 ** (ydec / 2))
+    a1.plot([c0 / 1e3, c0 * 1e3], [c0 / 1e3, c0 * 1e3], "--", color="k")
+    a2.plot([], [], "--", color="k", label=r"calibrated, $\mathcal{N}(0,1)$")
     a1.set_xlabel(r"predicted $\sigma$"); a1.set_ylabel("actual error")
     x = np.linspace(-5, 5, 201)
     a2.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi), "--", color="k")
     a2.set_yscale("log"); a2.set_ylim(1e-4, 5)
-    a2.set_xlabel(r"$(\mu-\log|\mathcal{M}|^2)/\sigma$"); a2.set_ylabel("density")
-    ps.legend(a1, "upper left"); ps.process_label(a2, r"$e^+e^-\to t\bar t$")
+    a2.set_xlabel(r"pull $(\mu-\log|\mathcal{M}|^2)/\sigma$"); a2.set_ylabel("density")
+    ps.legend(a2, "upper left"); ps.process_label(a1, r"$e^+e^-\to t\bar t$", loc="lower right")
     ps.save(fig, os.path.join(HERE, "figs", "het_sigonly"))
 
 

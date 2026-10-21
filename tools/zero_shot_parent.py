@@ -11,7 +11,11 @@ per-process parent has no prediction for a new process (only val_loss_affine). T
 mu_p + sigma_p z, with the probe's own statistics fitted on its train split (fine_tune.target_stats=own; a
 representation only, inverted exactly). Scored on the probe's validation split. Prints one ZERO_SHOT JSON line
 and one ZERO_SHOT_HIST line per probe. Needs a GPU.
-    python tools/zero_shot_parent.py --parent <pretraining run dir> <probe recipe.yaml> [<probe recipe.yaml> ...]
+--twins: a JSON {probe: training process} for a per-process parent: a probe that relabels a training process is scored
+in log|M|^2 with that process's statistics (prepd_mean/std at its index in the parent's recipe), parent_stats "twin".
+--save-dir: per probe <probe>.npz with the truth t, the affine-mapped prediction q_aff and, when there is one, the
+prediction q, all in log|M|^2 on the validation split (the Delta plots and per-process MSEs are built from these).
+    python tools/zero_shot_parent.py --parent <pretraining run dir> [--twins J] [--save-dir D] <probe recipe.yaml> [...]
 """
 import argparse, json, os, sys, tempfile
 
@@ -29,12 +33,24 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--parent", required=True, help="pretraining run dir (config.yaml, data_stats.json, models/)")
 ap.add_argument("--train-subsample", type=int, default=10000,
                 help="probe train events read for its own target statistics (a representation, inverted exactly)")
+ap.add_argument("--twins", default=None, help="JSON {probe: training process it relabels} (per-process parent)")
+ap.add_argument("--save-dir", default=None, help="write <probe>.npz (t, q_aff, q) here")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 
 parent = os.path.abspath(a.parent)
 pstats = json.load(open(os.path.join(parent, "data_stats.json")))
 ckpt = os.path.join(parent, "models", "model_run0_best.pt")
+twins = json.load(open(a.twins)) if a.twins else {}
+if twins:
+    import yaml
+    _pc = OmegaConf.load(os.path.join(parent, "config.yaml"))
+    _pr = yaml.safe_load(open(siteconf._expand_str(str(_pc.data.processes_file))))
+    _pr = _pr.get("processes", _pr) if isinstance(_pr, dict) else _pr
+    parent_index = {p["name"]: i for i, p in enumerate(_pr)}   # the order prepd_mean/std follow (experiment recipe load)
+    assert len(parent_index) == len(pstats["prepd_mean"]), "parent recipe and its data_stats disagree in length"
+if a.save_dir:
+    os.makedirs(a.save_dir, exist_ok=True)
 for recipe in a.recipes:
     recipe = os.path.abspath(siteconf._expand_str(recipe))
     cfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
@@ -88,11 +104,14 @@ for recipe in a.recipes:
         mu_c, sd_c, kind = float(am["a"]) + float(am["b"]) * N, float(am["sigma"]), "affine_multiplicity"
     elif pstats.get("shared_standardization"):
         mu_c, sd_c, kind = float(pstats["prepd_mean"][0]), float(pstats["prepd_std"][0]), "shared"
+    elif probe in twins:
+        i = parent_index[twins[probe]]
+        mu_c, sd_c, kind = float(pstats["prepd_mean"][i]), float(pstats["prepd_std"][i]), "twin"
     else:
         mu_c = sd_c = None; kind = "per_process"
     rec = {"probe": probe, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
            "n_val": int(len(z)), "var_logm2": float(np.var(t)), "val_loss_affine": affine,
-           "affine_ab": [float(c) for c in coef]}
+           "affine_ab": [float(c) for c in coef], "twin": twins.get(probe)}
     if mu_c is not None:
         q = mu_c + sd_c * h                                               # the zero-shot log|M|^2
         mse = float(np.mean((q - t) ** 2))
@@ -105,4 +124,8 @@ for recipe in a.recipes:
             "probe": probe, "parent": parent, "edges": e.tolist(), "truth": np.histogram(t, e)[0].tolist(),
             "pred": np.histogram(q, e)[0].tolist(), "h2_range": [lo, hi],
             "h2": np.histogram2d(t, q, bins=40, range=[[lo, hi], [lo, hi]])[0].astype(int).tolist()}), flush=True)
+    if a.save_dir:
+        np.savez_compressed(os.path.join(a.save_dir, probe + ".npz"), t=t.astype(np.float32),
+                            q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
+                            q=(q if mu_c is not None else np.zeros(0)).astype(np.float32))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)

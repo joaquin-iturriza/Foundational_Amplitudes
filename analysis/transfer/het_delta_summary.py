@@ -14,6 +14,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import plot_style as ps  # noqa: E402
 from delta_plots import load, tag  # noqa: E402
 
+# pull thresholds for the right panel: the fraction of events beyond k sigma, the whole shape of |pull| (a std and one
+# fraction are two numbers of it and do not define a Gaussian)
+KS = np.linspace(0, 5, 26)
 # the probes with three final-state particles (2->3)
 THREE = {"ee_ddbarg", "ee_ttbarg", "uubar_Zgg", "uubar_Zggg"}
 # het retrains that blew up: drawn apart at their best checkpoint (CLAUDE.md, reported values), left out of the ranges
@@ -38,7 +41,8 @@ def main():
         pts.append(dict(tag=t, probe=r["probe"], arm=r["arm"], three=r["probe"] in THREE, blowup=t in BLOWUP,
                         mse=None if m is None else float(np.median(np.abs(m[np.isfinite(m)]))),
                         het=float(np.median(np.abs(d[np.isfinite(d)]))), std=float(p.std()),
-                        f1=float(np.mean(np.abs(p) < 1))))
+                        f1=float(np.mean(np.abs(p) < 1)),
+                        tail=np.array([np.mean(np.abs(p) > k) for k in KS])))
     bad = [x for x in pts if x["blowup"]]
     pts = [x for x in pts if not x["blowup"]]
     fig, (a1, a2) = ps.figure(ncols=2)
@@ -46,18 +50,24 @@ def main():
         q = [x for x in pts if x["three"] == three]
         qq = [x for x in q if x["mse"] is not None]
         a1.plot([x["mse"] for x in qq], [x["het"] for x in qq], "o", color=c, label=lab)
-        a2.plot([x["std"] for x in q], [x["f1"] for x in q], "o", color=c)
+        T = np.array([x["tail"] for x in q])
+        a2.plot(KS, np.median(T, 0), "-", color=c)
+        a2.fill_between(KS, np.percentile(T, 10, 0), np.percentile(T, 90, 0), color=c, alpha=0.25, lw=0)
     for x in bad:
         if x["mse"]:
             a1.plot([x["mse"]], [x["het"]], "x", color="k", label="blew up")
-        a2.plot([x["std"]], [x["f1"]], "x", color="k")
+        a2.plot(KS, x["tail"], ":", color="k", label="blew up")
     lo = min(min(x["mse"] for x in pts if x["mse"]), min(x["het"] for x in pts))
     hi = max(max(x["mse"] for x in pts if x["mse"]), max(x["het"] for x in pts))
     a1.plot([lo, hi], [lo, hi], "--", color="grey", label="equal")
-    a2.plot([1], [0.683], "*", color="k", label="unit Gaussian")
+    from math import erfc
+    a2.plot(KS, [erfc(k / np.sqrt(2)) for k in KS], "--", color="k", label=r"$\mathcal{N}(0,1)$")
+    a2.plot([], [], "-", color="grey", label="median cell")
+    a2.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ of cells")
+    a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
     a1.set_xlabel(r"median $|\Delta|$, MSE"); a1.set_ylabel(r"median $|\Delta|$, het")
-    a2.set_xlabel("pull std"); a2.set_ylabel(r"fraction $|{\rm pull}|<1$")
+    a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
     ps.legend(a1, "upper left"); ps.legend(a2, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))
     r = np.array([x["het"] / x["mse"] for x in pts if x["mse"]])
