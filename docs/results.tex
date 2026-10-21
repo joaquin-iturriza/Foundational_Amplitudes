@@ -5754,24 +5754,15 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22, user's review of the five figures; answer each, first).} The user: stop re-explaining
-    the het loss. (1) fig:het\_sigonly: the short refit is the default already (D70); give its wall time and its share
-    of training (the ttbar $32$k run, the het\_delta cells, the catalog's $44$\,min against hp58's training); left panel:
-    the calibrated diagonal as a true diagonal (equal axes, legend not stretching the y range); right panel x label
-    ``pull''. (2) $2\to3$ het cells: the user wants a DyHPO sweep on a few of the $32$, check whether the best HPs agree,
-    then the rest at shared HPs or each swept; record a decision in the user's words, item, launch. Before it: say
-    whether the DyHPO fixes from the likelihoods project are in (yes: \code{4606315} 10-10 surrogate fitted in
-    suggest, standardised objective, diverged = worst; \code{8d31b58} 10-15 GP surrogate and signed-objective scaling;
-    \code{33b3079} whole waves in drive.py). Answer: std $=1$ with $68.3\%$ inside $\pm1$ does not define a unit Gaussian
-    (two moments of a shape; a heavy-tailed shape can match both), show the pull histograms / QQ instead. (3) catalog
-    sweep: a wider lr window ``probably makes sense''; show the full HPO (every trial's HPs and result) first; remind:
-    $3.9$ passes over the data, $1.8$ to $5.1$\,h per trial, $37$ GPU-h; hp58's own wall time. (4) catalog held-out:
-    $\Delta$ plots raw and after the best affine map, and a version of arXiv:2606.23791's per-process held-out MSE figure
-    (interpolation / extrapolation groups, MSE$(\log|\mathcal M|^2)$ per process) for hp58, raw and after the map; check
-    whether \code{job\_catalog\_heldout.sh} kept per-event predictions, else a short GPU eval. (5) fig:zero\_shot\_parts
-    explained plainly: left the level error (squared mean offset over the truth's variance), right the prediction's spread
-    over the truth's, x the gluon count of $u\bar u\to Z{+}ng$, diamonds the separate $u\bar d\to W^+4g$ probe drawn at
-    $n=4$, four colours four rung-9 parents. Watch: supervisor \code{b73xtn2a9}, waiter re-armed each event.
+  \item \textbf{Open (2026-10-22, 01:30).} From the user's review of the five figures: answered (sigma-stage cost, the
+    DyHPO fixes, why the star does not define a Gaussian, the catalog sweep's passes and hours, fig:zero\_shot\_parts);
+    done: fig:het\_sigonly true diagonal, fig:het\_delta\_summary split 2->2/2->3/2->4 with the |pull| tail fractions,
+    fig:dancat\_het\_pre\_hpo. Queued: launch \code{heldout\_preds} (D74, item heldout\_preds:
+    \code{job\_catalog\_heldout\_preds.sh}, then \code{collect\_heldout\_preds.py} on CC into
+    \code{analysis/catalog\_daniel/data/heldout\_preds.npz}, \code{heldout\_delta.py}, write up, send) and launch
+    \code{het23\_sweeps} (D75, item het23, the user chose the 8 sweeps, 52 trials, ~21 GPU-h; then compare each sweep's best
+    HPs across process and arm, best-vs-best with the MSE cell, and propose shared HPs or per-cell sweeps for the other 24).
+    Open for the user: whether to widen the catalog sweep's lr window (design to show first).
   \item \textbf{Open (2026-10-21).} het\_delta (D47, D71) is done, all $179$ cells (fig:het\_delta\_summary). For the
     user: D75: het DyHPO sweeps on a few of the $32$ overfit cells ($19$ at $2\to3$, $13$ at $2\to4$), then the rest at shared HPs or swept; which
     zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling powers and mass dimension in the target
