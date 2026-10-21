@@ -60,19 +60,23 @@ def main():
     for x in bad:
         if x["mse"]:
             a1.plot([x["mse"]], [x["het"]], "x", color="k", label="blew up")
-        a2.plot(KS, x["tail"], ":", color="k", label="blew up")
     lo = min(min(x["mse"] for x in pts if x["mse"]), min(x["het"] for x in pts))
     hi = max(max(x["mse"] for x in pts if x["mse"]), max(x["het"] for x in pts))
-    a1.plot([lo, hi], [lo, hi], "--", color="grey", label="equal")
+    lim = (lo / 1.5, hi * 1.5)          # the same limits on both axes: "equal" is the plot box's diagonal
+    a1.set_xlim(*lim); a1.set_ylim(*lim)
+    a1.plot(lim, lim, "--", color="grey", label="equal")
     from math import erfc
-    a2.plot(KS, [erfc(k / np.sqrt(2)) for k in KS], "--", color="k", label=r"$\mathcal{N}(0,1)$")
-    a2.plot([], [], "-", color="grey", label="median cell")
-    a2.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ of cells")
+    a2.plot(KS, [erfc(k / np.sqrt(2)) for k in KS], "--", color="k")
+    # one legend strip above both panels (a corner legend would make room by growing the left panel's y range and
+    # break its equal limits); the right panel's entries are drawn as proxies on the left
+    a1.plot([], [], "--", color="k", label=r"$\mathcal{N}(0,1)$ (right)")
+    a1.plot([], [], "-", color="grey", label="median cell (right)")
+    a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ of cells (right)")
     a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
     a1.set_xlabel(r"median $|\Delta|$, MSE"); a1.set_ylabel(r"median $|\Delta|$, het")
     a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
-    ps.legend(a1, "upper left"); ps.legend(a2, "upper right")
+    ps.shared_legend(fig, a1, ncol=4)
     ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))
     r = np.array([x["het"] / x["mse"] for x in pts if x["mse"]])
     print(f"{len(pts)} cells, {len(r)} with an MSE counterpart; het/MSE median |Delta|: median {np.median(r):.2f}, "

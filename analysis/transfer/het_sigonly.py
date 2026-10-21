@@ -38,13 +38,12 @@ def main():
         a2.stairs(hh, ee, color=c)
         print(f"{lab}: test pull std {pull.std():.2f}, |pull|<1 {np.mean(np.abs(pull) < 1):.2f}, RMS/sigma per decile "
               f"{np.round(rms / cs, 2)}, NLL {np.mean(np.log(sg) + r ** 2 / (2 * sg ** 2)):.3f}")
-    # a decade the same length on both axes, so the calibrated line is the box's true diagonal; the legend sits on the
+    # the same limits on both axes, so the calibrated line y = x is the plot box's diagonal; the legend sits on the
     # right panel, so it does not stretch this one
     a1.set_xscale("log"); a1.set_yscale("log")
-    c0, ydec = np.sqrt(lo * hi), np.log10(hi / lo) + 0.5
-    xdec = ydec * ps.PLOT_W_IN / ps.PLOT_H_IN
-    a1.set_xlim(c0 / 10 ** (xdec / 2), c0 * 10 ** (xdec / 2)); a1.set_ylim(c0 / 10 ** (ydec / 2), c0 * 10 ** (ydec / 2))
-    a1.plot([c0 / 1e3, c0 * 1e3], [c0 / 1e3, c0 * 1e3], "--", color="k")
+    lim = (lo / 1.5, hi * 1.5)
+    a1.set_xlim(*lim); a1.set_ylim(*lim)
+    a1.plot(lim, lim, "--", color="k")
     a2.plot([], [], "--", color="k", label=r"calibrated, $\mathcal{N}(0,1)$")
     a1.set_xlabel(r"predicted $\sigma$"); a1.set_ylabel("actual error")
     x = np.linspace(-5, 5, 201)
