@@ -33,7 +33,7 @@ random.Random(0).shuffle(r["processes"]); r["processes"] = r["processes"][:19]
 yaml.safe_dump(r, open(sys.argv[1], "w")); print("cat_19:", [p["name"] for p in r["processes"]])
 PY
 COMMON=(warm_start_idx=null run_name=null base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null
-        training.iterations=500 training.validate_frac=1.0 evaluate=false training.heterosc_sigma_stage_steps=0
+        training.iterations=500 training.validate_frac=1.0 evaluate=false ++training.heterosc_sigma_stage_steps=0
         ++training.track_train_eval=false)
 HET=(training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_select=nll ++model.net.sigma_after_pool=true
      ++model.net.detach_sigma_backbone=false training.sign_head=false)
