@@ -366,7 +366,15 @@ $15.4$k (validation NLL $1.9\times10^{6}$, the MSE of $\mu$ $6.5$); its best che
 and MSE $1.4\times10^{-2}$. Since the best lr sits at the top of the window and nothing has converged, a longer horizon or
 a window reaching higher lr would likely move the optimum; neither is run. Every trial against each searched HP:
 Fig.~\ref{fig:dancat_het_pre_hpo} (\code{dancat\_het\_pre\_hpo.py}); hp58 trained $281$\,min ($4.7$\,h) of the $5.1$\,h
-between its submission and its end. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
+between its submission and its end. Why a catalog step is slower than a rung-9 step (D79;
+\code{scripts/job\_step\_profile.sh}, $500$ steps each on one V100, batch $16384$, the data wait against the step's
+compute from \code{LLOCA\_PROFILE\_STEP}): hp58's configuration $0.474$\,s/step, rung~9 ($9$ processes, no diagrams,
+MSE) $0.360$, so $32\%$ slower. Without the diagram encoder the catalog step is $0.412$; on $19$ catalog processes
+with it, $0.394$; rung~9 with the diagram encoder $0.374$, with the het loss $0.361$. The data wait is $2$ to $5$\,ms in
+every variant. So the extra $0.11$\,s is compute, about half of it the diagram encoder, which costs $0.062$\,s with
+$1352$ processes in a batch and $0.014$ with $9$, and the rest the number of processes per batch; the het loss costs
+nothing. Memory-mapped data was not timed (it does not support the sign head rung~9 uses), and need not be: the data
+wait is under $1\%$ of the step. The $\sigma$-only stage on hp58 (D70; \code{tools/sigma\_stage.py}, $44$\,min on the full catalog) moves the
 validation NLL from $-4.098$ to $-4.102$; its test calibration is not measured yet.
 
 \paragraph{Its held-out split: zero-shot on $43$, in-class on $96$ (2026-10-16, D45).} hp58 scored on each of the $139$ held-out processes with
@@ -432,20 +440,24 @@ from $10^4$ train events each, within $0.012$ median of hp58's own statistics), 
 level error $(\hat\mu-\mu)^2/\sigma^2$ and the spread ratio $\hat\sigma/\sigma$, the two parts of a zero-shot error the
 normalization sets (Fig.~\ref{fig:zero_shot_parts}). Median level error over the $139$: one shared normalization $6.0$,
 the mean linear in $N$ $2.9$, the physics features in a ridge regression $0.59$, with gradient-boosted trees on its
-residuals $0.027$ ($90\%$ quantile $124$, $83$, $6.1$, $1.7$). On the $43$ held-out processes that relabel no training
-process: $45$, $31$, $0.76$, $0.19$. Spread ratio, $10$ to $90\%$ of processes: $0.61$ to $2.49$ for one spread (both
-baselines), $0.69$ to $1.42$ linear, $0.85$ to $1.27$ with the trees. Cross-fitted on the training processes, a
-relabelling class out of the fit together: $3.0$, $1.7$, $0.46$, $0.077$. The $96$ relabels have exact twins in
-training, so their numbers measure a lookup; the $43$ and the cross-fit are the test.
+residuals $0.015$ ($90\%$ quantile $124$, $83$, $6.1$, $1.4$). On the $43$ held-out processes that relabel no training
+process: $45$, $31$, $0.76$, $0.32$. Spread ratio, $10$ to $90\%$ of processes: $0.61$ to $2.49$ for one spread (both
+baselines), $0.69$ to $1.42$ linear, $0.88$ to $1.24$ with the trees. Cross-fitted on the training processes, a
+relabelling class out of the fit together: $3.0$, $1.7$, $0.46$, $0.064$. The $96$ relabels have exact twins in
+training, so their numbers measure a lookup; the $43$ and the cross-fit are the test. Every choice in $g$ (features,
+the trees' $800$ rounds of depth $3$ at rate $0.03$) is made on the cross-fit alone, never on the held-out processes;
+the model's own particle table pooled per side and the number of Feynman diagrams as features lower hp58's held-out
+MSE on its own ($1.27$ to $0.89$ on the $43$) but raise the cross-fit level error ($0.077$ to $0.12$), so they are not
+used (\code{stats\_net.py --props --ndiag}).
 
 hp58 read with $g$'s statistics, $\hat\mu+\hat\sigma h$ with $h$ its output, is a zero-shot on its own: nothing from
 the held-out process's data (\code{job\_catalog\_heldout\_preds.sh}, \code{heldout\_delta.py};
 Figs.~\ref{fig:heldout_delta} and \ref{fig:heldout_mse}). Median over processes of MSE$(\log|\mathcal M|^2)$ on the
-$43$: $1.27$ ($10$ to $90\%$: $0.14$ to $4.7$), against $0.46$ with the process's own train mean and spread (two
+$43$: $1.27$ ($10$ to $90\%$: $0.10$ to $4.1$), against $0.46$ with the process's own train mean and spread (two
 numbers from its data, none fitted to the predictions) and $0.080$ after the best rescale and shift; on the $96$
-relabels $0.22$, $0.0091$, $0.0055$. The median $|\Delta|$ per process on the $43$: $0.70$, $0.37$, $0.14$. The worst
-on its own are $gg\to b\bar tW^+$ and its conjugate ($51$ and $49$; $g$ places the mean $4.8$ too low) and $s\bar s\to
-d\bar uW^+$ and its conjugate ($17$; $\hat\mu=-7.3$ against $-11.5$). So $g$'s level error, not the shape of hp58's
+relabels $0.12$, $0.0091$, $0.0055$. The median $|\Delta|$ per process on the $43$: $0.69$, $0.37$, $0.14$. The worst
+on its own are $gg\to b\bar tW^+$ and its conjugate ($46$ and $43$; $g$ places the mean about $5$ too low) and $s\bar s\to
+d\bar uW^+$ and its conjugate ($14$; $g$'s mean about $4$ too high). So $g$'s level error, not the shape of hp58's
 prediction, is most of the gap on its own; the rescale-and-shift number bounds what a perfect $g$ could reach with this
 model. Not run: a pretraining normalized by $g$.
 
