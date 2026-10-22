@@ -51,8 +51,21 @@ def main():
                 res[f"{name}|{lab}|{'96 relabels' if rel else '43 new'}"] = dict(
                     n=len(Q), median=float(np.median(Q)) if Q else None,
                     p10=float(np.quantile(Q, .1)) if Q else None, p90=float(np.quantile(Q, .9)) if Q else None)
+    # the on-its-own error split per process into the squared mean error (level) and the error's variance (shape):
+    # medians of each, and the median of the per-process level fraction (medians of the parts do not add)
+    for name, z in models.items():
+        for rel in (False, True):
+            d = [z[f"{p}__q"].astype(float) - z[f"{p}__t"].astype(float) for p in probes
+                 if (p in twins) == rel and f"{p}__q" in z]
+            lv, sh = np.array([x.mean() ** 2 for x in d]), np.array([x.var() for x in d])
+            res[f"{name}|split|{'96 relabels' if rel else '43 new'}"] = dict(
+                n=len(d), level=float(np.median(lv)), shape=float(np.median(sh)),
+                level_fraction=float(np.median(lv / (lv + sh))))
+            v = res[f"{name}|split|{'96 relabels' if rel else '43 new'}"]
+            print(f"{name}|split|{'96 relabels' if rel else '43 new'}: level {v['level']:.3g}, shape {v['shape']:.3g}, "
+                  f"level fraction (median per process) {v['level_fraction']:.2f}")
     for k, v in res.items():
-        if v["median"] is not None:
+        if v.get("median") is not None:
             print(f"{k:58s} n={v['n']:3d} median {v['median']:.3g} (10-90% {v['p10']:.3g} to {v['p90']:.3g})")
     json.dump(res, open(os.path.join(HERE, "data", "catalog_norm_heldout.json"), "w"), indent=1)
 

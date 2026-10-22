@@ -612,17 +612,17 @@ A & $2.41$ ($0.033$ to $17$) & $0.135$ & $0.0045$ ($0.0004$ to $0.024$) & $0.004
 B (blew up) & $0.60$ ($0.17$ to $3.4$) & $0.22$ & $0.067$ & $0.058$ \\
 \end{tabular}
 \end{center}
-``After rescale and shift'' is an oracle (the best affine map, fitted on the test truth). Split into the squared mean
-error (level) and the variance of the error (shape), median over the $43$ new: A $2.3$ and $0.14$, B $0.11$ and
-$0.23$. So A learns the shape best, and on the relabels it is $27\times$ better than hp58 + $g$ on its own and better
-even than hp58 after the oracle map; but on the new processes $90\%$ of its error is the level its factor sets wrong.
+The rescale-and-shift columns are medians only. ``After rescale and shift'' is an oracle (the best affine map, fitted on the test truth). Split into the squared mean
+error (level) and the variance of the error (shape), median over the $43$ new (\code{catalog\_norm\_heldout.py}):
+A $2.3$ and $0.14$, B $0.11$ and $0.23$; the level's share of each process's error, median over the $43$, is $0.90$ for A
+and $0.38$ for B ($0.85$ for hp58 + $g$). So A learns the shape best, and on the relabels it is $27\times$ better than hp58 + $g$ on its own and better
+even than hp58 after the oracle map; but on the new processes most of its error is the level its factor sets wrong.
 The multi-Higgs processes are the bulk of it ($Z HH$, $W^\pm HH$, $HHH$ sit $3.6$ to $5.2$ too high: their leading
 coupling product is $ZH$'s, as Fig.~\ref{fig:norm_factor} found), then $gg\to Wq\bar q'$ ($3.6$ too low). B, with no
 factor, places levels by learning them from the particles and is the best of the three on the new processes on its own.
 Correcting A's predictions afterwards by IDEN and colour or by the sum over diagrams makes it worse (median $2.05$ to
 $9.8$ on the new, and $0.5$ to $1.9$ on the relabels): A's network has learned its own levels, so a better factor has
-to be in its training target. Next: A with IDEN, colour and the diagram sum in the target (the exploration's best
-data-free level, $2.3$ against A's $4.8$), and B's stability at hp58's HPs, are the user's call.
+to be in its training target.
 
 \begin{figure}[H]
 \centering
@@ -643,9 +643,9 @@ relabelling class on the training processes it is $0.12$; cross-fitted by multip
 $2\to2$ process placing the $2\to2$ ones, and the same for $2\to3$) it is $10.4$, so the descriptors interpolate between
 processes of a seen multiplicity and do not extrapolate in it. For comparison, the level read off the first $k$ events
 of each held-out process: $0.059$ at $k=10$ and $0.0067$ at $k=100$ (the sampling error of a $k$-event mean, $\approx1/k$).
-So ten events of a new process place its level as well as the best data-free map, and a hundred do $10\times$ better
-than any of them; what a pretraining has to learn from the particles is the shape, which is $62\%$ of B's error on the
-new processes (Fig.~\ref{fig:catalog_norm} paragraph).
+So ten events of a new process place its level as well as the best data-free map, and a hundred do $7$ to $13\times$
+better (against the single draw and the ensembles' median); what a pretraining has to learn from the particles is the
+shape, whose share of each process's error is a median $0.62$ for B on the new processes (the A-against-B paragraph above).
 
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
@@ -2578,8 +2578,8 @@ chose (Fig.~\ref{fig:het23}: one point for both $e^+e^-$ probes, one for both $u
 $20$ finished; $4$ were lost to the full \code{/sps/lpnhe} disk (a checkpoint write failed: $u\bar u\to Zgg$ at
 rungs $7$ and $8$, $u\bar u\to Zggg$ at rung $8$, $e^+e^-\to d\bar dg$ fine-tuned from the soft star) and are rerun once
 there is space. Median $|\Delta|$, het over MSE: median $1.39$ over the $10$ $2\to3$ cells and $1.31$ over the $10$
-$2\to4$ cells, against $1.78$ and $1.71$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the MSE
-cell's in $16$ of the $20$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
+$2\to4$ cells, against $1.78$ and $1.71$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the het retrain at the MSE
+cell's HPs in $16$ of the $20$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
 HPs help, and the het loss stays $30$ to $40\%$ behind MSE on $\mu$ at these multiplicities.
 
 \begin{figure}[H]
@@ -6050,7 +6050,7 @@ of the three share a test set.
     \code{zz\_catalog\_norm\_A\_sigstage}, \code{zz\_catalog\_norm\_B}); the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
     \code{collect\_delta.py} and redraw); the $4$ \code{het\_shared} cells lost to the disk (FA-ccin2p3-cd4f37bc); a smoke
-    test of the $\sigma$ stage writing its own per-event predictions with $\sigma$ (\code{c5ba313}). Fixed: 
+    test of the $\sigma$ stage writing its own per-event predictions with $\sigma$ (\code{c5ba313}). Fixed:
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
     $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
