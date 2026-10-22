@@ -595,6 +595,45 @@ the level error on the $43$ new held-out processes.}
 \label{fig:norm_explore}
 \end{figure}
 
+\paragraph{A against B, the pretrainings (2026-10-22, D83).} hp58's config and HPs, $50$ validations, both arms on the
+same $1352$ processes, read on the $139$ held-out with nothing taken from them (\code{scripts/job\_catalog\_norm.sh},
+\code{analysis/catalog\_daniel/catalog\_norm\_heldout.py}, Fig.~\ref{fig:catalog_norm}). A: the per-event factor of
+Fig.~\ref{fig:norm_factor} (leading coupling product and $(s_0/\hat s)^{4-N}$, $s_0=289$\,GeV$^2$, no IDEN or colour)
+and one shared standardization; B: one shared standardization. \emph{B blew up}: $50$ consecutive steps with
+non-finite gradients at step $8734$ (of hp58's horizon); it is read at its best checkpoint, saved before that. A ran
+to the end. MSE of $\log|\mathcal M|^2$ per process (the factor cancels in the difference), median with the
+$10$ to $90\%$ range:
+\begin{center}
+\begin{tabular}{lcccc}
+ & \multicolumn{2}{c}{$43$ new} & \multicolumn{2}{c}{$96$ relabels} \\
+ & on its own & after rescale and shift & on its own & after rescale and shift \\ \hline
+hp58 + $g$ & $1.27$ ($0.10$ to $4.1$) & $0.080$ & $0.12$ & $0.0055$ \\
+A & $2.41$ ($0.033$ to $17$) & $0.135$ & $0.0045$ ($0.0004$ to $0.024$) & $0.0042$ \\
+B (blew up) & $0.60$ ($0.17$ to $3.4$) & $0.22$ & $0.067$ & $0.058$ \\
+\end{tabular}
+\end{center}
+``After rescale and shift'' is an oracle (the best affine map, fitted on the test truth). Split into the squared mean
+error (level) and the variance of the error (shape), median over the $43$ new: A $2.3$ and $0.14$, B $0.11$ and
+$0.23$. So A learns the shape best, and on the relabels it is $27\times$ better than hp58 + $g$ on its own and better
+even than hp58 after the oracle map; but on the new processes $90\%$ of its error is the level its factor sets wrong.
+The multi-Higgs processes are the bulk of it ($Z HH$, $W^\pm HH$, $HHH$ sit $3.6$ to $5.2$ too high: their leading
+coupling product is $ZH$'s, as Fig.~\ref{fig:norm_factor} found), then $gg\to Wq\bar q'$ ($3.6$ too low). B, with no
+factor, places levels by learning them from the particles and is the best of the three on the new processes on its own.
+Correcting A's predictions afterwards by IDEN and colour or by the sum over diagrams makes it worse (median $2.05$ to
+$9.8$ on the new, and $0.5$ to $1.9$ on the relabels): A's network has learned its own levels, so a better factor has
+to be in its training target. Next: A with IDEN, colour and the diagram sum in the target (the exploration's best
+data-free level, $2.3$ against A's $4.8$), and B's stability at hp58's HPs, are the user's call.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_daniel/figs/catalog_norm_mse_interpolation.pdf}\\[1ex]
+\includegraphics{../analysis/catalog_daniel/figs/catalog_norm_mse_extrapolation.pdf}
+\caption{The $139$ held-out processes read on their own: MSE of $\log|\mathcal M|^2$ per process for hp58 read with
+the statistics map $g$, A and B (B at its best checkpoint, before it blew up), grouped as the held-out split, ordered
+by A within each group.}
+\label{fig:catalog_norm}
+\end{figure}
+
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
 $2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
@@ -5990,32 +6029,21 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22, 06:10).} Running on CC, item \code{catalog\_norm} (D83, the user: ``send the A
-    against B''): \code{scripts/job\_catalog\_norm.sh} A (FA-ccin2p3-afc528f5) and B (FA-ccin2p3-2b57217a), hp58's
-    config and HPs, 50 validations, memmap cache on the node's \code{/tmp} (\code{data.memmap\_dir}), then
-    \code{zero\_shot\_parent.py} on the 139 held-out into \code{\$SCRATCH/zz\_catalog\_norm\_\{A,B\}/}; about $5.5$\,h
-    each. A's factor (\code{data.target\_physics\_factor}, $s_0=289$\,GeV$^2$) is implemented on both data paths
-    (\code{experiment.\_physics\_logF}; \code{data\_mmap.py} stores \code{amp\_factor.npy}); the smoke test on the memmap
-    path logged ``target\_physics\_factor ON (memmap)'' (the SLURM out file, not \code{out\_0.log}). The first A and B
-    attempts failed building the cache on \code{/sps/lpnhe}, which is full ($511$ of $512$\,G; $557$\,G under my
-    directory; old mmap caches \code{98f8\ldots}, \code{9ff4\ldots}, \code{b020\ldots} $25$\,G each and \code{2b98\ldots}
-    $5.5$\,G left, not deleted: the user's call); \code{sweep/prune.py} (D19) frees $4.6$\,G. Next when they end:
-    collect the held-out npz (\code{collect\_heldout\_preds.py} pattern; \code{logF} saved), score on its own (MSE of
-    $\log|\mathcal M|^2$ per process, the user's held-out figure for A and B next to hp58 with $g$), write up, send.
-    Item \code{het\_shared} (D82, the user: ``yes, use the shared HPs''): 6 CC jobs of 4 cells
-    (\code{job\_het\_delta.sh --shared}, \code{analysis/transfer/het\_shared\_jobs.txt}); one (FA-ccin2p3-4a5196bd, the
-    $r5$ to $r8$ fine-tunes of $u\bar u\to Zgg$) failed writing a checkpoint on the full disk: rerun it once space
-    allows; then \code{collect\_het\_delta.py \$SCRATCH/zz\_delta\_hetshared}, compare with MSE and the D47 het cells,
-    write up. Normalization exploration (CPU, D83; fig:norm\_factor, fig:norm\_explore): continue from
-    \code{norm\_explore3.py} (the diagrams as process descriptors place B's level at $0.045$ on the $43$); open ideas:
-    IDEN and colour in A's factor (A as launched has neither), the per-event singular scales. For the user: the het
-    trial should write its per-event test predictions after its $\sigma$ stage; \code{site} matches a launch's runs by
-    item and time, so a report can name another launch's runs. Held (D78): \code{dancat\_ext} and
-    \code{catalog\_global}. For the user: which zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling
-    powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test); feedback on the D66
-    designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on CC from my tests, not deleted:
-    \code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*},
-    \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*} temp dirs ($417$, $1$\,M).
+  \item \textbf{Open (2026-10-22, 12:00).} A against B is done (Fig.~\ref{fig:catalog_norm}). For the user: A with
+    IDEN, colour and the diagram sum in its training target, and B's blow-up at hp58's HPs (a fix or its own DyHPO).
+    \code{/sps/lpnhe} is full ($1.3$\,G free; old mmap caches \code{98f8\ldots}, \code{9ff4\ldots}, \code{b020\ldots}
+    $25$\,G each and \code{2b98\ldots} $5.5$\,G, not deleted: the user's call; \code{sweep/prune.py} freed nothing, its
+    $4.6$\,G are in the excluded \code{tp3\_wadd} sweeps). Item \code{het\_shared}: $20$ of $24$ cells written up
+    (Fig.~\ref{fig:het_shared}); rerun the $4$ lost to the disk ($u\bar u\to Zgg$ $r7$, $r8$; $u\bar u\to Zggg$ $r8$;
+    $e^+e^-\to d\bar dg$ from the soft star) with \code{job\_het\_delta.sh --shared} once there is space. Normalization
+    exploration (CPU, D83): open ideas are the per-event singular scales in a target and the diagrams as process
+    descriptors in the network. For the user: the het trial should write its per-event test predictions after its
+    $\sigma$ stage; \code{site} matches a launch's runs by item and time, so a report can name another launch's runs.
+    Held (D78): \code{dancat\_ext} and \code{catalog\_global}. For the user: which zero-shot fix to design ((a)
+    eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched
+    $Z{+}ng$ test); feedback on the D66 designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on
+    CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*},
+    \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*} temp dirs.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
