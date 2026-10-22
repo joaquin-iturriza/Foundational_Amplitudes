@@ -5906,7 +5906,8 @@ $p=0.15$, from $ee\to b\bar b$ one-loop $-0.51$ and $u\bar u\to Zgg$ $-0.53$ to 
 $u\bar u\to Zg$); our encoder's arm there: $-0.24$, better on $3$, $p=0.08$. At $D=10^3$ ($8$k): median $+0.07$,
 better on $7$ of $12$, $p=0.52$ (our encoder $-0.10$, $4$ of $12$, $p=0.34$); at $D=10^2$: $+0.06$, better on $6$ of $12$,
 $p=0.52$ (ours $-0.07$, $5$ of $12$, $p=0.38$); Wilcoxon over probes throughout. The encoder of arXiv:2606.23791 sits
-$0.1$--$0.15$\,dex above ours at every $D$ and level with rung $9$ at $D\le10^3$, below it at $10^4$; neither diagram arm
+$0.1$--$0.15$\,dex above ours at every $D$ in the medians against rung $9$ (head to head per probe: better than ours on $8$,
+$9$, $8$ of $12$, median $+0.34$, $+0.21$, $+0.10$\,dex at $D=10^2$, $10^3$, $10^4$) and level with rung $9$ at $D\le10^3$, below it at $10^4$; neither diagram arm
 improves on rung $9$ at any $D$.
 
 \begin{figure}[H]
@@ -5916,8 +5917,8 @@ improves on rung $9$ at any $D$.
 \widerow{\pnl{../analysis/transfer/figs/levdiagl_c.pdf}\hfill\pnl{../analysis/transfer/figs/levdiagl_d.pdf}}
 \caption{The two diagram arms, rung $9$'s pretraining with Feynman-diagram inputs through our graph encoder and
 through the encoder of arXiv:2606.23791 (width $64$). (a) Validation loss of the three $64$k-step pretrainings (hp$73$).
-(b)--(d) Per probe, $\log_{10}(L_\text{rung 9}/L_\text{arm})$ at the best checkpoint, right of the dashed line is better
-than rung $9$: $D=10^2$ and $10^3$ on the $8$k grid (5-trial searches), $D=10^4$ at $32$k (best of the cell's chosen
+(b)--(d) Per probe, $\log_{10}(L_\text{off}/L_\text{on})$ at the best checkpoint (``diagrams off'' is rung $9$),
+right of the dashed line the diagram arm is better: $D=10^2$ and $10^3$ on the $8$k grid (5-trial searches), $D=10^4$ at $32$k (best of the cell's chosen
 points). A probe is drawn once both searches are in.}
 \label{fig:levdiagl}
 \end{figure}

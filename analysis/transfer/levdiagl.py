@@ -20,12 +20,14 @@ import plot_style as ps  # noqa: E402
 
 EXP = json.load(open(os.path.join(ROOT, "analysis", "transfer", "expect_tp3.json")))
 # (pretraining, fine-tune family, label, colour, marker)
-ARMS = [("tp3_levdiag", "tp3_levdiag", "diagrams, our encoder", ps.C.blue, "o"),
-        ("tp3_levdiagl", "tp3_levdiagl", "diagrams, Daniel's arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
+ARMS = [("tp3_levdiag", "tp3_levdiag", "diagrams on, our encoder", ps.C.blue, "o"),
+        ("tp3_levdiagl", "tp3_levdiagl", "diagrams on, arXiv:2606.23791 encoder", ps.C.vermillion, "s")]
+REF = "diagrams off"
 NAME = "levdiagl"
 if sys.argv[1:] == ["accum"]:
     ARMS = [("tp3_accum_r9", "tp3_accum", "gradient accumulation, ours", ps.C.blue, "o"),
             ("tp3_accrr_r9", "tp3_accrr", "gradient accumulation, Daniel's arXiv:2606.23791", ps.C.vermillion, "s")]
+    REF = "rung 9"
     NAME = "accrr"
 
 
@@ -50,10 +52,10 @@ base = os.path.join(ROOT, "analysis", "transfer", "figs", NAME)
 figs = ps.panels(4)
 ax = figs[0][1]
 x, y = curve("tp3_ladder_r9")
-ax.plot(x, y, color="0.4", label="rung 9")
-for pre, _, lab, col, _ in ARMS:
+ax.plot(x, y, color="0.4", label=REF)
+for pre, _, lab, col, m in ARMS:
     x, y = curve(pre)
-    ax.plot(x, y, color=col, label=lab)
+    ax.plot(x, y, color=col, marker=m, markevery=[len(x) - 1], label=lab)   # the marker ties the legend to (b)-(d)
 ax.set_yscale("log")
 ax.set_xlabel("step")
 ax.set_ylabel(r"val. MSE$(\log|\mathcal{M}|^2)$")
@@ -78,7 +80,7 @@ for (fig, ax), (k, dlab, arm, ref) in zip(figs[1:], PANELS):
     lo, hi = ax.get_xlim()
     ax.set_xlim(lo, hi + 0.45 * (hi - lo))  # the D label sits upper right, clear of the top probe's points
     ax.set_yticks(range(len(P))); ax.set_yticklabels([LAB[p] for p in P]); ax.invert_yaxis()
-    ax.set_xlabel(r"$\log_{10}(L_\mathrm{rung\,9}/L_\mathrm{arm})$")
+    ax.set_xlabel(r"$\log_{10}(L_\mathrm{off}/L_\mathrm{on})$" if NAME == "levdiagl" else r"$\log_{10}(L_\mathrm{rung\,9}/L_\mathrm{arm})$")
     ps.process_label(ax, dlab)
 ps.legend_strip(figs[0][1], base + "_legend", ncol=3)
 ps.save_panels(figs, base)
