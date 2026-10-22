@@ -1,0 +1,9 @@
+runs_from_lxplus/tp3_r9fte_ee_WW_d8_002/trial_0032
+runs_from_lxplus/tp3_r4fte_uubar_gg_d8/trial_0134
+runs/tp3_synfte_ee_dd_nlo_d8_lad
+runs/tp3_finfte_ee_dd_nlo_d8/trial_0186
+runs/tp3_synfte_ud_ud_d8/trial_0096
+runs/tp3_synfte_uubar_gg_d8/trial_0182
+runs/tp3_synfte_uubar_Zg_d8/trial_0064
+runs/tp3_finfte_uubar_Zg_d8/trial_0031
+runs_from_lxplus/tp3_ssudakovewfte_ee_ddbar_d8/trial_0132
