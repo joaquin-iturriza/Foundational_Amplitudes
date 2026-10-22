@@ -6192,6 +6192,36 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
+  \item \textbf{State (2026-10-22, 23:30).} Running or queued, all CC: (1) \code{het\_mumse22} (D89): the $147$ $2\to2$
+    $\Delta$ cells of D47 rerun with the checkpoint on the $\mu$ MSE, $35$ jobs (\code{analysis/transfer/het\_mumse22\_jobs.txt},
+    \code{job\_het\_delta.sh --mumse}, root \code{runs/het\_delta\_mumse}, predictions \code{\$SCRATCH/zz\_delta\_het\_mumse});
+    $\sim$22 done (every cell evaluated), the rest pending on Resources; when all are in: collect with
+    \code{collect\_het\_delta.py}, compare $\mu$ and pulls against the NLL-selected D47 cells, write up next to
+    fig:het\_mumse. (2) \code{het\_finale\_s1} (D91): $8$ het DyHPO sweeps of the finale fine-tune
+    (\code{sweep/gen\_finale\_het\_sweeps.py}; $ee\to d\bar d$, $ee\to W^+W^-$, $ee\to d\bar d$ one-loop, $u\bar u\to Zggg$ at
+    $D=10^2,10^4$; $5$ trials, $\mu$-MSE selection), driven from the laptop by \code{sweep/drive.py} (launch
+    \code{het\_finale\_s1}, state in \code{sweeps\_local/tp3\_finfte\_*\_het}); then compare the cells' best HPs: close $\Rightarrow$
+    stage 2 runs the rest of the no-twin probes ($ee\to\nu\bar\nu$, $ee\to t\bar t$, $ee\to b\bar b$ one-loop) and the big
+    catalog fine-tunes (hp58, MSE or het as decided) at those HPs; far $\Rightarrow$ sweep them. The user's ask: hp58
+    fine-tuned on old-catalog probes with no twin in the big catalog, the scaling plot against scratch, rung 9, finale,
+    synthetic (twins excluded: $u\bar u\to gg$, $Zg$, $Zgg$, $ud\to ud$, $ee\to Z\gamma$). Note: the het $ee\to d\bar d$ one-loop
+    cell has no sign head (its MSE cell had one), so a het-vs-MSE number on it needs re-basing. (3) \code{dimless} (D90): the
+    dimensionless path. Done: \code{data.dimensionless\_inputs} (momenta per event$/\sqrt{\hat s}$, masses as
+    $\log_{10}(m/\sqrt{\hat s})$ z-scored on frozen \code{dimless\_mass\_stats}, off-shellness$/(10^{-6}\hat s)$, guards), smoke passed;
+    $40$ $2\to4$ probes (\code{recipes/gen\_catalog\_2to4.py}, d4\_, parent $2\to3$ training process + $g$ or $\gamma$, one per
+    relabelling class) generated; short \code{Dless} done; queued: short \code{DlessIn} and \code{DlessIn extrap}. $2\to4$
+    results (short runs trained on catalog $2\to2+2\to3$, read on their own, median per process, $+g$ / $+\gamma$): shared target MSE
+    $29.5/54.6$ (offset $+5.2/+7.2$); $\hat s$ only, $s_0=289$: $4.6/4.0$ (offset $-0.9/+0.4$); dimensionless $s_0=1$: $44.5/26.3$
+    (offset $-6.5/-4.8$); shape $\approx2.3$ to $2.7$ for all (\code{data/catalog\_2to4\_short\_\{B,Adim,Dless\}.npz}). At seen
+    multiplicities dimensionless $0.72$ new / $0.061$ relabels. Reading (to test): the extra particle's cost
+    $\sim\log(g^2\hat s/k_T^2)$ is set per event by the emission; a fixed $s_0$ absorbs it only because the catalog shares one cut (the
+    user: what if cuts differ). Implemented, not yet run: \code{target\_physics\_dim\_ref=pairs} (arm \code{Dpair}: $\Lambda^2$ the
+    geometric mean of $2p_i\!\cdot\!p_j$) and \code{target\_physics\_eikonal} (arm \code{Deik}: pairs + each final $g/\gamma$'s
+    eikonal factor; the user: the eikonal "is well motivated here"). Next: short \code{Dpair} and \code{Deik} runs, score on the
+    $2\to4$ set; regenerate the $2\to4$ set with a harder cut ($p_T\ge30$\,GeV on jets and photons; only val and test,
+    several nodes, \code{AMP\_LHE\_CORES}$>1$: the user, "just use more cpus") and score $s_0=289$, dimensionless,
+    \code{Dpair}, \code{Deik} on both; then write the dimensionless round up as one paragraph with a figure. Waiters: the
+    supervisor (\code{site supervise}), \code{site events --wait}, \code{scripts/wait\_runs.sh} on the design runs.
   \item \textbf{Open (2026-10-22, 13:30).}
     Running on CC: the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
