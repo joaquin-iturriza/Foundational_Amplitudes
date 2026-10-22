@@ -124,12 +124,20 @@ for recipe in a.recipes:
             "probe": probe, "parent": parent, "edges": e.tolist(), "truth": np.histogram(t, e)[0].tolist(),
             "pred": np.histogram(q, e)[0].tolist(), "h2_range": [lo, hi],
             "h2": np.histogram2d(t, q, bins=40, range=[[lo, hi], [lo, hi]])[0].astype(int).tolist()}), flush=True)
+    # the per-event target factor (data.target_propagators / target_physics_factor): t and q are log(|M|^2 F), so
+    # t - logF is log|M|^2; their difference, hence every MSE and Delta here, does not depend on it
+    F = getattr(exp, "all_amp_factor", None)
+    logF = np.zeros(0, np.float32)
+    if F is not None:
+        Fv = np.asarray(F)[exp._split_indices["val"]].reshape(-1)
+        if len(Fv) == len(z):
+            logF = np.log(Fv).astype(np.float32)
     if a.save_dir:
         # q_own: the raw output read in the probe's own standardized units (its train split's mean and std of
         # log|M|^2, two numbers from its data, no fit to the predictions)
         np.savez_compressed(os.path.join(a.save_dir, probe + ".npz"), t=t.astype(np.float32),
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
-                            mu_sd=np.array([mu_p, sd_p]),
+                            mu_sd=np.array([mu_p, sd_p]), logF=logF,
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)

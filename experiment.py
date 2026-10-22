@@ -1441,6 +1441,10 @@ class AmplitudeExperiment(BaseExperiment):
             # the target factor (data.target_propagators) is part of the target these stats
             # were fitted on: a mismatch would rescale the target under the parent's
             # standardization without a trace
+            _pf_stats = bool(stats.get("target_physics_factor", False))
+            _pf_cfg = bool(self.cfg.data.get("target_physics_factor", False))
+            assert _pf_stats == _pf_cfg, (f"frozen data stats were fitted with target_physics_factor={_pf_stats}, "
+                                          f"this run sets {_pf_cfg}")
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
             assert _tp_stats == _tp_cfg, (
@@ -1583,8 +1587,10 @@ class AmplitudeExperiment(BaseExperiment):
         #     predictions at evaluation, so raw-space metrics and plots are on the true
         #     |M|². The transform resolution, the signed-log scale and the standardization
         #     all see the modified target. Same masks as the off-shellness input. ---
-        self._target_factor_on = bool(self.cfg.data.get("target_propagators", False))
-        if self._target_factor_on:
+        _tp_on = bool(self.cfg.data.get("target_propagators", False))
+        _phys_on = bool(self.cfg.data.get("target_physics_factor", False))
+        self._target_factor_on = _tp_on or _phys_on
+        if _tp_on:
             tp_pdgs = [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])]
             widths = {int(k): float(v) for k, v in
                       dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
@@ -1672,6 +1678,40 @@ class AmplitudeExperiment(BaseExperiment):
                         f"{n_tch} massless t-channel; pdgs {tp_pdgs}, widths {widths}); median range of "
                         f"ln|M|² on the train pools {np.median(red_before) if red_before else float('nan'):.2f} "
                         f"-> {np.median(red_after) if red_after else float('nan'):.2f}")
+        # --- the physics factor (data.target_physics_factor; 2026-10-22, D83, normalization A): every event's |M|^2 is
+        #     multiplied by (s0 / s_hat)^(4-N) / C_p, s_hat = (p1 + p2)^2 of the two incoming momenta, N the particle
+        #     count (the mass dimension 8 - 2N of |M|^2), C_p the coupling product of the process's leading tree diagram
+        #     (data.target_physics_couplings: analysis/catalog_daniel/diagram_couplings.py), s0 one reference for the
+        #     whole catalog (data.target_physics_s0, GeV^2). It needs no data of the process, so a held-out process is
+        #     read with the same shared standardization. Kept in rec["amp_factor"] with any propagator factor and divided
+        #     out of the raw predictions at evaluation, like target_propagators. ---
+        if _phys_on:
+            cp = os.path.expandvars(str(self.cfg.data.get(
+                "target_physics_couplings", "analysis/catalog_daniel/data/diagram_couplings.json")))
+            cp = cp if os.path.isabs(cp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), cp)
+            logc = {k: max(v["logc2"]) for k, v in json.load(open(cp)).items()}
+            ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
+            miss = [n for n in names if n not in logc]
+            assert not miss, f"target_physics_factor: no coupling product for {miss[:5]} ({len(miss)}) in {cp}"
+            spans = []
+            for name in names:
+                for role in roles:
+                    if (role, name) not in store:
+                        continue
+                    rec = store[(role, name)]
+                    pp = rec["momenta"].astype(np.float64) * mom_div                # (N,P,4) physical
+                    q = pp[:, 0] + pp[:, 1]
+                    shat = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                    k = 4 - pp.shape[1]
+                    logF = -(k * (np.log(shat) - ls0) + logc[name])
+                    F = np.exp(logF).reshape(rec["raw_amp"].shape)
+                    if role == "train":
+                        spans.append(float(np.mean(logF)))
+                    rec["amp_factor"] = rec.get("amp_factor", np.ones_like(rec["raw_amp"])) * F
+                    rec["raw_amp"] = rec["raw_amp"] * F
+            LOGGER.info(f"target_physics_factor ON: {len(names)} processes, s0 = {np.exp(ls0):.4g} GeV^2, "
+                        f"mean log F over the train pools: median {np.median(spans):.3g}, "
+                        f"5-95% {np.percentile(spans, 5):.3g} to {np.percentile(spans, 95):.3g}")
         if train_keep is not None:
             for n in names:
                 rec = store[("train", n)]
@@ -2046,7 +2086,8 @@ class AmplitudeExperiment(BaseExperiment):
                 "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
                 **({"affine_multiplicity": self._affine_multiplicity}
                    if getattr(self, "_affine_multiplicity", None) else {}),
-                "target_propagators": bool(getattr(self, "_target_factor_on", False)),
+                "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
+                "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "tchannel_norm": getattr(self, "_tch_norm", None),
                 "offshell_stats": getattr(self, "_offshell_stats", None),
                 "prepd_mean": [float(x) for x in self.prepd_mean],
