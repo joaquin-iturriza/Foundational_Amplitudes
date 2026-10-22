@@ -473,6 +473,9 @@ class AmplitudeExperiment(BaseExperiment):
                 "data.dimensionless_inputs: internal_mass_scalars without offshell_per_event feeds the masses in GeV"
             assert not bool(self.cfg.model.get("use_pair_bias", False)), \
                 "data.dimensionless_inputs: use_pair_bias rebuilds s - m^2 in GeV from the momenta"
+            assert not (bool(self.cfg.model.get("use_diagrams", False))
+                        and str(self.cfg.model.get("diagram_encoder_impl", "ours")) != "llm4lhc"), \
+                "data.dimensionless_inputs: the 'ours' diagram encoder feeds each propagator's log10 mass in GeV"
             assert not bool(self.cfg.model.get("use_diagram_virtuality", False)), \
                 "data.dimensionless_inputs: use_diagram_virtuality rebuilds the virtualities in GeV from the momenta"
         if self.cfg.data.get("source", "files") == "recipes":
@@ -1237,10 +1240,9 @@ class AmplitudeExperiment(BaseExperiment):
                 massive[0] = False                     # row 0: the padding entry
                 mu_d, sd_d = self._dimless_mass_stats
                 std_on = bool(self.cfg.data.get("standardize_props", False))
-                # massless rows: the mean of the massive ones, as the GeV column's is_massless neutralisation does
-                # (0 once z-scored)
-                model.setup_dimless_mass(spec["mass_col"], raw_m, massive, mu_d, sd_d if std_on else 1.0,
-                                         0.0 if std_on else mu_d)
+                # massless rows: the mean of the massive ones, as the GeV column's is_massless neutralisation does;
+                # the massive values are centred on mu_d in both modes, so that mean is 0
+                model.setup_dimless_mass(spec["mass_col"], raw_m, massive, mu_d, sd_d if std_on else 1.0, 0.0)
                 LOGGER.info(f"Mass encoding: log10(m / sqrt(s_hat)) per event for {int(massive.sum())} massive "
                             f"species (dimensionless_inputs), mass_col={spec['mass_col']}, "
                             f"{'z-scored' if std_on else 'raw'} on mean {mu_d:.3f}, std {sd_d:.3f}")
