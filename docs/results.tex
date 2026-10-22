@@ -2690,6 +2690,28 @@ the MSE cell: at the het sweeps' shared HPs (filled) and at the MSE cell's own H
 \label{fig:het_shared}
 \end{figure}
 
+\paragraph{The same $24$ cells with the checkpoint picked on the $\mu$ MSE (D85, 2026-10-22).} D82's cells select the
+main run's checkpoint on the validation NLL. Here they select on the validation $\mu$ MSE
+(\code{training.heterosc\_select=mu\_mse}), with the same HPs, data, steps and seeds; the $\sigma$ stage after it still
+selects on the NLL with $\mu$ frozen (\code{scripts/job\_het\_delta.sh --shared-mumse},
+\code{analysis/transfer/het\_mumse\_summary.py}, Fig.~\ref{fig:het_mumse}). Eight cells were trained by two duplicate
+jobs at once in the first attempt and were rerun into a clean directory, so all $24$ are single, complete runs. Median
+$|\Delta|$, het over MSE: $1.11$ over the $13$ $2\to3$ cells and $1.16$ over the $11$ $2\to4$ cells, against $1.39$ and
+$1.36$ when selected on the NLL. The $\mu$ MSE selection is lower than the NLL selection in $23$ of the $24$ cells (median
+ratio $0.81$ at $2\to3$, $0.90$ at $2\to4$), and below MSE in $3$ (the $t\bar tg$ cell of D82, $e^+e^-\to t\bar t g$ from the
+dead-cone star, plus $u\bar u\to Zgg$ at rung $8$ and $u\bar u\to Zggg$ at rung $2$, both within $4\%$). So
+the checkpoint choice was $72\%$ of the het loss's gap to MSE on $\mu$ at $2\to3$ and $56\%$ at $2\to4$: the two
+criteria pick different steps, and the NLL's has the worse $\mu$. The remaining gap is $11$ to $16\%$.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_mumse.pdf}
+\caption{The $24$ cells of Fig.~\ref{fig:het_shared}, het loss at the shared HPs, median $|\Delta|$ on the test split
+against the MSE cell, with the main run's checkpoint picked on the validation $\mu$ MSE (filled) or the validation NLL
+(open, as in Fig.~\ref{fig:het_shared}).}
+\label{fig:het_mumse}
+\end{figure}
+
 
 \begin{figure}[H]
 \centering
@@ -6177,9 +6199,8 @@ of the three share a test set.
     that do not gain. For the user: D78 holds the catalog preprocessing until their design (A with IDEN, colour and the
     diagram sum, and B's blow-up at hp58's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
     bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
-    fix is dropped until the preprocessing is settled (D86). Running: het at the shared HPs with the checkpoint on the
-    $\mu$ MSE (D85, item \code{het\_mumse}, $6$ CC jobs; the first $2$ registered under \code{het\_shared} by the
-    launcher's fixed item); the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
+    fix is dropped until the preprocessing is settled (D86). Done: het at the shared HPs with the checkpoint on the
+    $\mu$ MSE (D85, Fig.~\ref{fig:het_mumse}). Running: the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
     a CPU proxy for shape transfer under each target, sampling sensitivity, then new ideas); the het trial now writes its own predictions; \code{site} matches a launch's runs by
     item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
