@@ -6042,21 +6042,28 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22, 12:00).} A against B is done (Fig.~\ref{fig:catalog_norm}). For the user: A with
-    IDEN, colour and the diagram sum in its training target, and B's blow-up at hp58's HPs (a fix or its own DyHPO).
-    \code{/sps/lpnhe} is full ($1.3$\,G free; old mmap caches \code{98f8\ldots}, \code{9ff4\ldots}, \code{b020\ldots}
-    $25$\,G each and \code{2b98\ldots} $5.5$\,G, not deleted: the user's call; \code{sweep/prune.py} freed nothing, its
-    $4.6$\,G are in the excluded \code{tp3\_wadd} sweeps). Item \code{het\_shared}: $20$ of $24$ cells written up
-    (Fig.~\ref{fig:het_shared}); rerun the $4$ lost to the disk ($u\bar u\to Zgg$ $r7$, $r8$; $u\bar u\to Zggg$ $r8$;
-    $e^+e^-\to d\bar dg$ from the soft star) with \code{job\_het\_delta.sh --shared} once there is space. Normalization
-    exploration (CPU, D83): open ideas are the per-event singular scales in a target and the diagrams as process
-    descriptors in the network. For the user: the het trial should write its per-event test predictions after its
-    $\sigma$ stage; \code{site} matches a launch's runs by item and time, so a report can name another launch's runs.
-    Held (D78): \code{dancat\_ext} and \code{catalog\_global}. For the user: which zero-shot fix to design ((a)
-    eikonal/dipole factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched
-    $Z{+}ng$ test); feedback on the D66 designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on
-    CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*},
-    \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*} temp dirs.
+  \item \textbf{Open (2026-10-22, 13:30).} Running on CC: the weight interpolation finale $\leftrightarrow$ add-$W$ (D31
+    item 1, approved 2026-10-10, not started until now; item \code{interp}): \code{tools/run\_data\_tools.py interp} on the
+    best naive trial at $1$k, $2$k, $4$k (\code{tp3\_waddm\_naive*}), $11$ values of $\alpha$, out in
+    \code{zz\_interp/}; the $\sigma$ calibration on the $139$ held-out (hp58's, A's $\sigma$ stage, B's best checkpoint;
+    \code{zero\_shot\_parent.py} now saves $\sigma$ and the pulls; out \code{\$SCRATCH/zz\_catalog\_heldout\_preds\_sigstage},
+    \code{zz\_catalog\_norm\_A\_sigstage}, \code{zz\_catalog\_norm\_B}); the $9$ $\Delta$-plot models still off their
+    recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
+    \code{collect\_delta.py} and redraw); the $4$ \code{het\_shared} cells lost to the disk (FA-ccin2p3-cd4f37bc); a smoke
+    test of the $\sigma$ stage writing its own per-event predictions with $\sigma$ (\code{c5ba313}). Fixed: 
+    \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
+    number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
+    $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
+    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Not started: rung $6$'s
+    rescoring gap (its run is not on CC; TF32 is the likely cause, sec:tf32-eval); the one-loop sign decision reading
+    the validation and test amplitudes (a fix changes the one-loop probes' target, so it needs the user); the probes
+    that do not gain. For the user: D78 holds the catalog preprocessing until their design (A with IDEN, colour and the
+    diagram sum, and B's blow-up at hp58's HPs, are inputs to it); the zero-shot fix ((a) eikonal or dipole factors in
+    the target, (b) done in another form by D81 to D83, (c) Jonas's matched $Z{+}ng$ test); the D66 designs (decomp,
+    loops, nonsm, threephase); the het trial now writes its own predictions; \code{site} matches a launch's runs by
+    item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
+    \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
+    \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
