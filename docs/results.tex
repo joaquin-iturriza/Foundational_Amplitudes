@@ -634,6 +634,18 @@ by A within each group.}
 \label{fig:catalog_norm}
 \end{figure}
 
+\paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
+the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it; pulls $(q-t)/\sigma$ in
+$\log|\mathcal M|^2$, the median over processes of each process's pull standard deviation and of its fraction of events
+within one $\sigma$; a calibrated $\sigma$ gives $1$ and $0.68$). hp58 after its $\sigma$ stage, read with each
+process's own statistics: $1.86$ and $0.38$ on the $96$ relabels, $13.5$ and $0.06$ on the $43$ new. A after its $\sigma$
+stage, on its own: $1.32$ and $0.58$ on the relabels, $13.3$ and $0.02$ on the new ($9.3$ with each process's level error
+removed). B at its best checkpoint (it blew up before a $\sigma$ stage), on its own: $0.66$ and $0.87$ on the relabels,
+$1.20$ and $0.34$ on the new. The $\sigma$ stage calibrates $\sigma$ on the training processes, and it does not carry
+to processes the model has not seen: on the new ones the errors are $10$ to $13$ times the $\sigma$ the model gives, so
+$\sigma$ does not flag a process outside the training set. B's $\sigma$, never recalibrated, is too wide on the relabels
+and about the right size on the new processes, but its level errors put $66\%$ of the events outside one $\sigma$.
+
 \paragraph{How robust is the diagram-descriptor level (2026-10-22, D83).} The $0.045$ of the exploration above (B's level
 of the $43$ new placed by a $2\times64$ network on the process features and the diagram descriptors) is one draw
 (\code{analysis/catalog\_daniel/norm\_explore4.py}, level error $(\hat m_p-m_p)^2/\sigma_p^2$, median over the $43$).
@@ -6063,12 +6075,10 @@ of the three share a test set.
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{Open (2026-10-22, 13:30).} Done: the weight interpolation (D31 item 1, Fig.~\ref{fig:interp_tradeoff}).
-    Running on CC: the $\sigma$ calibration on the $139$ held-out (hp58's, A's $\sigma$ stage, B's best checkpoint;
-    \code{zero\_shot\_parent.py} now saves $\sigma$ and the pulls; out \code{\$SCRATCH/zz\_catalog\_heldout\_preds\_sigstage},
-    \code{zz\_catalog\_norm\_A\_sigstage}, \code{zz\_catalog\_norm\_B}); the $9$ $\Delta$-plot models still off their
+    Done: the $\sigma$ head on the held-out processes (its paragraph). Running on CC: the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
-    \code{collect\_delta.py} and redraw); a smoke
-    test of the $\sigma$ stage writing its own per-event predictions with $\sigma$ (\code{c5ba313}). Fixed:
+    \code{collect\_delta.py} and redraw). The $\sigma$
+    stage now writes its own per-event predictions with $\sigma$ (\code{c5ba313}; GPU smoke test passed). Fixed:
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
     $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
