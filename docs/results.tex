@@ -5800,6 +5800,27 @@ run's length.}
 \label{fig:waddm_tradeoff}
 \end{figure}
 
+\paragraph{Weight interpolation between the finale and the add-$W$ run (2026-10-22, D31 item 1).} The best checkpoint on
+$W$ of the naive add-$W$ run at $1$k, $2$k and $4$k steps, mixed with the finale as $\theta(\alpha)=(1-\alpha)\,
+\theta_{\rm finale}+\alpha\,\theta_W$ (the parameters only), $\alpha=0,0.1,\ldots,1$, scored on the add-$W$ run's own
+data as the table above (\code{tools/run\_data\_tools.py interp}, \code{analysis/transfer/interp\_tradeoff.py},
+Fig.~\ref{fig:interp_tradeoff}). The ends reproduce: $\alpha=1$ gives each run's recorded $W$ ($2.94$, $1.83$,
+$1.20\times10^{-4}$) and forgetting ($2.3$, $3.0$, $4.4\times10^4$), $\alpha=0$ the finale ($0.97$). In between there is
+no good point: at $\alpha=0.1$, $W$ is $0.17$ ($1.7\times$ below the finale's $0.28$) while the forgetting is already
+$268$ to $563$; it rises steadily to the end. Every interpolated point is worse on both axes than the naive run's own
+early validations (which reach $W=0.06$ at a forgetting of $226$), and far from the $10\%$ replay buffer ($W=3$ to
+$5\times10^{-4}$ at a forgetting of $3.5$ to $5$). So the add-$W$ solution is not linearly connected to the finale at low
+loss on both; of the methods tried, replay is the only one that keeps the old processes.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/interp_tradeoff.pdf}
+\caption{Weight interpolation between the finale and the naive add-$W$ run at $1$k, $2$k, $4$k steps ($\alpha$ from
+$0$, bottom right, to $1$, top left, in steps of $0.1$): $W$ against the forgetting of the finale's $28$ processes,
+with the Pareto fronts of the naive run's and the $10\%$ replay buffer's own validation points.}
+\label{fig:interp_tradeoff}
+\end{figure}
+
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/finale_synth_a.pdf}\hfill\pnl{../analysis/transfer/figs/finale_synth_b.pdf}}
@@ -6041,10 +6062,8 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22, 13:30).} Running on CC: the weight interpolation finale $\leftrightarrow$ add-$W$ (D31
-    item 1, approved 2026-10-10, not started until now; item \code{interp}): \code{tools/run\_data\_tools.py interp} on the
-    best naive trial at $1$k, $2$k, $4$k (\code{tp3\_waddm\_naive*}), $11$ values of $\alpha$, out in
-    \code{zz\_interp/}; the $\sigma$ calibration on the $139$ held-out (hp58's, A's $\sigma$ stage, B's best checkpoint;
+  \item \textbf{Open (2026-10-22, 13:30).} Done: the weight interpolation (D31 item 1, Fig.~\ref{fig:interp_tradeoff}).
+    Running on CC: the $\sigma$ calibration on the $139$ held-out (hp58's, A's $\sigma$ stage, B's best checkpoint;
     \code{zero\_shot\_parent.py} now saves $\sigma$ and the pulls; out \code{\$SCRATCH/zz\_catalog\_heldout\_preds\_sigstage},
     \code{zz\_catalog\_norm\_A\_sigstage}, \code{zz\_catalog\_norm\_B}); the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then

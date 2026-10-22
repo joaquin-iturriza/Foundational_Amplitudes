@@ -146,3 +146,4 @@ analysis/transfer/delta_d10_medians.json
 analysis/catalog_daniel/data/*.npz
 analysis/transfer/het23_data/
 analysis/transfer/het_shared_data/
+analysis/transfer/interp_data/
