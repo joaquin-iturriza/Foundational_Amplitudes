@@ -3686,6 +3686,9 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         tmp = path + ".tmp.npy"
         np.save(tmp, data)
         os.replace(tmp, path)
+        # each event's alpha_s (AQCDUP, the one it was labelled at), row-aligned with the pool: the coupling-order
+        # factor of the target (data.target_physics_orders, D93) divides it out
+        np.save(path[:-len(".npy")] + ".alphas.npy", np.asarray(a, dtype=np.float64))
         bcopy = None
         if banner:
             bcopy = os.path.join(d, f"{process}_lhe_iseed{iseed}.banner.txt")
