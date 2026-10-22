@@ -1491,7 +1491,7 @@ class AmplitudeExperiment(BaseExperiment):
             # the factor's parameters too, when it is on: each one shifts the target by a per-N constant
             # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
             if _pf_cfg:
-                for _k, _d in (("target_physics_dim_only", False), ("target_physics_s0", 289.0),
+                for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_s0", 289.0),
                                ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None)):
                     if _k not in stats:          # stats written before the key: only its default can be assumed
                         continue
@@ -2219,7 +2219,41 @@ class AmplitudeExperiment(BaseExperiment):
             # a fixed reference scale (GeV^2) instead of the event's s_hat: a change of units, e.g. 1e6 = |M|^2 in TeV
             # (2026-10-22, the extrapolation round: B in TeV against B in GeV)
             lref = np.full(mom_phys.shape[0], np.log(float(ref)))
-        return -((4 - mom_phys.shape[1]) * (lref - self._phys_ls0) + self._phys_logc[name])
+        n_eik, leik = 0, 0.0
+        if bool(self.cfg.data.get("target_physics_eikonal", False)):
+            n_eik, leik = self._eikonal_logS(name, mom_phys)
+        # the eikonal factors carry mass dimension -2 each, so the dimension factor's power grows by one per factor
+        return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + self._phys_logc[name])
+
+    def _eikonal_logS(self, name, mom_phys):
+        """data.target_physics_eikonal (the user, 2026-10-22: "the eikonal factor ... is well motivated here"): per event,
+        the sum over final gluons and photons k of log(w_k sum_{a<b} s_ab / (s_ak s_bk)), the pairs over the other
+        coloured legs (gluon, w = C_A = 3) or the other charged legs (photon, w = 1), every external leg counted
+        (incoming ones too), s_xy = 2 |p_x.p_y| (norm_surrogate.py's eik term). It is the cost of one more soft or
+        collinear particle, computed from the momenta and the particle table's charge and colour only, so it needs
+        no data of the process and no knowledge of its cuts. Returns (number of factors, (N,) log of their product)."""
+        from particle_ids import PARTICLE_PROPERTIES
+        pdgs = getattr(self, "_slot_pdgs_by_name", {}).get(name)
+        if pdgs is None:                 # the memory-mapped path computes the target before it records the slot order
+            import mg5_pipeline_final as mg
+            pdgs = [int(x) for x in mg.PROCESSES[name]["pdg_ids"]]
+        assert len(pdgs) == mom_phys.shape[1], (name, pdgs, mom_phys.shape)
+        pp = mom_phys.astype(np.float64)
+        g = 2.0 * np.abs(np.einsum("npc,nqc->npq", pp * np.array([1.0, -1.0, -1.0, -1.0]), pp))
+        g = np.clip(g, 1e-12, None)
+        out, n = np.zeros(pp.shape[0]), 0
+        for k in range(2, len(pdgs)):
+            if pdgs[k] not in (21, 22):
+                continue
+            col = pdgs[k] == 21
+            em = [a for a in range(len(pdgs)) if a != k and
+                  (PARTICLE_PROPERTIES[pdgs[a]][7] > 0 if col else PARTICLE_PROPERTIES[pdgs[a]][0] != 0)]
+            if len(em) < 2:
+                continue
+            S = sum(g[:, a, b] / (g[:, a, k] * g[:, b, k]) for i, a in enumerate(em) for b in em[i + 1:])
+            out += np.log((3.0 if col else 1.0) * S)
+            n += 1
+        return n, out
 
     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
@@ -2238,6 +2272,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
+                "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
                 "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
                 "dimless_mass_stats": getattr(self, "_dimless_mass_stats", None),
                 "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),

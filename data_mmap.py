@@ -281,7 +281,7 @@ def _code_hash():
         __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
-        E._setup_offshell_masks, E._physics_logF)]
+        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS)]
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
@@ -362,7 +362,8 @@ def init_data_recipes_mmap(exp, c):
                                    _file_digest(exp, cfg.data.get("target_physics_couplings",
                                                                   "analysis/catalog_daniel/data/diagram_couplings.json")),
                                    bool(cfg.data.get("target_physics_dim_only", False)),
-                                   str(cfg.data.get("target_physics_dim_ref", "shat"))] if phys_on else None),
+                                   str(cfg.data.get("target_physics_dim_ref", "shat")),
+                                   bool(cfg.data.get("target_physics_eikonal", False))] if phys_on else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
