@@ -43,6 +43,8 @@ def sigma_stage_cfg(cfg):
         # the stage's evaluation writes the calibrated model's per-event predictions and sigma (preds_<split>.npz in
         # sigma_stage/), so a het trial needs no separate evaluation job for its Delta plots and pulls
         s.evaluation.save_predictions = True
+        # plots: only what sigma changes (mu is frozen, so its histograms and pages are the main run's)
+        s.plotting.sigma_only = True
     return s
 
 

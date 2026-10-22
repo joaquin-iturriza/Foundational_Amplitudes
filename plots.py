@@ -116,6 +116,10 @@ def plot_loss_vs_compute(
 
 
 def plot_mixer(cfg, plot_path, title, plot_dict):
+    # plotting.sigma_only: the het sigma stage, where mu is the main run's (frozen) and only sigma changes: draw the
+    # loss curve and the sigma and pull plots, not the truth/prediction histograms, per-process pages and Delta plots,
+    # which would repeat the main run's (2026-10-22)
+    sigma_only = bool(cfg.plotting.get("sigma_only", False))
     """Dispatch all requested plots based on cfg flags."""
  
     if cfg.plotting.loss and cfg.train:
@@ -295,47 +299,49 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                 return np.sign(a) * np.log(np.abs(a) + 1e-30)
 
             dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
-            data = [
-                _slog(plot_dict["results_test"][dataset]["raw"]["truth"]),
-                _slog(plot_dict["results_train"][dataset]["raw"]["truth"]),
-                _slog(plot_dict["results_test"][dataset]["raw"]["prediction"]),
-            ]
-            plot_histograms(
-                file,
-                data,
-                labels,
-                title=title[0],
-                xlabel=r"$\log A$",
-                logx=False,
-                logy=True,
-            )
-
-            # Per-dataset pages (plotting.per_process_pages caps them: ~0.25 s a page,
-            # 478 pages were 2 of a short catalog run's 30 minutes; null = all)
-            _cap = cfg.plotting.get("per_process_pages", None)
-            _items = list(plot_dict.get("results_per_proc", {}).items())
-            if _cap is not None and len(_items) > int(_cap):
-                # spread over the recipe order, so every family of a large catalog gets pages (its first entries
-                # would be one initial state only)
-                _keep = sorted({int(round(i)) for i in np.linspace(0, len(_items) - 1, int(_cap))})
-                _items = [_items[i] for i in _keep]
-            for ds_name, ds_results in _items:
-                if not all(k in ds_results for k in ("test", "train")):
-                    continue     # a process with under two events in a split has no page
-                ds_data = [
-                    _slog(ds_results["test"]["raw"]["truth"]),
-                    _slog(ds_results["train"]["raw"]["truth"]),
-                    _slog(ds_results["test"]["raw"]["prediction"]),
+            # sigma_only (the het sigma stage: mu frozen, so these pages are the main run's): only the sigma plots
+            if not sigma_only:
+                data = [
+                    _slog(plot_dict["results_test"][dataset]["raw"]["truth"]),
+                    _slog(plot_dict["results_train"][dataset]["raw"]["truth"]),
+                    _slog(plot_dict["results_test"][dataset]["raw"]["prediction"]),
                 ]
                 plot_histograms(
                     file,
-                    ds_data,
+                    data,
                     labels,
-                    title=f"{title[0].split(':')[0]}: {ds_name}",
+                    title=title[0],
                     xlabel=r"$\log A$",
                     logx=False,
                     logy=True,
                 )
+
+                # Per-dataset pages (plotting.per_process_pages caps them: ~0.25 s a page,
+                # 478 pages were 2 of a short catalog run's 30 minutes; null = all)
+                _cap = cfg.plotting.get("per_process_pages", None)
+                _items = list(plot_dict.get("results_per_proc", {}).items())
+                if _cap is not None and len(_items) > int(_cap):
+                    # spread over the recipe order, so every family of a large catalog gets pages (its first entries
+                    # would be one initial state only)
+                    _keep = sorted({int(round(i)) for i in np.linspace(0, len(_items) - 1, int(_cap))})
+                    _items = [_items[i] for i in _keep]
+                for ds_name, ds_results in _items:
+                    if not all(k in ds_results for k in ("test", "train")):
+                        continue     # a process with under two events in a split has no page
+                    ds_data = [
+                        _slog(ds_results["test"]["raw"]["truth"]),
+                        _slog(ds_results["train"]["raw"]["truth"]),
+                        _slog(ds_results["test"]["raw"]["prediction"]),
+                    ]
+                    plot_histograms(
+                        file,
+                        ds_data,
+                        labels,
+                        title=f"{title[0].split(':')[0]}: {ds_name}",
+                        xlabel=r"$\log A$",
+                        logx=False,
+                        logy=True,
+                    )
         
             if cfg.training.loss == "HETEROSC":
                 labels = ["Test", "Train"]
@@ -430,7 +436,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
                     reference_truth=truth_test  # Pass truth values for selection
                 )
 
-    if cfg.plotting.delta and cfg.evaluate:
+    if cfg.plotting.delta and cfg.evaluate and not sigma_only:
         out = f"{plot_path}/delta.pdf"
         with PdfPages(out) as file:
             dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
@@ -533,7 +539,7 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             )
             
 
-    if cfg.plotting.delta_prepd and cfg.evaluate:
+    if cfg.plotting.delta_prepd and cfg.evaluate and not sigma_only:
         out = f"{plot_path}/delta_prepd.pdf"
         with PdfPages(out) as file:
             dataset = "combined" if len(cfg.data.dataset) > 1 else cfg.data.dataset[0]
