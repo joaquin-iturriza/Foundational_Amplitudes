@@ -38,7 +38,8 @@ def sigma_stage_cfg(cfg):
         s.training.cosanneal_warmup_frac = 0.0
         s.training.regularization_lambda = 0.0
         s.training.result_path = None
-        s.training.validate_frac = 0.04             # a validation every 10 steps, as in the D69 sweep
+        # 25 validations by default (every 10 steps of 250, as in the D69 sweep); fewer for short runs
+        s.training.validate_frac = 1.0 / int(t.get("heterosc_sigma_stage_validations", 25) or 25)
         # the stage's evaluation writes the calibrated model's per-event predictions and sigma (preds_<split>.npz in
         # sigma_stage/), so a het trial needs no separate evaluation job for its Delta plots and pulls
         s.evaluation.save_predictions = True
@@ -65,7 +66,13 @@ def main(cfg):
     exp()
     stage = sigma_stage_cfg(exp.cfg)
     if stage is not None:
-        AmplitudeExperiment(stage)()
+        # the stage trains on the data just used: reuse it in this process instead of reading every pool again
+        # (on the catalog the reload was most of the stage's 44 min); the trained model is freed first
+        exp.model = exp.optimizer = exp.scheduler = exp.ema = None
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
+        nxt = AmplitudeExperiment(stage)
+        nxt._reuse_data_from = exp
+        nxt()
 
 
 if __name__ == "__main__":

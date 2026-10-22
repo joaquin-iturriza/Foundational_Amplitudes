@@ -211,7 +211,22 @@ class BaseExperiment:
         if self.cfg.run_idx:        # see above: config_0.yaml duplicated config.yaml in every run (inode quota)
             self._save_config(f"config_{self.cfg.run_idx}.yaml")
         self.init_geometric_algebra()
-        self.init_data()
+        src = getattr(self, "_reuse_data_from", None)
+        if src is not None:
+            # a follow-up stage on the same data (the het sigma stage, run.py): take the loaded pools, statistics and
+            # split bookkeeping from the experiment that just trained instead of reading every pool again; its
+            # data_stats.json is the same file
+            for k in src._data_keys:
+                setattr(self, k, getattr(src, k))
+            os.makedirs(self.cfg.run_dir, exist_ok=True)
+            shutil.copyfile(os.path.join(src.cfg.run_dir, "data_stats.json"),
+                            os.path.join(self.cfg.run_dir, "data_stats.json"))
+            LOGGER.info(f"Data reused from {src.cfg.run_dir} ({len(src._data_keys)} attributes), not reloaded")
+        else:
+            before = {k: id(v) for k, v in self.__dict__.items()}
+            self.init_data()
+            # what init_data created or replaced: what a follow-up stage on the same data can take over
+            self._data_keys = [k for k, v in self.__dict__.items() if before.get(k) != id(v)]
         self._init_dataloader()
         self.init_model()
         self._init_loss()
