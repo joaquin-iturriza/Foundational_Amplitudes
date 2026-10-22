@@ -1041,9 +1041,19 @@ class AmplitudeExperiment(BaseExperiment):
                 f"diagram_encoder_llm4lhc: no sidecar in {diagrams_dir} for {missing}; "
                 "generate them with `python tools/dump_diagrams.py --all`")
         max_d = cfg.get("max_diagrams", None)
+        slot = None
+        if bool(cfg.get("virtuality_pool", False)):
+            smap = getattr(self, "_slot_pdgs_by_name", {})
+            assert all(n in smap for n in names), "virtuality_pool: per-slot PDG order missing for a process"
+            slot = [smap[n] for n in names]
         self._diag_set_llm4lhc = load_llm4lhc_diagram_set(
             paths, laplacian_pe_dim=int(cfg.get("laplacian_pe_dim", 8)),
-            max_diagrams=int(max_d) if max_d is not None else None)
+            max_diagrams=int(max_d) if max_d is not None else None, slot_pdgs=slot)
+        if slot is not None:
+            ok = self._diag_set_llm4lhc.virt_ok
+            LOGGER.info(f"virtuality_pool: internal lines placed for {int(ok.sum())}/{len(names)} processes "
+                        f"({int(self._diag_set_llm4lhc.virt_mask.shape[0])} lines)"
+                        + ("" if bool(ok.all()) else f"; without: {[n for n, o in zip(names, ok.tolist()) if not o][:10]}"))
         nd = self._diag_set_llm4lhc.n_diagrams
         LOGGER.info(
             f"Diagram conditioning (llm4lhc, mode={cfg.get('mode', 'pooled')}): "
@@ -1263,7 +1273,10 @@ class AmplitudeExperiment(BaseExperiment):
                     dropout=float(cfg.get("dropout", 0.0)),
                     mode=str(cfg.get("mode", "pooled")),
                     edge_feature_mode=str(cfg.get("edge_feature_mode", "bias_kv")),
+                    virtuality_pool=bool(cfg.get("virtuality_pool", False)),
+                    virtuality_eps=float(cfg.get("virtuality_eps", 1e-6)),
                 )
+                encoder.mom_div = float(self.mom_div or 1.0)   # model momenta x mom_div = GeV (without dimensionless inputs)
                 model.setup_diagram_conditioning_llm4lhc(encoder)
                 LOGGER.info(f"Diagram encoder (llm4lhc): "
                             f"{sum(p.numel() for p in encoder.parameters())} parameters, "

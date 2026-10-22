@@ -768,7 +768,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
             raw_props = self.property_matrix[particle_type_indices]   # (N_total, n_features)
             if self.mass_from_momenta:
                 raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
+            ev_lrs = None
             if getattr(self, "dimless_mass", False):
+                ev_lrs = order_labels[:, -1]                           # log10 sqrt(s_hat) per event, GeV
                 raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)
             particle_type = self.particle_encoder(raw_props)           # (N_total, d_particle_hidden)
 
@@ -789,9 +791,20 @@ class AmplitudeLLoCaWrapper(nn.Module):
         token_add = None
         if self.use_diagrams and process_ids is not None and self.diagram_encoder_impl == "llm4lhc":
             from models.diagram_encoder_llm4lhc import process_token_add
-            token_add = process_token_add(
-                self.diagram_encoder(), process_ids, ptr, fourmomenta.shape[0],
-                self.diagram_encoder.out_dim)                       # (N_total, width)
+            enc = self.diagram_encoder
+            if getattr(enc, "virtuality_pool", False):
+                # per-event diagram weighting: s_hat in GeV^2 for the masses, from the hidden log10 sqrt(s_hat)
+                # column (dimensionless inputs) or from the model's momenta times the global scale
+                if ev_lrs is not None:
+                    s_hat_phys = 10.0 ** (2.0 * ev_lrs.to(torch.float64))
+                else:
+                    p_in = (fourmomenta[ptr[:-1]] + fourmomenta[ptr[:-1] + 1]).to(torch.float64)
+                    s_hat_phys = (p_in[:, 0] ** 2 - (p_in[:, 1:] ** 2).sum(-1)) * float(enc.mom_div) ** 2
+                token_add = process_token_add(enc.forward_events(fourmomenta, ptr, process_ids, s_hat_phys),
+                                              None, ptr, fourmomenta.shape[0], enc.out_dim)
+            else:
+                token_add = process_token_add(enc(), process_ids, ptr, fourmomenta.shape[0],
+                                              enc.out_dim)                     # (N_total, width)
         elif self.use_diagrams and process_ids is not None:
             if self.use_diagram_virtuality:
                 feat_fn = (self._diagram_features_virtuality_pool

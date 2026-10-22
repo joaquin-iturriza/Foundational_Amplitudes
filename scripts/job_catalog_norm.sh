@@ -39,6 +39,14 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # Dpair (2026-10-22): the event's own scale, Lambda^2 = the geometric mean of the pair invariants 2 p_i.p_j, s0 = 1
 [ "$ARM" = Dpair ] && NORM+=("${DIM[@]}" ++data.target_physics_dim_ref=pairs ++data.target_physics_s0=1.0)
 [ "$ARM" = DlessIn ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false)
+# the diagram comparison (D93, the user 2026-10-23: "compare also what daniel's diagram encoder is able to do by itself"):
+# DlessIn's target and inputs, with the arXiv:2606.23791 encoder (hp58's, topology only: DlessIn itself), with its pooling
+# weighted per event by each diagram's propagator virtualities (DlessInVirt, model.diagram_encoder_llm4lhc.virtuality_pool,
+# "option 1 looks good for now"), and without diagrams (DlessInNoDiag, the floor)
+[ "$ARM" = DlessInVirt ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                   ++model.diagram_encoder_llm4lhc.virtuality_pool=true)
+[ "$ARM" = DlessInNoDiag ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                     ++model.use_diagrams=false)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits

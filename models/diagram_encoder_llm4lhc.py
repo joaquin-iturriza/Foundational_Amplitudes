@@ -192,7 +192,29 @@ class LLM4LHCDiagramSet:
         return int(self.node_types.shape[0])
 
 
-def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None):
+# the generator's widths (GeV, the catalog's param_card_sm.dat DECAY lines): the propagator modulus |s - M^2 + i M Gamma|
+# of the per-event diagram weighting; every other line is stable or massless
+GEN_WIDTHS = {6: 1.4915, 23: 2.441404, 24: 2.0476, 25: 6.382339e-3}
+
+
+def _virtuality_rows(diagram, external, slot_pdgs, n_initial=2):
+    """The internal lines of one sidecar diagram as (signed slot mask, M^2, (M Gamma)^2) rows over the event's particle
+    slots (all-outgoing: initial momenta enter with a minus sign), or None when a leg has no slot."""
+    from diagram_graphs import _phys_mass, leg_to_slot, propagator_leg_sets
+    legmap = leg_to_slot(external or [], list(slot_pdgs), n_initial)
+    rows = []
+    for _, _, legs, pdg in propagator_leg_sets(diagram):
+        if any(L not in legmap for L in legs):
+            return None
+        row = [0.0] * len(slot_pdgs)
+        for L in legs:
+            row[legmap[L]] = -1.0 if legmap[L] < n_initial else 1.0
+        m = _phys_mass(pdg)
+        rows.append((row, m * m, (m * GEN_WIDTHS.get(abs(pdg), 0.0)) ** 2))
+    return rows
+
+
+def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, slot_pdgs=None):
     """Build an :class:`LLM4LHCDiagramSet` from sidecar payloads.
 
     payloads : list indexed by process id of a sidecar path / loaded dict, or None
@@ -200,12 +222,16 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None):
         that for this encoder, as theirs does).
     max_diagrams : keep at most this many diagrams per process, in MadGraph order
         (their ``--max-diagrams``); None keeps all, their default.
+    slot_pdgs : per process id the event's per-slot PDG order, or None: with it, every diagram's internal lines are
+        mapped to signed sums over the event's particle slots (virt_* tensors), for the per-event diagram weighting
+        (LLM4LHCDiagramEncoder virtuality_pool). A process whose legs cannot all be placed gets no lines (weight 0).
     """
     vocab = particle_label_vocab()
-    graphs, seg, ext_by_pid = [], [], []
+    graphs, seg, ext_by_pid, virt_rows, virt_ok = [], [], [], [], []
     for pid, src in enumerate(payloads):
         if src is None:
             ext_by_pid.append([])
+            virt_rows.append([]); virt_ok.append(False)
             continue
         if isinstance(src, str):
             with open(src) as f:
@@ -218,9 +244,15 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None):
             diags = diags[:int(max_diagrams)]
         if not diags:
             raise ValueError(f"process {pid}: sidecar has no diagrams")
+        rows_p = []
         for d, external in diags:
+            if slot_pdgs is not None and rows_p is not None:
+                r = _virtuality_rows(d, external, slot_pdgs[pid])
+                rows_p = None if r is None else rows_p + [(len(graphs), x) for x in r]
             graphs.append(graph_from_sidecar_diagram(d, external, vocab))
             seg.append(pid)
+        virt_rows.append(rows_p or [])
+        virt_ok.append(rows_p is not None)
         external = subs[0].get("external") or []
         ext_by_pid.append([(_label(leg["pdg"], vocab), 1 if leg["state"] == "in" else 2)
                            for leg in sorted(external, key=lambda l: int(l["number"]))])
@@ -252,10 +284,22 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None):
             ext_dir[pid, k] = dr
     seg_t = torch.tensor(seg, dtype=torch.long)
     n_diagrams = torch.bincount(seg_t, minlength=n_proc) if T else torch.zeros(n_proc, dtype=torch.long)
+    virt = {}
+    if slot_pdgs is not None:
+        n_max = max(len(x) for x in slot_pdgs if x is not None)
+        flat = [(t, row, m2, mg2) for rows in virt_rows for t, (row, m2, mg2) in rows]
+        mask = torch.zeros(len(flat), n_max, dtype=torch.float32)
+        for k, (_, row, _, _) in enumerate(flat):
+            mask[k, :len(row)] = torch.tensor(row)
+        n_lines = torch.tensor([len(r) for r in virt_rows], dtype=torch.long)
+        virt = dict(virt_mask=mask, virt_m2=torch.tensor([f[2] for f in flat], dtype=torch.float32),
+                    virt_mg2=torch.tensor([f[3] for f in flat], dtype=torch.float32),
+                    virt_diag=torch.tensor([f[0] for f in flat], dtype=torch.long),
+                    virt_n_lines=n_lines, virt_ok=torch.tensor(virt_ok, dtype=torch.bool), virt_n_slots=n_max)
     return LLM4LHCDiagramSet(
         node_types=node_types, node_mask=node_mask, adj=adj, edge_labels=edge_labels,
         lap_pe=lap, seg=seg_t, n_proc=n_proc, ext_label=ext_label, ext_dir=ext_dir,
-        ext_count=ext_count, n_diagrams=n_diagrams, edge_vocab=len(vocab))
+        ext_count=ext_count, n_diagrams=n_diagrams, edge_vocab=len(vocab), **virt)
 
 
 class GraphTransformerLayer(nn.Module):
@@ -324,7 +368,8 @@ class LLM4LHCDiagramEncoder(nn.Module):
     """
 
     def __init__(self, diagrams, out_dim, hidden_size=256, num_layers=3, num_heads=4,
-                 laplacian_pe_dim=8, dropout=0.0, mode="pooled", edge_feature_mode="bias_kv"):
+                 laplacian_pe_dim=8, dropout=0.0, mode="pooled", edge_feature_mode="bias_kv",
+                 virtuality_pool=False, virtuality_eps=1e-6):
         super().__init__()
         if mode not in VALID_MODES:
             raise ValueError(f"mode={mode!r}; valid: {VALID_MODES}")
@@ -365,6 +410,26 @@ class LLM4LHCDiagramEncoder(nn.Module):
             if mode == "pooled":
                 self.pool_query = nn.Parameter(torch.zeros(self.out_dim))
                 nn.init.trunc_normal_(self.pool_query, std=0.02)
+        # model.diagram_encoder_llm4lhc.virtuality_pool (D93, the user 2026-10-23: "option 1 looks good for now"): the
+        # pooling over a process's diagrams is done per event, each diagram's score raised by gamma * P_d with
+        # P_d = -sum over its internal lines of log|v|, v = (s_line - M^2 + i M Gamma) / s_hat (softened by eps):
+        # the diagrams whose propagators are closest to singular in that event weigh most. gamma starts at 0, so at
+        # initialisation the encoder is the topology-only one.
+        self.virtuality_pool = bool(virtuality_pool)
+        if self.virtuality_pool:
+            if mode != "pooled":
+                raise ValueError("virtuality_pool needs mode='pooled'")
+            if not hasattr(diagrams, "virt_mask"):
+                raise ValueError("virtuality_pool needs the diagram set built with slot_pdgs")
+            for name in ("virt_mask", "virt_m2", "virt_mg2", "virt_diag", "virt_n_lines", "virt_ok"):
+                self.register_buffer(name, getattr(diagrams, name), persistent=False)
+            self.register_buffer("diag_off", torch.cat([torch.zeros(1, dtype=torch.long),
+                                                        torch.cumsum(self.n_diagrams, 0)]), persistent=False)
+            self.register_buffer("line_off", torch.cat([torch.zeros(1, dtype=torch.long),
+                                                        torch.cumsum(self.virt_n_lines, 0)]), persistent=False)
+            self.virt_n_slots = int(diagrams.virt_n_slots)
+            self.virtuality_eps = float(virtuality_eps)
+            self.virt_gamma = nn.Parameter(torch.zeros(1))
         else:  # pooled_external
             self.external_pdg_embed = nn.Embedding(edge_vocab, H)
             self.external_dir_embed = nn.Embedding(3, H)
@@ -432,6 +497,45 @@ class LLM4LHCDiagramEncoder(nn.Module):
         return self._segment_softmax_pool(per_diag, scores, self.seg, self.n_proc)
 
 
+    def forward_events(self, fourmomenta, ptr, process_ids, s_hat_phys):
+        """One vector per EVENT, (B, out_dim): the pooled readout with each diagram's score raised by gamma * P_d(event)
+        (virtuality_pool). fourmomenta (N_total, 4) in the model's units (only ratios of invariants are used), ptr
+        (B+1,), process_ids (B,), s_hat_phys (B,) the event's s_hat in GeV^2 (for the masses)."""
+        per_diag = self.encode_diagrams()                                        # (T, out)
+        dt, dev = per_diag.dtype, per_diag.device
+        a = (per_diag * self.pool_query.to(dt)).sum(-1) / math.sqrt(self.out_dim)   # (T,)
+        B = process_ids.shape[0]
+        # (event, diagram) pairs: every diagram of the event's process
+        nd = self.n_diagrams[process_ids]                                        # (B,)
+        pair_b = torch.repeat_interleave(torch.arange(B, device=dev), nd)
+        pstart = torch.cumsum(nd, 0) - nd                                        # (B,) first pair of each event
+        local = torch.arange(pair_b.shape[0], device=dev) - pstart[pair_b]
+        pair_t = self.diag_off[process_ids][pair_b] + local
+        # (event, internal line) pairs and each line's |v| per event
+        nl = self.virt_n_lines[process_ids]
+        line_b = torch.repeat_interleave(torch.arange(B, device=dev), nl)
+        lstart = torch.cumsum(nl, 0) - nl
+        line_k = self.line_off[process_ids][line_b] + torch.arange(line_b.shape[0], device=dev) - lstart[line_b]
+        S = self.virt_n_slots
+        gather = (ptr[:-1][line_b][:, None] + torch.arange(S, device=dev)[None]).clamp(max=fourmomenta.shape[0] - 1)
+        p_line = (self.virt_mask[line_k].to(dt)[..., None] * fourmomenta[gather].to(dt)).sum(1)   # (L, 4)
+        p_in = fourmomenta[ptr[:-1]].to(dt) + fourmomenta[ptr[:-1] + 1].to(dt)
+        s_hat_model = p_in[:, 0] ** 2 - (p_in[:, 1:] ** 2).sum(-1)               # (B,)
+        s_line = p_line[:, 0] ** 2 - (p_line[:, 1:] ** 2).sum(-1)
+        sh = s_hat_phys.to(dt)[line_b]
+        v = s_line / s_hat_model[line_b] - self.virt_m2.to(dt)[line_k] / sh
+        logmod = 0.5 * torch.log(v * v + self.virt_mg2.to(dt)[line_k] / (sh * sh) + self.virtuality_eps ** 2)
+        line_pair = pstart[line_b] + (self.virt_diag[line_k] - self.diag_off[process_ids][line_b])
+        P = torch.zeros(pair_b.shape[0], device=dev, dtype=dt).index_add(0, line_pair, -logmod)
+        scores = a[pair_t] + self.virt_gamma.to(dt) * P
+        smax = torch.full((B,), float("-inf"), device=dev, dtype=dt).scatter_reduce(
+            0, pair_b, scores, reduce="amax", include_self=True)
+        ex = torch.exp(scores - smax[pair_b])
+        w = ex / torch.zeros(B, device=dev, dtype=dt).index_add(0, pair_b, ex)[pair_b]
+        W = torch.sparse_coo_tensor(torch.stack([pair_b, pair_t]), w, (B, per_diag.shape[0]))
+        return torch.sparse.mm(W, per_diag)                                      # (B, out)
+
+
 def inject_at_positions(embeds, vectors, positions):
     """Their injection: ``embeds.index_put(positions, vectors, accumulate=True)``."""
     return embeds.index_put(positions, vectors.to(embeds.dtype), accumulate=True)
@@ -443,7 +547,8 @@ def process_token_add(proc_vectors, process_ids, ptr, n_tokens, width):
     :func:`inject_at_positions` on a zero (n_tokens, width) tensor, so the backbone adds
     it to its token embeddings. ``ptr`` (B+1,) event boundaries."""
     counts = ptr[1:] - ptr[:-1]
-    vec = proc_vectors[process_ids].repeat_interleave(counts, dim=0)            # (n_tokens, W)
+    # per-process vectors (P, W) indexed by the event's process, or per-event vectors (B, W) already (process_ids None)
+    vec = (proc_vectors if process_ids is None else proc_vectors[process_ids]).repeat_interleave(counts, dim=0)
     base = torch.zeros(n_tokens, width, device=vec.device, dtype=vec.dtype)
     pos = torch.arange(n_tokens, device=vec.device)
     return inject_at_positions(base, vec, (pos,))
