@@ -102,6 +102,19 @@ for name, g in todo:
         sub = [s for s in sd["subprocesses"] if [l["pdg"] for l in sorted(s["external"], key=lambda l: l["number"])]
                == list(pdg)]
         if not sub:
+            # the same legs in another order (e.g. e+ e- against e- e+): reorder the pool's legs to the sidecar's,
+            # matching by PDG within the initial and within the final state
+            for s_ in sd["subprocesses"]:
+                want = [l["pdg"] for l in sorted(s_["external"], key=lambda l: l["number"])]
+                if sorted(want[:2]) != sorted(list(pdg[:2])) or sorted(want[2:]) != sorted(list(pdg[2:])):
+                    continue
+                perm, used = [], set()
+                for w_ in want:
+                    k = next(k for k in range(n) if pdg[k] == w_ and k not in used and (k < 2) == (len(perm) < 2))
+                    perm.append(k); used.add(k)
+                P = P[:, perm]; pdg = pdg[perm]; sub = [s_]
+                break
+        if not sub:
             out[name] = {"error": "no subprocess with the pool's leg order"}
             continue
         # couplings of that subprocess's diagrams: diagram_couplings.json lists every subprocess's in order
