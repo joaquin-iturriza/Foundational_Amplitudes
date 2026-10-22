@@ -687,8 +687,9 @@ worse than B on the new processes at either length, three quarters of it level. 
 with B: $0.65$ against $0.60$ in the median, better in the tail (the $90\%$ point $2.6$ against $3.3$) and on the relabels
 ($0.060$ against $0.069$), with the level error slightly lower ($0.092$ against $0.11$). So at multiplicities seen in
 training the dimension factor costs nothing and gains a little, and the coupling product should go. A's relabel advantage
-($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ after the short stage:
-pull std $1.1$ to $1.2$ on the relabels, $2.5$ (B, Adim) to $4.2$ (A) on the new processes. The short runs stop before
+($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ as scored (the main run's best checkpoint, before the $\sigma$
+stage: the scoring read the run, not \code{sigma\_stage}; a rescore from the stage is running): pull std $1.1$ to $1.2$ on
+the relabels, $2.5$ (B, Adim) to $4.2$ (A) on the new processes. The short runs stop before
 step $8734$, where full-length B blew up, so they say nothing on its stability.
 
 \paragraph{Extrapolation in multiplicity: the units of the target (2026-10-22, D88).} Every target of the form
@@ -701,7 +702,7 @@ each, $4126$ steps, the short runs' settings otherwise; \code{scripts/job\_catal
 the held-out $2\to3$ processes, a multiplicity it never saw. With $4-N=0$ on every training event, B in TeV trains on B
 in GeV's targets and the $s_0=289$ variant on the dimensionless one's, so two networks give four readings, differing
 only by a constant at $N=5$. Median MSE of $\log|\mathcal M|^2$ per process (level and shape: squared mean error and
-error variance):
+error variance; \code{analysis/catalog\_daniel/catalog\_extrap\_heldout.py}, which also derives the read-back offsets):
 \begin{center}
 \begin{tabular}{lcccc}
  & B, GeV & B, TeV & dimensionless & $s_0=289$\,GeV$^2$ \\ \hline
@@ -721,7 +722,8 @@ not the magnitude: a sampling- and unit-agnostic target is necessary for extrapo
 and a test from $2\to2$ alone is too far a step to rank targets on shape.
 
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
-the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it; pulls $(q-t)/\sigma$ in
+the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
+\code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
 $\log|\mathcal M|^2$, the median over processes of each process's pull standard deviation and of its fraction of events
 within one $\sigma$; a calibrated $\sigma$ gives $1$ and $0.68$). hp58 after its $\sigma$ stage, read with each
 process's own statistics: $1.86$ and $0.38$ on the $96$ relabels, $13.5$ and $0.06$ on the $43$ new. A after its $\sigma$
