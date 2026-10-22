@@ -634,6 +634,38 @@ by A within each group.}
 \label{fig:catalog_norm}
 \end{figure}
 
+\paragraph{Few-shot calibration, and surrogates computed from momenta alone (2026-10-22, D83).} Median MSE of
+$\log|\mathcal M|^2$ over the $43$ new and the $96$ relabels. \emph{Few-shot} (\code{norm\_explore5.py},
+\code{norm\_explore7.py}; $k$ events of the new process drawn at random, $5$ draws, scored on the rest): hp58 with a
+rescale and shift fitted on them reaches $0.137$ and $0.0081$ at $k=3$, $0.091$ and $0.0071$ at $k=10$, $0.082$ and
+$0.0057$ at $k=100$ (the oracle: $0.080$, $0.0055$); A needs only a shift ($0.167$, $0.0048$ at $k=3$); B $0.28$, $0.066$
+at $k=10$; shrinking the fitted slope toward $1$ helps at $k=3$ (A $0.22\to0.14$, B $0.36\to0.29$). It holds only for
+representative events: A shifted on the $10$ lowest-$\hat s$ events gives $0.21$, on the $10$ highest $0.62$, against
+$0.16$ at random ($2\to3$ only). \emph{A CPU stand-in for shape transfer} (\code{norm\_explore6.py}: a $3\times128$
+network on $400$ events per process and summary invariants, ten candidate targets, three seeds) cannot rank them: every
+target lands at $0.40$ to $0.57$ on the new and $0.67$ to $0.70$ on the relabels, against $0.004$ to $0.06$ for the real
+models; too weak to test with. \emph{Surrogates from momenta alone} (\code{norm\_surrogate*.py}, \code{data/surrogate*.json};
+$2000$ events per process, the labels used only to score; the momenta, the cuts and the sampling cost nothing): per
+event, within a process, the correlation with the true $\log|\mathcal M|^2$ (median, $r^2$ in brackets) is $0.83$
+($0.69$) on the new for the product of the diagram sidecars' propagator factors, $0.67$ ($0.46$) on the training
+processes, $0.44$ ($0.20$) on the relabels, $0.39$ at $2\to2$ and $0.68$ at $2\to3$; adding an eikonal factor over the
+coloured massless legs gives $0.70$ ($0.50$) on training. The mass dimension, the eikonal and Parke--Taylor alone have
+$r^2\le0.21$ on the catalog (constant for most of it: no final gluon or photon, or $2\to2$). As level predictors across
+processes no surrogate's mean beats $g$ (best: dimension with IDEN and colour, $2.7$ to $3.1$; $g$ $0.32$), but in
+multiplicity it extrapolates where the learned map does not: fitted on $2\to2$ and scored on $2\to3$, $0.34$ against the
+descriptor network's $7.1$. \emph{Extrapolation within a family} ($u\bar u\to Z+ng$ and $u\bar d\to W+ng$, $n=1..5$, the
+transfer study's pools): the eikonal and Parke--Taylor surrogates explain $81$ to $96\%$ of each process's spread, rising
+with $n$, and a level and log-std map fitted on $n\le3$ places $n=4$, $5$ at a level error of $0.005$ and $0.014$ ($Z$),
+$0.004$ and $0.013$ ($W$), the log-std to $0.02$ to $0.03$ (the dimension factor $0.09$ to $0.47$). The two give identical
+maps on these families, not yet checked as a coincidence or a fallback. The catalog's maps carried to these families
+(up to $8$ particles) are poor at low $n$ ($4.6$ to $14$ at $n=1$). \emph{One loop}: not captured, and not yet a clean
+test: the tree-to-one-loop level shift is $+0.04$ to $+4.3$ against about $-2.9$ from a Catani-style factor, the tree
+surrogates correlate at $0.06$ to $0.29$ with the one-loop targets, and the one-loop pools are sampled uniformly where the
+tree pools use the mixture, and what they store was not checked. Reading: a soft-collinear factor computed from the
+momenta alone carries most of the per-event structure of the multi-gluon families and extrapolates their level and
+spread in $n$; on the catalog the diagram propagators carry the most. Their use is as a per-event input to a model with
+one shared standardization, which has nothing fixed outside the network for a new process.
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it; pulls $(q-t)/\sigma$ in
 $\log|\mathcal M|^2$, the median over processes of each process's pull standard deviation and of its fraction of events
