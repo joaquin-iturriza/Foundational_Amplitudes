@@ -29,7 +29,7 @@ df -h "$MMAP" | tail -1
 NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
 R="$SCRATCH/zz_catalog_heldout_recipes"; mkdir -p "$R"
-if [ "$SMOKE" = smoke ]; then
+if [ "$SMOKE" = smoke ] || [ "$SMOKE" = smoke_eval ]; then
     OUT="$SCRATCH/zz_catalog_norm_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
     python - "$SUB" <<'PY'
@@ -40,6 +40,8 @@ yaml.safe_dump(r, open(sys.argv[1], "w"))
 PY
     EXTRA=(training.iterations=40 training.validate_frac=0.5 evaluate=false data.processes_file="$SUB"
            ++training.heterosc_sigma_stage_steps=10)
+    # smoke_eval: the post-training evaluation on (train subsampled), so the sigma stage writes its preds_*.npz
+    [ "$SMOKE" = smoke_eval ] && EXTRA=("${EXTRA[@]/evaluate=false/evaluate=true}" evaluation.train_subsample=2000)
 fi
 # eval: the held-out scoring only, from the run's best checkpoint (a run that blew up is reported at its best
 # checkpoint, CLAUDE.md; B diverged at step 8734 on 2026-10-22). zero_shot_parent.py reads models/model_run0_best.pt.
@@ -59,7 +61,7 @@ for p in r["processes"]:
     yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 print(len(r["processes"]), "held-out recipes")
 PY
-P=("$R"/dc_*.yaml); [ "$SMOKE" = smoke ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
+P=("$R"/dc_*.yaml); [[ "$SMOKE" = smoke* ]] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
 # eval: the sigma-stage model when the run has one (trunk and mu frozen, so mu is the run's; its sigma is the calibrated
 # one, D70), into its own prediction dir
 PAR="$OUT"
