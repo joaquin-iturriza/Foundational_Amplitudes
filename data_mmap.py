@@ -343,7 +343,8 @@ def init_data_recipes_mmap(exp, c):
         "shared_standardization": bool(cfg.data.get("shared_standardization", False)),
         "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
         "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),
-                                   str(cfg.data.get("target_physics_couplings", "default"))] if phys_on else None),
+                                   str(cfg.data.get("target_physics_couplings", "default")),
+                                   bool(cfg.data.get("target_physics_dim_only", False))] if phys_on else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,

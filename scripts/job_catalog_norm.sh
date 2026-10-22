@@ -17,10 +17,12 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A or B}"; SMOKE="${2:-}"
+ARM="${1:?A, Adim or B}"; SMOKE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 [ "$ARM" = A ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0)
+# Adim (2026-10-22): the mass-dimension factor (s0/s_hat)^(4-N) alone, no coupling product
+[ "$ARM" = Adim ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0 ++data.target_physics_dim_only=true)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
@@ -42,6 +44,17 @@ PY
            ++training.heterosc_sigma_stage_steps=10)
     # smoke_eval: the post-training evaluation on (train subsampled), so the sigma stage writes its preds_*.npz
     [ "$SMOKE" = smoke_eval ] && EXTRA=("${EXTRA[@]/evaluate=false/evaluate=true}" evaluation.train_subsample=2000)
+fi
+# short (the user, 2026-10-22: "reduce the training set to 10000 events per process", "only 5 epochs", "keep events in
+# memory", "Reduce the validation pool proportionally too", a shorter sigma stage): 1e4 train and 200 val/test events
+# per process (hp58: 1e5 and 2000), 5 epochs (1352 x 1e4 / 16384 x 5 = 4126 steps), in memory, 50 validations, a 150-step sigma stage with
+# 5 validations; runs/catalog_norm_short/<arm>, held-out predictions $SCRATCH/zz_catalog_norm_short_<arm> (scored on
+# the held-out processes' full val split, tools/zero_shot_parent.py)
+if [ "$SMOKE" = short ]; then
+    OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"
+    EXTRA=(training.validate_frac=0.02 training.iterations=4126 ++data.memmap=false ++data.train_subsample=10000
+           ++data.eval_subsample=200 ++training.heterosc_sigma_stage_steps=150
+           ++training.heterosc_sigma_stage_validations=5 evaluation.train_subsample=2000)
 fi
 # eval: the held-out scoring only, from the run's best checkpoint (a run that blew up is reported at its best
 # checkpoint, CLAUDE.md; B diverged at step 8734 on 2026-10-22). zero_shot_parent.py reads models/model_run0_best.pt.

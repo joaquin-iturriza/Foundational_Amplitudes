@@ -1445,6 +1445,10 @@ class AmplitudeExperiment(BaseExperiment):
             _pf_cfg = bool(self.cfg.data.get("target_physics_factor", False))
             assert _pf_stats == _pf_cfg, (f"frozen data stats were fitted with target_physics_factor={_pf_stats}, "
                                           f"this run sets {_pf_cfg}")
+            _dim_stats = bool(stats.get("target_physics_dim_only", False))
+            _dim_cfg = bool(self.cfg.data.get("target_physics_dim_only", False))
+            assert _dim_stats == _dim_cfg, (f"frozen data stats were fitted with target_physics_dim_only={_dim_stats}, "
+                                            f"this run sets {_dim_cfg}")
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
             assert _tp_stats == _tp_cfg, (
@@ -2071,6 +2075,10 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_couplings", "analysis/catalog_daniel/data/diagram_couplings.json")))
             cp = cp if os.path.isabs(cp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), cp)
             self._phys_logc = {k: max(v["logc2"]) for k, v in json.load(open(cp)).items()}
+            if bool(self.cfg.data.get("target_physics_dim_only", False)):
+                # the mass-dimension part alone, (s0 / s_hat)^(4-N), no coupling product (2026-10-22: the coupling
+                # product is what misplaced the held-out levels, e.g. ZHH carries ZH's)
+                self._phys_logc = {k: 0.0 for k in self._phys_logc}
             self._phys_ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
         assert name in self._phys_logc, f"target_physics_factor: no coupling product for {name}"
         q = mom_phys[:, 0].astype(np.float64) + mom_phys[:, 1].astype(np.float64)
@@ -2093,6 +2101,7 @@ class AmplitudeExperiment(BaseExperiment):
                    if getattr(self, "_affine_multiplicity", None) else {}),
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
+                "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "tchannel_norm": getattr(self, "_tch_norm", None),
                 "offshell_stats": getattr(self, "_offshell_stats", None),
                 "prepd_mean": [float(x) for x in self.prepd_mean],

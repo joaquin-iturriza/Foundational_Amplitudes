@@ -35,6 +35,7 @@ ap.add_argument("--train-subsample", type=int, default=10000,
                 help="probe train events read for its own target statistics (a representation, inverted exactly)")
 ap.add_argument("--twins", default=None, help="JSON {probe: training process it relabels} (per-process parent)")
 ap.add_argument("--save-dir", default=None, help="write <probe>.npz (t, q_aff, q) here")
+ap.add_argument("--eval-subsample", type=int, default=2000, help="held-out val events per probe")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 
@@ -64,6 +65,9 @@ for recipe in a.recipes:
         cfg.data.processes_file = recipe
         cfg.data.train_subsample = a.train_subsample
         cfg.data.memmap = False                      # one probe fits in memory; a memmap would build a cache per probe
+        # the held-out val events per probe: 2000 unless --eval-subsample says otherwise, whatever the parent's own cap (hp58's
+        # was 2000, the scale every held-out number so far was read at; a short design run validates on 200)
+        cfg.data.eval_subsample = a.eval_subsample
         # the probe's own target statistics (one process: no pooled or affine fit)
         cfg.data.shared_standardization = False
         cfg.data.affine_multiplicity_std = False
