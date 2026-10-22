@@ -54,6 +54,14 @@ def cdf(d):
     return np.searchsorted(d, X, side="right") / len(d)
 
 
+ORDER = {"interpolation": ["ss~ annihilation processes (flavor-degenerate with dd~ and uu~)",
+                           "Muon final states from bb~ annihilation", "g+s processes from gluon + light-quark families",
+                           "b+s(~) scattering from b+light-quark families", "c+u~ scattering from c+light-quark families",
+                           "ds and s~s~ from same-sign light quark families",
+                           "Same-sign charm-bottom scattering (cb, c~b~)"],
+         "extrapolation": ["Multi-Higgs production (hh, hhh, Xhh)", "Higgs + tau lepton processes",
+                           "Triple-W production (W+W+W-, W+W-W-)", "Triple-Z production (ZZZ)",
+                           "gg -> W + qq' (W production from gluon fusion)", "gg -> tt~ + boson (ttX via gluon fusion)"]}
 G = "phys_gbr"   # the statistics map used for "on its own" (stats_net.py: physics features + trees, fit on the training)
 
 
@@ -67,38 +75,44 @@ def main():
     probes = sorted({k.split("__")[0] for k in z})
     twins = json.load(open(os.path.join(HERE, "heldout_twins.json")))
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(HERE, "classes_default.json")))["processes"]}
-    groups = {sp: sorted({meta[p]["test_group"] for p in probes if meta[p]["split"] == sp})
-              for sp in ("interpolation", "extrapolation")}
+    # the panels and group order of the user's figure (arXiv:2606.23791's held-out figure); it draws cb, c~b~ with
+    # the interpolation groups, which classes_default.json lists as extrapolation
+    groups = {sp: [g for g in ORDER[sp] if any(meta[p]["test_group"] == g for p in probes)] for sp in ORDER}
 
     LAB = {"q_g": "on its own (statistics from g)", "q_own": "with its own data's statistics",
            "q_aff": "after the best rescale and shift"}
-    figs = ps.panels(3)
-    for (fig, ax), kind in zip(figs, ("q_g", "q_own", "q_aff")):
-        for rel, c in ((True, ps.C.blue), (False, ps.C.vermillion)):
-            P = [p for p in probes if (p in twins) == rel and f"{p}__{kind}" in z]
-            if not P:
-                continue
-            C = np.array([cdf(np.exp(z[f"{p}__{kind}"].astype(float) - z[f"{p}__t"].astype(float)) - 1) for p in P])
-            for row in C:
-                ax.plot(X, row, "-", color=c, alpha=0.15, lw=0.6)    # weight encodes "one process" vs "median"
-            ax.plot(X, np.median(C, 0), "-", color=c, label=f"{'relabel' if rel else 'no relabel'} ({len(P)}), median")
-        ax.set_xscale("log"); ax.set_ylim(0, 1)
-        ax.set_xlabel(r"$|\Delta|$"); ax.set_ylabel(r"fraction of events below")
-        ps.process_label(ax, LAB[kind], loc="lower right")
-    ax = figs[0][1]
-    ax.plot([], [], "-", color="grey", alpha=0.3, lw=0.6, label="one process")
-    ps.shared_legend(figs[0][0], ax, ncol=2)      # a corner legend would stretch the 0..1 axis
-    ps.save_panels(figs, os.path.join(HERE, "figs", "heldout_delta"))
+    # Delta plots as for the ladder (analysis/transfer/delta_plots.py: the |Delta| density per unit log10|Delta|), one
+    # panel per test group showing its median process by MSE on its own, the two versions as two lines
+    sys.path.insert(0, os.path.join(os.path.dirname(HERE), "transfer"))
+    from delta_plots import hist  # noqa: E402
+    sel = []
+    for sp in ("interpolation", "extrapolation"):
+        for g in groups[sp]:
+            P = sorted((p for p in probes if meta[p]["test_group"] == g),
+                       key=lambda p: float(np.mean((z[f"{p}__q_g"] - z[f"{p}__t"]) ** 2)))
+            sel.append((g, P[len(P) // 2]))
+    figs = ps.panels(len(sel))
+    for (fig, ax), (g, p) in zip(figs, sel):
+        t = z[f"{p}__t"].astype(float)
+        for kind, c in (("q_g", ps.C.vermillion), ("q_aff", ps.C.blue)):
+            hist(ax, np.exp(z[f"{p}__{kind}"].astype(float) - t) - 1, color=c, label=LAB[kind])
+        ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$"); ax.set_ylabel(r"density per unit $\log_{10}|\Delta|$")
+        ps.process_label(ax, proc_label(meta[p]["process"]))
+    ps.shared_legend(figs[0][0], figs[0][1], ncol=1)
+    for i, (fig, _) in enumerate(figs):                        # 13 panels: numbered, save_panels' letters stop short
+        ps.save(fig, os.path.join(HERE, "figs", f"heldout_delta_{i + 1:02d}"))
+    print("Delta panels:", "; ".join(f"{i + 1} {SHORT.get(g, g)}: {p}" for i, (g, p) in enumerate(sel)))
 
     # the user's figure (arXiv:2606.23791's held-out figure, interpolation and extrapolation): one point per process,
     # named on the x axis, its test group named above. Wider than the house plot box on purpose: it is that figure.
     import matplotlib.pyplot as plt
     for sp in ("interpolation", "extrapolation"):
-        P = [p for g in groups[sp] for p in sorted(p for p in probes if meta[p]["split"] == sp and meta[p]["test_group"] == g)]
+        mse = lambda p, k: float(np.mean((z[f"{p}__{k}"].astype(float) - z[f"{p}__t"].astype(float)) ** 2))
+        P = [p for g in groups[sp] for p in sorted((p for p in probes if meta[p]["test_group"] == g),
+                                                   key=lambda p: mse(p, "q_g"))]     # best to worst, on its own
         fig, ax = plt.subplots(figsize=(8.0, 2.9))
         x = np.arange(len(P))
         for kind, c, mfc, lab in (("q_g", ps.C.vermillion, None, LAB["q_g"]),
-                                  ("q_own", ps.C.green, None, LAB["q_own"]),
                                   ("q_aff", ps.C.blue, "none", LAB["q_aff"])):
             y = [np.mean((z[f"{p}__{kind}"].astype(float) - z[f"{p}__t"].astype(float)) ** 2) for p in P]
             ax.plot(x, y, "o", color=c, mfc=mfc or c, ms=3.5, label=lab)
@@ -113,7 +127,7 @@ def main():
             ax.text(i0 + n / 2 - 0.5, 1.02, SHORT.get(g, g), transform=ax.get_xaxis_transform(), ha="center",
                     va="bottom", fontsize=7)
             i0 += n
-        fig.legend(*ax.get_legend_handles_labels(), loc="upper right", fontsize=7, frameon=False, ncol=3)
+        fig.legend(*ax.get_legend_handles_labels(), loc="upper right", fontsize=7, frameon=False, ncol=2)
         fig.text(0.08, 0.97, f"held-out: {sp}", fontsize=9, va="top")
         fig.subplots_adjust(left=0.08, right=0.99, top=0.84, bottom=0.36)
         for ext in ("png", "pdf"):

@@ -460,12 +460,17 @@ a spread ratio $\hat\sigma/\sigma$. The two baselines share one spread, so their
 
 \begin{figure}[H]
 \centering
-\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_b.pdf}} \\[1ex]
-\pnl{../analysis/catalog_daniel/figs/heldout_delta_c.pdf}
-\caption{hp58 on the $139$ held-out processes: the fraction of events with $|\Delta|$ below $x$, one thin line per
-process and the median process bold, for (a) the prediction on its own with the statistics from $g$, (b) the output
-read with the process's own train mean and spread, (c) after the best rescale and shift. Blue: the $96$ relabels;
-vermillion: the $43$ without one.}
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_01.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_02.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_03.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_04.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_05.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_06.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_07.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_08.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_09.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_10.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_11.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_12.pdf}} \\[1ex]
+\pnl{../analysis/catalog_daniel/figs/heldout_delta_13.pdf}
+\caption{$\Delta$ of hp58 on the held-out processes, one panel per test group (in the order of
+Fig.~\ref{fig:heldout_mse}) showing its median process by MSE on its own: the $|\Delta|$ density per unit
+$\log_{10}|\Delta|$ (as the ladder's $\Delta$ plots), on its own with the statistics from $g$ and after the best rescale
+and shift.}
 \label{fig:heldout_delta}
 \end{figure}
 
@@ -473,9 +478,10 @@ vermillion: the $43$ without one.}
 \centering
 \includegraphics[width=\textwidth]{../analysis/catalog_daniel/figs/heldout_mse_interpolation.pdf} \\[1ex]
 \includegraphics[width=\textwidth]{../analysis/catalog_daniel/figs/heldout_mse_extrapolation.pdf}
-\caption{The held-out figure of arXiv:2606.23791 for hp58: MSE$(\log|\mathcal M|^2)$ per held-out process, grouped by
-its test group, on its own (statistics from $g$), with its own data's statistics, and after the best rescale and
-shift. Top: the interpolation groups; bottom: the extrapolation groups.}
+\caption{The held-out figure of arXiv:2606.23791 for hp58, its panels and group order: MSE$(\log|\mathcal M|^2)$ per
+held-out process, on its own (statistics from $g$) and after the best rescale and shift, each group ordered from best to
+worst on its own. As there, the $cb$, $\bar c\bar b$ group is drawn with the interpolation groups (the split file lists
+it as extrapolation).}
 \label{fig:heldout_mse}
 \end{figure}
 
