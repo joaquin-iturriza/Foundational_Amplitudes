@@ -13,8 +13,12 @@ log C_p and MadGraph's IDEN and final colour sum, from the sidecar's external le
           D_S = s_S - M^2 + i M Gamma, k = 2 for a massive line, 1 for a massless one (the synthetic generator's rule),
           s_S from the leg set on one side of the internal edge (data/diagrams/dc_<p>.diagrams.json)
   propeik prop + the eik term
+  catani  (one-loop pools) prop + log|C alpha_s/(2 pi) (-l^2 - 3 l - 8 + pi^2)|, l = log(mu^2 / s_hat), mu = M_Z,
+          alpha_s = 0.118, C = C_F per quark line (the finite part of the Catani operator on a q qbar Born, a shape prior
+          for the virtual correction relative to the Born); a signed pool is read as log|value|, its sign fraction kept
 Login node, CPU only:
     python analysis/catalog_daniel/norm_surrogate.py <out.json> [--n 2000]
+    python analysis/catalog_daniel/norm_surrogate.py <out.json> --pools uubar_Zgg=uubar_Zgg_96-1000GeV_train_smix_amplitudes.npy ...
 """
 import argparse, itertools, json, math, os, sys, time
 from collections import Counter
@@ -25,6 +29,7 @@ import yaml
 ap = argparse.ArgumentParser(); ap.add_argument("out"); ap.add_argument("--n", type=int, default=2000)
 ap.add_argument("--recipes", nargs="+", default=["recipes/catalog_daniel_train.yaml", "recipes/catalog_daniel_heldout.yaml"])
 ap.add_argument("--cache", default=None)
+ap.add_argument("--pools", nargs="*", default=None, help="name=pool file in the cache (the sidecar is data/diagrams/<name>.diagrams.json)")
 a = ap.parse_args()
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -75,10 +80,15 @@ def edge_sides(diag, nleg):
 
 
 out, t0 = {}, time.time()
-for rf in a.recipes:
-    for p in yaml.safe_load(open(rf))["processes"]:
-        name = p["name"]
-        g = [x for x in files if x.startswith(name + "_") and "_train_" in x and x.endswith("amplitudes.npy")]
+if a.pools:
+    todo = [(kv.split("=")[0], [kv.split("=")[1]]) for kv in a.pools]
+else:
+    todo = []
+    for rf in a.recipes:
+        for p in yaml.safe_load(open(rf))["processes"]:
+            todo.append((p["name"], [x for x in files if x.startswith(p["name"] + "_") and "_train_" in x
+                                     and x.endswith("amplitudes.npy")]))
+for name, g in todo:
         sc = os.path.join(ROOT, "data", "diagrams", name + ".diagrams.json")
         if not g or not os.path.exists(sc):
             continue
@@ -86,7 +96,8 @@ for rf in a.recipes:
         n = (x.shape[1] - 1) // 5
         P = x[:, : 4 * n].reshape(len(x), n, 4)
         pdg = x[0, 4 * n: 5 * n].astype(int)
-        y = np.log(x[:, -1])
+        sign_frac = float(np.mean(x[:, -1] > 0))
+        y = np.log(np.abs(x[:, -1]))
         sd = json.load(open(sc))
         sub = [s for s in sd["subprocesses"] if [l["pdg"] for l in sorted(s["external"], key=lambda l: l["number"])]
                == list(pdg)]
@@ -99,7 +110,10 @@ for rf in a.recipes:
             if s is sub[0]:
                 break
             i0 += len(s["diagrams"])
-        logc = np.array(dcoup[name]["logc2"][i0: i0 + len(sub[0]["diagrams"])])
+        if name in dcoup:
+            logc = np.array(dcoup[name]["logc2"][i0: i0 + len(sub[0]["diagrams"])])
+        else:                                        # outside the catalog: equal couplings (the level map absorbs them)
+            logc = np.zeros(sum(1 for d in sub[0]["diagrams"] if d.get("diagram_type", "tree") == "tree") or 1)
         pin, pout = list(pdg[:2]), list(pdg[2:])
         const = float(logc.max()) - math.log(iden(pin, pout)) + sum(math.log(COLOR.get(abs(q), 1)) for q in pout)
         # all-outgoing momenta
@@ -140,7 +154,7 @@ for rf in a.recipes:
             sur["pt"] = sur["eik"]
         # diagrams: sum_d C_d prod 1/|D_S|^k
         tot = np.zeros(len(x))
-        for d, lc in zip(sub[0]["diagrams"], logc):
+        for d, lc in zip([d for d in sub[0]["diagrams"] if d.get("diagram_type", "tree") == "tree"], logc):
             term = np.full(len(x), math.exp(lc - logc.max()))
             for pid, legs in edge_sides(d, n):
                 k = np.zeros((len(x), 4))
@@ -155,7 +169,11 @@ for rf in a.recipes:
             tot += term
         sur["prop"] = sur["dimid"] - (4 - n) * (L - LS0) + np.log(np.maximum(tot, 1e-300))
         sur["propeik"] = sur["prop"] + eik
-        rec = {"N": int(n), "n": int(len(y)), "y_mean": float(y.mean()), "y_std": float(y.std()), "const": const}
+        nq = sum(abs(q) in QUARKS for q in pdg) // 2
+        l_ = np.log(91.188 ** 2 / s)
+        sur["catani"] = sur["prop"] + np.log(np.abs(nq * (4 / 3) * 0.118 / (2 * math.pi) * (-l_ ** 2 - 3 * l_ - 8 + math.pi ** 2)) + 1e-300)
+        rec = {"N": int(n), "n": int(len(y)), "y_mean": float(y.mean()), "y_std": float(y.std()), "const": const,
+               "sign_frac": sign_frac}
         for k_, v in sur.items():
             v = np.asarray(v, float)
             rec[k_] = [float(v.mean()), float(v.std()), float(np.corrcoef(v, y)[0, 1]) if v.std() > 0 else 0.0]
