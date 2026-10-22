@@ -13,7 +13,7 @@
 #   A  the same after each event's |M|^2 is multiplied by (s0/s_hat)^(4-N)/C_p (data.target_physics_factor; s0 =
 #      (17 GeV)^2, the reference fig:norm_factor chose on the training processes)
 # 50 validations (D79). smoke: 19 catalog processes, 40 steps, 2 held-out processes (a test of the code path only).
-#   site submit ccin2p3 FA scripts/job_catalog_norm.sh --hdr=--mem=40G -- A|B [smoke]
+#   site submit ccin2p3 FA scripts/job_catalog_norm.sh --hdr=--mem=40G -- A|B [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
@@ -29,7 +29,7 @@ df -h "$MMAP" | tail -1
 NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
 R="$SCRATCH/zz_catalog_heldout_recipes"; mkdir -p "$R"
-if [ -n "$SMOKE" ]; then
+if [ "$SMOKE" = smoke ]; then
     OUT="$SCRATCH/zz_catalog_norm_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
     python - "$SUB" <<'PY'
@@ -41,7 +41,11 @@ PY
     EXTRA=(training.iterations=40 training.validate_frac=0.5 evaluate=false data.processes_file="$SUB"
            ++training.heterosc_sigma_stage_steps=10)
 fi
-if [ ! -e "$OUT/sigma_stage/models" ]; then
+# eval: the held-out scoring only, from the run's best checkpoint (a run that blew up is reported at its best
+# checkpoint, CLAUDE.md; B diverged at step 8734 on 2026-10-22). zero_shot_parent.py reads models/model_run0_best.pt.
+if [ "$SMOKE" = eval ]; then
+    test -e "$OUT/models/model_run0_best.pt" || { echo "no best checkpoint in $OUT"; exit 1; }
+elif [ ! -e "$OUT/sigma_stage/models" ]; then
     test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
     python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
         base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
@@ -55,5 +59,5 @@ for p in r["processes"]:
     yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 print(len(r["processes"]), "held-out recipes")
 PY
-P=("$R"/dc_*.yaml); [ -n "$SMOKE" ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
+P=("$R"/dc_*.yaml); [ "$SMOKE" = smoke ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
 python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED" "${P[@]}"
