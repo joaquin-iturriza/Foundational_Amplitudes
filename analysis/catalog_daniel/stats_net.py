@@ -37,13 +37,61 @@ KINDS = ["g", "q", "b", "t", "a", "Z", "W", "H", "l", "v"]
 METHODS = ("shared", "affine_N", "phys_lin", "phys_gbr")
 
 
+UP, DOWN = set("uct"), set("dsb")
+
+
+def flavour_flow(ini, fin):
+    """The flavour structure the counts by kind lose (2026-10-22: s s~ > d u~ W+ looked like processes with a very
+    different mean): up/down-type quarks and antiquarks on each side, an initial quark-antiquark pair of one flavour
+    (it can annihilate), a flavour carried from the initial state into the final one, and the charge in. Flavour
+    names never enter, so what is learned on d carries to s."""
+    q = lambda p: p.rstrip("~") in UP | DOWN
+    up = lambda p: p.rstrip("~") in UP
+    anti = lambda p: p.endswith("~")
+    f = []
+    for side in (ini, fin):
+        f += [sum(q(p) and up(p) and not anti(p) for p in side), sum(q(p) and up(p) and anti(p) for p in side),
+              sum(q(p) and not up(p) and not anti(p) for p in side), sum(q(p) and not up(p) and anti(p) for p in side)]
+    f.append(float(len(ini) == 2 and q(ini[0]) and q(ini[1]) and ini[0].rstrip("~") == ini[1].rstrip("~")
+                   and anti(ini[0]) != anti(ini[1])))
+    f.append(float(sum(p in fin for p in ini if q(p))))
+    f.append(float(sum(1 for p in fin if q(p) and (p[:-1] if anti(p) else p + "~") in fin) // 2))
+    return f
+
+
+CC = {"w+": "w-", "w-": "w+", "e+": "e-", "e-": "e+", "mu+": "mu-", "mu-": "mu+", "ta+": "ta-", "ta-": "ta+"}
+
+
+def conj(p):
+    """Charge conjugate of one MadGraph particle name."""
+    if p in CC:
+        return CC[p]
+    if p in ("g", "a", "z", "h"):
+        return p
+    return p[:-1] if p.endswith("~") else p + "~"
+
+
 def features(meta):
+    """|M|^2 is the same for a process and its charge conjugate (CP violation aside), so both get the features of
+    whichever of the two gives the smaller feature vector: s s~ > d u~ w+ and its twin d d~ > c s~ w- (relabelled
+    and conjugated) then look alike."""
     ini, fin = meta["process"].split(" > ")
     ini, fin = ini.split(), fin.split()
+    a = _features(meta, ini, fin)
+    b = _features(meta, [conj(p) for p in ini], [conj(p) for p in fin])
+    return min(a, b, key=tuple)
+
+
+def _features(meta, ini, fin):
     o = meta["orders"][0]
     f = [len(ini) + len(fin), o.get("QCD", 0), o.get("QED", 0)]
     f += [sum(KIND[p] == k for p in ini) for k in KINDS] + [sum(KIND[p] == k for p in fin) for k in KINDS]
+    if FLOW:
+        f += flavour_flow(ini, fin)
     return np.array(f, float)
+
+
+FLOW = "--no-flow" not in sys.argv
 
 
 def fit_predict(method, Xtr, ytr, Xte):
@@ -87,7 +135,9 @@ def main():
         for a, b in GroupKFold(n_splits=5).split(Xtr, ytr, groups):
             cf[b] = fit_predict(m, Xtr[a], ytr[a], Xtr[b])
         res["crossfit"][m] = [list(map(float, v)) for v in scores(cf, ytr)]
-        res["heldout"][m] = [list(map(float, v)) for v in scores(fit_predict(m, Xtr, ytr, Xho), yho)]
+        pho = fit_predict(m, Xtr, ytr, Xho)
+        res["heldout"][m] = [list(map(float, v)) for v in scores(pho, yho)]
+        res.setdefault("heldout_pred", {})[m] = pho.tolist()      # (mu_hat, log sigma_hat) per held-out process
     res["heldout_names"], res["relabel"] = ho, [n in twins for n in ho]
     res["split"] = [meta[n]["split"] for n in ho]
     json.dump(res, open(os.path.join(HERE, "data", "stats_net.json"), "w"))
