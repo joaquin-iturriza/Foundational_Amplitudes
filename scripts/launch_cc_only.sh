@@ -10,7 +10,8 @@ ITEM="$1"; EST="$2"; NOTE="$3"; JOB="$4"; shift 4
 # a submission already made for this item, job and arguments is skipped (exit 0): a launch that loops over several
 # jobs and defers on a later one is retried whole by the supervisor, which otherwise submitted the earlier ones twice
 DONE="$HOME/.local/share/ccorch/launch/FA/$ITEM.cc_only.submitted"; KEY="$JOB $*"
-grep -qxF "$KEY" "$DONE" 2>/dev/null && { echo "already submitted: $KEY"; exit 0; }
+# RESUBMIT=1 submits again on purpose (a run that failed and is to be redone)
+[ -z "$RESUBMIT" ] && grep -qxF "$KEY" "$DONE" 2>/dev/null && { echo "already submitted: $KEY"; exit 0; }
 p=$(timeout 250 site pick FA --only ccin2p3 --jobs 1 --mem "${MEM:-16G}" --cpus 4 --hours "$EST" 2>&1 | tail -1 | sed "s/^ *//")
 echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
