@@ -13,6 +13,10 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"
+# MadEvent's work directories on the node's local disk, removed when the job exits: 48 of them at once on /sps/lpnhe
+# (the group's shared 512 GB) filled it on 2026-10-23 and killed every job writing there
+export AMP_LHE_WORK_DIR="${TMPDIR:-/tmp}/fa_recover_alphas_${SLURM_JOB_ID}"; mkdir -p "$AMP_LHE_WORK_DIR"
+trap 'rm -rf "$AMP_LHE_WORK_DIR"' EXIT
+df -h "$AMP_LHE_WORK_DIR" | tail -1
 python tools/recover_alphas.py "${ALPHAS_SPEC:-recipes/catalog_2to4_heldout.yaml}" --workers "${SLURM_CPUS_PER_TASK:-48}" \
     ${ALPHAS_ONLY:+--only $ALPHAS_ONLY}
