@@ -281,9 +281,22 @@ def _code_hash():
         __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
-        E._setup_offshell_masks)]
+        E._setup_offshell_masks, E._physics_logF)]
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
+
+
+def _file_digest(exp, path):
+    """sha256 of a file the cached targets depend on (the coupling table of data.target_physics_factor), resolved as
+    experiment._physics_logF resolves it"""
+    p = os.path.expandvars(str(path))
+    p = p if os.path.isabs(p) else os.path.join(os.path.dirname(os.path.abspath(experiment_file())), p)
+    return hashlib.sha256(open(p, "rb").read()).hexdigest() if os.path.exists(p) else None
+
+
+def experiment_file():
+    import experiment
+    return experiment.__file__
 
 
 def _cache_root(cfg):
@@ -344,7 +357,10 @@ def init_data_recipes_mmap(exp, c):
         "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
         "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),
                                    str(cfg.data.get("target_physics_couplings", "default")),
-                                   bool(cfg.data.get("target_physics_dim_only", False))] if phys_on else None),
+                                   _file_digest(exp, cfg.data.get("target_physics_couplings",
+                                                                  "analysis/catalog_daniel/data/diagram_couplings.json")),
+                                   bool(cfg.data.get("target_physics_dim_only", False)),
+                                   str(cfg.data.get("target_physics_dim_ref", "shat"))] if phys_on else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,

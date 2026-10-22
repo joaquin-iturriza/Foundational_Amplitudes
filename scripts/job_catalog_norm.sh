@@ -56,7 +56,7 @@ fi
 # memory", "Reduce the validation pool proportionally too", a shorter sigma stage): 1e4 train and 200 val/test events
 # per process (hp58: 1e5 and 2000), 5 epochs (1352 x 1e4 / 16384 x 5 = 4126 steps), in memory, 50 validations, a 150-step sigma stage with
 # 5 validations; runs/catalog_norm_short/<arm>, held-out predictions $SCRATCH/zz_catalog_norm_short_<arm> (scored on
-# the held-out processes' full val split, tools/zero_shot_parent.py)
+# 2000 val events per held-out process, tools/zero_shot_parent.py --eval-subsample)
 if [ "$SMOKE" = short ]; then
     OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"
     EXTRA=(training.validate_frac=0.02 training.iterations=4126 ++data.memmap=false ++data.train_subsample=10000
@@ -84,6 +84,9 @@ PY
 fi
 # eval: the held-out scoring only, from the run's best checkpoint (a run that blew up is reported at its best
 # checkpoint, CLAUDE.md; B diverged at step 8734 on 2026-10-22). zero_shot_parent.py reads models/model_run0_best.pt.
+# eval_short / eval_extrap: the held-out scoring of a finished short or extrap run, from its sigma stage
+[ "$SMOKE" = eval_short ] && { OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"; SMOKE=eval; }
+[ "$SMOKE" = eval_extrap ] && { OUT="$PROJECT_DIR/runs/catalog_norm_extrap/$ARM"; PRED="$SCRATCH/zz_catalog_norm_extrap_$ARM"; SMOKE=eval; }
 if [ "$SMOKE" = eval ]; then
     ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 elif [ ! -e "$OUT/sigma_stage/models" ]; then
@@ -103,7 +106,10 @@ PY
 P=("$R"/dc_*.yaml); [[ "$SMOKE" = smoke* ]] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
 # eval: the sigma-stage model when the run has one (trunk and mu frozen, so mu is the run's; its sigma is the calibrated
 # one, D70), into its own prediction dir
+# the sigma stage's model whenever the run has one (mu is the run's, frozen; sigma is the calibrated one): the held-out
+# pulls are then the calibrated sigma's (before 2026-10-22 only eval mode did this; the short and extrap runs' first
+# scoring read sigma before the stage)
 PAR="$OUT"
-if [ "$SMOKE" = eval ] && ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
+if ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
 mkdir -p "$PRED"
 python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" "${P[@]}"

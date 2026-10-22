@@ -10,13 +10,15 @@ POLL="${POLL:-90}"
 cd "$(dirname "$0")/.." || exit 1
 MON=".claude/.slurm_monitor_jobs"
 for r in "$@"; do grep -qxF "$r" "$MON" 2>/dev/null || echo "$r" >> "$MON"; done
-declare -A last
+declare -A last miss
 while :; do
     left=0
     out=$(timeout 120 site poll "$@" 2>/dev/null)
     for r in "$@"; do
         st=$(echo "$out" | awk -v r="$r" '$1 == r {print $NF}' | tail -1)
         [ -n "$st" ] && [ "$st" != "${last[$r]}" ] && { echo "$(date +%H:%M:%S) $r $st"; last[$r]=$st; }
+        # a state that never parses (unknown run id, site down) ends the wait after 10 polls instead of looping forever
+        if [ -z "$st" ]; then miss[$r]=$(( ${miss[$r]:-0} + 1 )); [ "${miss[$r]}" -ge 10 ] && { echo "$r: no state after 10 polls"; continue; }; fi
         case "$st" in COMPLETED|FAILED|CANCELLED|TIMEOUT|OUT_OF_MEMORY|OUT_OF_MEM|NODE_FAIL|HELD|REMOVED) ;; *) left=1 ;; esac
     done
     [ $left = 0 ] && break

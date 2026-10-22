@@ -8,6 +8,9 @@ JOBS="${JOBS:-analysis/transfer/het_shared_jobs.txt}"   # a rerun list overrides
 FLAG="${FLAG:---shared}"   # --shared-mumse: the checkpoint selected on the mu MSE (the user, 2026-10-22)
 DONE="$HOME/.local/share/ccorch/launch/FA/$(basename "$JOBS" .txt)${FLAG#--shared}.submitted"
 touch "$DONE"
+# one pass at a time per job list: two overlapping passes read the same DONE file and submitted the same jobs twice
+# (2026-10-22, het_mumse: 8 cells trained by two jobs at once)
+exec 9>"$DONE.lock"; flock -n 9 || { echo "another pass of $(basename "$JOBS") is running"; exit 75; }
 mapfile -t LEFT < <(grep -v '^#' "$JOBS" | while read -r t cells; do grep -qxF "$cells" "$DONE" || echo "$t $cells"; done)
 [ ${#LEFT[@]} -eq 0 ] && { echo "all $(grep -vc '^#' "$JOBS") jobs submitted"; exit 0; }
 plan=$(timeout 300 site pick FA --only ccin2p3 --jobs ${#LEFT[@]} --mem 16G --cpus 4 --hours 1.5 2>&1)

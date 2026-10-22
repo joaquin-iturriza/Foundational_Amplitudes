@@ -1445,10 +1445,17 @@ class AmplitudeExperiment(BaseExperiment):
             _pf_cfg = bool(self.cfg.data.get("target_physics_factor", False))
             assert _pf_stats == _pf_cfg, (f"frozen data stats were fitted with target_physics_factor={_pf_stats}, "
                                           f"this run sets {_pf_cfg}")
-            _dim_stats = bool(stats.get("target_physics_dim_only", False))
-            _dim_cfg = bool(self.cfg.data.get("target_physics_dim_only", False))
-            assert _dim_stats == _dim_cfg, (f"frozen data stats were fitted with target_physics_dim_only={_dim_stats}, "
-                                            f"this run sets {_dim_cfg}")
+            # the factor's parameters too, when it is on: each one shifts the target by a per-N constant
+            # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
+            if _pf_cfg:
+                for _k, _d in (("target_physics_dim_only", False), ("target_physics_s0", 289.0),
+                               ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None)):
+                    if _k not in stats:          # stats written before the key: only its default can be assumed
+                        continue
+                    _a, _b = stats[_k], self.cfg.data.get(_k, _d)
+                    _same = (abs(float(_a) - float(_b)) < 1e-9 * max(1.0, abs(float(_a)))
+                             if _k == "target_physics_s0" else str(_a) == str(_b))
+                    assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
             assert _tp_stats == _tp_cfg, (
@@ -2110,6 +2117,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),
                 "target_physics_s0": float(self.cfg.data.get("target_physics_s0", 289.0)),
+                "target_physics_couplings": self.cfg.data.get("target_physics_couplings", None),
                 "tchannel_norm": getattr(self, "_tch_norm", None),
                 "offshell_stats": getattr(self, "_offshell_stats", None),
                 "prepd_mean": [float(x) for x in self.prepd_mean],

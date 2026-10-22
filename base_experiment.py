@@ -226,10 +226,13 @@ class BaseExperiment:
                     shutil.copyfile(os.path.join(src.cfg.run_dir, f), os.path.join(self.cfg.run_dir, f))
             LOGGER.info(f"Data reused from {src.cfg.run_dir} ({len(src._data_keys)} attributes), not reloaded")
         else:
-            before = {k: id(v) for k, v in self.__dict__.items()}
+            before = dict(self.__dict__)             # references, not ids: a freed object's id can be reused
             self.init_data()
-            # what init_data created or replaced: what a follow-up stage on the same data can take over
-            self._data_keys = [k for k, v in self.__dict__.items() if before.get(k) != id(v)]
+            # what init_data created or replaced, plus what init_physics created and init_data filled in place
+            # (_proc_npart: zeros until the pools load; mom_mean/mom_std: appended on one path): what a follow-up stage
+            # on the same data can take over
+            self._data_keys = [k for k, v in self.__dict__.items() if k not in before or before[k] is not v]
+            self._data_keys += [k for k in ("_proc_npart", "mom_mean", "mom_std") if hasattr(self, k) and k not in self._data_keys]
         self._init_dataloader()
         self.init_model()
         self._init_loss()
