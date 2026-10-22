@@ -1,0 +1,71 @@
+processes:
+- name: dE100_dbx_ubxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_uxbx_uxbxz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ssx_uuxa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dxcx_guxsx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_bdx_tuxz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gb_bemep
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gbx_bxah
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ucx_usxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_csx_amupvm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ssx_aaz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000

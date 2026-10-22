@@ -1,0 +1,282 @@
+# catalog_2to4 probes (recipes/gen_catalog_2to4.py): 20 catalog 2->3 training processes + g, 20 + a
+processes:
+- name: dE100_dbx_ubxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_uux_csxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_uux_gzz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_db_dba
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_uxbx_uxbxz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gc_cccx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ccx_gaz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ccx_avtvtx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ssx_uuxa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ddx_gbbx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gdx_dxzh
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gsx_tcxbx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dxcx_guxsx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_bux_buxz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_sc_sca
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gsx_sxwpwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_bdx_tuxz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dsx_ucxa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gbx_txwpa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gd_dvtvtx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gb_bemep
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gcx_cxemep
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ssx_bbxa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_cbx_ctxwp
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gbx_bxah
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_bbx_aaz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_csx_bbxwp
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ud_ddwp
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ucx_usxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_sdx_cdxwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dsx_dsxh
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gu_uwpwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_csx_amupvm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gdx_dxaa
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dc_ucwm
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_dd_dda
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ssx_aaz
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_gs_smummup
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_ddx_hvmvmx
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: dE100_db_dbh
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000

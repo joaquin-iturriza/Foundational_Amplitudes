@@ -1046,9 +1046,15 @@ class AmplitudeExperiment(BaseExperiment):
             smap = getattr(self, "_slot_pdgs_by_name", {})
             assert all(n in smap for n in names), "virtuality_pool: per-slot PDG order missing for a process"
             slot = [smap[n] for n in names]
+            # each process's generator masses and widths (an lhe_pp entry's param card), else the property table's
+            import mg5_pipeline_final as mg
+            from models.diagram_encoder_llm4lhc import param_card_mass_width
+            mw = [param_card_mass_width(mg.lhe_cards(mg.PROCESSES[n])[1]) if n in mg.PROCESSES and mg.is_lhe_pp(n)
+                  else None for n in names]
         self._diag_set_llm4lhc = load_llm4lhc_diagram_set(
             paths, laplacian_pe_dim=int(cfg.get("laplacian_pe_dim", 8)),
-            max_diagrams=int(max_d) if max_d is not None else None, slot_pdgs=slot)
+            max_diagrams=int(max_d) if max_d is not None else None, slot_pdgs=slot,
+            mass_width=mw if slot is not None else None)
         if slot is not None:
             ok = self._diag_set_llm4lhc.virt_ok
             LOGGER.info(f"virtuality_pool: internal lines placed for {int(ok.sum())}/{len(names)} processes "
@@ -1505,12 +1511,12 @@ class AmplitudeExperiment(BaseExperiment):
             # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
             if _pf_cfg:
                 for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_orders", False), ("target_physics_s0", 289.0),
-                               ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None)):
-                    if _k not in stats:          # stats written before the key: only its default can be assumed
-                        continue
-                    _a, _b = stats[_k], self.cfg.data.get(_k, _d)
+                               ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None),
+                               ("target_physics_alpha_inv", 132.507)):
+                    # stats written before the key were fitted at its default
+                    _a, _b = stats.get(_k, _d), self.cfg.data.get(_k, _d)
                     _same = (abs(float(_a) - float(_b)) < 1e-9 * max(1.0, abs(float(_a)))
-                             if _k == "target_physics_s0" else str(_a) == str(_b))
+                             if _k in ("target_physics_s0", "target_physics_alpha_inv") else str(_a) == str(_b))
                     assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
             # the momentum scale of these stats is in GeV or in units of each event's sqrt(s_hat)
             _di_stats = bool(stats.get("dimensionless_inputs", False))
@@ -1631,6 +1637,8 @@ class AmplitudeExperiment(BaseExperiment):
                     "raw_amp": amplitudes,
                 }
                 if bool(self.cfg.data.get("target_physics_orders", False)):
+                    assert bool(self.cfg.data.get("target_physics_factor", False)), \
+                        "data.target_physics_orders acts through the target factor: set data.target_physics_factor=true"
                     # each event's own alpha_s, the one its |M|^2 was labelled at (lhe_pp: AQCDUP), stored next to the
                     # pool as <pool>.alphas.npy (mg5_pipeline_final.build_lhe_pp; tools/recover_alphas.py for older pools)
                     ap = paths[role][name][:-len(".npy")] + ".alphas.npy"
@@ -2249,12 +2257,13 @@ class AmplitudeExperiment(BaseExperiment):
             assert alphas is not None, f"target_physics_orders: no per-event alpha_s for {name}"
             o = self._orders_of(name)
             # the order vector's powers are the stored target's (a stripped virtual's alpha_s is the Born's, the loop
-            # is counted apart, mg5_pipeline_final.order_vector); a mixed tree entry records the two maxima, so its
-            # leading-QCD monomial alpha_s^q alpha^(nfinal - q) is taken (the total tree degree is nfinal)
+            # is counted apart, mg5_pipeline_final.order_vector)
             q, e = int(o[2]), int(o[3])
+            # a mixed tree entry (four-quark, heavy-quark pair: the order vector records the two maxima, q + e above the
+            # tree's total degree nfinal) has several coupling monomials, so no single power is exact: refused
             nfin = mom_phys.shape[1] - 2
-            if int(o[0]) == 0 and int(o[1]) == 0 and q + e > nfin:
-                e = nfin - q
+            assert not (int(o[0]) == 0 and int(o[1]) == 0 and q + e > nfin), \
+                f"target_physics_orders: {name} is a mixed-order entry {o}, its coupling homogeneity is not exact"
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)
         n_eik, leik = 0, 0.0
@@ -2264,10 +2273,10 @@ class AmplitudeExperiment(BaseExperiment):
         return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name])
 
     def _orders_of(self, name):
-        """[L_QCD, L_EW, alpha_s power, alpha power] of a process (mg5_pipeline_final.order_vector, the vector
-        data.amp_orders carries)"""
-        import mg5_pipeline_final as mg
-        return mg.normalize_order_vector(mg.order_vector(mg.PROCESSES[name]), catalog_cfg_for_dataset(name))
+        """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector
+        the order features carry (a recipe entry's explicit amp_orders wins over mg5_pipeline_final.order_vector)"""
+        names = list(self.cfg.data.dataset)
+        return [int(x) for x in self.cfg.data.amp_orders[names.index(name)]]
 
     def _eikonal_logS(self, name, mom_phys):
         """data.target_physics_eikonal (2026-10-22; not used: the user, the same day, "these kinds of priors shouldn't go
@@ -2320,6 +2329,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
+                "target_physics_alpha_inv": float(self.cfg.data.get("target_physics_alpha_inv", 132.507)),
                 "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
                 "dimless_mass_stats": getattr(self, "_dimless_mass_stats", None),
                 "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),

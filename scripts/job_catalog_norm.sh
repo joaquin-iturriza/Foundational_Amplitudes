@@ -17,7 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, Dpair or Ds0}"; SMOKE="${2:-}"
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, Dpair or Ds0}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -54,10 +55,16 @@ MMAP="${TMPDIR:-/tmp}/fa_mmap_${SLURM_JOB_ID}"; mkdir -p "$MMAP"; trap 'rm -rf "
 df -h "$MMAP" | tail -1
 NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
-R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_
-[ "$SET" = 2to4 ] && { R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_; }
-# 2to4c30: the same 40 with ptj = ptb = pta = 30 GeV (gen_catalog_2to4.py --cut 30, the cut test), <PRED>_2to4c30
-[ "$SET" = 2to4c30 ] && { R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_; }
+# the probe set: the catalog's 139 held-out; 2to4, the 40 2->4 processes beyond the catalog; 2to4c30, the same with
+# ptj = ptb = pta = 30 GeV (gen_catalog_2to4.py --cut 30, the cut test); 2to4E100, their 40 2->3 training parents at
+# pp 100 TeV (--parents-at 100, the energy test). Predictions in <PRED>_<SET> for every set but the catalog
+case "$SET" in
+    catalog)  R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_ ;;
+    2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_ ;;
+    2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_ ;;
+    2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;
+    *) echo "unknown probe set $SET"; exit 1 ;;
+esac
 mkdir -p "$R"
 if [ "$SMOKE" = smoke ] || [ "$SMOKE" = smoke_eval ]; then
     OUT="$SCRATCH/zz_catalog_norm_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"

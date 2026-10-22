@@ -192,12 +192,25 @@ class LLM4LHCDiagramSet:
         return int(self.node_types.shape[0])
 
 
-# the generator's widths (GeV, the catalog's param_card_sm.dat DECAY lines): the propagator modulus |s - M^2 + i M Gamma|
-# of the per-event diagram weighting; every other line is stable or massless
-GEN_WIDTHS = {6: 1.4915, 23: 2.441404, 24: 2.0476, 25: 6.382339e-3}
+def param_card_mass_width(path):
+    """{pdg: (mass, width)} of a MadGraph param card (Block MASS and the DECAY lines), GeV: the generator's own values,
+    for the propagator modulus |s - M^2 + i M Gamma| of the per-event diagram weighting"""
+    mass, width, block = {}, {}, None
+    for line in open(path):
+        t = line.split("#")[0].split()
+        if not t:
+            continue
+        if t[0].upper() == "BLOCK":
+            block = t[1].upper()
+        elif t[0].upper() == "DECAY":
+            block = None
+            width[abs(int(t[1]))] = float(t[2])
+        elif block == "MASS" and len(t) >= 2:
+            mass[abs(int(t[0]))] = float(t[1])
+    return {k: (mass.get(k, 0.0), width.get(k, 0.0)) for k in set(mass) | set(width)}
 
 
-def _virtuality_rows(diagram, external, slot_pdgs, n_initial=2):
+def _virtuality_rows(diagram, external, slot_pdgs, n_initial=2, mass_width=None):
     """The internal lines of one sidecar diagram as (signed slot mask, M^2, (M Gamma)^2) rows over the event's particle
     slots (all-outgoing: initial momenta enter with a minus sign), or None when a leg has no slot."""
     from diagram_graphs import _phys_mass, leg_to_slot, propagator_leg_sets
@@ -209,12 +222,14 @@ def _virtuality_rows(diagram, external, slot_pdgs, n_initial=2):
         row = [0.0] * len(slot_pdgs)
         for L in legs:
             row[legmap[L]] = -1.0 if legmap[L] < n_initial else 1.0
-        m = _phys_mass(pdg)
-        rows.append((row, m * m, (m * GEN_WIDTHS.get(abs(pdg), 0.0)) ** 2))
+        # the generator's mass and width when its card is known (the table's masses can differ: top 172.5 vs the
+        # catalog's 173.0), else the table's mass and no width
+        m, w = (mass_width or {}).get(abs(int(pdg)), (_phys_mass(pdg), 0.0))
+        rows.append((row, m * m, (m * w) ** 2))
     return rows
 
 
-def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, slot_pdgs=None):
+def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, slot_pdgs=None, mass_width=None):
     """Build an :class:`LLM4LHCDiagramSet` from sidecar payloads.
 
     payloads : list indexed by process id of a sidecar path / loaded dict, or None
@@ -225,6 +240,7 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, sl
     slot_pdgs : per process id the event's per-slot PDG order, or None: with it, every diagram's internal lines are
         mapped to signed sums over the event's particle slots (virt_* tensors), for the per-event diagram weighting
         (LLM4LHCDiagramEncoder virtuality_pool). A process whose legs cannot all be placed gets no lines (weight 0).
+    mass_width : per process id its generator's {pdg: (mass, width)} (param_card_mass_width), or None.
     """
     vocab = particle_label_vocab()
     graphs, seg, ext_by_pid, virt_rows, virt_ok = [], [], [], [], []
@@ -247,7 +263,7 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, sl
         rows_p = []
         for d, external in diags:
             if slot_pdgs is not None and rows_p is not None:
-                r = _virtuality_rows(d, external, slot_pdgs[pid])
+                r = _virtuality_rows(d, external, slot_pdgs[pid], mass_width=(mass_width or [None] * len(payloads))[pid])
                 rows_p = None if r is None else rows_p + [(len(graphs), x) for x in r]
             graphs.append(graph_from_sidecar_diagram(d, external, vocab))
             seg.append(pid)
@@ -410,6 +426,15 @@ class LLM4LHCDiagramEncoder(nn.Module):
             if mode == "pooled":
                 self.pool_query = nn.Parameter(torch.zeros(self.out_dim))
                 nn.init.trunc_normal_(self.pool_query, std=0.02)
+        else:  # pooled_external
+            self.external_pdg_embed = nn.Embedding(edge_vocab, H)
+            self.external_dir_embed = nn.Embedding(3, H)
+            with torch.no_grad():
+                self.external_dir_embed.weight[0].zero_()
+            self.external_set_norm = nn.LayerNorm(H)
+            self.external_pool_query = nn.Parameter(torch.zeros(H))
+            nn.init.trunc_normal_(self.external_pool_query, std=0.02)
+            self.external_out_proj = nn.Linear(H, self.out_dim)
         # model.diagram_encoder_llm4lhc.virtuality_pool (D93, the user 2026-10-23: "option 1 looks good for now"): the
         # pooling over a process's diagrams is done per event, each diagram's score raised by gamma * P_d with
         # P_d = -sum over its internal lines of log|v|, v = (s_line - M^2 + i M Gamma) / s_hat (softened by eps):
@@ -430,15 +455,6 @@ class LLM4LHCDiagramEncoder(nn.Module):
             self.virt_n_slots = int(diagrams.virt_n_slots)
             self.virtuality_eps = float(virtuality_eps)
             self.virt_gamma = nn.Parameter(torch.zeros(1))
-        else:  # pooled_external
-            self.external_pdg_embed = nn.Embedding(edge_vocab, H)
-            self.external_dir_embed = nn.Embedding(3, H)
-            with torch.no_grad():
-                self.external_dir_embed.weight[0].zero_()
-            self.external_set_norm = nn.LayerNorm(H)
-            self.external_pool_query = nn.Parameter(torch.zeros(H))
-            nn.init.trunc_normal_(self.external_pool_query, std=0.02)
-            self.external_out_proj = nn.Linear(H, self.out_dim)
 
     # -- per-diagram readouts ------------------------------------------------------
     def encode_diagrams(self):

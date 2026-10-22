@@ -1,0 +1,1052 @@
+# catalog_2to4: catalog 2->3 training processes plus one gluon or photon (D90). Written by
+# recipes/gen_catalog_2to4.py; do not edit by hand. Loaded by mg5_pipeline_final._load_catalog_2to4.
+lhe:
+  cards_dir: recipes/catalog_2to4E100
+  run_card: run_card.dat
+  param_card: param_card_sm.dat
+  model: sm
+  n_val: 10000
+  n_test: 10000
+  n_train: 1000
+  source: catalog run card with ebeam1 = ebeam2 = 50000.0 GeV
+processes:
+  dE100_dbx_ubxwm:
+    kind: lhe_pp
+    folder: dbx_ubxwm_E100
+    mg5_generate:
+    - generate d b~ > u b~ w-
+    proc_str: d b~ > u b~ w-
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -5
+    - 2
+    - -5
+    - -24
+    m_finals:
+    - 0.0
+    - 4.7
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dbx_ubxwm
+  dE100_uux_csxwm:
+    kind: lhe_pp
+    folder: uux_csxwm_E100
+    mg5_generate:
+    - generate u u~ > c s~ w-
+    proc_str: u u~ > c s~ w-
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 4
+    - -3
+    - -24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_uux_csxwm
+  dE100_uux_gzz:
+    kind: lhe_pp
+    folder: uux_gzz_E100
+    mg5_generate:
+    - generate u u~ > g z z
+    proc_str: u u~ > g z z
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 23
+    - 23
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_uux_gzz
+  dE100_db_dba:
+    kind: lhe_pp
+    folder: db_dba_E100
+    mg5_generate:
+    - generate d b > d b a
+    proc_str: d b > d b a
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 5
+    - 1
+    - 5
+    - 22
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_db_dba
+  dE100_uxbx_uxbxz:
+    kind: lhe_pp
+    folder: uxbx_uxbxz_E100
+    mg5_generate:
+    - generate u~ b~ > u~ b~ z
+    proc_str: u~ b~ > u~ b~ z
+    nfinal: 3
+    pdg_ids:
+    - -2
+    - -5
+    - -2
+    - -5
+    - 23
+    m_finals:
+    - 0.0
+    - 4.7
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_uxbx_uxbxz
+  dE100_gc_cccx:
+    kind: lhe_pp
+    folder: gc_cccx_E100
+    mg5_generate:
+    - generate g c > c c c~
+    proc_str: g c > c c c~
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - 4
+    - 4
+    - 4
+    - -4
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 3
+    - 0
+    alphas_power: 3
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gc_cccx
+  dE100_ccx_gaz:
+    kind: lhe_pp
+    folder: ccx_gaz_E100
+    mg5_generate:
+    - generate c c~ > g a z
+    proc_str: c c~ > g a z
+    nfinal: 3
+    pdg_ids:
+    - 4
+    - -4
+    - 21
+    - 22
+    - 23
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ccx_gaz
+  dE100_ccx_avtvtx:
+    kind: lhe_pp
+    folder: ccx_avtvtx_E100
+    mg5_generate:
+    - generate c c~ > a vt vt~
+    proc_str: c c~ > a vt vt~
+    nfinal: 3
+    pdg_ids:
+    - 4
+    - -4
+    - 22
+    - 16
+    - -16
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ccx_avtvtx
+  dE100_ssx_uuxa:
+    kind: lhe_pp
+    folder: ssx_uuxa_E100
+    mg5_generate:
+    - generate s s~ > u u~ a
+    proc_str: s s~ > u u~ a
+    nfinal: 3
+    pdg_ids:
+    - 3
+    - -3
+    - 2
+    - -2
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ssx_uuxa
+  dE100_ddx_gbbx:
+    kind: lhe_pp
+    folder: ddx_gbbx_E100
+    mg5_generate:
+    - generate d d~ > g b b~
+    proc_str: d d~ > g b b~
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 5
+    - -5
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    order:
+    - 0
+    - 0
+    - 3
+    - 0
+    alphas_power: 3
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ddx_gbbx
+  dE100_gdx_dxzh:
+    kind: lhe_pp
+    folder: gdx_dxzh_E100
+    mg5_generate:
+    - generate g d~ > d~ z h
+    proc_str: g d~ > d~ z h
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -1
+    - -1
+    - 23
+    - 25
+    m_finals:
+    - 0.0
+    - 91.188
+    - 125.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gdx_dxzh
+  dE100_gsx_tcxbx:
+    kind: lhe_pp
+    folder: gsx_tcxbx_E100
+    mg5_generate:
+    - generate g s~ > t c~ b~
+    proc_str: g s~ > t c~ b~
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -3
+    - 6
+    - -4
+    - -5
+    m_finals:
+    - 173.0
+    - 0.0
+    - 4.7
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gsx_tcxbx
+  dE100_dxcx_guxsx:
+    kind: lhe_pp
+    folder: dxcx_guxsx_E100
+    mg5_generate:
+    - generate d~ c~ > g u~ s~
+    proc_str: d~ c~ > g u~ s~
+    nfinal: 3
+    pdg_ids:
+    - -1
+    - -4
+    - 21
+    - -2
+    - -3
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dxcx_guxsx
+  dE100_bux_buxz:
+    kind: lhe_pp
+    folder: bux_buxz_E100
+    mg5_generate:
+    - generate b u~ > b u~ z
+    proc_str: b u~ > b u~ z
+    nfinal: 3
+    pdg_ids:
+    - 5
+    - -2
+    - 5
+    - -2
+    - 23
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_bux_buxz
+  dE100_sc_sca:
+    kind: lhe_pp
+    folder: sc_sca_E100
+    mg5_generate:
+    - generate s c > s c a
+    proc_str: s c > s c a
+    nfinal: 3
+    pdg_ids:
+    - 3
+    - 4
+    - 3
+    - 4
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_sc_sca
+  dE100_gsx_sxwpwm:
+    kind: lhe_pp
+    folder: gsx_sxwpwm_E100
+    mg5_generate:
+    - generate g s~ > s~ w+ w-
+    proc_str: g s~ > s~ w+ w-
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -3
+    - -3
+    - 24
+    - -24
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gsx_sxwpwm
+  dE100_bdx_tuxz:
+    kind: lhe_pp
+    folder: bdx_tuxz_E100
+    mg5_generate:
+    - generate b d~ > t u~ z
+    proc_str: b d~ > t u~ z
+    nfinal: 3
+    pdg_ids:
+    - 5
+    - -1
+    - 6
+    - -2
+    - 23
+    m_finals:
+    - 173.0
+    - 0.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_bdx_tuxz
+  dE100_dsx_ucxa:
+    kind: lhe_pp
+    folder: dsx_ucxa_E100
+    mg5_generate:
+    - generate d s~ > u c~ a
+    proc_str: d s~ > u c~ a
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -3
+    - 2
+    - -4
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dsx_ucxa
+  dE100_gbx_txwpa:
+    kind: lhe_pp
+    folder: gbx_txwpa_E100
+    mg5_generate:
+    - generate g b~ > t~ w+ a
+    proc_str: g b~ > t~ w+ a
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -5
+    - -6
+    - 24
+    - 22
+    m_finals:
+    - 173.0
+    - 80.419
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gbx_txwpa
+  dE100_gd_dvtvtx:
+    kind: lhe_pp
+    folder: gd_dvtvtx_E100
+    mg5_generate:
+    - generate g d > d vt vt~
+    proc_str: g d > d vt vt~
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - 1
+    - 1
+    - 16
+    - -16
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gd_dvtvtx
+  dE100_gb_bemep:
+    kind: lhe_pp
+    folder: gb_bemep_E100
+    mg5_generate:
+    - generate g b > b e- e+
+    proc_str: g b > b e- e+
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - 5
+    - 5
+    - 11
+    - -11
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gb_bemep
+  dE100_gcx_cxemep:
+    kind: lhe_pp
+    folder: gcx_cxemep_E100
+    mg5_generate:
+    - generate g c~ > c~ e- e+
+    proc_str: g c~ > c~ e- e+
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -4
+    - -4
+    - 11
+    - -11
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gcx_cxemep
+  dE100_ssx_bbxa:
+    kind: lhe_pp
+    folder: ssx_bbxa_E100
+    mg5_generate:
+    - generate s s~ > b b~ a
+    proc_str: s s~ > b b~ a
+    nfinal: 3
+    pdg_ids:
+    - 3
+    - -3
+    - 5
+    - -5
+    - 22
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ssx_bbxa
+  dE100_cbx_ctxwp:
+    kind: lhe_pp
+    folder: cbx_ctxwp_E100
+    mg5_generate:
+    - generate c b~ > c t~ w+
+    proc_str: c b~ > c t~ w+
+    nfinal: 3
+    pdg_ids:
+    - 4
+    - -5
+    - 4
+    - -6
+    - 24
+    m_finals:
+    - 0.0
+    - 173.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_cbx_ctxwp
+  dE100_gbx_bxah:
+    kind: lhe_pp
+    folder: gbx_bxah_E100
+    mg5_generate:
+    - generate g b~ > b~ a h
+    proc_str: g b~ > b~ a h
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -5
+    - -5
+    - 22
+    - 25
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gbx_bxah
+  dE100_bbx_aaz:
+    kind: lhe_pp
+    folder: bbx_aaz_E100
+    mg5_generate:
+    - generate b b~ > a a z
+    proc_str: b b~ > a a z
+    nfinal: 3
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 23
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_bbx_aaz
+  dE100_csx_bbxwp:
+    kind: lhe_pp
+    folder: csx_bbxwp_E100
+    mg5_generate:
+    - generate c s~ > b b~ w+
+    proc_str: c s~ > b b~ w+
+    nfinal: 3
+    pdg_ids:
+    - 4
+    - -3
+    - 5
+    - -5
+    - 24
+    m_finals:
+    - 4.7
+    - 4.7
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_csx_bbxwp
+  dE100_ud_ddwp:
+    kind: lhe_pp
+    folder: ud_ddwp_E100
+    mg5_generate:
+    - generate u d > d d w+
+    proc_str: u d > d d w+
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 1
+    - 24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ud_ddwp
+  dE100_ucx_usxwm:
+    kind: lhe_pp
+    folder: ucx_usxwm_E100
+    mg5_generate:
+    - generate u c~ > u s~ w-
+    proc_str: u c~ > u s~ w-
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -4
+    - 2
+    - -3
+    - -24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ucx_usxwm
+  dE100_sdx_cdxwm:
+    kind: lhe_pp
+    folder: sdx_cdxwm_E100
+    mg5_generate:
+    - generate s d~ > c d~ w-
+    proc_str: s d~ > c d~ w-
+    nfinal: 3
+    pdg_ids:
+    - 3
+    - -1
+    - 4
+    - -1
+    - -24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_sdx_cdxwm
+  dE100_dsx_dsxh:
+    kind: lhe_pp
+    folder: dsx_dsxh_E100
+    mg5_generate:
+    - generate d s~ > d s~ h
+    proc_str: d s~ > d s~ h
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - -3
+    - 25
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dsx_dsxh
+  dE100_gu_uwpwm:
+    kind: lhe_pp
+    folder: gu_uwpwm_E100
+    mg5_generate:
+    - generate g u > u w+ w-
+    proc_str: g u > u w+ w-
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - 2
+    - 2
+    - 24
+    - -24
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gu_uwpwm
+  dE100_csx_amupvm:
+    kind: lhe_pp
+    folder: csx_amupvm_E100
+    mg5_generate:
+    - generate c s~ > a mu+ vm
+    proc_str: c s~ > a mu+ vm
+    nfinal: 3
+    pdg_ids:
+    - 4
+    - -3
+    - 22
+    - -13
+    - 14
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_csx_amupvm
+  dE100_gdx_dxaa:
+    kind: lhe_pp
+    folder: gdx_dxaa_E100
+    mg5_generate:
+    - generate g d~ > d~ a a
+    proc_str: g d~ > d~ a a
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - -1
+    - -1
+    - 22
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gdx_dxaa
+  dE100_dc_ucwm:
+    kind: lhe_pp
+    folder: dc_ucwm_E100
+    mg5_generate:
+    - generate d c > u c w-
+    proc_str: d c > u c w-
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 4
+    - 2
+    - 4
+    - -24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dc_ucwm
+  dE100_dd_dda:
+    kind: lhe_pp
+    folder: dd_dda_E100
+    mg5_generate:
+    - generate d d > d d a
+    proc_str: d d > d d a
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 22
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_dd_dda
+  dE100_ssx_aaz:
+    kind: lhe_pp
+    folder: ssx_aaz_E100
+    mg5_generate:
+    - generate s s~ > a a z
+    proc_str: s s~ > a a z
+    nfinal: 3
+    pdg_ids:
+    - 3
+    - -3
+    - 22
+    - 22
+    - 23
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ssx_aaz
+  dE100_gs_smummup:
+    kind: lhe_pp
+    folder: gs_smummup_E100
+    mg5_generate:
+    - generate g s > s mu- mu+
+    proc_str: g s > s mu- mu+
+    nfinal: 3
+    pdg_ids:
+    - 21
+    - 3
+    - 3
+    - 13
+    - -13
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_gs_smummup
+  dE100_ddx_hvmvmx:
+    kind: lhe_pp
+    folder: ddx_hvmvmx_E100
+    mg5_generate:
+    - generate d d~ > h vm vm~
+    proc_str: d d~ > h vm vm~
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 14
+    - -14
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 0
+    - 3
+    alphas_power: 0
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_ddx_hvmvmx
+  dE100_db_dbh:
+    kind: lhe_pp
+    folder: db_dbh_E100
+    mg5_generate:
+    - generate d b > d b h
+    proc_str: d b > d b h
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 5
+    - 1
+    - 5
+    - 25
+    m_finals:
+    - 0.0
+    - 4.7
+    - 125.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    split: heldout
+    test_group: 2->3 training process at 100 TeV
+    parent: dc_db_dbh
