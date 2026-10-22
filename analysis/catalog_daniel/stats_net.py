@@ -227,7 +227,8 @@ def main():
         res.setdefault("heldout_pred", {})[m] = (pho + np.stack([oho, 0 * oho], 1)).tolist()      # (mu_hat, log sigma_hat) per held-out process
     res["heldout_names"], res["relabel"] = ho, [n in twins for n in ho]
     res["split"] = [meta[n]["split"] for n in ho]
-    json.dump(res, open(os.path.join(HERE, "data", "stats_net.json"), "w"))
+    if len(sys.argv) == 1 and not any(k.startswith("G_") for k in os.environ):
+        json.dump(res, open(os.path.join(HERE, "data", "stats_net.json"), "w"))   # the adopted g only, not a variant
 
     cols = dict(zip(METHODS, (ps.C.grey, ps.C.blue, ps.C.green, ps.C.vermillion)))
     labs = {"shared": "one shared normalization", "affine_N": r"mean linear in $N$",
