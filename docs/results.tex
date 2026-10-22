@@ -634,6 +634,19 @@ by A within each group.}
 \label{fig:catalog_norm}
 \end{figure}
 
+\paragraph{How robust is the diagram-descriptor level (2026-10-22, D83).} The $0.045$ of the exploration above (B's level
+of the $43$ new placed by a $2\times64$ network on the process features and the diagram descriptors) is one draw
+(\code{analysis/catalog\_daniel/norm\_explore4.py}, level error $(\hat m_p-m_p)^2/\sigma_p^2$, median over the $43$).
+Ten ensembles of three seeds give a median of $0.087$, ranging from $0.016$ to $0.19$ (the $90\%$ point $1.06$); other
+sizes give $0.04$ to $0.10$ at width $128$ or $64$ and $0.34$ to $0.53$ at width $32$ or three layers. Cross-fitted by
+relabelling class on the training processes it is $0.12$; cross-fitted by multiplicity (a network that never saw a
+$2\to2$ process placing the $2\to2$ ones, and the same for $2\to3$) it is $10.4$, so the descriptors interpolate between
+processes of a seen multiplicity and do not extrapolate in it. For comparison, the level read off the first $k$ events
+of each held-out process: $0.059$ at $k=10$ and $0.0067$ at $k=100$ (the sampling error of a $k$-event mean, $\approx1/k$).
+So ten events of a new process place its level as well as the best data-free map, and a hundred do $10\times$ better
+than any of them; what a pretraining has to learn from the particles is the shape, which is $62\%$ of B's error on the
+new processes (Fig.~\ref{fig:catalog_norm} paragraph).
+
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
 $2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
