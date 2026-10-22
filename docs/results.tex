@@ -2415,12 +2415,15 @@ Fig.~\ref{fig:het23}): median $|\Delta|$, het over MSE, $0.99$, $1.21$, $1.07$, 
 the order above. Against the het retrain at the MSE HPs the own sweep is better in five cells (by $3.5\times$ on
 $e^+e^-\to t\bar tg$ from scratch and $2.2\times$ on $u\bar u\to Zgg$ at rung~1) and worse in three ($e^+e^-\to d\bar dg$
 and $e^+e^-\to t\bar tg$ at rung~1, $u\bar u\to Zggg$ at rung~1), all three fine-tune sweeps of $5$ trials. So with its
-own HPs the het loss draws level with MSE on $\mu$ at $2\to3$ (within $\pm7\%$ in four of six cells, better on $u\bar
-u\to Zgg$ from scratch) and stays behind at $2\to4$ ($1.23$, $1.57$). The NLL objective picks the trial whose $\sigma$
+own HPs the het loss draws level with MSE on $\mu$ in half the $2\to3$ cells (within $7\%$ in three of six, $15\%$
+better on $u\bar u\to Zgg$ from scratch, $21\%$ and $59\%$ worse at rung~1 of $e^+e^-\to d\bar dg$ and $t\bar tg$) and
+stays behind at $2\to4$ ($1.23$, $1.57$). The NLL objective picks the trial whose $\sigma$
 fits best, not whose $\mu$ does, which can explain a best-NLL trial that loses on $|\Delta|$ to a trial at other HPs.
 The $\sigma$ of these best trials is too small: the pull std is $1.6$ to $3.0$ (a calibrated $\sigma$ gives $1$).
-HPs: $\lambda$ and the warmup split apart between the two losses (het low in both, MSE high), the het sweeps keep EMA on
-in $7$ of $8$ at decay $0.93$ to $0.995$ (MSE: on in $6$, mostly near $0.9$), and lr overlaps; the scratch sweeps of
+HPs: the warmup splits apart between the two losses (het in the lower half of the range in $7$ of $8$ cells, MSE near
+its top in $5$), $\lambda$ sits near the top of its range for MSE in $7$ of $8$ and is spread for het, EMA is on in $6$
+of $8$ for both but at decay $0.95$ to $0.995$ for het against $0.90$ to $0.92$ for MSE in $5$ of its $6$, and lr
+overlaps; the scratch sweeps of
 one probe pair chose one candidate twice ($e^+e^-\to d\bar dg$ and $t\bar tg$, the same point; $u\bar u\to Zgg$ and
 $Zggg$, the same point but for lr). So the het HPs are consistent among themselves and differ from the MSE ones.
 
