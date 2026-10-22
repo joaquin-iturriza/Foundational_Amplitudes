@@ -11,7 +11,7 @@ import numpy as np
 import yaml
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--rows", type=int, default=100000, help="train events read per process (the pool holds 1e5)")
+ap.add_argument("--rows", type=int, default=100000, help="at most this many train events per process (a catalog train split holds 1e4; the count used is stored as n)")
 a = ap.parse_args()
 cache = os.path.join(os.environ["SCRATCH"], "amp_data_cache")
 out = {"rows": a.rows, "train": {}, "heldout": {}, "missing": []}
