@@ -569,6 +569,14 @@ the level moves, in units of $\sigma_p$, when the pool is reweighted flat in $\l
     predicting the remaining level from the process brings the median on the $43$ to $0.45$ on B and $0.48$ on A,
     $90\%$ quantiles $5.0$ and $21$. This is the level the amplitude network has to learn under a shared
     standardization.
+  \item With the diagrams as descriptors too (\code{norm\_explore3.py}: the leading coupling product, the sum over
+    diagrams against it, the number of diagrams, the massive internal lines; all known for a process without data),
+    the same network places B's level of the $43$ at a median level error of $0.045$ ($90\%$: $1.3$; cross-fit on the
+    training processes $0.12$), ten times better than without them ($0.45$) and below the statistics map $g$ ($0.32$),
+    and the multi-Higgs processes are no longer the worst ($gg\to t\bar tZ$ is, at $8$). On A with IDEN and colour:
+    $0.34$. The level reweighted flat in $\log\hat s$, less tied to how the pool drew $\hat s$, is easier to place
+    without the diagrams ($0.18$ against $0.45$ on B) and as easy with them ($0.066$). hp58's configuration feeds the
+    diagrams to the amplitude network, so under B it can learn levels the same way.
   \item The multi-Higgs processes are the worst in every target ($15$ processes, all held out, none in training).
     $q\bar q\to ZHH$ has the leading coupling product of $q\bar q\to ZH$ (with dimensionless couplings one more Higgs
     costs nothing) and a level $3.6$ lower; one cost per kind of final particle fitted on the training levels does
