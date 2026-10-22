@@ -6086,9 +6086,12 @@ of the three share a test set.
     rescoring gap (its run is not on CC; TF32 is the likely cause, sec:tf32-eval); the one-loop sign decision reading
     the validation and test amplitudes (a fix changes the one-loop probes' target, so it needs the user); the probes
     that do not gain. For the user: D78 holds the catalog preprocessing until their design (A with IDEN, colour and the
-    diagram sum, and B's blow-up at hp58's HPs, are inputs to it); the zero-shot fix ((a) eikonal or dipole factors in
-    the target, (b) done in another form by D81 to D83, (c) Jonas's matched $Z{+}ng$ test); the D66 designs (decomp,
-    loops, nonsm, threephase); the het trial now writes its own predictions; \code{site} matches a launch's runs by
+    diagram sum, and B's blow-up at hp58's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
+    bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
+    fix is dropped until the preprocessing is settled (D86). Running: het at the shared HPs with the checkpoint on the
+    $\mu$ MSE (D85, item \code{het\_mumse}, $6$ CC jobs; the first $2$ registered under \code{het\_shared} by the
+    launcher's fixed item); the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
+    a CPU proxy for shape transfer under each target, sampling sensitivity, then new ideas); the het trial now writes its own predictions; \code{site} matches a launch's runs by
     item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
     \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
