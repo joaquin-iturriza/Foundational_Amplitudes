@@ -3,7 +3,7 @@ for the statistics map g (stats_net.py). Why (2026-10-22): counting features can
 no relative in training (q q~ > b b~ h sits 8 below g's mean: its Higgs attaches through the b Yukawa coupling). Each
 vertex's coupling is read off the particles on its lines with the MG5 sm model's values (alpha = 1/132.5, alpha_s =
 0.118, sin^2 theta_W = 0.222, v = 246 GeV; the generator's masses, particle_ids.py). Per diagram: the sum over vertices
-of log c^2 (dimensionful couplings, H W W = g m_W and the like, in GeV), and its massive internal lines (t, W, Z, H).
+of log c^2 (dimensionful couplings made dimensionless with v: H W W = g m_W / v and the like), and its massive internal lines (t, W, Z, H).
 Writes data/diagram_couplings.json {process: {"logc2": [...per diagram], "massive_internal": [...], "unmatched": n}}.
 CPU, on the site holding data/diagrams (CC):
     python analysis/catalog_daniel/diagram_couplings.py
@@ -49,11 +49,11 @@ def vertex_coupling(pdgs, orders):
         if b == [21, 21, 21, 21]:
             return GS ** 2
         if n.get(25) == 1 and n.get(24) == 2:
-            return G * M[24]
+            return G * M[24] / V
         if n.get(25) == 1 and n.get(23) == 2:
-            return GZ * M[23]
+            return GZ * M[23] / V
         if b == [25, 25, 25]:
-            return 3 * M[25] ** 2 / V
+            return 3 * M[25] ** 2 / V ** 2
         if n.get(25) == 2 and n.get(24) == 2:
             return G ** 2 / 2
         if n.get(25) == 2 and n.get(23) == 2:

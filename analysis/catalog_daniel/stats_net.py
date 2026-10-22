@@ -71,6 +71,21 @@ def conj(p):
     return p[:-1] if p.endswith("~") else p + "~"
 
 
+def coupling_features(meta):
+    """From the process's tree diagrams: the largest coupling product sum_vertices log c^2, the log of the sum over
+    diagrams of the products, the number of diagrams, and the massive internal lines of the leading diagram. The same for
+    a process and its conjugate, so it is added outside the conjugation choice."""
+    r = _DC["dc_" + meta["folder"]]
+    l = np.array(r["logc2"])
+    i = int(np.argmax(l))
+    f = [float(l.max()), float(l.max() + np.log(np.exp(l - l.max()).sum())), float(np.log(len(l))),
+         float(r["massive_internal"][i]), float(max(r["massive_internal"]))]
+    return [f[j] for j in COUP_COLS]
+
+
+COUP_COLS = [int(c) for c in os.environ.get("G_COUP_COLS", "0,1,2,3,4").split(",") if c != ""]
+
+
 def features(meta):
     """|M|^2 is the same for a process and its charge conjugate (CP violation aside), so both get the features of
     whichever of the two gives the smaller feature vector: s s~ > d u~ w+ and its twin d d~ > c s~ w- (relabelled
@@ -79,7 +94,10 @@ def features(meta):
     ini, fin = ini.split(), fin.split()
     a = _features(meta, ini, fin)
     b = _features(meta, [conj(p) for p in ini], [conj(p) for p in fin])
-    return min(a, b, key=tuple)
+    f = min(a, b, key=tuple)
+    if COUP and _DC:
+        f = np.concatenate([f, coupling_features(meta)])
+    return f
 
 
 def _features(meta, ini, fin):
@@ -100,6 +118,10 @@ def _features(meta, ini, fin):
 FLOW = "--no-flow" not in sys.argv
 PROPS = "--props" in sys.argv          # the model's own particle table (particle_ids.py), pooled per side
 NODIAG = "--ndiag" in sys.argv
+COUP = "--coup" in sys.argv            # the diagrams' coupling products as features (diagram_couplings.py)
+OFFSET = "--offset" in sys.argv        # ... or the leading one as a fixed offset of the mean: |M|^2 scales as c^2
+_DC = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "diagram_couplings.json"))) \
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "diagram_couplings.json")) else {}
 RES = "--res" in sys.argv              # Higgs coupling strength and final-state resonances: tried, no cross-fit gain         # the number of Feynman diagrams (classes_default.json)
 MG_PDG = {"d": 1, "u": 2, "s": 3, "c": 4, "b": 5, "t": 6, "e-": 11, "ve": 12, "mu-": 13, "vm": 14, "ta-": 15, "vt": 16,
           "g": 21, "a": 22, "z": 23, "w+": 24, "h": 25}
@@ -190,6 +212,9 @@ def main():
     Xtr = np.array([features(meta[n]) for n in tr]); Xho = np.array([features(meta[n]) for n in ho])
     Y = lambda names, s: np.array([[st[s][n]["mu"], np.log(st[s][n]["sd"])] for n in names])
     ytr, yho = Y(tr, "train"), Y(ho, "heldout")
+    off = (lambda names: np.array([max(_DC[n]["logc2"]) for n in names])) if OFFSET else (lambda names: np.zeros(len(names)))
+    otr, oho = off(tr), off(ho)
+    ytr[:, 0] -= otr; yho[:, 0] -= oho             # scored on mu - offset: the same level error as on mu
     groups = np.array([meta[n]["weak_key"] for n in tr])
     res = {"heldout": {}, "crossfit": {}}
     for m in METHODS:
@@ -199,7 +224,7 @@ def main():
         res["crossfit"][m] = [list(map(float, v)) for v in scores(cf, ytr)]
         pho = fit_predict(m, Xtr, ytr, Xho)
         res["heldout"][m] = [list(map(float, v)) for v in scores(pho, yho)]
-        res.setdefault("heldout_pred", {})[m] = pho.tolist()      # (mu_hat, log sigma_hat) per held-out process
+        res.setdefault("heldout_pred", {})[m] = (pho + np.stack([oho, 0 * oho], 1)).tolist()      # (mu_hat, log sigma_hat) per held-out process
     res["heldout_names"], res["relabel"] = ho, [n in twins for n in ho]
     res["split"] = [meta[n]["split"] for n in ho]
     json.dump(res, open(os.path.join(HERE, "data", "stats_net.json"), "w"))
