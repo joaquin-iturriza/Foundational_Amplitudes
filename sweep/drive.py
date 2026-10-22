@@ -149,6 +149,32 @@ class Sweep:
         self.seed = int(fp.get("data.seed", 42))
         self.sp = os.path.join(self.dir, "driver_state.json")
         self.st = json.load(open(self.sp)) if os.path.exists(self.sp) else {"trials": {}, "prebuild": {}}
+        if getattr(a, "retry_lost", False) and not a.dry_run:
+            self.requeue_lost()
+
+    def requeue_lost(self):
+        """--retry-lost: every "lost" trial (no RESULT_JSON in its log: the job died without reporting, e.g. a full
+        filesystem, 2026-10-23) is taken back: the failure penalty it was observed at is removed from the sampler and
+        the surrogate, its config leaves the diverged set, and it is resubmitted at the same hp and t_steps under the
+        same trial index. A "failed" trial (it reported a failure: diverged, NaN) keeps its penalty."""
+        alg = self.sampler.algorithm
+        for t in self.trials("lost"):
+            hp, combo = t["hp_idx"], self.sampler._to_combo(t["t_steps"])
+            h = self.sampler._val_loss_history.get(hp, {})
+            h.pop(combo, None)
+            if not h:
+                self.sampler._val_loss_history.pop(hp, None)
+            self.sampler._eval_order = [x for x in self.sampler._eval_order if tuple(x) != (hp, combo)]
+            o = getattr(alg, "observations", {}).get(hp, {})
+            o.pop(combo, None)
+            if hp in getattr(alg, "observations", {}) and not o:
+                alg.observations.pop(hp)
+            alg.diverged_configs.discard(hp)
+            t.setdefault("lost_runs", []).append(t["rid"])
+            t["status"] = "retry"
+            log("%s: trial %d (hp%04d t%d, lost in %s) requeued, its penalty removed"
+                % (self.name, t["idx"], hp, t["t_steps"], t["rid"]))
+        self.save()
 
     # ---- persistence
     def save(self):
@@ -174,6 +200,8 @@ class Sweep:
         return self.finished() >= self.n_trials
 
     def may_issue(self, parallel):
+        if self.trials("retry"):                   # requeued lost trials go out first, whatever the wave rule
+            return len(self.trials("retry"))
         if self.issued() >= self.n_trials:
             return 0
         if self.waves:
@@ -242,8 +270,14 @@ class Sweep:
 
     # ---- one trial out
     def submit(self, s, a):
-        hp_idx, hp, t_steps = self.sampler.suggest()
-        idx = self.issued()
+        retry = self.trials("retry")
+        if retry:
+            t0 = retry[0]
+            hp_idx, hp, t_steps, idx = t0["hp_idx"], t0["hp"], t0["t_steps"], t0["idx"]
+            self.sampler._in_flight.add(hp_idx)
+        else:
+            hp_idx, hp, t_steps = self.sampler.suggest()
+            idx = self.issued()
         args = ["submit", s, PROJECT, JOB, "--no-sync", "--item", a.item,
                 "--note", "%s hp%04d t%d" % (self.name, hp_idx, t_steps),
                 "--hdr=--mem=%s" % self.mem, "--hdr=--time=%s" % self.time,
@@ -265,9 +299,10 @@ class Sweep:
         if not m:
             self.sampler.report_failure(hp_idx)
             raise RuntimeError("submit gave no run id:\n" + out)
+        prev = self.st["trials"].get(str(idx), {}).get("lost_runs") if retry else None
         self.st["trials"][str(idx)] = {"idx": idx, "rid": m.group(1), "site": s, "hp_idx": hp_idx,
                                        "hp": hp, "t_steps": t_steps, "status": "submitted",
-                                       "submitted": int(time.time())}
+                                       "submitted": int(time.time()), **({"lost_runs": prev} if prev else {})}
         self.save()
         log("%s: trial %d -> %s  (hp%04d t%d, run %s)" % (self.name, idx, s, hp_idx, t_steps, m.group(1)))
 
@@ -354,6 +389,9 @@ def main():
     ap.add_argument("--poll", type=int, default=60)
     ap.add_argument("--no-fetch", dest="fetch", action="store_false", help="do not mirror each trial's tier-0 outputs locally")
     ap.add_argument("--once", action="store_true", help="one pass (collect, then submit what fits) and exit")
+    ap.add_argument("--retry-lost", action="store_true",
+                    help="resubmit every lost trial (no RESULT_JSON: the job died without reporting) at its hp, its "
+                         "penalty taken back out of the surrogate")
     ap.add_argument("--dry-run", action="store_true", help="print the first wave's submit commands; nothing written or sent")
     a = ap.parse_args()
     if a.dry_run:
