@@ -31,6 +31,7 @@ def sigma_stage_cfg(cfg):
         s.fine_tune.freeze_blocks = []
         s.fine_tune.reset_output_head = False
         s.training.heterosc_sigma_only = True
+        s.training.heterosc_select = "nll"          # mu is frozen here, so only the NLL can tell the steps apart
         s.training.lr = float(t.get("heterosc_sigma_stage_lr", 0.01) or 0.01)
         s.training.iterations = steps
         s.training.increment_steps = steps

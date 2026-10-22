@@ -18,8 +18,11 @@ cd "$PROJECT_DIR"
 # --shared (D82, the user: "yes, use the shared HPs"): the cell at the het sweeps' shared HPs instead of its own (D75,
 # fig:het23): each probe takes its scratch het sweep's best point; run dirs runs/het_shared/, predictions
 # $SCRATCH/zz_delta_hetshared/
-SHARED=0; ROOT=het_delta; EVAL="$SCRATCH/zz_delta_het"
+# --shared-mumse (the user, 2026-10-22): the same at the shared HPs, the checkpoint selected on the mu MSE instead of
+# the NLL (the sigma stage then calibrates sigma from that checkpoint); runs/het_shared_mumse/, $SCRATCH/zz_delta_hetshared_mumse/
+SHARED=0; ROOT=het_delta; EVAL="$SCRATCH/zz_delta_het"; SEL=nll
 [ "$1" = --shared ] && { SHARED=1; ROOT=het_shared; EVAL="$SCRATCH/zz_delta_hetshared"; shift; }
+[ "$1" = --shared-mumse ] && { SHARED=1; ROOT=het_shared_mumse; EVAL="$SCRATCH/zz_delta_hetshared_mumse"; SEL=mu_mse; shift; }
 shared_hps() {   # the probe of a cell's sweep name -> its HP overrides
     local ee="training.regularization_lambda=5.73461e-08 training.cosanneal_warmup_frac=0.05198803
               training.cosanneal_eta_min=1.353762e-09 ema=true training.ema_decay=0.992479 training.lr=0.002921688"
@@ -58,7 +61,7 @@ PY
 )
         python run.py --config-path "$PROJECT_DIR/$T" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null $RR \
             training.is_dyhpo_run=false training.increment_steps=null training.result_path="$OUT/result.json" plot=true \
-            training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_select=nll \
+            training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_select=$SEL \
             ++model.net.sigma_after_pool=true ++model.net.detach_sigma_backbone=false \
             training.sign_head=false ++training.track_train_eval=true evaluation.train_subsample=2000 $HP || { rc=1; continue; }
     fi

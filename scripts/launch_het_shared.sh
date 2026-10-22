@@ -5,7 +5,8 @@
 # supervisor's next pass) while any job is left. Every cell and its parent is on CC-IN2P3 (checked 2026-10-22).
 cd "$(dirname "$0")/.." || exit 1
 JOBS="${JOBS:-analysis/transfer/het_shared_jobs.txt}"   # a rerun list overrides (het_shared_rerun.txt)
-DONE="$HOME/.local/share/ccorch/launch/FA/$(basename "$JOBS" .txt).submitted"
+FLAG="${FLAG:---shared}"   # --shared-mumse: the checkpoint selected on the mu MSE (the user, 2026-10-22)
+DONE="$HOME/.local/share/ccorch/launch/FA/$(basename "$JOBS" .txt)${FLAG#--shared}.submitted"
 touch "$DONE"
 mapfile -t LEFT < <(grep -v '^#' "$JOBS" | while read -r t cells; do grep -qxF "$cells" "$DONE" || echo "$t $cells"; done)
 [ ${#LEFT[@]} -eq 0 ] && { echo "all $(grep -vc '^#' "$JOBS") jobs submitted"; exit 0; }
@@ -18,7 +19,7 @@ for site in ccin2p3; do          # the cells and parents are complete on CC only
         read -r t cells <<< "${LEFT[$i]}"
         # shellcheck disable=SC2086
         site submit "$site" FA scripts/job_het_delta.sh --item het_shared --est-gpu-hours "$t" \
-            --note "het at shared HPs, Delta cells (D82)" -- --shared $cells && { echo "$cells" >> "$DONE"; ok=$((ok + 1)); }
+            --note "het at shared HPs, Delta cells ($FLAG)" -- $FLAG $cells && { echo "$cells" >> "$DONE"; ok=$((ok + 1)); }
     done
 done
 left=$(( ${#LEFT[@]} - ok ))
