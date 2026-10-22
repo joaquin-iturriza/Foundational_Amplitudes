@@ -16,7 +16,9 @@ recipes/catalog_2to4_heldout.yaml (the probes). The coupling-order vector is [0,
 maximum orders plus the new vertex (classes_default.json "orders", as gen_catalog_daniel.py).
     python recipes/gen_catalog_2to4.py
 """
-import json, os, random, sys
+import argparse, json, os, random, shutil, sys
+
+import re
 
 import yaml
 
@@ -25,6 +27,7 @@ sys.path.insert(0, HERE)
 from gen_catalog_daniel import MG5_PDG, SRC, CLASSES, card_masses  # noqa: E402
 
 N_EACH, SEED = 20, 0
+ROOT_CARDS = os.path.join(HERE, "catalog_daniel", "src")
 EXTRA = {"g": ("g", 21, "QCD"), "a": ("a", 22, "QED")}
 
 
@@ -72,15 +75,36 @@ def build():
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cut", type=float, default=None,
+                    help="the same 40 processes with ptj = ptb = pta = CUT GeV (the catalog's run card otherwise), named "
+                         "d4c<CUT>_..., val and test only (1000 train events): the cut test of the dimensionless path "
+                         "(D90; the user: \"what if different cuts are chosen for different processes?\")")
+    a = ap.parse_args()
     entries = build()
     lhe = yaml.safe_load(open(os.path.join(HERE, "catalog_daniel_processes.yaml")))["lhe"]
-    with open(os.path.join(HERE, "catalog_2to4_processes.yaml"), "w") as f:
+    tag, n_train = "", 100000
+    if a.cut is not None:
+        tag, n_train = f"c{int(a.cut)}", 1000
+        cards = os.path.join(HERE, f"catalog_2to4{tag}")
+        os.makedirs(cards, exist_ok=True)
+        src = os.path.join(ROOT_CARDS, lhe["run_card"])
+        card = open(src).read()
+        for key in ("ptj", "ptb", "pta"):
+            card, n = re.subn(rf"^\s*[0-9.eE+-]+(\s*=\s*{key}\b)", f"  {a.cut}\\1", card, flags=re.M)
+            assert n == 1, (key, n)
+        open(os.path.join(cards, lhe["run_card"]), "w").write(card)
+        shutil.copy(os.path.join(ROOT_CARDS, lhe["param_card"]), cards)
+        lhe = dict(lhe, cards_dir=os.path.relpath(cards, os.path.dirname(HERE)), n_train=n_train,
+                   source=f"catalog run card with ptj = ptb = pta = {a.cut} GeV")
+        entries = {n.replace("d4_", f"d4{tag}_", 1): dict(e, folder=e["folder"] + f"_{tag}") for n, e in entries.items()}
+    with open(os.path.join(HERE, f"catalog_2to4{tag}_processes.yaml"), "w") as f:
         f.write("# catalog_2to4: catalog 2->3 training processes plus one gluon or photon (D90). Written by\n"
                 "# recipes/gen_catalog_2to4.py; do not edit by hand. Loaded by mg5_pipeline_final._load_catalog_2to4.\n")
         yaml.safe_dump({"lhe": lhe, "processes": entries}, f, sort_keys=False, width=120)
-    with open(os.path.join(HERE, "catalog_2to4_heldout.yaml"), "w") as f:
+    with open(os.path.join(HERE, f"catalog_2to4{tag}_heldout.yaml"), "w") as f:
         f.write("# catalog_2to4 probes (recipes/gen_catalog_2to4.py): 20 catalog 2->3 training processes + g, 20 + a\n")
-        yaml.safe_dump({"processes": [{"name": n, "sqrts": [13000, 13000], "n_train": 100000, "n_val": 10000,
+        yaml.safe_dump({"processes": [{"name": n, "sqrts": [13000, 13000], "n_train": n_train, "n_val": 10000,
                                        "n_test": 10000} for n in entries]}, f, sort_keys=False, width=120)
     for n, e in entries.items():
         print(f"{n:28s} {e['proc_str']:40s} order {e['order']}")

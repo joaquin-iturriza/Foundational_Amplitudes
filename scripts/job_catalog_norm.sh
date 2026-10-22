@@ -48,6 +48,8 @@ NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
 R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_
 [ "$SET" = 2to4 ] && { R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_; }
+# 2to4c30: the same 40 with ptj = ptb = pta = 30 GeV (gen_catalog_2to4.py --cut 30, the cut test), <PRED>_2to4c30
+[ "$SET" = 2to4c30 ] && { R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_; }
 mkdir -p "$R"
 if [ "$SMOKE" = smoke ] || [ "$SMOKE" = smoke_eval ]; then
     OUT="$SCRATCH/zz_catalog_norm_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
@@ -122,6 +124,6 @@ P=("$R"/${PFX}*.yaml); [[ "$SMOKE" = smoke* ]] && [ "$SET" = catalog ] && P=("$R
 # scoring read sigma before the stage)
 PAR="$OUT"
 if ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
-[ "$SET" = 2to4 ] && PRED="${PRED}_2to4"
+[ "$SET" != catalog ] && PRED="${PRED}_$SET"
 mkdir -p "$PRED"
 python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" "${P[@]}"

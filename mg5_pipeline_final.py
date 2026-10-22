@@ -1735,17 +1735,18 @@ def _load_catalog_2to4():
     """Append the 2->4 probes (recipes/gen_catalog_2to4.py, D90): catalog 2->3 training processes plus one gluon or
     photon, generated with the catalog's MadEvent cards (kind lhe_pp), named d4_<parent folder>_<g|a>."""
     import yaml as _yaml
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes", "catalog_2to4_processes.yaml")
-    if not os.path.exists(path):
-        return 0
-    with open(path) as f:
-        d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
-    lhe = dict(d.get("lhe") or {})
+    import glob as _glob
     n = 0
-    for name, entry in (d.get("processes") or {}).items():
-        if name in PROCESSES:
-            raise KeyError(f"catalog_2to4 entry {name} collides with an existing process")
-        PROCESSES[name] = dict(entry, lhe=lhe); n += 1
+    # catalog_2to4_processes.yaml and its harder-cut copies (catalog_2to4c<cut>_processes.yaml, gen_catalog_2to4.py --cut)
+    for path in sorted(_glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                               "catalog_2to4*_processes.yaml"))):
+        with open(path) as f:
+            d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+        lhe = dict(d.get("lhe") or {})
+        for name, entry in (d.get("processes") or {}).items():
+            if name in PROCESSES:
+                raise KeyError(f"catalog_2to4 entry {name} collides with an existing process")
+            PROCESSES[name] = dict(entry, lhe=lhe); n += 1
     return n
 
 CATALOG_2TO4_ENTRIES = _load_catalog_2to4()

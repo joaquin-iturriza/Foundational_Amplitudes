@@ -1,0 +1,71 @@
+processes:
+- name: d4c30_db_dba_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_ccx_avtvtx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_gsx_tcxbx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_gsx_sxwpwm_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_gd_dvtvtx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_cbx_ctxwp_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_ud_ddwp_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_gu_uwpwm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_dd_dda_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: d4c30_db_dbh_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
