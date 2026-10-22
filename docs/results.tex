@@ -2404,6 +2404,37 @@ Gaussian. Cross and dotted: the cell that blew up, at its best checkpoint.}
 \label{fig:het_delta_summary}
 \end{figure}
 
+\paragraph{The het loss with its own HPs on the cells with more than two final-state particles (D75, 2026-10-22).}
+The $2\to3$ and $2\to4$ cells came out worse with the het loss at the MSE cells' HPs, so eight of them got a DyHPO
+sweep of their own (\code{sweep/gen\_het23\_sweeps.py}): scratch and rung~1 of $e^+e^-\to d\bar dg$, $e^+e^-\to t\bar
+tg$, $u\bar u\to Zgg$ and $u\bar u\to Zggg$, each the MSE cell's sweep (search space, horizon $8$k, data, parent,
+surrogate and candidate pool) with the loss switched, $8$ trials from scratch and $5$ for rung~1, $52$ in all; the
+objective is the validation NLL, and every trial ends with the $\sigma$ stage. Each best trial against its MSE cell
+on the test split (\code{scripts/job\_het23\_eval.sh}, \code{analysis/transfer/het23\_summary.py},
+Fig.~\ref{fig:het23}): median $|\Delta|$, het over MSE, $0.99$, $1.21$, $1.07$, $1.59$, $0.85$, $1.04$, $1.23$, $1.57$ in
+the order above. Against the het retrain at the MSE HPs the own sweep is better in five cells (by $3.5\times$ on
+$e^+e^-\to t\bar tg$ from scratch and $2.2\times$ on $u\bar u\to Zgg$ at rung~1) and worse in three ($e^+e^-\to d\bar dg$
+and $e^+e^-\to t\bar tg$ at rung~1, $u\bar u\to Zggg$ at rung~1), all three fine-tune sweeps of $5$ trials. So with its
+own HPs the het loss draws level with MSE on $\mu$ at $2\to3$ (within $\pm7\%$ in four of six cells, better on $u\bar
+u\to Zgg$ from scratch) and stays behind at $2\to4$ ($1.23$, $1.57$). The NLL objective picks the trial whose $\sigma$
+fits best, not whose $\mu$ does, which can explain a best-NLL trial that loses on $|\Delta|$ to a trial at other HPs.
+The $\sigma$ of these best trials is too small: the pull std is $1.6$ to $3.0$ (a calibrated $\sigma$ gives $1$).
+HPs: $\lambda$ and the warmup split apart between the two losses (het low in both, MSE high), the het sweeps keep EMA on
+in $7$ of $8$ at decay $0.93$ to $0.995$ (MSE: on in $6$, mostly near $0.9$), and lr overlaps; the scratch sweeps of
+one probe pair chose one candidate twice ($e^+e^-\to d\bar dg$ and $t\bar tg$, the same point; $u\bar u\to Zgg$ and
+$Zggg$, the same point but for lr). So the het HPs are consistent among themselves and differ from the MSE ones.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/transfer/figs/het23_delta.pdf}\hfill\pnl{../analysis/transfer/figs/het23_hps.pdf}}
+\caption{The het loss on eight $2\to3$ and $2\to4$ cells with its own DyHPO sweep. Left: median $|\Delta|$ on the
+test split per cell (1, 2: $e^+e^-\to d\bar dg$ scratch, rung~1; 3, 4: $e^+e^-\to t\bar tg$; 5, 6: $u\bar u\to Zgg$;
+7, 8: $u\bar u\to Zggg$) for the MSE cell, the het retrain at its HPs (D47) and the het sweep's best trial. Right:
+each searched HP of each cell's best run as its position in the search range ($\log$ for lr, $\lambda$, $\eta_{\min}$),
+cells left to right in the same order; an open marker on EMA is a run with EMA off.}
+\label{fig:het23}
+\end{figure}
+
 
 \begin{figure}[H]
 \centering
@@ -5855,13 +5886,13 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22).} Running: \code{het23\_sweeps} (D75, item het23: 8 DyHPO sweeps, 52 trials, about
-    $21$ GPU-h; then compare each sweep's best HPs across process and arm, best-vs-best with the MSE cell, and propose
-    shared HPs or per-cell sweeps for the other $24$ overfit cells). Iterating on CPU, before any job (the user,
-    2026-10-22): the statistics map $g$; next, the leading diagram's coupling product from the catalog's diagram sidecars
-    (vertex couplings $\alpha_s$, $\alpha$, Yukawas $m_f/v$, $W$/$Z$ couplings), since counting features cannot carry a
-    suppression to a class with no relative in training ($q\bar q\to b\bar bH$). Designed, waiting on $g$: a pretraining
-    normalized by $g$ (\code{data.norm\_stats\_file}, hp58's configuration and HPs, about $5$ GPU-h). Held (D78):
+  \item \textbf{Open (2026-10-22).} For the user (D75, fig:het23): the other $24$ $2\to3$/$2\to4$ cells at shared het
+    HPs (the scratch sweeps' points) or swept each; the het trial should write its per-event test predictions after
+    its $\sigma$ stage so no evaluation job follows. Design under discussion with the user: how the catalog is normalized so
+    a new process needs no data of its own; per-process statistics depend on how a pool was sampled (the user), so the
+    options are a global standardization (B) or one after dividing each event by an analytic factor
+    $\hat s^{4-N}C_p$ with $C_p$ the leading diagram's coupling product (A; \code{diagram\_couplings.py}); the statistics
+    map $g$ is on hold. Held (D78):
     \code{dancat\_ext} and \code{catalog\_global}. For the user: which zero-shot fix to design ((a) eikonal/dipole
     factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test);
     feedback on the D66 designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on CC from my tests,

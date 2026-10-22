@@ -1,0 +1,66 @@
+[
+ {
+  "cell": "tp3_scr_ee_ddbarg_d8",
+  "mse": 0.008684822358191013,
+  "het_mse_hp": 0.009512081742286682,
+  "het_own": 0.008573353290557861,
+  "mse_run": "runs/tp3_scr_ee_ddbarg_d8/trial_0098",
+  "het_run": "runs/tp3_scr_ee_ddbarg_d8_het/trial_0050"
+ },
+ {
+  "cell": "tp3_r1fte_ee_ddbarg_d8",
+  "mse": 0.007198200095444918,
+  "het_mse_hp": 0.008204139769077301,
+  "het_own": 0.008740219287574291,
+  "mse_run": "runs/tp3_r1fte_ee_ddbarg_d8/trial_0162",
+  "het_run": "runs/tp3_r1fte_ee_ddbarg_d8_het/trial_0094"
+ },
+ {
+  "cell": "tp3_scr_ee_ttbarg_d8",
+  "mse": 0.008259489201009274,
+  "het_mse_hp": 0.031198423355817795,
+  "het_own": 0.008807143196463585,
+  "mse_run": "runs/tp3_scr_ee_ttbarg_d8/trial_0030",
+  "het_run": "runs/tp3_scr_ee_ttbarg_d8_het/trial_0050"
+ },
+ {
+  "cell": "tp3_r1fte_ee_ttbarg_d8",
+  "mse": 0.007950187660753727,
+  "het_mse_hp": 0.0077946363016963005,
+  "het_own": 0.01265639252960682,
+  "mse_run": "runs/tp3_r1fte_ee_ttbarg_d8/trial_0157",
+  "het_run": "runs/tp3_r1fte_ee_ttbarg_d8_het/trial_0193"
+ },
+ {
+  "cell": "tp_scr_uubar_Zgg_d8",
+  "mse": 0.00763238500803709,
+  "het_mse_hp": 0.00690662395209074,
+  "het_own": 0.00645214319229126,
+  "mse_run": "runs_from_lxplus/tp_scr_uubar_Zgg_d8/trial_0018",
+  "het_run": "runs/tp_scr_uubar_Zgg_d8_het/trial_0015"
+ },
+ {
+  "cell": "tp3_r1fte_uubar_Zgg_d8",
+  "mse": 0.006094415672123432,
+  "het_mse_hp": 0.013670811429619789,
+  "het_own": 0.006346250884234905,
+  "mse_run": "runs/tp3_r1fte_uubar_Zgg_d8/trial_0108",
+  "het_run": "runs/tp3_r1fte_uubar_Zgg_d8_het/trial_0132"
+ },
+ {
+  "cell": "tp3_scrh_uubar_Zggg_d8",
+  "mse": 0.0322573222219944,
+  "het_mse_hp": 0.04317210614681244,
+  "het_own": 0.03975167125463486,
+  "mse_run": "runs/tp3_scrh_uubar_Zggg_d8/trial_0144",
+  "het_run": "runs/tp3_scrh_uubar_Zggg_d8_het/trial_0015"
+ },
+ {
+  "cell": "tp3_r1fte_uubar_Zggg_d8",
+  "mse": 0.03230775147676468,
+  "het_mse_hp": 0.03755468130111694,
+  "het_own": 0.05071503296494484,
+  "mse_run": "runs/tp3_r1fte_uubar_Zggg_d8/trial_0151",
+  "het_run": "runs/tp3_r1fte_uubar_Zggg_d8_het/trial_0108"
+ }
+]
