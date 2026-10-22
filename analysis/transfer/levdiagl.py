@@ -84,3 +84,23 @@ for (fig, ax), (k, dlab, arm, ref) in zip(figs[1:], PANELS):
     ps.process_label(ax, dlab)
 ps.legend_strip(figs[0][1], base + "_legend", ncol=3)
 ps.save_panels(figs, base)
+
+if NAME == "levdiagl":
+    # the version for the collaborators (the user, 2026-10-22): the arXiv:2606.23791 encoder only, called "diagrams
+    # on" (their default), D = 10^4 only -> figs/diagrams_on_off_d4
+    fig, ax = ps.figure()
+    _, fam, _, col, m = ARMS[1]
+    k, _, arm, ref = PANELS[2]
+    xs, ys = [], []
+    for i, p in enumerate(P):
+        a, r = arm(fam, p), ref(p)
+        if a and r:
+            xs.append(np.log10(r / a)); ys.append(i)
+    ax.scatter(xs, ys, color=col, marker=m)
+    ax.axvline(0, color="0.4", ls="--")
+    lo, hi = ax.get_xlim()
+    ax.set_xlim(lo, hi + 1.1 * (hi - lo))   # the label clear of the dashed line
+    ax.set_yticks(range(len(P))); ax.set_yticklabels([LAB[p] for p in P]); ax.invert_yaxis()
+    ax.set_xlabel(r"$\log_{10}(L_\mathrm{diagrams\ off}/L_\mathrm{diagrams\ on})$")
+    ps.process_label(ax, r"$D=10^4$, $32$k steps")
+    ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "diagrams_on_off_d4"))
