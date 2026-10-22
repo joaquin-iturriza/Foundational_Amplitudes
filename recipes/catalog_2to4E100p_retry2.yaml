@@ -1,0 +1,8 @@
+processes:
+- name: d4E100_gc_cccx_g
+  sqrts:
+  - 100000
+  - 100000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
