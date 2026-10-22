@@ -88,10 +88,33 @@ def _features(meta, ini, fin):
     f += [sum(KIND[p] == k for p in ini) for k in KINDS] + [sum(KIND[p] == k for p in fin) for k in KINDS]
     if FLOW:
         f += flavour_flow(ini, fin)
+    if PROPS:
+        f += prop_pool(ini) + prop_pool(fin)
+    if NODIAG:
+        f.append(np.log(max(meta.get("n_diagrams") or 1, 1)))
     return np.array(f, float)
 
 
 FLOW = "--no-flow" not in sys.argv
+PROPS = "--props" in sys.argv          # the model's own particle table (particle_ids.py), pooled per side
+NODIAG = "--ndiag" in sys.argv         # the number of Feynman diagrams (classes_default.json)
+MG_PDG = {"d": 1, "u": 2, "s": 3, "c": 4, "b": 5, "t": 6, "e-": 11, "ve": 12, "mu-": 13, "vm": 14, "ta-": 15, "vt": 16,
+          "g": 21, "a": 22, "z": 23, "w+": 24, "h": 25}
+
+
+def pdg(p):
+    if p in MG_PDG:
+        return MG_PDG[p]
+    if p.endswith("~"):
+        return -MG_PDG[p[:-1]]
+    return -MG_PDG[{"e+": "e-", "mu+": "mu-", "ta+": "ta-", "w-": "w+"}[p]]
+
+
+def prop_pool(side):
+    """Sum and sum of absolute values of the 9 particle properties over one side's particles."""
+    from particle_ids import PARTICLE_PROPERTIES
+    v = np.array([PARTICLE_PROPERTIES[pdg(p)] for p in side], float)
+    return list(v.sum(0)) + list(np.abs(v).sum(0))
 
 
 def fit_predict(method, Xtr, ytr, Xte):
@@ -108,7 +131,7 @@ def fit_predict(method, Xtr, ytr, Xte):
         p = lin.predict(Xte)
         if method == "phys_gbr":
             r = ytr[:, j] - lin.predict(Xtr)
-            p = p + GradientBoostingRegressor(n_estimators=300, max_depth=3, learning_rate=0.05,
+            p = p + GradientBoostingRegressor(n_estimators=800, max_depth=3, learning_rate=0.03,
                                               subsample=0.8, random_state=0).fit(Xtr, r).predict(Xte)
         out.append(p)
     return np.stack(out, 1)
@@ -163,6 +186,17 @@ def main():
             l, s = (np.array(v)[sel] for v in res["heldout"][m])
             print(f"  {m:9s} level error median {np.median(l):.3g} (90% {np.quantile(l, .9):.3g}); spread ratio "
                   f"median {np.median(s):.2f}, 10-90% {np.quantile(s, .1):.2f} to {np.quantile(s, .9):.2f}")
+    zp = os.path.join(HERE, "data", "heldout_preds.npz")
+    if os.path.exists(zp):
+        z = np.load(zp)
+        for m in ("affine_N", "phys_lin", "phys_gbr"):
+            mse = []
+            for n, (mu, lsd) in zip(ho, res["heldout_pred"][m]):
+                t = z[f"{n}__t"].astype(float)
+                mse.append(np.mean((mu + np.exp(lsd) * z[f"{n}__h"].astype(float) - t) ** 2))
+            mse = np.array(mse)
+            print(f"hp58 on its own with {m}: MSE(log|M|^2) median 43 new {np.median(mse[~rel]):.3g} (90% "
+                  f"{np.quantile(mse[~rel], .9):.3g}), 96 relabels {np.median(mse[rel]):.3g}")
     print("cross-fitted on the training processes (by relabelling class):")
     for m in METHODS:
         l, s = (np.array(v) for v in res["crossfit"][m])
