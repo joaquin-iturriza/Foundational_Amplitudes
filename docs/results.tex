@@ -514,6 +514,36 @@ it as extrapolation).}
 \label{fig:heldout_mse}
 \end{figure}
 
+\paragraph{How much of a process's level physics fixes (2026-10-22, D82).} A dataset's mean and spread of
+$\log|\mathcal M|^2$ depend on how its events were drawn (the $\sqrt s$ window, the sampling, cuts), which no
+description of the process carries (the user), so a normalization for a process without data cannot use them.
+Normalized by one standardization shared by all processes, the network has to learn each process's level itself; the
+question is how much of that a fixed physics factor can take off first. Per event $y=\log|\mathcal M|^2-\log F$ with
+$F=\hat s^{\,4-N}C_p$: $\hat s$ the event's own squared collision energy (the mass dimension $8-2N$ of $|\mathcal M|^2$),
+$C_p$ the coupling product of the process's leading tree diagram (\code{diagram\_couplings.py}, from its diagram
+sidecar, the sm model's couplings, dimensionful ones over $v$); one reference $s_0$ for the whole catalog, chosen on
+the training processes (\code{norm\_factor\_stats.py} on all $10^5$ train events of each pool, CPU;
+\code{norm\_factor\_check.py}, Fig.~\ref{fig:norm_factor}). The spread (std) of the process levels across the $1352$
+training processes: $5.4$ for $\log|\mathcal M|^2$, $3.8$ after $C_p$, $4.5$ after $\hat s^{\,4-N}$, $2.9$ after both
+($\sqrt{s_0}=17$\,GeV; $4.2$ at $\sqrt{s_0}=1$\,TeV), against a median spread within a process of $2.1$ ($2.3$ after
+the factor). On the $43$ new held-out processes, the level error $(m_p-M)^2/\sigma_p^2$ a network would make if it
+learned no level at all: median $47$ for $\log|\mathcal M|^2$, $18$, $15$, and $4.8$ with both factors (the statistics
+map $g$, fitted on the training statistics: $0.32$). The largest remain after both factors: the multi-Higgs processes
+($s\bar c\to W^-HH$, $b\bar b\to ZHH$, $b\bar b\to HHH$ at $340$ to $500$), whose level the leading diagram's couplings
+do not capture. So the factor removes about half the spread of levels and ten times the median level error, and leaves
+a level spread larger than the spread within a process for the network to learn.
+
+\begin{figure}[H]
+\centering
+\pnl{../analysis/catalog_daniel/figs/norm_factor_legend.pdf} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/norm_factor_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/norm_factor_b.pdf}}
+\caption{The level of each catalog process under four targets, with one standardization shared by all processes:
+$\log|\mathcal M|^2$, minus the leading diagram's $\log C_p$, minus $(4-N)\log(\hat s/s_0)$ per event, minus both.
+(a) the process means of the $1352$ training processes, each minus the median; (b) the level error against the shared
+mean on the $43$ new held-out processes, the error of a network that learned no level.}
+\label{fig:norm_factor}
+\end{figure}
+
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
 $2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
@@ -5891,7 +5921,7 @@ of the three share a test set.
 \begin{itemize}
   \item \textbf{Open (2026-10-22).} For the user (D75, fig:het23): the other $24$ $2\to3$/$2\to4$ cells at shared het
     HPs (the scratch sweeps' points) or swept each; the het trial should write its per-event test predictions after
-    its $\sigma$ stage so no evaluation job follows. Design under discussion with the user: how the catalog is normalized so
+    its $\sigma$ stage so no evaluation job follows. Design under discussion with the user (fig:norm\_factor measured): how the catalog is normalized so
     a new process needs no data of its own; per-process statistics depend on how a pool was sampled (the user), so the
     options are a global standardization (B) or one after dividing each event by an analytic factor
     $\hat s^{4-N}C_p$ with $C_p$ the leading diagram's coupling product (A; \code{diagram\_couplings.py}); the statistics
