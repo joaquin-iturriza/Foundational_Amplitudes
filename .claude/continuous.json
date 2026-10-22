@@ -1,4 +1,1 @@
-{"tasks": [{"name": "preprocessing exploration (D83)",
-            "paths": ["analysis/catalog_daniel/norm_explore*", "analysis/catalog_daniel/norm_surrogate*",
-                      "analysis/catalog_daniel/data/norm_explore*", "analysis/catalog_daniel/data/surrogate*"],
-            "max_age_min": 90}]}
+{"tasks": []}
