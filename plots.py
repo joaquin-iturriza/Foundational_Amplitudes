@@ -314,8 +314,11 @@ def plot_mixer(cfg, plot_path, title, plot_dict):
             # 478 pages were 2 of a short catalog run's 30 minutes; null = all)
             _cap = cfg.plotting.get("per_process_pages", None)
             _items = list(plot_dict.get("results_per_proc", {}).items())
-            if _cap is not None:
-                _items = _items[:int(_cap)]
+            if _cap is not None and len(_items) > int(_cap):
+                # spread over the recipe order, so every family of a large catalog gets pages (its first entries
+                # would be one initial state only)
+                _keep = sorted({int(round(i)) for i in np.linspace(0, len(_items) - 1, int(_cap))})
+                _items = [_items[i] for i in _keep]
             for ds_name, ds_results in _items:
                 if not all(k in ds_results for k in ("test", "train")):
                     continue     # a process with under two events in a split has no page
