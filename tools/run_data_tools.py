@@ -7,9 +7,14 @@ apply a model to it, for the continual-pretraining test (the user's call of 2026
           the batch loss, averaged over --n-batches batches.
   eval    per-process validation loss of any checkpoint (--weights) on the run's data: how much a model fine-tuned
           away from this run forgot of its processes, read in the run's own preprocessed units (val_loss_no_reg).
+  interp  weight interpolation (D31 item 1): theta(a) = (1 - a) theta_from + a theta_run, with theta_run the run's best
+          checkpoint and theta_from another checkpoint of the same architecture (the finale), each as its validation
+          scored it (the EMA average when EMA was on); every a of --alphas scored as eval does, on the run's data (an
+          add-W run: W+4g, W+5g and the finale's 28 monitors). Non-float entries come from the run's checkpoint.
 
     python tools/run_data_tools.py fisher --run-dir runs/tp3_finale/trial_0073 [--n-batches 64]
     python tools/run_data_tools.py eval --run-dir runs/tp3_finale/trial_0073 --weights runs/X/trial_Y/models/model_run0_best.pt.gz [...] --out f.json
+    python tools/run_data_tools.py interp --run-dir runs/tp3_waddm_naive4k/trial_0179 --from runs/tp3_finale/trial_0073 --out f.json
 Runs on a GPU node (a job), never on a login node.
 """
 import argparse, json, os, sys
@@ -82,6 +87,43 @@ def cmd_fisher(a):
     print("FISHER " + json.dumps({"out": out, "n_params": len(fisher), "sum": tot, "weights": w}))
 
 
+def _per_proc(exp):
+    res = {}
+    for name, splits in getattr(exp, "results_per_proc", {}).items():
+        pre = (splits.get("val") or {}).get("preprocessed") or {}
+        if "mse" in pre:
+            res[name] = float(pre["mse"])
+    for name, r in exp.results_val.items():
+        pre = (r or {}).get("preprocessed") or {}
+        if "mse" in pre:
+            res[name] = float(pre["mse"])
+    return res
+
+
+def cmd_interp(a):
+    from base_experiment import _ckpt_scored_state, _torch_load
+    wr, wf = best_weights(a.run_dir), best_weights(a.from_dir)
+    exp = build(a.run_dir, wr)
+    names = [n for n, _ in exp.model.named_parameters()]
+    sr, src_r = _ckpt_scored_state(_torch_load(wr, map_location=exp.device, weights_only=False), names)
+    sf, src_f = _ckpt_scored_state(_torch_load(wf, map_location=exp.device, weights_only=False), names)
+    own = exp.model.state_dict()
+    miss = [k for k in own if k not in sr or k not in sf or tuple(sr[k].shape) != tuple(sf[k].shape)]
+    assert not miss, f"interp: entries missing or of different shape in the two checkpoints: {miss[:4]}"
+    outs = []
+    for al in a.alphas:
+        mix = {k: ((1 - al) * sf[k].to(own[k].dtype) + al * sr[k].to(own[k].dtype)) if own[k].is_floating_point()
+               else sr[k] for k in own}
+        exp.model.load_state_dict(mix)
+        exp.evaluate()
+        outs.append({"alpha": al, "val_mse_prepd": _per_proc(exp)})
+        print("INTERP " + json.dumps({"run_dir": a.run_dir, "from": a.from_dir, "run_state": src_r, "from_state": src_f,
+                                      **outs[-1]}), flush=True)
+    os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    json.dump({"run_dir": a.run_dir, "from": a.from_dir, "run_state": src_r, "from_state": src_f, "points": outs},
+              open(a.out, "w"), indent=1)
+
+
 def cmd_eval(a):
     """One or more checkpoints, each built afresh on the run's data; --out holds one record, or a list for several."""
     outs = []
@@ -112,6 +154,9 @@ def main():
     s.set_defaults(fn=cmd_fisher)
     s = sub.add_parser("eval"); s.add_argument("--run-dir", required=True); s.add_argument("--weights", required=True, nargs="+")
     s.add_argument("--out", required=True); s.set_defaults(fn=cmd_eval)
+    s = sub.add_parser("interp"); s.add_argument("--run-dir", required=True); s.add_argument("--from", dest="from_dir", required=True)
+    s.add_argument("--alphas", type=float, nargs="+", default=[round(0.1 * i, 1) for i in range(11)])
+    s.add_argument("--out", required=True); s.set_defaults(fn=cmd_interp)
     a = ap.parse_args()
     a.run_dir = os.path.abspath(a.run_dir)
     a.fn(a)
