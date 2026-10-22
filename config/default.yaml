@@ -147,10 +147,10 @@ training:
                       # no (μ,σ) competition for the shared trunk. Checkpoint selection stays on
                       # the NLL here (μ-MSE is constant by construction).
  heterosc_sigma_stage_steps: 250   # every HETEROSC run ends with a heterosc_sigma_only stage of this many steps on
- heterosc_sigma_stage_validations: 25   # validations over the sigma stage (every 10 steps of 250, the D69 sweep); fewer for short runs
                       # its own best checkpoint (run.py; written to <run_dir>/sigma_stage); 0 = off. The joint
                       # fit's σ comes out compressed (pull std 0.6 at 32k); 250 steps calibrate it (D69, D70;
                       # results.tex fig:het_sigonly)
+ heterosc_sigma_stage_validations: 25   # validations over the sigma stage (every 10 steps of 250, the D69 sweep); fewer for short runs
  heterosc_sigma_stage_lr: 0.01   # the stage's effective lr (lr_scale 1, warmup 0, no L2, EMA off): the D69 sweep's
                       # best, training.lr 0.097 x fine_tune.lr_scale 0.1
  heterosc_mu_only: false   # DIAGNOSTIC only. Keep the 2-ch HETEROSC net but optimise plain MSE
