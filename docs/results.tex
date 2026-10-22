@@ -692,9 +692,11 @@ worse than shared on the new processes at either length, three quarters of it le
 with shared: $0.65$ against $0.60$ in the median, better in the tail (the $90\%$ point $2.6$ against $3.3$) and on the relabels
 ($0.060$ against $0.069$), with the level error slightly lower ($0.092$ against $0.11$). So at multiplicities seen in
 training the dimension factor costs nothing and gains a little, and the coupling product should go. The $\hat s$+coupling target's relabel advantage
-($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ as scored (the main run's best checkpoint, before the $\sigma$
-stage: the scoring read the run, not \code{sigma\_stage}; a rescore from the stage is running): pull std $1.1$ to $1.2$ on
-the relabels, $2.5$ (shared, $\hat s$ only) to $4.2$ ($\hat s$+coupling) on the new processes. The short runs stop before
+($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ after the
+$150$-step stage, scored from \code{sigma\_stage} (the MSEs are identical to the main run's, $\mu$ being frozen): pull
+std $1.15$ (shared), $1.27$ ($\hat s$ only) and $1.16$ ($\hat s$+coupling) on the relabels, $2.9$, $2.5$ and $4.7$ on
+the new processes, against $1.15$, $1.22$, $1.13$ and $2.6$, $2.5$, $4.2$ before the stage: the short stage leaves
+$\sigma$ almost where the main run put it. The short runs stop before
 step $8734$, where the full-length shared run blew up, so they say nothing on its stability.
 
 \paragraph{Extrapolation in multiplicity: the units of the target (2026-10-22, D88).} Every target of the form

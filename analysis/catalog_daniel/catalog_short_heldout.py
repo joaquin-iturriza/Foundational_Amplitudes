@@ -5,7 +5,7 @@ standardization), Adim (the factor (s0/s_hat)^(4-N), s0 = 289 GeV^2, no coupling
 coupling product). Per process: MSE of log|M|^2 on its own, its split into the squared mean error (level) and the
 error's variance (shape), the median per-process level fraction, the MSE after the best rescale and shift (an oracle),
 and, where the npz has sigma, the pulls (q - t) / sigma.
-Inputs: data/catalog_short_{B,Adim,A}.npz, data/catalog_norm_{A,B}.npz, data/heldout_preds.npz + data/stats_net.json.
+Inputs: data/catalog_short_{B,Adim,A}_sigstage.npz (scored from each run's sigma stage; mu is the run's, frozen), data/catalog_norm_{A,B}.npz, data/heldout_preds.npz + data/stats_net.json.
 Output: the table printed, data/catalog_short_heldout.json.
     python analysis/catalog_daniel/catalog_short_heldout.py
 """
@@ -27,7 +27,7 @@ def main():
             z58[f"{n}__q"] = mu + np.exp(lsd) * z58[f"{n}__h"].astype(float)
     models = {"hp58 + g (full)": z58}
     for lab, f in (("A (full)", "catalog_norm_A"), ("B (full, blew up)", "catalog_norm_B"),
-                   ("B (short)", "catalog_short_B"), ("Adim (short)", "catalog_short_Adim"), ("A (short)", "catalog_short_A")):
+                   ("B (short)", "catalog_short_B_sigstage"), ("Adim (short)", "catalog_short_Adim_sigstage"), ("A (short)", "catalog_short_A_sigstage")):
         models[lab] = dict(np.load(os.path.join(HERE, "data", f + ".npz")))
     probes = sorted({k.split("__")[0] for k in z58 if k.endswith("__t")})
     res = {}
