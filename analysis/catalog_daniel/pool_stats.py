@@ -1,4 +1,4 @@
-"""Per-process target statistics of the arXiv:2606.23791 catalog (D80, the process-to-statistics network): the mean
+"""Per-process target statistics of the arXiv:2606.23791 catalog (D81, the process-to-statistics network): the mean
 and standard deviation of log|M|^2 (natural log, the experiment's "log" transform) over each process's train pool,
 for the 1352 training and the 139 held-out processes, plus hp58's own prepd_mean/prepd_std (data_stats.json, in its
 recipe order) as a check on the training ones. Login node, CPU only; prints JSON after a __B64__ line (base64 of
