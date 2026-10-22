@@ -98,9 +98,26 @@ def main():
             hist(ax, np.exp(z[f"{p}__{kind}"].astype(float) - t) - 1, color=c, label=LAB[kind])
         ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$"); ax.set_ylabel(r"density per unit $\log_{10}|\Delta|$")
         ps.process_label(ax, proc_label(meta[p]["process"]))
-    ps.shared_legend(figs[0][0], figs[0][1], ncol=1)
+    # the legend as a file of its own above the rows (a shared_legend on panel 1 grows its canvas and misaligns row 1)
+    ps.legend_strip(figs[0][1], os.path.join(HERE, "figs", "heldout_delta_legend"), ncol=2)
     for i, (fig, _) in enumerate(figs):                        # 13 panels: numbered, save_panels' letters stop short
         ps.save(fig, os.path.join(HERE, "figs", f"heldout_delta_{i + 1:02d}"))
+    # the distribution of log|M|^2 itself, the same processes: the truth against the prediction on its own and after
+    # the best rescale and shift
+    figs = ps.panels(len(sel))
+    for (fig, ax), (g, p) in zip(figs, sel):
+        t = z[f"{p}__t"].astype(float)
+        qs = {k: z[f"{p}__{k}"].astype(float) for k in ("q_g", "q_aff")}
+        lo, hi = np.quantile(np.concatenate([t, *qs.values()]), [0.001, 0.999])
+        b = np.linspace(lo, hi, 51)
+        ax.hist(t, bins=b, density=True, histtype="stepfilled", color="0.8", label="truth")
+        for kind, c in (("q_g", ps.C.vermillion), ("q_aff", ps.C.blue)):
+            ax.hist(qs[kind], bins=b, density=True, histtype="step", color=c, label=LAB[kind])
+        ax.set_xlabel(r"$\log|\mathcal{M}|^2$"); ax.set_ylabel("density")
+        ps.process_label(ax, proc_label(meta[p]["process"]))
+    ps.legend_strip(figs[0][1], os.path.join(HERE, "figs", "heldout_dist_legend"), ncol=2)
+    for i, (fig, _) in enumerate(figs):
+        ps.save(fig, os.path.join(HERE, "figs", f"heldout_dist_{i + 1:02d}"))
     print("Delta panels:", "; ".join(f"{i + 1} {SHORT.get(g, g)}: {p}" for i, (g, p) in enumerate(sel)))
 
     # the user's figure (arXiv:2606.23791's held-out figure, interpolation and extrapolation): one point per process,

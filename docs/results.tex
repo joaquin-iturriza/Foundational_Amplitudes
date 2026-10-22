@@ -452,7 +452,7 @@ used (\code{stats\_net.py --props --ndiag}).
 
 hp58 read with $g$'s statistics, $\hat\mu+\hat\sigma h$ with $h$ its output, is a zero-shot on its own: nothing from
 the held-out process's data (\code{job\_catalog\_heldout\_preds.sh}, \code{heldout\_delta.py};
-Figs.~\ref{fig:heldout_delta} and \ref{fig:heldout_mse}). Median over processes of MSE$(\log|\mathcal M|^2)$ on the
+Figs.~\ref{fig:heldout_delta}, \ref{fig:heldout_dist} and \ref{fig:heldout_mse}). Median over processes of MSE$(\log|\mathcal M|^2)$ on the
 $43$: $1.27$ ($10$ to $90\%$: $0.10$ to $4.1$), against $0.46$ with the process's own train mean and spread (two
 numbers from its data, none fitted to the predictions) and $0.080$ after the best rescale and shift; on the $96$
 relabels $0.12$, $0.0091$, $0.0055$. The median $|\Delta|$ per process on the $43$: $0.69$, $0.37$, $0.14$. The worst
@@ -472,6 +472,7 @@ a spread ratio $\hat\sigma/\sigma$. The two baselines share one spread, so their
 
 \begin{figure}[H]
 \centering
+\pnl{../analysis/catalog_daniel/figs/heldout_delta_legend.pdf} \\[1ex]
 \widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_01.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_02.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_03.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_04.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/catalog_daniel/figs/heldout_delta_05.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_delta_06.pdf}} \\[1ex]
@@ -484,6 +485,22 @@ Fig.~\ref{fig:heldout_mse}) showing its median process by MSE on its own: the $|
 $\log_{10}|\Delta|$ (as the ladder's $\Delta$ plots), on its own with the statistics from $g$ and after the best rescale
 and shift.}
 \label{fig:heldout_delta}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\pnl{../analysis/catalog_daniel/figs/heldout_dist_legend.pdf} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_01.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_02.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_03.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_04.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_05.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_06.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_07.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_08.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_09.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_10.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_11.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_12.pdf}} \\[1ex]
+\pnl{../analysis/catalog_daniel/figs/heldout_dist_13.pdf}
+\caption{The distribution of $\log|\mathcal M|^2$ over the test events of the processes of
+Fig.~\ref{fig:heldout_delta}: the truth (grey) against hp58's prediction on its own with the statistics from $g$ and
+after the best rescale and shift.}
+\label{fig:heldout_dist}
 \end{figure}
 
 \begin{figure}[H]
