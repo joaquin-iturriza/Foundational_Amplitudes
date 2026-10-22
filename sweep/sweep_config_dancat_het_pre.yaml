@@ -96,7 +96,7 @@ fixed_params:
   training.scheduler: CosineAnnealingLR
   training.get_ID: 'false'
   training.save_intermediate: 'false'
-  training.validate_frac: '0.01'
+  training.validate_frac: '0.02'   # 50 validations (the user, 2026-10-22: "let's do 50 validation steps"; 100 cost 42 min of a 4.7 h run)
   training.es_load_best_model: 'true'
   training.dtype: float32
   plot: 'true'
