@@ -15,10 +15,28 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
+# --shared (D82, the user: "yes, use the shared HPs"): the cell at the het sweeps' shared HPs instead of its own (D75,
+# fig:het23): each probe takes its scratch het sweep's best point; run dirs runs/het_shared/, predictions
+# $SCRATCH/zz_delta_hetshared/
+SHARED=0; ROOT=het_delta; EVAL="$SCRATCH/zz_delta_het"
+[ "$1" = --shared ] && { SHARED=1; ROOT=het_shared; EVAL="$SCRATCH/zz_delta_hetshared"; shift; }
+shared_hps() {   # the probe of a cell's sweep name -> its HP overrides
+    local ee="training.regularization_lambda=5.73461e-08 training.cosanneal_warmup_frac=0.05198803
+              training.cosanneal_eta_min=1.353762e-09 ema=true training.ema_decay=0.992479 training.lr=0.002921688"
+    local uu="training.regularization_lambda=1.191642e-09 training.cosanneal_warmup_frac=0.06418264
+              training.cosanneal_eta_min=6.52542e-10 ema=true training.ema_decay=0.9953661"
+    case "$1" in
+        *_ee_ddbarg_*|*_ee_ttbarg_*) echo $ee ;;
+        *_uubar_Zggg_*) echo $uu training.lr=0.002221238 ;;
+        *_uubar_Zgg_*)  echo $uu training.lr=0.0007033921 ;;
+        *) echo "no shared HPs for $1" >&2; return 1 ;;
+    esac
+}
 rc=0
 for T in "$@"; do
     T="${T%/}"
-    OUT="$PROJECT_DIR/runs/het_delta/$(basename $(dirname $T))__$(basename $T)"
+    OUT="$PROJECT_DIR/runs/$ROOT/$(basename $(dirname $T))__$(basename $T)"
+    HP=""; [ $SHARED = 1 ] && { HP=$(shared_hps "$(basename $(dirname $T))") || { rc=1; continue; }; }
     if [ ! -e "$OUT/sigma_stage/models" ]; then
         test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"    # an earlier attempt that did not finish: kept aside
         # increment_steps cleared (a DyHPO trial's config carries its fidelity there and it sets the cosine horizon);
@@ -42,8 +60,8 @@ PY
             training.is_dyhpo_run=false training.increment_steps=null training.result_path="$OUT/result.json" plot=true \
             training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_select=nll \
             ++model.net.sigma_after_pool=true ++model.net.detach_sigma_backbone=false \
-            training.sign_head=false ++training.track_train_eval=true evaluation.train_subsample=2000 || { rc=1; continue; }
+            training.sign_head=false ++training.track_train_eval=true evaluation.train_subsample=2000 $HP || { rc=1; continue; }
     fi
-    python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta_het" "$OUT/sigma_stage" || rc=1
+    python tools/eval_delta.py --out-dir "$EVAL" "$OUT/sigma_stage" || rc=1
 done
 exit $rc

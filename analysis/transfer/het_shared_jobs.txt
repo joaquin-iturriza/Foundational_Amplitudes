@@ -1,0 +1,8 @@
+# D82: the other 24 2->3/2->4 Delta cells, het loss at the het sweeps' shared HPs (job_het_delta.sh --shared).
+# est GPU-h (train + sigma stage + eval), then the job's cells
+1.17 runs/tp3_uu64fte_uubar_Zgg_d8/trial_0198 runs/tp3_r2fte_uubar_Zgg_d8/trial_0119 runs/tp3_r3fte_uubar_Zgg_d8/trial_0085 runs/tp3_r4fte_uubar_Zgg_d8/trial_0099
+1.22 runs/tp3_r5fte_uubar_Zgg_d8/trial_0114 runs/tp3_r6fte_uubar_Zgg_d8/trial_0029 runs/tp3_r7fte_uubar_Zgg_d8/trial_0194 runs/tp3_r8fte_uubar_Zgg_d8/trial_0154
+1.58 runs_from_lxplus/tp3_r9fte_uubar_Zgg_d8/trial_0048 runs/tp3_synfte_uubar_Zgg_d8/trial_0044 runs/tp3_finfte_uubar_Zgg_d8/trial_0036 runs/tp3_uu64fte_uubar_Zggg_d8/trial_0195
+1.49 runs/tp3_r2fte_uubar_Zggg_d8/trial_0182 runs/tp3_r3fte_uubar_Zggg_d8/trial_0122 runs/tp3_r4fte_uubar_Zggg_d8/trial_0027 runs/tp3_r5fte_uubar_Zggg_d8/trial_0006
+1.40 runs/tp3_r6fte_uubar_Zggg_d8/trial_0013 runs/tp3_r7fte_uubar_Zggg_d8/trial_0193 runs/tp3_r8fte_uubar_Zggg_d8/trial_0186 runs_from_lxplus/tp3_r9fte_uubar_Zggg_d8/trial_0148
+1.35 runs/tp3_synfte_uubar_Zggg_d8/trial_0150 runs/tp3_finfte_uubar_Zggg_d8/trial_0096 runs/tp3_ssoftfte_ee_ddbarg_d8/trial_0193 runs/tp3_sdeadconefte_ee_ttbarg_d8/trial_0176
