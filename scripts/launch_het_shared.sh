@@ -18,7 +18,7 @@ for site in ccin2p3; do          # the cells and parents are complete on CC only
     for ((k = 0; k < ${n:-0} && i < ${#LEFT[@]}; k++, i++)); do
         read -r t cells <<< "${LEFT[$i]}"
         # shellcheck disable=SC2086
-        site submit "$site" FA scripts/job_het_delta.sh --item het_shared --est-gpu-hours "$t" \
+        site submit "$site" FA scripts/job_het_delta.sh --item "${ITEM:-het_shared}" --est-gpu-hours "$t" \
             --note "het at shared HPs, Delta cells ($FLAG)" -- $FLAG $cells && { echo "$cells" >> "$DONE"; ok=$((ok + 1)); }
     done
 done
