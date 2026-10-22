@@ -34,7 +34,7 @@ for l in ("e", "mu", "ta"):
 for v in ("ve", "vm", "vt"):
     KIND[v] = KIND[v + "~"] = "v"
 KINDS = ["g", "q", "b", "t", "a", "Z", "W", "H", "l", "v"]
-METHODS = ("shared", "affine_N", "phys_lin", "phys_gbr")
+METHODS = ("shared", "affine_N", "phys_lin", "phys_gbr") + (("phys_gp",) if "--gp" in sys.argv else ())
 
 
 UP, DOWN = set("uct"), set("dsb")
@@ -190,6 +190,14 @@ def fit_predict(method, Xtr, ytr, Xte):
     for j in range(2):
         lin = Ridge(alpha=1.0).fit(Xtr, ytr[:, j])
         p = lin.predict(Xte)
+        if method == "phys_gp":      # a GP on the residual: far from the training processes it falls back to the skeleton
+            from sklearn.gaussian_process import GaussianProcessRegressor
+            from sklearn.gaussian_process.kernels import RBF, WhiteKernel, ConstantKernel
+            mu_, sd_ = Xtr.mean(0), Xtr.std(0) + 1e-9
+            r = ytr[:, j] - lin.predict(Xtr)
+            gp = GaussianProcessRegressor(ConstantKernel(1.0) * RBF(np.full(Xtr.shape[1], 3.0)) + WhiteKernel(0.1),
+                                          normalize_y=True, random_state=0).fit((Xtr - mu_) / sd_, r)
+            p = p + gp.predict((Xte - mu_) / sd_)
         if method == "phys_gbr":
             r = ytr[:, j] - lin.predict(Xtr)
             p = p + GradientBoostingRegressor(n_estimators=800, max_depth=3, learning_rate=0.03,
