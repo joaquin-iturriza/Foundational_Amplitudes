@@ -84,6 +84,9 @@ def main():
                     help="the 40 parents themselves (catalog 2->3 TRAINING processes) at a pp energy of TEV, named "
                          "dE<TEV>_<folder>, val and test only: the collider-energy test (D93, the held-out sets along "
                          "every axis a user can change), the energy the only difference from what the model trained on")
+    ap.add_argument("--probes-at", type=float, default=None, metavar="TEV",
+                    help="the 40 2->4 probes at a pp energy of TEV, named d4E<TEV>_..., val and test only: energy and "
+                         "multiplicity changed together (with --parents-at, energy alone)")
     a = ap.parse_args()
     entries = build()
     lhe = yaml.safe_load(open(os.path.join(HERE, "catalog_daniel_processes.yaml")))["lhe"]
@@ -103,6 +106,22 @@ def main():
                    source=f"catalog run card with ptj = ptb = pta = {a.cut} GeV")
         entries = {n.replace("d4_", f"d4{tag}_", 1): dict(e, folder=e["folder"] + f"_{tag}") for n, e in entries.items()}
     rs = 13000
+    if a.probes_at is not None:
+        tev = a.probes_at
+        tag, n_train, rs = f"E{int(tev)}p", 1000, int(round(tev * 1000))
+        cards = os.path.join(HERE, f"catalog_2to4{tag}")
+        os.makedirs(cards, exist_ok=True)
+        card = open(os.path.join(ROOT_CARDS, lhe["run_card"])).read()
+        for key in ("ebeam1", "ebeam2"):
+            card, n = re.subn(rf"^\s*[0-9.eE+-]+(\s*=\s*{key}\b)", f"  {rs / 2:.1f}\\1", card, flags=re.M)
+            assert n == 1, (key, n)
+        open(os.path.join(cards, lhe["run_card"]), "w").write(card)
+        shutil.copy(os.path.join(ROOT_CARDS, lhe["param_card"]), cards)
+        lhe = dict(lhe, cards_dir=os.path.relpath(cards, os.path.dirname(HERE)), n_train=n_train,
+                   source=f"catalog run card with ebeam1 = ebeam2 = {rs / 2:.1f} GeV")
+        entries = {n.replace("d4_", f"d4E{int(tev)}_", 1): dict(e, folder=e["folder"] + f"_E{int(tev)}",
+                                                                 test_group=e["test_group"] + f" at {tev:g} TeV")
+                   for n, e in entries.items()}
     if a.parents_at is not None:
         tag, n_train, rs = f"E{int(a.parents_at)}", 1000, int(round(a.parents_at * 1000))
         cards = os.path.join(HERE, f"catalog_2to4{tag}")

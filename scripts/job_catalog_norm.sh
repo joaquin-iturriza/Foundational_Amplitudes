@@ -57,12 +57,14 @@ NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
 # the probe set: the catalog's 139 held-out; 2to4, the 40 2->4 processes beyond the catalog; 2to4c30, the same with
 # ptj = ptb = pta = 30 GeV (gen_catalog_2to4.py --cut 30, the cut test); 2to4E100, their 40 2->3 training parents at
-# pp 100 TeV (--parents-at 100, the energy test). Predictions in <PRED>_<SET> for every set but the catalog
+# pp 100 TeV (--parents-at 100, the energy test); 2to4E100p, the 2->4 probes themselves at 100 TeV (--probes-at
+# 100, energy and multiplicity together). Predictions in <PRED>_<SET> for every set but the catalog
 case "$SET" in
     catalog)  R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_ ;;
     2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_ ;;
     2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_ ;;
     2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;
+    2to4E100p) R="$SCRATCH/zz_catalog_2to4E100p_recipes"; HELD=recipes/catalog_2to4E100p_heldout.yaml; PFX=d4E100_ ;;
     *) echo "unknown probe set $SET"; exit 1 ;;
 esac
 mkdir -p "$R"
