@@ -267,24 +267,27 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._mom_div = float(mom_div)
         self._mass_spec = dict(mass_spec)
 
-    def setup_dimless_mass(self, mass_col: int, massive, scale: float):
-        """Enable data.dimensionless_inputs on the property side: each massive particle's table column
-        log10(m / GeV) becomes log10(m / sqrt(s_hat)) of its event, so no absolute scale reaches the network.
-        The event's log10 sqrt(s_hat) arrives as the last column of order_labels, which this takes off before the
-        order features are used. ``massive``: (n_types,) bool per row of property_matrix (the generator's mass, not
-        recomputed from the float32 momenta, where a massless leg reads as m ~ 1e-4 sqrt(s_hat)); ``scale``: the
-        column's z-score std (1 when the table is not standardized)."""
+    def setup_dimless_mass(self, mass_col: int, raw_log10m, massive, mean: float, scale: float, massless_value: float):
+        """Enable data.dimensionless_inputs on the property side: the mass column becomes, per particle of each event,
+        (log10(m / sqrt(s_hat)) - mean) / scale for a massive species and ``massless_value`` for a massless one, so no
+        absolute scale reaches the network. The event's log10 sqrt(s_hat) arrives as the last column of order_labels,
+        which this takes off before the order features are used. ``raw_log10m``/``massive``: (n_types,) per row of
+        property_matrix, the generator's mass (not recomputed from the float32 momenta, where a massless leg reads as
+        m ~ 1e-4 sqrt(s_hat)); ``mean``/``scale``: the column's statistics over the massive train particles
+        (experiment: dimless_mass_stats, frozen with the data stats; scale 1 when the table is not standardized)."""
         self.dimless_mass = True
         self._dm_col = int(mass_col)
-        self._dm_scale = float(scale)
+        self._dm_mean, self._dm_scale, self._dm_massless = float(mean), float(scale), float(massless_value)
+        self.register_buffer("_dm_log10m", torch.as_tensor(raw_log10m, dtype=torch.float32), persistent=False)
         self.register_buffer("_dm_massive", torch.as_tensor(massive, dtype=torch.bool), persistent=False)
 
     def _apply_dimless_mass(self, raw_props, particle_type_indices, ptr, order_labels):
         """(raw_props with the mass column per event, order_labels without the log10 sqrt(s_hat) column)"""
         lrs = order_labels[:, -1].repeat_interleave(ptr[1:] - ptr[:-1], dim=0)          # (N_total,)
-        shift = torch.where(self._dm_massive[particle_type_indices], lrs, torch.zeros_like(lrs))
+        col = (self._dm_log10m[particle_type_indices] - lrs - self._dm_mean) / self._dm_scale
+        col = torch.where(self._dm_massive[particle_type_indices], col, torch.full_like(col, self._dm_massless))
         raw_props = raw_props.clone()
-        raw_props[:, self._dm_col] = raw_props[:, self._dm_col] - (shift / self._dm_scale).to(raw_props.dtype)
+        raw_props[:, self._dm_col] = col.to(raw_props.dtype)
         return raw_props, order_labels[:, :-1]
 
     def _apply_mass_from_momenta(self, raw_props, fourmomenta):

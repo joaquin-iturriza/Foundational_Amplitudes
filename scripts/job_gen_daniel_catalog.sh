@@ -26,7 +26,7 @@ export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"   # MadEvent di
 echo "host $(hostname)  spec $SPEC  workers $W  lhe cores ${AMP_LHE_CORES:-1}  work $AMP_LHE_WORK_DIR"
 python prebuild_recipes.py "$SPEC" --workers "$W" --lhe-cores "${AMP_LHE_CORES:-1}"
 rc=$?
-python tools/dump_diagrams.py --prefix dc_ --skip-existing --workers "$W"
+python tools/dump_diagrams.py --prefix "${DANIEL_PREFIX:-dc_}" --skip-existing --workers "$W"   # d4_: the 2->4 probes
 rc2=$?
 echo "prebuild exit $rc, sidecars exit $rc2"
 exit $(( rc != 0 || rc2 != 0 ))

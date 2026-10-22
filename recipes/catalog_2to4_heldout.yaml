@@ -1,0 +1,282 @@
+# catalog_2to4 probes (recipes/gen_catalog_2to4.py): 20 catalog 2->3 training processes + g, 20 + a
+processes:
+- name: d4_dbx_ubxwm_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_uux_csxwm_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_uux_gzz_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_db_dba_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_uxbx_uxbxz_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gc_cccx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ccx_gaz_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ccx_avtvtx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ssx_uuxa_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ddx_gbbx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gdx_dxzh_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gsx_tcxbx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_dxcx_guxsx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_bux_buxz_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_sc_sca_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gsx_sxwpwm_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_bdx_tuxz_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_dsx_ucxa_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gbx_txwpa_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gd_dvtvtx_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gb_bemep_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gcx_cxemep_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ssx_bbxa_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_cbx_ctxwp_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gbx_bxah_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_bbx_aaz_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_csx_bbxwp_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ud_ddwp_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ucx_usxwm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_sdx_cdxwm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_dsx_dsxh_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gu_uwpwm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_csx_amupvm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gdx_dxaa_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_dc_ucwm_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_dd_dda_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ssx_aaz_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_gs_smummup_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_ddx_hvmvmx_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: d4_db_dbh_a
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000

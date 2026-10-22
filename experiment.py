@@ -465,6 +465,16 @@ class AmplitudeExperiment(BaseExperiment):
         self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         self._resonance_per_event = bool(self.cfg.data.get("resonance_per_event", False))
         self._offshell_per_event = bool(self.cfg.data.get("offshell_per_event", False))
+        if bool(self.cfg.data.get("dimensionless_inputs", False)):
+            # the settings that would still feed GeV, or rebuild GeV from the momenta, under dimensionless_inputs
+            assert self.cfg.data.get("source", "files") == "recipes", "data.dimensionless_inputs: the recipe path only"
+            assert not self._resonance_per_event, "data.dimensionless_inputs: resonance_per_event feeds sqrt(s) - m in GeV"
+            assert not (self._use_internal_mass_scalars and not self._offshell_per_event), \
+                "data.dimensionless_inputs: internal_mass_scalars without offshell_per_event feeds the masses in GeV"
+            assert not bool(self.cfg.model.get("use_pair_bias", False)), \
+                "data.dimensionless_inputs: use_pair_bias rebuilds s - m^2 in GeV from the momenta"
+            assert not bool(self.cfg.model.get("use_diagram_virtuality", False)), \
+                "data.dimensionless_inputs: use_diagram_virtuality rebuilds the virtualities in GeV from the momenta"
         if self.cfg.data.get("source", "files") == "recipes":
             return self._init_data_recipes()
         assert str(self.cfg.data.get("particle_order", "none")) == "none" and \
@@ -1225,10 +1235,15 @@ class AmplitudeExperiment(BaseExperiment):
                 assert raw_m.shape[0] == self.property_matrix.shape[0], (raw_m.shape, self.property_matrix.shape)
                 massive = raw_m >= MASS_MASSLESS_LOG10_THR
                 massive[0] = False                     # row 0: the padding entry
-                model.setup_dimless_mass(spec["mass_col"], massive,
-                                         spec["std_sd"] if spec["std_sd"] is not None else 1.0)
+                mu_d, sd_d = self._dimless_mass_stats
+                std_on = bool(self.cfg.data.get("standardize_props", False))
+                # massless rows: the mean of the massive ones, as the GeV column's is_massless neutralisation does
+                # (0 once z-scored)
+                model.setup_dimless_mass(spec["mass_col"], raw_m, massive, mu_d, sd_d if std_on else 1.0,
+                                         0.0 if std_on else mu_d)
                 LOGGER.info(f"Mass encoding: log10(m / sqrt(s_hat)) per event for {int(massive.sum())} massive "
-                            f"species (dimensionless_inputs), mass_col={spec['mass_col']}")
+                            f"species (dimensionless_inputs), mass_col={spec['mass_col']}, "
+                            f"{'z-scored' if std_on else 'raw'} on mean {mu_d:.3f}, std {sd_d:.3f}")
             # Build + attach the diagram graph encoder (a real submodule → trained,
             # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
             # so it exists before μP finalisation and warm-start loading.
@@ -1446,9 +1461,11 @@ class AmplitudeExperiment(BaseExperiment):
         # data.preprocess_per_dataset (default False = global).
         per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
 
+        _dms_frozen = None   # dimensionless_inputs: the mass column's (mean, std), the parent's when stats are frozen
         if stats_src is not None:
             with open(stats_src) as f:
                 stats = json.load(f)
+            _dms_frozen = stats.get("dimless_mass_stats")
             mom_div    = float(stats["mom_div"])
             mom_mean   = float(stats["mom_mean"])
             mom_std    = float(stats["mom_std"])
@@ -1616,6 +1633,26 @@ class AmplitudeExperiment(BaseExperiment):
                 assert np.all(rs > 0), f"dimensionless_inputs: non-positive s_hat in {k}"
                 store[k]["rs"] = rs
                 store[k]["momenta"] = (mm / rs[:, None, None]).astype(np.float32)
+            # the mass column log10(m / sqrt(s_hat)) is z-scored on its own statistics over the massive particles of
+            # the train pools (the GeV column's frozen statistics would put it far off centre: the top at -4, the b
+            # at -8 at sqrt(s_hat) = 1 TeV, and the massless neutral value above every massive one); frozen with the
+            # data stats, so a fine-tune or a held-out process reads the parent's
+            if _dms_frozen is not None:
+                self._dimless_mass_stats = [float(_dms_frozen[0]), float(_dms_frozen[1])]
+            else:
+                from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
+                raw_lm = np.asarray(GLOBAL_PROPERTY_MATRIX)[:, PARTICLE_FEATURE_NAMES.index("log10_mass_gev")]
+                n1 = s1 = s2 = 0.0
+                for n in names:
+                    rec = store[("train", n)]
+                    t = np.asarray(rec["tokens"]).reshape(rec["momenta"].shape[:2])
+                    v = (raw_lm[t] - np.log10(rec["rs"])[:, None])[(raw_lm[t] >= MASS_MASSLESS_LOG10_THR) & (t > 0)]
+                    n1 += v.size; s1 += float(v.sum()); s2 += float((v.astype(np.float64) ** 2).sum())
+                mu = s1 / n1 if n1 else 0.0
+                sd = float(np.sqrt(max(s2 / n1 - mu ** 2, 0.0))) if n1 else 1.0
+                self._dimless_mass_stats = [mu, sd if sd > 1e-6 else 1.0]
+            LOGGER.info(f"dimensionless_inputs: log10(m / sqrt(s_hat)) over the massive train particles, mean "
+                        f"{self._dimless_mass_stats[0]:.3f}, std {self._dimless_mass_stats[1]:.3f}")
         if mom_div is None:
             train_mom = np.concatenate(
                 [store[("train", n)]["momenta"].reshape(-1, 4) for n in names], axis=0
@@ -1955,6 +1992,11 @@ class AmplitudeExperiment(BaseExperiment):
             # unit-std per column — matching the diagram-virtuality treatment. This is the
             # general form of the proven s-channel reson result.
             osh = np.concatenate(role_offshell, axis=0).astype(np.float64)
+            # dimensionless_inputs: osh is (s - M^2) / s_hat; log1p's unit, 1 GeV^2 above, becomes
+            # data.dimless_offshell_eps x s_hat (default 1e-6: 1 GeV^2 at sqrt(s_hat) = 1 TeV), so the near-pole
+            # region keeps the resolution it had in GeV^2 instead of collapsing onto 0
+            if _dimless:
+                osh = osh / float(self.cfg.data.get("dimless_offshell_eps", 1e-6))
             osh = np.sign(osh) * np.log1p(np.abs(osh))
             # the column stats are fitted on every role together, so they move with the val/test pools;
             # a run rebuilt on another pool (tools/rebuild_run.py) pins the run's own through
@@ -2154,6 +2196,8 @@ class AmplitudeExperiment(BaseExperiment):
                 # product is what misplaced the held-out levels, e.g. ZHH carries ZH's)
                 self._phys_logc = {k: 0.0 for k in self._phys_logc}
             self._phys_ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
+        if bool(self.cfg.data.get("target_physics_dim_only", False)):
+            self._phys_logc.setdefault(name, 0.0)     # no coupling product enters: a process beyond the table is fine
         assert name in self._phys_logc, f"target_physics_factor: no coupling product for {name}"
         ref = self.cfg.data.get("target_physics_dim_ref", "shat")
         if str(ref) == "shat":
@@ -2183,6 +2227,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
+                "dimless_mass_stats": getattr(self, "_dimless_mass_stats", None),
                 "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),
                 "target_physics_s0": float(self.cfg.data.get("target_physics_s0", 289.0)),
                 "target_physics_couplings": self.cfg.data.get("target_physics_couplings", None),
