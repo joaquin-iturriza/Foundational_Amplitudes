@@ -10,7 +10,7 @@ apply a model to it, for the continual-pretraining test (the user's call of 2026
   interp  weight interpolation (D31 item 1): theta(a) = (1 - a) theta_from + a theta_run, with theta_run the run's best
           checkpoint and theta_from another checkpoint of the same architecture (the finale), each as its validation
           scored it (the EMA average when EMA was on); every a of --alphas scored as eval does, on the run's data (an
-          add-W run: W+4g, W+5g and the finale's 28 monitors). Non-float entries come from the run's checkpoint.
+          add-W run: W+4g, W+5g and the finale's 28 monitors). Only parameters are mixed; buffers stay the run's.
 
     python tools/run_data_tools.py fisher --run-dir runs/tp3_finale/trial_0073 [--n-batches 64]
     python tools/run_data_tools.py eval --run-dir runs/tp3_finale/trial_0073 --weights runs/X/trial_Y/models/model_run0_best.pt.gz [...] --out f.json
@@ -107,13 +107,17 @@ def cmd_interp(a):
     names = [n for n, _ in exp.model.named_parameters()]
     sr, src_r = _ckpt_scored_state(_torch_load(wr, map_location=exp.device, weights_only=False), names)
     sf, src_f = _ckpt_scored_state(_torch_load(wf, map_location=exp.device, weights_only=False), names)
-    own = exp.model.state_dict()
-    miss = [k for k in own if k not in sr or k not in sf or tuple(sr[k].shape) != tuple(sf[k].shape)]
-    assert not miss, f"interp: entries missing or of different shape in the two checkpoints: {miss[:4]}"
+    # only the trained parameters are interpolated; buffers (the particle property table, which has grown since some
+    # checkpoints were written, normalisation constants) stay as build() set them from the run's own checkpoint
+    own = {k: v.detach().clone() for k, v in exp.model.state_dict().items()}
+    miss = [k for k in names if k not in sr or k not in sf or tuple(sr[k].shape) != tuple(sf[k].shape)
+            or tuple(sr[k].shape) != tuple(own[k].shape)]
+    assert not miss, f"interp: parameters missing or of different shape in the two checkpoints: {miss[:4]}"
     outs = []
     for al in a.alphas:
-        mix = {k: ((1 - al) * sf[k].to(own[k].dtype) + al * sr[k].to(own[k].dtype)) if own[k].is_floating_point()
-               else sr[k] for k in own}
+        mix = dict(own)
+        mix.update({k: (1 - al) * sf[k].to(own[k].device, own[k].dtype) + al * sr[k].to(own[k].device, own[k].dtype)
+                    for k in names})
         exp.model.load_state_dict(mix)
         exp.evaluate()
         outs.append({"alpha": al, "val_mse_prepd": _per_proc(exp)})
