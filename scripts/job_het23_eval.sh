@@ -13,6 +13,7 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 rc=0
 for OUT in "$@"; do
-    python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta_het23" "${OUT%/}/sigma_stage" || rc=1
+    OUT="${OUT%/}"     # one out dir per sweep: eval_delta tags by trial only, and sweeps share trial numbers
+    python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta_het23/$(basename "$(dirname "$OUT")")" "$OUT/sigma_stage" || rc=1
 done
 exit $rc

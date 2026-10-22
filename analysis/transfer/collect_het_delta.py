@@ -11,8 +11,10 @@ import numpy as np
 
 root = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.environ["SCRATCH"], "zz_delta_het")
 out, meta = {}, {}
-for d in sorted(glob.glob(os.path.join(root, "*__sigma_stage"))):
+for d in sorted(glob.glob(os.path.join(root, "*__sigma_stage")) + glob.glob(os.path.join(root, "*", "*__sigma_stage"))):
     key = os.path.basename(d)[: -len("__sigma_stage")]
+    if os.path.dirname(d) != root.rstrip("/"):        # nested <root>/<sweep>/<trial>__sigma_stage (job_het23_eval.sh)
+        key = os.path.basename(os.path.dirname(d)) + "__" + key
     try:
         with np.load(os.path.join(d, "preds_test.npz")) as z:
             t, p = z["raw_truth"].reshape(-1).astype(np.float64), z["raw_pred"].reshape(-1).astype(np.float64)
