@@ -87,11 +87,14 @@ for recipe in a.recipes:
     exp.proc_val_losses, exp.proc_val_losses_no_reg = {}, {}
     exp._init_regularization()
     with torch.no_grad():
-        hs, zs = [], []
+        hs, zs, ss = [], [], []
         for data in exp.val_loader:
-            y_pred, y, _, _, _ = exp._forward_lloca(data)
+            y_pred, y, _, sig, _ = exp._forward_lloca(data)
             hs.append(y_pred.reshape(-1).double().cpu()); zs.append(y.reshape(-1).double().cpu())
+            if sig is not None:                       # HETEROSC: the per-event sigma, in the parent's standardized units
+                ss.append(sig.reshape(-1).double().cpu())
     h, z = torch.cat(hs).numpy(), torch.cat(zs).numpy()
+    sig = torch.cat(ss).numpy() if ss else np.zeros(0)
     A = np.stack([np.ones_like(h), h], 1)
     coef = np.linalg.lstsq(A, z, rcond=None)[0]
     affine = float(np.mean((A @ coef - z) ** 2))
@@ -118,6 +121,10 @@ for recipe in a.recipes:
         rec.update({"mu_c": mu_c, "sigma_c": sd_c, "mse_logm2_real": mse, "mse_over_var": mse / float(np.var(t)),
                     "bias": float(np.mean(q - t)), "mse_after_offset": float(np.var(q - t)),
                     "corr": float(np.corrcoef(q, t)[0, 1]), "spread_ratio": float(np.std(q) / np.std(t))})
+        if len(sig) == len(q):                        # the sigma head's calibration on this probe: pulls in log|M|^2
+            pull = (q - t) / (sd_c * sig)
+            rec.update({"pull_std": float(np.std(pull)), "pull_mean": float(np.mean(pull)),
+                        "cover68": float(np.mean(np.abs(pull) < 1)), "cover95": float(np.mean(np.abs(pull) < 1.96))})
         lo, hi = float(min(t.min(), q.min())), float(max(t.max(), q.max()))
         e = np.linspace(lo, hi, 61)
         print("ZERO_SHOT_HIST " + json.dumps({
@@ -139,5 +146,7 @@ for recipe in a.recipes:
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
                             mu_sd=np.array([mu_p, sd_p]), logF=logF,
+                            sig=sig.astype(np.float32),     # raw, the parent's standardized units
+                            s=(sd_c * sig if (mu_c is not None and len(sig) == len(h)) else np.zeros(0)).astype(np.float32),
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)

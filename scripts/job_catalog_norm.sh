@@ -44,7 +44,7 @@ fi
 # eval: the held-out scoring only, from the run's best checkpoint (a run that blew up is reported at its best
 # checkpoint, CLAUDE.md; B diverged at step 8734 on 2026-10-22). zero_shot_parent.py reads models/model_run0_best.pt.
 if [ "$SMOKE" = eval ]; then
-    test -e "$OUT/models/model_run0_best.pt" || { echo "no best checkpoint in $OUT"; exit 1; }
+    ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 elif [ ! -e "$OUT/sigma_stage/models" ]; then
     test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
     python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
@@ -60,4 +60,9 @@ for p in r["processes"]:
 print(len(r["processes"]), "held-out recipes")
 PY
 P=("$R"/dc_*.yaml); [ "$SMOKE" = smoke ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
-python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED" "${P[@]}"
+# eval: the sigma-stage model when the run has one (trunk and mu frozen, so mu is the run's; its sigma is the calibrated
+# one, D70), into its own prediction dir
+PAR="$OUT"
+if [ "$SMOKE" = eval ] && ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
+mkdir -p "$PRED"
+python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" "${P[@]}"

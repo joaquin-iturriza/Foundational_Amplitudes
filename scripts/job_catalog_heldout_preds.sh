@@ -11,11 +11,13 @@
 # log|M|^2 with their training twin's statistics (--twins analysis/catalog_daniel/heldout_twins.json): the Delta plots
 # and the per-process MSE figure, raw and after the best affine map (the user, 2026-10-22). Predictions in
 # $SCRATCH/zz_catalog_heldout_preds/.
-#   site submit ccin2p3 FA scripts/job_catalog_heldout_preds.sh -- runs/dancat_het_pre/trial_0058
+#   site submit ccin2p3 FA scripts/job_catalog_heldout_preds.sh -- runs/dancat_het_pre/trial_0058 [out dir name]
+# The sigma head's calibration on the held-out: the parent's sigma_stage dir as the parent (mu frozen there, D70), into
+# its own out dir (... -- runs/dancat_het_pre/trial_0058/sigma_stage zz_catalog_heldout_preds_sigstage).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-P="$1"
+P="$1"; OUTN="${2:-zz_catalog_heldout_preds}"
 R="$SCRATCH/zz_catalog_heldout_recipes"; mkdir -p "$R"
 python - "$R" <<'PY'
 import sys, yaml
@@ -25,4 +27,4 @@ for p in r["processes"]:
 print(len(r["processes"]), "held-out recipes")
 PY
 python tools/zero_shot_parent.py --parent "$P" --twins analysis/catalog_daniel/heldout_twins.json \
-    --save-dir "$SCRATCH/zz_catalog_heldout_preds" "$R"/dc_*.yaml
+    --save-dir "$SCRATCH/$OUTN" "$R"/dc_*.yaml
