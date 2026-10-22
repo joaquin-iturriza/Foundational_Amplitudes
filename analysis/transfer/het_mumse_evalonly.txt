@@ -1,0 +1,2 @@
+# the last het_mumse job's 4 cells: trained, their eval_delta failed on the missing tokenizer (2026-10-22); eval only
+0.3 runs/tp3_synfte_uubar_Zggg_d8/trial_0150 runs/tp3_finfte_uubar_Zggg_d8/trial_0096 runs/tp3_ssoftfte_ee_ddbarg_d8/trial_0193 runs/tp3_sdeadconefte_ee_ttbarg_d8/trial_0176

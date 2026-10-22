@@ -23,6 +23,8 @@ cd "$PROJECT_DIR"
 SHARED=0; ROOT=het_delta; EVAL="$SCRATCH/zz_delta_het"; SEL=nll
 [ "$1" = --shared ] && { SHARED=1; ROOT=het_shared; EVAL="$SCRATCH/zz_delta_hetshared"; shift; }
 [ "$1" = --shared-mumse ] && { SHARED=1; ROOT=het_shared_mumse; EVAL="$SCRATCH/zz_delta_hetshared_mumse"; SEL=mu_mse; shift; }
+# --shared-mumse-clean: the same into a fresh root, for the 8 cells two duplicate jobs trained at once (2026-10-22)
+[ "$1" = --shared-mumse-clean ] && { SHARED=1; ROOT=het_shared_mumse_clean; EVAL="$SCRATCH/zz_delta_hetshared_mumse_clean"; SEL=mu_mse; shift; }
 shared_hps() {   # the probe of a cell's sweep name -> its HP overrides
     local ee="training.regularization_lambda=5.73461e-08 training.cosanneal_warmup_frac=0.05198803
               training.cosanneal_eta_min=1.353762e-09 ema=true training.ema_decay=0.992479 training.lr=0.002921688"

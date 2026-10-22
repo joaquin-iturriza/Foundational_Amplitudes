@@ -219,8 +219,11 @@ class BaseExperiment:
             for k in src._data_keys:
                 setattr(self, k, getattr(src, k))
             os.makedirs(self.cfg.run_dir, exist_ok=True)
-            shutil.copyfile(os.path.join(src.cfg.run_dir, "data_stats.json"),
-                            os.path.join(self.cfg.run_dir, "data_stats.json"))
+            # the files init_data writes into a run dir, which a rebuild of this stage reads (tools/eval_delta.py: the
+            # tokenizer; a run that skipped them failed there on 2026-10-22)
+            for f in ("data_stats.json", "particle_tokenizer.json"):
+                if os.path.exists(os.path.join(src.cfg.run_dir, f)):
+                    shutil.copyfile(os.path.join(src.cfg.run_dir, f), os.path.join(self.cfg.run_dir, f))
             LOGGER.info(f"Data reused from {src.cfg.run_dir} ({len(src._data_keys)} attributes), not reloaded")
         else:
             before = {k: id(v) for k, v in self.__dict__.items()}

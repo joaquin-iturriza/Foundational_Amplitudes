@@ -1,0 +1,3 @@
+# the 8 het_mumse cells (D85) that duplicate jobs trained at once on 2026-10-22, rerun into runs/het_shared_mumse_clean
+1.58 runs_from_lxplus/tp3_r9fte_uubar_Zgg_d8/trial_0048 runs/tp3_synfte_uubar_Zgg_d8/trial_0044 runs/tp3_finfte_uubar_Zgg_d8/trial_0036 runs/tp3_uu64fte_uubar_Zggg_d8/trial_0195
+1.49 runs/tp3_r2fte_uubar_Zggg_d8/trial_0182 runs/tp3_r3fte_uubar_Zggg_d8/trial_0122 runs/tp3_r4fte_uubar_Zggg_d8/trial_0027 runs/tp3_r5fte_uubar_Zggg_d8/trial_0006
