@@ -17,12 +17,19 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim or B}"; SMOKE="${2:-}"
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless or Ds0}"; SMOKE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 [ "$ARM" = A ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0)
 # Adim (2026-10-22): the mass-dimension factor (s0/s_hat)^(4-N) alone, no coupling product
 [ "$ARM" = Adim ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0 ++data.target_physics_dim_only=true)
+# the extrapolation round (the user, 2026-10-22): T = log|M|^2 - (4-N) log(Lambda^2), one shared standardization on top
+#   Bgev  Lambda = 1 GeV (B as run); Btev  Lambda = 1 TeV (a pure change of units, 1e6 GeV^2);
+#   Dless Lambda^2 = s_hat per event, s0 = 1 (|M|^2 s_hat^(N-4), dimensionless); Ds0 the same with s0 = 289 GeV^2 (Adim)
+DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
+[ "$ARM" = Btev ]  && NORM+=("${DIM[@]}" ++data.target_physics_dim_ref=1000000.0 ++data.target_physics_s0=1.0)
+[ "$ARM" = Dless ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0)
+[ "$ARM" = Ds0 ]   && NORM+=("${DIM[@]}" ++data.target_physics_s0=289.0)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
@@ -53,6 +60,25 @@ fi
 if [ "$SMOKE" = short ]; then
     OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"
     EXTRA=(training.validate_frac=0.02 training.iterations=4126 ++data.memmap=false ++data.train_subsample=10000
+           ++data.eval_subsample=200 ++training.heterosc_sigma_stage_steps=150
+           ++training.heterosc_sigma_stage_validations=5 evaluation.train_subsample=2000)
+fi
+# extrap (the user, 2026-10-22, "send those jobs now too"): train on the 236 2->2 training processes only, all 1e5 of
+# their train events (1e4 would give 720 steps over 5 epochs), the short runs' 4126 steps and settings otherwise;
+# read on the 139 held-out, the 2->3 ones being the multiplicity extrapolation; runs/catalog_norm_extrap/<arm>. With 2->2
+# only in training (4-N = 0 on every training event), Btev trains on Bgev's targets and Ds0 on Dless's: each pair is one
+# network, read back differently at N = 5 (by (4-N) log 1e6 and (4-N) log 289), so only Bgev and Dless are trained
+if [ "$SMOKE" = extrap ]; then
+    OUT="$PROJECT_DIR/runs/catalog_norm_extrap/$ARM"; PRED="$SCRATCH/zz_catalog_norm_extrap_$ARM"
+    SUB="$SCRATCH/zz_catalog_train_2to2_${SLURM_JOB_ID}.yaml"
+    python - "$SUB" <<'PY'
+import json, sys, yaml
+m = {"dc_" + p["folder"]: p for p in json.load(open("analysis/catalog_daniel/classes_default.json"))["processes"]}
+r = yaml.safe_load(open("recipes/catalog_daniel_train.yaml"))
+r["processes"] = [p for p in r["processes"] if len(m[p["name"]]["process"].replace(">", " ").split()) == 4]
+yaml.safe_dump(r, open(sys.argv[1], "w")); print(len(r["processes"]), "2->2 training processes")
+PY
+    EXTRA=(training.validate_frac=0.02 training.iterations=4126 ++data.memmap=false data.processes_file="$SUB"
            ++data.eval_subsample=200 ++training.heterosc_sigma_stage_steps=150
            ++training.heterosc_sigma_stage_validations=5 evaluation.train_subsample=2000)
 fi

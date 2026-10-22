@@ -2081,9 +2081,15 @@ class AmplitudeExperiment(BaseExperiment):
                 self._phys_logc = {k: 0.0 for k in self._phys_logc}
             self._phys_ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
         assert name in self._phys_logc, f"target_physics_factor: no coupling product for {name}"
-        q = mom_phys[:, 0].astype(np.float64) + mom_phys[:, 1].astype(np.float64)
-        shat = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-        return -((4 - mom_phys.shape[1]) * (np.log(shat) - self._phys_ls0) + self._phys_logc[name])
+        ref = self.cfg.data.get("target_physics_dim_ref", "shat")
+        if str(ref) == "shat":
+            q = mom_phys[:, 0].astype(np.float64) + mom_phys[:, 1].astype(np.float64)
+            lref = np.log(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+        else:
+            # a fixed reference scale (GeV^2) instead of the event's s_hat: a change of units, e.g. 1e6 = |M|^2 in TeV
+            # (2026-10-22, the extrapolation round: B in TeV against B in GeV)
+            lref = np.full(mom_phys.shape[0], np.log(float(ref)))
+        return -((4 - mom_phys.shape[1]) * (lref - self._phys_ls0) + self._phys_logc[name])
 
     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
@@ -2102,6 +2108,8 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
+                "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),
+                "target_physics_s0": float(self.cfg.data.get("target_physics_s0", 289.0)),
                 "tchannel_norm": getattr(self, "_tch_norm", None),
                 "offshell_stats": getattr(self, "_offshell_stats", None),
                 "prepd_mean": [float(x) for x in self.prepd_mean],
