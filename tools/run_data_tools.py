@@ -49,19 +49,23 @@ def build(run_dir, weights):
             cfg.fine_tune = {}
         cfg.fine_tune.pretrained_path = weights
         cfg.fine_tune.target_stats = "own"      # the run's own pools give the run's own statistics
+        # the weights are loaded as the run's validation scored them (_ckpt_scored_state: the EMA average when EMA was
+        # on), so no EMA is built here: init_model would build a fresh one over the random init, and evaluate() would
+        # score that shadow, never updated, instead of the loaded weights
+        cfg.ema = False
         if "ewc" in cfg.fine_tune and cfg.fine_tune.ewc is not None:
             cfg.fine_tune.ewc.enabled = False
     exp = AmplitudeExperiment(cfg)
     exp.warm_start = False
     exp.device = get_device()
     exp.dtype = torch.float32
-    exp.ema = None
     exp.init_physics()
     exp.init_data()
     exp._init_dataloader()
     exp._init_loss()
     exp._init_regularization()
     exp.init_model()
+    assert exp.ema is None, "run_data_tools: an EMA was built over the loaded weights"
     return exp
 
 
