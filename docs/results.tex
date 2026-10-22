@@ -666,6 +666,35 @@ momenta alone carries most of the per-event structure of the multi-gluon familie
 spread in $n$; on the catalog the diagram propagators carry the most. Their use is as a per-event input to a model with
 one shared standardization, which has nothing fixed outside the network for a new process.
 
+\paragraph{Extrapolation in multiplicity: the units of the target (2026-10-22, D88).} Every target of the form
+$T=\log|\mathcal M|^2-(4-N)\log\Lambda^2$ with one shared standardization is well defined; they differ in the
+reference scale $\Lambda$: B as run is $\Lambda=1$\,GeV (an arbitrary unit: in TeV a $2\to3$ process moves by
+$\log10^6=13.8$ against a $2\to2$), A's $s_0$ is a $\Lambda$ fitted on the catalog (the same as a mean affine in $N$),
+and $\Lambda^2=\hat s$ per event gives the dimensionless $|\mathcal M|^2\hat s^{N-4}$, the only member that depends on
+no unit and no fit. The test: hp58's configuration trained on the $236$ $2\to2$ training processes only ($10^5$ events
+each, $4126$ steps, the short runs' settings otherwise; \code{scripts/job\_catalog\_norm.sh Bgev|Dless extrap}), read on
+the held-out $2\to3$ processes, a multiplicity it never saw. With $4-N=0$ on every training event, B in TeV trains on B
+in GeV's targets and the $s_0=289$ variant on the dimensionless one's, so two networks give four readings, differing
+only by a constant at $N=5$. Median MSE of $\log|\mathcal M|^2$ per process (level and shape: squared mean error and
+error variance):
+\begin{center}
+\begin{tabular}{lcccc}
+ & B, GeV & B, TeV & dimensionless & $s_0=289$\,GeV$^2$ \\ \hline
+$2\to3$, $42$ new & $83$ ($82$, $1.2$) & $24$ ($23$, $1.2$) & $11$ ($10$, $1.5$) & $8.6$ ($7.3$, $1.5$) \\
+$2\to3$, $79$ relabels & $28$ ($22$, $2.8$) & $89$ ($83$, $2.8$) & $43$ ($40$, $3.9$) & $7.6$ ($3.7$, $3.9$) \\
+$2\to2$, $17$ relabels & $0.013$ & $0.013$ & $0.012$ & $0.012$ \\
+\end{tabular}
+\end{center}
+The unit choice moves B's error on the new multiplicity by $3.5\times$ either way, so B extrapolates by accident of units.
+The dimensionless target removes that arbitrariness but does not place the level: its $2\to3$ predictions are a median
+$4.8$ too low ($10$ to $90\%$: $0.7$ to $10$); a linear fit of that offset on the leading coupling product leaves $3.9$ of
+its $23$ (median squared), so the missing level is mostly the coupling cost of the extra particle, which a network that
+saw only $2\to2$ cannot know. The $s_0=289$ reading is best, but $s_0$ was fitted on the full catalog, $2\to3$ included,
+so it is not data-free here. The shape does not transfer from $2\to2$ either ($1.2$ to $3.9$ after the level, $0.9$ to
+$3.4$ after the oracle rescale and shift, against $0.14$ for A trained with $2\to3$). Dimensional analysis fixes the units,
+not the magnitude: a sampling- and unit-agnostic target is necessary for extrapolating in multiplicity but not sufficient,
+and a test from $2\to2$ alone is too far a step to rank targets on shape.
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it; pulls $(q-t)/\sigma$ in
 $\log|\mathcal M|^2$, the median over processes of each process's pull standard deviation and of its fraction of events
