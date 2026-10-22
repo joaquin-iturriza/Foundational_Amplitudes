@@ -5970,18 +5970,32 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22).} For the user (D75, fig:het23): the other $24$ $2\to3$/$2\to4$ cells at shared het
-    HPs (the scratch sweeps' points) or swept each; the het trial should write its per-event test predictions after
-    its $\sigma$ stage so no evaluation job follows. Design under discussion with the user (fig:norm\_factor measured): how the catalog is normalized so
-    a new process needs no data of its own; per-process statistics depend on how a pool was sampled (the user), so the
-    options are a global standardization (B) or one after dividing each event by an analytic factor
-    $\hat s^{4-N}C_p$ with $C_p$ the leading diagram's coupling product (A; \code{diagram\_couplings.py}); the statistics
-    map $g$ is on hold. Held (D78):
-    \code{dancat\_ext} and \code{catalog\_global}. For the user: which zero-shot fix to design ((a) eikonal/dipole
-    factors, (b) coupling powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test);
-    feedback on the D66 designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on CC from my tests,
-    not deleted (CLAUDE.md: nothing outside the command that made it): \code{zz\_memprof}, \code{zz\_memmap\_*},
-    \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, mmap caches \code{2b98\ldots}, \code{98f8\ldots}.
+  \item \textbf{Open (2026-10-22, 06:10).} Running on CC, item \code{catalog\_norm} (D83, the user: ``send the A
+    against B''): \code{scripts/job\_catalog\_norm.sh} A (FA-ccin2p3-afc528f5) and B (FA-ccin2p3-2b57217a), hp58's
+    config and HPs, 50 validations, memmap cache on the node's \code{/tmp} (\code{data.memmap\_dir}), then
+    \code{zero\_shot\_parent.py} on the 139 held-out into \code{\$SCRATCH/zz\_catalog\_norm\_\{A,B\}/}; about $5.5$\,h
+    each. A's factor (\code{data.target\_physics\_factor}, $s_0=289$\,GeV$^2$) is implemented on both data paths
+    (\code{experiment.\_physics\_logF}; \code{data\_mmap.py} stores \code{amp\_factor.npy}); the smoke test on the memmap
+    path logged ``target\_physics\_factor ON (memmap)'' (the SLURM out file, not \code{out\_0.log}). The first A and B
+    attempts failed building the cache on \code{/sps/lpnhe}, which is full ($511$ of $512$\,G; $557$\,G under my
+    directory; old mmap caches \code{98f8\ldots}, \code{9ff4\ldots}, \code{b020\ldots} $25$\,G each and \code{2b98\ldots}
+    $5.5$\,G left, not deleted: the user's call); \code{sweep/prune.py} (D19) frees $4.6$\,G. Next when they end:
+    collect the held-out npz (\code{collect\_heldout\_preds.py} pattern; \code{logF} saved), score on its own (MSE of
+    $\log|\mathcal M|^2$ per process, the user's held-out figure for A and B next to hp58 with $g$), write up, send.
+    Item \code{het\_shared} (D82, the user: ``yes, use the shared HPs''): 6 CC jobs of 4 cells
+    (\code{job\_het\_delta.sh --shared}, \code{analysis/transfer/het\_shared\_jobs.txt}); one (FA-ccin2p3-4a5196bd, the
+    $r5$ to $r8$ fine-tunes of $u\bar u\to Zgg$) failed writing a checkpoint on the full disk: rerun it once space
+    allows; then \code{collect\_het\_delta.py \$SCRATCH/zz\_delta\_hetshared}, compare with MSE and the D47 het cells,
+    write up. Normalization exploration (CPU, D83; fig:norm\_factor, fig:norm\_explore): continue from
+    \code{norm\_explore3.py} (the diagrams as process descriptors place B's level at $0.045$ on the $43$); open ideas:
+    IDEN and colour in A's factor (A as launched has neither), the per-event singular scales. For the user: the het
+    trial should write its per-event test predictions after its $\sigma$ stage; \code{site} matches a launch's runs by
+    item and time, so a report can name another launch's runs. Held (D78): \code{dancat\_ext} and
+    \code{catalog\_global}. For the user: which zero-shot fix to design ((a) eikonal/dipole factors, (b) coupling
+    powers and mass dimension in the target statistics, (c) Jonas's matched $Z{+}ng$ test); feedback on the D66
+    designs. Not measured: the catalog $\sigma$ stage's test calibration. Left on CC from my tests, not deleted:
+    \code{zz\_memprof}, \code{zz\_memmap\_*}, \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*},
+    \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*} temp dirs ($417$, $1$\,M).
   \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
     \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
     catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
