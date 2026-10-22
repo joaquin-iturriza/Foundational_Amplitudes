@@ -13,7 +13,7 @@ out = {}
 for f in sorted(glob.glob(os.path.join(root, "*.npz"))):
     probe = os.path.basename(f)[:-4]
     with np.load(f) as z:
-        for k in ("t", "q_aff", "q_own", "q"):
+        for k in ("t", "q_aff", "q_own", "q", "h", "mu_sd"):
             if z[k].size:
                 out[f"{probe}__{k}"] = z[k].astype(np.float32)
 print(len({k.split("__")[0] for k in out}), "probes", file=sys.stderr)
