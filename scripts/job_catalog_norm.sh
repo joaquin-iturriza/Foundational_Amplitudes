@@ -22,6 +22,11 @@ SRC=runs/dancat_het_pre/trial_0058
 NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 [ "$ARM" = A ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0)
 EXTRA=(training.validate_frac=0.02)
+# the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
+# it there); built by this job, removed when it exits
+MMAP="${TMPDIR:-/tmp}/fa_mmap_${SLURM_JOB_ID}"; mkdir -p "$MMAP"; trap 'rm -rf "$MMAP"' EXIT
+df -h "$MMAP" | tail -1
+NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
 R="$SCRATCH/zz_catalog_heldout_recipes"; mkdir -p "$R"
 if [ -n "$SMOKE" ]; then

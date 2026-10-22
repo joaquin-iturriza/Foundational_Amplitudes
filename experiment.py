@@ -1686,30 +1686,19 @@ class AmplitudeExperiment(BaseExperiment):
         #     read with the same shared standardization. Kept in rec["amp_factor"] with any propagator factor and divided
         #     out of the raw predictions at evaluation, like target_propagators. ---
         if _phys_on:
-            cp = os.path.expandvars(str(self.cfg.data.get(
-                "target_physics_couplings", "analysis/catalog_daniel/data/diagram_couplings.json")))
-            cp = cp if os.path.isabs(cp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), cp)
-            logc = {k: max(v["logc2"]) for k, v in json.load(open(cp)).items()}
-            ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
-            miss = [n for n in names if n not in logc]
-            assert not miss, f"target_physics_factor: no coupling product for {miss[:5]} ({len(miss)}) in {cp}"
             spans = []
             for name in names:
                 for role in roles:
                     if (role, name) not in store:
                         continue
                     rec = store[(role, name)]
-                    pp = rec["momenta"].astype(np.float64) * mom_div                # (N,P,4) physical
-                    q = pp[:, 0] + pp[:, 1]
-                    shat = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                    k = 4 - pp.shape[1]
-                    logF = -(k * (np.log(shat) - ls0) + logc[name])
+                    logF = self._physics_logF(name, rec["momenta"].astype(np.float64) * mom_div)
                     F = np.exp(logF).reshape(rec["raw_amp"].shape)
                     if role == "train":
                         spans.append(float(np.mean(logF)))
                     rec["amp_factor"] = rec.get("amp_factor", np.ones_like(rec["raw_amp"])) * F
                     rec["raw_amp"] = rec["raw_amp"] * F
-            LOGGER.info(f"target_physics_factor ON: {len(names)} processes, s0 = {np.exp(ls0):.4g} GeV^2, "
+            LOGGER.info(f"target_physics_factor ON: {len(names)} processes, s0 = {np.exp(self._phys_ls0):.4g} GeV^2, "
                         f"mean log F over the train pools: median {np.median(spans):.3g}, "
                         f"5-95% {np.percentile(spans, 5):.3g} to {np.percentile(spans, 95):.3g}")
         if train_keep is not None:
@@ -2071,6 +2060,22 @@ class AmplitudeExperiment(BaseExperiment):
                             f"parent's scale, the rest fitted here")
         self._offshell_stats = [mu.tolist(), sd.tolist()]
         return mu, sd
+
+    def _physics_logF(self, name, mom_phys):
+        """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p, s_hat
+        = (p1 + p2)^2 of the two incoming momenta (mom_phys: (N, P, 4) in GeV, any frame), N the particle count, C_p
+        the leading tree diagram's coupling product (data.target_physics_couplings). One definition for the in-memory
+        and the memory-mapped path."""
+        if not hasattr(self, "_phys_logc"):
+            cp = os.path.expandvars(str(self.cfg.data.get(
+                "target_physics_couplings", "analysis/catalog_daniel/data/diagram_couplings.json")))
+            cp = cp if os.path.isabs(cp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), cp)
+            self._phys_logc = {k: max(v["logc2"]) for k, v in json.load(open(cp)).items()}
+            self._phys_ls0 = float(np.log(float(self.cfg.data.get("target_physics_s0", 289.0))))
+        assert name in self._phys_logc, f"target_physics_factor: no coupling product for {name}"
+        q = mom_phys[:, 0].astype(np.float64) + mom_phys[:, 1].astype(np.float64)
+        shat = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+        return -((4 - mom_phys.shape[1]) * (np.log(shat) - self._phys_ls0) + self._phys_logc[name])
 
     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""

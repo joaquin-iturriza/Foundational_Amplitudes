@@ -17,7 +17,8 @@ from other inputs is never read. A cache hit restores the torch RNG state the bu
 draws what it would have drawn after the in-memory path.
 
 Not on this path (asserted): data.target_propagators, training.sign_head, data.resonance_per_event,
-data.phase_space_on_pool.
+data.phase_space_on_pool. data.target_physics_factor is: the factor multiplies |M|^2 as each pool loads and is kept
+per event in amp_factor.npy, in the final order, so the evaluation divides it out as on the in-memory path.
 """
 import fcntl
 import hashlib
@@ -309,7 +310,8 @@ def init_data_recipes_mmap(exp, c):
     for k in ("target_propagators", "resonance_per_event"):
         assert not bool(cfg.data.get(k, False)), f"data.memmap: data.{k} is not implemented on the memmap path"
     assert not bool(cfg.training.get("sign_head", False)), "data.memmap: training.sign_head is not implemented"
-    exp._target_factor_on = False
+    phys_on = bool(cfg.data.get("target_physics_factor", False))
+    exp._target_factor_on = phys_on
     exp._sign_head = False
 
     _porder = str(cfg.data.get("particle_order", "none"))
@@ -340,6 +342,8 @@ def init_data_recipes_mmap(exp, c):
         "signedlog_quantile": exp._signedlog_quantile(),
         "shared_standardization": bool(cfg.data.get("shared_standardization", False)),
         "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
+        "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),
+                                   str(cfg.data.get("target_physics_couplings", "default"))] if phys_on else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
@@ -413,6 +417,9 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     # ---- pass 2: load, tokenize, boost + augment (the torch RNG draws in the in-memory order), write ----
     raw_amp = {r: fmt.open_memmap(os.path.join(d, f"stage_amp_{r}.npy"), "w+", np.float64, (n_role[r], 1))
                for r in roles}
+    phys_on = bool(exp.cfg.data.get("target_physics_factor", False))
+    fac = ({r: fmt.open_memmap(os.path.join(d, f"stage_factor_{r}.npy"), "w+", np.float64, (n_role[r], 1))
+            for r in roles} if phys_on else None)
     reg, slot_pdgs, npart = [], {}, {}
     pbase = ebase = 0
     seg = {}                                         # (role, name) -> (particle offset, event offset in the role, N, P)
@@ -447,6 +454,10 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             assert toks.min() >= np.iinfo(np.int16).min and toks.max() <= np.iinfo(np.int16).max
             particles[pbase:pbase + Nn * P] = mom.reshape(Nn * P, 4)
             tokens[pbase:pbase + Nn * P] = toks
+            if phys_on:      # data.target_physics_factor: s_hat is boost invariant, so the lab momenta serve
+                F_ev = np.exp(exp._physics_logF(name, parts.reshape(len(parts), n_particles, 4))).reshape(-1, 1)
+                amplitudes = amplitudes * F_ev
+                fac[role][er:er + Nn] = F_ev
             raw_amp[role][er:er + Nn] = amplitudes
             seg[(role, name)] = (pbase, er, Nn, P)
             npart[name] = int(P)
@@ -495,6 +506,7 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     F = order_rows.shape[1]
     offsets = fmt.open_memmap(os.path.join(d, "offsets.npy"), "w+", np.int64, (N, 2))
     amp_out = fmt.open_memmap(os.path.join(d, "amplitudes.npy"), "w+", np.float32, (N, 1))
+    fac_out = fmt.open_memmap(os.path.join(d, "amp_factor.npy"), "w+", np.float64, (N, 1)) if phys_on else None
     pid_out = fmt.open_memmap(os.path.join(d, "process_ids.npy"), "w+", np.int32, (N,))
     order_out = fmt.open_memmap(os.path.join(d, "order_labels.npy"), "w+", np.float32, (N, F))
     n_pdg = len(exp._internal_mass_pdgs)
@@ -551,6 +563,8 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             o = slice(row0 + i, row0 + i + len(src))
             offsets[o] = np.stack([start, start + p_np[p]], axis=1)
             amp_out[o] = np.asarray(st_amp[src]).astype(np.float32)
+            if phys_on:
+                fac_out[o] = np.asarray(fac[role][src])
             pid_out[o] = p.astype(np.int32)
             order_out[o] = order_rows[p]
             if want_offshell:
@@ -563,6 +577,14 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     del raw_amp
     for r in roles:
         os.remove(os.path.join(d, f"stage_amp_{r}.npy"))
+    if phys_on:
+        fac_out.flush()
+        lf = np.log(np.asarray(fac["train"]).reshape(-1))
+        LOGGER.info(f"target_physics_factor ON (memmap): {len(names)} processes, mean log F over the train events "
+                    f"{lf.mean():.3g}, 5-95% {np.percentile(lf, 5):.3g} to {np.percentile(lf, 95):.3g}")
+        del fac
+        for r in roles:
+            os.remove(os.path.join(d, f"stage_factor_{r}.npy"))
 
     offshell_stats = None
     if want_offshell:
@@ -629,7 +651,10 @@ def _apply(exp, c, d, meta, built):
     exp.all_amplitudes = _open(d, "amplitudes")
     exp.all_process_ids = _open(d, "process_ids")
     exp.all_order_labels = _open(d, "order_labels")
-    exp.all_amp_factor = None
+    exp.all_amp_factor = (np.asarray(_open(d, "amp_factor"))
+                          if os.path.exists(os.path.join(d, "amp_factor.npy")) else None)
+    assert (exp.all_amp_factor is not None) == bool(cfg.data.get("target_physics_factor", False)), \
+        "data.memmap: the cache's amp_factor does not match data.target_physics_factor"
     exp._role_perm = {r: np.load(os.path.join(d, f"perm_{r}.npy"), mmap_mode="r") for r in roles}
     exp.n_order_features = int(meta["n_order_features"])
     exp.N_events = int(exp.offsets.shape[0])
