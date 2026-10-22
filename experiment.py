@@ -2184,7 +2184,8 @@ class AmplitudeExperiment(BaseExperiment):
         return mu, sd
 
     def _physics_logF(self, name, mom_phys):
-        """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p, s_hat
+        """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p (s_hat, a
+        fixed reference, or with target_physics_dim_ref=pairs the geometric mean of the 2 p_i.p_j), s_hat
         = (p1 + p2)^2 of the two incoming momenta (mom_phys: (N, P, 4) in GeV, any frame), N the particle count, C_p
         the leading tree diagram's coupling product (data.target_physics_couplings). One definition for the in-memory
         and the memory-mapped path."""
@@ -2205,6 +2206,15 @@ class AmplitudeExperiment(BaseExperiment):
         if str(ref) == "shat":
             q = mom_phys[:, 0].astype(np.float64) + mom_phys[:, 1].astype(np.float64)
             lref = np.log(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+        elif str(ref) == "pairs":
+            # the event's own scale (2026-10-22, the dimensionless path): log Lambda^2 = the mean over all pairs of
+            # external particles of log(2 p_i.p_j), so a soft or collinear particle lowers it; unit-free like s_hat,
+            # needs no fit and no knowledge of the cuts (a fixed s0 absorbs the typical emission scale only while
+            # every process shares one set of cuts)
+            pp = mom_phys.astype(np.float64)
+            g = np.einsum("npc,nqc->npq", pp * np.array([1.0, -1.0, -1.0, -1.0]), pp)        # Minkowski p_i.p_j
+            iu = np.triu_indices(pp.shape[1], 1)
+            lref = np.log(np.clip(2.0 * np.abs(g[:, iu[0], iu[1]]), 1e-12, None)).mean(axis=1)
         else:
             # a fixed reference scale (GeV^2) instead of the event's s_hat: a change of units, e.g. 1e6 = |M|^2 in TeV
             # (2026-10-22, the extrapolation round: B in TeV against B in GeV)

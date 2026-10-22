@@ -17,7 +17,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn or Ds0}"; SMOKE="${2:-}"
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, Dpair or Ds0}"; SMOKE="${2:-}"
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -36,6 +36,8 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # DlessIn (the user, 2026-10-22, the dimensionless path): Dless's target with dimensionless inputs too
 # (data.dimensionless_inputs: momenta per event / sqrt(s_hat), masses as log10(m / sqrt(s_hat)), off-shellness / s_hat);
 # in memory, the only path that implements it
+# Dpair (2026-10-22): the event's own scale, Lambda^2 = the geometric mean of the pair invariants 2 p_i.p_j, s0 = 1
+[ "$ARM" = Dpair ] && NORM+=("${DIM[@]}" ++data.target_physics_dim_ref=pairs ++data.target_physics_s0=1.0)
 [ "$ARM" = DlessIn ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
