@@ -356,7 +356,7 @@ generated with its MadEvent setup), the user's heteroscedastic loss ranked on th
 embedding at width $64$ on top of the usual inputs, $32$k steps at batch $16384$ ($12$ events per process per step,
 $3.9$ passes), memory-mapped data at $40$\,GB, GP DyHPO over $2000$ candidates, $8$ trials in waves $3+3+2$ on CC
 ($1.8$ to $5.1$\,h each, $37$ GPU-h in all; Fig.~\ref{fig:dancat_het_pre}, \code{analysis/catalog\_daniel/dancat\_het\_pre.py}).
-Best: hp58, validation NLL $-4.10$ (lr $8.9\times10^{-3}$, EMA on with decay $0.94$, warmup $0.16$, L2
+Best, the per-process pretraining (hp58): validation NLL $-4.10$ (lr $8.9\times10^{-3}$, EMA on with decay $0.94$, warmup $0.16$, L2
 $5\times10^{-7}$), the MSE of $\mu$ on the standardized $\log|\mathcal M|^2$ $3.96\times10^{-3}$ on validation and
 $3.97\times10^{-3}$ on test; the next, hp1733 at the same lr, $-4.07$ and $4.0\times10^{-3}$. The ranking follows the lr:
 the two at $8.9\times10^{-3}$, the top of the window $[10^{-3},9\times10^{-3}]$, lead; $6.9$ and $7.2\times10^{-3}$ reach
@@ -423,9 +423,9 @@ $43$ that are not (zero-shot proper).}
 
 \paragraph{Predicting a process's normalization from the process (2026-10-22, D81).} A model normalized per process has
 no prediction in $\log|\mathcal M|^2$ for a process without data: it needs that process's mean $\mu_p$ and spread
-$\sigma_p$ of $\log|\mathcal M|^2$. The design agreed (D81, design A): a map $g$ from the process alone to
-$(\hat\mu_p,\hat\sigma_p)$, first fitted on the training processes' measured statistics, then used to normalize the
-training (each training process by $g$ fitted without its relabelling class, so the model learns to correct $g$'s
+$\sigma_p$ of $\log|\mathcal M|^2$. The design agreed (D81, the statistics-predictor design): a map from the process alone to
+$(\hat\mu_p,\hat\sigma_p)$, the \emph{statistics predictor}, first fitted on the training processes' measured statistics, then used to normalize the
+training (each training process by the predictor fitted without its relabelling class, so the model learns to correct its
 errors as it will have to on a new process), with a physics skeleton. Features, no momenta
 (\code{analysis/catalog\_daniel/stats\_net.py}): the particle count $N$ (at fixed $\sqrt s$ the mass dimension $8-2N$
 of $|\mathcal M|^2$ makes the level linear in $N$), the amplitude's coupling powers, the counts of each kind of
@@ -444,22 +444,22 @@ residuals $0.015$ ($90\%$ quantile $124$, $83$, $6.1$, $1.4$). On the $43$ held-
 process: $45$, $31$, $0.76$, $0.32$. Spread ratio, $10$ to $90\%$ of processes: $0.61$ to $2.49$ for one spread (both
 baselines), $0.69$ to $1.42$ linear, $0.88$ to $1.24$ with the trees. Cross-fitted on the training processes, a
 relabelling class out of the fit together: $3.0$, $1.7$, $0.46$, $0.064$. The $96$ relabels have exact twins in
-training, so their numbers measure a lookup; the $43$ and the cross-fit are the test. Every choice in $g$ (features,
+training, so their numbers measure a lookup; the $43$ and the cross-fit are the test. Every choice in the predictor (features,
 the trees' $800$ rounds of depth $3$ at rate $0.03$) is made on the cross-fit alone, never on the held-out processes;
 the model's own particle table pooled per side and the number of Feynman diagrams as features lower hp58's held-out
 MSE on its own ($1.27$ to $0.89$ on the $43$) but raise the cross-fit level error ($0.077$ to $0.12$), so they are not
 used (\code{stats\_net.py --props --ndiag}).
 
-hp58 read with $g$'s statistics, $\hat\mu+\hat\sigma h$ with $h$ its output, is a prediction on its own (a zero-shot on the $43$; the $96$ relabel a training process): nothing from
+The per-process pretraining (hp58) read with the predictor's statistics, $\hat\mu+\hat\sigma h$ with $h$ its output, is a prediction on its own (a zero-shot on the $43$; the $96$ relabel a training process): nothing from
 the held-out process's data (\code{job\_catalog\_heldout\_preds.sh}, \code{heldout\_delta.py};
 Figs.~\ref{fig:heldout_delta}, \ref{fig:heldout_dist} and \ref{fig:heldout_mse}). Median over processes of MSE$(\log|\mathcal M|^2)$ on the
 $43$: $1.27$ ($10$ to $90\%$: $0.10$ to $4.1$), against $0.46$ with the process's own train mean and spread (two
 numbers from its data, none fitted to the predictions) and $0.080$ after the best rescale and shift; on the $96$
 relabels $0.12$, $0.0091$, $0.0055$. The median $|\Delta|$ per process on the $43$: $0.69$, $0.37$, $0.14$. The worst
-on its own are $gg\to b\bar tW^+$ and its conjugate ($46$ and $43$; $g$ places the mean about $5$ too low) and $s\bar s\to
-d\bar uW^+$ and its conjugate ($14$; $g$'s mean about $4$ too high). So $g$'s level error, not the shape of hp58's
-prediction, is most of the gap on its own; the rescale-and-shift number bounds what a perfect $g$ could reach with this
-model. Not run: a pretraining normalized by $g$.
+on its own are $gg\to b\bar tW^+$ and its conjugate ($46$ and $43$; the predictor places the mean about $5$ too low) and $s\bar s\to
+d\bar uW^+$ and its conjugate ($14$; its mean about $4$ too high). So the predictor's level error, not the shape of hp58's
+prediction, is most of the gap on its own; the rescale-and-shift number bounds what a perfect predictor could reach with this
+model. Not run: a pretraining normalized by the predictor.
 
 \begin{figure}[H]
 \centering
@@ -482,7 +482,7 @@ a spread ratio $\hat\sigma/\sigma$. The two baselines share one spread, so their
 \pnl{../analysis/catalog_daniel/figs/heldout_delta_13.pdf}
 \caption{$\Delta$ of hp58 on the held-out processes, one panel per test group (in the order of
 Fig.~\ref{fig:heldout_mse}) showing its median process by MSE on its own: the $|\Delta|$ density per unit
-$\log_{10}|\Delta|$ (as the ladder's $\Delta$ plots), on its own with the statistics from $g$ and after the best rescale
+$\log_{10}|\Delta|$ (as the ladder's $\Delta$ plots), on its own with the statistics from the predictor and after the best rescale
 and shift (an oracle: fitted on the test events' truth).}
 \label{fig:heldout_delta}
 \end{figure}
@@ -498,7 +498,7 @@ and shift (an oracle: fitted on the test events' truth).}
 \widerow{\pnl{../analysis/catalog_daniel/figs/heldout_dist_11.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/heldout_dist_12.pdf}} \\[1ex]
 \pnl{../analysis/catalog_daniel/figs/heldout_dist_13.pdf}
 \caption{The distribution of $\log|\mathcal M|^2$ over the test events of the processes of
-Fig.~\ref{fig:heldout_delta}: the truth (grey) against hp58's prediction on its own with the statistics from $g$ and
+Fig.~\ref{fig:heldout_delta}: the truth (grey) against hp58's prediction on its own with the statistics from the predictor and
 after the best rescale and shift (an oracle: fitted on the test events' truth).}
 \label{fig:heldout_dist}
 \end{figure}
@@ -508,7 +508,7 @@ after the best rescale and shift (an oracle: fitted on the test events' truth).}
 \includegraphics[width=\textwidth]{../analysis/catalog_daniel/figs/heldout_mse_interpolation.pdf} \\[1ex]
 \includegraphics[width=\textwidth]{../analysis/catalog_daniel/figs/heldout_mse_extrapolation.pdf}
 \caption{The held-out figure of arXiv:2606.23791 for hp58, its panels and group order: MSE$(\log|\mathcal M|^2)$ per
-held-out process, on its own (statistics from $g$) and after the best rescale and shift, each group ordered from best to
+held-out process, on its own (statistics from the predictor) and after the best rescale and shift, each group ordered from best to
 worst on its own. As there, the $cb$, $\bar c\bar b$ group is drawn with the interpolation groups (the split file lists
 it as extrapolation).}
 \label{fig:heldout_mse}
@@ -528,7 +528,7 @@ training processes: $5.4$ for $\log|\mathcal M|^2$, $3.8$ after $C_p$, $4.5$ aft
 ($\sqrt{s_0}=17$\,GeV; $4.2$ at $\sqrt{s_0}=1$\,TeV), against a median spread within a process of $2.1$ ($2.3$ after
 the factor). On the $43$ new held-out processes, the level error $(m_p-M)^2/\sigma_p^2$ a network would make if it
 learned no level at all: median $47$ for $\log|\mathcal M|^2$, $18$, $15$, and $4.8$ with both factors (the statistics
-map $g$, fitted on the training statistics: $0.32$). The largest remain after both factors: the multi-Higgs processes
+statistics predictor, fitted on the training statistics: $0.32$). The largest remain after both factors: the multi-Higgs processes
 ($s\bar c\to W^-HH$, $b\bar b\to ZHH$, $b\bar b\to HHH$ at $340$ to $500$), whose level the leading diagram's couplings
 do not capture. So the factor removes about half the spread of levels and ten times the median level error, and leaves
 a level spread larger than the spread within a process for the network to learn.
@@ -544,8 +544,10 @@ mean on the $43$ new held-out processes, the error of a network that learned no 
 \label{fig:norm_factor}
 \end{figure}
 
-\paragraph{More data-free normalizations, and a learned level (2026-10-22, D83).} With the A and B pretrainings
-running (\code{scripts/job\_catalog\_norm.sh}; A as in Fig.~\ref{fig:norm_factor}, $\sqrt{s_0}=17$\,GeV), more targets
+\paragraph{More data-free normalizations, and a learned level (2026-10-22, D83).} With two pretrainings running on targets that need no per-process statistics
+(\code{scripts/job\_catalog\_norm.sh}): the \emph{shared} target ($\log|\mathcal M|^2$ with one standardization shared by
+all processes) and the \emph{$\hat s$+coupling} target (the same after dividing by the factor of
+Fig.~\ref{fig:norm_factor}, $\sqrt{s_0}=17$\,GeV), more targets
 were scored on CPU from per-process moments of per-event quantities over every train pool
 (\code{norm\_moments.py}, \code{norm\_moments2.py}, \code{norm\_explore.py}, \code{norm\_explore2.py};
 Fig.~\ref{fig:norm_explore}), by the spread of the training levels, the median within-process std, the no-level
@@ -553,8 +555,8 @@ error on the $43$ new held-out processes, and a sampling sensitivity: the median
 the level moves, in units of $\sigma_p$, when the pool is reweighted flat in $\log\hat s$.
 \begin{itemize}
   \item MadGraph divides the stored $|\mathcal M|^2$ by its averaging over initial spins and colours and by $n!$ for
-    $n$ identical final particles; adding that back, with the colour sum of the final state, to A's factor lowers the
-    median no-level error on the $43$ from $4.8$ to $2.3$ (training level spread $2.9\to2.7$; B: $47$, $5.4$). Its
+    $n$ identical final particles; adding that back, with the colour sum of the final state, to the $\hat s$+coupling factor lowers the
+    median no-level error on the $43$ from $4.8$ to $2.3$ (training level spread $2.9\to2.7$; shared target: $47$, $5.4$). Its
     $90\%$ quantile stays large ($250$).
   \item Inside a process $\log|\mathcal M|^2$ rises with $\hat s$: the within-process slope on $\log\hat s$ is $+1.1$ at
     $2\to2$ and $+0.6$ at $2\to3$ (median), against the $0$ and $-1$ of the mass dimension, and $\log\hat s$ explains
@@ -566,17 +568,17 @@ the level moves, in units of $\sigma_p$, when the pool is reweighted flat in $\l
     sampling sensitivity to $0.19$, but raise the no-level error on the $43$ (to about $9$): they smooth the target
     and make it less tied to the sampling, without placing levels.
   \item A small network ($2\times64$, the process features of \code{stats\_net.py}, cross-fitted by relabelling class)
-    predicting the remaining level from the process brings the median on the $43$ to $0.45$ on B and $0.48$ on A,
+    predicting the remaining level from the process brings the median on the $43$ to $0.45$ on the shared target and $0.48$ on the $\hat s$+coupling one,
     $90\%$ quantiles $5.0$ and $21$. This is the level the amplitude network has to learn under a shared
     standardization.
   \item With the diagrams as descriptors too (\code{norm\_explore3.py}: the leading coupling product, the sum over
     diagrams against it, the number of diagrams, the massive internal lines; all known for a process without data),
-    the same network places B's level of the $43$ at a median level error of $0.045$ ($90\%$: $1.3$; cross-fit on the
-    training processes $0.12$), ten times better than without them ($0.45$) and below the statistics map $g$ ($0.32$),
-    and the multi-Higgs processes are no longer the worst ($gg\to t\bar tZ$ is, at $8$). On A with IDEN and colour:
+    the same network places the shared target's level of the $43$ at a median level error of $0.045$ ($90\%$: $1.3$; cross-fit on the
+    training processes $0.12$), ten times better than without them ($0.45$) and below the statistics predictor ($0.32$),
+    and the multi-Higgs processes are no longer the worst ($gg\to t\bar tZ$ is, at $8$). On the $\hat s$+coupling target with IDEN and colour:
     $0.34$. The level reweighted flat in $\log\hat s$, less tied to how the pool drew $\hat s$, is easier to place
-    without the diagrams ($0.18$ against $0.45$ on B) and as easy with them ($0.066$). hp58's configuration feeds the
-    diagrams to the amplitude network, so under B it can learn levels the same way.
+    without the diagrams ($0.18$ against $0.45$ on the shared target) and as easy with them ($0.066$). The pretraining's configuration feeds
+    the diagrams to the amplitude network, so on the shared target it can learn levels the same way.
   \item The multi-Higgs processes are the worst in every target ($15$ processes, all held out, none in training).
     $q\bar q\to ZHH$ has the leading coupling product of $q\bar q\to ZH$ (with dimensionless couplings one more Higgs
     costs nothing) and a level $3.6$ lower; one cost per kind of final particle fitted on the training levels does
@@ -588,59 +590,61 @@ the level moves, in units of $\sigma_p$, when the pool is reweighted flat in $\l
 \centering
 \pnl{../analysis/catalog_daniel/figs/norm_explore2_legend.pdf} \\[1ex]
 \widerow{\pnl{../analysis/catalog_daniel/figs/norm_explore2_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/norm_explore2_b.pdf}}
-\caption{Data-free normalizations of the catalog: B (one shared standardization), A (with the factor
-$(s_0/\hat s)^{4-N}/C_p$), A with MadGraph's averaging and symmetry factor and the final colour sum, and the last
+\caption{Data-free normalizations of the catalog: the shared target (one shared standardization), the $\hat s$+coupling
+target (with the factor $(s_0/\hat s)^{4-N}/C_p$), the same with MadGraph's averaging and symmetry factor and the final colour sum, and the last
 two with a small network predicting the remaining level from the process. (a) the training processes' levels; (b)
 the level error on the $43$ new held-out processes.}
 \label{fig:norm_explore}
 \end{figure}
 
-\paragraph{A against B, the pretrainings (2026-10-22, D83).} hp58's config and HPs, $50$ validations, both arms on the
+\paragraph{The shared and the $\hat s$+coupling pretrainings (2026-10-22, D83).} The per-process pretraining's
+(hp58's) config and HPs, $50$ validations, both arms on the
 same $1352$ processes, read on the $139$ held-out with nothing taken from them (\code{scripts/job\_catalog\_norm.sh},
-\code{analysis/catalog\_daniel/catalog\_norm\_heldout.py}, Fig.~\ref{fig:catalog_norm}). A: the per-event factor of
+\code{analysis/catalog\_daniel/catalog\_norm\_heldout.py}, Fig.~\ref{fig:catalog_norm}). The $\hat s$+coupling target: the per-event factor of
 Fig.~\ref{fig:norm_factor} (leading coupling product and $(s_0/\hat s)^{4-N}$, $s_0=289$\,GeV$^2$, no IDEN or colour)
-and one shared standardization; B: one shared standardization. \emph{B blew up}: $50$ consecutive steps with
-non-finite gradients at step $8734$ (of hp58's horizon); it is read at its best checkpoint, saved before that. A ran
+and one shared standardization; the shared target: one shared standardization. \emph{The shared run blew up}: $50$ consecutive steps with
+non-finite gradients at step $8734$ (of hp58's horizon); it is read at its best checkpoint, saved before that. The $\hat s$+coupling run ran
 to the end. MSE of $\log|\mathcal M|^2$ per process (the factor cancels in the difference), median with the
 $10$ to $90\%$ range:
 \begin{center}
 \begin{tabular}{lcccc}
  & \multicolumn{2}{c}{$43$ new} & \multicolumn{2}{c}{$96$ relabels} \\
  & on its own & after rescale and shift & on its own & after rescale and shift \\ \hline
-hp58 + $g$ & $1.27$ ($0.10$ to $4.1$) & $0.080$ & $0.12$ & $0.0055$ \\
-A & $2.41$ ($0.033$ to $17$) & $0.135$ & $0.0045$ ($0.0004$ to $0.024$) & $0.0042$ \\
-B (blew up) & $0.60$ ($0.17$ to $3.4$) & $0.22$ & $0.067$ & $0.058$ \\
+per-process, statistics predicted & $1.27$ ($0.10$ to $4.1$) & $0.080$ & $0.12$ & $0.0055$ \\
+$\hat s$+coupling & $2.41$ ($0.033$ to $17$) & $0.135$ & $0.0045$ ($0.0004$ to $0.024$) & $0.0042$ \\
+shared (blew up) & $0.60$ ($0.17$ to $3.4$) & $0.22$ & $0.067$ & $0.058$ \\
 \end{tabular}
 \end{center}
 The rescale-and-shift columns are medians only. ``After rescale and shift'' is an oracle (the best affine map, fitted on the test truth). Split into the squared mean
 error (level) and the variance of the error (shape), median over the $43$ new (\code{catalog\_norm\_heldout.py}):
-A $2.3$ and $0.14$, B $0.11$ and $0.23$; the level's share of each process's error, median over the $43$, is $0.90$ for A
-and $0.38$ for B ($0.85$ for hp58 + $g$). So A learns the shape best, and on the relabels it is $27\times$ better than hp58 + $g$ on its own and better
-even than hp58 after the oracle map; but on the new processes most of its error is the level its factor sets wrong.
+$\hat s$+coupling $2.3$ and $0.14$, shared $0.11$ and $0.23$; the level's share of each process's error, median over
+the $43$, is $0.90$ for $\hat s$+coupling and $0.38$ for shared ($0.85$ for the per-process pretraining with predicted
+statistics). So the $\hat s$+coupling target learns the shape best, and on the relabels it is $27\times$ better than the
+per-process pretraining with predicted statistics and better even than that pretraining after the oracle map; but on the new processes most of its error is the level its factor sets wrong.
 The multi-Higgs processes are the bulk of it ($Z HH$, $W^\pm HH$, $HHH$ sit $3.6$ to $5.2$ too high: their leading
-coupling product is $ZH$'s, as Fig.~\ref{fig:norm_factor} found), then $gg\to Wq\bar q'$ ($3.6$ too low). B, with no
+coupling product is $ZH$'s, as Fig.~\ref{fig:norm_factor} found), then $gg\to Wq\bar q'$ ($3.6$ too low). The shared target, with no
 factor, places levels by learning them from the particles and is the best of the three on the new processes on its own.
-Correcting A's predictions afterwards by IDEN and colour or by the sum over diagrams makes it worse (median $2.05$ to
-$9.8$ on the new, and $0.5$ to $1.9$ on the relabels): A's network has learned its own levels, so a better factor has
+Correcting the $\hat s$+coupling predictions afterwards by IDEN and colour or by the sum over diagrams makes it worse (median $2.05$ to
+$9.8$ on the new, and $0.5$ to $1.9$ on the relabels): its network has learned its own levels, so a better factor has
 to be in its training target.
 
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/catalog_daniel/figs/catalog_norm_mse_interpolation.pdf}\\[1ex]
 \includegraphics{../analysis/catalog_daniel/figs/catalog_norm_mse_extrapolation.pdf}
-\caption{The $139$ held-out processes read on their own: MSE of $\log|\mathcal M|^2$ per process for hp58 read with
-the statistics map $g$, A and B (B at its best checkpoint, before it blew up), grouped as the held-out split, ordered
-by A within each group.}
+\caption{The $139$ held-out processes read on their own: MSE of $\log|\mathcal M|^2$ per process for the per-process pretraining read with
+the predicted statistics, the $\hat s$+coupling target and the shared target (at its best checkpoint, before it blew
+up), grouped as the held-out split, ordered by $\hat s$+coupling within each group.}
 \label{fig:catalog_norm}
 \end{figure}
 
 \paragraph{Few-shot calibration, and surrogates computed from momenta alone (2026-10-22, D83).} Median MSE of
 $\log|\mathcal M|^2$ over the $43$ new and the $96$ relabels. \emph{Few-shot} (\code{norm\_explore5.py},
-\code{norm\_explore7.py}; $k$ events of the new process drawn at random, $5$ draws, scored on the rest): hp58 with a
+\code{norm\_explore7.py}; $k$ events of the new process drawn at random, $5$ draws, scored on the rest): the per-process pretraining with a
 rescale and shift fitted on them reaches $0.137$ and $0.0081$ at $k=3$, $0.091$ and $0.0071$ at $k=10$, $0.082$ and
-$0.0057$ at $k=100$ (the oracle: $0.080$, $0.0055$); A needs only a shift ($0.167$, $0.0048$ at $k=3$); B $0.28$, $0.066$
-at $k=10$; shrinking the fitted slope toward $1$ helps at $k=3$ (A $0.22\to0.14$, B $0.36\to0.29$). It holds only for
-representative events: A shifted on the $10$ lowest-$\hat s$ events gives $0.21$, on the $10$ highest $0.62$, against
+$0.0057$ at $k=100$ (the oracle: $0.080$, $0.0055$); the $\hat s$+coupling target needs only a shift ($0.167$, $0.0048$ at $k=3$); the shared target $0.28$, $0.066$
+at $k=10$; shrinking the fitted slope toward $1$ helps at $k=3$ ($\hat s$+coupling $0.22\to0.14$, shared
+$0.36\to0.29$). It holds only for representative events: the $\hat s$+coupling target shifted on the $10$ lowest-$\hat s$ events gives $0.21$, on the $10$ highest $0.62$, against
 $0.16$ at random ($2\to3$ only). \emph{A CPU stand-in for shape transfer} (\code{norm\_explore6.py}: a $3\times128$
 network on $400$ events per process and summary invariants, ten candidate targets, three seeds) cannot rank them: every
 target lands at $0.40$ to $0.57$ on the new and $0.67$ to $0.70$ on the relabels, against $0.004$ to $0.06$ for the real
@@ -651,7 +655,8 @@ event, within a process, the correlation with the true $\log|\mathcal M|^2$ (med
 processes, $0.44$ ($0.20$) on the relabels, $0.39$ at $2\to2$ and $0.68$ at $2\to3$; adding an eikonal factor over the
 coloured massless legs gives $0.70$ ($0.50$) on training. The mass dimension, the eikonal and Parke--Taylor alone have
 $r^2\le0.21$ on the catalog (constant for most of it: no final gluon or photon, or $2\to2$). As level predictors across
-processes no surrogate's mean beats $g$ (best: dimension with IDEN and colour, $2.7$ to $3.1$; $g$ $0.32$), but in
+processes no surrogate's mean beats the statistics predictor (best: dimension with IDEN and colour, $2.7$ to $3.1$;
+the predictor $0.32$), but in
 multiplicity it extrapolates where the learned map does not: fitted on $2\to2$ and scored on $2\to3$, $0.34$ against the
 descriptor network's $7.1$. \emph{Extrapolation within a family} ($u\bar u\to Z+ng$ and $u\bar d\to W+ng$, $n=1..5$, the
 transfer study's pools): the eikonal and Parke--Taylor surrogates explain $81$ to $96\%$ of each process's spread, rising
@@ -666,58 +671,58 @@ momenta alone carries most of the per-event structure of the multi-gluon familie
 spread in $n$; on the catalog the diagram propagators carry the most. Their use is as a per-event input to a model with
 one shared standardization, which has nothing fixed outside the network for a new process.
 
-\paragraph{Short design runs at seen multiplicities (2026-10-22, D87).} hp58's configuration with $10^4$ training and
-$200$ validation events per process ($1/10$ of hp58's), $4126$ steps (5 epochs), events in memory, a $150$-step
+\paragraph{Short design runs at seen multiplicities (2026-10-22, D87).} The per-process pretraining's (hp58's) configuration with $10^4$ training and
+$200$ validation events per process ($1/10$ of its), $4126$ steps (5 epochs), events in memory, a $150$-step
 $\sigma$ stage reusing the loaded data, about $1$\,h each (\code{scripts/job\_catalog\_norm.sh <arm> short},
 \code{analysis/catalog\_daniel/catalog\_short\_heldout.py}); read on the $139$ held-out on their own as
 Fig.~\ref{fig:catalog_norm}. Median MSE of $\log|\mathcal M|^2$, with the level's median share of each process's error:
 \begin{center}
 \begin{tabular}{lcccc}
  & $43$ new & level share & after rescale and shift & $96$ relabels \\ \hline
-B, full length (blew up; best checkpoint) & $0.604$ & $0.38$ & $0.22$ & $0.067$ \\
-B, short & $0.603$ & $0.24$ & $0.24$ & $0.069$ \\
-Adim, short ($\hat s$ factor, $s_0=289$) & $0.652$ & $0.20$ & $0.20$ & $0.060$ \\
-A, short (with the coupling product) & $2.55$ & $0.76$ & $0.17$ & $0.053$ \\
-A, full length & $2.41$ & $0.90$ & $0.135$ & $0.0045$ \\
+shared, full length (blew up; best checkpoint) & $0.604$ & $0.38$ & $0.22$ & $0.067$ \\
+shared, short & $0.603$ & $0.24$ & $0.24$ & $0.069$ \\
+$\hat s$ only, short ($s_0=289$) & $0.652$ & $0.20$ & $0.20$ & $0.060$ \\
+$\hat s$+coupling, short & $2.55$ & $0.76$ & $0.17$ & $0.053$ \\
+$\hat s$+coupling, full length & $2.41$ & $0.90$ & $0.135$ & $0.0045$ \\
 \end{tabular}
 \end{center}
-The short runs reproduce the full-length ones where both exist (B $0.603$ against $0.604$ on the new; A $2.55$ against
-$2.41$), so they are a usable design tool at a tenth of the cost. The coupling product is what fails: A is $4\times$
-worse than B on the new processes at either length, three quarters of it level. The $\hat s$ factor alone (Adim) is level
-with B: $0.65$ against $0.60$ in the median, better in the tail (the $90\%$ point $2.6$ against $3.3$) and on the relabels
+The short runs reproduce the full-length ones where both exist (shared $0.603$ against $0.604$ on the new; $\hat s$+coupling $2.55$ against
+$2.41$), so they are a usable design tool at a tenth of the cost. The coupling product is what fails: $\hat s$+coupling is $4\times$
+worse than shared on the new processes at either length, three quarters of it level. The $\hat s$ factor alone is level
+with shared: $0.65$ against $0.60$ in the median, better in the tail (the $90\%$ point $2.6$ against $3.3$) and on the relabels
 ($0.060$ against $0.069$), with the level error slightly lower ($0.092$ against $0.11$). So at multiplicities seen in
-training the dimension factor costs nothing and gains a little, and the coupling product should go. A's relabel advantage
+training the dimension factor costs nothing and gains a little, and the coupling product should go. The $\hat s$+coupling target's relabel advantage
 ($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ as scored (the main run's best checkpoint, before the $\sigma$
 stage: the scoring read the run, not \code{sigma\_stage}; a rescore from the stage is running): pull std $1.1$ to $1.2$ on
-the relabels, $2.5$ (B, Adim) to $4.2$ (A) on the new processes. The short runs stop before
-step $8734$, where full-length B blew up, so they say nothing on its stability.
+the relabels, $2.5$ (shared, $\hat s$ only) to $4.2$ ($\hat s$+coupling) on the new processes. The short runs stop before
+step $8734$, where the full-length shared run blew up, so they say nothing on its stability.
 
 \paragraph{Extrapolation in multiplicity: the units of the target (2026-10-22, D88).} Every target of the form
 $T=\log|\mathcal M|^2-(4-N)\log\Lambda^2$ with one shared standardization is well defined; they differ in the
-reference scale $\Lambda$: B as run is $\Lambda=1$\,GeV (an arbitrary unit: in TeV a $2\to3$ process moves by
-$\log10^6=13.8$ against a $2\to2$), A's $s_0$ is a $\Lambda$ fitted on the catalog (the same as a mean affine in $N$),
+reference scale $\Lambda$: the shared target as run is $\Lambda=1$\,GeV (an arbitrary unit: in TeV a $2\to3$ process moves by
+$\log10^6=13.8$ against a $2\to2$), the $\hat s$ factor's $s_0$ is a $\Lambda$ fitted on the catalog (the same as a mean affine in $N$),
 and $\Lambda^2=\hat s$ per event gives the dimensionless $|\mathcal M|^2\hat s^{N-4}$, the only member that depends on
-no unit and no fit. The test: hp58's configuration trained on the $236$ $2\to2$ training processes only ($10^5$ events
+no unit and no fit. The test: the per-process pretraining's configuration trained on the $236$ $2\to2$ training processes only ($10^5$ events
 each, $4126$ steps, the short runs' settings otherwise; \code{scripts/job\_catalog\_norm.sh Bgev|Dless extrap}), read on
-the held-out $2\to3$ processes, a multiplicity it never saw. With $4-N=0$ on every training event, B in TeV trains on B
-in GeV's targets and the $s_0=289$ variant on the dimensionless one's, so two networks give four readings, differing
+the held-out $2\to3$ processes, a multiplicity it never saw. With $4-N=0$ on every training event, the shared target in TeV and in GeV have the same training targets, as do the $s_0=289$ variant and the dimensionless one, so two networks give four readings, differing
 only by a constant at $N=5$. Median MSE of $\log|\mathcal M|^2$ per process (level and shape: squared mean error and
 error variance; \code{analysis/catalog\_daniel/catalog\_extrap\_heldout.py}, which also derives the read-back offsets):
 \begin{center}
 \begin{tabular}{lcccc}
- & B, GeV & B, TeV & dimensionless & $s_0=289$\,GeV$^2$ \\ \hline
+ & shared, GeV & shared, TeV & dimensionless & $s_0=289$\,GeV$^2$ \\ \hline
 $2\to3$, $42$ new & $83$ ($82$, $1.2$) & $24$ ($23$, $1.2$) & $11$ ($10$, $1.5$) & $8.6$ ($7.3$, $1.5$) \\
 $2\to3$, $79$ relabels & $28$ ($22$, $2.8$) & $89$ ($83$, $2.8$) & $43$ ($40$, $3.9$) & $7.6$ ($3.7$, $3.9$) \\
 $2\to2$, $17$ relabels & $0.013$ & $0.013$ & $0.012$ & $0.012$ \\
 \end{tabular}
 \end{center}
-The unit choice moves B's error on the new multiplicity by $3.5\times$ either way, so B extrapolates by accident of units.
+The unit choice moves the shared target's error on the new multiplicity by $3.5\times$ either way, so it extrapolates
+by accident of units.
 The dimensionless target removes that arbitrariness but does not place the level: its $2\to3$ predictions are a median
 $4.8$ too low ($10$ to $90\%$: $0.7$ to $10$); a linear fit of that offset on the leading coupling product leaves $3.9$ of
 its $23$ (median squared), so the missing level is mostly the coupling cost of the extra particle, which a network that
 saw only $2\to2$ cannot know. The $s_0=289$ reading is best, but $s_0$ was fitted on the full catalog, $2\to3$ included,
 so it is not data-free here. The shape does not transfer from $2\to2$ either ($1.2$ to $3.9$ after the level, $0.9$ to
-$3.4$ after the oracle rescale and shift, against $0.14$ for A trained with $2\to3$). Dimensional analysis fixes the units,
+$3.4$ after the oracle rescale and shift, against $0.14$ for $\hat s$+coupling trained with $2\to3$). Dimensional analysis fixes the units,
 not the magnitude: a sampling- and unit-agnostic target is necessary for extrapolating in multiplicity but not sufficient,
 and a test from $2\to2$ alone is too far a step to rank targets on shape.
 
@@ -725,16 +730,16 @@ and a test from $2\to2$ alone is too far a step to rank targets on shape.
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
 $\log|\mathcal M|^2$, the median over processes of each process's pull standard deviation and of its fraction of events
-within one $\sigma$; a calibrated $\sigma$ gives $1$ and $0.68$). hp58 after its $\sigma$ stage, read with each
-process's own statistics: $1.86$ and $0.38$ on the $96$ relabels, $13.5$ and $0.06$ on the $43$ new. A after its $\sigma$
+within one $\sigma$; a calibrated $\sigma$ gives $1$ and $0.68$). The per-process pretraining after its $\sigma$ stage, read with each
+process's own statistics: $1.86$ and $0.38$ on the $96$ relabels, $13.5$ and $0.06$ on the $43$ new. The $\hat s$+coupling target after its $\sigma$
 stage, on its own: $1.32$ and $0.58$ on the relabels, $13.3$ and $0.02$ on the new ($9.3$ with each process's level error
-removed). B at its best checkpoint (it blew up before a $\sigma$ stage), on its own: $0.66$ and $0.87$ on the relabels,
+removed). The shared target at its best checkpoint (it blew up before a $\sigma$ stage), on its own: $0.66$ and $0.87$ on the relabels,
 $1.20$ and $0.34$ on the new. The $\sigma$ stage calibrates $\sigma$ on the training processes, and it does not carry
 to processes the model has not seen: on the new ones the errors are $10$ to $13$ times the $\sigma$ the model gives, so
-$\sigma$ does not flag a process outside the training set. B's $\sigma$, never recalibrated, is too wide on the relabels
+$\sigma$ does not flag a process outside the training set. The shared target's $\sigma$, never recalibrated, is too wide on the relabels
 and about the right size on the new processes, but its level errors put $66\%$ of the events outside one $\sigma$.
 
-\paragraph{How robust is the diagram-descriptor level (2026-10-22, D83).} The $0.045$ of the exploration above (B's level
+\paragraph{How robust is the diagram-descriptor level (2026-10-22, D83).} The $0.045$ of the exploration above (the shared target's level
 of the $43$ new placed by a $2\times64$ network on the process features and the diagram descriptors) is one draw
 (\code{analysis/catalog\_daniel/norm\_explore4.py}, level error $(\hat m_p-m_p)^2/\sigma_p^2$, median over the $43$).
 Ten ensembles of three seeds give a median of $0.087$, ranging from $0.016$ to $0.19$ (the $90\%$ point $1.06$); other
@@ -745,7 +750,7 @@ processes of a seen multiplicity and do not extrapolate in it. For comparison, t
 of each held-out process: $0.059$ at $k=10$ and $0.0067$ at $k=100$ (the sampling error of a $k$-event mean, $\approx1/k$).
 So ten events of a new process place its level as well as the best data-free map, and a hundred do $7$ to $13\times$
 better (against the single draw and the ensembles' median); what a pretraining has to learn from the particles is the
-shape, whose share of each process's error is a median $0.62$ for B on the new processes (the A-against-B paragraph above).
+shape, whose share of each process's error is a median $0.62$ for the shared target on the new processes (the pretrainings paragraph above).
 
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
@@ -6185,8 +6190,8 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Open (2026-10-22, 13:30).} Done: the weight interpolation (D31 item 1, Fig.~\ref{fig:interp_tradeoff}).
-    Done: the $\sigma$ head on the held-out processes (its paragraph). Running on CC: the $9$ $\Delta$-plot models still off their
+  \item \textbf{Open (2026-10-22, 13:30).}
+    Running on CC: the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
     \code{collect\_delta.py} and redraw). The $\sigma$
     stage now writes its own per-event predictions with $\sigma$ (\code{c5ba313}; GPU smoke test passed). Fixed:
@@ -6196,11 +6201,10 @@ of the three share a test set.
     was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Not started: rung $6$'s
     rescoring gap (its run is not on CC; TF32 is the likely cause, sec:tf32-eval); the one-loop sign decision reading
     the validation and test amplitudes (a fix changes the one-loop probes' target, so it needs the user); the probes
-    that do not gain. For the user: D78 holds the catalog preprocessing until their design (A with IDEN, colour and the
-    diagram sum, and B's blow-up at hp58's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
+    that do not gain. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
+    diagram sum, and the shared target's blow-up at the per-process pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
     bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
-    fix is dropped until the preprocessing is settled (D86). Done: het at the shared HPs with the checkpoint on the
-    $\mu$ MSE (D85, Fig.~\ref{fig:het_mumse}). Running: the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
+    fix is dropped until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
     a CPU proxy for shape transfer under each target, sampling sensitivity, then new ideas); the het trial now writes its own predictions; \code{site} matches a launch's runs by
     item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
