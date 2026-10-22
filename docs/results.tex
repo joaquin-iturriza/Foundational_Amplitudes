@@ -666,6 +666,31 @@ momenta alone carries most of the per-event structure of the multi-gluon familie
 spread in $n$; on the catalog the diagram propagators carry the most. Their use is as a per-event input to a model with
 one shared standardization, which has nothing fixed outside the network for a new process.
 
+\paragraph{Short design runs at seen multiplicities (2026-10-22, D87).} hp58's configuration with $10^4$ training and
+$200$ validation events per process ($1/10$ of hp58's), $4126$ steps (5 epochs), events in memory, a $150$-step
+$\sigma$ stage reusing the loaded data, about $1$\,h each (\code{scripts/job\_catalog\_norm.sh <arm> short},
+\code{analysis/catalog\_daniel/catalog\_short\_heldout.py}); read on the $139$ held-out on their own as
+Fig.~\ref{fig:catalog_norm}. Median MSE of $\log|\mathcal M|^2$, with the level's median share of each process's error:
+\begin{center}
+\begin{tabular}{lcccc}
+ & $43$ new & level share & after rescale and shift & $96$ relabels \\ \hline
+B, full length (blew up; best checkpoint) & $0.604$ & $0.38$ & $0.22$ & $0.067$ \\
+B, short & $0.603$ & $0.24$ & $0.24$ & $0.069$ \\
+Adim, short ($\hat s$ factor, $s_0=289$) & $0.652$ & $0.20$ & $0.20$ & $0.060$ \\
+A, short (with the coupling product) & $2.55$ & $0.76$ & $0.17$ & $0.053$ \\
+A, full length & $2.41$ & $0.90$ & $0.135$ & $0.0045$ \\
+\end{tabular}
+\end{center}
+The short runs reproduce the full-length ones where both exist (B $0.603$ against $0.604$ on the new; A $2.55$ against
+$2.41$), so they are a usable design tool at a tenth of the cost. The coupling product is what fails: A is $4\times$
+worse than B on the new processes at either length, three quarters of it level. The $\hat s$ factor alone (Adim) is level
+with B: $0.65$ against $0.60$ in the median, better in the tail (the $90\%$ point $2.6$ against $3.3$) and on the relabels
+($0.060$ against $0.069$), with the level error slightly lower ($0.092$ against $0.11$). So at multiplicities seen in
+training the dimension factor costs nothing and gains a little, and the coupling product should go. A's relabel advantage
+($0.0045$) appears only at full length, with $10\times$ the events and $8\times$ the steps. $\sigma$ after the short stage:
+pull std $1.1$ to $1.2$ on the relabels, $2.5$ (B, Adim) to $4.2$ (A) on the new processes. The short runs stop before
+step $8734$, where full-length B blew up, so they say nothing on its stability.
+
 \paragraph{Extrapolation in multiplicity: the units of the target (2026-10-22, D88).} Every target of the form
 $T=\log|\mathcal M|^2-(4-N)\log\Lambda^2$ with one shared standardization is well defined; they differ in the
 reference scale $\Lambda$: B as run is $\Lambda=1$\,GeV (an arbitrary unit: in TeV a $2\to3$ process moves by
