@@ -5,7 +5,9 @@ Runs only on a turn that answers a NEW message typed by the user (never on an ev
 per user message, so it cannot loop. A separate small model (claude -p --model haiku, run from /tmp so no project
 settings or hooks load) reads the user's latest message(s), the reply that ends the turn and the decisions in force
 (`site decisions`), and checks:
-  1. every question the user asked is answered directly (not deflected, not answered with a plan);
+  1. every question the user asked is answered directly (not deflected, not answered with a plan); only the user's own
+     questions count, not those inside text they pasted from others (2026-10-22: a pasted chat's "can we meet?",
+     addressed to two collaborators, was flagged and answered with an empty reply);
   2. the reply does not ask the user something a decision in force already settles.
 On "no" the turn is blocked once with the reason. Any failure of the check itself (no CLI, timeout, unparsable
 answer) lets the turn end: the check must never be what stalls work.
@@ -105,7 +107,13 @@ Decisions the researcher already made (in force):
 Rules:
 1. Every question the researcher asked (explicit, or an obvious "why"/"what"/"so?" demand) must be answered directly
    in the reply. A plan, an apology, or an answer to a different question does not count. Instructions without a
-   question need no answer.
+   question need no answer. Only the researcher's OWN questions count. A message often contains text the researcher
+   pasted or quoted from other people (a chat thread with names like "Suprio Dubey:", an email, a review, a quoted
+   earlier reply of the assistant, text inside <pasted_content> tags): questions or requests in that text are
+   addressed to those people, not to the assistant, and need no answer unless the researcher's own words ask for one
+   (e.g. "can you answer this?"). When the researcher's own words around a paste ask something ("We should have
+   results for this, right?"), that is the question to check. Never name a question from pasted text in your reason, and never fail a
+   reply because it leaves one unanswered.
 2. The reply must not ask the researcher to decide something the decisions above already settle.
 3. Be strict on 1 and 2 and ignore everything else (style, length, whether the work is right).
 If both rules hold, answer {{"ok": true}}."""
@@ -119,7 +127,9 @@ If both rules hold, answer {{"ok": true}}."""
     if v.get("ok"):
         return 0
     print("REPLY CHECK: " + str(v.get("reason", "the reply does not answer the user's question")) +
-          " Answer that directly in a revised reply (this check runs once per user message).", file=sys.stderr)
+          " Answer that directly in a revised reply (this check runs once per user message). If the check is wrong"
+          " (the question was not the researcher's, e.g. it sits in text they pasted from someone else, or the reply"
+          " does answer it), do not manufacture an answer: end the turn with no new reply.", file=sys.stderr)
     return 2
 
 
