@@ -23,6 +23,9 @@ cd "$PROJECT_DIR"
 SHARED=0; ROOT=het_delta; EVAL="$SCRATCH/zz_delta_het"; SEL=nll
 [ "$1" = --shared ] && { SHARED=1; ROOT=het_shared; EVAL="$SCRATCH/zz_delta_hetshared"; shift; }
 [ "$1" = --shared-mumse ] && { SHARED=1; ROOT=het_shared_mumse; EVAL="$SCRATCH/zz_delta_hetshared_mumse"; SEL=mu_mse; shift; }
+# --mumse (the user, 2026-10-22: "this selection should also be applied to the 2 to 2 ones"): the D47 cells at their own
+# HPs, the checkpoint selected on the mu MSE; runs/het_delta_mumse/, $SCRATCH/zz_delta_het_mumse/
+[ "$1" = --mumse ] && { ROOT=het_delta_mumse; EVAL="$SCRATCH/zz_delta_het_mumse"; SEL=mu_mse; shift; }
 # --shared-mumse-clean: the same into a fresh root, for the 8 cells two duplicate jobs trained at once (2026-10-22)
 [ "$1" = --shared-mumse-clean ] && { SHARED=1; ROOT=het_shared_mumse_clean; EVAL="$SCRATCH/zz_delta_hetshared_mumse_clean"; SEL=mu_mse; shift; }
 shared_hps() {   # the probe of a cell's sweep name -> its HP overrides
