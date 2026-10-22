@@ -4,8 +4,8 @@
 # Plans the remaining jobs with `site pick`, submits each site's allotment, records what it submitted; exit 75 (stays queued, retried on the
 # supervisor's next pass) while any job is left. Every cell and its parent is on CC-IN2P3 (checked 2026-10-22).
 cd "$(dirname "$0")/.." || exit 1
-JOBS="analysis/transfer/het_shared_jobs.txt"
-DONE="$HOME/.local/share/ccorch/launch/FA/het_shared.submitted"
+JOBS="${JOBS:-analysis/transfer/het_shared_jobs.txt}"   # a rerun list overrides (het_shared_rerun.txt)
+DONE="$HOME/.local/share/ccorch/launch/FA/$(basename "$JOBS" .txt).submitted"
 touch "$DONE"
 mapfile -t LEFT < <(grep -v '^#' "$JOBS" | while read -r t cells; do grep -qxF "$cells" "$DONE" || echo "$t $cells"; done)
 [ ${#LEFT[@]} -eq 0 ] && { echo "all $(grep -vc '^#' "$JOBS") jobs submitted"; exit 0; }

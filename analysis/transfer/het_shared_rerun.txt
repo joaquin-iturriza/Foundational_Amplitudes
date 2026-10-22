@@ -1,0 +1,2 @@
+# D82: the 4 het_shared cells lost to the full /sps disk on 2026-10-22 (a checkpoint write failed), rerun in one job.
+1.30 runs/tp3_r7fte_uubar_Zgg_d8/trial_0194 runs/tp3_r8fte_uubar_Zgg_d8/trial_0154 runs/tp3_r8fte_uubar_Zggg_d8/trial_0186 runs/tp3_ssoftfte_ee_ddbarg_d8/trial_0193
