@@ -2575,19 +2575,18 @@ cells left to right in the same order; an open marker on EMA is a run with EMA o
 the four probes with more than two final-state particles, retrained with the het loss at the HPs the scratch het sweeps
 chose (Fig.~\ref{fig:het23}: one point for both $e^+e^-$ probes, one for both $u\bar u$ probes with each probe's lr;
 \code{scripts/job\_het\_delta.sh --shared}, \code{analysis/transfer/het\_shared\_summary.py}, Fig.~\ref{fig:het_shared}).
-$20$ finished; $4$ were lost to the full \code{/sps/lpnhe} disk (a checkpoint write failed: $u\bar u\to Zgg$ at
-rungs $7$ and $8$, $u\bar u\to Zggg$ at rung $8$, $e^+e^-\to d\bar dg$ fine-tuned from the soft star) and are rerun once
-there is space. Median $|\Delta|$, het over MSE: median $1.39$ over the $10$ $2\to3$ cells and $1.31$ over the $10$
-$2\to4$ cells, against $1.78$ and $1.71$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the het retrain at the MSE
-cell's HPs in $16$ of the $20$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
+All $24$ finished ($4$, lost to the full \code{/sps/lpnhe} disk at the first attempt, were rerun:
+$u\bar u\to Zgg$ at rungs $7$ and $8$, $u\bar u\to Zggg$ at rung $8$, $e^+e^-\to d\bar dg$ fine-tuned from the soft star).
+Median $|\Delta|$, het over MSE: median $1.39$ over the $13$ $2\to3$ cells and $1.36$ over the $11$ $2\to4$ cells,
+against $1.59$ and $1.79$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the het retrain at the MSE
+cell's HPs in $19$ of the $24$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
 HPs help, and the het loss stays $30$ to $40\%$ behind MSE on $\mu$ at these multiplicities.
 
 \begin{figure}[H]
 \centering
 \includegraphics{../analysis/transfer/figs/het_shared.pdf}
 \caption{The $2\to3$ and $2\to4$ $\Delta$ cells retrained with the het loss, median $|\Delta|$ on the test split against
-the MSE cell: at the het sweeps' shared HPs (filled) and at the MSE cell's own HPs (open, D47). $20$ of $24$ cells; $4$
-lost to the full disk.}
+the MSE cell: at the het sweeps' shared HPs (filled) and at the MSE cell's own HPs (open, D47). All $24$ cells.}
 \label{fig:het_shared}
 \end{figure}
 
@@ -6049,7 +6048,7 @@ of the three share a test set.
     \code{zero\_shot\_parent.py} now saves $\sigma$ and the pulls; out \code{\$SCRATCH/zz\_catalog\_heldout\_preds\_sigstage},
     \code{zz\_catalog\_norm\_A\_sigstage}, \code{zz\_catalog\_norm\_B}); the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
-    \code{collect\_delta.py} and redraw); the $4$ \code{het\_shared} cells lost to the disk (FA-ccin2p3-cd4f37bc); a smoke
+    \code{collect\_delta.py} and redraw); a smoke
     test of the $\sigma$ stage writing its own per-event predictions with $\sigma$ (\code{c5ba313}). Fixed:
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed

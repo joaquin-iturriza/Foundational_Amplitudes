@@ -49,6 +49,22 @@
    "het_shared": 0.00882054679095745
   },
   {
+   "tag": "tp3_r7fte_uubar_Zgg_d8__trial_0194",
+   "probe": "uubar_Zgg",
+   "arm": "r7",
+   "mse": 0.0046314336359500885,
+   "het_mse": 0.006512111984193325,
+   "het_shared": 0.006764342077076435
+  },
+  {
+   "tag": "tp3_r8fte_uubar_Zgg_d8__trial_0154",
+   "probe": "uubar_Zgg",
+   "arm": "r8",
+   "mse": 0.003941459581255913,
+   "het_mse": 0.011609929613769054,
+   "het_shared": 0.004872787743806839
+  },
+  {
    "tag": "tp3_r9fte_uubar_Zgg_d8__trial_0048",
    "probe": "uubar_Zgg",
    "arm": "r9",
@@ -129,6 +145,14 @@
    "het_shared": 0.031206607818603516
   },
   {
+   "tag": "tp3_r8fte_uubar_Zggg_d8__trial_0186",
+   "probe": "uubar_Zggg",
+   "arm": "r8",
+   "mse": 0.01520613580942154,
+   "het_mse": 0.035102229565382004,
+   "het_shared": 0.023997366428375244
+  },
+  {
    "tag": "tp3_r9fte_uubar_Zggg_d8__trial_0148",
    "probe": "uubar_Zggg",
    "arm": "r9",
@@ -153,6 +177,14 @@
    "het_shared": 0.025319399312138557
   },
   {
+   "tag": "tp3_ssoftfte_ee_ddbarg_d8__trial_0193",
+   "probe": "ee_ddbarg",
+   "arm": "ssoftfte",
+   "mse": 0.0036292579025030136,
+   "het_mse": 0.00560848880559206,
+   "het_shared": 0.0050270650535821915
+  },
+  {
    "tag": "tp3_sdeadconefte_ee_ttbarg_d8__trial_0176",
    "probe": "ee_ttbarg",
    "arm": "sdeadconefte",
@@ -161,10 +193,5 @@
    "het_shared": 0.007901983335614204
   }
  ],
- "missing": [
-  "tp3_r7fte_uubar_Zgg_d8__trial_0194",
-  "tp3_r8fte_uubar_Zgg_d8__trial_0154",
-  "tp3_r8fte_uubar_Zggg_d8__trial_0186",
-  "tp3_ssoftfte_ee_ddbarg_d8__trial_0193"
- ]
+ "missing": []
 }
