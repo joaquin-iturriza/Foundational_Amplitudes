@@ -18,6 +18,9 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn or Ds0}"; SMOKE="${2:-}"
+# the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
+# (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
+SET="${3:-catalog}"
 SRC=runs/dancat_het_pre/trial_0058
 NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 [ "$ARM" = A ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0)
@@ -41,7 +44,9 @@ MMAP="${TMPDIR:-/tmp}/fa_mmap_${SLURM_JOB_ID}"; mkdir -p "$MMAP"; trap 'rm -rf "
 df -h "$MMAP" | tail -1
 NORM+=(++data.memmap_dir="$MMAP")
 OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$ARM"
-R="$SCRATCH/zz_catalog_heldout_recipes"; mkdir -p "$R"
+R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_
+[ "$SET" = 2to4 ] && { R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_; }
+mkdir -p "$R"
 if [ "$SMOKE" = smoke ] || [ "$SMOKE" = smoke_eval ]; then
     OUT="$SCRATCH/zz_catalog_norm_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
@@ -100,14 +105,14 @@ elif [ ! -e "$OUT/sigma_stage/models" ]; then
         training.result_path="$OUT/result.json" plot=true "${NORM[@]}" "${EXTRA[@]}" || exit 1
 fi
 grep -a -m1 "target_physics_factor ON" "$OUT"/out_*.log 2>/dev/null
-python - "$R" <<'PY'
+python - "$R" "$HELD" <<'PY'
 import sys, yaml
-r = yaml.safe_load(open("recipes/catalog_daniel_heldout.yaml"))
+r = yaml.safe_load(open(sys.argv[2]))
 for p in r["processes"]:
     yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 print(len(r["processes"]), "held-out recipes")
 PY
-P=("$R"/dc_*.yaml); [[ "$SMOKE" = smoke* ]] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
+P=("$R"/${PFX}*.yaml); [[ "$SMOKE" = smoke* ]] && [ "$SET" = catalog ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
 # eval: the sigma-stage model when the run has one (trunk and mu frozen, so mu is the run's; its sigma is the calibrated
 # one, D70), into its own prediction dir
 # the sigma stage's model whenever the run has one (mu is the run's, frozen; sigma is the calibrated one): the held-out
@@ -115,5 +120,6 @@ P=("$R"/dc_*.yaml); [[ "$SMOKE" = smoke* ]] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_s
 # scoring read sigma before the stage)
 PAR="$OUT"
 if ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
+[ "$SET" = 2to4 ] && PRED="${PRED}_2to4"
 mkdir -p "$PRED"
 python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" "${P[@]}"
