@@ -90,6 +90,8 @@ def _features(meta, ini, fin):
         f += flavour_flow(ini, fin)
     if PROPS:
         f += prop_pool(ini) + prop_pool(fin)
+    if RES:
+        f += higgs_and_resonances(ini, fin)
     if NODIAG:
         f.append(np.log(max(meta.get("n_diagrams") or 1, 1)))
     return np.array(f, float)
@@ -97,7 +99,8 @@ def _features(meta, ini, fin):
 
 FLOW = "--no-flow" not in sys.argv
 PROPS = "--props" in sys.argv          # the model's own particle table (particle_ids.py), pooled per side
-NODIAG = "--ndiag" in sys.argv         # the number of Feynman diagrams (classes_default.json)
+NODIAG = "--ndiag" in sys.argv
+RES = "--res" in sys.argv              # Higgs coupling strength and final-state resonances: tried, no cross-fit gain         # the number of Feynman diagrams (classes_default.json)
 MG_PDG = {"d": 1, "u": 2, "s": 3, "c": 4, "b": 5, "t": 6, "e-": 11, "ve": 12, "mu-": 13, "vm": 14, "ta-": 15, "vt": 16,
           "g": 21, "a": 22, "z": 23, "w+": 24, "h": 25}
 
@@ -108,6 +111,42 @@ def pdg(p):
     if p.endswith("~"):
         return -MG_PDG[p[:-1]]
     return -MG_PDG[{"e+": "e-", "mu+": "mu-", "ta+": "ta-", "w-": "w+"}[p]]
+
+
+MASS = {"t": 172.5, "t~": 172.5, "w+": 80.4, "w-": 80.4, "z": 91.2, "h": 125.0, "b": 4.7, "b~": 4.7, "ta+": 1.78,
+        "ta-": 1.78}
+LEP = {"e-": "ve", "mu-": "vm", "ta-": "vt"}
+
+
+def higgs_and_resonances(ini, fin):
+    """The two failures of the cross-fit (2026-10-22): q q~ > b b~ h sat 8 in log|M|^2 above its truth (the Higgs
+    attaches only through the b Yukawa coupling) and q q~ > t b~ w+ 7 below it (b~ w+... can come from an on-shell top).
+    Per Higgs, log10 of the heaviest other particle it can couple to (0 without one: light quarks and leptons are
+    massless here); counts of final pairs that an on-shell t, W or Z/H can decay to."""
+    allp = ini + fin
+    nh = sum(p == "h" for p in allp)
+    heavy = max([MASS[p] for p in allp if p in MASS and p != "h"] or [1.0])
+    up = lambda p: p.rstrip("~") in UP
+    qk = lambda p: p.rstrip("~") in UP | DOWN
+    pairs = [(a, b) for i, a in enumerate(fin) for b in fin[i + 1:]]
+    top = sum({a, b} in ({"b", "w+"}, {"b~", "w-"}) for a, b in pairs)
+    def wpair(a, b):
+        if qk(a) and qk(b):   # up quark with a down antiquark (W+) or its conjugate (W-)
+            return up(a) != up(b) and a.endswith("~") != b.endswith("~") and \
+                (up(a) and not a.endswith("~")) == (not up(b) and b.endswith("~"))
+        for l, v in LEP.items():
+            lp = l[:-1] + "+"
+            if {a, b} in ({l, v + "~"}, {lp, v}):
+                return True
+        return False
+    w = sum(wpair(a, b) for a, b in pairs)
+    conjp = lambda p: conj(p)
+    z = sum(b == conjp(a) and a not in ("g", "a", "z", "h") and not a.startswith("w") for a, b in pairs)
+    f = [nh * np.log10(heavy), float(nh > 0 and heavy < 5), float(top), float(w), float(z)]
+    return [f[i] for i in RES_COLS]
+
+
+RES_COLS = [int(c) for c in os.environ.get("G_RES_COLS", "0,1,2,3,4").split(",") if c != ""]
 
 
 def prop_pool(side):
