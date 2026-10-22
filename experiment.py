@@ -2611,9 +2611,11 @@ class AmplitudeExperiment(BaseExperiment):
                     # single-dataset pass concat_split falls back to. The events come in the
                     # split's shuffled order (seed 42), not the pool's; pool_row maps each back
                     # to its row in the split's pool file (the loaders iterate each split in order)
-                    pred, truth, _, _, _, (raw_truth, raw_pred) = concat_split(split)
+                    pred, truth, sig, _, _, (raw_truth, raw_pred) = concat_split(split)
                     perm = getattr(self, "_role_perm", {}).get(split)
                     extra = dict(pool_row=perm[:pred.shape[0]]) if perm is not None else {}
+                    if sig is not None:          # HETEROSC: the per-event sigma, standardized units, for the pulls
+                        extra["sigma"] = sig
                     out = os.path.join(self.cfg.run_dir, f"preds_{split}.npz")
                     np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth, raw_pred=raw_pred,
                                         process_id=np.zeros(pred.shape[0], int), names=np.array(names[:1]), **extra)
@@ -2629,6 +2631,8 @@ class AmplitudeExperiment(BaseExperiment):
                 extra = {}
                 if proc_sign:
                     extra["sign"] = np.concatenate([proc_sign[n][split] for n in have], axis=0)   # (N,2) [pred, true] > 0
+                if proc_preds[have[0]][split][2] is not None:   # HETEROSC: per-event sigma, standardized units
+                    extra["sigma"] = np.concatenate([proc_preds[n][split][2] for n in have], axis=0)
                 np.savez_compressed(out, pred=pred, truth=truth, raw_truth=raw_truth,
                                     raw_pred=np.concatenate([_raw(n, split, proc_preds[n][split][0], "pred") for n in have], axis=0),
                                     process_id=pid, names=np.array(names), **extra)

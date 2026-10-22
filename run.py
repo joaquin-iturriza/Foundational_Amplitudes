@@ -38,6 +38,9 @@ def sigma_stage_cfg(cfg):
         s.training.regularization_lambda = 0.0
         s.training.result_path = None
         s.training.validate_frac = 0.04             # a validation every 10 steps, as in the D69 sweep
+        # the stage's evaluation writes the calibrated model's per-event predictions and sigma (preds_<split>.npz in
+        # sigma_stage/), so a het trial needs no separate evaluation job for its Delta plots and pulls
+        s.evaluation.save_predictions = True
     return s
 
 
