@@ -544,6 +544,49 @@ mean on the $43$ new held-out processes, the error of a network that learned no 
 \label{fig:norm_factor}
 \end{figure}
 
+\paragraph{More data-free normalizations, and a learned level (2026-10-22, D83).} With the A and B pretrainings
+running (\code{scripts/job\_catalog\_norm.sh}; A as in Fig.~\ref{fig:norm_factor}, $\sqrt{s_0}=17$\,GeV), more targets
+were scored on CPU from per-process moments of per-event quantities over every train pool
+(\code{norm\_moments.py}, \code{norm\_moments2.py}, \code{norm\_explore.py}, \code{norm\_explore2.py};
+Fig.~\ref{fig:norm_explore}), by the spread of the training levels, the median within-process std, the no-level
+error on the $43$ new held-out processes, and a sampling sensitivity: the median over training processes of how far
+the level moves, in units of $\sigma_p$, when the pool is reweighted flat in $\log\hat s$.
+\begin{itemize}
+  \item MadGraph divides the stored $|\mathcal M|^2$ by its averaging over initial spins and colours and by $n!$ for
+    $n$ identical final particles; adding that back, with the colour sum of the final state, to A's factor lowers the
+    median no-level error on the $43$ from $4.8$ to $2.3$ (training level spread $2.9\to2.7$; B: $47$, $5.4$). Its
+    $90\%$ quantile stays large ($250$).
+  \item Inside a process $\log|\mathcal M|^2$ rises with $\hat s$: the within-process slope on $\log\hat s$ is $+1.1$ at
+    $2\to2$ and $+0.6$ at $2\to3$ (median), against the $0$ and $-1$ of the mass dimension, and $\log\hat s$ explains
+    $18\%$ of the within-process variance. A cut fixed in GeV does this: at higher $\hat s$ an event reaches closer to
+    its soft and collinear limits. So the factor $\hat s^{\,4-N}$ raises the sampling sensitivity ($0.30\to0.39$).
+  \item Per-event scales that see the singular regions (the mean log pair invariant, the smallest invariant, the mean
+    nearest-neighbour invariant, a soft/collinear proximity), with one set of coefficients per particle count fitted
+    by the within-process regression on the training pools, lower the within-process std from $2.1$ to $1.2$ and the
+    sampling sensitivity to $0.19$, but raise the no-level error on the $43$ (to about $9$): they smooth the target
+    and make it less tied to the sampling, without placing levels.
+  \item A small network ($2\times64$, the process features of \code{stats\_net.py}, cross-fitted by relabelling class)
+    predicting the remaining level from the process brings the median on the $43$ to $0.45$ on B and $0.48$ on A,
+    $90\%$ quantiles $5.0$ and $21$. This is the level the amplitude network has to learn under a shared
+    standardization.
+  \item The multi-Higgs processes are the worst in every target ($15$ processes, all held out, none in training).
+    $q\bar q\to ZHH$ has the leading coupling product of $q\bar q\to ZH$ (with dimensionless couplings one more Higgs
+    costs nothing) and a level $3.6$ lower; one cost per kind of final particle fitted on the training levels does
+    not reach it either (median level error $12$ to $23$ on them), which fits a known cancellation between the
+    diagrams of Higgs-pair production.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\pnl{../analysis/catalog_daniel/figs/norm_explore2_legend.pdf} \\[1ex]
+\widerow{\pnl{../analysis/catalog_daniel/figs/norm_explore2_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/norm_explore2_b.pdf}}
+\caption{Data-free normalizations of the catalog: B (one shared standardization), A (with the factor
+$(s_0/\hat s)^{4-N}/C_p$), A with MadGraph's averaging and symmetry factor and the final colour sum, and the last
+two with a small network predicting the remaining level from the process. (a) the training processes' levels; (b)
+the level error on the $43$ new held-out processes.}
+\label{fig:norm_explore}
+\end{figure}
+
 \paragraph{Generation cost.} A timing prebuild of $17$ representative processes at small
 pools (one chunk per core, the mixture policy on) gives the per-core rates: LO trees
 $2$--$15\times10^3$ stored events per second ($2\to2$ fastest, the four-fermion and
