@@ -2226,7 +2226,9 @@ class AmplitudeExperiment(BaseExperiment):
         return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + self._phys_logc[name])
 
     def _eikonal_logS(self, name, mom_phys):
-        """data.target_physics_eikonal (the user, 2026-10-22: "the eikonal factor ... is well motivated here"): per event,
+        """data.target_physics_eikonal (2026-10-22; not used: the user, the same day, "these kinds of priors shouldn't go
+        in the target, since this is very laser focused on photons and gluons" -- the eikonal is to enter as an input,
+        kept here for that and for comparison): per event,
         the sum over final gluons and photons k of log(w_k sum_{a<b} s_ab / (s_ak s_bk)), the pairs over the other
         coloured legs (gluon, w = C_A = 3) or the other charged legs (photon, w = 1), every external leg counted
         (incoming ones too), s_xy = 2 |p_x.p_y| (norm_surrogate.py's eik term). It is the cost of one more soft or
