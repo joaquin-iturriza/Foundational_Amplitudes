@@ -267,6 +267,26 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._mom_div = float(mom_div)
         self._mass_spec = dict(mass_spec)
 
+    def setup_dimless_mass(self, mass_col: int, massive, scale: float):
+        """Enable data.dimensionless_inputs on the property side: each massive particle's table column
+        log10(m / GeV) becomes log10(m / sqrt(s_hat)) of its event, so no absolute scale reaches the network.
+        The event's log10 sqrt(s_hat) arrives as the last column of order_labels, which this takes off before the
+        order features are used. ``massive``: (n_types,) bool per row of property_matrix (the generator's mass, not
+        recomputed from the float32 momenta, where a massless leg reads as m ~ 1e-4 sqrt(s_hat)); ``scale``: the
+        column's z-score std (1 when the table is not standardized)."""
+        self.dimless_mass = True
+        self._dm_col = int(mass_col)
+        self._dm_scale = float(scale)
+        self.register_buffer("_dm_massive", torch.as_tensor(massive, dtype=torch.bool), persistent=False)
+
+    def _apply_dimless_mass(self, raw_props, particle_type_indices, ptr, order_labels):
+        """(raw_props with the mass column per event, order_labels without the log10 sqrt(s_hat) column)"""
+        lrs = order_labels[:, -1].repeat_interleave(ptr[1:] - ptr[:-1], dim=0)          # (N_total,)
+        shift = torch.where(self._dm_massive[particle_type_indices], lrs, torch.zeros_like(lrs))
+        raw_props = raw_props.clone()
+        raw_props[:, self._dm_col] = raw_props[:, self._dm_col] - (shift / self._dm_scale).to(raw_props.dtype)
+        return raw_props, order_labels[:, :-1]
+
     def _apply_mass_from_momenta(self, raw_props, fourmomenta):
         """Replace the log10_mass_gev column of ``raw_props`` (N, n_features) with
         each particle's on-shell mass derived from ``fourmomenta`` (N, 4), matching
@@ -745,6 +765,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
             raw_props = self.property_matrix[particle_type_indices]   # (N_total, n_features)
             if self.mass_from_momenta:
                 raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
+            if getattr(self, "dimless_mass", False):
+                raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)
             particle_type = self.particle_encoder(raw_props)           # (N_total, d_particle_hidden)
 
         if order_labels is not None:
@@ -834,6 +856,8 @@ class _AmplitudeGATrMuPBase(nn.Module):
     # identical to AmplitudeLLoCaWrapper.setup_mass_from_momenta / _apply_mass_from_momenta
     setup_mass_from_momenta = AmplitudeLLoCaWrapper.setup_mass_from_momenta
     _apply_mass_from_momenta = AmplitudeLLoCaWrapper._apply_mass_from_momenta
+    setup_dimless_mass = AmplitudeLLoCaWrapper.setup_dimless_mass
+    _apply_dimless_mass = AmplitudeLLoCaWrapper._apply_dimless_mass
 
     # identical to AmplitudeLLoCaWrapper.setup_particle_features
     def setup_particle_features(self, use_pids: bool, property_matrix=None,
@@ -858,6 +882,8 @@ class _AmplitudeGATrMuPBase(nn.Module):
             raw_props = self.property_matrix[particle_type_indices]
             if self.mass_from_momenta:
                 raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
+            if getattr(self, "dimless_mass", False):
+                raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)
             scalars = self.particle_encoder(raw_props)
         if order_labels is not None:
             counts = ptr[1:] - ptr[:-1]

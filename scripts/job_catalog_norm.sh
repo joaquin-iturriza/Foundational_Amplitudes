@@ -17,7 +17,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless or Ds0}"; SMOKE="${2:-}"
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn or Ds0}"; SMOKE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 [ "$ARM" = A ] && NORM+=(++data.target_physics_factor=true ++data.target_physics_s0=289.0)
@@ -30,6 +30,10 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 [ "$ARM" = Btev ]  && NORM+=("${DIM[@]}" ++data.target_physics_dim_ref=1000000.0 ++data.target_physics_s0=1.0)
 [ "$ARM" = Dless ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0)
 [ "$ARM" = Ds0 ]   && NORM+=("${DIM[@]}" ++data.target_physics_s0=289.0)
+# DlessIn (the user, 2026-10-22, the dimensionless path): Dless's target with dimensionless inputs too
+# (data.dimensionless_inputs: momenta per event / sqrt(s_hat), masses as log10(m / sqrt(s_hat)), off-shellness / s_hat);
+# in memory, the only path that implements it
+[ "$ARM" = DlessIn ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits

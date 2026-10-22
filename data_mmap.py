@@ -320,6 +320,8 @@ def init_data_recipes_mmap(exp, c):
     names, roles, specs = c["names"], c["roles"], c["specs"]
 
     assert not c["stats_on_pool"], "data.memmap: data.phase_space_on_pool is not implemented on the memmap path"
+    assert not bool(cfg.data.get("dimensionless_inputs", False)), \
+        "data.memmap: data.dimensionless_inputs is implemented on the in-memory path only (data.memmap=false)"
     for k in ("target_propagators", "resonance_per_event"):
         assert not bool(cfg.data.get(k, False)), f"data.memmap: data.{k} is not implemented on the memmap path"
     assert not bool(cfg.training.get("sign_head", False)), "data.memmap: training.sign_head is not implemented"

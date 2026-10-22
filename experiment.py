@@ -1205,6 +1205,30 @@ class AmplitudeExperiment(BaseExperiment):
                     f"Mass encoding: data-derived on-shell mass (mom_div={self.mom_div:.4g}, "
                     f"mass_col={spec['mass_col']}, replaces frozen table mass)"
                 )
+            # data.dimensionless_inputs: masses as log10(m / sqrt(s_hat)) per event (wrappers.setup_dimless_mass)
+            if self.cfg.data.get("dimensionless_inputs", False):
+                assert not use_pids, "data.dimensionless_inputs requires the property encoding (use_PIDs=false)"
+                assert not self.cfg.data.get("mass_from_momenta", False), \
+                    "data.dimensionless_inputs sets the mass column itself; data.mass_from_momenta must be off"
+                from particle_ids import mass_feature_spec, GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, \
+                    MASS_MASSLESS_LOG10_THR
+                spec = mass_feature_spec(
+                    spin_onehot=self.cfg.data.get("spin_onehot", False),
+                    color_onehot=self.cfg.data.get("color_onehot", False),
+                    is_massless=self.cfg.data.get("prop_is_massless", False),
+                    standardize=self.cfg.data.get("standardize_props", False),
+                    generation_onehot=bool(self.cfg.data.get("generation_onehot", False)),
+                    generation_feature=bool(self.cfg.data.get("generation_feature", True)),
+                )
+                # the column transforms keep the rows, so the raw table's mass column marks the massive rows
+                raw_m = np.asarray(GLOBAL_PROPERTY_MATRIX)[:, PARTICLE_FEATURE_NAMES.index("log10_mass_gev")]
+                assert raw_m.shape[0] == self.property_matrix.shape[0], (raw_m.shape, self.property_matrix.shape)
+                massive = raw_m >= MASS_MASSLESS_LOG10_THR
+                massive[0] = False                     # row 0: the padding entry
+                model.setup_dimless_mass(spec["mass_col"], massive,
+                                         spec["std_sd"] if spec["std_sd"] is not None else 1.0)
+                LOGGER.info(f"Mass encoding: log10(m / sqrt(s_hat)) per event for {int(massive.sum())} massive "
+                            f"species (dimensionless_inputs), mass_col={spec['mass_col']}")
             # Build + attach the diagram graph encoder (a real submodule → trained,
             # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
             # so it exists before μP finalisation and warm-start loading.
@@ -1456,6 +1480,11 @@ class AmplitudeExperiment(BaseExperiment):
                     _same = (abs(float(_a) - float(_b)) < 1e-9 * max(1.0, abs(float(_a)))
                              if _k == "target_physics_s0" else str(_a) == str(_b))
                     assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
+            # the momentum scale of these stats is in GeV or in units of each event's sqrt(s_hat)
+            _di_stats = bool(stats.get("dimensionless_inputs", False))
+            _di_cfg = bool(self.cfg.data.get("dimensionless_inputs", False))
+            assert _di_stats == _di_cfg, (f"frozen data stats were fitted with dimensionless_inputs={_di_stats}, "
+                                          f"this run sets {_di_cfg}")
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
             assert _tp_stats == _tp_cfg, (
@@ -1574,6 +1603,19 @@ class AmplitudeExperiment(BaseExperiment):
         #     load_file: momentum /= momentum.std()), then applied to every block.
         #     mom_mean/mom_std for the in-net (local-mean)/std are the global
         #     stats of the scaled train momenta. ---
+        # data.dimensionless_inputs (2026-10-22, the user: the dimensionless path): every event's momenta in units of its
+        #     own sqrt(s_hat), s_hat = (p1 + p2)^2, before the global scale (then a pure number). rec["rs"] keeps
+        #     sqrt(s_hat) in GeV for what needs physical momenta (the target factors, the off-shellness) and for the
+        #     per-event mass feature log10(m / sqrt(s_hat)) (wrappers.setup_dimless_mass).
+        _dimless = bool(self.cfg.data.get("dimensionless_inputs", False))
+        if _dimless:
+            for k in store:
+                mm = store[k]["momenta"].astype(np.float64)
+                q = mm[:, 0] + mm[:, 1]
+                rs = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+                assert np.all(rs > 0), f"dimensionless_inputs: non-positive s_hat in {k}"
+                store[k]["rs"] = rs
+                store[k]["momenta"] = (mm / rs[:, None, None]).astype(np.float32)
         if mom_div is None:
             train_mom = np.concatenate(
                 [store[("train", n)]["momenta"].reshape(-1, 4) for n in names], axis=0
@@ -1587,6 +1629,12 @@ class AmplitudeExperiment(BaseExperiment):
         self.mom_div  = float(mom_div)   # physical scale (for data.mass_from_momenta)
         for k in store:
             store[k]["momenta"] = store[k]["momenta"] / mom_div
+
+        def _phys(rec):
+            """(N, P, 4) momenta in GeV of a store record (undoes the global scale and, with dimensionless_inputs,
+            the per-event sqrt(s_hat))"""
+            pp = rec["momenta"].astype(np.float64) * mom_div
+            return pp * rec["rs"][:, None, None] if "rs" in rec else pp
 
         # --- amplitude preprocessing: stats fitted on TRAIN, applied to all ---
         # --- target-side propagator subtraction (data.target_propagators): every event's
@@ -1628,9 +1676,9 @@ class AmplitudeExperiment(BaseExperiment):
                 # no reachable pole.
                 props = []      # (pdg, mask, M², power, norm): massive -> BW, massless -> |t|^p
                 if cand and ("train", name) in store:
-                    pp = store[("train", name)]["momenta"].astype(np.float64)
+                    pp = _phys(store[("train", name)])
                     for pdg, mrow, mm in cand:
-                        q = np.einsum("s,nsc->nc", mrow, pp) * mom_div
+                        q = np.einsum("s,nsc->nc", mrow, pp)
                         s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
                         if mm > 0:
                             above = float(np.mean(s_prop > mm))
@@ -1662,10 +1710,10 @@ class AmplitudeExperiment(BaseExperiment):
                     if (role, name) not in store:
                         continue
                     rec = store[(role, name)]
-                    pp = rec["momenta"].astype(np.float64)                      # (N,P,4), /mom_div
+                    pp = _phys(rec)                                             # (N,P,4) GeV
                     logF = np.zeros(pp.shape[0], dtype=np.float64)
                     for pdg, mrow, mm, power, norm in props:
-                        q = np.einsum("s,nsc->nc", mrow, pp) * mom_div         # (N,4) physical
+                        q = np.einsum("s,nsc->nc", mrow, pp)                   # (N,4) physical
                         s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
                         if mm > 0:
                             g = widths.get(abs(int(pdg)), 0.0)
@@ -1703,7 +1751,7 @@ class AmplitudeExperiment(BaseExperiment):
                     if (role, name) not in store:
                         continue
                     rec = store[(role, name)]
-                    logF = self._physics_logF(name, rec["momenta"].astype(np.float64) * mom_div)
+                    logF = self._physics_logF(name, _phys(rec))
                     F = np.exp(logF).reshape(rec["raw_amp"].shape)
                     if role == "train":
                         spans.append(float(np.mean(logF)))
@@ -1758,6 +1806,7 @@ class AmplitudeExperiment(BaseExperiment):
                         and bool(self._internal_mass_pdgs) and not _want_offshell)
         offshell_masks = self._setup_offshell_masks(names) if _want_offshell else None
         role_offshell = []   # per-event propagator off-shellness (s_prop − M²)
+        role_lrs = []        # per-event log10 sqrt(s_hat) (dimensionless_inputs)
         role_factor = []     # per-event target factor (data.target_propagators; 1 when off)
         role_sign = []       # per-event sign target (1 for x >= 0), used by training.sign_head
         rng = np.random.default_rng(seed=42)
@@ -1767,6 +1816,7 @@ class AmplitudeExperiment(BaseExperiment):
             ds_parts, ds_toks = [], []
             ev_starts, ev_pid, ev_order, amp_blocks = [], [], [], []
             ev_resarg = []
+            ev_lrs = []          # dimensionless_inputs: log10 sqrt(s_hat) per event (GeV), for the mass feature
             ev_offshell = []
             ev_factor = []
             ev_sign = []
@@ -1794,11 +1844,14 @@ class AmplitudeExperiment(BaseExperiment):
                 ev_factor.append(np.asarray(rec.get("amp_factor", np.ones_like(rec["raw_amp"])),
                                             dtype=np.float64).reshape(-1))
                 ev_sign.append((np.asarray(rec["raw_amp"]).reshape(-1) >= 0).astype(np.float32))
+                if _dimless:
+                    ev_lrs.append(np.log10(rec["rs"]).astype(np.float32))
                 if _want_resarg:
                     # per-event √s (physical) from the initial pair (parts are /mom_div)
-                    q  = parts[:, 0, :] + parts[:, 1, :]                    # (N,4)
+                    pg = _phys(rec)
+                    q  = pg[:, 0, :] + pg[:, 1, :]                          # (N,4) GeV
                     s2 = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                    roots = np.sqrt(np.clip(s2, 0.0, None)) * mom_div       # (N,)
+                    roots = np.sqrt(np.clip(s2, 0.0, None))                 # (N,)
                     mz = self._internal_mass_by_proc[proc_idx]              # [m_pdg...]
                     ev_resarg.append(np.stack([roots - float(m) for m in mz], axis=1
                                               ).astype(np.float32))          # (N, n_pdg)
@@ -1813,16 +1866,18 @@ class AmplitudeExperiment(BaseExperiment):
                     cols  = np.zeros((N, n_pdg), dtype=np.float64)
                     sel   = offshell_masks[proc_idx] if offshell_masks is not None else None
                     if sel is not None:
-                        pp = parts.astype(np.float64)                        # (N,P,4), /mom_div
+                        pp = _phys(rec)                                      # (N,P,4) GeV
+                        # dimensionless_inputs: (s_prop - M^2) / s_hat, a pure number like every other input
+                        s_ev = rec["rs"] ** 2 if "rs" in rec else 1.0
                         for c, pdg in enumerate(self._internal_mass_pdgs):
                             props = sel.get(pdg, [])
                             if not props:
                                 continue
                             offs = []
                             for mrow, mm in props:
-                                q = np.einsum("s,nsc->nc", mrow, pp) * mom_div   # (N,4) physical
+                                q = np.einsum("s,nsc->nc", mrow, pp)             # (N,4) physical
                                 s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                                offs.append(s_prop - mm)                        # (N,)
+                                offs.append((s_prop - mm) / s_ev)               # (N,)
                             offs = np.stack(offs, axis=1)                       # (N, n_props)
                             idx  = np.argmin(np.abs(offs), axis=1)
                             cols[:, c] = offs[np.arange(N), idx]
@@ -1849,6 +1904,8 @@ class AmplitudeExperiment(BaseExperiment):
                 role_resarg.append(np.concatenate(ev_resarg, axis=0)[perm])
             if _want_offshell:
                 role_offshell.append(np.concatenate(ev_offshell, axis=0)[perm])
+            if _dimless:
+                role_lrs.append(np.concatenate(ev_lrs, axis=0)[perm])
             role_counts[role] = offs.shape[0]
             self._role_perm[role] = perm
 
@@ -1909,6 +1966,16 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"offshell_per_event ON: internal-mass slot ({n_pdg} col) filled "
                         f"per-event with signed-log-standardized (s−M²) for pdgs "
                         f"{self._internal_mass_pdgs}")
+        if _dimless:
+            # one column past the model's order features: the wrapper takes it off and uses it only to put each
+            # massive particle's table mass in units of its event's sqrt(s_hat) (wrappers.setup_dimless_mass), so
+            # no absolute scale reaches the network. Appended after the off-shellness fill, which writes the last
+            # n_pdg columns of the order features.
+            lrs = np.concatenate(role_lrs, axis=0).astype(np.float32)
+            self.all_order_labels = np.concatenate([self.all_order_labels, lrs[:, None]], axis=1)
+            LOGGER.info(f"dimensionless_inputs ON: momenta per event / sqrt(s_hat), masses as log10(m / sqrt(s_hat)), "
+                        f"off-shellness / s_hat; sqrt(s_hat) {np.median(10 ** lrs):.4g} GeV median "
+                        f"({np.percentile(10 ** lrs, 5):.4g} to {np.percentile(10 ** lrs, 95):.4g})")
         self.n_order_features = n_order_features
         self.N_events         = self.offsets.shape[0]
         self._role_counts     = (role_counts["train"], role_counts["val"],
@@ -2115,6 +2182,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
+                "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
                 "target_physics_dim_ref": str(self.cfg.data.get("target_physics_dim_ref", "shat")),
                 "target_physics_s0": float(self.cfg.data.get("target_physics_s0", 289.0)),
                 "target_physics_couplings": self.cfg.data.get("target_physics_couplings", None),
