@@ -2266,8 +2266,15 @@ class AmplitudeExperiment(BaseExperiment):
             q, e = int(o[2]), int(o[3])
             # a mixed tree entry (four-quark, heavy-quark pair: the order vector records the two maxima, q + e above the
             # tree's total degree nfinal) has several coupling monomials, so no single power is exact: refused
+            # a stripped one-loop QCD virtual (L_QCD = 1, its powers the Born's, order_vector) is mixed when its Born is:
+            # its powers then exceed nfinal the same way (by one more with alphas_prefactor, whose alpha_s power is k);
+            # loop-induced and electroweak one-loop entries carry an explicit order and are not judged here
+            import mg5_pipeline_final as mg
             nfin = mom_phys.shape[1] - 2
-            assert not (int(o[0]) == 0 and int(o[1]) == 0 and q + e > nfin), \
+            pc = mg.PROCESSES.get(name, {})
+            virt = pc.get("kind") == "virt" and pc.get("order") is None
+            deg = nfin + (1 if (virt and pc.get("alphas_prefactor")) else 0)
+            assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
                 f"target_physics_orders: {name} is a mixed-order entry {o}, its coupling homogeneity is not exact"
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)

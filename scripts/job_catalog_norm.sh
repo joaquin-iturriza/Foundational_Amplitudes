@@ -70,6 +70,7 @@ case "$SET" in
     # d4r_gdx_dxzh_g stands in (catalog_2to4r_processes.yaml), from a recipe dir of its own
     2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_
               [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
+    loop)     R="$SCRATCH/zz_catalog_loop_recipes"; HELD=recipes/catalog_loop_probes.yaml; PFX="" ;;
     top)      R="$SCRATCH/zz_catalog_top_recipes"; HELD=recipes/catalog_daniel_top.yaml; PFX=dc_ ;;
     2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_ ;;
     2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;

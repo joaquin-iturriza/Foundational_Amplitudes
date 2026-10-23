@@ -103,7 +103,12 @@ for recipe in a.recipes:
     coef = np.linalg.lstsq(A, z, rcond=None)[0]
     affine = float(np.mean((A @ coef - z) ** 2))
     tr = (exp._amp_trafos_pp or [exp.cfg.data.amp_trafos])[0]
-    assert str(tr[0]).startswith("log"), f"{recipe}: probe transform {tr} (a signed probe has no log|M|^2 target)"
+    if not str(tr[0]).startswith("log"):
+        # a signed probe (a one-loop finite part that changes sign) has no log|M|^2 target: listed, not dropped, and
+        # the other probes of the call still scored
+        print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "probe": probe,
+                                         "error": f"signed probe: transform {list(map(str, tr))}, no log|M|^2 target"}), flush=True)
+        continue
     mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
     t = mu_p + sd_p * z                                                   # the probe's log|M|^2
     if pstats.get("affine_multiplicity"):
