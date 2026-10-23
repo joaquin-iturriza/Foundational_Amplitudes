@@ -30,6 +30,10 @@ for p in yaml.safe_load(open(sys.argv[1]))["processes"]:
         elif not datagen._is_cached(out, mg.recipe_id(r)):
             bad.append((p["name"], role, out))
 print(len(missing), "pools to build:", missing)
+# prebuild_recipes.py keys a pool to build by (name, role): two missing windows of one name would share its chunk plan
+clash = [k for k in set(missing) if missing.count(k) > 1]
+if clash:
+    print("REFUSED: two missing windows of one process in one role (prebuild keys by name):", clash); sys.exit(1)
 if bad:
     print("REFUSED: existing pools would be rebuilt over:", bad); sys.exit(1)
 PY
