@@ -61,20 +61,28 @@ def main():
     # `why` ("<parent>+g", "+a" at enumeration; "+z", "+h", "+uu~", "+dd~", "+bb~", "+e+e-", "+veve~" in the D100
     # extension), mapped to the parent's class; four-fermion and multi-boson finals have none ("other:<beam>")
     cls = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "census_classes.json")))["classes"]
-    rep_of = {m: r for r, ms in cls.items() for m in ms}
+    rep_of = {m: n for ms in cls.values() for n in ms if n in set(reps) for m in ms}
+    members = defaultdict(list)
+    for m, n in rep_of.items():
+        members[n].append(m)
     ADDS = ("+e+e-", "+veve~", "+uu~", "+dd~", "+bb~", "+g", "+a", "+z", "+h")
 
-    def parent(n):
-        why = P[n].get("why", "")
-        for s_ in ADDS:
-            if why.endswith(s_) and why[: -len(s_)] in rep_of:
-                return rep_of[why[: -len(s_)]]
-        return None
-    kids = defaultdict(list)
+    def parents(r):
+        """the parent classes of class r over ALL its members' `why` (members of one class can come from different
+        parents; a held-out family must keep no training child)"""
+        out = set()
+        for m in members[r]:
+            why = P[m].get("why", "")
+            for s_ in ADDS:
+                if why.endswith(s_) and why[: -len(s_)] in rep_of:
+                    out.add(rep_of[why[: -len(s_)]]); break
+        return out
+    kids, par = defaultdict(list), {}
     for n in reps:
         if P[n]["layer"] == 4:
-            p = parent(n)
-            kids[p if p else "other:" + beam(n)].append(n)
+            par[n] = parents(n)
+            for p in sorted(par[n]) or ["other:" + beam(n)]:
+                kids[p].append(n)
     fams = sorted(f for f in kids if not f.startswith("other:"))
     out_fams = set(rng.sample(fams, max(1, round(a.family_frac * len(fams)))))
     for f in sorted(out_fams):
@@ -120,8 +128,10 @@ def main():
     for n in reps:
         if role[n]["axis"] == "H3":
             tops[P[n]["layer"]].append(n)
-    tot = sum(len(v) for v in tops.values())
-    hq_cls = [n for L, ns in sorted(tops.items()) for n in rng.sample(sorted(ns), max(1, round(a.n_heavy * len(ns) / tot)))]
+    # every 2->2 top class (the cheapest, most direct bracket), the rest of --n-heavy drawn over 2->3 and 2->4 by size
+    hq_cls = sorted(tops[2])
+    tot = len(tops[3]) + len(tops[4]); room = max(0, a.n_heavy - len(hq_cls))
+    hq_cls += [n for L in (3, 4) for n in rng.sample(sorted(tops[L]), max(1, round(room * len(tops[L]) / tot)))]
     heavy = {f"{n}__mt{m}": {"role": "train", "tree": n, "m_t": m} for n in sorted(hq_cls) for m in (50, 300, 600)}
     out = {"trees": role, "loops": loops, "heavy_quark": heavy, "twin_out": sorted(twin_out), "seed": a.seed,
            "family_frac": a.family_frac, "h1_frac": a.h1_frac}
