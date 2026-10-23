@@ -548,8 +548,11 @@ class LLM4LHCDiagramEncoder(nn.Module):
             0, pair_b, scores, reduce="amax", include_self=True)
         ex = torch.exp(scores - smax[pair_b])
         w = ex / torch.zeros(B, device=dev, dtype=dt).index_add(0, pair_b, ex)[pair_b]
-        W = torch.sparse_coo_tensor(torch.stack([pair_b, pair_t]), w, (B, per_diag.shape[0]))
-        return torch.sparse.mm(W, per_diag)                                      # (B, out)
+        # the weighted sum over each event's diagrams as an index_add (a sparse (B, T) @ (T, out) product hit a CUDA
+        # illegal memory access inside torch.sparse.mm on the 15th of 40 processes scored in one job, 2026-10-23, and
+        # never on that process alone); the same sum, without cuSPARSE
+        assert int(pair_t.max()) < per_diag.shape[0] if pair_t.numel() else True, "diagram index out of range"
+        return torch.zeros(B, per_diag.shape[1], device=dev, dtype=dt).index_add(0, pair_b, w[:, None] * per_diag[pair_t])
 
 
 def inject_at_positions(embeds, vectors, positions):
