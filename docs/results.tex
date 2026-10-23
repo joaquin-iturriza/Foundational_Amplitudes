@@ -362,10 +362,17 @@ already encodes (DMsimp's $Z'$, the 2HDM's scalars). Stage 3, $|\mathcal M|^2$ o
 leg relabelling (\code{tools/equal\_processes.py}, $32$ minutes on $16$ cores): $344$ classes of exactly equal processes
 take out $452$ strings ($\nu_e=\nu_\tau$ finals, $b\bar b\to c\bar c=b\bar b\to d\bar d$ at QCD order, \dots), and $151$
 near pairs (log-ratio spread $2\times10^{-6}$ to $10^{-2}$; $d\bar d\to HZZ$ against $u\bar u\to HZZ$, $e^+e^-\to HZZ$:
-the fermion line's couplings factor out up to the $Z$ width) take out $75$ more. Distinct tree classes: $1103$, $65$ at
-$2\to2$, $321$ at $2\to3$, $717$ at $2\to4$ (by beam: $e^+e^-$ $9$, $38$, $95$; quark pairs $44$, $214$, $489$;
-quark-gluon $9$, $55$, $109$; $gg$ $3$, $14$, $24$); $359$ coloured classes at $2\to2$ and $2\to3$ can carry a one-loop
-QCD virtual, $51$ of them with a top.
+the fermion line's couplings factor out up to the $Z$ width) take out $75$ more. Distinct SM tree classes: $1103$ (the $12$ BSM
+processes apart), by multiplicity and beam:
+\begin{center}
+\begin{tabular}{lccccc}
+ & $e^+e^-$ & quark pairs & quark-gluon & $gg$ & all \\ \hline
+$2\to2$ & $9$ & $44$ & $9$ & $3$ & $65$ \\
+$2\to3$ & $38$ & $214$ & $55$ & $14$ & $321$ \\
+$2\to4$ & $95$ & $489$ & $109$ & $24$ & $717$ \\
+\end{tabular}
+\end{center}
+Of these, $359$ coloured classes at $2\to2$ and $2\to3$ can carry a one-loop QCD virtual, $51$ of them with a top.
 
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
@@ -823,7 +830,7 @@ $79$ probes both arms can score, the trees read at $0.35$ (DlessIn) and $0.33$ (
 and $0.16$, $e^+e^-$-initiated $3.5$ and $3.6$, an initial state the catalog lacks) and their one-loop partners at $9.0$ and
 $10.1$: the stripped virtual of the same process and window is a median $18$ and $26$ times its tree's error (DlessIn on all
 $99$: $11$). Most of that error is the level, not the shape (next paragraph): once one labelled event fixes the offset the one-loop
-pools read at $0.97$ (with the orders), and the shape part alone is $0.50$, against $0.22$ for their trees.
+pools read at $1.0$ (with the orders), and the shape part alone is $0.50$, against $0.22$ for their trees.
 
 \begin{figure}[H]
 \centering
@@ -848,10 +855,10 @@ event of a process is cheap next to its dataset, and should already fix most of 
 reads of the dimensionless round, no new run (\code{analysis/catalog\_daniel/kshot\_level.py}, Fig.~\ref{fig:kshot_level}):
 per process, $K$ validation events drawn at random, the offset taken as the mean error on them and subtracted, the MSE of
 $\log|\mathcal M|^2$ measured on the remaining events, $200$ draws; median over processes. With the coupling orders
-(\code{DlessInOrd}), from $K=0$ to $1$ to $8$: $2\to4$ $+g$ $52\to5.2\to2.9$, $+\gamma$ $30\to4.5\to2.6$, the tops never
-seen $14\to2.9\to1.7$, the one-loop pools $10\to0.97\to0.59$; their floors (the error's variance, what any constant per
+(\code{DlessInOrd}), from $K=0$ to $1$ to $8$: $2\to4$ $+g$ $52\to5.0\to2.9$, $+\gamma$ $30\to4.6\to2.6$, the tops never
+seen $14\to2.9\to1.7$, the one-loop pools $10\to1.0\to0.57$; their floors (the error's variance, what any constant per
 process can reach) are $2.6$, $2.3$, $1.5$ and $0.50$. On the $43$ new processes the prior is already better than one event
-($0.48$ at $K=0$, $0.55$ at $K=1$, $0.30$ at $K=8$, floor $0.26$), so a calibration has to weigh the prediction against the
+($0.48$ at $K=0$, $0.53$ at $K=1$, $0.30$ at $K=8$, floor $0.26$), so a calibration has to weigh the prediction against the
 events, not replace it. Weighing them (a prior on the offset from the other probes of the same set, its
 mean and spread leave-one-process-out, combined with the $K$ events by their precision): one event no longer hurts there
 ($0.45$), and at $K=0$ the prior alone takes $2\to4$ $+g$ from $52$ to $4.7$, $+\gamma$ from $30$ to $4.4$ and the one-loop
@@ -927,7 +934,7 @@ $\pm0.5$), where no emission is soft and $\hat s$ is the right scale; that is th
 proxy for what a network can learn, not a prediction of it, so the candidate goes to a short run (next). (3) \emph{The
 sign-changing one-loop pools under $\mathrm{asinh}(V/(F r_0))$} (\code{signed\_band.py}, $53$ of the $55$ pools with val
 events): one shared $r_0$ (the median of the pools' $0.5\%$ quantiles of $|VF|$) puts more than $10\%$ of the events in the
-linear band on $14$ of them and all of them on one, since the pools' median $\log|VF|$ spans $-3.5$ to $10.7$; the user's
+linear band on $14$ of them and all of them on two, since the pools' median $\log|VF|$ spans $-3.5$ to $10.7$; the user's
 objection to the linear part holds for a shared $r_0$. The zero crossings themselves are thin: a median $3.4\%$ of a pool's
 events lie within a factor $10$ of zero relative to its median, $0.2\%$ within a factor $100$. So $r_0$ must follow the
 pool's level, which makes the signed target a consequence of the level problem: with the level normalized, one $r_0$
@@ -960,7 +967,7 @@ one-loop pools & $10.2$ & $10.0$ & $1.06$ \\
 \end{tabular}
 \end{center}
 The extra particle stops being the failure: the $2\to4$ offset goes from $-7.0$ / $-5.3$ to $-1.0$ / $-0.15$ and its
-shape error from $2.6$ / $2.3$ to $1.5$ / $1.8$, every $2\to4$ probe improves ($90\%$ of the ratios under $0.27$), at both
+shape error from $2.6$ / $2.3$ to $1.5$ / $1.8$, every $2\to4$ probe improves ($90\%$ of the ratios under $0.28$), at both
 cuts and at $100$\,TeV, where the fixed $s_0$, the best earlier $2\to4$ arm ($4.6$ / $4.0$), is tied to one set of cuts.
 The CPU proxy called both sides: the composition level at $2\to4$ $+g$ went from $9.4$ to $1.7$ and on the $43$ new from
 $0.48$ to $3.3$; trained, the $43$ new cost a factor $1.6$ at the median MSE ($0.48$ to $0.75$; level $0.19$ to $0.31$,
@@ -6546,73 +6553,36 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{Proposed to the user (2026-10-23, evening): a new catalog first, then the level. Design only, no job.}
-    The user: ``we shouldn't be bound to this catalog for much longer \dots\ design a new similarly sized catalog with
-    true diversity, no repetitions or relabelings, being very intentional on what is left out as heldout''. Why:
-    arXiv:2606.23791's $1501$ processes are $409$ classes, $96$ of its $149$ held-out processes relabel a training one,
-    and it has no $e^+e^-$, no $2\to4$, no loop and no mass that moves; catalog\_v2 is ruled but small ($400$, six beams).
-    \emph{The unit is an equality class.} Every candidate's $|\mathcal M|^2$ on shared points (\code{tools/equal\_processes.py}
-    extended to every candidate, one-loop included, with CP and parity mirrors among the relabellings); one representative
-    per class, near-twins (log-ratio spread under $10^{-2}$, $\mu$ against $\tau$ finals) counted as one; the class count
-    per layer is the catalog's size, not the process count. \emph{Layers}, $\sim1500$ classes: SM trees $2\to2$, $2\to3$
-    and part of $2\to4$ from every beam ($e^+e^-$, every quark pair with $b$, $qg$, $gg$); one-loop QCD virtuals at $2\to2$
-    and $2\to3$, positive and sign-changing, and loop-induced; parameter variants at far points ($\alpha_s$, $m_t$, $M_Z$,
-    $M_H$); a heavy-quark layer at several masses ($m_Q\in\{50,300,600\}$\,GeV, the top's quantum numbers) so that the
-    physical top is an interpolation in the particle table, which the top axis showed nothing in training varied.
-    \emph{Conventions}: one sampler (the mixture), one cut set, $\alpha_s$ stored per event at generation, every pool the
-    same size. \emph{Held out}, each probe with its whole class and tagged with the structure it needs and its nearest
-    training class: (H1) new combinations of seen vertices, particles, multiplicity and order, $\sim5\%$ per layer; (H2)
-    multiplicity, $2\to4$ of families with no $2\to4$ in training (inside the trained range) and $2\to5$ (outside);
-    (H3) particle, the physical top bracketed by the heavy-quark masses, and one particle never seen in any form; (H4) one
-    vertex class absent (the quartic gauge or the triple Higgs vertex); (H5) order, the one-loop of families whose trees
-    train, of held-out trees, and one loop-induced class; (H6) parameter interpolation points; (H7) $100$\,TeV and $p_T\geq30$.
-    H1, H2, H3's top, H5 to H7 come from one pretraining; H3's unseen particle and H4 need one removal twin, shared.
-    The census is done (par.\ catalog\_v3, the census): $1103$ distinct tree classes ($65$, $321$, $717$ at $2\to2$, $2\to3$,
-    $2\to4$) and $12$ BSM. Proposed composition, to the user before any generation: every tree class; one-loop QCD
-    virtuals of every coloured $2\to2$ class and $\sim90$ $2\to3$ ones ($\sim150$; a $2\to3$ MadLoop pool costs $100$--$200$
-    LO units); the certified loop-induced; the heavy-quark layer on $20$ top families at $m_Q\in\{50,300,600\}$\,GeV ($60$);
-    $\alpha_s$ far points on $\sim10$ families ($20$); $2\to5$ probes for H2's extrapolation ($\sim40$): about $1400$ pools.
-    The held-out selection, first draft (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}),
-    for the user's review before any generation: of the $1103$ tree classes $801$ train ($56$, $263$, $482$ at
-    $2\to2$, $2\to3$, $2\to4$); H3 the physical top, $157$ (every class with an external top, $2\to4$ included; the
-    heavy-quark layer brackets it at $2\to2$ and $2\to3$ only); H2 $104$ ($2\to4$ of $48$ of the $318$ $2\to3$ families,
-    and $15\%$ of the four-fermion and multi-boson finals); H1 $41$ ($5\%$ per layer and beam); one-loop virtuals $250$ train
-    and $58$ held out (H5: $15\%$ of the training families, and those of H1's trees). The removal twin (H3's never-seen
-    Higgs and H4's quartic gauge family) drops $205$ more training classes, a quarter of training. Open points for the
-    user: the loop layer's size ($308$ MadLoop pools is about twice the proposal; all $2\to2$ and a subset of $2\to3$
-    halves it), whether the top's $2\to4$ classes should get heavy-quark analogues too, and whether the twin should
-    remove the Higgs (a quarter of training) or a smaller particle.
-    The regimes are D93's (multiplicity, cuts, collider energy, unseen particle content, order: H2, H7, H3, H5); H1, H4,
-    H6 are mine, kept unless the user drops them. SM only: the heavy-quark layer serves the particle axis, and H3's
-    never-seen particle is the Higgs, held out whole in the twin that also removes H4's vertex. Questions for the user: the
-    size ($\sim1500$ classes); whether $e^+e^-$ stays in (proposed yes: no training process has that initial state, and its
-    one-loop probes read at $3.5$ against $0.16$ for quark-initiated ones).
-    \emph{The level, after the catalog} (par.\ What a few labelled events fix): (L1) a per-emission scale, the target
-    $|\mathcal M|^2$ times the product of the event's $k_T$-clustering scales instead of $\hat s^{N-4}$, which removes the
-    $\hat s/k_T^2$ an emission adds and keeps the $2\to4$ level inside the trained range (the fixed $s_0$ does that for one
-    cut set only); (L2) the loop factor $(16\pi^2)^{-L}$ and (L3) the spin, colour and identical-particle factors in $F$,
-    exact; (L4) a few-event calibration weighted by the $\sigma$ head, the only step between zero-shot and the floor at
-    small $K$; (L5) the small dedicated network, for what no constant fixes ($2\to4$ shape $2.5$, unseen tops $1.5$): first a
-    per-process context vector fitted on $K$ events with the trunk frozen (feature reuse matches meta-learning,
-    arXiv:1909.09157), then a factorisation-aware head that predicts the $(n{+}1)$-point amplitude from the model's own
-    $n$-point one times dipoles (arXiv:2107.06625, 2512.11036). Targets I set: zero-shot $2\to4$ within $2\times$ of
-    its $K=1$ error; the tops' shape floor under $0.5$ with the heavy-quark layer. Signed pools: the user, 2026-10-23,
-    the linear part of asinh costs against its log part, so $r_0$ per pool at a low quantile of $|V/F|$ ($\leq0.5\%$ of
-    events in the linear band, which is where the sign changes), compared with the sign head on $\log|V|$.
-  \item \textbf{State (2026-10-23, 17:10).} Nothing running; supervisor and \code{site events --wait} armed. Done today and
-    written up: D93's round (par:dimless\_orders, par:dimless\_particle, fig:dimless\_axes, every unit of
-    \code{dimless\_general}'s check), D97's hp58 extension (stage-2 paragraph and table). The magnitude-only scoring of the
-    $55$ sign-changing one-loop pools and their $48$ trees (\code{recipes/catalog\_loop\_signed.yaml},
-    \code{zero\_shot\_parent.py --signed-magnitude}; DlessIn $103$, DlessInOrd $61$ predictions in
-    \code{\$SCRATCH/zz\_catalog\_norm\_short\_*\_sigstage\_loopsigned}) is a diagnostic, not written up: the user,
-    2026-10-23, ``signed datasets should be dealt with in some way, in a proper way, not a patch on top of something that
-    was not thought for it''. Proposed to the user, waiting: one target for every process, signed or not,
-    $T=\mathrm{asinh}(V/(F r_0))$ with $F$ the per-event dimension and coupling-order factor and one shared $r_0$ (no
-    per-pool fit, log-like for large $|V/F|$ so trees are unchanged up to a constant, linear through zero so the sign is
-    carried by the target; het loss as is), and one-loop pools in the catalog pretraining so signs can be learned; not a
-    ratio to the Born (ruled out 2026-10-15). Also proposed: the full-length catalog pretraining (D78's held item) with the
-    dimension + coupling-order target, dimensionless inputs and the encoder. A new sweep on a cell another sweep measures is
-    refused (\code{sweep/cell\_guard.py}). Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
+  \item \textbf{The new catalog, catalog\_v3 (D98; the user, 2026-10-23: ``design a new similarly sized catalog with true
+    diversity, no repetitions or relabelings, being very intentional on what is left out as heldout'').} Design as approved:
+    the unit is an equality class (par.\ catalog\_v3, the census: $1103$ SM tree classes plus $12$ BSM); one sampler (the
+    mixture), one cut set, $\alpha_s$ stored per event at generation, every pool the same size; layers: every tree class,
+    one-loop QCD virtuals, the certified loop-induced, $\alpha_s$ far points, a heavy-quark layer with the top's quantum
+    numbers at $m_Q\in\{50,300,600\}$\,GeV, and the $Z'$ and 2HDM processes. Held-out axes in the approved order, each
+    probe with its whole class: H1 new combinations, H2 multiplicity ($2\to4$ of families with no $2\to4$ in training,
+    and $2\to5$), H3 particle content (the physical top, bracketed by the heavy-quark layer; one particle never seen, in a
+    removal twin), H4 a vertex class (the quartic gauge family, in the same twin), H5 order, H6 parameter interpolation, H7
+    $100$\,TeV and $p_T\geq30$\,GeV. The regimes are D93's (H2, H7, H3, H5); H1, H4 and H6 are proposed on top.
+    \emph{First draft of the selection} (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}):
+    $801$ tree classes train ($56$, $263$, $482$ at $2\to2$, $2\to3$, $2\to4$); H3 $157$ (every class with an external top,
+    $2\to4$ included); H2 $104$ (the $2\to4$ of $48$ of the $318$ $2\to3$ families, and $15\%$ of the four-fermion and
+    multi-boson finals); H1 $41$; one-loop virtuals $250$ train, $58$ held out (H5). The twin drops $205$ more training
+    classes. \emph{Waiting on the user, before any generation}: the loop layer's size ($308$ MadLoop pools, a $2\to3$ one
+    costing $100$--$200$ LO units; all $2\to2$ and a subset of $2\to3$ halves it); heavy-quark analogues of the top's
+    $2\to4$ classes; the twin's never-seen particle (the Higgs is a quarter of training). Then the cost from the pipeline's
+    cost model and the generation.
+  \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
+    $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); its read on the tops never seen
+    (the twin) is running. Next, in order: a variant that keeps the gain without the cost on finals with no soft particle,
+    through the CPU proxy first; the exact loop factor $(16\pi^2)^{-L}$ and the spin, colour and identical-particle factors
+    in $F$; a few-event calibration by shrinkage (the $\sigma$ head adds nothing); the small dedicated network for what no
+    constant fixes ($2\to4$ shape $1.5$, unseen tops), first a per-process context vector fitted on $K$ events with the
+    trunk frozen (arXiv:1909.09157), then a factorisation-aware head on the model's own lower-multiplicity prediction
+    (arXiv:2107.06625, 2512.11036). Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor
+    under $0.5$ with the heavy-quark layer. Signed pools: $r_0$ follows the pool's level (one shared $r_0$ puts most events
+    of some pools in the linear band, par.\ The candidate targets), compared with the sign head on $\log|V|$; the magnitude
+    scoring of the $55$ signed pools stays a diagnostic. Also proposed: the full-length catalog pretraining (D78's held
+    item) with the adopted target. Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
     \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
