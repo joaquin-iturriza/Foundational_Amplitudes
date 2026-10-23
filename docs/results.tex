@@ -6572,7 +6572,16 @@ of the three share a test set.
     virtuals of every coloured $2\to2$ class and $\sim90$ $2\to3$ ones ($\sim150$; a $2\to3$ MadLoop pool costs $100$--$200$
     LO units); the certified loop-induced; the heavy-quark layer on $20$ top families at $m_Q\in\{50,300,600\}$\,GeV ($60$);
     $\alpha_s$ far points on $\sim10$ families ($20$); $2\to5$ probes for H2's extrapolation ($\sim40$): about $1400$ pools.
-    Next: the held-out selection (H1 to H7) by script, then its cost from the pipeline's cost model.
+    The held-out selection, first draft (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}),
+    for the user's review before any generation: of the $1103$ tree classes $801$ train ($56$, $263$, $482$ at
+    $2\to2$, $2\to3$, $2\to4$); H3 the physical top, $157$ (every class with an external top, $2\to4$ included; the
+    heavy-quark layer brackets it at $2\to2$ and $2\to3$ only); H2 $104$ ($2\to4$ of $48$ of the $318$ $2\to3$ families,
+    and $15\%$ of the four-fermion and multi-boson finals); H1 $41$ ($5\%$ per layer and beam); one-loop virtuals $250$ train
+    and $58$ held out (H5: $15\%$ of the training families, and those of H1's trees). The removal twin (H3's never-seen
+    Higgs and H4's quartic gauge family) drops $205$ more training classes, a quarter of training. Open points for the
+    user: the loop layer's size ($308$ MadLoop pools is about twice the proposal; all $2\to2$ and a subset of $2\to3$
+    halves it), whether the top's $2\to4$ classes should get heavy-quark analogues too, and whether the twin should
+    remove the Higgs (a quarter of training) or a smaller particle.
     The regimes are D93's (multiplicity, cuts, collider energy, unseen particle content, order: H2, H7, H3, H5); H1, H4,
     H6 are mine, kept unless the user drops them. SM only: the heavy-quark layer serves the particle axis, and H3's
     never-seen particle is the Higgs, held out whole in the twin that also removes H4's vertex. Questions for the user: the
