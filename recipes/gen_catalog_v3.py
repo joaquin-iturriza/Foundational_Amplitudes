@@ -167,7 +167,7 @@ def enumerate_candidates():
     return trees, loops, induced, variants, bsm, n_tree
 
 
-def check(workers, out):
+def check(workers, out, only_bsm=False):
     """stage 2 (CC, CPU job scripts/job_catalog_v3_census.sh): one MadGraph `display processes` per tree and BSM
     candidate (catalog_v2's mg5_check: existence, diagram count, WEIGHTED); one-loop candidates are checked only once the
     loop layer is selected (MadLoop is far slower)"""
@@ -175,7 +175,7 @@ def check(workers, out):
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     from gen_catalog_v2 import mg5_check
     cands = json.load(open(OUT))
-    todo = [dict(c, layer=c["layer"] if c["layer"] != "bsm" else "bsm") for c in cands["trees"] + cands["bsm"]]
+    todo = [dict(c) for c in (cands["bsm"] if only_bsm else cands["trees"] + cands["bsm"])]
     for c in todo:
         c.setdefault("model", "sm")
     res = mg5_check(todo, workers=workers)
@@ -228,6 +228,7 @@ def main():
     ap.add_argument("--enumerate", action="store_true")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--workers", type=int, default=16)
+    ap.add_argument("--only-bsm", action="store_true", help="--check the BSM candidates only")
     ap.add_argument("--out", default=os.path.join(os.environ.get("SCRATCH", "/tmp"), "zz_catalog_v3_census", "checked.json"))
     a = ap.parse_args()
     if a.enumerate:
@@ -241,7 +242,7 @@ def main():
         print("wrote", OUT)
     if a.check:
         os.makedirs(os.path.dirname(a.out), exist_ok=True)
-        check(a.workers, a.out)
+        check(a.workers, a.out, a.only_bsm)
     if a.write:
         write(a.write)
 
