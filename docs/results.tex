@@ -6344,21 +6344,22 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-23, 11:30).} All work on CC; supervisor (\code{site supervise}) and \code{site events --wait}
-    armed, no open events, nothing running. Every active item has a check (\code{tools/item\_checks.py}); \code{site ack}
-    refuses a finished run's event until its log was read (\code{site logs}/\code{fetch}, recorded in
-    \code{\textasciitilde/.local/share/ccorch/reads.log}); \code{launch\_cc\_only.sh} fails loudly without a run id. Done and written up today:
-    het stage 2 (fig:het\_stage2), het\_mumse22 (fig:het\_mumse22: $2\to2$ runs of one config differ $>2\times$ in half the cells), the
-    dimensionless round (fig:dimless\_round; DlessInVirt's \code{torch.sparse.mm} crash fixed with an \code{index\_add}, \code{8444bf2}),
-    the cut test, the H100 rebuild of the off $\Delta$ models (sec:tf32-eval, $1$ of $251$ still off), D95 (\code{promote\_final}
-    done: $520$ CC runs; Jean Zay has none). Waiting on the user: (a) hp58's $13$ cells whose best is the highest learning rate
-    tried: a sweep at $[3\times10^{-3},2\times10^{-2}]$, $5$ trials each, about $26$ GPU-h (needs a yes); (b) the coupling-order
-    factor run (D93): $8$ processes whose $\alpha_s$ did not reproduce (mostly $W^+W^-H$), regenerate under new names
-    (recommended) or train without them. Blocked: every bulk transfer to Jean Zay times out (git push and bundle from the laptop,
-    \code{site copy} from the relay), short commands work; so the $29$ GB of lxplus-era tars (\code{\$SCRATCH/zz\_archive\_lxera},
-    checksummed) are not on STORE and nothing is removed from CC, and Jean Zay's checkout is at \code{8fb002e} (10-15). Next
-    without the user: the trim of concluded studies' models (\code{analysis/storage/trim\_plan.tsv}, D96 rule: concluded
-    studies only, never a run over $5$\,h) once the archive is on STORE.
+  \item \textbf{State (2026-10-23, 13:45).} D93's remaining parts are running, each a unit of \code{dimless\_general}'s check
+    (\code{tools/item\_checks.py}, so a part neither done nor running raises a GAP; before, the study had no such units and
+    stalled once its jobs ended): the coupling-order arm \code{DlessInOrd} (DlessIn with \code{data.target\_physics\_orders},
+    FA-ccin2p3-f6f9251c) and its twin trained without the catalog's $142$ top processes (FA-ccin2p3-def0b084, scored on all
+    $162$ top processes: the particle-content set; two Higgs bosons are already held out entirely by the catalog's split);
+    the order set, the $57$ one-loop pools on CC positive in every split with the tree of the same process and window
+    ($42$), $99$ probes (\code{recipes/catalog\_loop\_probes.yaml}; prep job FA-ccin2p3-8ec65e8f builds the missing tree
+    train pools and each pool's $\alpha_s$ by \code{tools/write\_own\_alphas.py}); the $\alpha_s$ recovery of the $30$\,GeV
+    set (FA-ccin2p3-ff70646f). Scorings are queued in \code{site launch} behind their inputs. $\alpha_s$: $10$ of the $11$ catalog
+    pools whose MadEvent rerun did not reproduce are purely electroweak ($\alpha_s$ power $0$, none needed); the eleventh,
+    the probe $d4\_gdx\_dxzh\_g$, is regenerated as \code{d4r\_gdx\_dxzh\_g} (a different sample of the same process).
+    Mixed-order entries (four-quark, heavy-quark pairs) have no single coupling power and are refused by the factor.
+    For the user: the $55$ one-loop pools whose target changes sign are not in the order set (a $\log|\mathcal M|^2$ model
+    cannot score them); hp58's $13$ cells at the top of their learning-rate window, extended in place
+    (\code{sweep/extend\_sweep.py}, then \code{drive.py --n-trials 10}), about $26$ GPU-h, needs a yes. Blocked: bulk
+    transfers to Jean Zay (the $29$ GB archive, its checkout at \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
     (sec:tf32-eval). The $\sigma$
