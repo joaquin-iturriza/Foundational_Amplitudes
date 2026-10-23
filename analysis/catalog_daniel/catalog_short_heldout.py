@@ -32,7 +32,8 @@ def main():
                    ("Dpair (short, best checkpoint, diverged)", "catalog_short_Dpair"),
                    ("Dpair seed 1 (short)", "catalog_short_Dpair_seed1_sigstage"),
                    ("DlessIn + virtuality pooling (short)", "catalog_short_DlessInVirt_sigstage"),
-                   ("DlessIn, no diagrams (short)", "catalog_short_DlessInNoDiag_sigstage")):
+                   ("DlessIn, no diagrams (short)", "catalog_short_DlessInNoDiag_sigstage"),
+                   ("DlessIn + coupling orders (short)", "catalog_short_DlessInOrd_sigstage")):
         models[lab] = dict(np.load(os.path.join(HERE, "data", f + ".npz")))
     probes = sorted({k.split("__")[0] for k in z58 if k.endswith("__t")})
     res = {}
