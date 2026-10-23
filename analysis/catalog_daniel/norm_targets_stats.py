@@ -10,6 +10,7 @@ covariance of
     Lkm    the same clustering every final particle with m_T^2 = p_T^2 + m^2 (generic: no particle list)
     Lq     the Lorentz-invariant emission scales of physics_scales.qperp_logs (what a training run can use: its stored
            momenta are randomly Lorentz transformed)
+    Lq0    the same with every massive particle at s_hat (no soft or collinear enhancement)
 so any target y + a.(Ls, Lp, Lk) + const has its per-process mean and variance at home (norm_targets.py).
 The clustering: the massless coloured particles and photons of the final state (|PDG| <= 5, 21, 22), the inclusive k_T
 measure with R = 1: d_iB = p_T,i^2, d_ij = min(p_T,i^2, p_T,j^2) Delta R_ij^2; at each of the N - 4 steps the smallest d
@@ -106,7 +107,8 @@ def one(args):
     Lkg = cluster_logs(P, pdg, Ls, {21, 22})          # gluons and photons only: a quark of the core is not an emission
     Lkm = cluster_logs(P, pdg, Ls, "all", mt=True)    # every final particle, m_T: no particle type singled out
     Lq = qperp_logs(P)                                 # the Lorentz-invariant emission scales (physics_scales.py)
-    V = np.stack([np.log(amp), Ls, Lp, Lk, Lkg, Lkm, Lq], 1)
+    Lq0 = qperp_logs(P, massive_shat=True)              # the same, massive particles at s_hat
+    V = np.stack([np.log(amp), Ls, Lp, Lk, Lkg, Lkm, Lq, Lq0], 1)
     return setname, key, {"N": int(N), "pdg": [int(c) for c in pdg], "n": int(len(V)), "file": os.path.basename(f),
                            "mean": V.mean(0).tolist(), "cov": np.cov(V.T).tolist()}
 
