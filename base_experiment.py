@@ -137,6 +137,24 @@ def _merge_lora_state(state_dict, pretrained_path):
 
 
 class BaseExperiment:
+
+    def _result_path(self):
+        """training.result_path, unless it names a sweep's result file (<sweep>/results/hp<i>_t<T>_*.json) that already
+        exists when this run first writes: a run started from a trial's config.yaml inherits that trial's result_path,
+        and writing it replaces the trial's recorded val_loss. On 2026-10-22 a step-time profile run from hp58's config
+        wrote its short run's loss there and sweep/prune.py, reading hp58 as no longer the best, deleted its model.
+        Such a run writes <run_dir>/result.json instead."""
+        if getattr(self, "_result_path_resolved", False):
+            return self._result_path_value
+        import re as _re
+        rp = self.cfg.training.get("result_path", None)
+        if rp and os.path.exists(rp) and _re.search(r"/results/hp\d+_t\d+", str(rp)):
+            new = os.path.join(str(self.cfg.run_dir), "result.json")
+            LOGGER.warning(f"training.result_path {rp} is an existing sweep result (inherited from a trial's config): "
+                           f"this run writes {new} instead")
+            rp = new
+        self._result_path_resolved, self._result_path_value = True, rp
+        return rp
     def __init__(self, cfg):
         self.cfg = cfg
 
@@ -271,7 +289,7 @@ class BaseExperiment:
             # train() and we need a final evaluation here.
             if self.cfg.evaluate and (not self.cfg.train or not self.cfg.training.save_intermediate):
                 self.evaluate()
-                result_path = self.cfg.training.get("result_path", None)
+                result_path = self._result_path()
                 if result_path and os.path.exists(result_path) and hasattr(self, "results_test"):
                     try:
                         import json as _json
@@ -1162,7 +1180,7 @@ class BaseExperiment:
         # Reports the no-regularization loss so the surrogate isn't biased by the
         # regularization strength (which is itself a tuned hyperparameter).
         # Falls back to the regularized loss if no-reg tracking wasn't enabled.
-        result_path = self.cfg.training.get("result_path", None)
+        result_path = self._result_path()
         if result_path:
             import json
             os.makedirs(os.path.dirname(result_path), exist_ok=True)

@@ -6227,8 +6227,13 @@ of the three share a test set.
     one-loop) at $D=10^2,10^4$ and the big-catalog fine-tunes (hp58, het, $7$ no-twin probes, $D=10^1$ to $10^4$), the learning-rate
     window to be widened downwards (three optima at its lower edge); over $10$ GPU-h, to the user before any job. The user's ask:
     hp58 fine-tuned on old-catalog probes with no twin in the big catalog, the scaling plot against scratch, rung 9, finale,
-    synthetic (twins excluded: $u\bar u\to gg$, $Zg$, $Zgg$, $ud\to ud$, $ee\to Z\gamma$). Note: the het $ee\to d\bar d$ one-loop
-    cell has no sign head (its MSE cell had one), so a het-vs-MSE number on it needs re-basing. (3) \code{dimless} (D90): the
+    synthetic (twins excluded: $u\bar u\to gg$, $Zg$, $Zgg$, $ud\to ud$, $ee\to Z\gamma$). Note: every het cell runs without the sign head and every MSE cell had one, which changes the
+    target of the two one-loop probes ($ee\to d\bar d$ and $ee\to b\bar b$ one-loop): their het-vs-MSE numbers need re-basing,
+    and the stage-2 figure says so (hp58 against the het finale is on equal footing). hp58's own best checkpoint was deleted
+    on 2026-10-22 (a step-time profile run from its config overwrote its sweep result with $-1.54$ and \code{sweep/prune.py}
+    took trial 1733 as the best); the record is restored (\code{hp0058\_t32000\_restored.json}), both jobs and
+    \code{run.py} now refuse to write over a sweep result, prune protects trials the job scripts start from, and the hp58
+    fine-tunes start from its $\sigma$ stage (hp58's EMA trunk and $\mu$, frozen, with the calibrated $\sigma$ head). (3) \code{dimless} (D90): the
     dimensionless path. Done: \code{data.dimensionless\_inputs} (momenta per event$/\sqrt{\hat s}$, masses as
     $\log_{10}(m/\sqrt{\hat s})$ z-scored on frozen \code{dimless\_mass\_stats}, off-shellness$/(10^{-6}\hat s)$, guards), smoke passed;
     $40$ $2\to4$ probes (\code{recipes/gen\_catalog\_2to4.py}, d4\_, parent $2\to3$ training process + $g$ or $\gamma$, one per

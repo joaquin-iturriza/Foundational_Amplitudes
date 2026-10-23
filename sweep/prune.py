@@ -30,6 +30,7 @@ sys.path.insert(0, REPO)
 sys.path.insert(0, os.path.join(REPO, "sweep"))
 import siteconf
 
+SCRIPT_RUN_RE = re.compile(r"\bruns/([A-Za-z0-9_.-]+/trial_\d+)\b")
 PARENT_RE = re.compile(r"fine_tune\.pretrained_path:\s*\S*?/(runs\S*?/[^/\s]+/[^/\s]+)/models/")
 RUN_ROOTS = ("runs", "runs_from_lxplus")
 
@@ -54,6 +55,15 @@ def parents():
         for m in PARENT_RE.finditer(txt):
             t = m.group(1)
             tails.add(t.split("/", 1)[1])            # <sweep>/<trial>, whichever run root it was under
+    # a trial a job script starts from (SRC=runs/<sweep>/trial_N, --config-path ...): hp58 (runs/dancat_het_pre/
+    # trial_0058, the catalog design runs' and fine-tunes' source) was named only there and lost its model on 2026-10-22
+    for f in glob.glob(os.path.join(REPO, "scripts", "*.sh")) + glob.glob(os.path.join(REPO, "sweep", "*.py")):
+        try:
+            txt = open(f, errors="replace").read()
+        except OSError:
+            continue
+        for m in SCRIPT_RUN_RE.finditer(txt):
+            tails.add(m.group(1))
     return tails
 
 

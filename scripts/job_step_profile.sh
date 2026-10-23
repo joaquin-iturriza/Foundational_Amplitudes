@@ -39,7 +39,10 @@ HET=(training.loss=HETEROSC training.heterosc_beta=0.0 ++training.heterosc_selec
      ++model.net.detach_sigma_backbone=false training.sign_head=false)
 run() {   # name, config dir, overrides...
     local name="$1" dir="$2"; shift 2
+    # result_path into the profile's own dir: the source trial's config names its sweep's result file, and this
+    # job writing there on 2026-10-22 replaced hp58's recorded val_loss (sweep/prune.py then deleted its model)
     python run.py --config-path "$PROJECT_DIR/$dir" --config-name config run_dir="$OUT/$name" "${COMMON[@]}" "$@" \
+        training.result_path="$OUT/$name/result.json" training.is_dyhpo_run=false \
         > "$OUT/$name.log" 2>&1
     local fin prof
     fin=$(grep -a -m1 "Finished training" "$OUT/$name.log" | sed 's/.*Finished training: //')

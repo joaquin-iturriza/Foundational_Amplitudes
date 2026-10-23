@@ -1,0 +1,115 @@
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 8G
+  cpus_per_task: 4
+  chain_width: 2
+  time: 01:45:00
+paths: null
+sweep_name: tp3_hp58fte_ee_WW_d6_het
+n_trials: 5
+dyhpo:
+  n_candidates: 200
+  seed: 1116287482
+  n_startup: 3
+  total_budget: 10000
+  waves:
+  - 3
+  - 2
+fidelity_schedule:
+  t_steps:
+  - 8000
+fixed_params:
+  data.source: recipes
+  data.require_cache: 'false'
+  data.eval_subsample: 10000
+  data.phase_space_on_pool: 'true'
+  data.preprocess_per_dataset: 'true'
+  data.signedlog_quantile: 0.01
+  data.seed: 42
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.generation_feature: 'true'
+  data.mass_from_momenta: 'false'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.offshell_per_event: 'true'
+  data.target_propagators: 'false'
+  data.target_propagator_tchannel: 'false'
+  data.target_propagator_tchannel_max_final: 2
+  data.internal_mass_pdgs: '[23,6,25]'
+  model: lloca
+  model.use_diagrams: 'true'
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: mean
+  training.sign_head: 'false'
+  training.val_aggregation: geometric_mean
+  training.regularization: L2
+  training.scheduler: CosineAnnealingLR
+  training.get_ID: 'false'
+  training.save_intermediate: 'false'
+  training.validate_frac: '0.01'
+  training.es_load_best_model: 'true'
+  training.dtype: float32
+  plot: 'true'
+  use_mlflow: 'false'
+  data.processes_file: ${PROJECT_DIR}/recipes/transfer_probe_ee_WW.yaml
+  data.train_subsample: 1000
+  fine_tune.lr_scale: 1.0
+  fine_tune.layer_decay: 1.0
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/dancat_het_pre/trial_0058/sigma_stage/models/model_run0_best.pt
+  fine_tune.target_stats: own
+  fine_tune.offshell_stats: parent
+  training.loss: HETEROSC
+  training.heterosc_beta: 0.0
+  training.heterosc_select: mu_mse
+  model.net.sigma_after_pool: 'true'
+  model.net.detach_sigma_backbone: 'false'
+  training.track_train_eval: 'true'
+  model.diagram_encoder_impl: llm4lhc
+  model.diagram_encoder_llm4lhc.hidden_size: 64
+  model.diagram_encoder_llm4lhc.num_layers: 3
+  model.diagram_encoder_llm4lhc.num_heads: 4
+  model.diagram_encoder_llm4lhc.laplacian_pe_dim: 8
+  model.diagram_encoder_llm4lhc.dropout: 0.0
+  model.diagram_encoder_llm4lhc.mode: pooled
+  model.diagram_encoder_llm4lhc.edge_feature_mode: bias_kv
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.0007
+  high: 0.006
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999

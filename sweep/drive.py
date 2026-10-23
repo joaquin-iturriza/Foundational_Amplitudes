@@ -390,8 +390,9 @@ def main():
     ap.add_argument("--no-fetch", dest="fetch", action="store_false", help="do not mirror each trial's tier-0 outputs locally")
     ap.add_argument("--once", action="store_true", help="one pass (collect, then submit what fits) and exit")
     ap.add_argument("--retry-lost", action="store_true",
-                    help="resubmit every lost trial (no RESULT_JSON: the job died without reporting) at its hp, its "
-                         "penalty taken back out of the surrogate")
+                    help="resubmit every lost trial (no RESULT_JSON: the job died without reporting, which includes a "
+                         "TIMEOUT or OUT_OF_MEM as well as a crash of the site) at its hp, its penalty taken back out of "
+                         "the surrogate")
     ap.add_argument("--dry-run", action="store_true", help="print the first wave's submit commands; nothing written or sent")
     a = ap.parse_args()
     if a.dry_run:
