@@ -104,7 +104,9 @@ def scorings(sets, item):
 # coupling-order factor 79 of them (the mixed-order entries are refused)
 ORD_SETS = {"": 139, "_2to4": 40, "_2to4c30": 40, "_2to4E100": 40, "_2to4E100p": 36, "_top": 162, "_loop": 79, "_loopsigned": 61}
 WRITEUPS = {"dimless_writeup_orders": "par:dimless_orders", "dimless_writeup_particle": "par:dimless_particle",
-            "dimless_loop_probes": "par:dimless_loop", "dimless_loop_signed": "par:dimless_loopsigned"}
+            "dimless_loop_probes": "par:dimless_loop"}
+# the signed set's magnitude scoring (_loopsigned) is a diagnostic: the user (2026-10-23) asked for signed targets to be
+# "dealt with ... in a proper way, not a patch", so its write-up waits on that design, which goes to the user first
 
 
 def dimless_rest(item):
