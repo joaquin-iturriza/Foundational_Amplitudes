@@ -142,7 +142,7 @@ QPERP_SETS = dict(ORD_SETS)
 
 def dimless_kt(item):
     lines = on_cc("for d in $SCRATCH/zz_catalog_norm_short_DlessInOrdQ*; do echo \"$(basename $d) $(ls $d/*.npz 2>/dev/null | wc -l)\"; done; "
-                  "ls runs/catalog_norm_short/DlessInOrdQ/sigma_stage/models/model_run0_best.pt >/dev/null 2>&1 && echo model 1")
+                  "ls runs/catalog_norm_short/DlessInOrdQ/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1 && echo model 1")
     if lines is None:
         return {}, [], "ccin2p3 did not answer"
     n = dict(l.rsplit(" ", 1) for l in lines if " " in l)
