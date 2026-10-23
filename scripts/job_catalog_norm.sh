@@ -71,6 +71,8 @@ case "$SET" in
     2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_
               [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
     loop)     R="$SCRATCH/zz_catalog_loop_recipes"; HELD=recipes/catalog_loop_probes.yaml; PFX=""; WINDOWS=1 ;;
+    # loopsigned: the sign-changing one-loop pools, scored on the magnitude log|M| (zero_shot_parent.py --signed-magnitude)
+    loopsigned) R="$SCRATCH/zz_catalog_loopsigned_recipes"; HELD=recipes/catalog_loop_signed.yaml; PFX=""; WINDOWS=1; SIGNED=1 ;;
     top)      R="$SCRATCH/zz_catalog_top_recipes"; HELD=recipes/catalog_daniel_top.yaml; PFX=dc_ ;;
     2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_
               [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4c30_orders_recipes"; HELD=recipes/catalog_2to4c30_heldout_orders.yaml; PFX=d4c30; } ;;
@@ -154,7 +156,7 @@ import sys, yaml
 r = yaml.safe_load(open(sys.argv[2]))
 for p in r["processes"]:
     # the loop set holds several sqrt(s) windows of some processes: one recipe file per window
-    stem = f"{p['name']}_{p['sqrts'][0]}-{p['sqrts'][1]}GeV" if sys.argv[3] == "loop" else p["name"]
+    stem = f"{p['name']}_{p['sqrts'][0]}-{p['sqrts'][1]}GeV" if sys.argv[3] in ("loop", "loopsigned") else p["name"]
     yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{stem}.yaml", "w"))
 print(len(r["processes"]), "held-out recipes")
 PY
@@ -172,4 +174,4 @@ if ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$
 [ "$SET" != catalog ] && PRED="${PRED}_$SET"
 [ -n "${DEBUG_PRED:-}" ] && PRED="$SCRATCH/zz_debug_${ARM}_${SET}_$SLURM_JOB_ID"
 mkdir -p "$PRED"
-python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" ${WINDOWS:+--window-names} "${P[@]}"
+python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" ${WINDOWS:+--window-names} ${SIGNED:+--signed-magnitude} "${P[@]}"

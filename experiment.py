@@ -2095,6 +2095,10 @@ class AmplitudeExperiment(BaseExperiment):
             with open_dict(self.cfg):
                 self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
         q = self._signedlog_quantile()
+        # data.signed_abslog changes a signed pool's target to log max(|x|, s) with no sign output: a scoring-only read
+        # (tools/zero_shot_parent.py --signed-magnitude), never a training target
+        assert not (self.cfg.data.get("signed_abslog", False) and self.cfg.get("train", True)), \
+            "data.signed_abslog is for scoring only (train=false): a model trained on it never sees the sign"
         if amp_trafos is None:                       # fresh run: resolve from raw amps
             # the sign decision (positive -> log, signed -> signedlog) looks at every role
             # of a process; the scale and the statistics stay train-only
@@ -2111,7 +2115,10 @@ class AmplitudeExperiment(BaseExperiment):
                 self._amp_trafos_pp = [
                     resolve_amp_trafos(base_trafos, get_amp("train", n),
                                        scale_quantile=q, sign_data=all_roles(n),
-                                       sign_head=self._sign_head)
+                                       # data.signed_abslog (scoring only, tools/zero_shot_parent.py --signed-magnitude):
+                                       # a signed pool read as log|M| ('abslog'), as with the sign head, but no sign
+                                       # output is added, so a model without one can be scored on the magnitude
+                                       sign_head=self._sign_head or bool(self.cfg.data.get("signed_abslog", False)))
                     for n in names]
         elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
             assert len(amp_trafos_pp) == len(names), (

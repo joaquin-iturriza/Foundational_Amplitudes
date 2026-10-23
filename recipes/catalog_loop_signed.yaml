@@ -1,0 +1,730 @@
+# the sign-changing one-loop pools of the order axis (D93; the user, 2026-10-23: "of course there has to be a way to deal
+# with negative values"): the 55 one-loop pools on CC whose target changes sign in some split (the complement of
+# catalog_loop_probes.yaml's one-loop pools), every sqrt(s) window, with the tree of the same process and window where one
+# exists (48; trees without a uniform train pool get 1000 train events). A catalog model predicts log|M|^2 and has no sign
+# output, so the one-loop pools are scored on the magnitude, log max(|M|^2, s) (tools/zero_shot_parent.py
+# --signed-magnitude, the sign head's 'abslog' transform); the sign is what stays out of reach. Each pool's fraction of
+# negative val events: analysis/catalog_daniel/data/catalog_loop_signed_negfrac.json (computed on CC from the val pools).
+# With data.target_physics_orders 61 of the 103 are scored (mixed-order entries refused).
+processes:
+- name: cs_cs_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_bbbarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_dd_ew_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ddbara_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ddg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_mumu_ew_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ssbarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ttbarg_nlo
+  sqrts:
+  - 362
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ttbarg_nlo
+  sqrts:
+  - 363
+  - 1000
+  n_train: 1000
+  n_val: 200
+  n_test: 200
+- name: ee_uu_ew_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_uua_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_uug_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ud_ud_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ud_uda_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ud_udg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_Wa_nlo
+  sqrts:
+  - 84
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_Wg_nlo
+  sqrts:
+  - 84
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_Wgg_nlo
+  sqrts:
+  - 84
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_WpHg_nlo
+  sqrts:
+  - 216
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_WpZg_nlo
+  sqrts:
+  - 180
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_Wpaa_nlo
+  sqrts:
+  - 84
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_Wpag_nlo
+  sqrts:
+  - 84
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_enug_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_tbbara_nlo
+  sqrts:
+  - 186
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_tbbarg_nlo
+  sqrts:
+  - 186
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_udbara_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: udbar_udbarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: us_usa_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: us_usg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uu_uua_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uu_uug_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_WpWmg_nlo
+  sqrts:
+  - 169
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ZHg_nlo
+  sqrts:
+  - 227
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ZZg_nlo
+  sqrts:
+  - 191
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_Zg_nlo
+  sqrts:
+  - 96
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_Zga_nlo
+  sqrts:
+  - 96
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_Zgg_nlo
+  sqrts:
+  - 96
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_agg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_bbbarH_nlo
+  sqrts:
+  - 141
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_bbbarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ddbar_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ddbar_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ddbara_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ddbarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ga_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_gaa_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_gg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ggg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_mumug_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbarH_nlo
+  sqrts:
+  - 494
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbarZ_nlo
+  sqrts:
+  - 458
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbara_nlo
+  sqrts:
+  - 362
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbarg_nlo
+  sqrts:
+  - 362
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_uubara_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_uubarg_nlo
+  sqrts:
+  - 25
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: cs_cs
+  sqrts:
+  - 25
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_bbbarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ddbara
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ssbarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: ee_ttbarg
+  sqrts:
+  - 363
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ee_uua
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ee_uug
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ud_ud
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ud_uda
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: ud_udg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wa
+  sqrts:
+  - 84
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wg
+  sqrts:
+  - 84
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wgg
+  sqrts:
+  - 84
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_WpHg
+  sqrts:
+  - 216
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_WpZg
+  sqrts:
+  - 180
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wpaa
+  sqrts:
+  - 84
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_Wpag
+  sqrts:
+  - 84
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_enug
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_tbbara
+  sqrts:
+  - 186
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_tbbarg
+  sqrts:
+  - 186
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_udbara
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: udbar_udbarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: us_usa
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: us_usg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uu_uua
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uu_uug
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_WpWmg
+  sqrts:
+  - 169
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ZHg
+  sqrts:
+  - 227
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ZZg
+  sqrts:
+  - 191
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_Zg
+  sqrts:
+  - 96
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_Zga
+  sqrts:
+  - 96
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_Zgg
+  sqrts:
+  - 96
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_agg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_bbbarH
+  sqrts:
+  - 141
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_bbbarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ddbar
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ddbara
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ddbarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ga
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_gaa
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_gg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ggg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_mumug
+  sqrts:
+  - 25
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ttbarH
+  sqrts:
+  - 494
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ttbarZ
+  sqrts:
+  - 458
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_ttbara
+  sqrts:
+  - 362
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_uubara
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000
+- name: uubar_uubarg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000

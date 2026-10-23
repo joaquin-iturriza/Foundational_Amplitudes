@@ -38,6 +38,9 @@ ap.add_argument("--save-dir", default=None, help="write <probe>.npz (t, q_aff, q
 ap.add_argument("--eval-subsample", type=int, default=2000, help="held-out val events per probe")
 ap.add_argument("--window-names", action="store_true",
                 help="save <probe>_<lo>-<hi>GeV.npz (the recipe's sqrt(s) window), for a probe set with several windows of one process")
+ap.add_argument("--signed-magnitude", action="store_true",
+                help="a probe whose target changes sign is scored on log|M| (data.signed_abslog: the 'abslog' transform), "
+                     "the magnitude a log|M|^2 model predicts; its sign, which such a model has no output for, is not scored")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 
@@ -70,6 +73,8 @@ for recipe in a.recipes:
         # the held-out val events per probe: 2000 unless --eval-subsample says otherwise, whatever the parent's own cap (hp58's
         # was 2000, the scale every held-out number so far was read at; a short design run validates on 200)
         cfg.data.eval_subsample = a.eval_subsample
+        if a.signed_magnitude:
+            cfg.data.signed_abslog = True
         # the probe's own target statistics (one process: no pooled or affine fit)
         cfg.data.shared_standardization = False
         cfg.data.affine_multiplicity_std = False
@@ -105,14 +110,14 @@ for recipe in a.recipes:
     coef = np.linalg.lstsq(A, z, rcond=None)[0]
     affine = float(np.mean((A @ coef - z) ** 2))
     tr = (exp._amp_trafos_pp or [exp.cfg.data.amp_trafos])[0]
-    if not str(tr[0]).startswith("log"):
+    if not (str(tr[0]).startswith("log") or (a.signed_magnitude and str(tr[0]).startswith("abslog"))):
         # a signed probe (a one-loop finite part that changes sign) has no log|M|^2 target: listed, not dropped, and
         # the other probes of the call still scored
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "probe": probe,
                                          "error": f"signed probe: transform {list(map(str, tr))}, no log|M|^2 target"}), flush=True)
         continue
     mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
-    t = mu_p + sd_p * z                                                   # the probe's log|M|^2
+    t = mu_p + sd_p * z                                                   # the probe's log|M|^2 (abslog: log max(|M|^2, s))
     if pstats.get("affine_multiplicity"):
         am = pstats["affine_multiplicity"]
         mu_c, sd_c, kind = float(am["a"]) + float(am["b"]) * N, float(am["sigma"]), "affine_multiplicity"
@@ -125,7 +130,13 @@ for recipe in a.recipes:
         mu_c = sd_c = None; kind = "per_process"
     rec = {"probe": probe, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
            "n_val": int(len(z)), "var_logm2": float(np.var(t)), "val_loss_affine": affine,
-           "affine_ab": [float(c) for c in coef], "twin": twins.get(probe)}
+           "affine_ab": [float(c) for c in coef], "twin": twins.get(probe), "transform": str(tr[0])}
+    # abslog: the truth is clipped at log s (s the probe's 1% quantile of |x| on its train split, data.signedlog_quantile),
+    # the prediction is not; the share of val events at that floor is part of what the MSE means
+    floor = np.log(float(str(tr[0]).split(":", 1)[1])) if str(tr[0]).startswith("abslog:") else None
+    at_floor = (t <= floor + 1e-4 * max(1.0, abs(floor))) if floor is not None else np.zeros(len(t), bool)
+    if floor is not None:
+        rec.update({"abslog_floor": float(floor), "frac_at_floor": float(np.mean(at_floor))})
     if mu_c is not None:
         q = mu_c + sd_c * h                                               # the zero-shot log|M|^2
         mse = float(np.mean((q - t) ** 2))
@@ -143,7 +154,8 @@ for recipe in a.recipes:
             "pred": np.histogram(q, e)[0].tolist(), "h2_range": [lo, hi],
             "h2": np.histogram2d(t, q, bins=40, range=[[lo, hi], [lo, hi]])[0].astype(int).tolist()}), flush=True)
     # the per-event target factor (data.target_propagators / target_physics_factor): t and q are log(|M|^2 F), so
-    # t - logF is log|M|^2; their difference, hence every MSE and Delta here, does not depend on it
+    # t - logF is log|M|^2 (abslog: log|M|^2 only off the floor, at_floor below; the floor is on |M|^2 F); their
+    # difference, hence every MSE and Delta here, does not depend on it
     F = getattr(exp, "all_amp_factor", None)
     logF = np.zeros(0, np.float32)
     if F is not None:
@@ -161,7 +173,7 @@ for recipe in a.recipes:
         np.savez_compressed(os.path.join(a.save_dir, stem + ".npz"), t=t.astype(np.float32),
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
-                            mu_sd=np.array([mu_p, sd_p]), logF=logF,
+                            mu_sd=np.array([mu_p, sd_p]), logF=logF, at_floor=at_floor,
                             sig=sig.astype(np.float32),     # raw, the parent's standardized units
                             s=(sd_c * sig if (mu_c is not None and len(sig) == len(h)) else np.zeros(0)).astype(np.float32),
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32))

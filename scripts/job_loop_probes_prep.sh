@@ -13,7 +13,7 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-SPEC=recipes/catalog_loop_probes.yaml
+SPEC="${LOOP_SPEC:-recipes/catalog_loop_probes.yaml}"   # LOOP_SPEC=recipes/catalog_loop_signed.yaml: the signed pools
 # prebuild writes a pool whose recipe_id differs (count, seed, cuts) over the existing file of the same name: refuse
 # unless every existing pool of the spec is a cache hit, so only the missing pools get built
 python - "$SPEC" <<'PY' || exit 1
