@@ -9,7 +9,7 @@ Inputs: data/catalog_short_<arm>_sigstage.npz, data/catalog_2to4_short_<arm>.npz
 data/catalog_top_short_DlessInOrd_notop.npz. Output: the tables printed, data/level_range.json.
     .venv-driver/bin/python analysis/catalog_daniel/level_range.py
 """
-import json, os
+import json, os, re
 from collections import defaultdict
 
 import numpy as np
@@ -58,7 +58,10 @@ def main():
     g = defaultdict(list)
     for p in ps:
         ini, fin = p.split("_")[1], p.split("_")[2]
-        k = ("gg" if ini == "gg" else "qg" if "g" in ini else "qq") + (", top pair" if "ttx" in fin else ", single top")
+        # tokens of the final state: t and tx counted apart (dc_gux_tuxtx is a top pair, written t ux tx)
+        toks = re.findall(r"ta[pm]|v[emt]x?|tx|t|[a-z]x?", fin)
+        pair = "t" in toks and "tx" in toks
+        k = ("gg" if ini == "gg" else "qg" if "g" in ini else "qq") + (", top pair" if pair else ", single top")
         g[k].append(off(z, p))
     for k, v in sorted(g.items()):
         res["top"][k] = dict(n=len(v), median=float(np.median(v)), sd=float(np.std(v)))

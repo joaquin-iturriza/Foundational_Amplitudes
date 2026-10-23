@@ -277,8 +277,10 @@ def _code_hash():
     import preprocessing
     from lloca.utils import polar_decomposition, rand_transforms
     E = experiment.AmplitudeExperiment
+    import physics_scales
     parts = [inspect.getsource(m) for m in (
-        __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition)]
+        __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition,
+        physics_scales)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
         E._setup_offshell_masks, E._physics_logF, E._eikonal_logS)]

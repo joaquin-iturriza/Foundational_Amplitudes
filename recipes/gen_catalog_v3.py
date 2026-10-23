@@ -9,13 +9,15 @@ below sees (e+e- > X = u u~ > X for colourless X, ...). The class count after st
 
 Particles: the SM at MadGraph's `sm` (u, d, s, c, e, mu, the neutrinos massless; b 4.7, t 172.5, tau 1.777 GeV).
 Beams: e+e-, every quark-antiquark and quark-quark pair of u, d, s, c, b, every quark-gluon pair, gg.
-Symmetries collapsed in stage 1 (exact in `sm`, diagonal CKM, massless first two generations): charge conjugation, the
-order of the beams, and the swap of the first and second generations (u<->c, d<->s, e<->mu, ve<->vm) applied to the
-whole process. Conservation filters: electric charge, baryon number, the three lepton numbers.
+Symmetries collapsed in stage 1: the order of the beams and the swap of the first and second generations (u<->c, d<->s,
+e<->mu, ve<->vm) applied to the whole process, exact in `sm` (massless, Yukawa-free first two generations, diagonal CKM,
+flavour-blind default cuts), and charge conjugation, which is exact at 2->2 and from 2->3 on only up to the parity-odd
+epsilon(p_i, p_j, p_k, p_l) terms the widths' absorptive parts allow (CP holds, so the conjugate equals the process at
+parity-mirrored momenta; the augmentation has no parity flip): a small approximation, stated with the census. Conservation filters: electric charge, baryon number, the three lepton numbers.
 Layers:
   2->2, 2->3  exhaustive over the beams and every final multiset of SM particles (MadGraph decides existence)
-  2->4        every 2->3 survivor + g or a (rule), the four-fermion finals of e+e- and q q~, the multi-boson finals
-              with quartic vertices (as catalog_v2); --max24 caps the layer
+  2->4        every 2->3 candidate + g or a (rule), the four-fermion finals of e+e- and q q~, the multi-boson finals
+              with quartic vertices (as catalog_v2); all of them go to --check, the selection comes after the census
   one loop    [virt=QCD] of every coloured 2->2 and 2->3 tree; loop-induced candidates listed for certification
   variants    alpha_s(M_Z) in {0.09, 0.15}, M_Z, M_H at far points on a few families; heavy quarks with the top's quantum
               numbers at m_Q in {50, 300, 600} GeV on the top family (the physical top held out between them, H3)
@@ -94,7 +96,7 @@ def name(ini, fin):
     return "v3_" + "".join(t(p) for p in ini) + "_" + "".join(t(p) for p in fin)
 
 
-def enumerate_candidates(max24):
+def enumerate_candidates():
     seen = {}
 
     def put(layer, ini, fin, why, extra=None):
@@ -111,7 +113,6 @@ def enumerate_candidates(max24):
             for fin in itertools.combinations_with_replacement(FINALS, n):
                 put(n, ini, fin, "exhaustive")
     layer3 = [c for c in seen.values() if c["layer"] == 3]
-    n24 = 0
     for c in layer3:
         for leg in ("g", "a"):
             put(4, tuple(c["beams"]), tuple(sorted(c["finals"] + [leg])), c["name"] + "+" + leg)
@@ -185,16 +186,52 @@ def check(workers, out):
           f"{Counter(c['error'][:40] for c in res if not c['exists']).most_common(5)}")
 
 
+MASS = {5: 4.7, 6: 172.5, 15: 1.777, 23: 91.1880, 24: 80.419, 25: 125.0}
+OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")
+OUT_CENSUS = os.path.join(ROOT, "recipes", "catalog_v3_census.yaml")
+
+
+def write(checked):
+    """stage 2 -> the tree entries (recipes/catalog_v3_processes.yaml, loaded by mg5_pipeline_final._load_catalog_v3 at
+    import) and the census recipe the numeric equality check reads (recipes/catalog_v3_census.yaml: every tree that
+    exists, its sqrt(s) window; no events are generated from it)"""
+    import sys
+    import yaml
+    sys.path.insert(0, ROOT)
+    import mg5_pipeline_final as mg
+    procs, lines = {}, []
+    for c in json.load(open(checked)):
+        if not c.get("exists") or c["layer"] not in (2, 3, 4):
+            continue
+        pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
+        if pdg_b[1] == -pdg_b[0] and pdg_b[0] < 0:
+            pdg_b = [pdg_b[1], pdg_b[0]]
+        n = len(pdg_f); W = c["weighted"]; a = 2 * n - W if W is not None else None
+        e = {"mg5_generate": [c["generate"]], "nfinal": n, "pdg_ids": pdg_b + pdg_f,
+             "m_finals": [MASS.get(abs(p), 0.0) for p in pdg_f], "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+             "param_card_patches": (dict(mg.TOP_PATCHES) if 6 in map(abs, pdg_f + pdg_b) else {}),
+             "layer": c["layer"], "why": c["why"], "diagrams": c["diagrams"], "v3_key": c["key"]}
+        if a:
+            e["alphas_power"] = a
+        procs[c["name"]] = e
+        lo = int(round(max(1.05 * (sum(e["m_finals"]) + 0.0), 25.0)))
+        lines.append(f"  - {{name: {c['name']}, sqrts: [{max(lo, 25)}, 1000], n_train: 0, n_val: 0, n_test: 0}}")
+    yaml.safe_dump({"processes": procs}, open(OUT_PROC, "w"), sort_keys=True)
+    open(OUT_CENSUS, "w").write("# catalog_v3 census (recipes/gen_catalog_v3.py --write): every tree candidate MadGraph "
+                                "generates, for the numeric equality check; no events\nprocesses:\n" + "\n".join(lines) + "\n")
+    print(f"wrote {OUT_PROC} ({len(procs)} trees) and {OUT_CENSUS}")
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--write", default=None, help="the stage-2 output (checked.json)")
     ap.add_argument("--enumerate", action="store_true")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--out", default=os.path.join(os.environ.get("SCRATCH", "/tmp"), "zz_catalog_v3_census", "checked.json"))
-    ap.add_argument("--max24", type=int, default=0)
     a = ap.parse_args()
     if a.enumerate:
-        trees, loops, induced, variants, bsm, n_tree = enumerate_candidates(a.max24)
+        trees, loops, induced, variants, bsm, n_tree = enumerate_candidates()
         json.dump({"trees": trees, "loops": loops, "loop_induced": induced, "variants": variants, "bsm": bsm},
                   open(OUT, "w"), indent=0)
         print(f"trees after the conservation filters and the symmetry collapse: {dict(sorted(n_tree.items()))}, "
@@ -205,6 +242,8 @@ def main():
     if a.check:
         os.makedirs(os.path.dirname(a.out), exist_ok=True)
         check(a.workers, a.out)
+    if a.write:
+        write(a.write)
 
 
 if __name__ == "__main__":

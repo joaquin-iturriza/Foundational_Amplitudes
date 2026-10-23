@@ -40,9 +40,9 @@ def m_finals_of(cfg):
     return [float(x) for x in m] if isinstance(m, (list, tuple)) else [float(m)] * cfg["nfinal"]
 
 
-def tree_processes():
+def tree_processes(recipes=None):
     out = {}
-    for r in RECIPES:
+    for r in (recipes or RECIPES):
         for p in yaml.safe_load(open(r))["processes"]:
             n = p["name"]
             if datagen.is_virt(n) or n.endswith("_loop") or n.endswith("_nlo"):
@@ -83,16 +83,24 @@ def main():
     ap.add_argument("--n", type=int, default=48)
     ap.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 8)))
     ap.add_argument("--out", default="analysis/process_equality")
+    ap.add_argument("--recipes", nargs="+", default=None, help="the recipes whose trees are compared (default: catalog_v2's)")
+    ap.add_argument("--compile-workers", type=int, default=1,
+                    help="compile missing backends this many at a time, one worker per distinct process (default 1: serially)")
     args = ap.parse_args()
 
-    procs = tree_processes()
+    procs = tree_processes(args.recipes)
     groups = defaultdict(list)
     for n in procs:
         cfg = mg.PROCESSES[n]
         groups[(cfg["nfinal"], tuple(sorted(m_finals_of(cfg))))].append(n)
     print(f"{len(procs)} trees in {len(groups)} (multiplicity, final masses) groups", flush=True)
 
-    # Backends first, serially: parallel workers must never race to compile one.
+    # Backends first: parallel workers must never race to compile one, so each worker gets distinct processes
+    # (catalog_v3's census: 1630 backends, serially some 30 h)
+    if args.compile_workers > 1:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(max_workers=args.compile_workers) as ex:
+            list(ex.map(datagen.ensure_backend, sorted(procs), chunksize=1))
     for n in procs:
         datagen.ensure_backend(n)
 
@@ -132,8 +140,9 @@ def main():
             lr = np.log(B[:, ok]) - np.log(A[ok])
             spread = lr.std(axis=1)
             k = int(np.argmin(spread))
-            pairs.append(dict(a=a, b=b, spread=float(spread[k]), log_ratio=float(lr[k].mean()),
-                              map=res[b][0][k], group=[key[0], list(key[1])]))
+            if spread[k] < NEAR:      # only the equal and the near pairs are kept (O(n^2) pairs in a large group)
+                pairs.append(dict(a=a, b=b, spread=float(spread[k]), log_ratio=float(lr[k].mean()),
+                                  map=res[b][0][k], group=[key[0], list(key[1])]))
 
     # equivalence classes from the equal pairs
     parent = {n: n for n in procs}

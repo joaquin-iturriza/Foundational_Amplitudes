@@ -136,7 +136,8 @@ def dimless_rest(item):
 # D99 (the user 2026-10-23: "you are allowed to do the gpu tests once something looks promising"): the first candidate
 # through the CPU proxy (analysis/catalog_daniel/norm_targets.py), DlessInOrd with the emission scales (DlessInOrdQ), read
 # on the sets DlessInOrd was read on that the A/B needs: the 139 held-out, the 2->4 probes at both cuts, the one-loop set
-QPERP_SETS = {"": 139, "_2to4": 40, "_2to4c30": 40, "_loop": 79}
+# (every set DlessInOrd was read on, and its no-top twin: CLAUDE.md 0b, the reviewer 2026-10-23)
+QPERP_SETS = dict(ORD_SETS)
 
 
 def dimless_kt(item):
@@ -148,9 +149,10 @@ def dimless_kt(item):
     act = bool(active_runs(item))
     u = lambda done: {"expected": 1, "done": int(done), "active": int(act and not done)}
     units = {"DlessInOrdQ_train": u(n.get("model") == "1")}
-    for suf, want in QPERP_SETS.items():
-        name = f"zz_catalog_norm_short_DlessInOrdQ_sigstage{suf}"
-        units[name] = u(int(n.get(name, 0)) >= want)
+    for arm, sets in (("DlessInOrdQ", QPERP_SETS), ("DlessInOrdQ_notop", {"_top": 162})):
+        for suf, want in sets.items():
+            name = f"zz_catalog_norm_short_{arm}_sigstage{suf}"
+            units[name] = u(int(n.get(name, 0)) >= want)
     pending = any(not v["done"] for v in units.values())
     done = "\\label{par:dimless_qperp}" in open(os.path.join(REPO, "docs", "results.tex")).read()
     units["dimless_writeup_qperp"] = {"expected": 1, "done": int(done), "active": int(pending and not done)}

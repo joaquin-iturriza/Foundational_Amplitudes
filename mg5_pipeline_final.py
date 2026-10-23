@@ -1710,6 +1710,25 @@ def _load_catalog_v2():
 CATALOG_V2_ENTRIES = _load_catalog_v2()
 
 
+def _load_catalog_v3():
+    """Append the catalog_v3 census trees (recipes/gen_catalog_v3.py --write; D98), tagged _v3. Names are v3_*, so none
+    may collide with an existing entry."""
+    import yaml as _yaml
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes", "catalog_v3_processes.yaml")
+    if not os.path.exists(path):
+        return 0
+    with open(path) as f:
+        d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+    n = 0
+    for name, entry in (d.get("processes") or {}).items():
+        if name in PROCESSES:
+            raise KeyError(f"catalog_v3 entry {name} collides with an existing process")
+        PROCESSES[name] = dict(entry, _v3=True); n += 1
+    return n
+
+CATALOG_V3_ENTRIES = _load_catalog_v3()
+
+
 def _load_catalog_daniel():
     """Append the arXiv:2606.23791 (LLM4LHC) catalog (recipes/gen_catalog_daniel.py): pp processes
     whose events come from MadEvent with their cards (kind ``lhe_pp``; generation in the LHE_PP
