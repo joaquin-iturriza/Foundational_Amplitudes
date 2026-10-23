@@ -19,7 +19,8 @@ ARMS = [("Adim", "Adim (short)", r"$\hat s$ only"),
         ("Dpair_seed1", "Dpair seed 1 (short)", r"dimensionless, $\Lambda^2$ pairs"),
         ("DlessIn", "DlessIn (short)", "dimensionless inputs"),
         ("DlessInVirt", "DlessIn + virtuality pooling (short)", "inputs + virtuality pooling"),
-        ("DlessInNoDiag", "DlessIn, no diagrams (short)", "inputs, no diagrams")]
+        ("DlessInNoDiag", "DlessIn, no diagrams (short)", "inputs, no diagrams"),
+        ("DlessInOrd", "DlessIn + coupling orders (short)", "inputs + coupling orders")]
 
 
 def main():

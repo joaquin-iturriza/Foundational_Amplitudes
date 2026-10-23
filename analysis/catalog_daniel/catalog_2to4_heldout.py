@@ -16,7 +16,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ARMS = {"B": "shared target (Lambda = 1 GeV)", "Adim": "s_hat only, s0 = 289 GeV^2",
         "Dless": "dimensionless (Lambda^2 = s_hat)", "DlessIn": "dimensionless, dimensionless inputs",
         "Dpair": "dimensionless (Lambda^2 = pairs)", "Dpair_seed1": "dimensionless (pairs), seed 1",
-        "DlessInVirt": "dimless inputs + virtuality pooling", "DlessInNoDiag": "dimless inputs, no diagrams"}
+        "DlessInVirt": "dimless inputs + virtuality pooling", "DlessInNoDiag": "dimless inputs, no diagrams",
+        "DlessInOrd": "dimless inputs + coupling orders"}
 SETS = {"2to4": "pT >= 10 GeV", "2to4c30": "pT >= 30 GeV", "2to4E100p": "2->4 at 100 TeV", "2to4E100": "2->3 at 100 TeV"}
 
 
