@@ -1,0 +1,9 @@
+# the generation recipe of catalog_2to4r (job_gen_daniel_catalog.sh DANIEL_SPEC, DANIEL_PREFIX=d4r_)
+processes:
+- name: d4r_gdx_dxzh_g
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 1000
+  n_val: 10000
+  n_test: 10000

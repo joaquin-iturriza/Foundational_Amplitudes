@@ -86,6 +86,36 @@ def scorings(sets, item):
     return units, []
 
 
+# D93's parts after the round of fig:dimless_round (2026-10-23: they had no unit here, so when the round's jobs ended no
+# event said the coupling-order factor and the particle-content and order sets were still to do, and the study stalled)
+ORD_SETS = {"": 139, "_2to4": 40, "_2to4c30": 40, "_2to4E100": 40, "_2to4E100p": 36, "_top": 162}
+WRITEUPS = {"dimless_writeup_orders": "par:dimless_orders", "dimless_writeup_particle": "par:dimless_particle",
+            "dimless_loop_probes": "par:dimless_loop"}
+
+
+def dimless_rest(item):
+    lines = on_cc("cd $DATA_DIR; echo c30 $(ls d4c30_*_val_lhe_amplitudes.alphas.npy 2>/dev/null | wc -l); "
+                  "echo d4r $(ls d4r_gdx_dxzh_g_*_val_lhe_amplitudes.alphas.npy 2>/dev/null | wc -l); "
+                  "for d in $SCRATCH/zz_catalog_norm_short_DlessInOrd*; do echo \"$(basename $d) $(ls $d/*.npz 2>/dev/null | wc -l)\"; done")
+    if lines is None:
+        return {}, [], "ccin2p3 did not answer"
+    n = dict(l.rsplit(" ", 1) for l in lines if " " in l)
+    act = bool(active_runs(item))
+    u = lambda done: {"expected": 1, "done": int(done), "active": int(act and not done)}
+    units = {"recover_alphas_2to4c30": u(int(n.get("c30", 0)) >= 40), "d4r_gdx_dxzh_g": u(int(n.get("d4r", 0)) >= 1)}
+    for arm, sets in (("DlessInOrd", ORD_SETS), ("DlessInOrd_notop", {"_top": 162})):
+        for suf, want in sets.items():
+            name = f"zz_catalog_norm_short_{arm}_sigstage{suf}"
+            units[name] = u(int(n.get(name, 0)) >= want)
+    tex = open(os.path.join(REPO, "docs", "results.tex")).read()
+    pending = any(not v["done"] for v in units.values())
+    for name, label in WRITEUPS.items():
+        done = f"\\label{{{label}}}" in tex
+        # a write-up waits on its scorings; with them done (or for the loop probes, not yet built) it is a GAP
+        units[name] = {"expected": 1, "done": int(done), "active": int(pending and not done and name != "dimless_loop_probes")}
+    return units, []
+
+
 def main():
     item = sys.argv[1]
     if item == "het_stage2":
@@ -94,6 +124,9 @@ def main():
         r = het_mumse22()
     elif item == "dimless_general":
         r = scorings(SETS, item)
+        if len(r) == 2:
+            r2 = dimless_rest(item)
+            r = (dict(r[0], **r2[0]), r[1] + r2[1]) + tuple(r2[2:])
     elif item == "cut_test":
         r = scorings({"2to4c30": 40}, item)
     else:

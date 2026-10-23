@@ -2,11 +2,11 @@
 metrics and data_stats, so any trial can be rerun from its config) applied to sweeps copied from another site
 (runs_from_lxplus/), whose result files stayed there, so prune.py sees no finished trial and keeps everything (the user,
 2026-10-23: "aren't we supposed to be pruning and deleting the models that don't win in a sweep?"). A sweep's best is
-read from the trials' own logs instead: per trial, the lowest validation loss its out_*.log reports, among the trials whose config ran the sweep's longest horizon
+read from the trials' own logs instead: per trial, the lowest val_loss_no_reg its out_*.log reports, among the trials whose config ran the sweep's longest horizon
 (training.iterations). A copy is never resumed, so its sweep is finished: as prune.py does for a finished sweep, every
 other trial loses its models (a lower-fidelity trial of a multi-fidelity sweep, a trial that crashed). Kept whole: the best trial, every
 trial named anywhere in the repo's job scripts, sweep configs, Delta lists or analysis files (runs/<sweep>/trial_N),
-and every trial written to in the last 6 h. Without --apply it prints the plan; with it, a manifest
+every fine-tune parent sweep/prune.py protects (its parents(), this site's sweep configs included), and every trial written to in the last 6 h. Without --apply it prints the plan; with it, a manifest
 (<root>/PRUNED_COPIES_<time>.json: per trial what was deleted and its size) is written before anything is deleted.
     python tools/prune_copies.py runs_from_lxplus [--apply]
 """
@@ -16,13 +16,17 @@ import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # "Val loss (combined): x" (several processes, regularized) or "Val loss: x" (one process, without the regularization
-# term); a multi-process log written before 2026-10-23 has no val_loss_no_reg field, so for those sweeps the kept model
-# is the lowest regularized value, which can differ from the val_loss_no_reg best; every trial's config and log stay
+# term); a multi-process log written before 2026-10-23 has no val_loss_no_reg field, and its regularized value cannot
+# rank trials (lambda is swept), so such a sweep has no best here and keeps every model
 VAL_RE = re.compile(r"Val loss(?: \(combined\))?: (-?[0-9.]+(?:e[-+]?\d+)?)")
 
 
 def referenced():
-    refs = set()
+    """Trials named in the repo, plus every fine-tune parent and job-script source sweep/prune.py protects (D19: fine-tune
+    parents kept whole), which includes the sweep configs under this site's SWEEP_DIR"""
+    sys.path.insert(0, os.path.join(REPO, "sweep"))
+    import prune
+    refs = set(prune.parents())
     pats = ["scripts/*.sh", "sweep/*.py", "sweep/**/*.yaml", "analysis/**/*.txt", "analysis/**/*.json",
             "analysis/**/*.py", "recipes/**/*.yaml", "tools/*.py"]
     for p in pats:
@@ -38,16 +42,23 @@ NOREG_RE = re.compile(r"val_loss_no_reg: (-?[0-9.]+(?:e[-+]?\d+)?)")
 
 
 def best_val(td):
-    """The trial's lowest checkpoint metric: val_loss_no_reg where the log prints it (multi-process runs since
-    2026-10-23), else the logged validation loss"""
-    best = None
+    """The trial's lowest checkpoint metric, val_loss_no_reg: where the log prints it (multi-process runs since
+    2026-10-23) or a single-process 'Val loss: x' line (already without the regularization term). A multi-process log
+    with only the regularized 'Val loss (combined)' gives (None, True): its regularized value adds lambda |theta|^2, and
+    lambda is a swept HP, so it cannot rank trials (CLAUDE.md "Reported values")."""
+    best, reg_only = None, False
     for log in glob.glob(os.path.join(td, "out_*.log")):
         for line in open(log, errors="replace"):
-            m = NOREG_RE.search(line) or VAL_RE.search(line)
+            m = NOREG_RE.search(line)
+            if m is None:
+                m = VAL_RE.search(line)
+                if m is not None and "(combined)" in line:
+                    reg_only = True
+                    continue
             if m:
                 v = float(m.group(1))
                 best = v if best is None or v < best else best
-    return best
+    return (None, True) if best is None and reg_only else (best, False)
 
 
 def iterations(td):
@@ -76,16 +87,20 @@ def main():
         if len(tds) < 2 or not any(model_files(t) for t in tds):
             continue
         sweep = os.path.basename(sd)
-        info = {td: (iterations(td), best_val(td)) for td in tds}
-        top = max((it for it, _ in info.values() if it is not None), default=None)
-        done = {td: v for td, (it, v) in info.items() if it == top and v is not None}
-        best = min(done, key=done.get) if done else None
-        if best is None:                      # no trial reports a validation at the horizon: no best to keep
+        info = {td: (iterations(td),) + best_val(td) for td in tds}
+        top = max((it for it, _, _ in info.values() if it is not None), default=None)
+        done = {td: v for td, (it, v, _) in info.items() if it == top and v is not None}
+        reg_only = any(r for it, _, r in info.values() if it == top)
+        best = min(done, key=done.get) if done and not reg_only else None
+        if best is None:
+            # no trial reports val_loss_no_reg at the horizon (none validated there, or a multi-process log that prints
+            # only the regularized value): no best to rank, so every model is kept
             for td in tds:
                 mf = model_files(td)
                 if mf:
                     sz = sum(os.path.getsize(f) for f in mf); kept_bytes += sz
-                    plan.append({"run_dir": td, "kept": "no best found (no validation at the horizon)", "bytes": sz})
+                    plan.append({"run_dir": td, "bytes": sz, "kept": "no best found (%s)" % (
+                        "only the regularized val loss in the logs" if reg_only else "no validation at the horizon")})
             continue
         for td in tds:
             mf = model_files(td)

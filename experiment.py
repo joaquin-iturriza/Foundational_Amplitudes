@@ -1642,8 +1642,13 @@ class AmplitudeExperiment(BaseExperiment):
                     # each event's own alpha_s, the one its |M|^2 was labelled at (lhe_pp: AQCDUP), stored next to the
                     # pool as <pool>.alphas.npy (mg5_pipeline_final.build_lhe_pp; tools/recover_alphas.py for older pools)
                     ap = paths[role][name][:-len(".npy")] + ".alphas.npy"
-                    assert os.path.exists(ap), f"data.target_physics_orders: no per-event alpha_s for {paths[role][name]}"
-                    a_s = np.load(ap, mmap_mode="r")
+                    if not os.path.exists(ap) and int(self._orders_of(name)[2]) == 0:
+                        # alpha_s power 0 (purely electroweak): the factor does not depend on alpha_s, so none is needed
+                        # (ten W+W-H-like catalog pools whose MadEvent rerun did not reproduce, 2026-10-23)
+                        a_s = np.ones(amplitudes.shape[0])
+                    else:
+                        assert os.path.exists(ap), f"data.target_physics_orders: no per-event alpha_s for {paths[role][name]}"
+                        a_s = np.load(ap, mmap_mode="r")
                     store[(role, name)]["alphas"] = np.asarray(a_s[:cap] if cap is not None else a_s, dtype=np.float64)
                     assert store[(role, name)]["alphas"].shape[0] == amplitudes.shape[0], (ap, a_s.shape, amplitudes.shape)
 

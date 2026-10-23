@@ -1,0 +1,8473 @@
+# the particle-content test (D93): catalog_daniel_train.yaml without its 142 processes with a top quark (no
+# relabelling class mixes top and non-top processes, classes_default.json), 1210 processes
+processes:
+- name: dc_bb_bb
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bb_bba
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bb_bbh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bb_bbz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bb_gbb
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_aa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_aaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_aah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_aaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_aemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_atamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_avevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_avtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_az
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_azh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_azz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ccxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_csxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ddxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ddxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ddxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_duxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_emep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ggh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ggz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_gzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_hemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_hvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_hvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_scxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ssxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_tamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_udxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_uuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_vevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_vtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wmepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wmtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wpemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wptamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wpwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wpwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_wpwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_ztamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bbx_zzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_bcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_bcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_bcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_bcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_bsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bcx_gbcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_bdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_bdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_bdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_bdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_buxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bdx_gbdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bsx_bcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_bdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_bux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_buxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_buxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_buxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bux_gbux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bxbx_bxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bxbx_bxbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bxbx_bxbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bxbx_bxbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_bxbx_gbxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_cbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_cbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_cbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_cbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_gcbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cbx_sbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_cc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_cca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_cch
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_ccz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_gcc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cc_scwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_aa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_aaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_aaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_aemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_amummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_atamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_avevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_avmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_avtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_az
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_azh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_azz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ccxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_csxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ddxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ddxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ddxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_duxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_emep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ggz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_gzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_hemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_hmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_hvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_hvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_hvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_mummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_scxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ssxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_tamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_udxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_uuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_vevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_vmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_vtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wmepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wmmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wmtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wptamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_wpwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_ztamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ccx_zzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cd_su
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_cdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_cdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_cdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_cdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_cuxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_gcdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cdx_sdxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_aepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_amupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_atapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_bbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_ccxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_csx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_csxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_csxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_csxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_ddxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_epve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gcsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_ggwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gudx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gwpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gwph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_gwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_hepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_hmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_mupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_ssxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_tapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_udx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_udxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_udxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_udxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_uuxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wptamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_wpzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_zepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_zmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_csx_ztapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_cdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_gsdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_sdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_sdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_sdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_sdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cux_suxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_cxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_cxcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_cxcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_cxcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_gcxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxcx_sxcxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_cxdx_sxux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_db
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_dba
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_dbh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_dbz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_gdb
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_db_ubwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_dbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_dbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_dbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_dbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_gdbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dbx_ubxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_dc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_dca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_dch
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_dcz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_dswp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_gdc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_gus
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_ucwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_usa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_ush
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dc_usz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_dcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_dcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_dcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_dcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_dsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_gdcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dcx_ucxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_dd
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_dda
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_ddh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_ddz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_gdd
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dd_udwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_aa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_aaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_aaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_aemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_amummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_atamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_avevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_avmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_avtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_az
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_azh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_azz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ccxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_csxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ddxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ddxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ddxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_duxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_emep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ggz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_gzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_hemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_hmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_hvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_hvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_hvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_mummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_scxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ssxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_tamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_udxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_uuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_vevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_vmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_vtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wmepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wmmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wmtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wptamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_wpwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_ztamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ddx_zzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ds_dcwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ds_uswm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_dcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_dsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_dsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_dsxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_dsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_gdsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_gucx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_ucx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_ucxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_ucxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_ucxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dsx_usxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_aemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_amumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_atamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_bbxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_ccxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_ddxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_dux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_duxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_duxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_duxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_emvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gdux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_ggwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gscx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gtamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_gwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_hemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_hmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_mumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_scx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_scxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_scxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_scxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_ssxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_tamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_uuxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_wmzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_zemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_zmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dux_ztamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_dxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_dxbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_dxbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_dxbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_gdxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxbx_uxbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_dxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_dxcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_dxcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_dxcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_dxsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_gdxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_guxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_uxcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_uxsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_uxsxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxcx_uxsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_dxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_dxdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_dxdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_dxdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_gdxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxdx_uxdxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_dxcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_dxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_dxsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_dxsxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_dxsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_gdxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_dxsx_uxsxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_ba
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_baa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_baz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_btamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_bzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_cbcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_dbdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_gb
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_gba
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_gbh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_gbz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_ggb
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_sbsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gb_ubux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bbxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_bxzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_ccxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_ddxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_gbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_gbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_gbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_gbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_ggbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_ssxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gbx_uuxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_ca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_caa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_caz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_ctamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_cz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_czh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_czz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_dcdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_gc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_gca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_gcz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_ggc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_gswp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_scsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_sepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_smupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_stapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_swp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_swpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_swph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_swpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_ucux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gc_usdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_bcxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_ccxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_cxzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_ddxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_duxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_gcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_gcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_gcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_ggcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_gsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_ssxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxtamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_sxwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gcx_uuxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_da
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_daa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_daz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_demep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_dzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_gd
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_gda
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_gdz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_ggd
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_guwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_udux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_umumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uscx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_utamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gd_uwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_bdxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_cdxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_cuxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_ddxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_dxzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_gdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_gdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_gdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_ggdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_guxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_sdxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uuxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxwpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxwph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gdx_uxwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ddxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ddxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_gddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gg_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_ctamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_cwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_dcux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_dsdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_gcwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_semep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_smummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_sssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_svevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_svmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gs_usux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_bsxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_csxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxwpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxwph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_cxwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_ddxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_gcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_ggsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_gsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_gsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_gsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_ssxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_sxzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_udxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gsx_uuxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dcsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_depve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dwpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dwph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_dwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_gdwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_ggu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_gu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_gua
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_guz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_ua
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_ubbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_umummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_ussx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_utamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uuux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gu_uzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_buxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_cuxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_duxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxtamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_dxwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_gdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_ggux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_gux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_guxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_guxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_sdxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_suxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uuxux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_gux_uxzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sb_cbwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sb_sbz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_cbxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_gsbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_sbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_sbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_sbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sbx_sbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_ccwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_gsc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_sc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_sca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_sch
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_scz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sc_sswp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_aemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_amumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_atamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_bbxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_ccxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_ddxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_dux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_duxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_duxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_duxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_emvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gdux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_ggwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gscx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gtamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_gwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_hemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_hmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_mumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_scx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_scxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_scxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_scxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_ssxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_tamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_uuxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_wmzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_zemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_zmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_scx_ztamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_cdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_cux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_cuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_cuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_cuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_gcux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_gsdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_sdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_sdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_sdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_sdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sdx_suxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_gss
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_scwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_ss
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_ssa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_ssh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ss_ssz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_aa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_aaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_aaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_amummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_atamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_avmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_avtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_az
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_azh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_azz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ccxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_csxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ggz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_gzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_hmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_hvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_hvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_mummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_scxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ssxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_tamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_uuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_vmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_vtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wmmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wmtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wpmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wptamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wpwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wpwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_wpwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_ztamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ssx_zzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_cuxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_gsux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_sdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_sux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_suxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_suxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sux_suxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_cxbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_gsxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_sxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_sxbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_sxbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxbx_sxbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_cxcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_gsxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_sxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_sxcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_sxcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_sxcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxcx_sxsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_sxsx_sxcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_dbwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_gub
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_ub
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_uba
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_ubh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ub_ubz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_dbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_gubx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_ubx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_ubxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_ubxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ubx_ubxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_dcwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_guc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_uc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_uca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_uch
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_ucz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uc_uswp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_dcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_dsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_dsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_dsxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_dsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_gdsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_gucx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_ucx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_ucxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_ucxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_ucxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ucx_usxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_ddwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_gud
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_ud
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_uda
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_udh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_udz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_ud_uuwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_aepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_amupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_atapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_bbxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_ccxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_csx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_csxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_csxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_csxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_ddxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_epve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gcsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_ggwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gudx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gwpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gwph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_gwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_hepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_hmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_mupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_ssxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_tapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_udx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_udxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_udxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_udxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_uuxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpah
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wph
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wptamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_wpzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_zepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_zmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_udx_ztapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_dc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_dca
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_dch
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_dcz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_dswp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_gdc
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_gus
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_ucwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_us
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_usa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_ush
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_us_usz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_dsxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_gusx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_ucxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_usx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_usxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_usxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_usx_usxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_guu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_udwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_uu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_uua
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_uuh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uu_uuz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_aa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_aaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_aaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_aemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_amummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_atamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_avevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_avmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_avtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_az
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_azh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_azz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_bbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_bbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_bbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_bbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ccxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ccxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ccxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_csxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ddxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ddxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ddxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_duxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_emep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gaa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gaz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gbbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gccx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gddx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gga
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ggg
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ggz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gtamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_guux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gwpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_gzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_hemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_hmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_hvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_hvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_hvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_mummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_scxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ssx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ssxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ssxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ssxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_tamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_udxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_uux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_uuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_uuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_uuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_vevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_vmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_vtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wmepve
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wmmupvm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wmtapvt
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpemvex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpmumvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wptamvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpwma
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpwmh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_wpwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zemep
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zmummup
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_ztamtap
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zvevex
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zvmvmx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zvtvtx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uux_zzh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_dxbxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_guxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_uxbx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_uxbxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_uxbxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxbx_uxbxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_dxcxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_guxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_uxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_uxcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_uxcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_uxcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxcx_uxsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_dxdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_guxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_uxdx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_uxdxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_uxdxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_uxdxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxdx_uxuxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_dxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_dxcxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_dxcxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_dxcxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_dxsxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_gdxcx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_guxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_uxcxwp
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_uxsx
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_uxsxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_uxsxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxsx_uxsxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_guxux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_uxdxwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_uxux
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_uxuxa
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_uxuxh
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: dc_uxux_uxuxz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000

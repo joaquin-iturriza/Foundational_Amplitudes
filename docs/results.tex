@@ -2778,11 +2778,11 @@ seed, parent; the config files differ in \code{heterosc\_select} alone; \code{sc
 rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($91$ of $146$ below it) against D47's $0.64$ ($119$ of
 $146$), and $1.15$ times D47 cell by cell, lower in only $56$; on the one-loop probes up to $130\times$ (electroweak
 $e^+e^-\to d\bar d$). That reading is wrong, because the two runs of a cell are not the same run: they already differ at
-the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above), and their last-step validation $\mu$ MSE,
-which no selection touches, differs by more than $2\times$ in $71$ of the $146$ cells ($10$ to $90\%$ of the ratio: $0.19$
-to $6.5$, median $1.05$). Inside one run the checkpoint choice barely matters at $2\to2$: the $\mu$ MSE at D47's NLL pick over its
+the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above), and their best validation $\mu$ MSE (each run's minimum)
+differs by more than $2\times$ in $69$ of the $146$ cells ($10$ to $90\%$ of the ratio: $0.20$
+to $5.9$, median $0.97$). Inside one run the checkpoint choice barely matters at $2\to2$: the $\mu$ MSE at D47's NLL pick over its
 run's $\mu$-MSE minimum is $1.00$ at the median and $1.03$ at the $75$th percentile ($1.29$ at the $90$th). At $2\to3$ and $2\to4$ (the
-$32$ run directories of D82 and D85) two runs of one config agree to $0.87$ to $1.15$, none $2\times$ apart, and the NLL pick
+$32$ run directories of D82 and D85) two runs of one config agree to $0.90$ to $1.15$ ($10$ to $90\%$), none $2\times$ apart, and the NLL pick
 costs $16\%$ in $\mu$ at the median, so D85's conclusion stands there. At $2\to2$ the het numbers carry a run-to-run factor of
 about $2$ either way per cell (D47's $0.64$ is one draw of it), and the selection is not what separates them. The pulls stay
 calibrated with either pick (std $0.99$, $1.01$, $1.02$ at the quartiles; $125$ of $146$ within $0.9$ to $1.2$, against
@@ -2792,7 +2792,7 @@ $138$). The cell that blew up in D47 (\code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $
 \centering
 \includegraphics{../analysis/transfer/figs/het_mumse22.pdf}
 \caption{Run-to-run spread against the checkpoint choice, per cell, from the runs' validation $\mu$-MSE curves. Solid:
-the last-step $\mu$ MSE of the rerun over the first run of the same config ($2\to2$: D89 over D47, $146$ cells; $2\to3$,
+the best (minimum) validation $\mu$ MSE of the rerun over that of the first run of the same config ($2\to2$: D89 over D47, $146$ cells; $2\to3$,
 $2\to4$: D85 over D82, $32$ runs). Dashed: inside the first run, the $\mu$ MSE at the NLL-selected checkpoint over the
 run's minimum.}
 \label{fig:het_mumse22}

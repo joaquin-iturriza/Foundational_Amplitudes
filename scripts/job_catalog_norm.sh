@@ -17,8 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, Dpair or Ds0}"; SMOKE="${2:-}"
-case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, Dpair or Ds0}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -48,6 +48,11 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
                                    ++model.diagram_encoder_llm4lhc.virtuality_pool=true)
 [ "$ARM" = DlessInNoDiag ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
                                      ++model.use_diagrams=false)
+# DlessInOrd (D93, the coupling-order half of the target): DlessIn with each event's |M|^2 also divided by
+# (4 pi alpha_s_event)^q (4 pi alpha)^e, q and e the process's orders (data.target_physics_orders; per-event alpha_s from
+# <pool>.alphas.npy, not needed where q = 0)
+[ "$ARM" = DlessInOrd ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                  ++data.target_physics_orders=true)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
@@ -61,7 +66,11 @@ OUT="$PROJECT_DIR/runs/catalog_norm/hp58_$ARM"; PRED="$SCRATCH/zz_catalog_norm_$
 # 100, energy and multiplicity together). Predictions in <PRED>_<SET> for every set but the catalog
 case "$SET" in
     catalog)  R="$SCRATCH/zz_catalog_heldout_recipes"; HELD=recipes/catalog_daniel_heldout.yaml; PFX=dc_ ;;
-    2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_ ;;
+    # DlessInOrd needs alpha_s on every probe with q > 0: d4_gdx_dxzh_g's could not be recovered, so its regeneration
+    # d4r_gdx_dxzh_g stands in (catalog_2to4r_processes.yaml), from a recipe dir of its own
+    2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_
+              [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
+    top)      R="$SCRATCH/zz_catalog_top_recipes"; HELD=recipes/catalog_daniel_top.yaml; PFX=dc_ ;;
     2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_ ;;
     2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;
     2to4E100p) R="$SCRATCH/zz_catalog_2to4E100p_recipes"; HELD=recipes/catalog_2to4E100p_heldout.yaml; PFX=d4E100_ ;;
@@ -117,6 +126,12 @@ fi
 # eval_short / eval_extrap: the held-out scoring of a finished short or extrap run, from its sigma stage
 [ "$SMOKE" = eval_short ] && { OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"; SMOKE=eval; }
 [ "$SMOKE" = eval_extrap ] && { OUT="$PROJECT_DIR/runs/catalog_norm_extrap/$ARM"; PRED="$SCRATCH/zz_catalog_norm_extrap_$ARM"; SMOKE=eval; }
+# FA_HOLDOUT=top: the particle-content test (D93, "every process with ... a top held out of training"): trained without the
+# catalog's 142 processes with a top (recipes/catalog_daniel_train_notop.yaml, 1210 processes; the same steps, HPs and
+# settings), into <OUT>_notop and <PRED>_notop; scored on SET=top (all 162 catalog processes with a top)
+if [ "${FA_HOLDOUT:-}" = top ]; then
+    OUT="${OUT}_notop"; PRED="${PRED}_notop"; EXTRA+=(data.processes_file="$PROJECT_DIR/recipes/catalog_daniel_train_notop.yaml")
+elif [ -n "${FA_HOLDOUT:-}" ]; then echo "unknown FA_HOLDOUT $FA_HOLDOUT"; exit 1; fi
 # FA_SEED: a rerun at another seed (a run that diverged, 2026-10-23 Dpair), into <OUT>_seed<N> and <PRED>_seed<N>
 if [ -n "${FA_SEED:-}" ]; then
     OUT="${OUT}_seed$FA_SEED"; PRED="${PRED}_seed$FA_SEED"; EXTRA+=(seed=$FA_SEED)
