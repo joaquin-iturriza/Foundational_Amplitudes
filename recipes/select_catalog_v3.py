@@ -94,7 +94,7 @@ def main():
     # H1: new combinations, per (layer, beam) cell, among what is left
     cells = defaultdict(list)
     for n in reps:
-        if n not in role:
+        if n not in role and n not in out_fams:      # a held-out family's parent trains, so H2 tests multiplicity alone
             cells[(P[n]["layer"], beam(n))].append(n)
     for c, ns in sorted(cells.items()):
         for n in rng.sample(sorted(ns), round(a.h1_frac * len(ns))):
