@@ -138,6 +138,9 @@ for p in r["processes"]:
 print(len(r["processes"]), "held-out recipes")
 PY
 P=("$R"/${PFX}*.yaml); [[ "$SMOKE" = smoke* ]] && [ "$SET" = catalog ] && P=("$R/dc_scx_wmhh.yaml" "$R/dc_ssx_vevex.yaml")
+# FA_ONLY: score only these processes (space-separated names) into a zz_debug dir, e.g. with CUDA_LAUNCH_BLOCKING=1 to
+# locate a crash (2026-10-23: DlessInVirt, an illegal memory access on dE100_ddx_hvmvmx, twice)
+if [ -n "${FA_ONLY:-}" ]; then P=(); for n in $FA_ONLY; do P+=("$R/$n.yaml"); done; DEBUG_PRED=1; fi
 # eval: the sigma-stage model when the run has one (trunk and mu frozen, so mu is the run's; its sigma is the calibrated
 # one, D70), into its own prediction dir
 # the sigma stage's model whenever the run has one (mu is the run's, frozen; sigma is the calibrated one): the held-out
@@ -146,5 +149,6 @@ P=("$R"/${PFX}*.yaml); [[ "$SMOKE" = smoke* ]] && [ "$SET" = catalog ] && P=("$R
 PAR="$OUT"
 if ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then PAR="$OUT/sigma_stage"; PRED="${PRED}_sigstage"; fi
 [ "$SET" != catalog ] && PRED="${PRED}_$SET"
+[ -n "${DEBUG_PRED:-}" ] && PRED="$SCRATCH/zz_debug_${ARM}_${SET}_$SLURM_JOB_ID"
 mkdir -p "$PRED"
 python tools/zero_shot_parent.py --parent "$PAR" --save-dir "$PRED" "${P[@]}"
