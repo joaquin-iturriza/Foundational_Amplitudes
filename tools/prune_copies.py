@@ -2,8 +2,7 @@
 metrics and data_stats, so any trial can be rerun from its config) applied to sweeps copied from another site
 (runs_from_lxplus/), whose result files stayed there, so prune.py sees no finished trial and keeps everything (the user,
 2026-10-23: "aren't we supposed to be pruning and deleting the models that don't win in a sweep?"). A sweep's best is
-read from the trials' own logs instead: per trial, the lowest "Val loss (combined)" its out_*.log reports (the
-validation the checkpoint selection reads), among the trials whose config ran the sweep's longest horizon
+read from the trials' own logs instead: per trial, the lowest validation loss its out_*.log reports, among the trials whose config ran the sweep's longest horizon
 (training.iterations). A copy is never resumed, so its sweep is finished: as prune.py does for a finished sweep, every
 other trial loses its models (a lower-fidelity trial of a multi-fidelity sweep, a trial that crashed). Kept whole: the best trial, every
 trial named anywhere in the repo's job scripts, sweep configs, Delta lists or analysis files (runs/<sweep>/trial_N),
@@ -16,7 +15,10 @@ import argparse, glob, json, os, re, sys, time
 import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VAL_RE = re.compile(r"Val loss \(combined\): (-?[0-9.]+(?:e[-+]?\d+)?)")
+# "Val loss (combined): x" (several processes) or "Val loss: x" (one); the logs carry the regularized value only (lambda
+# <= 1e-6), so the kept model is the lowest-logged trial, which can differ from the val_loss_no_reg best in a near tie;
+# every trial's config and log stay, so any trial can be rerun
+VAL_RE = re.compile(r"Val loss(?: \(combined\))?: (-?[0-9.]+(?:e[-+]?\d+)?)")
 
 
 def referenced():
