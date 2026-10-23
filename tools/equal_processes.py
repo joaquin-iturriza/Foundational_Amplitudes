@@ -98,9 +98,7 @@ def main():
     # Backends first: parallel workers must never race to compile one, so each worker gets distinct processes
     # (catalog_v3's census: 1630 backends, serially some 30 h)
     if args.compile_workers > 1:
-        from concurrent.futures import ProcessPoolExecutor
-        with ProcessPoolExecutor(max_workers=args.compile_workers) as ex:
-            list(ex.map(datagen.ensure_backend, sorted(procs), chunksize=1))
+        datagen.ensure_backends(sorted(procs), workers=args.compile_workers)   # deduplicated by backend
     for n in procs:
         datagen.ensure_backend(n)
 
