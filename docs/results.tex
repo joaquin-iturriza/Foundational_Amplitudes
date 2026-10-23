@@ -752,12 +752,13 @@ dimensionless, $\Lambda^2$ pairs & $0.77$ & $0.094$ & $15$ / $6.3$ ($-3.6$ / $-2
 dimensionless inputs, encoder & $1.57$ & $0.062$ & $34$ / $17$ ($-5.7$ / $-3.9$) & $33$ / $19$ \\
 \quad with virtuality pooling & $1.15$ & $0.064$ & $38$ / $25$ ($-6.0$ / $-4.7$) & $35$ / $27$ \\
 \quad without diagrams & $1.67$ & $0.085$ & $37$ / $19$ ($-5.9$ / $-4.1$) & $35$ / $20$ \\
+\quad with the coupling orders & $0.48$ & $0.077$ & $52$ / $30$ ($-7.0$ / $-5.3$) & $55$ / $30$ \\
 \end{tabular}
 \end{center}
-The energy is not the problem: every arm reads the $2\to3$ processes at $100$\,TeV with a median MSE of $0.06$ to $0.10$ and offsets of
+The energy is not the problem: every arm reads the $2\to3$ processes at $100$\,TeV with a median MSE of $0.06$ to $0.11$ and offsets of
 at most $0.03$. Nor are the cuts: from $p_T\geq10$ to $30$\,GeV the $2\to4$ offset moves by
-at most $0.6$ in any arm (under $0.3$ in three of the six), small against the offsets themselves. The extra particle is: at $13$ and
-$100$\,TeV alike, every dimensionless arm puts the $2\to4$ processes $2$ to $6.5$ too low, most of its
+at most $0.6$ in any arm (under $0.3$ in three of the seven), small against the offsets themselves. The extra particle is: at $13$ and
+$100$\,TeV alike, every dimensionless arm puts the $2\to4$ processes $2$ to $7$ too low, most of its
 error, and the $100$\,TeV probes repeat the $13$\,TeV numbers. Of the unit-free references the event's pair scale is the
 best by a factor $3$ to $4$ (it shrinks with a soft or collinear particle, which $\hat s$ does not), and the result is the
 same on both seeds ($11.5$ / $6.2$ at seed $42$'s best checkpoint). The fitted $s_0$ does better still, with offsets under
@@ -768,8 +769,53 @@ the new processes, $0.056$ against $0.080$ on the $96$ relabels, $34$ / $17$ aga
 by virtuality lowers the new processes' error further, to $1.15$, and leaves the relabels as they are ($0.059$), but does
 nothing for the extra particle ($38$ / $25$). It gives the encoder a per-event view of which diagrams dominate, not the
 cost of an emission. The dimensionless inputs cost on the new processes ($1.57$ against $0.72$ with the same target and raw
-inputs) and gain at $2\to4$ ($34$ / $17$ against $45$ / $26$). The coupling-order factor of the target, the other half of the
-D93 design, is not in this table yet (its per-event $\alpha_s$ is being recovered, hand-off).
+inputs) and gain at $2\to4$ ($34$ / $17$ against $45$ / $26$).
+
+\paragraph{The coupling orders in the target (D93).}\label{par:dimless_orders} The other half of the D93 target divides each
+event's $|\mathcal M|^2$ by $(4\pi\alpha_s)^q(4\pi\alpha)^e$, with $q$, $e$ the process's QCD and QED orders and $\alpha_s$
+the event's own (the value MadEvent labelled it at, \code{tools/recover\_alphas.py}; \code{data.target\_physics\_orders},
+arm \code{DlessInOrd}: the dimensionless inputs and encoder row with this factor, same steps, HPs and seed). It is exact
+for a single coupling monomial, so mixed-order entries (four-quark, heavy-quark pairs) are refused; none is in the
+catalog's training set. Of the $1491$ catalog pools, $11$ did not reproduce in the $\alpha_s$ recovery; $10$ are purely
+electroweak ($q=0$, no $\alpha_s$ needed), and the eleventh, the probe $g\bar d\to\bar dZHg$, is a regenerated sample at
+both cuts (\code{d4r\_}, \code{d4c30r\_}), so that $2\to4$ cell is not paired event by event with the other rows. On new
+processes the factor is the largest gain of the round, $1.57$ to $0.48$, the level error falling from $0.86$ to $0.19$
+and the shape error from $0.42$ to $0.26$, with the relabels unchanged ($0.051$ against $0.056$) and the energy axis at
+$0.077$. At $2\to4$ it costs: $52$ / $30$ against $34$ / $17$, through the offset ($-7.0$ / $-5.3$ against $-5.7$ / $-3.9$),
+at both cuts (the offset moves by $0.4$ between them) and at $100$\,TeV. Removing the couplings moves a $+g$ and a $+\gamma$
+target in opposite directions ($-\log 4\pi\alpha_s\approx-0.4$, $-\log 4\pi\alpha\approx+2.4$), yet both offsets grow by
+about $1.4$, so the change is in how the network extrapolates to one more particle, not the factor's arithmetic. One seed
+each.
+
+\paragraph{Particle content and perturbative order (D93).}\label{par:dimless_particle} The last two axes, read with the
+coupling-order arm (Fig.~\ref{fig:dimless_axes}; \code{catalog\_top\_heldout.py}, \code{catalog\_loop\_heldout.py},
+\code{dimless\_axes.py}). Particle content: a twin of \code{DlessInOrd} trained without the catalog's $142$ processes
+with a top quark ($1210$ processes, \code{recipes/catalog\_daniel\_train\_notop.yaml}; no relabelling class mixes top and
+non-top; two Higgs bosons needed no run, the catalog's split already holds all $15$ such processes out), read on all $162$
+processes with a top. Trained with them, the $142$ read at $0.054$ and the $20$ held out at $0.16$; never having seen a
+top, the twin reads them at $15$ and $10$, a factor $230$ and $50$ per process at the median, with median $|$offset$|$
+$3.3$ and $2.0$: an unseen particle is as far out of reach as one more particle (the top enters only through its row of
+the particle table, mass and quantum numbers, which no training process varied).
+\label{par:dimless_loop} Perturbative order: the $57$ one-loop pools on CC whose target is positive in every split (QCD
+and electroweak virtuals and loop-induced, $e^+e^-$ and quark initial states, every $\sqrt s$ window;
+\code{recipes/catalog\_loop\_probes.yaml}) with the tree of the same process and window ($42$; $30$ of them have the particle content of a catalog training
+process, $4$ of a held-out one, the $8$ $e^+e^-$-initiated ones of none, all generated by our own sampler on a flat
+partonic $\sqrt s$ window rather than the catalog's pp events), read with no further training; the $55$
+one-loop pools whose target changes sign cannot be read by a $\log|\mathcal M|^2$ model and are left out (hand-off). On the
+$79$ probes both arms can score, the trees read at $0.35$ (DlessIn) and $0.33$ (with the orders; quark-initiated $0.20$
+and $0.16$, $e^+e^-$-initiated $3.5$ and $3.6$, an initial state the catalog lacks) and their one-loop partners at $9.0$ and
+$10.1$: the stripped virtual of the same process and window is a median $18$ and $26$ times its tree's error (DlessIn on all
+$99$: $11$). The order a network never saw is out of reach with or without the coupling factor, which removes the
+couplings and not the loop's own dependence on the kinematics.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog\_daniel/figs/dimless\_axes.pdf}
+\caption{Per-process MSE of $\log|\mathcal M|^2$, ECDF. Left: the $162$ catalog processes with a top quark, read by the
+coupling-order design run and by its twin trained without any top. Right: the trees (dashed) and one-loop pools (solid) of
+the order set, on the $79$ probes both arms score, without and with the coupling orders in the target.}
+\label{fig:dimless_axes}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -6344,22 +6390,12 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-23, 13:45).} D93's remaining parts are running, each a unit of \code{dimless\_general}'s check
-    (\code{tools/item\_checks.py}, so a part neither done nor running raises a GAP; before, the study had no such units and
-    stalled once its jobs ended): the coupling-order arm \code{DlessInOrd} (DlessIn with \code{data.target\_physics\_orders},
-    FA-ccin2p3-f6f9251c) and its twin trained without the catalog's $142$ top processes (FA-ccin2p3-def0b084, scored on all
-    $162$ top processes: the particle-content set; two Higgs bosons are already held out entirely by the catalog's split);
-    the order set, the $57$ one-loop pools on CC positive in every split with the tree of the same process and window
-    ($42$), $99$ probes (\code{recipes/catalog\_loop\_probes.yaml}; prep job FA-ccin2p3-8ec65e8f builds the missing tree
-    train pools and each pool's $\alpha_s$ by \code{tools/write\_own\_alphas.py}); the $\alpha_s$ recovery of the $30$\,GeV
-    set (FA-ccin2p3-ff70646f). Scorings are queued in \code{site launch} behind their inputs. $\alpha_s$: $10$ of the $11$ catalog
-    pools whose MadEvent rerun did not reproduce are purely electroweak ($\alpha_s$ power $0$, none needed); the eleventh,
-    the probe \code{d4\_gdx\_dxzh\_g}, is regenerated as \code{d4r\_gdx\_dxzh\_g} (a different sample of the same process).
-    Mixed-order entries (four-quark, heavy-quark pairs) have no single coupling power and are refused by the factor.
-    For the user: the $55$ one-loop pools whose target changes sign are not in the order set (a $\log|\mathcal M|^2$ model
-    cannot score them); hp58's $13$ cells at the top of their learning-rate window, extended in place
-    (\code{sweep/extend\_sweep.py}, then \code{drive.py --n-trials 10}), about $26$ GPU-h, needs a yes. Blocked: bulk
-    transfers to Jean Zay (the $29$ GB archive, its checkout at \code{8fb002e}).
+  \item \textbf{State (2026-10-23, 15:45).} For the user: the $55$ one-loop pools whose
+    target changes sign are not in the order set (a $\log|\mathcal M|^2$ model cannot score them); hp58's $13$ cells at the
+    top of their learning-rate window, extended in place (\code{sweep/extend\_sweep.py}, then \code{drive.py --n-trials
+    10}), about $26$ GPU-h, needs a yes. A new sweep on a cell another sweep measures is now refused
+    (\code{sweep/cell\_guard.py}, in \code{drive.py} and \code{generate\_sweep.py}; $79$ cells in \code{sweep/} already had
+    two or three sweeps). Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
     (sec:tf32-eval). The $\sigma$
