@@ -6445,6 +6445,42 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
+  \item \textbf{Proposed to the user (2026-10-23, evening): a new catalog first, then the level. Design only, no job.}
+    The user: ``we shouldn't be bound to this catalog for much longer \dots\ design a new similarly sized catalog with
+    true diversity, no repetitions or relabelings, being very intentional on what is left out as heldout''. Why:
+    arXiv:2606.23791's $1501$ processes are $409$ classes, $96$ of its $149$ held-out processes relabel a training one,
+    and it has no $e^+e^-$, no $2\to4$, no loop and no mass that moves; catalog\_v2 is ruled but small ($400$, six beams).
+    \emph{The unit is an equality class.} Every candidate's $|\mathcal M|^2$ on shared points (\code{tools/equal\_processes.py}
+    extended to every candidate, one-loop included, with CP and parity mirrors among the relabellings); one representative
+    per class, near-twins (log-ratio spread under $10^{-2}$, $\mu$ against $\tau$ finals) counted as one; the class count
+    per layer is the catalog's size, not the process count. \emph{Layers}, $\sim1500$ classes: SM trees $2\to2$, $2\to3$
+    and part of $2\to4$ from every beam ($e^+e^-$, every quark pair with $b$, $qg$, $gg$); one-loop QCD virtuals at $2\to2$
+    and $2\to3$, positive and sign-changing, and loop-induced; parameter variants at far points ($\alpha_s$, $m_t$, $M_Z$,
+    $M_H$); a heavy-quark layer at several masses ($m_Q\in\{50,300,600\}$\,GeV, the top's quantum numbers) so that the
+    physical top is an interpolation in the particle table, which the top axis showed nothing in training varied.
+    \emph{Conventions}: one sampler (the mixture), one cut set, $\alpha_s$ stored per event at generation, every pool the
+    same size. \emph{Held out}, each probe with its whole class and tagged with the structure it needs and its nearest
+    training class: (H1) new combinations of seen vertices, particles, multiplicity and order, $\sim5\%$ per layer; (H2)
+    multiplicity, $2\to4$ of families with no $2\to4$ in training (inside the trained range) and $2\to5$ (outside);
+    (H3) particle, the physical top bracketed by the heavy-quark masses, and one particle never seen in any form; (H4) one
+    vertex class absent (the quartic gauge or the triple Higgs vertex); (H5) order, the one-loop of families whose trees
+    train, of held-out trees, and one loop-induced class; (H6) parameter interpolation points; (H7) $100$\,TeV and $p_T\geq30$.
+    H1, H2, H3's top, H5 to H7 come from one pretraining; H3's unseen particle and H4 need one removal twin, shared.
+    First step when approved: a CPU census (enumerate, validate in MadGraph, equality classes, cost per pool; no events).
+    Questions for the user: which of H1 to H7 are the regimes that matter, and in what order; SM only or BSM states too;
+    the size; whether $e^+e^-$ stays in.
+    \emph{The level, after the catalog} (par.\ What a few labelled events fix): (L1) a per-emission scale, the target
+    $|\mathcal M|^2$ times the product of the event's $k_T$-clustering scales instead of $\hat s^{N-4}$, which removes the
+    $\hat s/k_T^2$ an emission adds and keeps the $2\to4$ level inside the trained range (the fixed $s_0$ does that for one
+    cut set only); (L2) the loop factor $(16\pi^2)^{-L}$ and (L3) the spin, colour and identical-particle factors in $F$,
+    exact; (L4) a few-event calibration weighted by the $\sigma$ head, the only step between zero-shot and the floor at
+    small $K$; (L5) the small dedicated network, for what no constant fixes ($2\to4$ shape $2.5$, unseen tops $1.5$): first a
+    per-process context vector fitted on $K$ events with the trunk frozen (feature reuse matches meta-learning,
+    arXiv:1909.09157), then a factorisation-aware head that predicts the $(n{+}1)$-point amplitude from the model's own
+    $n$-point one times dipoles (arXiv:2107.06625, 2512.11036). Targets I set: zero-shot $2\to4$ within $2\times$ of
+    its $K=1$ error; the tops' shape floor under $0.5$ with the heavy-quark layer. Signed pools: the user, 2026-10-23,
+    the linear part of asinh costs against its log part, so $r_0$ per pool at a low quantile of $|V/F|$ ($\leq0.5\%$ of
+    events in the linear band, which is where the sign changes), compared with the sign head on $\log|V|$.
   \item \textbf{State (2026-10-23, 17:10).} Nothing running; supervisor and \code{site events --wait} armed. Done today and
     written up: D93's round (par:dimless\_orders, par:dimless\_particle, fig:dimless\_axes, every unit of
     \code{dimless\_general}'s check), D97's hp58 extension (stage-2 paragraph and table). The magnitude-only scoring of the
