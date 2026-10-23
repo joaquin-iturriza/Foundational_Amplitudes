@@ -363,6 +363,15 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
         print(f"Extending existing sweep: {sweep_name}")
     else:
         sweep_name = next_available_name(base_name, afs_sweep_dir)
+        # a second sweep of the same config (<name>_002) or a new sweep on a cell another sweep already measures is
+        # refused: extend the existing one (--extend, sweep/extend_sweep.py; sweep/cell_guard.py)
+        from sweep.cell_guard import check_new
+        if sweep_name != base_name and not os.environ.get("FA_NEW_SWEEP_REASON", "").strip():
+            raise SystemExit(f"Sweep '{base_name}' already exists: extend it (--extend, after sweep/extend_sweep.py to "
+                             f"widen a range) instead of starting '{sweep_name}'; a new sweep only with FA_NEW_SWEEP_REASON")
+        if not dry_run:
+            with open(config_path) as f:
+                check_new(yaml.safe_load(f), os.path.join(afs_sweep_dir, sweep_name))
         if sweep_name != base_name:
             print(f"Sweep '{base_name}' already exists — using '{sweep_name}' instead.")
 

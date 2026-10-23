@@ -119,6 +119,11 @@ class Sweep:
         self.state_path = os.path.join(self.dir, "dyhpo_state.pkl")
         self.out_path = os.path.join(self.dir, "dyhpo_surrogate")
         if not os.path.exists(self.state_path):
+            if not a.dry_run:
+                # a new sweep on a cell another sweep already measures is refused: extend that one (sweep/cell_guard.py)
+                from sweep.cell_guard import check_new
+                with open(config_path) as f:
+                    check_new(yaml.safe_load(f), self.dir)
             init_sampler(self.cfg, self.dir, self.dir)
         self.sampler = DyHPOSampler.load(self.state_path, self.out_path, force_cpu=True)
         self.n_trials = int(a.n_trials or self.cfg.get("n_trials", 40))
