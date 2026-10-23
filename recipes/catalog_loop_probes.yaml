@@ -1,10 +1,11 @@
 # the order axis of the dimensionless round (D93, "perturbative order: the one-loop probes"): every one-loop pool on CC
-# (QCD and electroweak virtuals, loop-induced; both initial states) whose |M|^2 is positive on every val event, one window
-# per process name (the widest: predictions are saved per name), 55 pools, with the tree pool of the same process and
-# window where one exists (46). The 51 signed one-loop pools are left out: a log|M|^2 model cannot score a target that
-# changes sign (tools/zero_shot_parent.py lists them). Counts are the existing pools' (trees without a uniform train pool
-# get 1000 train events, read only for the probe's own target statistics). With data.target_physics_orders 77 of the 101
-# are scored: mixed-order entries have no single coupling power, the loop-induced uubar_Hg_loop no alpha_s rule.
+# (QCD and electroweak virtuals, loop-induced; both initial states, every sqrt(s) window) whose |M|^2 is positive on
+# every event of every split, 57 pools, with the tree pool of the same process and window where one exists (42). The 55
+# one-loop pools whose target changes sign in some split are left out: a log|M|^2 model cannot score them
+# (tools/zero_shot_parent.py lists them). Counts are the existing pools' (trees without a uniform train pool get 1000
+# train events, read only for the probe's own target statistics). Predictions are saved per window
+# (<name>_<lo>-<hi>GeV.npz). With data.target_physics_orders 79 of the 99 are scored: mixed-order entries have no single
+# coupling power.
 processes:
 - name: dd_dd
   sqrts:
@@ -84,20 +85,6 @@ processes:
   n_val: 10000
   n_test: 10000
 - name: ee_bbbara_nlo
-  sqrts:
-  - 25
-  - 1000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: ee_bbbarg
-  sqrts:
-  - 25
-  - 1000
-  n_train: 1000
-  n_val: 10000
-  n_test: 10000
-- name: ee_bbbarg_nlo
   sqrts:
   - 25
   - 1000
@@ -336,20 +323,6 @@ processes:
   n_val: 5000
   n_test: 5000
 - name: udbar_tbbar_nlo
-  sqrts:
-  - 186
-  - 1000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: udbar_tbbara
-  sqrts:
-  - 186
-  - 1000
-  n_train: 1000
-  n_val: 10000
-  n_test: 10000
-- name: udbar_tbbara_nlo
   sqrts:
   - 186
   - 1000
@@ -650,20 +623,6 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: uubar_bbbarg
-  sqrts:
-  - 25
-  - 1000
-  n_train: 1000
-  n_val: 10000
-  n_test: 10000
-- name: uubar_bbbarg_nlo
-  sqrts:
-  - 25
-  - 1000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
 - name: uubar_mumu
   sqrts:
   - 25
@@ -674,20 +633,6 @@ processes:
 - name: uubar_mumu_nlo
   sqrts:
   - 25
-  - 1000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: uubar_ttbarZ
-  sqrts:
-  - 458
-  - 1000
-  n_train: 1000
-  n_val: 10000
-  n_test: 10000
-- name: uubar_ttbarZ_nlo
-  sqrts:
-  - 458
   - 1000
   n_train: 50000
   n_val: 5000
@@ -710,6 +655,48 @@ processes:
   sqrts:
   - 25
   - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_dd_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: ee_ttbar_nlo
+  sqrts:
+  - 363
+  - 450
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_HH_loop
+  sqrts:
+  - 263
+  - 1000
+  n_train: 1000
+  n_val: 200
+  n_test: 200
+- name: uubar_ZZ_nlo
+  sqrts:
+  - 192
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ZZ_nlo
+  sqrts:
+  - 500
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: uubar_ttbar_nlo
+  sqrts:
+  - 363
+  - 450
   n_train: 50000
   n_val: 5000
   n_test: 5000

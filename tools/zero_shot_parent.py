@@ -36,6 +36,8 @@ ap.add_argument("--train-subsample", type=int, default=10000,
 ap.add_argument("--twins", default=None, help="JSON {probe: training process it relabels} (per-process parent)")
 ap.add_argument("--save-dir", default=None, help="write <probe>.npz (t, q_aff, q) here")
 ap.add_argument("--eval-subsample", type=int, default=2000, help="held-out val events per probe")
+ap.add_argument("--window-names", action="store_true",
+                help="save <probe>_<lo>-<hi>GeV.npz (the recipe's sqrt(s) window), for a probe set with several windows of one process")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 
@@ -151,7 +153,12 @@ for recipe in a.recipes:
     if a.save_dir:
         # q_own: the raw output read in the probe's own standardized units (its train split's mean and std of
         # log|M|^2, two numbers from its data, no fit to the predictions)
-        np.savez_compressed(os.path.join(a.save_dir, probe + ".npz"), t=t.astype(np.float32),
+        stem = probe
+        if a.window_names:
+            import yaml
+            lo, hi = yaml.safe_load(open(recipe))["processes"][0]["sqrts"]
+            stem = f"{probe}_{lo}-{hi}GeV"
+        np.savez_compressed(os.path.join(a.save_dir, stem + ".npz"), t=t.astype(np.float32),
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
                             mu_sd=np.array([mu_p, sd_p]), logF=logF,

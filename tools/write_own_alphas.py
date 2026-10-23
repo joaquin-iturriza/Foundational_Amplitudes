@@ -6,11 +6,13 @@ at mu = sqrt(s_hat)), so it is recomputed here exactly:
   * a tree pool (mg5_pipeline_final, per_event_alphas true): alpha_s(sqrt(s_hat); alpha_s(M_Z));
   * a stripped one-loop QCD virtual (tools/nlo_virtual_pipeline.py, no alphas_prefactor): its Born is evaluated at the
     fixed alpha_s(M_Z) (nlo_virtual_pipeline: asrun = alphas_mz), so the constant;
-  * a virtual with alphas_prefactor, a loop-induced or an electroweak one-loop entry: refused (not needed for the
-    order axis; each would need its own rule).
+  * a loop-induced entry (|M_1|^2, no Born): the per-event running alpha_s, like a tree (nlo_virtual_pipeline's
+    loopind branch);
+  * a virtual with alphas_prefactor or an electroweak one-loop entry: refused (each would need its own rule; an EW
+    entry has alpha_s power 0, so a run with the factor needs none).
 alpha_s(M_Z) is the recipe's alphas_mz, else 0.118 (the generators' config["alphas_mz"] and its default). CPU only.
     python tools/write_own_alphas.py recipes/catalog_loop_probes.yaml [--roles train val test]
-(run after the pools exist: the 67 trees' 1000-event train pools are built by prebuild_recipes.py first)
+(run after the pools exist: the missing tree train pools are built by prebuild_recipes.py first)
 """
 import argparse, glob, json, os, sys
 
@@ -30,10 +32,14 @@ def alphas_of(path, rec, cfg):
     if cfg.get("kind") == "virt":
         from tools.nlo_virtual_pipeline import VIRT_PROCESSES
         vb = VIRT_PROCESSES.get(cfg.get("virt_base"), {})
-        if (cfg.get("alphas_prefactor") or rec.get("alphas_prefactor") or cfg.get("order") is not None
-                or any(cfg.get(k) or vb.get(k) for k in ("loopind", "ew"))):
-            raise ValueError(f"{path}: a virtual with its own alpha_s rule (prefactor, loop-induced or EW), refused")
-        return np.full(n, amz)
+        if cfg.get("alphas_prefactor") or rec.get("alphas_prefactor") or cfg.get("ew") or vb.get("ew"):
+            raise ValueError(f"{path}: a virtual with its own alpha_s rule (prefactor or EW), refused")
+        if not (cfg.get("loopind") or vb.get("loopind")):
+            if cfg.get("order") is not None:
+                raise ValueError(f"{path}: a virtual with an explicit order and no loop-induced flag, refused")
+            return np.full(n, amz)
+        # loop-induced (|M_1|^2, no Born): evaluated at the per-event running alpha_s(sqrt(s_hat); alpha_s(M_Z)) like a
+        # tree (nlo_virtual_pipeline.generate_virt_dataset, the loopind branch), so it takes the tree rule below
     if rec.get("per_event_alphas") is not True:
         raise ValueError(f"{path}: recipe does not say per_event_alphas true ({rec.get('per_event_alphas')!r})")
     npart = len(rec["pdg_ids"])

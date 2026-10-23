@@ -88,9 +88,9 @@ def scorings(sets, item):
 
 # D93's parts after the round of fig:dimless_round (2026-10-23: they had no unit here, so when the round's jobs ended no
 # event said the coupling-order factor and the particle-content and order sets were still to do, and the study stalled)
-# _loop (recipes/catalog_loop_probes.yaml): the 101 positive one-loop pools and their trees; with the coupling-order factor
-# 77 of them (mixed-order entries and the loop-induced uubar_Hg_loop, which has no alpha_s rule, are refused)
-ORD_SETS = {"": 139, "_2to4": 40, "_2to4c30": 40, "_2to4E100": 40, "_2to4E100p": 36, "_top": 162, "_loop": 77}
+# _loop (recipes/catalog_loop_probes.yaml): the 99 positive one-loop pools (every window) and their trees; with the
+# coupling-order factor 79 of them (the mixed-order entries are refused)
+ORD_SETS = {"": 139, "_2to4": 40, "_2to4c30": 40, "_2to4E100": 40, "_2to4E100p": 36, "_top": 162, "_loop": 79}
 WRITEUPS = {"dimless_writeup_orders": "par:dimless_orders", "dimless_writeup_particle": "par:dimless_particle",
             "dimless_loop_probes": "par:dimless_loop"}
 
@@ -105,7 +105,7 @@ def dimless_rest(item):
     act = bool(active_runs(item))
     u = lambda done: {"expected": 1, "done": int(done), "active": int(act and not done)}
     units = {"recover_alphas_2to4c30": u(int(n.get("c30", 0)) >= 40), "d4r_gdx_dxzh_g": u(int(n.get("d4r", 0)) >= 1)}
-    for arm, sets in (("DlessInOrd", ORD_SETS), ("DlessInOrd_notop", {"_top": 162}), ("DlessIn", {"_loop": 101})):
+    for arm, sets in (("DlessInOrd", ORD_SETS), ("DlessInOrd_notop", {"_top": 162}), ("DlessIn", {"_loop": 99})):
         for suf, want in sets.items():
             name = f"zz_catalog_norm_short_{arm}_sigstage{suf}"
             units[name] = u(int(n.get(name, 0)) >= want)

@@ -6,8 +6,8 @@
 #SBATCH --time=04:00:00
 #SBATCH --output=loop_probes_prep_%j.out
 #SBATCH --error=loop_probes_prep_%j.out
-# CPU only. The order axis of the dimensionless round (D93): the pools of recipes/catalog_loop_probes.yaml (73 one-loop
-# virtuals with their trees; existing pools are cache hits, the 67 trees' 1000-event uniform train pools are built),
+# CPU only. The order axis of the dimensionless round (D93): the pools of recipes/catalog_loop_probes.yaml (the positive
+# one-loop pools with their trees; existing pools are cache hits, the missing 1000-event tree train pools are built),
 # then each pool's per-event alpha_s (tools/write_own_alphas.py) for the runs with data.target_physics_orders.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
