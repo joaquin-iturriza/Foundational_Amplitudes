@@ -2772,6 +2772,33 @@ against the MSE cell, with the main run's checkpoint picked on the validation $\
 \label{fig:het_mumse}
 \end{figure}
 
+\paragraph{The $147$ $2\to2$ cells with the $\mu$-MSE checkpoint, and how far two runs of one config land (D89, 2026-10-23).}
+D47's $2\to2$ cells retrained with the checkpoint on the validation $\mu$ MSE, everything else as D47 (config, HPs, data,
+seed, parent; the config files differ in \code{heterosc\_select} alone; \code{scripts/job\_het\_delta.sh --mumse},
+\code{analysis/transfer/het\_mumse22\_summary.py}, Fig.~\ref{fig:het_mumse22}). Read as D85 read its $24$ cells, the
+rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($91$ of $146$ below it) against D47's $0.64$ ($119$ of
+$146$), and $1.15$ times D47 cell by cell, lower in only $56$; on the one-loop probes up to $130\times$ (electroweak
+$e^+e^-\to d\bar d$). That reading is wrong, because the two runs of a cell are not the same run: they already differ at
+the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above), and their last-step validation $\mu$ MSE,
+which no selection touches, differs by more than $2\times$ in $71$ of the $146$ cells ($10$ to $90\%$ of the ratio: $0.19$
+to $6.5$, median $1.05$). Inside one run the checkpoint choice barely matters at $2\to2$: the $\mu$ MSE at D47's NLL pick over its
+run's $\mu$-MSE minimum is $1.00$ at the median and $1.03$ at the $75$th percentile ($1.29$ at the $90$th). At $2\to3$ and $2\to4$ (the
+$32$ run directories of D82 and D85) two runs of one config agree to $0.87$ to $1.15$, none $2\times$ apart, and the NLL pick
+costs $16\%$ in $\mu$ at the median, so D85's conclusion stands there. At $2\to2$ the het numbers carry a run-to-run factor of
+about $2$ either way per cell (D47's $0.64$ is one draw of it), and the selection is not what separates them. The pulls stay
+calibrated with either pick (std $0.99$, $1.01$, $1.02$ at the quartiles; $125$ of $146$ within $0.9$ to $1.2$, against
+$138$). The cell that blew up in D47 (\code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$) is left out of these numbers, as there; its rerun is $51$ times the MSE cell's median $|\Delta|$.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_mumse22.pdf}
+\caption{Run-to-run spread against the checkpoint choice, per cell, from the runs' validation $\mu$-MSE curves. Solid:
+the last-step $\mu$ MSE of the rerun over the first run of the same config ($2\to2$: D89 over D47, $146$ cells; $2\to3$,
+$2\to4$: D85 over D82, $32$ runs). Dashed: inside the first run, the $\mu$ MSE at the NLL-selected checkpoint over the
+run's minimum.}
+\label{fig:het_mumse22}
+\end{figure}
+
 \paragraph{Het HPs of the finale fine-tune, stage 1 (D91, 2026-10-23).} The het fine-tune benchmark needs het HPs, and only
 the largest cells had them. Stage 1 sweeps four probes that have no twin in the big catalog, one of each kind
 ($e^+e^-\to d\bar d$, $e^+e^-\to W^+W^-$, $e^+e^-\to d\bar d$ at one loop, $u\bar u\to Zggg$), at $D=10^2$ and $10^4$: the finale's
@@ -6322,12 +6349,9 @@ of the three share a test set.
     now has a check (\code{tools/item\_checks.py}). (1) \code{het\_stage2} (D94): all $170$ trials done, written up
     (fig:het\_stage2). Open: in $13$ of the $28$ hp58 cells the best trial is the highest learning rate tried
     ($[7\times10^{-4},6\times10^{-3}]$), so hp58's values are upper bounds; a best-against-best comparison needs those
-    cells swept higher (proposed to the user, not started). (2) \code{het\_mumse22} (D89): $146$ of $147$ cells done; the last,
-    \code{tp3\_finfte\_ee\_Za\_d8/trial\_0123}, was in a job that failed after the full-disk incident and was missing from the
-    rerun list, rerun as \code{FA-ccin2p3-a7102438}; then \code{collect\_het\_delta.py} on \code{\$SCRATCH/zz\_delta\_het\_mumse},
-    compare with D47, write up next to fig:het\_mumse. (3) \code{dimless\_general} (D93): the inputs and held-out half is
-    written up (fig:dimless\_round); DlessInVirt on the $100$\,TeV parents crashed with a CUDA illegal memory access after
-    $14$ of $40$, rerun as \code{FA-ccin2p3-3d69b7b4}; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
+    cells swept higher (proposed to the user, not started). (2) \code{het\_mumse22} (D89): done and written up (fig:het\_mumse22): at $2\to2$ two runs of one config differ by more than $2\times$ in half the cells, so single het $2\to2$ cells carry that factor. (3) \code{dimless\_general} (D93): the inputs and held-out half is
+    written up (fig:dimless\_round); DlessInVirt on the $100$\,TeV parents crashes deterministically (CUDA illegal memory access) on
+    \code{dE100\_ddx\_hvmvmx}, $d\bar d\to H\nu\bar\nu$; debug run \code{FA-ccin2p3-cbddd341} with \code{CUDA\_LAUNCH\_BLOCKING}; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
     target's coupling-order factor (\code{data.target\_physics\_orders}, per-event $\alpha_s$ in \code{<pool>.alphas.npy}): the
     $\alpha_s$ recovery left $8$ processes whose momenta did not reproduce (mostly $W^+W^-H$; parts $1$, $9$, $11$), to regenerate,
     then a short run with the orders factor on the same held-out sets. (4) Storage (D96): tests and smokes deleted ($5$ GB);
