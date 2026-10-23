@@ -8,6 +8,8 @@ covariance of
            steps with nothing left to cluster, (N - 4) log s_hat for N <= 4    (Lambda^2 = the clustering history)
     Lkg    the same clustering gluons and photons only
     Lkm    the same clustering every final particle with m_T^2 = p_T^2 + m^2 (generic: no particle list)
+    Lq     the Lorentz-invariant emission scales of physics_scales.qperp_logs (what a training run can use: its stored
+           momenta are randomly Lorentz transformed)
 so any target y + a.(Ls, Lp, Lk) + const has its per-process mean and variance at home (norm_targets.py).
 The clustering: the massless coloured particles and photons of the final state (|PDG| <= 5, 21, 22), the inclusive k_T
 measure with R = 1: d_iB = p_T,i^2, d_ij = min(p_T,i^2, p_T,j^2) Delta R_ij^2; at each of the N - 4 steps the smallest d
@@ -19,11 +21,14 @@ positive one-loop probes with their trees (val pools, $DATA_DIR). CPU job (scrip
 $SCRATCH/zz_norm_targets/norm_targets_stats.json.
     python analysis/catalog_daniel/norm_targets_stats.py [--n 20000] [--workers 16]
 """
-import argparse, glob, json, os
+import argparse, glob, json, os, sys
 from multiprocessing import Pool
 
 import numpy as np
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from physics_scales import qperp_logs  # noqa: E402
 
 SETS = {"train": ("recipes/catalog_daniel_train.yaml", "train"), "heldout": ("recipes/catalog_daniel_heldout.yaml", "train"),
         "2to4": ("recipes/catalog_2to4_heldout.yaml", "val"), "2to4c30": ("recipes/catalog_2to4c30_heldout.yaml", "val"),
@@ -100,7 +105,8 @@ def one(args):
     Lk = cluster_logs(P, pdg, Ls)
     Lkg = cluster_logs(P, pdg, Ls, {21, 22})          # gluons and photons only: a quark of the core is not an emission
     Lkm = cluster_logs(P, pdg, Ls, "all", mt=True)    # every final particle, m_T: no particle type singled out
-    V = np.stack([np.log(amp), Ls, Lp, Lk, Lkg, Lkm], 1)
+    Lq = qperp_logs(P)                                 # the Lorentz-invariant emission scales (physics_scales.py)
+    V = np.stack([np.log(amp), Ls, Lp, Lk, Lkg, Lkm, Lq], 1)
     return setname, key, {"N": int(N), "pdg": [int(c) for c in pdg], "n": int(len(V)), "file": os.path.basename(f),
                            "mean": V.mean(0).tolist(), "cov": np.cov(V.T).tolist()}
 
