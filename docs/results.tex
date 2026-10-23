@@ -2797,6 +2797,54 @@ rate, at $D=10^2$ (left) and $10^4$ (right), $5$ trials per probe.}
 \label{fig:het_finale_s1}
 \end{figure}
 
+\paragraph{Stage 2: the big-catalog pretraining fine-tuned with the het loss (D94, 2026-10-23).} Since stage 1's optima are
+not shared, the rest is swept: the finale's other three no-twin probes ($e^+e^-\to\nu\bar\nu$, $t\bar t$, $b\bar b$ at one loop)
+at $D=10^2$ and $10^4$, and the per-process pretraining on the arXiv:2606.23791 catalog (hp58, its final model) fine-tuned on
+all seven at $D=10^1$ to $10^4$, the finale's cells with the parent and its diagram encoder swapped in, the learning-rate
+window widened to $[7\times10^{-4},6\times10^{-3}]$, $5$ trials each ($34$ sweeps, $170$ trials, none failed;
+\code{sweep/gen\_finale\_het\_sweeps.py --stage 2}; \code{analysis/transfer/het\_stage2.py}, Fig.~\ref{fig:het_stage2}).
+Every value is the sweep's best trial at its best checkpoint, the validation MSE of $\log|\mathcal M|^2$ ($\mu$ for het)
+in raw units; all arms of a probe and $D$ share one standardization, and the two one-loop pools are positive on every
+event, so the MSE cells' sign head is inert there and their target is the het one. hp58 against the finale, both het, at
+$D=10^2$ and $10^4$ (ratio hp58 over finale):
+\begin{center}
+\begin{tabular}{lcc}
+ & $D=10^2$ & $D=10^4$ \\ \hline
+$e^+e^-\to d\bar d$ & $1.6$ & $0.78$ \\
+$e^+e^-\to W^+W^-$ & $1.3$ & $0.99$ \\
+$e^+e^-\to\nu\bar\nu$ & $2.2$ & $2.5$ \\
+$e^+e^-\to t\bar t$ & $0.27$ & $0.67$ \\
+$u\bar u\to Zggg$ & $2.6$ & $0.71$ \\
+$e^+e^-\to d\bar d$, one loop & $16$ & $6.8$ \\
+$e^+e^-\to b\bar b$, one loop & $6.0$ & $1.2\times10^4$ \\
+\end{tabular}
+\end{center}
+On the five tree probes hp58 ends level with the finale or better at $D=10^4$ (except $\nu\bar\nu$, $2.5$ times worse) and
+is behind at $D=10^2$ (except $t\bar t$, where it is ahead at both). On the two one-loop probes it is far behind, and on
+$b\bar b$ it gets worse from $D=10^3$ to $10^4$ ($0.009$ to $0.033$). These hp58 numbers are upper bounds, not its
+fine-tune performance: in $13$ of its $28$ cells the best trial is the highest learning rate tried, among them all four
+$d\bar d$ one-loop cells and $b\bar b$ at $D=10^3$ and $10^4$, where the loss still falls steeply with the rate
+($b\bar b$, $D=10^4$: $0.12$ at $1.1\times10^{-3}$ to $0.028$ at $2.8\times10^{-3}$, the highest of its five). The
+finale's het cells sit at the other edge: $5$ of $14$ have their best at the lowest rate tried. So the window, chosen from
+the finale's stage 1, does not bracket hp58's optimum, and the comparison is not best against best until hp58's cells are
+swept higher (hand-off). Against the MSE cells (different losses, so only as context): at $D=10$ hp58 is below scratch on
+$\nu\bar\nu$, $t\bar t$, $Zggg$ and the one-loop $b\bar b$ ($0.51$ against $1.76$, $4.5\times10^{-4}$ against $5.4\times10^{-3}$, $0.34$ against
+$1.82$, $0.43$ against $0.63$), level on $W^+W^-$ and the one-loop $d\bar d$, and above on tree $d\bar d$ ($2.2$ against $0.80$).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/het_stage2_legend.pdf}\\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/het_stage2_a.pdf}\hfill\pnl{../analysis/transfer/figs/het_stage2_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/het_stage2_c.pdf}\hfill\pnl{../analysis/transfer/figs/het_stage2_d.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/transfer/figs/het_stage2_e.pdf}\hfill\pnl{../analysis/transfer/figs/het_stage2_f.pdf}} \\[1ex]
+\pnl{../analysis/transfer/figs/het_stage2_g.pdf}
+\caption{The seven no-twin probes against the fine-tune events $D$, each cell its sweep's best trial: the big-catalog
+pretraining hp58 fine-tuned with the het loss (stars; in $13$ of its $28$ cells the best is the highest learning rate tried, so
+these are upper bounds), the finale fine-tuned with the het loss (open diamonds, $D=10^2$, $10^4$) and the MSE cells of
+the ladder (scratch, rung~9, synthetic, finale). MSE of $\log|\mathcal M|^2$ ($\mu$ for het) at the best checkpoint.}
+\label{fig:het_stage2}
+\end{figure}
+
 
 \begin{figure}[H]
 \centering
@@ -6270,36 +6318,23 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-23, 04:05).} All work on CC; supervisor \code{site supervise} and
-    \code{site events --wait} armed. (1) \code{het\_stage2} (D94, ``Yes, launch stage 2''): $34$ het DyHPO sweeps of
-    $5$ trials, lr window $[7\times10^{-4},6\times10^{-3}]$, \code{sweep/gen\_finale\_het\_sweeps.py --stage 2}: $6$ finale cells
-    ($ee\to\nu\bar\nu$, $t\bar t$, $b\bar b$ one-loop at $D=10^2,10^4$) and $28$ hp58 cells (\code{tp3\_hp58fte\_*}, the $7$
-    no-twin probes at $d2,d4,d6,d8$; parent hp58's final model, after its $\sigma$ fit); launches \code{het\_stage2\_a} (finale
-    + the hp58 smoke, $3$ trials passed) and \code{het\_stage2\_b} ($27$ hp58 sweeps), state in \code{sweeps\_local/};
-    $48$ trials observed, $0$ failed at 04:03. When done: per-cell best, then the scaling plot hp58 vs scratch, rung 9,
-    finale, synthetic (the one-loop probes need re-basing: het has no sign head). (2) \code{het\_mumse22} (D89): the
-    $147$ $2\to2$ cells with $\mu$-MSE selection, nearly all done (the $5$ jobs the full disk killed rerun via
-    \code{het\_mumse22\_rerun}); then \code{collect\_het\_delta.py} on \code{\$SCRATCH/zz\_delta\_het\_mumse}, compare with D47, write
-    up next to fig:het\_mumse. (3) \code{dimless\_general} (D93): general dimensionless design. Target: mass dimension +
-    coupling orders (\code{data.target\_physics\_orders}, $(4\pi\alpha_s^{\rm ev})^q(4\pi\alpha)^e$, per-event $\alpha_s$ in
-    \code{<pool>.alphas.npy}); $\alpha_s$ recovery (\code{tools/recover\_alphas.py}, 12 parts \code{recipes/recover\_alphas/}, node-local
-    work dirs) mostly done, \code{dc\_ssx\_htamtap}, \code{dc\_csx\_wpzh}, \code{dc\_ddx\_htamtap} not reproduced (need
-    regeneration); next: a short run with the orders factor. Inputs: option 1 of the diagram design
-    (\code{model.diagram\_encoder\_llm4lhc.virtuality\_pool}, ``option 1 looks good for now''), arms \code{DlessInVirt} (running)
-    and \code{DlessInNoDiag} (done, $139$ scored; 2to4 scorings via launch \code{nodiag\_score}), against \code{DlessIn} (the
-    encoder alone). Held-out sets: \code{2to4}, \code{2to4c30} (cut test, item \code{cut\_test}, D92), \code{2to4E100} ($40$ parents at
-    $100$ TeV, done), \code{2to4E100p} ($36/40$ + $4$ retried with \code{AMP\_LHE\_MARGIN=15}). Results so far
-    (\code{analysis/catalog\_daniel/catalog\_\{short,2to4\}\_heldout.py}): cut $10\to30$ GeV moves the $2\to4$ offset by $<0.4$ for every
-    target; $2\to4$ offsets $+g/+\gamma$: $\hat s$ $-6.5/-4.8$, dimensionless inputs $-5.7/-3.9$, pairs reference (\code{Dpair},
-    best checkpoint, diverged at step $2505$ on $ud\to ud$) $-3.2/-1.9$; 43 new median MSE: $\hat s$ $0.72$, inputs $1.57$, pairs
-    $0.67$; \code{Dpair} rerun at seed 1 (\code{FA\_SEED=1}). To write up as one paragraph with a figure once
-    \code{DlessInVirt} and \code{Dpair\_seed1} are scored on all sets. (4) Storage (2026-10-23): /sps/lpnhe was full
-    (the $\alpha_s$ recovery's $576$ MadEvent dirs); fixed; hp58's best was deleted by \code{prune.py} after a step-time profile
-    run overwrote its sweep result (record restored, \code{run.py} refuses to write over a sweep result, prune protects
-    script-referenced trials); a run's \code{models/} now holds its final model (\code{run.py promote\_final\_model},
-    \code{tools/promote\_final\_models.py}: $485$ runs done, $28$ still to do once their $\sigma$ fit ends; lxplus and Jean Zay
-    copies not yet); the lxplus copies pruned to each sweep's best (\code{tools/prune\_copies.py}, $47$ GB, now in
-    \code{prune\_site.sh}). Disk $79\%$.
+  \item \textbf{State (2026-10-23, 06:30).} All work on CC; supervisor and \code{site events --wait} armed; every active item
+    now has a check (\code{tools/item\_checks.py}). (1) \code{het\_stage2} (D94): all $170$ trials done, written up
+    (fig:het\_stage2). Open: in $13$ of the $28$ hp58 cells the best trial is the highest learning rate tried
+    ($[7\times10^{-4},6\times10^{-3}]$), so hp58's values are upper bounds; a best-against-best comparison needs those
+    cells swept higher (proposed to the user, not started). (2) \code{het\_mumse22} (D89): $146$ of $147$ cells done; the last,
+    \code{tp3\_finfte\_ee\_Za\_d8/trial\_0123}, was in a job that failed after the full-disk incident and was missing from the
+    rerun list, rerun as \code{FA-ccin2p3-a7102438}; then \code{collect\_het\_delta.py} on \code{\$SCRATCH/zz\_delta\_het\_mumse},
+    compare with D47, write up next to fig:het\_mumse. (3) \code{dimless\_general} (D93): the inputs and held-out half is
+    written up (fig:dimless\_round); DlessInVirt on the $100$\,TeV parents crashed with a CUDA illegal memory access after
+    $14$ of $40$, rerun as \code{FA-ccin2p3-3d69b7b4}; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
+    target's coupling-order factor (\code{data.target\_physics\_orders}, per-event $\alpha_s$ in \code{<pool>.alphas.npy}): the
+    $\alpha_s$ recovery left $8$ processes whose momenta did not reproduce (mostly $W^+W^-H$; parts $1$, $9$, $11$), to regenerate,
+    then a short run with the orders factor on the same held-out sets. (4) Storage (D96): tests and smokes deleted ($5$ GB);
+    the $50$ lxplus-era dirs packed into $6$ checked tars ($29$ GB, \code{\$SCRATCH/zz\_archive\_lxera}); the copy to Jean
+    Zay's STORE fails (the relay cannot reach Jean Zay), so nothing is removed from CC yet; the trim of concluded studies'
+    models (\code{analysis/storage/trim\_plan.tsv}) is next, under the user's rule (concluded studies only, never a run of
+    more than $5$\,h).
   \item \textbf{Open (2026-10-22, 13:30).}
     Running on CC: the $9$ $\Delta$-plot models still off their
     recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
