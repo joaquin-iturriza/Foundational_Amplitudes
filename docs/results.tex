@@ -877,6 +877,45 @@ its twin trained without any top). $K=0$ is the zero-shot read.}
 \label{fig:kshot_level}
 \end{figure}
 
+\paragraph{The candidate targets on the pools themselves, before any training (2026-10-23, D83).} Three reads from the
+data alone. (1) \emph{Where the $2\to4$ shape error sits} (\code{residual\_kinematics.py}: each saved zero-shot
+prediction joined to its event by value, all $40$ probes matched): the error, offset removed, follows how soft or
+collinear the event is, correlation $+0.6$ to $+0.7$ with the clustering scales against $\hat s$, the softest fifth of
+the events predicted $1.2$ to $1.6$ too low and the hardest $0.9$ to $1.3$ too high, in both arms and for $+g$ and
+$+\gamma$ alike; five kinematic variables together explain $70$ to $74\%$ of it. The network learned the cost of one emission
+in $k_T$ and does not double it for two. (2) \emph{Candidate targets} (\code{norm\_targets\_stats.py} on CC, per event over
+$2\times10^4$ events of each of the $1670$ pools; \code{norm\_targets.py} at home): each target's per-process level read
+three ways, the range against the training processes', a level model from composition alone (ridge on the counts of each
+kind of particle incoming and outgoing, the reference-energy convention of interatomic potentials), and the
+within-process spread. The candidates: $\hat s$, the fixed $s_0$, the pair scale, and the emission history of
+\code{physics\_scales.py} (each particle beyond a $2\to2$ core carries its own Lorentz-invariant scale, the smallest
+$s_{ak}s_{bk}/s_{ab}$ over the other legs plus $m_k^2$, every particle type alike; a $k_T$ clustering in the lab frame
+gives the same picture but a trained run sees randomly Lorentz-transformed momenta), each with and without the coupling
+orders. Median squared level error of the composition model, with the orders:
+\begin{center}
+\begin{tabular}{lccccc}
+ & cross-fit & $43$ new & $2\to4$ $+g$ & $2\to4$ $+\gamma$ & $2\to4$ $+g$, $p_T\geq30$ \\ \hline
+$\hat s$ & $2.6$ & $0.48$ & $9.4$ & $3.0$ & $4.0$ \\
+$s_0=289$\,GeV$^2$ & $2.4$ & $0.88$ & $2.9$ & $2.0$ & $16.9$ \\
+pair scale & $2.5$ & $0.66$ & $3.3$ & $1.3$ & $3.2$ \\
+emission history & $2.7$ & $3.3$ & $1.7$ & $0.96$ & $1.8$ \\
+\end{tabular}
+\end{center}
+The emission history keeps every $2\to4$ level inside the training range ($0.4$ interquartile ranges above the training
+median, against $1.9$ for $\hat s$, where $35\%$ of the $+g$ probes lie above the training maximum), is the only target
+that survives the cut change ($s_0$ goes from $2.9$ to $16.9$ when the cut moves to $30$\,GeV), and has the smallest
+spread within a process ($2.4$ against $3.8$ for $\hat s$ at $2\to4$, $1.34$ against $1.61$ on the $43$ new). It costs on
+processes whose final state is all massive ($Z HH$, $W HH$, $ZZZ$, $t\bar tH$: $-2$ to $-3$ where $\hat s$ is within
+$\pm0.5$), where no emission is soft and $\hat s$ is the right scale; that is the $43$ new column. A composition model is a
+proxy for what a network can learn, not a prediction of it, so the candidate goes to a short run (next). (3) \emph{The
+sign-changing one-loop pools under $\mathrm{asinh}(V/(F r_0))$} (\code{signed\_band.py}, $53$ of the $55$ pools with val
+events): one shared $r_0$ (the median of the pools' $0.5\%$ quantiles of $|VF|$) puts more than $10\%$ of the events in the
+linear band on $14$ of them and all of them on one, since the pools' median $\log|VF|$ spans $-3.5$ to $10.7$; the user's
+objection to the linear part holds for a shared $r_0$. The zero crossings themselves are thin: a median $3.4\%$ of a pool's
+events lie within a factor $10$ of zero relative to its median, $0.2\%$ within a factor $100$. So $r_0$ must follow the
+pool's level, which makes the signed target a consequence of the level problem: with the level normalized, one $r_0$
+serves all.
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
