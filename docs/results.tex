@@ -6394,13 +6394,21 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-23, 17:00).} Running (D93, the user: ``of course there has to be a way to deal with negative
-    values''): the $55$ sign-changing one-loop pools and their $48$ trees (\code{recipes/catalog\_loop\_signed.yaml}) scored
-    on the magnitude $\log|\mathcal M|$ by DlessIn and DlessInOrd (\code{zero\_shot\_parent.py --signed-magnitude}), queued in
-    \code{site launch}; the sign itself stays out of reach for a model with no sign output. A new sweep on a cell another
-    sweep measures is now refused (\code{sweep/cell\_guard.py}, in \code{drive.py} and \code{generate\_sweep.py}; $79$ cells
-    in \code{sweep/} already had two or three sweeps). Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its
-    checkout at \code{8fb002e}).
+  \item \textbf{State (2026-10-23, 17:10).} Nothing running; supervisor and \code{site events --wait} armed. Done today and
+    written up: D93's round (par:dimless\_orders, par:dimless\_particle, fig:dimless\_axes, every unit of
+    \code{dimless\_general}'s check), D97's hp58 extension (stage-2 paragraph and table). The magnitude-only scoring of the
+    $55$ sign-changing one-loop pools and their $48$ trees (\code{recipes/catalog\_loop\_signed.yaml},
+    \code{zero\_shot\_parent.py --signed-magnitude}; DlessIn $103$, DlessInOrd $61$ predictions in
+    \code{\$SCRATCH/zz\_catalog\_norm\_short\_*\_sigstage\_loopsigned}) is a diagnostic, not written up: the user,
+    2026-10-23, ``signed datasets should be dealt with in some way, in a proper way, not a patch on top of something that
+    was not thought for it''. Proposed to the user, waiting: one target for every process, signed or not,
+    $T=\mathrm{asinh}(V/(F r_0))$ with $F$ the per-event dimension and coupling-order factor and one shared $r_0$ (no
+    per-pool fit, log-like for large $|V/F|$ so trees are unchanged up to a constant, linear through zero so the sign is
+    carried by the target; het loss as is), and one-loop pools in the catalog pretraining so signs can be learned; not a
+    ratio to the Born (ruled out 2026-10-15). Also proposed: the full-length catalog pretraining (D78's held item) with the
+    dimension + coupling-order target, dimensionless inputs and the encoder. A new sweep on a cell another sweep measures is
+    refused (\code{sweep/cell\_guard.py}). Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
+    \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
     (sec:tf32-eval). The $\sigma$
