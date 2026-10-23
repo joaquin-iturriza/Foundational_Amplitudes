@@ -4,9 +4,9 @@ representative per class, every class in exactly one role. The axes in the user'
 order"), each probe tagged with the structure it needs and its nearest training class:
   H1 new combination   ~5% of the classes of each (layer, beam) cell at random, none of whose particles, multiplicity
                        or order is missing from training (the other axes are removed first)
-  H2 multiplicity      every 2->4 class whose 2->3 parent (the class minus its last g or a; four-fermion and
-                       multi-boson finals by final-state kind) is in a held-out family: 15% of the 2->3 parents that
-                       have 2->4 children, so their 2->4 level is inside the trained range but their family's 2->4 is
+  H2 multiplicity      every 2->4 class whose parent (the 2->3 or 2->2 class the enumeration added a leg or a pair
+                       to, from its `why`; four-fermion and multi-boson finals by final-state kind) is in a held-out
+                       family: 15% of the parents that have 2->4 children, so their 2->4 level is inside the trained range but their family's 2->4 is
                        new; plus 2->5 probes (generated later, a training 2->4 plus a g or a)
   H3 particle content  the physical top (every class with an external t, mass 172.5) held out; the heavy-quark layer
                        (the top's quantum numbers at 50, 300, 600 GeV, at 2->2, 2->3 and 2->4) trains. Never-seen
@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--h1-frac", type=float, default=0.05)
     ap.add_argument("--family-frac", type=float, default=0.15)
     ap.add_argument("--n-loops", type=int, default=150, help="size of the one-loop layer")
+    ap.add_argument("--n-heavy", type=int, default=35, help="top classes in the heavy-quark layer (x3 masses)")
     a = ap.parse_args()
     rng = random.Random(a.seed)
     P = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")))["processes"]
@@ -56,22 +57,24 @@ def main():
     # is a quarter of training; the tau is a tenth: a charged lepton with a mass and a Higgs coupling next to massless e, mu)
     twin_out = [n for n in reps if any(abs(p) in (15, 16) for p in P[n]["pdg_ids"])
                 or (sum(abs(p) in (23, 24, 22) for p in fin(n)) >= 4 and sum(abs(p) == 24 for p in fin(n)) >= 2)]
-    # H2: families. The parent of a 2->4 class: its 2->3 key without one g or a
+    # H2: families. The parent of a 2->4 class is what the enumeration added a leg (or a pair) to, recorded in its
+    # `why` ("<parent>+g", "+a" at enumeration; "+z", "+h", "+uu~", "+dd~", "+bb~", "+e+e-", "+veve~" in the D100
+    # extension), mapped to the parent's class; four-fermion and multi-boson finals have none ("other:<beam>")
+    cls = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "census_classes.json")))["classes"]
+    rep_of = {m: r for r, ms in cls.items() for m in ms}
+    ADDS = ("+e+e-", "+veve~", "+uu~", "+dd~", "+bb~", "+g", "+a", "+z", "+h")
+
     def parent(n):
-        k = key[n]
-        ini, f = k.split(" > ")
-        toks = f.split()
-        for leg in ("g", "a"):
-            if leg in toks:
-                t2 = list(toks); t2.remove(leg)
-                return ini + " > " + " ".join(t2)
+        why = P[n].get("why", "")
+        for s_ in ADDS:
+            if why.endswith(s_) and why[: -len(s_)] in rep_of:
+                return rep_of[why[: -len(s_)]]
         return None
-    k3 = {key[n]: n for n in reps if P[n]["layer"] == 3}
     kids = defaultdict(list)
     for n in reps:
         if P[n]["layer"] == 4:
             p = parent(n)
-            kids[p if p in k3 else "other:" + beam(n)].append(n)
+            kids[p if p else "other:" + beam(n)].append(n)
     fams = sorted(f for f in kids if not f.startswith("other:"))
     out_fams = set(rng.sample(fams, max(1, round(a.family_frac * len(fams)))))
     for f in sorted(out_fams):
@@ -112,7 +115,15 @@ def main():
                                  "why": "one-loop of a training tree" if n in loop_out else "", "tree": n}
         elif role[n]["axis"] == "H1":
             loops[n + "_nlo"] = {"role": "heldout", "axis": "H5", "why": "one-loop of a held-out tree", "tree": n}
-    out = {"trees": role, "loops": loops, "twin_out": sorted(twin_out), "seed": a.seed,
+    # the heavy-quark layer (H3's brackets; D100: at 2->4 too): top classes drawn per layer, each at the three masses
+    tops = defaultdict(list)
+    for n in reps:
+        if role[n]["axis"] == "H3":
+            tops[P[n]["layer"]].append(n)
+    tot = sum(len(v) for v in tops.values())
+    hq_cls = [n for L, ns in sorted(tops.items()) for n in rng.sample(sorted(ns), max(1, round(a.n_heavy * len(ns) / tot)))]
+    heavy = {f"{n}__mt{m}": {"role": "train", "tree": n, "m_t": m} for n in sorted(hq_cls) for m in (50, 300, 600)}
+    out = {"trees": role, "loops": loops, "heavy_quark": heavy, "twin_out": sorted(twin_out), "seed": a.seed,
            "family_frac": a.family_frac, "h1_frac": a.h1_frac}
     json.dump(out, open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json"), "w"), indent=0)
     c = Counter((v["role"], v["axis"]) for v in role.values())
@@ -120,6 +131,8 @@ def main():
     print("trees by layer and role:", dict(sorted(Counter((P[n]["layer"], v["role"]) for n, v in role.items()).items())))
     print(f"held-out 2->4 families {len(out_fams)} of {len(fams)}")
     print("one-loop candidates:", dict(Counter((v["role"], v["axis"]) for v in loops.values())))
+    print("heavy-quark layer:", len(heavy), "pools from", len(hq_cls), "top classes by layer",
+          dict(Counter(P[n]["layer"] for n in hq_cls)))
     print(f"removal twin also drops {len(twin_out)} classes (tau, quartic gauge), "
           f"{sum(role[n]['role'] == 'train' for n in twin_out)} of them training classes")
 

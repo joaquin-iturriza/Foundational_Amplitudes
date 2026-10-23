@@ -19,8 +19,9 @@ Layers:
   2->4        every 2->3 candidate + g or a (rule), the four-fermion finals of e+e- and q q~, the multi-boson finals
               with quartic vertices (as catalog_v2); all of them go to --check, the selection comes after the census
   one loop    [virt=QCD] of every coloured 2->2 and 2->3 tree; loop-induced candidates listed for certification
-  variants    alpha_s(M_Z) in {0.09, 0.15}, M_Z, M_H at far points on a few families; heavy quarks with the top's quantum
-              numbers at m_Q in {50, 300, 600} GeV on the top family (the physical top held out between them, H3)
+  variants    alpha_s(M_Z) in {0.09, 0.15} at far points on a few families; the heavy-quark layer (the top's quantum
+              numbers at m_Q in {50, 300, 600} GeV, the physical top held out between them, H3) is chosen by
+              recipes/select_catalog_v3.py over the census classes
   BSM         the user (D98): "at least one BSM process that can be encoded with our current particle embedding": the
               two non-SM models the table already has rows for, DMsimp_s_spin1 (a Z') and the 2HDM (charged and neutral
               scalars), s-channel, pair and associated production; existence decided by stage 2
@@ -144,11 +145,8 @@ def enumerate_candidates():
     # variants: far points of the parameters, and the heavy-quark layer (the top's quantum numbers at other masses)
     variants = []
     fam = [c for c in trees if c["layer"] in (2, 3)]
-    top = [c for c in fam if any(p.rstrip("~") == "t" for p in c["finals"])]
-    for c in top:
-        for m in (50, 300, 600):
-            variants.append(dict(c, layer="heavy_quark", name=c["name"] + f"__mt{m}", physics={"m_t": m},
-                                 why=f"heavy quark at {m} GeV"))
+    # the heavy-quark layer is chosen over the census classes by recipes/select_catalog_v3.py (top classes at every
+    # multiplicity, 2->4 included, D100), not here
     for c in fam:
         if c["layer"] == 2 and any(P[p][3] for p in c["beams"] + c["finals"]):
             for a in (0.09, 0.15):
@@ -172,15 +170,15 @@ OUT_EXT = os.path.join(ROOT, "recipes", "catalog_v3_candidates_ext.json")
 
 def extend24(checked):
     """D100 (the user, 2026-10-23: "extend 2 to 4 to get 1500"): more 2->4 candidates from the stage-2 survivors, so the
-    catalog reaches ~1500 distinct classes with functions rather than variants: every existing 2->3 class plus a Z, a W+,
-    a W- or a Higgs, and every existing 2->2 class plus a quark-antiquark pair (u, d, b) or a lepton pair (e, ve).
+    catalog reaches ~1500 distinct classes with functions rather than variants: every existing 2->3 class plus a Z or a Higgs (a
+    single W never conserves the charge), and every existing 2->2 class plus a quark-antiquark pair (u, d, b) or a lepton pair (e, ve).
     Candidates already enumerated (any layer) are skipped by their symmetry key."""
     old = {c["key"] for c in json.load(open(OUT))["trees"]}
     seen, out = set(old), []
     for c in json.load(open(checked)):
         if not c.get("exists") or c["layer"] not in (2, 3):
             continue
-        adds = ([["z"], ["w+"], ["w-"], ["h"]] if c["layer"] == 3 else
+        adds = ([["z"], ["h"]] if c["layer"] == 3 else
                 [["u", "u~"], ["d", "d~"], ["b", "b~"], ["e+", "e-"], ["ve", "ve~"]])
         for add in adds:
             ini, fin = tuple(c["beams"]), tuple(sorted(c["finals"] + add))
@@ -194,7 +192,7 @@ def extend24(checked):
                         "key": k, "name": name(ini, fin), "generate": f"generate {' '.join(ini)} > {' '.join(fin)}"})
     json.dump({"trees": out, "bsm": []}, open(OUT_EXT, "w"), indent=0)
     print(f"wrote {OUT_EXT}: {len(out)} new 2->4 candidates "
-          f"({dict(Counter(c['why'].rsplit('+', 1)[1] for c in out))})")
+          f"({dict(Counter(next(s for s in ('+e+e-', '+veve~', '+uu~', '+dd~', '+bb~', '+z', '+h') if c['why'].endswith(s)) for c in out))})")
 
 
 def check(workers, out, only_bsm=False, cands_path=None):

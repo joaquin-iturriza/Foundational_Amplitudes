@@ -151,3 +151,4 @@ analysis/transfer/interp_data/
 analysis/transfer/het_mumse22_data/
 recipes/catalog_v3_checked.json
 .claude/.hook_backup/
+recipes/catalog_v3_checked_ext.json
