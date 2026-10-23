@@ -923,6 +923,44 @@ $K=1,4,16$): the head's $\sigma$ is not informative off the training processes. 
 $|\mathcal M_1|^2$ carries $(16\pi^2)^{-2}$, which removes $10.1$ from the four loop-induced offsets of
 \code{DlessInOrd} ($+7.6$ to $+9.5$), leaving $-2.6$ to $-0.6$.
 
+\paragraph{The emission scales in training (D99, 2026-10-23).}\label{par:dimless_qperp} The candidate through a short run:
+\code{DlessInOrdQ}, the coupling-order run with $\hat s^{N-4}$ replaced by the product of the event's emission scales
+(\code{data.target\_physics\_dim\_ref=qperp}, \code{physics\_scales.qperp\_logs}; inputs, encoder, steps, HPs and seed as
+\code{DlessInOrd}), read on every set \code{DlessInOrd} was (\code{analysis/catalog\_daniel/qperp\_ab.py},
+Fig.~\ref{fig:qperp_ab}; one seed each). Median MSE of $\log|\mathcal M|^2$ per process, $\hat s$ against the emission
+scales, with the per-process ratio's median:
+\begin{center}
+\begin{tabular}{lccc}
+ & $\hat s$ & emission scales & ratio, median ($10$--$90\%$) \\ \hline
+$2\to4$ $+g$ / $+\gamma$ & $52$ / $30$ & $2.2$ / $2.7$ & $0.05$ / $0.07$ \\
+$2\to4$ at $p_T\geq30$\,GeV, $+g$ / $+\gamma$ & $46$ / $26$ & $2.7$ / $2.5$ & $0.06$ / $0.09$ \\
+$2\to4$ at $100$\,TeV, $+g$ / $+\gamma$ & $55$ / $30$ & $3.2$ / $3.2$ & $0.06$ / $0.09$ \\
+$43$ new & $0.48$ & $0.75$ & $1.22$ ($0.29$--$3.8$) \\
+$96$ relabels & $0.051$ & $0.064$ & $1.05$ \\
+$2\to3$ at $100$\,TeV & $0.077$ & $0.086$ & $1.21$ \\
+trees of the loop probes & $0.33$ & $0.31$ & $0.95$ \\
+one-loop pools & $10.2$ & $10.0$ & $1.06$ \\
+\end{tabular}
+\end{center}
+The extra particle stops being the failure: the $2\to4$ offset goes from $-7.0$ / $-5.3$ to $-1.0$ / $-0.15$ and its
+shape error from $2.6$ / $2.3$ to $1.5$ / $1.8$, every $2\to4$ probe improves ($90\%$ of the ratios under $0.27$), at both
+cuts and at $100$\,TeV, where the fixed $s_0$, the best earlier $2\to4$ arm ($4.6$ / $4.0$), is tied to one set of cuts.
+The CPU proxy called both sides: the composition level at $2\to4$ $+g$ went from $9.4$ to $1.7$ and on the $43$ new from
+$0.48$ to $3.3$; trained, the $43$ new cost a factor $1.6$ at the median MSE ($0.48$ to $0.75$; level $0.19$ to $0.31$,
+shape $0.26$ to $0.48$) and per process a median $1.22$ with a wide spread (worst $b\bar b\to HHH$, $0.45$ to $5.6$; the
+$Zhh$ and $ZZZ$ finals go both ways by $4\times$), the size of one seed's noise on some processes and not on others. On the
+one-loop pools the shape error halves ($0.50$ to $0.22$) while the level stays the error ($10$), which is the loop factor and
+the stripping convention, not the kinematics. The particle-content axis (the twin without tops) is still running.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog\_daniel/figs/qperp\_ab.pdf}
+\caption{The coupling-order design run with $\hat s$ against the same run with the event's emission scales: per-process
+MSE of $\log|\mathcal M|^2$, ECDF. Left: the $80$ $2\to4$ probes ($+g$ and $+\gamma$, $p_T\geq10$ and $30$\,GeV). Right: the
+$43$ new processes (solid) and the one-loop pools (dashed). One seed each.}
+\label{fig:qperp_ab}
+\end{figure}
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
