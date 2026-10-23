@@ -4,7 +4,8 @@ metrics and data_stats, so any trial can be rerun from its config) applied to sw
 2026-10-23: "aren't we supposed to be pruning and deleting the models that don't win in a sweep?"). A sweep's best is
 read from the trials' own logs instead: per trial, the lowest "Val loss (combined)" its out_*.log reports (the
 validation the checkpoint selection reads), among the trials whose config ran the sweep's longest horizon
-(training.iterations); a trial without one is unfinished and keeps everything. Kept whole: the best trial, every
+(training.iterations). A copy is never resumed, so its sweep is finished: as prune.py does for a finished sweep, every
+other trial loses its models (a lower-fidelity trial of a multi-fidelity sweep, a trial that crashed). Kept whole: the best trial, every
 trial named anywhere in the repo's job scripts, sweep configs, Delta lists or analysis files (runs/<sweep>/trial_N),
 and every trial written to in the last 6 h. Without --apply it prints the plan; with it, a manifest
 (<root>/PRUNED_COPIES_<time>.json: per trial what was deleted and its size) is written before anything is deleted.
@@ -65,13 +66,20 @@ def main():
     plan, freed, kept_bytes = [], 0, 0
     for sd in sorted(glob.glob(os.path.join(a.root, "*"))):
         tds = sorted(glob.glob(os.path.join(sd, "trial_*")))
-        if len(tds) < 2:
+        if len(tds) < 2 or not any(model_files(t) for t in tds):
             continue
         sweep = os.path.basename(sd)
         info = {td: (iterations(td), best_val(td)) for td in tds}
         top = max((it for it, _ in info.values() if it is not None), default=None)
         done = {td: v for td, (it, v) in info.items() if it == top and v is not None}
         best = min(done, key=done.get) if done else None
+        if best is None:                      # no trial reports a validation at the horizon: no best to keep
+            for td in tds:
+                mf = model_files(td)
+                if mf:
+                    sz = sum(os.path.getsize(f) for f in mf); kept_bytes += sz
+                    plan.append({"run_dir": td, "kept": "no best found (no validation at the horizon)", "bytes": sz})
+            continue
         for td in tds:
             mf = model_files(td)
             if not mf:
@@ -85,8 +93,6 @@ def main():
                 why = "referenced in the repo"
             elif newest > now - 6 * 3600:
                 why = "written to in the last 6 h"
-            elif td not in done:
-                why = "unfinished (no validation at the sweep's horizon %s)" % top
             else:
                 why = None
             if why:
@@ -94,7 +100,8 @@ def main():
                 plan.append({"run_dir": td, "kept": why, "bytes": sz})
             else:
                 freed += sz
-                plan.append({"run_dir": td, "val": done[td], "best": best, "deleted": mf, "bytes": sz})
+                plan.append({"run_dir": td, "val": done.get(td), "iterations": info[td][0], "best": best,
+                             "deleted": mf, "bytes": sz})
     n_del = sum(1 for p in plan if "deleted" in p)
     print(f"{len(plan)} trials with models: {n_del} to prune ({freed / 1e9:.1f} GB), "
           f"{len(plan) - n_del} kept ({kept_bytes / 1e9:.1f} GB)")
