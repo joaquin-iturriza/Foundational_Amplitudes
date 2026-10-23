@@ -6344,20 +6344,21 @@ of the three share a test set.
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
-  \item \textbf{State (2026-10-23, 06:30).} All work on CC; supervisor and \code{site events --wait} armed; every active item
-    now has a check (\code{tools/item\_checks.py}). (1) \code{het\_stage2} (D94): all $170$ trials done, written up
-    (fig:het\_stage2). Open: in $13$ of the $28$ hp58 cells the best trial is the highest learning rate tried
-    ($[7\times10^{-4},6\times10^{-3}]$), so hp58's values are upper bounds; a best-against-best comparison needs those
-    cells swept higher (proposed to the user, not started). (2) \code{het\_mumse22} (D89): done and written up (fig:het\_mumse22): at $2\to2$ two runs of one config differ by more than $2\times$ in half the cells, so single het $2\to2$ cells carry that factor. (3) \code{dimless\_general} (D93): the inputs and held-out half is
-    written up (fig:dimless\_round); DlessInVirt's crash on the $100$\,TeV parents was \code{torch.sparse.mm} in the virtuality pooling (an illegal memory access on the
-    $15$th process of a job), replaced by an \code{index\_add} (\code{8444bf2}; the $14$ earlier predictions reproduce to $5\times10^{-3}$) and rescored; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
-    target's coupling-order factor (\code{data.target\_physics\_orders}, per-event $\alpha_s$ in \code{<pool>.alphas.npy}): the
-    $\alpha_s$ recovery left $8$ processes whose momenta did not reproduce (mostly $W^+W^-H$; parts $1$, $9$, $11$), to regenerate,
-    then a short run with the orders factor on the same held-out sets. (4) Storage (D96): tests and smokes deleted ($5$ GB);
-    the $50$ lxplus-era dirs packed into $6$ checked tars ($29$ GB, \code{\$SCRATCH/zz\_archive\_lxera}); the copy to Jean
-    Zay's STORE fails (the relay cannot reach Jean Zay), so nothing is removed from CC yet; the trim of concluded studies'
-    models (\code{analysis/storage/trim\_plan.tsv}) is next, under the user's rule (concluded studies only, never a run of
-    more than $5$\,h).
+  \item \textbf{State (2026-10-23, 11:30).} All work on CC; supervisor (\code{site supervise}) and \code{site events --wait}
+    armed, no open events, nothing running. Every active item has a check (\code{tools/item\_checks.py}); \code{site ack}
+    refuses a finished run's event until its log was read (\code{site logs}/\code{fetch}, recorded in
+    \code{\textasciitilde/.local/share/ccorch/reads.log}); \code{launch\_cc\_only.sh} fails loudly without a run id. Done and written up today:
+    het stage 2 (fig:het\_stage2), het\_mumse22 (fig:het\_mumse22: $2\to2$ runs of one config differ $>2\times$ in half the cells), the
+    dimensionless round (fig:dimless\_round; DlessInVirt's \code{torch.sparse.mm} crash fixed with an \code{index\_add}, \code{8444bf2}),
+    the cut test, the H100 rebuild of the off $\Delta$ models (sec:tf32-eval, $1$ of $251$ still off), D95 (\code{promote\_final}
+    done: $520$ CC runs; Jean Zay has none). Waiting on the user: (a) hp58's $13$ cells whose best is the highest learning rate
+    tried: a sweep at $[3\times10^{-3},2\times10^{-2}]$, $5$ trials each, about $26$ GPU-h (needs a yes); (b) the coupling-order
+    factor run (D93): $8$ processes whose $\alpha_s$ did not reproduce (mostly $W^+W^-H$), regenerate under new names
+    (recommended) or train without them. Blocked: every bulk transfer to Jean Zay times out (git push and bundle from the laptop,
+    \code{site copy} from the relay), short commands work; so the $29$ GB of lxplus-era tars (\code{\$SCRATCH/zz\_archive\_lxera},
+    checksummed) are not on STORE and nothing is removed from CC, and Jean Zay's checkout is at \code{8fb002e} (10-15). Next
+    without the user: the trim of concluded studies' models (\code{analysis/storage/trim\_plan.tsv}, D96 rule: concluded
+    studies only, never a run over $5$\,h) once the archive is on STORE.
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
     (sec:tf32-eval). The $\sigma$
