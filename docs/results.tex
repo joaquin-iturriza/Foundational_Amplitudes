@@ -6359,9 +6359,8 @@ of the three share a test set.
     models (\code{analysis/storage/trim\_plan.tsv}) is next, under the user's rule (concluded studies only, never a run of
     more than $5$\,h).
   \item \textbf{Open (2026-10-22, 13:30).}
-    Running on CC: the $9$ $\Delta$-plot models still off their
-    recorded loss, rebuilt on H100 at both precisions (\code{analysis/transfer/delta\_runs\_off10.txt}; then
-    \code{collect\_delta.py} and redraw). The $\sigma$
+    The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
+    (sec:tf32-eval). The $\sigma$
     stage now writes its own per-event predictions with $\sigma$ (\code{c5ba313}; GPU smoke test passed). Fixed:
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
@@ -7310,11 +7309,17 @@ its recorded loss. On H100 the same holds (\code{FA-ccin2p3-c0a4a22d}, TF32 on, 
 \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} rebuilds at $1.00\times$ its recorded loss (V100: $0.29\times$),
 \code{tp3\_finfte\_uubar\_Zg\_d8/trial\_0031} at $1.00\times$ (V100: $1.52\times$), and the lxplus-trained
 \code{tp3\_r9fte\_ee\_ddbar\_d8\_002/trial\_0060} matches only in fp32 ($7.3\times$ with TF32). With each model at its
-own precision and its EMA weights, $10$ of the $251$ $\Delta$-plot models at $D=10^4$ still rebuild off their recorded
-loss by more than $0.02$\,dex: CC runs trained on H100 and rebuilt on V100 ($0.70$ to $1.5\times$; the H100 queue held
-the TF32 rebuild for $11$\,h) and \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132} ($0.34\times$, EMA off, its own
-post-training evaluation reproducing the recorded loss). Not settled: that one, and whether the study's V100/A100/H100 mix moves its cell values beyond the
-run-to-run spread (the training-side A/B says not, at two cells). 
+own precision and its EMA weights, $10$ of the $251$ $\Delta$-plot models at $D=10^4$ still rebuilt off their recorded
+loss by more than $0.02$\,dex after the V100 and A100 rebuilds. Nine of them were rebuilt on H100 at both precisions
+(2026-10-23, \code{FA-ccin2p3-6030a6a3} TF32 on, \code{FA-ccin2p3-c2518adc} off; \code{analysis/transfer/delta\_runs\_off10.txt},
+\code{tf32\_h100\_off10.json}): with TF32 on, eight reproduce their recorded loss to $0.4$ to $4\%$ ($0.993$ to
+$1.040\times$), among them \code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132}, which is $0.34\times$ in fp32 on H100 as on
+V100: it was trained on H100 with TF32, and that settles it. With TF32 off the same eight are $0.34$ to $1.52\times$. The
+ninth, the lxplus-trained \code{tp3\_r9fte\_ee\_WW\_d8\_002/trial\_0032}, rebuilds at $1.06\times$ at both precisions
+($0.026$\,dex), on no hardware we have tried; it is the one model of the $251$ drawn dotted in the $\Delta$ figures,
+which are redrawn with each model at the precision that reproduces its loss (\code{delta\_plots.pick}). Not settled: whether
+the study's V100/A100/H100 mix moves its cell values beyond the run-to-run spread (the training-side A/B says not, at
+two cells). 
 
 \paragraph{The best checkpoint's \code{"model"} weights are not the EMA weights (2026-10-15).}\label{sec:ema-ckpt}
 The counts above are with the EMA weights (redone after this finding; the first count, with the live weights, had $5$
