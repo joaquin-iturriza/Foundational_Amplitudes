@@ -167,14 +167,44 @@ def enumerate_candidates():
     return trees, loops, induced, variants, bsm, n_tree
 
 
-def check(workers, out, only_bsm=False):
+OUT_EXT = os.path.join(ROOT, "recipes", "catalog_v3_candidates_ext.json")
+
+
+def extend24(checked):
+    """D100 (the user, 2026-10-23: "extend 2 to 4 to get 1500"): more 2->4 candidates from the stage-2 survivors, so the
+    catalog reaches ~1500 distinct classes with functions rather than variants: every existing 2->3 class plus a Z, a W+,
+    a W- or a Higgs, and every existing 2->2 class plus a quark-antiquark pair (u, d, b) or a lepton pair (e, ve).
+    Candidates already enumerated (any layer) are skipped by their symmetry key."""
+    old = {c["key"] for c in json.load(open(OUT))["trees"]}
+    seen, out = set(old), []
+    for c in json.load(open(checked)):
+        if not c.get("exists") or c["layer"] not in (2, 3):
+            continue
+        adds = ([["z"], ["w+"], ["w-"], ["h"]] if c["layer"] == 3 else
+                [["u", "u~"], ["d", "d~"], ["b", "b~"], ["e+", "e-"], ["ve", "ve~"]])
+        for add in adds:
+            ini, fin = tuple(c["beams"]), tuple(sorted(c["finals"] + add))
+            if not conserved(ini, fin):
+                continue
+            k = key(ini, fin)
+            if k in seen:
+                continue
+            seen.add(k)
+            out.append({"layer": 4, "beams": list(ini), "finals": list(fin), "why": c["name"] + "+" + "".join(add),
+                        "key": k, "name": name(ini, fin), "generate": f"generate {' '.join(ini)} > {' '.join(fin)}"})
+    json.dump({"trees": out, "bsm": []}, open(OUT_EXT, "w"), indent=0)
+    print(f"wrote {OUT_EXT}: {len(out)} new 2->4 candidates "
+          f"({dict(Counter(c['why'].rsplit('+', 1)[1] for c in out))})")
+
+
+def check(workers, out, only_bsm=False, cands_path=None):
     """stage 2 (CC, CPU job scripts/job_catalog_v3_census.sh): one MadGraph `display processes` per tree and BSM
     candidate (catalog_v2's mg5_check: existence, diagram count, WEIGHTED); one-loop candidates are checked only once the
     loop layer is selected (MadLoop is far slower)"""
     import sys
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     from gen_catalog_v2 import mg5_check
-    cands = json.load(open(OUT))
+    cands = json.load(open(cands_path or OUT))
     todo = [dict(c) for c in (cands["bsm"] if only_bsm else cands["trees"] + cands["bsm"])]
     for c in todo:
         c.setdefault("model", "sm")
@@ -191,7 +221,7 @@ OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")
 OUT_CENSUS = os.path.join(ROOT, "recipes", "catalog_v3_census.yaml")
 
 
-def write(checked):
+def write(*checked):
     """stage 2 -> the tree entries (recipes/catalog_v3_processes.yaml, loaded by mg5_pipeline_final._load_catalog_v3 at
     import) and the census recipe the numeric equality check reads (recipes/catalog_v3_census.yaml: every tree that
     exists, its sqrt(s) window; no events are generated from it)"""
@@ -200,7 +230,7 @@ def write(checked):
     sys.path.insert(0, ROOT)
     import mg5_pipeline_final as mg
     procs, lines = {}, []
-    for c in json.load(open(checked)):
+    for c in (c for f in checked for c in json.load(open(f))):
         if not c.get("exists") or c["layer"] not in (2, 3, 4):
             continue
         pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
@@ -224,7 +254,9 @@ def write(checked):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--write", default=None, help="the stage-2 output (checked.json)")
+    ap.add_argument("--write", nargs="+", default=None, help="the stage-2 outputs (checked.json, checked_ext.json)")
+    ap.add_argument("--extend24", default=None, help="stage-2 output to extend the 2->4 layer from (D100)")
+    ap.add_argument("--cands", default=None, help="--check this candidate file instead of catalog_v3_candidates.json")
     ap.add_argument("--enumerate", action="store_true")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--workers", type=int, default=16)
@@ -242,9 +274,11 @@ def main():
         print("wrote", OUT)
     if a.check:
         os.makedirs(os.path.dirname(a.out), exist_ok=True)
-        check(a.workers, a.out, a.only_bsm)
+        check(a.workers, a.out, a.only_bsm, a.cands)
+    if a.extend24:
+        extend24(a.extend24)
     if a.write:
-        write(a.write)
+        write(*a.write)
 
 
 if __name__ == "__main__":
