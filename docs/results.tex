@@ -805,8 +805,8 @@ one-loop pools whose target changes sign cannot be read by a $\log|\mathcal M|^2
 $79$ probes both arms can score, the trees read at $0.35$ (DlessIn) and $0.33$ (with the orders; quark-initiated $0.20$
 and $0.16$, $e^+e^-$-initiated $3.5$ and $3.6$, an initial state the catalog lacks) and their one-loop partners at $9.0$ and
 $10.1$: the stripped virtual of the same process and window is a median $18$ and $26$ times its tree's error (DlessIn on all
-$99$: $11$). The order a network never saw is out of reach with or without the coupling factor, which removes the
-couplings and not the loop's own dependence on the kinematics.
+$99$: $11$). Most of that error is the level, not the shape (next paragraph): once one labelled event fixes the offset the one-loop
+pools read at $0.97$ (with the orders), and the shape part alone is $0.50$, against $0.22$ for their trees.
 
 \begin{figure}[H]
 \centering
@@ -824,6 +824,57 @@ the order set, on the $79$ probes both arms score, without and with the coupling
 $43$ new processes and $40$ of its $2\to3$ training processes at $100$\,TeV. Right: the $2\to4$ probes, a training $2\to3$ process plus a gluon (filled) or a photon (open), at
 $13$\,TeV with $p_T\geq10$ and $30$\,GeV and at $100$\,TeV.}
 \label{fig:dimless_round}
+\end{figure}
+
+\paragraph{What a few labelled events fix, and where the level errors come from (2026-10-23).} The user's question: one
+event of a process is cheap next to its dataset, and should already fix most of a zero-shot error. Measured on the saved
+reads of the dimensionless round, no new run (\code{analysis/catalog\_daniel/kshot\_level.py}, Fig.~\ref{fig:kshot_level}):
+per process, $K$ validation events drawn at random, the offset taken as the mean error on them and subtracted, the MSE of
+$\log|\mathcal M|^2$ measured on the remaining events, $200$ draws; median over processes. With the coupling orders
+(\code{DlessInOrd}), from $K=0$ to $1$ to $8$: $2\to4$ $+g$ $52\to5.2\to2.9$, $+\gamma$ $30\to4.5\to2.6$, the tops never
+seen $14\to2.9\to1.7$, the one-loop pools $10\to0.97\to0.59$; their floors (the error's variance, what any constant per
+process can reach) are $2.6$, $2.3$, $1.5$ and $0.50$. On the $43$ new processes the prior is already better than one event
+($0.48$ at $K=0$, $0.55$ at $K=1$, $0.30$ at $K=8$, floor $0.26$), so a calibration has to weigh the prediction against the
+events, not replace it. Weighing them (a prior on the offset from the other probes of the same set, its
+mean and spread leave-one-process-out, combined with the $K$ events by their precision): one event no longer hurts there
+($0.45$), and at $K=0$ the prior alone takes $2\to4$ $+g$ from $52$ to $4.7$, $+\gamma$ from $30$ to $4.4$ and the one-loop
+pools from $10$ to $5.1$, but the tops only from $14$ to $13$. The $2\to4$ offset is one number for the whole axis (with the
+orders $-6.7$, spread $1.4$ over the $20$ processes), the tops' is not. An affine correction (offset and scale) needs $K\geq8$ to beat the offset alone and lowers the floor
+by $10$ to $50\%$. So on every out-of-distribution axis $85$ to $95\%$ of the zero-shot error is one number per process;
+what is left is $2\to4$ at $\sim2.5$ and unseen tops at $1.5$, a real shape error, against $0.2$ to $0.5$ elsewhere.
+Where the level errors come from (\code{level\_range.py}):
+\begin{itemize}
+  \item \emph{$2\to4$: outside the range the training spans.} The median $2\to4$ $+g$ target lies above the training levels
+  (the $96$ relabels as their proxy) in every dimensionless arm, and the predictions stay inside: $\Lambda^2=\hat s$ true
+  $13.5$, predicted $8.1$, the relabels' median $5.0$ and maximum $17.5$; with the coupling orders true $16.6$, predicted $9.9$,
+  $70\%$ of the probes above the training maximum $15.2$. With the fixed $s_0=289$\,GeV$^2$ the $2\to4$ levels fall inside
+  ($2.1$ against a median $0.4$, none above the maximum) and the prediction follows ($1.4$). A dimensionless $|\mathcal M|^2$
+  still grows by roughly $\hat s/k_T^2$ per extra soft or collinear particle, $k_T$ that particle's resolution scale
+  (here near the $10$\,GeV cut); a scale of the order of the cuts cancels that growth, $\hat s$ does not, and the network does
+  not extrapolate a level past what it was trained on.
+  \item \emph{Loop-induced pools: a missing loop factor.} The four loop-induced pools are predicted too high by $+7.4$ to
+  $+11.0$ (DlessIn, median $+10.7$; with the orders $+8.2$), close to $\log(16\pi^2)^2=10.1$, the factor a squared one-loop
+  amplitude carries and no tree does; the stripped virtuals sit at a median $-3.1$ ($-2.1$), from $-7.6$ to $+7.1$. Four
+  pools, so a pointer rather than a measurement.
+  \item \emph{Tops: thresholds.} The twin trained without tops puts the $t\bar t$ processes too high (quark-initiated,
+  $29$, median $+5.0$) and the single-top ones too low ($88$, $-1.3$; quark-gluon $-3.8$), with spreads of $3$ within each
+  group: the network has never seen a mass that moves a threshold, so it cannot know that a $2m_t$ threshold suppresses the
+  pair, and it places the top as a light quark.
+\end{itemize}
+No paper we found trains one regressor on many processes and tests the level of unseen ones (survey, 2026-10-23). The
+closest remedies are single-process: factorisation-aware emulators that write $|\mathcal M|^2$ as Catani-Seymour dipoles
+times learned coefficients (arXiv:2107.06625; at one loop, arXiv:2302.04005) and multi-jet surrogates built on the lower
+multiplicity times a splitting factor (arXiv:2512.11036). The interatomic-potential convention of per-element reference
+energies (MACE-MP-0, arXiv:2401.00096) is the nearest analogue of a level fixed by composition.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog\_daniel/figs/kshot\_level.pdf}
+\caption{Zero-shot error after a per-process offset fitted on $K$ labelled events, median over processes of the MSE of
+$\log|\mathcal M|^2$ on the other events (mean over $200$ draws of the $K$). Left: dimensionless inputs and the diagram
+encoder (\code{DlessIn}); right: the same with the coupling orders in the target (\code{DlessInOrd}; the tops are read by
+its twin trained without any top). $K=0$ is the zero-shot read.}
+\label{fig:kshot_level}
 \end{figure}
 
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
