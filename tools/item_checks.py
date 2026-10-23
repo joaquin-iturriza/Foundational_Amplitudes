@@ -1,0 +1,107 @@
+"""The `--check` of the active work items (site item ... --check): prints {"units": {name: {expected, done, active}},
+"alerts": [...]} so `site supervise` raises READY when a comparison becomes possible and GAP when results are missing
+with nothing queued (2026-10-23: no active item had a check, so finished work raised only per-run events and the
+comparisons they made possible never reached the user).
+    python tools/item_checks.py het_stage2|het_mumse22|dimless_general|cut_test
+Unit names match the item's --match globs.
+  het_stage2       one unit per stage-2 sweep (sweeps_local/, drive.py): expected its n_trials, done its observed trials
+  het_mumse22      one unit per cell of analysis/transfer/het_mumse22_jobs.txt: done once its eval_delta.json exists on CC
+  dimless_general  one unit per (arm, held-out set) scoring: done once its prediction directory on CC holds the set
+  cut_test         the same for the 30 GeV cut set (2to4c30)
+"""
+import glob, json, os, re, sqlite3, subprocess, sys
+
+import yaml
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB = os.path.expanduser("~/.local/share/ccorch/runs.db")
+ARMS = ("Adim", "Dless", "DlessIn", "DlessInVirt", "DlessInNoDiag", "Dpair_seed1")
+SETS = {"catalog": None, "2to4": 40, "2to4E100": 40, "2to4E100p": 40}
+
+
+def active_runs(item):
+    c = sqlite3.connect(DB)
+    return {r[0] for r in c.execute("SELECT id FROM runs WHERE project='FA' AND item=? AND state IN "
+                                    "('SUBMITTED','PENDING','RUNNING','QUEUED','IDLE')", (item,))}
+
+
+def on_cc(cmd):
+    p = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd + "; echo __END__"],
+                       capture_output=True, text=True, cwd=REPO)
+    out = p.stdout
+    if "__END__" not in out:
+        return None
+    return [l for l in out.splitlines() if l and not l.startswith("  run") and l != "__END__"]
+
+
+def het_stage2():
+    act = active_runs("het_stage2")
+    units = {}
+    for d in sorted(glob.glob(os.path.join(REPO, "sweeps_local", "tp3_*_het"))):
+        name = os.path.basename(d)
+        cfg = os.path.join(REPO, "sweep", f"sweep_config_{name}.yaml")
+        if not (name.startswith("tp3_hp58fte_") or re.match(r"tp3_finfte_(ee_nnbar|ee_ttbar|ee_bb_nlo)_d\d_het$", name)):
+            continue
+        st = json.load(open(os.path.join(d, "driver_state.json")))["trials"].values()
+        units[name] = {"expected": int(yaml.safe_load(open(cfg))["n_trials"]),
+                       "done": sum(t.get("status") == "observed" for t in st),
+                       "active": sum(t.get("rid") in act for t in st)}
+    return units, []
+
+
+def het_mumse22():
+    cells = []
+    for l in open(os.path.join(REPO, "analysis", "transfer", "het_mumse22_jobs.txt")):
+        if l.strip() and not l.startswith("#"):
+            cells += l.split()[1:]
+    lines = on_cc("ls -d $SCRATCH/zz_delta_het_mumse/*/eval_delta.json 2>/dev/null | xargs -n1 dirname | xargs -n1 basename")
+    if lines is None:
+        return {}, [], "ccin2p3 did not answer"
+    have = set(lines)
+    act = bool(active_runs("het_mumse22"))
+    units = {}
+    for c in cells:
+        # a lad cell keeps its root in the name (runs__X_lad__sigma_stage), a trial cell drops it (X__trial_N__sigma_stage)
+        tag = c.replace("/", "__") + "__sigma_stage"
+        done = tag in have or tag.split("__", 1)[1] in have
+        units["zz_delta_het_mumse/" + tag] = {"expected": 1, "done": int(done), "active": int(act and not done)}
+    return units, []
+
+
+def scorings(sets, item):
+    lines = on_cc("for d in $SCRATCH/zz_catalog_norm_short_*; do echo \"$(basename $d) $(ls $d/*.npz 2>/dev/null | wc -l)\"; done")
+    if lines is None:
+        return {}, [], "ccin2p3 did not answer"
+    n = dict(l.rsplit(" ", 1) for l in lines if " " in l)
+    act = bool(active_runs(item))
+    units = {}
+    for arm in ARMS:
+        for st, want in sets.items():
+            suf = "" if st == "catalog" else "_" + st
+            name = f"zz_catalog_norm_short_{arm}_sigstage{suf}"
+            got = int(n.get(name, 0))
+            done = int(got >= want if want else got > 0)
+            units[name] = {"expected": 1, "done": done, "active": int(act and not done)}
+    return units, []
+
+
+def main():
+    item = sys.argv[1]
+    if item == "het_stage2":
+        r = het_stage2()
+    elif item == "het_mumse22":
+        r = het_mumse22()
+    elif item == "dimless_general":
+        r = scorings(SETS, item)
+    elif item == "cut_test":
+        r = scorings({"2to4c30": 40}, item)
+    else:
+        sys.exit(f"unknown item {item}")
+    out = {"units": r[0], "alerts": r[1]}
+    if len(r) > 2:
+        out["partial"] = r[2]
+    print(json.dumps(out))
+
+
+if __name__ == "__main__":
+    main()
