@@ -4,7 +4,17 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git worktree:*)"
+      "Bash(git worktree:*)",
+      "Bash(bash .claude/hooks/review_backlog.sh advance:*)",
+      "Bash(.claude/hooks/review_backlog.sh advance:*)",
+      "Bash(bash .claude/hooks/review_backlog.sh begin:*)",
+      "Bash(.claude/hooks/review_backlog.sh begin:*)",
+      "Bash(bash .claude/hooks/review_backlog.sh status:*)",
+      "Bash(.claude/hooks/review_backlog.sh status:*)",
+      "Bash(bash /home/joaquin/work/FA/.claude/hooks/review_backlog.sh advance:*)",
+      "Bash(/home/joaquin/work/FA/.claude/hooks/review_backlog.sh advance:*)",
+      "Bash(bash /home/joaquin/work/FA/.claude/hooks/review_backlog.sh begin:*)",
+      "Bash(/home/joaquin/work/FA/.claude/hooks/review_backlog.sh begin:*)"
     ]
   },
   "hooks": {
