@@ -6467,8 +6467,11 @@ of the three share a test set.
     train, of held-out trees, and one loop-induced class; (H6) parameter interpolation points; (H7) $100$\,TeV and $p_T\geq30$.
     H1, H2, H3's top, H5 to H7 come from one pretraining; H3's unseen particle and H4 need one removal twin, shared.
     First step when approved: a CPU census (enumerate, validate in MadGraph, equality classes, cost per pool; no events).
-    Questions for the user: which of H1 to H7 are the regimes that matter, and in what order; SM only or BSM states too;
-    the size; whether $e^+e^-$ stays in.
+    The regimes are D93's (multiplicity, cuts, collider energy, unseen particle content, order: H2, H7, H3, H5); H1, H4,
+    H6 are mine, kept unless the user drops them. SM only: the heavy-quark layer serves the particle axis, and H3's
+    never-seen particle is the Higgs, held out whole in the twin that also removes H4's vertex. Questions for the user: the
+    size ($\sim1500$ classes); whether $e^+e^-$ stays in (proposed yes: no training process has that initial state, and its
+    one-loop probes read at $3.5$ against $0.16$ for quark-initiated ones).
     \emph{The level, after the catalog} (par.\ What a few labelled events fix): (L1) a per-emission scale, the target
     $|\mathcal M|^2$ times the product of the event's $k_T$-clustering scales instead of $\hat s^{N-4}$, which removes the
     $\hat s/k_T^2$ an emission adds and keeps the $2\to4$ level inside the trained range (the fixed $s_0$ does that for one
