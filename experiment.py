@@ -4213,9 +4213,13 @@ class AmplitudeExperiment(BaseExperiment):
                     self.proc_val_losses_no_reg[name] = []
                 self.proc_val_losses_no_reg[name].append(loss)
 
+        # the combined value includes the regularization term; the checkpoint metric (val_loss_no_reg: the aggregate
+        # without it, what selects the checkpoint and what DyHPO observes) is printed next to it, so a log read on its
+        # own gives the metric (2026-10-23: copied sweeps pruned from their logs had only the regularized value)
         LOGGER.info(
-            f"Val loss (combined): {val_loss:.4g} | " +
-            ", ".join(f"{n}={v:.4g}" for n, v in proc_losses.items())
+            f"Val loss (combined): {val_loss:.4g} | "
+            + (f"val_loss_no_reg: {val_loss_no_reg:.6e} | " if val_loss_no_reg is not None else "")
+            + ", ".join(f"{n}={v:.4g}" for n, v in proc_losses.items())
         )
 
         # σ-ranking SPEED probe on the MULTI-PROCESS path (this override does not

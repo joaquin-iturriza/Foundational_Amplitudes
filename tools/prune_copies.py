@@ -34,11 +34,16 @@ def referenced():
     return refs
 
 
+NOREG_RE = re.compile(r"val_loss_no_reg: (-?[0-9.]+(?:e[-+]?\d+)?)")
+
+
 def best_val(td):
+    """The trial's lowest checkpoint metric: val_loss_no_reg where the log prints it (multi-process runs since
+    2026-10-23), else the logged validation loss"""
     best = None
     for log in glob.glob(os.path.join(td, "out_*.log")):
         for line in open(log, errors="replace"):
-            m = VAL_RE.search(line)
+            m = NOREG_RE.search(line) or VAL_RE.search(line)
             if m:
                 v = float(m.group(1))
                 best = v if best is None or v < best else best
