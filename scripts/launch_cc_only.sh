@@ -16,5 +16,10 @@ DONE="$HOME/.local/share/ccorch/launch/FA/$ITEM.cc_only.submitted"; KEY="${FA_SE
 p=$(timeout 250 site pick FA --only ccin2p3 --jobs 1 --mem "${MEM:-16G}" --cpus 4 --hours "$EST" 2>&1 | tail -1 | sed "s/^ *//")
 echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
-site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${FA_SEED:+--env FA_SEED=$FA_SEED} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" || exit $?
+# a submission counts only once it printed its run id (2026-10-23: submits refused for an uncommitted file went
+# unnoticed behind a filtered output, and the scorings were never queued)
+out=$(site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${FA_SEED:+--env FA_SEED=$FA_SEED} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
+echo "$out"
+[ $rc -eq 0 ] || { echo "LAUNCH FAILED (exit $rc): $NOTE" >&2; exit $rc; }
+echo "$out" | grep -q "run FA-ccin2p3-" || { echo "LAUNCH FAILED (no run id printed): $NOTE" >&2; exit 1; }
 echo "$KEY" >> "$DONE"
