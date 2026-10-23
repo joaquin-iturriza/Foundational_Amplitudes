@@ -350,6 +350,23 @@ $b$ beams ($347$ processes) are built. The earlier rule-based bounds without the
 classes, $519$ to $711$ under a liberal flavour and charge-conjugation rule, $75$ to $78$ of them ours) are superseded.
 
 
+\paragraph{catalog\_v3, the census (D98, 2026-10-23).} The new catalog counts equality classes, not process strings
+(\code{recipes/gen\_catalog\_v3.py}; \code{analysis/catalog\_v3/}). Stage 1 enumerates every $2\to2$ and $2\to3$ final
+multiset of SM particles on every beam ($e^+e^-$, every quark-antiquark and quark-quark pair of $u,d,s,c,b$, every
+quark-gluon pair, $gg$), every $2\to3$ plus a gluon or a photon, the four-fermion and multi-boson $2\to4$ finals, under
+charge, baryon and lepton-number conservation, and collapses the beam order, the swap of the first two generations (exact in
+MadGraph's \code{sm}: massless, Yukawa-free $u,d,s,c,e,\mu$, diagonal CKM) and charge conjugation (exact at $2\to2$; from
+$2\to3$ on only up to the parity-odd terms the widths allow): $5192$ candidates. Stage 2, MadGraph on each: $1630$ exist
+($123$ at $2\to2$, $507$ at $2\to3$, $1000$ at $2\to4$), and the $12$ BSM processes of the two models the particle table
+already encodes (DMsimp's $Z'$, the 2HDM's scalars). Stage 3, $|\mathcal M|^2$ of every tree on shared points under every
+leg relabelling (\code{tools/equal\_processes.py}, $32$ minutes on $16$ cores): $344$ classes of exactly equal processes
+take out $452$ strings ($\nu_e=\nu_\tau$ finals, $b\bar b\to c\bar c=b\bar b\to d\bar d$ at QCD order, \dots), and $151$
+near pairs (log-ratio spread $2\times10^{-6}$ to $10^{-2}$; $d\bar d\to HZZ$ against $u\bar u\to HZZ$, $e^+e^-\to HZZ$:
+the fermion line's couplings factor out up to the $Z$ width) take out $75$ more. Distinct tree classes: $1103$, $65$ at
+$2\to2$, $321$ at $2\to3$, $717$ at $2\to4$ (by beam: $e^+e^-$ $9$, $38$, $95$; quark pairs $44$, $214$, $489$;
+quark-gluon $9$, $55$, $109$; $gg$ $3$, $14$, $24$); $359$ coloured classes at $2\to2$ and $2\to3$ can carry a one-loop
+QCD virtual, $51$ of them with a top.
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
@@ -6550,7 +6567,12 @@ of the three share a test set.
     vertex class absent (the quartic gauge or the triple Higgs vertex); (H5) order, the one-loop of families whose trees
     train, of held-out trees, and one loop-induced class; (H6) parameter interpolation points; (H7) $100$\,TeV and $p_T\geq30$.
     H1, H2, H3's top, H5 to H7 come from one pretraining; H3's unseen particle and H4 need one removal twin, shared.
-    First step when approved: a CPU census (enumerate, validate in MadGraph, equality classes, cost per pool; no events).
+    The census is done (par.\ catalog\_v3, the census): $1103$ distinct tree classes ($65$, $321$, $717$ at $2\to2$, $2\to3$,
+    $2\to4$) and $12$ BSM. Proposed composition, to the user before any generation: every tree class; one-loop QCD
+    virtuals of every coloured $2\to2$ class and $\sim90$ $2\to3$ ones ($\sim150$; a $2\to3$ MadLoop pool costs $100$--$200$
+    LO units); the certified loop-induced; the heavy-quark layer on $20$ top families at $m_Q\in\{50,300,600\}$\,GeV ($60$);
+    $\alpha_s$ far points on $\sim10$ families ($20$); $2\to5$ probes for H2's extrapolation ($\sim40$): about $1400$ pools.
+    Next: the held-out selection (H1 to H7) by script, then its cost from the pipeline's cost model.
     The regimes are D93's (multiplicity, cuts, collider energy, unseen particle content, order: H2, H7, H3, H5); H1, H4,
     H6 are mine, kept unless the user drops them. SM only: the heavy-quark layer serves the particle axis, and H3's
     never-seen particle is the Higgs, held out whole in the twin that also removes H4's vertex. Questions for the user: the
