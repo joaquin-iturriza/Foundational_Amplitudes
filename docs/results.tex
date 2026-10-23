@@ -750,7 +750,7 @@ $\hat s$ only, $s_0=289$ & $0.65$ & $0.081$ & $4.6$ / $4.0$ ($-0.9$ / $+0.4$) & 
 dimensionless, $\Lambda^2=\hat s$ & $0.72$ & $0.104$ & $45$ / $26$ ($-6.5$ / $-4.8$) & $43$ / $28$ \\
 dimensionless, $\Lambda^2$ pairs & $0.77$ & $0.094$ & $15$ / $6.3$ ($-3.6$ / $-2.0$) & $14$ / $6.7$ \\
 dimensionless inputs, encoder & $1.57$ & $0.062$ & $34$ / $17$ ($-5.7$ / $-3.9$) & $33$ / $19$ \\
-\quad with virtuality pooling & $1.15$ & ($0.088$, $14$ of $40$) & $38$ / $25$ ($-6.0$ / $-4.7$) & $35$ / $27$ \\
+\quad with virtuality pooling & $1.15$ & $0.064$ & $38$ / $25$ ($-6.0$ / $-4.7$) & $35$ / $27$ \\
 \quad without diagrams & $1.67$ & $0.085$ & $37$ / $19$ ($-5.9$ / $-4.1$) & $35$ / $20$ \\
 \end{tabular}
 \end{center}
@@ -775,8 +775,7 @@ D93 design, is not in this table yet (its per-event $\alpha_s$ is being recovere
 \centering
 \pnl{../analysis/catalog\_daniel/figs/dimless\_round\_a.pdf}\hfill\pnl{../analysis/catalog\_daniel/figs/dimless\_round\_b.pdf}
 \caption{The short design runs on the held-out sets, median MSE of $\log|\mathcal M|^2$ per process. Left: the catalog's
-$43$ new processes and $40$ of its $2\to3$ training processes at $100$\,TeV (with virtuality pooling only $14$ of the $40$
-are scored so far). Right: the $2\to4$ probes, a training $2\to3$ process plus a gluon (filled) or a photon (open), at
+$43$ new processes and $40$ of its $2\to3$ training processes at $100$\,TeV. Right: the $2\to4$ probes, a training $2\to3$ process plus a gluon (filled) or a photon (open), at
 $13$\,TeV with $p_T\geq10$ and $30$\,GeV and at $100$\,TeV.}
 \label{fig:dimless_round}
 \end{figure}
@@ -6350,8 +6349,8 @@ of the three share a test set.
     (fig:het\_stage2). Open: in $13$ of the $28$ hp58 cells the best trial is the highest learning rate tried
     ($[7\times10^{-4},6\times10^{-3}]$), so hp58's values are upper bounds; a best-against-best comparison needs those
     cells swept higher (proposed to the user, not started). (2) \code{het\_mumse22} (D89): done and written up (fig:het\_mumse22): at $2\to2$ two runs of one config differ by more than $2\times$ in half the cells, so single het $2\to2$ cells carry that factor. (3) \code{dimless\_general} (D93): the inputs and held-out half is
-    written up (fig:dimless\_round); DlessInVirt on the $100$\,TeV parents crashes deterministically (CUDA illegal memory access) on
-    \code{dE100\_ddx\_hvmvmx}, $d\bar d\to H\nu\bar\nu$; debug run \code{FA-ccin2p3-cbddd341} with \code{CUDA\_LAUNCH\_BLOCKING}; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
+    written up (fig:dimless\_round); DlessInVirt's crash on the $100$\,TeV parents was \code{torch.sparse.mm} in the virtuality pooling (an illegal memory access on the
+    $15$th process of a job), replaced by an \code{index\_add} (\code{8444bf2}; the $14$ earlier predictions reproduce to $5\times10^{-3}$) and rescored; $4$ of the $20$ $100$\,TeV $+g$ probes failed generation. Open: the
     target's coupling-order factor (\code{data.target\_physics\_orders}, per-event $\alpha_s$ in \code{<pool>.alphas.npy}): the
     $\alpha_s$ recovery left $8$ processes whose momenta did not reproduce (mostly $W^+W^-H$; parts $1$, $9$, $11$), to regenerate,
     then a short run with the orders factor on the same held-out sets. (4) Storage (D96): tests and smokes deleted ($5$ GB);
