@@ -28,7 +28,8 @@ def main():
     models = {"hp58 + g (full)": z58}
     for lab, f in (("A (full)", "catalog_norm_A"), ("B (full, blew up)", "catalog_norm_B"),
                    ("B (short)", "catalog_short_B_sigstage"), ("Adim (short)", "catalog_short_Adim_sigstage"), ("A (short)", "catalog_short_A_sigstage"),
-                   ("Dless (short)", "catalog_short_Dless_sigstage"), ("DlessIn (short)", "catalog_short_DlessIn_sigstage")):
+                   ("Dless (short)", "catalog_short_Dless_sigstage"), ("DlessIn (short)", "catalog_short_DlessIn_sigstage"),
+                   ("Dpair (short, best checkpoint, diverged)", "catalog_short_Dpair")):
         models[lab] = dict(np.load(os.path.join(HERE, "data", f + ".npz")))
     probes = sorted({k.split("__")[0] for k in z58 if k.endswith("__t")})
     res = {}
