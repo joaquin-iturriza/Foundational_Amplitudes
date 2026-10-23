@@ -75,6 +75,27 @@ def main(cfg):
         nxt = AmplitudeExperiment(stage)
         nxt._reuse_data_from = exp
         nxt()
+        promote_final_model(exp.cfg.run_dir, stage.run_dir)
+
+
+def promote_final_model(run_dir, stage_dir):
+    """The sigma fit is the last part of a HETEROSC run's training (D70), so the run's models/ holds the model it
+    ends with (the user, 2026-10-23: "There is no point in keeping the model pre sigma fit"): the stage's checkpoints
+    replace the pre-fit ones in <run_dir>/models, and <stage_dir>/models becomes a link to it, so a reader of either
+    path gets the run's final model. The stage's plots, predictions and log stay in <stage_dir>."""
+    import shutil
+    src, dst = os.path.join(stage_dir, "models"), os.path.join(run_dir, "models")
+    if os.path.islink(src) or not os.path.isdir(src) or not os.listdir(src):
+        return
+    os.makedirs(dst, exist_ok=True)
+    for f in os.listdir(dst):
+        if f.startswith("model_run"):
+            os.remove(os.path.join(dst, f))
+    for f in os.listdir(src):
+        shutil.move(os.path.join(src, f), os.path.join(dst, f))
+    os.rmdir(src)
+    os.symlink(os.path.relpath(dst, stage_dir), src)
+    print(f"[run] final model (after the sigma fit) in {dst}; {src} links to it", flush=True)
 
 
 if __name__ == "__main__":
