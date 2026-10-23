@@ -964,6 +964,8 @@ $96$ relabels & $0.051$ & $0.064$ & $1.05$ \\
 $2\to3$ at $100$\,TeV & $0.077$ & $0.086$ & $1.21$ \\
 trees of the loop probes & $0.33$ & $0.31$ & $0.95$ \\
 one-loop pools & $10.2$ & $10.0$ & $1.06$ \\
+$162$ top processes, trained with & $0.060$ & $0.068$ & $1.00$ \\
+$162$ top processes, never seen (twin) & $14.4$ & $10.3$ & $0.83$ ($0.38$--$1.34$) \\
 \end{tabular}
 \end{center}
 The extra particle stops being the failure: the $2\to4$ offset goes from $-7.0$ / $-5.3$ to $-1.0$ / $-0.15$ and its
@@ -974,7 +976,10 @@ $0.48$ to $3.3$; trained, the $43$ new cost a factor $1.6$ at the median MSE ($0
 shape $0.26$ to $0.48$) and per process a median $1.22$ with a wide spread (worst $b\bar b\to HHH$, $0.45$ to $5.6$; the
 $Zhh$ and $ZZZ$ finals go both ways by $4\times$), the size of one seed's noise on some processes and not on others. On the
 one-loop pools the shape error halves ($0.50$ to $0.22$) while the level stays the error ($10$), which is the loop factor and
-the stripping convention, not the kinematics. The particle-content axis (the twin without tops) is still running.
+the stripping convention, not the kinematics. On the particle-content axis the twins trained without any top read the
+$162$ top processes at $14.4$ and $10.3$: the emission scales help a little (median per-process ratio $0.83$) but leave
+an unseen particle out of reach, with a larger shape error ($1.5$ to $2.2$), as expected of a target that does not know
+where a $2m_t$ threshold sits.
 
 \begin{figure}[H]
 \centering
@@ -6571,13 +6576,12 @@ of the three share a test set.
     costing $100$--$200$ LO units; all $2\to2$ and a subset of $2\to3$ halves it); heavy-quark analogues of the top's
     $2\to4$ classes; the twin's never-seen particle (the Higgs is a quarter of training). Then the cost from the pipeline's
     cost model and the generation.
-  \item \textbf{State (2026-10-23, 22:30).} Running on CC: the no-top twin's top scoring (launch \code{qperp\_notop\_top},
-    item \code{dimless\_kt}); when its npz land, add the tops-never-seen row to par:dimless\_qperp (\code{qperp\_ab.py} reads
-    \code{catalog\_top\_short\_DlessInOrdQ\{,\_notop\}.npz}, to be collected with \code{collect\_heldout\_preds.py}). The
-    reviewers' \code{begin}/\code{advance} are permission rules in \code{.claude/settings.json}; the user, 2026-10-23: only the
-    reviewer itself may release its lock, never the main session; a hook check for that (agent\_type of the caller) is to be
-    written to a separate file and tested before it replaces anything in \code{review\_backlog.sh}. Decisions since the last
-    compaction: D98 (catalog\_v3 design, census), D99 (short GPU tests of candidates through the CPU proxy, up to $10$ GPU-h).
+  \item \textbf{State (2026-10-23, 22:40).} Nothing running; \code{dimless\_kt} complete (par:dimless\_qperp, every set and
+    the twin). The review locks: only a pillar's own reviewer may begin or advance (\code{.claude/hooks/lock\_guard.py},
+    tested live both ways); a hook script that does not parse is refused or restored (\code{hook\_syntax\_guard.py}).
+    Decisions since the last compaction: D98 (catalog\_v3 design, census), D99 (short GPU tests of candidates through the
+    CPU proxy, up to $10$ GPU-h; $\sim5$ used). Asked of the user: $2\to4$ extended by $+Z$, $+W$, $+H$ and quark pairs to
+    reach $\sim1500$ distinct classes (recommended), and the three catalog questions of the catalog\_v3 item.
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); its read on the tops never seen
     (the twin) is running. Next, in order: a variant that keeps the gain without the cost on finals with no soft particle,
