@@ -24,6 +24,9 @@ PROBES = {"ee_ddbar": r"$e^+e^-\to d\bar d$", "ee_WW": r"$e^+e^-\to W^+W^-$", "e
           "ee_ttbar": r"$e^+e^-\to t\bar t$", "uubar_Zggg": r"$u\bar u\to Zggg$",
           "ee_dd_nlo": r"$e^+e^-\to d\bar d$, one loop", "ee_bb_nlo": r"$e^+e^-\to b\bar b$, one loop"}
 STD = {k: v[0] for k, v in json.load(open(os.path.join(HERE, "het_stage2_stds.json"))).items()}
+# every trial of a sweep shares one standardization (one probe, one D; checked over het_stage2_stds.json), so a trial
+# added later (D97's extension) takes its sweep's value
+SWEEP_STD = {k.split("/")[1]: v for k, v in STD.items()}
 
 
 def het(sweep):
@@ -33,8 +36,30 @@ def het(sweep):
     for f in fs:
         r = json.load(open(f))
         rd = r["run_dir"].split("Foundational_Amplitudes/", 1)[1]
-        rows.append(r["val_loss"] * STD[rd] ** 2)
+        rows.append(r["val_loss"] * STD.get(rd, SWEEP_STD[sweep]) ** 2)
     return (min(rows), len(rows)) if rows else None
+
+
+def extension():
+    """D97: the 13 hp58 sweeps extended in place to lr 2e-2 (het_hp58_ext_cells.json): the best of the first 5 trials
+    (trial_idx < 5, the stage-2 sweep) against the best of all 10, and whether the best is again the highest lr tried"""
+    sys.path.insert(0, ROOT)
+    from sweep.dyhpo_sampler import DyHPOSampler
+    out = {}
+    for sw in json.load(open(os.path.join(HERE, "het_hp58_ext_cells.json"))):
+        d = os.path.join(ROOT, "sweeps_local", sw)
+        smp = DyHPOSampler.load(os.path.join(d, "dyhpo_state.pkl"), os.path.join(d, "dyhpo_surrogate"), force_cpu=True)
+        rs = [json.load(open(f)) for f in glob.glob(os.path.join(d, "results", "*.json"))]
+        rs = [r for r in rs if r.get("val_loss") is not None]
+        lr = lambda r: float(smp.candidates_raw[r["hp_idx"]]["training.lr"])
+        old = [r for r in rs if r["trial_idx"] < 5]
+        bo, bn = min(old, key=lambda r: r["val_loss"]), min(rs, key=lambda r: r["val_loss"])
+        out[sw] = dict(n=len(rs), old=bo["val_loss"], new=bn["val_loss"], ratio=bn["val_loss"] / bo["val_loss"],
+                       lr_old=lr(bo), lr_new=lr(bn), new_at_top=lr(bn) == max(lr(r) for r in rs),
+                       lr_max_tried=max(lr(r) for r in rs))
+        print(f"{sw:32s} best {bo['val_loss']:.3g} -> {bn['val_loss']:.3g} ({out[sw]['ratio']:.2f}), lr {lr(bo):.2e} -> "
+              f"{lr(bn):.2e}, highest tried {out[sw]['lr_max_tried']:.2e}{'  (best again at the top)' if out[sw]['new_at_top'] else ''}")
+    return out
 
 
 def main():
@@ -69,6 +94,7 @@ def main():
     a0 = max((ax for _, ax in figs), key=lambda ax: len(ax.get_legend_handles_labels()[1]))
     ps.legend_strip(a0, os.path.join(HERE, "figs", "het_stage2_legend"), ncol=3)
     ps.save_panels(figs, os.path.join(HERE, "figs", "het_stage2"))
+    res["_extension"] = extension()
     json.dump(res, open(os.path.join(HERE, "het_stage2.json"), "w"), indent=1)
 
 
