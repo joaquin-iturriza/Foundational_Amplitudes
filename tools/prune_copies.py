@@ -15,9 +15,9 @@ import argparse, glob, json, os, re, sys, time
 import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# "Val loss (combined): x" (several processes) or "Val loss: x" (one); the logs carry the regularized value only (lambda
-# <= 1e-6), so the kept model is the lowest-logged trial, which can differ from the val_loss_no_reg best in a near tie;
-# every trial's config and log stay, so any trial can be rerun
+# "Val loss (combined): x" (several processes, regularized) or "Val loss: x" (one process, without the regularization
+# term); a multi-process log written before 2026-10-23 has no val_loss_no_reg field, so for those sweeps the kept model
+# is the lowest regularized value, which can differ from the val_loss_no_reg best; every trial's config and log stay
 VAL_RE = re.compile(r"Val loss(?: \(combined\))?: (-?[0-9.]+(?:e[-+]?\d+)?)")
 
 
