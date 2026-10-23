@@ -16,7 +16,8 @@ import yaml
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.expanduser("~/.local/share/ccorch/runs.db")
 ARMS = ("Adim", "Dless", "DlessIn", "DlessInVirt", "DlessInNoDiag", "Dpair_seed1")
-SETS = {"catalog": None, "2to4": 40, "2to4E100": 40, "2to4E100p": 40}
+# 2to4E100p: 36, four of its +gluon probes failed generation at 100 TeV (docs/results.tex, the dimensionless round)
+SETS = {"catalog": None, "2to4": 40, "2to4E100": 40, "2to4E100p": 36}
 
 
 def active_runs(item):
