@@ -2,7 +2,7 @@
 "alerts": [...]} so `site supervise` raises READY when a comparison becomes possible and GAP when results are missing
 with nothing queued (2026-10-23: no active item had a check, so finished work raised only per-run events and the
 comparisons they made possible never reached the user).
-    python tools/item_checks.py het_stage2|het_mumse22|dimless_general|cut_test
+    python tools/item_checks.py het_stage2|het_hp58_ext|het_mumse22|dimless_general|cut_test
 Unit names match the item's --match globs.
   het_stage2       one unit per stage-2 sweep (sweeps_local/, drive.py): expected its n_trials, done its observed trials
   het_mumse22      one unit per cell of analysis/transfer/het_mumse22_jobs.txt: done once its eval_delta.json exists on CC
@@ -46,6 +46,18 @@ def het_stage2():
         st = json.load(open(os.path.join(d, "driver_state.json")))["trials"].values()
         units[name] = {"expected": int(yaml.safe_load(open(cfg))["n_trials"]),
                        "done": sum(t.get("status") == "observed" for t in st),
+                       "active": sum(t.get("rid") in act for t in st)}
+    return units, []
+
+
+def het_hp58_ext():
+    """D97: the 13 hp58 het sweeps whose best was the highest lr tried, extended in place to lr 2e-2 and continued to 10
+    trials (analysis/transfer/het_hp58_ext_cells.json)"""
+    act = active_runs("het_hp58_ext")
+    units = {}
+    for name in json.load(open(os.path.join(REPO, "analysis", "transfer", "het_hp58_ext_cells.json"))):
+        st = json.load(open(os.path.join(REPO, "sweeps_local", name, "driver_state.json")))["trials"].values()
+        units[name] = {"expected": 10, "done": sum(t.get("status") == "observed" for t in st),
                        "active": sum(t.get("rid") in act for t in st)}
     return units, []
 
@@ -123,6 +135,8 @@ def main():
     item = sys.argv[1]
     if item == "het_stage2":
         r = het_stage2()
+    elif item == "het_hp58_ext":
+        r = het_hp58_ext()
     elif item == "het_mumse22":
         r = het_mumse22()
     elif item == "dimless_general":
