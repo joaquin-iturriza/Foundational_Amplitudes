@@ -181,7 +181,7 @@ def mg5_check(cands, workers=8):
         return ok, (int(d.group(1)) if d else 0), (int(m.group(2)) if (m and m.group(2)) else None), err
     def one(c):
         loop = c["layer"] in ("nlo", "loop")
-        model = c.get("model", "loop_sm") if loop else "sm"
+        model = c.get("model", "loop_sm" if loop else "sm")
         ok, diag, W, err = run_mg5(c["name"], c["generate"], model)
         c2 = dict(c, exists=ok, diagrams=diag, weighted=W, error=err)
         if ok and c.get("suffix") and not loop:
