@@ -19,8 +19,9 @@ Layers:
   one loop    [virt=QCD] of every coloured 2->2 and 2->3 tree; loop-induced candidates listed for certification
   variants    alpha_s(M_Z) in {0.09, 0.15}, M_Z, M_H at far points on a few families; heavy quarks with the top's quantum
               numbers at m_Q in {50, 300, 600} GeV on the top family (the physical top held out between them, H3)
-  BSM         processes of a model whose new particles the particle table can encode (spin, charge, colour, mass, B, L):
-              a list here, its existence decided by stage 2 (the model must be on CC)
+  BSM         the user (D98): "at least one BSM process that can be encoded with our current particle embedding": the
+              two non-SM models the table already has rows for, DMsimp_s_spin1 (a Z') and the 2HDM (charged and neutral
+              scalars), s-channel, pair and associated production; existence decided by stage 2
 Output: recipes/catalog_v3_candidates.json and the counts printed.
     python recipes/gen_catalog_v3.py --enumerate
 """
@@ -152,12 +153,16 @@ def enumerate_candidates(max24):
             for a in (0.09, 0.15):
                 variants.append(dict(c, layer="scan", name=c["name"] + f"__as{int(a * 1000):03d}", physics={"alpha_s": a},
                                      why="alpha_s far point"))
-    bsm = [{"layer": "bsm", "model": "MSSM_SLHA2", "beams": list(i), "finals": list(f), "name": "v3bsm_" + n,
-            "generate": f"generate {' '.join(i)} > {' '.join(f)}", "why": w}
-           for i, f, n, w in ((("u", "u~"), ("ul", "ul~"), "uux_squark_pair", "scalar colour triplet, pair production"),
-                              (("g", "g"), ("ul", "ul~"), "gg_squark_pair", "scalar colour triplet, gluon fusion"),
-                              (("e+", "e-"), ("mur-", "mur+"), "ee_smuon_pair", "charged scalar, s-channel"),
-                              (("u", "g"), ("ul", "n1"), "ug_squark_neutralino", "scalar triplet + Majorana fermion"))]
+    # BSM: the two non-SM models the particle table already encodes (particle_ids.BSM_PARTICLE_PROPERTIES, the
+    # generator's point mg5_pipeline_final.NONSM_POINT): DMsimp_s_spin1's vector mediator Y1 (a Z', 500 GeV) and the
+    # 2HDM's scalars (H+ 200, h2 250, h3 300 GeV); no new row, no new feature
+    B = (("DMsimp_s_spin1", "e+ e- > mu+ mu- QED<=2 DMV<=2", "zp_ee_mumu"), ("DMsimp_s_spin1", "u u~ > mu+ mu- QED<=2 DMV<=2", "zp_uux_mumu"),
+         ("DMsimp_s_spin1", "e+ e- > u u~ QED<=2 DMV<=2", "zp_ee_uux"), ("DMsimp_s_spin1", "e+ e- > y1 a QED<=1 DMV<=1", "zp_ee_y1a"),
+         ("DMsimp_s_spin1", "u u~ > y1 g DMV<=1", "zp_uux_y1g"), ("DMsimp_s_spin1", "u u~ > y1 z QED<=1 DMV<=1", "zp_uux_y1z"),
+         ("2HDM", "e+ e- > h+ h-", "thdm_ee_hphm"), ("2HDM", "e+ e- > h2 h3", "thdm_ee_h2h3"), ("2HDM", "u u~ > h+ h-", "thdm_uux_hphm"),
+         ("2HDM", "u d~ > h+ h2", "thdm_udx_hph2"), ("2HDM", "e+ e- > h+ h- a", "thdm_ee_hphma"), ("2HDM", "u u~ > h2 h3 g", "thdm_uux_h2h3g"))
+    bsm = [{"layer": "bsm", "model": m, "name": "v3bsm_" + n, "generate": "generate " + g, "why": m,
+            "beams": g.split(" > ")[0].split(), "finals": [t for t in g.split(" > ")[1].split() if "<=" not in t]} for m, g, n in B]
     return trees, loops, induced, variants, bsm, n_tree
 
 
