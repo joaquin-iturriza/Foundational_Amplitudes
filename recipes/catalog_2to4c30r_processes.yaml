@@ -1,0 +1,41 @@
+# catalog_2to4c30r: d4c30_gdx_dxzh_g regenerated under a new name so its pools carry each event's alpha_s (D93):
+# its MadEvent rerun did not reproduce the stored momenta (tools/recover_alphas.py, FA-ccin2p3-ff70646f), as for
+# d4_gdx_dxzh_g at 10 GeV; the original pools are kept. Loaded by mg5_pipeline_final._load_catalog_2to4.
+lhe:
+  cards_dir: recipes/catalog_2to4c30
+  run_card: run_card.dat
+  param_card: param_card_sm.dat
+  model: sm
+  n_val: 10000
+  n_test: 10000
+  n_train: 1000
+  source: catalog run card with ptj = ptb = pta = 30.0 GeV
+processes:
+  d4c30r_gdx_dxzh_g:
+    kind: lhe_pp
+    folder: gdx_dxzh_g_c30_r
+    mg5_generate:
+    - generate g d~ > d~ z h g
+    proc_str: g d~ > d~ z h g
+    nfinal: 4
+    pdg_ids:
+    - 21
+    - -1
+    - -1
+    - 23
+    - 25
+    - 21
+    m_finals:
+    - 0.0
+    - 91.188
+    - 125.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 2
+    alphas_power: 2
+    split: heldout
+    test_group: '2->4: parent + gluon'
+    parent: dc_gdx_dxzh

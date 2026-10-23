@@ -72,7 +72,8 @@ case "$SET" in
               [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
     loop)     R="$SCRATCH/zz_catalog_loop_recipes"; HELD=recipes/catalog_loop_probes.yaml; PFX=""; WINDOWS=1 ;;
     top)      R="$SCRATCH/zz_catalog_top_recipes"; HELD=recipes/catalog_daniel_top.yaml; PFX=dc_ ;;
-    2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_ ;;
+    2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_
+              [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4c30_orders_recipes"; HELD=recipes/catalog_2to4c30_heldout_orders.yaml; PFX=d4c30; } ;;
     2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;
     2to4E100p) R="$SCRATCH/zz_catalog_2to4E100p_recipes"; HELD=recipes/catalog_2to4E100p_heldout.yaml; PFX=d4E100_ ;;
     *) echo "unknown probe set $SET"; exit 1 ;;

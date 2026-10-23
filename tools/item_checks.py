@@ -98,13 +98,14 @@ WRITEUPS = {"dimless_writeup_orders": "par:dimless_orders", "dimless_writeup_par
 def dimless_rest(item):
     lines = on_cc("cd $DATA_DIR; echo c30 $(ls d4c30_*_val_lhe_amplitudes.alphas.npy 2>/dev/null | wc -l); "
                   "echo d4r $(ls d4r_gdx_dxzh_g_*_val_lhe_amplitudes.alphas.npy 2>/dev/null | wc -l); "
+                  "echo d4c30r $(ls d4c30r_gdx_dxzh_g_*_val_lhe_amplitudes.alphas.npy 2>/dev/null | wc -l); "
                   "for d in $SCRATCH/zz_catalog_norm_short_DlessIn*; do echo \"$(basename $d) $(ls $d/*.npz 2>/dev/null | wc -l)\"; done")
     if lines is None:
         return {}, [], "ccin2p3 did not answer"
     n = dict(l.rsplit(" ", 1) for l in lines if " " in l)
     act = bool(active_runs(item))
     u = lambda done: {"expected": 1, "done": int(done), "active": int(act and not done)}
-    units = {"recover_alphas_2to4c30": u(int(n.get("c30", 0)) >= 40), "d4r_gdx_dxzh_g": u(int(n.get("d4r", 0)) >= 1)}
+    units = {"recover_alphas_2to4c30": u(int(n.get("c30", 0)) >= 39 and int(n.get("d4c30r", 0)) >= 1), "d4r_gdx_dxzh_g": u(int(n.get("d4r", 0)) >= 1)}
     for arm, sets in (("DlessInOrd", ORD_SETS), ("DlessInOrd_notop", {"_top": 162}), ("DlessIn", {"_loop": 99})):
         for suf, want in sets.items():
             name = f"zz_catalog_norm_short_{arm}_sigstage{suf}"
