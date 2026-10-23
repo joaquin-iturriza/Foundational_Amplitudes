@@ -6,6 +6,7 @@ Candidates, per event, from data/norm_targets_stats.json (norm_targets_stats.py)
     pairs    y + (N - 4) Lp                                  (Lambda^2 = the pair scale)
     kt       y + Lk                                          (Lambda^2 = the event's k_T clustering scales)
     kt_ga    y + Lkg                                         (the same, gluons and photons only)
+    kt_mT    y + Lkm                                         (every final particle, m_T: generic)
 each also with the coupling orders divided out (+ord: - q log 4 pi alpha_s - e log 4 pi alpha at alpha_s = 0.118, the
 orders from classes_default.json; a 2->4 probe takes its parent's plus one for the added g or photon).
 Three reads per candidate:
@@ -42,7 +43,7 @@ def comp(pdg):
 def cand(r, name, ord_):
     """per candidate: (mean, var) of the target over the process's events"""
     m, C, N = np.array(r["mean"]), np.array(r["cov"]), r["N"]
-    vecs = {"raw": [1, 0, 0, 0, 0], "s0": [1, 0, 0, 0, 0], "shat": [1, N - 4, 0, 0, 0], "pairs": [1, 0, N - 4, 0, 0], "kt": [1, 0, 0, 1, 0], "kt_ga": [1, 0, 0, 0, 1]}
+    vecs = {"raw": [1, 0, 0, 0, 0, 0], "s0": [1, 0, 0, 0, 0, 0], "shat": [1, N - 4, 0, 0, 0, 0], "pairs": [1, 0, N - 4, 0, 0, 0], "kt": [1, 0, 0, 1, 0, 0], "kt_ga": [1, 0, 0, 0, 1, 0], "kt_mT": [1, 0, 0, 0, 0, 1]}
     out = {}
     for k, a in vecs.items():
         a = np.array(a, float)
