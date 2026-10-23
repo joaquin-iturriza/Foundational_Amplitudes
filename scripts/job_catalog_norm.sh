@@ -17,8 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, Dpair or Ds0}"; SMOKE="${2:-}"
-case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, Dpair or Ds0}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -53,6 +53,11 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # <pool>.alphas.npy, not needed where q = 0)
 [ "$ARM" = DlessInOrd ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
                                   ++data.target_physics_orders=true)
+# DlessInOrdQ (D99, the first candidate through the CPU proxy, analysis/catalog_daniel/norm_targets.py): DlessInOrd with
+# each extra particle's own Lorentz-invariant emission scale in place of s_hat (data.target_physics_dim_ref=qperp,
+# physics_scales.qperp_logs); inputs, encoder, steps, HPs and seed as DlessInOrd
+[ "$ARM" = DlessInOrdQ ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                   ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
@@ -69,13 +74,13 @@ case "$SET" in
     # DlessInOrd needs alpha_s on every probe with q > 0: d4_gdx_dxzh_g's could not be recovered, so its regeneration
     # d4r_gdx_dxzh_g stands in (catalog_2to4r_processes.yaml), from a recipe dir of its own
     2to4)     R="$SCRATCH/zz_catalog_2to4_recipes"; HELD=recipes/catalog_2to4_heldout.yaml; PFX=d4_
-              [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
+              [[ "$ARM" == DlessInOrd* ]] && { R="$SCRATCH/zz_catalog_2to4_orders_recipes"; HELD=recipes/catalog_2to4_heldout_orders.yaml; PFX=d4; } ;;
     loop)     R="$SCRATCH/zz_catalog_loop_recipes"; HELD=recipes/catalog_loop_probes.yaml; PFX=""; WINDOWS=1 ;;
     # loopsigned: the sign-changing one-loop pools, scored on the magnitude log|M| (zero_shot_parent.py --signed-magnitude)
     loopsigned) R="$SCRATCH/zz_catalog_loopsigned_recipes"; HELD=recipes/catalog_loop_signed.yaml; PFX=""; WINDOWS=1; SIGNED=1 ;;
     top)      R="$SCRATCH/zz_catalog_top_recipes"; HELD=recipes/catalog_daniel_top.yaml; PFX=dc_ ;;
     2to4c30)  R="$SCRATCH/zz_catalog_2to4c30_recipes"; HELD=recipes/catalog_2to4c30_heldout.yaml; PFX=d4c30_
-              [ "$ARM" = DlessInOrd ] && { R="$SCRATCH/zz_catalog_2to4c30_orders_recipes"; HELD=recipes/catalog_2to4c30_heldout_orders.yaml; PFX=d4c30; } ;;
+              [[ "$ARM" == DlessInOrd* ]] && { R="$SCRATCH/zz_catalog_2to4c30_orders_recipes"; HELD=recipes/catalog_2to4c30_heldout_orders.yaml; PFX=d4c30; } ;;
     2to4E100) R="$SCRATCH/zz_catalog_2to4E100_recipes"; HELD=recipes/catalog_2to4E100_heldout.yaml; PFX=dE100_ ;;
     2to4E100p) R="$SCRATCH/zz_catalog_2to4E100p_recipes"; HELD=recipes/catalog_2to4E100p_heldout.yaml; PFX=d4E100_ ;;
     *) echo "unknown probe set $SET"; exit 1 ;;

@@ -2256,6 +2256,12 @@ class AmplitudeExperiment(BaseExperiment):
             g = np.einsum("npc,nqc->npq", pp * np.array([1.0, -1.0, -1.0, -1.0]), pp)        # Minkowski p_i.p_j
             iu = np.triu_indices(pp.shape[1], 1)
             lref = np.log(np.clip(2.0 * np.abs(g[:, iu[0], iu[1]]), 1e-12, None)).mean(axis=1)
+        elif str(ref) == "qperp":
+            # the event's emission history (2026-10-23, D99; physics_scales.qperp_logs): each particle beyond a 2->2
+            # core carries its own Lorentz-invariant emission scale q^2 instead of s_hat, so the ~s_hat/q^2 an extra
+            # soft or collinear particle adds is divided out and a 2->4 level stays inside the range the 2->3 trained
+            # on; every particle type alike. Handled apart below: it is a sum over steps, not N - 4 times one scale
+            lref = None
         else:
             # a fixed reference scale (GeV^2) instead of the event's s_hat: a change of units, e.g. 1e6 = |M|^2 in TeV
             # (2026-10-22, the extrapolation round: B in TeV against B in GeV)
@@ -2288,6 +2294,11 @@ class AmplitudeExperiment(BaseExperiment):
         n_eik, leik = 0, 0.0
         if bool(self.cfg.data.get("target_physics_eikonal", False)):
             n_eik, leik = self._eikonal_logS(name, mom_phys)
+        if lref is None:
+            from physics_scales import qperp_logs
+            assert n_eik == 0, "target_physics_dim_ref=qperp: the eikonal factor would count the emissions twice"
+            ldim = qperp_logs(mom_phys) - (mom_phys.shape[1] - 4) * self._phys_ls0
+            return ldim - (lord + self._phys_logc[name])
         # the eikonal factors carry mass dimension -2 each, so the dimension factor's power grows by one per factor
         return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name])
 
