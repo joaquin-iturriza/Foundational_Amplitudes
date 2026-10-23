@@ -6,6 +6,7 @@ covariance of
     Lp     the mean over pairs of external particles of log 2 p_i.p_j       (Lambda^2 = the pair scale)
     Lk     the sum over the N - 4 extra particles of the log of their k_T clustering scale (below), log s_hat for the
            steps with nothing left to cluster, (N - 4) log s_hat for N <= 4    (Lambda^2 = the clustering history)
+    Lkg    the same clustering gluons and photons only
 so any target y + a.(Ls, Lp, Lk) + const has its per-process mean and variance at home (norm_targets.py).
 The clustering: the massless coloured particles and photons of the final state (|PDG| <= 5, 21, 22), the inclusive k_T
 measure with R = 1: d_iB = p_T,i^2, d_ij = min(p_T,i^2, p_T,j^2) Delta R_ij^2; at each of the N - 4 steps the smallest d
@@ -43,14 +44,15 @@ def pt2_y_phi(p):
     return pt2, y, np.arctan2(p[..., 2], p[..., 1])
 
 
-def cluster_logs(P, pdg, Ls):
-    """sum of log scales of the N - 4 clustering steps, per event"""
+def cluster_logs(P, pdg, Ls, cluster=None):
+    """sum of log scales of the N - 4 clustering steps, per event (cluster: the PDG codes that can be clustered)"""
+    cluster = CLUSTER if cluster is None else cluster
     n, N, _ = P.shape
     m = N - 4
     if m <= 0:
         return m * Ls
     P = P[:, 2:].copy()
-    alive = np.broadcast_to(np.array([abs(int(c)) in CLUSTER for c in pdg[2:]]), (n, N - 2)).copy()
+    alive = np.broadcast_to(np.array([abs(int(c)) in cluster for c in pdg[2:]]), (n, N - 2)).copy()
     out = np.zeros(n)
     for _ in range(m):
         pt2, y, ph = pt2_y_phi(P)
@@ -91,7 +93,8 @@ def one(args):
     iu = np.triu_indices(N, 1)
     Lp = np.log(np.clip(2 * np.abs(G[:, iu[0], iu[1]]), 1e-12, None)).mean(1)
     Lk = cluster_logs(P, pdg, Ls)
-    V = np.stack([np.log(amp), Ls, Lp, Lk], 1)
+    Lkg = cluster_logs(P, pdg, Ls, {21, 22})          # gluons and photons only: a quark of the core is not an emission
+    V = np.stack([np.log(amp), Ls, Lp, Lk, Lkg], 1)
     return setname, key, {"N": int(N), "pdg": [int(c) for c in pdg], "n": int(len(V)), "file": os.path.basename(f),
                            "mean": V.mean(0).tolist(), "cov": np.cov(V.T).tolist()}
 
