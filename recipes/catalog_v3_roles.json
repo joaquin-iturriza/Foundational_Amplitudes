@@ -5517,35 +5517,11 @@
 }
 },
 "loops": {
-"v3_bb_abb_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bb_abb"
-},
 "v3_bb_bb_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_bb_bb"
-},
-"v3_bb_bbg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bb_bbg"
-},
-"v3_bb_bbh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bb_bbh"
-},
-"v3_bb_bbz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bb_bbz"
 },
 "v3_bbx_aa_nlo": {
 "role": "train",
@@ -5553,35 +5529,317 @@
 "why": "",
 "tree": "v3_bbx_aa"
 },
-"v3_bbx_aaa_nlo": {
+"v3_bbx_ag_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_bbx_aaa"
+"tree": "v3_bbx_ag"
+},
+"v3_bbx_ah_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_ah"
+},
+"v3_bbx_az_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_az"
+},
+"v3_bbx_bbx_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a held-out tree",
+"tree": "v3_bbx_bbx"
+},
+"v3_bbx_ccx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_ccx"
+},
+"v3_bbx_epem_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_epem"
+},
+"v3_bbx_gg_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_gg"
+},
+"v3_bbx_gh_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_gh"
+},
+"v3_bbx_gz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_gz"
+},
+"v3_bbx_hh_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_hh"
+},
+"v3_bbx_hz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_hz"
+},
+"v3_bbx_taptam_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_taptam"
+},
+"v3_bbx_vevex_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_vevex"
+},
+"v3_bbx_wpwm_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_wpwm"
+},
+"v3_bbx_zz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bbx_zz"
+},
+"v3_bg_ab_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bg_ab"
+},
+"v3_bg_bg_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bg_bg"
+},
+"v3_bg_bh_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bg_bh"
+},
+"v3_bg_bz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bg_bz"
+},
+"v3_db_bd_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_db_bd"
+},
+"v3_dd_dd_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_dd_dd"
+},
+"v3_ddx_aa_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_ddx_aa"
+},
+"v3_ddx_ag_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_ag"
+},
+"v3_ddx_bbx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_bbx"
+},
+"v3_ddx_ccx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_ccx"
+},
+"v3_ddx_ddx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_ddx"
+},
+"v3_ddx_epem_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_epem"
+},
+"v3_ddx_gg_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_gg"
+},
+"v3_ddx_hz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_ddx_hz"
+},
+"v3_ddx_wpwm_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_ddx_wpwm"
+},
+"v3_dg_ad_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_dg_ad"
+},
+"v3_dg_dg_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_dg_dg"
+},
+"v3_dg_dz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_dg_dz"
+},
+"v3_dg_uwm_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_dg_uwm"
+},
+"v3_ds_ds_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_ds_ds"
+},
+"v3_dsx_cxu_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_dsx_cxu"
+},
+"v3_epem_bbx_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_epem_bbx"
+},
+"v3_epem_ccx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_epem_ccx"
+},
+"v3_gg_bbx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_gg_bbx"
+},
+"v3_gg_gg_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_gg_gg"
+},
+"v3_udx_awp_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_awp"
+},
+"v3_udx_csx_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_csx"
+},
+"v3_udx_gwp_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_gwp"
+},
+"v3_udx_hwp_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_hwp"
+},
+"v3_udx_tapvt_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_tapvt"
+},
+"v3_udx_wpz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_udx_wpz"
+},
+"v3_us_cd_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_us_cd"
+},
+"v3_uux_taptam_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_uux_taptam"
+},
+"v3_uux_vevex_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a held-out tree",
+"tree": "v3_uux_vevex"
+},
+"v3_uux_wpwm_nlo": {
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
+"tree": "v3_uux_wpwm"
+},
+"v3_bb_bbz_nlo": {
+"role": "train",
+"axis": null,
+"why": "",
+"tree": "v3_bb_bbz"
 },
 "v3_bbx_aag_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bbx_aag"
-},
-"v3_bbx_aah_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_aah"
-},
-"v3_bbx_aaz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_aaz"
-},
-"v3_bbx_abbx_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_bbx_abbx"
 },
 "v3_bbx_accx_nlo": {
 "role": "train",
@@ -5590,34 +5848,10 @@
 "tree": "v3_bbx_accx"
 },
 "v3_bbx_addx_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_bbx_addx"
-},
-"v3_bbx_aepem_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_aepem"
-},
-"v3_bbx_ag_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_ag"
-},
-"v3_bbx_agg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_agg"
-},
-"v3_bbx_agh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_agh"
 },
 "v3_bbx_agz_nlo": {
 "role": "train",
@@ -5625,23 +5859,11 @@
 "why": "",
 "tree": "v3_bbx_agz"
 },
-"v3_bbx_ah_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ah"
-},
 "v3_bbx_ahh_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_ahh"
-},
-"v3_bbx_ahz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_bbx_ahz"
+"tree": "v3_bbx_ahh"
 },
 "v3_bbx_ataptam_nlo": {
 "role": "heldout",
@@ -5655,89 +5877,17 @@
 "why": "",
 "tree": "v3_bbx_avevex"
 },
-"v3_bbx_awpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_awpwm"
-},
-"v3_bbx_az_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_az"
-},
-"v3_bbx_azz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_azz"
-},
-"v3_bbx_bbx_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_bbx_bbx"
-},
-"v3_bbx_bbxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_bbxg"
-},
-"v3_bbx_bbxh_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_bbx_bbxh"
-},
 "v3_bbx_bbxz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bbx_bbxz"
 },
-"v3_bbx_ccx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ccx"
-},
-"v3_bbx_ccxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ccxg"
-},
 "v3_bbx_ccxh_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bbx_ccxh"
-},
-"v3_bbx_ccxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ccxz"
-},
-"v3_bbx_csxwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_csxwm"
-},
-"v3_bbx_ddxz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_ddxz"
-},
-"v3_bbx_epem_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_epem"
 },
 "v3_bbx_epemg_nlo": {
 "role": "train",
@@ -5752,64 +5902,16 @@
 "tree": "v3_bbx_epemh"
 },
 "v3_bbx_epemz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_bbx_epemz"
 },
-"v3_bbx_epvewm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_epvewm"
-},
-"v3_bbx_gg_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_gg"
-},
-"v3_bbx_ggg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ggg"
-},
-"v3_bbx_ggh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ggh"
-},
 "v3_bbx_ggz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_bbx_ggz"
-},
-"v3_bbx_gh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_gh"
-},
-"v3_bbx_ghh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ghh"
-},
-"v3_bbx_ghz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_ghz"
-},
-"v3_bbx_gtaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_gtaptam"
 },
 "v3_bbx_gvevex_nlo": {
 "role": "train",
@@ -5818,28 +5920,16 @@
 "tree": "v3_bbx_gvevex"
 },
 "v3_bbx_gwpwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_gwpwm"
-},
-"v3_bbx_gz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_bbx_gz"
+"tree": "v3_bbx_gwpwm"
 },
 "v3_bbx_gzz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bbx_gzz"
-},
-"v3_bbx_hh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_hh"
 },
 "v3_bbx_hhh_nlo": {
 "role": "train",
@@ -5848,9 +5938,9 @@
 "tree": "v3_bbx_hhh"
 },
 "v3_bbx_hhz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_bbx_hhz"
 },
 "v3_bbx_htaptam_nlo": {
@@ -5859,23 +5949,11 @@
 "why": "",
 "tree": "v3_bbx_htaptam"
 },
-"v3_bbx_hvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_hvevex"
-},
 "v3_bbx_hwpwm_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bbx_hwpwm"
-},
-"v3_bbx_hz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_hz"
 },
 "v3_bbx_hzz_nlo": {
 "role": "heldout",
@@ -5883,76 +5961,28 @@
 "why": "one-loop of a held-out tree",
 "tree": "v3_bbx_hzz"
 },
-"v3_bbx_taptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_taptam"
-},
-"v3_bbx_taptamz_nlo": {
+"v3_bbx_tapvtwm_nlo": {
 "role": "heldout",
 "axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_bbx_taptamz"
-},
-"v3_bbx_tapvtwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"why": "one-loop of a training tree",
 "tree": "v3_bbx_tapvtwm"
 },
-"v3_bbx_vevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_vevex"
-},
-"v3_bbx_vevexz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bbx_vevexz"
-},
-"v3_bbx_wpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bbx_wpwm"
-},
 "v3_bbx_wpwmz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_bbx_wpwmz"
 },
-"v3_bbx_zz_nlo": {
+"v3_bbx_zzz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_bbx_zz"
+"tree": "v3_bbx_zzz"
 },
-"v3_bbx_zzz_nlo": {
+"v3_bg_abg_nlo": {
 "role": "heldout",
 "axis": "H5",
 "why": "one-loop of a training tree",
-"tree": "v3_bbx_zzz"
-},
-"v3_bg_aab_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_aab"
-},
-"v3_bg_ab_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_ab"
-},
-"v3_bg_abg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
 "tree": "v3_bg_abg"
 },
 "v3_bg_abh_nlo": {
@@ -5973,23 +6003,11 @@
 "why": "",
 "tree": "v3_bg_bbbx"
 },
-"v3_bg_bccx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bccx"
-},
 "v3_bg_bepem_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bg_bepem"
-},
-"v3_bg_bg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bg"
 },
 "v3_bg_bgg_nlo": {
 "role": "train",
@@ -5997,47 +6015,17 @@
 "why": "",
 "tree": "v3_bg_bgg"
 },
-"v3_bg_bgh_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_bg_bgh"
-},
 "v3_bg_bgz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_bg_bgz"
 },
-"v3_bg_bh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bh"
-},
 "v3_bg_bhh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_bg_bhh"
-},
-"v3_bg_bhz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bhz"
-},
-"v3_bg_btaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_btaptam"
-},
-"v3_bg_bvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bvevex"
 },
 "v3_bg_bwpwm_nlo": {
 "role": "train",
@@ -6045,113 +6033,23 @@
 "why": "",
 "tree": "v3_bg_bwpwm"
 },
-"v3_bg_bz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_bg_bz"
-},
-"v3_bg_bzz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_bg_bzz"
-},
 "v3_db_abd_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_db_abd"
 },
-"v3_db_bd_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_db_bd"
-},
-"v3_db_bdg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_db_bdg"
-},
-"v3_db_bdh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_db_bdh"
-},
 "v3_db_bdz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_db_bdz"
 },
-"v3_db_buwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_db_buwm"
-},
-"v3_dbx_abxd_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dbx_abxd"
-},
-"v3_dbx_bxdg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dbx_bxdg"
-},
-"v3_dbx_bxdz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dbx_bxdz"
-},
-"v3_dd_add_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dd_add"
-},
-"v3_dd_dd_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dd_dd"
-},
-"v3_dd_ddg_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dd_ddg"
-},
-"v3_dd_ddh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dd_ddh"
-},
 "v3_dd_ddz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dd_ddz"
-},
-"v3_dd_duwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dd_duwm"
-},
-"v3_ddx_aa_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_ddx_aa"
+"tree": "v3_dd_ddz"
 },
 "v3_ddx_aaa_nlo": {
 "role": "heldout",
@@ -6159,173 +6057,29 @@
 "why": "one-loop of a held-out tree",
 "tree": "v3_ddx_aaa"
 },
-"v3_ddx_aag_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_ddx_aag"
-},
-"v3_ddx_abbx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_abbx"
-},
 "v3_ddx_accx_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_ddx_accx"
 },
-"v3_ddx_addx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_addx"
-},
-"v3_ddx_ag_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ag"
-},
-"v3_ddx_agg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_agg"
-},
-"v3_ddx_ahz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ahz"
-},
-"v3_ddx_ataptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ataptam"
-},
-"v3_ddx_avevex_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_ddx_avevex"
-},
-"v3_ddx_awpwm_nlo": {
+"v3_ddx_bbxh_nlo": {
 "role": "heldout",
 "axis": "H5",
 "why": "one-loop of a training tree",
-"tree": "v3_ddx_awpwm"
-},
-"v3_ddx_bbx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_bbx"
-},
-"v3_ddx_bbxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_bbxg"
-},
-"v3_ddx_bbxh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
 "tree": "v3_ddx_bbxh"
 },
-"v3_ddx_bbxz_nlo": {
+"v3_ddx_ccxh_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_ddx_bbxz"
-},
-"v3_ddx_ccx_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_ddx_ccx"
-},
-"v3_ddx_ccxh_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
 "tree": "v3_ddx_ccxh"
 },
-"v3_ddx_ddx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ddx"
-},
-"v3_ddx_ddxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ddxg"
-},
-"v3_ddx_ddxh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ddxh"
-},
-"v3_ddx_ddxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ddxz"
-},
-"v3_ddx_duxwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_duxwp"
-},
-"v3_ddx_epem_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_epem"
-},
-"v3_ddx_epemh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_epemh"
-},
-"v3_ddx_epvewm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_epvewm"
-},
-"v3_ddx_gg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_gg"
-},
-"v3_ddx_ggg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_ggg"
-},
 "v3_ddx_ghz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_ddx_ghz"
-},
-"v3_ddx_gtaptam_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_ddx_gtaptam"
+"tree": "v3_ddx_ghz"
 },
 "v3_ddx_gvevex_nlo": {
 "role": "train",
@@ -6333,95 +6087,17 @@
 "why": "",
 "tree": "v3_ddx_gvevex"
 },
-"v3_ddx_gwpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_gwpwm"
-},
 "v3_ddx_hhz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_ddx_hhz"
 },
-"v3_ddx_hssx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_hssx"
-},
-"v3_ddx_htaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_htaptam"
-},
 "v3_ddx_huux_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_ddx_huux"
-},
-"v3_ddx_hvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_hvevex"
-},
-"v3_ddx_hwpwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_ddx_hwpwm"
-},
-"v3_ddx_hz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_hz"
-},
-"v3_ddx_tapvtwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_tapvtwm"
-},
-"v3_ddx_wpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_wpwm"
-},
-"v3_ddx_wpwmz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ddx_wpwmz"
-},
-"v3_dg_aad_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dg_aad"
-},
-"v3_dg_ad_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_ad"
-},
-"v3_dg_adg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_adg"
-},
-"v3_dg_adz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_adz"
 },
 "v3_dg_auwm_nlo": {
 "role": "train",
@@ -6441,40 +6117,16 @@
 "why": "",
 "tree": "v3_dg_ccxd"
 },
-"v3_dg_cxsu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_cxsu"
-},
 "v3_dg_dddx_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_dg_dddx"
 },
-"v3_dg_depem_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_depem"
-},
-"v3_dg_dg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dg"
-},
-"v3_dg_dgg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dgg"
-},
 "v3_dg_dgz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_dg_dgz"
 },
 "v3_dg_dhz_nlo": {
@@ -6482,72 +6134,6 @@
 "axis": null,
 "why": "",
 "tree": "v3_dg_dhz"
-},
-"v3_dg_dtaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dtaptam"
-},
-"v3_dg_dvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dvevex"
-},
-"v3_dg_dwpwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dg_dwpwm"
-},
-"v3_dg_dz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dz"
-},
-"v3_dg_dzz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_dzz"
-},
-"v3_dg_emuvex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_emuvex"
-},
-"v3_dg_guwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_guwm"
-},
-"v3_dg_huwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_huwm"
-},
-"v3_dg_tamuvtx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_tamuvtx"
-},
-"v3_dg_uwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dg_uwm"
-},
-"v3_dg_uwmz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_dg_uwmz"
 },
 "v3_ds_ads_nlo": {
 "role": "train",
@@ -6561,59 +6147,11 @@
 "why": "",
 "tree": "v3_ds_cdwm"
 },
-"v3_ds_dgs_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ds_dgs"
-},
-"v3_ds_dhs_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ds_dhs"
-},
-"v3_ds_ds_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ds_ds"
-},
-"v3_ds_dsz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ds_dsz"
-},
 "v3_dsx_acxu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_dsx_acxu"
-},
-"v3_dsx_adsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dsx_adsx"
-},
-"v3_dsx_cxgu_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dsx_cxgu"
-},
-"v3_dsx_cxhu_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_dsx_cxhu"
-},
-"v3_dsx_cxu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dsx_cxu"
 },
 "v3_dsx_cxuz_nlo": {
 "role": "train",
@@ -6621,77 +6159,23 @@
 "why": "",
 "tree": "v3_dsx_cxuz"
 },
-"v3_dsx_dgsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dsx_dgsx"
-},
-"v3_dsx_dhsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_dsx_dhsx"
-},
 "v3_dsx_dsxz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_dsx_dsxz"
 },
-"v3_epem_abbx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_abbx"
-},
-"v3_epem_accx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_accx"
-},
-"v3_epem_addx_nlo": {
+"v3_epem_bbxg_nlo": {
 "role": "heldout",
 "axis": "H5",
 "why": "one-loop of a training tree",
-"tree": "v3_epem_addx"
-},
-"v3_epem_bbx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_bbx"
-},
-"v3_epem_bbxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
 "tree": "v3_epem_bbxg"
-},
-"v3_epem_bbxh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_bbxh"
 },
 "v3_epem_bbxz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_epem_bbxz"
-},
-"v3_epem_ccx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_ccx"
-},
-"v3_epem_ccxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_epem_ccxg"
 },
 "v3_epem_ccxh_nlo": {
 "role": "train",
@@ -6706,22 +6190,10 @@
 "tree": "v3_epem_ccxz"
 },
 "v3_epem_csxwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_epem_csxwm"
-},
-"v3_epem_ddxg_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_epem_ddxg"
-},
-"v3_epem_ddxz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_epem_ddxz"
 },
 "v3_gg_abbx_nlo": {
 "role": "train",
@@ -6729,59 +6201,11 @@
 "why": "",
 "tree": "v3_gg_abbx"
 },
-"v3_gg_accx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_accx"
-},
-"v3_gg_bbx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_bbx"
-},
-"v3_gg_bbxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_bbxg"
-},
-"v3_gg_bbxh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_bbxh"
-},
 "v3_gg_bbxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_bbxz"
-},
-"v3_gg_ccxg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_ccxg"
-},
-"v3_gg_ccxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_ccxz"
-},
-"v3_gg_csxwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_gg_csxwm"
-},
-"v3_gg_gg_nlo": {
 "role": "heldout",
 "axis": "H5",
 "why": "one-loop of a training tree",
-"tree": "v3_gg_gg"
+"tree": "v3_gg_bbxz"
 },
 "v3_gg_ggg_nlo": {
 "role": "train",
@@ -6789,47 +6213,17 @@
 "why": "",
 "tree": "v3_gg_ggg"
 },
-"v3_ub_abu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ub_abu"
-},
 "v3_ub_buz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_ub_buz"
 },
-"v3_ubx_abxu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ubx_abxu"
-},
-"v3_ubx_bxuz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ubx_bxuz"
-},
-"v3_uc_chu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uc_chu"
-},
 "v3_uc_cuz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_uc_cuz"
-},
-"v3_ucx_adsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ucx_adsx"
 },
 "v3_ucx_cxhu_nlo": {
 "role": "train",
@@ -6843,35 +6237,11 @@
 "why": "",
 "tree": "v3_ucx_cxuz"
 },
-"v3_ucx_dsxz_nlo": {
+"v3_ud_adu_nlo": {
 "role": "heldout",
 "axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_ucx_dsxz"
-},
-"v3_ud_adu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"why": "one-loop of a training tree",
 "tree": "v3_ud_adu"
-},
-"v3_ud_ddwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ud_ddwp"
-},
-"v3_ud_dhu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ud_dhu"
-},
-"v3_ud_duz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ud_duz"
 },
 "v3_udx_aawp_nlo": {
 "role": "train",
@@ -6879,23 +6249,11 @@
 "why": "",
 "tree": "v3_udx_aawp"
 },
-"v3_udx_acsx_nlo": {
+"v3_udx_adxu_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_udx_acsx"
-},
-"v3_udx_adxu_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
 "tree": "v3_udx_adxu"
-},
-"v3_udx_aepve_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_udx_aepve"
 },
 "v3_udx_agwp_nlo": {
 "role": "train",
@@ -6903,70 +6261,22 @@
 "why": "",
 "tree": "v3_udx_agwp"
 },
-"v3_udx_ahwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_ahwp"
-},
-"v3_udx_atapvt_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_atapvt"
-},
-"v3_udx_awp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_awp"
-},
-"v3_udx_awpz_nlo": {
+"v3_udx_ccxwp_nlo": {
 "role": "heldout",
 "axis": "H5",
 "why": "one-loop of a training tree",
-"tree": "v3_udx_awpz"
-},
-"v3_udx_bbxwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_bbxwp"
-},
-"v3_udx_ccxwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
 "tree": "v3_udx_ccxwp"
 },
-"v3_udx_cgsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_cgsx"
-},
 "v3_udx_chsx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_udx_chsx"
 },
-"v3_udx_csx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_csx"
-},
-"v3_udx_csxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_csxz"
-},
 "v3_udx_ddxwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
+"role": "heldout",
+"axis": "H5",
+"why": "one-loop of a training tree",
 "tree": "v3_udx_ddxwp"
 },
 "v3_udx_dxhu_nlo": {
@@ -6981,35 +6291,11 @@
 "why": "",
 "tree": "v3_udx_dxuz"
 },
-"v3_udx_epemwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_epemwp"
-},
-"v3_udx_epgve_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_epgve"
-},
-"v3_udx_epvez_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_epvez"
-},
 "v3_udx_ggwp_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_udx_ggwp"
-},
-"v3_udx_ghwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_ghwp"
 },
 "v3_udx_gtapvt_nlo": {
 "role": "train",
@@ -7017,35 +6303,11 @@
 "why": "",
 "tree": "v3_udx_gtapvt"
 },
-"v3_udx_gwp_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_udx_gwp"
-},
-"v3_udx_gwpz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_gwpz"
-},
-"v3_udx_hhwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_hhwp"
-},
 "v3_udx_htapvt_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_udx_htapvt"
-},
-"v3_udx_hwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_hwp"
 },
 "v3_udx_hwpz_nlo": {
 "role": "train",
@@ -7059,41 +6321,11 @@
 "why": "one-loop of a training tree",
 "tree": "v3_udx_taptamwp"
 },
-"v3_udx_tapvt_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_tapvt"
-},
-"v3_udx_tapvtz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_tapvtz"
-},
-"v3_udx_vevexwp_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_udx_vevexwp"
-},
 "v3_udx_wpwpwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_udx_wpwpwm"
-},
-"v3_udx_wpz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
-"tree": "v3_udx_wpz"
-},
-"v3_udx_wpzz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_udx_wpzz"
+"tree": "v3_udx_wpwpwm"
 },
 "v3_ug_adwp_nlo": {
 "role": "train",
@@ -7101,40 +6333,10 @@
 "why": "",
 "tree": "v3_ug_adwp"
 },
-"v3_ug_dtapvt_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ug_dtapvt"
-},
-"v3_ug_dwpz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ug_dwpz"
-},
-"v3_ug_epemu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ug_epemu"
-},
-"v3_ug_taptamu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ug_taptamu"
-},
-"v3_ug_uvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_ug_uvevex"
-},
 "v3_ug_uwpwm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
+"role": "train",
+"axis": null,
+"why": "",
 "tree": "v3_ug_uwpwm"
 },
 "v3_us_acd_nlo": {
@@ -7143,71 +6345,17 @@
 "why": "",
 "tree": "v3_us_acd"
 },
-"v3_us_cd_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_us_cd"
-},
 "v3_us_cdg_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_us_cdg"
 },
-"v3_us_cdh_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_us_cdh"
-},
-"v3_us_cdz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_us_cdz"
-},
-"v3_us_hsu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_us_hsu"
-},
-"v3_usx_hsxu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_usx_hsxu"
-},
-"v3_uu_huu_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uu_huu"
-},
-"v3_uu_uuz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uu_uuz"
-},
 "v3_uux_abbx_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_uux_abbx"
-},
-"v3_uux_addx_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_addx"
-},
-"v3_uux_aepem_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_aepem"
 },
 "v3_uux_ataptam_nlo": {
 "role": "heldout",
@@ -7227,18 +6375,6 @@
 "why": "",
 "tree": "v3_uux_awpwm"
 },
-"v3_uux_bbxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_bbxz"
-},
-"v3_uux_ccxh_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_uux_ccxh"
-},
 "v3_uux_ccxz_nlo": {
 "role": "train",
 "axis": null,
@@ -7251,47 +6387,11 @@
 "why": "",
 "tree": "v3_uux_ddxz"
 },
-"v3_uux_epemg_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_epemg"
-},
 "v3_uux_epemz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_uux_epemz"
-},
-"v3_uux_epvewm_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_uux_epvewm"
-},
-"v3_uux_gtaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_gtaptam"
-},
-"v3_uux_gvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_gvevex"
-},
-"v3_uux_gwpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_gwpwm"
-},
-"v3_uux_htaptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_htaptam"
 },
 "v3_uux_huux_nlo": {
 "role": "train",
@@ -7299,47 +6399,11 @@
 "why": "",
 "tree": "v3_uux_huux"
 },
-"v3_uux_hvevex_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_hvevex"
-},
-"v3_uux_hwpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_hwpwm"
-},
-"v3_uux_taptam_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_taptam"
-},
-"v3_uux_taptamz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_taptamz"
-},
 "v3_uux_tapvtwm_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_uux_tapvtwm"
-},
-"v3_uux_uuxz_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_uuxz"
-},
-"v3_uux_vevex_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a held-out tree",
-"tree": "v3_uux_vevex"
 },
 "v3_uux_vevexz_nlo": {
 "role": "train",
@@ -7347,284 +6411,130 @@
 "why": "",
 "tree": "v3_uux_vevexz"
 },
-"v3_uux_wpwm_nlo": {
-"role": "train",
-"axis": null,
-"why": "",
-"tree": "v3_uux_wpwm"
-},
 "v3_uux_wpwmz_nlo": {
 "role": "train",
 "axis": null,
 "why": "",
 "tree": "v3_uux_wpwmz"
-},
-"v3_uux_zzz_nlo": {
-"role": "heldout",
-"axis": "H5",
-"why": "one-loop of a training tree",
-"tree": "v3_uux_zzz"
 }
 },
 "twin_out": [
-"v3_bb_abbh",
-"v3_bb_bbgh",
-"v3_bb_bbh",
-"v3_bbx_aaah",
-"v3_bbx_aagh",
-"v3_bbx_aah",
-"v3_bbx_aahh",
-"v3_bbx_aahz",
+"v3_bbx_aataptam",
 "v3_bbx_aawpwm",
-"v3_bbx_abbxh",
-"v3_bbx_accxh",
-"v3_bbx_addxh",
-"v3_bbx_aepemh",
-"v3_bbx_aggh",
-"v3_bbx_agh",
-"v3_bbx_aghh",
-"v3_bbx_aghz",
-"v3_bbx_ah",
-"v3_bbx_ahh",
-"v3_bbx_ahhh",
-"v3_bbx_ahhz",
+"v3_bbx_agtaptam",
 "v3_bbx_ahtaptam",
-"v3_bbx_ahttx",
-"v3_bbx_ahvevex",
-"v3_bbx_ahwpwm",
-"v3_bbx_ahz",
-"v3_bbx_ahzz",
+"v3_bbx_ataptam",
+"v3_bbx_ataptamz",
+"v3_bbx_atapvtwm",
 "v3_bbx_awpwmz",
-"v3_bbx_bbxgh",
-"v3_bbx_bbxh",
-"v3_bbx_ccxgh",
-"v3_bbx_ccxh",
-"v3_bbx_epemgh",
-"v3_bbx_epemh",
-"v3_bbx_gggh",
-"v3_bbx_ggh",
-"v3_bbx_gghh",
-"v3_bbx_gghz",
-"v3_bbx_gh",
-"v3_bbx_ghh",
-"v3_bbx_ghhh",
-"v3_bbx_ghhz",
+"v3_bbx_ggtaptam",
 "v3_bbx_ghtaptam",
-"v3_bbx_ghttx",
-"v3_bbx_ghvevex",
-"v3_bbx_ghwpwm",
-"v3_bbx_ghz",
-"v3_bbx_ghzz",
-"v3_bbx_hh",
-"v3_bbx_hhh",
-"v3_bbx_hhz",
+"v3_bbx_gtaptam",
+"v3_bbx_gtaptamz",
+"v3_bbx_gtapvtwm",
 "v3_bbx_htaptam",
-"v3_bbx_httx",
-"v3_bbx_hvevex",
-"v3_bbx_hwpwm",
-"v3_bbx_hz",
-"v3_bbx_hzz",
-"v3_bg_aabh",
-"v3_bg_abgh",
-"v3_bg_abh",
-"v3_bg_abhh",
-"v3_bg_abhz",
-"v3_bg_ahtwm",
-"v3_bg_bggh",
-"v3_bg_bgh",
-"v3_bg_bghh",
-"v3_bg_bghz",
-"v3_bg_bh",
-"v3_bg_bhh",
-"v3_bg_bhz",
-"v3_bg_ghtwm",
-"v3_bg_htwm",
-"v3_db_abdh",
-"v3_db_bdgh",
-"v3_db_bdh",
-"v3_dbx_abxdh",
-"v3_dbx_ahtxu",
-"v3_dbx_bxdgh",
-"v3_dbx_ghtxu",
-"v3_dbx_htxu",
-"v3_dd_addh",
-"v3_dd_ddgh",
-"v3_dd_ddh",
-"v3_ddx_aahz",
+"v3_bbx_taptam",
+"v3_bbx_taptamz",
+"v3_bbx_tapvtwm",
+"v3_bg_abtaptam",
+"v3_bg_attamvtx",
+"v3_bg_bgtaptam",
+"v3_bg_btaptam",
+"v3_bg_gttamvtx",
+"v3_bg_ttamvtx",
 "v3_ddx_aawpwm",
-"v3_ddx_abbxh",
-"v3_ddx_accxh",
-"v3_ddx_addxh",
-"v3_ddx_aepemh",
-"v3_ddx_aghz",
-"v3_ddx_ahhz",
-"v3_ddx_ahssx",
 "v3_ddx_ahtaptam",
-"v3_ddx_ahuux",
-"v3_ddx_ahvevex",
-"v3_ddx_ahwpwm",
-"v3_ddx_ahz",
-"v3_ddx_ahzz",
+"v3_ddx_ataptam",
+"v3_ddx_ataptamz",
+"v3_ddx_atapvtwm",
 "v3_ddx_awpwmz",
-"v3_ddx_bbxgh",
-"v3_ddx_bbxh",
-"v3_ddx_ccxgh",
-"v3_ddx_ccxh",
-"v3_ddx_ddxgh",
-"v3_ddx_ddxh",
-"v3_ddx_epemgh",
-"v3_ddx_epemh",
-"v3_ddx_gghz",
-"v3_ddx_ghhz",
-"v3_ddx_ghssx",
+"v3_ddx_bbxtaptam",
+"v3_ddx_ddxtaptam",
+"v3_ddx_epemtaptam",
 "v3_ddx_ghtaptam",
-"v3_ddx_ghuux",
-"v3_ddx_ghvevex",
-"v3_ddx_ghwpwm",
-"v3_ddx_ghz",
-"v3_ddx_ghzz",
-"v3_ddx_hhhz",
-"v3_ddx_hhwpwm",
-"v3_ddx_hhz",
-"v3_ddx_hhzz",
-"v3_ddx_hssx",
+"v3_ddx_gtaptam",
+"v3_ddx_gtapvtwm",
 "v3_ddx_htaptam",
-"v3_ddx_huux",
-"v3_ddx_hvevex",
-"v3_ddx_hwpwm",
-"v3_ddx_hwpwmz",
-"v3_ddx_hz",
+"v3_ddx_taptamuux",
+"v3_ddx_taptamvevex",
+"v3_ddx_taptaptamtam",
+"v3_ddx_tapvtwm",
+"v3_ddx_ttaptamtx",
 "v3_ddx_wpwmzz",
 "v3_ddx_wpwpwmwm",
-"v3_dg_adhz",
-"v3_dg_ahuwm",
-"v3_dg_dghz",
-"v3_dg_dhz",
-"v3_dg_ghuwm",
-"v3_dg_huwm",
-"v3_ds_adhs",
-"v3_ds_dghs",
-"v3_ds_dhs",
-"v3_dsx_acxhu",
-"v3_dsx_adhsx",
-"v3_dsx_cxghu",
-"v3_dsx_cxhu",
-"v3_dsx_dghsx",
-"v3_dsx_dhsx",
+"v3_dg_adtaptam",
+"v3_dg_atamuvtx",
+"v3_dg_dgtaptam",
+"v3_dg_dtaptam",
+"v3_dg_gtamuvtx",
+"v3_dg_tamuvtx",
+"v3_epem_aataptam",
 "v3_epem_aawpwm",
-"v3_epem_abbxh",
-"v3_epem_accxh",
-"v3_epem_addxh",
-"v3_epem_aepemh",
-"v3_epem_ahmupmum",
 "v3_epem_ahtaptam",
-"v3_epem_ahttx",
-"v3_epem_ahvevex",
-"v3_epem_ahvmvmx",
-"v3_epem_ahwpwm",
+"v3_epem_ataptam",
+"v3_epem_ataptamz",
+"v3_epem_atapvtwm",
 "v3_epem_awpwmz",
-"v3_epem_bbxgh",
-"v3_epem_bbxh",
-"v3_epem_ccxgh",
-"v3_epem_ccxh",
-"v3_epem_ddxgh",
-"v3_epem_epemh",
-"v3_epem_ghttx",
-"v3_epem_hhwpwm",
-"v3_epem_hmupmum",
+"v3_epem_bbxtaptam",
+"v3_epem_ddxtaptam",
+"v3_epem_epemtaptam",
 "v3_epem_htaptam",
-"v3_epem_httx",
-"v3_epem_hvevex",
-"v3_epem_hwpwm",
-"v3_epem_hwpwmz",
+"v3_epem_mupmumtaptam",
+"v3_epem_taptam",
+"v3_epem_taptamuux",
+"v3_epem_taptamvevex",
+"v3_epem_taptamz",
+"v3_epem_taptaptamtam",
+"v3_epem_tapvtwm",
+"v3_epem_ttaptamtx",
 "v3_epem_wpwmzz",
 "v3_epem_wpwpwmwm",
-"v3_gg_abbxh",
-"v3_gg_ahttx",
-"v3_gg_bbxgh",
-"v3_gg_bbxh",
-"v3_gg_ghttx",
-"v3_gg_httx",
-"v3_ub_abhu",
-"v3_ub_adht",
-"v3_ub_dght",
-"v3_ub_dht",
-"v3_ubx_abxhu",
-"v3_uc_achu",
-"v3_uc_cghu",
-"v3_uc_chu",
-"v3_ucx_acxhu",
-"v3_ucx_adhsx",
-"v3_ucx_cxghu",
-"v3_ucx_cxhu",
-"v3_ud_adhu",
-"v3_ud_dghu",
-"v3_ud_dhu",
-"v3_udx_aahwp",
-"v3_udx_abxht",
-"v3_udx_achsx",
-"v3_udx_adxhu",
-"v3_udx_aephve",
-"v3_udx_aghwp",
-"v3_udx_ahhwp",
+"v3_udx_aatapvt",
+"v3_udx_agtapvt",
 "v3_udx_ahtapvt",
-"v3_udx_ahwp",
-"v3_udx_ahwpz",
+"v3_udx_ataptamwp",
+"v3_udx_atapvt",
+"v3_udx_atapvtz",
 "v3_udx_awpwpwm",
-"v3_udx_bxght",
-"v3_udx_bxht",
-"v3_udx_cghsx",
-"v3_udx_chsx",
-"v3_udx_dxghu",
-"v3_udx_dxhu",
-"v3_udx_epghve",
-"v3_udx_gghwp",
-"v3_udx_ghhwp",
+"v3_udx_ggtapvt",
 "v3_udx_ghtapvt",
-"v3_udx_ghwp",
-"v3_udx_ghwpz",
-"v3_udx_hhwp",
+"v3_udx_gtaptamwp",
+"v3_udx_gtapvt",
+"v3_udx_gtapvtz",
 "v3_udx_htapvt",
-"v3_udx_hwp",
-"v3_udx_hwpz",
-"v3_ug_adhwp",
-"v3_us_acdh",
-"v3_us_ahsu",
-"v3_us_cdgh",
-"v3_us_cdh",
-"v3_us_ghsu",
-"v3_us_hsu",
-"v3_usx_ahsxu",
-"v3_usx_ghsxu",
-"v3_usx_hsxu",
-"v3_uu_ahuu",
-"v3_uu_ghuu",
-"v3_uu_huu",
+"v3_udx_taptamwp",
+"v3_udx_tapvt",
+"v3_udx_tapvtz",
+"v3_ug_adtapvt",
+"v3_ug_ataptamu",
+"v3_ug_dgtapvt",
+"v3_ug_dtapvt",
+"v3_ug_gtaptamu",
+"v3_ug_taptamu",
+"v3_uux_aataptam",
 "v3_uux_aawpwm",
-"v3_uux_abbxh",
-"v3_uux_accxh",
-"v3_uux_addxh",
-"v3_uux_aepemh",
-"v3_uux_ahssx",
+"v3_uux_agtaptam",
 "v3_uux_ahtaptam",
-"v3_uux_ahttx",
-"v3_uux_ahuux",
-"v3_uux_ahvevex",
-"v3_uux_ahwpwm",
+"v3_uux_ataptam",
+"v3_uux_ataptamz",
+"v3_uux_atapvtwm",
 "v3_uux_awpwmz",
-"v3_uux_ccxgh",
-"v3_uux_ccxh",
-"v3_uux_epemgh",
+"v3_uux_bbxtaptam",
+"v3_uux_ddxtaptam",
+"v3_uux_epemtaptam",
+"v3_uux_ggtaptam",
 "v3_uux_ghtaptam",
-"v3_uux_ghuux",
-"v3_uux_ghvevex",
-"v3_uux_ghwpwm",
-"v3_uux_hhwpwm",
+"v3_uux_gtaptam",
+"v3_uux_gtaptamz",
+"v3_uux_gtapvtwm",
 "v3_uux_htaptam",
-"v3_uux_huux",
-"v3_uux_hvevex",
-"v3_uux_hwpwm",
-"v3_uux_hwpwmz",
+"v3_uux_taptam",
+"v3_uux_taptamuux",
+"v3_uux_taptamvevex",
+"v3_uux_taptamz",
+"v3_uux_taptaptamtam",
+"v3_uux_tapvtwm",
+"v3_uux_ttaptamtx",
 "v3_uux_wpwmzz",
 "v3_uux_wpwpwmwm"
 ],

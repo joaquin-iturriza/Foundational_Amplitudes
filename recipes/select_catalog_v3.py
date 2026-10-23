@@ -9,12 +9,12 @@ order"), each probe tagged with the structure it needs and its nearest training 
                        have 2->4 children, so their 2->4 level is inside the trained range but their family's 2->4 is
                        new; plus 2->5 probes (generated later, a training 2->4 plus a g or a)
   H3 particle content  the physical top (every class with an external t, mass 172.5) held out; the heavy-quark layer
-                       (the top's quantum numbers at 50, 300, 600 GeV) trains. Never-seen particle: every class with an
-                       external Higgs, held out of the removal twin only
+                       (the top's quantum numbers at 50, 300, 600 GeV, at 2->2, 2->3 and 2->4) trains. Never-seen
+                       particle: every class with an external tau or tau neutrino, held out of the removal twin only
   H4 vertex            the quartic gauge family (four or more external W, Z, a with at least two W), held out of the
                        removal twin only (with H3's Higgs)
-  H5 order             the one-loop virtuals of 15% of the coloured 2->2 / 2->3 families whose trees train; the
-                       one-loop virtuals of H1's coloured trees; one loop-induced class
+  H5 order             a one-loop layer of --n-loops (every coloured 2->2 class, 2->3 ones drawn per beam); 15% of
+                       those whose trees train held out, and those of H1's trees; one loop-induced class
   H6 parameters        alpha_s(M_Z) = 0.13 on the scanned families (trained at 0.09 and 0.15), m_Q = 172.5 = the top (H3)
   H7 energy, cuts      the training classes at 100 TeV and at p_T >= 30 GeV (no class leaves training)
 Writes recipes/catalog_v3_roles.json ({class representative: role, axis, why}) and prints the counts.
@@ -34,6 +34,7 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--h1-frac", type=float, default=0.05)
     ap.add_argument("--family-frac", type=float, default=0.15)
+    ap.add_argument("--n-loops", type=int, default=150, help="size of the one-loop layer")
     a = ap.parse_args()
     rng = random.Random(a.seed)
     P = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")))["processes"]
@@ -51,7 +52,9 @@ def main():
     for n in reps:
         if any(abs(p) == 6 for p in P[n]["pdg_ids"]):
             put(n, "heldout", "H3", "external top (the heavy-quark layer brackets it)")
-    twin_out = [n for n in reps if any(p == 25 for p in fin(n))
+    # the twin's never-seen particle: the tau and its neutrino (the user 2026-10-23: another particle than the Higgs, which
+    # is a quarter of training; the tau is a tenth: a charged lepton with a mass and a Higgs coupling next to massless e, mu)
+    twin_out = [n for n in reps if any(abs(p) in (15, 16) for p in P[n]["pdg_ids"])
                 or (sum(abs(p) in (23, 24, 22) for p in fin(n)) >= 4 and sum(abs(p) == 24 for p in fin(n)) >= 2)]
     # H2: families. The parent of a 2->4 class: its 2->3 key without one g or a
     def parent(n):
@@ -87,12 +90,23 @@ def main():
             put(n, "heldout", "H1", f"new combination in {c}")
     for n in reps:
         put(n, "train", None, "")
-    # H5: loop families
-    col = [n for n in reps if P[n]["layer"] in (2, 3) and any(abs(p) in (1, 2, 3, 4, 5, 21) for p in P[n]["pdg_ids"])]
-    tr_col = sorted(n for n in col if role[n]["role"] == "train")
+    # H5 and the one-loop layer: every coloured 2->2 class (top classes aside, H3) and coloured 2->3 classes drawn per
+    # beam up to --n-loops in all (a 2->3 MadLoop pool costs 100-200 LO units: the layer is sized, not exhaustive);
+    # of those whose tree trains, --family-frac are held out (the LO->NLO map on a seen tree), and the one-loop of every
+    # H1 tree in the layer is held out (a new process at a new order)
+    col = [n for n in reps if P[n]["layer"] in (2, 3) and role[n]["axis"] != "H3"
+           and any(abs(p) in (1, 2, 3, 4, 5, 21) for p in P[n]["pdg_ids"])]
+    two = sorted(n for n in col if P[n]["layer"] == 2)
+    three = defaultdict(list)
+    for n in sorted(n for n in col if P[n]["layer"] == 3):
+        three[beam(n)].append(n)
+    room = max(0, a.n_loops - len(two)); tot3 = sum(len(v) for v in three.values())
+    pick3 = [n for b, ns in sorted(three.items()) for n in rng.sample(ns, min(len(ns), round(room * len(ns) / max(tot3, 1))))]
+    layer = two + sorted(pick3)
+    tr_col = sorted(n for n in layer if role[n]["role"] == "train")
     loop_out = set(rng.sample(tr_col, round(a.family_frac * len(tr_col))))
     loops = {}
-    for n in col:
+    for n in layer:
         if role[n]["role"] == "train":
             loops[n + "_nlo"] = {"role": "heldout" if n in loop_out else "train", "axis": "H5" if n in loop_out else None,
                                  "why": "one-loop of a training tree" if n in loop_out else "", "tree": n}
@@ -106,7 +120,7 @@ def main():
     print("trees by layer and role:", dict(sorted(Counter((P[n]["layer"], v["role"]) for n, v in role.items()).items())))
     print(f"held-out 2->4 families {len(out_fams)} of {len(fams)}")
     print("one-loop candidates:", dict(Counter((v["role"], v["axis"]) for v in loops.values())))
-    print(f"removal twin also drops {len(twin_out)} classes (Higgs, quartic gauge), "
+    print(f"removal twin also drops {len(twin_out)} classes (tau, quartic gauge), "
           f"{sum(role[n]['role'] == 'train' for n in twin_out)} of them training classes")
 
 

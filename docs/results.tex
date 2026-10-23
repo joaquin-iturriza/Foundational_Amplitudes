@@ -6568,14 +6568,13 @@ of the three share a test set.
     and $2\to5$), H3 particle content (the physical top, bracketed by the heavy-quark layer; one particle never seen, in a
     removal twin), H4 a vertex class (the quartic gauge family, in the same twin), H5 order, H6 parameter interpolation, H7
     $100$\,TeV and $p_T\geq30$\,GeV. The regimes are D93's (H2, H7, H3, H5); H1, H4 and H6 are proposed on top.
-    \emph{First draft of the selection} (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}):
-    $801$ tree classes train ($56$, $263$, $482$ at $2\to2$, $2\to3$, $2\to4$); H3 $157$ (every class with an external top,
-    $2\to4$ included); H2 $104$ (the $2\to4$ of $48$ of the $318$ $2\to3$ families, and $15\%$ of the four-fermion and
-    multi-boson finals); H1 $41$; one-loop virtuals $250$ train, $58$ held out (H5). The twin drops $205$ more training
-    classes. \emph{Waiting on the user, before any generation}: the loop layer's size ($308$ MadLoop pools, a $2\to3$ one
-    costing $100$--$200$ LO units; all $2\to2$ and a subset of $2\to3$ halves it); heavy-quark analogues of the top's
-    $2\to4$ classes; the twin's never-seen particle (the Higgs is a quarter of training). Then the cost from the pipeline's
-    cost model and the generation.
+    \emph{The selection} (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}; to be rerun on
+    the extended census, D100): $801$ tree classes train; H3 $157$ (every class with an external top); H2 $104$; H1 $41$.
+    One-loop layer $150$: every coloured $2\to2$ class and $2\to3$ ones drawn per beam (a $2\to3$ MadLoop pool costs
+    $100$--$200$ LO units, so the layer is sized, not exhaustive); $122$ train, $28$ held out (H5). Heavy-quark analogues
+    at $2\to4$ too (D100). The removal twin drops the $\tau$ and $\nu_\tau$ (the user: another particle than the Higgs,
+    which is a quarter of training) and the quartic gauge family: $92$ training classes. Next: the extended census, the
+    selection rerun on it, then the generation cost from the pipeline's cost model.
   \item \textbf{State (2026-10-23, 22:40).} Nothing running; \code{dimless\_kt} complete (par:dimless\_qperp, every set and
     the twin). The review locks: only a pillar's own reviewer may begin or advance (\code{.claude/hooks/lock\_guard.py},
     tested live both ways); a hook script that does not parse is refused or restored (\code{hook\_syntax\_guard.py}).
