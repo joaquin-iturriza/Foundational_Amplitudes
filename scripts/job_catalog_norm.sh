@@ -117,6 +117,10 @@ fi
 # eval_short / eval_extrap: the held-out scoring of a finished short or extrap run, from its sigma stage
 [ "$SMOKE" = eval_short ] && { OUT="$PROJECT_DIR/runs/catalog_norm_short/$ARM"; PRED="$SCRATCH/zz_catalog_norm_short_$ARM"; SMOKE=eval; }
 [ "$SMOKE" = eval_extrap ] && { OUT="$PROJECT_DIR/runs/catalog_norm_extrap/$ARM"; PRED="$SCRATCH/zz_catalog_norm_extrap_$ARM"; SMOKE=eval; }
+# FA_SEED: a rerun at another seed (a run that diverged, 2026-10-23 Dpair), into <OUT>_seed<N> and <PRED>_seed<N>
+if [ -n "${FA_SEED:-}" ]; then
+    OUT="${OUT}_seed$FA_SEED"; PRED="${PRED}_seed$FA_SEED"; EXTRA+=(seed=$FA_SEED)
+fi
 if [ "$SMOKE" = eval ]; then
     ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 elif [ ! -e "$OUT/sigma_stage/models" ]; then
