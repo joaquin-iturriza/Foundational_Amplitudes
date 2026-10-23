@@ -15,8 +15,9 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARMS = {"B": "shared target (Lambda = 1 GeV)", "Adim": "s_hat only, s0 = 289 GeV^2",
         "Dless": "dimensionless (Lambda^2 = s_hat)", "DlessIn": "dimensionless, dimensionless inputs",
-        "Dpair": "dimensionless (Lambda^2 = pairs)"}
-SETS = {"2to4": "pT >= 10 GeV", "2to4c30": "pT >= 30 GeV"}
+        "Dpair": "dimensionless (Lambda^2 = pairs)", "Dpair_seed1": "dimensionless (pairs), seed 1",
+        "DlessInVirt": "dimless inputs + virtuality pooling", "DlessInNoDiag": "dimless inputs, no diagrams"}
+SETS = {"2to4": "pT >= 10 GeV", "2to4c30": "pT >= 30 GeV", "2to4E100p": "2->4 at 100 TeV", "2to4E100": "2->3 at 100 TeV"}
 
 
 def main():
@@ -28,7 +29,9 @@ def main():
                 continue
             z = np.load(f)
             probes = sorted({k.split("__")[0] for k in z.files})
-            for kind, suf in (("gluon", "_g"), ("photon", "_a")):
+            # the 100 TeV parents (2to4E100) are the catalog's own 2->3 training processes: one group
+            kinds = (("parent", ""),) if st == "2to4E100" else (("gluon", "_g"), ("photon", "_a"))
+            for kind, suf in kinds:
                 ps = [p for p in probes if p.endswith(suf)]
                 d = [z[f"{p}__q"].astype(float) - z[f"{p}__t"].astype(float) for p in ps]
                 r = dict(n=len(ps), mse=float(np.median([np.mean(x ** 2) for x in d])),

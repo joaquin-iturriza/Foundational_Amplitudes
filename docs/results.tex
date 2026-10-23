@@ -728,6 +728,59 @@ $3.4$ after the oracle rescale and shift, against $0.14$ for $\hat s$+coupling t
 not the magnitude: a sampling- and unit-agnostic target is necessary for extrapolating in multiplicity but not sufficient,
 and a test from $2\to2$ alone is too far a step to rank targets on shape.
 
+\paragraph{The dimensionless round: one axis at a time (2026-10-23, D90, D92, D93).} The short design runs of D87 (the
+catalog's $2\to2$ and $2\to3$ training processes, $10^4$ events each), read on held-out sets that change one thing a user
+can change: new processes at seen multiplicities (the catalog's $43$), the collider energy alone ($40$ catalog $2\to3$
+training processes regenerated at $100$\,TeV), one more particle ($20$ of those $2\to3$ processes plus a gluon, $20$ plus a
+photon, \code{recipes/gen\_catalog\_2to4.py}, a multiplicity no run saw), the cuts on that particle ($p_T\geq30$ instead of
+$10$\,GeV) and one more particle at $100$\,TeV ($16$ of the $20$ gluon probes: the other four failed generation at that
+energy, four retries each). Arms: the $\hat s$ factor with the fitted $s_0=289$\,GeV$^2$ (D87), the dimensionless target
+with $\Lambda^2=\hat s$ and with $\Lambda^2$ the geometric mean of the event's pair invariants $2p_i\cdot p_j$ (the seed-$42$
+run diverged at step $2505$ on $ud\to ud$, a $2\to2$ process; the table is its seed-$1$ rerun, which did not), and three on
+the dimensionless target with dimensionless inputs ($p/\sqrt{\hat s}$, $\log_{10}(m/\sqrt{\hat s})$): with hp58's diagram
+encoder (arXiv:2606.23791, topology only), with its pooling weighted per event by each diagram's propagator virtualities
+(\code{model.diagram\_encoder\_llm4lhc.virtuality\_pool}), and without diagrams
+(\code{scripts/job\_catalog\_norm.sh}; \code{analysis/catalog\_daniel/catalog\_short\_heldout.py},
+\code{catalog\_2to4\_heldout.py}, \code{dimless\_round.py}, Fig.~\ref{fig:dimless_round}). Median MSE of
+$\log|\mathcal M|^2$ per process, $2\to4$ as $+g$ / $+\gamma$, with the median offset (mean error) in brackets:
+\begin{center}
+\begin{tabular}{lcccc}
+ & $43$ new & $2\to3$ at $100$\,TeV & $2\to4$, $p_T\geq10$\,GeV & $2\to4$ at $100$\,TeV \\ \hline
+$\hat s$ only, $s_0=289$ & $0.65$ & $0.081$ & $4.6$ / $4.0$ ($-0.9$ / $+0.4$) & $4.6$ / $4.8$ \\
+dimensionless, $\Lambda^2=\hat s$ & $0.72$ & $0.104$ & $45$ / $26$ ($-6.5$ / $-4.8$) & $43$ / $28$ \\
+dimensionless, $\Lambda^2$ pairs & $0.77$ & $0.094$ & $15$ / $6.3$ ($-3.6$ / $-2.0$) & $14$ / $6.7$ \\
+dimensionless inputs, encoder & $1.57$ & $0.062$ & $34$ / $17$ ($-5.7$ / $-3.9$) & $33$ / $19$ \\
+\quad with virtuality pooling & $1.15$ & ($0.088$, $14$ of $40$) & $38$ / $25$ ($-6.0$ / $-4.7$) & $35$ / $27$ \\
+\quad without diagrams & $1.67$ & $0.085$ & $37$ / $19$ ($-5.9$ / $-4.1$) & $35$ / $20$ \\
+\end{tabular}
+\end{center}
+The energy is not the problem: every arm reads the $2\to3$ processes at $100$\,TeV with a median MSE of $0.06$ to $0.10$ and offsets of
+at most $0.03$. Nor are the cuts: from $p_T\geq10$ to $30$\,GeV the $2\to4$ offset moves by
+at most $0.6$ in any arm (under $0.3$ in three of the six), small against the offsets themselves. The extra particle is: at $13$ and
+$100$\,TeV alike, every dimensionless arm puts the $2\to4$ processes $2$ to $6.5$ too low, most of its
+error, and the $100$\,TeV probes repeat the $13$\,TeV numbers. Of the unit-free references the event's pair scale is the
+best by a factor $3$ to $4$ (it shrinks with a soft or collinear particle, which $\hat s$ does not), and the result is the
+same on both seeds ($11.5$ / $6.2$ at seed $42$'s best checkpoint). The fitted $s_0$ does better still, with offsets under
+$1$: $\sqrt{s_0}=17$\,GeV is of the order of the catalog's cuts, and the catalog it was fitted on has no $2\to4$ process, so
+here it is an honest extrapolation, but it is a property of one set of cuts that the pair scale gets from the event. Diagrams on
+their own (the encoder against none, same target and inputs) lower the error by $6$ to $30\%$: $1.57$ against $1.67$ on
+the new processes, $0.056$ against $0.080$ on the $96$ relabels, $34$ / $17$ against $37$ / $19$ at $2\to4$. Weighting the pooling
+by virtuality lowers the new processes' error further, to $1.15$, and leaves the relabels as they are ($0.059$), but does
+nothing for the extra particle ($38$ / $25$). It gives the encoder a per-event view of which diagrams dominate, not the
+cost of an emission. The dimensionless inputs cost on the new processes ($1.57$ against $0.72$ with the same target and raw
+inputs) and gain at $2\to4$ ($34$ / $17$ against $45$ / $26$). The coupling-order factor of the target, the other half of the
+D93 design, is not in this table yet (its per-event $\alpha_s$ is being recovered, hand-off).
+
+\begin{figure}[H]
+\centering
+\pnl{../analysis/catalog\_daniel/figs/dimless\_round\_a.pdf}\hfill\pnl{../analysis/catalog\_daniel/figs/dimless\_round\_b.pdf}
+\caption{The short design runs on the held-out sets, median MSE of $\log|\mathcal M|^2$ per process. Left: the catalog's
+$43$ new processes and $40$ of its $2\to3$ training processes at $100$\,TeV (with virtuality pooling only $14$ of the $40$
+are scored so far). Right: the $2\to4$ probes, a training $2\to3$ process plus a gluon (filled) or a photon (open), at
+$13$\,TeV with $p_T\geq10$ and $30$\,GeV and at $100$\,TeV.}
+\label{fig:dimless_round}
+\end{figure}
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
