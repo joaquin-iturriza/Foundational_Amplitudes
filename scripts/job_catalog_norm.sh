@@ -129,7 +129,7 @@ fi
 # FA_HOLDOUT=top: the particle-content test (D93, "every process with ... a top held out of training"): trained without the
 # catalog's 142 processes with a top (recipes/catalog_daniel_train_notop.yaml, 1210 processes; the same steps, HPs and
 # settings), into <OUT>_notop and <PRED>_notop; scored on SET=top (all 162 catalog processes with a top)
-if [ -n "${FA_HOLDOUT:-}" ] && [ "$SMOKE" != short ] && [ "$SMOKE" != eval_short ]; then
+if [ -n "${FA_HOLDOUT:-}" ] && [ "$SMOKE" != short ] && [ "$SMOKE" != eval ]; then
     echo "FA_HOLDOUT is for the short runs and their scoring (mode $SMOKE sets its own processes_file)"; exit 1; fi
 if [ "${FA_HOLDOUT:-}" = top ]; then
     OUT="${OUT}_notop"; PRED="${PRED}_notop"; EXTRA+=(data.processes_file="$PROJECT_DIR/recipes/catalog_daniel_train_notop.yaml")
