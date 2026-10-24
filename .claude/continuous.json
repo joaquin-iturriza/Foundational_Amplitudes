@@ -18,7 +18,8 @@
     "analysis/catalog_daniel/figs/*",
     "analysis/catalog_daniel/data/signed*"
    ],
-   "max_age_min": 90
+   "max_age_min": 90,
+   "stopped": "D114"
   },
   {
    "name": "catalog_v3 generation, stages 1-3 (D98, D100, D102)",
@@ -34,6 +35,18 @@
    ],
    "max_age_min": 90,
    "stopped": "D112"
+  },
+  {
+   "name": "catalog_v3 pretrainings (D115)",
+   "items": [
+    "v3_pretrain"
+   ],
+   "paths": [
+    "analysis/catalog_v3/*",
+    "recipes/catalog_v3_*.yaml",
+    "scripts/job_catalog_v3*"
+   ],
+   "max_age_min": 120
   }
  ]
 }
