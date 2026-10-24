@@ -32,7 +32,8 @@
     "recipes/catalog_v3_*.yaml",
     "recipes/catalog_v3_*.json"
    ],
-   "max_age_min": 90
+   "max_age_min": 90,
+   "stopped": "D112"
   }
  ]
 }
