@@ -6626,12 +6626,20 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
-  \item \textbf{State (2026-10-23, 22:40).} Nothing running; \code{dimless\_kt} complete (par:dimless\_qperp, every set and
-    the twin). The review locks: only a pillar's own reviewer may begin or advance (\code{.claude/hooks/lock\_guard.py},
-    tested live both ways); a hook script that does not parse is refused or restored (\code{hook\_syntax\_guard.py}).
-    Decisions since the last compaction: D98 (catalog\_v3 design, census), D99 (short GPU tests of candidates through the
-    CPU proxy, up to $10$ GPU-h; $\sim5$ used). Asked of the user: $2\to4$ extended by $+Z$, $+W$, $+H$ and quark pairs to
-    reach $\sim1500$ distinct classes (recommended), and the three catalog questions of the catalog\_v3 item.
+  \item \textbf{State (2026-10-24, 07:30).} Running on CC: the DlessInOrdQs short run (FA-ccin2p3-4c674f33, item
+    \code{qperp\_soft}, D99; its 2->4 scoring \code{qsoft\_2to4} queued on the model), catalog\_v3 stage 3's prebuild
+    (FA-ccin2p3-d703d83c: 40 2->5 probes, 24 $\alpha_s$ pools). Done: stage 1 (1703 pools, 5109 files, 21 min; pools
+    assembled one at a time since the prebuild fix; \code{/sps/lpnhe} 33 GB free after D103, D104 cleared the training
+    caches and 778 census backends). Next: stage 2, \code{catalog\_v3\_loops.yaml} (150 one-loop + 17 loop-induced, all
+    \code{certified: false}) in review, then \code{scripts/build\_nlo\_backends.sh} with \code{ONLY=} the v3 keys, 2->2
+    first ($23$--$80$ MB per standalone; keep 20 GB free), \code{gen\_catalog\_v3.py --certified} on the verdicts, then
+    the stage-2 recipe. The lxplus-era archive (28 GB of tars, D96) stays on CC: CC cannot reach Jean Zay (timeout);
+    \code{runs\_from\_lxplus} is the only copy of its runs (moved from EOS on 10-03). Probes that do not gain:
+    par.~\ref{par:nogain} done for $ee\to Z\gamma$; next rung $6$ against $7$ on $u\bar u\to Zg$
+    (\code{recipes/transfer\_ladder\_r6,7.yaml}), then the Sudakov arm. Decisions since the last compaction: D100 (2->4
+    extension), D101 (float32 check), D102 (generation), D103 (cache deletion), D104 (non-representative backends).
+    Guards: \code{continuous\_guard.py} now counts only committed results or live runs of a task's items; three tasks
+    registered (level, catalog\_v3, no-gain probes).
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); its read on the tops never seen
     (the twin) is running. Next, in order: a variant that keeps the gain without the cost on finals with no soft particle,
