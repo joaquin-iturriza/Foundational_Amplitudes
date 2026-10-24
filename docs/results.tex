@@ -6653,6 +6653,17 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
+  \item \textbf{State (2026-10-24, 10:40).} Running on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
+    \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}, 99 loop pools, 288 of 297 files at
+    10:30, no errors; \code{/sps/lpnhe} 26 GB free). Waiter: \code{site events --wait --project FA}; supervisor running.
+    Waiting on the user: (1) the heavy-quark mass-scheme shift for the 68 b/t loop pools of
+    \code{catalog\_v3\_gen\_stage2.yaml} ((a) none in v3, recommended; (b) a per-leg rule; the code holds a provisional
+    $0.5\times$ per final quark that must not generate: do not prebuild \code{catalog\_v3\_gen\_stage2.yaml} before the
+    answer); (2) the context-vector design (Level item, (d)); (3) whether to regenerate catalog\_v2's 53 one-loop pools
+    whose stored target carries the shift at a W/Z/H/$\tau$ mass; (4) a go for a linear read-out of rungs 6 and 7's frozen
+    features on $u\bar u\to Zg$ (no-gain probes, par.~\ref{par:nogain}). lxplus closed (2FA): the per-event read of the
+    Sudakov arm's predictions waits on it. Next without the user: when stage 2a ends, read its log and record it; the
+    Level item's (e) (signed $r_0$ following the level against the sign head) is a GPU A/B under D99's remaining budget.
   \item \textbf{State (2026-10-24, 07:30).} Done: the soft minimum (DlessInOrdQs, par.~\ref{par:qperp_cost}; negative). catalog\_v3 stage 2: all $167$ loop
     strings MadLoop-certified ($150$ one-loop, $17$ loop-induced) after three fixes: the certifier runs on the b beams'
     $4.7$\,GeV shell as generation does; b-beam standalones run with \code{ImprovePSPoint} $-1$ (MadLoop's PSMC
