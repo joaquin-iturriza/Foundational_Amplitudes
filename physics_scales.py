@@ -18,12 +18,14 @@ def minkowski_dots(P):
     return np.einsum("npc,nqc->npq", P * np.array([1.0, -1.0, -1.0, -1.0]), P)
 
 
-def qperp_logs(P, massive_shat=False, saturate=False):
+def qperp_logs(P, massive_shat=False, saturate=False, soft=None):
     """P: (n, N, 4) momenta, rows 0 and 1 incoming, any Lorentz frame. Returns (n,) the sum of log q^2 over the N - 4
     emission steps (GeV^2 units). massive_shat: a massive particle (m > 1 GeV, from its own momentum) takes s_hat as
     its scale (it has no soft or collinear enhancement), the massless ones their dipole scale. saturate: each removed
     step's scale is q^2 s_hat / (q^2 + s_hat), q^2 while the step is soft (q^2 << s_hat) and s_hat / 2 when it is hard,
-    for every particle alike (the order of removal is unchanged)."""
+    for every particle alike (the order of removal is unchanged). soft = tau (log units): each step's log q^2 is the
+    soft minimum -tau log sum exp(-log q^2 / tau) over every candidate particle and pair instead of the minimum, so the
+    scale has no kink where the minimising pair changes (the removal order is still the hard minimum's)."""
     P = np.asarray(P, dtype=np.float64)
     n, N, _ = P.shape
     G = minkowski_dots(P)
@@ -36,6 +38,7 @@ def qperp_logs(P, massive_shat=False, saturate=False):
     out = np.zeros(n)
     for _ in range(N - 4):
         best = np.full((n, N), np.inf)
+        soft_lq = np.full((n, N), np.inf)
         for k in range(2, N):
             # min over pairs a < b (a, b != k, alive) of s_ak s_bk / s_ab
             num = S[:, :, k][:, :, None] * S[:, :, k][:, None, :]
@@ -44,12 +47,23 @@ def qperp_logs(P, massive_shat=False, saturate=False):
             ok = alive[:, :, None] & alive[:, None, :]
             ok[:, k, :] = False; ok[:, :, k] = False
             ok &= ~np.eye(N, dtype=bool)[None]
-            q = np.where(ok, q, np.inf).reshape(n, -1).min(1) + m2[:, k]
+            q = np.where(ok, q, np.inf).reshape(n, -1)
+            if soft:
+                with np.errstate(divide="ignore"):
+                    lq = np.log(np.minimum(q, 1e300))
+                lq = np.where(np.isfinite(q), lq, np.inf)
+                lo = lq.min(1, keepdims=True)
+                sq_k = lo[:, 0] - soft * np.log(np.exp(-(lq - lo) / soft).sum(1))           # soft min of log(dipole)
+                soft_lq[:, k] = np.where(alive[:, k], np.logaddexp(sq_k, np.log(np.maximum(m2[:, k], 1e-300))), np.inf)
+            q = q.min(1) + m2[:, k]
             if massive_shat:
                 q = np.where(m2[:, k] > 1.0, np.exp(Ls), q)
             best[:, k] = np.where(alive[:, k], q, np.inf)
         k = best.argmin(1)
         qk = best[np.arange(n), k]
+        if soft:
+            lo = soft_lq.min(1, keepdims=True)
+            qk = np.exp(lo[:, 0] - soft * np.log(np.exp(-(soft_lq - lo) / soft).sum(1)))
         out += np.log(qk * np.exp(Ls) / (qk + np.exp(Ls)) if saturate else qk)
         alive[np.arange(n), k] = False
     return out
