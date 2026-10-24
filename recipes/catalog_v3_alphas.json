@@ -1,0 +1,146 @@
+{
+"v3_bbx_gvevex__as090": {
+"base": "v3_bbx_gvevex",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_bbx_gvevex__as130": {
+"base": "v3_bbx_gvevex",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_bbx_gvevex__as150": {
+"base": "v3_bbx_gvevex",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_dbx_abxd__as090": {
+"base": "v3_dbx_abxd",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_dbx_abxd__as130": {
+"base": "v3_dbx_abxd",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_dbx_abxd__as150": {
+"base": "v3_dbx_abxd",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_dg_adg__as090": {
+"base": "v3_dg_adg",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_dg_adg__as130": {
+"base": "v3_dg_adg",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_dg_adg__as150": {
+"base": "v3_dg_adg",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_dg_dhz__as090": {
+"base": "v3_dg_dhz",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_dg_dhz__as130": {
+"base": "v3_dg_dhz",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_dg_dhz__as150": {
+"base": "v3_dg_dhz",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_epem_bbxg__as090": {
+"base": "v3_epem_bbxg",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_epem_bbxg__as130": {
+"base": "v3_epem_bbxg",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_epem_bbxg__as150": {
+"base": "v3_epem_bbxg",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_gg_gg__as090": {
+"base": "v3_gg_gg",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_gg_gg__as130": {
+"base": "v3_gg_gg",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_gg_gg__as150": {
+"base": "v3_gg_gg",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_udx_ddxwp__as090": {
+"base": "v3_udx_ddxwp",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_udx_ddxwp__as130": {
+"base": "v3_udx_ddxwp",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_udx_ddxwp__as150": {
+"base": "v3_udx_ddxwp",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+},
+"v3_udx_ggwp__as090": {
+"base": "v3_udx_ggwp",
+"alpha_s": 0.09,
+"role": "train",
+"axis": null
+},
+"v3_udx_ggwp__as130": {
+"base": "v3_udx_ggwp",
+"alpha_s": 0.13,
+"role": "heldout",
+"axis": "H6"
+},
+"v3_udx_ggwp__as150": {
+"base": "v3_udx_ggwp",
+"alpha_s": 0.15,
+"role": "train",
+"axis": null
+}
+}

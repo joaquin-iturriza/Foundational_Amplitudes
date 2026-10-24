@@ -1,0 +1,725 @@
+{
+"trees": [
+{
+"layer": 5,
+"beams": [
+"e+",
+"e-"
+],
+"finals": [
+"c",
+"c~",
+"g",
+"ve",
+"ve~"
+],
+"why": "v3_epem_ccxvevex+g",
+"key": "e+ e- > c c~ g ve ve~",
+"name": "v3_epem_ccxgvevex",
+"generate": "generate e+ e- > c c~ g ve ve~"
+},
+{
+"layer": 5,
+"beams": [
+"e+",
+"e-"
+],
+"finals": [
+"a",
+"ve",
+"ve~",
+"z",
+"z"
+],
+"why": "v3_epem_vevexzz+a",
+"key": "e+ e- > a ve ve~ z z",
+"name": "v3_epem_avevexzz",
+"generate": "generate e+ e- > a ve ve~ z z"
+},
+{
+"layer": 5,
+"beams": [
+"e+",
+"e-"
+],
+"finals": [
+"d",
+"d~",
+"g",
+"g",
+"g"
+],
+"why": "v3_epem_ddxgg+g",
+"key": "e+ e- > d d~ g g g",
+"name": "v3_epem_ddxggg",
+"generate": "generate e+ e- > d d~ g g g"
+},
+{
+"layer": 5,
+"beams": [
+"e+",
+"e-"
+],
+"finals": [
+"a",
+"a",
+"a",
+"vm",
+"vm~"
+],
+"why": "v3_epem_aavmvmx+a",
+"key": "e+ e- > a a a vm vm~",
+"name": "v3_epem_aaavmvmx",
+"generate": "generate e+ e- > a a a vm vm~"
+},
+{
+"layer": 5,
+"beams": [
+"e+",
+"e-"
+],
+"finals": [
+"b",
+"b~",
+"g",
+"g",
+"h"
+],
+"why": "v3_epem_bbxgh+g",
+"key": "e+ e- > b b~ g g h",
+"name": "v3_epem_bbxggh",
+"generate": "generate e+ e- > b b~ g g h"
+},
+{
+"layer": 5,
+"beams": [
+"g",
+"g"
+],
+"finals": [
+"d",
+"d",
+"d~",
+"d~",
+"g"
+],
+"why": "v3_gg_dddxdx+g",
+"key": "g g > d d d~ d~ g",
+"name": "v3_gg_dddxdxg",
+"generate": "generate g g > d d d~ d~ g"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"g"
+],
+"finals": [
+"c~",
+"g",
+"h",
+"s",
+"u"
+],
+"why": "v3_dg_cxhsu+g",
+"key": "d g > c~ g h s u",
+"name": "v3_dg_cxghsu",
+"generate": "generate d g > c~ g h s u"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"g"
+],
+"finals": [
+"a",
+"d",
+"g",
+"z",
+"z"
+],
+"why": "v3_dg_adzz+g",
+"key": "d g > a d g z z",
+"name": "v3_dg_adgzz",
+"generate": "generate d g > a d g z z"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"g"
+],
+"finals": [
+"g",
+"h",
+"ta+",
+"ta-",
+"u"
+],
+"why": "v3_ug_htaptamu+g",
+"key": "c g > c g h ta+ ta-",
+"name": "v3_ug_ghtaptamu",
+"generate": "generate u g > g h ta+ ta- u"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"g"
+],
+"finals": [
+"a",
+"g",
+"ta+",
+"ta-",
+"u"
+],
+"why": "v3_ug_ataptamu+g",
+"key": "c g > a c g ta+ ta-",
+"name": "v3_ug_agtaptamu",
+"generate": "generate u g > a g ta+ ta- u"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"g"
+],
+"finals": [
+"d",
+"d~",
+"g",
+"u",
+"z"
+],
+"why": "v3_ug_ddxuz+g",
+"key": "c g > c g s s~ z",
+"name": "v3_ug_ddxguz",
+"generate": "generate u g > d d~ g u z"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"g"
+],
+"finals": [
+"b",
+"g",
+"u",
+"u~",
+"z"
+],
+"why": "v3_bg_buuxz+g",
+"key": "b g > b c c~ g z",
+"name": "v3_bg_bguuxz",
+"generate": "generate b g > b g u u~ z"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"u~"
+],
+"finals": [
+"a",
+"e+",
+"g",
+"ve",
+"w-"
+],
+"why": "v3_uux_aepvewm+g",
+"key": "c c~ > a g mu+ vm w-",
+"name": "v3_uux_aepgvewm",
+"generate": "generate u u~ > a e+ g ve w-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"d~"
+],
+"finals": [
+"a",
+"d~",
+"g",
+"g",
+"u"
+],
+"why": "v3_udx_adxgu+g",
+"key": "c s~ > a c g g s~",
+"name": "v3_udx_adxggu",
+"generate": "generate u d~ > a d~ g g u"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"d~"
+],
+"finals": [
+"d",
+"d~",
+"g",
+"ve",
+"ve~"
+],
+"why": "v3_ddx_ddxvevex+g",
+"key": "d d~ > d d~ g ve ve~",
+"name": "v3_ddx_ddxgvevex",
+"generate": "generate d d~ > d d~ g ve ve~"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"u~"
+],
+"finals": [
+"e+",
+"e-",
+"g",
+"g",
+"h"
+],
+"why": "v3_uux_epemgh+g",
+"key": "c c~ > g g h mu+ mu-",
+"name": "v3_uux_epemggh",
+"generate": "generate u u~ > e+ e- g g h"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"b~"
+],
+"finals": [
+"b~",
+"d",
+"d",
+"d~",
+"g"
+],
+"why": "v3_dbx_bxdddx+g",
+"key": "b d~ > b d d~ d~ g",
+"name": "v3_dbx_bxdddxg",
+"generate": "generate d b~ > b~ d d d~ g"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"s~"
+],
+"finals": [
+"c~",
+"g",
+"u",
+"u",
+"u~"
+],
+"why": "v3_dsx_cxuuux+g",
+"key": "d s~ > c c~ c~ g u",
+"name": "v3_dsx_cxguuux",
+"generate": "generate d s~ > c~ g u u u~"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"b~"
+],
+"finals": [
+"b~",
+"d",
+"e+",
+"e-",
+"g"
+],
+"why": "v3_dbx_bxdepem+g",
+"key": "b d~ > b d~ e+ e- g",
+"name": "v3_dbx_bxdepemg",
+"generate": "generate d b~ > b~ d e+ e- g"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"g",
+"g",
+"ta+",
+"ta-",
+"z"
+],
+"why": "v3_bbx_gtaptamz+g",
+"key": "b b~ > g g ta+ ta- z",
+"name": "v3_bbx_ggtaptamz",
+"generate": "generate b b~ > g g ta+ ta- z"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"d~"
+],
+"finals": [
+"g",
+"ta+",
+"ta+",
+"ta-",
+"ta-"
+],
+"why": "v3_ddx_taptaptamtam+g",
+"key": "d d~ > g ta+ ta+ ta- ta-",
+"name": "v3_ddx_gtaptaptamtam",
+"generate": "generate d d~ > g ta+ ta+ ta- ta-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"u~"
+],
+"finals": [
+"g",
+"h",
+"z",
+"z",
+"z"
+],
+"why": "v3_uux_hzzz+g",
+"key": "c c~ > g h z z z",
+"name": "v3_uux_ghzzz",
+"generate": "generate u u~ > g h z z z"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"b~"
+],
+"finals": [
+"b~",
+"g",
+"g",
+"u",
+"w-"
+],
+"why": "v3_dbx_bxguwm+g",
+"key": "b d~ > b g g u~ w+",
+"name": "v3_dbx_bxgguwm",
+"generate": "generate d b~ > b~ g g u w-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"b~"
+],
+"finals": [
+"b~",
+"g",
+"h",
+"u",
+"z"
+],
+"why": "v3_ubx_bxhuz+g",
+"key": "b c~ > b c~ g h z",
+"name": "v3_ubx_bxghuz",
+"generate": "generate u b~ > b~ g h u z"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"g",
+"g",
+"z",
+"z",
+"z"
+],
+"why": "v3_bbx_gzzz+g",
+"key": "b b~ > g g z z z",
+"name": "v3_bbx_ggzzz",
+"generate": "generate b b~ > g g z z z"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"d",
+"d~",
+"g",
+"w+",
+"w-"
+],
+"why": "v3_bbx_ddxwpwm+g",
+"key": "b b~ > d d~ g w+ w-",
+"name": "v3_bbx_ddxgwpwm",
+"generate": "generate b b~ > d d~ g w+ w-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"c~"
+],
+"finals": [
+"d",
+"g",
+"g",
+"s~",
+"z"
+],
+"why": "v3_ucx_dgsxz+g",
+"key": "c u~ > d~ g g s z",
+"name": "v3_ucx_dggsxz",
+"generate": "generate u c~ > d g g s~ z"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"u~"
+],
+"finals": [
+"a",
+"d",
+"d~",
+"g",
+"z"
+],
+"why": "v3_uux_addxz+g",
+"key": "c c~ > a g s s~ z",
+"name": "v3_uux_addxgz",
+"generate": "generate u u~ > a d d~ g z"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"g",
+"h",
+"h",
+"w+",
+"w-"
+],
+"why": "v3_bbx_hhwpwm+g",
+"key": "b b~ > g h h w+ w-",
+"name": "v3_bbx_ghhwpwm",
+"generate": "generate b b~ > g h h w+ w-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"d~"
+],
+"finals": [
+"a",
+"c",
+"g",
+"g",
+"s~"
+],
+"why": "v3_udx_acgsx+g",
+"key": "c s~ > a d~ g g u",
+"name": "v3_udx_acggsx",
+"generate": "generate u d~ > a c g g s~"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"s"
+],
+"finals": [
+"a",
+"c",
+"d",
+"g",
+"h"
+],
+"why": "v3_us_acdh+g",
+"key": "c d > a g h s u",
+"name": "v3_us_acdgh",
+"generate": "generate u s > a c d g h"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"c"
+],
+"finals": [
+"c",
+"g",
+"g",
+"h",
+"u"
+],
+"why": "v3_uc_cghu+g",
+"key": "c u > c g g h u",
+"name": "v3_uc_cgghu",
+"generate": "generate u c > c g g h u"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"d~"
+],
+"finals": [
+"b",
+"b~",
+"g",
+"h",
+"h"
+],
+"why": "v3_ddx_bbxhh+g",
+"key": "d d~ > b b~ g h h",
+"name": "v3_ddx_bbxghh",
+"generate": "generate d d~ > b b~ g h h"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"s"
+],
+"finals": [
+"c",
+"d",
+"g",
+"h",
+"z"
+],
+"why": "v3_us_cdhz+g",
+"key": "c d > g h s u z",
+"name": "v3_us_cdghz",
+"generate": "generate u s > c d g h z"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"u~"
+],
+"finals": [
+"g",
+"g",
+"ta+",
+"ta-",
+"z"
+],
+"why": "v3_uux_gtaptamz+g",
+"key": "c c~ > g g ta+ ta- z",
+"name": "v3_uux_ggtaptamz",
+"generate": "generate u u~ > g g ta+ ta- z"
+},
+{
+"layer": 5,
+"beams": [
+"d",
+"s"
+],
+"finals": [
+"d",
+"g",
+"h",
+"h",
+"s"
+],
+"why": "v3_ds_dhhs+g",
+"key": "d s > d g h h s",
+"name": "v3_ds_dghhs",
+"generate": "generate d s > d g h h s"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"b",
+"b~",
+"g",
+"ve",
+"ve~"
+],
+"why": "v3_bbx_bbxvevex+g",
+"key": "b b~ > b b~ g ve ve~",
+"name": "v3_bbx_bbxgvevex",
+"generate": "generate b b~ > b b~ g ve ve~"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"a",
+"a",
+"a",
+"g",
+"h"
+],
+"why": "v3_bbx_aaah+g",
+"key": "b b~ > a a a g h",
+"name": "v3_bbx_aaagh",
+"generate": "generate b b~ > a a a g h"
+},
+{
+"layer": 5,
+"beams": [
+"b",
+"b~"
+],
+"finals": [
+"g",
+"g",
+"h",
+"w+",
+"w-"
+],
+"why": "v3_bbx_ghwpwm+g",
+"key": "b b~ > g g h w+ w-",
+"name": "v3_bbx_gghwpwm",
+"generate": "generate b b~ > g g h w+ w-"
+},
+{
+"layer": 5,
+"beams": [
+"u",
+"d~"
+],
+"finals": [
+"d~",
+"g",
+"u",
+"z",
+"z"
+],
+"why": "v3_udx_dxuzz+g",
+"key": "c s~ > c g s~ z z",
+"name": "v3_udx_dxguzz",
+"generate": "generate u d~ > d~ g u z z"
+}
+],
+"bsm": []
+}

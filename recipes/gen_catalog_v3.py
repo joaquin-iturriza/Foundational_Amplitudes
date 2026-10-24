@@ -229,7 +229,7 @@ def write(*checked):
     import mg5_pipeline_final as mg
     procs, lines = {}, []
     for c in (c for f in checked for c in json.load(open(f))):
-        if not c.get("exists") or c["layer"] not in (2, 3, 4):
+        if not c.get("exists") or c["layer"] not in (2, 3, 4, 5):
             continue
         pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
         if pdg_b[1] == -pdg_b[0] and pdg_b[0] < 0:
@@ -250,9 +250,62 @@ def write(*checked):
     print(f"wrote {OUT_PROC} ({len(procs)} trees) and {OUT_CENSUS}")
 
 
+OUT_P5 = os.path.join(ROOT, "recipes", "catalog_v3_candidates_p5.json")
+COLOURED = {"u", "u~", "d", "d~", "s", "s~", "c", "c~", "b", "b~", "g"}
+
+
+def stage3(n_p5=40, n_as=7, seed=0):
+    """D102, stage 3 (trees only; the one-loop layer and the loop-induced classes are stage 2, MadLoop):
+      2->5 probes (H2): --n-p5 training 2->4 classes without a top, drawn per beam, plus a g when anything external is
+              coloured, else a photon; their MadGraph check (--check --cands catalog_v3_candidates_p5.json) and entries
+              (--write) as stage 2 of the census did
+      alpha_s points (H6): --n-as training 2->2 / 2->3 classes with alpha_s in their order, drawn per beam, at
+              alpha_s(M_Z) = 0.09 and 0.15 (train) and 0.13 (held out between them)
+    Writes recipes/catalog_v3_candidates_p5.json and recipes/catalog_v3_alphas.json (name -> base, alpha_s, role)."""
+    import random
+    import yaml
+    rng = random.Random(seed)
+    Pr = yaml.load(open(os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["processes"]
+    roles = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
+    tr = sorted(n for n, v in roles.items() if v["role"] == "train")
+    parse = lambda n: [t.split() for t in Pr[n]["mg5_generate"][0].replace("generate", "").split(">")]
+    beam = lambda n: "ee" if parse(n)[0] == ["e+", "e-"] else ("gg" if parse(n)[0] == ["g", "g"] else
+                                                                 ("qg" if "g" in parse(n)[0] else "qq"))
+    by = {}
+    for n in tr:
+        if Pr[n]["layer"] == 4 and not any(abs(p) == 6 for p in Pr[n]["pdg_ids"]):
+            by.setdefault(beam(n), []).append(n)
+    tot = sum(map(len, by.values()))
+    pick = [n for b, ns in sorted(by.items()) for n in rng.sample(ns, max(1, round(n_p5 * len(ns) / tot)))]
+    out, seen = [], set()
+    for n in pick:
+        ini, fin = parse(n)
+        add = "g" if COLOURED & set(ini + fin) else "a"
+        f5 = sorted(fin + [add]); k = key(ini, f5)
+        if k in seen:
+            continue
+        seen.add(k)
+        out.append({"layer": 5, "beams": ini, "finals": f5, "why": n + "+" + add, "key": k, "name": name(ini, f5),
+                    "generate": f"generate {' '.join(ini)} > {' '.join(f5)}"})
+    json.dump({"trees": out, "bsm": []}, open(OUT_P5, "w"), indent=0)
+    by = {}
+    for n in tr:
+        if Pr[n]["layer"] in (2, 3) and Pr[n].get("alphas_power", 0) >= 1 and not any(abs(p) == 6 for p in Pr[n]["pdg_ids"]):
+            by.setdefault(beam(n), []).append(n)
+    tot = sum(map(len, by.values()))
+    fams = [n for b, ns in sorted(by.items()) for n in rng.sample(ns, max(1, round(n_as * len(ns) / tot)))]
+    al = {f"{n}__as{int(round(1000 * a)):03d}": {"base": n, "alpha_s": a, "role": "heldout" if a == 0.13 else "train",
+                                                 "axis": "H6" if a == 0.13 else None}
+          for n in sorted(fams) for a in (0.09, 0.13, 0.15)}
+    json.dump(al, open(os.path.join(ROOT, "recipes", "catalog_v3_alphas.json"), "w"), indent=0)
+    print(f"stage 3: {len(out)} 2->5 candidates ({dict(Counter(c['why'][-1] for c in out))}) -> {OUT_P5}; "
+          f"{len(al)} alpha_s pools on {len(fams)} families -> recipes/catalog_v3_alphas.json")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", nargs="+", default=None, help="the stage-2 outputs (checked.json, checked_ext.json)")
+    ap.add_argument("--stage3", action="store_true", help="choose the 2->5 probes and the alpha_s points (D102)")
     ap.add_argument("--extend24", default=None, help="stage-2 output to extend the 2->4 layer from (D100)")
     ap.add_argument("--cands", default=None, help="--check this candidate file instead of catalog_v3_candidates.json")
     ap.add_argument("--enumerate", action="store_true")
@@ -275,6 +328,8 @@ def main():
         check(a.workers, a.out, a.only_bsm, a.cands)
     if a.extend24:
         extend24(a.extend24)
+    if a.stage3:
+        stage3()
     if a.write:
         write(*a.write)
 
