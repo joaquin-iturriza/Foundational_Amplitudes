@@ -5823,9 +5823,9 @@ grid): the median gain over the ten pretrainings is $-0.13$, $-0.57$, $-1.19$, $
 $10^{2.5}$ and $+0.21$, $+0.39$, $+0.19$ above. At $D=10^2$ scratch drops $2.3$ decades from the half-decade before
 ($1.0\times10^{-2}\to5.0\times10^{-5}$; its second-best trial $5.8\times10^{-5}$, so not one lucky point) while the
 fine-tunes drop about one ($7.8\times10^{-4}$, median); they reach scratch half a decade later. The same happens on every
-probe: at the half-decade where scratch's learning curve in $D$ is steepest, the gain dips below its two neighbours in
-$10$ of $12$ probes (median $-0.22$ decades; $ee\to d\bar d$ $-0.72$ at its $2.3$-decade step into $10^3$, $ud\to ud$
-$-0.71$), and over all $72$ cells the gain falls with scratch's drop into the cell (correlation $-0.30$). A fine-tune's
+probe: at the half-decade where scratch's learning curve in $D$ is steepest, the gain dips below the mean of its two
+neighbours in $10$ of $12$ probes (by a median $0.22$ decades; $ee\to d\bar d$ by $0.72$ at its $2.3$-decade step into
+$10^3$, $ud\to ud$ by $0.71$; below both neighbours in $7$), and over all $72$ cells the gain falls with scratch's drop into the cell (correlation $-0.30$). A fine-tune's
 learning curve in $D$ is smoother than scratch's, so it loses wherever scratch finds the process's structure in one
 step; $ee\to Z\gamma$ has the largest such step of the twelve probes and has it at small $D$, where the $D$-average of
 Fig.~\ref{fig:gain_heatmap} weighs it as much as any other cell. The fine-tunes stop early more often than scratch
@@ -6667,61 +6667,40 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
-  \item \textbf{State (2026-10-24, 10:40).} Running on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
-    \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}, 99 loop pools, 288 of 297 files at
-    10:30, no errors; \code{/sps/lpnhe} 26 GB free). Waiter: \code{site events --wait --project FA}; supervisor running.
-    Waiting on the user: (1) the heavy-quark mass-scheme shift for the 68 b/t loop pools of
+  \item \textbf{State (2026-10-24, 11:00).} Running on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
+    \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}: the $99$ loop strings with no $b$ or
+    $t$ on any leg, or loop-induced; 288 of 297 files at 10:30, no errors; \code{/sps/lpnhe} 26 GB free). Waiter:
+    \code{site events --wait --project FA}; supervisor running. All $167$ stage-2 loop strings are MadLoop-certified
+    ($150$ one-loop, $17$ loop-induced; $bb\to bb$, $bb\to bbZ$, $bg\to bb\bar b$ on the double pole only, the $25$
+    $b\bar b\to$ colourless strings on the single pole too; the certification fixes are in the code's comments,
+    \code{tools/nlo\_virtual\_pipeline.massive\_beam\_params}, \code{tools/nlo\_pole\_check.predict\_poles}). Waiting on
+    the user: (1) the heavy-quark mass-scheme shift for the other $68$ loop strings of
     \code{catalog\_v3\_gen\_stage2.yaml} ((a) none in v3, recommended; (b) a per-leg rule; the code holds a provisional
     $0.5\times$ per final quark that must not generate: do not prebuild \code{catalog\_v3\_gen\_stage2.yaml} before the
-    answer); (2) the context-vector design (Level item, (d)); (3) whether to regenerate catalog\_v2's 53 one-loop pools
-    whose stored target carries the shift at a W/Z/H/$\tau$ mass; (4) a go for a linear read-out of rungs 6 and 7's frozen
-    features on $u\bar u\to Zg$ (no-gain probes, par.~\ref{par:nogain}). lxplus closed (2FA): the per-event read of the
-    Sudakov arm's predictions waits on it. Next without the user: when stage 2a ends, read its log and record it; the
-    Level item's (e) (signed $r_0$ following the level against the sign head) is a GPU A/B under D99's remaining budget.
-  \item \textbf{State (2026-10-24, 07:30).} Done: the soft minimum (DlessInOrdQs, par.~\ref{par:qperp_cost}; negative). catalog\_v3 stage 2: all $167$ loop
-    strings MadLoop-certified ($150$ one-loop, $17$ loop-induced) after three fixes: the certifier runs on the b beams'
-    $4.7$\,GeV shell as generation does; b-beam standalones run with \code{ImprovePSPoint} $-1$ (MadLoop's PSMC
-    re-projection broke $p_z$ with a $W$) and a quad-precision rescue threshold of $10^{-5}$; a zero predicted double pole
-    is tested absolutely. The $25$ $b\bar b\to$ colourless strings are also certified on the single pole (the massive
-    pair's form, crossed; MadLoop within $2.4\times10^{-6}$); $bb\to bb$, $bb\to bbZ$, $bg\to bb\bar b$ on the double pole
-    only. Stage 2a (the $99$ strings with no $b$ or $t$ on any leg, or loop-induced) is generating; the other $68$ wait for
-    the user's call on the heavy-quark mass-scheme shift (none in v3, or a per-leg rule). Running on CC: catalog\_v3 stage 3's prebuild
-    (FA-ccin2p3-d703d83c: 40 2->5 probes, 24 $\alpha_s$ pools). Done: stage 1 (1703 pools, 5109 files, 21 min; pools
-    assembled one at a time since the prebuild fix; \code{/sps/lpnhe} 33 GB free after D103, D104 cleared the training
-    caches and 778 census backends). Next: stage 2, \code{catalog\_v3\_loops.yaml} (150 one-loop + 17 loop-induced, all
-    \code{certified: false}) in review, then \code{scripts/build\_nlo\_backends.sh} with \code{ONLY=} the v3 keys, 2->2
-    first ($23$--$80$ MB per standalone; keep 20 GB free), \code{gen\_catalog\_v3.py --certified} on the verdicts, then
-    the stage-2 recipe. The lxplus-era archive (28 GB of tars, D96) stays on CC: CC cannot reach Jean Zay (timeout);
-    \code{runs\_from\_lxplus} is the only copy of its runs (moved from EOS on 10-03). Probes that do not gain:
-    par.~\ref{par:nogain} done for $ee\to Z\gamma$; next rung $6$ against $7$ on $u\bar u\to Zg$
-    (\code{recipes/transfer\_ladder\_r6,7.yaml}), then the Sudakov arm. Decisions since the last compaction: D100 (2->4
-    extension), D101 (float32 check), D102 (generation), D103 (cache deletion), D104 (non-representative backends).
-    Guards: \code{continuous\_guard.py} now counts only committed results or live runs of a task's items; three tasks
-    registered (level, catalog\_v3, no-gain probes).
+    answer); (2) the context-vector design (the Level item, (i)); (3) whether to regenerate catalog\_v2's $53$ one-loop
+    pools whose stored target carries the shift at a W/Z/H/$\tau$ mass; (4) a go for a linear read-out of rungs $6$ and
+    $7$'s frozen features on $u\bar u\to Zg$ and for a fine-tune search on $ee\to Z\gamma$ with scratch's learning-rate
+    window (par.~\ref{par:nogain}). lxplus closed (2FA): the per-event read of the Sudakov arm's predictions waits on it.
+    The lxplus-era archive (28 GB of tars, D96) stays on CC: CC cannot reach Jean Zay (timeout); \code{runs\_from\_lxplus}
+    is the only copy of its runs (moved from EOS on 10-03). Next without the user: when stage 2a ends, read its log and
+    record it; the signed pools' A/B (the Level item) under D99's remaining GPU budget.
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
-    $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); its read on the tops never seen
-    (the twin) is running. Next, in order: a variant that keeps the gain without the cost on finals with no soft particle,
-    through the CPU proxy first (par.\ \ref{par:qperp_cost}: the GPU cost is in the shape of the non-boson finals; a
-    per-process shape proxy, \code{shape\_learn.py}, is running); the exact loop factor $(16\pi^2)^{-L}$ and the spin,
-    colour and identical-particle factors in $F$ (2026-10-24, composition proxy: the stored one-loop pools are already
-    stripped, their level offset against the tree model is $-1.4$ and dividing out $(16\pi^2)^{-1}$ takes the level MSE
-    from $4.9$ to $42$, so the loop factor belongs to the loop-induced pools only; undoing MadGraph's identical-particle
-    factor, $+\log\prod n_i!$, moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$ to
-    $8.7$ / $2.5$, the same mixed sign as IDEN and colour above; the spin and colour averages are linear in the initial
-    state's counts, which the level model already has); a few-event calibration by shrinkage (the $\sigma$ head adds nothing; done, Fig.~\ref{fig:kshot_level}: toward the
-    axis bias it beats the one-event offset, $1.29$ against $1.57$ on the $43$ new at $K=1$); the small dedicated network for what no
-    constant fixes (design for the user, 2026-10-24: (i) a context vector $c_p\in\mathbb R^{16}$ per process, added to
-    every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk frozen and $c_p$
-    the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process embedding with dropout to
-    zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new and the $2\to4$ probes
-    against the shrunk offset; cost one short pretraining ($\sim1$ GPU-h) plus CPU-side fits; (ii) only if (i) leaves the
-    $2\to4$ shape: a head that predicts the $2\to4$ target as the model's own $2\to3$ prediction on the clustered event
-    plus a learned correction, the factorisation the emission scales already encode in the target) ($2\to4$ shape $1.5$, unseen tops), first a per-process context vector fitted on $K$ events with the
-    trunk frozen (arXiv:1909.09157), then a factorisation-aware head on the model's own lower-multiplicity prediction
-    (arXiv:2107.06625, 2512.11036). Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor
-    under $0.5$ with the heavy-quark layer. Signed pools: $r_0$ follows the pool's level (one shared $r_0$ puts most events
-    of some pools in the linear band, par.\ The candidate targets), compared with the sign head on $\log|V|$; the magnitude
-    scoring of the $55$ signed pools stays a diagnostic. Also proposed: the full-length catalog pretraining (D78's held
+    $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); the soft minimum does not remove
+    the cost (par.~\ref{par:qperp_cost}), and neither do the loop or identical-particle factors (the stored one-loop pools
+    are already stripped, dividing out $(16\pi^2)^{-1}$ takes the level MSE from $4.9$ to $42$; undoing MadGraph's
+    identical-particle factor moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$
+    to $8.7$ / $2.5$). Open: what the $43$ new pay for. Next: the small dedicated network for what no constant fixes
+    ($2\to4$ shape $1.5$, unseen tops), design for the user (2026-10-24): (i) a context vector $c_p\in\mathbb R^{16}$ per
+    process, added to every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk
+    frozen and $c_p$ the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process
+    embedding with dropout to zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new
+    and the $2\to4$ probes against the shrunk offset (Fig.~\ref{fig:kshot_level}); cost one short pretraining ($\sim1$
+    GPU-h) plus CPU-side fits; (ii) only if (i) leaves the $2\to4$ shape: a head that predicts the $2\to4$ target as the
+    model's own $2\to3$ prediction on the clustered event plus a learned correction (arXiv:2107.06625, 2512.11036).
+    Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor under $0.5$ with the heavy-quark
+    layer. Signed pools: $r_0$ three nats below the predicted level (par.\ The candidate targets, \code{lin\_shift}),
+    compared with the sign head on $\log|V|$ in a short GPU A/B; the magnitude scoring of the $55$ signed pools stays a
+    diagnostic. Also proposed: the full-length catalog pretraining (D78's held
     item) with the adopted target. Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
     \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
