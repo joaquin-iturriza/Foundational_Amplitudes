@@ -358,24 +358,30 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and bad == 0) else "FA
 WIDTH_BACKUP = ".width_backup"
 
 
+ML_PARAMS_MASSIVE_BEAM = {"#ImprovePSPoint": "-1", "#MLStabThres": "1.000000d-05"}
+
+
 def massive_beam_params(sa, pdg):
     """A standalone with a massive beam (a b at mg.BEAM_MASS) runs with ImprovePSPoint = -1. MadLoop's default (2)
     re-projects every point onto exact on-shell kinematics; its V.H. method refuses massive beams and the PSMC fallback
     rescales beam 1's 3-momentum by x^2 and the rest by x, which breaks pz conservation whenever x != 1 (any W: our
     m_W = 80.419 against the card's derived 80.4190024) and stops MadLoop on "pz is not conserved (flag:CT692)". Our
-    points are on shell and conserve momentum to 1e-15 already, so the projection is not needed. Idempotent; no-op for
-    massless beams."""
+    points are on shell and conserve momentum to 1e-15 already, so the projection is not needed. Without the projection
+    MadLoop's double-precision stability test lets through points it would have cleaned (v3_bg_bhz: one point of 100 with
+    c2 = -2.994 against -3, rc 216, FA-ccin2p3-3680de8c), so the threshold for its quadruple-precision rescue goes from
+    1e-3 to 1e-5. Idempotent; no-op for massless beams."""
     if not any(mg.BEAM_MASS.get(abs(int(p)), 0.0) > 0 for p in pdg[:2]):
         return
     cards = {os.path.realpath(os.path.join(sa, *p, "MadLoopParams.dat"))
              for p in (("Cards",), ("SubProcesses", "MadLoop5_resources"))}
     for card in sorted(c for c in cards if os.path.isfile(c)):
         L = open(card).read().split("\n")
+        L0 = list(L)
         for i, l in enumerate(L[:-1]):
-            if l.strip() == "#ImprovePSPoint" and L[i + 1].strip() != "-1":
-                L[i + 1] = "-1"
-                open(card, "w").write("\n".join(L))
-                break
+            if l.strip() in ML_PARAMS_MASSIVE_BEAM:
+                L[i + 1] = ML_PARAMS_MASSIVE_BEAM[l.strip()]
+        if L != L0:
+            open(card, "w").write("\n".join(L))
 
 
 def restore_stale_card(param_card):
