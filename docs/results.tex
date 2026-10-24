@@ -984,7 +984,23 @@ of the $49$ probes score, the other $26$ (every $2\to3$ with mixed coupling orde
 not exact. On the $12$ one-loop probes that score, the magnitude's MSE is $8.9$ (DlessInOrd) and $6.8$ (DlessInOrdQ),
 mostly level (offset $-2.7$, $-2.3$; $1.2$, $1.3$ after it, correlation $0.73$, $0.56$); their $11$ tree twins score
 $0.03$, $0.05$. So the sign-changing one-loop pools miss on the level as the positive ones do, and their shape after
-the offset is $40\times$ worse than their trees'. Already in place for the training pools:
+the offset is $40\times$ worse than their trees'.
+
+\paragraph{The signed pools' A/B: the sign head wins (D99, 2026-10-24).} DlessInOrdQ's short run with catalog\_v3's $48$
+sign-changing one-loop training pools added, two targets for them (\code{scripts/job\_catalog\_norm.sh} SgnR0 and
+SgnHead; one seed each, runs FA-ccin2p3-db5b0e77 and -ca22575d, $0.9$ GPU-h each): SgnR0, the signed log with $r_0$
+three nats below each pool's $0.5\%$ quantile of $|x|$ (\code{data.signedlog\_scale\_shift} $-3$), and SgnHead, $\log|x|$
+floored at its $1\%$ quantile with a sign head. Both train on the MSE with the arithmetic mean and no $\sigma$ stage,
+since the sign head refuses the het loss: a deviation from D93's short setup, the same for both arms, so their losses
+are not comparable to DlessInOrdQ's. Scored on a common footing (\code{tools/signed\_ab\_score.py}, run
+FA-ccin2p3-1f951ace; \code{signed\_ab.py}, \code{data/signed\_ab.json}): the MSE of $\log\max(|x|,\text{floor})$ with one
+floor for both arms, the wrong-sign fraction, and both within a factor $10$ of zero. On the $48$ pools trained on, the
+sign head's magnitude error is $0.45$ against SgnR0's $0.78$ (median per pool; SgnR0 / SgnHead $1.7$, $10$--$90\%$
+$1.0$--$2.9$, SgnR0 better on $5$), with the same $1.3\%$ of signs wrong; within a factor $10$ of zero ($13\%$ of the
+events) SgnR0 is slightly better ($1.45$ against $1.75$, signs wrong $8.2\%$ against $9.2\%$). On the $14$ held-out
+(H5) pools, zero-shot: $1.9$ against $4.7$ (ratio $2.8$, SgnR0 better on $3$), signs wrong $14\%$ against $18\%$. So
+the signed log's linear band, even three nats below the level, costs the magnitude more than it gains at the crossing,
+and the sign head is the target for the signed pools. Already in place for the training pools:
 \code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its own train pool.
 Two negatives and one exact factor from the same pass. Putting every massive particle at $\hat s$ in the emission history
 (no soft or collinear enhancement, \code{qperp\_logs(massive\_shat=True)}) is worse on the $43$ new ($8.8$) and at $2\to4$
@@ -6787,9 +6803,7 @@ of the three share a test set.
     GPU-h) plus CPU-side fits; (ii) only if (i) leaves the $2\to4$ shape: a head that predicts the $2\to4$ target as the
     model's own $2\to3$ prediction on the clustered event plus a learned correction (arXiv:2107.06625, 2512.11036).
     Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor under $0.5$ with the heavy-quark
-    layer. Signed pools: $r_0$ three nats below the predicted level (par.\ The candidate targets, \code{lin\_shift}),
-    compared with the sign head on $\log|V|$ in a short GPU A/B; the magnitude scoring of the $55$ signed pools stays a
-    diagnostic. Also proposed: the full-length catalog pretraining (D78's held
+    layer. Signed pools: the sign head (par.\ The signed pools' A/B). Also proposed: the full-length catalog pretraining (D78's held
     item) with the adopted target. Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
     \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
