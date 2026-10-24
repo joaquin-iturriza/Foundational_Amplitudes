@@ -5832,7 +5832,15 @@ of rung $7$ over rung $6$ is specific to the probes with a massive vector boson 
 ($+0.26$), against a median $+0.1$ over the twelve probes. It is not a better start: the two fine-tunes begin at the
 same validation loss ($2.0$ and $1.9\times10^{-2}$ at $D=10^2$, the first validation, median over trials), and rung $6$'s
 improves $34\times$ from there, rung $7$'s $308\times$. The parents are each rung's best pretraining trial (the same HP
-point, $8.5$ and $4.9\times10^{-8}$ on their own mixtures). Open: why the same start trains so differently.
+point, $8.5$ and $4.9\times10^{-8}$ on their own mixtures). It is not the fine-tunes' hyperparameters either: at
+$D=10^{1.5}$ and $10^2$ the best trial of each search sits at the same learning rate ($1.1$ and $1.4\times10^{-3}$; $1.2$ and
+$1.3\times10^{-3}$). The difference is made in the first tenth of the run: by then rung $7$'s best curve has dropped
+$24\times$ and $417\times$ from its first validation, rung $6$'s $3.6\times$ and $17\times$, and rung $6$'s then stalls
+($4.7\times$ and $35\times$ at the end; its best checkpoint at $13\%$ of the run, \code{data/nogain\_arms.json}). From
+$D=10^{2.5}$ up both keep improving to the end and the gap closes ($1.2$ and $2.5\times10^3$ at $10^{2.5}$). So rung $6$'s
+pretrained function sits in a basin that $u\bar u\to Zg$ at small $D$ cannot leave, and adding $u\bar d\to Wgg$ moves it out.
+Open: what in the representation does it; a probe of the frozen trunk's features on $u\bar u\to Zg$ (a linear read-out per
+rung) would say whether rung $7$'s features already carry the target.
 The electroweak-Sudakov arm on the electroweak one-loop $ee\to d\bar d$ (\code{data/nogain\_arms.json}): scratch,
 rung $1$ and the arm stay within $1.5\times$ of each other at every $D$ but one ($10^3$, the arm $2\times$ below), and all
 three flatten between $D=10^2$ and $10^{2.5}$ ($7.6$ to $8.5\times10^{-3}$ for scratch). The arm's first validation on the
