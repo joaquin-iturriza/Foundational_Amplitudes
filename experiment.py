@@ -1425,7 +1425,7 @@ class AmplitudeExperiment(BaseExperiment):
         are frozen and saved to the run dir (reloaded on warm start rather than
         recomputed)."""
         import datagen
-        from particle_ids import global_encode
+        from particle_ids import global_encode, species_pdgs
         from dataset import build_flat_arrays
 
         assert self.modelname in (
@@ -1619,7 +1619,7 @@ class AmplitudeExperiment(BaseExperiment):
                 if use_pids:
                     toks = self.tokenizer.register_and_encode(pdg_ids)
                 else:
-                    toks = global_encode(pdg_ids)
+                    toks = global_encode(species_pdgs(pdg_ids, s.get("physics")))   # heavy-quark tops: their own mass
                     self.tokenizer.register_and_encode(pdg_ids)  # keep in sync
 
                 # Raw per-slot PDG order (fixed per process) for the Tier-B leg→slot map.
@@ -1726,6 +1726,10 @@ class AmplitudeExperiment(BaseExperiment):
             tp_pdgs = [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])]
             widths = {int(k): float(v) for k, v in
                       dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
+            # a pool generated with its own width (recipe physics.widths: catalog_v3's heavy-quark layer, the top width
+            # following m_t) takes that width in its Breit-Wigner, the configured one otherwise
+            _pool_widths = {sp["name"]: {abs(int(k)): float(v) for k, v in ((sp.get("physics") or {}).get("widths") or {}).items()}
+                            for sp in (getattr(self, "_recipe_specs", None) or [])}
             # massless t-channel exchanges (data.target_propagator_tchannel): a massless
             # propagator whose s_k is spacelike on the whole train pool is a t-channel
             # exchange; |M|² goes like 1/|t| for a fermion and 1/t² for a boson, so the
@@ -1789,7 +1793,7 @@ class AmplitudeExperiment(BaseExperiment):
                         q = np.einsum("s,nsc->nc", mrow, pp)                   # (N,4) physical
                         s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
                         if mm > 0:
-                            g = widths.get(abs(int(pdg)), 0.0)
+                            g = _pool_widths.get(name, {}).get(abs(int(pdg)), widths.get(abs(int(pdg)), 0.0))
                             logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
                         else:
                             med, floor = norm

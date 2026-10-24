@@ -193,6 +193,14 @@ BSM_PARTICLE_PROPERTIES = {
          36: [  0.0,  0.0,  float(np.log10(NONSM_MASSES_GEV["h3"])),  0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],  # h3 (2HDM, CP-odd)
     # fmt: on
 }
+# ── heavy-quark species (catalog_v3, D102): the top's quantum numbers at the masses its heavy-quark layer is generated
+# at, so a pool generated at m_t = 300 GeV reads its top as a 300 GeV particle (the table's masses are the generator's).
+# Codes sign * (6000000 + m); a pool's PDG 6 is mapped to them by species_pdgs() from its recipe's physics.masses.
+HEAVY_QUARK_MASSES_GEV = (50, 300, 600)
+for _m in HEAVY_QUARK_MASSES_GEV:
+    for _sgn in (1, -1):
+        _row = list(PARTICLE_PROPERTIES[6 * _sgn]); _row[2] = float(np.log10(_m))
+        BSM_PARTICLE_PROPERTIES[_sgn * (6000000 + _m)] = _row
 SM_PDGS = tuple(sorted(PARTICLE_PROPERTIES))      # frozen before the merge below
 assert not set(BSM_PARTICLE_PROPERTIES) & set(SM_PDGS)
 PARTICLE_PROPERTIES = {**PARTICLE_PROPERTIES, **BSM_PARTICLE_PROPERTIES}
@@ -587,6 +595,21 @@ def mass_feature_spec(spin_onehot=False, color_onehot=False,
         "std_mu":          None if std_mu is None else float(std_mu),
         "std_sd":          None if std_sd is None else float(std_sd),
     }
+
+
+def species_pdgs(pdg_ids, physics=None):
+    """The PDG ids the property table reads for a pool generated with recipe `physics`: a top generated at a heavy-quark
+    mass (physics.masses {6: m}, m in HEAVY_QUARK_MASSES_GEV) becomes that mass's species; anything else is unchanged.
+    For the encoding only: the pools, the slot order, the order vectors and the target keep the generated ids."""
+    m = ((physics or {}).get("masses") or {})
+    m = {abs(int(k)): float(v) for k, v in m.items()}.get(6)
+    # a top mass with no species row (catalog_v2's ee_ttbar__mt185 interpolation probe) keeps the table's 172.5, as
+    # every run on it so far has read it
+    if m is None or abs(m - round(m)) > 1e-9 or int(round(m)) not in HEAVY_QUARK_MASSES_GEV:
+        return pdg_ids
+    pdg_ids = np.array(pdg_ids, dtype=int, copy=True)
+    pdg_ids[pdg_ids == 6] = 6000000 + int(round(m)); pdg_ids[pdg_ids == -6] = -(6000000 + int(round(m)))
+    return pdg_ids
 
 
 def global_encode(pdg_ids: np.ndarray) -> np.ndarray:

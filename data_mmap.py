@@ -417,6 +417,7 @@ def init_data_recipes_mmap(exp, c):
 def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve_amp_trafos,
            preprocess_amplitude):
     from experiment import order_identical_particles
+    from particle_ids import species_pdgs
     cfg = exp.cfg
     names, roles, specs, paths = c["names"], c["roles"], c["specs"], c["paths"]
     use_pids = c["use_pids"]
@@ -465,7 +466,7 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             if use_pids:
                 toks = exp.tokenizer.register_and_encode(pdg_ids)
             else:
-                toks = global_encode(pdg_ids)
+                toks = global_encode(species_pdgs(pdg_ids, s.get("physics")))   # heavy-quark tops: their own mass
                 exp.tokenizer.register_and_encode(pdg_ids)
             reg.append(np.unique(pdg_ids).tolist())
             slot_pdgs.setdefault(name, [int(x) for x in pdg_ids[0]])
