@@ -1255,7 +1255,7 @@ processes:
     why: one-loop QCD of v3_dd_add
   v3_dd_dd_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1297,7 +1297,7 @@ processes:
     why: one-loop QCD of v3_dd_ddz
   v3_ddx_aa_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1339,7 +1339,7 @@ processes:
     why: one-loop QCD of v3_ddx_aaa
   v3_ddx_ag_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1403,7 +1403,7 @@ processes:
     why: one-loop QCD of v3_ddx_awpwm
   v3_ddx_bbx_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1467,7 +1467,7 @@ processes:
     why: one-loop QCD of v3_ddx_bbxz
   v3_ddx_ccx_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1509,7 +1509,7 @@ processes:
     why: one-loop QCD of v3_ddx_ccxh
   v3_ddx_ddx_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1529,7 +1529,7 @@ processes:
     why: one-loop QCD of v3_ddx_ddx
   v3_ddx_epem_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1571,7 +1571,7 @@ processes:
     why: one-loop QCD of v3_ddx_epvewm
   v3_ddx_gg_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1657,7 +1657,7 @@ processes:
     why: one-loop QCD of v3_ddx_gvevex
   v3_ddx_hg_loop:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -1683,7 +1683,7 @@ processes:
     why: loop-induced
   v3_ddx_hh_loop:
     alphas_power: 0
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -1759,7 +1759,7 @@ processes:
     why: one-loop QCD of v3_ddx_hhz
   v3_ddx_hz_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1801,7 +1801,7 @@ processes:
     why: one-loop QCD of v3_ddx_tapvtwm
   v3_ddx_wpwm_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1821,7 +1821,7 @@ processes:
     why: one-loop QCD of v3_ddx_wpwm
   v3_dg_ad_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1841,7 +1841,7 @@ processes:
     why: one-loop QCD of v3_dg_ad
   v3_dg_dg_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1905,7 +1905,7 @@ processes:
     why: one-loop QCD of v3_dg_dgz
   v3_dg_dz_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1969,7 +1969,7 @@ processes:
     why: one-loop QCD of v3_dg_tamuvtx
   v3_dg_uwm_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2055,7 +2055,7 @@ processes:
     why: one-loop QCD of v3_ds_cdwm
   v3_ds_ds_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2097,7 +2097,7 @@ processes:
     why: one-loop QCD of v3_dsx_acxu
   v3_dsx_cxu_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2205,7 +2205,7 @@ processes:
     why: one-loop QCD of v3_epem_addx
   v3_epem_bbx_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2247,7 +2247,7 @@ processes:
     why: one-loop QCD of v3_epem_bbxz
   v3_epem_ccx_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2311,7 +2311,7 @@ processes:
     why: one-loop QCD of v3_epem_ddxz
   v3_epem_hh_loop:
     alphas_power: 0
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2365,7 +2365,7 @@ processes:
     why: loop-induced
   v3_gg_aa_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2441,7 +2441,7 @@ processes:
     why: one-loop QCD of v3_gg_accx
   v3_gg_bbx_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2505,7 +2505,7 @@ processes:
     why: one-loop QCD of v3_gg_ccxz
   v3_gg_gg_nlo:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2525,7 +2525,7 @@ processes:
     why: one-loop QCD of v3_gg_gg
   v3_gg_hg_loop:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2551,7 +2551,7 @@ processes:
     why: loop-induced
   v3_gg_hh_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2605,7 +2605,7 @@ processes:
     why: loop-induced
   v3_gg_wpwm_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2631,7 +2631,7 @@ processes:
     why: loop-induced
   v3_gg_za_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2657,7 +2657,7 @@ processes:
     why: loop-induced
   v3_gg_zh_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2683,7 +2683,7 @@ processes:
     why: loop-induced
   v3_gg_zz_loop:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -2907,7 +2907,7 @@ processes:
     why: one-loop QCD of v3_udx_agwp
   v3_udx_awp_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -2949,7 +2949,7 @@ processes:
     why: one-loop QCD of v3_udx_ccxwp
   v3_udx_csx_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3057,7 +3057,7 @@ processes:
     why: one-loop QCD of v3_udx_gtapvt
   v3_udx_gwp_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3077,7 +3077,7 @@ processes:
     why: one-loop QCD of v3_udx_gwp
   v3_udx_hwp_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3119,7 +3119,7 @@ processes:
     why: one-loop QCD of v3_udx_taptamwp
   v3_udx_tapvt_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3161,7 +3161,7 @@ processes:
     why: one-loop QCD of v3_udx_wpwpwm
   v3_udx_wpz_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3291,7 +3291,7 @@ processes:
     why: one-loop QCD of v3_us_acd
   v3_us_cd_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3421,7 +3421,7 @@ processes:
     why: one-loop QCD of v3_uux_epemz
   v3_uux_hg_loop:
     alphas_power: 3
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -3447,7 +3447,7 @@ processes:
     why: loop-induced
   v3_uux_hh_loop:
     alphas_power: 0
-    certified: false
+    certified: true
     kind: virt
     layer: loop
     loopind: true
@@ -3567,7 +3567,7 @@ processes:
     why: one-loop QCD of v3_uux_hwpwm
   v3_uux_taptam_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3587,7 +3587,7 @@ processes:
     why: one-loop QCD of v3_uux_taptam
   v3_uux_vevex_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3607,7 +3607,7 @@ processes:
     why: one-loop QCD of v3_uux_vevex
   v3_uux_wpwm_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -4372,7 +4372,7 @@ virt:
     - 1
     - 1
   v3_dd_dd:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4396,7 +4396,7 @@ virt:
     - 1
     - 23
   v3_ddx_aa:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4420,7 +4420,7 @@ virt:
     - 22
     - 22
   v3_ddx_ag:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4457,7 +4457,7 @@ virt:
     - 24
     - -24
   v3_ddx_bbx:
-    certified: false
+    certified: true
     m_finals:
     - 4.7
     - 4.7
@@ -4494,7 +4494,7 @@ virt:
     - -5
     - 23
   v3_ddx_ccx:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4518,7 +4518,7 @@ virt:
     - -4
     - 25
   v3_ddx_ddx:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4529,7 +4529,7 @@ virt:
     - 1
     - -1
   v3_ddx_epem:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4553,7 +4553,7 @@ virt:
     - 12
     - -24
   v3_ddx_gg:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4603,7 +4603,7 @@ virt:
     - 12
     - -12
   v3_ddx_hg:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id001
     mg5: generate d d~ > h g [sqrvirt=QCD]
@@ -4611,7 +4611,7 @@ virt:
     order: *id002
     pdg_ids: *id003
   v3_ddx_hh:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id004
     mg5: generate d d~ > h h [sqrvirt=QCD QED]
@@ -4640,7 +4640,7 @@ virt:
     - 25
     - 23
   v3_ddx_hz:
-    certified: false
+    certified: true
     m_finals:
     - 125.0
     - 91.188
@@ -4664,7 +4664,7 @@ virt:
     - 16
     - -24
   v3_ddx_wpwm:
-    certified: false
+    certified: true
     m_finals:
     - 80.419
     - 80.419
@@ -4675,7 +4675,7 @@ virt:
     - 24
     - -24
   v3_dg_ad:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4686,7 +4686,7 @@ virt:
     - 22
     - 1
   v3_dg_dg:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4723,7 +4723,7 @@ virt:
     - 21
     - 23
   v3_dg_dz:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 91.188
@@ -4760,7 +4760,7 @@ virt:
     - 2
     - -16
   v3_dg_uwm:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 80.419
@@ -4810,7 +4810,7 @@ virt:
     - 1
     - -24
   v3_ds_ds:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4834,7 +4834,7 @@ virt:
     - -4
     - 2
   v3_dsx_cxu:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4897,7 +4897,7 @@ virt:
     - 1
     - -1
   v3_epem_bbx:
-    certified: false
+    certified: true
     m_finals:
     - 4.7
     - 4.7
@@ -4921,7 +4921,7 @@ virt:
     - -5
     - 23
   v3_epem_ccx:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -4958,7 +4958,7 @@ virt:
     - -1
     - 23
   v3_epem_hh:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id010
     mg5: generate e+ e- > h h [sqrvirt=QED]
@@ -4974,7 +4974,7 @@ virt:
     order: *id014
     pdg_ids: *id015
   v3_gg_aa:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id016
     mg5: generate g g > a a [sqrvirt=QCD]
@@ -5003,7 +5003,7 @@ virt:
     - 4
     - -4
   v3_gg_bbx:
-    certified: false
+    certified: true
     m_finals:
     - 4.7
     - 4.7
@@ -5040,7 +5040,7 @@ virt:
     - -4
     - 23
   v3_gg_gg:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -5051,7 +5051,7 @@ virt:
     - 21
     - 21
   v3_gg_hg:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id022
     mg5: generate g g > h g [sqrvirt=QCD]
@@ -5059,7 +5059,7 @@ virt:
     order: *id023
     pdg_ids: *id024
   v3_gg_hh:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id025
     mg5: generate g g > h h [sqrvirt=QCD]
@@ -5075,7 +5075,7 @@ virt:
     order: *id029
     pdg_ids: *id030
   v3_gg_wpwm:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id031
     mg5: generate g g > w+ w- [sqrvirt=QCD]
@@ -5083,7 +5083,7 @@ virt:
     order: *id032
     pdg_ids: *id033
   v3_gg_za:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id034
     mg5: generate g g > z a [sqrvirt=QCD]
@@ -5091,7 +5091,7 @@ virt:
     order: *id035
     pdg_ids: *id036
   v3_gg_zh:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id037
     mg5: generate g g > z h [sqrvirt=QCD]
@@ -5099,7 +5099,7 @@ virt:
     order: *id038
     pdg_ids: *id039
   v3_gg_zz:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id040
     mg5: generate g g > z z [sqrvirt=QCD]
@@ -5224,7 +5224,7 @@ virt:
     - 21
     - 24
   v3_udx_awp:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 80.419
@@ -5248,7 +5248,7 @@ virt:
     - -4
     - 24
   v3_udx_csx:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -5311,7 +5311,7 @@ virt:
     - -15
     - 16
   v3_udx_gwp:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 80.419
@@ -5322,7 +5322,7 @@ virt:
     - 21
     - 24
   v3_udx_hwp:
-    certified: false
+    certified: true
     m_finals:
     - 125.0
     - 80.419
@@ -5346,7 +5346,7 @@ virt:
     - 15
     - 24
   v3_udx_tapvt:
-    certified: false
+    certified: true
     m_finals:
     - 1.777
     - 0.0
@@ -5370,7 +5370,7 @@ virt:
     - 24
     - -24
   v3_udx_wpz:
-    certified: false
+    certified: true
     m_finals:
     - 80.419
     - 91.188
@@ -5446,7 +5446,7 @@ virt:
     - 4
     - 1
   v3_us_cd:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -5522,7 +5522,7 @@ virt:
     - 11
     - 23
   v3_uux_hg:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id043
     mg5: generate u u~ > h g [sqrvirt=QCD]
@@ -5530,7 +5530,7 @@ virt:
     order: *id044
     pdg_ids: *id045
   v3_uux_hh:
-    certified: false
+    certified: true
     loopind: true
     m_finals: *id046
     mg5: generate u u~ > h h [sqrvirt=QCD QED]
@@ -5585,7 +5585,7 @@ virt:
     - 24
     - -24
   v3_uux_taptam:
-    certified: false
+    certified: true
     m_finals:
     - 1.777
     - 1.777
@@ -5596,7 +5596,7 @@ virt:
     - -15
     - 15
   v3_uux_vevex:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 0.0
@@ -5607,7 +5607,7 @@ virt:
     - 12
     - -12
   v3_uux_wpwm:
-    certified: false
+    certified: true
     m_finals:
     - 80.419
     - 80.419
