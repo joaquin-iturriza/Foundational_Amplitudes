@@ -121,6 +121,23 @@ def _load_catalog_v2_virt():
 
 CATALOG_V2_VIRT = _load_catalog_v2_virt()
 
+
+def _load_catalog_v3_virt():
+    """catalog_v3's MadLoop strings (recipes/gen_catalog_v3.py --write-loops; D102 stage 2), keys v3_*"""
+    import yaml as _yaml
+    path = os.path.join(ROOT, "recipes", "catalog_v3_loops.yaml")
+    if not os.path.exists(path):
+        return 0
+    d = _yaml.load(open(path), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+    n = 0
+    for name, entry in (d.get("virt") or {}).items():
+        if name in VIRT_PROCESSES:
+            raise KeyError(f"catalog_v3 one-loop entry {name} collides with an existing one")
+        VIRT_PROCESSES[name] = dict(entry, _v3=True); n += 1
+    return n
+
+CATALOG_V3_VIRT = _load_catalog_v3_virt()
+
 ALPHA_EW = 1.0 / C.PARAM_CARD_PATCHES["aEWM1"]     # the locked card's alpha, MadLoop's QED normalisation
 
 

@@ -1752,7 +1752,10 @@ def _load_catalog_v3():
     with open(path) as f:
         d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
     n = 0
-    for name, entry in (d.get("processes") or {}).items():
+    lp = os.path.join(os.path.dirname(path), "catalog_v3_loops.yaml")      # stage 2: the one-loop and loop-induced entries
+    loops = (_yaml.load(open(lp), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}).get("processes", {}) \
+        if os.path.exists(lp) else {}
+    for name, entry in list((d.get("processes") or {}).items()) + list(loops.items()):
         if name in PROCESSES:
             raise KeyError(f"catalog_v3 entry {name} collides with an existing process")
         PROCESSES[name] = dict(entry, _v3=True); n += 1

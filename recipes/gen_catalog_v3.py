@@ -302,9 +302,87 @@ def stage3(n_p5=40, n_as=7, seed=0):
           f"{len(al)} alpha_s pools on {len(fams)} families -> recipes/catalog_v3_alphas.json")
 
 
+OUT_LOOPS = os.path.join(ROOT, "recipes", "catalog_v3_loops.yaml")
+# the loop-induced layer (D98, D102: every candidate the census enumerated that is a genuine loop-induced process; the
+# certification admits each): of the 40 candidates, dropped are the 2->1 (gg, qq~, ee -> h: no kinematics), those with a
+# tree (the census found one: uu~ -> zz, aa, za, zh, aag, ww and their ee, dd~ twins) and the colour-forbidden ee -> hg,
+# aag. Strings [sqrvirt=...] (tools/nlo_virtual_pipeline.py: [noborn=...] trips an MG5 3.7.0 bug in output standalone).
+# QCD quark loops on loop_sm: gg -> X, qq~ -> h g, order [1, 0, 2 + gluons, bosons] (gg -> h [1,0,2,1], uubar_Hg
+# [1,0,3,1]); EW loops on loop_qcd_qed_sm as catalog_v2's uubar_HH and ee_HH, order [0, 1, 0, 2 + bosons].
+# gg -> z a is the held-out one (H5).
+LOOP_INDUCED = [
+    ("gg_hh", "g g > h h", [21, 21, 25, 25], "QCD"), ("gg_zz", "g g > z z", [21, 21, 23, 23], "QCD"),
+    ("gg_aa", "g g > a a", [21, 21, 22, 22], "QCD"), ("gg_za", "g g > z a", [21, 21, 23, 22], "QCD"),
+    ("gg_hg", "g g > h g", [21, 21, 25, 21], "QCD"), ("gg_hhh", "g g > h h h", [21, 21, 25, 25, 25], "QCD"),
+    ("gg_zh", "g g > z h", [21, 21, 23, 25], "QCD"), ("gg_aag", "g g > a a g", [21, 21, 22, 22, 21], "QCD"),
+    ("gg_wpwm", "g g > w+ w-", [21, 21, 24, -24], "QCD"),
+    ("uux_hg", "u u~ > h g", [2, -2, 25, 21], "QCD"), ("ddx_hg", "d d~ > h g", [1, -1, 25, 21], "QCD"),
+    ("uux_hh", "u u~ > h h", [2, -2, 25, 25], "QCD QED"), ("ddx_hh", "d d~ > h h", [1, -1, 25, 25], "QCD QED"),
+    ("uux_hhh", "u u~ > h h h", [2, -2, 25, 25, 25], "QCD QED"), ("ddx_hhh", "d d~ > h h h", [1, -1, 25, 25, 25], "QCD QED"),
+    ("epem_hh", "e+ e- > h h", [11, -11, 25, 25], "QED"), ("epem_hhh", "e+ e- > h h h", [11, -11, 25, 25, 25], "QED")]
+LOOP_HELD = {"gg_za"}
+_M = {21: 0.0, 22: 0.0, 23: 91.188, 24: 80.419, 25: 125.0}
+
+
+def _loop_induced_entry(tag, g, pdg, loops):
+    """the stored target's order vector: a QCD quark loop [1, 0, 2 + external gluons, external bosons] (gg -> h
+    [1, 0, 2, 1], uubar_Hg [1, 0, 3, 1]); an EW loop [0, 1, 0, 2 + bosons] (ee_HH, uubar_HH [0, 1, 0, 4])"""
+    fin = pdg[2:]
+    n_g = sum(p == 21 for p in fin); n_b = sum(abs(p) in (22, 23, 24, 25) for p in fin)
+    return [1, 0, 2 + n_g, n_b] if loops == "QCD" else [0, 1, 0, 2 + n_b]
+
+
+def write_loops():
+    """D102 stage 2: the one-loop layer of recipes/catalog_v3_roles.json (150 QCD virtuals of tree classes, [virt=QCD],
+    as catalog_v2's *_nlo) and the five loop-induced classes, written to recipes/catalog_v3_loops.yaml: `virt` (the
+    MadLoop strings tools/nlo_virtual_pipeline.py builds and pole-certifies) and `processes` (the pipeline entries,
+    loaded by mg5_pipeline_final._load_catalog_v3). Every entry is written certified: false; --certified <verdicts>
+    (scripts/build_nlo_backends.sh's build_nlo_verdicts.txt) sets the PASSes true, and only those enter a recipe."""
+    import yaml
+    Pr = yaml.load(open(OUT_PROC), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["processes"]
+    roles = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))
+    virt, procs = {}, {}
+    for nlo, v in sorted(roles["loops"].items()):
+        n = v["tree"]; e = Pr[n]
+        virt[n] = {"mg5": e["mg5_generate"][0] + " [virt=QCD]", "pdg_ids": list(e["pdg_ids"]), "m_finals": list(e["m_finals"]),
+                   "certified": False}
+        procs[nlo] = {"kind": "virt", "virt": True, "virt_base": n, "nfinal": e["nfinal"], "n_loops": 1,
+                      "alphas_power": int(e.get("alphas_power", 0)) + 1, "pdg_ids": list(e["pdg_ids"]),
+                      "m_finals": list(e["m_finals"]), "param_card_patches": {}, "layer": "nlo",
+                      "why": f"one-loop QCD of {n}", "role": v["role"], "certified": False}
+    for tag, g, pdg, loops in LOOP_INDUCED:
+        base = "v3_" + tag; m = [_M[abs(p)] for p in pdg[2:]]; order = _loop_induced_entry(tag, g, pdg, loops)
+        role = "heldout" if tag in LOOP_HELD else "train"
+        virt[base] = {"mg5": f"generate {g} [sqrvirt={loops}]", "model": "loop_sm" if loops == "QCD" else "loop_qcd_qed_sm",
+                      "loopind": True, "pdg_ids": pdg, "m_finals": m, "order": order, "certified": False}
+        procs[base + "_loop"] = {"kind": "virt", "virt": True, "virt_base": base, "nfinal": len(m), "n_loops": 1,
+                                 "alphas_power": order[2], "loopind": True, "order": order, "pdg_ids": pdg, "m_finals": m,
+                                 "param_card_patches": {}, "layer": "loop", "why": "loop-induced", "role": role,
+                                 "certified": False}
+    yaml.safe_dump({"virt": virt, "processes": procs}, open(OUT_LOOPS, "w"), sort_keys=True)
+    print(f"wrote {OUT_LOOPS}: {len(virt)} MadLoop strings, {len(procs)} entries "
+          f"({dict(Counter(p['role'] for p in procs.values()))})")
+
+
+def set_certified(verdicts):
+    """scripts/build_nlo_backends.sh's verdict file ("<virt key> PASS|FAIL|..." per line) -> certified: true on the
+    PASSes in recipes/catalog_v3_loops.yaml, false on everything else"""
+    import yaml
+    ok = {l.split()[0] for l in open(verdicts) if len(l.split()) >= 2 and l.split()[1] == "PASS"}
+    d = yaml.safe_load(open(OUT_LOOPS))
+    for k, v in d["virt"].items():
+        v["certified"] = k in ok
+    for n, e in d["processes"].items():
+        e["certified"] = e["virt_base"] in ok
+    yaml.safe_dump(d, open(OUT_LOOPS, "w"), sort_keys=True)
+    print(f"certified {sum(v['certified'] for v in d['virt'].values())} of {len(d['virt'])} MadLoop strings")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", nargs="+", default=None, help="the stage-2 outputs (checked.json, checked_ext.json)")
+    ap.add_argument("--certified", default=None, help="the MadLoop verdicts file to mark the PASSes certified")
+    ap.add_argument("--write-loops", action="store_true", help="the one-loop layer and the loop-induced entries (D102)")
     ap.add_argument("--stage3", action="store_true", help="choose the 2->5 probes and the alpha_s points (D102)")
     ap.add_argument("--extend24", default=None, help="stage-2 output to extend the 2->4 layer from (D100)")
     ap.add_argument("--cands", default=None, help="--check this candidate file instead of catalog_v3_candidates.json")
@@ -330,6 +408,10 @@ def main():
         extend24(a.extend24)
     if a.stage3:
         stage3()
+    if a.write_loops:
+        write_loops()
+    if a.certified:
+        set_certified(a.certified)
     if a.write:
         write(*a.write)
 

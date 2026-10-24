@@ -1,0 +1,5632 @@
+processes:
+  v3_bb_bb_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    role: heldout
+    virt: true
+    virt_base: v3_bb_bb
+    why: one-loop QCD of v3_bb_bb
+  v3_bb_bbz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bb_bbz
+    why: one-loop QCD of v3_bb_bbz
+  v3_bbx_aa_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    role: train
+    virt: true
+    virt_base: v3_bbx_aa
+    why: one-loop QCD of v3_bbx_aa
+  v3_bbx_aag_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_bbx_aag
+    why: one-loop QCD of v3_bbx_aag
+  v3_bbx_addx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 1
+    - -1
+    role: train
+    virt: true
+    virt_base: v3_bbx_addx
+    why: one-loop QCD of v3_bbx_addx
+  v3_bbx_aepem_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - -11
+    - 11
+    role: train
+    virt: true
+    virt_base: v3_bbx_aepem
+    why: one-loop QCD of v3_bbx_aepem
+  v3_bbx_ag_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_bbx_ag
+    why: one-loop QCD of v3_bbx_ag
+  v3_bbx_agz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_agz
+    why: one-loop QCD of v3_bbx_agz
+  v3_bbx_ah_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_ah
+    why: one-loop QCD of v3_bbx_ah
+  v3_bbx_ahh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_ahh
+    why: one-loop QCD of v3_bbx_ahh
+  v3_bbx_ataptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - -15
+    - 15
+    role: train
+    virt: true
+    virt_base: v3_bbx_ataptam
+    why: one-loop QCD of v3_bbx_ataptam
+  v3_bbx_avevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 12
+    - -12
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_avevex
+    why: one-loop QCD of v3_bbx_avevex
+  v3_bbx_az_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_az
+    why: one-loop QCD of v3_bbx_az
+  v3_bbx_azz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_azz
+    why: one-loop QCD of v3_bbx_azz
+  v3_bbx_bbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_bbx_bbx
+    why: one-loop QCD of v3_bbx_bbx
+  v3_bbx_ccx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    role: train
+    virt: true
+    virt_base: v3_bbx_ccx
+    why: one-loop QCD of v3_bbx_ccx
+  v3_bbx_ccxh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 25
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_ccxh
+    why: one-loop QCD of v3_bbx_ccxh
+  v3_bbx_epem_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    role: train
+    virt: true
+    virt_base: v3_bbx_epem
+    why: one-loop QCD of v3_bbx_epem
+  v3_bbx_epemh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_epemh
+    why: one-loop QCD of v3_bbx_epemh
+  v3_bbx_epemz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_epemz
+    why: one-loop QCD of v3_bbx_epemz
+  v3_bbx_gg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_gg
+    why: one-loop QCD of v3_bbx_gg
+  v3_bbx_ggh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_ggh
+    why: one-loop QCD of v3_bbx_ggh
+  v3_bbx_gh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_gh
+    why: one-loop QCD of v3_bbx_gh
+  v3_bbx_ghh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_ghh
+    why: one-loop QCD of v3_bbx_ghh
+  v3_bbx_gvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_bbx_gvevex
+    why: one-loop QCD of v3_bbx_gvevex
+  v3_bbx_gwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_bbx_gwpwm
+    why: one-loop QCD of v3_bbx_gwpwm
+  v3_bbx_gz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_gz
+    why: one-loop QCD of v3_bbx_gz
+  v3_bbx_gzz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_gzz
+    why: one-loop QCD of v3_bbx_gzz
+  v3_bbx_hh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bbx_hh
+    why: one-loop QCD of v3_bbx_hh
+  v3_bbx_hhz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_hhz
+    why: one-loop QCD of v3_bbx_hhz
+  v3_bbx_htaptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - -15
+    - 15
+    role: train
+    virt: true
+    virt_base: v3_bbx_htaptam
+    why: one-loop QCD of v3_bbx_htaptam
+  v3_bbx_hvevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_bbx_hvevex
+    why: one-loop QCD of v3_bbx_hvevex
+  v3_bbx_hwpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_bbx_hwpwm
+    why: one-loop QCD of v3_bbx_hwpwm
+  v3_bbx_hz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_hz
+    why: one-loop QCD of v3_bbx_hz
+  v3_bbx_hzz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_hzz
+    why: one-loop QCD of v3_bbx_hzz
+  v3_bbx_taptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 15
+    role: train
+    virt: true
+    virt_base: v3_bbx_taptam
+    why: one-loop QCD of v3_bbx_taptam
+  v3_bbx_tapvtwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 16
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_bbx_tapvtwm
+    why: one-loop QCD of v3_bbx_tapvtwm
+  v3_bbx_vevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_bbx_vevex
+    why: one-loop QCD of v3_bbx_vevex
+  v3_bbx_wpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_bbx_wpwm
+    why: one-loop QCD of v3_bbx_wpwm
+  v3_bbx_wpwmz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 24
+    - -24
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_wpwmz
+    why: one-loop QCD of v3_bbx_wpwmz
+  v3_bbx_zz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 23
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_bbx_zz
+    why: one-loop QCD of v3_bbx_zz
+  v3_bbx_zzz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 23
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bbx_zzz
+    why: one-loop QCD of v3_bbx_zzz
+  v3_bg_ab_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    role: heldout
+    virt: true
+    virt_base: v3_bg_ab
+    why: one-loop QCD of v3_bg_ab
+  v3_bg_abg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_bg_abg
+    why: one-loop QCD of v3_bg_abg
+  v3_bg_abh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bg_abh
+    why: one-loop QCD of v3_bg_abh
+  v3_bg_abz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bg_abz
+    why: one-loop QCD of v3_bg_abz
+  v3_bg_bbbx_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_bg_bbbx
+    why: one-loop QCD of v3_bg_bbbx
+  v3_bg_bccx_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 4
+    - -4
+    role: train
+    virt: true
+    virt_base: v3_bg_bccx
+    why: one-loop QCD of v3_bg_bccx
+  v3_bg_bg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_bg_bg
+    why: one-loop QCD of v3_bg_bg
+  v3_bg_bgg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    - 21
+    role: heldout
+    virt: true
+    virt_base: v3_bg_bgg
+    why: one-loop QCD of v3_bg_bgg
+  v3_bg_bh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_bg_bh
+    why: one-loop QCD of v3_bg_bh
+  v3_bg_bhz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bg_bhz
+    why: one-loop QCD of v3_bg_bhz
+  v3_bg_btaptam_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - -15
+    - 15
+    role: train
+    virt: true
+    virt_base: v3_bg_btaptam
+    why: one-loop QCD of v3_bg_btaptam
+  v3_bg_bwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_bg_bwpwm
+    why: one-loop QCD of v3_bg_bwpwm
+  v3_bg_bz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_bg_bz
+    why: one-loop QCD of v3_bg_bz
+  v3_db_abd_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 22
+    - 5
+    - 1
+    role: train
+    virt: true
+    virt_base: v3_db_abd
+    why: one-loop QCD of v3_db_abd
+  v3_db_bd_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    role: train
+    virt: true
+    virt_base: v3_db_bd
+    why: one-loop QCD of v3_db_bd
+  v3_db_bdz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_db_bdz
+    why: one-loop QCD of v3_db_bdz
+  v3_dd_add_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 22
+    - 1
+    - 1
+    role: heldout
+    virt: true
+    virt_base: v3_dd_add
+    why: one-loop QCD of v3_dd_add
+  v3_dd_dd_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    role: train
+    virt: true
+    virt_base: v3_dd_dd
+    why: one-loop QCD of v3_dd_dd
+  v3_dd_ddz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_dd_ddz
+    why: one-loop QCD of v3_dd_ddz
+  v3_ddx_aa_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+    role: train
+    virt: true
+    virt_base: v3_ddx_aa
+    why: one-loop QCD of v3_ddx_aa
+  v3_ddx_aaa_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+    - 22
+    role: heldout
+    virt: true
+    virt_base: v3_ddx_aaa
+    why: one-loop QCD of v3_ddx_aaa
+  v3_ddx_ag_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 21
+    role: heldout
+    virt: true
+    virt_base: v3_ddx_ag
+    why: one-loop QCD of v3_ddx_ag
+  v3_ddx_agg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 21
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_ddx_agg
+    why: one-loop QCD of v3_ddx_agg
+  v3_ddx_awpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_ddx_awpwm
+    why: one-loop QCD of v3_ddx_awpwm
+  v3_ddx_bbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_ddx_bbx
+    why: one-loop QCD of v3_ddx_bbx
+  v3_ddx_bbxh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_ddx_bbxh
+    why: one-loop QCD of v3_ddx_bbxh
+  v3_ddx_bbxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_ddx_bbxz
+    why: one-loop QCD of v3_ddx_bbxz
+  v3_ddx_ccx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 4
+    - -4
+    role: train
+    virt: true
+    virt_base: v3_ddx_ccx
+    why: one-loop QCD of v3_ddx_ccx
+  v3_ddx_ccxh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 4
+    - -4
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_ddx_ccxh
+    why: one-loop QCD of v3_ddx_ccxh
+  v3_ddx_ddx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    role: train
+    virt: true
+    virt_base: v3_ddx_ddx
+    why: one-loop QCD of v3_ddx_ddx
+  v3_ddx_epem_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 11
+    role: train
+    virt: true
+    virt_base: v3_ddx_epem
+    why: one-loop QCD of v3_ddx_epem
+  v3_ddx_epvewm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 12
+    - -24
+    role: heldout
+    virt: true
+    virt_base: v3_ddx_epvewm
+    why: one-loop QCD of v3_ddx_epvewm
+  v3_ddx_gg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_ddx_gg
+    why: one-loop QCD of v3_ddx_gg
+  v3_ddx_ggg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 21
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_ddx_ggg
+    why: one-loop QCD of v3_ddx_ggg
+  v3_ddx_ghz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 25
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_ddx_ghz
+    why: one-loop QCD of v3_ddx_ghz
+  v3_ddx_gvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_ddx_gvevex
+    why: one-loop QCD of v3_ddx_gvevex
+  v3_ddx_hg_loop:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id001
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    order: &id002
+    - 1
+    - 0
+    - 3
+    - 1
+    param_card_patches: {}
+    pdg_ids: &id003
+    - 1
+    - -1
+    - 25
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_ddx_hg
+    why: loop-induced
+  v3_ddx_hh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id004
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    order: &id005
+    - 0
+    - 1
+    - 0
+    - 4
+    param_card_patches: {}
+    pdg_ids: &id006
+    - 1
+    - -1
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_ddx_hh
+    why: loop-induced
+  v3_ddx_hhh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id007
+    - 125.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    order: &id008
+    - 0
+    - 1
+    - 0
+    - 5
+    param_card_patches: {}
+    pdg_ids: &id009
+    - 1
+    - -1
+    - 25
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_ddx_hhh
+    why: loop-induced
+  v3_ddx_hhz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 25
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_ddx_hhz
+    why: one-loop QCD of v3_ddx_hhz
+  v3_ddx_hz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_ddx_hz
+    why: one-loop QCD of v3_ddx_hz
+  v3_ddx_tapvtwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - -15
+    - 16
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_ddx_tapvtwm
+    why: one-loop QCD of v3_ddx_tapvtwm
+  v3_ddx_wpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_ddx_wpwm
+    why: one-loop QCD of v3_ddx_wpwm
+  v3_dg_ad_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    role: heldout
+    virt: true
+    virt_base: v3_dg_ad
+    why: one-loop QCD of v3_dg_ad
+  v3_dg_dg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_dg_dg
+    why: one-loop QCD of v3_dg_dg
+  v3_dg_dgg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_dg_dgg
+    why: one-loop QCD of v3_dg_dgg
+  v3_dg_dgz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_dg_dgz
+    why: one-loop QCD of v3_dg_dgz
+  v3_dg_dz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_dg_dz
+    why: one-loop QCD of v3_dg_dz
+  v3_dg_huwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 25
+    - 2
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_dg_huwm
+    why: one-loop QCD of v3_dg_huwm
+  v3_dg_tamuvtx_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 15
+    - 2
+    - -16
+    role: train
+    virt: true
+    virt_base: v3_dg_tamuvtx
+    why: one-loop QCD of v3_dg_tamuvtx
+  v3_dg_uwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 2
+    - -24
+    role: heldout
+    virt: true
+    virt_base: v3_dg_uwm
+    why: one-loop QCD of v3_dg_uwm
+  v3_dg_uwmz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 2
+    - -24
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_dg_uwmz
+    why: one-loop QCD of v3_dg_uwmz
+  v3_ds_ads_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 22
+    - 1
+    - 3
+    role: train
+    virt: true
+    virt_base: v3_ds_ads
+    why: one-loop QCD of v3_ds_ads
+  v3_ds_cdwm_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 4
+    - 1
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_ds_cdwm
+    why: one-loop QCD of v3_ds_cdwm
+  v3_ds_ds_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+    role: train
+    virt: true
+    virt_base: v3_ds_ds
+    why: one-loop QCD of v3_ds_ds
+  v3_dsx_acxu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - 22
+    - -4
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_dsx_acxu
+    why: one-loop QCD of v3_dsx_acxu
+  v3_dsx_cxu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_dsx_cxu
+    why: one-loop QCD of v3_dsx_cxu
+  v3_dsx_cxuz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 2
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_dsx_cxuz
+    why: one-loop QCD of v3_dsx_cxuz
+  v3_dsx_dsxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - -3
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_dsx_dsxz
+    why: one-loop QCD of v3_dsx_dsxz
+  v3_epem_abbx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_epem_abbx
+    why: one-loop QCD of v3_epem_abbx
+  v3_epem_addx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 1
+    - -1
+    role: train
+    virt: true
+    virt_base: v3_epem_addx
+    why: one-loop QCD of v3_epem_addx
+  v3_epem_bbx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    role: heldout
+    virt: true
+    virt_base: v3_epem_bbx
+    why: one-loop QCD of v3_epem_bbx
+  v3_epem_bbxz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_epem_bbxz
+    why: one-loop QCD of v3_epem_bbxz
+  v3_epem_ccx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    role: train
+    virt: true
+    virt_base: v3_epem_ccx
+    why: one-loop QCD of v3_epem_ccx
+  v3_epem_ccxg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 21
+    role: heldout
+    virt: true
+    virt_base: v3_epem_ccxg
+    why: one-loop QCD of v3_epem_ccxg
+  v3_epem_ddxz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 1
+    - -1
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_epem_ddxz
+    why: one-loop QCD of v3_epem_ddxz
+  v3_epem_hh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id010
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    order: &id011
+    - 0
+    - 1
+    - 0
+    - 4
+    param_card_patches: {}
+    pdg_ids: &id012
+    - 11
+    - -11
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_epem_hh
+    why: loop-induced
+  v3_epem_hhh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id013
+    - 125.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    order: &id014
+    - 0
+    - 1
+    - 0
+    - 5
+    param_card_patches: {}
+    pdg_ids: &id015
+    - 11
+    - -11
+    - 25
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_epem_hhh
+    why: loop-induced
+  v3_gg_aa_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id016
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    order: &id017
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id018
+    - 21
+    - 21
+    - 22
+    - 22
+    role: train
+    virt: true
+    virt_base: v3_gg_aa
+    why: loop-induced
+  v3_gg_aag_loop:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id019
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    order: &id020
+    - 1
+    - 0
+    - 3
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id021
+    - 21
+    - 21
+    - 22
+    - 22
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_gg_aag
+    why: loop-induced
+  v3_gg_accx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 22
+    - 4
+    - -4
+    role: train
+    virt: true
+    virt_base: v3_gg_accx
+    why: one-loop QCD of v3_gg_accx
+  v3_gg_bbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_gg_bbx
+    why: one-loop QCD of v3_gg_bbx
+  v3_gg_bbxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 21
+    role: heldout
+    virt: true
+    virt_base: v3_gg_bbxg
+    why: one-loop QCD of v3_gg_bbxg
+  v3_gg_ccxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -4
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_gg_ccxz
+    why: one-loop QCD of v3_gg_ccxz
+  v3_gg_gg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 21
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_gg_gg
+    why: one-loop QCD of v3_gg_gg
+  v3_gg_hg_loop:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id022
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    order: &id023
+    - 1
+    - 0
+    - 3
+    - 1
+    param_card_patches: {}
+    pdg_ids: &id024
+    - 21
+    - 21
+    - 25
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_gg_hg
+    why: loop-induced
+  v3_gg_hh_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id025
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    order: &id026
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id027
+    - 21
+    - 21
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_gg_hh
+    why: loop-induced
+  v3_gg_hhh_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id028
+    - 125.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    order: &id029
+    - 1
+    - 0
+    - 2
+    - 3
+    param_card_patches: {}
+    pdg_ids: &id030
+    - 21
+    - 21
+    - 25
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_gg_hhh
+    why: loop-induced
+  v3_gg_wpwm_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id031
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    order: &id032
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id033
+    - 21
+    - 21
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_gg_wpwm
+    why: loop-induced
+  v3_gg_za_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id034
+    - 91.188
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    order: &id035
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id036
+    - 21
+    - 21
+    - 23
+    - 22
+    role: heldout
+    virt: true
+    virt_base: v3_gg_za
+    why: loop-induced
+  v3_gg_zh_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id037
+    - 91.188
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    order: &id038
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id039
+    - 21
+    - 21
+    - 23
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_gg_zh
+    why: loop-induced
+  v3_gg_zz_loop:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id040
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    order: &id041
+    - 1
+    - 0
+    - 2
+    - 2
+    param_card_patches: {}
+    pdg_ids: &id042
+    - 21
+    - 21
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_gg_zz
+    why: loop-induced
+  v3_ub_buz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 5
+    - 5
+    - 2
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_ub_buz
+    why: one-loop QCD of v3_ub_buz
+  v3_uc_cuz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 4
+    - 4
+    - 2
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_uc_cuz
+    why: one-loop QCD of v3_uc_cuz
+  v3_ucx_cxhu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -4
+    - -4
+    - 25
+    - 2
+    role: heldout
+    virt: true
+    virt_base: v3_ucx_cxhu
+    why: one-loop QCD of v3_ucx_cxhu
+  v3_ucx_cxuz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -4
+    - -4
+    - 2
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_ucx_cxuz
+    why: one-loop QCD of v3_ucx_cxuz
+  v3_ud_adu_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 1
+    - 22
+    - 1
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_ud_adu
+    why: one-loop QCD of v3_ud_adu
+  v3_ud_ddwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 1
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_ud_ddwp
+    why: one-loop QCD of v3_ud_ddwp
+  v3_udx_acsx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 4
+    - -3
+    role: train
+    virt: true
+    virt_base: v3_udx_acsx
+    why: one-loop QCD of v3_udx_acsx
+  v3_udx_adxu_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -1
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_udx_adxu
+    why: one-loop QCD of v3_udx_adxu
+  v3_udx_agwp_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 21
+    - 24
+    role: heldout
+    virt: true
+    virt_base: v3_udx_agwp
+    why: one-loop QCD of v3_udx_agwp
+  v3_udx_awp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_awp
+    why: one-loop QCD of v3_udx_awp
+  v3_udx_ccxwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -4
+    - 24
+    role: heldout
+    virt: true
+    virt_base: v3_udx_ccxwp
+    why: one-loop QCD of v3_udx_ccxwp
+  v3_udx_csx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -3
+    role: train
+    virt: true
+    virt_base: v3_udx_csx
+    why: one-loop QCD of v3_udx_csx
+  v3_udx_ddxwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 1
+    - -1
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_ddxwp
+    why: one-loop QCD of v3_udx_ddxwp
+  v3_udx_epgve_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 21
+    - 12
+    role: train
+    virt: true
+    virt_base: v3_udx_epgve
+    why: one-loop QCD of v3_udx_epgve
+  v3_udx_ggwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 21
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_ggwp
+    why: one-loop QCD of v3_udx_ggwp
+  v3_udx_gtapvt_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - -15
+    - 16
+    role: train
+    virt: true
+    virt_base: v3_udx_gtapvt
+    why: one-loop QCD of v3_udx_gtapvt
+  v3_udx_gwp_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_gwp
+    why: one-loop QCD of v3_udx_gwp
+  v3_udx_hwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_hwp
+    why: one-loop QCD of v3_udx_hwp
+  v3_udx_taptamwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 15
+    - 24
+    role: train
+    virt: true
+    virt_base: v3_udx_taptamwp
+    why: one-loop QCD of v3_udx_taptamwp
+  v3_udx_tapvt_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 16
+    role: train
+    virt: true
+    virt_base: v3_udx_tapvt
+    why: one-loop QCD of v3_udx_tapvt
+  v3_udx_wpwpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_udx_wpwpwm
+    why: one-loop QCD of v3_udx_wpwpwm
+  v3_udx_wpz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_udx_wpz
+    why: one-loop QCD of v3_udx_wpz
+  v3_udx_wpzz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_udx_wpzz
+    why: one-loop QCD of v3_udx_wpzz
+  v3_ug_dtapvt_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 1
+    - -15
+    - 16
+    role: train
+    virt: true
+    virt_base: v3_ug_dtapvt
+    why: one-loop QCD of v3_ug_dtapvt
+  v3_ug_epemu_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - -11
+    - 11
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_ug_epemu
+    why: one-loop QCD of v3_ug_epemu
+  v3_ug_taptamu_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - -15
+    - 15
+    - 2
+    role: train
+    virt: true
+    virt_base: v3_ug_taptamu
+    why: one-loop QCD of v3_ug_taptamu
+  v3_us_acd_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 22
+    - 4
+    - 1
+    role: train
+    virt: true
+    virt_base: v3_us_acd
+    why: one-loop QCD of v3_us_acd
+  v3_us_cd_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    role: train
+    virt: true
+    virt_base: v3_us_cd
+    why: one-loop QCD of v3_us_cd
+  v3_us_cdg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_us_cdg
+    why: one-loop QCD of v3_us_cdg
+  v3_uux_abbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 5
+    - -5
+    role: train
+    virt: true
+    virt_base: v3_uux_abbx
+    why: one-loop QCD of v3_uux_abbx
+  v3_uux_ccxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 4
+    - -4
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_uux_ccxz
+    why: one-loop QCD of v3_uux_ccxz
+  v3_uux_epemg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 11
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_uux_epemg
+    why: one-loop QCD of v3_uux_epemg
+  v3_uux_epemz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 11
+    - 23
+    role: heldout
+    virt: true
+    virt_base: v3_uux_epemz
+    why: one-loop QCD of v3_uux_epemz
+  v3_uux_hg_loop:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id043
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    order: &id044
+    - 1
+    - 0
+    - 3
+    - 1
+    param_card_patches: {}
+    pdg_ids: &id045
+    - 2
+    - -2
+    - 25
+    - 21
+    role: train
+    virt: true
+    virt_base: v3_uux_hg
+    why: loop-induced
+  v3_uux_hh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id046
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 2
+    order: &id047
+    - 0
+    - 1
+    - 0
+    - 4
+    param_card_patches: {}
+    pdg_ids: &id048
+    - 2
+    - -2
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_uux_hh
+    why: loop-induced
+  v3_uux_hhh_loop:
+    alphas_power: 0
+    certified: false
+    kind: virt
+    layer: loop
+    loopind: true
+    m_finals: &id049
+    - 125.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    order: &id050
+    - 0
+    - 1
+    - 0
+    - 5
+    param_card_patches: {}
+    pdg_ids: &id051
+    - 2
+    - -2
+    - 25
+    - 25
+    - 25
+    role: train
+    virt: true
+    virt_base: v3_uux_hhh
+    why: loop-induced
+  v3_uux_huux_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 2
+    - -2
+    role: train
+    virt: true
+    virt_base: v3_uux_huux
+    why: one-loop QCD of v3_uux_huux
+  v3_uux_hvevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_uux_hvevex
+    why: one-loop QCD of v3_uux_hvevex
+  v3_uux_hwpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 24
+    - -24
+    role: train
+    virt: true
+    virt_base: v3_uux_hwpwm
+    why: one-loop QCD of v3_uux_hwpwm
+  v3_uux_taptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 15
+    role: train
+    virt: true
+    virt_base: v3_uux_taptam
+    why: one-loop QCD of v3_uux_taptam
+  v3_uux_vevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 12
+    - -12
+    role: train
+    virt: true
+    virt_base: v3_uux_vevex
+    why: one-loop QCD of v3_uux_vevex
+  v3_uux_wpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 2
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    role: heldout
+    virt: true
+    virt_base: v3_uux_wpwm
+    why: one-loop QCD of v3_uux_wpwm
+  v3_uux_wpwmz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
+    role: train
+    virt: true
+    virt_base: v3_uux_wpwmz
+    why: one-loop QCD of v3_uux_wpwmz
+virt:
+  v3_bb_bb:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    mg5: generate b b > b b [virt=QCD]
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+  v3_bb_bbz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate b b > b b z [virt=QCD]
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 23
+  v3_bbx_aa:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a a [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+  v3_bbx_aag:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a a g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 21
+  v3_bbx_addx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a d d~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 1
+    - -1
+  v3_bbx_aepem:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a e+ e- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - -11
+    - 11
+  v3_bbx_ag:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+  v3_bbx_agz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > a g z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 23
+  v3_bbx_ah:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > a h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+  v3_bbx_ahh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 125.0
+    mg5: generate b b~ > a h h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+    - 25
+  v3_bbx_ataptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate b b~ > a ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - -15
+    - 15
+  v3_bbx_avevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a ve ve~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 12
+    - -12
+  v3_bbx_az:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > a z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 23
+  v3_bbx_azz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5: generate b b~ > a z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 23
+    - 23
+  v3_bbx_bbx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    mg5: generate b b~ > b b~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+  v3_bbx_ccx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > c c~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+  v3_bbx_ccxh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > c c~ h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 25
+  v3_bbx_epem:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > e+ e- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+  v3_bbx_epemh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > e+ e- h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 25
+  v3_bbx_epemz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > e+ e- z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 23
+  v3_bbx_gg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > g g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+  v3_bbx_ggh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > g g h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 25
+  v3_bbx_gh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > g h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+  v3_bbx_ghh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 125.0
+    mg5: generate b b~ > g h h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    - 25
+  v3_bbx_gvevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > g ve ve~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 12
+    - -12
+  v3_bbx_gwpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate b b~ > g w+ w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 24
+    - -24
+  v3_bbx_gz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > g z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 23
+  v3_bbx_gzz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5: generate b b~ > g z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 23
+    - 23
+  v3_bbx_hh:
+    certified: false
+    m_finals:
+    - 125.0
+    - 125.0
+    mg5: generate b b~ > h h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+  v3_bbx_hhz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 125.0
+    - 91.188
+    mg5: generate b b~ > h h z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+    - 23
+  v3_bbx_htaptam:
+    certified: false
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    mg5: generate b b~ > h ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - -15
+    - 15
+  v3_bbx_hvevex:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > h ve ve~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 12
+    - -12
+  v3_bbx_hwpwm:
+    certified: false
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    mg5: generate b b~ > h w+ w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 24
+    - -24
+  v3_bbx_hz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 91.188
+    mg5: generate b b~ > h z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 23
+  v3_bbx_hzz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 91.188
+    - 91.188
+    mg5: generate b b~ > h z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 23
+    - 23
+  v3_bbx_taptam:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    mg5: generate b b~ > ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 15
+  v3_bbx_tapvtwm:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    mg5: generate b b~ > ta+ vt w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 16
+    - -24
+  v3_bbx_vevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > ve ve~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 12
+    - -12
+  v3_bbx_wpwm:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    mg5: generate b b~ > w+ w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 24
+    - -24
+  v3_bbx_wpwmz:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    mg5: generate b b~ > w+ w- z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 24
+    - -24
+    - 23
+  v3_bbx_zz:
+    certified: false
+    m_finals:
+    - 91.188
+    - 91.188
+    mg5: generate b b~ > z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 23
+    - 23
+  v3_bbx_zzz:
+    certified: false
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    mg5: generate b b~ > z z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 23
+    - 23
+    - 23
+  v3_bg_ab:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    mg5: generate b g > a b [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+  v3_bg_abg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    mg5: generate b g > a b g [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 21
+  v3_bg_abh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 125.0
+    mg5: generate b g > a b h [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 25
+  v3_bg_abz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 91.188
+    mg5: generate b g > a b z [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 5
+    - 23
+  v3_bg_bbbx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 4.7
+    mg5: generate b g > b b b~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 5
+    - -5
+  v3_bg_bccx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate b g > b c c~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 4
+    - -4
+  v3_bg_bg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    mg5: generate b g > b g [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+  v3_bg_bgg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate b g > b g g [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    - 21
+  v3_bg_bh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 125.0
+    mg5: generate b g > b h [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+  v3_bg_bhz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 125.0
+    - 91.188
+    mg5: generate b g > b h z [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+    - 23
+  v3_bg_btaptam:
+    certified: false
+    m_finals:
+    - 4.7
+    - 1.777
+    - 1.777
+    mg5: generate b g > b ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - -15
+    - 15
+  v3_bg_bwpwm:
+    certified: false
+    m_finals:
+    - 4.7
+    - 80.419
+    - 80.419
+    mg5: generate b g > b w+ w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 24
+    - -24
+  v3_bg_bz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 91.188
+    mg5: generate b g > b z [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 23
+  v3_db_abd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    mg5: generate d b > a b d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 22
+    - 5
+    - 1
+  v3_db_bd:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    mg5: generate d b > b d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+  v3_db_bdz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    mg5: generate d b > b d z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 23
+  v3_dd_add:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d > a d d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 22
+    - 1
+    - 1
+  v3_dd_dd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d > d d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+  v3_dd_ddz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d d > d d z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 23
+  v3_ddx_aa:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a a [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+  v3_ddx_aaa:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a a a [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+    - 22
+  v3_ddx_ag:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 21
+  v3_ddx_agg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a g g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 21
+    - 21
+  v3_ddx_awpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate d d~ > a w+ w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 24
+    - -24
+  v3_ddx_bbx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    mg5: generate d d~ > b b~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+  v3_ddx_bbxh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    mg5: generate d d~ > b b~ h [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 25
+  v3_ddx_bbxz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate d d~ > b b~ z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 23
+  v3_ddx_ccx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > c c~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 4
+    - -4
+  v3_ddx_ccxh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate d d~ > c c~ h [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 4
+    - -4
+    - 25
+  v3_ddx_ddx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > d d~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+  v3_ddx_epem:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > e+ e- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 11
+  v3_ddx_epvewm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d d~ > e+ ve w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 12
+    - -24
+  v3_ddx_gg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > g g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 21
+  v3_ddx_ggg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > g g g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 21
+    - 21
+  v3_ddx_ghz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5: generate d d~ > g h z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 25
+    - 23
+  v3_ddx_gvevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > g ve ve~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 12
+    - -12
+  v3_ddx_hg:
+    certified: false
+    loopind: true
+    m_finals: *id001
+    mg5: generate d d~ > h g [sqrvirt=QCD]
+    model: loop_sm
+    order: *id002
+    pdg_ids: *id003
+  v3_ddx_hh:
+    certified: false
+    loopind: true
+    m_finals: *id004
+    mg5: generate d d~ > h h [sqrvirt=QCD QED]
+    model: loop_qcd_qed_sm
+    order: *id005
+    pdg_ids: *id006
+  v3_ddx_hhh:
+    certified: false
+    loopind: true
+    m_finals: *id007
+    mg5: generate d d~ > h h h [sqrvirt=QCD QED]
+    model: loop_qcd_qed_sm
+    order: *id008
+    pdg_ids: *id009
+  v3_ddx_hhz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 125.0
+    - 91.188
+    mg5: generate d d~ > h h z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 25
+    - 23
+  v3_ddx_hz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 91.188
+    mg5: generate d d~ > h z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 23
+  v3_ddx_tapvtwm:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    mg5: generate d d~ > ta+ vt w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - -15
+    - 16
+    - -24
+  v3_ddx_wpwm:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    mg5: generate d d~ > w+ w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 24
+    - -24
+  v3_dg_ad:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d g > a d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+  v3_dg_dg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d g > d g [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+  v3_dg_dgg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > d g g [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+    - 21
+  v3_dg_dgz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d g > d g z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 21
+    - 23
+  v3_dg_dz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    mg5: generate d g > d z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 23
+  v3_dg_huwm:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 80.419
+    mg5: generate d g > h u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 25
+    - 2
+    - -24
+  v3_dg_tamuvtx:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    - 0.0
+    mg5: generate d g > ta- u vt~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 15
+    - 2
+    - -16
+  v3_dg_uwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    mg5: generate d g > u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 2
+    - -24
+  v3_dg_uwmz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    mg5: generate d g > u w- z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 2
+    - -24
+    - 23
+  v3_ds_ads:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s > a d s [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 22
+    - 1
+    - 3
+  v3_ds_cdwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d s > c d w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 4
+    - 1
+    - -24
+  v3_ds_ds:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d s > d s [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+  v3_dsx_acxu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s~ > a c~ u [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - 22
+    - -4
+    - 2
+  v3_dsx_cxu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate d s~ > c~ u [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 2
+  v3_dsx_cxuz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d s~ > c~ u z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 2
+    - 23
+  v3_dsx_dsxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d s~ > d s~ z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - -3
+    - 23
+  v3_epem_abbx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate e+ e- > a b b~ [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 5
+    - -5
+  v3_epem_addx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate e+ e- > a d d~ [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 1
+    - -1
+  v3_epem_bbx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    mg5: generate e+ e- > b b~ [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+  v3_epem_bbxz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate e+ e- > b b~ z [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 23
+  v3_epem_ccx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate e+ e- > c c~ [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+  v3_epem_ccxg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate e+ e- > c c~ g [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 21
+  v3_epem_ddxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate e+ e- > d d~ z [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 1
+    - -1
+    - 23
+  v3_epem_hh:
+    certified: false
+    loopind: true
+    m_finals: *id010
+    mg5: generate e+ e- > h h [sqrvirt=QED]
+    model: loop_qcd_qed_sm
+    order: *id011
+    pdg_ids: *id012
+  v3_epem_hhh:
+    certified: false
+    loopind: true
+    m_finals: *id013
+    mg5: generate e+ e- > h h h [sqrvirt=QED]
+    model: loop_qcd_qed_sm
+    order: *id014
+    pdg_ids: *id015
+  v3_gg_aa:
+    certified: false
+    loopind: true
+    m_finals: *id016
+    mg5: generate g g > a a [sqrvirt=QCD]
+    model: loop_sm
+    order: *id017
+    pdg_ids: *id018
+  v3_gg_aag:
+    certified: false
+    loopind: true
+    m_finals: *id019
+    mg5: generate g g > a a g [sqrvirt=QCD]
+    model: loop_sm
+    order: *id020
+    pdg_ids: *id021
+  v3_gg_accx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate g g > a c c~ [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 22
+    - 4
+    - -4
+  v3_gg_bbx:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    mg5: generate g g > b b~ [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+  v3_gg_bbxg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate g g > b b~ g [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 21
+  v3_gg_ccxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate g g > c c~ z [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -4
+    - 23
+  v3_gg_gg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate g g > g g [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 21
+    - 21
+  v3_gg_hg:
+    certified: false
+    loopind: true
+    m_finals: *id022
+    mg5: generate g g > h g [sqrvirt=QCD]
+    model: loop_sm
+    order: *id023
+    pdg_ids: *id024
+  v3_gg_hh:
+    certified: false
+    loopind: true
+    m_finals: *id025
+    mg5: generate g g > h h [sqrvirt=QCD]
+    model: loop_sm
+    order: *id026
+    pdg_ids: *id027
+  v3_gg_hhh:
+    certified: false
+    loopind: true
+    m_finals: *id028
+    mg5: generate g g > h h h [sqrvirt=QCD]
+    model: loop_sm
+    order: *id029
+    pdg_ids: *id030
+  v3_gg_wpwm:
+    certified: false
+    loopind: true
+    m_finals: *id031
+    mg5: generate g g > w+ w- [sqrvirt=QCD]
+    model: loop_sm
+    order: *id032
+    pdg_ids: *id033
+  v3_gg_za:
+    certified: false
+    loopind: true
+    m_finals: *id034
+    mg5: generate g g > z a [sqrvirt=QCD]
+    model: loop_sm
+    order: *id035
+    pdg_ids: *id036
+  v3_gg_zh:
+    certified: false
+    loopind: true
+    m_finals: *id037
+    mg5: generate g g > z h [sqrvirt=QCD]
+    model: loop_sm
+    order: *id038
+    pdg_ids: *id039
+  v3_gg_zz:
+    certified: false
+    loopind: true
+    m_finals: *id040
+    mg5: generate g g > z z [sqrvirt=QCD]
+    model: loop_sm
+    order: *id041
+    pdg_ids: *id042
+  v3_ub_buz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    mg5: generate u b > b u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - 5
+    - 5
+    - 2
+    - 23
+  v3_uc_cuz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u c > c u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - 4
+    - 4
+    - 2
+    - 23
+  v3_ucx_cxhu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate u c~ > c~ h u [virt=QCD]
+    pdg_ids:
+    - 2
+    - -4
+    - -4
+    - 25
+    - 2
+  v3_ucx_cxuz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u c~ > c~ u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -4
+    - -4
+    - 2
+    - 23
+  v3_ud_adu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d > a d u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 22
+    - 1
+    - 2
+  v3_ud_ddwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d > d d w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 1
+    - 24
+  v3_udx_acsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > a c s~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 4
+    - -3
+  v3_udx_adxu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > a d~ u [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -1
+    - 2
+  v3_udx_agwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > a g w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 21
+    - 24
+  v3_udx_awp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > a w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 24
+  v3_udx_ccxwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > c c~ w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -4
+    - 24
+  v3_udx_csx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > c s~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -3
+  v3_udx_ddxwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > d d~ w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 1
+    - -1
+    - 24
+  v3_udx_epgve:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > e+ g ve [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 21
+    - 12
+  v3_udx_ggwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > g g w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 21
+    - 24
+  v3_udx_gtapvt:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    mg5: generate u d~ > g ta+ vt [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - -15
+    - 16
+  v3_udx_gwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > g w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 24
+  v3_udx_hwp:
+    certified: false
+    m_finals:
+    - 125.0
+    - 80.419
+    mg5: generate u d~ > h w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 24
+  v3_udx_taptamwp:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    - 80.419
+    mg5: generate u d~ > ta+ ta- w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 15
+    - 24
+  v3_udx_tapvt:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    mg5: generate u d~ > ta+ vt [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 16
+  v3_udx_wpwpwm:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    - 80.419
+    mg5: generate u d~ > w+ w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 24
+    - -24
+  v3_udx_wpz:
+    certified: false
+    m_finals:
+    - 80.419
+    - 91.188
+    mg5: generate u d~ > w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+  v3_udx_wpzz:
+    certified: false
+    m_finals:
+    - 80.419
+    - 91.188
+    - 91.188
+    mg5: generate u d~ > w+ z z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 24
+    - 23
+    - 23
+  v3_ug_dtapvt:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    mg5: generate u g > d ta+ vt [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - 1
+    - -15
+    - 16
+  v3_ug_epemu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u g > e+ e- u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - -11
+    - 11
+    - 2
+  v3_ug_taptamu:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    - 0.0
+    mg5: generate u g > ta+ ta- u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - -15
+    - 15
+    - 2
+  v3_us_acd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u s > a c d [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 22
+    - 4
+    - 1
+  v3_us_cd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate u s > c d [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+  v3_us_cdg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u s > c d g [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 21
+  v3_uux_abbx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate u u~ > a b b~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 5
+    - -5
+  v3_uux_ccxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u~ > c c~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 4
+    - -4
+    - 23
+  v3_uux_epemg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > e+ e- g [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 11
+    - 21
+  v3_uux_epemz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u~ > e+ e- z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 11
+    - 23
+  v3_uux_hg:
+    certified: false
+    loopind: true
+    m_finals: *id043
+    mg5: generate u u~ > h g [sqrvirt=QCD]
+    model: loop_sm
+    order: *id044
+    pdg_ids: *id045
+  v3_uux_hh:
+    certified: false
+    loopind: true
+    m_finals: *id046
+    mg5: generate u u~ > h h [sqrvirt=QCD QED]
+    model: loop_qcd_qed_sm
+    order: *id047
+    pdg_ids: *id048
+  v3_uux_hhh:
+    certified: false
+    loopind: true
+    m_finals: *id049
+    mg5: generate u u~ > h h h [sqrvirt=QCD QED]
+    model: loop_qcd_qed_sm
+    order: *id050
+    pdg_ids: *id051
+  v3_uux_huux:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > h u u~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 2
+    - -2
+  v3_uux_hvevex:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > h ve ve~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 12
+    - -12
+  v3_uux_hwpwm:
+    certified: false
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    mg5: generate u u~ > h w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - 24
+    - -24
+  v3_uux_taptam:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    mg5: generate u u~ > ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 15
+  v3_uux_vevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > ve ve~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 12
+    - -12
+  v3_uux_wpwm:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    mg5: generate u u~ > w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+  v3_uux_wpwmz:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    mg5: generate u u~ > w+ w- z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 24
+    - -24
+    - 23
