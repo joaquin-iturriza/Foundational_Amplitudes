@@ -5854,7 +5854,13 @@ in $[1.0, 9.9]\times10^{-3}$ and the best stops at $14\%$ and $64\%$ (\code{data
 From $D=10^{2.5}$ up scratch's optimum moves into the fine-tune window ($7.7\times10^{-4}$, $1.1\times10^{-3}$) and the gain
 returns. So the dip may be the search window, not the pretraining: the test is one fine-tune search on $ee\to Z\gamma$ at
 $D=10^{1.5}$, $10^2$ with the learning-rate window lowered to scratch's (DyHPO, single fidelity, $\sim0.5$ GPU-h; the
-user's go). Fig.~\ref{fig:nogain}.
+user's go). Fig.~\ref{fig:nogain}. The window alone does not make a dip, though: over the $84$ probe and $D$ cells,
+scratch's best learning rate lies below every fine-tune trial's in $46$ (\code{nogain\_lr.py}, \code{data/nogain\_lr.json}),
+and the median gain there is $+0.31$ decades against $+0.34$ in the other $38$ (correlation of the gain with the distance
+below the window $-0.15$). $ee\to d\bar d$ and $ee\to b\bar b$ at one loop have scratch a full decade below the window at
+$D=10^{2}$ to $10^{2.5}$ and gain $0.3$ to $0.9$ decades there. A least-squares fit of the gain on both readings gives
+$-0.23$ decades per decade below the window and $-0.23$ per decade of scratch's drop, so the two weigh alike and neither
+explains $ee\to Z\gamma$'s $-1.2$ at $D=10^2$ by itself; the lowered-window search remains the test.
 
 \begin{figure}[t]
 \centering
