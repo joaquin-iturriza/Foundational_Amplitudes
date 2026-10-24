@@ -1,6 +1,26 @@
 {
  "tasks": [
   {
+   "name": "the level and the preprocessing (D83, D99)",
+   "items": [
+    "catalog_norm",
+    "ctxvec",
+    "dimless_kt",
+    "qperp_soft",
+    "signed_ab"
+   ],
+   "paths": [
+    "analysis/catalog_daniel/data/norm_*",
+    "analysis/catalog_daniel/data/shape_*",
+    "analysis/catalog_daniel/data/qperp*",
+    "analysis/catalog_daniel/data/kshot*",
+    "analysis/catalog_daniel/data/level*",
+    "analysis/catalog_daniel/figs/*",
+    "analysis/catalog_daniel/data/signed*"
+   ],
+   "max_age_min": 90
+  },
+  {
    "name": "catalog_v3 generation, stages 1-3 (D98, D100, D102)",
    "items": [
     "catalog_v3_gen",
