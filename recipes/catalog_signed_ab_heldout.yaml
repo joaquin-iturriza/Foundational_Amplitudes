@@ -1,0 +1,17 @@
+# the signed pools' A/B (D99): written by recipes/select_signed_ab.py, do not edit
+# catalog_v3's 14 signed one-loop H5 pools
+processes:
+  - {name: "v3_dd_add_nlo", sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_ddx_aaa_nlo", sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_ddx_ag_nlo", sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_ddx_epvewm_nlo", sqrts: [84, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_dg_ad_nlo", sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_dg_dgz_nlo", sqrts: [96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_dg_uwm_nlo", sqrts: [84, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_epem_ccxg_nlo", sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_epem_ddxz_nlo", sqrts: [96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_uc_cuz_nlo", sqrts: [96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_ucx_cxhu_nlo", sqrts: [131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_udx_agwp_nlo", sqrts: [84, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_udx_ccxwp_nlo", sqrts: [84, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: "v3_uux_ccxz_nlo", sqrts: [96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
