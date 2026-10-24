@@ -28,18 +28,21 @@ processes:
   - {name: v3_bbx_gh_nlo, sqrts: [131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_ghh_nlo, sqrts: [262, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_gvevex_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: v3_bbx_gwpwm_nlo, sqrts: [169, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_gz_nlo, sqrts: [96, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_gzz_nlo, sqrts: [191, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_hh_nlo, sqrts: [262, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_hhz_nlo, sqrts: [358, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_htaptam_nlo, sqrts: [135, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_hvevex_nlo, sqrts: [131, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: v3_bbx_hwpwm_nlo, sqrts: [300, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_hz_nlo, sqrts: [227, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_hzz_nlo, sqrts: [323, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_taptam_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_tapvtwm_nlo, sqrts: [86, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_vevex_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_wpwm_nlo, sqrts: [169, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: v3_bbx_wpwmz_nlo, sqrts: [265, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_zz_nlo, sqrts: [191, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bbx_zzz_nlo, sqrts: [287, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bg_ab_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
@@ -51,7 +54,9 @@ processes:
   - {name: v3_bg_bg_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bg_bgg_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bg_bh_nlo, sqrts: [136, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: v3_bg_bhz_nlo, sqrts: [232, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bg_btaptam_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: v3_bg_bwpwm_nlo, sqrts: [174, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_bg_bz_nlo, sqrts: [101, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_db_abd_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: v3_db_bd_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
