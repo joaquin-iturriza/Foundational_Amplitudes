@@ -1,0 +1,68 @@
+# catalog_v3, generation stage 3 (D102; recipes/gen_catalog_v3.py --stage3): the 40 2->5 probes (H2, MadGraph-checked)
+# and the alpha_s points (H6: 0.09, 0.15 train, 0.13 held out) on 8 training families; roles in catalog_v3_alphas.json
+sampling: {mode: mixture}
+processes:
+  - {name: v3_epem_ccxgvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_epem_avevexzz, sqrts: [191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_epem_ddxggg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_epem_aaavmvmx, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_epem_bbxggh, sqrts: [141, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_gg_dddxdxg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dg_cxghsu, sqrts: [131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dg_adgzz, sqrts: [191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ug_ghtaptamu, sqrts: [135, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ug_agtaptamu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ug_ddxguz, sqrts: [96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bg_bguuxz, sqrts: [101, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uux_aepgvewm, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_udx_adxggu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ddx_ddxgvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uux_epemggh, sqrts: [131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dbx_bxdddxg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dsx_cxguuux, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dbx_bxdepemg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_ggtaptamz, sqrts: [99, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ddx_gtaptaptamtam, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uux_ghzzz, sqrts: [418, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_dbx_bxgguwm, sqrts: [89, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ubx_bxghuz, sqrts: [232, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_ggzzz, sqrts: [287, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_ddxgwpwm, sqrts: [169, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ucx_dggsxz, sqrts: [96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uux_addxgz, sqrts: [96, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_ghhwpwm, sqrts: [431, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_udx_acggsx, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_us_acdgh, sqrts: [131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uc_cgghu, sqrts: [131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ddx_bbxghh, sqrts: [272, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_us_cdghz, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_uux_ggtaptamz, sqrts: [99, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_ds_dghhs, sqrts: [262, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_bbxgvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_aaagh, sqrts: [131, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_gghwpwm, sqrts: [300, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_udx_dxguzz, sqrts: [191, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: v3_bbx_gvevex__as090, base: v3_bbx_gvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_bbx_gvevex__as130, base: v3_bbx_gvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_bbx_gvevex__as150, base: v3_bbx_gvevex, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_dbx_abxd__as090, base: v3_dbx_abxd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_dbx_abxd__as130, base: v3_dbx_abxd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_dbx_abxd__as150, base: v3_dbx_abxd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_dg_adg__as090, base: v3_dg_adg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_dg_adg__as130, base: v3_dg_adg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_dg_adg__as150, base: v3_dg_adg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_dg_dhz__as090, base: v3_dg_dhz, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_dg_dhz__as130, base: v3_dg_dhz, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_dg_dhz__as150, base: v3_dg_dhz, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_epem_bbxg__as090, base: v3_epem_bbxg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_epem_bbxg__as130, base: v3_epem_bbxg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_epem_bbxg__as150, base: v3_epem_bbxg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_gg_gg__as090, base: v3_gg_gg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_gg_gg__as130, base: v3_gg_gg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_gg_gg__as150, base: v3_gg_gg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_udx_ddxwp__as090, base: v3_udx_ddxwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_udx_ddxwp__as130, base: v3_udx_ddxwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_udx_ddxwp__as150, base: v3_udx_ddxwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
+  - {name: v3_udx_ggwp__as090, base: v3_udx_ggwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.09}}
+  - {name: v3_udx_ggwp__as130, base: v3_udx_ggwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.13}}
+  - {name: v3_udx_ggwp__as150, base: v3_udx_ggwp, sqrts: [84, 1000], n_train: 100000, n_val: 10000, n_test: 10000, physics: {alpha_s: 0.15}}
