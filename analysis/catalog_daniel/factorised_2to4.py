@@ -65,19 +65,22 @@ def main():
 def plot(res):
     import plot_style as ps
     ref = json.load(open(os.path.join(HERE, "data", "kshot_context_cmp.json")))
-    fig, ax = ps.figure()
-    cols = {"_g": ps.C.vermillion, "_a": ps.C.blue}
-    for sel, lab in (("_g", "+g"), ("_a", r"+\gamma")):
+    fig, axs = ps.figure(ncols=2)
+    for ax, sel, key, lab in ((axs[0], "_g", "2to4 +g", r"$2\to4$, $+g$"), (axs[1], "_a", "2to4 +a", r"$2\to4$, $+\gamma$")):
         ps_ = sorted((p for p in res if p.endswith(sel)), key=lambda p: res[p]["shape"])
         x = np.arange(len(ps_))
-        ax.plot(x, [res[p]["shape"] for p in ps_], "o", mfc="none", color=cols[sel], label=rf"${lab}$: $\log|\mathcal{{M}}|^2$")
-        ax.plot(x, [res[p]["parent"] for p in ps_], "s", color=cols[sel], label=rf"${lab}$: after the parent")
-        ax.plot(x, [res[p]["learned"] for p in ps_], "^", color=cols[sel], alpha=0.5, label=rf"${lab}$: and learned")
-        key = "2to4 +g" if sel == "_g" else "2to4 +a"
-        ax.plot([0, len(ps_) - 1], [ref[key]["floor"]] * 2, ls="--", color=cols[sel], label=rf"${lab}$: network floor")
-    ax.set_yscale("log")
-    ax.set_xlabel("probe (by its spread)"); ax.set_ylabel(r"variance (nat$^2$)")
-    ps.legend(ax, "upper left", ncol=2); ps.make_room(ax)
+        ax.plot(x, [res[p]["shape"] for p in ps_], "o", mfc="none", color=ps.C.grey, label=r"$\log|\mathcal{M}|^2$")
+        ax.plot(x, [res[p]["parent"] for p in ps_], "s", color=ps.C.blue, label="after the parent")
+        ax.plot(x, [res[p]["learned"] for p in ps_], "^", color=ps.C.vermillion, label="and learned")
+        ax.plot([0, len(ps_) - 1], [ref[key]["floor"]] * 2, ls="--", color=ps.C.green, label="network floor")
+        ax.set_yscale("log")
+        top = max(max(res[p][k] for k in ("shape", "parent", "learned")) for p in ps_)
+        ax.set_ylim(top=top * 10)                        # clears the process label over the highest point
+        ax.set_xlabel("probe (by its spread)"); ax.set_ylabel(r"variance (nat$^2$)")
+        ps.process_label(ax, lab)
+    ps.legend(axs[0], "upper left")
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "factorised_2to4"))
 
 

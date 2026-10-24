@@ -1129,6 +1129,36 @@ floor is the variance of the zero-shot error. (a) The $43$ new processes; (b) th
 \label{fig:kshot_context}
 \end{figure}
 
+\paragraph{Design (ii) on the data: the $2\to4$ probes factorised onto their parents (2026-10-25, D83).} Each $2\to4$
+probe is a $2\to3$ training process plus one gluon or photon on the same beams, so its $|\mathcal M|^2$ can be read
+against its parent's. Per probe, on $2000$ validation events (\code{tools/factorised\_2to4.py}, run FA-ccin2p3-cdff8d34,
+CPU): the softest particle of the extra flavour removed by the Catani-Seymour initial-initial map (hep-ph/9605323; the
+beam it is closer to emits, the final momenta Lorentz-transformed, so masses and momentum conservation hold for any final
+state), the parent's exact $|\mathcal M|^2$ at the mapped event from its compiled standalone at the probe event's own
+$\alpha_s$ (the backend reproduces each parent's own pool exactly, median and largest $|\log|$ ratio $0$). In
+$\log|\mathcal M|^2$, the per-probe mean removed (the level is the offset's business), median over the $20$ probes of each
+set (\code{analysis/catalog\_daniel/factorised\_2to4.py}, Fig.~\ref{fig:factorised_2to4}): the probe's own spread $7.1$
+($+g$) and $6.2$ ($+\gamma$); after dividing by the parent's $|\mathcal M|^2$, $2.5$ and $3.1$; after also removing a
+correction learned on the other $39$ probes (a gradient-boosted regression of the log ratio on the splitting variables
+$s_{ak}/\hat s$, $s_{bk}/\hat s$, the nearest final's $s_{jk}/\hat s$, $p_{T,k}^2/\hat s$, $y_k$, $1-x$, $\hat s$, the
+emitted flavour and the nearest emitter's kind; leave-one-probe-out), $0.73$ and $1.11$. The network's own $2\to4$ floor
+(the variance of its zero-shot error, Fig.~\ref{fig:kshot_context}) is $1.34$ and $1.37$: the learned factorisation goes
+under it on $17$ of the $20$ $+g$ probes and $14$ of the $20$ $+\gamma$. The six it misses: the four photon probes with
+a charged lepton in the final state ($5.5$ to $20$, no better than the spread: a photon collinear to a final lepton is
+not the initial-state emission the map assumes, and few other probes teach the correction that region), and two $+g$
+probes with four coloured final particles ($3.8$, $1.9$). Without the four lepton probes the $+\gamma$ median is $0.98$.
+This is an upper bound on what the head of design (ii) can do: it uses the parent's exact $|\mathcal M|^2$, where the
+network brings its own $2\to3$ error on the mapped events (in distribution, a training process at its own energy).
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_daniel/figs/factorised_2to4.pdf}
+\caption{Each $2\to4$ probe's variance of $\log|\mathcal M|^2$ (the per-probe mean removed): its own, after dividing by
+its $2\to3$ parent's exact $|\mathcal M|^2$ at the mapped event, and after also removing a correction learned on the
+other probes, against the network's zero-shot shape floor on the same probes. Left: a gluon added; right: a photon.}
+\label{fig:factorised_2to4}
+\end{figure}
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
@@ -6813,8 +6843,9 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-24, 23:50).} Nothing running. The D105 context arm's K-shot fits are done and written
-    up (par.\ The context vector, Fig.~\ref{fig:kshot_context}). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
+  \item \textbf{State (2026-10-25, 01:30).} Nothing running. Done since the last State: the context vector's K-shot
+    fits (par.\ The context vector) and design (ii)'s data check (par.\ Design (ii) on the data); catalog\_v3's
+    generation task closed (D112). Next: the level item's GPU read of design (ii). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
     (sign head wins); the no-gain probes (D108). Decided 2026-10-24: catalog\_v2 deleted (D110, manifest
     \code{mg5amcnlo/DELETED\_V2\_ONLY\_20261024\_172235.json}); no mass-scheme shift in catalog\_v3 (D111); catalog\_v2
     not regenerated (D106); the larger-catalog item replaced by catalog\_v3 (D107); large-$D$ points stay out (D109);
@@ -6823,7 +6854,7 @@ of the three share a test set.
     two launches syncing at once collide, so chain them. All $167$ stage-2 loop strings are MadLoop-certified
     (\code{tools/nlo\_virtual\_pipeline.massive\_beam\_params}, \code{tools/nlo\_pole\_check.predict\_poles}). The
     lxplus-era archive (28 GB, D96) stays on CC; \code{runs\_from\_lxplus} is the only copy of its runs. Supervisor and
-    \code{site events --wait --project FA} running. Waits on the user: the level item's design (ii).
+    \code{site events --wait --project FA} running. Nothing waits on the user.
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); the soft minimum does not remove
     the cost (par.~\ref{par:qperp_cost}), and neither do the loop or identical-particle factors (the stored one-loop pools
@@ -6836,9 +6867,12 @@ of the three share a test set.
     embedding with dropout to zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new
     and the $2\to4$ probes against the shrunk offset (Fig.~\ref{fig:kshot_level}); cost one short pretraining ($\sim1$
     GPU-h) plus CPU-side fits. It goes under the offset floor on the $43$ new ($0.21$ against $0.46$ at $K=16$) and leaves
-    the $2\to4$ shape where the offset leaves it ($1.5$), so the condition for (ii) is met; (ii) is a design for the user's
-    call before any job: a head that predicts the $2\to4$ target as the
-    model's own $2\to3$ prediction on the clustered event plus a learned correction (arXiv:2107.06625, 2512.11036).
+    the $2\to4$ shape where the offset leaves it ($1.5$), so the condition for (ii) is met: a head that predicts the $2\to4$ target as the
+    model's own $2\to3$ prediction on the mapped event plus a learned correction (arXiv:2107.06625, 2512.11036). Its data
+    check is done (par.\ Design (ii) on the data): with the parent's exact $|\mathcal M|^2$ and a correction learned on the
+    other probes, $0.73$ ($+g$) and $1.11$ ($+\gamma$) against the network's floor $1.34$ and $1.37$. Next (D99, a GPU
+    read under $1$ GPU-h): the same with DlessInOrdQ's own $2\to3$ prediction on the mapped events in place of the exact
+    parent, the correction refitted leave-one-probe-out on its ratio.
     Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor under $0.5$ with the heavy-quark
     layer. Signed pools: the sign head (par.\ The signed pools' A/B). Also proposed: the full-length catalog pretraining (D78's held
     item) with the adopted target. Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
