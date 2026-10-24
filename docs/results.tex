@@ -374,6 +374,27 @@ $2\to4$ & $95$ & $489$ & $109$ & $24$ & $717$ \\
 \end{center}
 Of these, $359$ coloured classes at $2\to2$ and $2\to3$ can carry a one-loop QCD virtual, $51$ of them with a top.
 
+\paragraph{catalog\_v3's pools and levels (D102, 2026-10-24).} Generated so far: stages 1, 2a and 3, $1866$ entries and
+$5598$ pools (the $68$ one-loop strings with a $b$ or $t$ on a leg wait on the mass-scheme call). The audit
+(\code{analysis/catalog\_v3/pool\_audit.py}, every pool) finds them all at their recipe sizes, no non-finite or zero
+$|\mathcal M|^2$, momentum conserved to $5\times10^{-11}$ of $\sqrt{\hat s}$, and train and validation medians of
+$\log_{10}|\mathcal M|^2$ within $0.07$ validation spreads; $62$ one-loop pools change sign, no tree pool does. A
+held-out process's level does not have to be extrapolated (\code{pool\_levels.py}, Fig.~\ref{fig:v3_levels}): at every
+multiplicity, each of the $54$ H1, $168$ H2 and $237$ H3 tree classes has its median $\log_{10}|\mathcal M|^2$ inside the
+range of the $1127$ training classes, at most $0.10$ of their spread from the nearest one; of the $16$ one-loop H5
+pools generated so far, one ($d\bar d\to\gamma\gamma\gamma$) lies just outside the $66$ training one-loop levels. So the
+zero-shot level is a question of which training levels to read, not of reach.
+
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/pool_levels.pdf}
+\caption{catalog\_v3: the median $\log_{10}|\mathcal M|^2$ of each pool's validation events against its particle count,
+training classes and each held-out axis side by side at every $N$ (offset horizontally for legibility). (a) Tree classes:
+training, H1 new combinations, H2 multiplicity, H3 particle content. (b) One-loop pools generated so far: training and
+H5.}
+\label{fig:v3_levels}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
