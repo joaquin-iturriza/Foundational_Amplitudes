@@ -17,8 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, Dpair or Ds0}"; SMOKE="${2:-}"
-case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, DlessInOrdQs, Dpair or Ds0}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|DlessInOrdQs|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
