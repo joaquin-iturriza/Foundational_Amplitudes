@@ -6613,8 +6613,14 @@ of the three share a test set.
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); its read on the tops never seen
     (the twin) is running. Next, in order: a variant that keeps the gain without the cost on finals with no soft particle,
-    through the CPU proxy first; the exact loop factor $(16\pi^2)^{-L}$ and the spin, colour and identical-particle factors
-    in $F$; a few-event calibration by shrinkage (the $\sigma$ head adds nothing); the small dedicated network for what no
+    through the CPU proxy first (par.\ \ref{par:qperp_cost}: the GPU cost is in the shape of the non-boson finals; a
+    per-process shape proxy, \code{shape\_learn.py}, is running); the exact loop factor $(16\pi^2)^{-L}$ and the spin,
+    colour and identical-particle factors in $F$ (2026-10-24, composition proxy: the stored one-loop pools are already
+    stripped, their level offset against the tree model is $-1.4$ and dividing out $(16\pi^2)^{-1}$ takes the level MSE
+    from $4.9$ to $42$, so the loop factor belongs to the loop-induced pools only; undoing MadGraph's identical-particle
+    factor, $+\log\prod n_i!$, moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$ to
+    $8.7$ / $2.5$, the same mixed sign as IDEN and colour above; the spin and colour averages are linear in the initial
+    state's counts, which the level model already has); a few-event calibration by shrinkage (the $\sigma$ head adds nothing); the small dedicated network for what no
     constant fixes ($2\to4$ shape $1.5$, unseen tops), first a per-process context vector fitted on $K$ events with the
     trunk frozen (arXiv:1909.09157), then a factorisation-aware head on the model's own lower-multiplicity prediction
     (arXiv:2107.06625, 2512.11036). Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor
