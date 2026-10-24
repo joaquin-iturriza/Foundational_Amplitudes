@@ -6645,7 +6645,14 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
-  \item \textbf{State (2026-10-24, 07:30).} Done: the soft minimum (DlessInOrdQs, par.~\ref{par:qperp_cost}; negative). Running on CC: catalog\_v3 stage 3's prebuild
+  \item \textbf{State (2026-10-24, 07:30).} Done: the soft minimum (DlessInOrdQs, par.~\ref{par:qperp_cost}; negative). catalog\_v3 stage 2: all $167$ loop
+    strings MadLoop-certified ($150$ one-loop, $17$ loop-induced) after three fixes: the certifier runs on the b beams'
+    $4.7$\,GeV shell as generation does; b-beam standalones run with \code{ImprovePSPoint} $-1$ (MadLoop's PSMC
+    re-projection broke $p_z$ with a $W$) and a quad-precision rescue threshold of $10^{-5}$; a zero predicted double pole
+    is tested absolutely. The $25$ $b\bar b\to$ colourless strings are also certified on the single pole (the massive
+    pair's form, crossed; MadLoop within $2.4\times10^{-6}$); $bb\to bb$, $bb\to bbZ$, $bg\to bb\bar b$ on the double pole
+    only. Stage 2a (the $99$ strings with no $b$ or $t$ on any leg, or loop-induced) is generating; the other $68$ wait for
+    the user's call on the heavy-quark mass-scheme shift (none in v3, or a per-leg rule). Running on CC: catalog\_v3 stage 3's prebuild
     (FA-ccin2p3-d703d83c: 40 2->5 probes, 24 $\alpha_s$ pools). Done: stage 1 (1703 pools, 5109 files, 21 min; pools
     assembled one at a time since the prebuild fix; \code{/sps/lpnhe} 33 GB free after D103, D104 cleared the training
     caches and 778 census backends). Next: stage 2, \code{catalog\_v3\_loops.yaml} (150 one-loop + 17 loop-induced, all
