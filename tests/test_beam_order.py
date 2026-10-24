@@ -59,7 +59,28 @@ def test_perm_builder():
 
 # sm / loop_sm default masses of the massive particles (restrict_default.dat), by |pdg|;
 # everything else is massless. A catalog entry may override MT/MB via param_card_patches.
-_CARD_DEFAULT_MASS = {5: 4.7, 6: 173.0, 15: 1.777, 23: 91.188, 24: 80.419, 25: 125.0}
+_CARD_DEFAULT_MASS = {5: 4.7, 6: 173.0, 15: 1.777, 23: 91.188, 24: 80.419, 25: 125.0,
+                      # the non-SM models' new particles at their fixed point (mg5_pipeline_final.NONSM_POINT)
+                      5000001: mg.NONSM_POINT["MY1"], 37: mg.NONSM_POINT["mhc"], 35: mg.NONSM_POINT["mh2"],
+                      36: mg.NONSM_POINT["mh3"]}
+
+
+def test_beams_on_shell():
+    """The samplers put each beam on the mass shell its card uses (a b beam at 4.7 GeV), and massless beams at
+    (E, 0, 0, +-E) exactly."""
+    sq = np.array([30.0, 200.0, 1000.0])
+    for pdg in ([5, -5, 2, -2], [2, -2, 2, -2], [5, -2, 5, -2], [11, -11, 2, -2]):
+        B = mg._beams(sq, pdg)
+        for i in (0, 1):
+            m = mg.BEAM_MASS.get(abs(pdg[i]), 0.0)
+            m2 = B[:, i, 0] ** 2 - (B[:, i, 1:] ** 2).sum(1)
+            assert np.allclose(m2, m ** 2, atol=1e-6 * sq.max() ** 2), (pdg, i, m2)
+        assert np.allclose(B.sum(1)[:, 0], sq) and np.allclose(B.sum(1)[:, 1:], 0.0)
+        if not any(abs(p) in mg.BEAM_MASS for p in pdg[:2]):
+            assert np.array_equal(B[:, 0], np.stack([sq / 2, 0 * sq, 0 * sq, sq / 2], 1))
+    ev, _ = mg.sample_nbody_phase_space(4, 50.0, 60.0, [0.0, 0.0, 0.0], [5, -5, 21, 21, 21], rng=np.random.default_rng(0))
+    p = np.array([e[0] for e in ev])
+    assert np.allclose(p[:, 0, 0] ** 2 - (p[:, 0, 1:] ** 2).sum(1), 4.7 ** 2, atol=1e-6)
 
 
 def test_masses_match_card():
@@ -205,6 +226,7 @@ def test_stored_pools(recipe="recipes/pretrain8_short.yaml", n_check=5):
 
 if __name__ == "__main__":
     test_perm_builder()
+    test_beams_on_shell()
     test_masses_match_card()
     test_order_vectors()
     test_cpp_driver_physics()

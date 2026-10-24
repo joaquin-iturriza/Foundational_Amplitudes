@@ -61,16 +61,21 @@ def main():
             for e in ti.get("edits") or [ti]:
                 a, b = e.get("old_string", ""), e.get("new_string", "")
                 new = new.replace(a, b) if e.get("replace_all") else new.replace(a, b, 1)
-        bad = violations(cur, new)
+        try:
+            bad = violations(cur, new)
+        except ValueError as e:              # the write would leave the file unreadable: the list would be lost
+            bad = [f"the new content is not valid JSON ({e})"]
         if bad:
             print("BLOCKED by continuous_list_guard:\n  " + "\n  ".join(bad), file=sys.stderr)
             return 2
         return 0
     if mode == "post":
-        if not os.path.exists(CONF):
-            return 0
         old = head_text()
-        bad = violations(old, open(CONF).read())
+        try:
+            bad = violations(old, open(CONF).read()) if os.path.exists(CONF) else (
+                ["the file was deleted"] if tasks(old) else [])
+        except ValueError as e:
+            bad = [f"the file is not valid JSON ({e})"]
         if bad:
             open(CONF, "w").write(old)
             print("continuous_list_guard: .claude/continuous.json restored from HEAD:\n  " + "\n  ".join(bad), file=sys.stderr)

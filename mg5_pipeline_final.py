@@ -149,6 +149,13 @@ def physics_to_generation(physics):
         else:
             print(f"  [WARN] physics.masses: no param_card symbol for PDG {pdg}; "
                   f"ME mass unchanged (phase-space mass still updated).")
+    # physics.widths {pdg: GeV}: a width set with the mass it belongs to (catalog_v3's heavy-quark layer scales the top
+    # width with m_t); opt-in, so a mass scan without it keeps the card's width
+    for pdg, w in (physics.get("widths") or {}).items():
+        sym = {6: "WT"}.get(abs(int(pdg)))
+        if sym is None:
+            raise KeyError(f"physics.widths: no param_card width symbol for PDG {pdg}")
+        patches[sym] = float(w)
     return patches, mass_by_pdg, alphas_mz
 
 
@@ -1641,6 +1648,9 @@ _ZP_OFF = {**_ZP, **{f"gVl{i}{i}": 0.0 for i in (1, 2, 3)}, **{f"gAl{i}{i}": 0.0
 _THDM = {**{k: v for k, v in _SM_ALIGN.items() if k not in ("MH", "WH")}, "mh1": 125.0, "Wh1": 6.38233934e-03,
          "mhc": NONSM_POINT["mhc"], "mh2": NONSM_POINT["mh2"], "mh3": NONSM_POINT["mh3"],
          **{f"GL{ri}{i}x{j}": 0.0 for ri in ("R", "I") for i in (1, 2, 3) for j in (1, 2, 3)}}
+# the quark-beam 2HDM entries (catalog_v3): the second doublet's quark Yukawas zeroed too (the UFO defaults are O(1),
+# GDR1x1 = 1), so u u~ -> scalars is gauge exchange only, as e+ e- -> scalars is
+_THDM_Q = {**_THDM, **{f"G{q}{ri}{i}x{j}": 0.0 for q in ("U", "D") for ri in ("R", "I") for i in (1, 2, 3) for j in (1, 2, 3)}}
 # SMEFTatNLO (restrict_LO) is an {MW, MZ, Gf} scheme: MW = the sm card's derived 80.419 gives the same alpha
 SMEFT_WILSON = ("cpDC cpWB cdp cp cWWW cG cpG cpW cpBB cpl1 cpl2 cpl3 c3pl1 c3pl2 c3pl3 cpe cpmu cpta cpqMi cpq3i "
                 "cpQ3 cpQM cpu cpt cpd ctp ctZ ctW ctG cQq83 cQq81 cQu8 ctq8 cQd8 ctu8 ctd8 cQq13 cQq11 cQu1 ctq1 "
@@ -1674,6 +1684,28 @@ NONSM = {
     "smeft_ee_ttbar": {"model": "SMEFTatNLO-LO", "mg5_generate": ["generate e+ e- > t t~ QED<=2 NP<=1"],
                        "nfinal": 2, "param_card_patches": {**_SMEFT0, "ctZ": 0.5, "cte1": 0.5},
                        "pdg_ids": [11, -11, 6, -6], "m_final": LOCKED_MT},
+    # catalog_v3's BSM layer (D98: "at least one BSM process that can be encoded with our current particle embedding"),
+    # beyond the five above: quark beams, an external Y1 with a gluon or a Z, the charged scalar with h2, and a 2->3
+    "zp_uux_mumu": {"model": "DMsimp_s_spin1", "mg5_generate": ["generate u u~ > mu+ mu- QED<=2 DMV<=2"],
+                    "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [2, -2, -13, 13], "m_final": 0.0},
+    "zp_uux_Y1g":  {"model": "DMsimp_s_spin1", "mg5_generate": ["generate u u~ > y1 g DMV<=1"],
+                    "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [2, -2, 5000001, 21],
+                    "m_finals": [NONSM_POINT["MY1"], 0.0]},
+    "zp_uux_Y1z":  {"model": "DMsimp_s_spin1", "mg5_generate": ["generate u u~ > y1 z QED<=1 DMV<=1"],
+                    "nfinal": 2, "param_card_patches": _ZP, "pdg_ids": [2, -2, 5000001, 23],
+                    "m_finals": [NONSM_POINT["MY1"], 91.188]},
+    "thdm_uux_HpHm": {"model": "2HDM", "mg5_generate": ["generate u u~ > h+ h-"], "nfinal": 2,
+                      "param_card_patches": _THDM_Q, "pdg_ids": [2, -2, 37, -37],
+                      "m_finals": [NONSM_POINT["mhc"], NONSM_POINT["mhc"]]},
+    "thdm_udx_Hph2": {"model": "2HDM", "mg5_generate": ["generate u d~ > h+ h2"], "nfinal": 2,
+                      "param_card_patches": _THDM_Q, "pdg_ids": [2, -1, 37, 35],
+                      "m_finals": [NONSM_POINT["mhc"], NONSM_POINT["mh2"]]},
+    "thdm_ee_HpHma": {"model": "2HDM", "mg5_generate": ["generate e+ e- > h+ h- a"], "nfinal": 3,
+                      "param_card_patches": _THDM, "pdg_ids": [11, -11, 37, -37, 22],
+                      "m_finals": [NONSM_POINT["mhc"], NONSM_POINT["mhc"], 0.0]},
+    "thdm_uux_h2h3g": {"model": "2HDM", "mg5_generate": ["generate u u~ > h2 h3 g"], "nfinal": 3,
+                       "param_card_patches": _THDM_Q, "pdg_ids": [2, -2, 35, 36, 21],
+                       "m_finals": [NONSM_POINT["mh2"], NONSM_POINT["mh3"], 0.0]},
     # validation only (tools/nonsm_validate.py): the same models with every non-SM coupling at zero
     "zp0_ee_mumu":    {"model": "DMsimp_s_spin1", "mg5_generate": ["generate e+ e- > mu+ mu- QED<=2 DMV<=2"],
                        "nfinal": 2, "param_card_patches": _ZP_OFF, "pdg_ids": [11, -11, -13, 13], "m_final": 0.0},
@@ -2654,6 +2686,26 @@ def _collect_with_cuts(draw, n_events, m_finals, pdg_ids, cuts):
     return np.concatenate(accP)[:n_events], np.concatenate(accS)[:n_events]
 
 
+# Masses of the beams as the sm card has them: a b beam is on its 4.7 GeV shell, like a b in the final state (the only
+# massive beam the catalogs generate here; light quarks, leptons and gluons are massless). Each beam carries
+# E_i = (s + m_i^2 - m_j^2) / (2 sqrt s) and |p_z| = lambda^(1/2)(s, m_1^2, m_2^2) / (2 sqrt s), beam- along +z; with
+# both beams massless the arrays are the old (E, 0, 0, +-E) ones bit for bit.
+BEAM_MASS = {5: 4.7}
+
+
+def _beams(sqrts, pdg_ids):
+    """(n, 2, 4) beam momenta in the c.o.m. frame for beams pdg_ids[:2]"""
+    sqrts = np.asarray(sqrts, float); z = np.zeros(len(sqrts))
+    m1, m2 = (BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg_ids[:2])
+    if m1 == 0.0 and m2 == 0.0:
+        E = sqrts / 2.0
+        return np.stack([np.stack([E, z, z, E], 1), np.stack([E, z, z, -E], 1)], axis=1)
+    s = sqrts ** 2
+    E1 = (s + m1 ** 2 - m2 ** 2) / (2.0 * sqrts); E2 = sqrts - E1
+    p = np.sqrt(np.maximum((s - (m1 + m2) ** 2) * (s - (m1 - m2) ** 2), 0.0)) / (2.0 * sqrts)
+    return np.stack([np.stack([E1, z, z, p], 1), np.stack([E2, z, z, -p], 1)], axis=1)
+
+
 def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None, cuts=None):
     """
     Sample uniform phase space for a 2→2 partonic process with a massless,
@@ -2671,8 +2723,8 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
     list of (momenta_array, pdg_ids_array) plus the per-event √s array.
 
     Column ordering matches the .npy convention and the NLO .dat files:
-        p1 = beam-  (E_beam, 0, 0, +E_beam)
-        p2 = beam+  (E_beam, 0, 0, -E_beam)
+        p1 = beam-  (E_1, 0, 0, +p)   (_beams: on the beams' mass shells; E, +-E when massless)
+        p2 = beam+  (E_2, 0, 0, -p)
         p3 = X      (E3, px, py, pz)
         p4 = Xbar   (E4, -px, -py, -pz)
     """
@@ -2692,7 +2744,6 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
         cos_t  = rng.uniform(-1.0, 1.0, nb)
         phi    = rng.uniform(0.0, 2.0 * np.pi, nb)
         s      = sqrts ** 2
-        E_beam = sqrts / 2.0
         E3     = (s + m3 ** 2 - m4 ** 2) / (2.0 * sqrts)
         E4     = sqrts - E3
         p_mag  = np.sqrt(np.maximum(E3 ** 2 - m3 ** 2, 0.0))
@@ -2700,13 +2751,10 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
         px = p_mag * sin_t * np.cos(phi)
         py = p_mag * sin_t * np.sin(phi)
         pz = p_mag * cos_t
-        zero = np.zeros(nb)
-        P = np.stack([
-            np.stack([E_beam, zero,  zero,  E_beam], axis=1),   # beam-
-            np.stack([E_beam, zero,  zero, -E_beam], axis=1),   # beam+
+        P = np.concatenate([_beams(sqrts, pdg_arr), np.stack([
             np.stack([E3,     px,    py,    pz],     axis=1),    # X
             np.stack([E4,    -px,   -py,   -pz],     axis=1),    # Xbar
-        ], axis=1)                                              # (nb, 4, 4)
+        ], axis=1)], axis=1)                                    # (nb, 4, 4): beam-, beam+, X, Xbar
         return P, sqrts
 
     P, sqrts = _collect_with_cuts(draw, n, m_finals, pdg_arr, cuts)
@@ -2810,14 +2858,9 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
 
     def draw(nb):
         sqrts   = rng.uniform(sqrts_min, sqrts_max, nb)
-        E_beam  = sqrts / 2.0
         p_ml    = _rambo_massless_batch(sqrts, nfinal, rng)          # (nb, nfinal, 4)
         p_final = p_ml if all_zero else _rambo_massive_batch(sqrts, masses, p_ml)
-        zero    = np.zeros(nb)
-        p_init  = np.stack([
-            np.stack([E_beam, zero, zero,  E_beam], axis=1),
-            np.stack([E_beam, zero, zero, -E_beam], axis=1),
-        ], axis=1)                                                  # (nb, 2, 4)
+        p_init  = _beams(sqrts, pdg_arr)                             # (nb, 2, 4)
         return np.concatenate([p_init, p_final], axis=1), sqrts     # (nb, nparticles, 4)
 
     P, sqrts = _collect_with_cuts(draw, n_events, m_finals, pdg_arr, cuts)
@@ -2976,8 +3019,7 @@ def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo):
     all_zero = np.all(m_finals == 0.0)
     def draw(n_draw):
         sq = np.asarray(sqrts_draw(n_draw), float)
-        Eb = sq / 2.0; z = np.zeros(n_draw)
-        beams = np.stack([np.stack([Eb, z, z, Eb], 1), np.stack([Eb, z, z, -Eb], 1)], axis=1)
+        beams = _beams(sq, pdg)
         if N == 2:
             P = democratic_draw(n_draw, sq, m_finals, y_lo, rng)     # N=2: back-to-back, isotropic
         else:

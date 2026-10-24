@@ -6,7 +6,8 @@ once at load, before the cast: the amplitude itself and the physics factors of t
 Over the existing catalog pools in $DATA_DIR (each row: n*4 momenta, n PDG ids, |M|^2; the val split, 1e4 events each):
   range    every pool: the fraction of |M|^2 outside float32's normal range (|x| < 1.18e-38 or > 3.4e38), the fraction
            negative, log10|M|^2 min / max, and whether every PDG id survives the cast exactly
-  target   --n-per-layer pools per final-state multiplicity (seed 0) plus every pool with a massive final leg: with the
+  target   --n-per-layer pools per final-state multiplicity (seed 0) plus a random tenth of the pools of five or more
+           particles with a massive final leg: with the
            momenta cast to float32 and back, the change in log s_hat, in the emission scales (physics_scales.qperp_logs),
            in the smallest log s_ij, in each leg's m^2, and in log|M|^2 with |M|^2 cast; quoted as max and 99.9% |delta|
 Prints one PRECISION line per pool and a summary; writes the summary as JSON to --out.

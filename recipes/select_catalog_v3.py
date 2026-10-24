@@ -143,8 +143,53 @@ def main():
     print("one-loop candidates:", dict(Counter((v["role"], v["axis"]) for v in loops.values())))
     print("heavy-quark layer:", len(heavy), "pools from", len(hq_cls), "top classes by layer",
           dict(Counter(P[n]["layer"] for n in hq_cls)))
+    write_stage1(P, role, heavy, a)
     print(f"removal twin also drops {len(twin_out)} classes (tau, quartic gauge), "
           f"{sum(role[n]['role'] == 'train' for n in twin_out)} of them training classes")
+
+
+BSM = ("zp_ee_mumu", "zp_uux_mumu", "zp_ee_uu", "zp_ee_Y1a", "zp_uux_Y1g", "zp_uux_Y1z", "thdm_ee_HpHm", "thdm_ee_h2h3",
+       "thdm_uux_HpHm", "thdm_udx_Hph2", "thdm_ee_HpHma", "thdm_uux_h2h3g")        # mg5_pipeline_final.NONSM, D98
+
+
+def write_stage1(P, role, heavy, a):
+    """the generation recipe of D102's first stage (recipes/catalog_v3_gen_stage1.yaml): every tree class
+    representative, train and held-out alike, at the catalog sizes (1e5 train, a tenth each for val and test), the
+    heavy-quark layer (the class at m_t = 50, 300, 600 GeV through physics.masses, the top width with it) and the BSM
+    layer; sqrt(s) from 1.05 x the final-state masses (at least 25 GeV) to 1 TeV, the catalogs' window (heavy pools: see
+    below). Stages 2 (the one-loop layer, after
+    its MadLoop certification) and 3 (2->5 probes, alpha_s points, loop-induced) are separate recipes."""
+    lo = lambda ms: max(25, int(round(1.05 * sum(ms))))
+    sz = "n_train: 100000, n_val: 10000, n_test: 10000"
+    L = ["# catalog_v3, generation stage 1 (D102; recipes/select_catalog_v3.py): tree classes, heavy-quark layer, BSM",
+         "# roles: recipes/catalog_v3_roles.json (this recipe generates every pool; the training recipes select)",
+         "sampling: {mode: mixture}", "processes:"]
+    for n in sorted(role):
+        assert lo(P[n]["m_finals"]) < 900, n
+        L.append(f"  - {{name: {n}, sqrts: [{lo(P[n]['m_finals'])}, 1000], {sz}}}")
+    # the heavy-quark pools: the window is the catalog's [threshold, 1 TeV] while that leaves 500 GeV above threshold,
+    # else [threshold, threshold + 500] (a t t~ pair at 600 GeV has its threshold at 1260); the top width follows the
+    # mass at LO, Gamma(t -> b W) ~ m^3 (1 - x)^2 (1 + 2x), x = M_W^2 / m^2, scaled to the card's 1.4915 at 172.5, and 0
+    # below the b W threshold (no on-shell top decays there)
+    MW, MB = 80.419, 4.7
+    f = lambda m: m ** 3 * (1 - MW ** 2 / m ** 2) ** 2 * (1 + 2 * MW ** 2 / m ** 2) if m > MW + MB else 0.0
+    width = lambda m: round(1.4915 * f(m) / f(172.5), 4)
+    for h, v in sorted(heavy.items()):
+        ms = [v["m_t"] if abs(p) == 6 else m for p, m in zip(P[v["tree"]]["pdg_ids"][2:], P[v["tree"]]["m_finals"])]
+        l = lo(ms); hi = max(1000, l + 500)
+        assert hi - l >= 500, h
+        L.append(f"  - {{name: {h}, base: {v['tree']}, sqrts: [{l}, {hi}], {sz}, "
+                 f"physics: {{masses: {{6: {float(v['m_t'])}}}, widths: {{6: {width(v['m_t'])}}}}}}}")
+    import sys
+    sys.path.insert(0, ROOT)
+    import mg5_pipeline_final as mg
+    for n in BSM:
+        e = mg.PROCESSES[n]
+        ms = e.get("m_finals") or [e.get("m_final", 0.0)] * e["nfinal"]
+        assert lo(ms) < 900, n
+        L.append(f"  - {{name: {n}, sqrts: [{lo(ms)}, 1000], {sz}}}")
+    open(os.path.join(ROOT, "recipes", "catalog_v3_gen_stage1.yaml"), "w").write("\n".join(L) + "\n")
+    print(f"wrote recipes/catalog_v3_gen_stage1.yaml: {len(role)} trees, {len(heavy)} heavy-quark, {len(BSM)} BSM")
 
 
 if __name__ == "__main__":
