@@ -3,7 +3,7 @@ pools (recipes/catalog_loop_signed.yaml), before any training. The user, 2026-10
 against its log part, so it should hold as few events as possible. Per pool, on its val events: V the stored value,
 F = s_hat^(4-N) (the mass dimension; the coupling orders are one constant per pool and only shift r0), u = log|V F|
 (the log-magnitude a log target would see). Reported per pool: the negative fraction, the quantiles of u, and the share
-of events with |V F| below r0 for (a) one shared r0, the median over pools of their 0.5% quantile, and (b) a per-pool r0
+of events with |V F| below r0 (lin_shift: for an r0 off its own quantile by a level error e, in nat) for (a) one shared r0, the median over pools of their 0.5% quantile, and (b) a per-pool r0
 at its own 0.5% quantile (0.5% by construction); and how thin the zero crossing is, the share of events within a factor
 10 and 100 of zero relative to the pool's median |V F|.
 Login node, CPU only; prints JSON after a __B64__ line.
@@ -39,7 +39,10 @@ def main():
         out["pools"][k] = {"n": int(len(v)), "neg_frac": float(np.mean(v < 0)),
                            "u_q": [float(x) for x in np.quantile(u, [0.005, 0.05, 0.5, 0.95, 0.995])],
                            "lin_shared": float(np.mean(a < r0)), "lin_own": float(np.mean(a < q05[k])),
-                           "near_zero_10": float(np.mean(a < med / 10)), "near_zero_100": float(np.mean(a < med / 100))}
+                           "near_zero_10": float(np.mean(a < med / 10)), "near_zero_100": float(np.mean(a < med / 100)),
+                           # r0 set from a level known only up to an error e (nat), r0 = q_0.5% * exp(e): the share in the
+                           # linear band for that r0 (Level item (e): r0 following a predicted level)
+                           "lin_shift": {f"{e:+g}": float(np.mean(a < q05[k] * np.exp(e))) for e in (-3, -2, -1, -0.5, 0.5, 1, 2, 3)}}
     print("__B64__"); print(base64.b64encode(gzip.compress(json.dumps(out).encode())).decode())
 
 
