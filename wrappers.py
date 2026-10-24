@@ -182,9 +182,14 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  pair_bias_max_props: int = 48,
                  pair_bias_logit_cap: float = 8.0,    # ditto: consumed by the experiment (spec build + setup_pair_bias)
                  diagram_encoder_impl: str = "ours",  # "ours" | "llm4lhc" (models/diagram_encoder_llm4lhc.py)
-                 diagram_encoder_llm4lhc=None):       # its hyperparameters; consumed by the experiment
+                 diagram_encoder_llm4lhc=None,        # its hyperparameters; consumed by the experiment
+                 context_dim: int = 0, context_dropout: float = 0.5,   # read in experiment._post_instantiate_model
+                 context_names_file=None):
         super().__init__()
         self.net = net
+        # Per-process context vector (model.context_dim, D105): off until the experiment calls setup_context().
+        self.context = None
+        self.context_override = None
         self.network_dtype = torch.float32
         self.token_size = token_size
         self.d_particle_hidden = d_particle_hidden
@@ -253,6 +258,45 @@ class AmplitudeLLoCaWrapper(nn.Module):
             self.particle_encoder = _build_particle_encoder(
                 n_features, self.d_particle_hidden, encoder_hidden
             )
+
+    def setup_context(self, names, dim: int, dropout: float, own_names):
+        """Per-process context vector c_p (model.context_dim, D105; CAVIA, arXiv:1909.09157): a learned row per
+        process of ``names`` (the pretraining's processes, in its recipe order), ADDED to every particle's encoded
+        properties of that process's events. In training each event's c_p is replaced by the zero vector with
+        probability ``dropout``, so the zero vector is the zero-shot model: a process the table has no row for gets
+        zero. ``own_names``: this run's processes in process-id order, mapped to table rows by name (a probe's run
+        reads a parent's table). The table starts at zero, i.e. at the zero-shot model."""
+        assert not self.use_pids, "the context vector is added to the property encoding (use_PIDs=false)"
+        assert int(dim) == self.d_particle_hidden, \
+            f"model.context_dim {dim} must equal d_particle_hidden {self.d_particle_hidden} (it is added to it)"
+        self.context_names = [str(n) for n in names]
+        self.context = nn.Parameter(torch.zeros(len(self.context_names), int(dim)))
+        self.context_dropout = float(dropout)
+        self.set_context_rows(own_names)
+
+    def set_context_rows(self, own_names):
+        """process id -> row of the context table (-1: no row, the zero vector)"""
+        idx = {n: i for i, n in enumerate(self.context_names)}
+        rows = torch.tensor([idx.get(str(n), -1) for n in own_names], dtype=torch.long)
+        if "_ctx_row" in self._buffers:
+            rows = rows.to(self._buffers["_ctx_row"].device)
+        self.register_buffer("_ctx_row", rows, persistent=False)
+
+    def _context_per_particle(self, process_ids, ptr, dtype):
+        """(N_total, dim) context added to the particle encoding, or None. ``context_override`` (a (dim,) tensor,
+        set by tools/kshot_context.py) replaces every event's vector: the K-shot fit of a held-out process."""
+        counts = ptr[1:] - ptr[:-1]
+        if self.context_override is not None:
+            c = self.context_override.to(dtype).unsqueeze(0).expand(counts.shape[0], -1)
+        elif process_ids is None:
+            return None
+        else:
+            row = self._ctx_row[process_ids]                                  # (B,)
+            c = self.context[row.clamp(min=0)].to(dtype) * (row >= 0).unsqueeze(-1).to(dtype)
+            if self.training and self.context_dropout > 0:
+                keep = (torch.rand(c.shape[0], device=c.device) >= self.context_dropout).to(dtype)
+                c = c * keep.unsqueeze(-1)
+        return c.repeat_interleave(counts, dim=0)
 
     def setup_mass_from_momenta(self, mom_div: float, mass_spec: dict):
         """Enable data-derived per-particle mass (``data.mass_from_momenta``).
@@ -773,6 +817,10 @@ class AmplitudeLLoCaWrapper(nn.Module):
                 ev_lrs = order_labels[:, -1]                           # log10 sqrt(s_hat) per event, GeV
                 raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)
             particle_type = self.particle_encoder(raw_props)           # (N_total, d_particle_hidden)
+            if self.context is not None:
+                ctx = self._context_per_particle(process_ids, ptr, particle_type.dtype)
+                if ctx is not None:
+                    particle_type = particle_type + ctx
 
         if order_labels is not None:
             # Broadcast each event's coupling-order vector to all its particles.

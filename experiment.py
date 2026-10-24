@@ -1262,6 +1262,16 @@ class AmplitudeExperiment(BaseExperiment):
                 LOGGER.info(f"Mass encoding: log10(m / sqrt(s_hat)) per event for {int(massive.sum())} massive "
                             f"species (dimensionless_inputs), mass_col={spec['mass_col']}, "
                             f"{'z-scored' if std_on else 'raw'} on mean {mu_d:.3f}, std {sd_d:.3f}")
+            # model.context_dim (D105): a per-process context vector added to every particle's encoded
+            # properties (wrappers.setup_context); a real parameter, marked SP by mup_finalize like the encoder
+            if int(self.cfg.model.get("context_dim", 0) or 0):
+                assert self.modelname == "LLOCAMuPTransformer", "model.context_dim is implemented on the LLoCa wrapper"
+                names = self._context_names()
+                model.setup_context(names, int(self.cfg.model.context_dim),
+                                    float(self.cfg.model.get("context_dropout", 0.5)), list(self.cfg.data.dataset))
+                LOGGER.info(f"Context vector: {len(names)} table rows x {int(self.cfg.model.context_dim)}, dropout "
+                            f"{model.context_dropout}; {int((model._ctx_row >= 0).sum())} of this run's "
+                            f"{len(self.cfg.data.dataset)} processes have a row")
             # Build + attach the diagram graph encoder (a real submodule → trained,
             # checkpointed, marked SP by mup_finalize). Done here, like particle_encoder,
             # so it exists before μP finalisation and warm-start loading.
@@ -1368,6 +1378,27 @@ class AmplitudeExperiment(BaseExperiment):
             f"HETEROSC σ-only: trunk + μ head frozen; {n_train} readout params trainable, "
             f"μ rows [:{k}] grad-zeroed → only σ trains."
         )
+
+    def _context_names(self):
+        """The context table's processes (model.context_dim): model.context_names_file if set, else the
+        context_names.json of the run fine_tune.pretrained_path comes from (a probe or fine-tune reads its parent's
+        table), else this run's own processes. The list is written to <run_dir>/context_names.json either way, so a
+        run started from this one (the sigma stage, a probe) finds it next to its checkpoint."""
+        f = self.cfg.model.get("context_names_file", None)
+        ft = (self.cfg.get("fine_tune", None) or {}).get("pretrained_path", None)
+        if not f and ft:
+            cand = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(str(ft)))), "context_names.json")
+            f = cand if os.path.exists(cand) else None
+            assert f, f"model.context_dim is on but the parent of {ft} has no context_names.json"
+        if f:
+            with open(str(f)) as fh:
+                names = [str(n) for n in json.load(fh)]
+        else:
+            names = [str(n) for n in self.cfg.data.dataset]
+        os.makedirs(self.cfg.run_dir, exist_ok=True)
+        with open(os.path.join(self.cfg.run_dir, "context_names.json"), "w") as fh:
+            json.dump(names, fh)
+        return names
 
     def init_model(self):
         super().init_model()  # _post_instantiate_model is called inside for all three models

@@ -9,6 +9,16 @@ particle_encoder_hidden: 0   # off (docs/results.tex tab:bigrun_arms, not load-b
                              # single Linear, so it can form nonlinear products of quantum
                              # numbers. 0 = legacy single Linear.
 
+# --- Per-process context vector (D105; CAVIA, arXiv:1909.09157) ---------------
+# context_dim > 0: a learned row c_p per training process ADDED to every particle's encoded properties
+# (wrappers.setup_context; must equal d_particle_hidden). In training each event's c_p is zeroed with probability
+# context_dropout, so the zero vector is the zero-shot model; a held-out process gets c_p fitted on K labelled events
+# with everything else frozen (tools/kshot_context.py). The table's processes are written to
+# <run_dir>/context_names.json; a run warm-started from it (fine_tune.pretrained_path) reads that file.
+context_dim: 0
+context_dropout: 0.5
+context_names_file: null
+
 # --- Feynman-diagram conditioning (arXiv:2606.23791 graph route) ---------------
 # Off by default (docs/results.tex tab:bigrun_arms: removing it lowers the geometric mean by a
 # third and raises the 90th percentile; to be retried once the catalog pretraining is understood,

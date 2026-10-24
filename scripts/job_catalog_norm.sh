@@ -17,8 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, DlessInOrdQs, Dpair or Ds0}"; SMOKE="${2:-}"
-case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|DlessInOrdQs|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, DlessInOrdQs, DlessInOrdQc, Dpair or Ds0}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|DlessInOrdQs|DlessInOrdQc|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -63,6 +63,12 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # on the 43 new at 0.0038 against the dimensionless target's 0.0026, the soft one at 0.0027
 [ "$ARM" = DlessInOrdQs ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
                                     ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp_soft)
+# DlessInOrdQc (D105, the Level item's design (i)): DlessInOrdQ with a per-process context vector c_p (16, the particle
+# encoding's width) added to every particle's encoded properties, zeroed with probability 0.5 per event in training so
+# c = 0 is the zero-shot model (model.context_dim, wrappers.setup_context); its K-shot fits: scripts/job_kshot_context.sh
+[ "$ARM" = DlessInOrdQc ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                    ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp
+                                    ++model.context_dim=16 ++model.context_dropout=0.5)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
