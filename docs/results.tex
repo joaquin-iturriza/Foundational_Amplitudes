@@ -1087,14 +1087,47 @@ $0.48$, $0.26$), the $96$ relabels $0.074$, $0.064$, $0.051$, and on the $2\to4$
 scales' gain but not all ($+g$ $3.97$ against $2.18$ and $51.8$; $+\gamma$ $3.32$, $2.65$, $29.6$). The kinks are not what
 the $43$ new pay for, and the shape proxy's ranking of the three targets did not carry to the network.
 
-\paragraph{The context vector, its zero-shot cost (D105, 2026-10-24).} DlessInOrdQc is DlessInOrdQ's short run with a
+\paragraph{The context vector (D105, 2026-10-24).} DlessInOrdQc is DlessInOrdQ's short run with a
 learned $c_p\in\mathbb R^{16}$ per training process added to every particle's encoding and zeroed on half the events
 (\code{model.context\_dim}, \code{context\_dropout} $0.5$; run FA-ccin2p3-ac99f6a2, one seed), so its zero-shot is the
 $c=0$ model. That model costs a little against DlessInOrdQ on the held-out processes (\code{qperp\_ab.py}): the
 $43$ new $0.97$ against $0.75$ (median per-process ratio $1.03$, $10$--$90\%$ $0.50$--$3.3$), the $96$ relabels
-$0.073$ against $0.064$ (ratio $1.11$). What the context is for, the fit of $c_p$ on $K=1$, $4$, $16$ labelled events of
-each held-out process against the shrunk offset (Fig.~\ref{fig:kshot_level}), is running
-(\code{scripts/job\_kshot\_context.sh}).
+$0.073$ against $0.064$ (ratio $1.11$). What the context is for, the fit of $c_p$ on $K$ labelled events
+(\code{tools/kshot\_context.py}, run FA-ccin2p3-dc3b51b7; trunk and heads frozen, $c$ from $0$, $300$ Adam steps at
+$0.05$, $5$ draws of the $K$ events per process, scored on the other $1995$ to $2000$ validation events), against a
+per-process offset on the same $c=0$ predictions and the same draws, plain and shrunk as in Fig.~\ref{fig:kshot_level}
+(\code{analysis/catalog\_daniel/kshot\_context\_cmp.py}, Fig.~\ref{fig:kshot_context}; medians over processes, $K=0$,
+$1$, $4$, $16$):
+\begin{itemize}
+  \item \emph{The $43$ new: the context does more than the level.} Zero-shot $0.97$; plain offset $0.83$, $0.55$, $0.50$;
+  shrunk $0.72$, $0.54$, $0.50$; context $0.59$, $0.38$, $0.21$. The offsets stop at the floor ($0.46$, the variance of
+  the $c=0$ error, what any constant per process reaches); the context goes under it from $K=4$ and reaches half of it
+  at $K=16$, so it corrects the shape too. It beats the shrunk offset on $63$, $67$ and $77\%$ of the processes (median
+  ratio $0.97$, $0.72$, $0.59$).
+  \item \emph{$2\to4$: it does not.} $+g$: zero-shot $2.77$, shrunk prior alone $1.69$; plain $2.39$, $1.82$, $1.45$;
+  shrunk $1.70$, $1.56$, $1.43$; context $2.43$, $2.10$, $1.48$; floor $1.34$. $+\gamma$: zero-shot $1.87$, prior alone
+  $2.12$; plain $2.47$, $1.78$, $1.46$; shrunk $1.67$, $1.50$, $1.46$; context $2.36$, $2.23$, $1.68$; floor $1.37$. The
+  context beats the plain offset only once ($+\gamma$ at $K=1$, $2.36$ against $2.47$), never goes under the floor, and wins against the shrunk offset on $10$, $25$,
+  $50\%$ ($+g$) and $0$, $20$, $45\%$ ($+\gamma$) of the probes. Neither a constant nor a learned per-process vector at
+  the input reaches the $2\to4$ shape error ($\sim1.4$): the network does not extrapolate past the multiplicities and levels
+  it was trained on (par.\ What a few labelled events fix), and a vector that moves the embedding inside the trained
+  range cannot carry it there.
+\end{itemize}
+One seed, five draws, the fit's step count and rate fixed (not tuned): a pointer on the $43$ new (where its gain is
+large against the draw spread) and a clear negative on $2\to4$. In the plan of the level item this is the condition
+for its design (ii), the $2\to4$ head built on the clustered $2\to3$ prediction.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_daniel/figs/kshot_context_a.pdf}\hfill\pnl{../analysis/catalog_daniel/figs/kshot_context_b.pdf}} \\[1ex]
+\pnl{../analysis/catalog_daniel/figs/kshot_context_c.pdf}
+\caption{The held-out processes of DlessInOrdQc after $K$ labelled events: a per-process offset on the zero-shot ($c=0$)
+prediction, plain or shrunk towards the other processes' offsets, against the fit of the context vector $c_p$ with the
+network frozen; median over processes of the MSE of $\log|\mathcal M|^2$ on the other events (mean over $5$ draws). The
+floor is the variance of the zero-shot error. (a) The $43$ new processes; (b) the $2\to4$ probes with a gluon,
+(c) with a photon.}
+\label{fig:kshot_context}
+\end{figure}
 
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
@@ -6780,11 +6813,8 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-24, 21:30).} Running on CC: the D105 context arm's K-shot fits
-    (FA-ccin2p3-dc3b51b7, item \code{ctxvec}, \code{scripts/job\_kshot\_context.sh DlessInOrdQc}; outputs in
-    \code{\$SCRATCH/zz\_kshot\_context\_DlessInOrdQc/\{new43,2to4\}/}, KSHOT lines in its log); when it ends: collect,
-    compare with the shrunk offset (Fig.~\ref{fig:kshot_level}), write up under par.\ The context vector, its zero-shot
-    cost. Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
+  \item \textbf{State (2026-10-24, 23:50).} Nothing running. The D105 context arm's K-shot fits are done and written
+    up (par.\ The context vector, Fig.~\ref{fig:kshot_context}). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
     (sign head wins); the no-gain probes (D108). Decided 2026-10-24: catalog\_v2 deleted (D110, manifest
     \code{mg5amcnlo/DELETED\_V2\_ONLY\_20261024\_172235.json}); no mass-scheme shift in catalog\_v3 (D111); catalog\_v2
     not regenerated (D106); the larger-catalog item replaced by catalog\_v3 (D107); large-$D$ points stay out (D109);
@@ -6793,19 +6823,21 @@ of the three share a test set.
     two launches syncing at once collide, so chain them. All $167$ stage-2 loop strings are MadLoop-certified
     (\code{tools/nlo\_virtual\_pipeline.massive\_beam\_params}, \code{tools/nlo\_pole\_check.predict\_poles}). The
     lxplus-era archive (28 GB, D96) stays on CC; \code{runs\_from\_lxplus} is the only copy of its runs. Supervisor and
-    \code{site events --wait --project FA} running. Nothing waits on the user.
+    \code{site events --wait --project FA} running. Waits on the user: the level item's design (ii).
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); the soft minimum does not remove
     the cost (par.~\ref{par:qperp_cost}), and neither do the loop or identical-particle factors (the stored one-loop pools
     are already stripped, dividing out $(16\pi^2)^{-1}$ takes the level MSE from $4.9$ to $42$; undoing MadGraph's
     identical-particle factor moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$
     to $8.7$ / $2.5$). Open: what the $43$ new pay for. Next: the small dedicated network for what no constant fixes
-    ($2\to4$ shape $1.5$, unseen tops), approved and running (D105, 2026-10-24): (i) a context vector $c_p\in\mathbb R^{16}$ per
+    ($2\to4$ shape $1.5$, unseen tops), (i) done (D105, par.\ The context vector): a context vector $c_p\in\mathbb R^{16}$ per
     process, added to every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk
     frozen and $c_p$ the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process
     embedding with dropout to zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new
     and the $2\to4$ probes against the shrunk offset (Fig.~\ref{fig:kshot_level}); cost one short pretraining ($\sim1$
-    GPU-h) plus CPU-side fits; (ii) only if (i) leaves the $2\to4$ shape: a head that predicts the $2\to4$ target as the
+    GPU-h) plus CPU-side fits. It goes under the offset floor on the $43$ new ($0.21$ against $0.46$ at $K=16$) and leaves
+    the $2\to4$ shape where the offset leaves it ($1.5$), so the condition for (ii) is met; (ii) is a design for the user's
+    call before any job: a head that predicts the $2\to4$ target as the
     model's own $2\to3$ prediction on the clustered event plus a learned correction (arXiv:2107.06625, 2512.11036).
     Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor under $0.5$ with the heavy-quark
     layer. Signed pools: the sign head (par.\ The signed pools' A/B). Also proposed: the full-length catalog pretraining (D78's held
