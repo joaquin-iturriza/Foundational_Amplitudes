@@ -78,6 +78,16 @@ def predict_poles(s, proc_pdgs, masses, mom=None):
     c2 = -sum(C.casimir(p) for p, _ in massless)
 
     c1, note = None, ""
+    beams_only = len(colored) == 2 and not colored_final and len(massive) == 2 and \
+        abs(massive[0][1] - massive[1][1]) < 1e-6
+    if beams_only:
+        # a massive Q Qbar pair in the beams, colourless finals (b b~ > Z Z on the b's 4.7 GeV shell): the pair's soft
+        # function is the final-state pair's by crossing (both timelike, the same v_i.v_j; MadLoop returns the real
+        # part), with the pair invariant the beams' s
+        m = massive[0][1]
+        b = np.sqrt(max(1.0 - 4.0 * m**2 / s, 0.0))
+        L = np.log((1.0 + b) / (1.0 - b))
+        return c2, 2.0 * C.CF * ((1.0 + b**2) / (2.0 * b) * L - 1.0), "massive Q Qbar beams, colourless finals (crossed)"
     if len(colored) != len(colored_final):
         note = "coloured incoming partons -> only the double pole is certified"
         return c2, None, note
