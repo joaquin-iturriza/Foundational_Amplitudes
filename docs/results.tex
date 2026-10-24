@@ -6736,28 +6736,17 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-24, 13:15).} Done on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
-    \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}: the $99$ loop strings with no $b$ or
-    $t$ on any leg, or loop-induced; all $297$ train/val/test pools built in 4.5 h, empty error file). Audit of every pool generated so far
-    (FA-ccin2p3-81192000, \code{analysis/catalog\_v3/pool\_audit.py}, \code{pool\_audit.json}): stages 1, 2a and 3,
-    $1866$ entries and $5598$ pools, all present at their recipe sizes, no non-finite or zero $|\mathcal M|^2$, ids
-    constant, momentum conservation within $5\times10^{-11}$ of $\sqrt{\hat s}$, train and val medians of
-    $\log_{10}|\mathcal M|^2$ within $0.07$ val spreads; $62$ of stage 2a's one-loop pools change sign, none of the tree
-    pools. Nothing is running. Waiter:
-    \code{site events --wait --project FA}; supervisor running. All $167$ stage-2 loop strings are MadLoop-certified
-    ($150$ one-loop, $17$ loop-induced; $bb\to bb$, $bb\to bbZ$, $bg\to bb\bar b$ on the double pole only, the $25$
-    $b\bar b\to$ colourless strings on the single pole too; the certification fixes are in the code's comments,
-    \code{tools/nlo\_virtual\_pipeline.massive\_beam\_params}, \code{tools/nlo\_pole\_check.predict\_poles}). Waiting on
-    the user: (1) the heavy-quark mass-scheme shift for the other $68$ loop strings of
-    \code{catalog\_v3\_gen\_stage2.yaml} ((a) none in v3, recommended; (b) a per-leg rule; the code holds a provisional
-    $0.5\times$ per final quark that must not generate: do not prebuild \code{catalog\_v3\_gen\_stage2.yaml} before the
-    answer); (2) the context-vector design (the Level item, (i)); (3) whether to regenerate catalog\_v2's $53$ one-loop
-    pools whose stored target carries the shift at a W/Z/H/$\tau$ mass; (4) a go for a linear read-out of rungs $6$ and
-    $7$'s frozen features on $u\bar u\to Zg$ and for a fine-tune search on $ee\to Z\gamma$ with scratch's learning-rate
-    window (par.~\ref{par:nogain}). lxplus closed (2FA): the per-event read of the Sudakov arm's predictions waits on it.
-    The lxplus-era archive (28 GB of tars, D96) stays on CC: CC cannot reach Jean Zay (timeout); \code{runs\_from\_lxplus}
-    is the only copy of its runs (moved from EOS on 10-03). Next without the user: when stage 2a ends, read its log and
-    record it; the signed pools' A/B (the Level item) under D99's remaining GPU budget.
+  \item \textbf{State (2026-10-24, 17:30).} Running on CC: the D105 context arm's smoke test (FA-ccin2p3-61437ca1,
+    item \code{ctxvec}; then \code{DlessInOrdQc short} and \code{scripts/job\_kshot\_context.sh}); D108's rung $6$/$7$
+    read-out (FA-ccin2p3-b2593f1c) and the $20$ lowered-window $ee\to Z\gamma$ searches (\code{sweep/drive.py}, launch
+    \code{ftelo\_ee\_Za2}, item \code{nogain\_probes}); the signed A/B under D99 (item \code{signed\_ab}: CPU prep, then
+    SgnR0 and SgnHead short, then \code{eval\_signed}; both arms on the MSE with the arithmetic mean and no $\sigma$ stage,
+    since the sign head refuses the het loss: a deviation from D93's short setup, the same for both arms). catalog\_v3
+    stages 1, 2a, 3 generated and audited (par.\ catalog\_v3's pools and levels). Waiting on the user: the heavy-quark
+    mass-scheme shift for the $68$ one-loop strings with a $b$ or $t$ ((a) none, recommended); the catalog\_v2 deletion
+    (D110), refused by the session's permission check, needs the user's permission rule. Decided 2026-10-24: catalog\_v2
+    not regenerated (D106); large-$D$ points stay out of the figures (D109); the larger-catalog item replaced by
+    catalog\_v3 (D107); D78, D66 and the holds stay. Supervisor and waiter running.
   \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
     $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); the soft minimum does not remove
     the cost (par.~\ref{par:qperp_cost}), and neither do the loop or identical-particle factors (the stored one-loop pools
