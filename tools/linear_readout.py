@@ -96,7 +96,7 @@ def ridge_loo(X, y):
 
 def one(cfg_path, out_dir, n_train_eval):
     name = yaml.safe_load(open(cfg_path))["sweep_name"]
-    exp, sw, fixed = build(cfg_path, os.path.join(out_dir, name), n_train_eval)
+    exp, sw, fixed = build(cfg_path, os.path.join(out_dir, "runs", f"{name}_{os.environ.get('SLURM_JOB_ID', os.getpid())}"), n_train_eval)   # one fresh run dir per job
     std2 = float(np.asarray(exp.prepd_std[0]).ravel()[0]) ** 2
     Ft, yt, zt = features(exp, exp.train_eval_loader)
     Fv, yv, zv = features(exp, exp.val_loader)
