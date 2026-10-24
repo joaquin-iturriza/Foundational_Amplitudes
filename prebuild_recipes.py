@@ -23,7 +23,7 @@ with AMP_FROZEN_DIR / AMP_TRAIN_CACHE_DIR). Idempotent.
 Usage:
     python prebuild_recipes.py recipes/pretrain8_D1e5.yaml --workers 24 [--seed 42]
 """
-import argparse, os, sys, time
+import argparse, os, shutil, sys, time
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import yaml
@@ -97,6 +97,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--min-free-gb", type=float, default=20.0,
+                    help="space to leave free on the destination after the build (a shared filesystem)")
     ap.add_argument("--workers", type=int, default=min(24, _cores_available()),
                     help="parallel chunk-generation workers (default: min(24, ncpu))")
     ap.add_argument("--lhe-cores", type=int, default=int(os.environ.get("AMP_LHE_CORES", "1")),
@@ -225,6 +227,30 @@ def main():
         # Longest-processing-time-first so the cheap chunks fill the tail.
         all_tasks.sort(key=lambda t: -t["est_cost"])
 
+        # 1c) Free space: the datasets still to build, float64 rows of 5 N + 1 columns, against the free space of the
+        # destination filesystem, with the 1 MB-block overhead of the chunk files (CC's /sps) and one dataset in two
+        # copies at assembly. Refused when it does not fit, before anything is written (2026-10-24, /sps/lpnhe full).
+        # Chunks already on disk (a resumed run) count as written; assembly then needs only the largest dataset twice.
+        need, peak = 0, 0
+        for meta in datasets.values():
+            nf = int(mg.PROCESSES.get(meta["process"], {}).get("nfinal", 2))
+            size = meta["n_ev"] * (5 * (nf + 2) + 1) * 8
+            have = sum(os.path.getsize(os.path.join(r, fn)) for r, _, fns in os.walk(meta["work"]) for fn in fns
+                       if fn == "chunk.npy") if os.path.isdir(meta["work"]) else 0
+            n_have = sum(1 for r, _, fns in os.walk(meta["work"]) for fn in fns if fn == "chunk.npy") \
+                if os.path.isdir(meta["work"]) else 0
+            need += max(0, size - have) + max(0, meta["n_chunks"] - n_have) * (1 << 20)
+            peak = max(peak, size)
+        need += peak
+        dests = {meta["dest"] for meta in datasets.values()}
+        for d in dests:
+            os.makedirs(d, exist_ok=True)
+            free = shutil.disk_usage(d).free
+            print(f"  space: {need / 1e9:.1f} GB to write (chunk overhead included), {free / 1e9:.1f} GB free on {d}")
+            if free < need * 1.1 + args.min_free_gb * 1e9:
+                sys.exit(f"REFUSED: {need / 1e9:.1f} GB to write and {free / 1e9:.1f} GB free on {d} "
+                         f"(margin 10% + --min-free-gb {args.min_free_gb}); free space first")
+
         # 2) Compile backends, in parallel over distinct backends (each in its own dir).
         names = sorted({m["process"] for m in datasets.values()})
         datagen.ensure_backends(names, workers=args.workers)
@@ -233,6 +259,20 @@ def main():
         print(f"\nGenerating {len(all_tasks)} chunks across {args.workers} workers...")
         results = defaultdict(dict)   # key -> {idx: path}
         done = 0
+
+        # 4) Each dataset is concatenated into its canonical .npy (chunks in index order) the moment its last chunk
+        # lands, and its chunk dir removed then: the disk holds one dataset twice at a time, not the whole recipe
+        # (2026-10-24: catalog_v3's stage 1 filled /sps/lpnhe with 47808 chunks before a single pool was assembled).
+        def finalize(key):
+            meta = datasets[key]
+            ordered = [results[key][i] for i in sorted(results[key])]
+            t0 = time.time()
+            final = datagen.finalize_dataset(
+                meta["process"], meta["smin"], meta["smax"], meta["n_ev"],
+                meta["role"], args.seed, ordered, meta["dest"], meta["work"])
+            print(f"  [{meta['role']:5s}] {meta['process']:10s} "
+                  f"({meta['n_chunks']} chunks) -> {final}  ({time.time()-t0:.1f}s)", flush=True)
+
         with ProcessPoolExecutor(max_workers=args.workers) as ex:
             futs = {ex.submit(_gen_chunk, t): t["_key"] for t in all_tasks}
             for fut in as_completed(futs):
@@ -242,17 +282,8 @@ def main():
                 done += 1
                 if done % max(1, len(all_tasks) // 20) == 0 or done == len(all_tasks):
                     print(f"  chunks {done}/{len(all_tasks)}")
-
-        # 4) Concatenate each dataset's chunks (in index order) -> canonical .npy.
-        print("\nFinalizing datasets...")
-        for key, meta in datasets.items():
-            ordered = [results[key][i] for i in sorted(results[key])]
-            t0 = time.time()
-            final = datagen.finalize_dataset(
-                meta["process"], meta["smin"], meta["smax"], meta["n_ev"],
-                meta["role"], args.seed, ordered, meta["dest"], meta["work"])
-            print(f"  [{meta['role']:5s}] {meta['process']:10s} "
-                  f"({meta['n_chunks']} chunks) -> {final}  ({time.time()-t0:.1f}s)")
+                if len(results[key]) == datasets[key]["n_chunks"]:
+                    finalize(key)
 
     # 5) Reweight NLO α_s-scan datasets from their (now materialized) stripped
     # parents — cheap numpy, no MadLoop. Each parent feeds all its α_s points.
