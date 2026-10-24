@@ -156,8 +156,9 @@ def main():
                 e = score_all()[rest] - t[rest]
                 fit_mse.append(float(np.mean(e ** 2))); fit_off.append(float(np.mean(e)))
                 fit_shape.append(float(np.var(e))); picks.append(pick)
-            rec["ks"][str(K)] = {"mse_fit": float(np.median(fit_mse)), "offset_fit": float(np.median(fit_off)),
-                                 "shape_fit": float(np.median(fit_shape)), "mse_offset": float(np.median(off_mse)),
+            # the mean over draws: the expected error after K events, as kshot_level.py's estimator
+            rec["ks"][str(K)] = {"mse_fit": float(np.mean(fit_mse)), "offset_fit": float(np.mean(fit_off)),
+                                 "shape_fit": float(np.mean(fit_shape)), "mse_offset": float(np.mean(off_mse)),
                                  "draws": a.draws}
             saved.update({f"pick_k{K}": np.array(picks), f"msefit_k{K}": np.array(fit_mse),
                           f"mseoff_k{K}": np.array(off_mse)})

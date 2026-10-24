@@ -30,6 +30,8 @@ def sigma_stage_cfg(cfg):
         s.fine_tune.layer_decay = 1.0
         s.fine_tune.freeze_blocks = []
         s.fine_tune.reset_output_head = False
+        if "context_dropout" in s.model:
+            s.model.context_dropout = 0.0          # mu frozen: every event keeps its trained c_p (D105)
         s.training.heterosc_sigma_only = True
         s.training.heterosc_select = "nll"          # mu is frozen here, so only the NLL can tell the steps apart
         s.training.lr = float(t.get("heterosc_sigma_stage_lr", 0.01) or 0.01)
