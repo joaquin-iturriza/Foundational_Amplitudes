@@ -17,8 +17,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, DlessInOrdQs, Dpair or Ds0}"; SMOKE="${2:-}"
-case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|DlessInOrdQs|Dpair|Ds0) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
+ARM="${1:?A, Adim, B, Bgev, Btev, Dless, DlessIn, DlessInVirt, DlessInNoDiag, DlessInOrd, DlessInOrdQ, DlessInOrdQs, Dpair, Ds0, SgnR0 or SgnHead}"; SMOKE="${2:-}"
+case "$ARM" in A|Adim|B|Bgev|Btev|Dless|DlessIn|DlessInVirt|DlessInNoDiag|DlessInOrd|DlessInOrdQ|DlessInOrdQs|Dpair|Ds0|SgnR0|SgnHead) ;; *) echo "unknown arm $ARM"; exit 1 ;; esac
 # the probes the run is scored on: the catalog's 139 held-out (default) or 2to4, the 40 2->4 processes beyond the catalog
 # (recipes/gen_catalog_2to4.py, D90), predictions in <PRED>_2to4
 SET="${3:-catalog}"
@@ -63,6 +63,21 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # on the 43 new at 0.0038 against the dimensionless target's 0.0026, the soft one at 0.0027
 [ "$ARM" = DlessInOrdQs ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
                                     ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp_soft)
+# the signed pools' A/B (D99; docs/results.tex, the candidate targets): DlessInOrdQ's target and inputs, with catalog_v3's
+# 48 sign-changing one-loop train pools added to the training set (recipes/select_signed_ab.py) and two targets for them:
+#   SgnR0    the signed log with r0 three nats below the pool's 0.5% quantile of |x| (data.signedlog_scale_shift=-3)
+#   SgnHead  log|x| (floored at its 1% quantile) with a sign head (training.sign_head)
+# The sign head is not wired into the heteroscedastic loss (experiment._resolve_amp_preprocessing refuses the pair), so
+# both arms train on the MSE, with the arithmetic mean over processes the het loss forces (no sigma stage); everything
+# else as DlessInOrdQ short. Inputs first: scripts/job_signed_ab_prep.sh (per-event alpha_s, diagram sidecars).
+# Scored by mode eval_signed (tools/signed_ab_score.py: SgnHead first, its floor and level offsets then read by SgnR0)
+SGN=(training.loss=MSE ++training.loss_aggregation=mean)
+[ "$ARM" = SgnR0 ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                             ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp "${SGN[@]}"
+                             ++data.signedlog_quantile=0.005 ++data.signedlog_scale_shift=-3.0)
+[ "$ARM" = SgnHead ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                               ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp "${SGN[@]}"
+                               ++training.sign_head=true)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
@@ -115,6 +130,17 @@ if [ "$SMOKE" = short ]; then
     EXTRA=(training.validate_frac=0.02 training.iterations=4126 ++data.memmap=false ++data.train_subsample=10000
            ++data.eval_subsample=200 ++training.heterosc_sigma_stage_steps=150
            ++training.heterosc_sigma_stage_validations=5 evaluation.train_subsample=2000)
+    if [[ "$ARM" == Sgn* ]]; then
+        # catalog_daniel's training processes plus the signed train pools (the same 4126 steps over 1400 processes)
+        SUB="$SCRATCH/zz_catalog_signed_ab_train_${SLURM_JOB_ID}.yaml"
+        python - "$SUB" <<'PY' || exit 1
+import sys, yaml
+r = yaml.safe_load(open("recipes/catalog_daniel_train.yaml"))
+r["processes"] += yaml.safe_load(open("recipes/catalog_signed_ab_indist.yaml"))["processes"]
+yaml.safe_dump(r, open(sys.argv[1], "w")); print(len(r["processes"]), "training processes")
+PY
+        EXTRA+=(data.processes_file="$SUB")
+    fi
 fi
 # extrap (the user, 2026-10-22, "send those jobs now too"): train on the 236 2->2 training processes only, all 1e5 of
 # their train events (1e4 would give 720 steps over 5 epochs), the short runs' 4126 steps and settings otherwise;
@@ -152,8 +178,42 @@ elif [ -n "${FA_HOLDOUT:-}" ]; then echo "unknown FA_HOLDOUT $FA_HOLDOUT"; exit 
 if [ -n "${FA_SEED:-}" ]; then
     OUT="${OUT}_seed$FA_SEED"; PRED="${PRED}_seed$FA_SEED"; EXTRA+=(seed=$FA_SEED)
 fi
+# eval_signed (the signed pools' A/B, both arms scored here, SgnHead first): every signed pool on its validation events,
+# the 48 trained on and the 14 held out (H5), into $SCRATCH/zz_catalog_signed_ab/<arm>_<indist|heldout>.txt
+if [ "$SMOKE" = eval_signed ]; then
+    [[ "$ARM" == Sgn* ]] || { echo "eval_signed is the signed A/B's scoring (arm SgnR0 or SgnHead)"; exit 1; }
+    D="$SCRATCH/zz_catalog_signed_ab"
+    for S in indist heldout; do
+        mkdir -p "$D/recipes/$S"
+        python - "$D/recipes/$S" "recipes/catalog_signed_ab_$S.yaml" <<'PY'
+import sys, yaml
+for p in yaml.safe_load(open(sys.argv[2]))["processes"]:
+    yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{p['name']}_{p['sqrts'][0]}-{p['sqrts'][1]}GeV.yaml", "w"))
+PY
+    done
+    for A in SgnHead SgnR0; do
+        ls "$PROJECT_DIR/runs/catalog_norm_short/$A"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint for $A"; exit 1; }
+    done
+    for S in indist heldout; do
+        python tools/signed_ab_score.py --run "$PROJECT_DIR/runs/catalog_norm_short/SgnHead" --arm head \
+            "$D/recipes/$S"/*.yaml | tee "$D/SgnHead_$S.txt" || exit 1
+        python tools/signed_ab_score.py --run "$PROJECT_DIR/runs/catalog_norm_short/SgnR0" --arm r0 \
+            --ref "$D/SgnHead_$S.txt" "$D/recipes/$S"/*.yaml | tee "$D/SgnR0_$S.txt" || exit 1
+    done
+    exit 0
+fi
 if [ "$SMOKE" = eval ]; then
     ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
+elif [[ "$ARM" == Sgn* ]]; then
+    # the A/B arms train on the MSE: no sigma stage marks them done, their best checkpoint does; scored by mode
+    # eval_signed once both are trained
+    if [ ! -e "$OUT/models/model_run0_best.pt" ]; then
+        test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
+        python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
+            base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
+            training.result_path="$OUT/result.json" plot=true "${NORM[@]}" "${EXTRA[@]}" || exit 1
+    fi
+    exit 0
 elif [ ! -e "$OUT/sigma_stage/models" ]; then
     test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
     python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
