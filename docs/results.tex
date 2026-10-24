@@ -5924,8 +5924,13 @@ three flatten between $D=10^2$ and $10^{2.5}$ ($7.6$ to $8.5\times10^{-3}$ for s
 probe is $0.1$--$0.5$ at every $D$, so its pretraining on the electroweak $ee\to\mu\mu$ and $u\bar u$ virtuals carries
 nothing of this target over, although the three share the Sudakov factor ($-3.7\times10^{-3}L^2$ on the Born). The
 pools change sign ($65$--$92\%$ of the events negative), and a signed target's error sits at its zero crossings, which
-differ between the processes; a per-event read of the error against the distance to the crossing would settle it (the
-predictions are not at home).
+differ between the processes. Per event at $D=10^4$ (\code{sudakov\_events.py}, \code{data/nogain\_sudakov\_events.json};
+the test predictions written for the $\Delta$ plots): the $12\%$ of the events within a factor $10$ of the crossing
+($|V|$ below a tenth of the pool's median) hold $96\%$ of scratch's squared error, $97\%$ of rung $1$'s and $95\%$ of the
+arm's, and no arm gets a sign wrong. The arm loses where the other two do not, a factor $30$ to $10$ from the crossing
+($8.7\%$ of the events): its error there is $1.9\times10^{-4}$ against $2.4$ and $3.2\times10^{-5}$, $37\%$ of its total.
+So the probe is a zero-crossing problem for every arm, and the Sudakov pretraining makes the approach to the crossing
+worse, not the far region its shared $L^2$ term describes.
 
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
@@ -6946,8 +6951,8 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
   \item \textbf{The probes that do not gain.} $ee\to Z\gamma$: par.~\ref{par:nogain} (the gain dips where scratch's
     curve in $D$ is steepest; open: why a fine-tune's curve is smoother, e.g.\ the pretrained net's starting function
     against scratch's small-norm init at $D\sim10^2$). Rung $6$ against $7$: par.~\ref{par:nogain} (specific to $V$ + massless-boson probes, the same start training
-    $34\times$ against $308\times$; open why). Sudakov arm: par.~\ref{par:nogain} (no transfer of the target at all, zero-shot $0.1$--$0.5$; the signed
-    pools' zero crossings the likely cause, a per-event read of the predictions next).
+    $34\times$ against $308\times$; open why). Sudakov arm: par.~\ref{par:nogain} (no transfer of the target, zero-shot $0.1$--$0.5$; per event, the error of
+    every arm sits within a factor $10$ of the zero crossings, and the arm's is worse a factor $10$--$30$ away).
   \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
     not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
     ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the catalog. The design (which
