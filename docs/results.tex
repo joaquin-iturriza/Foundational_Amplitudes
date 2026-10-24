@@ -6691,7 +6691,7 @@ of the three share a test set.
     costs $100$--$200$ LO units); $121$ train, $29$ held out (H5). Heavy-quark layer $105$ pools: every $2\to2$ top
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
-    entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
+    entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
   \item \textbf{State (2026-10-24, 13:15).} Done on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
     \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}: the $99$ loop strings with no $b$ or
     $t$ on any leg, or loop-induced; all $297$ train/val/test pools built in 4.5 h, empty error file). Audit of every pool generated so far
@@ -6757,8 +6757,7 @@ of the three share a test set.
     $6.5$\,h; GPU unit tests passed, prefix leak $3.6\times10^{-6}$ against $0.5$ to $0.6$ for the controls);
     \code{tp3\_jcausbnn\_r9} (CC job 61507824, the same plus the Bayesian last layer of the draft's fig:bnn, copied from
     jetgpt-splittings' \code{VBLinear}; tests passed); the Jean Zay and H100 $\Delta$ evaluations. Both pretrainings and their zero-shot are done
-    (Sec.~\ref{sec:jcaus}). For the user: an unmasked parent with the affine-in-$N$ statistics, to tell the mask's share of
-    the gain from the statistics'. To tell the user with the result: Jonas's code is not public, so ``the same
+    (Sec.~\ref{sec:jcaus}). The unmasked parent with the affine-in-$N$ statistics (D65) is done. To tell the user with the result: Jonas's code is not public, so ``the same
     implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
     each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). User's calls of 2026-10-15 13:30: the EMA checkpoint fix (D63), done (commits \code{cd26a58} to \code{cff8039}: with EMA on, the
 checkpoint's \code{"model"} is the EMA weights and \code{"model\_live"} the live ones, \code{"model\_is\_ema"} marks the
@@ -6767,9 +6766,9 @@ old checkpoints through the EMA shadow mapped by parameter name; \code{tests/tes
 $3/3$; from now on, fine-tunes of EMA parents start from different weights than the transfer study's so far); the catalog sweep launched (\code{dancat\_het\_pre}, $32$k,
 waves $3+3+2$; its $200$\,GB fits only CC's large V100 node and the H100 nodes; the user: ``there has to be a way around this'':
 a memory-mapped data path whose memory scales with the batch, being built and measured, then the sweep restarts); selection
-on the NLL by default (D62); the unmasked control \code{tp3\_jaff\_r9} (D65), done (Fig.~\ref{fig:zero_shot_jcaus}); state at 2026-10-15 18:50: the catalog sweep \code{dancat\_het\_pre} wave 1 (3 trials, 40\,G, memory-mapped data, FA-ccin2p3-d9c02964/-492e9587/-b8378faa) running under \code{sweep/drive.py} (launch log \code{\textasciitilde/.local/share/ccorch/launch/FA/dancat\_het\_pre\_memmap.log}); the het calibration diagnosis is done (Fig.~\ref{fig:het_recal} paragraph): open for the user, whether a $4$k-step $\sigma$-only stage (\code{heterosc\_sigma\_only}) becomes the standard end of het training; holds: D66 (decomp, loops, nonsm, threephase: designs sent, wait for the user's iteration), D67 (het\_delta: calibration first); the user's D47 questions (settled? signed one-loop probes) open; the $\Delta$ plots are the
+on the NLL by default (D62); the unmasked control \code{tp3\_jaff\_r9} (D65), done (Fig.~\ref{fig:zero_shot_jcaus}); state at 2026-10-15 18:50: the catalog sweep \code{dancat\_het\_pre} wave 1 (3 trials, 40\,G, memory-mapped data, FA-ccin2p3-d9c02964/-492e9587/-b8378faa) running under \code{sweep/drive.py} (launch log \code{\textasciitilde/.local/share/ccorch/launch/FA/dancat\_het\_pre\_memmap.log}); the het calibration diagnosis is done (Fig.~\ref{fig:het_recal} paragraph): settled by D70: a $250$-step $\sigma$-only stage is the default end of het training; holds: D66 (decomp, loops, nonsm, threephase: designs sent, wait for the user's iteration), D67 (het\_delta: calibration first); D47 done (par.\ The $\Delta$ cells retrained with the het loss); the $\Delta$ plots are the
 $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
-    (\code{4ef5b76}); the het sweep sets \code{nll} explicitly, the default waits for the user. The catalog class counts
+    (\code{4ef5b76}); the default is \code{nll} (D62). The catalog class counts
     ($467$/$409$) come from \code{analysis/catalog\_daniel/classify2.py}, which imports a \code{classify} module not in
     the repo, so they cannot yet be regenerated from trunk. \emph{The plan (the user's list of
     2026-10-14 16:48; D42 to D49), in priority order.} (1) \textbf{The catalog of arXiv:2606.23791} (D45, most urgent):
@@ -6788,7 +6787,7 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     \code{datasets}. The timing job (\code{FA-ccin2p3-85c90b04}): $10^5$ events take $7.6$ to $30$\,min of MadEvent per
     process ($b g\to b\bar b b$ $435$\,s, $gg\to ggg$ $1787$\,s). Next: the pretraining sweep on it (D59: GP, $8$ trials, $2000$ candidates,
     NLL-ranked, Daniel's diagram embedding; \code{sweep/sweep\_config\_dancat\_het\_pre.yaml}, whose horizon, lr window
-    $[10^{-3}, 9\times10^{-3}]$ and memory are PROPOSED and wait for the user). The proposal, for the user: $32$k steps
+    $[10^{-3}, 9\times10^{-3}]$ and memory were settled by D59 and D76). The proposal as sent: $32$k steps
     ($3.9\times10^5$ events per process, the per-process compute of catalog\_v2's pretraining), lr window centred at
     $3\times10^{-3}$ (between CLAUDE.md's high-$D$ $1.9\times10^{-3}$ at $32$k and catalog\_v2's best carried to $32$k,
     $4.7\times10^{-3}$), $200$\,GB host memory, $8$ trials in waves $3+3+2$ on CC; about $11$\,h per trial, $\approx90$
@@ -6801,9 +6800,8 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     user's answers: rank on the NLL, ``GP, 8 trials, 2000 candidates''; waves $3+3+2$ through \code{sweep/drive.py};
     FA's other sweeps unchanged, user: ``Let's see what we get from this sweep first''), done 2026-10-15 06:12
     (Fig.~\ref{fig:het_sweep}: test error $4.8\times$ below the MSE baseline's, $\sigma$ still $\approx2\times$ too large and
-    flat, every trial best at its last step). For the user: the longer horizon this sweep was the prerequisite for
-    (user: ``before extending the horizon, perhaps a HP sweep is needed''), at which length and whether to re-sweep
-    there; and whether \code{heterosc\_select} defaults to \code{nll}. \code{training.track\_train\_eval} (D58) scores the training split with the
+    flat, every trial best at its last step). Settled since: the longer horizon this sweep was the prerequisite for, $16$k and $32$k without a sweep (D61);
+    \code{heterosc\_select} defaults to \code{nll} (D62). \code{training.track\_train\_eval} (D58) scores the training split with the
     validation weights. Pulls in the $\Delta$ plots come after, by retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
     Plehn): arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at $D=10^4$: all
     ladder rungs, the scaling figures' arms, the star arms. The paper's figures use the $8$k grid at \code{d8}
