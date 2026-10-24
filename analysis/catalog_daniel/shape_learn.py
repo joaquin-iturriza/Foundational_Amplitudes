@@ -56,7 +56,7 @@ def one(args):
     out = {"N": int(N), "pdg": [int(c) for c in x[0, 4 * N: 5 * N]]}
     for k, y in tg.items():
         mu, sd = y[:N_FIT].mean(), y[:N_FIT].std()
-        r = MLPRegressor((64, 64), learning_rate_init=1e-3, max_iter=300, early_stopping=True, random_state=0)
+        r = MLPRegressor(hidden_layer_sizes=(64, 64), learning_rate_init=1e-3, max_iter=300, early_stopping=True, random_state=0)
         r.fit(X[:N_FIT], (y[:N_FIT] - mu) / sd)
         e = (r.predict(X[N_FIT:]) * sd + mu) - y[N_FIT:]
         out[k] = {"mse": float(np.mean((e - e.mean()) ** 2)), "var": float(np.var(y[N_FIT:])),
