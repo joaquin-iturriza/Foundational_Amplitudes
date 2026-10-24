@@ -711,6 +711,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > a a a g
     why: v3_bbx_aaa+g
+  v3_bbx_aaagh:
+    alphas_power: 1
+    diagrams: 120
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5_generate:
+    - generate b b~ > a a a g h
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 22
+    - 21
+    - 25
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > a a a g h
+    why: v3_bbx_aaah+g
   v3_bbx_aaah:
     diagrams: 24
     layer: 4
@@ -2781,6 +2808,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > b b~ g h
     why: v3_bbx_bbxh+g
+  v3_bbx_bbxgvevex:
+    alphas_power: 3
+    diagrams: 48
+    layer: 5
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate b b~ > b b~ g ve ve~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 21
+    - 12
+    - -12
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > b b~ g ve ve~
+    why: v3_bbx_bbxvevex+g
   v3_bbx_bbxgz:
     alphas_power: 3
     diagrams: 48
@@ -3692,6 +3746,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > d d~ g h
     why: v3_bbx_ddxh+g
+  v3_bbx_ddxgwpwm:
+    alphas_power: 3
+    diagrams: 102
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5_generate:
+    - generate b b~ > d d~ g w+ w-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 1
+    - -1
+    - 21
+    - 24
+    - -24
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > d d~ g w+ w-
+    why: v3_bbx_ddxwpwm+g
   v3_bbx_ddxgz:
     alphas_power: 3
     diagrams: 24
@@ -4658,6 +4739,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > g g h h
     why: v3_bbx_ghh+g
+  v3_bbx_gghwpwm:
+    alphas_power: 2
+    diagrams: 264
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    - 80.419
+    - 80.419
+    mg5_generate:
+    - generate b b~ > g g h w+ w-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 25
+    - 24
+    - -24
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > g g h w+ w-
+    why: v3_bbx_ghwpwm+g
   v3_bbx_gghz:
     alphas_power: 2
     diagrams: 38
@@ -4708,6 +4816,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > g g ta+ ta-
     why: v3_bbx_gtaptam+g
+  v3_bbx_ggtaptamz:
+    alphas_power: 2
+    diagrams: 154
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    - 91.188
+    mg5_generate:
+    - generate b b~ > g g ta+ ta- z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - -15
+    - 15
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > g g ta+ ta- z
+    why: v3_bbx_gtaptamz+g
   v3_bbx_ggttx:
     alphas_power: 4
     diagrams: 36
@@ -4858,6 +4993,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > g g z z
     why: v3_bbx_gzz+g
+  v3_bbx_ggzzz:
+    alphas_power: 2
+    diagrams: 258
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    - 91.188
+    - 91.188
+    mg5_generate:
+    - generate b b~ > g g z z z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 23
+    - 23
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > g g z z z
+    why: v3_bbx_gzzz+g
   v3_bbx_gh:
     alphas_power: 1
     diagrams: 2
@@ -4927,6 +5089,33 @@ processes:
       lpp2: '0'
     v3_key: b b~ > g h h h
     why: v3_bbx_hhh+g
+  v3_bbx_ghhwpwm:
+    alphas_power: 1
+    diagrams: 454
+    layer: 5
+    m_finals:
+    - 0.0
+    - 125.0
+    - 125.0
+    - 80.419
+    - 80.419
+    mg5_generate:
+    - generate b b~ > g h h w+ w-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    - 25
+    - 24
+    - -24
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b b~ > g h h w+ w-
+    why: v3_bbx_hhwpwm+g
   v3_bbx_ghhz:
     alphas_power: 1
     diagrams: 50
@@ -8243,6 +8432,33 @@ processes:
       lpp2: '0'
     v3_key: b g > b g t t~
     why: v3_bg_bttx+g
+  v3_bg_bguuxz:
+    alphas_power: 4
+    diagrams: 196
+    layer: 5
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5_generate:
+    - generate b g > b g u u~ z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    - 2
+    - -2
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b g > b c c~ g z
+    why: v3_bg_buuxz+g
   v3_bg_bgvevex:
     alphas_power: 2
     diagrams: 8
@@ -10830,6 +11046,33 @@ processes:
       lpp2: '0'
     v3_key: b d~ > b d d~ d~
     why: v3_dbx_bxd+dd~
+  v3_dbx_bxdddxg:
+    alphas_power: 5
+    diagrams: 128
+    layer: 5
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate d b~ > b~ d d d~ g
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - 1
+    - -1
+    - 21
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b d~ > b d d~ d~ g
+    why: v3_dbx_bxdddx+g
   v3_dbx_bxdepem:
     alphas_power: 2
     diagrams: 8
@@ -10855,6 +11098,33 @@ processes:
       lpp2: '0'
     v3_key: b d~ > b d~ e+ e-
     why: v3_dbx_bxd+e+e-
+  v3_dbx_bxdepemg:
+    alphas_power: 3
+    diagrams: 48
+    layer: 5
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate d b~ > b~ d e+ e- g
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - -11
+    - 11
+    - 21
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b d~ > b d~ e+ e- g
+    why: v3_dbx_bxdepem+g
   v3_dbx_bxdg:
     alphas_power: 3
     diagrams: 5
@@ -11124,6 +11394,33 @@ processes:
       lpp2: '0'
     v3_key: b d~ > b d~ z z
     why: v3_dbx_bxdz+z
+  v3_dbx_bxgguwm:
+    alphas_power: 4
+    diagrams: 98
+    layer: 5
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5_generate:
+    - generate d b~ > b~ g g u w-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 21
+    - 21
+    - 2
+    - -24
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b d~ > b g g u~ w+
+    why: v3_dbx_bxguwm+g
   v3_dbx_bxguwm:
     alphas_power: 3
     diagrams: 12
@@ -14777,6 +15074,33 @@ processes:
       lpp2: '0'
     v3_key: d d~ > b b~ g h
     why: v3_ddx_bbxh+g
+  v3_ddx_bbxghh:
+    alphas_power: 3
+    diagrams: 54
+    layer: 5
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 125.0
+    - 125.0
+    mg5_generate:
+    - generate d d~ > b b~ g h h
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 21
+    - 25
+    - 25
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d d~ > b b~ g h h
+    why: v3_ddx_bbxhh+g
   v3_ddx_bbxgz:
     alphas_power: 3
     diagrams: 24
@@ -15836,6 +16160,33 @@ processes:
       lpp2: '0'
     v3_key: d d~ > d d~ g h
     why: v3_ddx_ddxh+g
+  v3_ddx_ddxgvevex:
+    alphas_power: 3
+    diagrams: 48
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate d d~ > d d~ g ve ve~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 21
+    - 12
+    - -12
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d d~ > d d~ g ve ve~
+    why: v3_ddx_ddxvevex+g
   v3_ddx_ddxgz:
     alphas_power: 3
     diagrams: 48
@@ -17742,6 +18093,33 @@ processes:
       lpp2: '0'
     v3_key: d d~ > g ta+ ta- z
     why: v3_ddx_taptamz+g
+  v3_ddx_gtaptaptamtam:
+    alphas_power: 1
+    diagrams: 152
+    layer: 5
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    - 1.777
+    - 1.777
+    mg5_generate:
+    - generate d d~ > g ta+ ta+ ta- ta-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - -15
+    - -15
+    - 15
+    - 15
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d d~ > g ta+ ta+ ta- ta-
+    why: v3_ddx_taptaptamtam+g
   v3_ddx_gtapvtwm:
     alphas_power: 1
     diagrams: 13
@@ -20689,6 +21067,33 @@ processes:
       lpp2: '0'
     v3_key: d g > a d g z
     why: v3_dg_adz+g
+  v3_dg_adgzz:
+    alphas_power: 2
+    diagrams: 144
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5_generate:
+    - generate d g > a d g z z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 21
+    - 23
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d g > a d g z z
+    why: v3_dg_adzz+g
   v3_dg_adhz:
     alphas_power: 1
     diagrams: 6
@@ -21489,6 +21894,33 @@ processes:
       lpp2: '0'
     v3_key: d g > c c~ d z
     why: v3_dg_ccxd+z
+  v3_dg_cxghsu:
+    alphas_power: 2
+    diagrams: 24
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate d g > c~ g h s u
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - -4
+    - 21
+    - 25
+    - 3
+    - 2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d g > c~ g h s u
+    why: v3_dg_cxhsu+g
   v3_dg_cxgsu:
     alphas_power: 2
     diagrams: 24
@@ -23961,6 +24393,33 @@ processes:
       lpp2: '0'
     v3_key: d s > d g g s
     why: v3_ds_dgs+g
+  v3_ds_dghhs:
+    alphas_power: 1
+    diagrams: 16
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    - 125.0
+    - 0.0
+    mg5_generate:
+    - generate d s > d g h h s
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 21
+    - 25
+    - 25
+    - 3
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d s > d g h h s
+    why: v3_ds_dhhs+g
   v3_ds_dghs:
     alphas_power: 1
     diagrams: 4
@@ -24760,6 +25219,33 @@ processes:
       lpp2: '0'
     v3_key: d s~ > c~ g u
     why: exhaustive
+  v3_dsx_cxguuux:
+    alphas_power: 3
+    diagrams: 64
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate d s~ > c~ g u u u~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 21
+    - 2
+    - 2
+    - -2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: d s~ > c c~ c~ g u
+    why: v3_dsx_cxuuux+g
   v3_dsx_cxguz:
     alphas_power: 1
     diagrams: 24
@@ -25374,6 +25860,32 @@ processes:
       lpp2: '0'
     v3_key: e+ e- > a a a a
     why: v3_epem_aaa+a
+  v3_epem_aaavmvmx:
+    diagrams: 24
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate e+ e- > a a a vm vm~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 22
+    - 22
+    - 14
+    - -14
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: e+ e- > a a a vm vm~
+    why: v3_epem_aavmvmx+a
   v3_epem_aaaz:
     diagrams: 24
     layer: 4
@@ -26928,6 +27440,32 @@ processes:
       lpp2: '0'
     v3_key: e+ e- > a ve ve~ z
     why: v3_epem_vevexz+a
+  v3_epem_avevexzz:
+    diagrams: 212
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5_generate:
+    - generate e+ e- > a ve ve~ z z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 12
+    - -12
+    - 23
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: e+ e- > a ve ve~ z z
+    why: v3_epem_vevexzz+a
   v3_epem_avmvmx:
     diagrams: 2
     layer: 3
@@ -27299,6 +27837,33 @@ processes:
       lpp2: '0'
     v3_key: e+ e- > b b~ g g
     why: v3_epem_bbxg+g
+  v3_epem_bbxggh:
+    alphas_power: 2
+    diagrams: 68
+    layer: 5
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5_generate:
+    - generate e+ e- > b b~ g g h
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 21
+    - 21
+    - 25
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: e+ e- > b b~ g g h
+    why: v3_epem_bbxgh+g
   v3_epem_bbxgh:
     alphas_power: 1
     diagrams: 14
@@ -27931,6 +28496,33 @@ processes:
       lpp2: '0'
     v3_key: e+ e- > c c~ g h
     why: v3_epem_ccxh+g
+  v3_epem_ccxgvevex:
+    alphas_power: 1
+    diagrams: 43
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate e+ e- > c c~ g ve ve~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 21
+    - 12
+    - -12
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: e+ e- > c c~ g ve ve~
+    why: v3_epem_ccxvevex+g
   v3_epem_ccxgz:
     alphas_power: 1
     diagrams: 20
@@ -28333,6 +28925,33 @@ processes:
       lpp2: '0'
     v3_key: e+ e- > d d~ g g
     why: v3_epem_ddxg+g
+  v3_epem_ddxggg:
+    alphas_power: 3
+    diagrams: 100
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate e+ e- > d d~ g g g
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 1
+    - -1
+    - 21
+    - 21
+    - 21
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: e+ e- > d d~ g g g
+    why: v3_epem_ddxgg+g
   v3_epem_ddxgh:
     alphas_power: 1
     diagrams: 2
@@ -33125,6 +33744,33 @@ processes:
       lpp2: '0'
     v3_key: g g > d d d~ d~
     why: v3_gg_ddx+dd~
+  v3_gg_dddxdxg:
+    alphas_power: 5
+    diagrams: 682
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate g g > d d d~ d~ g
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 1
+    - 1
+    - -1
+    - -1
+    - 21
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: g g > d d d~ d~ g
+    why: v3_gg_dddxdx+g
   v3_gg_ddx:
     alphas_power: 2
     diagrams: 3
@@ -35462,6 +36108,33 @@ processes:
       lpp2: '0'
     v3_key: b c~ > b c~ g h
     why: v3_ubx_bxhu+g
+  v3_ubx_bxghuz:
+    alphas_power: 3
+    diagrams: 94
+    layer: 5
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    - 0.0
+    - 91.188
+    mg5_generate:
+    - generate u b~ > b~ g h u z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -5
+    - -5
+    - 21
+    - 25
+    - 2
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: b c~ > b c~ g h z
+    why: v3_ubx_bxhuz+g
   v3_ubx_bxgu:
     alphas_power: 3
     diagrams: 5
@@ -36128,6 +36801,33 @@ processes:
       lpp2: '0'
     v3_key: c u > c e+ e- u
     why: v3_uc_cu+e+e-
+  v3_uc_cgghu:
+    alphas_power: 2
+    diagrams: 24
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5_generate:
+    - generate u c > c g g h u
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 4
+    - 4
+    - 21
+    - 21
+    - 25
+    - 2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c u > c g g h u
+    why: v3_uc_cghu+g
   v3_uc_cggu:
     alphas_power: 4
     diagrams: 36
@@ -37242,6 +37942,33 @@ processes:
       lpp2: '0'
     v3_key: c u~ > d~ g g s
     why: v3_ucx_dgsx+g
+  v3_ucx_dggsxz:
+    alphas_power: 2
+    diagrams: 164
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5_generate:
+    - generate u c~ > d g g s~ z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -4
+    - 1
+    - 21
+    - 21
+    - -3
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c u~ > d~ g g s z
+    why: v3_ucx_dgsxz+g
   v3_ucx_dghsx:
     alphas_power: 1
     diagrams: 4
@@ -38650,6 +39377,33 @@ processes:
       lpp2: '0'
     v3_key: c s~ > a u u~ w+
     why: v3_udx_ccxwp+a
+  v3_udx_acggsx:
+    alphas_power: 2
+    diagrams: 164
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate u d~ > a c g g s~
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 4
+    - 21
+    - 21
+    - -3
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c s~ > a d~ g g u
+    why: v3_udx_acgsx+g
   v3_udx_acgsx:
     alphas_power: 1
     diagrams: 24
@@ -38770,6 +39524,33 @@ processes:
       lpp2: '0'
     v3_key: c s~ > a s s~ w+
     why: v3_udx_ddxwp+a
+  v3_udx_adxggu:
+    alphas_power: 4
+    diagrams: 196
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5_generate:
+    - generate u d~ > a d~ g g u
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -1
+    - 21
+    - 21
+    - 2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c s~ > a c g g s~
+    why: v3_udx_adxgu+g
   v3_udx_adxgu:
     alphas_power: 3
     diagrams: 24
@@ -40992,6 +41773,33 @@ processes:
       lpp2: '0'
     v3_key: c s~ > c g s~ z
     why: v3_udx_dxuz+g
+  v3_udx_dxguzz:
+    alphas_power: 3
+    diagrams: 140
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5_generate:
+    - generate u d~ > d~ g u z z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -1
+    - 21
+    - 2
+    - 23
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c s~ > c g s~ z z
+    why: v3_udx_dxuzz+g
   v3_udx_dxhhu:
     diagrams: 8
     layer: 4
@@ -43985,6 +44793,33 @@ processes:
       lpp2: '0'
     v3_key: c g > a c g g
     why: v3_ug_agu+g
+  v3_ug_agtaptamu:
+    alphas_power: 2
+    diagrams: 92
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    - 0.0
+    mg5_generate:
+    - generate u g > a g ta+ ta- u
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 22
+    - 21
+    - -15
+    - 15
+    - 2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c g > a c g ta+ ta-
+    why: v3_ug_ataptamu+g
   v3_ug_agu:
     alphas_power: 2
     diagrams: 8
@@ -44829,6 +45664,33 @@ processes:
       lpp2: '0'
     v3_key: c g > c g s s~
     why: v3_ug_ddxu+g
+  v3_ug_ddxguz:
+    alphas_power: 4
+    diagrams: 196
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5_generate:
+    - generate u g > d d~ g u z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 1
+    - -1
+    - 21
+    - 2
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c g > c g s s~ z
+    why: v3_ug_ddxuz+g
   v3_ug_ddxhu:
     alphas_power: 1
     diagrams: 8
@@ -45682,6 +46544,33 @@ processes:
       lpp2: '0'
     v3_key: c g > c g g z
     why: v3_ug_guz+g
+  v3_ug_ghtaptamu:
+    alphas_power: 2
+    diagrams: 40
+    layer: 5
+    m_finals:
+    - 0.0
+    - 125.0
+    - 1.777
+    - 1.777
+    - 0.0
+    mg5_generate:
+    - generate u g > g h ta+ ta- u
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 21
+    - 25
+    - -15
+    - 15
+    - 2
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c g > c g h ta+ ta-
+    why: v3_ug_htaptamu+g
   v3_ug_ghuz:
     alphas_power: 2
     diagrams: 8
@@ -46904,6 +47793,33 @@ processes:
       lpp2: '0'
     v3_key: c d > a g s u
     why: v3_us_acd+g
+  v3_us_acdgh:
+    alphas_power: 1
+    diagrams: 28
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5_generate:
+    - generate u s > a c d g h
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 22
+    - 4
+    - 1
+    - 21
+    - 25
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c d > a g h s u
+    why: v3_us_acdh+g
   v3_us_acdh:
     diagrams: 6
     layer: 4
@@ -47291,6 +48207,33 @@ processes:
       lpp2: '0'
     v3_key: c d > g h s u
     why: v3_us_cdh+g
+  v3_us_cdghz:
+    alphas_power: 1
+    diagrams: 52
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5_generate:
+    - generate u s > c d g h z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 21
+    - 25
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c d > g h s u z
+    why: v3_us_cdhz+g
   v3_us_cdgz:
     alphas_power: 1
     diagrams: 24
@@ -50227,6 +51170,33 @@ processes:
       lpp2: '0'
     v3_key: c c~ > a g s s~
     why: v3_uux_addx+g
+  v3_uux_addxgz:
+    alphas_power: 3
+    diagrams: 140
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5_generate:
+    - generate u u~ > a d d~ g z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 1
+    - -1
+    - 21
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c c~ > a g s s~ z
+    why: v3_uux_addxz+g
   v3_uux_addxh:
     diagrams: 10
     layer: 4
@@ -50396,6 +51366,33 @@ processes:
       lpp2: '0'
     v3_key: c c~ > a mu+ mu- z
     why: v3_uux_epemz+a
+  v3_uux_aepgvewm:
+    alphas_power: 1
+    diagrams: 83
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5_generate:
+    - generate u u~ > a e+ g ve w-
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - -11
+    - 21
+    - 12
+    - -24
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c c~ > a g mu+ vm w-
+    why: v3_uux_aepvewm+g
   v3_uux_aepvewm:
     diagrams: 32
     layer: 4
@@ -53431,6 +54428,33 @@ processes:
       lpp2: '0'
     v3_key: c c~ > g g mu+ mu-
     why: v3_uux_epemg+g
+  v3_uux_epemggh:
+    alphas_power: 2
+    diagrams: 8
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5_generate:
+    - generate u u~ > e+ e- g g h
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 11
+    - 21
+    - 21
+    - 25
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c c~ > g g h mu+ mu-
+    why: v3_uux_epemgh+g
   v3_uux_epemgh:
     alphas_power: 1
     diagrams: 2
@@ -54131,6 +55155,33 @@ processes:
       lpp2: '0'
     v3_key: c c~ > g g ta+ ta-
     why: v3_uux_gtaptam+g
+  v3_uux_ggtaptamz:
+    alphas_power: 2
+    diagrams: 100
+    layer: 5
+    m_finals:
+    - 0.0
+    - 0.0
+    - 1.777
+    - 1.777
+    - 91.188
+    mg5_generate:
+    - generate u u~ > g g ta+ ta- z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 21
+    - -15
+    - 15
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c c~ > g g ta+ ta- z
+    why: v3_uux_gtaptamz+g
   v3_uux_ggttx:
     alphas_power: 4
     diagrams: 36
@@ -54631,6 +55682,33 @@ processes:
       lpp2: '0'
     v3_key: c c~ > g h z z
     why: v3_uux_hzz+g
+  v3_uux_ghzzz:
+    alphas_power: 1
+    diagrams: 114
+    layer: 5
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    - 91.188
+    - 91.188
+    mg5_generate:
+    - generate u u~ > g h z z z
+    nfinal: 5
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 25
+    - 23
+    - 23
+    - 23
+    run_card_patches:
+      lpp1: '0'
+      lpp2: '0'
+    v3_key: c c~ > g h z z z
+    why: v3_uux_hzzz+g
   v3_uux_gmupmum:
     alphas_power: 1
     diagrams: 4

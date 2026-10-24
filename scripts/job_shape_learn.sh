@@ -5,8 +5,8 @@
 #SBATCH --output=shape_learn_%j.out
 #SBATCH --error=shape_learn_%j.out
 #
-# CPU only (D83): a shape proxy per candidate target, one small regressor per process on the 43 new processes and the
-# 2->4 +g probes (analysis/catalog_daniel/shape_learn.py). Writes $SCRATCH/zz_shape_learn/shape_learn.json.
+# CPU only (D83): a shape proxy per candidate target, one small regressor per process on the 43 new processes (the 2->4 +g
+# probes' val pools are too small and are listed as skipped) (analysis/catalog_daniel/shape_learn.py). Writes $SCRATCH/zz_shape_learn/shape_learn.json.
 
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"

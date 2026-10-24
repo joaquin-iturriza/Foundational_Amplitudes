@@ -367,7 +367,8 @@ def init_data_recipes_mmap(exp, c):
                                                                   "analysis/catalog_daniel/data/diagram_couplings.json")),
                                    bool(cfg.data.get("target_physics_dim_only", False)),
                                    str(cfg.data.get("target_physics_dim_ref", "shat")),
-                                   bool(cfg.data.get("target_physics_eikonal", False))] if phys_on else None),
+                                   bool(cfg.data.get("target_physics_eikonal", False)),
+                                   float(cfg.data.get("target_physics_qperp_tau", 0.3))] if phys_on else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
