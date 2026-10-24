@@ -5847,6 +5847,14 @@ $D=10^{2.5}$ up both keep improving to the end and the gap closes ($1.2$ and $2.
 pretrained function sits in a basin that $u\bar u\to Zg$ at small $D$ cannot leave, and adding $u\bar d\to Wgg$ moves it out.
 Open: what in the representation does it; a probe of the frozen trunk's features on $u\bar u\to Zg$ (a linear read-out per
 rung) would say whether rung $7$'s features already carry the target.
+On $ee\to Z\gamma$ the dip has a plainer candidate cause: the fine-tunes never searched the learning rate
+scratch wins with. At $D=10^{1.5}$ and $10^2$ scratch's best trial sits at $1.6$ and $1.9\times10^{-4}$ and trains to the
+end (best checkpoint at $99\%$ and $96\%$ of the run), while all $50$ fine-tune trials per cell (ten rungs, five each) lie
+in $[1.0, 9.9]\times10^{-3}$ and the best stops at $14\%$ and $64\%$ (\code{data/nogain\_arms.json}, \code{ee\_Za\_curves}).
+From $D=10^{2.5}$ up scratch's optimum moves into the fine-tune window ($7.7\times10^{-4}$, $1.1\times10^{-3}$) and the gain
+returns. So the dip may be the search window, not the pretraining: the test is one fine-tune search on $ee\to Z\gamma$ at
+$D=10^{1.5}$, $10^2$ with the learning-rate window lowered to scratch's (DyHPO, single fidelity, $\sim0.5$ GPU-h; the
+user's go).
 The electroweak-Sudakov arm on the electroweak one-loop $ee\to d\bar d$ (\code{data/nogain\_arms.json}): scratch,
 rung $1$ and the arm stay within $1.5\times$ of each other at every $D$ but one ($10^3$, the arm $2\times$ below), and all
 three flatten between $D=10^2$ and $10^{2.5}$ ($7.6$ to $8.5\times10^{-3}$ for scratch). The arm's first validation on the
