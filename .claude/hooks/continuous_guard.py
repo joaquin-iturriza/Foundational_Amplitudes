@@ -59,7 +59,7 @@ def main():
         return 2
     now, stale = time.time(), []
     for t in tasks:
-        if t.get("stopped"):             # stopped on the user's recorded decision (continuous_list_guard.py)
+        if t.get("stopped") or t.get("finished"):             # stopped on the user's recorded decision (continuous_list_guard.py)
             continue
         ct = newest_commit(t["paths"])
         if ct is None:
@@ -77,7 +77,7 @@ def main():
     for name, age, paths in stale:
         print(f"  {name}: newest commit on {', '.join(paths)} is {age:.0f} min old", file=sys.stderr)
     print("Produce and commit its next result now, or start a background worker that will, or (only if the user\n"
-          "stopped it or its queue is finished and written up) remove it from .claude/continuous.json and commit.",
+          "stopped it) set \"stopped\": \"D<n>\", or (its queue is finished and written up) set \"finished\": \"<the write-up commit>\" and commit; never ask the user to close finished work.",
           file=sys.stderr)
     return 2
 
