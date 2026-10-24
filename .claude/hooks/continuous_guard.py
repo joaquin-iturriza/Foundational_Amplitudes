@@ -7,20 +7,37 @@ raises no event, so after each event the turn ended and the exploration silently
 user: "everything is set up so you can continuously work on the goals set, and you are not doing it, this should be
 fixed").
 
-Rule: .claude/continuous.json lists the continuous tasks, each with the paths its work commits to and a maximum age.
-A task is alive while the newest commit touching its paths is younger than max_age_min. A real result is the only
-thing that keeps it alive (a touched file would prove nothing). While any listed task is stale, the turn cannot end:
+Rule: .claude/continuous.json lists the continuous tasks, each with the paths its RESULTS are committed to (data,
+figures, never the scripts: a committed script with nothing running kept a task "alive" for hours, 2026-10-24), its
+work items, and a maximum age. A task is alive while the newest commit touching its result paths is younger than
+max_age_min, or while a run of one of its items is queued or running in the site registry (runs.db). Nothing else
+keeps it alive. While any listed task is stale, the turn cannot end:
 either produce and commit its next result, start a worker that will, or remove the task from the file (a committed,
 deliberate act: when the user stops it or its queue is done and written up).
 
-    {"tasks": [{"name": "preprocessing exploration (D83)",
-                "paths": ["analysis/catalog_daniel/norm_explore*", "analysis/catalog_daniel/data/norm_explore*"],
+    {"tasks": [{"name": "the level (D83, D99)", "items": ["catalog_norm"],
+                "paths": ["analysis/catalog_daniel/data/norm_*", "analysis/catalog_daniel/figs/qperp*"],
                 "max_age_min": 90}]}
 """
 import json, os, subprocess, sys, time
 
 REPO = os.environ.get("CLAUDE_PROJECT_DIR") or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CONF = os.path.join(REPO, ".claude", "continuous.json")
+CONF = os.environ.get("CONTINUOUS_CONF") or os.path.join(REPO, ".claude", "continuous.json")
+RUNS_DB = os.environ.get("CONTINUOUS_RUNS_DB") or os.path.expanduser("~/.local/share/ccorch/runs.db")
+LIVE = ("SUBMITTED", "PENDING", "QUEUED", "RUNNING", "IDLE", "HELD_BY_DEP")
+
+
+def live_runs(items):
+    """runs of these work items that are queued or running in the site registry (a worker on the task)"""
+    if not items:
+        return []
+    try:
+        import sqlite3
+        c = sqlite3.connect(f"file:{RUNS_DB}?mode=ro", uri=True, timeout=10)
+        q = "select id from runs where item in (%s) and state in (%s)" % (",".join("?" * len(items)), ",".join("?" * len(LIVE)))
+        return [r[0] for r in c.execute(q, list(items) + list(LIVE))]
+    except Exception:
+        return None
 
 
 def newest_commit(paths):
@@ -48,8 +65,12 @@ def main():
         if ct is None:
             continue                     # git unavailable: never block on the guard's own failure
         age = (now - ct) / 60
-        if age > float(t.get("max_age_min", 90)):
-            stale.append((t["name"], age, t["paths"]))
+        if age <= float(t.get("max_age_min", 90)):
+            continue
+        runs = live_runs(t.get("items") or [])
+        if runs:                         # a queued or running job of the task's items is its worker
+            continue
+        stale.append((t["name"], age, t["paths"]))
     if not stale:
         return 0
     print("CONTINUOUS TASK STALE: the turn cannot end while a continuous task has produced nothing.", file=sys.stderr)

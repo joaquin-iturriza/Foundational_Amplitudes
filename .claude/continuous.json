@@ -1,1 +1,11 @@
-{"tasks": [{"name": "the level and the preprocessing (D83, D99)", "paths": ["analysis/catalog_daniel/norm_*", "analysis/catalog_daniel/qperp*", "analysis/catalog_daniel/kshot*", "analysis/catalog_daniel/level*", "analysis/catalog_daniel/signed*", "analysis/catalog_daniel/data/norm_*", "analysis/catalog_daniel/data/qperp*", "analysis/level/*", "physics_scales.py"], "max_age_min": 90}]}
+{"tasks": [
+  {"name": "the level and the preprocessing (D83, D99)", "items": ["catalog_norm", "dimless_kt"],
+   "paths": ["analysis/catalog_daniel/data/norm_*", "analysis/catalog_daniel/data/shape_*", "analysis/catalog_daniel/data/qperp*", "analysis/catalog_daniel/data/kshot*", "analysis/catalog_daniel/data/level*", "analysis/catalog_daniel/figs/*"],
+   "max_age_min": 90},
+  {"name": "catalog_v3 generation, stages 1-3 (D98, D100, D102)", "items": ["catalog_v3_gen", "catalog_v3_ext24", "catalog_v3_census"],
+   "paths": ["analysis/catalog_v3/*", "recipes/catalog_v3_*.yaml", "recipes/catalog_v3_*.json"],
+   "max_age_min": 90},
+  {"name": "the probes that do not gain (hand-off, open list of 2026-10-22)", "items": [],
+   "paths": ["analysis/transfer/data/nogain*", "analysis/transfer/figs/nogain*"],
+   "max_age_min": 90}
+]}
