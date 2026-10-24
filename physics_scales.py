@@ -18,10 +18,12 @@ def minkowski_dots(P):
     return np.einsum("npc,nqc->npq", P * np.array([1.0, -1.0, -1.0, -1.0]), P)
 
 
-def qperp_logs(P, massive_shat=False):
+def qperp_logs(P, massive_shat=False, saturate=False):
     """P: (n, N, 4) momenta, rows 0 and 1 incoming, any Lorentz frame. Returns (n,) the sum of log q^2 over the N - 4
     emission steps (GeV^2 units). massive_shat: a massive particle (m > 1 GeV, from its own momentum) takes s_hat as
-    its scale (it has no soft or collinear enhancement), the massless ones their dipole scale."""
+    its scale (it has no soft or collinear enhancement), the massless ones their dipole scale. saturate: each removed
+    step's scale is q^2 s_hat / (q^2 + s_hat), q^2 while the step is soft (q^2 << s_hat) and s_hat / 2 when it is hard,
+    for every particle alike (the order of removal is unchanged)."""
     P = np.asarray(P, dtype=np.float64)
     n, N, _ = P.shape
     G = minkowski_dots(P)
@@ -47,6 +49,7 @@ def qperp_logs(P, massive_shat=False):
                 q = np.where(m2[:, k] > 1.0, np.exp(Ls), q)
             best[:, k] = np.where(alive[:, k], q, np.inf)
         k = best.argmin(1)
-        out += np.log(best[np.arange(n), k])
+        qk = best[np.arange(n), k]
+        out += np.log(qk * np.exp(Ls) / (qk + np.exp(Ls)) if saturate else qk)
         alive[np.arange(n), k] = False
     return out
