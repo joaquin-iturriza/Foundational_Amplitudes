@@ -4298,6 +4298,7 @@ virt:
     - -15
     - 15
   v3_bg_bwpwm:
+    c2_rel_tol: 0.01   # the physical top width moves the double pole by up to 4.4e-3 here (an internal top on shell; 1e-5 with it zeroed, analysis/catalog_v3/data/pole_width_diag.txt)
     certified: true
     m_finals:
     - 4.7

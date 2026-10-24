@@ -525,6 +525,10 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     ew = bool(cfg.get("ew"))
     a_ew = ALPHA_EW / (2.0 * np.pi)
 
+    # the double-pole guard's relative tolerance: 1e-3, or an entry's c2_rel_tol where a physical width moves the
+    # pole (v3_bg_bwpwm: an internal top on shell, 4.4e-3 with the top width, 1e-5 with it zeroed; pole_width_diag.py)
+    c2_tol = float(cfg.get("c2_rel_tol", 1e-3))
+
     def evaluate_point(mom, sq):
         """(value, usable). MadLoop's return code hundreds digit 4 marks an
         exceptional point (stability rescue failed): its number is garbage, so
@@ -557,7 +561,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         # coloured legs), so a point whose 1/eps^2 coefficient is off is a MadLoop failure
         # whatever the return code says (u s > u s returned wrong poles on ~30% of the
         # points flagged stable). Costs nothing: the coefficient comes with every call.
-        if abs(r["c2"] - c2_pred) > 1e-3 * max(abs(c2_pred), 1.0):
+        if abs(r["c2"] - c2_pred) > c2_tol * max(abs(c2_pred), 1.0):
             return 0.0, False
         if not mass_shift:
             shift = 0.0
