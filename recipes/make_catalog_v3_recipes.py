@@ -10,7 +10,14 @@ recipes/catalog_v3_alphas.json):
                                class), H6 alpha_s = 0.13; H3p and H4, the twin's, read by the twin only
 Every recipe keeps the stage files' top-level keys (sampling: mixture), so a run resolves the _smix pools generated.
 The held-out loop-induced class is drawn with the selection's seed among the 17 and recorded in catalog_v3_roles.json
-("loop_induced"), as the design asks (H5: "one loop-induced class"). H7 (100 TeV, pT >= 30 GeV) is not in these recipes.
+("loop_induced"), as the design asks (H5: "one loop-induced class").
+H7, the regime axis (D98: "100 TeV and pT >= 30"), on catalog_v3's sampler (sqrt(s_hat) windows, not pp beams): 40
+training tree classes drawn with the selection's seed (h7_classes in catalog_v3_roles.json) among those outside the
+twin's removals with at least one massless visible final leg (the legs the cuts act on), each as
+  <name>__E10   sqrt(s_hat) in [1, 10] TeV, above every training window (the energy extrapolation)
+  <name>__c30   its own window with pT >= 30 GeV in place of the catalog's 10 GeV (physics.cuts)
+written as the generation recipe catalog_v3_gen_stage4.yaml (the catalog's sizes, 1e5 / 1e4 / 1e4) and the held-out files
+H7E and H7c.
     python3 recipes/make_catalog_v3_recipes.py
 """
 import json, os, random, sys
@@ -43,6 +50,15 @@ def main():
                               for n in induced}
         json.dump(ro, open(rpath, "w"), indent=1)
     LI = ro["loop_induced"]
+    if "h7_classes" not in ro:
+        # eligible: a training class outside the twin's removals (so the twin reads H7 as H7, not H3p/H4) with at least
+        # one massless visible final leg, the legs the fiducial cuts act on (else pT >= 30 changes nothing)
+        def cut_legs(n):
+            cfg = mg.PROCESSES[n]
+            return sum(m == 0.0 and abs(int(q)) not in (12, 14, 16) for m, q in zip(cfg["m_finals"], cfg["pdg_ids"][2:]))
+        ok = sorted(n for n, v in T.items() if v["role"] == "train" and n not in twin and cut_legs(n) >= 1)
+        ro["h7_classes"] = sorted(random.Random(ro["seed"]).sample(ok, 40))
+        json.dump(ro, open(rpath, "w"), indent=1)
     base = {**{n: v["tree"] for n, v in Hq.items()}, **{n: v["base"] for n, v in al.items()}}
 
     def pdg(n):
@@ -92,6 +108,14 @@ def main():
         dump(f"catalog_v3_heldout_{a}.yaml", es)
     dump("catalog_v3_heldout_H3p.yaml", seen)
     dump("catalog_v3_heldout_H4.yaml", quart)
+    s1 = {e["name"]: e for e in entries("stage1")}
+    sz = {k: s1[n][k] for n in ro["h7_classes"][:1] for k in ("n_train", "n_val", "n_test")}   # the catalog's sizes
+    h7e = [{"name": n + "__E10", "base": n, "sqrts": [1000, 10000], **sz} for n in ro["h7_classes"]]
+    h7c = [{"name": n + "__c30", "base": n, "sqrts": list(s1[n]["sqrts"]), **sz, "physics": {"cuts": {"pt_min": 30.0}}}
+           for n in ro["h7_classes"]]
+    dump("catalog_v3_gen_stage4.yaml", h7e + h7c)
+    dump("catalog_v3_heldout_H7E.yaml", h7e)
+    dump("catalog_v3_heldout_H7c.yaml", h7c)
 
 
 if __name__ == "__main__":

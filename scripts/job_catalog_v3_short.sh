@@ -9,7 +9,7 @@
 # D115 (the user, 2026-10-25: "switch to the new catalog now that it's done, run the pretrainings there"): catalog_v3's
 # short pretrainings, the short setup of Daniel's catalog round (scripts/job_catalog_norm.sh short: hp58's configuration and
 # HPs, 1e4 train and 200 val events per process, 5 epochs, in memory) on recipes/catalog_v3_train.yaml (1397 pools,
-# 5 epochs: 4264 steps), then every generated held-out axis read zero-shot (H7, 100 TeV and pT >= 30 GeV, is not generated) (tools/zero_shot_parent.py, 2000 val
+# 5 epochs: 4264 steps), then every held-out axis read zero-shot (tools/zero_shot_parent.py, 2000 val
 # events per process; the one-loop H5 pools on log|M|, --signed-magnitude). Arms:
 #   B      one standardization shared by all processes, log|M|^2 in GeV (the baseline)
 #   Q      the adopted target: dimensionless (s_hat per event, dimensionless inputs), the coupling orders, the emission
@@ -43,7 +43,7 @@ OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
 ITERS=$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
-AXES=(H1 H2 H2p5 H3 H5 H6); [ "$ARM" = Qtwin ] && AXES+=(H3p H4)
+AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c); [ "$ARM" = Qtwin ] && AXES+=(H3p H4)
 if [ "$MODE" = smoke ]; then
     OUT="$SCRATCH/zz_v3_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"

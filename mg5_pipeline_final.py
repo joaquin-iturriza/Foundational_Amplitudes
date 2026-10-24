@@ -193,6 +193,13 @@ def register_scan_process(name, base, physics):
     patches, mass_by_pdg, alphas_mz = physics_to_generation(physics)
     cfg = dict(PROCESSES[base])
     cfg["param_card_patches"] = {**cfg.get("param_card_patches", {}), **patches}
+    # physics.cuts {pt_min, cos_max, dr_min, m_min}: this entry's fiducial cuts in place of the global ones (catalog_v3's
+    # H7, pT >= 30 GeV); identity-bearing through recipe["fiducial_cuts"], so it never shares a pool with the default cuts
+    if (physics or {}).get("cuts"):
+        if not FIDUCIAL_CUTS_ENABLED:
+            raise ValueError(f"{name}: physics.cuts set while AMP_FIDUCIAL_CUTS=off (the pool would be built uncut)")
+        cfg["fiducial_cuts"] = {**FIDUCIAL_CUTS, **{k: float(v) for k, v in physics["cuts"].items()}}
+        assert set(cfg["fiducial_cuts"]) == set(FIDUCIAL_CUTS), f"physics.cuts: unknown keys {physics['cuts']}"
     if alphas_mz is not None:
         cfg["alphas_mz"] = alphas_mz
         # NLO-virtual: an α_s scan only bites if the physical α_s weighting is
@@ -3112,7 +3119,7 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     # Reference α_s(M_Z) for the per-event running μ=√s. Per-dataset scans set this
     # (register_scan_process); default 0.118 keeps existing datasets bit-identical.
     amz        = float(config.get("alphas_mz", 0.118))
-    cuts       = FIDUCIAL_CUTS if FIDUCIAL_CUTS_ENABLED else None
+    cuts       = dict(config.get("fiducial_cuts") or FIDUCIAL_CUTS) if FIDUCIAL_CUTS_ENABLED else None
     cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
     pol        = sampling_policy(config, role)
     synthetic  = backend == "synthetic"     # tools/synthetic_amplitudes.py labels the events
@@ -3369,7 +3376,7 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     # cut and pre-cut (no-cut) datasets never collide in the cache. Omitted when off,
     # so existing pre-cut datasets keep their recipe_id.
     if FIDUCIAL_CUTS_ENABLED:
-        recipe["fiducial_cuts"] = _cut_key(FIDUCIAL_CUTS)
+        recipe["fiducial_cuts"] = _cut_key(cfg.get("fiducial_cuts") or FIDUCIAL_CUTS)
     ceil_div    = lambda a, b: -(-a // b)
     n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)
