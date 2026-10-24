@@ -5822,6 +5822,13 @@ Fig.~\ref{fig:gain_heatmap} weighs it as much as any other cell. The fine-tunes 
 (the best step in the first quarter of the run for $66$--$68\%$ of $ee\to Z\gamma$'s fine-tune trials at $10^{1.5}$,
 $10^2$, none of scratch's), but so do those of $ee\to d\bar d$ ($88$--$94\%$), which gain a decade, so early stopping is
 not the cause.
+Rung $7$ against rung $6$ on $u\bar u\to Zg$ (rung $7$ adds only $u\bar d\to Wgg$ to rung $6$'s mixture): the gain
+of rung $7$ over rung $6$ is specific to the probes with a massive vector boson and a massless one, $u\bar u\to Zg$
+($+0.51$ decades averaged over $D$, $+1.1$ and $+1.0$ at $D=10^{1.5}$, $10^2$), $ee\to Z\gamma$ ($+0.39$), $u\bar u\to Zggg$
+($+0.26$), against a median $+0.1$ over the twelve probes. It is not a better start: the two fine-tunes begin at the
+same validation loss ($2.0$ and $1.9\times10^{-2}$ at $D=10^2$, the first validation, median over trials), and rung $6$'s
+improves $34\times$ from there, rung $7$'s $308\times$. The parents are each rung's best pretraining trial (the same HP
+point, $8.5$ and $4.9\times10^{-8}$ on their own mixtures). Open: why the same start trains so differently.
 
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
@@ -6835,8 +6842,8 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     \code{phase\_space\_on\_pool} it should read the training events only.
   \item \textbf{The probes that do not gain.} $ee\to Z\gamma$: par.~\ref{par:nogain} (the gain dips where scratch's
     curve in $D$ is steepest; open: why a fine-tune's curve is smoother, e.g.\ the pretrained net's starting function
-    against scratch's small-norm init at $D\sim10^2$). Still open: why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
-    why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
+    against scratch's small-norm init at $D\sim10^2$). Rung $6$ against $7$: par.~\ref{par:nogain} (specific to $V$ + massless-boson probes, the same start training
+    $34\times$ against $308\times$; open why). Still open: why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
   \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
     not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
     ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the catalog. The design (which
