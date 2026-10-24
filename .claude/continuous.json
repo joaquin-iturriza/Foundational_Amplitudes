@@ -33,17 +33,6 @@
     "recipes/catalog_v3_*.json"
    ],
    "max_age_min": 90
-  },
-  {
-   "name": "the probes that do not gain (hand-off, open list of 2026-10-22)",
-   "items": [
-    "nogain_probes"
-   ],
-   "paths": [
-    "analysis/transfer/data/nogain*",
-    "analysis/transfer/figs/nogain*"
-   ],
-   "max_age_min": 90
   }
  ]
 }

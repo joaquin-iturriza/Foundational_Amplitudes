@@ -6964,20 +6964,11 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{The probes that do not gain.} $ee\to Z\gamma$: par.~\ref{par:nogain} (the gain dips where scratch's
-    curve in $D$ is steepest; open: why a fine-tune's curve is smoother, e.g.\ the pretrained net's starting function
-    against scratch's small-norm init at $D\sim10^2$). Rung $6$ against $7$: par.~\ref{par:nogain} (specific to $V$ + massless-boson probes; rung $7$'s frozen features
-    carry $u\bar u\to Zg$ linearly, rung $6$'s do not). Sudakov arm: par.~\ref{par:nogain} (no transfer of the target, zero-shot $0.1$--$0.5$; per event, the error of
-    every arm sits within a factor $10$ of the zero crossings, and the arm's is worse a factor $10$--$30$ away).
-  \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
-    not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
-    ladder stops at $19$) and fine-tune on the probes, to see whether transfer grows with the catalog. The design (which
-    processes, events per process, total events, steps and therefore run length) is agreed with the user \emph{before}
-    anything is generated or run. \code{catalog\_v2\_train.yaml} holds $400$ processes, so $10^2$ and $10^{2.5}$ are
-    subsets of it. Settled: our sampler and $\sqrt s$ window as now (no PDF sampling; D17), gluon-initiated processes
-    added ($gg$, $qg$; D16). The candidate source for $10^3$ is the catalog of arXiv:2606.23791 now being generated
-    (state above), $409$ to $467$ classes (Sec.~\ref{sec:catalog}), so fewer than $10^3$ distinct processes. Still open:
-    subsets, events per process, steps, fine-tune grid, and whether $10^3$ waits for $10^2$ and $10^{2.5}$.
+  \item \textbf{The probes that do not gain.} Done and written up (par.~\ref{par:nogain}, D108): $ee\to Z\gamma$'s dip
+    is not the lr window (the lowered-window searches move the median gain by $0.03$ decades); rung $7$'s frozen
+    features carry $u\bar u\to Zg$ linearly, rung $6$'s do not; the Sudakov arm's error sits at the zero crossings.
+    Open, not approved: why the pretrained start limits $ee\to Z\gamma$ at $D\sim10^2$ (a probe of the start's
+    function against scratch's small-norm init), for the user to call.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
