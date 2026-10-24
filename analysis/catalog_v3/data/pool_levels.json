@@ -4,41 +4,44 @@
   "no_training_at_N": 0,
   "outside": 0,
   "outside_names": [],
-  "median_nearest_in_sd": 0.0024651807419310777,
-  "max_nearest_in_sd": 0.04331268786453497
+  "median_nearest_in_sd": 0.0024651807419310773,
+  "max_nearest_in_sd": 0.04331268786453496
  },
  "H2": {
   "pools": 168,
   "no_training_at_N": 0,
   "outside": 0,
   "outside_names": [],
-  "median_nearest_in_sd": 0.0017609705363602378,
-  "max_nearest_in_sd": 0.05954180539973175
+  "median_nearest_in_sd": 0.0017609705363602376,
+  "max_nearest_in_sd": 0.059541805399731744
  },
  "H3": {
   "pools": 237,
   "no_training_at_N": 0,
   "outside": 0,
   "outside_names": [],
-  "median_nearest_in_sd": 0.0016028979409468329,
+  "median_nearest_in_sd": 0.0016028979409468326,
   "max_nearest_in_sd": 0.09943865797017665
  },
  "H5": {
-  "pools": 16,
+  "pools": 29,
   "no_training_at_N": 0,
-  "outside": 1,
+  "outside": 4,
   "outside_names": [
-   "v3_ddx_aaa_nlo"
+   "v3_bb_bb_nlo",
+   "v3_bg_bgg_nlo",
+   "v3_ddx_aaa_nlo",
+   "v3_gg_bbxg_nlo"
   ],
-  "median_nearest_in_sd": 0.026179827601091322,
-  "max_nearest_in_sd": 0.14017292586799127
+  "median_nearest_in_sd": 0.025026964895449578,
+  "max_nearest_in_sd": 0.6029593134078246
  },
  "counts": {
   "tree train": 1127,
   "H3": 237,
   "H1": 54,
   "H2": 168,
-  "loop train": 66,
-  "H5": 16
+  "loop train": 121,
+  "H5": 29
  }
 }
