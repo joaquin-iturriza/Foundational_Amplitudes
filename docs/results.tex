@@ -943,7 +943,15 @@ quantile by a level error $e$ (nat), the linear band holds a median $0.9\%$, $1.
 $e=+0.5,+1,+2,+3$, more than $10\%$ on $4$, $6$, $17$, $37$ pools; an $r_0$ set too low costs nothing ($0.16\%$ at $e=-1$).
 The zero-shot level error on the held-out one-loop pools is $1.6$--$3$ ($|$offset$|$, DlessInOrd and DlessInOrdQ,
 \code{qperp\_ab.py}), so $r_0$ has to sit that far below the predicted level, $r_0=\hat q\,e^{-3}$; the
-signed target then needs no more than the level the catalog already predicts. Already in place for the training pools:
+signed target then needs no more than the level the catalog already predicts. The offsets' sign makes that margin
+mostly free (\code{signed\_r0\_margin.py}, \code{data/signed\_r0\_margin.json}: the $46$ zero-shot one-loop offsets
+crossed with the $53$ pools' \code{lin\_shift} curves, held at their end values past $\pm3$): the zero-shot level is
+predicted too low on most pools (median offset $-1.6$ nat for DlessInOrd, $-3.0$ for DlessInOrdQ; $90\%$ quantile
+$+5.3$ and $+1.9$), so already at $m=0$ the median share in the linear band is $0.04$--$0.1\%$. What the margin buys is
+the tail: the share of (pool, offset) pairs with over $10\%$ of the events linear falls, for DlessInOrdQ, from $7.6\%$
+at $m=0$ to $5.5\%$ at $m=3$ and $1.5\%$ at $m=5$ (DlessInOrd $9.9\%$, $7.8\%$, $6.7\%$; a lower bound wherever the
+offset exceeds $m+3$, $4$--$13\%$ of offsets). So $m=3$ stands for the A/B with DlessInOrdQ's level, and the few
+over-predicted pools, not the median, set how far below it has to go. Already in place for the training pools:
 \code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its own train pool.
 Two negatives and one exact factor from the same pass. Putting every massive particle at $\hat s$ in the emission history
 (no soft or collinear enhancement, \code{qperp\_logs(massive\_shat=True)}) is worse on the $43$ new ($8.8$) and at $2\to4$
