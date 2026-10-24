@@ -572,8 +572,21 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
     c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(m_finals))   # the set of legs only
+    # massive beams (b, catalog_v3): MadLoop runs without its PS-point improvement there (ImprovePSPoint -1,
+    # massive_beam_params) and STOPs on an energy imbalance above ~1e-10 GeV (CT692, v3_bbx_aa_nlo, 2026-10-24); the
+    # sampler's events carry up to 2e-9. The last final is set to the beams minus the other finals, which conserves
+    # four-momentum to the last bit and moves that leg's m^2 by at most ~1e-11 relative.
+    balance = bool(cfg.get("_v3")) and any(mg.BEAM_MASS.get(abs(int(p)), 0.0) > 0 for p in pdg[:2])
+
+    def balanced(mom):
+        if balance:
+            mom = np.array(mom, dtype=float, copy=True)
+            mom[-1] = mom[0] + mom[1] - mom[2:-1].sum(0)
+        return mom
+
     bad = 0
     for i, (mom, _) in enumerate(events):
+        mom = balanced(mom)
         value, usable = evaluate_point(mom, sqrts[i])
         tries = 0
         while not usable and tries < 20:
@@ -581,7 +594,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             bad += 1; tries += 1
             ev1, sq1 = mg.sample_nbody_phase_space(1, sqrts_min, sqrts_max, m_finals, pdg,
                                                    rng=rng, cuts=cuts)
-            mom, sqrts[i] = ev1[0][0], sq1[0]
+            mom, sqrts[i] = balanced(ev1[0][0]), sq1[0]
             value, usable = evaluate_point(mom, sqrts[i])
         if not usable:
             raise PoleGuardError(f"{process}: 20 consecutive unusable MadLoop points at event {i}")
