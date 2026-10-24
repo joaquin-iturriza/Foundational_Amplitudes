@@ -46,7 +46,7 @@ export -f one
 { one "${PROCS[0]}"; printf '%s\n' "${PROCS[@]:1}" | xargs -P "$PAR" -I{} bash -c 'one {}'; } > scripts/build_nlo_verdicts.txt
 declare -A RESULT
 while read -r P V; do RESULT[$P]="$V"; done < scripts/build_nlo_verdicts.txt
-for P in "${PROCS[@]}"; do echo "######## $P"; grep -E "^\[(BUILD|CERTIFY)\]|  \[CERTIFY\]|DOUBLE|SINGLE|predicted|MadLoop  mean" "scripts/build_nlo_logs/$P.log" | tail -8; done
+for P in "${PROCS[@]}"; do echo "######## $P"; grep -E "^\[(BUILD|CERTIFY)\]|  \[CERTIFY\]|DOUBLE|SINGLE|predicted|MadLoop  mean|max rel" "scripts/build_nlo_logs/$P.log" | tail -10; done
 
 echo "===================== NLO BACKEND BUILD SUMMARY ====================="
 for P in "${PROCS[@]}"; do
