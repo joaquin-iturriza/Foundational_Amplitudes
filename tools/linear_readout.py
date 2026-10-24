@@ -51,9 +51,10 @@ def build(cfg_path, run_dir, n_train_eval):
 
 def features(exp, loader):
     """per-event mean of linear_out's input, the head's output (channel 0) and the standardized target"""
-    net = exp.model.net
-    lin = getattr(net, "linear_out", None)
-    assert lin is not None, "linear_out not found: the LLoCa muP net is expected"
+    # the wrapper's net holds the LLoCa net, whose backbone holds the head (module name net.net.linear_out)
+    lins = [m for n, m in exp.model.named_modules() if n.split(".")[-1] == "linear_out"]
+    assert len(lins) == 1, f"expected one linear_out (the LLoCa muP head), found {len(lins)}"
+    lin = lins[0]
     store = {}
     h = lin.register_forward_hook(lambda m, i, o: store.__setitem__("h", i[0].detach()))
     F, Y, Z = [], [], []
