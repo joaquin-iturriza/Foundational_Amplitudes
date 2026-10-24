@@ -1147,8 +1147,12 @@ under it on $17$ of the $20$ $+g$ probes and $14$ of the $20$ $+\gamma$. The six
 a charged lepton in the final state ($5.5$ to $20$, no better than the spread: a photon collinear to a final lepton is
 not the initial-state emission the map assumes, and few other probes teach the correction that region), and two $+g$
 probes with four coloured final particles ($3.8$, $1.9$). Without the four lepton probes the $+\gamma$ median is $0.98$.
-This is an upper bound on what the head of design (ii) can do: it uses the parent's exact $|\mathcal M|^2$, where the
-network brings its own $2\to3$ error on the mapped events (in distribution, a training process at its own energy).
+With the network in place of the exact parent (\code{tools/factorised\_2to4\_net.py}, run FA-ccin2p3-5252f499, D99:
+DlessInOrdQc's own prediction of each parent at the mapped events, the parent's $c_p$ from its table; its error there is
+small, $0.06$ to $0.09$ on the first probes), the correction refitted the same way: $0.91$ ($+g$) and $1.26$
+($+\gamma$), under the floor on $16$ and $11$ of the $20$. The factorised form keeps most of its gain with the network's
+own $2\to3$; how far it carries beyond emitted gauge bosons (an added $Z$, $W$, $H$ or quark pair has no universal soft
+or collinear factor) is a question for catalog\_v3, where the study moves (D114).
 
 \begin{figure}[H]
 \centering

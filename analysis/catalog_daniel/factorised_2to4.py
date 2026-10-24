@@ -35,6 +35,9 @@ def load():
         X = np.column_stack([z["feats"][ok], np.full(ok.sum(), float(p.endswith("_g"))),
                              np.array([kind(e) for e in z["emitter"][ok]], float)])
         out[p] = dict(lt4=np.log(z["t4"][ok]), r=r, X=X, dropped=int((~ok).sum()))
+        nf = os.path.join(HERE, "data", "factorised_2to4_net", p + ".npz")
+        if os.path.exists(nf):                       # the network's 2->3 error at the mapped events (factorised_2to4_net.py)
+            out[p]["r_net"] = r - np.load(nf)["e3"][ok]
     return out
 
 
@@ -51,11 +54,17 @@ def main():
         e = v["r"] - h.predict(v["X"])
         res[p] = dict(shape=float(v["lt4"].var()), parent=float(v["r"].var()), learned=float(e.var()),
                       dropped=v["dropped"], n=int(len(v["r"])))
+        if all("r_net" in d[q] for q in d):
+            yn = np.concatenate([d[q]["r_net"] - d[q]["r_net"].mean() for q in tr])
+            hn = HistGradientBoostingRegressor(max_iter=300, learning_rate=0.05, categorical_features=[7, 8],
+                                               random_state=0).fit(Xtr, yn)
+            res[p].update(net_parent=float(v["r_net"].var()), net_learned=float((v["r_net"] - hn.predict(v["X"])).var()))
         print(p, json.dumps(res[p]))
     summ = {}
     for tag, sel in (("+g", "_g"), ("+a", "_a")):
         rs = [r for p, r in res.items() if p.endswith(sel)]
-        summ[tag] = {k: float(np.median([r[k] for r in rs])) for k in ("shape", "parent", "learned")}
+        summ[tag] = {k: float(np.median([r[k] for r in rs])) for k in ("shape", "parent", "learned", "net_parent",
+                                                                        "net_learned") if k in rs[0]}
         summ[tag]["n"] = len(rs)
         print("MEDIAN", tag, json.dumps(summ[tag]))
     json.dump({"summary": summ, "probes": res}, open(os.path.join(HERE, "data", "factorised_2to4.json"), "w"), indent=1)
