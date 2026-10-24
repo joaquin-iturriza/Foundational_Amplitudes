@@ -1012,7 +1012,11 @@ pools' invariants, $15000$ events to fit and $5000$ to score): the held-out shap
 $0.0026$ for the dimensionless target, $0.0038$ for the emission scales and $0.0027$ with their soft minimum
 ($-\tau\log\sum e^{-\log q^2/\tau}$ over the candidates, $\tau=0.3$; $0.0029$ at $\tau=0.1$), the GPU's order again. On the composition proxy it keeps the emission
 scales' $2\to4$ level ($+g$ $1.82$ against $1.74$ and the dimensionless $9.35$; $+\gamma$ $1.07$; $+g$ at $p_T\ge30$
-$1.78$). The soft minimum is in training as DlessInOrdQs (D99, item \code{qperp\_soft}).
+$1.78$). On the GPU it does not pay (DlessInOrdQs, D99, the short run of DlessInOrdQ with $\tau=0.3$, one seed;
+\code{qperp\_ab.py}): the $43$ new $0.88$ against the hard minimum's $0.75$ and the dimensionless $0.48$ (shape $0.44$,
+$0.48$, $0.26$), the $96$ relabels $0.074$, $0.064$, $0.051$, and on the $2\to4$ probes it keeps most of the emission
+scales' gain but not all ($+g$ $3.97$ against $2.18$ and $51.8$; $+\gamma$ $3.32$, $2.65$, $29.6$). The kinks are not what
+the $43$ new pay for, and the shape proxy's ranking of the three targets did not carry to the network.
 
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
@@ -6641,8 +6645,7 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
-  \item \textbf{State (2026-10-24, 07:30).} Running on CC: the DlessInOrdQs short run (FA-ccin2p3-4c674f33, item
-    \code{qperp\_soft}, D99; its 2->4 scoring \code{qsoft\_2to4} queued on the model), catalog\_v3 stage 3's prebuild
+  \item \textbf{State (2026-10-24, 07:30).} Done: the soft minimum (DlessInOrdQs, par.~\ref{par:qperp_cost}; negative). Running on CC: catalog\_v3 stage 3's prebuild
     (FA-ccin2p3-d703d83c: 40 2->5 probes, 24 $\alpha_s$ pools). Done: stage 1 (1703 pools, 5109 files, 21 min; pools
     assembled one at a time since the prebuild fix; \code{/sps/lpnhe} 33 GB free after D103, D104 cleared the training
     caches and 778 census backends). Next: stage 2, \code{catalog\_v3\_loops.yaml} (150 one-loop + 17 loop-induced, all

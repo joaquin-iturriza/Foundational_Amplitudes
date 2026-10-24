@@ -1,7 +1,8 @@
 """D99, the first GPU test of a candidate that passed the CPU proxy (norm_targets.py): DlessInOrdQ (the coupling-order
 design run with each extra particle's own Lorentz-invariant emission scale, physics_scales.qperp_logs, in place of
 s_hat; scripts/job_catalog_norm.sh DlessInOrdQ short: inputs, encoder, steps, HPs and seed as DlessInOrd) against
-DlessInOrd on every held-out set both were read on. Per process the error d = q - t of log|M|^2: the MSE, the offset
+DlessInOrd on every held-out set both were read on; DlessInOrdQs (the soft minimum, tau = 0.3, qperp_soft) in the table
+where it was scored (the 43 new, the 96 relabels, the 2->4 probes). Per process the error d = q - t of log|M|^2: the MSE, the offset
 (mean of d) and the shape (variance of d); medians over processes. One seed each.
 Inputs: data/catalog_short_<arm>_sigstage.npz, catalog_2to4{,c30,E100,E100p}_short_<arm>.npz, catalog_loop_short_<arm>.npz,
 catalog_top_short_<arm>{,_notop}.npz where present. Output: the table printed, data/qperp_ab.json, figs/qperp_ab.{png,pdf}.
@@ -13,7 +14,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
-ARMS = ("DlessInOrd", "DlessInOrdQ")
+ARMS = ("DlessInOrd", "DlessInOrdQ", "DlessInOrdQs")
 LOOP = ("_nlo_", "_loop_")
 
 
@@ -55,14 +56,16 @@ def main():
             row[a] = dict(n=len(d), mse=float(np.median([np.mean(x ** 2) for x in d.values()])),
                           offset=float(np.median([x.mean() for x in d.values()])),
                           shape=float(np.median([x.var() for x in d.values()])))
-        if len(row) == 2:
-            common = sorted(set(per[(lab, ARMS[0])]) & set(per[(lab, ARMS[1])]))
-            r = np.array([per[(lab, ARMS[1])][p] / per[(lab, ARMS[0])][p] for p in common])
-            row["ratio"] = [float(x) for x in np.quantile(r, [0.1, 0.5, 0.9])]
+        for b, key in ((ARMS[1], "ratio"), (ARMS[2], "ratio_soft")):
+            if ARMS[0] in row and b in row:
+                common = sorted(set(per[(lab, ARMS[0])]) & set(per[(lab, b)]))
+                r = np.array([per[(lab, b)][p] / per[(lab, ARMS[0])][p] for p in common])
+                row[key] = [float(x) for x in np.quantile(r, [0.1, 0.5, 0.9])]
         res[lab] = row
         print(f"{lab:18s} " + "  ".join(f"{a}: n={v['n']} MSE {v['mse']:.3g} off {v['offset']:+.2f} shape {v['shape']:.3g}"
                                         for a, v in row.items() if a in ARMS)
-              + (f"  Q/Ord per process 10/50/90% {np.round(row['ratio'], 2).tolist()}" if "ratio" in row else ""))
+              + (f"  Q/Ord per process 10/50/90% {np.round(row['ratio'], 2).tolist()}" if "ratio" in row else "")
+              + (f"  Qs/Ord {np.round(row['ratio_soft'], 2).tolist()}" if "ratio_soft" in row else ""))
     json.dump(res, open(os.path.join(HERE, "data", "qperp_ab.json"), "w"), indent=1)
     plot(per)
 
@@ -75,7 +78,7 @@ def plot(per):
     fig, (axL, axR) = ps.figure(ncols=2)
     col = {ARMS[0]: ps.C.blue, ARMS[1]: ps.C.vermillion}
     lab = {ARMS[0]: r"$\hat s$", ARMS[1]: "emission scales"}
-    for a in ARMS:
+    for a in ARMS[:2]:             # the soft-minimum arm (DlessInOrdQs) was scored on the 43 new and the 2->4 probes only
         v = [x for s in ("2to4 +g", "2to4 +a", "2to4 +g, pT>=30", "2to4 +a, pT>=30") for x in per.get((s, a), {}).values()]
         ecdf(axL, v, color=col[a], label=lab[a] + r", $2\to4$")
         ecdf(axR, list(per.get(("43 new", a), {}).values()), color=col[a], label=lab[a] + ", 43 new")
