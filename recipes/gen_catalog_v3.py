@@ -334,7 +334,7 @@ def _loop_induced_entry(tag, g, pdg, loops):
 
 def write_loops():
     """D102 stage 2: the one-loop layer of recipes/catalog_v3_roles.json (150 QCD virtuals of tree classes, [virt=QCD],
-    as catalog_v2's *_nlo) and the five loop-induced classes, written to recipes/catalog_v3_loops.yaml: `virt` (the
+    as catalog_v2's *_nlo) and the 17 loop-induced candidates of LOOP_INDUCED, written to recipes/catalog_v3_loops.yaml: `virt` (the
     MadLoop strings tools/nlo_virtual_pipeline.py builds and pole-certifies) and `processes` (the pipeline entries,
     loaded by mg5_pipeline_final._load_catalog_v3). Every entry is written certified: false; --certified <verdicts>
     (scripts/build_nlo_backends.sh's build_nlo_verdicts.txt) sets the PASSes true, and only those enter a recipe."""
