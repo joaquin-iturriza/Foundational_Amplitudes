@@ -106,6 +106,26 @@ def test_abslog_for_the_sign_head():
     assert resolve_amp_trafos(["log", "standardization"], pos, sign_head=True) == ["log", "standardization"]
 
 
+def test_scale_shift_moves_the_scale_off_its_quantile():
+    """data.signedlog_scale_shift (the signed pools' A/B): r0 three nats below the pool's 0.5% quantile; the shifted
+    scale is what the transform string carries, so the round trip needs nothing else; the abslog floor refuses it."""
+    x = _signed_pool()
+    q = np.quantile(np.abs(x[x != 0]), 0.005)
+    tr = resolve_amp_trafos(["log", "standardization"], x, scale_quantile=0.005, scale_shift=-3.0)
+    assert np.isclose(signedlog_scale(tr[0]), q * np.exp(-3.0), rtol=1e-5), (signedlog_scale(tr[0]), q)
+    y, m, s = preprocess_amplitude(x, trafos=tr)
+    assert np.allclose(undo_preprocess_amplitude(y, m, s, trafos=tr), x, rtol=1e-6, atol=0.0)
+    # fewer events in the linear band |x| < s: about 0.5% at the quantile, far fewer three nats below it
+    assert np.mean(np.abs(x) < signedlog_scale(tr[0])) < 0.005
+    assert resolve_amp_trafos(["log"], x, scale_shift=0.0) == resolve_amp_trafos(["log"], x)
+    try:
+        resolve_amp_trafos(["log"], x, sign_head=True, scale_shift=-3.0)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("scale_shift with the sign head's abslog should be refused")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     failed = 0
