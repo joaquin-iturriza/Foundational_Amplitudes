@@ -5801,6 +5801,22 @@ trials, fine-tune: five); outlined, the first rung with the probe's structure.}
 \label{fig:gain_heatmap}
 \end{figure}
 
+\paragraph{Where a probe does not gain (2026-10-24).}\label{par:nogain} The row of $ee\to Z\gamma$ in
+Fig.~\ref{fig:gain_heatmap} is negative at most rungs, but not across $D$ (\code{analysis/transfer/nogain.py}, the 8k
+grid): the median gain over the ten pretrainings is $-0.13$, $-0.57$, $-1.19$, $-0.16$ decades at $D=10^{1}$ to
+$10^{2.5}$ and $+0.21$, $+0.39$, $+0.19$ above. At $D=10^2$ scratch drops $2.3$ decades from the half-decade before
+($1.0\times10^{-2}\to5.0\times10^{-5}$; its second-best trial $5.8\times10^{-5}$, so not one lucky point) while the
+fine-tunes drop about one ($7.8\times10^{-4}$, median); they reach scratch half a decade later. The same happens on every
+probe: at the half-decade where scratch's learning curve in $D$ is steepest, the gain dips below its two neighbours in
+$10$ of $12$ probes (median $-0.22$ decades; $ee\to d\bar d$ $-0.72$ at its $2.3$-decade step into $10^3$, $ud\to ud$
+$-0.71$), and over all $72$ cells the gain falls with scratch's drop into the cell (correlation $-0.30$). A fine-tune's
+learning curve in $D$ is smoother than scratch's, so it loses wherever scratch finds the process's structure in one
+step; $ee\to Z\gamma$ has the largest such step of the twelve probes and has it at small $D$, where the $D$-average of
+Fig.~\ref{fig:gain_heatmap} weighs it as much as any other cell. The fine-tunes stop early more often than scratch
+(the best step in the first quarter of the run for $66$--$68\%$ of $ee\to Z\gamma$'s fine-tune trials at $10^{1.5}$,
+$10^2$, none of scratch's), but so do those of $ee\to d\bar d$ ($88$--$94\%$), which gain a decade, so early stopping is
+not the cause.
+
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
 $z=(\log|\mathcal M|^2-\mu_q)/\sigma_q$ (\code{tools/zero\_shot\_ft.py}). The parent outputs in its own standardized units,
@@ -6803,8 +6819,9 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{The probes that do not gain.} Why no pretraining helps $ee\to Z\gamma$ (fine-tunes $0.5$--$0.8\times$ scratch
-    from most rungs), why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
+  \item \textbf{The probes that do not gain.} $ee\to Z\gamma$: par.~\ref{par:nogain} (the gain dips where scratch's
+    curve in $D$ is steepest; open: why a fine-tune's curve is smoother, e.g.\ the pretrained net's starting function
+    against scratch's small-norm init at $D\sim10^2$). Still open: why adding $u\bar d\to Wg$ (rung $6$) does not help $u\bar u\to Zg$ while rung $7$ does ($3.3\times$), and
     why the electroweak-Sudakov arm transfers nothing to the EW one-loop $ee\to d\bar d$.
   \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
     not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
