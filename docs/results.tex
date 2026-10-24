@@ -5893,16 +5893,20 @@ scratch wins with. At $D=10^{1.5}$ and $10^2$ scratch's best trial sits at $1.6$
 end (best checkpoint at $99\%$ and $96\%$ of the run), while all $50$ fine-tune trials per cell (ten rungs, five each) lie
 in $[1.0, 9.9]\times10^{-3}$ and the best stops at $14\%$ and $64\%$ (\code{data/nogain\_arms.json}, \code{ee\_Za\_curves}).
 At $D=10$ scratch's best ($2.3\times10^{-3}$) is inside the window and the gain is $-0.13$; from $D=10^{2.5}$ up its
-optimum comes back to the window's floor ($7.7\times10^{-4}$, $1.1\times10^{-3}$) and the gain returns. So the dip may be the search window, not the pretraining: the test is one fine-tune search on $ee\to Z\gamma$ at
-$D=10^{1.5}$, $10^2$ with the learning-rate window lowered to scratch's (D108: the ten rungs at both $D$, five DyHPO trials each as the
-grid's cells, single fidelity, the window scratch's own search used, $[2.4\times10^{-5}, 2.4\times10^{-3}]$ and
-$[5.3\times10^{-5}, 5.3\times10^{-3}]$; $\sim2.2$ GPU-h of training). Fig.~\ref{fig:nogain}. The window alone does not make a dip, though: over the $84$ probe and $D$ cells,
+optimum comes back to the window's floor ($7.7\times10^{-4}$, $1.1\times10^{-3}$) and the gain returns. The search window is not the cause (D108; \code{nogain\_lowlr.py}, \code{data/nogain\_lowlr.json}): the same
+cells searched again with the window lowered to scratch's own ($[2.4\times10^{-5}, 2.4\times10^{-3}]$ at $D=10^{1.5}$,
+$[5.3\times10^{-5}, 5.3\times10^{-3}]$ at $10^2$; ten rungs, five DyHPO trials each, as the grid's cells) move the
+median gain over the ten rungs from $-0.57$ to $-0.54$ decades at $D=10^{1.5}$ and from $-1.19$ to $-1.16$ at $10^2$
+($-0.46$ and $-1.09$ for the better of the two searches per rung); the lowered window wins on $6$ and $7$ of the ten
+rungs, by up to $0.3$ decades. Its best trials mostly sit at $2$ to $9\times10^{-4}$, and none reaches scratch at
+$D=10^2$ ($1.5\times10^{-4}$ for rung $9$, the best, against $5.0\times10^{-5}$). So $ee\to Z\gamma$'s dip is in what
+the pretrained start lets the fine-tune reach, not in where it was searched. Fig.~\ref{fig:nogain}. The window alone does not make a dip, though: over the $84$ probe and $D$ cells,
 scratch's best learning rate lies below every fine-tune trial's in $46$ (\code{nogain\_lr.py}, \code{data/nogain\_lr.json}),
 and the median gain there is $+0.31$ decades against $+0.34$ in the other $38$ (correlation of the gain with the distance
 below the window $-0.15$). $ee\to d\bar d$ and $ee\to b\bar b$ at one loop have scratch about a decade below the window at
 $D=10^{1}$, $10^{2}$ and $10^{2.5}$ and gain $0.2$ to $0.9$ decades there. A least-squares fit of the gain on both readings gives
 $-0.23$ decades per decade below the window and $-0.23$ per decade of scratch's drop, so the two weigh alike and neither
-explains $ee\to Z\gamma$'s $-1.2$ at $D=10^2$ by itself; the lowered-window search remains the test. Nor is a smoother fine-tune curve a general property of the steep cells
+explains $ee\to Z\gamma$'s $-1.2$ at $D=10^2$ by itself. Nor is a smoother fine-tune curve a general property of the steep cells
 (\code{nogain\_start.py}, \code{data/nogain\_start.json}; per cell the median over trials of the first validation and
 of the best, in decades): in the $18$ cells where scratch's drop is in the top quarter the fine-tunes start $1.2$ decades
 below scratch and improve $2.2$ decades within the run against scratch's $2.5$; in the other $54$, $0.9$ below, $2.6$
