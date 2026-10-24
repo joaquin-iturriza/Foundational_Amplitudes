@@ -6665,8 +6665,15 @@ of the three share a test set.
     from $4.9$ to $42$, so the loop factor belongs to the loop-induced pools only; undoing MadGraph's identical-particle
     factor, $+\log\prod n_i!$, moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$ to
     $8.7$ / $2.5$, the same mixed sign as IDEN and colour above; the spin and colour averages are linear in the initial
-    state's counts, which the level model already has); a few-event calibration by shrinkage (the $\sigma$ head adds nothing); the small dedicated network for what no
-    constant fixes ($2\to4$ shape $1.5$, unseen tops), first a per-process context vector fitted on $K$ events with the
+    state's counts, which the level model already has); a few-event calibration by shrinkage (the $\sigma$ head adds nothing; done, Fig.~\ref{fig:kshot_level}: toward the
+    axis bias it beats the one-event offset, $1.29$ against $1.57$ on the $43$ new at $K=1$); the small dedicated network for what no
+    constant fixes (design for the user, 2026-10-24: (i) a context vector $c_p\in\mathbb R^{16}$ per process, added to
+    every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk frozen and $c_p$
+    the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process embedding with dropout to
+    zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new and the $2\to4$ probes
+    against the shrunk offset; cost one short pretraining ($\sim1$ GPU-h) plus CPU-side fits; (ii) only if (i) leaves the
+    $2\to4$ shape: a head that predicts the $2\to4$ target as the model's own $2\to3$ prediction on the clustered event
+    plus a learned correction, the factorisation the emission scales already encode in the target) ($2\to4$ shape $1.5$, unseen tops), first a per-process context vector fitted on $K$ events with the
     trunk frozen (arXiv:1909.09157), then a factorisation-aware head on the model's own lower-multiplicity prediction
     (arXiv:2107.06625, 2512.11036). Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor
     under $0.5$ with the heavy-quark layer. Signed pools: $r_0$ follows the pool's level (one shared $r_0$ puts most events
