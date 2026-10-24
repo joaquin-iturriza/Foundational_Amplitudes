@@ -65,7 +65,8 @@ def main():
     for p in yaml.safe_load(open(a.spec))["processes"]:
         lo, hi = p["sqrts"]
         for role in a.roles:
-            fs = glob.glob(os.path.join(dirs[role], f"{p['name']}_{lo}-{hi}GeV_{role}_amplitudes.npy"))
+            # a shaped pool carries the sampling tag in its name (catalog_v3: _smix_)
+            fs = glob.glob(os.path.join(dirs[role], f"{p['name']}_{lo}-{hi}GeV_{role}_*amplitudes.npy"))
             assert len(fs) == 1, (p["name"], role, fs)
             out = fs[0][:-len(".npy")] + ".alphas.npy"
             if os.path.exists(out):
