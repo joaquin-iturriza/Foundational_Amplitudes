@@ -2,7 +2,7 @@
 "alerts": [...]} so `site supervise` raises READY when a comparison becomes possible and GAP when results are missing
 with nothing queued (2026-10-23: no active item had a check, so finished work raised only per-run events and the
 comparisons they made possible never reached the user).
-    python tools/item_checks.py het_stage2|het_hp58_ext|het_mumse22|dimless_general|cut_test
+    python tools/item_checks.py het_stage2|het_hp58_ext|het_mumse22|dimless_general|cut_test|nogain_probes
 Unit names match the item's --match globs.
   het_stage2       one unit per stage-2 sweep (sweeps_local/, drive.py): expected its n_trials, done its observed trials
   het_mumse22      one unit per cell of analysis/transfer/het_mumse22_jobs.txt: done once its eval_delta.json exists on CC
@@ -60,6 +60,23 @@ def het_hp58_ext():
         units[name] = {"expected": 10, "done": sum(t.get("status") == "observed" for t in st),
                        "active": sum(t.get("rid") in act for t in st)}
     return units, []
+
+
+def nogain_probes():
+    """D108: the 20 ee_Za fine-tune searches with the lowered lr window (tp3_*ftelo_ee_Za_d3/d4, drive.py, 5 trials
+    each) and the rung 6/7 linear read-out (one unit, done once $SCRATCH/zz_linear_readout holds its 14 cells)"""
+    act = active_runs("nogain_probes")
+    units = {}
+    for cfg in sorted(glob.glob(os.path.join(REPO, "sweep", "sweep_config_tp3_*ftelo_ee_Za_d[34].yaml"))):
+        name = os.path.basename(cfg)[len("sweep_config_"):-len(".yaml")]
+        f = os.path.join(REPO, "sweeps_local", name, "driver_state.json")
+        st = json.load(open(f))["trials"].values() if os.path.exists(f) else []
+        units[name] = {"expected": int(yaml.safe_load(open(cfg))["n_trials"]),
+                       "done": sum(t.get("status") == "observed" for t in st),
+                       "active": sum(t.get("rid") in act for t in st)}
+    got = on_cc('ls $SCRATCH/zz_linear_readout/*.json 2>/dev/null | wc -l')
+    units["zz_linear_readout"] = {"expected": 14, "done": int(got[-1]) if got else 0, "active": len(act) > 0}
+    return units, ([] if got is not None else ["CC unreachable: the read-out unit not counted"])
 
 
 def het_mumse22():
@@ -165,6 +182,8 @@ def main():
         r = het_stage2()
     elif item == "het_hp58_ext":
         r = het_hp58_ext()
+    elif item == "nogain_probes":
+        r = nogain_probes()
     elif item == "het_mumse22":
         r = het_mumse22()
     elif item == "dimless_general":

@@ -24,7 +24,7 @@ def read(path):
         if "error" in d:
             bad[name] = d["error"][:160]
         else:
-            ok[name] = {k: d.get(k, 0.0) for k in KEYS}
+            ok[name] = {k: d.get(k) for k in KEYS}      # None where a metric was not written, never 0
     return ok, bad
 
 
@@ -35,7 +35,8 @@ def main():
     both = sorted(set.intersection(*(set(r[0]) for r in res.values())))
     for a, (ok, bad) in res.items():
         out[a] = {"scored": len(ok), "failed": len(bad), "failures": bad, "probes": ok,
-                  "median": {k: float(np.median([ok[p][k] for p in both])) for k in KEYS}}
+                  "median": {k: float(np.median([ok[p][k] for p in both if ok[p][k] is not None])) for k in KEYS
+                              if any(ok[p][k] is not None for p in both)}}
         print(a, len(ok), "scored,", len(bad), "failed;", json.dumps({k: round(v, 3) for k, v in out[a]["median"].items()}))
     out["both"] = both
     json.dump(out, open(os.path.join(HERE, "data", "loopsigned_mag.json"), "w"), indent=1)

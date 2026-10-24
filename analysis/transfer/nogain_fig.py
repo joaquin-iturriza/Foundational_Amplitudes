@@ -10,7 +10,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from cells import ARM, ROOT, S  # noqa: E402
+from cells import ROOT, S, best, scratch  # noqa: E402
 from rung_grid import fam  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
@@ -32,15 +32,18 @@ def main():
     p = "ee_Za"
     Ds, sc, ft, lo, hi = [], [], [], [], []
     for k in K:
-        st = [t for t in S.get(f"{ARM[p]}_{p}_d{k}", []) if t.get("val_loss")]
-        fts = [[t for t in S.get(f"{fam(r)}_{p}_d{k}", []) if t.get("val_loss")] for r in range(10)]
-        fts = [f for f in fts if f]
-        if not st or not fts:
+        # the cell rule of cells.py (window extensions and _002 continuations folded in, ranked on val_loss*prepd_std^2),
+        # the same trials as nogain_lr.py
+        s, st = scratch(p, k, steered=False)
+        bests = [best(f"{fam(r)}_{p}_d{k}")[1] for r in range(10)]
+        bests = [b for b in bests if b]
+        allf = [t["lr"] for r in range(10) for t in S.get(f"{fam(r)}_{p}_d{k}", []) + S.get(f"{fam(r)}_{p}_d{k}_002", [])
+                if t.get("val_loss") is not None and t.get("lr")]
+        if not s or not bests or not allf:
             continue
         Ds.append(10 ** (0.5 * k))
-        sc.append(min(st, key=lambda t: t["val_loss"])["lr"])
-        ft.append(float(np.median([min(f, key=lambda t: t["val_loss"])["lr"] for f in fts])))
-        allf = [t["lr"] for f in fts for t in f]
+        sc.append(st["lr"])
+        ft.append(float(np.median([b["lr"] for b in bests])))
         lo.append(min(allf)); hi.append(max(allf))
     axR.fill_between(Ds, lo, hi, color=ps.C.vermillion, alpha=0.2, label="fine-tune trials' range")
     axR.plot(Ds, ft, "o-", color=ps.C.vermillion, label="fine-tunes' best (median)")
