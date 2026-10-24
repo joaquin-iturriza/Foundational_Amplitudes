@@ -358,6 +358,26 @@ print("[CERTIFY] {process}: " + ("PASS" if (worst < {tol} and bad == 0) else "FA
 WIDTH_BACKUP = ".width_backup"
 
 
+def massive_beam_params(sa, pdg):
+    """A standalone with a massive beam (a b at mg.BEAM_MASS) runs with ImprovePSPoint = -1. MadLoop's default (2)
+    re-projects every point onto exact on-shell kinematics; its V.H. method refuses massive beams and the PSMC fallback
+    rescales beam 1's 3-momentum by x^2 and the rest by x, which breaks pz conservation whenever x != 1 (any W: our
+    m_W = 80.419 against the card's derived 80.4190024) and stops MadLoop on "pz is not conserved (flag:CT692)". Our
+    points are on shell and conserve momentum to 1e-15 already, so the projection is not needed. Idempotent; no-op for
+    massless beams."""
+    if not any(mg.BEAM_MASS.get(abs(int(p)), 0.0) > 0 for p in pdg[:2]):
+        return
+    cards = {os.path.realpath(os.path.join(sa, *p, "MadLoopParams.dat"))
+             for p in (("Cards",), ("SubProcesses", "MadLoop5_resources"))}
+    for card in sorted(c for c in cards if os.path.isfile(c)):
+        L = open(card).read().split("\n")
+        for i, l in enumerate(L[:-1]):
+            if l.strip() == "#ImprovePSPoint" and L[i + 1].strip() != "-1":
+                L[i + 1] = "-1"
+                open(card, "w").write("\n".join(L))
+                break
+
+
 def restore_stale_card(param_card):
     """A run killed inside _zero_top_width (SIGKILL, node failure) leaves the card at
     zero top width and its backup beside it; put the original back before anything
@@ -433,13 +453,14 @@ def pole_certify(process, n=100, seed=7):
     cmd = [sys.executable, f"{HERE}/nlo_pole_check.py", "--so-dir", p0,
            "--proc-order", *map(str, pdg), "--m", *map(str, masses),
            "--perm", *map(str, perm), "--n", str(n), "--seed", str(seed)]
+    massive_beam_params(sa, pdg)
     print(f"[CERTIFY] {process}: pole check (top width zeroed for the check) ...")
     with _zero_top_width(os.path.join(sa, "Cards", "param_card.dat")):
         res = subprocess.run(cmd, capture_output=True, text=True,
                              env=dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib"))
     out = res.stdout
     tail = [l for l in out.splitlines() if any(k in l for k in
-            ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted",
+            ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted", "conserved",
              "points:", "worst:", "exceptional"))]
     print("  " + ("\n  ".join(tail) if tail else "(no checker output)"))
     if "PASS" not in out or res.returncode not in (0, 2):     # a FAIL or a crash: the checker's stderr is the reason
@@ -480,9 +501,14 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts)
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
+    # catalog_v3 (_v3): the shift belongs to massive QUARKS only, half the pair formula per massive final quark (one
+    # t t~ pair = the eett-validated value). The line above takes the first massive final of any kind (a W, Z, H or
+    # tau too); it shaped catalog_v2's one-loop pools, which keep it so their stored targets stay reproducible.
+    v3_quarks = [m for p, m in zip(pdg[2:], m_finals) if abs(int(p)) in (5, 6) and m and m > 0] if cfg.get("_v3") else None
 
     sa = virt_standalone_dir(process)
     restore_stale_card(os.path.join(sa, "Cards", "param_card.dat"))
+    massive_beam_params(sa, pdg)
     p0 = find_p0(sa)
     get_me_full = ML.load(p0)   # chdir into p0
     swap = mg.row_to_slot_perm(pdg, cfg["mg5"])   # stored rows -> MadGraph slots
@@ -527,7 +553,12 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         # points flagged stable). Costs nothing: the coefficient comes with every call.
         if abs(r["c2"] - c2_pred) > 1e-3 * max(abs(c2_pred), 1.0):
             return 0.0, False
-        shift = C.heavy_quark_scheme_shift(s, heavy_m) if mass_shift else 0.0
+        if not mass_shift:
+            shift = 0.0
+        elif v3_quarks is not None:
+            shift = 0.5 * sum(C.heavy_quark_scheme_shift(s, m) for m in v3_quarks)
+        else:
+            shift = C.heavy_quark_scheme_shift(s, heavy_m)
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:
             # restore the loop's physical α_s weighting (born already ran above)
@@ -565,7 +596,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     np.save(out_file, arr)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
           f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional/wrong pole)={bad}  "
-          f"mass_shift={'on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off'}")
+          f"mass_shift={('on(quarks %s)' % v3_quarks if v3_quarks else 'off') if v3_quarks is not None else ('on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off')}")
     return out_file
 
 

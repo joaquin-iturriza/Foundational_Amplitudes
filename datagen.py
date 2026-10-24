@@ -275,9 +275,13 @@ def gen_virt_chunk(task):
     t0 = time.perf_counter()
     for attempt in range(4):
         r = subprocess.run(cmd, env=env, capture_output=True, text=True)
-        if r.returncode == 0:
+        if r.returncode == 0 and _chunk_done(out_path, task["count"]):
             _report_chunk_time(task, time.perf_counter() - t0)
             return task["idx"], out_path
+        if r.returncode == 0:
+            # a Fortran STOP inside MadLoop ends the interpreter with exit 0 and no chunk: a failure, not a success
+            raise RuntimeError(f"gen_virt_chunk: {process} exited 0 without its chunk (MadLoop STOP?):\n"
+                               f"{(r.stdout or '')[-1500:]}\n{(r.stderr or '')[-500:]}")
         last = r.stderr[-2000:]
         if r.returncode in (2, 3):
             # 2 = certification FAIL, 3 = per-event pole guard: deterministic at this
