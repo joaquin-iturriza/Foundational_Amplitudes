@@ -972,7 +972,12 @@ $+5.3$ and $+1.9$), so already at $m=0$ the median share in the linear band is $
 the tail: the share of (pool, offset) pairs with over $10\%$ of the events linear falls, for DlessInOrdQ, from $7.6\%$
 at $m=0$ to $5.5\%$ at $m=3$ and $1.5\%$ at $m=5$ (DlessInOrd $9.9\%$, $7.8\%$, $6.7\%$; a lower bound wherever the
 offset exceeds $m+3$, $0$--$13\%$ of offsets by $m$ and arm). So $m=3$ stands for the A/B with DlessInOrdQ's level, and the few
-over-predicted pools, not the median, set how far below it has to go. Already in place for the training pools:
+over-predicted pools, not the median, set how far below it has to go. The same reading on catalog\_v3's $62$ signed one-loop pools of stage 2a
+(\code{signed\_band.py recipes/catalog\_v3\_gen\_stage2a.yaml}, \code{data/signed\_band\_v3.json}; one of them
+entirely negative) agrees: a shared $r_0$ puts more than $10\%$ in the linear band on $11$, the median pool has $7.6\%$
+of its events within a factor $10$ of zero ($0.7\%$ within $100$), and an $r_0$ off its own quantile by $e=+0.5$, $+1$,
+$+2$, $+3$ nat leaves a median $0.9\%$, $1.4\%$, $4.1\%$, $12\%$ linear, over $10\%$ on $2$, $3$, $8$, $42$ pools; at
+$e=-1$, $0.2\%$ and none. Already in place for the training pools:
 \code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its own train pool.
 Two negatives and one exact factor from the same pass. Putting every massive particle at $\hat s$ in the emission history
 (no soft or collinear enhancement, \code{qperp\_logs(massive\_shat=True)}) is worse on the $43$ new ($8.8$) and at $2\to4$
