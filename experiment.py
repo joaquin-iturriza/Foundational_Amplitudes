@@ -2260,7 +2260,7 @@ class AmplitudeExperiment(BaseExperiment):
             g = np.einsum("npc,nqc->npq", pp * np.array([1.0, -1.0, -1.0, -1.0]), pp)        # Minkowski p_i.p_j
             iu = np.triu_indices(pp.shape[1], 1)
             lref = np.log(np.clip(2.0 * np.abs(g[:, iu[0], iu[1]]), 1e-12, None)).mean(axis=1)
-        elif str(ref) == "qperp":
+        elif str(ref) in ("qperp", "qperp_soft"):
             # the event's emission history (2026-10-23, D99; physics_scales.qperp_logs): each particle beyond a 2->2
             # core carries its own Lorentz-invariant emission scale q^2 instead of s_hat, so the ~s_hat/q^2 an extra
             # soft or collinear particle adds is divided out and a 2->4 level stays inside the range the 2->3 trained
@@ -2301,7 +2301,10 @@ class AmplitudeExperiment(BaseExperiment):
         if lref is None:
             from physics_scales import qperp_logs
             assert n_eik == 0, "target_physics_dim_ref=qperp: the eikonal factor would count the emissions twice"
-            ldim = qperp_logs(mom_phys) - (mom_phys.shape[1] - 4) * self._phys_ls0
+            # qperp_soft: the soft minimum over candidates (tau = data.target_physics_qperp_tau, default 0.3), no kink
+            # where the minimising pair changes (2026-10-24, analysis/catalog_daniel/shape_learn.py)
+            soft = float(self.cfg.data.get("target_physics_qperp_tau", 0.3)) if str(ref) == "qperp_soft" else None
+            ldim = qperp_logs(mom_phys, soft=soft) - (mom_phys.shape[1] - 4) * self._phys_ls0
             return ldim - (lord + self._phys_logc[name])
         # the eikonal factors carry mass dimension -2 each, so the dimension factor's power grows by one per factor
         return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name])

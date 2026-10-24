@@ -58,6 +58,11 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true)
 # physics_scales.qperp_logs); inputs, encoder, steps, HPs and seed as DlessInOrd
 [ "$ARM" = DlessInOrdQ ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
                                    ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp)
+# DlessInOrdQs (D99, 2026-10-24): DlessInOrdQ with the soft minimum over the emission candidates (tau = 0.3,
+# data.target_physics_dim_ref=qperp_soft): the per-process shape proxy (shape_learn.py) puts the hard minimum's shape cost
+# on the 43 new at 0.0038 against the dimensionless target's 0.0026, the soft one at 0.0027
+[ "$ARM" = DlessInOrdQs ] && NORM+=("${DIM[@]}" ++data.target_physics_s0=1.0 ++data.dimensionless_inputs=true ++data.memmap=false
+                                    ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp_soft)
 EXTRA=(training.validate_frac=0.02)
 # the memory-mapped cache on the node's local disk: /sps/lpnhe was 98% full (2026-10-22, the first A run failed building
 # it there); built by this job, removed when it exits
