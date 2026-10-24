@@ -977,7 +977,14 @@ over-predicted pools, not the median, set how far below it has to go. The same r
 entirely negative) agrees: a shared $r_0$ puts more than $10\%$ in the linear band on $11$, the median pool has $7.6\%$
 of its events within a factor $10$ of zero ($0.7\%$ within $100$), and an $r_0$ off its own quantile by $e=+0.5$, $+1$,
 $+2$, $+3$ nat leaves a median $0.9\%$, $1.4\%$, $4.1\%$, $12\%$ linear, over $10\%$ on $2$, $3$, $8$, $42$ pools; at
-$e=-1$, $0.2\%$ and none. Already in place for the training pools:
+$e=-1$, $0.2\%$ and none. The signed set scored zero-shot on the magnitude (2026-10-23, collected 10-24: FA-ccin2p3-e1e5d61f for
+DlessInOrd, FA-ccin2p3-f20eb068 for DlessInOrdQ; \code{loopsigned\_mag.py}, \code{data/loopsigned\_mag.json}): $23$
+of the $49$ probes score, the other $26$ (every $2\to3$ with mixed coupling orders, $u\bar u\to d\bar dg$, $t\bar tZ$,
+\dots, and their one-loop twins) stop on the order design's assertion that a mixed-order entry's coupling powers are
+not exact. On the $12$ one-loop probes that score, the magnitude's MSE is $8.9$ (DlessInOrd) and $6.8$ (DlessInOrdQ),
+mostly level (offset $-2.7$, $-2.3$; $1.2$, $1.3$ after it, correlation $0.73$, $0.56$); their $11$ tree twins score
+$0.03$, $0.05$. So the sign-changing one-loop pools miss on the level as the positive ones do, and their shape after
+the offset is $40\times$ worse than their trees'. Already in place for the training pools:
 \code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its own train pool.
 Two negatives and one exact factor from the same pass. Putting every massive particle at $\hat s$ in the emission history
 (no soft or collinear enhancement, \code{qperp\_logs(massive\_shat=True)}) is worse on the $43$ new ($8.8$) and at $2\to4$

@@ -1,0 +1,479 @@
+{
+ "DlessInOrd": {
+  "scored": 23,
+  "failed": 26,
+  "failures": {
+   "uubar_bbbarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarH_141-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarH is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarH_nlo_141-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarH_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbara_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbara_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_nlo_500-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbara_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbara_nlo_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarg_nlo_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarH_494-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarH is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarH_nlo_494-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarH_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarZ_458-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarZ is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarZ_nlo_458-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarZ_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubara_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubara_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_uubarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uu_uua_25-1000GeV": "AssertionError('target_physics_orders: uu_uua is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uu_uua_nlo_25-1000GeV": "AssertionError('target_physics_orders: uu_uua_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uu_uug_25-1000GeV": "AssertionError('target_physics_orders: uu_uug is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uu_uug_nlo_25-1000GeV": "AssertionError('target_physics_orders: uu_uug_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')"
+  },
+  "probes": {
+   "uubar_agg_nlo_25-1000GeV": {
+    "mse_logm2_real": 9.031044532056887,
+    "bias": -2.47749065198164,
+    "mse_after_offset": 2.8930846014004756,
+    "mse_over_var": 1.6419249926455715,
+    "corr": 0.7530628422908817,
+    "frac_at_floor": 0.0095
+   },
+   "uubar_ga_25-1000GeV": {
+    "mse_logm2_real": 4.3048975884695805e-05,
+    "bias": -0.00032779413381750884,
+    "mse_after_offset": 4.294152689053064e-05,
+    "mse_over_var": 0.00011830447357394701,
+    "corr": 0.9999410505460914,
+    "frac_at_floor": 0.0
+   },
+   "uubar_gaa_25-1000GeV": {
+    "mse_logm2_real": 0.004409604409806978,
+    "bias": -0.012704616826705222,
+    "mse_after_offset": 0.0042481971210935774,
+    "mse_over_var": 0.0039925122549499285,
+    "corr": 0.9980794796814204,
+    "frac_at_floor": 0.0
+   },
+   "uubar_gaa_nlo_25-1000GeV": {
+    "mse_logm2_real": 4.1274478309438045,
+    "bias": -1.4622123182785216,
+    "mse_after_offset": 1.9893829672183556,
+    "mse_over_var": 1.3289483763710843,
+    "corr": 0.6016823859225751,
+    "frac_at_floor": 0.009
+   },
+   "uubar_ga_nlo_25-1000GeV": {
+    "mse_logm2_real": 1.1509171054371645,
+    "bias": 0.871601826988528,
+    "mse_after_offset": 0.3912273606274247,
+    "mse_over_var": 0.5299708781638379,
+    "corr": 0.948311478334933,
+    "frac_at_floor": 0.0105
+   },
+   "uubar_gg_25-1000GeV": {
+    "mse_logm2_real": 0.3360418748735873,
+    "bias": -0.5796352157725918,
+    "mse_after_offset": 6.489150984824308e-05,
+    "mse_over_var": 0.49550260843096516,
+    "corr": 0.999960856248095,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ggg_25-1000GeV": {
+    "mse_logm2_real": 0.003561457008511664,
+    "bias": -0.022561125675894456,
+    "mse_after_offset": 0.00305245261674816,
+    "mse_over_var": 0.0021994730911911726,
+    "corr": 0.9990871800689094,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ggg_nlo_25-1000GeV": {
+    "mse_logm2_real": 11.452794922098075,
+    "bias": -3.1768250443338464,
+    "mse_after_offset": 1.3605775597913314,
+    "mse_over_var": 2.308683638414681,
+    "corr": 0.9287101163806885,
+    "frac_at_floor": 0.0115
+   },
+   "uubar_gg_nlo_25-1000GeV": {
+    "mse_logm2_real": 1.4398034984103278,
+    "bias": 0.32159305575732194,
+    "mse_after_offset": 1.3363814048989957,
+    "mse_over_var": 0.4041210997788778,
+    "corr": 0.8359588270887824,
+    "frac_at_floor": 0.008
+   },
+   "uubar_mumug_25-1000GeV": {
+    "mse_logm2_real": 0.3517300398061183,
+    "bias": -0.07634972263155054,
+    "mse_after_offset": 0.34590075966020356,
+    "mse_over_var": 0.16945984389365218,
+    "corr": 0.9185298045154369,
+    "frac_at_floor": 0.0
+   },
+   "uubar_mumug_nlo_25-1000GeV": {
+    "mse_logm2_real": 5.50518441930782,
+    "bias": 0.3211087190467467,
+    "mse_after_offset": 5.402073609859977,
+    "mse_over_var": 1.1931368875693902,
+    "corr": 0.18322144315474237,
+    "frac_at_floor": 0.013
+   },
+   "uubar_WpWmg_169-1000GeV": {
+    "mse_logm2_real": 0.24628904137627705,
+    "bias": 0.20326300736478514,
+    "mse_after_offset": 0.20497319121330032,
+    "mse_over_var": 0.12033542732167869,
+    "corr": 0.9538343718907232,
+    "frac_at_floor": 0.0
+   },
+   "uubar_WpWmg_nlo_169-1000GeV": {
+    "mse_logm2_real": 12.998851019509953,
+    "bias": -3.3376646111457613,
+    "mse_after_offset": 1.8588459630151664,
+    "mse_over_var": 6.304950577245899,
+    "corr": 0.43366480087348896,
+    "frac_at_floor": 0.0085
+   },
+   "uubar_Zg_96-1000GeV": {
+    "mse_logm2_real": 0.020378915671020386,
+    "bias": 0.11509360022613799,
+    "mse_after_offset": 0.007132378858006316,
+    "mse_over_var": 0.03472239264010801,
+    "corr": 0.9947865765858843,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zga_96-1000GeV": {
+    "mse_logm2_real": 0.039870592697073534,
+    "bias": -0.06270557111604219,
+    "mse_after_offset": 0.0359386040480845,
+    "mse_over_var": 0.03209262113456171,
+    "corr": 0.9863371952580342,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zga_nlo_96-1000GeV": {
+    "mse_logm2_real": 12.938489073227494,
+    "bias": -3.526917270556373,
+    "mse_after_offset": 0.49934363987867764,
+    "mse_over_var": 11.84480546690372,
+    "corr": 0.7449077232049013,
+    "frac_at_floor": 0.0125
+   },
+   "uubar_Zgg_96-1000GeV": {
+    "mse_logm2_real": 0.05925589867761484,
+    "bias": 0.09131699517274555,
+    "mse_after_offset": 0.050917105070235606,
+    "mse_over_var": 0.03393799339925412,
+    "corr": 0.9856202715269626,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zgg_nlo_96-1000GeV": {
+    "mse_logm2_real": 10.179227637189626,
+    "bias": -3.0302131045383374,
+    "mse_after_offset": 0.9970361782737545,
+    "mse_over_var": 5.280392897860805,
+    "corr": 0.6950515346061064,
+    "frac_at_floor": 0.008
+   },
+   "uubar_Zg_nlo_96-1000GeV": {
+    "mse_logm2_real": 0.6678212012080006,
+    "bias": -0.6149835615679239,
+    "mse_after_offset": 0.2896164202092322,
+    "mse_over_var": 2.8512067144956585,
+    "corr": 0.8539195408213661,
+    "frac_at_floor": 0.0095
+   },
+   "uubar_ZHg_227-1000GeV": {
+    "mse_logm2_real": 0.03131015837262219,
+    "bias": -0.004153962492283239,
+    "mse_after_offset": 0.0312929029682349,
+    "mse_over_var": 0.03161159337370996,
+    "corr": 0.9840800282102251,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ZHg_nlo_227-1000GeV": {
+    "mse_logm2_real": 8.720724722568765,
+    "bias": -2.8678430977127594,
+    "mse_after_offset": 0.4962006894700485,
+    "mse_over_var": 10.77887045829322,
+    "corr": 0.6325277942990064,
+    "frac_at_floor": 0.0075
+   },
+   "uubar_ZZg_191-1000GeV": {
+    "mse_logm2_real": 0.022339622720256806,
+    "bias": 0.07898519885198198,
+    "mse_after_offset": 0.016100961082569667,
+    "mse_over_var": 0.02122239663376848,
+    "corr": 0.9928656569360108,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ZZg_nlo_191-1000GeV": {
+    "mse_logm2_real": 9.89626476576849,
+    "bias": -3.064520409925215,
+    "mse_after_offset": 0.5049794229202812,
+    "mse_over_var": 10.018808465858923,
+    "corr": 0.7076651725815348,
+    "frac_at_floor": 0.006
+   }
+  },
+  "median": {
+   "mse_logm2_real": 0.6678212012080006,
+   "bias": -0.06270557111604219,
+   "mse_after_offset": 0.34590075966020356,
+   "mse_over_var": 0.49550260843096516,
+   "corr": 0.9287101163806885,
+   "frac_at_floor": 0.006
+  }
+ },
+ "DlessInOrdQ": {
+  "scored": 23,
+  "failed": 26,
+  "failures": {
+   "uubar_bbbarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarH_141-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarH is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_bbbarH_nlo_141-1000GeV": "AssertionError('target_physics_orders: uubar_bbbarH_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbara_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbara_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ddbar_nlo_500-1000GeV": "AssertionError('target_physics_orders: uubar_ddbar_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbara_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbara_nlo_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarg_nlo_362-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarH_494-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarH is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarH_nlo_494-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarH_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarZ_458-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarZ is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_ttbarZ_nlo_458-1000GeV": "AssertionError('target_physics_orders: uubar_ttbarZ_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubara_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubara is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubara_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubara_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uubar_uubarg_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubarg is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uubar_uubarg_nlo_25-1000GeV": "AssertionError('target_physics_orders: uubar_uubarg_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uu_uua_25-1000GeV": "AssertionError('target_physics_orders: uu_uua is a mixed-order entry [0, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uu_uua_nlo_25-1000GeV": "AssertionError('target_physics_orders: uu_uua_nlo is a mixed-order entry [1, 0, 2, 2], its coupling homogeneity is not exact')",
+   "uu_uug_25-1000GeV": "AssertionError('target_physics_orders: uu_uug is a mixed-order entry [0, 0, 3, 2], its coupling homogeneity is not exact')",
+   "uu_uug_nlo_25-1000GeV": "AssertionError('target_physics_orders: uu_uug_nlo is a mixed-order entry [1, 0, 3, 2], its coupling homogeneity is not exact')"
+  },
+  "probes": {
+   "uubar_agg_nlo_25-1000GeV": {
+    "mse_logm2_real": 4.779048548537717,
+    "bias": -1.56732605709761,
+    "mse_after_offset": 2.322537579280577,
+    "mse_over_var": 1.3681992769428775,
+    "corr": 0.6590278816618076,
+    "frac_at_floor": 0.0065
+   },
+   "uubar_ga_25-1000GeV": {
+    "mse_logm2_real": 1.8165648341802696e-05,
+    "bias": -0.0023525629216075666,
+    "mse_after_offset": 1.263109604167997e-05,
+    "mse_over_var": 4.9921686173501345e-05,
+    "corr": 0.9999830420555166,
+    "frac_at_floor": 0.0
+   },
+   "uubar_gaa_25-1000GeV": {
+    "mse_logm2_real": 0.029609278161205288,
+    "bias": -0.006870652499332499,
+    "mse_after_offset": 0.029562072295438706,
+    "mse_over_var": 0.07101462332503697,
+    "corr": 0.9643632568805319,
+    "frac_at_floor": 0.0
+   },
+   "uubar_gaa_nlo_25-1000GeV": {
+    "mse_logm2_real": 1.779228056541533,
+    "bias": -0.4924631872842074,
+    "mse_after_offset": 1.5367080657114127,
+    "mse_over_var": 0.8294038014070783,
+    "corr": 0.5362113768503726,
+    "frac_at_floor": 0.01
+   },
+   "uubar_ga_nlo_25-1000GeV": {
+    "mse_logm2_real": 1.8348982765795272,
+    "bias": -0.9369015097743916,
+    "mse_after_offset": 0.9571138375619928,
+    "mse_over_var": 0.8449284891032982,
+    "corr": 0.9551583400924705,
+    "frac_at_floor": 0.0105
+   },
+   "uubar_gg_25-1000GeV": {
+    "mse_logm2_real": 3.7089577544412777e-05,
+    "bias": 0.005474478107027107,
+    "mse_after_offset": 7.1196670000936746e-06,
+    "mse_over_var": 5.468956041794654e-05,
+    "corr": 0.9999981807899408,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ggg_25-1000GeV": {
+    "mse_logm2_real": 0.015639186519065516,
+    "bias": 0.01723397693017,
+    "mse_after_offset": 0.015342176558235884,
+    "mse_over_var": 0.04319715684647585,
+    "corr": 0.9794734251113723,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ggg_nlo_25-1000GeV": {
+    "mse_logm2_real": 9.506876589414732,
+    "bias": -2.8630631204591155,
+    "mse_after_offset": 1.309746157681644,
+    "mse_over_var": 4.935168916067794,
+    "corr": 0.5812228666865431,
+    "frac_at_floor": 0.0115
+   },
+   "uubar_gg_nlo_25-1000GeV": {
+    "mse_logm2_real": 7.100740311961598,
+    "bias": -2.226567301660343,
+    "mse_after_offset": 2.1431383631385774,
+    "mse_over_var": 1.9930212610834626,
+    "corr": 0.7953228030169721,
+    "frac_at_floor": 0.008
+   },
+   "uubar_mumug_25-1000GeV": {
+    "mse_logm2_real": 0.3839056752488053,
+    "bias": -0.031385729462867114,
+    "mse_after_offset": 0.3829206112348891,
+    "mse_over_var": 0.20176747803040931,
+    "corr": 0.8937537143196072,
+    "frac_at_floor": 0.0
+   },
+   "uubar_mumug_nlo_25-1000GeV": {
+    "mse_logm2_real": 3.6631459845698364,
+    "bias": -0.9746330003080242,
+    "mse_after_offset": 2.713236499280415,
+    "mse_over_var": 0.8645968247135855,
+    "corr": 0.6077557991291602,
+    "frac_at_floor": 0.008
+   },
+   "uubar_WpWmg_169-1000GeV": {
+    "mse_logm2_real": 0.1862346179920697,
+    "bias": 0.11949087083480543,
+    "mse_after_offset": 0.17195654977920952,
+    "mse_over_var": 0.10495296503754563,
+    "corr": 0.952496493999915,
+    "frac_at_floor": 0.0
+   },
+   "uubar_WpWmg_nlo_169-1000GeV": {
+    "mse_logm2_real": 14.976118969530454,
+    "bias": -3.376076924190912,
+    "mse_after_offset": 3.578223571476084,
+    "mse_over_var": 6.386176207690718,
+    "corr": -0.4671997474640722,
+    "frac_at_floor": 0.0095
+   },
+   "uubar_Zg_96-1000GeV": {
+    "mse_logm2_real": 0.05655576334773289,
+    "bias": 0.22624463189763963,
+    "mse_after_offset": 0.00536912988523443,
+    "mse_over_var": 0.09636191899128088,
+    "corr": 0.997648182940235,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zga_96-1000GeV": {
+    "mse_logm2_real": 0.11420533954575605,
+    "bias": -0.1346980446399969,
+    "mse_after_offset": 0.09606177631591746,
+    "mse_over_var": 0.15395283629120696,
+    "corr": 0.9336688340561573,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zga_nlo_96-1000GeV": {
+    "mse_logm2_real": 6.647648717130167,
+    "bias": -2.3470777336978825,
+    "mse_after_offset": 1.1388748291097786,
+    "mse_over_var": 6.165402942709164,
+    "corr": 0.22330514628216896,
+    "frac_at_floor": 0.0105
+   },
+   "uubar_Zgg_96-1000GeV": {
+    "mse_logm2_real": 0.0906186243756001,
+    "bias": -0.0014700320850082936,
+    "mse_after_offset": 0.09061646338126914,
+    "mse_over_var": 0.12739694696049575,
+    "corr": 0.9341609847901573,
+    "frac_at_floor": 0.0
+   },
+   "uubar_Zgg_nlo_96-1000GeV": {
+    "mse_logm2_real": 8.132163045738723,
+    "bias": -2.6254185578215252,
+    "mse_after_offset": 1.2393404419850673,
+    "mse_over_var": 6.849782350574584,
+    "corr": 0.20506762207914997,
+    "frac_at_floor": 0.01
+   },
+   "uubar_Zg_nlo_96-1000GeV": {
+    "mse_logm2_real": 6.922285539492026,
+    "bias": -2.6095875708932135,
+    "mse_after_offset": 0.11233824933168336,
+    "mse_over_var": 29.554118638573428,
+    "corr": 0.741067524956716,
+    "frac_at_floor": 0.0095
+   },
+   "uubar_ZHg_227-1000GeV": {
+    "mse_logm2_real": 0.052095753870624484,
+    "bias": -0.08235123512315447,
+    "mse_after_offset": 0.04531402794431541,
+    "mse_over_var": 0.12761592103488045,
+    "corr": 0.9428671141211953,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ZHg_nlo_227-1000GeV": {
+    "mse_logm2_real": 6.943183057639366,
+    "bias": -2.4900838152135183,
+    "mse_after_offset": 0.7426656508510531,
+    "mse_over_var": 7.914217186573848,
+    "corr": 0.3986989867867561,
+    "frac_at_floor": 0.009
+   },
+   "uubar_ZZg_191-1000GeV": {
+    "mse_logm2_real": 0.029256478188067557,
+    "bias": 0.01761605189788686,
+    "mse_after_offset": 0.02894615290359851,
+    "mse_over_var": 0.04991768197158172,
+    "corr": 0.9753803269141857,
+    "frac_at_floor": 0.0
+   },
+   "uubar_ZZg_nlo_191-1000GeV": {
+    "mse_logm2_real": 4.970495244790003,
+    "bias": -2.01075275795079,
+    "mse_after_offset": 0.9273685911832964,
+    "mse_over_var": 4.5598902719165615,
+    "corr": 0.3863160241033628,
+    "frac_at_floor": 0.0075
+   }
+  },
+  "median": {
+   "mse_logm2_real": 1.779228056541533,
+   "bias": -0.4924631872842074,
+   "mse_after_offset": 0.3829206112348891,
+   "mse_over_var": 0.8294038014070783,
+   "corr": 0.8937537143196072,
+   "frac_at_floor": 0.0065
+  }
+ },
+ "both": [
+  "uubar_WpWmg_169-1000GeV",
+  "uubar_WpWmg_nlo_169-1000GeV",
+  "uubar_ZHg_227-1000GeV",
+  "uubar_ZHg_nlo_227-1000GeV",
+  "uubar_ZZg_191-1000GeV",
+  "uubar_ZZg_nlo_191-1000GeV",
+  "uubar_Zg_96-1000GeV",
+  "uubar_Zg_nlo_96-1000GeV",
+  "uubar_Zga_96-1000GeV",
+  "uubar_Zga_nlo_96-1000GeV",
+  "uubar_Zgg_96-1000GeV",
+  "uubar_Zgg_nlo_96-1000GeV",
+  "uubar_agg_nlo_25-1000GeV",
+  "uubar_ga_25-1000GeV",
+  "uubar_ga_nlo_25-1000GeV",
+  "uubar_gaa_25-1000GeV",
+  "uubar_gaa_nlo_25-1000GeV",
+  "uubar_gg_25-1000GeV",
+  "uubar_gg_nlo_25-1000GeV",
+  "uubar_ggg_25-1000GeV",
+  "uubar_ggg_nlo_25-1000GeV",
+  "uubar_mumug_25-1000GeV",
+  "uubar_mumug_nlo_25-1000GeV"
+ ]
+}
