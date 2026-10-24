@@ -77,6 +77,12 @@ top = {k: v for k, v in r.items() if k != "processes"}
 for p in r["processes"]:
     yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 PY
+    # an axis whose pools are not generated yet (H7, stage 4) is skipped and listed, its read left for mode eval
+    miss=$(python -c "
+import glob, os, sys, yaml
+print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_val_*amplitudes.npy\"))
+          for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "recipes/catalog_v3_heldout_$A.yaml")
+    if [ "$miss" != 0 ]; then echo "V3_AXIS_SKIPPED $A: $miss pools not generated"; continue; fi
     P=("$R/$A"/*.yaml); [ "$MODE" = smoke ] && P=("${P[@]:0:2}")
     SM=(); [ "$A" = H5 ] && SM=(--signed-magnitude)
     python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
