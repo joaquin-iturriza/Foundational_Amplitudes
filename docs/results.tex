@@ -6568,6 +6568,15 @@ of the three share a test set.
     and $2\to5$), H3 particle content (the physical top, bracketed by the heavy-quark layer; one particle never seen, in a
     removal twin), H4 a vertex class (the quartic gauge family, in the same twin), H5 order, H6 parameter interpolation, H7
     $100$\,TeV and $p_T\geq30$\,GeV. The regimes are D93's (H2, H7, H3, H5); H1, H4 and H6 are proposed on top.
+    \emph{Storage precision} (D101, \code{analysis/catalog\_v3/pool\_precision.py}, run FA-ccin2p3-cb09b906): over
+    the $2667$ existing val pools ($2.6\times10^7$ events) no $|\mathcal M|^2$ lies outside float32's normal range
+    ($\log_{10}|\mathcal M|^2\in[-25.7, 9.6]$, twelve decades above the floor), $53$ pools hold negative values, every PDG id
+    survives the cast, and casting $|\mathcal M|^2$ moves $\log|\mathcal M|^2$ by at most $6\times10^{-8}$. Casting the
+    momenta (200 pools at every multiplicity) moves the load-time factors of the target: $\log\hat s$ by at most
+    $1.2\times10^{-3}$ ($99.9\%$ quantile $3\times10^{-4}$), the emission scales by at most $0.022$ (quantile
+    $3\times10^{-3}$), the smallest $\log s_{ij}$ by at most $0.011$, and a massless leg's $m^2$ by up to $81$\,GeV$^2$, the
+    worst all at $13$ and $100$\,TeV. Below the catalog losses ($\gtrsim10^{-2}$) but not below single-process ones
+    ($10^{-11}$ at best); the network's float32 cache already rounds its inputs the same way. Pools stay float64 ($52$\,GB).
     \emph{The selection} (\code{recipes/select\_catalog\_v3.py}, seed $0$; \code{catalog\_v3\_roles.json}) on the extended
     census (D100: $+Z$, $+H$ on every $2\to3$ class, quark and lepton pairs on every $2\to2$): $1586$ distinct tree classes
     ($65$, $321$, $1200$ at $2\to2$, $2\to3$, $2\to4$). $1127$ train; H3 $237$ (every class with an external top); H2
