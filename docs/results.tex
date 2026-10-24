@@ -1005,8 +1005,13 @@ processes worse ($5.6$) and the $+g$ probes as good as the emission scales ($2.2
 same way, the two arms' per-process MSE is $0.38\to0.64$ on the $20$ all-boson finals (their offset improves, $-0.50\to-0.10$)
 and $0.50\to1.49$ on the other $23$, where the \emph{shape} doubles ($0.28\to0.63$; within-process variance of the error,
 medians). The proxy reads only the process level and assumes the network fits any target's shape alike; the emission
-scales give a narrower target spread ($1.61\to1.34$) that the network fits worse. A guess to test: $L_q$ is a minimum over
-legs and pairs, so the target has kinks wherever the minimising pair changes, which a smooth network does not follow.
+scales give a narrower target spread ($1.61\to1.34$) that the network fits worse. $L_q$ is a minimum over legs and pairs, so
+the target has kinks wherever the minimising pair changes; a per-process shape proxy says that is the cost
+(\code{analysis/catalog\_daniel/shape\_learn.py}: one small regressor, the same for every target, on each of the $43$
+pools' invariants, $15000$ events to fit and $5000$ to score): the held-out shape error, median over the $43$, is
+$0.0026$ for the dimensionless target, $0.0038$ for the emission scales and $0.0027$ with their soft minimum
+($-\tau\log\sum e^{-\log q^2/\tau}$ over the candidates, $\tau=0.3$; $0.0029$ at $\tau=0.1$), the GPU's order again. The
+soft minimum is in training as DlessInOrdQs (D99, item \code{qperp\_soft}).
 
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
