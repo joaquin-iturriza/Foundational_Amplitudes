@@ -62,7 +62,12 @@ def main():
     dirs = {"val": os.environ["DATA_DIR"], "test": os.environ["DATA_DIR"],
             "train": os.path.join(os.environ["SCRATCH"], "amp_data_cache")}
     done = 0
-    for p in yaml.safe_load(open(a.spec))["processes"]:
+    spec = yaml.safe_load(open(a.spec))
+    # entries with a base or a physics block (catalog_v3's heavy-quark layer, alpha_s points, H7) are addressed by name
+    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
+                                   "sampling": p.get("sampling")} for p in spec["processes"]],
+                                 default_sampling=spec.get("sampling"))
+    for p in spec["processes"]:
         lo, hi = p["sqrts"]
         for role in a.roles:
             # a shaped pool carries the sampling tag in its name (catalog_v3: _smix_)
