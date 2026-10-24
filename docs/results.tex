@@ -5893,8 +5893,9 @@ on rung $7$'s frozen trunk reaches $2.6\times10^{-4}$, scratch's $2.5\times10^{-
 and rung $6$'s $8.1\times10^{-3}$, $30\times$ worse; at every $D$ from $10^{1.5}$ rung $7$'s read-out is $2.4$ to
 $30\times$ below rung $6$'s, and with $D\ge10^{3}$ it settles at $2.2$--$2.4\times10^{-5}$ against $1.3$--$1.7\times10^{-4}$. Neither
 pretrained head, refitted only by an affine map, is close ($0.09$ to $0.48$). So adding $u\bar d\to Wgg$ puts the
-structure $u\bar u\to Zg$ needs into rung $7$'s representation, linearly readable, and the fine-tune's head start is
-the head finding it, not the trunk relearning it.
+structure $u\bar u\to Zg$ needs into rung $7$'s representation, linearly readable, and the fine-tune's head start
+appears to come from the head finding it rather than the trunk relearning it (the read-out does not show which
+weights a fine-tune moves).
 On $ee\to Z\gamma$ the dip has a plainer candidate cause: the fine-tunes never searched the learning rate
 scratch wins with. At $D=10^{1.5}$ and $10^2$ scratch's best trial sits at $1.6$ and $1.9\times10^{-4}$ and trains to the
 end (best checkpoint at $99\%$ and $96\%$ of the run), while all $50$ fine-tune trials per cell (ten rungs, five each) lie
@@ -5907,7 +5908,8 @@ median gain over the ten rungs from $-0.57$ to $-0.54$ decades at $D=10^{1.5}$ a
 ($-0.46$ and $-1.09$ for the better of the two searches per rung); the lowered window wins on $6$ and $7$ of the ten
 rungs, by up to $0.3$ decades. Its best trials mostly sit at $2$ to $9\times10^{-4}$, and none reaches scratch at
 $D=10^2$ ($1.5\times10^{-4}$ for rung $9$, the best, against $5.0\times10^{-5}$). So $ee\to Z\gamma$'s dip is in what
-the pretrained start lets the fine-tune reach, not in where it was searched. Fig.~\ref{fig:nogain}. The window alone does not make a dip, though: over the $84$ probe and $D$ cells,
+the pretrained start lets the fine-tune reach, not in where it was searched (Fig.~\ref{fig:nogain}b). The window alone does not make a dip, though: over the $84$ probe and $D$ cells (all twelve probes at every $D$; panel (a) of
+Fig.~\ref{fig:nogain} has $72$, those with a half-decade before them),
 scratch's best learning rate lies below every fine-tune trial's in $46$ (\code{nogain\_lr.py}, \code{data/nogain\_lr.json}),
 and the median gain there is $+0.31$ decades against $+0.34$ in the other $38$ (correlation of the gain with the distance
 below the window $-0.15$). $ee\to d\bar d$ and $ee\to b\bar b$ at one loop have scratch about a decade below the window at
@@ -6768,7 +6770,7 @@ of the three share a test set.
     are already stripped, dividing out $(16\pi^2)^{-1}$ takes the level MSE from $4.9$ to $42$; undoing MadGraph's
     identical-particle factor moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$
     to $8.7$ / $2.5$). Open: what the $43$ new pay for. Next: the small dedicated network for what no constant fixes
-    ($2\to4$ shape $1.5$, unseen tops), design for the user (2026-10-24): (i) a context vector $c_p\in\mathbb R^{16}$ per
+    ($2\to4$ shape $1.5$, unseen tops), approved and running (D105, 2026-10-24): (i) a context vector $c_p\in\mathbb R^{16}$ per
     process, added to every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk
     frozen and $c_p$ the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process
     embedding with dropout to zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new
