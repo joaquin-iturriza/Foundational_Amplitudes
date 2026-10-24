@@ -1065,6 +1065,15 @@ $0.48$, $0.26$), the $96$ relabels $0.074$, $0.064$, $0.051$, and on the $2\to4$
 scales' gain but not all ($+g$ $3.97$ against $2.18$ and $51.8$; $+\gamma$ $3.32$, $2.65$, $29.6$). The kinks are not what
 the $43$ new pay for, and the shape proxy's ranking of the three targets did not carry to the network.
 
+\paragraph{The context vector, its zero-shot cost (D105, 2026-10-24).} DlessInOrdQc is DlessInOrdQ's short run with a
+learned $c_p\in\mathbb R^{16}$ per training process added to every particle's encoding and zeroed on half the events
+(\code{model.context\_dim}, \code{context\_dropout} $0.5$; run FA-ccin2p3-ac99f6a2, one seed), so its zero-shot is the
+$c=0$ model. That model costs a little against DlessInOrdQ on the held-out processes (\code{qperp\_ab.py}): the
+$43$ new $0.97$ against $0.75$ (median per-process ratio $1.03$, $10$--$90\%$ $0.50$--$3.3$), the $96$ relabels
+$0.073$ against $0.064$ (ratio $1.11$). What the context is for, the fit of $c_p$ on $K=1$, $4$, $16$ labelled events of
+each held-out process against the shrunk offset (Fig.~\ref{fig:kshot_level}), is running
+(\code{scripts/job\_kshot\_context.sh}).
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in

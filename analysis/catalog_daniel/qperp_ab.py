@@ -14,7 +14,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
-ARMS = ("DlessInOrd", "DlessInOrdQ", "DlessInOrdQs")
+ARMS = ("DlessInOrd", "DlessInOrdQ", "DlessInOrdQs", "DlessInOrdQc")   # Qc: D105's context arm, read at c = 0
 LOOP = ("_nlo_", "_loop_")
 
 
@@ -61,11 +61,17 @@ def main():
                 common = sorted(set(per[(lab, ARMS[0])]) & set(per[(lab, b)]))
                 r = np.array([per[(lab, b)][p] / per[(lab, ARMS[0])][p] for p in common])
                 row[key] = [float(x) for x in np.quantile(r, [0.1, 0.5, 0.9])]
+        # the context arm against DlessInOrdQ, the target it shares (its zero-shot is the c = 0 model)
+        if ARMS[1] in row and ARMS[3] in row:
+            common = sorted(set(per[(lab, ARMS[1])]) & set(per[(lab, ARMS[3])]))
+            r = np.array([per[(lab, ARMS[3])][p] / per[(lab, ARMS[1])][p] for p in common])
+            row["ratio_ctx"] = [float(x) for x in np.quantile(r, [0.1, 0.5, 0.9])]
         res[lab] = row
         print(f"{lab:18s} " + "  ".join(f"{a}: n={v['n']} MSE {v['mse']:.3g} off {v['offset']:+.2f} shape {v['shape']:.3g}"
                                         for a, v in row.items() if a in ARMS)
               + (f"  Q/Ord per process 10/50/90% {np.round(row['ratio'], 2).tolist()}" if "ratio" in row else "")
-              + (f"  Qs/Ord {np.round(row['ratio_soft'], 2).tolist()}" if "ratio_soft" in row else ""))
+              + (f"  Qs/Ord {np.round(row['ratio_soft'], 2).tolist()}" if "ratio_soft" in row else "")
+              + (f"  Qc/Q {np.round(row['ratio_ctx'], 2).tolist()}" if "ratio_ctx" in row else ""))
     json.dump(res, open(os.path.join(HERE, "data", "qperp_ab.json"), "w"), indent=1)
     plot(per)
 
