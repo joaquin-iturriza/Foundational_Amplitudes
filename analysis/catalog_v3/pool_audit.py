@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Audit of every catalog_v3 pool generated so far (D102: stages 1, 2a and 3), before any training reads them.
+"""Audit of every catalog_v3 pool generated so far (D102: stages 1, 2 and 3), before any training reads them.
 Per recipe entry and role (train in $SCRATCH/amp_data_cache, val and test in $DATA_DIR, as the prebuild writes them):
   rows      the row count against the recipe's n_<role>
   amp       the fraction of |M|^2 non-finite, zero and negative; log10|M|^2 at 0.1%, 50%, 99.9% and its spread
@@ -18,7 +18,7 @@ import numpy as np
 import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-STAGES = {"stage1": "recipes/catalog_v3_gen_stage1.yaml", "stage2a": "recipes/catalog_v3_gen_stage2a.yaml",
+STAGES = {"stage1": "recipes/catalog_v3_gen_stage1.yaml", "stage2": "recipes/catalog_v3_gen_stage2.yaml",
           "stage3": "recipes/catalog_v3_gen_stage3.yaml"}
 ROLES = ("train", "val", "test")
 
