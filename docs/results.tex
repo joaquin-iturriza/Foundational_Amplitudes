@@ -1103,7 +1103,7 @@ $1$, $4$, $16$):
   shrunk $0.72$, $0.54$, $0.50$; context $0.59$, $0.38$, $0.21$. The offsets stop at the floor ($0.46$, the variance of
   the $c=0$ error, what any constant per process reaches); the context goes under it from $K=4$ and reaches half of it
   at $K=16$, so it corrects the shape too. It beats the shrunk offset on $63$, $67$ and $77\%$ of the processes (median
-  ratio $0.97$, $0.72$, $0.59$).
+  ratio $0.97$, $0.72$, $0.59$). The shrunk offset weighs the $K$ events with the process's error variance over its whole pool, which $K$ events do not give: an optimistic baseline, so the context's wins over it are conservative.
   \item \emph{$2\to4$: it does not.} $+g$: zero-shot $2.77$, shrunk prior alone $1.69$; plain $2.39$, $1.82$, $1.45$;
   shrunk $1.70$, $1.56$, $1.43$; context $2.43$, $2.10$, $1.48$; floor $1.34$. $+\gamma$: zero-shot $1.87$, prior alone
   $2.12$; plain $2.47$, $1.78$, $1.46$; shrunk $1.67$, $1.50$, $1.46$; context $2.36$, $2.23$, $1.68$; floor $1.37$. The
@@ -6845,7 +6845,7 @@ of the three share a test set.
     them). One-loop layer $150$: every coloured $2\to2$ class and $2\to3$ ones drawn per beam (a $2\to3$ MadLoop pool
     costs $100$--$200$ LO units); $121$ train, $29$ held out (H5). Heavy-quark layer $105$ pools: every $2\to2$ top
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
-    and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
+    and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
   \item \textbf{State (2026-10-25, 01:30).} Nothing running. Done since the last State: the context vector's K-shot
     fits (par.\ The context vector) and design (ii)'s data check (par.\ Design (ii) on the data); catalog\_v3's

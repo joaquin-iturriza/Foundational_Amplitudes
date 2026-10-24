@@ -9,14 +9,15 @@
 # D115 (the user, 2026-10-25: "switch to the new catalog now that it's done, run the pretrainings there"): catalog_v3's
 # short pretrainings, the short setup of Daniel's catalog round (scripts/job_catalog_norm.sh short: hp58's configuration and
 # HPs, 1e4 train and 200 val events per process, 5 epochs, in memory) on recipes/catalog_v3_train.yaml (1397 pools,
-# 1397 x 1e4 / 16384 x 5 = 4263 steps), then every held-out axis read zero-shot (tools/zero_shot_parent.py, 2000 val
+# 5 epochs: 4264 steps), then every generated held-out axis read zero-shot (H7, 100 TeV and pT >= 30 GeV, is not generated) (tools/zero_shot_parent.py, 2000 val
 # events per process; the one-loop H5 pools on log|M|, --signed-magnitude). Arms:
 #   B      one standardization shared by all processes, log|M|^2 in GeV (the baseline)
 #   Q      the adopted target: dimensionless (s_hat per event, dimensionless inputs), the coupling orders, the emission
 #          scales (data.target_physics_dim_ref=qperp), the arXiv:2606.23791 diagram encoder (DlessInOrdQ)
 #   Qc     Q with the per-process context vector (model.context_dim 16, dropout 0.5; D105)
-#   Qtwin  Q trained on the removal twin (recipes/catalog_v3_twin_train.yaml, no tau, nu_tau, quartic gauge family),
-#          read on H4 (the 135 pools the twin leaves out) besides the axes
+#   Qtwin  Q trained on the removal twin (recipes/catalog_v3_twin_train.yaml, 1246 pools: none with a tau or nu_tau in any
+#          layer, none built on the quartic gauge family), read besides the axes on H3p (the 136 pools with the never-seen
+#          tau or nu_tau) and H4 (the 15 quartic-gauge pools); 5 epochs of its own set (3803 steps)
 # Every arm carries the sign head for catalog_v3's signed one-loop pools (the signed A/B, docs/results.tex) and so trains
 # on the MSE with the arithmetic mean over processes (the sign head is not wired into the het loss): one loss for all.
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- B|Q|Qc|Qtwin [smoke|eval]
@@ -38,9 +39,11 @@ case "$ARM" in
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
-EXTRA=(training.validate_frac=0.02 training.iterations=4263 ++data.memmap=false ++data.train_subsample=10000
+# 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
+ITERS=$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")
+EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
-AXES=(H1 H2 H2p5 H3 H5 H6); [ "$ARM" = Qtwin ] && AXES+=(H4)
+AXES=(H1 H2 H2p5 H3 H5 H6); [ "$ARM" = Qtwin ] && AXES+=(H3p H4)
 if [ "$MODE" = smoke ]; then
     OUT="$SCRATCH/zz_v3_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
@@ -65,12 +68,14 @@ if [ "$MODE" != eval ]; then
 fi
 ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 R="$SCRATCH/zz_v3_heldout_recipes"
-for A in "${AXES[@]}"; do
+for A in "${AXES[@]}"; do   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
     mkdir -p "$R/$A" "$PRED/$A"
     python - "$R/$A" "recipes/catalog_v3_heldout_$A.yaml" <<'PY'
 import sys, yaml
-for p in yaml.safe_load(open(sys.argv[2]))["processes"]:
-    yaml.safe_dump({"processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
+r = yaml.safe_load(open(sys.argv[2]))
+top = {k: v for k, v in r.items() if k != "processes"}
+for p in r["processes"]:
+    yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 PY
     P=("$R/$A"/*.yaml); [ "$MODE" = smoke ] && P=("${P[@]:0:2}")
     SM=(); [ "$A" = H5 ] && SM=(--signed-magnitude)

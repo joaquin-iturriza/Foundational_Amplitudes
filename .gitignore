@@ -143,7 +143,7 @@ analysis/transfer/delta_het_medians.json
 analysis/transfer/het_ab_data/
 analysis/transfer/delta_d10_medians.json
 .claude/.reply_check_state
-analysis/catalog_daniel/data/*.npz
+analysis/catalog_daniel/data/**/*.npz
 analysis/transfer/het23_data/
 analysis/transfer/het_shared_data/
 analysis/transfer/het_mumse_data/

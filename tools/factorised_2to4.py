@@ -34,8 +34,9 @@ def mdot(a, b):
 
 def pool(name, role="val"):
     g = sorted(glob.glob(os.path.join(os.environ["DATA_DIR"], f"{name}_*_{role}_*amplitudes.npy")))
-    if not g:
-        raise SystemExit(f"no {role} pool for {name} in $DATA_DIR")
+    g = [f for f in g if os.path.basename(f)[len(name) + 1].isdigit()]    # not a sibling such as <name>_nlo_...
+    if len(g) != 1:
+        raise SystemExit(f"{len(g)} {role} pools for {name} in $DATA_DIR: {g}")
     X = np.asarray(np.load(g[0], mmap_mode="r"))
     al = g[0][:-4] + ".alphas.npy"
     return X, (np.load(al) if os.path.exists(al) else None), g[0]
