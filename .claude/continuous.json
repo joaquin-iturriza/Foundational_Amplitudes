@@ -1,1 +1,1 @@
-{"tasks": []}
+{"tasks": [{"name": "the level and the preprocessing (D83, D99)", "paths": ["analysis/catalog_daniel/norm_*", "analysis/catalog_daniel/qperp*", "analysis/catalog_daniel/kshot*", "analysis/catalog_daniel/level*", "analysis/catalog_daniel/signed*", "analysis/catalog_daniel/data/norm_*", "analysis/catalog_daniel/data/qperp*", "analysis/level/*", "physics_scales.py"], "max_age_min": 90}]}

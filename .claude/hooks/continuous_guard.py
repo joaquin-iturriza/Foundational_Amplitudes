@@ -42,6 +42,8 @@ def main():
         return 2
     now, stale = time.time(), []
     for t in tasks:
+        if t.get("stopped"):             # stopped on the user's recorded decision (continuous_list_guard.py)
+            continue
         ct = newest_commit(t["paths"])
         if ct is None:
             continue                     # git unavailable: never block on the guard's own failure
