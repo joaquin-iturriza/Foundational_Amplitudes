@@ -6678,9 +6678,10 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family: $131$ training classes. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; waiting on the user's approval.
-  \item \textbf{State (2026-10-24, 11:00).} Running on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
+  \item \textbf{State (2026-10-24, 13:15).} Done on CC: catalog\_v3 stage 2a prebuild (FA-ccin2p3-794112d0, item
     \code{catalog\_v3\_gen}, D102; \code{recipes/catalog\_v3\_gen\_stage2a.yaml}: the $99$ loop strings with no $b$ or
-    $t$ on any leg, or loop-induced; 288 of 297 files at 10:30, no errors; \code{/sps/lpnhe} 26 GB free). Waiter:
+    $t$ on any leg, or loop-induced; all $297$ train/val/test pools built in 4.5 h, empty error file). Nothing is
+    running. Waiter:
     \code{site events --wait --project FA}; supervisor running. All $167$ stage-2 loop strings are MadLoop-certified
     ($150$ one-loop, $17$ loop-induced; $bb\to bb$, $bb\to bbZ$, $bg\to bb\bar b$ on the double pole only, the $25$
     $b\bar b\to$ colourless strings on the single pole too; the certification fixes are in the code's comments,
