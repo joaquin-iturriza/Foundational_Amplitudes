@@ -23,6 +23,18 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    hand-off. A figure or number that mixes cells run at different compute says so wherever it is
    shown.
 
+0c. **A plan I was told is a commitment: its cores, jobs and wall time.** When a tool refuses it ("fits NOWHERE",
+   a cap, a wrong default), the refusal is a gap to fix or route around (split the work into parallel jobs of what fits
+   so the stated wall time holds), never a reason to shrink the job. If neither works, the smaller version and its new
+   time go to me in the first lines, before it is submitted. (2026-10-24: catalog_v3 was promised on 48 cores in 3 to
+   4 h; `site pick` turned `--gpus 0` into 1 GPU, judged 48 cores against the GPU nodes, and the prebuild ran as one
+   16-core job, about 9 h for the trees.)
+
+0d. **When I point out a mistake, no apology and no quick patch presented as the end of it.** Answer with: what in
+   your process produced it (traced in the transcript, logs or code, not guessed); the change that stops it recurring
+   (a rule here, a guard, a tool fix), made in the same turn; then the fix of the instance. A mistake whose prevention
+   needs a permission I hold (a hook, a setting) is proposed to me as a concrete diff.
+
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
    `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`
