@@ -531,7 +531,7 @@ processes:
     why: one-loop QCD of v3_bbx_gvevex
   v3_bbx_gwpwm_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -681,7 +681,7 @@ processes:
     why: one-loop QCD of v3_bbx_hvevex
   v3_bbx_hwpwm_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -827,7 +827,7 @@ processes:
     why: one-loop QCD of v3_bbx_wpwm
   v3_bbx_wpwmz_nlo:
     alphas_power: 1
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -1127,7 +1127,7 @@ processes:
     why: one-loop QCD of v3_bg_btaptam
   v3_bg_bwpwm_nlo:
     alphas_power: 2
-    certified: false
+    certified: true
     kind: virt
     layer: nlo
     m_finals:
@@ -3954,7 +3954,7 @@ virt:
     - 12
     - -12
   v3_bbx_gwpwm:
-    certified: false
+    certified: true
     m_finals:
     - 0.0
     - 80.419
@@ -4041,7 +4041,7 @@ virt:
     - 12
     - -12
   v3_bbx_hwpwm:
-    certified: false
+    certified: true
     m_finals:
     - 125.0
     - 80.419
@@ -4124,7 +4124,7 @@ virt:
     - 24
     - -24
   v3_bbx_wpwmz:
-    certified: false
+    certified: true
     m_finals:
     - 80.419
     - 80.419
@@ -4298,7 +4298,7 @@ virt:
     - -15
     - 15
   v3_bg_bwpwm:
-    certified: false
+    certified: true
     m_finals:
     - 4.7
     - 80.419
