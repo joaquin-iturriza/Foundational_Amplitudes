@@ -112,16 +112,18 @@ def predict_poles(s, proc_pdgs, masses, mom=None):
 # ---------------------------------------------------------------------------
 # Self-contained 2-body phase space (CM frame), process order [1,2,3,4]
 # ---------------------------------------------------------------------------
-def sample_2body(sqrts, masses, rng):
+def sample_2body(sqrts, masses, rng, pdg=None):
     m3, m4 = masses[2], masses[3]
-    E = sqrts / 2.0
     # Rows in the STORED convention (row 0 along +z, like every stored event and
     # mg.sample_nbody_phase_space); main() then applies the same row->slot
     # permutation the generator applies, so MadLoop is certified on exactly the
     # momenta it sees in generation. That matters: the u s > u s and d s > d s
     # modules return wrong, history-dependent poles when their slot 1 points
     # along -z and exact ones along +z.
-    p1 = np.array([E, 0, 0, +E]); p2 = np.array([E, 0, 0, -E])
+    # the beams on their mass shells as generation has them (mg5_pipeline_final._beams: a b beam at 4.7 GeV; massless
+    # beams at (E, 0, 0, +-E) exactly)
+    import mg5_pipeline_final as mg
+    p1, p2 = mg._beams(np.array([sqrts]), list(pdg) if pdg is not None else [21, 21])[0]
     # final-state momentum magnitude
     lam = (sqrts**2 - (m3 + m4)**2) * (sqrts**2 - (m3 - m4)**2)
     p = np.sqrt(max(lam, 0.0)) / (2.0 * sqrts)
@@ -179,7 +181,7 @@ def main():
         rng = np.random.default_rng(args.seed)
         if len(masses) == 4:
             sq = rng.uniform(args.sqrts_min, args.sqrts_max, args.n)
-            pts = [sample_2body(s, masses, rng) for s in sq]
+            pts = [sample_2body(s, masses, rng, args.proc_order) for s in sq]
         else:
             # n-body (2->3 and up): the pipeline's RAMBO sampler under the fiducial cuts,
             # rows in the process order handed in (beams first). The check only needs s.

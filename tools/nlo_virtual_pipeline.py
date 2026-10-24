@@ -330,7 +330,7 @@ def certify_ew(process, n=50, seed=7, tol=1e-6):
     (ew_double_pole) and the point stable. Runs in a subprocess (the f2py module chdir's and is a singleton)."""
     cfg = VIRT_PROCESSES[process]
     p0 = find_p0(virt_standalone_dir(process))
-    pred = ew_double_pole(cfg["pdg_ids"], [0.0, 0.0] + list(cfg["m_finals"]))
+    pred = ew_double_pole(cfg["pdg_ids"], [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in cfg["pdg_ids"][:2]] + list(cfg["m_finals"]))
     code = f"""
 import sys, numpy as np
 sys.path.insert(0, {HERE!r}); sys.path.insert(0, {ROOT!r})
@@ -428,7 +428,8 @@ def pole_certify(process, n=100, seed=7):
     # applies (mom[swap]): the checker then certifies exactly what MadLoop sees.
     pdg = list(cfg["pdg_ids"])
     perm = mg.row_to_slot_perm(pdg, cfg["mg5"])
-    masses = [0.0, 0.0] + list(cfg["m_finals"])
+    # the beams on the masses generation gives them (mg5_pipeline_final.BEAM_MASS: a b beam at 4.7 GeV, 31954d7)
+    masses = [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(cfg["m_finals"])
     cmd = [sys.executable, f"{HERE}/nlo_pole_check.py", "--so-dir", p0,
            "--proc-order", *map(str, pdg), "--m", *map(str, masses),
            "--perm", *map(str, perm), "--n", str(n), "--seed", str(seed)]
@@ -440,7 +441,9 @@ def pole_certify(process, n=100, seed=7):
     tail = [l for l in out.splitlines() if any(k in l for k in
             ("DOUBLE", "SINGLE", "predicted", "MadLoop", "PASS", "FAIL", "not predicted",
              "points:", "worst:", "exceptional"))]
-    print("  " + ("\n  ".join(tail) if tail else "(no checker output)\n  " + res.stderr.strip()[-600:]))
+    print("  " + ("\n  ".join(tail) if tail else "(no checker output)"))
+    if "PASS" not in out or res.returncode not in (0, 2):     # a FAIL or a crash: the checker's stderr is the reason
+        print("  [stderr] " + res.stderr.strip()[-1500:].replace("\n", "\n  [stderr] "))
     # An explicit PASS is required: a checker that crashed (empty stdout) used to count as
     # a pass, which certified eight modules the venv could not even import.
     passed = ("PASS" in out) and ("FAIL" not in out)
@@ -531,7 +534,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return virt_e4 * (asrun / (2.0 * np.pi)), True
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
-    c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [0.0, 0.0] + list(m_finals))   # the set of legs only
+    c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(m_finals))   # the set of legs only
     bad = 0
     for i, (mom, _) in enumerate(events):
         value, usable = evaluate_point(mom, sqrts[i])
