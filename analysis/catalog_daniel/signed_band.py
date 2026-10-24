@@ -7,16 +7,16 @@ of events with |V F| below r0 (lin_shift: for an r0 off its own quantile by a le
 at its own 0.5% quantile (0.5% by construction); and how thin the zero crossing is, the share of events within a factor
 10 and 100 of zero relative to the pool's median |V F|.
 Login node, CPU only; prints JSON after a __B64__ line.
-    python analysis/catalog_daniel/signed_band.py
+    python analysis/catalog_daniel/signed_band.py [recipe]   (default recipes/catalog_loop_signed.yaml; catalog_v3: recipes/catalog_v3_gen_stage2a.yaml)
 """
-import base64, glob, gzip, json, os
+import base64, glob, gzip, json, os, sys
 
 import numpy as np
 import yaml
 
 
 def main():
-    rec = yaml.safe_load(open("recipes/catalog_loop_signed.yaml"))["processes"]
+    rec = yaml.safe_load(open(sys.argv[1] if len(sys.argv) > 1 else "recipes/catalog_loop_signed.yaml"))["processes"]
     pools = {}
     for p in rec:
         lo, hi = p["sqrts"]
