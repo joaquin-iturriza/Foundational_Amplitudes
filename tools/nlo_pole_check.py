@@ -223,7 +223,9 @@ def main():
     if not exc_ok:
         print("  more than 10% exceptional points -> FAIL")
     tol = 1e-3   # relative, on the pole coefficients (MadLoop rescues are ~1e-6 accurate)
-    dev2 = np.abs(c2_ml - c2_pred)[ok] / np.maximum(np.abs(c2_pred[ok]), 1e-9)
+    # floor 1 as the generation's per-event guard: every nonzero c2 has |c2| >= C_F > 1 (unchanged); a zero prediction
+    # (no massless coloured leg, e.g. b b~ > Z Z Z on massive beams) is tested absolutely, not against 1e-9 of noise
+    dev2 = np.abs(c2_ml - c2_pred)[ok] / np.maximum(np.abs(c2_pred[ok]), 1.0)
     print("\n--- DOUBLE pole c2 = -sum_i C_i  (universal) ---")
     print(f"  predicted (const): {c2_pred[0]:+.5f}")
     print(f"  MadLoop  mean/std: {c2_ml[ok].mean():+.5f} / {c2_ml[ok].std():.2e}")
@@ -231,7 +233,7 @@ def main():
           f"max rel = {dev2.max():.2e}  (95th pct {np.percentile(dev2, 95):.2e})   "
           f"-> {'PASS' if (dev2.max() < tol and exc_ok) else 'FAIL'}")
     for i in np.argsort(-np.where(ok, np.abs(c2_ml - c2_pred), -1.0))[:3]:
-        if abs(c2_ml[i] - c2_pred[i]) / max(abs(c2_pred[i]), 1e-9) > 0.1 * tol:
+        if abs(c2_ml[i] - c2_pred[i]) / max(abs(c2_pred[i]), 1.0) > 0.1 * tol:
             print(f"    worst: sqrt(s) {sqrts[i]:7.1f}  rc {rcs[i]}  c2 {c2_ml[i]:+.5f}")
     _, _, note = predict_poles(sqrts[0]**2, slot_pdgs, slot_masses)
     print(f"\n--- SINGLE pole c1 ---  [{note}]")
