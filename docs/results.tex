@@ -5894,7 +5894,12 @@ and the median gain there is $+0.31$ decades against $+0.34$ in the other $38$ (
 below the window $-0.15$). $ee\to d\bar d$ and $ee\to b\bar b$ at one loop have scratch about a decade below the window at
 $D=10^{1}$, $10^{2}$ and $10^{2.5}$ and gain $0.2$ to $0.9$ decades there. A least-squares fit of the gain on both readings gives
 $-0.23$ decades per decade below the window and $-0.23$ per decade of scratch's drop, so the two weigh alike and neither
-explains $ee\to Z\gamma$'s $-1.2$ at $D=10^2$ by itself; the lowered-window search remains the test.
+explains $ee\to Z\gamma$'s $-1.2$ at $D=10^2$ by itself; the lowered-window search remains the test. Nor is a smoother fine-tune curve a general property of the steep cells
+(\code{nogain\_start.py}, \code{data/nogain\_start.json}; per cell the median over trials of the first validation and
+of the best, in decades): in the $18$ cells where scratch's drop is in the top quarter the fine-tunes start $1.2$ decades
+below scratch and improve $2.2$ decades within the run against scratch's $2.5$; in the other $54$, $0.9$ below, $2.6$
+against $2.9$. The shortfall in improvement is the same $0.3$ decades in both. $ee\to Z\gamma$ at $D=10^2$ is the
+exception: the fine-tunes start $0.9$ decades lower and improve $1.9$ decades, scratch $3.8$.
 
 \begin{figure}[t]
 \centering
