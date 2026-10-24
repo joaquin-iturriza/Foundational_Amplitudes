@@ -5886,8 +5886,15 @@ $24\times$ and $417\times$ from its first validation, rung $6$'s $3.6\times$ and
 ($4.7\times$ and $35\times$ at the end; its best checkpoint at $13\%$ of the run, \code{data/nogain\_arms.json}). From
 $D=10^{2.5}$ up both keep improving to the end and the gap closes ($1.2$ and $2.5\times10^3$ at $10^{2.5}$). So rung $6$'s
 pretrained function sits in a basin that $u\bar u\to Zg$ at small $D$ cannot leave, and adding $u\bar d\to Wgg$ moves it out.
-Open: what in the representation does it; a probe of the frozen trunk's features on $u\bar u\to Zg$ (a linear read-out per
-rung) would say whether rung $7$'s features already carry the target.
+Rung $7$'s frozen features already carry the target (D108; \code{tools/linear\_readout.py}, \code{nogain\_readout.py},
+\code{data/nogain\_readout.json}: a ridge read-out of the head's input, mean-pooled per event, fitted on the cell's $D$
+training events with the penalty from leave-one-out on them, scored on the validation split). At $D=10^2$ the read-out
+on rung $7$'s frozen trunk reaches $2.6\times10^{-4}$, scratch's $2.5\times10^{-4}$ with no weight of the trunk moved,
+and rung $6$'s $8.1\times10^{-3}$, $30\times$ worse; at every $D$ from $10^{1.5}$ rung $7$'s read-out is $2.4$ to
+$20\times$ below rung $6$'s, and with $D\ge10^{3}$ it settles at $2.2\times10^{-5}$ against $1.3\times10^{-4}$. Neither
+pretrained head, refitted only by an affine map, is close ($0.09$ to $0.48$). So adding $u\bar d\to Wgg$ puts the
+structure $u\bar u\to Zg$ needs into rung $7$'s representation, linearly readable, and the fine-tune's head start is
+the head finding it, not the trunk relearning it.
 On $ee\to Z\gamma$ the dip has a plainer candidate cause: the fine-tunes never searched the learning rate
 scratch wins with. At $D=10^{1.5}$ and $10^2$ scratch's best trial sits at $1.6$ and $1.9\times10^{-4}$ and trains to the
 end (best checkpoint at $99\%$ and $96\%$ of the run), while all $50$ fine-tune trials per cell (ten rungs, five each) lie
@@ -6948,8 +6955,8 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     \code{phase\_space\_on\_pool} it should read the training events only.
   \item \textbf{The probes that do not gain.} $ee\to Z\gamma$: par.~\ref{par:nogain} (the gain dips where scratch's
     curve in $D$ is steepest; open: why a fine-tune's curve is smoother, e.g.\ the pretrained net's starting function
-    against scratch's small-norm init at $D\sim10^2$). Rung $6$ against $7$: par.~\ref{par:nogain} (specific to $V$ + massless-boson probes, the same start training
-    $34\times$ against $308\times$; open why). Sudakov arm: par.~\ref{par:nogain} (no transfer of the target, zero-shot $0.1$--$0.5$; per event, the error of
+    against scratch's small-norm init at $D\sim10^2$). Rung $6$ against $7$: par.~\ref{par:nogain} (specific to $V$ + massless-boson probes; rung $7$'s frozen features
+    carry $u\bar u\to Zg$ linearly, rung $6$'s do not). Sudakov arm: par.~\ref{par:nogain} (no transfer of the target, zero-shot $0.1$--$0.5$; per event, the error of
     every arm sits within a factor $10$ of the zero crossings, and the arm's is worse a factor $10$--$30$ away).
   \item \textbf{Progressively larger catalogs of real processes} (the user's call, 2026-10-07; real MadGraph processes,
     not synthetic ones, ``at first at least'', 2026-10-08, D15). Pretrain on $10^2$, $10^{2.5}$ and $10^3$ processes (the
