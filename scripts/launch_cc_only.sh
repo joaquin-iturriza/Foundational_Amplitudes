@@ -22,6 +22,8 @@ echo "$p"
 # unnoticed behind a filtered output, and the scorings were never queued)
 out=$(site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
 echo "$out"
+# CC full for this memory right now (site submit's fit check): defer, the supervisor retries on its next pass
+[ $rc -ne 0 ] && echo "$out" | grep -q "fits NOWHERE now" && { echo "deferred: no node fits ${MEM:-the request} now"; exit 75; }
 [ $rc -eq 0 ] || { echo "LAUNCH FAILED (exit $rc): $NOTE" >&2; exit $rc; }
 echo "$out" | grep -q "run FA-ccin2p3-" || { echo "LAUNCH FAILED (no run id printed): $NOTE" >&2; exit 1; }
 echo "$KEY" >> "$DONE"
