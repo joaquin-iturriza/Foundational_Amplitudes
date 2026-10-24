@@ -1,7 +1,8 @@
 """D83/D99: does a target between the dimensionless one and the emission scales keep the 2->4 gain without the cost on
 the 43 new processes? (par:dimless_qperp: the emission scales take 2->4 from 52 to 2.2 and the 43 new from 0.48 to
 0.75.) The emission scales replace one log s_hat per removed leg by that leg's log q^2; the blend replaces a fraction
-alpha of it (and the same with Lq0, every massive particle at s_hat: feat "m0"):
+alpha of it (and the same with Lq0, every massive particle at s_hat: feat "m0"; with Lqs, each step's scale
+q^2 s_hat / (q^2 + s_hat), saturating at s_hat for every particle alike: feat "sat"):
     blend(alpha) = y + (1 - alpha) (N - 4) log s_hat + alpha Lq,     alpha = 0 the DlessInOrd target, 1 the DlessInOrdQ one
 both with the coupling orders divided out. Exact per process from the means and covariances of norm_targets_stats.json
 (the blend is linear in them). Read with norm_targets.py's three proxies (range, the composition level model, the
@@ -24,9 +25,9 @@ ALPHAS = (0.0, 0.25, 0.5, 0.75, 1.0)
 
 
 def blend(r, alpha, ord_, col=6):
-    """col 6: Lq (the emission scales); col 7: Lq0 (the same with every massive particle at s_hat)"""
+    """col 6: Lq (the emission scales); 7: Lq0 (every massive particle at s_hat); 8: Lqs (each step saturating at s_hat)"""
     m, C, N = np.array(r["mean"]), np.array(r["cov"]), r["N"]
-    a = np.array([1, (1 - alpha) * (N - 4), 0, 0, 0, 0, 0, 0], float); a[col] = alpha
+    a = np.zeros(len(m)); a[0] = 1; a[1] = (1 - alpha) * (N - 4); a[col] = alpha
     q, e = ord_
     return float(a @ m) - q * np.log(4 * np.pi * A_S) - e * np.log(4 * np.pi * A_EM), float(a @ C @ a)
 
@@ -57,10 +58,10 @@ def main():
     kin = lambda k: float(rows[k]["mean"][6] - (rows[k]["N"] - 4) * rows[k]["mean"][1])
     res = {}
     for al, feat in ([(x, "comp") for x in ALPHAS] + [(x, "comp+kin") for x in (0.0,)]
-                     + [(x, "m0") for x in ALPHAS[1:]]):
+                     + [(x, "m0") for x in ALPHAS[1:]] + [(x, "sat") for x in ALPHAS[1:]]):
         X_of = (lambda k: np.r_[comp(rows[k]["pdg"]), kin(k)]) if feat == "comp+kin" else (lambda k: comp(rows[k]["pdg"]))
         Xtr = np.array([X_of(k) for k in tr])
-        b = {k: blend(rows[k], al, orders(*k), 7 if feat == "m0" else 6) for k in rows}
+        b = {k: blend(rows[k], al, orders(*k), {"m0": 7, "sat": 8}.get(feat, 6)) for k in rows}
         ytr = np.array([b[k][0] for k in tr])
         lo, med, hi = ytr.min(), np.median(ytr), ytr.max()
         iqr = np.subtract(*np.quantile(ytr, [0.75, 0.25]))

@@ -990,6 +990,20 @@ $43$ new processes (solid) and the one-loop pools (dashed). One seed each.}
 \label{fig:qperp_ab}
 \end{figure}
 
+\paragraph{Where the cost on the new processes comes from (D83, at home, 2026-10-24).}\label{par:qperp_cost} The
+composition proxy of par.\ \ref{par:dimless_qperp}'s neighbours (\code{analysis/catalog\_daniel/norm\_blend.py}) puts the
+dimensionless target and the emission scales on the $43$ new processes at $0.48$ and $3.3$ and on the $+g$ probes at $9.4$
+and $1.7$, the GPU A/B's order on both sets, and every mixture $\hat s^{1-\alpha} q^{2\alpha}$ in between ($\alpha=0.25$, $0.5$,
+$0.75$) trades one for the other monotonically: no mixture keeps both. The cost is not spread over the $43$. Split by final
+state, the $20$ whose finals are all massive bosons ($WWW$, $ZZZ$, $ZHH$, ...) go from $0.08$ to $3.5$, a bias of $-1.6$
+in the log, while the other $23$ \emph{gain} ($2.2\to1.35$). Two generic repairs leave it: a step's scale saturating at
+$\hat s$, $q^2\hat s/(q^2+\hat s)$ (all bosons $3.3$, others $1.37$; a hard massive boson's $q^2$ is still far below
+$\hat s$, $\log q^2/\hat s\approx-2.5$ on these finals), and every massive particle at $\hat s$ ($11$ and $4.1$: it shifts the
+level of every training process with a $W$, $Z$, $H$ or top, so the composition model's boson coefficients move for
+all of them). Giving the level model each pool's label-free mean of $L_q-(N-4)\log\hat s$ as an input makes the new
+processes worse ($5.6$) and the $+g$ probes as good as the emission scales ($2.2$). The open question is therefore the
+massive boson as an emitter: its $q^2$ carries $m^2$, so an all-boson final looks like a chain of soft emissions it is not.
+
 \paragraph{The $\sigma$ head on the held-out processes (2026-10-22).} The per-event $\sigma$ of the het loss, read on
 the $139$ held-out processes (\code{tools/zero\_shot\_parent.py} now saves it;
 \code{analysis/catalog\_daniel/catalog\_sigma\_heldout.py}; pulls $(q-t)/\sigma$ in
