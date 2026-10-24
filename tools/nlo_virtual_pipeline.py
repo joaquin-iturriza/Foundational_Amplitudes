@@ -507,10 +507,10 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts)
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
-    # catalog_v3 (_v3): the shift belongs to massive QUARKS only, half the pair formula per massive final quark (one
-    # t t~ pair = the eett-validated value). The line above takes the first massive final of any kind (a W, Z, H or
-    # tau too); it shaped catalog_v2's one-loop pools, which keep it so their stored targets stay reproducible.
-    v3_quarks = [m for p, m in zip(pdg[2:], m_finals) if abs(int(p)) in (5, 6) and m and m > 0] if cfg.get("_v3") else None
+    # catalog_v3 (_v3): no shift; the pools store MadLoop's own finite part (the user, 2026-10-24: "Just do whatever is
+    # correct and simpler"). The line above takes the first massive final of any kind (a W, Z, H or tau too); it
+    # shaped catalog_v2's one-loop pools.
+    v3 = bool(cfg.get("_v3"))
 
     sa = virt_standalone_dir(process)
     restore_stale_card(os.path.join(sa, "Cards", "param_card.dat"))
@@ -561,8 +561,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return 0.0, False
         if not mass_shift:
             shift = 0.0
-        elif v3_quarks is not None:
-            shift = 0.5 * sum(C.heavy_quark_scheme_shift(s, m) for m in v3_quarks)
+        elif v3:
+            shift = 0.0
         else:
             shift = C.heavy_quark_scheme_shift(s, heavy_m)
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
@@ -602,7 +602,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     np.save(out_file, arr)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
           f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional/wrong pole)={bad}  "
-          f"mass_shift={('on(quarks %s)' % v3_quarks if v3_quarks else 'off') if v3_quarks is not None else ('on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off')}")
+          f"mass_shift={'off (catalog_v3)' if v3 else ('on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off')}")
     return out_file
 
 
