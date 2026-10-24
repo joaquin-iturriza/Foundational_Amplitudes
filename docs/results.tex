@@ -5854,7 +5854,18 @@ in $[1.0, 9.9]\times10^{-3}$ and the best stops at $14\%$ and $64\%$ (\code{data
 From $D=10^{2.5}$ up scratch's optimum moves into the fine-tune window ($7.7\times10^{-4}$, $1.1\times10^{-3}$) and the gain
 returns. So the dip may be the search window, not the pretraining: the test is one fine-tune search on $ee\to Z\gamma$ at
 $D=10^{1.5}$, $10^2$ with the learning-rate window lowered to scratch's (DyHPO, single fidelity, $\sim0.5$ GPU-h; the
-user's go).
+user's go). Fig.~\ref{fig:nogain}.
+
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/transfer/figs/nogain.pdf}
+\caption{Where fine-tuning does not gain. (a) The median gain over the ten pretrainings, $\log_{10}$ of scratch's
+best over the fine-tune's, against scratch's drop into the cell from the half-decade of $D$ before, over the $72$
+probe and $D$ cells of the $8$k grid (\code{analysis/transfer/nogain.py}). (b) $ee\to Z\gamma$: the learning rate
+of the best trial per $D$, scratch's and the median over the ten rungs' fine-tunes, with the range every fine-tune
+trial searched (\code{nogain\_fig.py}).}
+\label{fig:nogain}
+\end{figure}
 The electroweak-Sudakov arm on the electroweak one-loop $ee\to d\bar d$ (\code{data/nogain\_arms.json}): scratch,
 rung $1$ and the arm stay within $1.5\times$ of each other at every $D$ but one ($10^3$, the arm $2\times$ below), and all
 three flatten between $D=10^2$ and $10^{2.5}$ ($7.6$ to $8.5\times10^{-3}$ for scratch). The arm's first validation on the
