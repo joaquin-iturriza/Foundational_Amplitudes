@@ -359,6 +359,7 @@ def init_data_recipes_mmap(exp, c):
         "per_dataset": bool(c["per_dataset"]),
         "base_trafos": list(cfg.data.amp_trafos),
         "signedlog_quantile": exp._signedlog_quantile(),
+        "signedlog_scale_shift": exp._signedlog_scale_shift(),
         "shared_standardization": bool(cfg.data.get("shared_standardization", False)),
         "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
         "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),

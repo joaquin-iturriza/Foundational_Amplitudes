@@ -619,7 +619,8 @@ class AmplitudeExperiment(BaseExperiment):
         # (e.g. virtual corrections / virt-born ratios). Store the resolved list back
         # on the config so the inverse (undo_preprocess_amplitude) uses the same one.
         amp_trafos = resolve_amp_trafos(self.cfg.data.amp_trafos, all_amplitudes_raw,
-                                        scale_quantile=self._signedlog_quantile())
+                                        scale_quantile=self._signedlog_quantile(),
+                                        scale_shift=self._signedlog_scale_shift())
         self.cfg.data.amp_trafos = amp_trafos
         LOGGER.info(
             f"Preprocessing amplitudes globally using trafos={amp_trafos}"
@@ -1528,6 +1529,12 @@ class AmplitudeExperiment(BaseExperiment):
             assert _tp_stats == _tp_cfg, (
                 f"frozen data stats were fitted with target_propagators={_tp_stats}, "
                 f"this run sets {_tp_cfg}")
+            # the signed-log scale's shift (stats written before the key were fitted without one): a mismatch would
+            # read the frozen signedlog strings under one convention and refit a probe's own under another
+            _ss_stats = float(stats.get("signedlog_scale_shift", 0.0) or 0.0)
+            assert abs(_ss_stats - self._signedlog_scale_shift()) < 1e-12, (
+                f"frozen data stats were fitted with signedlog_scale_shift={_ss_stats}, "
+                f"this run sets {self._signedlog_scale_shift()}")
             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
             if ft_path is not None and not self.warm_start:
                 # the off-shellness input's column stats, kept so the backbone reads a propagator's
@@ -2099,6 +2106,8 @@ class AmplitudeExperiment(BaseExperiment):
             with open_dict(self.cfg):
                 self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
         q = self._signedlog_quantile()
+        shift = self._signedlog_scale_shift()
+        _abslog = self._sign_head or bool(self.cfg.data.get("signed_abslog", False))
         # data.signed_abslog changes a signed pool's target to log max(|x|, s) with no sign output: a scoring-only read
         # (tools/zero_shot_parent.py --signed-magnitude), never a training target
         assert not (self.cfg.data.get("signed_abslog", False) and self.cfg.get("train", True)), \
@@ -2114,7 +2123,7 @@ class AmplitudeExperiment(BaseExperiment):
                          else np.concatenate([all_roles(n) for n in names], axis=0))
             amp_trafos = resolve_amp_trafos(
                 base_trafos, sign_data if global_min is not None and global_min > 0 else _train_raw(),
-                scale_quantile=q, sign_data=sign_data)
+                scale_quantile=q, sign_data=sign_data, scale_shift=shift)
             if per_dataset:
                 self._amp_trafos_pp = [
                     resolve_amp_trafos(base_trafos, get_amp("train", n),
@@ -2122,7 +2131,10 @@ class AmplitudeExperiment(BaseExperiment):
                                        # data.signed_abslog (scoring only, tools/zero_shot_parent.py --signed-magnitude):
                                        # a signed pool read as log|M| ('abslog'), as with the sign head, but no sign
                                        # output is added, so a model without one can be scored on the magnitude
-                                       sign_head=self._sign_head or bool(self.cfg.data.get("signed_abslog", False)))
+                                       sign_head=_abslog,
+                                       # data.signedlog_scale_shift moves the signedlog scale only; abslog's floor
+                                       # stays at its quantile
+                                       scale_shift=0.0 if _abslog else shift)
                     for n in names]
         elif per_dataset and amp_trafos_pp:          # frozen stats: reload as stored
             assert len(amp_trafos_pp) == len(names), (
@@ -2362,6 +2374,7 @@ class AmplitudeExperiment(BaseExperiment):
                 **({"affine_multiplicity": self._affine_multiplicity}
                    if getattr(self, "_affine_multiplicity", None) else {}),
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
+                "signedlog_scale_shift": self._signedlog_scale_shift(),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
@@ -2382,6 +2395,11 @@ class AmplitudeExperiment(BaseExperiment):
     def _signedlog_quantile(self):
         """Quantile of |x| that sets the signed-log scale (data.signedlog_quantile)."""
         return float(self.cfg.data.get("signedlog_quantile", SIGNEDLOG_QUANTILE))
+
+    def _signedlog_scale_shift(self):
+        """Shift (nat) of the signed-log scale off its quantile, s -> s exp(shift) (data.signedlog_scale_shift, default
+        0): the signed pools' A/B, r0 three nats below the pool's level (docs/results.tex, the candidate targets)."""
+        return float(self.cfg.data.get("signedlog_scale_shift", 0.0) or 0.0)
 
     def _init_dataloader(self):
         from dataset import (AmplitudeDataset, collate_variable_length, ProcessBalancedSampler,

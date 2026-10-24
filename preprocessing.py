@@ -8,7 +8,7 @@ SIGNEDLOG_QUANTILE = 0.01   # default scale: the 1% quantile of |x| on the train
 
 
 def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sign_data=None,
-                       sign_head=False):
+                       sign_head=False, scale_shift=0.0):
     """Swap 'log' -> 'signedlog:<s>' when the amplitude contains non-positive values.
 
     Plain log is undefined for x <= 0 (e.g. virtual corrections or virt/born ratios
@@ -29,6 +29,9 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sig
     `sign_head=True` resolves a signed pool to 'abslog:<s>' instead, f(x) = log(max(|x|, s)):
     the magnitude alone, with the sign carried by a separate classification target
     (training.sign_head); the inverse returns |x| and the caller applies the sign.
+    `scale_shift` (nat, data.signedlog_scale_shift) moves a signedlog scale off its quantile, s -> s exp(shift):
+    the signed pools' A/B (docs/results.tex, the candidate targets: r0 three nats below the pool's level, shift -3);
+    the shifted s is what the transform string carries, so the inverse and frozen stats need nothing else.
     """
     if not trafos or "log" not in trafos:
         return list(trafos) if trafos else trafos
@@ -41,6 +44,9 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sig
     s = float(np.quantile(a, scale_quantile)) if a.size else 1.0
     if not np.isfinite(s) or s <= 0.0:
         s = 1.0
+    # the abslog floor is the sign head's own convention (its 1% quantile): a shift there would be another design
+    assert not (sign_head and scale_shift), "scale_shift is for the signedlog target, not the sign head's abslog floor"
+    s *= float(np.exp(scale_shift))
     kind = "abslog" if sign_head else "signedlog"
     return [f"{kind}:{s:.6e}" if t == "log" else t for t in trafos]
 
