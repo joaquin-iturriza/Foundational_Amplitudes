@@ -7177,6 +7177,18 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
+  \item \textbf{State (2026-10-25, 19:00).} Running on CC: the pp study's five runs (the four window-trained arms
+    read on the $13$\,TeV pp test set, FA-ccin2p3-1b299199, -1c960b22, -4b1aabad, -81e14672; the pp-trained short
+    pretraining, FA-ccin2p3-e786bd74, whose pp read fires when it ends); all $1396$ pp processes' pools, $\alpha_s$
+    sidecars and diagram files checked on CC (\code{tools/check\_pp\_pools.py}, $0$ problems); the $\hat s$-only short
+    pretraining (FA-ccin2p3-fbd73961, the preprocessing exploration's next read); rung $6$'s hp15 rerun
+    (FA-ccin2p3-2ed18ab8). The small-$D$ fine-tuning DyHPO round (approved 2026-10-25, ``Yes, send them.'', about
+    $33$ GPU-h): its $180$ sweeps generated (FA-ccin2p3-cf864a9e), being submitted under the small-$D$ item, counted in
+    \code{analysis/transfer/expect\_tp3.json}. The scratch lr window no longer uses the square-root batch rule: it is
+    centred on the measured surface at each cell's steps and $D$ (Sec.~\ref{sec:ladder} protocol). The setup redesign
+    (approved with step agents 2026-10-25, ``Yes, the step agents and everything else you said sounds good''): code
+    review passed (branch at \code{9ce1cb1}, merges cleanly), two low fixes in progress, then
+    \code{tools/switch\_over.sh}, done-checks for every entry and the CLAUDE.md pass.
   \item \textbf{State (2026-10-25, 07:35).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
     untouched until the user says). Written up today: the four short pretrainings read on every axis
     (Tab.~\ref{tab:v3_short}), the factorised $2\to4$ check on $880$ classes and the $2\to5$ probes with exact and
