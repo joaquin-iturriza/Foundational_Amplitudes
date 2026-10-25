@@ -80,6 +80,20 @@ def hybrid_cp(P):
     return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
 
 
+def hybrid_blend(P, cp, lam):
+    """data.target_physics_hybrid_blend's term of one process (the user 2026-10-25, "run those two pretrainings blending
+    emission scales"): lam times the per-event emission-scale term Lq - (N - 4) log s_hat minus its process mean c_p
+    (hybrid_cp over the process's own training events, or the frozen stats' c_p), added to the hybrid target's log
+    factor. lam = 0 is the hybrid, lam = 1 the emission-scale target (c_p cancels there, whichever
+    events it was fitted on). P: (n, N, 4) momenta in GeV. Returns (n,)."""
+    pp = np.asarray(P, dtype=np.float64)
+    if float(lam) == 0.0:
+        return np.zeros(pp.shape[0])
+    q = pp[:, 0] + pp[:, 1]
+    ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
+    return float(lam) * (qperp_logs(pp) - (pp.shape[1] - 4) * ls - float(cp))
+
+
 def hybrid_cps(names, events, frozen=None):
     """The constants c_p of a run's processes: a process whose c_p the frozen data stats carry (data_stats.json's
     target_physics_hybrid_cp: a fine-tune's parent, a resumed run's own) keeps it, so a fine-tune onto a process its

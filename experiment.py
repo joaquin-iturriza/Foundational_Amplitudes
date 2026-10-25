@@ -1550,13 +1550,15 @@ class AmplitudeExperiment(BaseExperiment):
             # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
             if _pf_cfg:
                 for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_orders", False),
-                               ("target_physics_hybrid", False), ("target_physics_s0", 289.0),
+                               ("target_physics_hybrid", False), ("target_physics_hybrid_blend", 0.0),
+                               ("target_physics_s0", 289.0),
                                ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None),
                                ("target_physics_alpha_inv", 132.507)):
                     # stats written before the key were fitted at its default
                     _a, _b = stats.get(_k, _d), self.cfg.data.get(_k, _d)
                     _same = (abs(float(_a) - float(_b)) < 1e-9 * max(1.0, abs(float(_a)))
-                             if _k in ("target_physics_s0", "target_physics_alpha_inv") else str(_a) == str(_b))
+                             if _k in ("target_physics_s0", "target_physics_alpha_inv", "target_physics_hybrid_blend")
+                             else str(_a) == str(_b))
                     assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
             # the momentum scale of these stats is in GeV or in units of each event's sqrt(s_hat)
             _di_stats = bool(stats.get("dimensionless_inputs", False))
@@ -2379,10 +2381,20 @@ class AmplitudeExperiment(BaseExperiment):
         # data.target_physics_hybrid (D129, the user 2026-10-25): the s_hat target plus the process's constant c_p
         # (_physics_hybrid_cp, fitted on its own momenta in init_data before any factor is applied)
         lcp = 0.0
+        assert float(self.cfg.data.get("target_physics_hybrid_blend", 0.0)) == 0.0 or \
+            bool(self.cfg.data.get("target_physics_hybrid", False)), \
+            "target_physics_hybrid_blend: a blend of the hybrid target, needs data.target_physics_hybrid=true"
         if bool(self.cfg.data.get("target_physics_hybrid", False)):
             assert str(ref) == "shat" and n_eik == 0, "target_physics_hybrid: the s_hat reference, no eikonal factor"
             assert name in getattr(self, "_phys_cp", {}), f"target_physics_hybrid: no constant for {name}"
             lcp = self._phys_cp[name]
+            # data.target_physics_hybrid_blend (the user 2026-10-25, "run those two pretrainings blending emission
+            # scales"): lambda times the per-event emission-scale term minus its process mean c_p; 0 (default) is the
+            # hybrid, 1 the emission-scale target (physics_scales.hybrid_blend)
+            _lam = float(self.cfg.data.get("target_physics_hybrid_blend", 0.0))
+            if _lam != 0.0:
+                from physics_scales import hybrid_blend
+                lcp = lcp + hybrid_blend(mom_phys, self._phys_cp[name], _lam)
         # the eikonal factors carry mass dimension -2 each, so the dimension factor's power grows by one per factor
         return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name]) + lcp
 
@@ -2453,6 +2465,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
                 "target_physics_hybrid": bool(self.cfg.data.get("target_physics_hybrid", False)),
                 "target_physics_hybrid_cp": getattr(self, "_phys_cp", None) or None,
+                "target_physics_hybrid_blend": float(self.cfg.data.get("target_physics_hybrid_blend", 0.0)),
                 "target_physics_alpha_inv": float(self.cfg.data.get("target_physics_alpha_inv", 132.507)),
                 "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
                 "dimless_mass_stats": getattr(self, "_dimless_mass_stats", None),

@@ -25,11 +25,12 @@
 # on the MSE with the arithmetic mean over processes (the sign head is not wired into the het loss): one loss for all.
 #   dimensionless_shat     the same with s_hat alone as the target's reference scale (the shape proxy's candidate)
 #   dimensionless_hybrid   the s_hat target plus a per-process constant from the events' momenta (the hybrid reference scale)
+#   dimensionless_blend050, dimensionless_blend025   the hybrid target plus 0.5 / 0.25 of the emission-scale term minus its process mean
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
+ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -50,6 +51,13 @@ case "$ARM" in
     # (experiment._physics_hybrid_cp), so the shape within a process is the s_hat arm's and the class mean the
     # emission-scale arm's; everything else as the dimensionless arm
     dimensionless_hybrid)  NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}" ++data.target_physics_hybrid=true) ;;
+    # the blend of the hybrid and the emission scales (the user 2026-10-25, "run those two pretrainings blending
+    # emission scales"): the hybrid target plus lambda times the per-event emission-scale term minus its process mean
+    # (physics_scales.hybrid_blend); lambda 0 is the hybrid arm, 1 the dimensionless arm's target
+    dimensionless_blend050) NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}" ++data.target_physics_hybrid=true
+                                  ++data.target_physics_hybrid_blend=0.5) ;;
+    dimensionless_blend025) NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}" ++data.target_physics_hybrid=true
+                                  ++data.target_physics_hybrid_blend=0.25) ;;
     dimensionless_twin)    NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_twin_train.yaml" ;;
     # the pp study: the same target trained with every hadronic tree class on 13 TeV MadEvent pp events in place of its
     # shaped window (recipes/catalog_v3_pp_mixed_train.yaml; the other pools as in catalog_v3_train.yaml)
