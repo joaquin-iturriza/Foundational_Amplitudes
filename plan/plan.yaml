@@ -1,5 +1,5 @@
 # The plan: the only source of truth for open work. Edit through tools/plan.py.
-migrated_at: '2026-10-25T17:01:52+00:00'
+migrated_at: '2026-10-25T17:28:54+00:00'
 entries:
 - status: running
   quotes:
@@ -7,6 +7,11 @@ entries:
     text: this should be done in parallel to what we are doing, build it, run a few checks, and from that we decide if we
       switch or keep what we are doing
     decision: D117
+    covers:
+    - pp-beam sampling for catalog_v3
+    - 'in parallel: a PDF-weighted sqrt(s_hat) draw in the sampler (the mixture''s partonic shaping kept)'
+    - validated against MadEvent; pp-sampled test pools; the window-trained models scored on them; a pp-trained short pretraining
+      for comparison; then the user decides
   decisions:
   - D117
   next: 'CPU: PDF draw in the sampler, validation against MadEvent on a few processes, pp test pools for the held-out and
@@ -37,6 +42,11 @@ entries:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
     decision: D83
+    covers:
+    - catalog pretraining at hp58's configuration with normalization A (per-event factor s_hat^(4-N) C_p + one shared standardization)
+      and B (one shared standardization)
+    - and their held-out zero-shot
+    - CPU iteration on the catalog normalization
   decisions:
   - D83
   next: 'the context arm''s K-shot fits and the factorised head''s data check on its 2\to4 classes with an added Z, W, H or
@@ -85,6 +95,22 @@ entries:
   - said_at: '2026-10-25T14:50:51.032Z'
     text: Okay, go ahead then
     decision: D120
+    covers:
+    - the small-D fine-tuning study
+    - 'first round as proposed 2026-10-25 (hand-off entry Fine-tuning at small D): methods default full retraining with layer
+      decay'
+    - frozen read-out
+    - linear probe then fine-tune
+    - fine-tune pulled toward the start (L2-SP or EWC)
+    - frozen lower blocks
+    - per-cell choice; D=10
+    - 10^1.5
+    - 10^2
+    - 10^2.5; ee_Za
+    - ee_dd
+    - ud_ud and two gaining probes; rungs 1
+    - '7'
+    - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
   next: single-fidelity DyHPO for the methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared
@@ -168,6 +194,9 @@ entries:
     text: we want this for the largest D, do one showing all rungs for the ladder, and one showing the same ones we are showing
       in the scaling plots
     decision: D42
+    covers:
+    - 'Delta plots (arXiv:2603.22407 style) at each probe''s largest D: all ladder rungs; the scaling-plot arms; the star
+      arms'
   decisions:
   - D42
   next: 'Delta plots: re-evaluate 179 best checkpoints (ladder, rung_focus/finale_synth, star arms at d8) on their test split,
@@ -198,10 +227,18 @@ entries:
     text: About the zero shot "on it's own" we concluded that having a global preprocessing was the way if we wanted to do
       this
     decision: D77
+    covers:
+    - catalog pretraining at hp58 with global target preprocessing (shared + affine in N)
+    - 32k
+    - ~5 h
+    - then held-out zero-shot on its own
   - said_at: '2026-10-21T23:44:55.954Z'
     text: stop the sweep extension and the global preprocessing for the big catalog for now, I want to design something more
       clever first for the preprocessing
     decision: D78
+    covers:
+    - catalog_global
+    - dancat_ext
   decisions:
   - D77
   next: '1 GPU job on CC: hp58''s config retrained 32k steps (~5 h on a V100) with one pooled normalization and the mean linear
@@ -225,14 +262,33 @@ entries:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
     decision: D83
+    covers:
+    - catalog pretraining at hp58's configuration with normalization A (per-event factor s_hat^(4-N) C_p + one shared standardization)
+      and B (one shared standardization)
+    - and their held-out zero-shot
+    - CPU iteration on the catalog normalization
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D113
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - qperp_soft
+    - signed_ab
+    - f24
+    - f24net
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D114
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - f24
+    - f24net
+    - qperp_soft
+    - signed_ab
   decisions:
   - D83
   next: catalog pretraining at hp58's config and HPs under normalization A and B (2 runs, ~5.5 GPU-h each, CC V100) + the
@@ -256,10 +312,18 @@ entries:
   - said_at: '2026-10-21T23:24:23.505Z'
     text: Yes, the lr window should be widened and a few more runs added to that sweep
     decision: D76
+    covers:
+    - 'dancat_het_pre: lr window to [1e-3'
+    - 2.7e-2]
+    - 4 more trials (waves 2+2)
+    - ~20 GPU-h on CC
   - said_at: '2026-10-21T23:44:55.954Z'
     text: stop the sweep extension and the global preprocessing for the big catalog for now, I want to design something more
       clever first for the preprocessing
     decision: D78
+    covers:
+    - catalog_global
+    - dancat_ext
   decisions:
   - D76
   next: 4 more trials of dancat_het_pre (32k steps, ~5 h each on one V100, ~20 GPU-h on CC), lr window widened from [1e-3,
@@ -283,9 +347,18 @@ entries:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: separate the amplitude into the amplitude of each diagram that contributes
     decision: D48
+    covers:
+    - 'decomposed targets: per-diagram or per-pairing (as in real amplitude calculations) parts of the amplitude'
+    - design for loops; investigate how it is done; parallel
+    - below the catalog
   - said_at: '2026-10-15T12:58:09.482Z'
     text: Items whose design we agreed to iterate on stop at the design and come to me before any job
     decision: D66
+    covers:
+    - decomp
+    - loops
+    - nonsm
+    - threephase
   decisions:
   - D48
   next: 'decomposed targets: per-diagram / per-pairing parts of |M|^2 as training targets; design (incl. loops), CPU validation,
@@ -309,14 +382,32 @@ entries:
   - said_at: '2026-10-23T18:16:01.241Z'
     text: yes, you are allowed to do the gpu tests once something looks promising
     decision: D99
+    covers:
+    - short GPU tests (one seed
+    - the D93 round's short setup) of preprocessing candidates that pass the CPU proxy (D83 plan step 1 onwards)
+    - up to 10 GPU-h in all without asking each
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D113
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - qperp_soft
+    - signed_ab
+    - f24
+    - f24net
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D114
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - f24
+    - f24net
+    - qperp_soft
+    - signed_ab
   decisions:
   - D99
   next: short catalog design runs with the first candidate through the CPU proxy, DlessInOrdQ (DlessInOrd with the Lorentz-invariant
@@ -345,9 +436,16 @@ entries:
     text: Finish the transfer study's "Plan to finish" in docs/results.tex (sec:ladder-open), in order, without stopping to
       ask; every compute item is approved
     decision: D1
+    covers:
+    - the transfer study's Plan to finish
+    - steps 1-6
+    - the affine zero-shot plot
+    - a globally preprocessed pretraining
   - said_at: '2026-10-07T12:50:53.632Z'
     text: Okay, this is put on hold also, until further notice, continue with the rest of the plan
     decision: D13
+    covers:
+    - eqd
   decisions:
   - D1
   next: pretrainings done; fine-tune grids (8k and 32k) of rungs 2-9
@@ -369,14 +467,33 @@ entries:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
     decision: D83
+    covers:
+    - catalog pretraining at hp58's configuration with normalization A (per-event factor s_hat^(4-N) C_p + one shared standardization)
+      and B (one shared standardization)
+    - and their held-out zero-shot
+    - CPU iteration on the catalog normalization
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D113
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - qperp_soft
+    - signed_ab
+    - f24
+    - f24net
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D114
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - f24
+    - f24net
+    - qperp_soft
+    - signed_ab
   decisions:
   - D83
   next: one CPU job on CC, tools/factorised_2to4.py on the 40 2->4 probes, 2000 val events each, parent |M|^2 at CS initial-initial
@@ -400,14 +517,32 @@ entries:
   - said_at: '2026-10-23T18:16:01.241Z'
     text: yes, you are allowed to do the gpu tests once something looks promising
     decision: D99
+    covers:
+    - short GPU tests (one seed
+    - the D93 round's short setup) of preprocessing candidates that pass the CPU proxy (D83 plan step 1 onwards)
+    - up to 10 GPU-h in all without asking each
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D113
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - qperp_soft
+    - signed_ab
+    - f24
+    - f24net
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D114
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - f24
+    - f24net
+    - qperp_soft
+    - signed_ab
   decisions:
   - D99
   next: 'one GPU job on CC, tools/factorised_2to4_net.py: DlessInOrdQc''s prediction of each 2->4 probe''s parent on its 2000
@@ -432,10 +567,17 @@ entries:
     text: Finish the transfer study's "Plan to finish" in docs/results.tex (sec:ladder-open), in order, without stopping to
       ask; every compute item is approved
     decision: D1
+    covers:
+    - the transfer study's Plan to finish
+    - steps 1-6
+    - the affine zero-shot plot
+    - a globally preprocessed pretraining
   - said_at: '2026-10-06T20:34:16.653Z'
     text: Okay, put on hold the 32k runs for now, let's continue with other things, I don't believe they are really needed
       at this point, resume them only when I say
     decision: D12
+    covers:
+    - horizon32k
   decisions:
   - D1
   next: the ladder's 32k fine-tunes (rungs 1-9, scratch, ee->uu 64k) at their chosen points, D up to 10^5
@@ -457,9 +599,16 @@ entries:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: What is still unexplored is loops, so this should be investigated a bit
     decision: D44
+    covers:
+    - 'synthetic one-loop amplitudes: a small investigation (priority above the 3-phase test)'
   - said_at: '2026-10-15T12:58:09.482Z'
     text: Items whose design we agreed to iterate on stop at the design and come to me before any job
     decision: D66
+    covers:
+    - decomp
+    - loops
+    - nonsm
+    - threephase
   decisions:
   - D44
   next: 'synthetic one-loop amplitudes, a small investigation: design, CPU validation, a few small runs (<10 GPU-h)'
@@ -481,9 +630,16 @@ entries:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: Use non SM lagrangians (less important)
     decision: D49
+    covers:
+    - non-SM Lagrangians as training data; less important
   - said_at: '2026-10-15T12:58:09.482Z'
     text: Items whose design we agreed to iterate on stop at the design and come to me before any job
     decision: D66
+    covers:
+    - decomp
+    - loops
+    - nonsm
+    - threephase
   decisions:
   - D49
   next: 'non-SM Lagrangians as training data (less important): which models, generation, a first small pretraining test'
@@ -505,14 +661,32 @@ entries:
   - said_at: '2026-10-23T18:16:01.241Z'
     text: yes, you are allowed to do the gpu tests once something looks promising
     decision: D99
+    covers:
+    - short GPU tests (one seed
+    - the D93 round's short setup) of preprocessing candidates that pass the CPU proxy (D83 plan step 1 onwards)
+    - up to 10 GPU-h in all without asking each
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D113
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - qperp_soft
+    - signed_ab
+    - f24
+    - f24net
   - said_at: '2026-10-24T22:52:11.753Z'
     text: for now on and until I say, we won't touch daniel's catalog and the extra held out probes we made for it for this
       preprocessing study, we focus on the richer new catalog
     decision: D114
+    covers:
+    - catalog_norm
+    - dimless_kt
+    - f24
+    - f24net
+    - qperp_soft
+    - signed_ab
   decisions:
   - D99
   next: 'GPU: DlessInOrdQs short run (~1 GPU-h) and its 2to4 scoring (~0.3 GPU-h) on CC; CPU: the pool stats with Lqt'
@@ -535,9 +709,16 @@ entries:
     text: Finish the transfer study's "Plan to finish" in docs/results.tex (sec:ladder-open), in order, without stopping to
       ask; every compute item is approved
     decision: D1
+    covers:
+    - the transfer study's Plan to finish
+    - steps 1-6
+    - the affine zero-shot plot
+    - a globally preprocessed pretraining
   - said_at: '2026-10-07T14:01:14.941Z'
     text: I told you we wont do anything with them until I tell you again
     decision: D14
+    covers:
+    - seeds
   decisions:
   - D1
   next: seed batches (scripts/job_seed_batch.sh) over the 8k cells
@@ -559,6 +740,17 @@ entries:
   - said_at: '2026-10-25T15:19:48.322Z'
     text: All sounds good, the only thing I don't understand is what do you mean
     decision: D121
+    covers:
+    - 'the setup redesign of 2026-10-25: one plan file as the only source of truth'
+    - plan answer
+    - one owner agent per running entry with heartbeats and plan dispatch
+    - one plan check stop guard replacing the four idle-work guards
+    - keep the correctness guards
+    - reply check narrowed to questions answered
+    - site fixes
+    - plan printed at session start
+    - CLAUDE.md pass with the incident notes removed and its reviewer run; built and tested in a worktree
+    - switched when the failure scenarios pass
   decisions:
   - D121
   next: 'local only: build in worktrees/wt-setup, the plan tool and guard, site fixes on a copy, CLAUDE.md pass, scenario
@@ -581,9 +773,25 @@ entries:
   - said_at: '2026-10-23T02:46:51.647Z'
     text: Other wise, yes, archive and delete what you proposed before
     decision: D96
+    covers:
+    - 'storage: delete the tests and smokes (my_sweep_name'
+    - lloca_test
+    - tp_smoke
+    - sign_smoke
+    - zz_smoke
+    - zz_test; tmp zz_memmap_test60
+    - zz_step_profile_*); archive the pre-September lxplus-era families (scaling_solo_*
+    - DyPHO_sweep_test*
+    - lloca_lr*
+    - lloca_ee*
+    - finetune_eeuu*
+    - many_datasets*) to Jean Zay STORE and remove them from CC; models of kept families removed only when a study is concluded
+    - never for a run that took more than 5 h to train
   - said_at: '2026-10-24T14:35:37.643Z'
     text: can't fix jeanzay right now, so this will wait
     decision: D122
+    covers:
+    - storage
   decisions:
   - D96
   next: delete 12 test and smoke dirs (5.0 GB); archive 50 pre-September lxplus-era dirs (30.6 GB) to Jean Zay STORE as tars,
@@ -607,9 +815,19 @@ entries:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: it would be interesting to split the training into 3 phases
     decision: D46
+    covers:
+    - 'three-phase test: synthetic until fine-tune benefit saturates'
+    - then real data for fewer steps/less data; a few processes where real data helped most
+    - big cells
+    - no scaling; lowest priority
   - said_at: '2026-10-15T12:58:09.482Z'
     text: Items whose design we agreed to iterate on stop at the design and come to me before any job
     decision: D66
+    covers:
+    - decomp
+    - loops
+    - nonsm
+    - threephase
   decisions:
   - D46
   next: 'three-phase training test (lowest priority): synthetic, then real data, a few processes where real data helped most'

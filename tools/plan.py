@@ -18,7 +18,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan answer <id> --kind K --quote Q [--set title|question|next=V]   the user's words: typed after the entry's last
                                           ask or step (after the hold, for a release), then `site decide`, then the
                                           entry; all or nothing
-  plan ask <id> --ask Q | unanswered <id> | step <id> --agent <subagent id> | run <id> RUN...
+  plan ask <id> --ask Q --searched S | unanswered <id> | step <id> --agent <subagent id> | run <id> RUN...
   plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W | set-next <id> T
   plan next [--prompts]                   deterministic: what can move now, with each step agent's exact prompt
   plan done <id> --writeup C [--override-runs WHY]
@@ -756,7 +756,8 @@ def cmd_show(a):
             lr = [r for r, state, fin in runs_of(e, st) if live(state)]
             extra = ("live runs " + ", ".join(lr)) if lr else ("last step %s" % ls.isoformat()[:16] if ls else "no step")
         elif s == "waiting_user":
-            extra = "asked %s: %s" % ((e.get("waiting_since") or "?")[:16], e.get("ask", ""))
+            extra = "asked %s: %s (searched first: %s)" % ((e.get("waiting_since") or "?")[:16], e.get("ask", ""),
+                                                           e.get("searched") or "not recorded")
         elif s == "held":
             extra = "held by %s" % e.get("hold_decision")
         print("- [%s] %s (%s): %s" % (s, e.get("title"), e["id"], extra))
@@ -770,6 +771,18 @@ def cmd_show(a):
                 print("    dead end: %s (%s)" % (x["tried"], x["why"]))
 
 
+SEARCHED_MIN = 40             # characters: what was looked for before asking, named, not a token
+
+
+def _searched_ok(searched):
+    """A question goes to the user only once what could settle it was looked for: the CLAUDE.md rules (canonical
+    setup, HPO rules) and the decisions in force (`site decisions --project FA`), and why none settles it. (The lr
+    scalings entry waited three weeks on a question CLAUDE.md's HPO rule 2 and the measured lr surface settled.)"""
+    if len((searched or "").strip()) < SEARCHED_MIN:
+        sys.exit("plan: --searched must say what was looked for before asking (the CLAUDE.md rules and decisions read, "
+                 "and why none settles it), in at least %d characters" % SEARCHED_MIN)
+
+
 def _ask_ok(ask):
     if len(words(ask)) < 3:
         sys.exit("plan: the question needs at least three words of five letters or more, to be found in a message")
@@ -780,6 +793,7 @@ def cmd_add(a):
         sys.exit("plan: an entry starts approved (--decision D<n>, whose covers name it) or as a question (--ask)")
     if a.ask:
         _ask_ok(a.ask)
+        _searched_ok(a.searched)
     with transaction() as (d, st):
         if any(e["id"] == a.id for e in d["entries"]):
             sys.exit("plan: entry %s exists" % a.id)
@@ -799,8 +813,8 @@ def cmd_add(a):
             e["decisions"].append(a.decision)
         else:
             t = now().isoformat()
-            e.update(status="waiting_user", ask=a.ask, waiting_since=t)
-            e["asks"].append({"ask": a.ask, "at": t})
+            e.update(status="waiting_user", ask=a.ask, waiting_since=t, searched=a.searched)
+            e["asks"].append({"ask": a.ask, "at": t, "searched": a.searched})
         d["entries"].append(e)
     print("plan: added %s (%s); set its machine check with plan check" % (a.id, e["status"]))
 
@@ -910,6 +924,7 @@ def answered_asks(d):
 
 def cmd_ask(a):
     _ask_ok(a.ask)
+    _searched_ok(a.searched)
     with transaction() as (d, st):
         e = entry(d, a.id)
         if e.get("status") not in ("running", "waiting_user"):
@@ -920,9 +935,9 @@ def cmd_ask(a):
             sys.exit("plan: already answered: %r on %s, %s (%s); act on that answer" % (
                 x["ask"], o["id"], x["answered_at"][:16], x.get("decision")))
         t = now().isoformat()
-        e.update(status="waiting_user", ask=a.ask, waiting_since=t)
+        e.update(status="waiting_user", ask=a.ask, waiting_since=t, searched=a.searched)
         e.pop("checked_until", None)
-        e.setdefault("asks", []).append({"ask": a.ask, "at": t})
+        e.setdefault("asks", []).append({"ask": a.ask, "at": t, "searched": a.searched})
     print("plan: %s waits on the user from %s" % (a.id, t))
 
 
@@ -1067,7 +1082,8 @@ def render(d):
         st = {"running": "running", "waiting_user": "waiting on the user", "held": "held"}.get(e.get("status"))
         if st:
             body = tex(e.get("question")) + (" Next: " + tex(e["next"]) if e.get("next") else "")
-            body += (" Asked: " + tex(e.get("ask"))) if e.get("status") == "waiting_user" else ""
+            if e.get("status") == "waiting_user":
+                body += " Asked: " + tex(e.get("ask")) + " Searched first: " + tex(e.get("searched") or "not recorded")
             out.append("  \\item \\textbf{%s} (%s). %s" % (tex(e.get("title")), st, body))
     return "\n".join(out + ["\\end{itemize}", END])
 
@@ -1097,13 +1113,13 @@ def main(argv=None):
     cmd("where", cmd_where)
     cmd("show", cmd_show, A("--compact", action="store_true"))
     cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
-        A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"))
+        A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
     cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))
     cmd("check", cmd_check, A("id"), A("--done-when", required=True))
     cmd("ref", cmd_ref, A("id"), A("--label", required=True))
     cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
         A("--set", action="append"))
-    cmd("ask", cmd_ask, A("id"), A("--ask", required=True))
+    cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True))
     cmd("unanswered", cmd_unanswered, A("id"))
     cmd("step", cmd_step, A("id"), A("--agent", required=True))
     cmd("run", cmd_run, A("id"), A("runs", nargs="+"))

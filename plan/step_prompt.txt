@@ -26,8 +26,11 @@ The step
 4. If done_when now passes and the result is written up in docs/results.tex (numbers with their provenance comment,
    `% src: <command> @<commit>` and `% claim: key=value`), commit and run `python3 tools/plan.py done {id} --writeup
    <commit>`.
-5. A call only the user can make: write the question, word for word, in your final message; the main session sends it
-   and runs `plan ask`.
+5. Before asking the user anything, look for what settles it and apply that instead of asking: read CLAUDE.md's
+   canonical run setup and its HPO search-space rules, and `site decisions --project FA` (the user's calls in force).
+   Only a call none of them settles goes to the user: write the question, word for word, in your final message, with
+   what you read and why none settles it; the main session sends it and runs
+   `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"`.
 Rules: CLAUDE.md. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 10 GPU-h only if the user's words above cover it.
 Final message, short: what you did, what you found (numbers), what you recorded, the next step, any question.

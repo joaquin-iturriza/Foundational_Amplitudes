@@ -304,11 +304,12 @@ def questions():
               transcript=[(ago(90), "assistant", "should the small study also run the frozen lower blocks at every rung?")])
     scenario("one sent long before the ask does not", w.check()[0] == 2, w.check()[1])
     w = World([E("lowd")])
-    rc, out = w.plan_cmd("ask", "lowd", "--ask", "ok?")
+    rc, out = w.plan_cmd("ask", "lowd", "--ask", "ok?", "--searched", SEARCHED)
     scenario("an ask with no checkable words is refused", rc != 0, out)
     done = [{"ask": ask, "at": ago(200), "answered_at": ago(100), "decision": "D5"}]
     w = World([E("lowd", asks=done), E("other")])
-    rc, out = w.plan_cmd("ask", "other", "--ask", "Should the small study run the frozen lower blocks at every rung?")
+    rc, out = w.plan_cmd("ask", "other", "--ask", "Should the small study run the frozen lower blocks at every rung?",
+                         "--searched", SEARCHED)
     scenario("plan ask refuses a question already answered", rc != 0 and "already answered" in out, out)
     w = World([E("lowd", asks=done)], state={"lowd": step(1)},
               transcript=[(ago(10), "assistant", "Joaquin, should the small study also run the frozen lower blocks "
@@ -988,8 +989,37 @@ def added_only():
              stale not in left and not os.path.exists(stale), left)
 
 
+SEARCHED = ("CLAUDE.md HPO rule 2 and the canonical setup table, and the decisions in force: none says which of the "
+            "two pools the small study uses")
+
+
+def searched_first():
+    """A question goes to the user only with what was looked for first (the lr scalings entry waited three weeks on
+    a question CLAUDE.md's HPO rule 2 and the measured lr surface settled)."""
+    q = "Should the scratch lr window be re-centred on the measured surface?"
+    w = World([E("lr")])
+    r0 = w.plan_cmd("ask", "lr", "--ask", q)
+    r1 = w.plan_cmd("ask", "lr", "--ask", q, "--searched", "read CLAUDE.md")
+    r2 = w.plan_cmd("add", "lr2", "--title", "t", "--question", "q", "--next", "n", "--match", "lr2*", "--ask", q,
+                    "--searched", "nothing")
+    scenario("plan ask (and plan add --ask) without what was searched first, or with a token note, is refused",
+             r0[0] != 0 and r1[0] != 0 and "--searched" in r1[1] and r2[0] != 0 and w.entries()["lr"]["status"] ==
+             "running" and "lr2" not in w.entries(), r0[1] + r1[1] + r2[1])
+    r3 = w.plan_cmd("ask", "lr", "--ask", q, "--searched", SEARCHED)
+    e = w.entries()["lr"]
+    view, show = w.plan_cmd("view")[1], w.plan_cmd("show")[1]
+    scenario("plan ask with what was searched stores it on the entry and its ask, and plan view and show print it",
+             r3[0] == 0 and e["searched"] == SEARCHED and e["asks"][-1]["searched"] == SEARCHED
+             and "Searched first: CLAUDE.md HPO rule 2" in view and "searched first: CLAUDE.md HPO rule 2" in show,
+             r3[1] + view[-400:] + show[-400:])
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    scenario("the step prompt has a step agent read CLAUDE.md's setup and HPO rules and the decisions before asking",
+             "HPO search-space rules" in tpl and "site decisions --project FA" in tpl and "--searched" in tpl)
+
+
 def main():
     liveness(); files(); answers(); adding(); questions(); holds(); done(); migration(); claims()
+    searched_first()
     hold_release(); reask_once(); reopen(); commit_retry(); claims_budget(); added_only()
     worktree_then_merge(); plan_commits(); test_switch(); claims_state(); fourth_lower()
     direct_writes(); one_agent_per_step(); git_bypass(); parsing(); checks_and_sites(); no_plan_yet(); lower()

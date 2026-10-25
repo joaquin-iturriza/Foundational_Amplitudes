@@ -133,6 +133,9 @@ def main():
     open_ = [e for e in entries if e["status"] != "done"]
     notes.append("%d open entries have no machine check yet: set each with plan check before plan done" % sum(
         not e["done_when"] for e in open_))
+    notes += ["%s: waits on the user with nothing recorded as searched first; check CLAUDE.md's setup and HPO rules "
+              "and the decisions in force before the question is sent" % e["id"] for e in open_
+              if e["status"] == "waiting_user" and not e.get("searched")]
     notes += ["%s: no site item (plan item once the user approves it)" % e["id"] for e in open_
               if e["status"] != "waiting_user" and e["id"] not in items]
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
