@@ -4,8 +4,6 @@
  "The level.": "item:v3_prep_explore",
  "Open (2026-10-22": "item:v3_prep_explore",
  "State (2026-10-15": "reference: an old state record of the transfer study, kept for its run ids",
- "$ee\\to W^+W^-$.": "user:2026-10-25 the transfer study's ee->WW pool fixes: still wanted now the study runs on catalog_v3?",
- "Steering, next.": "user:2026-10-25 the milder steering selection at D~10^2: still wanted?",
  "Synthetic prior: alternatives not built": "held:D43",
  "The lr scalings.": "user:2026-10-25 re-centre the scratch lr window on the measured surface's batch correction?",
  "The ladder.": "item:delta"
