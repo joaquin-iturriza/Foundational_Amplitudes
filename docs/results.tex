@@ -524,8 +524,13 @@ $40$. With the network's own $2\to4$ prediction at the mapped events in place of
 (\code{tools/factorised\_2to4\_net.py --v3-nfinal 5}; the parents are training classes) the gain is gone: $1.01$
 against $1.02$ for the dimensionless run, $0.93$ against $0.93$ with the context vector, under on $16$ and $18$ of the
 $40$. The network's error on its own training classes at the mapped events adds about $0.5$, as much as the
-factorisation removes. So a factorised head on these short runs buys nothing even one multiplicity out; it would need a
-parent prediction several times more accurate than these runs give.
+factorisation removes. That is no failure at the mapped events: every mapped event lies inside its parent's training
+$\sqrt{\hat s}$ window (median share $1.00$), and the error there, $0.51$ (median; $10$--$90\%$ $0.20$--$1.34$), equals the
+run's own validation error on the same $40$ parents ($0.50$, $0.18$--$1.22$; \code{result.json}'s per-process loss at
+the best checkpoint times the shared standardization's $\sigma^2$), worse on $19$ of $40$. It is simply how well a
+$4264$-step run knows a $2\to4$ class. So on these short runs a factorised head buys nothing even one multiplicity out;
+it pays only once the parent's error falls well under the $0.46$ the exact parent leaves, which a longer pretraining may
+or may not give faster than it improves the $2\to5$ zero-shot ($1.02$, only twice the trained $2\to4$ error).
 
 \begin{figure}[H]
 \centering
