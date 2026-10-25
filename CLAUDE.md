@@ -17,7 +17,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    probe, parent, arm, D, seed and horizon of the design it belongs to. Running a subset ("only
    the best rung", "for now", "the leader at the time"), fewer trials or seeds than the sibling
    cells, or a different horizon or pool is MY decision: ask before generating the configs, never
-   after. If capacity or time forces a cut, propose it with what it costs the comparison and wait.
+   after. If capacity or time forces a cut, propose it with what it costs the comparison; that entry waits
+   for my answer (0g), the rest continues.
    Any difference between what was asked and what was submitted goes in the same message that
    reports the submission, in its first lines, never only in a commit message or the notes'
    hand-off. A figure or number that mixes cells run at different compute says so wherever it is
@@ -26,49 +27,57 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 0c. **A plan I was told is a commitment: its cores, jobs and wall time.** When a tool refuses it ("fits NOWHERE",
    a cap, a wrong default), the refusal is a gap to fix or route around (split the work into parallel jobs of what fits
    so the stated wall time holds), never a reason to shrink the job. If neither works, the smaller version and its new
-   time go to me in the first lines, before it is submitted. (2026-10-24: catalog_v3 was promised on 48 cores in 3 to
-   4 h; `site pick` turned `--gpus 0` into 1 GPU, judged 48 cores against the GPU nodes, and the prebuild ran as one
-   16-core job. The pools' compute was ~9 h in all; the other ~11 h of the 20 were gaps with nothing running, waiting
-   on a question the agent could have settled. A delay's cause is read from the run records, never assumed.)
+   time go to me in the first lines, before it is submitted. A delay's cause is read from the run records, never
+   assumed.
 
 0d. **When I point out a mistake, no apology and no quick patch presented as the end of it.** Answer with: what in
-   your process produced it (traced in the transcript, logs or code, not guessed); the change that stops it recurring
-   (a rule here, a guard, a tool fix), made in the same turn; then the fix of the instance. A mistake whose prevention
-   needs a permission I hold (a hook, a setting) is proposed to me as a concrete diff.
-   A cause stated about your own process names what was read to establish it (the transcript line, the log, the
-   code); if nothing was read, it says "not checked" and is checked before the message ends. (2026-10-25: "compaction
-   dropped the items" was said unchecked and was false: the plan is on disk and the hook pointed at it.)
+   your process produced it, traced in the transcript, logs or code (a cause nothing was read for says "not checked",
+   and is checked before the message ends); the change that stops it recurring (a rule here, a guard, a tool fix), made
+   in the same turn; then the fix of the instance. A change to this file is shown to me as a diff in the same message;
+   a prevention that needs a permission I hold (a hook registration, a setting) is proposed to me as a concrete diff.
 
 0e. **Plain names, no internal codes, in anything I read.** Messages to me and the notes name a thing by what it is
    ("the dimensionless target with the context vector", "my decision to delete catalog_v2", "the prep job's failure"),
-   never by a code: no D-numbers, E-numbers, run ids, arm codes (B, Q, DlessInOrdQ) or recipe tags on their own. An id
-   may follow the description in brackets when I need it to look something up. New arms, sweeps and run directories get
-   descriptive names (`dimensionless_context`, not `Qc`).
+   never by a code: no D-numbers, E-numbers, run ids, arm codes or recipe tags on their own. An id may follow the
+   description in brackets when I need it to look something up. New arms, sweeps and run directories get descriptive
+   names (`dimensionless_context`, not `Qc`).
 
-0f. **When my answer unblocks waiting work, that work goes out first.** A job held on a question of mine is launched
-   in the same turn the answer arrives, before write-ups or other items. (2026-10-24: the 68 b/t one-loop strings
-   waited 2 h after my answer while the agent wrote up other results first.)
+0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion, refused by
+   `no_blocking_question.sh`). A question for me goes in the message; only the plan entry that needs the answer waits
+   (status `waiting_user`), everything else continues. An interrupt or a rejected tool call that comes with a question
+   is answered and the work continues; only my words "stop" or "wait" stop it. Every word written in a turn is to me:
+   a hook whose check is wrong gets no reply (end the turn silently), never a line addressed to the hook.
 
-0h. **A question of mine is answered in text before any tool call of that turn**, and a batch of jobs goes out in
+0h. **A question of mine is answered in text first, before any tool call of that turn.** Then the work my answer
+   unblocks goes out, in that same turn, before write-ups, events or other entries. A batch of jobs goes out in
    parallel: `site sync <site> FA` once, then every launch with `NOSYNC=1` at once (`scripts/launch_cc_only.sh`), never
-   one sync per job in series. (2026-10-25: 11 K-shot jobs submitted one after another, ~25 s each, while the user's
-   question waited 5 min for the end of the turn.)
-   Every word written in a turn is to me: a hook that asks for a revised reply when its check is wrong gets no reply at
-   all (end the turn silently), never a line addressed to the hook.
+   one sync per job in series.
 
-0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion) and no turn that ends
-   waiting on me while other work can move: a question for me goes in the message, the one item that needs it waits,
-   and everything else continues. I answer when I come back. (2026-10-25: two blocking prompts held the session for
-   ~2 h at night; the agent used them to get words for a guard's decision record, which a message would have got too.; `no_blocking_question.sh` (PreToolUse) refuses the tool.)
-   An interrupt or a rejected tool call that comes with a question is answered, and the work then continues: only
-   my words "stop" or "wait" stop it. (2026-10-25: a rejected copy, sent with a question, was read as a stop.)
-
-0i. **One dedicated background agent per open plan entry that can move** (Agent tool, `run_in_background`), as we
-   agreed: it stays on its entry until the entry is finished or blocked, committing results as they land. The main
-   session only routes: events, launches, starting an agent the turn an entry becomes workable, and me. An entry
-   worked by the main session, or waiting for another to finish, is the failure this rule exists for. The agent of an
-   entry is recorded in `.claude/plan_map.json` (`"agent": "<what it is doing, since when>"`). (2026-10-25: for days
-   the entries ran one after another in the main session.)
+0i. **The plan is `plan/plan.yaml`; `plan next` decides what moves; step agents do the work.** One entry per piece of
+   work: its question, status (`running`, `waiting_user`, `held`, `done`), my words that authorise or shape it, next
+   step, evidence, dead ends and `done_when`, a shell check that passes only when the entry is finished. It changes only
+   through `python3 tools/plan.py` (`plan_files_guard.py` refuses anything else); where hand-off prose in
+   `docs/results.tex` disagrees with it, the plan wins.
+   - **Routing.** On every wake (an event, my message, an agent's report) the main session runs `plan next --prompts`,
+     which lists, by fixed rules, each entry that can move and the exact prompt of its step agent
+     (`plan/step_prompt.txt`). Each listed entry gets a background agent (Agent tool, `run_in_background`) started
+     from that prompt in that turn and recorded with `plan step <entry> --agent <id>`. The main session works no entry
+     itself: it launches step agents, sends me their questions and findings, and talks to me.
+   - **A step agent does one step and exits:** an analysis, a fix, a write-up, or a job (`site submit ... --item
+     <entry>`, recorded with `plan run`). It records evidence, dead ends and the next step through the plan CLI and
+     never waits on a job: when the job ends, `plan next` lists the entry again and a fresh step agent takes it. No entry
+     has a long-lived owner.
+   - **Questions.** Before a question reaches me, the rules here and `site decisions --project FA` are searched for
+     what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
+     <entry> --ask "<the question>" --searched "<what was read, and why none settles it>"`. My answer goes in with
+     `plan answer <entry> --kind K --quote "<my words>"`, which records the decision and changes the entry in one step.
+   - **Done** is `plan done <entry> --writeup <commit>`: it passes only when `done_when` passes and the write-up is
+     committed. Every number added to `docs/results.tex` carries its provenance (`% src: python3 <script> @<commit>`,
+     `% claim: key=value`); `tools/verify_claims.py` reruns the script and refuses a commit or merge whose numbers it
+     does not reproduce (`.githooks`, `git_verify_guard.py`).
+   - **The Stop check** `.claude/hooks/plan_check.py` keeps a turn from ending while `plan next` lists a step not
+     launched, a `waiting_user` entry's question is in no message sent to me, a running entry has no approval of mine
+     in force or a held one no hold, numbers on trunk fail the claims check, or a site event is open.
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
@@ -86,56 +95,25 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    be ignored** unless I explicitly ask. Don't refactor, "fix", or reference the
    legacy models in solutions by default.
 
-2. **The working copy is the local checkout `~/work/FA`; clusters are sites.**
-   Claude Code runs on the laptop (WSL2) and this checkout is where all file work
-   happens — read, grep, edit, commit. Nothing is edited on a cluster: no sshfs
-   mount, no `scripts/remote.sh`, no `ssh` by hand. Code reaches a site by git
-   (`site sync <site> FA`), jobs by `site submit <site|auto> FA <job.sh>`, state
-   comes back by `site poll` / `site logs <run>` / `site fetch <run>` /
-   `site where <run>`, and placement is `site pick FA`. The rules and the full verb
-   list live in `~/work/CLAUDE.md`; this file only adds what is FA-specific. There
-   is no project python env on the laptop (no torch): anything that imports the
-   project runs inside a job on a site, or on the local checkout only as a CPU
-   dry-run of the sweep generators.
-   - **The sites.** CC-IN2P3: SLURM, V100 and H100; it wants `--gpus=N`, a mandatory
-     `--mem`, and at most 5 CPUs per GPU — all added at submit time, never written
-     into a job script. Jean Zay: SLURM, A100 through `itg@a100`/`gpu_p5` (`-C a100`,
-     QOS `qos_gpu_a100-t3`) for FA since 2026-10-02 (`itg@v100` is in over-consumption);
-     a pending job moved by `scontrol` needs Account, Partition, Features **and** QOS, else
-     it sits on `InvalidQOS`; compute nodes have **no internet** (stage data first). lxplus: HTCondor; code
-     on EOS, submission from AFS; its ssh master needs a 2FA code, so I open it —
-     you cannot.
-   - **Jean Zay hours are limited.** `site pick` never chooses it on its own; use it
-     only when the work does not fit elsewhere or I explicitly ask
-     (`--allow-jeanzay`).
-   - **Login nodes have no GPU.** Don't run training or any GPU/CUDA code there
-     (xformers attention is CUDA-only and crashes off-GPU); GPU work goes through
-     `site submit`.
-   - **Infrastructure checks use `scripts/job_probe.sh`** (ten seconds: site, host,
-     python, torch, GPU) — never a training run. A job has run only once you have
-     read its log (`site logs <run>`); a RUNNING job with an empty log is not
-     working, and you don't report it as such.
-   - **Never delete anything on a cluster you did not create in the same command.**
-     Except `sweep/prune.py` (D19), run by the supervisor: it keeps each finished sweep's best-trial models and every
-     trial's config, logs, metrics and `data_stats.json`, never touches fine-tune parents, and writes a manifest first.
-     Need another trial's model? Rerun it from its config.
-   - **Submitting jobs is gated by GPU budget, not a blanket confirm.** You may
-     submit quick tests on your own — **always be mindful of the GPU budget**.
-     The rule: estimate the **total GPU-hours** of everything you're about to
-     submit; if it's **> 10 GPU-hours, stop and confirm with me first** (show the
-     command + your estimate). Under that, just run it (still show me what you ran).
-     Inspecting state (`site poll`, `site status <site>`, reading logs) you can
-     always just do.
-     - Estimate wall-time × GPUs across *all* jobs, and size the request to what I
-       actually asked for. Many runs train in seconds to minutes, so a short sweep
-       over those is well under half a GPU-hour; don't inflate a quick check into a
-       20-job sweep, and don't pad an estimate to avoid deciding.
-   - **Git and file edits are never confirm-first.** `git add`/`commit`/`push`/
-     `worktree` and edits happen freely (see the git workflow). Never conflate a
-     `git push` with submitting a job: the budget rule covers cluster compute only.
+2. **The working copy is the local checkout `~/work/FA`; clusters are sites.** The general rules and the `site` verbs
+   are in `~/work/CLAUDE.md`; this file adds only what is FA's. There is no project python env on the laptop (no
+   torch): anything that imports the project runs inside a job on a site, or locally only as a CPU dry-run of the sweep
+   generators.
+   - **The sites.** Jean Zay: A100 through `itg@a100`/`gpu_p5` (`-C a100`, QOS `qos_gpu_a100-t3`); `itg@v100` is in
+     over-consumption. A pending job moved by `scontrol` needs Account, Partition, Features **and** QOS, else it sits on
+     `InvalidQOS`. lxplus: HTCondor, code on EOS, submission from AFS; its ssh master needs a 2FA code only I can enter.
+   - **Login nodes have no GPU.** No training or CUDA code there (xformers attention is CUDA-only); GPU work goes
+     through `site submit`.
+   - **GPU budget.** Estimate the total GPU-hours of everything about to be submitted (wall time × GPUs over all jobs,
+     sized to what I asked, never padded); above 10 GPU-h, confirm with me first unless a decision of mine in force
+     already approves that work at that cost. Under it, run it and show me what ran. Every submission names its plan
+     entry's work item (`--item`, `~/work/CLAUDE.md` "Decisions and work items"), quick tests included. Reading state
+     is always free.
+   - **Git and file edits are never confirm-first.** The budget rule covers cluster compute only.
 
 3. **One centralized CLAUDE.md, and no new docs.** All project guidance lives in
-   this file, which I maintain; add to it only when I ask. No per-directory
+   this file, which I maintain: it changes when I ask, or under 0d, shown to me as a diff; claudemd-keeper reviews
+   every change. No per-directory
    `CLAUDE.md`/memory files (flag any you find for deletion), and no Claude
    persistent memory (`~/.claude/.../memory/`, `MEMORY.md`) — disabled via
    `autoMemoryEnabled: false` and blocked by a hook.
@@ -148,18 +126,10 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    `.claude/md_allowlist.txt`. Enforced by `md_guard.sh` (`PreToolUse(Write)`).
 
    **In `docs/results.tex`, results and the hand-off don't mix:** a finished finding
-   goes in its results section and its hand-off item is deleted; the hand-off holds
-   only open/future work.
+   goes in its results section, its plan entry is closed (`plan done`) and its hand-off
+   item is deleted; the hand-off holds only open/future work.
 
-4. **Cluster state is read through `site`, never by hand.** `site status <site>`
-   for the queue, `site logs <run>` for a job's log, `site fetch <run>` to bring
-   the tier-0 results (metrics, small plots, configs) home to
-   `~/.local/share/ccorch/artifacts/FA/<run>/`; heavy artefacts stay on the site
-   and `site where <run>` prints both locations. The registry
-   (`site runs --project FA`) records the deployed commit of every run, so a
-   result can always be tied to the code that produced it.
-
-5. **Never attribute work to yourself — anywhere, ever.** Do not add
+4. **Never attribute work to yourself, anywhere, ever.** Do not add
    `Co-Authored-By: Claude`, `Generated with Claude Code`, or any mention of
    Claude / Anthropic / "AI" / an assistant in git commit messages, commit
    trailers, PR titles or descriptions, code comments, docstrings, docs, or file
@@ -284,9 +254,7 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
     authoritative.
 
   Never state which processes a run saw from `data.dataset` without checking
-  `processes_file` first. This has been got wrong repeatedly, and it silently
-  inverts claims about what was held out, hence what "zero-shot", "held-out", or
-  "never seen" mean in `docs/results.tex`.
+  `processes_file` first: it decides what "zero-shot", "held-out" and "never seen" mean.
 
 - **Processes equal up to relabelling are one dataset.** `tools/equal_processes.py` (CPU, CC) finds
   the catalog trees whose |M|² is a constant multiple of another's up to a leg relabelling (18 classes,
@@ -407,7 +375,7 @@ Key files:
   `generate_scaling_sweep.py`, `fit_scaling_law.py`, `analyze_*_scaling*.py`.
 - Resubmission helpers: `resubmit_timed_out.py`, `resubmit_scaling_jobs.py`.
 
-**Submitting a sweep** (confirm with me before actually submitting). Submission
+**Submitting a sweep** (the GPU budget rule of 2 applies). Submission
 goes through `sweep_manager.py` (see below) so trials interleave round-robin
 across sweeps — do **not** hand-loop `sbatch` over `jobs/*.sh`. The generators
 call it for you:
@@ -456,8 +424,8 @@ Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 **Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick` places a
 batch once; this moves trials that have not started from the latest-finishing site to the earliest (by backlog and
 achieved rate), deletes nothing (the source is cancelled and marked `MOVED_TO`), and copies a fine-tune parent's
-whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan. Handling
-placement and rebalancing is the agent's job, never a question for me.
+whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan. Placement
+follows `site pick` and this tool, never a hand pick and never a question for me.
 
 ### HPO search-space rules (empirical — harvested from 422 converged sweeps)
 
@@ -558,35 +526,18 @@ being *fair* and *not wasteful*:
 
 ---
 
-## Waiting on jobs (always a mechanism, never hand-poll)
+## Waiting on jobs (a mechanism, never hand-polling)
 
-FA's work runs under `site` work items (`ledger = true`, `~/work/CLAUDE.md` "Decisions and work items"): one
-`site supervise --project FA` loop (CC feeder, rebalancer, `watchdog.py --units` as every item's check, overruns, run
-ends) and one `site events --wait --project FA` waiter replace the per-batch watchdog and waiter loops below; a run
-submitted with `--item` is watched by the supervisor without a waiter of its own. New sweep families go into
-`analysis/transfer/expect_tp3.json` so their item's check counts them.
+A job belongs to a plan entry: submitted with `--item <entry>` and recorded with `plan run <entry> <run>`. Nobody
+waits on it by hand and no step agent stays alive for it. `site supervise --project FA` (CC feeder, rebalancer,
+`watchdog.py --units` as every item's check, overruns, run ends) and one `site events --wait --project FA`, both in
+the background, are the whole watch: the run's end opens an event that wakes the main session, and `plan next` then
+lists the entry for its next step agent, which reads the log (`site logs <run>`) before reporting anything and acks
+the event with what the log shows. New sweep families go into `analysis/transfer/expect_tp3.json` so their item's
+check counts them.
 
-When I submit a job/test and need its result before continuing, **do not** poll
-`squeue` in a manual loop of tool calls, and **do not** promise "I'll check back"
-without a mechanism. The standard way on this laptop:
-
-1. Submit and capture the run id: `site submit <site|auto> FA <script>` prints
-   `run FA-<site>-<id>` (and the scheduler's job id); the registry keeps both.
-2. Start a **background Bash waiter** (`run_in_background`): a loop that runs
-   `site poll <run>` every 60–300 s and exits once every watched run is terminal
-   (COMPLETED, FAILED, CANCELLED, TIMEOUT, OUT_OF_MEM, NODE_FAIL, HELD, REMOVED), and
-   list the watched id(s) in `.claude/.slurm_monitor_jobs` so `slurm_waiter_guard.sh`
-   accepts the turn ending. It notifies only when it exits, so give each event you must
-   act on (a sweep that unlocks the next step) its own waiter. Read the run
-   (`site logs <run>`) before reporting anything, and clear the marker file.
-   Background waiters survive for hours on this laptop;
-   the Monitor tool is capped at 30 min per watch, so it suits only short waits.
-
-A foreground Bash call is capped at 10 min. `scripts/wait_for_slurm.sh` (`POLL=<s>`,
-`TAIL=<n>`; no id ⇒ all my jobs) is a waiter for a session running *on* a site.
-
-- Don't `sleep`-loop or re-run `site poll` by hand across turns; an interim peek reads
-  the task's output file, the completion event is what I act on.
+- Never `sleep` in the foreground or rerun `site poll` by hand across turns (`sleep_guard.sh`); a foreground Bash call
+  is capped at 10 min.
 - **Quick tests must return quickly**: pass `evaluation.train_subsample=2000` (the
   post-training train-split pass otherwise runs the whole pool; default 10000).
 
@@ -679,7 +630,9 @@ in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 `regularization_lambda`, `cosanneal_*`, `fine_tune.lr_scale`/`layer_decay`) a
 per-task shell variable — because HP search goes through DyHPO (allowlist
 `.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
-tag, warm-start ckpt, ablation flags, seeds) stay allowed.
+tag, warm-start ckpt, ablation flags, seeds) stay allowed. The plan's guards are in 0i: `plan_check.py` (`Stop`),
+`plan_files_guard.py` and `git_verify_guard.py` (`PreToolUse`), and the git hooks in `.githooks/` (`pre-commit`,
+`pre-merge-commit`), which run `tools/verify_claims.py`.
 
 ### Batched pillar review (`review_backlog.sh` + three reviewer subagents)
 
@@ -688,8 +641,8 @@ Three pillars each have a reviewer subagent in `.claude/agents/`:
 **repo-reviewer**. Review is **batched, not per-change**: each pillar carries a
 watermark (the commit it was last reviewed at, plus the size of the change reviewed
 then), and the `Stop` hook `review_backlog.sh check` only asks for a reviewer once
-that pillar's accumulated backlog crosses its threshold (200 changed lines or 20
-commits for `CLAUDE.md`/`.tex`, 600/30 for code). The reviewer then reads the
+that pillar's accumulated backlog crosses its threshold (any change for `CLAUDE.md`, 200 changed lines or 20
+commits for `.tex`, 600/30 for code). The reviewer then reads the
 **whole backlog at once**, which is the point: cross-edit problems (a rule now
 stated twice, a config default whose callers were not updated, a section that no
 longer reads as one argument) are invisible to a per-hunk review.
@@ -746,9 +699,7 @@ leaves its lock held on purpose, so the fixes it demanded can be applied. Waterm
    ```
    It copies untracked result files only (tracked ones return via the merge), never
    deletes, and is safe to re-run. `worktree_fold_guard.sh` (`PreToolUse(Bash)`) blocks
-   the removal until this has run. This is not hypothetical: the 12-trial
-   `sweeps/l2_poly_uugg` DyHPO sweep was lost this way, so the left panel of
-   `fig:l2_poly_keep` is empty and cannot be rebuilt without re-running it on GPU.
+   the removal until this has run.
 3. **Commit small and often; pushing is automatic.** Small, frequent, readable
    commits over big dumps. The `Stop` hook pushes already-committed work, so never
    ask permission to push; to push mid-turn just run `git push` (allowlisted).
@@ -761,7 +712,7 @@ visibility — making the repo public exposes `trunk` and the retired branches t
 *tree* is stripped, not the other branches. If a dev branch ever needs to be
 truly private, that forces a separate-repo split.
 
-(Ground rule #5 still holds everywhere: never attribute commits/PRs to Claude.)
+(Ground rule #4 still holds everywhere: never attribute commits/PRs to Claude.)
 
 ## Sweeps across sites: `sweep/drive.py`
 
