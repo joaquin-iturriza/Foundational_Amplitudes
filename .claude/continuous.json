@@ -48,6 +48,17 @@
    ],
    "max_age_min": 120,
    "finished": "53c5a02"
+  },
+  {
+   "name": "the preprocessing exploration on catalog_v3 (D83, D99; moved by D114; 'Keep iterating' 2026-10-24)",
+   "items": [
+    "v3_prep_explore"
+   ],
+   "paths": [
+    "analysis/catalog_v3/data/prep_*",
+    "analysis/catalog_v3/figs/prep_*"
+   ],
+   "max_age_min": 90
   }
  ]
 }
