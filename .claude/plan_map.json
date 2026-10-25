@@ -3,8 +3,8 @@
  "State (2026-10-25": "item:pp_sampling",
  "The level.": "item:v3_prep_explore",
  "Open (2026-10-22": "item:v3_prep_explore",
- "State (2026-10-15": "reference: an old state record of the transfer study, kept for its run ids",
  "Synthetic prior: alternatives not built": "held:D43",
  "The ladder.": "item:delta",
- "Fine-tuning at small $D$": "item:lowd_ft"
+ "Fine-tuning at small $D$": "item:lowd_ft",
+ "Standing since 2026-10-15.}": "reference: an old state record of the transfer study, kept for its run ids"
 }
