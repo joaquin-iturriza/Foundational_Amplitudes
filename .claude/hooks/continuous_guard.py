@@ -67,6 +67,10 @@ def main():
         age = (now - ct) / 60
         if age <= float(t.get("max_age_min", 90)):
             continue
+        # a local worker (a background agent) started on the task counts for ONE window only: by then it has committed a
+        # result or a CC job of the task's items is queued, or the task is stale again (2026-10-25)
+        if now - float(t.get("worker_started", 0)) <= 60 * float(t.get("max_age_min", 90)):
+            continue
         runs = live_runs(t.get("items") or [])
         if runs:                         # a queued or running job of the task's items is its worker
             continue

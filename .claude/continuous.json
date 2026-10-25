@@ -58,7 +58,8 @@
     "analysis/catalog_v3/data/prep_*",
     "analysis/catalog_v3/figs/prep_*"
    ],
-   "max_age_min": 90
+   "max_age_min": 90,
+   "worker_started": 1792936793
   }
  ]
 }
