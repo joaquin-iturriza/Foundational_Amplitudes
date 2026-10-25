@@ -188,7 +188,15 @@ def main():
         if a.v3:                                     # the kept finals in the parent's PDG order
             Pm = np.stack([to_parent_order(Pm[i:i + 1], [ids4[j] for j in range(N) if j != int(k_slot[i])], ids3)[0]
                            for i in range(len(Pm))])
-        t3 = me2(parent, Pm, alphas)
+        # events the map cannot place (the beam-recoil map below threshold) never reach the driver, which dies on NaN
+        fin = np.all(np.isfinite(Pm.reshape(len(Pm), -1)), 1)
+        t3 = np.full(len(Pm), np.nan)
+        try:
+            if fin.any():
+                t3[fin] = me2(parent, Pm[fin], None if alphas is None else alphas[fin])
+        except Exception as e:                       # listed, never dropped silently
+            print("F24 " + json.dumps({"probe": p, "parent": parent, "error": repr(e)[:300]}), flush=True)
+            continue
         n = len(P)
         k = P[np.arange(n), k_slot]
         s = mdot(P[:, 0] + P[:, 1], P[:, 0] + P[:, 1])
@@ -211,7 +219,7 @@ def main():
                             a_emits=a_emits, x=x, b_beam=b_beam)
         ok = (t3 > 0) & np.isfinite(t3)
         r = np.log(t4[ok]) - np.log(t3[ok])
-        rec = dict(probe=p, parent=parent, extra=extra, map="beam_recoil" if b_beam else "cs_ii", n=int(n), t3_bad=int((~ok).sum()), pool=os.path.basename(f4),
+        rec = dict(unmapped=int((~fin).sum()), probe=p, parent=parent, extra=extra, map="beam_recoil" if b_beam else "cs_ii", n=int(n), t3_bad=int((~ok).sum()), pool=os.path.basename(f4),
                    var_log_t4=float(np.var(np.log(t4))), var_r=float(np.var(r)), mean_r=float(np.mean(r)),
                    check_median_log_ratio=float(np.median(lr)), check_max_abs_log_ratio=float(np.abs(lr).max()),
                    has_alphas=al is not None)
