@@ -3,9 +3,11 @@ more than training on pp? Every catalog_v3 short arm read zero-shot on the 13 Te
 tree classes (scripts/job_catalog_v3_pp_score.sh; recipes/catalog_v3_pp_test.yaml: 410 held-out classes of H1, H2, H3
 and the 986 training classes; each pp13_<class> is its class's |M|^2 function on pp-distributed events, 2000 validation
 events). The predictions stay on the site ($SCRATCH/zz_v3_pp_<arm>/<probe>.npz); `collect`, run there, reduces them to
-one row per probe and adds each training class's window loss, read from the arm's own run at its best checkpoint
-(result.json proc_val_losses_no_reg, 200 validation events of the class's shaped window, times the shared
-standardization's variance: log|M|^2 units, EMA weights as the pp read), and prints the rows as JSON:
+one row per probe and adds each training pool's loss in the arm's own run at its best checkpoint (result.json
+proc_val_losses_no_reg, 200 validation events of the pool it trained on, times the shared standardization's variance:
+log|M|^2 units, EMA weights as the pp read). For a window-trained arm that pool is the class's shaped window (v3_<x>);
+for the pp-trained arm a hadronic tree class trains as pp13_<x>, so its in-run loss is a loss on pp events, kept apart
+from the window comparison (in_run_pp). It prints the rows as JSON:
     site run --item pp_sampling ccin2p3 FA -- python analysis/catalog_v3/pp_compare.py collect > analysis/catalog_v3/data/pp_rows.json
   window-trained   baseline, dimensionless, dimensionless_context, dimensionless_twin (the four short pretrainings,
                    every hadronic class on its shaped windows)
@@ -16,11 +18,12 @@ Per probe, from the saved truth t and the arm's prediction q (log|M|^2), as anal
 Per arm and group (H1, H2, H3, and the training classes, in distribution for the pp-trained arm only on pp events):
 the medians over probes, the 10% and 90% MSE quantiles, the count against the recipe, every missing probe listed by name.
 For the held-out classes, the same arm's read of the same class on its window pool (data/short_reads.json) beside it.
-Figure: (a) per probe, the pp-trained arm's MSE against the window-trained dimensionless arm's, on the pp pools;
-(b) the window-trained dimensionless arm's MSE per class on the pp pool against its window pool.
+Each probe's pp events are also split into those inside what its class's window pools cover (collect) and the rest.
+Figure pp_compare: (a) the window-trained dimensionless arm's MSE per class on the pp pool against its window pool;
+(b) the same on the pp events inside the windows' support. Figure pp_trained (once its reads exist): the pp-trained
+arm's MSE per class against the window-trained dimensionless arm's, both on the pp pools. The last line printed is
+the numbers docs/results.tex quotes, as one JSON object.
     python3 analysis/catalog_v3/pp_compare.py   -> data/pp_compare.json, figs/pp_compare.{png,pdf}
-Without the pp-trained arm's reads, panel (a) is the four window-trained arms' pp MSE against the window MSE on the
-training classes (same arm, same class), panel (b) as above.
 """
 import glob, json, os, sys
 
@@ -166,12 +169,17 @@ def summ(rows):
             "shape": float(np.median([v["shape"] for v in rows.values()]))}
 
 
+def med(x):
+    x = [v for v in x if v is not None]
+    return float(np.median(x)) if x else None
+
+
 def main():
     g = groups()
     sr_path = os.path.join(HERE, "data", "short_reads.json")
     sr = json.load(open(sr_path)) if os.path.exists(sr_path) else {}
     rows_all = json.load(open(os.path.join(HERE, "data", "pp_rows.json")))
-    res = {}
+    res, claims = {}, {}
     for arm in ARMS:
         rows, bad = read(arm, rows_all)
         if rows is None:
@@ -182,78 +190,118 @@ def main():
             exp = sorted(p for p, a in g.items() if a == grp)
             r = {p: rows[p] for p in exp if p in rows}
             ent = {"n_expected": len(exp), "missing": sorted(set(exp) - set(r))}
-            if r:
-                ent.update(summ(r))
-                ent["probes"] = r
-                # the same arm on the same classes' window pools: a held-out class's zero-shot window read
-                # (data/short_reads.json, 2000 events), a training class's validation loss in the arm's own run
-                # (200 events, its best checkpoint); a class the arm never trained on (the twin's removed ones) has
-                # neither and is counted apart
-                if grp == "train":
-                    win = {k: {"mse": v} for k, v in rows_all[arm]["window_train"].items()}
-                    ent["not_in_arm_training"] = sorted(p for p in r if "v3_" + p[len("pp13_"):] not in win)
-                else:
-                    win = sr.get(arm, {}).get(grp, {}).get("probes", {})
-                pair = [(r[p]["mse"], win["v3_" + p[len("pp13_"):]]["mse"]) for p in r if "v3_" + p[len("pp13_"):] in win]
-                ent["window_pairs"] = {p: win["v3_" + p[len("pp13_"):]]["mse"] for p in r if "v3_" + p[len("pp13_"):] in win}
-                if pair:
-                    lr = np.log10([a / b for a, b in pair])
-                    ent["window_same_classes"] = {"n": len(pair), "mse_pp": float(np.median([a for a, _ in pair])),
-                                                  "mse_window": float(np.median([b for _, b in pair])),
-                                                  "ratio_pp_over_window_median": float(10 ** np.median(lr)),
-                                                  "ratio_q10_q90": [float(10 ** x) for x in np.quantile(lr, [0.1, 0.9])],
-                                                  "n_pp_worse": int((lr > 0).sum())}
-            else:
+            if not r:
                 ent["n"] = 0
+                res[arm][grp] = ent
+                print(f"{arm:24s} {grp:5s} n=   0/{len(exp):4d} NO READS")
+                continue
+            ent.update(summ(r))
+            ent["probes"] = r
+            # the same arm on the same classes' window pools: a held-out class's zero-shot window read
+            # (data/short_reads.json, 2000 events), a training class's validation loss in the arm's own run
+            # (200 events, its best checkpoint); a class the arm never trained on (the twin's removed ones) has
+            # neither and is counted apart
+            if grp == "train":
+                own = rows_all[arm]["window_train"]          # every pool of the arm's own run, by its training name
+                win = {k: {"mse": v} for k, v in own.items() if k.startswith("v3_")}
+                # the pp-trained arm trained the class on pp events (pp13_<x>): its in-run loss is on pp, not a window
+                ent["in_run_pp"] = {p: own[p] for p in r if p in own}
+                ent["not_in_arm_training"] = sorted(p for p in r if p not in own and "v3_" + p[len("pp13_"):] not in own)
+            else:
+                win = sr.get(arm, {}).get(grp, {}).get("probes", {})
+            wk = lambda p: "v3_" + p[len("pp13_"):]
+            both = [p for p in r if wk(p) in win and r[p].get("mse_inside") is not None]
+            ent["window_pairs"] = {p: win[wk(p)]["mse"] for p in both}
+            if both:
+                lr = np.log10([r[p]["mse"] / win[wk(p)]["mse"] for p in both])
+                li = np.log10([r[p]["mse_inside"] / win[wk(p)]["mse"] for p in both])
+                ent["window_same_classes"] = {
+                    "n": len(both), "mse_pp": med(r[p]["mse"] for p in both),
+                    "mse_window": med(win[wk(p)]["mse"] for p in both),
+                    "mse_pp_inside": med(r[p]["mse_inside"] for p in both),
+                    "mse_pp_outside": med(r[p]["mse_outside"] for p in both),
+                    "ratio": float(10 ** np.median(lr)), "ratio_q10_q90": [float(10 ** x) for x in np.quantile(lr, [0.1, 0.9])],
+                    "n_pp_worse": int((lr > 0).sum()),
+                    "ratio_inside": float(10 ** np.median(li)), "n_inside_worse": int((li > 0).sum())}
+            ent["support"] = {"frac_inside": med(v["frac_inside"] for v in r.values()),
+                              "frac_out_cuts": med(1 - v["frac_in_cuts"] for v in r.values()),
+                              "frac_above_window": med(1 - v["frac_in_sqrts"] for v in r.values()),
+                              "frac_fail_angle": med(v["cut_fail"]["cos"] for v in r.values()),
+                              "frac_fail_pair_mass": med(v["cut_fail"]["m"] for v in r.values()),
+                              "frac_fail_dr": med(v["cut_fail"]["dr"] for v in r.values()),
+                              "frac_fail_pt": med(v["cut_fail"]["pt"] for v in r.values())}
             res[arm][grp] = ent
             w = ent.get("window_same_classes")
-            print(f"{arm:24s} {grp:5s} n={ent['n']:4d}/{len(exp):4d}" +
-                  (f" mse {ent['mse']:.3g} level {ent['level']:.3g} shape {ent['shape']:.3g}" if ent["n"] else " NO READS") +
-                  (f" | window {w['mse_window']:.3g} on the same {w['n']}, ratio {w['ratio_pp_over_window_median']:.3g}"
-                   f" ({w['n_pp_worse']} worse on pp)" if w else ""))
+            c = claims.setdefault(arm, {})[grp] = {"n": ent["n"], "mse": ent["mse"], "level": ent["level"],
+                                                   "shape": ent["shape"], **({k: w[k] for k in (
+                                                       "mse_window", "mse_pp_inside", "mse_pp_outside", "ratio",
+                                                       "n_pp_worse", "ratio_inside", "n_inside_worse")} if w else {})}
+            if w:
+                c["n_pairs"] = w["n"]
+            claims.setdefault("support", {})[grp] = ent["support"]
+            print(f"{arm:24s} {grp:5s} n={ent['n']:4d}/{len(exp):4d} mse {ent['mse']:.3g} level {ent['level']:.3g} "
+                  f"shape {ent['shape']:.3g}" +
+                  (f" | window {w['mse_window']:.3g} on the same {w['n']}, ratio {w['ratio']:.3g} ({w['n_pp_worse']} "
+                   f"worse); pp inside the window's support {w['mse_pp_inside']:.3g} (ratio {w['ratio_inside']:.3g}, "
+                   f"{w['n_inside_worse']} worse), outside {w['mse_pp_outside']:.3g}" if w else ""))
+    for grp in GROUPS:
+        sp = claims["support"][grp]
+        sp.update({k.replace("frac_", "pct_"): 100 * v for k, v in list(sp.items())})      # the shares as percentages
+        print(f"support {grp:5s}", {k: round(v, 3) for k, v in sp.items()})
+    claims["n_classes"] = len(g)
+    claims["n_no_prediction"] = sum(len(res[a]["no_prediction"]) for a in res)
     json.dump(res, open(os.path.join(HERE, "data", "pp_compare.json"), "w"), indent=1)
-    plot(res, sr)
+    plot(res)
+    print(json.dumps(claims))
 
 
-def plot(res, sr):
+def plot(res):
+    """(a) per class, the window-trained dimensionless arm's MSE on the pp pool against its MSE on the class's window
+    pool; (b) the same pp MSE on the events inside what the window pools cover only. With the pp-trained arm's reads, a
+    second figure: its pp MSE against the window-trained arm's, per class (pp_trained.{png,pdf})."""
     import plot_style as ps
-    fig, axs = ps.figure(ncols=2)
     marks = {"H1": ("o", ps.C.blue), "H2": ("s", ps.C.green), "H3": ("^", ps.C.vermillion), "train": ("D", ps.C.grey)}
-    # (a) pp-trained against window-trained, both on the pp pools
-    ax = axs[0]
+    fig, axs = ps.figure(ncols=2)
+    a = res.get("dimensionless", {})
+    lo, hi = np.inf, 0
+    for ax, key in zip(axs, ("mse", "mse_inside")):
+        for grp in ("train", "H1", "H2", "H3"):
+            e = a.get(grp, {})
+            wp, pr = e.get("window_pairs", {}), e.get("probes", {})
+            ps_ = sorted(wp)
+            if not ps_:
+                continue
+            x = [wp[p] for p in ps_]
+            y = [pr[p][key] for p in ps_]
+            ax.plot(x, y, marks[grp][0], mfc="none", ms=3, alpha=0.6, color=marks[grp][1], label=NAMES[grp])
+            lo, hi = min(lo, min(x), min(y)), max(hi, max(x), max(y))
+    for ax in axs:
+        ax.plot([lo, hi], [lo, hi], ls="--", color="k", label="equal")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlim(lo / 2, hi * 2); ax.set_ylim(lo / 2, hi * 2)
+        ax.set_xlabel("MSE, window pool")
+    axs[0].set_ylabel("MSE, pp pool")
+    axs[1].set_ylabel("MSE, pp inside the windows")
+    ps.shared_legend(fig, axs[0], ncol=5)
+    ps.save(fig, os.path.join(HERE, "figs", "pp_compare"))
+    b = res.get("dimensionless_pp", {})
+    if not any(b.get(grp, {}).get("probes") for grp in GROUPS):
+        return
+    fig, ax = ps.figure()
     lo, hi = np.inf, 0
     for grp in GROUPS:
-        a = res.get("dimensionless", {}).get(grp, {}).get("probes", {})
-        b = res.get("dimensionless_pp", {}).get(grp, {}).get("probes", {})
-        ps_ = sorted(set(a) & set(b))
+        x_, y_ = a.get(grp, {}).get("probes", {}), b.get(grp, {}).get("probes", {})
+        ps_ = sorted(set(x_) & set(y_))
         if ps_:
-            x, y = [a[p]["mse"] for p in ps_], [b[p]["mse"] for p in ps_]
-            ax.plot(x, y, marks[grp][0], mfc="none", color=marks[grp][1], label=NAMES[grp])
+            x, y = [x_[p]["mse"] for p in ps_], [y_[p]["mse"] for p in ps_]
+            ax.plot(x, y, marks[grp][0], mfc="none", ms=3, alpha=0.6, color=marks[grp][1], label=NAMES[grp])
             lo, hi = min(lo, min(x), min(y)), max(hi, max(x), max(y))
-    if hi > 0:
-        ax.plot([lo, hi], [lo, hi], ls="--", color=ps.C.grey, label="equal")
-    ax.set_xlabel("MSE, trained on windows"); ax.set_ylabel("MSE, trained on pp")
-    # (b) window-trained: the same class on its pp pool against its window pool
-    ax = axs[1]
-    lo, hi = np.inf, 0
-    for grp in ("H1", "H2", "H3"):
-        a = res.get("dimensionless", {}).get(grp, {}).get("probes", {})
-        w = sr.get("dimensionless", {}).get(grp, {}).get("probes", {})
-        ps_ = sorted(p for p in a if "v3_" + p[len("pp13_"):] in w)
-        if ps_:
-            x = [w["v3_" + p[len("pp13_"):]]["mse"] for p in ps_]
-            y = [a[p]["mse"] for p in ps_]
-            ax.plot(x, y, marks[grp][0], mfc="none", color=marks[grp][1], label=NAMES[grp])
-            lo, hi = min(lo, min(x), min(y)), max(hi, max(x), max(y))
-    if hi > 0:
-        ax.plot([lo, hi], [lo, hi], ls="--", color=ps.C.grey, label="equal")
-    ax.set_xlabel("MSE, window pool"); ax.set_ylabel("MSE, pp pool")
-    for ax in axs:
-        ax.set_xscale("log"); ax.set_yscale("log")
-    ps.legend(axs[0], "upper left")
-    for ax in axs:
-        ps.make_room(ax, max_growth=4)
-    ps.save(fig, os.path.join(HERE, "figs", "pp_compare"))
+    ax.plot([lo, hi], [lo, hi], ls="--", color="k", label="equal")
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("MSE on pp, trained on windows"); ax.set_ylabel("MSE on pp, trained on pp")
+    ps.legend(ax, "upper left")
+    ps.make_room(ax, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "pp_trained"))
 
 
 if __name__ == "__main__":
