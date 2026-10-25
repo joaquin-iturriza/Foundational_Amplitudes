@@ -12,7 +12,7 @@ import importlib.util, os, sys
 import yaml
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-DEFAULT = ["recipes/catalog_daniel_train.yaml"]   # the catalog in use (catalog_v2 deleted, D110)
+DEFAULT = ["recipes/catalog_v3_train.yaml"]   # the catalog in use (D115); catalog_v2's pools deleted (D110), Daniel's (D131)
 SEED = 42                      # data.seed of every catalog run
 
 ok = True
