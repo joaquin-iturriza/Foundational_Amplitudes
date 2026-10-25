@@ -35,6 +35,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    your process produced it (traced in the transcript, logs or code, not guessed); the change that stops it recurring
    (a rule here, a guard, a tool fix), made in the same turn; then the fix of the instance. A mistake whose prevention
    needs a permission I hold (a hook, a setting) is proposed to me as a concrete diff.
+   A cause stated about your own process names what was read to establish it (the transcript line, the log, the
+   code); if nothing was read, it says "not checked" and is checked before the message ends. (2026-10-25: "compaction
+   dropped the items" was said unchecked and was false: the plan is on disk and the hook pointed at it.)
 
 0e. **Plain names, no internal codes, in anything I read.** Messages to me and the notes name a thing by what it is
    ("the dimensionless target with the context vector", "my decision to delete catalog_v2", "the prep job's failure"),
@@ -57,6 +60,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    waiting on me while other work can move: a question for me goes in the message, the one item that needs it waits,
    and everything else continues. I answer when I come back. (2026-10-25: two blocking prompts held the session for
    ~2 h at night; the agent used them to get words for a guard's decision record, which a message would have got too.; `no_blocking_question.sh` (PreToolUse) refuses the tool.)
+   An interrupt or a rejected tool call that comes with a question is answered, and the work then continues: only
+   my words "stop" or "wait" stop it. (2026-10-25: a rejected copy, sent with a question, was read as a stop.)
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:

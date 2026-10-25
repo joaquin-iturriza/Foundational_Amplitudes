@@ -22,10 +22,48 @@ INSTR = ("CONTEXT GUARD: Claude Code wants to compact the context and is held un
          "batch: sites, counts, waiters; decisions taken since the last compaction; results not yet written up; the "
          "plan's next steps in the transfer study's hand-off, the 'Plan to finish' item); commit; then run "
          "`touch .claude/.notes_flushed` and end the turn. Compaction then goes through.")
-AFTER = ("CONTEXT GUARD: this context was just compacted. Before continuing, read in docs/results.tex the transfer "
-         "study's hand-off (sec:ladder-open), in particular the 'Plan to finish' item, and CLAUDE.md's ground rules "
-         "(0: start every message with 'Joaquin'; 0b: never narrow the scope). Re-check the running batches with `site` "
-         "before acting on any number in the summary.")
+AFTER = ("CONTEXT GUARD: this context was just compacted. The summary above is a lossy record of the CONVERSATION (what "
+         "was in flight), not of the plan: work only from the plan and the items printed below, not from the summary's "
+         "pending list. CLAUDE.md's ground rules hold (0: start every message with 'Joaquin'; 0b: never narrow the scope). "
+         "Re-check the running batches with `site` before acting on any number in the summary.")
+
+
+def plan_text():
+    """The open items of the hand-off (sec:ladder-open), each top-level item's first 600 characters, and the active and
+    held work items: printed into the fresh context, since a pointer to them was skipped (2026-10-25: the summary listed
+    only the pp generation and the plan's other items sat untouched for hours)."""
+    import re, subprocess
+    out = []
+    try:
+        s = open(os.path.join(REPO, "docs", "results.tex")).read()
+        i = s.index("\\label{sec:ladder-open}")
+        body, depth, items, cur = s[i:], 0, [], None
+        for line in body.splitlines()[1:]:
+            st = line.strip()
+            if st.startswith("\\begin{itemize}"):
+                depth += 1
+                if depth == 1:
+                    continue
+            if st.startswith("\\end{itemize}"):
+                depth -= 1
+                if depth == 0:
+                    break
+            if depth == 1 and st.startswith("\\item"):
+                cur = [st]; items.append(cur)
+            elif cur is not None:
+                cur.append(st)
+        out.append("THE PLAN (docs/results.tex, sec:ladder-open), every open item, first lines:")
+        for it in items:
+            t = re.sub(r"\s+", " ", " ".join(it))
+            out.append("  - " + (t[:600] + " ..." if len(t) > 600 else t))
+    except (OSError, ValueError) as e:
+        out.append("THE PLAN could not be read (%r): read docs/results.tex sec:ladder-open now." % e)
+    try:
+        r = subprocess.run(["site", "items", "--project", "FA"], capture_output=True, text=True, timeout=60)
+        out.append("WORK ITEMS (site items): each active one needs its next step taken or its wait named:\n" + r.stdout)
+    except Exception as e:                      # noqa: BLE001
+        out.append("site items failed (%r): run it now." % e)
+    return "\n".join(out)
 
 
 def _clear(path):
@@ -51,7 +89,7 @@ def main():
         if inp.get("source") == "compact":
             _clear(FLUSHED)
             _clear(WANTED)
-            print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AFTER}}))
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AFTER + "\\n\\n" + plan_text()}}))
         return 0
     if not os.path.exists(WANTED) or os.path.exists(FLUSHED):
         return 0
