@@ -56,8 +56,8 @@ def main():
         # a fixed point is run once: a script repeating a point already submitted or done (a sweep the rebalancer
         # moved back and forth carries one pair of scripts per visit) is marked submitted and never runs
         have = {_fixed(f) for f in sub if os.path.exists(f)} | {
-            int(m.group(1)) for r in glob.glob(os.path.join(d, "results", "hp*.json"))
-            for m in [re.match(r"hp(\d+)_", os.path.basename(r))] if m}
+            int(m.group(1)) for r in glob.glob(os.path.join(d, "results", "hp*.json")) if os.path.getsize(r) > 0
+            for m in [re.match(r"hp(\d+)_", os.path.basename(r))] if m}   # an empty file (full disk) is no result
         keep = {}
         for f in new:
             h = _fixed(f)
