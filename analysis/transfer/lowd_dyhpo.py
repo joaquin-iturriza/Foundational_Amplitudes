@@ -54,16 +54,28 @@ def main():
                                               "wins_over_scratch": int((gs > 0).sum()),
                                               "factor_over_default": float(10 ** np.median(g)),
                                               "factor_over_scratch": float(10 ** np.median(gs))}
+    # over all 60 cells: wins and the median, and per probe the median over its three rungs at each D
+    pooled = {m: {"n": len(g), "wins_over_default": int((g > 0).sum()), "gain_over_default": float(np.median(g))}
+              for m in METHODS
+              for g in [np.array([np.log10(r["recorded_ft"] / r[m]) for r in rows if r.get(m) is not None])] if len(g)}
+    by_probe = {m: {p: {str(k): float(np.median([np.log10(r["recorded_ft"] / r[m]) for r in rows
+                                                if r["probe"] == p and r["k"] == k and r.get(m) is not None]))
+                        for k in (2, 3, 4, 5)} for p in sorted({r["probe"] for r in rows})} for m in summ}
+    # a sweep with more results than distinct candidates (a candidate run twice): its best is over the distinct ones
+    repeats = {f"tp3_lowd_{m}_r{r['rung']}_{r['probe']}_d{r['k']}": r[m + "_n"] for r in rows for m in METHODS
+               if r.get(m + "_n", 0) > 5}
     dflt = {str(k): float(np.median([np.log10(r["scratch"] / r["recorded_ft"]) for r in rows if r["k"] == k]))
             for k in (2, 3, 4, 5)}
-    out = {"summary": summ, "default_over_scratch": dflt, "incomplete": incomplete, "cells": rows}
+    out = {"summary": summ, "default_over_scratch": dflt, "pooled": pooled, "by_probe": by_probe, "repeats": repeats,
+           "incomplete": incomplete, "cells": rows}
     json.dump(out, open(os.path.join(HERE, "data", f"lowd_dyhpo{tag}.json"), "w"), indent=1)
     for m, v in summ.items():
         print(m, json.dumps(v))
     print("incomplete:", len(incomplete), incomplete[:10])
     plot(summ, dflt, tag)
     # last line: the object the results.tex claims key into (tools/verify_claims.py), e.g. summary.l2sp.4.wins_over_default
-    print(json.dumps({"summary": summ, "default_over_scratch": dflt, "n_cells": len(rows),
+    print(json.dumps({"summary": summ, "default_over_scratch": dflt, "pooled": pooled, "by_probe": by_probe,
+                      "repeats": repeats, "n_cells": len(rows),
                       "n_incomplete": len(incomplete)}))
 
 
@@ -83,6 +95,9 @@ def plot(summ, dflt, tag=""):
     for ax, yl in ((a, "gain over scratch (decades)"), (b, "gain over the default (decades)")):
         ax.axhline(0, ls="--", color=ps.C.grey, label="equal")
         ax.set_xlabel(r"$\log_{10} D$"); ax.set_ylabel(yl)
+    # symmetric about equal, wide enough that a median within the cells' spread does not read as a trend
+    lim = max(0.3, 1.2 * max(abs(v[str(k)]["gain_over_default"]) for v in summ.values() for k in v))
+    b.set_ylim(-lim, lim)
     ps.legend(a, "upper left")
     for ax in (a, b):
         ps.make_room(ax)
