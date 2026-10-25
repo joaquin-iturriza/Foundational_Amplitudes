@@ -766,8 +766,12 @@ entries:
   notes_ref: null
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 8ea29bf
+    paths:
+    - .claude/hooks/plan_check.py
+    - .githooks
+    - tests/test_setup_scenarios.py
+    - tools/plan.py
   dead_ends: []
   asks: []
   id: setup_redesign
