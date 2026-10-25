@@ -166,3 +166,8 @@ plan/.state.json
 plan/.plan_tmp_*
 plan/.check_cache.json
 plan/.claims_cache.json
+
+# scripts/disk_watch.py: its du cache and the disk-full flag sweep/feed_capped.py reads
+/.disk_watch_cache.json
+/.disk_watch_cache.json.tmp
+/.disk_full

@@ -8,10 +8,15 @@ behind a queue it kept at 100. Run on the site (through `site run`), every 20 mi
 
 Every registered sweep matching PREFIX that is not MOVED_TO and has trial scripts the registry has not submitted is
 handed to submit_sweeps (chained, interleaved by round), which skips submitted scripts and stops at the cap.
+
+Nothing is submitted while the checkout's .disk_full flag is under 30 min old: scripts/disk_watch.py writes it when a
+filesystem of this site is at 97% or more (CC's /sps/lpnhe at 100% on 2026-10-25 failed the jobs it ran).
 """
-import argparse, glob, json, os, re, sys
+import argparse, glob, json, os, re, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+DISK_FULL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".disk_full")
+DISK_FULL_FRESH_S = 1800
 from sweep_manager import DEFAULT_REGISTRY, load_registry, save_registry, submit_sweeps  # noqa: E402
 
 
@@ -25,6 +30,18 @@ def main():
     ap.add_argument("prefixes", nargs="+")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
+    try:
+        age = time.time() - os.path.getmtime(DISK_FULL)
+    except OSError:
+        age = None
+    if age is not None and age < DISK_FULL_FRESH_S:
+        try:
+            why = open(DISK_FULL).read().strip()
+        except OSError:
+            why = ""
+        print("FEED 0: disk full, nothing submitted (%s, %.0f min old%s)" % (DISK_FULL, age / 60,
+                                                                       ": " + why if why else ""), flush=True)
+        return
     reg = load_registry(DEFAULT_REGISTRY)["sweeps"]
     todo = []
     for name, e in reg.items():
