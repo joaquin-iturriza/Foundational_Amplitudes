@@ -42,7 +42,7 @@ entries:
     read). The setup redesign (approved with step agents 2026-10-25, ``Yes, the step agents and everything else you said sounds
     good''''): code review passed (branch at 9ce1cb1, merges cleanly), two low fixes in progress, then tools/switch_over.sh,
     done-checks for every entry and the CLAUDE.md pass.'
-- status: waiting_user
+- status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -52,11 +52,18 @@ entries:
       and B (one shared standardization)
     - and their held-out zero-shot
     - CPU iteration on the catalog normalization
+  - said_at: '2026-10-25T18:40:58.832000+00:00'
+    text: Yes, run that hybrid test then.
+    decision: D129
+    answers_after: '2026-10-25T18:21:16+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
-  next: 'the CPU level check of the s-hat reference times a per-process constant (rerun FA-ccin2p3-c9fb30f5): write the design
-    and its numbers up, then bring the design and the GPU test''s cost to the user before any job; queue after that: the signed-data
-    check, then new candidates'
+  - D129
+  next: implement the hybrid target option in experiment.py (s-hat reference plus the per-process constant from the pool's
+    momenta), check it on CPU against prep_level's constants, then run the dimensionless_hybrid short pretraining on CC (about
+    2 GPU-h, same setup as the other five arms) and read it zero-shot on every axis
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*
@@ -75,6 +82,8 @@ entries:
       decisions: D99 allows GPU tests once a candidate looks promising but the user''s 2026-10-15 rule (designs we iterate
       on stop at the design and come to the user before any job) and the goal''s same clause govern this exploration; no decision
       sets the windows'' angular cut'
+    answered_at: '2026-10-25T18:40:58.832000+00:00'
+    decision: D129
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -91,15 +100,10 @@ entries:
     per target, par.\ The shape proxy on catalog_v3; queue: the signed-data check, sampling sensitivity, then new ideas).
     Held (D78): dancat_ext, catalog_global. Left on CC from my tests, not deleted: zz_memprof, zz_memmap_*, zz_ema_ckpt_*,
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
-  ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
-    + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
-    and should the catalog''s windows cover the forward region (|cos theta| < 0.9 leaves out two in five pp events)?'
-  waiting_since: '2026-10-25T18:21:16+00:00'
   searched: 'CLAUDE.md canonical setup (target-side levers are per-run) and HPO rules say nothing on new target designs; decisions:
     D99 allows GPU tests once a candidate looks promising but the user''s 2026-10-15 rule (designs we iterate on stop at the
     design and come to the user before any job) and the goal''s same clause govern this exploration; no decision sets the
     windows'' angular cut'
-  checked_until: '2026-10-25T18:40:21+00:00'
 - status: running
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
