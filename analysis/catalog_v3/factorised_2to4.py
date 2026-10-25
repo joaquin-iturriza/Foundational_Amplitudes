@@ -26,6 +26,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, ROOT)
+ARMS4 = ("baseline", "dimensionless", "dimensionless_context", "dimensionless_twin")
 KINDS = {"g": "a gluon", "a": "a photon", "z": "a Z", "h": "an H"}
 
 
@@ -111,7 +112,7 @@ def two_to_five(d, sub):
     for p, v in d5.items():
         hv = h.predict(v["X"])
         netp = {}
-        for arm in ("dimensionless", "dimensionless_context"):
+        for arm in ARMS4:
             nf = os.path.join(HERE, "data", f"factorised_2to5_net_{arm}", p + ".npz")
             if os.path.exists(nf):   # the arm's own 2->4 prediction in place of the exact parent (factorised_2to4_net.py)
                 z = dict(np.load(os.path.join(HERE, "data", "factorised_2to5", p + ".npz")))
@@ -127,7 +128,9 @@ def two_to_five(d, sub):
     med["net"] = {a: float(np.median([r["net"][a] for r in out.values() if a in r["net"]])) for a in arms}
     med["learned_below_net"] = {a: int(sum(r["learned"] < r["net"][a] for r in out.values() if a in r["net"]))
                                 for a in arms}
-    for arm in ("dimensionless", "dimensionless_context"):
+    med["net_parent_missing"] = {arm: sorted(p for p, r in out.items() if arm not in r["net_parent"]) for arm in ARMS4}
+    med["net_parent_missing"] = {a: m for a, m in med["net_parent_missing"].items() if m}   # listed, never dropped
+    for arm in ARMS4:
         rs = [r for r in out.values() if arm in r["net_parent"]]
         if rs:
             med[f"with {arm} as parent"] = {k: float(np.median([r["net_parent"][arm][k] for r in rs]))
