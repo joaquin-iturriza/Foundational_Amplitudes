@@ -996,9 +996,15 @@ entries:
     at: '2026-10-25T20:40:04+00:00'
     searched: D130 approved massless b (5-flavour) but not what happens to b-Yukawa-only classes; no decision covers dropping
       classes
-  searched: D130 approved massless b (5-flavour) but not what happens to b-Yukawa-only classes; no decision covers dropping
-    classes
-  ask: 'With the b massless (the 5-flavour scheme you approved), 34 catalog classes have no diagrams left: a Higgs on a b
-    line with nothing else to couple to it (b b~ > h, b g > b h, g g > b b~ h, ...). Do they drop out, or should the b keep
-    its Higgs coupling?'
-  waiting_since: '2026-10-25T20:40:04+00:00'
+  - ask: 'Storage on CC: which of these may go? (1) MadGraph events directories, never read, 97 GB; (2) model files of concluded
+      studies'' runs that train in under 1 h (38.5 GB) or under 5 h (40 GB); (3) the 28 GB of archive tars, which become the
+      only copy of the lxplus-era models if (2) runs'
+    at: '2026-10-25T20:44:02+00:00'
+    searched: D133 scopes model deletion to concluded studies under ~5 h but approves no deletion; D122 holds the storage
+      entry; D19 covers only prune.py's rules
+  searched: D133 scopes model deletion to concluded studies under ~5 h but approves no deletion; D122 holds the storage entry;
+    D19 covers only prune.py's rules
+  ask: 'Storage on CC: which of these may go? (1) MadGraph events directories, never read, 97 GB; (2) model files of concluded
+    studies'' runs that train in under 1 h (38.5 GB) or under 5 h (40 GB); (3) the 28 GB of archive tars, which become the
+    only copy of the lxplus-era models if (2) runs'
+  waiting_since: '2026-10-25T20:44:02+00:00'
