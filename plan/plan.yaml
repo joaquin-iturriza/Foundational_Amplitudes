@@ -118,13 +118,15 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: 'Progress at 19:22 (watchdog check over the 180 tp3_lowd_ sweeps on CC): 248 of 900 trials in (freeze 104/300, L2-SP
-    77/300, linear probe 67/300), 647 queued or running. Seven linear-probe slots failed on the head read-out assertion (r1_uubar_gg_d5,
-    r7_ee_Za_d5, r1_ud_ud_d4, r1_ud_ud_d5, r1_ee_bb_nlo_d5, r1_ee_Za_d5, r7_uubar_gg_d4), more may follow among the queued
-    linear-probe trials; a separate agent is repairing fine_tune.py, and those slots are rerun from their configs once the
-    fix is synced. When all 900 are in: collect tp3_lowd_ (analysis/transfer/collect_sweeps.py), run analysis/transfer/lowd_dyhpo.py,
-    compare each method''s best against best with the default''s own search on cell medians, and write it up after par:lowd_ft
-    in docs/results.tex.'
+  next: 'The H100 replay of a failed linear-probe trial (r1_ud_ud_d5 trial_0001, 20 steps, run FA-ccin2p3-cf5b43a4 at commit
+    921d3d0, which carries the fix of c11ff1e: the probe head fitted and checked with TF32 off, TF32 back on for training)
+    passes: head match 4.4e-05 against the 1e-3 tolerance (the seven failures missed by 0.0017 to 0.0089); ridge lambda 0.218,
+    leave-one-out MSE 0.0514 standardized, the parent head''s own 2.343. So TF32 rounding was the cause and the committed
+    fix removes it. Next: once the other agent''s remaining fine_tune.py edits are committed and synced to CC, rerun the failed
+    linear-probe slots (r1_uubar_gg_d5, r7_ee_Za_d5, r1_ud_ud_d4, r1_ud_ud_d5, r1_ee_bb_nlo_d5, r1_ee_Za_d5, r7_uubar_gg_d4,
+    and any later ones) from their configs (sweep/rerun_failed.py); check that linear-probe trials started after the sync
+    log ''head match'' below 1e-3. When all 900 are in: collect tp3_lowd_ (analysis/transfer/collect_sweeps.py), run analysis/transfer/lowd_dyhpo.py,
+    compare each method''s best against the default''s own search on cell medians, and write it up after par:lowd_ft in docs/results.tex.'
   done_when: null
   match: tp3_lowd*,zz_lowd*
   notes_ref: null
