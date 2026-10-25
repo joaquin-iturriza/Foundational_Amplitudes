@@ -1,4 +1,6 @@
 #!/bin/bash
+# NOSYNC=1: submit against the code already deployed (a batch: `site sync ccin2p3 FA` once, then every job with
+# NOSYNC=1 in parallel; one sync per job serialised a batch at ~25 s a job, and two syncs at once collide)
 # Launch-queue run command for a one-job submission whose inputs live only on CC-IN2P3 (a run dir written there):
 # plan with `site pick --only ccin2p3` (the job cannot run elsewhere; planning over every site deferred it for as long
 # as another site looked faster, which with CC busy was indefinitely) and submit; defer (exit 75; the supervisor
@@ -20,7 +22,7 @@ echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
 # a submission counts only once it printed its run id (2026-10-23: submits refused for an uncommitted file went
 # unnoticed behind a filtered output, and the scorings were never queued)
-out=$(site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} ${V3_AXES:+--env "V3_AXES=$V3_AXES"} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
+out=$(site submit ccin2p3 FA "$JOB" ${NOSYNC:+--no-sync} ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} ${V3_AXES:+--env "V3_AXES=$V3_AXES"} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
 echo "$out"
 # CC full for this memory right now (site submit's fit check): defer, the supervisor retries on its next pass
 # the code transfer to CC failed (two launches syncing at once collide on the push; a dropped bundle): defer and retry
