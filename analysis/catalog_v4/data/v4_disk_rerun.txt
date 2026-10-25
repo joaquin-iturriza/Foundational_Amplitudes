@@ -1,0 +1,37 @@
+V4SIZE_KB 3473	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bb_abtwm__mt300_standalone
+V4SIZE_KB 3473	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bb_abtwm__mt50_standalone
+V4SIZE_KB 2529	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_ag_standalone
+V4SIZE_KB 3065	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_ddxgz_standalone
+V4SIZE_KB 3025	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_epvewm_standalone
+V4SIZE_KB 3425	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_ggtaptamz_standalone
+V4SIZE_KB 2689	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_gvevex_standalone
+V4SIZE_KB 2769	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bbx_wpwm_standalone
+V4SIZE_KB 2769	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bg_bgg_standalone
+V4SIZE_KB 3025	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_bg_bggz_standalone
+V4SIZE_KB 2529	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dbx_txu_standalone
+V4SIZE_KB 2777	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dd_add_standalone
+V4SIZE_KB 3233	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_ddx_ddxgg_standalone
+V4SIZE_KB 2689	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_ddx_ddx_standalone
+V4SIZE_KB 2817	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dg_dddx_standalone
+V4SIZE_KB 2689	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dg_dz_standalone
+V4SIZE_KB 3297	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dg_uuuxwm_standalone
+V4SIZE_KB 2569	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_dg_uwm_standalone
+V4SIZE_KB 3185	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_agttx_standalone
+V4SIZE_KB 3417	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_ccxgvevex_standalone
+V4SIZE_KB 2705	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_ccxhh_standalone
+V4SIZE_KB 2905	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_epvewm_standalone
+V4SIZE_KB 2873	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_mupvmwm_standalone
+V4SIZE_KB 2697	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_vevex_standalone
+V4SIZE_KB 2737	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_epem_wpwm_standalone
+V4SIZE_KB 2737	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_bbxg_standalone
+V4SIZE_KB 2697	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_bbx_standalone
+V4SIZE_KB 2745	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_cgsxwm_standalone
+V4SIZE_KB 2689	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_csxwm_standalone
+V4SIZE_KB 2633	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_gg_standalone
+V4SIZE_KB 3009	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_gg_gttxz_standalone
+V4SIZE_KB 2721	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_ud_dhu_standalone
+V4SIZE_KB 2945	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_uu_uuz_standalone
+V4SIZE_KB 2769	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_uux_ddx_standalone
+V4SIZE_KB 3121	/sps/lpnhe/jiturrizaramirez01/mg5amcnlo/v4_zp_ee_mumu_standalone
+V4SIZE_TOTAL_KB 1894261 dirs 70
+V4SIZE_FREE_KB 23524352

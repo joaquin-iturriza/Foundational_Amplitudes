@@ -1,10 +1,15 @@
-"""catalog_v4's validation and census read (run FA-ccin2p3-44e6a15b, scripts/job_catalog_v4_validate.sh).
+"""catalog_v4's validation and census read (runs FA-ccin2p3-44e6a15b and, with the sampling fix 63bc5de, the rerun
+FA-ccin2p3-2e1a0894; scripts/job_catalog_v4_validate.sh).
 
-Inputs (analysis/catalog_v4/data/, fetched from CC): validation.json (analysis/catalog_v4/validate_v4.py: per sampled
-entry the diagram counts, the backend build and its cards, the pool checks), checked.json (recipes/gen_catalog_v4.py
+Inputs (analysis/catalog_v4/data/, fetched from CC): validation.json (the rerun; analysis/catalog_v4/validate_v4.py: per
+sampled entry the diagram counts, the backend's cards, the pool checks), validation_first.json (the first run, whose
+pools all stopped on the missing sampling block; its backend build times, the rerun reused the backends),
+v4_disk_rerun.txt (the rerun's du of the standalones and the free space), checked.json (recipes/gen_catalog_v4.py
 --check: every catalog_v3 tree on its v4 string through MadGraph), v4_disk.txt (the job's du of the v4 backends it
 built, the free space, and the count of catalog_v3's MadGraph events dirs).
-Output: figs/census_diagrams (v4 against v3 diagram count per string, by layer) and, last line, the JSON of the numbers
+Output: figs/census_diagrams (v4 against v3 diagram count per string, by layer), figs/pool_sqrts_forward (three
+entries' sqrt(s_hat) per decade in the pool against log-uniform and log-uniform after the cuts, and the forward
+component's u = log(1/(1-|cos|)) against uniform) and, last line, the JSON of the numbers
 docs/results.tex cites. The regeneration's pool size is rows x (5 k + 1) float64 columns over every entry of
 recipes/catalog_v4_gen_stage{1..4}.yaml (k legs; mg5_pipeline_final's registry), its backends the count of distinct
 standalone names times the measured mean size per backend.
@@ -20,6 +25,9 @@ sys.path.insert(0, ROOT)
 D = os.path.join(HERE, "data")
 C = json.load(open(os.path.join(D, "checked.json")))
 V = json.load(open(os.path.join(D, "validation.json")))
+V0 = {r["name"]: r for r in json.load(open(os.path.join(D, "validation_first.json")))["rows"]}
+FIG_ENTRIES = ["v4_uux_ddx", "v4_ddx_ddxgg", "v4_epem_ccxgvevex"]
+NLOC = 20000          # local draws per entry for the after-cuts expectation and the forward replay
 
 
 def census():
@@ -45,9 +53,10 @@ def validation():
     rows = {r["name"]: r for r in V["rows"]}
     out = {"n_rows": V["n_rows"], "n_ok": V["n_ok"],
            "n_pool_error": sum("mixture path only" in (r.get("error") or "") for r in rows.values()),
-           "t_build_min": round(min(r["t_build"] for r in rows.values()), 0),
-           "t_build_max": round(max(r["t_build"] for r in rows.values()), 0),
-           "t_build_mean": round(float(np.mean([r["t_build"] for r in rows.values()])), 0),
+           # the builds ran in the first run; the rerun found them built (0 s)
+           "t_build_min": round(min(r["t_build"] for r in V0.values()), 0),
+           "t_build_max": round(max(r["t_build"] for r in V0.values()), 0),
+           "t_build_mean": round(float(np.mean([r["t_build"] for r in V0.values()])), 0),
            "tool_matches_v3": sum(bool(r["diagrams"].get("tool_matches_v3")) for r in rows.values()),
            "bound_attained": sum(r["diagrams"].get("bound_attained") is True for r in rows.values()),
            "bound_tested": sum(r["diagrams"].get("bound_attained") is not None for r in rows.values()),
@@ -59,9 +68,12 @@ def validation():
     for n in ("v4_uux_ddx", "v4_uu_uuz", "v4_ud_dhu", "v4_bbx_wpwm", "v4_bbx_ggtaptamz"):
         d = rows[n]["diagrams"]
         out[n] = {"v3": d["diagrams_v3_recorded"], "v4": d["v4"], "fivefs": d["v3_string_5fs"]}
+    out["card_ok"] = sum(bool(r.get("card_ok")) for r in rows.values())
     L = V["loops"]
     out["loops"] = {"entries": L["entries"], "bad": len(L["bad"]),
-                    "loop_qcd_qed_import": L["models"]["loop_qcd_qed_sm-no_b_mass"]}
+                    "loop_qcd_qed_import": L["models"]["loop_qcd_qed_sm-no_b_mass"],
+                    "generate_ok": sum(g["ok"] for g in L.get("generate", {}).values()),
+                    "generate_n": len(L.get("generate", {}))}
     from tools import nlo_virtual_pipeline as NV
     out["loops"]["loop_qcd_qed_entries"] = sum(v.get("_v4", False) and v["model"] == "loop_qcd_qed_sm-no_b_mass"
                                                for v in NV.VIRT_PROCESSES.values())
@@ -94,6 +106,137 @@ def disk():
             "v3_events_dirs": n3, "v3_events_gb": round(n3 * mev / 1e3, 0)}
 
 
+def local_draws(name, spec):
+    """the entry registered as the regeneration does; NLOC draws of its log-uniform measure through the pipeline's
+    candidate path with the cuts (bulk: no turn, forward: every draw turned), and the validation's forward replay
+    (raw draws, no cuts, turned by rotate_forward with the job's seeds) giving the turned particle's u"""
+    import mg5_pipeline_final as mg
+    sys.path.insert(0, HERE)
+    import validate_v4 as vv
+    vv.register(spec)
+    c = mg.PROCESSES[name]; lo, hi = spec["sqrts"]
+    rng = np.random.default_rng(1)
+    sm = mg._sqrts_sampler(lo, hi, c.get("sqrts_measure"), rng)
+    cut = [mg._candidates(NLOC, sm, c["m_finals"], c["pdg_ids"], rng, c["fiducial_cuts"], 0.0, 1e-6, ff,
+                          c.get("beam_masses"))[1] for ff in (0.0, 1.0)]
+    seed = 7000 + sorted(vv.sample()).index(name)
+    k = len(c["pdg_ids"]); r = np.random.default_rng(seed + 1)
+    mg._sqrts_sampler(lo, hi, "log", r)(vv.NKS)
+    ev, _ = mg._candidates(vv.NKS, mg._sqrts_sampler(lo, hi, "log", r), [float(m) for m in c["m_finals"]],
+                           list(c["pdg_ids"]), r, None, 0.5, 1e-6, 0.0, {})
+    cap = float(c["fiducial_cuts"]["cos_max"])
+    Q = mg.rotate_forward(np.stack([e[0] for e in ev]), cap, np.random.default_rng(seed + 2))
+    j = np.random.default_rng(seed + 2).integers(2, k, vv.NKS)
+    return mg.sampling_policy(c), cut, vv.u_of(Q[np.arange(vv.NKS), j]), float(np.log(1.0 / (1.0 - cap)))
+
+
+def pools():
+    """the rerun's pool checks over the 35 entries, and the pool's sqrt(s_hat) per decade against log-uniform and
+    against log-uniform after the cuts (the bulk and forward parts drawn locally; the flat-|M|^2 part needs labels)"""
+    sys.path.insert(0, HERE)
+    import mg5_pipeline_final as mg
+    import validate_v4 as vv
+    S = vv.sample()
+    for spec in S.values():
+        vv.register(spec)
+    rows = [r for r in V["rows"] if "error" not in r]
+    ks = [r["ks_log_sqrts"] for r in rows]; fk = [r["forward"]["ks_u"] for r in rows]
+    top = [r for r in rows if 6 in [abs(p) for p in mg.PROCESSES[r["name"]]["pdg_ids"][2:]]]
+    out = {"n": len(rows), "errors": len(V["rows"]) - len(rows),
+           "cuts_pass": sum(r["pass_v4"] == 1.0 for r in rows),
+           "outside_v3_min": round(min(r["outside_v3_cuts"] for r in rows if "outside_v3_cuts" in r), 2),
+           "outside_v3_max": round(max(r["outside_v3_cuts"] for r in rows if "outside_v3_cuts" in r), 2),
+           "in_window": sum(r["in_window"] for r in rows),
+           "ks_sqrts_pass": sum(d < c for d, c in ks), "ks_sqrts_max": round(max(d for d, _ in ks), 4),
+           "ks_crit": round(ks[0][1], 4),
+           "ks_u_pass": sum(d < c for d, c in fk), "ks_u_max": round(max(d for d, _ in fk), 4),
+           "u_replay_maxdev": float(f"{max(r['forward']['u_replay_maxdev'] for r in rows):.0e}"),
+           "fwd_conservation_max": float(f"{max(r['forward']['conservation_rel'] for r in rows):.0e}"),
+           "fwd_mass_dev_max": float(f"{max(r['forward']['mass_dev_rel'] for r in rows):.0e}"),
+           "conservation_max": float(f"{max(r['conservation_rel'] for r in rows):.0e}"),
+           "mass_dev_max": float(f"{max(r['mass_dev_rel'] for r in rows):.0e}"),
+           "beams_massless": sum(r["beams_massless"] for r in rows), "b_massless": sum(r["b_masses_zero"] for r in rows),
+           "top_entries": len(top), "labels_positive_min": round(min(r["labels_positive"] for r in rows), 3),
+           "fwd_share_v3_edge_min": round(min(r["forward_share_v3_edge"] for r in rows), 2),
+           "fwd_share_v3_edge_max": round(max(r["forward_share_v3_edge"] for r in rows), 2),
+           "ms_per_event_min": round(1e3 * min(r["sec_per_event"] for r in rows), 2),
+           "ms_per_event_max": round(1e3 * max(r["sec_per_event"] for r in rows), 2)}
+    # the pool's decades: binned CDF distance (a lower bound on the KS distance) to log-uniform and to log-uniform
+    # after the cuts; the lowest decade's share in the pool, after the cuts and under log-uniform
+    dec, loc = {}, {}
+    for r in rows:
+        pol, cut, u, ue = local_draws(r["name"], S[r["name"]])
+        e = np.log10(r["decades"]["edges"]); fw = float(pol.get("f_fwd", 0)); fb = 1 - float(pol["f_flat"]) - fw
+        exp = (fb * np.histogram(np.log10(cut[0]), e)[0] + fw * np.histogram(np.log10(cut[1]), e)[0]) / (NLOC * (fb + fw))
+        sh, lu = np.array(r["decades"]["share"]), np.array(r["decades"]["log_uniform"])
+        cdf = lambda x: np.cumsum(x)[:-1]
+        dec[r["name"]] = {"d_log_uniform": float(np.abs(cdf(sh) - cdf(lu)).max()),
+                          "d_after_cuts": float(np.abs(cdf(sh) - cdf(exp)).max()),
+                          "low": [float(sh[0]), float(exp[0]), float(lu[0])]}
+        loc[r["name"]] = (exp, u, ue)
+    dl = [v["d_log_uniform"] for v in dec.values()]; dc = [v["d_after_cuts"] for v in dec.values()]
+    out["pool_d_log_uniform_median"] = round(float(np.median(dl)), 3)
+    out["pool_d_log_uniform_max"] = round(float(max(dl)), 2)
+    out["pool_d_after_cuts_median"] = round(float(np.median(dc)), 3)
+    out["pool_d_after_cuts_max"] = round(float(max(dc)), 2)
+    for n in FIG_ENTRIES:
+        out[n] = {"low_pool": round(dec[n]["low"][0], 3), "low_cuts": round(dec[n]["low"][1], 3),
+                  "low_log_uniform": round(dec[n]["low"][2], 3)}
+    return out, loc
+
+
+def regeneration(disk_res):
+    """the full regeneration's CPU from the measured seconds per kept event (per number of finals, mean over the
+    sample; 2000-event chunks with 16 entries at once on one node, so a chunk's startup is in it) and its disk"""
+    import mg5_pipeline_final as mg
+    rows = [r for r in V["rows"] if "error" not in r]
+    nf = lambda n: len(mg.PROCESSES[n]["pdg_ids"]) - 2
+    spe = {}
+    for r in rows:
+        spe.setdefault(nf(r["name"]), []).append(r["sec_per_event"])
+    m = {k: float(np.mean(v)) for k, v in spe.items()}
+    cpu, ev, nl, nt = 0.0, 0, 0, 0
+    for s in (1, 2, 3, 4):
+        for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v4_gen_stage{s}.yaml")))["processes"]:
+            b = e.get("base", e["name"]); n = sum(e.get(x, 0) for x in ("n_train", "n_val", "n_test"))
+            if b.endswith("_nlo"):
+                nl += 1; continue
+            k = nf(b); cpu += n * m[min(k, max(m))] / 3600; ev += n; nt += 1
+    inv = json.load(open(os.path.join(ROOT, "analysis", "storage", "inventory.json")))["mg5amcnlo"]["catalog_v4_projection"]
+    lines = [l.split() for l in open(os.path.join(D, "v4_disk_rerun.txt")) if l.startswith("V")]
+    free = next(int(l[1]) for l in lines if l[0] == "V4SIZE_FREE_KB") * 1.024e-6
+    return {"ms_per_event_by_nfinal": {str(k): round(1e3 * v, 2) for k, v in sorted(m.items())},
+            "tree_entries": nt, "loop_entries": nl, "tree_events_m": round(ev / 1e6, 0),
+            "tree_cpu_h": round(cpu, 0), "backends_no_events_gb": inv["without_events_dirs_GB"],
+            "pool_gb": disk_res["pool_gb"], "total_gb": round(disk_res["pool_gb"] + inv["without_events_dirs_GB"], 0),
+            "free_gb": round(free, 1)}
+
+
+def figure_pools(loc):
+    import plot_style as ps
+    fig, (axL, axR) = ps.figure(ncols=2)
+    rows = {r["name"]: r for r in V["rows"]}
+    cols = [ps.C.blue, ps.C.vermillion, ps.C.green]
+    lab = {"v4_uux_ddx": r"$u\bar u\to d\bar d$", "v4_ddx_ddxgg": r"$d\bar d\to d\bar dgg$",
+           "v4_epem_ccxgvevex": r"$e^+e^-\to c\bar cg\nu_e\bar\nu_e$"}
+    for c, n in zip(cols, FIG_ENTRIES):
+        d = rows[n]["decades"]; e = np.log10(d["edges"]); w = np.diff(e)
+        exp, u, ue = loc[n]
+        axL.stairs(np.array(d["share"]) / w, e, color=c, label=lab[n], baseline=None)
+        axL.stairs(exp / w, e, color=c, linestyle="--", baseline=None)
+        axL.stairs(np.array(d["log_uniform"]) / w, e, color=c, linestyle=":", baseline=None)
+        h, b = np.histogram(u, np.linspace(0, ue, 21), density=True)
+        axR.stairs(h, b, color=c, baseline=None)
+        axR.plot([0, ue], [1 / ue] * 2, color=c, linestyle=":")
+    axL.plot([], [], color="k", label="sample"); axL.plot([], [], color="k", linestyle="--", label="after the cuts")
+    axL.plot([], [], color="k", linestyle=":", label="target")
+    axL.set_xlabel(r"$\log_{10}\sqrt{\hat s}$ [GeV]"); axL.set_ylabel(r"$dP/d\log_{10}\sqrt{\hat s}$")
+    axR.set_xlabel(r"$u=\log(1/(1-|\cos\theta|))$"); axR.set_ylabel(r"$dP/du$")
+    axR.set_ylim(0, 0.62)
+    ps.legend(axR, "upper right", handles=axL.get_legend_handles_labels()[0], ncol=2)
+    ps.save(fig, os.path.join(HERE, "figs", "pool_sqrts_forward"))
+
+
 def figure():
     import plot_style as ps
     fig, ax = ps.figure()
@@ -115,10 +258,12 @@ def figure():
 def main():
     by, tot = census()
     res = {"census": by, "total": tot, "val": validation(), "disk": disk()}
+    res["pools"], loc = pools()
+    res["regen"] = regeneration(res["disk"])
     # the tree backends' build, one core each (35 builds on 16 workers took 64 s of wall): measured mean x count
     res["disk"]["build_core_h"] = round(res["disk"]["tree_backends"] * res["val"]["t_build_mean"] / 3600, 0)
     if "--no-fig" not in sys.argv:
-        figure()
+        figure(); figure_pools(loc)
     print(json.dumps(res, default=lambda o: o.item() if hasattr(o, "item") else str(o)))
 
 

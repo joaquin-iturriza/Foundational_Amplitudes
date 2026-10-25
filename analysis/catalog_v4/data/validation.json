@@ -21,18 +21,81 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 26.760061025619507,
+   "t_build": 0.007253170013427734,
    "card": {
     "MT": 300.0,
     "ymt": 300.0,
     "WT": 8.729709,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 2.166299343109131,
+   "sec_per_event": 0.0010831496715545655,
+   "mass_dev_rel": 2.8389691039624434e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 9.495089334830488e-15,
+   "sqrts_min": 413.3432681472743,
+   "sqrts_max": 5994.663211045397,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     400.9999999999999,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.2765,
+     0.7235
+    ],
+    "log_uniform": [
+     0.3377474931340002,
+     0.6622525068659998
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.13949999999999996,
+   "u_hist": [
+    101,
+    268,
+    350,
+    285,
+    229,
+    171,
+    115,
+    101,
+    60,
+    47,
+    37,
+    34,
+    35,
+    27,
+    33,
+    30,
+    37,
+    25,
+    14,
+    1
+   ],
+   "forward_share_v3_edge": 0.424,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.008622653374755873,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.8260948309034575e-12,
+    "ks_u": [
+     0.004599553181779625,
+     0.013788582233137676
+    ],
+    "conservation_rel": 9.124160620990095e-15,
+    "mass_dev_rel": 3.573154031872421e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bb_abtwm__mt50",
@@ -54,18 +117,81 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 27.31198525428772,
+   "t_build": 0.0072460174560546875,
    "card": {
     "MT": 50.0,
     "ymt": 50.0,
     "WT": 0.0,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.7571971416473389,
+   "sec_per_event": 0.0008785985708236694,
+   "mass_dev_rel": 2.079548532477335e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 4.498542003242187e-14,
+   "sqrts_min": 154.85928953006263,
+   "sqrts_max": 5996.226278002121,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     150.99999999999994,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.403,
+     0.597
+    ],
+    "log_uniform": [
+     0.5134043556854107,
+     0.48659564431458935
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.14849999999999997,
+   "u_hist": [
+    150,
+    309,
+    294,
+    271,
+    231,
+    169,
+    113,
+    77,
+    52,
+    57,
+    39,
+    31,
+    46,
+    27,
+    23,
+    29,
+    27,
+    42,
+    12,
+    1
+   ],
+   "forward_share_v3_edge": 0.4085,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.00609840647170401,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.284394895468722e-12,
+    "ks_u": [
+     0.004614633612142094,
+     0.013788582233137676
+    ],
+    "conservation_rel": 7.054062905600042e-14,
+    "mass_dev_rel": 3.7538861776605234e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_ag__c30",
@@ -86,18 +212,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 21.98716139793396,
+   "t_build": 0.002406597137451172,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > a g QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > a g QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.39993929862976074,
+   "sec_per_event": 0.00019996964931488038,
+   "mass_dev_rel": 3.3036731609643607e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.5694740905491083e-16,
+   "sqrts_min": 62.267755575849776,
+   "sqrts_max": 5997.865619096724,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     60.0,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.043,
+     0.4285,
+     0.5285
+    ],
+    "log_uniform": [
+     0.11092437480817818,
+     0.5,
+     0.3890756251918219
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.349,
+   "u_hist": [
+    483,
+    355,
+    234,
+    163,
+    102,
+    95,
+    71,
+    71,
+    59,
+    58,
+    50,
+    53,
+    45,
+    43,
+    36,
+    28,
+    34,
+    16,
+    4,
+    0
+   ],
+   "forward_share_v3_edge": 0.349,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005097374608516864,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.140509991477302e-12,
+    "ks_u": [
+     0.004339001722367342,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5696291976911588e-16,
+    "mass_dev_rel": 5.252532775399336e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_ddxgz",
@@ -119,18 +311,81 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 24.281553030014038,
+   "t_build": 0.007104635238647461,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > d d~ g z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > d d~ g z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.3856735229492188,
+   "sec_per_event": 0.0006928367614746093,
+   "mass_dev_rel": 4.379844222327664e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.1065757135626646e-14,
+   "sqrts_min": 130.11481272404484,
+   "sqrts_max": 5989.347530079065,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     122.00000000000004,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.427,
+     0.573
+    ],
+    "log_uniform": [
+     0.5400430328949538,
+     0.4599569671050462
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.34650000000000003,
+   "u_hist": [
+    98,
+    254,
+    344,
+    285,
+    258,
+    181,
+    130,
+    85,
+    83,
+    65,
+    43,
+    34,
+    32,
+    22,
+    24,
+    21,
+    13,
+    16,
+    12,
+    0
+   ],
+   "forward_share_v3_edge": 0.4285,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005262606961313504,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.1724844145865063e-12,
+    "ks_u": [
+     0.0057747217878765245,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.338619196566398e-13,
+    "mass_dev_rel": 3.9818989889960164e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_epvewm",
@@ -151,18 +406,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 24.894834995269775,
+   "t_build": 0.007420539855957031,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3481624126434326,
+   "sec_per_event": 0.0001740812063217163,
+   "mass_dev_rel": 3.0570874204230144e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 7.603238348195395e-14,
+   "sqrts_min": 97.38619671123999,
+   "sqrts_max": 5985.034287304026,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     92.00000000000001,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.0015,
+     0.5395,
+     0.459
+    ],
+    "log_uniform": [
+     0.019958610383474677,
+     0.5511574954071411,
+     0.4288838942093843
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.16200000000000003,
+   "u_hist": [
+    238,
+    348,
+    324,
+    264,
+    196,
+    130,
+    79,
+    65,
+    65,
+    50,
+    40,
+    28,
+    31,
+    29,
+    25,
+    30,
+    27,
+    22,
+    9,
+    0
+   ],
+   "forward_share_v3_edge": 0.3515,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.006245605871438853,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.474465077284549e-12,
+    "ks_u": [
+     0.004886349565477573,
+     0.013788582233137676
+    ],
+    "conservation_rel": 9.372426665527478e-14,
+    "mass_dev_rel": 5.937623982714271e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_ggtaptamz",
@@ -183,18 +504,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 27.380073070526123,
+   "t_build": 0.01193857192993164,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > g g ta+ ta- z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > g g ta+ ta- z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 4.6482179164886475,
+   "sec_per_event": 0.002324108958244324,
+   "mass_dev_rel": 2.701155677938853e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 3.5848340789929057e-14,
+   "sqrts_min": 144.6551005845959,
+   "sqrts_max": 5983.122829143075,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     132.00000000000006,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.391,
+     0.609
+    ],
+    "log_uniform": [
+     0.5305490480711758,
+     0.46945095192882424
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.259,
+   "u_hist": [
+    32,
+    184,
+    287,
+    339,
+    288,
+    206,
+    167,
+    118,
+    83,
+    71,
+    52,
+    36,
+    26,
+    29,
+    19,
+    27,
+    15,
+    16,
+    5,
+    0
+   ],
+   "forward_share_v3_edge": 0.4885,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005753285629918781,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.6076918402395677e-12,
+    "ks_u": [
+     0.006297759415217485,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.260516888850633e-13,
+    "mass_dev_rel": 4.893756805024482e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_gvevex__as090",
@@ -215,18 +599,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 22.808714151382446,
+   "t_build": 0.0029735565185546875,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > g ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > g ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.35953211784362793,
+   "sec_per_event": 0.00017976605892181397,
+   "mass_dev_rel": 2.919481385427794e-15,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.391450499220295e-11,
+   "sqrts_min": 20.619956636118037,
+   "sqrts_max": 5986.0783611822035,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.196,
+     0.4555,
+     0.3485
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.15849999999999997,
+   "u_hist": [
+    326,
+    370,
+    312,
+    218,
+    161,
+    105,
+    80,
+    62,
+    50,
+    44,
+    42,
+    34,
+    36,
+    16,
+    26,
+    27,
+    39,
+    34,
+    16,
+    2
+   ],
+   "forward_share_v3_edge": 0.333,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.00911126849729596,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.7461587731304462e-12,
+    "ks_u": [
+     0.005164312139735561,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.1579259011576284e-11,
+    "mass_dev_rel": 4.691037220022758e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bbx_wpwm",
@@ -247,18 +697,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 23.120911598205566,
+   "t_build": 0.00687718391418457,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b b~ > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.31954050064086914,
+   "sec_per_event": 0.00015977025032043457,
+   "mass_dev_rel": 4.3153322711645134e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 3.0820756713204616e-16,
+   "sqrts_min": 161.50062521017114,
+   "sqrts_max": 5997.00461456177,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     160.99999999999994,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4385,
+     0.5615
+    ],
+    "log_uniform": [
+     0.5047803191591378,
+     0.49521968084086215
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.0,
+   "u_hist": [
+    480,
+    315,
+    219,
+    143,
+    113,
+    90,
+    69,
+    47,
+    60,
+    57,
+    57,
+    48,
+    51,
+    54,
+    40,
+    41,
+    40,
+    50,
+    26,
+    0
+   ],
+   "forward_share_v3_edge": 0.3855,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.007418262264018316,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.84385839929746e-12,
+    "ks_u": [
+     0.003938694843091117,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.131094342515444e-16,
+    "mass_dev_rel": 5.761548525952014e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bg_bgg",
@@ -279,18 +792,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 24.160852193832397,
+   "t_build": 0.007192850112915039,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b g > b g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b g > b g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.5672686100006104,
+   "sec_per_event": 0.0002836343050003052,
+   "mass_dev_rel": 5.1160188511691124e-15,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.1145318125584167e-12,
+   "sqrts_min": 40.44066684701963,
+   "sqrts_max": 5982.786066251413,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     29.999999999999996,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.056,
+     0.4225,
+     0.5215
+    ],
+    "log_uniform": [
+     0.22723682275574014,
+     0.43458798967609363,
+     0.33817518756816634
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.3205,
+   "u_hist": [
+    195,
+    325,
+    351,
+    239,
+    185,
+    146,
+    108,
+    66,
+    43,
+    49,
+    31,
+    52,
+    33,
+    33,
+    30,
+    38,
+    29,
+    28,
+    19,
+    0
+   ],
+   "forward_share_v3_edge": 0.3875,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005283709357738697,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.540190280342358e-12,
+    "ks_u": [
+     0.005158925974281692,
+     0.013788582233137676
+    ],
+    "conservation_rel": 2.6915940396940416e-11,
+    "mass_dev_rel": 4.1562505251422436e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_bg_bggz",
@@ -311,18 +890,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 25.58487892150879,
+   "t_build": 0.007331132888793945,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate b g > b g g z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b g > b g g z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.956383466720581,
+   "sec_per_event": 0.0009781917333602905,
+   "mass_dev_rel": 3.3737467861149125e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 8.250530829026411e-14,
+   "sqrts_min": 138.02808527258543,
+   "sqrts_max": 5986.423059588081,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     122.00000000000004,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.407,
+     0.593
+    ],
+    "log_uniform": [
+     0.5400430328949538,
+     0.4599569671050462
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.26449999999999996,
+   "u_hist": [
+    71,
+    278,
+    334,
+    317,
+    251,
+    177,
+    124,
+    98,
+    66,
+    58,
+    51,
+    20,
+    26,
+    28,
+    22,
+    26,
+    21,
+    22,
+    9,
+    1
+   ],
+   "forward_share_v3_edge": 0.421,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.004116312325985971,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.8420820424580597e-12,
+    "ks_u": [
+     0.005691561055038763,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.3645075567597368e-13,
+    "mass_dev_rel": 3.850195326299724e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dbx_txu",
@@ -343,18 +985,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 22.053418397903442,
+   "t_build": 0.008138656616210938,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d b~ > t~ u QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d b~ > t~ u QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3056788444519043,
+   "sec_per_event": 0.00015283942222595214,
+   "mass_dev_rel": 4.037288346018774e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.9020102746207573e-16,
+   "sqrts_min": 183.09973712746705,
+   "sqrts_max": 5995.584815955256,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     182.99999999999991,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.39,
+     0.61
+    ],
+    "log_uniform": [
+     0.48660607778237125,
+     0.5133939222176288
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.383,
+   "u_hist": [
+    470,
+    308,
+    231,
+    151,
+    111,
+    111,
+    84,
+    58,
+    58,
+    48,
+    55,
+    51,
+    25,
+    46,
+    44,
+    58,
+    37,
+    36,
+    18,
+    0
+   ],
+   "forward_share_v3_edge": 0.383,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.0047651871327936135,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.8047785488306545e-12,
+    "ks_u": [
+     0.009712746824877716,
+     0.013788582233137676
+    ],
+    "conservation_rel": 2.984495781265458e-16,
+    "mass_dev_rel": 6.17610868786955e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dd_add",
@@ -376,18 +1081,84 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 21.85893678665161,
+   "t_build": 0.0071353912353515625,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d d > a d d QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d > a d d QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.48995018005371094,
+   "sec_per_event": 0.00024497509002685547,
+   "mass_dev_rel": 5.346814343823117e-15,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.6946890155321351e-12,
+   "sqrts_min": 38.53296631934489,
+   "sqrts_max": 5979.337983147134,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     29.999999999999996,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.0665,
+     0.443,
+     0.4905
+    ],
+    "log_uniform": [
+     0.22723682275574014,
+     0.43458798967609363,
+     0.33817518756816634
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.363,
+   "u_hist": [
+    225,
+    394,
+    302,
+    245,
+    185,
+    133,
+    95,
+    78,
+    58,
+    45,
+    32,
+    31,
+    31,
+    37,
+    25,
+    25,
+    24,
+    23,
+    12,
+    0
+   ],
+   "forward_share_v3_edge": 0.359,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.009546878130581582,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.1866952693017083e-12,
+    "ks_u": [
+     0.006597589375363033,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.8253208858350246e-11,
+    "mass_dev_rel": 4.507594424341882e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_ddx_ddx",
@@ -409,18 +1180,84 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 21.560016632080078,
+   "t_build": 0.007657289505004883,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d d~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.36144399642944336,
+   "sec_per_event": 0.0001807219982147217,
+   "mass_dev_rel": 5.134779647573066e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.568857549804203e-16,
+   "sqrts_min": 20.25535664474011,
+   "sqrts_max": 5992.946340256237,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.1705,
+     0.41,
+     0.4195
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.344,
+   "u_hist": [
+    515,
+    303,
+    251,
+    162,
+    132,
+    107,
+    76,
+    80,
+    51,
+    51,
+    51,
+    30,
+    36,
+    31,
+    35,
+    30,
+    20,
+    21,
+    18,
+    0
+   ],
+   "forward_share_v3_edge": 0.344,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.010858241599520868,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.3447910280083306e-12,
+    "ks_u": [
+     0.007184258386856046,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5699755406232537e-16,
+    "mass_dev_rel": 4.895456451073696e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_ddx_ddxgg",
@@ -442,18 +1279,84 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 26.193812370300293,
+   "t_build": 0.006797075271606445,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d d~ > d d~ g g QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d~ > d d~ g g QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.9798717498779297,
+   "sec_per_event": 0.0009899358749389648,
+   "mass_dev_rel": 1.3807240542850214e-15,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.6042106114674983e-12,
+   "sqrts_min": 60.26987966009456,
+   "sqrts_max": 5996.9312622607495,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     40.000000000000014,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.018,
+     0.438,
+     0.544
+    ],
+    "log_uniform": [
+     0.18286917288787063,
+     0.4595395509441786,
+     0.3575912761679508
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.42800000000000005,
+   "u_hist": [
+    61,
+    292,
+    324,
+    308,
+    277,
+    167,
+    109,
+    114,
+    69,
+    61,
+    58,
+    43,
+    19,
+    23,
+    20,
+    19,
+    14,
+    13,
+    9,
+    0
+   ],
+   "forward_share_v3_edge": 0.4205,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.0064553649022605075,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.7248424910576432e-12,
+    "ks_u": [
+     0.003762193226200694,
+     0.013788582233137676
+    ],
+    "conservation_rel": 5.913922748097017e-11,
+    "mass_dev_rel": 4.3798832523430584e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dg_dddx",
@@ -475,18 +1378,84 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 22.531134128570557,
+   "t_build": 0.0072095394134521484,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d g > d d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > d d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.5219607353210449,
+   "sec_per_event": 0.0002609803676605225,
+   "mass_dev_rel": 1.1409226533957634e-14,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.482256596479093e-12,
+   "sqrts_min": 39.87536145385973,
+   "sqrts_max": 5991.982244788355,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     29.999999999999996,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.063,
+     0.4475,
+     0.4895
+    ],
+    "log_uniform": [
+     0.22723682275574014,
+     0.43458798967609363,
+     0.33817518756816634
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.39249999999999996,
+   "u_hist": [
+    205,
+    366,
+    303,
+    232,
+    189,
+    136,
+    102,
+    70,
+    65,
+    61,
+    51,
+    40,
+    38,
+    29,
+    38,
+    21,
+    20,
+    20,
+    14,
+    0
+   ],
+   "forward_share_v3_edge": 0.3865,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.008305840650403407,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.112088282046898e-12,
+    "ks_u": [
+     0.00320053751340732,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.565491211954672e-11,
+    "mass_dev_rel": 4.758405149565134e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dg_dz",
@@ -507,18 +1476,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 22.9709529876709,
+   "t_build": 0.00738525390625,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d g > d z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > d z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.511976957321167,
+   "sec_per_event": 0.0002559884786605835,
+   "mass_dev_rel": 5.010665537991709e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 3.0744362586431605e-16,
+   "sqrts_min": 102.13578557065037,
+   "sqrts_max": 5966.939651963618,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     101.99999999999999,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.522,
+     0.478
+    ],
+    "log_uniform": [
+     0.5602549936056478,
+     0.4397450063943522
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.34750000000000003,
+   "u_hist": [
+    528,
+    302,
+    214,
+    182,
+    114,
+    92,
+    88,
+    54,
+    55,
+    50,
+    43,
+    48,
+    49,
+    35,
+    30,
+    39,
+    28,
+    29,
+    20,
+    0
+   ],
+   "forward_share_v3_edge": 0.3475,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005420475715596507,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.8563817977556027e-12,
+    "ks_u": [
+     0.0076175422427007256,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.1377695985034253e-16,
+    "mass_dev_rel": 5.105797414175317e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dg_uuuxwm",
@@ -540,18 +1572,81 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 20.322808027267456,
+   "t_build": 0.007113933563232422,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d g > u u u~ w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > u u u~ w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.9716541767120361,
+   "sec_per_event": 0.00048582708835601807,
+   "mass_dev_rel": 2.8838337061047973e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 9.049702718591527e-14,
+   "sqrts_min": 120.92411078614458,
+   "sqrts_max": 5986.770639385734,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     111.00000000000004,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4215,
+     0.5785
+    ],
+    "log_uniform": [
+     0.5509357371769481,
+     0.44906426282305195
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.3385,
+   "u_hist": [
+    90,
+    263,
+    340,
+    302,
+    219,
+    181,
+    136,
+    104,
+    63,
+    52,
+    48,
+    36,
+    29,
+    24,
+    36,
+    24,
+    20,
+    21,
+    12,
+    0
+   ],
+   "forward_share_v3_edge": 0.427,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.007413014291726305,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.120970066243899e-12,
+    "ks_u": [
+     0.0057644951275417355,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.3873090288945474e-13,
+    "mass_dev_rel": 4.841701279127202e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_dg_uwm",
@@ -572,18 +1667,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 14.553895950317383,
+   "t_build": 0.007086515426635742,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate d g > u w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > u w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.41927456855773926,
+   "sec_per_event": 0.00020963728427886964,
+   "mass_dev_rel": 3.7128909572689305e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 3.07508482442533e-16,
+   "sqrts_min": 92.36141432196393,
+   "sqrts_max": 5993.477237234513,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     92.00000000000001,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.015,
+     0.4815,
+     0.5035
+    ],
+    "log_uniform": [
+     0.019958610383474677,
+     0.5511574954071411,
+     0.4288838942093843
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.36,
+   "u_hist": [
+    500,
+    298,
+    227,
+    182,
+    122,
+    100,
+    86,
+    61,
+    65,
+    55,
+    54,
+    45,
+    37,
+    40,
+    31,
+    25,
+    27,
+    31,
+    14,
+    0
+   ],
+   "forward_share_v3_edge": 0.36,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.0074983330206753185,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.8598456108520622e-12,
+    "ks_u": [
+     0.007172246543301064,
+     0.013788582233137676
+    ],
+    "conservation_rel": 4.384177454759046e-16,
+    "mass_dev_rel": 5.076812593253128e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_agttx",
@@ -604,18 +1765,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 18.732645988464355,
+   "t_build": 0.007375478744506836,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > a g t t~ QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > a g t t~ QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.0373790264129639,
+   "sec_per_event": 0.0005186895132064819,
+   "mass_dev_rel": 2.595642872752566e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 7.401451845916238e-15,
+   "sqrts_min": 370.8235502374362,
+   "sqrts_max": 5996.792590175787,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     364.99999999999994,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.3225,
+     0.6775
+    ],
+    "log_uniform": [
+     0.35999845097893196,
+     0.6400015490210681
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.21099999999999997,
+   "u_hist": [
+    103,
+    311,
+    339,
+    332,
+    262,
+    204,
+    164,
+    115,
+    101,
+    37,
+    13,
+    8,
+    3,
+    2,
+    3,
+    2,
+    0,
+    1,
+    0,
+    0
+   ],
+   "forward_share_v3_edge": 0.374,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.007965494734801515,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.220446049250313e-14,
+    "ks_u": [
+     0.007211255905142128,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.1842480149980804e-14,
+    "mass_dev_rel": 4.2440377030623207e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_ccxgvevex",
@@ -636,18 +1860,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 20.36449885368347,
+   "t_build": 0.007971048355102539,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > c c~ g ve ve~ QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > c c~ g ve ve~ QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.8979933261871338,
+   "sec_per_event": 0.0004489966630935669,
+   "mass_dev_rel": 6.326655484396813e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.1566989942290804e-11,
+   "sqrts_min": 60.9111409451704,
+   "sqrts_max": 5998.681454427575,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     29.999999999999996,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.0125,
+     0.4485,
+     0.539
+    ],
+    "log_uniform": [
+     0.22723682275574014,
+     0.43458798967609363,
+     0.33817518756816634
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.26149999999999995,
+   "u_hist": [
+    34,
+    231,
+    338,
+    320,
+    356,
+    228,
+    182,
+    141,
+    110,
+    30,
+    9,
+    6,
+    7,
+    2,
+    2,
+    3,
+    0,
+    0,
+    1,
+    0
+   ],
+   "forward_share_v3_edge": 0.434,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.004475729159335806,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.398081733190338e-14,
+    "ks_u": [
+     0.00559965190002254,
+     0.013788582233137676
+    ],
+    "conservation_rel": 5.0876858125197436e-11,
+    "mass_dev_rel": 4.547786480722526e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_ccxhh",
@@ -668,18 +1958,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 16.363948583602905,
+   "t_build": 0.006612062454223633,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > c c~ h h QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > c c~ h h QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.4880690574645996,
+   "sec_per_event": 0.0002440345287322998,
+   "mass_dev_rel": 2.560049671873026e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 6.762498997272981e-15,
+   "sqrts_min": 275.041653049733,
+   "sqrts_max": 5995.770276371506,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     270.00000000000006,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4065,
+     0.5935
+    ],
+    "log_uniform": [
+     0.4222167503464306,
+     0.5777832496535694
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.21450000000000002,
+   "u_hist": [
+    116,
+    300,
+    367,
+    331,
+    221,
+    211,
+    175,
+    111,
+    111,
+    31,
+    12,
+    4,
+    4,
+    3,
+    0,
+    1,
+    2,
+    0,
+    0,
+    0
+   ],
+   "forward_share_v3_edge": 0.369,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005767106606656108,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.3092638912203256e-14,
+    "ks_u": [
+     0.005845310836369411,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.9491349261156613e-14,
+    "mass_dev_rel": 4.426382068557825e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_epvewm",
@@ -700,18 +2053,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 17.51541256904602,
+   "t_build": 0.0066416263580322266,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.40119504928588867,
+   "sec_per_event": 0.00020059752464294433,
+   "mass_dev_rel": 4.078988692036699e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 4.8967157511396266e-14,
+   "sqrts_min": 94.94001299786589,
+   "sqrts_max": 5992.4597045645305,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     92.00000000000001,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.0025,
+     0.52,
+     0.4775
+    ],
+    "log_uniform": [
+     0.019958610383474677,
+     0.5511574954071411,
+     0.4288838942093843
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.17100000000000004,
+   "u_hist": [
+    201,
+    353,
+    346,
+    265,
+    226,
+    179,
+    132,
+    127,
+    104,
+    32,
+    10,
+    10,
+    8,
+    3,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1
+   ],
+   "forward_share_v3_edge": 0.35,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005992811001672371,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.1316282072803006e-14,
+    "ks_u": [
+     0.008663889248054557,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.0287180268067562e-13,
+    "mass_dev_rel": 4.3406239653894743e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_mupvmwm",
@@ -732,18 +2151,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 17.92532992362976,
+   "t_build": 0.007568359375,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > mu+ vm w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > mu+ vm w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3559889793395996,
+   "sec_per_event": 0.0001779944896697998,
+   "mass_dev_rel": 4.167719727517516e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.6877637335742107e-14,
+   "sqrts_min": 96.77577860893943,
+   "sqrts_max": 5988.836656355468,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     92.00000000000001,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.001,
+     0.5335,
+     0.4655
+    ],
+    "log_uniform": [
+     0.019958610383474677,
+     0.5511574954071411,
+     0.4288838942093843
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.133,
+   "u_hist": [
+    204,
+    345,
+    331,
+    296,
+    258,
+    188,
+    121,
+    111,
+    79,
+    32,
+    14,
+    12,
+    4,
+    1,
+    2,
+    2,
+    0,
+    0,
+    0,
+    0
+   ],
+   "forward_share_v3_edge": 0.331,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005741466591892563,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 1.5987211554602254e-14,
+    "ks_u": [
+     0.007453595120110235,
+     0.013788582233137676
+    ],
+    "conservation_rel": 9.514134140535627e-14,
+    "mass_dev_rel": 4.0417203863674314e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_vevex",
@@ -764,18 +2249,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 15.14724063873291,
+   "t_build": 0.007081031799316406,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.37755250930786133,
+   "sec_per_event": 0.00018877625465393066,
+   "mass_dev_rel": 3.9584392764420823e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.567946146515049e-16,
+   "sqrts_min": 10.030771144670851,
+   "sqrts_max": 5980.382144670173,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     10.0,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.39,
+     0.3135,
+     0.2965
+    ],
+    "log_uniform": [
+     0.3599516044570672,
+     0.3599516044570672,
+     0.2800967910858656
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.0,
+   "u_hist": [
+    585,
+    424,
+    263,
+    173,
+    135,
+    103,
+    98,
+    95,
+    87,
+    27,
+    4,
+    4,
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0
+   ],
+   "forward_share_v3_edge": 0.2315,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.007054889791021535,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.353672812205332e-14,
+    "ks_u": [
+     0.004326478074285767,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5700830173821529e-16,
+    "mass_dev_rel": 4.690257898920522e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_epem_wpwm",
@@ -796,18 +2347,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 16.58896040916443,
+   "t_build": 0.007166147232055664,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3227522373199463,
+   "sec_per_event": 0.00016137611865997314,
+   "mass_dev_rel": 4.0828643714639184e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 3.0972323357919962e-16,
+   "sqrts_min": 161.10613267020585,
+   "sqrts_max": 5988.705018516365,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     160.99999999999994,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4615,
+     0.5385
+    ],
+    "log_uniform": [
+     0.5047803191591378,
+     0.49521968084086215
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.0,
+   "u_hist": [
+    539,
+    352,
+    256,
+    200,
+    159,
+    114,
+    106,
+    108,
+    121,
+    25,
+    5,
+    4,
+    4,
+    0,
+    2,
+    3,
+    1,
+    0,
+    0,
+    1
+   ],
+   "forward_share_v3_edge": 0.2755,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.003757154276390451,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.5757174171303632e-14,
+    "ks_u": [
+     0.003989874164708529,
+     0.013788582233137676
+    ],
+    "conservation_rel": 3.1341447398643486e-16,
+    "mass_dev_rel": 4.506825698277871e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_bbx",
@@ -828,18 +2442,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 15.432581424713135,
+   "t_build": 0.007463932037353516,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > b b~ QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > b b~ QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.34477996826171875,
+   "sec_per_event": 0.00017238998413085938,
+   "mass_dev_rel": 3.3210048762450594e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.5687860619693175e-16,
+   "sqrts_min": 20.81499086915616,
+   "sqrts_max": 5979.2182129942885,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.186,
+     0.397,
+     0.417
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.0,
+   "u_hist": [
+    512,
+    347,
+    227,
+    158,
+    109,
+    79,
+    80,
+    62,
+    66,
+    52,
+    46,
+    39,
+    38,
+    31,
+    35,
+    28,
+    39,
+    33,
+    19,
+    0
+   ],
+   "forward_share_v3_edge": 0.337,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.0048783623245601815,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.7923440509548527e-12,
+    "ks_u": [
+     0.0036113755026585814,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.569840245143177e-16,
+    "mass_dev_rel": 5.52105965596442e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_bbxg",
@@ -860,18 +2540,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 16.77637028694153,
+   "t_build": 0.00735926628112793,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > b b~ g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > b b~ g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.5787670612335205,
+   "sec_per_event": 0.00028938353061676026,
+   "mass_dev_rel": 2.8654619480634635e-15,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.4829528445692063e-12,
+   "sqrts_min": 33.45692488588505,
+   "sqrts_max": 5999.631310056759,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     29.999999999999996,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.061,
+     0.428,
+     0.511
+    ],
+    "log_uniform": [
+     0.22723682275574014,
+     0.43458798967609363,
+     0.33817518756816634
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.20450000000000002,
+   "u_hist": [
+    208,
+    352,
+    328,
+    245,
+    194,
+    142,
+    99,
+    80,
+    62,
+    32,
+    39,
+    42,
+    32,
+    13,
+    43,
+    27,
+    32,
+    19,
+    11,
+    0
+   ],
+   "forward_share_v3_edge": 0.3725,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.008187335021294873,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.597033699203166e-12,
+    "ks_u": [
+     0.0047561363876971186,
+     0.013788582233137676
+    ],
+    "conservation_rel": 2.8267431697510723e-11,
+    "mass_dev_rel": 6.46663741545256e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_cgsxwm",
@@ -892,18 +2638,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 16.783867835998535,
+   "t_build": 0.006850004196166992,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > c g s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > c g s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 1.0663230419158936,
+   "sec_per_event": 0.0005331615209579468,
+   "mass_dev_rel": 2.661254906455719e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 9.719310728701316e-14,
+   "sqrts_min": 119.32511549232596,
+   "sqrts_max": 5996.537614092699,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     111.00000000000004,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4025,
+     0.5975
+    ],
+    "log_uniform": [
+     0.5509357371769481,
+     0.44906426282305195
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.3415,
+   "u_hist": [
+    90,
+    279,
+    335,
+    324,
+    224,
+    172,
+    130,
+    89,
+    66,
+    61,
+    38,
+    40,
+    36,
+    23,
+    20,
+    18,
+    22,
+    17,
+    15,
+    1
+   ],
+   "forward_share_v3_edge": 0.413,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.004020186665492864,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 1.8705037518884637e-12,
+    "ks_u": [
+     0.004187626115492171,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.4696221792174354e-13,
+    "mass_dev_rel": 3.7923007958031396e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_csxwm",
@@ -924,18 +2733,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 15.53317141532898,
+   "t_build": 0.006838560104370117,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > c s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > c s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.5112724304199219,
+   "sec_per_event": 0.0002556362152099609,
+   "mass_dev_rel": 4.829293859045709e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 5.352439890337712e-14,
+   "sqrts_min": 105.86763635433273,
+   "sqrts_max": 5991.433516393435,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     101.00000000000001,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.4405,
+     0.5595
+    ],
+    "log_uniform": [
+     0.5613157379699055,
+     0.43868426203009453
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.29800000000000004,
+   "u_hist": [
+    238,
+    345,
+    303,
+    244,
+    168,
+    124,
+    91,
+    62,
+    50,
+    51,
+    41,
+    50,
+    43,
+    35,
+    44,
+    35,
+    32,
+    29,
+    15,
+    0
+   ],
+   "forward_share_v3_edge": 0.381,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005174895391287404,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.7178259642823832e-12,
+    "ks_u": [
+     0.004842071756397726,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.035448130749842e-13,
+    "mass_dev_rel": 4.136457932076644e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_gg",
@@ -956,18 +2828,84 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 16.04184341430664,
+   "t_build": 0.006214618682861328,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.35610532760620117,
+   "sec_per_event": 0.0001780526638031006,
+   "mass_dev_rel": 3.506560913357692e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.568025546593164e-16,
+   "sqrts_min": 20.080030296684594,
+   "sqrts_max": 5999.8345242287105,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.157,
+     0.398,
+     0.445
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.37150000000000005,
+   "u_hist": [
+    495,
+    291,
+    226,
+    160,
+    134,
+    101,
+    79,
+    59,
+    58,
+    51,
+    55,
+    43,
+    44,
+    46,
+    36,
+    42,
+    25,
+    33,
+    22,
+    0
+   ],
+   "forward_share_v3_edge": 0.3715,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005814874881227561,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.431832513138943e-12,
+    "ks_u": [
+     0.010967698265335613,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5700393749848094e-16,
+    "mass_dev_rel": 6.007167481427859e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_gg_gttxz",
@@ -988,18 +2926,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 17.737960815429688,
+   "t_build": 0.007190227508544922,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate g g > g t t~ z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > g t t~ z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 2.6446189880371094,
+   "sec_per_event": 0.0013223094940185546,
+   "mass_dev_rel": 2.898061195428259e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.1696604923310836e-14,
+   "sqrts_min": 447.4770147239584,
+   "sqrts_max": 5999.627264289345,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     447.00000000000017,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.2495,
+     0.7505
+    ],
+    "log_uniform": [
+     0.31005401583443,
+     0.68994598416557
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.16549999999999998,
+   "u_hist": [
+    88,
+    287,
+    312,
+    268,
+    216,
+    147,
+    126,
+    87,
+    64,
+    58,
+    44,
+    29,
+    46,
+    48,
+    36,
+    34,
+    41,
+    36,
+    33,
+    0
+   ],
+   "forward_share_v3_edge": 0.4515,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.003376916078793424,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.9309887850104133e-12,
+    "ks_u": [
+     0.004489206289218284,
+     0.013788582233137676
+    ],
+    "conservation_rel": 8.596945745812383e-15,
+    "mass_dev_rel": 3.0959812009467675e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_ud_dhu",
@@ -1020,18 +3021,81 @@
     "bound_attained": null,
     "tool_matches_v3": true
    },
-   "t_build": 14.837265253067017,
+   "t_build": 0.00709986686706543,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate u d > d h u QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u d > d h u QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3375258445739746,
+   "sec_per_event": 0.0001687629222869873,
+   "mass_dev_rel": 3.2127264142381294e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 2.971339014302238e-14,
+   "sqrts_min": 151.28990676977037,
+   "sqrts_max": 5990.039818751437,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     144.99999999999997,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.3905,
+     0.6095
+    ],
+    "log_uniform": [
+     0.5187040369977348,
+     0.4812959630022651
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.32599999999999996,
+   "u_hist": [
+    229,
+    328,
+    330,
+    214,
+    148,
+    119,
+    105,
+    74,
+    70,
+    60,
+    54,
+    36,
+    40,
+    39,
+    25,
+    36,
+    38,
+    37,
+    16,
+    2
+   ],
+   "forward_share_v3_edge": 0.4015,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.0031114565333469346,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.900790718740609e-12,
+    "ks_u": [
+     0.004886162023024498,
+     0.013788582233137676
+    ],
+    "conservation_rel": 5.816818051118308e-14,
+    "mass_dev_rel": 5.939434125816327e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_uu_uuz",
@@ -1053,18 +3117,81 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 12.926509857177734,
+   "t_build": 0.007398366928100586,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate u u > u u z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u u > u u z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.5232052803039551,
+   "sec_per_event": 0.00026160264015197754,
+   "mass_dev_rel": 3.2742089029961597e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 4.7277657162552653e-14,
+   "sqrts_min": 116.3374629499557,
+   "sqrts_max": 5995.268335561322,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     111.99999999999997,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.405,
+     0.595
+    ],
+    "log_uniform": [
+     0.5499240584248823,
+     0.45007594157511766
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.3405,
+   "u_hist": [
+    204,
+    333,
+    263,
+    220,
+    182,
+    136,
+    86,
+    89,
+    66,
+    56,
+    40,
+    46,
+    51,
+    29,
+    46,
+    39,
+    45,
+    39,
+    28,
+    2
+   ],
+   "forward_share_v3_edge": 0.4305,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.005430377660638308,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.517097641430155e-12,
+    "ks_u": [
+     0.010764832200530039,
+     0.013788582233137676
+    ],
+    "conservation_rel": 8.396226064325437e-14,
+    "mass_dev_rel": 5.659096926377212e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_uux_ddx",
@@ -1086,18 +3213,84 @@
     "bound_attained": true,
     "tool_matches_v3": true
    },
-   "t_build": 11.868818998336792,
+   "t_build": 0.007670402526855469,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "sm_no_b_mass"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate u u~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u u~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3065519332885742,
+   "sec_per_event": 0.0001532759666442871,
+   "mass_dev_rel": 3.5139532029661816e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.56974116432859e-16,
+   "sqrts_min": 20.21553639330921,
+   "sqrts_max": 5996.341712359504,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.181,
+     0.3425,
+     0.4765
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.351,
+   "u_hist": [
+    482,
+    334,
+    218,
+    189,
+    134,
+    96,
+    78,
+    72,
+    56,
+    45,
+    32,
+    46,
+    33,
+    39,
+    37,
+    30,
+    39,
+    28,
+    12,
+    0
+   ],
+   "forward_share_v3_edge": 0.351,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.009181809340995217,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 9.306898218339018,
+    "u_replay_maxdev": 2.282618538629322e-12,
+    "ks_u": [
+     0.004467237750264197,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5700488852262405e-16,
+    "mass_dev_rel": 5.191967035937128e-16
+   },
+   "ok": true
   },
   {
    "name": "v4_zp_ee_mumu",
@@ -1110,18 +3303,84 @@
     "v4": 3,
     "exists": true
    },
-   "t_build": 13.912052631378174,
+   "t_build": 0.007062435150146484,
    "card": {
     "MT": 172.5,
     "ymt": 172.5,
     "WT": 1.480327,
     "MB": null,
     "ymb": null,
-    "model": null
+    "model": "DMsimp_s_spin1"
    },
-   "card_ok": false,
-   "error": "ValueError: ['generate e+ e- > mu+ mu- QED<=2 DMV<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
-   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > mu+ mu- QED<=2 DMV<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+   "card_ok": true,
+   "t_gen": 0.3809661865234375,
+   "sec_per_event": 0.00019048309326171874,
+   "mass_dev_rel": 4.1972432777563767e-16,
+   "b_masses_zero": true,
+   "beams_massless": true,
+   "conservation_rel": 1.5669984220069174e-16,
+   "sqrts_min": 20.238749190851074,
+   "sqrts_max": 5964.599464781174,
+   "in_window": true,
+   "decades": {
+    "edges": [
+     20.000000000000004,
+     100.0,
+     1000.0,
+     6000.000000000003
+    ],
+    "share": [
+     0.1975,
+     0.549,
+     0.2535
+    ],
+    "log_uniform": [
+     0.2821702825423948,
+     0.40369440861835026,
+     0.3141353088392549
+    ]
+   },
+   "pass_v4": 1.0,
+   "outside_v3_cuts": 0.1925,
+   "u_hist": [
+    607,
+    444,
+    274,
+    191,
+    147,
+    108,
+    77,
+    70,
+    63,
+    19,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "forward_share_v3_edge": 0.1925,
+   "labels_positive": 1.0,
+   "ks_log_sqrts": [
+    0.00504433126510373,
+    0.013788582233137676
+   ],
+   "forward": {
+    "u_edge": 4.605170185988091,
+    "u_replay_maxdev": 2.6645352591003757e-14,
+    "ks_u": [
+     0.012593828320145772,
+     0.013788582233137676
+    ],
+    "conservation_rel": 1.5700904684511086e-16,
+    "mass_dev_rel": 4.815256415202721e-16
+   },
+   "ok": true
   }
  ],
  "loops": {
@@ -1130,13 +3389,21 @@
   "models": {
    "sm-no_b_mass": true,
    "loop_sm-no_b_mass": true,
-   "loop_qcd_qed_sm-no_b_mass": false
+   "loop_qcd_qed_sm-no_b_mass": true
   },
   "generate": {
    "v4_bb_bb": {
     "string": "generate b b > b b QED<=2 [virt=QCD]",
     "model": "loop_sm-no_b_mass",
-    "ok": false,
+    "ok": true,
+    "diagrams": {
+     "born": 6,
+     "loops": 28,
+     "loops_discarded": 8,
+     "R2": 26,
+     "UV": 32,
+     "subprocesses": 1
+    },
     "info": [
      "MG5_aMC>\u001b[1;34mWARNING: All Born diagrams do not factorize the same sum of power(s) of the the perturbed order(s) QCD.",
      "This is potentially dangerous as the real-emission diagrams from aMC@NLO will not be consistent with these virtual contributions. \u001b[0m",
@@ -1147,7 +3414,15 @@
    "v4_bb_bbz": {
     "string": "generate b b > b b z QED<=3 [virt=QCD]",
     "model": "loop_sm-no_b_mass",
-    "ok": false,
+    "ok": true,
+    "diagrams": {
+     "born": 24,
+     "loops": 208,
+     "loops_discarded": 44,
+     "R2": 164,
+     "UV": 128,
+     "subprocesses": 1
+    },
     "info": [
      "MG5_aMC>\u001b[1;34mWARNING: All Born diagrams do not factorize the same sum of power(s) of the the perturbed order(s) QCD.",
      "This is potentially dangerous as the real-emission diagrams from aMC@NLO will not be consistent with these virtual contributions. \u001b[0m",
@@ -1158,13 +3433,37 @@
    "v4_ddx_hg": {
     "string": "generate d d~ > h g [sqrvirt=QCD]",
     "model": "loop_sm-no_b_mass",
-    "ok": false,
+    "ok": true,
+    "diagrams": {
+     "born": 0,
+     "loops": 2,
+     "loops_discarded": 0,
+     "R2": 1,
+     "UV": 0,
+     "subprocesses": 1
+    },
     "info": [
      "MG5_aMC>INFO: Contributing diagrams generated: 0 Born, 2 loops, 1 R2, 0 UV"
+    ]
+   },
+   "v4_ddx_hh": {
+    "string": "generate d d~ > h h [sqrvirt=QCD QED]",
+    "model": "loop_qcd_qed_sm-no_b_mass",
+    "ok": true,
+    "diagrams": {
+     "born": 0,
+     "loops": 82,
+     "loops_discarded": 0,
+     "R2": 0,
+     "UV": 0,
+     "subprocesses": 1
+    },
+    "info": [
+     "MG5_aMC>INFO: Contributing diagrams generated: 0 Born, 82 loops, 0 R2, 0 UV"
     ]
    }
   }
  },
- "n_ok": 0,
+ "n_ok": 35,
  "n_rows": 35
 }

@@ -1,0 +1,1170 @@
+{
+ "n": 2000,
+ "rows": [
+  {
+   "name": "v4_bb_abtwm__mt300",
+   "cell": "other",
+   "sqrts": [
+    401,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b > a b t w- QED<=4",
+    "qed_bound": 4,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 24,
+    "v4": 114,
+    "v3_string_5fs": 24,
+    "v3_string_sm": 24,
+    "qed_b_minus_1": 24,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 26.760061025619507,
+   "card": {
+    "MT": 300.0,
+    "ymt": 300.0,
+    "WT": 8.729709,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bb_abtwm__mt50",
+   "cell": "other",
+   "sqrts": [
+    151,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b > a b t w- QED<=4",
+    "qed_bound": 4,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 24,
+    "v4": 114,
+    "v3_string_5fs": 24,
+    "v3_string_sm": 24,
+    "qed_b_minus_1": 24,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 27.31198525428772,
+   "card": {
+    "MT": 50.0,
+    "ymt": 50.0,
+    "WT": 0.0,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b > a b t w- QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_ag__c30",
+   "cell": "other",
+   "sqrts": [
+    60,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > a g QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 21.98716139793396,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > a g QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > a g QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_ddxgz",
+   "cell": "4:qq",
+   "sqrts": [
+    122,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > d d~ g z QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 24,
+    "v4": 64,
+    "v3_string_5fs": 24,
+    "v3_string_sm": 24,
+    "qed_b_minus_1": 24,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 24.281553030014038,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > d d~ g z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > d d~ g z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_epvewm",
+   "cell": "3:qq",
+   "sqrts": [
+    92,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > e+ ve w- QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 7,
+    "v4": 6,
+    "v3_string_5fs": 6,
+    "v3_string_sm": 7,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 24.894834995269775,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_ggtaptamz",
+   "cell": "other",
+   "sqrts": [
+    132,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > g g ta+ ta- z QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 154,
+    "v4": 100,
+    "v3_string_5fs": 100,
+    "v3_string_sm": 154,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 27.380073070526123,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > g g ta+ ta- z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > g g ta+ ta- z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_gvevex__as090",
+   "cell": "other",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > g ve ve~ QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 22.808714151382446,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > g ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > g ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bbx_wpwm",
+   "cell": "2:qq",
+   "sqrts": [
+    161,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b b~ > w+ w- QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 4,
+    "v4": 3,
+    "v3_string_5fs": 3,
+    "v3_string_sm": 4,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 23.120911598205566,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b b~ > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b b~ > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bg_bgg",
+   "cell": "3:qg",
+   "sqrts": [
+    30,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b g > b g g QED<=0",
+    "qed_bound": 0,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 16,
+    "v4": 16,
+    "v3_string_5fs": 16,
+    "v3_string_sm": 16,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 24.160852193832397,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b g > b g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b g > b g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_bg_bggz",
+   "cell": "4:qg",
+   "sqrts": [
+    122,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate b g > b g g z QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 50,
+    "v4": 50,
+    "v3_string_5fs": 50,
+    "v3_string_sm": 50,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 25.58487892150879,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate b g > b g g z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate b g > b g g z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dbx_txu",
+   "cell": "2:qq",
+   "sqrts": [
+    183,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d b~ > t~ u QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 1,
+    "v4": 1,
+    "v3_string_5fs": 1,
+    "v3_string_sm": 1,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 22.053418397903442,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d b~ > t~ u QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d b~ > t~ u QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dd_add",
+   "cell": "3:qq",
+   "sqrts": [
+    30,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d d > a d d QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 8,
+    "v4": 24,
+    "v3_string_5fs": 8,
+    "v3_string_sm": 8,
+    "qed_b_minus_1": 8,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 21.85893678665161,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d d > a d d QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d > a d d QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_ddx_ddx",
+   "cell": "2:qq",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d d~ > d d~ QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 2,
+    "v4": 6,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "qed_b_minus_1": 2,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 21.560016632080078,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d d~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_ddx_ddxgg",
+   "cell": "4:qq",
+   "sqrts": [
+    40,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d d~ > d d~ g g QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 72,
+    "v4": 168,
+    "v3_string_5fs": 72,
+    "v3_string_sm": 72,
+    "qed_b_minus_1": 72,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 26.193812370300293,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d d~ > d d~ g g QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d d~ > d d~ g g QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dg_dddx",
+   "cell": "3:qg",
+   "sqrts": [
+    30,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d g > d d d~ QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 10,
+    "v4": 26,
+    "v3_string_5fs": 10,
+    "v3_string_sm": 10,
+    "qed_b_minus_1": 10,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 22.531134128570557,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d g > d d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > d d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dg_dz",
+   "cell": "2:qg",
+   "sqrts": [
+    102,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d g > d z QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 22.9709529876709,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d g > d z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > d z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dg_uuuxwm",
+   "cell": "4:qg",
+   "sqrts": [
+    111,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d g > u u u~ w- QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 24,
+    "v4": 90,
+    "v3_string_5fs": 24,
+    "v3_string_sm": 24,
+    "qed_b_minus_1": 24,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 20.322808027267456,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d g > u u u~ w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > u u u~ w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_dg_uwm",
+   "cell": "2:qg",
+   "sqrts": [
+    92,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate d g > u w- QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 14.553895950317383,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate d g > u w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate d g > u w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_agttx",
+   "cell": "4:ee",
+   "sqrts": [
+    365,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > a g t t~ QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 20,
+    "v4": 20,
+    "v3_string_5fs": 20,
+    "v3_string_sm": 20,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 18.732645988464355,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > a g t t~ QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > a g t t~ QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_ccxgvevex",
+   "cell": "other",
+   "sqrts": [
+    30,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > c c~ g ve ve~ QED<=4",
+    "qed_bound": 4,
+    "qed_v3": 4,
+    "diagrams_v3_recorded": 43,
+    "v4": 43,
+    "v3_string_5fs": 43,
+    "v3_string_sm": 43,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 20.36449885368347,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > c c~ g ve ve~ QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > c c~ g ve ve~ QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_ccxhh",
+   "cell": "4:ee",
+   "sqrts": [
+    270,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > c c~ h h QED<=4",
+    "qed_bound": 4,
+    "qed_v3": 4,
+    "diagrams_v3_recorded": 4,
+    "v4": 4,
+    "v3_string_5fs": 4,
+    "v3_string_sm": 4,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 16.363948583602905,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > c c~ h h QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > c c~ h h QED<=4']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_epvewm",
+   "cell": "3:ee",
+   "sqrts": [
+    92,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > e+ ve w- QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 12,
+    "v4": 12,
+    "v3_string_5fs": 12,
+    "v3_string_sm": 12,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 17.51541256904602,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > e+ ve w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_mupvmwm",
+   "cell": "3:ee",
+   "sqrts": [
+    92,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > mu+ vm w- QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 6,
+    "v4": 6,
+    "v3_string_5fs": 6,
+    "v3_string_sm": 6,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 17.92532992362976,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > mu+ vm w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > mu+ vm w- QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_vevex",
+   "cell": "2:ee",
+   "sqrts": [
+    10,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > ve ve~ QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 15.14724063873291,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > ve ve~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_epem_wpwm",
+   "cell": "2:ee",
+   "sqrts": [
+    161,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate e+ e- > w+ w- QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 2,
+    "diagrams_v3_recorded": 3,
+    "v4": 3,
+    "v3_string_5fs": 3,
+    "v3_string_sm": 3,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 16.58896040916443,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > w+ w- QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_bbx",
+   "cell": "2:gg",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > b b~ QED<=0",
+    "qed_bound": 0,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 3,
+    "v4": 3,
+    "v3_string_5fs": 3,
+    "v3_string_sm": 3,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 15.432581424713135,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > b b~ QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > b b~ QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_bbxg",
+   "cell": "3:gg",
+   "sqrts": [
+    30,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > b b~ g QED<=0",
+    "qed_bound": 0,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 16,
+    "v4": 16,
+    "v3_string_5fs": 16,
+    "v3_string_sm": 16,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 16.77637028694153,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > b b~ g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > b b~ g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_cgsxwm",
+   "cell": "4:gg",
+   "sqrts": [
+    111,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > c g s~ w- QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 50,
+    "v4": 50,
+    "v3_string_5fs": 50,
+    "v3_string_sm": 50,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 16.783867835998535,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > c g s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > c g s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_csxwm",
+   "cell": "3:gg",
+   "sqrts": [
+    101,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > c s~ w- QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 8,
+    "v4": 8,
+    "v3_string_5fs": 8,
+    "v3_string_sm": 8,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 15.53317141532898,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > c s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > c s~ w- QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_gg",
+   "cell": "2:gg",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > g g QED<=0",
+    "qed_bound": 0,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 4,
+    "v4": 4,
+    "v3_string_5fs": 4,
+    "v3_string_sm": 4,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 16.04184341430664,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > g g QED<=0']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_gg_gttxz",
+   "cell": "4:gg",
+   "sqrts": [
+    447,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate g g > g t t~ z QED<=1",
+    "qed_bound": 1,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 50,
+    "v4": 50,
+    "v3_string_5fs": 50,
+    "v3_string_sm": 50,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 17.737960815429688,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate g g > g t t~ z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate g g > g t t~ z QED<=1']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_ud_dhu",
+   "cell": "3:qq",
+   "sqrts": [
+    145,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate u d > d h u QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 3,
+    "diagrams_v3_recorded": 2,
+    "v4": 2,
+    "v3_string_5fs": 2,
+    "v3_string_sm": 2,
+    "exists": true,
+    "bound_attained": null,
+    "tool_matches_v3": true
+   },
+   "t_build": 14.837265253067017,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate u d > d h u QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u d > d h u QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_uu_uuz",
+   "cell": "3:qq",
+   "sqrts": [
+    112,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate u u > u u z QED<=3",
+    "qed_bound": 3,
+    "qed_v3": 1,
+    "diagrams_v3_recorded": 8,
+    "v4": 24,
+    "v3_string_5fs": 8,
+    "v3_string_sm": 8,
+    "qed_b_minus_1": 8,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 12.926509857177734,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate u u > u u z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u u > u u z QED<=3']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_uux_ddx",
+   "cell": "other",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "string": "generate u u~ > d d~ QED<=2",
+    "qed_bound": 2,
+    "qed_v3": 0,
+    "diagrams_v3_recorded": 1,
+    "v4": 4,
+    "v3_string_5fs": 1,
+    "v3_string_sm": 1,
+    "qed_b_minus_1": 1,
+    "exists": true,
+    "bound_attained": true,
+    "tool_matches_v3": true
+   },
+   "t_build": 11.868818998336792,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate u u~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate u u~ > d d~ QED<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  },
+  {
+   "name": "v4_zp_ee_mumu",
+   "cell": "other",
+   "sqrts": [
+    20,
+    6000
+   ],
+   "diagrams": {
+    "v4": 3,
+    "exists": true
+   },
+   "t_build": 13.912052631378174,
+   "card": {
+    "MT": 172.5,
+    "ymt": 172.5,
+    "WT": 1.480327,
+    "MB": null,
+    "ymb": null,
+    "model": null
+   },
+   "card_ok": false,
+   "error": "ValueError: ['generate e+ e- > mu+ mu- QED<=2 DMV<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)",
+   "trace": "Traceback (most recent call last):\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/analysis/catalog_v4/validate_v4.py\", line 193, in one\n    t = time.time(); _, path = datagen.gen_chunk(task); row[\"t_gen\"] = time.time() - t\n                               ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/datagen.py\", line 327, in gen_chunk\n    mg.build_dataset_variable_energy(\n  File \"/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/mg5_pipeline_final.py\", line 3336, in build_dataset_variable_energy\n    raise ValueError(f\"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture \"\nValueError: ['generate e+ e- > mu+ mu- QED<=2 DMV<=2']: sqrts_measure / beam_masses are implemented on the mixture path only (catalog_v4's policy)\n"
+  }
+ ],
+ "loops": {
+  "entries": 167,
+  "bad": [],
+  "models": {
+   "sm-no_b_mass": true,
+   "loop_sm-no_b_mass": true,
+   "loop_qcd_qed_sm-no_b_mass": false
+  },
+  "generate": {
+   "v4_bb_bb": {
+    "string": "generate b b > b b QED<=2 [virt=QCD]",
+    "model": "loop_sm-no_b_mass",
+    "ok": false,
+    "info": [
+     "MG5_aMC>\u001b[1;34mWARNING: All Born diagrams do not factorize the same sum of power(s) of the the perturbed order(s) QCD.",
+     "This is potentially dangerous as the real-emission diagrams from aMC@NLO will not be consistent with these virtual contributions. \u001b[0m",
+     "\u001b[1;34mWARNING: Some loop diagrams contributing to this process are discarded because they are not pure (QCD)-perturbation.",
+     "INFO: Contributing diagrams generated: 6 Born, 28(+8) loops, 26 R2, 32 UV"
+    ]
+   },
+   "v4_bb_bbz": {
+    "string": "generate b b > b b z QED<=3 [virt=QCD]",
+    "model": "loop_sm-no_b_mass",
+    "ok": false,
+    "info": [
+     "MG5_aMC>\u001b[1;34mWARNING: All Born diagrams do not factorize the same sum of power(s) of the the perturbed order(s) QCD.",
+     "This is potentially dangerous as the real-emission diagrams from aMC@NLO will not be consistent with these virtual contributions. \u001b[0m",
+     "\u001b[1;34mWARNING: Some loop diagrams contributing to this process are discarded because they are not pure (QCD)-perturbation.",
+     "INFO: Contributing diagrams generated: 24 Born, 208(+44) loops, 164 R2, 128 UV"
+    ]
+   },
+   "v4_ddx_hg": {
+    "string": "generate d d~ > h g [sqrvirt=QCD]",
+    "model": "loop_sm-no_b_mass",
+    "ok": false,
+    "info": [
+     "MG5_aMC>INFO: Contributing diagrams generated: 0 Born, 2 loops, 1 R2, 0 UV"
+    ]
+   }
+  }
+ },
+ "n_ok": 0,
+ "n_rows": 35
+}
