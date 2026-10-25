@@ -1214,6 +1214,50 @@ def plan_commits_and_launches():
              a.stdout + b.stdout + sub)
 
 
+def slow_done_checks():
+    """A done entry whose check is longer than the stop's time is noted once and cached for the day, not retried at
+    every stop; plan recheck finishes it with no limit; plan check --replace gives it a faster check."""
+    repo = tempfile.mkdtemp(prefix="slowdone_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q"); os.makedirs(os.path.join(repo, "docs")); os.makedirs(os.path.join(repo, "an"))
+    open(os.path.join(repo, "docs", "results.tex"), "w").write("x\n"); g("add", "."); g("commit", "-qm", "a")
+    open(os.path.join(repo, "docs", "results.tex"), "a").write("\\paragraph{rd.}\\label{par:readout} done.\n")
+    g("commit", "-qam", "b")
+    sha = g("rev-parse", "HEAD").stdout.strip()
+    open(os.path.join(repo, "an", "fig.png"), "w").write("p")
+    rd = E("rd", status="done", writeup=sha, done_when="sleep 4; test -f an/fig.png", notes_ref="par:readout",
+           evidence={"runs": [], "commit": sha, "paths": ["an/fig.png"]})
+    w = World([rd])
+    w.env.update(PLAN_ROOT=repo, PLAN_BUDGET="2")
+    rc1, out1 = w.check()
+    rc2, out2 = w.check()
+    scenario("a done check longer than the stop's time is noted once, then cached for the day like a pass",
+             rc1 == 0 and "did not finish" in out1 and "plan.py recheck rd" in out1 and rc2 == 0
+             and "did not finish" not in out2, out1 + "|" + out2)
+    r = w.plan_cmd("recheck", "rd")
+    rc3, out3 = w.check()
+    scenario("plan recheck runs it with no limit, and the stops read its result", r[0] == 0 and "0 regressed" in r[1]
+             and rc3 == 0 and "did not finish" not in out3, r[1] + out3)
+    w.env.pop("PLAN_BUDGET")
+    w2 = World([E("run1")])
+    w2.env["PLAN_ROOT"] = repo
+    tries = (("a running entry", w2, "run1", "test -f an/fig.png", "is for a done entry"),
+             ("a trivially true check", w, "rd", "true", "checks nothing"),
+             ("a check that fails now", w, "rd", "test -f an/none.png", "reopen it"))
+    for name, ww, eid, chk, why in tries:
+        r = ww.plan_cmd("check", eid, "--done-when", chk, "--replace")
+        scenario("plan check --replace refuses %s" % name, r[0] != 0 and why in r[1], r[1])
+    r = w.plan_cmd("check", "rd", "--done-when", "test -f an/fig.png")
+    scenario("plan check without --replace on a done entry is refused", r[0] != 0 and "--replace" in r[1], r[1])
+    r = w.plan_cmd("check", "rd", "--done-when", "test -f an/fig.png", "--replace")
+    e = w.entries()["rd"]
+    rc, out = w.check()
+    scenario("plan check --replace gives a done entry a fast check that passes, keeping the old one in its history",
+             r[0] == 0 and e["done_when"] == "test -f an/fig.png" and e["status"] == "done"
+             and e["history"][-1]["was_done_when"].startswith("sleep 4") and rc == 0 and "marked done" not in out,
+             r[1] + out)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1234,7 +1278,7 @@ GROUPS = [liveness, files, answers, adding, questions, holds, done, migration, c
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, the_suite_itself]
+          decision_quotes, plan_commits_and_launches, slow_done_checks, the_suite_itself]
 
 
 def main():

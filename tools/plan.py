@@ -684,31 +684,35 @@ def claims_problems(limit=True):
 DONE_RECHECK_H = 24           # a done entry's finishing checks are rerun at most this often
 
 
-def done_problems(d, st):
+def done_problems(d, st, limit=True, only=None):
     """[(entry, why)]: done entries that no longer pass what plan done checked. Cached for DONE_RECHECK_H hours under
     a key of every field the check reads, so any write to the entry reruns it. A regression is a suggestion (plan next
-    lists `plan reopen`), never a standing block."""
+    lists `plan reopen`), never a standing block. With `limit` (the Stop hook) a check that runs out of time is cached
+    for the day like a pass and noted once; `plan recheck` runs it with no limit."""
     try:
         cache = json.load(open(CHECK_CACHE))
     except (OSError, ValueError):
         cache = {}
     out, changed = [], False
     for e in d["entries"]:
-        if e.get("status") != "done":
+        if e.get("status") != "done" or (only and e["id"] != only):
             continue
         import hashlib
         runs = sorted(map(list, runs_of(e, st)))
         key = "done:%s:%s" % (e["id"], hashlib.sha256(json.dumps([e, runs], sort_keys=True, default=str).encode())
                               .hexdigest()[:16])
         hit = cache.get(key)
-        if hit and (now() - parse(hit["at"])).total_seconds() < 3600 * DONE_RECHECK_H:
+        if limit and hit and (now() - parse(hit["at"])).total_seconds() < 3600 * DONE_RECHECK_H:
             why = hit["why"]
         else:
             try:
-                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"), timeout=min(30, budget()),
-                                record=e.get("record"))
+                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"),
+                                    timeout=min(30, budget()) if limit else None, record=e.get("record"))
             except subprocess.TimeoutExpired:
-                NOTES.append("%s: its done check did not finish; it runs again next time" % e["id"])
+                # cached for the day like a pass, noted once: retrying it at every stop only repeats the note
+                cache[key], changed = {"at": now().isoformat(), "why": [], "unfinished": True}, True
+                NOTES.append("%s: its daily done check did not finish within the stop's time; `python3 tools/plan.py "
+                             "recheck %s` runs it with no limit" % (e["id"], e["id"]))
                 continue
             cache[key], changed = {"at": now().isoformat(), "why": why}, True
         if why:
@@ -719,6 +723,19 @@ def done_problems(d, st):
 
 
 # ---------------------------------------------------------------- commands
+def cmd_recheck(a):
+    """The done entries' finishing checks with no time limit (those the Stop's budget could not finish); the result is
+    cached, so the next stops read it."""
+    d, st = load()
+    bad = done_problems(d, st, limit=False, only=a.id)
+    for e, why in bad:
+        print("REGRESSED %s: %s; plan reopen %s --why ..., or fix it" % (e["id"], why, e["id"]))
+    print("plan: %d done entr%s rechecked, %d regressed" % (
+        sum(1 for e in d["entries"] if e.get("status") == "done" and (not a.id or e["id"] == a.id)),
+        "y" if a.id else "ies", len(bad)))
+    return 1 if bad else 0
+
+
 def cmd_kind(a):
     """setup: the entry is about the setup (its record may be CLAUDE.md or a tool, plan done --record); work: the
     default, written up in docs/results.tex."""
@@ -858,14 +875,28 @@ def cmd_item(a):
 
 
 def cmd_check(a):
+    """Set the check that finishes an entry. --replace changes a DONE entry's check (e.g. one too slow for the daily
+    recheck): it must pass now, since the entry is done; only a trivially true check is refused."""
     if trivial_check(a.done_when):
         sys.exit("plan: %r passes in an empty directory: it checks nothing about the work" % a.done_when)
+    status = entry(load()[0], a.id).get("status")
+    if a.replace and status != "done":
+        sys.exit("plan: --replace is for a done entry's check; %s is %s (plan check without --replace)" % (
+            a.id, status))
+    if not a.replace and status == "done":
+        sys.exit("plan: %s is done; change its check with --replace" % a.id)
     r = subprocess.run(a.done_when, shell=True, cwd=ROOT, capture_output=True, timeout=600)
-    if r.returncode == 0:
+    if a.replace and r.returncode != 0:
+        sys.exit("plan: %r fails now, and %s is done: reopen it (plan reopen) rather than give it a failing check"
+                 % (a.done_when, a.id))
+    if not a.replace and r.returncode == 0:
         sys.exit("plan: %r already passes in the checkout: it would finish the entry with nothing done; check "
                  "what this entry still has to produce" % a.done_when)
     with transaction() as (d, st):
-        entry(d, a.id)["done_when"] = a.done_when
+        e = entry(d, a.id)
+        if a.replace and e.get("done_when"):
+            e.setdefault("history", []).append({"at": now().isoformat(), "was_done_when": e["done_when"]})
+        e["done_when"] = a.done_when
     print("plan: %s finishes when `%s` passes" % (a.id, a.done_when))
 
 
@@ -1060,7 +1091,7 @@ def cmd_next(a):
     return 1 if todo else 0
 
 
-def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None):
+def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None):   # timeout None: no limit
     """Why the entry cannot be marked done (empty: it can). Work is written up in docs/results.tex (its notes_ref
     label, a commit adding to it); a setup entry (kind: setup, plan kind) may instead have its record elsewhere, a
     CLAUDE.md rule or a tool, named by `record`, which the write-up commit must change."""
@@ -1072,7 +1103,7 @@ def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None):
     chk = e.get("done_when")
     if not chk:
         out.append("no done_when check (plan check)")
-    elif trivial_check(chk, min(timeout, 120)):
+    elif trivial_check(chk, min(timeout or 120, 120)):
         out.append("done_when %r checks nothing about the work" % chk)
     else:
         r = subprocess.run(chk, shell=True, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
@@ -1172,7 +1203,8 @@ def main(argv=None):
     cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
         A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
     cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))
-    cmd("check", cmd_check, A("id"), A("--done-when", required=True))
+    cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"))
+    cmd("recheck", cmd_recheck, A("id", nargs="?"))
     cmd("ref", cmd_ref, A("id"), A("--label", required=True))
     cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
         A("--set", action="append"))
