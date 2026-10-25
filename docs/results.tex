@@ -374,7 +374,7 @@ $2\to4$ & $95$ & $489$ & $109$ & $24$ & $717$ \\
 \end{center}
 Of these, $359$ coloured classes at $2\to2$ and $2\to3$ can carry a one-loop QCD virtual, $51$ of them with a top.
 
-\paragraph{catalog\_v3's pools and levels (D102, 2026-10-24).} Generated: stages 1, 2 and 3, $1934$ entries and
+\paragraph{catalog\_v3's pools and levels (2026-10-24).} Generated: stages 1, 2 and 3, $1934$ entries and
 $5802$ pools, among them all $167$ one-loop strings (\code{recipes/catalog\_v3\_gen\_stage2.yaml}). Two fixes the
 massive $b$ beams needed in generation: MadLoop STOPs on an energy imbalance above $\sim10^{-10}$\,GeV without its
 phase-space improvement, and the sampler's events carry up to $2\times10^{-9}$, so the last final is set to the beams
@@ -382,7 +382,7 @@ minus the other finals (\code{tools/nlo\_virtual\_pipeline.py}); and $bg\to bW^+
 shell, has its double pole moved by the physical top width by up to $4.4\times10^{-3}$ ($1.2\times10^{-5}$ with the
 width zeroed, as it was certified; \code{tools/pole\_width\_diag.py} over the $68$ strings with a $b$ or $t$: the only
 one), so its pole guard is $10^{-2}$ against $10^{-3}$ for every other string. No string carries the heavy-quark
-mass-scheme shift (D111). The audit (\code{analysis/catalog\_v3/pool\_audit.py}, every pool) finds them all at their
+mass-scheme shift (the user's call, 2026-10-24). The audit (\code{analysis/catalog\_v3/pool\_audit.py}, every pool) finds them all at their
 recipe sizes, no non-finite or zero $|\mathcal M|^2$, momentum conserved to $5\times10^{-11}$ of $\sqrt{\hat s}$, and
 train and validation medians of $\log_{10}|\mathcal M|^2$ within $0.07$ validation spreads; $74$ one-loop pools change
 sign, no tree pool does. A held-out process's level does not have to be extrapolated (\code{pool\_levels.py},
@@ -992,22 +992,26 @@ mostly level (offset $-2.7$, $-2.3$; $1.2$, $1.3$ after it, correlation $0.73$, 
 $0.03$, $0.05$. So the sign-changing one-loop pools miss on the level as the positive ones do, and their shape after
 the offset is $40\times$ worse than their trees'.
 
-\paragraph{The signed pools' A/B: the sign head wins (D99, 2026-10-24).} DlessInOrdQ's short run with catalog\_v3's $48$
-sign-changing one-loop training pools added, two targets for them (\code{scripts/job\_catalog\_norm.sh} SgnR0 and
-SgnHead; one seed each, runs FA-ccin2p3-db5b0e77 and -ca22575d, $0.9$ GPU-h each): SgnR0, the signed log with $r_0$
-three nats below each pool's $0.5\%$ quantile of $|x|$ (\code{data.signedlog\_scale\_shift} $-3$), and SgnHead, $\log|x|$
-floored at its $1\%$ quantile with a sign head. Both train on the MSE with the arithmetic mean and no $\sigma$ stage,
-since the sign head refuses the het loss: a deviation from D93's short setup, the same for both arms, so their losses
-are not comparable to DlessInOrdQ's. Scored on a common footing (\code{tools/signed\_ab\_score.py}, run
-FA-ccin2p3-1f951ace; \code{signed\_ab.py}, \code{data/signed\_ab.json}): the MSE of $\log\max(|x|,\text{floor})$ with one
-floor for both arms, the wrong-sign fraction, and both within a factor $10$ of zero. On the $48$ pools trained on, the
-sign head's magnitude error is $0.45$ against SgnR0's $0.78$ (median per pool; SgnR0 / SgnHead $1.7$, $10$--$90\%$
-$1.0$--$2.9$, SgnR0 better on $5$), with the same $1.3\%$ of signs wrong; within a factor $10$ of zero ($13\%$ of the
-events) SgnR0 is slightly better ($1.45$ against $1.75$, signs wrong $8.2\%$ against $9.2\%$). On the $14$ held-out
-(H5) pools, zero-shot: $1.9$ against $4.7$ (ratio $2.8$, SgnR0 better on $3$), signs wrong $14\%$ against $18\%$. So
-the signed log's linear band, even three nats below the level, costs the magnitude more than it gains at the crossing,
-and the sign head is the target for the signed pools. Already in place for the training pools:
-\code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its own train pool.
+\paragraph{The signed pools' A/B: the sign head ahead in one seed (2026-10-24).} The short run of the emission-scale
+target (par.~\ref{par:dimless_qperp}) with catalog\_v3's $48$ sign-changing one-loop training pools added, and two targets
+for them (\code{scripts/job\_catalog\_norm.sh}, arms \code{SgnR0} and \code{SgnHead}; one seed each, $0.9$ GPU-h each):
+the \emph{shifted signed log}, $\mathrm{sgn}(x)\log(1+|x|/r_0)$ with $r_0$ three nats below each pool's $0.5\%$ quantile of
+$|x|$ (\code{data.signedlog\_scale\_shift} $-3$), and the \emph{sign head}, $\log|x|$ floored at its $1\%$ quantile plus a
+sign logit. Both train on the MSE with the arithmetic mean and no $\sigma$ stage, since the sign head refuses the het
+loss: a departure from the short setup, the same for both arms, so their losses are not comparable to the emission-scale
+run's. The pools are the $62$ sign-changing ones of the first one-loop batch (stage 2a; the $68$ strings with a $b$ or $t$
+leg were generated later): $48$ training, $14$ held out (H5). Scored on one footing (\code{tools/signed\_ab\_score.py};
+\code{signed\_ab.py}, \code{data/signed\_ab.json}): the MSE of $\log\max(|x|,\text{floor})$ with one floor for both arms
+(the sign head's own target space, so the metric favours it by construction), the wrong-sign fraction, and both within a
+factor $10$ of zero. On the $48$ pools trained on, the sign head's magnitude error is $0.45$ against the shifted signed
+log's $0.78$ (median per pool; ratio $1.7$, $10$--$90\%$ $1.0$--$2.9$, the signed log better on $5$), with the same
+$1.3\%$ of signs wrong; within a factor $10$ of zero ($13\%$ of the events) the signed log is better ($1.45$ against
+$1.75$, signs wrong $8.2\%$ against $9.2\%$). On the $14$ held-out pools, zero-shot: $1.9$ against $4.7$ (ratio $2.8$,
+the signed log better on $3$), signs wrong $14\%$ against $18\%$. In this single-seed A/B the signed log's linear band,
+even three nats below the level, costs the magnitude more than it gains at the crossing, where it is ahead; the sign head
+is the target the catalog\_v3 runs use, a second seed and a crossing-weighted metric still to come.
+Already in place for the training pools: \code{data.signedlog\_quantile} $0.01$ sets each signed pool's scale from its
+own train pool.
 Two negatives and one exact factor from the same pass. Putting every massive particle at $\hat s$ in the emission history
 (no soft or collinear enhancement, \code{qperp\_logs(massive\_shat=True)}) is worse on the $43$ new ($8.8$) and at $2\to4$
 $+g$ ($2.4$), so the all-massive finals are not the whole of that column's cost. Weighting the $K$ calibration events by the
@@ -1087,13 +1091,14 @@ $0.48$, $0.26$), the $96$ relabels $0.074$, $0.064$, $0.051$, and on the $2\to4$
 scales' gain but not all ($+g$ $3.97$ against $2.18$ and $51.8$; $+\gamma$ $3.32$, $2.65$, $29.6$). The kinks are not what
 the $43$ new pay for, and the shape proxy's ranking of the three targets did not carry to the network.
 
-\paragraph{The context vector (D105, 2026-10-24).} DlessInOrdQc is DlessInOrdQ's short run with a
+\paragraph{The context vector (2026-10-24).} The emission-scale target's short run (par.~\ref{par:dimless_qperp}) with a
 learned $c_p\in\mathbb R^{16}$ per training process added to every particle's encoding and zeroed on half the events
-(\code{model.context\_dim}, \code{context\_dropout} $0.5$; run FA-ccin2p3-ac99f6a2, one seed), so its zero-shot is the
-$c=0$ model. That model costs a little against DlessInOrdQ on the held-out processes (\code{qperp\_ab.py}): the
+(\code{model.context\_dim}, \code{context\_dropout} $0.5$; arm \code{DlessInOrdQc}, one seed; trained on
+\code{recipes/catalog\_daniel\_train.yaml}, its run config's \code{processes\_file}, so every probe below is held out), so its
+zero-shot is the $c=0$ model. That model costs a little against the same target without the context on the held-out processes (\code{qperp\_ab.py}): the
 $43$ new $0.97$ against $0.75$ (median per-process ratio $1.03$, $10$--$90\%$ $0.50$--$3.3$), the $96$ relabels
 $0.073$ against $0.064$ (ratio $1.11$). What the context is for, the fit of $c_p$ on $K$ labelled events
-(\code{tools/kshot\_context.py}, run FA-ccin2p3-dc3b51b7; trunk and heads frozen, $c$ from $0$, $300$ Adam steps at
+(\code{tools/kshot\_context.py}; trunk and heads frozen, $c$ from $0$, $300$ Adam steps at
 $0.05$, $5$ draws of the $K$ events per process, scored on the other $1995$ to $2000$ validation events), against a
 per-process offset on the same $c=0$ predictions and the same draws, plain and shrunk as in Fig.~\ref{fig:kshot_level}
 (\code{analysis/catalog\_daniel/kshot\_context\_cmp.py}, Fig.~\ref{fig:kshot_context}; medians over processes, $K=0$,
@@ -1129,9 +1134,9 @@ floor is the variance of the zero-shot error. (a) The $43$ new processes; (b) th
 \label{fig:kshot_context}
 \end{figure}
 
-\paragraph{Design (ii) on the data: the $2\to4$ probes factorised onto their parents (2026-10-25, D83).} Each $2\to4$
+\paragraph{Design (ii) on the data: the $2\to4$ probes factorised onto their parents (2026-10-25).} Each $2\to4$
 probe is a $2\to3$ training process plus one gluon or photon on the same beams, so its $|\mathcal M|^2$ can be read
-against its parent's. Per probe, on $2000$ validation events (\code{tools/factorised\_2to4.py}, run FA-ccin2p3-cdff8d34,
+against its parent's. Per probe, on $2000$ validation events (\code{tools/factorised\_2to4.py},
 CPU): the softest particle of the extra flavour removed by the Catani-Seymour initial-initial map (hep-ph/9605323; the
 beam it is closer to emits, the final momenta Lorentz-transformed, so masses and momentum conservation hold for any final
 state), the parent's exact $|\mathcal M|^2$ at the mapped event from its compiled standalone at the probe event's own
@@ -1143,16 +1148,19 @@ correction learned on the other $39$ probes (a gradient-boosted regression of th
 $s_{ak}/\hat s$, $s_{bk}/\hat s$, the nearest final's $s_{jk}/\hat s$, $p_{T,k}^2/\hat s$, $y_k$, $1-x$, $\hat s$, the
 emitted flavour and the nearest emitter's kind; leave-one-probe-out), $0.73$ and $1.11$. The network's own $2\to4$ floor
 (the variance of its zero-shot error, Fig.~\ref{fig:kshot_context}) is $1.34$ and $1.37$: the learned factorisation goes
-under it on $17$ of the $20$ $+g$ probes and $14$ of the $20$ $+\gamma$. The six it misses: the four photon probes with
+under it on $17$ of the $20$ $+g$ probes and $14$ of the $20$ $+\gamma$. The two budgets differ: the floor is
+the network's zero-shot error with no labels of the probe, while the correction learned the true $|\mathcal M|^2$ of
+the other $39$ probes, so the comparison says what a head trained on other $2\to4$ processes could reach, not that the
+zero-shot network is beaten at equal information. The six it misses: the four photon probes with
 a charged lepton in the final state ($5.5$ to $20$, no better than the spread: a photon collinear to a final lepton is
 not the initial-state emission the map assumes, and few other probes teach the correction that region), and two $+g$
 probes with four coloured final particles ($3.8$, $1.9$). Without the four lepton probes the $+\gamma$ median is $0.98$.
-With the network in place of the exact parent (\code{tools/factorised\_2to4\_net.py}, run FA-ccin2p3-5252f499, D99:
-DlessInOrdQc's own prediction of each parent at the mapped events, the parent's $c_p$ from its table; its error there is
-small, $0.06$ to $0.09$ on the first probes), the correction refitted the same way: $0.91$ ($+g$) and $1.26$
+With the network in place of the exact parent (\code{tools/factorised\_2to4\_net.py}: the context-vector run's own
+prediction of each parent at the mapped events, the parent's $c_p$ from its table; its MSE there is small, median $0.14$
+over the $40$ probes, $10$--$90\%$ $0.05$--$0.71$), the correction refitted the same way: $0.91$ ($+g$) and $1.26$
 ($+\gamma$), under the floor on $16$ and $11$ of the $20$. The factorised form keeps most of its gain with the network's
 own $2\to3$; how far it carries beyond emitted gauge bosons (an added $Z$, $W$, $H$ or quark pair has no universal soft
-or collinear factor) is a question for catalog\_v3, where the study moves (D114).
+or collinear factor) is a question for catalog\_v3, where the study moves (the user, 2026-10-25).
 
 \begin{figure}[H]
 \centering
@@ -6847,58 +6855,42 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-25, 03:00).} The study has moved to catalog\_v3 (the user, 2026-10-25: Daniel's catalog and
-    its extra probes untouched until they say; the level and preprocessing items on it held). Running on CC, item
-    \code{v3\_pretrain}: the four short catalog\_v3 pretrainings (\code{scripts/job\_catalog\_v3\_short.sh}, 4264 steps,
-    the twin 3803; every arm with the sign head, the MSE and the arithmetic mean): \code{dimensionless} (the adopted
-    target, FA-ccin2p3-ff0533da), \code{baseline} (one shared standardization in GeV, 7c0710dd),
-    \code{dimensionless\_context} (7c41ffd5), \code{dimensionless\_twin} (no $\tau$, $\nu_\tau$ or quartic-gauge pool,
-    910eee41); each then reads H1, H2, H2p5, H3, H5 (with the sign head's scoring on its sign-changing pools), H6, H7E and
-    H7c, the twin also H3p and H4; predictions in \code{\$SCRATCH/zz\_v3\_short\_<arm>/<axis>/}. When they end: collect,
-    write up a catalog\_v3 section (per axis, per arm), send to the user. Built today: the pretraining recipes
-    (\code{recipes/make\_catalog\_v3\_recipes.py}: 1397 train, the twin 1246; the held-out loop-induced class drawn with
-    the seed, $gg\to ZH$); H7 (the user's call: partonic windows, no pp; 40 seeded classes at $\sqrt{\hat s}\in[1,10]$\,TeV
-    and at $p_T\geq30$\,GeV, generated and prepared); the sidecars for every pool; the diagram encoder's optional BSM
-    labels. In progress, the pp study (approved: build it in parallel, check, the user decides whether catalog\_v3
-    switches): \code{recipes/gen\_catalog\_v3\_pp.py} writes the 1396 hadronic classes as 13\,TeV MadEvent processes
-    (\code{pp13\_*}, the parents' param-card patches, labels at the window's $\alpha_s$ rule, AQCDUP kept), a test set
-    (all 410 hadronic held-out and all 986 hadronic training classes) and the pp training set; next: the repo review of
-    it (lock held), generation with \code{scripts/job\_gen\_daniel\_catalog.sh} (\code{DANIEL\_SPEC}, \code{DANIEL\_PREFIX=pp13\_})
-    split over several CPU jobs, then the window-trained arms scored on it and one pp-trained short pretraining of the
-    dimensionless target. Rules added to CLAUDE.md today: a stated plan's cores and time hold (0c), a pointed-out mistake
-    gets its cause and a prevention (0d), plain names and no internal codes to the user (0e), work an answer unblocks goes
-    out first (0f). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
-    (sign head wins); the no-gain probes (D108). Decided 2026-10-24: catalog\_v2 deleted (D110, manifest
-    \code{mg5amcnlo/DELETED\_V2\_ONLY\_20261024\_172235.json}); no mass-scheme shift in catalog\_v3 (D111); catalog\_v2
-    not regenerated (D106); the larger-catalog item replaced by catalog\_v3 (D107); large-$D$ points stay out (D109);
-    D78, D66 and the holds stay. Infrastructure fixed today: \code{tools/check\_site\_data.py} verifies Daniel's catalog
-    (catalog\_v2 gone); \code{scripts/launch\_cc\_only.sh} defers (exit 75) when nothing fits or the code transfer fails;
-    two launches syncing at once collide, so chain them. All $167$ stage-2 loop strings are MadLoop-certified
-    (\code{tools/nlo\_virtual\_pipeline.massive\_beam\_params}, \code{tools/nlo\_pole\_check.predict\_poles}). The
-    lxplus-era archive (28 GB, D96) stays on CC; \code{runs\_from\_lxplus} is the only copy of its runs. Supervisor and
-    \code{site events --wait --project FA} running. Nothing waits on the user.
-  \item \textbf{The level (D83, D99).} Adopted candidate: the emission scales (par.\ The emission scales in training),
-    $2\to4$ from $52$ / $30$ to $2.2$ / $2.7$ at a cost on the $43$ new ($0.48$ to $0.75$); the soft minimum does not remove
-    the cost (par.~\ref{par:qperp_cost}), and neither do the loop or identical-particle factors (the stored one-loop pools
-    are already stripped, dividing out $(16\pi^2)^{-1}$ takes the level MSE from $4.9$ to $42$; undoing MadGraph's
-    identical-particle factor moves the $43$ new from $0.48$ to $0.85$ and the $+g$ / $+\gamma$ probes from $9.4$ / $3.0$
-    to $8.7$ / $2.5$). Open: what the $43$ new pay for. Next: the small dedicated network for what no constant fixes
-    ($2\to4$ shape $1.5$, unseen tops), (i) done (D105, par.\ The context vector): a context vector $c_p\in\mathbb R^{16}$ per
-    process, added to every particle's embedding, fitted on the $K$ labelled events of a held-out process with the trunk
-    frozen and $c_p$ the only free parameter (CAVIA, arXiv:1909.09157; trained in the pretraining as a per-process
-    embedding with dropout to zero, so the zero vector is the zero-shot model); read at $K=1$, $4$, $16$ on the $43$ new
-    and the $2\to4$ probes against the shrunk offset (Fig.~\ref{fig:kshot_level}); cost one short pretraining ($\sim1$
-    GPU-h) plus CPU-side fits. It goes under the offset floor on the $43$ new ($0.21$ against $0.46$ at $K=16$) and leaves
-    the $2\to4$ shape where the offset leaves it ($1.5$), so the condition for (ii) is met: a head that predicts the $2\to4$ target as the
-    model's own $2\to3$ prediction on the mapped event plus a learned correction (arXiv:2107.06625, 2512.11036). Its data
-    check is done (par.\ Design (ii) on the data): with the parent's exact $|\mathcal M|^2$ and a correction learned on the
-    other probes, $0.73$ ($+g$) and $1.11$ ($+\gamma$) against the network's floor $1.34$ and $1.37$. Next (D99, a GPU
-    read under $1$ GPU-h): the same with DlessInOrdQ's own $2\to3$ prediction on the mapped events in place of the exact
-    parent, the correction refitted leave-one-probe-out on its ratio.
-    Targets: zero-shot $2\to4$ within $2\times$ its one-event error; the tops' shape floor under $0.5$ with the heavy-quark
-    layer. Signed pools: the sign head (par.\ The signed pools' A/B). Also proposed: the full-length catalog pretraining (D78's held
-    item) with the adopted target. Blocked: bulk transfers to Jean Zay (the $29$ GB archive, its checkout at
-    \code{8fb002e}).
+  \item \textbf{State (2026-10-25, 04:00).} The study runs on catalog\_v3 (the user, 2026-10-25: Daniel's catalog and its
+    extra probes stay untouched until they say; the level and preprocessing items on it are held). Running on CC:
+    \begin{itemize}
+      \item the four short catalog\_v3 pretrainings (\code{scripts/job\_catalog\_v3\_short.sh}; every arm with the sign
+      head, the MSE and the arithmetic mean): \code{dimensionless}, the emission-scale target with dimensionless inputs
+      (run FA-ccin2p3-ff0533da); \code{baseline}, one shared standardization of $\log|\mathcal M|^2$ in GeV (7c0710dd);
+      \code{dimensionless\_context}, the same with the context vector (7c41ffd5); \code{dimensionless\_twin}, trained
+      without any $\tau$, $\nu_\tau$ or quartic-gauge pool (910eee41). Each then reads every held-out axis (H1, H2, the
+      $2\to5$ probes, H3, H5 with the sign head's scoring of its sign-changing pools, H6, H7 at 1 to 10\,TeV and at
+      $p_T\geq30$\,GeV; the twin also the never-seen particle and the quartic vertex) into
+      \code{\$SCRATCH/zz\_v3\_short\_<arm>/<axis>/}. When they end: collect, write a catalog\_v3 results section per axis
+      and arm, send it.
+      \item the pp study (the user, 2026-10-25: build it in parallel, check, then they decide whether catalog\_v3 moves to
+      pp beams): the 13\,TeV MadEvent pools of the $1396$ hadronic classes (\code{recipes/gen\_catalog\_v3\_pp.py}: each
+      with its parent's parameter card and labelled at the windows' $\alpha_s$ rule, MadEvent's own kept beside it), in
+      eight CPU jobs (\code{recipes/catalog\_v3\_pp\_part<k>.yaml}, \code{scripts/job\_gen\_daniel\_catalog.sh}, runs
+      FA-ccin2p3-5f43c90c, 27dcc2fe, 1bc35466, 4ef28e2d, a41644b4, a5ab796e, 3c1ca5da, 1b21566d). Next: the window-trained
+      arms scored on the pp test set (all $410$ hadronic held-out and $986$ hadronic training classes), then one pp-trained
+      short pretraining of the dimensionless target (its heavy-quark, $\alpha_s$-point, BSM, one-loop and $e^+e^-$ pools
+      stay on windows: their pp versions are not built; for the user to confirm or extend).
+    \end{itemize}
+    Settled since the last State: catalog\_v3 stays on partonic windows for now; H7 on the windows (40 classes drawn with
+    the seed); the held-out loop-induced class drawn with the seed ($gg\to ZH$); the diagram encoder's labels for the BSM
+    particles (\code{bsm\_labels}). Facts to keep: two launches syncing at once collide, so chain them;
+    \code{scripts/launch\_cc\_only.sh} defers (exit 75) when nothing fits or the code transfer fails; \code{site pick} now
+    plans CPU-only jobs on the CPU partition; the lxplus-era archive (28\,GB) stays on CC, \code{runs\_from\_lxplus} the
+    only copy of its runs. Supervisor and the event waiter running. Waits on the user: only the pp-trained run's scope
+    above, and it does not block anything else.
+  \item \textbf{The level.} Adopted candidate: the emission scales (par.\ The emission scales in training); open on Daniel's
+    catalog (held): what the $43$ new pay for. The small dedicated network for what no constant fixes: the context vector
+    and the factorised $2\to4$ head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on
+    catalog\_v3: the context arm's K-shot fits and the factorised head's data check on its $2\to4$ classes with an added
+    $Z$, $W$, $H$ or quark pair (no universal soft or collinear factor there). Targets: zero-shot $2\to4$ within $2\times$
+    its one-event error; the tops' shape floor under $0.5$ with the heavy-quark layer. Also proposed: the full-length
+    catalog pretraining with the adopted target (held by the user, 2026-10-21, until the preprocessing design settles).
+    Blocked: bulk transfers to Jean Zay (the $29$\,GB archive, its checkout at \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
     The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
     (sec:tf32-eval). The $\sigma$
@@ -7071,10 +7063,7 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
   \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
     reads the validation and test amplitudes as well as the $D$ training events; with
     \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{The probes that do not gain.} Done and written up (par.~\ref{par:nogain}, D108): $ee\to Z\gamma$'s dip
-    is not the lr window (the lowered-window searches move the median gain by $0.03$ decades); rung $7$'s frozen
-    features carry $u\bar u\to Zg$ linearly, rung $6$'s do not; the Sudakov arm's error sits at the zero crossings.
-    Open, not approved: why the pretrained start limits $ee\to Z\gamma$ at $D\sim10^2$ (a probe of the start's
+  \item \textbf{The probes that do not gain} (results in par.~\ref{par:nogain}). Open, not approved: why the pretrained start limits $ee\to Z\gamma$ at $D\sim10^2$ (a probe of the start's
     function against scratch's small-norm init), for the user to call.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
