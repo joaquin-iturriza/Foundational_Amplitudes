@@ -7414,6 +7414,19 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated.
+  \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
+    % allow: 13 because it is the beam energy in TeV, a setting
+    % allow: 25485185 because it is part of a run id
+    next}); this item only summarises it. Running on CC: the pp-trained arm's read on the $13$\,TeV pp test set
+    (FA-ccin2p3-25485185), then its comparison inside and outside the windows against the four window-trained arms; the
+    hybrid reference-scale short pretraining (approved 2026-10-25 ``Yes, run that hybrid test
+    then.'', its own zero-shot reads at the end); the small-$D$ DyHPO round (the linear-probe head check's TF32
+    failures fixed in \code{c11ff1e}, the failed slots queued again). Ended and being written up: the CPU check of the
+    catalog's coverage (FA-ccin2p3-ec84e913, every tree class; approved 2026-10-25 ``Yes, go ahead with what you
+    proposed.'': the CPU check only, the design back to the user before any regeneration or GPU job). CLAUDE.md now
+    lists every data-generation choice with its source; the open ones (chosen by an agent, no decision of the user's)
+    include the fiducial cuts, the window's lower edge and floor, the uniform $\sqrt{\hat s}$ and the cuts' exemption
+    of $b$ and $\tau$.
   \item \textbf{State (2026-10-25, 19:00).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
     untouched until the user says). The pp study (scope settled by the user, 2026-10-25: hadronic tree classes on pp, every other
     pool on windows): the four window-trained arms' pp reads are written up (par.\ catalog\_v3's short arms read on pp
