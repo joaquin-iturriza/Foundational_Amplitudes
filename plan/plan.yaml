@@ -926,9 +926,13 @@ entries:
     at: '2026-10-25T19:51:22+00:00'
     searched: 'site pick FA (ccin2p3 AVOID: sps not writable), site env ccin2p3 FA (No space left on device), df on /sps/lpnhe
       (512G used of 512G); CLAUDE.md and the plan have no H7E window for catalog_v4'
-  ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
-    sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
-    6 TeV training window; drop it or give it a new window (e.g. 6-20 TeV)?'
-  waiting_since: '2026-10-25T19:51:22+00:00'
-  searched: 'site pick FA (ccin2p3 AVOID: sps not writable), site env ccin2p3 FA (No space left on device), df on /sps/lpnhe
-    (512G used of 512G); CLAUDE.md and the plan have no H7E window for catalog_v4'
+  - ask: CC's project disk is full; which of your data there may go (the 47 GB of lxplus run copies, the 28 GB of archive
+      tars for the held storage plan, or something in your other projects)?
+    at: '2026-10-25T19:56:25+00:00'
+    searched: D19 allows only sweep/prune.py's rules, which need room to write their manifest; D122 holds the storage plan;
+      nothing else authorises deleting on CC
+  ask: CC's project disk is full; which of your data there may go (the 47 GB of lxplus run copies, the 28 GB of archive tars
+    for the held storage plan, or something in your other projects)?
+  waiting_since: '2026-10-25T19:56:25+00:00'
+  searched: D19 allows only sweep/prune.py's rules, which need room to write their manifest; D122 holds the storage plan;
+    nothing else authorises deleting on CC
