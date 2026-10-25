@@ -226,8 +226,9 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-2ed18ab8
-    commit: 3ccf3b7
+    commit: bc60cec
     paths:
+    - analysis/transfer/figs/ladder_r6_hp15_rerun.pdf
     - analysis/transfer/figs/ladder_r6_hp15_rerun.png
   dead_ends: []
   asks: []
