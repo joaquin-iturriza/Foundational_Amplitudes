@@ -30,7 +30,11 @@ for name in names:
     for rp in sorted(glob.glob(os.path.join(sdir, "results", "hp*_t*.json"))):
         m = re.match(r"hp(\d+)_t(\d+)_", os.path.basename(rp))
         hp, T = int(m.group(1)), int(m.group(2))
-        r = json.load(open(rp))
+        try:
+            r = json.load(open(rp))
+        except ValueError:                     # empty or cut short (a full disk): not a result, listed on stderr
+            print(f"unreadable result, skipped: {name}/{os.path.basename(rp)}", file=sys.stderr)
+            continue
         # the run dir that wrote this result: a cold-start rerun runs in trial_<hp>_r<k> (sweep/run_trial.py) beside the
         # failed attempt's trial_<hp>, so the dir is the one whose config names this result file
         base = os.path.join(siteconf.PROJECT_DIR, "runs", name, f"trial_{hp:04d}")

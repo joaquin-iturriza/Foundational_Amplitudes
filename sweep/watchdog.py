@@ -23,6 +23,15 @@ SITES = ["ccin2p3", "jeanzay", "lxplus"]
 STATE = os.path.join(REPO, ".claude", ".watchdog_state.json")
 
 
+
+def _written(f):
+    """a result file that holds something: a trial killed by a full disk leaves an empty hp*.json, which is not a result
+    (2026-10-25, two such files on CC counted the small-D fine-tuning sweeps as 900 of 900 at 898)"""
+    try:
+        return os.path.getsize(f) > 0
+    except OSError:
+        return False
+
 def site_report(prefixes, window_min):
     sys.path.insert(0, REPO)
     import siteconf
@@ -51,7 +60,7 @@ def site_report(prefixes, window_min):
             except OSError:
                 nodes = 1
             rd = getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR)
-            done = len(glob.glob(os.path.join(rd, n, "results", "hp*.json")))
+            done = len([f for f in glob.glob(os.path.join(rd, n, "results", "hp*.json")) if _written(f)])
             pending = max(0, nodes - done) - running.get(n, 0)
             queued[n] = max(queued.get(n, 0), pending, 1 if n not in queued else 0)
     else:
@@ -94,7 +103,7 @@ def site_report(prefixes, window_min):
     results = {}
     rd = getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR)
     for n in names:
-        hp = sorted({int(m.group(1)) for f in glob.glob(os.path.join(rd, n, "results", "hp*.json"))
+        hp = sorted({int(m.group(1)) for f in glob.glob(os.path.join(rd, n, "results", "hp*.json")) if _written(f)
                      for m in [re.match(r"hp(\d+)", os.path.basename(f))] if m})
         if hp:
             results[n] = hp

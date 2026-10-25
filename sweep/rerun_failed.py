@@ -6,7 +6,7 @@ contains MATCH, take each one's candidate from its result path (hp<idx>_t<T>_), 
 (sweep/feed_capped.py) then submits. A candidate with a result, or with a fixed trial already written, is skipped, so a
 second pass changes nothing. Runs on the site that holds the sweeps (through `site run`).
 
-    python sweep/rerun_failed.py --match "TEXT" SWEEP_DIR... [--dry-run]
+    python sweep/rerun_failed.py --match "TEXT" SWEEP_DIR... [--empty-results] [--dry-run]
 """
 import argparse, glob, os, re, sys
 
@@ -34,16 +34,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("sweeps", nargs="+")
     ap.add_argument("--match", required=True, help="text of the error that is unrelated to the HPs")
+    ap.add_argument("--empty-results", action="store_true",
+                    help="also rerun the candidates whose result file is empty (killed while writing it, no log left)")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     n = 0
     for d in a.sweeps:
         d = d.rstrip("/")
-        done = {int(m.group(1)) for r in glob.glob(os.path.join(d, "results", "hp*.json"))
+        res = glob.glob(os.path.join(d, "results", "hp*.json"))
+        empty = {int(m.group(1)) for r in res if os.path.getsize(r) == 0
+                 for m in [re.match(r"hp(\d+)_", os.path.basename(r))] if m}
+        done = {int(m.group(1)) for r in res if os.path.getsize(r) > 0
                 for m in [re.match(r"hp(\d+)_", os.path.basename(r))] if m}
         fixed = {int(m.group(1)) for f in glob.glob(os.path.join(d, "jobs", "trial_*.sh"))
                  for m in [re.search(r"--fixed-hp-idx (\d+)", open(f).read())] if m}
-        todo = sorted(h for h in failed_points(d, a.match) if h not in done and h not in fixed)
+        # an empty result file is a trial killed while writing it (a full disk), whose logs may not exist at all
+        found = set(failed_points(d, a.match)) | (empty if a.empty_results else set())
+        todo = sorted(h for h in found if h not in done and h not in fixed)
         if not todo:
             continue
         print(f"{os.path.basename(d)}: rerun hp {todo}")
