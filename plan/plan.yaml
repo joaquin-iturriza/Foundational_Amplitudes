@@ -14,9 +14,9 @@ entries:
       for comparison; then the user decides
   decisions:
   - D117
-  next: 'CPU: PDF draw in the sampler, validation against MadEvent on a few processes, pp test pools for the held-out and
-    some training processes; GPU: scoring the window-trained models on them (<1 GPU-h) and one pp-trained short pretraining
-    of the adopted target (~1.5 GPU-h)'
+  next: when the pp-trained short pretraining (FA-ccin2p3-e786bd74) ends, its queued pp read fires; then compare it with the
+    four window-trained arms' pp reads (analysis/catalog_v3/pp_compare.py) per class family at the best checkpoint and write
+    the result up
   done_when: null
   match: zz_pp_*,catalog_v3_pp*
   notes_ref: null
