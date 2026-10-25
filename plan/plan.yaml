@@ -934,13 +934,14 @@ entries:
   - D127
   - D130
   - D134
-  next: 'Disk measured before submitting (read-only du on CC, 2026-10-25): a built catalog_v3 tree backend is ~50 MB of MadGraph
-    events dir plus ~2.6-3.5 MB of standalone (33 analogues of the validation''s 35 entries: 1.68 GB events + 0.09 GB standalone,
-    1.77 GB; the 2->5 bbx_ggtaptamz the largest at 56 MB); the v4 census runs display processes only (no output, a few KB
-    of .in files), so validation plus census fit well inside 10 GB of the 28 GB free; both submitted in full. When the validation
-    (FA-ccin2p3-44e6a15b) ends: read it, report the cuts, sqrt(s) shape, forward angle, top and b checks and the EW diagram
-    counts, and the measured per-process disk (V4SIZE lines in its log) and CPU cost (t_build, sec_per_event in validation.json).
-    The harder-cut rerun (FA-ccin2p3-144e2111) is in: pp numbers of the 40 pT>30 GeV entries written up (1f03805).'
+  next: 'Fix analysis/catalog_v4/validate_v4.py: register() must attach the recipe-level sampling block (mixture, f_fwd 0.15,
+    fwd_cand 1/3) to each sampled entry as register_recipe_processes does (0 of 35 pools ran: flat path refuses the log measure);
+    also read the model from the standalone (card check found none) and parse loop generation''s ''Contributing diagrams''
+    line. Rerun on CC with V4VAL_NO_CENSUS=1 (the 35 backends are reused; ~10 min of 16 CPUs) and report the pool checks and
+    sec_per_event. Open for the user: the 6 one-loop entries on loop_qcd_qed_sm-no_b_mass (did not import on CC); the 34 b-Higgs
+    strings that vanish with the massless b; disk: the regeneration needs ~142 GB (57 GB if the 51 MB events dirs are skipped)
+    against 27.4 GB free, catalog_v3''s 1790 events dirs hold ~92 GB. Then regenerate catalog_v4''s pools once the user answers
+    the 1 to 10 TeV energy hold-out and the disk has room; then the classes and roles on v4; then the b mass in particle_ids.py.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
