@@ -2,7 +2,11 @@
 more than training on pp? Every catalog_v3 short arm read zero-shot on the 13 TeV MadEvent pools of the 1396 hadronic
 tree classes (scripts/job_catalog_v3_pp_score.sh; recipes/catalog_v3_pp_test.yaml: 410 held-out classes of H1, H2, H3
 and the 986 training classes; each pp13_<class> is its class's |M|^2 function on pp-distributed events, 2000 validation
-events). Predictions copied home from $SCRATCH/zz_v3_pp_<arm>/<probe>.npz into data/pp_reads/<arm>/.
+events). The predictions stay on the site ($SCRATCH/zz_v3_pp_<arm>/<probe>.npz); `collect`, run there, reduces them to
+one row per probe and adds each training class's window loss, read from the arm's own run at its best checkpoint
+(result.json proc_val_losses_no_reg, 200 validation events of the class's shaped window, times the shared
+standardization's variance: log|M|^2 units, EMA weights as the pp read), and prints the rows as JSON:
+    site run --item pp_sampling ccin2p3 FA -- python analysis/catalog_v3/pp_compare.py collect > analysis/catalog_v3/data/pp_rows.json
   window-trained   baseline, dimensionless, dimensionless_context, dimensionless_twin (the four short pretrainings,
                    every hadronic class on its shaped windows)
   pp-trained       dimensionless_pp: the dimensionless arm with every hadronic training tree class on 13 TeV pp events
@@ -15,6 +19,8 @@ For the held-out classes, the same arm's read of the same class on its window po
 Figure: (a) per probe, the pp-trained arm's MSE against the window-trained dimensionless arm's, on the pp pools;
 (b) the window-trained dimensionless arm's MSE per class on the pp pool against its window pool.
     python3 analysis/catalog_v3/pp_compare.py   -> data/pp_compare.json, figs/pp_compare.{png,pdf}
+Without the pp-trained arm's reads, panel (a) is the four window-trained arms' pp MSE against the window MSE on the
+training classes (same arm, same class), panel (b) as above.
 """
 import glob, json, os, sys
 
@@ -40,17 +46,38 @@ def groups():
     return out
 
 
-def read(arm):
-    rows, bad = {}, []
-    for f in sorted(glob.glob(os.path.join(HERE, "data", "pp_reads", arm, "*.npz"))):
-        z = np.load(f)
-        p = os.path.basename(f)[:-4]
-        if "q" not in z.files or len(z["q"]) != len(z["t"]) or not len(z["t"]):
-            bad.append(p)                      # no prediction in the parent's units: listed, never dropped silently
+def collect():
+    """on the site: every arm's pp predictions reduced to rows, and its training classes' window losses"""
+    out = {}
+    for arm in ARMS:
+        pred = os.path.join(os.environ["SCRATCH"], f"zz_v3_pp_{arm}")
+        files = sorted(glob.glob(os.path.join(pred, "*.npz")))
+        if not files:
             continue
-        d = z["q"].astype(float) - z["t"].astype(float)
-        rows[p] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2), "shape": float(np.var(d))}
-    return rows, bad
+        rows, bad = {}, []
+        for f in files:
+            z = np.load(f)
+            p = os.path.basename(f)[:-4]
+            if "q" not in z.files or len(z["q"]) != len(z["t"]) or not len(z["t"]):
+                bad.append(p)                  # no prediction in the parent's units: listed, never dropped silently
+                continue
+            d = z["q"].astype(float) - z["t"].astype(float)
+            rows[p] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2), "shape": float(np.var(d)),
+                       "var_t": float(np.var(z["t"].astype(float))), "n": int(len(d))}
+        run = os.path.join(ROOT, "runs", "catalog_v3_short", arm)
+        res = json.load(open(os.path.join(run, "result.json")))
+        st = json.load(open(os.path.join(run, "data_stats.json")))
+        sd = st["prepd_std"]
+        assert st.get("shared_standardization") and max(sd) - min(sd) < 1e-9 * max(sd), f"{arm}: not one shared std"
+        win = {k: float(v) * sd[0] ** 2 for k, v in res["proc_val_losses_no_reg"].items()}
+        out[arm] = {"pp": rows, "no_prediction": bad, "window_train": win, "best_step": res.get("best_step"),
+                    "shared_std": sd[0]}
+    json.dump(out, sys.stdout)
+
+
+def read(arm, rows_all):
+    a = rows_all.get(arm)
+    return (a["pp"], a["no_prediction"]) if a else (None, None)
 
 
 def summ(rows):
@@ -64,12 +91,13 @@ def main():
     g = groups()
     sr_path = os.path.join(HERE, "data", "short_reads.json")
     sr = json.load(open(sr_path)) if os.path.exists(sr_path) else {}
+    rows_all = json.load(open(os.path.join(HERE, "data", "pp_rows.json")))
     res = {}
     for arm in ARMS:
-        if not os.path.isdir(os.path.join(HERE, "data", "pp_reads", arm)):
-            print(f"{arm}: no pp reads copied home")
+        rows, bad = read(arm, rows_all)
+        if rows is None:
+            print(f"{arm}: no pp reads")
             continue
-        rows, bad = read(arm)
         res[arm] = {"no_prediction": bad}
         for grp in GROUPS:
             exp = sorted(p for p, a in g.items() if a == grp)
@@ -78,20 +106,32 @@ def main():
             if r:
                 ent.update(summ(r))
                 ent["probes"] = r
-                # the same arm on the same classes' window pools (the held-out axes only: the training classes were
-                # not read on their windows)
-                win = sr.get(arm, {}).get(grp, {}).get("probes", {})
+                # the same arm on the same classes' window pools: a held-out class's zero-shot window read
+                # (data/short_reads.json, 2000 events), a training class's validation loss in the arm's own run
+                # (200 events, its best checkpoint); a class the arm never trained on (the twin's removed ones) has
+                # neither and is counted apart
+                if grp == "train":
+                    win = {k: {"mse": v} for k, v in rows_all[arm]["window_train"].items()}
+                    ent["not_in_arm_training"] = sorted(p for p in r if "v3_" + p[len("pp13_"):] not in win)
+                else:
+                    win = sr.get(arm, {}).get(grp, {}).get("probes", {})
                 pair = [(r[p]["mse"], win["v3_" + p[len("pp13_"):]]["mse"]) for p in r if "v3_" + p[len("pp13_"):] in win]
+                ent["window_pairs"] = {p: win["v3_" + p[len("pp13_"):]]["mse"] for p in r if "v3_" + p[len("pp13_"):] in win}
                 if pair:
+                    lr = np.log10([a / b for a, b in pair])
                     ent["window_same_classes"] = {"n": len(pair), "mse_pp": float(np.median([a for a, _ in pair])),
-                                                  "mse_window": float(np.median([b for _, b in pair]))}
+                                                  "mse_window": float(np.median([b for _, b in pair])),
+                                                  "ratio_pp_over_window_median": float(10 ** np.median(lr)),
+                                                  "ratio_q10_q90": [float(10 ** x) for x in np.quantile(lr, [0.1, 0.9])],
+                                                  "n_pp_worse": int((lr > 0).sum())}
             else:
                 ent["n"] = 0
             res[arm][grp] = ent
             w = ent.get("window_same_classes")
             print(f"{arm:24s} {grp:5s} n={ent['n']:4d}/{len(exp):4d}" +
                   (f" mse {ent['mse']:.3g} level {ent['level']:.3g} shape {ent['shape']:.3g}" if ent["n"] else " NO READS") +
-                  (f" | window {w['mse_window']:.3g} on the same {w['n']}" if w else ""))
+                  (f" | window {w['mse_window']:.3g} on the same {w['n']}, ratio {w['ratio_pp_over_window_median']:.3g}"
+                   f" ({w['n_pp_worse']} worse on pp)" if w else ""))
     json.dump(res, open(os.path.join(HERE, "data", "pp_compare.json"), "w"), indent=1)
     plot(res, sr)
 
@@ -138,4 +178,4 @@ def plot(res, sr):
 
 
 if __name__ == "__main__":
-    main()
+    collect() if sys.argv[1:] == ["collect"] else main()
