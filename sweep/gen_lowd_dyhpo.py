@@ -1,4 +1,4 @@
-"""The small-D fine-tuning study, second round (D120; docs/results.tex par:lowd_ft and the hand-off entry "Fine-tuning at
+"""The small-D fine-tuning study, second round (approved by D123, the user's "Yes, send them.", about 33 GPU-h; the design D120; docs/results.tex par:lowd_ft and the hand-off entry "Fine-tuning at
 small D"): single-fidelity DyHPO for the three methods that did not win at the default's HPs, on the first round's 60
 cells (analysis/transfer/data/lowd_ft_spec.json: e+e- -> Z gamma, e+e- -> d dbar, u d -> u d, e+e- -> b bbar at one loop,
 u ubar -> g g; rungs 1, 7, 9; D = 10 to 10^2.5). Each sweep is its cell's grid config (sweep_config_tp3_r<rung>fte_<probe>
@@ -15,7 +15,7 @@ The default's side of the comparison is the grid's own 5-trial search of each ce
 Sweep names: tp3_lowd_<method>_r<rung>_<probe>_d<k> (the rung is in the name: three rungs share a probe and D).
     python3 sweep/gen_lowd_dyhpo.py              -> sweep/sweep_config_tp3_lowd_*.yaml (180 configs)
     python3 sweep/gen_lowd_dyhpo.py --generate   on the site: generate_sweep for each not yet generated (no submission;
-                                                 FA_NEW_SWEEP_REASON=D120 for the cell guard)
+                                                 FA_NEW_SWEEP_REASON=D123 for the cell guard)
 """
 import argparse, json, os, sys, zlib
 
@@ -58,7 +58,7 @@ def main():
     for name, cfg in cf:
         p = os.path.join(HERE, f"sweep_config_{name}.yaml")
         with open(p, "w") as f:
-            f.write("# Written by sweep/gen_lowd_dyhpo.py (the small-D study's DyHPO round, D120).\n")
+            f.write("# Written by sweep/gen_lowd_dyhpo.py (the small-D study's DyHPO round, D123).\n")
             yaml.safe_dump(cfg, f, sort_keys=False)
         paths.append(p)
     print(f"{len(cf)} configs: {len(METHODS)} methods x {len(cf) // len(METHODS)} cells")
@@ -67,7 +67,7 @@ def main():
         import glob
         import siteconf
         from sweep.generate_sweep import run_generate
-        os.environ.setdefault("FA_NEW_SWEEP_REASON", "D120")   # the cell guard: these differ from the grid cells only
+        os.environ.setdefault("FA_NEW_SWEEP_REASON", "D123")   # the cell guard: these differ from the grid cells only
                                                                 # in the method (fixed flag or one searched dimension)
         for (name, _), p in zip(cf, paths):
             d = os.path.join(siteconf.SWEEP_DIR, name)

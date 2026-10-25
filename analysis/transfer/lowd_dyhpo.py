@@ -1,4 +1,4 @@
-"""The small-D fine-tuning study, second round (D120; sweep/gen_lowd_dyhpo.py): each method's own single-fidelity DyHPO
+"""The small-D fine-tuning study, second round (D123, the design D120; sweep/gen_lowd_dyhpo.py): each method's own single-fidelity DyHPO
 search (5 trials per cell, the grid's fine-tune space plus L2-SP's lambda or the frozen depth) against the grid's own
 5-trial search of the default fine-tune and against scratch, best against best per cell (CLAUDE.md A/B protocol step 4),
 on the first round's 60 cells (analysis/transfer/data/lowd_ft_spec.json). Each value is the best trial's best-checkpoint
