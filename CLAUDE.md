@@ -327,6 +327,7 @@ Files: `mg5_pipeline_final.py` (unprefixed line numbers), `recipes/gen_catalog_v
 | heavy-quark layer (`select_catalog_v3.py:135`) | the top's quantum numbers at m_Q ∈ {50, 300, 600} GeV, width scaled from 1.4915 at LO | my catalog design approval (2026-10-23, "the proposals for the catalog are good") [D98, D100]; width rule **open (unsourced)** |
 | b beams (:2796) | on their 4.7 GeV shell | **open (unsourced)** |
 | BSM points `NONSM_POINT` (:1649-1662) | Z′ MY1 500 GeV (gVl 0.3, gAl 0.1, gVq 0.25 model default, dark matter decoupled); 2HDM H± 200, h2 250, h3 300 GeV, second-doublet Yukawas zero | layer: "at least one BSM process that can be encoded with our current particle embedding" (2026-10-23) [D98]; the points **open (unsourced)** |
+| pool storage | float64 momenta, IDs and amplitudes; never propose float32 again | my call after the float32 check (2026-10-24, "Okay, fine, keep it like that then"): float32 momenta shift the target's physics factors by up to 0.022, and single-process precision studies reuse the pools |
 | pool sizes | trees 1e5 / 1e4 / 1e4 (train / val / test), one-loop 5e4 / 5e3 / 5e3 | my approval of the generation (2026-10-24, "go ahead with the generation") [D102] |
 | pp pool sizes (`recipes/gen_catalog_v3_pp.py:88`) | 1e4 / 2e3 / 2e3 | **open (unsourced)** |
 | pp pools' cards (`recipes/catalog_v3_pp/`) | Daniel's 13 TeV run card as is (nn23lo1, pT > 10 GeV, abs(η) < 5); catalog_v3's param card | the pp study (2026-10-25, "build it, run a few checks"; "that's acceptable yes") [D117, D119] |
