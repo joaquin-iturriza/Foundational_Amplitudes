@@ -6235,6 +6235,30 @@ of the best, in decades): in the $18$ cells where scratch's drop is in the top q
 below scratch and improve $2.2$ decades within the run against scratch's $2.5$; in the other $54$, $0.9$ below, $2.6$
 against $2.9$. The shortfall in improvement is the same $0.3$ decades in both. $ee\to Z\gamma$ at $D=10^2$ is the
 exception: the fine-tunes start $0.9$ decades lower and improve $1.9$ decades, scratch $3.8$.
+What the start already holds on $ee\to Z\gamma$ (2026-10-25; \code{tools/linear\_readout.py} as above, on every
+rung's frozen pretraining, rung $0$ the $ee\to u\bar u$ one; run FA-ccin2p3-b0302fe9, \code{nogain\_readout\_za.py},
+\code{data/nogain\_readout\_za.json}, Fig.~\ref{fig:nogain_readout_za}). At $D=10^{1.5}$ scratch reaches
+$1.0\times10^{-2}$: the frozen features of rungs $5$, $7$ and $8$ read out at or below it ($9.9$, $7.1$, $7.8\times10^{-3}$)
+and those of rungs $2$, $3$ and $6$ within $1.4\times$, while the fine-tunes of rungs $0$ to $6$ and $9$ sit $2.7$ to
+$5.6\times$ above scratch; the read-out beats the rung's own fine-tune in $8$ of the $10$ rungs, by more than $2\times$
+in $6$. There the start holds the target, linearly, and the fine-tune loses it. At $D=10^2$ scratch reaches
+$5.0\times10^{-5}$ and no start does: the best read-out is rung $8$'s at $9.4\times10^{-5}$ ($1.9\times$), then rung $6$'s
+($4.8\times$), rung $9$'s ($6.9\times$) and the finale's ($9.0\times$), up to $145\times$ for rung $0$; the fine-tunes sit
+$4.6$ to $35\times$ above, and in rungs $5$, $6$ and $8$ the frozen read-out still beats the fine-tune, by $2.0$ to
+$6.1\times$. So $ee\to Z\gamma$'s dip has two parts: at $D=10^{1.5}$ it is the fine-tune failing to keep what its start
+already carries, and at $D=10^2$ it is mostly that no pretrained representation carries the structure scratch finds
+with $100$ events (at least $1.9\times$ short of scratch with a linear read-out), with the same failure on top in three
+rungs. The finale's fine-tune cells are not in the collected grid, so its read-out has no fine-tune to compare.
+
+\begin{figure}[t]
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/nogain_readout_za.pdf}}
+\caption{$ee\to Z\gamma$: a ridge read-out of each pretraining's frozen per-event features, fitted on the cell's $D$
+training events and scored on validation, against the rung's fine-tune (the $8$k grid's best) and scratch, at
+$D=10^{1.5}$ and $10^2$; rung $0$ is the $ee\to u\bar u$ pretraining, ``fin'' the finale
+(\code{analysis/transfer/nogain\_readout\_za.py}).}
+\label{fig:nogain_readout_za}
+\end{figure}
 
 \begin{figure}[t]
 \centering
@@ -7245,13 +7269,6 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
     are flushed (\code{touch .claude/.notes\_flushed}).
-  \item \textbf{The probes that do not gain} (par.~\ref{par:nogain}). Not concluded. Why $ee\to Z\gamma$'s fine-tunes
-    lose $1.2$ decades to scratch at $D=10^2$: ruled out are early stopping, the fine-tune search window (the lowered
-    window moves the median gain by $0.03$ decades) and a generally smoother fine-tune curve in steep cells. What is left is
-    the pretrained start itself, as on $u\bar u\to Zg$, where rung $6$'s frozen features read out $30\times$ worse than rung
-    $7$'s. Proposed next, not approved (about $0.5$ GPU-h): the same linear read-out of every rung's frozen features on
-    $ee\to Z\gamma$ at $D=10^{1.5}$, $10^2$; if no rung's features carry the target, the dip is the start's
-    representation, otherwise it is the fine-tune failing to find what is there.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
