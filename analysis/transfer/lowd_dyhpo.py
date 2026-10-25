@@ -64,10 +64,20 @@ def main():
     # a sweep with more results than distinct candidates (a candidate run twice): its best is over the distinct ones
     repeats = {f"tp3_lowd_{m}_r{r['rung']}_{r['probe']}_d{r['k']}": r[m + "_n"] for r in rows for m in METHODS
                if r.get(m + "_n", 0) > 5}
+    # the single-run noise (data/lowd_ft.json, par:lowd_ft): the default rerun at its recorded trial's HPs against the
+    # grid's record of that trial, per cell, and the median of that log ratio over each D's 15 cells, which is what a
+    # method no different from the default would show on this comparison
+    first = json.load(open(os.path.join(HERE, "data", "lowd_ft.json")))["cells"].values()
+    lr_ = np.array([np.log10(c["recorded_ft"] / c["default"]) for c in first])
+    noise = {"q90_abs": float(np.quantile(np.abs(lr_), 0.9)), "median_abs": float(np.median(np.abs(lr_))),
+             "per_D_median": {str(k): float(np.median([np.log10(c["recorded_ft"] / c["default"]) for c in first
+                                                       if c["D"] == D_])) for k, D_ in
+                              sorted({(r["k"], r["D"]) for r in rows})}}
+    noise["per_D_median_max_abs"] = max(abs(v) for v in noise["per_D_median"].values())
     dflt = {str(k): float(np.median([np.log10(r["scratch"] / r["recorded_ft"]) for r in rows if r["k"] == k]))
             for k in (2, 3, 4, 5)}
     out = {"summary": summ, "default_over_scratch": dflt, "pooled": pooled, "by_probe": by_probe, "repeats": repeats,
-           "incomplete": incomplete, "cells": rows}
+           "noise": noise, "incomplete": incomplete, "cells": rows}
     json.dump(out, open(os.path.join(HERE, "data", f"lowd_dyhpo{tag}.json"), "w"), indent=1)
     for m, v in summ.items():
         print(m, json.dumps(v))
@@ -75,7 +85,7 @@ def main():
     plot(summ, dflt, tag)
     # last line: the object the results.tex claims key into (tools/verify_claims.py), e.g. summary.l2sp.4.wins_over_default
     print(json.dumps({"summary": summ, "default_over_scratch": dflt, "pooled": pooled, "by_probe": by_probe,
-                      "repeats": repeats, "n_cells": len(rows),
+                      "repeats": repeats, "noise": noise, "n_cells": len(rows),
                       "n_incomplete": len(incomplete)}))
 
 
