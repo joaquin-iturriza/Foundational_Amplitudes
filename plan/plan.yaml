@@ -131,7 +131,13 @@ entries:
     and any later ones) from their configs (sweep/rerun_failed.py); check that linear-probe trials started after the sync
     log ''head match'' below 1e-3. When all 900 are in: collect tp3_lowd_ (analysis/transfer/collect_sweeps.py), run analysis/transfer/lowd_dyhpo.py,
     compare each method''s best against the default''s own search on cell medians, and write it up after par:lowd_ft in docs/results.tex.'
-  done_when: null
+  done_when: 'python3 sweep/watchdog.py tp3_lowd_ --expect analysis/transfer/expect_tp3.json --window 30 --sites ccin2p3 --units
+    | tail -1 | python3 -c "import json,sys; u=json.load(sys.stdin)[''units'']; sys.exit(0 if len(u)==180 and all(v[''done'']>=v[''expected'']
+    and not v[''active''] for v in u.values()) else 1)" && python3 -c "import json,sys; d=json.load(open(''analysis/transfer/data/lowd_dyhpo.json''));
+    sys.exit(0 if not d[''incomplete''] and len(d[''cells''])==60 and sorted(d[''summary''])==[''freeze'',''l2sp'',''lpft'']
+    else 1)" && test -f analysis/transfer/figs/lowd_dyhpo.png && test -f analysis/transfer/figs/lowd_dyhpo.pdf && grep -q
+    ''label{par:lowd_dyhpo}'' docs/results.tex && grep -q ''figs/lowd_dyhpo.pdf'' docs/results.tex && grep -q ''% src: python3
+    analysis/transfer/lowd_dyhpo.py'' docs/results.tex'
   match: tp3_lowd*,zz_lowd*
   notes_ref: null
   evidence:
