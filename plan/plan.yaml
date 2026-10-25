@@ -875,10 +875,13 @@ entries:
   quotes: []
   decisions:
   - D127
-  next: 'CPU check on CC: for every catalog_v3 class, sample events under the proposed coverage (hadronic classes: pT>10 GeV,
-    |eta|<5, dR>0.4; e+e-: |cos theta|<0.99; a mixture component uniform in log(1/(1-|cos theta|))), report the growth of
-    the log|M|^2 range against the current pools, the fraction of the 13 TeV pp pools it covers, and the generation cost;
-    write it up and bring the design back to the user before any regeneration or GPU job'
+  next: 'when the coverage check run (FA-ccin2p3-ec84e913) ends, read its log (selftest line, RUN_SUMMARY rows=1586 expected=1586,
+    the errors listed); bring the rows home with site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v3/coverage_check.py
+    collect > analysis/catalog_v3/data/coverage_rows.json, run the summary; write the paragraph in docs/results.tex with %
+    src / % claim lines and a figure, reporting separately: the angular coverage and its log|M|^2 range growth, the sqrt(s_hat)
+    window (pp share above it, the wide log-uniform window, the measures'' effective sample sizes), cutting b and tau, the
+    forward component''s population of the pp forward region, and the generation cost; then bring the design to the user (one-loop
+    pools unshaped: not in this check, say so)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
