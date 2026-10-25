@@ -10,14 +10,15 @@
 # (scripts/job_catalog_v3_short.sh, runs/catalog_v3_short/<arm>) read zero-shot on the 13 TeV MadEvent pools of the
 # 1396 hadronic classes (recipes/catalog_v3_pp_test.yaml: 410 held-out, 986 training; each pp13_<class> is its class's
 # |M|^2 function on pp-distributed events), 2000 val events each (tools/zero_shot_parent.py); predictions in
-# $SCRATCH/zz_v3_pp_<arm>/. Args: <arm> [recipe, default the test set]
-# MISSING_ONLY=1 scores only the recipe's probes with no readable prediction file yet (a read cut short, e.g. by a full disk).
+# $SCRATCH/zz_v3_pp_<arm>/. Args: <arm> [recipe, default the test set] [missing]
+# Third arg "missing" (or MISSING_ONLY=1) scores only the recipe's probes with no readable prediction file yet (a read cut short, e.g. by a full disk).
 # The job ends nonzero, without V3_PP_SCORE_DONE, when the scorer fails or any probe of the recipe has no
 # readable prediction file afterwards (every such probe listed as V3_PP_MISSING); a ZERO_SHOT error line is a failed probe too.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 ARM="${1:?an arm of runs/catalog_v3_short}"; SPEC="${2:-recipes/catalog_v3_pp_test.yaml}"
+[ "${3:-}" = missing ] && MISSING_ONLY=1
 RUN="$PROJECT_DIR/runs/catalog_v3_short/$ARM"
 ls "$RUN"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $RUN"; exit 1; }
 R="$SCRATCH/zz_v3_pp_recipes"; PRED="$SCRATCH/zz_v3_pp_$ARM"; mkdir -p "$R" "$PRED"
