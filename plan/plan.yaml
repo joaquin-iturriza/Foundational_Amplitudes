@@ -14,11 +14,9 @@ entries:
       for comparison; then the user decides
   decisions:
   - D117
-  next: 'score the 29 missing training probes once CC has space: site submit ccin2p3 FA scripts/job_catalog_v3_pp_score.sh
-    dimensionless_pp recipes/catalog_v3_pp_test.yaml missing (the job now fails nonzero on any missing probe); then pp_compare.py
-    collect, rerun pp_compare.py (the interim figure figs/pp_trained_{a,b,c,d} becomes final), write up in docs/results.tex.
-    done_when names figs/pp_trained.png/.pdf as one file, the figure is four panels (pp_trained_a..d): its check needs the
-    panel names'
+  next: 'when FA-ccin2p3-982b5a14 (the 29 missing training probes) ends: check all 1396 have readable predictions, collect
+    (pp_compare.py collect), redraw figs/pp_trained_{a..d}, write up the pp-trained arm in the pp paragraph with % src / %
+    claim lines, and fix the entry''s done check to the four panel files (pp_trained_a..d .png/.pdf) instead of figs/pp_trained.png/.pdf'
   done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
     g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
     not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
