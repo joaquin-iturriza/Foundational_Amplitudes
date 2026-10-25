@@ -51,8 +51,8 @@ def support_masks():
     class's window and the catalog's fiducial cuts (mg5_pipeline_final.FIDUCIAL_CUTS: pT > 10 GeV, |cos theta| < 0.9,
     Delta R > 0.4, m_ij > 10 GeV on the massless visible finals), both read in the partonic rest frame, where the window
     sampler draws. MadEvent's run card cuts in the lab (pT > 10 GeV, |eta| < 5), so a pp event can be forward, collinear
-    or above the window's top, none of which a window pool holds. The first 2000 rows of the val pool are the ones the
-    read scored (tools/zero_shot_parent.py, data.eval_subsample: an mmap slice)."""
+    or above the window's top, none of which a window pool holds. The first 2000 rows of the val pool are the events the
+    read scored (tools/zero_shot_parent.py, data.eval_subsample: an mmap slice), in another order (matched in collect)."""
     import mg5_pipeline_final as mg
     win = {}
     for f in ["catalog_v3_train.yaml"] + [f"catalog_v3_heldout_{a}.yaml" for a in ("H1", "H2", "H3")]:
@@ -99,18 +99,26 @@ def collect():
             rows[p] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2), "shape": float(np.var(d)),
                        "var_t": float(np.var(z["t"].astype(float))), "n": int(len(d))}
             m = sup.get(p)
+            lf = z["logF"].astype(float) if ("logF" in z.files and len(z["logF"]) == len(d)) else 0.0
             if m is not None and len(m["in_cuts"]) == len(d):
-                inside = m["in_cuts"] & m["in_sqrts"]
-                rows[p].update({"frac_in_cuts": float(m["in_cuts"].mean()), "frac_in_sqrts": float(m["in_sqrts"].mean()),
+                # the read's validation loader does not keep the pool's row order: each scored event is matched to its
+                # pool row by its log|M|^2 (t minus the target factor), sorted against sorted, and the match checked
+                la = z["t"].astype(float) - lf
+                perm = np.empty(len(la), int)
+                perm[np.argsort(la, kind="stable")] = np.argsort(m["log_amp"], kind="stable")
+                chk = float(np.max(np.abs(la - m["log_amp"][perm])))
+                rows[p]["order_check"] = chk
+                if chk > 1e-3:                     # not the same events: no split for this probe, listed
+                    continue
+                inc, ins = m["in_cuts"][perm], m["in_sqrts"][perm]
+                inside = inc & ins
+                rows[p].update({"frac_in_cuts": float(inc.mean()), "frac_in_sqrts": float(ins.mean()),
                                 "frac_inside": float(inside.mean()),
                                 "mse_inside": float(np.mean(d[inside] ** 2)) if inside.any() else None,
                                 "mse_outside": float(np.mean(d[~inside] ** 2)) if (~inside).any() else None,
-                                "mse_out_cuts": float(np.mean(d[~m["in_cuts"]] ** 2)) if (~m["in_cuts"]).any() else None,
-                                "mse_above_window": float(np.mean(d[~m["in_sqrts"]] ** 2)) if (~m["in_sqrts"]).any() else None,
+                                "mse_out_cuts": float(np.mean(d[~inc] ** 2)) if (~inc).any() else None,
+                                "mse_above_window": float(np.mean(d[~ins] ** 2)) if (~ins).any() else None,
                                 "sqrts_median": float(np.median(m["sqrts"]))})
-                # the rows are the scored events in the same order: t minus the target factor is log|M|^2
-                lf = z["logF"].astype(float) if ("logF" in z.files and len(z["logF"]) == len(d)) else 0.0
-                rows[p]["order_check"] = float(np.max(np.abs(z["t"].astype(float) - lf - m["log_amp"])))
         run = os.path.join(ROOT, "runs", "catalog_v3_short", arm)
         res = json.load(open(os.path.join(run, "result.json")))
         st = json.load(open(os.path.join(run, "data_stats.json")))
