@@ -1,0 +1,6 @@
+{"cause": "CC /sps/lpnhe full, 2026-10-25 from ~20:25; requeued 2026-10-25 21:3x with sweep/rerun_failed.py (retract + one fixed trial at the same candidate) after 30 GB were freed",
+ "errno28_fixed_reruns": {"tp3_lowd_freeze_r1_uubar_gg_d3": [28], "tp3_lowd_freeze_r7_ee_Za_d2": [159], "tp3_lowd_lpft_r7_uubar_gg_d2": [68], "tp3_lowd_lpft_r9_ee_Za_d2": [64], "tp3_lowd_lpft_r9_uubar_gg_d2": [24]},
+ "truncated_save_fixed_reruns": {"tp3_lowd_lpft_r7_ud_ud_d3": [15], "tp3_lowd_lpft_r9_ud_ud_d3": [71]},
+ "guided_replacements": {"tp3_lowd_freeze_r1_uubar_gg_d3": "trial_0004 failed in suggest() (Errno 28) before a candidate was drawn; one guided trial added (generate_sweep --extend, n_trials=1) so the sweep keeps its 5"},
+ "n_requeued": 8,
+ "submission": "by the CC feeder (sweep/feed_capped.py tp3_), not submitted by hand"}
