@@ -161,3 +161,5 @@ analysis/catalog_v3/data/factorised_2to4_skipped.jsonl
 analysis/catalog_v3/data/factorised_2to5/
 analysis/catalog_v3/data/factorised_2to5_net_*/
 analysis/catalog_v3/data/kshot_v3/
+plan/*.lock
+plan/.state.json
