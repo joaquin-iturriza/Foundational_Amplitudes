@@ -6847,9 +6847,27 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-25, 01:30).} Nothing running. Done since the last State: the context vector's K-shot
-    fits (par.\ The context vector) and design (ii)'s data check (par.\ Design (ii) on the data); catalog\_v3's
-    generation task closed (D112). Next: the level item's GPU read of design (ii). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
+  \item \textbf{State (2026-10-25, 03:00).} The study has moved to catalog\_v3 (the user, 2026-10-25: Daniel's catalog and
+    its extra probes untouched until they say; the level and preprocessing items on it held). Running on CC, item
+    \code{v3\_pretrain}: the four short catalog\_v3 pretrainings (\code{scripts/job\_catalog\_v3\_short.sh}, 4264 steps,
+    the twin 3803; every arm with the sign head, the MSE and the arithmetic mean): \code{dimensionless} (the adopted
+    target, FA-ccin2p3-ff0533da), \code{baseline} (one shared standardization in GeV, 7c0710dd),
+    \code{dimensionless\_context} (7c41ffd5), \code{dimensionless\_twin} (no $\tau$, $\nu_\tau$ or quartic-gauge pool,
+    910eee41); each then reads H1, H2, H2p5, H3, H5 (with the sign head's scoring on its sign-changing pools), H6, H7E and
+    H7c, the twin also H3p and H4; predictions in \code{\$SCRATCH/zz\_v3\_short\_<arm>/<axis>/}. When they end: collect,
+    write up a catalog\_v3 section (per axis, per arm), send to the user. Built today: the pretraining recipes
+    (\code{recipes/make\_catalog\_v3\_recipes.py}: 1397 train, the twin 1246; the held-out loop-induced class drawn with
+    the seed, $gg\to ZH$); H7 (the user's call: partonic windows, no pp; 40 seeded classes at $\sqrt{\hat s}\in[1,10]$\,TeV
+    and at $p_T\geq30$\,GeV, generated and prepared); the sidecars for every pool; the diagram encoder's optional BSM
+    labels. In progress, the pp study (approved: build it in parallel, check, the user decides whether catalog\_v3
+    switches): \code{recipes/gen\_catalog\_v3\_pp.py} writes the 1396 hadronic classes as 13\,TeV MadEvent processes
+    (\code{pp13\_*}, the parents' param-card patches, labels at the window's $\alpha_s$ rule, AQCDUP kept), a test set
+    (all 410 hadronic held-out and all 986 hadronic training classes) and the pp training set; next: the repo review of
+    it (lock held), generation with \code{scripts/job\_gen\_daniel\_catalog.sh} (\code{DANIEL\_SPEC}, \code{DANIEL\_PREFIX=pp13\_})
+    split over several CPU jobs, then the window-trained arms scored on it and one pp-trained short pretraining of the
+    dimensionless target. Rules added to CLAUDE.md today: a stated plan's cores and time hold (0c), a pointed-out mistake
+    gets its cause and a prevention (0d), plain names and no internal codes to the user (0e), work an answer unblocks goes
+    out first (0f). Done today: catalog\_v3 generation complete and audited (par.\ catalog\_v3's pools and levels); the signed A/B
     (sign head wins); the no-gain probes (D108). Decided 2026-10-24: catalog\_v2 deleted (D110, manifest
     \code{mg5amcnlo/DELETED\_V2\_ONLY\_20261024\_172235.json}); no mass-scheme shift in catalog\_v3 (D111); catalog\_v2
     not regenerated (D106); the larger-catalog item replaced by catalog\_v3 (D107); large-$D$ points stay out (D109);
