@@ -5492,7 +5492,11 @@ $k=9$). Each $(\text{probe},D)$ cell is one single-fidelity DyHPO of $8$ trials
 (\code{sweep/gen\_transfer\_pilot.py}), searched wide at first, to be narrowed once
 patterns show: the lr window is one decade either side of $\eta^\ast(t)$ of the high-$D$
 row (Sec.~\ref{sec:lrlaw}) times $\sqrt{B/16384}$, Adam's square-root batch rule, with the
-batch $B=\min(16384,D/2)$, so the batch moves with $D$ (both the user's choice). One seed per
+batch $B=\min(16384,D/2)$, so the batch moves with $D$ (both the user's choice). The rule was measured not to
+hold (the measured optimum moves $1.9\times$ between $D=700$ and $7\times10^4$, the rule $6.8\times$; $31$ scratch cells
+had their best at the window's top and were re-searched higher); scratch cells generated from 2026-10-25 on are
+centred on the measured surface at their own steps and $D$ instead (\code{gen\_transfer\_pilot.lr\_surface}), and
+every cell reported here before that date used the rule. One seed per
 cell, until the noise is known. What depends on the momenta only (their scale, and which
 propagator factors the target divides out) is fitted on the whole pool's phase-space points,
 which carry no labels (\code{data.phase\_space\_on\_pool}); the amplitude transform and its

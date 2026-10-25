@@ -30,11 +30,22 @@ improving (the best checkpoint's step), and that sets the horizons of the full s
 Search spaces are wide, at the user's request for this study (2026-09-30: "general and wide,
 like the ones we were doing before", to be narrowed once patterns show), so the lr window is
 one decade either side instead of CLAUDE.md's half decade:
-  scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima, measured
-                      at batch 16384); no batch scaling: the square-root batch rule chosen on
-                      2026-09-30 was measured not to hold (the measured optimum moves 1.9x between
-                      D=700 and 7e4 at t=1000, the rule 6.8x; 31 scratch cells hit the window's
-                      top) and is dropped; the window covers the measured small-D shift. The
+  pretrain            lr one decade either side of lr*(t, high D) (analysis/hpo_optima's
+                      n_train = 7e4 row, batch 8192)
+  scratch             lr one decade either side of the measured surface lr*(t, D) at the cell's
+                      own (t, D) (CLAUDE.md HPO rule 2): the high-D row at the cell's steps
+                      times the surface's fitted D factor (D_FACTOR, from the rows n_train 700,
+                      2212, 7000, 22130, 7e4, each summed over 8 processes) at the cell's D
+                      training events. Matching by total training
+                      events keeps the batch matched too: the surface's low-D rows ran at batch
+                      ~D/2 or less (256 at 700, 1024 at 2212, 3500 at 7000), as the cells do
+                      (B = min(16384, D/2)), so the surface's D axis already carries the batch
+                      effect. Below D = 700 (k <= 5) the 700 factor is held, off the measured
+                      grid (the measured trend, lr* ~ D^0.17, would put D = 10 about 2x lower,
+                      inside the window). This replaces the square-root batch rule chosen on 2026-09-30,
+                      measured not to hold (the optimum moves 1.9x between D = 700 and 7e4 at
+                      t = 1000, the rule 6.8x; 31 scratch cells hit the window's top). Scratch
+                      cells generated before 2026-10-25 were centred with the rule. The
                       template's lambda, warm-up, eta_min, EMA
   fine-tune           training.lr = the pretrain's best, fine_tune.lr_scale [0.1, 10] (superseded by
                       --eff-lr, the rung fine-tune grid's direct search)
@@ -106,10 +117,11 @@ SEC_PER_STEP, OVERHEAD_MIN = 0.45, 15              # bs 16384 on a V100 (gen_sol
 T_LADDER = 64000
 
 recs = json.load(open(os.path.join(ROOT, "analysis", "hpo_optima", "hpo_optima.json")))
-row = collections.defaultdict(list)
+rows = collections.defaultdict(lambda: collections.defaultdict(list))       # n_train -> t -> [log lr*]
 for r in recs:
-    if r["family"] == "scaling_p" and r["converged"] and r["hp_best"].get("training.lr") and r["n_train"] == 70000:
-        row[r["t_steps"]].append(np.log(r["hp_best"]["training.lr"]["val"]))
+    if r["family"] == "scaling_p" and r["converged"] and r["hp_best"].get("training.lr"):
+        rows[r["n_train"]][r["t_steps"]].append(np.log(r["hp_best"]["training.lr"]["val"]))
+row = rows[70000]
 ts = np.array(sorted(row)); lr_row = np.array([np.mean(row[t]) for t in ts])
 # Past the high-D row's last horizon (~1.8e4) the centre follows CLAUDE.md rule 2's extrapolation of that
 # row's decay (2e-3 at 3e4, 1.4e-3 at 5e4, 9e-4 at 1e5); np.interp alone would hold the last value
@@ -154,8 +166,30 @@ def batch(k):
 LR_SHIFT = 0.0                                     # decades the scratch window moves up (--lr-shift)
 
 
+# The surface's D axis as one factor per D row, fitted over every horizon at once (log lr* = A(t) + B(D), least
+# squares over the converged scaling_p records, B = 0 on the 7e4 row): the single (t, D) cells hold 1 to 8 sweeps
+# each and their means scatter by up to 2x, the factors come out monotone and saturating (0.58, 0.63, 0.81, 0.81, 1 at
+# n_train 700, 2212, 7000, 22130, 7e4), as CLAUDE.md rule 2 records (lr* ~ D^0.17, saturating).
+_pts = [(t, n, v) for n in rows for t in rows[n] for v in rows[n][t]]
+_T, _N = sorted({p[0] for p in _pts}), sorted(rows)
+_M = np.zeros((len(_pts), len(_T) + len(_N) - 1))
+for _i, (_t, _n, _) in enumerate(_pts):
+    _M[_i, _T.index(_t)] = 1
+    if _n != 70000:
+        _M[_i, len(_T) + [m for m in _N if m != 70000].index(_n)] = 1
+_sol = np.linalg.lstsq(_M, np.array([p[2] for p in _pts]), rcond=None)[0]
+D_FACTOR = {**dict(zip([m for m in _N if m != 70000], _sol[len(_T):])), 70000: 0.0}
+
+
+def lr_surface(t, D):
+    """lr*(t, D): the high-D row's lr_star(t) times the fitted factor of D, interpolated in log D and held to the
+    measured [700, 7e4]."""
+    Ns = np.array(sorted(D_FACTOR)); B = np.array([D_FACTOR[n] for n in Ns])
+    return float(lr_star(t) * np.exp(np.interp(np.log(np.clip(D, Ns.min(), Ns.max())), np.log(Ns), B)))
+
+
 def lr_space(T, k=None):
-    c = lr_star(T) * 10 ** LR_SHIFT
+    c = (lr_star(T) if k is None else lr_surface(T, round(10 ** (k / 2)))) * 10 ** LR_SHIFT
     return {"name": "training.lr", "type": "float_log",
             "low": float(f"{c / 10:.3g}"), "high": float(f"{c * 10:.3g}")}
 
