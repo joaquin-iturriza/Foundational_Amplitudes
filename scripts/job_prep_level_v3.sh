@@ -5,9 +5,9 @@
 #SBATCH --output=prep_level_v3_%j.out
 #SBATCH --error=prep_level_v3_%j.out
 #
-# CPU only (the preprocessing exploration on catalog_v3, D83/D114): the class-mean level a target leaves for unseen classes (the hybrid design), from
+# CPU only (the preprocessing exploration on catalog_v3: D83, moved to catalog_v3 by D114): the class-mean level a target leaves for unseen classes (the hybrid design), from
 # every training tree class and every held-out tree axis (analysis/catalog_v3/prep_level.py).
-# Writes $SCRATCH/zz_v3_prep/prep_level.json.
+# Writes $SCRATCH/zz_v3_prep/prep_level_comp.json.
 
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
