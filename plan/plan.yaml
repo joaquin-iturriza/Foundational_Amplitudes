@@ -1,7 +1,7 @@
 # The plan: the only source of truth for open work. Edit through tools/plan.py.
 migrated_at: '2026-10-25T18:02:36+00:00'
 entries:
-- status: running
+- status: done
   quotes:
   - said_at: '2026-10-25T01:21:19.569Z'
     text: this should be done in parallel to what we are doing, build it, run a few checks, and from that we decide if we
@@ -71,6 +71,7 @@ entries:
       docs/results.tex && grep -q ''% claim: dimensionless_pp\.'' docs/results.tex'
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
+  writeup: 8a0f886
 - status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
