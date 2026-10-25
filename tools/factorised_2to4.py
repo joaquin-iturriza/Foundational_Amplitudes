@@ -78,11 +78,11 @@ def me2(proc, mom, alphas):
 V3_EXTRA = {"g": 21, "a": 22, "z": 23, "h": 25}
 
 
-def v3_probes(per_kind, seed):
-    """catalog_v3's 2->4 classes built as a 2->3 class plus one g, a, Z or H (the census's `why` = '<parent>+<x>'), on
-    massless beams (the map rescales a beam), whose parent is a generated class (its standalone exists): per kind up to
-    `per_kind` drawn with `seed`. Returns [(probe, parent, extra pdg)]."""
-    import json, random
+def v3_probes():
+    """Every catalog_v3 2->4 class (with pools) built as a 2->3 class plus one g, a, Z or H (the census's `why` =
+    '<parent>+<x>'). Read: those on massless beams (the map rescales a beam) whose parent's standalone is compiled here.
+    The others are listed with the reason (V3_SKIP lines). Returns [(probe, parent, extra pdg)]."""
+    import json
     gen = set(json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"])   # classes with pools
     out = []
     for kind, pdg in V3_EXTRA.items():
@@ -92,12 +92,16 @@ def v3_probes(per_kind, seed):
             if n not in gen or cfg.get("nfinal") != 4 or not why.endswith("+" + kind):
                 continue
             par = why[: -len(kind) - 1]
-            if par not in mg.PROCESSES or any(abs(int(q)) == 5 for q in cfg["pdg_ids"][:2]):
-                continue
-            if not os.path.isdir(f"{mg.WORK_DIR}/{par}_standalone"):
+            why_skip = ("parent not in the catalog" if par not in mg.PROCESSES else
+                        "b beam (the map rescales a massless beam)" if any(abs(int(q)) == 5 for q in cfg["pdg_ids"][:2])
+                        else "no compiled parent standalone here" if not os.path.isdir(f"{mg.WORK_DIR}/{par}_standalone")
+                        else None)
+            if why_skip:
+                print("V3_SKIP " + json.dumps({"probe": n, "parent": par, "kind": kind, "why": why_skip}), flush=True)
                 continue
             c.append((n, par, pdg))
-        out += random.Random(seed).sample(c, min(per_kind, len(c)))
+        print(f"V3_KIND {kind}: {len(c)} read", flush=True)
+        out += c
     return out
 
 
@@ -119,13 +123,12 @@ def main():
     ap.add_argument("--n-check", type=int, default=200)
     ap.add_argument("--out", default=os.path.join(os.environ.get("SCRATCH", "."), "zz_factorised_2to4"))
     ap.add_argument("--only", nargs="*", default=None)
-    ap.add_argument("--v3", type=int, default=0, metavar="PER_KIND",
-                    help="catalog_v3's 2->4 classes (a 2->3 class plus g, a, Z or H), up to PER_KIND per kind")
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--v3", action="store_true",
+                    help="every catalog_v3 2->4 class built as a 2->3 class plus g, a, Z or H (the skipped listed)")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     if a.v3:
-        jobs = v3_probes(a.v3, a.seed)
+        jobs = v3_probes()
     else:
         jobs = [(e["name"], mg.PROCESSES[e["name"]]["parent"], None) for e in yaml.safe_load(open(a.recipe))["processes"]]
     for p, parent, extra in jobs:
