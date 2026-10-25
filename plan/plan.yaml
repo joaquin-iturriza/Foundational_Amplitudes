@@ -931,8 +931,13 @@ entries:
     at: '2026-10-25T19:56:25+00:00'
     searched: D19 allows only sweep/prune.py's rules, which need room to write their manifest; D122 holds the storage plan;
       nothing else authorises deleting on CC
-  ask: CC's project disk is full; which of your data there may go (the 47 GB of lxplus run copies, the 28 GB of archive tars
-    for the held storage plan, or something in your other projects)?
-  waiting_since: '2026-10-25T19:56:25+00:00'
-  searched: D19 allows only sweep/prune.py's rules, which need room to write their manifest; D122 holds the storage plan;
-    nothing else authorises deleting on CC
+  - ask: 'The 1 to 10 TeV energy hold-out now sits inside the 6 TeV training range: drop it, or move it above (for example
+      6 to 20 TeV)?'
+    at: '2026-10-25T19:56:48+00:00'
+    searched: D130 approved the 6 TeV log-uniform range but says nothing about the energy hold-out; D98/D100 set the hold-out
+      at 1-10 TeV relative to the 1 TeV window
+  ask: 'The 1 to 10 TeV energy hold-out now sits inside the 6 TeV training range: drop it, or move it above (for example 6
+    to 20 TeV)?'
+  waiting_since: '2026-10-25T19:56:48+00:00'
+  searched: D130 approved the 6 TeV log-uniform range but says nothing about the energy hold-out; D98/D100 set the hold-out
+    at 1-10 TeV relative to the 1 TeV window
