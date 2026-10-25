@@ -883,8 +883,11 @@ entries:
   notes_ref: null
   match: zz_cov_*,cov_*
   evidence:
-    runs: []
-    commit: null
-    paths: []
+    runs:
+    - FA-ccin2p3-ec84e913
+    commit: 2f7d3e3
+    paths:
+    - analysis/catalog_v3/coverage_check.py
+    - scripts/job_coverage_check.sh
   dead_ends: []
   asks: []
