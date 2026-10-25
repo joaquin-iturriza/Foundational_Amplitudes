@@ -211,6 +211,12 @@ entries:
     why: 'the guided trial''s suggest ran before the fixed one observed, so DyHPO handed it the same candidate (145): two
       results for one candidate, the sweep stays at 4 distinct of 5; add the guided trial only after the fixed rerun has observed'
     at: '2026-10-25T22:42:43+00:00'
+  - tried: the final collection on the supervisor's 900 of 900 (E1614, 23:49)
+    why: 'two result files are empty, written while CC''s disk was full at 20:37 (tp3_lowd_lpft_r9_ee_ddbar_d2 hp90, tp3_lowd_lpft_r9_ud_ud_d2
+      hp199; no job log left, so rerun_failed did not find them in the disk requeue); the watchdog counted file names, so
+      the real count was 898, and collect_sweeps crashed on them. Fixed: the watchdog, the collector and the feeder ignore
+      an empty result file, rerun_failed --empty-results reruns its candidate (921a634, e92a682)'
+    at: '2026-10-25T22:56:45+00:00'
   asks: []
   id: lowd_ft
   title: 'fine-tuning at small D: the method comparison, first round'
