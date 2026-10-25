@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: waiting_user
+- status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -88,22 +88,18 @@ entries:
     answers_after: '2026-10-25T18:21:16+00:00'
     covers:
     - v3_prep_explore
+  - said_at: '2026-10-25T22:55:35.895000+00:00'
+    text: Yes, run those two pretrainings blending emission scales
+    decision: D135
+    answers_after: '2026-10-25T22:44:55+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
   - D129
-  next: 'Design, waiting for the user (no job). Part 1 ran on the laptop (analysis/catalog_v3/prep_hybrid_split.py @dc1578e):
-    the hybrid''s mean error splits into the network''s error on the class mean and the error of the constant c_p it is handed;
-    the constant is negligible everywhere (median const^2 3e-4 on the top, 3e-4 at pT>=30, against net^2 0.875 and 0.084;
-    it dominates on <=12% of probes), so the level gap is the network''s: net^2 over the emission scales'' level, median per
-    probe, 1.31 on the top, 9.9 at pT>=30, 4.5 on 2->5. At pT>=30 the network''s error tracks the handed c_p (correlation
-    0.62, 40 probes, all of whose default-cut processes are trained): proposed CPU check, read the default-cut c_p of those
-    40 processes from the hybrid run''s frozen stats (target_physics_hybrid_cp, a state read on CC) and test net ~ c_p(cut)
-    - c_p(default), i.e. the network reproduces the trained process''s constant and cannot see the cut''s shift. On the top
-    no such trace (correlation -0.07); open. Part 2: the comparison is a short-pretraining arm on t_h + lambda (logF_q - logF_shat
-    - c_p) at lambda 0.5 (and 0.25), about 2 GPU-h each, read on 2->5 level (hybrid 0.45, emission 0.10) and shape (hybrid
-    0.68, s_hat 0.69). A laptop proxy, averaging the two existing networks'' predictions (an ensemble, not the trained target,
-    so optimistic): at lambda 0.5, 2->5 level 0.13 shape 0.67; top 0.51 / 0.57; pT>=30 0.015 / 0.22. Question for the user:
-    go for the CC state read of the default-cut constants, and for one or two blended-target arms (2-4 GPU-h)?'
+  - D135
+  next: two blended-target short pretrainings on catalog_v3 at lambda 0.5 and 0.25 (the hybrid target plus lambda times the
+    emission-scale term minus its process mean), same setup as the hybrid arm, read zero-shot on every axis
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
@@ -134,6 +130,8 @@ entries:
     at: '2026-10-25T22:44:55+00:00'
     searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only
       the hybrid test
+    answered_at: '2026-10-25T22:55:35.895000+00:00'
+    decision: D135
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -152,9 +150,6 @@ entries:
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
   searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only the
     hybrid test
-  ask: Go ahead with one or two blended-target short pretrainings (the hybrid target plus 0.5, and maybe 0.25, of the emission-scale
-    factor minus its class mean), 2 to 4 GPU-h in all, read on every axis like the other arms?
-  waiting_since: '2026-10-25T22:44:55+00:00'
 - status: running
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
