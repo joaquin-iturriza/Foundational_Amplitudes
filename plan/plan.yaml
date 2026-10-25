@@ -147,8 +147,15 @@ entries:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: This should be recorded as a result, and this direction put on pause
     decision: D43
+  - said_at: '2026-10-14T16:48:48.871000+00:00'
+    text: This should be recorded as a result, and this direction put on pause
+    decision: D125
+    answers_after: null
+    covers:
+    - synthetic_prior_alternatives_not_built
   decisions:
   - D43
+  - D125
   next: resumes when the user releases it
   done_when: null
   match: null
@@ -168,7 +175,7 @@ entries:
     integrals (Sec. , plan item (5)); multiplicities well past 2\to4, where MadGraph struggles and the generator does not
     (Sec. ), with a cheaper symmetrisation than the permutation average. How close to real amplitudes the prior should be
     is still to be settled with others.'
-  hold_decision: D43
+  hold_decision: D125
 - status: running
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
