@@ -18751,7 +18751,7 @@ processes:
     parent: v3_dg_dgg
   pp13_dg_dggg:
     lhe:
-      margin: 2.33
+      n_runs: 6
     kind: lhe_pp
     folder: pp13_dg_dggg
     mg5_generate:
