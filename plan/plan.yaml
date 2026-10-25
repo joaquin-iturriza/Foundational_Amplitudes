@@ -91,12 +91,19 @@ entries:
   decisions:
   - D83
   - D129
-  next: 'Design, for the user before any job: why the hybrid predicts the same class mean worse than the emission scales on
-    the top (level 1.29x) and at pT >= 30 GeV (9.8x), read on the CPU by splitting each probe''s level error into the network''s
-    error on the class mean of the s_hat target and the c_p it is handed (c_p from the probe''s own cut pools against the
-    default cuts'' for the pT >= 30 probes), and whether a per-event term that keeps the class mean but restores part of L_q
-    (the hybrid plus a fraction of L_q minus its class mean) closes the 2->5 level gap (0.45 against 0.10) without giving
-    back the shape.'
+  next: 'Design, waiting for the user (no job). Part 1 ran on the laptop (analysis/catalog_v3/prep_hybrid_split.py @dc1578e):
+    the hybrid''s mean error splits into the network''s error on the class mean and the error of the constant c_p it is handed;
+    the constant is negligible everywhere (median const^2 3e-4 on the top, 3e-4 at pT>=30, against net^2 0.875 and 0.084;
+    it dominates on <=12% of probes), so the level gap is the network''s: net^2 over the emission scales'' level, median per
+    probe, 1.31 on the top, 9.9 at pT>=30, 4.5 on 2->5. At pT>=30 the network''s error tracks the handed c_p (correlation
+    0.62, 40 probes, all of whose default-cut processes are trained): proposed CPU check, read the default-cut c_p of those
+    40 processes from the hybrid run''s frozen stats (target_physics_hybrid_cp, a state read on CC) and test net ~ c_p(cut)
+    - c_p(default), i.e. the network reproduces the trained process''s constant and cannot see the cut''s shift. On the top
+    no such trace (correlation -0.07); open. Part 2: the comparison is a short-pretraining arm on t_h + lambda (logF_q - logF_shat
+    - c_p) at lambda 0.5 (and 0.25), about 2 GPU-h each, read on 2->5 level (hybrid 0.45, emission 0.10) and shape (hybrid
+    0.68, s_hat 0.69). A laptop proxy, averaging the two existing networks'' predictions (an ensemble, not the trained target,
+    so optimistic): at lambda 0.5, 2->5 level 0.13 shape 0.67; top 0.51 / 0.57; pT>=30 0.015 / 0.22. Question for the user:
+    go for the CC state read of the default-cut constants, and for one or two blended-target arms (2-4 GPU-h)?'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
