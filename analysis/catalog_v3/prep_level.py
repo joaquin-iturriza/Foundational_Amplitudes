@@ -93,7 +93,8 @@ def main():
         for s, n, r in pl.imap_unordered(one, jobs, chunksize=4):
             if isinstance(r, str):
                 skipped.append((s, n, r)); continue
-            r["order"] = [int(v) for v in mg.order_vector(mg.PROCESSES[n])] if n in mg.PROCESSES else None
+            base = n if n in mg.PROCESSES else n.split("__")[0]     # a variant (mass, alpha_s, cut, energy) has its parent's orders
+            r["order"] = [int(v) for v in mg.order_vector(mg.PROCESSES[base])] if base in mg.PROCESSES else None
             res.setdefault(s, {})[n] = r
     for s in res:                                          # a class without an order vector is skipped, listed
         for n in [n for n, r in res[s].items() if r["order"] is None]:
