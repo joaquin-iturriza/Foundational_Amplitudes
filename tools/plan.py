@@ -554,7 +554,13 @@ def next_steps(d, st, t=None, msgs=None):
 
 def step_prompt(e, reason):
     tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
-    q = "\n".join('  "%s" (%s)' % (x.get("text"), (x.get("said_at") or "")[:16]) for x in e.get("quotes") or [])
+    qs = [(x.get("text"), x.get("said_at")) for x in e.get("quotes") or []]
+    have = {x.get("decision") for x in e.get("quotes") or []}
+    for did in e.get("decisions") or []:                # an entry added under a decision has no quote of its own
+        dd = decision(did) if did not in have else None
+        if dd and dd["quote"]:
+            qs.append((dd["quote"], dd["said_at"].isoformat() if dd["said_at"] else ""))
+    q = "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
     de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in e.get("dead_ends") or []) or "  none"
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
                       next=e.get("next"), done_when=e.get("done_when"), quotes=q or "  none", dead_ends=de,
@@ -699,7 +705,8 @@ def done_problems(d, st):
             why = hit["why"]
         else:
             try:
-                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"), timeout=min(30, budget()))
+                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"), timeout=min(30, budget()),
+                                record=e.get("record"))
             except subprocess.TimeoutExpired:
                 NOTES.append("%s: its done check did not finish; it runs again next time" % e["id"])
                 continue
@@ -712,6 +719,18 @@ def done_problems(d, st):
 
 
 # ---------------------------------------------------------------- commands
+def cmd_kind(a):
+    """setup: the entry is about the setup (its record may be CLAUDE.md or a tool, plan done --record); work: the
+    default, written up in docs/results.tex."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if a.kind == "work":
+            e.pop("kind", None)
+        else:
+            e["kind"] = a.kind
+    print("plan: %s is %s" % (a.id, a.kind))
+
+
 def cmd_reopen(a):
     """A done entry back to running (its write-up kept in its history), e.g. when plan next says it regressed."""
     with transaction() as (d, st):
@@ -812,6 +831,8 @@ def cmd_add(a):
             if not ok:
                 sys.exit("plan: site item %s not created, entry not added: %s" % (a.id, why))
             e["decisions"].append(a.decision)
+            e["quotes"].append({"said_at": dd["said_at"].isoformat() if dd["said_at"] else None, "text": dd["quote"],
+                                "decision": a.decision, "covers": dd["covers"]})
         else:
             t = now().isoformat()
             e.update(status="waiting_user", ask=a.ask, waiting_since=t, searched=a.searched)
@@ -1039,9 +1060,15 @@ def cmd_next(a):
     return 1 if todo else 0
 
 
-def done_refusals(e, st, commit, override_runs=None, timeout=600):
-    """Why the entry cannot be marked done (empty: it can)."""
+def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None):
+    """Why the entry cannot be marked done (empty: it can). Work is written up in docs/results.tex (its notes_ref
+    label, a commit adding to it); a setup entry (kind: setup, plan kind) may instead have its record elsewhere, a
+    CLAUDE.md rule or a tool, named by `record`, which the write-up commit must change."""
     out = []
+    if record and e.get("kind") != "setup":
+        out.append("--record is for setup entries only (plan kind %s setup); work is written up in docs/results.tex"
+                   % e["id"])
+        record = None
     chk = e.get("done_when")
     if not chk:
         out.append("no done_when check (plan check)")
@@ -1057,18 +1084,27 @@ def done_refusals(e, st, commit, override_runs=None, timeout=600):
     miss = [p for p in ev.get("paths") or [] if not os.path.exists(os.path.join(ROOT, p))]
     if miss:
         out.append("evidence paths missing: " + ", ".join(miss))
-    ref = e.get("notes_ref")
-    if not ref or ref not in labels():
-        out.append("notes_ref %r is not a \\label in docs/results.tex (plan ref)" % ref)
-    show = subprocess.run(["git", "-C", ROOT, "show", "--format=%ct", "--unified=0", commit, "--", "docs/results.tex"],
-                          capture_output=True, text=True)
-    lines = show.stdout.splitlines()
-    added = "\n".join(l[1:] for l in lines[1:] if l.startswith("+") and not l.startswith("+++"))
-    names = [n for n in (ref, e.get("title")) if n]
-    if show.returncode != 0 or not added:
-        out.append("%s adds nothing to docs/results.tex" % commit)
-    elif not any(n.lower() in added.lower() for n in names):
-        out.append("%s's addition to docs/results.tex names neither %s" % (commit, " nor ".join(map(repr, names))))
+    if record:
+        show = subprocess.run(["git", "-C", ROOT, "show", "--format=%ct", "--name-only", commit, "--", record],
+                              capture_output=True, text=True)
+        lines = show.stdout.splitlines()
+        if not os.path.exists(os.path.join(ROOT, record)):
+            out.append("the record %s does not exist" % record)
+        if show.returncode != 0 or not any(l.strip() == os.path.normpath(record) for l in lines[1:]):
+            out.append("%s does not change the record %s" % (commit, record))
+    else:
+        ref = e.get("notes_ref")
+        if not ref or ref not in labels():
+            out.append("notes_ref %r is not a \\label in docs/results.tex (plan ref)" % ref)
+        show = subprocess.run(["git", "-C", ROOT, "show", "--format=%ct", "--unified=0", commit, "--",
+                               "docs/results.tex"], capture_output=True, text=True)
+        lines = show.stdout.splitlines()
+        added = "\n".join(l[1:] for l in lines[1:] if l.startswith("+") and not l.startswith("+++"))
+        names = [n for n in (ref, e.get("title")) if n]
+        if show.returncode != 0 or not added:
+            out.append("%s adds nothing to docs/results.tex" % commit)
+        elif not any(n.lower() in added.lower() for n in names):
+            out.append("%s's addition to docs/results.tex names neither %s" % (commit, " nor ".join(map(repr, names))))
     ls = last_step(st, e["id"])
     if show.returncode == 0 and lines and lines[0].strip().isdigit() and ls and int(lines[0]) < ls.timestamp():
         out.append("%s was committed before the entry's last step (%s)" % (commit, ls.isoformat()[:16]))
@@ -1085,10 +1121,12 @@ def done_refusals(e, st, commit, override_runs=None, timeout=600):
 def cmd_done(a):
     with transaction() as (d, st):
         e = entry(d, a.id)
-        why = done_refusals(e, st, a.writeup, a.override_runs)
+        why = done_refusals(e, st, a.writeup, a.override_runs, record=a.record)
         if why:
             sys.exit("plan: %s is not done:\n  " % a.id + "\n  ".join(why))
         e["status"], e["writeup"] = "done", a.writeup
+        if a.record:
+            e["record"] = a.record
         if a.override_runs:
             e["runs_override"] = a.override_runs
     print("plan: %s done (%s)" % (a.id, a.writeup))
@@ -1147,7 +1185,9 @@ def main(argv=None):
     cmd("set-next", cmd_set_next, A("id"), A("text"))
     cmd("dead-end", cmd_dead_end, A("id"), A("--tried", required=True), A("--why", required=True))
     cmd("next", cmd_next, A("--prompts", action="store_true"))
-    cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"))
+    cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"),
+        A("--record", help="setup entries: the file that is their record (CLAUDE.md, a tool), changed by the write-up"))
+    cmd("kind", cmd_kind, A("id"), A("kind", choices=("setup", "work")))
     cmd("view", cmd_view, A("--write", action="store_true"))
     cmd("claims", cmd_claims, A("--verified", action="store_true"))
     cmd("reopen", cmd_reopen, A("id"), A("--why", required=True))

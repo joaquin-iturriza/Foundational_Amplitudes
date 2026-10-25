@@ -673,10 +673,18 @@ def lower():
           and all(any(c == k for _, _, c, _ in cmds) for k in kept))
     scenario("lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep "
              "every other hook", ok, r.stdout + r.stderr + json.dumps(cmds)[:600])
-    r = subprocess.run(["sh", os.path.join(ROOT, "tools", "switch_over.sh"), "some-branch"], cwd=ROOT,
-                       capture_output=True, text=True)
-    scenario("lower: the switch-over refuses to run from a worktree", r.returncode != 0 and "main checkout" in r.stdout,
-             r.stdout + r.stderr)
+    # always from a temporary worktree: run from the main checkout on trunk the script would really merge
+    tmp_wt = os.path.join(tempfile.mkdtemp(prefix="switch_wt_"), "wt")
+    subprocess.run(["git", "-C", ROOT, "worktree", "add", "-q", "--detach", tmp_wt, "HEAD"], capture_output=True)
+    try:
+        r = subprocess.run(["sh", os.path.join(tmp_wt, "tools", "switch_over.sh"), "some-branch"], cwd=tmp_wt,
+                           capture_output=True, text=True)
+        head_after = subprocess.run(["git", "-C", tmp_wt, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
+    finally:
+        subprocess.run(["git", "-C", ROOT, "worktree", "remove", "--force", tmp_wt], capture_output=True)
+    head = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
+    scenario("lower: the switch-over refuses to run from a worktree (run in a temporary one, nothing merged)",
+             r.returncode != 0 and "main checkout" in r.stdout and head_after == head, r.stdout + r.stderr)
 
 
 def worktree_then_merge():
@@ -1093,21 +1101,95 @@ def hold_without_item():
              r[1])
 
 
-def main():
-    liveness(); files(); answers(); adding(); questions(); holds(); done(); migration(); claims()
-    searched_first(); seventh_lower(); hold_without_item(); sed_reads()
-
-
 def sed_reads():
     for c, want in (("sed -n 140,200p plan/plan.yaml", 0), ("sed -i s/held/running/ plan/plan.yaml", 2),
                     ("sed -ni s/a/b/ plan/plan.yaml", 2), ("sed -n 'w plan/plan.yaml' /tmp/x", 2)):
         rc, out = hook(GUARD_FILES, {"tool_name": "Bash", "tool_input": {"command": c}})
         scenario("live: `%s` is %s" % (c, "refused" if want else "allowed (a read)"), rc == want, out)
-    hold_release(); reask_once(); reopen(); commit_retry(); claims_budget(); added_only()
-    worktree_then_merge(); plan_commits(); test_switch(); claims_state(); fourth_lower()
-    direct_writes(); one_agent_per_step(); git_bypass(); parsing(); checks_and_sites(); no_plan_yet(); lower()
+
+
+def setup_records():
+    """A setup entry's record may be CLAUDE.md or a tool (plan kind <id> setup, plan done --record); work entries
+    still need their docs/results.tex write-up."""
+    repo = tempfile.mkdtemp(prefix="setup_rec_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q"); os.makedirs(os.path.join(repo, "docs")); os.makedirs(os.path.join(repo, "tools"))
+    open(os.path.join(repo, "docs", "results.tex"), "w").write("x\n")
+    open(os.path.join(repo, "CLAUDE.md"), "w").write("rules\n")
+    open(os.path.join(repo, "tools", "t.py"), "w").write("x = 1\n")
+    g("add", "."); g("commit", "-qm", "a")
+    open(os.path.join(repo, "CLAUDE.md"), "a").write("a new rule\n"); g("commit", "-qam", "the rule")
+    rule = g("rev-parse", "HEAD").stdout.strip()
+    open(os.path.join(repo, "tools", "t.py"), "a").write("y = 2\n"); g("commit", "-qam", "the tool")
+    tool = g("rev-parse", "HEAD").stdout.strip()
+    base = dict(done_when="grep -q 'a new rule' CLAUDE.md", evidence={"runs": [], "commit": rule, "paths": ["CLAUDE.md"]})
+    w = World([E("setup_x", **base), E("work_x", **base)])
+    w.env["PLAN_ROOT"] = repo
+    r0 = w.plan_cmd("done", "work_x", "--writeup", rule, "--record", "CLAUDE.md")
+    scenario("--record on an entry not marked setup is refused", r0[0] != 0 and "setup entries only" in r0[1], r0[1])
+    w.plan_cmd("kind", "setup_x", "setup")
+    r1 = w.plan_cmd("done", "setup_x", "--writeup", tool, "--record", "CLAUDE.md")
+    scenario("a setup entry's write-up commit must change its record", r1[0] != 0 and "does not change the record"
+             in r1[1], r1[1])
+    r2 = w.plan_cmd("done", "setup_x", "--writeup", rule, "--record", "CLAUDE.md")
+    e = w.entries()["setup_x"]
+    rc, err = w.check()
+    scenario("a setup entry is done with its record in CLAUDE.md, no results.tex label, and stays done on recheck",
+             r2[0] == 0 and e["status"] == "done" and e["record"] == "CLAUDE.md" and "marked done but" not in err,
+             r2[1] + err)
+    out = os.path.join(tempfile.mkdtemp(), "plan.yaml")
+    subprocess.run([sys.executable, MIGRATE, "--out", out, "--root", ROOT], capture_output=True, text=True)
+    kinds = {e["id"]: e.get("kind") for e in yaml.safe_load(open(out))["entries"]}
+    scenario("the migration marks the setup's own entries setup", all(
+        v == "setup" for k, v in kinds.items() if "setup" in k) and any("setup" in k for k in kinds), kinds)
+
+
+def decision_quotes():
+    """An entry added under a decision carries that decision's words, and its step agent is shown them."""
+    words = "Okay, go ahead with the small study first round"
+    w = World([], decisions=[("D127", "approve", "lowd2", 1, ago(30), words)])
+    r = w.plan_cmd("add", "lowd2", "--title", "t", "--question", "q", "--next", "the first round", "--match",
+                   "tp3_lowd*", "--decision", "D127")
+    e = w.entries()["lowd2"]
+    rn, out = w.plan_cmd("next", "--prompts")
+    scenario("plan add --decision records the decision's words; the step prompt lists them, not 'none'",
+             r[0] == 0 and e["quotes"][0]["text"] == words and words in out, r[1] + out[-600:])
+    rc, err = w.check()
+    scenario("that quote passes the quote check", "quote on it" not in err, err)
+    w = World([E("old", decisions=["D1"])], decisions=[("D1", "approve", "*", 1, ago(30), "go ahead with all of it")])
+    rn, out = w.plan_cmd("next", "--prompts")
+    scenario("an entry whose decision has no quote on it still shows the decision's words to its step agent",
+             "go ahead with all of it" in out, out[-600:])
+
+
+def the_suite_itself():
+    """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
+    once let the suite exit 0 with failures: main() was split by an edit)."""
+    import ast
+    tree = ast.parse(open(os.path.abspath(__file__)).read())
+    groups = {f.name for f in tree.body if isinstance(f, ast.FunctionDef) and any(
+        isinstance(n, ast.Call) and getattr(n.func, "id", None) == "scenario" for n in ast.walk(f))}
+    listed = {g.__name__ for g in GROUPS}
+    scenario("every function that runs scenarios is in GROUPS", groups <= listed, sorted(groups - listed))
+    code = ("import sys; sys.path.insert(0, %r); import test_setup_scenarios as t; "
+            "t.GROUPS[:] = [lambda: t.scenario('a failing scenario', False)]; sys.exit(t.main())"
+            % os.path.dirname(os.path.abspath(__file__)))
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    scenario("a failing scenario makes the suite exit 1", r.returncode == 1, r.stdout + r.stderr)
+
+
+GROUPS = [liveness, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
+          hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
+          worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
+          one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
+          decision_quotes, the_suite_itself]
+
+
+def main():
+    for g in GROUPS:
+        g()
     print("%d/%d scenarios pass" % (sum(RESULTS), len(RESULTS)))
-    return 0 if all(RESULTS) else 1
+    return 0 if RESULTS and all(RESULTS) else 1
 
 
 if __name__ == "__main__":
