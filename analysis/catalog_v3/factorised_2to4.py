@@ -109,8 +109,17 @@ def two_to_five(d, sub):
     sr = json.load(open(os.path.join(HERE, "data", "short_reads.json")))
     out = {}
     for p, v in d5.items():
-        out[p] = dict(kind=v["kind"], parent=v["parent"], shape=float(v["lt4"].var()), parent_var=float(v["r"].var()),
-                      learned=float((v["r"] - h.predict(v["X"])).var()), dropped=v["dropped"],
+        hv = h.predict(v["X"])
+        netp = {}
+        for arm in ("dimensionless", "dimensionless_context"):
+            nf = os.path.join(HERE, "data", f"factorised_2to5_net_{arm}", p + ".npz")
+            if os.path.exists(nf):   # the arm's own 2->4 prediction in place of the exact parent (factorised_2to4_net.py)
+                z = dict(np.load(os.path.join(HERE, "data", "factorised_2to5", p + ".npz")))
+                ok = (z["t3"] > 0) & np.isfinite(z["t3"]) & (z["t4"] > 0) & np.all(np.isfinite(z["feats"]), 1)
+                rn = v["r"] - np.load(nf)["e3"][ok]
+                netp[arm] = {"parent_var": float(rn.var()), "learned": float((rn - hv).var())}
+        out[p] = dict(net_parent=netp, kind=v["kind"], parent=v["parent"], shape=float(v["lt4"].var()), parent_var=float(v["r"].var()),
+                      learned=float((v["r"] - hv).var()), dropped=v["dropped"],
                       net={arm: sr[arm]["H2p5"]["probes"][p]["shape"] for arm in sr
                            if "H2p5" in sr[arm] and p in sr[arm]["H2p5"].get("probes", {})})
     med = {k: float(np.median([r[k] for r in out.values()])) for k in ("shape", "parent_var", "learned")}
@@ -118,6 +127,14 @@ def two_to_five(d, sub):
     med["net"] = {a: float(np.median([r["net"][a] for r in out.values() if a in r["net"]])) for a in arms}
     med["learned_below_net"] = {a: int(sum(r["learned"] < r["net"][a] for r in out.values() if a in r["net"]))
                                 for a in arms}
+    for arm in ("dimensionless", "dimensionless_context"):
+        rs = [r for r in out.values() if arm in r["net_parent"]]
+        if rs:
+            med[f"with {arm} as parent"] = {k: float(np.median([r["net_parent"][arm][k] for r in rs]))
+                                            for k in ("parent_var", "learned")}
+            med[f"with {arm} as parent"]["below_its_zero_shot"] = int(sum(
+                r["net_parent"][arm]["learned"] < r["net"][arm] for r in rs if arm in r["net"]))
+            med[f"with {arm} as parent"]["n"] = len(rs)
     med["n"] = len(out)
     print("2to5", json.dumps(med))
     return {"summary": med, "probes": out}
