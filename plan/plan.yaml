@@ -99,7 +99,7 @@ entries:
     D99 allows GPU tests once a candidate looks promising but the user''s 2026-10-15 rule (designs we iterate on stop at the
     design and come to the user before any job) and the goal''s same clause govern this exploration; no decision sets the
     windows'' angular cut'
-  checked_until: '2026-10-25T18:36:24+00:00'
+  checked_until: '2026-10-25T18:40:21+00:00'
 - status: running
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
