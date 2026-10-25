@@ -606,6 +606,312 @@ window pools cover (the catalog's fiducial cuts in the partonic frame and the cl
 \label{fig:v3_pp}
 \end{figure}
 
+% src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+% claim: n_rows=2014
+% claim: n_sampled=1847
+% claim: n_read=167
+% claim: n_usable=1586
+% claim: types.heavy_quark.n=105
+% claim: types.bsm.n=12
+% claim: types.probe_2to5.n=40
+% claim: types.alpha_s.n=24
+% claim: n_errors=0
+% claim: pp.n=1396
+% allow: 10 5 0.4 0.9 13 2000 1 because they are the pp card's and the current pools' cuts, the beam energy, the event count and the angle variable's constant the check is set to, no results
+% allow: 0.99 15 6 30 -3 2 because they are the check's own choices, stated as such in the text, no results
+% allow: M|^2
+\paragraph{The catalog's coverage, a check (2026-10-25).} The pp reading above puts the miss in the angular acceptance,
+so the user asked for a CPU check of a new coverage before anything is regenerated (``Yes, go ahead with what you
+proposed.'', 2026-10-25: the check only, no regeneration, no GPU). Every one of catalog\_v3's $2014$ entries is in it
+(\code{analysis/catalog\_v3/coverage\_check.py}, \code{scripts/job\_coverage\_check.sh}; runs \code{FA-ccin2p3-ec84e913}
+for the tree classes and \code{FA-ccin2p3-33503e6c} for the rest; summary \code{data/coverage\_check.json}; $0$ entries
+failed). The $1847$ tree pools are sampled three ways with the generator's own sampler and labelled by their compiled
+backends, $2000$ events each: the $1586$ tree classes, the $105$ heavy-quark mass points, the $12$ BSM entries, the
+$40$ $2\to5$ probes, the $24$ $\alpha_s$ points, the $40$ entries on a $1$ to $10$\,TeV window and the $40$ at
+$p_T>30$\,GeV. The three samples are \emph{current}, the pools' cuts and measure; \emph{proposed}, the hadronic
+classes cut as the $13$\,TeV pp run card cuts ($p_T>10$\,GeV, $|\eta|<5$, $\Delta R>0.4$, no pair-mass cut), the
+$e^+e^-$ classes at $|\cos\theta|<0.99$ with the other cuts as now, $b$ and $\tau$ cut like jets and leptons, and $15\%$
+of the events from a forward component (one final particle turned, with the whole final state, to an angle uniform in
+$\log 1/(1-|\cos\theta|)$ up to the coverage's edge; nothing in it knows which process has a $t$-channel pole),
+$\sqrt{\hat s}$ uniform on the class's window as now; \emph{wide}, the proposed coverage with $\sqrt{\hat s}$ log
+uniform from the window's bottom to $6$\,TeV. The $1396$ hadronic tree classes are also read against their pp pools.
+The $167$ one-loop and loop-induced pools are read without new samples (the last item but one says what that leaves
+out, and why). Medians over a family's classes throughout; the figures show the tree classes
+(Figs.~\ref{fig:v3_cov_range}, \ref{fig:v3_cov_pp}, \ref{fig:v3_cov_fwd}). Several ingredients of the proposed
+coverage were the check's own choices when it ran, not the user's; each moves some of the numbers below. The user has
+since approved the $b$ and $\tau$ cut, the $e^+e^-$ cut, the wide window and a forward component (the conclusion
+below); the forward component's two shares and the falling measure stay the check's own, open for the user.
+Cutting $b$ and $\tau$ like jets and leptons moves the proposed samples and ranges of the classes with a $b$ or $\tau$,
+the $b$ and $\tau$ shares and the pp share inside the proposed coverage. The $e^+e^-$ angular cut at $0.99$ moves the
+$e^+e^-$ classes' proposed samples and ranges. The forward component's share ($15\%$ of the events) and the third of
+the flat part's candidates turned forward move the forward shares, the forward cover of the pp events, the share
+outside the current cuts and the range's growth at the top. The wide window's top at $6$\,TeV moves the wide samples
+and their range, the pp shares up to it and the effective sample sizes of the measures to it. The falling
+$\hat s^{-3/2}$ measure moves its own effective sample size only. The entries at $p_T>30$\,GeV keep that threshold in
+their proposed coverage.
+\begin{itemize}
+  \item \emph{The angular cut.} The current cuts and window hold $0.84$, $0.72$ and $0.49$ of a hadronic class's pp
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: hadronic_2to2.pp_in_cur_window=0.84
+    % claim: hadronic_2to3.pp_in_cur_window=0.72
+    % claim: hadronic_2to4.pp_in_cur_window=0.49
+    % claim: hadronic_2to2.pp_in_new_window=0.94
+    % claim: hadronic_2to3.pp_in_new_window=0.99
+    % claim: hadronic_2to4.pp_in_new_window=0.92
+    % claim: pp.in_new_min=0.99
+    % claim: pp.fail_max.cos_max=0.012
+    % claim: hadronic_2to2.growth_999_proposed=1.19
+    % claim: hadronic_2to3.growth_999_proposed=1.08
+    % claim: hadronic_2to4.growth_999_proposed=0.52
+    % claim: hadronic_2to2.max_up_proposed=0.74
+    % claim: hadronic_2to3.max_up_proposed=1.09
+    % claim: hadronic_2to4.max_up_proposed=0.53
+    % claim: ee_2to2.growth_999_proposed=0.06
+    % claim: ee_2to3.growth_999_proposed=0.14
+    % claim: ee_2to4.growth_999_proposed=0.03
+    % claim: hadronic_2to2.outside_current_proposed=0.25
+    % claim: hadronic_2to3.outside_current_proposed=0.20
+    % claim: hadronic_2to4.outside_current_proposed=0.24
+    % claim: hadronic_2to4.pp_in_range_new=0.956
+    % claim: hadronic_2to4.pp_in_range_cur=0.969
+    % allow: 5 0.1 99.9 2000 because they are the eta cut, the quantiles and the event count the check is set to, no results
+    % allow: M|^2
+    events ($2\to2$, $2\to3$, $2\to4$), the proposed coverage on the same window $0.94$, $0.99$ and $0.92$ (the rest lies
+    above the window). The proposed cuts are the pp card's own, so up to the frame change every pp event passes them:
+    at least $0.99$ of every class's (the boost to the partonic frame moves at most $0.012$ of a class's events past
+    $|\eta|=5$). On the samples, a quarter of the proposed events lie outside the current cuts ($0.25$, $0.20$, $0.24$
+    for hadronic $2\to2$, $2\to3$, $2\to4$), and the range of $\log_{10}|\mathcal M|^2$ ($0.1$ to $99.9\%$) widens by
+    $1.19$, $1.08$ and $0.52$ decades, almost all of it at the top ($0.74$, $1.09$, $0.53$ on the maximum): the forward
+    poles the current cut keeps out. The $e^+e^-$ classes change little ($0.06$, $0.14$, $0.03$ decades). At $2000$
+    events the larger region is sampled more thinly: of the $2\to4$ pp events inside the proposed coverage, $0.956$ lie
+    within the proposed sample's $|\mathcal M|^2$ range against $0.969$ inside the current one's.
+  \item \emph{The $\sqrt{\hat s}$ window and its measure.} A pp event lies above its class's window top in $0.039$ of a
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: pp.train.above_window=0.039
+    % claim: pp.H3.above_window=0.26
+    % claim: pp.H3.in_new_window=0.74
+    % claim: pp.H3.in_new_wide=1.00
+    % claim: hadronic_2to2.pp_ess_uniform_window=0.73
+    % claim: hadronic_2to3.pp_ess_uniform_window=0.77
+    % claim: hadronic_2to4.pp_ess_uniform_window=0.83
+    % claim: hadronic_2to2.pp_ess_log_wide=0.82
+    % claim: hadronic_2to3.pp_ess_log_wide=0.86
+    % claim: hadronic_2to4.pp_ess_log_wide=0.87
+    % claim: hadronic_2to2.pp_ess_lumi_wide=0.91
+    % claim: hadronic_2to4.pp_ess_lumi_wide=0.80
+    % claim: hadronic_2to4.pp_ess_uniform_wide=0.78
+    % claim: hadronic_2to2.growth_999_wide=2.53
+    % claim: hadronic_2to3.growth_999_wide=3.18
+    % claim: hadronic_2to4.growth_999_wide=3.87
+    % claim: hadronic_2to3.min_down_wide=1.74
+    % claim: hadronic_2to4.min_down_wide=3.24
+    % claim: hadronic_2to2.max_up_wide=1.60
+    % allow: 6 because it is the wide window's top in TeV, no result
+    % allow: M|^2
+    % allow: 2 -3 because they are the powers in the effective sample size's formula and in the measure, no results
+    training class's events and $0.26$ of a top class's, so the proposed coverage on the current window holds only
+    $0.74$ of a top class's pp events; up to $6$\,TeV it holds $1.00$, and no pp event of any class lies above. For the
+    measure, the pp events are reweighted from each candidate, and the effective sample size per event
+    $(\sum w)^2/(n\sum w^2)$ is $0.73$, $0.77$, $0.83$ from the current uniform window ($2\to2$, $2\to3$, $2\to4$),
+    $0.82$, $0.86$, $0.87$ from log uniform to $6$\,TeV, and from a falling $\hat s^{-3/2}$ to $6$\,TeV $0.91$ on
+    $2\to2$ but $0.80$ on $2\to4$ (uniform to $6$\,TeV, $0.78$ on $2\to4$). Log uniform has the best worst case
+    across multiplicities. The wide window widens the $\log_{10}|\mathcal M|^2$ range by $2.53$, $3.18$ and $3.87$
+    decades, on $2\to3$ and $2\to4$ mostly at the bottom ($1.74$ and $3.24$ on the minimum): the mass dimension of a
+    $2\to n$ amplitude squared falls by two per extra final particle, so a higher $\sqrt{\hat s}$ lowers it; on $2\to2$
+    it is the top that grows ($1.60$).
+  \item \emph{$b$ and $\tau$.} The current cut keys on a massless final, so the $4.7$\,GeV $b$ and the $1.777$\,GeV $\tau$
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: b_tau.n=481
+    % claim: b_tau.no_cut_now=165
+    % claim: b_tau.fail_share=0.25
+    % claim: b_tau.width_loss=0.67
+    % claim: b_tau.fail_share_proposed=0.13
+    % claim: b_tau.width_loss_proposed=0.25
+    % claim: b_tau.pp_n=430
+    % claim: b_tau.pp_in_new_mean=0.999
+    % claim: b_tau.pp_in_new_uncut_mean=0.9998
+    % allow: 4.7 1.777 because they are the generator's b and tau masses, no results
+    % allow: 10 0.9 5 0.99 because they are the current and the proposed cuts, the proposed $e^+e^-$ angle being the check's own choice, no results
+    % allow: M|^2
+    are never cut: $481$ tree classes have one, $165$ of them no other cut leg and so no cut at all. Under the current
+    thresholds ($p_T>10$\,GeV, $|\cos\theta|<0.9$, $\Delta R$ and pair mass as now), a quarter ($0.25$) of such a class's
+    current events fail on the $b$ or $\tau$ alone, and they carry $0.67$ decades of its $\log_{10}|\mathcal M|^2$
+    range: soft or collinear $b$ and $\tau$ the pools hold and an analysis would not. Under the proposed thresholds
+    ($|\eta|<5$ and no pair-mass cut on hadronic classes, $|\cos\theta|<0.99$ and the pair mass as now on $e^+e^-$
+    ones), the same two quantities, what the proposed coverage removes from what the pools now hold, are $0.13$ and
+    $0.25$ decades. Cutting them costs the pp events almost nothing: on the $430$ such hadronic classes the
+    proposed coverage holds a mean $0.999$ of the pp events, against $0.9998$ with $b$ and $\tau$ left uncut.
+  \item \emph{The forward component.} The most forward final particle lies beyond $|\cos\theta|=0.9$ in $0.16$, $0.45$
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: hadronic_2to2.pp_forward_share=0.16
+    % claim: hadronic_2to3.pp_forward_share=0.45
+    % claim: hadronic_2to4.pp_forward_share=0.62
+    % claim: hadronic_2to2.forward_share_current=0
+    % claim: hadronic_2to3.forward_share_current=0.13
+    % claim: hadronic_2to4.forward_share_current=0.17
+    % claim: hadronic_2to2.forward_share_proposed=0.34
+    % claim: hadronic_2to3.forward_share_proposed=0.39
+    % claim: hadronic_2to4.forward_share_proposed=0.43
+    % claim: hadronic_2to2.pp_u_uncovered_mean_current=0.097
+    % claim: hadronic_2to4.pp_u_uncovered_mean_current=0.085
+    % claim: hadronic_2to4.pp_u_uncovered_mean_proposed=0.003
+    % claim: hadronic_2to2.pp_u_ess_current=0.92
+    % claim: hadronic_2to3.pp_u_ess_current=0.64
+    % claim: hadronic_2to4.pp_u_ess_current=0.36
+    % claim: hadronic_2to2.pp_u_ess_proposed=0.80
+    % claim: hadronic_2to3.pp_u_ess_proposed=0.82
+    % claim: hadronic_2to4.pp_u_ess_proposed=0.76
+    % allow: 0.9 because it is the current angular cut, no result
+    and $0.62$ of a hadronic class's pp events ($2\to2$, $2\to3$, $2\to4$), in $0$, $0.13$ and $0.17$ of its current
+    sample (only massive finals pass there) and in $0.34$, $0.39$ and $0.43$ of the proposed one. A mean $0.097$
+    ($2\to2$) and $0.085$ ($2\to4$) of a class's pp events fall at angles the current sample never reaches, $0.003$ or
+    less under the proposed one. Reweighting a sample to the pp events' angle distribution leaves an effective size per
+    event of $0.92$, $0.64$, $0.36$ for the current samples and $0.80$, $0.82$, $0.76$ for the proposed: the forward
+    component costs a little at $2\to2$, where the current cut leaves the pp events little to miss inside its reach, and
+    doubles the effective size at $2\to4$.
+  \item \emph{The other tree pools.} Sampled as the tree classes, they move the same way, by type (medians; the range's
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: types.heavy_quark.n=105
+    % claim: types.heavy_quark.growth_999_proposed=0.27
+    % claim: types.heavy_quark.max_up_proposed=0.16
+    % claim: types.heavy_quark.outside_current_proposed=0
+    % claim: types.bsm.n=12
+    % claim: types.bsm.growth_999_proposed=0.11
+    % claim: types.bsm.max_up_proposed=0.00
+    % claim: types.bsm.outside_current_proposed=0.14
+    % claim: types.probe_2to5.n=40
+    % claim: types.probe_2to5.growth_999_proposed=0.22
+    % claim: types.probe_2to5.max_up_proposed=0.32
+    % claim: types.probe_2to5.outside_current_proposed=0.31
+    % claim: types.probe_2to5.growth_999_wide=5.11
+    % claim: types.alpha_s.n=24
+    % claim: types.alpha_s.growth_999_proposed=1.74
+    % claim: types.alpha_s.max_up_proposed=1.72
+    % claim: types.alpha_s.outside_current_proposed=0.29
+    % claim: types.alpha_s.pp_n=21
+    % claim: types.alpha_s.pp_in_cur_window=0.57
+    % claim: types.alpha_s.pp_in_new_window=0.99
+    % claim: types.alpha_s.pp_in_new_wide=1.00
+    % claim: types.high_energy.n=40
+    % claim: types.high_energy.growth_999_proposed=2.54
+    % claim: types.high_energy.max_up_proposed=2.81
+    % claim: types.high_energy.outside_current_proposed=0.33
+    % claim: types.high_energy.pp_n=34
+    % claim: types.high_energy.pp_in_cur_window=0.0025
+    % claim: types.high_energy.pp_in_new_window=0.041
+    % claim: types.harder_cut.n=40
+    % claim: types.harder_cut.growth_999_proposed=0.53
+    % claim: types.harder_cut.max_up_proposed=0.70
+    % claim: types.harder_cut.outside_current_proposed=0.21
+    % claim: cost.other_n_pool_events=31M
+    % claim: cost.other_sampled.current=6.9
+    % claim: cost.other_sampled.proposed=6.8
+    % claim: cost.other_sampled.wide=6.7
+    % allow: 1 10 30 6 13 because they are the entries' windows and threshold, the wide window's top and the beam energy, no results
+    growth in decades, of it at the top, the share of the proposed sample outside the current cuts): the $105$
+    heavy-quark mass points $0.27$, $0.16$, $0$ (none of their events lies outside the current cuts; the forward
+    component is what changes them); the $12$ BSM entries $0.11$, $0.00$, $0.14$; the $40$ $2\to5$ probes $0.22$,
+    $0.32$, $0.31$, and $5.11$ decades on the wide window; the $24$ $\alpha_s$ points $1.74$, $1.72$, $0.29$; the $40$
+    entries on a $1$ to $10$\,TeV window $2.54$, $2.81$, $0.33$; the $40$ at $p_T>30$\,GeV $0.53$, $0.70$, $0.21$.
+    Against pp, an $\alpha_s$ point reads its base class's pp pool ($21$ of them hadronic): $0.57$ of the events inside
+    the current cuts and window, $0.99$ inside the proposed coverage on the window, $1.00$ up to $6$\,TeV (no range
+    comparison, the labels are not the base's). The $13$\,TeV pp events rarely reach a $1$ to $10$\,TeV window: on the
+    $34$ hadronic such entries $0.0025$ of the base's pp events lie inside the current cuts and window, $0.041$ inside
+    the proposed coverage, too few for the pp comparison to say much. The heavy-quark mass points (a top off the pp
+    events' shell), the BSM entries and the $2\to5$ probes have no pp pool. The pp read of the $p_T>30$\,GeV entries is
+    left out: these rows read their base's pp events against the global current cuts ($p_T>10$\,GeV) instead of the
+    entry's own, which the fix in \code{27e8edd} corrects after the run; it waits for their rerun. Their 31M pool events
+    take $6.9$, $6.8$ and $6.7$ CPU-hours under the current, the proposed and the wide coverage.
+  \item \emph{The one-loop and loop-induced pools} are read, not sampled. Their labels come from MadLoop, which
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: loops.one_loop_hadronic.n=143
+    % claim: loops.one_loop_ee.n=7
+    % claim: loops.loop_induced_hadronic.n=15
+    % claim: loops.loop_induced_ee.n=2
+    % claim: loops.one_loop_hadronic.pool_width_999=4.47
+    % claim: loops.one_loop_ee.pool_width_999=4.94
+    % claim: loops.loop_induced_hadronic.pool_width_999=2.41
+    % claim: loops.loop_induced_ee.pool_width_999=4.61
+    % claim: loops.one_loop_hadronic.pp_in_cur_window=0.77
+    % claim: loops.one_loop_hadronic.pp_in_new_window=0.99
+    % claim: loops.one_loop_hadronic.pp_in_new_wide=1.00
+    % claim: loops.one_loop_hadronic.pp_forward_share=0.31
+    % allow: 0.1 99.9 6 0.9 because they are the quantiles, the wide window's top and the current angular cut, no results
+    % allow: M|^2
+    generation runs one process per pool in an isolated subprocess (MadLoop is a process-wide singleton that changes
+    directory), so the check's worker pool cannot label them, and a one-loop event costs far more to label than a tree
+    one. So nothing that needs a new labelled sample ran on them: no proposed or wide sample, hence no range growth, no
+    share outside the current cuts, no $b$ and $\tau$ shares, no forward share of a sample, no reweighting and no cost.
+    What needs no new label is read: the width of the existing validation pool's $\log_{10}|\mathcal M|^2$ ($0.1$ to
+    $99.9\%$), $4.47$ decades on the $143$ hadronic one-loop pools, $4.94$ on the $7$ $e^+e^-$ ones, $2.41$ and $4.61$ on
+    the $15$ hadronic and $2$ $e^+e^-$ loop-induced ones; and for a hadronic one-loop pool its tree's pp events against
+    the loop pool's window, $0.77$ inside the current cuts and window, $0.99$ inside the proposed coverage on the window,
+    $1.00$ up to $6$\,TeV, the most forward final beyond $|\cos\theta|=0.9$ in $0.31$ (the pp labels are the tree's, so
+    no range comparison). The loop-induced pools have no tree and no pp pool: their range is all that is read.
+  \item \emph{The generation cost.} The sampler labels $2.75$ events per kept event under every coverage and draws
+    % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+    % claim: cost.current.labelled_per_kept=2.75
+    % claim: cost.current.drawn_per_kept=7.20
+    % claim: cost.proposed.drawn_per_kept=7.21
+    % claim: cost.current.label_time_share=0.97
+    % claim: cost.n_pool_events=190M
+    % claim: cost.current.cpu_h=31
+    % claim: cost.proposed.cpu_h=30
+    % claim: cost.wide.cpu_h=30
+    $7.20$ against $7.21$, and labelling is $0.97$ of the time, so the new coverage costs what the old one did: at the
+    check's rate the 190M events of the tree classes' pools take $31$ CPU-hours under the current coverage, $30$ under
+    the proposed and the wide (a difference the check, which runs the three samples one after the other, does not
+    resolve).
+\end{itemize}
+% src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
+% claim: hadronic_2to4.pp_in_new_window=0.92
+% claim: hadronic_2to4.pp_in_cur_window=0.49
+% allow: 6 because it is the wide window's top in TeV, the check's own choice, no result
+% allow: 1 3 because they are in the user's words (the items of the proposal), no results
+So on the tree classes the proposed coverage holds nine in ten of a class's pp events or more on the current windows
+($2\to4$: $0.92$ against $0.49$), all of them up to $6$\,TeV, reaches the forward region the pp events populate, and
+costs no more to generate; the other tree pools and the hadronic one-loop pools' kinematics move the same way. On it the
+user decided the next catalog's design (``Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no
+to the decayed final states'', 2026-10-25): the proposed acceptance with $b$ and $\tau$ cut, $\sqrt{\hat s}$ log uniform
+from threshold to $6$\,TeV, and a forward component in the mixture, plus electroweak production and the smaller fixes; it is being built as
+catalog\_v4 (hand-off), and no catalog\_v3 pool has been regenerated. The forward component's two shares stay the
+check's choices.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v3/figs/coverage_range_a.pdf}\hfill\pnl{../analysis/catalog_v3/figs/coverage_range_b.pdf}}
+% allow: 0.1 99.9 6 because they are the quantiles the range is read at and the wide window's top in TeV, the check's own choice, no results
+% allow: M|^2
+\caption{The catalog's coverage check: the $0.1$ to $99.9\%$ range of $\log_{10}|\mathcal M|^2$, relative to the
+class's current-sample median, under the current cuts, the proposed coverage and the proposed coverage with
+$\sqrt{\hat s}$ log uniform to $6$\,TeV; medians over each family's classes. (a) Hadronic beams, (b) $e^+e^-$ beams.}
+\label{fig:v3_cov_range}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v3/figs/coverage_pp_a.pdf}\hfill\pnl{../analysis/catalog_v3/figs/coverage_pp_b.pdf}}
+% allow: 13 6 because they are the beam energy in TeV and the wide window's top in TeV, the check's own choice, no results
+% allow: 2 because it is the square in the effective sample size's formula, no result
+\caption{The hadronic classes' $13$\,TeV pp events against the coverage, medians per multiplicity. (a) The share inside
+the current cuts and window, the proposed coverage and window, and the proposed coverage up to $6$\,TeV. (b) The
+effective sample size per event, $(\sum w)^2/(n\sum w^2)$, of the pp events reweighted from each $\sqrt{\hat s}$
+measure.}
+\label{fig:v3_cov_pp}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v3/figs/coverage_fwd_a.pdf}\hfill\pnl{../analysis/catalog_v3/figs/coverage_fwd_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v3/figs/coverage_fwd_c.pdf}\hfill\pnl{../analysis/catalog_v3/figs/coverage_fwd_d.pdf}}
+% allow: 13 1 0.9 because they are the beam energy in TeV and the angle variable's constants, no results
+\caption{The angle to the beam of each event's most forward final particle, $\log 1/(1-|\cos\theta|)$ in the partonic
+frame, per family: the classes' normalised histograms averaged, for the $13$\,TeV pp events and the three samples.
+(a) to (c) Hadronic $2\to2$, $2\to3$, $2\to4$; (d) the $e^+e^-$ classes, which have no pp pool. The current cut sits at
+$|\cos\theta|=0.9$, where the current samples' massless finals stop.}
+\label{fig:v3_cov_fwd}
+\end{figure}
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
@@ -7461,6 +7767,18 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated.
+  \item \textbf{catalog\_v4: the new coverage (open).} The user's design decision of 2026-10-25 (``Okay, yes to 1 to 3,
+    % allow: 1 3 because they are in the user's words, no results
+    % allow: 10 5 0.4 0.99 6 because they are the approved design's cuts and window top, no results
+    % allow: 30 because it is the harder-cut entries' threshold in GeV, no result
+    yes to electroweak production and the smaller fixes, no to the decayed final states'') on the coverage check (par.\
+    The catalog's coverage, a check): hadronic classes at $p_T>10$\,GeV, $|\eta|<5$, $\Delta R>0.4$, no pair-mass cut,
+    $e^+e^-$ at $|\cos\theta|<0.99$; $b$ and $\tau$ cut like jets and leptons; $\sqrt{\hat s}$ log uniform from
+    threshold to $6$\,TeV; a forward component in the mixture; electroweak production and the smaller fixes (one top
+    mass, massless $b$); no decayed final states. Open: the implementation and its CPU validation against the coverage
+    check, the regeneration of the pools, the short pretrainings again (GPU estimate to the user with the run); the
+    forward component's two shares are still the check's choices. Also open: the pp read of the $p_T>30$\,GeV entries,
+    waiting for a rerun of the coverage check under \code{27e8edd}.
   \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
     % allow: 13 because it is the beam energy in TeV, a setting
     % allow: 25485185 because it is part of a run id
@@ -7468,9 +7786,7 @@ of the three share a test set.
     (FA-ccin2p3-25485185), then its comparison inside and outside the windows against the four window-trained arms; the
     hybrid reference-scale short pretraining (approved 2026-10-25 ``Yes, run that hybrid test
     then.'', its own zero-shot reads at the end); the small-$D$ DyHPO round (the linear-probe head check's TF32
-    failures fixed in \code{c11ff1e}, the failed slots queued again). Ended and being written up: the CPU check of the
-    catalog's coverage (FA-ccin2p3-ec84e913, every tree class; approved 2026-10-25 ``Yes, go ahead with what you
-    proposed.'': the CPU check only, the design back to the user before any regeneration or GPU job). CLAUDE.md now
+    failures fixed in \code{c11ff1e}, the failed slots queued again). CLAUDE.md now
     lists every data-generation choice with its source; the open ones (chosen by an agent, no decision of the user's)
     include the fiducial cuts, the window's lower edge and floor, the uniform $\sqrt{\hat s}$ and the cuts' exemption
     of $b$ and $\tau$.
