@@ -947,7 +947,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -1043,5 +1043,13 @@ entries:
       entry; D19 covers only prune.py's rules
     answered_at: '2026-10-25T22:55:35.895000+00:00'
     decision: D136
-  searched: D133 scopes model deletion to concluded studies under ~5 h but approves no deletion; D122 holds the storage entry;
-    D19 covers only prune.py's rules
+  - ask: Keep catalog_v4's sqrt(s-hat) range at 6 TeV and move the energy hold-out to 6 to 20 TeV (recommended), or train
+      up to 14 TeV and drop the hold-out?
+    at: '2026-10-25T23:36:26+00:00'
+    searched: D130 approved the 6 TeV range as proposed; the user asked why 6 TeV (2026-10-26); no decision sets the hold-out
+      for catalog_v4
+  searched: D130 approved the 6 TeV range as proposed; the user asked why 6 TeV (2026-10-26); no decision sets the hold-out
+    for catalog_v4
+  ask: Keep catalog_v4's sqrt(s-hat) range at 6 TeV and move the energy hold-out to 6 to 20 TeV (recommended), or train up
+    to 14 TeV and drop the hold-out?
+  waiting_since: '2026-10-25T23:36:26+00:00'
