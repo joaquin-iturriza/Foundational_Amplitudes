@@ -992,7 +992,7 @@ entries:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-ec84e913
-    commit: b310c18
+    commit: 417a565
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1005,6 +1005,9 @@ entries:
     - analysis/catalog_v4/figs/pool_sqrts_forward.png
     - analysis/catalog_v4/read_validation.py
     - analysis/catalog_v4/validate_v4.py
+    - analysis/storage/free_manifest_2026-10-26.tsv
+    - analysis/storage/free_space.py
+    - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/gen_catalog_v4.py
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
