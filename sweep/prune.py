@@ -10,10 +10,14 @@ Run on a site (through `site run`); without --apply it prints what it would dele
   4. ... and its plots (*.png, *.pdf) and prediction arrays (preds_*.npz)
 A trial named as a fine-tune parent (fine_tune.pretrained_path) by any sweep config in the checkout or on this site is
 never touched. config.yaml, logs, metrics, data_stats.json and the tokenizer are always kept, so a run can be
-re-scored or rerun from its config. Before deleting anything in a sweep, runs/<sweep>/PRUNED.json records every trial
-(hp, fidelity, val_loss, per-process losses, run dir, what was deleted and its size); one PRUNE JSON line per sweep
-goes to stdout for the laptop to keep. A sweep that also ran on another site keeps its best here, so the global best
-is kept wherever it ran.
+re-scored or rerun from its config. The manifest comes before any deletion: per sweep, one PRUNE JSON line (every
+trial's hp, fidelity, val_loss, per-process losses, run dir, what is deleted and its size) is printed to stdout and
+flushed first (scripts/prune_site.sh appends it to the laptop's prune/<site>.jsonl), then runs/<sweep>/PRUNED.json is
+written (to a temporary file renamed over it, so a failed write never truncates the old one). On a full disk that
+write fails with ENOSPC, and pruning is exactly what frees the space: the deletion then proceeds on the strength of
+the stdout copy already printed, and the file write is retried after it (a warning if it still fails). Any other
+failure to write the manifest deletes nothing. A sweep that also ran on another site keeps its best here, so the
+global best is kept wherever it ran.
   4b. --submit-logs: in a finished sweep's directory under SWEEP_DIR (on lxplus the 2 GB AFS home) the scheduler's
      bookkeeping (DAG manager output and logs, node logs, *.bak copies of the DyHPO state) is removed and trial
      stdout/stderr (*.out, *.err) gzipped in place
@@ -23,7 +27,7 @@ is kept wherever it ran.
     python sweep/prune.py [PREFIX ...] [--apply] [--caches] [--submit-logs] [--cache-days 30] [--every HOURS]
 --every: skip this run if the last applied one on this site was less than HOURS ago (for the supervisor's upkeep).
 """
-import argparse, glob, json, os, re, shutil, sys, time
+import argparse, errno, glob, json, os, re, shutil, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
@@ -194,18 +198,19 @@ def plan_sweep(sweep, q, protect, apply, dags=frozenset(), exclude=()):
         return None
     man = {"sweep": sweep, "site": siteconf.SITE, "when": time.strftime("%Y-%m-%d %H:%M"), "finished": fin,
            "top_fidelity": tf, "best_hp": best, "freed_bytes": freed, "trials": trials}
+    if freed:
+        print("PRUNE " + json.dumps(man), flush=True)         # the first copy of the manifest, before any deletion
     if apply and freed:
-        mdir = os.path.join(siteconf.PROJECT_DIR, "runs", sweep)
-        os.makedirs(mdir, exist_ok=True)
-        mf = os.path.join(mdir, "PRUNED.json")
-        old = []
-        if os.path.exists(mf):
-            try:
-                old = json.load(open(mf))
-                old = old if isinstance(old, list) else [old]
-            except ValueError:
-                old = []
-        json.dump(old + [man], open(mf, "w"), indent=1)       # written before anything is deleted
+        mf = os.path.join(siteconf.PROJECT_DIR, "runs", sweep, "PRUNED.json")
+        try:
+            write_manifest(mf, man)
+            retry = False
+        except OSError as e:
+            if e.errno != errno.ENOSPC:
+                raise                                         # not a full disk: nothing is deleted
+            print("PRUNE_WARN %s: PRUNED.json not written (disk full); deleting on the stdout copy, then retrying"
+                  % sweep, flush=True)
+            retry = True
         for rec in trials:
             td = os.path.join(siteconf.PROJECT_DIR, rec["run_dir"])
             for f in rec["deleted"]:
@@ -213,7 +218,38 @@ def plan_sweep(sweep, q, protect, apply, dags=frozenset(), exclude=()):
                     os.remove(os.path.join(td, f))
                 except FileNotFoundError:
                     pass
+        if retry:
+            try:
+                write_manifest(mf, man)
+                print("PRUNE_WARN %s: PRUNED.json written after the deletion" % sweep, flush=True)
+            except OSError as e:
+                print("PRUNE_WARN %s: PRUNED.json still not written (%s); the PRUNE line above is the only record"
+                      % (sweep, e), flush=True)
     return man
+
+
+def write_manifest(mf, man):
+    """Append man to the list in mf through a temporary file renamed over it: a write that fails (ENOSPC) leaves the
+    old manifest whole and removes its own temporary file."""
+    os.makedirs(os.path.dirname(mf), exist_ok=True)
+    old = []
+    if os.path.exists(mf):
+        try:
+            old = json.load(open(mf))
+            old = old if isinstance(old, list) else [old]
+        except ValueError:
+            old = []
+    tmp = mf + ".tmp"
+    try:
+        with open(tmp, "w") as f:
+            json.dump(old + [man], f, indent=1)
+        os.replace(tmp, mf)
+    except OSError:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def submit_logs(sweep, apply):
@@ -286,13 +322,15 @@ def main():
     for n in sorted(names):
         man = plan_sweep(n, q, protect, a.apply, dags, a.exclude)
         if man and man["freed_bytes"]:
-            total += man["freed_bytes"]; nsw += 1
-            print("PRUNE " + json.dumps(man), flush=True)
+            total += man["freed_bytes"]; nsw += 1         # its PRUNE line was printed by plan_sweep, before deleting
     print("SUMMARY %s %s: %d sweeps, %.1f GB %s; %d parent trials protected" % (
         siteconf.SITE, "applied" if a.apply else "dry run", nsw, total / 1e9, "freed" if a.apply else "to free",
         len(protect)))
     if a.apply:
-        open(stamp, "w").close()
+        try:
+            open(stamp, "w").close()
+        except OSError as e:                              # a full disk must not stop the submit-log and cache passes
+            print("PRUNE_WARN stamp %s not written: %s" % (stamp, e), flush=True)
     if a.submit_logs:
         sl = sum(submit_logs(n, a.apply) for n in sorted(names)
                  if finished(n, q, dags) and not any(n.startswith(x) for x in a.exclude))
