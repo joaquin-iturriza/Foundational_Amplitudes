@@ -50,9 +50,9 @@ entries:
     - CPU iteration on the catalog normalization
   decisions:
   - D83
-  next: 'CPU jobs on CC, one at a time, each under an hour: the shape proxy (shape_learn) per candidate target on catalog_v3''s
-    training and held-out classes, the signed-data check (signed band, r0 margin, the sign head against log-magnitude), sampling
-    sensitivity, then new candidates; GPU short tests only under D99 once a candidate passes the proxy'
+  next: 'the CPU level check of the s-hat reference times a per-process constant (rerun FA-ccin2p3-c9fb30f5): write the design
+    and its numbers up, then bring the design and the GPU test''s cost to the user before any job; queue after that: the signed-data
+    check, then new candidates'
   done_when: null
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*
   notes_ref: null
