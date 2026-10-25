@@ -817,6 +817,63 @@ $\log|\mathcal M|^2$. Triangles: the $2\to5$ and $1$ to $10$\,TeV probes. One se
 \label{fig:v3_prep_shat}
 \end{figure}
 
+% allow: ^2 N-4 4a159066
+\paragraph{The hybrid reference scale, a design (2026-10-25).} The two references trade shape against level (the
+paragraph above), and one number per process can take both: the target $\log|\mathcal M|^2+(N-4)\log\hat s+c_p$ with
+$c_p$ the mean over the process's events of $L_q-(N-4)\log\hat s$, the emission scales' factor less the $\hat s$ one.
+Within a process $c_p$ is a constant, so the per-event shape is that of $\hat s$ alone; its class mean is the emission
+scales' exactly. The rule for a process never trained on: $c_p$ needs only momenta, no amplitude, so it is computed
+from the events being predicted, the same events the network reads. The CPU half, on every catalog\_v3 tree class
+(\code{analysis/catalog\_v3/prep\_level.py}, run FA-ccin2p3-4a159066; \code{prep\_level\_read.py},
+\code{data/prep\_level.json}):
+\begin{itemize}
+  \item \emph{$c_p$ is stable under resampling.} On the $2\to5$ probes, where it is largest (median $-15.4$), it moves by
+% src: python3 analysis/catalog_v3/prep_level_read.py @275f98a
+% claim: cp_H2p5_val_vs_test=0.045
+% claim: cp_H2p5_n200_vs_2000=0.075
+% claim: cp_H2p5_c_p_median=-15.4
+    a median $0.045$ between the validation and the test events and by $0.075$ between a tenth of them and all.
+  \item \emph{Its level is the emission scales', the best of the three at a new multiplicity.} The notes' composition
+% allow: ^2
+% allow: 12 because it is the count of BSM classes in the fit set, not a result
+% allow: 1 10 because they are the ends of the energy window in TeV, a setting
+% src: python3 analysis/catalog_v3/prep_level_read.py @275f98a
+% claim: comp_H2p5_raw=2.56
+% claim: comp_H2p5_dless=2.32
+% claim: comp_H2p5_qperp=1.42
+% claim: comp_H2_raw=1.04
+% claim: comp_H2_dless=0.93
+% claim: comp_H2_qperp=0.79
+% claim: comp_H7E_raw=60
+% claim: comp_H7E_dless=2.7
+% claim: comp_H7E_qperp=2.6
+% claim: comp_H3_raw=2.17
+% claim: comp_H3_qperp=2.28
+% claim: net_H2p5_baseline=42.5
+% claim: net_H2p5_dimensionless_shat=13.6
+% claim: net_H2p5_dimensionless=0.10
+    model (par.\ The candidate targets on the pools themselves: a ridge on the counts of each kind of particle in and out,
+    the coupling orders removed), fitted on the training classes (the $12$ BSM ones included) and scored on the held-out
+    axes, median squared error of the class mean, for $\log|\mathcal M|^2$, $\hat s$ alone and the emission scales (the
+    hybrid's): $2\to5$ $2.56$, $2.32$, $1.42$; $2\to4$ $1.04$, $0.93$, $0.79$; $1$ to $10$\,TeV $60$, $2.7$, $2.6$; the top
+    $2.17$ for $\log|\mathcal M|^2$ against $2.28$. At $2\to5$ the order is the network's (level part $42.5$, $13.6$ and
+    $0.10$ for the three arms), the size is not: the network extrapolates the emission scales' level far better than a
+    linear rule does.
+  \item \emph{Its shape is $\hat s$'s by construction}: the shape proxy's $0.062$ on $2\to4$ and $0.091$ on $2\to5$
+% src: python3 analysis/catalog_v3/prep_level_read.py @275f98a
+% claim: proxy_H2_dless=0.062
+% claim: proxy_H2_qperp=0.123
+% claim: proxy_H2p5_dless=0.091
+% claim: proxy_H2p5_qperp=0.236
+    against the emission scales' $0.123$ and $0.236$.
+\end{itemize}
+% allow: 2 because it is the GPU-hour estimate of a job not run, a plan
+What the CPU cannot say is whether the network's level skill with the emission scales comes from the class mean, which
+the hybrid keeps, or from the per-event $L_q$, which it drops; only a network answers that. The GPU test: one more arm
+of the short pretraining, the same inputs, orders, setup and HPs as the other five, with the hybrid target, read
+zero-shot on every axis; one seed, about $2$\,GPU-h. Not run: it needs the target option in \code{experiment.py} and
+comes to the user first.
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
