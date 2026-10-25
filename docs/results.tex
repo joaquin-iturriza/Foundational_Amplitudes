@@ -8061,11 +8061,10 @@ of the three share a test set.
     mass, massless $b$); no decayed final states. Open: the implementation and its CPU validation against the coverage
     check, the regeneration of the pools, the short pretrainings again (GPU estimate to the user with the run); the
     forward component's two shares are still the check's choices.
-  \item \textbf{catalog\_v4's validation and census (open; run \code{FA-ccin2p3-44e6a15b}).}
+  \item \textbf{catalog\_v4's validation and census (open; runs \code{FA-ccin2p3-44e6a15b} and, with the sampling
+    fix, \code{FA-ccin2p3-2e1a0894}).}
     % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
     % claim: val.n_rows=35
-    % claim: val.n_ok=0
-    % claim: val.n_pool_error=35
     % claim: val.t_build_min=12
     % claim: val.t_build_max=27
     % claim: val.t_build_mean=20
@@ -8088,21 +8087,76 @@ of the three share a test set.
     % claim: val.loops.loop_qcd_qed_entries=6
     % allow: 172.5 300 50 because they are the approved top mass and heavy-quark points, settings
     The sampled $35$ entries (every layer and beam, the three electroweak test processes, the heavy-quark, $\alpha_s$,
-    harder-cut and BSM points) built their backends ($12$ to $27$\,s each, mean $20$\,s), and all $35$ then stopped
-    before a pool: the validation registers the entries without the recipe's \code{sampling} block, so the generator
-    took the flat path, which refuses the log-uniform $\sqrt{\hat s}$ (``implemented on the mixture path only''). The
-    regeneration attaches the block (\code{register\_recipe\_processes}); the script does not. So $0$ entries have their
-    pool checks (cuts recomputed, log-uniform $\sqrt{\hat s}$, the forward angle, mass shells, seconds per event): not
-    measured yet. What did run: the diagram tool reproduces catalog\_v3's recorded count on all $34$ SM entries; the
-    QED bound is attained wherever it exceeds catalog\_v3's minimal order ($10$ of $10$); $u\bar u\to d\bar d$ goes from
-    $1$ to $4$ diagrams and $uu\to uuZ$ from $8$ to $24$ (the electroweak exchanges), $ud\to udh$ stays at $2$ (its
-    vector-boson fusion was already the minimal order); the massless $b$ removes the $b$-Yukawa Higgs diagrams
-    ($b\bar b\to W^+W^-$ $4\to3$, $b\bar b\to gg\tau^+\tau^-Z$ $154\to100$). The cards: MT $=$ ymt $=172.5$ in the $33$
-    entries with no heavy-quark point, WT $=1.4803$ (the LO width with a massless $b$), $8.73$ at $m_Q=300$\,GeV and
-    $0$ at $m_Q=50$\,GeV (below $Wb$, the heavy quark is stable); no $b$ mass or Yukawa in any card; the card check
-    itself reads no model from the standalone's proc card, so its flag is false everywhere. The one-loop layer's $167$
-    entries are configured as designed, but $6$ of them name \code{loop\_qcd\_qed\_sm-no\_b\_mass}, which MadGraph did
-    not import on CC.
+    harder-cut and BSM points) built their backends ($12$ to $27$\,s each, mean $20$\,s). The diagram tool reproduces
+    catalog\_v3's recorded count on all $34$ SM entries; the QED bound is attained wherever it exceeds catalog\_v3's
+    minimal order ($10$ of $10$); $u\bar u\to d\bar d$ goes from $1$ to $4$ diagrams and $uu\to uuZ$ from $8$ to $24$
+    (the electroweak exchanges), $ud\to udh$ stays at $2$ (its vector-boson fusion was already the minimal order); the
+    massless $b$ removes the $b$-Yukawa Higgs diagrams ($b\bar b\to W^+W^-$ $4\to3$, $b\bar b\to gg\tau^+\tau^-Z$
+    $154\to100$). The cards: MT $=$ ymt $=172.5$ in the $33$ entries with no heavy-quark point, WT $=1.4803$ (the LO
+    width with a massless $b$), $8.73$ at $m_Q=300$\,GeV and $0$ at $m_Q=50$\,GeV (below $Wb$, the heavy quark is
+    stable); no $b$ mass or Yukawa in any card. The one-loop layer's $167$ entries are configured as designed, $6$ of
+    them on \code{loop\_qcd\_qed\_sm-no\_b\_mass}.
+    % src: python3 analysis/catalog_v4/read_validation.py @0490f0a
+    % claim: pools.n=35
+    % claim: val.n_ok=35
+    % claim: val.card_ok=35
+    % claim: val.loops.generate_ok=4
+    % claim: val.loops.generate_n=4
+    % claim: pools.cuts_pass=35
+    % claim: pools.outside_v3_min=0
+    % claim: pools.outside_v3_max=0.43
+    % claim: pools.in_window=35
+    % claim: pools.ks_sqrts_pass=35
+    % claim: pools.ks_sqrts_max=0.0109
+    % claim: pools.ks_crit=0.0138
+    % claim: pools.ks_u_pass=35
+    % claim: pools.ks_u_max=0.0126
+    % claim: pools.u_replay_maxdev=3e-12
+    % claim: pools.fwd_conservation_max=6e-11
+    % claim: pools.fwd_mass_dev_max=6e-16
+    % claim: pools.conservation_max=2e-11
+    % claim: pools.mass_dev_max=1e-14
+    % claim: pools.beams_massless=35
+    % claim: pools.b_massless=35
+    % claim: pools.top_entries=5
+    % claim: pools.fwd_share_v3_edge_min=0.19
+    % claim: pools.fwd_share_v3_edge_max=0.49
+    % claim: pools.pool_d_log_uniform_median=0.112
+    % claim: pools.pool_d_log_uniform_max=0.21
+    % claim: pools.pool_d_after_cuts_median=0.044
+    % claim: pools.pool_d_after_cuts_max=0.11
+    % claim: pools.v4_ddx_ddxgg.low_pool=0.018
+    % claim: pools.v4_ddx_ddxgg.low_cuts=0.019
+    % claim: pools.v4_ddx_ddxgg.low_log_uniform=0.183
+    % claim: pools.v4_epem_ccxgvevex.low_pool=0.013
+    % claim: pools.v4_epem_ccxgvevex.low_cuts=0.018
+    % claim: pools.v4_epem_ccxgvevex.low_log_uniform=0.227
+    % allow: 2000 20000 0.9 0.35 0.15 6 0.1 because they are the validation's pool and draw sizes, catalog_v3's angular edge, the KS test's level, the mixture's flat and forward shares and the window top in TeV, settings
+    \emph{The pools} (the rerun registers each entry with its recipe's sampling block, as the regeneration does; $2000$
+    events per entry through the pipeline's generation path): all $35$ entries pass every check. Every event passes the
+    v4 acceptance recomputed independently of the pipeline's mask ($35$ of $35$; $0$ to $0.43$ of each pool lies outside
+    catalog\_v3's cuts), and every $\sqrt{\hat s}$ lies in its window ($35$). The log-uniform measure: $20000$ draws of the
+    sampler per entry against log-uniform, KS distance at most $0.0109$ against the $0.1\%$ critical $0.0138$ ($35$
+    pass). The forward component: the turned particle's $u=\log(1/(1-|\cos\theta|))$ against uniform up to the cuts'
+    edge, KS at most $0.0126$ ($35$ pass), the drawn $u$ replayed to $3\times10^{-12}$, four-momentum kept to
+    $6\times10^{-11}$ and every shell to $6\times10^{-16}$ by the turn; in the pools the most forward final lies beyond
+    catalog\_v3's $|\cos\theta|=0.9$ in $0.19$ to $0.49$ of the events. The shells: beams massless and $b$ finals
+    massless in all $35$, the tops of the $5$ entries with one on $172.5$ ($m_Q$ at a heavy-quark point), every final on
+    its mass to $1\times10^{-14}$ relative, four-momentum conserved to $2\times10^{-11}$; every label finite and positive. The
+    pool itself is not log-uniform in $\sqrt{\hat s}$, nor meant to be (Fig.~\ref{fig:v4_pool_checks}): its per-decade
+    CDF lies a median $0.112$ (at most $0.21$) from log-uniform, and a median $0.044$ (at most $0.11$) from log-uniform
+    after the cuts (the bulk and forward parts drawn locally through the same candidate path); the rest is the
+    $0.35$ flat in $\log|\mathcal M|^2$, which follows the amplitude. The cuts empty the threshold region of the
+    multi-leg classes: $d\bar d\to d\bar dgg$ has $0.018$ of its pool in its lowest decade ($0.019$ after the cuts,
+    $0.183$ log-uniform), $e^+e^-\to c\bar cg\nu_e\bar\nu_e$ $0.013$ ($0.018$, $0.227$); the window's lower edge is the
+    mass threshold, below the cuts' effective one, so those draws are spent on rejection. The cards now read their
+    model from the standalone ($35$ of $35$ pass the card check), \code{loop\_qcd\_qed\_sm-no\_b\_mass} imports on CC,
+    and MadGraph generates the $4$ loop strings tried ($4$ of $4$). MadGraph warns on the mixed-order virtuals ($b b\to
+    bb$ at QED$\le2$): their Born diagrams do not all carry the same QCD power, so the virtual is the QCD correction to
+    a Born of mixed orders. Not yet in the validation: a MadLoop pool. The one-loop entries' model differs from the
+    trees' (inherited from catalog\_v3, the loop models' own cards):
+    % allow: 128.93 132.507 because they are the two model cards' inverse couplings, settings
+    a massless $\tau$ and $\alpha^{-1}=128.93$ against the trees' $\tau$ mass and $132.507$.
     % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
     % claim: total.n=2404
     % claim: total.exists=2370
@@ -8151,16 +8205,48 @@ of the three share a test set.
     build, used only for LHE) plus $2.3$\,MB of standalone. The $1974$ pool entries at the approved sizes, float64,
     $5k+1$ columns, are $53$\,GB; their $1655$ tree backends $89$\,GB ($3.7$\,GB without the events directories): $142$\,GB in
     all, $57$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
-    directories hold about $92$\,GB there. The builds cost about $9$ core-hours; the generation's CPU is not measured
-    (no pool ran) and the one-loop backends' size neither. Next: the validation registers the recipe's sampling and
-    reruns without the census (its backends are reused), then the regeneration once the energy hold-out's window is
-    settled and the disk has room.
+    directories hold about $92$\,GB there. The builds cost about $9$ core-hours.
+    % src: python3 analysis/catalog_v4/read_validation.py @0490f0a
+    % claim: disk.pool_entries=1974
+    % claim: regen.tree_entries=1824
+    % claim: regen.loop_entries=150
+    % claim: regen.ms_per_event_by_nfinal.2=0.18
+    % claim: regen.ms_per_event_by_nfinal.3=0.23
+    % claim: regen.ms_per_event_by_nfinal.4=0.77
+    % claim: regen.ms_per_event_by_nfinal.5=1.39
+    % claim: pools.ms_per_event_min=0.15
+    % claim: pools.ms_per_event_max=2.32
+    % claim: regen.tree_events_m=218
+    % claim: regen.tree_cpu_h=39
+    % claim: regen.pool_gb=53
+    % claim: regen.backends_no_events_gb=12.8
+    % claim: regen.total_gb=66
+    % claim: regen.free_gb=24.1
+    % allow: 2 3 4 5 16 2000 because they are final-state multiplicities and the validation's worker and chunk sizes, settings
+    The measured generation cost per kept event (candidates and their labels included, $2000$-event chunks, $16$
+    entries at once on one node, so a chunk's start is in it) is $0.15$ to $2.32$\,ms, a mean of $0.18$, $0.23$,
+    $0.77$ and $1.39$\,ms at $2$, $3$, $4$ and $5$ finals. Over the regeneration's $1824$ tree entries ($218$M events)
+    that is about $39$ core-hours, an hour of wall on one node; the $150$ one-loop entries are not measured. The
+    $1974$ entries' pools are $53$\,GB in float64 and the backends built without events directories about
+    $12.8$\,GB (storage inventory, \code{analysis/storage}): about $66$\,GB against $24.1$\,GB free on CC now.
+    Next: the regeneration once the user answers the open questions (the $1$ to $10$\,TeV energy hold-out, the $34$
+    $b$-Higgs classes, the storage) and the disk has room; then classes and roles on v4; then the $b$ mass in
+    \code{particle\_ids.py}.
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/census_diagrams.pdf}
   \caption{MadGraph's diagram count of every catalog\_v3 tree on its catalog\_v4 string (full coupling orders,
     massless $b$) against its catalog\_v3 count, by layer; the $34$ strings with no v4 diagram are left out.}
   \label{fig:v4_census}
+\end{figure}
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/pool_sqrts_forward.pdf}
+  \caption{catalog\_v4's validation pools, three entries. Left: $\sqrt{\hat s}$ per decade in the pool (solid),
+    log-uniform after the cuts (dashed, the bulk and forward parts drawn locally) and log-uniform (dotted, the
+    measure). Right: the forward component's turned particle, $u=\log(1/(1-|\cos\theta|))$ before the cuts (solid),
+    against uniform up to the cuts' edge (dotted).}
+  \label{fig:v4_pool_checks}
 \end{figure}
   \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
     % allow: 6 because it is a rung's index, a name
