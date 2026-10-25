@@ -193,7 +193,12 @@ entries:
     - analysis/transfer/data/lowd_probe_reruns.json
     - analysis/transfer/figs/lowd_dyhpo_interim.pdf
     - analysis/transfer/figs/lowd_dyhpo_interim.png
-  dead_ends: []
+  dead_ends:
+  - tried: requeueing a disk-failed trial as a fixed rerun of its in-flight candidate AND adding a guided trial to the same
+      sweep at the same time (tp3_lowd_freeze_r7_ee_bb_nlo_d2, trials 5 and 6, 21:53)
+    why: 'the guided trial''s suggest ran before the fixed one observed, so DyHPO handed it the same candidate (145): two
+      results for one candidate, the sweep stays at 4 distinct of 5; add the guided trial only after the fixed rerun has observed'
+    at: '2026-10-25T22:42:43+00:00'
   asks: []
   id: lowd_ft
   title: 'fine-tuning at small D: the method comparison, first round'
