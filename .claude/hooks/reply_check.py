@@ -37,8 +37,10 @@ def texts(content):
 
 
 def scan(path):
-    """The messages typed since the current turn began (its prompt, then any sent mid-turn), and the last assistant text."""
-    msgs, reply = [], ""
+    """The messages typed since the current turn began (its prompt, then any sent mid-turn), and EVERY assistant text
+    block since that prompt, joined: an answer written before a tool call is as much the reply as the last block
+    (2026-10-25: reading only the last block failed answers that sat before a tool call, three times in a row)."""
+    msgs, replies = [], []
     for line in open(path):
         if not line.strip():
             continue
@@ -54,11 +56,12 @@ def scan(path):
                             msgs.append(part)
                 elif t and not t.startswith(SKIP) and r.get("toolUseResult") is None and not r.get("isMeta"):
                     msgs = [t]        # a new prompt opens the window: earlier messages were answered in earlier turns
+                    replies = []
         elif r.get("type") == "assistant":
             tx = "".join(texts(m.get("content"))).strip()
             if tx:
-                reply = tx
-    return msgs, reply
+                replies.append(tx)
+    return msgs, "\n\n".join(replies)
 
 
 def main():
@@ -70,7 +73,7 @@ def main():
     if not path or not os.path.exists(path):
         return 0
     msgs, reply = scan(path)
-    reply = inp.get("last_assistant_message") or reply
+    reply = reply or inp.get("last_assistant_message") or ""
     if not msgs or not reply:
         return 0
     recent = msgs[-3:]
