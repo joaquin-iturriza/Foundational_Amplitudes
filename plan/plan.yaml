@@ -101,10 +101,9 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: single-fidelity DyHPO for the methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared
-    best against best with the default's own search, with \lambda for L2-SP and the frozen depth in their search spaces next
-    to the learning rate (the first round ran one untuned value of each), which also asks whether a lower rate keeps the linear-probe
-    head; the single-run noise (90\% quantile 0.41 decades) asks for the comparison on cell medians, not single cells.
+  next: when the DyHPO round's 900 trials are in (watchdog check), collect tp3_lowd_ (analysis/transfer/collect_sweeps.py),
+    run analysis/transfer/lowd_dyhpo.py, compare each method best against best with the default's own search on cell medians,
+    and write it up after par:lowd_ft
   done_when: null
   match: tp3_lowd*,zz_lowd*
   notes_ref: null
