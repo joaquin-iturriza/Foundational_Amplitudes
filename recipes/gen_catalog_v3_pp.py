@@ -17,6 +17,7 @@ Writes
                                  layer, the alpha_s points, the BSM layer, the one-loop pools and the e+e- classes
                                  stay on their windows there: their pp versions need patched masses, another alpha_s
                                  rule or MadLoop labels of pp events, not built yet)
+  catalog_v3_pp_part<k>.yaml     the same processes in 8 parts, one CPU generation job each
 Every pool: 1e4 train (the short pretraining's size), 2e3 val and test (the 2000 events a held-out read scores).
     python3 recipes/gen_catalog_v3_pp.py
 """
@@ -76,6 +77,13 @@ def main():
         with open(os.path.join(HERE, name), "w") as f:
             f.write(hdr)
             yaml.safe_dump({"processes": es}, f, sort_keys=False)
+    # the generation in 8 CPU jobs (CLAUDE.md 0c): every process once, dealt round-robin by multiplicity so each part
+    # carries its share of the slow 2->4 MadEvent runs
+    order = sorted(test, key=lambda e: (-mg.PROCESSES[e["name"]]["nfinal"], e["name"]))
+    for k in range(8):
+        with open(os.path.join(HERE, f"catalog_v3_pp_part{k}.yaml"), "w") as f:
+            f.write(hdr)
+            yaml.safe_dump({"processes": order[k::8]}, f, sort_keys=False)
     print(f"patched cards: {cards}")
     print(f"{len(procs)} hadronic classes; test {len(test)} ({len(held)} held-out, {len(ref)} training); "
           f"train {len(tr)}")
