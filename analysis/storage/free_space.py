@@ -24,7 +24,8 @@ REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
 from build_inventory import load_map, family_group, mg_kind          # noqa: E402
 
-MG5 = "/sps/lpnhe/jiturrizaramirez01/mg5amcnlo"
+sys.path.insert(0, REPO)
+from mg5_pipeline_final import WORK_DIR as MG5                    # noqa: E402  (MG5_WORK_DIR, else $WORK/mg5amcnlo)
 EVENT_KINDS = {"catalog_v3", "catalog_v2 and older (ee_, uubar_, ...)", "catalog_v4 (generating now)"}
 RUN_ROOTS = ("runs", "runs_from_lxplus")
 WEIGHTS = (".pt", ".pt.gz", ".ckpt", ".pth")
@@ -68,10 +69,24 @@ def list_events(now, out, skipped):
 
 
 def protected():
+    """sweep/prune.py's fine-tune parents and job-script sources, the Delta lists, and tools/prune_copies.referenced()'s
+    repo references (its file patterns), except the storage inventory's own files: inventory.json names every
+    candidate, so counting it would protect the whole candidate set by listing it"""
+    import glob
     sys.path.insert(0, os.path.join(REPO, "sweep"))
-    sys.path.insert(0, os.path.join(REPO, "tools"))
-    import prune, prune_copies
-    return set(prune.parents()) | set(prune.delta_runs()) | set(prune_copies.referenced())
+    import prune
+    refs = set(prune.parents()) | set(prune.delta_runs())
+    pats = ["scripts/*.sh", "sweep/*.py", "sweep/**/*.yaml", "analysis/**/*.txt", "analysis/**/*.json",
+            "analysis/**/*.py", "recipes/**/*.yaml", "tools/*.py"]
+    for pat in pats:
+        for f in glob.glob(os.path.join(REPO, pat), recursive=True):
+            if os.path.relpath(f, REPO).startswith("analysis/storage/"):
+                continue
+            try:
+                refs |= set(re.findall(r"([A-Za-z0-9_.-]+/trial_\d+)", open(f, errors="replace").read()))
+            except OSError:
+                pass
+    return refs
 
 
 def repo_text():
@@ -188,6 +203,10 @@ def cmd_delete(a):
             refused += 1
             continue
         st = os.lstat(p)
+        if kind == "events" and walk_dir(p, time.time())[2]:
+            print("SKIP\t%s\ta file written in the last 6 h" % p)
+            refused += 1
+            continue
         if int(st.st_mtime) != int(mt) or (kind == "model" and st.st_size != int(app)):
             print("SKIP\t%s\tchanged since the list" % p)
             refused += 1
