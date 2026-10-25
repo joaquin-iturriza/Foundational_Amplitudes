@@ -6,8 +6,8 @@ its saved truth t and the run's prediction q, both log|M|^2 on 2000 validation e
   shape   the variance of q - t, what is left after that number
 Per arm and axis: the medians over its probes, the 10% and 90% quantiles of the MSE, the probe count against the
 axis recipe's (recipes/catalog_v3_heldout_<axis>.yaml; the pp-trained arm's and the twin's own axes likewise), and every
-expected probe with no prediction, listed by name (a probe that errored on the site writes no .npz). The one-loop H5 probes are read on log|M| (--signed-magnitude), so their
-numbers are on half the scale of the trees'. Figure: the median zero-shot MSE per axis, one marker per arm.
+expected probe with no prediction, listed by name (a probe that errored on the site writes no .npz). A sign-changing one-loop pool (H5, the twin's H3p) is read on
+log max(|M|^2, floor) (--signed-magnitude), the sign head's magnitude; its sign is scored apart (<axis>_signed.txt). Figure: the median zero-shot MSE per axis, one marker per arm.
     python3 analysis/catalog_v3/short_reads.py   -> data/short_reads.json, figs/short_reads.{png,pdf}
 """
 import glob, json, os, sys

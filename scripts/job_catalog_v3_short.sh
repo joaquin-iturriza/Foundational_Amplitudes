@@ -52,6 +52,8 @@ ITERS=$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(op
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
+# mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
+[ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
 if [ "$MODE" = smoke ]; then
     OUT="$SCRATCH/zz_v3_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
@@ -101,14 +103,16 @@ neg = lambda f: au[os.path.basename(f)[:-5]]['val'].get('negative', 0) > 0
 fs = sys.argv[2:]
 print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1]) if sys.argv[1] == 'H5' else fs[:2]))" "$A" "${P[@]}"))
     fi
-    SM=(); [ "$A" = H5 ] && SM=(--signed-magnitude)
+    # every axis on log max(|M|^2, floor) for a sign-changing pool (the one-loop pools of H5, and the twin's tau
+    # one-loop pools of H3p); a positive pool's target is log|M|^2 either way
+    SM=(--signed-magnitude)
     python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
-    if [ "$A" = H5 ]; then
+    if grep -qE "name: .*_(nlo|loop)$" "recipes/catalog_v3_heldout_$A.yaml"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
-        python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/H5_signed.txt"
+        python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
         [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     fi
 done
