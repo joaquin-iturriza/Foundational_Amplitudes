@@ -7941,6 +7941,107 @@ of the three share a test set.
     mass, massless $b$); no decayed final states. Open: the implementation and its CPU validation against the coverage
     check, the regeneration of the pools, the short pretrainings again (GPU estimate to the user with the run); the
     forward component's two shares are still the check's choices.
+  \item \textbf{catalog\_v4's validation and census (open; run \code{FA-ccin2p3-44e6a15b}).}
+    % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
+    % claim: val.n_rows=35
+    % claim: val.n_ok=0
+    % claim: val.n_pool_error=35
+    % claim: val.t_build_min=12
+    % claim: val.t_build_max=27
+    % claim: val.t_build_mean=20
+    % claim: val.tool_matches_v3=34
+    % claim: val.bound_attained=10
+    % claim: val.bound_tested=10
+    % claim: val.mt_172=33
+    % claim: val.wt=1.4803
+    % claim: val.wt_mt50=0
+    % claim: val.wt_mt300=8.73
+    % claim: val.v4_uux_ddx.v3=1
+    % claim: val.v4_uux_ddx.v4=4
+    % claim: val.v4_uu_uuz.v3=8
+    % claim: val.v4_uu_uuz.v4=24
+    % claim: val.v4_ud_dhu.v3=2
+    % claim: val.v4_bbx_wpwm.v4=3
+    % claim: val.v4_bbx_ggtaptamz.v3=154
+    % claim: val.v4_bbx_ggtaptamz.v4=100
+    % claim: val.loops.entries=167
+    % claim: val.loops.loop_qcd_qed_entries=6
+    % allow: 172.5 300 50 because they are the approved top mass and heavy-quark points, settings
+    The sampled $35$ entries (every layer and beam, the three electroweak test processes, the heavy-quark, $\alpha_s$,
+    harder-cut and BSM points) built their backends ($12$ to $27$\,s each, mean $20$\,s), and all $35$ then stopped
+    before a pool: the validation registers the entries without the recipe's \code{sampling} block, so the generator
+    took the flat path, which refuses the log-uniform $\sqrt{\hat s}$ (``implemented on the mixture path only''). The
+    regeneration attaches the block (\code{register\_recipe\_processes}); the script does not. So $0$ entries have their
+    pool checks (cuts recomputed, log-uniform $\sqrt{\hat s}$, the forward angle, mass shells, seconds per event): not
+    measured yet. What did run: the diagram tool reproduces catalog\_v3's recorded count on all $34$ SM entries; the
+    QED bound is attained wherever it exceeds catalog\_v3's minimal order ($10$ of $10$); $u\bar u\to d\bar d$ goes from
+    $1$ to $4$ diagrams and $uu\to uuZ$ from $8$ to $24$ (the electroweak exchanges), $ud\to udh$ stays at $2$ (its
+    vector-boson fusion was already the minimal order); the massless $b$ removes the $b$-Yukawa Higgs diagrams
+    ($b\bar b\to W^+W^-$ $4\to3$, $b\bar b\to gg\tau^+\tau^-Z$ $154\to100$). The cards: MT $=$ ymt $=172.5$ in the $33$
+    entries with no heavy-quark point, WT $=1.4803$ (the LO width with a massless $b$), $8.73$ at $m_Q=300$\,GeV and
+    $0$ at $m_Q=50$\,GeV (below $Wb$, the heavy quark is stable); no $b$ mass or Yukawa in any card; the card check
+    itself reads no model from the standalone's proc card, so its flag is false everywhere. The one-loop layer's $167$
+    entries are configured as designed, but $6$ of them name \code{loop\_qcd\_qed\_sm-no\_b\_mass}, which MadGraph did
+    not import on CC.
+    % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
+    % claim: total.n=2404
+    % claim: total.exists=2370
+    % claim: total.vanished=34
+    % claim: census.l2.exists=119
+    % claim: census.l2.n=123
+    % claim: census.l2.d3=213
+    % claim: census.l2.d4=287
+    % claim: census.l3.exists=497
+    % claim: census.l3.n=507
+    % claim: census.l3.d3=2713
+    % claim: census.l3.d4=4024
+    % claim: census.l4.exists=1715
+    % claim: census.l4.n=1734
+    % claim: census.l4.d3=39384
+    % claim: census.l4.d4=70281
+    % claim: census.l5.exists=39
+    % claim: census.l5.n=40
+    % claim: census.l5.d3=5016
+    % claim: census.l5.d4=8689
+    % claim: total.ratio=1.76
+    % claim: total.grew=865
+    % claim: total.shrank=230
+    \emph{The census} (every catalog\_v3 tree on its v4 string, Fig.~\ref{fig:v4_census}): $2370$ of $2404$ strings
+    exist; by layer $119/123$, $497/507$, $1715/1734$, $39/40$ ($2\to2$ to $2\to5$), with $213\to287$, $2713\to4024$,
+    $39384\to70281$, $5016\to8689$ diagrams, $1.76$ times as many overall; $865$ strings gained diagrams, $230$ lost some
+    (the $b$ Yukawa). The $34$ that vanish are all a Higgs on a $b$ line with nothing else to couple to it
+    ($b\bar b\to h$, $h+\gamma/g$, $hh$, $bg\to bh$, $gg\to b\bar bh$, ...): MadGraph finds no diagram once the $b$ is
+    massless, so these classes leave the catalog unless the $b$ keeps a Yukawa.
+    % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
+    % claim: disk.events_mb=51
+    % claim: disk.standalone_mb=2.3
+    % claim: disk.tree_backends=1655
+    % claim: disk.backends_gb=89
+    % claim: disk.backends_sa_gb=3.7
+    % claim: disk.pool_entries=1974
+    % claim: disk.pool_gb=53
+    % claim: disk.total_gb=142
+    % claim: disk.total_sa_gb=57
+    % claim: disk.free_gb=27.4
+    % claim: disk.v3_events_dirs=1790
+    % claim: disk.v3_events_gb=92
+    % claim: disk.build_core_h=9
+    % allow: 5 1 because they are a column count's terms (5k+1), no results
+    \emph{The regeneration's disk and CPU.} A built tree backend is $51$\,MB of MadGraph events directory (made by every
+    build, used only for LHE) plus $2.3$\,MB of standalone. The $1974$ pool entries at the approved sizes, float64,
+    $5k+1$ columns, are $53$\,GB; their $1655$ tree backends $89$\,GB ($3.7$\,GB without the events directories): $142$\,GB in
+    all, $57$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
+    directories hold about $92$\,GB there. The builds cost about $9$ core-hours; the generation's CPU is not measured
+    (no pool ran) and the one-loop backends' size neither. Next: the validation registers the recipe's sampling and
+    reruns without the census (its backends are reused), then the regeneration once the energy hold-out's window is
+    settled and the disk has room.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/census_diagrams.pdf}
+  \caption{MadGraph's diagram count of every catalog\_v3 tree on its catalog\_v4 string (full coupling orders,
+    massless $b$) against its catalog\_v3 count, by layer; the $34$ strings with no v4 diagram are left out.}
+  \label{fig:v4_census}
+\end{figure}
   \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
     % allow: 6 because it is a rung's index, a name
     next}); this item only summarises it. The study runs on catalog\_v3 (Daniel's catalog and its extra probes untouched
