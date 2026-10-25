@@ -20,8 +20,9 @@ the medians over probes, the 10% and 90% MSE quantiles, the count against the re
 For the held-out classes, the same arm's read of the same class on its window pool (data/short_reads.json) beside it.
 Each probe's pp events are also split into those inside what its class's window pools cover (collect) and the rest.
 Figure pp_compare: (a) the window-trained dimensionless arm's MSE per class on the pp pool against its window pool;
-(b) the same on the pp events inside the windows' support. Figure pp_trained (once its reads exist): the pp-trained
-arm's MSE per class against the window-trained dimensionless arm's, both on the pp pools. The last line printed is
+(b) the same on the pp events inside the windows' support. Figure pp_trained (once its reads exist), one panel per
+group: the median per-class ratio of the pp-trained arm's MSE to each window-trained arm's, on the pp pool, inside and
+outside the windows' coverage, and on the window pools (held-out groups: data/pp_window_rows.json, collect-windows). The last line printed is
 the numbers docs/results.tex quotes, as one JSON object.
     python3 analysis/catalog_v3/pp_compare.py   -> data/pp_compare.json, figs/pp_compare.{png,pdf}
 """
@@ -157,6 +158,27 @@ def collect():
     json.dump(out, sys.stdout)
 
 
+def collect_windows():
+    """on the site: the pp-trained arm's zero-shot reads of the held-out classes on their window pools
+    (scripts/job_catalog_v3_short.sh, $SCRATCH/zz_v3_short_dimensionless_pp/<axis>/<probe>.npz, 2000 validation
+    events), reduced per probe as data/short_reads.json holds the window-trained arms' (short_reads.read), with the
+    window-trained dimensionless arm's same reads beside them as a check of that reduction. Printed as JSON:
+        python analysis/catalog_v3/pp_compare.py collect-windows > analysis/catalog_v3/data/pp_window_rows.json"""
+    out = {}
+    for arm in ("dimensionless_pp", "dimensionless"):
+        for axis in ("H1", "H2", "H3"):
+            rows = {}
+            for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], f"zz_v3_short_{arm}", axis, "*.npz"))):
+                z = np.load(f)
+                if "q" not in z.files or len(z["q"]) != len(z["t"]) or not len(z["t"]):
+                    continue
+                d = z["q"].astype(float) - z["t"].astype(float)
+                rows[os.path.basename(f)[:-4]] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2),
+                                                  "shape": float(np.var(d))}
+            out.setdefault(arm, {})[axis] = {"probes": rows}
+    json.dump(out, sys.stdout)
+
+
 def read(arm, rows_all):
     a = rows_all.get(arm)
     return (a["pp"], a["no_prediction"]) if a else (None, None)
@@ -179,6 +201,8 @@ def main():
     sr_path = os.path.join(HERE, "data", "short_reads.json")
     sr = json.load(open(sr_path)) if os.path.exists(sr_path) else {}
     rows_all = json.load(open(os.path.join(HERE, "data", "pp_rows.json")))
+    wr_path = os.path.join(HERE, "data", "pp_window_rows.json")
+    wr = json.load(open(wr_path)) if os.path.exists(wr_path) else {}
     res, claims = {}, {}
     for arm in ARMS:
         rows, bad = read(arm, rows_all)
@@ -207,6 +231,8 @@ def main():
                 # the pp-trained arm trained the class on pp events (pp13_<x>): its in-run loss is on pp, not a window
                 ent["in_run_pp"] = {p: own[p] for p in r if p in own}
                 ent["not_in_arm_training"] = sorted(p for p in r if p not in own and "v3_" + p[len("pp13_"):] not in own)
+            elif arm == "dimensionless_pp":                  # its window reads, collected on the site
+                win = wr.get(arm, {}).get(grp, {}).get("probes", {})
             else:
                 win = sr.get(arm, {}).get(grp, {}).get("probes", {})
             wk = lambda p: "v3_" + p[len("pp13_"):]
@@ -240,7 +266,9 @@ def main():
                                                        "n_pp_worse", "ratio_inside", "n_inside_worse")} if w else {})}
             if w:
                 c["n_pairs"] = w["n"]
-            claims.setdefault("support", {})[grp] = ent["support"]
+            # what the window pools cover is a property of the events, not of an arm: kept from the first arm with the
+            # group's reads (a window-trained arm, complete), never from a partial read
+            claims.setdefault("support", {}).setdefault(grp, ent["support"])
             print(f"{arm:24s} {grp:5s} n={ent['n']:4d}/{len(exp):4d} mse {ent['mse']:.3g} level {ent['level']:.3g} "
                   f"shape {ent['shape']:.3g}" +
                   (f" | window {w['mse_window']:.3g} on the same {w['n']}, ratio {w['ratio']:.3g} ({w['n_pp_worse']} "
@@ -252,9 +280,54 @@ def main():
         print(f"support {grp:5s}", {k: (round(v, 3) if v is not None else None) for k, v in sp.items()})
     claims["n_classes"] = len(g)
     claims["n_no_prediction"] = sum(len(res[a]["no_prediction"]) for a in res)
+    claims["pp_vs"] = res["pp_vs"] = pp_vs(res)
     json.dump(res, open(os.path.join(HERE, "data", "pp_compare.json"), "w"), indent=1)
     plot(res)
     print(json.dumps(claims))
+
+
+MEASURES = (("mse", "pp pool"), ("mse_inside", "pp, inside the windows"), ("mse_outside", "pp, outside the windows"),
+            ("window", "window pool"))
+
+
+def pp_vs(res):
+    """the pp-trained arm against each window-trained arm, per group, on the classes both read: per class the ratio of
+    their MSEs (pp-trained over window-trained), its median over classes (a median of log ratios) and the count where
+    the pp-trained arm is lower, on the whole pp pool, on its events inside and outside what the window pools cover,
+    and on the window pools (held-out groups only: a training class has no window read for the pp-trained arm, which
+    trained it on pp). The training group is the pp-trained arm's scored subset (n_pp of n_expected) until its read is
+    complete."""
+    b = res.get("dimensionless_pp")
+    if not b:
+        return {}
+    out = {}
+    for arm in ARMS[:-1]:
+        a = res.get(arm, {})
+        for grp in GROUPS:
+            pa, pb = a.get(grp, {}).get("probes", {}), b.get(grp, {}).get("probes", {})
+            common = sorted(set(pa) & set(pb))
+            e = {"n": len(common), "n_pp": b.get(grp, {}).get("n", 0), "n_expected": b.get(grp, {}).get("n_expected")}
+            for key, _ in MEASURES:
+                if key == "window":
+                    wa, wb = a.get(grp, {}).get("window_pairs", {}), b.get(grp, {}).get("window_pairs", {})
+                    if grp == "train":
+                        continue
+                    ps_ = [p for p in common if p in wa and p in wb]
+                    x, y = [wa[p] for p in ps_], [wb[p] for p in ps_]
+                else:
+                    ps_ = [p for p in common if pa[p].get(key) is not None and pb[p].get(key) is not None]
+                    x, y = [pa[p][key] for p in ps_], [pb[p][key] for p in ps_]
+                if not ps_:
+                    continue
+                lr = np.log10(np.array(y) / np.array(x))
+                e[key] = {"n": len(ps_), "pp_trained": med(y), "window_trained": med(x),
+                          "ratio": float(10 ** np.median(lr)), "ratio_q10_q90": [float(10 ** q) for q in np.quantile(lr, [0.1, 0.9])],
+                          "n_pp_lower": int((lr < 0).sum())}
+            out.setdefault(arm, {})[grp] = e
+            print(f"pp-trained vs {arm:22s} {grp:5s} n={e['n']:4d} " + "; ".join(
+                f"{lab} {e[k]['pp_trained']:.3g} vs {e[k]['window_trained']:.3g} ratio {e[k]['ratio']:.3g} "
+                f"({e[k]['n_pp_lower']}/{e[k]['n']} lower)" for k, lab in MEASURES if k in e))
+    return out
 
 
 def plot(res):
@@ -286,25 +359,32 @@ def plot(res):
     axs[1].set_ylabel("MSE, pp inside the windows")
     ps.shared_legend(fig, axs[0], ncol=5)
     ps.save(fig, os.path.join(HERE, "figs", "pp_compare"))
-    b = res.get("dimensionless_pp", {})
-    if not any(b.get(grp, {}).get("probes") for grp in GROUPS):
+    v = res.get("pp_vs", {})
+    if not v:
         return
-    fig, ax = ps.figure()
-    lo, hi = np.inf, 0
-    for grp in GROUPS:
-        x_, y_ = a.get(grp, {}).get("probes", {}), b.get(grp, {}).get("probes", {})
-        ps_ = sorted(set(x_) & set(y_))
-        if ps_:
-            x, y = [x_[p]["mse"] for p in ps_], [y_[p]["mse"] for p in ps_]
-            ax.plot(x, y, marks[grp][0], mfc="none", ms=3, alpha=0.6, color=marks[grp][1], label=NAMES[grp])
-            lo, hi = min(lo, min(x), min(y)), max(hi, max(x), max(y))
-    ax.plot([lo, hi], [lo, hi], ls="--", color="k", label="equal")
-    ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("MSE on pp, trained on windows"); ax.set_ylabel("MSE on pp, trained on pp")
-    ps.legend(ax, "upper left")
-    ps.make_room(ax, max_growth=4)
-    ps.save(fig, os.path.join(HERE, "figs", "pp_trained"))
+    arms = [("baseline", "baseline"), ("dimensionless", "dimen-\nsionless"), ("dimensionless_context", "with\ncontext"),
+            ("dimensionless_twin", "twin")]
+    cols = (ps.C.blue, ps.C.green, ps.C.vermillion, ps.C.grey)
+    figs = ps.panels(4)
+    for (fig, ax), grp in zip(figs, ("train", "H1", "H2", "H3")):
+        x = np.arange(len(arms))
+        for j, ((key, lab), col) in enumerate(zip(MEASURES, cols)):
+            y = [v[a][grp][key]["ratio"] if key in v[a][grp] else np.nan for a, _ in arms]
+            if not np.all(np.isnan(y)):
+                ax.bar(x + (j - 1.5) * 0.2, y, 0.2, color=col, label=lab)
+        ax.axhline(1, ls="--", color="k", label="equal")
+        ax.set_xticks(x)
+        ax.set_xticklabels([l for _, l in arms])
+        ax.set_yscale("log")
+        ax.set_ylim(0.05, 5)                          # one range for the four groups
+        ax.set_ylabel("MSE ratio, pp / windows")
+        e = v["dimensionless"][grp]
+        part = e["n_pp"] < e["n_expected"]
+        ax.set_xlabel(NAMES[grp] + (f", {e['n_pp']}/{e['n_expected']}, interim" if part else ""))
+    ps.legend(figs[1][1], "upper left")
+    ps.make_room(figs[1][1])
+    ps.save_panels(figs, os.path.join(HERE, "figs", "pp_trained"))
 
 
 if __name__ == "__main__":
-    collect() if sys.argv[1:] == ["collect"] else main()
+    {"collect": collect, "collect-windows": collect_windows}.get((sys.argv[1:] or [""])[0], main)()
