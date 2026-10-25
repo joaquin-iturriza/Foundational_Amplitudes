@@ -1809,7 +1809,8 @@ def _load_catalog_2to4():
         for name, entry in (d.get("processes") or {}).items():
             if name in PROCESSES:
                 raise KeyError(f"catalog_2to4 entry {name} collides with an existing process")
-            PROCESSES[name] = dict(entry, lhe={**lhe, **(entry.get("lhe") or {})})   # an entry's own lhe keys win (its param card); n += 1
+            # an entry's own lhe keys win (its param card)
+            PROCESSES[name] = dict(entry, lhe={**lhe, **(entry.get("lhe") or {})}); n += 1
     return n
 
 CATALOG_2TO4_ENTRIES = _load_catalog_2to4()
