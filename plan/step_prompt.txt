@@ -33,4 +33,6 @@ The step
    `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"`.
 Rules: CLAUDE.md. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 10 GPU-h only if the user's words above cover it.
-Final message, short: what you did, what you found (numbers), what you recorded, the next step, any question.
+Final message, short: what you did, what you found (numbers), the figure files that show it (absolute paths of the
+.png, every result has one: the main session sends them to the user with the result), what you recorded, the next
+step, any question.
