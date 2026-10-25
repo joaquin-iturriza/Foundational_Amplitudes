@@ -26,7 +26,7 @@ import siteconf  # noqa: E402
 import mg5_pipeline_final as mg  # noqa: E402
 from rebuild_run import _build, load_best_weights  # noqa: E402
 from kshot_context import cat_batches, parent_frame  # noqa: E402
-from factorised_2to4 import ii_map, pool  # noqa: E402
+from factorised_2to4 import beam_recoil_map, ii_map, pool, to_parent_order, v3_probes  # noqa: E402
 
 def main():
     ap = argparse.ArgumentParser()
@@ -36,26 +36,45 @@ def main():
     ap.add_argument("--n", type=int, default=2000)
     ap.add_argument("--out", default=os.path.join(os.environ.get("SCRATCH", "."), "zz_factorised_2to4_net"))
     ap.add_argument("--only", nargs="*", default=None)
+    ap.add_argument("--v3-nfinal", type=int, default=0,
+                    help="catalog_v3: its probes of this multiplicity (factorised_2to4.py --v3 --nfinal), the parents' "
+                         "entries from recipes/catalog_v3_train.yaml")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     parent_run = os.path.abspath(a.parent)
     pstats = json.load(open(os.path.join(parent_run, "data_stats.json")))
-    train = {e["name"]: e for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_daniel_train.yaml")))["processes"]}
+    tr = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_train.yaml" if a.v3_nfinal
+                                          else "catalog_daniel_train.yaml")))
+    top = {k: v for k, v in tr.items() if k != "processes"}     # catalog_v3's sampling: mixture
+    train = {e["name"]: e for e in tr["processes"]}
     rdir = tempfile.mkdtemp(prefix="f24net_", dir=os.environ["SCRATCH"])
-    for p in [e["name"] for e in yaml.safe_load(open(a.recipe))["processes"]]:
+    if a.v3_nfinal:
+        jobs = v3_probes(a.v3_nfinal)
+    else:
+        jobs = [(e["name"], mg.PROCESSES[e["name"]]["parent"], None) for e in yaml.safe_load(open(a.recipe))["processes"]]
+    for p, par, extra in jobs:
         if a.only and p not in a.only:
             continue
+        if par not in train:                               # a parent that is not a training process: listed
+            print("F24NET " + json.dumps(dict(probe=p, parent=par, error="parent not a training process")), flush=True)
+            continue
         cfg4 = mg.PROCESSES[p]
-        par = cfg4["parent"]
         ids4 = [int(i) for i in cfg4["pdg_ids"]]
+        extra = ids4[-1] if extra is None else extra
         z = np.load(os.path.join(a.f24, p + ".npz"))
         X, al, _ = pool(p)
         X = X[: a.n]
         N = len(ids4)
         P = X[:, : 4 * N].reshape(-1, N, 4).astype(np.float64)
-        cand = [j for j in range(2, N) if ids4[j] == ids4[-1]]
+        cand = [j for j in range(2, N) if ids4[j] == extra]
         pt = np.sqrt(P[:, cand, 1] ** 2 + P[:, cand, 2] ** 2)
-        Pm, _, _ = ii_map(P, np.asarray(cand)[pt.argmin(1)])
+        k_slot = np.asarray(cand)[pt.argmin(1)]
+        # the same map and row order as factorised_2to4.py, so t3 there labels these rows
+        Pm, _, _ = (beam_recoil_map if any(abs(q) == 5 for q in ids4[:2]) else ii_map)(P, k_slot)
+        if a.v3_nfinal:
+            ids3l = [int(i) for i in mg.PROCESSES[par]["pdg_ids"]]
+            Pm = np.stack([to_parent_order(Pm[i:i + 1], [ids4[j] for j in range(N) if j != int(k_slot[i])], ids3l)[0]
+                           for i in range(len(Pm))])
         t3 = np.asarray(z["t3"], np.float64)
         n = len(Pm)
         ids3 = np.asarray(mg.PROCESSES[par]["pdg_ids"], np.float64)
@@ -68,7 +87,7 @@ def main():
         if alphas is not None:
             np.save(vpath[:-len(".npy")] + ".alphas.npy", alphas)
         rec_path = os.path.join(rdir, par + ".yaml")
-        yaml.safe_dump({"processes": [train[par]]}, open(rec_path, "w"))
+        yaml.safe_dump({**top, "processes": [train[par]]}, open(rec_path, "w"))
         cfg = OmegaConf.load(os.path.join(parent_run, "config.yaml"))
         with open_dict(cfg):
             cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
