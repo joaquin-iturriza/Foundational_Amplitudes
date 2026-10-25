@@ -36,6 +36,16 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    (a rule here, a guard, a tool fix), made in the same turn; then the fix of the instance. A mistake whose prevention
    needs a permission I hold (a hook, a setting) is proposed to me as a concrete diff.
 
+0e. **Plain names, no internal codes, in anything I read.** Messages to me and the notes name a thing by what it is
+   ("the dimensionless target with the context vector", "my decision to delete catalog_v2", "the prep job's failure"),
+   never by a code: no D-numbers, E-numbers, run ids, arm codes (B, Q, DlessInOrdQ) or recipe tags on their own. An id
+   may follow the description in brackets when I need it to look something up. New arms, sweeps and run directories get
+   descriptive names (`dimensionless_context`, not `Qc`).
+
+0f. **When my answer unblocks waiting work, that work goes out first.** A job held on a question of mine is launched
+   in the same turn the answer arrives, before write-ups or other items. (2026-10-24: the 68 b/t one-loop strings
+   waited 2 h after my answer while the agent wrote up other results first.)
+
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
    `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`
