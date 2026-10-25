@@ -401,6 +401,80 @@ training, H1 new combinations, H2 multiplicity, H3 particle content. (b) One-loo
 \label{fig:v3_levels}
 \end{figure}
 
+\paragraph{catalog\_v3's short pretrainings, read zero-shot (2026-10-25).} Four arms, one seed each, the same short
+setup (\code{scripts/job\_catalog\_v3\_short.sh}: $4264$ steps, five epochs of the $1397$ training pools, the twin $3803$
+over its $1246$; the sign head for the sign-changing one-loop pools, the MSE with the arithmetic mean, the diagram
+encoder with the BSM layer's labels; $\sim1$ GPU-h each): the \emph{baseline}, one shared standardization of
+$\log|\mathcal M|^2$ in GeV; the \emph{dimensionless target} (the emission scales of par.~\ref{par:dimless_qperp},
+dimensionless inputs, coupling orders); the same \emph{with the context vector} (par.\ The context vector; read here
+at $c=0$); and the dimensionless target trained on the \emph{twin}, without any pool with a $\tau$ or $\nu_\tau$ or
+built on a quartic-gauge class. Each read every held-out axis on $2000$ validation events per process
+(\code{tools/zero\_shot\_parent.py}; \code{analysis/catalog\_v3/short\_reads.py}, \code{data/short\_reads.json}): the
+MSE of $\log|\mathcal M|^2$ (for a sign-changing one-loop pool, of $\log\max(|\mathcal M|^2,\text{floor})$, the sign
+head's magnitude), split into the level, the squared mean error, which one number per process removes, and the shape,
+what is left. Every probe of every axis was read ($617$ per arm, the twin $754$ of $761$: the $7$ sign-changing
+one-loop $\tau$ pools of its never-seen-particle axis are being read again with the magnitude scoring). The training
+losses are on different targets and not compared; these reads all are on $\log|\mathcal M|^2$.
+
+\begin{table}[H]
+\centering
+\caption{catalog\_v3's four short arms read zero-shot: the median over each axis's processes of the MSE of
+$\log|\mathcal M|^2$ and, in brackets, of its level part. One seed each.}
+\label{tab:v3_short}
+\small
+\begin{tabular}{lrcccc}
+\hline
+held-out axis & processes & baseline & dimensionless & with context & twin \\
+\hline
+new combinations (H1) & $54$ & $1.01$ ($0.17$) & $0.84$ ($0.06$) & $0.75$ ($0.06$) & $0.93$ ($0.13$) \\
+$2\to4$ families (H2) & $168$ & $1.12$ ($0.20$) & $1.04$ ($0.11$) & $1.08$ ($0.09$) & $1.17$ ($0.11$) \\
+the physical top (H3) & $237$ & $1.86$ ($0.48$) & $1.67$ ($0.52$) & $1.46$ ($0.35$) & $1.82$ ($0.55$) \\
+one loop (H5) & $30$ & $1.25$ ($0.40$) & $1.12$ ($0.25$) & $1.34$ ($0.31$) & $0.85$ ($0.31$) \\
+$\alpha_s=0.13$ (H6) & $8$ & $0.22$ ($0.03$) & $0.14$ ($0.01$) & $0.16$ ($0.03$) & $0.20$ ($0.01$) \\
+$p_T\geq30$\,GeV (H7) & $40$ & $0.54$ ($0.03$) & $0.44$ ($0.01$) & $0.42$ ($0.01$) & $0.44$ ($0.01$) \\
+$2\to5$ (H2) & $40$ & $46$ ($43$) & $1.21$ ($0.10$) & $1.03$ ($0.09$) & $1.31$ ($0.13$) \\
+$\sqrt{\hat s}\in[1,10]$\,TeV (H7) & $40$ & $64$ ($39$) & $2.88$ ($0.34$) & $2.29$ ($0.18$) & $3.12$ ($0.43$) \\
+$\tau$, $\nu_\tau$ never seen & $129$ of $136$ & & & & $4.49$ ($0.58$) \\
+quartic vertex never seen & $15$ & & & & $0.68$ ($0.15$) \\
+\hline
+\end{tabular}
+\end{table}
+
+What the table and Fig.~\ref{fig:v3_short} say:
+\begin{itemize}
+  \item \emph{The dimensionless target is what extrapolates.} Past the training range the baseline's error is its level
+  ($43$ of $46$ at $2\to5$, $39$ of $64$ at $1$ to $10$\,TeV): a level read in GeV has no rule for a new multiplicity or
+  energy. The dimensionless target takes both to $1.2$ and $2.9$, better on every one of the $40$ probes of each (median
+  per-probe ratio $0.03$ and $0.07$). Within the catalog's range it gains less: median per-probe ratio $0.78$ to $1.02$
+  per axis, better on $116$ of the $237$ top probes and on $34$ of the $54$ new combinations.
+  \item \emph{The context vector, read at $c=0$, is close to neutral zero-shot}: median per-probe ratio against the same
+  target without it $0.91$ (top) to $1.22$ ($\alpha_s=0.13$, $8$ probes), better on $138$ of the $237$ top probes and on
+  $13$ of the $30$ one-loop ones. Its use is the $K$-shot fit, still to be read on catalog\_v3.
+  \item \emph{A particle never seen costs its shape, a vertex never seen does not.} With no $\tau$ or $\nu_\tau$ in
+  training, the $129$ processes with one are read at $4.5$, three quarters of it shape ($3.2$): the $\tau$'s mass and
+  generation sit in its property vector, and what the network learned from the $e$ and $\mu$ does not carry
+  over to it (the other arms trained on these processes, so there is no zero-shot reference for them).
+  The $15$ processes built on a quartic-gauge class the twin never saw are read at $0.68$, as well as the new
+  combinations. Removing those pools costs the twin a little elsewhere (median per-probe ratio against the full
+  catalog $0.91$ to $1.13$ per axis).
+  \item \emph{The sign of a one-loop pool.} On the $17$ of the $30$ held-out one-loop pools that change sign
+  (\code{tools/signed\_ab\_score.py}), the baseline gets $5\%$ of the signs wrong (median per pool), the dimensionless
+  target $18\%$, with it the context vector $19\%$ and the twin $12\%$; near the crossing (within a factor $10$ of zero,
+  $7$ to $9\%$ of the events) $29$ to $39\%$ for every arm. Why the dimensionless target loses the sign is not
+  measured (one guess: its per-event rescaling moves where the crossing sits in the target); one seed, so this is a
+  lead, not a finding.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/short_reads.pdf}
+\caption{catalog\_v3's short arms, per held-out process: the zero-shot MSE of $\log|\mathcal M|^2$ of one arm against
+another's. (a) The dimensionless target against the baseline; (b) with the context vector (at $c=0$) against without it.
+Triangles: the $2\to5$ probes and the classes at $\sqrt{\hat s}\in[1,10]$\,TeV, beyond the training range; circles:
+every other held-out process.}
+\label{fig:v3_short}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram

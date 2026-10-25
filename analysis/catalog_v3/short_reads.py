@@ -70,26 +70,34 @@ def main():
 
 
 def plot(res):
+    """per probe, one arm's zero-shot MSE against another's on the same probes: (a) the dimensionless target against
+    the baseline, (b) the context vector against the dimensionless target without it; the probes of the two
+    extrapolation axes (2->5, 1-10 TeV) apart from the rest. The table in docs/results.tex carries the counts."""
     import plot_style as ps
-    fig, ax = ps.figure()
-    axes = [a for a in AXES if any(a in res.get(arm, {}) for arm in ARMS)]
-    has = lambda arm, a: a in res.get(arm, {}) and res[arm][a]["n"] > 0
-    cols = {"baseline": ps.C.grey, "dimensionless": ps.C.blue, "dimensionless_context": ps.C.green,
-            "dimensionless_twin": ps.C.vermillion, "dimensionless_pp": ps.C.orange}
-    marks = {"baseline": "o", "dimensionless": "s", "dimensionless_context": "^", "dimensionless_twin": "D",
-             "dimensionless_pp": "v"}
-    for j, arm in enumerate(ARMS):
-        xs = [i + 0.15 * (j - 2) for i, a in enumerate(axes) if has(arm, a)]
-        ys = [res[arm][a]["mse"] for a in axes if has(arm, a)]
-        if xs:
-            ax.plot(xs, ys, marks[arm], color=cols[arm], label=arm.replace("_", " "))
-    ax.set_yscale("log")
-    ax.set_xticks(range(len(axes)))
-    # each axis's read count, n of the recipe's (the smallest over the arms, so a short arm shows)
-    ax.set_xticklabels([a + "\n" + str(min(res[arm][a]["n"] for arm in ARMS if a in res.get(arm, {}))) + "/"
-                        + str(next(res[arm][a]["n_expected"] for arm in ARMS if a in res.get(arm, {}))) for a in axes])
-    ax.set_xlabel("held-out axis"); ax.set_ylabel(r"median MSE$(\log|\mathcal{M}|^2)$")
-    ps.legend(ax, "upper left"); ps.make_room(ax)
+    fig, axs = ps.figure(ncols=2)
+    extra = ("H2p5", "H7E")
+    for ax, (x_arm, y_arm, xl, yl) in zip(axs, (("baseline", "dimensionless", "baseline", "dimensionless target"),
+                                               ("dimensionless", "dimensionless_context", "dimensionless target",
+                                                "with the context vector"))):
+        lo, hi = np.inf, 0
+        for grp, col, mk, lab in ((False, ps.C.blue, "o", "within the catalog's range"),
+                                  (True, ps.C.vermillion, "^", r"$2\to5$ and $1$-$10$ TeV")):
+            xs, ys = [], []
+            for a in AXES:
+                if (a in extra) != grp or a not in res.get(x_arm, {}) or a not in res.get(y_arm, {}):
+                    continue
+                px, py = res[x_arm][a].get("probes", {}), res[y_arm][a].get("probes", {})
+                for p in sorted(set(px) & set(py)):
+                    xs.append(px[p]["mse"]); ys.append(py[p]["mse"])
+            if xs:
+                ax.plot(xs, ys, mk, mfc="none", color=col, label=lab)
+                lo, hi = min(lo, min(xs), min(ys)), max(hi, max(xs), max(ys))
+        ax.plot([lo, hi], [lo, hi], ls="--", color=ps.C.grey, label="equal")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel(f"MSE, {xl}"); ax.set_ylabel(f"MSE, {yl}")
+    ps.legend(axs[0], "upper left")
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "short_reads"))
 
 
