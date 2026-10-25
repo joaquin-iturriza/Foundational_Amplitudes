@@ -412,8 +412,8 @@ built on a quartic-gauge class. Each read every held-out axis on $2000$ validati
 (\code{tools/zero\_shot\_parent.py}; \code{analysis/catalog\_v3/short\_reads.py}, \code{data/short\_reads.json}): the
 MSE of $\log|\mathcal M|^2$ (for a sign-changing one-loop pool, of $\log\max(|\mathcal M|^2,\text{floor})$, the sign
 head's magnitude), split into the level, the squared mean error, which one number per process removes, and the shape,
-what is left. Every probe of every axis was read ($617$ per arm, the twin $754$ of $761$: the $7$ sign-changing
-one-loop $\tau$ pools of its never-seen-particle axis are being read again with the magnitude scoring). The training
+what is left. Every probe of every axis was read ($617$ per arm, the twin $761$; the twin's $7$ sign-changing one-loop
+$\tau$ pools were left out of its first read and read again with the magnitude scoring, run FA-ccin2p3-aeb819d4). The training
 losses are on different targets and not compared; these reads all are on $\log|\mathcal M|^2$.
 
 \begin{table}[H]
@@ -434,7 +434,7 @@ $\alpha_s=0.13$ (H6) & $8$ & $0.22$ ($0.03$) & $0.14$ ($0.01$) & $0.16$ ($0.03$)
 $p_T\geq30$\,GeV (H7) & $40$ & $0.54$ ($0.03$) & $0.44$ ($0.01$) & $0.42$ ($0.01$) & $0.44$ ($0.01$) \\
 $2\to5$ (H2) & $40$ & $46$ ($43$) & $1.21$ ($0.10$) & $1.03$ ($0.09$) & $1.31$ ($0.13$) \\
 $\sqrt{\hat s}\in[1,10]$\,TeV (H7) & $40$ & $64$ ($39$) & $2.88$ ($0.34$) & $2.29$ ($0.18$) & $3.12$ ($0.43$) \\
-$\tau$, $\nu_\tau$ never seen & $129$ of $136$ & & & & $4.49$ ($0.58$) \\
+$\tau$, $\nu_\tau$ never seen & $136$ & & & & $4.75$ ($0.67$) \\
 quartic vertex never seen & $15$ & & & & $0.68$ ($0.15$) \\
 \hline
 \end{tabular}
@@ -451,7 +451,7 @@ What the table and Fig.~\ref{fig:v3_short} say:
   target without it $0.91$ (top) to $1.22$ ($\alpha_s=0.13$, $8$ probes), better on $138$ of the $237$ top probes and on
   $13$ of the $30$ one-loop ones. Its use is the $K$-shot fit, still to be read on catalog\_v3.
   \item \emph{A particle never seen costs its shape, a vertex never seen does not.} With no $\tau$ or $\nu_\tau$ in
-  training, the $129$ processes with one are read at $4.5$, three quarters of it shape ($3.2$): the $\tau$'s mass and
+  training, the $136$ processes with one are read at $4.8$, most of it shape ($3.3$): the $\tau$'s mass and
   generation sit in its property vector, and what the network learned from the $e$ and $\mu$ does not carry
   over to it (the other arms trained on these processes, so there is no zero-shot reference for them).
   The $15$ processes built on a quartic-gauge class the twin never saw are read at $0.68$, as well as the new
