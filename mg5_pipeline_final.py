@@ -1887,15 +1887,19 @@ def repatch_standalone_param_cards(standalone_dir, config):
         if os.path.exists(pc):
             patch_param_card_slha(pc, patches)
 
-def generate_mg5_process(process_name, config, events=False):
-    """Run MadGraph to generate the standalone outputs, plus the MadEvent dir only when asked:
+def generate_mg5_process(process_name, config, events=None):
+    """Run MadGraph to generate the standalone outputs, plus the MadEvent dir:
        - <proc>_standalone     : standalone_cpp (C++ driver, fixed α_s) — fallback
        - <proc>_standalone_py  : Fortran standalone (matrix2py, per-event α_s) — preferred
-       - <proc>_events         : MadEvent output (events=True), read only by the fixed-energy LHE
-                                 mode of main() (configure_cards / run_event_generation / the LHE
-                                 reader). The recipe path (datagen.ensure_backend, generate_from_recipe)
-                                 reads the standalone alone, so it builds no events dir (~51 MB each).
+       - <proc>_events         : MadEvent output, read only by the fixed-energy LHE mode of main()
+                                 (configure_cards / run_event_generation / the LHE reader; it passes
+                                 events=True). The recipe path (datagen.ensure_backend,
+                                 generate_from_recipe) reads the standalone alone, so a catalog_v4
+                                 entry (`_v4`) builds no events dir (~51 MB each); events=None keeps
+                                 every other entry's (catalog_v3's) behaviour, the events dir included.
     """
+    if events is None:
+        events = not config.get("_v4")
     events_dir    = f"{WORK_DIR}/{process_name}_events"
     standalone_dir = f"{WORK_DIR}/{process_name}_standalone"
     fortran_dir    = fortran_dir_for(standalone_dir)
