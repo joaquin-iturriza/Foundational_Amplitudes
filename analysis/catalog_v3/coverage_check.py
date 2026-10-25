@@ -163,6 +163,16 @@ def register(C):
             mg.register_scan_process(n, info["base"], info["physics"])
 
 
+def finals(cfg):
+    """the final-state masses as generation reads them (mg5_pipeline_final's recipe rule): m_finals, else m_final (a list,
+    or one mass for every final)"""
+    mf = cfg.get("m_finals")
+    if mf is None:
+        mf = cfg.get("m_final", 0.0)
+        mf = list(mf) if isinstance(mf, (list, tuple)) else [mf] * int(cfg.get("nfinal", len(cfg["pdg_ids"]) - 2))
+    return [float(x) for x in mf]
+
+
 def kind(cfg):
     return "ee" if abs(int(cfg["pdg_ids"][0])) in LEPTON_BEAMS else "hadronic"
 
@@ -412,8 +422,8 @@ def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists, wide_hi=SQRTS_WIDE):
     me = np.asarray(a[:, -1], float)
     with np.errstate(divide="ignore", invalid="ignore"):
         l = np.log10(np.where(me > 0, me, np.nan))
-    s_cur, s_new = cut_slots(c["m_finals"], c["pdg_ids"], False), cut_slots(c["m_finals"], c["pdg_ids"], True)
-    cur = mg.fiducial_pass_mask(P, c["m_finals"], c["pdg_ids"], mg.FIDUCIAL_CUTS)
+    s_cur, s_new = cut_slots(finals(c), c["pdg_ids"], False), cut_slots(finals(c), c["pdg_ids"], True)
+    cur = mg.fiducial_pass_mask(P, finals(c), c["pdg_ids"], mg.FIDUCIAL_CUTS)
     new = pass_mask(P, s_new, cuts_new)
     new_nobt = pass_mask(P, s_cur, cuts_new)                 # the proposed thresholds, b and tau left uncut
     lo, hi = sq
@@ -459,7 +469,7 @@ def one(task):
     perm = mg.row_to_slot_perm(cfg["pdg_ids"], cfg["mg5_generate"])
     amz = float(cfg.get("alphas_mz", 0.118))
     pol = mg.sampling_policy({"sampling": {"mode": "mixture"}})
-    m, pdg = [float(x) for x in cfg["m_finals"]], cfg["pdg_ids"]
+    m, pdg = finals(cfg), cfg["pdg_ids"]
     s_cur, s_new = cut_slots(m, pdg, False), cut_slots(m, pdg, True)
     beams = "".join(sorted("l" if abs(int(p)) in LEPTON_BEAMS else ("g" if int(p) == 21 else "b" if abs(int(p)) == 5
                                                                     else "q") for p in pdg[:2]))
@@ -545,7 +555,7 @@ def selftest(name, info):
     _, _, driver_bin, eff_dir = mg.detect_compiled_backend(sa)
     perm = mg.row_to_slot_perm(cfg["pdg_ids"], cfg["mg5_generate"])
     pol = mg.sampling_policy({"sampling": {"mode": "mixture"}})
-    m, pdg = [float(x) for x in cfg["m_finals"]], cfg["pdg_ids"]
+    m, pdg = finals(cfg), cfg["pdg_ids"]
     amz = float(cfg.get("alphas_mz", 0.118))
     lo, hi = info["sqrts"]
     with mg.CppDriverPipe(driver_bin, eff_dir) as pipe:
