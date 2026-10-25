@@ -17,4 +17,9 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 N="${SLURM_CPUS_PER_TASK:-16}"
 python analysis/catalog_v4/validate_v4.py run --n "${V4VAL_N:-2000}" --workers "$N"
+# the measured disk of the v4 backends this run built (events dir + standalone per process) and the free space
+du -sk "$WORK"/mg5amcnlo/v4_*_events "$WORK"/mg5amcnlo/v4_*_standalone 2>/dev/null \
+    | awk '{print "V4SIZE_KB", $0; s += $1} END {print "V4SIZE_TOTAL_KB", s, "dirs", NR}'
+df -k "$WORK" | tail -1 | awk '{print "V4SIZE_FREE_KB", $4}'
+[ -n "${V4VAL_NO_CENSUS:-}" ] && { echo "V4VAL census skipped (V4VAL_NO_CENSUS)"; exit 0; }
 python recipes/gen_catalog_v4.py --check --workers "$N" --out "$SCRATCH/zz_catalog_v4/checked.json"
