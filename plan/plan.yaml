@@ -896,13 +896,11 @@ entries:
   decisions:
   - D127
   - D130
-  next: 'implement the approved coverage design for a new catalog (catalog_v4): (1) acceptance: hadronic classes pT>10 GeV,
-    |eta|<5, dR>0.4, no pair-mass cut; e+e- |cos theta|<0.99; b and tau cut like jets and leptons; (2) sqrt(s-hat) from threshold
-    (no 1.05 strip, no 25 GeV floor) to 6 TeV, log-uniform; (3) a forward component uniform in log(1/(1-|cos theta|)) in the
-    mixture, the collinear splitter kept, f_flat 0.35 kept; plus electroweak production (full coupling orders in the generate
-    strings, so VBF, VBS and EW-QCD interference are in), one top mass 172.5 everywhere, massless b (5-flavour); no decayed
-    final states (a later extension that adds, never replaces). Validate on CPU against the coverage check, then regenerate
-    the pools on CC (CPU), then the short pretrainings (GPU estimate to the user with the run)'
+  next: 'run the catalog_v4 validation job (scripts/job_catalog_v4_validate.sh on CC under item catalog_coverage; CPU, 16
+    cores, under 10 h; it also runs the v4 census check) once /sps/lpnhe has space (100% full, 512G, 2026-10-25: site env
+    and every sync fail); when it ends read it, then the v4 equality step (tools/equal_processes.py on recipes/catalog_v4_census.yaml)
+    and roles, then regenerate catalog_v4''s pools on CC (CPU, under item catalog_coverage), make particle_ids'' b massless
+    for v4 training, then the short pretrainings on catalog_v4 (GPU: estimate first; over 10 GPU-h goes to the user)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
