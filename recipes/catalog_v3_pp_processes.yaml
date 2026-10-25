@@ -2960,7 +2960,7 @@ processes:
     parent: v3_bbx_bbxg
   pp13_bbx_bbxgg:
     lhe:
-      margin: 0.48
+      n_runs: 2
     kind: lhe_pp
     folder: pp13_bbx_bbxgg
     mg5_generate:
@@ -15029,7 +15029,7 @@ processes:
     parent: v3_ddx_ddxg
   pp13_ddx_ddxgg:
     lhe:
-      margin: 1.49
+      n_runs: 3
     kind: lhe_pp
     folder: pp13_ddx_ddxgg
     mg5_generate:

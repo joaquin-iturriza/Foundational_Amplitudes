@@ -35,7 +35,7 @@ processes:
   n_train: 10000
   n_val: 2000
   n_test: 2000
-- name: pp13_dg_bbxdg
+- name: pp13_db_bguwm
   sqrts:
   - 13000
   - 13000
