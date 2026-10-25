@@ -20,7 +20,8 @@ The generated plan view between % plan:begin and % plan:end is skipped. Exit 1 w
 import argparse, json, os, re, shlex, subprocess, sys
 
 SKIP_CMDS = r"\\(?:label|ref|eqref|cite|code|texttt|url|includegraphics|pnl|input)\{[^}]*\}"
-SKIP = [SKIP_CMDS, r"\d+\s*\\to\s*\d+", r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?", r"\b\d{1,2}:\d{2}\b",
+SKIP = [SKIP_CMDS, r"\b[A-Z]+-[a-z0-9]+-[0-9a-f]{6,}\b",   # registry run ids (FA-ccin2p3-60b47206)
+        r"\d+\s*\\to\s*\d+", r"\b\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?", r"\b\d{1,2}:\d{2}\b",
         r"\b(?:19|20)\d{2}\b", r"_\{[^}]*\}", r"_\d", r"\\(?:multicolumn|multirow)\{\d+\}",
         r"\d+(?:\.\d+)?\s*\\(?:line|text|column)width", r"\b\d+(?:\.\d+)?\s*(?:pt|mm|cm|em|ex)\b",
         r"\\(?:hspace|vspace|setlength|rule)\*?(?:\{[^}]*\})+", r"\[\s*[\d.]+\s*\]"]
