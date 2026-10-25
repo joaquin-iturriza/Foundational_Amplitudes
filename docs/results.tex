@@ -592,6 +592,23 @@ inside the catalog's range; (b) the $80$ beyond it ($2\to5$, $\sqrt{\hat s}\in[1
 \label{fig:v3_kshot}
 \end{figure}
 
+\paragraph{The level's two targets on catalog\_v3 (2026-10-25).} Set on Daniel's catalog when its $2\to4$ zero-shot error was $52$
+(the hand-off's level item): zero-shot $2\to4$ within $2\times$ its one-event error, and the tops' shape floor under $0.5$
+with the heavy-quark layer. Read off the short pretrainings (Tab.~\ref{tab:v3_short}) and the context arm's K-shot fits
+(par.\ The context vector's $K$-shot fits on catalog\_v3, \code{analysis/catalog\_v3/data/kshot\_context.json}), medians over processes:
+\begin{itemize}
+  \item \emph{$2\to4$: met, and the target no longer separates anything.} The context arm's zero-shot error on the $168$
+    held-out $2\to4$ classes is $1.08$; one labelled event gives $1.43$ with the plain offset and $1.10$ with the shrunk one,
+    so zero-shot sits at $0.76\times$ and $0.99\times$ the one-event error. On the $40$ $2\to5$ probes, $1.03$ against $1.58$
+    and $1.08$. One event carries more noise than level, because the level is already small ($0.09$ to $0.20$ over the four
+    arms on $2\to4$) and what is left is shape ($0.79$ to $0.94$), which no per-process number reaches.
+  \item \emph{The tops' shape floor: not met.} With the heavy-quark layer in training ($105$ pools at
+    $m_Q\in\{50,300,600\}$\,GeV), the median shape on the $237$ held-out top classes is $0.88$ (baseline), $0.80$
+    (dimensionless), $0.80$ (with the context vector) and $0.85$ (the twin), against the target $0.5$. Their floor in the
+    K-shot read, the variance of the zero-shot error, is $0.80$.
+\end{itemize}
+Both targets now point at the same thing: the zero-shot error left on catalog\_v3 is shape, not level.
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
@@ -7063,8 +7080,9 @@ of the three share a test set.
     catalog (held): what the $43$ new pay for. The small dedicated network for what no constant fixes: the context vector
     and the factorised $2\to4$ head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on
     catalog\_v3: the context arm's K-shot fits and the factorised head's data check on its $2\to4$ classes with an added
-    $Z$, $W$, $H$ or quark pair (no universal soft or collinear factor there). Targets: zero-shot $2\to4$ within $2\times$
-    its one-event error; the tops' shape floor under $0.5$ with the heavy-quark layer. Also proposed: the full-length
+    $Z$, $W$, $H$ or quark pair (no universal soft or collinear factor there): both done (par.\ The factorised $2\to4$
+    head's data check on catalog\_v3; par.\ The context vector's $K$-shot fits on catalog\_v3), and the two targets read (par.\ The level's two targets on
+    catalog\_v3: $2\to4$ met, the tops' shape floor $0.80$ against $0.5$ not met). Also proposed: the full-length
     catalog pretraining with the adopted target (held by the user, 2026-10-21, until the preprocessing design settles).
     Blocked: bulk transfers to Jean Zay (the $29$\,GB archive, its checkout at \code{8fb002e}).
   \item \textbf{Open (2026-10-22, 13:30).}
