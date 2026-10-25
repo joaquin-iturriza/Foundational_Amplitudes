@@ -322,9 +322,9 @@
   },
   "n_pool_events": 190320000,
   "other_sampled": {
-   "current": 6.9215926806132,
-   "proposed": 6.758917021751404,
-   "wide": 6.652323909600576
+   "current": 7.005845725536346,
+   "proposed": 6.758815062046051,
+   "wide": 6.596813984711965
   },
   "other_n_pool_events": 31320000
  },
@@ -376,11 +376,11 @@
    "forward_share_proposed": 0.349,
    "forward_share_wide": 0.3995,
    "pp_n": 34,
-   "pp_in_cur_window": 0.47925,
+   "pp_in_cur_window": 0.07075000000000001,
    "pp_in_new_window": 0.107,
    "pp_in_new_wide": 0.1775,
    "pp_above_window": 0.041249999999999995,
-   "pp_in_range_cur": 0.7316221497579403,
+   "pp_in_range_cur": 0.9808138824392032,
    "pp_in_range_new": 0.967542638357118,
    "pp_forward_share": 0.579
   },

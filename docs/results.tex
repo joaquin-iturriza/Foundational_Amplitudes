@@ -831,11 +831,18 @@ their proposed coverage.
     % claim: types.harder_cut.growth_999_proposed=0.53
     % claim: types.harder_cut.max_up_proposed=0.70
     % claim: types.harder_cut.outside_current_proposed=0.21
+    % claim: types.harder_cut.pp_n=34
+    % claim: types.harder_cut.pp_in_cur_window=0.071
+    % claim: types.harder_cut.pp_in_new_window=0.11
+    % claim: types.harder_cut.pp_in_new_wide=0.18
+    % claim: types.harder_cut.pp_in_range_cur=0.98
+    % claim: types.harder_cut.pp_in_range_new=0.97
     % claim: cost.other_n_pool_events=31M
-    % claim: cost.other_sampled.current=6.9
+    % claim: cost.other_sampled.current=7.0
     % claim: cost.other_sampled.proposed=6.8
-    % claim: cost.other_sampled.wide=6.7
+    % claim: cost.other_sampled.wide=6.6
     % allow: 1 10 30 6 13 because they are the entries' windows and threshold, the wide window's top and the beam energy, no results
+    % allow: M|^2
     growth in decades, of it at the top, the share of the proposed sample outside the current cuts): the $105$
     heavy-quark mass points $0.27$, $0.16$, $0$ (none of their events lies outside the current cuts; the forward
     component is what changes them); the $12$ BSM entries $0.11$, $0.00$, $0.14$; the $40$ $2\to5$ probes $0.22$,
@@ -846,10 +853,12 @@ their proposed coverage.
     comparison, the labels are not the base's). The $13$\,TeV pp events rarely reach a $1$ to $10$\,TeV window: on the
     $34$ hadronic such entries $0.0025$ of the base's pp events lie inside the current cuts and window, $0.041$ inside
     the proposed coverage, too few for the pp comparison to say much. The heavy-quark mass points (a top off the pp
-    events' shell), the BSM entries and the $2\to5$ probes have no pp pool. The pp read of the $p_T>30$\,GeV entries is
-    left out: these rows read their base's pp events against the global current cuts ($p_T>10$\,GeV) instead of the
-    entry's own, which the fix in \code{27e8edd} corrects after the run; it waits for their rerun. Their 31M pool events
-    take $6.9$, $6.8$ and $6.7$ CPU-hours under the current, the proposed and the wide coverage.
+    events' shell), the BSM entries and the $2\to5$ probes have no pp pool. A $p_T>30$\,GeV entry reads its base's pp
+    events, generated at $p_T>10$\,GeV, against its own cuts ($34$ of them hadronic): $0.071$ inside the current cuts and
+    window, $0.11$ inside the proposed coverage (its $p_T>30$\,GeV kept) on the window, $0.18$ up to $6$\,TeV; most of
+    the base's events lie below the entry's threshold. Of the events inside, $0.98$ lie inside the current sample's
+    $\log_{10}|\mathcal M|^2$ range and $0.97$ inside the proposed one's. The 31M pool events of these entries take
+    $7.0$, $6.8$ and $6.6$ CPU-hours under the current, the proposed and the wide coverage.
   \item \emph{The one-loop and loop-induced pools} are read, not sampled. Their labels come from MadLoop, which
     % src: python3 analysis/catalog_v3/coverage_check.py @27e8edd
     % claim: loops.one_loop_hadronic.n=143
@@ -7798,15 +7807,13 @@ of the three share a test set.
   \item \textbf{catalog\_v4: the new coverage (open).} The user's design decision of 2026-10-25 (``Okay, yes to 1 to 3,
     % allow: 1 3 because they are in the user's words, no results
     % allow: 10 5 0.4 0.99 6 because they are the approved design's cuts and window top, no results
-    % allow: 30 because it is the harder-cut entries' threshold in GeV, no result
     yes to electroweak production and the smaller fixes, no to the decayed final states'') on the coverage check (par.\
     The catalog's coverage, a check): hadronic classes at $p_T>10$\,GeV, $|\eta|<5$, $\Delta R>0.4$, no pair-mass cut,
     $e^+e^-$ at $|\cos\theta|<0.99$; $b$ and $\tau$ cut like jets and leptons; $\sqrt{\hat s}$ log uniform from
     threshold to $6$\,TeV; a forward component in the mixture; electroweak production and the smaller fixes (one top
     mass, massless $b$); no decayed final states. Open: the implementation and its CPU validation against the coverage
     check, the regeneration of the pools, the short pretrainings again (GPU estimate to the user with the run); the
-    forward component's two shares are still the check's choices. Also open: the pp read of the $p_T>30$\,GeV entries,
-    waiting for a rerun of the coverage check under \code{27e8edd}.
+    forward component's two shares are still the check's choices.
   \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
     % allow: 13 because it is the beam energy in TeV, a setting
     % allow: 25485185 because it is part of a run id
