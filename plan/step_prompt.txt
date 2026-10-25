@@ -31,7 +31,8 @@ The step
    Only a call none of them settles goes to the user: write the question, word for word, in your final message, with
    what you read and why none settles it; the main session sends it and runs
    `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"`.
-Rules: CLAUDE.md. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
+Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
+to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 10 GPU-h only if the user's words above cover it.
 Final message, short: what you did, what you found (numbers), the figure files that show it (absolute paths of the
 .png, every result has one: the main session sends them to the user with the result), what you recorded, the next
