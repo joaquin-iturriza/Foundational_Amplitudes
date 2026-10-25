@@ -574,12 +574,12 @@ The floor is the variance of the zero-shot error, what any one number per proces
 of processes where the context fit beats the shrunk offset. Unlike Daniel's catalog, where the fit went under the floor
 on the $43$ new ($0.21$ against $0.46$), on catalog\_v3 it is worse than an offset on six of the eight axes, and worse
 than not fitting at all on four ($p_T\geq30$: $0.73$ against a zero-shot $0.42$). It goes under the floor only on the
-one-loop pools ($0.50$ against $0.78$) and reaches it on the top classes ($0.80$). Where it fails, catalog\_v3's
-zero-shot error is already mostly shape (the level is $0.01$ to $0.12$ of it, Tab.~\ref{tab:v3_short}), so there is
+one-loop pools ($0.50$ against $0.78$) and reaches it on the top classes ($0.80$). Where it fails, the context
+run's zero-shot error is already mostly shape (its level part $0.01$ to $0.18$, Tab.~\ref{tab:v3_short}), so there is
 little a per-process vector can carry, and sixteen free numbers fitted on $K\leq16$ events chase the noise of the draw
-(at $K=1$ the fit is above the zero-shot on every axis but one loop and the top). Where it helps, the processes differ
-from training in something a per-process vector can encode: the one-loop finite part's normalisation and sign pattern,
-and the top's mass and width. The fit's settings were kept from Daniel's catalog for comparability; a fit with a
+(at $K=1$ the fit is above the zero-shot on every axis but one loop and the top). Where it helps, the level part is the largest ($0.31$ one loop, $0.35$ top) and the
+processes differ from training in something a per-process vector can encode: the one-loop finite part's normalisation,
+the top's mass and width. The fit's settings were kept from Daniel's catalog for comparability; a fit with a
 penalty on $|c|$, or with the step count chosen on held-out draws, is the obvious next try, not run.
 
 \begin{figure}[H]
