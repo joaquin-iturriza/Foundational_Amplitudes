@@ -6997,34 +6997,28 @@ of the three share a test set.
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-25, 04:00).} The study runs on catalog\_v3 (the user, 2026-10-25: Daniel's catalog and its
-    extra probes stay untouched until they say; the level and preprocessing items on it are held). Running on CC:
+  \item \textbf{State (2026-10-25, 07:35).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
+    untouched until the user says). Written up today: the four short pretrainings read on every axis
+    (Tab.~\ref{tab:v3_short}), the factorised $2\to4$ check on $880$ classes and the $2\to5$ probes with exact and
+    network parents (Fig.~\ref{fig:v3_factorised}). Running on CC:
     \begin{itemize}
-      \item the four short catalog\_v3 pretrainings (\code{scripts/job\_catalog\_v3\_short.sh}; every arm with the sign
-      head, the MSE and the arithmetic mean): \code{dimensionless}, the emission-scale target with dimensionless inputs
-      (run FA-ccin2p3-ff0533da); \code{baseline}, one shared standardization of $\log|\mathcal M|^2$ in GeV (7c0710dd);
-      \code{dimensionless\_context}, the same with the context vector (7c41ffd5); \code{dimensionless\_twin}, trained
-      without any $\tau$, $\nu_\tau$ or quartic-gauge pool (910eee41). Each then reads every held-out axis (H1, H2, the
-      $2\to5$ probes, H3, H5 with the sign head's scoring of its sign-changing pools, H6, H7 at 1 to 10\,TeV and at
-      $p_T\geq30$\,GeV; the twin also the never-seen particle and the quartic vertex) into
-      \code{\$SCRATCH/zz\_v3\_short\_<arm>/<axis>/}. When they end: collect, write a catalog\_v3 results section per axis
-      and arm, send it.
-      \item the pp study (the user, 2026-10-25: build it in parallel, check, then they decide whether catalog\_v3 moves to
-      pp beams): the 13\,TeV MadEvent pools of the $1396$ hadronic classes (\code{recipes/gen\_catalog\_v3\_pp.py}: each
-      with its parent's parameter card and labelled at the windows' $\alpha_s$ rule, MadEvent's own kept beside it), in
-      eight CPU jobs (\code{recipes/catalog\_v3\_pp\_part<k>.yaml}, \code{scripts/job\_gen\_daniel\_catalog.sh}, runs
-      FA-ccin2p3-5f43c90c, 27dcc2fe, 1bc35466, 4ef28e2d, a41644b4, a5ab796e, 3c1ca5da, 1b21566d). Next: the window-trained
-      arms scored on the pp test set (all $410$ hadronic held-out and $986$ hadronic training classes), then one pp-trained
-      short pretraining of the dimensionless target (its heavy-quark, $\alpha_s$-point, BSM, one-loop and $e^+e^-$ pools
-      stay on windows: their pp versions are not built; for the user to confirm or extend).
+      \item the context vector's $K$-shot fits on every held-out axis (the user's go, 2026-10-25, $\sim27$ GPU-h;
+      \code{scripts/job\_kshot\_context\_v3.sh <axis> <k> <n>}, output \code{\$SCRATCH/zz\_kshot\_v3/<axis>/}): done
+      $\alpha_s=0.13$ and one loop; running new combinations (FA-ccin2p3-b46f5515), $2\to4$ families (e7d05c0c,
+      1a31d95a), $2\to5$ (0ad8cf22), the top (52338832, 12070559, 315959b7), $1$ to $10$\,TeV (cfa40154), $p_T\geq30$
+      (c61fab2a). When all end: copy home, compare to the plain and shrunk offsets as on Daniel's catalog
+      (\code{analysis/catalog\_daniel/kshot\_context\_cmp.py}, adapted to the axes), write up, send.
+      \item the pp study: all 8 MadEvent parts done ($1356$ of $1396$ pools); the $40$ short runs rerun at their own
+      margins (\code{recipes/catalog\_v3\_pp\_margins.json}, \code{catalog\_v3\_pp\_rerun\_part<k>.yaml}, 10 CPU jobs, three
+      done). When all pass: \code{touch .claude/.pp\_pools\_ready} (after checking every pool and sidecar exists), which
+      releases the queued launches: the four window-trained arms read on the pp test set
+      (\code{scripts/job\_catalog\_v3\_pp\_score.sh}) and the pp-trained short run \code{dimensionless\_pp} with its pp read
+      (scope settled by the user, 2026-10-25: hadronic tree classes on pp, every other pool on windows).
     \end{itemize}
-    Settled since the last State: catalog\_v3 stays on partonic windows for now; H7 on the windows (40 classes drawn with
-    the seed); the held-out loop-induced class drawn with the seed ($gg\to ZH$); the diagram encoder's labels for the BSM
-    particles (\code{bsm\_labels}). Facts to keep: two launches syncing at once collide, so chain them;
-    \code{scripts/launch\_cc\_only.sh} defers (exit 75) when nothing fits or the code transfer fails; \code{site pick} now
-    plans CPU-only jobs on the CPU partition; the lxplus-era archive (28\,GB) stays on CC, \code{runs\_from\_lxplus} the
-    only copy of its runs. Supervisor and the event waiter running. Waits on the user: only the pp-trained run's scope
-    above, and it does not block anything else.
+    Rules added today: never stop the turn for an answer (0g, hook \code{no\_blocking\_question.sh}); answer in text
+    first, batches sync once and submit in parallel (\code{NOSYNC=1}), every word is to the user (0h); the sleep guard
+    is global (\code{\textasciitilde/.claude/hooks/sleep\_guard.sh}). The reply check reads every text block of a turn and
+    only the relevant decisions. Supervisor and the event waiter running.
   \item \textbf{The level.} Adopted candidate: the emission scales (par.\ The emission scales in training); open on Daniel's
     catalog (held): what the $43$ new pay for. The small dedicated network for what no constant fixes: the context vector
     and the factorised $2\to4$ head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on
