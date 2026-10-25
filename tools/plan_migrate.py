@@ -106,7 +106,13 @@ def main():
                       next=next_of(prose) or "resumes when the user releases it",
                       quotes=[{"said_at": x["said_at"], "text": x["quote"], "decision": x["id"]} for x in decs
                               if x["id"] == did])
-            entries.append(e)
+            it = items.get(e["id"])
+            if it:                        # paused, and since given a site item: its globs and the hold naming it
+                e["match"] = it["match"]
+                e["hold_decision"] = next((x["id"] for x in decs if x["kind"] in ("hold", "forbid") and e["id"] in
+                                           [y.strip() for y in (x["covers"] or "").split(",")]), did)
+                e["quotes"] += [q for q in quotes(e["id"], it["decision"]) if q["decision"] != did]
+            entries.append(e); by_id[e["id"]] = e
         else:
             notes.append("hand-off entry %r (%s): a record, not work; stays as prose" % (title[:60], kind or "no map"))
     for iid, it in items.items():

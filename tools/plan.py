@@ -878,16 +878,34 @@ def cmd_answer(a):
         if not after:
             sys.exit("plan: not recorded: the user typed these words before %s (%s)" % (
                 what, since.isoformat()[:16] if since else "?"))
-        if a.kind in ("hold", "release") and not item_exists(e["id"]):
-            sys.exit("plan: %s has no site item to %s; attach one first (plan item)" % (e["id"], a.kind))
+        made_item = False
+        if a.kind == "release" and not item_exists(e["id"]):
+            sys.exit("plan: %s has no site item to release; attach one first (plan item)" % e["id"])
+        if a.kind in ("hold", "forbid") and not item_exists(e["id"]):
+            # an entry paused before it had an item: the item is filed under the entry's own approval or scope in
+            # force (site item add takes no hold), then the hold puts it on hold; undone if the hold fails
+            under = next((x for x in e.get("decisions") or [] for dx in [decision(x)]
+                          if dx and dx["in_force"] and dx["kind"] in ("approve", "scope", "release")), None)
+            if not under:
+                sys.exit("plan: %s has no site item and no approval or scope in force to file one under (an item "
+                         "needs one); record the user's scope for it first" % e["id"])
+            ok, why = ensure_item(e, under)
+            if not ok:
+                sys.exit("plan: site item %s not created (%s); nothing recorded" % (e["id"], why))
+            made_item = True
         rc, out, err = site_call("decide", PROJECT, "--kind", a.kind, "--quote", a.quote, "--covers", e["id"])
         m = re.search(r"\b(D\d+)\b", out)
         if rc != 0 or not m:
-            sys.exit("plan: not recorded, the entry is unchanged (site decide: %s)" % (err or out).strip()[-300:])
+            if made_item:
+                site_call("item", "done", PROJECT, e["id"])
+            sys.exit("plan: not recorded, the entry is unchanged%s (site decide: %s)" % (
+                "; the site item made for the hold is closed" if made_item else "", (err or out).strip()[-300:]))
         did = m.group(1)
         dd = decision(did)
         said = (dd or {}).get("said_at")
         if not said or (since and said <= since):
+            if made_item:
+                site_call("item", "done", PROJECT, e["id"])
             rollback(did, "said_at %s is not after %s" % (said, since))
             sys.exit("plan: site decide dated the words %s, not after %s (%s); %s rolled back, the entry is unchanged"
                      % (said.isoformat()[:16] if said else "?", what, since.isoformat()[:16] if since else "?", did))

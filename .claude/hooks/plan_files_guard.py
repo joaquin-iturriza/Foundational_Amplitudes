@@ -68,6 +68,13 @@ def bash_refusal(cmd):
             return "python on a plan file other than tools/plan.py"
         if prog in READERS and "-i" not in words and not any(w.startswith("--in-place") for w in words):
             continue
+        if prog == "sed" and not any(w == "-i" or re.match(r"-[a-zA-Z]*i", w) or w.startswith("--in-place")
+                                     for w in words[1:]):
+            # a read (sed -n 1,9p FILE): the plan file may only be an input, after the script, never in the script
+            # (sed's w command writes)
+            script = next((w for w in words[1:] if not w.startswith("-")), "")
+            if not re.search(DATA, script):
+                continue
         if prog == "git" and len(words) > 1:
             sub = next((w for w in words[1:] if not w.startswith("-")), "")
             if sub in GIT_READ:
