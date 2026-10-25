@@ -212,7 +212,7 @@ entries:
   done_when: site runs --id FA-ccin2p3-2ed18ab8 | grep -qw COMPLETED && awk '/label\{sec:ladder-open\}/{exit} /2ed18ab8/{f=1}
     END{exit !f}' docs/results.tex
   match: eval_delta*,zz_delta*,tp3_finfte_uubar_Zggg_d8,tp3_r1fte_udbar_enu_d8,tp3_r1fte_ee_dd_ew_nlo_d8
-  notes_ref: null
+  notes_ref: fig:ladder_pre_curves
   evidence:
     runs: []
     commit: null
