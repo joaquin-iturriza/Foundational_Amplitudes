@@ -1547,7 +1547,8 @@ class AmplitudeExperiment(BaseExperiment):
             # the factor's parameters too, when it is on: each one shifts the target by a per-N constant
             # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
             if _pf_cfg:
-                for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_orders", False), ("target_physics_s0", 289.0),
+                for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_orders", False),
+                               ("target_physics_hybrid", False), ("target_physics_s0", 289.0),
                                ("target_physics_dim_ref", "shat"), ("target_physics_couplings", None),
                                ("target_physics_alpha_inv", 132.507)):
                     # stats written before the key were fitted at its default
@@ -1866,6 +1867,19 @@ class AmplitudeExperiment(BaseExperiment):
         #     out of the raw predictions at evaluation, like target_propagators. ---
         if _phys_on:
             spans = []
+            # data.target_physics_hybrid: one constant per process, c_p, from its own momenta (its train events, a
+            # held-out probe's own train events too; val or test when a process has no train split), shared by its roles
+            self._phys_cp = {}
+            if bool(self.cfg.data.get("target_physics_hybrid", False)):
+                assert str(self.cfg.data.get("target_physics_dim_ref", "shat")) == "shat", \
+                    "target_physics_hybrid: the s_hat reference (target_physics_dim_ref=shat) plus the constant"
+                for name in names:
+                    src = next(((r, name) for r in ("train", "val", "test") if (r, name) in store), None)
+                    assert src is not None, f"target_physics_hybrid: no events of {name} to fit its constant on"
+                    self._phys_cp[name] = self._physics_hybrid_cp(_phys(store[src]))
+                _cps = np.array(list(self._phys_cp.values()))
+                LOGGER.info(f"target_physics_hybrid ON: c_p for {len(_cps)} processes, median {np.median(_cps):.3g}, "
+                            f"5-95% {np.percentile(_cps, 5):.3g} to {np.percentile(_cps, 95):.3g}")
             for name in names:
                 for role in roles:
                     if (role, name) not in store:
@@ -2354,8 +2368,27 @@ class AmplitudeExperiment(BaseExperiment):
             soft = float(self.cfg.data.get("target_physics_qperp_tau", 0.3)) if str(ref) == "qperp_soft" else None
             ldim = qperp_logs(mom_phys, soft=soft) - (mom_phys.shape[1] - 4) * self._phys_ls0
             return ldim - (lord + self._phys_logc[name])
+        # data.target_physics_hybrid (D129, the user 2026-10-25): the s_hat target plus the process's constant c_p
+        # (_physics_hybrid_cp, fitted on its own momenta in init_data before any factor is applied)
+        lcp = 0.0
+        if bool(self.cfg.data.get("target_physics_hybrid", False)):
+            assert str(ref) == "shat" and n_eik == 0, "target_physics_hybrid: the s_hat reference, no eikonal factor"
+            assert name in getattr(self, "_phys_cp", {}), f"target_physics_hybrid: no constant for {name}"
+            lcp = self._phys_cp[name]
         # the eikonal factors carry mass dimension -2 each, so the dimension factor's power grows by one per factor
-        return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name])
+        return -((4 - mom_phys.shape[1] + n_eik) * (lref - self._phys_ls0) + leik + lord + self._phys_logc[name]) + lcp
+
+    @staticmethod
+    def _physics_hybrid_cp(mom_phys):
+        """data.target_physics_hybrid's constant of one process (docs/results.tex, par. The hybrid reference scale, a
+        design; analysis/catalog_v3/prep_level.py): c_p = the mean over its events of Lq - (N - 4) log s_hat, Lq the
+        emission scales (physics_scales.qperp_logs). The s_hat target plus c_p keeps the s_hat target's shape within
+        the process and takes the emission-scale target's class mean. Momenta only, no amplitude; s0 cancels."""
+        from physics_scales import qperp_logs
+        pp = np.asarray(mom_phys, dtype=np.float64)
+        q = pp[:, 0] + pp[:, 1]
+        ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
+        return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
 
     def _orders_of(self, name):
         """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector
@@ -2415,6 +2448,8 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
+                "target_physics_hybrid": bool(self.cfg.data.get("target_physics_hybrid", False)),
+                "target_physics_hybrid_cp": getattr(self, "_phys_cp", None) or None,
                 "target_physics_alpha_inv": float(self.cfg.data.get("target_physics_alpha_inv", 132.507)),
                 "dimensionless_inputs": bool(self.cfg.data.get("dimensionless_inputs", False)),
                 "dimless_mass_stats": getattr(self, "_dimless_mass_stats", None),

@@ -23,11 +23,13 @@
 #          tau or nu_tau) and H4 (the 15 quartic-gauge pools); 5 epochs of its own set (3803 steps)
 # Every arm carries the sign head for catalog_v3's signed one-loop pools (the signed A/B, docs/results.tex) and so trains
 # on the MSE with the arithmetic mean over processes (the sign head is not wired into the het loss): one loss for all.
-#   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- baseline|dimensionless|dimensionless_context|dimensionless_twin [smoke|eval]
+#   dimensionless_shat     the same with s_hat alone as the target's reference scale (the shape proxy's candidate)
+#   dimensionless_hybrid   the s_hat target plus a per-process constant from the events' momenta (the hybrid reference scale)
+#   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
+ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -43,6 +45,11 @@ case "$ARM" in
     # the shape proxy's candidate (docs/results.tex, par. The shape proxy on catalog_v3; D99): the same dimensionless
     # inputs and orders, the target's reference scale s_hat alone in place of the emission scales
     dimensionless_shat)    NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}") ;;
+    # the hybrid reference scale (docs/results.tex, par. The hybrid reference scale, a design; D129): the s_hat target
+    # plus one constant per process, c_p = the mean over its own events of the emission scales minus (N - 4) log s_hat
+    # (experiment._physics_hybrid_cp), so the shape within a process is the s_hat arm's and the class mean the
+    # emission-scale arm's; everything else as the dimensionless arm
+    dimensionless_hybrid)  NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}" ++data.target_physics_hybrid=true) ;;
     dimensionless_twin)    NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_twin_train.yaml" ;;
     # the pp study: the same target trained with every hadronic tree class on 13 TeV MadEvent pp events in place of its
     # shaped window (recipes/catalog_v3_pp_mixed_train.yaml; the other pools as in catalog_v3_train.yaml)
