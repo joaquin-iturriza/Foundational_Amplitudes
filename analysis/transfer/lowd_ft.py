@@ -100,7 +100,7 @@ def plot(out):
             if all(v is None for v in y):
                 continue
             ax.plot(x, [np.nan if v is None else v for v in y], marker=marks[m], color=cols[m], label=LABEL[m])
-        ax.axhline(0, color=ps.C.grey, ls="--", label="equal")
+        ax.plot([x.min(), x.max()], [0, 0], color=ps.C.grey, ls="--", label="equal")
         ax.set_xlabel(r"$\log_{10} D$"); ax.set_ylabel(yl)
     ps.legend(axs[0], "upper left", handles=axs[0].get_legend_handles_labels()[0])
     for ax in axs:
