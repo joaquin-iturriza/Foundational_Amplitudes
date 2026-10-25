@@ -786,6 +786,7 @@ entries:
   title: the setup redesign (plan file, owner agents, one guard)
   question: 'local only: build in worktrees/wt-setup, the plan tool and guard, site fixes on a copy, CLAUDE.md pass, scenario
     tests; no cluster jobs'
+  kind: setup
 - status: held
   quotes:
   - said_at: '2026-10-23T02:46:51.647Z'
