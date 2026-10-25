@@ -521,14 +521,18 @@ with a gluon, $2$ with a photon, all on $e^+e^-$ beams). Onto their $2\to4$ pare
 $2\to4$ classes and applied unchanged: own spread $16.3$, after the exact parent $3.45$, and learned $0.46$, under the
 dimensionless run's zero-shot shape ($1.02$; $0.93$ with the context vector, $2.35$ for the baseline) on $34$ of the
 $40$. With the network's own $2\to4$ prediction at the mapped events in place of the exact parent
-(\code{tools/factorised\_2to4\_net.py --v3-nfinal 5}; the parents are training classes) the gain is gone: $1.01$
-against $1.02$ for the dimensionless run, $0.93$ against $0.93$ with the context vector, under on $16$ and $18$ of the
-$40$. The network's error on its own training classes at the mapped events adds about $0.5$, as much as the
-factorisation removes. That is no failure at the mapped events: every mapped event lies inside its parent's training
+(\code{tools/factorised\_2to4\_net.py --v3-nfinal 5}, each of the four short runs; the parents are training
+classes) the gain is gone for the three dimensionless runs: $1.01$ against $1.02$, $0.93$ against $0.93$ with the
+context vector, $1.12$ against $0.98$ for the twin, under on $16$, $18$ and $15$ of the $40$. For the baseline it is
+not: its own parent gives $1.00$ against its zero-shot $2.35$, under on $39$ of the $40$. The baseline's $2\to5$ error
+is its level (Tab.~\ref{tab:v3_short}), and reading a $2\to5$ process through its $2\to4$ parent carries the level
+over, which the dimensionless target already does on its own; both land at about $1$. The network's error on its own training classes at the mapped events adds about $0.5$, as much as the
+factorisation removes, for the dimensionless target. That is no failure at the mapped events: every mapped event lies inside its parent's training
 $\sqrt{\hat s}$ window (median share $1.00$), and the error there, $0.51$ (median; $10$--$90\%$ $0.20$--$1.34$), equals the
 run's own validation error on the same $40$ parents ($0.50$, $0.18$--$1.22$; \code{result.json}'s per-process loss at
 the best checkpoint times the shared standardization's $\sigma^2$), worse on $19$ of $40$. It is simply how well a
-$4264$-step run knows a $2\to4$ class. So on these short runs a factorised head buys nothing even one multiplicity out;
+$4264$-step run knows a $2\to4$ class. So on these short runs a factorised head buys nothing one multiplicity out beyond what the dimensionless target
+already gives (it does repair a target whose level does not extrapolate);
 it pays only once the parent's error falls well under the $0.46$ the exact parent leaves, which a longer pretraining may
 or may not give faster than it improves the $2\to5$ zero-shot ($1.02$, only twice the trained $2\to4$ error).
 
