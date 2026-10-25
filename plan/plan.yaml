@@ -159,16 +159,14 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: 'Interim read at 530 of 900 trials (commit fbcc7df; analysis/transfer/lowd_dyhpo.py --complete, figs/lowd_dyhpo_interim;
-    not in results.tex): on cells with all 5 trials, each method''s best against the default''s own 5-trial best, cell medians
-    in decades: linear probe then fine-tune D=10^2 -0.07 (12 cells), 10^2.5 -0.04 (15); L2-SP 10^2 -0.03 (15), 10^2.5 -0.02
-    (15); frozen blocks 10 -0.03 (3), 10^1.5 -0.04 (3), 10^2 -0.07 (15), 10^2.5 +0.04 (15, 9 wins); D=10 and 10^1.5 had 0
-    complete cells for linear probe and L2-SP. Still to do: rerun the failed linear-probe slots (r1_uubar_gg_d5, r7_ee_Za_d5,
-    r1_ud_ud_d4, r1_ud_ud_d5, r1_ee_bb_nlo_d5, r1_ee_Za_d5, r7_uubar_gg_d4, and any later ones; at 530 the d4 sweeps r1_ud_ud,
-    r9_ud_ud, r7_uubar_gg sit at 4/5) from their configs (sweep/rerun_failed.py) once the fine_tune.py fix is synced, checking
-    ''head match'' below 1e-3. When all 900 are in: the final collection (collect_sweeps.py tp3_lowd_ > data/lowd_dyhpo_sweeps.json,
-    python3 analysis/transfer/lowd_dyhpo.py without --complete), compare each method''s best against the default''s own search
-    on cell medians, and write it up after par:lowd_ft in docs/results.tex.'
+  next: 'At 869 of 900 trials (2026-10-25, 0 in the queue): the seven linear-probe reruns all passed the head check after
+    the TF32 fix (head match 6e-7 to 4.5e-5, threshold 1e-3); 31 trials the full disk failed silently (20:36-20:38, no Errno
+    28 text, so the earlier disk reruns missed them) were requeued in 20 sweeps, 8 at their in-flight candidate and 23 guided,
+    each sweep back to 5 (analysis/transfer/data/lowd_probe_reruns.json, 7586f43); the CC feeder submits them (disk 96%, pauses
+    at 97%). Interim read at 530 (fbcc7df) stands. When all 900 are in: the final collection (collect_sweeps.py tp3_lowd_
+    > data/lowd_dyhpo_sweeps.json, python3 analysis/transfer/lowd_dyhpo.py without --complete), compare each method''s best
+    against the default''s own 5-trial search on cell medians, and write it up after par:lowd_ft in docs/results.tex. If trials
+    are still missing with nothing queued, read their logs before requeueing.'
   done_when: 'python3 sweep/watchdog.py tp3_lowd_ --expect analysis/transfer/expect_tp3.json --window 30 --sites ccin2p3 --units
     | tail -1 | python3 -c "import json,sys; u=json.load(sys.stdin)[''units'']; sys.exit(0 if len(u)==180 and all(v[''done'']>=v[''expected'']
     and not v[''active''] for v in u.values()) else 1)" && python3 -c "import json,sys; d=json.load(open(''analysis/transfer/data/lowd_dyhpo.json''));
