@@ -1800,14 +1800,16 @@ def _load_catalog_2to4():
     n = 0
     # catalog_2to4_processes.yaml and its harder-cut copies (catalog_2to4c<cut>_processes.yaml, gen_catalog_2to4.py --cut)
     for path in sorted(_glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
-                                               "catalog_2to4*_processes.yaml"))):
+                                               "catalog_2to4*_processes.yaml"))
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v3_pp_processes.yaml"))):
         with open(path) as f:
             d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
         lhe = dict(d.get("lhe") or {})
         for name, entry in (d.get("processes") or {}).items():
             if name in PROCESSES:
                 raise KeyError(f"catalog_2to4 entry {name} collides with an existing process")
-            PROCESSES[name] = dict(entry, lhe=lhe); n += 1
+            PROCESSES[name] = dict(entry, lhe={**lhe, **(entry.get("lhe") or {})})   # an entry's own lhe keys win (its param card); n += 1
     return n
 
 CATALOG_2TO4_ENTRIES = _load_catalog_2to4()
@@ -3534,7 +3536,11 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
         "alphas_power":     int(cfg.get("alphas_power", 0)),
         "amp_orders":       order_vector(cfg),
         "mg5_generate":     list(cfg["mg5_generate"]),
-        "per_event_alphas": "lhe_aqcdup",
+        # the alpha_s the pool is labelled at: MadEvent's AQCDUP (Daniel's catalog), or the window pools' convention,
+        # alpha_s(sqrt(s_hat)) run at one loop from 0.118 (lhe.label_alphas: running_sqrt_shat; the pp study, so a pp
+        # pool is the same |M|^2 function as its catalog_v3 window parent)
+        "per_event_alphas": ("lhe_aqcdup" if cfg["lhe"].get("label_alphas", "aqcdup") == "aqcdup"
+                             else str(cfg["lhe"]["label_alphas"])),
         "label_convention": "mg5_slot_v2",
         "lhe": {
             "model":             cfg["lhe"].get("model", "sm"),
@@ -3746,6 +3752,13 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     for rec, path in items:
         lo, hi = rec["lhe"]["block"]
         m, a = mom[lo:hi], aqcd[lo:hi]
+        a_up = a
+        rule = cfg["lhe"].get("label_alphas", "aqcdup")
+        if rule == "running_sqrt_shat":
+            q = m[:, 0] + m[:, 1]
+            a = compute_alphas(np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 1e-300, None)), alphas_mz=0.118)
+        elif rule != "aqcdup":
+            raise ValueError(f"{process}: unknown lhe.label_alphas {rule!r}")
         amps = label_lhe_pp(process, m, a, sa)
         bad = ~np.isfinite(amps) | (amps <= 0)
         if bad.any():
@@ -3757,9 +3770,12 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         tmp = path + ".tmp.npy"
         np.save(tmp, data)
         os.replace(tmp, path)
-        # each event's alpha_s (AQCDUP, the one it was labelled at), row-aligned with the pool: the coupling-order
-        # factor of the target (data.target_physics_orders, D93) divides it out
+        # each event's alpha_s (the one it was labelled at), row-aligned with the pool: the coupling-order factor of
+        # the target (data.target_physics_orders, D93) divides it out; MadEvent's own AQCDUP kept beside it when the
+        # label used another
         np.save(path[:-len(".npy")] + ".alphas.npy", np.asarray(a, dtype=np.float64))
+        if rule != "aqcdup":
+            np.save(path[:-len(".npy")] + ".aqcdup.npy", np.asarray(a_up, dtype=np.float64))
         bcopy = None
         if banner:
             bcopy = os.path.join(d, f"{process}_lhe_iseed{iseed}.banner.txt")
