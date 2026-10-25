@@ -8275,25 +8275,25 @@ of the three share a test set.
     (the $b$ Yukawa). The $34$ that vanish are all a Higgs on a $b$ line with nothing else to couple to it
     ($b\bar b\to h$, $h+\gamma/g$, $hh$, $bg\to bh$, $gg\to b\bar bh$, ...): MadGraph finds no diagram once the $b$ is
     massless, so these classes leave the catalog unless the $b$ keeps a Yukawa.
-    % src: python3 analysis/catalog_v4/read_validation.py @652bad3
+    % src: python3 analysis/catalog_v4/read_validation.py @1244c7e
     % claim: disk.events_mb=51
     % claim: disk.standalone_mb=2.3
     % claim: disk.tree_backends=1621
     % claim: disk.backends_gb=87
     % claim: disk.backends_sa_gb=3.7
-    % claim: disk.pool_entries=1930
-    % claim: disk.pool_gb=52
-    % claim: disk.total_gb=139
-    % claim: disk.total_sa_gb=56
+    % claim: disk.pool_entries=1968
+    % claim: disk.pool_gb=53
+    % claim: disk.total_gb=140
+    % claim: disk.total_sa_gb=57
     % claim: disk.free_gb=27.4
     % claim: disk.v3_events_dirs=1790
     % claim: disk.v3_events_gb=92
     % claim: disk.build_core_h=9
     % allow: 5 1 because they are a column count's terms (5k+1), no results
     \emph{The regeneration's disk and CPU.} A built tree backend is $51$\,MB of MadGraph events directory (made by every
-    build, used only for LHE) plus $2.3$\,MB of standalone. The $1930$ pool entries (after the $b$-Higgs drop) at the approved sizes, float64,
-    $5k+1$ columns, are $52$\,GB; their $1621$ tree backends $87$\,GB ($3.7$\,GB without the events directories): $139$\,GB in
-    all, $56$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
+    build, used only for LHE) plus $2.3$\,MB of standalone. The $1968$ pool entries (after the $b$-Higgs drop, with the energy hold-out) at the approved sizes, float64,
+    $5k+1$ columns, are $53$\,GB; their $1621$ tree backends $87$\,GB ($3.7$\,GB without the events directories): $140$\,GB in
+    all, $57$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
     directories hold about $92$\,GB there. The builds cost about $9$ core-hours.
     % src: python3 analysis/catalog_v4/read_validation.py @0490f0a
     % claim: disk.pool_entries=1974
@@ -8312,32 +8312,39 @@ of the three share a test set.
     % claim: regen.total_gb=66
     % claim: regen.free_gb=24.1
     % allow: 2 3 4 5 16 2000 because they are final-state multiplicities and the validation's worker and chunk sizes, settings
-    The measured generation cost per kept event (candidates and their labels included, $2000$-event chunks, $16$
+    Before the $b$-Higgs drop and the energy hold-out's return (the current figures follow), the measured generation cost per kept event (candidates and their labels included, $2000$-event chunks, $16$
     entries at once on one node, so a chunk's start is in it) is $0.15$ to $2.32$\,ms, a mean of $0.18$, $0.23$,
     $0.77$ and $1.39$\,ms at $2$, $3$, $4$ and $5$ finals. Over the regeneration's $1824$ tree entries ($218$M events)
     that is about $39$ core-hours, an hour of wall on one node; the $150$ one-loop entries are not measured. The
     $1974$ entries' pools are $53$\,GB in float64 and the backends built without events directories about
     $12.8$\,GB (storage inventory, \code{analysis/storage}): about $66$\,GB against $24.1$\,GB free on CC now.
-    % src: python3 analysis/catalog_v4/read_validation.py @652bad3
+    % src: python3 analysis/catalog_v4/read_validation.py @1244c7e
     % claim: drop.trees=34
     % claim: drop.trees_left_in_v4=0
     % claim: drop.loop_entries=8
-    % claim: drop.recipe_entries=123
+    % claim: drop.recipe_entries=127
     % claim: drop.by_recipe.train=35
     % claim: drop.by_recipe.gen_stage1=33
-    % claim: regen.tree_entries=1788
+    % claim: drop.energy.v3_entries=40
+    % claim: drop.energy.entries=38
+    % claim: drop.energy.lo_tev=6
+    % claim: drop.energy.hi_tev=20
+    % claim: regen.tree_entries=1826
     % claim: regen.loop_entries=142
-    % claim: regen.tree_events_m=214
-    % claim: regen.tree_cpu_h=38
-    % claim: regen.pool_gb=52
-    % claim: regen.total_gb=65
+    % claim: regen.tree_events_m=218
+    % claim: regen.tree_cpu_h=39
+    % claim: regen.pool_gb=53
+    % claim: regen.total_gb=66
     \emph{The $b$-Higgs classes dropped} (the user, 2026-10-25: ``Drop the b to higgs events.''): the $34$ trees with no
     diagram are out of catalog\_v4's entries ($0$ left), with the $8$ one-loop entries on them as Born and every recipe
-    entry, in any role, named after or based on them: $123$ entries ($33$ in the first generation stage, $35$ in the
-    training recipe). The regeneration is now $1788$ tree entries ($214$M events, about $38$ core-hours) and $142$
-    one-loop entries, about $52$\,GB of pools and $65$\,GB with the backends. Next: the $1$ to $10$\,TeV energy hold-out
-    (still the user's call); then the regeneration on CC once it is answered; then classes and roles on v4; then the
-    $b$ mass in \code{particle\_ids.py}.
+    entry, in any role, named after or based on them: $127$ entries ($33$ in the first generation stage, $35$ in the
+    training recipe). \emph{The energy hold-out} moves above the training window (the user, 2026-10-26: ``Yes, okay,
+    that's fine, go ahead.''): catalog\_v3's $40$ energy probes become \code{v4\_<name>\_\_E20} on $\sqrt{\hat s}\in[6,20]$\,TeV,
+    log-uniform like the window, in the fourth generation stage and the held-out recipe
+    \code{catalog\_v4\_heldout\_H7E.yaml}; $38$ of them, since two sit on dropped $b$-Higgs trees ($b\bar b\to ggh$,
+    $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
+    one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
+    classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/census_diagrams.pdf}
