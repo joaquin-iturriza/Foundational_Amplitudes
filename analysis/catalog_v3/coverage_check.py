@@ -505,14 +505,26 @@ def med(x):
     return float(np.median(x)) if x else None
 
 
+def u_cover(h_pp, h_s):
+    """the pp events' forward angle u against a sample's: (pp share in u bins the sample never reaches, effective sample
+    size per event (sum w)^2 / (n sum w^2) of the sample reweighted to the pp u distribution on the bins it reaches)"""
+    a, b = np.asarray(h_pp, float), np.asarray(h_s, float)
+    a, b = a / a.sum(), b / b.sum()
+    m = b > 0
+    w = a[m] / b[m]
+    return float(a[~m].sum()), float((b[m] * w).sum() ** 2 / (b[m] * w ** 2).sum())
+
+
 def summary():
-    """medians per kind and multiplicity (the write-up's figure and paragraph are the next step's)"""
+    """medians per kind and multiplicity, per held-out axis on pp, b and tau, totals; the last line is the whole
+    summary as one JSON object (docs/results.tex's claims, analysis/catalog_v3/coverage_fig.py)"""
     rows = json.load(open(os.path.join(HERE, "data", "coverage_rows.json")))
     keys = ("current", "proposed", "wide")
     ok = {n: r for n, r in rows.items() if "error" not in r and all("width_999" in r.get(k, {}) for k in keys)}
     print(f"{len(rows)} rows, {len(ok)} usable, errors: {sorted(n for n, r in rows.items() if 'error' in r)}")
-    out = {}
+    out = {"n_rows": len(rows), "n_usable": len(ok), "n_errors": sum(1 for r in rows.values() if "error" in r)}
     sec = lambda r, c: r[c]["t_total"] / r["n"]
+    pp_ok = lambda r: "pp" in r and not r["pp"].get("missing")
     for kd in ("hadronic", "ee"):
         for nf in (2, 3, 4):
             g = [r for r in ok.values() if r["kind"] == kd and r["nfinal"] == nf]
@@ -528,24 +540,54 @@ def summary():
             for k in keys:
                 e[f"cpu_h_{k}"] = float(sum(sec(r, k) * r["n_pool"] for r in g) / 3600)
                 e[f"forward_share_{k}"] = med(r[k]["forward_share"] for r in g)
+                e[f"width_999_{k}"] = med(r[k]["width_999"] for r in g)
             bt = [r for r in g if "b_tau_fail_share" in r["current"]]
             e["b_tau_classes"] = len(bt)
             e["b_tau_no_cut_now"] = sum(1 for r in g if r["has_b_tau"] and r["n_cut_legs_current"] == 0)
             if bt:
                 e["b_tau_fail_share"] = med(r["current"]["b_tau_fail_share"] for r in bt)
-            pp = [r["pp"] for r in g if "pp" in r and not r["pp"].get("missing")]
+            pp = [r for r in g if pp_ok(r)]
             if pp:
                 for f in ("in_cur_window", "in_new_window", "in_new_wide", "in_cur", "in_new", "in_new_b_tau_uncut",
                           "in_window", "above_window", "above_wide", "in_range_cur", "in_range_new", "forward_share"):
-                    e[f"pp_{f}"] = med(p[f] for p in pp)
+                    e[f"pp_{f}"] = med(r["pp"][f] for r in pp)
                 for k in keys:
-                    e[f"pp_u_overlap_{k}"] = med(p["u_overlap"].get(k) for p in pp)
+                    e[f"pp_u_overlap_{k}"] = med(r["pp"]["u_overlap"].get(k) for r in pp)
+                    uc = [u_cover(r["pp"]["u_hist"], r[k]["u_hist"]) for r in pp]
+                    e[f"pp_u_uncovered_mean_{k}"] = float(np.mean([x[0] for x in uc]))
+                    e[f"pp_u_ess_{k}"] = med(x[1] for x in uc)
                 for k in ("uniform_window", "uniform_wide", "log_wide", "lumi_wide"):
-                    e[f"pp_ess_{k}"] = med(p["sqrts_measure"][k]["ess"] for p in pp)
+                    e[f"pp_ess_{k}"] = med(r["pp"]["sqrts_measure"][k]["ess"] for r in pp)
                 e["pp_n"] = len(pp)
             out[f"{kd}_2to{nf}"] = e
             print(f"{kd:8s} 2->{nf}", json.dumps({k: (round(v, 3) if isinstance(v, float) else v) for k, v in e.items()}))
+    had = [r for r in ok.values() if r["kind"] == "hadronic" and pp_ok(r)]
+    out["pp"] = {"n": len(had), "n_missing": sum(1 for r in ok.values() if r["kind"] == "hadronic" and not pp_ok(r)),
+                 "in_new_min": float(min(r["pp"]["in_new"] for r in had)),
+                 "fail_max": {c: float(max(r["pp"]["fail_new"][c] for r in had)) for c in ("pt_min", "cos_max", "dr_min",
+                                                                                         "m_min")}}
+    for ax in ("train", "H1", "H2", "H3"):
+        g = [r["pp"] for r in had if r["group"] == ax]
+        out["pp"][ax] = {"n": len(g), **{f: med(p[f] for p in g) for f in (
+            "in_cur_window", "in_new_window", "in_new_wide", "above_window", "above_wide", "in_range_cur",
+            "in_range_new")}}
+    bt = [r for r in ok.values() if r["has_b_tau"]]
+    btc = [r for r in bt if r["current"].get("width_999_b_tau_cut") is not None]
+    btp = [r["pp"] for r in bt if pp_ok(r)]
+    out["b_tau"] = {"n": len(bt), "no_cut_now": sum(1 for r in bt if r["n_cut_legs_current"] == 0),
+                    "fail_share": med(r["current"].get("b_tau_fail_share") for r in bt),
+                    "width_loss": med(r["current"]["width_999"] - r["current"]["width_999_b_tau_cut"] for r in btc),
+                    "pp_n": len(btp), "pp_in_new_mean": float(np.mean([p["in_new"] for p in btp])),
+                    "pp_in_new_uncut_mean": float(np.mean([p["in_new_b_tau_uncut"] for p in btp]))}
+    R = list(ok.values())
+    out["cost"] = {k: {"cpu_h": float(sum(sec(r, k) * r["n_pool"] for r in R) / 3600),
+                       "labelled_per_kept": med(r[k]["labelled"] / r["n"] for r in R),
+                       "drawn_per_kept": med(r[k]["drawn"] / r["n"] for r in R),
+                       "label_time_share": float(sum(r[k]["t_label"] for r in R) / sum(r[k]["t_total"] for r in R))}
+                   for k in keys}
+    out["cost"]["n_pool_events"] = int(sum(r["n_pool"] for r in R))
     json.dump(out, open(os.path.join(HERE, "data", "coverage_check.json"), "w"), indent=1)
+    print(json.dumps(out))
 
 
 if __name__ == "__main__":
