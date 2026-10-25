@@ -23,7 +23,7 @@ entries:
     && test -f analysis/catalog_v3/figs/pp_trained.pdf && grep -q ''figs/pp_trained.pdf'' docs/results.tex && grep -q ''label{fig:v3_pp_trained}''
     docs/results.tex && grep -q ''% claim: dimensionless_pp\.'' docs/results.tex'
   match: zz_pp_*,catalog_v3_pp*
-  notes_ref: null
+  notes_ref: fig:v3_pp
   evidence:
     runs: []
     commit: null
