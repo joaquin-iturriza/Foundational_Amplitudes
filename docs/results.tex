@@ -475,6 +475,61 @@ every other held-out process.}
 \label{fig:v3_short}
 \end{figure}
 
+\paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
+probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
+as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
+out, none skipped (\code{tools/factorised\_2to4.py --v3}, CPU; \code{analysis/catalog\_v3/factorised\_2to4.py}). The
+method is the one of Daniel's catalog with three changes: for a $Z$ or $H$ the map's beam fraction is $x=K^2/\hat s$;
+on $b$ beams, where a rescaled beam would leave its mass shell, the other finals are kept and the beams absorb the
+recoil, each on its mass shell, back to back in $K$'s rest frame (\code{beam\_recoil\_map}; momentum conserved to
+$10^{-13}$ and masses exact on constructed events; $5$ of the $266{,}000$ $b$-beam events below its threshold are
+dropped and counted), so the $266$ $b$-beam classes are summarised apart; and the learned correction is fitted in $10$
+folds grouped by parent (a class's siblings on the same parent never in its own fit), $400$ events per class, in place
+of leave-one-probe-out. Every parent's backend reproduces its own pool exactly where it has one; $78$ parents never
+generated were compiled for the check. Medians over the classes of the variance of $\log|\mathcal M|^2$, the class's
+mean removed:
+\begin{center}
+\small
+\begin{tabular}{lrccc}
+\hline
+added particle, beams & classes & its own & after the parent & and learned \\
+\hline
+gluon, light & $205$ & $10.9$ & $3.57$ & $0.49$ \\
+gluon, $b$ & $107$ & $10.7$ & $3.72$ & $0.52$ \\
+photon, light & $210$ & $10.7$ & $4.29$ & $1.15$ \\
+photon, $b$ & $88$ & $10.6$ & $4.31$ & $1.10$ \\
+$Z$, light & $116$ & $5.05$ & $1.18$ & $0.87$ \\
+$Z$, $b$ & $48$ & $4.31$ & $0.87$ & $0.50$ \\
+$H$, light & $83$ & $8.88$ & $1.48$ & $1.06$ \\
+$H$, $b$ & $23$ & $6.32$ & $0.98$ & $0.65$ \\
+\hline
+\end{tabular}
+\end{center}
+The parent carries a massive emission as well as a massless one: after it a $Z$ or $H$ leaves about $1$, and the learned
+correction, which removes most of what a gluon or photon leaves, adds little there. The $b$-beam classes behave as
+the light ones. Against the network: on catalog\_v3, unlike Daniel's catalog, the short dimensionless run already
+reads a held-out $2\to4$ class's shape zero-shot about as well as the exact parent with the learned correction. On the
+$124$ held-out $2\to4$ families among these classes (H2), its shape is $0.47$ / $1.15$ / $0.81$ / $0.73$ (gluon /
+photon / $Z$ / $H$, median) against the factorised $0.55$ / $1.23$ / $0.90$ / $1.34$, the factorised form better on
+$22$ of $42$, $14$ of $44$, $9$ of $23$ and $6$ of $15$. On the $144$ top classes (H3) the factorised form is ahead,
+$0.39$ / $0.89$ / $0.29$ / $0.39$ against the network's $0.57$ / $1.08$ / $0.61$ / $1.08$, better on $34$ of $45$,
+$32$ of $43$, $31$ of $35$ and $19$ of $21$. The information budgets differ as on Daniel's catalog: the factorised
+numbers use the parent's exact $|\mathcal M|^2$ and a correction fitted on the true $2\to4$ labels of other parents'
+classes, the network's are zero-shot. So where catalog\_v3 trains on the multiplicity, the head would add little; where
+it might is at a multiplicity not trained on, the $40$ $2\to5$ probes (each a $2\to4$ class plus one particle), whose
+factorisation onto their $2\to4$ parents is running.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v3/figs/factorised_2to4_a.pdf}\hfill\pnl{../analysis/catalog_v3/figs/factorised_2to4_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v3/figs/factorised_2to4_c.pdf}\hfill\pnl{../analysis/catalog_v3/figs/factorised_2to4_d.pdf}}
+\caption{catalog\_v3's $2\to4$ classes built as a $2\to3$ class plus one particle: per class (ordered by its own
+spread) the variance of $\log|\mathcal M|^2$, after dividing by the parent's exact $|\mathcal M|^2$ at the mapped event,
+and after also removing a correction learned on other parents' classes. (a) A gluon added, (b) a photon, (c) a $Z$,
+(d) an $H$; light and $b$ beams together.}
+\label{fig:v3_factorised}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
