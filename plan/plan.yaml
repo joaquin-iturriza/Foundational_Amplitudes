@@ -979,9 +979,9 @@ entries:
   - D134
   - D136
   - D137
-  next: keep catalog_v4's sqrt(s-hat) range at threshold to 6 TeV and move the energy hold-out to 6 to 20 TeV (the 40 probes
-    regenerated there, log-uniform like the window); finish the storage deletions; then regenerate catalog_v4's pools on CC
-    (CPU, ~39 core-h, ~66 GB), then classes and roles on v4, then the b mass in particle_ids.py
+  next: regenerate catalog_v4's pools on CC (CPU, about 39 core-h, about 66 GB; 1826 tree entries with the energy hold-out
+    on 6 to 20 TeV, 38 of its 40 probes, the 34 b-Higgs classes dropped; CC has 89 GB free after the storage cleanup); then
+    classes and roles on v4; then the b mass in particle_ids.py
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
