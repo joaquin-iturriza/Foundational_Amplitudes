@@ -7,6 +7,8 @@ D63 the "model" entry alone is the live weights at the best step).
 The rebuilt statistics are asserted against the run's data_stats.json. Prints one EVAL_BEST JSON line per run.
 Needs a GPU.
     python tools/eval_best_val.py <run_dir> [<run_dir> ...]
+EVAL_LIVE=1 scores the checkpoint's "model" entry alone, as this tool did before D63's EMA readers (2026-10-15): in an
+older checkpoint with EMA on that is the live weights, not the EMA weights validation used.
 """
 import json, os, sys, tempfile
 
@@ -41,7 +43,11 @@ for run_dir in sys.argv[1:]:
     for k in ("prepd_mean", "prepd_std"):
         got = [float(x) for x in getattr(exp, k)]
         assert np.allclose(got, saved[k], rtol=1e-6), f"{run_dir}: rebuilt {k} {got} != {saved[k]}"
-    ema_applied = load_best_weights(exp.model, run_dir)
+    if os.environ.get("EVAL_LIVE") == "1":
+        from rebuild_run import _load_best_ckpt
+        exp.model.load_state_dict(_load_best_ckpt(run_dir)["model"]); ema_applied = False
+    else:
+        ema_applied = load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     exp.ema, exp.train_sampler = None, None
     exp.val_loss, exp.val_loss_no_reg, exp.val_mse = [], [], []
@@ -51,5 +57,6 @@ for run_dir in sys.argv[1:]:
         exp._validate(0)
     print("EVAL_BEST " + json.dumps({
         "run_dir": run_dir, "val_loss": exp.val_loss_no_reg[-1], "ema_applied": ema_applied,
+        "live_only": os.environ.get("EVAL_LIVE") == "1",
         "proc_val_losses_no_reg": {n: v[-1] for n, v in exp.proc_val_losses_no_reg.items()},
         "prepd_std": saved["prepd_std"]}), flush=True)
