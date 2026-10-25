@@ -266,14 +266,26 @@ def linear_probe_head(exp, lambdas=None):
     rescales its input by a constant, so the written weights are calibrated on the training events and the match is
     asserted. The small-D fine-tuning study (D120); fine_tune.linear_probe, off by default."""
     import os, sys
-    import numpy as np
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
-    from linear_readout import features, ridge_loo
     lins = [m for n, m in exp.model.named_modules() if n.split(".")[-1] == "linear_out"]
     assert len(lins) == 1, f"linear probe: expected one linear_out, found {len(lins)}"
     head = lins[0]
     was_training = exp.model.training
     exp.model.eval()
+    # TF32 (training.allow_tf32, active on H100/A100) rounds the trunk's and the head's matmuls to ~1e-3: two passes
+    # then disagree by up to ~1e-2 standardized and the match below fails although the head is written right (5 of the
+    # round's d5 trials on H100, none on V100). The probe's passes run in full float32; training keeps the flag.
+    tf32 = (torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32)
+    torch.backends.cuda.matmul.allow_tf32 = torch.backends.cudnn.allow_tf32 = False
+    try:
+        return _linear_probe_fit(exp, head, was_training)
+    finally:
+        torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32 = tf32
+
+
+def _linear_probe_fit(exp, head, was_training):
+    import numpy as np
+    from linear_readout import features, ridge_loo
     F, y, z0 = features(exp, exp.train_eval_loader)
     w, b, lam, loo = ridge_loo(F, y)
     target = F @ w + b
