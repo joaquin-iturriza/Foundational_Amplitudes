@@ -8,6 +8,8 @@ the method wins; every cell without 5 finished trials is listed, never dropped.
 Input: data/lowd_dyhpo_sweeps.json, written on CC by
     python analysis/transfer/collect_sweeps.py tp3_lowd_ > analysis/transfer/data/lowd_dyhpo_sweeps.json
     python3 analysis/transfer/lowd_dyhpo.py    -> data/lowd_dyhpo.json, figs/lowd_dyhpo.{png,pdf}
+An interim read before all trials are in: --complete counts a method's cell only once its sweep has all 5 trials
+(-> data/lowd_dyhpo_interim.json, figs/lowd_dyhpo_interim.{png,pdf}; the final files are left alone).
 """
 import json, os, sys
 
@@ -20,6 +22,8 @@ METHODS = {"lpft": "linear probe, then fine-tune", "l2sp": "pulled toward the st
 
 
 def main():
+    complete = "--complete" in sys.argv[1:]
+    tag = "_interim" if complete else ""
     spec = json.load(open(os.path.join(HERE, "data", "lowd_ft_spec.json")))
     S = json.load(open(os.path.join(HERE, "data", "lowd_dyhpo_sweeps.json")))
     rows, incomplete = [], []
@@ -30,7 +34,7 @@ def main():
             tr = [t for t in S.get(name, []) if t.get("val_loss") is not None and t.get("prepd_std")]
             if len(tr) < 5:
                 incomplete.append(f"{name}: {len(tr)}/5")
-            if tr:
+            if tr and (len(tr) >= 5 or not complete):
                 b = min(tr, key=lambda t: t["val_loss"] * t["prepd_std"] ** 2)
                 r[m] = b["val_loss"] * b["prepd_std"] ** 2
                 r[m + "_hp"] = b.get("hp")
@@ -53,17 +57,17 @@ def main():
     dflt = {str(k): float(np.median([np.log10(r["scratch"] / r["recorded_ft"]) for r in rows if r["k"] == k]))
             for k in (2, 3, 4, 5)}
     out = {"summary": summ, "default_over_scratch": dflt, "incomplete": incomplete, "cells": rows}
-    json.dump(out, open(os.path.join(HERE, "data", "lowd_dyhpo.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", f"lowd_dyhpo{tag}.json"), "w"), indent=1)
     for m, v in summ.items():
         print(m, json.dumps(v))
     print("incomplete:", len(incomplete), incomplete[:10])
-    plot(summ, dflt)
+    plot(summ, dflt, tag)
     # last line: the object the results.tex claims key into (tools/verify_claims.py), e.g. summary.l2sp.4.wins_over_default
     print(json.dumps({"summary": summ, "default_over_scratch": dflt, "n_cells": len(rows),
                       "n_incomplete": len(incomplete)}))
 
 
-def plot(summ, dflt):
+def plot(summ, dflt, tag=""):
     import plot_style as ps
     fig, (a, b) = ps.figure(ncols=2)
     cols = {"lpft": ps.C.vermillion, "l2sp": ps.C.green, "freeze": ps.C.orange}
@@ -82,7 +86,7 @@ def plot(summ, dflt):
     ps.legend(a, "upper left")
     for ax in (a, b):
         ps.make_room(ax)
-    ps.save(fig, os.path.join(HERE, "figs", "lowd_dyhpo"))
+    ps.save(fig, os.path.join(HERE, "figs", f"lowd_dyhpo{tag}"))
 
 
 if __name__ == "__main__":
