@@ -27,7 +27,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
+ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -40,6 +40,9 @@ case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
     dimensionless_context) NORM=("${DIM[@]}" ++model.context_dim=16 ++model.context_dropout=0.5) ;;
+    # the shape proxy's candidate (docs/results.tex, par. The shape proxy on catalog_v3; D99): the same dimensionless
+    # inputs and orders, the target's reference scale s_hat alone in place of the emission scales
+    dimensionless_shat)    NORM=("${DIM[@]/target_physics_dim_ref=qperp/target_physics_dim_ref=shat}") ;;
     dimensionless_twin)    NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_twin_train.yaml" ;;
     # the pp study: the same target trained with every hadronic tree class on 13 TeV MadEvent pp events in place of its
     # shaped window (recipes/catalog_v3_pp_mixed_train.yaml; the other pools as in catalog_v3_train.yaml)

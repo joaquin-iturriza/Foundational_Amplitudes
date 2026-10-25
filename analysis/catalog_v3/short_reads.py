@@ -16,11 +16,12 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
-ARMS = ("baseline", "dimensionless", "dimensionless_context", "dimensionless_twin", "dimensionless_pp")
+ARMS = ("baseline", "dimensionless", "dimensionless_shat", "dimensionless_context", "dimensionless_twin", "dimensionless_pp")
 # the axes each arm's job reads (scripts/job_catalog_v3_short.sh): every arm the eight, the twin also its two
 READ = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
 READS = {arm: READ + (("H3p", "H4") if arm == "dimensionless_twin" else ()) for arm in
-         ("baseline", "dimensionless", "dimensionless_context", "dimensionless_twin", "dimensionless_pp")}
+         ("baseline", "dimensionless", "dimensionless_shat", "dimensionless_context", "dimensionless_twin",
+          "dimensionless_pp")}
 AXES = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "the top",
         "H5": "one loop", "H6": r"$\alpha_s=0.13$", "H7E": r"$1$-$10$ TeV", "H7c": r"$p_T\geq30$ GeV",
         "H3p": r"$\tau$, $\nu_\tau$ never seen", "H4": "quartic vertex never seen"}
