@@ -140,7 +140,7 @@ entries:
     ''label{par:lowd_dyhpo}'' docs/results.tex && grep -q ''figs/lowd_dyhpo.pdf'' docs/results.tex && grep -q ''% src: python3
     analysis/transfer/lowd_dyhpo.py'' docs/results.tex'
   match: tp3_lowd*,zz_lowd*
-  notes_ref: null
+  notes_ref: par:lowd_ft
   evidence:
     runs:
     - FA-ccin2p3-cf5b43a4
