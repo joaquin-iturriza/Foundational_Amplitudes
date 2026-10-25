@@ -22,7 +22,13 @@ echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
 # a submission counts only once it printed its run id (2026-10-23: submits refused for an uncommitted file went
 # unnoticed behind a filtered output, and the scorings were never queued)
-out=$(site submit ccin2p3 FA "$JOB" ${NOSYNC:+--no-sync} ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} ${V3_AXES:+--env "V3_AXES=$V3_AXES"} ${AMP_LHE_CORES:+--env AMP_LHE_CORES=$AMP_LHE_CORES} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
+# NOSYNC only against the commit this checkout is at: a failed batch sync (a dirty tree) once let two jobs run on old code
+if [ -n "$NOSYNC" ]; then
+    here=$(git -C "$(dirname "$0")/.." rev-parse HEAD)
+    there=$(site run ccin2p3 FA -- git rev-parse HEAD 2>/dev/null | grep -oE '^[0-9a-f]{40}$' | tail -1)
+    [ "$here" = "$there" ] || { echo "NOSYNC refused: CC is at ${there:-?}, this checkout at $here; run site sync first"; exit 2; }
+fi
+out=$(site submit ccin2p3 FA "$JOB" ${NOSYNC:+--no-sync} ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} ${V3_AXES:+--env "V3_AXES=$V3_AXES"} ${AMP_LHE_CORES:+--env AMP_LHE_CORES=$AMP_LHE_CORES} ${ARMS:+--env "ARMS=$ARMS"} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
 echo "$out"
 # CC full for this memory right now (site submit's fit check): defer, the supervisor retries on its next pass
 # the code transfer to CC failed (two launches syncing at once collide on the push; a dropped bundle): defer and retry
