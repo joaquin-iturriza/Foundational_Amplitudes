@@ -56,14 +56,18 @@ def main():
         o = out[ax]
         flat.update({f"{ax}_{k}": float(f"{o[k]:.3g}") for k in ("mse", "level", "shape")})
         flat[f"{ax}_rank"] = o["rank_mse"]
+        flat[f"{ax}_n"] = o["n"]
         for ref, sh in short.items():
             v = o[f"vs_{ref}"]
             flat[f"{ax}_{sh}_ratio"] = round(v["median_mse_ratio"], 2)
             flat[f"{ax}_{sh}_level"] = round(v["level_ratio"], 2)
             flat[f"{ax}_{sh}_shape"] = round(v["shape_ratio"], 2)
             flat[f"{ax}_{sh}_better"] = v["mse_better"]
+            flat.update({f"{ax}_{sh}_med_{k}": float(f"{r[ref][ax][k]:.3g}") for k in ("mse", "level", "shape")})
     for arm, sh in (("dimensionless_hybrid", "hyb"),) + tuple(short.items()):
         flat[f"wrong_sign_{sh}"] = round(100 * out["signed_H5"][arm]["wrong_sign"])
+    flat["signed_pools"] = out["signed_H5"][ARM]["pools"]
+    flat["n_probes"] = sum(out[ax]["n"] for ax in AXES)
     plot(r)
     print(json.dumps(flat))
 
