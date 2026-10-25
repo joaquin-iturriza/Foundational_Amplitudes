@@ -112,18 +112,20 @@ def me2(proc, mom, alphas):
 V3_EXTRA = {"g": 21, "a": 22, "z": 23, "h": 25}
 
 
-def v3_probes():
+def v3_probes(nfinal=4):
     """Every catalog_v3 2->4 class (with pools) built as a 2->3 class plus one g, a, Z or H (the census's `why` =
     '<parent>+<x>'). Massless beams take the CS map, b beams the beam-recoil map; a parent with no compiled
     standalone is compiled (datagen.ensure_backend). A class whose parent is not in the catalog is listed (V3_SKIP). Returns [(probe, parent, extra pdg)]."""
     import json
     gen = set(json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"])   # classes with pools
+    if nfinal == 5:                                  # the 2->5 probes (H2p5), each a 2->4 class plus one particle
+        gen = {e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_heldout_H2p5.yaml")))["processes"]}
     out = []
     for kind, pdg in V3_EXTRA.items():
         c = []
         for n, cfg in sorted(mg.PROCESSES.items()):
             why = str(cfg.get("why", ""))
-            if n not in gen or cfg.get("nfinal") != 4 or not why.endswith("+" + kind):
+            if n not in gen or cfg.get("nfinal") != nfinal or not why.endswith("+" + kind):
                 continue
             par = why[: -len(kind) - 1]
             why_skip = "parent not in the catalog" if par not in mg.PROCESSES else None
@@ -156,11 +158,12 @@ def main():
     ap.add_argument("--only", nargs="*", default=None)
     ap.add_argument("--v3", action="store_true",
                     help="every catalog_v3 2->4 class built as a 2->3 class plus g, a, Z or H (the skipped listed)")
+    ap.add_argument("--nfinal", type=int, default=4, help="with --v3: 4 (the 2->4 classes) or 5 (the 2->5 probes)")
     ap.add_argument("--skip-done", action="store_true", help="skip a probe whose npz is already in --out (a rerun)")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     if a.v3:
-        jobs = v3_probes()
+        jobs = v3_probes(a.nfinal)
     else:
         jobs = [(e["name"], mg.PROCESSES[e["name"]]["parent"], None) for e in yaml.safe_load(open(a.recipe))["processes"]]
     for p, parent, extra in jobs:
