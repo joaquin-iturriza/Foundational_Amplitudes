@@ -920,8 +920,7 @@ entries:
     of .in files), so validation plus census fit well inside 10 GB of the 28 GB free; both submitted in full. When the validation
     (FA-ccin2p3-44e6a15b) ends: read it, report the cuts, sqrt(s) shape, forward angle, top and b checks and the EW diagram
     counts, and the measured per-process disk (V4SIZE lines in its log) and CPU cost (t_build, sec_per_event in validation.json).
-    When the harder-cut rerun (FA-ccin2p3-144e2111, COV_REDO=harder_cut) ends: collect and update the coverage paragraph''s
-    pp numbers for those 40 entries.'
+    The harder-cut rerun (FA-ccin2p3-144e2111) is in: pp numbers of the 40 pT>30 GeV entries written up (1f03805).'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
