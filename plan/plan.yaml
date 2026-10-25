@@ -915,10 +915,14 @@ entries:
   - D127
   - D130
   - D134
-  next: CC has 30 GB free again (Daniel's catalog's cached pools deleted, D131); the 1-10 TeV energy hold-out question is
-    still open. Run catalog_v4's validation on CC (scripts/job_catalog_v4_validate.sh, CPU, under item catalog_coverage) but
-    measure first what its MadGraph census writes to disk (process dirs under mg5amcnlo) and run only the 35-entry validation
-    if the census would take more than 10 GB; and rerun the coverage check's 40 harder-cut entries (COV_REDO=harder_cut)
+  next: 'Disk measured before submitting (read-only du on CC, 2026-10-25): a built catalog_v3 tree backend is ~50 MB of MadGraph
+    events dir plus ~2.6-3.5 MB of standalone (33 analogues of the validation''s 35 entries: 1.68 GB events + 0.09 GB standalone,
+    1.77 GB; the 2->5 bbx_ggtaptamz the largest at 56 MB); the v4 census runs display processes only (no output, a few KB
+    of .in files), so validation plus census fit well inside 10 GB of the 28 GB free; both submitted in full. When the validation
+    (FA-ccin2p3-44e6a15b) ends: read it, report the cuts, sqrt(s) shape, forward angle, top and b checks and the EW diagram
+    counts, and the measured per-process disk (V4SIZE lines in its log) and CPU cost (t_build, sec_per_event in validation.json).
+    When the harder-cut rerun (FA-ccin2p3-144e2111, COV_REDO=harder_cut) ends: collect and update the coverage paragraph''s
+    pp numbers for those 40 entries.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
