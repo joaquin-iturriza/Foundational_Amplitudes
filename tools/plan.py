@@ -880,9 +880,28 @@ def cmd_check(a):
     if trivial_check(a.done_when):
         sys.exit("plan: %r passes in an empty directory: it checks nothing about the work" % a.done_when)
     status = entry(load()[0], a.id).get("status")
+    if a.stale and (a.replace or status == "done"):
+        sys.exit("plan: --stale is for an open entry whose check names the wrong files; a done one takes --replace")
+    if a.stale:
+        # the old check fails, the new one passes, and the swap is recorded with its reason for the user to see:
+        # a check that names the wrong deliverable (a figure split into panels) is fixed, never quietly loosened
+        if not a.why:
+            sys.exit("plan: --stale needs --why (what in the old check was wrong)")
+        old_dw = entry(load()[0], a.id).get("done_when") or ""
+        if old_dw and subprocess.run(old_dw, shell=True, cwd=ROOT, capture_output=True, timeout=600).returncode == 0:
+            sys.exit("plan: %s's current check passes: it is not stale" % a.id)
+        if subprocess.run(a.done_when, shell=True, cwd=ROOT, capture_output=True, timeout=600).returncode != 0:
+            sys.exit("plan: the new check fails too: the work is not there yet")
+        with transaction() as (d, st):
+            e = entry(d, a.id)
+            e.setdefault("history", []).append({"at": now().isoformat(), "was_done_when": old_dw,
+                                                "stale_because": a.why})
+            e["done_when"] = a.done_when
+        print("plan: %s's stale check replaced (%s); tell the user, then plan done" % (a.id, a.why))
+        return
     if a.replace and status != "done":
-        sys.exit("plan: --replace is for a done entry's check; %s is %s (plan check without --replace)" % (
-            a.id, status))
+        sys.exit("plan: --replace is for a done entry's check; %s is %s (plan check without --replace, or --stale"
+                 " for a check naming the wrong files)" % (a.id, status))
     if not a.replace and status == "done":
         sys.exit("plan: %s is done; change its check with --replace" % a.id)
     r = subprocess.run(a.done_when, shell=True, cwd=ROOT, capture_output=True, timeout=600)
@@ -1203,7 +1222,8 @@ def main(argv=None):
     cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
         A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
     cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))
-    cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"))
+    cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"),
+        A("--stale", action="store_true"), A("--why"))
     cmd("recheck", cmd_recheck, A("id", nargs="?"))
     cmd("ref", cmd_ref, A("id"), A("--label", required=True))
     cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
