@@ -6245,8 +6245,36 @@ recorded, $28\%$ above, while rung $1$'s hp47 reproduces to $1\%$. The rescoring
 but that is not the gap (FA-ccin2p3-60b47206, 2026-10-25): the live and the EMA weights of the same settings (hp15, EMA
 decay $0.995$, on rung $4$, since rung $6$'s own checkpoint is pruned) score $5.62\times10^{-8}$ and $5.79\times10^{-8}$
 against $5.81\times10^{-8}$ recorded, and rung $1$'s hp47 $3.58$ and $3.62$ against $3.62\times10^{-8}$: the live weights
-sit $1$ to $3\%$ \emph{below} the EMA's, not $28\%$ above. What is left is the hardware and TF32 of rung $6$'s training on
-lxplus against the rescoring's.
+sit $1$ to $3\%$ \emph{below} the EMA's, not $28\%$ above. Rerun cold from its own config on CC (V100, TF32 on, a
+no-op there; FA-ccin2p3-2ed18ab8, 2026-10-25; \code{analysis/transfer/ladder\_r6\_hp15\_rerun.py},
+Fig.~\ref{fig:ladder_r6_rerun}), the same settings reach $1.38\times10^{-7}$ at step $62080$: $6\%$ above the record and
+$18\%$ below the rescoring, so the rerun reproduces the record and not the rescoring. $6\%$ is inside the noise of the
+anneal's end: the last five validations reach up to $1.70\times10^{-7}$ in the record and $1.82\times10^{-7}$ in the
+rerun, and per process the rerun sits $0.43$ to $2.5\times$ the record (one seed each; GPU nondeterminism alone moved a
+rerun of a catalog trial by more, par.\ The quick working point). The rerun's own checkpoint, rebuilt on the same GPU
+(\code{tools/eval\_delta.py}, EMA weights), scores $1.376\times10^{-7}$, its record to $0.01\%$, so the rebuild path is
+sound for a model rebuilt where it was trained. The gap belongs to the rescoring of the lxplus-trained checkpoint on
+other hardware, as with the one lxplus model the $\Delta$ plots never reproduced (par.~\ref{sec:tf32-eval}); that
+checkpoint is pruned, so it is not pursued, and the rung's best (hp73) does not move.
+% src: python3 analysis/transfer/ladder_r6_hp15_rerun.py @bc60cec
+% claim: rerun=1.38e-7
+% claim: rerun_step=62080
+% claim: rerun_over_record_pct=6
+% claim: rerun_under_rescored_pct=18
+% claim: record_last5_max=1.70e-7
+% claim: rerun_last5_max=1.82e-7
+% claim: proc_ratio_min=0.43
+% claim: proc_ratio_max=2.5
+% claim: rerun_rebuilt=1.376e-7
+% claim: rebuilt_off_pct=0.01
+\begin{figure}[H]
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/ladder_r6_hp15_rerun.pdf}}
+\caption{The sixth rung's hp15: the lxplus run's validation curve ($\vlnr$, the rung's geometric mean) and its rerun from the
+same config on a CC V100, each best checkpoint marked; dashed, the lxplus checkpoint rescored. (b) The last quarter of
+the anneal.}
+\label{fig:ladder_r6_rerun}
+\end{figure}
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_a.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_b.pdf}} \\[1ex]
@@ -7560,9 +7588,6 @@ of the three share a test set.
     integrals (Sec.~\ref{sec:syn-loops}, plan item (5)); multiplicities well past $2\to4$, where MadGraph struggles and the
     generator does not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average. How close to
     real amplitudes the prior should be is still to be settled with others.
-  \item \textbf{The ladder.} Rung $6$'s hp15 rerun from its config (FA-ccin2p3-2ed18ab8, running, $\approx6$ GPU-h) is
-    compared with its record ($1.30\times10^{-7}$, against the $1.67\times10^{-7}$ its rescoring gave; par.\ The ladder's
-    pretraining), which tests the hardware and TF32 of its lxplus training against the rescoring's.
 \end{itemize}
 
 \section{Non-SM Lagrangians as training data}\label{sec:nonsm}
