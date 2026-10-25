@@ -7092,10 +7092,7 @@ of the three share a test set.
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
     $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
-    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Rung $6$'s rescoring gap: see the ladder entry. Settled by the
-    user on 2026-10-24: the one-loop sign question is superseded by the signed-data check of the preprocessing study;
-    the probes that do not gain ran and are written up (par.~\ref{par:nogain}); the large-$D$ points stay out of the
-    grid figures; the larger real catalogs are replaced by catalog\_v3. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
+    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Rung $6$'s rescoring gap: see the ladder entry. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
     diagram sum, and the shared target's blow-up at the per-process pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
     bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
     fix is dropped until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since D114 moved it there (D83; item \code{v3\_prep\_explore}; queue: the shape proxy per target, the signed-data check,
@@ -7248,6 +7245,13 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
     are flushed (\code{touch .claude/.notes\_flushed}).
+  \item \textbf{The probes that do not gain} (par.~\ref{par:nogain}). Not concluded. Why $ee\to Z\gamma$'s fine-tunes
+    lose $1.2$ decades to scratch at $D=10^2$: ruled out are early stopping, the fine-tune search window (the lowered
+    window moves the median gain by $0.03$ decades) and a generally smoother fine-tune curve in steep cells. What is left is
+    the pretrained start itself, as on $u\bar u\to Zg$, where rung $6$'s frozen features read out $30\times$ worse than rung
+    $7$'s. Proposed next, not approved (about $0.5$ GPU-h): the same linear read-out of every rung's frozen features on
+    $ee\to Z\gamma$ at $D=10^{1.5}$, $10^2$; if no rung's features carry the target, the dip is the start's
+    representation, otherwise it is the fine-tune failing to find what is there.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$

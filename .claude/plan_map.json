@@ -6,5 +6,6 @@
  "State (2026-10-15": "reference: an old state record of the transfer study, kept for its run ids",
  "Synthetic prior: alternatives not built": "held:D43",
  "The lr scalings.": "user:2026-10-25 re-centre the scratch lr window on the measured surface's batch correction?",
- "The ladder.": "item:delta"
+ "The ladder.": "item:delta",
+ "The probes that do not gain": "user:2026-10-25 the linear read-out of every rung's frozen features on ee->Z gamma at D=10^1.5, 10^2 (~0.5 GPU-h), to conclude the no-gain question?"
 }
