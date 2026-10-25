@@ -35,7 +35,8 @@ def sqrts(setname, name):
 
 
 def load(name, sq, role, n):
-    d = os.environ["DATA_DIR"]
+    import datagen
+    d = datagen.dest_for_role(role)                         # val and test frozen in $WORK/datasets, train cached on $SCRATCH
     g = sorted(glob.glob(os.path.join(d, f"{name}_{sq[0]}-{sq[1]}GeV_{role}_*amplitudes.npy"))) if sq else []
     g = g or sorted(glob.glob(os.path.join(d, f"{name}_*_{role}_*amplitudes.npy")))
     x = np.asarray(np.load(g[0], mmap_mode="r")[:n], dtype=np.float64)
