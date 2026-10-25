@@ -29,7 +29,12 @@ entries:
     - FA-ccin2p3-e786bd74
     commit: null
     paths: []
-  dead_ends: []
+  dead_ends:
+  - tried: the pp-trained arm's read on the 13 TeV pp test set (FA-ccin2p3-25485185)
+    why: 'read FA-ccin2p3-25485185 failed on the full CC disk: OSError no space left on device at tempfile.mkdtemp in SCRATCH
+      after 1367 of the 1396 probes were scored; the last 29 (pp13_uux_htapvtwm through pp13_uux_zzzz, all uux training classes)
+      have no prediction, so the train group is incomplete and the done check cannot pass'
+    at: '2026-10-25T19:58:39+00:00'
   asks: []
   id: pp_sampling
   title: 'pp-beam sampling: does training on the shaped windows serve pp-sampled use?'
