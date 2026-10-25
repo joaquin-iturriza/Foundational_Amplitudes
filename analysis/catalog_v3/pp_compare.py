@@ -223,13 +223,15 @@ def main():
                     "ratio": float(10 ** np.median(lr)), "ratio_q10_q90": [float(10 ** x) for x in np.quantile(lr, [0.1, 0.9])],
                     "n_pp_worse": int((lr > 0).sum()),
                     "ratio_inside": float(10 ** np.median(li)), "n_inside_worse": int((li > 0).sum())}
-            ent["support"] = {"frac_inside": med(v["frac_inside"] for v in r.values()),
-                              "frac_out_cuts": med(1 - v["frac_in_cuts"] for v in r.values()),
-                              "frac_above_window": med(1 - v["frac_in_sqrts"] for v in r.values()),
-                              "frac_fail_angle": med(v["cut_fail"]["cos"] for v in r.values()),
-                              "frac_fail_pair_mass": med(v["cut_fail"]["m"] for v in r.values()),
-                              "frac_fail_dr": med(v["cut_fail"]["dr"] for v in r.values()),
-                              "frac_fail_pt": med(v["cut_fail"]["pt"] for v in r.values())}
+            # only the probes whose scored events matched their pool rows carry the split (collect); counted
+            sp_ = [v for v in r.values() if "frac_inside" in v]
+            ent["support"] = {"n": len(sp_), "frac_inside": med(v["frac_inside"] for v in sp_),
+                              "frac_out_cuts": med(1 - v["frac_in_cuts"] for v in sp_),
+                              "frac_above_window": med(1 - v["frac_in_sqrts"] for v in sp_),
+                              "frac_fail_angle": med(v["cut_fail"]["cos"] for v in sp_),
+                              "frac_fail_pair_mass": med(v["cut_fail"]["m"] for v in sp_),
+                              "frac_fail_dr": med(v["cut_fail"]["dr"] for v in sp_),
+                              "frac_fail_pt": med(v["cut_fail"]["pt"] for v in sp_)}
             res[arm][grp] = ent
             w = ent.get("window_same_classes")
             c = claims.setdefault(arm, {})[grp] = {"n": ent["n"], "mse": ent["mse"], "level": ent["level"],
@@ -246,8 +248,8 @@ def main():
                    f"{w['n_inside_worse']} worse), outside {w['mse_pp_outside']:.3g}" if w else ""))
     for grp in GROUPS:
         sp = claims["support"][grp]
-        sp.update({k.replace("frac_", "pct_"): 100 * v for k, v in list(sp.items())})      # the shares as percentages
-        print(f"support {grp:5s}", {k: round(v, 3) for k, v in sp.items()})
+        sp.update({k.replace("frac_", "pct_"): 100 * v for k, v in list(sp.items()) if k.startswith("frac_") and v is not None})      # the shares as percentages
+        print(f"support {grp:5s}", {k: (round(v, 3) if v is not None else None) for k, v in sp.items()})
     claims["n_classes"] = len(g)
     claims["n_no_prediction"] = sum(len(res[a]["no_prediction"]) for a in res)
     json.dump(res, open(os.path.join(HERE, "data", "pp_compare.json"), "w"), indent=1)
