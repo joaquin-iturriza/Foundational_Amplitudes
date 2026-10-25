@@ -50,6 +50,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    parallel: `site sync <site> FA` once, then every launch with `NOSYNC=1` at once (`scripts/launch_cc_only.sh`), never
    one sync per job in series. (2026-10-25: 11 K-shot jobs submitted one after another, ~25 s each, while the user's
    question waited 5 min for the end of the turn.)
+   Every word written in a turn is to me: a hook that asks for a revised reply when its check is wrong gets no reply at
+   all (end the turn silently), never a line addressed to the hook.
 
 0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion) and no turn that ends
    waiting on me while other work can move: a question for me goes in the message, the one item that needs it waits,
