@@ -155,3 +155,4 @@ recipes/catalog_v3_checked_ext.json
 recipes/catalog_v3_checked_p5.json
 .claude/.pp_pools_ready
 analysis/catalog_v3/data/short_reads/
+analysis/catalog_v3/data/factorised_2to4/

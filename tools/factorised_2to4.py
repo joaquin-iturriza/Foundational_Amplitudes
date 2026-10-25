@@ -65,6 +65,40 @@ def ii_map(P, k_slot):
     return np.concatenate([pa_t[:, None], pb_t[:, None], fin_t], 1), x, a_emits
 
 
+def beam_recoil_map(P, k_slot):
+    """for massive beams (a b quark), where the CS map's rescaled beam would leave its mass shell: the other finals are
+    kept as they are and the beams absorb k's recoil, p~_a + p~_b = K = p_a + p_b - k, each on its own mass shell (read
+    from the event), back to back in K's rest frame along the direction of p_a there. Momentum is conserved and every
+    particle is on shell; an event with K^2 < (m_a + m_b)^2 has no such beams and comes back NaN (dropped and counted
+    downstream)."""
+    n, N, _ = P.shape
+    k = P[np.arange(n), k_slot]
+    pa, pb = P[:, 0], P[:, 1]
+    m_a, m_b = np.sqrt(np.maximum(mdot(pa, pa), 0)), np.sqrt(np.maximum(mdot(pb, pb), 0))
+    K = pa + pb - k
+    M = np.sqrt(np.maximum(mdot(K, K), 0))
+    beta = K[:, 1:] / K[:, :1]
+
+    def boost(p, b):                                         # p boosted by velocity b
+        b2 = (b * b).sum(-1, keepdims=True)
+        g = 1 / np.sqrt(1 - b2)
+        bp = (b * p[:, 1:]).sum(-1, keepdims=True)
+        return np.concatenate([g * (p[:, :1] + bp),
+                               p[:, 1:] + ((g - 1) * bp / np.where(b2 > 0, b2, 1) + g * p[:, :1]) * b], 1)
+    pa_rest = boost(pa, -beta)
+    u = pa_rest[:, 1:] / np.linalg.norm(pa_rest[:, 1:], axis=1, keepdims=True)
+    Ea = (M ** 2 + m_a ** 2 - m_b ** 2) / (2 * M)
+    with np.errstate(invalid="ignore"):
+        q = np.sqrt(Ea ** 2 - m_a ** 2)                       # NaN below threshold
+    a_t = boost(np.concatenate([Ea[:, None], q[:, None] * u], 1), beta)
+    b_t = boost(np.concatenate([(M - Ea)[:, None], -q[:, None] * u], 1), beta)
+    keep = np.ones((n, N), bool)
+    keep[np.arange(n), k_slot] = False
+    fin = P[keep].reshape(n, N - 1, 4)[:, 2:]
+    x = mdot(K, K) / mdot(pa + pb, pa + pb)
+    return np.concatenate([a_t[:, None], b_t[:, None], fin], 1), x, mdot(pa, k) <= mdot(pb, k)
+
+
 def me2(proc, mom, alphas):
     cfg = mg.PROCESSES[proc]
     sa = f"{mg.WORK_DIR}/{proc}_standalone"
@@ -80,8 +114,8 @@ V3_EXTRA = {"g": 21, "a": 22, "z": 23, "h": 25}
 
 def v3_probes():
     """Every catalog_v3 2->4 class (with pools) built as a 2->3 class plus one g, a, Z or H (the census's `why` =
-    '<parent>+<x>'). Read: those on massless beams (the map rescales a beam) whose parent's standalone is compiled here.
-    The others are listed with the reason (V3_SKIP lines). Returns [(probe, parent, extra pdg)]."""
+    '<parent>+<x>'). Massless beams take the CS map, b beams the beam-recoil map; a parent with no compiled
+    standalone is compiled (datagen.ensure_backend). A class whose parent is not in the catalog is listed (V3_SKIP). Returns [(probe, parent, extra pdg)]."""
     import json
     gen = set(json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"])   # classes with pools
     out = []
@@ -92,10 +126,7 @@ def v3_probes():
             if n not in gen or cfg.get("nfinal") != 4 or not why.endswith("+" + kind):
                 continue
             par = why[: -len(kind) - 1]
-            why_skip = ("parent not in the catalog" if par not in mg.PROCESSES else
-                        "b beam (the map rescales a massless beam)" if any(abs(int(q)) == 5 for q in cfg["pdg_ids"][:2])
-                        else "no compiled parent standalone here" if not os.path.isdir(f"{mg.WORK_DIR}/{par}_standalone")
-                        else None)
+            why_skip = "parent not in the catalog" if par not in mg.PROCESSES else None
             if why_skip:
                 print("V3_SKIP " + json.dumps({"probe": n, "parent": par, "kind": kind, "why": why_skip}), flush=True)
                 continue
@@ -149,7 +180,11 @@ def main():
         cand = [j for j in range(2, N) if ids4[j] == extra]
         pt = np.sqrt(P[:, cand, 1] ** 2 + P[:, cand, 2] ** 2)
         k_slot = np.asarray(cand)[pt.argmin(1)]
-        Pm, x, a_emits = ii_map(P, k_slot)
+        b_beam = any(abs(q) == 5 for q in ids4[:2])
+        Pm, x, a_emits = (beam_recoil_map if b_beam else ii_map)(P, k_slot)
+        if a.v3 and not os.path.isdir(f"{mg.WORK_DIR}/{parent}_standalone"):
+            import datagen
+            datagen.ensure_backend(parent)
         if a.v3:                                     # the kept finals in the parent's PDG order
             Pm = np.stack([to_parent_order(Pm[i:i + 1], [ids4[j] for j in range(N) if j != int(k_slot[i])], ids3)[0]
                            for i in range(len(Pm))])
@@ -173,10 +208,10 @@ def main():
         lr = np.log(np.abs(me2(parent, Pp, None if alp is None else np.asarray(alp[: a.n_check], np.float64)))
                     / np.abs(Xp[:, -1]))
         np.savez_compressed(os.path.join(a.out, p + ".npz"), t4=t4, t3=t3, feats=feats, emitter=emitter,
-                            a_emits=a_emits, x=x)
+                            a_emits=a_emits, x=x, b_beam=b_beam)
         ok = (t3 > 0) & np.isfinite(t3)
         r = np.log(t4[ok]) - np.log(t3[ok])
-        rec = dict(probe=p, parent=parent, extra=extra, n=int(n), t3_bad=int((~ok).sum()), pool=os.path.basename(f4),
+        rec = dict(probe=p, parent=parent, extra=extra, map="beam_recoil" if b_beam else "cs_ii", n=int(n), t3_bad=int((~ok).sum()), pool=os.path.basename(f4),
                    var_log_t4=float(np.var(np.log(t4))), var_r=float(np.var(r)), mean_r=float(np.mean(r)),
                    check_median_log_ratio=float(np.median(lr)), check_max_abs_log_ratio=float(np.abs(lr).max()),
                    has_alphas=al is not None)
