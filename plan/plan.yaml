@@ -152,7 +152,7 @@ entries:
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
   searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only the
     hybrid test
-- status: running
+- status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
     text: Okay, go ahead then
@@ -233,6 +233,7 @@ entries:
     up by the CC feeder under item lowd_ft. All 180 generated on CC (5 trial scripts each; 111 had 10 from a double generation,
     trials 5 to 9 moved to jobs_beyond_5/; a duplicate tp3_lowd_lpft_r9_ud_ud_d4_002 marked HELD). The default''s side is
     the grid''s own 5-trial search per cell (cells.best).'
+  writeup: fa8afcf
 - status: held
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
