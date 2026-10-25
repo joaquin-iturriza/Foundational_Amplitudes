@@ -606,9 +606,136 @@ a held-out class reads on pp at $1.09$ to $1.37$ times its window MSE, while abo
 $|\cos\theta|$ beyond the catalog's cut in the partonic frame, where no window pool holds an event, and their loss sets
 the pp number. The training classes keep a gap inside the windows too, $1.6$ to $2.2$ times their window MSE over the
 arms, which nothing here explains. The comparison measures the difference between the two cut sets as much as between the
-two samplers. The pp-trained comparison follows: the pp-trained short pretraining (\code{FA-ccin2p3-e786bd74}) trains
-its hadronic tree classes on pp events with the lab cuts; read on the same pp pools and split the same way, it says
-whether pp training buys the events outside the windows and what it costs inside.
+two samplers.
+
+% src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+% claim: n_classes=1396
+% claim: n_no_prediction=0
+% allow: 13 because it is the beam energy in TeV, a setting
+\paragraph{The pp-trained arm.} The pp-trained short pretraining (\code{FA-ccin2p3-e786bd74}) is the dimensionless
+arm with every hadronic training tree class trained on its $13$\,TeV pp events under the lab cuts, every other pool on
+its windows (the user's scope, 2026-10-25). It was read on the same pp pools and on the held-out classes' window pools,
+all $1396$ classes with a prediction and $0$ without (the last training classes in a rerun,
+\code{FA-ccin2p3-982b5a14}, after the first read stopped on a full disk). Against the dimensionless arm, the one it
+differs from only in how the hadronic classes are sampled, the medians per group and the median per-class ratio of the
+pp-trained arm's MSE to the window-trained one's (Fig.~\ref{fig:v3_pp_trained}):
+\begin{itemize}
+  \item \emph{Training classes:} on pp $0.43$ against $2.86$, ratio $0.19$, lower in $963$ of $986$; on the pp events
+    % src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+    % claim: dimensionless_pp.train.n=986
+    % claim: dimensionless_pp.train.mse=0.43
+    % claim: pp_vs.dimensionless.train.mse.window_trained=2.86
+    % claim: pp_vs.dimensionless.train.mse.ratio=0.19
+    % claim: pp_vs.dimensionless.train.mse.n_pp_lower=963
+    % claim: pp_vs.dimensionless.train.mse_inside.pp_trained=0.38
+    % claim: pp_vs.dimensionless.train.mse_inside.window_trained=0.53
+    % claim: pp_vs.dimensionless.train.mse_inside.ratio=0.59
+    % claim: pp_vs.dimensionless.train.mse_inside.n_pp_lower=802
+    % claim: pp_vs.dimensionless.train.mse_outside.pp_trained=0.51
+    % claim: pp_vs.dimensionless.train.mse_outside.window_trained=4.91
+    % claim: pp_vs.dimensionless.train.mse_outside.ratio=0.13
+    % claim: pp_vs.dimensionless.train.mse_outside.n_pp_lower=968
+    % claim: pp_vs.dimensionless.train.mse_outside.n=982
+    inside the windows' coverage $0.38$ against $0.53$, ratio $0.59$ ($802$ lower); outside it $0.51$ against $4.91$,
+    ratio $0.13$ ($968$ lower of the $982$ with events outside). A training class has no window read here: the
+    pp-trained arm trained it on pp.
+  \item \emph{New combinations:} on pp $0.74$ against $2.77$, ratio $0.23$, lower in $45$ of $48$; inside the coverage
+    % src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+    % claim: dimensionless_pp.H1.n=48
+    % claim: dimensionless_pp.H1.mse=0.74
+    % claim: pp_vs.dimensionless.H1.mse.window_trained=2.77
+    % claim: pp_vs.dimensionless.H1.mse.ratio=0.23
+    % claim: pp_vs.dimensionless.H1.mse.n_pp_lower=45
+    % claim: dimensionless_pp.H1.mse_pp_inside=0.56
+    % claim: pp_vs.dimensionless.H1.mse_inside.window_trained=0.81
+    % claim: pp_vs.dimensionless.H1.mse_inside.ratio=0.64
+    % claim: dimensionless_pp.H1.mse_pp_outside=0.84
+    % claim: pp_vs.dimensionless.H1.mse_outside.window_trained=4.67
+    % claim: pp_vs.dimensionless.H1.mse_outside.ratio=0.17
+    % claim: dimensionless_pp.H1.mse_window=1.73
+    % claim: pp_vs.dimensionless.H1.window.window_trained=0.82
+    % claim: pp_vs.dimensionless.H1.window.ratio=2.05
+    % claim: pp_vs.dimensionless.H1.window.n_pp_lower=5
+    $0.56$ against $0.81$, ratio $0.64$; outside $0.84$ against $4.67$, ratio $0.17$; on the window pools $1.73$
+    against $0.82$, ratio $2.05$, lower in $5$.
+  \item \emph{$2\to4$ families:} on pp $0.83$ against $3.72$, ratio $0.26$, lower in $141$ of $153$; inside the
+    % src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+    % claim: dimensionless_pp.H2.n=153
+    % claim: dimensionless_pp.H2.mse=0.83
+    % claim: pp_vs.dimensionless.H2.mse.window_trained=3.72
+    % claim: pp_vs.dimensionless.H2.mse.ratio=0.26
+    % claim: pp_vs.dimensionless.H2.mse.n_pp_lower=141
+    % claim: dimensionless_pp.H2.mse_pp_inside=0.73
+    % claim: pp_vs.dimensionless.H2.mse_inside.window_trained=1.10
+    % claim: pp_vs.dimensionless.H2.mse_inside.ratio=0.66
+    % claim: dimensionless_pp.H2.mse_pp_outside=0.99
+    % claim: pp_vs.dimensionless.H2.mse_outside.window_trained=6.05
+    % claim: pp_vs.dimensionless.H2.mse_outside.ratio=0.20
+    % claim: dimensionless_pp.H2.mse_window=2.03
+    % claim: pp_vs.dimensionless.H2.window.window_trained=1.03
+    % claim: pp_vs.dimensionless.H2.window.ratio=1.94
+    % claim: pp_vs.dimensionless.H2.window.n_pp_lower=22
+    coverage $0.73$ against $1.10$, ratio $0.66$; outside $0.99$ against $6.05$, ratio $0.20$; on the window pools
+    $2.03$ against $1.03$, ratio $1.94$, lower in $22$.
+  \item \emph{The top:} on pp $3.79$ against $3.36$, ratio $0.88$, lower in $113$ of $209$; inside the coverage $2.50$
+    % src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+    % claim: dimensionless_pp.H3.n=209
+    % claim: dimensionless_pp.H3.mse=3.79
+    % claim: pp_vs.dimensionless.H3.mse.window_trained=3.36
+    % claim: pp_vs.dimensionless.H3.mse.ratio=0.88
+    % claim: pp_vs.dimensionless.H3.mse.n_pp_lower=113
+    % claim: dimensionless_pp.H3.mse_pp_inside=2.50
+    % claim: pp_vs.dimensionless.H3.mse_inside.window_trained=1.75
+    % claim: pp_vs.dimensionless.H3.mse_inside.ratio=1.11
+    % claim: dimensionless_pp.H3.mse_pp_outside=4.24
+    % claim: pp_vs.dimensionless.H3.mse_outside.window_trained=4.01
+    % claim: pp_vs.dimensionless.H3.mse_outside.ratio=0.87
+    % claim: dimensionless_pp.H3.mse_window=2.18
+    % claim: pp_vs.dimensionless.H3.window.window_trained=1.56
+    % claim: pp_vs.dimensionless.H3.window.ratio=1.24
+    % claim: pp_vs.dimensionless.H3.window.n_pp_lower=71
+    % claim: dimensionless_pp.H3.level=1.85
+    against $1.75$, ratio $1.11$; outside $4.24$ against $4.01$, ratio $0.87$; on the window pools $2.18$ against
+    $1.56$, ratio $1.24$, lower in $71$. Half of its pp MSE is a constant offset per class (median level $1.85$).
+\end{itemize}
+% src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
+% claim: pp_vs.dimensionless_twin.train.mse.ratio=0.14
+% claim: pp_vs.dimensionless_context.H2.mse.ratio=0.28
+% claim: pp_vs.baseline.H3.mse.ratio=0.78
+% claim: pp_vs.dimensionless_twin.H3.mse.ratio=0.95
+% claim: pp_vs.dimensionless.H3.window.ratio=1.24
+% claim: pp_vs.dimensionless_context.H1.window.ratio=2.42
+% claim: pp_vs.dimensionless.train.mse_outside.ratio=0.13
+% claim: pp_vs.dimensionless.H2.mse_outside.ratio=0.20
+% claim: pp_vs.dimensionless.train.mse_inside.ratio=0.59
+% claim: pp_vs.dimensionless.H2.mse_inside.ratio=0.66
+% claim: pp_vs.dimensionless.H2.window.ratio=1.94
+% claim: pp_vs.dimensionless.H1.window.ratio=2.05
+% allow: 6 because it is catalog_v4's approved window top in TeV, a setting
+Against every window-trained arm the picture is the same: on the whole pp pool the ratio is $0.14$ to $0.28$ on the
+training classes, new combinations and $2\to4$ and $0.78$ to $0.95$ on the top, and on the held-out window pools
+$1.24$ to $2.42$. So, off the top, pp training buys most where the windows hold no event (ratio $0.13$ to $0.20$
+outside the coverage), less inside it ($0.59$ to $0.66$), and costs about a factor two on the window pools of new
+combinations and $2\to4$ ($1.94$, $2.05$). The top, held out whole and so never trained on pp, gains nothing. For
+catalog\_v4, whose coverage is approved and in validation (hand-off): its acceptance in the lab variables, its
+$\sqrt{\hat s}$ up to $6$\,TeV and its forward component aim at the events outside catalog\_v3's coverage, where the
+largest part of the pp-trained arm's gain lies. What coverage cannot give is the part inside it, the same support
+weighted differently, nor does it say whether a window sampler that also covers pp's region keeps its advantage on the
+window pools; the catalog\_v4 short pretrainings, read on these pp pools and split the same way, measure both. One seed
+per arm, short pretrainings.
+
+\begin{figure}[H]
+\centering
+\widerow{\pnl{../analysis/catalog_v3/figs/pp_trained_a.pdf}\hfill\pnl{../analysis/catalog_v3/figs/pp_trained_b.pdf}} \\[1ex]
+\widerow{\pnl{../analysis/catalog_v3/figs/pp_trained_c.pdf}\hfill\pnl{../analysis/catalog_v3/figs/pp_trained_d.pdf}}
+\caption{The pp-trained short arm against catalog\_v3's four window-trained short arms (baseline, dimensionless target,
+with the context vector, twin): per group the median over classes of the ratio of the pp-trained arm's MSE of
+$\log|\mathcal M|^2$ to the window-trained arm's, on the pp pool, on its events inside and outside what the window
+pools cover, and on the window pool (held-out groups only). (a) Training classes, (b) new combinations, (c) $2\to4$
+families, (d) the top.}
+% allow: M|^2
+\label{fig:v3_pp_trained}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -7815,13 +7942,10 @@ of the three share a test set.
     check, the regeneration of the pools, the short pretrainings again (GPU estimate to the user with the run); the
     forward component's two shares are still the check's choices.
   \item \textbf{State (2026-10-25, 21:10).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
-    % allow: 13 because it is the beam energy in TeV, a setting
-    % allow: 25485185 because it is part of a run id
     % allow: 6 because it is a rung's index, a name
     next}); this item only summarises it. The study runs on catalog\_v3 (Daniel's catalog and its extra probes untouched
-    until the user says). Running on CC: the pp study's last read (scope settled by the user, 2026-10-25: hadronic tree
-    classes on pp, every other pool on windows), the pp-trained arm read on the $13$\,TeV pp test set
-    (FA-ccin2p3-25485185), then its comparison inside and outside the windows against the four window-trained arms; the
+    until the user says). The pp study's reads are complete and written up (par.\ The pp-trained arm); the user's call
+    on switching to pp sampling or keeping the windows is open. Running on CC: the
     hybrid reference-scale short pretraining (approved 2026-10-25 ``Yes, run that hybrid test
     then.'', its own zero-shot reads at the end); the small-$D$ DyHPO round (the linear-probe head check's TF32
     failures fixed in \code{c11ff1e}, the seven failed points rerun as fixed trials; its state in the small-$D$ item);
