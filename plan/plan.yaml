@@ -908,10 +908,14 @@ entries:
   match: zz_cov_*,cov_*
   evidence:
     runs:
+    - FA-ccin2p3-33503e6c
     - FA-ccin2p3-ec84e913
-    commit: 2f7d3e3
+    commit: 4a53ccd
     paths:
     - analysis/catalog_v3/coverage_check.py
+    - analysis/catalog_v3/figs/coverage_fwd_c.png
+    - analysis/catalog_v3/figs/coverage_pp_a.png
+    - analysis/catalog_v3/figs/coverage_range_a.png
     - scripts/job_coverage_check.sh
   dead_ends: []
   asks: []
