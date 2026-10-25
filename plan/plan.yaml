@@ -108,9 +108,10 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-2f7d86e7
-    commit: 998271c
+    commit: cdcfaf5
     paths:
     - analysis/catalog_v3/figs/prep_hybrid.png
+    - tests/test_hybrid_blend.py
   dead_ends:
   - tried: hybrid short pretraining FA-ccin2p3-9b88e434
     why: CC disk full at 20:36; log stops mid-run, job failed; not a result
