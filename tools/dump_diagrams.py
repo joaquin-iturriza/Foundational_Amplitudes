@@ -283,8 +283,12 @@ def _dump_virt_process(name, spec, out_dir):
     }
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"{name}.diagrams.json")
-    with open(path, "w") as f:
+    # through a temp file and a rename: parallel jobs may write the same sidecar, and one killed mid-write must not
+    # leave a truncated file that --skip-existing then accepts
+    tmp = f"{path}.tmp{os.getpid()}"
+    with open(tmp, "w") as f:
         json.dump(payload, f, indent=2)
+    os.replace(tmp, path)
     n_diag = sum(s["n_diagrams"] for s in subprocesses)
     n_loop = sum(s["n_loop"] for s in subprocesses)
     return path, f"{len(subprocesses)} subprocess(es), {n_diag} diagram(s) ({n_loop} loop)"
@@ -337,8 +341,12 @@ def dump_process(name, spec, out_dir, model_name="sm"):
 
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"{name}.diagrams.json")
-    with open(path, "w") as f:
+    # through a temp file and a rename: parallel jobs may write the same sidecar, and one killed mid-write must not
+    # leave a truncated file that --skip-existing then accepts
+    tmp = f"{path}.tmp{os.getpid()}"
+    with open(tmp, "w") as f:
         json.dump(payload, f, indent=2)
+    os.replace(tmp, path)
     n_diag = sum(s["n_diagrams"] for s in subprocesses)
     return path, f"{len(subprocesses)} subprocess(es), {n_diag} diagram(s)"
 
