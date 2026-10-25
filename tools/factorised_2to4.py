@@ -48,7 +48,9 @@ def ii_map(P, k_slot):
     k = P[np.arange(n), k_slot]
     pa, pb = P[:, 0], P[:, 1]
     sab, sak, sbk = mdot(pa, pb), mdot(pa, k), mdot(pb, k)
-    x = (sab - sak - sbk) / sab
+    # x = K^2 / s with K = p_a + p_b - k (massless beams): (s - 2 p_a.k - 2 p_b.k + m_k^2) / s, so a massive emission
+    # (Z, H) maps as well as a gluon or photon
+    x = (sab - sak - sbk + 0.5 * mdot(k, k)) / sab
     a_emits = sak <= sbk
     pa_t = np.where(a_emits[:, None], x[:, None] * pa, pa)
     pb_t = np.where(a_emits[:, None], pb, x[:, None] * pb)
@@ -73,6 +75,43 @@ def me2(proc, mom, alphas):
         return np.asarray(pipe.compute([(m, np.asarray(cfg["pdg_ids"])) for m in mom], perm=perm, alphas=alphas), float)
 
 
+V3_EXTRA = {"g": 21, "a": 22, "z": 23, "h": 25}
+
+
+def v3_probes(per_kind, seed):
+    """catalog_v3's 2->4 classes built as a 2->3 class plus one g, a, Z or H (the census's `why` = '<parent>+<x>'), on
+    massless beams (the map rescales a beam), whose parent is a generated class (its standalone exists): per kind up to
+    `per_kind` drawn with `seed`. Returns [(probe, parent, extra pdg)]."""
+    import json, random
+    gen = set(json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"])   # classes with pools
+    out = []
+    for kind, pdg in V3_EXTRA.items():
+        c = []
+        for n, cfg in sorted(mg.PROCESSES.items()):
+            why = str(cfg.get("why", ""))
+            if n not in gen or cfg.get("nfinal") != 4 or not why.endswith("+" + kind):
+                continue
+            par = why[: -len(kind) - 1]
+            if par not in mg.PROCESSES or any(abs(int(q)) == 5 for q in cfg["pdg_ids"][:2]):
+                continue
+            if not os.path.isdir(f"{mg.WORK_DIR}/{par}_standalone"):
+                continue
+            c.append((n, par, pdg))
+        out += random.Random(seed).sample(c, min(per_kind, len(c)))
+    return out
+
+
+def to_parent_order(Pm, ids_kept, ids_par):
+    """rows of the mapped events (beams, then the kept finals in the probe's order) permuted to the parent's PDG order"""
+    fin_kept, fin_par = list(ids_kept[2:]), list(ids_par[2:])
+    used, perm = set(), [0, 1]
+    for q in fin_par:
+        j = next(j for j, r in enumerate(fin_kept) if r == q and j not in used)
+        used.add(j); perm.append(2 + j)
+    assert list(ids_kept[:2]) == list(ids_par[:2]), (ids_kept, ids_par)
+    return Pm[:, perm]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--recipe", default=os.path.join(ROOT, "recipes", "catalog_2to4_heldout_orders.yaml"))
@@ -80,18 +119,24 @@ def main():
     ap.add_argument("--n-check", type=int, default=200)
     ap.add_argument("--out", default=os.path.join(os.environ.get("SCRATCH", "."), "zz_factorised_2to4"))
     ap.add_argument("--only", nargs="*", default=None)
+    ap.add_argument("--v3", type=int, default=0, metavar="PER_KIND",
+                    help="catalog_v3's 2->4 classes (a 2->3 class plus g, a, Z or H), up to PER_KIND per kind")
+    ap.add_argument("--seed", type=int, default=0)
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
-    probes = [e["name"] for e in yaml.safe_load(open(a.recipe))["processes"]]
-    for p in probes:
+    if a.v3:
+        jobs = v3_probes(a.v3, a.seed)
+    else:
+        jobs = [(e["name"], mg.PROCESSES[e["name"]]["parent"], None) for e in yaml.safe_load(open(a.recipe))["processes"]]
+    for p, parent, extra in jobs:
         if a.only and p not in a.only:
             continue
         cfg = mg.PROCESSES[p]
-        parent = cfg["parent"]
         pcfg = mg.PROCESSES[parent]
         ids4, ids3 = [int(i) for i in cfg["pdg_ids"]], [int(i) for i in pcfg["pdg_ids"]]
-        extra = ids4[-1]
-        assert ids4[:-1] == ids3 and extra in (21, 22), (p, ids4, ids3)
+        if extra is None:
+            extra = ids4[-1]
+            assert ids4[:-1] == ids3 and extra in (21, 22), (p, ids4, ids3)
         X, al, f4 = pool(p)
         X = X[: a.n]
         N = len(ids4)
@@ -102,6 +147,9 @@ def main():
         pt = np.sqrt(P[:, cand, 1] ** 2 + P[:, cand, 2] ** 2)
         k_slot = np.asarray(cand)[pt.argmin(1)]
         Pm, x, a_emits = ii_map(P, k_slot)
+        if a.v3:                                     # the kept finals in the parent's PDG order
+            Pm = np.stack([to_parent_order(Pm[i:i + 1], [ids4[j] for j in range(N) if j != int(k_slot[i])], ids3)[0]
+                           for i in range(len(Pm))])
         t3 = me2(parent, Pm, alphas)
         n = len(P)
         k = P[np.arange(n), k_slot]
