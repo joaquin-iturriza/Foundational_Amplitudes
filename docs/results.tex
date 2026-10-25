@@ -489,6 +489,123 @@ every other held-out process.}
 \label{fig:v3_short}
 \end{figure}
 
+% src: python3 analysis/catalog_v3/pp_compare.py @fb85838
+% claim: n_classes=1396
+% claim: dimensionless.H1.n=48
+% claim: dimensionless.H2.n=153
+% claim: dimensionless.H3.n=209
+% claim: dimensionless.train.n=986
+% allow: 13 because it is the beam energy in TeV, a setting
+% allow: 0.118 because it is the coupling the labels run from, a setting
+% allow: 2000 200 because they are the event counts the reads and the runs are set to, settings
+% allow: M|^2
+\paragraph{catalog\_v3's short arms read on pp events (2026-10-25).} The pp study asks whether training on the shaped
+$\sqrt{\hat s}$ windows serves a user whose events come from proton beams (the user, 2026-10-25: ``this should be done
+in parallel to what we are doing, build it, run a few checks, and from that we decide if we switch or keep what we are
+doing''). Each of the $1396$ hadronic tree classes has a $13$\,TeV pool of MadEvent's unweighted pp events carrying the
+class's $|\mathcal M|^2$ function as its window pools have it (the same parameter card, $\alpha_s(\sqrt{\hat s})$ run
+from $0.118$; \code{recipes/gen\_catalog\_v3\_pp.py}). The four window-trained arms of par.\ catalog\_v3's short
+pretrainings read every class zero-shot on $2000$ validation events, as on the windows
+(\code{scripts/job\_catalog\_v3\_pp\_score.sh}, runs \code{FA-ccin2p3-1b299199}, \code{-1c960b22}, \code{-4b1aabad},
+\code{-81e14672}; \code{analysis/catalog\_v3/pp\_compare.py}, \code{data/pp\_compare.json}, Fig.~\ref{fig:v3_pp}):
+the $48$ new combinations, $153$ $2\to4$ families and $209$ top classes held out, and the $986$ training classes; every
+class was read by every arm, none failed. Each class is set against the same arm on the same class's window pool: a
+held-out class's zero-shot read of Tab.~\ref{tab:v3_short} ($2000$ events), a training class's validation loss in the
+arm's own run at its best checkpoint ($200$ events). All numbers are the MSE of $\log|\mathcal M|^2$, medians over
+classes, one seed per arm.
+\begin{itemize}
+  \item \emph{On pp events every arm reads worse than on the windows, the training classes most.} The median per-class
+    % src: python3 analysis/catalog_v3/pp_compare.py @fb85838
+    % claim: baseline.train.ratio=7.9
+    % claim: dimensionless.train.ratio=6.4
+    % claim: dimensionless_context.train.ratio=7.1
+    % claim: dimensionless_twin.train.ratio=6.6
+    % claim: dimensionless_twin.train.n_pairs=875
+    % claim: dimensionless.H3.ratio=2.6
+    % claim: dimensionless.H1.ratio=5.1
+    % claim: dimensionless.train.mse=2.86
+    % claim: dimensionless.train.mse_window=0.39
+    % claim: dimensionless.train.n_pp_worse=957
+    % claim: dimensionless.train.n=986
+    ratio of the pp MSE to the window MSE is $7.9$, $6.4$, $7.1$ and $6.6$ on the training classes (baseline,
+    dimensionless, with context, twin; the twin on the $875$ it trained on) and $2.6$ to $5.1$ on the held-out axes. The
+    dimensionless arm reads its own training classes at $2.86$ on pp against $0.39$ on their windows, worse on pp in
+    $957$ of $986$.
+  \item \emph{The loss sits where no window event lies.} The window pools are drawn in the partonic rest frame with the
+    % src: python3 analysis/catalog_v3/pp_compare.py @fb85838
+    % claim: support.train.pct_inside=56.5
+    % claim: support.H1.pct_inside=48.6
+    % claim: support.H2.pct_inside=54.8
+    % claim: support.H3.pct_inside=45.6
+    % claim: support.train.pct_fail_angle=37
+    % claim: support.H2.pct_fail_angle=39
+    % claim: support.H1.pct_fail_angle=43
+    % claim: support.train.pct_above_window=4.7
+    % claim: support.H3.pct_above_window=26
+    % claim: support.H2.pct_fail_pair_mass=1.1
+    % allow: 10 0.9 0.4 5 because they are the two cut sets' values, settings
+    catalog's fiducial cuts on every massless visible final ($p_T>10$\,GeV, $|\cos\theta|<0.9$, $\Delta R>0.4$,
+    $m_{ij}>10$\,GeV), and $\sqrt{\hat s}$ stops at the window's top; the pp pools carry MadEvent's lab cuts
+    ($p_T>10$\,GeV, $|\eta|<5$) and $\hat s$ up to the beam's. Per class, $56.5\%$ of a training class's pp events pass
+    the window's cuts inside its $\sqrt{\hat s}$ window ($48.6\%$, $54.8\%$ and $45.6\%$ on new combinations, $2\to4$
+    and the top). The angular cut alone removes $37\%$ ($39$ to $43\%$ held out), a $\sqrt{\hat s}$ above the window's
+    top $4.7\%$ ($26\%$ of a top class's events), the pair mass at most $1.1\%$, and $\Delta R$ and $p_T$ nothing.
+  \item \emph{Inside what the windows cover, a held-out class reads on pp about as on its window.} On those pp events the
+    % src: python3 analysis/catalog_v3/pp_compare.py @fb85838
+    % claim: dimensionless_twin.H1.ratio_inside=1.09
+    % claim: dimensionless_twin.H3.ratio_inside=1.37
+    % claim: dimensionless.H1.ratio_inside=1.19
+    % claim: dimensionless.H2.ratio_inside=1.12
+    % claim: dimensionless.H3.ratio_inside=1.28
+    % claim: dimensionless.H1.mse_pp_outside=4.67
+    % claim: dimensionless.H2.mse_pp_outside=6.05
+    % claim: dimensionless.H3.mse_pp_outside=4.01
+    % claim: dimensionless.H1.mse_window=0.82
+    % claim: dimensionless.H2.mse_window=1.03
+    % claim: dimensionless.H3.mse_window=1.56
+    % claim: dimensionless.train.ratio_inside=1.6
+    % claim: dimensionless_twin.train.ratio_inside=1.56
+    % claim: baseline.train.ratio_inside=2.16
+    % claim: dimensionless.train.n_inside_worse=795
+    % claim: dimensionless.train.n=986
+    median per-class ratio to the window MSE is $1.09$ to $1.37$ over the held-out axes and arms (dimensionless:
+    $1.19$, $1.12$, $1.28$ on new combinations, $2\to4$ and the top), while the events outside read at $4.67$, $6.05$
+    and $4.01$ against window MSEs of $0.82$, $1.03$ and $1.56$. The training classes keep a gap inside: ratio $1.6$
+    for the dimensionless arm ($1.56$ to $2.16$ over the arms), above the window in $795$ of $986$. What makes that gap
+    is not measured: the pp events inside are distributed differently within the same support, and the window loss is
+    the run's own validation, the split its checkpoint was selected on.
+  \item \emph{Between the arms}, on pp as on the windows the dimensionless target reads below the baseline on new
+    % src: python3 analysis/catalog_v3/pp_compare.py @fb85838
+    % claim: dimensionless.H1.mse=2.77
+    % claim: baseline.H1.mse=4.43
+    % claim: dimensionless.H3.mse=3.36
+    % claim: baseline.H3.mse=5.17
+    % claim: dimensionless.H2.mse=3.72
+    % claim: baseline.H2.mse=3.36
+    % claim: dimensionless_twin.H1.mse=6.23
+    % claim: dimensionless_twin.H2.mse=4.49
+    combinations ($2.77$ against $4.43$) and the top ($3.36$ against $5.17$), not on $2\to4$ ($3.72$ against $3.36$);
+    the twin reads worst on new combinations and $2\to4$ ($6.23$, $4.49$).
+\end{itemize}
+So what a pp user misses is not the windows' $\sqrt{\hat s}$ shaping but their angular acceptance: about two in five
+pp events lie at $|\cos\theta|$ beyond the catalog's cut in the partonic frame, where no window pool holds an event, and
+their loss sets the pp number. The comparison measures the difference between the two cut sets as much as between the
+two samplers. The pp-trained comparison follows: the pp-trained short pretraining (\code{FA-ccin2p3-e786bd74}) trains
+its hadronic tree classes on pp events with the lab cuts; read on the same pp pools and split the same way, it says
+whether pp training buys the events outside the windows and what it costs inside.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/pp_compare.pdf}
+% allow: M|^2
+% allow: 13 because it is the beam energy in TeV, a setting
+\caption{catalog\_v3's dimensionless short arm, per class (training classes and the three held-out axes): (a) its MSE
+of $\log|\mathcal M|^2$ on the $13$\,TeV pp pool against its MSE on the class's window pool (a held-out class read
+zero-shot, a training class the run's own validation); (b) the same with the pp MSE on the pp events inside what the
+window pools cover (the catalog's fiducial cuts in the partonic frame and the class's $\sqrt{\hat s}$ window).}
+\label{fig:v3_pp}
+\end{figure}
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
@@ -7241,10 +7358,10 @@ of the three share a test set.
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
     entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated.
   \item \textbf{State (2026-10-25, 19:00).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
-    untouched until the user says). Running on CC: the pp study's five runs (scope settled by the user, 2026-10-25:
-    hadronic tree classes on pp, every other pool on windows), the four window-trained arms read on the $13$\,TeV pp test
-    set (FA-ccin2p3-1b299199, -1c960b22, -4b1aabad, -81e14672) and the pp-trained short pretraining (FA-ccin2p3-e786bd74),
-    whose pp read fires when it ends; all $1396$ pp processes' pools, $\alpha_s$ sidecars and diagram files are checked on
+    untouched until the user says). The pp study (scope settled by the user, 2026-10-25: hadronic tree classes on pp, every other
+    pool on windows): the four window-trained arms' pp reads are written up (par.\ catalog\_v3's short arms read on pp
+    events); running on CC, the pp-trained short pretraining (FA-ccin2p3-e786bd74), whose pp read fires when it ends, then
+    \code{pp\_compare.py collect} on CC and the pp-trained comparison; all $1396$ pp processes' pools, $\alpha_s$ sidecars and diagram files are checked on
     CC (\code{tools/check\_pp\_pools.py}, $0$ problems). Also running: rung $6$'s hp15 rerun (the ladder item) and the
     small-$D$ fine-tuning DyHPO round (its state in the small-$D$ item). Ended: the $\hat s$-only short pretraining
     (FA-ccin2p3-fbd73961, the preprocessing exploration's next read). The setup redesign (approved with step agents
