@@ -17,6 +17,10 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 ARMS = ("baseline", "dimensionless", "dimensionless_context", "dimensionless_twin", "dimensionless_pp")
+# the axes each arm's job reads (scripts/job_catalog_v3_short.sh): every arm the eight, the twin also its two
+READ = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
+READS = {arm: READ + (("H3p", "H4") if arm == "dimensionless_twin" else ()) for arm in
+         ("baseline", "dimensionless", "dimensionless_context", "dimensionless_twin", "dimensionless_pp")}
 AXES = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "the top",
         "H5": "one loop", "H6": r"$\alpha_s=0.13$", "H7E": r"$1$-$10$ TeV", "H7c": r"$p_T\geq30$ GeV",
         "H3p": r"$\tau$, $\nu_\tau$ never seen", "H4": "quartic vertex never seen"}
@@ -43,12 +47,16 @@ def read(arm, axis):
 def main():
     res = {}
     for arm in ARMS:
-        for axis in AXES:
+        if not os.path.isdir(os.path.join(HERE, "data", "short_reads", arm)):
+            continue                                       # the arm's reads not copied home yet
+        for axis in READS[arm]:
             r = read(arm, axis)
-            if not r:
-                continue
             exp = expected(axis)
             missing = sorted(set(exp) - set(r))
+            if not r:                                      # every probe of the axis failed: recorded, never dropped
+                res.setdefault(arm, {})[axis] = {"n": 0, "n_expected": len(exp), "missing": missing}
+                print(f"{arm:24s} {axis:5s} n=   0/{len(exp):4d}  NO READS")
+                continue
             m = np.array([v["mse"] for v in r.values()])
             res.setdefault(arm, {})[axis] = {
                 "n": len(r), "n_expected": len(exp), "missing": missing, "mse": float(np.median(m)), "mse_q10_q90": [float(x) for x in np.quantile(m, [0.1, 0.9])],
@@ -64,13 +72,14 @@ def plot(res):
     import plot_style as ps
     fig, ax = ps.figure()
     axes = [a for a in AXES if any(a in res.get(arm, {}) for arm in ARMS)]
+    has = lambda arm, a: a in res.get(arm, {}) and res[arm][a]["n"] > 0
     cols = {"baseline": ps.C.grey, "dimensionless": ps.C.blue, "dimensionless_context": ps.C.green,
             "dimensionless_twin": ps.C.vermillion, "dimensionless_pp": ps.C.orange}
     marks = {"baseline": "o", "dimensionless": "s", "dimensionless_context": "^", "dimensionless_twin": "D",
              "dimensionless_pp": "v"}
     for j, arm in enumerate(ARMS):
-        xs = [i + 0.15 * (j - 2) for i, a in enumerate(axes) if a in res.get(arm, {})]
-        ys = [res[arm][a]["mse"] for a in axes if a in res.get(arm, {})]
+        xs = [i + 0.15 * (j - 2) for i, a in enumerate(axes) if has(arm, a)]
+        ys = [res[arm][a]["mse"] for a in axes if has(arm, a)]
         if xs:
             ax.plot(xs, ys, marks[arm], color=cols[arm], label=arm.replace("_", " "))
     ax.set_yscale("log")
