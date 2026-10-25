@@ -6,7 +6,8 @@ compacts, with nothing in between, so a long autonomous run does not drift.
                 that a compaction is wanted (WANTED). Flushed, or a manual /compact: let it through.
   Stop          a compaction is wanted and the notes are not flushed: block, and say what to do.
   PostToolUse   the same condition: the instruction as additional context, so it is seen mid-turn too.
-  SessionStart  (source "compact"): clear both markers and point the fresh context at the notes' plan and rules.
+  SessionStart  every source: print the plan (tools/plan.py show --compact); after a compaction also clear both
+                markers and say that the summary is not the plan.
 
 When auto-compaction fires is Claude Code's call (env CLAUDE_CODE_AUTO_COMPACT_WINDOW in settings.json); a hook
 cannot start one, only hold it. Held, it is retried on the next auto-compaction check, which then finds the flush.
@@ -23,47 +24,21 @@ INSTR = ("CONTEXT GUARD: Claude Code wants to compact the context and is held un
          "plan's next steps in the transfer study's hand-off, the 'Plan to finish' item); commit; then run "
          "`touch .claude/.notes_flushed` and end the turn. Compaction then goes through.")
 AFTER = ("CONTEXT GUARD: this context was just compacted. The summary above is a lossy record of the CONVERSATION (what "
-         "was in flight), not of the plan: work only from the plan and the items printed below, not from the summary's "
+         "was in flight), not of the plan: work only from the plan printed below, not from the summary's "
          "pending list. CLAUDE.md's ground rules hold (0: start every message with 'Joaquin'; 0b: never narrow the scope). "
          "Re-check the running batches with `site` before acting on any number in the summary.")
 
 
 def plan_text():
-    """The open items of the hand-off (sec:ladder-open), each top-level item's first 600 characters, and the active and
-    held work items: printed into the fresh context, since a pointer to them was skipped (2026-10-25: the summary listed
-    only the pp generation and the plan's other items sat untouched for hours)."""
-    import re, subprocess
-    out = []
+    """The plan itself (tools/plan.py show --compact): the only source of truth, printed so no summary stands
+    between the fresh context and it (setup redesign, D121)."""
+    import subprocess
     try:
-        s = open(os.path.join(REPO, "docs", "results.tex")).read()
-        i = s.index("\\label{sec:ladder-open}")
-        body, depth, items, cur = s[i:], 0, [], None
-        for line in body.splitlines()[1:]:
-            st = line.strip()
-            if st.startswith("\\begin{itemize}"):
-                depth += 1
-                if depth == 1:
-                    continue
-            if st.startswith("\\end{itemize}"):
-                depth -= 1
-                if depth == 0:
-                    break
-            if depth == 1 and st.startswith("\\item"):
-                cur = [st]; items.append(cur)
-            elif cur is not None:
-                cur.append(st)
-        out.append("THE PLAN (docs/results.tex, sec:ladder-open), every open item, first lines:")
-        for it in items:
-            t = re.sub(r"\s+", " ", " ".join(it))
-            out.append("  - " + (t[:600] + " ..." if len(t) > 600 else t))
-    except (OSError, ValueError) as e:
-        out.append("THE PLAN could not be read (%r): read docs/results.tex sec:ladder-open now." % e)
-    try:
-        r = subprocess.run(["site", "items", "--project", "FA"], capture_output=True, text=True, timeout=60)
-        out.append("WORK ITEMS (site items): each active one needs its next step taken or its wait named:\n" + r.stdout)
+        r = subprocess.run([sys.executable, os.path.join(REPO, "tools", "plan.py"), "show", "--compact"],
+                           capture_output=True, text=True, timeout=60)
+        return "THE PLAN (plan/plan.yaml; launch a step agent for each entry `plan next` lists, now):\n" + r.stdout + r.stderr
     except Exception as e:                      # noqa: BLE001
-        out.append("site items failed (%r): run it now." % e)
-    return "\n".join(out)
+        return "THE PLAN could not be printed (%r): run python3 tools/plan.py show now." % e
 
 
 def _clear(path):
@@ -86,10 +61,12 @@ def main():
         sys.stderr.write(INSTR)
         return 2
     if ev == "SessionStart":
+        ctx = plan_text()                     # every source (startup, resume, clear, compact) starts from the plan
         if inp.get("source") == "compact":
             _clear(FLUSHED)
             _clear(WANTED)
-            print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AFTER + "\\n\\n" + plan_text()}}))
+            ctx = AFTER + "\n\n" + ctx
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}))
         return 0
     if not os.path.exists(WANTED) or os.path.exists(FLUSHED):
         return 0
