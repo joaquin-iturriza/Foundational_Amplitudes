@@ -46,9 +46,43 @@ def groups():
     return out
 
 
+def support_masks():
+    """per pp probe, which of its 2000 scored events lie inside what its class's window pools cover: sqrt(s_hat) in the
+    class's window and the catalog's fiducial cuts (mg5_pipeline_final.FIDUCIAL_CUTS: pT > 10 GeV, |cos theta| < 0.9,
+    Delta R > 0.4, m_ij > 10 GeV on the massless visible finals), both read in the partonic rest frame, where the window
+    sampler draws. MadEvent's run card cuts in the lab (pT > 10 GeV, |eta| < 5), so a pp event can be forward, collinear
+    or above the window's top, none of which a window pool holds. The first 2000 rows of the val pool are the ones the
+    read scored (tools/zero_shot_parent.py, data.eval_subsample: an mmap slice)."""
+    import mg5_pipeline_final as mg
+    win = {}
+    for f in ["catalog_v3_train.yaml"] + [f"catalog_v3_heldout_{a}.yaml" for a in ("H1", "H2", "H3")]:
+        for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f)))["processes"]:
+            win.setdefault(e["name"], tuple(float(x) for x in e["sqrts"]))
+    out = {}
+    for n in groups():
+        c = mg.PROCESSES[n]
+        k = len(c["pdg_ids"])
+        a = np.load(os.path.join(os.environ["DATA_DIR"], f"{n}_13000-13000GeV_val_lhe_amplitudes.npy"), mmap_mode="r")
+        a = np.asarray(a[:2000], dtype=np.float64)
+        P = a[:, :4 * k].reshape(-1, k, 4)
+        tot = P[:, 0] + P[:, 1]
+        bz = tot[:, 3] / tot[:, 0]
+        g = 1.0 / np.sqrt(1.0 - bz ** 2)
+        E, pz = P[..., 0].copy(), P[..., 3].copy()
+        P[..., 0] = g[:, None] * (E - bz[:, None] * pz)
+        P[..., 3] = g[:, None] * (pz - bz[:, None] * E)
+        rs = np.sqrt(np.clip(tot[:, 0] ** 2 - (tot[:, 1:] ** 2).sum(-1), 0, None))
+        lo, hi = win["v3_" + n[len("pp13_"):]]
+        cut = mg.fiducial_pass_mask(P, c["m_finals"], c["pdg_ids"], mg.FIDUCIAL_CUTS)
+        inw = (rs >= lo) & (rs <= hi)
+        out[n] = {"in_sqrts": inw, "in_cuts": cut, "log_amp": np.log(np.abs(a[:, -1])), "sqrts": rs}
+    return out
+
+
 def collect():
     """on the site: every arm's pp predictions reduced to rows, and its training classes' window losses"""
     out = {}
+    sup = support_masks()
     for arm in ARMS:
         pred = os.path.join(os.environ["SCRATCH"], f"zz_v3_pp_{arm}")
         files = sorted(glob.glob(os.path.join(pred, "*.npz")))
@@ -64,6 +98,19 @@ def collect():
             d = z["q"].astype(float) - z["t"].astype(float)
             rows[p] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2), "shape": float(np.var(d)),
                        "var_t": float(np.var(z["t"].astype(float))), "n": int(len(d))}
+            m = sup.get(p)
+            if m is not None and len(m["in_cuts"]) == len(d):
+                inside = m["in_cuts"] & m["in_sqrts"]
+                rows[p].update({"frac_in_cuts": float(m["in_cuts"].mean()), "frac_in_sqrts": float(m["in_sqrts"].mean()),
+                                "frac_inside": float(inside.mean()),
+                                "mse_inside": float(np.mean(d[inside] ** 2)) if inside.any() else None,
+                                "mse_outside": float(np.mean(d[~inside] ** 2)) if (~inside).any() else None,
+                                "mse_out_cuts": float(np.mean(d[~m["in_cuts"]] ** 2)) if (~m["in_cuts"]).any() else None,
+                                "mse_above_window": float(np.mean(d[~m["in_sqrts"]] ** 2)) if (~m["in_sqrts"]).any() else None,
+                                "sqrts_median": float(np.median(m["sqrts"]))})
+                # the rows are the scored events in the same order: t minus the target factor is log|M|^2
+                lf = z["logF"].astype(float) if ("logF" in z.files and len(z["logF"]) == len(d)) else 0.0
+                rows[p]["order_check"] = float(np.max(np.abs(z["t"].astype(float) - lf - m["log_amp"])))
         run = os.path.join(ROOT, "runs", "catalog_v3_short", arm)
         res = json.load(open(os.path.join(run, "result.json")))
         st = json.load(open(os.path.join(run, "data_stats.json")))
