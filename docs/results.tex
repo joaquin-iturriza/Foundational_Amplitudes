@@ -609,6 +609,48 @@ with the heavy-quark layer. Read off the short pretrainings (Tab.~\ref{tab:v3_sh
 \end{itemize}
 Both targets now point at the same thing: the zero-shot error left on catalog\_v3 is shape, not level.
 
+\paragraph{The shape proxy on catalog\_v3 (2026-10-25).} Since the zero-shot error left is shape, which target leaves
+the least of it? Per class, one small regressor (sklearn MLP $(64,64)$, the same for every target) fitted on $7500$
+validation events and scored on $2500$ more, with the same inputs for every target (the pair invariants and masses over
+$\hat s$, and $\log\hat s$); its held-out MSE after the mean is the shape a target costs within a process
+(\code{analysis/catalog\_v3/prep\_shape.py}, run FA-ccin2p3-17fcc322; \code{prep\_shape\_read.py},
+\code{data/prep\_shape.json}; the port of the proxy on Daniel's catalog). Four targets: $\log|\mathcal M|^2$ (the baseline
+arm's), $+(N-4)\log\hat s$ (the $\hat s$ factor alone), $+L_q$ (the emission scales, the dimensionless arms' target) and
+$L_q$ with a soft minimum ($\tau=0.3$). $200$ training classes drawn with seed $0$ and every class of the seven held-out
+tree axes, none skipped. Medians over classes (Fig.~\ref{fig:v3_prep_shape}a):
+\begin{itemize}
+  \item \emph{The $\hat s$ factor alone leaves the least shape on every set, the emission scales the most.} On the $168$
+    held-out $2\to4$ classes: $0.062$ for the $\hat s$ factor, $0.077$ for $\log|\mathcal M|^2$, $0.093$ with the soft
+    minimum, $0.123$ for the emission scales; per class the $\hat s$ factor is below $\log|\mathcal M|^2$ on $145$ of $168$
+    (median ratio $0.84$) and the emission scales above it on $163$ (ratio $1.61$). On the $40$ $2\to5$ probes the gap
+    widens: $0.091$, $0.124$, $0.181$, $0.236$ (emission scales above on all $40$). The same order on the training classes
+    ($0.052$, $0.059$, $0.071$, $0.086$), the top ($0.023$, $0.027$, $0.030$, $0.040$) and every other axis but
+    $\alpha_s=0.13$, where all four are below $0.007$.
+  \item \emph{The order holds at a third of the events} (run FA-ccin2p3-31d221cd, $2500$ to fit,
+    \code{data/prep\_shape\_n2500.json}): every MSE about doubles ($2\to4$: $0.141$, $0.163$, $0.192$, $0.243$) and the
+    ranking is unchanged on every set.
+  \item \emph{The proxy tracks where the network leaves shape.} Across held-out classes, the rank correlation between the
+    proxy's MSE and the short pretrainings' zero-shot shape (Tab.~\ref{tab:v3_short}) is $0.68$ on $2\to4$ and $0.80$ on
+    the top for the dimensionless arm on its own target, $0.68$ and $0.71$ for the baseline (Fig.~\ref{fig:v3_prep_shape}b).
+    In size the network's zero-shot shape is $10$ to $30\times$ the proxy's ($0.85$ against $0.12$ on $2\to4$, $0.80$
+    against $0.04$ on the top): a per-class fit on $7500$ events is not what zero-shot gets, so the proxy ranks targets and
+    classes, it does not bound the network.
+\end{itemize}
+The emission scales bought the $2\to4$ level on Daniel's catalog ($52$ to $2.2$, par.\ The emission scales in training) and
+cost shape there (par.~\ref{par:qperp_cost}); on catalog\_v3, where the level is already small, that cost is what remains, and the proxy puts it at
+$1.6\times$ within a process. The candidate it suggests is the $\hat s$ factor alone with the same dimensionless inputs:
+the least shape of the four on every axis but $\alpha_s=0.13$, though it gives up the emission scales' level on
+$2\to4$, which only a network can weigh.
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_shape.pdf}
+\caption{The shape proxy on catalog\_v3. (a) Per set (the $200$ training classes, tr, and the held-out axes H1 new
+combinations, H2 $2\to4$, H2.5 $2\to5$, H3 the top, H6 $\alpha_s=0.13$, H7c $p_T\geq30$\,GeV, H7E $1$ to $10$\,TeV), the
+median over classes of a fixed small regressor's held-out MSE for each target. (b) Per held-out class, that MSE for
+the emission-scale target against the dimensionless arm's zero-shot shape on the same class.}
+\label{fig:v3_prep_shape}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram

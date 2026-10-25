@@ -6,11 +6,12 @@ target's MSE to the raw target's; and, against the short pretrainings' zero-shot
 tracks what the network leaves.
     python3 analysis/catalog_v3/prep_shape_read.py [--tag ""]   -> data/prep_shape<tag>.json, figs/prep_shape<tag>
 """
-import argparse, json, os
+import argparse, json, os, sys
 
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 TARGETS = ("raw", "dless", "qperp", "soft")
 SETS = ("train", "H1", "H2", "H2p5", "H3", "H6", "H7c", "H7E")
 ARM_OF = {"raw": "baseline", "qperp": "dimensionless"}     # the target each short pretraining's arm trained on
@@ -69,10 +70,9 @@ def plot(raw, sr, tag):
     for j, t in enumerate(TARGETS):
         ax.plot(x + (j - 1.5) * 0.12, [np.median([v[t]["mse"] for v in raw[s].values()]) for s in sets], mk[t],
                 color=cols[t], label=labs[t])
-    names = {"train": "train", "H1": "H1", "H2": r"$2\to4$", "H2p5": r"$2\to5$", "H3": "top", "H6": r"$\alpha_s$",
-             "H7c": r"$p_T$", "H7E": "TeV"}
+    names = {"train": "tr", "H1": "1", "H2": "2", "H2p5": "2.5", "H3": "3", "H6": "6", "H7c": "7c", "H7E": "7E"}
     ax.set_xticks(x); ax.set_xticklabels([names[s] for s in sets])
-    ax.set_yscale("log"); ax.set_xlabel("set"); ax.set_ylabel("proxy shape MSE")
+    ax.set_yscale("log"); ax.set_xlabel("training (tr) or held-out axis H"); ax.set_ylabel("proxy shape MSE")
     ps.legend(ax, "upper left")
     xs, ys = [], []
     for s in sets:
