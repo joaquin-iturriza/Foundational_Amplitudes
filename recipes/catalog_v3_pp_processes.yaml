@@ -33307,7 +33307,7 @@ processes:
     parent: v3_us_acdh
   pp13_us_acdz:
     lhe:
-      margin: 2.03
+      n_runs: 8
     kind: lhe_pp
     folder: pp13_us_acdz
     mg5_generate:
