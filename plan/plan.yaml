@@ -23,9 +23,9 @@ entries:
     that the user''s call: switch catalog sampling to pp or keep the windows (catalog_v4''s coverage already approved).'
   done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
     g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
-    not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
-    && test -f analysis/catalog_v3/figs/pp_trained.pdf && grep -q ''figs/pp_trained.pdf'' docs/results.tex && grep -q ''label{fig:v3_pp_trained}''
-    docs/results.tex && grep -q ''% claim: dimensionless_pp\.'' docs/results.tex'
+    not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && for x in a b c d; do test -f analysis/catalog_v3/figs/pp_trained_$x.png
+    && test -f analysis/catalog_v3/figs/pp_trained_$x.pdf && grep -q figs/pp_trained_$x.pdf docs/results.tex || exit 1; done
+    && grep -q "label{fig:v3_pp_trained}" docs/results.tex && grep -q "% claim: dimensionless_pp\." docs/results.tex'
   match: zz_pp_*,catalog_v3_pp*
   notes_ref: fig:v3_pp
   evidence:
@@ -62,6 +62,15 @@ entries:
     read). The setup redesign (approved with step agents 2026-10-25, ``Yes, the step agents and everything else you said sounds
     good''''): code review passed (branch at 9ce1cb1, merges cleanly), two low fixes in progress, then tools/switch_over.sh,
     done-checks for every entry and the CLAUDE.md pass.'
+  history:
+  - at: '2026-10-25T20:38:35+00:00'
+    was_done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
+      g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
+      not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
+      && test -f analysis/catalog_v3/figs/pp_trained.pdf && grep -q ''figs/pp_trained.pdf'' docs/results.tex && grep -q ''label{fig:v3_pp_trained}''
+      docs/results.tex && grep -q ''% claim: dimensionless_pp\.'' docs/results.tex'
+    stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
+      file
 - status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
