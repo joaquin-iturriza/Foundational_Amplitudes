@@ -198,8 +198,9 @@ def register_scan_process(name, base, physics):
     if (physics or {}).get("cuts"):
         if not FIDUCIAL_CUTS_ENABLED:
             raise ValueError(f"{name}: physics.cuts set while AMP_FIDUCIAL_CUTS=off (the pool would be built uncut)")
-        cfg["fiducial_cuts"] = {**FIDUCIAL_CUTS, **{k: float(v) for k, v in physics["cuts"].items()}}
-        assert set(cfg["fiducial_cuts"]) == set(FIDUCIAL_CUTS), f"physics.cuts: unknown keys {physics['cuts']}"
+        base_cuts = cfg.get("fiducial_cuts") or FIDUCIAL_CUTS       # a catalog_v4 entry carries its own
+        assert set(physics["cuts"]) <= set(FIDUCIAL_CUTS), f"physics.cuts: unknown keys {physics['cuts']}"
+        cfg["fiducial_cuts"] = {**base_cuts, **{k: float(v) for k, v in physics["cuts"].items()}}
     if alphas_mz is not None:
         cfg["alphas_mz"] = alphas_mz
         # NLO-virtual: an α_s scan only bites if the physical α_s weighting is
@@ -1771,6 +1772,27 @@ def _load_catalog_v3():
 CATALOG_V3_ENTRIES = _load_catalog_v3()
 
 
+def _load_catalog_v4():
+    """Append the catalog_v4 entries (recipes/gen_catalog_v4.py --write; D130), tagged _v4: the trees of
+    recipes/catalog_v4_processes.yaml and the one-loop and loop-induced entries of recipes/catalog_v4_loops.yaml. Names
+    are v4_*, so none may collide with an existing entry."""
+    import yaml as _yaml
+    here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes")
+    n = 0
+    for f in ("catalog_v4_processes.yaml", "catalog_v4_loops.yaml"):
+        path = os.path.join(here, f)
+        if not os.path.exists(path):
+            continue
+        d = _yaml.load(open(path), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+        for name, entry in (d.get("processes") or {}).items():
+            if name in PROCESSES:
+                raise KeyError(f"catalog_v4 entry {name} collides with an existing process")
+            PROCESSES[name] = dict(entry, _v4=True); n += 1
+    return n
+
+CATALOG_V4_ENTRIES = _load_catalog_v4()
+
+
 def _load_catalog_daniel():
     """Append the arXiv:2606.23791 (LLM4LHC) catalog (recipes/gen_catalog_daniel.py): pp processes
     whose events come from MadEvent with their cards (kind ``lhe_pp``; generation in the LHE_PP
@@ -2643,23 +2665,91 @@ FIDUCIAL_CUTS = {"pt_min": 10.0, "cos_max": 0.9, "dr_min": 0.4, "m_min": 10.0}
 FIDUCIAL_CUTS_ENABLED = os.environ.get("AMP_FIDUCIAL_CUTS", "on").lower() != "off"
 _NEUTRINOS = frozenset((12, 14, 16))
 
+# catalog_v4 (D130, the user 2026-10-25: "yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the
+# decayed final states"). Its entries (recipes/gen_catalog_v4.py) carry these as their own fields, so nothing above
+# changes for any earlier catalog:
+#   cuts        hadronic beams: pT > 10 GeV, |eta| < 5, Delta R > 0.4, no pair-mass cut (m_min < 0); e+e- beams:
+#               |cos theta| < 0.99, the other cuts as FIDUCIAL_CUTS; the b and the tau cut like the other legs
+#               (cut_pdgs; the b is massless in the five-flavour scheme, so only the tau needs it)
+#   sqrt(s)     from the threshold the masses and the cuts give (V4_SQRTS_LO) to 6 TeV, log-uniform (sqrts_measure)
+#   forward     f_fwd of each pool from the forward component (rotate_forward), fwd_cand of the flat part's
+#               candidates turned forward: the coverage check's settings (analysis/catalog_v3/coverage_check.py
+#               FWD_SHARE, FWD_CAND), open (no decision behind the values)
+#   top         MT = ymt = 172.5 in every entry, internal tops too, WT its LO width (V4_WT)
+#   b           massless, beams and finals: MadGraph's sm-no_b_mass (the five-flavour scheme, no b Yukawa)
+V4_COS_ETA5 = float(np.tanh(5.0))      # |eta| < 5 is |cos theta| < tanh 5 for any particle
+V4_CUTS = {"hadronic": {"pt_min": 10.0, "cos_max": V4_COS_ETA5, "dr_min": 0.4, "m_min": -1.0, "cut_pdgs": [5, 15]},
+           "ee":       {"pt_min": 10.0, "cos_max": 0.99, "dr_min": 0.4, "m_min": 10.0, "cut_pdgs": [5, 15]}}
+V4_SQRTS_MAX = 6000.0
+V4_SQRTS_FLOOR = 10.0      # GeV: the lower edge of a class with neither a cut leg nor a mass (e+e- > nu nu~), open
+V4_SAMPLING = {"mode": "mixture", "f_fwd": 0.15, "fwd_cand": 1.0 / 3.0}
+V4_MODEL = "sm-no_b_mass"
+V4_MT = 172.5
+
+
+def top_width_lo(m, mw=80.419, gf=1.16639e-5):
+    """LO Gamma(t -> b W+) with a massless b and V_tb = 1: G_F m^3 / (8 pi sqrt 2) (1 - x)^2 (1 + 2x), x = M_W^2 / m^2;
+    the top's only LO decay with a diagonal CKM, so the total width; 0 at or below M_W (catalog_v4's width rule: the
+    physical top and the heavy-quark layer alike)"""
+    if m <= mw:
+        return 0.0
+    x = mw ** 2 / m ** 2
+    return float(gf * m ** 3 / (8.0 * np.pi * np.sqrt(2.0)) * (1.0 - x) ** 2 * (1.0 + 2.0 * x))
+
+
+V4_WT = round(top_width_lo(V4_MT), 6)
+V4_TOP_PATCHES = {"MT": V4_MT, "ymt": V4_MT, "WT": V4_WT}
+
+
+def v4_cut_kind(pdg_ids):
+    return "ee" if abs(int(pdg_ids[0])) in (11, 13) else "hadronic"
+
+
+def v4_sqrts_lo(pdg_ids, m_finals, cuts=None):
+    """catalog_v4's lower sqrt(s) edge (D130: "from threshold", the 1.05 strip and the 25 GeV floor dropped, the IR
+    regulators the cuts give kept): the least sqrt(s) at which the masses and the pT cut allow an event, rounded up
+    to the GeV. Cut legs need E >= sqrt(m^2 + pT_min^2); with one cut leg the rest recoils against its pT, so it needs
+    E >= sqrt(M_rest^2 + pT_min^2), M_rest the sum of the other masses; uncut legs need their mass. A class with
+    neither a cut leg nor a mass takes V4_SQRTS_FLOOR."""
+    cuts = cuts or V4_CUTS[v4_cut_kind(pdg_ids)]
+    extra = {abs(int(p)) for p in cuts.get("cut_pdgs") or ()}
+    pt = float(cuts["pt_min"])
+    cut, rest = [], []
+    for p, m in zip(pdg_ids[2:], m_finals):
+        (cut if abs(int(p)) not in _NEUTRINOS and (float(m) == 0.0 or abs(int(p)) in extra) else rest).append(float(m))
+    if len(cut) == 1:
+        lo = np.hypot(cut[0], pt) + np.hypot(sum(rest), pt)
+    else:
+        lo = sum(np.hypot(m, pt) for m in cut) + sum(rest)
+    if lo <= 0:
+        lo = V4_SQRTS_FLOOR
+    return float(np.ceil(lo - 1e-9))
+
 
 def _cut_key(cuts):
-    """Identity-bearing view of the active cuts (for recipe_id)."""
-    return {k: float(cuts[k]) for k in ("pt_min", "cos_max", "dr_min", "m_min")}
+    """Identity-bearing view of the active cuts (for recipe_id). `cut_pdgs` (catalog_v4: the massive finals cut like
+    the massless ones) enters only when set, so every earlier recipe_id is unchanged."""
+    key = {k: float(cuts[k]) for k in ("pt_min", "cos_max", "dr_min", "m_min")}
+    if cuts.get("cut_pdgs"):
+        key["cut_pdgs"] = sorted(int(abs(p)) for p in cuts["cut_pdgs"])
+    return key
 
 
 def fiducial_pass_mask(P, m_finals, pdg_ids, cuts, n_initial=2):
     """Boolean mask (N,) of events passing the fiducial cuts. P is (N, npart, 4).
     Cuts hit only massless visible finals (m_final==0, |pdg|∉{12,14,16}): single-
     particle pt>pt_min & |cosθ|<cos_max; pairwise (among those) ΔR>dr_min & m>m_min.
-    A process with no such particle (all-massive / all-neutrino finals) passes all."""
+    A process with no such particle (all-massive / all-neutrino finals) passes all.
+    cuts["cut_pdgs"] (catalog_v4: the tau, and the b where it is massive) adds the finals of those
+    |pdg| to the cut legs whatever their mass; absent, the rule above is the whole rule."""
     import itertools
     N = P.shape[0]
     m_finals = np.asarray(m_finals, float)
     fin = list(range(n_initial, n_initial + len(m_finals)))
+    extra = {abs(int(p)) for p in (cuts.get("cut_pdgs") or ())}
     slots = [fin[i] for i in range(len(m_finals))
-             if m_finals[i] == 0.0 and abs(int(pdg_ids[fin[i]])) not in _NEUTRINOS]
+             if abs(int(pdg_ids[fin[i]])) not in _NEUTRINOS
+             and (m_finals[i] == 0.0 or abs(int(pdg_ids[fin[i]])) in extra)]
     keep = np.ones(N, dtype=bool)
     if not slots:
         return keep
@@ -2706,10 +2796,12 @@ def _collect_with_cuts(draw, n_events, m_finals, pdg_ids, cuts):
 BEAM_MASS = {5: 4.7}
 
 
-def _beams(sqrts, pdg_ids):
-    """(n, 2, 4) beam momenta in the c.o.m. frame for beams pdg_ids[:2]"""
+def _beams(sqrts, pdg_ids, beam_mass=None):
+    """(n, 2, 4) beam momenta in the c.o.m. frame for beams pdg_ids[:2]; beam_mass {|pdg|: GeV} in place of BEAM_MASS
+    (an entry's `beam_masses`: catalog_v4's five-flavour scheme has every beam massless)"""
     sqrts = np.asarray(sqrts, float); z = np.zeros(len(sqrts))
-    m1, m2 = (BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg_ids[:2])
+    bm = BEAM_MASS if beam_mass is None else beam_mass
+    m1, m2 = (bm.get(abs(int(p)), 0.0) for p in pdg_ids[:2])
     if m1 == 0.0 and m2 == 0.0:
         E = sqrts / 2.0
         return np.stack([np.stack([E, z, z, E], 1), np.stack([E, z, z, -E], 1)], axis=1)
@@ -2850,13 +2942,16 @@ def _rambo_massive_batch(sqrts_arr, masses, p_massless):
     return p
 
 
-def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=None, cuts=None):
+def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=None, cuts=None,
+                             sqrts_measure="uniform", beam_mass=None):
     """
     Sample n-body phase space using RAMBO for a range of CM energies.
 
     Uses fully vectorized batch RAMBO; no Python loop over events.
     The initial-state convention (e- row 0, e+ row 1) matches CPPProcess.
     With ``cuts`` set, oversamples and keeps only events in the fiducial region.
+
+    sqrts_measure "log" draws sqrt(s) log-uniform (catalog_v4); beam_mass as _beams.
 
     Returns (events, sqrts_arr) where events is a list of
     (momenta_array (nparticles x 4), pdg_ids_array).
@@ -2869,11 +2964,13 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
     all_zero = np.all(masses == 0.0)
     pdg_arr  = np.array(pdg_ids, dtype=int)
 
+    sq_draw = _sqrts_sampler(sqrts_min, sqrts_max, sqrts_measure, rng)
+
     def draw(nb):
-        sqrts   = rng.uniform(sqrts_min, sqrts_max, nb)
+        sqrts   = sq_draw(nb)
         p_ml    = _rambo_massless_batch(sqrts, nfinal, rng)          # (nb, nfinal, 4)
         p_final = p_ml if all_zero else _rambo_massive_batch(sqrts, masses, p_ml)
-        p_init  = _beams(sqrts, pdg_arr)                             # (nb, 2, 4)
+        p_init  = _beams(sqrts, pdg_arr, beam_mass)                  # (nb, 2, 4)
         return np.concatenate([p_init, p_final], axis=1), sqrts     # (nb, nparticles, 4)
 
     P, sqrts = _collect_with_cuts(draw, n_events, m_finals, pdg_arr, cuts)
@@ -2918,6 +3015,51 @@ def sampling_policy(cfg, role=None):
     if cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
         pol["mode"] = "flat"
     return pol
+
+
+def _sqrts_sampler(lo, hi, measure, rng):
+    """n -> sqrt(s) draws on [lo, hi]: "uniform" (every catalog up to v3; the same random stream as before) or "log"
+    (log-uniform, catalog_v4)"""
+    lo, hi = float(lo), float(hi)
+    if measure in (None, "uniform"):
+        return lambda n: rng.uniform(lo, hi, n)
+    if measure == "log":
+        if lo <= 0:
+            raise ValueError(f"log-uniform sqrt(s) needs a positive lower edge (got {lo})")
+        a, b = np.log(lo), np.log(hi)
+        return lambda n: np.exp(rng.uniform(a, b, n))
+    raise ValueError(f"unknown sqrts_measure {measure!r}")
+
+
+def rotate_forward(P, cos_cap, rng):
+    """catalog_v4's forward component (D130; analysis/catalog_v3/coverage_check.py, which measured it): P (n, k, 4),
+    beams in rows 0 and 1, the partonic rest frame. Per event one final particle at random is turned to an angle with
+    1 - |cos theta| = exp(-u), u uniform in [0, log(1/(1 - cos_cap))], phi uniform, either hemisphere; the whole final
+    state turns with it (one rotation), so momentum conservation and every mass shell hold. Nothing here knows which
+    process has a t-channel pole."""
+    n, k = P.shape[:2]
+    j = rng.integers(2, k, n)
+    p = P[np.arange(n), j, 1:]
+    a = p / np.clip(np.linalg.norm(p, axis=1, keepdims=True), 1e-300, None)
+    u = rng.uniform(0.0, np.log(1.0 / (1.0 - cos_cap)), n)
+    c = (1.0 - np.exp(-u)) * np.where(rng.random(n) < 0.5, 1.0, -1.0)
+    ph = rng.uniform(0.0, 2.0 * np.pi, n)
+    s = np.sqrt(np.clip(1.0 - c ** 2, 0.0, None))
+    b = np.stack([s * np.cos(ph), s * np.sin(ph), c], 1)
+    v = np.cross(a, b); sv = np.linalg.norm(v, axis=1); cc = (a * b).sum(1)
+    K = np.zeros((n, 3, 3))
+    K[:, 0, 1], K[:, 0, 2], K[:, 1, 2] = -v[:, 2], v[:, 1], -v[:, 0]
+    K[:, 1, 0], K[:, 2, 0], K[:, 2, 1] = v[:, 2], -v[:, 1], v[:, 0]
+    f = np.where(sv > 1e-12, (1.0 - cc) / np.clip(sv ** 2, 1e-300, None), 0.0)
+    R = np.eye(3)[None] + K + f[:, None, None] * (K @ K)
+    anti = (sv <= 1e-12) & (cc < 0)               # a already opposite b: a half turn about an axis normal to a
+    if anti.any():
+        e = np.where(np.abs(a[anti, 0:1]) < 0.9, np.array([[1.0, 0, 0]]), np.array([[0, 1.0, 0]]))
+        w = np.cross(a[anti], e); w /= np.linalg.norm(w, axis=1, keepdims=True)
+        R[anti] = 2.0 * w[:, :, None] * w[:, None, :] - np.eye(3)[None]
+    Q = P.copy()
+    Q[:, 2:, 1:] = np.einsum("nij,nkj->nki", R, P[:, 2:, 1:])
+    return Q
 
 
 def _random_dirs(n, rng):
@@ -3022,17 +3164,20 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
     return idx_all[rng.choice(len(idx_all), size=n_keep, replace=False, p=w)]
 
 
-def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo):
+def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo, frac_fwd=0.0, beam_mass=None):
     """nb candidate events with sqrt(s) from `sqrts_draw(n)`: 2->2 isotropic two-body; for
     n >= 3 a frac_dem share from the democratic splitter, the rest RAMBO. Fiducial cuts by
     rejection with top-up (the pipeline's _collect_with_cuts); the cuts bite the democratic
     draws hardest (they sit in the corners), so the realised democratic share of the
-    survivors is below frac_dem."""
+    survivors is below frac_dem. frac_fwd (catalog_v4) turns that share of the draws forward (rotate_forward, up to
+    the cuts' |cos theta| edge); zero draws no extra random numbers, so every earlier pool keeps its stream."""
     m_finals = np.asarray(m_finals, float); N = len(m_finals); pdg = np.asarray(pdg_ids, int)
     all_zero = np.all(m_finals == 0.0)
+    if frac_fwd > 0 and cuts is None:
+        raise ValueError("the forward component needs the fiducial cuts (its edge is their |cos theta| bound)")
     def draw(n_draw):
         sq = np.asarray(sqrts_draw(n_draw), float)
-        beams = _beams(sq, pdg)
+        beams = _beams(sq, pdg, beam_mass)
         if N == 2:
             P = democratic_draw(n_draw, sq, m_finals, y_lo, rng)     # N=2: back-to-back, isotropic
         else:
@@ -3043,24 +3188,42 @@ def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo):
                 p_ml = _rambo_massless_batch(sq[n_dem:], N, rng)
                 parts.append(p_ml if all_zero else _rambo_massive_batch(sq[n_dem:], m_finals, p_ml))
             P = np.concatenate(parts, axis=0)
-        return np.concatenate([beams, P], axis=1), sq
+        P = np.concatenate([beams, P], axis=1)
+        if frac_fwd > 0:
+            r = rng.random(n_draw) < frac_fwd
+            if r.any():
+                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng)
+        return P, sq
     P, sq = _collect_with_cuts(draw, nb, m_finals, pdg, cuts)
     return [(P[i], pdg) for i in range(nb)], sq
 
 
-def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng, cuts, pol, label):
+def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng, cuts, pol, label,
+                          sqrts_measure="uniform", beam_mass=None):
     """The mixture policy above. `label(events, sqrts) -> |M|^2` is the exact matrix
-    element (the pipeline's backend). Returns (events, sqrts, me2) shuffled."""
+    element (the pipeline's backend). Returns (events, sqrts, me2) shuffled.
+    catalog_v4 (D130) adds, all absent from every earlier policy (so their pools are unchanged): sqrts_measure "log"
+    (the bulk, the forward part and the first candidate pass log-uniform in sqrt(s); the adaptive pass bins in
+    log sqrt(s)), pol["f_fwd"] (that share of the dataset from the forward component, out of the bulk) and
+    pol["fwd_cand"] (that share of the flat part's candidates turned forward, so the flat selection reaches the
+    forward extremes too); beam_mass as _beams."""
     lo, hi = float(sqrts_min), float(sqrts_max)
-    n_flat = int(round(pol["f_flat"] * n_events)); n_bulk = n_events - n_flat
-    uni = lambda n: rng.uniform(lo, hi, n)
-    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"])   # bulk: uniform-sqrt(s) measure
+    f_fwd, fwd_cand = float(pol.get("f_fwd", 0.0)), float(pol.get("fwd_cand", 0.0))
+    n_flat = int(round(pol["f_flat"] * n_events)); n_fwd = int(round(f_fwd * n_events))
+    n_bulk = n_events - n_flat - n_fwd
+    uni = _sqrts_sampler(lo, hi, sqrts_measure, rng)
+    log_s = sqrts_measure == "log"
+    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
     me_b = np.asarray(label(ev_b, sq_b), float)
+    if n_fwd:
+        ev_w, sq_w = _candidates(n_fwd, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 1.0, beam_mass)
+        ev_b = ev_b + ev_w; sq_b = np.concatenate([sq_b, sq_w])
+        me_b = np.concatenate([me_b, np.asarray(label(ev_w, sq_w), float)])
     ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
     if n_flat:
         n_cand = max(int(pol["oversample"]) * n_flat, n_flat)
         n1 = n_cand // 2 if pol["sqrts_adapt"] else n_cand
-        ev1, sq1 = _candidates(n1, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
+        ev1, sq1 = _candidates(n1, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
         me1 = np.asarray(label(ev1, sq1), float)
         cand, sq_c, me_c = ev1, sq1, me1
         if pol["sqrts_adapt"] and n_cand - n1 > 0:
@@ -3068,14 +3231,17 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
                 lg1 = np.log(np.where(me1 > 0, me1, np.nan))
             ok = np.isfinite(lg1)
             nb_s = _adaptive_bins(int(ok.sum()), int(pol["n_sqrts_bins"]))
+            # the proposal's variable: sqrt(s), or log sqrt(s) under the log measure (bins equal in log, as the draws)
+            tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
+            t_lo, t_hi = tr(lo), tr(hi)
             if ok.any():
-                edges, probs = _sqrts_proposal_from_pass(sq1[ok], lg1[ok], lo, hi, nb_s, n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
+                edges, probs = _sqrts_proposal_from_pass(tr(sq1[ok]), lg1[ok], t_lo, t_hi, nb_s, n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
             else:
                 # no positive candidate (a signed target negative throughout, e.g. a synthetic one-loop pool): the
                 # proposal stays uniform in sqrt(s); every pool that has one is unchanged
-                edges, probs = np.linspace(lo, hi, nb_s + 1), np.full(nb_s, 1.0 / nb_s)
-            ev2, sq2 = _candidates(n_cand - n1, lambda n: _draw_sqrts_from_bins(n, edges, probs, rng),
-                                   m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"])
+                edges, probs = np.linspace(t_lo, t_hi, nb_s + 1), np.full(nb_s, 1.0 / nb_s)
+            ev2, sq2 = _candidates(n_cand - n1, lambda n: itr(_draw_sqrts_from_bins(n, edges, probs, rng)),
+                                   m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
             me2 = np.asarray(label(ev2, sq2), float)
             cand, sq_c, me_c = ev1 + ev2, np.concatenate([sq1, sq2]), np.concatenate([me1, me2])
         with np.errstate(divide="ignore", invalid="ignore"):
@@ -3125,6 +3291,11 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
     cuts       = dict(config.get("fiducial_cuts") or FIDUCIAL_CUTS) if FIDUCIAL_CUTS_ENABLED else None
     cut_msg    = f"  fiducial cuts {_cut_key(cuts)}" if cuts else "  (no cuts)"
     pol        = sampling_policy(config, role)
+    # catalog_v4 (D130): the entry's sqrt(s) measure and beam masses; absent, uniform and BEAM_MASS as before
+    measure    = config.get("sqrts_measure", "uniform")
+    beam_mass  = config.get("beam_masses")
+    if (pol.get("f_fwd") or pol.get("fwd_cand")) and pol["mode"] != "mixture":
+        raise ValueError("the forward component is part of the mixture policy (mode: mixture)")
     synthetic  = backend == "synthetic"     # tools/synthetic_amplitudes.py labels the events
     if synthetic:
         from tools.synthetic_amplitudes import label_events
@@ -3140,13 +3311,13 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
               f"  policy=mixture f_flat={pol['f_flat']} oversample={pol['oversample']}")
         if synthetic:
             events, sqrts_arr, total_me2 = build_mixture_dataset(
-                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, syn_label)
+                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, syn_label, measure, beam_mass)
         else:
             perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
             with CppDriverPipe(driver_bin, standalone_dir) as pipe:
                 label = lambda ev, sq: pipe.compute(ev, perm=perm, alphas=compute_alphas(np.asarray(sq, float), alphas_mz=amz))
                 events, sqrts_arr, total_me2 = build_mixture_dataset(
-                    n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label)
+                    n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label, measure, beam_mass)
         os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
         mmap_path = output_file + ".mmap"
         mmap = np.lib.format.open_memmap(mmap_path, mode="w+", dtype=np.float64, shape=(n_events, ncols))
@@ -3161,6 +3332,9 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
         print(f"[DATA] Saved {n_events:,} events → {output_file}  |M|² ∈ [{w.min():.4e}, {w.max():.4e}]  neg: {(w < 0).sum()}")
         return
 
+    if measure != "uniform" or beam_mass is not None:
+        raise ValueError(f"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture "
+                         f"path only (catalog_v4's policy)")
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
         # fall back to the scalar m_final for an equal-mass pair (X X~).
@@ -3380,6 +3554,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     # so existing pre-cut datasets keep their recipe_id.
     if FIDUCIAL_CUTS_ENABLED:
         recipe["fiducial_cuts"] = _cut_key(cfg.get("fiducial_cuts") or FIDUCIAL_CUTS)
+    # catalog_v4 (D130): the sqrt(s) measure and the beam masses, recorded only where an entry sets them
+    if cfg.get("sqrts_measure", "uniform") != "uniform":
+        recipe["sqrts_measure"] = cfg["sqrts_measure"]
+    if cfg.get("beam_masses") is not None:
+        recipe["beam_masses"] = {str(k): float(v) for k, v in sorted(cfg["beam_masses"].items())}
     ceil_div    = lambda a, b: -(-a // b)
     n_chunks    = process_n_chunks(process, n)
     legacy_nch  = ceil_div(n, MAX_CHUNK)

@@ -138,6 +138,30 @@ def _load_catalog_v3_virt():
 
 CATALOG_V3_VIRT = _load_catalog_v3_virt()
 
+
+def _load_catalog_v4_virt():
+    """catalog_v4's MadLoop strings (recipes/gen_catalog_v4.py --write; D130), keys v4_*. Each carries its own
+    fiducial_cuts, sqrts_measure, beam_masses (the five-flavour scheme: none massive) and param_card_patches (the top
+    width at 172.5), read below in place of the global ones; no earlier entry has them."""
+    import yaml as _yaml
+    path = os.path.join(ROOT, "recipes", "catalog_v4_loops.yaml")
+    if not os.path.exists(path):
+        return 0
+    d = _yaml.load(open(path), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+    n = 0
+    for name, entry in (d.get("virt") or {}).items():
+        if name in VIRT_PROCESSES:
+            raise KeyError(f"catalog_v4 one-loop entry {name} collides with an existing one")
+        VIRT_PROCESSES[name] = dict(entry, _v4=True); n += 1
+    return n
+
+CATALOG_V4_VIRT = _load_catalog_v4_virt()
+
+
+def beam_masses(cfg):
+    """the beams' masses of a one-loop entry: its own beam_masses (catalog_v4), else the pipeline's BEAM_MASS"""
+    return mg.BEAM_MASS if cfg.get("beam_masses") is None else cfg["beam_masses"]
+
 ALPHA_EW = 1.0 / C.PARAM_CARD_PATCHES["aEWM1"]     # the locked card's alpha, MadLoop's QED normalisation
 
 
@@ -278,7 +302,7 @@ def build_virt_standalone(process, force=False):
     if "GET_ME_FULL" not in open(wrapper).read():
         with open(wrapper, "a") as f:
             f.write(GET_ME_FULL_F)
-    patch_param_card_slha(f"{sa}/Cards/param_card.dat", C.PARAM_CARD_PATCHES)
+    patch_param_card_slha(f"{sa}/Cards/param_card.dat", {**C.PARAM_CARD_PATCHES, **cfg.get("param_card_patches", {})})
 
     print(f"[BUILD] {process}: compiling matrix2py.so ...")
     env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
@@ -361,7 +385,7 @@ WIDTH_BACKUP = ".width_backup"
 ML_PARAMS_MASSIVE_BEAM = {"#ImprovePSPoint": "-1", "#MLStabThres": "1.000000d-05"}
 
 
-def massive_beam_params(sa, pdg):
+def massive_beam_params(sa, pdg, beam_mass=None):
     """A standalone with a massive beam (a b at mg.BEAM_MASS) runs with ImprovePSPoint = -1. MadLoop's default (2)
     re-projects every point onto exact on-shell kinematics; its V.H. method refuses massive beams and the PSMC fallback
     rescales beam 1's 3-momentum by x^2 and the rest by x, which breaks pz conservation whenever x != 1 (any W: our
@@ -370,7 +394,8 @@ def massive_beam_params(sa, pdg):
     MadLoop's double-precision stability test lets through points it would have cleaned (v3_bg_bhz: one point of 100 with
     c2 = -2.994 against -3, rc 216, FA-ccin2p3-3680de8c), so the threshold for its quadruple-precision rescue goes from
     1e-3 to 1e-5. Idempotent; no-op for massless beams."""
-    if not any(mg.BEAM_MASS.get(abs(int(p)), 0.0) > 0 for p in pdg[:2]):
+    bm = mg.BEAM_MASS if beam_mass is None else beam_mass
+    if not any(bm.get(abs(int(p)), 0.0) > 0 for p in pdg[:2]):
         return
     cards = {os.path.realpath(os.path.join(sa, *p, "MadLoopParams.dat"))
              for p in (("Cards",), ("SubProcesses", "MadLoop5_resources"))}
@@ -455,11 +480,11 @@ def pole_certify(process, n=100, seed=7):
     pdg = list(cfg["pdg_ids"])
     perm = mg.row_to_slot_perm(pdg, cfg["mg5"])
     # the beams on the masses generation gives them (mg5_pipeline_final.BEAM_MASS: a b beam at 4.7 GeV, 31954d7)
-    masses = [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(cfg["m_finals"])
+    masses = [beam_masses(cfg).get(abs(int(p)), 0.0) for p in pdg[:2]] + list(cfg["m_finals"])
     cmd = [sys.executable, f"{HERE}/nlo_pole_check.py", "--so-dir", p0,
            "--proc-order", *map(str, pdg), "--m", *map(str, masses),
            "--perm", *map(str, perm), "--n", str(n), "--seed", str(seed)]
-    massive_beam_params(sa, pdg)
+    massive_beam_params(sa, pdg, beam_masses(cfg))
     print(f"[CERTIFY] {process}: pole check (top width zeroed for the check) ...")
     with _zero_top_width(os.path.join(sa, "Cards", "param_card.dat")):
         res = subprocess.run(cmd, capture_output=True, text=True,
@@ -502,9 +527,12 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     rng = np.random.default_rng(seed)
     # Same fiducial cuts as the LO path so phase-space coverage is consistent across
     # the perturbative-order axis (and matches the fiducial_cuts recorded in recipe_id).
-    cuts = mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None
+    # catalog_v4: the entry's own cuts, sqrt(s) measure and beam masses (absent: the global ones, uniform, BEAM_MASS)
+    cuts = (cfg.get("fiducial_cuts") or mg.FIDUCIAL_CUTS) if mg.FIDUCIAL_CUTS_ENABLED else None
+    measure, bm = cfg.get("sqrts_measure", "uniform"), beam_masses(cfg)
     events, sqrts = mg.sample_nbody_phase_space(
-        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts)
+        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts, sqrts_measure=measure,
+        beam_mass=cfg.get("beam_masses"))
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
     # catalog_v3 (_v3): no shift; the pools store MadLoop's own finite part (the user, 2026-10-24: "Just do whatever is
@@ -514,7 +542,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
 
     sa = virt_standalone_dir(process)
     restore_stale_card(os.path.join(sa, "Cards", "param_card.dat"))
-    massive_beam_params(sa, pdg)
+    massive_beam_params(sa, pdg, bm)
     p0 = find_p0(sa)
     get_me_full = ML.load(p0)   # chdir into p0
     swap = mg.row_to_slot_perm(pdg, cfg["mg5"])   # stored rows -> MadGraph slots
@@ -575,12 +603,12 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             return virt_e4 * (asrun / (2.0 * np.pi)), True
         return virt_e4, True                    # absolute, no α_s (legacy default)
 
-    c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [mg.BEAM_MASS.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(m_finals))   # the set of legs only
+    c2_pred = (ew_double_pole if ew else PC.double_pole)(pdg, [bm.get(abs(int(p)), 0.0) for p in pdg[:2]] + list(m_finals))   # the set of legs only
     # massive beams (b, catalog_v3): MadLoop runs without its PS-point improvement there (ImprovePSPoint -1,
     # massive_beam_params) and STOPs on an energy imbalance above ~1e-10 GeV (CT692, v3_bbx_aa_nlo, 2026-10-24); the
     # sampler's events carry up to 2e-9. The last final is set to the beams minus the other finals, which conserves
     # four-momentum to the last bit and moves that leg's m^2 by at most ~1e-11 relative.
-    balance = bool(cfg.get("_v3")) and any(mg.BEAM_MASS.get(abs(int(p)), 0.0) > 0 for p in pdg[:2])
+    balance = bool(cfg.get("_v3")) and any(bm.get(abs(int(p)), 0.0) > 0 for p in pdg[:2])
 
     def balanced(mom):
         if balance:
@@ -597,7 +625,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             # redraw the event from the same sampler (same cuts, same rng stream)
             bad += 1; tries += 1
             ev1, sq1 = mg.sample_nbody_phase_space(1, sqrts_min, sqrts_max, m_finals, pdg,
-                                                   rng=rng, cuts=cuts)
+                                                   rng=rng, cuts=cuts, sqrts_measure=measure,
+                                                   beam_mass=cfg.get("beam_masses"))
             mom, sqrts[i] = balanced(ev1[0][0]), sq1[0]
             value, usable = evaluate_point(mom, sqrts[i])
         if not usable:
