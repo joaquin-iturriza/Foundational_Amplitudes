@@ -6284,6 +6284,48 @@ arm's, and no arm gets a sign wrong. The arm loses where the other two do not, a
 So the probe is a zero-crossing problem for every arm, and the Sudakov pretraining makes the approach to the crossing
 worse, not the far region its shared $L^2$ term describes.
 
+\paragraph{Fine-tuning at small $D$, first round (2026-10-25, D120).}\label{par:lowd_ft} Whether a gentler fine-tune
+does better where the default one loses (par.~\ref{par:nogain}): every method at each cell's best fine-tune trial of the
+grid (its HPs, steps and seed; CLAUDE.md's comparison protocol, step 3), on $60$ cells: rungs $1$, $7$, $9$ at
+$D=10$, $10^{1.5}$, $10^2$, $10^{2.5}$ ($176$ to $4576$ steps) on $ee\to Z\gamma$, $ee\to d\bar d$ and $ud\to ud$, and
+the two probes picked for this round by the largest mean gain at these $D$ besides them ($ee\to b\bar b$ at one loop, $+0.66$
+decades; $u\bar u\to gg$, $+0.57$; \code{data/nogain.json}). Methods: the default (full retraining, the cell's layer
+decay), rerun on one machine with the rest; linear probe then fine-tune (the head written as the frozen trunk's
+ridge read-out before training, \code{fine\_tune.linear\_probe}); the fine-tune pulled toward the start, L2-SP
+($\tfrac\lambda2|\theta-\theta^*|^2$ on every weight, \code{fine\_tune.ewc.uniform}); the lower half of the trunk frozen;
+the frozen read-out itself; and per cell the better of read-out and default on validation (chosen on the split it is
+scored on, as the grid's best-of-five is). The L2-SP arm ran at one strength, $\lambda=10^{-2}$, and the frozen arm at
+one depth, blocks $0$ to $3$ of $8$, both values picked for this round and not tuned: a loss in those two arms is about one untuned
+value, not about the method. $240$ runs and $60$ read-outs, $8.9$ GPU-h, none failed (\code{tools/lowd\_ft.py},
+\code{scripts/job\_lowd\_ft.sh}, \code{analysis/transfer/lowd\_ft.py}, \code{data/lowd\_ft.json};
+Fig.~\ref{fig:lowd_ft}).
+
+A single run is noisy at these $D$: the default rerun against the grid's record of the same trial is within $1.2\times$ in
+$36$ of $60$ cells, the median $|\log_{10}|$ ratio $0.035$ but its $90\%$ quantile $0.41$ decades (up to $11.7\times$
+on $u\bar u\to gg$, rung $1$, $D=10^2$); the medians over the $15$ cells per $D$ move little ($+0.47$ to $+0.78$ decades
+over scratch rerun against $+0.39$ to $+0.78$ recorded). Over all five probes no method beats the default: the median gain
+over it per $D$ is $-0.19$ to $+0.08$ decades for linear probe then fine-tune (it wins $5$ to $8$ of $15$ cells per
+$D$), $0.00$ to $-0.87$ for L2-SP, $-0.06$ to $-0.19$ for the frozen half, and $-0.26$ to $-1.09$ for the read-out, which
+falls further behind as $D$ grows; the per-cell choice takes the read-out in $3$, $5$, $2$ and $1$ of the $15$ cells
+per $D$ (its median gain over scratch $+0.77$ decades against the default's $+0.57$ at $D=10^{1.5}$, equal at the others). On $ee\to Z\gamma$ alone linear probe then fine-tune beats the
+default at every $D$, by $+0.11$, $+0.21$, $+0.21$ and $+0.38$ decades (medians over the three rungs), and the read-out by
+$+0.16$ and $+0.38$ at $D=10$ and $10^{1.5}$; yet the best of all methods stays below scratch there ($-0.07$, $-0.25$,
+$-0.71$, $-0.01$ decades). So on the probe that does not gain the head-first start recovers part of the loss, never all of
+it, and the same start costs a little on the probes that gain. In the smoke run the fitted head started at the read-out's
+error ($7\times10^{-3}$ on $ee\to Z\gamma$, rung $7$, $D=10^{1.5}$) and the first validation, seven steps later at the
+cell's learning rate ($6.8\times10^{-3}$), was already above it, so at the default's HPs the fine-tune undoes the head
+it was given; whether a lower rate keeps it is an HP question for the next round.
+
+\begin{figure}[t]
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/lowd_ft.pdf}}
+\caption{Fine-tuning at small $D$, first round: every method at each cell's best fine-tune HPs on $60$ cells (five
+probes, rungs $1$, $7$, $9$). Medians over the $15$ cells per $D$ of (a) the gain over scratch and (b) the gain over the
+default fine-tune, both $\log_{10}$ of the reference's MSE of $\log|\mathcal M|^2$ over the method's
+(\code{analysis/transfer/lowd\_ft.py}).}
+\label{fig:lowd_ft}
+\end{figure}
+
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
 $z=(\log|\mathcal M|^2-\mu_q)/\sigma_q$ (\code{tools/zero\_shot\_ft.py}). The parent outputs in its own standardized units,
@@ -7269,20 +7311,12 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
     are flushed (\code{touch .claude/.notes\_flushed}).
-  \item \textbf{Fine-tuning at small $D$ (proposed 2026-10-25, design for the user).} The no-gain read-out
-    (par.~\ref{par:nogain}) shows a frozen trunk with a fitted linear head beating the default fine-tune on $8$ of $10$
-    rungs at $D=10^{1.5}$ on $ee\to Z\gamma$; the fine-tune method comparison (Tab.~\ref{tab:ftmethods}) ran at $10^5$
-    events and the add-$W$ one on forgetting, so no gentler method was ever tested at small $D$. Proposed: methods (the
-    default full retraining with layer decay; the frozen read-out; linear probe then fine-tune; the fine-tune pulled
-    toward the start, L2-SP or EWC; frozen lower blocks; the per-cell choice between read-out and fine-tune on
-    validation) at $D=10$, $10^{1.5}$, $10^2$, $10^{2.5}$, on $ee\to Z\gamma$, $ee\to d\bar d$, $ud\to ud$ (dips) and two probes
-    that gain, from rungs $1$, $7$ and $9$. First every method at the current best fine-tune HPs (CLAUDE.md's comparison
-    protocol, step 3), then single-fidelity DyHPO only for the methods that do not win, best against best. Steps as the grid's
-    own cells ($176$, $704$, $2816$, $4576$ at $D=10$ to $10^{2.5}$, \code{sweep/sweep\_config\_tp3\_*fte\_*\_d2} to
-    \code{\_d5}): $8272$ steps per probe and rung over the four $D$, about one $8$k-step run, which takes $10$ to $16$\,min
-    on these probes at $D=10^4$. The first round, $5$ probes $\times$ $3$ rungs $\times$ $4$ trained methods, is about $60$
-    such units, $10$ to $16$ GPU-h plus each run's start-up (the read-out and the per-cell choice cost no training).
-    Open for the user: the methods and the probes.
+  \item \textbf{Fine-tuning at small $D$} (D120; first round in par.~\ref{par:lowd_ft}: no method beats the default
+    at the default's HPs; linear probe then fine-tune helps on $ee\to Z\gamma$ only). Next: single-fidelity DyHPO for the
+    methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared best against best with the
+    default's own search, with $\lambda$ for L2-SP and the frozen depth in their search spaces next to the learning rate
+    (the first round ran one untuned value of each); the single-run noise ($90\%$ quantile $0.41$ decades) asks for the
+    comparison on cell medians, not single cells.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$

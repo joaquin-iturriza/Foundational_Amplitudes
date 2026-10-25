@@ -102,7 +102,7 @@ def plot(out):
             ax.plot(x, [np.nan if v is None else v for v in y], marker=marks[m], color=cols[m], label=LABEL[m])
         ax.plot([x.min(), x.max()], [0, 0], color=ps.C.grey, ls="--", label="equal")
         ax.set_xlabel(r"$\log_{10} D$"); ax.set_ylabel(yl)
-    ps.legend(axs[0], "upper left", handles=axs[0].get_legend_handles_labels()[0])
+    ps.legend(axs[0], "upper left", handles=axs[0].get_legend_handles_labels()[0], ncol=2)
     for ax in axs:
         ps.make_room(ax)
     ps.save(fig, os.path.join(HERE, "figs", "lowd_ft"))
