@@ -112,8 +112,8 @@ def main():
     # alone (the longest MadEvent runs), the rest dealt into five parts
     short = sorted((e for e in test if e["name"] in margins and e["name"] not in runs), key=lambda e: -margins[e["name"]])
     # the stalled processes' own rerun, one job each
-    for k, e in enumerate(e for e in test if e["name"] in runs):
-        with open(os.path.join(HERE, f"catalog_v3_pp_runs_part{k}.yaml"), "w") as f:
+    for e in (e for e in test if e["name"] in runs):     # named by process: a new entry never renames another's file
+        with open(os.path.join(HERE, f"catalog_v3_pp_runs_{e['name']}.yaml"), "w") as f:
             f.write(hdr)
             yaml.safe_dump({"processes": [e]}, f, sort_keys=False)
     parts = [[e] for e in short[:5]] + [short[5:][k::5] for k in range(5)]
