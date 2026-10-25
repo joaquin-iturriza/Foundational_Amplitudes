@@ -37,6 +37,10 @@
 # call scoped, which matters on Lustre where a full-tree diff is slow.
 set -uo pipefail
 
+# No filename globbing anywhere in this script: the pillar pathspecs (`*.py`, `docs/*.tex`) expand unquoted and must
+# reach git as written, where they match at any depth. With globbing on, `*.py` became the root's own .py files and
+# analysis/**/*.py never counted toward the repo-reviewer's backlog (in the line and commit counts, gate and bashpre).
+set -f
 FALLBACK_REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 STATE_REL=".claude/.review_state"
 

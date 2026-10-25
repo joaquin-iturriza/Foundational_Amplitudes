@@ -1258,6 +1258,50 @@ def slow_done_checks():
              r[1] + out)
 
 
+def tooling_fixes():
+    """The review backlog counts code at any depth; run ids are not numbers; a heredoc is judged by what it does."""
+    repo = tempfile.mkdtemp(prefix="backlog_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q")
+    for d in (".claude/hooks", ".claude/.review_state", "analysis/deep"):
+        os.makedirs(os.path.join(repo, d))
+    shutil.copy(os.path.join(ROOT, ".claude", "hooks", "review_backlog.sh"), os.path.join(repo, ".claude", "hooks"))
+    open(os.path.join(repo, "root_module.py"), "w").write("x = 1\n")
+    open(os.path.join(repo, "analysis", "deep", "fit.py"), "w").write("y = 1\n")
+    g("add", "."); g("commit", "-qm", "base")
+    base = g("rev-parse", "HEAD").stdout.strip()
+    for name in ("repo-reviewer", "notes-editor", "claudemd-keeper"):
+        open(os.path.join(repo, ".claude", ".review_state", name), "w").write("%s 0 0\n" % base)
+    open(os.path.join(repo, "analysis", "deep", "fit.py"), "a").write("".join("z%d = %d\n" % (i, i) for i in range(10)))
+    g("commit", "-qam", "deep change")
+    st = subprocess.run(["bash", ".claude/hooks/review_backlog.sh", "status"], cwd=repo, capture_output=True,
+                        text=True).stdout
+    row = next((l.split() for l in st.splitlines() if l.startswith("repo-reviewer")), [])
+    scenario("review backlog: a .py change two directories down counts toward the repo-reviewer (lines and commits)",
+             row[1:3] == ["10/600", "1/30"], st)
+    repo2, g2, tex, base2 = repo_with_script()
+    open(tex, "a").write("\n%% src: python3 analysis/s.py @%s\n%% claim: h3.shape=0.80\nThe rerun FA-ccin2p3-60b47206 "
+                         "gives $0.80$.\n" % base2)
+    g2("add", ".")
+    r1 = subprocess.run([sys.executable, VERIFY, "--root", repo2, "--staged"], capture_output=True, text=True)
+    open(tex, "a").write("\nAt 13 TeV it holds.\n")
+    g2("add", ".")
+    r2 = subprocess.run([sys.executable, VERIFY, "--root", repo2, "--staged"], capture_output=True, text=True)
+    scenario("verify: a registry run id is not read as numbers; 13 TeV still needs a claim or an allow",
+             r1.returncode == 0 and r2.returncode == 1 and "13 is no claim" in r2.stdout, r1.stdout + r2.stdout)
+    for c, want in (
+            ("python3 - <<'EOF'\nimport yaml\nd = yaml.safe_load(open('plan/plan.yaml'))\nprint(len(d))\nEOF", 0),
+            ("python3 - <<'EOF'\nd = open('plan/plan.yaml').read()\nopen('/tmp/out.txt', 'w').write(d)\nEOF", 0),
+            ("git commit -F - <<'EOF'\nplan: an edit to plan/plan.yaml\nEOF", 0),
+            ("python3 - <<'EOF'\nopen('plan/plan.yaml', 'w').write('x')\nEOF", 2),
+            ("python3 - <<'EOF'\nimport json\np = 'plan/.state.json'\njson.dump({}, open(p, 'w'))\nEOF", 2),
+            ("bash <<'EOF'\necho x > plan/plan.yaml\nEOF", 2),
+            ("cat <<'EOF' > plan/plan.yaml\nentries: []\nEOF", 2)):
+        rc, out = hook(GUARD_FILES, {"tool_name": "Bash", "tool_input": {"command": c}})
+        scenario("heredoc: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"), rc == want,
+                 out)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1278,7 +1322,7 @@ GROUPS = [liveness, files, answers, adding, questions, holds, done, migration, c
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, slow_done_checks, the_suite_itself]
+          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, the_suite_itself]
 
 
 def main():
