@@ -758,7 +758,10 @@ entries:
   - D121
   next: 'local only: build in worktrees/wt-setup, the plan tool and guard, site fixes on a copy, CLAUDE.md pass, scenario
     tests; no cluster jobs'
-  done_when: null
+  done_when: python3 tests/test_setup_scenarios.py 2>&1 | tail -n 1 | grep -Eq '^([0-9]+)/\1 scenarios pass$' && test "$(git
+    rev-parse --git-path hooks)" = .githooks && grep -q '/.claude/hooks/plan_check.py' .claude/settings.json && ! test -e
+    .claude/hooks/plan_guard.py && ! test -e .claude/hooks/continuous_guard.py && ! test -e .claude/hooks/continuous_list_guard.py
+    && ! test -e .claude/hooks/slurm_waiter_guard.sh
   match: ''
   notes_ref: null
   evidence:
