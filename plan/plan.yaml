@@ -756,8 +756,11 @@ entries:
     - switched when the failure scenarios pass
   decisions:
   - D121
-  next: 'local only: build in worktrees/wt-setup, the plan tool and guard, site fixes on a copy, CLAUDE.md pass, scenario
-    tests; no cluster jobs'
+  next: 'fix tests/test_setup_scenarios.py: (1) main() drops sed_reads()''s return, so the suite exits 0 even with a FAIL;
+    return it; (2) the ''switch-over refuses to run from a worktree'' scenario now runs tools/switch_over.sh in the main checkout
+    (it ran from wt-setup before the merge) and fails 197/198; run it from a temporary worktree. Then plan done needs a way
+    to close a setup entry whose record is CLAUDE.md (fcd6a52), not a docs/results.tex label: tool change in plan done, for
+    the user to decide'
   done_when: python3 tests/test_setup_scenarios.py 2>&1 | tail -n 1 | grep -Eq '^([0-9]+)/\1 scenarios pass$' && test "$(git
     rev-parse --git-path hooks)" = .githooks && grep -q '/.claude/hooks/plan_check.py' .claude/settings.json && ! test -e
     .claude/hooks/plan_guard.py && ! test -e .claude/hooks/continuous_guard.py && ! test -e .claude/hooks/continuous_list_guard.py
