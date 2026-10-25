@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: waiting_user
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -129,6 +129,11 @@ entries:
       sets the windows'' angular cut'
     answered_at: '2026-10-25T18:40:58.832000+00:00'
     decision: D129
+  - ask: Go ahead with one or two blended-target short pretrainings (the hybrid target plus 0.5, and maybe 0.25, of the emission-scale
+      factor minus its class mean), 2 to 4 GPU-h in all, read on every axis like the other arms?
+    at: '2026-10-25T22:44:55+00:00'
+    searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only
+      the hybrid test
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -145,10 +150,11 @@ entries:
     per target, par.\ The shape proxy on catalog_v3; queue: the signed-data check, sampling sensitivity, then new ideas).
     Held (D78): dancat_ext, catalog_global. Left on CC from my tests, not deleted: zz_memprof, zz_memmap_*, zz_ema_ckpt_*,
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
-  searched: 'CLAUDE.md canonical setup (target-side levers are per-run) and HPO rules say nothing on new target designs; decisions:
-    D99 allows GPU tests once a candidate looks promising but the user''s 2026-10-15 rule (designs we iterate on stop at the
-    design and come to the user before any job) and the goal''s same clause govern this exploration; no decision sets the
-    windows'' angular cut'
+  searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only the
+    hybrid test
+  ask: Go ahead with one or two blended-target short pretrainings (the hybrid target plus 0.5, and maybe 0.25, of the emission-scale
+    factor minus its class mean), 2 to 4 GPU-h in all, read on every axis like the other arms?
+  waiting_since: '2026-10-25T22:44:55+00:00'
 - status: running
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
