@@ -1017,9 +1017,41 @@ def searched_first():
              "HPO search-space rules" in tpl and "site decisions --project FA" in tpl and "--searched" in tpl)
 
 
+def seventh_lower():
+    """Seventh review: a source script is bounded on the hook path (plan claims has no limit); a temporary worktree
+    a live run uses is never removed by another run's cleanup."""
+    repo, g, tex, base = repo_with_script()
+    open(os.path.join(repo, "analysis", "slow.py"), "w").write(
+        'import json, time\ntime.sleep(3)\nprint(json.dumps({"v": 0.25}))\n')
+    g("add", "analysis/slow.py"); g("commit", "-qm", "slow", "--no-verify")
+    sha = g("rev-parse", "HEAD").stdout.strip()
+    open(tex, "a").write("\n%% src: python3 analysis/slow.py @%s\n%% claim: v=0.25\nThe value is $0.25$.\n" % sha)
+    g("add", ".")
+    run = lambda *a: subprocess.run([sys.executable, VERIFY, "--root", repo, "--staged"] + list(a),
+                                    capture_output=True, text=True)
+    r1, r0 = run("--script-timeout", "1"), run("--script-timeout", "0")
+    scenario("1: a source script past --script-timeout fails its claim; 0 means no limit", r1.returncode == 1
+             and "took over 1 s" in r1.stdout and r0.returncode == 0, r1.stdout + r0.stdout)
+    src = open(PLAN).read()
+    scenario("1: the hook path defaults to 1800 s per script, plan claims passes no limit",
+             "SCRIPT_TIMEOUT = [1800]" in open(VERIFY).read() and '"--script-timeout", "0"' in src)
+    owner = subprocess.Popen(["sleep", "60"])
+    live_dir = tempfile.mkdtemp(prefix="verify_claims_")
+    live = os.path.join(live_dir, "wt")
+    g("worktree", "add", "-q", "--detach", live, base)
+    open(os.path.join(live_dir, "owner.pid"), "w").write(str(owner.pid))
+    os.utime(live, (1, 1))
+    subprocess.run([sys.executable, VERIFY, "--root", repo, "--rev", "%s..HEAD" % base], capture_output=True)
+    kept = os.path.isdir(live) and live in g("worktree", "list").stdout
+    owner.kill(); owner.wait()
+    subprocess.run([sys.executable, VERIFY, "--root", repo, "--rev", "%s..HEAD" % base], capture_output=True)
+    scenario("2: a temporary worktree whose owning run is alive is kept, however old; once it is gone it is removed",
+             kept and not os.path.exists(live) and live not in g("worktree", "list").stdout, g("worktree", "list").stdout)
+
+
 def main():
     liveness(); files(); answers(); adding(); questions(); holds(); done(); migration(); claims()
-    searched_first()
+    searched_first(); seventh_lower()
     hold_release(); reask_once(); reopen(); commit_retry(); claims_budget(); added_only()
     worktree_then_merge(); plan_commits(); test_switch(); claims_state(); fourth_lower()
     direct_writes(); one_agent_per_step(); git_bypass(); parsing(); checks_and_sites(); no_plan_yet(); lower()

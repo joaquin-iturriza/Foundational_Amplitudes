@@ -154,7 +154,7 @@ class Where:
     """Where a source runs. Staged or working-tree mode: the checkout. Range mode: the checkout when its copy of the
     script is the one at rev; else a worktree whose HEAD is rev (it has that branch's local artifacts); else a
     temporary detached worktree at rev, removed afterwards."""
-    STALE_S = 3600           # a temporary worktree older than this is left over from a run that was cut off
+    STALE_S = 3600           # with no pid file, a temporary worktree older than this is left over
 
     def __init__(self, root, rev=None):
         self.root, self.rev, self.tmp = root, rev, None
@@ -163,14 +163,36 @@ class Where:
         if rev:
             self.cleanup()
 
-    def cleanup(self):
-        """Remove temporary worktrees of earlier runs that were cut off (a timeout kills a run before close)."""
+    @staticmethod
+    def owner_alive(wt):
+        """The run that made this temporary worktree is still going: its pid file (beside the worktree) names a live
+        process. With no pid file (an older run) it counts as gone once older than STALE_S."""
         import time
+        try:
+            pid = int(open(os.path.join(os.path.dirname(wt), "owner.pid")).read().strip())
+        except (OSError, ValueError):
+            return os.path.isdir(wt) and time.time() - os.path.getmtime(wt) <= Where.STALE_S
+        try:
+            os.kill(pid, 0)
+            return True
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+
+    def cleanup(self):
+        """Remove temporary worktrees of earlier runs that were cut off (a timeout kills a run before close), never one
+        a live run still uses."""
         for blk in git(self.root, "worktree", "list", "--porcelain", check=False).stdout.split("\n\n"):
             f = dict(l.split(" ", 1) for l in blk.splitlines() if " " in l)
             wt = f.get("worktree", "")
-            if "/verify_claims_" in wt and (not os.path.isdir(wt) or time.time() - os.path.getmtime(wt) > self.STALE_S):
+            if "/verify_claims_" in wt and not self.owner_alive(wt):
                 git(self.root, "worktree", "remove", "--force", wt, check=False)
+                try:
+                    os.remove(os.path.join(os.path.dirname(wt), "owner.pid"))
+                    os.rmdir(os.path.dirname(wt))
+                except OSError:
+                    pass
         git(self.root, "worktree", "prune", check=False)
 
     def dir_for(self, path):
@@ -189,7 +211,9 @@ class Where:
             return wt
         if not self.tmp:
             import tempfile
-            self.tmp = os.path.join(tempfile.mkdtemp(prefix="verify_claims_"), "wt")
+            base = tempfile.mkdtemp(prefix="verify_claims_")
+            open(os.path.join(base, "owner.pid"), "w").write(str(os.getpid()))    # cleanup leaves it while we live
+            self.tmp = os.path.join(base, "wt")
             git(self.root, "worktree", "add", "-q", "--detach", self.tmp, self.sha)
         return self.tmp
 
@@ -197,15 +221,25 @@ class Where:
         if self.tmp:
             git(self.root, "worktree", "remove", "--force", self.tmp, check=False)
             try:
+                os.remove(os.path.join(os.path.dirname(self.tmp), "owner.pid"))
                 os.rmdir(os.path.dirname(self.tmp))
             except OSError:
                 pass
 
 
+SCRIPT_TIMEOUT = [1800]       # seconds per source script (the git hooks); plan claims passes 0, no limit
+
+
 def run_src(where, cmd, cache):
     if cmd not in cache:
         cwd = where.dir_for(os.path.normpath(shlex.split(cmd)[1]))
-        r = subprocess.run(shlex.split(cmd), cwd=cwd, capture_output=True, text=True)   # bounded by the caller
+        try:
+            r = subprocess.run(shlex.split(cmd), cwd=cwd, capture_output=True, text=True,
+                               timeout=SCRIPT_TIMEOUT[0] or None)
+        except subprocess.TimeoutExpired:
+            cache[cmd] = RuntimeError("took over %d s (--script-timeout; plan claims runs with no limit)"
+                                      % SCRIPT_TIMEOUT[0])
+            return cache[cmd]
         js = [l for l in r.stdout.splitlines() if l.strip().startswith("{")]
         if r.returncode != 0 or not js:
             cache[cmd] = RuntimeError("exit %d, %s" % (r.returncode, (r.stderr or "no JSON line").strip()[-200:]))
@@ -355,7 +389,10 @@ def main(argv=None):
     g.add_argument("--worktree", action="store_true", help="the working file against HEAD")
     g.add_argument("--rev")
     ap.add_argument("--cache", help="a JSON file of paragraphs (by content hash) that passed; they are skipped")
+    ap.add_argument("--script-timeout", type=float, default=SCRIPT_TIMEOUT[0],
+                    help="seconds per source script, 0 for no limit (default %(default)s)")
     a = ap.parse_args(argv)
+    SCRIPT_TIMEOUT[0] = a.script_timeout
     new_rev = None
     if a.rev:
         new_rev = a.rev.split("..")[-1] or "HEAD"

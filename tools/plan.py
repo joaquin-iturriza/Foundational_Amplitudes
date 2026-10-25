@@ -658,7 +658,8 @@ def claims_problems(limit=True):
         return incomplete
     import signal
     pr = subprocess.Popen([sys.executable, os.path.join(ROOT, "tools", "verify_claims.py"), "--root", ROOT, "--rev",
-                           "%s..%s" % (base, head), "--cache", CLAIMS_CACHE], stdout=subprocess.PIPE,
+                           "%s..%s" % (base, head), "--cache", CLAIMS_CACHE, "--script-timeout", "0"],
+                          stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE, text=True, start_new_session=True)
     try:
         out, err = pr.communicate(timeout=left)
