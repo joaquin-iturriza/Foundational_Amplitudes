@@ -1520,10 +1520,12 @@ class AmplitudeExperiment(BaseExperiment):
         per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
 
         _dms_frozen = None   # dimensionless_inputs: the mass column's (mean, std), the parent's when stats are frozen
+        _cp_frozen = None    # target_physics_hybrid: the constants c_p the frozen stats carry (a parent's, a resumed run's)
         if stats_src is not None:
             with open(stats_src) as f:
                 stats = json.load(f)
             _dms_frozen = stats.get("dimless_mass_stats")
+            _cp_frozen = stats.get("target_physics_hybrid_cp")
             mom_div    = float(stats["mom_div"])
             mom_mean   = float(stats["mom_mean"])
             mom_std    = float(stats["mom_std"])
@@ -1867,18 +1869,24 @@ class AmplitudeExperiment(BaseExperiment):
         #     out of the raw predictions at evaluation, like target_propagators. ---
         if _phys_on:
             spans = []
-            # data.target_physics_hybrid: one constant per process, c_p, from its own momenta (its train events, a
-            # held-out probe's own train events too; val or test when a process has no train split), shared by its roles
+            # data.target_physics_hybrid: one constant per process, c_p, shared by its roles. A process the frozen data
+            # stats carry a c_p for (a fine-tune's parent trained on it, a resumed run) keeps that one, the target the
+            # stats were fitted on; any other is fitted on its own momenta (its train events, a held-out probe's own
+            # train events too; val or test when a process has no train split)
             self._phys_cp = {}
             if bool(self.cfg.data.get("target_physics_hybrid", False)):
                 assert str(self.cfg.data.get("target_physics_dim_ref", "shat")) == "shat", \
                     "target_physics_hybrid: the s_hat reference (target_physics_dim_ref=shat) plus the constant"
-                for name in names:
+                from physics_scales import hybrid_cps
+
+                def _cp_events(name):
                     src = next(((r, name) for r in ("train", "val", "test") if (r, name) in store), None)
                     assert src is not None, f"target_physics_hybrid: no events of {name} to fit its constant on"
-                    self._phys_cp[name] = self._physics_hybrid_cp(_phys(store[src]))
+                    return _phys(store[src])
+                self._phys_cp, _cp_reused = hybrid_cps(names, _cp_events, frozen=_cp_frozen)
                 _cps = np.array(list(self._phys_cp.values()))
-                LOGGER.info(f"target_physics_hybrid ON: c_p for {len(_cps)} processes, median {np.median(_cps):.3g}, "
+                LOGGER.info(f"target_physics_hybrid ON: c_p for {len(_cps)} processes ({len(_cp_reused)} from the "
+                            f"frozen data stats), median {np.median(_cps):.3g}, "
                             f"5-95% {np.percentile(_cps, 5):.3g} to {np.percentile(_cps, 95):.3g}")
             for name in names:
                 for role in roles:
@@ -2380,15 +2388,10 @@ class AmplitudeExperiment(BaseExperiment):
 
     @staticmethod
     def _physics_hybrid_cp(mom_phys):
-        """data.target_physics_hybrid's constant of one process (docs/results.tex, par. The hybrid reference scale, a
-        design; analysis/catalog_v3/prep_level.py): c_p = the mean over its events of Lq - (N - 4) log s_hat, Lq the
-        emission scales (physics_scales.qperp_logs). The s_hat target plus c_p keeps the s_hat target's shape within
-        the process and takes the emission-scale target's class mean. Momenta only, no amplitude; s0 cancels."""
-        from physics_scales import qperp_logs
-        pp = np.asarray(mom_phys, dtype=np.float64)
-        q = pp[:, 0] + pp[:, 1]
-        ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
-        return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
+        """data.target_physics_hybrid's constant of one process: physics_scales.hybrid_cp (kept for
+        analysis/catalog_v3/hybrid_check.py)."""
+        from physics_scales import hybrid_cp
+        return hybrid_cp(mom_phys)
 
     def _orders_of(self, name):
         """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector

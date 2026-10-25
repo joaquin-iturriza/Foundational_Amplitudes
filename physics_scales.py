@@ -67,3 +67,30 @@ def qperp_logs(P, massive_shat=False, saturate=False, soft=None):
         out += np.log(qk * np.exp(Ls) / (qk + np.exp(Ls)) if saturate else qk)
         alive[np.arange(n), k] = False
     return out
+
+
+def hybrid_cp(P):
+    """data.target_physics_hybrid's constant of one process (docs/results.tex, par. The hybrid reference scale, a
+    design; analysis/catalog_v3/prep_level.py): c_p = the mean over its events of Lq - (N - 4) log s_hat, Lq the
+    emission scales (qperp_logs). The s_hat target plus c_p keeps the s_hat target's shape within the process and takes
+    the emission-scale target's class mean. Momenta only, no amplitude; s0 cancels. P: (n, N, 4) momenta in GeV."""
+    pp = np.asarray(P, dtype=np.float64)
+    q = pp[:, 0] + pp[:, 1]
+    ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
+    return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
+
+
+def hybrid_cps(names, events, frozen=None):
+    """The constants c_p of a run's processes: a process whose c_p the frozen data stats carry (data_stats.json's
+    target_physics_hybrid_cp: a fine-tune's parent, a resumed run's own) keeps it, so a fine-tune onto a process its
+    parent trained on reads the target the parent's standardization was fitted on; any other process gets its own,
+    hybrid_cp(events(name)) (events is called only for those). Returns ({name: c_p}, [names taken from frozen])."""
+    frozen = frozen or {}
+    cps, reused = {}, []
+    for name in names:
+        if name in frozen and frozen[name] is not None:
+            cps[name] = float(frozen[name])
+            reused.append(name)
+        else:
+            cps[name] = hybrid_cp(events(name))
+    return cps, reused
