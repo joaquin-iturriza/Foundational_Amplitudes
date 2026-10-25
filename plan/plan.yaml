@@ -26,12 +26,18 @@ entries:
   notes_ref: fig:v3_pp
   evidence:
     runs:
+    - FA-ccin2p3-982b5a14
     - FA-ccin2p3-e786bd74
-    commit: null
+    commit: 8a0f886
     paths:
+    - analysis/catalog_v3/data/pp_compare.json
+    - analysis/catalog_v3/figs/pp_trained_a.pdf
     - analysis/catalog_v3/figs/pp_trained_a.png
+    - analysis/catalog_v3/figs/pp_trained_b.pdf
     - analysis/catalog_v3/figs/pp_trained_b.png
+    - analysis/catalog_v3/figs/pp_trained_c.pdf
     - analysis/catalog_v3/figs/pp_trained_c.png
+    - analysis/catalog_v3/figs/pp_trained_d.pdf
     - analysis/catalog_v3/figs/pp_trained_d.png
   dead_ends:
   - tried: the pp-trained arm's read on the 13 TeV pp test set (FA-ccin2p3-25485185)
