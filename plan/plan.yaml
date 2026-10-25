@@ -916,7 +916,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -990,5 +990,15 @@ entries:
       at 1-10 TeV relative to the 1 TeV window
     answered_at: '2026-10-25T20:06:52.002000+00:00'
     decision: D134
-  searched: D130 approved the 6 TeV log-uniform range but says nothing about the energy hold-out; D98/D100 set the hold-out
-    at 1-10 TeV relative to the 1 TeV window
+  - ask: 'With the b massless (the 5-flavour scheme you approved), 34 catalog classes have no diagrams left: a Higgs on a
+      b line with nothing else to couple to it (b b~ > h, b g > b h, g g > b b~ h, ...). Do they drop out, or should the b
+      keep its Higgs coupling?'
+    at: '2026-10-25T20:40:04+00:00'
+    searched: D130 approved massless b (5-flavour) but not what happens to b-Yukawa-only classes; no decision covers dropping
+      classes
+  searched: D130 approved massless b (5-flavour) but not what happens to b-Yukawa-only classes; no decision covers dropping
+    classes
+  ask: 'With the b massless (the 5-flavour scheme you approved), 34 catalog classes have no diagrams left: a Higgs on a b
+    line with nothing else to couple to it (b b~ > h, b g > b h, g g > b b~ h, ...). Do they drop out, or should the b keep
+    its Higgs coupling?'
+  waiting_since: '2026-10-25T20:40:04+00:00'
