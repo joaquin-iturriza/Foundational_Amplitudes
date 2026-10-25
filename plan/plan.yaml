@@ -1,5 +1,5 @@
 # The plan: the only source of truth for open work. Edit through tools/plan.py.
-migrated_at: '2026-10-25T17:28:54+00:00'
+migrated_at: '2026-10-25T18:02:36+00:00'
 entries:
 - status: running
   quotes:
@@ -28,15 +28,16 @@ entries:
   asks: []
   id: pp_sampling
   title: 'pp-beam sampling: does training on the shaped windows serve pp-sampled use?'
-  question: 'State (2026-10-25, 07:35). The study runs on catalog_v3 (Daniel''s catalog and its extra probes untouched until
-    the user says). Written up today: the four short pretrainings read on every axis (Tab. ), the factorised 2\to4 check on
-    880 classes and the 2\to5 probes with exact and network parents (Fig. ). Running on CC: \begin{itemize} \item the pp study:
-    all 8 MadEvent parts done (1356 of 1396 pools); the 40 short runs rerun at their own margins (recipes/catalog_v3_pp_margins.json,
-    catalog_v3_pp_rerun_part<k>.yaml, 10 CPU jobs, three done). When all pass: touch .claude/.pp_pools_ready (after checking
-    every pool and sidecar exists), which releases the queued launches: the four window-trained arms read on the pp test set
-    (scripts/job_catalog_v3_pp_score.sh) and the pp-trained short run dimensionless_pp with its pp read (scope settled by
-    the user, 2026-10-25: hadronic tree classes on pp, every other pool on windows). \end{itemize} Supervisor and the event
-    waiter running.'
+  question: 'State (2026-10-25, 19:00). The study runs on catalog_v3 (Daniel''s catalog and its extra probes untouched until
+    the user says). Running on CC: the pp study''s five runs (scope settled by the user, 2026-10-25: hadronic tree classes
+    on pp, every other pool on windows), the four window-trained arms read on the 13 TeV pp test set (FA-ccin2p3-1b299199,
+    -1c960b22, -4b1aabad, -81e14672) and the pp-trained short pretraining (FA-ccin2p3-e786bd74), whose pp read fires when
+    it ends; all 1396 pp processes'' pools, \alpha_s sidecars and diagram files are checked on CC (tools/check_pp_pools.py,
+    0 problems). Also running: rung 6''s hp15 rerun (the ladder item) and the small-D fine-tuning DyHPO round (its state in
+    the small-D item). Ended: the \hat s-only short pretraining (FA-ccin2p3-fbd73961, the preprocessing exploration''s next
+    read). The setup redesign (approved with step agents 2026-10-25, ``Yes, the step agents and everything else you said sounds
+    good''''): code review passed (branch at 9ce1cb1, merges cleanly), two low fixes in progress, then tools/switch_over.sh,
+    done-checks for every entry and the CLAUDE.md pass.'
 - status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
@@ -49,10 +50,9 @@ entries:
     - CPU iteration on the catalog normalization
   decisions:
   - D83
-  next: 'the context arm''s K-shot fits and the factorised head''s data check on its 2\to4 classes with an added Z, W, H or
-    quark pair (no universal soft or collinear factor there): both done (par.\ The factorised 2\to4 head''s data check on
-    catalog_v3; par.\ The context vector''s K-shot fits on catalog_v3), and the two targets read (par.\ The level''s two targets
-    on catalog_v3: 2\to4 met, the tops'' shape floor 0.80 against 0.5 not met).'
+  next: 'CPU jobs on CC, one at a time, each under an hour: the shape proxy (shape_learn) per candidate target on catalog_v3''s
+    training and held-out classes, the signed-data check (signed band, r0 margin, the sign head against log-magnitude), sampling
+    sensitivity, then new candidates; GPU short tests only under D99 once a candidate passes the proxy'
   done_when: null
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*
   notes_ref: null
@@ -64,32 +64,20 @@ entries:
   asks: []
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
-  question: 'The level. Adopted candidate: the emission scales (par.\ The emission scales in training); open on Daniel''s
-    catalog (held): what the 43 new pay for. The small dedicated network for what no constant fixes: the context vector and
-    the factorised 2\to4 head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on catalog_v3:
-    the context arm''s K-shot fits and the factorised head''s data check on its 2\to4 classes with an added Z, W, H or quark
-    pair (no universal soft or collinear factor there): both done (par.\ The factorised 2\to4 head''s data check on catalog_v3;
-    par.\ The context vector''s K-shot fits on catalog_v3), and the two targets read (par.\ The level''s two targets on catalog_v3:
-    2\to4 met, the tops'' shape floor 0.80 against 0.5 not met). Also proposed: the full-length catalog pretraining with the
-    adopted target (held by the user, 2026-10-21, until the preprocessing design settles). Blocked: bulk transfers to Jean
-    Zay (the 29 GB archive, its checkout at 8fb002e).
+  question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
+    until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the emission scales
+    (par.\ The emission scales in training).
 
 
-    Open (2026-10-22, 13:30). The 9 \Delta-plot models off their recorded loss: rebuilt on H100, 8 match with TF32 on, figures
-    redrawn (sec:tf32-eval). The \sigma stage now writes its own per-event predictions with \sigma (c5ba313; GPU smoke test
-    passed). Fixed: run_data_tools.py built a fresh EMA over the random init that evaluate() would score (no reported number
-    used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed 80 G on /sps/lpnhe
-    (D84, 67 G free). Not doable from trunk: classify2.py''s classify module was passed by path and is on no site (superseded
-    by tools/equal_processes.py). Rung 6''s rescoring gap: see the ladder entry. For the user: D78 holds the catalog preprocessing
-    until their design (the \hat s+coupling target with IDEN, colour and the diagram sum, and the shared target''s blow-up
-    at the per-process pretraining''s HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase: bring them
-    back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot fix is dropped
-    until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog_v3
-    since D114 moved it there (D83; item v3_prep_explore; queue: the shape proxy per target, the signed-data check, sampling
-    sensitivity, then new ideas; done on catalog_v3: the few-shot calibration, par.\ The context vector''s K-shot fits on
-    catalog_v3); the het trial now writes its own predictions; site matches a launch''s runs by item and time, and simultaneous
-    launches collide on the git push. Held (D78): dancat_ext, catalog_global. Left on CC from my tests, not deleted: zz_memprof,
-    zz_memmap_*, zz_ema_ckpt_*, zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
+    Open (2026-10-22, 13:30). For the user: D78 holds the catalog preprocessing until their design (the \hat s+coupling target
+    with IDEN, colour and the diagram sum, and the shared target''s blow-up at the per-process pretraining''s HPs, are inputs
+    to it); the D66 designs (decomp, loops, nonsm, threephase: bring them back to the user as the concrete designs of 2026-10-15
+    when they ask; D48, D44, D49, D46). The zero-shot fix is dropped until the preprocessing is settled (D86). Running: the
+    preprocessing exploration as a continuous CPU task, on catalog_v3 since D114 moved it there (D83; item v3_prep_explore;
+    done on catalog_v3: the few-shot calibration, par.\ The context vector''s K-shot fits on catalog_v3, and the shape proxy
+    per target, par.\ The shape proxy on catalog_v3; queue: the signed-data check, sampling sensitivity, then new ideas).
+    Held (D78): dancat_ext, catalog_global. Left on CC from my tests, not deleted: zz_memprof, zz_memmap_*, zz_ema_ckpt_*,
+    zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
 - status: running
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
@@ -115,8 +103,8 @@ entries:
   - D120
   next: single-fidelity DyHPO for the methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared
     best against best with the default's own search, with \lambda for L2-SP and the frozen depth in their search spaces next
-    to the learning rate (the first round ran one untuned value of each); the single-run noise (90\% quantile 0.41 decades)
-    asks for the comparison on cell medians, not single cells.
+    to the learning rate (the first round ran one untuned value of each), which also asks whether a lower rate keeps the linear-probe
+    head; the single-run noise (90\% quantile 0.41 decades) asks for the comparison on cell medians, not single cells.
   done_when: null
   match: tp3_lowd*,zz_lowd*
   notes_ref: null
@@ -132,11 +120,13 @@ entries:
     probe then fine-tune helps on ee\to Z\gamma only). Next: single-fidelity DyHPO for the methods that do not win (linear
     probe then fine-tune, L2-SP, the frozen blocks), compared best against best with the default''s own search, with \lambda
     for L2-SP and the frozen depth in their search spaces next to the learning rate (the first round ran one untuned value
-    of each); the single-run noise (90\% quantile 0.41 decades) asks for the comparison on cell medians, not single cells.
-    State 2026-10-25 evening: the DyHPO round is approved (D123, ``Yes, send them.'''', about 33 GPU-h): 3 methods \times
-    60 cells \times 5 trials, sweeps tp3_lowd_<method>_r<rung>_<probe>_d<k> generated by sweep/gen_lowd_dyhpo.py from each
-    cell''s grid config, submitted on CC by sweep_manager (chained) and topped up by the CC feeder under item lowd_ft. The
-    default''s side is the grid''s own 5-trial search per cell (cells.best).'
+    of each), which also asks whether a lower rate keeps the linear-probe head; the single-run noise (90\% quantile 0.41 decades)
+    asks for the comparison on cell medians, not single cells. State 2026-10-25 evening: the DyHPO round is approved (D123,
+    ``Yes, send them.'''', about 33 GPU-h): 3 methods \times 60 cells \times 5 trials, sweeps tp3_lowd_<method>_r<rung>_<probe>_d<k>
+    generated by sweep/gen_lowd_dyhpo.py from each cell''s grid config, submitted on CC by sweep_manager (chained) and topped
+    up by the CC feeder under item lowd_ft. All 180 generated on CC (5 trial scripts each; 111 had 10 from a double generation,
+    trials 5 to 9 moved to jobs_beyond_5/; a duplicate tp3_lowd_lpft_r9_ud_ud_d4_002 marked HELD). The default''s side is
+    the grid''s own 5-trial search per cell (cells.best).'
 - status: held
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
@@ -164,30 +154,6 @@ entries:
     (Sec. ), with a cheaper symmetrisation than the permutation average. How close to real amplitudes the prior should be
     is still to be settled with others.'
   hold_decision: D43
-- status: waiting_user
-  quotes: []
-  decisions: []
-  next: act on the user's answer
-  done_when: null
-  match: null
-  notes_ref: null
-  evidence:
-    runs: []
-    commit: null
-    paths: []
-  dead_ends: []
-  asks:
-  - ask: re-centre the scratch lr window on the measured surface's batch correction?
-    at: '2026-10-25T00:00:00+00:00'
-  id: the_lr_scalings
-  title: The lr scalings.
-  question: The \sqrt{B/16384} scaling of the scratch and fine-tune lr pushed 31 scratch cells and 46 fine-tune cells to their
-    window's top (now extended in place) and the far probes' best lr_scale to 57--930. The measured surface (analysis/hpo_optima)
-    predicts a smaller batch correction (1.9\times between D=700 and 7\times10^4 at t=1000, against the rule's 6.8\times);
-    re-centring the scratch window on it stays open (the fine-tune grid now searches the effective lr directly, with a candidate
-    seed per sweep).
-  ask: re-centre the scratch lr window on the measured surface's batch correction?
-  waiting_since: '2026-10-25T00:00:00+00:00'
 - status: running
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
@@ -212,15 +178,9 @@ entries:
   asks: []
   id: delta
   title: delta
-  question: 'The ladder. Rung 6''s hp15 rescored at 1.67\times10^{-7} against the 1.30\times10^{-7} its run recorded (rung
-    1''s hp47 reproduces to 1\%); the gap is not understood. Not the EMA weights (FA-ccin2p3-60b47206, 2026-10-25): that rescoring
-    predates the EMA-aware loader (rebuild_run.load_best_weights, 2026-10-15) and scored the checkpoint''s live weights, but
-    scoring the live and the EMA weights of the same settings (hp15, EMA decay 0.995, on rung 4; rung 6''s own checkpoint
-    is pruned) gives 5.62\times10^{-8} live and 5.79\times10^{-8} EMA against 5.81\times10^{-8} recorded, and rung 1''s hp47
-    3.58 and 3.62 against 3.62\times10^{-8}: the live weights sit 1 to 3\% below, not 28\% above. Left: the hardware and TF32
-    of rung 6''s training on lxplus against the rescoring''s, testable only by rerunning hp15 on rung 6 from its config (\approx6
-    GPU-h). Each process''s loss rises at rung 9 at a fixed 64k steps (Fig. ), so the rung comparison mixes structure with
-    training per process; the step budget stays 64k on every rung (the user''s call).'
+  question: The ladder. Rung 6's hp15 rerun from its config (FA-ccin2p3-2ed18ab8, running, \approx6 GPU-h) is compared with
+    its record (1.30\times10^{-7}, against the 1.67\times10^{-7} its rescoring gave; par.\ The ladder's pretraining), which
+    tests the hardware and TF32 of its lxplus training against the rescoring's.
 - status: held
   quotes:
   - said_at: '2026-10-21T23:35:42.396Z'
