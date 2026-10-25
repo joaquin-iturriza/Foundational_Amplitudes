@@ -41,13 +41,13 @@ FALLBACK_REPO="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 STATE_REL=".claude/.review_state"
 
 # --- pillar table -----------------------------------------------------------
-# name | line threshold | commit threshold | git pathspecs
+# name | line threshold | commit threshold | git pathspecs  (CLAUDE.md: every change is reviewed)
 #
 # The code pathspec is SOURCE only. `*.py`/`*.sh`/`*.yaml`-style globs match at any depth in
 # git, so they already cover analysis/, compare_models/, etc. without listing them; the
 # :(exclude) terms drop the generated companions that share those trees (result JSONs, job
 # logs, run/sweep output), which would otherwise swamp the line count with data churn.
-PILLARS='claudemd-keeper|200|20|CLAUDE.md
+PILLARS='claudemd-keeper|1|1|CLAUDE.md
 notes-editor|200|20|docs/*.tex
 repo-reviewer|600|30|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
 
