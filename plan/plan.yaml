@@ -767,10 +767,10 @@ entries:
     (it ran from wt-setup before the merge) and fails 197/198; run it from a temporary worktree. Then plan done needs a way
     to close a setup entry whose record is CLAUDE.md (fcd6a52), not a docs/results.tex label: tool change in plan done, for
     the user to decide'
-  done_when: python3 tests/test_setup_scenarios.py 2>&1 | tail -n 1 | grep -Eq '^([0-9]+)/\1 scenarios pass$' && test "$(git
-    rev-parse --git-path hooks)" = .githooks && grep -q '/.claude/hooks/plan_check.py' .claude/settings.json && ! test -e
-    .claude/hooks/plan_guard.py && ! test -e .claude/hooks/continuous_guard.py && ! test -e .claude/hooks/continuous_list_guard.py
-    && ! test -e .claude/hooks/slurm_waiter_guard.sh
+  done_when: grep -qi 'hookspath *= *\.githooks' .git/config && grep -q plan_check.py .claude/settings.json && grep -q plan_files_guard.py
+    .claude/settings.json && ! grep -qE 'plan_guard\.py|continuous_guard\.py|continuous_list_guard\.py|slurm_waiter_guard\.sh'
+    .claude/settings.json && ! test -e .claude/hooks/plan_guard.py && ! test -e .claude/hooks/continuous_guard.py && ! test
+    -e .claude/hooks/continuous_list_guard.py && ! test -e .claude/hooks/slurm_waiter_guard.sh
   match: ''
   notes_ref: null
   evidence:
@@ -790,6 +790,12 @@ entries:
   kind: setup
   writeup: e5128c9
   record: CLAUDE.md
+  history:
+  - at: '2026-10-25T19:04:53+00:00'
+    was_done_when: python3 tests/test_setup_scenarios.py 2>&1 | tail -n 1 | grep -Eq '^([0-9]+)/\1 scenarios pass$' && test
+      "$(git rev-parse --git-path hooks)" = .githooks && grep -q '/.claude/hooks/plan_check.py' .claude/settings.json && !
+      test -e .claude/hooks/plan_guard.py && ! test -e .claude/hooks/continuous_guard.py && ! test -e .claude/hooks/continuous_list_guard.py
+      && ! test -e .claude/hooks/slurm_waiter_guard.sh
 - status: held
   quotes:
   - said_at: '2026-10-23T02:46:51.647Z'
