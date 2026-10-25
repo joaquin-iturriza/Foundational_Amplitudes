@@ -14,9 +14,13 @@ entries:
       for comparison; then the user decides
   decisions:
   - D117
-  next: 'when FA-ccin2p3-982b5a14 (the 29 missing training probes) ends: check all 1396 have readable predictions, collect
-    (pp_compare.py collect), redraw figs/pp_trained_{a..d}, write up the pp-trained arm in the pp paragraph with % src / %
-    claim lines, and fix the entry''s done check to the four panel files (pp_trained_a..d .png/.pdf) instead of figs/pp_trained.png/.pdf'
+  next: 'the work is done and written up (8a0f886, par. The pp-trained arm, fig:v3_pp_trained; all 1396 probes predicted).
+    Only the done check is stale: it tests figs/pp_trained.png/.pdf, which the per-panel figure never writes. plan check refuses
+    the corrected check because it already passes (it refuses any passing check on an open entry), so it needs the main session
+    or the user to set it, e.g. through a plan reopen/--replace route or by hand-editing plan.yaml under the guard: replace
+    the three pp_trained tests with: for x in a b c d; do test -f analysis/catalog_v3/figs/pp_trained_$x.png && test -f analysis/catalog_v3/figs/pp_trained_$x.pdf
+    && grep -q figs/pp_trained_$x.pdf docs/results.tex || exit 1; done; then plan done pp_sampling --writeup 8a0f886. After
+    that the user''s call: switch catalog sampling to pp or keep the windows (catalog_v4''s coverage already approved).'
   done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
     g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
     not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
