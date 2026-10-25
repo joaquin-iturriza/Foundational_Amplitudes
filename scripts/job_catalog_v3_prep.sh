@@ -16,6 +16,7 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 # H7E / H7c (stage 4) are prepared with their generation: their pools do not exist before it
 R=(recipes/catalog_v3_train.yaml $(ls recipes/catalog_v3_heldout_*.yaml | grep -v '_H7'))
+[ $# -gt 0 ] && R=("$@")       # given recipes only (H7 after its generation)
 for f in "${R[@]}"; do
     python tools/write_own_alphas.py "$f" || exit 1
 done

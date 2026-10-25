@@ -85,6 +85,7 @@ diagram_encoder_llm4lhc:     # their defaults (config/graph_pooled.yaml, App. B)
   dropout: 0.0
   edge_feature_mode: bias_kv # bias | bias_kv
   max_diagrams: null         # their default: every diagram (the old encoder caps at 512)
+  bsm_labels: false          # edge labels for catalog_v3's BSM particles (Y1, h2, h3, H+-); on for a catalog with them
 net:
   _target_: models.lloca.LLOCAMuPTransformer
 

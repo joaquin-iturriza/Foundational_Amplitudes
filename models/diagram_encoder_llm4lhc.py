@@ -97,8 +97,14 @@ _SELF_CONJUGATE = {21, 22, 23, 25, 250}
 # one-loop processes stopped the first GPU run on PDG 82).
 _LOOP_LINES = (82, -82, 9000001, -9000001, 9000002, -9000002, 9000003, -9000003, 9000004, -9000004, 250, 251, -251)
 
+# The non-SM particles of catalog_v3's BSM layer (particle_ids.BSM_PARTICLE_PROPERTIES: DMsimp's Y1, the 2HDM's h2, h3,
+# H+-), labelled after the loop lines in a FIXED order when diagram_encoder_llm4lhc.bsm_labels is on (off by default, so
+# the tables of every checkpoint built without them keep their size). Y1, h2 and h3 are their own antiparticles.
+_BSM_LINES = (5000001, 35, 36, 37, -37)
+_BSM_SELF_CONJUGATE = {5000001, 35, 36}
 
-def particle_label_vocab():
+
+def particle_label_vocab(bsm=False):
     """Signed PDG -> edge label: [0, 30) the SM particles and antiparticles of
     ``particle_ids.PARTICLE_PROPERTIES`` in sorted-PDG order (the same 30 entries as
     their ``particles.json``; only the numbering differs, which a learned embedding
@@ -110,12 +116,16 @@ def particle_label_vocab():
     n = len(vocab)
     for k, pdg in enumerate(_LOOP_LINES):
         vocab[pdg] = n + k
+    if bsm:
+        n = len(vocab)
+        for k, pdg in enumerate(_BSM_LINES):
+            vocab[pdg] = n + k
     return vocab
 
 
 def _label(pdg, vocab):
     pdg = int(pdg)
-    if abs(pdg) in _SELF_CONJUGATE:
+    if abs(pdg) in _SELF_CONJUGATE or abs(pdg) in _BSM_SELF_CONJUGATE:
         pdg = abs(pdg)
     if pdg not in vocab:
         raise KeyError(f"diagram_encoder_llm4lhc: PDG {pdg} not in the particle vocabulary "
@@ -229,7 +239,8 @@ def _virtuality_rows(diagram, external, slot_pdgs, n_initial=2, mass_width=None)
     return rows
 
 
-def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, slot_pdgs=None, mass_width=None):
+def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, slot_pdgs=None, mass_width=None,
+                             bsm_labels=False):
     """Build an :class:`LLM4LHCDiagramSet` from sidecar payloads.
 
     payloads : list indexed by process id of a sidecar path / loaded dict, or None
@@ -242,7 +253,7 @@ def load_llm4lhc_diagram_set(payloads, laplacian_pe_dim=8, max_diagrams=None, sl
         (LLM4LHCDiagramEncoder virtuality_pool). A process whose legs cannot all be placed gets no lines (weight 0).
     mass_width : per process id its generator's {pdg: (mass, width)} (param_card_mass_width), or None.
     """
-    vocab = particle_label_vocab()
+    vocab = particle_label_vocab(bsm=bsm_labels)
     graphs, seg, ext_by_pid, virt_rows, virt_ok = [], [], [], [], []
     for pid, src in enumerate(payloads):
         if src is None:

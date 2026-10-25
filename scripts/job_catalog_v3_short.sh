@@ -29,7 +29,9 @@ cd "$PROJECT_DIR"
 ARM="${1:?baseline, dimensionless, dimensionless_context or dimensionless_twin}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
-COMMON=(training.loss=MSE ++training.loss_aggregation=mean ++training.sign_head=true)
+# the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
+COMMON=(training.loss=MSE ++training.loss_aggregation=mean ++training.sign_head=true
+        ++model.diagram_encoder_llm4lhc.bsm_labels=true)
 DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++data.target_physics_s0=1.0
      ++data.dimensionless_inputs=true ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)

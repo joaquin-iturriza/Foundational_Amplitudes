@@ -1055,7 +1055,7 @@ class AmplitudeExperiment(BaseExperiment):
         self._diag_set_llm4lhc = load_llm4lhc_diagram_set(
             paths, laplacian_pe_dim=int(cfg.get("laplacian_pe_dim", 8)),
             max_diagrams=int(max_d) if max_d is not None else None, slot_pdgs=slot,
-            mass_width=mw if slot is not None else None)
+            mass_width=mw if slot is not None else None, bsm_labels=bool(cfg.get("bsm_labels", False)))
         if slot is not None:
             ok = self._diag_set_llm4lhc.virt_ok
             LOGGER.info(f"virtuality_pool: internal lines placed for {int(ok.sum())}/{len(names)} processes "
