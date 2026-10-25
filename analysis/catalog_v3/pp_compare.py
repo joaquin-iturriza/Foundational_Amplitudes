@@ -63,7 +63,7 @@ def support_masks():
         c = mg.PROCESSES[n]
         k = len(c["pdg_ids"])
         a = np.load(os.path.join(os.environ["DATA_DIR"], f"{n}_13000-13000GeV_val_lhe_amplitudes.npy"), mmap_mode="r")
-        a = np.asarray(a[:2000], dtype=np.float64)
+        a = np.array(a[:2000], dtype=np.float64)          # a copy: the mmap is read-only
         P = a[:, :4 * k].reshape(-1, k, 4)
         tot = P[:, 0] + P[:, 1]
         bz = tot[:, 3] / tot[:, 0]
