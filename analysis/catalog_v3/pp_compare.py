@@ -75,8 +75,32 @@ def support_masks():
         lo, hi = win["v3_" + n[len("pp13_"):]]
         cut = mg.fiducial_pass_mask(P, c["m_finals"], c["pdg_ids"], mg.FIDUCIAL_CUTS)
         inw = (rs >= lo) & (rs <= hi)
-        out[n] = {"in_sqrts": inw, "in_cuts": cut, "log_amp": np.log(np.abs(a[:, -1])), "sqrts": rs}
+        out[n] = {"in_sqrts": inw, "in_cuts": cut, "log_amp": np.log(np.abs(a[:, -1])), "sqrts": rs,
+                  "fail": cut_fails(P, c, mg.FIDUCIAL_CUTS, cut)}
     return out
+
+
+def cut_fails(P, c, C, combined):
+    """the share of events each fiducial cut alone removes (as mg5_pipeline_final.fiducial_pass_mask, one cut at a
+    time; their conjunction checked against it)"""
+    import itertools
+    k = len(c["pdg_ids"])
+    sl = [i for j, i in enumerate(range(2, k)) if c["m_finals"][j] == 0.0 and abs(int(c["pdg_ids"][i])) not in (12, 14, 16)]
+    f = {x: np.ones(len(P), bool) for x in ("pt", "cos", "dr", "m")}
+    pt = lambda p: np.hypot(p[:, 1], p[:, 2])
+    eta = lambda p: np.arcsinh(p[:, 3] / np.clip(pt(p), 1e-9, None))
+    phi = lambda p: np.arctan2(p[:, 2], p[:, 1])
+    for s_ in sl:
+        p = P[:, s_]
+        f["pt"] &= pt(p) > C["pt_min"]
+        f["cos"] &= np.abs(p[:, 3]) / np.clip(np.linalg.norm(p[:, 1:], axis=1), 1e-12, None) < C["cos_max"]
+    for i, j in itertools.combinations(sl, 2):
+        dp = np.abs(phi(P[:, i]) - phi(P[:, j])); dp = np.minimum(dp, 2 * np.pi - dp)
+        q = P[:, i] + P[:, j]
+        f["dr"] &= np.hypot(eta(P[:, i]) - eta(P[:, j]), dp) > C["dr_min"]
+        f["m"] &= np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0, None)) > C["m_min"]
+    assert np.array_equal(f["pt"] & f["cos"] & f["dr"] & f["m"], combined), c["pdg_ids"]
+    return {x: float(1 - v.mean()) for x, v in f.items()}
 
 
 def collect():
@@ -118,7 +142,7 @@ def collect():
                                 "mse_outside": float(np.mean(d[~inside] ** 2)) if (~inside).any() else None,
                                 "mse_out_cuts": float(np.mean(d[~inc] ** 2)) if (~inc).any() else None,
                                 "mse_above_window": float(np.mean(d[~ins] ** 2)) if (~ins).any() else None,
-                                "sqrts_median": float(np.median(m["sqrts"]))})
+                                "sqrts_median": float(np.median(m["sqrts"])), "cut_fail": m["fail"]})
         run = os.path.join(ROOT, "runs", "catalog_v3_short", arm)
         res = json.load(open(os.path.join(run, "result.json")))
         st = json.load(open(os.path.join(run, "data_stats.json")))
