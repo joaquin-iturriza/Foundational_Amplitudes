@@ -7371,12 +7371,6 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     integrals (Sec.~\ref{sec:syn-loops}, plan item (5)); multiplicities well past $2\to4$, where MadGraph struggles and the
     generator does not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average. How close to
     real amplitudes the prior should be is still to be settled with others.
-  \item \textbf{The lr scalings.} The $\sqrt{B/16384}$ scaling of the scratch and fine-tune lr pushed $31$ scratch
-    cells and $46$ fine-tune cells to their window's top (now extended in place) and the far probes' best
-    \code{lr\_scale} to $57$--$930$. The measured surface (\code{analysis/hpo\_optima}) predicts a smaller batch
-    correction ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$); re-centring
-    the scratch window on it stays open (the fine-tune grid now searches the effective lr directly, with a candidate
-    seed per sweep).
   \item \textbf{The ladder.} Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the $1.30\times10^{-7}$ its run
     recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Not the EMA weights (FA-ccin2p3-60b47206,
     2026-10-25): that rescoring predates the EMA-aware loader (\code{rebuild\_run.load\_best\_weights}, 2026-10-15) and

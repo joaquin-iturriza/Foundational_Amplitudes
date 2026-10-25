@@ -31,9 +31,13 @@ Search spaces are wide, at the user's request for this study (2026-09-30: "gener
 like the ones we were doing before", to be narrowed once patterns show), so the lr window is
 one decade either side instead of CLAUDE.md's half decade:
   scratch / pretrain  lr one decade either side of lr*(t, high D) (analysis/hpo_optima, measured
-                      at batch 16384) * sqrt(B/16384), Adam's square-root batch rule (the user's
-                      choice, 2026-09-30); the template's lambda, warm-up, eta_min, EMA
-  fine-tune           training.lr = the pretrain's best * sqrt(B/16384), fine_tune.lr_scale [0.1, 10]
+                      at batch 16384); no batch scaling: the square-root batch rule chosen on
+                      2026-09-30 was measured not to hold (the measured optimum moves 1.9x between
+                      D=700 and 7e4 at t=1000, the rule 6.8x; 31 scratch cells hit the window's
+                      top) and is dropped; the window covers the measured small-D shift. The
+                      template's lambda, warm-up, eta_min, EMA
+  fine-tune           training.lr = the pretrain's best, fine_tune.lr_scale [0.1, 10] (superseded by
+                      --eff-lr, the rung fine-tune grid's direct search)
                       (--lr-scale; the tp3_ fine-tunes search [1, 100]),
                       fine_tune.layer_decay [0.75, 1], lambda, warm-up, eta_min, EMA;
                       amplitude stats fitted on the probe (fine_tune.target_stats=own)
@@ -151,7 +155,7 @@ LR_SHIFT = 0.0                                     # decades the scratch window 
 
 
 def lr_space(T, k=None):
-    c = lr_star(T) * (np.sqrt(batch(k) / 16384) if k is not None else 1.0) * 10 ** LR_SHIFT
+    c = lr_star(T) * 10 ** LR_SHIFT
     return {"name": "training.lr", "type": "float_log",
             "low": float(f"{c / 10:.3g}"), "high": float(f"{c * 10:.3g}")}
 
@@ -328,7 +332,7 @@ def main():
                 fam = (a.family or f"{pfx}{'s' if a.steered else ''}_{tag}") + hz
                 name = f"{fam}_{p}_d{k}"
                 lr = ({"fine_tune.lr_scale": 1.0, "fine_tune.layer_decay": 1.0} if a.eff_lr else
-                      {"training.lr": float(f"{a.lr * np.sqrt(batch(k) / 16384):.3g}")})
+                      {"training.lr": float(f"{a.lr:.3g}")})
                 out.append(write(name, recipe, T_CELL[k], ft_space + COMMON_SPACE,
                                  {"data.train_subsample": int(round(10 ** (k / 2))), **lr,
                                   "fine_tune.pretrained_path": a.ft, "fine_tune.target_stats": "own", **osh},
