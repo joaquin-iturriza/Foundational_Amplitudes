@@ -1009,3 +1009,4 @@ entries:
     studies'' runs that train in under 1 h (38.5 GB) or under 5 h (40 GB); (3) the 28 GB of archive tars, which become the
     only copy of the lxplus-era models if (2) runs'
   waiting_since: '2026-10-25T20:44:02+00:00'
+  checked_until: '2026-10-25T22:42:35+00:00'
