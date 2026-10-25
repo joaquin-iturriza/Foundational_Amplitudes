@@ -165,8 +165,8 @@ entries:
       arms'
   decisions:
   - D42
-  next: 'Delta plots: re-evaluate 179 best checkpoints (ladder, rung_focus/finale_synth, star arms at d8) on their test split,
-    one eval job per site ~0.5 GPU-h each, plus 3 reruns of pruned trials (~0.85 GPU-h)'
+  next: when rung 6's hp15 rerun (FA-ccin2p3-2ed18ab8) ends, compare its best validation loss with the record 1.30e-7 and
+    the rescoring's 1.67e-7, and write which one it reproduces
   done_when: null
   match: eval_delta*,zz_delta*,tp3_finfte_uubar_Zggg_d8,tp3_r1fte_udbar_enu_d8,tp3_r1fte_ee_dd_ew_nlo_d8
   notes_ref: null
