@@ -165,14 +165,13 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: 'At 869 of 900 trials (2026-10-25, 0 in the queue): the seven linear-probe reruns all passed the head check after
-    the TF32 fix (head match 6e-7 to 4.5e-5, threshold 1e-3); 31 trials the full disk failed silently (20:36-20:38, no Errno
-    28 text, so the earlier disk reruns missed them) were requeued in 20 sweeps, 8 at their in-flight candidate and 23 guided,
-    each sweep back to 5 (analysis/transfer/data/lowd_probe_reruns.json, 7586f43); the CC feeder submits them (disk 96%, pauses
-    at 97%). Interim read at 530 (fbcc7df) stands. When all 900 are in: the final collection (collect_sweeps.py tp3_lowd_
-    > data/lowd_dyhpo_sweeps.json, python3 analysis/transfer/lowd_dyhpo.py without --complete), compare each method''s best
-    against the default''s own 5-trial search on cell medians, and write it up after par:lowd_ft in docs/results.tex. If trials
-    are still missing with nothing queued, read their logs before requeueing.'
+  next: 'At 899 of 900 (2026-10-25 22:40, queue empty): the missing trial is in the frozen-blocks sweep for ee to bb one-loop
+    at rung 7, D=10^2 (tp3_lowd_freeze_r7_ee_bb_nlo_d2). Logs: trials 5 (fixed rerun of the disk-failed candidate 145) and
+    6 (guided) ran together and both drew candidate 145, so only 4 distinct candidates are in. One guided trial added (trial_0007,
+    generate_sweep --extend --n-trials 1; the feeder dry-run lists it, 1 to submit); the CC feeder submits it. When it is
+    in (900/900): the final collection (collect_sweeps.py tp3_lowd_ > data/lowd_dyhpo_sweeps.json), python3 analysis/transfer/lowd_dyhpo.py
+    without --complete, compare each method''s best against the default''s own 5-trial search on cell medians per D, figure,
+    write-up after par:lowd_ft.'
   done_when: 'python3 sweep/watchdog.py tp3_lowd_ --expect analysis/transfer/expect_tp3.json --window 30 --sites ccin2p3 --units
     | tail -1 | python3 -c "import json,sys; u=json.load(sys.stdin)[''units'']; sys.exit(0 if len(u)==180 and all(v[''done'']>=v[''expected'']
     and not v[''active''] for v in u.values()) else 1)" && python3 -c "import json,sys; d=json.load(open(''analysis/transfer/data/lowd_dyhpo.json''));
