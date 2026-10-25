@@ -14,9 +14,9 @@ entries:
       for comparison; then the user decides
   decisions:
   - D117
-  next: when the pp-trained short pretraining (FA-ccin2p3-e786bd74) ends, its queued pp read fires; then compare it with the
-    four window-trained arms' pp reads (analysis/catalog_v3/pp_compare.py) per class family at the best checkpoint and write
-    the result up
+  next: 'when the pp-trained arm''s pp read ends: collect (site run --item pp_sampling ccin2p3 FA -- python analysis/catalog_v3/pp_compare.py
+    collect > analysis/catalog_v3/data/pp_rows.json, stripping the banner line), check n_pairs and support counts, draw figs/pp_trained,
+    read it inside and outside the windows separately against the window-trained arms, write it up with % src / % claim lines'
   done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
     g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
     not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
