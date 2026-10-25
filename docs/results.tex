@@ -412,8 +412,8 @@ built on a quartic-gauge class. Each read every held-out axis on $2000$ validati
 (\code{tools/zero\_shot\_parent.py}; \code{analysis/catalog\_v3/short\_reads.py}, \code{data/short\_reads.json}): the
 MSE of $\log|\mathcal M|^2$ (for a sign-changing one-loop pool, of $\log\max(|\mathcal M|^2,\text{floor})$, the sign
 head's magnitude), split into the level, the squared mean error, which one number per process removes, and the shape,
-what is left. Every probe of every axis was read ($617$ per arm, the twin $761$; the twin's $7$ sign-changing one-loop
-$\tau$ pools were left out of its first read and read again with the magnitude scoring, run FA-ccin2p3-aeb819d4). The training
+what is left. Every probe of every axis was read ($617$ per arm, the twin $768$; the twin's $7$ sign-changing one-loop
+$\tau$ pools were left out of its first read and read again with the magnitude scoring). The training
 losses are on different targets and not compared; these reads all are on $\log|\mathcal M|^2$.
 
 \begin{table}[H]
@@ -442,14 +442,14 @@ quartic vertex never seen & $15$ & & & & $0.68$ ($0.15$) \\
 
 What the table and Fig.~\ref{fig:v3_short} say:
 \begin{itemize}
-  \item \emph{The dimensionless target is what extrapolates.} Past the training range the baseline's error is its level
+  \item \emph{The dimensionless target extrapolates where the baseline does not} (one seed each). Past the training range the baseline's error is its level
   ($43$ of $46$ at $2\to5$, $39$ of $64$ at $1$ to $10$\,TeV): a level read in GeV has no rule for a new multiplicity or
   energy. The dimensionless target takes both to $1.2$ and $2.9$, better on every one of the $40$ probes of each (median
   per-probe ratio $0.03$ and $0.07$). Within the catalog's range it gains less: median per-probe ratio $0.78$ to $1.02$
   per axis, better on $116$ of the $237$ top probes and on $34$ of the $54$ new combinations.
   \item \emph{The context vector, read at $c=0$, is close to neutral zero-shot}: median per-probe ratio against the same
   target without it $0.91$ (top) to $1.22$ ($\alpha_s=0.13$, $8$ probes), better on $138$ of the $237$ top probes and on
-  $13$ of the $30$ one-loop ones. Its use is the $K$-shot fit, still to be read on catalog\_v3.
+  $13$ of the $30$ one-loop ones. Its use is the $K$-shot fit, read in the paragraph below.
   \item \emph{A particle never seen costs its shape, a vertex never seen does not.} With no $\tau$ or $\nu_\tau$ in
   training, the $136$ processes with one are read at $4.8$, most of it shape ($3.3$): the $\tau$'s mass and
   generation sit in its property vector, and what the network learned from the $e$ and $\mu$ does not carry
@@ -563,9 +563,9 @@ new combinations & $54$ & $0.75$ & $0.63$ & $0.66$ & $0.67$ & $0.93$ & $9\%$ \\
 $2\to4$ families & $168$ & $1.08$ & $0.84$ & $0.89$ & $0.88$ & $1.25$ & $13\%$ \\
 the physical top & $237$ & $1.46$ & $0.80$ & $0.85$ & $0.84$ & $0.80$ & $53\%$ \\
 one loop & $30$ & $1.34$ & $0.78$ & $0.81$ & $0.81$ & $0.50$ & $63\%$ \\
-$\alpha_s=0.13$ & $8$ & $0.16$ & $0.09$ & $0.09$ & $0.10$ & $0.19$ & $12\%$ \\
-$p_T\geq30$\,GeV & $40$ & $0.42$ & $0.40$ & $0.44$ & $0.42$ & $0.73$ & $7\%$ \\
-$2\to5$ & $40$ & $1.03$ & $0.93$ & $0.97$ & $0.96$ & $1.32$ & $7\%$ \\
+$\alpha_s=0.13$ & $8$ & $0.16$ & $0.09$ & $0.09$ & $0.10$ & $0.19$ & $13\%$ \\
+$p_T\geq30$\,GeV & $40$ & $0.42$ & $0.40$ & $0.44$ & $0.42$ & $0.73$ & $8\%$ \\
+$2\to5$ & $40$ & $1.03$ & $0.93$ & $0.97$ & $0.96$ & $1.32$ & $8\%$ \\
 $\sqrt{\hat s}\in[1,10]$\,TeV & $40$ & $2.29$ & $1.59$ & $1.69$ & $1.69$ & $2.11$ & $33\%$ \\
 \hline
 \end{tabular}
@@ -573,7 +573,7 @@ $\sqrt{\hat s}\in[1,10]$\,TeV & $40$ & $2.29$ & $1.59$ & $1.69$ & $1.69$ & $2.11
 The floor is the variance of the zero-shot error, what any one number per process reaches; ``fit better'' is the share
 of processes where the context fit beats the shrunk offset. Unlike Daniel's catalog, where the fit went under the floor
 on the $43$ new ($0.21$ against $0.46$), on catalog\_v3 it is worse than an offset on six of the eight axes, and worse
-than not fitting at all on four ($p_T\geq30$: $0.73$ against a zero-shot $0.42$). It goes under the floor only on the
+than not fitting at all on five ($p_T\geq30$: $0.73$ against a zero-shot $0.42$). It goes under the floor only on the
 one-loop pools ($0.50$ against $0.78$) and reaches it on the top classes ($0.80$). Where it fails, the context
 run's zero-shot error is already mostly shape (its level part $0.01$ to $0.18$, Tab.~\ref{tab:v3_short}), so there is
 little a per-process vector can carry, and sixteen free numbers fitted on $K\leq16$ events chase the noise of the draw
@@ -7058,10 +7058,7 @@ of the three share a test set.
       (\code{scripts/job\_catalog\_v3\_pp\_score.sh}) and the pp-trained short run \code{dimensionless\_pp} with its pp read
       (scope settled by the user, 2026-10-25: hadronic tree classes on pp, every other pool on windows).
     \end{itemize}
-    Rules added today: never stop the turn for an answer (0g, hook \code{no\_blocking\_question.sh}); answer in text
-    first, batches sync once and submit in parallel (\code{NOSYNC=1}), every word is to the user (0h); the sleep guard
-    is global (\code{\textasciitilde/.claude/hooks/sleep\_guard.sh}). The reply check reads every text block of a turn and
-    only the relevant decisions. Supervisor and the event waiter running.
+    Supervisor and the event waiter running.
   \item \textbf{The level.} Adopted candidate: the emission scales (par.\ The emission scales in training); open on Daniel's
     catalog (held): what the $43$ new pay for. The small dedicated network for what no constant fixes: the context vector
     and the factorised $2\to4$ head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on
