@@ -8080,9 +8080,9 @@ are data-bound). Transfer cells from then on mix V100 and A100 trials. One run p
 $\Delta=(A_\theta-A)/A$ as $|\Delta|$ histograms on log bins per process, for every ladder rung, the scaling figures'
 arms and the star arms, from the $8$k grid at $D=10^4$ (\code{analysis/transfer/delta\_audit.json}). As first
 collected, $179$ runs: $107$ on Jean Zay, $37$ on CC, $32$ on lxplus (copied to CC, \code{runs\_from\_lxplus/<sweep>/}),
-and three pruned trials rerun on CC from their configs; later extended to the $251$ models of the evaluation-precision paragraph below (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial $96$,
+and three pruned trials rerun on CC from their configs (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial $96$,
 \code{tp3\_r1fte\_udbar\_enu\_d8} $197$, \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} $98$; their parent
-\code{runs/tp3\_ladder\_r1/trial\_0047} md5-identical to lxplus's). \code{tools/eval\_delta.py} rebuilds a run with its own
+\code{runs/tp3\_ladder\_r1/trial\_0047} md5-identical to lxplus's); later extended to the $251$ models of the evaluation-precision paragraph below. \code{tools/eval\_delta.py} rebuilds a run with its own
 frozen \code{data\_stats.json} and tokenizer as a resume reads them, the fine-tune head kept, and writes its test
 predictions (\code{--tf32 on|off}); \code{analysis/transfer/collect\_delta.py} collects the test $\Delta$ and the rebuilt
 validation loss, and \code{delta\_plots.py} draws the figures and flags a rebuild more than $5\%$ off its recorded loss.
