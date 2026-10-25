@@ -608,7 +608,8 @@ def labels():
 
 
 # ---------------------------------------------------------------- the numbers on trunk, checked as state
-CLAIMS_TIMEOUT = 240          # seconds for verify_claims over the new trunk commits (below plan_check's 300)
+# seconds for verify_claims over the new trunk commits inside the Stop hook (below plan_check's 300)
+CLAIMS_TIMEOUT = float(ENV.get("PLAN_CLAIMS_TIMEOUT", 240))
 CLAIMS_CACHE = os.path.join(os.path.dirname(STATE_FILE), ".claims_cache.json")   # passed paragraphs, by content
 
 
@@ -621,12 +622,20 @@ def _set_state(key, value):
         _write_atomic(STATE_FILE, json.dumps(st, indent=1, sort_keys=True))
 
 
-def claims_problems():
+def claims_verified():
+    """(last verified commit, trunk's head): read only, nothing run (auto_push.sh pushes trunk up to the first)."""
+    g = lambda *a: subprocess.run(["git", "-C", ROOT] + list(a), capture_output=True, text=True)
+    st = json.load(open(STATE_FILE)) if os.path.exists(STATE_FILE) else {}
+    return st.get("_claims_verified"), g("rev-parse", "-q", "--verify", "trunk^{commit}").stdout.strip()
+
+
+def claims_problems(limit=True):
     """verify_claims over every trunk commit since the last verified one (_claims_verified in the state file). This
     is the gate on the numbers in docs/results.tex, whatever way a commit reached trunk (hooks skipped, a merge, a
     rebase); the git hooks and git_verify_guard only catch a problem earlier. On a pass the watermark moves to trunk's
-    head; a check that does not finish in the time left blocks as "claims check incomplete" (plan claims finishes
-    it with no limit, and paragraphs that passed are kept by content hash), never a silent timeout of the hook."""
+    head. With `limit` (the Stop hook) a check that does not finish in the time left blocks as "claims check
+    incomplete", never a silent timeout of the hook; `plan claims` runs it with no limit, and paragraphs that passed
+    are kept by content hash, so each run builds on the last."""
     if not os.path.exists(PLAN_FILE):
         return []
     g = lambda *a: subprocess.run(["git", "-C", ROOT] + list(a), capture_output=True, text=True)
@@ -641,18 +650,23 @@ def claims_problems():
         return []
     base = last if g("merge-base", "--is-ancestor", last, head).returncode == 0 else \
         g("merge-base", last, head).stdout.strip()
-    left = min(CLAIMS_TIMEOUT, budget())
+    left = min(CLAIMS_TIMEOUT, budget()) if limit else None
     incomplete = ["claims check incomplete: verify_claims over trunk %s..%s did not finish in the %d s left; run "
                   "`python3 tools/plan.py claims` (no time limit; passed paragraphs are kept) to finish it"
-                  % (base[:8], head[:8], left)]
-    if left < 5:
+                  % (base[:8], head[:8], left or 0)]
+    if left is not None and left < 5:
         return incomplete
+    import signal
+    pr = subprocess.Popen([sys.executable, os.path.join(ROOT, "tools", "verify_claims.py"), "--root", ROOT, "--rev",
+                           "%s..%s" % (base, head), "--cache", CLAIMS_CACHE], stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE, text=True, start_new_session=True)
     try:
-        r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "verify_claims.py"), "--root", ROOT, "--rev",
-                            "%s..%s" % (base, head), "--cache", CLAIMS_CACHE], capture_output=True, text=True,
-                           timeout=left)
+        out, err = pr.communicate(timeout=left)
     except subprocess.TimeoutExpired:
+        os.killpg(pr.pid, signal.SIGKILL)               # the scripts it runs too, not only verify_claims
+        pr.communicate()
         return incomplete
+    r = subprocess.CompletedProcess(pr.args, pr.returncode, out, err)
     if r.returncode == 0:
         _set_state("_claims_verified", head)
         return []
@@ -716,8 +730,12 @@ def cmd_commit(a):
 
 
 def cmd_claims(a):
-    """The claims check of trunk since the last verified commit (auto_push.sh runs it before pushing trunk)."""
-    bad = claims_problems()
+    """The claims check of trunk since the last verified commit, with no time limit (the Stop hook runs it within its
+    budget). --verified prints the last verified commit and runs nothing (auto_push.sh)."""
+    if a.verified:
+        print(claims_verified()[0] or "")
+        return 0
+    bad = claims_problems(limit=False)
     for l in bad + ["note: " + n for n in NOTES]:
         print(l)
     return 1 if bad else 0
@@ -1096,7 +1114,7 @@ def main(argv=None):
     cmd("next", cmd_next, A("--prompts", action="store_true"))
     cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"))
     cmd("view", cmd_view, A("--write", action="store_true"))
-    cmd("claims", cmd_claims)
+    cmd("claims", cmd_claims, A("--verified", action="store_true"))
     cmd("reopen", cmd_reopen, A("id"), A("--why", required=True))
     cmd("commit", cmd_commit)
     a = p.parse_args(argv)

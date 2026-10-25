@@ -4,8 +4,9 @@ pre-merge-commit). A paragraph (or itemize item) that states numbers carries the
     % src: python3 <a tracked script under analysis/ or tools/> [args] @<commit where that script exists>
     % claim: <key, dotted into the JSON object the script prints as its last {...} line>=<value as written, 0.80, 5.8e-8, 40>
     % allow: <tokens that are not results: 2\to4, H100> [<a plain number> because <why it is no result>]  (optional)
-For each paragraph or item the change touches (only numbers the change ADDS count: those on its + lines less those on
-its - lines, so a reflow, a move or a typo fix around existing numbers needs no claim):
+For each paragraph or item the change touches (only numbers the change ADDS to it count: those on its added lines
+less those on the lines its own hunks removed, so a reflow or a typo fix around existing numbers needs no claim, while a
+number moved in from another part of the file does):
   - every added number in its text (decimals, integers, a x 10^b, 5.8e-8, braced \\textbf{0.80} or \\num{..}, table cells,
     suffixed 40k or 2.35x; -- is a range) must be the written value of one of its claims or an allowed token;
     multiplicities (2\\to4), years, dates, times, subscripts, lengths and the insides of \\label, \\ref, \\cite,
@@ -153,10 +154,24 @@ class Where:
     """Where a source runs. Staged or working-tree mode: the checkout. Range mode: the checkout when its copy of the
     script is the one at rev; else a worktree whose HEAD is rev (it has that branch's local artifacts); else a
     temporary detached worktree at rev, removed afterwards."""
+    STALE_S = 3600           # a temporary worktree older than this is left over from a run that was cut off
+
     def __init__(self, root, rev=None):
         self.root, self.rev, self.tmp = root, rev, None
         self.sha = git(root, "rev-parse", "--verify", "-q", rev + "^{commit}", check=False).stdout.strip() if rev \
             else None
+        if rev:
+            self.cleanup()
+
+    def cleanup(self):
+        """Remove temporary worktrees of earlier runs that were cut off (a timeout kills a run before close)."""
+        import time
+        for blk in git(self.root, "worktree", "list", "--porcelain", check=False).stdout.split("\n\n"):
+            f = dict(l.split(" ", 1) for l in blk.splitlines() if " " in l)
+            wt = f.get("worktree", "")
+            if "/verify_claims_" in wt and (not os.path.isdir(wt) or time.time() - os.path.getmtime(wt) > self.STALE_S):
+                git(self.root, "worktree", "remove", "--force", wt, check=False)
+        git(self.root, "worktree", "prune", check=False)
 
     def dir_for(self, path):
         if not self.rev:
@@ -181,12 +196,16 @@ class Where:
     def close(self):
         if self.tmp:
             git(self.root, "worktree", "remove", "--force", self.tmp, check=False)
+            try:
+                os.rmdir(os.path.dirname(self.tmp))
+            except OSError:
+                pass
 
 
 def run_src(where, cmd, cache):
     if cmd not in cache:
         cwd = where.dir_for(os.path.normpath(shlex.split(cmd)[1]))
-        r = subprocess.run(shlex.split(cmd), cwd=cwd, capture_output=True, text=True, timeout=900)
+        r = subprocess.run(shlex.split(cmd), cwd=cwd, capture_output=True, text=True)   # bounded by the caller
         js = [l for l in r.stdout.splitlines() if l.strip().startswith("{")]
         if r.returncode != 0 or not js:
             cache[cmd] = RuntimeError("exit %d, %s" % (r.returncode, (r.stderr or "no JSON line").strip()[-200:]))
@@ -198,16 +217,38 @@ def run_src(where, cmd, cache):
     return cache[cmd]
 
 
-def added_numbers(diff):
-    """The numbers the diff adds: those on its + lines less those on its - lines (a multiset of their text), so a
-    reflow, a move or a typo fix around an existing number adds none. Comment lines are provenance, not numbers."""
-    import collections
-    plus, minus = collections.Counter(), collections.Counter()
+def hunks(diff):
+    """[(new start, new count, removed lines)] of a -U0 diff."""
+    out, cur = [], None
     for l in diff.splitlines():
-        if l.startswith(("+++", "---")) or not l[:1] in "+-" or l[1:].lstrip().startswith("%"):
-            continue
-        (plus if l[0] == "+" else minus).update(t for t, _ in numbers(l[1:], []))
-    return plus - minus
+        m = re.match(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", l)
+        if m:
+            cur = (int(m.group(1)), int(m.group(2) or 1), [])
+            out.append(cur)
+        elif cur is not None and l.startswith("-"):
+            cur[2].append(l[1:])
+    return out
+
+
+def added_numbers(lines, first, last, added, hks):
+    """The numbers a paragraph gains: those on its added lines, joined, less those on the lines its own hunks
+    removed, joined. A reflow or a typo fix inside the paragraph adds none; a number moved in from elsewhere (the
+    hand-off) counts as added. Comment lines are provenance, not numbers."""
+    import collections
+    text = lambda ls: " ".join(l for l in ls if not l.lstrip().startswith("%"))
+    plus = text(l for i, l in enumerate(lines) if first + i in added)
+    gone = []
+    for c, n, rem in hks:
+        lo, hi = (c, c + n - 1) if n else (c, c + 1)          # a pure deletion sits after line c
+        if lo <= last and hi >= first:
+            gone += rem
+    return collections.Counter(numkey(v) for _, v in numbers(plus, [])) - collections.Counter(
+        numkey(v) for _, v in numbers(text(gone), []))
+
+
+def numkey(v):
+    """A number by value, so 5.8\\times10^{-8} split over two lines by a reflow is the same number."""
+    return "%.12g" % v
 
 
 def verify(root, text, added, rev=None, diff=None, cache_file=None):
@@ -220,10 +261,10 @@ def verify(root, text, added, rev=None, diff=None, cache_file=None):
 
 def _verify(root, text, added, rev, runner, diff=None, cache_file=None):
     """Policy (the user's approval wording, "every number and figure added"): only numbers ADDED by the diff need a
-    claim; a claim is rerun when its line is added or its value is an added number."""
+    claim; a claim is rerun when its claim line or its src line is added, or its value is an added number."""
     import hashlib
     problems, cache = [], {}
-    new_nums = added_numbers(diff) if diff is not None else None
+    hks = hunks(diff) if diff is not None else None
     try:
         done = json.load(open(cache_file)) if cache_file else {}
     except (OSError, ValueError):
@@ -243,11 +284,11 @@ def _verify(root, text, added, rev, runner, diff=None, cache_file=None):
         n_before = len(problems)
         where = "lines %d-%d" % (first, last)
         body = " ".join(l for l in lines if not l.lstrip().startswith("%"))
-        src, commit, claims, allowed = None, None, [], []
+        src, commit, claims, allowed, src_added = None, None, [], [], False
         for i, l in enumerate(lines):
             m = re.match(r"\s*%\s*src:\s*(.+?)(?:\s+@(\S+))?\s*$", l)
             if m:
-                src, commit = m.group(1), m.group(2)
+                src, commit, src_added = m.group(1), m.group(2), first + i in added
                 why = src_problem(root, src, commit, rev)
                 if why:                                        # reported if the line is new or a claim of it is rerun
                     src = "!" + why
@@ -256,7 +297,7 @@ def _verify(root, text, added, rev, runner, diff=None, cache_file=None):
                 continue
             m = re.match(r"\s*%\s*claim:\s*([^=\s]+)\s*=\s*(\S+)\s*$", l)
             if m:
-                claims.append((src, m.group(1), m.group(2), first + i in added))
+                claims.append((src, m.group(1), m.group(2), first + i in added or src_added))
                 continue
             m = re.match(r"\s*%\s*allow:\s*(.+)$", l)
             if m:
@@ -269,13 +310,13 @@ def _verify(root, text, added, rev, runner, diff=None, cache_file=None):
             if claim_value(v) is None:
                 problems.append("%s: claim %s=%s is not a number" % (where, key_, v))
         values = [v for v in values if v is not None]
-        left = None if new_nums is None else new_nums.copy()
+        left = None if hks is None else added_numbers(lines, first, last, added, hks)
         new_vals = []
         for tok, val in numbers(body, allowed):
             if left is not None:
-                if left[tok] <= 0:
-                    continue                                   # already in the text before this change
-                left[tok] -= 1
+                if left[numkey(val)] <= 0:
+                    continue                                   # already in the paragraph before this change
+                left[numkey(val)] -= 1
             new_vals.append(val)
             if not any(abs(val - v) <= 1e-12 * max(1.0, abs(v)) for v in values):
                 problems.append("%s: %s is no claim's value (add a %% claim, or %% allow it if it is no result)" % (

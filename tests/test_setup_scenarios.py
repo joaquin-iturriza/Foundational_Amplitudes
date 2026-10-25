@@ -774,10 +774,18 @@ def claims_state():
     scenario("4: a number committed to trunk with the hooks skipped blocks the stop", rc.returncode == 2
              and "fail the claims check" in rc.stderr and "0.66" in rc.stderr, rc.stderr + rc.stdout)
     shutil.copy(PLAN, os.path.join(repo, "tools", "plan.py"))
+    origin = tempfile.mkdtemp(prefix="origin_")
+    subprocess.run(["git", "init", "-q", "--bare", origin], capture_output=True)
+    g("remote", "add", "origin", origin)
+    g("push", "-q", "-u", "origin", "%s:refs/heads/trunk" % base)
+    g("branch", "-q", "--set-upstream-to=origin/trunk", "trunk")
+    remote = lambda: subprocess.run(["git", "-C", origin, "rev-parse", "trunk"], capture_output=True,
+                                    text=True).stdout.strip()
     ap = subprocess.run(["bash", os.path.join(ROOT, ".claude", "hooks", "auto_push.sh")], capture_output=True,
                         text=True, env=dict(env, CLAUDE_PROJECT_DIR=repo))
-    scenario("4: auto_push does not push trunk while the claims check fails", ap.returncode == 2
-             and "trunk NOT pushed" in ap.stderr, ap.stdout + ap.stderr)
+    scenario("4 (sixth review): auto_push runs no check, pushes trunk only up to the last verified commit",
+             ap.returncode == 0 and remote() == base and "wait for the claims check" in ap.stdout
+             and not os.path.exists(os.path.join(repo, "plan", ".claims_cache.json")), ap.stdout + ap.stderr)
     open(tex, "w").write(open(tex).read().replace("\nAn unsourced number, $0.66$.\n", "\n"))
     g("commit", "-qam", "fix", "--no-verify")
     r = subprocess.run([sys.executable, PLAN, "claims"], env=env, capture_output=True, text=True)
@@ -785,6 +793,9 @@ def claims_state():
     mark = json.load(open(os.path.join(repo, "plan", ".state.json"))).get("_claims_verified")
     scenario("4: once a new commit fixes it, the check passes and the watermark moves to trunk's head",
              r.returncode == 0 and mark == head, r.stdout + r.stderr + str(mark))
+    ap = subprocess.run(["bash", os.path.join(ROOT, ".claude", "hooks", "auto_push.sh")], capture_output=True,
+                        text=True, env=dict(env, CLAUDE_PROJECT_DIR=repo))
+    scenario("4: then auto_push pushes trunk's head", ap.returncode == 0 and remote() == head, ap.stdout + ap.stderr)
 
 
 def fourth_lower():
@@ -912,10 +923,26 @@ def claims_budget():
              r.returncode == 0 and len(cache) == 1
              and json.load(open(os.path.join(repo, "plan", ".state.json")))["_claims_verified"] == head,
              r.stdout + r.stderr)
+    # sixth review 1: a script slower than the claims check's own limit inside the stop
+    repo, g, tex, base, env = plan_repo()
+    open(os.path.join(repo, "analysis", "slow.py"), "w").write(
+        'import json, time\ntime.sleep(6)\nprint(json.dumps({"v": 0.25}))\n')
+    g("add", "analysis/slow.py"); g("commit", "-qm", "slow", "--no-verify")
+    sha = g("rev-parse", "HEAD").stdout.strip()
+    open(tex, "a").write("\n%% src: python3 analysis/slow.py @%s\n%% claim: v=0.25\nThe value is $0.25$.\n" % sha)
+    g("commit", "-qam", "par", "--no-verify")
+    env2 = dict(env, PLAN_CLAIMS_TIMEOUT="2")
+    rc = subprocess.run([sys.executable, CHECK], input="{}", env=env2, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, PLAN, "claims"], env=env2, capture_output=True, text=True)
+    left = subprocess.run(["git", "-C", repo, "worktree", "list"], capture_output=True, text=True).stdout
+    scenario("1 (sixth review): a script slower than the stop's claims limit: the stop says incomplete, plan claims "
+             "(no limit) completes it", rc.returncode == 2 and "claims check incomplete" in rc.stderr
+             and r.returncode == 0 and "verify_claims_" not in left, rc.stderr + r.stdout + r.stderr + left)
 
 
 def added_only():
-    """Policy: only numbers the diff adds need a claim; reflows, moves and typo fixes around them need none."""
+    """Policy: only numbers a change adds to a paragraph need a claim; reflows and typo fixes around them need
+    none, a number moved in from another paragraph does."""
     repo, g, tex, base = repo_with_script()
     open(tex, "w").write("Old paragraph with 1.23 and no source.\n\n% src: python3 analysis/gone.py @" + base +
                          "\n% claim: x=0.77\nA claimed $0.77$ whose source is gone.\n")
@@ -930,14 +957,35 @@ def added_only():
     for name, text, want in (
             ("a reflow of an unsourced old number", "Old paragraph\nwith 1.23 and, reworded, no source.\n\n" + claimed
              + "A claimed $0.77$ whose source is gone.\n", 0),
-            ("a move of both paragraphs", claimed + "A claimed $0.77$ whose source is gone.\n\nOld paragraph with "
-             "1.23 and no source.\n", 0),
+            ("a number moved in from another paragraph (it counts as added there)", claimed +
+             "A claimed $0.77$ whose source is gone.\n\nOld paragraph with 1.23 and no source.\n", 1),
+            ("a reflow of a claimed paragraph (its claim is not rerun)", "Old paragraph with 1.23 and no source.\n\n" + claimed
+             + "A claimed $0.77$ whose source\nis gone.\n", 0),
             ("a typo fix in a claimed paragraph (its claim is not rerun)", "Old paragraph with 1.23 and no source.\n\n"
              + claimed + "A claimed $0.77$ whose source has gone.\n", 0),
             ("a changed number", "Old paragraph with 1.24 and no source.\n\n" + claimed +
              "A claimed $0.77$ whose source is gone.\n", 1)):
         rc, out = stage(text)
         scenario("policy: %s %s" % (name, "is refused" if want else "needs no claim"), rc == want, out)
+    # sixth review 2: a changed % src: line reruns its claims
+    repo, g, tex, base = repo_with_script()
+    open(tex, "w").write("x\n\n%% src: python3 analysis/s.py @%s\n%% claim: h3.shape=0.80\nThe floor is $0.80$.\n"
+                         % base)
+    g("add", "."); g("commit", "-qm", "claimed", "--no-verify")
+    open(os.path.join(repo, "analysis", "s.py"), "w").write(
+        'import json\nprint(json.dumps({"h3": {"shape": 0.5}}))\n')
+    g("commit", "-qam", "the script changed", "--no-verify")
+    sha2 = g("rev-parse", "HEAD").stdout.strip()
+    rc, out = stage("x\n\n%% src: python3 analysis/s.py @%s\n%% claim: h3.shape=0.80\nThe floor is $0.80$.\n" % sha2)
+    scenario("2 (sixth review): a changed src line reruns its claims", rc == 1 and "recomputed 0.5" in out, out)
+    # lower: temporary worktrees a cut-off run left behind are removed at the start of the next
+    stale = os.path.join(tempfile.mkdtemp(prefix="verify_claims_"), "wt")
+    g("worktree", "add", "-q", "--detach", stale, base)
+    os.utime(stale, (1, 1))
+    subprocess.run([sys.executable, VERIFY, "--root", repo, "--rev", "%s..HEAD" % base], capture_output=True)
+    left = g("worktree", "list").stdout
+    scenario("lower: a temporary worktree left by a cut-off run is removed by the next range check",
+             stale not in left and not os.path.exists(stale), left)
 
 
 def main():
