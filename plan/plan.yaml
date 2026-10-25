@@ -206,7 +206,7 @@ entries:
     (Sec. ), with a cheaper symmetrisation than the permutation average. How close to real amplitudes the prior should be
     is still to be settled with others.'
   hold_decision: D125
-- status: running
+- status: done
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
     text: we want this for the largest D, do one showing all rungs for the ladder, and one showing the same ones we are showing
@@ -237,6 +237,7 @@ entries:
   question: The ladder. Rung 6's hp15 rerun from its config (FA-ccin2p3-2ed18ab8, running, \approx6 GPU-h) is compared with
     its record (1.30\times10^{-7}, against the 1.67\times10^{-7} its rescoring gave; par.\ The ladder's pretraining), which
     tests the hardware and TF32 of its lxplus training against the rescoring's.
+  writeup: 3ccf3b7
 - status: held
   quotes:
   - said_at: '2026-10-21T23:35:42.396Z'
