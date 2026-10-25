@@ -32,6 +32,7 @@ entries:
     - analysis/catalog_v3/figs/pp_trained_a.png
     - analysis/catalog_v3/figs/pp_trained_b.png
     - analysis/catalog_v3/figs/pp_trained_c.png
+    - analysis/catalog_v3/figs/pp_trained_d.png
   dead_ends:
   - tried: the pp-trained arm's read on the 13 TeV pp test set (FA-ccin2p3-25485185)
     why: 'read FA-ccin2p3-25485185 failed on the full CC disk: OSError no space left on device at tempfile.mkdtemp in SCRATCH
