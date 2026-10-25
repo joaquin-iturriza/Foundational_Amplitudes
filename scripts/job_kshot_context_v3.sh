@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=kshot_v3
 #SBATCH --cpus-per-task=5
-#SBATCH --time=06:00:00
+#SBATCH --time=08:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --output=kshot_v3_%j.out
 #SBATCH --error=kshot_v3_%j.out
@@ -10,11 +10,12 @@
 # on the catalog_v3 short run with the context vector (scripts/job_catalog_v3_short.sh dimensionless_context), per
 # held-out process of one axis, c alone fitted on K = 1, 4, 16 of its validation events, everything else frozen, scored
 # on the others, against the plain K-event offset on the same draws (tools/kshot_context.py, as on Daniel's catalog).
-# Output: $SCRATCH/zz_kshot_v3/<axis>/. Args: <axis> (one of catalog_v3_heldout_<axis>.yaml)
+# Output: $SCRATCH/zz_kshot_v3/<axis>/. Args: <axis> (one of catalog_v3_heldout_<axis>.yaml) [k n]: part k of n of the
+# axis's processes (every n-th from k, sorted by name), so a large axis runs as n parallel jobs
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-AX="${1:?a held-out axis}"
+AX="${1:?a held-out axis}"; K="${2:-0}"; NP="${3:-1}"
 PAR="$PROJECT_DIR/runs/catalog_v3_short/dimensionless_context"
 ls "$PAR"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $PAR"; exit 1; }
 test -e "$PAR/context_names.json" || { echo "$PAR has no context_names.json"; exit 1; }
@@ -27,5 +28,8 @@ for p in r["processes"]:
     yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 print(len(r["processes"]), "recipes")
 PY
-python tools/kshot_context.py --parent "$PAR" --save-dir "$OUT" "$R"/*.yaml
-echo "KSHOT_V3_DONE $AX"
+ALL=("$R"/*.yaml); P=()
+for i in "${!ALL[@]}"; do [ $((i % NP)) = "$K" ] && P+=("${ALL[$i]}"); done
+echo "part $K of $NP: ${#P[@]} of ${#ALL[@]} processes"
+python tools/kshot_context.py --parent "$PAR" --save-dir "$OUT" "${P[@]}"
+echo "KSHOT_V3_DONE $AX $K/$NP"
