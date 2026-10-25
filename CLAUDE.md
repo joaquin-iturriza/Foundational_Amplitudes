@@ -28,7 +28,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    so the stated wall time holds), never a reason to shrink the job. If neither works, the smaller version and its new
    time go to me in the first lines, before it is submitted. (2026-10-24: catalog_v3 was promised on 48 cores in 3 to
    4 h; `site pick` turned `--gpus 0` into 1 GPU, judged 48 cores against the GPU nodes, and the prebuild ran as one
-   16-core job, about 9 h for the trees.)
+   16-core job. The pools' compute was ~9 h in all; the other ~11 h of the 20 were gaps with nothing running, waiting
+   on a question the agent could have settled. A delay's cause is read from the run records, never assumed.)
 
 0d. **When I point out a mistake, no apology and no quick patch presented as the end of it.** Answer with: what in
    your process produced it (traced in the transcript, logs or code, not guessed); the change that stops it recurring
