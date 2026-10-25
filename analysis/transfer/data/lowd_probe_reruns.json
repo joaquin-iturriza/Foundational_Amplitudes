@@ -1,0 +1,140 @@
+{
+ "probe_failures": {
+  "cause": "linear-probe head check missed the 1e-3 match on H100 by TF32 rounding (fixed in c11ff1e, on CC at 6eb9b41)",
+  "reruns_done": {
+   "tp3_lowd_lpft_r1_ee_Za_d5": 1.1e-05,
+   "tp3_lowd_lpft_r1_ee_bb_nlo_d5": 3.2e-06,
+   "tp3_lowd_lpft_r1_ud_ud_d5": 1e-05,
+   "tp3_lowd_lpft_r1_uubar_gg_d5": 4.5e-05,
+   "tp3_lowd_lpft_r7_ee_Za_d5": 2.3e-06,
+   "tp3_lowd_lpft_r7_uubar_gg_d4": 6e-07,
+   "tp3_lowd_lpft_r1_ud_ud_d4": 1.1e-06
+  },
+  "note": "head match of each rerun (trial_0005 at the failed candidate; r1_ud_ud_d4: DyHPO re-suggested the failed candidate 172 as trial_0003, which passed, so its fixed trial_0005 was a stale duplicate and its fifth trial is a guided one below); all far below 1e-3; no probe failure after the fix"
+ },
+ "silent_disk_full_failures": {
+  "cause": "trials that ran 2026-10-25 20:36-20:38 while /sps/lpnhe was full: exit 1 with a truncated log or exit 0:53 with no log, no traceback, so analysis/transfer/data/lowd_disk_reruns.json (matched on Errno 28 text) missed them; no penalty in the DyHPO state, the drawn candidate left in flight where one was drawn",
+  "requeued_2026_10_25": {
+   "tp3_lowd_freeze_r1_uubar_gg_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [
+     84
+    ],
+    "guided_added": 1
+   },
+   "tp3_lowd_freeze_r7_ee_Za_d2": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [],
+    "guided_added": 1
+   },
+   "tp3_lowd_freeze_r7_ee_Za_d3": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_ee_bb_nlo_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [
+     145
+    ],
+    "guided_added": 1
+   },
+   "tp3_lowd_freeze_r7_ee_bb_nlo_d3": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_ee_ddbar_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_ee_ddbar_d3": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_ud_ud_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_ud_ud_d3": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_uubar_gg_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r7_uubar_gg_d3": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_freeze_r9_ee_Za_d2": {
+    "results_before": 3,
+    "fixed_rerun_candidates": [],
+    "guided_added": 2
+   },
+   "tp3_lowd_l2sp_r9_uubar_gg_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     103
+    ],
+    "guided_added": 0
+   },
+   "tp3_lowd_lpft_r1_ud_ud_d4": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [],
+    "guided_added": 1
+   },
+   "tp3_lowd_lpft_r7_ee_Za_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     51
+    ],
+    "guided_added": 0
+   },
+   "tp3_lowd_lpft_r7_uubar_gg_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     104
+    ],
+    "guided_added": 0
+   },
+   "tp3_lowd_lpft_r9_ee_Za_d2": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [],
+    "guided_added": 1
+   },
+   "tp3_lowd_lpft_r9_ee_Za_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     75
+    ],
+    "guided_added": 0
+   },
+   "tp3_lowd_lpft_r9_ee_ddbar_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     178
+    ],
+    "guided_added": 0
+   },
+   "tp3_lowd_lpft_r9_uubar_gg_d3": {
+    "results_before": 4,
+    "fixed_rerun_candidates": [
+     106
+    ],
+    "guided_added": 0
+   }
+  },
+  "n_fixed": 8,
+  "n_guided": 23,
+  "how": "in-flight candidate retracted and one fixed trial at it (generate_sweep --extend --fixed-hp); where no candidate was drawn, guided trials (--extend --n-trials k) so each sweep keeps 5; submitted by the CC feeder (sweep/feed_capped.py tp3_), not by hand"
+ },
+ "trials_in_at_requeue": "869/900 (180 units, 0 active)"
+}
