@@ -7092,14 +7092,14 @@ of the three share a test set.
     \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
     number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
     $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
-    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Not started: rung $6$'s
-    rescoring gap (its run is not on CC; TF32 is the likely cause, sec:tf32-eval); the one-loop sign decision reading
-    the validation and test amplitudes (a fix changes the one-loop probes' target, so it needs the user); the probes
-    that do not gain. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
+    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Rung $6$'s rescoring gap: see the ladder entry. Settled by the
+    user on 2026-10-24: the one-loop sign question is superseded by the signed-data check of the preprocessing study;
+    the probes that do not gain ran and are written up (par.~\ref{par:nogain}); the large-$D$ points stay out of the
+    grid figures; the larger real catalogs are replaced by catalog\_v3. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
     diagram sum, and the shared target's blow-up at the per-process pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
     bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
-    fix is dropped until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task (D83; queue: few-shot calibration,
-    a CPU proxy for shape transfer under each target, sampling sensitivity, then new ideas); the het trial now writes its own predictions; \code{site} matches a launch's runs by
+    fix is dropped until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since D114 moved it there (D83; item \code{v3\_prep\_explore}; queue: the shape proxy per target, the signed-data check,
+    sampling sensitivity, then new ideas; done on catalog\_v3: the few-shot calibration, par.\ The context vector's $K$-shot fits on catalog\_v3); the het trial now writes its own predictions; \code{site} matches a launch's runs by
     item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
     \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
@@ -7254,11 +7254,6 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     IR-democratic splitter, so the flat-in-$\log|\mathcal M|^2$ selection has events there to keep.
   \item \textbf{Steering, next.} A milder selection ($\gamma<3$, or a floor of mixture events) could later replace the
     mixture pool at $D\sim10^2$.
-  \item \textbf{One-loop sign decision.} The choice between log and log-magnitude with a sign head
-    reads the validation and test amplitudes as well as the $D$ training events; with
-    \code{phase\_space\_on\_pool} it should read the training events only.
-  \item \textbf{The probes that do not gain} (results in par.~\ref{par:nogain}). Open, not approved: why the pretrained start limits $ee\to Z\gamma$ at $D\sim10^2$ (a probe of the start's
-    function against scratch's small-norm init), for the user to call.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
@@ -7283,9 +7278,6 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     the rescoring's, testable only by rerunning hp15 on rung $6$ from its config ($\approx6$ GPU-h). Each process's loss rises at rung $9$ at a
     fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
     process; the step budget stays $64$k on every rung (the user's call).
-  \item \textbf{Large $D$.} All fourteen probe/$D$ points at $10^{4.5}$, $10^5$ now exist on the grid's target
-    (\code{large\_d\_64k.json}), one run each. Whether they join the grid figures, drawn apart as a different horizon, is
-    open; the grid figures leave them out (the user stopped a first version, 2026-10-03).
 \end{itemize}
 
 \section{Non-SM Lagrangians as training data}\label{sec:nonsm}
