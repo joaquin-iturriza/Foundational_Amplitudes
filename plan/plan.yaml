@@ -224,9 +224,11 @@ entries:
   match: eval_delta*,zz_delta*,tp3_finfte_uubar_Zggg_d8,tp3_r1fte_udbar_enu_d8,tp3_r1fte_ee_dd_ew_nlo_d8
   notes_ref: fig:ladder_pre_curves
   evidence:
-    runs: []
-    commit: null
-    paths: []
+    runs:
+    - FA-ccin2p3-2ed18ab8
+    commit: 3ccf3b7
+    paths:
+    - analysis/transfer/figs/ladder_r6_hp15_rerun.png
   dead_ends: []
   asks: []
   id: delta
