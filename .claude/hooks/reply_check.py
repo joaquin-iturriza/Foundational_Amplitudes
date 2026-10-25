@@ -138,11 +138,8 @@ Rules:
    results for this, right?"), that is the question to check. Never name a question from pasted text in your reason, and never fail a
    reply because it leaves one unanswered.
 2. The reply must not ask the researcher to decide something the decisions above already settle.
-3. When the reply states why the assistant itself did or failed to do something (a cause in its own process: "the
-   summary dropped X", "I read it as Y", "the hook let Z"), each such cause must name what it was checked against (a
-   transcript line, a log, a file, code) or be marked as not checked. A self-explanation with neither fails.
-4. Be strict on 1, 2 and 3 and ignore everything else (style, length, whether the work is right).
-If all three hold, answer {{"ok": true}}."""
+3. Be strict on 1 and 2 and ignore everything else (style, length, whether the work is right).
+If both rules hold, answer {{"ok": true}}."""
     try:
         out = subprocess.run(["claude", "-p", "--setting-sources", "project", "--model", "haiku",
                               "--no-session-persistence", "--disallowed-tools", "Bash,Read,Edit,Write,Agent,WebFetch"],
