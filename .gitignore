@@ -153,3 +153,5 @@ recipes/catalog_v3_checked.json
 .claude/.hook_backup/
 recipes/catalog_v3_checked_ext.json
 recipes/catalog_v3_checked_p5.json
+.claude/.pp_pools_ready
+analysis/catalog_v3/data/short_reads/
