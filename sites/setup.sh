@@ -48,6 +48,18 @@ if [ ! -x "$BIN" ]; then
 fi
 # non-interactive smoke: MG5 starts and quits (writes its configuration on first run)
 echo quit | timeout 600 "$BIN" >/dev/null 2>&1 || { echo "mg5_aMC does not start"; exit 1; }
+# catalog_v4 names its electroweak-loop model loop_qcd_qed_sm-no_b_mass, a restriction MadGraph does not ship: the
+# model's default restriction already has MB = ymb = 0 (only restrict_with_b_mass*.dat gives the b a mass), so the
+# no_b_mass card is that default restriction, copied unchanged and only after checking both are zero. Created, never
+# overwritten; the same physics as the plain loop_qcd_qed_sm catalog_v3 used.
+lq="$ROOT/models/loop_qcd_qed_sm"
+if [ -f "$lq/restrict_default.dat" ] && [ ! -e "$lq/restrict_no_b_mass.dat" ]; then
+  if grep -Eq '^ +5 +0\.0+e\+00 +# MB *$' "$lq/restrict_default.dat" && grep -Eq '^ +5 +0\.0+e\+00 +# ymb *$' "$lq/restrict_default.dat"; then
+    cp "$lq/restrict_default.dat" "$lq/restrict_no_b_mass.dat" && echo "installed $lq/restrict_no_b_mass.dat (= restrict_default.dat)"
+  else
+    echo "warning: $lq/restrict_default.dat gives the b a mass; loop_qcd_qed_sm-no_b_mass not installed"
+  fi
+fi
 # diagram sidecars (data/diagrams/, gitignored): regenerable, ~3 CPU-minutes, needed by every
 # catalog run. The train/val/test pools are NOT generated here: MG5 differs per site
 # (3.7.0 at CC-IN2P3, 3.6.7 elsewhere) and a pool's recipe id does not record the version,

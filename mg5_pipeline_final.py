@@ -1887,10 +1887,14 @@ def repatch_standalone_param_cards(standalone_dir, config):
         if os.path.exists(pc):
             patch_param_card_slha(pc, patches)
 
-def generate_mg5_process(process_name, config):
-    """Run MadGraph to generate the events dir plus two standalone outputs:
+def generate_mg5_process(process_name, config, events=False):
+    """Run MadGraph to generate the standalone outputs, plus the MadEvent dir only when asked:
        - <proc>_standalone     : standalone_cpp (C++ driver, fixed α_s) — fallback
        - <proc>_standalone_py  : Fortran standalone (matrix2py, per-event α_s) — preferred
+       - <proc>_events         : MadEvent output (events=True), read only by the fixed-energy LHE
+                                 mode of main() (configure_cards / run_event_generation / the LHE
+                                 reader). The recipe path (datagen.ensure_backend, generate_from_recipe)
+                                 reads the standalone alone, so it builds no events dir (~51 MB each).
     """
     events_dir    = f"{WORK_DIR}/{process_name}_events"
     standalone_dir = f"{WORK_DIR}/{process_name}_standalone"
@@ -1900,25 +1904,28 @@ def generate_mg5_process(process_name, config):
         generate_cmds = f"import model {config['model']}\n" + generate_cmds
 
     # Generation is complete only when the standalone tree is: a run killed mid-output
-    # (the 432-way parallel prebuild that died on fork) leaves the events dir and a
-    # partial standalone that would otherwise be "skipped" and then fail to compile forever.
-    complete = (os.path.exists(f"{standalone_dir}/Cards/param_card.dat")
-                and glob.glob(f"{standalone_dir}/SubProcesses/P*/CPPProcess.cc"))
-    if os.path.exists(events_dir) and not complete:
+    # (the 432-way parallel prebuild that died on fork) leaves a partial standalone that
+    # would otherwise be "skipped" and then fail to compile forever. The partial dirs are
+    # this function's own output; an events dir is removed with them only when it is
+    # rebuilt here (events=True), else it is left as it is.
+    complete = bool(os.path.exists(f"{standalone_dir}/Cards/param_card.dat")
+                    and glob.glob(f"{standalone_dir}/SubProcesses/P*/CPPProcess.cc"))
+    partial = [d for d in (standalone_dir, fortran_dir) + ((events_dir,) if events else ()) if os.path.isdir(d)]
+    if not complete and partial:
         print(f"[MG5] {process_name}: incomplete output from an interrupted run, regenerating.")
-        for d in (events_dir, standalone_dir, fortran_dir):
-            if os.path.isdir(d):
-                shutil.rmtree(d)
-    if not os.path.exists(events_dir):
+        for d in partial:
+            shutil.rmtree(d)
+    need_events = events and not os.path.exists(events_dir)
+    if not complete or need_events:
         print(f"\n[MG5] Generating process directories for {process_name}...")
         # The Fortran standalone (matrix2py) is only emitted when opted in — by
         # default the C++ driver + analytic α_s rescale covers everything.
         fortran_out = (f"output standalone {fortran_dir}\n"
-                       if os.environ.get("MG5_USE_MATRIX2PY") else "")
+                       if os.environ.get("MG5_USE_MATRIX2PY") and not complete else "")
         mg5_script = f"""
 {generate_cmds}
-output {events_dir}
-output standalone_cpp {standalone_dir}
+{f"output {events_dir}" if need_events else ""}
+{"" if complete else f"output standalone_cpp {standalone_dir}"}
 {fortran_out}"""
         result = subprocess.run(
             [MG5_BIN],
@@ -4136,7 +4143,7 @@ def main():
     # Step 1–3: Generate process dirs and events
     # ------------------------------------------------------------------
     if not args.skip_gen:
-        generate_mg5_process(args.process, config)
+        generate_mg5_process(args.process, config, events=True)
 
         if args.reset:
             print(f"\n[RESET] Deleting existing runs...")

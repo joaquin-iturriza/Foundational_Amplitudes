@@ -54,8 +54,13 @@ def sample():
     """name -> recipe spec (name, base, physics, sqrts) of the entries validated"""
     import mg5_pipeline_final as mg
     R = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
-    S1 = {e["name"]: e for f in ("gen_stage1", "gen_stage3", "gen_stage4")
-          for e in load(os.path.join(ROOT, "recipes", f"catalog_v4_{f}.yaml"))["processes"]}
+    S1, SAMP = {}, {}
+    for f in ("gen_stage1", "gen_stage3", "gen_stage4"):
+        rec = load(os.path.join(ROOT, "recipes", f"catalog_v4_{f}.yaml"))
+        for e in rec["processes"]:
+            # an entry's sampling is its own block, else its recipe's (register_recipe_processes' default_sampling)
+            S1[e["name"]] = e; SAMP[e["name"]] = e.get("sampling") or rec.get("sampling")
+    default_sampling = load(os.path.join(ROOT, "recipes", "catalog_v4_gen_stage1.yaml")).get("sampling")
     beam = lambda p: ("ee" if abs(p[0]) == 11 else "gg" if p[:2] == [21, 21] else "qg" if 21 in p[:2] else "qq")
     cells = {}
     for n3 in sorted(R):
@@ -77,18 +82,26 @@ def sample():
         # a named process that is no class representative (u u~ > d d~) is validated on its own v4 entry and window
         e = S1.get(n) or {"name": n, "sqrts": window(mg.PROCESSES[n])}
         out[n] = {"name": n, "base": e.get("base", n), "physics": e.get("physics") or {}, "sqrts": list(e["sqrts"]),
+                  "sampling": SAMP.get(n) or default_sampling,
                   "cell": next((f"{c[0]}:{c[1]}" for c, ns in cells.items() if n in ns), "other")}
     return out
 
 
 def register(spec):
+    """the entry registered exactly as the regeneration does (scan and sampling policy): without the sampling block
+    the generator takes the flat path, which refuses the log-uniform sqrt(s_hat)"""
     import mg5_pipeline_final as mg
-    if spec["physics"] or spec["base"] != spec["name"]:
-        mg.register_scan_process(spec["name"], spec["base"], spec["physics"])
+    mg.register_recipe_processes([{k: spec[k] for k in ("name", "base", "physics", "sampling")}])
+    assert spec["sampling"] is None or mg.PROCESSES[spec["name"]].get("sampling") == spec["sampling"], spec["name"]
+
+
+LOOP_RE = re.compile(r"Contributing diagrams generated:\s*(\d+) Born,\s*(\d+)(?:\(\+(\d+)\))? loops,"
+                     r"\s*(\d+) R2,\s*(\d+) UV")
 
 
 def mg_run(gen, model, timeout=3600):
-    """(exists, diagrams, the lines naming diagrams or the error) of one MadGraph generate"""
+    """(exists, diagrams, the lines naming diagrams or the error) of one MadGraph generate; a loop string's diagrams
+    are {born, loops, loops_discarded, R2, UV} summed over its subprocesses (MadLoop's 'Contributing diagrams' lines)"""
     import mg5_pipeline_final as mg
     r = subprocess.run([mg.MG5_BIN], input=f"import model {model}\n{gen}\ndisplay processes\nexit\n",
                        capture_output=True, text=True, timeout=timeout)
@@ -96,6 +109,11 @@ def mg_run(gen, model, timeout=3600):
     d = re.search(r"Total: 1 processes with (\d+) diagrams", out)
     lines = [l.strip() for l in out.splitlines() if "diagram" in l.lower()][-4:]
     err = re.search(r"(NoDiagramException|InvalidCmd|InvalidModel|Error)[^\n]{0,160}", out)
+    loop = LOOP_RE.findall(out)
+    if d is None and loop:
+        n = [sum(int(x[i] or 0) for x in loop) for i in range(5)]
+        dd = {"born": n[0], "loops": n[1], "loops_discarded": n[2], "R2": n[3], "UV": n[4], "subprocesses": len(loop)}
+        return err is None, dd, (err.group(0) if err else lines)
     return (d is not None and err is None), (int(d.group(1)) if d else None), (err.group(0) if err else lines)
 
 
@@ -125,15 +143,14 @@ def diagrams(name):
 
 
 def card(sa):
-    """MT, ymt, WT, MB, ymb and the model of a standalone"""
+    """MT, ymt, WT, MB, ymb and the model of a standalone. A standalone_cpp output has no proc card (its Cards/ holds
+    the param card only): the model is read from its src/Parameters_<model>.h, MadGraph's name with '-' as '_'"""
     pc = open(os.path.join(sa, "Cards", "param_card.dat")).read()
     val = lambda name: (float(m.group(1)) if (m := re.search(r"^\s*(?:DECAY\s+)?\d+\s+([-+0-9.eE]+)\s*#\s*" + name + r"\s*$",
                                                               pc, re.M)) else None)
-    proc = open(os.path.join(sa, "Cards", "proc_card_mg5.dat")).read() if os.path.exists(
-        os.path.join(sa, "Cards", "proc_card_mg5.dat")) else ""
-    model = re.findall(r"^\s*import model\s+(\S+)", proc, re.M)
+    hs = sorted(glob.glob(os.path.join(sa, "src", "Parameters_*.h")))
     return {"MT": val("MT"), "ymt": val("ymt"), "WT": val("WT"), "MB": val("MB"), "ymb": val("ymb"),
-            "model": model[-1] if model else None}
+            "model": os.path.basename(hs[0])[len("Parameters_"):-2] if len(hs) == 1 else None}
 
 
 def v4_mask(P, pdg, mf, cuts):
@@ -183,11 +200,11 @@ def one(args):
         sa = f"{mg.WORK_DIR}/{mg.standalone_name(name)}_standalone"
         m_t = float((spec["physics"].get("masses") or {}).get(6, mg.V4_MT))
         row["card"] = c = card(sa)
-        want_model = cfg.get("model")
+        want_model = cfg.get("model") or "sm"
         row["card_ok"] = bool(c["MT"] == m_t and c["ymt"] == m_t and c["WT"] is not None
                               and abs(c["WT"] - mg.top_width_lo(m_t)) < 1e-5 * max(1, c["WT"])
                               and (want_model != mg.V4_MODEL or (c["MB"] in (None, 0.0) and c["ymb"] in (None, 0.0)))
-                              and c["model"] == want_model)
+                              and c["model"] == want_model.replace("-", "_"))
         task = {"process": name, "count": n, "sqrts_min": float(lo), "sqrts_max": float(hi), "role": "val",
                 "seed": seed, "out_dir": os.path.join(OUT(), "pools", name), "idx": 0}
         t = time.time(); _, path = datagen.gen_chunk(task); row["t_gen"] = time.time() - t
@@ -274,10 +291,13 @@ def loops():
     mixed = [k for k in sorted(V.VIRT_PROCESSES) if V.VIRT_PROCESSES[k].get("_v4") and not V.VIRT_PROCESSES[k].get("loopind")
              and k in mg.PROCESSES and int(re.search(r"QED<=(\d+)", V.VIRT_PROCESSES[k]["mg5"]).group(1)) > mg.PROCESSES[k]["qed_v3"]]
     induced = [k for k in sorted(V.VIRT_PROCESSES) if V.VIRT_PROCESSES[k].get("_v4") and V.VIRT_PROCESSES[k].get("loopind")]
-    for k in mixed[:2] + induced[:1]:
+    # and one entry of each loop model (loop_qcd_qed_sm-no_b_mass needs its restriction card, sites/setup.sh)
+    by_model = [sorted(k for k in V.VIRT_PROCESSES if V.VIRT_PROCESSES[k].get("_v4") and V.VIRT_PROCESSES[k]["model"] == m)[:1]
+                for m in ("loop_qcd_qed_sm-no_b_mass",)]
+    for k in dict.fromkeys(mixed[:2] + induced[:1] + sum(by_model, [])):
         v = V.VIRT_PROCESSES[k]
         ok, d, info = mg_run(v["mg5"], v["model"], timeout=7200)
-        out.setdefault("generate", {})[k] = {"string": v["mg5"], "model": v["model"], "ok": ok, "info": info}
+        out.setdefault("generate", {})[k] = {"string": v["mg5"], "model": v["model"], "ok": ok, "diagrams": d, "info": info}
     return out
 
 
