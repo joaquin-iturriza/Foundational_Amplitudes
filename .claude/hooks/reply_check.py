@@ -64,6 +64,25 @@ def scan(path):
     return msgs, "\n\n".join(replies)
 
 
+STOP = set("the a an and or of to in on for with is are be it that this what why how do does did you your i me my we "
+           "not no yes so but if as at by from was were has have had can could would should will just about".split())
+
+
+def relevant(dec, text, keep=12):
+    """only the decisions that bear on this exchange (the user, 2026-10-25: "only decisions that are relevant"): each
+    decision line scored by the words it shares with the user's messages and the reply, the best `keep` with any
+    overlap; the whole list (~35 KB) made every check slow and noisy"""
+    words = {w for w in re.findall(r"[a-z][a-z0-9_+-]{2,}", text.lower()) if w not in STOP}
+    blocks = re.split(r"\n(?=\s*D\d+ )", dec)
+    scored = []
+    for b in blocks:
+        bw = {w for w in re.findall(r"[a-z][a-z0-9_+-]{2,}", b.lower()) if w not in STOP}
+        n = len(words & bw)
+        if n >= 2:
+            scored.append((n, b.strip()))
+    return "\n".join(b for _, b in sorted(scored, key=lambda x: -x[0])[:keep])
+
+
 def main():
     try:
         inp = json.load(sys.stdin)
@@ -89,6 +108,7 @@ def main():
         dec = subprocess.run(["site", "decisions", "--project", "FA"], capture_output=True, text=True, timeout=30).stdout
     except Exception:
         dec = ""
+    dec = relevant(dec, "\n".join(recent) + "\n" + reply)
     prompt = f"""You check one reply of an assistant to a researcher. Answer ONLY with JSON: {{"ok": true}} or
 {{"ok": false, "reason": "<one or two sentences naming exactly what is missing>"}}.
 
