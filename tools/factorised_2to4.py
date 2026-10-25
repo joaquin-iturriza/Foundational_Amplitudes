@@ -156,6 +156,7 @@ def main():
     ap.add_argument("--only", nargs="*", default=None)
     ap.add_argument("--v3", action="store_true",
                     help="every catalog_v3 2->4 class built as a 2->3 class plus g, a, Z or H (the skipped listed)")
+    ap.add_argument("--skip-done", action="store_true", help="skip a probe whose npz is already in --out (a rerun)")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     if a.v3:
@@ -164,6 +165,8 @@ def main():
         jobs = [(e["name"], mg.PROCESSES[e["name"]]["parent"], None) for e in yaml.safe_load(open(a.recipe))["processes"]]
     for p, parent, extra in jobs:
         if a.only and p not in a.only:
+            continue
+        if a.skip_done and os.path.exists(os.path.join(a.out, p + ".npz")):
             continue
         cfg = mg.PROCESSES[p]
         pcfg = mg.PROCESSES[parent]

@@ -11,4 +11,4 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-python tools/factorised_2to4.py --v3 --n 2000 --out "$SCRATCH/zz_factorised_v3_all"
+python tools/factorised_2to4.py --v3 --n 2000 --skip-done --out "$SCRATCH/zz_factorised_v3_all"
