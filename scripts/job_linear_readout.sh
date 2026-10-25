@@ -11,6 +11,9 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-CFGS=()
-for r in 6 7; do for k in 2 3 4 5 6 7 8; do CFGS+=("sweep/sweep_config_tp3_r${r}fte_uubar_Zg_d${k}.yaml"); done; done
+# with arguments: those sweep configs (e.g. every rung's ee_Za cells, the no-gain read-out of 2026-10-25)
+CFGS=("$@")
+if [ ${#CFGS[@]} -eq 0 ]; then
+  for r in 6 7; do for k in 2 3 4 5 6 7 8; do CFGS+=("sweep/sweep_config_tp3_r${r}fte_uubar_Zg_d${k}.yaml"); done; done
+fi
 python tools/linear_readout.py --out "$SCRATCH/zz_linear_readout" "${CFGS[@]}"
