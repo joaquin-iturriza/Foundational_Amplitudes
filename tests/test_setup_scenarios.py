@@ -1162,6 +1162,58 @@ def decision_quotes():
              "go ahead with all of it" in out, out[-600:])
 
 
+SITE_STUB_LAUNCH = r'''#!/bin/sh
+# a stub of site for the launcher: pick says ccin2p3, run prints the site's commit, submit prints a run id
+case "$1" in
+  pick) echo "  pick: ccin2p3" ;;
+  run) echo "a login notice"; echo "$STUB_SITE_SHA" ;;
+  submit) echo "submit $*" >> "$STUB_LOG"; echo "  run FA-ccin2p3-stub0001 (job 1)" ;;
+  sync) echo "sync $*" >> "$STUB_LOG" ;;
+esac
+'''
+
+
+def plan_commits_and_launches():
+    """Every plan write is a trunk commit; a NOSYNC launch against a site checkout that differs only in plan/ runs the
+    same code and goes out, one whose code differs is refused (2026-10-25: launches failed or deferred on the race)."""
+    repo = tempfile.mkdtemp(prefix="launch_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q"); os.makedirs(os.path.join(repo, "scripts")); os.makedirs(os.path.join(repo, "plan"))
+    for f in ("launch_cc_only.sh", "same_code.sh"):
+        shutil.copy(os.path.join(ROOT, "scripts", f), os.path.join(repo, "scripts", f))
+    open(os.path.join(repo, "job.sh"), "w").write("echo job\n")
+    open(os.path.join(repo, "plan", "plan.yaml"), "w").write("entries: []\n")
+    g("add", "."); g("commit", "-qm", "code")
+    site_at = g("rev-parse", "HEAD").stdout.strip()
+    open(os.path.join(repo, "plan", "plan.yaml"), "a").write("# a plan write\n"); g("commit", "-qam", "plan: set-next x")
+    plan_only = g("rev-parse", "HEAD").stdout.strip()
+    r = lambda *a: subprocess.run(["bash", os.path.join(repo, "scripts", "same_code.sh")] + list(a),
+                                  capture_output=True).returncode
+    open(os.path.join(repo, "job.sh"), "a").write("echo changed\n"); g("commit", "-qam", "code change")
+    code = g("rev-parse", "HEAD").stdout.strip()
+    scenario("same_code.sh: a commit apart by plan/ only is the same code; a code change or an unknown commit is not",
+             r(site_at, plan_only) == 0 and r(site_at, code) == 1 and r("0" * 40, plan_only) == 1)
+    bindir, home = tempfile.mkdtemp(prefix="bin_"), tempfile.mkdtemp(prefix="home_")
+    os.makedirs(os.path.join(home, ".local", "share", "ccorch", "launch", "FA"))    # the launcher's submitted list
+    open(os.path.join(bindir, "site"), "w").write(SITE_STUB_LAUNCH)
+    os.chmod(os.path.join(bindir, "site"), 0o755)
+    log = os.path.join(home, "stub.log")
+    env = dict(os.environ, PATH=bindir + os.pathsep + os.environ["PATH"], HOME=home, STUB_SITE_SHA=site_at,
+               STUB_LOG=log, NOSYNC="1")
+
+    def launch(head, key):
+        g("checkout", "-q", head)
+        return subprocess.run(["bash", os.path.join(repo, "scripts", "launch_cc_only.sh"), key, "0.1", "a test launch",
+                               "job.sh"], capture_output=True, text=True, env=env)
+    a = launch(plan_only, "item_a")
+    b = launch(code, "item_b")
+    sub = open(log).read() if os.path.exists(log) else ""
+    scenario("a NOSYNC launch against a site checkout behind by plan commits only goes out; a code difference is "
+             "refused", a.returncode == 0 and "run FA-ccin2p3-stub0001" in a.stdout and b.returncode == 2
+             and "the code differs" in b.stdout and len(sub.splitlines()) == 1 and "item_a" in sub,
+             a.stdout + b.stdout + sub)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1182,7 +1234,7 @@ GROUPS = [liveness, files, answers, adding, questions, holds, done, migration, c
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, the_suite_itself]
+          decision_quotes, plan_commits_and_launches, the_suite_itself]
 
 
 def main():

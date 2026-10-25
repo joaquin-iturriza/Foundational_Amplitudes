@@ -22,7 +22,8 @@ echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
 # a submission counts only once it printed its run id (2026-10-23: submits refused for an uncommitted file went
 # unnoticed behind a filtered output, and the scorings were never queued)
-# NOSYNC only against the commit this checkout is at: a failed batch sync (a dirty tree) once let two jobs run on old code
+# NOSYNC only against the code this checkout has (the same commit, or one that differs only in plan/, which every plan
+# write commits; scripts/same_code.sh): a failed batch sync (a dirty tree) once let two jobs run on old code
 # SYNC_FIRST=1 (a single queued launch): sync right after the pick, so a commit landed during the pick
 # (minutes) does not trip the check (2026-10-25: a sync before the launcher lost the race to a parallel commit)
 if [ -n "$NOSYNC" ] && [ -n "$SYNC_FIRST" ]; then
@@ -31,7 +32,8 @@ fi
 if [ -n "$NOSYNC" ]; then
     here=$(git -C "$(dirname "$0")/.." rev-parse HEAD)
     there=$(site run ccin2p3 FA -- git rev-parse HEAD 2>/dev/null | grep -oE '^[0-9a-f]{40}$' | tail -1)
-    [ "$here" = "$there" ] || { echo "NOSYNC refused: CC is at ${there:-?}, this checkout at $here; run site sync first"; [ -n "$SYNC_FIRST" ] && exit 75; exit 2; }
+    # the same job code is enough: commits between the two that touch only plan/ (plan writes) change no code
+    [ "$here" = "$there" ] || bash scripts/same_code.sh "$there" "$here" || { echo "NOSYNC refused: CC is at ${there:-?}, this checkout at $here, and the code differs; run site sync first"; [ -n "$SYNC_FIRST" ] && exit 75; exit 2; }
 fi
 out=$(site submit ccin2p3 FA "$JOB" ${NOSYNC:+--no-sync} ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} ${V3_AXES:+--env "V3_AXES=$V3_AXES"} ${AMP_LHE_CORES:+--env AMP_LHE_CORES=$AMP_LHE_CORES} ${ARMS:+--env "ARMS=$ARMS"} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
 echo "$out"
