@@ -910,12 +910,15 @@ entries:
     runs:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-ec84e913
-    commit: 4a53ccd
+    commit: 09d4ee9
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/figs/coverage_fwd_c.png
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
+    - analysis/catalog_v4/validate_v4.py
+    - recipes/gen_catalog_v4.py
+    - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
   dead_ends: []
   asks: []
