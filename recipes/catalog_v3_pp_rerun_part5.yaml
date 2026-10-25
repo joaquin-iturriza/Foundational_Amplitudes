@@ -21,28 +21,28 @@ processes:
   n_train: 10000
   n_val: 2000
   n_test: 2000
-- name: pp13_dbx_htxuz
+- name: pp13_udx_aaawp
   sqrts:
   - 13000
   - 13000
   n_train: 10000
   n_val: 2000
   n_test: 2000
-- name: pp13_uux_wpwmzz
+- name: pp13_uux_aepemg
   sqrts:
   - 13000
   - 13000
   n_train: 10000
   n_val: 2000
   n_test: 2000
-- name: pp13_dg_dggg
+- name: pp13_udx_aawpz
   sqrts:
   - 13000
   - 13000
   n_train: 10000
   n_val: 2000
   n_test: 2000
-- name: pp13_ub_adtz
+- name: pp13_dg_bbxdg
   sqrts:
   - 13000
   - 13000

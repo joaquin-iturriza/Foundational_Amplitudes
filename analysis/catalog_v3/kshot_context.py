@@ -70,7 +70,14 @@ def main():
         s = res[ax]
         print(f"{ax:5s} {s['n']:3d}/{len(exp):3d} zero {s['zero']:.3g} floor {s['floor']:.3g} | K=16 off {s['off16']:.3g} "
               f"shr {s['shr16']:.3g} fit {s['fit16']:.3g} fit<shr {s['fit_beats_shrunk16']:.2f}")
-    res["pooled"] = {k: summary(v) for k, v in pooled.items() if v}
+    # a pool is shown only when every axis in it is complete; its counts and any missing axis are recorded
+    res["pooled"] = {}
+    for k, axes in (("inside", [a for a in AXES if a not in BEYOND]), ("beyond", list(BEYOND))):
+        n_exp = sum(res[a].get("n_expected", 0) for a in axes)
+        incomplete = [a for a in axes if res[a]["n"] < res[a]["n_expected"]]
+        res["pooled"][k] = {**(summary(pooled[k]) if pooled[k] else {"n": 0}), "n_expected": n_exp,
+                            "incomplete_axes": incomplete}
+        print(f"pooled {k}: {res['pooled'][k]['n']}/{n_exp}" + (f", incomplete {incomplete}" if incomplete else ""))
     json.dump(res, open(os.path.join(HERE, "data", "kshot_context.json"), "w"), indent=1)
     plot(res["pooled"])
 
@@ -80,7 +87,8 @@ def plot(pooled):
     fig, axs = ps.figure(ncols=2)
     labels = {"inside": "within the catalog's range", "beyond": r"$2\to5$ and $1$-$10$ TeV"}
     for ax, key in zip(axs, ("inside", "beyond")):
-        if key not in pooled:
+        if not pooled.get(key) or pooled[key]["incomplete_axes"]:
+            print(f"{key}: not plotted, incomplete axes {pooled.get(key, {}).get('incomplete_axes')}")
             continue
         r = pooled[key]
         x = [0] + KS

@@ -43,6 +43,8 @@ def main():
     # measured on the first pass (recipes/catalog_v3_pp_margins.json: name -> margin)
     mp = os.path.join(HERE, "catalog_v3_pp_margins.json")
     margins = json.load(open(mp)) if os.path.exists(mp) else {}
+    rp = os.path.join(HERE, "catalog_v3_pp_runs.json")
+    runs = json.load(open(rp)) if os.path.exists(rp) else {}
     procs, cards = {}, {}
     base_card = os.path.join(HERE, "catalog_v3_pp", "param_card.dat")
     for n in hadronic:
@@ -60,7 +62,11 @@ def main():
                 assert not left, (n, left)
                 cards[fn] = pat
             own = {"lhe": {"param_card": fn}}
-        if margins.get("pp13_" + n[len("v3_"):]):
+        # a process whose MadEvent run stalls at a few thousand events however many are asked: several runs
+        # (catalog_v3_pp_runs.json: name -> n_runs, from the events one run returned), at the default margin
+        if runs.get("pp13_" + n[len("v3_"):]):
+            own.setdefault("lhe", {})["n_runs"] = runs["pp13_" + n[len("v3_"):]]
+        elif margins.get("pp13_" + n[len("v3_"):]):
             own.setdefault("lhe", {})["margin"] = margins["pp13_" + n[len("v3_"):]]
         procs["pp13_" + n[len("v3_"):]] = {**own, 
             "kind": "lhe_pp", "folder": "pp13_" + n[len("v3_"):], "mg5_generate": list(c["mg5_generate"]),
@@ -104,7 +110,12 @@ def main():
             yaml.safe_dump({"processes": order[k::8]}, f, sort_keys=False)
     # the rerun of the processes whose MadEvent run came back short, each at its own margin: the five largest margins
     # alone (the longest MadEvent runs), the rest dealt into five parts
-    short = sorted((e for e in test if e["name"] in margins), key=lambda e: -margins[e["name"]])
+    short = sorted((e for e in test if e["name"] in margins and e["name"] not in runs), key=lambda e: -margins[e["name"]])
+    # the stalled processes' own rerun, one job each
+    for k, e in enumerate(e for e in test if e["name"] in runs):
+        with open(os.path.join(HERE, f"catalog_v3_pp_runs_part{k}.yaml"), "w") as f:
+            f.write(hdr)
+            yaml.safe_dump({"processes": [e]}, f, sort_keys=False)
     parts = [[e] for e in short[:5]] + [short[5:][k::5] for k in range(5)]
     for k, es in enumerate(p for p in parts if p):
         with open(os.path.join(HERE, f"catalog_v3_pp_rerun_part{k}.yaml"), "w") as f:

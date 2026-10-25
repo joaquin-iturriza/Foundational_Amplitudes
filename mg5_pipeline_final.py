@@ -3552,6 +3552,8 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             "block":             [lo, lo + n],
             "run_card_sha256":   _file_sha256(run_card),
             "param_card_sha256": _file_sha256(param_card),
+            # several MadEvent runs only where set (lhe.n_runs > 1), so every other pool keeps its identity
+            **({"n_runs": int(cfg["lhe"]["n_runs"])} if int(cfg["lhe"].get("n_runs", 1)) > 1 else {}),
         },
     }
 
@@ -3610,7 +3612,7 @@ def lhe_prepare(process, work_root, log_path):
     return ev, sa
 
 
-def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1):
+def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01"):
     """generate_events in `ev` with the catalog's cards (nevents and iseed set). run_mode 0 (one core)
     unless mg_cores > 1. Returns (lhe_path, banner_path)."""
     cfg = PROCESSES[process]
@@ -3623,12 +3625,12 @@ def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1):
                     {"run_mode": 0 if mg_cores == 1 else 2, "nb_core": mg_cores,
                      "automatic_html_opening": "False"})
     with open(log_path, "a") as log:
-        r = subprocess.run([f"{ev}/bin/generate_events", "run_01", "-f"], cwd=ev, stdout=log,
+        r = subprocess.run([f"{ev}/bin/generate_events", run_name, "-f"], cwd=ev, stdout=log,
                            stderr=subprocess.STDOUT, env=dict(os.environ, OMP_NUM_THREADS="1"))
-    lhe = f"{ev}/Events/run_01/unweighted_events.lhe.gz"
+    lhe = f"{ev}/Events/{run_name}/unweighted_events.lhe.gz"
     if r.returncode != 0 or not os.path.exists(lhe):
         raise RuntimeError(f"{process}: generate_events exited {r.returncode}, no {lhe}; log {log_path}")
-    banners = sorted(glob.glob(f"{ev}/Events/run_01/*_banner.txt"))
+    banners = sorted(glob.glob(f"{ev}/Events/{run_name}/*_banner.txt"))
     return lhe, (banners[0] if banners else None)
 
 
@@ -3737,18 +3739,28 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     secs, t0 = {}, time.time()
     ev, sa = lhe_prepare(process, work_root, log_path)
     secs["output"] = time.time() - t0; t0 = time.time()
-    lhe, banner = lhe_run_madevent(process, ev, n_req, iseed, log_path, mg_cores)
+    # a process whose MadEvent run returns a fixed few thousand events however many are asked (its unweighting stalls)
+    # runs n_runs times with seeds iseed + 7919 k (lhe.n_runs, in its pool identity), the unweighted events concatenated
+    n_runs = int(cfg["lhe"].get("n_runs", 1))
+    moms, aqcds = [], []
+    for k in range(n_runs):
+        lhe, b = lhe_run_madevent(process, ev, n_req, (iseed + 7919 * k - 1) % 30000 + 1, log_path, mg_cores,
+                                  run_name=f"run_{k + 1:02d}")
+        banner = banner if k else b
+        m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+        moms.append(m_k); aqcds.append(a_k)
     secs["madevent"] = time.time() - t0; t0 = time.time()
-    mom, aqcd, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+    mom, aqcd = np.concatenate(moms), np.concatenate(aqcds)
     secs["parse"] = time.time() - t0; t0 = time.time()
     n_lhe = len(mom)
     need = max(r["lhe"]["block"][1] for r in recs)
     if n_lhe < need:
         raise RuntimeError(f"{process}: MadEvent returned {n_lhe} events, the blocks need {need} "
-                           f"(asked {n_req}); raise AMP_LHE_MARGIN")
+                           f"(asked {n_req} in {n_runs} run(s)); raise lhe.margin, or lhe.n_runs if a larger "
+                           f"request returns no more events")
     order = np.random.default_rng(np.random.SeedSequence([seed, iseed])).permutation(n_lhe)
     mom, aqcd = mom[order], aqcd[order]
-    xsec, version = _banner_xsec(banner), _mg5_version()
+    xsec, version = _banner_xsec(banner), _mg5_version()     # the first run's banner (each run's own events counted below)
     npart = int(cfg["nfinal"]) + 2
     pdg_row = np.asarray(cfg["pdg_ids"], dtype=np.float64)
     out = []
@@ -3787,6 +3799,8 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         full["effective_seed"] = seed
         full["backend"] = "cpp"
         full["lhe_run"] = {"n_lhe_events": n_lhe, "xsec_pb": xsec, "mg5_version": version,
+                           "iseeds": [(iseed + 7919 * k - 1) % 30000 + 1 for k in range(n_runs)],
+                           "events_per_run": [len(m_k) for m_k in moms],
                            "banner": bcopy, "mg_cores": int(mg_cores),
                            "alphas_range": [float(a.min()), float(a.max())],
                            "amp_range": [float(amps.min()), float(amps.max())],

@@ -21,11 +21,13 @@ ls "$PAR"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoi
 test -e "$PAR/context_names.json" || { echo "$PAR has no context_names.json"; exit 1; }
 R="$SCRATCH/zz_kshot_v3_recipes/$AX"; OUT="$SCRATCH/zz_kshot_v3/$AX"; mkdir -p "$R" "$OUT"
 python - "$R" "recipes/catalog_v3_heldout_$AX.yaml" <<'PY'
-import sys, yaml
+import os, sys, yaml
 r = yaml.safe_load(open(sys.argv[2]))
 top = {k: v for k, v in r.items() if k != "processes"}
 for p in r["processes"]:
-    yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
+    f = f"{sys.argv[1]}/{p['name']}.yaml"           # through a temp file: the axis's parts write them at once
+    yaml.safe_dump({**top, "processes": [p]}, open(f + ".tmp%d" % os.getpid(), "w"))
+    os.replace(f + ".tmp%d" % os.getpid(), f)
 print(len(r["processes"]), "recipes")
 PY
 ALL=("$R"/*.yaml); P=()

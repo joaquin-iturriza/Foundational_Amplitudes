@@ -21011,7 +21011,7 @@ processes:
     parent: v3_dsx_acxu
   pp13_dsx_acxuz:
     lhe:
-      margin: 4.38
+      n_runs: 5
     kind: lhe_pp
     folder: pp13_dsx_acxuz
     mg5_generate:
