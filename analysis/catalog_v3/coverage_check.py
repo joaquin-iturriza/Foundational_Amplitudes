@@ -24,24 +24,50 @@ event for event (checked at the start of `run`).
 
 Three samples per class: `current` (the pools' cuts and measure), `proposed` (the coverage above, the forward
 component, sqrt(s_hat) uniform on the class's window as now) and `wide` (the proposed coverage with sqrt(s_hat)
-log uniform on [window bottom, SQRTS_WIDE]: what a pp-like falling measure reaching several TeV changes).
+log uniform on [window bottom, max(SQRTS_WIDE, window top)]: what a pp-like falling measure reaching several TeV changes).
 
-Per class (the 1586 tree classes of recipes/catalog_v3_roles.json, every one; the one-loop and loop-induced entries are
-not part of this check), N events under each coverage on its own sqrt(s_hat) window, labelled by its compiled backend
-with alpha_s(sqrt s_hat) as in generation:
+The check's own choices, none of them the user's (open for the user; what moves with each):
+  b and tau cut (HEAVY_CUT)    the proposed samples of the 481 classes with a b or tau final, their range, the b and tau
+                               shares below, the pp share inside the proposed coverage (in_new vs in_new_b_tau_uncut)
+  |cos theta| < 0.99 on e+e-   the e+e- classes' proposed samples and range
+  FWD_SHARE 0.15, FWD_CAND 1/3 the forward shares, the forward cover of the pp events (u_overlap, the forward ESS and
+                               uncovered share), the share outside the current cuts and the range growth at the top
+  SQRTS_WIDE 6 TeV             the wide sample and its range, the pp shares up to it (in_new_wide, above_wide) and the
+                               *_wide measures' ESS
+  the sqrt(s_hat)^-3 measure   its ESS only (lumi_wide)
+  the harder-cut probes        keep their own pT threshold (30 GeV) in the proposed coverage, the other cuts as proposed
+
+Every catalog_v3 entry, in two modes:
+  sampled  every tree pool generated (recipes/catalog_v3_gen_stage1, 3 and 4: the 1586 tree classes, the 105
+           heavy-quark mass points, the 12 BSM entries, the 40 2->5 probes, the 24 alpha_s points, the 40 entries on a
+           1-10 TeV window and the 40 at pT > 30 GeV), N events under each coverage on its own window, labelled by its
+           compiled backend with alpha_s(sqrt s_hat) as in generation; the 1586 tree classes keep the first run's
+           seeds, so their samples are the first run's
+  read     the 150 one-loop and 17 loop-induced pools (stage 2): no new sample. Their labels come from MadLoop, which
+           datagen runs one process per pool in an isolated subprocess (a process singleton that changes directory), so
+           the worker pool here cannot label them, and a 2->3 one-loop event costs 100 to 200 tree units. What needs no
+           new label is read: the range of the existing validation pool, and for a hadronic one-loop pool the
+           kinematic coverage of its tree's pp events (current cuts and window, proposed, proposed to SQRTS_WIDE, the
+           forward angle; the pp labels are the tree's, so no range comparison). The loop-induced pools have no tree
+           and no pp pool: range only.
+Per entry:
   range      log10|M|^2 quantiles (0.1%, 1%, 50%, 99%, 99.9%), min and max, of the current-coverage sample, the
              proposed sample and the class's existing validation pool (10000 events, $DATA_DIR); the growth is the
              proposed sample's 0.1% to 99.9% width minus the current sample's, at equal N
   new region the share of the proposed sample outside the current cuts
-  b and tau  on the current sample, the share of events whose b or tau legs fail the current thresholds (what the
-             pools now hold that the proposed coverage removes) and the 0.1% to 99.9% width without those events
+  b and tau  on the current sample, the share of events whose b or tau legs fail the thresholds and the 0.1% to
+             99.9% width without those events, under the current thresholds (b_tau_fail_share, width_999_b_tau_cut)
+             and under the proposed ones (b_tau_fail_share_proposed, width_999_b_tau_cut_proposed: what the pools now
+             hold that the proposed coverage removes)
   forward    u = log(1/(1 - |cos theta|)) of the most forward final particle (any final, massive ones too: small |t|
              and beam-collinear emissions), histogrammed on U_EDGES for each sample and the pp events; the overlap
              sum_bins min(p_pp, p_sample) and the pp share and each sample's share beyond the current edge (|cos| > 0.9)
   cost       per coverage, seconds of sampling and of labelling, events labelled and drawn per kept event; the CPU hours
              of the full pools (n_train + n_val + n_test of the recipe) follow from the seconds per kept event
   pp         for a hadronic class, its 13 TeV pp validation pool (pp13_<class>, 2000 events, boosted to the partonic
-             frame): the share inside the current cuts, inside the proposed coverage, inside the class's sqrt(s_hat)
+             frame; for an alpha_s point, a 1-10 TeV or a pT > 30 GeV entry its base class's pool, the |M|^2 range
+             comparison only where the labels are the base's, i.e. not for an alpha_s point; none for a heavy-quark mass
+             point, whose top is off the pp events' shell, a BSM entry or a 2->5 probe, which have no pp pool): the share inside the current cuts, inside the proposed coverage, inside the class's sqrt(s_hat)
              window, the share each proposed cut alone removes, and the share of the pp events inside the coverage and
              window whose log|M|^2 lies inside the proposed sample's range (the current sample's for the current cuts);
              the share above the window's top and above SQRTS_WIDE, the share inside the proposed coverage on the wide
@@ -50,7 +76,7 @@ with alpha_s(sqrt s_hat) as in generation:
              reweighted from each candidate measure (uniform on the window, uniform and log uniform to SQRTS_WIDE, and
              a luminosity-like sqrt(s_hat)^-3 to SQRTS_WIDE; w = p_pp / q, p_pp a histogram of the pp events in
              log sqrt(s_hat); events outside a measure's support count as uncovered, reported apart)
-Rows are appended to $SCRATCH/zz_cov_check/rows.jsonl as classes finish (a rerun skips the classes already there).
+Rows are appended to $SCRATCH/zz_cov_check/ROWS as classes finish (a rerun skips the classes already there).
     python analysis/catalog_v3/coverage_check.py run [--n 2000] [--workers 32]          (CPU job on CC)
     site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v3/coverage_check.py collect \
         > analysis/catalog_v3/data/coverage_rows.json
@@ -79,21 +105,62 @@ SQRTS_WIDE = 6000.0  # GeV, the wide window's top
 U_EDGES = np.linspace(0.0, 10.0, 21)    # u = log(1/(1-|cos theta|)); |cos| = 0.9 is u = 2.30, |eta| = 5 is u = 9.31
 QS = (0.001, 0.01, 0.5, 0.99, 0.999)
 OUT = lambda: os.path.join(os.environ["SCRATCH"], "zz_cov_check")
+ROWS = "rows_v2.jsonl"   # the second run: every entry, the b and tau shares under both thresholds (rows.jsonl: the first)
+PT_HARD = 30.0           # the harder-cut probes' own threshold, kept in their proposed coverage
 
 
 def classes():
-    """every tree class: name -> (window, role/axis, pool sizes)"""
-    T = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
+    """every catalog_v3 entry: name -> window, group, pool size, type, base and physics; the 1586 tree classes first"""
+    R = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))
     rec = {}
-    for f in ["catalog_v3_train.yaml"] + [f"catalog_v3_heldout_{a}.yaml" for a in ("H1", "H2", "H3")]:
-        for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f)))["processes"]:
+    for st in (1, 2, 3, 4):
+        for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v3_gen_stage{st}.yaml")))["processes"]:
             rec.setdefault(e["name"], e)
+    axis = {}
+    for a in ("H2p5", "H6", "H7E", "H7c"):
+        for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v3_heldout_{a}.yaml")))["processes"]:
+            axis[e["name"]] = a
+
+    def typ(n, e):
+        if n in R["trees"]:
+            return "tree"
+        if n in R["heavy_quark"]:
+            return "heavy_quark"
+        if n in R["loops"]:
+            return "one_loop"
+        if n in R["loop_induced"]:
+            return "loop_induced"
+        if "__as" in n:
+            return "alpha_s"
+        if n.endswith("__E10"):
+            return "high_energy"
+        if (e.get("physics") or {}).get("cuts"):
+            return "harder_cut"
+        if axis.get(n) == "H2p5":
+            return "probe_2to5"
+        return "bsm"
     out = {}
-    for n, r in T.items():
+    for n in sorted(R["trees"]) + sorted(n for n in rec if n not in R["trees"]):
         e = rec[n]
-        out[n] = {"sqrts": [float(x) for x in e["sqrts"]], "group": "train" if r["role"] == "train" else r["axis"],
-                  "n_pool": int(e["n_train"]) + int(e["n_val"]) + int(e["n_test"])}
+        t = typ(n, e)
+        r = (R["trees"].get(n) or R["heavy_quark"].get(n) or R["loops"].get(n) or R["loop_induced"].get(n) or {})
+        g = "train" if r.get("role") == "train" else (r.get("axis") or axis.get(n) or "train")
+        out[n] = {"sqrts": [float(x) for x in e["sqrts"]], "group": g, "type": t,
+                  "n_pool": int(e["n_train"]) + int(e["n_val"]) + int(e["n_test"]),
+                  "base": e.get("base", n), "physics": e.get("physics") or {},
+                  "tree": (R["loops"].get(n) or {}).get("tree")}
     return out
+
+
+def register(C):
+    """the scan entries (heavy-quark masses, alpha_s points, the harder cuts, a base other than the name) into
+    mg5_pipeline_final.PROCESSES, as generation registers them"""
+    import mg5_pipeline_final as mg
+    for n, info in C.items():
+        if info["type"] in ("one_loop", "loop_induced"):
+            continue
+        if info["physics"] or info["base"] != n:
+            mg.register_scan_process(n, info["base"], info["physics"])
 
 
 def kind(cfg):
@@ -331,7 +398,8 @@ def ess(rs, lo, hi, density):
     return float(ins.mean()), float(w.sum() ** 2 / (len(w) * (w ** 2).sum()))
 
 
-def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists):
+def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists, wide_hi=SQRTS_WIDE):
+    """name: the tree class whose pp pool is read; rng_* None: no |M|^2 range comparison (labels not this entry's)"""
     import mg5_pipeline_final as mg
     pn = "pp13_" + name[len("v3_"):]
     f = os.path.join(os.environ["DATA_DIR"], f"{pn}_13000-13000GeV_val_lhe_amplitudes.npy")
@@ -350,17 +418,17 @@ def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists):
     new_nobt = pass_mask(P, s_cur, cuts_new)                 # the proposed thresholds, b and tau left uncut
     lo, hi = sq
     inw = (rs >= lo) & (rs <= hi)
-    inwide = (rs >= lo) & (rs <= SQRTS_WIDE)
+    inwide = (rs >= lo) & (rs <= wide_hi)
     inr = lambda m, r: float(((l >= r[0]) & (l <= r[1]))[m].mean()) if m.any() and r else None
     u = u_forward(P)
     hp = u_hist(u)
     meas = {"uniform_window": (lo, hi, lambda x: np.ones_like(x)),
-            "uniform_wide": (lo, SQRTS_WIDE, lambda x: np.ones_like(x)),
-            "log_wide": (lo, SQRTS_WIDE, lambda x: 1.0 / x),
-            "lumi_wide": (lo, SQRTS_WIDE, lambda x: x ** -3.0)}
+            "uniform_wide": (lo, wide_hi, lambda x: np.ones_like(x)),
+            "log_wide": (lo, wide_hi, lambda x: 1.0 / x),
+            "lumi_wide": (lo, wide_hi, lambda x: x ** -3.0)}
     out = {"n": int(len(P)), "in_cur": float(cur.mean()), "in_new": float(new.mean()),
            "in_new_b_tau_uncut": float(new_nobt.mean()), "in_window": float(inw.mean()),
-           "above_window": float((rs > hi).mean()), "above_wide": float((rs > SQRTS_WIDE).mean()),
+           "above_window": float((rs > hi).mean()), "above_wide": float((rs > wide_hi).mean()),
            "in_cur_window": float((cur & inw).mean()), "in_new_window": float((new & inw).mean()),
            "in_new_wide": float((new & inwide).mean()),
            "fail_new": single_cut_fails(P, s_new, cuts_new),
@@ -376,10 +444,16 @@ def one(task):
     name, info, n, seed = task
     import datagen
     import mg5_pipeline_final as mg
+    if info["type"] in ("one_loop", "loop_induced"):
+        return one_loop(task)
     cfg = mg.PROCESSES[name]
     kd = kind(cfg)
-    cuts_new = COVERAGE[kd]
+    cuts_cur = dict(cfg.get("fiducial_cuts") or mg.FIDUCIAL_CUTS)
+    cuts_new = dict(COVERAGE[kd])
+    if info["type"] == "harder_cut":
+        cuts_new["pt_min"] = max(cuts_new["pt_min"], cuts_cur["pt_min"])
     lo, hi = info["sqrts"]
+    wide_hi = max(SQRTS_WIDE, hi)
     sa = datagen.ensure_backend(name)
     _, _, driver_bin, eff_dir = mg.detect_compiled_backend(sa)
     perm = mg.row_to_slot_perm(cfg["pdg_ids"], cfg["mg5_generate"])
@@ -389,10 +463,11 @@ def one(task):
     s_cur, s_new = cut_slots(m, pdg, False), cut_slots(m, pdg, True)
     beams = "".join(sorted("l" if abs(int(p)) in LEPTON_BEAMS else ("g" if int(p) == 21 else "b" if abs(int(p)) == 5
                                                                     else "q") for p in pdg[:2]))
-    row = {"name": name, "kind": kd, "group": info["group"], "nfinal": int(cfg["nfinal"]), "sqrts": info["sqrts"],
+    row = {"name": name, "kind": kd, "group": info["group"], "type": info["type"], "base": info["base"],
+           "nfinal": int(cfg["nfinal"]), "sqrts": info["sqrts"], "wide_top": wide_hi, "cuts_current": cuts_cur,
            "n_pool": info["n_pool"], "n": n, "beams": beams, "n_cut_legs_current": len(s_cur),
            "n_cut_legs_proposed": len(s_new), "has_b_tau": any(abs(int(p)) in HEAVY_CUT for p in pdg[2:])}
-    m_cur = lambda P: mg.fiducial_pass_mask(P, m, pdg, mg.FIDUCIAL_CUTS)
+    m_cur = lambda P: mg.fiducial_pass_mask(P, m, pdg, cuts_cur)
     m_new = lambda P: pass_mask(P, s_new, cuts_new)
     try:
         with mg.CppDriverPipe(driver_bin, eff_dir) as pipe:
@@ -400,7 +475,7 @@ def one(task):
             S = {"current": build(n, lo, hi, m, pdg, np.random.default_rng(seed), m_cur, pol, label),
                  "proposed": build(n, lo, hi, m, pdg, np.random.default_rng(seed + 1), m_new, pol, label,
                                    FWD_SHARE, FWD_CAND, cuts_new["cos_max"]),
-                 "wide": build(n, lo, SQRTS_WIDE, m, pdg, np.random.default_rng(seed + 2), m_new, pol, label,
+                 "wide": build(n, lo, wide_hi, m, pdg, np.random.default_rng(seed + 2), m_new, pol, label,
                                FWD_SHARE, FWD_CAND, cuts_new["cos_max"], log_sqrts=True)}
         hists = {}
         for key, (P, sq, me, st) in S.items():
@@ -410,18 +485,53 @@ def one(task):
                             sqrts_q=[float(x) for x in np.quantile(sq, (0.1, 0.5, 0.9, 0.99))])
         for key in ("proposed", "wide"):
             row[key]["outside_current_cuts"] = float(1.0 - m_cur(S[key][0]).mean())
-        # b and tau: what the current sample holds that the proposed thresholds would cut on those legs alone
+        # b and tau: what the current sample holds that the thresholds would cut on those legs, under the current
+        # thresholds and under the proposed ones (the other legs pass both: the current sample is inside the current
+        # cuts, which are as tight or tighter on them)
         Pc, _, mc, _ = S["current"]
         bt = [i for i in s_new if i not in s_cur]
         if bt:
-            keep = pass_mask(Pc, s_new, mg.FIDUCIAL_CUTS)
-            row["current"]["b_tau_fail_share"] = float(1.0 - keep.mean())
-            row["current"]["width_999_b_tau_cut"] = quantiles(mc[keep]).get("width_999")
+            for tag, C in (("", cuts_cur), ("_proposed", cuts_new)):
+                keep = pass_mask(Pc, s_new, C)
+                row["current"]["b_tau_fail_share" + tag] = float(1.0 - keep.mean())
+                row["current"]["width_999_b_tau_cut" + tag] = quantiles(mc[keep]).get("width_999")
         row["pool"] = pool_quantiles(name, info["sqrts"])
         if kd == "hadronic":
             rr = lambda r: (r["min"], r["max"]) if "min" in r else None
-            row["pp"] = pp_read(name, info["sqrts"], cuts_new, rr(row["current"]), rr(row["proposed"]), hists)
+            if info["type"] == "tree":
+                row["pp"] = pp_read(name, info["sqrts"], cuts_new, rr(row["current"]), rr(row["proposed"]), hists,
+                                    wide_hi)
+            elif info["type"] in ("high_energy", "harder_cut", "alpha_s"):
+                same = info["type"] != "alpha_s"            # an alpha_s point's labels are not its base's
+                row["pp"] = pp_read(info["base"], info["sqrts"], cuts_new, rr(row["current"]) if same else None,
+                                    rr(row["proposed"]) if same else None, hists, wide_hi)
+                row["pp"]["source"] = info["base"]
+            else:
+                row["pp"] = {"missing": True, "why": "a heavy-quark mass point, a BSM entry or a 2->5 probe: no pp pool"}
     except Exception as e:                    # a class that fails is listed with its error, never dropped silently
+        row["error"] = f"{type(e).__name__}: {e}"
+    return row
+
+
+def one_loop(task):
+    """a one-loop or loop-induced pool, read without new labels: its validation pool's range, and for a hadronic one-loop
+    pool its tree's pp events against the loop pool's window, the current cuts and the proposed coverage"""
+    name, info, n, seed = task
+    import mg5_pipeline_final as mg
+    row = {"name": name, "group": info["group"], "type": info["type"], "tree": info["tree"], "sqrts": info["sqrts"],
+           "n_pool": info["n_pool"], "mode": "read"}
+    try:
+        cfg = mg.PROCESSES.get(name) or mg.PROCESSES[info["tree"]]
+        row["kind"] = kind(cfg)
+        row["nfinal"] = int(cfg.get("nfinal", len(cfg["pdg_ids"]) - 2))
+        row["pool"] = pool_quantiles(name, info["sqrts"])
+        if row["kind"] == "hadronic" and info["tree"]:
+            row["pp"] = pp_read(info["tree"], info["sqrts"], COVERAGE["hadronic"], None, None, {},
+                                max(SQRTS_WIDE, info["sqrts"][1]))
+            row["pp"]["source"] = info["tree"]
+        else:
+            row["pp"] = {"missing": True, "why": "e+e- beams or loop-induced: no tree pp pool"}
+    except Exception as e:
         row["error"] = f"{type(e).__name__}: {e}"
     return row
 
@@ -462,8 +572,9 @@ def run(args):
     from multiprocessing import Pool
     import datagen
     C = classes()
+    register(C)
     os.makedirs(OUT(), exist_ok=True)
-    path = os.path.join(OUT(), "rows.jsonl")
+    path = os.path.join(OUT(), ROWS)
     done = set()
     if os.path.exists(path):
         for l in open(path):
@@ -471,17 +582,22 @@ def run(args):
             if "error" not in r:
                 done.add(r["name"])
     import mg5_pipeline_final as mg
-    todo = sorted((n for n in C if n not in done), key=lambda n: -mg.PROCESSES[n]["nfinal"])   # the costly first
-    print(f"{len(C)} tree classes, {len(done)} already done, {len(todo)} to run, {args.n} events per coverage", flush=True)
-    datagen.ensure_backends(todo, workers=args.workers)
+    loop = lambda n: C[n]["type"] in ("one_loop", "loop_induced")
+    nf = lambda n: 0 if loop(n) else mg.PROCESSES[n]["nfinal"]
+    todo = sorted((n for n in C if n not in done), key=lambda n: -nf(n))   # the costly first
+    print(f"{len(C)} entries ({sum(1 for n in C if not loop(n))} sampled, {sum(1 for n in C if loop(n))} read), "
+          f"{len(done)} already done, {len(todo)} to run, {args.n} events per coverage", flush=True)
+    datagen.ensure_backends([n for n in todo if not loop(n)], workers=args.workers)
     selftest("v3_bb_abb" if "v3_bb_abb" in C else todo[0], C["v3_bb_abb" if "v3_bb_abb" in C else todo[0]])
-    tasks = [(n, C[n], args.n, 1000 + 2 * i) for i, n in enumerate(sorted(C)) if n in set(todo)]
-    tasks.sort(key=lambda t: -mg.PROCESSES[t[0]]["nfinal"])
+    # seeds: the tree classes in sorted order first (the first run's seeds), then every other entry
+    tasks = [(n, C[n], args.n, 1000 + 2 * i) for i, n in enumerate(C) if n in set(todo)]
+    tasks.sort(key=lambda t: -nf(t[0]))
     t0 = time.time()
     with Pool(args.workers) as pool, open(path, "a") as f:
         for i, row in enumerate(pool.imap_unordered(one, tasks)):
             f.write(json.dumps(row) + "\n"); f.flush()
-            msg = row.get("error") or (f"width {row['current'].get('width_999', float('nan')):.2f} -> "
+            msg = row.get("error") or ("read" if row.get("mode") == "read" else
+                                       f"width {row['current'].get('width_999', float('nan')):.2f} -> "
                                        f"{row['proposed'].get('width_999', float('nan')):.2f}")
             print(f"[{i + 1}/{len(tasks)} {time.time() - t0:7.0f}s] {row['name']:28s} {msg}", flush=True)
     rows = [json.loads(l) for l in open(path)]
@@ -493,7 +609,7 @@ def run(args):
 def collect():
     """the latest row per class, as one JSON object on stdout"""
     rows = {}
-    for l in open(os.path.join(OUT(), "rows.jsonl")):
+    for l in open(os.path.join(OUT(), ROWS)):
         r = json.loads(l)
         if r["name"] not in rows or "error" in rows[r["name"]]:
             rows[r["name"]] = r
