@@ -14,7 +14,8 @@ method's flags fixed and, for two methods, one more searched dimension:
 The default's side of the comparison is the grid's own 5-trial search of each cell (analysis/transfer/cells.best).
 Sweep names: tp3_lowd_<method>_r<rung>_<probe>_d<k> (the rung is in the name: three rungs share a probe and D).
     python3 sweep/gen_lowd_dyhpo.py              -> sweep/sweep_config_tp3_lowd_*.yaml (180 configs)
-    python3 sweep/gen_lowd_dyhpo.py --generate   on the site: generate_sweep for each (no submission)
+    python3 sweep/gen_lowd_dyhpo.py --generate   on the site: generate_sweep for each not yet generated (no submission;
+                                                 FA_NEW_SWEEP_REASON=D120 for the cell guard)
 """
 import argparse, json, os, sys, zlib
 
@@ -63,8 +64,16 @@ def main():
     print(f"{len(cf)} configs: {len(METHODS)} methods x {len(cf) // len(METHODS)} cells")
     if a.generate:
         sys.path.insert(0, ROOT)
+        import glob
+        import siteconf
         from sweep.generate_sweep import run_generate
-        for p in paths:
+        os.environ.setdefault("FA_NEW_SWEEP_REASON", "D120")   # the cell guard: these differ from the grid cells only
+                                                                # in the method (fixed flag or one searched dimension)
+        for (name, _), p in zip(cf, paths):
+            d = os.path.join(siteconf.SWEEP_DIR, name)
+            if os.path.exists(os.path.join(d, "dyhpo_state.pkl")) and len(glob.glob(os.path.join(d, "jobs", "*.sh"))) >= 5:
+                print(f"{name}: generated already, kept")
+                continue
             run_generate(p, submit=False)
 
 
