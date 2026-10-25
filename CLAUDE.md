@@ -46,6 +46,11 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    in the same turn the answer arrives, before write-ups or other items. (2026-10-24: the 68 b/t one-loop strings
    waited 2 h after my answer while the agent wrote up other results first.)
 
+0h. **A question of mine is answered in text before any tool call of that turn**, and a batch of jobs goes out in
+   parallel: `site sync <site> FA` once, then every launch with `NOSYNC=1` at once (`scripts/launch_cc_only.sh`), never
+   one sync per job in series. (2026-10-25: 11 K-shot jobs submitted one after another, ~25 s each, while the user's
+   question waited 5 min for the end of the turn.)
+
 0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion) and no turn that ends
    waiting on me while other work can move: a question for me goes in the message, the one item that needs it waits,
    and everything else continues. I answer when I come back. (2026-10-25: two blocking prompts held the session for
