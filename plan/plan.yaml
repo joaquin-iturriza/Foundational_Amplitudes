@@ -62,9 +62,10 @@ entries:
   decisions:
   - D83
   - D129
-  next: implement the hybrid target option in experiment.py (s-hat reference plus the per-process constant from the pool's
-    momenta), check it on CPU against prep_level's constants, then run the dimensionless_hybrid short pretraining on CC (about
-    2 GPU-h, same setup as the other five arms) and read it zero-shot on every axis
+  next: when the hybrid reference scale's short pretraining (dimensionless_hybrid) ends, read it zero-shot on every axis like
+    the other five arms (copy its predictions home into data/short_reads/dimensionless_hybrid, python3 analysis/catalog_v3/short_reads.py),
+    write it up beside the s-hat-only paragraph with a figure and % src / % claim lines; the CPU check of the target is analysis/catalog_v3/hybrid_check.py
+    (constants equal prep_level's to 4e-15, shape equal to the s-hat target's, class mean equal to the emission-scale target's)
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
