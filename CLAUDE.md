@@ -300,6 +300,37 @@ run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
     (`val_loss_no_reg`, checkpoint selection, HPO objective) is fixed by
     `training.val_aggregation` (geometric mean) and never follows a training-side knob.
 
+### Data generation (catalog_v3): what the pools contain and how they are sampled
+
+Files: `mg5_pipeline_final.py` (unprefixed line numbers), `recipes/gen_catalog_v3.py`, `recipes/select_catalog_v3.py`.
+**open (unsourced)** = chosen by an agent with no decision of mine behind it; changing it needs my decision.
+
+| Knob | Value | Source |
+|---|---|---|
+| fiducial cuts `FIDUCIAL_CUTS` (:2642) | pT > 10 GeV, abs(cos θ) < 0.9, ΔR > 0.4, pair mass > 10 GeV; partonic c.o.m. frame, by rejection with top-up (:2652-2700) | **open (unsourced)** (commit bfb2d7a) |
+| which finals are cut (:2662) | only m_final == 0 and not a neutrino: b (4.7) and τ (1.777) never cut, nor W/Z/t/H | **open (unsourced)** |
+| √ŝ window (`gen_catalog_v3.py:245`, `select_catalog_v3.py:162`) | [max(25 GeV, 1.05 × Σ m_final), 1000 GeV] | [threshold, 1 TeV] kept by my decision to leave the sampler as it was (2026-10-08, "We'll keep things as they are for now") [D17]; the 1.05 and the 25 GeV floor **open (unsourced)** (commit f9f5ad7) |
+| heavy-quark pool window (`select_catalog_v3.py:179`) | [lo, max(1000, lo + 500)] | **open (unsourced)** |
+| √ŝ draw (:2756, :2873, :3056) | uniform in the window (bulk, all roles) | **open (unsourced)**; a dataset convention (Data above) |
+| mixture `f_flat` (:2902) | 0.35 of a pool flat in log abs(M)² | `docs/results.tex` `fig:eeuu_genmix_fraction_sweep` |
+| mixture `oversample` (:2903) | 6 candidates per flat event | **open (unsourced)** |
+| mixture `democratic` (:2904) | 0.5 of multi-leg candidates from the splitter, rest RAMBO | `docs/results.tex` `sec:div-sampling` |
+| mixture `y_lo` (:2905) | 1e-6 (deepest invariant / s) | `docs/results.tex` `fig:deep_sampling_antenna` (at lowered cuts, not the catalog's) |
+| adaptive √ŝ pass (:2906, :2982) | on, ≤ 200 bins, ≥ 50 candidates per bin | **open (unsourced)** |
+| phase space shape (:3025, :2955) | 2→2 isotropic; the splitter is final-final only (no initial-state collinear corner) | **open (unsourced)** |
+| one-loop pools (:2918) | never shaped (uniform √ŝ, RAMBO) whatever the recipe says | **open (unsourced)** |
+| α_s (:74, :3147, :3226) | α_s(M_Z) = 0.118, one-loop running, n_f = 5, μ = √ŝ per event, trees and one-loop | one-loop: `tools/nlo_conventions.py:39-41` (collaborators' reference); trees: **open (unsourced)** |
+| α_s points (`recipes/catalog_v3_gen_stage3.yaml`) | 0.09, 0.15 trained, 0.13 held out | my approval of the generation (2026-10-24, "go ahead with the generation") [D102] |
+| coupling orders (`gen_catalog_v3.py:111`, :192) | none in the generate strings: MadGraph's minimal QED order, so no VBF/VBS topologies | MadGraph default |
+| external W, Z, t, H | stable, on-shell, unpolarised | MadGraph default |
+| masses and widths | MadGraph `sm` card (G_μ scheme); MT = ymt = 172.5 only when a top is external (:463, `gen_catalog_v3.py:240`), 173.0 when internal; WT 1.4915 | card: MadGraph default; 172.5: `tools/nlo_conventions.py` (collaborators' reference); external-only patch **open (unsourced)** |
+| heavy-quark layer (`select_catalog_v3.py:135`) | the top's quantum numbers at m_Q ∈ {50, 300, 600} GeV, width scaled from 1.4915 at LO | my catalog design approval (2026-10-23, "the proposals for the catalog are good") [D98, D100]; width rule **open (unsourced)** |
+| b beams (:2706) | on their 4.7 GeV shell | **open (unsourced)** |
+| BSM points `NONSM_POINT` (:1648-1661) | Z′ MY1 500 GeV (gVl 0.3, gAl 0.1, gVq 0.25 model default, dark matter decoupled); 2HDM H± 200, h2 250, h3 300 GeV, second-doublet Yukawas zero | layer: "at least one BSM process that can be encoded with our current particle embedding" (2026-10-23) [D98]; the points **open (unsourced)** |
+| pool sizes | trees 1e5 / 1e4 / 1e4 (train / val / test), one-loop 5e4 / 5e3 / 5e3 | my approval of the generation (2026-10-24, "go ahead with the generation") [D102] |
+| pp pool sizes (`recipes/gen_catalog_v3_pp.py:88`) | 1e4 / 2e3 / 2e3 | **open (unsourced)** |
+| pp pools' cards (`recipes/catalog_v3_pp/`) | Daniel's 13 TeV run card as is (nn23lo1, pT > 10 GeV, abs(η) < 5); catalog_v3's param card | the pp study (2026-10-25, "build it, run a few checks"; "that's acceptable yes") [D117, D119] |
+
 ---
 
 ## Config (Hydra)
