@@ -1435,6 +1435,10 @@ class AmplitudeExperiment(BaseExperiment):
 
     def _init_ewc(self):
         ft = self.cfg.get("fine_tune", None)
+        # linear probe, then fine-tune (D120): the head fitted on the frozen trunk before the optimizer is built
+        if ft is not None and ft.get("pretrained_path", None) and ft.get("linear_probe", False):
+            from fine_tune import linear_probe_head
+            linear_probe_head(self)
         if ft is None or not ft.ewc.get("enabled", False):
             self.ewc = None
             return
@@ -1447,6 +1451,7 @@ class AmplitudeExperiment(BaseExperiment):
             device=self.device,
             loss_fn=loss_fn,
             fisher_path=ft.ewc.get("fisher_path", None),
+            uniform=bool(ft.ewc.get("uniform", False)),
         )
         LOGGER.info(f"Fine-tuning: EWC initialized (lambda={ft.ewc.get('lambda', 1000.0)})")
 

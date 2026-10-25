@@ -247,6 +247,7 @@ fine_tune:
  layer_decay: 1.0             # LLRD: lr = base_lr * lr_scale * layer_decay^depth (1.0 = no decay)
  freeze_blocks: []            # list of block indices to freeze, e.g. [0,1,2,3]
  reset_output_head: false     # re-init linear_out weights after loading
+ linear_probe: false          # fit linear_out's channel 0 on the frozen trunk (ridge, leave-one-out) before fine-tuning (LP-FT, D120)
  lora:
   enabled: false
   rank: 8                     # bottleneck rank r
@@ -257,6 +258,7 @@ fine_tune:
   lambda: 1000.0              # EWC regularization strength (sweep: 1e2–1e5)
   n_fisher_batches: 64        # number of train batches to estimate Fisher diagonal
   fisher_path: null           # Fisher diagonal of the PARENT's data (tools/run_data_tools.py fisher); null = estimate on this run's own train set (new-task importance)
+  uniform: false              # a uniform Fisher: L2-SP, every weight pulled toward the start alike (D120)
 
 defaults:
  - hydra

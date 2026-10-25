@@ -138,13 +138,19 @@ class EWC:
         device: torch.device,
         loss_fn,
         fisher_path: str = None,
+        uniform: bool = False,
     ):
         self._theta_star = {
             name: param.data.clone()
             for name, param in model.named_parameters()
             if param.requires_grad
         }
-        if fisher_path:
+        if uniform:
+            # L2-SP (Li et al. 2018): every weight pulled toward the start with the same strength, (lambda/2) |theta -
+            # theta*|^2; the small-D fine-tuning study (D120)
+            self._fisher = {n: torch.ones_like(p) for n, p in self._theta_star.items()}
+            LOGGER.info("EWC: uniform Fisher, i.e. L2-SP toward the pretrained weights.")
+        elif fisher_path:
             blob = torch.load(fisher_path, map_location="cpu", weights_only=False)
             fisher = blob["fisher"]
             missing = [n for n in self._theta_star if n not in fisher]
@@ -247,3 +253,51 @@ def build_ft_param_groups(
         LOGGER.debug(f"LLRD depth={depth}: lr={lr:.2e}, n_param_tensors={len(groups[depth])}")
 
     return param_groups
+
+
+# ---------------------------------------------------------------------------
+# Linear probe, then fine-tune (LP-FT; Kumar et al. 2022)
+# ---------------------------------------------------------------------------
+
+def linear_probe_head(exp, lambdas=None):
+    """Fit the head (linear_out, output channel 0) on the frozen trunk before the fine-tune starts: the ridge read-out of
+    tools/linear_readout.py (per-event mean of linear_out's input, penalty by closed-form leave-one-out on the training
+    events alone), written into linear_out so that the network's channel-0 output IS that read-out. The muP readout
+    rescales its input by a constant, so the written weights are calibrated on the training events and the match is
+    asserted. The small-D fine-tuning study (D120); fine_tune.linear_probe, off by default."""
+    import os, sys
+    import numpy as np
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
+    from linear_readout import features, ridge_loo
+    lins = [m for n, m in exp.model.named_modules() if n.split(".")[-1] == "linear_out"]
+    assert len(lins) == 1, f"linear probe: expected one linear_out, found {len(lins)}"
+    head = lins[0]
+    was_training = exp.model.training
+    exp.model.eval()
+    F, y, z0 = features(exp, exp.train_eval_loader)
+    w, b, lam, loo = ridge_loo(F, y)
+    target = F @ w + b
+    W = head.weight.data
+    with torch.no_grad():
+        W[0].copy_(torch.as_tensor(w, dtype=W.dtype, device=W.device))
+        if head.bias is not None:
+            head.bias.data[0] = 0.0
+    for _ in range(3):                                  # the readout's input scale and the pooling, calibrated
+        _, _, z = features(exp, exp.train_eval_loader)
+        A = np.column_stack([F @ w, np.ones_like(z)])
+        (k, c), *_ = np.linalg.lstsq(A, z, rcond=None)
+        with torch.no_grad():
+            W[0].mul_(1.0 / k)                          # z = k (F w) + c: the head's row now gives F w itself
+            if head.bias is not None:
+                head.bias.data[0] += float(b - c)
+        _, _, z = features(exp, exp.train_eval_loader)
+        err = float(np.max(np.abs(z - target)))
+        if err < 1e-4 * max(float(np.std(y)), 1e-12):
+            break
+    assert err < 1e-3 * max(float(np.std(y)), 1e-12), f"linear probe: the written head misses the read-out by {err:.3g}"
+    LOGGER.info(f"Fine-tuning: linear probe head fitted on {len(y)} training events (ridge lambda {lam:.3g}, "
+                f"leave-one-out MSE {loo:.4g} standardized, head match {err:.2g}); the parent head's own MSE "
+                f"{float(np.mean((z0 - y) ** 2)):.4g}")
+    if was_training:
+        exp.model.train()
+    return {"lambda": lam, "loo_mse": loo, "n": int(len(y)), "match": err}
