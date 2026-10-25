@@ -46,6 +46,11 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    in the same turn the answer arrives, before write-ups or other items. (2026-10-24: the 68 b/t one-loop strings
    waited 2 h after my answer while the agent wrote up other results first.)
 
+0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion) and no turn that ends
+   waiting on me while other work can move: a question for me goes in the message, the one item that needs it waits,
+   and everything else continues. I answer when I come back. (2026-10-25: two blocking prompts held the session for
+   ~2 h at night; the agent used them to get words for a guard's decision record, which a message would have got too.)
+
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
    `models.lloca.LLOCAMuPTransformer`, wrapped by `wrappers.AmplitudeLLoCaWrapper`
