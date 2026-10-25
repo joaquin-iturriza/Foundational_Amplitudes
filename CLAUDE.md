@@ -630,9 +630,7 @@ in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 `regularization_lambda`, `cosanneal_*`, `fine_tune.lr_scale`/`layer_decay`) a
 per-task shell variable — because HP search goes through DyHPO (allowlist
 `.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
-tag, warm-start ckpt, ablation flags, seeds) stay allowed. The plan's guards are in 0i: `plan_check.py` (`Stop`),
-`plan_files_guard.py` and `git_verify_guard.py` (`PreToolUse`), and the git hooks in `.githooks/` (`pre-commit`,
-`pre-merge-commit`), which run `tools/verify_claims.py`.
+tag, warm-start ckpt, ablation flags, seeds) stay allowed.
 
 ### Batched pillar review (`review_backlog.sh` + three reviewer subagents)
 
