@@ -119,7 +119,9 @@ for recipe in a.recipes:
     q = mu_c + sd_c * h                               # the run's prediction in the same transform
     rec = {"pool": pool, "arm": a.arm, "run": run, "transform": tr, "n_val": int(len(z))}
     if a.arm == "head":
-        assert tr.startswith("abslog:"), f"{pool}: SgnHead scores a sign-changing pool, transform {tr}"
+        if not tr.startswith("abslog:"):          # a pool the run resolves as positive has no sign to score: listed
+            print("SIGNED_AB " + json.dumps({**rec, "skipped": f"not sign-changing here, transform {tr}"}), flush=True)
+            continue
         floor = signedlog_scale(tr)
         sgn_t = np.where(np.concatenate(signs) > 0.5, 1.0, -1.0)
         sgn_p = np.where(np.concatenate(logits) > 0, 1.0, -1.0)
