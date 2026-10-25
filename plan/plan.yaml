@@ -934,14 +934,11 @@ entries:
   - D127
   - D130
   - D134
-  next: 'Fix analysis/catalog_v4/validate_v4.py: register() must attach the recipe-level sampling block (mixture, f_fwd 0.15,
-    fwd_cand 1/3) to each sampled entry as register_recipe_processes does (0 of 35 pools ran: flat path refuses the log measure);
-    also read the model from the standalone (card check found none) and parse loop generation''s ''Contributing diagrams''
-    line. Rerun on CC with V4VAL_NO_CENSUS=1 (the 35 backends are reused; ~10 min of 16 CPUs) and report the pool checks and
-    sec_per_event. Open for the user: the 6 one-loop entries on loop_qcd_qed_sm-no_b_mass (did not import on CC); the 34 b-Higgs
-    strings that vanish with the massless b; disk: the regeneration needs ~142 GB (57 GB if the 51 MB events dirs are skipped)
-    against 27.4 GB free, catalog_v3''s 1790 events dirs hold ~92 GB. Then regenerate catalog_v4''s pools once the user answers
-    the 1 to 10 TeV energy hold-out and the disk has room; then the classes and roles on v4; then the b mass in particle_ids.py.'
+  next: 'when the validation rerun (FA-ccin2p3-2e1a0894, no census) ends: read each pool check (cuts recomputed, log-uniform
+    sqrt(s), forward angle, mass shells, sec per event), the card check (model now read from src/Parameters_*.h), the one-loop
+    generate counts including the loop_qcd_qed_sm-no_b_mass entry (its restriction card now installed on CC: a copy of the
+    model''s massless-b default), and the measured generation CPU-h; update the catalog_v4 hand-off item (v4 builds no longer
+    write the MadEvent events dir; the 35 existing v4_*_events dirs, ~1.8 GB, are left for the user)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
