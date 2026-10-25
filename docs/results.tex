@@ -818,12 +818,29 @@ $\log|\mathcal M|^2$. Triangles: the $2\to5$ and $1$ to $10$\,TeV probes. One se
 \end{figure}
 
 % allow: ^2 N-4 4a159066
+% allow: 10000 because it is the number of training events a held-out probe's statistics read, a setting
+% allow: 2000 because it is the number of validation events read per probe, a setting
 \paragraph{The hybrid reference scale, a design (2026-10-25).} The two references trade shape against level (the
 paragraph above), and one number per process can take both: the target $\log|\mathcal M|^2+(N-4)\log\hat s+c_p$ with
 $c_p$ the mean over the process's events of $L_q-(N-4)\log\hat s$, the emission scales' factor less the $\hat s$ one.
 Within a process $c_p$ is a constant, so the per-event shape is that of $\hat s$ alone; its class mean is the emission
 scales' exactly. The rule for a process never trained on: $c_p$ needs only momenta, no amplitude, so it is computed
-from the events being predicted, the same events the network reads. The CPU half, on every catalog\_v3 tree class
+from the process's own training events, as for a training class (a held-out probe's first $10000$, the events
+\code{tools/zero\_shot\_parent.py} reads for the probe's own statistics; its validation or test events only when it has
+no training split), not from the events being predicted. A fine-tune onto a process its parent trained on keeps the
+parent's $c_p$, which the frozen data statistics carry (\code{6b387fb}). The two choices of events give nearly the same
+constant: on $9$ catalog\_v3 pools of five to seven particles
+% src: python3 analysis/catalog_v3/hybrid_check_read.py @11519b9
+% claim: n_pools=9
+% claim: dcp_min=0.0024
+% claim: dcp_max=0.091
+% claim: ratio_max=2.1
+% claim: serr_min=0.026
+% claim: serr_max=0.086
+(\code{analysis/catalog\_v3/hybrid\_check.py} on CC's login node; \code{hybrid\_check\_read.py},
+\code{data/hybrid\_check.json}), $c_p$ on the first $10000$ training events and on the first $2000$ validation events
+differ by $0.0024$ to $0.091$, at most $2.1$ times the validation estimate's sampling error ($0.026$ to $0.086$). The
+CPU half of the design, on every catalog\_v3 tree class
 (\code{analysis/catalog\_v3/prep\_level.py}, run FA-ccin2p3-4a159066; \code{prep\_level\_read.py},
 \code{data/prep\_level.json}):
 \begin{itemize}
@@ -852,8 +869,8 @@ from the events being predicted, the same events the network reads. The CPU half
 % claim: net_H2p5_baseline=42.5
 % claim: net_H2p5_dimensionless_shat=13.6
 % claim: net_H2p5_dimensionless=0.10
-    model (par.\ The candidate targets on the pools themselves: a ridge on the counts of each kind of particle in and out,
-    the coupling orders removed), fitted on the training classes (the $12$ BSM ones included) and scored on the held-out
+    model (a ridge on the counts of each kind of particle in and out, the coupling orders removed; par.\ The candidate
+    targets on the pools themselves), fitted on the training classes (the $12$ BSM ones included) and scored on the held-out
     axes, median squared error of the class mean, for $\log|\mathcal M|^2$, $\hat s$ alone and the emission scales (the
     hybrid's): $2\to5$ $2.56$, $2.32$, $1.42$; $2\to4$ $1.04$, $0.93$, $0.79$; $1$ to $10$\,TeV $60$, $2.7$, $2.6$; the top
     $2.17$ for $\log|\mathcal M|^2$ against $2.28$. At $2\to5$ the order is the network's (level part $42.5$, $13.6$ and
@@ -867,12 +884,14 @@ from the events being predicted, the same events the network reads. The CPU half
 % claim: proxy_H2p5_qperp=0.236
     against the emission scales' $0.123$ and $0.236$.
 \end{itemize}
-% allow: 2 because it is the GPU-hour estimate of a job not run, a plan
+% allow: 2 because it is the GPU-hour estimate of the job, a plan
+% allow: 9b88e434
 What the CPU cannot say is whether the network's level skill with the emission scales comes from the class mean, which
 the hybrid keeps, or from the per-event $L_q$, which it drops; only a network answers that. The GPU test: one more arm
 of the short pretraining, the same inputs, orders, setup and HPs as the other five, with the hybrid target, read
-zero-shot on every axis; one seed, about $2$\,GPU-h. Not run: it needs the target option in \code{experiment.py} and
-comes to the user first.
+zero-shot on every axis; one seed, about $2$\,GPU-h. Approved (the user, 2026-10-25: ``Yes, run that hybrid test
+then.'') and running on CC with the target option \code{data.target\_physics\_hybrid} (\code{66559de};
+FA-ccin2p3-9b88e434).
 
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
