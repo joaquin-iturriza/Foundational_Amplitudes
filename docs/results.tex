@@ -5495,7 +5495,9 @@ row (Sec.~\ref{sec:lrlaw}) times $\sqrt{B/16384}$, Adam's square-root batch rule
 batch $B=\min(16384,D/2)$, so the batch moves with $D$ (both the user's choice). The rule was measured not to
 hold (the measured optimum moves $1.9\times$ between $D=700$ and $7\times10^4$, the rule $6.8\times$; $31$ scratch cells
 had their best at the window's top and were re-searched higher); scratch cells generated from 2026-10-25 on are
-centred on the measured surface at their own steps and $D$ instead (\code{gen\_transfer\_pilot.lr\_surface}), and
+centred on the measured surface at their own steps and $D$ instead (\code{gen\_transfer\_pilot.lr\_surface}; below
+$D=700$, off the measured grid, the $D=700$ value is held, about $2\times$ above the measured trend's extrapolation at
+$D=10$ and well inside the one-decade window), and
 every cell reported here before that date used the rule. One seed per
 cell, until the noise is known. What depends on the momenta only (their scale, and which
 propagator factors the target divides out) is fitted on the whole pool's phase-space points,
