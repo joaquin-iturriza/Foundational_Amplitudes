@@ -8186,25 +8186,25 @@ of the three share a test set.
     (the $b$ Yukawa). The $34$ that vanish are all a Higgs on a $b$ line with nothing else to couple to it
     ($b\bar b\to h$, $h+\gamma/g$, $hh$, $bg\to bh$, $gg\to b\bar bh$, ...): MadGraph finds no diagram once the $b$ is
     massless, so these classes leave the catalog unless the $b$ keeps a Yukawa.
-    % src: python3 analysis/catalog_v4/read_validation.py @5ebaff5
+    % src: python3 analysis/catalog_v4/read_validation.py @652bad3
     % claim: disk.events_mb=51
     % claim: disk.standalone_mb=2.3
-    % claim: disk.tree_backends=1655
-    % claim: disk.backends_gb=89
+    % claim: disk.tree_backends=1621
+    % claim: disk.backends_gb=87
     % claim: disk.backends_sa_gb=3.7
-    % claim: disk.pool_entries=1974
-    % claim: disk.pool_gb=53
-    % claim: disk.total_gb=142
-    % claim: disk.total_sa_gb=57
+    % claim: disk.pool_entries=1930
+    % claim: disk.pool_gb=52
+    % claim: disk.total_gb=139
+    % claim: disk.total_sa_gb=56
     % claim: disk.free_gb=27.4
     % claim: disk.v3_events_dirs=1790
     % claim: disk.v3_events_gb=92
     % claim: disk.build_core_h=9
     % allow: 5 1 because they are a column count's terms (5k+1), no results
     \emph{The regeneration's disk and CPU.} A built tree backend is $51$\,MB of MadGraph events directory (made by every
-    build, used only for LHE) plus $2.3$\,MB of standalone. The $1974$ pool entries at the approved sizes, float64,
-    $5k+1$ columns, are $53$\,GB; their $1655$ tree backends $89$\,GB ($3.7$\,GB without the events directories): $142$\,GB in
-    all, $57$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
+    build, used only for LHE) plus $2.3$\,MB of standalone. The $1930$ pool entries (after the $b$-Higgs drop) at the approved sizes, float64,
+    $5k+1$ columns, are $52$\,GB; their $1621$ tree backends $87$\,GB ($3.7$\,GB without the events directories): $139$\,GB in
+    all, $56$\,GB without the events directories, against $27.4$\,GB free on CC. catalog\_v3's $1790$ events
     directories hold about $92$\,GB there. The builds cost about $9$ core-hours.
     % src: python3 analysis/catalog_v4/read_validation.py @0490f0a
     % claim: disk.pool_entries=1974
@@ -8229,9 +8229,26 @@ of the three share a test set.
     that is about $39$ core-hours, an hour of wall on one node; the $150$ one-loop entries are not measured. The
     $1974$ entries' pools are $53$\,GB in float64 and the backends built without events directories about
     $12.8$\,GB (storage inventory, \code{analysis/storage}): about $66$\,GB against $24.1$\,GB free on CC now.
-    Next: the regeneration once the user answers the open questions (the $1$ to $10$\,TeV energy hold-out, the $34$
-    $b$-Higgs classes, the storage) and the disk has room; then classes and roles on v4; then the $b$ mass in
-    \code{particle\_ids.py}.
+    % src: python3 analysis/catalog_v4/read_validation.py @652bad3
+    % claim: drop.trees=34
+    % claim: drop.trees_left_in_v4=0
+    % claim: drop.loop_entries=8
+    % claim: drop.recipe_entries=123
+    % claim: drop.by_recipe.train=35
+    % claim: drop.by_recipe.gen_stage1=33
+    % claim: regen.tree_entries=1788
+    % claim: regen.loop_entries=142
+    % claim: regen.tree_events_m=214
+    % claim: regen.tree_cpu_h=38
+    % claim: regen.pool_gb=52
+    % claim: regen.total_gb=65
+    \emph{The $b$-Higgs classes dropped} (the user, 2026-10-25: ``Drop the b to higgs events.''): the $34$ trees with no
+    diagram are out of catalog\_v4's entries ($0$ left), with the $8$ one-loop entries on them as Born and every recipe
+    entry, in any role, named after or based on them: $123$ entries ($33$ in the first generation stage, $35$ in the
+    training recipe). The regeneration is now $1788$ tree entries ($214$M events, about $38$ core-hours) and $142$
+    one-loop entries, about $52$\,GB of pools and $65$\,GB with the backends. Next: the $1$ to $10$\,TeV energy hold-out
+    (still the user's call); then the regeneration on CC once it is answered; then classes and roles on v4; then the
+    $b$ mass in \code{particle\_ids.py}.
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/census_diagrams.pdf}
