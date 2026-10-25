@@ -858,3 +858,24 @@ entries:
   question: 'three-phase training test (lowest priority): synthetic, then real data, a few processes where real data helped
     most'
   hold_decision: D66
+- id: catalog_coverage
+  title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
+  question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
+    40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
+  status: running
+  quotes: []
+  decisions:
+  - D127
+  next: 'CPU check on CC: for every catalog_v3 class, sample events under the proposed coverage (hadronic classes: pT>10 GeV,
+    |eta|<5, dR>0.4; e+e-: |cos theta|<0.99; a mixture component uniform in log(1/(1-|cos theta|))), report the growth of
+    the log|M|^2 range against the current pools, the fraction of the 13 TeV pp pools it covers, and the generation cost;
+    write it up and bring the design back to the user before any regeneration or GPU job'
+  done_when: null
+  notes_ref: null
+  match: zz_cov_*,cov_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
