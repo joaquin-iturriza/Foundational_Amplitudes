@@ -143,7 +143,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/sleep_guard.py\""
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/sleep_guard.sh"
           }
         ]
       }
