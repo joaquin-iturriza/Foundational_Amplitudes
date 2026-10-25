@@ -744,7 +744,7 @@ entries:
   title: Two extra seeds at every fine-tune cell's best point (step 5)
   question: seed batches (scripts/job_seed_batch.sh) over the 8k cells
   hold_decision: D14
-- status: running
+- status: done
   quotes:
   - said_at: '2026-10-25T15:19:48.322Z'
     text: All sounds good, the only thing I don't understand is what do you mean
@@ -788,6 +788,8 @@ entries:
   question: 'local only: build in worktrees/wt-setup, the plan tool and guard, site fixes on a copy, CLAUDE.md pass, scenario
     tests; no cluster jobs'
   kind: setup
+  writeup: e5128c9
+  record: CLAUDE.md
 - status: held
   quotes:
   - said_at: '2026-10-23T02:46:51.647Z'
