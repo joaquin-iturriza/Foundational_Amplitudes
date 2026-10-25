@@ -313,6 +313,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_bb_bbg
   pp13_bb_bbgg:
+    lhe:
+      margin: 11.07
     kind: lhe_pp
     folder: pp13_bb_bbgg
     mg5_generate:
@@ -2957,6 +2959,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_bbx_bbxg
   pp13_bbx_bbxgg:
+    lhe:
+      margin: 0.48
     kind: lhe_pp
     folder: pp13_bbx_bbxgg
     mg5_generate:
@@ -7833,6 +7837,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_bg_bbbx
   pp13_bg_bbbxg:
+    lhe:
+      margin: 17.04
     kind: lhe_pp
     folder: pp13_bg_bbbxg
     mg5_generate:
@@ -10215,6 +10221,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_db_bdg
   pp13_db_bdgg:
+    lhe:
+      margin: 18.32
     kind: lhe_pp
     folder: pp13_db_bdgg
     mg5_generate:
@@ -10491,6 +10499,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_db_bdzz
   pp13_db_bguwm:
+    lhe:
+      margin: 0.5
     kind: lhe_pp
     folder: pp13_db_bguwm
     mg5_generate:
@@ -11203,6 +11213,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dbx_bxdg
   pp13_dbx_bxdgg:
+    lhe:
+      margin: 13.07
     kind: lhe_pp
     folder: pp13_dbx_bxdgg
     mg5_generate:
@@ -11425,6 +11437,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dbx_bxdzz
   pp13_dbx_bxguwm:
+    lhe:
+      margin: 2.36
     kind: lhe_pp
     folder: pp13_dbx_bxguwm
     mg5_generate:
@@ -11779,6 +11793,7 @@ processes:
   pp13_dbx_htxuz:
     lhe:
       param_card: param_card_MT172p5_ymt172p5.dat
+      margin: 4.12
     kind: lhe_pp
     folder: pp13_dbx_htxuz
     mg5_generate:
@@ -12005,6 +12020,8 @@ processes:
     test_group: 'pp 13 TeV: H1'
     parent: v3_dd_add
   pp13_dd_addg:
+    lhe:
+      margin: 14.15
     kind: lhe_pp
     folder: pp13_dd_addg
     mg5_generate:
@@ -12251,6 +12268,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dd_ddg
   pp13_dd_ddgg:
+    lhe:
+      margin: 128.82
     kind: lhe_pp
     folder: pp13_dd_ddgg
     mg5_generate:
@@ -12527,6 +12546,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dd_ddzz
   pp13_dd_dguwm:
+    lhe:
+      margin: 3.36
     kind: lhe_pp
     folder: pp13_dd_dguwm
     mg5_generate:
@@ -14011,6 +14032,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ddx_awpwm
   pp13_ddx_awpwmz:
+    lhe:
+      margin: 135.5
     kind: lhe_pp
     folder: pp13_ddx_awpwmz
     mg5_generate:
@@ -15005,6 +15028,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ddx_ddxg
   pp13_ddx_ddxgg:
+    lhe:
+      margin: 1.49
     kind: lhe_pp
     folder: pp13_ddx_ddxgg
     mg5_generate:
@@ -17009,6 +17034,8 @@ processes:
     test_group: 'pp 13 TeV: H2'
     parent: v3_ddx_uuxwpwm
   pp13_ddx_vevexwpwm:
+    lhe:
+      margin: 3.79
     kind: lhe_pp
     folder: pp13_ddx_vevexwpwm
     mg5_generate:
@@ -17973,6 +18000,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dg_bbxd
   pp13_dg_bbxdg:
+    lhe:
+      margin: 0.54
     kind: lhe_pp
     folder: pp13_dg_bbxdg
     mg5_generate:
@@ -18721,6 +18750,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dg_dgg
   pp13_dg_dggg:
+    lhe:
+      margin: 2.33
     kind: lhe_pp
     folder: pp13_dg_dggg
     mg5_generate:
@@ -20485,6 +20516,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ds_depems
   pp13_ds_dggs:
+    lhe:
+      margin: 9.6
     kind: lhe_pp
     folder: pp13_ds_dggs
     mg5_generate:
@@ -20977,6 +21010,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dsx_acxu
   pp13_dsx_acxuz:
+    lhe:
+      margin: 4.38
     kind: lhe_pp
     folder: pp13_dsx_acxuz
     mg5_generate:
@@ -21447,6 +21482,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dsx_cxhu
   pp13_dsx_cxhuz:
+    lhe:
+      margin: 12.12
     kind: lhe_pp
     folder: pp13_dsx_cxhuz
     mg5_generate:
@@ -21665,6 +21702,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_dsx_depemsx
   pp13_dsx_dggsx:
+    lhe:
+      margin: 12.42
     kind: lhe_pp
     folder: pp13_dsx_dggsx
     mg5_generate:
@@ -24137,6 +24176,7 @@ processes:
   pp13_ub_adtz:
     lhe:
       param_card: param_card_MT172p5_ymt172p5.dat
+      margin: 1.14
     kind: lhe_pp
     folder: pp13_ub_adtz
     mg5_generate:
@@ -24657,6 +24697,7 @@ processes:
   pp13_ub_dhtz:
     lhe:
       param_card: param_card_MT172p5_ymt172p5.dat
+      margin: 280.27
     kind: lhe_pp
     folder: pp13_ub_dhtz
     mg5_generate:
@@ -25833,6 +25874,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ucx_adsx
   pp13_ucx_adsxz:
+    lhe:
+      margin: 12.19
     kind: lhe_pp
     folder: pp13_ucx_adsxz
     mg5_generate:
@@ -26275,6 +26318,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ucx_dsxz
   pp13_ucx_dsxzz:
+    lhe:
+      margin: 38.67
     kind: lhe_pp
     folder: pp13_ucx_dsxzz
     mg5_generate:
@@ -26441,6 +26486,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ud_adu
   pp13_ud_aduz:
+    lhe:
+      margin: 2.81
     kind: lhe_pp
     folder: pp13_ud_aduz
     mg5_generate:
@@ -26607,6 +26654,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ud_ddwpz
   pp13_ud_depemu:
+    lhe:
+      margin: 7.94
     kind: lhe_pp
     folder: pp13_ud_depemu
     mg5_generate:
@@ -26663,6 +26712,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ud_dghu
   pp13_ud_dguz:
+    lhe:
+      margin: 1.31
     kind: lhe_pp
     folder: pp13_ud_dguz
     mg5_generate:
@@ -26883,6 +26934,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ud_uuwmz
   pp13_udx_aaawp:
+    lhe:
+      margin: 3.92
     kind: lhe_pp
     folder: pp13_udx_aaawp
     mg5_generate:
@@ -27135,6 +27188,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_udx_aawp
   pp13_udx_aawpz:
+    lhe:
+      margin: 2.14
     kind: lhe_pp
     folder: pp13_udx_aawpz
     mg5_generate:
@@ -28191,6 +28246,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_udx_awp
   pp13_udx_awpwpwm:
+    lhe:
+      margin: 14.28
     kind: lhe_pp
     folder: pp13_udx_awpwpwm
     mg5_generate:
@@ -28245,6 +28302,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_udx_awpz
   pp13_udx_awpzz:
+    lhe:
+      margin: 3.58
     kind: lhe_pp
     folder: pp13_udx_awpzz
     mg5_generate:
@@ -30967,6 +31026,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_udx_hwp
   pp13_udx_hwpwpwm:
+    lhe:
+      margin: 0.37
     kind: lhe_pp
     folder: pp13_udx_hwpwpwm
     mg5_generate:
@@ -31351,6 +31412,8 @@ processes:
     test_group: 'pp 13 TeV: H3'
     parent: v3_udx_ttxwpz
   pp13_udx_uuxwpz:
+    lhe:
+      margin: 38.92
     kind: lhe_pp
     folder: pp13_udx_uuxwpz
     mg5_generate:
@@ -33131,6 +33194,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_ug_uzzz
   pp13_us_aacd:
+    lhe:
+      margin: 43.41
     kind: lhe_pp
     folder: pp13_us_aacd
     mg5_generate:
@@ -33241,6 +33306,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_us_acdh
   pp13_us_acdz:
+    lhe:
+      margin: 2.03
     kind: lhe_pp
     folder: pp13_us_acdz
     mg5_generate:
@@ -33625,6 +33692,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_us_cdhh
   pp13_us_cdhz:
+    lhe:
+      margin: 18.71
     kind: lhe_pp
     folder: pp13_us_cdhz
     mg5_generate:
@@ -34291,6 +34360,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_uu_ghuu
   pp13_uu_guuz:
+    lhe:
+      margin: 21.98
     kind: lhe_pp
     folder: pp13_uu_guuz
     mg5_generate:
@@ -35069,6 +35140,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_uux_aepem
   pp13_uux_aepemg:
+    lhe:
+      margin: 3.22
     kind: lhe_pp
     folder: pp13_uux_aepemg
     mg5_generate:
@@ -35713,6 +35786,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_uux_awpwm
   pp13_uux_awpwmz:
+    lhe:
+      margin: 3.09
     kind: lhe_pp
     folder: pp13_uux_awpwmz
     mg5_generate:
@@ -38617,6 +38692,8 @@ processes:
     test_group: 'pp 13 TeV: train'
     parent: v3_uux_wpwmz
   pp13_uux_wpwmzz:
+    lhe:
+      margin: 3.24
     kind: lhe_pp
     folder: pp13_uux_wpwmzz
     mg5_generate:

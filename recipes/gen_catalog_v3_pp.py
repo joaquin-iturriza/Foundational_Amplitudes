@@ -19,6 +19,8 @@ Writes
                                  rule or MadLoop labels of pp events, not built yet)
   catalog_v3_pp_mixed_train.yaml catalog_v3_train.yaml with every hadronic tree class swapped for its pp version
   catalog_v3_pp_part<k>.yaml     the same processes in 8 parts, one CPU generation job each
+  catalog_v3_pp_rerun_part<k>.yaml  the processes whose MadEvent run came back short, at their own margins
+                                 (catalog_v3_pp_margins.json: 1.3 x the events needed over the share returned, minus 1)
 Every pool: 1e4 train (the short pretraining's size), 2e3 val and test (the 2000 events a held-out read scores).
     python3 recipes/gen_catalog_v3_pp.py
 """
@@ -100,6 +102,15 @@ def main():
         with open(os.path.join(HERE, f"catalog_v3_pp_part{k}.yaml"), "w") as f:
             f.write(hdr)
             yaml.safe_dump({"processes": order[k::8]}, f, sort_keys=False)
+    # the rerun of the processes whose MadEvent run came back short, each at its own margin: the five largest margins
+    # alone (the longest MadEvent runs), the rest dealt into five parts
+    short = sorted((e for e in test if e["name"] in margins), key=lambda e: -margins[e["name"]])
+    parts = [[e] for e in short[:5]] + [short[5:][k::5] for k in range(5)]
+    for k, es in enumerate(p for p in parts if p):
+        with open(os.path.join(HERE, f"catalog_v3_pp_rerun_part{k}.yaml"), "w") as f:
+            f.write(hdr)
+            yaml.safe_dump({"processes": es}, f, sort_keys=False)
+    print(f"rerun: {len(short)} short processes in {sum(1 for p in parts if p)} parts")
     print(f"patched cards: {cards}")
     print(f"{len(procs)} hadronic classes; test {len(test)} ({len(held)} held-out, {len(ref)} training); "
           f"train {len(tr)}")
