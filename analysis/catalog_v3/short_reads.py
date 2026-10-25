@@ -48,7 +48,8 @@ def main():
     res = {}
     for arm in ARMS:
         if not os.path.isdir(os.path.join(HERE, "data", "short_reads", arm)):
-            continue                                       # the arm's reads not copied home yet
+            print(f"{arm}: no reads copied home")         # the arm's reads not copied home yet
+            continue
         for axis in READS[arm]:
             r = read(arm, axis)
             exp = expected(axis)
