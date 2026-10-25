@@ -27,7 +27,7 @@ KEYS = [("current", "current cuts", ps.C.blue), ("proposed", "proposed coverage"
         ("wide", r"proposed, $\sqrt{\hat s}$ to 6 TeV", ps.C.green)]
 NF = (2, 3, 4)
 U_EDGES = np.linspace(0.0, 10.0, 21)
-ok = [r for r in rows.values() if "error" not in r]
+ok = [r for r in rows.values() if "error" not in r and r.get("type", "tree") == "tree"]   # the tree classes
 
 # ---- log|M|^2 range per family
 figs = ps.panels(2)

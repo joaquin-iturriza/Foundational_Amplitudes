@@ -636,9 +636,15 @@ def summary():
     summary as one JSON object (docs/results.tex's claims, analysis/catalog_v3/coverage_fig.py)"""
     rows = json.load(open(os.path.join(HERE, "data", "coverage_rows.json")))
     keys = ("current", "proposed", "wide")
-    ok = {n: r for n, r in rows.items() if "error" not in r and all("width_999" in r.get(k, {}) for k in keys)}
-    print(f"{len(rows)} rows, {len(ok)} usable, errors: {sorted(n for n, r in rows.items() if 'error' in r)}")
-    out = {"n_rows": len(rows), "n_usable": len(ok), "n_errors": sum(1 for r in rows.values() if "error" in r)}
+    typ = lambda r: r.get("type", "tree")
+    sampled = {n: r for n, r in rows.items() if "error" not in r and r.get("mode") != "read"
+               and all("width_999" in r.get(k, {}) for k in keys)}
+    ok = {n: r for n, r in sampled.items() if typ(r) == "tree"}          # the families: the tree classes
+    print(f"{len(rows)} rows, {len(sampled)} sampled usable, errors: {sorted(n for n, r in rows.items() if 'error' in r)}")
+    out = {"n_rows": len(rows), "n_usable": len(ok), "n_sampled": len(sampled),
+           "n_read": sum(1 for r in rows.values() if r.get("mode") == "read" and "error" not in r),
+           "n_errors": sum(1 for r in rows.values() if "error" in r),
+           "errors": sorted(n for n, r in rows.items() if "error" in r)}
     sec = lambda r, c: r[c]["t_total"] / r["n"]
     pp_ok = lambda r: "pp" in r and not r["pp"].get("missing")
     for kd in ("hadronic", "ee"):
@@ -662,6 +668,7 @@ def summary():
             e["b_tau_no_cut_now"] = sum(1 for r in g if r["has_b_tau"] and r["n_cut_legs_current"] == 0)
             if bt:
                 e["b_tau_fail_share"] = med(r["current"]["b_tau_fail_share"] for r in bt)
+                e["b_tau_fail_share_proposed"] = med(r["current"].get("b_tau_fail_share_proposed") for r in bt)
             pp = [r for r in g if pp_ok(r)]
             if pp:
                 for f in ("in_cur_window", "in_new_window", "in_new_wide", "in_cur", "in_new", "in_new_b_tau_uncut",
@@ -690,9 +697,13 @@ def summary():
     bt = [r for r in ok.values() if r["has_b_tau"]]
     btc = [r for r in bt if r["current"].get("width_999_b_tau_cut") is not None]
     btp = [r["pp"] for r in bt if pp_ok(r)]
+    btq = [r for r in bt if r["current"].get("width_999_b_tau_cut_proposed") is not None]
     out["b_tau"] = {"n": len(bt), "no_cut_now": sum(1 for r in bt if r["n_cut_legs_current"] == 0),
                     "fail_share": med(r["current"].get("b_tau_fail_share") for r in bt),
                     "width_loss": med(r["current"]["width_999"] - r["current"]["width_999_b_tau_cut"] for r in btc),
+                    "fail_share_proposed": med(r["current"].get("b_tau_fail_share_proposed") for r in bt),
+                    "width_loss_proposed": med(r["current"]["width_999"] - r["current"]["width_999_b_tau_cut_proposed"]
+                                               for r in btq),
                     "pp_n": len(btp), "pp_in_new_mean": float(np.mean([p["in_new"] for p in btp])),
                     "pp_in_new_uncut_mean": float(np.mean([p["in_new_b_tau_uncut"] for p in btp]))}
     R = list(ok.values())
@@ -702,6 +713,45 @@ def summary():
                        "label_time_share": float(sum(r[k]["t_label"] for r in R) / sum(r[k]["t_total"] for r in R))}
                    for k in keys}
     out["cost"]["n_pool_events"] = int(sum(r["n_pool"] for r in R))
+    X = [r for r in sampled.values() if typ(r) != "tree"]
+    out["cost"]["other_sampled"] = {k: float(sum(sec(r, k) * r["n_pool"] for r in X) / 3600) for k in keys}
+    out["cost"]["other_n_pool_events"] = int(sum(r["n_pool"] for r in X))
+    # the other sampled entries, per type
+    out["types"] = {}
+    for t in sorted({typ(r) for r in sampled.values()} - {"tree"}):
+        g = [r for r in sampled.values() if typ(r) == t]
+        e = {"n": len(g), "n_entries": sum(1 for r in rows.values() if typ(r) == t)}
+        for k in ("proposed", "wide"):
+            e[f"growth_999_{k}"] = med(r[k]["width_999"] - r["current"]["width_999"] for r in g)
+            e[f"max_up_{k}"] = med(r[k]["max"] - r["current"]["max"] for r in g)
+            e[f"outside_current_{k}"] = med(r[k]["outside_current_cuts"] for r in g)
+        for k in keys:
+            e[f"forward_share_{k}"] = med(r[k]["forward_share"] for r in g)
+        pp = [r["pp"] for r in g if pp_ok(r)]
+        if pp:
+            e["pp_n"] = len(pp)
+            for f in ("in_cur_window", "in_new_window", "in_new_wide", "above_window", "in_range_cur", "in_range_new",
+                      "forward_share"):
+                e[f"pp_{f}"] = med(p.get(f) for p in pp)
+        out["types"][t] = e
+        print(f"{t:14s}", json.dumps({k: (round(v, 3) if isinstance(v, float) else v) for k, v in e.items()}))
+    # the loop pools, read without new labels
+    L = [r for r in rows.values() if r.get("mode") == "read" and "error" not in r]
+    out["loops"] = {}
+    for t in ("one_loop", "loop_induced"):
+        for kd in ("hadronic", "ee"):
+            g = [r for r in L if r["type"] == t and r.get("kind") == kd]
+            if not g:
+                continue
+            e = {"n": len(g), "pool_width_999": med(r["pool"].get("width_999") for r in g),
+                 "n_pool_missing": sum(1 for r in g if r["pool"].get("missing"))}
+            pp = [r["pp"] for r in g if pp_ok(r)]
+            if pp:
+                e["pp_n"] = len(pp)
+                for f in ("in_cur_window", "in_new_window", "in_new_wide", "above_window", "forward_share"):
+                    e[f"pp_{f}"] = med(p[f] for p in pp)
+            out["loops"][f"{t}_{kd}"] = e
+            print(f"{t}_{kd:9s}", json.dumps({k: (round(v, 3) if isinstance(v, float) else v) for k, v in e.items()}))
     json.dump(out, open(os.path.join(HERE, "data", "coverage_check.json"), "w"), indent=1)
     print(json.dumps(out))
 
