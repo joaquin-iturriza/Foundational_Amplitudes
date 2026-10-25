@@ -408,8 +408,9 @@ def ess(rs, lo, hi, density):
     return float(ins.mean()), float(w.sum() ** 2 / (len(w) * (w ** 2).sum()))
 
 
-def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists, wide_hi=SQRTS_WIDE):
-    """name: the tree class whose pp pool is read; rng_* None: no |M|^2 range comparison (labels not this entry's)"""
+def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists, wide_hi=SQRTS_WIDE, cuts_cur=None):
+    """name: the tree class whose pp pool is read; rng_* None: no |M|^2 range comparison (labels not this entry's);
+    cuts_cur: the entry's own current cuts (the harder-cut probes' pT > 30 GeV), else the global ones"""
     import mg5_pipeline_final as mg
     pn = "pp13_" + name[len("v3_"):]
     f = os.path.join(os.environ["DATA_DIR"], f"{pn}_13000-13000GeV_val_lhe_amplitudes.npy")
@@ -423,7 +424,7 @@ def pp_read(name, sq, cuts_new, rng_cur, rng_new, hists, wide_hi=SQRTS_WIDE):
     with np.errstate(divide="ignore", invalid="ignore"):
         l = np.log10(np.where(me > 0, me, np.nan))
     s_cur, s_new = cut_slots(finals(c), c["pdg_ids"], False), cut_slots(finals(c), c["pdg_ids"], True)
-    cur = mg.fiducial_pass_mask(P, finals(c), c["pdg_ids"], mg.FIDUCIAL_CUTS)
+    cur = mg.fiducial_pass_mask(P, finals(c), c["pdg_ids"], cuts_cur or mg.FIDUCIAL_CUTS)
     new = pass_mask(P, s_new, cuts_new)
     new_nobt = pass_mask(P, s_cur, cuts_new)                 # the proposed thresholds, b and tau left uncut
     lo, hi = sq
@@ -514,7 +515,7 @@ def one(task):
             elif info["type"] in ("high_energy", "harder_cut", "alpha_s"):
                 same = info["type"] != "alpha_s"            # an alpha_s point's labels are not its base's
                 row["pp"] = pp_read(info["base"], info["sqrts"], cuts_new, rr(row["current"]) if same else None,
-                                    rr(row["proposed"]) if same else None, hists, wide_hi)
+                                    rr(row["proposed"]) if same else None, hists, wide_hi, cuts_cur)
                 row["pp"]["source"] = info["base"]
             else:
                 row["pp"] = {"missing": True, "why": "a heavy-quark mass point, a BSM entry or a 2->5 probe: no pp pool"}
@@ -589,7 +590,7 @@ def run(args):
     if os.path.exists(path):
         for l in open(path):
             r = json.loads(l)
-            if "error" not in r:
+            if "error" not in r and r.get("type") not in args.redo:
                 done.add(r["name"])
     import mg5_pipeline_final as mg
     loop = lambda n: C[n]["type"] in ("one_loop", "loop_induced")
@@ -621,7 +622,7 @@ def collect():
     rows = {}
     for l in open(os.path.join(OUT(), ROWS)):
         r = json.loads(l)
-        if r["name"] not in rows or "error" in rows[r["name"]]:
+        if r["name"] not in rows or "error" in rows[r["name"]] or "error" not in r:     # the latest good row wins
             rows[r["name"]] = r
     json.dump(rows, sys.stdout)
 
@@ -771,5 +772,7 @@ if __name__ == "__main__":
     ap.add_argument("mode", nargs="?", default="summary", choices=("run", "collect", "summary"))
     ap.add_argument("--n", type=int, default=2000)
     ap.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 8)))
+    ap.add_argument("--redo", nargs="*", default=os.environ.get("COV_REDO", "").split(),
+                    help="entry types to run again although done (their new rows supersede the old in collect)")
     a = ap.parse_args()
     {"run": lambda: run(a), "collect": collect, "summary": summary}[a.mode]()

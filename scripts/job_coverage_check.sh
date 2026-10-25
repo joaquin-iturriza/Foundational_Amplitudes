@@ -15,4 +15,4 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-python analysis/catalog_v3/coverage_check.py run --n "${COV_N:-2000}" --workers "${SLURM_CPUS_PER_TASK:-32}"
+python analysis/catalog_v3/coverage_check.py run --n "${COV_N:-2000}" --workers "${SLURM_CPUS_PER_TASK:-32}" "$@"
