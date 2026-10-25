@@ -255,9 +255,29 @@ def figure():
     ps.save(fig, os.path.join(HERE, "figs", "census_diagrams"))
 
 
+def dropped():
+    """what the drop of the vanished trees (D136, recipes/gen_catalog_v4.py) took out of the generated v4 files: trees,
+    one-loop entries (a virtual on a vanished Born) and recipe entries named after or based on them, per role"""
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    import gen_catalog_v4 as g
+    van = {r["name"] for r in C if not r["exists"]}
+    P = g.load(os.path.join(ROOT, "recipes", "catalog_v4_processes.yaml"))["processes"]
+    L3, L4 = (g.load(os.path.join(ROOT, "recipes", f"catalog_{v}_loops.yaml")) for v in ("v3", "v4"))
+    out = {"trees": len(van), "trees_left_in_v4": len(van & set(P)),
+           "loop_entries": len(L3["processes"]) - len(L4["processes"]), "loop_strings": len(L3["virt"]) - len(L4["virt"])}
+    per = {}
+    for r in g.RECIPES:
+        n3 = sum(not e["name"].endswith("__E10") for e in g.load(os.path.join(ROOT, "recipes", f"catalog_v3_{r}.yaml"))["processes"])
+        n4 = len(g.load(os.path.join(ROOT, "recipes", f"catalog_v4_{r}.yaml"))["processes"])
+        if n3 != n4:
+            per[r] = n3 - n4
+    out["recipe_entries"] = sum(per.values()); out["by_recipe"] = per
+    return out
+
+
 def main():
     by, tot = census()
-    res = {"census": by, "total": tot, "val": validation(), "disk": disk()}
+    res = {"census": by, "total": tot, "val": validation(), "disk": disk(), "drop": dropped()}
     res["pools"], loc = pools()
     res["regen"] = regeneration(res["disk"])
     # the tree backends' build, one core each (35 builds on 16 workers took 64 s of wall): measured mean x count

@@ -244,66 +244,6 @@ processes:
     virt: true
     virt_base: v4_bbx_agz
     why: one-loop QCD of v4_bbx_agz
-  v4_bbx_ah_nlo:
-    alphas_power: 1
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 125.0
-    n_loops: 1
-    nfinal: 2
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 22
-    - 25
-    role: heldout
-    sqrts_measure: log
-    v3_name: v3_bbx_ah_nlo
-    virt: true
-    virt_base: v4_bbx_ah
-    why: one-loop QCD of v4_bbx_ah
-  v4_bbx_ahh_nlo:
-    alphas_power: 1
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 125.0
-    - 125.0
-    n_loops: 1
-    nfinal: 3
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 22
-    - 25
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bbx_ahh_nlo
-    virt: true
-    virt_base: v4_bbx_ahh
-    why: one-loop QCD of v4_bbx_ahh
   v4_bbx_ataptam_nlo:
     alphas_power: 1
     beam_masses: {}
@@ -635,97 +575,6 @@ processes:
     virt: true
     virt_base: v4_bbx_gg
     why: one-loop QCD of v4_bbx_gg
-  v4_bbx_ggh_nlo:
-    alphas_power: 3
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 0.0
-    - 125.0
-    n_loops: 1
-    nfinal: 3
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 21
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bbx_ggh_nlo
-    virt: true
-    virt_base: v4_bbx_ggh
-    why: one-loop QCD of v4_bbx_ggh
-  v4_bbx_gh_nlo:
-    alphas_power: 2
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 125.0
-    n_loops: 1
-    nfinal: 2
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bbx_gh_nlo
-    virt: true
-    virt_base: v4_bbx_gh
-    why: one-loop QCD of v4_bbx_gh
-  v4_bbx_ghh_nlo:
-    alphas_power: 2
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 125.0
-    - 125.0
-    n_loops: 1
-    nfinal: 3
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 25
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bbx_ghh_nlo
-    virt: true
-    virt_base: v4_bbx_ghh
-    why: one-loop QCD of v4_bbx_ghh
   v4_bbx_gvevex_nlo:
     alphas_power: 2
     beam_masses: {}
@@ -848,35 +697,6 @@ processes:
     virt: true
     virt_base: v4_bbx_gzz
     why: one-loop QCD of v4_bbx_gzz
-  v4_bbx_hh_nlo:
-    alphas_power: 1
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 125.0
-    - 125.0
-    n_loops: 1
-    nfinal: 2
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - -5
-    - 25
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bbx_hh_nlo
-    virt: true
-    virt_base: v4_bbx_hh
-    why: one-loop QCD of v4_bbx_hh
   v4_bbx_hhz_nlo:
     alphas_power: 1
     beam_masses: {}
@@ -1330,37 +1150,6 @@ processes:
     virt: true
     virt_base: v4_bg_abg
     why: one-loop QCD of v4_bg_abg
-  v4_bg_abh_nlo:
-    alphas_power: 2
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 0.0
-    - 125.0
-    n_loops: 1
-    nfinal: 3
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - 21
-    - 22
-    - 5
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bg_abh_nlo
-    virt: true
-    virt_base: v4_bg_abh
-    why: one-loop QCD of v4_bg_abh
   v4_bg_abz_nlo:
     alphas_power: 2
     beam_masses: {}
@@ -1514,35 +1303,6 @@ processes:
     virt: true
     virt_base: v4_bg_bgg
     why: one-loop QCD of v4_bg_bgg
-  v4_bg_bh_nlo:
-    alphas_power: 2
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    kind: virt
-    layer: nlo
-    m_finals:
-    - 0.0
-    - 125.0
-    n_loops: 1
-    nfinal: 2
-    param_card_patches: {}
-    pdg_ids:
-    - 5
-    - 21
-    - 5
-    - 25
-    role: train
-    sqrts_measure: log
-    v3_name: v3_bg_bh_nlo
-    virt: true
-    virt_base: v4_bg_bh
-    why: one-loop QCD of v4_bg_bh
   v4_bg_bhz_nlo:
     alphas_power: 2
     beam_masses: {}
@@ -5350,54 +5110,6 @@ virt:
     - 23
     sqrts_measure: log
     v3_name: v3_bbx_agz
-  v4_bbx_ah:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 125.0
-    mg5: generate b b~ > a h QED<=2 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 22
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_ah
-  v4_bbx_ahh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 125.0
-    - 125.0
-    mg5: generate b b~ > a h h QED<=3 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 22
-    - 25
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_ahh
   v4_bbx_ataptam:
     beam_masses: {}
     certified: false
@@ -5663,79 +5375,6 @@ virt:
     - 21
     sqrts_measure: log
     v3_name: v3_bbx_gg
-  v4_bbx_ggh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 0.0
-    - 125.0
-    mg5: generate b b~ > g g h QED<=1 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 21
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_ggh
-  v4_bbx_gh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 125.0
-    mg5: generate b b~ > g h QED<=1 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_gh
-  v4_bbx_ghh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 125.0
-    - 125.0
-    mg5: generate b b~ > g h h QED<=2 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 21
-    - 25
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_ghh
   v4_bbx_gvevex:
     beam_masses: {}
     certified: false
@@ -5834,29 +5473,6 @@ virt:
     - 23
     sqrts_measure: log
     v3_name: v3_bbx_gzz
-  v4_bbx_hh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 125.0
-    - 125.0
-    mg5: generate b b~ > h h QED<=2 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - -5
-    - 25
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bbx_hh
   v4_bbx_hhz:
     beam_masses: {}
     certified: false
@@ -6220,31 +5836,6 @@ virt:
     - 21
     sqrts_measure: log
     v3_name: v3_bg_abg
-  v4_bg_abh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 0.0
-    - 125.0
-    mg5: generate b g > a b h QED<=2 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - 21
-    - 22
-    - 5
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bg_abh
   v4_bg_abz:
     beam_masses: {}
     certified: false
@@ -6368,29 +5959,6 @@ virt:
     - 21
     sqrts_measure: log
     v3_name: v3_bg_bgg
-  v4_bg_bh:
-    beam_masses: {}
-    certified: false
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    m_finals:
-    - 0.0
-    - 125.0
-    mg5: generate b g > b h QED<=1 [virt=QCD]
-    model: loop_sm-no_b_mass
-    param_card_patches:
-      WT: 1.480327
-    pdg_ids:
-    - 5
-    - 21
-    - 5
-    - 25
-    sqrts_measure: log
-    v3_name: v3_bg_bh
   v4_bg_bhz:
     beam_masses: {}
     certified: false

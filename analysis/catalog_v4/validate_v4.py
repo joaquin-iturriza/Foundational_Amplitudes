@@ -65,11 +65,18 @@ def sample():
     cells = {}
     for n3 in sorted(R):
         n = "v4_" + n3[3:]
-        e = mg.PROCESSES[n]
+        # the cells as the validation drew them: a tree dropped since (the 34 b-Higgs trees with no diagram, D136)
+        # keeps its catalog_v3 entry's layer and legs here, so the seeded pick is unchanged
+        e = mg.PROCESSES.get(n) or mg.PROCESSES[n3]
         cells.setdefault((e["layer"], beam(list(e["pdg_ids"]))), []).append(n)
     rng = random.Random(SEED)
     pick = [n for c in sorted(cells) for n in rng.sample(cells[c], min(PER_CELL, len(cells[c])))]
-    five = sorted(n for n in S1 if mg.PROCESSES.get(n, {}).get("layer") == 5)
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    from gen_catalog_v4 import vanished
+    v3_stage = {e["name"] for f in ("gen_stage1", "gen_stage3", "gen_stage4")
+                for e in load(os.path.join(ROOT, "recipes", f"catalog_v3_{f}.yaml"))["processes"]}
+    gone = {n for n in vanished() if "v3_" + n[3:] in v3_stage and mg.PROCESSES["v3_" + n[3:]]["layer"] == 5}
+    five = sorted({n for n in S1 if mg.PROCESSES.get(n, {}).get("layer") == 5} | gone)   # as drawn before the drop
     pick += rng.sample(five, 2)
     for tag in ("__mt50", "__mt300", "__as090", "__c30"):
         pick.append(sorted(n for n in S1 if n.endswith(tag))[0])
