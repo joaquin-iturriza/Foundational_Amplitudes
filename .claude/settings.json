@@ -24,10 +24,6 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/context_guard.py"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/plan_guard.py"
           }
         ]
       },
@@ -43,15 +39,7 @@
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/slurm_waiter_guard.sh"
-          },
-          {
-            "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/review_backlog.sh check"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/continuous_guard.py"
           }
         ]
       },
@@ -61,6 +49,15 @@
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/reply_check.py",
             "timeout": 150
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/plan_check.py\"",
+            "timeout": 300
           }
         ]
       }
@@ -80,10 +77,6 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/hook_syntax_guard.py\" pre"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/continuous_list_guard.py\" pre"
           }
         ]
       },
@@ -141,6 +134,43 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/no_blocking_question.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/plan_files_guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/plan_files_guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/git_verify_guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/git_verify_guard.py\"",
+            "timeout": 120
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -162,10 +192,6 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/hook_syntax_guard.py\" post"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/continuous_list_guard.py\" post"
           }
         ]
       },
@@ -181,7 +207,6 @@
     ],
     "SessionStart": [
       {
-        "matcher": "compact",
         "hooks": [
           {
             "type": "command",
