@@ -17,6 +17,7 @@
 #                          orders, with each extra particle's emission scale; dimensionless inputs; the arXiv:2606.23791
 #                          diagram encoder (Daniel's catalog round: DlessInOrdQ)
 #   dimensionless_context  the same with a learned per-process context vector (16, zeroed on half the events)
+#   dimensionless_pp       the same with every hadronic tree class trained on 13 TeV pp events (the pp study)
 #   dimensionless_twin     the same trained on the removal twin (recipes/catalog_v3_twin_train.yaml, 1246 pools: none with a tau or nu_tau in any
 #          layer, none built on the quartic gauge family), read besides the axes on H3p (the 136 pools with the never-seen
 #          tau or nu_tau) and H4 (the 15 quartic-gauge pools); 5 epochs of its own set (3803 steps)
@@ -26,7 +27,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_context or dimensionless_twin}"; MODE="${2:-}"
+ARM="${1:?baseline, dimensionless, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -40,6 +41,9 @@ case "$ARM" in
     dimensionless)         NORM=("${DIM[@]}") ;;
     dimensionless_context) NORM=("${DIM[@]}" ++model.context_dim=16 ++model.context_dropout=0.5) ;;
     dimensionless_twin)    NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_twin_train.yaml" ;;
+    # the pp study: the same target trained with every hadronic tree class on 13 TeV MadEvent pp events in place of its
+    # shaped window (recipes/catalog_v3_pp_mixed_train.yaml; the other pools as in catalog_v3_train.yaml)
+    dimensionless_pp)      NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_pp_mixed_train.yaml" ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"

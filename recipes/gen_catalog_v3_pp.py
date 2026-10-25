@@ -17,6 +17,7 @@ Writes
                                  layer, the alpha_s points, the BSM layer, the one-loop pools and the e+e- classes
                                  stay on their windows there: their pp versions need patched masses, another alpha_s
                                  rule or MadLoop labels of pp events, not built yet)
+  catalog_v3_pp_mixed_train.yaml catalog_v3_train.yaml with every hadronic tree class swapped for its pp version
   catalog_v3_pp_part<k>.yaml     the same processes in 8 parts, one CPU generation job each
 Every pool: 1e4 train (the short pretraining's size), 2e3 val and test (the 2000 events a held-out read scores).
     python3 recipes/gen_catalog_v3_pp.py
@@ -83,6 +84,15 @@ def main():
         with open(os.path.join(HERE, name), "w") as f:
             f.write(hdr)
             yaml.safe_dump({"processes": es}, f, sort_keys=False)
+    # the pp-trained comparison's training set: catalog_v3's training recipe with every hadronic tree class swapped for
+    # its pp version; every other pool (e+e- classes, heavy-quark layer, alpha_s points, BSM, one-loop) stays as it is
+    base = yaml.safe_load(open(os.path.join(HERE, "catalog_v3_train.yaml")))
+    swap = {n: {"name": pp(n), "sqrts": [13000, 13000], **sz} for n in train}
+    mixed = [swap.get(e["name"], e) for e in base["processes"]]
+    with open(os.path.join(HERE, "catalog_v3_pp_mixed_train.yaml"), "w") as f:
+        f.write(hdr)
+        yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": mixed}, f, sort_keys=False)
+    print(f"mixed training set: {len(mixed)} pools, {sum(e['name'].startswith('pp13_') for e in mixed)} of them pp")
     # the generation in 8 CPU jobs (CLAUDE.md 0c): every process once, dealt round-robin by multiplicity so each part
     # carries its share of the slow 2->4 MadEvent runs
     order = sorted(test, key=lambda e: (-mg.PROCESSES[e["name"]]["nfinal"], e["name"]))
