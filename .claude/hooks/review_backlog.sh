@@ -290,6 +290,11 @@ except Exception: print("")' 2>/dev/null)
 
     due=""
     for who in $(pillar_names); do
+      # a reviewer that took its lock in the last 30 min is working on it: asking again only wakes the main session
+      # for nothing (2026-10-25: a dozen such turns during one review). Past 30 min a held lock is a blocking verdict
+      # waiting on its fixes, and this nudge is then the only reminder (gate, bashpre and bashpost exempt any fresh
+      # lock), so it asks again
+      f=$(lock_file "$who"); [ -f "$f" ] && [ -n "$(find "$f" -mmin -30 2>/dev/null)" ] && continue
       lt=$(pillar_field "$who" 2); ct=$(pillar_field "$who" 3)
       set -- $(backlog_for "$who")
       l="${1:-0}"; c="${2:-0}"
