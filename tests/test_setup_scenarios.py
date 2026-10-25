@@ -27,12 +27,25 @@ d = os.path.dirname(os.path.abspath(__file__))
 open(os.path.join(d, "calls.log"), "a").write(" ".join(a) + "\n")
 c = sqlite3.connect(os.path.join(d, "runs.db"))
 if a[0] == "decide":
+    import datetime as dt, glob, json
     kind, cov, q = a[a.index("--kind") + 1], a[a.index("--covers") + 1], a[a.index("--quote") + 1]
-    import datetime as dt
-    t = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
-    c.execute("INSERT INTO decisions VALUES ('D900','FA',?,?,?,?,1,'')", (kind, q, cov, t))
+    # said_at as the real site dates it: the last time the user typed the words (here: the fixture transcripts)
+    t = None
+    for f in glob.glob(os.path.join(os.environ.get("PLAN_TRANSCRIPTS", "/nonexistent"), "*.jsonl")):
+        for line in open(f):
+            m = json.loads(line)
+            if m.get("type") == "user" and q in str((m.get("message") or {}).get("content")):
+                t = max(t or m["timestamp"], m["timestamp"])
+    t = t or dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    did = "D%d" % (900 + c.execute("SELECT COUNT(*) FROM decisions WHERE id LIKE 'D9__'").fetchone()[0])
+    c.execute("INSERT INTO decisions VALUES (?,'FA',?,?,?,?,1,'')", (did, kind, q, cov, t))
+    if kind in ("hold", "release"):      # as the real site: the older opposite decision stops covering these items
+        other = "release" if kind == "hold" else "hold"
+        for oid, ocov in c.execute("SELECT id, covers FROM decisions WHERE kind=? AND in_force=1", (other,)).fetchall():
+            left = [k for k in (ocov or "").split(",") if k and k not in cov.split(",")]
+            c.execute("UPDATE decisions SET covers=?, in_force=? WHERE id=?", (",".join(left), 1 if left else 0, oid))
     c.commit()
-    print("  D900  FA/%s  said 2026-10-25T15:00:00Z: \"x\"" % kind)
+    print("  %s  FA/%s  said %s: \"x\"" % (did, kind, t))
 elif a[0] == "item":
     if os.environ.get("STUB_ITEM_FAIL"):
         sys.exit("site: item refused")
@@ -73,7 +86,7 @@ class World:
                 f.write(J({"type": role, "timestamp": ts, "entrypoint": "cli", "message": m}) + "\n")
         # subagent transcripts: (id, started, entry its prompt names); every step in `state` gets its own, started
         # at the step's time with that entry's prompt, unless its agent id starts with "forged"
-        agents = list(agents) + [(x["agent"], x["at"], eid) for eid, v in (state or {}).items()
+        agents = list(agents) + [(x["agent"], x["at"], eid) for eid, v in (state or {}).items() if eid[:1] != "_"
                                  for x in (v or {}).get("steps") or [] if not x["agent"].startswith("forged")]
         for aid, started, eid in agents:
             p = os.path.join(self.ag, "agent-%s.jsonl" % aid)
@@ -746,8 +759,10 @@ def test_switch():
     w = World([E("rd", status="done", writeup="abc", done_when="test -f an/none.png", notes_ref="par:readout",
                  evidence={"runs": [], "commit": None, "paths": []})])
     rc, err = w.check()
-    scenario("3: a done entry that no longer passes plan done's checks blocks", rc == 2 and "marked done but" in err,
-             err)
+    rn, out = w.plan_cmd("next")
+    scenario("3 (fifth review): a done entry that regressed is a note and a reopen suggestion, never a block",
+             rc == 0 and "marked done but" in err and rn == 0 and "SUGGEST rd" in out and "plan reopen rd" in out,
+             err + out)
 
 
 def claims_state():
@@ -786,8 +801,148 @@ def fourth_lower():
              "|| true" not in so and "git rm -q .claude/hooks/plan_guard.py" in so)
 
 
+def hold_release():
+    """Fifth review 1: a hold then a release (the real site edits the hold's covers) leaves nothing standing."""
+    w = World([E("syn")], items=[("syn", None)], state={"syn": step(40)},
+              transcript=[(ago(20), "user", "hold the synthetic direction for now please"),
+                          (ago(2), "user", "release the synthetic direction now please")])
+    r1 = w.plan_cmd("answer", "syn", "--kind", "hold", "--quote", "hold the synthetic direction for now please")
+    r2 = w.plan_cmd("answer", "syn", "--kind", "release", "--quote", "release the synthetic direction now please")
+    held = w.sql("SELECT covers, in_force FROM decisions WHERE kind='hold'")
+    rc, err = w.check()
+    scenario("1: hold then release: the registry's hold no longer covers it, the entry runs, nothing blocks",
+             r1[0] == 0 and r2[0] == 0 and held == [("", 0)] and w.entries()["syn"]["status"] == "running"
+             and "quote" not in err, r1[1] + r2[1] + str(held) + err)
+
+
+def reask_once():
+    """Fifth review 2: an answered question asked again is reported at one stop; a quoted question is no re-ask."""
+    ask = "Should the small study also run the frozen lower blocks at every rung?"
+    done_ask = [{"ask": ask, "at": ago(200), "answered_at": ago(100), "decision": "D5"}]
+    w = World([E("lowd", asks=done_ask)], state={"lowd": step(1)},
+              transcript=[(ago(10), "assistant", "Joaquin, should the small study also run the frozen lower blocks "
+                                                 "at every rung?")])
+    rc1, err1 = w.check()
+    rc2, err2 = w.check()
+    scenario("2: a re-ask blocks at one stop, and not at the next", rc1 == 2 and "asked again" in err1 and rc2 == 0,
+             err1 + err2)
+    w = World([E("lowd", asks=done_ask)], state={"lowd": step(1)},
+              transcript=[(ago(10), "assistant", 'Joaquin, you asked me before: "Should the small study also run the '
+                                                 'frozen lower blocks at every rung?" Your answer was yes; it runs.')])
+    rc, err = w.check()
+    scenario("2: a question quoted in a status message is no re-ask", rc == 0, err)
+    w = World([E("lowd", asks=done_ask)], state={"lowd": step(1), "_asks_scanned": ago(5)},
+              transcript=[(ago(10), "assistant", "Joaquin, should the small study also run the frozen lower blocks "
+                                                 "at every rung?")])
+    rc, err = w.check()
+    scenario("2: messages before the previous scan are not read again", rc == 0, err)
+
+
+def reopen():
+    """Fifth review 3: plan reopen and plan evidence --drop; any write to a done entry reruns its check."""
+    repo = tempfile.mkdtemp(prefix="reopen_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q"); os.makedirs(os.path.join(repo, "docs")); os.makedirs(os.path.join(repo, "an"))
+    open(os.path.join(repo, "docs", "results.tex"), "w").write("x\n"); g("add", "."); g("commit", "-qm", "a")
+    open(os.path.join(repo, "docs", "results.tex"), "a").write("\\paragraph{rd.}\\label{par:readout} done.\n")
+    g("commit", "-qam", "b")
+    sha = g("rev-parse", "HEAD").stdout.strip()
+    open(os.path.join(repo, "an", "fig.png"), "w").write("p")
+    open(os.path.join(repo, "an", "old.png"), "w").write("p")
+    rd = E("rd", status="done", writeup=sha, done_when="test -f an/fig.png", notes_ref="par:readout",
+           evidence={"runs": [], "commit": sha, "paths": ["an/fig.png", "an/old.png"]})
+    w = World([rd])
+    w.env["PLAN_ROOT"] = repo
+    rc0, err0 = w.check()
+    os.remove(os.path.join(repo, "an", "old.png"))
+    w.plan_cmd("evidence", "rd", "--drop", "an/old.png")
+    rc1, err1 = w.check()
+    scenario("3: plan evidence --drop removes a pruned path, and the write reruns the done check (still passing)",
+             rc0 == 0 and rc1 == 0 and "marked done" not in err0 + err1
+             and w.entries()["rd"]["evidence"]["paths"] == ["an/fig.png"], err0 + err1)
+    os.remove(os.path.join(repo, "an", "fig.png"))
+    w.plan_cmd("set-next", "rd", "redo the figure")
+    rc2, err2 = w.check()
+    r = w.plan_cmd("reopen", "rd", "--why", "its figure was pruned")
+    e = w.entries()["rd"]
+    scenario("3: a regression is seen after a write; plan reopen takes it back to running and keeps the write-up",
+             rc2 == 0 and "marked done but" in err2 and r[0] == 0 and e["status"] == "running"
+             and e["history"][0]["writeup"] == sha and "writeup" not in e, err2 + r[1])
+
+
+def commit_retry():
+    """Lower: a plan write waits out an index.lock; when git stays busy it says how to recover."""
+    import threading, time
+    repo, g, tex, base, env = plan_repo()
+    lock = os.path.join(repo, ".git", "index.lock")
+    open(lock, "w").close()
+    threading.Timer(2.0, lambda: os.remove(lock)).start()
+    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "after the lock"], env=env, capture_output=True,
+                       text=True)
+    scenario("lower: a plan write retries through a short index.lock and commits", r.returncode == 0
+             and g("status", "--porcelain").stdout == "", r.stdout + r.stderr)
+    open(lock, "w").close()
+    t0 = time.monotonic()
+    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "while git is busy"], env=env, capture_output=True,
+                       text=True)
+    os.remove(lock)
+    r2 = subprocess.run([sys.executable, PLAN, "commit"], env=env, capture_output=True, text=True)
+    scenario("lower: with git busy throughout it fails naming plan commit, which then commits",
+             r.returncode == 3 and "tools/plan.py commit" in r.stderr and r2.returncode == 0
+             and g("status", "--porcelain").stdout == "" and time.monotonic() - t0 < 40, r.stderr + r2.stderr)
+
+
+def claims_budget():
+    """Lower: a claims check that does not fit the stop's time blocks as incomplete; plan claims finishes it."""
+    repo, g, tex, base, env = plan_repo()
+    open(os.path.join(repo, "analysis", "slow.py"), "w").write(
+        'import json, time\ntime.sleep(8)\nprint(json.dumps({"v": 0.25}))\n')
+    g("add", "analysis/slow.py"); g("commit", "-qm", "slow", "--no-verify")
+    sha = g("rev-parse", "HEAD").stdout.strip()
+    open(tex, "a").write("\n%% src: python3 analysis/slow.py @%s\n%% claim: v=0.25\nThe value is $0.25$.\n" % sha)
+    g("commit", "-qam", "par", "--no-verify")
+    rc = subprocess.run([sys.executable, CHECK], input="{}", env=dict(env, PLAN_BUDGET="3"), capture_output=True,
+                        text=True)
+    scenario("lower: the claims check out of time blocks as 'claims check incomplete', not a hook timeout",
+             rc.returncode == 2 and "claims check incomplete" in rc.stderr, rc.stderr)
+    r = subprocess.run([sys.executable, PLAN, "claims"], env=env, capture_output=True, text=True)
+    cache = json.load(open(os.path.join(repo, "plan", ".claims_cache.json")))
+    head = g("rev-parse", "HEAD").stdout.strip()
+    scenario("lower: plan claims finishes it with no limit, keeps the passed paragraph, moves the watermark",
+             r.returncode == 0 and len(cache) == 1
+             and json.load(open(os.path.join(repo, "plan", ".state.json")))["_claims_verified"] == head,
+             r.stdout + r.stderr)
+
+
+def added_only():
+    """Policy: only numbers the diff adds need a claim; reflows, moves and typo fixes around them need none."""
+    repo, g, tex, base = repo_with_script()
+    open(tex, "w").write("Old paragraph with 1.23 and no source.\n\n% src: python3 analysis/gone.py @" + base +
+                         "\n% claim: x=0.77\nA claimed $0.77$ whose source is gone.\n")
+    g("add", "."); g("commit", "-qm", "two paragraphs", "--no-verify")
+
+    def stage(text):
+        open(tex, "w").write(text)
+        g("add", ".")
+        r = subprocess.run([sys.executable, VERIFY, "--root", repo, "--staged"], capture_output=True, text=True)
+        return r.returncode, r.stdout
+    claimed = "% src: python3 analysis/gone.py @" + base + "\n% claim: x=0.77\n"
+    for name, text, want in (
+            ("a reflow of an unsourced old number", "Old paragraph\nwith 1.23 and, reworded, no source.\n\n" + claimed
+             + "A claimed $0.77$ whose source is gone.\n", 0),
+            ("a move of both paragraphs", claimed + "A claimed $0.77$ whose source is gone.\n\nOld paragraph with "
+             "1.23 and no source.\n", 0),
+            ("a typo fix in a claimed paragraph (its claim is not rerun)", "Old paragraph with 1.23 and no source.\n\n"
+             + claimed + "A claimed $0.77$ whose source has gone.\n", 0),
+            ("a changed number", "Old paragraph with 1.24 and no source.\n\n" + claimed +
+             "A claimed $0.77$ whose source is gone.\n", 1)):
+        rc, out = stage(text)
+        scenario("policy: %s %s" % (name, "is refused" if want else "needs no claim"), rc == want, out)
+
+
 def main():
     liveness(); files(); answers(); adding(); questions(); holds(); done(); migration(); claims()
+    hold_release(); reask_once(); reopen(); commit_retry(); claims_budget(); added_only()
     worktree_then_merge(); plan_commits(); test_switch(); claims_state(); fourth_lower()
     direct_writes(); one_agent_per_step(); git_bypass(); parsing(); checks_and_sites(); no_plan_yet(); lower()
     print("%d/%d scenarios pass" % (sum(RESULTS), len(RESULTS)))

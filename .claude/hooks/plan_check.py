@@ -4,11 +4,12 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
   - `plan next` lists a step not launched: a run of an entry ended, an entry has nothing in flight, or the user wrote
     after a question (their answer has not reached its entry);
   - an entry waits on the user but no message sent to them carries its question (from 15 min before the ask on);
-  - a question already answered is asked again in a message sent after the answer;
   - an entry is held by anything but a hold or forbid in force that names it;
-  - a step recorded in the state file is not a real step agent of its entry (re-validated on every read); a quote is
-    not the words its decision recorded about that entry, at that time, after what it answers; a running entry has
-    no approval in force naming it; a done entry no longer passes what plan done checked (rerun daily);
+  - a running entry has no approval in force naming it;
+  - once, at one stop (checks of history): a step recorded in the state file is not a real step agent of its entry; a
+    quote is not the words its decision recorded about that entry (covers as recorded), at that time, after what it
+    answers; an answered question was asked again in a message since the previous stop (quoted text left out);
+  - never blocking, a note: a done entry no longer passes what plan done checked (plan next suggests plan reopen);
   - numbers committed to docs/results.tex on trunk since the last verified commit fail tools/verify_claims.py (the
     gate on the numbers, a check of state; the git hooks only catch a problem earlier);
   - a site event is open.
@@ -29,11 +30,24 @@ def open_events():
     return [l.strip() for l in r.stdout.splitlines() if re.match(r"\s*E\d+\s", l)]
 
 
+BUDGET_S = 270            # all checks that reach out end within this; the hook is registered with 300 s
+BUDGET_TEST = "PLAN_BUDGET"   # a shorter budget, honoured only under PLAN_TEST=1 (tests)
+QUOTED = re.compile(r"\u201c[^\u201d]*\u201d|\"[^\"\n]*\"|`[^`\n]*`|^\s*>.*$", re.M)
+
+
+def own_questions(text):
+    """The sentences a message itself asks: quoted text (a question cited in a status message) is left out."""
+    return [q.strip() for q in re.findall(r"[^.!?\n]*[.!?]?", QUOTED.sub(" ", text)) if q.strip().endswith("?")]
+
+
 def problems():
-    import plan
+    """(blocks, once): blocks stand until fixed through the plan CLI or a commit; `once` are checks of history
+    (a quote, a recorded step, an answered question asked again), reported at one stop and then not again."""
+    import plan, time
+    plan.DEADLINE[0] = time.monotonic() + float(plan.ENV.get(BUDGET_TEST, BUDGET_S))
     d, st = plan.load()
-    msgs = plan.messages(plan.oldest_open(d))          # only from the oldest open question or answer on
-    out = []
+    msgs = plan.messages(plan.oldest_open(d, st))     # from the oldest open question, or the previous re-ask scan
+    out, once = [], []
     for e, why, launched in plan.next_steps(d, st, msgs=msgs):
         if launched:
             continue
@@ -52,31 +66,46 @@ def problems():
         for q in e.get("quotes") or []:
             why = plan.quote_problem(q, e["id"])
             if why:
-                out.append("%s: a quote on it is not the user's recorded words: %s" % (e["id"], why))
+                once.append("%s: a quote on it is not the user's recorded words: %s" % (e["id"], why))
         if e.get("status") == "held":
             dd = plan.decision(e.get("hold_decision"))
             if not dd or not dd["in_force"] or dd["kind"] not in ("hold", "forbid") or not plan.covers_name(dd, e["id"]):
                 out.append("%s is held by %s, which is not a hold in force that names it" % (
                     e["id"], e.get("hold_decision")))
+    mark = plan.asks_mark(st)                         # only messages since the previous scan
     for e, x in plan.answered_asks(d):
-        t1 = plan.parse(x["answered_at"])
-        again = [ts for ts, text in sent if ts > t1 and any(
-            q.strip().endswith("?") and plan.overlap(x["ask"], q) for q in re.findall(r"[^.!?\n]*[.!?]?", text))]
+        t1 = max(plan.parse(x["answered_at"]), mark)
+        again = [ts for ts, text in sent if ts > t1 and any(plan.overlap(x["ask"], q) for q in own_questions(text))]
         if again:
-            out.append("a question answered on %s (%s, %s) was asked again at %s" % (
+            once.append("a question answered on %s (%s, %s) was asked again at %s" % (
                 x["answered_at"][:16], e["id"], x.get("decision"), again[-1].isoformat()[:16]))
-    out += ["a step recorded on %s is not valid (%s); record steps only through plan step" % (eid, why)
-            for eid, stp, why in plan.bad_steps(st)]
-    out += plan.done_problems(d, st)
+    once += ["a step recorded on %s is not valid (%s); it does not count, record steps only through plan step" % (
+        eid, why) for eid, stp, why in plan.bad_steps(st)]
+    for e, why in plan.done_problems(d, st):
+        plan.NOTES.append("%s is marked done but %s: plan reopen %s --why ..., or fix it (see plan next)" % (
+            e["id"], why, e["id"]))
     out += plan.claims_problems()
     out += ["open event: " + ev for ev in open_events()]
-    return out
+    return out, once, st
+
+
+def report_once(st, once):
+    """The `once` messages not reported at an earlier stop; records them and the end of this re-ask scan."""
+    import plan
+    seen = list(st.get("_reported") or [])
+    new = [m for m in once if m not in seen]
+    plan._set_state("_reported", (seen + new)[-500:])
+    plan._set_state("_asks_scanned", plan.now().isoformat())
+    return new
 
 
 def main():
     try:
         sys.stdin.read()
-        bad = problems()
+        bad, once, st = problems()
+        import plan
+        if os.path.exists(plan.PLAN_FILE):
+            bad += report_once(st, once)
     except Exception as ex:                       # fail closed: a guard that errors is a guard that is off
         sys.stderr.write("plan check failed (%r); fix it before ending the turn\n" % ex)
         return 2

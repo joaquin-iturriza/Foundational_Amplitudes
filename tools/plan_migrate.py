@@ -70,8 +70,8 @@ def main():
 
     def quotes(iid, dec):
         names = lambda x: [y.strip() for y in (x["covers"] or "").split(",")]
-        return [{"said_at": x["said_at"], "text": x["quote"], "decision": x["id"]} for x in decs
-                if x["id"] == dec or iid in names(x)]
+        return [{"said_at": x["said_at"], "text": x["quote"], "decision": x["id"], "covers": names(x)} for x in decs
+                if x["id"] == dec or iid in names(x)]     # covers as they stand now: a later hold/release edits them
 
     def blank(**k):
         e = {"status": "running", "quotes": [], "decisions": [], "next": None, "done_when": None, "match": None,

@@ -4,12 +4,13 @@ pre-merge-commit). A paragraph (or itemize item) that states numbers carries the
     % src: python3 <a tracked script under analysis/ or tools/> [args] @<commit where that script exists>
     % claim: <key, dotted into the JSON object the script prints as its last {...} line>=<value as written, 0.80, 5.8e-8, 40>
     % allow: <tokens that are not results: 2\to4, H100> [<a plain number> because <why it is no result>]  (optional)
-For each paragraph or item the change touches:
-  - every number in its text (decimals, integers, a x 10^b, 5.8e-8, braced \\textbf{0.80} or \\num{..}, table cells,
+For each paragraph or item the change touches (only numbers the change ADDS count: those on its + lines less those on
+its - lines, so a reflow, a move or a typo fix around existing numbers needs no claim):
+  - every added number in its text (decimals, integers, a x 10^b, 5.8e-8, braced \\textbf{0.80} or \\num{..}, table cells,
     suffixed 40k or 2.35x; -- is a range) must be the written value of one of its claims or an allowed token;
     multiplicities (2\\to4), years, dates, times, subscripts, lengths and the insides of \\label, \\ref, \\cite,
     \\code, \\texttt and \\url are skipped;
-  - every claim's value must be written in the text;
+  - every claim whose line is added, or whose value is an added number, must be written in the text;
   - every src must be `python3 <path>`, the path tracked, under analysis/ or tools/, and present at @commit; it is rerun
     on the local artifacts (range mode: where the script is the one at the range's end, see Where) and each claim must equal the recomputed value up to the rounding the text shows (half a
     unit of its last digit).
@@ -197,16 +198,36 @@ def run_src(where, cmd, cache):
     return cache[cmd]
 
 
-def verify(root, text, added, rev=None):
+def added_numbers(diff):
+    """The numbers the diff adds: those on its + lines less those on its - lines (a multiset of their text), so a
+    reflow, a move or a typo fix around an existing number adds none. Comment lines are provenance, not numbers."""
+    import collections
+    plus, minus = collections.Counter(), collections.Counter()
+    for l in diff.splitlines():
+        if l.startswith(("+++", "---")) or not l[:1] in "+-" or l[1:].lstrip().startswith("%"):
+            continue
+        (plus if l[0] == "+" else minus).update(t for t, _ in numbers(l[1:], []))
+    return plus - minus
+
+
+def verify(root, text, added, rev=None, diff=None, cache_file=None):
     where = Where(root, rev)
     try:
-        return _verify(root, text, added, rev, where)
+        return _verify(root, text, added, rev, where, diff, cache_file)
     finally:
         where.close()
 
 
-def _verify(root, text, added, rev, runner):
+def _verify(root, text, added, rev, runner, diff=None, cache_file=None):
+    """Policy (the user's approval wording, "every number and figure added"): only numbers ADDED by the diff need a
+    claim; a claim is rerun when its line is added or its value is an added number."""
+    import hashlib
     problems, cache = [], {}
+    new_nums = added_numbers(diff) if diff is not None else None
+    try:
+        done = json.load(open(cache_file)) if cache_file else {}
+    except (OSError, ValueError):
+        done = {}
     tl = text.splitlines()
     gen = [i for i, l in enumerate(tl, 1) if l.lstrip().startswith("% plan:begin")]
     gen = [(b, next((j for j in range(b, len(tl) + 1) if tl[j - 1].lstrip().startswith("% plan:end")), len(tl)))
@@ -216,50 +237,71 @@ def _verify(root, text, added, rev, runner):
             continue
         if any(b <= first and last <= e for b, e in gen):      # the plan's generated view (tools/plan.py view)
             continue
+        key = hashlib.sha256("\n".join(lines).encode()).hexdigest()
+        if key in done:                                        # this paragraph, as it stands, passed before
+            continue
+        n_before = len(problems)
         where = "lines %d-%d" % (first, last)
         body = " ".join(l for l in lines if not l.lstrip().startswith("%"))
         src, commit, claims, allowed = None, None, [], []
-        for l in lines:
+        for i, l in enumerate(lines):
             m = re.match(r"\s*%\s*src:\s*(.+?)(?:\s+@(\S+))?\s*$", l)
             if m:
                 src, commit = m.group(1), m.group(2)
                 why = src_problem(root, src, commit, rev)
-                if why:
-                    problems.append("%s: %s" % (where, why))
-                    src = None
+                if why:                                        # reported if the line is new or a claim of it is rerun
+                    src = "!" + why
+                    if first + i in added:
+                        problems.append("%s: %s" % (where, why))
                 continue
             m = re.match(r"\s*%\s*claim:\s*([^=\s]+)\s*=\s*(\S+)\s*$", l)
             if m:
-                claims.append((src, m.group(1), m.group(2)))
+                claims.append((src, m.group(1), m.group(2), first + i in added))
                 continue
             m = re.match(r"\s*%\s*allow:\s*(.+)$", l)
             if m:
                 toks, why = allow_line(m.group(1))
                 allowed += toks
-                if why:
+                if why and first + i in added:
                     problems.append("%s: %s" % (where, why))
-        values = [claim_value(v) for _, _, v in claims]
-        for _, key, v in claims:
+        values = [claim_value(v) for _, _, v, _ in claims]
+        for _, key_, v, _ in claims:
             if claim_value(v) is None:
-                problems.append("%s: claim %s=%s is not a number" % (where, key, v))
+                problems.append("%s: claim %s=%s is not a number" % (where, key_, v))
         values = [v for v in values if v is not None]
+        left = None if new_nums is None else new_nums.copy()
+        new_vals = []
         for tok, val in numbers(body, allowed):
+            if left is not None:
+                if left[tok] <= 0:
+                    continue                                   # already in the text before this change
+                left[tok] -= 1
+            new_vals.append(val)
             if not any(abs(val - v) <= 1e-12 * max(1.0, abs(v)) for v in values):
                 problems.append("%s: %s is no claim's value (add a %% claim, or %% allow it if it is no result)" % (
                     where, tok))
-        for s, key, val in claims:
+        for s_, key_, val, line_added in claims:
+            cv = claim_value(val)
+            if not line_added and not any(cv is not None and abs(cv - x) <= 1e-12 * max(1.0, abs(x))
+                                          for x in new_vals):
+                continue                                       # an existing claim whose number did not change
             if not any(f in body for f in forms(val)):
-                problems.append("%s: claim %s=%s is not written in the text" % (where, key, val))
-            if s is None:
-                problems.append("%s: claim %s has no valid src above it" % (where, key))
+                problems.append("%s: claim %s=%s is not written in the text" % (where, key_, val))
+            if s_ is None or s_.startswith("!"):
+                problems.append("%s: claim %s has no valid src above it%s" % (where, key_, ": " + s_[1:] if s_ else ""))
                 continue
-            got = run_src(runner, s, cache)
+            got = run_src(runner, s_, cache)
             if isinstance(got, Exception):
-                problems.append("%s: %s failed: %s" % (where, s, got))
-            elif key not in got:
-                problems.append("%s: %s prints no %s" % (where, s, key))
-            elif not matches(val, got[key]):
-                problems.append("%s: %s=%s, recomputed %r (%s)" % (where, key, val, got[key], s))
+                problems.append("%s: %s failed: %s" % (where, s_, got))
+            elif key_ not in got:
+                problems.append("%s: %s prints no %s" % (where, s_, key_))
+            elif not matches(val, got[key_]):
+                problems.append("%s: %s=%s, recomputed %r (%s)" % (where, key_, val, got[key_], s_))
+        if cache_file and len(problems) == n_before:           # saved paragraph by paragraph: a cut run keeps them
+            done[key] = 1
+            tmp = cache_file + ".tmp"
+            open(tmp, "w").write(json.dumps(done))
+            os.replace(tmp, cache_file)
     return problems
 
 
@@ -271,6 +313,7 @@ def main(argv=None):
     g.add_argument("--staged", action="store_true")
     g.add_argument("--worktree", action="store_true", help="the working file against HEAD")
     g.add_argument("--rev")
+    ap.add_argument("--cache", help="a JSON file of paragraphs (by content hash) that passed; they are skipped")
     a = ap.parse_args(argv)
     new_rev = None
     if a.rev:
@@ -281,7 +324,7 @@ def main(argv=None):
         text, diff = open(os.path.join(a.root, a.file)).read(), git(a.root, "diff", "-U0", "HEAD", "--", a.file).stdout
     else:
         text, diff = git(a.root, "show", ":" + a.file).stdout, git(a.root, "diff", "--cached", "-U0", "--", a.file).stdout
-    problems = verify(a.root, text, changed_lines(diff), new_rev if a.rev else None)
+    problems = verify(a.root, text, changed_lines(diff), new_rev if a.rev else None, diff, a.cache)
     for p in problems:
         print("CLAIM: " + p)
     print("verify_claims: %d problem(s)" % len(problems))

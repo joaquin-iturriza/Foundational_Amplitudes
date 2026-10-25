@@ -165,3 +165,4 @@ plan/*.lock
 plan/.state.json
 plan/.plan_tmp_*
 plan/.check_cache.json
+plan/.claims_cache.json

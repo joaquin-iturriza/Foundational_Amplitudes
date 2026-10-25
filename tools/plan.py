@@ -169,9 +169,16 @@ def commit_plan():
         return
     if not tracked:
         g("add", "--", rel)
-    r = g("commit", "-q", "-m", "plan: %s" % " ".join(COMMAND), "--only", "--", rel)
+    import time
+    for wait in (0, 1, 2, 4, 8):                 # an index.lock or a merge in progress clears within seconds
+        time.sleep(wait)
+        r = g("commit", "-q", "-m", "plan: %s" % " ".join(COMMAND), "--only", "--", rel)
+        busy = "index.lock" in r.stderr or "during a merge" in r.stderr or "MERGE_HEAD" in r.stderr
+        if r.returncode == 0 or not busy:
+            break
     if r.returncode != 0:
-        sys.stderr.write("plan: recorded, but committing %s failed (%s); commit it before any launch\n" % (
+        sys.stderr.write("plan: recorded, but committing %s failed (%s); run `python3 tools/plan.py commit` once "
+                         "git is free, before any launch\n" % (
             PLAN_FILE, (r.stderr or r.stdout).strip()[-300:]))
         sys.exit(3)
 
@@ -239,7 +246,8 @@ def names_it(dd, did, eid):
 def quote_problem(q, eid):
     """Why a quote on an entry is not the user's recorded words for it (None: it is). Its decision is in the registry
     with that text (`site decide` stored it only after finding it in a message the user typed), is about this entry,
-    carries the same said_at, and was said after the question or step it answers."""
+    carries the same said_at, and was said after the question or step it answers. Coverage is read from the covers
+    recorded with the quote (a release edits the hold's covers in the registry afterwards)."""
     did = q.get("decision")
     dd = decision(did)
     if not dd:
@@ -247,8 +255,9 @@ def quote_problem(q, eid):
     a, b = S()._norm(q.get("text") or ""), S()._norm(dd["quote"])
     if not a or not (a in b or b in a):
         return "%s's recorded words are not %r" % (did, (q.get("text") or "")[:60])
-    if not names_it(dd, did, eid):
-        return "%s does not cover %s (covers: %s)" % (did, eid, ", ".join(dd["covers"])[:120])
+    snap = dict(dd, covers=q["covers"]) if q.get("covers") is not None else dd    # covers as recorded: site decide
+    if not names_it(snap, did, eid):                                              # edits them on a later hold/release
+        return "%s does not cover %s (covers: %s)" % (did, eid, ", ".join(snap["covers"])[:120])
     if dd["said_at"] and parse(q.get("said_at")) and abs((dd["said_at"] - parse(q["said_at"])).total_seconds()) > 1:
         return "the quote is dated %s, %s says %s" % (q["said_at"][:16], did, dd["said_at"].isoformat()[:16])
     if q.get("answers_after") and dd["said_at"] and dd["said_at"] <= parse(q["answers_after"]):
@@ -274,7 +283,8 @@ def _check_cmd(eid):
 def _run_check(eid, cmd):
     """(active units, note): None when the check could not run (a site unreachable, a timeout), with the reason."""
     try:
-        r = subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True, timeout=CHECK_TIMEOUT)
+        r = subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True,
+                           timeout=max(1, min(CHECK_TIMEOUT, budget())))
         js = [l for l in r.stdout.splitlines() if l.strip().startswith("{")]
         if r.returncode != 0 or not js:
             return None, "exit %d: %s" % (r.returncode, (r.stderr or "no JSON").strip()[-160:])
@@ -470,6 +480,13 @@ def last_event(e, st):
 
 
 NOTES = []                    # what the check could not see (an unreachable site): reported, never blocking
+DEADLINE = [None]             # monotonic time by which the Stop hook's checks must end (plan_check sets it)
+
+
+def budget():
+    """Seconds left for checks that reach out (item checks, the claims check); large outside the Stop hook."""
+    import time
+    return 10 ** 6 if DEADLINE[0] is None else max(0.0, DEADLINE[0] - time.monotonic())
 
 
 def why_moves(e, st, msgs, t, d=None, checks=None):
@@ -501,19 +518,28 @@ def why_moves(e, st, msgs, t, d=None, checks=None):
     return None
 
 
-def oldest_open(d):
-    """The earliest time the guard's transcript reading has to start from."""
+ASKS_FIRST_MIN = 60          # with no scan recorded yet, re-asks are looked for in the last hour
+
+
+def asks_mark(st):
+    """Where the scan for answered questions asked again starts: the end of the previous scan (state _asks_scanned)."""
+    return parse(st.get("_asks_scanned")) or now() - dt.timedelta(minutes=ASKS_FIRST_MIN)
+
+
+def oldest_open(d, st=None):
+    """The earliest time the transcripts are read from: the oldest OPEN question (less the margin) or the end of the
+    previous re-ask scan, whichever is earlier."""
     ts = [parse(e.get("waiting_since")) - dt.timedelta(minutes=ASK_MARGIN_MIN) for e in d["entries"]
           if e.get("status") == "waiting_user" and e.get("waiting_since")]
-    ts += [parse(x["answered_at"]) for e in d["entries"] for x in e.get("asks") or [] if x.get("answered_at")]
-    return min(ts) if ts else now()
+    ts.append(asks_mark(st or {}))
+    return min(ts)
 
 
 def next_steps(d, st, t=None, msgs=None):
     """Deterministic: [(entry, reason, launched)]. A running entry's step is launched when a step agent was recorded
     after the reason arose; a waiting entry is never launched by a step (only plan answer or unanswered clear it)."""
     t = t or now()
-    msgs = messages(oldest_open(d)) if msgs is None else msgs
+    msgs = messages(oldest_open(d, st)) if msgs is None else msgs
     checks = item_checks([e["id"] for e in d["entries"] if e.get("status") == "running"])
     out = []
     for e in d["entries"]:
@@ -583,6 +609,7 @@ def labels():
 
 # ---------------------------------------------------------------- the numbers on trunk, checked as state
 CLAIMS_TIMEOUT = 240          # seconds for verify_claims over the new trunk commits (below plan_check's 300)
+CLAIMS_CACHE = os.path.join(os.path.dirname(STATE_FILE), ".claims_cache.json")   # passed paragraphs, by content
 
 
 def _set_state(key, value):
@@ -598,7 +625,8 @@ def claims_problems():
     """verify_claims over every trunk commit since the last verified one (_claims_verified in the state file). This
     is the gate on the numbers in docs/results.tex, whatever way a commit reached trunk (hooks skipped, a merge, a
     rebase); the git hooks and git_verify_guard only catch a problem earlier. On a pass the watermark moves to trunk's
-    head; a check that does not finish in CLAIMS_TIMEOUT is a note and the watermark stays."""
+    head; a check that does not finish in the time left blocks as "claims check incomplete" (plan claims finishes
+    it with no limit, and paragraphs that passed are kept by content hash), never a silent timeout of the hook."""
     if not os.path.exists(PLAN_FILE):
         return []
     g = lambda *a: subprocess.run(["git", "-C", ROOT] + list(a), capture_output=True, text=True)
@@ -613,13 +641,18 @@ def claims_problems():
         return []
     base = last if g("merge-base", "--is-ancestor", last, head).returncode == 0 else \
         g("merge-base", last, head).stdout.strip()
+    left = min(CLAIMS_TIMEOUT, budget())
+    incomplete = ["claims check incomplete: verify_claims over trunk %s..%s did not finish in the %d s left; run "
+                  "`python3 tools/plan.py claims` (no time limit; passed paragraphs are kept) to finish it"
+                  % (base[:8], head[:8], left)]
+    if left < 5:
+        return incomplete
     try:
         r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "verify_claims.py"), "--root", ROOT, "--rev",
-                            "%s..%s" % (base, head)], capture_output=True, text=True, timeout=CLAIMS_TIMEOUT)
+                            "%s..%s" % (base, head), "--cache", CLAIMS_CACHE], capture_output=True, text=True,
+                           timeout=left)
     except subprocess.TimeoutExpired:
-        NOTES.append("the claims check of trunk %s..%s did not finish in %d s; it runs again next time" % (
-            base[:8], head[:8], CLAIMS_TIMEOUT))
-        return []
+        return incomplete
     if r.returncode == 0:
         _set_state("_claims_verified", head)
         return []
@@ -631,7 +664,9 @@ DONE_RECHECK_H = 24           # a done entry's finishing checks are rerun at mos
 
 
 def done_problems(d, st):
-    """Every done entry still passes what plan done checked; cached for DONE_RECHECK_H hours per entry and write-up."""
+    """[(entry, why)]: done entries that no longer pass what plan done checked. Cached for DONE_RECHECK_H hours under
+    a key of every field the check reads, so any write to the entry reruns it. A regression is a suggestion (plan next
+    lists `plan reopen`), never a standing block."""
     try:
         cache = json.load(open(CHECK_CACHE))
     except (OSError, ValueError):
@@ -640,24 +675,46 @@ def done_problems(d, st):
     for e in d["entries"]:
         if e.get("status") != "done":
             continue
-        key = "done:%s:%s:%s" % (e["id"], e.get("writeup"), e.get("done_when"))
+        import hashlib
+        runs = sorted(map(list, runs_of(e, st)))
+        key = "done:%s:%s" % (e["id"], hashlib.sha256(json.dumps([e, runs], sort_keys=True, default=str).encode())
+                              .hexdigest()[:16])
         hit = cache.get(key)
         if hit and (now() - parse(hit["at"])).total_seconds() < 3600 * DONE_RECHECK_H:
             why = hit["why"]
         else:
             try:
-                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"), timeout=30)
+                why = done_refusals(e, st, e.get("writeup") or "?", e.get("runs_override"), timeout=min(30, budget()))
             except subprocess.TimeoutExpired:
                 NOTES.append("%s: its done check did not finish; it runs again next time" % e["id"])
                 continue
             cache[key], changed = {"at": now().isoformat(), "why": why}, True
-        out += ["%s is marked done but %s" % (e["id"], w) for w in why]
+        if why:
+            out.append((e, "; ".join(why)))
     if changed and os.path.exists(PLAN_FILE):
         _write_atomic(CHECK_CACHE, json.dumps(cache))
     return out
 
 
 # ---------------------------------------------------------------- commands
+def cmd_reopen(a):
+    """A done entry back to running (its write-up kept in its history), e.g. when plan next says it regressed."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if e.get("status") != "done":
+            sys.exit("plan: %s is %s, not done" % (a.id, e.get("status")))
+        e.setdefault("history", []).append({"at": now().isoformat(), "was": "done", "writeup": e.pop("writeup", None),
+                                            "why": a.why})
+        e["status"] = "running"
+    print("plan: %s reopened" % a.id)
+
+
+def cmd_commit(a):
+    """Commit plan/plan.yaml when a write left it uncommitted (an index.lock or a merge in progress)."""
+    with transaction(write=False):
+        commit_plan()
+
+
 def cmd_claims(a):
     """The claims check of trunk since the last verified commit (auto_push.sh runs it before pushing trunk)."""
     bad = claims_problems()
@@ -808,7 +865,8 @@ def cmd_answer(a):
                 sys.exit("plan: site item %s not created (%s); %s rolled back, the entry is unchanged" % (
                     e["id"], why, did))
         e.setdefault("quotes", []).append({"said_at": said.isoformat(), "text": a.quote, "decision": did,
-                                           "answers_after": since.isoformat() if since else None})
+                                           "answers_after": since.isoformat() if since else None,
+                                           "covers": dd["covers"]})
         e.setdefault("decisions", []).append(did)
         for k, v in sets.items():
             e[k] = v
@@ -898,7 +956,7 @@ def cmd_evidence(a):
     with transaction() as (d, st):
         ev = entry(d, a.id).setdefault("evidence", {"runs": [], "commit": None, "paths": []})
         ev["runs"] = sorted(set((ev.get("runs") or []) + (a.run or [])))
-        ev["paths"] = sorted(set((ev.get("paths") or []) + (a.path or [])))
+        ev["paths"] = sorted(set((ev.get("paths") or []) + (a.path or [])) - set(a.drop or []))
         if a.commit:
             ev["commit"] = a.commit
 
@@ -922,6 +980,9 @@ def cmd_next(a):
         if a.prompts and e.get("status") == "running":
             print(step_prompt(e, why))
             print("-" * 60)
+    for e, why in done_problems(d, st):
+        print("SUGGEST %s: marked done, but %s; plan reopen %s --why ..., or fix it (plan evidence --drop ...)" % (
+            e["id"], why, e["id"]))
     print("plan: %d step(s) to launch" % len(todo))
     return 1 if todo else 0
 
@@ -1028,13 +1089,16 @@ def main(argv=None):
     cmd("unanswered", cmd_unanswered, A("id"))
     cmd("step", cmd_step, A("id"), A("--agent", required=True))
     cmd("run", cmd_run, A("id"), A("runs", nargs="+"))
-    cmd("evidence", cmd_evidence, A("id"), A("--run", action="append"), A("--commit"), A("--path", action="append"))
+    cmd("evidence", cmd_evidence, A("id"), A("--run", action="append"), A("--commit"), A("--path", action="append"),
+        A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
     cmd("set-next", cmd_set_next, A("id"), A("text"))
     cmd("dead-end", cmd_dead_end, A("id"), A("--tried", required=True), A("--why", required=True))
     cmd("next", cmd_next, A("--prompts", action="store_true"))
     cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"))
     cmd("view", cmd_view, A("--write", action="store_true"))
     cmd("claims", cmd_claims)
+    cmd("reopen", cmd_reopen, A("id"), A("--why", required=True))
+    cmd("commit", cmd_commit)
     a = p.parse_args(argv)
     COMMAND[:] = [a.cmd] + ([a.id] if getattr(a, "id", None) else [])
     return a.f(a) or 0
