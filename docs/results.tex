@@ -341,13 +341,27 @@ MadGraph's default coupling orders, which is what its events contain, and $467$ 
 diagram files show ($616$ and $708$ without merging CP conjugates). The classes follow the vertices of each process's
 diagrams: massless quark flavours are interchangeable on pure-QCD quark lines, only up or down type matters once an
 electroweak vertex touches a light quark, and a $W$ on a light quark allows only the generation swap
-(\code{analysis/catalog\_daniel/classify2.py}, \code{classes\_default.json}, \code{classes\_allorders.json}). $96$ of
+(\code{analysis/catalog\_daniel/classify2.py}, \code{classes\_default.json}, \code{classes\_allorders.json}; \code{classify2.py}
+imports a \code{classify} module that is in neither the repo nor any site, so these counts cannot be regenerated from
+trunk, and \code{tools/equal\_processes.py} supersedes it). $96$ of
 its $149$ held-out processes are exact relabels of training processes, so ``held out'' in its split is not
 ``unseen'' in ours, where a probe's whole class is held out (Sec.~\ref{sec:ladder}). Our catalog covers $81$ of the
 $467$ classes (\code{overlap.py}, \code{overlap\_ours\_vs\_daniel.json}). No $|\mathcal M|^2$ is public (the Zenodo record
 holds momenta only); generating all of it ourselves is $\approx19$ core-h, once a reader of its catalog and massive
 $b$ beams ($347$ processes) are built. The earlier rule-based bounds without the diagrams' vertices ($484$ to $779$
 classes, $519$ to $711$ under a liberal flavour and charge-conjugation rule, $75$ to $78$ of them ours) are superseded.
+
+\paragraph{Generating it (2026-10-15, D45).} About $10^5$ training events per process (the user: ``For now let's do only
+100k.''), with its MadEvent setup and its split as published. Settled by its setup and the user's answers: its default
+coupling orders, massive $b$ beams, the $2\to1$ group dropped (``Drop them'': $1491$ processes, $139$ held out), the
+hold-out ``Their split, report both'' (all $139$ and the $43$ without a relabel in training), the top mass ``173.0,
+theirs''. The pipeline (a reader of its catalog, massive $b$ beams for $347$ processes; commits \code{9bbc825},
+\code{77cae08}) was tested end to end, $gg\to gg$ labels against the analytic $|\mathcal M|^2$ to $1.7\times10^{-7}$.
+Generated on one $48$-core CC node (FA-ccin2p3-17f91455): $1491$ processes, $0$ failed, a MadEvent phase of $3.6$\,h;
+validation and test ($10^4$ each) in \code{\$WORK/datasets}, training ($10^5$) in the \code{\$SCRATCH} cache, diagram
+sidecars \code{data/diagrams/dc\_*.diagrams.json} for all $1491$, $33$\,GB in \code{datasets}. A timing job
+(FA-ccin2p3-85c90b04) put $10^5$ events at $7.6$ to $30$\,min of wall per process ($b g\to b\bar b b$ $458$\,s, of which
+MadEvent $435$; $gg\to ggg$ $1823$\,s, MadEvent $1787$).
 
 
 \paragraph{catalog\_v3, the census (D98, 2026-10-23).} The new catalog counts equality classes, not process strings
@@ -592,9 +606,9 @@ inside the catalog's range; (b) the $80$ beyond it ($2\to5$, $\sqrt{\hat s}\in[1
 \label{fig:v3_kshot}
 \end{figure}
 
-\paragraph{The level's two targets on catalog\_v3 (2026-10-25).} Set on Daniel's catalog when its $2\to4$ zero-shot error was $52$
-(the hand-off's level item): zero-shot $2\to4$ within $2\times$ its one-event error, and the tops' shape floor under $0.5$
-with the heavy-quark layer. Read off the short pretrainings (Tab.~\ref{tab:v3_short}) and the context arm's K-shot fits
+\paragraph{The level's two targets on catalog\_v3 (2026-10-25).} The hand-off's level item set two targets on Daniel's catalog, when its $2\to4$ zero-shot error was $52$:
+zero-shot $2\to4$ within $2\times$ its one-event error, and the tops' shape floor under $0.5$
+with the heavy-quark layer. Both are read off the short pretrainings (Tab.~\ref{tab:v3_short}) and the context arm's K-shot fits
 (par.\ The context vector's $K$-shot fits on catalog\_v3, \code{analysis/catalog\_v3/data/kshot\_context.json}), medians over processes:
 \begin{itemize}
   \item \emph{$2\to4$: met, and the target no longer separates anything.} The context arm's zero-shot error on the $168$
@@ -612,28 +626,30 @@ Both targets now point at the same thing: the zero-shot error left on catalog\_v
 \paragraph{The shape proxy on catalog\_v3 (2026-10-25).} Since the zero-shot error left is shape, which target leaves
 the least of it? Per class, one small regressor (sklearn MLP $(64,64)$, the same for every target) fitted on $7500$
 validation events and scored on $2500$ more, with the same inputs for every target (the pair invariants and masses over
-$\hat s$, and $\log\hat s$); its held-out MSE after the mean is the shape a target costs within a process
+$\hat s$, and $\log\hat s$); its MSE on the $2500$ scoring events after the mean is the shape a target costs within a process
 (\code{analysis/catalog\_v3/prep\_shape.py}, run FA-ccin2p3-17fcc322; \code{prep\_shape\_read.py},
 \code{data/prep\_shape.json}; the port of the proxy on Daniel's catalog). Four targets: $\log|\mathcal M|^2$ (the baseline
 arm's), $+(N-4)\log\hat s$ (the $\hat s$ factor alone), $+L_q$ (the emission scales, the dimensionless arms' target) and
 $L_q$ with a soft minimum ($\tau=0.3$). $200$ training classes drawn with seed $0$ and every class of the seven held-out
 tree axes, none skipped. Medians over classes (Fig.~\ref{fig:v3_prep_shape}a):
 \begin{itemize}
-  \item \emph{The $\hat s$ factor alone leaves the least shape on every set, the emission scales the most.} On the $168$
+  \item \emph{The $\hat s$ factor alone leaves the least shape on every set but $\alpha_s=0.13$, the emission scales the most.} On the $168$
     held-out $2\to4$ classes: $0.062$ for the $\hat s$ factor, $0.077$ for $\log|\mathcal M|^2$, $0.093$ with the soft
     minimum, $0.123$ for the emission scales; per class the $\hat s$ factor is below $\log|\mathcal M|^2$ on $145$ of $168$
     (median ratio $0.84$) and the emission scales above it on $163$ (ratio $1.61$). On the $40$ $2\to5$ probes the gap
     widens: $0.091$, $0.124$, $0.181$, $0.236$ (emission scales above on all $40$). The same order on the training classes
     ($0.052$, $0.059$, $0.071$, $0.086$), the top ($0.023$, $0.027$, $0.030$, $0.040$) and every other axis but
-    $\alpha_s=0.13$, where all four are below $0.007$.
+    $\alpha_s=0.13$ ($8$ classes), where all four are below $0.007$ and the order differs: the soft minimum, $0.0034$, is just
+    below the $\hat s$ factor, $0.0036$, then the emission scales, $0.0058$, and $\log|\mathcal M|^2$, $0.0067$.
   \item \emph{The order holds at a third of the events} (run FA-ccin2p3-31d221cd, $2500$ to fit,
     \code{data/prep\_shape\_n2500.json}): every MSE about doubles ($2\to4$: $0.141$, $0.163$, $0.192$, $0.243$) and the
-    ranking is unchanged on every set.
+    ranking is the one above on every set but $\alpha_s=0.13$, where it is $0.0067$ for the $\hat s$ factor, $0.0087$ with
+    the soft minimum, $0.011$ for $\log|\mathcal M|^2$ and $0.014$ for the emission scales.
   \item \emph{The proxy tracks where the network leaves shape.} Across held-out classes, the rank correlation between the
     proxy's MSE and the short pretrainings' zero-shot shape (Tab.~\ref{tab:v3_short}) is $0.68$ on $2\to4$ and $0.80$ on
     the top for the dimensionless arm on its own target, $0.68$ and $0.71$ for the baseline (Fig.~\ref{fig:v3_prep_shape}b).
-    In size the network's zero-shot shape is $10$ to $30\times$ the proxy's ($0.85$ against $0.12$ on $2\to4$, $0.80$
-    against $0.04$ on the top): a per-class fit on $7500$ events is not what zero-shot gets, so the proxy ranks targets and
+    In size the network's zero-shot shape is $7$ to $20\times$ the proxy's (ratio of the medians: $0.85$ against $0.12$ on
+    $2\to4$, $0.80$ against $0.04$ on the top): a per-class fit on $7500$ events is not what zero-shot gets, so the proxy ranks targets and
     classes, it does not bound the network.
 \end{itemize}
 The emission scales bought the $2\to4$ level on Daniel's catalog ($52$ to $2.2$, par.\ The emission scales in training) and
@@ -646,9 +662,42 @@ $2\to4$, which only a network can weigh.
 \includegraphics{../analysis/catalog_v3/figs/prep_shape.pdf}
 \caption{The shape proxy on catalog\_v3. (a) Per set (the $200$ training classes, tr, and the held-out axes H1 new
 combinations, H2 $2\to4$, H2.5 $2\to5$, H3 the top, H6 $\alpha_s=0.13$, H7c $p_T\geq30$\,GeV, H7E $1$ to $10$\,TeV), the
-median over classes of a fixed small regressor's held-out MSE for each target. (b) Per held-out class, that MSE for
+median over classes of a fixed small regressor's MSE on the $2500$ scoring events for each target. (b) Per held-out class, that MSE for
 the emission-scale target against the dimensionless arm's zero-shot shape on the same class.}
 \label{fig:v3_prep_shape}
+\end{figure}
+
+\paragraph{The shape proxy's candidate in a network (2026-10-25).} The dimensionless arm with $\hat s$ alone as the
+target's reference scale in place of the emission scales (the same dimensionless inputs and coupling orders; arm
+\code{dimensionless\_shat} of \code{scripts/job\_catalog\_v3\_short.sh}, one seed, the short setup and HPs of the four
+arms, run FA-ccin2p3-fbd73961, under D99), read zero-shot on every axis as in Tab.~\ref{tab:v3_short} (all $617$ probes;
+\code{analysis/catalog\_v3/prep\_shat.py}, \code{data/prep\_shat.json}, Fig.~\ref{fig:v3_prep_shat}). Medians over each
+axis's processes, MSE (level, shape), against the dimensionless arm's in Tab.~\ref{tab:v3_short}:
+\begin{itemize}
+  \item \emph{Inside the catalog's range it is the best of the five arms on three of the six axes and second on one.} New combinations
+    $0.74$ ($0.14$, $0.53$), $2\to4$ $0.85$ ($0.12$, $0.67$), the top $1.51$ ($0.42$, $0.78$), one loop $0.87$,
+    $p_T\geq30$\,GeV $0.34$; against the dimensionless arm's $0.84$, $1.04$, $1.67$, $1.12$, $0.44$. The context vector's
+    arm keeps the top ($1.46$), the twin one loop ($0.85$); on $\alpha_s=0.13$ ($8$ probes) it is $0.17$ against $0.14$. Per probe its shape is below
+    the dimensionless arm's on $124$ of the $168$ $2\to4$ classes (median ratio $0.80$), $147$ of $237$ tops ($0.90$), $45$
+    of $54$ new combinations ($0.81$), and $22$ of $30$ to $33$ of $40$ on the others: the proxy's ranking holds in the
+    network, the shape about $10$ to $30\%$ lower.
+  \item \emph{It gives up the level at a new multiplicity.} On the $2\to5$ probes the MSE is $14.8$, of it $13.6$ level,
+    against $1.21$ ($0.10$) for the emission scales, worse on all $40$ although its shape is lower on $32$; at $1$ to
+    $10$\,TeV it is $1.73$ ($0.28$, $1.11$) against $2.88$, so the energy extrapolation the $\hat s$ factor carries holds.
+    It is still below the baseline's $46$ on every $2\to5$ probe: $\hat s$ alone sets part of a new multiplicity's level,
+    the emission scales the rest.
+  \item \emph{Signs.} On the $17$ one-loop pools that change sign, the median wrong-sign fraction is $15\%$, against $18\%$
+    for the emission scales and $5\%$ for the baseline.
+\end{itemize}
+So the two references trade one against the other: the emission scales set the level of a multiplicity never seen and
+cost shape everywhere, $\hat s$ alone keeps the shape and loses that level. One seed each.
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_shat.pdf}
+\caption{catalog\_v3's short pretraining with $\hat s$ alone as the target's reference scale against the dimensionless
+arm (the emission scales), per held-out probe: (a) the shape of the zero-shot error, (b) its MSE, on
+$\log|\mathcal M|^2$. Triangles: the $2\to5$ and $1$ to $10$\,TeV probes. One seed each.}
+\label{fig:v3_prep_shat}
 \end{figure}
 
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
@@ -5490,15 +5539,17 @@ pool, so the smaller sets are nested in the larger; validation and test are fixe
 splits at every $D$ (one-loop pools hold $5\times10^4$ training events, so their grid stops at
 $k=9$). Each $(\text{probe},D)$ cell is one single-fidelity DyHPO of $8$ trials
 (\code{sweep/gen\_transfer\_pilot.py}), searched wide at first, to be narrowed once
-patterns show: the lr window is one decade either side of $\eta^\ast(t)$ of the high-$D$
-row (Sec.~\ref{sec:lrlaw}) times $\sqrt{B/16384}$, Adam's square-root batch rule, with the
-batch $B=\min(16384,D/2)$, so the batch moves with $D$ (both the user's choice). The rule was measured not to
-hold (the measured optimum moves $1.9\times$ between $D=700$ and $7\times10^4$, the rule $6.8\times$; $31$ scratch cells
-had their best at the window's top and were re-searched higher); scratch cells generated from 2026-10-25 on are
-centred on the measured surface at their own steps and $D$ instead (\code{gen\_transfer\_pilot.lr\_surface}; below
-$D=700$, off the measured grid, the $D=700$ value is held, about $2\times$ above the measured trend's extrapolation at
-$D=10$ and well inside the one-decade window), and
-every cell reported here before that date used the rule. One seed per
+patterns show. The lr window is one decade either side of a centre. A pretraining's centre is $\eta^\ast(t)$ of the
+high-$D$ row (Sec.~\ref{sec:lrlaw}); a scratch cell's is the measured surface at its own steps and $D$
+(\code{gen\_transfer\_pilot.lr\_surface}): the high-$D$ row's $\eta^\ast(t)$ times a fitted factor of $D$, $0.58$ at
+$D=700$ rising to $1$ at $7\times10^4$, so the centre moves $1/0.581=1.72\times$ between the two. Below $D=700$, off the
+measured grid, the $D=700$ factor is held, about $2\times$ above the measured trend's extrapolation at $D=10$ and well
+inside the one-decade window. The batch is $B=\min(16384,D/2)$, so it moves with $D$ (both the user's choice); the
+surface's low-$D$ rows ran at batches of that size, so its $D$ factor already carries the batch. Cells reported before
+2026-10-25 used Adam's square-root batch rule instead, the high-$D$ row's $\eta^\ast(t)$ times $\sqrt{B/16384}$, which
+moves the centre $6.8\times$ over the same range ($\sqrt{16384/350}$). The rule was measured not to hold (at $t=1000$ the
+measured optimum moves $1.9\times$ between $D=700$ and $7\times10^4$), and $31$ scratch cells had their best at the
+window's top and were re-searched higher. One seed per
 cell, until the noise is known. What depends on the momenta only (their scale, and which
 propagator factors the target divides out) is fitted on the whole pool's phase-space points,
 which carry no labels (\code{data.phase\_space\_on\_pool}); the amplitude transform and its
@@ -5993,7 +6044,16 @@ the rung's best checkpoint (Fig.~\ref{fig:ladder_pre_dataset}) each process's MS
 $\sim3\times$ from rung to rung up to rung $8$ and jumps $\sim10\times$ at rung $9$, where the one-loop sets come in:
 $ee\to u\bar u$ $1.1\times10^{-7}$ at rung $1$, $1.7$--$3.6\times10^{-7}$ at rungs $4$--$8$, $2.6\times10^{-6}$ at rung
 $9$; the four-quark processes $9$--$12\times$ between rungs $4$ and $9$. At a fixed $64$k steps every added process takes
-its share of the same budget, and the one-loop targets take more of it.
+its share of the same budget, and the one-loop targets take more of it, so the rung comparison mixes structure with
+training per process; the step budget stays $64$k on every rung (the user's call).
+Rung $6$'s hp15, rescored from its checkpoint, scores $1.67\times10^{-7}$ against the $1.30\times10^{-7}$ its run
+recorded, $28\%$ above, while rung $1$'s hp47 reproduces to $1\%$. The rescoring predates the EMA-aware loader
+(\code{rebuild\_run.load\_best\_weights}, 2026-10-15, par.~\ref{sec:ema-ckpt}) and scored the checkpoint's live weights,
+but that is not the gap (FA-ccin2p3-60b47206, 2026-10-25): the live and the EMA weights of the same settings (hp15, EMA
+decay $0.995$, on rung $4$, since rung $6$'s own checkpoint is pruned) score $5.62\times10^{-8}$ and $5.79\times10^{-8}$
+against $5.81\times10^{-8}$ recorded, and rung $1$'s hp47 $3.58$ and $3.62$ against $3.62\times10^{-8}$: the live weights
+sit $1$ to $3\%$ \emph{below} the EMA's, not $28\%$ above. What is left is the hardware and TF32 of rung $6$'s training on
+lxplus against the rescoring's.
 \begin{figure}[H]
 \centering
 \widerow{\pnl{../analysis/transfer/figs/ladder_pretrain_curves_a.pdf}\hfill\pnl{../analysis/transfer/figs/ladder_pretrain_curves_b.pdf}} \\[1ex]
@@ -6283,13 +6343,14 @@ of the best, in decades): in the $18$ cells where scratch's drop is in the top q
 below scratch and improve $2.2$ decades within the run against scratch's $2.5$; in the other $54$, $0.9$ below, $2.6$
 against $2.9$. The shortfall in improvement is the same $0.3$ decades in both. $ee\to Z\gamma$ at $D=10^2$ is the
 exception: the fine-tunes start $0.9$ decades lower and improve $1.9$ decades, scratch $3.8$.
-What the start already holds on $ee\to Z\gamma$ (2026-10-25; \code{tools/linear\_readout.py} as above, on every
-rung's frozen pretraining, rung $0$ the $ee\to u\bar u$ one; run FA-ccin2p3-b0302fe9, \code{nogain\_readout\_za.py},
-\code{data/nogain\_readout\_za.json}, Fig.~\ref{fig:nogain_readout_za}). At $D=10^{1.5}$ scratch reaches
+
+\paragraph{What the start already holds on $ee\to Z\gamma$ (2026-10-25).} A ridge read-out of every rung's frozen
+pretraining (\code{tools/linear\_readout.py} as above; rung $0$ is the $ee\to u\bar u$ one; run FA-ccin2p3-b0302fe9,
+\code{nogain\_readout\_za.py}, \code{data/nogain\_readout\_za.json}, Fig.~\ref{fig:nogain_readout_za}). At $D=10^{1.5}$ scratch reaches
 $1.0\times10^{-2}$: the frozen features of rungs $5$, $7$ and $8$ read out at or below it ($9.9$, $7.1$, $7.8\times10^{-3}$)
 and those of rungs $2$, $3$ and $6$ within $1.4\times$, while the fine-tunes of rungs $0$ to $6$ and $9$ sit $2.7$ to
-$5.6\times$ above scratch; the read-out beats the rung's own fine-tune in $8$ of the $10$ rungs, by more than $2\times$
-in $6$. There the start holds the target, linearly, and the fine-tune loses it. At $D=10^2$ scratch reaches
+$5.6\times$ above scratch; the read-out beats the rung's own fine-tune in $7$ of the $10$ rungs, by more than $2\times$
+in $6$, and ties it in one (rung $7$, $7.099$ against $7.101\times10^{-3}$). There the start holds the target, linearly, and the fine-tune loses it. At $D=10^2$ scratch reaches
 $5.0\times10^{-5}$ and no start does: the best read-out is rung $8$'s at $9.4\times10^{-5}$ ($1.9\times$), then rung $6$'s
 ($4.8\times$), rung $9$'s ($6.9\times$) and the finale's ($9.0\times$), up to $145\times$ for rung $0$; the fine-tunes sit
 $4.6$ to $35\times$ above, and in rungs $5$, $6$ and $8$ the frozen read-out still beats the fine-tune, by $2.0$ to
@@ -6344,14 +6405,16 @@ ridge read-out before training, \code{fine\_tune.linear\_probe}); the fine-tune 
 the frozen read-out itself; and per cell the better of read-out and default on validation (chosen on the split it is
 scored on, as the grid's best-of-five is). The L2-SP arm ran at one strength, $\lambda=10^{-2}$, and the frozen arm at
 one depth, blocks $0$ to $3$ of $8$, both values picked for this round and not tuned: a loss in those two arms is about one untuned
-value, not about the method. $240$ runs and $60$ read-outs, $8.9$ GPU-h, none failed (\code{tools/lowd\_ft.py},
+value, not about the method. $240$ runs and $60$ read-outs, $8.9$ GPU-h, none failed, each scored at its best validation checkpoint as the grid reports a cell (\code{tools/lowd\_ft.py},
 \code{scripts/job\_lowd\_ft.sh}, \code{analysis/transfer/lowd\_ft.py}, \code{data/lowd\_ft.json};
 Fig.~\ref{fig:lowd_ft}).
 
 A single run is noisy at these $D$: the default rerun against the grid's record of the same trial is within $1.2\times$ in
 $36$ of $60$ cells, the median $|\log_{10}|$ ratio $0.035$ but its $90\%$ quantile $0.41$ decades (up to $11.7\times$
-on $u\bar u\to gg$, rung $1$, $D=10^2$); the medians over the $15$ cells per $D$ move little ($+0.47$ to $+0.78$ decades
-over scratch rerun against $+0.39$ to $+0.78$ recorded). Over all five probes no method beats the default: the median gain
+on $u\bar u\to gg$, rung $1$, $D=10^2$); the medians over the $15$ cells per $D$ move little ($+0.25$ to $+0.78$ decades
+over scratch rerun against $+0.39$ to $+0.78$ recorded). ``Over scratch'' sets a single rerun against the grid's scratch,
+the best of eight trials selected on validation, so the selection favours scratch, which is why the rerun's gain is
+the smaller at $D=10^2$ ($+0.25$ against $+0.39$ recorded). Over all five probes no method beats the default: the median gain
 over it per $D$ is $-0.19$ to $+0.08$ decades for linear probe then fine-tune (it wins $5$ to $8$ of $15$ cells per
 $D$), $0.00$ to $-0.87$ for L2-SP, $-0.06$ to $-0.19$ for the frozen half, and $-0.26$ to $-1.09$ for the read-out, which
 falls further behind as $D$ grows; the per-cell choice takes the read-out in $3$, $5$, $2$ and $1$ of the $15$ cells
@@ -6359,10 +6422,10 @@ per $D$ (its median gain over scratch $+0.77$ decades against the default's $+0.
 default at every $D$, by $+0.11$, $+0.21$, $+0.21$ and $+0.38$ decades (medians over the three rungs), and the read-out by
 $+0.16$ and $+0.38$ at $D=10$ and $10^{1.5}$; yet the best of all methods stays below scratch there ($-0.07$, $-0.25$,
 $-0.71$, $-0.01$ decades). So on the probe that does not gain the head-first start recovers part of the loss, never all of
-it, and the same start costs a little on the probes that gain. In the smoke run the fitted head started at the read-out's
-error ($7\times10^{-3}$ on $ee\to Z\gamma$, rung $7$, $D=10^{1.5}$) and the first validation, seven steps later at the
-cell's learning rate ($6.8\times10^{-3}$), was already above it, so at the default's HPs the fine-tune undoes the head
-it was given; whether a lower rate keeps it is an HP question for the next round.
+it, and the same start costs a little on the probes that gain. The head-first start can also be lost: on $ee\to Z\gamma$, rung
+$7$, $D=10^{1.5}$, the run starts from the read-out's head (the frozen read-out scores $8.1\times10^{-3}$) and its best
+validation checkpoint is $2.4\times10^{-2}$, $2.9\times$ above that start and $3.4\times$ above the default
+($7.0\times10^{-3}$), so at the default's HPs that fine-tune undoes the head it was given.
 
 \begin{figure}[t]
 \centering
@@ -7094,7 +7157,7 @@ $\approx2$ on $W{+}4g$ and $2$ to $3$ at $n=4,5$, the multiplicities furthest pa
 the affine map the control has the best shape on $Z{+}ng$ ($0.040$ to $0.10$, against $0.080$ to $0.41$ causal) and is
 between the two on $W{+}4g$ ($0.011$): the mask helps place the level, not the shape. One seed per arm. Not Jonas's implementation (his code is not public, the
 draft is the spec): the local frames are built from the prefix with the first $4$ particles seeing each other, our extra
-scalar inputs stay, and the training set is rung 9 ($10^5$ events per process), not $Z+ng$ with $10^7$ per $n$. One
+scalar inputs stay without the coupling powers, and the training set is rung 9 ($10^5$ events per process), not $Z+ng$ with $10^7$ per $n$. One
 seed per arm; the hp73 trial has EMA off.
 
 \begin{figure}[H]
@@ -7176,147 +7239,43 @@ of the three share a test set.
     costs $100$--$200$ LO units); $121$ train, $29$ held out (H5). Heavy-quark layer $105$ pools: every $2\to2$ top
     class, $5$ at $2\to3$ and $23$ at $2\to4$, each at $50$, $300$, $600$ GeV. The removal twin drops the $\tau$, $\nu_\tau$
     and the quartic gauge family, in every layer: $151$ training pools ($136$ with a $\tau$ or $\nu_\tau$, H3p; $15$ on a quartic-gauge class, H4), $1246$ left (\code{recipes/make\_catalog\_v3\_recipes.py}). The held-out loop-induced class, drawn with the selection's seed among the $17$: $gg\to ZH$. Generation estimate from catalog\_v2's $6$ CPU-h for $478$
-    entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated (the State item below).
-  \item \textbf{State (2026-10-25, 19:00).} Running on CC: the pp study's five runs (the four window-trained arms
-    read on the $13$\,TeV pp test set, FA-ccin2p3-1b299199, -1c960b22, -4b1aabad, -81e14672; the pp-trained short
-    pretraining, FA-ccin2p3-e786bd74, whose pp read fires when it ends); all $1396$ pp processes' pools, $\alpha_s$
-    sidecars and diagram files checked on CC (\code{tools/check\_pp\_pools.py}, $0$ problems); the $\hat s$-only short
-    pretraining (FA-ccin2p3-fbd73961, the preprocessing exploration's next read); rung $6$'s hp15 rerun
-    (FA-ccin2p3-2ed18ab8). The small-$D$ fine-tuning DyHPO round (approved 2026-10-25, ``Yes, send them.'', about
-    $33$ GPU-h): its $180$ sweeps generated (FA-ccin2p3-cf864a9e), being submitted under the small-$D$ item, counted in
-    \code{analysis/transfer/expect\_tp3.json}. The scratch lr window no longer uses the square-root batch rule: it is
-    centred on the measured surface at each cell's steps and $D$ (Sec.~\ref{sec:ladder} protocol). The setup redesign
-    (approved with step agents 2026-10-25, ``Yes, the step agents and everything else you said sounds good''): code
-    review passed (branch at \code{9ce1cb1}, merges cleanly), two low fixes in progress, then
-    \code{tools/switch\_over.sh}, done-checks for every entry and the CLAUDE.md pass.
-  \item \textbf{State (2026-10-25, 07:35).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
-    untouched until the user says). Written up today: the four short pretrainings read on every axis
-    (Tab.~\ref{tab:v3_short}), the factorised $2\to4$ check on $880$ classes and the $2\to5$ probes with exact and
-    network parents (Fig.~\ref{fig:v3_factorised}). Running on CC:
-    \begin{itemize}
-      \item the pp study: all 8 MadEvent parts done ($1356$ of $1396$ pools); the $40$ short runs rerun at their own
-      margins (\code{recipes/catalog\_v3\_pp\_margins.json}, \code{catalog\_v3\_pp\_rerun\_part<k>.yaml}, 10 CPU jobs, three
-      done). When all pass: \code{touch .claude/.pp\_pools\_ready} (after checking every pool and sidecar exists), which
-      releases the queued launches: the four window-trained arms read on the pp test set
-      (\code{scripts/job\_catalog\_v3\_pp\_score.sh}) and the pp-trained short run \code{dimensionless\_pp} with its pp read
-      (scope settled by the user, 2026-10-25: hadronic tree classes on pp, every other pool on windows).
-    \end{itemize}
-    Supervisor and the event waiter running.
-  \item \textbf{The level.} Adopted candidate: the emission scales (par.\ The emission scales in training); open on Daniel's
-    catalog (held): what the $43$ new pay for. The small dedicated network for what no constant fixes: the context vector
-    and the factorised $2\to4$ head are measured (par.\ The context vector; par.\ Design (ii) on the data). Next, on
-    catalog\_v3: the context arm's K-shot fits and the factorised head's data check on its $2\to4$ classes with an added
-    $Z$, $W$, $H$ or quark pair (no universal soft or collinear factor there): both done (par.\ The factorised $2\to4$
-    head's data check on catalog\_v3; par.\ The context vector's $K$-shot fits on catalog\_v3), and the two targets read (par.\ The level's two targets on
-    catalog\_v3: $2\to4$ met, the tops' shape floor $0.80$ against $0.5$ not met). Also proposed: the full-length
-    catalog pretraining with the adopted target (held by the user, 2026-10-21, until the preprocessing design settles).
-    Blocked: bulk transfers to Jean Zay (the $29$\,GB archive, its checkout at \code{8fb002e}).
-  \item \textbf{Open (2026-10-22, 13:30).}
-    The $9$ $\Delta$-plot models off their recorded loss: rebuilt on H100, $8$ match with TF32 on, figures redrawn
-    (sec:tf32-eval). The $\sigma$
-    stage now writes its own per-event predictions with $\sigma$ (\code{c5ba313}; GPU smoke test passed). Fixed:
-    \code{run\_data\_tools.py} built a fresh EMA over the random init that \code{evaluate()} would score (no reported
-    number used it with EMA on: the finale has EMA off and the forgetting numbers are scored inside the runs). Freed
-    $80$\,G on \code{/sps/lpnhe} (D84, $67$\,G free). Not doable from trunk: \code{classify2.py}'s \code{classify} module
-    was passed by path and is on no site (superseded by \code{tools/equal\_processes.py}). Rung $6$'s rescoring gap: see the ladder entry. For the user: D78 holds the catalog preprocessing until their design (the $\hat s$+coupling target with IDEN, colour and the
-    diagram sum, and the shared target's blow-up at the per-process pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase:
-    bring them back to the user as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot
-    fix is dropped until the preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since D114 moved it there (D83; item \code{v3\_prep\_explore}; queue: the shape proxy per target, the signed-data check,
-    sampling sensitivity, then new ideas; done on catalog\_v3: the few-shot calibration, par.\ The context vector's $K$-shot fits on catalog\_v3); the het trial now writes its own predictions; \code{site} matches a launch's runs by
-    item and time, and simultaneous launches collide on the git push. Held (D78): \code{dancat\_ext},
+    entries: $100$ to $150$ core-hours, $3$ to $4$ h of wall on one $48$-core node, no GPU; approved (D102) and generated.
+  \item \textbf{State (2026-10-25, 19:00).} The study runs on catalog\_v3 (Daniel's catalog and its extra probes
+    untouched until the user says). Running on CC: the pp study's five runs (scope settled by the user, 2026-10-25:
+    hadronic tree classes on pp, every other pool on windows), the four window-trained arms read on the $13$\,TeV pp test
+    set (FA-ccin2p3-1b299199, -1c960b22, -4b1aabad, -81e14672) and the pp-trained short pretraining (FA-ccin2p3-e786bd74),
+    whose pp read fires when it ends; all $1396$ pp processes' pools, $\alpha_s$ sidecars and diagram files are checked on
+    CC (\code{tools/check\_pp\_pools.py}, $0$ problems). Also running: the $\hat s$-only short pretraining
+    (FA-ccin2p3-fbd73961, the preprocessing exploration's next read), rung $6$'s hp15 rerun (the ladder item) and the
+    small-$D$ fine-tuning DyHPO round (its state in the small-$D$ item). The setup redesign (approved with step agents
+    2026-10-25, ``Yes, the step agents and everything else you said sounds good''): code review passed (branch at
+    \code{9ce1cb1}, merges cleanly), two low fixes in progress, then \code{tools/switch\_over.sh}, done-checks for every
+    entry and the CLAUDE.md pass.
+  \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
+    (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
+    emission scales (par.\ The emission scales in training).
+  \item \textbf{Open (2026-10-22, 13:30).} For the user: D78 holds the catalog preprocessing until their design (the
+    $\hat s$+coupling target with IDEN, colour and the diagram sum, and the shared target's blow-up at the per-process
+    pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase: bring them back to the user
+    as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot fix is dropped until the
+    preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since
+    D114 moved it there (D83; item \code{v3\_prep\_explore}; done on catalog\_v3: the few-shot calibration, par.\ The
+    context vector's $K$-shot fits on catalog\_v3, and the shape proxy per target, par.\ The shape proxy on catalog\_v3;
+    queue: the signed-data check, sampling sensitivity, then new ideas). Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
     \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
-  \item \textbf{State (2026-10-15, 05:00).} The work lives in \code{site}'s registers (\code{site items -v},
-    \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{Running 2026-10-15 05:40:}
-    catalog generation (CC \code{htc}); \code{tp3\_jcaus\_r9} (CC job 61507736, Jonas's causal mask, hp73, $64$k, about
-    $6.5$\,h; GPU unit tests passed, prefix leak $3.6\times10^{-6}$ against $0.5$ to $0.6$ for the controls);
-    \code{tp3\_jcausbnn\_r9} (CC job 61507824, the same plus the Bayesian last layer of the draft's fig:bnn, copied from
-    jetgpt-splittings' \code{VBLinear}; tests passed); the Jean Zay and H100 $\Delta$ evaluations. Both pretrainings and their zero-shot are done
-    (Sec.~\ref{sec:jcaus}). The unmasked parent with the affine-in-$N$ statistics (D65) is done. To tell the user with the result: Jonas's code is not public, so ``the same
-    implementation'' is unverified; ours builds the local frames from the prefix with the first $4$ particles seeing
-    each other, keeps our extra scalar inputs, drops the coupling powers, and trains on rung $9$ ($10^5$ per process). User's calls of 2026-10-15 13:30: the EMA checkpoint fix (D63), done (commits \code{cd26a58} to \code{cff8039}: with EMA on, the
-checkpoint's \code{"model"} is the EMA weights and \code{"model\_live"} the live ones, \code{"model\_is\_ema"} marks the
-format; the post-training evaluation scores the best checkpoint's EMA; fine-tunes start from the parent's EMA weights,
-old checkpoints through the EMA shadow mapped by parameter name; \code{tests/test\_ema\_checkpoint.py}, real-model check
-$3/3$; from now on, fine-tunes of EMA parents start from different weights than the transfer study's so far); the catalog sweep launched (\code{dancat\_het\_pre}, $32$k,
-waves $3+3+2$; its $200$\,GB fits only CC's large V100 node and the H100 nodes; the user: ``there has to be a way around this'':
-a memory-mapped data path whose memory scales with the batch, being built and measured, then the sweep restarts); selection
-on the NLL by default (D62); the unmasked control \code{tp3\_jaff\_r9} (D65), done (Fig.~\ref{fig:zero_shot_jcaus}); state at 2026-10-15 18:50: the catalog sweep \code{dancat\_het\_pre} wave 1 (3 trials, 40\,G, memory-mapped data, FA-ccin2p3-d9c02964/-492e9587/-b8378faa) running under \code{sweep/drive.py} (launch log \code{\textasciitilde/.local/share/ccorch/launch/FA/dancat\_het\_pre\_memmap.log}); the het calibration diagnosis is done (Fig.~\ref{fig:het_recal} paragraph): settled by D70: a $250$-step $\sigma$-only stage is the default end of het training; holds: D66 (decomp, loops, nonsm, threephase: designs sent, wait for the user's iteration), D67 (het\_delta: calibration first); D47 done (par.\ The $\Delta$ cells retrained with the het loss); the $\Delta$ plots are the
-$8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{training.heterosc\_select} defaults to \code{mu\_mse} while the user's loss selects on the NLL
-    (\code{4ef5b76}); the default is \code{nll} (D62). The catalog class counts
-    ($467$/$409$) come from \code{analysis/catalog\_daniel/classify2.py}, which imports a \code{classify} module not in
-    the repo, so they cannot yet be regenerated from trunk. \emph{The plan (the user's list of
-    2026-10-14 16:48; D42 to D49), in priority order.} (1) \textbf{The catalog of arXiv:2606.23791} (D45, most urgent):
-    its $1501$ tree processes, with Daniel's diagram embedding on top of the usual inputs; the user wants its diversity
-    (how many are relabels of one another, Sec.~\ref{sec:catalog}) to ask the others about. No $|\mathcal M|^2$ is
-    public, so we generate it: about $10^5$ events per process (user, 2026-10-15: ``For now let's do only 100k.''), with
-    their MadEvent setup and their split as published; the pipeline (a reader of their catalog, massive $b$ beams for
-    $347$ processes) is built (commits \code{9bbc825}, \code{77cae08}; tested end to end locally, $gg\to gg$ labels
-    against the analytic $|\mathcal M|^2$ to $1.7\times10^{-7}$). Settled by their setup and the user's answers of
-    2026-10-15: their default coupling orders, massive $b$ beams, the $2\to1$ group ``Drop them'' ($1491$ processes,
-    $139$ held out), the hold-out ``Their split, report both'' (all $139$ and the $43$ without a relabel in training),
-    the top mass ``173.0, theirs''; the loss is the user's heteroscedastic one (D52). Generated 2026-10-15 08:10
-    (\code{FA-ccin2p3-17f91455}, one $48$-core CC node, user: ``No, just send it''): $1491$ processes, $0$ failed, MadEvent
-    phase $3.6$\,h; val and test ($10^4$ each) in \code{\$WORK/datasets}, train ($10^5$) in the \code{\$SCRATCH} cache
-    (\code{amp\_data\_cache}), diagram sidecars \code{data/diagrams/dc\_*.diagrams.json} for all $1491$; $33$\,GB in
-    \code{datasets}. The timing job (\code{FA-ccin2p3-85c90b04}): $10^5$ events take $7.6$ to $30$\,min of MadEvent per
-    process ($b g\to b\bar b b$ $435$\,s, $gg\to ggg$ $1787$\,s). Next: the pretraining sweep on it (D59: GP, $8$ trials, $2000$ candidates,
-    NLL-ranked, Daniel's diagram embedding; \code{sweep/sweep\_config\_dancat\_het\_pre.yaml}, whose horizon, lr window
-    $[10^{-3}, 9\times10^{-3}]$ and memory were settled by D59 and D76). The proposal as sent: $32$k steps
-    ($3.9\times10^5$ events per process, the per-process compute of catalog\_v2's pretraining), lr window centred at
-    $3\times10^{-3}$ (between CLAUDE.md's high-$D$ $1.9\times10^{-3}$ at $32$k and catalog\_v2's best carried to $32$k,
-    $4.7\times10^{-3}$), $200$\,GB host memory, $8$ trials in waves $3+3+2$ on CC; about $11$\,h per trial, $\approx90$
-    GPU-h ($60$ to $120$). $16$k steps would halve it. (2) \textbf{Heteroscedastic loss}
-    (agreement with the user first). The first clean joint run of the user's loss is written up (the correction after
-    ``The coupled fit fails'', Sec.~\ref{sec:divergences}): $\mu$ $2.6\times$ below the MSE baseline on $ee\to t\bar t$,
-    calibration open (pull std $0.46$, the NLL still falling at $8$k). The test is that one run (user, 2026-10-15: ``No
-    need to send 8 runs, let's just see that the het loss works''). Next (D57, before any longer horizon): a GP sweep of
-    the user's loss on $ee\to t\bar t$ at $D=10^4$, $8$k (\code{sweep/sweep\_config\_tp\_het\_ee\_ttbar\_d8.yaml}; the
-    user's answers: rank on the NLL, ``GP, 8 trials, 2000 candidates''; waves $3+3+2$ through \code{sweep/drive.py};
-    FA's other sweeps unchanged, user: ``Let's see what we get from this sweep first''), done 2026-10-15 06:12
-    (Fig.~\ref{fig:het_sweep}: test error $4.8\times$ below the MSE baseline's, $\sigma$ still $\approx2\times$ too large and
-    flat, every trial best at its last step). Settled since: the longer horizon this sweep was the prerequisite for, $16$k and $32$k without a sweep (D61);
-    \code{heterosc\_select} defaults to \code{nll} (D62). \code{training.track\_train\_eval} (D58) scores the training split with the
-    validation weights. Pulls in the $\Delta$ plots come after, by retraining those cells with the agreed loss (D47). (3) \textbf{$\Delta$ plots} (D42, item \code{delta}; Butter,
-    Plehn): arXiv:2603.22407's $\Delta=(A_\theta-A)/A$, $|\Delta|$ histograms on log bins per process, at $D=10^4$: all
-    ladder rungs, the scaling figures' arms, the star arms. The paper's figures use the $8$k grid at \code{d8}
-    (\code{analysis/transfer/delta\_audit.json}): $179$ runs, on Jean Zay $107$, CC $37$, lxplus $32$, and three pruned
-    trials (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial 96, \code{tp3\_r1fte\_udbar\_enu\_d8} 197,
-    \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} 98) rerun on CC from their configs (parent \code{runs/tp3\_ladder\_r1/trial\_0047},
-    md5-identical to lxplus's). Tools: \code{tools/eval\_delta.py} (rebuilds a run with its own frozen
-    \code{data\_stats.json} and tokenizer as a resume reads them, EMA off with the checkpoint's weights, fine-tune head
-    kept; writes \code{preds\_*.npz} to \code{\$SCRATCH/zz\_delta/<sweep>\_\_<trial>}; \code{--list}, \code{--seed},
-    \code{--tf32 on|off}), \code{scripts/job\_eval\_delta.sh}, \code{scripts/job\_rerun\_trial.sh} (a pruned trial rerun from
-    its config into \code{<trial>\_rerun}), \code{analysis/transfer/collect\_delta.py} (test $\Delta$ and the rebuilt val in
-    MSE$(\log|\mathcal M|^2)$), \code{analysis/transfer/delta\_plots.py} (delta\_ladder, delta\_focus, delta\_finale,
-    delta\_star; flags rebuilt against recorded above $5\%$). Evaluated on V100: the $37$ CC and $32$ lxplus runs (the
-    latter copied to CC \code{runs\_from\_lxplus/<sweep>/}) and the three reruns; \code{analysis/transfer/delta\_data/ccin2p3.npz}
-    was collected before the reruns. Open: $17/69$ rebuilt val losses differ from the recorded by $5\%$ to $13\times$
-    (worst \code{runs/tp3\_synfte\_ee\_bb\_nlo\_d8\_lad} $13\times$ worse, \code{tp3\_ssudakovewfte\_ee\_dd\_ew\_nlo\_d8}
-    $7\times$ worse, \code{tp3\_finfte\_ud\_ud\_d8/trial\_0175} $3.4\times$ better). Ruled out: the Lorentz-frame seed
-    (4 digits over seeds 1, 2, 3, 42), the tokenizer, pools, sidecars and recipes (older than the runs), the checkpoint
-    step. Lead, TF32: finfte ud\_ud trained on \code{gpu\_h100} (TF32 on, val $1.14\times10^{-7}$, reproduced by its own
-    post-training eval) rebuilds on V100 at $3.3\times10^{-8}$; on A100 TF32 had changed nothing beyond the run-to-run
-    spread (Sec.~\ref{sec:tf32-a100}). Test: \code{FA-ccin2p3-c0a4a22d} (TF32 on) and \code{FA-ccin2p3-9916a268} (off),
-    \code{--partition=gpu\_h100}, list \code{analysis/transfer/delta\_runs\_seedcheck.txt}, pending on Resources since
-    10-14 23:30. Jean Zay's $107$ runs (\code{analysis/transfer/delta\_runs\_jeanzay.txt}): \code{FA-jeanzay-e99a690d}
-    (TF32 on) and \code{FA-jeanzay-5c91508e} (TF32 off) submitted by hand (D50, \code{scripts/hand\_place.sh}), since
-    \code{site copy} from Jean Zay fails (relay \code{lpnclaude03} times out on port 22) and \code{site pick} reports it
-    DOWN, so \code{placement\_guard} refuses it. Then: one evaluation precision for every run (likely fp32, stated in
-    the caption), re-collect from all sites, draw. Caveat: \code{tools/run\_data\_tools.py eval} scores a fresh EMA of
-    random weights when \code{cfg.ema} (fix: \code{cfg.ema=False}, \code{reset\_output\_head=False}, a \code{--pred-dir}
-    with \code{save\_predictions}, assert stats and val MSE); \code{eval\_delta.py} avoids it, and the forgetting
-    evaluations (\code{FA-ccin2p3-4e4e6153}, \code{-3ab918ca}) used that tool. (4) \textbf{Decomposed targets} (D48):
-    per-diagram or per-pairing parts of the amplitude, as in real calculations; design for loops. (5) \textbf{Synthetic
-    one-loop amplitudes} (D44), small. (6) \textbf{Non-SM Lagrangians} (D49). (7) \textbf{Three-phase training} (D46,
-    lowest): synthetic until the fine-tune benefit stops, then real data. Recorded as a result (D43,
-    Sec.~\ref{sec:syn-versions}): synthetic data does not help at high multiplicity and the closer-to-physical versions
-    hurt; the direction is paused.
-    \emph{Also approved (2026-10-15).} Jonas's causal mask, reimplemented as in his section of the draft (the zero-shot
-    comparison in Sec.~\ref{sec:ladder}), then one pretraining like \code{tp3\_gstd\_r9} with it, scored zero-shot on $W$
-    with one more emission (user: ``do whatever jonas did for his results with the causal mask and run a pretraining'');
-    the mask is being reimplemented. Weight interpolation between the finale and the \code{tp3\_waddm\_naive*} models
-    (D31 item 1), evaluated on their own run dirs (their off-shell scale is the finale's), approved and not started.
+  \item \textbf{Standing since 2026-10-15.} The work lives in \code{site}'s registers (\code{site items -v},
+    \code{site decisions}, \code{site digest --project FA}); this summarises them. \emph{The user's plan of 2026-10-14
+    16:48 (D42 to D49).} Done: (1) the catalog of arXiv:2606.23791 (par.\ Generating it; par.\ Pretraining on it), (2) the
+    heteroscedastic loss (Sec.~\ref{sec:divergences}, Fig.~\ref{fig:het_sweep}), (3) the $\Delta$ plots
+    (par.\ The $\Delta$ plots, par.~\ref{sec:tf32-eval}, par.~\ref{sec:ema-ckpt}). Held under D66 (designs sent, waiting for the user's
+    iteration): (4) \textbf{Decomposed targets} (D48): per-diagram or per-pairing parts of the amplitude, as in real
+    calculations; design for loops. (5) \textbf{Synthetic one-loop amplitudes} (D44), small. (6) \textbf{Non-SM
+    Lagrangians} (D49). (7) \textbf{Three-phase training} (D46, lowest): synthetic until the fine-tune benefit stops,
+    then real data. The synthetic direction is paused (D43, Sec.~\ref{sec:syn-versions}). Also held: D67 (het\_delta:
+    calibration first).
+    \emph{Approved, not started.} Weight interpolation between the finale and the \code{tp3\_waddm\_naive*} models
+    (D31 item 1), evaluated on their own run dirs (their off-shell scale is the finale's).
     \emph{Not to be proposed again:} a ratio target (user, 2026-10-15: ``We already tried learning the ratio and it
     didn't go well'').
     \emph{On hold until the user says.} (a) The horizon item (\code{horizon32k}, since 2026-10-06 22:45): the $32$k grid of
@@ -7354,9 +7313,10 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     fresh collection from all sites before any figure; the study's figures sent to the user unprompted after every
     collection; never narrow the scope (CLAUDE.md 0b).
     \emph{Sites and infrastructure.} Background: \code{site supervise --project FA} and \code{site events --wait
-    --project FA}. Jean Zay: its checkout is at \code{ec44fee} since 2026-10-15 (fast-forwarded from GitHub on the site; a git push from the laptop times out) (uploads over
+    --project FA}. Jean Zay: its checkout is at \code{8fb002e} (a git push from the laptop times out: uploads over
     $\sim1.4$\,KB from \code{lpnclaude03} are silently dropped, a path-MTU black hole; the user's fix:
-    \code{tcp\_mtu\_probing=1} or a route MTU of $1400$), so check the commit of anything run there;
+    \code{tcp\_mtu\_probing=1} or a route MTU of $1400$), so check the commit of anything run there; bulk transfers to it
+    are blocked (the $29$\,GB archive);
     \code{\textasciitilde/.ssh/config} gives \code{jean-zay} no shared master; WORK at $467\,006$ of $500\,000$ files after the
     archive (\code{lfs quota -p}); old runs are in \code{\$STORE/FA\_runs\_archive}, one tar per study or family
     (\code{scripts/archive\_runs.sh}, restore with \code{tar -xf}). Still to do there: \code{site sync jeanzay},
@@ -7370,12 +7330,14 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     \code{sweep\_manager submit} on SLURM; check for existing sweep dirs on every site before generating. Before a fine-tune
     grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
-    are flushed (\code{touch .claude/.notes\_flushed}).
+    are flushed (\code{touch .claude/.notes\_flushed}). \code{site} matches a launch's runs by item and time, and simultaneous launches collide on
+    the git push.
   \item \textbf{Fine-tuning at small $D$} (D120; first round in par.~\ref{par:lowd_ft}: no method beats the default
     at the default's HPs; linear probe then fine-tune helps on $ee\to Z\gamma$ only). Next: single-fidelity DyHPO for the
     methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared best against best with the
     default's own search, with $\lambda$ for L2-SP and the frozen depth in their search spaces next to the learning rate
-    (the first round ran one untuned value of each); the single-run noise ($90\%$ quantile $0.41$ decades) asks for the
+    (the first round ran one untuned value of each), which also asks whether a lower rate keeps the linear-probe
+    head; the single-run noise ($90\%$ quantile $0.41$ decades) asks for the
     comparison on cell medians, not single cells.
     State 2026-10-25 evening: the DyHPO round is approved (D123, ``Yes, send them.'', about $33$ GPU-h): $3$ methods $\times$ $60$ cells $\times$ $5$ trials, sweeps \code{tp3\_lowd\_<method>\_r<rung>\_<probe>\_d<k>}
     generated by \code{sweep/gen\_lowd\_dyhpo.py} from each cell's grid config, submitted on CC by \code{sweep\_manager}
@@ -7389,16 +7351,9 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     integrals (Sec.~\ref{sec:syn-loops}, plan item (5)); multiplicities well past $2\to4$, where MadGraph struggles and the
     generator does not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average. How close to
     real amplitudes the prior should be is still to be settled with others.
-  \item \textbf{The ladder.} Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the $1.30\times10^{-7}$ its run
-    recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Not the EMA weights (FA-ccin2p3-60b47206,
-    2026-10-25): that rescoring predates the EMA-aware loader (\code{rebuild\_run.load\_best\_weights}, 2026-10-15) and
-    scored the checkpoint's live weights, but scoring the live and the EMA weights of the same settings (hp15, EMA decay
-    $0.995$, on rung $4$; rung $6$'s own checkpoint is pruned) gives $5.62\times10^{-8}$ live and $5.79\times10^{-8}$ EMA
-    against $5.81\times10^{-8}$ recorded, and rung $1$'s hp47 $3.58$ and $3.62$ against $3.62\times10^{-8}$: the live weights
-    sit $1$ to $3\%$ \emph{below}, not $28\%$ above. Left: the hardware and TF32 of rung $6$'s training on lxplus against
-    the rescoring's, testable only by rerunning hp15 on rung $6$ from its config ($\approx6$ GPU-h). Each process's loss rises at rung $9$ at a
-    fixed $64$k steps (Fig.~\ref{fig:ladder_pre_dataset}), so the rung comparison mixes structure with training per
-    process; the step budget stays $64$k on every rung (the user's call).
+  \item \textbf{The ladder.} Rung $6$'s hp15 rerun from its config (FA-ccin2p3-2ed18ab8, running, $\approx6$ GPU-h) is
+    compared with its record ($1.30\times10^{-7}$, against the $1.67\times10^{-7}$ its rescoring gave; par.\ The ladder's
+    pretraining), which tests the hardware and TF32 of its lxplus training against the rescoring's.
 \end{itemize}
 
 \section{Non-SM Lagrangians as training data}\label{sec:nonsm}
@@ -8121,6 +8076,20 @@ $1.6\times10^{-3}$, $4.18\times10^{-3}$, $4.18\times10^{-3}$ (test $6.4$, $6.5$,
 beyond the run-to-run spread, which is larger between the two GPUs. A step is $\sim20\%$ faster than on V100 (these runs
 are data-bound). Transfer cells from then on mix V100 and A100 trials. One run per setting.
 
+\paragraph{The $\Delta$ plots (D42, D64; 2026-10-14).} For the paper draft (Butter, Plehn): arXiv:2603.22407's
+$\Delta=(A_\theta-A)/A$ as $|\Delta|$ histograms on log bins per process, for every ladder rung, the scaling figures'
+arms and the star arms, from the $8$k grid at $D=10^4$ (\code{analysis/transfer/delta\_audit.json}). As first
+collected, $179$ runs: $107$ on Jean Zay, $37$ on CC, $32$ on lxplus (copied to CC, \code{runs\_from\_lxplus/<sweep>/}),
+and three pruned trials rerun on CC from their configs (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial $96$,
+\code{tp3\_r1fte\_udbar\_enu\_d8} $197$, \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} $98$; their parent
+\code{runs/tp3\_ladder\_r1/trial\_0047} md5-identical to lxplus's). \code{tools/eval\_delta.py} rebuilds a run with its own
+frozen \code{data\_stats.json} and tokenizer as a resume reads them, the fine-tune head kept, and writes its test
+predictions (\code{--tf32 on|off}); \code{analysis/transfer/collect\_delta.py} collects the test $\Delta$ and the rebuilt
+validation loss, and \code{delta\_plots.py} draws the figures and flags a rebuild more than $5\%$ off its recorded loss.
+Those off were traced to the evaluation precision and to the checkpoint's EMA weights (the two paragraphs below). Ruled
+out before that: the Lorentz-frame seed (four digits over seeds $1$, $2$, $3$, $42$), the tokenizer, pools, sidecars and
+recipes (older than the runs), the checkpoint step.
+
 \paragraph{TF32 at evaluation (2026-10-15).}\label{sec:tf32-eval} The training-side A/B above does not cover evaluating a
 model at a precision other than the one it was trained at, and that is not harmless. Each of the $107$ Jean Zay runs in
 the $\Delta$ plots was rebuilt on A100 twice (\code{tools/eval\_delta.py --tf32 on|off}) and its rebuilt validation loss
@@ -8167,8 +8136,13 @@ final EMA model's (in the synfte run exactly the step-$8000$ value); and every f
 parent's live weights at its best step (\code{base\_experiment.py:1203}), not from the model whose loss the parent
 reports. The best checkpoint of a run whose best step sits late in the cosine schedule has live $\approx$ EMA weights,
 which is why most rebuilds matched; the four far off had their best step on an unstable stretch.
-\code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132} ($0.34\times$) has EMA off and stays open (its own post-training
-evaluation reproduces the recorded loss; an H100 TF32 rebuild is queued).
+\code{tp3\_ssudakovewfte\_ee\_ddbar\_d8/trial\_0132} ($0.34\times$) has EMA off; it was trained on H100 with TF32 and
+reproduces there (par.~\ref{sec:tf32-eval}). Fixed since (D63, 2026-10-15, commits \code{cd26a58} to \code{cff8039}): with
+EMA on, the checkpoint's \code{"model"} is the EMA weights and \code{"model\_live"} the live ones (\code{"model\_is\_ema"}
+marks the format); the post-training evaluation scores the best checkpoint's EMA; a fine-tune starts from the parent's
+EMA weights, an old checkpoint's through its EMA shadow mapped by parameter name (\code{tests/test\_ema\_checkpoint.py},
+real-model check $3/3$). Fine-tunes of EMA parents launched since start from other weights than the transfer study's
+earlier ones.
 
 \begin{figure}[H]
 \centering

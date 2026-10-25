@@ -1,0 +1,192 @@
+{
+ "H1": {
+  "n": 54,
+  "n_expected": 54,
+  "mse": 0.7379654150711907,
+  "level": 0.14177440011205017,
+  "shape": 0.5334680745424674,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 54,
+   "mse_ratio": 0.885457851539703,
+   "mse_better": 32,
+   "shape_ratio": 0.8073678719190436,
+   "shape_better": 45
+  },
+  "vs_baseline": {
+   "n": 54,
+   "mse_ratio": 0.7813938307932967,
+   "mse_better": 37,
+   "shape_ratio": 0.766607785438584,
+   "shape_better": 45
+  }
+ },
+ "H2": {
+  "n": 168,
+  "n_expected": 168,
+  "mse": 0.8518475701453871,
+  "level": 0.12354299796334924,
+  "shape": 0.665988225350036,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 168,
+   "mse_ratio": 0.8914292148452574,
+   "mse_better": 106,
+   "shape_ratio": 0.8014664344345424,
+   "shape_better": 124
+  },
+  "vs_baseline": {
+   "n": 168,
+   "mse_ratio": 0.820042572413467,
+   "mse_better": 114,
+   "shape_ratio": 0.8346981036837593,
+   "shape_better": 129
+  }
+ },
+ "H2p5": {
+  "n": 40,
+  "n_expected": 40,
+  "mse": 14.805432173150221,
+  "level": 13.633147178702036,
+  "shape": 0.6915320173537989,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 40,
+   "mse_ratio": 10.800084749232347,
+   "mse_better": 0,
+   "shape_ratio": 0.8061764665186479,
+   "shape_better": 32
+  },
+  "vs_baseline": {
+   "n": 40,
+   "mse_ratio": 0.36425857192303557,
+   "mse_better": 40,
+   "shape_ratio": 0.31731310787320044,
+   "shape_better": 40
+  }
+ },
+ "H3": {
+  "n": 237,
+  "n_expected": 237,
+  "mse": 1.5082043377503362,
+  "level": 0.4154016524556396,
+  "shape": 0.7771205562209923,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 237,
+   "mse_ratio": 0.9130351923992536,
+   "mse_better": 131,
+   "shape_ratio": 0.8972944500383702,
+   "shape_better": 147
+  },
+  "vs_baseline": {
+   "n": 237,
+   "mse_ratio": 0.8881962912255957,
+   "mse_better": 132,
+   "shape_ratio": 0.8530263224819499,
+   "shape_better": 152
+  }
+ },
+ "H5": {
+  "n": 30,
+  "n_expected": 30,
+  "mse": 0.8723901253505084,
+  "level": 0.2565845426487653,
+  "shape": 0.509676752491183,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 30,
+   "mse_ratio": 0.8276709050704076,
+   "mse_better": 15,
+   "shape_ratio": 0.8191189644220855,
+   "shape_better": 22
+  },
+  "vs_baseline": {
+   "n": 30,
+   "mse_ratio": 0.609316023145308,
+   "mse_better": 21,
+   "shape_ratio": 0.6961232122083089,
+   "shape_better": 24
+  }
+ },
+ "H6": {
+  "n": 8,
+  "n_expected": 8,
+  "mse": 0.1704211720906582,
+  "level": 0.0555395593436946,
+  "shape": 0.07272660423494562,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 8,
+   "mse_ratio": 1.2226492707998617,
+   "mse_better": 4,
+   "shape_ratio": 0.7400669522235852,
+   "shape_better": 7
+  },
+  "vs_baseline": {
+   "n": 8,
+   "mse_ratio": 1.0222291402257613,
+   "mse_better": 4,
+   "shape_ratio": 0.6168411031763184,
+   "shape_better": 8
+  }
+ },
+ "H7E": {
+  "n": 40,
+  "n_expected": 40,
+  "mse": 1.7258302861648689,
+  "level": 0.27470813869666555,
+  "shape": 1.112546870488048,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 40,
+   "mse_ratio": 0.9149759757461529,
+   "mse_better": 26,
+   "shape_ratio": 0.8618751738985593,
+   "shape_better": 31
+  },
+  "vs_baseline": {
+   "n": 40,
+   "mse_ratio": 0.04687747737495971,
+   "mse_better": 40,
+   "shape_ratio": 0.06531082038986623,
+   "shape_better": 40
+  }
+ },
+ "H7c": {
+  "n": 40,
+  "n_expected": 40,
+  "mse": 0.3407359588930843,
+  "level": 0.008691179711749378,
+  "shape": 0.28038957829387967,
+  "missing": [],
+  "vs_dimensionless": {
+   "n": 40,
+   "mse_ratio": 0.809333239397338,
+   "mse_better": 28,
+   "shape_ratio": 0.7149252604224479,
+   "shape_better": 33
+  },
+  "vs_baseline": {
+   "n": 40,
+   "mse_ratio": 0.6640182492963767,
+   "mse_better": 35,
+   "shape_ratio": 0.7043925606612915,
+   "shape_better": 37
+  }
+ },
+ "signed_H5": {
+  "dimensionless_shat": {
+   "pools": 17,
+   "wrong_sign": 0.147
+  },
+  "dimensionless": {
+   "pools": 17,
+   "wrong_sign": 0.178
+  },
+  "baseline": {
+   "pools": 17,
+   "wrong_sign": 0.054
+  }
+ }
+}
