@@ -100,14 +100,25 @@ class World:
                 m = {"content": [{"type": "text", "text": text}]} if role == "assistant" else {"content": text}
                 f.write(J({"type": role, "timestamp": ts, "entrypoint": "cli", "message": m}) + "\n")
         # subagent transcripts: (id, started, entry its prompt names); every step in `state` gets its own, started
-        # at the step's time with that entry's prompt, unless its agent id starts with "forged"
-        agents = list(agents) + [(x["agent"], x["at"], eid) for eid, v in (state or {}).items() if eid[:1] != "_"
-                                 for x in (v or {}).get("steps") or [] if not x["agent"].startswith("forged")]
-        for aid, started, eid in agents:
+        # at the step's time with that entry's prompt, unless its agent id starts with "forged". An optional fourth
+        # element lists later records (time, "work" | "handback"): a tool call, or the SubagentHandback call and its
+        # result, as a handed-back agent's transcript ends
+        agents = [tuple(a) + ((),) * (4 - len(a)) for a in agents] + [
+            (x["agent"], x["at"], eid, ()) for eid, v in (state or {}).items() if eid[:1] != "_"
+            for x in (v or {}).get("steps") or [] if not x["agent"].startswith("forged")]
+        for aid, started, eid, later in agents:
             p = os.path.join(self.ag, "agent-%s.jsonl" % aid)
             if not os.path.exists(p):
-                open(p, "w").write(J({"type": "user", "timestamp": started, "message": {
-                    "role": "user", "content": "You are a step agent.\n\nEntry: %s (t)\nQuestion: q" % eid}}) + "\n")
+                recs = [{"type": "user", "timestamp": started, "message": {
+                    "role": "user", "content": "You are a step agent.\n\nEntry: %s (t)\nQuestion: q" % eid}}]
+                for ts, kind in later:
+                    name, inp = ("SubagentHandback", {"message": "report"}) if kind == "handback" else \
+                        ("Bash", {"command": "site poll"})
+                    recs.append({"type": "assistant", "timestamp": ts, "message": {"role": "assistant", "content": [
+                        {"type": "tool_use", "id": "tu1", "name": name, "input": inp}]}})
+                    recs.append({"type": "user", "timestamp": ts, "message": {"role": "user", "content": [
+                        {"type": "tool_result", "tool_use_id": "tu1", "content": "ok"}]}})
+                open(p, "w").write("".join(J(r) + "\n" for r in recs))
         open(j("site"), "w").write(STUB)
         os.chmod(j("site"), 0o755)
         self.env = dict(os.environ, PLAN_TEST="1", PLAN_FILE=self.plan, PLAN_STATE=self.state, PLAN_RUNS_DB=self.db,
@@ -168,6 +179,23 @@ def liveness():
     scenario("a step agent started 10 min ago is the entry in flight", w.check()[0] == 0, w.check()[1])
     w = World([E("lowd")], state={"lowd": step(50)})
     scenario("one started 50 min ago is not", w.check()[0] == 2, w.check()[1])
+    w = World([E("lowd")], state={"lowd": step(40, "busy1")}, agents=[("busy1", ago(40), "lowd", [(ago(5), "work")])])
+    scenario("a step agent started 40 min ago that wrote a record 5 min ago is in flight", w.check()[0] == 0,
+             w.check()[1])
+    w = World([E("lowd")], state={"lowd": step(40, "back1")},
+              agents=[("back1", ago(40), "lowd", [(ago(20), "work"), (ago(5), "handback")])])
+    rc, err = w.check()
+    scenario("one that handed back 5 min ago is not, and nothing is in flight since its handback",
+             rc == 2 and "lowd: nothing in flight" in err, err)
+    w2 = World([E("lowd")], state={"lowd": step(40, "back2")},
+               agents=[("back2", ago(40), "lowd", [(ago(5), "handback")]), ("next2", ago(2), "lowd")])
+    rc2, out2 = w2.plan_cmd("step", "lowd", "--agent", "next2")
+    scenario("a step agent started after the handback is accepted", rc2 == 0 and w2.check()[0] == 0, out2)
+    w = World([E("lowd")], state={"lowd": step(50, "quiet1")},
+              agents=[("quiet1", ago(50), "lowd", [(ago(35), "work")])])
+    rc, err = w.check()
+    scenario("one whose transcript was last written more than STEP_MIN (30 min) ago is not", rc == 2
+             and "lowd: nothing in flight" in err, err)
     w = World([E("pp")], runs=[("FA-ccin2p3-r1", "RUNNING", "pp", epoch(90), None)])
     scenario("a live registry job is the entry in flight", w.check()[0] == 0, w.check()[1])
     w = World([E("sw")], items=[("sw", "echo '{\"units\": {\"tp3_x\": {\"expected\": 8, \"done\": 3, \"active\": 2}}}'")])

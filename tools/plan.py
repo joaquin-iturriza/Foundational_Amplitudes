@@ -423,6 +423,32 @@ def subagent(agent_id):
     return out
 
 
+def subagent_activity(agent_id):
+    """(last, handed_back): the time of the subagent's last transcript record, and whether its last assistant record
+    is a SubagentHandback call (its report is delivered and its run is over); None with no transcript. A step agent
+    waiting on a long batch on a site keeps writing, so it is in flight until it hands back or goes quiet."""
+    base = ENV.get("PLAN" + "_AGENTS")
+    pat = os.path.join(base, "agent-%s.jsonl" % agent_id) if base else \
+        os.path.join(S().TRANSCRIPTS, slug() + "*", "*", "subagents", "agent-%s.jsonl" % agent_id)
+    for f in glob.glob(pat) if re.fullmatch(r"[A-Za-z0-9_-]+", agent_id or "") else []:
+        last, handed = None, False
+        for line in open(f, errors="replace"):
+            try:
+                m = json.loads(line)
+            except ValueError:
+                continue
+            if not isinstance(m, dict):
+                continue
+            last = parse(m.get("timestamp")) or last
+            if m.get("type") == "assistant":
+                c = (m.get("message") or {}).get("content")
+                handed = isinstance(c, list) and any(isinstance(x, dict) and x.get("type") == "tool_use"
+                                                     and x.get("name") == "SubagentHandback" for x in c)
+        if last:
+            return last, handed
+    return None
+
+
 def subagent_started(agent_id):
     r = subagent(agent_id)
     return r[0] if r else None
@@ -504,9 +530,16 @@ def why_moves(e, st, msgs, t, d=None, checks=None):
             return None
         if ls and 0 <= (t - ls).total_seconds() / 60 <= STEP_MIN:
             return None
-        # the reason arose when the last step's window lapsed or the last run ended, whichever is later
+        # a step agent still writing its transcript is in flight; one that handed back is not
+        acts = [a for a in (subagent_activity(x.get("agent")) for x in (st.get(e["id"]) or {}).get("steps") or []
+                            if not step_problem(st, e["id"], x)) if a]
+        if any(not handed and 0 <= (t - last).total_seconds() / 60 <= STEP_MIN for last, handed in acts):
+            return None
+        # the reason arose when the last step's window lapsed, its agent handed back or went quiet for the window, or
+        # the last run ended, whichever is later
         fins = [parse(fin) for r, state, fin in rows if fin]
-        marks = [x for x in [ls + dt.timedelta(minutes=STEP_MIN) if ls else None] + fins if x]
+        quiet = [last if handed else last + dt.timedelta(minutes=STEP_MIN) for last, handed in acts]
+        marks = [x for x in [ls + dt.timedelta(minutes=STEP_MIN) if ls else None] + fins + quiet if x]
         return "nothing in flight: " + (e.get("next") or "take the next step"), (max(marks) if marks else None)
     if s == "waiting_user":
         since = max([x for x in (parse(e.get("waiting_since")), parse(e.get("checked_until"))) if x]
