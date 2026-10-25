@@ -37,6 +37,14 @@ if a[0] == "decide":
             if m.get("type") == "user" and q in str((m.get("message") or {}).get("content")):
                 t = max(t or m["timestamp"], m["timestamp"])
     t = t or dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    if os.environ.get("STUB_DECIDE_FAIL"):
+        sys.exit("site: decide refused")
+    if kind in ("hold", "release"):      # as the real site: a hold or release names existing items
+        hit = [k for k in cov.split(",") if c.execute("SELECT 1 FROM items WHERE id=?", (k,)).fetchone()]
+        if not hit:
+            sys.exit("site: a %s names the work items it covers; none of %s matches an item" % (kind, cov))
+        for k in hit:
+            c.execute("UPDATE items SET status=? WHERE id=?", ("held" if kind == "hold" else "active", k))
     did = "D%d" % (900 + c.execute("SELECT COUNT(*) FROM decisions WHERE id LIKE 'D9__'").fetchone()[0])
     c.execute("INSERT INTO decisions VALUES (?,'FA',?,?,?,?,1,'')", (did, kind, q, cov, t))
     if kind in ("hold", "release"):      # as the real site: the older opposite decision stops covering these items
@@ -46,13 +54,20 @@ if a[0] == "decide":
             c.execute("UPDATE decisions SET covers=?, in_force=? WHERE id=?", (",".join(left), 1 if left else 0, oid))
     c.commit()
     print("  %s  FA/%s  said %s: \"x\"" % (did, kind, t))
+elif a[0] == "item" and a[1] == "done":
+    c.execute("UPDATE items SET status='done' WHERE id=?", (a[3],))
+    c.commit()
 elif a[0] == "item":
     if os.environ.get("STUB_ITEM_FAIL"):
         sys.exit("site: item refused")
-    c.execute("INSERT INTO items (project, id, status, decision) VALUES ('FA', ?, 'active', ?)",
-              (a[2], a[a.index("--decision") + 1]))
+    dec = a[a.index("--decision") + 1]
+    k = c.execute("SELECT kind, in_force FROM decisions WHERE id=?", (dec,)).fetchone()
+    if not k or not k[1] or k[0] not in ("approve", "scope", "release"):    # as the real site
+        sys.exit("site: an item needs a decision in force that approves it")
+    c.execute("INSERT INTO items (project, id, status, decision, match) VALUES ('FA', ?, 'active', ?, ?)",
+              (a[3], dec, a[a.index("--match") + 1]))
     c.commit()
-    print("  item FA/%s active" % a[2])
+    print("  item FA/%s active" % a[3])
 '''
 
 
@@ -70,7 +85,7 @@ class World:
         c.execute("CREATE TABLE runs (id TEXT, project TEXT, state TEXT, item TEXT, submitted INTEGER, finished INTEGER)")
         c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, quote TEXT, covers TEXT, said_at TEXT, "
                   "in_force INTEGER, note TEXT)")
-        c.execute("CREATE TABLE items (project TEXT, id TEXT, check_cmd TEXT, status TEXT, decision TEXT)")
+        c.execute("CREATE TABLE items (project TEXT, id TEXT, check_cmd TEXT, status TEXT, decision TEXT, match TEXT)")
         c.executemany("INSERT INTO runs VALUES (?,?,?,?,?,?)", [(r[0], "FA") + tuple(r[1:]) for r in runs])
         if not any(x[0] == "D1" for x in decisions):          # the approval every running test entry stands on
             decisions = list(decisions) + [("D1", "approve", "*", 1)]
@@ -1049,9 +1064,45 @@ def seventh_lower():
              kept and not os.path.exists(live) and live not in g("worktree", "list").stdout, g("worktree", "list").stdout)
 
 
+def hold_without_item():
+    """An entry paused before it had a site item (the synthetic prior, paused under a scope decision on 2026-10-14):
+    plan answer --kind hold files the item under that scope, then holds it; all or nothing."""
+    words = "This should be recorded as a result, and this direction put on pause"
+    paused = lambda: E("syn", status="held", hold_decision="D43", decisions=["D43"], match=None,
+                       quotes=[{"said_at": ago(600), "text": words, "decision": "D43", "covers": ["synthetic data"]}])
+    dec = [("D43", "scope", "synthetic data", 1, ago(600), words)]
+    tr = [(ago(600), "user", words)]
+    w = World([paused()], decisions=dec, transcript=tr)
+    rc0, err0 = w.check()
+    r = w.plan_cmd("answer", "syn", "--kind", "hold", "--quote", words)
+    e, item = w.entries()["syn"], w.sql("SELECT decision, status, match FROM items WHERE id='syn'")
+    rc, err = w.check()
+    scenario("a hold on a paused entry with no item: the item is filed under its scope, held, and nothing is flagged",
+             rc0 == 2 and r[0] == 0 and item == [("D43", "held", "syn*")] and e["status"] == "held"
+             and e["hold_decision"] == "D900" and rc == 0, err0 + r[1] + str(item) + err)
+    w = World([paused()], decisions=dec, transcript=tr)
+    r = w.plan_cmd("answer", "syn", "--kind", "hold", "--quote", words, env={"STUB_DECIDE_FAIL": "1"})
+    scenario("if the hold itself fails, the item made for it is closed and the entry is unchanged",
+             r[0] != 0 and w.sql("SELECT status FROM items WHERE id='syn'") == [("done",)]
+             and w.entries()["syn"]["hold_decision"] == "D43", r[1])
+    w = World([E("syn2", status="held", hold_decision="D44", decisions=["D44"])],
+              decisions=[("D44", "prefer", "syn2", 1, ago(600), words)], transcript=tr)
+    r = w.plan_cmd("answer", "syn2", "--kind", "forbid", "--quote", words)
+    scenario("with no approval or scope in force to file an item under, it is refused before anything is recorded",
+             r[0] != 0 and "no approval or scope" in r[1] and "decide" not in w.calls() and "item" not in w.calls(),
+             r[1])
+
+
 def main():
     liveness(); files(); answers(); adding(); questions(); holds(); done(); migration(); claims()
-    searched_first(); seventh_lower()
+    searched_first(); seventh_lower(); hold_without_item(); sed_reads()
+
+
+def sed_reads():
+    for c, want in (("sed -n 140,200p plan/plan.yaml", 0), ("sed -i s/held/running/ plan/plan.yaml", 2),
+                    ("sed -ni s/a/b/ plan/plan.yaml", 2), ("sed -n 'w plan/plan.yaml' /tmp/x", 2)):
+        rc, out = hook(GUARD_FILES, {"tool_name": "Bash", "tool_input": {"command": c}})
+        scenario("live: `%s` is %s" % (c, "refused" if want else "allowed (a read)"), rc == want, out)
     hold_release(); reask_once(); reopen(); commit_retry(); claims_budget(); added_only()
     worktree_then_merge(); plan_commits(); test_switch(); claims_state(); fourth_lower()
     direct_writes(); one_agent_per_step(); git_bypass(); parsing(); checks_and_sites(); no_plan_yet(); lower()
