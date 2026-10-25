@@ -46,7 +46,8 @@
     "recipes/catalog_v3_*.yaml",
     "scripts/job_catalog_v3*"
    ],
-   "max_age_min": 120
+   "max_age_min": 120,
+   "finished": "53c5a02"
   }
  ]
 }
