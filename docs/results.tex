@@ -7269,6 +7269,18 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     grid from an hp73 parent goes out, resolve the run dir that wrote the hp73 result (a rerun trains in
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
     are flushed (\code{touch .claude/.notes\_flushed}).
+  \item \textbf{Fine-tuning at small $D$ (proposed 2026-10-25, design for the user).} The no-gain read-out
+    (par.~\ref{par:nogain}) shows a frozen trunk with a fitted linear head beating the default fine-tune on $8$ of $10$
+    rungs at $D=10^{1.5}$ on $ee\to Z\gamma$; the fine-tune method comparison (Tab.~\ref{tab:ftmethods}) ran at $10^5$
+    events and the add-$W$ one on forgetting, so no gentler method was ever tested at small $D$. Proposed: methods (the
+    default full retraining with layer decay; the frozen read-out; linear probe then fine-tune; the fine-tune pulled
+    toward the start, L2-SP or EWC; frozen lower blocks; the per-cell choice between read-out and fine-tune on
+    validation) at $D=10$, $10^{1.5}$, $10^2$, $10^{2.5}$, on $ee\to Z\gamma$, $ee\to d\bar d$, $ud\to ud$ (dips) and two probes
+    that gain, from rungs $1$, $7$ and $9$. First every method at the current best fine-tune HPs (CLAUDE.md's comparison
+    protocol, step 3), then single-fidelity DyHPO only for the methods that do not win, best against best. Cost from the
+    recorded times ($10$ to $16$\,min per $8$k-step fine-tune on these probes): the first round is $5\times4\times3=60$
+    cells per method, $4$ trained methods, $240$ runs, about $50$ GPU-h at $8$k steps or about $13$ at $2$k (the
+    read-out and the per-cell choice cost no training). Open for the user: the methods, the probes, the step budget.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
