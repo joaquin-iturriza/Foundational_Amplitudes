@@ -6,11 +6,13 @@ read from the trials' own logs instead: per trial, the lowest val_loss_no_reg it
 (training.iterations). A copy is never resumed, so its sweep is finished: as prune.py does for a finished sweep, every
 other trial loses its models (a lower-fidelity trial of a multi-fidelity sweep, a trial that crashed). Kept whole: the best trial, every
 trial named anywhere in the repo's job scripts, sweep configs, Delta lists or analysis files (runs/<sweep>/trial_N),
-every fine-tune parent sweep/prune.py protects (its parents(), this site's sweep configs included), and every trial written to in the last 6 h. Without --apply it prints the plan; with it, a manifest
-(<root>/PRUNED_COPIES_<time>.json: per trial what was deleted and its size) is written before anything is deleted.
+every fine-tune parent sweep/prune.py protects (its parents(), this site's sweep configs included), and every trial written to in the last 6 h. Without --apply it prints the plan; with it, the manifest (per trial what is
+deleted and its size) is printed to stdout as one PRUNE_COPIES JSON line before anything is deleted, then written to
+<root>/PRUNED_COPIES_<time>.json through a temporary file renamed into place; on ENOSPC the deletion proceeds on the
+stdout copy and the file write is retried after it, any other failure to write it deletes nothing.
     python tools/prune_copies.py runs_from_lxplus [--apply]
 """
-import argparse, glob, json, os, re, sys, time
+import argparse, errno, glob, json, os, re, sys, time
 
 import yaml
 
@@ -136,12 +138,49 @@ def main():
     if not a.apply:
         return
     man = os.path.join(a.root, "PRUNED_COPIES_%s.json" % time.strftime("%Y%m%d_%H%M%S"))
-    json.dump(plan, open(man, "w"), indent=1)
-    print("manifest", man)
+    # the first copy of the manifest goes to stdout, before any deletion and before the file write that a full disk
+    # refuses; deleting is what frees the space, so on ENOSPC the deletion proceeds on that copy and the write is retried
+    print("PRUNE_COPIES " + json.dumps({"root": a.root, "manifest": man, "freed_bytes": freed, "trials": plan}),
+          flush=True)
+    try:
+        write_manifest(man, plan)
+        retry = False
+        print("manifest", man)
+    except OSError as e:
+        if e.errno != errno.ENOSPC:
+            raise                                             # not a full disk: nothing is deleted
+        print("PRUNE_WARN %s not written (disk full); deleting on the stdout copy, then retrying" % man, flush=True)
+        retry = True
     for p in plan:
         for f in p.get("deleted", []):
-            os.remove(f)
+            try:
+                os.remove(f)
+            except FileNotFoundError:
+                pass
+    if retry:
+        try:
+            write_manifest(man, plan)
+            print("PRUNE_WARN manifest %s written after the deletion" % man, flush=True)
+        except OSError as e:
+            print("PRUNE_WARN manifest %s still not written (%s); the PRUNE_COPIES line above is the only record"
+                  % (man, e), flush=True)
     print(f"PRUNED_COPIES {n_del} trials, {freed / 1e9:.1f} GB freed")
+
+
+def write_manifest(mf, plan):
+    """Write plan to mf through a temporary file renamed over it: a failed write (ENOSPC) never leaves a truncated
+    manifest and removes its own temporary file"""
+    tmp = mf + ".tmp"
+    try:
+        with open(tmp, "w") as f:
+            json.dump(plan, f, indent=1)
+        os.replace(tmp, mf)
+    except OSError:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
 
 
 if __name__ == "__main__":
