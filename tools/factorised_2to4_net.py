@@ -113,7 +113,8 @@ def main():
         assert sorted(order.tolist()) == list(range(n)), f"{p}: the val split is not the {n} mapped rows"
         mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
         mu_c, sd_c = parent_frame(pstats, int(exp._proc_npart[0]))
-        t = (mu_p + sd_p * val[1].reshape(-1).double()).numpy()
+        # a sign-head run's target carries the sign as a second column; its magnitude is column 0
+        t = (mu_p + sd_p * (val[1][:, 0] if val[1].dim() == 2 else val[1]).reshape(-1).double()).numpy()
         with torch.no_grad():
             q = (mu_c + sd_c * exp._forward_lloca(val)[0].reshape(-1).double().cpu()).numpy()
         e3 = np.empty(n); tt = np.empty(n)

@@ -115,7 +115,7 @@ def main():
         val = cat_batches(list(exp.val_loader))
         mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
         mu_c, sd_c = parent_frame(pstats, N)
-        t = (mu_p + sd_p * val[1].reshape(-1).double()).numpy()            # log(|M|^2 F), the probe's truth
+        t = (mu_p + sd_p * (val[1][:, 0] if val[1].dim() == 2 else val[1]).reshape(-1).double()).numpy()            # log(|M|^2 F), the probe's truth
         n = len(t)
         tgt = ((torch.as_tensor(t) - mu_c) / sd_c).to(exp.dtype)            # the truth in the parent's output units
 
