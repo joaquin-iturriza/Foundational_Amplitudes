@@ -83,14 +83,30 @@ import glob, os, sys, yaml
 print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_val_*amplitudes.npy\"))
           for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "recipes/catalog_v3_heldout_$A.yaml")
     if [ "$miss" != 0 ]; then echo "V3_AXIS_SKIPPED $A: $miss pools not generated"; continue; fi
-    P=("$R/$A"/*.yaml); [ "$MODE" = smoke ] && P=("${P[@]:0:2}")
+    P=("$R/$A"/*.yaml)
+    # smoke: two probes per axis; on H5 one that changes sign and one that does not, so both scorings are exercised
+    if [ "$MODE" = smoke ]; then
+        P=($(python -c "
+import json, os, sys
+au = json.load(open('analysis/catalog_v3/pool_audit.json'))['pools']
+neg = lambda f: au[os.path.basename(f)[:-5]]['val'].get('negative', 0) > 0
+fs = sys.argv[2:]
+print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1]) if sys.argv[1] == 'H5' else fs[:2]))" "$A" "${P[@]}"))
+    fi
     SM=(); [ "$A" = H5 ] && SM=(--signed-magnitude)
     python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
     if [ "$A" = H5 ]; then
-        python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/H5_signed.txt"
-        [ "${PIPESTATUS[0]}" = 0 ] || exit 1
+        # only the pools that change sign (val split, analysis/catalog_v3/pool_audit.json); the others have no sign to score
+        SP=($(python -c "
+import json, os, sys
+au = json.load(open('analysis/catalog_v3/pool_audit.json'))['pools']
+print(' '.join(f for f in sys.argv[1:] if au[os.path.basename(f)[:-5]]['val'].get('negative', 0) > 0))" "${P[@]}"))
+        if [ ${#SP[@]} -gt 0 ]; then
+            python tools/signed_ab_score.py --run "$OUT" --arm head "${SP[@]}" | tee "$PRED/H5_signed.txt"
+            [ "${PIPESTATUS[0]}" = 0 ] || exit 1
+        fi
     fi
 done
 echo "V3_SHORT_DONE $ARM"
