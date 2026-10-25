@@ -885,7 +885,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -919,4 +919,16 @@ entries:
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
+      sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
+      6 TeV training window; drop it or give it a new window (e.g. 6-20 TeV)?'
+    at: '2026-10-25T19:51:22+00:00'
+    searched: 'site pick FA (ccin2p3 AVOID: sps not writable), site env ccin2p3 FA (No space left on device), df on /sps/lpnhe
+      (512G used of 512G); CLAUDE.md and the plan have no H7E window for catalog_v4'
+  ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
+    sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
+    6 TeV training window; drop it or give it a new window (e.g. 6-20 TeV)?'
+  waiting_since: '2026-10-25T19:51:22+00:00'
+  searched: 'site pick FA (ccin2p3 AVOID: sps not writable), site env ccin2p3 FA (No space left on device), df on /sps/lpnhe
+    (512G used of 512G); CLAUDE.md and the plan have no H7E window for catalog_v4'
