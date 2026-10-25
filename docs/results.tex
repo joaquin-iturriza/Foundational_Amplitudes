@@ -1360,8 +1360,128 @@ What the CPU cannot say is whether the network's level skill with the emission s
 the hybrid keeps, or from the per-event $L_q$, which it drops; only a network answers that. The GPU test: one more arm
 of the short pretraining, the same inputs, orders, setup and HPs as the other five, with the hybrid target, read
 zero-shot on every axis; one seed, about $2$\,GPU-h. Approved (the user, 2026-10-25: ``Yes, run that hybrid test
-then.'') and running on CC with the target option \code{data.target\_physics\_hybrid} (\code{66559de};
-FA-ccin2p3-9b88e434).
+then.'') and run on CC with the target option \code{data.target\_physics\_hybrid} (\code{66559de};
+FA-ccin2p3-9b88e434, which died on the full disk, rerun as FA-ccin2p3-2f7d86e7); its read is the next paragraph.
+
+% allow: 10000 because it is the number of training events c_p is computed on, a setting
+% allow: 2000 because it is the number of validation events read per probe, a setting
+% allow: 1 10 30 because they are the ends of the energy window in TeV and the pT threshold, settings
+% allow: N-4 4 because it is the reference multiplicity in the target, a definition
+% src: python3 analysis/catalog_v3/prep_hybrid.py @3bd4fab
+% claim: n_probes=617
+\paragraph{The hybrid reference scale in a network (2026-10-25).} The hybrid arm (\code{dimensionless\_hybrid} of
+\code{scripts/job\_catalog\_v3\_short.sh}: the target of $\hat s$ alone plus the per-process constant $c_p$, the same
+inputs, coupling orders, short setup and HPs as the other five arms; one seed; run FA-ccin2p3-2f7d86e7), read zero-shot
+on every axis as in Tab.~\ref{tab:v3_short}, all $617$ probes (\code{analysis/catalog\_v3/prep\_hybrid.py},
+\code{data/prep\_hybrid.json}, Fig.~\ref{fig:v3_prep_hybrid}). Its constant follows the rule of the paragraph above:
+$c_p$ is the mean of $L_q-(N-4)\log\hat s$ over the process's own training events (a held-out probe's first $10000$,
+its validation or test events only when it has no training split), never over the $2000$ events being predicted; the
+measured gap between that constant and the one on the predicted validation events is
+% src: python3 analysis/catalog_v3/hybrid_check_read.py @11519b9
+% claim: dcp_min=0.0024
+% claim: dcp_max=0.091
+% claim: ratio_max=2.1
+$0.0024$ to $0.091$, at most $2.1$ sampling errors, small against the levels below.
+Medians over each axis's processes, MSE (level, shape); the ratios are of the hybrid's medians to the other arm's,
+the per-probe ones the median over probes of the hybrid's value over the other arm's:
+\begin{itemize}
+  \item \emph{Inside the catalog's range it is the best of the six arms on three axes.} New combinations $0.61$
+% src: python3 analysis/catalog_v3/prep_hybrid.py @3bd4fab
+% claim: H1_mse=0.61
+% claim: H1_level=0.088
+% claim: H1_shape=0.46
+% claim: H2_mse=0.82
+% claim: H2_level=0.14
+% claim: H2_shape=0.56
+% claim: H6_mse=0.058
+% claim: H1_qperp_ratio=0.72
+% claim: H2_qperp_ratio=0.79
+% claim: H6_qperp_ratio=0.43
+% claim: H1_shat_ratio=0.82
+% claim: H2_shat_ratio=0.96
+% claim: H6_shat_ratio=0.34
+% claim: H1_shat_shape=0.89
+% claim: H2_shat_shape=0.89
+% claim: H2_qperp_level=1.38
+% claim: H2_shat_level=0.82
+% claim: H2_shat_better=102
+% claim: H2_n=168
+% claim: H7c_shat_med_mse=0.341
+% allow: 0.13 because it is the held-out coupling value, a setting
+% claim: H7c_mse=0.366
+% claim: H5_mse=0.926
+% claim: H5_twin_ratio=1.09
+% claim: H5_shat_ratio=1.06
+    ($0.088$, $0.46$), $2\to4$ $0.82$ ($0.14$, $0.56$), $\alpha_s=0.13$ $0.058$: $0.72$, $0.79$ and $0.43$ of the
+    emission scales', $0.82$, $0.96$ and $0.34$ of $\hat s$ alone's. Its shape is below even $\hat s$ alone's (per
+    probe $0.89$ on new combinations and on $2\to4$), and on $2\to4$ its level is between the two references ($1.38$ of
+    the emission scales' per probe, $0.82$ of $\hat s$ alone's); its MSE beats $\hat s$ alone's on $102$ of the $168$
+    $2\to4$ classes. At $p_T\geq30$\,GeV it is second ($0.366$ against $\hat s$ alone's $0.341$), on one loop third
+    ($0.926$, $1.09$ of the twin's and $1.06$ of $\hat s$ alone's).
+  \item \emph{At a new multiplicity the class mean carries most of the level.} On the $40$ $2\to5$ probes the MSE is
+% src: python3 analysis/catalog_v3/prep_hybrid.py @3bd4fab
+% claim: H2p5_mse=1.20
+% claim: H2p5_level=0.45
+% claim: H2p5_shape=0.68
+% claim: H2p5_qperp_ratio=0.99
+% claim: H2p5_shat_ratio=0.08
+% claim: H2p5_qperp_level=4.51
+% claim: H2p5_qperp_shape=0.70
+% claim: H2p5_qperp_better=19
+% claim: H2p5_n=40
+% claim: H2p5_shat_med_mse=14.8
+% claim: H2p5_shat_med_level=13.6
+% claim: H2p5_qperp_med_level=0.10
+% allow: 1 10 because they are the ends of the energy window in TeV, a setting
+% claim: H2p5_ctx_ratio=1.16
+% claim: H7E_mse=2.31
+% claim: H7E_qperp_ratio=0.80
+% claim: H7E_shat_ratio=1.34
+    $1.20$ ($0.45$, $0.68$), $0.99$ of the emission scales' and $0.08$ of $\hat s$ alone's $14.8$ (level $13.6$); per
+    probe its level is $4.51$ times the emission scales' and its shape $0.70$ of theirs, and it beats them on $19$ of
+    the $40$, and the context vector's arm stays below it ($1.16$). The per-event $L_q$ the hybrid drops carries the rest
+    of the emission scales' level, from $0.45$ to their $0.10$. At $1$ to $10$\,TeV it is $2.31$, $0.80$ of the
+    emission scales' and $1.34$ of $\hat s$ alone's.
+  \item \emph{It loses level on the top and with harder cuts.} On the $237$ top classes the MSE is $1.94$ ($0.82$,
+% src: python3 analysis/catalog_v3/prep_hybrid.py @3bd4fab
+% claim: H3_mse=1.94
+% claim: H3_level=0.82
+% claim: H3_shape=0.78
+% claim: H3_qperp_level=1.29
+% claim: H3_shat_level=1.60
+% claim: H3_shat_shape=1.01
+% claim: H3_ctx_ratio=1.32
+% claim: H7c_level=0.074
+% claim: H7c_qperp_level=9.8
+% claim: H7c_qperp_shape=0.57
+% claim: H3_n=237
+    $0.78$), the worst of the six ($1.32$ times the context vector's arm, the best there); per probe its level is $1.29$
+    times the emission scales' and $1.60$ times $\hat s$ alone's, its shape $1.01$ of $\hat s$ alone's. At $p_T\geq30$\,GeV
+    its level, $0.074$, is $9.8$ times the emission scales' per probe while its shape is $0.57$ of theirs. Why the
+    same class mean is predicted worse there than with the per-event $L_q$ is not checked.
+  \item \emph{Signs.} On the $17$ one-loop pools that change sign, the median wrong-sign fraction is $10\%$, against
+% src: python3 analysis/catalog_v3/prep_hybrid.py @3bd4fab
+% claim: wrong_sign_hyb=10
+% claim: wrong_sign_qperp=18
+% claim: wrong_sign_shat=15
+% claim: wrong_sign_base=5
+% claim: signed_pools=17
+    $18\%$ for the emission scales, $15\%$ for $\hat s$ alone and $5\%$ for the baseline.
+\end{itemize}
+So one number per process takes most of both references' gains: $\hat s$'s shape (lower still inside the range) and
+most of the emission scales' level at $2\to5$, at the price of the top's level and the level under harder cuts. One seed
+each arm, so differences of a few tens of percent on an axis are within what a second seed could move (not measured).
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_hybrid.pdf}
+% allow: ^2
+% allow: 1 10 because they are the ends of the energy window in TeV, a setting
+\caption{catalog\_v3's short pretraining with the hybrid reference scale ($\hat s$ alone plus a per-process constant),
+per held-out probe: (a) the shape of its zero-shot error against that of the arm with $\hat s$ alone, (b) its level
+against that of the arm with the emission scales, on $\log|\mathcal M|^2$. Triangles: the $2\to5$ and $1$ to
+$10$\,TeV probes. One seed each.}
+\label{fig:v3_prep_hybrid}
+\end{figure}
 
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
