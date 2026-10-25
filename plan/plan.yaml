@@ -946,3 +946,4 @@ entries:
   waiting_since: '2026-10-25T19:56:48+00:00'
   searched: D130 approved the 6 TeV log-uniform range but says nothing about the energy hold-out; D98/D100 set the hold-out
     at 1-10 TeV relative to the 1 TeV window
+  checked_until: '2026-10-25T20:02:59+00:00'
