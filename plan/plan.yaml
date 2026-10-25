@@ -57,7 +57,8 @@ entries:
   next: 'the CPU level check of the s-hat reference times a per-process constant (rerun FA-ccin2p3-c9fb30f5): write the design
     and its numbers up, then bring the design and the GPU test''s cost to the user before any job; queue after that: the signed-data
     check, then new candidates'
-  done_when: null
+  done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
+    docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*
   notes_ref: null
   evidence:
