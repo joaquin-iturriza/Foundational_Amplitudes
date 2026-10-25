@@ -47,7 +47,9 @@ def main():
             summ.setdefault(m, {})[str(k)] = {"n": len(cs), "gain_over_default": float(np.median(g)),
                                               "wins_over_default": int((g > 0).sum()),
                                               "gain_over_scratch": float(np.median(gs)),
-                                              "wins_over_scratch": int((gs > 0).sum())}
+                                              "wins_over_scratch": int((gs > 0).sum()),
+                                              "factor_over_default": float(10 ** np.median(g)),
+                                              "factor_over_scratch": float(10 ** np.median(gs))}
     dflt = {str(k): float(np.median([np.log10(r["scratch"] / r["recorded_ft"]) for r in rows if r["k"] == k]))
             for k in (2, 3, 4, 5)}
     out = {"summary": summ, "default_over_scratch": dflt, "incomplete": incomplete, "cells": rows}
@@ -56,6 +58,9 @@ def main():
         print(m, json.dumps(v))
     print("incomplete:", len(incomplete), incomplete[:10])
     plot(summ, dflt)
+    # last line: the object the results.tex claims key into (tools/verify_claims.py), e.g. summary.l2sp.4.wins_over_default
+    print(json.dumps({"summary": summ, "default_over_scratch": dflt, "n_cells": len(rows),
+                      "n_incomplete": len(incomplete)}))
 
 
 def plot(summ, dflt):
