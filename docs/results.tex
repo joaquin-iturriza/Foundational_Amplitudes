@@ -516,8 +516,16 @@ $0.39$ / $0.89$ / $0.29$ / $0.39$ against the network's $0.57$ / $1.08$ / $0.61$
 $32$ of $43$, $31$ of $35$ and $19$ of $21$. The information budgets differ as on Daniel's catalog: the factorised
 numbers use the parent's exact $|\mathcal M|^2$ and a correction fitted on the true $2\to4$ labels of other parents'
 classes, the network's are zero-shot. So where catalog\_v3 trains on the multiplicity, the head would add little; where
-it might is at a multiplicity not trained on, the $40$ $2\to5$ probes (each a $2\to4$ class plus one particle), whose
-factorisation onto their $2\to4$ parents is running.
+it might is at a multiplicity not trained on, the $40$ $2\to5$ probes (each a $2\to4$ class plus one particle, $38$
+with a gluon, $2$ with a photon, all on $e^+e^-$ beams). Onto their $2\to4$ parents, the correction fitted on all $880$
+$2\to4$ classes and applied unchanged: own spread $16.3$, after the exact parent $3.45$, and learned $0.46$, under the
+dimensionless run's zero-shot shape ($1.02$; $0.93$ with the context vector, $2.35$ for the baseline) on $34$ of the
+$40$. With the network's own $2\to4$ prediction at the mapped events in place of the exact parent
+(\code{tools/factorised\_2to4\_net.py --v3-nfinal 5}; the parents are training classes) the gain is gone: $1.01$
+against $1.02$ for the dimensionless run, $0.93$ against $0.93$ with the context vector, under on $16$ and $18$ of the
+$40$. The network's error on its own training classes at the mapped events adds about $0.5$, as much as the
+factorisation removes. So a factorised head on these short runs buys nothing even one multiplicity out; it would need a
+parent prediction several times more accurate than these runs give.
 
 \begin{figure}[H]
 \centering
