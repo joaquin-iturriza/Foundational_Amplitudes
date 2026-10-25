@@ -63,12 +63,12 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    An interrupt or a rejected tool call that comes with a question is answered, and the work then continues: only
    my words "stop" or "wait" stop it. (2026-10-25: a rejected copy, sent with a question, was read as a stop.)
 
-0i. **Independent plan entries run in parallel, through background agents.** Every entry of the hand-off plan that
-   does not depend on another and needs analysis, porting or a write-up goes to its own background agent (Agent tool,
-   `run_in_background`), started in the same turn the entry becomes workable; the main session keeps the events, the
-   launches and me. One entry worked at a time by the main session while the others wait is the failure this rule
-   exists for. (2026-10-14 and 09-30 I asked for this in conversation; it was never written down, and for days every
-   entry ran one after another in the main session.)
+0i. **One dedicated background agent per open plan entry that can move** (Agent tool, `run_in_background`), as we
+   agreed: it stays on its entry until the entry is finished or blocked, committing results as they land. The main
+   session only routes: events, launches, starting an agent the turn an entry becomes workable, and me. An entry
+   worked by the main session, or waiting for another to finish, is the failure this rule exists for. The agent of an
+   entry is recorded in `.claude/plan_map.json` (`"agent": "<what it is doing, since when>"`). (2026-10-25: for days
+   the entries ran one after another in the main session.)
 
 1. **μP only — three maintained architectures.** All maintained models use μP.
    The default and usual best is the μP LLoCa Lorentz-local transformer:
