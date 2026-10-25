@@ -164,6 +164,7 @@ entries:
     - FA-ccin2p3-cf864a9e
     commit: fbcc7df
     paths:
+    - analysis/transfer/data/lowd_disk_reruns.json
     - analysis/transfer/data/lowd_dyhpo_interim.json
     - analysis/transfer/figs/lowd_dyhpo_interim.pdf
     - analysis/transfer/figs/lowd_dyhpo_interim.png
