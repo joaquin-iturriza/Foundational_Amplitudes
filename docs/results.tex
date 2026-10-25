@@ -7273,9 +7273,6 @@ $8$k set at $D=10^4$ (D64). Open from review (now settled by D62): \code{trainin
     correction ($1.9\times$ between $D=700$ and $7\times10^4$ at $t=1000$, against the rule's $6.8\times$); re-centring
     the scratch window on it stays open (the fine-tune grid now searches the effective lr directly, with a candidate
     seed per sweep).
-  \item \textbf{Prediction order.} \code{preds\_val.npz} holds the events in the split's shuffled
-    order; \code{residual\_map.py} matches them back by $|\mathcal M|^2$ (at most $0.6\%$ of the
-    events ambiguous). Saving the pool row would remove the matching.
   \item \textbf{The ladder.} Rung $6$'s hp15 rescored at $1.67\times10^{-7}$ against the $1.30\times10^{-7}$ its run
     recorded (rung $1$'s hp47 reproduces to $1\%$); the gap is not understood. Not the EMA weights (FA-ccin2p3-60b47206,
     2026-10-25): that rescoring predates the EMA-aware loader (\code{rebuild\_run.load\_best\_weights}, 2026-10-15) and

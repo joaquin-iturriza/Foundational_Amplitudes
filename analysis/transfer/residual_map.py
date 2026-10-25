@@ -2,7 +2,8 @@
 and cos(theta) (the angle between the first beam, row 0, and the first final-state particle, row 2),
 as the mean squared error of log|M|^2 per bin. Needs a run made with
 evaluation.save_predictions=true (preds_val.npz in the run dir). The predictions come out shuffled;
-each is matched to its validation-pool row by rank of the raw |M|^2, and the match is checked before
+each is mapped to its validation-pool row by the saved pool_row (runs since 2026-09-30), else matched by rank of
+the raw |M|^2; either map is checked against the raw |M|^2 before
 anything is binned. Rank matching can only swap two events whose |M|^2 differ by less than the
 match precision (the saved raw_truth is float32): those are counted (n_ambiguous, the events with a
 neighbour in |M|^2 closer than twice the largest matching error) and the map is refused above 1%.
@@ -26,18 +27,25 @@ pool = np.asarray(np.load(val_path, mmap_mode="r")[:n_val])
 npart = (pool.shape[1] - 1) // 5
 mom = pool[:, :npart * 4].reshape(-1, npart, 4)
 raw_file = pool[:, -1]
-# the events are shuffled when the splits are assembled (experiment.py, seed 42): match each
-# prediction to its pool row by the raw |M|^2, which is distinct per event, and check the match
+# the events are shuffled when the splits are assembled (experiment.py, seed 42). A run since f7c2a6f (2026-09-30)
+# saves each prediction's pool row (pool_row, the split's permutation): read it, and check it against the raw |M|^2.
+# An older run: match each prediction to its pool row by the raw |M|^2, which is distinct per event, and check the match
 raw_pred_rows = np.asarray(P["raw_truth"]).reshape(-1)
+if "pool_row" in P.files:
+    row_of = np.asarray(P["pool_row"]).astype(int)
+    match = float(np.max(np.abs(raw_pred_rows - raw_file[row_of]) / np.abs(raw_file[row_of])))
+    assert match < 1e-3, f"pool_row does not match the val pool (max rel diff {match:.2g})"
+    n_amb = 0
 i_file, i_pred = np.argsort(raw_file), np.argsort(raw_pred_rows)
-match = float(np.max(np.abs(raw_pred_rows[i_pred] - raw_file[i_file]) / np.abs(raw_file[i_file])))
-assert match < 1e-3, f"predictions do not match the val pool (max rel diff {match:.2g})"
-row_of = np.empty(len(raw_file), int); row_of[i_pred] = i_file          # prediction k -> pool row
-gaps = np.diff(np.log(np.abs(raw_file[i_file])))
-close = gaps < 2 * match                                                    # a swap is possible here
-amb = np.zeros(len(raw_file), bool); amb[:-1] |= close; amb[1:] |= close
-n_amb = int(amb.sum())
-assert n_amb <= 0.01 * len(raw_file), f"{n_amb} events are closer in |M|^2 than the match precision"
+if "pool_row" not in P.files:
+    match = float(np.max(np.abs(raw_pred_rows[i_pred] - raw_file[i_file]) / np.abs(raw_file[i_file])))
+    assert match < 1e-3, f"predictions do not match the val pool (max rel diff {match:.2g})"
+    row_of = np.empty(len(raw_file), int); row_of[i_pred] = i_file      # prediction k -> pool row
+    gaps = np.diff(np.log(np.abs(raw_file[i_file])))
+    close = gaps < 2 * match                                                # a swap is possible here
+    amb = np.zeros(len(raw_file), bool); amb[:-1] |= close; amb[1:] |= close
+    n_amb = int(amb.sum())
+    assert n_amb <= 0.01 * len(raw_file), f"{n_amb} events are closer in |M|^2 than the match precision"
 mom, raw_file = mom[row_of], raw_file[row_of]                              # pool rows in prediction order
 
 res = (np.asarray(P["pred"]).reshape(len(raw_file), -1)[:, 0]
