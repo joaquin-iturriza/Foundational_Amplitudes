@@ -2675,7 +2675,7 @@ _NEUTRINOS = frozenset((12, 14, 16))
 #   forward     f_fwd of each pool from the forward component (rotate_forward), fwd_cand of the flat part's
 #               candidates turned forward: the coverage check's settings (analysis/catalog_v3/coverage_check.py
 #               FWD_SHARE, FWD_CAND), open (no decision behind the values)
-#   top         MT = ymt = 172.5 in every entry, internal tops too, WT its LO width (V4_WT)
+#   top         MT = ymt = 172.5 in every entry, internal tops too, WT its LO width (V4_WT; this width rule is an open choice, not the user's: the approval covered the 172.5 mass)
 #   b           massless, beams and finals: MadGraph's sm-no_b_mass (the five-flavour scheme, no b Yukawa)
 V4_COS_ETA5 = float(np.tanh(5.0))      # |eta| < 5 is |cos theta| < tanh 5 for any particle
 V4_CUTS = {"hadronic": {"pt_min": 10.0, "cos_max": V4_COS_ETA5, "dr_min": 0.4, "m_min": -1.0, "cut_pdgs": [5, 15]},
