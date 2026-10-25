@@ -926,7 +926,7 @@ entries:
     runs:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-ec84e913
-    commit: 09d4ee9
+    commit: d225b11
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/figs/coverage_fwd_c.png
