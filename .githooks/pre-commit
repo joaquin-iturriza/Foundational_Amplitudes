@@ -1,0 +1,7 @@
+#!/bin/sh
+# git pre-commit (core.hooksPath = .githooks; setup redesign, D121): a commit whose index changes docs/results.tex
+# must state only numbers the analysis scripts reproduce (tools/verify_claims.py on the real index). It runs for every
+# way of committing (add then commit, commit -a, commit --all, a worktree) since git calls it on the index itself.
+top=$(git rev-parse --show-toplevel) || exit 1
+git diff --cached --name-only | grep -qx 'docs/results.tex' || exit 0
+exec python3 "$top/tools/verify_claims.py" --root "$top" --staged

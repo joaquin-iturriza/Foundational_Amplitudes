@@ -1,0 +1,3 @@
+#!/bin/sh
+# git pre-merge-commit: the same check on a merge's result (a merge of a branch that edited docs/results.tex).
+exec "$(dirname "$0")/pre-commit"
