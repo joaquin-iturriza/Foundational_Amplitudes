@@ -210,18 +210,24 @@ def main():
                           np.log(s)], 1)
         emitter = np.asarray(ids4[2:])[near]
         # the backend check: the parent's own pool relabelled at its stored alpha_s
-        Xp, alp, _ = pool(parent)
-        Xp = Xp[: a.n_check]
-        Pp = Xp[:, : 4 * len(ids3)].reshape(-1, len(ids3), 4).astype(np.float64)
-        lr = np.log(np.abs(me2(parent, Pp, None if alp is None else np.asarray(alp[: a.n_check], np.float64)))
-                    / np.abs(Xp[:, -1]))
+        # (a parent compiled here for the check has no pool: no backend check, recorded as null)
+        try:
+            Xp, alp, _ = pool(parent)
+        except SystemExit:
+            Xp = None
+        if Xp is not None:
+            Xp = Xp[: a.n_check]
+            Pp = Xp[:, : 4 * len(ids3)].reshape(-1, len(ids3), 4).astype(np.float64)
+            lr = np.log(np.abs(me2(parent, Pp, None if alp is None else np.asarray(alp[: a.n_check], np.float64)))
+                        / np.abs(Xp[:, -1]))
         np.savez_compressed(os.path.join(a.out, p + ".npz"), t4=t4, t3=t3, feats=feats, emitter=emitter,
                             a_emits=a_emits, x=x, b_beam=b_beam)
         ok = (t3 > 0) & np.isfinite(t3)
         r = np.log(t4[ok]) - np.log(t3[ok])
         rec = dict(unmapped=int((~fin).sum()), probe=p, parent=parent, extra=extra, map="beam_recoil" if b_beam else "cs_ii", n=int(n), t3_bad=int((~ok).sum()), pool=os.path.basename(f4),
                    var_log_t4=float(np.var(np.log(t4))), var_r=float(np.var(r)), mean_r=float(np.mean(r)),
-                   check_median_log_ratio=float(np.median(lr)), check_max_abs_log_ratio=float(np.abs(lr).max()),
+                   check_median_log_ratio=None if Xp is None else float(np.median(lr)),
+                   check_max_abs_log_ratio=None if Xp is None else float(np.abs(lr).max()),
                    has_alphas=al is not None)
         print("F24 " + json.dumps(rec), flush=True)
 
