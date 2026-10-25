@@ -939,11 +939,8 @@ entries:
   - D127
   - D130
   - D134
-  next: 'when the validation rerun (FA-ccin2p3-2e1a0894, no census) ends: read each pool check (cuts recomputed, log-uniform
-    sqrt(s), forward angle, mass shells, sec per event), the card check (model now read from src/Parameters_*.h), the one-loop
-    generate counts including the loop_qcd_qed_sm-no_b_mass entry (its restriction card now installed on CC: a copy of the
-    model''s massless-b default), and the measured generation CPU-h; update the catalog_v4 hand-off item (v4 builds no longer
-    write the MadEvent events dir; the 35 existing v4_*_events dirs, ~1.8 GB, are left for the user)'
+  next: regenerate catalog_v4's pools once the user answers the open questions (the 1 to 10 TeV energy hold-out, the 34 b-Higgs
+    classes, storage) and the disk has room; then classes and roles on v4; then the b mass in particle_ids.py
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
