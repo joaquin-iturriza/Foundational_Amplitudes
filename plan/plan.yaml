@@ -178,13 +178,14 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: 'At 899 of 900 (2026-10-25 22:40, queue empty): the missing trial is in the frozen-blocks sweep for ee to bb one-loop
-    at rung 7, D=10^2 (tp3_lowd_freeze_r7_ee_bb_nlo_d2). Logs: trials 5 (fixed rerun of the disk-failed candidate 145) and
-    6 (guided) ran together and both drew candidate 145, so only 4 distinct candidates are in. One guided trial added (trial_0007,
-    generate_sweep --extend --n-trials 1; the feeder dry-run lists it, 1 to submit); the CC feeder submits it. When it is
-    in (900/900): the final collection (collect_sweeps.py tp3_lowd_ > data/lowd_dyhpo_sweeps.json), python3 analysis/transfer/lowd_dyhpo.py
-    without --complete, compare each method''s best against the default''s own 5-trial search on cell medians per D, figure,
-    write-up after par:lowd_ft.'
+  next: 'At 898 of 900 (2026-10-26 00:0x): the two candidates whose result files are empty (full disk, 20:37) are requeued
+    as fixed trials, trial_0005 of tp3_lowd_lpft_r9_ee_ddbar_d2 (hp90) and of tp3_lowd_lpft_r9_ud_ud_d2 (hp199), by rerun_failed
+    --empty-results; the CC feeder submits them (its dry run lists 1 each). The empty files stay on CC (not mine to delete)
+    and are ignored by the watchdog, collector and feeder. When both are in: the final collection (collect_sweeps.py tp3_lowd_
+    > data/lowd_dyhpo_sweeps.json, banner stripped), python3 analysis/transfer/lowd_dyhpo.py without --complete, compare each
+    method''s best against the default''s own 5-trial search on cell medians per D (wins, the single-run noise of par:lowd_ft),
+    note tp3_lowd_freeze_r7_ee_bb_nlo_d2 (hp145 twice, best over 5 distinct candidates with trial_0007: check), figure, write-up
+    as par:lowd_dyhpo after par:lowd_ft.'
   done_when: 'python3 sweep/watchdog.py tp3_lowd_ --expect analysis/transfer/expect_tp3.json --window 30 --sites ccin2p3 --units
     | tail -1 | python3 -c "import json,sys; u=json.load(sys.stdin)[''units'']; sys.exit(0 if len(u)==180 and all(v[''done'']>=v[''expected'']
     and not v[''active''] for v in u.values()) else 1)" && python3 -c "import json,sys; d=json.load(open(''analysis/transfer/data/lowd_dyhpo.json''));
