@@ -74,6 +74,8 @@ def main():
                 if x["id"] == dec or iid in names(x)]     # covers as they stand now: a later hold/release edits them
 
     def blank(**k):
+        if re.search(r"\bsetup\b", "%s %s" % (k.get("id", ""), k.get("title", "")), re.I):
+            k.setdefault("kind", "setup")          # the setup's own entries: their record may be CLAUDE.md or a tool
         e = {"status": "running", "quotes": [], "decisions": [], "next": None, "done_when": None, "match": None,
              "notes_ref": None, "evidence": {"runs": [], "commit": None, "paths": []}, "dead_ends": [], "asks": []}
         e.update(k)
