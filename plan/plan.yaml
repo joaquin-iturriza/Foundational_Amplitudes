@@ -948,14 +948,19 @@ entries:
     runs:
     - FA-ccin2p3-144e2111
     - FA-ccin2p3-33503e6c
+    - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-ec84e913
-    commit: 1f03805
+    commit: 0bf9e4d
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/figs/coverage_fwd_c.png
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
+    - analysis/catalog_v4/data/checked.json
+    - analysis/catalog_v4/data/validation.json
+    - analysis/catalog_v4/figs/census_diagrams.png
+    - analysis/catalog_v4/read_validation.py
     - analysis/catalog_v4/validate_v4.py
     - recipes/gen_catalog_v4.py
     - scripts/job_catalog_v4_validate.sh
