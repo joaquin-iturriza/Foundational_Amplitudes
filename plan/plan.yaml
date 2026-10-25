@@ -117,9 +117,13 @@ entries:
     - 9; at the current best fine-tune HPs; 10-16 GPU-h
   decisions:
   - D120
-  next: when the DyHPO round's 900 trials are in (watchdog check), collect tp3_lowd_ (analysis/transfer/collect_sweeps.py),
-    run analysis/transfer/lowd_dyhpo.py, compare each method best against best with the default's own search on cell medians,
-    and write it up after par:lowd_ft
+  next: 'Progress at 19:22 (watchdog check over the 180 tp3_lowd_ sweeps on CC): 248 of 900 trials in (freeze 104/300, L2-SP
+    77/300, linear probe 67/300), 647 queued or running. Seven linear-probe slots failed on the head read-out assertion (r1_uubar_gg_d5,
+    r7_ee_Za_d5, r1_ud_ud_d4, r1_ud_ud_d5, r1_ee_bb_nlo_d5, r1_ee_Za_d5, r7_uubar_gg_d4), more may follow among the queued
+    linear-probe trials; a separate agent is repairing fine_tune.py, and those slots are rerun from their configs once the
+    fix is synced. When all 900 are in: collect tp3_lowd_ (analysis/transfer/collect_sweeps.py), run analysis/transfer/lowd_dyhpo.py,
+    compare each method''s best against best with the default''s own search on cell medians, and write it up after par:lowd_ft
+    in docs/results.tex.'
   done_when: null
   match: tp3_lowd*,zz_lowd*
   notes_ref: null
