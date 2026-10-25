@@ -547,6 +547,51 @@ and after also removing a correction learned on other parents' classes. (a) A gl
 \label{fig:v3_factorised}
 \end{figure}
 
+\paragraph{The context vector's $K$-shot fits on catalog\_v3 (2026-10-25).} The fit of par.\ The context vector, on
+catalog\_v3's short run with the context vector, for every held-out process of every axis it reads ($617$; the user's go,
+$\sim27$ GPU-h; \code{scripts/job\_kshot\_context\_v3.sh}, \code{tools/kshot\_context.py} unchanged: $c$ alone fitted on
+$K=1$, $4$, $16$ of the process's validation events, $5$ draws, $300$ Adam steps at $0.05$, scored on the others),
+against the plain and the shrunk offset on the same draws (\code{analysis/catalog\_v3/kshot\_context.py},
+\code{data/kshot\_context.json}, Fig.~\ref{fig:v3_kshot}). Medians over each axis's processes, at $K=16$:
+\begin{center}
+\small
+\begin{tabular}{lrcccccc}
+\hline
+held-out axis & processes & zero-shot & floor & plain offset & shrunk offset & context fit & fit better \\
+\hline
+new combinations & $54$ & $0.75$ & $0.63$ & $0.66$ & $0.67$ & $0.93$ & $9\%$ \\
+$2\to4$ families & $168$ & $1.08$ & $0.84$ & $0.89$ & $0.88$ & $1.25$ & $13\%$ \\
+the physical top & $237$ & $1.46$ & $0.80$ & $0.85$ & $0.84$ & $0.80$ & $53\%$ \\
+one loop & $30$ & $1.34$ & $0.78$ & $0.81$ & $0.81$ & $0.50$ & $63\%$ \\
+$\alpha_s=0.13$ & $8$ & $0.16$ & $0.09$ & $0.09$ & $0.10$ & $0.19$ & $12\%$ \\
+$p_T\geq30$\,GeV & $40$ & $0.42$ & $0.40$ & $0.44$ & $0.42$ & $0.73$ & $7\%$ \\
+$2\to5$ & $40$ & $1.03$ & $0.93$ & $0.97$ & $0.96$ & $1.32$ & $7\%$ \\
+$\sqrt{\hat s}\in[1,10]$\,TeV & $40$ & $2.29$ & $1.59$ & $1.69$ & $1.69$ & $2.11$ & $33\%$ \\
+\hline
+\end{tabular}
+\end{center}
+The floor is the variance of the zero-shot error, what any one number per process reaches; ``fit better'' is the share
+of processes where the context fit beats the shrunk offset. Unlike Daniel's catalog, where the fit went under the floor
+on the $43$ new ($0.21$ against $0.46$), on catalog\_v3 it is worse than an offset on six of the eight axes, and worse
+than not fitting at all on four ($p_T\geq30$: $0.73$ against a zero-shot $0.42$). It goes under the floor only on the
+one-loop pools ($0.50$ against $0.78$) and reaches it on the top classes ($0.80$). Where it fails, catalog\_v3's
+zero-shot error is already mostly shape (the level is $0.01$ to $0.12$ of it, Tab.~\ref{tab:v3_short}), so there is
+little a per-process vector can carry, and sixteen free numbers fitted on $K\leq16$ events chase the noise of the draw
+(at $K=1$ the fit is above the zero-shot on every axis but one loop and the top). Where it helps, the processes differ
+from training in something a per-process vector can encode: the one-loop finite part's normalisation and sign pattern,
+and the top's mass and width. The fit's settings were kept from Daniel's catalog for comparability; a fit with a
+penalty on $|c|$, or with the step count chosen on held-out draws, is the obvious next try, not run.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/kshot_context.pdf}
+\caption{catalog\_v3: the MSE of $\log|\mathcal M|^2$ on a held-out process's other validation events after $K$
+labelled events, by the plain per-process offset, the shrunk offset and the fit of the context vector $c_p$, against
+the floor (the variance of the zero-shot error); medians over processes. (a) The $537$ processes of the six axes
+inside the catalog's range; (b) the $80$ beyond it ($2\to5$, $\sqrt{\hat s}\in[1,10]$\,TeV).}
+\label{fig:v3_kshot}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
@@ -7006,12 +7051,6 @@ of the three share a test set.
     (Tab.~\ref{tab:v3_short}), the factorised $2\to4$ check on $880$ classes and the $2\to5$ probes with exact and
     network parents (Fig.~\ref{fig:v3_factorised}). Running on CC:
     \begin{itemize}
-      \item the context vector's $K$-shot fits on every held-out axis (the user's go, 2026-10-25, $\sim27$ GPU-h;
-      \code{scripts/job\_kshot\_context\_v3.sh <axis> <k> <n>}, output \code{\$SCRATCH/zz\_kshot\_v3/<axis>/}): done
-      $\alpha_s=0.13$ and one loop; running new combinations (FA-ccin2p3-b46f5515), $2\to4$ families (e7d05c0c,
-      1a31d95a), $2\to5$ (0ad8cf22), the top (52338832, 12070559, 315959b7), $1$ to $10$\,TeV (cfa40154), $p_T\geq30$
-      (c61fab2a). When all end: copy home, compare to the plain and shrunk offsets as on Daniel's catalog
-      (\code{analysis/catalog\_daniel/kshot\_context\_cmp.py}, adapted to the axes), write up, send.
       \item the pp study: all 8 MadEvent parts done ($1356$ of $1396$ pools); the $40$ short runs rerun at their own
       margins (\code{recipes/catalog\_v3\_pp\_margins.json}, \code{catalog\_v3\_pp\_rerun\_part<k>.yaml}, 10 CPU jobs, three
       done). When all pass: \code{touch .claude/.pp\_pools\_ready} (after checking every pool and sidecar exists), which
