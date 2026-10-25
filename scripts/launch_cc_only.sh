@@ -20,7 +20,7 @@ echo "$p"
 [ "$p" = "pick: ccin2p3" ] || exit 75
 # a submission counts only once it printed its run id (2026-10-23: submits refused for an uncommitted file went
 # unnoticed behind a filtered output, and the scorings were never queued)
-out=$(site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
+out=$(site submit ccin2p3 FA "$JOB" ${MEM:+--hdr=--mem=$MEM} ${TIME:+--hdr=--time=$TIME} ${FA_SEED:+--env FA_SEED=$FA_SEED} ${FA_HOLDOUT:+--env FA_HOLDOUT=$FA_HOLDOUT} ${FA_ONLY:+--env "FA_ONLY=$FA_ONLY"} ${CUDA_LAUNCH_BLOCKING:+--env CUDA_LAUNCH_BLOCKING=$CUDA_LAUNCH_BLOCKING} ${DANIEL_SPEC:+--env DANIEL_SPEC=$DANIEL_SPEC} ${DANIEL_PREFIX:+--env DANIEL_PREFIX=$DANIEL_PREFIX} ${AMP_LHE_MARGIN:+--env AMP_LHE_MARGIN=$AMP_LHE_MARGIN} --item "$ITEM" --est-gpu-hours "$EST" --note "$NOTE" -- "$@" 2>&1); rc=$?
 echo "$out"
 # CC full for this memory right now (site submit's fit check): defer, the supervisor retries on its next pass
 # the code transfer to CC failed (two launches syncing at once collide on the push; a dropped bundle): defer and retry
