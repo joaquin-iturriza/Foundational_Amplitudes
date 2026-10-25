@@ -7248,6 +7248,95 @@ default fine-tune, both $\log_{10}$ of the reference's MSE of $\log|\mathcal M|^
 \label{fig:lowd_ft}
 \end{figure}
 
+\paragraph{Fine-tuning at small $D$, each method with its own search (2026-10-26, D123).}\label{par:lowd_dyhpo} The
+first round ran every method at the default's HPs (par.~\ref{par:lowd_ft}). Here the three methods it did not settle,
+linear probe then fine-tune, L2-SP and the frozen lower blocks, each get their own single-fidelity DyHPO search of five
+trials per cell, on the same $60$ cells and steps: the grid's fine-tune space, plus for L2-SP its strength $\lambda$
+(log-uniform from $10^{-8}$ to $1$) and for the frozen arm the number of frozen blocks ($2$, $4$ or $6$ of $8$)
+(\code{sweep/gen\_lowd\_dyhpo.py}). Each method's best is set against the grid's own five-trial search of the default
+fine-tune in the same cell, best against best (CLAUDE.md's comparison protocol, step $4$), on the MSE of
+$\log|\mathcal M|^2$ at each best trial's best validation checkpoint. All $900$ trials in the $180$ sweeps on CC have a
+result. Seven linear-probe trials on H100 had failed the probe's head-match assertion from TF32 rounding of its forward
+passes, not from a wrong head; the probe now runs those passes with TF32 off and the seven were rerun at their points.
+Two results a full disk left as empty files were rerun at the same candidates and the empty files are not read. On the
+frozen arm, rung $7$, $ee\to b\bar b$ at one loop, $D=10$, a double requeue ran one candidate twice, so that sweep has
+$6$ results and its best is over its five distinct candidates (\code{analysis/transfer/lowd\_dyhpo.py},
+\code{data/lowd\_dyhpo.json}; Fig.~\ref{fig:lowd_dyhpo}).
+% src: python3 analysis/transfer/lowd_dyhpo.py @24ab0af
+% claim: n_cells=60
+% claim: repeats.tp3_lowd_freeze_r7_ee_bb_nlo_d2=6
+% claim: summary.lpft.2.gain_over_default=-0.04
+% claim: summary.lpft.3.gain_over_default=0.07
+% claim: summary.lpft.4.gain_over_default=0.06
+% claim: summary.lpft.5.gain_over_default=-0.04
+% claim: summary.lpft.2.wins_over_default=7
+% claim: summary.lpft.3.wins_over_default=9
+% claim: summary.lpft.4.wins_over_default=8
+% claim: summary.lpft.5.wins_over_default=6
+% claim: summary.l2sp.2.gain_over_default=0.03
+% claim: summary.l2sp.3.gain_over_default=-0.03
+% claim: summary.l2sp.4.gain_over_default=-0.03
+% claim: summary.l2sp.5.gain_over_default=-0.02
+% claim: summary.l2sp.2.wins_over_default=8
+% claim: summary.l2sp.3.wins_over_default=7
+% claim: summary.l2sp.4.wins_over_default=4
+% claim: summary.l2sp.5.wins_over_default=7
+% claim: summary.freeze.2.gain_over_default=-0.03
+% claim: summary.freeze.3.gain_over_default=-0.08
+% claim: summary.freeze.4.gain_over_default=-0.07
+% claim: summary.freeze.5.gain_over_default=0.04
+% claim: summary.freeze.2.wins_over_default=6
+% claim: summary.freeze.3.wins_over_default=6
+% claim: summary.freeze.4.wins_over_default=6
+% claim: summary.freeze.5.wins_over_default=9
+% claim: pooled.lpft.wins_over_default=30
+% claim: pooled.l2sp.wins_over_default=26
+% claim: pooled.freeze.wins_over_default=27
+% claim: pooled.lpft.gain_over_default=-0.01
+% claim: pooled.l2sp.gain_over_default=-0.02
+% claim: pooled.freeze.gain_over_default=-0.03
+% claim: noise.q90_abs=0.41
+% claim: noise.per_D_median_max_abs=0.06
+% claim: default_over_scratch.2=0.41
+% claim: default_over_scratch.5=0.78
+% claim: summary.l2sp.4.gain_over_scratch=0.00
+% claim: by_probe.lpft.ee_Za.2=0.11
+% claim: by_probe.lpft.ee_Za.3=0.13
+% claim: by_probe.lpft.ee_Za.4=0.26
+% claim: by_probe.lpft.ee_Za.5=-0.04
+% allow: 10 10^{1.5} 10^2 10^{2.5} because they are the design's training set sizes
+% allow: 900 180 because they are the design's trial and sweep counts
+% allow: 2 4 6 8 because they are the frozen depths searched and the trunk's block count, settings
+% allow: 10^{-8} 1 because they are the bounds of the searched strength, settings
+% allow: 7 because it is a rung index
+% allow: 15 because it is the number of cells per D, a design count
+% allow: 90 because it is a quantile level
+No method separates from the default. The median over the $15$ cells per $D$ of the gain over the default
+($\log_{10}$ of the default's MSE over the method's), at $D=10$, $10^{1.5}$, $10^2$ and $10^{2.5}$, is $-0.04$,
+$+0.07$, $+0.06$, $-0.04$ decades for linear probe then fine-tune (it wins $7$, $9$, $8$, $6$ of $15$ cells), $+0.03$,
+$-0.03$, $-0.03$, $-0.02$ for L2-SP (wins $8$, $7$, $4$, $7$) and $-0.03$, $-0.08$, $-0.07$, $+0.04$ for the frozen
+blocks (wins $6$, $6$, $6$, $9$). Over all $60$ cells the three win $30$, $26$ and $27$, with medians $-0.01$, $-0.02$
+and $-0.03$ decades. These medians are at the scale of the noise of the comparison itself: a single run's value moves
+by up to $0.41$ decades at the $90\%$ quantile (the first round's rerun of the default against the grid's record of the
+same trial), and the median of that move over a $D$'s cells reaches $0.06$ decades. Over scratch the three track the
+default ($+0.41$ to $+0.78$ decades for the default), except L2-SP at $D=10^2$, whose median falls to $0.00$ where it
+wins only $4$ of the $15$ cells against the default. On $ee\to Z\gamma$, the probe where linear probe then fine-tune
+beat the default at the default's HPs, its own search keeps a gain at three $D$, $+0.11$, $+0.13$ and $+0.26$ decades
+(medians over the three rungs), and loses it at $D=10^{2.5}$ ($-0.04$). So searching L2-SP's strength and the frozen
+depth removes the first round's loss from their untuned values but adds no gain, and at $D\le 10^{2.5}$ none of the
+three gentler fine-tunes is worth its extra search over the default full retraining with layer decay.
+
+\begin{figure}[t]
+% allow: 60 15 1 7 9 2 because they are the design's cell counts, rung indices and the square in the target, settings
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/lowd_dyhpo.pdf}}
+\caption{Fine-tuning at small $D$, each method with its own five-trial DyHPO search, best against best on $60$ cells
+(five probes, rungs $1$, $7$, $9$). Medians over the $15$ cells per $D$ of (a) the gain over scratch and (b) the gain
+over the default fine-tune's own five-trial search, both $\log_{10}$ of the reference's MSE of $\log|\mathcal M|^2$
+over the method's (\code{analysis/transfer/lowd\_dyhpo.py}).}
+\label{fig:lowd_dyhpo}
+\end{figure}
+
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
 $z=(\log|\mathcal M|^2-\mu_q)/\sigma_q$ (\code{tools/zero\_shot\_ft.py}). The parent outputs in its own standardized units,
@@ -8358,21 +8447,6 @@ of the three share a test set.
     \code{trial\_0073\_r<k>}). Context guard (\code{.claude/hooks/context\_guard.py}): auto-compaction waits until the notes
     are flushed (\code{touch .claude/.notes\_flushed}). \code{site} matches a launch's runs by item and time, and simultaneous launches collide on
     the git push.
-  \item \textbf{Fine-tuning at small $D$} (D120; first round in par.~\ref{par:lowd_ft}: no method beats the default
-    at the default's HPs; linear probe then fine-tune helps on $ee\to Z\gamma$ only). Next: single-fidelity DyHPO for the
-    methods that do not win (linear probe then fine-tune, L2-SP, the frozen blocks), compared best against best with the
-    default's own search, with $\lambda$ for L2-SP and the frozen depth in their search spaces next to the learning rate
-    (the first round ran one untuned value of each), which also asks whether a lower rate keeps the linear-probe
-    head; the single-run noise ($90\%$ quantile $0.41$ decades) asks for the
-    comparison on cell medians, not single cells.
-    State 2026-10-25 evening: the DyHPO round is approved (D123, ``Yes, send them.'', about $33$ GPU-h): $3$ methods $\times$ $60$ cells $\times$ $5$ trials, sweeps \code{tp3\_lowd\_<method>\_r<rung>\_<probe>\_d<k>}
-    generated by \code{sweep/gen\_lowd\_dyhpo.py} from each cell's grid config, submitted on CC by \code{sweep\_manager}
-    (chained) and topped up by the CC feeder under item \code{lowd\_ft}. All $180$ generated on CC (5 trial scripts each; $111$ had $10$ from a double generation, trials $5$ to $9$ moved to \code{jobs\_beyond\_5/}; a duplicate \code{tp3\_lowd\_lpft\_r9\_ud\_ud\_d4\_002} marked HELD). The default's side is the grid's own $5$-trial
-    search per cell (\code{cells.best}). Seven linear-probe trials on H100 failed the probe's head-match assertion:
-    TF32 rounding of the forward passes, not a wrongly written head; the probe now runs its passes with TF32 off
-    (\code{fine\_tune.linear\_probe\_head}, checked on H100 by \code{scripts/job\_lowd\_tf32\_check.sh}). The seven
-    points were retracted from their sweeps' states and each is rerun as one fixed trial at the same point, added as its
-    sweep's sixth trial script (\code{sweep/rerun\_failed.py}) and submitted by the CC feeder.
   \item \textbf{Synthetic prior: alternatives not built} (the user's list of 2026-10-08 and 09; paused with the direction,
     D43). Built as versions $2$ to $6$ (Sec.~\ref{sec:syn-versions}): quark-generation conservation, $K$ growing with
     multiplicity, vertex legality, the effective $ggH$ vertex, the collinear limit through $\langle ij\rangle$, $[ij]$
