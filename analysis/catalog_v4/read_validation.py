@@ -256,7 +256,7 @@ def figure():
 
 
 def dropped():
-    """what the drop of the vanished trees (D136, recipes/gen_catalog_v4.py) took out of the generated v4 files: trees,
+    """the energy hold-out's entries and what the drop of the vanished trees (D136, recipes/gen_catalog_v4.py) took out of the generated v4 files: trees,
     one-loop entries (a virtual on a vanished Born) and recipe entries named after or based on them, per role"""
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     import gen_catalog_v4 as g
@@ -267,11 +267,16 @@ def dropped():
            "loop_entries": len(L3["processes"]) - len(L4["processes"]), "loop_strings": len(L3["virt"]) - len(L4["virt"])}
     per = {}
     for r in g.RECIPES:
-        n3 = sum(not e["name"].endswith("__E10") for e in g.load(os.path.join(ROOT, "recipes", f"catalog_v3_{r}.yaml"))["processes"])
+        n3 = len(g.load(os.path.join(ROOT, "recipes", f"catalog_v3_{r}.yaml"))["processes"])
         n4 = len(g.load(os.path.join(ROOT, "recipes", f"catalog_v4_{r}.yaml"))["processes"])
         if n3 != n4:
             per[r] = n3 - n4
     out["recipe_entries"] = sum(per.values()); out["by_recipe"] = per
+    # the energy hold-out, moved above the training window (the user 2026-10-26)
+    H = g.load(os.path.join(ROOT, "recipes", "catalog_v4_heldout_H7E.yaml"))["processes"]
+    out["energy"] = {"entries": len(H), "v3_entries": len(g.load(os.path.join(ROOT, "recipes",
+                     "catalog_v3_heldout_H7E.yaml"))["processes"]),
+                     "lo_tev": min(e["sqrts"][0] for e in H) / 1e3, "hi_tev": max(e["sqrts"][1] for e in H) / 1e3}
     return out
 
 

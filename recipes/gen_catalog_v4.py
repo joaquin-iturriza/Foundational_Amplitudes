@@ -24,8 +24,10 @@ What changes against catalog_v3, all of it as fields of the v4 entries that mg5_
 Not changed: the classes (catalog_v3's census until --check and the equality step are rerun on v4: a class can split
 when EW diagrams tell its relabelled members apart, merge when the massless b equals a d or s, vanish when only the b
 Yukawa made it), the roles, the pool sizes, the BSM strings (their orders are explicit already), the alpha_s points.
-Dropped: the energy-extrapolation axis H7E (sqrt(s_hat) in [1, 10] TeV, inside the v4 training window up to 6 TeV):
-its new window is the user's call. Dropped too (D136, the user 2026-10-25: "Drop the b to higgs events."): the 34 trees
+The energy-extrapolation axis H7E (catalog_v3: sqrt(s_hat) in [1, 10] TeV, inside the v4 training window up to 6 TeV)
+moves above it (the user 2026-10-26, "Yes, okay, that's fine, go ahead.", to the proposal of 6 to 20 TeV, log-uniform
+like the window): each catalog_v3 probe <name>__E10 becomes v4_<name>__E20 on E_HOLDOUT, in gen_stage4 and its
+held-out recipe heldout_H7E. Dropped too (D136, the user 2026-10-25: "Drop the b to higgs events."): the 34 trees
 with no diagram once the b is massless (a Higgs on a b line with nothing else to couple to it: b b~ > h + photons,
 gluons or Higgses, b g > b h ..., g g > b b~ h ...), MadGraph's verdict in analysis/catalog_v4/data/checked.json
 (exists false), with their one-loop entries and every recipe entry (any role) named after or based on them.
@@ -47,9 +49,11 @@ OUT_CENSUS = os.path.join(HERE, "catalog_v4_census.yaml")
 QUARKS = {1, 2, 3, 4, 5, 6}
 CHECKED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "checked.json")
 LOOP_MODEL = {"loop_sm": "loop_sm-no_b_mass", "loop_qcd_qed_sm": "loop_qcd_qed_sm-no_b_mass"}
-# the v3 stage and training recipes mapped to v4 (H7E dropped, see above)
+# the v3 stage and training recipes mapped to v4
 RECIPES = ["gen_stage1", "gen_stage2", "gen_stage3", "gen_stage4", "train", "twin_train", "heldout_H1", "heldout_H2",
-           "heldout_H2p5", "heldout_H3", "heldout_H3p", "heldout_H4", "heldout_H5", "heldout_H6", "heldout_H7c"]
+           "heldout_H2p5", "heldout_H3", "heldout_H3p", "heldout_H4", "heldout_H5", "heldout_H6", "heldout_H7c",
+           "heldout_H7E"]
+E_HOLDOUT = [6000, 20000]      # GeV, the energy hold-out's window (the user 2026-10-26, see the docstring)
 
 
 def load(path):
@@ -184,16 +188,15 @@ def write():
              for n, e in sorted(procs.items()) if n in trees]
     open(OUT_CENSUS, "w").write("# catalog_v4 census (recipes/gen_catalog_v4.py --write): every catalog_v3 tree on its v4 "
                                 "string, for the numeric equality check; no events\nprocesses:\n" + "\n".join(lines) + "\n")
-    dropped, bdrop, counts = Counter(), Counter(), {}
+    energies, bdrop, counts = Counter(), Counter(), {}
     for r in RECIPES:
         src = load(os.path.join(HERE, f"catalog_v3_{r}.yaml"))
         out = []
         for e in src["processes"]:
-            if e["name"].endswith("__E10"):
-                dropped[r] += 1; continue
             if v4name(e["name"]) in drop_names or v4name(e.get("base", e["name"])) in drop_names:
                 bdrop[r] += 1; continue
-            ne = dict(e, name=v4name(e["name"]))
+            energy = e["name"].endswith("__E10")
+            ne = dict(e, name=v4name(e["name"][:-len("__E10")] + "__E20" if energy else e["name"]))
             ph = dict(e.get("physics") or {})
             if "base" in e:
                 ne["base"] = v4name(e["base"])
@@ -201,10 +204,12 @@ def write():
                 ph["widths"] = {6: round(mg.top_width_lo(float(ph["masses"][6])), 6)}
             if ph:
                 ne["physics"] = ph
-            ne["sqrts"] = window(allp[ne.get("base", ne["name"])], ph)
+            ne["sqrts"] = list(E_HOLDOUT) if energy else window(allp[ne.get("base", ne["name"])], ph)
+            assert not energy or window(allp[ne["base"]], ph)[0] < E_HOLDOUT[0], ne["name"]
+            energies[r] += energy
             out.append(ne)
         with open(os.path.join(HERE, f"catalog_v4_{r}.yaml"), "w") as f:
-            f.write(hdr + f"# from catalog_v3_{r}.yaml: names v3_ -> v4_, windows [threshold, 6 TeV], the v4 mixture; the 34 b-Higgs trees with no "
+            f.write(hdr + f"# from catalog_v3_{r}.yaml: names v3_ -> v4_, windows [threshold, 6 TeV] (the energy hold-out [6, 20] TeV), the v4 mixture; the 34 b-Higgs trees with no "
                     "diagram (massless b) dropped; "
                     "classes and roles are catalog_v3's until the v4 census is rerun\n")
             yaml.safe_dump({"sampling": dict(mg.V4_SAMPLING), "processes": out}, f, sort_keys=False)
@@ -214,7 +219,7 @@ def write():
     lo = Counter(min(window(procs[n])[0], 100) // 10 * 10 for n in trees)
     print(f"wrote {OUT_PROC} ({len(procs)}: {len(trees)} trees, {len(bsm)} BSM), {OUT_LOOPS} ({len(virt)} MadLoop "
           f"strings, {len(lprocs)} entries), {OUT_CENSUS}")
-    print(f"recipes: {counts}; H7E dropped ({dict(dropped)})")
+    print(f"recipes: {counts}; energy hold-out entries on {E_HOLDOUT} GeV: {dict(energies)}")
     print(f"b-Higgs classes with no diagram dropped: {len(gone)} trees, {len(lgone)} one-loop entries; recipe entries "
           f"dropped: {dict(bdrop)} ({sum(bdrop.values())})")
     print(f"QED bound above catalog_v3's minimal order: {sum(t['qed_v3'] < qed_max(t['pdg_ids']) for t in trees.values())}"
