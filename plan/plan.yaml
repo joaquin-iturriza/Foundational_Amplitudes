@@ -17,7 +17,11 @@ entries:
   next: when the pp-trained short pretraining (FA-ccin2p3-e786bd74) ends, its queued pp read fires; then compare it with the
     four window-trained arms' pp reads (analysis/catalog_v3/pp_compare.py) per class family at the best checkpoint and write
     the result up
-  done_when: null
+  done_when: 'python3 -c "import json,sys; d=json.load(open(''analysis/catalog_v3/data/pp_compare.json''))[''dimensionless_pp''];
+    g=[d[k] for k in (''H1'',''H2'',''H3'',''train'')]; sys.exit(0 if all(x.get(''n'') and x[''n'']==x[''n_expected''] and
+    not x[''missing''] for x in g) and not d[''no_prediction''] else 1)" && test -f analysis/catalog_v3/figs/pp_trained.png
+    && test -f analysis/catalog_v3/figs/pp_trained.pdf && grep -q ''figs/pp_trained.pdf'' docs/results.tex && grep -q ''label{fig:v3_pp_trained}''
+    docs/results.tex && grep -q ''% claim: dimensionless_pp\.'' docs/results.tex'
   match: zz_pp_*,catalog_v3_pp*
   notes_ref: null
   evidence:
