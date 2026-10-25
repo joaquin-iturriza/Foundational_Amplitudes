@@ -674,7 +674,7 @@ arms, run FA-ccin2p3-fbd73961, under D99), read zero-shot on every axis as in Ta
 \code{analysis/catalog\_v3/prep\_shat.py}, \code{data/prep\_shat.json}, Fig.~\ref{fig:v3_prep_shat}). Medians over each
 axis's processes, MSE (level, shape), against the dimensionless arm's in Tab.~\ref{tab:v3_short}:
 \begin{itemize}
-  \item \emph{Inside the catalog's range it is the best of the five arms on three of the six axes and second on one.} New combinations
+  \item \emph{Inside the catalog's range it is the best of the five arms on three of the six axes and second on two.} New combinations
     $0.74$ ($0.14$, $0.53$), $2\to4$ $0.85$ ($0.12$, $0.67$), the top $1.51$ ($0.42$, $0.78$), one loop $0.87$,
     $p_T\geq30$\,GeV $0.34$; against the dimensionless arm's $0.84$, $1.04$, $1.67$, $1.12$, $0.44$. The context vector's
     arm keeps the top ($1.46$), the twin one loop ($0.85$); on $\alpha_s=0.13$ ($8$ probes) it is $0.17$ against $0.14$. Per probe its shape is below
@@ -8080,13 +8080,13 @@ are data-bound). Transfer cells from then on mix V100 and A100 trials. One run p
 $\Delta=(A_\theta-A)/A$ as $|\Delta|$ histograms on log bins per process, for every ladder rung, the scaling figures'
 arms and the star arms, from the $8$k grid at $D=10^4$ (\code{analysis/transfer/delta\_audit.json}). As first
 collected, $179$ runs: $107$ on Jean Zay, $37$ on CC, $32$ on lxplus (copied to CC, \code{runs\_from\_lxplus/<sweep>/}),
-and three pruned trials rerun on CC from their configs (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial $96$,
+and three pruned trials rerun on CC from their configs; later extended to the $251$ models of the evaluation-precision paragraph below (\code{tp3\_finfte\_uubar\_Zggg\_d8} trial $96$,
 \code{tp3\_r1fte\_udbar\_enu\_d8} $197$, \code{tp3\_r1fte\_ee\_dd\_ew\_nlo\_d8} $98$; their parent
 \code{runs/tp3\_ladder\_r1/trial\_0047} md5-identical to lxplus's). \code{tools/eval\_delta.py} rebuilds a run with its own
 frozen \code{data\_stats.json} and tokenizer as a resume reads them, the fine-tune head kept, and writes its test
 predictions (\code{--tf32 on|off}); \code{analysis/transfer/collect\_delta.py} collects the test $\Delta$ and the rebuilt
 validation loss, and \code{delta\_plots.py} draws the figures and flags a rebuild more than $5\%$ off its recorded loss.
-Those off were traced to the evaluation precision and to the checkpoint's EMA weights (the two paragraphs below). Ruled
+All but one of those off (\code{tp3\_r9fte\_ee\_WW\_d8\_002} trial $32$, unexplained) were traced to the evaluation precision and to the checkpoint's EMA weights (the two paragraphs below). Ruled
 out before that: the Lorentz-frame seed (four digits over seeds $1$, $2$, $3$, $42$), the tokenizer, pools, sidecars and
 recipes (older than the runs), the checkpoint step.
 
