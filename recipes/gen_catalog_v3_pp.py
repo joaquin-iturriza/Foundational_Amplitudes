@@ -36,6 +36,10 @@ def main():
     T = ro["trees"]
     hadronic = sorted(n for n in T if n.startswith("v3_") and n in mg.PROCESSES
                       and all(abs(int(p)) in PARTONS for p in mg.PROCESSES[n]["pdg_ids"][:2]))
+    # the processes whose MadEvent run came back short at the default margin: their own margin, from the shortfall
+    # measured on the first pass (recipes/catalog_v3_pp_margins.json: name -> margin)
+    mp = os.path.join(HERE, "catalog_v3_pp_margins.json")
+    margins = json.load(open(mp)) if os.path.exists(mp) else {}
     procs, cards = {}, {}
     base_card = os.path.join(HERE, "catalog_v3_pp", "param_card.dat")
     for n in hadronic:
@@ -53,6 +57,8 @@ def main():
                 assert not left, (n, left)
                 cards[fn] = pat
             own = {"lhe": {"param_card": fn}}
+        if margins.get("pp13_" + n[len("v3_"):]):
+            own.setdefault("lhe", {})["margin"] = margins["pp13_" + n[len("v3_"):]]
         procs["pp13_" + n[len("v3_"):]] = {**own, 
             "kind": "lhe_pp", "folder": "pp13_" + n[len("v3_"):], "mg5_generate": list(c["mg5_generate"]),
             "proc_str": c["mg5_generate"][0].replace("generate ", ""), "nfinal": int(c["nfinal"]),

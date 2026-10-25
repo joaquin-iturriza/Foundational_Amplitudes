@@ -3497,7 +3497,9 @@ def lhe_layout(cfg):
 def lhe_n_requested(cfg):
     """Events asked of MadEvent: the layout plus a margin (an unweighted run can come back short)."""
     total = lhe_layout(cfg)["train"][1]
-    return int(math.ceil(total * (1.0 + LHE_MARGIN)))
+    # a process's own margin (lhe.margin: one whose MadEvent run came back short at the default) wins over the global
+    # one, so the identity read back and the one generated agree without an environment variable
+    return int(math.ceil(total * (1.0 + float(cfg["lhe"].get("margin", LHE_MARGIN)))))
 
 
 def lhe_cards(cfg):
