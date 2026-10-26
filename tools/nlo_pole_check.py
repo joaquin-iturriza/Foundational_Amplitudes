@@ -122,6 +122,11 @@ def predict_poles(s, proc_pdgs, masses, mom=None):
 # ---------------------------------------------------------------------------
 # Self-contained 2-body phase space (CM frame), process order [1,2,3,4]
 # ---------------------------------------------------------------------------
+def beam_mass_of(pdg, masses):
+    """{|pdg|: mass} of the two beams as handed in with --m (rows in the stored order)"""
+    return {abs(int(p)): float(m) for p, m in zip(pdg[:2], masses[:2]) if m > 0}
+
+
 def sample_2body(sqrts, masses, rng, pdg=None):
     m3, m4 = masses[2], masses[3]
     # Rows in the STORED convention (row 0 along +z, like every stored event and
@@ -132,8 +137,11 @@ def sample_2body(sqrts, masses, rng, pdg=None):
     # along -z and exact ones along +z.
     # the beams on their mass shells as generation has them (mg5_pipeline_final._beams: a b beam at 4.7 GeV; massless
     # beams at (E, 0, 0, +-E) exactly)
+    # The beams' masses are the --m ones (masses[:2]), never mg.BEAM_MASS: catalog_v4's b beams are massless, and
+    # b beams at 4.7 GeV against its loop_sm-no_b_mass model gave c2 = 0 at a third of the points (FA-ccin2p3-10321cd6).
     import mg5_pipeline_final as mg
-    p1, p2 = mg._beams(np.array([sqrts]), list(pdg) if pdg is not None else [21, 21])[0]
+    pdg = list(pdg) if pdg is not None else [21, 21]
+    p1, p2 = mg._beams(np.array([sqrts]), pdg, beam_mass=beam_mass_of(pdg, masses))[0]
     # final-state momentum magnitude
     lam = (sqrts**2 - (m3 + m4)**2) * (sqrts**2 - (m3 - m4)**2)
     p = np.sqrt(max(lam, 0.0)) / (2.0 * sqrts)
@@ -198,7 +206,8 @@ def main():
             import mg5_pipeline_final as mg
             ev, _ = mg.sample_nbody_phase_space(args.n, args.sqrts_min, args.sqrts_max,
                                                 masses[2:], args.proc_order, rng=rng,
-                                                cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None)
+                                                cuts=mg.FIDUCIAL_CUTS if mg.FIDUCIAL_CUTS_ENABLED else None,
+                                                beam_mass=beam_mass_of(args.proc_order, masses))
             pts = [mom for mom, _ in ev]
     pts = [mom[perm] for mom in pts]             # stored rows -> MadLoop slots (--dat rows too)
     rows, rcs, n_noborn = [], [], 0
