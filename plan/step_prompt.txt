@@ -34,6 +34,7 @@ The step
 Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
 to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 10 GPU-h only if the user's words above cover it.
-Final message, short: what you did, what you found (numbers), the figure files that show it (absolute paths of the
+Final message, short, readable by someone who has forgotten this entry (CLAUDE.md 0e): first the question this step
+answers and why it was asked, then what you did, what you found (numbers) and what it changes, the figure files that show it (absolute paths of the
 .png, every result has one: the main session sends them to the user with the result), what you recorded, the next
 step, any question.
