@@ -2073,7 +2073,19 @@ with \code{MuonAdamW} (\code{optim/muon.py}): Muon on $\mu$P's hidden matrices w
 update scaled to AdamW's RMS, so the same learning rate number applies, and AdamW as before on every other parameter.
 Each optimizer is run with two seeds (model initialisation and batch order; the pools unchanged, D146), every run
 read zero-shot on every held-out axis as the other short arms. Neither optimizer is retuned for this catalog, so this
-compares Muon at AdamW's learning rate. Small-$D$ fine-tunes from both pretrainings follow in the hand-off
+compares Muon at AdamW's learning rate. That baseline is itself untuned here: AdamW's HPs (learning rate
+$8.94\times10^{-3}$, the L2 weight, warmup and EMA) are the best trial of a $32000$-step search on Daniel's catalog,
+transferred to this catalog and a horizon about eight times shorter, and both of AdamW's validation curves spike sharply
+mid-run (Fig.~\ref{fig:v3_muon}a), the mark of a learning rate too high for the setup. Stage 1 therefore measures Muon
+against an untuned AdamW, not against AdamW at its best, which the A/B protocol requires; stage 2 (D146) searches both,
+each an 8-trial single-fidelity search at this horizon from this run's exact configuration (learning rate in
+$[3\times10^{-3}, 2.7\times10^{-2}]$ for both, Muon's decoupled weight decay in $[10^{-3}, 0.3]$, AdamW's L2 weight in
+$[10^{-10}, 10^{-6}]$; \code{sweep/sweep\_config\_ccin2p3\_muon\_test\_search\_\{muon,adamw\}.yaml}), read best
+against best in the hand-off.
+% allow: 8.94 32000 because they are the transferred learning rate and the source search's horizon, settings
+% allow: 3 2.7 0.3 10 8 because they are the stage-2 search windows and trial count, settings
+% allow: 1 2 because they number the stages of the test
+Small-$D$ fine-tunes from both pretrainings follow in the hand-off
 (\code{analysis/catalog\_v3/muon\_compare.py}, \code{data/muon\_pretrain.json}, \code{data/muon\_compare.json},
 Fig.~\ref{fig:v3_muon}; runs FA-ccin2p3-ee733aa9, FA-ccin2p3-2bc30261 (Muon), FA-ccin2p3-87426222 (AdamW's second
 seed)).
@@ -2131,8 +2143,8 @@ seed)).
 \end{itemize}
 So at this horizon and at AdamW's learning rate, Muon fits the training pools about eight times better and carries
 most of that into the held-out processes inside the catalog's range; beyond it (one more particle, ten times the
-energy) the gain shrinks or vanishes. Whether Muon's lead holds at a learning rate tuned for it, or at the full
-horizon, is not tested; whether it transfers better under fine-tuning is the hand-off's fine-tune item.
+energy) the gain shrinks or vanishes. All of this is against an untuned AdamW: whether the lead survives both
+optimizers' own searches is stage 2's question, and the full horizon is not tested; whether it transfers better under fine-tuning is the hand-off's fine-tune item.
 \begin{figure}[t]
 \centering
 \includegraphics{../analysis/catalog_v3/figs/muon_compare.pdf}
