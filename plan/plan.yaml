@@ -1039,6 +1039,13 @@ entries:
       pole identically 0; d d~ > c c~ and d d~ > b b~: 95% exact, a few rc 236 points off by up to 25%), all four with the
       full coupling orders (QED<=n) that v3 did not have'
     at: '2026-10-26T00:22:46+00:00'
+  - tried: regeneration parts 1, 4, 7 rerun with the four mixed-order one-loop entries skipped (V4REGEN_SKIP, commit 6ff6566;
+      FA-ccin2p3-ed260ed1, FA-ccin2p3-fa369ce2, FA-ccin2p3-e5f403ab)
+    why: 'all three died in the backend phase after ~20 s on further pole-check failures the b-beam bug had masked: v4_bbx_tapvtwm_nlo
+      (part 1) and v4_bbx_hwpwm_nlo (part 7) double pole off by ~0.4% at rc 216 points; v4_bbx_ccx_nlo (part 4) exact at 95%
+      but 12% off at an rc 236 point (same pattern as d d~ > c c~); part 3 (FA-ccin2p3-1116cde3, not rerun) died the same
+      way on v4_bg_bwpwm_nlo (0.4%, rc 216). A failing certification aborts the whole shard'
+    at: '2026-10-26T00:31:07+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
