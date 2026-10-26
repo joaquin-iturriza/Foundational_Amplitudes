@@ -11,7 +11,8 @@ no train split), the first n_fit to fit and the next n_score to score:
     err_mlp        the same for a classifier on the event's invariants (sklearn MLPClassifier (64, 64), early stopping,
                    seed 0; the inputs of prep_shape.py: log(2|p_i.p_j|/s_hat) over pairs, log(m^2/s_hat) of the
                    massive legs, log s_hat; standardized on the fit events), and err_mlp_near on the scoring events
-                   within a factor 10 of zero
+                   within a factor 10 of zero; with fewer than 20 fit events of one sign, no classifier
+                   (rare: err_mlp = err_major)
     err_shat       the same classifier on log s_hat alone (does the sign follow the energy only)
     shape_<t>      the regressor of prep_shape.py (MLPRegressor (64, 64)) on the magnitude log max(|x|, floor) under
                    target t: raw (as is), dless (+ (N - 4) log s_hat), qperp (+ the emission scales Lq); its scoring
@@ -34,6 +35,7 @@ from physics_scales import minkowski_dots, qperp_logs  # noqa: E402
 
 TARGETS = ("raw", "dless", "qperp")
 FLOOR_Q = 0.01                       # the sign head's abslog floor quantile (data.signedlog_quantile default)
+MIN_MINOR = 20                       # fewer fit events of one sign: no classifier, the pool is marked rare
 
 
 def files(name, sq):
@@ -49,6 +51,13 @@ def files(name, sq):
 
 
 def one(args):
+    try:
+        return _one(args)
+    except Exception as e:                            # listed, not dropped
+        return args[0], args[1], {"error": repr(e)[:300]}
+
+
+def _one(args):
     setname, name, sq, n_fit, n_score = args
     from sklearn.neural_network import MLPClassifier, MLPRegressor
     fs = files(name, sq)
@@ -92,15 +101,19 @@ def one(args):
     rec["neg_score"] = float(np.mean(~ss))
     rec["err_major"] = float(np.mean(ss != major))
     rec["err_major_near"] = float(np.mean(ss[near] != major)) if near.any() else None
-    c = MLPClassifier(hidden_layer_sizes=(64, 64), learning_rate_init=1e-3, max_iter=300, early_stopping=True,
-                      random_state=0).fit(X[:n_fit], sf)
-    p = c.predict(X[n_fit:])
+    rec["n_minor_fit"] = int(min(sf.sum(), (~sf).sum()))
+    if rec["n_minor_fit"] < MIN_MINOR:                # too few of one sign to fit a classifier: one sign per pool
+        rec["rare"] = True
+        p = np.full(len(ss), major)
+    else:
+        p = MLPClassifier(hidden_layer_sizes=(64, 64), learning_rate_init=1e-3, max_iter=300, early_stopping=True,
+                          random_state=0).fit(X[:n_fit], sf).predict(X[n_fit:])
     rec["err_mlp"] = float(np.mean(p != ss))
     rec["err_mlp_near"] = float(np.mean(p[near] != ss[near])) if near.any() else None
     Z = ((Ls - Ls[:n_fit].mean()) / (Ls[:n_fit].std() + 1e-12))[:, None]
-    c1 = MLPClassifier(hidden_layer_sizes=(16,), learning_rate_init=1e-3, max_iter=300, early_stopping=True,
-                       random_state=0).fit(Z[:n_fit], sf)
-    rec["err_shat"] = float(np.mean(c1.predict(Z[n_fit:]) != ss))
+    rec["err_shat"] = rec["err_major"] if rec.get("rare") else float(np.mean(MLPClassifier(
+        hidden_layer_sizes=(16,), learning_rate_init=1e-3, max_iter=300, early_stopping=True,
+        random_state=0).fit(Z[:n_fit], sf).predict(Z[n_fit:]) != ss))
     tg = {"raw": m, "dless": m + (N - 4) * Ls, "qperp": m + qperp_logs(P)}
     for k, y in tg.items():
         mu, sd = y[:n_fit].mean(), y[:n_fit].std()
