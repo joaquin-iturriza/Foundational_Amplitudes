@@ -1274,18 +1274,16 @@ entries:
   - D161
   - D162
   - D166
-  next: 'FIRST (the user, 2026-10-26: what mattered most was catalog_v4 against training on pp, on pp-generated data; D117
-    ''from that we decide if we switch'', D119 the pp-trained comparison): compare catalog_v4''s two Muon runs with the existing
-    pp-trained arm (dimensionless_pp, FA-ccin2p3-e786bd74 and its rerun 982b5a14, AdamW) on the same 13 TeV pp pools (1396
-    classes, inside and outside catalog_v3''s coverage, trained / held-out classes, b apart), at no compute: (a) directly,
-    stating that the optimizers differ (Muon against AdamW; the Muon test measured 3.3x zero-shot on catalog_v3); (b) each
-    relative to its own optimizer''s window-trained catalog_v3 arm (catalog_v4/v3-window with Muon; pp-trained/v3-window with
-    AdamW, analysis/catalog_v3/pp_compare.py), i.e. how much of the pp-training gain catalog_v4 recovers. Say what a clean
-    answer would need (a pp-trained Muon arm, 2 seeds, ~3 GPU-h; its design through the design gate) and propose it. Write
-    it into par:v4_vs_v3 next to the pp table, figure, provenance. THEN: The comparison is written (docs/results.tex par:v4_vs_v3,
-    7bf814b0). Waiting on the user''s call: switch pretraining to catalog_v4 or not. If yes: the held Daniel''s-catalog studies
-    adapted to catalog_v4, and catalog_v3''s deletion (D163, only once the switch is confirmed, nothing deleted before). If
-    no: say what catalog_v3 keeps and what of catalog_v4 is kept.'
+  next: 'FIRST (free, CPU): catalog_v4''s training density against the 13 TeV pp events'' density on the same classes, along
+    sqrt(s_hat) and the forward angle (and every variable analysis/catalog_v3/coverage_check.py used), and whether the per-class
+    pp error of the catalog_v4 runs relative to the pp-trained arm (analysis/catalog_v4/data/compare_pp_trained.json, docs/results.tex
+    par:v4_vs_pp) follows the density gap; the coverage check before generation measured containment only, not density. THEN:
+    the comparison is written (par:v4_vs_pp, f1cd98c5: catalog_v4 with Muon behind the AdamW pp-trained arm on the classes
+    it trained on pp (0.86 against 0.47), level on the held-out ones (0.94 against 0.92); Muon alone is worth about a factor
+    four on pp; against its own optimizer''s catalog_v3 arm catalog_v4 recovers a share 0.15 to 0.35 of the pp-training gain,
+    none inside catalog_v3''s coverage). A pp-trained Muon arm (2 seeds, ~3 GPU-h) would separate catalog from optimizer;
+    not proposed. The user''s switch call stands (''Okay, switching makes sense then''): the held Daniel''s-catalog studies
+    adapted to catalog_v4, and catalog_v3''s deletion (D163) only once the switch is confirmed, nothing deleted before.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
