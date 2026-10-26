@@ -12,8 +12,8 @@ objective is the geometric mean of the 16 cells' best-checkpoint val_loss_no_reg
     the untuned reference is the same 16 cells at lr_scale 1, layer_decay 1 from par:v3_muon's fine-tunes (Muon parent,
     Muon fine-tune, parent's standardization; data/muon_ft.json), objective their geometric mean; per trial the
     objective and its ratio to the reference; the best trial's per-cell, per-probe and per-D (geometric mean over the 4
-    probes) ratio reference / best; blown-up cells (a validation over BLOWUP_FACTOR times its running minimum,
-    pair_head_blowup.py) listed with their step; the best point's position in the search window (fraction of the
+    probes) ratio reference / best; every cell's curve after its best checkpoint (last validation
+    over the best, and the best's position along the run; a non-finite validation fails the read); the best point's position in the search window (fraction of the
     log10 range for lr_scale, of the range for layer_decay); the step-0 check (each cell's step-0 validation against
     the reference cell's, same parent weights and events, so it should agree).
     python3 analysis/catalog_v3/muon_hp_ft.py   -> data/muon_hp_ft.json, figs/muon_hp_ft.{png,pdf}
@@ -25,7 +25,6 @@ import glob, json, math, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
-from pair_head_blowup import BLOWUP_FACTOR  # noqa: E402
 sys.path.insert(0, ROOT)
 SWEEP = "muon_hp_ft"
 PROBES = {"v3_dg_dgwpwm": r"$dg\to dgW^+W^-$", "v3_usx_cxuwpz": r"$u\bar s\to \bar c uW^+Z$",
@@ -70,13 +69,10 @@ def gmean(v):
     return math.exp(sum(math.log(x) for x in v) / len(v))
 
 
-def blowup(curve):
-    run_min = curve[0]
-    for i in range(1, len(curve)):
-        if not math.isfinite(curve[i]) or curve[i] > BLOWUP_FACTOR * run_min:
-            return i
-        run_min = min(run_min, curve[i])
-    return None
+def median(v):
+    v = sorted(v)
+    n = len(v)
+    return v[n // 2] if n % 2 else 0.5 * (v[n // 2 - 1] + v[n // 2])
 
 
 def main():
@@ -86,7 +82,7 @@ def main():
            and c["parent"] == "dimensionless_muon" and c["optimizer"] == "MuonAdamW"}
     assert len(ref) == 16, len(ref)
     ref_obj = gmean(c["val_loss_no_reg"] for c in ref.values())
-    trials, blown, step0 = [], [], []
+    trials, rise, step0 = [], [], []
     for t in raw["trials"]:
         cells = t["cells"]
         assert set(cells) == set(ref), t["hp_idx"]
@@ -94,9 +90,11 @@ def main():
             assert c["optimizer"] == "MuonAdamW" and c["target_stats"] == "parent_shared", (t["hp_idx"], n)
             assert abs(c["lr_scale"] / t["hp"]["fine_tune.lr_scale"] - 1) < 1e-6, (t["hp_idx"], n)
             assert c["iterations"] == ref[n]["steps"], (t["hp_idx"], n)
-            j = blowup(c["val_curve"])
-            if j is not None:
-                blown.append({"hp_idx": t["hp_idx"], "cell": n, "validation": j, "val_loss_no_reg": c["val_loss_no_reg"]})
+            v = c["val_curve"]
+            assert all(math.isfinite(x) for x in v), (t["hp_idx"], n)
+            # the curve after the best checkpoint: how far the last validation ends above it, and where the best is
+            rise.append({"hp_idx": t["hp_idx"], "cell": n, "last_over_best": v[-1] / min(v),
+                         "best_position": v.index(min(v)) / (len(v) - 1)})
             # step 0 is the parent's weights on the same events and target: it must equal the reference cell's,
             # else the target (or its standardization) changed between the reference and the search
             r0 = c["val_loss_step0"] / ref[n]["val_loss_step0"]
@@ -118,7 +116,7 @@ def main():
     per_probe = {p: gmean(gain[f"{p}_{t}"] for t in TAG_D) for p in PROBES}
     per_D = {f"D{d}": gmean(gain[f"{p}_{t}"] for p in PROBES) for t, d in TAG_D.items()}
     out = {"sweep": SWEEP, "n_jobs": raw["n_jobs"], "n_observed": len(trials), "failed": raw["failed_logs"],
-           "blown_up_cells": blown, "n_blown_up_cells": len(blown),
+           "after_best": rise,
            "reference": {"lr_scale": 1.0, "layer_decay": 1.0, "objective": ref_obj,
                          "cells": {n: c["val_loss_no_reg"] for n, c in ref.items()}},
            "best": {"hp_idx": best["hp_idx"], "lr_scale": best["lr_scale"], "layer_decay": best["layer_decay"],
@@ -144,6 +142,14 @@ def main():
               "muon_hp_ft.worst.lr_scale": out["worst"]["lr_scale"],
               "muon_hp_ft.worst.layer_decay": out["worst"]["layer_decay"],
               "muon_hp_ft.n_better": out["n_trials_better_than_reference"],
+              "muon_hp_ft.all.last_over_best_median": median(r["last_over_best"] for r in rise),
+              "muon_hp_ft.all.best_position_median": median(r["best_position"] for r in rise),
+              "muon_hp_ft.all.n_cells": len(rise),
+              "muon_hp_ft.all.n_nonfinite": 0,
+              "muon_hp_ft.best.last_over_best_median": median(r["last_over_best"] for r in rise
+                                                              if r["hp_idx"] == best["hp_idx"]),
+              "muon_hp_ft.best.best_position_median": median(r["best_position"] for r in rise
+                                                             if r["hp_idx"] == best["hp_idx"]),
               "muon_hp_ft.step0_maxdev": max(abs(r - 1) for r in step0)}
     for p, g in per_probe.items():
         claims[f"muon_hp_ft.best.probe.{p}"] = g
@@ -162,11 +168,11 @@ def figure(out):
     fig, (a, b) = ps.figure(ncols=2)
     tr = out["trials"]
     sc = a.scatter([r["lr_scale"] for r in tr], [r["layer_decay"] for r in tr], c=[r["objective"] for r in tr],
-                   cmap="viridis", label="trials", zorder=3)
+                   cmap="viridis", zorder=3)
     a.scatter([1.0], [1.0], marker="*", c=[out["reference"]["objective"]], cmap="viridis", norm=sc.norm,
-              edgecolors="k", s=160, label="untuned", zorder=4)
+              edgecolors="k", s=160, zorder=4)
     a.scatter([out["best"]["lr_scale"]], [out["best"]["layer_decay"]], marker="o", facecolors="none",
-              edgecolors=ps.C.vermillion, s=120, label="best", zorder=5)
+              edgecolors=ps.C.vermillion, s=120, zorder=5)
     a.set_xscale("log")
     a.set_xlim(0.1, 10)
     a.set_xlabel(r"fine-tune lr scale")
@@ -178,11 +184,17 @@ def figure(out):
         g = [out["best"]["cell_gain"][f"{p}_{t}"] for t in TAG_D]
         kw = {"color": cols[i]} if cols else {}
         b.plot(Ds, g, "o-", label=lab, **kw)
-    b.axhline(1.0, color="0.5", ls=":", label="untuned")
+    b.axhline(1.0, color="0.5", ls=":")
+    from matplotlib.lines import Line2D
+    h = b.get_legend_handles_labels()[0] + [
+        Line2D([], [], color="0.5", ls=":", marker="*", markerfacecolor="w", markeredgecolor="k",
+               label="untuned (scale 1, decay 1)"),
+        Line2D([], [], ls="", marker="o", markerfacecolor="none", markeredgecolor=ps.C.vermillion,
+               label="best trial")]
     b.set_xscale("log")
     b.set_xlabel(r"$D$ (training events)")
     b.set_ylabel(r"untuned / best")
-    ps.legend(b, "upper left")
+    ps.legend(b, "upper left", handles=h)
     ps.make_room(b, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "muon_hp_ft"))
 
