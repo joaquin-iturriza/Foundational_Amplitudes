@@ -1737,6 +1737,8 @@ def open_questions():
 
 DESIGN_GUARD = os.path.join(ROOT, ".claude", "hooks", "design_guard.py")
 DESIGN = ["--question", "does the sign head lower the wrong-sign share on the held-out pools",
+          "--prior", "the sign head search at one seed (results, sign head section): share 0.12 vs 0.30; this adds "
+                     "seeds 1 and 2 and the matched pair head control",
           "--measure", "the wrong-sign share on the held-out pools at the best checkpoint",
           "--check", "on the two finished sign runs the share moved 4x between heads, above its binomial spread",
           "--fixed", "pools, horizon, optimizer, every other HP", "--control", "the same search with the pair head",
@@ -1854,10 +1856,56 @@ def designs():
         rc, out = w.plan_cmd("design", "other", *args)
         scenario("design: plan design refuses an empty %s" % DESIGN[i - 1], rc != 0 and DESIGN[i - 1] in out, out)
     args = list(DESIGN)
-    args[5] = "checked"
+    args[DESIGN.index("--check") + 1] = "checked"
     rc, out = w.plan_cmd("design", "other", *args)
     scenario("design: a check that does not say how it was verified is refused, nothing is recorded",
              rc != 0 and "existing data" in out and "designs" not in w.entries()["other"], out)
+
+
+def design_prior():
+    """2026-10-26: a pp-trained arm existed and was written up, the entry's decisions named it as the reference, yet a
+    comparison was written without it and a rerun proposed ("you completely ignored previous work done ... and you
+    were about to run the same thing again"). A design names the prior work on its question, or the terms searched
+    to find none; the design reviewer searches again itself."""
+    w = World([E("pp", quotes=[{"said_at": ago(60), "text": "build it, run a few checks", "decision": "D117"}])])
+    i = DESIGN.index("--prior") + 1
+    for k, v in (("an empty --prior", "   "), ("a --prior too short to name a result", "the earlier run"),
+                 ("none found without search terms", "none found"), ("none found with one term", "none found: pp")):
+        args = list(DESIGN)
+        args[i] = v
+        rc, out = w.plan_cmd("design", "pp", *args)
+        scenario("design prior: %s is refused, nothing is recorded" % k,
+                 rc != 0 and "--prior" in out and "designs" not in w.entries()["pp"], out)
+    args = list(DESIGN)
+    args[i] = "none found; searched pp-trained, trained on pp, pp arm, catalog_v4 pp pools"
+    rc, out = w.plan_cmd("design", "pp", *args)
+    scenario("design prior: none found with the search terms is recorded", rc == 0
+             and "pp-trained" in w.entries()["pp"]["designs"][-1]["prior"], out)
+    rc, out = w.plan_cmd("design", "pp", *DESIGN)
+    show = w.plan_cmd("show", "pp")[1]
+    pr = w.plan_cmd("next", "--prompts")[1]
+    scenario("design prior: the prior work is shown by plan show and carried by the step prompt",
+             rc == 0 and "prior: the sign head search at one seed" in show
+             and "prior: the sign head search at one seed" in pr, show + pr[-2000:])
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    rev = open(os.path.join(ROOT, ".claude", "agents", "design-reviewer.md")).read()
+    scenario("design prior: the step prompt asks for --prior and, in a write-up answering a decision, each quote's "
+             "result; the reviewer searches on its own and checks every quoted comparison",
+             "--prior" in tpl and "names a comparison" in tpl and "searched independently" in rev
+             and "grep -n -i" in rev and "site decisions --project FA" in rev and "names a comparison" in rev)
+    wf = World([E("pp", quotes=[{"said_at": ago(90), "text": "compare against the pp-trained arm",
+                                 "decision": "D119"}],
+                  designs=[dict(zip([k[2:] for k in DESIGN[0::2]], DESIGN[1::2]), at=ago(40))])])
+    nxt = wf.plan_cmd("next", "--prompts")[1]
+    scenario("design prior: the reviewer's fallback prompt carries the prior field and the user's quoted words",
+             "Design review." in nxt and "prior: the sign head search" in nxt
+             and "compare against the pp-trained arm" in nxt, nxt[-2500:])
+    old = World([E("pp", designs=[dict(zip([k[2:] for k in DESIGN[0::2] if k != "--prior"],
+                                           [v for k, v in zip(DESIGN[0::2], DESIGN[1::2]) if k != "--prior"]),
+                                       at=ago(60))])])
+    show = old.plan_cmd("show", "pp")[1]
+    scenario("design prior: a design recorded before the field shows it as not recorded",
+             "prior: not recorded" in show, show)
 
 
 def prompt_cap():
@@ -1903,7 +1951,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
-          designs, prompt_cap, the_suite_itself]
+          designs, design_prior, prompt_cap, the_suite_itself]
 
 
 def main():

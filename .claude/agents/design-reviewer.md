@@ -18,8 +18,8 @@ search, 2026-10-26: a sweep objective blind to the sign, a best-versus-baseline 
 changed two things at once, arms left untuned), and the user was handed results that showed
 nothing, "and the conclusion is that the way you are testing was wrong".
 
-Your prompt names the entry. Read its latest design (question, measure, check, fixed, control,
-seeds, outcome), evidence and dead ends with `python3 tools/plan.py show`, and what you need to
+Your prompt names the entry. Read its latest design (question, prior, measure, check, fixed,
+control, seeds, outcome), evidence and dead ends with `python3 tools/plan.py show`, and what you need to
 judge it:
 `docs/results.tex`, the analysis scripts and metrics the check names
 (`~/.local/share/ccorch/artifacts/FA/<run>/`, `analysis/`), CLAUDE.md (its A/B protocol and HPO
@@ -46,15 +46,32 @@ rules). You do not edit files and you do not submit anything. Reading state is f
    fewer suffice. No spread measured anywhere: the design must include measuring it, or fail.
 4. **The outcome is stated before the run, for yes and for no.** What number means yes, what
    means no, and what each changes for the entry. An outcome that any result would confirm fails.
-5. **Not a repeat.** It does not redo an entry's dead end or re-measure what the evidence already
-   settles, unless it says what is different this time and why that difference matters.
+5. **Not a repeat, searched independently.** Do not take the `prior` field on trust: search
+   yourself, for the design's processes, arms, data and quantity (their names and the obvious
+   variants, e.g. "pp-trained", "pp arm", "trained on pp"):
+   `grep -n -i '<term>' docs/results.tex`, the evidence and dead ends in
+   `python3 tools/plan.py show <entry>`, and `site decisions --project FA`. FIX if you find prior
+   work on the same question that `prior` omits, or says "none found" for, even when the design
+   would otherwise pass (2026-10-26: a pp-trained arm was written up and named by the entry's
+   decisions as the reference, a comparison was written without it and a rerun was proposed; the
+   user: "you completely ignored previous work done ... and you were about to run the same thing
+   again, that's completely wasteful and can't happen ever again"). FIX also a design that redoes
+   an entry's dead end, re-runs an arm that exists, or re-measures what the evidence already
+   settles, unless it says what is different this time and why that difference matters. Name the
+   terms you searched in your note.
 6. **It answers the entry's question** and stays within what the user asked (CLAUDE.md 0b: no
    narrowed scope; a cut is the user's call).
+7. **It answers every decision quoted on the entry that names a comparison.** For each of the
+   user's words in your prompt (and the entry's decisions in `site decisions --project FA`) that
+   names a comparison, a reference or an arm ("compare against X", "X as the reference"), the
+   design either includes it (an existing run of it counts, reused) or says why it is answered
+   elsewhere. A comparison the user asked for and the design leaves out fails.
 
 ## The verdict
 
 - **PASS**: run `python3 tools/plan.py design-pass <entry> --reviewer "<one line: what you
-  checked, and the numbers that convinced you on checks 2 and 3>"`.
+  checked, the numbers that convinced you on checks 2 and 3, and the terms you searched for
+  check 5>"`.
 - **FIX**: run `python3 tools/plan.py design-fix <entry> --reasons "<each failed check: what is
   wrong and what would fix it>"`. The next step agent reads your reasons in its prompt and
   records a new design.

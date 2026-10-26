@@ -8,7 +8,7 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees 
                      paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision}], the open question: ask +
                      waiting_since + searched + blocks (what waits on the answer) + checked_until, on a running entry,
                      or with holds_all (why everything waits) on a waiting_user one, hold_decision (held), writeup
-                     (done), designs [{at, question, measure, check, fixed, control, seeds, outcome, passed_at, reviewer,
+                     (done), designs [{at, question, prior, measure, check, fixed, control, seeds, outcome, passed_at, reviewer,
                      fix_at, fix}]
   plan/.state.json   runtime state, gitignored: per entry the step agents launched [{agent, at, reason}], the design
                      reviewers launched [{agent, at, design_at}] and runs
@@ -26,9 +26,11 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
-  plan design <id> --question Q --measure M --check C --fixed F --control K --seeds S --outcome O
+  plan design <id> --question Q --prior P --measure M --check C --fixed F --control K --seeds S --outcome O
                                           the design of the next job, before it is submitted: the question it
-                                          answers, the measurement that answers it, how it was checked on existing
+                                          answers, the prior work found on that question (each with its result
+                                          and how this design differs, or "none found" with the search terms),
+                                          the measurement that answers it, how it was checked on existing
                                           data that the measurement moves with the tested change, what is held
                                           fixed, the matched control, the seeds, the outcome read as yes and as no;
                                           design_guard.py refuses a submission for an entry without one recorded
@@ -880,15 +882,20 @@ def next_steps(d, st, t=None, msgs=None):
 PROMPT_TAIL = 8               # dead ends and evidence runs / paths a step prompt carries; plan show <id> has them all
 
 
-def step_prompt(e, reason):
-    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
+def entry_quotes(e):
+    """The user's words on the entry, one per line: its quotes, and the quote of each decision it has none of."""
     qs = [(x.get("text"), x.get("said_at")) for x in e.get("quotes") or []]
     have = {x.get("decision") for x in e.get("quotes") or []}
     for did in e.get("decisions") or []:                # an entry added under a decision has no quote of its own
         dd = decision(did) if did not in have else None
         if dd and dd["quote"]:
             qs.append((dd["quote"], dd["said_at"].isoformat() if dd["said_at"] else ""))
-    q = "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
+    return "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
+
+
+def step_prompt(e, reason):
+    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
+    q = entry_quotes(e)
     # the last PROMPT_TAIL dead ends and evidence items only: an entry's whole history made one prompt 17k characters
     dl = e.get("dead_ends") or []
     de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in dl[-PROMPT_TAIL:]) or "  none"
@@ -1188,9 +1195,12 @@ def _ask_ok(ask):
         sys.exit("plan: the question needs at least three words of five letters or more, to be found in a message")
 
 
-DESIGN_FIELDS = ("question", "measure", "check", "fixed", "control", "seeds", "outcome")
+DESIGN_FIELDS = ("question", "prior", "measure", "check", "fixed", "control", "seeds", "outcome")
 DESIGN_H = 24                 # hours a recorded design covers submissions of its entry (design_guard.py)
 CHECK_MIN = 40                # characters: how the measure was seen to move with the change, named, not a token
+PRIOR_MIN = 40                # characters: the prior work found, its result and how this design differs
+PRIOR_TERMS = 3               # search terms a "none found" names
+NONE_FOUND = re.compile(r"\b(none found|nothing found|no prior( work)?( found)?|none)\b", re.I)
 
 
 def last_design(e):
@@ -1219,12 +1229,14 @@ REVIEW_HEAD = "Design review."
 def review_prompt(e):
     x = last_design(e)
     de = "\n".join("  %s: %s" % (y["tried"], y["why"]) for y in e.get("dead_ends") or []) or "  none"
+    qs = entry_quotes(e) or "  none"
     return ("%s Review the latest recorded design of one plan entry (your instructions: "
-            ".claude/agents/design-reviewer.md).\n\nEntry: %s (%s)\nQuestion of the entry: %s\nThe design, recorded "
+            ".claude/agents/design-reviewer.md).\n\nEntry: %s (%s)\nQuestion of the entry: %s\nThe user's words on "
+            "it (the design answers every one that names a comparison):\n%s\nThe design, recorded "
             "%s:\n%s\nEvidence so far: %s\nDead ends so far:\n%s\n\nOn PASS run `python3 tools/plan.py design-pass "
             "%s --reviewer \"<your note>\"`; on FIX run `python3 tools/plan.py design-fix %s --reasons \"<what to "
             "change>\"`. Then report the verdict and its reasons." % (
-                REVIEW_HEAD, e["id"], e.get("title"), e.get("question"), (x.get("at") or "")[:16],
+                REVIEW_HEAD, e["id"], e.get("title"), e.get("question"), qs, (x.get("at") or "")[:16],
                 design_text(x), json.dumps(e.get("evidence") or {}), de, e["id"], e["id"]))
 
 
@@ -1248,7 +1260,29 @@ def design_text(x, indent="  "):
                "review asked for a fix %s: %s" % (x["fix_at"][:16], x.get("fix")) if x.get("fix_at") else
                "not reviewed yet")
     return "\n".join(["%srecorded %s, %s" % (indent, (x.get("at") or "")[:16], verdict)] +
-                      ["%s%s: %s" % (indent, k, x.get(k)) for k in DESIGN_FIELDS])
+                      ["%s%s: %s" % (indent, k, x.get(k) if x.get(k) is not None else "not recorded")
+                       for k in DESIGN_FIELDS])
+
+
+def _prior_ok(prior):
+    """A design names the work already done on its question before it proposes more (2026-10-26: a pp-trained arm
+    existed, was written up and named by the entry's decisions as the reference, yet a comparison was written without
+    it and a rerun proposed; the user: "you completely ignored previous work done ... and you were about to run the
+    same thing again, that's completely wasteful and can't happen ever again"). Either each prior result with how
+    this design differs, or "none found" with the terms searched (in docs/results.tex, plan show, site decisions)."""
+    if NONE_FOUND.search(prior):
+        rest = NONE_FOUND.sub(" ", prior)
+        terms = [t for t in re.split(r"[\s,;:/()\"']+", rest) if len(t) >= 2 and t.lower() not in (
+            "searched", "search", "terms", "term", "for", "in", "the", "and", "of", "on", "with", "docs", "results.tex",
+            "plan", "show", "site", "decisions")]
+        if len(terms) < PRIOR_TERMS:
+            sys.exit("plan: --prior says none found but names no search terms: list what was searched for in "
+                     "docs/results.tex, plan show and site decisions (process, arm, data, quantity names), at least "
+                     "%d terms" % PRIOR_TERMS)
+    elif len(prior) < PRIOR_MIN:
+        sys.exit("plan: --prior must name the prior work found on this question (searched in docs/results.tex, plan "
+                 "show, site decisions), each with its result and how this design differs, or \"none found\" with the "
+                 "search terms; at least %d characters" % PRIOR_MIN)
 
 
 def cmd_design(a):
@@ -1260,6 +1294,7 @@ def cmd_design(a):
     empty = [k for k, v in vals.items() if not v]
     if empty:
         sys.exit("plan: a design needs every field; empty: %s" % ", ".join("--" + k for k in empty))
+    _prior_ok(vals["prior"])
     if len(vals["check"]) < CHECK_MIN:
         sys.exit("plan: --check must say how it was verified, on existing data, that the measure moves with the "
                  "tested change (which runs or pools, what moved and by how much), in at least %d characters"
@@ -1848,6 +1883,9 @@ def main(argv=None):
         "before any submission)", ID,
         *[A("--" + k, required=True, help={
             "question": "the question the job answers",
+            "prior": "the prior work on the same question, searched in docs/results.tex, plan show <entry> and site "
+                     "decisions --project FA (process, arm, data, quantity names): each with its result and how this "
+                     "design differs; or \"none found\" plus the search terms",
             "measure": "the measurement that answers it",
             "check": "how existing data showed the measurement moves with the tested change",
             "fixed": "what is held fixed",
