@@ -27,7 +27,10 @@ The step
 4. If done_when now passes and the result is written up in docs/results.tex (numbers with their provenance comment,
    `% src: <command> @<commit>` and `% claim: key=value`), commit and run `python3 tools/plan.py done {id} --writeup
    <commit>`.
-5. Before asking the user anything, look for what settles it and apply that instead of asking: read CLAUDE.md's
+5. Before asking the user anything, look for what settles it and apply that instead of asking. First: a choice with
+   one physically or technically correct answer (exact where an approximation would be wrong, a bug fix, a
+   convention the field settles) is made, never asked: the user's standing call is "Just do whatever is correct and
+   simpler". Then read CLAUDE.md's
    canonical run setup and its HPO search-space rules, and `site decisions --project FA` (the user's calls in force).
    Only a call none of them settles goes to the user: write the question, word for word, in your final message, with
    what you read and why none settles it; the main session sends it and runs
