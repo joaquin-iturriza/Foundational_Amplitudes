@@ -788,8 +788,9 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None):
                     or [dt.datetime(1970, 1, 1, tzinfo=dt.timezone.utc)])
         said = [ts for ts, role, text in msgs if role == "user" and ts > since]
         if said:
-            return ("the user wrote at %s after the question: plan answer with their words, or plan unanswered if "
-                    "it does not answer it" % said[-1].isoformat()[:16]), said[-1]
+            return ("the user wrote at %s after the question %r: plan answer with their words, or plan unanswered "
+                    "if it does not answer it (never blocks the stop; listed here until one of them)" % (
+                        said[-1].isoformat()[:16], e.get("ask"))), said[-1]
     return None
 
 

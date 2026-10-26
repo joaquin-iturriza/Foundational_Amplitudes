@@ -139,7 +139,9 @@ class World:
         them, and a passing check that printed anything fails here."""
         r = subprocess.run([sys.executable, CHECK], input="{}", env=self.env, capture_output=True, text=True)
         if r.returncode != 0:
-            return r.returncode, r.stderr + r.stdout
+            if "note: " in r.stderr + r.stdout:
+                return 99, "a blocking stop check carried a note to the user's screen: " + r.stderr + r.stdout
+            return r.returncode, r.stderr + r.stdout + "\n" + self.plan_cmd("next")[1]
         if r.stdout.strip() or r.stderr.strip():
             return 99, "a passing stop check printed to the user's screen: " + r.stderr + r.stdout
         return 0, self.plan_cmd("next")[1]
@@ -281,7 +283,9 @@ def liveness():
               transcript=[(ago(29), "assistant", "Joaquin, should the readout run on every rung now?"),
                           (ago(3), "user", "Yes, run it on every rung please")])
     rc, out = w.plan_cmd("step", "ng", "--agent", "a3")
-    scenario("B1: a waiting entry takes no step; it blocks until answered", rc != 0 and w.check()[0] == 2, out)
+    rc2, out2 = w.check()
+    scenario("B1: a waiting entry takes no step; plan next lists the reply until it is answered",
+             rc != 0 and rc2 == 0 and "NEXT ng: the user wrote" in out2, out + out2)
     runs = [("FA-ccin2p3-old", "RUNNING", "pp", 1, None)] + [("FA-ccin2p3-n%02d" % i, "COMPLETED", "pp", 100 + i, 200)
                                                               for i in range(40)]
     w = World([E("pp")], runs=runs, state={"pp": step(1)})
@@ -347,19 +351,37 @@ def answers():
         rc, out = w.plan_cmd("answer", "x", "--kind", "scope", "--quote", "Yes, run it on every rung please", "--set", kv)
         scenario("B2/B3: answer --set %s is refused before anything is recorded" % kv,
                  rc != 0 and open(w.plan).read() == before and "decide" not in w.calls(), out)
+    # a reply after a question never blocks the stop (a block is shown on the user's screen; the user, 2026-10-26: "Me
+    # not answering a question from you it's not you not answering a question from me"); plan next carries it to the
+    # main session on every wake until plan answer or plan unanswered, so an answer is never lost
     w = World([E("ng", **wait())], transcript=say)
-    rc, err = w.check()
-    scenario("a user message after the question blocks until it reaches the entry", rc == 2 and "the user wrote" in err,
-             err)
+    r = subprocess.run([sys.executable, CHECK], input="{}", env=w.env, capture_output=True, text=True)
+    rc, nxt = w.plan_cmd("next")
+    scenario("an answer after the question does not block the stop and prints nothing; plan next lists it",
+             r.returncode == 0 and not (r.stdout + r.stderr).strip() and rc == 1
+             and "NEXT ng: the user wrote" in nxt and ask in nxt, r.stderr + r.stdout + nxt)
+    scenario("plan next keeps listing it at every later read until it reaches the entry",
+             "NEXT ng: the user wrote" in w.plan_cmd("next")[1] and "NEXT ng: the user wrote" in w.check()[1])
     rc, out = w.plan_cmd("answer", "ng", "--kind", "scope", "--quote", "Yes, run it on every rung please", "--set",
                          "next=run it")
     e = w.entries()["ng"]
     scenario("plan answer records the words and updates the entry in one call",
              rc == 0 and e["status"] == "running" and e["next"] == "run it" and e["quotes"][0]["decision"] == "D900"
              and e["asks"][0]["answered_at"], out)
+    scenario("once answered, plan next no longer lists the reply", "the user wrote" not in w.plan_cmd("next")[1])
     w = World([E("ng", **wait())], transcript=say[:1] + [(ago(3), "user", "Unrelated: how is the pp generation going")])
+    r = subprocess.run([sys.executable, CHECK], input="{}", env=w.env, capture_output=True, text=True)
+    scenario("a non-answer while a question is open does not block and prints nothing",
+             r.returncode == 0 and not (r.stdout + r.stderr).strip(), r.stderr + r.stdout)
     w.plan_cmd("unanswered", "ng")
-    scenario("plan unanswered leaves it waiting, unblocked", w.check()[0] == 0, w.check()[1])
+    rc, nxt = w.plan_cmd("next")
+    scenario("plan unanswered leaves it waiting, off plan next", rc == 0 and "the user wrote" not in nxt
+             and w.entries()["ng"]["status"] == "waiting_user", nxt)
+    w = World([E("ng", **wait()), E("pp")], transcript=say[:1] + [(ago(3), "user", "how is the pp generation going")])
+    r = subprocess.run([sys.executable, CHECK], input="{}", env=w.env, capture_output=True, text=True)
+    scenario("a block for another reason does not mention the reply on the user's screen",
+             r.returncode == 2 and "pp:" in r.stderr and "the user wrote" not in r.stderr + r.stdout
+             and "NEXT ng: the user wrote" in w.plan_cmd("next")[1], r.stderr + r.stdout)
     w = World([E("ng", **wait())], transcript=[(ago(120), "user", "Yes, run it on every rung please")])
     rc, out = w.plan_cmd("answer", "ng", "--kind", "scope", "--quote", "Yes, run it on every rung please")
     scenario("words typed before the question do not answer it", rc != 0 and "decide" not in w.calls(), out)
@@ -897,6 +919,14 @@ def test_switch():
     scenario("3 (fifth review): a done entry that regressed is a note and a reopen suggestion, never a block",
              rc == 0 and "marked done but" in err and rn == 0 and "SUGGEST rd" in out and "plan reopen rd" in out,
              err + out)
+    w = World([E("rd", status="done", writeup="abc", done_when="test -f an/none.png", notes_ref="par:readout",
+                 evidence={"runs": [], "commit": None, "paths": []}), E("pp")])
+    r = subprocess.run([sys.executable, CHECK], input="{}", env=w.env, capture_output=True, text=True)
+    rn, out = w.plan_cmd("next")
+    scenario("a check that blocks for another reason keeps its notes off the user's screen, for plan next",
+             r.returncode == 2 and "pp:" in r.stderr and "note" not in r.stderr + r.stdout
+             and "marked done but" not in r.stderr + r.stdout and "note: rd is marked done but" in out,
+             r.stderr + r.stdout + out)
 
 
 def claims_state():
