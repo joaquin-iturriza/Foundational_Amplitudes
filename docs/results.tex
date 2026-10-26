@@ -1900,6 +1900,64 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     amplitude's, so the arms' shares there are real errors: on $u\bar u\to e^+e^-Z$ the baseline's sign head calls
     $90\%$ of an all-positive validation set negative; on the two all-negative pools the arms get $31.4$ to $73.8\%$
     wrong on $d\bar d\to\gamma g$ and $0.0$ to $1.7\%$ on $u\bar c\to\bar c H u$. No number above changes.
+  \item \emph{Two sign arms do not close the gap.} Each is the baseline with one change, at the baseline's HPs, one
+% src: python3 analysis/catalog_v3/prep_signed.py @cb682111
+% allow: 10 16 32 because they are the arms' settings (the near-zero factor and weight, the pair features, the pair MLP's width)
+% claim: base_n=17
+% claim: base_wrong1=5.4
+% claim: pair_wrong1=11.3
+% claim: near_wrong1=9.8
+% claim: pair_better_base=6
+% claim: near_better_base=6
+% claim: pair_worse_base=8
+% claim: near_worse_base=9
+% claim: base_wrong_near=39.4
+% claim: pair_wrong_near=32.8
+% claim: near_wrong_near=28.5
+% claim: axis_n_pools=30
+% claim: base_axis_wrong=13.1
+% claim: pair_axis_wrong=13.0
+% claim: near_axis_wrong=12.3
+% claim: axis_major=6.3
+% claim: axis_mlp=0.7
+% claim: pair_ccg_wrong=72
+% claim: near_ccg_wrong=72
+% allow: 2 because it is the square in |M|^2
+    seed (runs FA-ccin2p3-161fc56b and FA-ccin2p3-a7009d00, \code{scripts/job\_catalog\_v3\_short.sh}): (a) the
+    sign logit gets a term on the particles' pair invariants, the ones the classifier above reads ($16$ pair features
+    through an MLP of $32$ hidden units); (b) the sign loss weighs the events within a factor $10$ of zero $10$ times
+    the others, each pool's mean weight kept. The $10$, $16$ and $32$ are untuned, one value each, so a loss says that
+    value does not help, not that the idea fails. On the $17$ held-out pools the median wrong-sign share is $5.4\%$
+    for the baseline, $11.3\%$ with the pair term and $9.8\%$ with the weighting; each arm beats the baseline on $6$
+    of the $17$ and loses on $8$ and $9$. Within a factor $10$ of zero it is $39.4\%$, $32.8\%$ and $28.5\%$. Over
+    the whole one-loop axis ($30$ pools; one the scorer reads as one sign is a plain log, with no sign error for
+    anyone) the baseline, the pair term and the weighting get $13.1\%$, $13.0\%$ and $12.3\%$ of the signs wrong,
+    against $6.3\%$ for one sign per pool and $0.7\%$ for the classifier (one sign per pool where it has none); on
+    $e^+e^-\to c\bar cg$ both arms still get $72\%$ wrong.
+  \item \emph{The pair term costs the size, the weighting does not.} The zero-shot MSE on $\log|\mathcal M|^2$ per
+% src: python3 analysis/catalog_v3/prep_signed.py @cb682111
+% claim: pair_mse_ratio=1.77
+% claim: near_mse_ratio=1.02
+% claim: pair_n_probes=617
+% claim: pair_n_probes_worse=467
+% claim: near_n_probes_worse=331
+% claim: pair_H5_mse=2.18
+% claim: near_H5_mse=1.39
+% claim: base_H5_mse=1.25
+% claim: pair_mse_mag=2.54
+% claim: near_mse_mag=1.59
+% claim: base_mse_mag=1.25
+% claim: base_n=17
+% allow: 2 because it is the square in |M|^2
+% allow: 1 because it is the ratio of equal errors, no result
+    held-out probe of every axis, over the baseline's on the same probe, has the median $1.77$ with the pair term
+    (above $1$ on $467$ of the $617$ probes) and $1.02$ with the weighting (above on $331$); on the one-loop axis the
+    median MSE is $2.18$ and $1.39$ against the baseline's $1.25$, and the magnitude's on the $17$ sign-changing pools
+    $2.54$ and $1.59$ against $1.25$. The pair term's run blew up about a third of the way in: from its seventeenth
+    validation on, gradient norms went non-finite on a dozen steps (skipped) and its validation loss rose by two orders
+    of magnitude and never came back; its reads are at its best checkpoint, before the blow-up, whose validation loss
+    is about five times the baseline's, while the weighting's ends level with it (the runs' logs).
+    Fig.~\ref{fig:v3_prep_signed_arms}.
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
@@ -1920,6 +1978,15 @@ with fewer than $20$ fit events of one sign). (b) Per held-out pool, the
 short pretrainings' zero-shot wrong-sign share against one sign per pool's; the pools of one sign in every event sit
 at zero on the horizontal axis.}
 \label{fig:v3_prep_signed}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_signed_arms.pdf}
+% allow: 2 because it is the square in |M|^2
+\caption{The two sign arms on catalog\_v3's held-out probes, zero-shot, one seed each. (a) Per held-out one-loop pool
+the scorer reads as sign-changing, each arm's wrong-sign share against the baseline's. (b) Per held-out probe of every
+axis, each arm's MSE on $\log|\mathcal M|^2$ against the baseline's.}
+\label{fig:v3_prep_signed_arms}
 \end{figure}
 
 \paragraph{The sampling sensitivity on catalog\_v3 (2026-10-26).}\label{par:v3_prep_sampling} How much of what a target
