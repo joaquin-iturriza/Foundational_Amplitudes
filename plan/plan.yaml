@@ -1103,10 +1103,10 @@ entries:
   - D142
   - D145
   - D154
-  next: 'Generate the one-loop b b~ > h w+ w- (v4_bbx_hwpwm_nlo) at zero top width, exact there since the top is t-channel
-    only (the user: one correct way; D111 ''do whatever is correct and simpler''); every other entry keeps WT 1.4915; check
-    the pole guard passes over [threshold, 6 TeV]; then the pool check, classes and roles, the massless b in particle_ids.py,
-    and catalog_v4''s short pretrainings'
+  next: 'Read FA-ccin2p3-b508f477''s log: WT0_CARD lines (b b~ > h w+ w- one-loop card DECAY 6 at 0 in column 1, b b~ > ta+
+    vt w- at 1.4915), WT0_DIAG redrawn fraction over [286, 6000] GeV against the 2% guard, then whether V4REGEN_DONE built
+    v4_bbx_hwpwm_nlo''s three pools; then the pool check, classes and roles, the massless b in particle_ids.py, and catalog_v4''s
+    short pretrainings'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
