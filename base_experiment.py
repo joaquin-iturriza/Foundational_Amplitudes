@@ -927,6 +927,7 @@ class BaseExperiment:
     def train(self):
         self.train_lr, self.train_loss, self.val_loss = [], [], []
         self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
+        self._step_log = []
         self.val_loss_no_reg, self.val_mse = [], []
         self.val_loss_no_reg_all = []              # monitor processes (experiment._monitor_names)
         self._smallest_all = float("inf")
@@ -1082,6 +1083,7 @@ class BaseExperiment:
 
             if is_val_step or is_last_step:
                 val_loss = self._validate(step)
+                self._write_step_log()
                 # Select checkpoint on no-reg loss when available; fall back to
                 # regularized loss only if no-reg was never computed.
                 val_loss_no_reg_now = self.val_loss_no_reg[-1] if self.val_loss_no_reg else None
@@ -1507,6 +1509,15 @@ class BaseExperiment:
             self.cfg.run_dir, "models", f"model_run{self.cfg.run_idx}_current.pt"
         ))
             
+    def _write_step_log(self):
+        """<run_dir>/train_steps.npz: the per-step record (_step), columns step, grad_norm (pre-clip), loss, lr."""
+        if not self._step_log or not self.cfg.get("run_dir"):
+            return
+        a = np.asarray(self._step_log, dtype=np.float64)
+        tmp = os.path.join(str(self.cfg.run_dir), "train_steps.tmp.npz")
+        np.savez(tmp, step=a[:, 0].astype(np.int64), grad_norm=a[:, 1], loss=a[:, 2], lr=a[:, 3])
+        os.replace(tmp, os.path.join(str(self.cfg.run_dir), "train_steps.npz"))
+
     def _step(self, data, step):
         # actual update step
         if getattr(self, "_per_process_accum", False):
@@ -1560,6 +1571,12 @@ class BaseExperiment:
             grad_norm = vals[1]
             lnr_val  = vals[2] if want_lnr else None
 
+        # the per-step record, skipped steps included (train_grad_norm keeps only the taken ones): step, pre-clip
+        # gradient norm, loss (nan where the blocking path has not read it yet), lr; written to
+        # <run_dir>/train_steps.npz at every validation (_write_step_log), so a run that blows up keeps the norms
+        # before its jump (the pair sign head's and the more-signed arm's blow-ups, par:v3_prep_signed, had none)
+        self._step_log.append((step, grad_norm, float("nan") if loss_val is None else loss_val,
+                               self.optimizer.param_groups[0]["lr"]))
         # NaN/inf guard (BOTH sync paths): replaces the per-step isfinite assert
         # (which synced). A non-finite loss yields a non-finite grad_norm; skip the
         # update so a transient blow-up doesn't corrupt the weights (better than

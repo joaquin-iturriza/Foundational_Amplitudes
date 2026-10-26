@@ -185,13 +185,16 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  diagram_encoder_llm4lhc=None,        # its hyperparameters; consumed by the experiment
                  context_dim: int = 0, context_dropout: float = 0.5,   # read in experiment._post_instantiate_model
                  context_names_file=None,
-                 sign_pair_dim: int = 0, sign_pair_hidden: int = 32):
+                 sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False):
         super().__init__()
         self.net = net
         # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
         # are pair features; the sign logit gets the mean over the event's particle pairs of an MLP of them and of the
         # pair's invariants (see _sign_pair_logit). Output layer zeroed: at init the head is the pooled channel alone.
         self.sign_pair_dim = int(sign_pair_dim or 0)
+        # sign_pair_bound: the pair channels go through tanh before the sums and products, so h_i + h_j and h_i h_j stay
+        # in [-2, 2] and [-1, 1] (the unbounded head's run blew up, par:v3_prep_signed); off keeps the first arm's head
+        self.sign_pair_bound = bool(sign_pair_bound)
         if self.sign_pair_dim > 0:
             K = self.sign_pair_dim
             self.sign_pair_mlp = nn.Sequential(nn.Linear(2 * K + 4, int(sign_pair_hidden)), nn.SiLU(),
@@ -814,6 +817,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
         valid = ar[None, :] < cnt[:, None]                                       # (B, n)
         idx = (ptr[:-1, None] + ar[None, :]).clamp(max=h.shape[0] - 1)
         H = h[idx]                                                               # (B, n, K)
+        if self.sign_pair_bound:
+            H = torch.tanh(H)
         P = p[idx].to(torch.float32)                                             # (B, n, 4)
         eta = torch.tensor([1.0, -1.0, -1.0, -1.0], device=h.device, dtype=P.dtype)
         dots = torch.einsum("bic,bjc,c->bij", P, P, eta)                         # (B, n, n)

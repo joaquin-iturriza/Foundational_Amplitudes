@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -86,6 +86,10 @@ case "$ARM" in
     # the pair MLP's 32 hidden units are open (unsourced) settings, one untuned value each: a loss says that value
     # does not help, not that the idea fails
     baseline_sign_pairs)   NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false ++model.sign_pair_dim=16) ;;
+    # the pair sign head again with its pair channels bounded (tanh) before their sums and products; the run writes
+    # its per-step gradient norm (train_steps.npz), so a blow-up's lead-up is read
+    baseline_sign_pairs_bounded) NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
+                                 ++model.sign_pair_dim=16 ++model.sign_pair_bound=true) ;;
     # the baseline trained on more sign-changing one-loop pools (recipes/catalog_v3_train_signext.yaml: catalog_v3_train
     # plus the 95 one-loop pools of the coloured 2->3 training trees whose train events take both signs,
     # recipes/make_catalog_v3_train_signext.py), at the baseline's 4264 steps (same compute)

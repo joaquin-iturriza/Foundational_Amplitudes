@@ -21,6 +21,8 @@ particle_encoder_hidden: 0   # off (docs/results.tex tab:bigrun_arms, not load-b
 # the invariants the per-pool sign classifier used (analysis/catalog_v3/prep_signed_pools.py). Zero-init output.
 sign_pair_dim: 0
 sign_pair_hidden: 32
+# sign_pair_bound: tanh on the pair channels h_i before their sums and products (bounded inputs to the pair MLP)
+sign_pair_bound: false
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null
