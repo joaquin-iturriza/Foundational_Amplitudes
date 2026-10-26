@@ -1360,7 +1360,13 @@ entries:
     - tests/test_muon.py
     - tests/test_parent_target_stats.py
     - tools/catalog_ft.py
-  dead_ends: []
+  dead_ends:
+  - tried: keep-parent-stats fine-tunes FA-ccin2p3-483f4bfc, 8fe3a758, 3a2f3a89, b03e4c9a (code @96a53d89)
+    why: 'the EMA was built on the random initialisation before the parent''s weights were loaded and never reset, so every
+      early validation (scored on the EMA average) blended the random weights in (2/11 after the first update, 1/22 after
+      the second): first validation 0.203 (AdamW parent) and 0.703 (Muon parent) instead of the zero-shot 0.043 and 0.0035;
+      their curves before about step 10, and any best checkpoint there, are wrong. Fixed in ddfc0314, rerun into zz_catft_emafix'
+    at: '2026-10-26T08:20:10+00:00'
   asks:
   - ask: 'The Muon against AdamW test: go ahead with stage 1 as designed (one Muon short pretraining at the transferred lr
       8.94e-3 and weight decay 0.1, its zero-shot reads on all eight axes, and 64 small-D fine-tunes: 4 held-out processes
