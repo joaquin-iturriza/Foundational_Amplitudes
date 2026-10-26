@@ -49,7 +49,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    why it was asked (which study, which decision it feeds), then how it was designed (what is compared against what,
    on which data, how many runs and seeds, what is held fixed), stated again in every message that carries a result
    of that study, then the answer with its numbers, then what it changes for what we do next. A figure goes with what
-   its axes and points are. A step agent's report is rewritten to this shape before it reaches me. A request for my go
+   its axes and points are. A figure is sent once per version; a redrawn one says in its caption that it replaces
+   the earlier one and what changed, and an unchanged one is referred to, never sent again. A step agent's report is rewritten to this shape before it reaches me. A request for my go
    names the rule behind it (the GPU budget, or which decision of mine sends the work back at its design).
 
 0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion, refused by
