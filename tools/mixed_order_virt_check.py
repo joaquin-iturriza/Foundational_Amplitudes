@@ -20,6 +20,11 @@ compared with the born of the same piece (the universal double pole is -sum C_i 
   qcdqed    <born> QED<=n [virt=QCD QED]            (loop_qcd_qed_sm: the QCD and EW loops of every order)
   amcnlo    <born> QED<=n [QCD], aMC@NLO output, check_poles  (MadGraph's own pole check against its FKS
                                                      integrated counterterms, colour correlations included)
+  top173    v4's string with catalog_v3's internal top (MT = ymt = 173, WT 1.4915), for the three sub-percent ones
+
+The five mixed-order borns are generated at the pure-QCD born in catalog_v4 now (v4_<x>_qcdborn, the user 2026-10-26);
+the second run (MOV_ARGS="--only v4_bg_bwpwm v4_bbx_tapvtwm v4_bbx_hwpwm") is the three sub-percent ones with every
+variant. check_poles is the Fortran test `compile FO` builds per SubProcesses/P*/ (not an aMC@NLO shell command).
 
 plus a stability scan on the v4 standalone of the processes with outlier points (MadLoopParams.dat: the default,
 MLStabThres 1e-5, CTModeRun 4 = quadruple precision everywhere, MLReductionLib 1 / 6 / 7 alone): a point whose poles
@@ -52,6 +57,7 @@ for p in (ROOT, HERE):
 
 OUT = os.path.join(os.environ.get("SCRATCH", "/tmp"), "zz_mixed_order_virt")
 MAXSO = 20
+N_POLES = 50     # points of aMC@NLO's check_poles rerun
 
 # the five failing entries: born string, the QED order of catalog_v4, the squared QED orders of the born pieces
 PROCS = {
@@ -60,12 +66,16 @@ PROCS = {
     "v4_ddx_ccx":  {"born": "d d~ > c c~",   "qed": 2, "sq": [0, 2, 4], "stab": True},
     "v4_ddx_bbx":  {"born": "d d~ > b b~",   "qed": 2, "sq": [0, 2, 4], "stab": True},
     "v4_bbx_ccx":  {"born": "b b~ > c c~",   "qed": 2, "sq": [0, 2, 4], "stab": True},
-    # the sub-percent rc 216 pattern (all points "stable" in double precision, the double pole off by ~4e-3): read as a
-    # precision question, the v4 standalone and its stability scan only
-    "v4_bg_bwpwm":    {"born": "b g > b w+ w-",    "qed": 2, "sq": [], "stab": True, "only_v4": True},
-    "v4_bbx_tapvtwm": {"born": "b b~ > ta+ vt w-", "qed": 3, "sq": [], "stab": True, "only_v4": True},
-    "v4_bbx_hwpwm":   {"born": "b b~ > h w+ w-",   "qed": 3, "sq": [], "stab": True, "only_v4": True},
+    # the sub-percent rc 216 pattern (all points "stable" in double precision, the double pole off by ~4e-3 in every
+    # MadLoopParams setting of the first run, so not precision): single-order borns (QED<=n is their minimal order), so
+    # the split-order variant is the one squared order; the top variant puts back catalog_v3's internal top (MT = ymt =
+    # 173, WT 1.4915), the one other change from v3, where they passed (with a 4.7 GeV b); aMC@NLO's check_poles
+    # compares MadLoop's poles with its own FKS prediction per squared order
+    "v4_bg_bwpwm":    {"born": "b g > b w+ w-",    "qed": 2, "sq": [4], "stab": False, "top173": True},
+    "v4_bbx_tapvtwm": {"born": "b b~ > ta+ vt w-", "qed": 3, "sq": [6], "stab": False, "top173": True},
+    "v4_bbx_hwpwm":   {"born": "b b~ > h w+ w-",   "qed": 3, "sq": [6], "stab": False, "top173": True},
 }
+V3_TOP = {"MT": 173.0, "ymt": 173.0, "WT": 1.4915}     # catalog_v3's internal top (CLAUDE.md, masses and widths)
 
 STAB = {   # MadLoopParams.dat key -> value, per configuration of the stability scan
     "default": {},
@@ -146,6 +156,8 @@ def variants(name, P):
         v[f"sq{k}"] = (f"generate {b} QED<={n} QED^2=={k} [virt=QCD]", "loop_sm-no_b_mass")
     v["sqrvirt"] = (f"generate {b} QED<={n} [sqrvirt=QCD]", "loop_sm-no_b_mass")
     v["qcdqed"] = (f"generate {b} QED<={n} [virt=QCD QED]", qcdqed_model())
+    if P.get("top173"):
+        v["top173"] = (f"generate {b} QED<={n} [virt=QCD]", "loop_sm-no_b_mass", V3_TOP)
     return v
 
 
@@ -161,13 +173,14 @@ def warnings_of(text):
             if re.search(r"WARNING|not supported|cannot|Error|error|mixed|squared order", l)][:40]
 
 
-def build(name, var, string, model):
-    """MG5 standalone + the split-order wrapper + the locked param card + matrix2py.so; returns a status dict"""
+def build(name, var, string, model, patches=None):
+    """MG5 standalone + the split-order wrapper + the locked param card (and the variant's patches) + matrix2py.so;
+    returns a status dict"""
     import mg5_pipeline_final as mg
     import nlo_conventions as C
     import nlo_virtual_pipeline as NV
     sa = os.path.join(OUT, f"{name}__{var}")
-    st = {"proc": name, "var": var, "mg5": string, "model": model, "dir": sa}
+    st = {"proc": name, "var": var, "mg5": string, "model": model, "dir": sa, "patches": patches or {}}
     done = glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so")
     if done and open(os.path.join(sa, ".mg5_string")).read().strip() == string:
         st["built"] = True
@@ -192,7 +205,7 @@ def build(name, var, string, model):
     p0 = p0s[0]
     with open(f"{p0}/f2py_wrapper.f", "a") as f:
         f.write(NV.GET_ME_FULL_F + GET_ME_SPLIT_F)
-    NV.patch_param_card_slha(f"{sa}/Cards/param_card.dat", {**C.PARAM_CARD_PATCHES, "WT": 1.480327})
+    NV.patch_param_card_slha(f"{sa}/Cards/param_card.dat", {**C.PARAM_CARD_PATCHES, "WT": 1.480327, **(patches or {})})
     # the squared orders MadGraph wrote into the code, for reading the columns
     so = []
     for fn in sorted(glob.glob(f"{p0}/*.f")):
@@ -345,17 +358,45 @@ def amcnlo_check_poles(name, P):
     if not os.path.exists(os.path.join(d, "bin", "aMCatNLO")):
         st["why"] = "no aMC@NLO output"
         return st
-    cmdf = os.path.join(d, "zz_check_poles.cmd")
-    open(cmdf, "w").write("check_poles -f\n")
+    # check_poles is not a command of the aMC@NLO shell: it is a Fortran test that `compile FO` builds and runs in
+    # every SubProcesses/P*/ with a virtual (amcatnlo_run_interface.compile_dir; input: points, tolerance). `compile FO
+    # -f` builds the libraries and runs it at the default tolerance (FKS_params.dat IRPoleCheckThreshold 1e-5; it
+    # raises when more than 10% fail, the logs stay); then check_poles is rerun here on N_POLES points, each P* dir
+    # reporting MadLoop's against the FKS double and single pole per squared order.
+    cmdf = os.path.join(d, "zz_compile_fo.cmd")
+    open(cmdf, "w").write("compile FO -f\n")
     try:
         r = subprocess.run([os.path.join(d, "bin", "aMCatNLO"), cmdf], cwd=d, text=True, capture_output=True,
-                           timeout=3600, input="\n" * 20)
+                           timeout=7200, input="\n" * 20)
         txt = r.stdout + r.stderr
     except subprocess.TimeoutExpired as e:
         txt = (e.stdout or "") if isinstance(e.stdout, str) else "timeout"
-    open(os.path.join(OUT, f"{name}__amcnlo.check_poles.log"), "w").write(txt)
-    st["check_poles"] = [l.rstrip() for l in txt.splitlines()
-                         if re.search(r"pole|Pole|cancel|PASS|FAIL|WARNING|Error|tolerance", l)][-40:]
+    open(os.path.join(OUT, f"{name}__amcnlo.compile.log"), "w").write(txt)
+    st["compile"] = [l.rstrip() for l in txt.splitlines()
+                     if re.search(r"pole|Pole|cancel|PASS|FAIL|Error|error|tolerance|not recognized", l)][-20:]
+    st["check_poles"] = []
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
+    for pd in sorted(glob.glob(os.path.join(d, "SubProcesses", "P*_*"))):
+        if not os.path.isdir(pd) or not glob.glob(os.path.join(pd, "V*")):
+            continue
+        tag = os.path.basename(pd)
+        if not os.path.exists(os.path.join(pd, "check_poles")):
+            with open(os.path.join(pd, "zz_make_check_poles.log"), "w") as lf:
+                subprocess.run(["make", "check_poles"], cwd=pd, env=env, stdout=lf, stderr=lf)
+        if not os.path.exists(os.path.join(pd, "check_poles")):
+            st["check_poles"].append(f"{tag}: check_poles did not build (zz_make_check_poles.log)")
+            continue
+        try:
+            c = subprocess.run(["./check_poles"], cwd=pd, input=f"{N_POLES}\n-1\n", text=True, capture_output=True,
+                               timeout=3600)
+            out = c.stdout + c.stderr
+        except subprocess.TimeoutExpired as e:
+            out = (e.stdout or "") if isinstance(e.stdout, str) else "timeout"
+        open(os.path.join(OUT, f"{name}__amcnlo.{tag}.check_poles.log"), "w").write(out)
+        npass, nfail = out.count(" PASSED"), out.count(" FAILED")
+        st["check_poles"].append(f"{tag}: PASSED {npass} FAILED {nfail} (tolerance: FKS_params.dat default)")
+        st["check_poles"] += [f"{tag}: {l.rstrip()}" for l in out.splitlines()
+                              if re.search(r"pole|POLE|Pole|MadFKS|MadLoop|ratio|FAILED|amp_split|order", l)][:60]
     return st
 
 
@@ -388,7 +429,7 @@ def main():
                    Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["virt"]
     os.makedirs(OUT, exist_ok=True)
     names = args.only or list(PROCS)
-    jobs = [(nm, var, s, m) for nm in names for var, (s, m) in variants(nm, PROCS[nm]).items()]
+    jobs = [(nm, var, *sm) for nm in names for var, sm in variants(nm, PROCS[nm]).items()]
     log(f"{len(jobs)} standalones to build under {OUT}, {args.workers} workers")
     builds = {}
     with cf.ThreadPoolExecutor(args.workers) as ex:
@@ -407,6 +448,8 @@ def main():
             log(f"BUILT {nm} {var}: built={st.get('built')} {st.get('why', '')} ({st.get('build_s', '-')} s) {st.get('mg5', '')}")
             for w in st.get("warnings", [])[:15]:
                 log(f"  WARN {nm} {var}: {w}")
+            for w in st.get("compile", []):
+                log(f"  COMPILE_FO {nm}: {w}")
             for w in st.get("check_poles", []):
                 log(f"  CHECK_POLES {nm}: {w}")
     results = {"builds": {f"{k[0]}__{k[1]}": v for k, v in builds.items()}, "evals": {}}
@@ -414,7 +457,7 @@ def main():
     for (nm, var), st in builds.items():
         if not st.get("built") or var == "amcnlo":
             continue
-        cfg = dict(v4[nm])
+        cfg = dict(v4[nm] if nm in v4 else v4[nm + "_qcdborn"])   # the five mixed-order borns are v4_<x>_qcdborn now
         n = args.n_2to2 if len(cfg["pdg_ids"]) == 4 else args.n
         scan = list(STAB) if (var == "v4" and PROCS[nm]["stab"]) else ["default"]
         for ptag in scan:

@@ -13,6 +13,8 @@
 # cached, a rerun builds only what is missing. Val/test go to $DATA_DIR, train to the cache under $SCRATCH.
 # V4REGEN_SKIP (optional, comma-separated entry names) leaves those entries out of this shard after sharding (the
 # other entries are unchanged); each is logged as SHARD_SKIP, to be built by a later rerun without the skip.
+# V4REGEN_ONLY (optional, comma-separated entry names) builds just those entries and their backend-group mates (run it
+# with V4REGEN_N=1 V4REGEN_K=0), each logged as SHARD_ONLY.
 # A one-loop entry whose backend build or pole certification fails is skipped with its backend group (the entries
 # sharing its backend), each logged as CERT_FAILED <name>: <reason>, and the rest of the shard is built; the job then
 # exits nonzero listing them (V4REGEN_CERT_SKIPPED). They stay in the catalog, built by a rerun once fixed.
@@ -28,13 +30,14 @@ N="${V4REGEN_N:?V4REGEN_N (number of shards) not set}"
 W="${SLURM_CPUS_PER_TASK:-16}"
 mkdir -p "$SCRATCH/zz_catalog_v4_regen"
 SPEC="$SCRATCH/zz_catalog_v4_regen/shard_${K}_of_${N}.yaml"
-echo "V4REGEN_SKIP ${V4REGEN_SKIP:-none}"
+echo "V4REGEN_SKIP ${V4REGEN_SKIP:-none} V4REGEN_ONLY ${V4REGEN_ONLY:-all}"
+[ -n "${V4REGEN_ONLY:-}" ] && SPEC="$SCRATCH/zz_catalog_v4_regen/only_$(echo "$V4REGEN_ONLY" | md5sum | cut -c1-8).yaml"
 python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n "$N" --k "$K" --skip "${V4REGEN_SKIP:-}" \
-    --out "$SPEC" 2>&1 || exit 1
+    --only "${V4REGEN_ONLY:-}" --out "$SPEC" 2>&1 || exit 1
 echo "V4REGEN shard $K of $N: $(grep -c '^- name:' "$SPEC") entries"
 df -k "$DATA_DIR" | tail -1 | awk '{print "V4REGEN_FREE_KB_START", $4}'
 T0=$(date +%s)
-CERTF="$SCRATCH/zz_catalog_v4_regen/cert_failed_${K}_of_${N}.txt"
+CERTF="${SPEC%.yaml}_cert_failed.txt"
 rm -f "$CERTF"
 python prebuild_recipes.py "$SPEC" --workers "$W" --skip-cert-failed "$CERTF"
 RC=$?

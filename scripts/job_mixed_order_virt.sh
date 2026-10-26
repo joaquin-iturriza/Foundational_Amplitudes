@@ -9,6 +9,7 @@
 # check. tools/mixed_order_virt_check.py builds each born as [virt=QCD] with and without QED<=n, one squared order at a
 # time, [sqrvirt=QCD], [virt=QCD QED] and an aMC@NLO check_poles, reads MadLoop's answer per squared order, and scans
 # MadLoopParams (stability threshold, quadruple precision, reduction library). Everything under $SCRATCH/zz_mixed_order_virt.
+# MOV_ARGS (env) passes run options, e.g. --only v4_bg_bwpwm v4_bbx_tapvtwm v4_bbx_hwpwm (the three sub-percent ones).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1

@@ -54,6 +54,27 @@ RECIPES = ["gen_stage1", "gen_stage2", "gen_stage3", "gen_stage4", "train", "twi
            "heldout_H2p5", "heldout_H3", "heldout_H3p", "heldout_H4", "heldout_H5", "heldout_H6", "heldout_H7c",
            "heldout_H7E"]
 E_HOLDOUT = [6000, 20000]      # GeV, the energy hold-out's window (the user 2026-10-26, see the docstring)
+# One-loop entries whose full-order born mixes QCD and electroweak powers (QED<=n with QCD diagrams too): MadLoop's
+# [virt=QCD] on that born fails the pole check (double pole identically 0 for the two 2->3, off by up to 25% at a few
+# points for the three 2->2; plan catalog_coverage). They keep catalog_v3's pure-QCD born string (no QED order), which
+# order_vector encodes as a lower electroweak maximum ([1, 0, 2, 1] or [1, 0, 2, 0] against the tree's [0, 0, 2, 3] or
+# [0, 0, 2, 2]), so the difference is in the data (the user 2026-10-26, D142: "As long as there is a way to encode this
+# difference in the data, then yes, qcd only is fine, if not drop them."). Their trees keep the full orders. The names
+# carry _qcdborn (virt base v4_<x>_qcdborn, entry v4_<x>_qcdborn_nlo), so no pool, standalone or quarantined chunk of
+# the mixed-order one-loop definition is ever reused for them.
+QCD_BORN = {"v3_uux_ccxz", "v3_ddx_bbxz", "v3_ddx_ccx", "v3_ddx_bbx", "v3_bbx_ccx"}
+
+
+def qcdborn_name(n, virt_key=False):
+    """v4_<x>_nlo -> v4_<x>_qcdborn_nlo for the QCD_BORN entries, and with virt_key their one-loop table key
+    v4_<x> -> v4_<x>_qcdborn (v4_<x> as a process name is the tree, which stays); any other name unchanged"""
+    for b in QCD_BORN:
+        vb = v4name(b)
+        if virt_key and n == vb:
+            return vb + "_qcdborn"
+        if n == vb + "_nlo":
+            return vb + "_qcdborn_nlo"
+    return n
 
 
 def load(path):
@@ -130,14 +151,17 @@ def loop_entries(trees):
         else:
             gen, tail = v["mg5"].split(" [", 1)
             assert gen == trees[nk]["v3_gen"], (k, gen)
-            w.update(mg5=trees[nk]["mg5_generate"][0] + " [" + tail, model=LOOP_MODEL[v.get("model", "loop_sm")])
-        virt[nk] = w
+            born = gen if k in QCD_BORN else trees[nk]["mg5_generate"][0]   # QCD_BORN: catalog_v3's string as is
+            w.update(mg5=born + " [" + tail, model=LOOP_MODEL[v.get("model", "loop_sm")])
+            if k in QCD_BORN:
+                w["qcd_born"] = True
+        virt[qcdborn_name(nk, virt_key=True)] = w
     for n, p in L["processes"].items():
         e = {k: v for k, v in p.items() if k not in ("param_card_patches",)}
-        vb = v4name(p["virt_base"]); pdg = list(p["pdg_ids"])
+        vb = qcdborn_name(v4name(p["virt_base"]), virt_key=True); pdg = list(p["pdg_ids"])
         e.update(virt_base=vb, m_finals=b_massless(pdg, p["m_finals"]), param_card_patches={}, certified=False,
                  v3_name=n, why=re.sub(r"\bv3_", "v4_", p.get("why", "")), **common(pdg))
-        procs[v4name(n)] = e
+        procs[qcdborn_name(v4name(n))] = e
     return virt, procs
 
 
@@ -196,10 +220,10 @@ def write():
             if v4name(e["name"]) in drop_names or v4name(e.get("base", e["name"])) in drop_names:
                 bdrop[r] += 1; continue
             energy = e["name"].endswith("__E10")
-            ne = dict(e, name=v4name(e["name"][:-len("__E10")] + "__E20" if energy else e["name"]))
+            ne = dict(e, name=qcdborn_name(v4name(e["name"][:-len("__E10")] + "__E20" if energy else e["name"])))
             ph = dict(e.get("physics") or {})
             if "base" in e:
-                ne["base"] = v4name(e["base"])
+                ne["base"] = qcdborn_name(v4name(e["base"]))
             if (ph.get("masses") or {}).get(6) is not None:           # the heavy-quark layer: width at its mass
                 ph["widths"] = {6: round(mg.top_width_lo(float(ph["masses"][6])), 6)}
             if ph:

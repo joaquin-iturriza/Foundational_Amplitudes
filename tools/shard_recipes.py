@@ -16,6 +16,8 @@ The recipes must share one recipe-level `sampling` block (it is written into eve
 `--skip a,b` drops the named entries from shard k's output AFTER sharding, so every shard keeps the entries it
 had without the skip (a part rerun with a skip builds the same pools as the others expect, minus the named ones).
 A name that is not in the shard is an error; each skipped name is printed as `SHARD_SKIP <name>`.
+`--only a,b` keeps just the named entries (with their backend-group mates) before sharding, for a job that builds a
+few entries (use --n 1 --k 0); a name in no recipe is an error.
 """
 import argparse, os, sys
 import yaml
@@ -95,8 +97,17 @@ def main():
     ap.add_argument("--out")
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--skip", default="", help="comma-separated entry names left out of shard k (after sharding)")
+    ap.add_argument("--only", default="", help="comma-separated entry names kept, with their backend groups (before sharding)")
     a = ap.parse_args()
     procs, sampling = load(a.recipes)
+    only = [s for s in a.only.split(",") if s]
+    if only:
+        missing = [s for s in only if s not in {e["name"] for e in procs}]
+        if missing:
+            sys.exit(f"--only: in no recipe: {', '.join(missing)}")
+        procs = [e for g in groups_of(procs) if any(e["name"] in only for e in g) for e in g]
+        for e in procs:
+            print(f"SHARD_ONLY {e['name']}", file=sys.stderr)
     shards = shard(procs, a.n)
     if a.plan or a.k is None:
         tot = sum(c for c, _ in shards)

@@ -395,7 +395,7 @@ processes:
     virt: true
     virt_base: v4_bbx_bbx
     why: one-loop QCD of v4_bbx_bbx
-  v4_bbx_ccx_nlo:
+  v4_bbx_ccx_qcdborn_nlo:
     alphas_power: 3
     beam_masses: {}
     certified: false
@@ -422,7 +422,7 @@ processes:
     sqrts_measure: log
     v3_name: v3_bbx_ccx_nlo
     virt: true
-    virt_base: v4_bbx_ccx
+    virt_base: v4_bbx_ccx_qcdborn
     why: one-loop QCD of v4_bbx_ccx
   v4_bbx_ccxh_nlo:
     alphas_power: 3
@@ -1758,7 +1758,7 @@ processes:
     virt: true
     virt_base: v4_ddx_awpwm
     why: one-loop QCD of v4_ddx_awpwm
-  v4_ddx_bbx_nlo:
+  v4_ddx_bbx_qcdborn_nlo:
     alphas_power: 3
     beam_masses: {}
     certified: false
@@ -1785,7 +1785,7 @@ processes:
     sqrts_measure: log
     v3_name: v3_ddx_bbx_nlo
     virt: true
-    virt_base: v4_ddx_bbx
+    virt_base: v4_ddx_bbx_qcdborn
     why: one-loop QCD of v4_ddx_bbx
   v4_ddx_bbxh_nlo:
     alphas_power: 3
@@ -1818,7 +1818,7 @@ processes:
     virt: true
     virt_base: v4_ddx_bbxh
     why: one-loop QCD of v4_ddx_bbxh
-  v4_ddx_bbxz_nlo:
+  v4_ddx_bbxz_qcdborn_nlo:
     alphas_power: 3
     beam_masses: {}
     certified: false
@@ -1847,9 +1847,9 @@ processes:
     sqrts_measure: log
     v3_name: v3_ddx_bbxz_nlo
     virt: true
-    virt_base: v4_ddx_bbxz
+    virt_base: v4_ddx_bbxz_qcdborn
     why: one-loop QCD of v4_ddx_bbxz
-  v4_ddx_ccx_nlo:
+  v4_ddx_ccx_qcdborn_nlo:
     alphas_power: 3
     beam_masses: {}
     certified: false
@@ -1876,7 +1876,7 @@ processes:
     sqrts_measure: log
     v3_name: v3_ddx_ccx_nlo
     virt: true
-    virt_base: v4_ddx_ccx
+    virt_base: v4_ddx_ccx_qcdborn
     why: one-loop QCD of v4_ddx_ccx
   v4_ddx_ccxh_nlo:
     alphas_power: 1
@@ -4504,7 +4504,7 @@ processes:
     virt: true
     virt_base: v4_uux_abbx
     why: one-loop QCD of v4_uux_abbx
-  v4_uux_ccxz_nlo:
+  v4_uux_ccxz_qcdborn_nlo:
     alphas_power: 3
     beam_masses: {}
     certified: false
@@ -4533,7 +4533,7 @@ processes:
     sqrts_measure: log
     v3_name: v3_uux_ccxz_nlo
     virt: true
-    virt_base: v4_uux_ccxz
+    virt_base: v4_uux_ccxz_qcdborn
     why: one-loop QCD of v4_uux_ccxz
   v4_uux_epemg_nlo:
     alphas_power: 2
@@ -5231,7 +5231,7 @@ virt:
     - -5
     sqrts_measure: log
     v3_name: v3_bbx_bbx
-  v4_bbx_ccx:
+  v4_bbx_ccx_qcdborn:
     beam_masses: {}
     certified: false
     fiducial_cuts:
@@ -5243,7 +5243,7 @@ virt:
     m_finals:
     - 0.0
     - 0.0
-    mg5: generate b b~ > c c~ QED<=2 [virt=QCD]
+    mg5: generate b b~ > c c~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
       WT: 1.480327
@@ -5252,6 +5252,7 @@ virt:
     - -5
     - 4
     - -4
+    qcd_born: true
     sqrts_measure: log
     v3_name: v3_bbx_ccx
   v4_bbx_ccxh:
@@ -6324,7 +6325,7 @@ virt:
     - -24
     sqrts_measure: log
     v3_name: v3_ddx_awpwm
-  v4_ddx_bbx:
+  v4_ddx_bbx_qcdborn:
     beam_masses: {}
     certified: false
     fiducial_cuts:
@@ -6336,7 +6337,7 @@ virt:
     m_finals:
     - 0.0
     - 0.0
-    mg5: generate d d~ > b b~ QED<=2 [virt=QCD]
+    mg5: generate d d~ > b b~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
       WT: 1.480327
@@ -6345,6 +6346,7 @@ virt:
     - -1
     - 5
     - -5
+    qcd_born: true
     sqrts_measure: log
     v3_name: v3_ddx_bbx
   v4_ddx_bbxh:
@@ -6372,7 +6374,7 @@ virt:
     - 25
     sqrts_measure: log
     v3_name: v3_ddx_bbxh
-  v4_ddx_bbxz:
+  v4_ddx_bbxz_qcdborn:
     beam_masses: {}
     certified: false
     fiducial_cuts:
@@ -6385,7 +6387,7 @@ virt:
     - 0.0
     - 0.0
     - 91.188
-    mg5: generate d d~ > b b~ z QED<=3 [virt=QCD]
+    mg5: generate d d~ > b b~ z [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
       WT: 1.480327
@@ -6395,9 +6397,10 @@ virt:
     - 5
     - -5
     - 23
+    qcd_born: true
     sqrts_measure: log
     v3_name: v3_ddx_bbxz
-  v4_ddx_ccx:
+  v4_ddx_ccx_qcdborn:
     beam_masses: {}
     certified: false
     fiducial_cuts:
@@ -6409,7 +6412,7 @@ virt:
     m_finals:
     - 0.0
     - 0.0
-    mg5: generate d d~ > c c~ QED<=2 [virt=QCD]
+    mg5: generate d d~ > c c~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
       WT: 1.480327
@@ -6418,6 +6421,7 @@ virt:
     - -1
     - 4
     - -4
+    qcd_born: true
     sqrts_measure: log
     v3_name: v3_ddx_ccx
   v4_ddx_ccxh:
@@ -8540,7 +8544,7 @@ virt:
     - -5
     sqrts_measure: log
     v3_name: v3_uux_abbx
-  v4_uux_ccxz:
+  v4_uux_ccxz_qcdborn:
     beam_masses: {}
     certified: false
     fiducial_cuts:
@@ -8553,7 +8557,7 @@ virt:
     - 0.0
     - 0.0
     - 91.188
-    mg5: generate u u~ > c c~ z QED<=3 [virt=QCD]
+    mg5: generate u u~ > c c~ z [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
       WT: 1.480327
@@ -8563,6 +8567,7 @@ virt:
     - 4
     - -4
     - 23
+    qcd_born: true
     sqrts_measure: log
     v3_name: v3_uux_ccxz
   v4_uux_epemg:

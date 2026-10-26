@@ -8233,7 +8233,7 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_bbx_ccx_nlo
+- name: v4_bbx_ccx_qcdborn_nlo
   sqrts:
   - 20
   - 6000
@@ -8450,7 +8450,7 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_ddx_bbx_nlo
+- name: v4_ddx_bbx_qcdborn_nlo
   sqrts:
   - 20
   - 6000
@@ -8464,7 +8464,7 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_ddx_ccx_nlo
+- name: v4_ddx_ccx_qcdborn_nlo
   sqrts:
   - 20
   - 6000

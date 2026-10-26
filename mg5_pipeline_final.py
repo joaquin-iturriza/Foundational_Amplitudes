@@ -425,7 +425,7 @@ def generate_slot_pdgs(gen):
         if s.startswith(pre):
             s = s[len(pre):]
     s = re.split(r"[\[/$@]", s)[0]
-    s = re.sub(r"\b[A-Z]+\s*(<=|>=|==|=|<|>)\s*\d+", " ", s)
+    s = re.sub(r"\b[A-Z]+(\^2)?\s*(<=|>=|==|=|<|>)\s*\d+", " ", s)   # QED<=2, and squared orders QED^2==4
     ini, fin = s.split(">", 1)
     ini, fin = ini.split(), fin.split()
     unknown = [t for t in ini + fin if t not in MG5_PDG]
