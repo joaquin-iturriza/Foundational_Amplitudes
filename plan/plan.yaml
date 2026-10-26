@@ -604,9 +604,18 @@ entries:
     - signed_ab
   decisions:
   - D83
-  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
-    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
-    that decides'
+  next: 'Adapted to catalog_v4 (D166), waits for the user''s release of D114. What it was: shared standardization (B) against
+    the s_hat+coupling factor (A) at hp58''s config with AdamW on Daniel''s catalog, read on its 139 held-out; that ran (par.
+    The shared and the s_hat+coupling pretrainings: B blew up at step 8734) and its successor on catalog_v3 is the short-arm
+    series (baseline = B, dimensionless_shat = A with dimensionless inputs, hybrid, blends; the hybrid best inside the range).
+    The design as written no longer holds: hp58 and AdamW are replaced by the Muon search best (D155, trial_1860 HPs: lr 4.997e-3,
+    muon wd 0.0217), and Daniel''s 139 held-out by catalog_v4''s own axes (H1..H7E, plus XV3 and PP cross reads). On catalog_v4
+    the emission-scale arm already exists (v4_dimensionless_muon, seeds 42 and 43). What would run: two new arms in scripts/job_catalog_v3_short.sh
+    on recipes/catalog_v4_train.yaml (1153 pools), 4264 steps, same HPs (A/B step 3): v4_baseline_muon (one shared standardization
+    of log|M|^2, B) and v4_shat_muon (s_hat alone with the coupling orders and dimensionless inputs, A; the 388 mixed-order
+    pools divided by their highest power as in the emission-scale arm), seeds 42 and 43: 4 runs, about 1.2 GPU-h each with
+    the reads, about 5 GPU-h on CC. Option for the user: the hybrid on catalog_v4 too (2 runs, +2.5 GPU-h). Design reviewer
+    before submission.'
   done_when: null
   match: runs/catalog_norm/*,zz_catalog_norm*
   notes_ref: null
