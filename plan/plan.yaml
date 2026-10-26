@@ -947,7 +947,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -973,12 +973,22 @@ entries:
     answers_after: '2026-10-25T23:36:26+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T00:26:32.958000+00:00'
+    text: 'c) Investigate it
+
+
+      Okay, we''ve been discussing the infrastructure for a while again, can you tell me what''s being done in the background?'
+    decision: D139
+    answers_after: '2026-10-26T00:23:11+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
   - D134
   - D136
   - D137
+  - D139
   next: 'when parts 0,2,3,5,6 of the regeneration end: check every pool (counts, cuts, sidecars), report CPU-h and disk; parts
     1,4,7 wait for the user''s answer on the four mixed-order one-loop entries; then classes and roles on v4; then the b mass
     in particle_ids.py; then the short pretrainings (GPU estimate to the user)'
@@ -1075,13 +1085,8 @@ entries:
     searched: 'CLAUDE.md data-generation table (coupling orders row) and site decisions: the approval of full coupling orders
       for catalog_v4 covers the tree strings and says nothing on one-loop entries whose born mixes orders; no decision settles
       a failed certification'
+    answered_at: '2026-10-26T00:26:32.876000+00:00'
+    decision: D139
   searched: 'CLAUDE.md data-generation table (coupling orders row) and site decisions: the approval of full coupling orders
     for catalog_v4 covers the tree strings and says nothing on one-loop entries whose born mixes orders; no decision settles
     a failed certification'
-  ask: 'Four catalog_v4 one-loop entries fail MadLoop''s pole check for a reason other than the b-beam bug: u u~ > c c~ z
-    and d d~ > b b~ z (with QED<=3) return a double pole of exactly 0 against -16/3, and d d~ > c c~ and d d~ > b b~ (QED<=2)
-    are exact at 95% of points but off by up to 25% at a few. catalog_v3 generated the same processes as pure QCD born (no
-    QED order) and passed. They block regeneration parts 1, 4 and 7. Options: (a) generate these one-loop entries with the
-    pure-QCD born as v3 did (the trees keep the full orders), (b) drop the four one-loop entries, (c) I investigate MadLoop''s
-    mixed-order virtual first (costs a few CPU-hours of tests). Which?'
-  waiting_since: '2026-10-26T00:23:11+00:00'
