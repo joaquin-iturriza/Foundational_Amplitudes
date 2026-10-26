@@ -109,6 +109,51 @@ def test_non_sm_rows_are_appended_after_the_sm_ones():
     assert mat[P.GLOBAL_PDG_IDX[22], names.index("log10_mass_gev")] == P.MASSLESS_NEUTRAL_LOG10
 
 
+def test_massless_b_is_its_own_species_for_catalog_v4_only():
+    """catalog_v4 generates the b massless (sm-no_b_mass, beam_masses {}): its pools read the massless-b row, which
+    differs from the b's only in the mass; catalog_v3's entries (b at 4.7 in beams and finals) keep the b's row."""
+    m = P.PARTICLE_FEATURE_NAMES.index("log10_mass_gev")
+    for s in (1, -1):
+        rb, r0 = P.PARTICLE_PROPERTIES[5 * s], P.PARTICLE_PROPERTIES[s * P.MASSLESS_B_PDG]
+        assert [n for n, x, y in zip(P.PARTICLE_FEATURE_NAMES, rb, r0) if abs(x - y) > 1e-9] == ["log10_mass_gev"]
+        assert r0[m] == P._MASSLESS
+    ids = np.array([[5, -5, 5, -5, 21]])
+    v4_final = {"pdg_ids": [11, -11, 5, -5, 21], "m_finals": [0.0, 0.0, 0.0], "beam_masses": {}}
+    v4_beam = {"pdg_ids": [5, -5, 23], "m_finals": [91.188], "beam_masses": {}}
+    v3_final = {"pdg_ids": [11, -11, 5, -5, 21], "m_finals": [4.7, 4.7, 0.0]}
+    v3_beam = {"pdg_ids": [5, -5, 23], "m_finals": [91.188]}                       # no beam_masses: b on 4.7
+    old_2to2 = {"pdg_ids": [11, -11, 5, -5], "m_final": 4.7}
+    assert P.b_mass_of_process(v4_final) == 0.0 and P.b_mass_of_process(v4_beam) == 0.0
+    assert P.b_mass_of_process(v3_final) == 4.7 and P.b_mass_of_process(v3_beam) == 4.7
+    assert P.b_mass_of_process(old_2to2) == 4.7
+    assert P.b_mass_of_process({"pdg_ids": [11, -11, 1, -1], "m_finals": [0.0, 0.0]}) is None
+    mb = P.MASSLESS_B_PDG
+    assert P.species_pdgs(ids, None, v4_final).tolist() == [[mb, -mb, mb, -mb, 21]]
+    for cfg in (v3_final, v3_beam, old_2to2, None):
+        assert np.asarray(P.species_pdgs(ids, None, cfg)).tolist() == ids.tolist()
+    # with a heavy-quark top the two mappings compose
+    hq = {"pdg_ids": [5, -5, 6, -6], "m_finals": [300.0, 300.0], "beam_masses": {}}
+    out = P.species_pdgs(np.array([[5, -5, 6, -6]]), {"masses": {6: 300.0}}, hq)
+    assert out.tolist() == [[mb, -mb, 6000300, -6000300]]
+    # appended after every earlier row: catalog_v3 checkpoints' property matrices stay a prefix
+    assert P.GLOBAL_PDG_IDX[P.MASSLESS_B_PDG] > P.GLOBAL_PDG_IDX[-6000600]
+    assert P.GLOBAL_PDG_IDX[-P.MASSLESS_B_PDG] == P.GLOBAL_N_ENTRIES - 1
+
+
+def test_massless_b_matches_the_catalog_v4_entries():
+    try:
+        import mg5_pipeline_final as mg
+    except Exception as e:      # the pipeline needs the cluster env
+        print(f"  (skipped: pipeline not importable here: {e})"); return
+    n4 = n3 = 0
+    for name, cfg in mg.PROCESSES.items():
+        if cfg.get("_v4") and any(abs(int(p)) == 5 for p in cfg.get("pdg_ids", [])):
+            assert P.b_mass_of_process(cfg) == 0.0, name; n4 += 1
+        if cfg.get("_v3") and any(abs(int(p)) == 5 for p in cfg.get("pdg_ids", [])):
+            assert P.b_mass_of_process(cfg) == 4.7, name; n3 += 1
+    assert n4 > 0 and n3 > 0
+
+
 if __name__ == "__main__":       # plain runner: python tests/test_particle_encoding.py
     import traceback
     fails = 0

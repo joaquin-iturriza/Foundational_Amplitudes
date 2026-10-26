@@ -283,7 +283,8 @@ def loops():
             why.append("model " + v["model"])
         if not v.get("loopind") and "QED<=" not in v["mg5"]:
             why.append("no QED bound")
-        if v.get("param_card_patches", {}).get("WT") != mg.V4_WT:
+        # V4_WT, or the entry's own width where gen_catalog_v4.WIDTH_OVERRIDE sets one (b b~ > h w+ w- at zero, D154)
+        if v.get("param_card_patches", {}).get("WT") != (v.get("width_override") or {}).get("WT", mg.V4_WT):
             why.append("WT")
         if v.get("sqrts_measure") != "log" or v.get("beam_masses") != {} or not v.get("fiducial_cuts"):
             why.append("cuts/measure/beams")

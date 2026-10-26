@@ -422,6 +422,7 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
            preprocess_amplitude):
     from experiment import order_identical_particles
     from particle_ids import species_pdgs
+    from experiment import recipe_process_cfg
     cfg = exp.cfg
     names, roles, specs, paths = c["names"], c["roles"], c["specs"], c["paths"]
     use_pids = c["use_pids"]
@@ -470,7 +471,7 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             if use_pids:
                 toks = exp.tokenizer.register_and_encode(pdg_ids)
             else:
-                toks = global_encode(species_pdgs(pdg_ids, s.get("physics")))   # heavy-quark tops: their own mass
+                toks = global_encode(species_pdgs(pdg_ids, s.get("physics"), recipe_process_cfg(s)))   # heavy-quark tops, massless b: their mass
                 exp.tokenizer.register_and_encode(pdg_ids)
             reg.append(np.unique(pdg_ids).tolist())
             slot_pdgs.setdefault(name, [int(x) for x in pdg_ids[0]])

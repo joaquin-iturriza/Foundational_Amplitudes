@@ -80,6 +80,13 @@ def catalog_cfg_for_dataset(name):
     return mg.PROCESSES[keys[0]] if keys and "nfinal" in mg.PROCESSES[keys[0]] else None
 
 
+def recipe_process_cfg(spec):
+    """The PROCESSES entry a recipe spec's pool was generated from (its own name once register_recipe_processes has
+    registered a physics scan, else its base), for the encoding's species (particle_ids.species_pdgs); None if unknown."""
+    import mg5_pipeline_final as mg
+    return mg.PROCESSES.get(spec["name"]) or mg.PROCESSES.get(spec.get("base", spec["name"]))
+
+
 def amp_order_for_dataset(name):
     """Map a dataset name to its coupling-order vector (see above)."""
     import mg5_pipeline_final as mg
@@ -1683,7 +1690,7 @@ class AmplitudeExperiment(BaseExperiment):
                 if use_pids:
                     toks = self.tokenizer.register_and_encode(pdg_ids)
                 else:
-                    toks = global_encode(species_pdgs(pdg_ids, s.get("physics")))   # heavy-quark tops: their own mass
+                    toks = global_encode(species_pdgs(pdg_ids, s.get("physics"), recipe_process_cfg(s)))   # heavy-quark tops, massless b: their mass
                     self.tokenizer.register_and_encode(pdg_ids)  # keep in sync
 
                 # Raw per-slot PDG order (fixed per process) for the Tier-B leg→slot map.

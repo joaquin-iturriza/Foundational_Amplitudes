@@ -201,6 +201,14 @@ for _m in HEAVY_QUARK_MASSES_GEV:
     for _sgn in (1, -1):
         _row = list(PARTICLE_PROPERTIES[6 * _sgn]); _row[2] = float(np.log10(_m))
         BSM_PARTICLE_PROPERTIES[_sgn * (6000000 + _m)] = _row
+# ── the massless b (catalog_v4, D130: the five-flavour scheme, MadGraph's sm-no_b_mass, b massless in beams and finals):
+# the b's quantum numbers at zero mass, so a catalog_v4 pool reads its b as the massless particle it was generated as while
+# catalog_v3's pools (b at 4.7 GeV) keep the row above. Code sign * (5000000 + m) with m = 0, the heavy-quark layer's rule;
+# a pool's PDG 5 is mapped to it by species_pdgs() from its process entry's generated b mass (b_mass_of_process).
+MASSLESS_B_PDG = 5000000
+for _sgn in (1, -1):
+    _row = list(PARTICLE_PROPERTIES[5 * _sgn]); _row[2] = _MASSLESS
+    BSM_PARTICLE_PROPERTIES[_sgn * MASSLESS_B_PDG] = _row
 SM_PDGS = tuple(sorted(PARTICLE_PROPERTIES))      # frozen before the merge below
 assert not set(BSM_PARTICLE_PROPERTIES) & set(SM_PDGS)
 PARTICLE_PROPERTIES = {**PARTICLE_PROPERTIES, **BSM_PARTICLE_PROPERTIES}
@@ -597,10 +605,38 @@ def mass_feature_spec(spin_onehot=False, color_onehot=False,
     }
 
 
-def species_pdgs(pdg_ids, physics=None):
-    """The PDG ids the property table reads for a pool generated with recipe `physics`: a top generated at a heavy-quark
-    mass (physics.masses {6: m}, m in HEAVY_QUARK_MASSES_GEV) becomes that mass's species; anything else is unchanged.
+def b_mass_of_process(cfg, physics=None):
+    """The mass (GeV) the generator gave the external b legs of process entry `cfg` (an mg5_pipeline_final.PROCESSES
+    entry, its recipe `physics` applied), None when it has no external b. A b beam has the entry's `beam_masses` (absent:
+    the pipeline's BEAM_MASS, the b on its 4.7 GeV shell; catalog_v4's `beam_masses: {}` makes every beam massless), a
+    final b its `m_finals` (or `m_final`); a physics.masses {5: m} wins over both. The legs of one entry must agree."""
+    pdg = [int(p) for p in cfg["pdg_ids"]]
+    pm = {abs(int(k)): float(v) for k, v in (((physics or {}).get("masses")) or {}).items()}
+    if 5 in pm:
+        return pm[5] if any(abs(p) == 5 for p in pdg) else None
+    bm = cfg.get("beam_masses")
+    bm = {5: GENERATOR_MASSES_GEV["b"]} if bm is None else {abs(int(k)): float(v) for k, v in bm.items()}
+    if "m_finals" in cfg:
+        mf = [float(x) for x in cfg["m_finals"]]
+    else:
+        mf = cfg.get("m_final", 0.0)
+        mf = [float(x) for x in mf] if isinstance(mf, (list, tuple)) else [float(mf)] * (len(pdg) - 2)
+    ms = [bm.get(5, 0.0) for p in pdg[:2] if abs(p) == 5] + [m for p, m in zip(pdg[2:], mf) if abs(p) == 5]
+    if not ms:
+        return None
+    assert max(ms) - min(ms) < 1e-9, f"{cfg.get('mg5_generate')}: b legs generated at different masses {ms}"
+    return ms[0]
+
+
+def species_pdgs(pdg_ids, physics=None, process=None):
+    """The PDG ids the property table reads for a pool generated with recipe `physics` from process entry `process`
+    (its mg5_pipeline_final.PROCESSES entry): a top generated at a heavy-quark mass (physics.masses {6: m}, m in
+    HEAVY_QUARK_MASSES_GEV) becomes that mass's species; a b generated massless (catalog_v4, b_mass_of_process == 0)
+    becomes the massless b (MASSLESS_B_PDG); anything else is unchanged. Without `process` the b is left as is.
     For the encoding only: the pools, the slot order, the order vectors and the target keep the generated ids."""
+    if process is not None and b_mass_of_process(process, physics) == 0.0:
+        pdg_ids = np.array(pdg_ids, dtype=int, copy=True)
+        pdg_ids[pdg_ids == 5] = MASSLESS_B_PDG; pdg_ids[pdg_ids == -5] = -MASSLESS_B_PDG
     m = ((physics or {}).get("masses") or {})
     m = {abs(int(k)): float(v) for k, v in m.items()}.get(6)
     # a top mass with no species row (catalog_v2's ee_ttbar__mt185 interpolation probe) keeps the table's 172.5, as
