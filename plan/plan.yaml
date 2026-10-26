@@ -157,6 +157,10 @@ entries:
     why: 'cancelled minutes in: the leg-mass invariant used a 1e-8 floor, below float32 noise of the augmented momenta, so
       massless legs'' inputs moved with the Lorentz draw; floors set to 1e-6 in 46841b69 and rerun as FA-ccin2p3-161fc56b'
     at: '2026-10-26T05:09:58+00:00'
+  - tried: smoke of baseline_more_signed FA-ccin2p3-b563ab66
+    why: 'submitted while the CC checkout was still at 3f7c3acd (the sync had refused: my audit json was untracked there),
+      so the spooled script has no such arm and exits; resubmitted at dfa59624 as FA-ccin2p3-19f25524'
+    at: '2026-10-26T06:43:43+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
