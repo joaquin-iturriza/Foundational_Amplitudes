@@ -101,7 +101,10 @@ entries:
   next: 'Sampling sensitivity written up (par. The sampling sensitivity on catalog_v3, b257dc64). Queue done (signed-data
     check, sampling sensitivity); next: new ideas for the preprocessing exploration on catalog_v3, e.g. why the s factor lowers
     the flat-in-log-shat level shift on catalog_v3 (0.30 to 0.10) but raised it on Daniel''s catalog (0.30 to 0.39), a CPU
-    check on the pools; done_when already passes but the entry is continuous (D83).'
+    check on the pools; done_when already passes but the entry is continuous (D83).; THEN the one-loop sign transfer (from
+    par:v3_prep_signed: the sign is set by the kinematics but the arms fail it zero-shot): short catalog_v3 arms trying (a)
+    the sign head given the invariants the per-pool classifier used, (b) the sign loss weighted toward events near the zero
+    crossing, (c) more sign-changing pools in training; under 10 GPU-h runs without asking (CLAUDE.md 0i)'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
