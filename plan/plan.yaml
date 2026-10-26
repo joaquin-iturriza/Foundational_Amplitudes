@@ -98,15 +98,18 @@ entries:
   - D83
   - D129
   - D135
-  next: 'Running: second seeds (seed 43) of the baseline (baseline_seed2, FA-ccin2p3-37a95d76) and of the more-signed-pools
-    arm (baseline_more_signed_seed2, FA-ccin2p3-878d6b9a), 4264 steps each, started 10:10 on CC (~1.3 h). When both end: check
-    V3_SIDECARS and V3_SHORT_DONE in each log, copy $SCRATCH/zz_v3_short_<arm> home into analysis/catalog_v3/data/short_reads/
-    (and runs/catalog_v3_short/<arm>/out_0.log as train.log), add both to prep_signed.py and short_reads.py, and read the
-    third sign arm''s gain (12 of 17 held-out pools better, near zero 14.2% vs 39.4%, zero-shot MSE 1.07x) against the seed-to-seed
-    spread of each arm; update par:v3_prep_signed''s one-seed wording. The pair head''s blow-up is diagnosed (par:v3_prep_signed,
-    075724f5): whole-network jump at steps 1360 to 1445, sign logit flipped, NaNs follow it; per-step grad norms are not logged.
-    Then: before the DyHPO search over the pair head''s sizes and near-zero weighting, bound the pair inputs (normalise or
-    tanh the h_i h_j products) and log the per-step grad norm; price the search against the 30 GPU-h budget before submitting.'
+  next: 'Two seeds read (f86b5242): the more-signed pools'' sign gain is beyond the seed spread (near zero 39.4/41.3% baseline
+    vs 14.2/14.6% arm; axis 13.1/14.8% vs 7.7/8.0%; 14 of 17 pools better on the two-seed mean); the zero-shot cost is not
+    resolved (1.07 at seed 42 inside the baseline''s own seed spread 1.14; 1.32 at seed 43 confounded: the arm''s seed-43
+    run blew up at steps 1360 to 1445, the pair head''s interval, and is read at step 1360). Code in 0a616ed4: model.sign_pair_bound
+    (tanh on the pair channels) and per-step grad norm/loss/lr in <run_dir>/train_steps.npz at each validation; arm baseline_sign_pairs_bounded.
+    Next: site sync, smoke then full run of baseline_sign_pairs_bounded on CC (scripts/job_catalog_v3_short.sh, ~1.3 GPU-h,
+    --item v3_prep_explore); read its train_steps.npz (grad norms before any jump) and compare its sign and zero-shot reads
+    to the baseline''s two seeds. Because the plain sign head also blew up in the same interval, read whether the step 1360
+    to 1445 coincidence is the data order or the lr schedule (lr 8.9e-3, warmup 676 steps) before blaming the pair term. Then
+    the DyHPO search over sign_pair_dim, sign_pair_hidden, sign_near_weight/factor with lr and the template''s other HPs,
+    single fidelity at 4264 steps: priced at 16 trials x ~1.1 GPU-h = ~18 GPU-h plus ~1 GPU-h for the best trial''s zero-shot
+    read, under the 30 GPU-h budget; objective val_loss_no_reg (canonical), held-out signs read on the best only.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
