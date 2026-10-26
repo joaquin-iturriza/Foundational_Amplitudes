@@ -98,13 +98,12 @@ entries:
   - D83
   - D129
   - D135
-  next: 'Smoke of the bounded pair head passed (FA-ccin2p3-fd393560); running on CC: its full arm FA-ccin2p3-1c11d753 (4264
-    steps) and the more-signed-pools seed 43 rerun with the per-step record FA-ccin2p3-5a8c8fde. When they end: check V3_SIDECARS
-    and V3_SHORT_DONE; copy train.log and zz_v3_short_<arm> into analysis/catalog_v3/data/short_reads/; fetch both train_steps.npz;
-    read the seed 43 rerun''s per-step grad norm, loss and lr from step ~1200 to the jump; read the bounded pair head against
-    the unbounded one and the baseline (blow-up or not; held-out wrong-sign share, zero-shot MSE); add to pair_head_blowup.py
-    / prep_signed.py, write up in par:v3_prep_signed with provenance. Then the pair head''s DyHPO search, priced against the
-    30 GPU-h budget.'
+  next: 'Design and submit the DyHPO search (single-fidelity, short catalog_v3 pretraining, 4264 steps) over the pair sign
+    head''s sizes (sign_pair_dim, sign_pair_hidden, sign_pair_bound) and the near-zero weighting (sign_near_weight, sign_near_factor),
+    with lr and warmup searched alongside them, since the blow-ups sit near the lr peak and the bounded head blew up at 646-691.
+    Use MuonAdamW (D155) with a Muon baseline on the same target as the comparison point; the current sign arms are AdamW,
+    so they are not comparable. The objective must include the sign, not val_loss_no_reg alone; this is a design point to
+    settle. Price it under 30 GPU-h: about 1.3 GPU-h per trial on a V100, so about 20 trials in all.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
