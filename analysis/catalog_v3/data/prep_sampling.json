@@ -1,0 +1,1663 @@
+{
+ "train": {
+  "n": 200,
+  "raw_shift_flat": 0.30445,
+  "raw_sd_flat": 0.9798,
+  "raw_shift_low": 0.13474999999999998,
+  "raw_sd_low": 1.045,
+  "dless_shift_flat": 0.1013,
+  "dless_sd_flat": 0.97245,
+  "dless_shift_low": 0.2207,
+  "dless_sd_low": 1.1245,
+  "qperp_shift_flat": 0.1135,
+  "qperp_sd_flat": 0.9842,
+  "qperp_shift_low": 0.20450000000000002,
+  "qperp_sd_low": 1.102,
+  "soft_shift_flat": 0.11410000000000001,
+  "soft_sd_flat": 0.9843,
+  "soft_shift_low": 0.19855,
+  "soft_sd_low": 1.103
+ },
+ "held": {
+  "n": 602,
+  "raw_shift_flat": 0.2497,
+  "raw_sd_flat": 0.98045,
+  "raw_shift_low": 0.19124999999999998,
+  "raw_sd_low": 1.058,
+  "dless_shift_flat": 0.07404,
+  "dless_sd_flat": 0.9719,
+  "dless_shift_low": 0.25095,
+  "dless_sd_low": 1.114,
+  "qperp_shift_flat": 0.087465,
+  "qperp_sd_flat": 0.9773000000000001,
+  "qperp_shift_low": 0.20505,
+  "qperp_sd_low": 1.102,
+  "soft_shift_flat": 0.08707000000000001,
+  "soft_sd_flat": 0.9779,
+  "soft_shift_low": 0.2019,
+  "soft_sd_low": 1.1045
+ },
+ "missing": {},
+ "axes": {
+  "H1": {
+   "n": 54,
+   "baseline": {
+    "uni": [
+     1.0074999999999998,
+     0.1698,
+     0.65595
+    ],
+    "flat": [
+     0.93895,
+     0.14345,
+     0.66725
+    ],
+    "low": [
+     1.097,
+     0.17470000000000002,
+     0.782
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     0.8432,
+     0.056444999999999995,
+     0.69625
+    ],
+    "flat": [
+     0.7918499999999999,
+     0.050955,
+     0.67835
+    ],
+    "low": [
+     1.013,
+     0.08918000000000001,
+     0.8417
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     0.73795,
+     0.14175,
+     0.5335
+    ],
+    "flat": [
+     0.7328,
+     0.12065000000000001,
+     0.46714999999999995
+    ],
+    "low": [
+     0.8528,
+     0.15889999999999999,
+     0.57155
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     0.60495,
+     0.087495,
+     0.45904999999999996
+    ],
+    "flat": [
+     0.57225,
+     0.075615,
+     0.4716
+    ],
+    "low": [
+     0.69045,
+     0.080175,
+     0.55155
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     0.66015,
+     0.034065,
+     0.5306500000000001
+    ],
+    "flat": [
+     0.663,
+     0.041190000000000004,
+     0.4991
+    ],
+    "low": [
+     0.8178,
+     0.055745,
+     0.65045
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     0.7727999999999999,
+     0.06382,
+     0.57035
+    ],
+    "flat": [
+     0.7939499999999999,
+     0.0513,
+     0.5324
+    ],
+    "low": [
+     0.9609000000000001,
+     0.06801499999999999,
+     0.6899500000000001
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     0.7452000000000001,
+     0.06314,
+     0.63475
+    ],
+    "flat": [
+     0.7203999999999999,
+     0.05545,
+     0.623
+    ],
+    "low": [
+     0.8161,
+     0.082285,
+     0.7609
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     0.92705,
+     0.13185,
+     0.76625
+    ],
+    "flat": [
+     0.8911,
+     0.087085,
+     0.7388
+    ],
+    "low": [
+     1.0535,
+     0.14205,
+     0.9057999999999999
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless_shat",
+     "dimensionless_context",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_blend050",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_hybrid",
+     "dimensionless_context",
+     "dimensionless_blend025",
+     "dimensionless_shat",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_hybrid",
+    "flat": "dimensionless_hybrid",
+    "low": "dimensionless_hybrid"
+   }
+  },
+  "H2": {
+   "n": 168,
+   "baseline": {
+    "uni": [
+     1.1155,
+     0.19985,
+     0.79
+    ],
+    "flat": [
+     1.158,
+     0.18225,
+     0.7814
+    ],
+    "low": [
+     1.309,
+     0.2113,
+     0.97655
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     1.0419999999999998,
+     0.11299999999999999,
+     0.84585
+    ],
+    "flat": [
+     0.9883500000000001,
+     0.10575,
+     0.815
+    ],
+    "low": [
+     1.233,
+     0.1487,
+     0.994
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     0.85185,
+     0.12355,
+     0.66595
+    ],
+    "flat": [
+     0.86425,
+     0.14350000000000002,
+     0.6464
+    ],
+    "low": [
+     0.9962500000000001,
+     0.14325,
+     0.788
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     0.8202499999999999,
+     0.13915,
+     0.5569500000000001
+    ],
+    "flat": [
+     0.8163,
+     0.13205,
+     0.57135
+    ],
+    "low": [
+     0.90835,
+     0.11249999999999999,
+     0.6743
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     0.90245,
+     0.07864,
+     0.6778500000000001
+    ],
+    "flat": [
+     0.8662000000000001,
+     0.08803,
+     0.65995
+    ],
+    "low": [
+     1.0675,
+     0.08149,
+     0.8592
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     0.99695,
+     0.1159,
+     0.77875
+    ],
+    "flat": [
+     0.96095,
+     0.15605000000000002,
+     0.75305
+    ],
+    "low": [
+     1.17,
+     0.1399,
+     0.9651000000000001
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     1.0835,
+     0.09457499999999999,
+     0.8432
+    ],
+    "flat": [
+     1.0350000000000001,
+     0.09819,
+     0.8190999999999999
+    ],
+    "low": [
+     1.2555,
+     0.12585,
+     1.0605
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     1.1665,
+     0.10755,
+     0.9428
+    ],
+    "flat": [
+     1.1155,
+     0.1255,
+     0.86195
+    ],
+    "low": [
+     1.3679999999999999,
+     0.13705,
+     1.1325
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_hybrid",
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "baseline",
+     "dimensionless_twin"
+    ],
+    "flat": [
+     "dimensionless_hybrid",
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_hybrid",
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "baseline",
+     "dimensionless_twin"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": true
+   },
+   "best": {
+    "uni": "dimensionless_hybrid",
+    "flat": "dimensionless_hybrid",
+    "low": "dimensionless_hybrid"
+   }
+  },
+  "H2p5": {
+   "n": 40,
+   "baseline": {
+    "uni": [
+     46.230000000000004,
+     42.465,
+     2.3475
+    ],
+    "flat": [
+     36.765,
+     32.78,
+     2.551
+    ],
+    "low": [
+     44.585,
+     42.515,
+     2.5235000000000003
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     1.2120000000000002,
+     0.10135,
+     1.0234999999999999
+    ],
+    "flat": [
+     1.1225,
+     0.12995,
+     1.0033
+    ],
+    "low": [
+     1.3355000000000001,
+     0.12735000000000002,
+     1.1425
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     14.805,
+     13.635,
+     0.69155
+    ],
+    "flat": [
+     14.649999999999999,
+     13.92,
+     0.7123999999999999
+    ],
+    "low": [
+     15.52,
+     14.004999999999999,
+     0.8243
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     1.195,
+     0.44565,
+     0.68225
+    ],
+    "flat": [
+     1.1524999999999999,
+     0.44889999999999997,
+     0.6740999999999999
+    ],
+    "low": [
+     1.3065,
+     0.36465000000000003,
+     0.8563000000000001
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     1.2389999999999999,
+     0.25635,
+     0.8387
+    ],
+    "flat": [
+     1.23,
+     0.25670000000000004,
+     0.9202
+    ],
+    "low": [
+     1.3175,
+     0.1522,
+     1.05
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     1.1219999999999999,
+     0.1855,
+     0.79985
+    ],
+    "flat": [
+     1.045,
+     0.1789,
+     0.79305
+    ],
+    "low": [
+     1.198,
+     0.2069,
+     0.9641500000000001
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     1.0314999999999999,
+     0.093065,
+     0.9306
+    ],
+    "flat": [
+     1.0535,
+     0.12225,
+     0.8834
+    ],
+    "low": [
+     1.0965,
+     0.10234,
+     1.0255
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     1.311,
+     0.13169999999999998,
+     0.9798
+    ],
+    "flat": [
+     1.1829999999999998,
+     0.1381,
+     0.94635
+    ],
+    "low": [
+     1.396,
+     0.10313,
+     1.0939999999999999
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_context",
+     "dimensionless_blend050",
+     "dimensionless_hybrid",
+     "dimensionless",
+     "dimensionless_blend025",
+     "dimensionless_twin",
+     "dimensionless_shat",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_blend050",
+     "dimensionless_context",
+     "dimensionless",
+     "dimensionless_hybrid",
+     "dimensionless_twin",
+     "dimensionless_blend025",
+     "dimensionless_shat",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_context",
+     "dimensionless_blend050",
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless",
+     "dimensionless_twin",
+     "dimensionless_shat",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_context",
+    "flat": "dimensionless_blend050",
+    "low": "dimensionless_context"
+   }
+  },
+  "H3": {
+   "n": 237,
+   "baseline": {
+    "uni": [
+     1.856,
+     0.4755,
+     0.8794
+    ],
+    "flat": [
+     1.912,
+     0.5014,
+     0.812
+    ],
+    "low": [
+     2.042,
+     0.4694,
+     1.022
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     1.669,
+     0.5205,
+     0.8031
+    ],
+    "flat": [
+     1.655,
+     0.5415,
+     0.7747
+    ],
+    "low": [
+     1.855,
+     0.5007,
+     0.926
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     1.508,
+     0.4154,
+     0.7771
+    ],
+    "flat": [
+     1.632,
+     0.4419,
+     0.7632
+    ],
+    "low": [
+     1.772,
+     0.4857,
+     0.9215
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     1.937,
+     0.824,
+     0.7811
+    ],
+    "flat": [
+     2.004,
+     0.8999,
+     0.7565
+    ],
+    "low": [
+     2.203,
+     0.8748,
+     0.9023
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     1.843,
+     0.5426,
+     0.7194
+    ],
+    "flat": [
+     1.929,
+     0.6081,
+     0.7287
+    ],
+    "low": [
+     1.959,
+     0.569,
+     0.905
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     1.837,
+     0.5503,
+     0.8939
+    ],
+    "flat": [
+     1.943,
+     0.5777,
+     0.8247
+    ],
+    "low": [
+     2.002,
+     0.5324,
+     1.036
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     1.463,
+     0.3476,
+     0.7951
+    ],
+    "flat": [
+     1.449,
+     0.4084,
+     0.7598
+    ],
+    "low": [
+     1.565,
+     0.2968,
+     0.9306
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     1.818,
+     0.5463,
+     0.8496
+    ],
+    "flat": [
+     1.815,
+     0.5373,
+     0.8297
+    ],
+    "low": [
+     1.945,
+     0.5832,
+     1.019
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_twin",
+     "dimensionless_blend050",
+     "dimensionless_blend025",
+     "baseline",
+     "dimensionless_hybrid"
+    ],
+    "flat": [
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless_hybrid"
+    ],
+    "low": [
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_twin",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "baseline",
+     "dimensionless_hybrid"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_context",
+    "flat": "dimensionless_context",
+    "low": "dimensionless_context"
+   }
+  },
+  "H5": {
+   "n": 30,
+   "baseline": {
+    "uni": [
+     1.223,
+     0.38034999999999997,
+     0.57865
+    ],
+    "flat": [
+     1.293,
+     0.3544,
+     0.57245
+    ],
+    "low": [
+     1.3075,
+     0.34815,
+     0.69575
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     1.0915,
+     0.2526,
+     0.5441
+    ],
+    "flat": [
+     1.1275,
+     0.28969999999999996,
+     0.5461
+    ],
+    "low": [
+     1.1429999999999998,
+     0.31025,
+     0.7223999999999999
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     0.8206500000000001,
+     0.26965,
+     0.47995
+    ],
+    "flat": [
+     0.84865,
+     0.26185,
+     0.48205
+    ],
+    "low": [
+     0.8404,
+     0.2138,
+     0.50455
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     0.88635,
+     0.28965,
+     0.44655
+    ],
+    "flat": [
+     0.93615,
+     0.27480000000000004,
+     0.46109999999999995
+    ],
+    "low": [
+     0.99085,
+     0.2522,
+     0.4507
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     0.92945,
+     0.2707,
+     0.43485
+    ],
+    "flat": [
+     1.135,
+     0.2685,
+     0.41359999999999997
+    ],
+    "low": [
+     1.0625,
+     0.25075000000000003,
+     0.5178
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     0.93285,
+     0.16970000000000002,
+     0.46155
+    ],
+    "flat": [
+     1.0297,
+     0.1869,
+     0.44930000000000003
+    ],
+    "low": [
+     0.96615,
+     0.19824999999999998,
+     0.53145
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     1.2975,
+     0.32185,
+     0.7233499999999999
+    ],
+    "flat": [
+     1.233,
+     0.2518,
+     0.7059500000000001
+    ],
+    "low": [
+     1.3820000000000001,
+     0.34230000000000005,
+     0.75635
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     0.844,
+     0.30845,
+     0.5022
+    ],
+    "flat": [
+     0.8744000000000001,
+     0.30315000000000003,
+     0.538
+    ],
+    "low": [
+     0.976,
+     0.33899999999999997,
+     0.57715
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_shat",
+     "dimensionless_twin",
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "baseline",
+     "dimensionless_context"
+    ],
+    "flat": [
+     "dimensionless_shat",
+     "dimensionless_twin",
+     "dimensionless_hybrid",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_blend025",
+     "dimensionless_context",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_shat",
+     "dimensionless_blend050",
+     "dimensionless_twin",
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless",
+     "baseline",
+     "dimensionless_context"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_shat",
+    "flat": "dimensionless_shat",
+    "low": "dimensionless_shat"
+   }
+  },
+  "H6": {
+   "n": 8,
+   "baseline": {
+    "uni": [
+     0.21744999999999998,
+     0.025375,
+     0.16485
+    ],
+    "flat": [
+     0.22870000000000001,
+     0.035554999999999996,
+     0.1643
+    ],
+    "low": [
+     0.29190000000000005,
+     0.024184999999999998,
+     0.2273
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     0.1351,
+     0.0066085,
+     0.118815
+    ],
+    "flat": [
+     0.14325,
+     0.0056955,
+     0.124015
+    ],
+    "low": [
+     0.16935,
+     0.0074595,
+     0.1477
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     0.1704,
+     0.055540000000000006,
+     0.07272999999999999
+    ],
+    "flat": [
+     0.18355,
+     0.06216,
+     0.07108500000000001
+    ],
+    "low": [
+     0.19815,
+     0.07206,
+     0.09703500000000001
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     0.058120000000000005,
+     0.0015040000000000001,
+     0.052965
+    ],
+    "flat": [
+     0.0644,
+     0.001728,
+     0.05624
+    ],
+    "low": [
+     0.07172,
+     0.0038190000000000003,
+     0.06758
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     0.06491,
+     0.0059854999999999995,
+     0.0555
+    ],
+    "flat": [
+     0.062265,
+     0.0039134999999999994,
+     0.056305
+    ],
+    "low": [
+     0.085965,
+     0.0074985,
+     0.07653
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     0.11215,
+     0.019485000000000002,
+     0.085395
+    ],
+    "flat": [
+     0.103975,
+     0.01541,
+     0.079695
+    ],
+    "low": [
+     0.15889999999999999,
+     0.016625,
+     0.11925
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     0.15975,
+     0.028295,
+     0.08989
+    ],
+    "flat": [
+     0.1573,
+     0.023535,
+     0.08527000000000001
+    ],
+    "low": [
+     0.1942,
+     0.034555,
+     0.127
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     0.1968,
+     0.0080035,
+     0.11149999999999999
+    ],
+    "flat": [
+     0.2257,
+     0.0091855,
+     0.10985
+    ],
+    "low": [
+     0.22804999999999997,
+     0.00802,
+     0.1547
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_blend025",
+     "dimensionless_hybrid",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_hybrid",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless_twin",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": true
+   },
+   "best": {
+    "uni": "dimensionless_hybrid",
+    "flat": "dimensionless_blend025",
+    "low": "dimensionless_hybrid"
+   }
+  },
+  "H7c": {
+   "n": 40,
+   "baseline": {
+    "uni": [
+     0.5437000000000001,
+     0.02723,
+     0.3788
+    ],
+    "flat": [
+     0.55935,
+     0.04418,
+     0.3609
+    ],
+    "low": [
+     0.65615,
+     0.04587,
+     0.48475
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     0.43695,
+     0.011369,
+     0.39695
+    ],
+    "flat": [
+     0.372,
+     0.01417,
+     0.35805
+    ],
+    "low": [
+     0.4959,
+     0.018385,
+     0.4678
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     0.3407,
+     0.008691,
+     0.2804
+    ],
+    "flat": [
+     0.3341,
+     0.0121675,
+     0.25405
+    ],
+    "low": [
+     0.4457,
+     0.01205,
+     0.32894999999999996
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     0.3661,
+     0.07429,
+     0.23275
+    ],
+    "flat": [
+     0.3653,
+     0.07342499999999999,
+     0.21239999999999998
+    ],
+    "low": [
+     0.3997,
+     0.07417,
+     0.27035
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     0.36055,
+     0.050665,
+     0.28
+    ],
+    "flat": [
+     0.36285,
+     0.05262,
+     0.26355
+    ],
+    "low": [
+     0.45535000000000003,
+     0.047380000000000005,
+     0.35665
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     0.4451,
+     0.024375,
+     0.351
+    ],
+    "flat": [
+     0.4255,
+     0.03671,
+     0.32099999999999995
+    ],
+    "low": [
+     0.52945,
+     0.026505,
+     0.444
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     0.4171,
+     0.009412,
+     0.4041
+    ],
+    "flat": [
+     0.37485,
+     0.011005,
+     0.35785
+    ],
+    "low": [
+     0.51665,
+     0.0103885,
+     0.48985
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     0.4403,
+     0.0077345,
+     0.43420000000000003
+    ],
+    "flat": [
+     0.3891,
+     0.010985,
+     0.3824
+    ],
+    "low": [
+     0.5218499999999999,
+     0.015225,
+     0.51105
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_hybrid",
+     "dimensionless_context",
+     "dimensionless",
+     "dimensionless_twin",
+     "dimensionless_blend050",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_hybrid",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_twin",
+     "dimensionless_blend050",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_hybrid",
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless",
+     "dimensionless_context",
+     "dimensionless_twin",
+     "dimensionless_blend050",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_shat",
+    "flat": "dimensionless_shat",
+    "low": "dimensionless_hybrid"
+   }
+  },
+  "H7E": {
+   "n": 40,
+   "baseline": {
+    "uni": [
+     64.405,
+     39.345,
+     19.9
+    ],
+    "flat": [
+     36.260000000000005,
+     14.345,
+     18.915
+    ],
+    "low": [
+     53.675,
+     30.195,
+     20.0
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     2.8834999999999997,
+     0.3367,
+     1.5310000000000001
+    ],
+    "flat": [
+     2.3455,
+     0.17654999999999998,
+     1.3125
+    ],
+    "low": [
+     4.250500000000001,
+     0.9117999999999999,
+     2.112
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     1.726,
+     0.2747,
+     1.1125
+    ],
+    "flat": [
+     1.3399999999999999,
+     0.25235,
+     0.98185
+    ],
+    "low": [
+     2.5875,
+     0.58945,
+     1.5785
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     2.3070000000000004,
+     0.25175000000000003,
+     1.09285
+    ],
+    "flat": [
+     1.9435,
+     0.33294999999999997,
+     0.891
+    ],
+    "low": [
+     2.8145,
+     0.3822,
+     1.5354999999999999
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     2.0075,
+     0.2434,
+     1.2645
+    ],
+    "flat": [
+     1.7255,
+     0.22039999999999998,
+     1.07725
+    ],
+    "low": [
+     2.712,
+     0.13795000000000002,
+     1.685
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     2.1900000000000004,
+     0.2202,
+     1.431
+    ],
+    "flat": [
+     1.5915,
+     0.1336,
+     1.1684999999999999
+    ],
+    "low": [
+     2.7555,
+     0.3778,
+     1.925
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     2.293,
+     0.1829,
+     1.5945
+    ],
+    "flat": [
+     1.7525,
+     0.10785,
+     1.229
+    ],
+    "low": [
+     3.048,
+     0.5955999999999999,
+     1.9905000000000002
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     3.117,
+     0.4294,
+     1.4885000000000002
+    ],
+    "flat": [
+     2.085,
+     0.23320000000000002,
+     1.321
+    ],
+    "low": [
+     3.879,
+     0.8952500000000001,
+     2.043
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless_context",
+     "dimensionless_hybrid",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_shat",
+     "dimensionless_blend050",
+     "dimensionless_blend025",
+     "dimensionless_context",
+     "dimensionless_hybrid",
+     "dimensionless_twin",
+     "dimensionless",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_shat",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless_hybrid",
+     "dimensionless_context",
+     "dimensionless_twin",
+     "dimensionless",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_shat",
+    "flat": "dimensionless_shat",
+    "low": "dimensionless_shat"
+   }
+  },
+  "all": {
+   "n": 617,
+   "baseline": {
+    "uni": [
+     1.482,
+     0.3331,
+     0.8621
+    ],
+    "flat": [
+     1.491,
+     0.3464,
+     0.8248
+    ],
+    "low": [
+     1.767,
+     0.3446,
+     1.055
+    ]
+   },
+   "dimensionless": {
+    "uni": [
+     1.16,
+     0.162,
+     0.7749
+    ],
+    "flat": [
+     1.129,
+     0.1695,
+     0.7458
+    ],
+    "low": [
+     1.318,
+     0.2013,
+     0.9201
+    ]
+   },
+   "dimensionless_shat": {
+    "uni": [
+     1.146,
+     0.2298,
+     0.653
+    ],
+    "flat": [
+     1.124,
+     0.2393,
+     0.6337
+    ],
+    "low": [
+     1.291,
+     0.2391,
+     0.7724
+    ]
+   },
+   "dimensionless_hybrid": {
+    "uni": [
+     1.122,
+     0.2419,
+     0.5875
+    ],
+    "flat": [
+     1.136,
+     0.2621,
+     0.5852
+    ],
+    "low": [
+     1.267,
+     0.2458,
+     0.6975
+    ]
+   },
+   "dimensionless_blend025": {
+    "uni": [
+     1.071,
+     0.1862,
+     0.6451
+    ],
+    "flat": [
+     1.087,
+     0.1891,
+     0.6192
+    ],
+    "low": [
+     1.23,
+     0.1601,
+     0.7931
+    ]
+   },
+   "dimensionless_blend050": {
+    "uni": [
+     1.128,
+     0.1764,
+     0.7236
+    ],
+    "flat": [
+     1.098,
+     0.1888,
+     0.7144
+    ],
+    "low": [
+     1.261,
+     0.1992,
+     0.8707
+    ]
+   },
+   "dimensionless_context": {
+    "uni": [
+     1.095,
+     0.1247,
+     0.7776
+    ],
+    "flat": [
+     1.063,
+     0.122,
+     0.7472
+    ],
+    "low": [
+     1.274,
+     0.1456,
+     0.9063
+    ]
+   },
+   "dimensionless_twin": {
+    "uni": [
+     1.187,
+     0.1692,
+     0.8258
+    ],
+    "flat": [
+     1.154,
+     0.1654,
+     0.8013
+    ],
+    "low": [
+     1.395,
+     0.2005,
+     0.9726
+    ]
+   },
+   "order": {
+    "uni": [
+     "dimensionless_blend025",
+     "dimensionless_context",
+     "dimensionless_hybrid",
+     "dimensionless_blend050",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "flat": [
+     "dimensionless_context",
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_hybrid",
+     "dimensionless_twin",
+     "baseline"
+    ],
+    "low": [
+     "dimensionless_blend025",
+     "dimensionless_blend050",
+     "dimensionless_hybrid",
+     "dimensionless_context",
+     "dimensionless_shat",
+     "dimensionless",
+     "dimensionless_twin",
+     "baseline"
+    ]
+   },
+   "same_order": {
+    "flat": false,
+    "low": false
+   },
+   "best": {
+    "uni": "dimensionless_blend025",
+    "flat": "dimensionless_context",
+    "low": "dimensionless_blend025"
+   }
+  }
+ }
+}
