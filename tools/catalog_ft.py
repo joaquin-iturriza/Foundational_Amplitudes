@@ -4,7 +4,8 @@ D144/D146), modelled on tools/lowd_ft.py: the small-D cells (D = 10, 10^1.5, 10^
 the parent's remaining HPs (run.py on the parent's own config.yaml, only the recipe, the steps and the fine-tune block
 changed), the target's statistics fitted on the probe's own train split and the off-shellness on the parent's scale
 (as the small-D round), validation on the probe's first 2000 validation events (the zero-shot read's), and the
-fine-tune's optimizer chosen apart from the parent's (AdamW or MuonAdamW: the 2x2 of parent and fine-tune optimizers).
+fine-tune's optimizer chosen apart from the parent's (AdamW or MuonAdamW: the 2x2 of parent and fine-tune optimizers;
+MuonAdamW unless --optimizer says otherwise, the user's switch to Muon for fine-tunes too, 2026-10-26, D155).
 --scratch trains the same cells from a fresh initialisation instead (no pretrained weights, the target's and the
 off-shellness statistics the probe's own), with the parent's config and HPs otherwise: whether fine-tuning a current
 pretraining beats training from scratch at small D (the user, 2026-10-26).
@@ -58,7 +59,9 @@ def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scr
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--parent", required=True, help="the pretraining's run dir (config.yaml, models/)")
-    ap.add_argument("--optimizer", required=True, choices=["AdamW", "MuonAdamW"])
+    ap.add_argument("--optimizer", default="MuonAdamW", choices=["AdamW", "MuonAdamW"],
+                    help="the fine-tune's (or --scratch run's) optimizer; MuonAdamW by default, the user's switch to "
+                         "Muon for pretraining and fine-tuning (2026-10-26, D155)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--probes", nargs="*", default=PROBES)
     ap.add_argument("--only", nargs="*", help="cells by tag (d2 d3 d4 d5)")

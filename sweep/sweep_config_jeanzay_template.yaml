@@ -31,6 +31,11 @@ fixed_params:
   training.regularization: L2
   training.save_intermediate: 'false'
   training.scheduler: CosineAnnealingLR
+  # MuonAdamW (optim/muon.py) for pretraining and fine-tuning, the user's switch to Muon (2026-10-26, "seems obvious
+  # that we should switch to muon", D155; docs/results.tex par:v3_muon). config/default.yaml keeps AdamW so sweeps
+  # and reruns written before the switch keep the optimizer they ran with; a new sweep sets it here. A fine-tune whose
+  # base_config is a Muon parent inherits MuonAdamW from the parent's config.yaml.
+  training.optimizer: MuonAdamW
 
 # Search space centred on the empirical HPO optima (422 converged sweeps; see
 # docs/results.tex sec:lrlaw). lr obeys the inverted-U law across horizon and
@@ -44,13 +49,20 @@ fixed_params:
 # the high-D row of analysis/hpo_optima/hpo_optima.json). For a big foundation run
 # (per-proc D~30-100k) the (high-D,high-t) corner is off the measured grid, so the
 # centre is an extrapolation of the high-D decay: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
-# @100k steps. The band below is a wide default for when (t,D) are not yet fixed.
+# @100k steps. That surface was measured with AdamW. For MuonAdamW the only measured centre is the Muon search's
+# best on catalog_v3's short pretraining: lr 5e-3, muon_weight_decay 0.0217 at 4264 steps (docs/results.tex
+# par:v3_muon, sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml); the band below is +/-1/2 decade around it
+# [c/3, 3c]. Re-centre it at your (t,D) once a Muon optimum at another horizon exists.
 # (There is NO "is the loss floored?" test -- never a measured axis; only t and D.)
 search_space:
 - name: training.lr
   type: float_log
-  low: 1.0e-03      # default band [1e-3, 3e-2]; replace with [c/3, 3c] once (t,D) are set
-  high: 3.0e-02
+  low: 1.667e-03    # [c/3, 3c] around c = 5e-3, the Muon search's best at 4264 steps
+  high: 1.5e-02
+- name: training.muon_weight_decay
+  type: float_log
+  low: 1.0e-03      # the Muon search's window (best 0.0217); decoupled, Muon's matrices only
+  high: 0.3
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10      # optima p5-p95 within [2.5e-11, 9.8e-7]; cap high at 1e-6
