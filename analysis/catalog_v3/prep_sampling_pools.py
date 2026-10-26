@@ -60,6 +60,32 @@ def w_low(Lm):
     return np.where(low, 0.5 / low.sum(), 0.5 / (~low).sum())
 
 
+def match_skip(a, b):
+    """Order-preserving match of sorted b (m values) into sorted a (n >= m values), skipping n - m of a, with the least
+    sum of squared differences: the index into a of each b."""
+    n, m = len(a), len(b); k = n - m
+    if k == 0:
+        return np.arange(n)
+    INF = np.inf
+    cost = np.full(k + 1, INF); cost[0] = 0.0
+    skip = np.zeros((n, k + 1), bool)
+    js = np.arange(k + 1)
+    for i in range(n):
+        bi = i - js                                    # the b matched to a[i] when j of a[:i] were skipped
+        ok = (bi >= 0) & (bi < m)
+        take = np.where(ok, cost + (a[i] - b[np.clip(bi, 0, m - 1)]) ** 2, INF)
+        sk = np.concatenate([[INF], cost[:-1]])        # skip a[i]: j - 1 skipped before
+        skip[i] = sk < take
+        cost = np.minimum(take, sk)
+    out = np.empty(m, int); j = k
+    for i in range(n - 1, -1, -1):
+        if skip[i, j]:
+            j -= 1
+        else:
+            out[i - j] = i
+    return out
+
+
 def r4(x):
     return float(f"{x:.4g}")
 
@@ -110,22 +136,22 @@ def one(args):
                 net[arm] = {"why": "no prediction (q empty)"}
                 continue
             tl = t - z["logF"].astype(np.float64) if len(z["logF"]) == n else t
-            # the read loads the pool's first n events and shuffles them: each saved event is matched to the pool event
-            # nearest in log|M|^2. An event at the sign head's floor (abslog pools; the floor is on |M|^2 F, so t - logF
-            # there is no log|M|^2) cannot be matched and is left out, its count reported (n_floor); every weighting
-            # below is over the matched events
+            # the read loads the pool's first n events and shuffles them. An event at the sign head's floor (abslog
+            # pools; the floor is on |M|^2 F, so t - logF there is no log|M|^2) cannot be matched and is left out, its
+            # count reported (n_floor). The other m saved events, sorted on log|M|^2, are matched in order to the pool's
+            # first n sorted the same way, skipping the n - m pool events whose |M|^2 F lies at the floor (least squared
+            # differences, match_skip); with none at the floor this is matching by rank. Every weighting below is over
+            # the matched events.
             fl = (z["at_floor"].astype(bool) if "at_floor" in z.files and len(z["at_floor"]) == n
                   else np.zeros(n, bool))
-            o = np.argsort(la[:n], kind="stable"); ls = la[:n][o]
-            j = np.clip(np.searchsorted(ls, tl), 1, n - 1)
-            j = np.where(np.abs(ls[j - 1] - tl) <= np.abs(ls[j] - tl), j - 1, j)
-            perm = o[j]
+            io = np.flatnonzero(~fl); io = io[np.argsort(tl[io], kind="stable")]
+            op = np.argsort(la[:n], kind="stable")
+            perm = np.empty(n, int)
+            perm[io] = op[match_skip(la[:n][op], tl[io])]
             keep = ~fl & (amp[perm] != 0)
-            uniq = len(np.unique(perm[keep])) == keep.sum()
             al = float(np.max(np.abs(tl[keep] - la[perm][keep]))) if keep.any() else np.inf
-            if not (al <= ALIGN_TOL and uniq):
-                net[arm] = {"why": "not aligned" if uniq else "not aligned (two events on one pool event)",
-                            "align": r4(al) if np.isfinite(al) else None}
+            if not al <= ALIGN_TOL:
+                net[arm] = {"why": "not aligned", "align": r4(al) if np.isfinite(al) else None}
                 continue
             t, q, perm = t[keep], q[keep], perm[keep]
             n = int(keep.sum())
