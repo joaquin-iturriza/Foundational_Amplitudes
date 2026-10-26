@@ -18,7 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 ARMS = ("baseline", "dimensionless", "dimensionless_shat", "dimensionless_hybrid", "dimensionless_blend050", "dimensionless_blend025",
         "dimensionless_context", "dimensionless_twin", "dimensionless_pp", "dimensionless_seed2", "dimensionless_muon",
-        "dimensionless_muon_seed2")
+        "dimensionless_muon_seed2", "baseline_sign_pairs", "baseline_sign_near")
 # the axes each arm's job reads (scripts/job_catalog_v3_short.sh): every arm the eight, the twin also its two
 READ = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
 READS = {arm: READ + (("H3p", "H4") if arm == "dimensionless_twin" else ()) for arm in

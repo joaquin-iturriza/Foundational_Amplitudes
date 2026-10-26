@@ -28,6 +28,10 @@ PCT = ("neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near", "err_
 ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "shat", "dimensionless_hybrid": "hyb",
         "dimensionless_blend025": "b25", "dimensionless_blend050": "b50", "dimensionless_context": "ctx",
         "dimensionless_twin": "twin"}
+# the two sign arms, each the baseline with one change at its HPs (scripts/job_catalog_v3_short.sh): a pair term in the
+# sign logit, and the near-zero events' sign loss weighted 10 times. Scored like ARMS; the ranges over arms quoted in
+# the notes before them (e+e- -> c cbar g, the all-negative pools) stay over ARMS, the sign arms' values are apart
+SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near"}
 
 
 def load_raw():
@@ -43,15 +47,66 @@ def key(r):
     return f[: f.index("GeV_") + 3]                    # v3_<name>_<lo>-<hi>GeV, the scorer's pool name
 
 
-def arm_signs(arm):
+def arm_signs(arm, field="wrong_sign"):
     f = os.path.join(HERE, "data", "short_reads", arm, "H5_signed.txt")
     out = {}
     for l in open(f):
         if "SIGNED_AB " in l:
             d = json.loads(l.split("SIGNED_AB ", 1)[1])
             if "skipped" not in d and "error" not in d:
-                out[d["pool"]] = d["wrong_sign"]
+                out[d["pool"]] = d[field]
     return out
+
+
+def sign_arms(h5all, n_axis, flat, out):
+    """The two sign arms against the baseline on the held-out one-loop pools: the median wrong-sign share over the
+    pools the scorer reads as sign-changing, and over their events within a factor 10 of zero (the scorer's near
+    events), the mean over the whole one-loop axis (n_axis pools of 2000 validation events each; a pool the scorer
+    reads as one sign is a plain log, so no arm makes a sign error there, nor does the data's one sign), the median
+    magnitude MSE on the scored pools, and the zero-shot MSE on log|M|^2 per probe over every held-out axis
+    (data/short_reads.json): the median of its ratio to the baseline's on the same probes, how many probes it is
+    above, and the median per axis."""
+    sr = json.load(open(os.path.join(HERE, "data", "short_reads.json")))
+    b = arm_signs("baseline")
+    flat["axis_n_pools"] = n_axis
+    flat["axis_major"] = round(100 * sum(h5all[p]["err_major"] for p in b if p in h5all) / n_axis, 1)
+    flat["axis_mlp"] = round(100 * sum(h5all[p]["err_mlp"] for p in b if p in h5all) / n_axis, 1)
+    out["sign_arms"] = {}
+    for arm, sh in (("baseline", "base"),) + tuple(SIGN_ARMS.items()):
+        w = arm_signs(arm); wn = arm_signs(arm, "wrong_sign_near"); mm = arm_signs(arm, "mse_mag")
+        ps_ = sorted(set(w) & set(h5all))
+        o = {"n": len(ps_), "wrong": med([w[p] for p in ps_]), "wrong_near": med([wn[p] for p in ps_]),
+             "axis_wrong": sum(w[p] for p in ps_) / n_axis, "mse_mag": med([mm[p] for p in ps_])}
+        if arm != "baseline":
+            o["better_than_base"] = int(sum(w[p] < b[p] for p in ps_))
+            o["worse_than_base"] = int(sum(w[p] > b[p] for p in ps_))
+            rat, ax = [], {}
+            for a, ra in sr[arm].items():
+                pb = sr["baseline"].get(a, {}).get("probes", {})
+                rr = [v["mse"] / pb[p]["mse"] for p, v in ra.get("probes", {}).items() if p in pb and pb[p]["mse"] > 0]
+                rat += rr
+                ax[a] = {"mse": ra.get("mse"), "base_mse": sr["baseline"][a].get("mse"), "ratio": med(rr)}
+            o.update({"mse_ratio": med(rat), "n_probes": len(rat), "n_probes_worse": int(sum(r > 1 for r in rat)),
+                      "axes": ax})
+            flat[f"{sh}_mse_ratio"] = round(o["mse_ratio"], 2)
+            flat[f"{sh}_n_probes"] = o["n_probes"]
+            flat[f"{sh}_n_probes_worse"] = o["n_probes_worse"]
+            flat[f"{sh}_better_base"] = o["better_than_base"]
+            flat[f"{sh}_worse_base"] = o["worse_than_base"]
+            flat[f"{sh}_H5_mse"] = round(ax["H5"]["mse"], 2)
+            flat["base_H5_mse"] = round(ax["H5"]["base_mse"], 2)
+            for a in ax:
+                flat[f"{sh}_{a}_ratio"] = round(ax[a]["ratio"], 2)
+        flat[f"{sh}_wrong1"] = round(100 * o["wrong"], 1)
+        flat[f"{sh}_wrong_near"] = round(100 * o["wrong_near"], 1)
+        flat[f"{sh}_axis_wrong"] = round(100 * o["axis_wrong"], 1)
+        flat[f"{sh}_mse_mag"] = round(o["mse_mag"], 2)
+        out["sign_arms"][arm] = o
+        print(f"{arm:24s} n={o['n']} wrong {100 * o['wrong']:.1f}% near {100 * o['wrong_near']:.1f}% "
+              f"axis {100 * o['axis_wrong']:.2f}% mag {o['mse_mag']:.3g}"
+              + (f" mse-ratio {o['mse_ratio']:.3g} over {o['n_probes']} (above on {o['n_probes_worse']}) "
+                 f"better/worse than baseline {o['better_than_base']}/{o['worse_than_base']}" if arm != "baseline" else ""))
+    return sr
 
 
 def med(v):
@@ -117,7 +172,7 @@ def main():
     h5all = {**one_sign, **h5}
     out["one_sign_scored"] = {}
     out["arms"] = {}
-    for arm, sh in ARMS.items():
+    for arm, sh in {**ARMS, **SIGN_ARMS}.items():
         ws = arm_signs(arm)
         ps = sorted(set(ws) & set(h5all))
         w = np.array([ws[p] for p in ps]); mj = np.array([h5all[p]["err_major"] for p in ps])
@@ -141,13 +196,18 @@ def main():
     out["pools"] = {s: {key(r): {k: r.get(k) for k in ("name", "neg", "near10", "err_major", "err_mlp", "err_shat",
                                                          "shape_raw", "shape_dless", "shape_qperp")} for r in sig[s]}
                     for s in SETS}
+    n_axis = len([r for r in rows if r["set"] == "H5" and "error" not in r])
+    sr = sign_arms(h5all, n_axis, flat, out)
     json.dump(out, open(os.path.join(HERE, "data", "prep_signed.json"), "w"), indent=1)
     plot(sig, h5, out)
+    plot_sign_arms(out, sr)
     # e+e- -> c cbar g at one loop: the pool every arm gets most wrong
     cg = "v3_epem_ccxg_nlo_25-1000GeV"
     wc = [out["arms"][a]["per_pool"][cg] for a in ARMS]
     flat.update({"ccg_neg": round(100 * h5[cg]["neg"]), "ccg_mlp": round(100 * h5[cg]["err_mlp"], 1),
                  "ccg_wrong_min": round(100 * min(wc)), "ccg_wrong_max": round(100 * max(wc))})
+    for a, sh in SIGN_ARMS.items():
+        flat[f"{sh}_ccg_wrong"] = round(100 * out["arms"][a]["per_pool"][cg])
     flat["n_one_sign_scored"] = len(out["one_sign_scored"])
     audit = json.load(open(os.path.join(HERE, "pool_audit.json")))["pools"]
     n_allneg = 0
@@ -197,6 +257,40 @@ def plot(sig, h5, out):
     for ax in axs:
         ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "prep_signed"))
+
+
+def plot_sign_arms(out, sr):
+    """(a) per held-out pool the scorer reads as sign-changing, each sign arm's zero-shot wrong-sign share against the
+    baseline's; (b) per held-out probe on every axis, each sign arm's zero-shot MSE on log|M|^2 against the baseline's."""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    sty = {"baseline_sign_pairs": (ps.C.blue, "o", "pair sign head"),
+           "baseline_sign_near": (ps.C.vermillion, "^", "near-zero weighting")}
+    b = out["arms"]["baseline"]["per_pool"]
+    for arm, (col, mk, lab) in sty.items():
+        pp = out["arms"][arm]["per_pool"]
+        q = sorted(set(pp) & set(b))
+        axs[0].plot([b[p] for p in q], [pp[p] for p in q], mk, mfc="none", color=col, label=lab)
+    axs[0].plot([0, 1], [0, 1], ls="--", color=ps.C.grey, label="equal")
+    axs[0].set_xlabel("wrong sign, baseline"); axs[0].set_ylabel("wrong sign, sign arm")
+    ps.legend(axs[0], "upper left")
+    lo, hi = np.inf, 0
+    for arm, (col, mk, lab) in sty.items():
+        xs, ys = [], []
+        for a, ra in sr[arm].items():
+            pb = sr["baseline"].get(a, {}).get("probes", {})
+            for p, v in ra.get("probes", {}).items():
+                if p in pb:
+                    xs.append(pb[p]["mse"]); ys.append(v["mse"])
+        axs[1].plot(xs, ys, mk, mfc="none", color=col, ms=3, label=lab)
+        lo, hi = min(lo, min(xs), min(ys)), max(hi, max(xs), max(ys))
+    axs[1].plot([lo, hi], [lo, hi], ls="--", color=ps.C.grey, label="equal")
+    axs[1].set_xscale("log"); axs[1].set_yscale("log")
+    axs[1].set_xlabel("zero-shot MSE, baseline"); axs[1].set_ylabel("zero-shot MSE, sign arm")
+    ps.legend(axs[1], "upper left")
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "prep_signed_arms"))
 
 
 if __name__ == "__main__":
