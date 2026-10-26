@@ -1013,7 +1013,14 @@ entries:
     - recipes/gen_catalog_v4.py
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
-  dead_ends: []
+  dead_ends:
+  - tried: first catalog_v4 regeneration, 8 parts (FA-ccin2p3-10321cd6 ...)
+    why: 'all 8 died in the backend phase (~5-7 min each, no pool written): 51 one-loop entries with a b beam failed the pole
+      check because nlo_pole_check sampled the b beams at 4.7 GeV against the massless-b model (fixed 37198d1, recheck of
+      b b~ > h z and b b~ > a d d~ passes to 1e-13); 4 more fail independently (u u~ > c c~ z and d d~ > b b~ z: MadLoop double
+      pole identically 0; d d~ > c c~ and d d~ > b b~: 95% exact, a few rc 236 points off by up to 25%), all four with the
+      full coupling orders (QED<=n) that v3 did not have'
+    at: '2026-10-26T00:22:46+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
