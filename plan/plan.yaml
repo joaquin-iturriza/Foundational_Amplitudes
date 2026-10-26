@@ -1024,11 +1024,8 @@ entries:
   - D139
   - D140
   - D142
-  next: 'report to the user: the five one-loop entries at the QCD born certified and built (50000/5000/5000, order vectors
-    [1,0,2,0] and [1,0,2,1]); the three sub-percent entries'' cause is the certifier''s top-width zeroing being a no-op on
-    v4 cards (fixed 7f879cd7). Then a certification-only CPU check of b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h w+ w- at zero
-    top width with the fix (no pools) to confirm, before proposing their build; when regeneration part 5 (FA-ccin2p3-23fe1dcb)
-    ends, read its log'
+  next: 'read it (FA-ccin2p3-f470a7f2): if all three PASS at zero width, build them (V4REGEN_ONLY with the three names, the
+    in-generation pole check keeping b g > b w+ w-''s 1e-2 tolerance); also read part 5 (FA-ccin2p3-23fe1dcb) when it ends'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
