@@ -112,14 +112,17 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-0bddbf48
+    - FA-ccin2p3-161fc56b
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
+    - FA-ccin2p3-89daa7d6
     - FA-ccin2p3-8acabdd2
+    - FA-ccin2p3-a7009d00
     - FA-ccin2p3-bc20e0d6
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-f72f1379
-    commit: 493fef01
+    commit: '55299616'
     paths:
     - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/data/prep_sampling.json
@@ -129,6 +132,7 @@ entries:
     - analysis/catalog_v3/figs/prep_hybrid.png
     - analysis/catalog_v3/figs/prep_sampling.png
     - analysis/catalog_v3/figs/prep_signed.png
+    - analysis/catalog_v3/figs/prep_signed_arms.png
     - analysis/catalog_v3/pool_audit_signext.json
     - analysis/catalog_v3/prep_sampling.py
     - analysis/catalog_v3/prep_shat_slope.py
