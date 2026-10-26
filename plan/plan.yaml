@@ -1126,20 +1126,23 @@ entries:
     - FA-ccin2p3-790fac19
     - FA-ccin2p3-84bc4800
     - FA-ccin2p3-a22a1770
+    - FA-ccin2p3-ac1a7a20
     - FA-ccin2p3-b508f477
     - FA-ccin2p3-b67b49d6
     - FA-ccin2p3-c09de7d2
     - FA-ccin2p3-ce878798
+    - FA-ccin2p3-d0c787ec
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-e957351b
     - FA-ccin2p3-ec84e913
-    commit: cdd3d9f8
+    commit: 3abde40c
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/figs/coverage_fwd_c.png
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
+    - analysis/catalog_v3/pool_audit.py
     - analysis/catalog_v4/data/card_width_audit.json
     - analysis/catalog_v4/data/checked.json
     - analysis/catalog_v4/data/validation.json
@@ -1149,15 +1152,18 @@ entries:
     - analysis/catalog_v4/validate_v4.py
     - analysis/storage/free_manifest_2026-10-26.tsv
     - analysis/storage/free_space.py
+    - particle_ids.py
     - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/catalog_v4_loops.yaml
     - recipes/gen_catalog_v4.py
+    - scripts/job_catalog_v4_equality.sh
     - scripts/job_catalog_v4_regen.sh
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
     - scripts/job_mixed_order_virt.sh
     - scripts/job_v4_hwpwm_zero_width.sh
     - scripts/job_width_regen.sh
+    - tests/test_particle_encoding.py
     - tools/certify_v4_loops.py
     - tools/mixed_order_virt_check.py
     - tools/nlo_virtual_pipeline.py
