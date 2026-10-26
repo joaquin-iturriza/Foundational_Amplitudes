@@ -105,6 +105,8 @@ def main():
             if k in PCT or k in ("err_major_all", "err_major_near_all", "rare_max_err_major"):                              # shares of events, in percent as the notes write them
                 v = round(100 * v, 1)
             flat[f"{sh}_{k}"] = round(v, 3) if isinstance(v, float) else v
+        for n_, v_ in o["rare_pools"].items():            # the rare pools, by their minority count in the fit events
+            flat[f"{sh}_rare_{n_[3:]}"] = v_["n_minor_fit"]
     # the arms' signs on the held-out pools, against the data's floors on the same pools
     h5 = {key(r): r for r in sig["H5"]}
     # a held-out pool of one sign in every validation and test event that the scorer still reads as sign-changing:
