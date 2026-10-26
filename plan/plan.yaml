@@ -1174,7 +1174,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 1d9d6a29
+    commit: 5f69bb20
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1182,6 +1182,7 @@ entries:
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
     - analysis/catalog_v3/pool_audit.py
+    - analysis/catalog_v3/short_reads.py
     - analysis/catalog_v4/census_classes.json
     - analysis/catalog_v4/data/card_width_audit.json
     - analysis/catalog_v4/data/checked.json
@@ -1205,6 +1206,7 @@ entries:
     - recipes/gen_catalog_v4.py
     - recipes/make_catalog_v3v4_shared.py
     - recipes/select_catalog_v4.py
+    - scripts/job_catalog_v3_short.sh
     - scripts/job_catalog_v4_equality.sh
     - scripts/job_catalog_v4_regen.sh
     - scripts/job_catalog_v4_validate.sh
