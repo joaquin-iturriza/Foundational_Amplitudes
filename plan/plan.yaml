@@ -1300,15 +1300,16 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'PRETRAINING AND ZERO-SHOT WRITTEN (par:v3_muon @a9da7fb9): Muon 7.9x / 7.1x lower best val_loss_no_reg than AdamW
-    (seeds 42/43), zero-shot AdamW/Muon median 4.47 over 617 probes (Muon lower at both seeds on 88%), gain shrinks at 2->5
-    (1.77) and ties at 1-10 TeV (1.18). FINE-TUNES SUBMITTED @880da85c, 5 jobs ~0.7 GPU-h each (~3.5 total): from AdamW parent
-    dimensionless with AdamW FA-ccin2p3-6e5d2ed2 and MuonAdamW FA-ccin2p3-ce1dba1c; from Muon parent dimensionless_muon with
-    AdamW FA-ccin2p3-54fd017f and MuonAdamW FA-ccin2p3-be7d9ff7; scratch (dimensionless config, AdamW) FA-ccin2p3-00d080ba.
-    NEXT when they end: read each log (CATFT lines, CATFT_DONE, no error cells), collect the CATFT lines into a committed
-    JSON, add the fine-tune read to muon_compare.py (per probe and D: the 2x2 of parent and fine-tune optimizer, and each
-    against scratch), figure, write it into par:v3_muon with provenance, then plan done. Stage 2 (~34 GPU-h) only if inconclusive
-    (D146).'
+  next: 'STAGE 2 PRETRAINING SEARCHES SUBMITTED @8f25c905 (caveat in par:v3_muon @bd3af563): config check clean (the four
+    short runs'' resolved configs differ only in optimizer, seed and run paths; val_loss_no_reg computed identically; AdamW
+    seed 42 ran at commit 48c06ac, the other three at 66076d2, code between them inert for AdamW). Two single-fidelity DyHPO
+    searches at 4264 steps, 8 trials each, every trial from runs/catalog_v3_short/dimensionless''s exact config (run_trial
+    base_config): sweeps/muon_test_search_muon (lr [3e-3,2.7e-2], muon_weight_decay [1e-3,0.3]) and sweeps/muon_test_search_adamw
+    (lr same, regularization_lambda [1e-10,1e-6]) on CC, SLURM 62412105-62412120 in 3 afterany waves, ~1.3-1.5 h per trial
+    (~20-24 GPU-h); item check = watchdog over analysis/catalog_v3/expect_muon.json. NEXT when the 16 trials end: read the
+    logs (no failed trials, MuonAdamW line in the Muon trials), read each search''s best val_loss_no_reg (best checkpoint)
+    against the other''s and against stage 1''s runs, write it into par:v3_muon with provenance. Then the fine-tunes (FA-ccin2p3-6e5d2ed2,
+    ce1dba1c, 54fd017f, be7d9ff7, 00d080ba): CATFT read as before; stage 2''s fine-tune search waits on them.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
