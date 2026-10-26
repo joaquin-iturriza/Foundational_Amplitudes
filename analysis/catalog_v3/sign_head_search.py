@@ -199,6 +199,12 @@ def train_signs(rows, d, ref, flat, out):
         if g:
             flat.update({f"tv_{k}_worst": round(100 * g[0]["wrong_worst"], 1), f"tv_{k}_worst_hp": g[0]["hp_idx"]})
     best = min(rows, key=lambda x: x["objective"])
+    # one standard deviation of a pool's wrong-sign share at the Muon baseline's worst value, binomial over its events
+    pw = refs["muon"]["wrong_worst"]
+    flat["tv_binom_sd"] = round(100 * float(np.sqrt(pw * (1 - pw) / N_VAL_PER_POOL)), 1)
+    flat["tv_calm_worst_min"] = round(100 * min(x["wrong_worst"] for x in calm), 1)
+    flat["tv_calm_worst_max"] = round(100 * max(x["wrong_worst"] for x in calm), 1)
+    flat["best_lr_over_mb"] = round(best["lr"] / ref["lr"], 1)
     flat["tv_best_worst"] = round(100 * best["wrong_worst"], 1)
     flat["tv_best_med_ev"] = ev(best["wrong_median"])
     rk = lambda v: np.argsort(np.argsort(v))
