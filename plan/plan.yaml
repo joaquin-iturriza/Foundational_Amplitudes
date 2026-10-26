@@ -111,7 +111,7 @@ entries:
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
-    commit: 0663f689
+    commit: fa3b8ab0
     paths:
     - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/data/prep_signed.json
