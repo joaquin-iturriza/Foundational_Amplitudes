@@ -1002,8 +1002,9 @@ entries:
   - D137
   - D139
   - D140
-  next: Read the full certification FA-ccin2p3-ce878798 (site logs; CERT SUMMARY PASS/FAIL/ERROR/BUILD_FAIL) and act on the
-    FAIL and ERROR lists.
+  next: 'Read the full one-loop certification with the fixed copier (FA-ccin2p3-ce878798; summary counts PASS / FAIL / ERROR
+    / BUILD_FAIL separately) and act on its FAIL and ERROR lists. The copier bug of FA-ccin2p3-e425f8aa is fixed (348a984);
+    check run FA-ccin2p3-84bc4800: v4_gg_gg and v4_bbx_hz PASS, v4_bg_bwpwm FAIL (double pole max rel 4.2e-3 > 1e-3).'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
