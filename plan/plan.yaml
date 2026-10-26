@@ -1281,16 +1281,19 @@ entries:
   - D161
   - D162
   - D166
-  next: 'FIRST (free, CPU): catalog_v4''s training density against the 13 TeV pp events'' density on the same classes, along
-    sqrt(s_hat) and the forward angle (and every variable analysis/catalog_v3/coverage_check.py used), and whether the per-class
-    pp error of the catalog_v4 runs relative to the pp-trained arm (analysis/catalog_v4/data/compare_pp_trained.json, docs/results.tex
-    par:v4_vs_pp) follows the density gap; the coverage check before generation measured containment only, not density. THEN:
-    the comparison is written (par:v4_vs_pp, f1cd98c5: catalog_v4 with Muon behind the AdamW pp-trained arm on the classes
-    it trained on pp (0.86 against 0.47), level on the held-out ones (0.94 against 0.92); Muon alone is worth about a factor
-    four on pp; against its own optimizer''s catalog_v3 arm catalog_v4 recovers a share 0.15 to 0.35 of the pp-training gain,
-    none inside catalog_v3''s coverage). A pp-trained Muon arm (2 seeds, ~3 GPU-h) would separate catalog from optimizer;
-    not proposed. The user''s switch call stands (''Okay, switching makes sense then''): the held Daniel''s-catalog studies
-    adapted to catalog_v4, and catalog_v3''s deletion (D163) only once the switch is confirmed, nothing deleted before.'
+  next:
+    1: 'Write the density check (analysis/catalog_v4/density_check.py, data/density_check.json, figs/density_check, commits
+      2f12de30 b499d470: catalog_v4 at 0.21 of pp''s density where pp events sit, 0.66 of pp events in thin bins, rank corr
+      0.30 with the error gap; the PDF-weighted sampler of D117 was never built, MadEvent pp events were used) into par:v4_vs_pp
+      with provenance, and the pp blend proposal as an open item in the hand-off (waiting on the user''s call)'
+    2: 'The switch to catalog_v4 (D166 ''Okay, switching makes sense then''): adapt the held studies (catalog_norm, qperp_soft,
+      f24, f24net) to catalog_v4: for each, what changes (recipes, pools, axes) and whether its design still holds; release
+      is the user''s (they are held by D114), so this step writes the adaptation into each entry''s next step and lists what
+      would run, no job'
+    3: 'catalog_v3''s deletion (D163, after the switch): write the manifest (paths, sizes, what reads them) of catalog_v3''s
+      pools on CC; check that nothing running or queued reads them (the pair sign head test''s seed-43 runs train on catalog_v3
+      now; the pp blend test would compare against catalog_v3-trained arms only through stored reads); delete nothing until
+      the manifest is shown to the user and no running work reads the pools'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
