@@ -1345,7 +1345,7 @@ entries:
     fine-tunes (add 16 scratch runs on the same 4 probes x 4 D, ~0.7 GPU-h) and to catalog_v4''s pretraining'
   done_when: 'grep -q ''label{par:ft_harm}'' docs/results.tex && test -f analysis/transfer/data/ft_harm.json && test -f analysis/transfer/figs/ft_harm.png
     && test -f analysis/transfer/figs/ft_harm.pdf && grep -q ''% src: python3 analysis/transfer/ft_harm.py'' docs/results.tex'
-  notes_ref: null
+  notes_ref: par:ft_harm
   match: zz_ft_harm*,tp3_ftharm*
   evidence:
     runs: []
