@@ -293,6 +293,32 @@ entries:
       seeds sit below both control seeds on most of the 17 pools (at least 9). No otherwise, including when either arm blows
       up and its best-checkpoint read is not lower. Either way the sign study stops and is written up in docs/results.tex
       (par:v3_prep_signed) with the four runs; no further sign head arms follow from this test.
+    fix_at: '2026-10-26T19:46:06+00:00'
+    fix: 'Seeds against spread (fails): the expected effect is the search''s 1.05 point gap (2.75% vs 3.8% median held-out
+      wrong-sign share, sign_head_search.json zero_shot), and the measured run-to-run spread of that median on the more-signed-pools
+      arm is 0.6 to 1.45 points (prep_signed.json seeds: 4.75 vs 3.3, rerun 3.3 vs 3.9), i.e. about 1 point per run; with
+      two seeds per arm the seed-mean difference has a spread of about 1 point, so the expected effect is about one standard
+      deviation. The yes threshold (gap larger than max(1.45, within-arm differences)) is above the expected effect, and the
+      per-pool rule (both pair seeds below both control seeds on 9 of 17 pools) is far stricter still: per-pool run-to-run
+      swings are huge (the unchanged rerun moved v3_ddx_ag 38.5% to 2.25% and v3_ddx_aaa 0.45% to 13.6%), so a real 1 point
+      effect would almost always come back ''no''. Fix: either enough seeds that the expected 1 point stands above the spread
+      (about 6 to 8 per arm by the measured spread; more GPU than the approved two seeds each, so that is the user''s call
+      and goes to them as a question with its cost), or a statistic whose measured run-to-run spread on the three existing
+      more-signed-pools runs is shown below 1 point, and a yes rule the expected effect can actually meet. Outcome (fails):
+      ''No otherwise'' merges ''the pair head does not help'' with ''cannot tell at this spread''; with the thresholds above
+      nearly every result lands in ''no'', which then drops the pair head from the sign study''s answer. State three outcomes:
+      yes (rule above), no (pair arm''s seed mean not lower than the control''s, or higher on most pools), inconclusive (lower
+      but within the spread), and what each writes in par:v3_prep_signed. Matched control (needs stating): the control runs
+      at the pair arm''s tuned lr 1.246e-2 / warmup 0.081; no pair-off trial in the search went above lr 9.2e-3 and pair trials
+      blew up at 1.37e-2 and 1.45e-2, so the control is untested and may be unstable there, and a control blow-up would read
+      as a pair head win. Say how a control blow-up is scored (not a yes for the head), and either add the control at its
+      own tuned setting as the best-vs-best reference (the Muon baseline, lr 5e-3, warmup 0.158, already read at seed 42 with
+      3.8%) or say why the pair arm''s HPs are fair to the control. Also note that seed 42 of the pair arm repeats the search''s
+      selected trial (the search ran seed 42), so its number carries the best-of-20 selection; reuse that run instead of retraining
+      it, and treat the other seeds as the unbiased ones. Checks that hold: one change (sign_pair_dim 16 vs 0, near weighting
+      off in both, everything else the same config); the measure is the quantity the head predicts and moved 15.3% to 4.3%
+      at two seeds with the more-signed pools (prep_signed.json m2); not a repeat (it deconfounds the search''s best-vs-baseline
+      gap); within the user''s approved test.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
