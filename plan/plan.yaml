@@ -1005,7 +1005,13 @@ entries:
   next: 'when the mixed-order investigation (FA-ccin2p3-e5d74011) and the certify-all job (FA-ccin2p3-e425f8aa) end: read
     them, report to the user the cause of each failing one-loop entry (mixed-order definition vs MadLoop precision), the full
     list of failures, and what generating them correctly needs, before building them; then rerun the regeneration parts that
-    skipped them'
+    skipped them. When the 8 regeneration parts now running end (they run the code before the pole-guard quarantine of commit
+    9bb0fb9): read each part''s CERT file ($SCRATCH/zz_catalog_v4_regen/cert_failed_K_of_8.txt) and log, and for every entry
+    skipped there check on CC (site run ccin2p3 FA, read-only listing first) which pools of its backend group (val/test in
+    $DATA_DIR, train in the cache under $SCRATCH, any role, the entry and its group-mates, alpha_s-scan children and stripped
+    parents included) and which .chunks_<recipe_id> dirs with finished chunks are on disk; move them with their .recipe.json
+    sidecars to $SCRATCH/zz_catalog_v4_regen/quarantine/ (never delete) and append each move as a ''#quarantined<TAB>pool<TAB>moved
+    to'' line to that part''s CERT file, as prebuild_recipes.py now does itself; only then rerun the parts that skipped them'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
