@@ -1223,6 +1223,10 @@ entries:
       is t-channel only there (never resonant), so the fixed width is a gauge-violating artefact. Other two: 0.0% and 0.1%
       redrawn (pole_guard_diag, 800 points each)'
     at: '2026-10-26T04:59:15+00:00'
+  - tried: zero-width job FA-ccin2p3-b508f477
+    why: its card check took the neighbour's indented DECAY 6 line (1.480327, ignored by MadGraph) as the width instead of
+      the compiled default 1.4915; check fixed in cdd3d9f8, rerun FA-ccin2p3-66920c4c
+    at: '2026-10-26T13:10:52+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
