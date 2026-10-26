@@ -1339,7 +1339,7 @@ entries:
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
-  notes_ref: null
+  notes_ref: par:v3_muon
   match: '*muon*'
   evidence:
     runs:
