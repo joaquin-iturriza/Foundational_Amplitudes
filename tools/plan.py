@@ -18,19 +18,24 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan answer <id> --kind K --quote Q [--set title|question|next=V]   the user's words: typed after the entry's last
                                           ask or step (after the hold, for a release), then `site decide`, then the
                                           entry; all or nothing
-  plan ask <id> --ask Q --searched S | unanswered <id> | step <id> --agent <subagent id> | run <id> RUN...
+  plan ask <id> --ask Q --searched S | unanswered <id> | step <id> --agent <subagent id>
+  plan run <id> [RUN...] [--sweep SITE:NAME]   a registry run, or a sweep sweep_manager submitted (never in runs.db)
+  plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
   plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W | set-next <id> T
   plan next [--prompts]                   deterministic: what can move now, with each step agent's exact prompt
   plan done <id> --writeup C [--override-runs WHY]
   plan view [--write]
 Work is done by step agents: `plan next` lists what can move, each step agent does one step, writes evidence, dead
 ends and the next step through this CLI, and exits. A running entry is in flight while a registry job of it is live,
-a unit of its site item's check is active, or a step agent recorded for it started within STEP_MIN minutes. A step is
+a sweep recorded on it has a job in its site's queue, a unit of its site item's check is active, or a step agent
+recorded for it started within STEP_MIN minutes. A sweep no entry records, live or submitted within SWEEP_RECENT_H
+hours, is recorded on the one running entry whose match globs name it whenever plan next or the Stop check runs;
+one that fits several blocks until recorded by hand. A step is
 a real subagent started with that entry's step prompt ("Entry: <id>"), one step per subagent, re-validated against its
 transcript on every read (a step written into the state file by hand does not count). A waiting entry moves only
 through plan answer or plan unanswered. The plan files change only through this CLI (plan_files_guard.py).
 Env for tests: PLAN_FILE, PLAN_STATE, PLAN_RUNS_DB, PLAN_SITE, PLAN_SITE_MODULE, PLAN_TRANSCRIPTS, PLAN_AGENTS,
-PLAN_ROOT."""
+PLAN_ROOT, PLAN_SWEEP_SITES."""
 import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, os, re
 import shlex, shutil, sqlite3, subprocess, sys, tempfile
 
@@ -339,6 +344,200 @@ def item_check_active(eid):
     return item_checks([eid])[eid]
 
 
+# ---------------------------------------------------------------- sweeps (sweep_manager's jobs never reach runs.db)
+SWEEP_RECENT_H = 24      # an unrecorded sweep submitted this recently is recorded even if it has already ended
+
+
+def note(n):
+    if n not in NOTES:
+        NOTES.append(n)
+
+
+def sweep_name(x):
+    """A sweep's name from its name or directory (sweep_manager's sweep_name_from_dir); "" for nothing."""
+    return os.path.basename(os.path.normpath(x)) if (x or "").strip(" /.") else ""
+
+
+def sweep_sites():
+    """The sites whose sweep_manager registry is read for sweeps no entry records: sites/sites.yaml's SLURM sites
+    (sweep_manager submits with sbatch; lxplus's legacy HTCondor DAG path keeps no registry)."""
+    if "PLAN_SWEEP_SITES" in ENV:
+        return [x for x in ENV["PLAN_SWEEP_SITES"].split(",") if x]
+    try:
+        y = yaml.safe_load(open(os.path.join(HERE, "sites", "sites.yaml"))) or {}
+    except OSError:
+        return []
+    return sorted(k for k, v in y.items()
+                  if isinstance(v, dict) and (v.get("cluster") or {}).get("scheduler") == "slurm")
+
+
+def sweeps_of(st, eid):
+    return list((st.get(eid) or {}).get("sweeps") or [])
+
+
+def want_of(st, eids):
+    """{site: names} of the sweeps recorded on these entries."""
+    out = {}
+    for eid in eids:
+        for x in sweeps_of(st, eid):
+            out.setdefault(x["site"], set()).add(x["name"])
+    return out
+
+
+def _read_site_sweeps(site, names):
+    """(sweeps, note): `sweep_manager.py state` on the site, read only. `site run` names no work item, so the site's
+    sbatch shim refuses anything it might submit."""
+    try:
+        r = subprocess.run(SITE + ["run", site, PROJECT, "--", "python", "sweep/sweep_manager.py", "state"]
+                           + sorted(names), capture_output=True, text=True,
+                           timeout=max(1, min(CHECK_TIMEOUT, budget())))
+    except subprocess.TimeoutExpired:
+        return None, "no answer in %d s" % CHECK_TIMEOUT
+    line = [l for l in r.stdout.splitlines() if l.startswith("SWEEP_STATE ")]
+    if r.returncode != 0 or not line:
+        return None, "exit %d: %s" % (r.returncode, (r.stderr or r.stdout or "no SWEEP_STATE line").strip()[-160:])
+    try:
+        return dict(json.loads(line[-1][len("SWEEP_STATE "):])["sweeps"]), None
+    except (ValueError, KeyError, TypeError) as ex:
+        return None, "bad output (%s)" % ex
+
+
+def site_sweeps(want, all_sites=True, fetch=True, fresh=False):
+    """{site: {"sweeps": {name: facts | None (not in the registry)}, "ended": {name: first seen ended}} or None (could
+    not be read)} for the sites of `want` ({site: names to report even if ended}), and with all_sites every
+    sweep_sites() site. Read in parallel and cached CHECK_CACHE_MIN per site like the item checks, a failure included;
+    an unreadable site gets a note and its recorded sweeps count as in flight. The end of a sweep is the first read
+    that found none of its jobs in the queue, kept across reads. fetch=False reads the cache only (plan show)."""
+    try:
+        cache = json.load(open(CHECK_CACHE))
+    except (OSError, ValueError):
+        cache = {}
+    sites = set(want) | (set(sweep_sites()) if all_sites else set())
+    out, todo = {}, {}
+    for site in sorted(sites):
+        names = set(want.get(site) or ())
+        hit = cache.get("sweeps:" + site)
+        ok = hit and not fresh and names <= set(hit.get("names") or []) and \
+            (now() - parse(hit["at"])).total_seconds() < 60 * CHECK_CACHE_MIN
+        if ok or (hit and not fetch):
+            data = hit.get("data")
+            out[site] = {"sweeps": data, "ended": hit.get("ended") or {}} if data is not None else None
+            if hit.get("data") is None:
+                note("the sweep registry on %s could not be read (%s, since %s): its recorded sweeps count as in flight"
+                     % (site, hit.get("note"), (hit.get("failing_since") or hit["at"])[:16]))
+        elif fetch:
+            todo[site] = names | set((hit or {}).get("names") or [])
+        else:
+            out[site] = None
+    if todo:
+        import concurrent.futures as cf
+        with cf.ThreadPoolExecutor(len(todo)) as ex:
+            res = dict(zip(todo, ex.map(lambda k: _read_site_sweeps(k, todo[k]), todo)))
+        try:
+            cache = json.load(open(CHECK_CACHE))          # the item checks may have written it meanwhile
+        except (OSError, ValueError):
+            cache = {}
+        for site, (data, why) in res.items():
+            prev = cache.get("sweeps:" + site) or {}
+            ended = dict(prev.get("ended") or {})
+            rec = {"at": now().isoformat(), "names": sorted(todo[site]), "data": data, "note": why}
+            if data is None:
+                rec["failing_since"] = prev.get("failing_since") if prev.get("data") is None and \
+                    prev.get("failing_since") else now().isoformat()
+                note("the sweep registry on %s could not be read (%s, since %s): its recorded sweeps count as in flight"
+                     % (site, why, rec["failing_since"][:16]))
+            else:
+                for name, f in data.items():
+                    if f is None or f.get("live"):
+                        ended.pop(name, None)
+                    else:
+                        ended.setdefault(name, now().isoformat())
+            rec["ended"] = ended
+            cache["sweeps:" + site] = rec
+            out[site] = {"sweeps": data, "ended": ended} if data is not None else None
+        if os.path.exists(PLAN_FILE):
+            _write_atomic(CHECK_CACHE, json.dumps(cache))
+    return out
+
+
+def sweep_label(name, site, f):
+    return "%s (%s, %s of %s trials submitted, %s results)" % (
+        name, site, f.get("submitted"), "?" if f.get("scripts") is None else f["scripts"],
+        "?" if f.get("results") is None else f["results"])
+
+
+def sweep_status(eid, st, sw):
+    """(ended [(label, ended at, recorded at)], live [label], unread [label]) of the sweeps recorded on the entry. One
+    missing from its site's registry is listed as ended (from when it was recorded), so a step agent looks at it."""
+    ended, lv, unread = [], [], []
+    for x in sweeps_of(st, eid):
+        site, name, rec = x["site"], x["name"], parse(x.get("at"))
+        data = sw.get(site)
+        if data is None:
+            unread.append("%s (%s)" % (name, site))
+            continue
+        f = data["sweeps"].get(name)
+        if f is None:
+            ended.append(("%s (%s: not in its sweep registry)" % (name, site), rec, rec))
+        elif f.get("live"):
+            lv.append("%s (%s, %d jobs queued or running)" % (name, site, f["live"]))
+        else:
+            ended.append((sweep_label(name, site, f), parse(data["ended"].get(name)) or now(), rec))
+    return ended, lv, unread
+
+
+def unrecorded_sweeps(d, st, sw):
+    """[(site, name, [entry ids it fits], facts)] of the sweeps on the sites, live or submitted within SWEEP_RECENT_H
+    hours, that no entry records. It fits the running entries whose match globs name it, narrowed to the work items
+    its submission named (sweep_manager's stamp) when that names some of them."""
+    recorded = {(x.get("site"), x.get("name")) for k, v in entries_state(st) for x in v.get("sweeps") or []}
+    running = [e for e in d["entries"] if e.get("status") == "running"]
+    cut = now().timestamp() - 3600 * SWEEP_RECENT_H
+    out = []
+    for site in sorted(sw):
+        for name, f in sorted(((sw[site] or {}).get("sweeps") or {}).items()):
+            if not f or (site, name) in recorded or not (f.get("live") or (f.get("submitted_at") or 0) >= cut):
+                continue
+            fits = [e["id"] for e in running if any(fnmatch.fnmatchcase(name, g.strip())
+                                                    for g in (e.get("match") or "").split(",") if g.strip())]
+            stamped = [x for x in f.get("items") or [] if x in {e["id"] for e in running}]
+            narrowed = [x for x in fits if x in stamped] or (stamped if len(stamped) == 1 and not fits else [])
+            out.append((site, name, narrowed or fits, f))
+    return out
+
+
+def reconcile_sweeps():
+    """Every sweep a site runs that no entry records is recorded on the one running entry it fits (plan next and the
+    Stop check run this first). Returns the blocking problems: a sweep that fits several entries (record it with plan
+    run <entry> --sweep). A live one that fits none is noted."""
+    if not os.path.exists(PLAN_FILE):
+        return []
+    d, st = load()
+    running = [e["id"] for e in d["entries"] if e.get("status") == "running"]
+    found = unrecorded_sweeps(d, st, site_sweeps(want_of(st, running)))
+    probs, todo = [], []
+    for site, name, fits, f in found:
+        if len(fits) == 1:
+            todo.append((fits[0], site, name, f))
+        elif fits:
+            probs.append("sweep %s on %s runs with no record on the plan and fits %s: record it on its entry with "
+                         "`python3 tools/plan.py run <entry> --sweep %s:%s`"
+                         % (name, site, ", ".join(fits), site, name))
+        elif f.get("live"):
+            note("sweep %s on %s has %d jobs in the queue and no running entry's match names it" % (name, site,
+                                                                                                    f["live"]))
+    if todo:
+        with transaction() as (d2, st2):
+            for eid, site, name, f in todo:
+                lst = st2.setdefault(eid, {}).setdefault("sweeps", [])
+                if not any(x.get("site") == site and x.get("name") == name for x in lst):
+                    at = parse(f.get("submitted_at")) or now()
+                    lst.append({"site": site, "name": name, "at": at.isoformat(), "found": now().isoformat()})
+        for eid, site, name, f in todo:
+            note("sweep %s on %s ran with no record on the plan: recorded on %s" % (name, site, eid))
+    return probs
+
+
 # ---------------------------------------------------------------- transcripts (the user's typed words, site's rules)
 def slug():
     return re.sub(r"[^A-Za-z0-9]", "-", os.path.realpath(ROOT))
@@ -541,26 +740,32 @@ def budget():
     return 10 ** 6 if DEADLINE[0] is None else max(0.0, DEADLINE[0] - time.monotonic())
 
 
-def why_moves(e, st, msgs, t, d=None, checks=None):
+def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None):
     """(reason, since) when the entry can move now, else None. `since` is when the reason arose."""
     s, ls = e.get("status"), mark(d or {}, st, e["id"])
     if s == "running":
         rows = runs_of(e, st)
         ended = [(r, fin) for r, state, fin in rows if terminal(state) and fin and (not ls or fin > ls.timestamp())]
+        if sweeps is None:
+            sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
+        sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps)
+        # a sweep that ended after the last step, as (label, ended, recorded) in epoch seconds
+        sended = [(lab, f.timestamp(), r.timestamp() if r else 0) for lab, f, r in sw_end if not ls or f > ls]
         # an ended run a working step agent owns is its to handle: one it submitted (after its step started) or one
         # that ended before its last transcript record; once it hands back, the run is listed again (it ended after
         # the step started, so after `ls`). Hidden only when every ended run is owned: when one is not, the reason
         # lists them all, owned ones included, since the step it starts moves `ls` past every one of them
-        work = working_steps(st, e["id"], t) if ended else []
+        work = working_steps(st, e["id"], t) if ended or sended else []
         if work:
             sub = run_submitted([r for r, _ in ended])
-            owned = lambda r, fin: any((sub.get(r) or 0) >= s0.timestamp() or fin <= last.timestamp()
-                                       for s0, last in work)
-            if all(owned(r, fin) for r, fin in ended):
+            owned = lambda subm, fin: any(subm >= s0.timestamp() or fin <= last.timestamp() for s0, last in work)
+            if all(owned(sub.get(r) or 0, fin) for r, fin in ended) and all(owned(r, f) for _, f, r in sended):
                 return None
-        if ended:
-            return "runs ended: " + ", ".join(r for r, _ in ended), parse(max(f for _, f in ended))
-        if any(live(state) for r, state, fin in rows):
+        if ended or sended:
+            why = (["runs ended: " + ", ".join(r for r, _ in ended)] if ended else []) + \
+                (["sweep ended: " + ", ".join(lab for lab, _, _ in sended)] if sended else [])
+            return "; ".join(why), parse(max([f for _, f in ended] + [f for _, f, _ in sended]))
+        if any(live(state) for r, state, fin in rows) or sw_live or sw_unread:
             return None
         active = (checks or {}).get(e["id"], 0) if checks is not None else item_check_active(e["id"])
         if active is None or active > 0:          # None: the check could not run; counted in flight, with a note
@@ -574,7 +779,7 @@ def why_moves(e, st, msgs, t, d=None, checks=None):
             return None
         # the reason arose when the last step's window lapsed, its agent handed back or went quiet for the window, or
         # the last run ended, whichever is later
-        fins = [parse(fin) for r, state, fin in rows if fin]
+        fins = [parse(fin) for r, state, fin in rows if fin] + [f for _, f, _ in sw_end]
         quiet = [last if handed else last + dt.timedelta(minutes=STEP_MIN) for last, handed in acts]
         marks = [x for x in [ls + dt.timedelta(minutes=STEP_MIN) if ls else None] + fins + quiet if x]
         return "nothing in flight: " + (e.get("next") or "take the next step"), (max(marks) if marks else None)
@@ -610,10 +815,12 @@ def next_steps(d, st, t=None, msgs=None):
     after the reason arose; a waiting entry is never launched by a step (only plan answer or unanswered clear it)."""
     t = t or now()
     msgs = messages(oldest_open(d, st)) if msgs is None else msgs
-    checks = item_checks([e["id"] for e in d["entries"] if e.get("status") == "running"])
+    running = [e["id"] for e in d["entries"] if e.get("status") == "running"]
+    checks = item_checks(running)
+    sweeps = site_sweeps(want_of(st, running), all_sites=False)
     out = []
     for e in d["entries"]:
-        r = why_moves(e, st, msgs, t, d, checks)
+        r = why_moves(e, st, msgs, t, d, checks, sweeps)
         if r:
             reason, since = r
             ls = last_step(st, e["id"])
@@ -862,6 +1069,13 @@ def cmd_show(a):
             ls = last_step(st, e["id"])
             lr = [r for r, state, fin in runs_of(e, st) if live(state)]
             extra = ("live runs " + ", ".join(lr)) if lr else ("last step %s" % ls.isoformat()[:16] if ls else "no step")
+            if sweeps_of(st, e["id"]):
+                ended, lv, unread = sweep_status(e["id"], st, site_sweeps(want_of(st, [e["id"]]), all_sites=False,
+                                                                          fetch=False))
+                extra += "; sweeps: " + ", ".join(["live " + x for x in lv] + ["ended " + x[0] for x in ended]
+                                                  + [x + " not read yet" for x in unread])
+        elif sweeps_of(st, e["id"]):
+            extra = "sweeps " + ", ".join("%s (%s)" % (x["name"], x["site"]) for x in sweeps_of(st, e["id"]))
         elif s == "waiting_user":
             extra = "asked %s: %s (searched first: %s)" % ((e.get("waiting_since") or "?")[:16], e.get("ask", ""),
                                                            e.get("searched") or "not recorded")
@@ -1139,10 +1353,60 @@ def cmd_step(a):
 
 
 def cmd_run(a):
+    """Registry runs, and sweeps (--sweep SITE:NAME, a sweep name or dir): sweep_manager's jobs are not in runs.db, so
+    a sweep is in flight while its site's queue holds a job of it. A sweep the site's registry does not know is
+    refused; an unreadable site records it, counted in flight until read."""
+    if not a.runs and not a.sweep:
+        sys.exit("plan: name a run, or a sweep with --sweep SITE:NAME")
+    specs = []
+    for x in a.sweep or []:
+        site, _, name = x.partition(":")
+        if not site or not sweep_name(name):
+            sys.exit("plan: --sweep takes SITE:NAME (e.g. ccin2p3:muon_test_search_adamw), not %r" % x)
+        specs.append((site, sweep_name(name)))
+    if specs:
+        if os.path.exists(PLAN_FILE):
+            entry(load()[0], a.id)                    # before reaching the site
+        want = {}
+        for site, name in specs:
+            want.setdefault(site, set()).add(name)
+        sw = site_sweeps(want, all_sites=False, fresh=True)
+        missing = ["%s on %s" % (n, site) for site, n in specs if sw.get(site) is not None
+                   and sw[site]["sweeps"].get(n) is None]
+        if missing:
+            sys.exit("plan: not recorded: no sweep %s in the site's sweep_manager registry" % ", ".join(missing))
     with transaction() as (d, st):
         entry(d, a.id)
         rs = st.setdefault(a.id, {}).setdefault("runs", [])
         rs += [r for r in a.runs if r not in rs]
+        sl = st[a.id].setdefault("sweeps", [])
+        for site, name in specs:
+            if not any(x.get("site") == site and x.get("name") == name for x in sl):
+                sl.append({"site": site, "name": name, "at": now().isoformat()})
+    for site, name in specs:
+        print("plan: sweep %s (%s) recorded on %s" % (name, site, a.id))
+    for n in NOTES:
+        print("note: " + n)
+
+
+def cmd_sweeps(a):
+    """Records the sweeps no entry records (as plan next does), then prints every recorded sweep of an open entry with
+    its state on its site."""
+    probs = reconcile_sweeps()
+    d, st = load()
+    eids = [e["id"] for e in d["entries"] if e.get("status") != "done"]
+    sw = site_sweeps(want_of(st, eids), all_sites=False, fresh=a.fresh)
+    for eid in eids:
+        ended, lv, unread = sweep_status(eid, st, sw)
+        for lab in lv:
+            print("%s: live %s" % (eid, lab))
+        for lab, f, r in ended:
+            print("%s: ended %s, seen ended %s" % (eid, lab, f.isoformat()[:16]))
+        for lab in unread:
+            print("%s: not read %s" % (eid, lab))
+    for l in probs + ["note: " + n for n in NOTES]:
+        print(l)
+    return 1 if probs else 0
 
 
 def cmd_evidence(a):
@@ -1166,8 +1430,11 @@ def cmd_dead_end(a):
 
 def cmd_next(a):
     """What can move now, and the exact prompt of each step agent to launch (exit 1 while anything is unlaunched)."""
+    probs = reconcile_sweeps()
     d, st = load()
     todo = [(e, why) for e, why, launched in next_steps(d, st) if not launched]
+    for p in probs:
+        print("UNRECORDED " + p)
     for e, why in todo:
         print("NEXT %s: %s" % (e["id"], why))
         if a.prompts and e.get("status") == "running":
@@ -1176,8 +1443,10 @@ def cmd_next(a):
     for e, why in done_problems(d, st):
         print("SUGGEST %s: marked done, but %s; plan reopen %s --why ..., or fix it (plan evidence --drop ...)" % (
             e["id"], why, e["id"]))
+    for n in NOTES:
+        print("note: " + n)
     print("plan: %d step(s) to launch" % len(todo))
-    return 1 if todo else 0
+    return 1 if todo or probs else 0
 
 
 def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None):   # timeout None: no limit
@@ -1242,6 +1511,13 @@ def cmd_done(a):
     with transaction() as (d, st):
         e = entry(d, a.id)
         why = done_refusals(e, st, a.writeup, a.override_runs, record=a.record)
+        if sweeps_of(st, a.id):
+            ended, lv, unread = sweep_status(a.id, st, site_sweeps(want_of(st, [a.id]), all_sites=False, fresh=True))
+            if lv:
+                why.append("sweeps still going: " + ", ".join(lv))
+            if unread and not a.override_runs:
+                why.append("sweeps whose site could not be read: %s (pass --override-runs with the reason)"
+                           % ", ".join(unread))
         if why:
             sys.exit("plan: %s is not done:\n  " % a.id + "\n  ".join(why))
         e["status"], e["writeup"] = "done", a.writeup
@@ -1301,7 +1577,9 @@ def main(argv=None):
     cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True))
     cmd("unanswered", cmd_unanswered, A("id"))
     cmd("step", cmd_step, A("id"), A("--agent", required=True))
-    cmd("run", cmd_run, A("id"), A("runs", nargs="+"))
+    cmd("run", cmd_run, A("id"), A("runs", nargs="*"),
+        A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"))
+    cmd("sweeps", cmd_sweeps, A("--fresh", action="store_true", help="read the sites now, not the cache"))
     cmd("evidence", cmd_evidence, A("id"), A("--run", action="append"), A("--commit"), A("--path", action="append"),
         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
     cmd("set-next", cmd_set_next, A("id"), A("text"))

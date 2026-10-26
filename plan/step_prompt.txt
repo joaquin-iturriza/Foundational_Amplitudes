@@ -17,7 +17,8 @@ The step
 1. Read what the reason points to: an ended run's log (`site logs <run>`, then ack its event with what the log shows),
    the user's answer, or the evidence.
 2. Do one thing that moves the entry: an analysis, a fix, a write-up, or a job (`site pick`, then
-   `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id>`).
+   `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id>`; a sweep submitted through
+   sweep_manager with `site run ... --item {id}` is recorded with `python3 tools/plan.py run {id} --sweep <site>:<name>`).
 3. Record, through the plan CLI only:
      python3 tools/plan.py evidence {id} --run <id> --commit <sha> --path <figure or metrics file>
      python3 tools/plan.py dead-end {id} --tried "<what>" --why "<why it failed>"

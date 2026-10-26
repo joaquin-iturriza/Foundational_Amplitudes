@@ -58,6 +58,7 @@ import math
 import os
 import subprocess
 import sys
+import time
 from collections import defaultdict
 import os as _os, sys as _sys
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
@@ -360,6 +361,8 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         return
     reg = load_registry(registry)
     gap = reg["round_gap"]
+    before = {sweep_name_from_dir(d): len((reg["sweeps"].get(sweep_name_from_dir(d)) or {}).get("jobs") or {})
+              for d in sweep_dirs}
 
     # 1. Register sweeps + discover not-yet-submitted scripts.
     new_items = {}          # sweep -> [(trial_idx, script), ...]
@@ -392,9 +395,13 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     ordered = assign_rounds(new_items, weights)
 
     if chain:
-        _submit_chained(new_items, reg, registry, sweep_dep, capacity or DEFAULT_CAPACITY, dry_run)
+        try:
+            _submit_chained(new_items, reg, registry, sweep_dep, capacity or DEFAULT_CAPACITY, dry_run)
+        finally:
+            if not dry_run:
+                stamp_submitted(reg, before)
+                save_registry(registry, reg)
         if not dry_run:
-            save_registry(registry, reg)
             _rebalance(reg, registry, gap, dry_run=dry_run)
         return
 
@@ -437,7 +444,9 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
             # The scheduler's per-user submit cap (CC-IN2P3 gpu qos: 100). Keep what went in,
             # leave the rest unsubmitted; `submit` again once the queue drains picks them up.
             if "SubmitJobPerUserLimit" not in str(e):
-                if not dry_run: save_registry(registry, reg)
+                if not dry_run:
+                    stamp_submitted(reg, before)
+                    save_registry(registry, reg)
                 raise
             print(f"  submit limit reached after {i} of {len(ordered)} trials; "
                   f"{len(ordered) - i} left unsubmitted, `submit` again when the queue drains")
@@ -459,8 +468,60 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     # 3. Persist and globally re-interleave everything still pending (fixes nice
     #    across sweeps). Both are no-ops under dry-run.
     if not dry_run:
+        stamp_submitted(reg, before)
         save_registry(registry, reg)
         _rebalance(reg, registry, gap, dry_run=dry_run)
+
+
+def stamp_submitted(reg, before):
+    """Every sweep this call submitted jobs for is stamped in the registry with the work items `site run --item` named
+    (CCORCH_WORK) and the time, and announced in one machine-readable line (SWEEP_SUBMITTED). tools/plan.py reads the
+    stamp back through `state` and records the sweep on its plan entry: a sweep submitted here never reached the plan
+    before (the Muon test's two searches ran for hours unrecorded, 2026-10-26)."""
+    items = (json.loads(os.environ.get("CCORCH_WORK") or "{}") or {}).get("items") or []
+    site = os.environ.get("CCORCH_SITE") or ""
+    for name, n0 in before.items():
+        entry = reg["sweeps"].get(name)
+        if not entry or len(entry.get("jobs") or {}) <= n0:
+            continue
+        entry["items"] = sorted(set(entry.get("items") or []) | set(items))
+        entry["submitted_at"] = int(time.time())
+        print("SWEEP_SUBMITTED " + json.dumps({"site": site, "sweep": name, "items": entry["items"],
+                                               "jobs": len(entry["jobs"])}, sort_keys=True))
+        print(f"  plan: recorded on its entry at the next `plan next` or stop; now: python3 tools/plan.py run "
+              f"<entry> --sweep {site or '<site>'}:{name}")
+
+
+RECENT_H = 48      # `state` reports, besides the named and live sweeps, those submitted within this many hours
+
+
+def sweep_state(names=(), registry=DEFAULT_REGISTRY):
+    """Read only, for tools/plan.py: one line `SWEEP_STATE {"sweeps": {name: facts | null}}` for the named sweeps
+    (null: not in the registry), every sweep with a job in the queue and every one submitted within RECENT_H hours.
+    facts: dir, live (its jobs still in squeue), submitted (jobs recorded), scripts (trial scripts in jobs/), results
+    (result files), items and submitted_at (stamp_submitted's stamp; absent on sweeps submitted before it)."""
+    import glob as _glob
+    reg = load_registry(registry)
+    states = squeue_states()
+    want = {sweep_name_from_dir(n) for n in names}
+    cut = time.time() - RECENT_H * 3600
+    out = {}
+    for name, entry in reg["sweeps"].items():
+        jobs = entry.get("jobs") or {}
+        live = sum(1 for j in jobs if j in states)
+        if not (live or name in want or (entry.get("submitted_at") or 0) >= cut):
+            continue
+        d = entry.get("dir") or ""
+        try:
+            scripts = len(discover_trial_scripts(d))
+        except OSError:
+            scripts = None
+        out[name] = {"dir": d, "live": live, "submitted": len(jobs), "scripts": scripts,
+                     "results": len(_glob.glob(os.path.join(d, "results", "*.json"))) if d else None,
+                     "items": entry.get("items") or [], "submitted_at": entry.get("submitted_at")}
+    for n in want - set(out):
+        out[n] = None
+    print("SWEEP_STATE " + json.dumps({"sweeps": out}, sort_keys=True))
 
 
 def _submit_chained(new_items, reg, registry, sweep_dep, capacity, dry_run):
@@ -702,6 +763,11 @@ def build_parser():
 
     s = sub.add_parser("status", help="show per-sweep running/pending/done")
     s.set_defaults(func=cmd_status)
+
+    s = sub.add_parser("state", help="read only: one SWEEP_STATE JSON line for tools/plan.py (named, live and "
+                                     "recently submitted sweeps)")
+    s.add_argument("sweeps", nargs="*", help="sweep names or dirs to report even if ended")
+    s.set_defaults(func=lambda a: sweep_state(a.sweeps, registry=a.registry))
 
     return p
 

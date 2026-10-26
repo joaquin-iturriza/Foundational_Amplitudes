@@ -54,6 +54,13 @@ if a[0] == "decide":
             c.execute("UPDATE decisions SET covers=?, in_force=? WHERE id=?", (",".join(left), 1 if left else 0, oid))
     c.commit()
     print("  %s  FA/%s  said %s: \"x\"" % (did, kind, t))
+elif a[0] == "run":                      # only the read of sweep_manager's state: sweeps_<site>.json, else down
+    p = os.path.join(d, "sweeps_%s.json" % a[1])
+    if not os.path.exists(p):
+        sys.stderr.write("ssh: connect to host %s port 22: Connection refused\n" % a[1])
+        sys.exit(255)
+    print("  run %s: python sweep/sweep_manager.py state" % a[1])
+    print("SWEEP_STATE " + open(p).read().strip())
 elif a[0] == "item" and a[1] == "done":
     c.execute("UPDATE items SET status='done' WHERE id=?", (a[3],))
     c.commit()
@@ -123,7 +130,7 @@ class World:
         os.chmod(j("site"), 0o755)
         self.env = dict(os.environ, PLAN_TEST="1", PLAN_FILE=self.plan, PLAN_STATE=self.state, PLAN_RUNS_DB=self.db,
                         PLAN_TRANSCRIPTS=self.tr, PLAN_AGENTS=self.ag, PLAN_SITE=j("site"), PLAN_ROOT=self.d,
-                        PLAN_SITE_MODULE=shutil.which("site"),
+                        PLAN_SITE_MODULE=shutil.which("site"), PLAN_SWEEP_SITES="",
                         PLAN_EVENTS_CMD="printf '%s\\n'" % events.replace("'", ""))
 
     def check(self):
@@ -1398,6 +1405,175 @@ def tooling_fixes():
                  out)
 
 
+SM = os.path.join(ROOT, "sweep", "sweep_manager.py")
+
+
+def sweep_world(entries, sweeps=None, state=None, ended=None, cache_at=None, sites="", **k):
+    """A world whose stub site serves sweep_manager's state on ccin2p3 (`sweeps`: name -> facts; None: the site is
+    down). `ended` / `cache_at` pre-seed the check cache (when each sweep was first seen ended, and when it was read)."""
+    w = World(entries, state=state, **k)
+    w.env["PLAN_SWEEP_SITES"] = sites
+    if sweeps is not None:
+        json.dump({"sweeps": sweeps}, open(os.path.join(w.d, "sweeps_ccin2p3.json"), "w"))
+    if cache_at is not None:
+        json.dump({"sweeps:ccin2p3": {"at": cache_at, "names": sorted(sweeps or {}), "data": sweeps, "note": None,
+                                      "ended": ended or {}}}, open(os.path.join(w.d, ".check_cache.json"), "w"))
+    return w
+
+
+def F(live=0, submitted=8, scripts=8, results=None, items=(), submitted_at=None):
+    return {"dir": "/sps/x", "live": live, "submitted": submitted, "scripts": scripts,
+            "results": submitted - live if results is None else results, "items": list(items),
+            "submitted_at": submitted_at}
+
+
+def rec(name, m=60):
+    return {"site": "ccin2p3", "name": name, "at": ago(m)}
+
+
+def sweeps():
+    """A sweep submitted through sweep_manager (never in runs.db) recorded on its entry: in flight while its jobs are
+    in the site's queue, listed when it ends, in flight with a note when the site cannot be read; one no entry records
+    is recorded on the entry it fits (the Muon test's two searches ran for hours with no record, 2026-10-26)."""
+    st = {"mu": {"sweeps": [rec("mu_search_a")]}}
+    w = sweep_world([E("mu")], {"mu_search_a": F(live=3)}, state=st)
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("next")
+    rc3, out3 = w.plan_cmd("show")
+    scenario("sweeps: a recorded sweep with jobs in the queue is the entry in flight (plan next, the Stop check), and "
+             "plan show lists it", rc == 0 and rc2 == 0 and "nothing in flight" not in err + out2
+             and "live mu_search_a (ccin2p3, 3 jobs queued or running)" in out3, err + out2 + out3)
+    w = sweep_world([E("mu")], None, state=st)
+    rc, err = w.check()
+    scenario("sweeps: the recorded sweep's site cannot be read: in flight, with a note naming the site and the error",
+             rc == 0 and "sweep registry on ccin2p3 could not be read" in err and "Connection refused" in err, err)
+    w = sweep_world([E("mu")], {"mu_search_a": F(live=0, results=7)}, state=st, ended={"mu_search_a": ago(10)},
+                    cache_at=ago(1), agents=[("mu_s1", ago(5), "mu"), ("mu_s0", ago(15), "mu")])
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("next", "--prompts")
+    want = "sweep ended: mu_search_a (ccin2p3, 8 of 8 trials submitted, 7 results)"
+    scenario("sweeps: an ended sweep lists the entry with 'sweep ended: <name>' and the step agent's prompt says so",
+             rc == 2 and want in err and rc2 == 1 and "Why you were started: " + want in out2, err + out2)
+    rc, out = w.plan_cmd("step", "mu", "--agent", "mu_s0")
+    rc2, out2 = w.plan_cmd("step", "mu", "--agent", "mu_s1")
+    rc3, err3 = w.check()
+    scenario("sweeps: a step agent started before the sweep was seen ended is refused, one started after clears it",
+             rc != 0 and "before the reason" in out and rc2 == 0 and rc3 == 0, out + out2 + err3)
+    w = sweep_world([E("mu")], {"mu_search_a": F(live=0)}, state=st, ended={"mu_search_a": ago(25)},
+                    cache_at=ago(30))
+    w.check()
+    kept = json.load(open(os.path.join(w.d, ".check_cache.json")))["sweeps:ccin2p3"]
+    scenario("sweeps: when the site is read again, the time the sweep was first seen ended is kept",
+             kept["ended"].get("mu_search_a") == ago(25) and kept["at"] > ago(1), kept)
+    w = sweep_world([E("mu")], {}, state={"mu": {"sweeps": [rec("mu_typo")]}}, cache_at=ago(1))
+    rc, err = w.check()
+    scenario("sweeps: a recorded sweep its site's registry does not know is listed (a step agent looks), not in flight "
+             "forever", rc == 2 and "sweep ended: mu_typo (ccin2p3: not in its sweep registry)" in err, err)
+    # recording by hand
+    w = sweep_world([E("mu")], {"mu_search_a": F(live=2)})
+    rc, out = w.plan_cmd("run", "mu", "--sweep", "ccin2p3:/sps/x/sweeps/mu_search_a/")
+    got = json.load(open(w.state)).get("mu", {}).get("sweeps") or []
+    rc2, out2 = w.plan_cmd("run", "mu", "--sweep", "ccin2p3:mu_nonesuch")
+    rc3, out3 = w.plan_cmd("run", "mu", "--sweep", "mu_search_a")
+    rc4, out4 = w.plan_cmd("run", "mu")
+    scenario("sweeps: plan run --sweep SITE:DIR records the sweep by name; one the registry lacks, a spec with no site "
+             "and a run with nothing named are refused",
+             rc == 0 and [x["name"] for x in got] == ["mu_search_a"] and rc2 != 0 and "no sweep mu_nonesuch" in out2
+             and rc3 != 0 and rc4 != 0, [out, got, out2, out3, out4])
+    w = sweep_world([E("mu")], None)
+    rc, out = w.plan_cmd("run", "mu", "--sweep", "ccin2p3:mu_search_b")
+    scenario("sweeps: with the site down the sweep is recorded anyway, with a note, and counts in flight",
+             rc == 0 and "could not be read" in out and w.check()[0] == 0, out)
+    w = sweep_world([E("mu", done_when="true")], {"mu_search_a": F(live=1)}, state=st, cache_at=ago(1))
+    rc, out = w.plan_cmd("done", "mu", "--writeup", "HEAD")
+    scenario("sweeps: plan done is refused while a recorded sweep has jobs in the queue",
+             rc != 0 and "sweeps still going: mu_search_a" in out, out)
+    # the unrecorded ones
+    w = sweep_world([E("mu", match="mu_*"), E("other", match="zz_*")], {"mu_search_c": F(live=4)}, sites="ccin2p3",
+                    state={"other": step(5)})
+    rc, err = w.check()
+    got = json.load(open(w.state)).get("mu", {}).get("sweeps") or []
+    scenario("sweeps: a live sweep no entry records is caught and recorded on the running entry whose match names it, "
+             "with a note", rc == 0 and [x["name"] for x in got] == ["mu_search_c"] and "recorded on mu" in err, err)
+    w = sweep_world([E("mu", match="mu_*"), E("other", match="*_c")], {"mu_search_c": F(live=4)}, sites="ccin2p3",
+                    state={"other": step(5), "mu": step(5)})
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("next")
+    scenario("sweeps: an unrecorded sweep that fits two running entries blocks the turn and plan next, naming both",
+             rc == 2 and "mu_search_c on ccin2p3 runs with no record" in err and "fits mu, other" in err
+             and rc2 == 1 and "UNRECORDED" in out2, err + out2)
+    w = sweep_world([E("mu", match="mu_*"), E("other", match="*_c")], {"mu_search_c": F(live=4, items=["other"])},
+                    sites="ccin2p3", state={"other": step(5), "mu": step(5)})
+    rc, err = w.check()
+    got = json.load(open(w.state)).get("other", {}).get("sweeps") or []
+    scenario("sweeps: the work item its submission named (sweep_manager's stamp) settles which entry it is",
+             rc == 0 and [x["name"] for x in got] == ["mu_search_c"], err)
+    w = sweep_world([E("mu", match="mu_*")], {"mu_old": F(live=0), "mu_new": F(live=0, items=["mu"],
+                                                                                submitted_at=epoch(120))},
+                    sites="ccin2p3", state={"mu": step(40)})
+    rc, err = w.check()
+    got = [x["name"] for x in json.load(open(w.state)).get("mu", {}).get("sweeps") or []]
+    scenario("sweeps: an ended sweep submitted within a day is recorded and listed as ended; an old ended one is not "
+             "(no noise from the registry's history)", got == ["mu_new"] and "sweep ended: mu_new" in err, err)
+    w = sweep_world([E("muon_test", match="*muon*", status="done", writeup="abc")], {"muon_test_search_x": F(live=0)},
+                    sites="ccin2p3", state={"muon_test": {"sweeps": [rec("muon_test_search_x")]}})
+    w2 = sweep_world([E("muon_test", match="*muon*", status="done", writeup="abc")],
+                     {"muon_test_search_y": F(live=2)}, sites="ccin2p3")
+    rc, err = w.check()
+    rc2, err2 = w2.check()
+    scenario("sweeps: a done entry is never reopened by its sweeps, recorded or not; a live one nobody runs is a note",
+             w.entries()["muon_test"]["status"] == "done" and "sweep ended" not in err
+             and w2.entries()["muon_test"]["status"] == "done" and "muon_test" not in json.load(open(w2.state))
+             and rc2 == 0 and "no running entry's match names it" in err2, err + err2)
+    # the submission side: sweep_manager stamps the sweep with the work item, and its state feeds the plan
+    t = tempfile.mkdtemp(prefix="sm_")
+    bins, sw = os.path.join(t, "bin"), os.path.join(t, "sweeps", "mu_search_d")
+    os.makedirs(bins); os.makedirs(os.path.join(sw, "jobs")); os.makedirs(os.path.join(sw, "results"))
+    for i in range(3):
+        open(os.path.join(sw, "jobs", "trial_%04d.sh" % i), "w").write("#!/bin/sh\n")
+    open(os.path.join(sw, "results", "hp0000_t1_1.json"), "w").write("{}")
+    q = os.path.join(t, "queue")
+    open(os.path.join(bins, "sbatch"), "w").write(
+        "#!/bin/sh\nn=$(($(cat %s 2>/dev/null | wc -l) + 7001)); echo \"$n PENDING\" >> %s; echo $n\n" % (q, q))
+    open(os.path.join(bins, "squeue"), "w").write("#!/bin/sh\ncat %s 2>/dev/null\n" % q)
+    open(os.path.join(bins, "scontrol"), "w").write("#!/bin/sh\nexit 0\n")
+    for b in ("sbatch", "squeue", "scontrol"):
+        os.chmod(os.path.join(bins, b), 0o755)
+    env = dict(os.environ, PATH=bins + os.pathsep + os.environ["PATH"], CCORCH_SITE="ccin2p3",
+               CCORCH_WORK=J({"items": ["mu"], "active": ["mu_*"], "held": []}))
+    reg = os.path.join(t, "registry.json")
+    r = subprocess.run([sys.executable, SM, "--registry", reg, "submit", sw, "--seq-batches", "1"], env=env,
+                       capture_output=True, text=True)
+    stamp = json.load(open(reg))["sweeps"].get("mu_search_d") or {}
+    r2 = subprocess.run([sys.executable, SM, "--registry", reg, "state"], env=env, capture_output=True, text=True)
+    line = [l for l in r2.stdout.splitlines() if l.startswith("SWEEP_STATE ")]
+    facts = json.loads(line[0][len("SWEEP_STATE "):])["sweeps"].get("mu_search_d") if line else {}
+    scenario("sweeps: sweep_manager submit stamps the sweep with the work item and time and prints SWEEP_SUBMITTED; "
+             "its state reports the queued jobs, scripts and results",
+             r.returncode == 0 and "SWEEP_SUBMITTED" in r.stdout and stamp.get("items") == ["mu"]
+             and stamp.get("submitted_at") and facts and facts["live"] == 3 and facts["scripts"] == 3
+             and facts["results"] == 1, r.stdout + r.stderr + r2.stdout + r2.stderr)
+    w = World([E("mu", match="zz_*")])
+    w.env["PLAN_SWEEP_SITES"] = "ccin2p3"
+    open(os.path.join(w.d, "sweeps_ccin2p3.json"), "w").write(line[0][len("SWEEP_STATE "):] if line else "{}")
+    rc, err = w.check()
+    got = [x["name"] for x in json.load(open(w.state)).get("mu", {}).get("sweeps") or []]
+    open(q, "w").write("")                                    # the queue drains
+    r3 = subprocess.run([sys.executable, SM, "--registry", reg, "state", "mu_search_d"], env=env, capture_output=True,
+                        text=True)
+    open(os.path.join(w.d, "sweeps_ccin2p3.json"), "w").write(r3.stdout.split("SWEEP_STATE ", 1)[-1])
+    os.remove(os.path.join(w.d, ".check_cache.json"))
+    rc2, err2 = w.check()
+    scenario("sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's "
+             "entry, in flight while queued, listed when the queue drains",
+             rc == 0 and got == ["mu_search_d"] and rc2 == 2 and "sweep ended: mu_search_d (ccin2p3, 3 of 3" in err2,
+             err + err2)
+    r4 = subprocess.run([sys.executable, SM, "--registry", reg, "submit", sw], env=dict(env, CCORCH_WORK=""),
+                        capture_output=True, text=True)
+    scenario("sweeps: a submission with no work item is still refused by the work gate (nothing stamped)",
+             "refused mu_search_d" in r4.stdout and "SWEEP_SUBMITTED" not in r4.stdout, r4.stdout + r4.stderr)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1418,7 +1594,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, the_suite_itself]
+          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, sweeps, the_suite_itself]
 
 
 def main():

@@ -12,7 +12,9 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
   - never blocking, a note: a done entry no longer passes what plan done checked (plan next suggests plan reopen);
   - numbers committed to docs/results.tex on trunk since the last verified commit fail tools/verify_claims.py (the
     gate on the numbers, a check of state; the git hooks only catch a problem earlier);
-  - a site event is open.
+  - a site event is open;
+  - a sweep on a site, live or just submitted, that no entry records and that fits several running entries (one that
+    fits a single entry is recorded on it here, with a note: plan.reconcile_sweeps).
 An item check that cannot reach its site counts as in flight and is reported as a note, never as a block.
 It fails closed: an error in the check blocks too. Env for tests: see tools/plan.py, and PLAN_EVENTS_CMD."""
 import datetime as dt, json, os, re, shlex, subprocess, sys
@@ -45,9 +47,10 @@ def problems():
     (a quote, a recorded step, an answered question asked again), reported at one stop and then not again."""
     import plan, time
     plan.DEADLINE[0] = time.monotonic() + float(plan.ENV.get(BUDGET_TEST, BUDGET_S))
+    unrecorded = plan.reconcile_sweeps()              # first: a sweep it records on an entry counts below
     d, st = plan.load()
     msgs = plan.messages(plan.oldest_open(d, st))     # from the oldest open question, or the previous re-ask scan
-    out, once = [], []
+    out, once = list(unrecorded), []
     for e, why, launched in plan.next_steps(d, st, msgs=msgs):
         if launched:
             continue
