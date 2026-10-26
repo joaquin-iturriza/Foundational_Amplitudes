@@ -1162,6 +1162,10 @@ entries:
       deviations of every light-quark W process come from the checker''s W mass 80.419 against the card''s derived 80.4190024
       (d d~ > w+ w-: 2.2e-6 -> 5.7e-14 at the card value); harmless under the 1e-3 tolerance, not fixed'
     at: '2026-10-26T03:08:59+00:00'
+  - tried: width rebuild job FA-ccin2p3-c09de7d2 (staged build 1411 s rc 0, VERIFY_CARDS 240 cards 0 bad)
+    why: migrate --apply opened quarantine/migrate/migrate_manifest.tsv before creating its dir (FileNotFoundError); died
+      before any sidecar rewrite, chunk rename or swap, so production pools untouched; fixed b341db18, rerun FA-ccin2p3-e957351b
+    at: '2026-10-26T04:23:08+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
