@@ -595,7 +595,7 @@ being *fair* and *not wasteful*:
 
 ## Waiting on jobs (a mechanism, never hand-polling)
 
-A job belongs to a plan entry: submitted with `--item <entry>` and recorded with `plan run <entry> <run>`. Nobody
+A job belongs to a plan entry: submitted with `--item <entry>` and recorded with `plan run <entry> <run>` (a sweep: `plan run <entry> --sweep <site>:<name>`, done by `plan next` itself when missed). Nobody
 waits on it by hand and no step agent stays alive for it. `site supervise --project FA` (CC feeder, rebalancer,
 `watchdog.py --units` as every item's check, overruns, run ends) and one `site events --wait --project FA`, both in
 the background, are the whole watch: the run's end opens an event that wakes the main session, and `plan next` then
