@@ -148,6 +148,10 @@ entries:
   - tried: 'rerun FA-ccin2p3-8e8fdb3f (7f1fcf39): nearest-value match with a one-to-one check'
     why: 'near ties in log|M|^2 put two saved events on one pool event: 336 arm-probe reads refused'
     at: '2026-10-26T03:31:48+00:00'
+  - tried: pair sign head short arm FA-ccin2p3-6eb53ab6 (78f24891)
+    why: 'cancelled minutes in: the leg-mass invariant used a 1e-8 floor, below float32 noise of the augmented momenta, so
+      massless legs'' inputs moved with the Lorentz draw; floors set to 1e-6 in 46841b69 and rerun as FA-ccin2p3-161fc56b'
+    at: '2026-10-26T05:09:58+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
