@@ -1055,15 +1055,12 @@ entries:
   - D140
   - D142
   - D145
-  next: 'read the width regeneration job (FA-ccin2p3-c09de7d2: staged build of the heavy-quark, Z''/2HDM and v4 loop-induced
-    pools, VERIFY_CARDS, MIGRATE_SUMMARY (dry run: 5076 v4 tree sidecars, all cards gave 1.4915), SWAP_SUMMARY, then the three
-    held one-loop entries'' certification and build); commit CLAUDE.md''s width rows once claudemd-keeper passes; then the
-    pool check, classes and roles, the massless b in particle_ids.py, catalog_v4''s short pretrainings. Open for the user:
-    catalog_v3''s six loop-induced HH/HHH pools have Z 2.48883 / W 2.08465 (not regenerated); results.tex''s WT=1.4803 claim
-    (notes-editor); ALSO (covered by the user''s ''For the others, if it''s not too much time for regeneration, regenerate'',
-    D145): rebuild catalog_v3''s six loop-induced HH/HHH pools at Z 2.441404 / W 2.0476 (~2 core-h, tools/width_regen.py,
-    quarantine the old ones) and check the 2HDM u u~ > h2 h3 g build that printed ''0 diagrams'' for one subprocess; check
-    results.tex''s val.wt=1.4803 claim against the new 1.4915'
+  next: 'read the width rebuild rerun FA-ccin2p3-e957351b (site logs, grep WIDTH_|MIGRATE_SUMMARY|SWAP_SUMMARY|SWAP_REFUSED|Traceback):
+    check the staged build was reused, migrate and swap summaries (swap all-or-nothing per family, manifests in $SCRATCH/zz_width_regen/quarantine),
+    then the three held one-loop entries'' certification and build; then commit CLAUDE.md''s width rows once claudemd-keeper
+    passes; the pool check, classes and roles, the massless b in particle_ids.py, catalog_v4''s short pretrainings. Still
+    open: catalog_v3''s six loop-induced HH/HHH pools rebuild at Z 2.441404 / W 2.0476 (D145), the 2HDM u u~ > h2 h3 g ''0
+    diagrams'' subprocess, results.tex val.wt=1.4803 claim vs 1.4915'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
