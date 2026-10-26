@@ -439,8 +439,12 @@ class TrainingReference:
             cfg = mg.PROCESSES.get(name) or mg.PROCESSES.get(s["base"])
             if cfg is None:
                 continue
-            blk = (blocks or {}).get(name) or physics_block(name if name in mg.PROCESSES else s["base"],
-                                                            spec_physics=s["physics"], cfg=cfg)
+            try:
+                blk = (blocks or {}).get(name) or physics_block(name if name in mg.PROCESSES else s["base"],
+                                                                spec_physics=s["physics"], cfg=cfg)
+            except Exception as e:                   # listed, never a reference
+                self.unreadable = getattr(self, "unreadable", []) + [(name, repr(e)[:120])]
+                continue
             self.entries.append({"name": name, "scan": bool(s["physics"]), "declared": declared_fields(s["physics"]),
                                  "pdg": [int(p) for p in cfg["pdg_ids"]],
                                  "loop": is_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
