@@ -576,8 +576,9 @@ entries:
     - signed_ab
   decisions:
   - D83
-  next: one CPU job on CC, tools/factorised_2to4.py on the 40 2->4 probes, 2000 val events each, parent |M|^2 at CS initial-initial
-    mapped events; ~1 h, 2 CPUs, no GPU
+  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
+    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
+    that decides'
   done_when: null
   match: zz_factorised_2to4*
   notes_ref: null
