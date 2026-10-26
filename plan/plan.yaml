@@ -1027,7 +1027,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -1085,6 +1085,13 @@ entries:
     answers_after: '2026-10-26T03:17:36+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T12:59:00.938000+00:00'
+    text: isn't there I single correct way to calculate the amplitude? Why are there so many decisions to make about it? and
+      if this one is blowing up, then it's clearly wrong
+    decision: D154
+    answers_after: '2026-10-26T05:01:38+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -1095,14 +1102,11 @@ entries:
   - D140
   - D142
   - D145
-  next: 'waiting on the user for b b~ > h w+ w- one-loop (generate it at zero top width, the top is t-channel only there;
-    or drop it; question in the step report). State now: width rebuild complete (1440 pools and sidecars swapped in, 2046
-    old files in $SCRATCH/zz_width_regen/quarantine listed in swap_manifest.tsv; 5076 tree sidecars migrated, migrate_manifest.tsv),
-    the 720 swapped pools'' alpha_s sidecars rewritten (write_own_alphas, 0 refused), b b~ > ta+ vt w- and b g > b w+ w- one-loop
-    pools built. Meanwhile: commit CLAUDE.md''s width rows once claudemd-keeper passes; the pool check, classes and roles,
-    the massless b in particle_ids.py, catalog_v4''s short pretrainings. Still open: the 2HDM u u~ > h2 h3 g ''0 diagrams''
-    subprocess, results.tex val.wt=1.4803 claim vs 1.4915; whether the trees with a t-channel top (b b~ > w+ w-, b b~ > h
-    w+ w- ...) carry the same width artefact at multi-TeV (not checked)'
+  - D154
+  next: 'Generate the one-loop b b~ > h w+ w- (v4_bbx_hwpwm_nlo) at zero top width, exact there since the top is t-channel
+    only (the user: one correct way; D111 ''do whatever is correct and simpler''); every other entry keeps WT 1.4915; check
+    the pole guard passes over [threshold, 6 TeV]; then the pool check, classes and roles, the massless b in particle_ids.py,
+    and catalog_v4''s short pretrainings'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -1301,13 +1305,10 @@ entries:
     at: '2026-10-26T05:01:38+00:00'
     searched: D145 'do 1.4915 for all' chose which nonzero width, not zero; D142 'for the other three, investigate' authorises
       the investigation, not a width change; no other decision covers a per-process width
+    answered_at: '2026-10-26T12:59:00.843000+00:00'
+    decision: D154
   searched: D145 'do 1.4915 for all' chose which nonzero width, not zero; D142 'for the other three, investigate' authorises
     the investigation, not a width change; no other decision covers a per-process width
-  ask: For the one-loop b b~ > h W+ W-, the top appears only in the t-channel, so the fixed 1.4915 top width breaks the pole
-    structure, by up to 20% at 4 to 6 TeV. Should I generate this one process at zero top width (exact here, since the top
-    can never be on shell), or drop it from the catalog?
-  waiting_since: '2026-10-26T05:01:38+00:00'
-  checked_until: '2026-10-26T12:54:37+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
