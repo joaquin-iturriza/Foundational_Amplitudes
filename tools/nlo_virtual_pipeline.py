@@ -443,7 +443,11 @@ def _zero_top_width(param_card):
         text = open(param_card).read()
         bak = param_card + WIDTH_BACKUP
         open(bak, "w").write(text)
-        patched = re.sub(r"^(DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
+        # patch_param_card_slha writes " DECAY 6 ..." with a leading blank: anchored at column 0 this was a silent
+        # no-op on every card it had patched (catalog_v4's WT), so the check ran at the physical width
+        patched, n_sub = re.subn(r"^(\s*DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
+        if n_sub != 1:
+            raise RuntimeError(f"_zero_top_width: {n_sub} 'DECAY 6' lines in {param_card}, expected 1")
         prev = signal.getsignal(signal.SIGTERM)
 
         def on_term(signum, frame):
