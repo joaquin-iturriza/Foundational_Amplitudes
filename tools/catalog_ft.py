@@ -14,6 +14,11 @@ parent_shared: the probe's own transform, the parent's pooled mean and sigma), s
 zero-shot on the probe instead of its output read in the probe's own units (the refit fine-tunes threw that level away).
 The four probes are the dimensionless arm's median-MSE probe of each axis (H1 new combinations, H2 2->4, H3 the top,
 H5 one loop), fixed before any fine-tune ran.
+The fine-tune keeps the parent's coupling-monomial convention (data.orders_from_diagrams, which sets the order features
+and the dimensionless target's monomial): read from the parent's data_stats.json (target_physics_orders_source), else
+inferred from the run that wrote it (experiment.AmplitudeExperiment._infer_orders_source), so a parent from before the
+diagrams were read (the table) is fine-tuned on the table without a hand-set flag; a parent whose source no setting
+reproduces (diagrams_alphas_only, 6dee967a..5e4040a9) is refused.
 One CATFT JSON line per cell: the best-checkpoint val_loss_no_reg (the run's result file) and that times prepd_std^2,
 the MSE in the target's log units, as tools/lowd_ft.py reports a cell; a failed cell is listed with its error.
     python tools/catalog_ft.py --parent runs/catalog_v3_short/dimensionless_muon --optimizer AdamW --out $SCRATCH/zz_catft
@@ -42,7 +47,27 @@ def probe_recipe(probe, out):
     raise KeyError(f"{probe} is in no recipes/catalog_v3_heldout_*.yaml")
 
 
-def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False, target_stats="own"):
+# the parent's coupling-monomial source -> data.orders_from_diagrams (experiment._target_orders_source's inverse)
+ORDERS_FLAG = {"diagrams_highest_alphas": True, "table": False}
+
+
+def parent_orders_flag(parent):
+    """(data.orders_from_diagrams for the fine-tune, the parent's source, how it was read)."""
+    stats = os.path.join(parent, "data_stats.json")
+    src = json.load(open(stats)).get("target_physics_orders_source") if os.path.exists(stats) else None
+    how = "data_stats.json"
+    if src is None:
+        sys.path.insert(0, ROOT)
+        from experiment import AmplitudeExperiment
+        src, how = AmplitudeExperiment._infer_orders_source(parent)
+    if src not in ORDERS_FLAG:
+        raise ValueError(f"the parent {parent} was fitted with target_physics_orders_source={src} ({how}), which no "
+                         f"data.orders_from_diagrams setting reproduces")
+    return ORDERS_FLAG[src], src, how
+
+
+def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False, target_stats="own",
+            orders_from_diagrams=True):
     ft = [] if scratch else [
         f"fine_tune.pretrained_path={os.path.abspath(parent)}/models/model_run0_best.pt",
         "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", f"fine_tune.target_stats={target_stats}",
@@ -53,7 +78,8 @@ def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scr
             f"training.iterations={T}", "training.validate_frac=0.01", "training.es_load_best_model=true",
             f"training.optimizer={optimizer}", f"training.result_path={result_path}",
             f"data.processes_file={recipe}", f"++data.train_subsample={D}", f"++data.eval_subsample={EVAL_EVENTS}",
-            "evaluation.train_subsample=2000", "plot=true"] + ft
+            "evaluation.train_subsample=2000", "plot=true",
+            f"++data.orders_from_diagrams={str(bool(orders_from_diagrams)).lower()}"] + ft
 
 
 def main():
@@ -74,6 +100,8 @@ def main():
     assert not (a.scratch and a.keep_parent_stats), "scratch has no parent statistics"
     kind = "scratch" if a.scratch else ("catft_parentstats" if a.keep_parent_stats else "catft")
     target_stats = "parent_shared" if a.keep_parent_stats else "own"
+    ofd, osrc, ohow = parent_orders_flag(a.parent)
+    print(f"CATFT_ORDERS parent source {osrc} ({ohow}): data.orders_from_diagrams={str(ofd).lower()}", flush=True)
     base = os.path.join(a.out, f"{kind}_{pname}_{a.optimizer}")
     os.makedirs(base, exist_ok=True)
     failed = 0
@@ -89,7 +117,7 @@ def main():
             t0 = time.time()
             try:
                 p = subprocess.run(command(a.parent, a.optimizer, recipe, D, T, run_dir, res,
-                                           f"{kind}_{pname}_{a.optimizer}", a.scratch, target_stats), cwd=ROOT)
+                                           f"{kind}_{pname}_{a.optimizer}", a.scratch, target_stats, ofd), cwd=ROOT)
                 if p.returncode:
                     raise RuntimeError(f"run.py exit {p.returncode}")
                 r = json.load(open(res))

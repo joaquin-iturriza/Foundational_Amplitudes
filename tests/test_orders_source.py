@@ -16,6 +16,7 @@ where it came from (plan catalog_coverage, the repo review of the coupling-order
    them: the commit in its out_0.log against the history (before 6dee967a the table, 6dee967a and 5e4040a9 the
    alpha_s power alone, from 1d9d6a29 the current source), else its config.yaml (the key true: the diagrams; absent:
    the table). A parent of today's catalog comparison (git_hash 1d9d6a29) passes a diagrams run's check.
+5. tools/catalog_ft.py gives the fine-tune the parent's data.orders_from_diagrams (recorded or inferred source).
 
 Needs the project's env (torch, omegaconf): run on a site,  python tests/test_orders_source.py
 """
@@ -230,9 +231,39 @@ def test_stats_without_record_inferred_from_parent():
           "a parent at 1d9d6a29 passes a diagrams run")
 
 
+def test_catalog_ft_follows_parent():
+    """5. tools/catalog_ft.py sets data.orders_from_diagrams from the parent: the source recorded in its
+    data_stats.json, else inferred (_infer_orders_source); a table parent (before 6dee967a) gets false on the run.py
+    command line, a current one true, an alpha_s-only one (6dee967a..5e4040a9) is refused."""
+    spec = importlib.util.spec_from_file_location("catalog_ft", os.path.join(ROOT, "tools", "catalog_ft.py"))
+    ft = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ft)
+    with tempfile.TemporaryDirectory() as d:
+        rec = _parent(os.path.join(d, "recorded"))
+        json.dump({"target_physics_orders_source": "table"}, open(os.path.join(rec, "data_stats.json"), "w"))
+        assert ft.parent_orders_flag(rec)[:2] == (False, "table"), ft.parent_orders_flag(rec)
+        cfg_on = _parent(os.path.join(d, "cfg_on"), {"orders_from_diagrams": True})
+        json.dump({}, open(os.path.join(cfg_on, "data_stats.json"), "w"))       # stats written before the record
+        assert ft.parent_orders_flag(cfg_on)[:2] == (True, "diagrams_highest_alphas"), ft.parent_orders_flag(cfg_on)
+        cfg_off = _parent(os.path.join(d, "cfg_absent"))
+        assert ft.parent_orders_flag(cfg_off)[:2] == (False, "table"), ft.parent_orders_flag(cfg_off)
+        if _git_has("6dee967a49596d36a16055653cdf5a7df05f520b"):
+            old = _parent(os.path.join(d, "alphas_only"), git_hash="6dee967a49596d36a16055653cdf5a7df05f520b")
+            try:
+                ft.parent_orders_flag(old)
+                raise RuntimeError("an alpha_s-only parent accepted")
+            except ValueError:
+                pass
+        for flag in (True, False):
+            cmd = ft.command(rec, "AdamW", "r.yaml", 10, 20, "rd", "res.json", "e", orders_from_diagrams=flag)
+            assert f"++data.orders_from_diagrams={str(flag).lower()}" in cmd, cmd
+    print("[catalog_ft] the fine-tune's data.orders_from_diagrams follows the parent's source (recorded, inferred)")
+
+
 if __name__ == "__main__":
     test_switch_off_is_the_table_target()
     test_mixed_entry()
     test_frozen_stats_record_and_check()
     test_stats_without_record_inferred_from_parent()
+    test_catalog_ft_follows_parent()
     print("all ok")
