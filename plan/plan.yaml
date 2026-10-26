@@ -1057,7 +1057,10 @@ entries:
     held one-loop entries'' certification and build); commit CLAUDE.md''s width rows once claudemd-keeper passes; then the
     pool check, classes and roles, the massless b in particle_ids.py, catalog_v4''s short pretrainings. Open for the user:
     catalog_v3''s six loop-induced HH/HHH pools have Z 2.48883 / W 2.08465 (not regenerated); results.tex''s WT=1.4803 claim
-    (notes-editor)'
+    (notes-editor); ALSO (covered by the user''s ''For the others, if it''s not too much time for regeneration, regenerate'',
+    D145): rebuild catalog_v3''s six loop-induced HH/HHH pools at Z 2.441404 / W 2.0476 (~2 core-h, tools/width_regen.py,
+    quarantine the old ones) and check the 2HDM u u~ > h2 h3 g build that printed ''0 diagrams'' for one subprocess; check
+    results.tex''s val.wt=1.4803 claim against the new 1.4915'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
