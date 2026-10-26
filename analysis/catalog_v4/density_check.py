@@ -146,6 +146,9 @@ def run(workers, only=None):
 # the summary, on the laptop
 COARSE = (2, 2, 1)          # fine bins merged per coarse bin along s, u, y: 0.2 dex in sqrt(s_hat), 2 in u, 1 dex in y
 GAP = 1.0 / 3               # a bin is thin when the sample's density there is below a third of pp's
+# COARSE, GAP, the half-event floor and N_POOL are the check's own choices (no source); `robustness` reruns the gap and
+# the KL and their correlation with the error over five binnings and three thresholds, `robustness_range` their span
+MIN_OTHERS = 5              # s_tmpl: a group needs at least this many other classes for a leave-one-out template
 FS = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0)
 PARTONS = {1, 2, 3, 4, 5, 21}
 
@@ -236,7 +239,7 @@ def spear(x, y, n_boot=2000, seed=0):
 
 def summary():
     """Per class, on coarse joint bins (0.2 dex in sqrt(s_hat), 2 in u, 1 dex in y: 14 x 5 x 9), pp's density p from
-    its training and scored events together (12000), each catalog's q from its N_POOL training events with an empty bin
+    its training pool alone (1e4; the 2000 scored events are only the weights v), each catalog's q from its N_POOL training events with an empty bin
     floored at half an event; the metrics of metrics() for catalog_v4 and catalog_v3, jointly and per variable alone.
     The check's own choices: the coarse bins, the third (GAP), the half-event floor, N_POOL; the gap share and the
     median ratio do not use the floor (an empty bin is thin whatever the floor), the KL does.
@@ -253,7 +256,8 @@ def summary():
       pp      c = p: MadEvent's pp events themselves (the bound)
       s_own   catalog_v4's events with sqrt(s_hat) redrawn from the class's own pp marginal: c = q_v4 p(s) / q_v4(s)
       s_tmpl  the same with the marginal from a template shared by the classes of one beam pair (gg, qg, q qbar, qq) and
-              multiplicity, in log10(sqrt(s_hat) / the class's catalog_v4 threshold) (what a class with no pp pool gets)
+              multiplicity, in log10(sqrt(s_hat) / the class's catalog_v4 threshold) (what a class with no pp pool gets); leave-one-out (the
+              class's own pp left out), groups with fewer than MIN_OTHERS other classes left out of s_tmpl
       su_own  sqrt(s_hat) and the forward angle redrawn from the class's pp (s, u) marginal: c = q_v4 p(s,u) / q_v4(s,u)
     A component's mass where catalog_v4 has no event at that s (or s, u) is lost (counted, `lost`): redrawing cannot put
     events where the mixture's conditional is empty. Breadth: q_f >= (1 - f) q_v4 in every bin, so no region of
@@ -268,7 +272,7 @@ def summary():
     per = {}
     tmpl = {}
     for n, r in rows.items():
-        P = dense(r["pp"]) + dense(r["ppval"])
+        P = dense(r["pp"])                          # pp's density from its training pool alone: the scored events
         p = P / P.sum()
         v = dense(r["ppval"])
         e = {"nfinal": r["nfinal"], "beams": beams_kind(mg.PROCESSES[n]["pdg_ids"]), "b": bool(isb[n]), "role": role[n]}
@@ -284,7 +288,7 @@ def summary():
                 e[cat][nm] = metrics(cm / cm.sum(), pm, vm)
             # pT alone, on its own fine bins merged by two
             cp = np.add.reduceat(np.asarray(r[cat]["pt"], float), np.arange(0, len(r[cat]["pt"]), 2))
-            pp_ = np.add.reduceat(np.asarray(r["pp"]["pt"], float) + np.asarray(r["ppval"]["pt"], float),
+            pp_ = np.add.reduceat(np.asarray(r["pp"]["pt"], float),
                                   np.arange(0, len(r["pp"]["pt"]), 2))
             vp = np.add.reduceat(np.asarray(r["ppval"]["pt"], float), np.arange(0, len(r["pp"]["pt"]), 2))
             e[cat]["pt"] = metrics(cp / cp.sum(), pp_ / pp_.sum(), vp)
@@ -296,13 +300,18 @@ def summary():
                 e["lo"] = float(r["v4"]["sqrts"][0])
                 if not e["b"]:
                     # the template's input: pp's fine sqrt(s_hat) marginal shifted to the class's threshold
-                    fs = dense(r["pp"], (1, 1, 1)).sum((1, 2)) + dense(r["ppval"], (1, 1, 1)).sum((1, 2))
+                    fs = dense(r["pp"], (1, 1, 1)).sum((1, 2))
                     i0 = int(np.clip(np.floor((np.log10(e["lo"]) - S_EDGES[0]) / 0.1 + 1e-9), 0, len(fs) - 1))
                     sh = np.zeros(len(fs)); sh[:len(fs) - i0] = fs[i0:]
                     e["_i0"] = i0
-                    tmpl.setdefault((e["beams"], e["nfinal"]), []).append(sh / sh.sum())
+                    tmpl.setdefault((e["beams"], e["nfinal"]), {})[n] = sh / sh.sum()
+        e["_name"] = n
         per[n] = e
-    T = {k: np.mean(v, 0) for k, v in tmpl.items()}
+    # leave-one-out: a class's template is the mean over the OTHER classes of its group (beams, multiplicity); a group
+    # with fewer than MIN_OTHERS others gives no template and its classes are left out of s_tmpl (counted)
+    def T(n, key):
+        oth = [v for m, v in tmpl[key].items() if m != n]
+        return np.mean(oth, 0) if len(oth) >= MIN_OTHERS else None
 
     # --- correlations with the reads
     tr = [n for n, e in per.items() if not e["b"] and e["role"]["v3"] == "train" and e["role"]["v4"] == "train"
@@ -358,7 +367,9 @@ def summary():
         if kind in ("s_own", "s_tmpl"):
             ps_ = marg(p, (0,))
             if kind == "s_tmpl":
-                t = T[(e["beams"], e["nfinal"])]
+                t = T(e["_name"], (e["beams"], e["nfinal"]))
+                if t is None:
+                    return None, None
                 fine = np.zeros(SHAPE[0]); fine[e["_i0"]:] = t[:SHAPE[0] - e["_i0"]]
                 ps_ = fine.reshape(-1, COARSE[0]).sum(1) if SHAPE[0] % COARSE[0] == 0 else None
                 ps_ = ps_ / ps_.sum()
@@ -378,6 +389,8 @@ def summary():
         e = per[n]
         for k in KINDS:
             c, l = comp(e, k)
+            if c is None:
+                continue
             lost[k].append(l)
             for f in FS:
                 cf = (1 - f) * (e["_c"] / e["_c"].sum()) + f * c
@@ -397,7 +410,7 @@ def summary():
             g_, k_ = [], []
             for n in tr:
                 r = rows[n]
-                P_ = dense(r["pp"], co) + dense(r["ppval"], co)
+                P_ = dense(r["pp"], co)
                 c_ = dense(r["v4"], co)
                 m_ = metrics(c_ / c_.sum(), P_ / P_.sum(), dense(r["ppval"], co), gp)
                 g_.append(m_["gap"])
@@ -405,7 +418,15 @@ def summary():
             rob[f"{co[0]}{co[1]}{co[2]}_{gp:.2f}"] = {"gap": md(g_), "rho_gap": spear(g_, yd, 300)["rho"],
                                                      "kl": md(k_), "rho_kl": spear(k_, yd, 300)["rho"]}
     out["robustness"] = rob
+    out["robustness_range"] = {x: [float(min(v[x] for v in rob.values())), float(max(v[x] for v in rob.values()))]
+                               for x in ("gap", "rho_gap", "kl", "rho_kl")}
+    # the same over the three binnings that keep all three variables (the other two drop s, or u and y)
+    jt = [v for k, v in rob.items() if k.split("_")[0] in ("111", "221", "453")]
+    out["robustness_range_joint"] = {x: [float(min(v[x] for v in jt)), float(max(v[x] for v in jt))]
+                                     for x in ("gap", "rho_gap", "kl", "rho_kl")}
+    out["mixture_n"] = {k: len(mix[k][FS[0]]["gap"]) for k in KINDS}
     out["template_groups"] = {f"{a}_2to{b}": len(v) for (a, b), v in tmpl.items()}
+    out["template_min_others"] = MIN_OTHERS
     json.dump(out, open(os.path.join(HERE, "data", "density_check.json"), "w"), indent=1)
     plot(per, tr, Y, mix, out)
     print(json.dumps(out))
