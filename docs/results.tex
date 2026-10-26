@@ -1231,8 +1231,10 @@ is whether to pretrain on catalog\_v4 instead of catalog\_v3 (the user's decisio
 deletion of catalog\_v3). Design: the dimensionless arm with Muon at its search's best (par.~\ref{par:v3_muon}), the
 same HPs, batch and steps on both catalogs (the user: ``Match steps.'', ``only the winner''), two seeds each
 (\code{scripts/job\_catalog\_v3\_short.sh}: \code{dimensionless\_muon\_best}, \code{\_seed2};
-\code{v4\_dimensionless\_muon}, \code{\_seed2}); each run's best checkpoint is at step $4250$ of $4264$ (no blow-up check beyond that).
-Every read is zero-shot at the best checkpoint on $2000$ validation events per pool, the MSE of
+\code{v4\_dimensionless\_muon}, \code{\_seed2}); each run's best checkpoint is at step $4250$ of $4264$. None of the four blew up: no step has a non-finite training
+loss, and the one spike (catalog\_v3 seed $42$, a single step early in training) was gone at the next step
+(\code{train\_steps.npz} of each run). Every read is at the best checkpoint on $2000$ validation events per pool,
+zero-shot only for the processes held out in the catalog being read, the MSE of
 $\log|\mathcal M|^2$ (\code{analysis/catalog\_v4/compare\_v3.py}, Figs.~\ref{fig:v4_vs_v3_shared}
 and~\ref{fig:v4_vs_v3_pp}). Per group: each run's median over probes; the catalog ratio, the median over probes of
 catalog\_v4's MSE over catalog\_v3's (each the geometric mean of its two seeds); the share of probes lower in both
@@ -1276,7 +1278,7 @@ seed spreads $0.09$ and $0.12$. On catalog\_v4's pools: catalog\_v3's runs $2.34
 and $0.48$; ratio $0.21$, lower in both seeds on $88\%$ against $5\%$, gap $0.68$ against $0.11$ and $0.08$. Both
 differences exceed the seed spread. Each catalog reads its own pools best, but the cost of crossing is not symmetric:
 catalog\_v3's model on catalog\_v4's pools (forward events, $\sqrt{\hat s}$ to $6$\,TeV) is about six times its error on
-its own, catalog\_v4's model on catalog\_v3's about twice (a quarter more per process).
+its own, catalog\_v4's model on catalog\_v3's about twice its error on its own.
 % src: python3 analysis/catalog_v4/compare_v3.py @2327492d
 % claim: shared.v3.all_no_b.H3.ratio=0.90
 % claim: shared.v3.all_no_b.H6.ratio=1.11
@@ -1290,9 +1292,9 @@ its own, catalog\_v4's model on catalog\_v3's about twice (a quarter more per pr
 % claim: shared.v3.b.all.ratio=2.25
 % claim: shared.v4.b.all.ratio=0.21
 Per axis on catalog\_v3's pools catalog\_v4 is behind on new combinations, $2\to4$, $2\to5$, one loop and the harder cut
-(ratios $1.24$ to $2.7$: $1.38$, $1.24$ at $2\to5$, $2.7$ on the one-loop pools, $1.68$ at $p_T\geq30$\,GeV), even on
-the top ($0.90$, as many probes lower in both seeds on either side) and within the seed spread at $\alpha_s=0.13$ ($1.11$, $5$
-probes); on catalog\_v4's pools it is ahead on every axis ($0.02$ at $\alpha_s=0.13$ to $0.37$ at $2\to5$). The $b$
+(ratios $1.24$ to $2.7$: $1.38$, $1.24$ at $2\to5$, $2.7$ on the one-loop pools, $1.68$ at $p_T\geq30$\,GeV), slightly
+ahead on the top ($0.90$, as many probes lower in both seeds on either side) and even within the seed spread at
+$\alpha_s=0.13$ ($1.11$, $5$ probes); on catalog\_v4's pools it is ahead on every axis ($0.02$ at $\alpha_s=0.13$ to $0.37$ at $2\to5$). The $b$
 processes go the same way, more so: $2.25$ on catalog\_v3's pools (catalog\_v4 never saw a $4.7$\,GeV $b$), $0.21$ on
 catalog\_v4's.
 % src: python3 analysis/catalog_v4/compare_v3.py @2327492d
@@ -1319,6 +1321,10 @@ catalog\_v4's.
 % claim: pp.no_b.heldout.mse_outside.ratio=0.63
 % claim: pp.no_b.heldout.mse_inside.ratio=1.21
 % claim: pp.no_b.heldout.H3.ratio=0.76
+% claim: pp.no_b.heldout.H3.n=45
+% claim: pp.no_b.heldout.H3.gap=0.23
+% claim: pp.no_b.heldout.H3.spread_v3=0.23
+% claim: pp.no_b.heldout.H3.spread_v4=0.19
 % claim: pp.no_b.role_changed.mse.n=39
 % claim: pp.no_b.role_changed.mse.ratio=1.74
 \emph{The $13$\,TeV pp pools} of the $1396$ hadronic tree classes, which neither catalog trains on, by the class's role
@@ -1329,7 +1335,8 @@ $4.7$\,GeV $b$). The $578$ classes trained in both: ratio $0.75$, catalog\_v4 lo
 on $27\%$ (gap $0.33$, seed spreads $0.11$ and $0.10$); outside catalog\_v3's coverage $0.50$ ($68\%$ lower), inside it
 $1.20$ (catalog\_v3 lower on $56\%$; the medians, $0.13$ against $0.60$, differ more than the per-class ratio because
 the classes' errors spread over two decades). The $180$ held out in both: ratio $0.78$ ($50\%$ against $27\%$),
-$0.63$ outside and $1.21$ inside; on the top alone the difference ($0.76$) is within the seed spread. The $39$ whose role
+$0.63$ outside and $1.21$ inside; on the top alone ($45$ classes) the difference ($0.76$, gap $0.23$ against seed spreads $0.23$ and $0.19$) is within the
+seed spread. The $39$ whose role
 differs, nearly all trained in catalog\_v3 and held out in catalog\_v4 by its class merges: $1.74$. Every difference
 quoted exceeds the seed spread unless said otherwise.
 % src: python3 analysis/catalog_v4/compare_v3.py @2327492d
@@ -1392,6 +1399,147 @@ here. Two seeds per catalog, short pretrainings.
     catalogs (left) and held out in both (right), on the whole pool and on its events inside and outside what
     catalog\_v3's window pools cover. Seed $42$ filled, $43$ open.}
   \label{fig:v4_vs_v3_pp}
+\end{figure}
+
+% src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+% claim: n_classes=1396
+% allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
+% allow: 4 because it is the catalog's number in the user's words
+% allow: M|^2
+\paragraph{catalog\_v4 against training on pp (2026-10-26).}\label{par:v4_vs_pp} The question the pp study was set up for
+(the user, 2026-10-25: ``from that we decide if we switch''; 2026-10-26: ``what mattered the most was checking how
+training on catalog 4 compares to training on pp collisions on the datasets generated like pp collisions''): on the
+$13$\,TeV pp pools, how does a model pretrained on catalog\_v4 compare with the pp-trained arm (par.\ The pp-trained
+arm), the dimensionless arm with every hadronic training class on its pp events? No new run: the reads of
+par.~\ref{par:v4_vs_v3} and par.\ The pp-trained arm, set side by side (\code{analysis/catalog\_v4/compare\_pp\_trained.py},
+Fig.~\ref{fig:v4_vs_pp}). The four runs read the same events: every read scores the first $2000$ rows of the class's
+pp validation pool, and the share of events inside catalog\_v3's coverage, from the two collections a day apart, is
+the same on all $1396$ classes; the inside/outside split has one definition (\code{pp\_compare.support\_masks}:
+catalog\_v3's fiducial cuts in the partonic frame and the class's $\sqrt{\hat s}$ window) in both. The comparison is
+not clean: catalog\_v4's two runs use Muon (seeds $42$, $43$), the pp-trained arm and its catalog\_v3 reference AdamW,
+one seed each, and those two were trained before the mixed-order fix (two catalog\_v3 BSM pools with wrong coupling
+powers). The groups are compare\_v3's, $b$ classes apart (the pp pools carry a $4.7$\,GeV $b$ that catalog\_v4 never
+saw). Medians over classes of the MSE of $\log|\mathcal M|^2$ (catalog\_v4: the geometric mean of its two seeds):
+\begin{itemize}
+  \item \emph{Directly.} On the $578$ classes trained in both catalogs: pp-trained $0.47$, catalog\_v4 $0.86$, catalog\_v3
+    % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+    % claim: no_b.train.mse.n=578
+    % claim: no_b.heldout.mse.n=180
+    % claim: no_b.train.mse.med_pp=0.47
+    % claim: no_b.train.mse.med_v4=0.86
+    % claim: no_b.train.mse.med_v3_muon=1.48
+    % claim: no_b.train.mse.med_v3_adamw=5.23
+    % claim: no_b.heldout.mse.med_pp=0.92
+    % claim: no_b.heldout.mse.med_v4=0.94
+    % claim: no_b.heldout.mse.med_v3_muon=1.17
+    % claim: no_b.heldout.mse.med_v3_adamw=3.79
+    % claim: no_b.train.mse.direct=1.31
+    % claim: no_b.train.mse.direct_lower_pct=42
+    % claim: no_b.train.mse_inside.direct=1.15
+    % claim: no_b.train.mse_outside.direct=1.28
+    % claim: no_b.heldout.mse.direct=0.79
+    % claim: no_b.heldout.mse.direct_lower_pct=54
+    % claim: no_b.heldout.mse_inside.direct=0.80
+    % claim: no_b.heldout.mse_outside.direct=0.75
+    % claim: no_b.train.mse.direct_gap=0.50
+    % claim: no_b.heldout.mse.direct_gap=0.36
+    % claim: no_b.train.mse.v4_seed_spread=0.10
+    % claim: no_b.heldout.mse.v4_seed_spread=0.14
+    % allow: 42 because it is a seed, a setting
+    with Muon $1.48$, catalog\_v3 with AdamW $5.23$. Per class catalog\_v4 over pp-trained is $1.31$ (catalog\_v4 lower
+    in both seeds on $42\%$), $1.15$ inside catalog\_v3's coverage and $1.28$ outside. On the $180$ held out in both:
+    pp-trained $0.92$, catalog\_v4 $0.94$, catalog\_v3 with Muon $1.17$, with AdamW $3.79$; per class $0.79$ ($54\%$
+    lower), $0.80$ inside, $0.75$ outside. The per-class ratios scatter by about a factor three either way (median
+    $|\log_{10}|$ $0.50$ and $0.36$, against catalog\_v4's seed spread $0.10$ and $0.14$; Fig.~\ref{fig:v4_vs_pp_scatter}).
+    So at equal steps catalog\_v4 with Muon is behind pp training with AdamW on the classes the pp-trained arm trained
+    on pp ($0.86$ against $0.47$) and level with it on the held-out ones ($0.94$ against $0.92$).
+  \item \emph{The optimizer alone is worth more than that.} On the same pp pools catalog\_v3 with Muon over catalog\_v3
+    % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+    % claim: no_b.train.mse.muon_over_adamw_v3=0.26
+    % claim: no_b.train.mse.muon_over_adamw_v3_lower_pct=96
+    % claim: no_b.heldout.mse.muon_over_adamw_v3=0.28
+    % claim: no_b.heldout.mse.muon_over_adamw_v3_lower_pct=91
+    with AdamW, same catalog, is $0.26$ on the trained classes and $0.28$ on the held-out ones (Muon lower in both
+    seeds on $96\%$ and $91\%$). So the direct comparison carries a factor of about four in catalog\_v4's favour that
+    is the optimizer's, not the catalog's.
+  \item \emph{Each against its own optimizer's catalog\_v3 arm.} Catalog\_v4 over catalog\_v3 (Muon) and pp-trained
+    % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+    % claim: no_b.train.mse.v4_over_v3_muon=0.75
+    % claim: no_b.train.mse.pp_over_v3_adamw=0.15
+    % claim: no_b.train.mse.recovered=0.15
+    % claim: no_b.train.mse_outside.v4_over_v3_muon=0.50
+    % claim: no_b.train.mse_outside.pp_over_v3_adamw=0.10
+    % claim: no_b.train.mse_outside.recovered=0.30
+    % claim: no_b.train.mse_inside.v4_over_v3_muon=1.20
+    % claim: no_b.train.mse_inside.pp_over_v3_adamw=0.60
+    % claim: no_b.heldout.mse.v4_over_v3_muon=0.78
+    % claim: no_b.heldout.mse.pp_over_v3_adamw=0.33
+    % claim: no_b.heldout.mse.recovered=0.23
+    % claim: no_b.heldout.mse_outside.v4_over_v3_muon=0.63
+    % claim: no_b.heldout.mse_outside.pp_over_v3_adamw=0.26
+    % claim: no_b.heldout.mse_outside.recovered=0.35
+    % claim: no_b.heldout.mse_inside.v4_over_v3_muon=1.21
+    % claim: no_b.heldout.mse_inside.pp_over_v3_adamw=0.68
+    over catalog\_v3 (AdamW), per class: on the trained classes $0.75$ against $0.15$, so catalog\_v4 recovers a share
+    $0.15$ of the pp-trained arm's gain (in $\log$ MSE); outside the coverage $0.50$ against $0.10$ (a share $0.30$);
+    inside it catalog\_v4 loses ($1.20$) where pp training gains ($0.60$). On the held-out classes $0.78$ against $0.33$
+    (a share $0.23$), outside $0.63$ against $0.26$ ($0.35$), inside $1.21$ against $0.68$. If Muon's factor carried
+    over to a pp-trained arm, it would read pp several times below catalog\_v4 on both groups; whether it does is not
+    measured.
+  \item \emph{The $39$ classes whose role changed} (trained in catalog\_v3, so on pp by the pp-trained arm, and held out
+    % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+    % claim: no_b.role_changed.mse.n=39
+    % claim: no_b.role_changed.mse.direct=2.98
+    % claim: no_b.role_changed.mse.direct_lower_pct=8
+    in catalog\_v4 by its class merges) go to the pp-trained arm: $2.98$, catalog\_v4 lower in both seeds on $8\%$.
+  \item \emph{The $b$ classes} go to the pp-trained arm on the trained ones ($4.97$, catalog\_v4 lower in both seeds on
+    % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+    % claim: b.train.mse.n=284
+    % claim: b.train.mse.direct=4.97
+    % claim: b.train.mse.direct_lower_pct=5
+    % claim: b.heldout.mse.n=225
+    % claim: b.heldout.mse.direct=0.91
+    % claim: b.dropped_in_v4.mse.n=33
+    % claim: b.dropped_in_v4.mse.direct=24.3
+    % allow: 4.7 because it is catalog_v3's b mass in GeV, a setting
+    $5\%$ of $284$; the pp pools' $b$ is catalog\_v3's $4.7$\,GeV one), are even on the $225$ held-out ones ($0.91$), and
+    the $33$ $b$-Higgs classes catalog\_v4 dropped read at $24.3$ times the pp-trained arm.
+\end{itemize}
+% src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+% claim: no_b.train.mse.recovered=0.15
+% claim: no_b.heldout.mse_outside.recovered=0.35
+% allow: 4264 42 43 3 because they are the step count, the seeds and the GPU-hour estimate of a run not made, settings
+So the direct reading (catalog\_v4 with Muon behind pp training with AdamW on the trained classes, level on the held-out
+ones) carries an optimizer factor of about four in catalog\_v4's favour; against its own optimizer's reference catalog\_v4 recovers a share of $0.15$ to $0.35$ of what pp training
+buys, outside catalog\_v3's coverage most, and none inside it. Separating catalog from optimizer would need the
+pp-trained arm with Muon at the catalog\_v4 runs' settings (same HPs, batch and $4264$ steps, seeds $42$ and $43$),
+read on the same pp pools, about $3$ GPU-hours; not run. Before it, a check at no compute: whether catalog\_v4's
+training density is thin where the pp events sit (the coverage check before generation measured containment only),
+and whether the per-class gap to the pp-trained arm follows that density gap.
+
+\begin{figure}[t]
+  \centering
+  \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_pp_trained.pdf}}
+  % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
+  % allow: 13 42 43 because they are the beam energy in TeV and the seeds, settings
+  % allow: M|^2
+  \caption{catalog\_v4 against training on pp, on the $13$\,TeV pp pools, no $b$: each run's median MSE of
+    $\log|\mathcal M|^2$ over the classes trained in both catalogs (left) and held out in both (right), on the whole
+    pool and on its events inside and outside what catalog\_v3's window pools cover. catalog\_v3 and the pp-trained arm
+    with AdamW (one seed each), catalog\_v3 and catalog\_v4 with Muon (seed $42$ filled, $43$ open).}
+  \label{fig:v4_vs_pp}
+\end{figure}
+\begin{figure}[t]
+  \centering
+  \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_pp_trained_scatter.pdf}}
+  % src: python3 analysis/catalog_v4/compare_pp_trained.py @1e20a1dc
+  % allow: 13 because it is the beam energy in TeV, a setting
+  % allow: M|^2
+  \caption{catalog\_v4 against the pp-trained arm per class on the $13$\,TeV pp pools, no $b$: catalog\_v4's MSE of
+    $\log|\mathcal M|^2$ (geometric mean of its two seeds) against the pp-trained arm's, on the class's pp events inside
+    (circles) and outside (squares) what catalog\_v3's window pools cover. Left the classes trained in both catalogs,
+    right those held out in both.}
+  \label{fig:v4_vs_pp_scatter}
 \end{figure}
 
 
