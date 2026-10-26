@@ -1132,15 +1132,12 @@ entries:
   - D154
   - D161
   - D162
-  next: 'When the smoke FA-ccin2p3-0e8c605e (v4_dimensionless_muon smoke, code 1d9d6a29) ends: read its log (the line ''orders_from_diagrams:
-    coupling powers read from the diagrams for N/N processes'', no missing-sidecar warning, V3_SHORT_DONE); its afterok dependants
-    then run: catalog_v4 seeds 42 and 43 (FA-ccin2p3-339ec100, 380842ed), catalog_v3 seed 43 (190f0d06), catalog_v3 seed 42
-    retrained at the new code (dimensionless_muon_best, 5209e83c), trial_1860''s cross reads on catalog_v4''s shared held-out
-    and the pp pools (efc4c352, V3_AXES=''XV4 PP''). If the smoke fails, the dependants stay pending on DependencyNeverSatisfied:
-    fix, rerun the smoke, and move them (scontrol update dependency) or resubmit. When the four trainings and the read end:
+  next: 'When the four trainings (catalog_v4 seeds 42 and 43 FA-ccin2p3-339ec100, 380842ed; catalog_v3 seed 43 190f0d06; catalog_v3
+    seed 42 retrained 5209e83c) and trial_1860''s cross read (efc4c352, V3_AXES=''XV4 PP'') end: read their logs, then write
     the comparison catalog_v4 against catalog_v3, two seeds each, in docs/results.tex (par:dimless_orders: replace ''mixed-order
     entries are refused'' with the highest-alpha_s-monomial rule, the audit''s numbers and the diagram-derived order features;
-    say catalog_v3''s earlier runs had zp_uux_Y1g and thdm_uux_h2h3g''s powers wrong, 2 of 1397 pools)'
+    say catalog_v3''s earlier runs had zp_uux_Y1g and thdm_uux_h2h3g''s powers wrong, 2 of 1397 pools). The smoke 0e8c605e
+    completed (V3_SHORT_DONE).'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
