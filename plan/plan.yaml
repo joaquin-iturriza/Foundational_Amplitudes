@@ -125,9 +125,10 @@ entries:
     - FA-ccin2p3-bc20e0d6
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-ecc413f9
+    - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 577164a6
+    commit: 78458ce4
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -137,6 +138,8 @@ entries:
     - analysis/catalog_v3/data/short_reads/baseline_more_signed_muon
     - analysis/catalog_v3/data/short_reads/baseline_more_signed_seed2
     - analysis/catalog_v3/data/short_reads/baseline_seed2
+    - analysis/catalog_v3/data/sign_head_search.json
+    - analysis/catalog_v3/data/sign_head_search_trials.json
     - analysis/catalog_v3/figs/pair_head_blowup.png
     - analysis/catalog_v3/figs/pair_head_steps.png
     - analysis/catalog_v3/figs/prep_blend.png
@@ -145,10 +148,12 @@ entries:
     - analysis/catalog_v3/figs/prep_signed.png
     - analysis/catalog_v3/figs/prep_signed_arms.png
     - analysis/catalog_v3/figs/prep_signed_seeds.png
+    - analysis/catalog_v3/figs/sign_head_search.png
     - analysis/catalog_v3/pair_head_blowup.py
     - analysis/catalog_v3/pool_audit_signext.json
     - analysis/catalog_v3/prep_sampling.py
     - analysis/catalog_v3/prep_shat_slope.py
+    - analysis/catalog_v3/sign_head_search.py
     - recipes/catalog_v3_gen_signext.yaml
     - recipes/catalog_v3_train_signext.yaml
     - sweep/sweep_config_ccin2p3_sign_head_search.yaml
