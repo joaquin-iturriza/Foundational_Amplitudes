@@ -140,6 +140,9 @@ entries:
     why: 'on 14 of the 30 one-loop held-out pools (all 2->3, signed or abslog) every non-baseline arm was not aligned: the
       sign head''s floor is on |M|^2 F, so the floor events'' t - logF is no log|M|^2 and shifts every rank'
     at: '2026-10-26T03:31:47+00:00'
+  - tried: 'rerun FA-ccin2p3-8e8fdb3f (7f1fcf39): nearest-value match with a one-to-one check'
+    why: 'near ties in log|M|^2 put two saved events on one pool event: 336 arm-probe reads refused'
+    at: '2026-10-26T03:31:48+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
