@@ -76,6 +76,7 @@ def main():
             "first_skip_after_validation": jj["first_skip_after_validation"],
             "pairs_vs_base_before": f"{jj['pairs_vs_baseline_before']:.2f}",
             "peak_over_best": int(round(jj["peak_over_best"], -2)), "final_over_best": round(jj["final_over_best"])}
+    flat = {k: (float(v) if isinstance(v, str) else v) for k, v in flat.items()}
     for a in ARMS[:3]:
         flat[f"{a}_skipped"] = out["arms"][a]["n_skipped"]
     print(json.dumps(flat))
@@ -97,9 +98,9 @@ def plot(R):
                         color=col, label=f"{lab}, skipped step")
     axs[0].set_yscale("log"); axs[0].set_xlabel("step"); axs[0].set_ylabel(r"validation loss (no reg.)")
     axs[1].set_xlabel("step"); axs[1].set_ylabel("median sign accuracy")
-    ps.legend(axs[0], "upper right"); ps.legend(axs[1], "center right")
+    ps.legend(axs[0], "upper right")
     ps.make_room(axs[0], max_growth=4)
-    axs[1].set_ylim(0, 1.25)
+    axs[1].set_ylim(0, 1.05)
     ps.save(fig, os.path.join(HERE, "figs", "pair_head_blowup"))
 
 
