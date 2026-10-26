@@ -1330,13 +1330,9 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'When the four EMA-fixed refit fine-tunes end (FA-ccin2p3-fe864fda AdamW parent/AdamW ft, f620ed40 AdamW parent/Muon
-    ft, 60177afb Muon parent/AdamW ft, 29e8ad2f Muon parent/Muon ft; output $SCRATCH/zz_catft_refit_emafix), read them together
-    with the four parent-stats reruns (FA-ccin2p3-70adfc03, 8103a0bb, 13e57de7, e5265e31) and scratch (00d080ba, unaffected,
-    kept), replace the Muon paragraph''s fine-tune numbers (muon_ft.json from the old refit jobs is polluted). Still pending:
-    stage 2''s two 8-trial searches, best against best; then plan done.; ALSO explain why the one-loop u d~ > a g w+ probe''s
-    step-0 validation varies slightly with D in the parent-stats reruns (AdamW parent 0.0539 to 0.0568, Muon 0.0746 to 0.0749)
-    while the other three probes'' is the same at every D (the validation set should not depend on D)'
+  next: 'The fine-tune read at the fix is written up (b6827ae1). Next: stage 2, the two 8-trial single-fidelity searches at
+    the short horizon (sweep/sweep_config_ccin2p3_muon_test_search_adamw.yaml and _muon.yaml), site pick then submit with
+    --item muon_test, read best against best; then plan done.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
