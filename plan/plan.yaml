@@ -1267,6 +1267,10 @@ entries:
     why: its card check took the neighbour's indented DECAY 6 line (1.480327, ignored by MadGraph) as the width instead of
       the compiled default 1.4915; check fixed in cdd3d9f8, rerun FA-ccin2p3-66920c4c
     at: '2026-10-26T13:10:52+00:00'
+  - tried: catalog_v4 short smoke FA-ccin2p3-a4df3671
+    why: no catalog_v4 diagram sidecars on CC (0/1069 for catalog_v4_train.yaml); the v4 strings with full coupling orders
+      need their own; built by FA-ccin2p3-7f2fb49d
+    at: '2026-10-26T14:10:10+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
