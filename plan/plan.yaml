@@ -1052,13 +1052,12 @@ entries:
   - D140
   - D142
   - D145
-  next: '(1) catalog_v4 top width 1.4915 everywhere (the user''s call): set it in mg5_pipeline_final/gen_catalog_v4 so cards
-    say 1.4915 from column 1, rebuild nothing that already has 1.4915; build the three one-loop entries (b g > b w+ w-, b
-    b~ > ta+ vt w-, b b~ > h w+ w-; scripts/job_v4_certify_then_regen.sh); regenerate the 6 loop-induced HH/HHH builds (loop_qcd_qed_sm-no_b_mass)
-    at top 1.4915 and the sm Z/W widths. (2) the others whose widths were ignored (heavy-quark layer at 50/300/600 GeV in
-    catalog_v3 and catalog_v4, the Z'' point, the 2HDM point): estimate the regeneration CPU-h; if a few CPU-hours, regenerate
-    at the intended widths (quarantining the old pools, never deleting), else report the cost to the user. Update CLAUDE.md''s
-    width rows (shown to the user as a diff).'
+  next: 'read the width regeneration job (FA-ccin2p3-c09de7d2: staged build of the heavy-quark, Z''/2HDM and v4 loop-induced
+    pools, VERIFY_CARDS, MIGRATE_SUMMARY (dry run: 5076 v4 tree sidecars, all cards gave 1.4915), SWAP_SUMMARY, then the three
+    held one-loop entries'' certification and build); commit CLAUDE.md''s width rows once claudemd-keeper passes; then the
+    pool check, classes and roles, the massless b in particle_ids.py, catalog_v4''s short pretrainings. Open for the user:
+    catalog_v3''s six loop-induced HH/HHH pools have Z 2.48883 / W 2.08465 (not regenerated); results.tex''s WT=1.4803 claim
+    (notes-editor)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
