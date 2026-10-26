@@ -7877,6 +7877,79 @@ over the method's (\code{analysis/transfer/lowd\_dyhpo.py}).}
 \label{fig:lowd_dyhpo}
 \end{figure}
 
+\paragraph{Why a fine-tune loses to scratch at small $D$ (2026-10-26).}\label{par:ft_harm} Whether the fine-tunes that
+end above scratch, in the grid (par.~\ref{par:nogain}) and in the two rounds above, start from a pretrained network that
+already holds less than scratch reaches, or start better and lose it. A reported value is its curve's minimum, so a
+losing curve never dips below scratch at any validation; what the start holds is read off the frozen trunk instead, as
+the ridge read-out of par.~\ref{par:lowd_ft}, which is exactly the step-$0$ validation of linear probe then fine-tune.
+(The other arms start from the pretraining's own head, far worse than the read-out on these targets; the read-out is
+what the trunk holds.) With $S$ scratch's best, $R$ the read-out and $F$ the fine-tune's best, a losing cell is (i) a
+bad start, $R\ge S$ and $F\le R$: fine-tuning improves on the start, not enough; (ii) a good start undone, $R<S<F$; or
+(iii) other: $R\ge S$ and $F>R$, the fine-tune ends worse than a linear head on its own frozen trunk, or the cell has
+no read-out. The sources are the grid's fine-tunes at $D=10$ to $10^{2.5}$ (each cell's best trial), the first round's
+$240$ runs (their validation curves copied home from CC, \code{data/lowd\_ft\_curves.json}) and each method's best
+trial of the DyHPO round; a cell counts once per source and method, $224$ losing rows over $30$ of the $60$ cells of
+the two rounds. They split $99$ (i), $5$ (ii), $45$ (iii, worse than the read-out) and $75$ (iii, grid cells on rungs
+and probes no read-out was run for). Over the $149$ rows with a read-out, the read-out sits a median $+1.09$ decades
+above scratch and the fine-tune $-0.37$ decades below the read-out: the trunk holds a fit about ten times worse than
+scratch reaches, and fine-tuning closes about a third of that gap. The probes differ. On $ud\to ud$ ($41$ losing rows,
+$38$ of them (i)) and $u\bar u\to gg$ ($16$, $14$ (i)) the start is far worse, $+1.77$ and $+1.31$ decades over scratch,
+and fine-tuning gains much on it, $-1.00$ and $-0.60$ decades below the read-out, without getting there. On $ee\to
+Z\gamma$ ($92$ losing rows: $47$ (i), $3$ (ii), $42$ (iii)) the start is nearer, $+0.80$ decades, but fine-tuning gains
+nothing on it: the median fine-tune ends at the read-out ($-0.02$ decades), and in about half of its losing rows above
+it. What the first steps do to a fitted head shows in linear probe then fine-tune, which starts at the read-out: its
+first validation is above it in $96$ of $120$ runs (median $1.25\times$), and its best is below it in all but $10$.
+The losing curves reach their minimum later in the run than the winning ones (median at $0.55$ of the run against
+$0.33$), a fine-tune still improving slowly, not one overfitting after an early best. So fine-tuning seldom destroys
+a start that beats scratch ($5$ rows); the losses are a start the pretraining did not prepare for these probes at these
+$D$, and on $ee\to Z\gamma$ a fine-tune that does not move off that start (Fig.~\ref{fig:ft_harm};
+\code{analysis/transfer/ft\_harm.py}, \code{data/ft\_harm.json}).
+% src: python3 analysis/transfer/ft_harm.py @9ff0af38
+% claim: curves_first_round=240
+% claim: losing=224
+% claim: losing_cells=30
+% claim: cls.i=99
+% claim: cls.ii=5
+% claim: cls.iii-worse=45
+% claim: cls.iii-noreadout=75
+% claim: with_readout=149
+% claim: readout_over_scratch=1.09
+% claim: ft_over_readout=-0.37
+% claim: probe.ud_ud.losing=41
+% claim: probe.ud_ud.i=38
+% claim: probe.uubar_gg.losing=16
+% claim: probe.uubar_gg.i=14
+% claim: probe.ud_ud.readout_over_scratch=1.77
+% claim: probe.uubar_gg.readout_over_scratch=1.31
+% claim: probe.ud_ud.ft_over_readout=-1.00
+% claim: probe.uubar_gg.ft_over_readout=-0.60
+% claim: za.losing=92
+% claim: za.cls.i=47
+% claim: za.cls.ii=3
+% claim: za.cls.iii-worse=42
+% claim: za.readout_over_scratch=0.80
+% claim: za.ft_over_readout=-0.02
+% claim: lpft.first_above=96
+% claim: lpft.runs=120
+% claim: lpft.first_over_readout=1.25
+% claim: lpft.best_above=10
+% claim: best_frac_losing=0.55
+% claim: best_frac_winning=0.33
+% allow: 0 10 10^{2.5} 60 because they are step zero, the design's smallest and largest D and its cell count, settings
+
+\begin{figure}[t]
+% allow: 0 2 because they are step zero and the square in the target, settings
+\centering
+\widerow{\includegraphics{../analysis/transfer/figs/ft_harm.pdf}}
+\caption{Why a fine-tune loses to scratch at small $D$. (a) Per row (grid, first round, each method's own search; cells
+with a read-out), the fine-tune's best against the frozen trunk's read-out, both over scratch's best, $\log_{10}$ of
+the MSE of $\log|\mathcal M|^2$: above the dotted horizontal line the fine-tune loses, right of the vertical one the
+start is worse than scratch, above the dashed diagonal it ends worse than its own read-out. (b) Linear probe then
+fine-tune, first round: the validation curve over its step-$0$ value, the read-out
+(\code{analysis/transfer/ft\_harm.py}).}
+\label{fig:ft_harm}
+\end{figure}
+
 \paragraph{Distance from the pretraining.} How far a probe is from what a pretraining already knows, measured before
 any fine-tune step: the parent's output $h$ on the probe's validation split, against the probe's own standardized target
 $z=(\log|\mathcal M|^2-\mu_q)/\sigma_q$ (\code{tools/zero\_shot\_ft.py}). The parent outputs in its own standardized units,
