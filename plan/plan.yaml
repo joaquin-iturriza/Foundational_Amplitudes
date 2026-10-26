@@ -490,10 +490,8 @@ entries:
     - signed_ab
   decisions:
   - D99
-  next: short catalog design runs with the first candidate through the CPU proxy, DlessInOrdQ (DlessInOrd with the Lorentz-invariant
-    emission scales of physics_scales.qperp_logs in place of s_hat) and its no-top twin (~1 GPU-h each), read on every set
-    DlessInOrd was read on (139 held-out, 2to4, 2to4c30, 2to4E100, 2to4E100p, top, loop, loopsigned) and the twin on top;
-    up to 10 GPU-h in all
+  next: 'superseded (the user, 2026-10-26, approving the proposal to close it): the emission-scale arm and its no-top twin
+    were run on catalog_v3 as one of its six arms; nothing left to run on Daniel''s catalog'
   done_when: null
   match: runs/catalog_norm_short/*,zz_catalog_*,catalog_norm*
   notes_ref: null
