@@ -1333,10 +1333,20 @@ entries:
   - D162
   - D166
   - D167
-  next: 'Waiting on the user (two open questions): the catalog_v3 pools'' deletion (the manifest''s ''pools'' group; the deletion
-    agent was refused by Claude Code''s auto-mode permission check, so it needs the user''s explicit go; on a go: re-list
-    with v3_disk_listing.py, refuse changed files, delete only the manifest''s pools, log every path) and the pp pools'' regeneration
-    with catalog_v4''s physics. Nothing to launch until one is answered.'
+  next:
+    4: 'Delete catalog_v3''s pools on CC (the manifest''s ''pools'' group, analysis/catalog_v4/data/catalog_v3_delete_manifest.json
+      @f494c9fe): re-list with v3_disk_listing.py right before, refuse any file whose size or mtime changed or not in the
+      manifest, check nothing running or queued reads them, never touch the pp13 pools, run directories or reads; the four
+      extra groups (backends 16.1 GB, quarantine 5.05 GB, staging 6.41 GB, sidecars 0.63 GB) stay until the user names them;
+      log every removed path, commit the log, report bytes freed'
+    5: 'Regenerate the 13 TeV pp pools with catalog_v4''s physics (approved): the 819 classes whose physics differs (566 with
+      a b: massless b in a 5-flavour proton; 253 that gain electroweak diagrams under QED<=b), plus the 173 catalog_v4 classes
+      with no pp pool; Daniel''s run card, catalog_v4''s model and cards (top 172.5 / 1.4915), 1e4/2e3/2e3 events as the existing
+      pp pools, written with the new physics block in the sidecars; CPU on CC, ~160 to 420 core-hours, MadEvent multi-core
+      for the heaviest classes; validate with pp_physics_check.py (log ratio 0 against catalog_v4''s matrix element on every
+      class); new pool names (pp13v4_ or similar), the old pp13 pools kept until the comparison is redone; record its design
+      (plan design, --prior: the pp study''s generation, gen_catalog_v3_pp.py, pp_physics_check) and get it through the design
+      reviewer before submitting'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
