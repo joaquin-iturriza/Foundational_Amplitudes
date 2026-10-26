@@ -1323,8 +1323,11 @@ entries:
   match: '*muon*'
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 6584c2fa
+    paths:
+    - optim/muon.py
+    - tests/test_muon.py
+    - tools/catalog_ft.py
   dead_ends: []
   asks:
   - ask: 'The Muon against AdamW test: go ahead with stage 1 as designed (one Muon short pretraining at the transferred lr
