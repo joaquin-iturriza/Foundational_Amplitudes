@@ -10778,13 +10778,16 @@ of the three share a test set.
     $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
     one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
     classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
-  \item \textbf{State (2026-10-26, 21:00).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
-    \code{plan next}); this item only summarises it. catalog\_v4 against catalog\_v3 is read (par.~\ref{par:v4_vs_v3}).
-    Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop $b\bar b\to hW^+W^-$ only; no
-    second seeds for the old sign arms; the contaminated fine-tunes not rerun. Next: the user's call on switching to
-    catalog\_v4; then the held Daniel's-catalog studies adapted to the chosen catalog, and catalog\_v3's deletion only
-    if the switch is confirmed. Disk on CC at $90\%$: the user is asked what to free.
-    % allow: 21 00 90 because they are a clock time and the disk share, not results
+  \item \textbf{State (2026-10-27, 00:30).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
+    \code{plan next}); this item only summarises it. Everything is on the user's hold (2026-10-26, ``let's put things on
+    hold for a bit''): the catalog coverage and preprocessing entries are held, no job runs on any site. Decided: the
+    switch to catalog\_v4; catalog\_v3's pools to be deleted (the manifest's pools group, checked and dry-run; the apply
+    was refused by the session's permission check, so the user runs it); the $13$\,TeV pp pools to be regenerated with
+    catalog\_v4's physics for the classes where it differs (not started). Open for the user: the four extra catalog\_v3
+    groups, releasing the four held studies on catalog\_v4, registering the label check \code{send\_check.py} and the
+    glossary file. The sign study is closed (no for the pair head). In progress: the Wednesday deck
+    (\code{talks/progress\_oct2026b}), being fixed after an independent slide check.
+    % allow: 2026 10 27 00 30 26 13 because they are dates, a clock time and the beam energy, not results
   \item \textbf{The pp blend (proposed 2026-10-26, on hold).} Proposed from par.~\ref{par:v4_density}: each hadronic
     tree training pool of catalog\_v4 ($797$ classes) becomes $70\%$ its current events and $30\%$ MadEvent $13$\,TeV
     pp events of its own processes (about $140$ to $350$ core-hours), then a test of about $6$ GPU-hours (the blend
