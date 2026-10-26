@@ -1,0 +1,9548 @@
+{
+ "trees": {
+  "v4_bb_aabb": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bb_abbg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bb_abbh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_abbz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_abtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bb_bb": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbbbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbddx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bbzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bb_bgtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bb_bhtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bb_btwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bb_btwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_aa": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaa": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaaa": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaag": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaaz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aabbx": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_aaccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaddx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aag": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aagg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_aagz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aataptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aattx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_aavevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aawpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aaz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aazz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_abbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_abbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_abbxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_abbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_abtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_accx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_accxh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_accxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_acsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_addx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_addxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_addxh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_addxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aepemg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aepemh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_aepemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aepvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_aggz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_agvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_agzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ahvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ahzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ataptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ataptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_atapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_attx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_attxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_avevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_avevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_awpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_awpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_az": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_azz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_azzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbbxbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_bbxepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxhh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_bbxhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_bbxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bbxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_bgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_bhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_btxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_btxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ccxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ccxgg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxgh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxgz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ccxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ccxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_cgsxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_chsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_csxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_csxwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_dddxdx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ddxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ddxhh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ddxhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ddxtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ddxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ddxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ddxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ddxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemgh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_epemgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemhh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_epemhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_epemtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_epemvevex": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_epemvtvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epemzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epgvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ephvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_epvewmz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_gg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gggz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gghz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ggtaptam": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ggttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ggvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ggwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_ggz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ggzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ghvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ghzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gtaptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gtapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_gttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_gvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gvevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_gzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hhhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_hhtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_hhvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_hhwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hhzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_htaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_htaptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_htapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_httx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_httxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_hvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hvevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_hzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_taptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_taptamuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_taptamvevex": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_taptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_taptamzz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bbx_tapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_tapvtwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_ttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ttxuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ttxvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_ttxzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bbx_uuxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_uuxzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bbx_vevevexvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_vevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_vevexvtvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_vevexwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_vevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_vevexzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_wpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_wpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_wpwmzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_zz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_zzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bbx_zzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_aaab": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_aab": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_aabg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_aabz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_aatwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ab": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_abbbx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_abg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_abgg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_abgz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bg_abttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_abvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_abwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_abz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_abzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_acxst": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_aemtvex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_agtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ahtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_attamvtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_atwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_atwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_bbbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bbbxg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_bbbxh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_bbbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bbxtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_bccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bccxg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_bddxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_bg_bepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bggz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bgttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_bgvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bgwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bgz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_bg_bgzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_bhvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bhwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_btaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_bttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_buuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bvevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_bzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_bg_cxgst": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_cxhst": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_cxst": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_cxstz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ddxtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_emgtvex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_emhtvex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_emtvex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_emtvexz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_epemtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ggtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ghtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_gttamvtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_gtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_gtwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_hhtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_httamvtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_htwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_htwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ttamvtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_ttamvtxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_tuuxwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_tvevexwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_twm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_twmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_bg_twmzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_db_aabd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_abd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_abdg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_abdh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_abuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_adtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_db_bbbxd": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_db_bd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bduux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bdzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bguwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_bhuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_buwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_buwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_db_dgtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_db_dhtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_db_dtwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_db_dtwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_aabxd": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dbx_aatxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_abxd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_abxdg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dbx_abxdh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_abxdz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_abxuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_adtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_agtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_ahtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_atxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_atxuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_bbxbxd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bbxtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_bxdepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdgg": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dbx_bxdgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxduux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxdzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxguwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxhuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_bxuwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dbx_ddxtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_dgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_dhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_dtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_dtxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_epemtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_ggtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_ghtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_gtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_gtxuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_hhtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_htxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_htxuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_txu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_txuuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_txuvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_txuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dbx_txuzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dd_add": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dd_aduwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dd_dduux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dd_dguwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dd_dhuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dd_duwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dd_duwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_aahz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_aattx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_aauux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_aawpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_abtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_accxg": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_acsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_aduxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_aepvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ag": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_aghz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_agttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_aguux": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_agwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ahttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ahuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ahwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_atapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_attx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_attxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_auux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_auuxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_awpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_awpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_bbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_bbxgg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxgh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxgz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_bbxssx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_bbxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_bbxzz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_bgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_bhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_btxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_btxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ccxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_ccxhh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_ccxhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_ccxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_ccxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_cgsxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_chsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_csxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_csxwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ddxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ddxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_ddxwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_dguxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_dhuxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_duxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_duxwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_epemgg": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_epemmupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_epemttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_epemuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_epemvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_epemwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_epepemem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_epgvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ephvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_epvewm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_epvewmz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ddx_ggttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_gguux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ggwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ghttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ghuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ghwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_gtapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_gttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_gttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_guux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_guuxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_gwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_gwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_hhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_hhuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_hhwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_htapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_httx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_httxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_huux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_huuxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_hwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_hwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ssxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_taptamuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_taptaptamtam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_tapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_tapvtwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_ttaptamtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_tttxtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ttxuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ttxvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_ttxzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ddx_uuuxux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_uux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_uuxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_uuxwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_uuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_uuxzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_vevexwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_wpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_wpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ddx_wpwmzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ddx_wpwpwmwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_aauwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_abbxd": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_abtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_accxd": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dg_acxsu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dg_adepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_adhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_adtaptam": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_adttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_aduux": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dg_adwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_aemuvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_aguwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_ahuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_atamuvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_auwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_auwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_bbxd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_bbxdg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_bbxdh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_bbxuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_bgtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_bhtxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_btxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_btxuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_ccxdh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_cxgsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_cxhsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_cxsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_cxsuz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dg_ddxuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_depemg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_depemh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_depemz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dghz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dgtaptam": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dgttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_dguux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_dgwpwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dg_dhhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dhtaptam": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_dhuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_dhwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_dhzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dtaptamz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_dttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_dttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_dg_duux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_duuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_dwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_dwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_emguvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_emhuvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_emuvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_emuvexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_epemuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_gguwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_ghuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_gtamuvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_guwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_guwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dg_hhuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_htamuvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_huwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_huwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_tamuvtx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_tamuvtxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_uuuxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_uvevexwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_uwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_uwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dg_uwmzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ds_acdwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ds_adsz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ds_bbxds": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ds_cdgwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ds_cdhwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ds_cdwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ds_cdwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ds_dggs": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ds_dghs": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_dsx_aacxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_acxdwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dsx_acxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_acxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_acxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_acxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_bbxcxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_bbxdsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxddxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxdgwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dsx_cxdhwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dsx_cxdwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxdwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_dsx_cxepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxggu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxghu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxguz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxhhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxhuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_cxuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_dhhsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_dsx_dhsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aabbx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_aaccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aaepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aamupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aataptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aattx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_aavevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_aavmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aawpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_abbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_abbxg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_abbxh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_abbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_abtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_accx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_accxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_accxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_accxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_acsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_aepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aepemh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aepemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_aepvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_agttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ahmupmum": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_ahtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ahttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ahvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ahvmvmx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_ahwpwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_amupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_amupmumz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_amupvmwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ataptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ataptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_atapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_attx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_attxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_avevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_avevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_avmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_avmvmxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_awpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_awpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_azzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbbxbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxddx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxgg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_bbxgh": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_bbxgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_bbxmupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_bbxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxvmvmx": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_bbxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bbxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_bgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_bhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_btxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_btxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ccx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxg": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_ccxgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxhz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_ccxuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ccxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_cgsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_chsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_csxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_csxwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_ddxtaptam": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_ddxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ddxuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ddxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ddxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_dhuxwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_epem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemmupmum": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_epemtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_epemvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemvmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epemzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epepemem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ephvewm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_epvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_epvewmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ggttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ghttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_gttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_gttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_hhmupmum": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_hhtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_hhvevex": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_hhwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hmupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hmupmumz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_hmupvmwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_htaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_htaptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_htapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_httx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_httxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_hvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hvevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hvmvmxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_hwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_hzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmumtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmumttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_mupmumuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmumvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_epem_mupmumz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmumzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupmupmummum": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupvmwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_mupvmwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptamuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptamvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptamzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_taptaptamtam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_tapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_tapvtwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_ttaptamtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_tttxtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ttxuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ttxvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_ttxzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_epem_uuuxux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_uuxvmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_uuxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevevexvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevexvmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevexwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vevexzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vmvmxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_vmvmxzz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_epem_wpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_wpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_wpwmzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_wpwpwmwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_zzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_epem_zzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_aabbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_aattx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_abbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_abbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_abbxz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_abtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_acsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_agttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ahttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_attx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_attxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_bbbxbx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_bbxgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_bbxgz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_bbxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_bbxzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_bgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_bhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_btxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_btxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ccxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_ccxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_ccxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_ccxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_cgsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_chsxwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_csxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_csxwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_ddxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ddxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_gg_epemttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_gg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_ggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_gggg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_gg_ggttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ghttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_gttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_gttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_hhttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_httx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_httxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ttxuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ttxvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_gg_ttxzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_aabu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_aadt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_abdwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_abgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_abu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_abuz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ub_adgt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_adht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_adt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_adtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_atuwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_bbbxu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ub_bbxdt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_bddxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bdgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bdhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bdwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bdwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bggu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ub_bgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_bguz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ub_bhuz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ub_buuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_buvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_buz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ub_buzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ub_dddxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_depemt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dggt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dght": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dgt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dgtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dhht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dhtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dtuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dtvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_dtzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_gtuwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_htuwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_tuwm": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ub_tuwmz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ubx_aabxu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ubx_abxgu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ubx_abxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_abxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_abxuz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ubx_atxuwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ubx_bbxbxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxddxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxdgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxdhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxdwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxdwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxguz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxhuz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ubx_bxuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_bxuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ubx_gtxuwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ubx_htxuwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ubx_txuwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ubx_txuwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uc_acdwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uc_acgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_achu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_acuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_bbxcu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cddxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cdhwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uc_cdwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uc_cepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cggu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uc_cghu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cguz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uc_chhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_chu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_chuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uc_cuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_aadsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_acxdwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_acxhu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_acxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_adgsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_adhsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_adsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_adsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_bbxcxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_bbxdsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxdhwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_cxdwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_cxepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxggu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxghu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_cxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxguz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxhhu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_cxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxhuz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ucx_cxuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_cxuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_depemsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_dgsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_dhsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_dsxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_dsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ucx_dsxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_aadu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_addwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_adgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_adhu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ud_adu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_aduz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ud_auuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_bbxdu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dddxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_ddgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_ddhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_ddwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_ddwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_depemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dggu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ud_dghu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dguz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ud_dhhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_dhuz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ud_du": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_duuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_duvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_duz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_duzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ud_huuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ud_uuwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aaawp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aabxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_aacsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aadxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aaepve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aagwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aahwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aatapvt": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_aawp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aawpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_abbxwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_abxgt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_abxht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_abxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_abxtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_accxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_acgsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_achsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_acsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_acsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_addxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_adxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_adxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_adxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_adxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aepemwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aepgve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aephve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aepve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aepvez": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aggwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_aghwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_agtapvt": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_agwp": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_udx_agwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ahhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ahtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ahwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ahwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_assxwp": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_udx_ataptamwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_atapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_atapvtz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_attxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_auuxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_avevexwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_awp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_awpwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_awpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_awpzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_bbxbxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bbxcsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxdxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxepve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxgwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_bbxhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_bbxwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_bxddxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxepemt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxggt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxght": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxgt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxgtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxhht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxhtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxtuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxtvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_bxtzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_ccxgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ccxhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ccxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ccxwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cddxsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cepemsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cggsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cghsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cgsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_cgsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_chhsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_chsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_chsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_csx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_csxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_csxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_csxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxdxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxepve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ddxwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_dxepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxggu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxghu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxguz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxhhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxhuz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_udx_dxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_dxuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemmupvm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epemwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_epepemve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epggve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epghve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epgve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epgvez": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ephvez": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epuuxve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epvevevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epvez": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_epvezz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gggwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_gghwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ggtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ggwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ggwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ghhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ghtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ghwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ghwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gssxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gtaptamwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gtapvtz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_gttxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_guuxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gvevexwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gwpwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_gwpzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_hhhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hhtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hhwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hssxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_htaptamwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_htapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_htapvtz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_httxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_huuxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hvevexwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hwpwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_hwpzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_mupvevexvm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_ssxwpz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_udx_taptamwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_taptamwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_tapuuxvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_tapvevexvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_tapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_tapvtz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_tapvtzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_ttxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_ttxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_udx_uuxwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_vevexwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_vevexwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_udx_wpwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_wpwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_wpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_wpzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_udx_wpzzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_aadwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_abbxu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_abxdt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_accxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_acdsx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_addxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_adepve": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_adgwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_adhwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_adtapvt": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_adwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_adwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_aepemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ataptamu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_attxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_auuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_auvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_auwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_bbxdwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_bbxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_bxdgt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_bxdht": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_bxdt": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_bxdtz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_ccxgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ccxhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ccxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ccxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_cdsxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ddxuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_depemwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_depvez": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dgtapvt": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_dgwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dhtapvt": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_dhwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dtapvt": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dtapvtz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_dvevexwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_dwpzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_epemgu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_epemhu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_epemu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_epemuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_gtaptamu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_ug_gttxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_guuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_guvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_htaptamu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_httxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_huuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_huvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_huwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_taptamu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_taptamuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_ttxu": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_ttxuz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_ug_uuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_uuuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_uvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_uvevexz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_ug_uwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_ug_uzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_aacd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_acd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_acdg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_acdh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_acdz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_acuwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_adswp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_ahsu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_bbxcd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_bbxsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cd": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdddx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cduux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cdz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_us_cdzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cguwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_chuwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_cuwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_cuwmz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_ddxsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_us_dhswp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_dswpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_ghsu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_hhsu": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_us_hsu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_usx_acxuwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_adsxwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_bbxsxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_usx_cxguwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_cxhuwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_cxuwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_usx_cxuwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_dgsxwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_dhsxwp": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_dsxwpz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_usx_ghsxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_usx_hhsxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_usx_hsxu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_aauu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_aduwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_aguu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_ahuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_auu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uu_auuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_bbxuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_ddxuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_dhuwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_duwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_epemuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_gguu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_ghuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_guu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_guuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_hhuu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_huu": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uu_huuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_uu": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_uuuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_uuvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_uuz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uu_uuzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aabbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aaddx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aaepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aataptam": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_aattx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_aavevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aawpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_abbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_abbxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_abbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_abtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_accxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_accxh": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_accxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_acsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_addx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_addxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_addxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_addxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aduxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aepem": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aepemg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aepemh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aepemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_aepvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_agtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_agttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_aguux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_agvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_agwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ahssx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ahtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ahttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ahuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ahvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ahwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ataptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ataptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_atapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_attx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_attxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_auux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_auuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_avevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_avevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_awpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_awpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_azzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbbxbx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bbxccx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bbxhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxssx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bbxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_bbxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_bbxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bbxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bbxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_bgtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_bhtxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_btxwp": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_btxwpz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ccxddx": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ccxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ccxg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxgg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxgz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_ccxh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxhh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ccxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ccxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ccxz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_ccxzz": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_cgsxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_chsxwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_csxwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_csxwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ddxepem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ddxgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ddxhz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ddxtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ddxttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ddxuux": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ddxvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ddxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ddxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ddxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_dguxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_dhuxwp": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_duxwpz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemg": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemgg": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_epemgh": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemgz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemhz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemmupmum": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_epemtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_epemuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemvmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epemzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epepemem": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_epgvewm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_ephvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epvewm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_epvewmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ggtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ggttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_gguux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ggvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ggwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ghtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ghttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ghuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ghvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_ghwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gtaptam": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_gtaptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gtapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gttx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_gttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_guux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_guuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gvevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_gzzz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_hhtaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hhuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hhvevex": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_hhwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_htaptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_htaptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_htapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_httxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_huux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_huuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hvevexz": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_hwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hwpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_hzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptamuux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptamvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptamz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptamzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_taptaptamtam": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_tapvtwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_tapvtwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_ttaptamtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_tttxtx": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ttxuux": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ttxvevex": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ttxz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_ttxzz": {
+   "role": "heldout",
+   "axis": "H3",
+   "why": "external top (the heavy-quark layer brackets it)"
+  },
+  "v4_uux_uuuxux": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_uuxvevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_uuxwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_uuxz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_uuxzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevevexvex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevex": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevexvmvmx": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevexwpwm": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevexz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_vevexzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_wpwm": {
+   "role": "heldout",
+   "axis": "H1",
+   "why": "new combination (catalog_v3's draw)"
+  },
+  "v4_uux_wpwmz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_wpwmzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_wpwpwmwm": {
+   "role": "heldout",
+   "axis": "H2",
+   "why": "2->4 of a held-out family or four-fermion / multi-boson 2->4 (catalog_v3's draw)"
+  },
+  "v4_uux_zzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  },
+  "v4_uux_zzzz": {
+   "role": "train",
+   "axis": null,
+   "why": ""
+  }
+ },
+ "loops": {
+  "v4_bb_bb_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bb_bb",
+   "class": "v4_bb_bb"
+  },
+  "v4_bb_bbz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bb_bbz",
+   "class": "v4_bb_bbz"
+  },
+  "v4_bbx_aa_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_aa",
+   "class": "v4_bbx_aa"
+  },
+  "v4_bbx_aag_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_aag",
+   "class": "v4_bbx_aag"
+  },
+  "v4_bbx_addx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_addx",
+   "class": "v4_bbx_addx"
+  },
+  "v4_bbx_aepem_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_aepem",
+   "class": "v4_bbx_aepem"
+  },
+  "v4_bbx_ag_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_bbx_ag",
+   "class": "v4_ddx_ag",
+   "dup_of": "v4_ddx_ag_nlo"
+  },
+  "v4_bbx_agz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_agz",
+   "class": "v4_bbx_agz"
+  },
+  "v4_bbx_ataptam_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_ataptam",
+   "class": "v4_bbx_ataptam"
+  },
+  "v4_bbx_avevex_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bbx_avevex",
+   "class": "v4_bbx_avevex"
+  },
+  "v4_bbx_az_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_az",
+   "class": "v4_bbx_az"
+  },
+  "v4_bbx_azz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_azz",
+   "class": "v4_bbx_azz"
+  },
+  "v4_bbx_bbx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_bbx",
+   "class": "v4_bbx_bbx"
+  },
+  "v4_bbx_ccx_qcdborn_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_ccx",
+   "class": "v4_bbx_ccx"
+  },
+  "v4_bbx_ccxh_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bbx_ccxh",
+   "class": "v4_bbx_ccxh"
+  },
+  "v4_bbx_epem_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_bbx_epem",
+   "class": "v4_bbx_epem",
+   "dup_of": "v4_epem_bbx_nlo"
+  },
+  "v4_bbx_epemh_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_epemh",
+   "class": "v4_bbx_epemh"
+  },
+  "v4_bbx_epemz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_epemz",
+   "class": "v4_bbx_epemz"
+  },
+  "v4_bbx_gg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bbx_gg",
+   "class": "v4_bbx_gg"
+  },
+  "v4_bbx_gvevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_gvevex",
+   "class": "v4_bbx_gvevex"
+  },
+  "v4_bbx_gwpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_gwpwm",
+   "class": "v4_bbx_gwpwm"
+  },
+  "v4_bbx_gz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_gz",
+   "class": "v4_bbx_gz"
+  },
+  "v4_bbx_gzz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_gzz",
+   "class": "v4_bbx_gzz"
+  },
+  "v4_bbx_hhz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_hhz",
+   "class": "v4_bbx_hhz"
+  },
+  "v4_bbx_htaptam_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_htaptam",
+   "class": "v4_bbx_htaptam"
+  },
+  "v4_bbx_hvevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_hvevex",
+   "class": "v4_bbx_hvevex"
+  },
+  "v4_bbx_hwpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_hwpwm",
+   "class": "v4_bbx_hwpwm"
+  },
+  "v4_bbx_hz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bbx_hz",
+   "class": "v4_bbx_hz"
+  },
+  "v4_bbx_hzz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_hzz",
+   "class": "v4_bbx_hzz"
+  },
+  "v4_bbx_taptam_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_taptam",
+   "class": "v4_bbx_taptam"
+  },
+  "v4_bbx_tapvtwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_tapvtwm",
+   "class": "v4_bbx_tapvtwm"
+  },
+  "v4_bbx_vevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_vevex",
+   "class": "v4_bbx_vevex"
+  },
+  "v4_bbx_wpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_wpwm",
+   "class": "v4_bbx_wpwm"
+  },
+  "v4_bbx_wpwmz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_wpwmz",
+   "class": "v4_bbx_wpwmz"
+  },
+  "v4_bbx_zz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bbx_zz",
+   "class": "v4_bbx_zz"
+  },
+  "v4_bbx_zzz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bbx_zzz",
+   "class": "v4_bbx_zzz"
+  },
+  "v4_bg_ab_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bg_ab",
+   "class": "v4_bg_ab"
+  },
+  "v4_bg_abg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_abg",
+   "class": "v4_bg_abg"
+  },
+  "v4_bg_abz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_abz",
+   "class": "v4_bg_abz"
+  },
+  "v4_bg_bbbx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bbbx",
+   "class": "v4_bg_bbbx"
+  },
+  "v4_bg_bccx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bccx",
+   "class": "v4_bg_bccx"
+  },
+  "v4_bg_bg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bg",
+   "class": "v4_bg_bg"
+  },
+  "v4_bg_bgg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_bg_bgg",
+   "class": "v4_bg_bgg"
+  },
+  "v4_bg_bhz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bhz",
+   "class": "v4_bg_bhz"
+  },
+  "v4_bg_btaptam_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_btaptam",
+   "class": "v4_bg_btaptam"
+  },
+  "v4_bg_bwpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bwpwm",
+   "class": "v4_bg_bwpwm"
+  },
+  "v4_bg_bz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_bg_bz",
+   "class": "v4_bg_bz"
+  },
+  "v4_db_abd_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_db_abd",
+   "class": "v4_db_abd"
+  },
+  "v4_db_bd_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_db_bd",
+   "class": "v4_db_bd"
+  },
+  "v4_db_bdz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_db_bdz",
+   "class": "v4_db_bdz"
+  },
+  "v4_dd_add_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_dd_add",
+   "class": "v4_dd_add"
+  },
+  "v4_dd_dd_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_dd_dd",
+   "class": "v4_bb_bb",
+   "dup_of": "v4_bb_bb_nlo"
+  },
+  "v4_dd_ddz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dd_ddz",
+   "class": "v4_bb_bbz",
+   "dup_of": "v4_bb_bbz_nlo"
+  },
+  "v4_ddx_aa_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_aa",
+   "class": "v4_bbx_aa",
+   "dup_of": "v4_bbx_aa_nlo"
+  },
+  "v4_ddx_aaa_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_ddx_aaa",
+   "class": "v4_bbx_aaa"
+  },
+  "v4_ddx_ag_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_ddx_ag",
+   "class": "v4_ddx_ag"
+  },
+  "v4_ddx_agg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_agg",
+   "class": "v4_bbx_agg"
+  },
+  "v4_ddx_awpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_awpwm",
+   "class": "v4_ddx_awpwm"
+  },
+  "v4_ddx_bbx_qcdborn_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_bbx",
+   "class": "v4_bbx_ccx",
+   "dup_of": "v4_bbx_ccx_qcdborn_nlo"
+  },
+  "v4_ddx_bbxh_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_bbxh",
+   "class": "v4_ddx_bbxh"
+  },
+  "v4_ddx_bbxz_qcdborn_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_ddx_bbxz",
+   "class": "v4_bbx_ddxz"
+  },
+  "v4_ddx_ccx_qcdborn_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_ccx",
+   "class": "v4_bbx_ccx",
+   "dup_of": "v4_bbx_ccx_qcdborn_nlo"
+  },
+  "v4_ddx_ccxh_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_ddx_ccxh",
+   "class": "v4_bbx_ccxh",
+   "dup_of": "v4_bbx_ccxh_nlo"
+  },
+  "v4_ddx_ddx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_ddx",
+   "class": "v4_bbx_bbx",
+   "dup_of": "v4_bbx_bbx_nlo"
+  },
+  "v4_ddx_epem_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_ddx_epem",
+   "class": "v4_bbx_epem",
+   "dup_of": "v4_epem_bbx_nlo"
+  },
+  "v4_ddx_epvewm_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_ddx_epvewm",
+   "class": "v4_ddx_epvewm"
+  },
+  "v4_ddx_gg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_ddx_gg",
+   "class": "v4_bbx_gg",
+   "dup_of": "v4_bbx_gg_nlo"
+  },
+  "v4_ddx_ggg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_ggg",
+   "class": "v4_bbx_ggg"
+  },
+  "v4_ddx_ghz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_ghz",
+   "class": "v4_bbx_ghz"
+  },
+  "v4_ddx_gvevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_gvevex",
+   "class": "v4_bbx_gvevex",
+   "dup_of": "v4_bbx_gvevex_nlo"
+  },
+  "v4_ddx_hhz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_hhz",
+   "class": "v4_bbx_hhz",
+   "dup_of": "v4_bbx_hhz_nlo"
+  },
+  "v4_ddx_hz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_ddx_hz",
+   "class": "v4_bbx_hz",
+   "dup_of": "v4_bbx_hz_nlo"
+  },
+  "v4_ddx_tapvtwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_tapvtwm",
+   "class": "v4_ddx_tapvtwm"
+  },
+  "v4_ddx_wpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ddx_wpwm",
+   "class": "v4_ddx_wpwm"
+  },
+  "v4_dg_ad_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_dg_ad",
+   "class": "v4_bg_ab",
+   "dup_of": "v4_bg_ab_nlo"
+  },
+  "v4_dg_dg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dg_dg",
+   "class": "v4_bg_bg",
+   "dup_of": "v4_bg_bg_nlo"
+  },
+  "v4_dg_dgg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_dg_dgg",
+   "class": "v4_bg_bgg",
+   "dup_of": "v4_bg_bgg_nlo"
+  },
+  "v4_dg_dgz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_dg_dgz",
+   "class": "v4_bg_bgz"
+  },
+  "v4_dg_dz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dg_dz",
+   "class": "v4_bg_bz",
+   "dup_of": "v4_bg_bz_nlo"
+  },
+  "v4_dg_huwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dg_huwm",
+   "class": "v4_dg_huwm"
+  },
+  "v4_dg_tamuvtx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dg_tamuvtx",
+   "class": "v4_dg_tamuvtx"
+  },
+  "v4_dg_uwm_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_dg_uwm",
+   "class": "v4_dg_uwm"
+  },
+  "v4_dg_uwmz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dg_uwmz",
+   "class": "v4_dg_uwmz"
+  },
+  "v4_ds_ads_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ds_ads",
+   "class": "v4_db_abd",
+   "dup_of": "v4_db_abd_nlo"
+  },
+  "v4_ds_cdwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ds_cdwm",
+   "class": "v4_ds_cdwm"
+  },
+  "v4_ds_ds_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ds_ds",
+   "class": "v4_db_bd",
+   "dup_of": "v4_db_bd_nlo"
+  },
+  "v4_dsx_acxu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dsx_acxu",
+   "class": "v4_dsx_acxu"
+  },
+  "v4_dsx_cxu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dsx_cxu",
+   "class": "v4_dsx_cxu"
+  },
+  "v4_dsx_cxuz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dsx_cxuz",
+   "class": "v4_dsx_cxuz"
+  },
+  "v4_dsx_dsxz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_dsx_dsxz",
+   "class": "v4_dbx_bxdz"
+  },
+  "v4_epem_abbx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_epem_abbx",
+   "class": "v4_epem_abbx"
+  },
+  "v4_epem_addx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_epem_addx",
+   "class": "v4_epem_abbx",
+   "dup_of": "v4_epem_abbx_nlo"
+  },
+  "v4_epem_bbx_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_epem_bbx",
+   "class": "v4_bbx_epem"
+  },
+  "v4_epem_bbxz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_epem_bbxz",
+   "class": "v4_epem_bbxz",
+   "dup_of": "v4_epem_ddxz_nlo"
+  },
+  "v4_epem_ccx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_epem_ccx",
+   "class": "v4_epem_ccx"
+  },
+  "v4_epem_ccxg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_epem_ccxg",
+   "class": "v4_epem_ccxg"
+  },
+  "v4_epem_ddxz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_epem_ddxz",
+   "class": "v4_epem_bbxz"
+  },
+  "v4_gg_accx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_gg_accx",
+   "class": "v4_gg_abbx"
+  },
+  "v4_gg_bbx_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a class whose other one-loop is held out",
+   "tree": "v4_gg_bbx",
+   "class": "v4_bbx_gg",
+   "dup_of": "v4_bbx_gg_nlo"
+  },
+  "v4_gg_bbxg_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_gg_bbxg",
+   "class": "v4_gg_bbxg"
+  },
+  "v4_gg_ccxz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_gg_ccxz",
+   "class": "v4_gg_bbxz"
+  },
+  "v4_gg_gg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_gg_gg",
+   "class": "v4_gg_gg"
+  },
+  "v4_ub_buz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ub_buz",
+   "class": "v4_ub_buz"
+  },
+  "v4_uc_cuz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_uc_cuz",
+   "class": "v4_uc_cuz"
+  },
+  "v4_ucx_cxhu_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_ucx_cxhu",
+   "class": "v4_ucx_cxhu"
+  },
+  "v4_ucx_cxuz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ucx_cxuz",
+   "class": "v4_ucx_cxuz"
+  },
+  "v4_ud_adu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ud_adu",
+   "class": "v4_ud_adu"
+  },
+  "v4_ud_ddwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ud_ddwp",
+   "class": "v4_ud_ddwp"
+  },
+  "v4_udx_acsx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_acsx",
+   "class": "v4_udx_acsx"
+  },
+  "v4_udx_adxu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_adxu",
+   "class": "v4_udx_adxu"
+  },
+  "v4_udx_agwp_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_udx_agwp",
+   "class": "v4_udx_agwp"
+  },
+  "v4_udx_awp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_awp",
+   "class": "v4_udx_awp"
+  },
+  "v4_udx_ccxwp_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_udx_ccxwp",
+   "class": "v4_udx_ccxwp"
+  },
+  "v4_udx_csx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_csx",
+   "class": "v4_udx_csx"
+  },
+  "v4_udx_ddxwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_ddxwp",
+   "class": "v4_udx_ddxwp"
+  },
+  "v4_udx_epgve_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_epgve",
+   "class": "v4_udx_epgve"
+  },
+  "v4_udx_ggwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_ggwp",
+   "class": "v4_udx_ggwp"
+  },
+  "v4_udx_gtapvt_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_gtapvt",
+   "class": "v4_udx_gtapvt"
+  },
+  "v4_udx_gwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_gwp",
+   "class": "v4_udx_gwp"
+  },
+  "v4_udx_hwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_hwp",
+   "class": "v4_udx_hwp"
+  },
+  "v4_udx_taptamwp_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_taptamwp",
+   "class": "v4_udx_taptamwp"
+  },
+  "v4_udx_tapvt_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_tapvt",
+   "class": "v4_udx_tapvt"
+  },
+  "v4_udx_wpwpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_wpwpwm",
+   "class": "v4_udx_wpwpwm"
+  },
+  "v4_udx_wpz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_wpz",
+   "class": "v4_udx_wpz"
+  },
+  "v4_udx_wpzz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_udx_wpzz",
+   "class": "v4_udx_wpzz"
+  },
+  "v4_ug_dtapvt_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ug_dtapvt",
+   "class": "v4_ug_dtapvt"
+  },
+  "v4_ug_epemu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ug_epemu",
+   "class": "v4_ug_epemu"
+  },
+  "v4_ug_taptamu_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_ug_taptamu",
+   "class": "v4_ug_taptamu"
+  },
+  "v4_us_acd_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_us_acd",
+   "class": "v4_us_acd"
+  },
+  "v4_us_cd_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_us_cd",
+   "class": "v4_us_cd"
+  },
+  "v4_us_cdg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_us_cdg",
+   "class": "v4_us_cdg"
+  },
+  "v4_uux_abbx_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_abbx",
+   "class": "v4_uux_abbx"
+  },
+  "v4_uux_ccxz_qcdborn_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_uux_ccxz",
+   "class": "v4_uux_ccxz"
+  },
+  "v4_uux_epemg_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_epemg",
+   "class": "v4_uux_epemg"
+  },
+  "v4_uux_epemz_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a training tree",
+   "tree": "v4_uux_epemz",
+   "class": "v4_uux_epemz"
+  },
+  "v4_uux_huux_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_huux",
+   "class": "v4_uux_huux"
+  },
+  "v4_uux_hvevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_hvevex",
+   "class": "v4_uux_hvevex"
+  },
+  "v4_uux_hwpwm_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_hwpwm",
+   "class": "v4_uux_hwpwm"
+  },
+  "v4_uux_taptam_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_taptam",
+   "class": "v4_uux_taptam"
+  },
+  "v4_uux_vevex_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_vevex",
+   "class": "v4_uux_vevex"
+  },
+  "v4_uux_wpwm_nlo": {
+   "role": "heldout",
+   "axis": "H5",
+   "why": "one-loop of a held-out tree",
+   "tree": "v4_uux_wpwm",
+   "class": "v4_uux_wpwm"
+  },
+  "v4_uux_wpwmz_nlo": {
+   "role": "train",
+   "axis": null,
+   "why": "",
+   "tree": "v4_uux_wpwmz",
+   "class": "v4_uux_wpwmz"
+  }
+ },
+ "loop_induced": {
+  "v4_ddx_hg_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_ddx_hh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_ddx_hhh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_epem_hh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_epem_hhh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_aa_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_aag_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_hg_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_hh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_hhh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_wpwm_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_za_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_zh_loop": {
+   "role": "heldout",
+   "axis": "H5"
+  },
+  "v4_gg_zz_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_uux_hg_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_uux_hh_loop": {
+   "role": "train",
+   "axis": null
+  },
+  "v4_uux_hhh_loop": {
+   "role": "train",
+   "axis": null
+  }
+ },
+ "alphas": {
+  "v4_bbx_gvevex__as090": {
+   "base": "v4_bbx_gvevex",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_bbx_gvevex__as130": {
+   "base": "v4_bbx_gvevex",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_bbx_gvevex__as150": {
+   "base": "v4_bbx_gvevex",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dbx_abxd__as090": {
+   "base": "v4_dbx_abxd",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dbx_abxd__as130": {
+   "base": "v4_dbx_abxd",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_dbx_abxd__as150": {
+   "base": "v4_dbx_abxd",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dg_adg__as090": {
+   "base": "v4_dg_adg",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dg_adg__as130": {
+   "base": "v4_dg_adg",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_dg_adg__as150": {
+   "base": "v4_dg_adg",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dg_dhz__as090": {
+   "base": "v4_dg_dhz",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_dg_dhz__as130": {
+   "base": "v4_dg_dhz",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_dg_dhz__as150": {
+   "base": "v4_dg_dhz",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_epem_bbxg__as090": {
+   "base": "v4_epem_bbxg",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_epem_bbxg__as130": {
+   "base": "v4_epem_bbxg",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_epem_bbxg__as150": {
+   "base": "v4_epem_bbxg",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_gg__as090": {
+   "base": "v4_gg_gg",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_gg_gg__as130": {
+   "base": "v4_gg_gg",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_gg_gg__as150": {
+   "base": "v4_gg_gg",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_udx_ddxwp__as090": {
+   "base": "v4_udx_ddxwp",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_udx_ddxwp__as130": {
+   "base": "v4_udx_ddxwp",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_udx_ddxwp__as150": {
+   "base": "v4_udx_ddxwp",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  },
+  "v4_udx_ggwp__as090": {
+   "base": "v4_udx_ggwp",
+   "alpha_s": 0.09,
+   "role": "train",
+   "axis": null
+  },
+  "v4_udx_ggwp__as130": {
+   "base": "v4_udx_ggwp",
+   "alpha_s": 0.13,
+   "role": "heldout",
+   "axis": "H6"
+  },
+  "v4_udx_ggwp__as150": {
+   "base": "v4_udx_ggwp",
+   "alpha_s": 0.15,
+   "role": "train",
+   "axis": null
+  }
+ },
+ "heavy_quark": {
+  "v4_bb_abtwm__mt300": {
+   "role": "train",
+   "tree": "v4_bb_abtwm",
+   "m_t": 300.0
+  },
+  "v4_bb_abtwm__mt50": {
+   "role": "train",
+   "tree": "v4_bb_abtwm",
+   "m_t": 50.0
+  },
+  "v4_bb_abtwm__mt600": {
+   "role": "train",
+   "tree": "v4_bb_abtwm",
+   "m_t": 600.0
+  },
+  "v4_bb_btwm__mt300": {
+   "role": "train",
+   "tree": "v4_bb_btwm",
+   "m_t": 300.0
+  },
+  "v4_bb_btwm__mt50": {
+   "role": "train",
+   "tree": "v4_bb_btwm",
+   "m_t": 50.0
+  },
+  "v4_bb_btwm__mt600": {
+   "role": "train",
+   "tree": "v4_bb_btwm",
+   "m_t": 600.0
+  },
+  "v4_bb_btwmz__mt300": {
+   "role": "train",
+   "tree": "v4_bb_btwmz",
+   "m_t": 300.0
+  },
+  "v4_bb_btwmz__mt50": {
+   "role": "train",
+   "tree": "v4_bb_btwmz",
+   "m_t": 50.0
+  },
+  "v4_bb_btwmz__mt600": {
+   "role": "train",
+   "tree": "v4_bb_btwmz",
+   "m_t": 600.0
+  },
+  "v4_bbx_btxwp__mt300": {
+   "role": "train",
+   "tree": "v4_bbx_btxwp",
+   "m_t": 300.0
+  },
+  "v4_bbx_btxwp__mt50": {
+   "role": "train",
+   "tree": "v4_bbx_btxwp",
+   "m_t": 50.0
+  },
+  "v4_bbx_btxwp__mt600": {
+   "role": "train",
+   "tree": "v4_bbx_btxwp",
+   "m_t": 600.0
+  },
+  "v4_bbx_btxwpz__mt300": {
+   "role": "train",
+   "tree": "v4_bbx_btxwpz",
+   "m_t": 300.0
+  },
+  "v4_bbx_btxwpz__mt50": {
+   "role": "train",
+   "tree": "v4_bbx_btxwpz",
+   "m_t": 50.0
+  },
+  "v4_bbx_btxwpz__mt600": {
+   "role": "train",
+   "tree": "v4_bbx_btxwpz",
+   "m_t": 600.0
+  },
+  "v4_bbx_ttx__mt300": {
+   "role": "train",
+   "tree": "v4_bbx_ttx",
+   "m_t": 300.0
+  },
+  "v4_bbx_ttx__mt50": {
+   "role": "train",
+   "tree": "v4_bbx_ttx",
+   "m_t": 50.0
+  },
+  "v4_bbx_ttx__mt600": {
+   "role": "train",
+   "tree": "v4_bbx_ttx",
+   "m_t": 600.0
+  },
+  "v4_bbx_ttxzz__mt300": {
+   "role": "train",
+   "tree": "v4_bbx_ttxzz",
+   "m_t": 300.0
+  },
+  "v4_bbx_ttxzz__mt50": {
+   "role": "train",
+   "tree": "v4_bbx_ttxzz",
+   "m_t": 50.0
+  },
+  "v4_bbx_ttxzz__mt600": {
+   "role": "train",
+   "tree": "v4_bbx_ttxzz",
+   "m_t": 600.0
+  },
+  "v4_bg_aemtvex__mt300": {
+   "role": "train",
+   "tree": "v4_bg_aemtvex",
+   "m_t": 300.0
+  },
+  "v4_bg_aemtvex__mt50": {
+   "role": "train",
+   "tree": "v4_bg_aemtvex",
+   "m_t": 50.0
+  },
+  "v4_bg_aemtvex__mt600": {
+   "role": "train",
+   "tree": "v4_bg_aemtvex",
+   "m_t": 600.0
+  },
+  "v4_bg_bttxz__mt300": {
+   "role": "train",
+   "tree": "v4_bg_bttxz",
+   "m_t": 300.0
+  },
+  "v4_bg_bttxz__mt50": {
+   "role": "train",
+   "tree": "v4_bg_bttxz",
+   "m_t": 50.0
+  },
+  "v4_bg_bttxz__mt600": {
+   "role": "train",
+   "tree": "v4_bg_bttxz",
+   "m_t": 600.0
+  },
+  "v4_bg_htwmz__mt300": {
+   "role": "train",
+   "tree": "v4_bg_htwmz",
+   "m_t": 300.0
+  },
+  "v4_bg_htwmz__mt50": {
+   "role": "train",
+   "tree": "v4_bg_htwmz",
+   "m_t": 50.0
+  },
+  "v4_bg_htwmz__mt600": {
+   "role": "train",
+   "tree": "v4_bg_htwmz",
+   "m_t": 600.0
+  },
+  "v4_bg_twm__mt300": {
+   "role": "train",
+   "tree": "v4_bg_twm",
+   "m_t": 300.0
+  },
+  "v4_bg_twm__mt50": {
+   "role": "train",
+   "tree": "v4_bg_twm",
+   "m_t": 50.0
+  },
+  "v4_bg_twm__mt600": {
+   "role": "train",
+   "tree": "v4_bg_twm",
+   "m_t": 600.0
+  },
+  "v4_db_dhtwm__mt300": {
+   "role": "train",
+   "tree": "v4_db_dhtwm",
+   "m_t": 300.0
+  },
+  "v4_db_dhtwm__mt50": {
+   "role": "train",
+   "tree": "v4_db_dhtwm",
+   "m_t": 50.0
+  },
+  "v4_db_dhtwm__mt600": {
+   "role": "train",
+   "tree": "v4_db_dhtwm",
+   "m_t": 600.0
+  },
+  "v4_dbx_txu__mt300": {
+   "role": "train",
+   "tree": "v4_dbx_txu",
+   "m_t": 300.0
+  },
+  "v4_dbx_txu__mt50": {
+   "role": "train",
+   "tree": "v4_dbx_txu",
+   "m_t": 50.0
+  },
+  "v4_dbx_txu__mt600": {
+   "role": "train",
+   "tree": "v4_dbx_txu",
+   "m_t": 600.0
+  },
+  "v4_ddx_ddxttx__mt300": {
+   "role": "train",
+   "tree": "v4_ddx_ddxttx",
+   "m_t": 300.0
+  },
+  "v4_ddx_ddxttx__mt50": {
+   "role": "train",
+   "tree": "v4_ddx_ddxttx",
+   "m_t": 50.0
+  },
+  "v4_ddx_ddxttx__mt600": {
+   "role": "train",
+   "tree": "v4_ddx_ddxttx",
+   "m_t": 600.0
+  },
+  "v4_ddx_ttaptamtx__mt300": {
+   "role": "train",
+   "tree": "v4_ddx_ttaptamtx",
+   "m_t": 300.0
+  },
+  "v4_ddx_ttaptamtx__mt50": {
+   "role": "train",
+   "tree": "v4_ddx_ttaptamtx",
+   "m_t": 50.0
+  },
+  "v4_ddx_ttaptamtx__mt600": {
+   "role": "train",
+   "tree": "v4_ddx_ttaptamtx",
+   "m_t": 600.0
+  },
+  "v4_dg_adttx__mt300": {
+   "role": "train",
+   "tree": "v4_dg_adttx",
+   "m_t": 300.0
+  },
+  "v4_dg_adttx__mt50": {
+   "role": "train",
+   "tree": "v4_dg_adttx",
+   "m_t": 50.0
+  },
+  "v4_dg_adttx__mt600": {
+   "role": "train",
+   "tree": "v4_dg_adttx",
+   "m_t": 600.0
+  },
+  "v4_epem_ghttx__mt300": {
+   "role": "train",
+   "tree": "v4_epem_ghttx",
+   "m_t": 300.0
+  },
+  "v4_epem_ghttx__mt50": {
+   "role": "train",
+   "tree": "v4_epem_ghttx",
+   "m_t": 50.0
+  },
+  "v4_epem_ghttx__mt600": {
+   "role": "train",
+   "tree": "v4_epem_ghttx",
+   "m_t": 600.0
+  },
+  "v4_epem_mupmumttx__mt300": {
+   "role": "train",
+   "tree": "v4_epem_mupmumttx",
+   "m_t": 300.0
+  },
+  "v4_epem_mupmumttx__mt50": {
+   "role": "train",
+   "tree": "v4_epem_mupmumttx",
+   "m_t": 50.0
+  },
+  "v4_epem_mupmumttx__mt600": {
+   "role": "train",
+   "tree": "v4_epem_mupmumttx",
+   "m_t": 600.0
+  },
+  "v4_epem_ttx__mt300": {
+   "role": "train",
+   "tree": "v4_epem_ttx",
+   "m_t": 300.0
+  },
+  "v4_epem_ttx__mt50": {
+   "role": "train",
+   "tree": "v4_epem_ttx",
+   "m_t": 50.0
+  },
+  "v4_epem_ttx__mt600": {
+   "role": "train",
+   "tree": "v4_epem_ttx",
+   "m_t": 600.0
+  },
+  "v4_gg_bhtxwp__mt300": {
+   "role": "train",
+   "tree": "v4_gg_bhtxwp",
+   "m_t": 300.0
+  },
+  "v4_gg_bhtxwp__mt50": {
+   "role": "train",
+   "tree": "v4_gg_bhtxwp",
+   "m_t": 50.0
+  },
+  "v4_gg_bhtxwp__mt600": {
+   "role": "train",
+   "tree": "v4_gg_bhtxwp",
+   "m_t": 600.0
+  },
+  "v4_gg_hhttx__mt300": {
+   "role": "train",
+   "tree": "v4_gg_hhttx",
+   "m_t": 300.0
+  },
+  "v4_gg_hhttx__mt50": {
+   "role": "train",
+   "tree": "v4_gg_hhttx",
+   "m_t": 50.0
+  },
+  "v4_gg_hhttx__mt600": {
+   "role": "train",
+   "tree": "v4_gg_hhttx",
+   "m_t": 600.0
+  },
+  "v4_gg_ttx__mt300": {
+   "role": "train",
+   "tree": "v4_gg_ttx",
+   "m_t": 300.0
+  },
+  "v4_gg_ttx__mt50": {
+   "role": "train",
+   "tree": "v4_gg_ttx",
+   "m_t": 50.0
+  },
+  "v4_gg_ttx__mt600": {
+   "role": "train",
+   "tree": "v4_gg_ttx",
+   "m_t": 600.0
+  },
+  "v4_gg_ttxz__mt300": {
+   "role": "train",
+   "tree": "v4_gg_ttxz",
+   "m_t": 300.0
+  },
+  "v4_gg_ttxz__mt50": {
+   "role": "train",
+   "tree": "v4_gg_ttxz",
+   "m_t": 50.0
+  },
+  "v4_gg_ttxz__mt600": {
+   "role": "train",
+   "tree": "v4_gg_ttxz",
+   "m_t": 600.0
+  },
+  "v4_ub_bbxdt__mt300": {
+   "role": "train",
+   "tree": "v4_ub_bbxdt",
+   "m_t": 300.0
+  },
+  "v4_ub_bbxdt__mt50": {
+   "role": "train",
+   "tree": "v4_ub_bbxdt",
+   "m_t": 50.0
+  },
+  "v4_ub_bbxdt__mt600": {
+   "role": "train",
+   "tree": "v4_ub_bbxdt",
+   "m_t": 600.0
+  },
+  "v4_ub_dgtz__mt300": {
+   "role": "train",
+   "tree": "v4_ub_dgtz",
+   "m_t": 300.0
+  },
+  "v4_ub_dgtz__mt50": {
+   "role": "train",
+   "tree": "v4_ub_dgtz",
+   "m_t": 50.0
+  },
+  "v4_ub_dgtz__mt600": {
+   "role": "train",
+   "tree": "v4_ub_dgtz",
+   "m_t": 600.0
+  },
+  "v4_ub_dt__mt300": {
+   "role": "train",
+   "tree": "v4_ub_dt",
+   "m_t": 300.0
+  },
+  "v4_ub_dt__mt50": {
+   "role": "train",
+   "tree": "v4_ub_dt",
+   "m_t": 50.0
+  },
+  "v4_ub_dt__mt600": {
+   "role": "train",
+   "tree": "v4_ub_dt",
+   "m_t": 600.0
+  },
+  "v4_ub_dtz__mt300": {
+   "role": "train",
+   "tree": "v4_ub_dtz",
+   "m_t": 300.0
+  },
+  "v4_ub_dtz__mt50": {
+   "role": "train",
+   "tree": "v4_ub_dtz",
+   "m_t": 50.0
+  },
+  "v4_ub_dtz__mt600": {
+   "role": "train",
+   "tree": "v4_ub_dtz",
+   "m_t": 600.0
+  },
+  "v4_udx_bxepemt__mt300": {
+   "role": "train",
+   "tree": "v4_udx_bxepemt",
+   "m_t": 300.0
+  },
+  "v4_udx_bxepemt__mt50": {
+   "role": "train",
+   "tree": "v4_udx_bxepemt",
+   "m_t": 50.0
+  },
+  "v4_udx_bxepemt__mt600": {
+   "role": "train",
+   "tree": "v4_udx_bxepemt",
+   "m_t": 600.0
+  },
+  "v4_udx_bxht__mt300": {
+   "role": "train",
+   "tree": "v4_udx_bxht",
+   "m_t": 300.0
+  },
+  "v4_udx_bxht__mt50": {
+   "role": "train",
+   "tree": "v4_udx_bxht",
+   "m_t": 50.0
+  },
+  "v4_udx_bxht__mt600": {
+   "role": "train",
+   "tree": "v4_udx_bxht",
+   "m_t": 600.0
+  },
+  "v4_udx_bxt__mt300": {
+   "role": "train",
+   "tree": "v4_udx_bxt",
+   "m_t": 300.0
+  },
+  "v4_udx_bxt__mt50": {
+   "role": "train",
+   "tree": "v4_udx_bxt",
+   "m_t": 50.0
+  },
+  "v4_udx_bxt__mt600": {
+   "role": "train",
+   "tree": "v4_udx_bxt",
+   "m_t": 600.0
+  },
+  "v4_udx_bxtuux__mt300": {
+   "role": "train",
+   "tree": "v4_udx_bxtuux",
+   "m_t": 300.0
+  },
+  "v4_udx_bxtuux__mt50": {
+   "role": "train",
+   "tree": "v4_udx_bxtuux",
+   "m_t": 50.0
+  },
+  "v4_udx_bxtuux__mt600": {
+   "role": "train",
+   "tree": "v4_udx_bxtuux",
+   "m_t": 600.0
+  },
+  "v4_ug_bxdgt__mt300": {
+   "role": "train",
+   "tree": "v4_ug_bxdgt",
+   "m_t": 300.0
+  },
+  "v4_ug_bxdgt__mt50": {
+   "role": "train",
+   "tree": "v4_ug_bxdgt",
+   "m_t": 50.0
+  },
+  "v4_ug_bxdgt__mt600": {
+   "role": "train",
+   "tree": "v4_ug_bxdgt",
+   "m_t": 600.0
+  },
+  "v4_uux_aattx__mt300": {
+   "role": "train",
+   "tree": "v4_uux_aattx",
+   "m_t": 300.0
+  },
+  "v4_uux_aattx__mt50": {
+   "role": "train",
+   "tree": "v4_uux_aattx",
+   "m_t": 50.0
+  },
+  "v4_uux_aattx__mt600": {
+   "role": "train",
+   "tree": "v4_uux_aattx",
+   "m_t": 600.0
+  },
+  "v4_uux_btxwpz__mt300": {
+   "role": "train",
+   "tree": "v4_uux_btxwpz",
+   "m_t": 300.0
+  },
+  "v4_uux_btxwpz__mt50": {
+   "role": "train",
+   "tree": "v4_uux_btxwpz",
+   "m_t": 50.0
+  },
+  "v4_uux_btxwpz__mt600": {
+   "role": "train",
+   "tree": "v4_uux_btxwpz",
+   "m_t": 600.0
+  },
+  "v4_uux_epemttx__mt300": {
+   "role": "train",
+   "tree": "v4_uux_epemttx",
+   "m_t": 300.0
+  },
+  "v4_uux_epemttx__mt50": {
+   "role": "train",
+   "tree": "v4_uux_epemttx",
+   "m_t": 50.0
+  },
+  "v4_uux_epemttx__mt600": {
+   "role": "train",
+   "tree": "v4_uux_epemttx",
+   "m_t": 600.0
+  }
+ },
+ "bsm": [
+  "v4_thdm_ee_HpHm",
+  "v4_thdm_ee_HpHma",
+  "v4_thdm_ee_h2h3",
+  "v4_thdm_udx_Hph2",
+  "v4_thdm_uux_HpHm",
+  "v4_thdm_uux_h2h3g",
+  "v4_zp_ee_Y1a",
+  "v4_zp_ee_mumu",
+  "v4_zp_ee_uu",
+  "v4_zp_uux_Y1g",
+  "v4_zp_uux_Y1z",
+  "v4_zp_uux_mumu"
+ ],
+ "twin_out": [
+  "v4_bbx_aataptam",
+  "v4_bbx_aawpwm",
+  "v4_bbx_agtaptam",
+  "v4_bbx_ahtaptam",
+  "v4_bbx_ataptam",
+  "v4_bbx_ataptamz",
+  "v4_bbx_atapvtwm",
+  "v4_bbx_awpwmz",
+  "v4_bbx_bbxtaptam",
+  "v4_bbx_ddxtaptam",
+  "v4_bbx_epemtaptam",
+  "v4_bbx_epemvtvtx",
+  "v4_bbx_ggtaptam",
+  "v4_bbx_ghtaptam",
+  "v4_bbx_gtaptam",
+  "v4_bbx_gtaptamz",
+  "v4_bbx_gtapvtwm",
+  "v4_bbx_hhtaptam",
+  "v4_bbx_htaptam",
+  "v4_bbx_htaptamz",
+  "v4_bbx_htapvtwm",
+  "v4_bbx_taptam",
+  "v4_bbx_taptamuux",
+  "v4_bbx_taptamvevex",
+  "v4_bbx_taptamz",
+  "v4_bbx_taptamzz",
+  "v4_bbx_tapvtwm",
+  "v4_bbx_tapvtwmz",
+  "v4_bbx_vevexvtvtx",
+  "v4_bbx_wpwmzz",
+  "v4_bg_attamvtx",
+  "v4_bg_btaptam",
+  "v4_bg_gttamvtx",
+  "v4_bg_httamvtx",
+  "v4_bg_ttamvtx",
+  "v4_bg_ttamvtxz",
+  "v4_ddx_aawpwm",
+  "v4_ddx_atapvtwm",
+  "v4_ddx_awpwmz",
+  "v4_ddx_gtapvtwm",
+  "v4_ddx_htapvtwm",
+  "v4_ddx_taptamuux",
+  "v4_ddx_taptaptamtam",
+  "v4_ddx_tapvtwm",
+  "v4_ddx_tapvtwmz",
+  "v4_ddx_ttaptamtx",
+  "v4_ddx_wpwmzz",
+  "v4_ddx_wpwpwmwm",
+  "v4_dg_adtaptam",
+  "v4_dg_atamuvtx",
+  "v4_dg_dgtaptam",
+  "v4_dg_dhtaptam",
+  "v4_dg_dtaptamz",
+  "v4_dg_gtamuvtx",
+  "v4_dg_htamuvtx",
+  "v4_dg_tamuvtx",
+  "v4_dg_tamuvtxz",
+  "v4_epem_aataptam",
+  "v4_epem_aawpwm",
+  "v4_epem_ahtaptam",
+  "v4_epem_ataptam",
+  "v4_epem_ataptamz",
+  "v4_epem_atapvtwm",
+  "v4_epem_awpwmz",
+  "v4_epem_ddxtaptam",
+  "v4_epem_epemtaptam",
+  "v4_epem_hhtaptam",
+  "v4_epem_htaptam",
+  "v4_epem_htaptamz",
+  "v4_epem_htapvtwm",
+  "v4_epem_mupmumtaptam",
+  "v4_epem_taptam",
+  "v4_epem_taptamuux",
+  "v4_epem_taptamvevex",
+  "v4_epem_taptamz",
+  "v4_epem_taptamzz",
+  "v4_epem_taptaptamtam",
+  "v4_epem_tapvtwm",
+  "v4_epem_tapvtwmz",
+  "v4_epem_ttaptamtx",
+  "v4_epem_wpwmzz",
+  "v4_epem_wpwpwmwm",
+  "v4_udx_aatapvt",
+  "v4_udx_agtapvt",
+  "v4_udx_ahtapvt",
+  "v4_udx_ataptamwp",
+  "v4_udx_atapvt",
+  "v4_udx_atapvtz",
+  "v4_udx_awpwpwm",
+  "v4_udx_bbxtapvt",
+  "v4_udx_ddxtapvt",
+  "v4_udx_epemtapvt",
+  "v4_udx_ggtapvt",
+  "v4_udx_ghtapvt",
+  "v4_udx_gtaptamwp",
+  "v4_udx_gtapvt",
+  "v4_udx_gtapvtz",
+  "v4_udx_hhtapvt",
+  "v4_udx_htaptamwp",
+  "v4_udx_htapvt",
+  "v4_udx_htapvtz",
+  "v4_udx_taptamwp",
+  "v4_udx_taptamwpz",
+  "v4_udx_tapuuxvt",
+  "v4_udx_tapvevexvt",
+  "v4_udx_tapvt",
+  "v4_udx_tapvtz",
+  "v4_udx_tapvtzz",
+  "v4_udx_wpwpwmz",
+  "v4_ug_adtapvt",
+  "v4_ug_ataptamu",
+  "v4_ug_dgtapvt",
+  "v4_ug_dhtapvt",
+  "v4_ug_dtapvt",
+  "v4_ug_dtapvtz",
+  "v4_ug_gtaptamu",
+  "v4_ug_htaptamu",
+  "v4_ug_taptamu",
+  "v4_ug_taptamuz",
+  "v4_uux_aataptam",
+  "v4_uux_aawpwm",
+  "v4_uux_agtaptam",
+  "v4_uux_ahtaptam",
+  "v4_uux_ataptam",
+  "v4_uux_ataptamz",
+  "v4_uux_atapvtwm",
+  "v4_uux_awpwmz",
+  "v4_uux_bbxtaptam",
+  "v4_uux_ddxtaptam",
+  "v4_uux_epemtaptam",
+  "v4_uux_ggtaptam",
+  "v4_uux_ghtaptam",
+  "v4_uux_gtaptam",
+  "v4_uux_gtaptamz",
+  "v4_uux_gtapvtwm",
+  "v4_uux_hhtaptam",
+  "v4_uux_htaptam",
+  "v4_uux_htaptamz",
+  "v4_uux_htapvtwm",
+  "v4_uux_taptam",
+  "v4_uux_taptamuux",
+  "v4_uux_taptamvevex",
+  "v4_uux_taptamz",
+  "v4_uux_taptamzz",
+  "v4_uux_taptaptamtam",
+  "v4_uux_tapvtwm",
+  "v4_uux_tapvtwmz",
+  "v4_uux_ttaptamtx",
+  "v4_uux_wpwmzz",
+  "v4_uux_wpwpwmwm"
+ ],
+ "h7_classes": [
+  "v4_bbx_epvewm",
+  "v4_bg_bccx",
+  "v4_bg_bg",
+  "v4_dd_dguwm",
+  "v4_ddx_agvevex",
+  "v4_ddx_awpwm",
+  "v4_ddx_dhuxwp",
+  "v4_ddx_gvevex",
+  "v4_ddx_hssxz",
+  "v4_dg_dhwpwm",
+  "v4_dg_dvevexz",
+  "v4_ds_depems",
+  "v4_dsx_adsxz",
+  "v4_dsx_cxuzz",
+  "v4_epem_aaccx",
+  "v4_epem_ccxddx",
+  "v4_epem_ccxh",
+  "v4_epem_ddxg",
+  "v4_epem_epemz",
+  "v4_epem_mupmum",
+  "v4_gg_ccxg",
+  "v4_ubx_abxhu",
+  "v4_ucx_adsxz",
+  "v4_ud_ddhwp",
+  "v4_udx_aawpz",
+  "v4_udx_epvevevex",
+  "v4_ug_aepemu",
+  "v4_ug_uzzz",
+  "v4_uu_ahuu",
+  "v4_uu_epemuu",
+  "v4_uux_aepemz",
+  "v4_uux_csxwmz",
+  "v4_uux_epemvevex",
+  "v4_uux_uuxvevex"
+ ],
+ "held_out_families": [
+  "v4_bbx_aag",
+  "v4_bbx_ahz",
+  "v4_bbx_ccx",
+  "v4_bbx_ccxh",
+  "v4_bbx_ccxz",
+  "v4_bbx_epemh",
+  "v4_bbx_gg",
+  "v4_bbx_gtaptam",
+  "v4_bbx_gvevex",
+  "v4_bbx_gwpwm",
+  "v4_bg_abg",
+  "v4_bg_bbbx",
+  "v4_bg_bepem",
+  "v4_bg_bhz",
+  "v4_bg_btaptam",
+  "v4_dbx_abxd",
+  "v4_dd_add",
+  "v4_ddx_bbxg",
+  "v4_ddx_wpwm",
+  "v4_dg_bbxd",
+  "v4_dg_uwmz",
+  "v4_ds_cdwm",
+  "v4_epem_abbx",
+  "v4_epem_avevex",
+  "v4_epem_bbxg",
+  "v4_epem_csxwm",
+  "v4_epem_hmupmum",
+  "v4_epem_hwpwm",
+  "v4_gg_bbxz",
+  "v4_gg_csxwm",
+  "v4_ubx_abxu",
+  "v4_ucx_cxhu",
+  "v4_ud_duz",
+  "v4_udx_atapvt",
+  "v4_udx_bbxwp",
+  "v4_udx_ggwp",
+  "v4_udx_tapvtz",
+  "v4_udx_wpz",
+  "v4_udx_wpzz",
+  "v4_ug_dtapvt",
+  "v4_ug_uvevex",
+  "v4_us_hsu",
+  "v4_uux_epemg",
+  "v4_uux_hvevex",
+  "v4_uux_zzz"
+ ],
+ "gen_stage5": [
+  "v4_bb_bbuux",
+  "v4_bbx_ccxuux",
+  "v4_bbx_ddxuux",
+  "v4_bbx_ttxuux",
+  "v4_bg_tuuxwm",
+  "v4_dbx_bxhuwm",
+  "v4_dbx_bxuwm",
+  "v4_dbx_dhtxwp",
+  "v4_dbx_dtxwp",
+  "v4_ddx_aattx",
+  "v4_ddx_aauux",
+  "v4_ddx_acsxwm",
+  "v4_ddx_agttx",
+  "v4_ddx_aguux",
+  "v4_ddx_ahttx",
+  "v4_ddx_attx",
+  "v4_ddx_attxz",
+  "v4_ddx_auux",
+  "v4_ddx_auuxz",
+  "v4_ddx_bbxssx",
+  "v4_ddx_bbxuux",
+  "v4_ddx_ccxuux",
+  "v4_ddx_cgsxwm",
+  "v4_ddx_csxwm",
+  "v4_ddx_csxwmz",
+  "v4_ddx_ddxuux",
+  "v4_ddx_epemttx",
+  "v4_ddx_epemuux",
+  "v4_ddx_ggttx",
+  "v4_ddx_gguux",
+  "v4_ddx_ghttx",
+  "v4_ddx_gttx",
+  "v4_ddx_gttxz",
+  "v4_ddx_guux",
+  "v4_ddx_guuxz",
+  "v4_ddx_hhttx",
+  "v4_ddx_httx",
+  "v4_ddx_httxz",
+  "v4_ddx_huuxz",
+  "v4_ddx_taptamuux",
+  "v4_ddx_ttx",
+  "v4_ddx_ttxuux",
+  "v4_ddx_ttxvevex",
+  "v4_ddx_ttxz",
+  "v4_ddx_ttxzz",
+  "v4_ddx_uuuxux",
+  "v4_ddx_uux",
+  "v4_ddx_uuxvevex",
+  "v4_ddx_uuxz",
+  "v4_ddx_uuxzz",
+  "v4_dg_aduux",
+  "v4_dg_dguux",
+  "v4_dg_duux",
+  "v4_dg_duuxz",
+  "v4_dsx_cxdhwp",
+  "v4_dsx_cxdwp",
+  "v4_epem_ddxuux",
+  "v4_epem_dhuxwp",
+  "v4_gg_ccxuux",
+  "v4_gg_ddxuux",
+  "v4_gg_ttxuux",
+  "v4_ub_bbbxu",
+  "v4_ub_bddxu",
+  "v4_ub_bdgwp",
+  "v4_ub_bdhwp",
+  "v4_ub_bdwp",
+  "v4_ub_bggu",
+  "v4_ub_bgu",
+  "v4_ub_buuux",
+  "v4_ub_gtuwm",
+  "v4_ub_htuwm",
+  "v4_ub_tuwm",
+  "v4_ubx_bbxbxu",
+  "v4_ubx_bxddxu",
+  "v4_ubx_bxdgwp",
+  "v4_ubx_bxdhwp",
+  "v4_ubx_bxdwp",
+  "v4_ubx_bxuuux",
+  "v4_ubx_gtxuwp",
+  "v4_ubx_htxuwp",
+  "v4_ubx_txuwp",
+  "v4_uc_acgu",
+  "v4_uc_bbxcu",
+  "v4_uc_cddxu",
+  "v4_uc_cdhwp",
+  "v4_uc_cggu",
+  "v4_uc_cgu",
+  "v4_uc_cuuux",
+  "v4_ucx_bbxcxu",
+  "v4_ucx_bbxdsx",
+  "v4_ucx_cxdhwp",
+  "v4_ucx_cxggu",
+  "v4_ucx_cxgu",
+  "v4_ucx_cxuuux",
+  "v4_ud_bbxdu",
+  "v4_ud_dddxu",
+  "v4_ud_dggu",
+  "v4_ud_dgu",
+  "v4_ud_du",
+  "v4_ud_duuux",
+  "v4_ud_huuwm",
+  "v4_udx_bbxdxu",
+  "v4_udx_ddxdxu",
+  "v4_udx_dxggu",
+  "v4_udx_dxgu",
+  "v4_udx_dxu",
+  "v4_udx_dxuuux",
+  "v4_udx_epuuxve",
+  "v4_udx_gssxwp",
+  "v4_udx_guuxwp",
+  "v4_udx_hssxwp",
+  "v4_udx_huuxwp",
+  "v4_ug_accxu",
+  "v4_ug_auuux",
+  "v4_ug_bbxdwp",
+  "v4_ug_ccxgu",
+  "v4_ug_ccxu",
+  "v4_ug_gttxu",
+  "v4_ug_guuux",
+  "v4_ug_httxu",
+  "v4_ug_ttxu",
+  "v4_ug_uuux",
+  "v4_us_bbxsu",
+  "v4_us_cguwm",
+  "v4_us_chuwm",
+  "v4_us_cuwm",
+  "v4_us_ddxsu",
+  "v4_us_dhswp",
+  "v4_usx_bbxsxu",
+  "v4_usx_cxguwp",
+  "v4_usx_cxhuwp",
+  "v4_usx_cxuwp",
+  "v4_usx_dgsxwp",
+  "v4_usx_dhsxwp",
+  "v4_uu_aauu",
+  "v4_uu_aguu",
+  "v4_uu_auu",
+  "v4_uu_bbxuu",
+  "v4_uu_ddxuu",
+  "v4_uu_dhuwp",
+  "v4_uu_gguu",
+  "v4_uu_guu",
+  "v4_uu_uu",
+  "v4_uu_uuuux",
+  "v4_uux_accxg",
+  "v4_uux_aguux",
+  "v4_uux_auux",
+  "v4_uux_bbbxbx",
+  "v4_uux_bbxccx",
+  "v4_uux_bbxddx",
+  "v4_uux_bbxssx",
+  "v4_uux_bbxttx",
+  "v4_uux_bbxuux",
+  "v4_uux_bgtxwp",
+  "v4_uux_bhtxwp",
+  "v4_uux_btxwp",
+  "v4_uux_ccxddx",
+  "v4_uux_ccxg",
+  "v4_uux_ccxgg",
+  "v4_uux_ccxuux",
+  "v4_uux_cgsxwm",
+  "v4_uux_chsxwm",
+  "v4_uux_csxwm",
+  "v4_uux_ddxttx",
+  "v4_uux_ddxuux",
+  "v4_uux_dguxwp",
+  "v4_uux_dhuxwp",
+  "v4_uux_ggttx",
+  "v4_uux_gguux",
+  "v4_uux_ghttx",
+  "v4_uux_gttx",
+  "v4_uux_guux",
+  "v4_uux_tttxtx",
+  "v4_uux_ttxuux",
+  "v4_uux_uuuxux"
+ ],
+ "source": "catalog_v3_roles.json carried to catalog_v4's classes (recipes/select_catalog_v4.py)"
+}

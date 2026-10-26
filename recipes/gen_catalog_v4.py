@@ -23,9 +23,9 @@ What changes against catalog_v3, all of it as fields of the v4 entries that mg5_
                heavy-quark layer's width the LO formula at its mass (mg5_pipeline_final.top_width_lo); the one-loop
                b b~ > h w+ w- at zero top width (WIDTH_OVERRIDE, the user 2026-10-26, D154)
   b            massless in beams and finals: model sm-no_b_mass (loop_sm-no_b_mass for MadLoop), beam_masses {}
-Not changed: the classes (catalog_v3's census until --check and the equality step are rerun on v4: a class can split
-when EW diagrams tell its relabelled members apart, merge when the massless b equals a d or s, vanish when only the b
-Yukawa made it), the roles, the pool sizes, the BSM strings (their orders are explicit already), the alpha_s points.
+Classes and roles: catalog_v4's own (recipes/select_catalog_v4.py on the v4 census's equality, after --write; it
+writes the training and held-out recipes and gen_stage5, the pools of the classes the electroweak orders split off).
+Not changed: the pool sizes, the BSM strings (their orders are explicit already), the alpha_s points.
 The energy-extrapolation axis H7E (catalog_v3: sqrt(s_hat) in [1, 10] TeV, inside the v4 training window up to 6 TeV)
 moves above it (the user 2026-10-26, "Yes, okay, that's fine, go ahead.", to the proposal of 6 to 20 TeV, log-uniform
 like the window): each catalog_v3 probe <name>__E10 becomes v4_<name>__E20 on E_HOLDOUT, in gen_stage4 and its
@@ -33,7 +33,7 @@ held-out recipe heldout_H7E. Dropped too (D136, the user 2026-10-25: "Drop the b
 with no diagram once the b is massless (a Higgs on a b line with nothing else to couple to it: b b~ > h + photons,
 gluons or Higgses, b g > b h ..., g g > b b~ h ...), MadGraph's verdict in analysis/catalog_v4/data/checked.json
 (exists false), with their one-loop entries and every recipe entry (any role) named after or based on them.
-    python3 recipes/gen_catalog_v4.py --write            entries + recipes (no MadGraph, laptop or site)
+    python3 recipes/gen_catalog_v4.py --write            entries + generation recipes (no MadGraph, laptop or site)
     python recipes/gen_catalog_v4.py --check [--workers N] [--only NAME ...]   (CC) MadGraph on the v4 strings
     python3 recipes/gen_catalog_v4.py --summary <checked.json>   census change: existence, diagrams
 """
@@ -52,9 +52,9 @@ QUARKS = {1, 2, 3, 4, 5, 6}
 CHECKED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "checked.json")
 LOOP_MODEL = {"loop_sm": "loop_sm-no_b_mass", "loop_qcd_qed_sm": "loop_qcd_qed_sm-no_b_mass"}
 # the v3 stage and training recipes mapped to v4
-RECIPES = ["gen_stage1", "gen_stage2", "gen_stage3", "gen_stage4", "train", "twin_train", "heldout_H1", "heldout_H2",
-           "heldout_H2p5", "heldout_H3", "heldout_H3p", "heldout_H4", "heldout_H5", "heldout_H6", "heldout_H7c",
-           "heldout_H7E"]
+# (the generation stages only: the training and held-out recipes come from catalog_v4's own classes and roles,
+# recipes/select_catalog_v4.py, run after this)
+RECIPES = ["gen_stage1", "gen_stage2", "gen_stage3", "gen_stage4"]
 E_HOLDOUT = [6000, 20000]      # GeV, the energy hold-out's window (the user 2026-10-26, see the docstring)
 # One-loop entries whose full-order born mixes QCD and electroweak powers (QED<=n with QCD diagrams too): MadLoop's
 # [virt=QCD] on that born fails the pole check (double pole identically 0 for the two 2->3, off by up to 25% at a few
@@ -255,7 +255,7 @@ def write():
         with open(os.path.join(HERE, f"catalog_v4_{r}.yaml"), "w") as f:
             f.write(hdr + f"# from catalog_v3_{r}.yaml: names v3_ -> v4_, windows [threshold, 6 TeV] (the energy hold-out [6, 20] TeV), the v4 mixture; the 34 b-Higgs trees with no "
                     "diagram (massless b) dropped; "
-                    "classes and roles are catalog_v3's until the v4 census is rerun\n")
+                    "generation recipe (roles: recipes/select_catalog_v4.py)\n")
             yaml.safe_dump({"sampling": dict(mg.V4_SAMPLING), "processes": out}, f, sort_keys=False)
         counts[r] = len(out)
     floor = sum(1 for n in trees if window(procs[n])[0] == int(mg.V4_SQRTS_FLOOR) and
