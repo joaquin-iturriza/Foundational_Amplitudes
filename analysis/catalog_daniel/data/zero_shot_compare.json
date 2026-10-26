@@ -1,0 +1,102 @@
+{
+ "zs_vs_draft": {
+  "per-process stats, predicted|96": {
+   "n": 96,
+   "median": 0.12018510572767765
+  },
+  "shared standardization|96": {
+   "n": 96,
+   "median": 0.06935392939118432
+  },
+  "$\\hat s$ + coupling factor|96": {
+   "n": 96,
+   "median": 0.004445659783579044
+  },
+  "dimensionless + coupling orders|96": {
+   "n": 96,
+   "median": 0.050691873300719476
+  },
+  "per-process stats, predicted|43": {
+   "n": 43,
+   "median": 1.2716221881120646
+  },
+  "shared standardization|43": {
+   "n": 43,
+   "median": 0.6026096791452705
+  },
+  "$\\hat s$ + coupling factor|43": {
+   "n": 43,
+   "median": 2.4130755190721778
+  },
+  "dimensionless + coupling orders|43": {
+   "n": 43,
+   "median": 0.477688304525408
+  }
+ },
+ "diagram_ab": {
+  "encoder|96 relabels": {
+   "n": 96,
+   "median_off": 0.07982511697146226,
+   "median_on": 0.055785257128985286,
+   "better": 70,
+   "median_dex": 0.08114962650435628,
+   "p": 2.1973978131204792e-07
+  },
+  "encoder|43 new": {
+   "n": 43,
+   "median_off": 1.6698247807795479,
+   "median_on": 1.5695583828210207,
+   "better": 23,
+   "median_dex": 0.026893427069720335,
+   "p": 0.862427443999195
+  },
+  "encoder|$2\\to3$ at 100 TeV": {
+   "n": 40,
+   "median_off": 0.08544200082876446,
+   "median_on": 0.06178471150772795,
+   "better": 28,
+   "median_dex": 0.06249422777478339,
+   "p": 0.0009411722930963151
+  },
+  "encoder|$2\\to4$": {
+   "n": 40,
+   "median_off": 26.03735939495114,
+   "median_on": 23.412685914681067,
+   "better": 18,
+   "median_dex": -0.027528373477763192,
+   "p": 0.3753805605592788
+  },
+  "virtuality pooling|96 relabels": {
+   "n": 96,
+   "median_off": 0.07982511697146226,
+   "median_on": 0.05856114781361896,
+   "better": 62,
+   "median_dex": 0.04708842169645049,
+   "p": 0.00022031275867955298
+  },
+  "virtuality pooling|43 new": {
+   "n": 43,
+   "median_off": 1.6698247807795479,
+   "median_on": 1.1482558341037006,
+   "better": 25,
+   "median_dex": 0.07663251566480764,
+   "p": 0.5298736895283582
+  },
+  "virtuality pooling|$2\\to3$ at 100 TeV": {
+   "n": 40,
+   "median_off": 0.08544200082876446,
+   "median_on": 0.06355920512332175,
+   "better": 27,
+   "median_dex": 0.07542929657920235,
+   "p": 0.001862897997852997
+  },
+  "virtuality pooling|$2\\to4$": {
+   "n": 40,
+   "median_off": 26.03735939495114,
+   "median_on": 27.741183964406513,
+   "better": 14,
+   "median_dex": -0.04763225563683031,
+   "p": 0.010628069954691455
+  }
+ }
+}

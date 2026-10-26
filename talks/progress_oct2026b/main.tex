@@ -1,0 +1,146 @@
+%=========================================================================
+%  Foundational Amplitudes, informal weekly update (late October 2026)
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}{../../analysis/catalog_daniel/figs/}{../../analysis/catalog_v3/figs/}{../../analysis/transfer/figs/}}
+
+\definecolor{navy}{RGB}{38,38,110}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\Large\bfseries\color{navy} Foundational Amplitudes}\\[1.4em]
+    {\large Joaqu\'in Iturriza Ramirez}\\[0.4em]
+    {\footnotesize\color{gray} October 2026}
+  \end{center}
+  \vfill
+\end{frame}
+
+%---------------------------------------------------------------- Daniel's catalog
+\begin{frame}{Zero shot on Daniel's catalog}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{zs_vs_draft.pdf}
+\end{frame}
+
+\begin{frame}{Most held out processes are relabels}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{heldout_zero_shot.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- catalog_v3
+\begin{frame}{Catalog v3}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{pool_levels.pdf}
+\end{frame}
+
+\begin{frame}{Dimensionless target extrapolates}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{short_reads.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- transfer
+\begin{frame}{Muon}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_compare.pdf}
+\end{frame}
+
+\begin{frame}{Muon, both optimizers tuned}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_search_zs.pdf}
+\end{frame}
+
+\begin{frame}{Fine tuning at small D}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_ft.pdf}
+\end{frame}
+
+\begin{frame}{Gentler fine tunes do not help}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{lowd_dyhpo.pdf}
+\end{frame}
+
+\begin{frame}{Why a fine tune loses to scratch}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{ft_harm.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- other
+\begin{frame}{More sign changing pools carry the sign}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{prep_signed_arms.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- diagrams
+\begin{frame}{Feynman diagrams, zero shot}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{diagram_ab.pdf}
+\end{frame}
+
+\begin{frame}{Feynman diagrams, fine tuning}
+  \centering
+  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{levdiagl_legend.pdf}\\[0.3em]
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_b.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_d.pdf}
+\end{frame}
+
+\begin{frame}{Feynman diagrams}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.86\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.9em}
+        \item Relabels, 0.080 without, 0.056 with, 70 of 96 better
+        \item New processes, 1.67 without, 1.57 with, 23 of 43 better
+        \item $2\to4$, 26 without, 23 with, 18 of 40 better
+        \item Fine tunes 0.07 to 0.24 decades worse with them
+        \item 448 processes in distribution, 33\% better without
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\begin{frame}{Open ends}
+  \vfill
+  \begin{center}
+    \begin{minipage}{0.8\textwidth}
+      \large
+      \begin{itemize}\setlength{\itemsep}{0.9em}
+        \item Diagrams with more than one seed
+        \item Fine tuning from a full length catalog pretraining
+        \item Muon fine tunes at the full horizon
+        \item One loop sign on held out processes
+      \end{itemize}
+    \end{minipage}
+  \end{center}
+  \vfill
+\end{frame}
+
+\end{document}
