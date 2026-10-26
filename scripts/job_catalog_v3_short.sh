@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -72,6 +72,10 @@ case "$ARM" in
     dimensionless_muon)    NORM=("${DIM[@]}" training.optimizer=MuonAdamW) ;;
     dimensionless_seed2)   NORM=("${DIM[@]}" seed=43) ;;
     dimensionless_muon_seed2) NORM=("${DIM[@]}" training.optimizer=MuonAdamW seed=43) ;;
+    # the Muon test's stage 2 (D146): the best trial of each optimizer's 8-trial search at this horizon
+    # (sweep/sweep_config_ccin2p3_muon_test_search_{adamw,muon}.yaml), read zero-shot only (mode eval) from its run dir
+    muon_search_best_adamw) OUT_FIXED=runs/muon_test_search_adamw/trial_0768 ;;
+    muon_search_best_muon)  OUT_FIXED=runs/muon_test_search_muon/trial_1860 ;;
     # the one-loop sign transfer (docs/results.tex, par. The signed one-loop pools' data: the kinematics decide the
     # sign within a pool, the arms fail it zero-shot), each the baseline with one change, at its HPs:
     #   baseline_sign_pairs  the sign logit also gets a pair term on the invariants the per-pool classifier used
@@ -96,7 +100,8 @@ case "$ARM" in
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
-OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
+OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_v3_short/$ARM}"; PRED="$SCRATCH/zz_v3_short_$ARM"
+[ -n "$OUT_FIXED" ] && [ "$MODE" != eval ] && { echo "$ARM is a sweep trial: mode eval only"; exit 1; }
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
 ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")}
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
