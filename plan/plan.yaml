@@ -1276,7 +1276,9 @@ entries:
     (CC had 40 GB free; a short run dir is ~115 MB). NEXT when they end: read each log (V3_SHORT_DONE, finite losses, Muon
     line), add the three arms to analysis/catalog_v3/short_reads.py, then write the fine-tune job wrapper (like scripts/job_lowd_ft.sh)
     and run tools/catalog_ft.py from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW
-    and MuonAdamW (64 runs, ~2.8 GPU-h). Stage 2 (~34 GPU-h) only if stage 1 is inconclusive.'
+    and MuonAdamW (64 runs, ~2.8 GPU-h). Stage 2 (~34 GPU-h) only if stage 1 is inconclusive.; ALSO: 16 from-scratch runs
+    on the same 4 probes x 4 D (~0.7 GPU-h), so the fine-tunes also answer whether fine-tuning a current pretraining beats
+    scratch at small D (moved from ft_harm, 2026-10-26)'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
