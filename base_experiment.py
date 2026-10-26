@@ -996,6 +996,16 @@ class BaseExperiment:
         prof_n = 0
         _on_cuda = self.device == torch.device("cuda")
 
+        # the EMA restarted on the weights training starts from (a fine-tune's are the parent's, loaded after the EMA
+        # was built), then a fine-tune's step 0: its validation before any update, logged and in the result JSON
+        if not self.warm_start:
+            self._restart_ema()
+        self.val_loss_step0 = None
+        _ft = self.cfg.get("fine_tune", None)
+        if (not self.warm_start and _ft is not None and _ft.get("pretrained_path", None) is not None
+                and self.is_main_process()):
+            self.val_loss_step0 = self._validate_start()
+
         # --- evaluate at initialisation (step 0, before any gradient update) ---
         if self.is_main_process() and self.cfg.training.save_intermediate:
             self._evals(results, smallest_val_loss_step, step=0)
@@ -1217,6 +1227,9 @@ class BaseExperiment:
                       "best_step": int(smallest_val_loss_step) + 1,
                       "validate_every": int(self.cfg.training.validate_every_n_steps),
                       "val_curve": [float(x) for x in self.val_loss_no_reg]}
+            if getattr(self, "val_loss_step0", None) is not None:
+                # a fine-tune's validation before any update (the parent's weights): not a checkpoint candidate
+                result["val_loss_step0"] = float(self.val_loss_step0)
             # the curves on equal footing (training.track_train_eval), and the val mu-MSE for HETEROSC
             for k in ("train_eval_loss_no_reg", "train_eval_mse", "val_mse"):
                 if getattr(self, k, None):
@@ -1224,6 +1237,56 @@ class BaseExperiment:
             result.update(self._result_extra())
             with open(result_path, "w") as _f:
                 json.dump(result, _f)
+
+    def _restart_ema(self):
+        """The EMA shadow reset to the current weights, its update count to zero (torch_ema's shadow is a copy taken when
+        it is built). init_model builds the EMA on the fresh initialisation and a fine-tune then loads the parent's
+        weights (and LoRA, a linear-probe head) into the model; without this reset every validation, scored on the EMA
+        average, blended the random initialisation in: 2/11 of it after the first update (torch_ema's warm-up decay
+        (1 + n)/(10 + n)), 1/22 after the second, about 1e-4 after ten. A run that does not touch its weights after
+        init_model is unchanged (the shadow is rebuilt from the same weights)."""
+        if self.ema is None:
+            return
+        self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.cfg.training.ema_decay)
+        self.ema.to(self.device)
+
+    # the curves a validation appends to, restored by _validate_start
+    _START_CURVES = ("val_loss", "val_loss_no_reg", "val_mse", "val_loss_no_reg_all",
+                     "train_eval_loss_no_reg", "train_eval_mse")
+    _START_PER_PROCESS = ("proc_val_losses", "proc_val_losses_no_reg")
+
+    def _validate_start(self):
+        """The validation loss before any update (step 0): the same _validate as every later step, logged as
+        "Val loss: ... | step 0", then taken back out of the curves, so it is never a checkpoint candidate and the
+        curves' indices are unchanged. Returns val_loss_no_reg (the regularized loss when no-reg is not tracked), or
+        None with a process-balanced sampler (its validation also moves the sampler's weights)."""
+        if getattr(self, "train_sampler", None) is not None:
+            LOGGER.info("Step-0 validation skipped: the process-balanced sampler updates its weights on a validation")
+            return None
+        lens = {k: len(getattr(self, k)) for k in self._START_CURVES if isinstance(getattr(self, k, None), list)}
+        per = {k: {n: len(v) for n, v in getattr(self, k, {}).items()} for k in self._START_PER_PROCESS}
+        n_nr, n_v = len(self.val_loss_no_reg), len(self.val_loss)
+        self._validate(-1)
+        v0 = (self.val_loss_no_reg[-1] if len(self.val_loss_no_reg) > n_nr
+              else self.val_loss[-1] if len(self.val_loss) > n_v else None)
+        for k in self._START_CURVES:
+            cur = getattr(self, k, None)
+            if not isinstance(cur, list):
+                continue
+            if k in lens:
+                del cur[lens[k]:]
+            else:
+                delattr(self, k)
+        for k in self._START_PER_PROCESS:
+            d = getattr(self, k, None) or {}
+            for n in list(d):
+                if n in per[k]:
+                    del d[n][per[k][n]:]
+                else:
+                    del d[n]
+        if v0 is not None:
+            LOGGER.info(f"Fine-tuning: validation before any update (step 0) {float(v0):.6e}")
+        return None if v0 is None else float(v0)
 
     def _result_extra(self) -> dict:
         """Subclasses can override to add extra fields to the result JSON."""

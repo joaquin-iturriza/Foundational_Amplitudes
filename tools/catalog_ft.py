@@ -93,6 +93,8 @@ def main():
                 std2 = float(json.load(open(os.path.join(run_dir, "data_stats.json")))["prepd_std"][0]) ** 2
                 rec.update(val_loss_no_reg=float(r["val_loss"]), mse_log=float(r["val_loss"]) * std2,
                            prepd_std=std2 ** 0.5, best_step=r.get("best_step"), seconds=round(time.time() - t0))
+                if r.get("val_loss_step0") is not None:     # the validation before any update (the parent weights)
+                    rec.update(val_loss_step0=float(r["val_loss_step0"]), mse_log_step0=float(r["val_loss_step0"]) * std2)
             except Exception as e:                    # one failed cell is listed, never silently dropped
                 rec["error"] = repr(e)[:300]
                 failed += 1
