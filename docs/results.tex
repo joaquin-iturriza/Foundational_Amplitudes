@@ -2296,91 +2296,171 @@ seed)).
     and $1$ to $10$\,TeV $1.18$, a tie (Muon lower on $50\%$, AdamW on $30\%$; the median error is $2.88$ for AdamW's
     first seed and $3.42$ for Muon's second).
   \item \emph{Fine-tunes at small $D$} (the user, 2026-10-26: ``I agree with that reframing of the question for the
-    finetuning at small D, go ahead with it''), two questions: does the Muon pretraining transfer better, and does
-    fine-tuning a current pretraining beat scratch at small $D$ (the question par.~\ref{par:ft_harm} hands on). The
-    design (\code{tools/catalog\_ft.py}, \code{scripts/job\_catalog\_ft.sh}): four held-out probes, the dimensionless
-    arm's median-error probe of new combinations ($dg\to dgW^+W^-$), $2\to4$ families ($u\bar s\to\bar c uW^+Z$), the
-    top ($gg\to\gamma t\bar t$) and one loop ($u\bar d\to\gamma gW^+$), fixed before any fine-tune ran; the four cells
-    of the small-$D$ round ($D=10$, $32$, $100$, $316$ training events at $176$ to $4576$ steps); full retraining from
-    the best checkpoint of each optimizer's first-seed pretraining, with each fine-tune optimizer (the $2\times2$ of
-    parent and fine-tune optimizer), the target's statistics refitted on the probe, and the same cells from scratch
-    with the parent's configuration and AdamW. \emph{One seed per cell, and the fine-tune HPs untuned}: the parent's
-    learning rate (scale $1$), no layer decay (decay $1$), the parent's other HPs, scratch likewise. Every cell is read
-    at its best checkpoint as the MSE of $\log|\mathcal M|^2$ on the probe's first $2000$ validation events, the
-    zero-shot read's events (Fig.~\ref{fig:v3_muon_ft}; \code{data/muon\_ft.json}, runs FA-ccin2p3-6e5d2ed2,
-    FA-ccin2p3-ce1dba1c, FA-ccin2p3-54fd017f, FA-ccin2p3-be7d9ff7, FA-ccin2p3-00d080ba). The only seed reference is the
-    zero-shot one above: the pretraining seed moves a probe's error by a median $0.124$ to $0.148$ decades, a factor
-    of about $1.4$, so a single-cell ratio inside that is not resolved. These fine-tunes ran before the fix of the weight average that
-    started on the random initialisation (par.~\ref{par:ema_start}); their numbers below are being replaced by reruns at
-    the fix.
-% src: python3 analysis/catalog_v3/muon_compare.py @d66e2769
-% claim: ft.parent.AdamW.median=1.47
-% claim: ft.parent.AdamW.den_lower=15
-% claim: ft.parent.AdamW.n=16
-% claim: ft.parent.Muon.median=1.38
-% claim: ft.parent.Muon.den_lower=14
-% claim: ft.parent.AdamW_D10.median=1.1
-% claim: ft.parent.Muon_D10.median=1.11
-% claim: ft.parent.AdamW_D316.median=2.77
-% claim: ft.parent.Muon_D316.median=2.21
-% claim: ft.ft_opt.AdamW.median=0.991
-% claim: ft.ft_opt.AdamW.den_lower=7
-% claim: ft.ft_opt.Muon.median=0.907
-% claim: ft.ft_opt.Muon.den_lower=3
-% claim: ft.vs_scratch.AdamW_AdamW.median=1.63
-% claim: ft.vs_scratch.AdamW_AdamW.min=1.25
-% claim: ft.vs_scratch.AdamW_Muon.median=1.72
-% claim: ft.vs_scratch.Muon_AdamW.median=2.78
-% claim: ft.vs_scratch.Muon_Muon.median=2.61
-% claim: ft.vs_scratch.AdamW_AdamW_D10.median=1.43
-% claim: ft.vs_scratch.AdamW_AdamW_D316.median=2.17
-% claim: ft.vs_scratch.Muon_AdamW_D10.median=1.5
-% claim: ft.vs_scratch.Muon_AdamW_D316.median=6.11
-% claim: ft.vs_zero_shot.AdamW_AdamW.median=0.416
-% claim: ft.vs_zero_shot.AdamW_AdamW.ft_lower=12
-% claim: ft.vs_zero_shot.Muon_AdamW.median=0.843
-% claim: ft.vs_zero_shot.Muon_AdamW.ft_lower=10
-% claim: ft.vs_zero_shot.Muon_Muon.ft_lower=8
-% claim: ft.zs.Muon/v3_dg_dgwpwm=0.0707
-% claim: ft.start.Muon/v3_dg_dgwpwm=3.25
+    finetuning at small D, go ahead with it''), three questions: does the Muon pretraining transfer better, does
+    fine-tuning a current pretraining beat scratch at small $D$ (the question par.~\ref{par:ft_harm} hands on), and
+    does the fine-tune end below the parent's own zero-shot error. The design (\code{tools/catalog\_ft.py},
+    \code{scripts/job\_catalog\_ft.sh}): four held-out probes, the dimensionless arm's median-error probe of new
+    combinations ($dg\to dgW^+W^-$), $2\to4$ families ($u\bar s\to\bar c uW^+Z$), the top ($gg\to\gamma t\bar t$) and
+    one loop ($u\bar d\to\gamma gW^+$), fixed before any fine-tune ran; the four cells of the small-$D$ round ($D=10$,
+    $32$, $100$, $316$ training events at $176$ to $4576$ steps); full retraining from the best checkpoint of each
+    optimizer's first-seed pretraining, with each fine-tune optimizer (the $2\times2$ of parent and fine-tune
+    optimizer), each in two target standardizations: the parent's kept (its pooled mean and $\sigma$, so step $0$ is
+    the parent's zero-shot on the probe) and refitted on the probe's $D$ events (the parent's output then read in the
+    probe's own units); and the same cells from scratch with the parent's configuration and AdamW. $128$ fine-tune
+    cells and $16$ from scratch, \emph{one seed per cell, the fine-tune HPs untuned}: the parent's learning rate (scale
+    $1$), no layer decay (decay $1$), the parent's other HPs, scratch likewise. Every cell is read at its best
+    checkpoint as the MSE of $\log|\mathcal M|^2$ on the probe's first $2000$ validation events, the zero-shot read's
+    events; the zero-shot reference is each parent-stats cell's step-$0$ validation, the same events in the same target
+    (Fig.~\ref{fig:v3_muon_ft}; \code{data/muon\_ft.json}; runs FA-ccin2p3-70adfc03, FA-ccin2p3-8103a0bb,
+    FA-ccin2p3-13e57de7, FA-ccin2p3-e5265e31 (parent's standardization), FA-ccin2p3-fe864fda, FA-ccin2p3-f620ed40,
+    FA-ccin2p3-60177afb, FA-ccin2p3-29e8ad2f (refit), FA-ccin2p3-00d080ba (scratch)). All of them ran after the fix of
+    the weight average that started on the random initialisation (par.~\ref{par:ema_start}); the pre-fix fine-tunes
+    are not read. The only seed reference is the zero-shot one above: the pretraining seed moves a probe's error by a
+    median $0.124$ to $0.148$ decades, a factor of about $1.4$, so a single-cell ratio inside that is not resolved.
+% src: python3 analysis/catalog_v3/muon_compare.py @f4e6a54a
+% claim: ft.vs_zero_shot.parent_AdamW_AdamW.median=0.387
+% claim: ft.vs_zero_shot.parent_AdamW_AdamW.below=16
+% claim: ft.vs_zero_shot.parent_AdamW_Muon.median=0.416
+% claim: ft.vs_zero_shot.parent_AdamW_Muon.below=16
+% claim: ft.vs_zero_shot.parent_Muon_Muon.median=0.553
+% claim: ft.vs_zero_shot.parent_Muon_Muon.below=16
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.median=0.487
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.below=13
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.at=2
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.above=1
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.max=1.25
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.D10.median=0.847
+% claim: ft.vs_zero_shot.parent_Muon_AdamW.D316.median=0.231
+% claim: ft.vs_zero_shot.refit_AdamW_AdamW.below=11
+% claim: ft.vs_zero_shot.refit_AdamW_Muon.below=12
+% claim: ft.vs_zero_shot.refit_Muon_AdamW.below=10
+% claim: ft.vs_zero_shot.refit_Muon_Muon.below=8
+% claim: ft.vs_zero_shot.refit_Muon_AdamW.D10.median=8.42
+% claim: ft.vs_zero_shot.refit_Muon_Muon.D10.median=7.35
+% claim: ft.refit_vs_parent.AdamW_AdamW.median=1.09
+% claim: ft.refit_vs_parent.AdamW_AdamW.den_lower=13
+% claim: ft.refit_vs_parent.AdamW_Muon.median=1.02
+% claim: ft.refit_vs_parent.AdamW_Muon.den_lower=10
+% claim: ft.refit_vs_parent.AdamW_AdamW.D10=1.76
+% claim: ft.refit_vs_parent.AdamW_Muon.D10=1.96
+% claim: ft.refit_vs_parent.AdamW_AdamW.D316=1.02
+% claim: ft.refit_vs_parent.AdamW_Muon.D316=0.986
+% claim: ft.refit_vs_parent.Muon_AdamW.median=1.83
+% claim: ft.refit_vs_parent.Muon_AdamW.den_lower=15
+% claim: ft.refit_vs_parent.Muon_Muon.median=1.84
+% claim: ft.refit_vs_parent.Muon_Muon.den_lower=14
+% claim: ft.refit_vs_parent.Muon_AdamW.D10=9.62
+% claim: ft.refit_vs_parent.Muon_Muon.D10=9.8
+% claim: ft.refit_vs_parent.Muon_AdamW.D316=1.23
+% claim: ft.refit_vs_parent.Muon_Muon.D316=1.34
+% claim: ft.parent.parent_AdamW.median=3.2
+% claim: ft.parent.parent_AdamW.den_lower=16
+% claim: ft.parent.parent_Muon.median=3.23
+% claim: ft.parent.parent_Muon.den_lower=14
+% claim: ft.parent.parent_AdamW.D10=5.43
+% claim: ft.parent.parent_Muon.D10=5.99
+% claim: ft.parent.parent_AdamW.D316=3.2
+% claim: ft.parent.parent_Muon.D316=3.23
+% claim: ft.parent.refit_AdamW.median=1.39
+% claim: ft.parent.refit_Muon.median=1.35
+% claim: ft.parent.refit_AdamW.D10=1.11
+% claim: ft.parent.refit_AdamW.D316=2.73
+% claim: ft.zs_ratio_median=7.13
+% claim: ft.ft_opt.parent_AdamW.median=0.986
+% claim: ft.ft_opt.parent_AdamW.den_lower=6
+% claim: ft.ft_opt.parent_Muon.median=0.935
+% claim: ft.ft_opt.parent_Muon.den_lower=6
+% claim: ft.ft_opt.refit_AdamW.median=0.993
+% claim: ft.ft_opt.refit_AdamW.den_lower=8
+% claim: ft.ft_opt.refit_Muon.median=0.892
+% claim: ft.ft_opt.refit_Muon.den_lower=3
+% claim: ft.vs_scratch.parent_AdamW_AdamW.median=2.18
+% claim: ft.vs_scratch.parent_AdamW_AdamW.min=1.33
+% claim: ft.vs_scratch.parent_AdamW_Muon.median=2.05
+% claim: ft.vs_scratch.parent_Muon_AdamW.median=9.11
+% claim: ft.vs_scratch.parent_Muon_Muon.median=9.04
+% claim: ft.vs_scratch.parent_Muon_AdamW.D10=11.9
+% claim: ft.vs_scratch.parent_Muon_AdamW.D316=7.57
+% claim: ft.vs_scratch.refit_AdamW_AdamW.median=1.74
+% claim: ft.vs_scratch.refit_AdamW_Muon.median=1.71
+% claim: ft.vs_scratch.refit_Muon_AdamW.median=2.55
+% claim: ft.vs_scratch.refit_Muon_Muon.median=2.58
+% claim: ft.vs_scratch.parent_AdamW_AdamW.den_lower=16
+% claim: ft.vs_scratch.parent_AdamW_Muon.den_lower=16
+% claim: ft.vs_scratch.parent_Muon_AdamW.den_lower=16
+% claim: ft.vs_scratch.parent_Muon_Muon.den_lower=16
+% claim: ft.vs_scratch.refit_AdamW_AdamW.den_lower=16
+% claim: ft.vs_scratch.refit_AdamW_Muon.den_lower=16
+% claim: ft.vs_scratch.refit_Muon_AdamW.den_lower=16
+% claim: ft.vs_scratch.refit_Muon_Muon.den_lower=16
+% claim: ft.zs.Muon/v3_dg_dgwpwm.zero_shot_read=0.0707
+% claim: ft.zs.Muon/v3_dg_dgwpwm.refit_start_D10=3.01
+% claim: ft.zs.AdamW/v3_udx_agwp_nlo.step0_D10=1.09
+% claim: ft.zs.AdamW/v3_udx_agwp_nlo.step0_D316=1.15
+% claim: ft.zs.AdamW/v3_udx_agwp_nlo.zero_shot_read=1.17
+% claim: ft.zs.Muon/v3_udx_agwp_nlo.step0_D10=1.51
+% claim: ft.zs.Muon/v3_udx_agwp_nlo.step0_D316=1.52
+% claim: ft.nlo_scale.D10=0.542
+% claim: ft.nlo_scale.D32=0.372
+% claim: ft.nlo_scale.D100=0.365
+% claim: ft.nlo_scale.D316=0.179
 % claim: zs.all.spread_a=0.124
 % claim: zs.all.spread_m=0.148
-% claim: ft.zs_ratio_median=7.13
-% claim: ft.vs_scratch.AdamW_AdamW.den_lower=16
-% claim: ft.vs_scratch.AdamW_Muon.den_lower=16
-% claim: ft.vs_scratch.Muon_AdamW.den_lower=16
-% claim: ft.vs_scratch.Muon_Muon.den_lower=16
-% claim: ft.vs_zero_shot.Muon_Muon.ft_lower_D316=3
 % allow: 10 32 100 316 176 4576 because they are the cells' training events and steps, settings
 % allow: 1 because it is the fine-tune learning rate scale and layer decay, settings
+% allow: 0 because it is step 0, the validation before any update
 % allow: 2000 because it is the validation events read, a setting
+% allow: 128 144 because they count the cells of the design, settings
 % allow: 1.4 because it is 10^0.148 rounded, the seed spread above restated as a factor
 % allow: 2 because it is the 2x2 design
-    \emph{Does Muon's pretraining transfer better?} Fine-tuned from the Muon parent, the error is lower than from the
-    AdamW parent in $15$ of the $16$ cells with the AdamW fine-tune (median ratio $1.47$) and in $14$ with the Muon
-    fine-tune ($1.38$). The gap grows with $D$: at $D=10$ it is $1.1$ and $1.11$, inside the seed scatter, and at
-    $D=316$ it is $2.77$ and $2.21$. Muon as the fine-tune optimizer adds nothing: from the AdamW parent the two
-    fine-tune optimizers tie (AdamW over Muon $0.991$, Muon lower in $7$ cells), from the Muon parent AdamW is better
-    ($0.907$, Muon lower in $3$). So the parent optimizer matters and the fine-tune optimizer does not, but this does
+% allow: 0.1 because it is the tolerance that counts a cell as at the zero-shot, a setting
+    \emph{Does the fine-tune end below the zero-shot?} With the parent's standardization kept, almost always: from
+    the AdamW parent all $16$ cells end below it with either fine-tune optimizer (fine-tune over zero-shot, median
+    $0.387$ with AdamW, $0.416$ with Muon), from the Muon parent all $16$ with the Muon fine-tune ($0.553$) and $13$
+    with AdamW ($0.487$). Of the AdamW fine-tune's other three, two ($dg\to dgW^+W^-$ and $gg\to\gamma t\bar t$ at
+    $D=10$) end within $0.1\%$ of it, the best checkpoint being the first validation after an update, and one ($dg\to dgW^+W^-$ at
+    $D=32$) $1.25$ times above it, since the step-$0$ validation is not a checkpoint the selection can return. The
+    gain grows with $D$: from the Muon parent with AdamW the median ratio is $0.847$ at $D=10$ and $0.231$ at
+    $D=316$. Refitting the standardization loses this: the refit fine-tunes end below the zero-shot in only $11$ and
+    $12$ cells (AdamW parent) and $10$ and $8$ (Muon parent), and from the Muon parent at $D=10$ they end a median
+    $8.42$ (AdamW) and $7.35$ (Muon) times above it: the refit start reads the parent's output in the probe's own
+    units, which discards the level the zero-shot carries ($dg\to dgW^+W^-$ from the Muon parent: zero-shot $0.0707$,
+    the refit start at $D=10$ $3.01$), and at small $D$ the fine-tune does not climb back.
+    \emph{Refit against the parent's standardization}, refit over kept: from the AdamW parent a median $1.09$ (kept
+    lower in $13$ of $16$, AdamW fine-tune) and $1.02$ ($10$, Muon fine-tune), $1.76$ and $1.96$ at $D=10$, a tie
+    ($1.02$, $0.986$) at $D=316$; from the Muon parent $1.83$ ($15$) and $1.84$ ($14$), $9.62$ and $9.8$ at $D=10$,
+    still $1.23$ and $1.34$ at $D=316$. Keeping the parent's standardization is the better fine-tune, and matters most
+    where the zero-shot is good and $D$ small.
+    \emph{Does Muon's pretraining transfer better?} AdamW parent over Muon parent, with the standardization kept: a
+    median $3.2$ (AdamW fine-tune, Muon parent lower in all $16$) and $3.23$ (Muon fine-tune, $14$), from $5.43$ and
+    $5.99$ at $D=10$ to $3.2$ and $3.23$ at $D=316$; refit, $1.39$ and $1.35$, from $1.11$ at $D=10$ to $2.73$ at
+    $D=316$ (AdamW fine-tune), the refit throwing away the Muon parent's head start at small $D$. Either way this does
     not isolate a transfer property of Muon: the Muon parent is the better pretraining to begin with (eight times lower
-    on its own pools), and on these four probes its lead after fine-tuning is smaller than before it (AdamW's zero-shot error over Muon's, a median $7.13$).
-    \emph{Does fine-tuning beat scratch at small $D$?} Yes, in every cell: all $16$ cells of all four combinations end
-    below scratch. From the AdamW parent with AdamW, scratch over fine-tune is a median $1.63$ (at least $1.25$), from
-    $1.43$ at $D=10$ to $2.17$ at $D=316$; with the Muon fine-tune $1.72$; from the Muon parent $2.78$ (AdamW) and $2.61$
-    (Muon), from $1.5$ at $D=10$ to $6.11$ at $D=316$. Unlike the transfer study's older pretrainings
-    (par.~\ref{par:ft_harm}), a current one never loses to scratch here. \emph{Against the parent's own zero-shot}, the
-    fine-tune is not always a gain. From the AdamW parent it ends below the zero-shot error in $12$ cells (median
-    fine-tune over zero-shot $0.416$); from the Muon parent, whose zero-shot is already low, in $10$ (AdamW fine-tune,
-    $0.843$) and $8$ (Muon fine-tune), most misses at $D\le100$; at $D=316$ the Muon fine-tune is below the zero-shot on $3$ of the four probes. The cause is the start: the fine-tunes refit the target's
-    statistics on the probe, so the parent's output is read in the probe's own units, which discards the level the
-    zero-shot carries ($dg\to dgW^+W^-$ from the Muon parent: zero-shot $0.0707$, the same output in the probe's units
-    $3.25$), and at small $D$ the fine-tune does not climb back to it. A fine-tune that keeps the parent's
-    standardization is not run.
+    on its own pools), and on these probes its lead after fine-tuning is under half its zero-shot lead (AdamW's
+    step-$0$ error over Muon's, a median $7.13$ over the $16$ cells).
+    \emph{The fine-tune optimizer} adds nothing: AdamW fine-tune over Muon fine-tune is $0.986$ (Muon lower in $6$
+    cells) from the AdamW parent and $0.935$ ($6$) from the Muon parent with the standardization kept, $0.993$ ($8$)
+    and $0.892$ ($3$) refit.
+    \emph{Against scratch}, every one of the $128$ fine-tune cells ends below the same cell from scratch. Scratch over
+    fine-tune with the standardization kept: from the AdamW parent $2.18$ (at least $1.33$, AdamW fine-tune) and
+    $2.05$ (Muon), from the Muon parent $9.11$ and $9.04$, $11.9$ at $D=10$ and $7.57$ at $D=316$ (AdamW fine-tune);
+    refit, $1.74$, $1.71$, $2.55$, $2.58$. Unlike the transfer study's older pretrainings (par.~\ref{par:ft_harm}), a
+    current one never loses to scratch here.
+    \emph{The one-loop probe's step $0$ moves with $D$} ($1.09$ at $D=10$ to $1.15$ at $D=316$ from the AdamW parent,
+    $1.51$ to $1.52$ from the Muon parent, against the zero-shot read's $1.17$), while the three tree probes' is the
+    zero-shot read at every $D$. The parent's weights and the validation events are the same in every cell; the
+    target is not. $u\bar d\to\gamma gW^+$ at one loop changes sign, so its target is the signed log
+    $\mathrm{sgn}(x)\log(1+|x|/s)$, whose scale $s$ is the $1\%$ quantile of $|x|$ over the training split the cell
+    sees: $0.542$, $0.372$, $0.365$ and $0.179$ over $D=10$, $32$, $100$ and $316$ events (the zero-shot read's split
+    is larger again). The validation target, and with it the step-$0$ error, therefore shifts slightly with $D$ in
+    every cell of that probe (refit and scratch too); the cells of one $D$ share it, so the comparisons above, all
+    within one $D$, are unaffected.
 \end{itemize}
 So at this horizon and at AdamW's learning rate, Muon fits the training pools about eight times better and carries
 most of that into the held-out processes inside the catalog's range; beyond it (one more particle, ten times the
-energy) the gain shrinks or vanishes. Fine-tuned at small $D$, the Muon pretraining stays ahead and every pretraining
-beats scratch, while Muon as the fine-tune optimizer does not help. All of this is against an untuned AdamW and with
+energy) the gain shrinks or vanishes. Fine-tuned at small $D$, the Muon pretraining stays ahead, every fine-tune
+beats scratch, keeping the parent's standardization beats refitting it, and Muon as the fine-tune optimizer does not
+help. All of this is against an untuned AdamW and with
 untuned fine-tunes, one seed each: whether the lead survives both optimizers' own searches is stage 2's question, and
 the full horizon is not tested.
 \begin{figure}[t]
@@ -2401,8 +2481,11 @@ axis (1 new combinations, 2 $2\to4$ families, 3 $2\to5$, 4 the top, 5 one loop, 
 \includegraphics{../analysis/catalog_v3/figs/muon_ft.pdf}
 \caption{Small-$D$ fine-tunes of four held-out probes from catalog\_v3's short pretrainings, one seed per cell: the
 best-checkpoint MSE of $\log|\mathcal M|^2$ against the training events $D$, for the AdamW and the Muon pretraining each
-fine-tuned with AdamW and with Muon, and the same cells from scratch with AdamW; dotted, each pretraining's zero-shot
-error on the probe. Fine-tune HPs untuned (the parent's learning rate, no layer decay).}
+fine-tuned with AdamW and with Muon, keeping the parent's target standardization (solid, filled) or refitting it on
+the probe (dashed, open), and the same cells from scratch with AdamW; dotted, each pretraining's zero-shot error on the
+probe (the step-$0$ validation). All at the weight-average fix; fine-tune HPs untuned (the parent's learning rate, no
+layer decay).}
+% allow: 0 because it is step 0, the validation before any update
 \label{fig:v3_muon_ft}
 \end{figure}
 
