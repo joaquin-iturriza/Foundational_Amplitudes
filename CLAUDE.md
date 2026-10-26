@@ -50,7 +50,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    on which data, how many runs and seeds, what is held fixed), stated again in every message that carries a result
    of that study, then the answer with its numbers, then what it changes for what we do next. A figure goes with what
    its axes and points are. A figure is sent once per version; a redrawn one says in its caption that it replaces
-   the earlier one and what changed, and an unchanged one is referred to, never sent again. The main session sends
+   the earlier one and what changed, and an unchanged one is referred to, never sent again; a redraw that does not
+   visibly change what the figure shows (a fix that barely moves its numbers) counts as unchanged. The main session sends
    it with SendUserFile and never opens it with Read (a Read image is shown to me too, so it arrives twice); the
    step agent that drew it looks at it and says what it shows. A step agent's report is rewritten to this shape before it reaches me. A request for my go
    names the rule behind it (the GPU budget, or which decision of mine sends the work back at its design).
