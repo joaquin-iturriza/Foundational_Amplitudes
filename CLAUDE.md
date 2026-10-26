@@ -44,9 +44,11 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    description in brackets when I need it to look something up. New arms, sweeps and run directories get descriptive
    names (`dimensionless_context`, not `Qc`).
    **A result reaches me self-contained**, never as a continuation I must decode: first the question it answers and
-   why it was asked (which study, which decision it feeds), then what was done in one or two sentences, then the
-   answer with its numbers, then what it changes for what we do next. A figure goes with what its axes and points are.
-   A step agent's report is rewritten to this shape before it reaches me.
+   why it was asked (which study, which decision it feeds), then how it was designed (what is compared against what,
+   on which data, how many runs and seeds, what is held fixed), stated again in every message that carries a result
+   of that study, then the answer with its numbers, then what it changes for what we do next. A figure goes with what
+   its axes and points are. A step agent's report is rewritten to this shape before it reaches me. A request for my go
+   names the rule behind it (the GPU budget, or which decision of mine sends the work back at its design).
 
 0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion, refused by
    `no_blocking_question.sh`). A question for me goes in the message; only the plan entry that needs the answer waits
@@ -80,7 +82,7 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
      <entry> --ask "<the question>" --searched "<what was read, and why none settles it>"`. My answer goes in with
      `plan answer <entry> --kind K --quote "<my words>"`, which records the decision and changes the entry in one step.
-     Inside a running entry I approved, a new step (a design, an analysis, a job under 10 GPU-h) goes ahead without
+     Inside a running entry I approved, a new step (a design, an analysis, a job under the GPU budget of 2) goes ahead without
      coming to me; only work a decision of mine sends back at its design stops there (`site decisions`: the "stop at
      the design" hold, the larger synthetic catalogs' "consult with me on the design").
    - **Done** is `plan done <entry> --writeup <commit>`: it passes only when `done_when` passes and the write-up is
@@ -117,7 +119,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    - **Login nodes have no GPU.** No training or CUDA code there (xformers attention is CUDA-only); GPU work goes
      through `site submit`.
    - **GPU budget.** Estimate the total GPU-hours of everything about to be submitted (wall time × GPUs over all jobs,
-     sized to what I asked, never padded); above 10 GPU-h, confirm with me first unless a decision of mine in force
+     sized to what I asked, never padded); above 30 GPU-h (10 on Jean Zay, my call of 2026-10-26 while it is unused),
+     confirm with me first unless a decision of mine in force
      already approves that work at that cost. Under it, run it and show me what ran. Every submission names its plan
      entry's work item (`--item`, `~/work/CLAUDE.md` "Decisions and work items"), quick tests included. Reading state
      is always free.
