@@ -115,6 +115,7 @@ def main():
     assert out["check"]["n_grouped"] == chk["n_classes"], out["check"]["n_grouped"]
     json.dump(out, open(os.path.join(HERE, "data", "compare_pp_trained.json"), "w"), indent=1)
     plot(out)
+    scatter(R, [n for n in role if not b[n] and groups["train"](n)], [n for n in role if not b[n] and groups["heldout"](n)])
     print("check", chk)
     for bk in ("no_b", "b"):
         for g, e in out[bk].items():
@@ -167,6 +168,30 @@ def plot(out):
         ax.set_xlabel(f"classes {lab}")
     ps.shared_legend(fig, axs[0], ncol=3)
     ps.save(fig, os.path.join(HERE, "figs", "compare_pp_trained"))
+
+
+def scatter(R, train, held):
+    """per class (no b), catalog_v4's MSE (geometric mean of its seeds) against the pp-trained arm's, on the pp events
+    inside and outside catalog_v3's coverage: (a) classes trained in both catalogs, (b) held out in both"""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    lo, hi = np.inf, 0
+    for ax, ps_ in zip(axs, (train, held)):
+        for k, col, mk, lab in (("mse_inside", ps.C.blue, "o", "inside v3 coverage"),
+                                ("mse_outside", ps.C.vermillion, "s", "outside v3 coverage")):
+            q = [n for n in ps_ if all(n in R[k][r] for r in V4 + ("dimensionless_pp",))]
+            x = [R[k]["dimensionless_pp"][n] for n in q]
+            y = [gm(R, k, V4, n) for n in q]
+            ax.plot(x, y, mk, color=col, mfc="none", ms=3, alpha=0.6, label=lab)
+            lo, hi = min(lo, min(x), min(y)), max(hi, max(x), max(y))
+    for ax in axs:
+        ax.plot([lo, hi], [lo, hi], ls="--", color="k", label="equal")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlim(lo / 2, hi * 2); ax.set_ylim(lo / 2, hi * 2)
+        ax.set_xlabel("MSE, pp-trained arm")
+        ax.set_ylabel("MSE, catalog v4")
+    ps.shared_legend(fig, axs[0], ncol=3)
+    ps.save(fig, os.path.join(HERE, "figs", "compare_pp_trained_scatter"))
 
 
 if __name__ == "__main__":
