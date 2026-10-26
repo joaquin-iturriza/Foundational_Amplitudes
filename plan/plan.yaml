@@ -1105,6 +1105,9 @@ entries:
       the certifier''s top-width zeroing was a no-op on v4 cards (regex anchored at column 0, cards patched with a leading
       blank), so every check ran at the physical top width'
     at: '2026-10-26T02:33:39+00:00'
+  - tried: zero-width certification FA-ccin2p3-f470a7f2
+    why: names with _nlo suffix refused by argparse; nothing checked
+    at: '2026-10-26T02:41:12+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
