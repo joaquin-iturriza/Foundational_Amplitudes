@@ -1355,6 +1355,7 @@ entries:
     - FA-ccin2p3-be7d9ff7
     - FA-ccin2p3-ce1dba1c
     - FA-ccin2p3-ee733aa9
+    - FA-ccin2p3-fe864fda
     commit: 2f40a595
     paths:
     - analysis/catalog_v3/data/muon_compare.json
