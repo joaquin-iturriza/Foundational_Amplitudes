@@ -22,7 +22,11 @@ STAGES = {"stage1": "recipes/catalog_v3_gen_stage1.yaml", "stage2": "recipes/cat
           "stage3": "recipes/catalog_v3_gen_stage3.yaml",
           # the one-loop sign transfer's extension (gen_catalog_v3.py --write-loops-signext); audited on its own
           # (--stages signext --out analysis/catalog_v3/pool_audit_signext.json)
-          "signext": "recipes/catalog_v3_gen_signext.yaml"}
+          "signext": "recipes/catalog_v3_gen_signext.yaml",
+          # catalog_v4 (D130), audited on its own (--stages v4_stage1 v4_stage2 v4_stage3 v4_stage4 --out ...): the same
+          # checks plus the v4 kinematics, b legs massless (the five-flavour scheme) and sqrt(s_hat) inside the window
+          **{f"v4_stage{k}": f"recipes/catalog_v4_gen_stage{k}.yaml" for k in (1, 2, 3, 4)}}
+B_MASS_TOL = 1e-2      # GeV: a massless leg's sqrt|E^2 - p^2| in float64 at 20 TeV is ~1e-5 GeV, a 4.7 GeV b is far above
 ROLES = ("train", "val", "test")
 
 
@@ -59,6 +63,11 @@ def one(args):
                      "spread": float(la.std()) if len(la) else 0.0,
                      "ids_constant": bool((ids == ids[0]).all()), "pdg": [int(c) for c in ids[0]],
                      "mom_viol": float(viol.max())}
+        if stage.startswith("v4_"):
+            m2 = P[..., 0] ** 2 - (P[..., 1:] ** 2).sum(-1)
+            isb = np.abs(ids[0]) == 5
+            out[role]["b_mass_max"] = float(np.sqrt(np.abs(m2[:, isb])).max()) if isb.any() else None
+            out[role]["sqrts_range"] = [float(sq.min()), float(sq.max())]
     fl = []
     for role in ROLES:
         r = out[role]
@@ -74,6 +83,11 @@ def one(args):
             fl.append(f"{role} momentum {r['mom_viol']:.1e}")
         if r["spread"] < 1e-3:
             fl.append(f"{role} constant |M|^2")
+        if (r.get("b_mass_max") or 0.0) > B_MASS_TOL:
+            fl.append(f"{role} b mass {r['b_mass_max']:.3g} GeV")
+        if r.get("sqrts_range") and not (e["sqrts"][0] * (1 - 1e-9) <= r["sqrts_range"][0]
+                                         and r["sqrts_range"][1] <= e["sqrts"][1] * (1 + 1e-9)):
+            fl.append(f"{role} sqrt(s_hat) {r['sqrts_range']} outside {e['sqrts']}")
     t, v = out["train"], out["val"]
     if not t.get("missing") and not v.get("missing") and t["q"] and v["q"] and v["spread"] > 0:
         out["split_shift"] = abs(t["q"][1] - v["q"][1]) / v["spread"]
