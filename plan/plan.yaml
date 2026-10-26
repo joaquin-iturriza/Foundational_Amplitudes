@@ -1335,7 +1335,8 @@ entries:
   next: 'CPU: copy the first round''s result files (curves) home from CC zz_lowd; classify the losing cells from the curves
     (start, minimum and step, final) against scratch''s best and the frozen read-out; figure; paragraph par:ft_harm after
     par:lowd_dyhpo with provenance; then design a targeted test of the dominant mechanism with its GPU cost for the user.'
-  done_when: null
+  done_when: 'grep -q ''label{par:ft_harm}'' docs/results.tex && test -f analysis/transfer/data/ft_harm.json && test -f analysis/transfer/figs/ft_harm.png
+    && test -f analysis/transfer/figs/ft_harm.pdf && grep -q ''% src: python3 analysis/transfer/ft_harm.py'' docs/results.tex'
   notes_ref: null
   match: zz_ft_harm*,tp3_ftharm*
   evidence:
