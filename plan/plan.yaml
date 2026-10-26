@@ -1061,6 +1061,15 @@ entries:
     why: 'each part still died on a one-loop certification (nlo_virtual_pipeline --certify exit 2): v4_bbx_tapvtwm (part 1),
       v4_bbx_ccx (part 4), v4_bbx_hwpwm (part 7)'
     at: '2026-10-26T00:40:20+00:00'
+  - tried: 'mixed-order one-loop investigation (tools/mixed_order_virt_check.py, FA-ccin2p3-e5d74011): MadLoopParams scan
+      (default, MLStabThres 1e-5, quadruple precision, CutTools, Ninja, COLLIER) on the eight failing one-loop entries'
+    why: the three sub-percent entries (b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h w+ w-) give identical double-pole deviations
+      in all six settings (max rel 4.23e-3, 4.56e-3, 4.19e-3), so it is not numerical precision, and the certifier, which
+      zeroes the top width, gets the same 4.23e-3, so not the top width either; cause not identified. Its per-point split-order
+      reader is not trustworthy for the 2->2 mixed-order standalones (its per-order 'born' columns change with the reduction
+      library, impossible for a tree); its sq<k> variants crashed (row_to_slot_perm on the QED^2== string) and its aMC@NLO
+      check_poles step never ran (command not recognised in the mg5 shell)
+    at: '2026-10-26T01:03:23+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
