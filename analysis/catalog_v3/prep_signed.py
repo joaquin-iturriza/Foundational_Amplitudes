@@ -76,8 +76,6 @@ def main():
         for k in ("err_major", "err_mlp", "err_mlp_near", "err_major_near", "err_shat"):
             o[k] = med([r[k] for r in c])
         o["mlp_over_major"] = med([r["err_mlp"] / r["err_major"] for r in c if r["err_major"] > 0])
-        o["n_mlp_below_5pct"] = int(sum(r["err_mlp"] < 0.05 for r in c))
-        o["n_major_below_5pct"] = int(sum(r["err_major"] < 0.05 for r in c))
         o["n_rare"] = len(d) - len(c)
         o["n_shat_beats_major"] = int(sum(r["err_shat"] < r["err_major"] for r in c))
         o["rare_pools"] = {r["name"]: {"n_minor_fit": r["n_minor_fit"], "neg": r["neg"], "err_major": r["err_major"]}
@@ -98,7 +96,7 @@ def main():
                   f"negative {100 * v_['neg']:.2f}%, one sign per pool wrong {100 * v_['err_major']:.2f}%")
         sh = {"train": "tr", "H5": "H5"}[s]
         for k in ("n_pools", "n_signed", "n_clf", "neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near",
-                  "err_major_near", "err_shat", "mlp_over_major", "n_mlp_below_5pct", "n_major_below_5pct", "n_rare", "n_shat_beats_major", "shape_raw", "shape_dless", "shape_qperp",
+                  "err_major_near", "err_shat", "mlp_over_major", "n_rare", "n_shat_beats_major", "shape_raw", "shape_dless", "shape_qperp",
                   "dless_over_raw", "qperp_over_raw", "qperp_above_raw", "err_major_all", "err_major_near_all",
                   "rare_max_err_major", "rare_max_minor_fit"):
             v = o[k]
@@ -158,11 +156,10 @@ def main():
         o["audit"] = {r: {"rows": au[r]["rows"], "negative": au[r]["negative"]} for r in ("train", "val", "test")}
         if all(au[r]["negative"] == 1.0 for r in ("train", "val", "test")):
             n_allneg += 1
-            wa = [o[a] for a in ARMS]
-            if max(wa) > 0.05:                        # the all-negative pool the arms get wrong
-                flat["neg_one_sign_pool"] = one_sign[p]["name"]
-                flat["neg_one_sign_wrong_min"] = round(100 * min(wa))
-                flat["neg_one_sign_wrong_max"] = round(100 * max(wa))
+            wa = [o[a] for a in ARMS]                 # every all-negative pool, keyed by its name
+            nm = one_sign[p]["name"][3:]
+            flat[f"allneg_{nm}_wrong_min"] = round(100 * min(wa), 1)
+            flat[f"allneg_{nm}_wrong_max"] = round(100 * max(wa), 1)
         if one_sign[p]["neg"] == 0.0:                 # positive in val and test: the negatives are in train
             tr = au["train"]
             flat["pos_one_sign_pool"] = one_sign[p]["name"]
