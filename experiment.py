@@ -2420,8 +2420,21 @@ class AmplitudeExperiment(BaseExperiment):
             pc = mg.PROCESSES.get(name, {})
             virt = pc.get("kind") == "virt" and pc.get("order") is None
             deg = nfin + (1 if (virt and pc.get("alphas_prefactor")) else 0)
+            # the alpha_s power is read from the generated diagrams where the entry has a sidecar (plan catalog_coverage,
+            # tools/mixed_order_audit.py): a mixed entry (catalog_v4's full coupling orders: QCD-EW interference, 35%
+            # of its training pools) is a polynomial of total degree deg in (alpha_s, alpha), so no single monomial is
+            # exact; it is divided by its highest alpha_s power, the term catalog_v3's minimal-QED pool of the same
+            # process stored alone, and the rest (a function of alpha / alpha_s) is left in the target. At the nominal
+            # alpha_s(M_Z) each event's alpha_s is fixed by its s_hat, so that rest is a function of the momenta. The
+            # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
+            # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g
+            if pc.get("order") is None:
+                qd = self._diagram_alphas_powers(name)
+                if qd is not None:
+                    q = max(qd) + (1 if (virt and pc.get("alphas_prefactor")) else 0)
+                    e = deg - q
             assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
-                f"target_physics_orders: {name} is a mixed-order entry {o}, its coupling homogeneity is not exact"
+                f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)
         n_eik, leik = 0, 0.0
@@ -2461,6 +2474,26 @@ class AmplitudeExperiment(BaseExperiment):
         analysis/catalog_v3/hybrid_check.py)."""
         from physics_scales import hybrid_cp
         return hybrid_cp(mom_phys)
+
+    def _diagram_alphas_powers(self, name):
+        """The alpha_s powers of a process's (Born) amplitudes, sorted, from its diagram sidecar: each diagram's QCD
+        order (the sum over its vertices), minus 2 for a one-loop QCD diagram; None without a sidecar. |M|^2's powers
+        are the pairwise means, so the highest is the largest of these (tools/mixed_order_audit.py)."""
+        cache = self.__dict__.setdefault("_diag_as_powers", {})
+        if name not in cache:
+            ddir = self.cfg.model.get("diagrams_dir", "data/diagrams")
+            ddir = ddir if os.path.isabs(ddir) else os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
+            path = self._resolve_diagram_path(ddir, name)
+            if path is None:
+                cache[name] = None
+            else:
+                out = set()
+                for sp in json.load(open(path))["subprocesses"]:
+                    for dg in sp["diagrams"]:
+                        a = sum(int(n.get("orders", {}).get("QCD", 0)) for n in dg["nodes"] if n["kind"] == "vertex")
+                        out.add(a - 2 if dg.get("diagram_type") == "loop" else a)
+                cache[name] = sorted(out) or None
+        return cache[name]
 
     def _orders_of(self, name):
         """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector
