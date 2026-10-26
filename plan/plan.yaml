@@ -1372,12 +1372,13 @@ entries:
   match: zz_ft_harm*,tp3_ftharm*
   evidence:
     runs: []
-    commit: 3ca721f3
+    commit: 5c8b302f
     paths:
     - analysis/transfer/data/ft_harm.json
     - analysis/transfer/data/lowd_ft_curves.json
     - analysis/transfer/figs/ft_harm.png
     - analysis/transfer/nogain_readout_za.py
+    - docs/results.tex
   dead_ends: []
   asks:
   - ask: Do you approve the starting-point blend test (the 30 losing cells x 5 blends of pretrained and fresh weights x 3
