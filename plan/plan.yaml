@@ -98,16 +98,15 @@ entries:
   - D83
   - D129
   - D135
-  next: 'The more-signed-pools arm (FA-ccin2p3-ecc413f9) is written up in par:v3_prep_signed (5de6392b): sign better on 12
-    of 17 held-out pools, near zero 14.2% vs 39.4%, whole one-loop axis 7.7% vs 13.1%, zero-shot MSE 1.07x the baseline''s
-    per probe elsewhere (0.86 on one loop, 1.36 on 1-10 TeV), one seed, confounded by more one-loop data and 4.7 vs 5 epochs
-    per pool. Decided (0i, within the approved exploration and budget): keep the 95 extra pools (recipes/catalog_v3_train_signext.yaml)
-    as the recipe of any further sign arm. Next, in order: (1) CPU: diagnose the pair sign head''s blow-up from FA-ccin2p3-161fc56b''s
-    log (grad norms, clipping share, which validation it starts at); (2) a second seed of the baseline and of baseline_more_signed
-    (about 2.5 GPU-h; scripts/job_catalog_v3_short.sh with a seed override) to size whether the 1.07 cost and the 12/17 sign
-    gain exceed seed spread; (3) only after (1), a small single-fidelity DyHPO search (HPO rule 6) over the pair head''s dims
-    (16, 32) and the near-zero weighting''s factor and weight (10, 10) at the baseline''s HPs on the extended recipe, priced
-    against the 30 GPU-h budget before submitting.'
+  next: 'Running: second seeds (seed 43) of the baseline (baseline_seed2, FA-ccin2p3-37a95d76) and of the more-signed-pools
+    arm (baseline_more_signed_seed2, FA-ccin2p3-878d6b9a), 4264 steps each, started 10:10 on CC (~1.3 h). When both end: check
+    V3_SIDECARS and V3_SHORT_DONE in each log, copy $SCRATCH/zz_v3_short_<arm> home into analysis/catalog_v3/data/short_reads/
+    (and runs/catalog_v3_short/<arm>/out_0.log as train.log), add both to prep_signed.py and short_reads.py, and read the
+    third sign arm''s gain (12 of 17 held-out pools better, near zero 14.2% vs 39.4%, zero-shot MSE 1.07x) against the seed-to-seed
+    spread of each arm; update par:v3_prep_signed''s one-seed wording. The pair head''s blow-up is diagnosed (par:v3_prep_signed,
+    075724f5): whole-network jump at steps 1360 to 1445, sign logit flipped, NaNs follow it; per-step grad norms are not logged.
+    Then: before the DyHPO search over the pair head''s sizes and near-zero weighting, bound the pair inputs (normalise or
+    tanh the h_i h_j products) and log the per-step grad norm; price the search against the 30 GPU-h budget before submitting.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
