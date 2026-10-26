@@ -2277,6 +2277,92 @@ dashed, the clipping bound; dotted, the end of warmup. (b) The bounded head's le
 loss per step, each over its median in the reference window (steps $510$ to $595$); vertical lines, the steps the text
 names.}\label{fig:v3_pair_head_steps}
 \end{figure}
+  \item \emph{Searched together with the learning rate under Muon, neither sign knob shows in the training objective; the
+    rate decides it.} The question, from the bounded head's read above: does the pair sign head or the near-zero
+    weighting help once its own sizes and the learning rate are searched together? The design
+    (\code{sweep/sweep\_config\_ccin2p3\_sign\_head\_search.yaml}, the user's call of 2026-10-26): a single-fidelity
+    DyHPO search of $20$ trials ($6$ random, then the Gaussian process) at the short pretraining's $4264$ steps, every
+    trial the more-signed-pools arm (the baseline target, one shared standardization, $1492$ training pools, seed $42$)
+    with Muon at the Muon search's decoupled weight decay $0.0217$ (par.~\ref{par:v3_muon}). Searched: the learning
+    rate in $[1.667\times10^{-3}, 1.5\times10^{-2}]$, half a decade either side of the Muon search's best $5\times10^{-3}$;
+    the warmup fraction in $[0.05, 0.2]$; the pair head's width in $\{0, 8, 16, 32\}$ ($0$ is no pair head), its hidden
+    width in $\{16, 32, 64\}$ and the $\tanh$ bound on or off; the near-zero weight in $\{1, 3, 10, 30\}$ ($1$ is none)
+    and its band in $\{3, 10, 30\}$ times from zero. The pair and near-zero values are open settings, chosen with no
+    decision of the user's behind them: an octave or half a decade around the first, untuned arms' values. The
+    objective is the loss the model trains on, on the training processes' validation events only: per process the
+    magnitude MSE plus the sign head's cross-entropy, geometric mean over processes, read at the checkpoint with the
+    best magnitude loss. The comparison point is the Muon baseline (run FA-ccin2p3-0a9d3d4c): the same arm with both
+    knobs off at learning rate $5\times10^{-3}$ and warmup $0.158$, a rate and weight decay taken from the Muon search
+    on the dimensionless target, not searched here, so the fair comparison is inside the search. One seed each
+    (\code{analysis/catalog\_v3/sign\_head\_search.py}, \code{data/sign\_head\_search.json},
+    Fig.~\ref{fig:v3_sign_head_search}).
+% src: python3 analysis/catalog_v3/sign_head_search.py @f2db13a5
+% claim: n_trials=20
+% claim: n_failed=0
+% claim: n_blowup=4
+% claim: blowup_lr_min=8.959e-03
+% claim: n_hi_lr=7
+% claim: n_hi_lr_unbounded_pair=5
+% claim: n_blowup_unbounded_pair=4
+% claim: n_off=2
+% claim: off_obj=2.039e-03
+% claim: off_lr=2.337e-03
+% claim: n_pair=6
+% claim: pair_obj=1.187e-03
+% claim: n_near=7
+% claim: near_obj=1.397e-03
+% claim: near_lr=8.25e-03
+% claim: n_both=5
+% claim: both_obj=1.517e-03
+% claim: both_lr=5.916e-03
+% claim: best_lr=1.246e-02
+% claim: best_pair_dim=16
+% claim: best_pair_hidden=16
+% claim: best_warmup=0.081
+% claim: best_mag=9.673e-04
+% claim: mb_obj=1.374e-03
+% claim: mb_mag=1.11e-03
+% claim: best_over_mb_obj=0.86
+% claim: best_over_mb_mag=0.87
+% claim: n_beat_mb=2
+% claim: best_on_over_off=0.58
+% claim: calm_rho_lr=-0.89
+% claim: n_calm=16
+% claim: obj_over_mag_min=1.18
+% claim: obj_over_mag_max=1.25
+% claim: mb_obj_over_mag=1.24
+% allow: 6 4264 1492 42 0.0217 because they are the search's design (random start-up trials, steps, training pools, seed, Muon's weight decay)
+% allow: 1.667 1.5 5 0.05 0.2 because they are the searched ranges and the Muon search's best rate they centre on
+% allow: 0 8 32 64 1 3 10 30 because they are the searched pair and near-zero values
+% allow: 0.158 because it is the Muon baseline's warmup, its design
+% allow: -3 -2 because they are the powers of ten of the rates
+    All $20$ trials ended, none failed. Four blew up (a validation over $10$ times its running minimum, as above),
+    all at learning rate at least $8.959\times10^{-3}$ and all with an unbounded pair head: of the $7$ trials at or
+    above that rate, $5$ had an unbounded pair head and $4$ of those blew up; they stay in every number below, at
+    their best checkpoint. Best objective by which knob is on: both off $2.039\times10^{-3}$ (best of $2$ trials, at
+    rate $2.337\times10^{-3}$); the pair head alone $1.187\times10^{-3}$ (of $6$; rate $1.246\times10^{-2}$, width
+    $16$, hidden $16$, unbounded, warmup $0.081$, magnitude loss $9.673\times10^{-4}$); the near-zero weight alone
+    $1.397\times10^{-3}$ (of $7$; rate $8.25\times10^{-3}$); both $1.517\times10^{-3}$ (of $5$; rate
+    $5.916\times10^{-3}$). The Muon baseline's is $1.374\times10^{-3}$ (magnitude $1.11\times10^{-3}$). The best trial,
+    the pair head's, is at $0.86$ of the baseline's objective and $0.87$ of its magnitude loss, and only $2$ of the
+    $20$ trials beat the baseline. Inside the search the best with a knob on is at $0.58$ of the best with both off,
+    but the search put both of its knobs-off trials at low rates, and over the $16$ trials that did not blow up the
+    objective's rank correlation with the rate is $-0.89$: that ratio measures the rate, not the knobs. The objective
+    cannot see the sign either: it is $1.18$ to $1.25$ times the magnitude loss in every trial, whatever the knobs
+    ($1.24$ for the baseline), so the sign cross-entropy on the training processes' events, whose signs the network
+    learns within a pool, adds a near-constant share and the search ranks the trials by their magnitude. So the
+    search shows no gain from either knob on what it measures, one seed each, and the pair head's best only at a rate
+    where its unbounded variant mostly blows up; what the knobs do to the held-out signs only the zero-shot read can
+    say. The best trial (the pair head's) is being read zero-shot on every held-out axis against the Muon baseline
+    (run FA-ccin2p3-ef655fd7).
+\begin{figure}[t]\centering
+\includegraphics{../analysis/catalog_v3/figs/sign_head_search.pdf}
+\caption{The sign head search on catalog\_v3: $20$ short pretrainings with Muon, one seed each, by which sign knob is
+on; hollow, the trials that blew up (read at their best checkpoint); star, the Muon baseline (both knobs off, not a
+trial of the search). (a) The objective (magnitude MSE plus the sign cross-entropy on the training processes'
+validation events) against the learning rate. (b) The objective over the magnitude loss against the learning
+rate.}\label{fig:v3_sign_head_search}
+\end{figure}
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
