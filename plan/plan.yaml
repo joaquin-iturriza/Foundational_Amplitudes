@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: done
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -162,6 +162,7 @@ entries:
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
   searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only the
     hybrid test
+  writeup: fa3b8ab0
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
