@@ -71,7 +71,18 @@ FT_NAME = {"dimensionless": "AdamW", "dimensionless_muon": "Muon", "AdamW": "Ada
 
 
 def collect_ft():
-    cells = [json.loads(l[len("CATFT "):]) for l in sys.stdin if l.startswith("CATFT {")]
+    import re
+    cells, scale = [], None
+    for l in sys.stdin:     # a signed probe's target transform, printed by the cell's run before its CATFT line
+        m = re.search(r"trafos=\['signedlog:([0-9.e+-]+)'", l)
+        if m:
+            scale = float(m.group(1))
+        if l.startswith("CATFT {"):
+            c = json.loads(l[len("CATFT "):])
+            if scale is not None:
+                c["signedlog_scale"] = scale
+            cells.append(c)
+            scale = None
     json.dump(sorted(cells, key=lambda c: (c["kind"], c["parent"], c["optimizer"], c["probe"], c["D"])), sys.stdout,
               indent=0)
 
@@ -169,6 +180,15 @@ def ft_compare(tab, z0, read, step0_refit):
             out["cells"][f"{FT_NAME[parent]}/{p}"] = {
                 "zero_shot_read": read[(parent, p)], **{f"step0_D{D}": z0[(parent, p, D)] for D in FT_D},
                 **{f"refit_start_D{D}": step0_refit[(parent, "AdamW", p, D)] for D in FT_D}}
+    # the one-loop probe's signedlog scale per D (the 1% quantile of |M|^2 over the D training events): one value per D
+    # whatever the arm, since every cell draws the same D events
+    sc = {}
+    for c in json.load(open(os.path.join(HERE, "data", "muon_ft.json"))):
+        if "signedlog_scale" in c:
+            assert c["probe"] == "v3_udx_agwp_nlo", c["probe"]
+            sc.setdefault(c["D"], set()).add(round(c["signedlog_scale"], 5))
+    assert sorted(sc) == list(FT_D) and all(len(v) == 1 for v in sc.values()), sc
+    out["nlo_signedlog_scale"] = {f"D{D}": float(sc[D].pop()) for D in FT_D}
     for k, v in tab.items():
         out["cells"][name(k) if k[0] != "scratch" else "scratch"] = {f"{p}/{D}": v[(p, D)] for p, D in keys}
     return out
@@ -269,6 +289,7 @@ def main():
     out["ft"] = {sec: {k: rr(v) for k, v in ft[sec].items()}
                  for sec in ("vs_zero_shot", "refit_vs_parent", "parent", "ft_opt", "vs_scratch")}
     out["ft"]["zs_ratio_median"] = r2(ft["zs_ratio_median"])
+    out["ft"]["nlo_scale"] = rr(ft["nlo_signedlog_scale"])
     out["ft"]["zs"] = {k: rr(v) for k, v in ft["cells"].items() if "zero_shot_read" in v}
     print(json.dumps(out))
 
