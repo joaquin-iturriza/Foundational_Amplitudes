@@ -117,7 +117,7 @@ entries:
     - FA-ccin2p3-bc20e0d6
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-f72f1379
-    commit: dfa59624
+    commit: 493fef01
     paths:
     - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/data/prep_sampling.json
