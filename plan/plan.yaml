@@ -134,6 +134,7 @@ entries:
     - analysis/catalog_v3/data/prep_sampling.json
     - analysis/catalog_v3/data/prep_shat_slope.json
     - analysis/catalog_v3/data/prep_signed.json
+    - analysis/catalog_v3/data/short_reads/baseline_seed2
     - analysis/catalog_v3/figs/pair_head_blowup.png
     - analysis/catalog_v3/figs/prep_blend.png
     - analysis/catalog_v3/figs/prep_hybrid.png
