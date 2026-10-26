@@ -1306,6 +1306,15 @@ entries:
       (scancel 62461373-62461376); fixed in 6dee967a: the target''s alpha_s power is read from the diagram sidecars and a
       mixed entry is divided by its highest power'
     at: '2026-10-26T14:51:19+00:00'
+  - tried: 'catalog_v3 short pretrainings before 1d9d6a29 (trial_1860 and every earlier catalog_v3 arm): order features and
+      target from the catalog table'
+    why: 'the table had the wrong coupling powers on 2 of 1397 catalog_v3 pools, read from the diagram sidecars: zp_uux_Y1g
+      [0,0,0,2] against the diagrams'' [0,0,1,0] (one gluon, the Z'' coupling is neither alpha_s nor alpha) and thdm_uux_h2h3g
+      [0,0,0,3] against [0,0,1,2]; catalog_v4''s table was wrong on 15 b-quark Higgs training entries (and 8 shared held-out
+      ones; massless b, purely electroweak, the table claimed alpha_s^2 or alpha_s^3) and its two copies of the same BSM entries.
+      Fixed in 5e4040a9..1d9d6a29: features and target read the sidecar''s QCD and QED orders; test_order_features passes
+      on CC (all 25 + 2 + 2 entries, every other entry of the four recipes unchanged, 81 affected pools still cache hits)'
+    at: '2026-10-26T15:05:32+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
