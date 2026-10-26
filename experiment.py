@@ -356,6 +356,7 @@ class AmplitudeExperiment(BaseExperiment):
             sd[sd < 1e-8] = 1.0
             self._internal_mass_feat = ((logm - mu) / sd).astype(np.float32)
         self._recipe_base_by_name = base_by_name
+        amp_orders = self._orders_from_diagrams(names, amp_orders)
         with open_dict(self.cfg):
             self.cfg.data.dataset    = names
             self.cfg.data.amp_orders = amp_orders
@@ -401,8 +402,12 @@ class AmplitudeExperiment(BaseExperiment):
         if cfg_orders is not None and len(cfg_orders) == len(names):
             # a legacy 2-vector takes its EW power from the catalog entry of the dataset,
             # so an explicit config and the recipe path label the same .npy identically
-            return [mg.normalize_order_vector(o, catalog_cfg_for_dataset(n)) for o, n in zip(cfg_orders, names)]
-        derived = [amp_order_for_dataset(n) for n in names]
+            out = self._orders_from_diagrams(
+                names, [mg.normalize_order_vector(o, catalog_cfg_for_dataset(n)) for o, n in zip(cfg_orders, names)])
+            with open_dict(self.cfg):
+                self.cfg.data.amp_orders = out
+            return out
+        derived = self._orders_from_diagrams(names, [amp_order_for_dataset(n) for n in names])
         if cfg_orders is not None:
             LOGGER.warning(
                 f"data.amp_orders has {len(cfg_orders)} entries but {len(names)} "
@@ -2427,7 +2432,8 @@ class AmplitudeExperiment(BaseExperiment):
             # process stored alone, and the rest (a function of alpha / alpha_s) is left in the target. At the nominal
             # alpha_s(M_Z) each event's alpha_s is fixed by its s_hat, so that rest is a function of the momenta. The
             # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
-            # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g
+            # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g; the order
+            # features read the same sidecar (_orders_from_diagrams), so input and target agree
             if pc.get("order") is None:
                 qd = self._diagram_alphas_powers(name)
                 if qd is not None:
@@ -2487,13 +2493,47 @@ class AmplitudeExperiment(BaseExperiment):
             if path is None:
                 cache[name] = None
             else:
-                out = set()
-                for sp in json.load(open(path))["subprocesses"]:
-                    for dg in sp["diagrams"]:
-                        a = sum(int(n.get("orders", {}).get("QCD", 0)) for n in dg["nodes"] if n["kind"] == "vertex")
-                        out.add(a - 2 if dg.get("diagram_type") == "loop" else a)
-                cache[name] = sorted(out) or None
+                import mg5_pipeline_final as mg
+                cache[name] = mg.sidecar_qcd_orders(path)
         return cache[name]
+
+    def _orders_from_diagrams(self, names, orders):
+        """The order features' coupling powers from the generated diagrams (mg5_pipeline_final.order_vector_from_diagrams),
+        the same source the dimensionless target's alpha_s power reads (_diagram_alphas_powers), so input and target
+        cannot disagree: the hand-set table claims an alpha_s^2 term for catalog_v4's b-quark Higgs entries (massless b,
+        purely electroweak) and misses the gluon of zp_uux_Y1g and thdm_uux_h2h3g (plan catalog_coverage). A mixed entry
+        keeps the convention of the four-quark entries, both maxima (the largest alpha_s power and the largest alpha
+        power), so the feature says which monomials the stored target holds; the target divides by the first.
+        Idempotent; entries with an explicit order (loop-induced) or without a sidecar keep theirs (the latter listed).
+        Off with data.orders_from_diagrams=false. Pool names and recipe ids do not depend on it (recipe_id drops
+        amp_orders)."""
+        import mg5_pipeline_final as mg
+        if not bool(self.cfg.data.get("orders_from_diagrams", True)):
+            return [list(o) for o in orders]
+        base = getattr(self, "_recipe_base_by_name", {}) or {}
+        out, changed, missing, n_read = [], [], [], 0
+        for name, o in zip(names, orders):
+            o = [int(x) for x in o]
+            pc = mg.PROCESSES.get(name) or mg.PROCESSES.get(base.get(name, "")) or catalog_cfg_for_dataset(name)
+            if pc is None or pc.get("order") is not None or "nfinal" not in pc or len(o) != 4:
+                out.append(o)
+                continue
+            qd = self._diagram_alphas_powers(name)
+            if qd is None:
+                missing.append(name)
+                out.append(o)
+                continue
+            n_read += 1
+            new = mg.order_vector_from_diagrams(pc, qd, o)
+            if new != o:
+                changed.append((name, o, new))
+            out.append(new)
+        LOGGER.info(f"orders_from_diagrams: coupling powers read from the diagrams for {n_read}/{len(names)} "
+                    f"processes, {len(changed)} differ from the catalog table: {changed}")
+        if missing:
+            LOGGER.warning(f"orders_from_diagrams: no diagram sidecar for {len(missing)} processes, their order "
+                           f"features stay the catalog table's: {missing}")
+        return out
 
     def _orders_of(self, name):
         """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector

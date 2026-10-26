@@ -30,7 +30,7 @@
 #                          on muP's 32 hidden matrices and AdamW as before on the rest (optim/muon.py; the Muon test, D144/D146)
 #   dimensionless_seed2, dimensionless_muon_seed2   the same two with a second seed (model init and batch order, seed 43;
 #                          the pools and their order unchanged)
-#   v4_dimensionless_muon, v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2   catalog_v4 against catalog_v3 with
+#   v4_dimensionless_muon, v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2, dimensionless_muon_best   catalog_v4 against catalog_v3 with
 #                          Muon at its search's best (catalog_coverage; runs/catalog_v4_short/<arm>, $SCRATCH/zz_v4_short_<arm>)
 # Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py;
 # catalog_v3 arms only).
@@ -38,7 +38,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, dimensionless_muon_best_seed2, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -86,10 +86,14 @@ case "$ARM" in
     # dimensionless arm with MuonAdamW at the Muon search's best (trial_1860 above: lr 4.997423e-3, decoupled weight
     # decay 0.02171863, the rest the arm's) on recipes/catalog_v4_train.yaml (1153 pools) at catalog_v3's 4264 steps:
     # same steps and batch, so about 6 epochs of each pool's 1e4 events where catalog_v3 has 5. Seeds 42 and 43; the
-    # catalog_v3 pair is trial_1860 itself (seed 42, reused) and dimensionless_muon_best_seed2 (seed 43). Besides its own
+    # catalog_v3 pair is dimensionless_muon_best (trial_1860 retrained, seed 42) and dimensionless_muon_best_seed2 (seed 43). Besides its own
     # axes each reads the other catalog's pools of the probes held out in both (XV3/XV4,
     # recipes/make_catalog_v3v4_shared.py) and the 13 TeV pp pools (PP, recipes/catalog_v3_pp_test.yaml), which neither trains on
     dimensionless_muon_best_seed2) NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV4 PP) ;;
+    # trial_1860 retrained at seed 42 with the order features and the target's alpha_s power from the diagrams
+    # (experiment._orders_from_diagrams): trial_1860 had the table's alpha_s power on zp_uux_Y1g and thdm_uux_h2h3g
+    # (2 of 1397 pools), so both catalog_v3 seeds now carry what catalog_v4's do
+    dimensionless_muon_best) NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV4 PP) ;;
     v4_dimensionless_muon)  CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP)
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
