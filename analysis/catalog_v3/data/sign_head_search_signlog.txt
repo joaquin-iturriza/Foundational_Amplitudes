@@ -1,0 +1,2266 @@
+== runs/sign_head_search/trial_1860
+sign accuracy on the 155 signed pools: median 0.7350, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.389737e-01
+sign accuracy on the 155 signed pools: median 0.8950, min 0.0400 (v3_udx_awp_nlo)
+val_loss_no_reg: 7.488095e-02
+sign accuracy on the 155 signed pools: median 0.9350, min 0.0400 (v3_udx_awp_nlo)
+val_loss_no_reg: 5.986142e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.2900 (v3_udx_chsx_nlo)
+val_loss_no_reg: 3.563264e-02
+sign accuracy on the 155 signed pools: median 0.9550, min 0.5350 (v3_dg_adz_nlo)
+val_loss_no_reg: 2.410481e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6150 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 1.785490e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6050 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.433271e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6100 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.175538e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7050 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.005746e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 8.620394e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7050 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.931462e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6600 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.346639e-03
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 8.208366e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6350 (v3_dg_aad_nlo)
+val_loss_no_reg: 6.949983e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6550 (v3_dg_adz_nlo)
+val_loss_no_reg: 5.892988e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6750 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.500974e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.6750 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.500460e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6900 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.945868e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.6650 (v3_dg_adz_nlo)
+val_loss_no_reg: 4.636267e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6900 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.381979e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6750 (v3_dg_adz_nlo)
+val_loss_no_reg: 4.448185e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6850 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.230918e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7500 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.089055e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7150 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.899045e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7500 (v3_dg_dhz_nlo)
+val_loss_no_reg: 4.053156e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7700 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.699817e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.496357e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7250 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.778495e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7650 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.455615e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7750 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.295350e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7750 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.153260e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7400 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.091897e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7650 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.024955e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.892904e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.837904e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7550 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.745887e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.709839e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8100 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.638902e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.592069e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.581699e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8250 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.535627e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8050 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.523420e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.465481e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8150 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.437972e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7850 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.481287e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7850 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.434631e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.405494e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.390817e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.375451e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.370813e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.370644e-03
+== runs/sign_head_search/trial_0177
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0300 (v3_udx_gwp_nlo)
+val_loss_no_reg: 1.543868e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.2300 (v3_epem_addx_nlo)
+val_loss_no_reg: 8.460815e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.7050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.542061e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.764712e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.089707e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.042475e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.380018e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.984726e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.966789e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.220476e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.901155e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.256940e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.279932e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.516010e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.899012e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.237549e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.114250e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.860329e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.688159e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.716323e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.429562e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.315541e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.339269e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.109694e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.039707e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.951354e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.926485e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.802877e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.801642e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.683434e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.611507e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.545749e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.499972e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.445878e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.555007e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.411974e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.316516e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.275223e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.213980e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.396974e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.183409e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.111010e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.077806e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.047774e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_csxz_nlo)
+val_loss_no_reg: 1.033245e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.004785e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.889011e-04
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.758824e-04
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.703388e-04
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.672958e-04
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.672128e-04
+== runs/sign_head_search/trial_1289
+sign accuracy on the 155 signed pools: median 0.8450, min 0.0200 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 2.262687e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.1450 (v3_udx_gtapvt_nlo)
+val_loss_no_reg: 6.328959e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6300 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.888258e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.431463e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.077709e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.273460e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.522661e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.338890e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.993496e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.743683e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.130665e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.540156e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.093353e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.902898e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.302608e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.087452e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.968308e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.735702e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.585560e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.397851e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.323714e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.252107e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.203646e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.063274e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.948490e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.917697e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.275912e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.052603e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.806524e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.730241e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.624519e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.199841e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.102659e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.786548e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.635178e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.535423e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.461473e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.383818e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.311212e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.257721e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.229249e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.183371e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.153201e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.119703e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.101269e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 1.081958e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9450 (v3_ddx_aag_nlo)
+val_loss_no_reg: 1.063816e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.056312e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.047288e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.044734e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.044645e-03
+== runs/sign_head_search/trial_1273
+sign accuracy on the 155 signed pools: median 0.7750, min 0.1050 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.558337e-01
+sign accuracy on the 155 signed pools: median 0.8650, min 0.1850 (v3_udx_aawp_nlo)
+val_loss_no_reg: 8.861822e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5500 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 4.064260e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7000 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.392283e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.770217e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.769939e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.904433e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.282473e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.426948e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.271471e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.601497e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.093695e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.273818e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.358099e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.877231e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.741595e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.297795e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.937296e-03
+sign accuracy on the 155 signed pools: median 0.9650, min 0.7550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.487013e-02
+sign accuracy on the 155 signed pools: median 0.5950, min 0.0250 (v3_gg_ggg_nlo)
+val_loss_no_reg: 6.934166e+00
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0250 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 3.249698e+00
+sign accuracy on the 155 signed pools: median 0.3400, min 0.0000 (v3_udx_wpzz_nlo)
+val_loss_no_reg: 2.343018e+01
+sign accuracy on the 155 signed pools: median 0.7100, min 0.0000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 8.324532e+00
+sign accuracy on the 155 signed pools: median 0.6150, min 0.0250 (v3_uux_huux_nlo)
+val_loss_no_reg: 3.953453e+00
+sign accuracy on the 155 signed pools: median 0.6800, min 0.0200 (v3_udx_gwp_nlo)
+val_loss_no_reg: 5.422600e+00
+sign accuracy on the 155 signed pools: median 0.2100, min 0.0000 (v3_bbx_ggh_nlo)
+val_loss_no_reg: 8.201284e+01
+sign accuracy on the 155 signed pools: median 0.4050, min 0.0150 (v3_bbx_bbx_nlo)
+val_loss_no_reg: 6.057904e+00
+sign accuracy on the 155 signed pools: median 0.7050, min 0.0000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 2.184757e+01
+sign accuracy on the 155 signed pools: median 0.5450, min 0.1100 (v3_udx_wpzz_nlo)
+val_loss_no_reg: 8.293963e+00
+sign accuracy on the 155 signed pools: median 0.6700, min 0.0250 (v3_udx_gwp_nlo)
+val_loss_no_reg: 2.518019e+01
+sign accuracy on the 155 signed pools: median 0.5750, min 0.0400 (v3_gg_gg_nlo)
+val_loss_no_reg: 4.469585e+00
+sign accuracy on the 155 signed pools: median 0.5300, min 0.0800 (v3_gg_ggg_nlo)
+val_loss_no_reg: 5.113446e+00
+sign accuracy on the 155 signed pools: median 0.4900, min 0.0550 (v3_udx_epemwp_nlo)
+val_loss_no_reg: 4.228180e+00
+sign accuracy on the 155 signed pools: median 0.3450, min 0.0400 (v3_ddx_awpwm_nlo)
+val_loss_no_reg: 4.363456e+01
+sign accuracy on the 155 signed pools: median 0.4750, min 0.0850 (v3_gg_bbx_nlo)
+val_loss_no_reg: 6.231649e+00
+sign accuracy on the 155 signed pools: median 0.7800, min 0.0000 (v3_dsx_cxu_nlo)
+val_loss_no_reg: 1.944647e+01
+sign accuracy on the 155 signed pools: median 0.7900, min 0.0000 (v3_dsx_cxu_nlo)
+val_loss_no_reg: 9.003291e+00
+sign accuracy on the 155 signed pools: median 0.6500, min 0.0100 (v3_gg_gg_nlo)
+val_loss_no_reg: 5.136125e+00
+sign accuracy on the 155 signed pools: median 0.7400, min 0.0100 (v3_uux_huux_nlo)
+val_loss_no_reg: 3.506985e+00
+sign accuracy on the 155 signed pools: median 0.5450, min 0.0300 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 3.533454e+00
+sign accuracy on the 155 signed pools: median 0.6500, min 0.0200 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.783788e+00
+sign accuracy on the 155 signed pools: median 0.6250, min 0.0250 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.504170e+00
+sign accuracy on the 155 signed pools: median 0.6300, min 0.0300 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.177687e+00
+sign accuracy on the 155 signed pools: median 0.6250, min 0.0250 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.466959e+00
+sign accuracy on the 155 signed pools: median 0.5650, min 0.1000 (v3_ddx_ghz_nlo)
+val_loss_no_reg: 2.265607e+00
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0350 (v3_ddx_huux_nlo)
+val_loss_no_reg: 2.250206e+00
+sign accuracy on the 155 signed pools: median 0.5850, min 0.0550 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.059308e+00
+sign accuracy on the 155 signed pools: median 0.6150, min 0.0150 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.070262e+00
+sign accuracy on the 155 signed pools: median 0.6000, min 0.0600 (v3_ddx_huux_nlo)
+val_loss_no_reg: 2.034791e+00
+sign accuracy on the 155 signed pools: median 0.5950, min 0.0350 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.010284e+00
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0450 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.038000e+00
+== runs/sign_head_search/trial_1333
+sign accuracy on the 155 signed pools: median 0.8950, min 0.0400 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.418529e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5850 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 4.200891e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6400 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.272340e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.260282e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6800 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.051565e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.102669e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.855778e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.450363e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.315575e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.715325e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.154215e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.451101e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.964083e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.614430e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.392629e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.321851e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.081647e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.871963e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.702312e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.590564e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.560338e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.414487e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.334639e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.248783e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.167433e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.423074e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.043642e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.982314e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.913278e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.819700e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.038239e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.765717e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.730466e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.592154e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.591351e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.502551e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.461418e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.400561e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.379495e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.324566e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.299825e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.272137e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.235152e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.226894e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.197820e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.171640e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.158975e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.149864e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.139849e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.137527e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.137390e-03
+== runs/sign_head_search/trial_0353
+sign accuracy on the 155 signed pools: median 0.9500, min 0.0000 (v3_ddx_huux_nlo)
+val_loss_no_reg: 1.383387e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.2750 (v3_epem_addx_nlo)
+val_loss_no_reg: 6.634110e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6150 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 3.297139e-02
+sign accuracy on the 155 signed pools: median 0.9450, min 0.4900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 4.491439e-01
+sign accuracy on the 155 signed pools: median 0.1800, min 0.0000 (v3_bbx_bbx_nlo)
+val_loss_no_reg: 1.269697e+02
+sign accuracy on the 155 signed pools: median 0.1850, min 0.0000 (v3_bbx_bbx_nlo)
+val_loss_no_reg: 1.362428e+01
+sign accuracy on the 155 signed pools: median 0.7000, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.241349e+02
+sign accuracy on the 155 signed pools: median 0.6000, min 0.0350 (v3_gg_gg_nlo)
+val_loss_no_reg: 8.534621e+00
+sign accuracy on the 155 signed pools: median 0.5650, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.412399e+01
+sign accuracy on the 155 signed pools: median 0.7150, min 0.0300 (v3_us_cd_nlo)
+val_loss_no_reg: 1.521577e+01
+sign accuracy on the 155 signed pools: median 0.6800, min 0.0800 (v3_ddx_huux_nlo)
+val_loss_no_reg: 1.444976e+01
+sign accuracy on the 155 signed pools: median 0.5750, min 0.2250 (v3_uux_huux_nlo)
+val_loss_no_reg: 7.391148e+00
+sign accuracy on the 155 signed pools: median 0.6000, min 0.1250 (v3_uux_huux_nlo)
+val_loss_no_reg: 7.858556e+00
+sign accuracy on the 155 signed pools: median 0.6950, min 0.0000 (v3_us_cd_nlo)
+val_loss_no_reg: 2.365121e+02
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0000 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 2.526045e+02
+sign accuracy on the 155 signed pools: median 0.7800, min 0.0000 (v3_dsx_cxu_nlo)
+val_loss_no_reg: 1.803401e+03
+sign accuracy on the 155 signed pools: median 0.8200, min 0.0000 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 7.501616e+02
+sign accuracy on the 155 signed pools: median 0.8050, min 0.0000 (v3_dsx_cxu_nlo)
+val_loss_no_reg: 7.464749e+02
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0100 (v3_uux_huux_nlo)
+val_loss_no_reg: 9.376637e+02
+sign accuracy on the 155 signed pools: median 0.5150, min 0.1050 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.451895e+03
+sign accuracy on the 155 signed pools: median 0.5300, min 0.0100 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.650593e+03
+sign accuracy on the 155 signed pools: median 0.5500, min 0.1000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 3.707620e+02
+sign accuracy on the 155 signed pools: median 0.7050, min 0.0300 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 6.320493e+02
+sign accuracy on the 155 signed pools: median 0.7000, min 0.0000 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 1.001557e+03
+sign accuracy on the 155 signed pools: median 0.5750, min 0.0400 (v3_ddx_huux_nlo)
+val_loss_no_reg: 7.542696e+02
+sign accuracy on the 155 signed pools: median 0.4800, min 0.1550 (v3_uux_taptamz_nlo)
+val_loss_no_reg: 4.634775e+02
+sign accuracy on the 155 signed pools: median 0.4700, min 0.1050 (v3_us_cd_nlo)
+val_loss_no_reg: 3.956171e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.0200 (v3_us_cd_nlo)
+val_loss_no_reg: 2.079855e+02
+sign accuracy on the 155 signed pools: median 0.5250, min 0.0550 (v3_us_cd_nlo)
+val_loss_no_reg: 2.132894e+02
+sign accuracy on the 155 signed pools: median 0.5650, min 0.0550 (v3_us_cd_nlo)
+val_loss_no_reg: 1.768242e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.0150 (v3_udx_wpzz_nlo)
+val_loss_no_reg: 2.115401e+02
+sign accuracy on the 155 signed pools: median 0.5650, min 0.0250 (v3_us_cd_nlo)
+val_loss_no_reg: 2.070753e+02
+sign accuracy on the 155 signed pools: median 0.5900, min 0.0150 (v3_us_cd_nlo)
+val_loss_no_reg: 6.696860e+02
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0050 (v3_us_cd_nlo)
+val_loss_no_reg: 1.691381e+02
+sign accuracy on the 155 signed pools: median 0.5450, min 0.0600 (v3_us_acd_nlo)
+val_loss_no_reg: 1.307324e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.0500 (v3_us_cd_nlo)
+val_loss_no_reg: 1.412607e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.1250 (v3_dg_dg_nlo)
+val_loss_no_reg: 2.417576e+02
+sign accuracy on the 155 signed pools: median 0.5550, min 0.0650 (v3_us_cd_nlo)
+val_loss_no_reg: 1.229390e+02
+sign accuracy on the 155 signed pools: median 0.5750, min 0.0850 (v3_us_cdg_nlo)
+val_loss_no_reg: 1.147906e+02
+sign accuracy on the 155 signed pools: median 0.5350, min 0.0300 (v3_gg_ggg_nlo)
+val_loss_no_reg: 8.910800e+01
+sign accuracy on the 155 signed pools: median 0.6350, min 0.0200 (v3_gg_ggg_nlo)
+val_loss_no_reg: 1.821231e+02
+sign accuracy on the 155 signed pools: median 0.6950, min 0.0350 (v3_ucx_adsx_nlo)
+val_loss_no_reg: 4.357935e+01
+sign accuracy on the 155 signed pools: median 0.5550, min 0.0650 (v3_dg_dg_nlo)
+val_loss_no_reg: 6.839017e+01
+sign accuracy on the 155 signed pools: median 0.5900, min 0.0900 (v3_ucx_dsxz_nlo)
+val_loss_no_reg: 4.147429e+01
+sign accuracy on the 155 signed pools: median 0.6400, min 0.0650 (v3_ucx_dsxz_nlo)
+val_loss_no_reg: 2.311656e+01
+sign accuracy on the 155 signed pools: median 0.5350, min 0.0900 (v3_gg_bbx_nlo)
+val_loss_no_reg: 1.755571e+01
+sign accuracy on the 155 signed pools: median 0.5700, min 0.1200 (v3_dg_dg_nlo)
+val_loss_no_reg: 1.646436e+01
+sign accuracy on the 155 signed pools: median 0.5750, min 0.1200 (v3_dg_dg_nlo)
+val_loss_no_reg: 1.561844e+01
+sign accuracy on the 155 signed pools: median 0.5950, min 0.1300 (v3_dg_dg_nlo)
+val_loss_no_reg: 1.614475e+01
+sign accuracy on the 155 signed pools: median 0.5900, min 0.1300 (v3_epem_csxwm_nlo)
+val_loss_no_reg: 1.599972e+01
+sign accuracy on the 155 signed pools: median 0.5950, min 0.1300 (v3_dg_dg_nlo)
+val_loss_no_reg: 1.565218e+01
+== runs/sign_head_search/trial_0905
+sign accuracy on the 155 signed pools: median 0.8150, min 0.0900 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 1.659326e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3450 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 5.894516e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6650 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.877150e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7500 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.684432e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.7000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.068981e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6750 (v3_ug_uwpwm_nlo)
+val_loss_no_reg: 2.770637e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7250 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.233893e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7750 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.999636e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.274565e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.740622e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.371876e-03
+sign accuracy on the 155 signed pools: median 0.9650, min 0.5500 (v3_dg_dtaptam_nlo)
+val_loss_no_reg: 2.394650e-02
+sign accuracy on the 155 signed pools: median 0.2600, min 0.0000 (v3_bg_abz_nlo)
+val_loss_no_reg: 1.192610e+00
+sign accuracy on the 155 signed pools: median 0.6600, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.913950e+00
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.424796e+01
+sign accuracy on the 155 signed pools: median 0.7300, min 0.0000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 5.397889e+00
+sign accuracy on the 155 signed pools: median 0.5350, min 0.1100 (v3_ddx_ghz_nlo)
+val_loss_no_reg: 4.845494e+00
+sign accuracy on the 155 signed pools: median 0.5350, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 3.942741e+00
+sign accuracy on the 155 signed pools: median 0.4650, min 0.0400 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.912429e+01
+sign accuracy on the 155 signed pools: median 0.5000, min 0.0300 (v3_bbx_bbx_nlo)
+val_loss_no_reg: 1.337409e+01
+sign accuracy on the 155 signed pools: median 0.5500, min 0.0050 (v3_udx_gwp_nlo)
+val_loss_no_reg: 1.597691e+01
+sign accuracy on the 155 signed pools: median 0.6700, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.149651e+01
+sign accuracy on the 155 signed pools: median 0.5000, min 0.1400 (v3_ddx_ghz_nlo)
+val_loss_no_reg: 9.588376e+00
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0000 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.157750e+01
+sign accuracy on the 155 signed pools: median 0.5550, min 0.0000 (v3_gg_bbx_nlo)
+val_loss_no_reg: 7.615361e+00
+sign accuracy on the 155 signed pools: median 0.6000, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 4.073660e+01
+sign accuracy on the 155 signed pools: median 0.6400, min 0.0050 (v3_us_cd_nlo)
+val_loss_no_reg: 2.179604e+01
+sign accuracy on the 155 signed pools: median 0.4750, min 0.0100 (v3_gg_bbx_nlo)
+val_loss_no_reg: 2.311333e+01
+sign accuracy on the 155 signed pools: median 0.4000, min 0.0050 (v3_gg_bbx_nlo)
+val_loss_no_reg: 1.209034e+01
+sign accuracy on the 155 signed pools: median 0.5700, min 0.0050 (v3_gg_bbx_nlo)
+val_loss_no_reg: 2.696524e+01
+sign accuracy on the 155 signed pools: median 0.7150, min 0.0000 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.083505e+02
+sign accuracy on the 155 signed pools: median 0.6600, min 0.0500 (v3_ddx_huux_nlo)
+val_loss_no_reg: 7.934963e+00
+sign accuracy on the 155 signed pools: median 0.5850, min 0.0500 (v3_uux_huux_nlo)
+val_loss_no_reg: 7.039775e+00
+sign accuracy on the 155 signed pools: median 0.5100, min 0.0350 (v3_gg_bbx_nlo)
+val_loss_no_reg: 6.292223e+00
+sign accuracy on the 155 signed pools: median 0.6050, min 0.0150 (v3_uux_huux_nlo)
+val_loss_no_reg: 7.981142e+00
+sign accuracy on the 155 signed pools: median 0.4950, min 0.0500 (v3_gg_bbx_nlo)
+val_loss_no_reg: 4.436005e+00
+sign accuracy on the 155 signed pools: median 0.5300, min 0.1050 (v3_gg_bbx_nlo)
+val_loss_no_reg: 3.035915e+00
+sign accuracy on the 155 signed pools: median 0.7050, min 0.0100 (v3_ddx_huux_nlo)
+val_loss_no_reg: 1.289272e+01
+sign accuracy on the 155 signed pools: median 0.6350, min 0.0350 (v3_uux_huux_nlo)
+val_loss_no_reg: 3.228013e+00
+sign accuracy on the 155 signed pools: median 0.5800, min 0.0300 (v3_gg_bbx_nlo)
+val_loss_no_reg: 2.957802e+00
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0150 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.733187e+00
+sign accuracy on the 155 signed pools: median 0.5750, min 0.0400 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.916275e+00
+sign accuracy on the 155 signed pools: median 0.6000, min 0.0150 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.040312e+00
+sign accuracy on the 155 signed pools: median 0.6050, min 0.0200 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.095571e+00
+sign accuracy on the 155 signed pools: median 0.6000, min 0.0150 (v3_uux_huux_nlo)
+val_loss_no_reg: 2.346185e+00
+sign accuracy on the 155 signed pools: median 0.6050, min 0.0350 (v3_ddx_huux_nlo)
+val_loss_no_reg: 2.215212e+00
+sign accuracy on the 155 signed pools: median 0.6100, min 0.0300 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.853912e+00
+sign accuracy on the 155 signed pools: median 0.6050, min 0.0250 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.850727e+00
+sign accuracy on the 155 signed pools: median 0.6150, min 0.0400 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.845551e+00
+sign accuracy on the 155 signed pools: median 0.6050, min 0.0450 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.838426e+00
+sign accuracy on the 155 signed pools: median 0.5950, min 0.0350 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.832295e+00
+== runs/sign_head_search/trial_1665
+sign accuracy on the 155 signed pools: median 0.9050, min 0.0950 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 1.220564e-01
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5200 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.219972e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6500 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.708347e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.504648e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.364099e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.512032e-03
+sign accuracy on the 155 signed pools: median 0.4250, min 0.0000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 1.992473e+00
+sign accuracy on the 155 signed pools: median 0.1800, min 0.0000 (v3_bbx_bbx_nlo)
+val_loss_no_reg: 1.429533e+01
+sign accuracy on the 155 signed pools: median 0.7400, min 0.0000 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 1.060864e+02
+sign accuracy on the 155 signed pools: median 0.7600, min 0.0000 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 7.548493e+00
+sign accuracy on the 155 signed pools: median 0.5950, min 0.1950 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 3.377259e+00
+sign accuracy on the 155 signed pools: median 0.5250, min 0.0450 (v3_gg_gg_nlo)
+val_loss_no_reg: 9.506527e+00
+sign accuracy on the 155 signed pools: median 0.5500, min 0.0500 (v3_ddx_huux_nlo)
+val_loss_no_reg: 1.983553e+02
+sign accuracy on the 155 signed pools: median 0.5350, min 0.0800 (v3_udx_gwp_nlo)
+val_loss_no_reg: 1.331236e+02
+sign accuracy on the 155 signed pools: median 0.6600, min 0.0000 (v3_us_cdg_nlo)
+val_loss_no_reg: 2.882369e+02
+sign accuracy on the 155 signed pools: median 0.5900, min 0.0200 (v3_us_cdg_nlo)
+val_loss_no_reg: 1.972761e+02
+sign accuracy on the 155 signed pools: median 0.5300, min 0.2650 (v3_udx_ghwp_nlo)
+val_loss_no_reg: 8.547905e+01
+sign accuracy on the 155 signed pools: median 0.6650, min 0.0500 (v3_uux_huux_nlo)
+val_loss_no_reg: 4.904448e+01
+sign accuracy on the 155 signed pools: median 0.5050, min 0.1750 (v3_udx_ahwp_nlo)
+val_loss_no_reg: 5.357422e+01
+sign accuracy on the 155 signed pools: median 0.5700, min 0.2100 (v3_uux_huux_nlo)
+val_loss_no_reg: 4.910683e+01
+sign accuracy on the 155 signed pools: median 0.6950, min 0.0050 (v3_dsx_cxuz_nlo)
+val_loss_no_reg: 6.347850e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.2350 (v3_udx_gtapvt_nlo)
+val_loss_no_reg: 3.433601e+02
+sign accuracy on the 155 signed pools: median 0.6050, min 0.1850 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 9.144200e+01
+sign accuracy on the 155 signed pools: median 0.4000, min 0.1050 (v3_udx_wpzz_nlo)
+val_loss_no_reg: 1.709074e+02
+sign accuracy on the 155 signed pools: median 0.5050, min 0.1950 (v3_epem_csxwm_nlo)
+val_loss_no_reg: 1.948115e+02
+sign accuracy on the 155 signed pools: median 0.5050, min 0.2200 (v3_udx_chsx_nlo)
+val_loss_no_reg: 1.022160e+02
+sign accuracy on the 155 signed pools: median 0.4850, min 0.2850 (v3_udx_wpzz_nlo)
+val_loss_no_reg: 1.041860e+03
+sign accuracy on the 155 signed pools: median 0.5400, min 0.1450 (v3_epem_csxwm_nlo)
+val_loss_no_reg: 1.425973e+02
+sign accuracy on the 155 signed pools: median 0.5400, min 0.2000 (v3_epem_csxwm_nlo)
+val_loss_no_reg: 9.052699e+01
+sign accuracy on the 155 signed pools: median 0.6450, min 0.1250 (v3_ucx_dsxz_nlo)
+val_loss_no_reg: 4.066787e+02
+sign accuracy on the 155 signed pools: median 0.6650, min 0.0350 (v3_uux_huux_nlo)
+val_loss_no_reg: 1.070731e+02
+sign accuracy on the 155 signed pools: median 0.5200, min 0.2500 (v3_epem_csxwm_nlo)
+val_loss_no_reg: 8.027589e+01
+sign accuracy on the 155 signed pools: median 0.5050, min 0.2000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 6.012982e+01
+sign accuracy on the 155 signed pools: median 0.5150, min 0.2200 (v3_ddx_huux_nlo)
+val_loss_no_reg: 4.849976e+01
+sign accuracy on the 155 signed pools: median 0.6100, min 0.1400 (v3_us_cd_nlo)
+val_loss_no_reg: 9.139449e+01
+sign accuracy on the 155 signed pools: median 0.6150, min 0.1150 (v3_dsx_cxu_nlo)
+val_loss_no_reg: 8.118715e+01
+sign accuracy on the 155 signed pools: median 0.6350, min 0.0850 (v3_uux_huux_nlo)
+val_loss_no_reg: 7.708716e+01
+sign accuracy on the 155 signed pools: median 0.5800, min 0.1700 (v3_us_cd_nlo)
+val_loss_no_reg: 6.079627e+01
+sign accuracy on the 155 signed pools: median 0.5450, min 0.1900 (v3_us_cd_nlo)
+val_loss_no_reg: 4.525097e+01
+sign accuracy on the 155 signed pools: median 0.6650, min 0.0750 (v3_us_cd_nlo)
+val_loss_no_reg: 1.051362e+02
+sign accuracy on the 155 signed pools: median 0.5150, min 0.3100 (v3_us_acd_nlo)
+val_loss_no_reg: 5.759053e+01
+sign accuracy on the 155 signed pools: median 0.5000, min 0.3000 (v3_bbx_bbxh_nlo)
+val_loss_no_reg: 6.875519e+01
+sign accuracy on the 155 signed pools: median 0.6550, min 0.1650 (v3_uux_huux_nlo)
+val_loss_no_reg: 4.534794e+01
+sign accuracy on the 155 signed pools: median 0.6500, min 0.1550 (v3_ddx_huux_nlo)
+val_loss_no_reg: 3.585260e+01
+sign accuracy on the 155 signed pools: median 0.6200, min 0.1300 (v3_uux_huux_nlo)
+val_loss_no_reg: 3.632750e+01
+sign accuracy on the 155 signed pools: median 0.6450, min 0.1500 (v3_uux_huux_nlo)
+val_loss_no_reg: 4.359352e+01
+sign accuracy on the 155 signed pools: median 0.6000, min 0.2450 (v3_us_acd_nlo)
+val_loss_no_reg: 6.395460e+01
+sign accuracy on the 155 signed pools: median 0.6150, min 0.2150 (v3_us_cd_nlo)
+val_loss_no_reg: 5.766710e+01
+sign accuracy on the 155 signed pools: median 0.5750, min 0.2250 (v3_uux_huux_nlo)
+val_loss_no_reg: 3.626782e+01
+sign accuracy on the 155 signed pools: median 0.5450, min 0.2950 (v3_us_acd_nlo)
+val_loss_no_reg: 3.415783e+01
+sign accuracy on the 155 signed pools: median 0.5400, min 0.3000 (v3_us_cd_nlo)
+val_loss_no_reg: 3.386347e+01
+== runs/sign_head_search/trial_1405
+sign accuracy on the 155 signed pools: median 0.7950, min 0.0200 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.080416e-01
+sign accuracy on the 155 signed pools: median 0.9550, min 0.2550 (v3_udx_gtapvt_nlo)
+val_loss_no_reg: 5.920898e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.631289e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6550 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.158955e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7500 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.314115e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_dg_aad_nlo)
+val_loss_no_reg: 9.308853e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7600 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.760315e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_udx_csxz_nlo)
+val_loss_no_reg: 6.568099e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.462702e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.347721e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.185323e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.623790e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.314863e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.159580e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.806102e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.485492e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.210871e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.012556e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.919714e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.791240e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.620227e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.645479e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.463014e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.308836e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.289658e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.160196e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.140350e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.161103e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.951441e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.922638e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.876357e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.776768e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.721753e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.683128e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_dg_dhz_nlo)
+val_loss_no_reg: 1.616911e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.557972e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.551635e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.473401e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.507938e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.437358e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.385465e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.354314e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.333032e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.310158e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.281536e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.261746e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.250455e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.244677e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.235042e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.233664e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.233633e-03
+== runs/sign_head_search/trial_0619
+sign accuracy on the 155 signed pools: median 0.7350, min 0.0300 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.303622e-01
+sign accuracy on the 155 signed pools: median 0.9150, min 0.1500 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 8.679309e-02
+sign accuracy on the 155 signed pools: median 0.9400, min 0.3050 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 6.887845e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3200 (v3_dg_emuvex_nlo)
+val_loss_no_reg: 5.550964e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.798174e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6850 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.896737e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.383109e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.061276e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.831117e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.027159e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.821246e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.923004e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.378962e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.882407e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.511639e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.203818e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.069672e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.779886e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.853146e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.501499e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.262802e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.178416e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.028776e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.909137e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.767684e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.733601e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.636442e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.725520e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.499485e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.386237e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.583106e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.490565e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.357471e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.225033e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.153927e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.079386e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.049187e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.595730e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.162290e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.080248e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.987938e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.934587e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.909925e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_ghwp_nlo)
+val_loss_no_reg: 1.881245e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.857698e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.843762e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_ug_epemu_nlo)
+val_loss_no_reg: 1.842853e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.832757e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.826721e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.825067e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.824995e-03
+== runs/sign_head_search/trial_1133
+sign accuracy on the 155 signed pools: median 0.7050, min 0.0250 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.409559e-01
+sign accuracy on the 155 signed pools: median 0.9550, min 0.3300 (v3_udx_awp_nlo)
+val_loss_no_reg: 6.989394e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3900 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 4.201375e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.4000 (v3_udx_awp_nlo)
+val_loss_no_reg: 2.373316e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.5050 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.523955e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6350 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.136497e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.101576e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.5750 (v3_udx_awp_nlo)
+val_loss_no_reg: 8.654421e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6350 (v3_dg_aad_nlo)
+val_loss_no_reg: 9.201157e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 6.850967e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7300 (v3_dg_aad_nlo)
+val_loss_no_reg: 6.105586e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6950 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.831397e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7250 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.339204e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7000 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.410564e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.781609e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.511069e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 4.643538e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_ddx_accx_nlo)
+val_loss_no_reg: 4.383096e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.132016e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.848745e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.6850 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.685127e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7150 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.193094e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.930914e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.515170e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7600 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.466722e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7600 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.294285e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7750 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.121604e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7850 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.379153e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.325540e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.962312e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.924443e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.818368e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.677969e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.626383e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.607344e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.506879e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.457776e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8200 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.376603e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8200 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.350710e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8200 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.259152e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.241537e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.201341e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.258229e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.131393e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8300 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.096787e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.096791e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.076694e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.058597e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.048071e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.044177e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.043994e-03
+== runs/sign_head_search/trial_0917
+sign accuracy on the 155 signed pools: median 0.8800, min 0.0700 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.089654e-01
+sign accuracy on the 155 signed pools: median 0.9550, min 0.1400 (v3_udx_gtapvt_nlo)
+val_loss_no_reg: 6.423391e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5800 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.377768e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6400 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.141463e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6450 (v3_dg_adz_nlo)
+val_loss_no_reg: 1.501997e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7050 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.575630e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.655638e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.201016e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7800 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.397470e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.768434e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.196267e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.662346e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.192169e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.491388e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.195090e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.738621e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.451393e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.312253e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.248177e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.035411e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.034435e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.898633e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.990931e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.659427e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.547813e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.524922e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.364942e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.226940e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.198664e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.090283e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.793689e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.186431e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.033366e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.971254e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.846086e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.786487e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.742328e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.694880e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.687209e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_gwpz_nlo)
+val_loss_no_reg: 1.668503e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.592947e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.536307e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_ug_epemu_nlo)
+val_loss_no_reg: 1.515598e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.468906e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_aepve_nlo)
+val_loss_no_reg: 1.455153e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.429813e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.421723e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.408926e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.401007e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.397368e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.397282e-03
+== runs/sign_head_search/trial_0797
+sign accuracy on the 155 signed pools: median 0.8600, min 0.0750 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 1.016778e-01
+sign accuracy on the 155 signed pools: median 0.9550, min 0.3200 (v3_dg_emuvex_nlo)
+val_loss_no_reg: 6.852692e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6050 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.490495e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6350 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.149217e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6850 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.305789e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7350 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.403786e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7650 (v3_ddx_accx_nlo)
+val_loss_no_reg: 8.771682e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.173652e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7600 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.158776e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.018162e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 8.799196e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.140177e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.122671e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_aepve_nlo)
+val_loss_no_reg: 5.420104e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.353641e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.918713e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.704637e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_ddx_accx_nlo)
+val_loss_no_reg: 4.149524e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.743524e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7800 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.920069e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.460463e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.583829e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.899394e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.465606e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.037659e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.727525e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.571332e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.403955e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.396883e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.892121e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.471046e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.266987e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.168327e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.038942e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.713220e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.106696e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.976810e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.872892e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.853640e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.800071e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.755232e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.681267e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.648668e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.612477e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.581216e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.568434e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.549105e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.541574e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.535841e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.534001e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.533874e-03
+== runs/sign_head_search/trial_1337
+sign accuracy on the 155 signed pools: median 0.9450, min 0.0150 (v3_ddx_huux_nlo)
+val_loss_no_reg: 9.586448e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.4450 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 4.383837e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.5900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.426395e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6300 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.051183e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.780950e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.067692e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.195417e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7200 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.963197e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 9.335533e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.308812e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.607731e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8050 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.226944e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8300 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.556958e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.295435e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.398599e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7600 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.060661e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.121932e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 4.371772e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.466539e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8150 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.828886e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.478221e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.153292e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.421782e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 3.452324e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.555481e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.262592e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.971823e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.717701e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.678174e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.450528e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.512265e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.303518e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.209509e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.139682e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.138467e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.348024e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.027792e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.914769e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.839219e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.764562e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.724120e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.676672e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_dg_dgg_nlo)
+val_loss_no_reg: 1.642317e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.617508e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.589250e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.554316e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.539502e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.528613e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.516481e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.514348e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.514288e-03
+== runs/sign_head_search/trial_1035
+sign accuracy on the 155 signed pools: median 0.7600, min 0.0100 (v3_uux_avevex_nlo)
+val_loss_no_reg: 1.557506e-01
+sign accuracy on the 155 signed pools: median 0.9450, min 0.0950 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 6.823397e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.5000 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.767796e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6350 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.666372e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.641024e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.259112e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.928716e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.320733e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.070587e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_dg_aad_nlo)
+val_loss_no_reg: 8.784797e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.020244e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.704481e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.511587e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.056814e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.449925e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.131515e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_gg_ccxg_nlo)
+val_loss_no_reg: 6.029449e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.027889e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.555380e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.368240e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.194637e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.978749e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.840645e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.813085e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.679056e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.591209e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.449062e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.420770e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.313946e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.246541e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.206116e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.128073e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9300 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.285250e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.060532e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.996847e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.941064e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.900930e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.865280e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.835318e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.801596e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.825532e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.768703e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.728218e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.718801e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.702350e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.691523e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.681759e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.673380e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.670395e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.668043e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.667983e-03
+== runs/sign_head_search/trial_0195
+sign accuracy on the 155 signed pools: median 0.7750, min 0.0000 (v3_udx_gwp_nlo)
+val_loss_no_reg: 1.388130e-01
+sign accuracy on the 155 signed pools: median 0.9350, min 0.0750 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 8.049035e-02
+sign accuracy on the 155 signed pools: median 0.9500, min 0.0850 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 1.117447e-01
+sign accuracy on the 155 signed pools: median 0.9550, min 0.3050 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 5.727607e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3250 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.149866e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6500 (v3_ug_epemu_nlo)
+val_loss_no_reg: 2.609602e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.619473e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6650 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.506514e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.124456e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 9.367084e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.584935e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.477501e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.804324e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.241831e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.068994e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.441802e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.334452e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.832321e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.699064e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.451282e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.240705e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.082996e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.852466e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.054927e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.849292e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.578265e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.751569e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.478615e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.315764e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.220429e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.129475e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.007719e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.942979e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.907735e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.854777e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.814469e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.737490e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.691012e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.646372e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.627501e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.604442e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.577589e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.591486e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.547742e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.523760e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.509723e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.492592e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.487207e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.477502e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.477760e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.476880e-03
+== runs/sign_head_search/trial_0931
+sign accuracy on the 155 signed pools: median 0.7450, min 0.0050 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.411619e-01
+sign accuracy on the 155 signed pools: median 0.9050, min 0.0500 (v3_udx_awp_nlo)
+val_loss_no_reg: 7.524486e-02
+sign accuracy on the 155 signed pools: median 0.9250, min 0.1000 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 7.561333e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3300 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 4.304298e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.5850 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.746685e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6850 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.028360e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6900 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.534572e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7450 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.260508e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.235550e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.250651e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.980893e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7300 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.140228e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.7100 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 3.424660e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.430724e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.407720e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.683295e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.658139e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.087972e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.572329e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.465254e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.920408e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.582548e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.337489e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.313725e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.030359e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.973229e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.749628e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.634552e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.520022e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.531160e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.338837e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.215807e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.137736e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.055282e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.450913e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.079356e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.964294e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.905316e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.852735e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.806071e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.766540e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.787684e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.746116e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.720302e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.695944e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.681711e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.669099e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.663669e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.657583e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.654972e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.655119e-03
+== runs/sign_head_search/trial_0983
+sign accuracy on the 155 signed pools: median 0.8050, min 0.0250 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.246895e-01
+sign accuracy on the 155 signed pools: median 0.9350, min 0.0550 (v3_udx_awp_nlo)
+val_loss_no_reg: 7.626780e-02
+sign accuracy on the 155 signed pools: median 0.9550, min 0.2500 (v3_udx_awp_nlo)
+val_loss_no_reg: 3.970261e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6150 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.278907e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6000 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.761051e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6100 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.300078e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6450 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.020658e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 8.929592e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6800 (v3_dg_dzz_nlo)
+val_loss_no_reg: 8.361955e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6700 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.179797e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7300 (v3_dg_dhz_nlo)
+val_loss_no_reg: 7.045464e-03
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6650 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.762283e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.003626e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7250 (v3_dg_aad_nlo)
+val_loss_no_reg: 6.782659e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7100 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.644329e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7500 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.533827e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_dg_dhz_nlo)
+val_loss_no_reg: 4.873347e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7400 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.422024e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7300 (v3_dg_dhz_nlo)
+val_loss_no_reg: 4.161763e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.978417e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.825067e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7650 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.856864e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.570024e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.486670e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7550 (v3_dg_dhz_nlo)
+val_loss_no_reg: 3.402552e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.256405e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7800 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.107569e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.010711e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.053480e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.890461e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8200 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.782005e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.733988e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.728608e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.693695e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.595701e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.481348e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.434095e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.377282e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.344077e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.290754e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.409597e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.265945e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8550 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.251046e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8550 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.225706e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.198238e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.171746e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.155918e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.156372e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.139028e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.136839e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.136786e-03
+== runs/sign_head_search/trial_1139
+sign accuracy on the 155 signed pools: median 0.7300, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 1.195381e-01
+sign accuracy on the 155 signed pools: median 0.8850, min 0.0700 (v3_udx_awp_nlo)
+val_loss_no_reg: 7.578561e-02
+sign accuracy on the 155 signed pools: median 0.9400, min 0.1750 (v3_udx_gtapvt_nlo)
+val_loss_no_reg: 6.069364e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3700 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.328214e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6350 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.308355e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6050 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.823865e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6650 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.459863e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6950 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.132374e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7350 (v3_dg_aad_nlo)
+val_loss_no_reg: 9.976166e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7600 (v3_dg_aad_nlo)
+val_loss_no_reg: 8.688441e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.790991e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6800 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.530703e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_dg_aad_nlo)
+val_loss_no_reg: 7.053844e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7800 (v3_ddx_accx_nlo)
+val_loss_no_reg: 6.453992e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.909566e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7900 (v3_dg_aad_nlo)
+val_loss_no_reg: 5.622276e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8100 (v3_ddx_accx_nlo)
+val_loss_no_reg: 5.260488e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7750 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.995077e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7850 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.708795e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7800 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.541502e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7950 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.400818e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.248575e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.106135e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.977256e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.805714e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.718667e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 3.615474e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8550 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.539162e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.495238e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.399866e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.320786e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8400 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.300360e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.363467e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.152988e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.043818e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.981772e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.007328e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.890838e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_dg_dhz_nlo)
+val_loss_no_reg: 2.840493e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_dg_aad_nlo)
+val_loss_no_reg: 2.796299e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.769957e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.744239e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.701710e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.688691e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.675349e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.669802e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.646370e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.645686e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.632443e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.630299e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.630435e-03
+== runs/sign_head_search/trial_1227
+sign accuracy on the 155 signed pools: median 0.8150, min 0.0200 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.023927e-01
+sign accuracy on the 155 signed pools: median 0.9450, min 0.2050 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 8.417751e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.4000 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.894130e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6550 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.257382e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7200 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 1.591683e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7050 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.887740e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7850 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.163297e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.279972e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.857210e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.333408e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.266945e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.010210e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.531885e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.964525e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.660434e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.260650e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.071333e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.906786e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.679711e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.665026e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.422985e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.183726e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.016376e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.886099e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.774643e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.797166e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.599162e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.834159e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.681211e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.464893e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.354812e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9100 (v3_udx_atapvt_nlo)
+val_loss_no_reg: 2.323540e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.289988e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.181743e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.140978e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.105176e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.036374e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.004922e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.982362e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.963066e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.942984e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.906514e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.874140e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.854417e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.872885e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.846186e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.830418e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.826175e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.818715e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.816821e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.816862e-03
+== runs/catalog_v3_short/baseline_more_signed_muon
+sign accuracy on the 155 signed pools: median 0.7600, min 0.0400 (v3_ddx_ggg_nlo)
+val_loss_no_reg: 1.356260e-01
+sign accuracy on the 155 signed pools: median 0.9200, min 0.0400 (v3_udx_awp_nlo)
+val_loss_no_reg: 1.274162e-01
+sign accuracy on the 155 signed pools: median 0.9450, min 0.3050 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 7.048676e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.3750 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.946071e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7050 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 2.243116e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.609316e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.163586e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.361469e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.7900 (v3_dg_aad_nlo)
+val_loss_no_reg: 1.272796e-02
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 9.157403e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.759485e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.610961e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8700 (v3_udx_atapvt_nlo)
+val_loss_no_reg: 4.725469e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.242371e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.705882e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.675646e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.318976e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8650 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.835446e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 3.388901e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.987458e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.958604e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.789891e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.509100e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.324241e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.232453e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.139020e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 2.018369e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.991077e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.861300e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.774522e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.752497e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.671619e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9050 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.605829e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_ghwp_nlo)
+val_loss_no_reg: 1.544118e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.484823e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.440343e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.385500e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.354802e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.314895e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.303272e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9300 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.269345e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.236097e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9450 (v3_gg_ccxg_nlo)
+val_loss_no_reg: 1.207832e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_atapvt_nlo)
+val_loss_no_reg: 1.180911e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.157525e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.140940e-03
+sign accuracy on the 155 signed pools: median 0.9900, min 0.9500 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.130892e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.118239e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.111687e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.110356e-03
+sign accuracy on the 155 signed pools: median 0.9950, min 0.9450 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.110314e-03
+== runs/catalog_v3_short/baseline_more_signed
+sign accuracy on the 155 signed pools: median 0.7550, min 0.0000 (v3_gg_gg_nlo)
+val_loss_no_reg: 4.503176e-01
+sign accuracy on the 155 signed pools: median 0.8850, min 0.0750 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 9.875918e-02
+sign accuracy on the 155 signed pools: median 0.9550, min 0.2150 (v3_ddx_gtaptam_nlo)
+val_loss_no_reg: 6.287331e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.4250 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 3.840946e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.6200 (v3_uux_ddxz_nlo)
+val_loss_no_reg: 3.080031e-02
+sign accuracy on the 155 signed pools: median 0.9600, min 0.3200 (v3_epem_ddxg_nlo)
+val_loss_no_reg: 5.714500e-02
+sign accuracy on the 155 signed pools: median 0.9650, min 0.5950 (v3_dg_aad_nlo)
+val_loss_no_reg: 3.396609e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.638372e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6750 (v3_ddx_accx_nlo)
+val_loss_no_reg: 2.132628e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.822615e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7000 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.566342e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7400 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.559978e-02
+sign accuracy on the 155 signed pools: median 0.9700, min 0.7700 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.363749e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.211387e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.117904e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7900 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.026886e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7950 (v3_ddx_accx_nlo)
+val_loss_no_reg: 9.657632e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 1.011520e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8350 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.812987e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.176919e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.6850 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.249947e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.912392e-03
+sign accuracy on the 155 signed pools: median 0.9700, min 0.6950 (v3_ug_uwpwm_nlo)
+val_loss_no_reg: 1.199452e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.7550 (v3_ddx_accx_nlo)
+val_loss_no_reg: 1.569597e-02
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8250 (v3_ddx_accx_nlo)
+val_loss_no_reg: 9.705556e-03
+sign accuracy on the 155 signed pools: median 0.9750, min 0.8150 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.255625e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8500 (v3_ddx_accx_nlo)
+val_loss_no_reg: 7.555460e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8100 (v3_udx_acsx_nlo)
+val_loss_no_reg: 8.932054e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8200 (v3_udx_acsx_nlo)
+val_loss_no_reg: 7.812438e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8450 (v3_dg_aad_nlo)
+val_loss_no_reg: 6.956122e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8400 (v3_udx_acsx_nlo)
+val_loss_no_reg: 6.459548e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8600 (v3_dg_aad_nlo)
+val_loss_no_reg: 6.124133e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.930761e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.770760e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8700 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.596748e-03
+sign accuracy on the 155 signed pools: median 0.9800, min 0.8850 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.407593e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.326231e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.186348e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 5.064382e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.985242e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8800 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.907534e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.867330e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.826934e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.777403e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8750 (v3_dg_aad_nlo)
+val_loss_no_reg: 4.736761e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.707771e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.9000 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.692715e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.677113e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.669829e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8950 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.667429e-03
+sign accuracy on the 155 signed pools: median 0.9850, min 0.8900 (v3_udx_acsx_nlo)
+val_loss_no_reg: 4.667421e-03
