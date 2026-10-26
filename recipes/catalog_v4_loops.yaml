@@ -808,7 +808,8 @@ processes:
     - 80.419
     n_loops: 1
     nfinal: 3
-    param_card_patches: {}
+    param_card_patches:
+      WT: 0.0
     pdg_ids:
     - 5
     - -5
@@ -5551,7 +5552,6 @@ virt:
     v3_name: v3_bbx_hvevex
   v4_bbx_hwpwm:
     beam_masses: {}
-    c2_rel_tol: 0.01
     certified: false
     fiducial_cuts:
       cos_max: 0.9999092042625951
@@ -5566,7 +5566,7 @@ virt:
     mg5: generate b b~ > h w+ w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.4915
+      WT: 0.0
     pdg_ids:
     - 5
     - -5
@@ -5575,6 +5575,8 @@ virt:
     - -24
     sqrts_measure: log
     v3_name: v3_bbx_hwpwm
+    width_override:
+      WT: 0.0
   v4_bbx_hz:
     beam_masses: {}
     certified: false

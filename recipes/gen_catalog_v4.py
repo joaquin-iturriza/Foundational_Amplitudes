@@ -20,7 +20,8 @@ What changes against catalog_v3, all of it as fields of the v4 entries that mg5_
                the bound (order_vector: [0, 0, a_max, b]); a_max is catalog_v3's (minimal QED = maximal QCD)
   top          MT = ymt = 172.5 in every entry, internal tops and the one-loop layer too, WT = V4_WT = 1.4915, the width
                the pools built before the DECAY-column fix have (the user 2026-10-26, "do 1.4915 for all"); the
-               heavy-quark layer's width the LO formula at its mass (mg5_pipeline_final.top_width_lo)
+               heavy-quark layer's width the LO formula at its mass (mg5_pipeline_final.top_width_lo); the one-loop
+               b b~ > h w+ w- at zero top width (WIDTH_OVERRIDE, the user 2026-10-26, D154)
   b            massless in beams and finals: model sm-no_b_mass (loop_sm-no_b_mass for MadLoop), beam_masses {}
 Not changed: the classes (catalog_v3's census until --check and the equality step are rerun on v4: a class can split
 when EW diagrams tell its relabelled members apart, merge when the massless b equals a d or s, vanish when only the b
@@ -67,7 +68,15 @@ QCD_BORN = {"v3_uux_ccxz", "v3_ddx_bbxz", "v3_ddx_ccx", "v3_ddx_bbx", "v3_bbx_cc
 # One-loop entries with an internal top that can go on shell: the physical top width moves MadLoop's double pole off the
 # analytic one by ~width/mass (4.2e-3 to 4.6e-3 at WT, below 5e-5 with it zeroed; plan catalog_coverage), above the 1e-3
 # per-event guard, so they carry catalog_v3's v3_bg_bwpwm tolerance (c2_rel_tol 0.01, pole_width_diag.txt).
-C2_WIDTH_TOL = {"v3_bg_bwpwm": 0.01, "v3_bbx_tapvtwm": 0.01, "v3_bbx_hwpwm": 0.01}
+C2_WIDTH_TOL = {"v3_bg_bwpwm": 0.01, "v3_bbx_tapvtwm": 0.01}
+# One-loop entries generated at another top width than V4_WT (width_override: written into the virt entry's
+# param_card_patches, so the card patcher puts it on the column-1 DECAY line, and into the process entry's, so the
+# pool's recipe_id and sidecar carry it). b b~ > h w+ w-: the top is t-channel only, never resonant, so the exact
+# amplitude has no width; the fixed width breaks gauge cancellations and moves MadLoop's double pole off the analytic
+# one by up to 2e-2 at 4 to 6 TeV (19% of points refused by the pole guard over [286, 6000] GeV; 1.6e-5 at zero width;
+# plan catalog_coverage). The user 2026-10-26 (D154): "isn't there I single correct way to calculate the amplitude?
+# ... if this one is blowing up, then it's clearly wrong". Exact at zero width, it takes the default pole tolerance.
+WIDTH_OVERRIDE = {"v3_bbx_hwpwm": {"WT": 0.0}}
 
 
 def qcdborn_name(n, virt_key=False):
@@ -162,11 +171,15 @@ def loop_entries(trees):
                 w["qcd_born"] = True
         if k in C2_WIDTH_TOL:
             w["c2_rel_tol"] = C2_WIDTH_TOL[k]
+        if k in WIDTH_OVERRIDE:
+            w["width_override"] = dict(WIDTH_OVERRIDE[k])
+            w["param_card_patches"] = {**w["param_card_patches"], **WIDTH_OVERRIDE[k]}
         virt[qcdborn_name(nk, virt_key=True)] = w
     for n, p in L["processes"].items():
         e = {k: v for k, v in p.items() if k not in ("param_card_patches",)}
         vb = qcdborn_name(v4name(p["virt_base"]), virt_key=True); pdg = list(p["pdg_ids"])
-        e.update(virt_base=vb, m_finals=b_massless(pdg, p["m_finals"]), param_card_patches={}, certified=False,
+        e.update(virt_base=vb, m_finals=b_massless(pdg, p["m_finals"]),
+                 param_card_patches=dict(WIDTH_OVERRIDE.get(p["virt_base"], {})), certified=False,
                  v3_name=n, why=re.sub(r"\bv3_", "v4_", p.get("why", "")), **common(pdg))
         procs[qcdborn_name(v4name(n))] = e
     return virt, procs

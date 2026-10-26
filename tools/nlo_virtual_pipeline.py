@@ -288,6 +288,20 @@ def build_virt_standalone(process, force=False):
         print(f"[BUILD] {process}: built from a different generate string ({open(tag).read().strip()!r}) -- rebuilding")
         force = True
     if p0_glob and not force:
+        # an entry's width_override (catalog_v4, gen_catalog_v4.WIDTH_OVERRIDE) set after its standalone was built:
+        # MadLoop reads Cards/param_card.dat at run time, so the card is re-patched (column-1 DECAY line), no rebuild
+        card = f"{sa}/Cards/param_card.dat"
+        want = {k.lower(): float(v) for k, v in (cfg.get("width_override") or {}).items()}
+        if want and os.path.exists(card):
+            restore_stale_card(card)
+            got = {}
+            for line in open(card):
+                m = re.match(r"DECAY\s+-?\d+\s+(\S+)\s*#\s*(\w+)", line, re.I)   # column 1 only: what MadGraph reads
+                if m:
+                    got[m.group(2).lower()] = float(m.group(1).replace("d", "e").replace("D", "e"))
+            if any(k not in got or abs(got[k] - v) > 1e-9 for k, v in want.items()):
+                print(f"[BUILD] {process}: card widths {got} differ from width_override {want} -- re-patching the card")
+                patch_param_card_slha(card, {**C.PARAM_CARD_PATCHES, **cfg.get("param_card_patches", {})})
         print(f"[BUILD] {process}: standalone+module exist ({sa}) — skipping.")
         return sa
     if force and os.path.exists(sa):
