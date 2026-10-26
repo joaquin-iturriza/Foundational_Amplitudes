@@ -1070,13 +1070,14 @@ entries:
     - FA-ccin2p3-ce878798
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-ec84e913
-    commit: 7b00eb21
+    commit: 5ab5e1fc
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/figs/coverage_fwd_c.png
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
+    - analysis/catalog_v4/data/card_width_audit.json
     - analysis/catalog_v4/data/checked.json
     - analysis/catalog_v4/data/validation.json
     - analysis/catalog_v4/figs/census_diagrams.png
