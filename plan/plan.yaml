@@ -1137,7 +1137,9 @@ entries:
     the comparison catalog_v4 against catalog_v3, two seeds each, in docs/results.tex (par:dimless_orders: replace ''mixed-order
     entries are refused'' with the highest-alpha_s-monomial rule, the audit''s numbers and the diagram-derived order features;
     say catalog_v3''s earlier runs had zp_uux_Y1g and thdm_uux_h2h3g''s powers wrong, 2 of 1397 pools). The smoke 0e8c605e
-    completed (V3_SHORT_DONE).'
+    completed (V3_SHORT_DONE).; THEN, once the switch to catalog_v4 is confirmed from that read (D163 below), delete catalog_v3''s
+    pools on CC: first a manifest (paths, sizes) and a check that no running or queued work reads them (site runs, sweep registries),
+    then delete only what the manifest lists; if catalog_v4 loses, delete nothing and report to the user'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
