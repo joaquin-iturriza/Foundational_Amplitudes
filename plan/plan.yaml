@@ -1345,11 +1345,13 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-00d080ba
+    - FA-ccin2p3-0caa5e2a
     - FA-ccin2p3-13e57de7
     - FA-ccin2p3-27a6f23b
     - FA-ccin2p3-29e8ad2f
     - FA-ccin2p3-2bc30261
     - FA-ccin2p3-3a2f3a89
+    - FA-ccin2p3-41b4f15a
     - FA-ccin2p3-483f4bfc
     - FA-ccin2p3-54fd017f
     - FA-ccin2p3-60177afb
@@ -1363,13 +1365,15 @@ entries:
     - FA-ccin2p3-ee733aa9
     - FA-ccin2p3-f620ed40
     - FA-ccin2p3-fe864fda
-    commit: b6827ae1
+    commit: cbe55d39
     paths:
     - analysis/catalog_v3/data/muon_compare.json
     - analysis/catalog_v3/data/muon_ft.json
+    - analysis/catalog_v3/data/muon_search.json
     - analysis/catalog_v3/expect_muon.json
     - analysis/catalog_v3/figs/muon_compare.png
     - analysis/catalog_v3/figs/muon_ft.png
+    - analysis/catalog_v3/figs/muon_search.png
     - analysis/transfer/data/ema_start_audit.json
     - analysis/transfer/ema_start_audit.py
     - docs/results.tex
