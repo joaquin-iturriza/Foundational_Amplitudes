@@ -30,8 +30,10 @@ ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "sha
         "dimensionless_twin": "twin"}
 # the two sign arms, each the baseline with one change at its HPs (scripts/job_catalog_v3_short.sh): a pair term in the
 # sign logit, and the near-zero events' sign loss weighted 10 times. Scored like ARMS; the ranges over arms quoted in
-# the notes before them (e+e- -> c cbar g, the all-negative pools) stay over ARMS, the sign arms' values are apart
-SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near"}
+# the notes before them (e+e- -> c cbar g, the all-negative pools) stay over ARMS, the sign arms' values are apart.
+# The third, the baseline at its HPs and step count with 95 more sign-changing one-loop training pools
+# (recipes/catalog_v3_train_signext.yaml, 1492 processes against 1397), changes the data, not the model
+SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near", "baseline_more_signed": "more"}
 
 
 def load_raw():
@@ -226,6 +228,7 @@ def main():
             flat["pos_one_sign_train_neg"] = int(round(tr["negative"] * tr["rows"]))
             flat["pos_one_sign_train_rows"] = tr["rows"]
             flat["pos_one_sign_base_wrong"] = round(100 * o["baseline"])
+            flat["pos_one_sign_more_wrong"] = round(100 * o["baseline_more_signed"], 1)
     flat["n_one_sign_allneg"] = n_allneg
     print("one sign in every event, scored as sign-changing:", json.dumps(out["one_sign_scored"]))
     print(json.dumps(flat))
@@ -265,7 +268,8 @@ def plot_sign_arms(out, sr):
     import plot_style as ps
     fig, axs = ps.figure(ncols=2)
     sty = {"baseline_sign_pairs": (ps.C.blue, "o", "pair sign head"),
-           "baseline_sign_near": (ps.C.vermillion, "^", "near-zero weighting")}
+           "baseline_sign_near": (ps.C.vermillion, "^", "near-zero weighting"),
+           "baseline_more_signed": (ps.C.green, "s", "more signed pools")}
     b = out["arms"]["baseline"]["per_pool"]
     for arm, (col, mk, lab) in sty.items():
         pp = out["arms"][arm]["per_pool"]
