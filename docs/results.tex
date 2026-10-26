@@ -1772,7 +1772,7 @@ one-loop pool of catalog\_v3's training recipe and of the one-loop held-out axis
 together, the first $7500$ to fit and the next $2500$ to score (\code{analysis/catalog\_v3/prep\_signed\_pools.py}, run
 FA-ccin2p3-7145824e on CC's CPUs; \code{prep\_signed.py}, \code{data/prep\_signed.json}, Fig.~\ref{fig:v3_prep_signed}):
 the share of negative events, the wrong-sign share of one sign per pool and of a classifier on the shape proxy's inputs
-(sklearn MLP $(64,64)$; none when the fit events hold fewer than $20$ of one sign), the same classifier on $\log\hat s$
+(Fig.~\ref{fig:v3_prep_shape}; sklearn MLP $(64,64)$; none when the fit events hold fewer than $20$ of one sign), the same classifier on $\log\hat s$
 alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s$ the pool's $1\%$ quantile of $\abs x$
 (the sign head's floor). Medians over the sign-changing pools, training then held out:
 \begin{itemize}
@@ -1855,13 +1855,30 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
 % claim: ccg_wrong_min=71
 % claim: ccg_wrong_max=72
 % allow: 0.25 0.5 because they are the blend weights lambda, settings
-    pretrainings' scorer reads as sign-changing (the $14$ above and $3$ whose events all carry one sign, which it still
-    resolves as sign-changing; why is not checked), the median wrong-sign share is $5\%$ for the baseline, $10\%$ for
+    pretrainings' scorer reads as sign-changing (the $14$ above and $3$ whose validation and test events all carry one
+    sign, see below), the median wrong-sign share is $5\%$ for the baseline, $10\%$ for
     the hybrid, $9\%$ and $21\%$ for its blends at $\lambda=0.25$ and $0.5$, $12\%$ for the twin, $15\%$ for $\hat s$
     alone, $18\%$ for the emission scales and $19\%$ with the context vector, against the classifier's $0.7\%$. Every
     arm is worse than one sign per pool on $7$ to $10$ of the $17$ and gets more than half of the signs wrong on $1$ to
     $4$. On $e^+e^-\to c\bar cg$ ($28\%$ negative, the classifier $0.7\%$ wrong) every arm gets $71$ to $72\%$ wrong: it
     predicts the minority sign on nearly every event.
+  \item \emph{The three one-sign pools are scored correctly.} The scorer resolves a pool's transform on all its
+% src: python3 analysis/catalog_v3/prep_signed.py @d8636fad
+% claim: n_one_sign_scored=3
+% claim: n_one_sign_allneg=2
+% claim: pos_one_sign_train_neg=9
+% claim: pos_one_sign_train_rows=50000
+% claim: pos_one_sign_base_wrong=90
+% claim: neg_one_sign_wrong_min=31
+% claim: neg_one_sign_wrong_max=74
+    roles, the train split included, which this check does not read, and any value at or below zero makes it signed
+    (\code{experiment.\_resolve\_amp\_preprocessing}; \code{analysis/catalog\_v3/pool\_audit.json} for the train
+    splits). $2$ of the $3$ are negative in every role ($d\bar d\to\gamma g$ and $u\bar c\to\bar c H u$ at one loop),
+    and a pool with no positive value has no plain log; $u\bar u\to e^+e^-Z$ has $9$ negative events among its
+    $50000$ training ones and none in validation or test. The true sign the scorer compares with is the raw
+    amplitude's, so the arms' shares there are real errors: on $u\bar u\to e^+e^-Z$ the baseline's sign head calls
+    $90\%$ of an all-positive validation set negative, and on $d\bar d\to\gamma g$ the arms get $31$ to $74\%$ of an
+    all-negative one wrong. No number above changes.
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
 % claim: H5_err_mlp=0.7
