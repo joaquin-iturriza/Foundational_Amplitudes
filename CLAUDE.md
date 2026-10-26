@@ -77,6 +77,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      (`plan/step_prompt.txt`). Each listed entry gets a background agent (Agent tool, `run_in_background`) started
      from that prompt in that turn and recorded with `plan step <entry> --agent <id>`. The main session works no entry
      itself: it launches step agents, sends me their questions and findings, and talks to me.
+     Independent pieces of work are separate next steps of the entry (`plan set-next <entry> "<step>" --also "<step>"`,
+     `add-next`), each listed and launched on its own (`plan step ... --next N`), never one step chained with "then".
    - **A step agent does one step and exits:** an analysis, a fix, a write-up, or a job (`site submit ... --item
      <entry>`, recorded with `plan run`). It records evidence, dead ends and the next step through the plan CLI and
      never waits on a job: when the job ends, `plan next` lists the entry again and a fresh step agent takes it. No entry
