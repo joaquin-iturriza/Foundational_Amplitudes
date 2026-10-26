@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -99,6 +99,10 @@ case "$ARM" in
     # their order unchanged), to size the third sign arm's gain and cost against seed spread
     baseline_seed2)        NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false seed=43) ;;
     baseline_more_signed_seed2) NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false seed=43)
+                           TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
+    # the more-signed-pools arm's seed 43 again, unchanged, in its own run dir so it trains (the first run's dir holds a
+    # best checkpoint), now with the per-step record train_steps.npz: its blow-up at steps 1360 to 1445 read step by step
+    baseline_more_signed_seed2_steplog) NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false seed=43)
                            TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
