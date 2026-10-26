@@ -87,6 +87,9 @@ def all_parents():
 DONE_ITEMS = ("tp3_lowd*", "zz_lowd*")    # the small-D first round and its DyHPO round: finished (lowd_ft 900/900)
 
 
+RELEASED = []    # globs whose finished fine-tunes the user's call covers too (list --release GLOB)
+
+
 def item_globs():
     """The active and held work items' globs (CCORCH_WORK, exported by `site run`), less the finished small-D ones."""
     import json
@@ -94,7 +97,7 @@ def item_globs():
         w = json.loads(os.environ.get("CCORCH_WORK", "{}"))
     except ValueError:
         return []
-    return [g for g in w.get("active", []) + w.get("held", []) if g not in DONE_ITEMS]
+    return [g for g in w.get("active", []) + w.get("held", []) if g not in DONE_ITEMS and g not in RELEASED]
 
 
 def item_match(rd, top, globs):
@@ -224,9 +227,13 @@ def cmd_delete(a):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sp = ap.add_subparsers(dest="cmd", required=True)
-    sp.add_parser("list")
+    l = sp.add_parser("list")
+    l.add_argument("--release", action="append", default=[],
+                   help="an item glob not to keep (its runs' parents, pretrainings and recent files stay kept)")
     d = sp.add_parser("delete")
     d.add_argument("manifest")
     d.add_argument("--apply", action="store_true")
     a = ap.parse_args()
+    if a.cmd == "list":
+        RELEASED.extend(a.release)
     cmd_list() if a.cmd == "list" else cmd_delete(a)
