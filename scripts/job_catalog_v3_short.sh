@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -82,13 +82,18 @@ case "$ARM" in
     # the pair MLP's 32 hidden units are open (unsourced) settings, one untuned value each: a loss says that value
     # does not help, not that the idea fails
     baseline_sign_pairs)   NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false ++model.sign_pair_dim=16) ;;
+    # the baseline trained on more sign-changing one-loop pools (recipes/catalog_v3_train_signext.yaml: catalog_v3_train
+    # plus the 95 one-loop pools of the coloured 2->3 training trees whose train events take both signs,
+    # recipes/make_catalog_v3_train_signext.py), at the baseline's 4264 steps (same compute)
+    baseline_more_signed)  NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
+                           TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
-ITERS=$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")
+ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")}
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
@@ -104,6 +109,7 @@ loops = [p for p in ps if p["name"].endswith(("_nlo", "_loop"))]
 # the sign-changing one-loop pools first (any role with a negative value), so the sign loss is exercised
 import json
 au = json.load(open("analysis/catalog_v3/pool_audit.json"))["pools"]
+au.update(json.load(open("analysis/catalog_v3/pool_audit_signext.json"))["pools"])   # the sign extension's pools
 neg = lambda n: any(v.get("negative", 0) > 0 for v in au.get(n, {}).values() if isinstance(v, dict))
 loops = sorted(loops, key=lambda p: not neg(p["name"]))
 random.Random(0).shuffle(ps); r["processes"] = ps[:16] + loops[:3]
