@@ -35,7 +35,16 @@ held-out probe, as (b). The last line printed is the numbers docs/results.tex qu
         AdamW parent / Muon parent, AdamW fine-tune / Muon fine-tune, scratch / fine-tune, and per D over the 4 probes.
         Figure muon_ft (2x2, one panel per probe): MSE against D, the eight fine-tunes and scratch, each parent's step
         0 dotted.
-    python3 analysis/catalog_v3/muon_compare.py   -> data/muon_compare.json, figs/muon_compare.{png,pdf}, figs/muon_ft.{png,pdf}
+  collect-search (on the site): stage 2, the two 8-trial single-fidelity searches (sweep/sweep_config_ccin2p3_muon_test_
+           search_{adamw,muon}.yaml): each trial's result file and run config, as JSON:
+    site run --item muon_test ccin2p3 FA -- python analysis/catalog_v3/muon_compare.py collect-search \
+        > analysis/catalog_v3/data/muon_search.json
+  search read (in main): per optimizer every trial's best-checkpoint val_loss_no_reg, the best, the blown-up trials
+        (a validation over 10 times its running minimum, listed with that step); best against best and against stage 1.
+        Figure muon_search (2x2): (a) every trial's loss against its lr, stage 1 starred; (b) the best trials' and
+        stage 1's validation curves; (c) Muon's against its decoupled weight decay; (d) AdamW's against its L2 weight.
+    python3 analysis/catalog_v3/muon_compare.py   -> data/muon_compare.json, figs/muon_compare.{png,pdf}, figs/muon_ft.{png,pdf},
+                                                     figs/muon_search.{png,pdf}
 """
 import glob, json, os, sys
 
@@ -274,6 +283,88 @@ def compare(a42, a43, m42, m43):
             "gap": float(np.median(np.abs(np.log10(ratio))))}
 
 
+def search_compare(pre):
+    """stage 2: per optimizer its trials sorted by the best-checkpoint val_loss_no_reg (what DyHPO observed), the best,
+    the trials that spiked (a validation more than 10 times its running minimum, the step of the first such one), of
+    them those that blew up (their best checkpoint before the spike, never recovered; listed, their best checkpoint
+    still their value), and best against best and against stage 1"""
+    S = json.load(open(os.path.join(HERE, "data", "muon_search.json")))
+    out = {}
+    for opt, v in S.items():
+        assert v["n_jobs"] == len(v["trials"]) == 8 and not v["failed_logs"], (opt, v["n_jobs"], v["failed_logs"])
+        assert all(t["loss"] == "MSE" and t["has_best_model"] for t in v["trials"])
+        rows = []
+        for t in sorted(v["trials"], key=lambda t: t["val_loss_no_reg"]):
+            c = np.asarray(t["val_curve"], dtype=float)
+            assert abs(np.nanmin(c) / t["val_loss_no_reg"] - 1) < 1e-6, (opt, t["hp_idx"])
+            run_min = np.minimum.accumulate(np.where(np.isfinite(c), c, np.inf))
+            bad = np.where(~np.isfinite(c[1:]) | (c[1:] > 10 * run_min[:-1]))[0]
+            rows.append({"hp_idx": t["hp_idx"], "lr": t["lr"], "hp2": t["hp2"], "val_loss_no_reg": t["val_loss_no_reg"],
+                         "best_step": t["best_step"], "mse_log": t["val_loss_no_reg"] * t["prepd_std"] ** 2,
+                         "spike_at": int((bad[0] + 2) * t["validate_every"]) if bad.size else None,
+                         "max_val": float(np.nanmax(c))})
+            rows[-1]["blew_up_at"] = (rows[-1]["spike_at"] if bad.size and t["best_step"] < rows[-1]["spike_at"]
+                                      else None)
+        out[opt] = {"hp2": v["hp2"], "trials": rows, "best": rows[0],
+                    "blown_up": [r["hp_idx"] for r in rows if r["blew_up_at"] is not None],
+                    "spiked_recovered": [r["hp_idx"] for r in rows if r["spike_at"] and r["blew_up_at"] is None]}
+    s1 = {o: [pre[RUNS[(o, sd)]]["val_loss_no_reg"] for sd in (42, 43)] for o in ("AdamW", "Muon")}
+    ba, bm = out["AdamW"]["best"]["val_loss_no_reg"], out["Muon"]["best"]["val_loss_no_reg"]
+    out["best_ratio"] = ba / bm
+    out["stage1"] = s1
+    out["adamw_best_vs_stage1"] = s1["AdamW"][0] / ba         # stage 1 seed 42 over the search's best (same seed)
+    out["muon_best_vs_stage1"] = bm / s1["Muon"][0]           # the search's best over stage 1 seed 42
+    out["best_adamw_vs_stage1_muon"] = ba / s1["Muon"][0]
+    # the shared candidate pool (dyhpo seed 42): the HP index names the same lr in both searches
+    la = {r["hp_idx"]: r for r in out["AdamW"]["trials"]}
+    lm = {r["hp_idx"]: r for r in out["Muon"]["trials"]}
+    out["shared"] = {str(k): {"lr": la[k]["lr"], "AdamW": la[k]["val_loss_no_reg"], "Muon": lm[k]["val_loss_no_reg"]}
+                     for k in sorted(set(la) & set(lm))}
+    assert all(abs(la[k]["lr"] / lm[k]["lr"] - 1) < 1e-6 for k in set(la) & set(lm))
+    return out
+
+
+def plot_search(sr, pre):
+    import plot_style as ps
+    S = json.load(open(os.path.join(HERE, "data", "muon_search.json")))
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    (a, b), (c, d) = axs
+    col = {"AdamW": ps.C.blue, "Muon": ps.C.vermillion}
+    for opt in ("AdamW", "Muon"):
+        rows = sr[opt]["trials"]
+        ok = [r for r in rows if r["blew_up_at"] is None]
+        bu = [r for r in rows if r["blew_up_at"] is not None]
+        a.plot([r["lr"] for r in ok], [r["val_loss_no_reg"] for r in ok], "o", color=col[opt], label=f"{opt} search")
+        a.plot([r["lr"] for r in bu], [r["val_loss_no_reg"] for r in bu], "o", mfc="none", color=col[opt],
+               label=f"{opt} search, blew up")
+        a.plot([8.935617e-3] * 2, sr["stage1"][opt], "*", color=col[opt], label=f"{opt} stage 1, two seeds")
+        ax2 = c if opt == "Muon" else d
+        ax2.plot([r["hp2"] for r in ok], [r["val_loss_no_reg"] for r in ok], "o", color=col[opt], label=f"{opt} search")
+        ax2.plot([r["hp2"] for r in bu], [r["val_loss_no_reg"] for r in bu], "o", mfc="none", color=col[opt],
+                 label=f"{opt} search, blew up")
+        ax2.plot([0.1 if opt == "Muon" else 4.96e-7] * 2, sr["stage1"][opt], "*", color=col[opt],
+                 label=f"{opt} stage 1, two seeds")
+        best = {t["hp_idx"]: t for t in S[opt]["trials"]}[sr[opt]["best"]["hp_idx"]]
+        b.plot(best["validate_every"] * (np.arange(len(best["val_curve"])) + 1), best["val_curve"], color=col[opt],
+               label=f"{opt} search best")
+        p = pre[RUNS[(opt, 42)]]
+        b.plot(p["validate_every"] * (np.arange(len(p["val_curve"])) + 1), p["val_curve"], color=col[opt], ls="--",
+               label=f"{opt} stage 1, seed 42")
+    from matplotlib.ticker import NullFormatter
+    a.set_xscale("log"); a.xaxis.set_minor_formatter(NullFormatter()); a.set_xticks([3e-3, 1e-2, 3e-2])
+    a.set_xticklabels([r"$3\times10^{-3}$", r"$10^{-2}$", r"$3\times10^{-2}$"])
+    a.set_yscale("log"); a.set_xlabel("learning rate"); a.set_ylabel("val loss (no reg.), best")
+    b.set_yscale("log"); b.set_xlabel("step"); b.set_ylabel("val loss (no reg.)")
+    c.set_xscale("log"); c.set_yscale("log"); c.set_xlabel("Muon decoupled weight decay")
+    c.set_ylabel("val loss (no reg.), best")
+    d.set_xscale("log"); d.set_yscale("log"); d.set_xlabel(r"AdamW L2 weight $\lambda$")
+    d.set_ylabel("val loss (no reg.), best")
+    for ax in (a, b, c, d):
+        ps.legend(ax, "upper left")
+        ps.make_room(ax, max_growth=6)
+    ps.save(fig, os.path.join(HERE, "figs", "muon_search"))
+
+
 def main():
     pre = json.load(open(os.path.join(HERE, "data", "muon_pretrain.json")))
     res = {"pretrain": {}, "zero_shot": {}}
@@ -297,8 +388,10 @@ def main():
     res["zero_shot"]["all"] = compare(*(allp[RUNS[k]] for k in (("AdamW", 42), ("AdamW", 43), ("Muon", 42), ("Muon", 43))))
     tab, z0, read, step0_refit = ft_read()
     res["fine_tune"] = ft_compare(tab, z0, read, step0_refit)
+    res["search"] = search_compare(pre)
     json.dump(res, open(os.path.join(HERE, "data", "muon_compare.json"), "w"), indent=1)
     plot(pre, reads)
+    plot_search(res["search"], pre)
     plot_ft(tab, z0)
     for a in AXES + ("all",):
         z = res["zero_shot"][a]
@@ -322,6 +415,15 @@ def main():
     out["ft"]["zs_ratio_median"] = r2(ft["zs_ratio_median"])
     out["ft"]["nlo_scale"] = rr(ft["nlo_signedlog_scale"])
     out["ft"]["zs"] = {k: rr(v) for k, v in ft["cells"].items() if "zero_shot_read" in v}
+    sr = res["search"]
+    out["search"] = {o: {"best": {k: r2(v) if isinstance(v, float) else v for k, v in sr[o]["best"].items()},
+                         "blown_up": len(sr[o]["blown_up"]), "spiked_recovered": len(sr[o]["spiked_recovered"]),
+                         "trials": {f"hp{r['hp_idx']}": {"lr": r2(r["lr"]), "hp2": r2(r["hp2"]),
+                                                         "val": r2(r["val_loss_no_reg"]), "blew_up_at": r["blew_up_at"],
+                                                         "spike_at": r["spike_at"], "best_step": r["best_step"]} for r in sr[o]["trials"]}}
+                     for o in ("AdamW", "Muon")}
+    for k in ("best_ratio", "adamw_best_vs_stage1", "muon_best_vs_stage1", "best_adamw_vs_stage1_muon"):
+        out["search"][k] = r2(sr[k])
     print(json.dumps(out))
 
 
