@@ -1661,7 +1661,7 @@ entries:
   searched: 'D130, D117/D119, D163/D166: none covers adding pp events to catalog_v4; the user asked why any regeneration is
     needed'
   blocks: the pp blend's relabelling and test; the switch's other steps continue
-  checked_until: '2026-10-26T21:27:01+00:00'
+  checked_until: '2026-10-26T21:36:36+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
