@@ -1361,8 +1361,28 @@ entries:
       the investigation, not a width change; no other decision covers a per-process width
     answered_at: '2026-10-26T12:59:00.843000+00:00'
     decision: D154
-  searched: D145 'do 1.4915 for all' chose which nonzero width, not zero; D142 'for the other three, investigate' authorises
-    the investigation, not a width change; no other decision covers a per-process width
+  - ask: 'Your coverage approval included running the short pretrainings again on catalog_v4. catalog_v3''s short-pretraining
+      study has six arms, and with the switch to Muon all six would need a Muon run on both catalogs: about 36 GPU-h at one
+      seed (72 at two), over the 30 GPU-h budget. What is running now is the dimensionless arm only, both catalogs, two seeds
+      (10.6 GPU-h). Do you want the other five arms too, and at one or two seeds? And should the catalogs match in training
+      steps (same compute, my recommendation, what is running) or in epochs (5 each, the study''s rule, so catalog_v4 gets
+      18% fewer steps)?'
+    at: '2026-10-26T14:13:29+00:00'
+    searched: CLAUDE.md canonical setup and A/B protocol; D130 approves the coverage proposal including the short pretrainings
+      again but not their arms under Muon nor their cost; D155/D158 switch to Muon; ground rule 2's 30 GPU-h budget, which
+      the full set exceeds; none names the arms or the horizon
+    blocks: the other five arms and the epochs-versus-steps horizon; the dimensionless arm at equal steps keeps running
+  searched: CLAUDE.md canonical setup and A/B protocol; D130 approves the coverage proposal including the short pretrainings
+    again but not their arms under Muon nor their cost; D155/D158 switch to Muon; ground rule 2's 30 GPU-h budget, which the
+    full set exceeds; none names the arms or the horizon
+  ask: 'Your coverage approval included running the short pretrainings again on catalog_v4. catalog_v3''s short-pretraining
+    study has six arms, and with the switch to Muon all six would need a Muon run on both catalogs: about 36 GPU-h at one
+    seed (72 at two), over the 30 GPU-h budget. What is running now is the dimensionless arm only, both catalogs, two seeds
+    (10.6 GPU-h). Do you want the other five arms too, and at one or two seeds? And should the catalogs match in training
+    steps (same compute, my recommendation, what is running) or in epochs (5 each, the study''s rule, so catalog_v4 gets 18%
+    fewer steps)?'
+  waiting_since: '2026-10-26T14:13:29+00:00'
+  blocks: the other five arms and the epochs-versus-steps horizon; the dimensionless arm at equal steps keeps running
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
