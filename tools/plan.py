@@ -423,12 +423,30 @@ def subagent(agent_id):
     return out
 
 
+def working_steps(st, eid, t):
+    """(started, last record) of each recorded step agent of the entry that has not handed back and wrote to its
+    transcript within STEP_MIN of t."""
+    out = []
+    for x in (st.get(eid) or {}).get("steps") or []:
+        a = None if step_problem(st, eid, x) else subagent_activity(x.get("agent"))
+        if a and not a[1] and 0 <= (t - a[0]).total_seconds() / 60 <= STEP_MIN:
+            out.append((parse(x.get("at")), a[0]))
+    return out
+
+
 def step_working(st, eid, t):
     """A recorded step agent of the entry has not handed back and wrote to its transcript within STEP_MIN of t: the
     entry's open events are its to ack."""
-    acts = [a for a in (subagent_activity(x.get("agent")) for x in (st.get(eid) or {}).get("steps") or []
-                        if not step_problem(st, eid, x)) if a]
-    return any(not handed and 0 <= (t - last).total_seconds() / 60 <= STEP_MIN for last, handed in acts)
+    return bool(working_steps(st, eid, t))
+
+
+def run_submitted(ids):
+    """{id: submitted (epoch)} of these runs in the registry."""
+    c = db()
+    if c is None or not ids:
+        return {}
+    return dict(c.execute("SELECT id, submitted FROM runs WHERE project=? AND id IN (%s)" % ",".join("?" * len(ids)),
+                          [PROJECT] + list(ids)).fetchall())
 
 
 def subagent_activity(agent_id):
@@ -529,6 +547,17 @@ def why_moves(e, st, msgs, t, d=None, checks=None):
     if s == "running":
         rows = runs_of(e, st)
         ended = [(r, fin) for r, state, fin in rows if terminal(state) and fin and (not ls or fin > ls.timestamp())]
+        # an ended run a working step agent owns is its to handle: one it submitted (after its step started) or one
+        # that ended before its last transcript record; once it hands back, the run is listed again (it ended after
+        # the step started, so after `ls`). Hidden only when every ended run is owned: when one is not, the reason
+        # lists them all, owned ones included, since the step it starts moves `ls` past every one of them
+        work = working_steps(st, e["id"], t) if ended else []
+        if work:
+            sub = run_submitted([r for r, _ in ended])
+            owned = lambda r, fin: any((sub.get(r) or 0) >= s0.timestamp() or fin <= last.timestamp()
+                                       for s0, last in work)
+            if all(owned(r, fin) for r, fin in ended):
+                return None
         if ended:
             return "runs ended: " + ", ".join(r for r, _ in ended), parse(max(f for _, f in ended))
         if any(live(state) for r, state, fin in rows):

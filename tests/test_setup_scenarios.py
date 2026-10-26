@@ -217,6 +217,47 @@ def liveness():
     scenario("B1: a subagent started before the run ended is refused", rc != 0 and "before the reason" in out, out)
     rc, out = w.plan_cmd("step", "pp", "--agent", "a1good")
     scenario("B1: a subagent started after it is recorded and clears the step", rc == 0 and w.check()[0] == 0, out)
+    # a working step agent owns the runs it submitted and the runs that ended before its last record; after its
+    # handback they are listed again
+    r1 = [("FA-ccin2p3-r1", "COMPLETED", "pp", epoch(90), epoch(5))]
+    w = World([E("pp")], runs=r1, state={"pp": step(20, "wk3")}, agents=[("wk3", ago(20), "pp", [(ago(2), "work")])])
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("next")
+    scenario("a run that ended while the step agent kept working is its to handle: not listed",
+             rc == 0 and "runs ended" not in err and rc2 == 0 and "runs ended" not in out2, err + out2)
+    w = World([E("pp")], runs=[("FA-ccin2p3-r1", "COMPLETED", "pp", epoch(15), epoch(5))],
+              state={"pp": step(20, "wk4")}, agents=[("wk4", ago(20), "pp", [(ago(8), "work")])])
+    rc, err = w.check()
+    scenario("a run the working step agent submitted is its to handle, even if it ended after its last record",
+             rc == 0 and "runs ended" not in err, err)
+    w = World([E("pp")], runs=r1 + [("FA-ccin2p3-r2", "FAILED", "pp", epoch(90), epoch(3))],
+              state={"pp": step(20, "wk5")}, agents=[("wk5", ago(20), "pp", [(ago(4), "work")])])
+    rc, err = w.check()
+    scenario("with a working step agent and one run it does not own, every ended run is listed",
+             rc == 2 and "runs ended: FA-ccin2p3-r1, FA-ccin2p3-r2" in err, err)
+    # the step started for that reason moves the entry's last step past both runs: the owned one must reach it too,
+    # so it is not lost when the working agent hands back
+    w = World([E("pp")], runs=r1 + [("FA-ccin2p3-r2", "FAILED", "pp", epoch(90), epoch(3))],
+              state={"pp": step(20, "wkA")}, agents=[("wkA", ago(20), "pp", [(ago(4), "work")]), ("wkB", ago(1), "pp")])
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("step", "pp", "--agent", "wkB")
+    reason = [x.get("reason") for x in json.load(open(w.state))["pp"]["steps"] if x["agent"] == "wkB"]
+    with open(os.path.join(w.ag, "agent-wkA.jsonl"), "a") as f:          # A hands back after B is recorded
+        f.write(J({"type": "assistant", "timestamp": ago(0), "message": {"role": "assistant", "content": [
+            {"type": "tool_use", "id": "tu2", "name": "SubagentHandback", "input": {"message": "report"}}]}}) + "\n")
+        f.write(J({"type": "user", "timestamp": ago(0), "message": {"role": "user", "content": [
+            {"type": "tool_result", "tool_use_id": "tu2", "content": "ok"}]}}) + "\n")
+    rc3, err3 = w.check()
+    scenario("A owns r1, r2 is not: both listed, B's recorded reason names r1, and after A hands back B is in flight",
+             rc == 2 and "runs ended: FA-ccin2p3-r1, FA-ccin2p3-r2" in err and rc2 == 0
+             and reason == ["runs ended: FA-ccin2p3-r1, FA-ccin2p3-r2"] and rc3 == 0, err + out2 + str(reason) + err3)
+    w = World([E("pp")], runs=r1, state={"pp": step(20, "hb3")},
+              agents=[("hb3", ago(20), "pp", [(ago(2), "work"), (ago(1), "handback")])])
+    rc, err = w.check()
+    rc2, out2 = w.plan_cmd("next", "--prompts")
+    scenario("once it hands back, the run that ended during its step is listed",
+             rc == 2 and "runs ended: FA-ccin2p3-r1" in err and rc2 == 1
+             and "Why you were started: runs ended: FA-ccin2p3-r1" in out2, err + out2)
     w = World([E("lowd")], state={"lowd": step(50)}, agents=[("a2early", ago(40), "lowd")])
     rc, out = w.plan_cmd("step", "lowd", "--agent", "a2early")
     scenario("B1: nothing in flight since 20 min ago: a subagent started 40 min ago is refused", rc != 0, out)
