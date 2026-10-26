@@ -58,6 +58,22 @@ PAIRS = {"sd_base": (("baseline",), ("baseline_seed2",)),
          "rerun": (("baseline_more_signed_seed2",), ("baseline_more_signed_seed2_steplog",))}
 
 
+# The pair sign head test at the sign head search's best HPs (plan v3_prep_explore, the design passed 2026-10-26; the
+# user's "Yes, run that test."): the more-signed-pools arm with Muon (decoupled weight decay 0.0217), lr 1.246e-2,
+# warmup 0.081, pair head on (width 16, hidden 16, unbounded) against off, seeds 42 and 43
+# (scripts/job_catalog_v3_short.sh arms sign_pair_best[_seed2], sign_off_best[_seed2]); beside, the Muon baseline at its
+# own HPs (lr 5e-3, warmup 0.158, seed 42) and the search's best trial (trial_0177, the pair head at the same HPs and
+# seed 42). Decision statistic: per pool the seed mean of each arm, the count of pools where the pair arm is lower
+# (ties excluded), one-sided sign test; the median secondary; seed 43 alone stated.
+PB_ARMS = {"pair": ("sign_pair_best", "sign_pair_best_seed2"), "off": ("sign_off_best", "sign_off_best_seed2")}
+PB_REFS = {"muon": "baseline_more_signed_muon", "search": "sign_search_best"}
+# the design's outcome rule: yes needs the pair arm lower on at least PB_YES of the pools, the seed-mean median lower,
+# and the same direction at seed 43 alone
+PB_YES = 13
+# a blow-up: a validation over BLOWUP_FACTOR times its running minimum (pair_head_blowup.py's rule, the same factor)
+BLOWUP_FACTOR = 10
+
+
 def load_raw():
     rows = []
     for l in open(os.path.join(HERE, "data", "prep_signed_raw.txt")):
@@ -184,6 +200,120 @@ def seed_spread(h5all, n_axis, flat, out, sr):
               f"(above on {o['n_probes_worse']}) " + " ".join(f"{a}:{r:.2f}" for a, r in ax.items()))
 
 
+def train_curve(arm):
+    """from the run's training log (data/short_reads/<arm>/train.log, the out_0.log lines copied home): the validation
+    curve (val_loss_no_reg every `every` steps, the last at the last step), the best and its step, the first
+    validation over BLOWUP_FACTOR times the running minimum (the blow-up) with the one before, the steps skipped for a
+    non-finite gradient norm, the final validation"""
+    import re
+    t = open(os.path.join(HERE, "data", "short_reads", arm, "train.log")).read()
+    every = int(re.search(r"validating every (\d+) steps", t).group(1))
+    iters = int(re.search(r"Starting to train for (\d+) iterations", t).group(1))
+    v = [float(x) for x in re.findall(r"Val loss \(combined\).*?val_loss_no_reg: ([0-9.eE+-]+)", t)]
+    steps = [min(every * (i + 1), iters) for i in range(len(v))]
+    i = int(np.argmin(v))
+    j = next((k for k in range(1, len(v)) if v[k] > BLOWUP_FACTOR * min(v[:k])), None)
+    o = {"best": v[i], "best_step": steps[i], "final": v[-1], "n_skipped": t.count("Skipping update, non-finite"),
+         "steps": steps, "vals": v, "iters": iters}
+    if j is not None:
+        o.update({"blow_step": steps[j], "blow_step_before": steps[j - 1], "blow_val": v[j], "blow_val_before": v[j - 1]})
+    return o
+
+
+def sign_test(k, n):
+    """one-sided sign test: P(at least k of n lower) under no effect"""
+    from math import comb
+    return sum(comb(n, i) for i in range(k, n + 1)) / 2 ** n if n else None
+
+
+def pair_best(h5all, n_axis, flat, out):
+    """The pair sign head test (PB_ARMS) scored under its passed design, on the held-out one-loop pools every run reads
+    as sign-changing: per run the median wrong-sign share; per arm the seed mean per pool and its median; the count of
+    pools where the pair arm is lower and higher (ties excluded) with the one-sided sign test, on the seed means, at
+    seed 43 alone and at seed 42 alone; each arm's seed means against the Muon baseline at its own HPs; the zero-shot
+    MSE per probe on every held-out axis (pair over off on the two seeds' geometric mean per probe, and each arm over
+    the Muon baseline); the runs' training curves and blow-ups; and the outcome by the design's rule."""
+    from short_reads import READ, read
+    runs = PB_ARMS["pair"] + PB_ARMS["off"] + tuple(PB_REFS.values())
+    w = {a: arm_signs(a) for a in runs}
+    pools = sorted(set.intersection(*[set(x) for x in w.values()]) & set(h5all))
+    o = {"n_pools": len(pools), "runs": {}, "curves": {a: train_curve(a) for a in runs if a != PB_REFS["search"]}}
+    for a in runs:
+        o["runs"][a] = {"wrong": med([w[a][p] for p in pools]), "axis": sum(w[a][p] for p in pools) / n_axis,
+                        "per_pool": {p: w[a][p] for p in pools}}
+    mean = {k: {p: float(np.mean([w[a][p] for a in arms])) for p in pools} for k, arms in PB_ARMS.items()}
+    mean["muon"] = {p: w[PB_REFS["muon"]][p] for p in pools}
+
+    def count(y, x, tag):
+        lo = int(sum(y[p] < x[p] for p in pools)); hi = int(sum(y[p] > x[p] for p in pools))
+        r = {"lower": lo, "higher": hi, "ties": len(pools) - lo - hi, "p": sign_test(lo, lo + hi),
+             "med_y": med([y[p] for p in pools]), "med_x": med([x[p] for p in pools])}
+        o[tag] = r
+        flat.update({f"pb_{tag}_lower": lo, f"pb_{tag}_higher": hi, f"pb_{tag}_ties": r["ties"],
+                     f"pb_{tag}_p": round(r["p"], 3), f"pb_{tag}_med_y": round(100 * r["med_y"], 1),
+                     f"pb_{tag}_med_x": round(100 * r["med_x"], 1)})
+        return r
+    m = count(mean["pair"], mean["off"], "mean")
+    s43 = count(w[PB_ARMS["pair"][1]], w[PB_ARMS["off"][1]], "s43")
+    count(w[PB_ARMS["pair"][0]], w[PB_ARMS["off"][0]], "s42")
+    count(mean["pair"], mean["muon"], "pair_muon")
+    count(mean["off"], mean["muon"], "off_muon")
+    count(w[PB_ARMS["pair"][0]], w[PB_REFS["search"]], "rerun42")      # seed 42's pair run against the search's trial
+    # the only full-length pair: the search's trial (pair head on, clean) against the control at seed 42 (clean)
+    count(w[PB_REFS["search"]], w[PB_ARMS["off"][0]], "clean42")
+    # the outcome by the design's rule
+    blew = {a: "blow_step" in o["curves"][a] for a in PB_ARMS["pair"] + PB_ARMS["off"]}
+    off_only = any(blew[a] and not blew[b] for a, b in zip(PB_ARMS["off"], PB_ARMS["pair"]))
+    if m["lower"] >= PB_YES and m["p"] < 0.05 and m["med_y"] < m["med_x"] and s43["lower"] > s43["higher"] and not off_only:
+        outcome = "yes"
+    elif m["lower"] <= m["higher"]:
+        outcome = "no"
+    else:
+        outcome = "inconclusive"
+    o["outcome"] = outcome
+    o["blew_up"] = blew
+    flat["pb_outcome"] = outcome
+    flat["pb_n_pools"] = len(pools)
+    for a in runs:
+        flat[f"pb_{a}_wrong"] = round(100 * o["runs"][a]["wrong"], 1)
+        flat[f"pb_{a}_axis"] = round(100 * o["runs"][a]["axis"], 1)
+    for a, c in o["curves"].items():
+        flat.update({f"pb_{a}_best": float(f"{c['best']:.3g}"), f"pb_{a}_best_step": c["best_step"],
+                     f"pb_{a}_final": float(f"{c['final']:.3g}"), f"pb_{a}_skipped": c["n_skipped"]})
+        if "blow_step" in c:
+            flat.update({f"pb_{a}_blow_step": c["blow_step"], f"pb_{a}_blow_step_before": c["blow_step_before"],
+                         f"pb_{a}_blow_val": float(f"{c['blow_val']:.3g}"),
+                         f"pb_{a}_blow_val_before": float(f"{c['blow_val_before']:.3g}")})
+    # the zero-shot MSE per probe on every held-out axis
+    mse = {a: {ax: read(a, ax) for ax in READ} for a in runs}
+
+    def gm(arms):
+        return {ax: {p: float(np.exp(np.mean([np.log(mse[a][ax][p]["mse"]) for a in arms])))
+                     for p in set.intersection(*[set(mse[a][ax]) for a in arms])
+                     if all(mse[a][ax][p]["mse"] > 0 for a in arms)} for ax in READ}
+    g = {k: gm(arms) for k, arms in PB_ARMS.items()}
+    g["muon"] = gm((PB_REFS["muon"],))
+    g["s43_pair"] = gm((PB_ARMS["pair"][1],)); g["s43_off"] = gm((PB_ARMS["off"][1],))
+    for tag, (y, x) in {"mse_mean": ("pair", "off"), "mse_s43": ("s43_pair", "s43_off"),
+                        "mse_pair_muon": ("pair", "muon"), "mse_off_muon": ("off", "muon")}.items():
+        rat, ax_ = [], {}
+        for ax in READ:
+            rr = [g[y][ax][p] / g[x][ax][p] for p in sorted(set(g[y][ax]) & set(g[x][ax]))]
+            rat += rr
+            ax_[ax] = med(rr)
+        o[tag] = {"ratio": med(rat), "n": len(rat), "above": int(sum(r > 1 for r in rat)), "axes": ax_}
+        flat.update({f"pb_{tag}_ratio": round(med(rat), 2), f"pb_{tag}_n": len(rat),
+                     f"pb_{tag}_above": o[tag]["above"]})
+    out["pair_best"] = o
+    print("pair_best", json.dumps({k: v for k, v in o.items() if k not in ("runs", "curves")}))
+    for a in runs:
+        c = o["curves"].get(a, {})
+        print(f"  {a:28s} median {100 * o['runs'][a]['wrong']:.2f}% axis {100 * o['runs'][a]['axis']:.2f}% "
+              + (f"best {c['best']:.3g}@{c['best_step']} blow {c.get('blow_step')} skipped {c['n_skipped']} "
+                 f"final {c['final']:.3g}" if c else ""))
+    return o
+
+
 def med(v):
     v = [x for x in v if x is not None]
     return float(np.median(v)) if v else None
@@ -274,10 +404,12 @@ def main():
     n_axis = len([r for r in rows if r["set"] == "H5" and "error" not in r])
     sr = sign_arms(h5all, n_axis, flat, out)
     seed_spread(h5all, n_axis, flat, out, sr)
+    pair_best(h5all, n_axis, flat, out)
     json.dump(out, open(os.path.join(HERE, "data", "prep_signed.json"), "w"), indent=1)
     plot(sig, h5, out)
     plot_sign_arms(out, sr)
     plot_seeds(out, sr)
+    plot_pair_best(out)
     # e+e- -> c cbar g at one loop: the pool every arm gets most wrong
     cg = "v3_epem_ccxg_nlo_25-1000GeV"
     wc = [out["arms"][a]["per_pool"][cg] for a in ARMS]
@@ -401,6 +533,39 @@ def plot_seeds(out, sr):
     for ax in axs:
         ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "prep_signed_seeds"))
+
+
+def plot_pair_best(out):
+    """The pair sign head test: (a) per held-out sign-changing one-loop pool, the pair arm's zero-shot wrong-sign share
+    against the control's (pair head off), on the two seeds' mean and at seed 43 alone; (b) the four runs' and the Muon
+    baseline's validation loss without regularisation against step."""
+    import plot_style as ps
+    o = out["pair_best"]
+    fig, axs = ps.figure(ncols=2)
+    R = o["runs"]
+    pools = sorted(R[PB_ARMS["pair"][0]]["per_pool"])
+    mp = [100 * np.mean([R[a]["per_pool"][p] for a in PB_ARMS["pair"]]) for p in pools]
+    mo = [100 * np.mean([R[a]["per_pool"][p] for a in PB_ARMS["off"]]) for p in pools]
+    axs[0].plot(mo, mp, "o", mfc="none", color=ps.C.blue, label="mean of seeds 42, 43")
+    axs[0].plot([100 * R[PB_ARMS["off"][1]]["per_pool"][p] for p in pools],
+                [100 * R[PB_ARMS["pair"][1]]["per_pool"][p] for p in pools], "^", mfc="none", color=ps.C.vermillion,
+                label="seed 43")
+    hi = max(mp + mo) * 1.05
+    axs[0].plot([0, hi], [0, hi], ls="--", color=ps.C.grey, label="equal")
+    axs[0].set_xlabel("wrong sign, pair head off (%)"); axs[0].set_ylabel("wrong sign, pair head on (%)")
+    ps.legend(axs[0], "upper left")
+    sty = ((PB_ARMS["pair"][0], ps.C.vermillion, "-", "on, seed 42"), (PB_ARMS["pair"][1], ps.C.vermillion, "--", "on, seed 43"),
+           (PB_ARMS["off"][0], ps.C.blue, "-", "off, seed 42"), (PB_ARMS["off"][1], ps.C.blue, "--", "off, seed 43"),
+           (PB_REFS["muon"], ps.C.grey, ":", "Muon baseline"))
+    for a, col, ls, lab in sty:
+        c = o["curves"][a]
+        axs[1].plot(c["steps"], c["vals"], color=col, ls=ls, label=lab)
+    axs[1].set_yscale("log")
+    axs[1].set_xlabel("step"); axs[1].set_ylabel("validation loss, no regularisation")
+    ps.legend(axs[1], "upper right", ncol=2)
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "prep_signed_pair_best"))
 
 
 if __name__ == "__main__":
