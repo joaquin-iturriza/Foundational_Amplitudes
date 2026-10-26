@@ -1483,6 +1483,133 @@ $10$\,TeV probes. One seed each.}
 \label{fig:v3_prep_hybrid}
 \end{figure}
 
+% allow: 0.25 0.5 0 1 because they are the blend weights lambda, settings
+% allow: N-4 4 because it is the reference multiplicity in the target, a definition
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% claim: n_probes=617
+\paragraph{Blending the hybrid with the emission scales (2026-10-26).} The hybrid target plus $\lambda$ times the
+per-event emission-scale term less its process mean, $\lambda\,[L_q-(N-4)\log\hat s-c_p]$
+(\code{physics\_scales.hybrid\_blend}, \code{data.target\_physics\_hybrid\_blend}): $\lambda=0$ is the hybrid,
+$\lambda=1$ the emission scales' target. The added term has zero mean over the process's own training events, so the
+class mean stays the emission scales' at every $\lambda$, and $\lambda$ sets only how much of the per-event $L_q$ the
+network is asked to carry. Two more arms of the short pretraining, $\lambda=0.25$ and $0.5$, with the same inputs,
+orders, setup and HPs as the other arms, one seed each (approved, the user 2026-10-25: ``Yes, run those two
+pretrainings blending emission scales''; runs FA-ccin2p3-6d35589c and FA-ccin2p3-0bddbf48, code \code{cdcfaf5}), read
+zero-shot on every axis, all $617$ probes (\code{analysis/catalog\_v3/prep\_blend.py}, \code{data/prep\_blend.json},
+Fig.~\ref{fig:v3_prep_blend}). Medians over each axis's processes, listed at $\lambda=0$, $0.25$, $0.5$, $1$; the
+per-probe ratios are the median over probes of a blend's value over the hybrid's:
+\begin{itemize}
+  \item \emph{The per-event term costs shape on every axis.} At $\lambda=0.25$ the shape is $1.05$ to $1.26$ of the
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% allow: 0.25 0.5 because they are the blend weights lambda, settings
+% claim: H3_b25_hyb_shape=1.05
+% claim: H2p5_b25_hyb_shape=1.26
+% claim: H3_b50_hyb_shape=1.10
+% claim: H6_b50_hyb_shape=1.62
+    hybrid's per probe, at $0.5$ $1.10$ to $1.62$, as the shape proxy on the pools said it would (par.\ The shape proxy on catalog\_v3).
+  \item \emph{It buys level everywhere but at $\alpha_s=0.13$.} At $\lambda=0.25$ the level is $0.43$ ($2\to5$) to
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% allow: 0.25 0.5 because they are the blend weights lambda, settings
+% claim: H2p5_b25_hyb_level=0.43
+% claim: H3_b25_hyb_level=0.85
+% claim: H6_hyb_level=0.0015
+% claim: H6_b25_hyb_level=8.08
+% claim: H2p5_hyb_level=0.446
+% claim: H2p5_b25_level=0.256
+% claim: H2p5_b50_level=0.185
+% claim: H2p5_qperp_level=0.101
+% claim: H7c_hyb_level=0.0743
+% claim: H7c_b25_level=0.0507
+% claim: H7c_b50_level=0.0244
+% claim: H7c_qperp_level=0.0114
+% allow: 0.13 because it is the held-out coupling value, a setting
+% allow: 30 because it is the pT threshold of the axis in GeV, a setting
+    $0.85$ (the top) of the hybrid's per probe; at $\alpha_s=0.13$, where the hybrid's level is $0.0015$, it is
+    $8.08$ times that. At $2\to5$ the level falls steadily toward the emission scales', $0.446$, $0.256$, $0.185$,
+    $0.101$, and at $p_T\geq30$\,GeV $0.0743$, $0.0507$, $0.0244$, $0.0114$.
+  \item \emph{Inside the catalog's range the hybrid stays best.} The MSE rises with $\lambda$: new combinations
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% claim: H1_hyb_mse=0.605
+% claim: H1_b25_mse=0.66
+% claim: H1_b50_mse=0.773
+% claim: H1_qperp_mse=0.843
+% claim: H2_hyb_mse=0.82
+% claim: H2_b25_mse=0.902
+% claim: H2_b50_mse=0.997
+% claim: H2_qperp_mse=1.04
+% claim: H6_hyb_mse=0.0581
+% claim: H6_b25_mse=0.0649
+% claim: H6_b50_mse=0.112
+% claim: H6_qperp_mse=0.135
+% claim: H5_hyb_mse=0.926
+% claim: H5_b25_mse=0.929
+% claim: H5_b50_mse=0.971
+% claim: H5_qperp_mse=1.12
+% allow: 0.13 because it is the held-out coupling value, a setting
+    $0.605$, $0.66$, $0.773$, $0.843$; $2\to4$ $0.82$, $0.902$, $0.997$, $1.04$; $\alpha_s=0.13$ $0.0581$, $0.0649$,
+    $0.112$, $0.135$; one loop $0.926$, $0.929$, $0.971$, $1.12$.
+  \item \emph{Outside it, $\lambda=0.25$ gains a little where the hybrid lost.} At $1$ to $10$\,TeV its MSE is $2.01$
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% allow: 0.25 0.5 because they are the blend weights lambda, settings
+% claim: H7E_b25_mse=2.01
+% claim: H7E_hyb_mse=2.31
+% claim: H7E_qperp_mse=2.88
+% claim: H7E_b25_hyb_mse=0.86
+% claim: H7E_b25_hyb_better=26
+% claim: H7E_n=40
+% claim: H3_b25_mse=1.84
+% claim: H3_hyb_mse=1.94
+% claim: H3_qperp_mse=1.67
+% claim: H3_b25_hyb_better=130
+% claim: H3_n=237
+% claim: H7c_b25_mse=0.361
+% claim: H7c_hyb_mse=0.366
+% claim: H2p5_hyb_mse=1.20
+% claim: H2p5_b25_mse=1.24
+% claim: H2p5_b50_mse=1.12
+% claim: H2p5_qperp_mse=1.21
+% claim: H2p5_b25_hyb_mse=0.90
+% claim: H2p5_b25_hyb_better=24
+% claim: H2p5_best_mse=1.03
+% claim: H3_best_mse=1.46
+% claim: H7E_best_mse=1.73
+% claim: H7c_best_mse=0.341
+% allow: 1 10 30 because they are the ends of the energy window in TeV and the pT threshold, settings
+    against the hybrid's $2.31$ and the emission scales' $2.88$ ($0.86$ of the hybrid's per probe, better on $26$ of
+    the $40$); on the top $1.84$, between the hybrid's $1.94$ and the emission scales' $1.67$ (better than the hybrid
+    on $130$ of the $237$); at $p_T\geq30$\,GeV $0.361$ against $0.366$. At $2\to5$ the level it buys is paid back in
+    shape: $1.20$, $1.24$, $1.12$, $1.21$, though $0.90$ of the hybrid's per probe at $\lambda=0.25$ (better on $24$ of
+    the $40$). None of the blends overtakes the best of the other arms there: the context vector's on $2\to5$ ($1.03$)
+    and the top ($1.46$), $\hat s$ alone's at $1$ to $10$\,TeV ($1.73$) and $p_T\geq30$\,GeV ($0.341$).
+  \item \emph{Signs.} On the $17$ one-loop pools that change sign the median wrong-sign fraction is $10\%$, $9\%$,
+% src: python3 analysis/catalog_v3/prep_blend.py @44d24f4
+% claim: wrong_sign_hyb=10
+% claim: wrong_sign_b25=9
+% claim: wrong_sign_b50=21
+% claim: wrong_sign_qperp=18
+% allow: 17 because it is the count of sign-changing one-loop pools, stated in the hybrid paragraph
+    $21\%$, $18\%$.
+\end{itemize}
+% allow: 0.25 0.5 0 because they are the blend weights lambda, settings
+% allow: 0.13 because it is the held-out coupling value, a setting
+So the per-event emission-scale term trades shape for level at every weight tried, and the trade nets a gain only
+outside the catalog's range, at $\lambda=0.25$ and by tens of percent at most; $\lambda=0.5$ is no better than
+$0.25$ on any axis but $2\to5$. On new combinations, $2\to4$, $\alpha_s=0.13$ and one loop the hybrid ($\lambda=0$) is
+still the best of the four weights, and on the first three the best of the eight arms. One seed
+each arm, so differences of a few tens of percent are within what a second seed could move (not measured).
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_blend.pdf}
+% allow: ^2
+% allow: 0 because it is a blend weight lambda, a setting
+% allow: 1 10 30 because they are the ends of the energy window in TeV and the pT threshold, settings
+% allow: 0.13 because it is the held-out coupling value, a setting
+\caption{catalog\_v3's short pretrainings with the hybrid target plus $\lambda$ times the per-event emission-scale term
+less its process mean ($\lambda=0$ the hybrid, $1$ the emission scales), per held-out axis: (a) the median level and
+(b) the median shape of the zero-shot error on $\log|\mathcal M|^2$, each over the hybrid's. One seed each.}
+\label{fig:v3_prep_blend}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
@@ -8368,9 +8495,8 @@ of the three share a test set.
     the smaller fixes, no to the decayed final states''; 2026-10-26 ``Yes, okay, that's fine, go ahead.'' for the
     $6$\,TeV range with the energy hold-out at $6$ to $20$\,TeV; ``Drop the b to higgs events.''), eight CPU parts that
     all failed at the first one-loop entry (\code{tools/nlo\_virtual\_pipeline.py}), a step agent diagnosing them and
-    resubmitting only what is missing; the two blended-target short pretrainings (the hybrid target plus $0.5$ and
-    $0.25$ of the emission-scale term minus its process mean; approved 2026-10-25 ``Yes, run those two pretrainings
-    blending emission scales''). After the regeneration: check every pool, the classes and roles on catalog\_v4, the
+    resubmitting only what is missing. The two blended-target short pretrainings are read (par.\ Blending the hybrid
+    with the emission scales). After the regeneration: check every pool, the classes and roles on catalog\_v4, the
     massless $b$ in \code{particle\_ids.py}, then catalog\_v4's short pretrainings (GPU estimate to the user). Storage
     on CC (approved 2026-10-25 ``About the storage, yes to 1, 2 under 5 h, keep the tars.''): the MadGraph events
     directories and the concluded studies' model files under $5$\,h deleted from a committed manifest
