@@ -2277,10 +2277,12 @@ dashed, the clipping bound; dotted, the end of warmup. (b) The bounded head's le
 loss per step, each over its median in the reference window (steps $510$ to $595$); vertical lines, the steps the text
 names.}\label{fig:v3_pair_head_steps}
 \end{figure}
-  \item \emph{Searched together with the learning rate under Muon, neither sign knob shows in the training objective; the
-    rate decides it.} The question, from the bounded head's read above: does the pair sign head or the near-zero
+  \item \emph{Searched together with the learning rate under Muon, neither sign knob shows in the training objective nor
+    in the training pools' validation signs; the best trial beats the Muon baseline held out, but at a higher rate that
+    cannot be told from its pair head.} The question, from the bounded head's read above: does the pair sign head or the near-zero
     weighting help once its own sizes and the learning rate are searched together? The design
-    (\code{sweep/sweep\_config\_ccin2p3\_sign\_head\_search.yaml}, the user's call of 2026-10-26): a single-fidelity
+    (\code{sweep/sweep\_config\_ccin2p3\_sign\_head\_search.yaml}; open: no decision of the user's is behind the
+    design, its ranges, its single seed, its objective or the zero-shot read of its best trial alone): a single-fidelity
     DyHPO search of $20$ trials ($6$ random, then the Gaussian process) at the short pretraining's $4264$ steps, every
     trial the more-signed-pools arm (the baseline target, one shared standardization, $1492$ training pools, seed $42$)
     with Muon at the Muon search's decoupled weight decay $0.0217$ (par.~\ref{par:v3_muon}). Searched: the learning
@@ -2296,7 +2298,7 @@ names.}\label{fig:v3_pair_head_steps}
     on the dimensionless target, not searched here, so the fair comparison is inside the search. One seed each
     (\code{analysis/catalog\_v3/sign\_head\_search.py}, \code{data/sign\_head\_search.json},
     Fig.~\ref{fig:v3_sign_head_search}).
-% src: python3 analysis/catalog_v3/sign_head_search.py @f2db13a5
+% src: python3 analysis/catalog_v3/sign_head_search.py @151979fe
 % claim: n_trials=20
 % claim: n_failed=0
 % claim: n_blowup=4
@@ -2331,6 +2333,51 @@ names.}\label{fig:v3_pair_head_steps}
 % claim: obj_over_mag_min=1.18
 % claim: obj_over_mag_max=1.25
 % claim: mb_obj_over_mag=1.24
+% claim: tv_n_signed=155
+% claim: tv_n_val=200
+% claim: tv_calm_med_ev_min=1
+% claim: tv_calm_med_ev_max=3
+% claim: tv_n_calm_med_1ev=3
+% claim: tv_n_calm_med_2ev=10
+% claim: tv_n_calm_med_3ev=3
+% claim: tv_mb_med_ev=1
+% claim: tv_adamw_med_ev=3
+% claim: tv_calm_worst_min=5.0
+% claim: tv_calm_worst_max=20.5
+% claim: tv_pair_worst=5.0
+% claim: tv_off_worst=6.0
+% claim: tv_both_worst=6.0
+% claim: tv_near_worst=7.5
+% claim: tv_mb_worst=5.5
+% claim: tv_adamw_worst=10.5
+% claim: tv_best_worst=7.5
+% claim: tv_binom_sd=1.6
+% claim: tv_rho_worst_obj=0.71
+% claim: tv_rho_worst_lr=-0.4
+% claim: zs_n_pools=17
+% claim: zs_best_wrong=2.8
+% claim: zs_muon_wrong=3.8
+% claim: zs_adamw_wrong=4.8
+% claim: zs_best_better=12
+% claim: zs_best_worse=3
+% claim: zs_adamw_better=6
+% claim: zs_adamw_worse=10
+% claim: zs_hard1_muon=40.8
+% claim: zs_hard1_best=26.7
+% claim: zs_hard1_adamw=70.5
+% claim: zs_hard2_muon=37.9
+% claim: zs_hard2_best=29.6
+% claim: zs_hard2_adamw=48.8
+% claim: zs_best_n_probes=617
+% claim: zs_best_mse_ratio=0.67
+% claim: zs_best_n_probes_worse=137
+% claim: zs_best_H6_ratio=0.51
+% claim: zs_best_H7c_ratio=0.78
+% claim: zs_best_H7E_ratio=1.3
+% claim: zs_adamw_mse_ratio=2.07
+% claim: zs_adamw_n_probes_worse=482
+% claim: best_lr_over_mb=2.5
+% allow: 1 10 because they are the energy axis's range in TeV, the axis's name
 % allow: 6 4264 1492 42 0.0217 because they are the search's design (random start-up trials, steps, training pools, seed, Muon's weight decay)
 % allow: 1.667 1.5 5 0.05 0.2 because they are the searched ranges and the Muon search's best rate they centre on
 % allow: 0 8 32 64 1 3 10 30 because they are the searched pair and near-zero values
@@ -2352,16 +2399,43 @@ names.}\label{fig:v3_pair_head_steps}
     ($1.24$ for the baseline), so the sign cross-entropy on the training processes' events, whose signs the network
     learns within a pool, adds a near-constant share and the search ranks the trials by their magnitude. So the
     search shows no gain from either knob on what it measures, one seed each, and the pair head's best only at a rate
-    where its unbounded variant mostly blows up; what the knobs do to the held-out signs only the zero-shot read can
-    say. The best trial (the pair head's) is being read zero-shot on every held-out axis against the Muon baseline
-    (run FA-ccin2p3-ef655fd7).
+    where its unbounded variant mostly blows up.
+    Since the objective cannot see the sign, the trials are ranked again by the wrong-sign share on the validation
+    events of the $155$ sign-changing training pools ($200$ events each), training processes only, read at no new
+    compute from the sign accuracy every validation logs, at the best checkpoint
+    (\code{data/sign\_head\_search\_signlog.txt}). The median over pools separates nothing: every trial that did not
+    blow up gets $1$ to $3$ events of $200$ wrong in its median pool ($3$ trials at one event, $10$ at two, $3$ at
+    three), the Muon baseline $1$, the AdamW arm with more sign-changing pools $3$. The worst pool, nearly always the
+    one-loop $u\bar d\to\gamma c\bar s$, is $5.0\%$ to $20.5\%$ wrong over the calm trials; the best of each kind is
+    $5.0\%$ with the pair head, $6.0\%$ with both off, $6.0\%$ with both on, $7.5\%$ with the near-zero weight, against
+    $5.5\%$ for the Muon baseline and $10.5\%$ for the AdamW arm, and the best trial by the objective has $7.5\%$. One
+    pool's share has a binomial spread of $1.6$ points at these values, so the best of every kind and the Muon
+    baseline are within one spread of each other; the worst-pool share follows the overall fit (rank correlation
+    $0.71$ with the objective over the calm trials, $-0.4$ with the rate), not a knob. On the training processes'
+    signs neither knob wins.
+    The best trial read zero-shot on every held-out axis (run FA-ccin2p3-ef655fd7, the short pretraining's read in
+    eval mode), against the Muon baseline's and the AdamW arm's reads, scored as \code{prep\_signed.py} scores them:
+    on the $17$ held-out one-loop pools that all three read as sign-changing, its median wrong-sign share is $2.8\%$,
+    the Muon baseline's $3.8\%$ and the AdamW arm's $4.8\%$. It gets $12$ pools less wrong than the Muon baseline and
+    $3$ more (the AdamW arm $6$ and $10$), and the gain is in the two pools the baseline gets most wrong: the one-loop
+    $e^+e^-\to c\bar c g$, $40.8\%$ to $26.7\%$ (AdamW $70.5\%$), and $d\bar d\to\gamma g$, $37.9\%$ to $29.6\%$
+    (AdamW $48.8\%$). Its zero-shot MSE over the $617$ held-out probes all three read is a median $0.67$ of the Muon
+    baseline's per probe, above it on $137$; per axis $0.51$ to $0.78$, except the $1$ to $10$ TeV energy axis at
+    $1.3$. The AdamW arm is at $2.07$, above on $482$. So the best trial is better than the Muon baseline held out, on
+    the sign and on the magnitude, but it differs from it twice at once: the pair head, and a rate $2.5$ times the
+    baseline's with a shorter warmup, at which its training magnitude loss is already $0.87$ of the baseline's; and on
+    the training pools' validation signs, where a sign knob would show first, it is not separated from the knobs-off
+    trials. With one seed and no knobs-off trial at its rate, the held-out gain cannot be given to the pair head. The
+    test that can: the Muon baseline, both knobs off, at the best trial's rate and warmup, read zero-shot the same way.
 \begin{figure}[t]\centering
 \includegraphics{../analysis/catalog_v3/figs/sign_head_search.pdf}
 \caption{The sign head search on catalog\_v3: $20$ short pretrainings with Muon, one seed each, by which sign knob is
 on; hollow, the trials that blew up (read at their best checkpoint); star, the Muon baseline (both knobs off, not a
 trial of the search). (a) The objective (magnitude MSE plus the sign cross-entropy on the training processes'
 validation events) against the learning rate. (b) The objective over the magnitude loss against the learning
-rate.}\label{fig:v3_sign_head_search}
+rate. (c) The wrong-sign share on the worst sign-changing training pool's validation events at the best checkpoint,
+against the learning rate. (d) Per held-out sign-changing one-loop pool, the zero-shot wrong-sign share of the best
+trial (the pair head's) and of the AdamW arm against the Muon baseline's; the line is equality.}\label{fig:v3_sign_head_search}
 \end{figure}
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
@@ -9972,16 +10046,9 @@ of the three share a test set.
     \code{plan next}); this item only summarises it. Running on CC-IN2P3: catalog\_v4 against catalog\_v3, the
     dimensionless arm only with Muon at its search best, two seeds each, equal steps (4264; the user: ``Match steps.'',
     ``only the winner''), with the cross reads on the 555 probes held out in both catalogs and the 13 TeV pp pools
-    (smoke passed; trainings running, the catalog\_v3 seed-42 rerun and the cross read pending); the sign-head search
-    (20 trials, Muon, objective the total validation loss on training processes; its plain Muon baseline running;
-    the collect step compares best heads-off against best heads-on inside the search and states the agent-chosen
-    ranges); the Muon fine-tune search (12 trials, lr scale and layer decay, from the stage-1 Muon parent keeping its
-    standardization). Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop
+    (smoke passed; trainings running, the catalog\_v3 seed-42 rerun and the cross read pending). Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop
     $b\bar b\to hW^+W^-$ only; no second seeds for the old sign arms; the 18 contaminated fine-tunes not rerun.
-    Done today: the Muon test (closed), the fine-tune weight-average bug (fixed, audited, written up), catalog\_v4
-    (complete: stage 5 built, audits clean, classes and roles its own, massless $b$ in the particle table, coupling
-    orders read from the diagrams for target and features; mixed-order entries divided by their highest
-    $\alpha_s$ power). Next: read the catalog comparison and decide the switch with the user; then the held
+    Next: read the catalog comparison and decide the switch with the user; then the held
     Daniel's-catalog studies adapted to the chosen catalog. Disk on CC at 90\%: the user is asked what to free.
     % allow: 16 00 2 42 1 4264 555 13 20 12 5 90 18 4 because they are a clock time, seed and trial counts, the step horizon, the probe and pool counts, the disk share and the stage number, settings and counts named in the plan, not results
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
