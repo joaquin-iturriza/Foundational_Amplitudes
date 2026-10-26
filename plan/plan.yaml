@@ -1364,7 +1364,7 @@ entries:
     - FA-ccin2p3-ee733aa9
     - FA-ccin2p3-f620ed40
     - FA-ccin2p3-fe864fda
-    commit: cbe55d39
+    commit: a7f294f4
     paths:
     - analysis/catalog_v3/data/muon_compare.json
     - analysis/catalog_v3/data/muon_ft.json
@@ -1373,6 +1373,7 @@ entries:
     - analysis/catalog_v3/figs/muon_compare.png
     - analysis/catalog_v3/figs/muon_ft.png
     - analysis/catalog_v3/figs/muon_search.png
+    - analysis/catalog_v3/figs/muon_search_zs.png
     - analysis/transfer/data/ema_start_audit.json
     - analysis/transfer/ema_start_audit.py
     - docs/results.tex
