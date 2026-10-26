@@ -12,8 +12,9 @@ dless + (N - 4) log s_hat; qperp + the emission scales; soft, the same with tau 
 level moves under each reweighting in units of the pool's std (shift_<w>), and the std's ratio (sd_<w>).
 Network part, per held-out probe and short arm (scripts/job_catalog_v3_short.sh; its saved predictions
 $SCRATCH/zz_v3_short_<arm>/<axis>/<probe>.npz, truth t and prediction q of log|M|^2 on the first 2000 validation events):
-the zero-shot MSE, level and shape under uniform, flat and low weights on those events. align = the median
-abs(t - logF - log abs(M)^2) over the pool's first events off the floor (t is log(|M|^2 F), logF saved beside it); an arm
+the zero-shot MSE, level and shape under uniform, flat and low weights on those events (the read shuffles them; each is
+matched to its pool event by sorting both on log|M|^2). align = the largest abs(t - logF - log abs(M)^2) over the matched
+events off the floor (t is log(|M|^2 F), logF saved beside it); an arm
 whose align exceeds ALIGN_TOL (float32 rounding of a log of order 10 is 1e-6) or that saved no prediction reports why
 instead of numbers.
 Sets: the 200 training classes of prep_shape.py (seed 0) and every class of the held-out axes H1 H2 H2p5 H3 H5 H6 H7c H7E.
@@ -108,16 +109,19 @@ def one(args):
                 net[arm] = {"why": "no prediction (q empty)"}
                 continue
             tl = t - z["logF"].astype(np.float64) if len(z["logF"]) == n else t
-            ok = amp[:n] != 0
+            # the read loads the pool's first n events and shuffles them: event k of the saved arrays is pool event
+            # perm[k], found by sorting both on log|M|^2 (ties only among events at the floor)
+            perm = np.empty(n, int); perm[np.argsort(tl, kind="stable")] = np.argsort(la[:n], kind="stable")
+            ok = amp[perm] != 0
             if "at_floor" in z.files and len(z["at_floor"]) == n:
                 ok &= ~z["at_floor"]
-            al = float(np.median(np.abs(tl[ok] - la[:n][ok]))) if ok.any() else np.inf
+            al = float(np.max(np.abs(tl[ok] - la[perm][ok]))) if ok.any() else np.inf
             if not al <= ALIGN_TOL:
                 net[arm] = {"why": "not aligned", "align": r4(al) if np.isfinite(al) else None}
                 continue
             e = q - t
             r = {"align": r4(al)}
-            ww = {"uni": np.full(n, 1 / n), "flat": w_flat(Ls[:n]), "low": w_low(Lm[:n])}
+            ww = {"uni": np.full(n, 1 / n), "flat": w_flat(Ls[perm]), "low": w_low(Lm[perm])}
             for wn, w in ww.items():
                 mse = float(np.sum(w * e ** 2)); lev = float(np.sum(w * e)) ** 2
                 r[wn] = [r4(mse), r4(lev), r4(mse - lev)]
