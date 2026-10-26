@@ -1326,13 +1326,7 @@ entries:
   - D161
   - D162
   - D166
-  next:
-    3: 'catalog_v3''s deletion (D163): manifest written (analysis/catalog_v4/data/catalog_v3_delete_manifest.json @f494c9fe:
-      pools 71.7 GB in 19329 files, 13.9 GB val/test in DATA_DIR and 57.8 GB train cache; nothing running or queued on CC
-      at 22:25). Delete the group ''pools'' only after (a) v3_prep_explore has collected the pair sign head seed-43 runs and
-      written up the sign study, (b) the user has seen the manifest; the pp13 pools stay; backends 16.1 GB, quarantine 5.05
-      GB, the width rebuild''s staging 6.41 GB and diagram sidecars 0.63 GB wait for the user''s call (D163 names only the
-      pools). Re-list (v3_disk_listing.py) right before deleting and refuse any file whose size or mtime changed'
+  next: null
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
