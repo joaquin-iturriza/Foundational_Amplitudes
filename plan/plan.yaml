@@ -113,6 +113,7 @@ entries:
   notes_ref: fig:v3_prep_shape
   evidence:
     runs:
+    - FA-ccin2p3-0a9d3d4c
     - FA-ccin2p3-0bddbf48
     - FA-ccin2p3-161fc56b
     - FA-ccin2p3-1c11d753
@@ -130,7 +131,7 @@ entries:
     - FA-ccin2p3-ecc413f9
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: c1f1a758
+    commit: 43a442e9
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -153,7 +154,9 @@ entries:
     - analysis/catalog_v3/prep_shat_slope.py
     - recipes/catalog_v3_gen_signext.yaml
     - recipes/catalog_v3_train_signext.yaml
+    - sweep/sweep_config_ccin2p3_sign_head_search.yaml
     - tests/test_hybrid_blend.py
+    - tests/test_val_total.py
   dead_ends:
   - tried: hybrid short pretraining FA-ccin2p3-9b88e434
     why: CC disk full at 20:36; log stops mid-run, job failed; not a result
