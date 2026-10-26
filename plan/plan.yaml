@@ -1652,7 +1652,7 @@ entries:
     pp events to catalog_v4 or its compute; the user asked for the design'
   blocks: the pp blend's generation and test; the switch's other steps (adapting the held studies, the catalog_v3 deletion
     manifest) continue
-  checked_until: '2026-10-26T21:22:14+00:00'
+  checked_until: '2026-10-26T21:24:11+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
