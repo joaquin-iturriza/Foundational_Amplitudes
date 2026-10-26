@@ -121,8 +121,11 @@ def main():
         sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in bad + [
             "note: " + n for n in plan.NOTES]) + "\n")
         return 2
-    if plan.NOTES:                                # seen, never blocking: an item check that could not reach its site
-        print(json.dumps({"systemMessage": "plan check notes:\n" + "\n".join("  " + n for n in plan.NOTES)}))
+    # Notes never reach the user: a passing check prints nothing (a systemMessage is shown on their screen; the user,
+    # 2026-10-25 and 2026-10-26: "Why are you back again with this?"). They are kept for `plan next`, which prints them
+    # to the main session once.
+    if plan.NOTES:
+        plan._set_state("_stop_notes", list(plan.NOTES))
     return 0
 
 

@@ -134,8 +134,15 @@ class World:
                         PLAN_EVENTS_CMD="printf '%s\\n'" % events.replace("'", ""))
 
     def check(self):
+        """The stop check's verdict, plus what reaches the main session. A passing check prints nothing (its notes
+        never reach the user's screen, 2026-10-26); the notes are read from `plan next`, where the main session sees
+        them, and a passing check that printed anything fails here."""
         r = subprocess.run([sys.executable, CHECK], input="{}", env=self.env, capture_output=True, text=True)
-        return r.returncode, r.stderr + r.stdout
+        if r.returncode != 0:
+            return r.returncode, r.stderr + r.stdout
+        if r.stdout.strip() or r.stderr.strip():
+            return 99, "a passing stop check printed to the user's screen: " + r.stderr + r.stdout
+        return 0, self.plan_cmd("next")[1]
 
     def plan_cmd(self, *args, env=None):
         r = subprocess.run([sys.executable, PLAN] + list(args), env=dict(self.env, **(env or {})), capture_output=True,

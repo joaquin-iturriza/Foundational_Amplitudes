@@ -1445,6 +1445,12 @@ def cmd_next(a):
             e["id"], why, e["id"]))
     for n in NOTES:
         print("note: " + n)
+    stop_notes = st.get("_stop_notes") or []      # the last stop's notes: the stop check never shows them to the user
+    for n in stop_notes:
+        if n not in NOTES:
+            print("note: " + n)
+    if stop_notes:
+        _set_state("_stop_notes", [])
     print("plan: %d step(s) to launch" % len(todo))
     return 1 if todo or probs else 0
 
