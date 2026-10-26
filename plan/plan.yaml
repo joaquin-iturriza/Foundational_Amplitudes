@@ -999,12 +999,10 @@ entries:
   - D137
   - D139
   - D140
-  next: 'D139 (investigate) continues for the failing one-loop certifications. Regeneration parts 1, 3, 4, 7 resubmitted at
-    929e1a9 with skip-and-log (abd3ee7: a failed one-loop certification or pole-guard refusal skips its backend group, logged
-    CERT_FAILED <name>: <reason>, rest of the shard builds, exit 4 with V4REGEN_CERT_SKIPPED list; mixed-order V4REGEN_SKIP
-    kept on 1, 4, 7): part 1 FA-ccin2p3-6bd04ec8, part 3 FA-ccin2p3-7a70bae4, part 4 FA-ccin2p3-05f408b4, part 7 FA-ccin2p3-b6969e26.
-    When they end: read each log for CERT_FAILED lines and confirm the tree pools built; skipped entries stay in the catalog
-    for a rerun once the investigation settles them.'
+  next: 'when the mixed-order investigation (FA-ccin2p3-e5d74011) and the certify-all job (FA-ccin2p3-e425f8aa) end: read
+    them, report to the user the cause of each failing one-loop entry (mixed-order definition vs MadLoop precision), the full
+    list of failures, and what generating them correctly needs, before building them; then rerun the regeneration parts that
+    skipped them'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
