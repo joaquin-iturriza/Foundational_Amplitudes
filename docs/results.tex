@@ -7947,6 +7947,14 @@ $0.33$), a fine-tune still improving slowly, not one overfitting after an early 
 a start that beats scratch ($5$ rows); the losses are a start the pretraining did not prepare for these probes at these
 $D$, and on $ee\to Z\gamma$ a fine-tune that does not move off that start (Fig.~\ref{fig:ft_harm};
 \code{analysis/transfer/ft\_harm.py}, \code{data/ft\_harm.json}).
+This read-out has a limit that bounds what it says. The starts are the transfer study's pretrainings, trained on
+catalogs much smaller and less diverse than the current one and before the later work on the target and its
+preprocessing, and a linear head on their frozen trunk measures little more than how well each of them zero-shots the
+probe. That a start is bad here says how far those old pretrainings were from these probes, not how far a current
+pretraining would be, so the test that blends the read-out into the fine-tune's start is not run. Whether fine-tuning a
+current pretraining beats scratch at small $D$ moves to the Muon test's fine-tunes, with sixteen scratch runs added
+on the same four probes at the same four $D$ so each fine-tune has its scratch, and to catalog\_v4's pretraining once
+it exists.
 % src: python3 analysis/transfer/ft_harm.py @9ff0af38
 % claim: curves_first_round=240
 % claim: losing=224
