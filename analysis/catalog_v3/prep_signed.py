@@ -4,10 +4,13 @@ tools/signed_ab_score.py: each arm's wrong-sign share on the held-out one-loop p
 Per set (the one-loop pools of the training recipe, and of the one-loop held-out axis H5), over the sign-changing pools:
 the medians of the negative share, the shares within a factor 10 and 100 of zero, the wrong-sign share of one sign per
 pool (err_major), of a classifier on the invariants (err_mlp, and within a factor 10 of zero) and on log s_hat alone
-(err_shat), and the magnitude's shape per target (raw, + (N - 4) log s_hat, + the emission scales) with the per-pool
+(err_shat). The classifier's statistics (err_mlp, err_mlp_near, err_shat, their counts, and err_major, err_major_near
+quoted against them) are over the pools it was fitted on only: a pool with fewer than 20 fit events of one sign (rare)
+has no classifier, its stored err_mlp and err_shat are one sign per pool's, so it is listed apart (rare_pools) with
+its counts and left out of them. Comparisons are strict (no margin); and the magnitude's shape per target (raw, + (N - 4) log s_hat, + the emission scales) with the per-pool
 ratio of each to the raw one. On the held-out pools, per arm: the median wrong-sign share, how many pools it gets worse
-than one sign per pool would (by more than 0.01), how many it gets more than half wrong, and the median of its
-wrong-sign share less the classifier's; the held-out pools of one sign in every event that the scorer still reads as
+than one sign per pool would, how many it gets more than half wrong, and the median of its wrong-sign share less the
+classifier's (over the pools the classifier was fitted on); the held-out pools of one sign in every event that the scorer still reads as
 sign-changing count there with no error for one sign per pool.
 Figure: per sign-changing pool, (a) the classifier's wrong-sign share against one sign per pool's, (b) on the held-out
 pools, each arm's wrong-sign share against one sign per pool's.
@@ -64,14 +67,23 @@ def main():
     for s in SETS:
         allp = [r for r in rows if r["set"] == s and "error" not in r]
         d = sig[s]
-        o = {"n_pools": len(allp), "n_signed": len(d)}
-        for k in ("neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near", "err_major_near", "err_shat"):
-            o[k] = med([r[k] for r in d])
-        o["mlp_over_major"] = med([r["err_mlp"] / r["err_major"] for r in d if r["err_major"] > 0])
-        o["n_mlp_below_5pct"] = int(sum(r["err_mlp"] < 0.05 for r in d))
-        o["n_major_below_5pct"] = int(sum(r["err_major"] < 0.05 for r in d))
-        o["n_rare"] = int(sum(bool(r.get("rare")) for r in d))
-        o["n_shat_beats_major"] = int(sum(r["err_shat"] < r["err_major"] - 0.005 for r in d))
+        c = [r for r in d if not r.get("rare")]      # the pools a classifier was fitted on
+        o = {"n_pools": len(allp), "n_signed": len(d), "n_clf": len(c)}
+        for k in ("neg", "near10", "near100", "err_major", "err_major_near"):
+            o[k + "_all"] = med([r[k] for r in d])     # the data alone, every sign-changing pool
+        for k in ("neg", "near10", "near100"):
+            o[k] = o[k + "_all"]
+        for k in ("err_major", "err_mlp", "err_mlp_near", "err_major_near", "err_shat"):
+            o[k] = med([r[k] for r in c])
+        o["mlp_over_major"] = med([r["err_mlp"] / r["err_major"] for r in c if r["err_major"] > 0])
+        o["n_mlp_below_5pct"] = int(sum(r["err_mlp"] < 0.05 for r in c))
+        o["n_major_below_5pct"] = int(sum(r["err_major"] < 0.05 for r in c))
+        o["n_rare"] = len(d) - len(c)
+        o["n_shat_beats_major"] = int(sum(r["err_shat"] < r["err_major"] for r in c))
+        o["rare_pools"] = {r["name"]: {"n_minor_fit": r["n_minor_fit"], "neg": r["neg"], "err_major": r["err_major"]}
+                           for r in d if r.get("rare")}
+        o["rare_max_err_major"] = max([r["err_major"] for r in d if r.get("rare")], default=None)
+        o["rare_max_minor_fit"] = max([r["n_minor_fit"] for r in d if r.get("rare")], default=None)
         for t in TARGETS:
             o[f"shape_{t}"] = med([r[f"shape_{t}"] for r in d])
             o[f"frac_{t}"] = med([r[f"frac_{t}"] for r in d])
@@ -80,13 +92,17 @@ def main():
                 o[f"{t}_over_raw"] = float(np.median(rr))
                 o[f"{t}_above_raw"] = int((rr > 1).sum())
         out[s] = o
-        print(s, json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in o.items()}))
+        print(s, json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in o.items() if k != "rare_pools"}))
+        for n_, v_ in o["rare_pools"].items():
+            print(f"  no classifier (rare) {n_:24s} {v_['n_minor_fit']:3d} of one sign in the fit events, "
+                  f"negative {100 * v_['neg']:.2f}%, one sign per pool wrong {100 * v_['err_major']:.2f}%")
         sh = {"train": "tr", "H5": "H5"}[s]
-        for k in ("n_pools", "n_signed", "neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near",
+        for k in ("n_pools", "n_signed", "n_clf", "neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near",
                   "err_major_near", "err_shat", "mlp_over_major", "n_mlp_below_5pct", "n_major_below_5pct", "n_rare", "n_shat_beats_major", "shape_raw", "shape_dless", "shape_qperp",
-                  "dless_over_raw", "qperp_over_raw", "qperp_above_raw"):
+                  "dless_over_raw", "qperp_over_raw", "qperp_above_raw", "err_major_all", "err_major_near_all",
+                  "rare_max_err_major", "rare_max_minor_fit"):
             v = o[k]
-            if k in PCT:                              # shares of events, in percent as the notes write them
+            if k in PCT or k in ("err_major_all", "err_major_near_all", "rare_max_err_major"):                              # shares of events, in percent as the notes write them
                 v = round(100 * v, 1)
             flat[f"{sh}_{k}"] = round(v, 3) if isinstance(v, float) else v
     # the arms' signs on the held-out pools, against the data's floors on the same pools
@@ -106,11 +122,12 @@ def main():
         ps = sorted(set(ws) & set(h5all))
         w = np.array([ws[p] for p in ps]); mj = np.array([h5all[p]["err_major"] for p in ps])
         ml = np.array([h5all[p]["err_mlp"] for p in ps])
+        clf = np.array([not h5all[p].get("rare") for p in ps])     # the classifier's pools (and the one-sign ones)
         for p in sorted(set(ws) & set(one_sign)):
             out["one_sign_scored"].setdefault(p, {"neg": one_sign[p]["neg"]})[arm] = ws[p]
         o = {"n": len(ps), "n_one_sign": len(set(ws) & set(one_sign)), "unmatched": sorted(set(ws) - set(h5all)),
              "wrong_sign": float(np.median(w)),
-             "worse_than_major": int((w > mj + 0.01).sum()), "minus_mlp": float(np.median(w - ml)),
+             "worse_than_major": int((w > mj).sum()), "minus_mlp": float(np.median((w - ml)[clf])),
              "per_pool": {p: ws[p] for p in ps}}
         out["arms"][arm] = o
         print(f"{arm:24s} n={o['n']:2d} wrong {o['wrong_sign']:.3f} worse-than-one-sign {o['worse_than_major']} "
@@ -160,7 +177,8 @@ def plot(sig, h5, out):
     fig, axs = ps.figure(ncols=2)
     ax = axs[0]
     for s, col, mk, lab in (("train", ps.C.blue, "o", "training pools"), ("H5", ps.C.vermillion, "^", "held-out pools")):
-        ax.plot([r["err_major"] for r in sig[s]], [r["err_mlp"] for r in sig[s]], mk, mfc="none", color=col, label=lab)
+        c = [r for r in sig[s] if not r.get("rare")]  # no classifier on the rare pools
+        ax.plot([r["err_major"] for r in c], [r["err_mlp"] for r in c], mk, mfc="none", color=col, label=lab)
     ax.plot([0, 0.5], [0, 0.5], ls="--", color=ps.C.grey, label="equal")
     ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, classifier")
     ps.legend(ax, "upper left")
