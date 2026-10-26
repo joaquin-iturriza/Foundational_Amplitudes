@@ -104,6 +104,11 @@ def main():
     ap.add_argument("--lhe-cores", type=int, default=int(os.environ.get("AMP_LHE_CORES", "1")),
                     help="MadEvent cores per lhe_pp process (catalog_daniel); the pool then runs "
                          "workers // lhe-cores processes at once (default 1: run_mode 0)")
+    ap.add_argument("--skip-cert-failed", metavar="LIST_FILE", default=None,
+                    help="a one-loop entry whose backend build or pole certification fails (or whose chunks the "
+                         "pole guard refuses) is skipped with every entry of its backend group, logged as "
+                         "CERT_FAILED <name>, and the rest is built; the skipped names go to LIST_FILE and the "
+                         "exit status is 4. Without it such a failure aborts the whole spec.")
     ap.add_argument("--auto-workers", action="store_true",
                     help="raise --workers up to ncpu when the cost estimate shows "
                          "more cores would shorten the prebuild (free on prepost)")
@@ -117,6 +122,29 @@ def main():
     # mg.PROCESSES so generation can address them by their (decorated) dataset name
     # — same registration the training recipe path does in init_physics.
     mg.register_recipe_processes(procs, default_sampling=(spec.get("sampling") if isinstance(spec, dict) else None))
+
+    # Backend groups (tools/shard_recipes.groups_of: entries sharing a compiled backend, a base, a scan base). A
+    # certification failure skips its whole group; skipped_names[name] = reason, skipped_keys = their (process, role)
+    # datasets, stripped parents of alpha_s scans included.
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
+    from shard_recipes import groups_of
+    group_of = {e["name"]: [x["name"] for x in g] for g in groups_of(procs) for e in g}
+    skipped_names, skipped_keys = {}, set()
+
+    def skip_group(process, why):
+        """Skip every entry of `process`'s backend group (process may be a stripped parent outside the spec)."""
+        key = datagen._backend_key(process)
+        members = {n for n, g in group_of.items()
+                   if n == process or datagen._backend_key(n) == key
+                   or mg.PROCESSES.get(n, {}).get("scan_base") == process}
+        members = set().union(*(group_of[n] for n in members)) if members else {process}
+        for n in sorted(members - set(skipped_names)):
+            skipped_names[n] = why if n == process else f"{why} [shares its backend group with {process}]"
+            print(f"CERT_FAILED {n}: {skipped_names[n]}", flush=True)
+        keys = {datagen._backend_key(n) for n in members} | {key}
+        for dk, meta in datasets.items():
+            if meta["process"] in members or datagen._backend_key(meta["process"]) in keys:
+                skipped_keys.add(dk)
 
     print(f"Spec        : {args.spec}")
     print(f"Frozen dir  : {datagen.frozen_dir()}")
@@ -253,7 +281,11 @@ def main():
 
         # 2) Compile backends, in parallel over distinct backends (each in its own dir).
         names = sorted({m["process"] for m in datasets.values()})
-        datagen.ensure_backends(names, workers=args.workers)
+        failed_keys = {} if args.skip_cert_failed else None
+        datagen.ensure_backends(names, workers=args.workers, failed=failed_keys)
+        for k, why in (failed_keys or {}).items():
+            skip_group(next(n for n in names if datagen._backend_key(n) == k), why)
+        all_tasks = [t for t in all_tasks if t["_key"] not in skipped_keys]
 
         # 3) Generate all chunks across all datasets in one flat pool.
         print(f"\nGenerating {len(all_tasks)} chunks across {args.workers} workers...")
@@ -277,7 +309,18 @@ def main():
             futs = {ex.submit(_gen_chunk, t): t["_key"] for t in all_tasks}
             for fut in as_completed(futs):
                 key = futs[fut]
-                idx, path = fut.result()
+                if key in skipped_keys:
+                    continue
+                try:
+                    idx, path = fut.result()
+                except RuntimeError as e:
+                    if not (args.skip_cert_failed and datagen.is_virt(key[0]) and "pole guard" in str(e)):
+                        raise
+                    skip_group(key[0], f"chunk refused by the pole guard ({key[1]}): {str(e).splitlines()[0]}")
+                    for f, k in futs.items():
+                        if k in skipped_keys:
+                            f.cancel()
+                    continue
                 results[key][idx] = path
                 done += 1
                 if done % max(1, len(all_tasks) // 20) == 0 or done == len(all_tasks):
@@ -287,6 +330,7 @@ def main():
 
     # 5) Reweight NLO α_s-scan datasets from their (now materialized) stripped
     # parents — cheap numpy, no MadLoop. Each parent feeds all its α_s points.
+    reweight_jobs = [j for j in reweight_jobs if j[0] not in skipped_names]
     if reweight_jobs:
         print(f"\nReweighting {len(reweight_jobs)} NLO α_s datasets from stripped parents...")
         for (name, out, pout, role, recipe) in reweight_jobs:
@@ -296,10 +340,17 @@ def main():
             mg.write_recipe(out, full)
         print(f"  reweighted {len(reweight_jobs)} datasets.")
 
-    print(f"\nBuilt {len(datasets)} datasets + reweighted {len(reweight_jobs)} "
+    print(f"\nBuilt {len(set(datasets) - skipped_keys)} datasets + reweighted {len(reweight_jobs)} "
           f"in {time.time()-t_all:.1f}s ({n_cached} were cached).")
+    if skipped_names:
+        names = sorted(skipped_names)
+        with open(args.skip_cert_failed, "w") as f:
+            f.write("".join(f"{n}\t{skipped_names[n]}\n" for n in names))
+        print(f"\nCERT_SKIPPED {len(names)} entries (not built, still in the catalog): {' '.join(names)}", flush=True)
     if lhe_failed:
         sys.exit(1)
+    if skipped_names:
+        sys.exit(4)
 
 
 if __name__ == "__main__":

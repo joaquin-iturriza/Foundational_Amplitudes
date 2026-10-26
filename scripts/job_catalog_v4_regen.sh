@@ -13,6 +13,9 @@
 # cached, a rerun builds only what is missing. Val/test go to $DATA_DIR, train to the cache under $SCRATCH.
 # V4REGEN_SKIP (optional, comma-separated entry names) leaves those entries out of this shard after sharding (the
 # other entries are unchanged); each is logged as SHARD_SKIP, to be built by a later rerun without the skip.
+# A one-loop entry whose backend build or pole certification fails is skipped with its backend group (the entries
+# sharing its backend), each logged as CERT_FAILED <name>: <reason>, and the rest of the shard is built; the job then
+# exits nonzero listing them (V4REGEN_CERT_SKIPPED). They stay in the catalog, built by a rerun once fixed.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
@@ -28,9 +31,15 @@ python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n "$N
 echo "V4REGEN shard $K of $N: $(grep -c '^- name:' "$SPEC") entries"
 df -k "$DATA_DIR" | tail -1 | awk '{print "V4REGEN_FREE_KB_START", $4}'
 T0=$(date +%s)
-python prebuild_recipes.py "$SPEC" --workers "$W"
+CERTF="$SCRATCH/zz_catalog_v4_regen/cert_failed_${K}_of_${N}.txt"
+rm -f "$CERTF"
+python prebuild_recipes.py "$SPEC" --workers "$W" --skip-cert-failed "$CERTF"
 RC=$?
 df -k "$DATA_DIR" | tail -1 | awk '{print "V4REGEN_FREE_KB_END", $4}'
 echo "V4REGEN_WALL_S $(( $(date +%s) - T0 )) cores $W"
+if [ -s "$CERTF" ]; then
+    echo "V4REGEN_CERT_SKIPPED $(wc -l < "$CERTF") entries:"
+    sed 's/^/  /' "$CERTF"
+fi
 [ $RC -eq 0 ] || { echo "V4REGEN_FAILED rc=$RC"; exit $RC; }
 echo "V4REGEN_DONE shard $K of $N"

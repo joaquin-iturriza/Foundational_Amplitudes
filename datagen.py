@@ -127,12 +127,15 @@ def _backend_key(process):
     return "lo:" + mg.standalone_name(process)
 
 
-def ensure_backends(processes, workers=8):
+def ensure_backends(processes, workers=8, failed=None):
     """ensure_backend over many processes in parallel: one job per DISTINCT backend
     (dedup by _backend_key), each in its own subprocess. Backends live in distinct
     standalone dirs and neither MadGraph output nor g++/f2py share any state, so this is
     safe; the serial re-patch of a name-keyed own backend still happens in ensure_backend.
-    Returns {process: standalone_dir}."""
+    Returns {process: standalone_dir}.
+
+    `failed` (a dict) makes a one-loop backend whose build or pole certification fails a recorded failure instead of
+    an abort: failed[backend_key] = reason, and no process of that backend is in the result. LO backends still raise."""
     from concurrent.futures import ProcessPoolExecutor, as_completed
     import time
     reps = {}
@@ -143,11 +146,21 @@ def ensure_backends(processes, workers=8):
     with ProcessPoolExecutor(max_workers=max(1, workers)) as ex:
         futs = {ex.submit(ensure_backend, p): p for p in reps.values()}
         for fut in as_completed(futs):
-            p = futs[fut]; out[p] = fut.result()
+            p = futs[fut]
+            try:
+                out[p] = fut.result()
+            except subprocess.CalledProcessError as e:
+                if failed is None or not is_virt(p):
+                    raise
+                why = ("pole certification FAIL" if e.returncode == 2
+                       else f"one-loop build failed (exit {e.returncode})")
+                failed[_backend_key(p)] = f"{why}: {mg.PROCESSES[p]['virt_base']}"
+                print(f"  backend {p:24s} FAILED ({why}; {time.time()-t0:6.1f}s elapsed)", flush=True)
+                continue
             print(f"  backend {p:24s} ready  ({time.time()-t0:6.1f}s elapsed)", flush=True)
     # every process (not only the representatives) gets its param card re-patched
     for p in processes:
-        if p not in out:
+        if p not in out and not (failed and _backend_key(p) in failed):
             out[p] = ensure_backend(p)
     return out
 
