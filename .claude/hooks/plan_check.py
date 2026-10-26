@@ -85,7 +85,11 @@ def problems():
         plan.NOTES.append("%s is marked done but %s: plan reopen %s --why ..., or fix it (see plan next)" % (
             e["id"], why, e["id"]))
     out += plan.claims_problems()
-    out += ["open event: " + ev for ev in open_events()]
+    # an event on an entry whose step agent is still working is that agent's to ack: blocking on it only bounces the
+    # main session while the agent reads the logs (2026-10-26, eight failed regeneration parts)
+    working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
+    out += ["open event: " + ev for ev in open_events()
+            if not (len(ev.split()) > 5 and ev.split()[5] in working)]
     return out, once, st
 
 

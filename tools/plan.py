@@ -423,6 +423,14 @@ def subagent(agent_id):
     return out
 
 
+def step_working(st, eid, t):
+    """A recorded step agent of the entry has not handed back and wrote to its transcript within STEP_MIN of t: the
+    entry's open events are its to ack."""
+    acts = [a for a in (subagent_activity(x.get("agent")) for x in (st.get(eid) or {}).get("steps") or []
+                        if not step_problem(st, eid, x)) if a]
+    return any(not handed and 0 <= (t - last).total_seconds() / 60 <= STEP_MIN for last, handed in acts)
+
+
 def subagent_activity(agent_id):
     """(last, handed_back): the time of the subagent's last transcript record, and whether its last assistant record
     is a SubagentHandback call (its report is delivered and its run is over); None with no transcript. A step agent
@@ -533,7 +541,7 @@ def why_moves(e, st, msgs, t, d=None, checks=None):
         # a step agent still writing its transcript is in flight; one that handed back is not
         acts = [a for a in (subagent_activity(x.get("agent")) for x in (st.get(e["id"]) or {}).get("steps") or []
                             if not step_problem(st, e["id"], x)) if a]
-        if any(not handed and 0 <= (t - last).total_seconds() / 60 <= STEP_MIN for last, handed in acts):
+        if step_working(st, e["id"], t):
             return None
         # the reason arose when the last step's window lapsed, its agent handed back or went quiet for the window, or
         # the last run ended, whichever is later

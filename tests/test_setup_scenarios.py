@@ -236,6 +236,33 @@ def liveness():
         scenario("a run in state %s is not live" % s, w.check()[0] == 2, w.check()[1])
 
 
+def event_ownership():
+    ev = lambda eid: "  E1621  10-26 01:07 FA  RUN  %s  FA-ccin2p3-x ended FAILED" % eid
+    w = World([E("cov")], state={"cov": step(40, "wk1")}, agents=[("wk1", ago(40), "cov", [(ago(3), "work")])],
+              events=ev("cov"))
+    rc, err = w.check()
+    scenario("an open event on an entry whose step agent is working does not block",
+             rc == 0 and "open event" not in err, err)
+    w = World([E("cov")], state={"cov": step(40, "hb1")}, agents=[("hb1", ago(40), "cov", [(ago(3), "handback")])],
+              events=ev("cov"))
+    rc, err = w.check()
+    scenario("the event blocks once the step agent handed back", rc == 2 and "open event" in err, err)
+    w = World([E("cov")], state={"cov": step(50, "q1")}, agents=[("q1", ago(50), "cov", [(ago(35), "work")])],
+              events=ev("cov"))
+    rc, err = w.check()
+    scenario("the event blocks when the step agent is quiet 35 min", rc == 2 and "open event" in err, err)
+    w = World([E("cov")], state={"cov": step(10, "wk2")}, events=ev("other_item"))
+    rc, err = w.check()
+    scenario("an event whose item is not a plan entry still blocks", rc == 2 and "open event" in err, err)
+    w = World([E("cov")], state={"cov": step(10, "forged9")},
+              agents=[("forged9", ago(10), "other", [(ago(2), "work")])], events=ev("cov"))
+    rc, err = w.check()
+    scenario("a forged step does not exempt the entry's event", rc == 2 and "open event" in err, err)
+    w = World([E("cov")], state={"cov": step(10, "wk3")}, events="  E1622  10-26 01:07 FA")
+    rc, err = w.check()
+    scenario("an event line under 6 columns blocks", rc == 2 and "open event" in err, err)
+
+
 def files():
     w = World([E("pp")])
     with cf.ThreadPoolExecutor(20) as ex:
@@ -1346,7 +1373,7 @@ def the_suite_itself():
     scenario("a failing scenario makes the suite exit 1", r.returncode == 1, r.stdout + r.stderr)
 
 
-GROUPS = [liveness, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
+GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
