@@ -1381,6 +1381,20 @@ entries:
     blocks: the other five arms and the epochs-versus-steps horizon; the dimensionless arm at equal steps keeps running
     answered_at: '2026-10-26T14:20:17.008000+00:00'
     decision: D161
+  - ask: 'Should the other five target variants of catalog_v3''s short-pretraining study also be trained on catalog_v4 (about
+      36 GPU-h), to check the dimensionless target still wins there? My recommendation is no: the switch decision only needs
+      the target we would use.'
+    at: '2026-10-26T14:20:38+00:00'
+    searched: D130 approves the short pretrainings again without naming the arms; D161 settles the horizon only; ground rule
+      2's budget is exceeded by the full set
+    blocks: training the other five target variants on catalog_v4; the dimensionless arm continues
+  ask: 'Should the other five target variants of catalog_v3''s short-pretraining study also be trained on catalog_v4 (about
+    36 GPU-h), to check the dimensionless target still wins there? My recommendation is no: the switch decision only needs
+    the target we would use.'
+  waiting_since: '2026-10-26T14:20:38+00:00'
+  searched: D130 approves the short pretrainings again without naming the arms; D161 settles the horizon only; ground rule
+    2's budget is exceeded by the full set
+  blocks: training the other five target variants on catalog_v4; the dimensionless arm continues
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
