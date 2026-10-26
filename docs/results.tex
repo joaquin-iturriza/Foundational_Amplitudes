@@ -1994,7 +1994,7 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
 \begin{figure}[t]\centering
 \includegraphics{../analysis/catalog_v3/figs/pair_head_blowup.pdf}
 \caption{The sign arms' short pretrainings on catalog\_v3, one seed each, at the baseline's hyperparameters.
-(a) Validation loss without regularisation against step; crosses: the pair sign head's steps skipped for a non-finite
+(a) Validation loss without regularisation against step; crosses: the pair sign heads' steps skipped for a non-finite
 gradient norm, at the validation interval they fall in. (b) Median sign accuracy on the sign-changing training pools at
 each validation.}\label{fig:v3_pair_head_blowup}
 \end{figure}
@@ -2112,6 +2112,171 @@ each validation.}\label{fig:v3_pair_head_blowup}
     come from a run read before its blow-up at a higher loss, so they cannot be told from the blow-up. What stands:
     the added sign-changing pools buy a sign gain well beyond the seed spread; a zero-shot cost is not shown at seed
     $42$ and is confounded with the blow-up at seed $43$.
+  \item \emph{The seed-$43$ blow-up does not repeat, and with it goes most of the zero-shot cost.} The more-signed-pools
+    arm's seed-$43$ run was run again with its configuration unchanged (the dumped configs differ only in the run's
+    name and paths), now writing the gradient norm before clipping, the training loss and the learning rate at every
+    step (run FA-ccin2p3-5a8c8fde). The two runs are not the same run: the per-step record is the only code change,
+    yet the first validation already differs, $0.247$ against $0.127$ (the runs' logs), so a run at a fixed seed is
+    not reproducible on these GPUs, and a blow-up is a property of the run, not of the seed.
+% src: python3 analysis/catalog_v3/pair_head_blowup.py @f9223ba6
+% claim: r_jumps=0
+% claim: r_final_val=0.00442
+% claim: r_win_grad_max=1.83
+% claim: r_win_clip_pct=0.0
+% claim: r_clip_pct_after600=0.0
+% claim: r_clip_pct_before600=33.3
+% claim: r_grad_med_after600=0.132
+% claim: r_warmup_end=675
+% allow: 0.247 0.127 4.40\times10^{-3} 4.67\times10^{-3} 5.88\times10^{-3} because they are read from the runs' logs (first validations, best validation losses), not from the script
+% allow: 1275 1530 1360 1445 600 5 because they are the read's windows (the first run's jump interval and a validation each side, the steps after warmup's early transient) and the clipping bound
+% allow: 43 42 because they are the seeds
+    The rerun did not blow up: through steps $1275$ to $1530$, around the first run's jump at $1360$ to $1445$, its
+    largest gradient norm is $1.83$ and clipping at $5$ bounds $0.0\%$ of the steps; after step $600$ it bounds none
+    ($0.0\%$, median norm $0.132$), against $33.3\%$ of the first $600$, the start of warmup, which ends at step $675$.
+    It ends at a validation loss of $0.00442$, level with the baseline's first seed ($4.40\times10^{-3}$) and the arm's
+    ($4.67\times10^{-3}$), below the baseline's second seed ($5.88\times10^{-3}$).
+% src: python3 analysis/catalog_v3/prep_signed.py @f9223ba6
+% claim: rerun_mse_ratio=0.74
+% claim: rerun_n_probes_worse=192
+% claim: rerun_n_probes=617
+% claim: rerun_H7E_ratio=3.41
+% claim: rerun_H2p5_ratio=1.05
+% claim: s43r_better=13
+% claim: s43r_worse=4
+% claim: s43r_near_x=41.3
+% claim: s43r_near_y=20.5
+% claim: s43r_axis_x=14.8
+% claim: s43r_axis_y=5.9
+% claim: s43r_mse_ratio=0.93
+% claim: s43r_n_probes_worse=276
+% claim: s43r_H2p5_ratio=2.15
+% claim: s43r_H7E_ratio=2.34
+% claim: m2r_better=14
+% claim: m2r_worse=3
+% claim: m2r_near_y=22.3
+% claim: m2r_axis_y=6.8
+% claim: m2r_mse_ratio=0.97
+% claim: m2r_n_probes_worse=289
+% claim: m2r_H2p5_ratio=1.58
+% claim: m2r_H7E_ratio=1.79
+% claim: sd_more_r_mse_ratio=0.99
+% claim: sd_base_H2p5_ratio=1.17
+% claim: s42_H2p5_ratio=1.17
+% claim: s42_H7E_ratio=1.36
+% claim: s43_mse_ratio=1.32
+% claim: base_n=17
+% allow: 1 because it is the ratio of equal errors, no result
+% allow: 10 because it is the near-zero factor of the scorer
+    Its zero-shot MSE per held-out probe over the blown-up run's has the median $0.74$ (above $1$ on $192$ of the
+    $617$ probes): the higher loss of the first run's best checkpoint is what its reads carried. Read on the rerun, the
+    arm against the baseline at seed $43$ is less wrong in sign on $13$ of the $17$ pools and more on $4$, $20.5\%$
+    against $41.3\%$ within a factor $10$ of zero and $5.9\%$ against $14.8\%$ over the one-loop axis; the zero-shot
+    MSE ratio has the median $0.93$ (above $1$ on $276$ probes), against $1.32$ on the blown-up run. With the two seeds'
+    mean per pool and per probe the arm is less wrong on $14$ pools and more on $3$, at $22.3\%$ near zero and $6.8\%$
+    over the axis, and its MSE ratio is $0.97$ (above on $289$). Its seed $42$ and the rerun differ by a median
+    $0.99$. Two costs stay at both seeds: $2\to5$ at $1.17$ and $2.15$ (mean $1.58$), beyond the baseline's seed
+    spread of $1.17$ there and the $1.05$ between the two seed-$43$ runs; and the $1$ to $10$\,TeV axis at $1.36$ and
+    $2.34$ (mean $1.79$), which the two seed-$43$ runs alone move by $3.41$, so it is inside the run-to-run spread.
+    What stands: the added sign-changing pools buy the sign gain at no zero-shot cost overall; a cost on $2\to5$
+    remains, read on one run per seed.
+  \item \emph{Bounding the pair inputs does not stop the blow-up; it comes earlier.} The pair sign head again, each of
+    its $16$ pair channels through $\tanh$ before their sums and products (\code{model.sign\_pair\_bound}), everything
+    else as the first pair head, one seed (run FA-ccin2p3-1c11d753, with the per-step record; no second seed, the user's
+    call of 2026-10-26).
+% src: python3 analysis/catalog_v3/pair_head_blowup.py @f9223ba6
+% claim: b_jump_validation=9
+% claim: b_jump_step_before=680
+% claim: b_jump_step=765
+% claim: b_jump_val_before=0.178
+% claim: b_jump_val_at=3.58
+% claim: b_best_step=595
+% claim: b_best_val=0.0312
+% claim: b_final_val=2.52
+% claim: b_n_nonfinite=33
+% claim: b_ref_from=510
+% claim: b_ref_to=595
+% claim: b_ref_loss=0.0627
+% claim: b_ref_grad=0.837
+% claim: b_loss_rise_step=646
+% claim: b_lr_at_loss_rise_over_peak=0.957
+% claim: b_warmup_end=675
+% claim: b_grad_at_loss_rise=3.81
+% claim: b_grad_clip_step=654
+% claim: b_grad_jump_step=671
+% claim: b_loss_at_grad_jump_over_ref=22.9
+% claim: b_first_nonfinite_step=688
+% claim: b_loss_blow_step=691
+% claim: b_clip_pct_after600=97.8
+% claim: bg0_validation=8
+% claim: bg0_step=680
+% claim: bg0_n_signed=62
+% claim: bg0_signed=3.5
+% claim: bg0_loop_pos=3.53
+% claim: bg0_trees=4.59
+% claim: bg0_acc_before=0.965
+% claim: bg0_acc_at=0.785
+% allow: 16 because it is the head's design, its pair channels
+% allow: 3 1000 100 5 10 because they are the read's thresholds (the loss's rise, the norm's jump, the loss's blow-up, the clipping bound) and the blow-up rule's factor
+% allow: 600 because it is a window edge of the read
+% allow: 42 43 because they are the seeds
+    It blew up between its $8$th validation and its $9$th (steps $680$ to $765$, validation loss $0.178$ to $3.58$),
+    against the $16$th and $17$th of the unbounded head; its best checkpoint is at step $595$ ($0.0312$), it ended at
+    $2.52$, and $33$ steps had a non-finite gradient norm (a blow-up is a validation over $10$ times the running
+    minimum, as above). That factor, the lead-up's thresholds below, its five-step median, its reference window
+    and the step-$600$ split of the clipping shares are open settings of this read, chosen with no decision behind
+    them. The per-step record against the reference window, steps $510$ to $595$ (median loss $0.0627$,
+    median gradient norm $0.837$; Fig.~\ref{fig:v3_pair_head_steps}): the loss rises first. From step $646$, at $0.957$
+    of the peak learning rate (warmup ends at step $675$), its five-step median stays above $3$ times the reference,
+    while the gradient norm's is $3.81$, under the clipping bound of $5$; the norm's stays above that bound from step
+    $654$. At step $671$ one gradient norm exceeds $1000$ times the reference while the loss is $22.9$ times its own,
+    an increase of four orders of magnitude in the norm within two steps with no matching increase in the loss; the first non-finite norm is at step
+    $688$ and the loss exceeds $100$ times the reference from step $691$. After step $600$ clipping bounds $97.8\%$ of
+    the steps and does not stop it. Which loss term jumps: the per-step loss sums the sign and the magnitude terms, so
+    the record cannot split them; the validations can. At the $8$th (step $680$) the magnitude loss rose by a median
+    factor $3.5$ on the $62$ pools with a negative value in some role, $3.53$ on the other one-loop pools and $4.59$ on
+    the trees, while the median sign accuracy on the sign-changing training pools fell from $0.965$ to $0.785$: both
+    at once, the trees as much as the signed pools, so the failure is the whole network's, not the sign logit's alone.
+% src: python3 analysis/catalog_v3/prep_signed.py @f9223ba6
+% claim: bpair_wrong1=24.4
+% claim: base_wrong1=5.4
+% claim: pair_wrong1=11.3
+% claim: bpair_better_base=3
+% claim: bpair_worse_base=11
+% claim: bpair_wrong_near=37.6
+% claim: base_wrong_near=39.4
+% claim: pair_wrong_near=32.8
+% claim: bpair_axis_wrong=16.7
+% claim: base_axis_wrong=13.1
+% claim: pair_axis_wrong=13.0
+% claim: bpair_mse_ratio=2.28
+% claim: bpair_n_probes_worse=502
+% claim: pair_n_probes=617
+% claim: pair_mse_ratio=1.77
+% claim: bpair_H5_mse=2.32
+% claim: base_H5_mse=1.25
+% claim: bpair_ccg_wrong=72
+% claim: base_n=17
+% allow: 595 because it is the best checkpoint's step, read above
+% allow: 1 because it is the ratio of equal errors, no result
+% allow: 2 because it is the square in |M|^2
+    Its reads are at step $595$, before the lead-up, a seventh of the way through: on the $17$ held-out pools the median
+    wrong-sign share is $24.4\%$ against the baseline's $5.4\%$ and the unbounded head's $11.3\%$, less wrong than the
+    baseline on $3$ and more on $11$; within a factor $10$ of zero $37.6\%$ against $39.4\%$ and $32.8\%$, over the
+    one-loop axis $16.7\%$ against $13.1\%$ and $13.0\%$; $e^+e^-\to c\bar cg$ $72\%$. The zero-shot MSE on
+    $\log|\mathcal M|^2$ per probe over the baseline's has the median $2.28$ (above $1$ on $502$ of the $617$ probes)
+    against the unbounded head's $1.77$, and the one-loop axis' median MSE is $2.32$ against $1.25$. These read a model
+    stopped early, not the head at its length. So the blow-ups are not the unbounded pair products' alone: a run with
+    no pair head blew up in the same interval as the first pair head, its rerun did not, and the bounded head blew up
+    near the peak of the learning rate. Whether a lower peak rate or a longer warmup prevents them is not checked; the
+    search over the heads' sizes has to search the rate with them, the coupled space (CLAUDE.md, the HPO rules).
+\begin{figure}[t]\centering
+\includegraphics{../analysis/catalog_v3/figs/pair_head_steps.pdf}
+\caption{The per-step record of two short pretrainings on catalog\_v3 at the baseline's hyperparameters, one run each.
+(a) Gradient norm before clipping per step: the bounded pair sign head and the more-signed-pools arm's seed-$43$ rerun;
+dashed, the clipping bound; dotted, the end of warmup. (b) The bounded head's lead-up: its gradient norm and training
+loss per step, each over its median in the reference window (steps $510$ to $595$); vertical lines, the steps the text
+names.}\label{fig:v3_pair_head_steps}
+\end{figure}
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
