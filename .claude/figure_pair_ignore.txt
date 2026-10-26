@@ -11,3 +11,4 @@ talks/progress_jul2026/figs/lloca_white.png
 talks/progress_jul2026/figs/tth_C.pdf
 phase1_scaling
 talks/progress_oct2026/main.pdf
+talks/progress_oct2026b/main.pdf
