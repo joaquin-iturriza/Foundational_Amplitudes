@@ -441,7 +441,8 @@ class TrainingReference:
                 continue
             blk = (blocks or {}).get(name) or physics_block(name if name in mg.PROCESSES else s["base"],
                                                             spec_physics=s["physics"], cfg=cfg)
-            self.entries.append({"name": name, "scan": bool(s["physics"]), "pdg": [int(p) for p in cfg["pdg_ids"]],
+            self.entries.append({"name": name, "scan": bool(s["physics"]), "declared": declared_fields(s["physics"]),
+                                 "pdg": [int(p) for p in cfg["pdg_ids"]],
                                  "loop": is_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
         self.by_key = {}
         for e in self.entries:
@@ -463,9 +464,10 @@ class TrainingReference:
 
 def compare(probe_blk, pdg_ids, refs, fields, exempt=()):
     """[(field, probe value, reference values)] where the probe's value is none of the references'; plus the fields
-    not compared (absent on either side) and the exempt ones present"""
+    not compared (absent on either side, or set by a reference's own scan) and the exempt ones present"""
     pv = _view(probe_blk, pdg_ids)
-    rv = [_view(r["block"], r["pdg"]) for r in refs]
+    # a reference entry's own scan (the alpha_s points, the heavy-quark layer) is no reference for the fields it sets
+    rv = [{k: x for k, x in _view(r["block"], r["pdg"]).items() if k not in r.get("declared", ())} for r in refs]
     bad, skipped, ex = [], [], []
     for f in fields:
         if f in exempt:

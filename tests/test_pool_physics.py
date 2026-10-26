@@ -147,6 +147,14 @@ def test_scenario():
     # the same probe without its declaration is refused (the same process's plain entry has MT 172.5)
     c = pp.check_probe("v4_gg_ttx__mt300", None, None, ref)
     assert c["status"] == "mismatch" and "MT" in {m["field"] for m in c["mismatches"]}, c
+    # a process the catalog has only scans of (the alpha_s points 0.09 and 0.15): their alpha_s is no reference for
+    # a probe at 0.118, the rest of their physics is
+    mg.register_recipe_processes([{"name": "v4_ddx_aag__as150", "base": "v4_ddx_aag", "physics": {"alpha_s": 0.15}}])
+    r2 = os.path.join(TMP, "train_scans.yaml")
+    yaml.safe_dump({"processes": [{"name": "v4_ddx_aag__as150", "base": "v4_ddx_aag", "physics": {"alpha_s": 0.15},
+                                   "sqrts": [100, 6000], "n_train": 10, "n_val": 10, "n_test": 10}]}, open(r2, "w"))
+    c = pp.check_probe("pp13_ddx_aag", None, None, pp.TrainingReference(r2))
+    assert c["status"] == "ok" and "alphas_mz" in c["not_compared"], c
     # a process the catalog has no entry of: the catalog-wide values (a catalog_v3 pp b class held out)
     mg.PROCESSES["pp13_zz_heldout"] = dict(mg.PROCESSES["pp13_bbx_bbxgg"])
     mg.PROCESSES["pp13_zz_heldout"]["pdg_ids"] = [5, -5, 5, -5, 21, 22]
