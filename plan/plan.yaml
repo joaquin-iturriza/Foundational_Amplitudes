@@ -1320,8 +1320,13 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-27a6f23b
-    commit: 6584c2fa
+    - FA-ccin2p3-2bc30261
+    - FA-ccin2p3-87426222
+    - FA-ccin2p3-ee733aa9
+    commit: a9da7fb9
     paths:
+    - analysis/catalog_v3/data/muon_compare.json
+    - analysis/catalog_v3/figs/muon_compare.png
     - optim/muon.py
     - tests/test_muon.py
     - tools/catalog_ft.py
