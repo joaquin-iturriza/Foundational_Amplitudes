@@ -11,6 +11,39 @@
   "9": 0.00010825088224469031,
   "10": 5.953798523457967e-05
  },
+ "claims": {
+  "W1": 0.18181818181818182,
+  "W2": 0.045454545454545456,
+  "W3": 0.013986013986013988,
+  "transfer_d10": {
+   "searches": 327,
+   "at_update_1_to_3": 0
+  },
+  "lpft": {
+   "all": {
+    "runs": 120,
+    "first_above_readout": 96,
+    "median_first_over_readout": 1.2532100482253996
+   },
+   "exposed": {
+    "runs": 18,
+    "first_above_readout": 18,
+    "median_first_over_readout": 4.946860373551214
+   },
+   "clean": {
+    "runs": 102,
+    "first_above_readout": 78,
+    "median_first_over_readout": 1.0860916337131694
+   }
+  },
+  "lowd_za_r1_d10": {
+   "lpft": 0.12996960328007437,
+   "readout": 0.11620569666654003,
+   "update": 2,
+   "W": 0.045454545454545456,
+   "gain_over_default": 0.1106417260724787
+  }
+ },
  "table": {
   "transfer study / every 1": {
    "EMA unknown": 2,
@@ -1569,6 +1602,16 @@
    "runs": 120,
    "first_above_readout": 96,
    "median_first_over_readout": 1.2532100482253996
+  },
+  "exposed": {
+   "runs": 18,
+   "first_above_readout": 18,
+   "median_first_over_readout": 4.946860373551214
+  },
+  "clean": {
+   "runs": 102,
+   "first_above_readout": 78,
+   "median_first_over_readout": 1.0860916337131694
   },
   "first validation W 0.0e+00": {
    "runs": 56,

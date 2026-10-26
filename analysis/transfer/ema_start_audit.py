@@ -180,7 +180,12 @@ def lpft_first_steps():
     by = defaultdict(list)
     for x in lp:
         by["EMA unknown" if x["ema"] is None else f"first validation W {x['W_first']:.1e}"].append(x)
-    return dict(all=summ(lp), **{k: summ(v) for k, v in sorted(by.items())})
+    # exposed: EMA on and a first validation after one update (the D = 10 fine-tunes, validate_every 1), where the
+    # random initialisation still weighs W(1) = 2/11; every other run's first validation is at update 7 or later
+    exposed = [x for x in lp if x["ema"] and x["first_step"] == 1]
+    clean = [x for x in lp if not (x["ema"] and x["first_step"] == 1)]
+    return dict(all=summ(lp), exposed=summ(exposed), clean=summ(clean),
+                **{k: summ(v) for k, v in sorted(by.items())})
 
 
 def main():
@@ -230,7 +235,22 @@ def main():
         print(f"  {k:30s} " + json.dumps(v))
     flagged = {n: f for n, f in res.items() if (f["win_ema"] is True and f["best_update"] <= 7) or f["rose_over_value"]
                or f["win_rose"] or f["n_ema_unknown"]}
-    json.dump(dict(W={N: W_curve(1, N, DEFAULT_BETA)[0] for N in range(1, 11)},
+    t1 = Counter()
+    for (study, ve), c in table.items():
+        if study == "transfer study" and ve == 1:
+            t1 += c
+    cells = json.load(open(os.path.join(HERE, "data", "lowd_ft.json")))["cells"]
+    za = cells["ee_Za/r1/d2"]
+    za_audit = res["lowd_round/lpft/ee_Za/r1_d2"]
+    claims = dict(W1=W_curve(1, 1, DEFAULT_BETA)[0], W2=W_curve(1, 2, DEFAULT_BETA)[0],
+                  W3=W_curve(1, 3, DEFAULT_BETA)[0],
+                  transfer_d10=dict(searches=sum(t1.values()), at_update_1_to_3=sum(t1.get(k, 0) for k in "123")),
+                  lpft=dict((k, lp[k]) for k in ("all", "exposed", "clean")),
+                  lowd_za_r1_d10=dict(lpft=za["lpft"], readout=za["readout"], update=za_audit["best_update"],
+                                      W=za_audit["W_best"], gain_over_default=za["gain_over_default"]["lpft"]))
+    print("\nclaims:")
+    print(json.dumps(claims))
+    json.dump(dict(W={N: W_curve(1, N, DEFAULT_BETA)[0] for N in range(1, 11)}, claims=claims,
                    table={f"{s} / every {ve}": dict(c) for (s, ve), c in table.items()},
                    listed=flagged, pairs=pairs, reruns_in=n_rerun, lpft_first_steps=lp),
               open(os.path.join(HERE, "data", "ema_start_audit.json"), "w"), indent=1)
