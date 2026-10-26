@@ -209,6 +209,36 @@ def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
     return cmd
 
 
+def _run_cells(cfg, hp_params, run_dir, results_dir, hp_idx, t_steps, project_dir):
+    """A trial that is several runs at one HP point (cfg["cells"]: [{name, steps, params: {key: value}}]): each cell
+    is one run.py with the sweep's fixed_params, the trial's HPs, its own steps (training.iterations and the
+    scheduler's increment) and its own params, run one after the other in <run_dir>/<name>. The objective is the
+    geometric mean of the cells' best-checkpoint val_loss_no_reg, so every cell's relative gain counts equally (as
+    the default loss aggregation weighs processes) and the best point is not tuned to one cell. Any failed cell fails
+    the trial (no partial mean). Returns (objective, {cell: val_loss_no_reg}, summary result path)."""
+    pre = "++" if cfg.get("base_config") else ""
+    os.makedirs(run_dir, exist_ok=True)
+    per_cell, logs = {}, []
+    for c in cfg["cells"]:
+        cell_dir = os.path.join(run_dir, c["name"])
+        res = os.path.join(results_dir, f"hp{hp_idx:04d}_t{t_steps}_{c['name']}_{int(time.time())}.json")
+        cmd = build_command(cfg, hp_params, cell_dir, 0, res, t_steps, increment_steps=int(c["steps"]))
+        cmd += [f"{pre}{k}={v}" for k, v in (c.get("params") or {}).items()]
+        print(f"[run_trial] cell {c['name']}: {' '.join(cmd)}", flush=True)
+        if subprocess.run(cmd, cwd=project_dir).returncode != 0:
+            raise RuntimeError(f"cell {c['name']}: run.py failed")
+        with open(res) as f:
+            per_cell[c["name"]] = float(json.load(f)["val_loss"])
+        _drop_last_model(cfg, cell_dir, 0, t_steps)
+        print(f"[run_trial] cell {c['name']}  val_loss_no_reg={per_cell[c['name']]:.6g}", flush=True)
+    obj = math.exp(sum(math.log(v) for v in per_cell.values()) / len(per_cell))
+    summary = os.path.join(results_dir, f"hp{hp_idx:04d}_t{t_steps}_{int(time.time())}.json")
+    with open(summary, "w") as f:
+        json.dump({"val_loss": obj, "aggregation": "geometric_mean_over_cells", "cells": per_cell,
+                   "hp": hp_params}, f, indent=1)
+    return obj, per_cell, summary
+
+
 def _drop_last_model(cfg, run_dir, run_idx, t_steps):
     """A trial that ended at its sweep's top fidelity keeps only its best checkpoint: the last model
     (model_run<i>.pt[.gz]) is read only to warm-start a higher fidelity, and every reported value and every
@@ -387,15 +417,22 @@ def main():
     print(f"[run_trial] Running: {' '.join(cmd)}")
 
     try:
-        proc = subprocess.run(cmd, cwd=project_dir)
-        if proc.returncode != 0:
-            raise RuntimeError(f"run.py exited with code {proc.returncode}")
+        if cfg.get("cells"):
+            # several runs at this HP point, the objective their geometric mean (_run_cells)
+            assert warm_start_idx is None, "a cells trial is single-fidelity: it never warm-starts"
+            val_loss, proc_val_losses, result_path = _run_cells(cfg, hp_params, run_dir, results_dir, hp_idx,
+                                                                t_steps, project_dir)
+            result = {"val_loss": val_loss}
+        else:
+            proc = subprocess.run(cmd, cwd=project_dir)
+            if proc.returncode != 0:
+                raise RuntimeError(f"run.py exited with code {proc.returncode}")
 
-        with open(result_path) as f:
-            result = json.load(f)
-        val_loss        = float(result["val_loss"])
-        proc_val_losses = result.get("proc_val_losses")
-        _drop_last_model(cfg, run_dir, run_idx, t_steps)
+            with open(result_path) as f:
+                result = json.load(f)
+            val_loss        = float(result["val_loss"])
+            proc_val_losses = result.get("proc_val_losses")
+            _drop_last_model(cfg, run_dir, run_idx, t_steps)
 
         # Use transfer-ratio geometric mean as HPO objective when scaling law
         # params are available; fall back to raw combined val_loss otherwise.

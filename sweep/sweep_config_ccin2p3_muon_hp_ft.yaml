@@ -1,0 +1,135 @@
+# Muon fine-tune HPs (muon_hp; D159/D160, the user 2026-10-26: "We may have to explore a bit the HP space for muon,
+# that's fine, the gain is clearly worth it"; D158: fine-tunes on Muon too). One single-fidelity DyHPO search (HPO rule 6)
+# over fine_tune.lr_scale, log-uniform in [0.1, 10] (centred on 1, HPO rule 4) and fine_tune.layer_decay, uniform in
+# [0.75, 1]. A trial is the whole small-D grid of par:v3_muon at one HP point (sweep/run_trial.py, cells): the four
+# held-out probes (tools/catalog_ft.py PROBES) x D = 10, 32, 100, 316 training events at 176, 704, 2816, 4576 steps,
+# sixteen fine-tunes run one after the other; the objective is the geometric mean of their best-checkpoint
+# val_loss_no_reg, so no single cell sets the best point. Every cell is tools/catalog_ft.py --keep-parent-stats with
+# MuonAdamW: full retraining from the best checkpoint of the Muon short pretraining's first seed
+# (runs/catalog_v3_short/dimensionless_muon: lr 8.94e-3, muon weight decay 0.1; its pretraining and zero-shot beat
+# the stage-2 search's best by 1.45x and 1.47x, and it is the parent of the untuned Muon fine-tunes, the lr_scale 1,
+# layer_decay 1 reference), the parent's target standardization and other HPs, validation on the probe's first 2000
+# validation events. 12 trials, 4 random start-up; t_steps is the sixteen cells' summed steps (a label: one fidelity).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 48G
+  cpus_per_task: 5
+  time: 02:00:00
+paths: null
+sweep_name: muon_hp_ft
+base_config: ${PROJECT_DIR}/runs/catalog_v3_short/dimensionless_muon
+n_trials: 12
+dyhpo:
+  n_candidates: 2000
+  seed: 42
+  n_startup: 4
+  total_budget: 10000
+  surrogate: gp
+  objective_scale: linear
+fidelity_schedule:
+  t_steps:
+  - 33088
+fixed_params:
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/catalog_v3_short/dimensionless_muon/models/model_run0_best.pt
+  fine_tune.target_stats: parent_shared
+  fine_tune.offshell_stats: parent
+  training.optimizer: MuonAdamW
+  training.validate_frac: 0.01
+  training.es_load_best_model: 'true'
+  data.eval_subsample: 2000
+  evaluation.train_subsample: 2000
+  plot: 'true'
+cells:
+- name: v3_dg_dgwpwm_d2
+  steps: 176
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_dg_dgwpwm.yaml
+    data.train_subsample: 10
+- name: v3_dg_dgwpwm_d3
+  steps: 704
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_dg_dgwpwm.yaml
+    data.train_subsample: 32
+- name: v3_dg_dgwpwm_d4
+  steps: 2816
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_dg_dgwpwm.yaml
+    data.train_subsample: 100
+- name: v3_dg_dgwpwm_d5
+  steps: 4576
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_dg_dgwpwm.yaml
+    data.train_subsample: 316
+- name: v3_usx_cxuwpz_d2
+  steps: 176
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_usx_cxuwpz.yaml
+    data.train_subsample: 10
+- name: v3_usx_cxuwpz_d3
+  steps: 704
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_usx_cxuwpz.yaml
+    data.train_subsample: 32
+- name: v3_usx_cxuwpz_d4
+  steps: 2816
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_usx_cxuwpz.yaml
+    data.train_subsample: 100
+- name: v3_usx_cxuwpz_d5
+  steps: 4576
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_usx_cxuwpz.yaml
+    data.train_subsample: 316
+- name: v3_gg_attx_d2
+  steps: 176
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_gg_attx.yaml
+    data.train_subsample: 10
+- name: v3_gg_attx_d3
+  steps: 704
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_gg_attx.yaml
+    data.train_subsample: 32
+- name: v3_gg_attx_d4
+  steps: 2816
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_gg_attx.yaml
+    data.train_subsample: 100
+- name: v3_gg_attx_d5
+  steps: 4576
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_gg_attx.yaml
+    data.train_subsample: 316
+- name: v3_udx_agwp_nlo_d2
+  steps: 176
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_udx_agwp_nlo.yaml
+    data.train_subsample: 10
+- name: v3_udx_agwp_nlo_d3
+  steps: 704
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_udx_agwp_nlo.yaml
+    data.train_subsample: 32
+- name: v3_udx_agwp_nlo_d4
+  steps: 2816
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_udx_agwp_nlo.yaml
+    data.train_subsample: 100
+- name: v3_udx_agwp_nlo_d5
+  steps: 4576
+  params:
+    data.processes_file: ${PROJECT_DIR}/recipes/muon_hp_ft/v3_udx_agwp_nlo.yaml
+    data.train_subsample: 316
+range_extension:
+  enabled: false
+search_space:
+- name: fine_tune.lr_scale
+  type: float_log
+  low: 0.1
+  high: 10.0
+- name: fine_tune.layer_decay
+  type: float_uniform
+  low: 0.75
+  high: 1.0

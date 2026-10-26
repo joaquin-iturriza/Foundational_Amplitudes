@@ -21,7 +21,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def cell_key(cfg):
     fp = {k: str(v) for k, v in (cfg.get("fixed_params") or {}).items()}
-    return json.dumps([fp, (cfg.get("fidelity_schedule") or {}).get("t_steps")], sort_keys=True)
+    key = [fp, (cfg.get("fidelity_schedule") or {}).get("t_steps")]
+    if cfg.get("cells") or cfg.get("base_config"):      # a cells trial (run_trial._run_cells) or a run's own config
+        key += [cfg.get("cells"), cfg.get("base_config")]
+    return json.dumps(key, sort_keys=True)
 
 
 def same_cell(cfg):

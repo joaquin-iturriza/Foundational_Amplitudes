@@ -1,0 +1,10 @@
+processes:
+- n_test: 5000
+  n_train: 50000
+  n_val: 5000
+  name: v3_udx_agwp_nlo
+  sqrts:
+  - 84
+  - 1000
+sampling:
+  mode: mixture
