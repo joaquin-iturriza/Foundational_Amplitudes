@@ -1496,3 +1496,28 @@ entries:
     writeup: ba29485e
     why: read-out double variance factor, code review
   writeup: 04c5a05e
+- id: muon_hp
+  title: Muon fine-tune hyperparameters
+  question: Where are Muon's best fine-tune settings (lr_scale, layer_decay) in our setup, now that Muon is the fine-tune
+    optimizer too (D155, D158)? The short pretraining was already searched (stage 2 of the Muon test).
+  status: running
+  quotes:
+  - said_at: '2026-10-26T13:15:33.917000+00:00'
+    text: We may have to explore a bit the HP space for muon, that's fine, the gain is clearly worth it
+    decision: D160
+    covers:
+    - muon_hp
+  decisions:
+  - D160
+  next: 'Design the fine-tune search (single-fidelity DyHPO, HPO rule 6): fine_tune.lr_scale [0.1,10]@1, layer_decay [0.75,1],
+    Muon fine-tunes from the Muon pretraining on the small-D catalog_v3 probes, keeping the parent''s standardization; trials
+    and GPU-h under 30; then submit'
+  done_when: null
+  notes_ref: null
+  match: muon_hp*,zz_muon_hp*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
