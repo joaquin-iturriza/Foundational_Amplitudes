@@ -1226,6 +1226,175 @@ Sec.~\ref{sec:ladder-open}, the regeneration item).
   \label{fig:v4_pool_checks}
 \end{figure}
 
+\paragraph{catalog\_v4 against catalog\_v3 as pretraining catalogs (2026-10-26).}\label{par:v4_vs_v3} The question
+is whether to pretrain on catalog\_v4 instead of catalog\_v3 (the user's decision; it gates the held studies and the
+deletion of catalog\_v3). Design: the dimensionless arm with Muon at its search's best (par.~\ref{par:v3_muon}), the
+same HPs, batch and steps on both catalogs (the user: ``Match steps.'', ``only the winner''), two seeds each
+(\code{scripts/job\_catalog\_v3\_short.sh}: \code{dimensionless\_muon\_best}, \code{\_seed2};
+\code{v4\_dimensionless\_muon}, \code{\_seed2}); each run's best checkpoint is at step $4250$ of $4264$ (no blow-up check beyond that).
+Every read is zero-shot at the best checkpoint on $2000$ validation events per pool, the MSE of
+$\log|\mathcal M|^2$ (\code{analysis/catalog\_v4/compare\_v3.py}, Figs.~\ref{fig:v4_vs_v3_shared}
+and~\ref{fig:v4_vs_v3_pp}). Per group: each run's median over probes; the catalog ratio, the median over probes of
+catalog\_v4's MSE over catalog\_v3's (each the geometric mean of its two seeds); the share of probes lower in both
+seeds; and the gap, the median $|\log_{10}|$ of that ratio, against each catalog's seed spread, the median
+$|\log_{10}|$ of seed $43$ over seed $42$ (the convention of par.~\ref{par:v3_muon}). Both catalog\_v3 runs were
+trained after the mixed-order fix: until then the catalog table gave catalog\_v3's two BSM pools with a gluon the
+wrong coupling powers, $Z'$ plus a gluon from $u\bar u$ ($[0,0,0,2]$, its diagrams $[0,0,1,0]$) and $u\bar u\to
+h_2h_3g$ ($[0,0,0,3]$, its diagrams $[0,0,1,2]$), in the order features and the target, so every earlier catalog\_v3
+arm carries that error on those two pools; both now read the powers from the diagrams, as catalog\_v4 does.
+% allow: 4250 4264 42 43 2000 13 4.7 6 because they are the best step and step count, the seeds, the events per read, the beam energy in TeV, the b mass in GeV and the window top in TeV, settings
+% allow: 0 1 2 3 because they are coupling-power vectors, settings
+% src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+% claim: n_shared=555
+% claim: n_shared_b=265
+% claim: shared.v3.all_no_b.all.n=290
+% claim: shared.v3.all_no_b.all.v3_lo=0.36
+% claim: shared.v3.all_no_b.all.v3_hi=0.40
+% claim: shared.v3.all_no_b.all.v4_lo=0.78
+% claim: shared.v3.all_no_b.all.v4_hi=0.82
+% claim: shared.v3.all_no_b.all.ratio=1.25
+% claim: shared.v3.all_no_b.all.v4_lower_both_pct=21
+% claim: shared.v3.all_no_b.all.v3_lower_both_pct=54
+% claim: shared.v3.all_no_b.all.gap=0.26
+% claim: shared.v3.all_no_b.all.spread_v3=0.09
+% claim: shared.v3.all_no_b.all.spread_v4=0.12
+% claim: shared.v4.all_no_b.all.v3_lo=2.34
+% claim: shared.v4.all_no_b.all.v3_hi=2.37
+% claim: shared.v4.all_no_b.all.v4_lo=0.44
+% claim: shared.v4.all_no_b.all.v4_hi=0.48
+% claim: shared.v4.all_no_b.all.ratio=0.21
+% claim: shared.v4.all_no_b.all.v4_lower_both_pct=88
+% claim: shared.v4.all_no_b.all.v3_lower_both_pct=5
+% claim: shared.v4.all_no_b.all.gap=0.68
+% claim: shared.v4.all_no_b.all.spread_v3=0.11
+% claim: shared.v4.all_no_b.all.spread_v4=0.08
+\emph{The $555$ processes held out in both catalogs}, each read on its catalog\_v3 pool and on its catalog\_v4 pool
+by all four runs ($265$ with a $b$ apart: the two pools of such a process are different functions, $4.7$\,GeV
+against massless). On the other $290$, catalog\_v3's pools: catalog\_v3's runs $0.36$ and $0.40$, catalog\_v4's
+$0.78$ and $0.82$; ratio $1.25$, catalog\_v4 lower in both seeds on $21\%$, catalog\_v3 on $54\%$, gap $0.26$ against
+seed spreads $0.09$ and $0.12$. On catalog\_v4's pools: catalog\_v3's runs $2.34$ and $2.37$, catalog\_v4's $0.44$
+and $0.48$; ratio $0.21$, lower in both seeds on $88\%$ against $5\%$, gap $0.68$ against $0.11$ and $0.08$. Both
+differences exceed the seed spread. Each catalog reads its own pools best, but the cost of crossing is not symmetric:
+catalog\_v3's model on catalog\_v4's pools (forward events, $\sqrt{\hat s}$ to $6$\,TeV) is about six times its error on
+its own, catalog\_v4's model on catalog\_v3's about twice (a quarter more per process).
+% src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+% claim: shared.v3.all_no_b.H3.ratio=0.90
+% claim: shared.v3.all_no_b.H6.ratio=1.11
+% claim: shared.v3.all_no_b.H6.n=5
+% claim: shared.v3.all_no_b.H5.ratio=2.7
+% claim: shared.v3.all_no_b.H7c.ratio=1.68
+% claim: shared.v3.all_no_b.H1.ratio=1.38
+% claim: shared.v3.all_no_b.H2p5.ratio=1.24
+% claim: shared.v4.all_no_b.H6.ratio=0.02
+% claim: shared.v4.all_no_b.H2p5.ratio=0.37
+% claim: shared.v3.b.all.ratio=2.25
+% claim: shared.v4.b.all.ratio=0.21
+Per axis on catalog\_v3's pools catalog\_v4 is behind on new combinations, $2\to4$, $2\to5$, one loop and the harder cut
+(ratios $1.24$ to $2.7$: $1.38$, $1.24$ at $2\to5$, $2.7$ on the one-loop pools, $1.68$ at $p_T\geq30$\,GeV), even on
+the top ($0.90$, as many probes lower in both seeds on either side) and within the seed spread at $\alpha_s=0.13$ ($1.11$, $5$
+probes); on catalog\_v4's pools it is ahead on every axis ($0.02$ at $\alpha_s=0.13$ to $0.37$ at $2\to5$). The $b$
+processes go the same way, more so: $2.25$ on catalog\_v3's pools (catalog\_v4 never saw a $4.7$\,GeV $b$), $0.21$ on
+catalog\_v4's.
+% src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+% claim: n_pp=1396
+% claim: n_pp_b=599
+% claim: pp_frac_inside=0.54
+% claim: pp.no_b.train.mse.n=578
+% claim: pp.no_b.train.mse.ratio=0.75
+% claim: pp.no_b.train.mse.v4_lower_both_pct=57
+% claim: pp.no_b.train.mse.v3_lower_both_pct=27
+% claim: pp.no_b.train.mse.gap=0.33
+% claim: pp.no_b.train.mse.spread_v3=0.11
+% claim: pp.no_b.train.mse.spread_v4=0.10
+% claim: pp.no_b.train.mse_outside.ratio=0.50
+% claim: pp.no_b.train.mse_outside.v4_lower_both_pct=68
+% claim: pp.no_b.train.mse_inside.ratio=1.20
+% claim: pp.no_b.train.mse_inside.v3_lower_both_pct=56
+% claim: pp.no_b.train.mse_inside.v3_med=0.13
+% claim: pp.no_b.train.mse_inside.v4_med=0.60
+% claim: pp.no_b.heldout.mse.n=180
+% claim: pp.no_b.heldout.mse.ratio=0.78
+% claim: pp.no_b.heldout.mse.v4_lower_both_pct=50
+% claim: pp.no_b.heldout.mse.v3_lower_both_pct=27
+% claim: pp.no_b.heldout.mse_outside.ratio=0.63
+% claim: pp.no_b.heldout.mse_inside.ratio=1.21
+% claim: pp.no_b.heldout.H3.ratio=0.76
+% claim: pp.no_b.role_changed.mse.n=39
+% claim: pp.no_b.role_changed.mse.ratio=1.74
+\emph{The $13$\,TeV pp pools} of the $1396$ hadronic tree classes, which neither catalog trains on, by the class's role
+in both catalogs (a catalog\_v3 class merged into or split across catalog\_v4 classes takes the role of the one holding
+its tree), the pool split into its events inside what catalog\_v3's window pools cover (a median $0.54$ of a class's
+events; par.\ The pp-trained arm) and the rest; the $599$ classes with a $b$ apart (the pp pools carry catalog\_v3's
+$4.7$\,GeV $b$). The $578$ classes trained in both: ratio $0.75$, catalog\_v4 lower in both seeds on $57\%$, catalog\_v3
+on $27\%$ (gap $0.33$, seed spreads $0.11$ and $0.10$); outside catalog\_v3's coverage $0.50$ ($68\%$ lower), inside it
+$1.20$ (catalog\_v3 lower on $56\%$; the medians, $0.13$ against $0.60$, differ more than the per-class ratio because
+the classes' errors spread over two decades). The $180$ held out in both: ratio $0.78$ ($50\%$ against $27\%$),
+$0.63$ outside and $1.21$ inside; on the top alone the difference ($0.76$) is within the seed spread. The $39$ whose role
+differs, nearly all trained in catalog\_v3 and held out in catalog\_v4 by its class merges: $1.74$. Every difference
+quoted exceeds the seed spread unless said otherwise.
+% src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+% claim: pp.b.train.mse.ratio=4.9
+% claim: pp.b.heldout.mse.ratio=1.48
+% claim: pp.b.dropped_in_v4.mse.n=33
+% claim: pp.b.dropped_in_v4.mse.ratio=51
+On the $b$ classes catalog\_v4 is behind, as it must be on a $b$ mass it never saw: $4.9$ on the training classes,
+$1.48$ on the held-out ones, and $51$ on the $33$ $b$-Higgs classes catalog\_v4 dropped.
+% src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+% claim: own.v3.H1.seed42=0.20
+% claim: own.v3.H1.seed43=0.22
+% claim: own.v4.H1.seed42=0.24
+% claim: own.v4.H1.seed43=0.26
+% claim: own.v3.H2.seed42=0.29
+% claim: own.v3.H2.seed43=0.31
+% claim: own.v4.H2.seed42=0.46
+% claim: own.v4.H2.seed43=0.48
+% claim: own.v3.H3.seed42=0.94
+% claim: own.v3.H3.seed43=0.98
+% claim: own.v4.H3.seed42=0.83
+% claim: own.v4.H3.seed43=0.87
+% claim: own.v3.H5.seed42=0.49
+% claim: own.v3.H5.seed43=0.45
+% claim: own.v4.H5.seed42=0.80
+% claim: own.v4.H5.seed43=1.00
+% claim: own.v3.H7E.seed42=1.34
+% claim: own.v3.H7E.seed43=1.66
+% claim: own.v4.H7E.seed42=0.37
+% claim: own.v4.H7E.seed43=0.36
+\emph{Each catalog's own axes}, which differ in pools, cuts and windows and are not comparable across catalogs (seed
+$42$ / $43$): new combinations $0.20$ / $0.22$ (catalog\_v3) and $0.24$ / $0.26$ (catalog\_v4), $2\to4$ $0.29$ /
+$0.31$ and $0.46$ / $0.48$, the top $0.94$ / $0.98$ and $0.83$ / $0.87$, one loop $0.49$ / $0.45$ and $0.80$ /
+$1.00$, the energy axis $1.34$ / $1.66$ ($1$ to $10$\,TeV) and $0.37$ / $0.36$ ($6$ to $20$\,TeV, above catalog\_v4's
+window).
+% allow: 1 10 6 20 because they are the energy axes' windows in TeV, settings
+So at equal steps catalog\_v4 buys pp use outside catalog\_v3's coverage (a factor $0.50$ to $0.63$ there, $0.75$ to
+$0.78$ on whole pools) and the whole of its own wider region (a factor five), and pays about a quarter per process on
+catalog\_v3's narrower region, more on its one-loop pools, plus everything that needs a massive $b$. Whether that
+in-region cost is the same steps spread over a larger phase space (and so shrinks with a longer run) is not checked
+here. Two seeds per catalog, short pretrainings.
+
+\begin{figure}[t]
+  \centering
+  \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_v3_shared.pdf}}
+  % src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+  % allow: 42 43 because they are the seeds, settings
+  % allow: M|^2
+  \caption{catalog\_v4 against catalog\_v3 on the processes held out in both, no $b$: per held-out axis
+    (catalog\_v3's), each run's median MSE of $\log|\mathcal M|^2$ over the axis's processes, seed $42$ filled, $43$
+    open. Left on catalog\_v3's pools, right on catalog\_v4's.}
+  \label{fig:v4_vs_v3_shared}
+\end{figure}
+\begin{figure}[t]
+  \centering
+  \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_v3_pp.pdf}}
+  % src: python3 analysis/catalog_v4/compare_v3.py @2327492d
+  % allow: 13 42 43 because they are the beam energy in TeV and the seeds, settings
+  \caption{The same runs on the $13$\,TeV pp pools, no $b$: each run's median MSE over the classes trained in both
+    catalogs (left) and held out in both (right), on the whole pool and on its events inside and outside what
+    catalog\_v3's window pools cover. Seed $42$ filled, $43$ open.}
+  \label{fig:v4_vs_v3_pp}
+\end{figure}
+
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
@@ -3566,8 +3735,10 @@ inputs) and gain at $2\to4$ ($34$ / $17$ against $45$ / $26$).
 event's $|\mathcal M|^2$ by $(4\pi\alpha_s)^q(4\pi\alpha)^e$, with $q$, $e$ the process's QCD and QED orders and $\alpha_s$
 the event's own (the value MadEvent labelled it at, \code{tools/recover\_alphas.py}; \code{data.target\_physics\_orders},
 arm \code{DlessInOrd}: the dimensionless inputs and encoder row with this factor, same steps, HPs and seed). It is exact
-for a single coupling monomial, so mixed-order entries (four-quark, heavy-quark pairs) are refused; none is in the
-catalog's training set. Of the $1491$ catalog pools, $11$ did not reproduce in the $\alpha_s$ recovery; $10$ are purely
+for a single coupling monomial. An entry whose diagrams carry more than one (four-quark, heavy-quark pairs, and
+catalog\_v4's electroweak and QCD interference) was refused at first; it is now divided by its highest $\alpha_s$
+power with that term's $\alpha$ power, both read from its diagram sidecar (\code{experiment.\_orders\_from\_diagrams}),
+and the ratio of the other terms stays in the target (par.~\ref{par:v4_vs_v3}). Of the $1491$ catalog pools, $11$ did not reproduce in the $\alpha_s$ recovery; $10$ are purely
 electroweak ($q=0$, no $\alpha_s$ needed), and the eleventh, the probe $g\bar d\to\bar dZHg$, is a regenerated sample at
 both cuts (\code{d4r\_}, \code{d4c30r\_}), so that $2\to4$ cell is not paired event by event with the other rows. On new
 processes the factor is the largest gain of the round, $1.57$ to $0.48$, the level error falling from $0.86$ to $0.19$
@@ -10042,15 +10213,13 @@ of the three share a test set.
     $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
     one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
     classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
-  \item \textbf{State (2026-10-26, 16:00).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
-    \code{plan next}); this item only summarises it. Running on CC-IN2P3: catalog\_v4 against catalog\_v3, the
-    dimensionless arm only with Muon at its search best, two seeds each, equal steps (4264; the user: ``Match steps.'',
-    ``only the winner''), with the cross reads on the 555 probes held out in both catalogs and the 13 TeV pp pools
-    (smoke passed; trainings running, the catalog\_v3 seed-42 rerun and the cross read pending). Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop
-    $b\bar b\to hW^+W^-$ only; no second seeds for the old sign arms; the 18 contaminated fine-tunes not rerun.
-    Next: read the catalog comparison and decide the switch with the user; then the held
-    Daniel's-catalog studies adapted to the chosen catalog. Disk on CC at 90\%: the user is asked what to free.
-    % allow: 16 00 2 42 1 4264 555 13 20 12 5 90 18 4 because they are a clock time, seed and trial counts, the step horizon, the probe and pool counts, the disk share and the stage number, settings and counts named in the plan, not results
+  \item \textbf{State (2026-10-26, 21:00).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
+    \code{plan next}); this item only summarises it. catalog\_v4 against catalog\_v3 is read (par.~\ref{par:v4_vs_v3}).
+    Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop $b\bar b\to hW^+W^-$ only; no
+    second seeds for the old sign arms; the contaminated fine-tunes not rerun. Next: the user's call on switching to
+    catalog\_v4; then the held Daniel's-catalog studies adapted to the chosen catalog, and catalog\_v3's deletion only
+    if the switch is confirmed. Disk on CC at $90\%$: the user is asked what to free.
+    % allow: 21 00 90 because they are a clock time and the disk share, not results
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).
