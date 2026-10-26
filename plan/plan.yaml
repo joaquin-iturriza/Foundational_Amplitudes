@@ -116,7 +116,7 @@ entries:
     - FA-ccin2p3-bc20e0d6
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-f72f1379
-    commit: c03d3500
+    commit: 46841b69
     paths:
     - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/data/prep_sampling.json
@@ -128,6 +128,7 @@ entries:
     - analysis/catalog_v3/figs/prep_signed.png
     - analysis/catalog_v3/prep_sampling.py
     - analysis/catalog_v3/prep_shat_slope.py
+    - recipes/catalog_v3_gen_signext.yaml
     - tests/test_hybrid_blend.py
   dead_ends:
   - tried: hybrid short pretraining FA-ccin2p3-9b88e434
