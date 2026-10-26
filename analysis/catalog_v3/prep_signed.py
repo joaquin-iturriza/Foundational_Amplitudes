@@ -34,6 +34,17 @@ ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "sha
 # The third, the baseline at its HPs and step count with 95 more sign-changing one-loop training pools
 # (recipes/catalog_v3_train_signext.yaml, 1492 processes against 1397), changes the data, not the model
 SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near", "baseline_more_signed": "more"}
+# second seeds (43; the arms above are seed 42) of the baseline and of the more-signed-pools arm, everything else
+# unchanged, to size that arm's sign gain and zero-shot cost against the seed-to-seed spread of each
+SEED2 = {"baseline_seed2": "base2", "baseline_more_signed_seed2": "more2"}
+# the comparisons, each y against x on the same pools and probes: one setting's two seeds (the spread), the arm
+# against the baseline at each seed, and the two-seed means (per pool the mean wrong-sign share, per probe the
+# geometric mean MSE)
+PAIRS = {"sd_base": (("baseline",), ("baseline_seed2",)),
+         "sd_more": (("baseline_more_signed",), ("baseline_more_signed_seed2",)),
+         "s42": (("baseline",), ("baseline_more_signed",)),
+         "s43": (("baseline_seed2",), ("baseline_more_signed_seed2",)),
+         "m2": (("baseline", "baseline_seed2"), ("baseline_more_signed", "baseline_more_signed_seed2"))}
 
 
 def load_raw():
@@ -111,6 +122,57 @@ def sign_arms(h5all, n_axis, flat, out):
     return sr
 
 
+def seed_spread(h5all, n_axis, flat, out, sr):
+    """PAIRS: per comparison, on the held-out pools the scorer reads as sign-changing in every run of both settings, how
+    many y gets less wrong than x and more, the median wrong-sign share of each, within a factor 10 of zero, and over
+    the whole one-loop axis (n_axis pools); and per held-out probe of every axis read by all its runs, the median of
+    y's zero-shot MSE over x's, how many probes it is above 1, and the median per axis."""
+    def signs(arms, field):
+        d = [arm_signs(a, field) for a in arms]
+        # a pool with no event within a factor 10 of zero has no near share (None): None for the mean too
+        return {p: (None if any(x[p] is None for x in d) else float(np.mean([x[p] for x in d])))
+                for p in set.intersection(*[set(x) for x in d]) if p in h5all}
+
+    def mses(arms):
+        out_ = {}
+        for a in set.intersection(*[set(sr[x]) for x in arms]):
+            pr = [sr[x][a].get("probes", {}) for x in arms]
+            out_[a] = {p: float(np.exp(np.mean([np.log(q[p]["mse"]) for q in pr])))
+                       for p in set.intersection(*[set(q) for q in pr]) if all(q[p]["mse"] > 0 for q in pr)}
+        return out_
+    out["seeds"] = {}
+    for k, (xa, ya) in PAIRS.items():
+        wx, wy = signs(xa, "wrong_sign"), signs(ya, "wrong_sign")
+        nx, ny = signs(xa, "wrong_sign_near"), signs(ya, "wrong_sign_near")
+        ps_ = sorted(set(wx) & set(wy))
+        pn = [p for p in ps_ if nx.get(p) is not None and ny.get(p) is not None]
+        mx, my = mses(xa), mses(ya)
+        rat, ax = [], {}
+        for a in sorted(set(mx) & set(my)):
+            rr = [my[a][p] / mx[a][p] for p in sorted(set(mx[a]) & set(my[a]))]
+            rat += rr
+            ax[a] = med(rr)
+        o = {"x": xa, "y": ya, "n": len(ps_), "better": int(sum(wy[p] < wx[p] for p in ps_)),
+             "worse": int(sum(wy[p] > wx[p] for p in ps_)),
+             "wrong_x": med([wx[p] for p in ps_]), "wrong_y": med([wy[p] for p in ps_]),
+             "n_near": len(pn), "near_x": med([nx[p] for p in pn]), "near_y": med([ny[p] for p in pn]),
+             "axis_x": sum(wx[p] for p in ps_) / n_axis, "axis_y": sum(wy[p] for p in ps_) / n_axis,
+             "mse_ratio": med(rat), "n_probes": len(rat), "n_probes_worse": int(sum(r > 1 for r in rat)), "axes": ax}
+        out["seeds"][k] = o
+        flat.update({f"{k}_n": o["n"], f"{k}_n_near": o["n_near"], f"{k}_better": o["better"], f"{k}_worse": o["worse"],
+                     f"{k}_n_probes": o["n_probes"], f"{k}_n_probes_worse": o["n_probes_worse"],
+                     f"{k}_mse_ratio": round(o["mse_ratio"], 2)})
+        for f_ in ("wrong", "near", "axis"):
+            flat[f"{k}_{f_}_x"] = round(100 * o[f"{f_}_x"], 1)
+            flat[f"{k}_{f_}_y"] = round(100 * o[f"{f_}_y"], 1)
+        for a, r in ax.items():
+            flat[f"{k}_{a}_ratio"] = round(r, 2)
+        print(f"{k:8s} n={o['n']} y better/worse {o['better']}/{o['worse']} wrong {100 * o['wrong_x']:.1f}->"
+              f"{100 * o['wrong_y']:.1f}% near {100 * o['near_x']:.1f}->{100 * o['near_y']:.1f}% axis "
+              f"{100 * o['axis_x']:.1f}->{100 * o['axis_y']:.1f}% mse-ratio {o['mse_ratio']:.3g} over {o['n_probes']} "
+              f"(above on {o['n_probes_worse']}) " + " ".join(f"{a}:{r:.2f}" for a, r in ax.items()))
+
+
 def med(v):
     v = [x for x in v if x is not None]
     return float(np.median(v)) if v else None
@@ -174,7 +236,7 @@ def main():
     h5all = {**one_sign, **h5}
     out["one_sign_scored"] = {}
     out["arms"] = {}
-    for arm, sh in {**ARMS, **SIGN_ARMS}.items():
+    for arm, sh in {**ARMS, **SIGN_ARMS, **SEED2}.items():
         ws = arm_signs(arm)
         ps = sorted(set(ws) & set(h5all))
         w = np.array([ws[p] for p in ps]); mj = np.array([h5all[p]["err_major"] for p in ps])
@@ -200,9 +262,11 @@ def main():
                     for s in SETS}
     n_axis = len([r for r in rows if r["set"] == "H5" and "error" not in r])
     sr = sign_arms(h5all, n_axis, flat, out)
+    seed_spread(h5all, n_axis, flat, out, sr)
     json.dump(out, open(os.path.join(HERE, "data", "prep_signed.json"), "w"), indent=1)
     plot(sig, h5, out)
     plot_sign_arms(out, sr)
+    plot_seeds(out, sr)
     # e+e- -> c cbar g at one loop: the pool every arm gets most wrong
     cg = "v3_epem_ccxg_nlo_25-1000GeV"
     wc = [out["arms"][a]["per_pool"][cg] for a in ARMS]
@@ -295,6 +359,36 @@ def plot_sign_arms(out, sr):
     for ax in axs:
         ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "prep_signed_arms"))
+
+
+def plot_seeds(out, sr):
+    """The more-signed-pools arm against the seed-to-seed spread, as empirical distributions of one comparison's
+    per-unit differences (PAIRS, the single-seed ones): (a) over the held-out pools the scorer reads as sign-changing,
+    the wrong-sign share's difference y - x in percentage points; (b) over the held-out probes of every axis, log10 of
+    y's zero-shot MSE over x's."""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    sty = {"sd_base": (ps.C.grey, "--", "baseline, seed 43 against 42"),
+           "sd_more": (ps.C.green, "--", "more signed, seed 43 against 42"),
+           "s42": (ps.C.blue, "-", "more signed against baseline, seed 42"),
+           "s43": (ps.C.vermillion, "-", "more signed against baseline, seed 43")}
+    for k, (col, ls, lab) in sty.items():
+        (xa,), (ya,) = PAIRS[k]
+        wx, wy = arm_signs(xa), arm_signs(ya)
+        d = np.sort([100 * (wy[p] - wx[p]) for p in sorted(set(wx) & set(wy)) if p in out["arms"][xa]["per_pool"]])
+        axs[0].step(d, np.arange(1, len(d) + 1) / len(d), where="post", color=col, ls=ls, label=lab)
+        r = []
+        for a in set(sr[xa]) & set(sr[ya]):
+            px, py = sr[xa][a].get("probes", {}), sr[ya][a].get("probes", {})
+            r += [np.log10(py[p]["mse"] / px[p]["mse"]) for p in set(px) & set(py) if px[p]["mse"] > 0 and py[p]["mse"] > 0]
+        r = np.sort(r)
+        axs[1].step(r, np.arange(1, len(r) + 1) / len(r), where="post", color=col, ls=ls, label=lab)
+    axs[0].set_xlabel("wrong sign, y - x (points)"); axs[0].set_ylabel("fraction of pools")
+    axs[1].set_xlabel(r"$\log_{10}$ MSE$_y$ / MSE$_x$"); axs[1].set_ylabel("fraction of probes")
+    ps.legend(axs[0], "upper left")
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "prep_signed_seeds"))
 
 
 if __name__ == "__main__":

@@ -46,7 +46,9 @@ def main():
                           "best_val_loss_no_reg": min(v), "best_step": r["vals"][v.index(min(v))]["step"],
                           "final_val_loss_no_reg": v[-1]}
     p = R["baseline_sign_pairs"]; v = [x["val_loss_no_reg"] for x in p["vals"]]
-    j = next(i for i in range(1, len(v)) if v[i] > 5 * min(v[:i]))     # the first validation 5x above the best so far
+    # the first validation 5x above the best so far; the factor is open (unsourced, no decision behind it). muon_compare
+    # classifies a blow-up at 10x its running minimum (also open); here both pick the same validation (0.0208 -> 0.391)
+    j = next(i for i in range(1, len(v)) if v[i] > 5 * min(v[:i]))
     a, b = p["vals"][j - 1]["per_pool"], p["vals"][j]["per_pool"]
     rat = {k: b[k] / a[k] for k in a if a[k] > 0 and k in b}
     loop = [x for k, x in rat.items() if k.endswith(("_nlo", "_loop"))]

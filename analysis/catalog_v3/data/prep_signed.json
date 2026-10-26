@@ -138,7 +138,9 @@
    "dimensionless_twin": 0.498,
    "baseline_sign_pairs": 0.5435,
    "baseline_sign_near": 0.2875,
-   "baseline_more_signed": 0.4875
+   "baseline_more_signed": 0.4875,
+   "baseline_seed2": 0.4375,
+   "baseline_more_signed_seed2": 0.3845
   },
   "v3_ucx_cxhu_nlo_131-1000GeV": {
    "neg": 1.0,
@@ -152,7 +154,9 @@
    "dimensionless_twin": 0.017,
    "baseline_sign_pairs": 0.0,
    "baseline_sign_near": 0.0,
-   "baseline_more_signed": 0.0
+   "baseline_more_signed": 0.0,
+   "baseline_seed2": 0.0,
+   "baseline_more_signed_seed2": 0.0
   },
   "v3_uux_epemz_nlo_96-1000GeV": {
    "neg": 0.0,
@@ -166,7 +170,9 @@
    "dimensionless_twin": 0.879,
    "baseline_sign_pairs": 0.6095,
    "baseline_sign_near": 0.592,
-   "baseline_more_signed": 0.003
+   "baseline_more_signed": 0.003,
+   "baseline_seed2": 0.974,
+   "baseline_more_signed_seed2": 0.0045
   }
  },
  "arms": {
@@ -465,6 +471,60 @@
     "v3_udx_ccxwp_nlo_84-1000GeV": 0.1595,
     "v3_uux_ccxz_nlo_96-1000GeV": 0.258,
     "v3_uux_epemz_nlo_96-1000GeV": 0.003
+   }
+  },
+  "baseline_seed2": {
+   "n": 17,
+   "n_one_sign": 3,
+   "unmatched": [],
+   "wrong_sign": 0.1925,
+   "worse_than_major": 10,
+   "minus_mlp": 0.19080000000000003,
+   "per_pool": {
+    "v3_bg_bgg_nlo_25-1000GeV": 0.007,
+    "v3_dd_add_nlo_25-1000GeV": 0.011,
+    "v3_ddx_aaa_nlo_25-1000GeV": 0.0045,
+    "v3_ddx_ag_nlo_25-1000GeV": 0.4375,
+    "v3_ddx_epvewm_nlo_84-1000GeV": 0.0785,
+    "v3_dg_ad_nlo_25-1000GeV": 0.019,
+    "v3_dg_dgz_nlo_96-1000GeV": 0.369,
+    "v3_dg_uwm_nlo_84-1000GeV": 0.2625,
+    "v3_epem_ccxg_nlo_25-1000GeV": 0.7225,
+    "v3_epem_ddxz_nlo_96-1000GeV": 0.163,
+    "v3_gg_bbxg_nlo_25-1000GeV": 0.0285,
+    "v3_uc_cuz_nlo_96-1000GeV": 0.302,
+    "v3_ucx_cxhu_nlo_131-1000GeV": 0.0,
+    "v3_udx_agwp_nlo_84-1000GeV": 0.621,
+    "v3_udx_ccxwp_nlo_84-1000GeV": 0.1925,
+    "v3_uux_ccxz_nlo_96-1000GeV": 0.256,
+    "v3_uux_epemz_nlo_96-1000GeV": 0.974
+   }
+  },
+  "baseline_more_signed_seed2": {
+   "n": 17,
+   "n_one_sign": 3,
+   "unmatched": [],
+   "wrong_sign": 0.033,
+   "worse_than_major": 9,
+   "minus_mlp": 0.0666,
+   "per_pool": {
+    "v3_bg_bgg_nlo_25-1000GeV": 0.0025,
+    "v3_dd_add_nlo_25-1000GeV": 0.0145,
+    "v3_ddx_aaa_nlo_25-1000GeV": 0.0045,
+    "v3_ddx_ag_nlo_25-1000GeV": 0.3845,
+    "v3_ddx_epvewm_nlo_84-1000GeV": 0.0145,
+    "v3_dg_ad_nlo_25-1000GeV": 0.033,
+    "v3_dg_dgz_nlo_96-1000GeV": 0.282,
+    "v3_dg_uwm_nlo_84-1000GeV": 0.1665,
+    "v3_epem_ccxg_nlo_25-1000GeV": 0.723,
+    "v3_epem_ddxz_nlo_96-1000GeV": 0.069,
+    "v3_gg_bbxg_nlo_25-1000GeV": 0.0105,
+    "v3_uc_cuz_nlo_96-1000GeV": 0.022,
+    "v3_ucx_cxhu_nlo_131-1000GeV": 0.0,
+    "v3_udx_agwp_nlo_84-1000GeV": 0.257,
+    "v3_udx_ccxwp_nlo_84-1000GeV": 0.206,
+    "v3_uux_ccxz_nlo_96-1000GeV": 0.192,
+    "v3_uux_epemz_nlo_96-1000GeV": 0.0045
    }
   }
  },
@@ -1379,6 +1439,165 @@
      "base_mse": 0.5437208790134327,
      "ratio": 0.9164183819535046
     }
+   }
+  }
+ },
+ "seeds": {
+  "sd_base": {
+   "x": [
+    "baseline"
+   ],
+   "y": [
+    "baseline_seed2"
+   ],
+   "n": 17,
+   "better": 6,
+   "worse": 9,
+   "wrong_x": 0.054,
+   "wrong_y": 0.1925,
+   "n_near": 16,
+   "near_x": 0.39413027916964927,
+   "near_y": 0.4133081226688769,
+   "axis_x": 0.13141666666666665,
+   "axis_y": 0.14828333333333335,
+   "mse_ratio": 1.1406134098027343,
+   "n_probes": 617,
+   "n_probes_worse": 382,
+   "axes": {
+    "H1": 1.091147266990396,
+    "H2": 1.1334473898569222,
+    "H2p5": 1.1672111143469481,
+    "H3": 1.089451407585037,
+    "H5": 0.9666130567185003,
+    "H6": 1.3002113340511903,
+    "H7E": 1.299093859219151,
+    "H7c": 1.1311392075319893
+   }
+  },
+  "sd_more": {
+   "x": [
+    "baseline_more_signed"
+   ],
+   "y": [
+    "baseline_more_signed_seed2"
+   ],
+   "n": 17,
+   "better": 4,
+   "worse": 10,
+   "wrong_x": 0.0475,
+   "wrong_y": 0.033,
+   "n_near": 16,
+   "near_x": 0.14154507556018758,
+   "near_y": 0.14560595594443165,
+   "axis_x": 0.07718333333333334,
+   "axis_y": 0.07953333333333333,
+   "mse_ratio": 1.3590011459736266,
+   "n_probes": 617,
+   "n_probes_worse": 441,
+   "axes": {
+    "H1": 1.4264265682273494,
+    "H2": 1.462286389390913,
+    "H2p5": 1.7731137217919264,
+    "H3": 1.1394534117285628,
+    "H5": 1.34871381498782,
+    "H6": 1.9452616435800372,
+    "H7E": 0.5964704877166085,
+    "H7c": 1.6010915227371219
+   }
+  },
+  "s42": {
+   "x": [
+    "baseline"
+   ],
+   "y": [
+    "baseline_more_signed"
+   ],
+   "n": 17,
+   "better": 12,
+   "worse": 3,
+   "wrong_x": 0.054,
+   "wrong_y": 0.0475,
+   "n_near": 16,
+   "near_x": 0.39413027916964927,
+   "near_y": 0.14154507556018758,
+   "axis_x": 0.13141666666666665,
+   "axis_y": 0.07718333333333334,
+   "mse_ratio": 1.072904640973326,
+   "n_probes": 617,
+   "n_probes_worse": 355,
+   "axes": {
+    "H1": 1.0668083821514975,
+    "H2": 1.0697380792167657,
+    "H2p5": 1.1718874980104905,
+    "H3": 1.056093268114675,
+    "H5": 0.8640396984215138,
+    "H6": 1.0482230946353284,
+    "H7E": 1.3598783948573467,
+    "H7c": 0.9164183819535046
+   }
+  },
+  "s43": {
+   "x": [
+    "baseline_seed2"
+   ],
+   "y": [
+    "baseline_more_signed_seed2"
+   ],
+   "n": 17,
+   "better": 11,
+   "worse": 4,
+   "wrong_x": 0.1925,
+   "wrong_y": 0.033,
+   "n_near": 16,
+   "near_x": 0.4133081226688769,
+   "near_y": 0.14560595594443165,
+   "axis_x": 0.14828333333333335,
+   "axis_y": 0.07953333333333333,
+   "mse_ratio": 1.3249374367574673,
+   "n_probes": 617,
+   "n_probes_worse": 423,
+   "axes": {
+    "H1": 1.3721720051083224,
+    "H2": 1.437002139188806,
+    "H2p5": 1.8573102658935334,
+    "H3": 1.2721049598499985,
+    "H5": 1.0762054067635516,
+    "H6": 1.4773291621180165,
+    "H7E": 0.6349342007149477,
+    "H7c": 1.4099892263587857
+   }
+  },
+  "m2": {
+   "x": [
+    "baseline",
+    "baseline_seed2"
+   ],
+   "y": [
+    "baseline_more_signed",
+    "baseline_more_signed_seed2"
+   ],
+   "n": 17,
+   "better": 14,
+   "worse": 1,
+   "wrong_x": 0.15275,
+   "wrong_y": 0.042749999999999996,
+   "n_near": 16,
+   "near_x": 0.40608164111065065,
+   "near_y": 0.15277074219049813,
+   "axis_x": 0.13985,
+   "axis_y": 0.07835833333333334,
+   "mse_ratio": 1.159972522718108,
+   "n_probes": 617,
+   "n_probes_worse": 415,
+   "axes": {
+    "H1": 1.2899120052723987,
+    "H2": 1.2000973252747364,
+    "H2p5": 1.6686246624706733,
+    "H3": 1.1100360357796153,
+    "H5": 1.026750848994316,
+    "H6": 1.3106204853980274,
+    "H7E": 0.9903251769894754,
+    "H7c": 1.108124626331302
    }
   }
  }
