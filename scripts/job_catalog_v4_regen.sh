@@ -11,6 +11,8 @@
 # every entry sharing a backend with another in the same shard. prebuild_recipes.py assembles each pool the moment its
 # last chunk lands and refuses to start when the shard's pools do not fit the free space. Resumable: built pools are
 # cached, a rerun builds only what is missing. Val/test go to $DATA_DIR, train to the cache under $SCRATCH.
+# V4REGEN_SKIP (optional, comma-separated entry names) leaves those entries out of this shard after sharding (the
+# other entries are unchanged); each is logged as SHARD_SKIP, to be built by a later rerun without the skip.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
@@ -20,7 +22,9 @@ N="${V4REGEN_N:?V4REGEN_N (number of shards) not set}"
 W="${SLURM_CPUS_PER_TASK:-16}"
 mkdir -p "$SCRATCH/zz_catalog_v4_regen"
 SPEC="$SCRATCH/zz_catalog_v4_regen/shard_${K}_of_${N}.yaml"
-python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n "$N" --k "$K" --out "$SPEC" || exit 1
+echo "V4REGEN_SKIP ${V4REGEN_SKIP:-none}"
+python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n "$N" --k "$K" --skip "${V4REGEN_SKIP:-}" \
+    --out "$SPEC" 2>&1 || exit 1
 echo "V4REGEN shard $K of $N: $(grep -c '^- name:' "$SPEC") entries"
 df -k "$DATA_DIR" | tail -1 | awk '{print "V4REGEN_FREE_KB_START", $4}'
 T0=$(date +%s)

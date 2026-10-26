@@ -12,6 +12,10 @@ The recipes must share one recipe-level `sampling` block (it is written into eve
 
     python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n 8 --plan
     python tools/shard_recipes.py recipes/catalog_v4_gen_stage{1,2,3,4}.yaml --n 8 --k 3 --out shard3.yaml
+
+`--skip a,b` drops the named entries from shard k's output AFTER sharding, so every shard keeps the entries it
+had without the skip (a part rerun with a skip builds the same pools as the others expect, minus the named ones).
+A name that is not in the shard is an error; each skipped name is printed as `SHARD_SKIP <name>`.
 """
 import argparse, os, sys
 import yaml
@@ -90,6 +94,7 @@ def main():
     ap.add_argument("--k", type=int)
     ap.add_argument("--out")
     ap.add_argument("--plan", action="store_true")
+    ap.add_argument("--skip", default="", help="comma-separated entry names left out of shard k (after sharding)")
     a = ap.parse_args()
     procs, sampling = load(a.recipes)
     shards = shard(procs, a.n)
@@ -104,10 +109,19 @@ def main():
             print(f"  shard {i:2d}: {len(es):4d} entries ({nv:3d} one-loop), {ev/1e6:6.1f}M events, "
                   f"{gb:5.1f} GB, cost {c/1e6:7.1f}M ({100*c/tot:4.1f}%)")
     if a.k is not None:
-        spec = {"processes": shards[a.k][1]}
+        es = shards[a.k][1]
+        skip = [s for s in a.skip.split(",") if s]
+        missing = [s for s in skip if s not in {e["name"] for e in es}]
+        if missing:
+            sys.exit(f"--skip: not in shard {a.k}: {', '.join(missing)}")
+        for s in skip:
+            print(f"SHARD_SKIP {s}", file=sys.stderr)
+        es = [e for e in es if e["name"] not in skip]
+        spec = {"processes": es}
         if sampling is not None:
             spec = {"sampling": sampling, **spec}
         txt = (f"# shard {a.k} of {a.n} of {' '.join(map(os.path.basename, a.recipes))} (tools/shard_recipes.py)\n"
+               + (f"# skipped: {', '.join(skip)}\n" if skip else "")
                + yaml.safe_dump(spec, sort_keys=False))
         if a.out:
             open(a.out, "w").write(txt)
