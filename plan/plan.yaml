@@ -107,10 +107,12 @@ entries:
   notes_ref: fig:v3_prep_shape
   evidence:
     runs:
+    - FA-ccin2p3-0bddbf48
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-6d35589c
     commit: 44d24f4
     paths:
+    - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/figs/prep_blend.png
     - analysis/catalog_v3/figs/prep_hybrid.png
     - tests/test_hybrid_blend.py
