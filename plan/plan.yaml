@@ -982,6 +982,15 @@ entries:
     answers_after: '2026-10-26T00:23:11+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T00:26:32.958000+00:00'
+    text: 'c) Investigate it
+
+
+      Okay, we''ve been discussing the infrastructure for a while again, can you tell me what''s being done in the background?'
+    decision: D140
+    answers_after: '2026-10-26T00:23:11+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -989,9 +998,10 @@ entries:
   - D136
   - D137
   - D139
-  next: 'when parts 0,2,3,5,6 of the regeneration end: check every pool (counts, cuts, sidecars), report CPU-h and disk; parts
-    1,4,7 wait for the user''s answer on the four mixed-order one-loop entries; then classes and roles on v4; then the b mass
-    in particle_ids.py; then the short pretrainings (GPU estimate to the user)'
+  - D140
+  next: investigate MadLoop's mixed-order one-loop virtual on the 4 failing catalog_v4 entries (CPU only, a few CPU-hours),
+    report the cause and what generating them correctly needs to the user before building them; meanwhile the rest of the
+    regeneration runs
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
