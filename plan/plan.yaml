@@ -1148,7 +1148,7 @@ entries:
     - FA-ccin2p3-e957351b
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-f5a04d70
-    commit: b8041191
+    commit: 7bc4e8ed
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1172,7 +1172,9 @@ entries:
     - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/catalog_v4_loops.yaml
     - recipes/catalog_v4_roles.json
+    - recipes/catalog_v4_shared_heldout.yaml
     - recipes/gen_catalog_v4.py
+    - recipes/make_catalog_v3v4_shared.py
     - recipes/select_catalog_v4.py
     - scripts/job_catalog_v4_equality.sh
     - scripts/job_catalog_v4_regen.sh
