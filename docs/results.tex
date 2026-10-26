@@ -2042,8 +2042,76 @@ each validation.}\label{fig:v3_pair_head_blowup}
     $e^+e^-\to c\bar cg$ stays at $71\%$ wrong. The size moves the other way: the zero-shot MSE on
     $\log|\mathcal M|^2$ per held-out probe over the baseline's has the median $1.07$ (above $1$ on $355$ of the $617$
     probes), $0.86$ on the one-loop axis (median MSE $0.84$ against $1.25$) but $1.17$ on $2\to5$ and $1.36$ on the
-    $1$ to $10$\,TeV axis; the magnitude's MSE on the $17$ sign-changing pools is $1.42$ against $1.25$. One seed, so
-    the $1.07$ is within what a seed could move; the sign gain on $12$ of $17$ pools is the clearer part.
+    $1$ to $10$\,TeV axis; the magnitude's MSE on the $17$ sign-changing pools is $1.42$ against $1.25$. One seed;
+    the second seeds follow.
+  \item \emph{Two seeds: the sign gain is beyond the seed spread, the zero-shot cost is not resolved.} The baseline and
+    the more-signed-pools arm were each run again at seed $43$ (the runs above are seed $42$), everything else unchanged
+    (runs FA-ccin2p3-37a95d76 and FA-ccin2p3-878d6b9a), and every comparison is read on the same held-out pools and
+    probes (Fig.~\ref{fig:v3_prep_signed_seeds}). The pair sign head and the near-zero weighting were not run again:
+    they stay at one seed, so their comparisons above carry no seed spread.
+% src: python3 analysis/catalog_v3/prep_signed.py @e37ef15a
+% claim: sd_base_n=17
+% claim: sd_base_n_probes=617
+% claim: sd_base_better=6
+% claim: sd_base_worse=9
+% claim: sd_more_better=4
+% claim: sd_more_worse=10
+% claim: s42_better=12
+% claim: s43_better=11
+% claim: s43_worse=4
+% claim: m2_better=14
+% claim: m2_worse=1
+% claim: sd_base_n_near=16
+% claim: sd_base_near_x=39.4
+% claim: sd_base_near_y=41.3
+% claim: sd_more_near_x=14.2
+% claim: sd_more_near_y=14.6
+% claim: sd_base_axis_x=13.1
+% claim: sd_base_axis_y=14.8
+% claim: sd_more_axis_x=7.7
+% claim: sd_more_axis_y=8.0
+% claim: sd_base_wrong_x=5.4
+% claim: sd_base_wrong_y=19.2
+% claim: sd_more_wrong_x=4.8
+% claim: sd_more_wrong_y=3.3
+% claim: sd_base_mse_ratio=1.14
+% claim: sd_base_n_probes_worse=382
+% claim: sd_base_H2p5_ratio=1.17
+% claim: sd_base_H7E_ratio=1.30
+% claim: sd_more_mse_ratio=1.36
+% claim: s42_mse_ratio=1.07
+% claim: s43_mse_ratio=1.32
+% claim: m2_mse_ratio=1.16
+% claim: s43_H2p5_ratio=1.86
+% claim: m2_H2p5_ratio=1.67
+% claim: s42_H7E_ratio=1.36
+% claim: s43_H7E_ratio=0.63
+% claim: m2_H7E_ratio=0.99
+% allow: 42 43 because they are the seeds
+% allow: 16 17 1360 1445 28 0.381 1.09 9.18\times10^{-3} 5.88\times10^{-3} 4.40\times10^{-3} 4.67\times10^{-3} 1.6 because they are read from the four runs' logs (validation count, steps, skipped steps, validation losses), not from the script
+% allow: 10 because it is the near-zero factor of the scorer
+    The arm's second run blew up: between its $16$th and $17$th validation (steps $1360$ to $1445$, the same
+    interval as the pair sign head's, so a blow-up at these hyperparameters is not the pair term's alone; whether the
+    coincidence of the step is more than chance is not checked) its validation loss went from $9.18\times10^{-3}$ to $0.381$; $28$ steps were
+    skipped for a non-finite gradient norm and it ended at $1.09$. Its reads are at its best checkpoint, step $1360$,
+    whose validation loss is $1.6$ times the baseline second seed's $5.88\times10^{-3}$ (the first seeds:
+    $4.40\times10^{-3}$ baseline, $4.67\times10^{-3}$ arm; the runs' logs). Why it blew up is not checked.
+    The sign: the seed alone moves pools both ways, the baseline's second seed less wrong on $6$ of the $17$ pools and
+    more on $9$, the arm's on $4$ and $10$; the arm moves them one way, less wrong than the baseline on $12$ of $17$ at
+    seed $42$ and $11$ (more on $4$) at seed $43$, and on $14$ (more on $1$) by the two seeds' mean per pool. Within a
+    factor $10$ of zero ($16$ pools have such events) the baseline is at $39.4\%$ and $41.3\%$, the arm at $14.2\%$ and
+    $14.6\%$; over the whole one-loop axis $13.1\%$ and $14.8\%$ against $7.7\%$ and $8.0\%$: gaps several times the
+    seed spread, and the near-zero one over ten times it. The median wrong-sign share is no stable number: the
+    baseline's goes from $5.4\%$ to $19.2\%$ with the seed (the arm's $4.8\%$ and $3.3\%$), so the near-zero and axis
+    shares carry the gain, not the median. The size: the seed alone moves the zero-shot MSE per probe by a median
+    factor $1.14$ for the baseline (above $1$ on $382$ of the $617$ probes; $1.17$ on $2\to5$, $1.30$ on the $1$ to
+    $10$\,TeV axis) and $1.36$ for the arm, whose second run is the blown-up one. The arm over the baseline is $1.07$
+    at seed $42$, $1.32$ at seed $43$ and $1.16$ on the two seeds' geometric mean per probe; on $2\to5$ it is $1.17$ and
+    $1.86$ (mean $1.67$), on the $1$ to $10$\,TeV axis $1.36$ and $0.63$ (mean $0.99$). The seed-$42$ cost is inside
+    the baseline's own seed spread, the energy axis' cost reverses at the other seed, and the larger costs at seed $43$
+    come from a run read before its blow-up at a higher loss, so they cannot be told from the blow-up. What stands:
+    the added sign-changing pools buy a sign gain well beyond the seed spread; a zero-shot cost is not shown at seed
+    $42$ and is confounded with the blow-up at seed $43$.
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
@@ -2075,6 +2143,19 @@ catalog\_v3's held-out probes, zero-shot, one seed each. (a) Per held-out one-lo
 the scorer reads as sign-changing, each arm's wrong-sign share against the baseline's. (b) Per held-out probe of every
 axis, each arm's MSE on $\log|\mathcal M|^2$ against the baseline's.}
 \label{fig:v3_prep_signed_arms}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_signed_seeds.pdf}
+% allow: 95 because it is the arm's design, the pools it adds
+% allow: 42 43 because they are the seeds
+\caption{The more-signed-pools arm ($95$ more sign-changing one-loop training pools) against the seed-to-seed spread,
+on catalog\_v3's held-out probes, zero-shot. Each line is one comparison of a run $y$ against a run $x$: dashed, one
+setting at seed $43$ against seed $42$ (the baseline, the arm); solid, the arm against the baseline at one seed. The
+arm's seed-$43$ run blew up and is read at its best checkpoint, before the blow-up. (a) Over the held-out one-loop
+pools the scorer reads as sign-changing, the distribution of the wrong-sign share's difference $y-x$. (b) Over the
+held-out probes of every axis, the distribution of $\log_{10}$ of $y$'s MSE on $\log|\mathcal M|^2$ over $x$'s.}
+\label{fig:v3_prep_signed_seeds}
 \end{figure}
 
 \paragraph{The sampling sensitivity on catalog\_v3 (2026-10-26).}\label{par:v3_prep_sampling} How much of what a target
@@ -2304,7 +2385,7 @@ seed)).
     $[10^{-10}, 10^{-6}]$; the warmup fraction, the minimum learning rate and the EMA at stage 1's values. Both searches
     draw from one candidate pool (seed 42), so the start-up trials share their learning rates. The objective DyHPO
     observed is each trial's \code{val\_loss\_no\_reg} at its best checkpoint (the MSE loss, no regularization), the
-    number stage 1 reports. All $16$ trials ended, none failed (\code{data/muon\_search.json},
+    number stage 1 reports. All $16$ trials ended, none crashed (\code{data/muon\_search.json},
     Fig.~\ref{fig:v3_muon_search}).
 % src: python3 analysis/catalog_v3/muon_compare.py @54478a51
 % claim: search.AdamW.best.val_loss_no_reg=0.0141
@@ -2360,7 +2441,8 @@ seed)).
     over two decades, moves its optimizer by as much as the gap between them. From $0.0148$ up every trial of both
     blew up, whatever its second HP (no trial lies between $0.0105$ and $0.0148$): $3$ per optimizer, AdamW's at
     steps $680$ to $850$ (best checkpoints $0.088$ to $0.0933$), Muon's at $595$ to $1020$ ($0.0246$ to $0.0476$),
-    each read at its best checkpoint before the blow-up (a validation over ten times its running minimum). One more
+    each read at its best checkpoint before the blow-up (a validation over ten times its running minimum, a threshold
+    of no decision, open). One more
     AdamW trial (learning rate $0.005$, L2 weight $1.44\times10^{-8}$) spiked at step $1445$ and recovered to
     $0.0196$, best at its last validation like every stable trial. So after both searches Muon's pretraining lead is
     about five times (search against search) to seven (against stage 1's Muon point), not an artefact of an untuned
