@@ -1594,7 +1594,7 @@ entries:
   title: Muon fine-tune hyperparameters
   question: Where are Muon's best fine-tune settings (lr_scale, layer_decay) in our setup, now that Muon is the fine-tune
     optimizer too (D155, D158)? The short pretraining was already searched (stage 2 of the Muon test).
-  status: running
+  status: done
   quotes:
   - said_at: '2026-10-26T13:15:33.917000+00:00'
     text: We may have to explore a bit the HP space for muon, that's fine, the gain is clearly worth it
@@ -1620,3 +1620,4 @@ entries:
     - sweep/sweep_config_ccin2p3_muon_hp_ft.yaml
   dead_ends: []
   asks: []
+  writeup: 14fec1ef
