@@ -2441,8 +2441,9 @@ seed)).
     over two decades, moves its optimizer by as much as the gap between them. From $0.0148$ up every trial of both
     blew up, whatever its second HP (no trial lies between $0.0105$ and $0.0148$): $3$ per optimizer, AdamW's at
     steps $680$ to $850$ (best checkpoints $0.088$ to $0.0933$), Muon's at $595$ to $1020$ ($0.0246$ to $0.0476$),
-    each read at its best checkpoint before the blow-up (a validation over ten times its running minimum, a threshold
-    of no decision, open). One more
+    each read at its best checkpoint before the blow-up (a validation over ten times its running minimum, a technical
+    choice under the user's ``do whatever is correct and simpler''; five times picks the same validations on every run
+    so far, the pair sign head's included). One more
     AdamW trial (learning rate $0.005$, L2 weight $1.44\times10^{-8}$) spiked at step $1445$ and recovered to
     $0.0196$, best at its last validation like every stable trial. So after both searches Muon's pretraining lead is
     about five times (search against search) to seven (against stage 1's Muon point), not an artefact of an untuned

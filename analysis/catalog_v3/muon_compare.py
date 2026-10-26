@@ -57,6 +57,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, HERE)
+from pair_head_blowup import BLOWUP_FACTOR  # noqa: E402  the blow-up rule, one constant for both reads
 sys.path.insert(0, ROOT)
 RUNS = {("AdamW", 42): "dimensionless", ("AdamW", 43): "dimensionless_seed2",
         ("Muon", 42): "dimensionless_muon", ("Muon", 43): "dimensionless_muon_seed2"}
@@ -303,9 +305,8 @@ def search_compare(pre):
             c = np.asarray(t["val_curve"], dtype=float)
             assert abs(np.nanmin(c) / t["val_loss_no_reg"] - 1) < 1e-6, (opt, t["hp_idx"])
             run_min = np.minimum.accumulate(np.where(np.isfinite(c), c, np.inf))
-            # a spike: a validation over 10 times its running minimum; the factor is open (unsourced, no decision of
-            # the user's behind it; pair_head_blowup.py locates its jump at 5x, the same validation there)
-            bad = np.where(~np.isfinite(c[1:]) | (c[1:] > 10 * run_min[:-1]))[0]
+            # a spike: a validation over BLOWUP_FACTOR (10) times its running minimum (pair_head_blowup.py, its source)
+            bad = np.where(~np.isfinite(c[1:]) | (c[1:] > BLOWUP_FACTOR * run_min[:-1]))[0]
             rows.append({"hp_idx": t["hp_idx"], "lr": t["lr"], "hp2": t["hp2"], "val_loss_no_reg": t["val_loss_no_reg"],
                          "best_step": t["best_step"], "mse_log": t["val_loss_no_reg"] * t["prepd_std"] ** 2,
                          "spike_at": int((bad[0] + 2) * t["validate_every"]) if bad.size else None,

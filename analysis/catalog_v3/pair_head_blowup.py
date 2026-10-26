@@ -16,6 +16,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 ARMS = ["baseline", "baseline_sign_near", "baseline_more_signed", "baseline_sign_pairs"]
 TS = re.compile(r"^\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)")
+# A run blows up at the first validation over BLOWUP_FACTOR times its running minimum (shared with muon_compare.py).
+# Chosen by the main session, a technical choice under the user's "do whatever is correct and simpler" (D111): 5x and
+# 10x pick the same validations on every run so far (here 0.0208 -> 0.391, the Muon search's trials alike).
+BLOWUP_FACTOR = 10
 
 
 def read(arm):
@@ -46,9 +50,8 @@ def main():
                           "best_val_loss_no_reg": min(v), "best_step": r["vals"][v.index(min(v))]["step"],
                           "final_val_loss_no_reg": v[-1]}
     p = R["baseline_sign_pairs"]; v = [x["val_loss_no_reg"] for x in p["vals"]]
-    # the first validation 5x above the best so far; the factor is open (unsourced, no decision behind it). muon_compare
-    # classifies a blow-up at 10x its running minimum (also open); here both pick the same validation (0.0208 -> 0.391)
-    j = next(i for i in range(1, len(v)) if v[i] > 5 * min(v[:i]))
+    # the first validation BLOWUP_FACTOR times above the best so far
+    j = next(i for i in range(1, len(v)) if v[i] > BLOWUP_FACTOR * min(v[:i]))
     a, b = p["vals"][j - 1]["per_pool"], p["vals"][j]["per_pool"]
     rat = {k: b[k] / a[k] for k in a if a[k] > 0 and k in b}
     loop = [x for k, x in rat.items() if k.endswith(("_nlo", "_loop"))]
