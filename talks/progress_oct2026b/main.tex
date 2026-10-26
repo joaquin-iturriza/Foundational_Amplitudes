@@ -14,7 +14,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{xcolor}
 
-\graphicspath{{figs/}{../../analysis/catalog_daniel/figs/}{../../analysis/catalog_v3/figs/}{../../analysis/transfer/figs/}}
+\graphicspath{{figs/}}
 
 \definecolor{navy}{RGB}{38,38,110}
 
@@ -44,103 +44,115 @@
 \end{frame}
 
 %---------------------------------------------------------------- Daniel's catalog
-\begin{frame}{Zero shot on Daniel's catalog}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{zs_vs_draft.pdf}
+\begin{frame}{Daniel's catalog and what is measured}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.15em}
+        \item Daniel's 1491 processes, $2\to2$ and $2\to3$ with proton partons, his generator settings, our own events
+        \item His split, 1352 training and 139 held out. Interpolation, 96 held-out processes that are a relabel of a training process (swap of massless quarks of equal charge, of $e$ and $\mu$, or charge conjugation). Extrapolation, the 43 with no relabel in training
+        \item Every number in this deck is the per-process MSE of $\log|\mathcal M|^2$ (natural log) on 2000 events of that process, with nothing fitted on the held-out process, no rescale and no shift
+        \item Level part, the squared mean error, which one number per process would remove. Shape part, the variance of the error. The two add up to the MSE
+        \item Full run, $10^5$ events per process and 32k steps. Short run, $10^4$ events per process and about 4k steps, otherwise the same. One seed each
+    \end{itemize}
+  \end{minipage}
+  \vfill
 \end{frame}
 
-\begin{frame}{Most held out processes are relabels}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{heldout_zero_shot.pdf}
+\begin{frame}{What the network is trained to output}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.15em}
+        \item Per-process standardization, $\log|\mathcal M|^2$ minus the process's own mean over its own spread. A new process has neither, so both are predicted from the process by a small fit to the training processes
+        \item One shared standardization, one mean and one spread for all processes. The network learns each process's level itself
+        \item $\hat s$ factor, $|\mathcal M|^2$ times $(\hat s\,\Lambda^{-2})^{N-4}$ with one fixed scale $\Lambda$, its mass dimension for $N$ particles. With the coupling product, also divided by the couplings of the leading diagram
+        \item Dimensionless target, $|\mathcal M|^2\,\hat s^{\,N-4}$, no units and no fitted scale. Pair scale, the event's pair invariants in place of $\hat s$. Dimensionless inputs, momenta divided by $\sqrt{\hat s}$
+        \item Coupling orders, also divided by $(4\pi\alpha_s)^q(4\pi\alpha)^e$ with $q$, $e$ the process's QCD and QED orders
+        \item Emission scales, each particle beyond $2\to2$ brings its own soft or collinear scale in place of $\hat s$
+        \item Context vector, 16 learned numbers per training process. A new process gets zeros, so zero shot runs without it; it is meant to be fitted on a few labelled events
+        \item Diagrams, the Feynman diagram encoder of Daniel's paper. On in every run unless a label says without diagrams
+    \end{itemize}
+  \end{minipage}
+  \vfill
 \end{frame}
 
-%---------------------------------------------------------------- catalog_v3
-\begin{frame}{Catalog v3}
+\begin{frame}{Zero shot per held-out process, the draft's figure}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{pool_levels.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_per_process.pdf}
 \end{frame}
 
-\begin{frame}{Dimensionless target extrapolates}
+\begin{frame}{Zero shot on Daniel's catalog, the draft's distributions}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{short_reads.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_grid.pdf}
+\end{frame}
+
+\begin{frame}{What moves the zero-shot error, relabels and new processes}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_moves_heldout.pdf}
+\end{frame}
+
+\begin{frame}{What moves the zero-shot error, beyond the trained range}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_moves_ood.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- new catalog
+\begin{frame}{Why a new catalog}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{why_new_catalog.pdf}
+\end{frame}
+
+\begin{frame}{The new catalog}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.15em}
+        \item One process per class of processes equal up to relabelling, checked numerically on $|\mathcal M|^2$, so no held-out process is a relabel of a training one
+        \item Trees at $2\to2$, $2\to3$, $2\to4$ on every beam ($e^+e^-$, quark pairs, quark and gluon, two gluons), one-loop QCD virtuals, loop-induced processes, two $\alpha_s$ values, a heavy quark with the top's quantum numbers at 50, 300, 600 GeV, a $Z'$ and a two-Higgs-doublet model
+        \item Held out, each process with its whole class
+        \item \quad New combinations, about 5\% of the classes, every particle, multiplicity and order of which is seen in training
+        \item \quad Higher multiplicity, the $2\to4$ processes of families whose $2\to4$ is never trained, and $2\to5$ probes
+        \item \quad Particle content, every process with a physical top. In a twin run trained without them, every process with a $\tau$ or $\nu_\tau$, and every process with a quartic gauge vertex
+        \item \quad One loop, one-loop processes held out while their trees train
+        \item \quad $\alpha_s=0.13$, trained at 0.09 and 0.15
+        \item \quad Outside the trained kinematics, training processes at $\sqrt{\hat s}$ from 1 to 10 TeV, and at $p_T\geq30$ GeV instead of 10
+        \item Short runs, 4264 steps over 1397 training pools, one seed each. The fine tunes start from the emission-scale run and keep its standardization
+    \end{itemize}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+\begin{frame}{Zero shot on the new catalog, per held-out axis}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_zero_shot.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- transfer
-\begin{frame}{Muon}
+\begin{frame}{Muon against AdamW, zero shot on the new catalog}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_compare.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_muon.pdf}
 \end{frame}
 
-\begin{frame}{Muon, both optimizers tuned}
+\begin{frame}{Fine tuning held-out processes from few events}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_search_zs.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_finetune.pdf}
 \end{frame}
 
-\begin{frame}{Fine tuning at small D}
+\begin{frame}{Gentler fine tunes do not beat the default, transfer study}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{muon_ft.pdf}
-\end{frame}
-
-\begin{frame}{Gentler fine tunes do not help}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{lowd_dyhpo.pdf}
-\end{frame}
-
-\begin{frame}{Why a fine tune loses to scratch}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{ft_harm.pdf}
-\end{frame}
-
-%---------------------------------------------------------------- other
-\begin{frame}{More sign changing pools carry the sign}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{prep_signed_arms.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{lowd_methods.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- diagrams
-\begin{frame}{Feynman diagrams, zero shot}
+\begin{frame}{Feynman diagrams, zero shot on Daniel's catalog}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{diagram_ab.pdf}
+  \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{diagrams_zero_shot.pdf}
 \end{frame}
 
-\begin{frame}{Feynman diagrams, fine tuning}
+\begin{frame}{Feynman diagrams, fine tuning 12 transfer study probes}
   \centering
-  \includegraphics[width=0.8\textwidth,height=0.07\textheight,keepaspectratio]{levdiagl_legend.pdf}\\[0.3em]
-  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_b.pdf}\hfill
-  \includegraphics[width=0.49\textwidth,height=0.70\textheight,keepaspectratio]{levdiagl_d.pdf}
-\end{frame}
-
-\begin{frame}{Feynman diagrams}
-  \vfill
-  \begin{center}
-    \begin{minipage}{0.86\textwidth}
-      \large
-      \begin{itemize}\setlength{\itemsep}{0.9em}
-        \item Relabels, 0.080 without, 0.056 with, 70 of 96 better
-        \item New processes, 1.67 without, 1.57 with, 23 of 43 better
-        \item $2\to4$, 26 without, 23 with, 18 of 40 better
-        \item Fine tunes 0.07 to 0.24 decades worse with them
-        \item 448 processes in distribution, 33\% better without
-      \end{itemize}
-    \end{minipage}
-  \end{center}
-  \vfill
-\end{frame}
-
-\begin{frame}{Open ends}
-  \vfill
-  \begin{center}
-    \begin{minipage}{0.8\textwidth}
-      \large
-      \begin{itemize}\setlength{\itemsep}{0.9em}
-        \item Diagrams with more than one seed
-        \item Fine tuning from a full length catalog pretraining
-        \item Muon fine tunes at the full horizon
-        \item One loop sign on held out processes
-      \end{itemize}
-    \end{minipage}
-  \end{center}
-  \vfill
+  \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{diagrams_finetune.pdf}
 \end{frame}
 
 \end{document}
