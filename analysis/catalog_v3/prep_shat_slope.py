@@ -92,7 +92,7 @@ def main():
           if l.startswith("SLOPE {")]
     out = {"catalog_v3": summarise(v3), "daniel": summarise(daniel())}
     json.dump(out, open(os.path.join(HERE, "data", "prep_shat_slope.json"), "w"), indent=1)
-    print(json.dumps(out, indent=1))
+    print(json.dumps(out))
 
 
 if __name__ == "__main__":
