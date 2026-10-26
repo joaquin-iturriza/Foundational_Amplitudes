@@ -1777,7 +1777,7 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
 (the sign head's floor). Medians over the sign-changing pools, training then held out:
 \begin{itemize}
   \item \emph{Few pools change sign, and their crossings are thin.} $53$ of the $137$ training one-loop pools and $14$
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % allow: 10 100 because they are the factors from zero that define the near-zero events, settings
 % allow: 20 because it is the least count of one sign a classifier is fitted on, a setting
 % claim: tr_n_signed=53
@@ -1817,31 +1817,25 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     pools the median negative share is $22.2\%$ and $26.0\%$; $11.6\%$ and $8.9\%$ of the events lie within a
     factor $10$ of zero (relative to the pool's median), $1.1\%$ and $0.8\%$ within a factor $100$.
   \item \emph{Within a pool the kinematics decide the sign.} The classifier gets $1.0\%$ and $0.8\%$ of the signs wrong,
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
-% allow: 5 because it is a threshold in percent, a setting
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % allow: 10 because it is the factor from zero that defines the near-zero events, a setting
 % claim: tr_err_mlp=1.0
 % claim: H5_err_mlp=0.8
 % claim: tr_err_major=9.9
 % claim: H5_err_major=15.8
-% claim: tr_n_mlp_below_5pct=33
 % claim: tr_n_clf=44
-% claim: H5_n_mlp_below_5pct=11
 % claim: H5_n_clf=12
-% claim: tr_n_major_below_5pct=19
-% claim: H5_n_major_below_5pct=5
 % claim: tr_err_mlp_near=5.5
 % claim: H5_err_mlp_near=8.6
 % claim: tr_err_major_near=33.9
 % claim: H5_err_major_near=15.4
 % claim: tr_n_shat_beats_major=2
 % claim: H5_n_shat_beats_major=0
-    against $9.9\%$ and $15.8\%$ for one sign per pool on the same pools, and stays under $5\%$ on $33$ of the $44$
-    and $11$ of the $12$ pools (one sign per pool on $19$ and $5$); within a factor $10$ of zero it is $5.5\%$ and
+    against $9.9\%$ and $15.8\%$ for one sign per pool on the same $44$ and $12$ pools; within a factor $10$ of zero it is $5.5\%$ and
     $8.6\%$ against $33.9\%$ and $15.4\%$. On $\log\hat s$ alone it does better than one sign per pool on $2$ of the
     $44$ and none of the $12$: the sign changes across the angles, not with the energy.
   \item \emph{On the magnitude the targets barely differ.} The regressor's MSE is $0.053$ on $\log\abs x$, $0.056$ with
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % allow: 1.6 because it is the trees' ratio quoted from the shape proxy paragraph
 % claim: tr_shape_raw=0.053
 % claim: tr_shape_dless=0.056
@@ -1857,7 +1851,7 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     per pool the emission scales cost $1.061$ times $\log\abs x$'s (above it on $33$ of the $53$) and the $\hat s$ factor
     $0.997$, where on the trees' $2\to4$ the emission scales cost $1.6$ times (par.~\ref{par:v3_shape_proxy}).
   \item \emph{The networks' zero-shot signs are far from what the data allow.} On the $17$ held-out pools the short
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: base_n=17
 % claim: H5_n_signed=14
 % claim: n_one_sign_scored=3
@@ -1888,24 +1882,26 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     $4$. On $e^+e^-\to c\bar cg$ ($28\%$ negative, the classifier $0.7\%$ wrong) every arm gets $71$ to $72\%$ wrong: it
     predicts the minority sign on nearly every event.
   \item \emph{The three one-sign pools are scored correctly.} The scorer resolves a pool's transform on all its
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: n_one_sign_scored=3
 % claim: n_one_sign_allneg=2
 % claim: pos_one_sign_train_neg=9
 % claim: pos_one_sign_train_rows=50000
 % claim: pos_one_sign_base_wrong=90
-% claim: neg_one_sign_wrong_min=31
-% claim: neg_one_sign_wrong_max=74
+% claim: allneg_ddx_ag_nlo_wrong_min=31.4
+% claim: allneg_ddx_ag_nlo_wrong_max=73.8
+% claim: allneg_ucx_cxhu_nlo_wrong_min=0.0
+% claim: allneg_ucx_cxhu_nlo_wrong_max=1.7
     roles, the train split included, which this check does not read, and any value at or below zero makes it signed
     (\code{experiment.\_resolve\_amp\_preprocessing}; \code{analysis/catalog\_v3/pool\_audit.json} for the train
     splits). $2$ of the $3$ are negative in every role ($d\bar d\to\gamma g$ and $u\bar c\to\bar c H u$ at one loop),
     and a pool with no positive value has no plain log; $u\bar u\to e^+e^-Z$ has $9$ negative events among its
     $50000$ training ones and none in validation or test. The true sign the scorer compares with is the raw
     amplitude's, so the arms' shares there are real errors: on $u\bar u\to e^+e^-Z$ the baseline's sign head calls
-    $90\%$ of an all-positive validation set negative, and on $d\bar d\to\gamma g$ the arms get $31$ to $74\%$ of an
-    all-negative one wrong. No number above changes.
+    $90\%$ of an all-positive validation set negative; on the two all-negative pools the arms get $31.4$ to $73.8\%$
+    wrong on $d\bar d\to\gamma g$ and $0.0$ to $1.7\%$ on $u\bar c\to\bar c H u$. No number above changes.
 \end{itemize}
-% src: python3 analysis/catalog_v3/prep_signed.py @a2335f7f
+% src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
 % claim: tr_err_mlp=1.0
 % claim: base_wrong=5
