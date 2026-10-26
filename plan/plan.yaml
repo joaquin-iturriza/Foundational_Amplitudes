@@ -1165,6 +1165,16 @@ entries:
     why: migrate --apply opened quarantine/migrate/migrate_manifest.tsv before creating its dir (FileNotFoundError); died
       before any sidecar rewrite, chunk rename or swap, so production pools untouched; fixed b341db18, rerun FA-ccin2p3-e957351b
     at: '2026-10-26T04:23:08+00:00'
+  - tried: 'width rebuild rerun FA-ccin2p3-e957351b: staged build reused (6 s), VERIFY_CARDS 240/0 bad, MIGRATE_SUMMARY 5076
+      sidecars rewritten, SWAP_SUMMARY 1440 in / 2046 quarantined (720 pools, 720 recipes, 351 alpha_s sidecars, 255 standalones;
+      swap_manifest.tsv), certification of the three held one-loop entries PASS at zero width; b b~ > ta+ vt w- and b g >
+      b w+ w- pools built; b b~ > h w+ w- one-loop refused by the per-event pole guard at generation'
+    why: 'with the card top width the double-pole deviation of b b~ > h w+ w- grows with sqrt(s): median 2e-4 at 300 GeV,
+      2e-3 at 1.5 TeV, 1e-2 at 3-4 TeV, 2e-2 (max 0.21) at 4-6 TeV, 19% of points redrawn over [286, 6000] GeV (guard limit
+      2%); with the top width zeroed max 1.6e-5 everywhere; certification samples only up to 1 TeV so it missed it. The top
+      is t-channel only there (never resonant), so the fixed width is a gauge-violating artefact. Other two: 0.0% and 0.1%
+      redrawn (pole_guard_diag, 800 points each)'
+    at: '2026-10-26T04:59:15+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
