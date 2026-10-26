@@ -64,7 +64,7 @@ def main():
     os.makedirs(os.path.join(HERE, "data"), exist_ok=True)
     json.dump(out, open(os.path.join(HERE, "data", "pair_head_blowup.json"), "w"), indent=1)
     g, jj = out["arms"]["baseline_sign_pairs"]["grad_norm"], out["jump"]
-    flat = {"pairs_grad_median": f"{g['median']:.3g}", "pairs_clip_pct": f"{g['clipped_pct']:.1f}",
+    flat = {"pairs_grad_median_e6": f"{g['median'] / 1e6:.3g}", "pairs_clip_pct": f"{g['clipped_pct']:.1f}",
             "base_grad_median": f"{out['arms']['baseline']['grad_norm']['median']:.3g}",
             "base_clip_pct": f"{out['arms']['baseline']['grad_norm']['clipped_pct']:.1f}",
             "pairs_skipped": out["arms"]["baseline_sign_pairs"]["n_skipped"],
