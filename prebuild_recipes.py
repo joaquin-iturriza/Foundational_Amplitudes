@@ -136,6 +136,9 @@ def main():
     pools = {}            # (process, role) -> canonical pool path, for every pool this spec touches (cached or not)
     quarantined = []      # (pool or chunk dir, where it was moved)
     pole_names, pole_keys = set(), set()   # entries / datasets skipped because the pole guard refused a chunk
+    pole_backends = set()                  # their backend keys: a stripped parent or a non-spec process sharing the
+                                           # refused backend is in no group, and its pools cached from an earlier run
+                                           # are in no key planned this run
 
     def write_cert():
         """LIST_FILE: one `name<TAB>reason` line per skipped entry, then one `#quarantined<TAB>pool<TAB>moved to` line
@@ -154,7 +157,7 @@ def main():
         reused by a rerun (datagen._chunk_done) just as a pool is."""
         qdir = args.quarantine_dir or os.path.join(
             os.path.dirname(os.path.abspath(args.skip_cert_failed)), "quarantine")
-        mine = lambda key: key[0] in pole_names or key in pole_keys
+        mine = lambda key: key[0] in pole_names or key in pole_keys or datagen._backend_key(key[0]) in pole_backends
         srcs = [x for key, out in sorted(pools.items()) if mine(key) for x in (out, out + ".recipe.json")]
         if chunks:
             srcs += sorted(meta["work"] for key, meta in datasets.items() if mine(key))
@@ -361,6 +364,7 @@ def main():
                     skip_group(key[0], f"chunk refused by the pole guard ({key[1]}): {str(e).splitlines()[0]}")
                     pole_names.update(set(skipped_names) - names0)
                     pole_keys.update(skipped_keys - keys0)
+                    pole_backends.update(datagen._backend_key(n) for n in (set(skipped_names) - names0) | {key[0]})
                     quarantine_group()
                     for f, k in futs.items():
                         if k in skipped_keys:
