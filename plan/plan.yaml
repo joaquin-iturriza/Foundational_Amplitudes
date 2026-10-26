@@ -1005,9 +1005,11 @@ entries:
   - D137
   - D139
   - D140
-  next: 'Read the full one-loop certification with the fixed copier (FA-ccin2p3-ce878798; summary counts PASS / FAIL / ERROR
-    / BUILD_FAIL separately) and act on its FAIL and ERROR lists. The copier bug of FA-ccin2p3-e425f8aa is fixed (348a984);
-    check run FA-ccin2p3-84bc4800: v4_gg_gg and v4_bbx_hz PASS, v4_bg_bwpwm FAIL (double pole max rel 4.2e-3 > 1e-3).'
+  next: 'Waiting for the user''s call on the eight mixed-order one-loop entries (main session sends the investigation''s findings
+    and the question: generate the five mixed-order ones at the pure-QCD born as catalog_v3 did, or attempt the full QCD+EW
+    one-loop; and for the three sub-percent ones, loosen the 1e-3 double-pole tolerance, or investigate further with aMC@NLO''s
+    own pole check). Meanwhile read the full one-loop certification FA-ccin2p3-ce878798 when it ends and act on its FAIL and
+    ERROR lists. Regeneration part 2 (FA-ccin2p3-b67b49d6) built all 242 entries (726 pools), no certification failures.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
