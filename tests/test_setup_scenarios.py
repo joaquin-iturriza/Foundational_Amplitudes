@@ -1642,13 +1642,18 @@ def open_questions():
            (ago(10), "user", "Yes, take the leading-order width at each mass")]
     w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
               state={"cov": step(5)}, transcript=say)
+    rc0, err0 = w.check()
+    nxt0 = w.plan_cmd("next")[1]
+    scenario("open question: a user reply after a running entry's question is listed by plan next (REPLY) and never "
+             "blocks the stop", rc0 == 0 and "REPLY cov: the user wrote at" in nxt0, err0 + nxt0)
     rc, out = w.plan_cmd("answer", "cov", "--kind", "scope", "--quote", "Yes, take the leading-order width at each mass")
     e = w.entries()["cov"]
+    nxt1 = w.plan_cmd("next")[1]
     pr = World([e]).plan_cmd("next", "--prompts")[1]
     scenario("open question: plan answer (words typed after the ask, before the entry's later step) records the "
              "decision and clears the question; the prompt shows none",
              rc == 0 and e["status"] == "running" and not any(k in e for k in ("ask", "waiting_since", "blocks"))
-             and e["asks"][-1]["answered_at"] and e["asks"][-1]["decision"] == "D900"
+             and e["asks"][-1]["answered_at"] and e["asks"][-1]["decision"] == "D900" and "REPLY cov" not in nxt1
              and "Open question to the user (only what it blocks waits; CLAUDE.md 0g):\n  none" in pr, out + pr[-800:])
     rc, out = w.plan_cmd("ask", "cov", "--ask", "Should the heavy-quark pools take the leading-order width at each "
                          "mass point?", "--searched", SEARCHED)

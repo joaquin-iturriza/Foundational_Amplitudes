@@ -791,13 +791,22 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None):
         marks = [x for x in [ls + dt.timedelta(minutes=STEP_MIN) if ls else None] + fins + quiet if x]
         return "nothing in flight: " + (e.get("next") or "take the next step"), (max(marks) if marks else None)
     if s == "waiting_user":
-        since = max([x for x in (parse(e.get("waiting_since")), parse(e.get("checked_until"))) if x]
-                    or [dt.datetime(1970, 1, 1, tzinfo=dt.timezone.utc)])
-        said = [ts for ts, role, text in msgs if role == "user" and ts > since]
-        if said:
-            return ("the user wrote at %s after the question %r: plan answer with their words, or plan unanswered "
-                    "if it does not answer it (never blocks the stop; listed here until one of them)" % (
-                        said[-1].isoformat()[:16], e.get("ask"))), said[-1]
+        return replied(e, msgs)
+    return None
+
+
+def replied(e, msgs):
+    """(reason, when) if the user wrote after the entry's open question (and after the last plan unanswered), else
+    None. Never blocks the stop; plan next lists it until plan answer or plan unanswered."""
+    if not open_question(e):
+        return None
+    since = max([x for x in (parse(e.get("waiting_since")), parse(e.get("checked_until"))) if x]
+                or [dt.datetime(1970, 1, 1, tzinfo=dt.timezone.utc)])
+    said = [ts for ts, role, text in msgs if role == "user" and ts > since]
+    if said:
+        return ("the user wrote at %s after the question %r: plan answer with their words, or plan unanswered "
+                "if it does not answer it (never blocks the stop; listed here until one of them)" % (
+                    said[-1].isoformat()[:16], e.get("ask"))), said[-1]
     return None
 
 
@@ -1481,7 +1490,8 @@ def cmd_next(a):
     """What can move now, and the exact prompt of each step agent to launch (exit 1 while anything is unlaunched)."""
     probs = reconcile_sweeps()
     d, st = load()
-    todo = [(e, why) for e, why, launched in next_steps(d, st) if not launched]
+    msgs = messages(oldest_open(d, st))
+    todo = [(e, why) for e, why, launched in next_steps(d, st, msgs=msgs) if not launched]
     for p in probs:
         print("UNRECORDED " + p)
     for e, why in todo:
@@ -1489,6 +1499,10 @@ def cmd_next(a):
         if a.prompts and e.get("status") == "running":
             print(step_prompt(e, why))
             print("-" * 60)
+    for e in d["entries"]:                        # a running entry's open question: a reply is listed, never a step
+        r = replied(e, msgs) if e.get("status") == "running" else None
+        if r:
+            print("REPLY %s: %s" % (e["id"], r[0]))
     for e, why in done_problems(d, st):
         print("SUGGEST %s: marked done, but %s; plan reopen %s --why ..., or fix it (plan evidence --drop ...)" % (
             e["id"], why, e["id"]))
