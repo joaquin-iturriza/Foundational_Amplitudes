@@ -98,11 +98,12 @@ entries:
   - D83
   - D129
   - D135
-  next: 'The one-loop sign transfer (from par:v3_prep_signed: the sign is set by the kinematics but the arms fail it zero-shot):
-    design short catalog_v3 arms trying (a) the sign head given the invariants the per-pool classifier used, (b) the sign
-    loss weighted toward events near the zero crossing, (c) more sign-changing pools in training; estimate GPU-h and, if under
-    10 GPU-h, submit in the following step without asking (CLAUDE.md 0i). Done before it: why the s factor''s sensitivity
-    differs between catalogs (c03d3500: v3''s singular reach scales with s_hat, Daniel''s cuts are fixed in GeV).'
+  next: 'Read the two sign arms (pair head FA-ccin2p3-161fc56b, near-zero weighting FA-ccin2p3-a7009d00) zero-shot against
+    the baseline: the wrong-sign share on the 17 sign-changing H5 pools and the whole one-loop axis, against the classifier
+    and one sign per pool (prep_signed.py ARMS). When the extension generation FA-ccin2p3-8acabdd2 ends: read which of the
+    153 new one-loop pools certified, generated and change sign, write recipes/catalog_v3_train_signext.yaml (catalog_v3_train
+    plus only the sign-changing new pools), add arm baseline_more_signed at the baseline''s 4264 steps (same compute), smoke,
+    submit (~2 GPU-h).'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
