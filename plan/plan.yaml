@@ -1315,6 +1315,10 @@ entries:
       Fixed in 5e4040a9..1d9d6a29: features and target read the sidecar''s QCD and QED orders; test_order_features passes
       on CC (all 25 + 2 + 2 entries, every other entry of the four recipes unchanged, 81 affected pools still cache hits)'
     at: '2026-10-26T15:05:32+00:00'
+  - tried: trial_1860 read on every axis (FA-ccin2p3-e3b9003d)
+    why: submitted without V3_AXES, so it would have re-read catalog_v3's own axes too; cancelled before start (scancel 62464702)
+      and resubmitted on the cross reads only as FA-ccin2p3-efc4c352
+    at: '2026-10-26T15:05:32+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
