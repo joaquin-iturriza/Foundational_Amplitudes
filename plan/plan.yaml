@@ -1327,10 +1327,6 @@ entries:
   - D162
   - D166
   next:
-    1: 'Write the density check (analysis/catalog_v4/density_check.py, data/density_check.json, figs/density_check, commits
-      2f12de30 b499d470: catalog_v4 at 0.21 of pp''s density where pp events sit, 0.66 of pp events in thin bins, rank corr
-      0.30 with the error gap; the PDF-weighted sampler of D117 was never built, MadEvent pp events were used) into par:v4_vs_pp
-      with provenance, and the pp blend proposal as an open item in the hand-off (waiting on the user''s call)'
     3: 'catalog_v3''s deletion (D163): manifest written (analysis/catalog_v4/data/catalog_v3_delete_manifest.json @f494c9fe:
       pools 71.7 GB in 19329 files, 13.9 GB val/test in DATA_DIR and 57.8 GB train cache; nothing running or queued on CC
       at 22:25). Delete the group ''pools'' only after (a) v3_prep_explore has collected the pair sign head seed-43 runs and
