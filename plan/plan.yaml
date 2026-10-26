@@ -1103,10 +1103,10 @@ entries:
   - D142
   - D145
   - D154
-  next: 'Read FA-ccin2p3-66920c4c''s log (cards and pole guard already passed: 0 of 1000 refused, max double-pole deviation
-    8e-6 over 286 to 6000 GeV at zero top width): check V4REGEN_DONE and that v4_bbx_hwpwm_nlo''s train, val and test pools
-    were built with no pole-guard refusal; then the pool check, classes and roles, the massless b in particle_ids.py, and
-    catalog_v4''s short pretrainings'
+  next: 'Read the catalog_v4 pool audit (FA-ccin2p3-d0c787ec: FLAG and SUMMARY lines in its log; its json write to the unexpanded
+    $SCRATCH path is expected to fail at the end, fixed in 5770b278) and the v4 equality (FA-ccin2p3-ac1a7a20, $SCRATCH/zz_catalog_v4_census/equality/equal_processes.json):
+    build the v4 classes (catalog_v3''s census_classes.json shape) and redo the roles (select_catalog_v3.py adapted to v4)
+    where classes split or merge; with the zero-width b b~ > h w+ w- pool in, catalog_v4''s short pretrainings'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
