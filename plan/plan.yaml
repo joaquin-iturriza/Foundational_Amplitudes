@@ -98,8 +98,7 @@ entries:
   - D83
   - D129
   - D135
-  next: 'sampling sensitivity on catalog_v3 (the signed check''s open question is closed in fa3b8ab0: the one-sign pools are
-    resolved on every role, train included), then new ideas'
+  next: sampling sensitivity on catalog_v3, then new ideas (the signed check and its one-sign-pool question closed in fa3b8ab0)
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
