@@ -30,12 +30,15 @@
 #                          on muP's 32 hidden matrices and AdamW as before on the rest (optim/muon.py; the Muon test, D144/D146)
 #   dimensionless_seed2, dimensionless_muon_seed2   the same two with a second seed (model init and batch order, seed 43;
 #                          the pools and their order unchanged)
-# Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py).
+#   v4_dimensionless_muon, v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2   catalog_v4 against catalog_v3 with
+#                          Muon at its search's best (catalog_coverage; runs/catalog_v4_short/<arm>, $SCRATCH/zz_v4_short_<arm>)
+# Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py;
+# catalog_v3 arms only).
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw or muon_search_best_muon}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, dimensionless_muon_best_seed2, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -44,6 +47,9 @@ COMMON=(training.loss=MSE ++training.loss_aggregation=mean ++training.sign_head=
 DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++data.target_physics_s0=1.0
      ++data.dimensionless_inputs=true ++data.target_physics_orders=true ++data.target_physics_dim_ref=qperp
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
+# the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
+MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
+CAT=v3; CROSS=()   # the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
@@ -75,7 +81,19 @@ case "$ARM" in
     # the Muon test's stage 2 (D146): the best trial of each optimizer's 8-trial search at this horizon
     # (sweep/sweep_config_ccin2p3_muon_test_search_{adamw,muon}.yaml), read zero-shot only (mode eval) from its run dir
     muon_search_best_adamw) OUT_FIXED=runs/muon_test_search_adamw/trial_0768 ;;
-    muon_search_best_muon)  OUT_FIXED=runs/muon_test_search_muon/trial_1860 ;;
+    muon_search_best_muon)  OUT_FIXED=runs/muon_test_search_muon/trial_1860; CROSS=(XV4 PP) ;;
+    # catalog_v4's short pretrainings against catalog_v3's (catalog_coverage; D130 the coverage, D155 Muon): the
+    # dimensionless arm with MuonAdamW at the Muon search's best (trial_1860 above: lr 4.997423e-3, decoupled weight
+    # decay 0.02171863, the rest the arm's) on recipes/catalog_v4_train.yaml (1153 pools) at catalog_v3's 4264 steps:
+    # same steps and batch, so about 6 epochs of each pool's 1e4 events where catalog_v3 has 5. Seeds 42 and 43; the
+    # catalog_v3 pair is trial_1860 itself (seed 42, reused) and dimensionless_muon_best_seed2 (seed 43). Besides its own
+    # axes each reads the other catalog's pools of the probes held out in both (XV3/XV4,
+    # recipes/make_catalog_v3v4_shared.py) and the 13 TeV pp pools (PP, recipes/catalog_v3_pp_test.yaml), which neither trains on
+    dimensionless_muon_best_seed2) NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV4 PP) ;;
+    v4_dimensionless_muon)  CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP)
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+    v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     # the one-loop sign transfer (docs/results.tex, par. The signed one-loop pools' data: the kinematics decide the
     # sign within a pool, the arms fail it zero-shot), each the baseline with one change, at its HPs:
     #   baseline_sign_pairs  the sign logit also gets a pair term on the invariants the per-pool classifier used
@@ -114,13 +132,17 @@ case "$ARM" in
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
-OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_v3_short/$ARM}"; PRED="$SCRATCH/zz_v3_short_$ARM"
+OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/zz_${CAT}_short_$ARM"
+# an axis's recipe: the arm's catalog's held-out axis, or one of the cross reads
+axis_recipe() { case "$1" in
+    XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
+    PP) echo recipes/catalog_v3_pp_test.yaml ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 [ -n "$OUT_FIXED" ] && [ "$MODE" != eval ] && { echo "$ARM is a sweep trial: mode eval only"; exit 1; }
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
 ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")}
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
-AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
+AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
 # every process of the arm's whole training recipe needs its diagram sidecar (the parent's diagram encoder refuses a
@@ -155,7 +177,7 @@ yaml.safe_dump(r, open(sys.argv[2], "w"))
 PY
     EXTRA=(training.iterations=40 training.validate_frac=0.5 evaluate=false data.processes_file="$SUB"
            ++data.memmap=false ++data.train_subsample=2000 ++data.eval_subsample=200)
-    AXES=(H1 H5)
+    AXES=(H1 H5 "${CROSS[@]}")
 fi
 if [ "$MODE" != eval ]; then
     if [ ! -e "$OUT/models/model_run0_best.pt" ]; then
@@ -167,9 +189,10 @@ if [ "$MODE" != eval ]; then
 fi
 ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 R="$SCRATCH/zz_v3_heldout_recipes"
-for A in "${AXES[@]}"; do   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
+for A in "${AXES[@]}"; do
+    AR=$(axis_recipe "$A")   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
     mkdir -p "$R/$A" "$PRED/$A"
-    python - "$R/$A" "recipes/catalog_v3_heldout_$A.yaml" <<'PY'
+    python - "$R/$A" "$AR" <<'PY'
 import sys, yaml
 r = yaml.safe_load(open(sys.argv[2]))
 top = {k: v for k, v in r.items() if k != "processes"}
@@ -180,7 +203,7 @@ PY
     miss=$(python -c "
 import glob, os, sys, yaml
 print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_val_*amplitudes.npy\"))
-          for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "recipes/catalog_v3_heldout_$A.yaml")
+          for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "$AR")
     if [ "$miss" != 0 ]; then echo "V3_AXIS_SKIPPED $A: $miss pools not generated"; continue; fi
     P=("$R/$A"/*.yaml)
     # smoke: two probes per axis; on H5 one that changes sign and one that does not, so both scorings are exercised
@@ -188,7 +211,7 @@ print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_va
         P=($(python -c "
 import json, os, sys
 au = json.load(open('analysis/catalog_v3/pool_audit.json'))['pools']
-neg = lambda f: au[os.path.basename(f)[:-5]]['val'].get('negative', 0) > 0
+neg = lambda f: au.get(os.path.basename(f)[:-5], {}).get('val', {}).get('negative', 0) > 0   # catalog_v3's audit
 fs = sys.argv[2:]
 print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1]) if sys.argv[1] == 'H5' else fs[:2]))" "$A" "${P[@]}"))
     fi
@@ -198,14 +221,14 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
-    if grep -qE "name: .*_(nlo|loop)$" "recipes/catalog_v3_heldout_$A.yaml"; then
+    if grep -qE "name: .*_(nlo|loop)$" "$AR"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
         python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
         [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     fi
 done
-if [ "$MODE" = smoke ]; then   # the fine-tune path from a catalog_v3 short parent, both fine-tune optimizers
+if [ "$MODE" = smoke ] && [ "$CAT" = v3 ]; then   # the fine-tune path from a catalog_v3 short parent, both fine-tune optimizers
     for O in AdamW MuonAdamW; do
         python tools/catalog_ft.py --parent "$OUT" --optimizer "$O" --out "$OUT/ft" --probes v3_gg_attx --only d2 \
             --steps-cap 20 || exit 1
