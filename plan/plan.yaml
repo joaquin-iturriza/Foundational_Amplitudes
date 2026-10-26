@@ -319,6 +319,54 @@ entries:
       off in both, everything else the same config); the measure is the quantity the head predicts and moved 15.3% to 4.3%
       at two seeds with the more-signed pools (prep_signed.json m2); not a repeat (it deconfounds the search''s best-vs-baseline
       gap); within the user''s approved test.'
+  - at: '2026-10-26T19:46:54+00:00'
+    question: Does the pair sign head (a pair term on the leg invariants added to the sign logit) carry the one-loop amplitude
+      sign to held-out processes better than the same model without it, at the sign head search's best hyperparameters with
+      Muon? The search's best trial (pair head on, lr 1.246e-2, warmup 0.081) read 2.75% median held-out wrong-sign share
+      against 3.8% for the Muon baseline (lr 5e-3, warmup 0.158), one seed each, so the gain is not separated from the hyperparameters
+      and the seed. After this test the sign study stops and is written up whatever the outcome.
+    measure: 'Held-out wrong-sign share at the best checkpoint (lowest aggregate val_loss_no_reg), zero-shot on the 17 sign-changing
+      one-loop held-out pools of catalog_v3''s axes (2000 events per pool, scored as analysis/catalog_v3/sign_head_search.py
+      and prep_signed.py). Two statistics: (a) the median over the 17 pools per run and its seed mean per arm; (b) a paired
+      per-pool count: per pool the seed mean of each arm, and the number of pools (ties excluded) where the pair arm is lower,
+      read as a one-sided sign test over pools. (b) is the one that can resolve a 1 point effect: it pools the 17 pools''
+      evidence instead of the median''s single noisy value. Secondary, reported not decided on: zero-shot MSE ratio per probe
+      on every held-out axis, val_loss_no_reg, every blow-up with its step.'
+    check: 'Existing data where the measure moved with the tested change (analysis/catalog_v3/data/sign_head_search.json,
+      zero_shot): the search''s best trial (pair head 16/16 unbounded) 2.75% median against the Muon baseline''s 3.8% on the
+      same 17 pools, lower on 12 pools and higher on 3 (12 of 15 non-tied: one-sided sign test p about 0.02), so the per-pool
+      count already separates them at one seed each; the untuned pair arms moved the median to 11.3% and 24.4% against 5.4%
+      (prep_signed.json). Adding training sign-changing pools moved it from 15.3% to 4.3% over two seeds (prep_signed.json
+      seeds m2). What is unknown is how much of the search''s gap is the pair head rather than lr and warmup.'
+    fixed: Everything of the more-signed-pools arm (baseline target, one shared standardization, log|M|^2 plus sign head,
+      recipes/catalog_v3_train_signext.yaml, 1492 pools, 4264 steps, batch 16384), MuonAdamW decoupled weight decay 0.0217,
+      lr 1.246e-2, warmup fraction 0.081 in both arms, near-zero weighting off (sign_near_weight 1), the same zero-shot reads
+      (scripts/job_catalog_v3_short.sh arms sign_pair_best[_seed2] and sign_off_best[_seed2], commit 0d54c999).
+    control: 'The same configuration with the pair head off (sign_pair_dim 0): the only difference is the pair head, which
+      is the user''s approved test (''both at lr 1.246e-2 and warmup 0.081''). The lr is the pair arm''s tuned value, untested
+      for the control in the search (no pair-off trial above 9.2e-3); that is accepted because the question is the head''s
+      effect at fixed optimisation, and the best-against-best reference already exists without a new run: the Muon baseline
+      at its own HPs (lr 5e-3, warmup 0.158, seed 42, 3.8%), reported beside the four runs. A control blow-up is reported
+      with its step and read at its best checkpoint as every run (CLAUDE.md Reported values); it never counts as a yes for
+      the head: if the control blows up and the pair arm does not, the outcome is ''inconclusive, the control is unstable
+      at this lr'', and the comparison against the Muon baseline at its own HPs carries the write-up.'
+    seeds: 'Two per arm, seeds 42 and 43, as approved. Known spread: the binomial spread of one pool''s share at 2000 events
+      is about 0.4 points at 4%; the median''s run-to-run spread is 0.6 to 1.45 points (more-signed-pools arm seeds 4.75%
+      and 3.3%, an unchanged rerun of seed 43 3.9%; prep_signed.json), and single pools swing by tens of points between unchanged
+      runs (v3_ddx_ag 38.5% to 2.25%). So on the median a 1 point effect is about one standard deviation with two seeds and
+      this design will most likely not settle it on (a); (b) the paired per-pool count is the decision statistic. Seed 42
+      of the pair arm repeats the search''s selected trial (trial_0177, best of 20 on the training-pool objective, not on
+      held-out sign): it is retrained anyway as approved, its difference from trial_0177 gives one more rerun spread point,
+      and the seed 43 runs are the ones free of the selection; the decision is also stated on seed 43 alone. The within-arm
+      seed differences measured here are reported as the spread at these HPs.'
+    outcome: 'Yes (the pair head helps): seed-mean per-pool share lower for the pair arm on at least 13 of the 17 pools (ties
+      excluded, one-sided sign test p below 0.05), the seed-mean median lower, and the same direction at seed 43 alone; the
+      write-up keeps the pair head in the sign study''s answer. No (it does not help): the pair arm is not lower on the seed-mean
+      median, or is higher on most pools; the write-up drops it. Inconclusive: lower on the median or on most pools but short
+      of the yes rule, or a control blow-up the pair arm does not share; the write-up says the head''s effect is below what
+      two seeds resolve (with the measured spread) and that settling it needs about 6 to 8 seeds per arm, which goes to the
+      user as a question with its GPU cost, not run. In every case the sign study stops after these four runs and is written
+      up in docs/results.tex par:v3_prep_signed.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
