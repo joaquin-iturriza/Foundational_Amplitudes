@@ -1125,13 +1125,14 @@ entries:
     - FA-ccin2p3-790fac19
     - FA-ccin2p3-84bc4800
     - FA-ccin2p3-a22a1770
+    - FA-ccin2p3-b508f477
     - FA-ccin2p3-b67b49d6
     - FA-ccin2p3-c09de7d2
     - FA-ccin2p3-ce878798
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-e957351b
     - FA-ccin2p3-ec84e913
-    commit: db9fb442
+    commit: 4968a1dc
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1154,6 +1155,7 @@ entries:
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
     - scripts/job_mixed_order_virt.sh
+    - scripts/job_v4_hwpwm_zero_width.sh
     - scripts/job_width_regen.sh
     - tools/certify_v4_loops.py
     - tools/mixed_order_virt_check.py
