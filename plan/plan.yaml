@@ -1169,6 +1169,7 @@ entries:
     - FA-ccin2p3-5826d401
     - FA-ccin2p3-66920c4c
     - FA-ccin2p3-6bd04ec8
+    - FA-ccin2p3-718253fe
     - FA-ccin2p3-76ba6018
     - FA-ccin2p3-790fac19
     - FA-ccin2p3-7f2fb49d
@@ -1186,10 +1187,11 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 77b43ae3
+    commit: 6e0eece0
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
+    - analysis/catalog_v3/data/short_reads/dimensionless_muon_best
     - analysis/catalog_v3/data/short_reads/dimensionless_muon_best_seed2
     - analysis/catalog_v3/data/short_reads/muon_search_best_muon
     - analysis/catalog_v3/data/short_reads/v4_dimensionless_muon
@@ -1233,6 +1235,7 @@ entries:
     - tests/test_order_features.py
     - tests/test_orders_source.py
     - tests/test_particle_encoding.py
+    - tools/catalog_ft.py
     - tools/certify_v4_loops.py
     - tools/mixed_order_audit.py
     - tools/mixed_order_virt_check.py
