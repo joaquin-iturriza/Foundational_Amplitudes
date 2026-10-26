@@ -108,20 +108,21 @@ def test_site():
         exp.cfg = cfg
         exp._resolve_recipe_config()
         got = {n: [int(x) for x in o] for n, o in zip(cfg.data.dataset, cfg.data.amp_orders)}
-        hit = [n for n in names if n in AFFECTED]
+        base = {p["name"]: p.get("base", p["name"]).split("__")[0] for p in procs}   # a decorated variant (__c30)
+        hit = [n for n in names if base[n] in AFFECTED]
         for n in hit:
-            nf, k = AFFECTED[n]
+            nf, k = AFFECTED[base[n]]
             assert got[n] == [0, 0, k, nf - k], (n, got[n], table[n])
         # every other change must be a mixed entry's alpha maximum the diagrams pin below the QED<=N bound, never an
         # alpha_s power (the audit found the 17 + 8 above as the only alpha_s disagreements)
-        other = {n: (table[n], got[n]) for n in names if n not in AFFECTED and got[n] != table[n]}
+        other = {n: (table[n], got[n]) for n in names if base[n] not in AFFECTED and got[n] != table[n]}
         bad = {n: v for n, v in other.items() if v[0][:3] != v[1][:3]}
         assert not bad, f"{rf}: alpha_s power changed outside the expected entries: {bad}"
         print(f"[site] {os.path.basename(rf)}: {len(hit)} expected entries have the diagram's orders; "
               f"{len(other)} others change only their alpha maximum: {sorted(other.items())[:10]}")
         # pools: the same paths and recipe ids at the current code (a cache hit, nothing generated)
         for p in procs:
-            if p["name"] not in AFFECTED:
+            if base[p["name"]] not in AFFECTED:
                 continue
             smin, smax = p["sqrts"]
             for role in ("train", "val", "test"):
