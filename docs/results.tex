@@ -2065,6 +2065,88 @@ open. (b) Per short arm, the median zero-shot MSE over all held-out probes rewei
 \label{fig:v3_prep_sampling}
 \end{figure}
 
+\paragraph{Muon against AdamW on the short pretraining and its zero-shot reads (2026-10-26).}\label{par:v3_muon} The
+user's question (D144): does Muon, the orthogonalised-update optimizer, now with decoupled weight decay, beat AdamW in
+this setup, and does it transfer better, as is claimed for it? The design: the dimensionless short arm (the short
+setup of the paragraphs above, the same HPs, its learning rate the per-process pretraining sweep's best for AdamW) run
+with \code{MuonAdamW} (\code{optim/muon.py}): Muon on $\mu$P's hidden matrices with decoupled weight decay and its
+update scaled to AdamW's RMS, so the same learning rate number applies, and AdamW as before on every other parameter.
+Each optimizer is run with two seeds (model initialisation and batch order; the pools unchanged, D146), every run
+read zero-shot on every held-out axis as the other short arms. Neither optimizer is retuned for this catalog, so this
+compares Muon at AdamW's learning rate. Small-$D$ fine-tunes from both pretrainings follow in the hand-off
+(\code{analysis/catalog\_v3/muon\_compare.py}, \code{data/muon\_pretrain.json}, \code{data/muon\_compare.json},
+Fig.~\ref{fig:v3_muon}; runs FA-ccin2p3-ee733aa9, FA-ccin2p3-2bc30261 (Muon), FA-ccin2p3-87426222 (AdamW's second
+seed)).
+\begin{itemize}
+  \item \emph{Pretraining.} The best-checkpoint validation loss (standardized target, no regularization) is
+% src: python3 analysis/catalog_v3/muon_compare.py @880da85c
+% claim: pre.dimensionless=0.0155
+% claim: pre.dimensionless_seed2=0.0173
+% claim: pre.dimensionless_muon=0.00197
+% claim: pre.dimensionless_muon_seed2=0.00245
+% claim: pre_ratio42=7.88
+% claim: pre_ratio43=7.07
+% claim: pools.n=1397
+% claim: pools.ratio_median=8.03
+% claim: pools.muon_wins_both_pct=99.4
+% claim: pools.seed_spread_adamw=0.065
+% claim: pools.seed_spread_muon=0.107
+% allow: 42 43 because they are the seeds, settings
+    $0.0155$ and $0.0173$ with AdamW, $0.00197$ and $0.00245$ with Muon: $7.88\times$ lower at seed 42, $7.07\times$
+    at seed 43, while the second seed moves either optimizer's loss far less. Per training pool
+    (all $1397$, each at the best checkpoint), AdamW over Muon is a median $8.03$, and Muon is lower at both seeds on
+    $99.4\%$ of them; the seeds move a pool by a median $0.065$ decades with AdamW, $0.107$ with Muon. Every run's best
+    is its last validation: both are still improving at this horizon.
+  \item \emph{Zero-shot.}
+% src: python3 analysis/catalog_v3/muon_compare.py @880da85c
+% claim: zs.all.n=617
+% claim: zs.all.ratio=4.47
+% claim: zs.all.wins=88
+% claim: zs.all.loses=4
+% claim: zs.all.spread_a=0.124
+% claim: zs.all.spread_m=0.148
+% claim: zs.H1.ratio=6.56
+% claim: zs.H2.ratio=5.53
+% claim: zs.H3.ratio=3.74
+% claim: zs.H5.ratio=2.81
+% claim: zs.H6.ratio=12.4
+% claim: zs.H7c.ratio=7.53
+% claim: zs.H2p5.ratio=1.77
+% claim: zs.H2p5.wins=68
+% claim: zs.H2p5.loses=15
+% claim: zs.H7E.ratio=1.18
+% claim: zs.H7E.wins=50
+% claim: zs.H7E.loses=30
+% claim: zs.H7E.mse.dimensionless=2.88
+% claim: zs.H7E.mse.dimensionless_muon_seed2=3.42
+% allow: 0.13 because it is the held-out coupling value, a setting
+% allow: 30 1 10 because they are the pT threshold and the energy window in TeV, settings
+    Over all $617$ held-out probes the ratio of AdamW's error to Muon's (each the two seeds'
+    geometric mean) is a median $4.47$; Muon is lower at both seeds on $88\%$ of the probes, AdamW on $4\%$, and the
+    seeds move a probe by a median $0.124$ decades (AdamW) and $0.148$ (Muon), well under the gap. Per axis: new
+    combinations $6.56$, $2\to4$ families $5.53$, the top $3.74$, one loop $2.81$, $\alpha_s=0.13$ $12.4$, $p_T\geq30$\,GeV
+    $7.53$. The two extrapolation axes gain least: $2\to5$ $1.77$ (Muon lower at both seeds on $68\%$, AdamW on $15\%$),
+    and $1$ to $10$\,TeV $1.18$, a tie (Muon lower on $50\%$, AdamW on $30\%$; the median error is $2.88$ for AdamW's
+    first seed and $3.42$ for Muon's second).
+\end{itemize}
+So at this horizon and at AdamW's learning rate, Muon fits the training pools about eight times better and carries
+most of that into the held-out processes inside the catalog's range; beyond it (one more particle, ten times the
+energy) the gain shrinks or vanishes. Whether Muon's lead holds at a learning rate tuned for it, or at the full
+horizon, is not tested; whether it transfers better under fine-tuning is the hand-off's fine-tune item.
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/muon_compare.pdf}
+\caption{Muon against AdamW on catalog\_v3's short pretraining, two seeds each. (a) The validation loss (no
+regularization) against step. (b) Per training pool, its validation loss at the best checkpoint against AdamW's at
+seed 42: Muon's seed 42, and AdamW's seed 43 as the seed-to-seed scatter. (c) The median zero-shot MSE per held-out
+axis (1 new combinations, 2 $2\to4$ families, 3 $2\to5$, 4 the top, 5 one loop, 6 $\alpha_s=0.13$, 7 $1$ to $10$\,TeV,
+8 $p_T\geq30$\,GeV), filled seed 42, open seed 43. (d) Per held-out probe, as (b).}
+% allow: 1 2 3 4 5 6 7 8 because they number the axes on the figure
+% allow: 42 43 because they are the seeds, settings
+% allow: 0.13 10 30 because they are the held-out coupling, the energy window in TeV and the pT threshold, settings
+\label{fig:v3_muon}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
@@ -9028,6 +9110,17 @@ of the three share a test set.
     integrals (Sec.~\ref{sec:syn-loops}, plan item (5)); multiplicities well past $2\to4$, where MadGraph struggles and the
     generator does not (Sec.~\ref{sec:syn-cost}), with a cheaper symmetrisation than the permutation average. How close to
     real amplitudes the prior should be is still to be settled with others.
+  \item \textbf{The Muon test's fine-tunes (D144, D146; the user, 2026-10-26: ``I agree with that reframing of the
+    question for the finetuning at small D, go ahead with it'').} The question: does a Muon pretraining transfer better
+    than an AdamW one under fine-tuning, and does fine-tuning a current pretraining beat scratch at small $D$ (the
+    question par.~\ref{par:ft_harm} hands on)? The pretraining and zero-shot part is par.~\ref{par:v3_muon}. The design
+    (\code{tools/catalog\_ft.py}, \code{scripts/job\_catalog\_ft.sh}): four held-out probes, the dimensionless arm's
+    median-error probe of new combinations, $2\to4$ families, the top and one loop, fixed before any fine-tune ran; the
+    four small-$D$ cells of the small-$D$ round; full retraining from each pretraining's best checkpoint (the AdamW and
+    the Muon arm, first seed) with each fine-tune optimizer, sixty-four runs, and the same cells from scratch with the
+    parent's config and AdamW, sixteen runs. Submitted 2026-10-26 (FA-ccin2p3-6e5d2ed2, FA-ccin2p3-ce1dba1c from the
+    AdamW pretraining; FA-ccin2p3-54fd017f, FA-ccin2p3-be7d9ff7 from the Muon one; FA-ccin2p3-00d080ba scratch). A
+    larger second stage only if these leave the comparison open (D146).
 \end{itemize}
 
 \section{Non-SM Lagrangians as training data}\label{sec:nonsm}
