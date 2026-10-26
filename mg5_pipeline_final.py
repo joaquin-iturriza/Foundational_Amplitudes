@@ -2031,7 +2031,10 @@ def patch_param_card_slha(card_path, patches):
             if name in want and name not in done:
                 toks = code.rstrip("\n").rstrip().split()
                 toks[-1] = f"{want[name]:.6e}"
-                out.append(" " + " ".join(toks) + " #" + comment)
+                # MadGraph's Fortran reader (Source/MODEL/lha_read.f) takes a width only from a line whose first five
+                # characters are DECAY: an indented DECAY line is skipped and the compiled default width used instead
+                lead = "" if toks[0].upper() == "DECAY" else " "
+                out.append(lead + " ".join(toks) + " #" + comment)
                 done.add(name)
                 continue
         out.append(line)

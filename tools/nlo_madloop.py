@@ -32,6 +32,12 @@ def load(so_dir):
     import matrix2py
     param_card = os.path.abspath(os.path.join(so_dir, os.pardir, os.pardir,
                                               "Cards", "param_card.dat"))
+    # MadGraph's lha_read.f reads a width only from a line whose first five characters are DECAY: an indented DECAY
+    # line is skipped and the compiled default width is used, whatever the card says
+    skipped = [l.split("#")[0].split()[1:3] for l in open(param_card) if l[:1].isspace() and l.strip().upper().startswith("DECAY")]
+    if skipped:
+        print(f"[CARD] indented DECAY lines not read by MadGraph (compiled default widths in effect): "
+              + ", ".join(f"{p}={w}" for p, w in skipped) + f" in {param_card}", file=sys.stderr)
     init = getattr(matrix2py, "ml5_0_initialise", None) or getattr(matrix2py, "initialise")
     init(param_card)
     full = getattr(matrix2py, "ml5_0_get_me_full", None) or getattr(matrix2py, "get_me_full")

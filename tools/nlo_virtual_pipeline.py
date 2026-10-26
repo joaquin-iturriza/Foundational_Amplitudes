@@ -254,7 +254,10 @@ def patch_param_card_slha(card_path, patches):
             if name in want and name not in done:
                 toks = code.rstrip("\n").rstrip().split()
                 toks[-1] = f"{want[name]:.6e}"
-                out.append(" " + " ".join(toks) + " #" + comment)
+                # a DECAY line must start in column 1: MadGraph's lha_read.f skips an indented one (compiled default
+                # width, whatever the card says), as mg5_pipeline_final.patch_param_card_slha
+                lead = "" if toks[0].upper() == "DECAY" else " "
+                out.append(lead + " ".join(toks) + " #" + comment)
                 done.add(name)
                 continue
         out.append(line)
@@ -443,9 +446,12 @@ def _zero_top_width(param_card):
         text = open(param_card).read()
         bak = param_card + WIDTH_BACKUP
         open(bak, "w").write(text)
-        # patch_param_card_slha writes " DECAY 6 ..." with a leading blank: anchored at column 0 this was a silent
-        # no-op on every card it had patched (catalog_v4's WT), so the check ran at the physical width
-        patched, n_sub = re.subn(r"^(\s*DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
+        # The zeroed line is written from column 1. MadGraph's Fortran reader (lha_read.f) takes a width only from a
+        # line whose first five characters are DECAY; patch_param_card_slha used to write " DECAY 6 ..." with a
+        # leading blank, which MadLoop skips (compiled default width 1.4915 whatever the card says): zeroing that line
+        # in place left the check at the physical width (catalog_v4's b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h w+ w-:
+        # double pole off by 4.2e-3 to 4.6e-3 with the indented zero, 7e-7 to 5e-5 with it in column 1)
+        patched, n_sub = re.subn(r"^\s*(DECAY\s+6\s+)[0-9.eE+-]+", r"\g<1>0.000000e+00", text, flags=re.M)
         if n_sub != 1:
             raise RuntimeError(f"_zero_top_width: {n_sub} 'DECAY 6' lines in {param_card}, expected 1")
         prev = signal.getsignal(signal.SIGTERM)
