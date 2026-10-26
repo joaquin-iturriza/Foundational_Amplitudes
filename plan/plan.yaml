@@ -119,6 +119,7 @@ entries:
     - FA-ccin2p3-0a9d3d4c
     - FA-ccin2p3-0bddbf48
     - FA-ccin2p3-161fc56b
+    - FA-ccin2p3-19971006
     - FA-ccin2p3-1c11d753
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-37a95d76
@@ -145,6 +146,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/baseline_more_signed_muon
     - analysis/catalog_v3/data/short_reads/baseline_more_signed_seed2
     - analysis/catalog_v3/data/short_reads/baseline_seed2
+    - analysis/catalog_v3/data/short_reads/sign_off_best
     - analysis/catalog_v3/data/sign_head_search.json
     - analysis/catalog_v3/data/sign_head_search_signlog.txt
     - analysis/catalog_v3/data/sign_head_search_trials.json
