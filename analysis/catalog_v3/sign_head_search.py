@@ -125,6 +125,11 @@ def zero_shot(best_hp, flat, out):
           {a: {k: v for k, v in o[a].items() if k != "per_pool"} for a in (ZS_ARMS[0], ZS_ARMS[2])})
 
 
+def sig(x, n=4):
+    """x to n significant figures, as the notes write it"""
+    return float(f"{x:.{n - 1}e}")
+
+
 def med(v):
     v = [x for x in v if x is not None]
     return float(np.median(v)) if v else None
@@ -148,28 +153,28 @@ def main():
            "muon_baseline": ref, "adamw_more_signed": {"val_loss_no_reg": d["refs"]["adamw_more_signed"]["val_loss"]}}
     flat = {"n_trials": len(rows), "n_failed": len(d["failed_logs"]),
             "n_blowup": sum(x["blowup_step"] is not None for x in rows),
-            "mb_obj": round(1e3 * ref["objective"], 3), "mb_mag": round(1e3 * ref["val_loss_no_reg"], 3)}
+            "mb_obj": sig(ref["objective"]), "mb_mag": sig(ref["val_loss_no_reg"])}
     blown = [x for x in rows if x["blowup_step"] is not None]
-    flat["blowup_lr_min"] = round(1e3 * min(x["lr"] for x in blown), 2) if blown else None
-    flat["calm_lr_max"] = round(1e3 * max(x["lr"] for x in rows if x["blowup_step"] is None), 2)
+    flat["blowup_lr_min"] = sig(min(x["lr"] for x in blown)) if blown else None
+    flat["calm_lr_max"] = sig(max(x["lr"] for x in rows if x["blowup_step"] is None))
     for k in ("off", "pair", "near", "both"):
         g = [x for x in rows if x["kind"] == k]
         flat[f"n_{k}"] = len(g)
         if g:
             b = g[0]
             out[f"best_{k}"] = b
-            flat.update({f"{k}_hp": b["hp_idx"], f"{k}_obj": round(1e3 * b["objective"], 3),
-                         f"{k}_mag": round(1e3 * b["val_loss_no_reg"], 3), f"{k}_lr": round(1e3 * b["lr"], 2)})
+            flat.update({f"{k}_hp": b["hp_idx"], f"{k}_obj": sig(b["objective"]),
+                         f"{k}_mag": sig(b["val_loss_no_reg"]), f"{k}_lr": sig(b["lr"])})
     best = rows[0]
     on = [x for x in rows if x["kind"] != "off"]
-    flat.update({"best_hp": best["hp_idx"], "best_kind": best["kind"], "best_obj": round(1e3 * best["objective"], 3),
-                 "best_mag": round(1e3 * best["val_loss_no_reg"], 3), "best_lr": round(1e3 * best["lr"], 2),
+    flat.update({"best_hp": best["hp_idx"], "best_kind": best["kind"], "best_obj": sig(best["objective"]),
+                 "best_mag": sig(best["val_loss_no_reg"]), "best_lr": sig(best["lr"]),
                  "best_pair_dim": best["sign_pair_dim"], "best_pair_hidden": best["sign_pair_hidden"],
                  "best_warmup": round(best["cosanneal_warmup_frac"], 3),
                  "best_on_over_off": round(on[0]["objective"] / out["best_off"]["objective"], 2),
                  "best_over_mb_obj": round(best["objective"] / ref["objective"], 2),
                  "best_over_mb_mag": round(best["val_loss_no_reg"] / ref["val_loss_no_reg"], 2),
-                 "off_lr_max": round(1e3 * max(x["lr"] for x in rows if x["kind"] == "off"), 2),
+                 "off_lr_max": sig(max(x["lr"] for x in rows if x["kind"] == "off")),
                  "n_beat_mb": sum(x["objective"] < ref["objective"] for x in rows)})
     # the lr confound: the objective's rank correlation with lr over the trials that did not blow up
     calm = [x for x in rows if x["blowup_step"] is None]
