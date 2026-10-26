@@ -5,6 +5,9 @@ the parent's remaining HPs (run.py on the parent's own config.yaml, only the rec
 changed), the target's statistics fitted on the probe's own train split and the off-shellness on the parent's scale
 (as the small-D round), validation on the probe's first 2000 validation events (the zero-shot read's), and the
 fine-tune's optimizer chosen apart from the parent's (AdamW or MuonAdamW: the 2x2 of parent and fine-tune optimizers).
+--scratch trains the same cells from a fresh initialisation instead (no pretrained weights, the target's and the
+off-shellness statistics the probe's own), with the parent's config and HPs otherwise: whether fine-tuning a current
+pretraining beats training from scratch at small D (the user, 2026-10-26).
 The four probes are the dimensionless arm's median-MSE probe of each axis (H1 new combinations, H2 2->4, H3 the top,
 H5 one loop), fixed before any fine-tune ran.
 One CATFT JSON line per cell: the best-checkpoint val_loss_no_reg (the run's result file) and that times prepd_std^2,
@@ -35,17 +38,18 @@ def probe_recipe(probe, out):
     raise KeyError(f"{probe} is in no recipes/catalog_v3_heldout_*.yaml")
 
 
-def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name):
+def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False):
+    ft = [] if scratch else [
+        f"fine_tune.pretrained_path={os.path.abspath(parent)}/models/model_run0_best.pt",
+        "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", "fine_tune.target_stats=own",
+        "fine_tune.offshell_stats=parent"]
     return [sys.executable, os.path.join(ROOT, "run.py"), "--config-path", os.path.abspath(parent),
             "--config-name", "config", f"run_dir={run_dir}", "run_name=null", "warm_start_idx=null",
             f"exp_name={exp_name}", f"base_dir={ROOT}", "training.is_dyhpo_run=false", "training.increment_steps=null",
             f"training.iterations={T}", "training.validate_frac=0.01", "training.es_load_best_model=true",
             f"training.optimizer={optimizer}", f"training.result_path={result_path}",
             f"data.processes_file={recipe}", f"++data.train_subsample={D}", f"++data.eval_subsample={EVAL_EVENTS}",
-            "evaluation.train_subsample=2000", "plot=true",
-            f"fine_tune.pretrained_path={os.path.abspath(parent)}/models/model_run0_best.pt",
-            "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", "fine_tune.target_stats=own",
-            "fine_tune.offshell_stats=parent"]
+            "evaluation.train_subsample=2000", "plot=true"] + ft
 
 
 def main():
@@ -55,10 +59,12 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--probes", nargs="*", default=PROBES)
     ap.add_argument("--only", nargs="*", help="cells by tag (d2 d3 d4 d5)")
+    ap.add_argument("--scratch", action="store_true", help="fresh initialisation, no pretrained weights")
     ap.add_argument("--steps-cap", type=int, default=None, help="cap every cell's steps (the smoke test)")
     a = ap.parse_args()
     pname = os.path.basename(os.path.normpath(a.parent))
-    base = os.path.join(a.out, f"catft_{pname}_{a.optimizer}")
+    kind = "scratch" if a.scratch else "catft"
+    base = os.path.join(a.out, f"{kind}_{pname}_{a.optimizer}")
     os.makedirs(base, exist_ok=True)
     failed = 0
     for probe in a.probes:
@@ -69,11 +75,11 @@ def main():
             T = min(T, a.steps_cap) if a.steps_cap else T
             run_dir = os.path.join(base, f"{probe}_{tag}")
             res = run_dir + "_result.json"
-            rec = dict(parent=pname, optimizer=a.optimizer, probe=probe, tag=tag, D=D, steps=T)
+            rec = dict(kind=kind, parent=pname, optimizer=a.optimizer, probe=probe, tag=tag, D=D, steps=T)
             t0 = time.time()
             try:
                 p = subprocess.run(command(a.parent, a.optimizer, recipe, D, T, run_dir, res,
-                                           f"catft_{pname}_{a.optimizer}"), cwd=ROOT)
+                                           f"{kind}_{pname}_{a.optimizer}", a.scratch), cwd=ROOT)
                 if p.returncode:
                     raise RuntimeError(f"run.py exit {p.returncode}")
                 r = json.load(open(res))
