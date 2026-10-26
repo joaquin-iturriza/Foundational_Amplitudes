@@ -91,8 +91,11 @@ def main():
             flat[f"{sh}_{k}"] = round(v, 3) if isinstance(v, float) else v
     # the arms' signs on the held-out pools, against the data's floors on the same pools
     h5 = {key(r): r for r in sig["H5"]}
-    # a held-out pool of one sign in every event the scorer still reads as sign-changing (it resolves the sign on
-    # data this check does not see; not checked why): one sign per pool and the classifier make no error there
+    # a held-out pool of one sign in every validation and test event that the scorer still reads as sign-changing:
+    # the transform is resolved on every role of the pool (experiment._resolve_amp_preprocessing), the train split
+    # included, which this check does not read, and any non-positive value there makes it signed (an all-negative
+    # pool too, which has no plain log). The truth's sign is the raw amplitude's, so the arms' shares there are real
+    # errors; one sign per pool and the classifier make none. Per role, the negative share from the pool audit.
     one_sign = {key(r): {**r, "err_major": 0.0, "err_mlp": 0.0} for r in rows
                 if r["set"] == "H5" and "error" not in r and not r.get("signed")}
     h5all = {**one_sign, **h5}
@@ -129,6 +132,25 @@ def main():
     flat.update({"ccg_neg": round(100 * h5[cg]["neg"]), "ccg_mlp": round(100 * h5[cg]["err_mlp"], 1),
                  "ccg_wrong_min": round(100 * min(wc)), "ccg_wrong_max": round(100 * max(wc))})
     flat["n_one_sign_scored"] = len(out["one_sign_scored"])
+    audit = json.load(open(os.path.join(HERE, "pool_audit.json")))["pools"]
+    n_allneg = 0
+    for p, o in out["one_sign_scored"].items():
+        au = audit[one_sign[p]["name"]]
+        o["audit"] = {r: {"rows": au[r]["rows"], "negative": au[r]["negative"]} for r in ("train", "val", "test")}
+        if all(au[r]["negative"] == 1.0 for r in ("train", "val", "test")):
+            n_allneg += 1
+            wa = [o[a] for a in ARMS]
+            if max(wa) > 0.05:                        # the all-negative pool the arms get wrong
+                flat["neg_one_sign_pool"] = one_sign[p]["name"]
+                flat["neg_one_sign_wrong_min"] = round(100 * min(wa))
+                flat["neg_one_sign_wrong_max"] = round(100 * max(wa))
+        if one_sign[p]["neg"] == 0.0:                 # positive in val and test: the negatives are in train
+            tr = au["train"]
+            flat["pos_one_sign_pool"] = one_sign[p]["name"]
+            flat["pos_one_sign_train_neg"] = int(round(tr["negative"] * tr["rows"]))
+            flat["pos_one_sign_train_rows"] = tr["rows"]
+            flat["pos_one_sign_base_wrong"] = round(100 * o["baseline"])
+    flat["n_one_sign_allneg"] = n_allneg
     print("one sign in every event, scored as sign-changing:", json.dumps(out["one_sign_scored"]))
     print(json.dumps(flat))
 
