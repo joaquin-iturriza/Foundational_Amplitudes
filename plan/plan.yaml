@@ -874,9 +874,14 @@ entries:
     - signed_ab
   decisions:
   - D99
-  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
-    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
-    that decides'
+  next: 'Adapted to catalog_v4 (D166), waits for the user''s release of D114 and needs f24''s catalog_v4 mapped events first.
+    Already done on Daniel''s catalog (context run, 40 probes) and on catalog_v3 (--v3-nfinal 5, 40 2->5 probes, each short
+    run: the gain is gone for the dimensionless runs, 1.01 against 1.02, because the network''s own 2->4 error at the mapped
+    events, 0.51, is as large as what the factorisation removes). The design holds; at the same 4264 steps catalog_v3''s answer
+    predicts no gain, so it informs only whether catalog_v4''s network knows its 2->4 parents better (its forward and wide-energy
+    pools). What would run: a --v4-nfinal 5 mode in tools/factorised_2to4_net.py (parents from recipes/catalog_v4_train.yaml),
+    one GPU job per catalog_v4 short run (v4_dimensionless_muon seeds 42 and 43) on the 38 2->5 probes, under 1 GPU-h each,
+    about 2 GPU-h on CC.'
   done_when: null
   match: zz_factorised_2to4_net*
   notes_ref: null
