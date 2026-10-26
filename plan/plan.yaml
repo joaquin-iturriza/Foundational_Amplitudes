@@ -103,7 +103,10 @@ entries:
     with lr and warmup searched alongside them, since the blow-ups sit near the lr peak and the bounded head blew up at 646-691.
     Use MuonAdamW (D155) with a Muon baseline on the same target as the comparison point; the current sign arms are AdamW,
     so they are not comparable. The objective must include the sign, not val_loss_no_reg alone; this is a design point to
-    settle. Price it under 30 GPU-h: about 1.3 GPU-h per trial on a V100, so about 20 trials in all.'
+    settle. Price it under 30 GPU-h: about 1.3 GPU-h per trial on a V100, so about 20 trials in all.; SEARCH OBJECTIVE (main
+    session, a technical choice under D111 ''correct and simpler''): the total validation loss the model trains on, magnitude
+    MSE plus the sign head''s cross-entropy, on validation events of the training processes (never the held-out pools: tuning
+    on them would leak); the zero-shot sign and MSE reads of the best trial against a Muon baseline are the result'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
