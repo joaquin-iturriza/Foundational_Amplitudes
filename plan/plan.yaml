@@ -817,9 +817,16 @@ entries:
     - signed_ab
   decisions:
   - D83
-  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
-    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
-    that decides'
+  next: 'Adapted to catalog_v4 (D166), waits for the user''s release of D114. Already done twice: on Daniel''s 40 probes and
+    on catalog_v3''s 880 classes built as a 2->3 class plus g, a, Z or H (par. The factorised 2->4 head''s data check on catalog_v3).
+    The design holds; on catalog_v4 it reads 796 classes (280 g, 255 a, 150 Z, 111 H; 348 held out; 2 skipped, parent outside
+    the catalog) and the 38 2->5 probes (36 g, 2 a). Changes needed: a --v4 mode in tools/factorised_2to4.py (classes from
+    recipes/catalog_v4_roles.json and catalog_v4_processes.yaml, whose why fields carry the v4 parents); the b is massless
+    in catalog_v4 but keeps PDG 5, so the b-beam rule (abs(id)==5 -> beam_recoil_map) must go by mass and every beam takes
+    the Catani-Seymour map; parents are the v4 standalones with full coupling orders, so 388 mixed-order pools enter (the
+    correction gets the probe''s and parent''s order vectors as features); the forward component and the 6 TeV window put
+    more emissions where the map is exact. What would run: one CPU job on CC, 4 CPUs, about 10 h (catalog_v3''s took the same
+    for 880 classes), plus analysis/catalog_v4/factorised_2to4.py; no GPU.'
   done_when: null
   match: zz_factorised_2to4*
   notes_ref: null
