@@ -108,8 +108,10 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-2f7d86e7
-    commit: cdcfaf5
+    - FA-ccin2p3-6d35589c
+    commit: 44d24f4
     paths:
+    - analysis/catalog_v3/figs/prep_blend.png
     - analysis/catalog_v3/figs/prep_hybrid.png
     - tests/test_hybrid_blend.py
   dead_ends:
